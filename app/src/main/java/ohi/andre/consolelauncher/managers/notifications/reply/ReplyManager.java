@@ -145,6 +145,9 @@ public class ReplyManager implements XMLPrefsElement {
         List<Reply> enums = new ArrayList<>(Arrays.asList(Reply.values()));
 
         File file = new File(Tuils.getFolder(), PATH);
+        if (!file.exists()) {
+            XMLPrefsManager.resetFile(file, NAME);
+        }
 
         Object[] o;
         try {

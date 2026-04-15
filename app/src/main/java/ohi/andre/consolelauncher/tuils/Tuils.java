@@ -1491,24 +1491,35 @@ public class Tuils {
 
     private static final int FILEUPDATE_DELAY = 100;
     private static File folder = null;
+    private static final String FORK_FOLDER_NAME = "Re-T-UI";
 
     public static void init(Context context) {
         Log.e("TUI-INIT", "Starting Tuils.init()");
         try {
-            File root = Environment.getExternalStorageDirectory();
-            File newFolder = new File(root, "Re:T-UI");
+            File appExternalRoot = context.getExternalFilesDir(null);
+            if (appExternalRoot == null) {
+                appExternalRoot = context.getFilesDir();
+            }
+
+            File newFolder = new File(appExternalRoot, FORK_FOLDER_NAME);
             Log.e("TUI-INIT", "Target folder: " + newFolder.getAbsolutePath());
-            
+
             if (!newFolder.exists()) {
                 boolean created = newFolder.mkdirs();
                 Log.e("TUI-INIT", "Root folder created: " + created);
+            }
 
-                if (created) {
-                    File oldFolder = new File(root, "T-UI");
-                    if (oldFolder.exists() && oldFolder.isDirectory()) {
-                        Log.e("TUI-INIT", "Old T-UI folder found, migrating...");
-                        copyDirectory(oldFolder, newFolder);
-                    }
+            File sharedRoot = Environment.getExternalStorageDirectory();
+            File legacyForkFolder = new File(sharedRoot, "Re:T-UI");
+            File legacyOriginalFolder = new File(sharedRoot, "T-UI");
+
+            if (newFolder.exists() && isDirectoryEffectivelyEmpty(newFolder)) {
+                if (legacyForkFolder.exists() && legacyForkFolder.isDirectory()) {
+                    Log.e("TUI-INIT", "Legacy Re:T-UI folder found, migrating...");
+                    copyDirectory(legacyForkFolder, newFolder);
+                } else if (legacyOriginalFolder.exists() && legacyOriginalFolder.isDirectory()) {
+                    Log.e("TUI-INIT", "Old T-UI folder found, migrating...");
+                    copyDirectory(legacyOriginalFolder, newFolder);
                 }
             }
 
@@ -1529,6 +1540,11 @@ public class Tuils {
             Log.e("TUI-INIT", "Crash in Tuils.init", e);
             toFile(e);
         }
+    }
+
+    private static boolean isDirectoryEffectivelyEmpty(File dir) {
+        File[] files = dir.listFiles();
+        return files == null || files.length == 0;
     }
 
     public static void copyDirectory(File source, File target) throws IOException {

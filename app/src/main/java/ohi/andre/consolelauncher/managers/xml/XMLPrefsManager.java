@@ -131,6 +131,9 @@ public class XMLPrefsManager {
 
         @Override
         public void write(XMLPrefsSave save, String value) {
+            if (values == null) {
+                values = new XMLPrefsList();
+            }
             File f = new File(Tuils.getFolder(), path);
             set(f, save.label(), new String[] {VALUE_ATTRIBUTE}, new String[] {value});
             values.add(save.label(), value);
@@ -140,6 +143,9 @@ public class XMLPrefsManager {
         public XMLPrefsList getValues() {
             if (this == APPS && AppsManager.instance != null) {
                 return AppsManager.instance.getValues();
+            }
+            if (values == null) {
+                values = new XMLPrefsList();
             }
             return values;
         }
@@ -156,10 +162,11 @@ public class XMLPrefsManager {
         commonsLoaded = false;
 
         for(XMLPrefsRoot element : XMLPrefsRoot.values()) {
-            if (element.values != null && element.values.list != null) {
+            if (element.values == null) {
+                element.values = new XMLPrefsList();
+            } else if (element.values.list != null) {
                 element.values.list.clear();
             }
-            element.values = null;
         }
     }
 
@@ -178,6 +185,12 @@ public class XMLPrefsManager {
 
         for(XMLPrefsRoot element : XMLPrefsRoot.values()) {
             if (element == XMLPrefsRoot.APPS) continue;
+
+            if (element.values == null) {
+                element.values = new XMLPrefsList();
+            } else if (element.values.list != null) {
+                element.values.list.clear();
+            }
 
             File file = new File(folder, element.path);
             if(!file.exists()) {

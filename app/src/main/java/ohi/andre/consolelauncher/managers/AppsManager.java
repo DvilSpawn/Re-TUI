@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.content.pm.LauncherActivityInfo;
 import android.content.pm.LauncherApps;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -18,6 +19,7 @@ import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.os.Process;
+import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
@@ -33,6 +35,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -382,53 +385,72 @@ public class AppsManager implements XMLPrefsElement {
     }
 
     private List<LaunchInfo> createAppMap(PackageManager mgr) {
-        List<LaunchInfo> infos = new ArrayList<>();
+        LinkedHashMap<String, LaunchInfo> deduped = new LinkedHashMap<>();
+        LauncherApps launcherApps = null;
+        boolean canReadShortcuts = false;
 
-//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-//            LauncherApps launcherApps = (LauncherApps) context.getSystemService(Context.LAUNCHER_APPS_SERVICE);
-//
-//            List<PackageInfo> installedPackages = mgr.getInstalledPackages(0);
-//            List<LauncherActivityInfo> activityInfos = new ArrayList<>();
-//            for(PackageInfo info : installedPackages) {
-//                activityInfos.addAll(launcherApps.getActivityList(info.packageName, android.os.Process.myUserHandle()));
-//            }
-//        } else {
-            Intent i = new Intent(Intent.ACTION_MAIN);
-            i.addCategory(Intent.CATEGORY_LAUNCHER);
-
-            List<ResolveInfo> main;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             try {
-                main = mgr.queryIntentActivities(i, 0);
-            } catch (Exception e) {
-                return infos;
-            }
-//        }
+                launcherApps = (LauncherApps) context.getSystemService(Context.LAUNCHER_APPS_SERVICE);
+                canReadShortcuts = launcherApps != null
+                        && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1
+                        && Tuils.isMyLauncherDefault(context.getPackageManager());
+                List<LauncherActivityInfo> activities = launcherApps != null
+                        ? launcherApps.getActivityList(null, Process.myUserHandle())
+                        : null;
 
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1 && Tuils.isMyLauncherDefault(context.getPackageManager())) {
-            LauncherApps launcherApps = (LauncherApps) context.getSystemService(Context.LAUNCHER_APPS_SERVICE);
-            for (ResolveInfo ri : main) {
-                LaunchInfo li = new LaunchInfo(ri.activityInfo.packageName, ri.activityInfo.name, ri.loadLabel(mgr).toString());
-
-                try {
-                    LauncherApps.ShortcutQuery query = new LauncherApps.ShortcutQuery();
-                    query.setQueryFlags(LauncherApps.ShortcutQuery.FLAG_MATCH_MANIFEST | LauncherApps.ShortcutQuery.FLAG_MATCH_DYNAMIC);
-                    query.setPackage(li.componentName.getPackageName());
-                    li.setShortcuts(launcherApps.getShortcuts(query, Process.myUserHandle()));
-                } catch (Throwable e) {
-//                    Re:T-UI is not the default launcher
-                    Tuils.log(e);
+                if (activities != null) {
+                    for (LauncherActivityInfo activity : activities) {
+                        ComponentName component = activity.getComponentName();
+                        String label = activity.getLabel() != null ? activity.getLabel().toString() : component.getClassName();
+                        LaunchInfo li = new LaunchInfo(component.getPackageName(), component.getClassName(), label);
+                        maybeLoadShortcuts(launcherApps, li, canReadShortcuts);
+                        deduped.put(li.componentName.flattenToShortString(), li);
+                    }
                 }
-
-                infos.add(li);
-            }
-        } else {
-            for (ResolveInfo ri : main) {
-                LaunchInfo li = new LaunchInfo(ri.activityInfo.packageName, ri.activityInfo.name, ri.loadLabel(mgr).toString());
-                infos.add(li);
+            } catch (Throwable e) {
+                Tuils.log(e);
             }
         }
 
-        return infos;
+        Intent i = new Intent(Intent.ACTION_MAIN);
+        i.addCategory(Intent.CATEGORY_LAUNCHER);
+
+        List<ResolveInfo> main;
+        try {
+            main = mgr.queryIntentActivities(i, 0);
+        } catch (Exception e) {
+            return new ArrayList<>(deduped.values());
+        }
+
+        for (ResolveInfo ri : main) {
+            LaunchInfo li = new LaunchInfo(ri.activityInfo.packageName, ri.activityInfo.name, ri.loadLabel(mgr).toString());
+            if (launcherApps != null) {
+                maybeLoadShortcuts(launcherApps, li, canReadShortcuts);
+            }
+            deduped.put(li.componentName.flattenToShortString(), li);
+        }
+
+        Log.i("TUI-APPS", "Loaded " + deduped.size() + " launchable activities");
+
+        return new ArrayList<>(deduped.values());
+    }
+
+    private void maybeLoadShortcuts(LauncherApps launcherApps, LaunchInfo li, boolean canReadShortcuts) {
+        if (!canReadShortcuts || launcherApps == null || Build.VERSION.SDK_INT < Build.VERSION_CODES.N_MR1) {
+            return;
+        }
+
+        try {
+            LauncherApps.ShortcutQuery query = new LauncherApps.ShortcutQuery();
+            query.setQueryFlags(LauncherApps.ShortcutQuery.FLAG_MATCH_MANIFEST | LauncherApps.ShortcutQuery.FLAG_MATCH_DYNAMIC);
+            query.setPackage(li.componentName.getPackageName());
+            li.setShortcuts(launcherApps.getShortcuts(query, Process.myUserHandle()));
+        } catch (SecurityException e) {
+            Log.w("TUI-APPS", "Shortcut access denied for " + li.componentName.getPackageName());
+        } catch (Throwable e) {
+            Tuils.log(e);
+        }
     }
 
     private void appInstalled(String packageName) {

@@ -1350,11 +1350,13 @@ public class UIManager implements OnTouchListener {
             try {
                 asciiContent = Tuils.inputStreamToString(new FileInputStream(asciiFile));
                 asciiColor = XMLPrefsManager.getColor(Theme.ascii_color);
-                
-                TextView asciiView = labelViews[Label.ascii.ordinal()];
-                asciiView.setTypeface(Typeface.MONOSPACE);
-                
+
                 updateText(Label.ascii, Tuils.span(mContext, asciiContent, asciiColor, labelSizes[Label.ascii.ordinal()]));
+
+                TextView asciiView = getLabelView(Label.ascii);
+                if (asciiView != null) {
+                    asciiView.setTypeface(Typeface.MONOSPACE);
+                }
             } catch (Exception e) {
                 Log.e("TUI-UI", "Error loading ascii.txt", e);
             }
@@ -1876,4 +1878,3 @@ public class UIManager implements OnTouchListener {
         updateText(Label.unlock, s);
     }
 }
-
