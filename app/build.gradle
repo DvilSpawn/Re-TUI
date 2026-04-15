@@ -28,8 +28,8 @@ android {
         applicationId "com.dvil.tui_renewed"
         minSdk 21
         targetSdk 36
-        versionCode 303
-        versionName "v6.15.1-updated-v4"
+        versionCode 304
+        versionName "v6.15.1-updated-v5"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -55,7 +55,7 @@ android {
                 serviceCredentialsFile = "/Users/mako/Downloads/t-ui-renewed-firebase-adminsdk-fbsvc-3da60ffd6f.json"
                 artifactType = "APK"
                 testers = "mekiranjayan@gmail.com"
-                releaseNotes = "New ASCII art fix - Version v6.15.1-updated-v4"
+                releaseNotes = "Added swipe-down for notifications, customizable app launch output (%l, %p, %a), and fixed duplicate uninstall messages. - Version v6.15.1-updated-v5"
             }
         }
     }

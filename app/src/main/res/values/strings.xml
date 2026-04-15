@@ -349,6 +349,10 @@
         \n\nUsage:
         \n$ uninstall [appName]
     </string>
+    <string name="help_install">Search and install an application from the Play Store
+        \n\nUsage:
+        \n$ install [appName]
+    </string>
     <string name="help_wifi">Toggle wifi</string>
     <string name="help_sms">Send an SMS.
         \n\nUsage:
