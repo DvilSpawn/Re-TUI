@@ -28,8 +28,8 @@ android {
         applicationId "com.dvil.tui_renewed"
         minSdk 21
         targetSdk 36
-        versionCode 304
-        versionName "v6.15.1-updated-v5"
+        versionCode 306
+        versionName "v6.15.1-EXPERIMENTAL-v1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -55,7 +55,7 @@ android {
                 serviceCredentialsFile = "/Users/mako/Downloads/t-ui-renewed-firebase-adminsdk-fbsvc-3da60ffd6f.json"
                 artifactType = "APK"
                 testers = "mekiranjayan@gmail.com"
-                releaseNotes = "Added swipe-down for notifications, customizable app launch output (%l, %p, %a), and fixed duplicate uninstall messages. - Version v6.15.1-updated-v5"
+                releaseNotes = "v6.15.1-EXPERIMENTAL-v2: Implemented full Webhook system with template substitution and history-based argument suggestions."
             }
         }
     }

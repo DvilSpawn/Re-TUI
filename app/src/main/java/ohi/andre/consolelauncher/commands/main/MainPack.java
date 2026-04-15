@@ -18,6 +18,8 @@ import ohi.andre.consolelauncher.managers.RssManager;
 import ohi.andre.consolelauncher.managers.TerminalManager;
 import ohi.andre.consolelauncher.managers.flashlight.TorchManager;
 import ohi.andre.consolelauncher.managers.music.MusicManager2;
+import ohi.andre.consolelauncher.managers.WebhookManager;
+import ohi.andre.consolelauncher.managers.HistoryManager;
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager;
 import ohi.andre.consolelauncher.managers.xml.options.Behavior;
 import ohi.andre.consolelauncher.tuils.interfaces.Redirectator;
@@ -66,10 +68,13 @@ public class MainPack extends ExecutePack {
 
     public OkHttpClient client;
 
+    public WebhookManager webhookManager;
+    public HistoryManager historyManager;
+
     public int commandColor = TerminalManager.NO_COLOR;
 
     public MainPack(Context context, CommandGroup commandGroup, AliasManager alMgr, AppsManager appmgr, MusicManager2 p,
-                    ContactManager c, Redirectator redirectator, RssManager rssManager, OkHttpClient client) {
+                    ContactManager c, Redirectator redirectator, RssManager rssManager, OkHttpClient client, WebhookManager webhookManager, HistoryManager historyManager) {
         super(commandGroup);
 
         this.currentDirectory = XMLPrefsManager.get(File.class, Behavior.home_path);
@@ -77,6 +82,9 @@ public class MainPack extends ExecutePack {
         this.rssManager = rssManager;
 
         this.client = client;
+
+        this.webhookManager = webhookManager;
+        this.historyManager = historyManager;
 
         this.res = context.getResources();
 

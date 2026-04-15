@@ -32,6 +32,8 @@ import ohi.andre.consolelauncher.managers.TerminalManager;
 import ohi.andre.consolelauncher.managers.ThemeManager;
 import ohi.andre.consolelauncher.managers.TimeManager;
 import ohi.andre.consolelauncher.managers.TuiLocationManager;
+import ohi.andre.consolelauncher.managers.WebhookManager;
+import ohi.andre.consolelauncher.managers.HistoryManager;
 import ohi.andre.consolelauncher.managers.music.MusicManager2;
 import ohi.andre.consolelauncher.managers.music.MusicService;
 import ohi.andre.consolelauncher.managers.notifications.KeeperService;
@@ -127,6 +129,8 @@ public class MainManager {
     private MusicManager2 musicManager2;
     private ThemeManager themeManager;
     private HTMLExtractManager htmlExtractManager;
+    private WebhookManager webhookManager;
+    private HistoryManager historyManager;
 
     private BroadcastReceiver receiver;
 
@@ -198,8 +202,10 @@ public class MainManager {
         themeManager = new ThemeManager(client, mContext, c);
         musicManager2 = XMLPrefsManager.getBoolean(Behavior.enable_music) ? new MusicManager2(mContext) : null;
         htmlExtractManager = new HTMLExtractManager(mContext, client);
+        webhookManager = new WebhookManager(mContext);
+        historyManager = new HistoryManager();
 
-        mainPack = new MainPack(mContext, group, aliasManager, appsManager, musicManager2, contactManager, redirectator, rssManager, client);
+        mainPack = new MainPack(mContext, group, aliasManager, appsManager, musicManager2, contactManager, redirectator, rssManager, client, webhookManager, historyManager);
 
         ShellHolder shellHolder = new ShellHolder(mContext);
         interactive = shellHolder.build();

@@ -353,6 +353,22 @@
         \n\nUsage:
         \n$ install [appName]
     </string>
+    <string name="help_post">Send an HTTP POST request to a URL.
+        \n\nUsage:
+        \n$ post [url] [body]
+        \n\nExample:
+        \n$ post https://httpbin.org/post "hello world"
+    </string>
+    <string name="help_webhook">Manage and trigger webhooks.
+        \n\nUsage:
+        \n$ webhook -add [name] [url] [body_template]
+        \n$ webhook -rm [name]
+        \n$ webhook -ls
+        \n$ webhook [name] [args...]
+        \n\nExample:
+        \n$ webhook -add myhook https://example.com/post "{\"status\":\"%1\"}"
+        \n$ webhook myhook active
+    </string>
     <string name="help_wifi">Toggle wifi</string>
     <string name="help_sms">Send an SMS.
         \n\nUsage:

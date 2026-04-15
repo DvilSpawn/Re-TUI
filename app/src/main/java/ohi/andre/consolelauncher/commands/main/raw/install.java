@@ -47,7 +47,7 @@ public class install implements CommandAbstraction {
 
     @Override
     public int[] argType() {
-        return new int[]{CommandAbstraction.TEXT};
+        return new int[]{CommandAbstraction.PLAIN_TEXT};
     }
 
     @Override

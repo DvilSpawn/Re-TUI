@@ -791,6 +791,28 @@ public class SuggestionsManager {
             case CommandAbstraction.THEME_PRESET:
                 suggestThemePresets(suggestions, afterLastSpace, beforeLastSpace);
                 break;
+            case CommandAbstraction.TEXTLIST:
+                suggestWebhookHistory(info, suggestions, afterLastSpace, beforeLastSpace);
+                break;
+        }
+    }
+
+    private void suggestWebhookHistory(MainPack info, List<Suggestion> suggestions, String afterLastSpace, String beforeLastSpace) {
+        if (beforeLastSpace == null || beforeLastSpace.isEmpty()) return;
+
+        String[] split = beforeLastSpace.split(Tuils.SPACE);
+        if (split.length < 1 || !split[0].equalsIgnoreCase("webhook")) return;
+
+        String webhookName = split.length > 1 ? split[1] : null;
+        if (webhookName == null || webhookName.startsWith("-")) return;
+
+        List<String> history = info.historyManager.getHistory(webhookName);
+        if (history == null || history.isEmpty()) return;
+
+        for (String entry : history) {
+            if (afterLastSpace == null || afterLastSpace.isEmpty() || entry.startsWith(afterLastSpace)) {
+                suggestions.add(new Suggestion(beforeLastSpace, entry, clickToLaunch, Suggestion.TYPE_WEBHOOK_HISTORY));
+            }
         }
     }
 
@@ -1304,6 +1326,7 @@ public class SuggestionsManager {
         public static final int TYPE_COLOR = 14;
         public static final int TYPE_PERMANENT = 15;
         public static final int TYPE_CONFIGFILE = 16;
+        public static final int TYPE_WEBHOOK_HISTORY = 17;
 
         public String text, textBefore;
 
