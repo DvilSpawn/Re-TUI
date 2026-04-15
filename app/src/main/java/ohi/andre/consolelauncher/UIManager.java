@@ -1180,7 +1180,7 @@ public class UIManager implements OnTouchListener {
                     byte[] data = new byte[(int) asciiFile.length()];
                     fis.read(data);
                     fis.close();
-                    asciiContent = new String(data, "UTF-8");
+                    asciiContent = Tuils.NEWLINE + new String(data, "UTF-8");
                 } else {
                     asciiContent = "ascii.txt not found after creation attempt";
                 }
@@ -1348,7 +1348,7 @@ public class UIManager implements OnTouchListener {
             }
 
             try {
-                asciiContent = Tuils.inputStreamToString(new FileInputStream(asciiFile));
+                asciiContent = Tuils.NEWLINE + Tuils.inputStreamToString(new FileInputStream(asciiFile));
                 asciiColor = XMLPrefsManager.getColor(Theme.ascii_color);
 
                 updateText(Label.ascii, Tuils.span(mContext, asciiContent, asciiColor, labelSizes[Label.ascii.ordinal()]));
