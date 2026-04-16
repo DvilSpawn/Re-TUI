@@ -1042,6 +1042,11 @@ public class UIManager implements OnTouchListener {
         };
 
         LocalBroadcastManager.getInstance(context.getApplicationContext()).registerReceiver(receiver, filter);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            context.getApplicationContext().registerReceiver(receiver, filter, Context.RECEIVER_EXPORTED);
+        } else {
+            context.getApplicationContext().registerReceiver(receiver, filter);
+        }
 
         policy = (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
         component = new ComponentName(context, PolicyReceiver.class);
@@ -1650,14 +1655,14 @@ public class UIManager implements OnTouchListener {
 
         if (XMLPrefsManager.getBoolean(Behavior.show_music_widget)) {
             View musicWidget = inflater.inflate(R.layout.music_widget, rootView.findViewById(R.id.context_container), false);
+            int widgetColor = XMLPrefsManager.getColor(Theme.music_widget_color);
+            int buttonColor = XMLPrefsManager.getColor(Theme.music_widget_button_color);
+            int widgetBgColor = XMLPrefsManager.getColor(Theme.window_terminal_bg);
+
             LinearLayout contextContainer = rootView.findViewById(R.id.context_container);
             if (contextContainer != null) {
                 contextContainer.addView(musicWidget);
                 contextContainer.setVisibility(View.GONE);
-
-                int widgetColor = XMLPrefsManager.getColor(Theme.music_widget_color);
-                int buttonColor = XMLPrefsManager.getColor(Theme.music_widget_button_color);
-                int widgetBgColor = XMLPrefsManager.getColor(Theme.window_terminal_bg);
 
                 View borderView = musicWidget.findViewById(R.id.music_widget_border);
                 if (borderView != null) {

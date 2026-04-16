@@ -119,6 +119,7 @@ public class NotificationService extends NotificationListenerService {
             Intent intent = new Intent(MusicService.ACTION_MUSIC_CHANGED);
             intent.putExtra(MusicService.MUSIC_PLAYING, false);
             sendBroadcast(intent);
+            LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
             return;
         }
 
@@ -152,6 +153,7 @@ public class NotificationService extends NotificationListenerService {
             intent.putExtra(MusicService.SONG_POSITION, (int) position);
             intent.putExtra(MusicService.MUSIC_PLAYING, isPlaying);
             sendBroadcast(intent);
+            LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
         }
     }
 
