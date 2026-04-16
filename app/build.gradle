@@ -43,6 +43,12 @@ android {
             if (signingConfigs.release.storeFile != null && signingConfigs.release.storeFile.exists()) {
                 signingConfig signingConfigs.release
             }
+            firebaseAppDistribution {
+                serviceCredentialsFile = "/Users/mako/Downloads/t-ui-renewed-firebase-adminsdk-fbsvc-3da60ffd6f.json"
+                artifactType = "APK"
+                testers = "mekiranjayan@gmail.com"
+                releaseNotes = "Implement terminal-styled music player widget, ASCII borders, and enhanced battery progress bar"
+            }
         }
         release {
             minifyEnabled true
