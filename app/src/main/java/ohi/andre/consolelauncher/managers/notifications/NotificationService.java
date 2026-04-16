@@ -38,6 +38,7 @@ import java.util.regex.Pattern;
 
 import ohi.andre.consolelauncher.managers.TerminalManager;
 import ohi.andre.consolelauncher.managers.TimeManager;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import ohi.andre.consolelauncher.managers.music.MusicService;
 import ohi.andre.consolelauncher.managers.notifications.reply.ReplyManager;
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager;
