@@ -115,7 +115,12 @@ public class NotificationService extends NotificationListenerService {
     }
 
     private void broadcastMediaMetadata() {
-        if (activeControllers.isEmpty()) return;
+        if (activeControllers.isEmpty()) {
+            Intent intent = new Intent(MusicService.ACTION_MUSIC_CHANGED);
+            intent.putExtra(MusicService.MUSIC_PLAYING, false);
+            sendBroadcast(intent);
+            return;
+        }
 
         // Find the first playing controller, or fallback to the first one
         MediaController activeController = null;

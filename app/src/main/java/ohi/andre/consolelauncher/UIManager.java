@@ -977,6 +977,15 @@ public class UIManager implements OnTouchListener {
                     int position = intent.getIntExtra(SONG_POSITION, 0);
                     boolean isPlaying = intent.getBooleanExtra(MUSIC_PLAYING, false);
 
+                    LinearLayout contextContainer = rootView.findViewById(R.id.context_container);
+                    if (contextContainer != null) {
+                        if (isPlaying || (song != null && !song.isEmpty())) {
+                            contextContainer.setVisibility(View.VISIBLE);
+                        } else {
+                            contextContainer.setVisibility(View.GONE);
+                        }
+                    }
+
                     int widgetColor = XMLPrefsManager.getColor(Theme.music_widget_color);
                     int widgetBgColor = XMLPrefsManager.getColor(Theme.window_terminal_bg);
 
@@ -1644,7 +1653,7 @@ public class UIManager implements OnTouchListener {
             LinearLayout contextContainer = rootView.findViewById(R.id.context_container);
             if (contextContainer != null) {
                 contextContainer.addView(musicWidget);
-                contextContainer.setVisibility(View.VISIBLE);
+                contextContainer.setVisibility(View.GONE);
 
                 int widgetColor = XMLPrefsManager.getColor(Theme.music_widget_color);
                 int buttonColor = XMLPrefsManager.getColor(Theme.music_widget_button_color);

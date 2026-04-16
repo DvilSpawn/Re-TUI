@@ -264,6 +264,8 @@ public class MusicService extends Service implements
             player.release();
         } catch (Exception e) {}
 
+        songTitle = null;
+        broadcastMusicState();
         setSong(0);
     }
 
