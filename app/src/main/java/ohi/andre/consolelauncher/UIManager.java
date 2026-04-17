@@ -23,6 +23,7 @@ import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Handler;
 import androidx.core.app.ActivityCompat;
+import androidx.core.graphics.ColorUtils;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.core.view.GestureDetectorCompat;
 import android.text.SpannableString;
@@ -45,15 +46,19 @@ import ohi.andre.consolelauncher.commands.main.MainPack;
 import ohi.andre.consolelauncher.managers.AppsManager;
 import ohi.andre.consolelauncher.managers.music.MusicService;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
-import android.widget.GridView;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.AbsListView;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -80,6 +85,7 @@ import ohi.andre.consolelauncher.managers.xml.options.Theme;
 import ohi.andre.consolelauncher.managers.xml.options.Toolbar;
 import ohi.andre.consolelauncher.managers.xml.options.Ui;
 import ohi.andre.consolelauncher.tuils.AllowEqualsSequence;
+import ohi.andre.consolelauncher.tuils.MusicVisualizerView;
 import ohi.andre.consolelauncher.tuils.NetworkUtils;
 import ohi.andre.consolelauncher.tuils.OutlineEditText;
 import ohi.andre.consolelauncher.tuils.OutlineTextView;
@@ -103,12 +109,12 @@ public class UIManager implements OnTouchListener {
     public static String ACTION_WEATHER_DELAY = BuildConfig.APPLICATION_ID + "ui_weather_delay";
     public static String ACTION_WEATHER_MANUAL_UPDATE = BuildConfig.APPLICATION_ID + "ui_weather_update";
 
-    public static final String ACTION_MUSIC_CHANGED = "ohi.andre.consolelauncher.music_changed";
-    public static final String SONG_TITLE = "song_title";
-    public static final String SONG_SINGER = "song_singer";
-    public static final String SONG_DURATION = "song_duration";
-    public static final String SONG_POSITION = "song_position";
-    public static final String MUSIC_PLAYING = "music_playing";
+    public static final String ACTION_MUSIC_CHANGED = MusicService.ACTION_MUSIC_CHANGED;
+    public static final String SONG_TITLE = MusicService.SONG_TITLE;
+    public static final String SONG_SINGER = MusicService.SONG_SINGER;
+    public static final String SONG_DURATION = MusicService.SONG_DURATION;
+    public static final String SONG_POSITION = MusicService.SONG_POSITION;
+    public static final String MUSIC_PLAYING = MusicService.MUSIC_PLAYING;
 
     public static String FILE_NAME = "fileName";
     public static String PREFS_NAME = "ui";
@@ -140,14 +146,21 @@ public class UIManager implements OnTouchListener {
     private boolean swipeDownNotifications, swipeUpAppsDrawer;
     private GestureDetectorCompat gestureDetector;
     private View appsDrawerRoot;
-    private GridView appsGrid;
+    private ListView appsList;
+    private LinearLayout appsGroupTabs;
+    private LinearLayout appsAlphaTabs;
     private TextView appsDrawerHeader, appsDrawerFooter;
+    private AppsDrawerAdapter appsDrawerAdapter;
+    private final List<AppDrawerEntry> appsDrawerEntries = new ArrayList<>();
+    private final LinkedHashMap<String, Integer> appsDrawerAlphaPositions = new LinkedHashMap<>();
+    private final LinkedHashMap<String, TextView> appsDrawerAlphaViews = new LinkedHashMap<>();
+    private String selectedAppsDrawerGroup = null;
+    private String selectedAppsDrawerAlpha = null;
 
     SharedPreferences preferences;
 
     private InputMethodManager imm;
     private TerminalManager mTerminalAdapter;
-
     int mediumPercentage, lowPercentage;
     String batteryFormat;
 
@@ -177,7 +190,7 @@ public class UIManager implements OnTouchListener {
         public void run() {
             View musicWidget = mRootView.findViewById(R.id.music_widget);
             if (musicWidget != null && musicWidget.getVisibility() == View.VISIBLE) {
-                if (mainPack != null && mainPack.player != null) {
+                if (mainPack != null && mainPack.player != null && mainPack.player.isPlaying()) {
                     Intent intent = new Intent(ACTION_MUSIC_CHANGED);
                     int index = mainPack.player.getSongIndex();
                     if (index != -1) {
@@ -973,47 +986,37 @@ public class UIManager implements OnTouchListener {
                 } else if (action.equals(ACTION_MUSIC_CHANGED)) {
                     String song = intent.getStringExtra(SONG_TITLE);
                     String singer = intent.getStringExtra(SONG_SINGER);
-                    int duration = intent.getIntExtra(SONG_DURATION, 0);
-                    int position = intent.getIntExtra(SONG_POSITION, 0);
                     boolean isPlaying = intent.getBooleanExtra(MUSIC_PLAYING, false);
+                    boolean showMusicWidget = isPlaying && song != null && !song.isEmpty();
 
+                    View musicWidget = rootView.findViewById(R.id.music_widget);
                     LinearLayout contextContainer = rootView.findViewById(R.id.context_container);
+                    if (musicWidget != null) {
+                        musicWidget.setVisibility(showMusicWidget ? View.VISIBLE : View.GONE);
+                    }
                     if (contextContainer != null) {
-                        if (isPlaying || (song != null && !song.isEmpty())) {
-                            contextContainer.setVisibility(View.VISIBLE);
-                        } else {
-                            contextContainer.setVisibility(View.GONE);
-                        }
+                        contextContainer.setVisibility(showMusicWidget ? View.VISIBLE : View.GONE);
                     }
 
                     int widgetColor = XMLPrefsManager.getColor(Theme.music_widget_color);
                     int widgetBgColor = XMLPrefsManager.getColor(Theme.window_terminal_bg);
 
-                    if (song != null) {
-                        TextView songTitleView = rootView.findViewById(R.id.music_song_title);
-                        if (songTitleView != null) {
-                            songTitleView.setText("Now Playing: " + song.toUpperCase());
-                            songTitleView.setTextColor(widgetColor);
-                        }
-                    }
-                    if (singer != null) {
-                        TextView singerView = rootView.findViewById(R.id.music_singer);
-                        if (singerView != null) {
-                            singerView.setText("Singer      : " + singer.toUpperCase());
-                            singerView.setTextColor(widgetColor);
-                        }
+                    MusicVisualizerView visualizerView = rootView.findViewById(R.id.music_visualizer);
+                    if (visualizerView != null) {
+                        visualizerView.setBarColor(widgetColor);
+                        visualizerView.setPlaying(showMusicWidget);
                     }
 
-                    TextView timeView = rootView.findViewById(R.id.music_time);
-                    if (timeView != null) {
-                        String time = "Time        : " + Tuils.formatMillis(position) + "/" + Tuils.formatMillis(duration);
-                        timeView.setText(time);
-                        timeView.setTextColor(widgetColor);
+                    TextView songTitleView = rootView.findViewById(R.id.music_song_title);
+                    if (songTitleView != null) {
+                        songTitleView.setText(song != null ? "Now Playing: " + song.toUpperCase() : "Now Playing: -");
+                        songTitleView.setTextColor(widgetColor);
                     }
 
-                    TextView playPauseView = rootView.findViewById(R.id.music_play_pause);
-                    if (playPauseView != null) {
-                        playPauseView.setText(isPlaying ? "STOP" : "START");
+                    TextView singerView = rootView.findViewById(R.id.music_singer);
+                    if (singerView != null) {
+                        singerView.setText(singer != null ? "Singer      : " + singer.toUpperCase() : "Singer      : -");
+                        singerView.setTextColor(widgetColor);
                     }
 
                     View borderView = rootView.findViewById(R.id.music_widget_border);
@@ -1035,7 +1038,21 @@ public class UIManager implements OnTouchListener {
                     TextView widgetLabel = rootView.findViewById(R.id.music_widget_label);
                     if (widgetLabel != null) {
                         widgetLabel.setTextColor(widgetColor);
-                        widgetLabel.setBackgroundColor(widgetBgColor);
+                        try {
+                            GradientDrawable gd = (GradientDrawable) androidx.core.content.res.ResourcesCompat.getDrawable(
+                                    mContext.getResources(), R.drawable.apps_drawer_header_border, null).mutate();
+                            if (gd != null) {
+                                if (XMLPrefsManager.getBoolean(Ui.enable_dashed_border)) {
+                                    gd.setStroke((int) Tuils.dpToPx(mContext, 1.5f), widgetColor,
+                                            Tuils.dpToPx(mContext, XMLPrefsManager.getInt(Ui.dashed_border_dash_length)),
+                                            Tuils.dpToPx(mContext, XMLPrefsManager.getInt(Ui.dashed_border_gap_length)));
+                                } else {
+                                    gd.setStroke((int) Tuils.dpToPx(mContext, 1.5f), widgetColor);
+                                }
+                                gd.setColor(widgetBgColor);
+                                widgetLabel.setBackgroundDrawable(gd);
+                            }
+                        } catch (Exception ignored) {}
                     }
                 }
             }
@@ -1178,7 +1195,9 @@ public class UIManager implements OnTouchListener {
         }
 
         appsDrawerRoot = rootView.findViewById(R.id.apps_drawer_root);
-        appsGrid = rootView.findViewById(R.id.apps_grid);
+        appsList = rootView.findViewById(R.id.apps_list);
+        appsGroupTabs = rootView.findViewById(R.id.apps_group_tabs);
+        appsAlphaTabs = rootView.findViewById(R.id.apps_alpha_tabs);
         appsDrawerHeader = rootView.findViewById(R.id.apps_drawer_header);
         appsDrawerFooter = rootView.findViewById(R.id.apps_drawer_footer);
 
@@ -1656,7 +1675,6 @@ public class UIManager implements OnTouchListener {
         if (XMLPrefsManager.getBoolean(Behavior.show_music_widget)) {
             View musicWidget = inflater.inflate(R.layout.music_widget, rootView.findViewById(R.id.context_container), false);
             int widgetColor = XMLPrefsManager.getColor(Theme.music_widget_color);
-            int buttonColor = XMLPrefsManager.getColor(Theme.music_widget_button_color);
             int widgetBgColor = XMLPrefsManager.getColor(Theme.window_terminal_bg);
 
             LinearLayout contextContainer = rootView.findViewById(R.id.context_container);
@@ -1683,7 +1701,21 @@ public class UIManager implements OnTouchListener {
                 TextView widgetLabel = musicWidget.findViewById(R.id.music_widget_label);
                 if (widgetLabel != null) {
                     widgetLabel.setTextColor(widgetColor);
-                    widgetLabel.setBackgroundColor(widgetBgColor);
+                    try {
+                        GradientDrawable gd = (GradientDrawable) androidx.core.content.res.ResourcesCompat.getDrawable(
+                                mContext.getResources(), R.drawable.apps_drawer_header_border, null).mutate();
+                        if (gd != null) {
+                            if (useDashed) {
+                                gd.setStroke((int) Tuils.dpToPx(mContext, 1.5f), widgetColor,
+                                        Tuils.dpToPx(mContext, XMLPrefsManager.getInt(Ui.dashed_border_dash_length)),
+                                        Tuils.dpToPx(mContext, XMLPrefsManager.getInt(Ui.dashed_border_gap_length)));
+                            } else {
+                                gd.setStroke((int) Tuils.dpToPx(mContext, 1.5f), widgetColor);
+                            }
+                            gd.setColor(widgetBgColor);
+                            widgetLabel.setBackgroundDrawable(gd);
+                        }
+                    } catch (Exception ignored) {}
                 }
 
                 TextView songTitleView = musicWidget.findViewById(R.id.music_song_title);
@@ -1702,70 +1734,10 @@ public class UIManager implements OnTouchListener {
                     singerView.setTextColor(widgetColor);
                 }
 
-                TextView timeView = musicWidget.findViewById(R.id.music_time);
-                if (timeView != null) {
-                    timeView.setTextColor(widgetColor);
-                }
-
-                TextView prevBtn = musicWidget.findViewById(R.id.music_prev);
-                TextView nextBtn = musicWidget.findViewById(R.id.music_next);
-                TextView playPauseBtn = musicWidget.findViewById(R.id.music_play_pause);
-
-                if (prevBtn != null) {
-                    prevBtn.setTextColor(buttonColor);
-                    GradientDrawable gd = new GradientDrawable();
-                    gd.setShape(GradientDrawable.RECTANGLE);
-                    if (useDashed) {
-                        gd.setStroke((int) Tuils.dpToPx(mContext, 1.2f), buttonColor,
-                                Tuils.dpToPx(mContext, XMLPrefsManager.getInt(Ui.dashed_border_dash_length) / 2),
-                                Tuils.dpToPx(mContext, XMLPrefsManager.getInt(Ui.dashed_border_gap_length) / 2));
-                    } else {
-                        gd.setStroke((int) Tuils.dpToPx(mContext, 1.2f), buttonColor);
-                    }
-                    gd.setColor(Color.TRANSPARENT);
-                    prevBtn.setBackgroundDrawable(gd);
-                    prevBtn.setOnClickListener(v -> {
-                        if (mainPack.player != null) mainPack.player.playPrev();
-                    });
-                }
-
-                if (nextBtn != null) {
-                    nextBtn.setTextColor(buttonColor);
-                    GradientDrawable gd = new GradientDrawable();
-                    gd.setShape(GradientDrawable.RECTANGLE);
-                    if (useDashed) {
-                        gd.setStroke((int) Tuils.dpToPx(mContext, 1.2f), buttonColor,
-                                Tuils.dpToPx(mContext, XMLPrefsManager.getInt(Ui.dashed_border_dash_length) / 2),
-                                Tuils.dpToPx(mContext, XMLPrefsManager.getInt(Ui.dashed_border_gap_length) / 2));
-                    } else {
-                        gd.setStroke((int) Tuils.dpToPx(mContext, 1.2f), buttonColor);
-                    }
-                    gd.setColor(Color.TRANSPARENT);
-                    nextBtn.setBackgroundDrawable(gd);
-                    nextBtn.setOnClickListener(v -> {
-                        if (mainPack.player != null) mainPack.player.playNext();
-                    });
-                }
-
-                if (playPauseBtn != null) {
-                    playPauseBtn.setTextColor(buttonColor);
-                    GradientDrawable gd = new GradientDrawable();
-                    gd.setShape(GradientDrawable.RECTANGLE);
-                    if (useDashed) {
-                        gd.setStroke((int) Tuils.dpToPx(mContext, 1.2f), buttonColor,
-                                Tuils.dpToPx(mContext, XMLPrefsManager.getInt(Ui.dashed_border_dash_length) / 2),
-                                Tuils.dpToPx(mContext, XMLPrefsManager.getInt(Ui.dashed_border_gap_length) / 2));
-                    } else {
-                        gd.setStroke((int) Tuils.dpToPx(mContext, 1.2f), buttonColor);
-                    }
-                    gd.setColor(Color.TRANSPARENT);
-                    playPauseBtn.setBackgroundDrawable(gd);
-                    playPauseBtn.setOnClickListener(v -> {
-                        if (mainPack.player != null) {
-                            mainPack.player.play();
-                            playPauseBtn.setText(mainPack.player.isPlaying() ? "STOP" : "START");
-                        }
-                    });
+                MusicVisualizerView visualizerView = musicWidget.findViewById(R.id.music_visualizer);
+                if (visualizerView != null) {
+                    visualizerView.setBarColor(widgetColor);
+                    visualizerView.setPlaying(false);
                 }
             }
         }
@@ -1812,19 +1784,16 @@ public class UIManager implements OnTouchListener {
     }
 
     public void showAppsDrawer() {
-        if (appsDrawerRoot == null || appsGrid == null) return;
+        if (appsDrawerRoot == null || appsList == null) return;
 
         closeKeyboard();
 
         MainPack mainPack = mTerminalAdapter.getMainPack();
         if (mainPack == null || mainPack.appsManager == null) return;
 
-        List<AppsManager.LaunchInfo> apps = mainPack.appsManager.shownApps();
-        Collections.sort(apps, (a, b) -> a.publicLabel.compareToIgnoreCase(b.publicLabel));
-
         int drawerColor = XMLPrefsManager.getColor(Theme.apps_drawer_color);
         int widgetBgColor = XMLPrefsManager.getColor(Theme.window_terminal_bg);
-        
+
         appsDrawerHeader.setTextColor(drawerColor);
         appsDrawerFooter.setTextColor(drawerColor);
         appsDrawerHeader.setBackgroundColor(widgetBgColor);
@@ -1859,51 +1828,325 @@ public class UIManager implements OnTouchListener {
             }
         } catch (Exception e) {}
 
-        appsGrid.setAdapter(new AppsAdapter(mContext, apps, drawerColor));
-        appsGrid.setOnItemClickListener((parent, view, position, id) -> {
-            AppsManager.LaunchInfo app = apps.get(position);
-            Intent intent = mainPack.appsManager.getIntent(app);
-            if (intent != null) {
-                mContext.startActivity(intent);
-            }
-            hideAppsDrawer();
-        });
+        if (appsDrawerAdapter == null) {
+            appsDrawerAdapter = new AppsDrawerAdapter(mContext, drawerColor, widgetBgColor);
+            appsList.setAdapter(appsDrawerAdapter);
+            appsList.setOnItemClickListener((parent, view, position, id) -> {
+                AppDrawerEntry entry = appsDrawerEntries.get(position);
+                if (!(entry instanceof AppEntry)) {
+                    return;
+                }
 
-        appsDrawerHeader.setText("Applications/ [" + apps.size() + "]");
-        appsDrawerFooter.setText("total " + apps.size() + " [~]");
+                AppsManager.LaunchInfo app = ((AppEntry) entry).app;
+                Intent intent = mainPack.appsManager.getIntent(app);
+                if (intent != null) {
+                    mContext.startActivity(intent);
+                }
+                hideAppsDrawer();
+            });
+            appsList.setOnScrollListener(new AbsListView.OnScrollListener() {
+                @Override
+                public void onScrollStateChanged(AbsListView view, int scrollState) {
+                }
+
+                @Override
+                public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                    updateSelectedAlphaFromPosition(firstVisibleItem);
+                }
+            });
+        } else {
+            appsDrawerAdapter.setColors(drawerColor, widgetBgColor);
+        }
+
+        buildGroupTabs(mainPack.appsManager, drawerColor, widgetBgColor);
+        rebuildAppsDrawerContents(mainPack.appsManager, drawerColor, widgetBgColor);
         appsDrawerRoot.setVisibility(View.VISIBLE);
     }
 
-    private static class AppsAdapter extends android.widget.BaseAdapter {
-        private final Context context;
-        private final List<AppsManager.LaunchInfo> apps;
-        private final int color;
+    private void buildGroupTabs(AppsManager appsManager, int drawerColor, int widgetBgColor) {
+        if (appsGroupTabs == null) return;
 
-        public AppsAdapter(Context context, List<AppsManager.LaunchInfo> apps, int color) {
-            this.context = context;
-            this.apps = apps;
-            this.color = color;
+        appsGroupTabs.removeAllViews();
+
+        addGroupTab("ALL", null, drawerColor, widgetBgColor, true);
+
+        List<AppsManager.Group> groups = new ArrayList<>(appsManager.groups);
+        Collections.sort(groups, (a, b) -> Tuils.alphabeticCompare(a.name(), b.name()));
+        for (AppsManager.Group group : groups) {
+            String tabLabel = group.name().length() <= 3
+                    ? group.name().toUpperCase(Locale.getDefault())
+                    : group.name().substring(0, 3).toUpperCase(Locale.getDefault());
+            addGroupTab(tabLabel, group.name(), drawerColor, widgetBgColor, false);
+        }
+    }
+
+    private void addGroupTab(String label, String groupName, int drawerColor, int widgetBgColor, boolean isAll) {
+        TextView tab = new TextView(mContext);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        lp.bottomMargin = (int) Tuils.dpToPx(mContext, 6);
+        tab.setLayoutParams(lp);
+        tab.setGravity(Gravity.CENTER);
+        tab.setPadding((int) Tuils.dpToPx(mContext, 4), (int) Tuils.dpToPx(mContext, 8), (int) Tuils.dpToPx(mContext, 4), (int) Tuils.dpToPx(mContext, 8));
+        tab.setText(label);
+        tab.setMaxLines(1);
+        tab.setEllipsize(TextUtils.TruncateAt.END);
+        tab.setTextSize(9);
+        tab.setTypeface(Typeface.MONOSPACE, Typeface.BOLD);
+        tab.setMinHeight((int) Tuils.dpToPx(mContext, 40));
+
+        boolean selected = (isAll && selectedAppsDrawerGroup == null) || (groupName != null && groupName.equals(selectedAppsDrawerGroup));
+        int selectedColor = getDrawerSelectionColor(drawerColor, widgetBgColor);
+        int fgColor = drawerColor;
+        int bgColor = widgetBgColor;
+        if (groupName != null) {
+            AppsManager.Group group = findAppsGroup(groupName);
+            if (group != null) {
+                if (group.getForeColor() != Integer.MAX_VALUE) {
+                    fgColor = group.getForeColor();
+                }
+                if (group.getBgColor() != Integer.MAX_VALUE) {
+                    bgColor = group.getBgColor();
+                }
+            }
         }
 
-        @Override public int getCount() { return apps.size(); }
-        @Override public Object getItem(int position) { return apps.get(position); }
+        GradientDrawable bg = new GradientDrawable();
+        bg.setCornerRadius(Tuils.dpToPx(mContext, 2));
+        bg.setStroke((int) Tuils.dpToPx(mContext, 1.5f), drawerColor);
+        bg.setColor(selected ? selectedColor : bgColor);
+        tab.setBackground(bg);
+        tab.setTextColor(selected ? widgetBgColor : fgColor);
+        tab.setAlpha(1f);
+
+        tab.setOnClickListener(v -> {
+            selectedAppsDrawerGroup = groupName;
+            buildGroupTabs(mainPack.appsManager, drawerColor, widgetBgColor);
+            rebuildAppsDrawerContents(mainPack.appsManager, drawerColor, widgetBgColor);
+        });
+
+        appsGroupTabs.addView(tab);
+    }
+
+    private AppsManager.Group findAppsGroup(String name) {
+        if (mainPack == null || mainPack.appsManager == null) return null;
+        for (AppsManager.Group group : mainPack.appsManager.groups) {
+            if (group.name().equals(name)) {
+                return group;
+            }
+        }
+        return null;
+    }
+
+    private void rebuildAppsDrawerContents(AppsManager appsManager, int drawerColor, int widgetBgColor) {
+        List<AppsManager.LaunchInfo> visibleApps = getAppsForDrawer(appsManager);
+        appsDrawerEntries.clear();
+        appsDrawerAlphaPositions.clear();
+        selectedAppsDrawerAlpha = null;
+
+        String currentSection = null;
+        for (AppsManager.LaunchInfo app : visibleApps) {
+            String section = sectionForApp(app);
+            if (!section.equals(currentSection)) {
+                appsDrawerAlphaPositions.put(section, appsDrawerEntries.size());
+                appsDrawerEntries.add(new SectionEntry(section));
+                currentSection = section;
+            }
+            appsDrawerEntries.add(new AppEntry(app));
+        }
+
+        appsDrawerAdapter.notifyDataSetChanged();
+        buildAlphabetTabs(drawerColor, widgetBgColor);
+
+        String scope = selectedAppsDrawerGroup == null ? "all" : selectedAppsDrawerGroup;
+        appsDrawerHeader.setText("Applications/ [" + visibleApps.size() + "] <" + scope + ">");
+        appsDrawerFooter.setText("groups " + appsManager.groups.size() + " | tabs " + appsDrawerAlphaPositions.size());
+        appsList.setSelection(0);
+        updateSelectedAlphaFromPosition(0);
+    }
+
+    private List<AppsManager.LaunchInfo> getAppsForDrawer(AppsManager appsManager) {
+        List<AppsManager.LaunchInfo> apps = new ArrayList<>();
+
+        if (selectedAppsDrawerGroup == null) {
+            apps.addAll(appsManager.shownApps());
+        } else {
+            AppsManager.Group group = findAppsGroup(selectedAppsDrawerGroup);
+            if (group != null) {
+                List<? extends Object> members = group.members();
+                for (Object member : members) {
+                    if (member instanceof AppsManager.LaunchInfo) {
+                        apps.add((AppsManager.LaunchInfo) member);
+                    }
+                }
+            }
+        }
+
+        Collections.sort(apps, (a, b) -> Tuils.alphabeticCompare(a.publicLabel, b.publicLabel));
+        return apps;
+    }
+
+    private String sectionForApp(AppsManager.LaunchInfo app) {
+        if (app == null || app.publicLabel == null || app.publicLabel.length() == 0) {
+            return "#";
+        }
+
+        char first = Character.toUpperCase(app.publicLabel.charAt(0));
+        if (first < 'A' || first > 'Z') {
+            return "#";
+        }
+        return String.valueOf(first);
+    }
+
+    private void buildAlphabetTabs(int drawerColor, int widgetBgColor) {
+        if (appsAlphaTabs == null) return;
+
+        appsAlphaTabs.removeAllViews();
+        appsDrawerAlphaViews.clear();
+        for (Map.Entry<String, Integer> entry : appsDrawerAlphaPositions.entrySet()) {
+            TextView tab = new TextView(mContext);
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f);
+            lp.bottomMargin = (int) Tuils.dpToPx(mContext, 3);
+            tab.setLayoutParams(lp);
+            tab.setGravity(Gravity.CENTER);
+            tab.setMinHeight(0);
+            tab.setMinimumHeight(0);
+            tab.setPadding(0, 0, 0, 0);
+            tab.setText(entry.getKey());
+            tab.setTypeface(Typeface.MONOSPACE, Typeface.BOLD);
+            tab.setTextSize(9.5f);
+            styleAlphaTab(tab, entry.getKey(), drawerColor, widgetBgColor);
+            tab.setOnClickListener(v -> {
+                appsList.setSelection(entry.getValue());
+                updateSelectedAlpha(entry.getKey());
+            });
+            appsDrawerAlphaViews.put(entry.getKey(), tab);
+            appsAlphaTabs.addView(tab);
+        }
+    }
+
+    private void styleAlphaTab(TextView tab, String letter, int drawerColor, int widgetBgColor) {
+        boolean selected = letter != null && letter.equals(selectedAppsDrawerAlpha);
+        tab.setTextColor(selected ? widgetBgColor : drawerColor);
+        int selectedColor = getDrawerSelectionColor(drawerColor, widgetBgColor);
+
+        GradientDrawable bg = new GradientDrawable();
+        bg.setCornerRadius(Tuils.dpToPx(mContext, 2));
+        bg.setStroke((int) Tuils.dpToPx(mContext, 1.2f), drawerColor);
+        bg.setColor(selected ? selectedColor : widgetBgColor);
+        tab.setBackground(bg);
+    }
+
+    private int getDrawerSelectionColor(int drawerColor, int widgetBgColor) {
+        float[] hsv = new float[3];
+        Color.colorToHSV(drawerColor, hsv);
+        hsv[1] = Math.max(0f, hsv[1] * 0.55f);
+        hsv[2] = Math.min(1f, 0.88f + (0.12f * hsv[2]));
+        int lightBase = Color.HSVToColor(hsv);
+        return ColorUtils.blendARGB(lightBase, widgetBgColor, 0.18f);
+    }
+
+    private void updateSelectedAlphaFromPosition(int position) {
+        if (position < 0 || position >= appsDrawerEntries.size()) {
+            return;
+        }
+
+        for (int i = position; i < appsDrawerEntries.size(); i++) {
+            AppDrawerEntry entry = appsDrawerEntries.get(i);
+            if (entry instanceof SectionEntry) {
+                updateSelectedAlpha(((SectionEntry) entry).title);
+                return;
+            }
+        }
+    }
+
+    private void updateSelectedAlpha(String letter) {
+        if (letter == null || letter.equals(selectedAppsDrawerAlpha)) {
+            return;
+        }
+
+        selectedAppsDrawerAlpha = letter;
+        int drawerColor = XMLPrefsManager.getColor(Theme.apps_drawer_color);
+        int widgetBgColor = XMLPrefsManager.getColor(Theme.window_terminal_bg);
+        for (Map.Entry<String, TextView> entry : appsDrawerAlphaViews.entrySet()) {
+            styleAlphaTab(entry.getValue(), entry.getKey(), drawerColor, widgetBgColor);
+        }
+    }
+
+    private abstract static class AppDrawerEntry {
+        abstract int getViewType();
+    }
+
+    private static class SectionEntry extends AppDrawerEntry {
+        final String title;
+
+        SectionEntry(String title) {
+            this.title = title;
+        }
+
+        @Override
+        int getViewType() {
+            return 0;
+        }
+    }
+
+    private static class AppEntry extends AppDrawerEntry {
+        final AppsManager.LaunchInfo app;
+
+        AppEntry(AppsManager.LaunchInfo app) {
+            this.app = app;
+        }
+
+        @Override
+        int getViewType() {
+            return 1;
+        }
+    }
+
+    private class AppsDrawerAdapter extends android.widget.BaseAdapter {
+        private final Context context;
+        private int color;
+        private int bgColor;
+
+        AppsDrawerAdapter(Context context, int color, int bgColor) {
+            this.context = context;
+            this.color = color;
+            this.bgColor = bgColor;
+        }
+
+        void setColors(int color, int bgColor) {
+            this.color = color;
+            this.bgColor = bgColor;
+        }
+
+        @Override public int getCount() { return appsDrawerEntries.size(); }
+        @Override public Object getItem(int position) { return appsDrawerEntries.get(position); }
         @Override public long getItemId(int position) { return position; }
+        @Override public int getViewTypeCount() { return 2; }
+        @Override public int getItemViewType(int position) { return appsDrawerEntries.get(position).getViewType(); }
+        @Override public boolean isEnabled(int position) { return getItemViewType(position) == 1; }
 
         @Override
         public View getView(int position, View convertView, android.view.ViewGroup parent) {
-            TextView tv;
-            if (convertView == null) {
-                tv = new TextView(context);
-                tv.setLayoutParams(new GridView.LayoutParams(GridView.LayoutParams.MATCH_PARENT, GridView.LayoutParams.WRAP_CONTENT));
-                tv.setPadding(8, 8, 8, 8);
+            AppDrawerEntry entry = appsDrawerEntries.get(position);
+            TextView tv = convertView instanceof TextView ? (TextView) convertView : new TextView(context);
+
+            if (entry instanceof SectionEntry) {
+                tv.setPadding(0, (int) Tuils.dpToPx(context, 8), 0, (int) Tuils.dpToPx(context, 6));
                 tv.setTextColor(color);
-                tv.setTextSize(16);
-                tv.setTypeface(android.graphics.Typeface.MONOSPACE);
-            } else {
-                tv = (TextView) convertView;
-                tv.setTextColor(color);
+                tv.setTextSize(12);
+                tv.setTypeface(Typeface.MONOSPACE, Typeface.BOLD);
+                tv.setBackgroundColor(Color.TRANSPARENT);
+                tv.setText("[" + ((SectionEntry) entry).title + "]");
+                return tv;
             }
-            tv.setText(apps.get(position).publicLabel);
+
+            AppsManager.LaunchInfo app = ((AppEntry) entry).app;
+            tv.setPadding((int) Tuils.dpToPx(context, 6), (int) Tuils.dpToPx(context, 12), (int) Tuils.dpToPx(context, 6), (int) Tuils.dpToPx(context, 12));
+            tv.setTextColor(color);
+            tv.setTextSize(16);
+            tv.setTypeface(Typeface.MONOSPACE);
+            tv.setBackgroundColor(Color.TRANSPARENT);
+            tv.setText(app.publicLabel);
             return tv;
         }
     }
@@ -2018,6 +2261,9 @@ public class UIManager implements OnTouchListener {
         if(suggestionsManager != null) suggestionsManager.dispose();
         if(notesManager != null) notesManager.dispose(mContext);
         LocalBroadcastManager.getInstance(mContext.getApplicationContext()).unregisterReceiver(receiver);
+        try {
+            mContext.getApplicationContext().unregisterReceiver(receiver);
+        } catch (Exception ignored) {}
         Tuils.unregisterBatteryReceiver(mContext);
 
         Tuils.cancelFont();

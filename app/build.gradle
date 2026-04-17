@@ -28,8 +28,8 @@ android {
         applicationId "com.dvil.tui_renewed"
         minSdk 21
         targetSdk 36
-        versionCode 313
-        versionName "v6.15.5-STABLE"
+        versionCode 314
+        versionName "v6.15.6-STABLE"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -61,7 +61,7 @@ android {
                 serviceCredentialsFile = "/Users/mako/Downloads/t-ui-renewed-firebase-adminsdk-fbsvc-3da60ffd6f.json"
                 artifactType = "APK"
                 testers = "mekiranjayan@gmail.com"
-                releaseNotes = "v6.15.5-STABLE: Stabilized external music widget updates and retained webhook fixes."
+                releaseNotes = "v6.15.6-STABLE: Refined the app drawer window treatment and polished the terminal-style music widget."
             }
         }
     }

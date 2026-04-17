@@ -3,7 +3,7 @@
     android:id="@+id/apps_drawer_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#E6000000"
+    android:background="#77000000"
     android:visibility="gone"
     android:clickable="true"
     android:focusable="true">
@@ -21,19 +21,26 @@
         android:layout_height="match_parent"
         android:layout_above="@id/apps_drawer_dummy_input_anchor"
         android:orientation="vertical"
-        android:layout_margin="16dp"
+        android:layout_marginStart="28dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="28dp"
+        android:layout_marginBottom="8dp"
         android:background="@drawable/apps_drawer_border"
         android:padding="2dp">
 
-        <GridView
-            android:id="@+id/apps_grid"
+        <ListView
+            android:id="@+id/apps_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:numColumns="2"
-            android:padding="12dp"
-            android:horizontalSpacing="16dp"
-            android:verticalSpacing="8dp"
-            android:stretchMode="columnWidth" />
+            android:divider="@android:color/transparent"
+            android:dividerHeight="0dp"
+            android:fastScrollEnabled="false"
+            android:listSelector="@android:color/transparent"
+            android:paddingStart="112dp"
+            android:paddingTop="14dp"
+            android:paddingEnd="42dp"
+            android:paddingBottom="12dp"
+            android:scrollbars="none" />
 
     </LinearLayout>
 
@@ -54,6 +61,43 @@
         android:textColor="#A5D6A7"
         android:textSize="14sp"
         android:fontFamily="monospace" />
+
+    <ScrollView
+        android:id="@+id/apps_group_tabs_scroll"
+        android:layout_width="84dp"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/apps_drawer_container"
+        android:layout_alignStart="@id/apps_drawer_container"
+        android:layout_marginStart="-10dp"
+        android:layout_marginTop="18dp"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:id="@+id/apps_group_tabs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+    </ScrollView>
+
+    <LinearLayout
+        android:id="@+id/apps_alpha_tabs_scroll"
+        android:layout_width="40dp"
+        android:layout_height="match_parent"
+        android:layout_alignTop="@id/apps_drawer_container"
+        android:layout_alignBottom="@id/apps_drawer_container"
+        android:layout_alignEnd="@id/apps_drawer_container"
+        android:layout_marginEnd="-10dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
+        android:gravity="center_vertical"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/apps_alpha_tabs"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/apps_drawer_footer"

@@ -40,6 +40,14 @@ public class MusicService extends Service implements
     public static final String SONG_DURATION = "song_duration";
     public static final String SONG_POSITION = "song_position";
     public static final String MUSIC_PLAYING = "music_playing";
+    public static final String MUSIC_SOURCE = "music_source";
+    public static final String SOURCE_INTERNAL = "internal";
+    public static final String SOURCE_EXTERNAL = "external";
+    public static final String ACTION_MUSIC_CONTROL = "ohi.andre.consolelauncher.music_control";
+    public static final String MUSIC_CONTROL = "music_control";
+    public static final String CONTROL_PREVIOUS = "previous";
+    public static final String CONTROL_PLAY_PAUSE = "play_pause";
+    public static final String CONTROL_NEXT = "next";
 
     public static final int NOTIFY_ID=100001;
 
@@ -83,6 +91,7 @@ public class MusicService extends Service implements
         intent.putExtra(MUSIC_PLAYING, isPng());
         intent.putExtra(SONG_POSITION, getPosn());
         intent.putExtra(SONG_DURATION, getDur());
+        intent.putExtra(MUSIC_SOURCE, SOURCE_INTERNAL);
         
         if (songs != null && songPosn >= 0 && songPosn < songs.size()) {
             Song s = songs.get(songPosn);
@@ -146,6 +155,7 @@ public class MusicService extends Service implements
         }
 
         Song playSong = songs.get(songPosn);
+        songTitle = playSong.getTitle();
 
         long id = playSong.getID();
         if(id == -1) {
@@ -158,7 +168,6 @@ public class MusicService extends Service implements
                 return null;
             }
         } else {
-            songTitle=playSong.getTitle();
             long currSong = playSong.getID();
             Uri trackUri = ContentUris.withAppendedId(android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, currSong);
             try {

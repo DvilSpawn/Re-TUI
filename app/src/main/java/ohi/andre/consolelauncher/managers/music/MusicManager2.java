@@ -51,6 +51,7 @@ public class MusicManager2 implements MediaController.MediaPlayerControl {
     String savedParam;
 
     BroadcastReceiver headsetBroadcast;
+    boolean headsetReceiverRegistered;
 
     public MusicManager2(Context c) {
         mContext = c;
@@ -63,14 +64,7 @@ public class MusicManager2 implements MediaController.MediaPlayerControl {
             }
         };
 
-        String action;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            action = AudioManager.ACTION_HEADSET_PLUG;
-        } else {
-            action = Intent.ACTION_HEADSET_PLUG;
-        }
-
-        mContext.getApplicationContext().registerReceiver(headsetBroadcast, new IntentFilter(action));
+        registerHeadsetReceiver();
 
         init();
     }
@@ -84,6 +78,7 @@ public class MusicManager2 implements MediaController.MediaPlayerControl {
     public void refresh() {
         destroy();
         updateSongs();
+        registerHeadsetReceiver();
     }
 
     public void destroy() {
@@ -94,15 +89,41 @@ public class MusicManager2 implements MediaController.MediaPlayerControl {
             musicSrv = null;
         }
 
+        unregisterHeadsetReceiver();
+
+        musicBound = false;
+        playbackPaused = true;
+        stopped = true;
+    }
+
+    private void registerHeadsetReceiver() {
+        if (headsetReceiverRegistered) {
+            return;
+        }
+
+        String action;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            action = AudioManager.ACTION_HEADSET_PLUG;
+        } else {
+            action = Intent.ACTION_HEADSET_PLUG;
+        }
+
+        mContext.getApplicationContext().registerReceiver(headsetBroadcast, new IntentFilter(action));
+        headsetReceiverRegistered = true;
+    }
+
+    private void unregisterHeadsetReceiver() {
+        if (!headsetReceiverRegistered) {
+            return;
+        }
+
         try {
             mContext.getApplicationContext().unregisterReceiver(headsetBroadcast);
         } catch (Exception e) {
             Tuils.log(e);
         }
 
-        musicBound = false;
-        playbackPaused = true;
-        stopped = true;
+        headsetReceiverRegistered = false;
     }
 
     public String playNext() {

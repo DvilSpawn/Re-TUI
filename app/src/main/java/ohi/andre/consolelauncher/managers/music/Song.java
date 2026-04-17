@@ -31,6 +31,7 @@ public class Song implements StringableObject  {
         this.path = file.getAbsolutePath();
         this.id = -1;
         this.singer = "Unknown";
+        this.lowercaseTitle = title.toLowerCase();
     }
 
     public long getID() {
@@ -59,4 +60,3 @@ public class Song implements StringableObject  {
         return title;
     }
 }
-

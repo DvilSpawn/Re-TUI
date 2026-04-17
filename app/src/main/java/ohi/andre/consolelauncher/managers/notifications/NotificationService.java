@@ -140,16 +140,10 @@ public class NotificationService extends NotificationListenerService {
 
         cancelExternalMusicClear();
 
-        // Find the first playing controller, or fallback to the first one
-        MediaController activeController = null;
-        for (MediaController controller : activeControllers) {
-            PlaybackState state = controller.getPlaybackState();
-            if (state != null && state.getState() == PlaybackState.STATE_PLAYING) {
-                activeController = controller;
-                break;
-            }
+        MediaController activeController = resolveActiveController();
+        if (activeController == null) {
+            return;
         }
-        if (activeController == null) activeController = activeControllers.get(0);
 
         MediaMetadata metadata = activeController.getMetadata();
         PlaybackState state = activeController.getPlaybackState();
@@ -164,21 +158,30 @@ public class NotificationService extends NotificationListenerService {
             int duration = (int) metadata.getLong(MediaMetadata.METADATA_KEY_DURATION);
             rememberMediaState(title, artist, duration, position);
             sendMusicBroadcast(title, artist, duration, position, isPlaying);
-            if (!isPlaying) {
-                scheduleExternalMusicClear();
-            }
             return;
         }
 
         if (hasLastMediaState) {
             sendMusicBroadcast(lastMediaTitle, lastMediaArtist, lastMediaDuration, position, isPlaying);
             lastMediaPosition = position;
-            if (!isPlaying) {
-                scheduleExternalMusicClear();
-            }
         } else if (!isPlaying) {
             sendMusicBroadcast(null, null, 0, 0, false);
         }
+    }
+
+    private MediaController resolveActiveController() {
+        MediaController activeController = null;
+        for (MediaController controller : activeControllers) {
+            PlaybackState state = controller.getPlaybackState();
+            if (state != null && state.getState() == PlaybackState.STATE_PLAYING) {
+                activeController = controller;
+                break;
+            }
+        }
+        if (activeController == null && !activeControllers.isEmpty()) {
+            activeController = activeControllers.get(0);
+        }
+        return activeController;
     }
 
     private void rememberMediaState(String title, String artist, int duration, int position) {
@@ -217,7 +220,6 @@ public class NotificationService extends NotificationListenerService {
         intent.putExtra(MusicService.SONG_DURATION, duration);
         intent.putExtra(MusicService.SONG_POSITION, position);
         intent.putExtra(MusicService.MUSIC_PLAYING, isPlaying);
-        sendBroadcast(intent);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
