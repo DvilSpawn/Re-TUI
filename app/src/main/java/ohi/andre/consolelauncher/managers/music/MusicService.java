@@ -35,6 +35,8 @@ public class MusicService extends Service implements
         MediaPlayer.OnCompletionListener {
 
     public static final String ACTION_MUSIC_CHANGED = "ohi.andre.consolelauncher.music_changed";
+    public static final String ACTION_MUSIC_CONTROL = "ohi.andre.consolelauncher.music_control";
+    
     public static final String SONG_TITLE = "song_title";
     public static final String SONG_SINGER = "song_singer";
     public static final String SONG_DURATION = "song_duration";
@@ -43,11 +45,15 @@ public class MusicService extends Service implements
     public static final String MUSIC_SOURCE = "music_source";
     public static final String SOURCE_INTERNAL = "internal";
     public static final String SOURCE_EXTERNAL = "external";
-    public static final String ACTION_MUSIC_CONTROL = "ohi.andre.consolelauncher.music_control";
     public static final String MUSIC_CONTROL = "music_control";
     public static final String CONTROL_PREVIOUS = "previous";
     public static final String CONTROL_PLAY_PAUSE = "play_pause";
     public static final String CONTROL_NEXT = "next";
+
+    public static final String EXTRA_CONTROL_CMD = "control_cmd";
+    public static final int CONTROL_NEXT_INT = 1;
+    public static final int CONTROL_PREV_INT = 2;
+    public static final int CONTROL_PLAY_PAUSE_INT = 3;
 
     public static final int NOTIFY_ID=100001;
 

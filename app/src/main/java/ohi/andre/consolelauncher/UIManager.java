@@ -124,6 +124,9 @@ public class UIManager implements OnTouchListener {
     public static final String EXTRA_NOTIFICATION_LIST = NotificationService.EXTRA_NOTIFICATION_LIST;
     public static final String ACTION_REQUEST_NOTIFICATION_FEED = NotificationService.ACTION_REQUEST_NOTIFICATION_FEED;
 
+    public static final String ACTION_NOTIFICATION_RECEIVED = BuildConfig.APPLICATION_ID + ".ui_notification_received";
+    public static final String NOTIFICATION_TEXT = "notification_text";
+
     public static String FILE_NAME = "fileName";
     public static String PREFS_NAME = "ui";
 
@@ -194,25 +197,30 @@ public class UIManager implements OnTouchListener {
     private NotesManager notesManager;
     private NotesRunnable notesRunnable;
 
+    private String activeMusicSource = "internal";
+
     private final Runnable musicTimeRunnable = new Runnable() {
         @Override
         public void run() {
-            View musicWidget = mRootView.findViewById(R.id.music_widget);
-            if (musicWidget != null && musicWidget.getVisibility() == View.VISIBLE) {
-                if (mainPack != null && mainPack.player != null && mainPack.player.isPlaying()) {
-                    Intent intent = new Intent(ACTION_MUSIC_CHANGED);
-                    int index = mainPack.player.getSongIndex();
-                    if (index != -1) {
-                        ohi.andre.consolelauncher.managers.music.Song song = mainPack.player.get(index);
-                        if (song != null) {
-                            intent.putExtra(SONG_TITLE, song.getTitle());
-                            intent.putExtra(SONG_SINGER, song.getSinger());
+            if ("internal".equals(activeMusicSource)) {
+                View musicWidget = mRootView.findViewById(R.id.music_widget);
+                if (musicWidget != null && musicWidget.getVisibility() == View.VISIBLE) {
+                    if (mainPack != null && mainPack.player != null && mainPack.player.isPlaying()) {
+                        Intent intent = new Intent(ACTION_MUSIC_CHANGED);
+                        int index = mainPack.player.getSongIndex();
+                        if (index != -1) {
+                            ohi.andre.consolelauncher.managers.music.Song song = mainPack.player.get(index);
+                            if (song != null) {
+                                intent.putExtra(SONG_TITLE, song.getTitle());
+                                intent.putExtra(SONG_SINGER, song.getSinger());
+                            }
                         }
+                        intent.putExtra(SONG_DURATION, mainPack.player.getDuration());
+                        intent.putExtra(SONG_POSITION, mainPack.player.getCurrentPosition());
+                        intent.putExtra(MUSIC_PLAYING, mainPack.player.isPlaying());
+                        intent.putExtra("source", "internal");
+                        LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
                     }
-                    intent.putExtra(SONG_DURATION, mainPack.player.getDuration());
-                    intent.putExtra(SONG_POSITION, mainPack.player.getCurrentPosition());
-                    intent.putExtra(MUSIC_PLAYING, mainPack.player.isPlaying());
-                    LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
                 }
             }
             handler.postDelayed(this, 1000);
@@ -1101,10 +1109,39 @@ public class UIManager implements OnTouchListener {
                     weatherRunnable = new WeatherRunnable();
                     handler.post(weatherRunnable);
                 } else if (action.equals(ACTION_MUSIC_CHANGED)) {
+                    Log.d("TUI-Music", "UIManager received music change broadcast");
                     String song = intent.getStringExtra(SONG_TITLE);
                     String singer = intent.getStringExtra(SONG_SINGER);
                     boolean isPlaying = intent.getBooleanExtra(MUSIC_PLAYING, false);
-                    boolean showMusicWidget = isPlaying && song != null && !song.isEmpty();
+                    String source = intent.getStringExtra(MusicService.MUSIC_SOURCE);
+                    String pkg = intent.getStringExtra("package");
+
+                    String preferredPkg = XMLPrefsManager.get(Behavior.preferred_music_app);
+                    boolean isPreferred = TextUtils.isEmpty(preferredPkg) || preferredPkg.equals(pkg);
+
+                    // Source logic: external always wins if it is playing.
+                    // Internal only wins if it's playing and external is not.
+                    if (source != null) {
+                        if (MusicService.SOURCE_EXTERNAL.equals(source)) {
+                            // Strictly filter external source if a preferred app is set
+                            if (!isPreferred) {
+                                isPlaying = false;
+                                song = null;
+                            }
+                            activeMusicSource = source;
+                        } else if (MusicService.SOURCE_INTERNAL.equals(source) && MusicService.SOURCE_EXTERNAL.equals(activeMusicSource)) {
+                            // Don't let internal idle broadcast override external metadata
+                            if (!isPlaying) return;
+                            activeMusicSource = source;
+                        } else {
+                            activeMusicSource = source;
+                        }
+                    }
+
+                    Log.d("TUI-Music", "UIManager update UI: " + song + ", isPlaying=" + isPlaying + " source=" + activeMusicSource + " pkg=" + pkg);
+
+                    boolean hasContent = (song != null && !song.isEmpty() && !song.equals("-"));
+                    boolean showMusicWidget = isPlaying || hasContent;
 
                     View musicWidget = rootView.findViewById(R.id.music_widget);
                     if (musicWidget != null) {
@@ -1118,7 +1155,7 @@ public class UIManager implements OnTouchListener {
                     MusicVisualizerView visualizerView = rootView.findViewById(R.id.music_visualizer);
                     if (visualizerView != null) {
                         visualizerView.setBarColor(widgetColor);
-                        visualizerView.setPlaying(showMusicWidget);
+                        visualizerView.setPlaying(isPlaying);
                     }
 
                     TextView songTitleView = rootView.findViewById(R.id.music_song_title);
@@ -1137,7 +1174,6 @@ public class UIManager implements OnTouchListener {
                     if (borderView != null) {
                         GradientDrawable gd = new GradientDrawable();
                         gd.setShape(GradientDrawable.RECTANGLE);
-                        // Segmented border: 1.5dp width, custom dash/gap for ASCII look
                         if (XMLPrefsManager.getBoolean(Ui.enable_dashed_border)) {
                             gd.setStroke((int) Tuils.dpToPx(mContext, 1.5f), widgetColor,
                                     Tuils.dpToPx(mContext, XMLPrefsManager.getInt(Ui.dashed_border_dash_length)),
@@ -1798,34 +1834,11 @@ public class UIManager implements OnTouchListener {
         }
 
         if (XMLPrefsManager.getBoolean(Behavior.show_music_widget)) {
-            View musicWidget = inflater.inflate(R.layout.music_widget, rootView.findViewById(R.id.context_container), false);
             LinearLayout contextContainer = rootView.findViewById(R.id.context_container);
             if (contextContainer != null) {
+                View musicWidget = inflater.inflate(R.layout.music_widget, contextContainer, false);
                 contextContainer.addView(musicWidget);
-                contextContainer.setVisibility(View.GONE);
                 styleMusicWidget(musicWidget);
-
-                TextView songTitleView = musicWidget.findViewById(R.id.music_song_title);
-                if (songTitleView != null) {
-                    songTitleView.setTextColor(XMLPrefsManager.getColor(Theme.music_widget_color));
-                    if (mainPack.player != null && mainPack.player.getSongIndex() != -1) {
-                        ohi.andre.consolelauncher.managers.music.Song current = mainPack.player.get(mainPack.player.getSongIndex());
-                        if (current != null) {
-                            songTitleView.setText("Now Playing: " + current.getTitle().toUpperCase());
-                        }
-                    }
-                }
-
-                TextView singerView = musicWidget.findViewById(R.id.music_singer);
-                if (singerView != null) {
-                    singerView.setTextColor(XMLPrefsManager.getColor(Theme.music_widget_color));
-                }
-
-                MusicVisualizerView visualizerView = musicWidget.findViewById(R.id.music_visualizer);
-                if (visualizerView != null) {
-                    visualizerView.setBarColor(XMLPrefsManager.getColor(Theme.music_widget_color));
-                    visualizerView.setPlaying(false);
-                }
             }
         }
 
@@ -1914,6 +1927,72 @@ public class UIManager implements OnTouchListener {
                     widgetLabel.setBackgroundDrawable(gd);
                 }
             } catch (Exception ignored) {}
+        }
+
+        // Style control buttons
+        int buttonColor = widgetColor;
+        TextView prevBtn = musicWidget.findViewById(R.id.music_prev);
+        TextView nextBtn = musicWidget.findViewById(R.id.music_next);
+        TextView playPauseBtn = musicWidget.findViewById(R.id.music_play_pause);
+
+        View[] buttons = {prevBtn, nextBtn, playPauseBtn};
+        for (View b : buttons) {
+            if (b instanceof TextView) {
+                TextView btn = (TextView) b;
+                btn.setTextColor(buttonColor);
+                btn.setTypeface(Tuils.getTypeface(mContext));
+                
+                GradientDrawable gd = new GradientDrawable();
+                gd.setShape(GradientDrawable.RECTANGLE);
+                if (useDashed) {
+                    gd.setStroke((int) Tuils.dpToPx(mContext, 1.2f), buttonColor,
+                            Tuils.dpToPx(mContext, XMLPrefsManager.getInt(Ui.dashed_border_dash_length) / 2),
+                            Tuils.dpToPx(mContext, XMLPrefsManager.getInt(Ui.dashed_border_gap_length) / 2));
+                } else {
+                    gd.setStroke((int) Tuils.dpToPx(mContext, 1.2f), buttonColor);
+                }
+                gd.setColor(Color.TRANSPARENT);
+                btn.setBackgroundDrawable(gd);
+            }
+        }
+
+        if (prevBtn != null) {
+            prevBtn.setOnClickListener(v -> {
+                if ("internal".equals(activeMusicSource)) {
+                    if (mainPack.player != null) mainPack.player.playPrev();
+                } else {
+                    Intent intent = new Intent(MusicService.ACTION_MUSIC_CONTROL);
+                    intent.putExtra(MusicService.EXTRA_CONTROL_CMD, MusicService.CONTROL_PREV_INT);
+                    LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
+                }
+            });
+        }
+
+        if (nextBtn != null) {
+            nextBtn.setOnClickListener(v -> {
+                if ("internal".equals(activeMusicSource)) {
+                    if (mainPack.player != null) mainPack.player.playNext();
+                } else {
+                    Intent intent = new Intent(MusicService.ACTION_MUSIC_CONTROL);
+                    intent.putExtra(MusicService.EXTRA_CONTROL_CMD, MusicService.CONTROL_NEXT_INT);
+                    LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
+                }
+            });
+        }
+
+        if (playPauseBtn != null) {
+            playPauseBtn.setOnClickListener(v -> {
+                if ("internal".equals(activeMusicSource)) {
+                    if (mainPack.player != null) {
+                        if (mainPack.player.isPlaying()) mainPack.player.pause();
+                        else mainPack.player.play();
+                    }
+                } else {
+                    Intent intent = new Intent(MusicService.ACTION_MUSIC_CONTROL);
+                    intent.putExtra(MusicService.EXTRA_CONTROL_CMD, MusicService.CONTROL_PLAY_PAUSE_INT);
+                    LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
+                }
+            });
         }
     }
 
@@ -2014,7 +2093,8 @@ public class UIManager implements OnTouchListener {
             return;
         }
 
-        int widgetColor = XMLPrefsManager.getColor(Notifications.default_notification_color);
+        // Use music_widget_color to ensure synchronization with music widget as requested
+        int widgetColor = XMLPrefsManager.getColor(Theme.music_widget_color);
         int widgetBgColor = XMLPrefsManager.getColor(Theme.window_terminal_bg);
         boolean useDashed = XMLPrefsManager.getBoolean(Ui.enable_dashed_border);
 
@@ -2065,8 +2145,11 @@ public class UIManager implements OnTouchListener {
 
         View notificationWidget = rootView.findViewById(R.id.notification_widget);
         if (notificationWidget != null) {
-            notificationWidget.setVisibility(currentOverlayNotifications.isEmpty() ? View.GONE : View.VISIBLE);
-            renderNotificationRows(notificationWidget);
+            boolean visible = !currentOverlayNotifications.isEmpty();
+            notificationWidget.setVisibility(visible ? View.VISIBLE : View.GONE);
+            if (visible) {
+                styleNotificationWidget(notificationWidget);
+            }
         }
         updateContextContainerVisibility(rootView);
     }
@@ -2079,9 +2162,10 @@ public class UIManager implements OnTouchListener {
         }
 
         rows.removeAllViews();
-        int widgetColor = XMLPrefsManager.getColor(Notifications.default_notification_color);
+        int widgetColor = XMLPrefsManager.getColor(Theme.music_widget_color);
         int widgetBgColor = XMLPrefsManager.getColor(Theme.window_terminal_bg);
-        int rowBackground = ColorUtils.blendARGB(widgetBgColor, Color.BLACK, 0.18f);
+        int rowBackground = ColorUtils.blendARGB(widgetBgColor, Color.BLACK, 0.22f);
+        int strokeColor = ColorUtils.setAlphaComponent(widgetColor, 140);
 
         for (NotificationService.Notification notification : currentOverlayNotifications) {
             TextView row = new TextView(mContext);
@@ -2099,9 +2183,9 @@ public class UIManager implements OnTouchListener {
 
             GradientDrawable bg = new GradientDrawable();
             bg.setShape(GradientDrawable.RECTANGLE);
-            bg.setCornerRadius(Tuils.dpToPx(mContext, 2));
+            bg.setCornerRadius(Tuils.dpToPx(mContext, 4));
             bg.setColor(rowBackground);
-            bg.setStroke((int) Tuils.dpToPx(mContext, 1f), ColorUtils.setAlphaComponent(widgetColor, 180));
+            bg.setStroke((int) Tuils.dpToPx(mContext, 1.2f), strokeColor);
             row.setBackgroundDrawable(bg);
 
             if (notification.pendingIntent != null) {

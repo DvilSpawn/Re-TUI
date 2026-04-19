@@ -14,12 +14,12 @@ android {
 
     signingConfigs {
         release {
-            def ksFile = file("../" + (keystoreProperties["storeFile"] ?: "release.jks"))
+            def ksFile = rootProject.file(keystoreProperties["storeFile"] ?: "release.jks")
             if (ksFile.exists()) {
                 storeFile ksFile
-                storePassword = keystoreProperties["storePassword"] ?: ""
+                storePassword = keystoreProperties["storePassword"] ?: "password"
                 keyAlias = keystoreProperties["keyAlias"] ?: "tui-alias"
-                keyPassword = keystoreProperties["keyPassword"] ?: ""
+                keyPassword = keystoreProperties["keyPassword"] ?: "password"
             }
         }
     }
@@ -28,7 +28,7 @@ android {
         applicationId "com.dvil.tui_renewed"
         minSdk 21
         targetSdk 36
-        versionCode 315
+        versionCode 316
         versionName "v6.16.0-STABLE"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -40,23 +40,19 @@ android {
 
     buildTypes {
         debug {
-            if (signingConfigs.release.storeFile != null && signingConfigs.release.storeFile.exists()) {
-                signingConfig signingConfigs.release
-            }
+            signingConfig signingConfigs.release
             firebaseAppDistribution {
                 serviceCredentialsFile = "/Users/mako/Downloads/t-ui-renewed-firebase-adminsdk-fbsvc-3da60ffd6f.json"
                 artifactType = "APK"
                 testers = "mekiranjayan@gmail.com"
-                releaseNotes = "Implement terminal-styled music player widget, ASCII borders, and enhanced battery progress bar"
+                releaseNotes = "Debug Build: Same signing as Release for update compatibility."
             }
         }
         release {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            if (signingConfigs.release.storeFile != null && signingConfigs.release.storeFile.exists()) {
-                signingConfig signingConfigs.release
-            }
+            signingConfig signingConfigs.release
             firebaseAppDistribution {
                 serviceCredentialsFile = "/Users/mako/Downloads/t-ui-renewed-firebase-adminsdk-fbsvc-3da60ffd6f.json"
                 artifactType = "APK"

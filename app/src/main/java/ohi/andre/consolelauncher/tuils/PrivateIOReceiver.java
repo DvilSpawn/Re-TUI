@@ -76,13 +76,11 @@ public class PrivateIOReceiver extends BroadcastReceiver {
                 boolean infoArea = intent.getBooleanExtra(INFO_AREA, false);
                 int color = intent.getIntExtra(COLOR, Integer.MAX_VALUE);
 
-                Object singleClickExtraObject, longClickExtraObject;
-
-                singleClickExtraObject = intent.getStringExtra(ACTION);
-                longClickExtraObject = intent.getStringExtra(LONG_ACTION);
-
-                if(singleClickExtraObject == null) singleClickExtraObject = intent.getParcelableExtra(ACTION);
-                if(longClickExtraObject == null) longClickExtraObject = intent.getParcelableExtra(LONG_ACTION);
+                Object singleClickExtraObject = null, longClickExtraObject = null;
+                if (intent.getExtras() != null) {
+                    singleClickExtraObject = intent.getExtras().get(ACTION);
+                    longClickExtraObject = intent.getExtras().get(LONG_ACTION);
+                }
 
                 if(singleClickExtraObject != null || longClickExtraObject != null) {
                     text = new SpannableStringBuilder(text);

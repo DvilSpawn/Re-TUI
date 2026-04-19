@@ -6,7 +6,9 @@ package ohi.andre.consolelauncher.managers.notifications;
 
 import android.annotation.TargetApi;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.media.MediaMetadata;
@@ -38,6 +40,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import android.util.Log;
 import ohi.andre.consolelauncher.BuildConfig;
 import ohi.andre.consolelauncher.managers.TerminalManager;
 import ohi.andre.consolelauncher.managers.TimeManager;
@@ -126,6 +129,51 @@ public class NotificationService extends NotificationListenerService {
         }
     };
 
+    private BroadcastReceiver controlReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (MusicService.ACTION_MUSIC_CONTROL.equals(intent.getAction())) {
+                int cmd = intent.getIntExtra(MusicService.EXTRA_CONTROL_CMD, -1);
+                handleControlCommand(cmd);
+            }
+        }
+    };
+
+    private void handleControlCommand(int cmd) {
+        if (activeControllers.isEmpty()) return;
+
+        MediaController activeController = null;
+        for (MediaController controller : activeControllers) {
+            PlaybackState state = controller.getPlaybackState();
+            if (state != null && state.getState() == PlaybackState.STATE_PLAYING) {
+                activeController = controller;
+                break;
+            }
+        }
+        if (activeController == null) activeController = activeControllers.get(0);
+
+        Log.d("TUI-Music", "Handling control command: " + cmd + " for " + activeController.getPackageName());
+        
+        switch (cmd) {
+            case MusicService.CONTROL_NEXT_INT:
+                activeController.getTransportControls().skipToNext();
+                break;
+            case MusicService.CONTROL_PREV_INT:
+                activeController.getTransportControls().skipToPrevious();
+                break;
+            case MusicService.CONTROL_PLAY_PAUSE_INT:
+                PlaybackState state = activeController.getPlaybackState();
+                if (state != null) {
+                    if (state.getState() == PlaybackState.STATE_PLAYING) {
+                        activeController.getTransportControls().pause();
+                    } else {
+                        activeController.getTransportControls().play();
+                    }
+                }
+                break;
+        }
+    }
+
     private MediaController.Callback mediaCallback = new MediaController.Callback() {
         @Override
         public void onMetadataChanged(MediaMetadata metadata) {
@@ -152,15 +200,24 @@ public class NotificationService extends NotificationListenerService {
     }
 
     private void updateActiveSessions(List<MediaController> controllers) {
-        for (MediaController controller : activeControllers) {
-            controller.unregisterCallback(mediaCallback);
-        }
-        activeControllers.clear();
-
+        Log.d("TUI-Music", "updateActiveSessions: " + (controllers != null ? controllers.size() : 0) + " sessions");
         if (controllers != null) {
-            activeControllers.addAll(controllers);
+            for (MediaController mc : controllers) {
+                Log.d("TUI-Music", "Session: " + mc.getPackageName() + " State: " + (mc.getPlaybackState() != null ? mc.getPlaybackState().getState() : "null"));
+            }
+        }
+        synchronized (activeControllers) {
             for (MediaController controller : activeControllers) {
-                controller.registerCallback(mediaCallback);
+                controller.unregisterCallback(mediaCallback);
+            }
+            activeControllers.clear();
+
+            if (controllers != null) {
+                activeControllers.addAll(controllers);
+                for (MediaController controller : activeControllers) {
+                    controller.registerCallback(mediaCallback);
+                    Log.d("TUI-Music", "Registered callback for: " + controller.getPackageName());
+                }
             }
         }
         broadcastMediaMetadata();
@@ -168,10 +225,11 @@ public class NotificationService extends NotificationListenerService {
 
     private void broadcastMediaMetadata() {
         if (activeControllers.isEmpty()) {
+            Log.d("TUI-Music", "No active controllers to broadcast");
             if (hasLastMediaState) {
                 scheduleExternalMusicClear();
             } else {
-                sendMusicBroadcast(null, null, 0, 0, false);
+                sendMusicBroadcast(null, null, 0, 0, false, MusicService.SOURCE_EXTERNAL, null);
             }
             return;
         }
@@ -180,6 +238,13 @@ public class NotificationService extends NotificationListenerService {
 
         MediaController activeController = resolveActiveController();
         if (activeController == null) {
+            return;
+        }
+
+        String preferredPkg = XMLPrefsManager.get(Behavior.preferred_music_app);
+        if (!TextUtils.isEmpty(preferredPkg) && !preferredPkg.equals(activeController.getPackageName())) {
+            Log.d("TUI-Music", "Active controller " + activeController.getPackageName() + " is not preferred. Hiding widget.");
+            sendMusicBroadcast(null, null, 0, 0, false, MusicService.SOURCE_EXTERNAL, activeController.getPackageName());
             return;
         }
 
@@ -194,16 +259,18 @@ public class NotificationService extends NotificationListenerService {
             if (artist == null) artist = metadata.getString(MediaMetadata.METADATA_KEY_ALBUM_ARTIST);
 
             int duration = (int) metadata.getLong(MediaMetadata.METADATA_KEY_DURATION);
+            Log.d("TUI-Music", "Broadcasting: " + title + " by " + artist + " (playing=" + isPlaying + ") pkg=" + activeController.getPackageName());
             rememberMediaState(title, artist, duration, position);
-            sendMusicBroadcast(title, artist, duration, position, isPlaying);
+            sendMusicBroadcast(title, artist, duration, position, isPlaying, MusicService.SOURCE_EXTERNAL, activeController.getPackageName());
             return;
         }
 
+        Log.d("TUI-Music", "No metadata for active controller: " + activeController.getPackageName());
         if (hasLastMediaState) {
-            sendMusicBroadcast(lastMediaTitle, lastMediaArtist, lastMediaDuration, position, isPlaying);
+            sendMusicBroadcast(lastMediaTitle, lastMediaArtist, lastMediaDuration, position, isPlaying, MusicService.SOURCE_EXTERNAL, activeController.getPackageName());
             lastMediaPosition = position;
-        } else if (!isPlaying) {
-            sendMusicBroadcast(null, null, 0, 0, false);
+        } else {
+            sendMusicBroadcast(null, null, 0, 0, isPlaying, MusicService.SOURCE_EXTERNAL, activeController.getPackageName());
         }
     }
 
@@ -232,19 +299,18 @@ public class NotificationService extends NotificationListenerService {
                 ? controller.getPackageName()
                 : Tuils.EMPTYSTRING;
 
+        PlaybackState state = controller != null ? controller.getPlaybackState() : null;
+        if (state != null && state.getState() == PlaybackState.STATE_PLAYING) {
+            rank += 1000;
+        }
+
         if (!TextUtils.isEmpty(preferredPackage) && preferredPackage.equals(packageName)) {
             rank += 100;
         }
 
-        PlaybackState state = controller != null ? controller.getPlaybackState() : null;
-        if (state != null && state.getState() == PlaybackState.STATE_PLAYING) {
-            rank += 10;
-        }
-
-        MediaMetadata metadata = controller != null ? controller.getMetadata() : null;
-        if (metadata != null) {
-            String title = metadata.getString(MediaMetadata.METADATA_KEY_TITLE);
-            String artist = metadata.getString(MediaMetadata.METADATA_KEY_ARTIST);
+        if (controller != null && controller.getMetadata() != null) {
+            String title = controller.getMetadata().getString(MediaMetadata.METADATA_KEY_TITLE);
+            String artist = controller.getMetadata().getString(MediaMetadata.METADATA_KEY_ARTIST);
             if (!TextUtils.isEmpty(title) || !TextUtils.isEmpty(artist)) {
                 rank += 1;
             }
@@ -279,6 +345,10 @@ public class NotificationService extends NotificationListenerService {
     }
 
     private void sendMusicBroadcast(String title, String artist, int duration, int position, boolean isPlaying) {
+        sendMusicBroadcast(title, artist, duration, position, isPlaying, MusicService.SOURCE_EXTERNAL, null);
+    }
+
+    private void sendMusicBroadcast(String title, String artist, int duration, int position, boolean isPlaying, String source, String packageName) {
         Intent intent = new Intent(MusicService.ACTION_MUSIC_CHANGED);
         if (title != null) {
             intent.putExtra(MusicService.SONG_TITLE, title);
@@ -289,14 +359,73 @@ public class NotificationService extends NotificationListenerService {
         intent.putExtra(MusicService.SONG_DURATION, duration);
         intent.putExtra(MusicService.SONG_POSITION, position);
         intent.putExtra(MusicService.MUSIC_PLAYING, isPlaying);
+        intent.putExtra(MusicService.MUSIC_SOURCE, source);
+        if (packageName != null) {
+            intent.putExtra("package", packageName);
+        }
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        sendBroadcast(intent);
     }
+
+    private final Runnable progressUpdateRunnable = new Runnable() {
+        @Override
+        public void run() {
+            boolean anyPlaying = false;
+            for (MediaController controller : activeControllers) {
+                PlaybackState state = controller.getPlaybackState();
+                if (state != null && state.getState() == PlaybackState.STATE_PLAYING) {
+                    anyPlaying = true;
+                    break;
+                }
+            }
+            if (anyPlaying) {
+                broadcastMediaMetadata();
+            }
+            handler.postDelayed(this, 1000);
+        }
+    };
 
     @Override
     public void onCreate() {
         super.onCreate();
 
+        IntentFilter filter = new IntentFilter(MusicService.ACTION_MUSIC_CONTROL);
+        LocalBroadcastManager.getInstance(this).registerReceiver(controlReceiver, filter);
+
         init();
+    }
+
+    @Override
+    public void onListenerConnected() {
+        super.onListenerConnected();
+        Log.d("TUI-Music", "NotificationListener connected");
+        setupMediaSession();
+    }
+
+    @Override
+    public void onListenerDisconnected() {
+        super.onListenerDisconnected();
+        Log.d("TUI-Music", "NotificationListener disconnected");
+    }
+
+    private void setupMediaSession() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (mediaSessionManager == null) {
+                mediaSessionManager = (MediaSessionManager) getSystemService(Context.MEDIA_SESSION_SERVICE);
+            }
+            ComponentName componentName = new ComponentName(this, NotificationService.class);
+            try {
+                mediaSessionManager.removeOnActiveSessionsChangedListener(sessionsChangedListener);
+                mediaSessionManager.addOnActiveSessionsChangedListener(sessionsChangedListener, componentName);
+                List<MediaController> sessions = mediaSessionManager.getActiveSessions(componentName);
+                Log.d("TUI-Music", "Initial active sessions count: " + (sessions != null ? sessions.size() : 0));
+                updateActiveSessions(sessions);
+            } catch (SecurityException e) {
+                Log.e("TUI-Music", "MediaSession access denied: " + e.getMessage());
+            } catch (Exception e) {
+                Log.e("TUI-Music", "Error setting up MediaSession: " + e.getMessage());
+            }
+        }
     }
 
     private void init() {
@@ -328,7 +457,7 @@ public class NotificationService extends NotificationListenerService {
 
                         StatusBarNotification sbn;
                         while ((sbn = queue.poll()) != null) {
-
+                            Log.d("TUI-Notif", "Processing notification from: " + sbn.getPackageName());
                             android.app.Notification notification = sbn.getNotification();
                             if (notification == null) {
                                 continue;
@@ -481,6 +610,10 @@ public class NotificationService extends NotificationListenerService {
 
                             Tuils.sendOutput(NotificationService.this.getApplicationContext(), s, TerminalManager.CATEGORY_NO_COLOR, click ? notification.contentIntent : null, longClick ? n : null);
 
+                            Intent notifyIntent = new Intent(ohi.andre.consolelauncher.UIManager.ACTION_NOTIFICATION_RECEIVED);
+                            notifyIntent.putExtra(ohi.andre.consolelauncher.UIManager.NOTIFICATION_TEXT, s);
+                            LocalBroadcastManager.getInstance(NotificationService.this).sendBroadcast(notifyIntent);
+
                             if(replyManager != null) replyManager.onNotification(sbn, s);
                         }
                     }
@@ -523,16 +656,8 @@ public class NotificationService extends NotificationListenerService {
         seedActiveNotifications();
         bgThread.start();
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            mediaSessionManager = (MediaSessionManager) getSystemService(Context.MEDIA_SESSION_SERVICE);
-            ComponentName componentName = new ComponentName(this, NotificationService.class);
-            try {
-                mediaSessionManager.addOnActiveSessionsChangedListener(sessionsChangedListener, componentName);
-                updateActiveSessions(mediaSessionManager.getActiveSessions(componentName));
-            } catch (SecurityException e) {
-                Tuils.log("MediaSession access denied: " + e.getMessage());
-            }
-        }
+        setupMediaSession();
+        handler.post(progressUpdateRunnable);
 
         active = true;
     }
@@ -557,6 +682,7 @@ public class NotificationService extends NotificationListenerService {
 
     private void dispose() {
         cancelExternalMusicClear();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(controlReceiver);
         if (mediaSessionManager != null && sessionsChangedListener != null) {
             mediaSessionManager.removeOnActiveSessionsChangedListener(sessionsChangedListener);
         }
@@ -608,7 +734,42 @@ public class NotificationService extends NotificationListenerService {
     public void onNotificationPosted(StatusBarNotification sbn) {
         if(!enabled) return;
 
+        Log.d("TUI-Music", "onNotificationPosted: " + sbn.getPackageName());
+        
+        // Try to extract media session from notification if we don't have it
+        android.app.Notification notification = sbn.getNotification();
+        if (notification != null && notification.extras != null) {
+            Object tokenObj = notification.extras.get(android.app.Notification.EXTRA_MEDIA_SESSION);
+            if (tokenObj instanceof android.media.session.MediaSession.Token) {
+                android.media.session.MediaSession.Token token = (android.media.session.MediaSession.Token) tokenObj;
+                handleMediaSessionToken(token, sbn.getPackageName());
+            }
+        }
+
         queue.offer(sbn);
+    }
+
+    private void handleMediaSessionToken(android.media.session.MediaSession.Token token, String packageName) {
+        synchronized (activeControllers) {
+            boolean exists = false;
+            for (MediaController mc : activeControllers) {
+                if (mc.getSessionToken().equals(token)) {
+                    exists = true;
+                    break;
+                }
+            }
+            if (!exists) {
+                try {
+                    Log.d("TUI-Music", "Creating new MediaController from notification token for " + packageName);
+                    MediaController controller = new MediaController(this, token);
+                    activeControllers.add(controller);
+                    controller.registerCallback(mediaCallback);
+                    broadcastMediaMetadata();
+                } catch (Exception e) {
+                    Log.e("TUI-Music", "Error creating MediaController from token", e);
+                }
+            }
+        }
     }
 
 //    0 = not found
