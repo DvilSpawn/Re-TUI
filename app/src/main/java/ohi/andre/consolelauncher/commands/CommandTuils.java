@@ -31,6 +31,21 @@ import ohi.andre.consolelauncher.tuils.Tuils;
 @SuppressLint("DefaultLocale")
 public class CommandTuils {
 
+    private static final String[] HIDDEN_COMMANDS = {"theme"};
+
+    public static boolean isHiddenCommandName(String name) {
+        if (name == null) {
+            return false;
+        }
+
+        for (String hidden : HIDDEN_COMMANDS) {
+            if (hidden.equalsIgnoreCase(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static FileManager.SpecificExtensionFileFilter extensionFileFilter = new FileManager.SpecificExtensionFileFilter();
     private static FileManager.SpecificNameFileFilter nameFileFilter = new FileManager.SpecificNameFileFilter();
 
@@ -313,6 +328,10 @@ public class CommandTuils {
         } catch (Exception e) {
             Tuils.log(e);
             Tuils.toFile(e);
+        }
+
+        if (isHiddenCommandName(string)) {
+            abstraction = null;
         }
 
         return new ArgInfo(abstraction, i.residualString, abstraction != null, 1);

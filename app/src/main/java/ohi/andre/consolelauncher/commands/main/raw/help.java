@@ -8,6 +8,7 @@ import java.util.List;
 
 import ohi.andre.consolelauncher.R;
 import ohi.andre.consolelauncher.commands.CommandAbstraction;
+import ohi.andre.consolelauncher.commands.CommandTuils;
 import ohi.andre.consolelauncher.commands.ExecutePack;
 import ohi.andre.consolelauncher.commands.main.MainPack;
 import ohi.andre.consolelauncher.tuils.Tuils;
@@ -18,6 +19,9 @@ public class help implements CommandAbstraction {
     public String exec(ExecutePack pack) throws Exception {
         MainPack info = (MainPack) pack;
         CommandAbstraction cmd = info.get(CommandAbstraction.class);
+        if (cmd != null && CommandTuils.isHiddenCommandName(cmd.getClass().getSimpleName())) {
+            return info.res.getString(R.string.output_commandnotfound);
+        }
         int res = cmd == null ? R.string.output_commandnotfound : cmd.helpRes();
         return "Priority: " + info.cmdPrefs.getPriority(cmd) + Tuils.NEWLINE + info.res.getString(res);
     }
@@ -41,6 +45,7 @@ public class help implements CommandAbstraction {
     public String onNotArgEnough(ExecutePack pack, int nArgs) {
         MainPack info = (MainPack) pack;
         List<String> toPrint = new ArrayList<>(Arrays.asList(info.commandGroup.getCommandNames()));
+        toPrint.removeIf(CommandTuils::isHiddenCommandName);
 
         Collections.sort(toPrint, Tuils::alphabeticCompare);
 

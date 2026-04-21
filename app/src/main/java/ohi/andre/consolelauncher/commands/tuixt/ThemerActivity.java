@@ -255,7 +255,7 @@ public class ThemerActivity extends AppCompatActivity {
                         .show();
             } else {
                 // Apply
-                List<String> presetNames = PresetManager.listPresets();
+                List<String> presetNames = PresetManager.listAllPresetNames();
                 if (presetNames.isEmpty()) {
                     Toast.makeText(ThemerActivity.this, "No presets found.", Toast.LENGTH_SHORT).show();
                     return;

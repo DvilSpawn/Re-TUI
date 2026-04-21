@@ -72,8 +72,8 @@
     <!-- hints -->
     <string-array name="hints">
         <item name="hint_tutorial">Did you read the tutorial? (\"$ tutorial\")</item>
-        <item name="hint_theme">Did you know that you can easily switch your theme? Have a look at the cmd \"$ theme\"</item>
-        <item name="hint_theme2">Did you know? You can create your custom theme and share it with other users. Have a look at the cmd \"$ theme -create\"</item>
+        <item name="hint_preset">Did you know that you can save and switch your current look? Have a look at the cmd \"$ preset\"</item>
+        <item name="hint_preset2">Did you know? After \"$ wallpaper -auto\", you can lock in the result with \"$ preset -save mylook\"</item>
         <item name="hint_help">Doubts about a command? Use \"$ help cmdName\"</item>
         <item name="hint_music">Did you know? You can listen to music using Re:T-UI. Have a look at the cmd \"$ music\"</item>
         <item name="hint_appgroups">Did you know? Re:T-UI 6.4 introduced App Groups.\nYou can get more details with the cmd \"$ apps -tutorial\"</item>
@@ -93,7 +93,7 @@
         <item>Launch your apps typing their name</item>
         <item>You can call your contacts with the cmd \"call contactName\"</item>
         <item>Re:T-UI is highly customizable. Check \"config -ls\" or use the cmd \"config -tutorial\" to see what you can change</item>
-        <item>You can choose within a large database of themes uploaded by Re:T-UI users. Check the cmd \"theme -view\"</item>
+        <item>You can save your current colors with \"preset -save [name]\" and restore them with \"preset -apply [name]\"</item>
     </string-array>
 
     <!-- apps -->
@@ -213,7 +213,7 @@
 
 
     <string name="help_airplane">Toggle airplane mode</string>
-    <string name="help_settings">-theme -> open theme settings
+    <string name="help_settings">-appearance -> open appearance settings
         \n-music -> open music settings
         \n(no args) -> open the Re:T-UI settings hub
     </string>
@@ -223,9 +223,9 @@
         \n(no args) -> open the wallpaper picker
     </string>
     <string name="hint_wallpaper_auto_confirm">Yes/No</string>
-    <string name="help_preset">-save [name] -> save the current theme and suggestion colors as a preset
-        \n-apply [name] -> apply a saved preset and disable auto_color_pick
-        \n-ls -> list saved presets
+    <string name="help_preset">-save [name] -> save the current theme.xml and suggestions.xml colors as a preset
+        \n-apply [name] -> apply a saved or built-in preset and disable auto_color_pick
+        \n-ls -> list saved and built-in presets
     </string>
     <string name="help_alias">-add [aliasName] [alias content] -> add a new alias
         \n-rm [aliasName] -> remove an existing alias
@@ -337,7 +337,7 @@
         \n-use [shortcutID OR shortcut index] [optional: appName] -> use the specified shortcut
         \n-cp [index] [appName] -> copy to clipboard the nth shortcut of the selected app (first: 0)</string>
     <string name="help_status">Get info about battery charge, wifi status and mobile data</string>
-    <string name="help_theme">-apply [path] -> apply a theme from a local file
+    <string name="help_theme">-apply [themeName] -> apply a shared upstream theme by ID
         \n-set [element] [color] -> manually set a color
         \n-preset [name] -> apply a built-in preset (blue, red, green, pink, bw, cyberpunk)
         \n-old -> re-apply the theme that was replaced by the current one

@@ -65,7 +65,7 @@ public class preset extends ParamCommand {
         ls {
             @Override
             public String exec(ExecutePack pack) {
-                List<String> list = PresetManager.listPresets();
+                List<String> list = PresetManager.listAllPresetNames();
                 if (list.isEmpty()) return "No presets found.";
                 return Tuils.toPlanString(list, "\n");
             }

@@ -839,8 +839,7 @@ public class SuggestionsManager {
     }
 
     private void suggestThemePresets(List<Suggestion> suggestions, String afterLastSpace, String beforeLastSpace) {
-        String[] presets = {"blue", "red", "green", "pink", "bw", "cyberpunk"};
-        for (String p : presets) {
+        for (String p : PresetManager.listBuiltInPresets()) {
             if (afterLastSpace == null || afterLastSpace.length() == 0 || p.startsWith(afterLastSpace)) {
                 suggestions.add(new Suggestion(beforeLastSpace, p, true, Suggestion.TYPE_PERMANENT));
             }
@@ -849,7 +848,7 @@ public class SuggestionsManager {
 
     private void suggestSavedPresetNames(List<Suggestion> suggestions, String afterLastSpace, String beforeLastSpace) {
         boolean applyCommand = beforeLastSpace != null && beforeLastSpace.toLowerCase().contains(" -apply");
-        for (String preset : PresetManager.listPresets()) {
+        for (String preset : PresetManager.listAllPresetNames()) {
             if (afterLastSpace == null || afterLastSpace.length() == 0 || preset.toLowerCase().startsWith(afterLastSpace.toLowerCase())) {
                 suggestions.add(new Suggestion(beforeLastSpace, preset, applyCommand && clickToLaunch, Suggestion.TYPE_COMMAND));
             }
@@ -1079,6 +1078,7 @@ public class SuggestionsManager {
             int canInsert = counts[Suggestion.TYPE_COMMAND];
             for (String s : cmds) {
                 if(canInsert == 0 || Thread.currentThread().isInterrupted()) return;
+                if (CommandTuils.isHiddenCommandName(s)) continue;
 
                 if(s.startsWith(afterLastSpace)) {
                     CommandAbstraction cmd = info.commandGroup.getCommandByName(s);
@@ -1100,6 +1100,7 @@ public class SuggestionsManager {
 
         for (CommandAbstraction cmd : cmds) {
             if(canInsert == 0 || Thread.currentThread().isInterrupted()) return;
+            if (CommandTuils.isHiddenCommandName(cmd.getClass().getSimpleName())) continue;
 
             if (info.cmdPrefs.getPriority(cmd) >= minCmdPriority) {
                 int[] args = cmd.argType();
