@@ -182,6 +182,7 @@ public class UIManager implements OnTouchListener {
     private final LinkedHashMap<String, Integer> appsDrawerAlphaPositions = new LinkedHashMap<>();
     private final LinkedHashMap<String, TextView> appsDrawerAlphaViews = new LinkedHashMap<>();
     private final ArrayList<NotificationService.Notification> currentOverlayNotifications = new ArrayList<>();
+    private boolean notificationCompactForKeyboard = false;
     private String selectedAppsDrawerGroup = null;
     private String selectedAppsDrawerAlpha = null;
 
@@ -649,14 +650,14 @@ public class UIManager implements OnTouchListener {
         styleHackOverlay(rootView);
 
 //        scrolllllll
-        if(XMLPrefsManager.getBoolean(Behavior.auto_scroll)) {
-            rootView.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
-                int heightDiff = rootView.getRootView().getHeight() - rootView.getHeight();
-                if (heightDiff > UIUtils.dpToPx(context, 200)) { // if more than 200 dp, it's probably a keyboard...
-                    if(mTerminalAdapter != null) mTerminalAdapter.scrollToEnd();
-                }
-            });
-        }
+        rootView.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+            int heightDiff = rootView.getRootView().getHeight() - rootView.getHeight();
+            boolean keyboardVisible = heightDiff > UIUtils.dpToPx(context, 200);
+            setNotificationWidgetCompact(rootView, keyboardVisible);
+            if (keyboardVisible && XMLPrefsManager.getBoolean(Behavior.auto_scroll)) {
+                if(mTerminalAdapter != null) mTerminalAdapter.scrollToEnd();
+            }
+        });
 
         clearOnLock = XMLPrefsManager.getBoolean(Behavior.clear_on_lock);
 
@@ -1413,6 +1414,7 @@ public class UIManager implements OnTouchListener {
 
     private void styleNotificationWidget(View notificationWidget) {
         ohi.andre.consolelauncher.tuils.TuiWidgetDecorator.decorateWidget(notificationWidget, R.id.notification_widget_border, R.id.notification_widget_label);
+        applyNotificationWidgetSize(notificationWidget);
         renderNotificationRows(notificationWidget);
     }
 
@@ -1443,17 +1445,20 @@ public class UIManager implements OnTouchListener {
         rows.removeAllViews();
         int widgetColor = XMLPrefsManager.getColor(Theme.music_widget_color);
 
-        for (NotificationService.Notification notification : currentOverlayNotifications) {
+        int maxRows = notificationCompactForKeyboard ? Math.min(1, currentOverlayNotifications.size()) : currentOverlayNotifications.size();
+        for (int i = 0; i < maxRows; i++) {
+            NotificationService.Notification notification = currentOverlayNotifications.get(i);
             TextView row = new TextView(mContext);
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            lp.bottomMargin = (int) Tuils.dpToPx(mContext, 6);
+            lp.bottomMargin = notificationCompactForKeyboard ? 0 : (int) Tuils.dpToPx(mContext, 6);
             row.setLayoutParams(lp);
             row.setTypeface(Tuils.getTypeface(mContext));
             row.setTextSize(12);
             row.setSingleLine(true);
             row.setEllipsize(TextUtils.TruncateAt.END);
             row.setGravity(Gravity.CENTER_VERTICAL);
-            row.setPadding((int) Tuils.dpToPx(mContext, 10), (int) Tuils.dpToPx(mContext, 8), (int) Tuils.dpToPx(mContext, 10), (int) Tuils.dpToPx(mContext, 8));
+            int verticalPadding = (int) Tuils.dpToPx(mContext, notificationCompactForKeyboard ? 5 : 8);
+            row.setPadding((int) Tuils.dpToPx(mContext, 10), verticalPadding, (int) Tuils.dpToPx(mContext, 10), verticalPadding);
             row.setTextColor(widgetColor);
             row.setText(buildNotificationLine(notification));
 
@@ -1489,6 +1494,41 @@ public class UIManager implements OnTouchListener {
             preview = notification.text;
         }
         return (appName != null ? appName : "Notification") + "  " + (preview != null ? preview : Tuils.EMPTYSTRING);
+    }
+
+    private void setNotificationWidgetCompact(View rootView, boolean compact) {
+        if (notificationCompactForKeyboard == compact) {
+            return;
+        }
+
+        notificationCompactForKeyboard = compact;
+        View notificationWidget = rootView.findViewById(R.id.notification_widget);
+        if (notificationWidget != null && notificationWidget.getVisibility() == View.VISIBLE) {
+            applyNotificationWidgetSize(notificationWidget);
+            renderNotificationRows(notificationWidget);
+        }
+    }
+
+    private void applyNotificationWidgetSize(View notificationWidget) {
+        View border = notificationWidget.findViewById(R.id.notification_widget_border);
+        if (border != null) {
+            ViewGroup.LayoutParams lp = border.getLayoutParams();
+            lp.height = (int) Tuils.dpToPx(mContext, notificationCompactForKeyboard ? 58 : 132);
+            border.setLayoutParams(lp);
+        }
+
+        ScrollView scrollView = notificationWidget.findViewById(R.id.notification_scroll);
+        if (scrollView != null) {
+            int topPadding = (int) Tuils.dpToPx(mContext, notificationCompactForKeyboard ? 12 : 14);
+            scrollView.setPadding(scrollView.getPaddingLeft(), topPadding, scrollView.getPaddingRight(), scrollView.getPaddingBottom());
+        }
+
+        notificationWidget.setPadding(
+                notificationWidget.getPaddingLeft(),
+                notificationWidget.getPaddingTop(),
+                notificationWidget.getPaddingRight(),
+                (int) Tuils.dpToPx(mContext, notificationCompactForKeyboard ? 6 : 12)
+        );
     }
 
     private void updateContextContainerVisibility(View rootView) {

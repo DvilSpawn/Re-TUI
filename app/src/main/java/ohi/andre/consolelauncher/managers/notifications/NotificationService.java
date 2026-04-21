@@ -191,12 +191,26 @@ public class NotificationService extends NotificationListenerService {
             return;
         }
 
+        requestListenerRebind(context);
+
         Intent intent = new Intent(context, NotificationService.class);
         intent.setAction(ACTION_RELOAD_NOTIFICATION_CONFIG);
         context.startService(intent);
 
         LocalBroadcastManager.getInstance(context.getApplicationContext())
                 .sendBroadcast(new Intent(ACTION_RELOAD_NOTIFICATION_CONFIG));
+    }
+
+    public static void requestListenerRebind(Context context) {
+        if (context == null || Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            return;
+        }
+
+        try {
+            requestRebind(new ComponentName(context, NotificationService.class));
+        } catch (Exception e) {
+            Tuils.log(e);
+        }
     }
 
     private void updateActiveSessions(List<MediaController> controllers) {
@@ -399,6 +413,11 @@ public class NotificationService extends NotificationListenerService {
     public void onListenerConnected() {
         super.onListenerConnected();
         Log.d("TUI-Music", "NotificationListener connected");
+        if (!active) {
+            init();
+        } else {
+            reloadNotificationConfig();
+        }
         setupMediaSession();
     }
 
@@ -430,6 +449,7 @@ public class NotificationService extends NotificationListenerService {
 
     private void init() {
         try {
+            Tuils.init(this);
             notificationManager = NotificationManager.create(this);
             XMLPrefsManager.loadCommons(this);
         } catch (Exception e) {

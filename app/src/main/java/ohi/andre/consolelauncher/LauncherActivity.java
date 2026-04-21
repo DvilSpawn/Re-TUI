@@ -326,6 +326,7 @@ public class LauncherActivity extends AppCompatActivity implements Reloadable {
 
                     Intent notificationIntent = new Intent(this, NotificationService.class);
                     startService(notificationIntent);
+                    NotificationService.requestListenerRebind(this);
                 } catch (NoClassDefFoundError er) {
                     Intent intent = new Intent(PrivateIOReceiver.ACTION_OUTPUT);
                     intent.putExtra(PrivateIOReceiver.TEXT, getString(R.string.output_notification_error) + Tuils.SPACE + er.toString());
