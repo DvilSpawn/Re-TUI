@@ -11,7 +11,7 @@ import ohi.andre.consolelauncher.commands.main.MainPack;
 import ohi.andre.consolelauncher.commands.main.specific.ParamCommand;
 import ohi.andre.consolelauncher.managers.PresetManager;
 import ohi.andre.consolelauncher.managers.ThemeManager;
-import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager;
+import ohi.andre.consolelauncher.managers.settings.LauncherSettings;
 import ohi.andre.consolelauncher.managers.xml.options.Theme;
 import ohi.andre.consolelauncher.tuils.Tuils;
 import ohi.andre.consolelauncher.tuils.interfaces.Reloadable;
@@ -55,7 +55,7 @@ public class theme extends ParamCommand {
                     return "Invalid color format. Use #RRGGBB or #AARRGGBB";
                 }
 
-                XMLPrefsManager.XMLPrefsRoot.THEME.write(element, color);
+                LauncherSettings.setTheme(element, color);
 
                 try {
                     if (pack.context instanceof Reloadable) {

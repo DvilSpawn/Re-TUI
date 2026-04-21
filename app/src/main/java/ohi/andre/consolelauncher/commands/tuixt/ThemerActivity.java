@@ -28,6 +28,7 @@ import java.util.List;
 
 import ohi.andre.consolelauncher.LauncherActivity;
 import ohi.andre.consolelauncher.managers.PresetManager;
+import ohi.andre.consolelauncher.managers.settings.LauncherSettings;
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager;
 import ohi.andre.consolelauncher.managers.xml.options.Behavior;
 import ohi.andre.consolelauncher.managers.xml.options.Ui;
@@ -163,8 +164,8 @@ public class ThemerActivity extends AppCompatActivity {
 
             private void applySystemFont() {
                 // Set system_font to true in ui.xml
-                XMLPrefsManager.XMLPrefsRoot.UI.write(Ui.system_font, "true");
-                XMLPrefsManager.XMLPrefsRoot.UI.write(Ui.font_file, "");
+                LauncherSettings.setUi(Ui.system_font, "true");
+                LauncherSettings.setUi(Ui.font_file, "");
 
                 // Sweep any current font files in root to 'old'
                 sweepCurrentFonts();
@@ -174,8 +175,8 @@ public class ThemerActivity extends AppCompatActivity {
 
             private void applyFont(File source) {
                 // Set system_font to false in ui.xml
-                XMLPrefsManager.XMLPrefsRoot.UI.write(Ui.system_font, "false");
-                XMLPrefsManager.XMLPrefsRoot.UI.write(Ui.font_file, source.getName());
+                LauncherSettings.setUi(Ui.system_font, "false");
+                LauncherSettings.setUi(Ui.font_file, source.getName());
 
                 sweepCurrentFonts();
 

@@ -8,9 +8,7 @@ import ohi.andre.consolelauncher.commands.ExecutePack;
 import ohi.andre.consolelauncher.commands.main.MainPack;
 import ohi.andre.consolelauncher.commands.main.specific.ParamCommand;
 import ohi.andre.consolelauncher.commands.main.specific.RedirectCommand;
-import ohi.andre.consolelauncher.managers.xml.AutoColorManager;
-import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager;
-import ohi.andre.consolelauncher.managers.xml.options.Ui;
+import ohi.andre.consolelauncher.managers.settings.LauncherSettings;
 import ohi.andre.consolelauncher.tuils.Tuils;
 import ohi.andre.consolelauncher.tuils.interfaces.Reloadable;
 
@@ -130,8 +128,7 @@ public class wallpaper extends ParamCommand {
     }
 
     private static String enableWallpaperAuto(ExecutePack pack) {
-        XMLPrefsManager.XMLPrefsRoot.UI.write(Ui.auto_color_pick, "true");
-        AutoColorManager.invalidate();
+        LauncherSettings.setAutoColorPick(true);
 
         if (pack.context instanceof Reloadable) {
             ((Reloadable) pack.context).addMessage("wallpaper", "Enabled wallpaper-derived colors");

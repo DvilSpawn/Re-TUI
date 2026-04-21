@@ -3,7 +3,7 @@ package ohi.andre.consolelauncher.commands.main.raw;
 import ohi.andre.consolelauncher.R;
 import ohi.andre.consolelauncher.commands.CommandAbstraction;
 import ohi.andre.consolelauncher.commands.ExecutePack;
-import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager;
+import ohi.andre.consolelauncher.managers.settings.LauncherSettings;
 import ohi.andre.consolelauncher.managers.xml.options.Ui;
 import ohi.andre.consolelauncher.tuils.interfaces.Reloadable;
 
@@ -18,8 +18,8 @@ public class username implements CommandAbstraction {
             return onNotArgEnough(pack, 0);
         }
 
-        XMLPrefsManager.XMLPrefsRoot.UI.write(Ui.username, newUser);
-        XMLPrefsManager.XMLPrefsRoot.UI.write(Ui.deviceName, newDevice);
+        LauncherSettings.setUi(Ui.username, newUser);
+        LauncherSettings.setUi(Ui.deviceName, newDevice);
 
         try {
             if (pack.context instanceof Reloadable) {

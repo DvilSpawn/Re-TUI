@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import ohi.andre.consolelauncher.managers.xml.AutoColorManager;
+import ohi.andre.consolelauncher.managers.settings.LauncherSettings;
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager;
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave;
 import ohi.andre.consolelauncher.managers.xml.options.Suggestions;
@@ -67,11 +67,10 @@ public final class PresetManager {
             throw new IllegalStateException("Unable to create preset folder");
         }
 
-        boolean autoColor = XMLPrefsManager.getBoolean(Ui.auto_color_pick);
         writeXml(new File(presetFolder, XMLPrefsManager.XMLPrefsRoot.THEME.path),
-                XMLPrefsManager.XMLPrefsRoot.THEME, Theme.values(), autoColor);
+                XMLPrefsManager.XMLPrefsRoot.THEME, Theme.values());
         writeXml(new File(presetFolder, XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS.path),
-                XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS, Suggestions.values(), autoColor);
+                XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS, Suggestions.values());
 
         apply(cleanName);
     }
@@ -98,7 +97,7 @@ public final class PresetManager {
         Tuils.insertOld(currentSuggestions);
         Tuils.copy(presetTheme, currentTheme);
         Tuils.copy(presetSuggestions, currentSuggestions);
-        XMLPrefsManager.XMLPrefsRoot.UI.write(Ui.auto_color_pick, "false");
+        LauncherSettings.setAutoColorPick(false);
     }
 
     public static boolean applyBuiltIn(String name) {
@@ -110,7 +109,7 @@ public final class PresetManager {
         Map<Theme, String> colors = new HashMap<>();
         Map<Suggestions, String> suggestionColors = new HashMap<>();
 
-        boolean isTransparent = XMLPrefsManager.getBoolean(Ui.system_wallpaper);
+        boolean isTransparent = LauncherSettings.getBoolean(Ui.system_wallpaper);
         Theme backgroundTarget = isTransparent ? Theme.overlay_color : Theme.bg_color;
         String transPrefix = isTransparent ? "#00" : "#FF";
 
@@ -219,12 +218,12 @@ public final class PresetManager {
 
         colors.put(Theme.toolbar_bg, "#00000000");
         for (Map.Entry<Theme, String> entry : colors.entrySet()) {
-            XMLPrefsManager.XMLPrefsRoot.THEME.write(entry.getKey(), entry.getValue());
+            LauncherSettings.setTheme(entry.getKey(), entry.getValue());
         }
         for (Map.Entry<Suggestions, String> entry : suggestionColors.entrySet()) {
-            XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS.write(entry.getKey(), entry.getValue());
+            LauncherSettings.setSuggestion(entry.getKey(), entry.getValue());
         }
-        XMLPrefsManager.XMLPrefsRoot.UI.write(Ui.auto_color_pick, "false");
+        LauncherSettings.setAutoColorPick(false);
         return true;
     }
 
@@ -251,14 +250,14 @@ public final class PresetManager {
         return false;
     }
 
-    private static void writeXml(File file, XMLPrefsManager.XMLPrefsRoot root, XMLPrefsSave[] values, boolean autoColor) throws Exception {
+    private static void writeXml(File file, XMLPrefsManager.XMLPrefsRoot root, XMLPrefsSave[] values) throws Exception {
         StringBuilder xml = new StringBuilder(XMLPrefsManager.XML_DEFAULT);
         xml.append("<").append(root.name()).append(">\n");
         for (XMLPrefsSave value : values) {
             xml.append("\t<")
                     .append(value.label())
                     .append(" value=\"")
-                    .append(resolveValue(value, autoColor))
+                    .append(LauncherSettings.getEffective(value))
                     .append("\" />\n");
         }
         xml.append("</").append(root.name()).append(">\n");
@@ -269,18 +268,4 @@ public final class PresetManager {
         stream.close();
     }
 
-    private static String resolveValue(XMLPrefsSave value, boolean autoColor) {
-        if (autoColor) {
-            int color = AutoColorManager.getAutoColor(value, Integer.MAX_VALUE);
-            if (color != Integer.MAX_VALUE) {
-                return String.format("#%08X", color);
-            }
-        }
-
-        String current = XMLPrefsManager.get(value);
-        if (current == null || current.length() == 0) {
-            return value.defaultValue();
-        }
-        return current;
-    }
 }

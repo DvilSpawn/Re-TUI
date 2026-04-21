@@ -104,6 +104,7 @@ import ohi.andre.consolelauncher.managers.TerminalManager;
 import ohi.andre.consolelauncher.managers.music.MusicManager2;
 import ohi.andre.consolelauncher.managers.music.Song;
 import ohi.andre.consolelauncher.managers.notifications.NotificationService;
+import ohi.andre.consolelauncher.managers.settings.LauncherSettings;
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager;
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave;
 import ohi.andre.consolelauncher.managers.xml.options.Behavior;
@@ -178,7 +179,7 @@ public class Tuils {
                 font = resolveLegacyFontFile(tui);
                 if (prefsLoaded && !systemFont && font != null && (configuredFont == null || configuredFont.trim().length() == 0)) {
                     try {
-                        XMLPrefsManager.XMLPrefsRoot.UI.write(Ui.font_file, font.getName());
+                        LauncherSettings.setUi(Ui.font_file, font.getName());
                     } catch (Exception ignored) {}
                 }
             }
