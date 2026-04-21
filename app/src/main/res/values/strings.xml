@@ -213,6 +213,9 @@
 
 
     <string name="help_airplane">Toggle airplane mode</string>
+    <string name="help_debug">-theme -> inspect effective theme, auto color, and font state
+        \n-presets -> inspect preset directory and available presets
+    </string>
     <string name="help_settings">-appearance -> open appearance settings
         \n-music -> open music settings
         \n(no args) -> open the Re:T-UI settings hub
