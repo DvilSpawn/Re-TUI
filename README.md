@@ -54,6 +54,11 @@ To enable a full Linux environment, you can install BusyBox directly from the la
 
 ---
 
+## 🧪 Future Ideas
+*   **Animated ASCII Art:** Explore a low-power animated ASCII header using an AsciiAnimator-style plain text format with `[frame]` separators, capped FPS, and lifecycle-aware playback.
+
+---
+
 ## 🛡 Security Hardening (OWASP MASVS Compliance)
 
 This project has been audited and hardened following the **OWASP Mobile Application Security Verification Standard (MASVS)**.

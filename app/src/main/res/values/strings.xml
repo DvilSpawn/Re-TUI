@@ -219,9 +219,10 @@
     </string>
     <string name="help_wallpaper">-static -> open the static wallpaper picker
         \n-live -> open the live wallpaper picker
-        \n-auto -> refresh wallpaper-derived theme colors
+        \n-auto -> enable or refresh wallpaper-derived theme colors
         \n(no args) -> open the wallpaper picker
     </string>
+    <string name="hint_wallpaper_auto_confirm">Yes/No</string>
     <string name="help_preset">-save [name] -> save the current theme and suggestion colors as a preset
         \n-apply [name] -> apply a saved preset and disable auto_color_pick
         \n-ls -> list saved presets

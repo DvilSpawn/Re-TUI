@@ -7,6 +7,7 @@ import ohi.andre.consolelauncher.R;
 import ohi.andre.consolelauncher.commands.ExecutePack;
 import ohi.andre.consolelauncher.commands.main.MainPack;
 import ohi.andre.consolelauncher.commands.main.specific.ParamCommand;
+import ohi.andre.consolelauncher.commands.main.specific.RedirectCommand;
 import ohi.andre.consolelauncher.managers.xml.AutoColorManager;
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager;
 import ohi.andre.consolelauncher.managers.xml.options.Ui;
@@ -41,18 +42,11 @@ public class wallpaper extends ParamCommand {
         auto {
             @Override
             public String exec(ExecutePack pack) {
-                AutoColorManager.invalidate();
-
-                if (pack.context instanceof Reloadable) {
-                    ((Reloadable) pack.context).addMessage("wallpaper", "Refreshed wallpaper-derived colors");
-                    ((Reloadable) pack.context).reload();
-                    return Tuils.EMPTYSTRING;
+                if (pack instanceof MainPack) {
+                    ((MainPack) pack).redirectator.prepareRedirection(new WallpaperAutoConfirmation());
+                    return "Please confirm if you have saved your preset (Yes/No)";
                 }
-
-                if (XMLPrefsManager.getBoolean(Ui.auto_color_pick)) {
-                    return "Wallpaper-derived colors refreshed.";
-                }
-                return "Wallpaper palette cache cleared. Enable auto_color_pick to use wallpaper-derived colors.";
+                return enableWallpaperAuto(pack);
             }
         };
 
@@ -132,6 +126,76 @@ public class wallpaper extends ParamCommand {
             return Tuils.EMPTYSTRING;
         } catch (Exception e) {
             return pack.context.getString(R.string.output_error);
+        }
+    }
+
+    private static String enableWallpaperAuto(ExecutePack pack) {
+        XMLPrefsManager.XMLPrefsRoot.UI.write(Ui.auto_color_pick, "true");
+        AutoColorManager.invalidate();
+
+        if (pack.context instanceof Reloadable) {
+            ((Reloadable) pack.context).addMessage("wallpaper", "Enabled wallpaper-derived colors");
+            ((Reloadable) pack.context).reload();
+            return Tuils.EMPTYSTRING;
+        }
+
+        return "Wallpaper-derived colors enabled.";
+    }
+
+    private static class WallpaperAutoConfirmation extends RedirectCommand {
+        @Override
+        public String onRedirect(ExecutePack pack) {
+            MainPack mainPack = (MainPack) pack;
+            String answer = Tuils.EMPTYSTRING;
+            if (!afterObjects.isEmpty() && afterObjects.get(0) != null) {
+                answer = afterObjects.get(0).toString().trim();
+            }
+
+            mainPack.redirectator.cleanup();
+            if ("yes".equalsIgnoreCase(answer) || "y".equalsIgnoreCase(answer)) {
+                return enableWallpaperAuto(pack);
+            }
+            return "Wallpaper auto cancelled.";
+        }
+
+        @Override
+        public int getHint() {
+            return R.string.hint_wallpaper_auto_confirm;
+        }
+
+        @Override
+        public boolean isWaitingPermission() {
+            return false;
+        }
+
+        @Override
+        public int[] argType() {
+            return new int[0];
+        }
+
+        @Override
+        public int priority() {
+            return 0;
+        }
+
+        @Override
+        public int helpRes() {
+            return R.string.help_wallpaper;
+        }
+
+        @Override
+        public String onArgNotFound(ExecutePack pack, int indexNotFound) {
+            return null;
+        }
+
+        @Override
+        public String onNotArgEnough(ExecutePack pack, int nArgs) {
+            return null;
+        }
+
+        @Override
+        public String exec(ExecutePack pack) {
+            return null;
         }
     }
 

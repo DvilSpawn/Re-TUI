@@ -1700,15 +1700,16 @@ public class UIManager implements OnTouchListener {
 
     private List<AppsManager.LaunchInfo> getAppsForDrawer(AppsManager appsManager) {
         List<AppsManager.LaunchInfo> apps = new ArrayList<>();
+        List<AppsManager.LaunchInfo> shownApps = appsManager.shownApps();
 
         if (selectedAppsDrawerGroup == null) {
-            apps.addAll(appsManager.shownApps());
+            apps.addAll(shownApps);
         } else {
             AppsManager.Group group = findAppsGroup(selectedAppsDrawerGroup);
             if (group != null) {
                 List<? extends Object> members = group.members();
                 for (Object member : members) {
-                    if (member instanceof AppsManager.LaunchInfo) {
+                    if (member instanceof AppsManager.LaunchInfo && shownApps.contains(member)) {
                         apps.add((AppsManager.LaunchInfo) member);
                     }
                 }

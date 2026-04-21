@@ -29,7 +29,7 @@ android {
         applicationId "com.dvil.tui_renewed"
         minSdk 23
         targetSdk 36
-        versionCode 318
+        versionCode 319
         versionName "v6.16.1-STABLE"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
