@@ -178,8 +178,8 @@ public class ThemerActivity extends AppCompatActivity {
 
             private void applySystemFont() {
                 // Set system_font to true in ui.xml
-                LauncherSettings.setUi(Ui.system_font, "true");
-                LauncherSettings.setUi(Ui.font_file, "");
+                LauncherSettings.set(ThemerActivity.this, Ui.system_font, "true");
+                LauncherSettings.set(ThemerActivity.this, Ui.font_file, "");
 
                 // Sweep any current font files in root to 'old'
                 sweepCurrentFonts();
@@ -189,8 +189,8 @@ public class ThemerActivity extends AppCompatActivity {
 
             private void applyFont(File source) {
                 // Set system_font to false in ui.xml
-                LauncherSettings.setUi(Ui.system_font, "false");
-                LauncherSettings.setUi(Ui.font_file, source.getName());
+                LauncherSettings.set(ThemerActivity.this, Ui.system_font, "false");
+                LauncherSettings.set(ThemerActivity.this, Ui.font_file, source.getName());
 
                 sweepCurrentFonts();
 

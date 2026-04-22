@@ -1,6 +1,7 @@
 package ohi.andre.consolelauncher.commands.tuixt;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.graphics.Color;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -19,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 import ohi.andre.consolelauncher.R;
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings;
-import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager;
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave;
 
 public class TuixtAdapter extends RecyclerView.Adapter<TuixtAdapter.ViewHolder> {
@@ -39,11 +39,20 @@ public class TuixtAdapter extends RecyclerView.Adapter<TuixtAdapter.ViewHolder> 
     }
 
     public void saveAll() {
+        saveAll(null);
+    }
+
+    public void saveAll(Context context) {
         for (Map.Entry<XMLPrefsSave, String> entry : pendingChanges.entrySet()) {
             XMLPrefsSave item = entry.getKey();
             String value = entry.getValue();
-            LauncherSettings.set(item, value);
+            LauncherSettings.set(context, item, value);
         }
+        pendingChanges.clear();
+    }
+
+    public boolean hasPendingChanges() {
+        return !pendingChanges.isEmpty();
     }
 
     @NonNull
@@ -59,7 +68,7 @@ public class TuixtAdapter extends RecyclerView.Adapter<TuixtAdapter.ViewHolder> 
         holder.title.setText(item.label());
         holder.description.setText(item.info());
 
-        String currentValue = pendingChanges.containsKey(item) ? pendingChanges.get(item) : XMLPrefsManager.get(item);
+        String currentValue = getCurrentValue(item);
 
         holder.input.removeTextChangedListener(holder.textWatcher);
         holder.toggle.setOnClickListener(null);
@@ -76,7 +85,7 @@ public class TuixtAdapter extends RecyclerView.Adapter<TuixtAdapter.ViewHolder> 
             boolean checked = Boolean.parseBoolean(currentValue);
             TuixtTheme.styleToggle(holder.itemView.getContext(), holder.toggle, checked);
             holder.toggle.setOnClickListener(v -> {
-                boolean next = !Boolean.parseBoolean(pendingChanges.containsKey(item) ? pendingChanges.get(item) : XMLPrefsManager.get(item));
+                boolean next = !Boolean.parseBoolean(getCurrentValue(item));
                 pendingChanges.put(item, String.valueOf(next));
                 TuixtTheme.styleToggle(holder.itemView.getContext(), holder.toggle, next);
             });
@@ -123,6 +132,10 @@ public class TuixtAdapter extends RecyclerView.Adapter<TuixtAdapter.ViewHolder> 
         } catch (Exception e) {
             TuixtTheme.styleColorPreview(view.getContext(), view, Color.BLACK);
         }
+    }
+
+    private String getCurrentValue(XMLPrefsSave item) {
+        return pendingChanges.containsKey(item) ? pendingChanges.get(item) : LauncherSettings.get(item);
     }
 
     private void showColorPicker(ViewHolder holder, XMLPrefsSave item, String currentHex) {

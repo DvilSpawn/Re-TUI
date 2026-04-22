@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Gravity;
@@ -41,6 +42,7 @@ public class TuixtActivity extends Activity {
     private XMLPrefsManager.XMLPrefsRoot xmlRoot;
     private List<XMLPrefsSave> originalItems;
     private EditText plainTextEditor;
+    private String originalRawText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,7 +121,7 @@ public class TuixtActivity extends Activity {
         btnSave.setOnClickListener(v -> {
             Toast.makeText(this, "Applying changes...", Toast.LENGTH_SHORT).show();
             if (adapter != null) {
-                adapter.saveAll();
+                adapter.saveAll(this);
             } else if (plainTextEditor != null) {
                 try {
                     ohi.andre.consolelauncher.tuils.Tuils.write(file, "", plainTextEditor.getText().toString());
@@ -130,7 +132,6 @@ public class TuixtActivity extends Activity {
                     Toast.makeText(this, "Error saving: " + e.getMessage(), Toast.LENGTH_LONG).show();
                 }
             }
-            ohi.andre.consolelauncher.managers.notifications.NotificationService.requestReload(this);
             setResult(SAVE_PRESSED);
             finish();
         });
@@ -171,9 +172,11 @@ public class TuixtActivity extends Activity {
 
             try {
                 java.io.FileInputStream fis = new java.io.FileInputStream(file);
-                plainTextEditor.setText(ohi.andre.consolelauncher.tuils.Tuils.convertStreamToString(fis));
+                originalRawText = ohi.andre.consolelauncher.tuils.Tuils.convertStreamToString(fis);
+                plainTextEditor.setText(originalRawText);
                 fis.close();
             } catch (Exception e) {
+                originalRawText = "";
                 plainTextEditor.setText("");
             }
 
@@ -192,5 +195,33 @@ public class TuixtActivity extends Activity {
             }
         }
         adapter.updateList(filtered);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (!hasUnsavedChanges()) {
+            super.onBackPressed();
+            return;
+        }
+
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Discard changes?")
+                .setMessage("Unsaved settings changes will be lost.")
+                .setPositiveButton("Discard", (dialog, which) -> {
+                    setResult(BACK_PRESSED);
+                    finish();
+                })
+                .setNegativeButton("Keep editing", null)
+                .show();
+    }
+
+    private boolean hasUnsavedChanges() {
+        if (adapter != null && adapter.hasPendingChanges()) {
+            return true;
+        }
+        if (plainTextEditor != null) {
+            return !TextUtils.equals(originalRawText, plainTextEditor.getText().toString());
+        }
+        return false;
     }
 }
