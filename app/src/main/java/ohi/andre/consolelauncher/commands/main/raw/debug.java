@@ -105,6 +105,9 @@ public class debug extends ParamCommand {
 
     @Override
     protected String doThings(ExecutePack pack) {
+        if (pack.get(ohi.andre.consolelauncher.commands.main.Param.class, 0) != null) {
+            return null;
+        }
         return pack.context.getString(R.string.help_debug);
     }
 
