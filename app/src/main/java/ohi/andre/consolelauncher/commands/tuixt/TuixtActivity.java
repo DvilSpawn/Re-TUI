@@ -2,7 +2,6 @@ package ohi.andre.consolelauncher.commands.tuixt;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.text.Editable;
@@ -10,7 +9,6 @@ import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -27,8 +25,6 @@ import java.util.List;
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings;
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager;
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave;
-import ohi.andre.consolelauncher.tuils.interfaces.Reloadable;
-
 public class TuixtActivity extends Activity {
 
     public static final String PATH = "path";
@@ -105,17 +101,17 @@ public class TuixtActivity extends Activity {
         btnLayout.setOrientation(LinearLayout.HORIZONTAL);
         btnLayout.setPadding(0, 10, 0, 0);
 
-        Button btnCancel = new Button(this);
+        TextView btnCancel = new TextView(this);
         btnCancel.setText("CANCEL");
         TuixtTheme.styleButton(this, btnCancel, false);
-        btnCancel.setOnClickListener(v -> finish());
+        btnCancel.setOnClickListener(v -> attemptClose());
         btnLayout.addView(btnCancel);
 
         View spacer = new View(this);
         spacer.setLayoutParams(new LinearLayout.LayoutParams(0, 1, 1));
         btnLayout.addView(spacer);
 
-        Button btnSave = new Button(this);
+        TextView btnSave = new TextView(this);
         btnSave.setText("SAVE");
         TuixtTheme.styleButton(this, btnSave, true);
         btnSave.setOnClickListener(v -> {
@@ -199,8 +195,13 @@ public class TuixtActivity extends Activity {
 
     @Override
     public void onBackPressed() {
+        attemptClose();
+    }
+
+    private void attemptClose() {
         if (!hasUnsavedChanges()) {
-            super.onBackPressed();
+            setResult(BACK_PRESSED);
+            finish();
             return;
         }
 

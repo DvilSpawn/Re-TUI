@@ -47,6 +47,9 @@ public class ThemerActivity extends AppCompatActivity {
     public static final String SECTION_SYSTEM = "system";
 
     private RecyclerView recyclerView;
+    private TextView header;
+    private RecyclerView.Adapter<ViewHolder> sectionsAdapter;
+    private final List<String> sectionItems = new ArrayList<>();
     private String section;
 
     @Override
@@ -75,7 +78,7 @@ public class ThemerActivity extends AppCompatActivity {
         panelParams.setMargins(panelLeft, panelTop, TuixtTheme.dp(this, 28), TuixtTheme.dp(this, 28));
         screen.addView(root, panelParams);
 
-        TextView header = new TextView(this);
+        header = new TextView(this);
         header.setText(getHeaderText(section));
         TuixtTheme.styleHeader(this, header);
         FrameLayout.LayoutParams headerParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -88,9 +91,10 @@ public class ThemerActivity extends AppCompatActivity {
         recyclerView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1));
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        List<String> items = getItemsForSection(section);
+        sectionItems.clear();
+        sectionItems.addAll(getItemsForSection(section));
 
-        recyclerView.setAdapter(new RecyclerView.Adapter<ViewHolder>() {
+        sectionsAdapter = new RecyclerView.Adapter<ViewHolder>() {
             @Override
             public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
                 TextView tv = new TextView(parent.getContext());
@@ -100,7 +104,7 @@ public class ThemerActivity extends AppCompatActivity {
 
             @Override
             public void onBindViewHolder(ViewHolder holder, int position) {
-                String fileName = items.get(position);
+                String fileName = sectionItems.get(position);
                 TextView itemView = (TextView) holder.itemView;
                 itemView.setText(fileName.toUpperCase());
                 TuixtTheme.styleListItem(ThemerActivity.this, itemView, false);
@@ -169,7 +173,7 @@ public class ThemerActivity extends AppCompatActivity {
 
             @Override
             public int getItemCount() {
-                return items.size();
+                return sectionItems.size();
             }
 
             private void applySystemFont() {
@@ -236,7 +240,9 @@ public class ThemerActivity extends AppCompatActivity {
                     finish();
                 }, 500);
             }
-        });
+        };
+
+        recyclerView.setAdapter(sectionsAdapter);
 
         root.addView(recyclerView);
         setContentView(screen);
@@ -351,9 +357,21 @@ public class ThemerActivity extends AppCompatActivity {
     }
 
     private void openSection(String targetSection) {
-        Intent intent = new Intent(this, ThemerActivity.class);
-        intent.putExtra(EXTRA_SECTION, targetSection);
-        startActivity(intent);
+        section = targetSection;
+        header.setText(getHeaderText(section));
+        sectionItems.clear();
+        sectionItems.addAll(getItemsForSection(section));
+        sectionsAdapter.notifyDataSetChanged();
+        recyclerView.scrollToPosition(0);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (!SECTION_HOME.equals(section)) {
+            openSection(SECTION_HOME);
+            return;
+        }
+        super.onBackPressed();
     }
 
     private void launchWallpaperPicker() {

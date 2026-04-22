@@ -146,8 +146,7 @@ final class TuixtDialog {
                 ViewGroup.LayoutParams.WRAP_CONTENT));
         panel.addView(scrollView, new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
-                0,
-                1));
+                ViewGroup.LayoutParams.WRAP_CONTENT));
 
         if (buttons != null) {
             panel.addView(buttons);

@@ -36,7 +36,7 @@ final class TuixtTheme {
     }
 
     static int overlayColor() {
-        return ColorUtils.setAlphaComponent(0xFF000000, 188);
+        return ColorUtils.setAlphaComponent(0xFF000000, 96);
     }
 
     static void stylePanel(Context context, View view) {

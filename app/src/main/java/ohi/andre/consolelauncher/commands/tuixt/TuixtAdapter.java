@@ -1,6 +1,7 @@
 package ohi.andre.consolelauncher.commands.tuixt;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -139,6 +140,7 @@ public class TuixtAdapter extends RecyclerView.Adapter<TuixtAdapter.ViewHolder> 
 
     private void showColorPicker(ViewHolder holder, XMLPrefsSave item, String currentHex) {
         View dialogView = LayoutInflater.from(holder.itemView.getContext()).inflate(R.layout.color_picker_dialog, null);
+        styleColorPicker(dialogView);
         View preview = dialogView.findViewById(R.id.color_preview);
         SeekBar seekAlpha = dialogView.findViewById(R.id.seek_alpha);
         SeekBar seekHue = dialogView.findViewById(R.id.seek_hue);
@@ -195,6 +197,63 @@ public class TuixtAdapter extends RecyclerView.Adapter<TuixtAdapter.ViewHolder> 
                     holder.input.setText(finalHex);
                     pendingChanges.put(item, finalHex);
                 });
+    }
+
+    private void styleColorPicker(View dialogView) {
+        Context context = dialogView.getContext();
+        dialogView.setBackgroundColor(Color.TRANSPARENT);
+
+        TextView title = dialogView.findViewById(R.id.picker_title);
+        if (title != null) {
+            title.setVisibility(View.GONE);
+        }
+
+        int accent = TuixtTheme.borderColor();
+        int text = TuixtTheme.textColor();
+        tintSeekBar(dialogView.findViewById(R.id.seek_alpha), accent);
+        tintSeekBar(dialogView.findViewById(R.id.seek_hue), accent);
+        tintSeekBar(dialogView.findViewById(R.id.seek_sat), accent);
+        tintSeekBar(dialogView.findViewById(R.id.seek_val), accent);
+
+        stylePickerLabels(dialogView, text);
+        TextView hexText = dialogView.findViewById(R.id.hex_preview);
+        if (hexText != null) {
+            hexText.setTextColor(text);
+            hexText.setTypeface(ohi.andre.consolelauncher.tuils.Tuils.getTypeface(context), android.graphics.Typeface.BOLD);
+            hexText.setBackground(TuixtTheme.rect(context, TuixtTheme.surfaceColor(), TuixtTheme.borderColor(), 1.25f));
+            hexText.setPadding(
+                    TuixtTheme.dp(context, 8),
+                    TuixtTheme.dp(context, 8),
+                    TuixtTheme.dp(context, 8),
+                    TuixtTheme.dp(context, 8));
+        }
+    }
+
+    private void stylePickerLabels(View root, int textColor) {
+        if (!(root instanceof ViewGroup)) {
+            return;
+        }
+        ViewGroup group = (ViewGroup) root;
+        for (int i = 0; i < group.getChildCount(); i++) {
+            View child = group.getChildAt(i);
+            if (child instanceof TextView && child.getId() != R.id.hex_preview && child.getId() != R.id.picker_title) {
+                TextView label = (TextView) child;
+                label.setTextColor(textColor);
+                label.setTypeface(ohi.andre.consolelauncher.tuils.Tuils.getTypeface(root.getContext()), android.graphics.Typeface.BOLD);
+            } else {
+                stylePickerLabels(child, textColor);
+            }
+        }
+    }
+
+    private void tintSeekBar(SeekBar seekBar, int color) {
+        if (seekBar == null) {
+            return;
+        }
+        ColorStateList tint = ColorStateList.valueOf(color);
+        seekBar.setProgressTintList(tint);
+        seekBar.setThumbTintList(tint);
+        seekBar.setProgressBackgroundTintList(ColorStateList.valueOf(TuixtTheme.surfaceColor()));
     }
 
     @Override
