@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import ohi.andre.consolelauncher.R;
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager;
+import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsElement;
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave;
 
 public class TuixtAdapter extends RecyclerView.Adapter<TuixtAdapter.ViewHolder> {
@@ -42,8 +43,10 @@ public class TuixtAdapter extends RecyclerView.Adapter<TuixtAdapter.ViewHolder> 
         for (Map.Entry<XMLPrefsSave, String> entry : pendingChanges.entrySet()) {
             XMLPrefsSave item = entry.getKey();
             String value = entry.getValue();
-            XMLPrefsManager.XMLPrefsRoot root = (XMLPrefsManager.XMLPrefsRoot) item.parent();
-            root.write(item, value);
+            XMLPrefsElement parent = item.parent();
+            if (parent != null) {
+                parent.write(item, value);
+            }
         }
     }
 

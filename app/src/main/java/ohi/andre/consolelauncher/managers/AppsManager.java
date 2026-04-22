@@ -103,6 +103,7 @@ public class AppsManager implements XMLPrefsElement {
     @Override
     public void write(XMLPrefsSave save, String value) {
         set(new File(Tuils.getFolder(), PATH), save.label(), new String[] {VALUE_ATTRIBUTE}, new String[] {value});
+        prefsList.add(save.label(), value);
     }
 
     @Override

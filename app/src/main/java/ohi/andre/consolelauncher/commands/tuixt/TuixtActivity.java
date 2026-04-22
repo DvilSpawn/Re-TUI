@@ -128,6 +128,7 @@ public class TuixtActivity extends Activity {
                     Toast.makeText(this, "Error saving: " + e.getMessage(), Toast.LENGTH_LONG).show();
                 }
             }
+            ohi.andre.consolelauncher.managers.notifications.NotificationService.requestReload(this);
             setResult(SAVE_PRESSED);
             finish();
         });

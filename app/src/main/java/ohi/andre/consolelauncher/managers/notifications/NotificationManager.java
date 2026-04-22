@@ -64,6 +64,7 @@ public class NotificationManager implements XMLPrefsElement {
     @Override
     public void write(XMLPrefsSave save, String value) {
         set(new File(Tuils.getFolder(), PATH), save.label(), new String[] {VALUE_ATTRIBUTE}, new String[] {value});
+        values.add(save.label(), value);
     }
 
     @Override
