@@ -12,6 +12,13 @@ This wiki is organized like the original upstream docs, but rebuilt around the c
 - [Customization and Config Files](./Customization-and-Config-Files.md)
 - [Settings Hub](./Settings-Hub.md)
 
+## Reference and Guides
+
+- [Command Reference](./Command-Reference.md)
+- [Migration Guide](./Migration-Guide.md)
+- [Preset Sharing](./Preset-Sharing.md)
+- [FAQ and Troubleshooting](./FAQ-and-Troubleshooting.md)
+
 ## Features
 
 - [Presets and Wallpaper Auto Color](./Presets-and-Wallpaper-Auto-Color.md)
