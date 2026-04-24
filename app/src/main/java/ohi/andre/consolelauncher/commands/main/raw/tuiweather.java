@@ -66,7 +66,7 @@ public class tuiweather extends ParamCommand {
         tutorial {
             @Override
             public String exec(ExecutePack pack) {
-                pack.context.startActivity(Tuils.webPage("https://github.com/DvilSpawn/Re-T-UI/wiki/Weather"));
+                pack.context.startActivity(Tuils.webPage("https://github.com/DvilSpawn/Re-TUI/wiki/Weather"));
                 return null;
             }
         },

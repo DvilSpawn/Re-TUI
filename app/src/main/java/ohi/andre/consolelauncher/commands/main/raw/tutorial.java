@@ -13,7 +13,7 @@ import ohi.andre.consolelauncher.tuils.Tuils;
 
 public class tutorial implements CommandAbstraction {
 
-    final String url = "https://github.com/DvilSpawn/Re-T-UI/wiki";
+    final String url = "https://github.com/DvilSpawn/Re-TUI/wiki";
 
     @Override
     public String exec(ExecutePack pack) throws Exception {

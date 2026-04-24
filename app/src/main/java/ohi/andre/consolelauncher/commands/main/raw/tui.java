@@ -102,7 +102,7 @@ public class tui extends ParamCommand {
         sourcecode {
             @Override
             public String exec(ExecutePack pack) {
-                pack.context.startActivity(Tuils.webPage("https://github.com/DvilSpawn/Re-T-UI"));
+                pack.context.startActivity(Tuils.webPage("https://github.com/DvilSpawn/Re-TUI"));
                 return null;
             }
         },

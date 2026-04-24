@@ -24,7 +24,7 @@ import ohi.andre.consolelauncher.commands.main.MainPack;
 
 public class donate implements CommandAbstraction {
 
-    private final String DONATE_URL = "https://github.com/DvilSpawn/Re-T-UI";
+    private final String DONATE_URL = "https://github.com/DvilSpawn/Re-TUI";
 
     @Override
     public String exec(ExecutePack pack) {

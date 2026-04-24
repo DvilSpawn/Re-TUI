@@ -78,7 +78,7 @@ public class alias extends ParamCommand {
 
             @Override
             public String exec(ExecutePack pack) {
-                pack.context.startActivity(Tuils.webPage("https://github.com/DvilSpawn/Re-T-UI/wiki/Alias"));
+                pack.context.startActivity(Tuils.webPage("https://github.com/DvilSpawn/Re-TUI/wiki/Alias"));
                 return null;
             }
         };

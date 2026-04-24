@@ -102,7 +102,7 @@ public class reply extends ParamCommand implements APICommand {
 
             @Override
             public String exec(ExecutePack pack) {
-                pack.context.startActivity(Tuils.webPage("https://github.com/DvilSpawn/Re-T-UI/wiki/Reply"));
+                pack.context.startActivity(Tuils.webPage("https://github.com/DvilSpawn/Re-TUI/wiki/Reply"));
                 return null;
             }
         };

@@ -158,7 +158,7 @@ public class htmlextract extends ParamCommand {
 
             @Override
             public String exec(ExecutePack pack) {
-                pack.context.startActivity(Tuils.webPage("https://github.com/DvilSpawn/Re-T-UI/wiki/HTMLExtract"));
+                pack.context.startActivity(Tuils.webPage("https://github.com/DvilSpawn/Re-TUI/wiki/HTMLExtract"));
                 return null;
             }
         },

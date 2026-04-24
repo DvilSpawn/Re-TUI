@@ -325,7 +325,7 @@ public class config extends ParamCommand {
 
             @Override
             public String exec(ExecutePack pack) {
-                pack.context.startActivity(Tuils.webPage("https://github.com/DvilSpawn/Re-T-UI/wiki/Customize-T_UI"));
+                pack.context.startActivity(Tuils.webPage("https://github.com/DvilSpawn/Re-TUI/wiki/Customize-T_UI"));
                 return null;
             }
         };
