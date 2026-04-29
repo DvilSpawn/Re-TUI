@@ -707,7 +707,7 @@ public class SuggestionsManager {
     private void suggestAlias(AliasManager aliasManager, List<Suggestion> suggestions, String lastWord) {
         int canInsert = lastWord == null || lastWord.length() == 0 ? noInputCounts[Suggestion.TYPE_ALIAS] : counts[Suggestion.TYPE_ALIAS];
 
-        for(AliasManager.Alias a : aliasManager.getAliases(true)) {
+        for(AliasManager.Alias a : aliasManager.getAliases(true, AliasManager.SCOPE_APP)) {
             if (lastWord.length() == 0 || a.name.startsWith(lastWord)) {
                 if (canInsert == 0) return;
                 canInsert--;
@@ -803,7 +803,7 @@ public class SuggestionsManager {
                 break;
         }
 
-        suggestClockCommandArgs(suggestions, afterLastSpace, beforeLastSpace);
+        suggestClockCommandArgs(info, suggestions, afterLastSpace, beforeLastSpace);
     }
 
     private void suggestClockCommandRoots(List<Suggestion> suggestions, String lastWord) {
@@ -827,9 +827,16 @@ public class SuggestionsManager {
                 suggestions.add(new Suggestion(null, option, true, Suggestion.TYPE_PERMANENT));
             }
         }
+
+        if ("termux".startsWith(lower)) {
+            suggestions.add(new Suggestion(null, "termux", true, Suggestion.TYPE_PERMANENT));
+            suggestions.add(new Suggestion(null, "termux -status", true, Suggestion.TYPE_PERMANENT));
+            suggestions.add(new Suggestion(null, "termux -open", true, Suggestion.TYPE_PERMANENT));
+            suggestions.add(new Suggestion(null, "termux -run", false, Suggestion.TYPE_PERMANENT));
+        }
     }
 
-    private void suggestClockCommandArgs(List<Suggestion> suggestions, String afterLastSpace, String beforeLastSpace) {
+    private void suggestClockCommandArgs(MainPack pack, List<Suggestion> suggestions, String afterLastSpace, String beforeLastSpace) {
         if (beforeLastSpace == null || beforeLastSpace.isEmpty()) {
             return;
         }
@@ -854,6 +861,30 @@ public class SuggestionsManager {
             suggestions.add(new Suggestion(beforeLastSpace, "-stop", true, Suggestion.TYPE_COMMAND));
             suggestions.add(new Suggestion(beforeLastSpace, "-reset", true, Suggestion.TYPE_COMMAND));
             suggestions.add(new Suggestion(beforeLastSpace, "-status", true, Suggestion.TYPE_COMMAND));
+        } else if ("termux".equals(normalized)) {
+            suggestions.add(new Suggestion(beforeLastSpace, "-status", true, Suggestion.TYPE_COMMAND));
+            suggestions.add(new Suggestion(beforeLastSpace, "-open", true, Suggestion.TYPE_COMMAND));
+            suggestions.add(new Suggestion(beforeLastSpace, "-run", false, Suggestion.TYPE_COMMAND));
+        } else if ("termux -run".equals(normalized) || "termux run".equals(normalized)) {
+            suggestScopedAliases(pack.aliasManager, suggestions, afterLastSpace, beforeLastSpace, AliasManager.SCOPE_SCRIPT);
+        }
+    }
+
+    private void suggestScopedAliases(AliasManager aliasManager, List<Suggestion> suggestions, String lastWord, String beforeLastSpace, String scope) {
+        if(aliasManager == null) {
+            return;
+        }
+
+        String filter = lastWord == null ? Tuils.EMPTYSTRING : lastWord;
+        int canInsert = filter.length() == 0 ? noInputCounts[Suggestion.TYPE_ALIAS] : counts[Suggestion.TYPE_ALIAS];
+
+        for(AliasManager.Alias a : aliasManager.getAliases(true, scope)) {
+            if (filter.length() == 0 || a.name.startsWith(filter)) {
+                if (canInsert == 0) return;
+                canInsert--;
+
+                suggestions.add(new Suggestion(beforeLastSpace, a.name, false, Suggestion.TYPE_ALIAS));
+            }
         }
     }
 

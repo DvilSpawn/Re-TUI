@@ -181,6 +181,11 @@
         android:layout_gravity="end|center_vertical" />
 
     <include
+        layout="@layout/termux_console"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <include
         layout="@layout/apps_drawer"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

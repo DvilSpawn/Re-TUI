@@ -13,6 +13,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
@@ -43,15 +44,18 @@ import android.view.GestureDetector;
 import android.view.GestureDetector.OnDoubleTapListener;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import ohi.andre.consolelauncher.commands.main.MainPack;
 import ohi.andre.consolelauncher.managers.AppsManager;
+import ohi.andre.consolelauncher.managers.AliasManager;
 import ohi.andre.consolelauncher.managers.ClockManager;
 import ohi.andre.consolelauncher.managers.music.MusicService;
 import java.util.Collections;
@@ -150,6 +154,23 @@ public class UIManager implements OnTouchListener {
     public static final String ACTION_CLOCK_STATE = ClockManager.ACTION_CLOCK_STATE;
     public static final String ACTION_POMODORO_STATE = PomodoroManager.ACTION_POMODORO_STATE;
     public static final String ACTION_DASHBOARD = BuildConfig.APPLICATION_ID + ".ui_dashboard";
+    public static final String ACTION_TERMUX_CONSOLE = BuildConfig.APPLICATION_ID + ".ui_termux_console";
+    public static final String EXTRA_TERMUX_COMMAND = "termux_command";
+    private static final String TERMUX_PACKAGE = "com.termux";
+    private static final String TERMUX_RUN_COMMAND_PERMISSION = "com.termux.permission.RUN_COMMAND";
+    private static final String TERMUX_RUN_COMMAND_ACTION = "com.termux.RUN_COMMAND";
+    private static final String TERMUX_RUN_COMMAND_SERVICE = "com.termux.app.RunCommandService";
+    private static final String TERMUX_RUN_COMMAND_PATH = "com.termux.RUN_COMMAND_PATH";
+    private static final String TERMUX_RUN_COMMAND_ARGUMENTS = "com.termux.RUN_COMMAND_ARGUMENTS";
+    private static final String TERMUX_RUN_COMMAND_BACKGROUND = "com.termux.RUN_COMMAND_BACKGROUND";
+    private static final String TERMUX_RUN_COMMAND_PENDING_INTENT = "com.termux.RUN_COMMAND_PENDING_INTENT";
+    public static final String ACTION_TERMUX_RESULT = BuildConfig.APPLICATION_ID + ".ui_termux_result";
+    public static final String EXTRA_TERMUX_RESULT_PATH = "termux_result_path";
+    public static final String EXTRA_TERMUX_RESULT_STDOUT = "termux_result_stdout";
+    public static final String EXTRA_TERMUX_RESULT_STDERR = "termux_result_stderr";
+    public static final String EXTRA_TERMUX_RESULT_EXIT_CODE = "termux_result_exit_code";
+    public static final String EXTRA_TERMUX_RESULT_ERROR = "termux_result_error";
+    public static final String EXTRA_TERMUX_RESULT_DEBUG = "termux_result_debug";
     public static final String ACTION_NOTIFICATION_RECEIVED = BuildConfig.APPLICATION_ID + ".ui_notification_received";
     public static final String NOTIFICATION_TEXT = "notification_text";
 
@@ -198,6 +219,7 @@ public class UIManager implements OnTouchListener {
     private final LinkedHashMap<String, Integer> appsDrawerAlphaPositions = new LinkedHashMap<>();
     private final LinkedHashMap<String, TextView> appsDrawerAlphaViews = new LinkedHashMap<>();
     private final ArrayList<NotificationService.Notification> currentOverlayNotifications = new ArrayList<>();
+    private final StringBuilder termuxBuffer = new StringBuilder();
     private boolean notificationCompactForKeyboard = false;
     private boolean timerTabVisible = false;
     private boolean stopwatchTabVisible = false;
@@ -207,6 +229,23 @@ public class UIManager implements OnTouchListener {
     }
     private String selectedAppsDrawerGroup = null;
     private String selectedAppsDrawerAlpha = null;
+    private View termuxOverlay;
+    private View termuxWindowBorder;
+    private TextView termuxWindowLabel;
+    private TextView termuxClose;
+    private TextView termuxOutput;
+    private TextView termuxPrefix;
+    private EditText termuxInput;
+    private ScrollView termuxScroll;
+    private View termuxInputGroup;
+    private View termuxTools;
+    private TextView termuxClear;
+    private TextView termuxUp;
+    private TextView termuxDown;
+    private TextView termuxPaste;
+    private View suggestionsContainer;
+    private int suggestionsVisibilityBeforeTermux = View.VISIBLE;
+    private boolean termuxConsoleOpen = false;
 
     SharedPreferences preferences;
 
@@ -678,6 +717,80 @@ public class UIManager implements OnTouchListener {
         scheduleTypefaceRefreshes();
     }
 
+    private void setupTermuxConsole(ViewGroup rootView) {
+        termuxOverlay = rootView.findViewById(R.id.termux_overlay);
+        if (termuxOverlay == null) {
+            return;
+        }
+
+        termuxWindowBorder = rootView.findViewById(R.id.termux_window_border);
+        termuxWindowLabel = rootView.findViewById(R.id.termux_window_label);
+        termuxClose = rootView.findViewById(R.id.termux_close);
+        termuxOutput = rootView.findViewById(R.id.termux_output);
+        termuxPrefix = rootView.findViewById(R.id.termux_prefix);
+        termuxInput = rootView.findViewById(R.id.termux_input);
+        termuxScroll = rootView.findViewById(R.id.termux_scroll);
+        termuxInputGroup = rootView.findViewById(R.id.termux_input_group);
+        termuxTools = rootView.findViewById(R.id.termux_tools);
+        termuxClear = rootView.findViewById(R.id.termux_clear);
+        termuxUp = rootView.findViewById(R.id.termux_up);
+        termuxDown = rootView.findViewById(R.id.termux_down);
+        termuxPaste = rootView.findViewById(R.id.termux_paste);
+        suggestionsContainer = rootView.findViewById(R.id.suggestions_container);
+
+        styleTermuxConsole();
+
+        if (termuxClose != null) {
+            termuxClose.setOnClickListener(v -> closeTermuxConsole());
+        }
+
+        if (termuxInput != null) {
+            termuxInput.setOnEditorActionListener((v, actionId, event) -> {
+                boolean enter = event != null
+                        && event.getKeyCode() == KeyEvent.KEYCODE_ENTER
+                        && event.getAction() == KeyEvent.ACTION_UP;
+                if (actionId == EditorInfo.IME_ACTION_GO || enter) {
+                    String command = termuxInput.getText().toString();
+                    termuxInput.setText(Tuils.EMPTYSTRING);
+                    executeTermuxConsoleCommand(command);
+                    return true;
+                }
+                return false;
+            });
+        }
+
+        if (termuxClear != null) {
+            termuxClear.setOnClickListener(v -> {
+                termuxBuffer.setLength(0);
+                updateTermuxOutput();
+            });
+        }
+        if (termuxUp != null) {
+            termuxUp.setOnClickListener(v -> {
+                if (termuxScroll != null) {
+                    termuxScroll.smoothScrollBy(0, -(int) Tuils.dpToPx(mContext, 120));
+                }
+            });
+        }
+        if (termuxDown != null) {
+            termuxDown.setOnClickListener(v -> {
+                if (termuxScroll != null) {
+                    termuxScroll.smoothScrollBy(0, (int) Tuils.dpToPx(mContext, 120));
+                }
+            });
+        }
+        if (termuxPaste != null) {
+            termuxPaste.setOnClickListener(v -> {
+                String text = Tuils.getTextFromClipboard(mContext);
+                if (text != null && text.length() > 0 && termuxInput != null) {
+                    int start = Math.max(termuxInput.getSelectionStart(), 0);
+                    int end = Math.max(termuxInput.getSelectionEnd(), 0);
+                    termuxInput.getText().replace(Math.min(start, end), Math.max(start, end), text);
+                }
+            });
+        }
+    }
+
     protected UIManager(final Context context, final ViewGroup rootView, MainPack mainPack, boolean canApplyTheme, CommandExecuter executer) {
         this.mRootView = rootView;
         this.mainPack = mainPack;
@@ -701,6 +814,8 @@ public class UIManager implements OnTouchListener {
         filter.addAction(ACTION_CLOCK_STATE);
         filter.addAction(ACTION_POMODORO_STATE);
         filter.addAction(ACTION_DASHBOARD);
+        filter.addAction(ACTION_TERMUX_CONSOLE);
+        filter.addAction(ACTION_TERMUX_RESULT);
 
         receiver = new BroadcastReceiver() {
             @Override
@@ -722,6 +837,10 @@ public class UIManager implements OnTouchListener {
                         int page = intent.getIntExtra("page", 1);
                         viewPager.setCurrentItem(page, true);
                     }
+                } else if(action.equals(ACTION_TERMUX_CONSOLE)) {
+                    openTermuxConsole(intent.getStringExtra(EXTRA_TERMUX_COMMAND));
+                } else if(action.equals(ACTION_TERMUX_RESULT)) {
+                    appendTermuxResult(intent);
                 } else if(action.equals(ACTION_NOROOT)) {
                     mTerminalAdapter.onStandard();
 //                } else if(action.equals(ACTION_CLEAR_SUGGESTIONS)) {
@@ -931,6 +1050,7 @@ public class UIManager implements OnTouchListener {
         }
 
         styleHackOverlay(rootView);
+        setupTermuxConsole(rootView);
 
 //        scrolllllll
         rootView.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
@@ -1505,6 +1625,471 @@ public class UIManager implements OnTouchListener {
         hackText.setTextColor(accent);
         hackText.setTypeface(Tuils.getTypeface(mContext));
         hackText.setTextSize(11f);
+    }
+
+    private void styleTermuxConsole() {
+        if (termuxOverlay == null) {
+            return;
+        }
+
+        int borderColor = AppearanceSettings.notificationWidgetBorderColor();
+        int textColor = AppearanceSettings.notificationWidgetTextColor();
+        int bgColor = AppearanceSettings.terminalWindowBackground();
+        int labelBg = ColorUtils.setAlphaComponent(bgColor, 255);
+
+        if (termuxWindowBorder != null) {
+            GradientDrawable border = new GradientDrawable();
+            border.setShape(GradientDrawable.RECTANGLE);
+            border.setColor(bgColor);
+            if (AppearanceSettings.dashedBorders()) {
+                border.setStroke((int) Tuils.dpToPx(mContext, 1.5f), borderColor,
+                        Tuils.dpToPx(mContext, AppearanceSettings.dashLength()),
+                        Tuils.dpToPx(mContext, AppearanceSettings.dashGap()));
+            } else {
+                border.setStroke((int) Tuils.dpToPx(mContext, 1.5f), borderColor);
+            }
+            termuxWindowBorder.setBackground(border);
+        }
+
+        if (termuxWindowLabel != null) {
+            termuxWindowLabel.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD);
+            termuxWindowLabel.setTextColor(textColor);
+            termuxWindowLabel.setBackground(termuxLabelBackground(labelBg, borderColor));
+        }
+
+        if (termuxClose != null) {
+            termuxClose.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD);
+            termuxClose.setTextColor(textColor);
+            termuxClose.setBackground(termuxLabelBackground(labelBg, borderColor));
+        }
+
+        if (termuxOutput != null) {
+            termuxOutput.setTypeface(Tuils.getTypeface(mContext));
+            termuxOutput.setTextColor(textColor);
+            termuxOutput.setTextIsSelectable(true);
+        }
+
+        if (termuxPrefix != null) {
+            termuxPrefix.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD);
+            termuxPrefix.setTextColor(textColor);
+        }
+
+        if (termuxInput != null) {
+            termuxInput.setTypeface(Tuils.getTypeface(mContext));
+            termuxInput.setTextColor(textColor);
+            termuxInput.setHintTextColor(ColorUtils.setAlphaComponent(textColor, 150));
+        }
+
+        if (termuxInputGroup != null) {
+            GradientDrawable inputBg = new GradientDrawable();
+            inputBg.setShape(GradientDrawable.RECTANGLE);
+            inputBg.setColor(ColorUtils.blendARGB(bgColor, Color.BLACK, 0.16f));
+            inputBg.setStroke((int) Tuils.dpToPx(mContext, 1.2f), ColorUtils.setAlphaComponent(borderColor, 180));
+            termuxInputGroup.setBackground(inputBg);
+        }
+
+        if (termuxTools != null) {
+            termuxTools.setBackgroundColor(Color.TRANSPARENT);
+        }
+        styleTermuxToolButton(termuxClear, textColor);
+        styleTermuxToolButton(termuxUp, textColor);
+        styleTermuxToolButton(termuxDown, textColor);
+        styleTermuxToolButton(termuxPaste, textColor);
+    }
+
+    private GradientDrawable termuxLabelBackground(int fill, int stroke) {
+        GradientDrawable bg = new GradientDrawable();
+        bg.setShape(GradientDrawable.RECTANGLE);
+        bg.setColor(fill);
+        if (AppearanceSettings.dashedBorders()) {
+            bg.setStroke((int) Tuils.dpToPx(mContext, 1.5f), stroke,
+                    Tuils.dpToPx(mContext, AppearanceSettings.dashLength()),
+                    Tuils.dpToPx(mContext, AppearanceSettings.dashGap()));
+        } else {
+            bg.setStroke((int) Tuils.dpToPx(mContext, 1.5f), stroke);
+        }
+        return bg;
+    }
+
+    private void styleTermuxToolButton(TextView button, int color) {
+        if (button == null) {
+            return;
+        }
+        button.setBackgroundColor(Color.TRANSPARENT);
+        button.setTextColor(color);
+        button.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD);
+        button.setPadding((int) Tuils.dpToPx(mContext, 2), 0,
+                (int) Tuils.dpToPx(mContext, 2), 0);
+    }
+
+    public void openTermuxConsole(String command) {
+        if (termuxOverlay == null) {
+            return;
+        }
+
+        styleTermuxConsole();
+        termuxOverlay.setVisibility(View.VISIBLE);
+        termuxOverlay.bringToFront();
+        hideHomeSuggestionsForTermux();
+
+        if (termuxBuffer.length() == 0) {
+            appendTermuxLine("Re:T-UI Termux console");
+            appendTermuxLine("Type help, status, open, run, clear, or exit.");
+            appendTermuxLine("Run non-interactive Termux scripts from here.");
+        }
+
+        String normalized = command == null ? Tuils.EMPTYSTRING : command.trim();
+        if (normalized.length() > 0) {
+            if (normalized.startsWith("-")) {
+                normalized = normalized.substring(1);
+            }
+            executeTermuxConsoleCommand(normalized);
+        }
+
+        if (termuxInput != null) {
+            termuxInput.requestFocus();
+            termuxInput.postDelayed(() -> {
+                InputMethodManager manager = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+                if (manager != null) {
+                    manager.showSoftInput(termuxInput, InputMethodManager.SHOW_IMPLICIT);
+                }
+            }, 120);
+        }
+    }
+
+    private void closeTermuxConsole() {
+        if (termuxOverlay != null) {
+            termuxOverlay.setVisibility(View.GONE);
+        }
+        restoreHomeSuggestionsAfterTermux();
+        if (termuxInput != null) {
+            InputMethodManager manager = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+            if (manager != null) {
+                manager.hideSoftInputFromWindow(termuxInput.getWindowToken(), 0);
+            }
+            termuxInput.clearFocus();
+        }
+        if (mTerminalAdapter != null) {
+            mTerminalAdapter.focusInputEnd();
+        }
+    }
+
+    private void hideHomeSuggestionsForTermux() {
+        if (termuxConsoleOpen) {
+            return;
+        }
+        termuxConsoleOpen = true;
+        if (suggestionsContainer != null) {
+            suggestionsVisibilityBeforeTermux = suggestionsContainer.getVisibility();
+            suggestionsContainer.setVisibility(View.GONE);
+        }
+    }
+
+    private void restoreHomeSuggestionsAfterTermux() {
+        if (!termuxConsoleOpen) {
+            return;
+        }
+        termuxConsoleOpen = false;
+        if (suggestionsContainer != null) {
+            suggestionsContainer.setVisibility(suggestionsVisibilityBeforeTermux);
+        }
+    }
+
+    private void executeTermuxConsoleCommand(String rawCommand) {
+        String displayCommand = rawCommand == null ? Tuils.EMPTYSTRING : rawCommand.trim();
+        if (displayCommand.length() == 0) {
+            return;
+        }
+
+        appendTermuxLine("$ " + displayCommand);
+        String command = normalizeTermuxConsoleCommand(displayCommand);
+        if (command.length() == 0) {
+            appendTermuxLine("Termux console is already open. Type help for available commands.");
+            return;
+        }
+
+        String lower = command.toLowerCase(Locale.US);
+        if ("exit".equals(lower) || "close".equals(lower)) {
+            appendTermuxLine("closing termux console.");
+            closeTermuxConsole();
+        } else if ("clear".equals(lower)) {
+            termuxBuffer.setLength(0);
+            updateTermuxOutput();
+        } else if ("help".equals(lower)) {
+            appendTermuxLine("help");
+            appendTermuxLine("status  -> check Termux bridge readiness");
+            appendTermuxLine("open    -> launch Termux");
+            appendTermuxLine("run <script> [args...] -> dispatch a Termux script");
+            appendTermuxLine("clear   -> clear this console");
+            appendTermuxLine("exit    -> close this console");
+        } else if ("status".equals(lower)) {
+            appendTermuxStatus();
+        } else if ("open".equals(lower)) {
+            openTermuxApp();
+        } else if (lower.startsWith("run")) {
+            runTermuxCommand(command);
+        } else {
+            appendTermuxLine("unknown termux console command: " + command);
+            appendTermuxLine("type help for available commands.");
+        }
+    }
+
+    private String normalizeTermuxConsoleCommand(String command) {
+        String normalized = command == null ? Tuils.EMPTYSTRING : command.trim();
+        String lower = normalized.toLowerCase(Locale.US);
+
+        if ("termux".equals(lower)) {
+            return Tuils.EMPTYSTRING;
+        }
+
+        if (lower.startsWith("termux ")) {
+            normalized = normalized.substring("termux".length()).trim();
+        }
+
+        if (normalized.startsWith("-")) {
+            normalized = normalized.substring(1).trim();
+        }
+
+        return normalized;
+    }
+
+    private void appendTermuxStatus() {
+        boolean installed = isPackageInstalled(TERMUX_PACKAGE);
+        boolean bridgeAvailable = installed && termuxDeclaresRunCommandPermission();
+        boolean permissionGranted = hasTermuxRunCommandPermission();
+
+        appendTermuxLine("Termux installed: " + installed);
+        appendTermuxLine("RunCommand bridge: " + (bridgeAvailable ? "available" : "not available"));
+        appendTermuxLine("RunCommand permission: " + (permissionGranted ? "granted" : "not granted"));
+        appendTermuxLine("Required Termux setting: allow-external-apps=true");
+        if (!installed) {
+            appendTermuxLine("Install Termux before enabling script dispatch.");
+        } else if (!bridgeAvailable) {
+            appendTermuxLine("This Termux build does not expose RUN_COMMAND.");
+            appendTermuxLine("Install the current Termux build from F-Droid/GitHub, not the old Play Store build.");
+        } else if (!permissionGranted) {
+            appendTermuxLine("Grant Re:T-UI permission to run commands in Termux when prompted by Android/Termux.");
+        } else {
+            appendTermuxLine("Bridge prerequisites look ready for the next phase.");
+        }
+    }
+
+    private void runTermuxCommand(String command) {
+        List<String> parts = Tuils.splitArgs(command);
+        if (parts.size() < 2) {
+            appendTermuxLine("usage: run <script_path> [args...]");
+            appendTermuxLine("example: run /data/data/com.termux/files/home/retui/myscript.sh");
+            return;
+        }
+
+        if (!isPackageInstalled(TERMUX_PACKAGE)) {
+            appendTermuxLine("Termux is not installed.");
+            return;
+        }
+
+        if (!termuxDeclaresRunCommandPermission()) {
+            appendTermuxLine("This Termux build does not expose RUN_COMMAND.");
+            appendTermuxLine("Install/update Termux from F-Droid or GitHub, then retry.");
+            return;
+        }
+
+        if (!hasTermuxRunCommandPermission()) {
+            requestTermuxRunCommandPermission();
+            appendTermuxLine("RunCommand permission is not granted yet.");
+            appendTermuxLine("If Android shows a permission prompt, allow Re:T-UI and retry.");
+            appendTermuxLine("Termux must also have allow-external-apps=true.");
+            return;
+        }
+
+        String path = parts.get(1);
+        String aliasName = path;
+        path = resolveTermuxAlias(path);
+        ArrayList<String> args = new ArrayList<>();
+        if (parts.size() > 2) {
+            args.addAll(parts.subList(2, parts.size()));
+        }
+
+        Intent intent = new Intent(TERMUX_RUN_COMMAND_ACTION);
+        intent.setClassName(TERMUX_PACKAGE, TERMUX_RUN_COMMAND_SERVICE);
+        intent.putExtra(TERMUX_RUN_COMMAND_PATH, path);
+        intent.putExtra(TERMUX_RUN_COMMAND_BACKGROUND, true);
+        intent.putExtra(TERMUX_RUN_COMMAND_PENDING_INTENT, createTermuxResultPendingIntent(path));
+        if (!args.isEmpty()) {
+            intent.putExtra(TERMUX_RUN_COMMAND_ARGUMENTS, args.toArray(new String[0]));
+        }
+
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                ContextCompat.startForegroundService(mContext, intent);
+            } else {
+                mContext.startService(intent);
+            }
+            appendTermuxLine("dispatched to Termux: " + path);
+            if (!aliasName.equals(path)) {
+                appendTermuxLine("alias: " + aliasName + " -> " + path);
+            }
+            if (!args.isEmpty()) {
+                appendTermuxLine("args: " + Tuils.toPlanString(args, Tuils.SPACE));
+            }
+        } catch (SecurityException e) {
+            appendTermuxLine("Termux rejected the command: permission denied.");
+            appendTermuxLine("Check allow-external-apps=true and grant RUN_COMMAND permission.");
+        } catch (Exception e) {
+            appendTermuxLine("unable to dispatch Termux command: " + e.getClass().getSimpleName());
+            appendTermuxLine("Open Termux once, then retry from this console.");
+        }
+    }
+
+    private String resolveTermuxAlias(String candidate) {
+        if (candidate == null || candidate.length() == 0 || mainPack == null || mainPack.aliasManager == null) {
+            return candidate;
+        }
+
+        String[] alias = mainPack.aliasManager.getAlias(candidate, false, AliasManager.SCOPE_SCRIPT);
+        if (alias == null || alias.length == 0 || alias[0] == null || alias[0].trim().length() == 0) {
+            alias = mainPack.aliasManager.getAlias(candidate, false);
+        }
+
+        if (alias == null || alias.length == 0 || alias[0] == null || alias[0].trim().length() == 0) {
+            return candidate;
+        }
+
+        return alias[0].trim();
+    }
+
+    private PendingIntent createTermuxResultPendingIntent(String path) {
+        Intent resultIntent = new Intent(mContext, ohi.andre.consolelauncher.managers.termux.TermuxResultService.class);
+        resultIntent.putExtra(EXTRA_TERMUX_RESULT_PATH, path);
+
+        int flags = PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_UPDATE_CURRENT;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            flags |= PendingIntent.FLAG_MUTABLE;
+        }
+
+        return PendingIntent.getService(mContext, (int) System.currentTimeMillis(), resultIntent, flags);
+    }
+
+    private void appendTermuxResult(Intent intent) {
+        if (intent == null) {
+            return;
+        }
+
+        String path = intent.getStringExtra(EXTRA_TERMUX_RESULT_PATH);
+        String stdout = intent.getStringExtra(EXTRA_TERMUX_RESULT_STDOUT);
+        String stderr = intent.getStringExtra(EXTRA_TERMUX_RESULT_STDERR);
+        int exitCode = intent.getIntExtra(EXTRA_TERMUX_RESULT_EXIT_CODE, Integer.MIN_VALUE);
+        String error = intent.getStringExtra(EXTRA_TERMUX_RESULT_ERROR);
+        String debug = intent.getStringExtra(EXTRA_TERMUX_RESULT_DEBUG);
+
+        appendTermuxLine("result: " + (path == null ? "termux command" : path));
+        if (exitCode != Integer.MIN_VALUE) {
+            appendTermuxLine("exit: " + exitCode);
+        }
+        if (stdout != null && stdout.trim().length() > 0) {
+            appendTermuxLine("stdout:");
+            appendTermuxLine(stdout.trim());
+        }
+        if (stderr != null && stderr.trim().length() > 0) {
+            appendTermuxLine("stderr:");
+            appendTermuxLine(stderr.trim());
+        }
+        if (error != null && error.trim().length() > 0) {
+            appendTermuxLine("error: " + error.trim());
+        }
+        if (debug != null && debug.trim().length() > 0) {
+            appendTermuxLine("debug: " + debug.trim());
+        }
+        if ((stdout == null || stdout.trim().length() == 0)
+                && (stderr == null || stderr.trim().length() == 0)
+                && (error == null || error.trim().length() == 0)) {
+            appendTermuxLine("no output returned.");
+        }
+    }
+
+    private boolean hasTermuxRunCommandPermission() {
+        return Build.VERSION.SDK_INT < Build.VERSION_CODES.M
+                || ContextCompat.checkSelfPermission(mContext, TERMUX_RUN_COMMAND_PERMISSION) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private boolean termuxDeclaresRunCommandPermission() {
+        try {
+            PackageInfo info;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                info = mContext.getPackageManager().getPackageInfo(TERMUX_PACKAGE,
+                        PackageManager.PackageInfoFlags.of(PackageManager.GET_PERMISSIONS));
+            } else {
+                info = mContext.getPackageManager().getPackageInfo(TERMUX_PACKAGE, PackageManager.GET_PERMISSIONS);
+            }
+
+            if (info.permissions == null) {
+                return false;
+            }
+
+            for (android.content.pm.PermissionInfo permission : info.permissions) {
+                if (permission != null && TERMUX_RUN_COMMAND_PERMISSION.equals(permission.name)) {
+                    return true;
+                }
+            }
+        } catch (Exception ignored) {
+            return false;
+        }
+
+        return false;
+    }
+
+    private void requestTermuxRunCommandPermission() {
+        if (!(mContext instanceof Activity) || Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            return;
+        }
+
+        ActivityCompat.requestPermissions((Activity) mContext,
+                new String[] {TERMUX_RUN_COMMAND_PERMISSION},
+                LauncherActivity.COMMAND_REQUEST_PERMISSION);
+    }
+
+    private void openTermuxApp() {
+        Intent launchIntent = mContext.getPackageManager().getLaunchIntentForPackage(TERMUX_PACKAGE);
+        if (launchIntent == null) {
+            appendTermuxLine("Termux is not installed.");
+            return;
+        }
+        launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        try {
+            mContext.startActivity(launchIntent);
+            appendTermuxLine("opened Termux.");
+        } catch (Exception e) {
+            appendTermuxLine("unable to open Termux: " + e.getClass().getSimpleName());
+        }
+    }
+
+    private boolean isPackageInstalled(String packageName) {
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                mContext.getPackageManager().getPackageInfo(packageName, PackageManager.PackageInfoFlags.of(0));
+            } else {
+                mContext.getPackageManager().getPackageInfo(packageName, 0);
+            }
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private void appendTermuxLine(String line) {
+        if (termuxBuffer.length() > 0) {
+            termuxBuffer.append(Tuils.NEWLINE);
+        }
+        termuxBuffer.append(line);
+        updateTermuxOutput();
+    }
+
+    private void updateTermuxOutput() {
+        if (termuxOutput != null) {
+            termuxOutput.setText(termuxBuffer.toString());
+        }
+        if (termuxScroll != null) {
+            termuxScroll.post(() -> termuxScroll.fullScroll(View.FOCUS_DOWN));
+        }
     }
 
     private void styleClockOverlay(View rootView) {

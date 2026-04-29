@@ -35,6 +35,10 @@ public class AliasManager {
     public static String NAME = "name";
 
     public static final String PATH = "alias.txt";
+    public static final String SCOPE_APP = "a";
+    public static final String SCOPE_SCRIPT = "s";
+    public static final String SCOPE_DEFAULT = SCOPE_APP;
+    private static final String SCOPE_SEPARATOR = "|";
 
     private List<Alias> aliases;
     private String paramSeparator, aliasLabelFormat;
@@ -82,7 +86,7 @@ public class AliasManager {
     public String printAliases() {
         String output = Tuils.EMPTYSTRING;
         for (Alias a : aliases) {
-            output = output.concat(a.name + " --> " + a.value + Tuils.NEWLINE);
+            output = output.concat("[" + a.scope + "] " + a.name + " --> " + a.value + Tuils.NEWLINE);
         }
 
         return output.trim();
@@ -92,12 +96,16 @@ public class AliasManager {
 //    [1] = aliasName
 //    [2] = residualString
     public String[] getAlias(String alias, boolean supportSpaces) {
+        return getAlias(alias, supportSpaces, SCOPE_DEFAULT);
+    }
+
+    public String[] getAlias(String alias, boolean supportSpaces, String scope) {
         if(supportSpaces) {
             String args = Tuils.EMPTYSTRING;
 
             String aliasValue = null;
             while (true) {
-                aliasValue = getALias(alias);
+                aliasValue = getALias(alias, scope);
                 if(aliasValue != null) break;
                 else {
                     int index = alias.lastIndexOf(Tuils.SPACE);
@@ -111,7 +119,7 @@ public class AliasManager {
 
             return new String[] {aliasValue, alias, args};
         } else {
-            return new String[] {getALias(alias), alias, Tuils.EMPTYSTRING};
+            return new String[] {getALias(alias, scope), alias, Tuils.EMPTYSTRING};
         }
     }
 
@@ -139,23 +147,29 @@ public class AliasManager {
     }
 
     private String getALias(String name) {
+        return getALias(name, SCOPE_DEFAULT);
+    }
+
+    private String getALias(String name, String scope) {
+        scope = sanitizeScope(scope);
         for(Alias a : aliases) {
-            if(name.equals(a.name)) return a.value;
+            if(name.equals(a.name) && scope.equals(a.scope)) return a.value;
         }
 
         return null;
     }
 
     private boolean removeAlias(String name) {
-        for(int c = 0; c < aliases.size(); c++) {
+        boolean removed = false;
+        for(int c = aliases.size() - 1; c >= 0; c--) {
             Alias a = aliases.get(c);
             if(name.equals(a.name)) {
                 aliases.remove(c);
-                return true;
+                removed = true;
             }
         }
 
-        return false;
+        return removed;
     }
 
     private final Pattern pv = Pattern.compile("%v", Pattern.CASE_INSENSITIVE | Pattern.LITERAL);
@@ -184,19 +198,21 @@ public class AliasManager {
 
             String line;
             while((line = reader.readLine()) != null) {
-                String[] splatted = line.split("=");
+                String[] splatted = line.split("=", 2);
                 if(splatted.length < 2) continue;
 
                 String name, value = Tuils.EMPTYSTRING;
                 name = splatted[0];
-
-                for(int c = 1; c < splatted.length; c++) {
-                    value += splatted[c];
-                    if(c != splatted.length - 1) value += "=";
-                }
+                value = splatted[1];
 
                 name = name.trim();
                 value = value.trim();
+                String scope = SCOPE_DEFAULT;
+                int scopeIndex = name.lastIndexOf(SCOPE_SEPARATOR);
+                if(scopeIndex > 0 && scopeIndex < name.length() - 1) {
+                    scope = sanitizeScope(name.substring(scopeIndex + 1));
+                    name = name.substring(0, scopeIndex).trim();
+                }
 
                 if(name.equalsIgnoreCase(value)) {
                     Tuils.sendOutput(Color.RED, context,
@@ -205,7 +221,7 @@ public class AliasManager {
                     Tuils.sendOutput(Color.RED, context,
                             context.getString(R.string.output_notaddingalias1) + Tuils.SPACE + name + Tuils.SPACE + context.getString(R.string.output_notaddingalias3));
                 } else {
-                    aliases.add(new Alias(name, value, parameterPattern));
+                    aliases.add(new Alias(name, value, scope, parameterPattern));
                 }
             }
         } catch (Exception e) {
@@ -218,8 +234,13 @@ public class AliasManager {
     }
 
     public void add(Context context, String name, String value) {
+        add(context, name, value, SCOPE_DEFAULT);
+    }
+
+    public void add(Context context, String name, String value, String scope) {
+        scope = sanitizeScope(scope);
         for(Alias a : aliases) {
-            if(name.equals(a.name)) {
+            if(name.equals(a.name) && scope.equals(a.scope)) {
                 Tuils.sendOutput(context, R.string.unavailable_name);
                 return;
             }
@@ -228,10 +249,10 @@ public class AliasManager {
         FileOutputStream fos;
         try {
             fos = new FileOutputStream(new File(Tuils.getFolder(), PATH), true);
-            fos.write((Tuils.NEWLINE + name + "=" + value).getBytes());
+            fos.write((Tuils.NEWLINE + serializeName(name, scope) + "=" + value).getBytes());
             fos.close();
 
-            aliases.add(new Alias(name, value, parameterPattern));
+            aliases.add(new Alias(name, value, scope, parameterPattern));
         } catch (Exception e) {
             Tuils.sendOutput(context, e.toString());
         }
@@ -254,9 +275,11 @@ public class AliasManager {
             BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
 
             String prefix = name + "=";
+            String scopedPrefix = name + SCOPE_SEPARATOR;
             String line;
             while((line = reader.readLine()) != null) {
                 if(line.startsWith(prefix)) continue;
+                if(line.startsWith(scopedPrefix)) continue;
                 writer.write(line + Tuils.NEWLINE);
             }
             writer.close();
@@ -269,7 +292,20 @@ public class AliasManager {
     }
 
     public List<Alias> getAliases(boolean excludeEmtpy) {
+        return getAliases(excludeEmtpy, null);
+    }
+
+    public List<Alias> getAliases(boolean excludeEmtpy, String scope) {
+        scope = scope == null ? null : sanitizeScope(scope);
         List<Alias> l = new ArrayList<>(aliases);
+        if(scope != null) {
+            for(int c = l.size() - 1; c >= 0; c--) {
+                if(!scope.equals(l.get(c).scope)) {
+                    l.remove(c);
+                }
+            }
+        }
+
         if(excludeEmtpy) {
             for(int c = 0; c < l.size(); c++) {
                 if(l.get(c).name.length() == 0) {
@@ -282,13 +318,44 @@ public class AliasManager {
         return l;
     }
 
+    private String sanitizeScope(String scope) {
+        if(scope == null || scope.trim().length() == 0) {
+            return SCOPE_DEFAULT;
+        }
+
+        scope = scope.trim().toLowerCase();
+        if(scope.startsWith(Tuils.MINUS)) {
+            scope = scope.substring(1);
+        }
+
+        if(SCOPE_SCRIPT.equals(scope)) {
+            return SCOPE_SCRIPT;
+        }
+
+        return SCOPE_APP;
+    }
+
+    private String serializeName(String name, String scope) {
+        scope = sanitizeScope(scope);
+        if(SCOPE_DEFAULT.equals(scope)) {
+            return name;
+        }
+
+        return name + SCOPE_SEPARATOR + scope;
+    }
+
     public static class Alias {
-        public String name, value;
+        public String name, value, scope;
         public boolean isParametrized;
 
         public Alias(String name, String value, Pattern parameterPattern) {
+            this(name, value, SCOPE_DEFAULT, parameterPattern);
+        }
+
+        public Alias(String name, String value, String scope, Pattern parameterPattern) {
             this.name = name;
             this.value = value;
+            this.scope = scope == null ? SCOPE_DEFAULT : scope;
 
             isParametrized = parameterPattern.matcher(value).find();
         }

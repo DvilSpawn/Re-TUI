@@ -22,9 +22,19 @@ public class alias extends ParamCommand {
             @Override
             public String exec(ExecutePack pack) {
                 ArrayList<String> args = pack.getList();
+                String scope = AliasManager.SCOPE_APP;
+
+                if(args.size() > 0) {
+                    String first = args.get(0);
+                    if(("-" + AliasManager.SCOPE_APP).equalsIgnoreCase(first) || ("-" + AliasManager.SCOPE_SCRIPT).equalsIgnoreCase(first)) {
+                        scope = first.substring(1).toLowerCase();
+                        args.remove(0);
+                    }
+                }
+
                 if(args.size() < 2) return pack.context.getString(R.string.output_lessarg);
 
-                ((MainPack) pack).aliasManager.add(pack.context, args.remove(0), Tuils.toPlanString(args, Tuils.SPACE));
+                ((MainPack) pack).aliasManager.add(pack.context, args.remove(0), Tuils.toPlanString(args, Tuils.SPACE), scope);
                 return null;
             }
 

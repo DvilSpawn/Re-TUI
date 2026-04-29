@@ -2,6 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <queries>
+        <package android:name="com.termux" />
+    </queries>
+
     <supports-screens
         android:anyDensity="true"
         android:largeScreens="true"
@@ -40,6 +44,7 @@
     <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
     <uses-permission android:name="android.permission.EXPAND_STATUS_BAR" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <uses-permission android:name="com.termux.permission.RUN_COMMAND" />
 
     <!-- features -->
     <uses-feature
@@ -222,6 +227,14 @@
         </service>
         <service 
             android:name=".managers.notifications.NotificationMonitorService"
+            android:exported="false" />
+
+        <receiver
+            android:name=".managers.termux.TermuxResultReceiver"
+            android:exported="false" />
+
+        <service
+            android:name=".managers.termux.TermuxResultService"
             android:exported="false" />
 
         <activity

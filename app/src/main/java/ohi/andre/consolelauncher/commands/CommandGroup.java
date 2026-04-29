@@ -32,7 +32,7 @@ public class CommandGroup {
 
         if (cmds.isEmpty()) {
             if (packageName.equals("ohi.andre.consolelauncher.commands.main.raw")) {
-                cmds.addAll(Arrays.asList("airplane", "alias", "apps", "bbman", "beep", "bluetooth", "brightness", "calc", "call", "changelog", "clear", "cntcts", "config", "ctrlc", "dashboard", "data", "debug", "devutils", "donate", "exit", "flash", "hack", "help", "htmlextract", "install", "location", "music", "notes", "notifications", "open", "pomodoro", "post", "preset", "rate", "refresh", "regex", "reply", "restart", "rss", "search", "settings", "share", "shortcut", "status", "stopwatch", "theme", "themer", "time", "timer", "tui", "tuiweather", "tuixt", "tutorial", "uninstall", "username", "vibrate", "volume", "wallpaper", "webhook", "wifi"));
+                cmds.addAll(Arrays.asList("airplane", "alias", "apps", "bbman", "beep", "bluetooth", "brightness", "calc", "call", "changelog", "clear", "cntcts", "config", "ctrlc", "dashboard", "data", "debug", "devutils", "donate", "exit", "flash", "hack", "help", "htmlextract", "install", "location", "music", "notes", "notifications", "open", "pomodoro", "post", "preset", "rate", "refresh", "regex", "reply", "restart", "rss", "search", "settings", "share", "shortcut", "status", "stopwatch", "termux", "theme", "themer", "time", "timer", "tui", "tuiweather", "tuixt", "tutorial", "uninstall", "username", "vibrate", "volume", "wallpaper", "webhook", "wifi"));
             } else if (packageName.equals("ohi.andre.consolelauncher.commands.tuixt.raw")) {
                 cmds.addAll(Arrays.asList("exit", "help", "save"));
             }

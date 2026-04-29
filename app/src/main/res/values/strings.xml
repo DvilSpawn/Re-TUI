@@ -198,6 +198,7 @@
     <string name="output_flashlightnotavailable">Your device doesn\'t support flashlight</string>
 
     <string name="help_dashboard">Navigate to the dashboard or switch pages.\n\nUsage:\ndashboard [page_number]</string>
+    <string name="help_termux">Open the Re:T-UI Termux console.\n\nUsage:\ntermux\ntermux -status\ntermux -open\ntermux -run &lt;script_path&gt; [args...]\n\nInside the console:\nstatus, open, run, help, clear, exit</string>
     <!-- status -->
     <string name="battery_label">Battery:</string>
     <string name="mobile_data_label">Mobile data:</string>
@@ -232,10 +233,12 @@
         \n-apply [name] -> apply a saved or built-in preset and disable auto_color_pick
         \n-ls -> list saved and built-in presets
     </string>
-    <string name="help_alias">-add [aliasName] [alias content] -> add a new alias
+    <string name="help_alias">-add [aliasName] [alias content] -> add a home alias
+        \n-add -a [aliasName] [alias content] -> add a home alias
+        \n-add -s [aliasName] [script path] -> add a Termux script alias
         \n-rm [aliasName] -> remove an existing alias
         \n-ls -> list your aliases
-        \n-file -> open alias.xml
+        \n-file -> open alias.txt
     </string>
     <string name="help_apps">-ls -> list your apps
         \n-lsh -> list your hidden apps
