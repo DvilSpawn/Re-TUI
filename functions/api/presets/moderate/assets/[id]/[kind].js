@@ -23,8 +23,8 @@ export async function onRequestGet({ env, request, params }) {
   const type = row[`${kind}_type`];
   if (!key || !type) return new Response("Not found", { status: 404 });
 
-  const value = await env.RETUI_PRESET_ASSETS.get(key, "arrayBuffer");
-  if (!value) return new Response("Not found", { status: 404 });
+  const object = await env.RETUI_PRESET_ASSETS.get(key);
+  if (!object) return new Response("Not found", { status: 404 });
 
   const headers = new Headers({
     "content-type": type,
@@ -34,7 +34,7 @@ export async function onRequestGet({ env, request, params }) {
     headers.set("content-disposition", `attachment; filename="${row.slug || id}.retui-backup.zip"`);
   }
 
-  return new Response(value, { headers });
+  return new Response(object.body, { headers });
 }
 
 function authorize(request, env) {

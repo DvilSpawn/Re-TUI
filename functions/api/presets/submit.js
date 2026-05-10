@@ -50,15 +50,27 @@ async function handlePost({ env, request }) {
   const screenshotBytes = await screenshot.arrayBuffer();
   const wallpaperBytes = isFile(wallpaper) ? await wallpaper.arrayBuffer() : null;
   const appVersion = await readAppVersion(presetBytes);
+  const screenshotType = normalizeType(screenshot.type, "image/png");
+  const presetType = "application/zip";
+  const wallpaperType = wallpaperBytes ? normalizeType(wallpaper.type, "image/png") : null;
 
   const screenshotKey = `presets/${id}/screenshot`;
   const presetKey = `presets/${id}/preset`;
   const wallpaperKey = wallpaperBytes ? `presets/${id}/wallpaper` : null;
 
-  await env.RETUI_PRESET_ASSETS.put(screenshotKey, screenshotBytes);
-  await env.RETUI_PRESET_ASSETS.put(presetKey, presetBytes);
+  await env.RETUI_PRESET_ASSETS.put(screenshotKey, screenshotBytes, {
+    httpMetadata: { contentType: screenshotType }
+  });
+  await env.RETUI_PRESET_ASSETS.put(presetKey, presetBytes, {
+    httpMetadata: {
+      contentType: presetType,
+      contentDisposition: `attachment; filename="${slug}.retui-backup.zip"`
+    }
+  });
   if (wallpaperKey && wallpaperBytes) {
-    await env.RETUI_PRESET_ASSETS.put(wallpaperKey, wallpaperBytes);
+    await env.RETUI_PRESET_ASSETS.put(wallpaperKey, wallpaperBytes, {
+      httpMetadata: { contentType: wallpaperType }
+    });
   }
 
   await env.RETUI_PRESETS.prepare(
@@ -77,13 +89,13 @@ async function handlePost({ env, request }) {
     JSON.stringify(tags),
     appVersion,
     screenshotKey,
-    normalizeType(screenshot.type, "image/png"),
+    screenshotType,
     screenshot.size,
     presetKey,
-    "application/zip",
+    presetType,
     preset.size,
     wallpaperKey,
-    wallpaperBytes ? normalizeType(wallpaper.type, "image/png") : null,
+    wallpaperType,
     wallpaperBytes ? wallpaper.size : null,
     submitterName || null,
     consent ? 1 : 0

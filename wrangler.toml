@@ -7,6 +7,6 @@ binding = "RETUI_PRESETS"
 database_name = "retui-presets"
 database_id = "97f12e5d-6066-44b4-b463-33d94263c3e3"
 
-[[kv_namespaces]]
+[[r2_buckets]]
 binding = "RETUI_PRESET_ASSETS"
-id = "fcff455084a64eee86e2c2e1358cc80e"
+bucket_name = "retui-preset-assets"

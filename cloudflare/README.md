@@ -3,7 +3,7 @@
 The website uses Cloudflare Pages Functions for preset uploads and browsing.
 
 - D1 stores preset metadata and moderation status.
-- Workers KV stores screenshots, preset packages, and optional wallpaper images.
+- R2 stores screenshots, preset packages, and optional wallpaper images.
 - Public gallery reads only approved presets from `/api/presets`.
 - Public asset downloads only work for approved presets.
 - Uploads land in `pending` status through `/api/presets/submit`.
@@ -13,8 +13,9 @@ The website uses Cloudflare Pages Functions for preset uploads and browsing.
 
 ```sh
 wrangler d1 execute retui-presets --remote --file cloudflare/d1/0001_preset_marketplace.sql
-wrangler kv key put "presets/northern-violet/screenshot" --path docs/preset-assets/northern-violet/screenshot.png --namespace-id fcff455084a64eee86e2c2e1358cc80e --remote
-wrangler kv key put "presets/northern-violet/preset" --path docs/preset-assets/northern-violet/northern-violet.retui-backup.zip --namespace-id fcff455084a64eee86e2c2e1358cc80e --remote
+wrangler r2 bucket create retui-preset-assets --location apac
+wrangler r2 object put retui-preset-assets/presets/northern-violet/screenshot --file docs/preset-assets/northern-violet/screenshot.png --content-type image/png --remote
+wrangler r2 object put retui-preset-assets/presets/northern-violet/preset --file docs/preset-assets/northern-violet/northern-violet.retui-backup.zip --content-type application/zip --content-disposition 'attachment; filename="northern-violet.retui-backup.zip"' --remote
 wrangler d1 execute retui-presets --remote --file cloudflare/d1/seed_northern_violet.sql
 ```
 
@@ -26,4 +27,4 @@ Set a private token before using `/moderate.html`:
 wrangler pages secret put RETUI_ADMIN_TOKEN --project-name re-tui
 ```
 
-R2 is a better long-term asset store, but this project currently uses KV because R2 is not enabled on the Cloudflare account yet.
+R2 is the production asset store. D1 remains the source of truth for moderation and public listing status.
