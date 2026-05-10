@@ -388,6 +388,99 @@
       margin-top: 22px;
     }
 
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+
+    .section-header .heading-copy {
+      max-width: 760px;
+    }
+
+    .upload-preset {
+      flex: 0 0 auto;
+      border: 1px solid var(--accent);
+      border-radius: 6px;
+      background: rgba(217, 139, 153, 0.17);
+      color: var(--ink);
+      padding: 9px 12px;
+      text-decoration: none;
+      font: 0.82rem "SFMono-Regular", Consolas, monospace;
+      white-space: nowrap;
+    }
+
+    .upload-preset:focus-visible,
+    .upload-preset:hover {
+      border-color: var(--cyan);
+      color: var(--ink);
+      outline: none;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 22px;
+    }
+
+    .look-card {
+      min-height: 248px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(21, 23, 23, 0.74);
+      overflow: hidden;
+    }
+
+    .look-preview {
+      position: relative;
+      min-height: 134px;
+      border-bottom: 1px solid var(--line);
+      background:
+        linear-gradient(135deg, rgba(8, 9, 9, 0.1), rgba(8, 9, 9, 0.74)),
+        linear-gradient(125deg, #191b1c 0%, #cf5f75 48%, #86d5da 100%);
+    }
+
+    .look-preview.terminal-green {
+      background:
+        linear-gradient(135deg, rgba(8, 9, 9, 0.08), rgba(8, 9, 9, 0.76)),
+        linear-gradient(125deg, #101412 0%, #90c86f 50%, #e4d4c8 100%);
+    }
+
+    .look-preview.mono {
+      background:
+        linear-gradient(135deg, rgba(8, 9, 9, 0.08), rgba(8, 9, 9, 0.7)),
+        linear-gradient(125deg, #0d0f10 0%, #9fa6aa 54%, #f2efe8 100%);
+    }
+
+    .swatches {
+      position: absolute;
+      left: 12px;
+      bottom: 12px;
+      display: flex;
+      gap: 7px;
+    }
+
+    .swatches span {
+      width: 22px;
+      height: 22px;
+      border: 1px solid rgba(244, 238, 231, 0.56);
+      border-radius: 50%;
+      box-shadow: 0 5px 18px rgba(0, 0, 0, 0.28);
+    }
+
+    .look-card-content {
+      padding: 16px;
+    }
+
+    .look-meta {
+      margin-top: 12px;
+      color: var(--cyan);
+      font: 0.78rem "SFMono-Regular", Consolas, monospace;
+    }
+
     .tile,
     .step,
     .download-card {
@@ -584,7 +677,8 @@
 
       .command-grid,
       .feature-grid,
-      .download-grid {
+      .download-grid,
+      .gallery-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
@@ -615,6 +709,16 @@
       .hero,
       section.guide {
         padding-block: 30px;
+      }
+
+      .section-header {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .upload-preset {
+        width: 100%;
+        text-align: center;
       }
 
       .cta-row a {
@@ -658,7 +762,8 @@
 
     @media (max-width: 520px) {
       .command-grid,
-      .download-grid {
+      .download-grid,
+      .gallery-grid {
         grid-template-columns: 1fr;
       }
     }
@@ -687,6 +792,7 @@
     <nav aria-label="Guide sections">
       <a href="#start">Start</a>
       <a href="#downloads">Downloads</a>
+      <a href="#preset-gallery">Gallery</a>
       <a href="#commands">Commands</a>
       <a href="#customize">Customize</a>
       <a href="modules.html">Modules</a>
@@ -747,6 +853,61 @@
           <h3>GitHub download</h3>
           <p>Use this path to get the launcher for free if you cannot pay, do not want to pay, or prefer to install the APK directly from GitHub releases.</p>
           <a class="download-link secondary" href="https://github.com/DvilSpawn/Re-TUI/releases/latest/download/app-github-release.apk">Download APK from GitHub</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="guide" id="preset-gallery">
+      <div class="section-header">
+        <div class="heading-copy">
+          <div class="kicker">Preset gallery</div>
+          <h2>Share the look without sharing the private setup.</h2>
+          <p>Community presets are curated palette and wallpaper combos exported from Re:T-UI. They are meant to carry the visual mood of a setup while leaving modules, scripts, aliases, app lists, tokens, and personal data out of the file.</p>
+        </div>
+        <a class="upload-preset" href="https://github.com/DvilSpawn/Re-TUI/issues/new?template=look_submission.yml">Upload preset</a>
+      </div>
+      <div class="gallery-grid">
+        <div class="look-card">
+          <div class="look-preview">
+            <div class="swatches" aria-label="Sample accent colors">
+              <span style="background: #cf5f75;"></span>
+              <span style="background: #86d5da;"></span>
+              <span style="background: #f4eee7;"></span>
+            </div>
+          </div>
+          <div class="look-card-content">
+            <h3>Export a look</h3>
+            <p>Create a shareable look from the settings hub after your palette and wallpaper feel right.</p>
+            <div class="look-meta">theme.xml + suggestions.xml + wallpaper</div>
+          </div>
+        </div>
+        <div class="look-card">
+          <div class="look-preview terminal-green">
+            <div class="swatches" aria-label="Sample accent colors">
+              <span style="background: #90c86f;"></span>
+              <span style="background: #26332b;"></span>
+              <span style="background: #e4d4c8;"></span>
+            </div>
+          </div>
+          <div class="look-card-content">
+            <h3>Submit for review</h3>
+            <p>Attach the exported preset and a screenshot. Curated entries can then be added here for everyone.</p>
+            <div class="look-meta">GitHub issue submission</div>
+          </div>
+        </div>
+        <div class="look-card">
+          <div class="look-preview mono">
+            <div class="swatches" aria-label="Sample accent colors">
+              <span style="background: #0d0f10;"></span>
+              <span style="background: #9fa6aa;"></span>
+              <span style="background: #f2efe8;"></span>
+            </div>
+          </div>
+          <div class="look-card-content">
+            <h3>Apply safely</h3>
+            <p>Preset imports focus on appearance, so users can try a look without inheriting someone else's commands.</p>
+            <div class="look-meta">visual-only sharing path</div>
+          </div>
         </div>
       </div>
     </section>
