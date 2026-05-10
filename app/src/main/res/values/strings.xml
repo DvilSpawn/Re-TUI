@@ -222,14 +222,12 @@
         \n$ retui-token -rotate
         \n$ retui-token -on
         \n$ retui-token -off
-        \n\nCallback action:
-        \ncom.dvil.tui_renewed.RETUI_CALLBACK
+        \n\nUse retui-token -status to show this build\'s callback package and action.
         \n\nExtras:
         \ntoken, action, text, title, module
         \n\nSafe actions now:
         \noutput, notify, module_set
-        \n\nTermux callback example:
-        \nam broadcast -p com.dvil.tui_renewed -a com.dvil.tui_renewed.RETUI_CALLBACK --es token TOKEN --es action module_set --es module server --es text ONLINE</string>
+    </string>
     <string name="help_module">Show and manage Re:T-UI modules.
         \n\nUsage:
         \n$ module -ls

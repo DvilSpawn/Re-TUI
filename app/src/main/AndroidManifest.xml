@@ -214,7 +214,7 @@
             android:name=".managers.callback.RetuiCallbackReceiver"
             android:exported="true">
             <intent-filter>
-                <action android:name="com.dvil.tui_renewed.RETUI_CALLBACK" />
+                <action android:name="${retuiCallbackAction}" />
             </intent-filter>
         </receiver>
 

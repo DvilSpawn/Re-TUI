@@ -4,6 +4,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 
+import ohi.andre.consolelauncher.BuildConfig;
 import ohi.andre.consolelauncher.R;
 import ohi.andre.consolelauncher.commands.CommandAbstraction;
 import ohi.andre.consolelauncher.commands.ExecutePack;
@@ -53,7 +54,11 @@ public class retuitoken implements CommandAbstraction {
     private String status(ExecutePack info) {
         return "Callback auth: " + (CallbackAuthManager.isEnabled(info.context) ? "enabled" : "disabled")
                 + Tuils.NEWLINE
-                + "Token present: " + (!CallbackAuthManager.getToken(info.context).isEmpty());
+                + "Token present: " + (!CallbackAuthManager.getToken(info.context).isEmpty())
+                + Tuils.NEWLINE
+                + "Package: " + BuildConfig.APPLICATION_ID
+                + Tuils.NEWLINE
+                + "Action: " + callbackAction();
     }
 
     private void copyToken(Context context, String token) {
@@ -68,7 +73,15 @@ public class retuitoken implements CommandAbstraction {
                 + Tuils.NEWLINE
                 + "Token copied to clipboard."
                 + Tuils.NEWLINE
-                + "Token: " + token;
+                + "Token: " + token
+                + Tuils.NEWLINE
+                + "Package: " + BuildConfig.APPLICATION_ID
+                + Tuils.NEWLINE
+                + "Action: " + callbackAction();
+    }
+
+    private String callbackAction() {
+        return BuildConfig.APPLICATION_ID + ".RETUI_CALLBACK";
     }
 
     @Override

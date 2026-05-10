@@ -2926,7 +2926,7 @@ public class UIManager implements OnTouchListener {
         appendTermuxLine("5. Run it from Re:T-UI:");
         appendTermuxLine("   termux -run test");
         appendTermuxLine("6. For callback modules, package-scope the broadcast:");
-        appendTermuxLine("   am broadcast -p com.dvil.tui_renewed -a com.dvil.tui_renewed.RETUI_CALLBACK ...");
+        appendTermuxLine("   am broadcast -p " + BuildConfig.APPLICATION_ID + " -a " + retuiCallbackAction() + " ...");
         appendTermuxLine("7. Optional helper:");
         appendTermuxLine("   retui-token -show");
         appendTermuxLine("   create ~/retui/retui-helper.sh with retui_module/retui_output helpers.");
@@ -3304,10 +3304,15 @@ public class UIManager implements OnTouchListener {
             return;
         }
 
-        if (!lower.contains("-p com.dvil.tui_renewed") && !lower.contains("pkg=com.dvil.tui_renewed")) {
+        String packageName = BuildConfig.APPLICATION_ID.toLowerCase(Locale.US);
+        if (!lower.contains("-p " + packageName) && !lower.contains("pkg=" + packageName)) {
             appendTermuxLine("callback hint: if the module did not appear, add this to the script broadcast:");
-            appendTermuxLine("  -p com.dvil.tui_renewed");
+            appendTermuxLine("  -p " + BuildConfig.APPLICATION_ID);
         }
+    }
+
+    private static String retuiCallbackAction() {
+        return BuildConfig.APPLICATION_ID + ".RETUI_CALLBACK";
     }
 
     private boolean hasTermuxRunCommandPermission() {

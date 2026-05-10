@@ -28,6 +28,9 @@ android {
         targetSdk 36
         versionCode 329
         versionName "v6.16.4-STABLE"
+        manifestPlaceholders = [
+                retuiCallbackAction: "com.dvil.tui_renewed.RETUI_CALLBACK"
+        ]
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -55,6 +58,16 @@ android {
         }
         playstore {
             dimension "default"
+            manifestPlaceholders = [
+                    retuiCallbackAction: "com.dvil.tui_renewed.RETUI_CALLBACK"
+            ]
+        }
+        github {
+            dimension "default"
+            applicationIdSuffix ".github"
+            manifestPlaceholders = [
+                    retuiCallbackAction: "com.dvil.tui_renewed.github.RETUI_CALLBACK"
+            ]
         }
     }
 

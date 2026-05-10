@@ -7,13 +7,14 @@ import android.util.Log;
 
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import ohi.andre.consolelauncher.BuildConfig;
 import ohi.andre.consolelauncher.UIManager;
 import ohi.andre.consolelauncher.managers.modules.ModuleManager;
 import ohi.andre.consolelauncher.tuils.Tuils;
 
 public class RetuiCallbackReceiver extends BroadcastReceiver {
 
-    public static final String ACTION_CALLBACK = "com.dvil.tui_renewed.RETUI_CALLBACK";
+    public static final String ACTION_CALLBACK = BuildConfig.APPLICATION_ID + ".RETUI_CALLBACK";
     public static final String EXTRA_TOKEN = "token";
     public static final String EXTRA_ACTION = "action";
     public static final String EXTRA_TEXT = "text";
