@@ -1,0 +1,56 @@
+name: Submit a Re:T-UI preset
+description: Share a palette and wallpaper preset for the website gallery.
+title: "[Preset] "
+labels: ["preset-gallery"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for sharing a Re:T-UI look. Gallery presets should contain visual configuration only: palette/theme values, suggestion styling, and an optional wallpaper.
+  - type: input
+    id: preset-name
+    attributes:
+      label: Preset name
+      description: The name you want shown in the gallery.
+      placeholder: Neon Workstation
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Describe the visual style and what kind of setup it fits.
+      placeholder: A compact dark terminal look with cyan highlights and a muted wallpaper.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Re:T-UI version
+      description: The app version used to export this preset.
+      placeholder: v6.16.4-STABLE
+    validations:
+      required: true
+  - type: input
+    id: tags
+    attributes:
+      label: Tags
+      description: Short labels that describe the look.
+      placeholder: dark, cyan, minimal, wallpaper
+  - type: textarea
+    id: attachments
+    attributes:
+      label: Preset file and screenshot
+      description: Drag the exported preset file and a screenshot into this box.
+      placeholder: Attach the files here.
+    validations:
+      required: true
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: Safety confirmation
+      options:
+        - label: This preset is a visual look only and does not include modules, scripts, aliases, tokens, contacts, calendar data, app lists, or other personal information.
+          required: true
+        - label: I am okay with this preset and screenshot being reviewed and published on the Re:T-UI website gallery.
+          required: true
