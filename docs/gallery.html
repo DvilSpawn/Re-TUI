@@ -1,0 +1,811 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Re:T-UI Preset Marketplace</title>
+  <meta name="description" content="Preview and download community Re:T-UI visual presets.">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #080909;
+      --panel: #151717;
+      --ink: #f4eee7;
+      --muted: #c8b9b5;
+      --accent: #d98b99;
+      --line: #4b393d;
+      --green: #b8db88;
+      --cyan: #81cad6;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 18% 8%, rgba(217, 139, 153, 0.14), transparent 28rem),
+        radial-gradient(circle at 84% 28%, rgba(129, 202, 214, 0.1), transparent 24rem),
+        linear-gradient(140deg, #070808 0%, #111413 58%, #090a0a 100%);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    main {
+      width: min(1280px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 24px 0 60px;
+    }
+
+    nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 10px 0 28px;
+    }
+
+    nav a,
+    .action-link,
+    .preset-upload-label {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: rgba(32, 35, 34, 0.78);
+      color: var(--muted);
+      padding: 8px 11px;
+      text-decoration: none;
+      font: 0.8rem "SFMono-Regular", Consolas, monospace;
+    }
+
+    nav a:hover,
+    nav a:focus-visible,
+    .action-link:hover,
+    .action-link:focus-visible,
+    .preset-upload-label:hover,
+    .preset-upload-label:focus-within {
+      border-color: var(--cyan);
+      color: var(--ink);
+      outline: none;
+    }
+
+    .hero {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+      padding: 16px 0 28px;
+      border-bottom: 1px solid rgba(75, 57, 61, 0.82);
+    }
+
+    .kicker {
+      color: var(--green);
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 0.82rem;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      max-width: 780px;
+      margin: 12px 0 14px;
+      font-size: clamp(2.15rem, 5.2vw, 4.8rem);
+      line-height: 0.98;
+      letter-spacing: 0;
+    }
+
+    h2,
+    h3 {
+      margin: 0 0 8px;
+      color: var(--ink);
+      letter-spacing: 0;
+    }
+
+    p {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 1rem;
+    }
+
+    .hero p {
+      max-width: 780px;
+      font-size: 1.04rem;
+    }
+
+    .action-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .action-link.primary,
+    .preset-upload-label {
+      border-color: var(--accent);
+      background: rgba(217, 139, 153, 0.17);
+      color: var(--ink);
+      cursor: pointer;
+    }
+
+    .action-link.disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+      pointer-events: none;
+    }
+
+    .marketplace {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(300px, 430px);
+      gap: 22px;
+      align-items: start;
+      padding-top: 28px;
+    }
+
+    .preset-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .preset-option {
+      display: grid;
+      gap: 10px;
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(21, 23, 23, 0.74);
+      color: var(--muted);
+      cursor: pointer;
+      padding: 16px;
+      text-align: left;
+    }
+
+    .preset-option:hover,
+    .preset-option:focus-visible,
+    .preset-option.active {
+      border-color: var(--cyan);
+      outline: none;
+    }
+
+    .preset-option.active {
+      background: rgba(129, 202, 214, 0.09);
+    }
+
+    .preset-option p {
+      margin: 0;
+      font-size: 0.92rem;
+    }
+
+    .preset-option-meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      color: var(--cyan);
+      font: 0.76rem "SFMono-Regular", Consolas, monospace;
+    }
+
+    .preset-option-swatches {
+      display: flex;
+      gap: 6px;
+      margin-left: auto;
+    }
+
+    .preset-option-swatches span {
+      width: 18px;
+      height: 18px;
+      border: 1px solid rgba(244, 238, 231, 0.5);
+      border-radius: 50%;
+    }
+
+    .preview-panel {
+      position: sticky;
+      top: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(21, 23, 23, 0.74);
+      padding: 16px;
+    }
+
+    .preset-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 14px 0;
+    }
+
+    .preset-file-input {
+      position: absolute;
+      inline-size: 1px;
+      block-size: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+    }
+
+    .preset-status {
+      min-height: 1.3em;
+      margin: 0 0 12px;
+      color: var(--muted);
+      font: 0.76rem "SFMono-Regular", Consolas, monospace;
+    }
+
+    .mock-phone {
+      --mock-bg: #0a050a;
+      --mock-input: #7d6eca;
+      --mock-output: #e6e6e6;
+      --mock-device: #7d6eca;
+      --mock-time: #7d6eca;
+      --mock-enter: #e6e6e6;
+      --mock-toolbar-bg: rgba(12, 7, 17, 0.88);
+      --mock-panel-bg: rgba(13, 8, 20, 0.86);
+      --mock-border: #7d6eca;
+      --mock-suggestion-bg: #7266a6;
+      --mock-suggestion-text: #ffffff;
+      --mock-wallpaper: none;
+      aspect-ratio: 9 / 19.8;
+      border: 1px solid var(--mock-border);
+      border-radius: 8px;
+      background:
+        linear-gradient(rgba(5, 4, 8, 0.18), rgba(5, 4, 8, 0.34)),
+        var(--mock-wallpaper),
+        radial-gradient(circle at 68% 28%, rgba(125, 110, 202, 0.22), transparent 9rem),
+        var(--mock-bg);
+      background-size: cover;
+      background-position: center;
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.32);
+    }
+
+    .mock-screen {
+      display: flex;
+      flex-direction: column;
+      min-height: 100%;
+      padding: 14px;
+      font-family: "SFMono-Regular", Consolas, monospace;
+    }
+
+    .mock-battery {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 8px;
+      color: var(--mock-output);
+      margin-bottom: 4px;
+    }
+
+    .mock-battery-track {
+      display: grid;
+      grid-template-columns: repeat(28, 1fr);
+      gap: 2px;
+      border: 1px solid var(--mock-border);
+      padding: 2px;
+      height: 14px;
+    }
+
+    .mock-battery-track span {
+      background: var(--mock-device);
+      min-width: 2px;
+    }
+
+    .mock-battery-track span:nth-last-child(-n+3) {
+      background: transparent;
+    }
+
+    .mock-status-panel,
+    .mock-ascii-panel,
+    .mock-storage,
+    .mock-output-panel,
+    .mock-toolbar {
+      border: 1px solid var(--mock-border);
+      background: var(--mock-panel-bg);
+    }
+
+    .mock-status-panel {
+      padding: 7px 10px;
+      margin-bottom: 4px;
+    }
+
+    .mock-time {
+      color: var(--mock-time);
+      font-size: clamp(2.1rem, 6vw, 3.2rem);
+      line-height: 0.98;
+      letter-spacing: 0;
+    }
+
+    .mock-date,
+    .mock-storage {
+      color: var(--mock-device);
+      font-size: 0.72rem;
+      line-height: 1.2;
+    }
+
+    .mock-storage {
+      padding: 2px 4px;
+      margin-bottom: 4px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .mock-ascii-panel {
+      color: var(--mock-device);
+      font-size: clamp(2.3rem, 7vw, 3.7rem);
+      font-weight: 800;
+      line-height: 0.9;
+      padding: 12px;
+      margin-bottom: 8px;
+      min-height: 92px;
+    }
+
+    .mock-tabs {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: auto;
+    }
+
+    .mock-tabs span,
+    .mock-suggestions span {
+      border: 1px solid var(--mock-border);
+      background: var(--mock-suggestion-bg);
+      color: var(--mock-suggestion-text);
+      padding: 6px 5px;
+      text-align: center;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .mock-output-tab {
+      width: 34%;
+      min-width: 128px;
+      border: 1px solid var(--mock-border);
+      background: var(--mock-panel-bg);
+      color: var(--mock-device);
+      padding: 2px 8px;
+      margin-left: 8px;
+      font-size: 0.72rem;
+      text-align: center;
+    }
+
+    .mock-output-panel {
+      color: var(--mock-output);
+      padding: 8px 0 6px;
+      min-height: 106px;
+      background: color-mix(in srgb, var(--mock-panel-bg), transparent 14%);
+    }
+
+    .mock-output-line {
+      padding: 0 6px;
+      font-size: 0.72rem;
+      line-height: 1.25;
+    }
+
+    .mock-prompt {
+      color: var(--mock-input);
+      border-top: 1px solid rgba(244, 238, 231, 0.28);
+      margin-top: 6px;
+      padding: 6px;
+    }
+
+    .mock-enter {
+      color: var(--mock-enter);
+    }
+
+    .mock-toolbar {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      color: var(--mock-output);
+      background: var(--mock-toolbar-bg);
+      padding: 10px;
+      margin-top: 8px;
+      text-align: center;
+      font-size: 1.1rem;
+    }
+
+    .mock-suggestions {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+
+    .mock-suggestions span {
+      flex: 0 0 auto;
+      max-width: 42%;
+      font-size: 0.72rem;
+      padding-inline: 9px;
+    }
+
+    @media (max-width: 920px) {
+      .hero,
+      .marketplace {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        display: block;
+      }
+
+      .preview-panel {
+        position: static;
+      }
+    }
+
+    @media (max-width: 560px) {
+      main {
+        width: min(100% - 18px, 520px);
+      }
+
+      .hero {
+        padding-top: 8px;
+      }
+
+      .action-link,
+      .preset-upload-label {
+        width: 100%;
+        text-align: center;
+      }
+
+      .mock-screen {
+        padding: 10px;
+      }
+
+      .mock-tabs {
+        gap: 5px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <nav aria-label="Gallery navigation">
+      <a href="index.html">Home</a>
+      <a href="index.html#downloads">Downloads</a>
+      <a href="modules.html">Modules</a>
+      <a href="privacy.html">Privacy</a>
+    </nav>
+
+    <section class="hero">
+      <div>
+        <div class="kicker">Preset marketplace</div>
+        <h1>Preview Re:T-UI looks before you install them.</h1>
+        <p>Browse curated visual presets on the left. The mock device on the right updates as you select a preset, and local exports can be previewed directly in the browser before submitting.</p>
+      </div>
+      <div class="action-row">
+        <a class="action-link primary" href="https://github.com/DvilSpawn/Re-TUI/issues/new?template=look_submission.yml">Upload preset</a>
+        <a class="action-link" href="index.html#preset-gallery">Back to gallery intro</a>
+      </div>
+    </section>
+
+    <section class="marketplace" aria-label="Preset marketplace">
+      <div class="preset-list" aria-label="Preset list">
+        <button class="preset-option" type="button" data-gallery-preset data-name="Northern Violet" data-version="v6.16.4-STABLE" data-description="A violet terminal setup with boxed status widgets, pale output text, and muted purple suggestion chips." data-bg="#FF0A050A" data-input="#FF7D6ECA" data-output="#FFE6E6E6" data-device="#FF7D6ECA" data-time="#FF7D6ECA" data-enter="#FFE6E6E6" data-toolbar-bg="#FF0C0711" data-panel-bg="#E00D0814" data-border="#FF7D6ECA" data-suggestion-bg="#FF7266A6" data-suggestion-text="#FFFFFFFF">
+          <div>
+            <h3>Northern Violet</h3>
+            <p>Boxed launcher widgets, violet accents, and pale terminal output.</p>
+          </div>
+          <div class="preset-option-meta">
+            <span>v6.16.4-STABLE</span>
+            <span>sample from export</span>
+            <span class="preset-option-swatches" aria-hidden="true">
+              <span style="background: #7D6ECA;"></span>
+              <span style="background: #0A050A;"></span>
+              <span style="background: #E6E6E6;"></span>
+            </span>
+          </div>
+        </button>
+        <button class="preset-option" type="button" data-gallery-preset data-name="Green Console" data-version="v6.16.4-STABLE" data-description="A readable green terminal palette with soft output and classic launcher contrast." data-bg="#001B00" data-input="#00FF41" data-output="#D5F5E3" data-device="#2ECC71" data-time="#A9DFBF" data-enter="#00FF41" data-toolbar-bg="#001B00" data-panel-bg="#D0001200" data-border="#00FF41" data-suggestion-bg="#00FF41" data-suggestion-text="#001B00">
+          <div>
+            <h3>Green Console</h3>
+            <p>Classic terminal energy, softened enough for a daily home screen.</p>
+          </div>
+          <div class="preset-option-meta">
+            <span>v6.16.4-STABLE</span>
+            <span>curated sample</span>
+            <span class="preset-option-swatches" aria-hidden="true">
+              <span style="background: #00FF41;"></span>
+              <span style="background: #D5F5E3;"></span>
+              <span style="background: #2ECC71;"></span>
+            </span>
+          </div>
+        </button>
+        <button class="preset-option" type="button" data-gallery-preset data-name="Mono Shell" data-version="v6.16.4-STABLE" data-description="A quiet black and white preset for minimal setups and wallpaper-heavy screens." data-bg="#000000" data-input="#FFFFFF" data-output="#CCCCCC" data-device="#AAAAAA" data-time="#FFFFFF" data-enter="#FFFFFF" data-toolbar-bg="#000000" data-panel-bg="#D0000000" data-border="#FFFFFF" data-suggestion-bg="#FFFFFF" data-suggestion-text="#000000">
+          <div>
+            <h3>Mono Shell</h3>
+            <p>Plain, readable, and deliberately low-drama for minimal Android setups.</p>
+          </div>
+          <div class="preset-option-meta">
+            <span>v6.16.4-STABLE</span>
+            <span>curated sample</span>
+            <span class="preset-option-swatches" aria-hidden="true">
+              <span style="background: #000000;"></span>
+              <span style="background: #CCCCCC;"></span>
+              <span style="background: #FFFFFF;"></span>
+            </span>
+          </div>
+        </button>
+      </div>
+
+      <aside class="preview-panel" aria-label="Preset preview">
+        <h2 id="presetPreviewTitle">Preset preview</h2>
+        <p id="presetPreviewDescription">Choose a preset from the list to update the mock device.</p>
+        <div class="preset-actions">
+          <label class="preset-upload-label" for="presetPreviewInput">Preview local file</label>
+          <input class="preset-file-input" id="presetPreviewInput" type="file" accept=".retui-preset,.retui-backup,.zip,application/zip">
+          <a class="action-link disabled" id="presetDownloadLink" href="#" aria-disabled="true">Download pending</a>
+        </div>
+        <p class="preset-status" id="presetPreviewStatus">The first available preset is selected automatically.</p>
+
+        <div class="mock-phone" id="presetMock" aria-label="Generated Re:T-UI preset preview">
+          <div class="mock-screen">
+            <div class="mock-battery">
+              <div class="mock-battery-track" aria-hidden="true">
+                <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span>
+              </div>
+              <strong>94%</strong>
+            </div>
+            <div class="mock-status-panel">
+              <div class="mock-time">08:20</div>
+              <div class="mock-date">10 MAY 2026</div>
+            </div>
+            <div class="mock-storage">INTERNAL STORAGE: 212.77 GB / 460.98 GB (46.16%)</div>
+            <div class="mock-ascii-panel">RE:TUI</div>
+            <div class="mock-tabs">
+              <span>MUSIC</span>
+              <span>NOTES</span>
+              <span>TIMER</span>
+              <span>CAL</span>
+              <span>REMIND</span>
+            </div>
+            <div class="mock-output-tab">OUTPUT ^</div>
+            <div class="mock-output-panel">
+              <div class="mock-output-line">[20:13] $ MANGAFIRE</div>
+              <div class="mock-output-line">MANGAFIRE --&gt; APP LAUNCHED SUCCESSFULLY</div>
+              <div class="mock-prompt"><span class="mock-enter">$</span> DVIL@1000:~</div>
+            </div>
+            <div class="mock-toolbar">
+              <span>x</span><span>^</span><span>v</span><span>[]</span><span>=</span>
+            </div>
+            <div class="mock-suggestions">
+              <span>REDDIT</span>
+              <span>WHATSAPP</span>
+              <span>PLAY STORE</span>
+              <span>FILES</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    const retuiPreviewDefaults = {
+      bg_color: "#0a050a",
+      input_color: "#7d6eca",
+      output_color: "#e6e6e6",
+      device_color: "#7d6eca",
+      time_color: "#7d6eca",
+      enter_color: "#e6e6e6",
+      toolbar_bg: "#0c0711",
+      input_bgrectcolor: "rgba(13, 8, 20, 0.86)",
+      default_bg_color: "#7266a6",
+      default_text_color: "#ffffff"
+    };
+
+    function retuiFirstColor(value) {
+      return String(value || "").split(",")[0].trim();
+    }
+
+    function retuiNormalizeColor(value, fallback, allowTransparent = false) {
+      const raw = retuiFirstColor(value) || fallback;
+      if (!/^#([0-9a-f]{6}|[0-9a-f]{8})$/i.test(raw)) return fallback;
+      if (raw.length === 9) {
+        const alpha = parseInt(raw.slice(1, 3), 16) / 255;
+        if (alpha === 0 && !allowTransparent) return fallback;
+        const red = parseInt(raw.slice(3, 5), 16);
+        const green = parseInt(raw.slice(5, 7), 16);
+        const blue = parseInt(raw.slice(7, 9), 16);
+        return `rgba(${red}, ${green}, ${blue}, ${alpha.toFixed(3)})`;
+      }
+      return raw;
+    }
+
+    function retuiParseXmlValues(xmlText) {
+      if (!xmlText) return {};
+      const xml = new DOMParser().parseFromString(xmlText, "application/xml");
+      if (xml.querySelector("parsererror")) return {};
+      return Array.from(xml.querySelectorAll("[value]")).reduce((values, node) => {
+        values[node.localName] = node.getAttribute("value") || "";
+        return values;
+      }, {});
+    }
+
+    function retuiParseManifest(text) {
+      if (!text) return {};
+      try {
+        return JSON.parse(text);
+      } catch (error) {
+        return text.split(/\r?\n/).reduce((values, line) => {
+          const index = line.indexOf("=");
+          if (index > 0) values[line.slice(0, index)] = line.slice(index + 1);
+          return values;
+        }, {});
+      }
+    }
+
+    function retuiFindEndOfCentralDirectory(view) {
+      for (let offset = view.byteLength - 22; offset >= 0; offset -= 1) {
+        if (view.getUint32(offset, true) === 0x06054b50) return offset;
+      }
+      throw new Error("Preset package is missing a ZIP directory.");
+    }
+
+    async function retuiInflate(bytes) {
+      if (!("DecompressionStream" in window)) {
+        throw new Error("This browser cannot read compressed preset packages yet.");
+      }
+      const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream("deflate-raw"));
+      return new Uint8Array(await new Response(stream).arrayBuffer());
+    }
+
+    async function retuiReadZipEntries(file) {
+      const buffer = await file.arrayBuffer();
+      const view = new DataView(buffer);
+      const bytes = new Uint8Array(buffer);
+      const decoder = new TextDecoder();
+      const eocd = retuiFindEndOfCentralDirectory(view);
+      const totalEntries = view.getUint16(eocd + 10, true);
+      let offset = view.getUint32(eocd + 16, true);
+      const entries = {};
+
+      for (let entryIndex = 0; entryIndex < totalEntries; entryIndex += 1) {
+        if (view.getUint32(offset, true) !== 0x02014b50) break;
+        const method = view.getUint16(offset + 10, true);
+        const compressedSize = view.getUint32(offset + 20, true);
+        const nameLength = view.getUint16(offset + 28, true);
+        const extraLength = view.getUint16(offset + 30, true);
+        const commentLength = view.getUint16(offset + 32, true);
+        const localOffset = view.getUint32(offset + 42, true);
+        const name = decoder.decode(bytes.slice(offset + 46, offset + 46 + nameLength));
+        const localNameLength = view.getUint16(localOffset + 26, true);
+        const localExtraLength = view.getUint16(localOffset + 28, true);
+        const dataStart = localOffset + 30 + localNameLength + localExtraLength;
+        const compressed = bytes.slice(dataStart, dataStart + compressedSize);
+        if (method !== 0 && method !== 8) throw new Error(`Unsupported ZIP compression method: ${method}`);
+        entries[name] = method === 0 ? compressed : await retuiInflate(compressed);
+        offset += 46 + nameLength + extraLength + commentLength;
+      }
+
+      return entries;
+    }
+
+    function retuiEntryText(entries, name) {
+      const entry = entries[name];
+      return entry ? new TextDecoder().decode(entry) : "";
+    }
+
+    function retuiEntryUrl(entries, name) {
+      const entry = entries[name];
+      if (!entry) return "";
+      return URL.createObjectURL(new Blob([entry], { type: "image/png" }));
+    }
+
+    function retuiApplyPreview(theme, suggestions, wallpaperUrl, manifest, fileName) {
+      const mock = document.getElementById("presetMock");
+      const title = document.getElementById("presetPreviewTitle");
+      const description = document.getElementById("presetPreviewDescription");
+      const status = document.getElementById("presetPreviewStatus");
+      const download = document.getElementById("presetDownloadLink");
+      if (!mock || !status) return;
+
+      const panel = theme.input_bgrectcolor || theme.output_bgrectcolor || theme.input_bg || theme.output_bg;
+      mock.style.setProperty("--mock-bg", retuiNormalizeColor(theme.bg_color, retuiPreviewDefaults.bg_color));
+      mock.style.setProperty("--mock-input", retuiNormalizeColor(theme.input_color, retuiPreviewDefaults.input_color));
+      mock.style.setProperty("--mock-output", retuiNormalizeColor(theme.output_color, retuiPreviewDefaults.output_color));
+      mock.style.setProperty("--mock-device", retuiNormalizeColor(theme.device_color || theme.ascii_color, retuiPreviewDefaults.device_color));
+      mock.style.setProperty("--mock-time", retuiNormalizeColor(theme.time_color, retuiPreviewDefaults.time_color));
+      mock.style.setProperty("--mock-enter", retuiNormalizeColor(theme.enter_color, retuiPreviewDefaults.enter_color));
+      mock.style.setProperty("--mock-toolbar-bg", retuiNormalizeColor(theme.toolbar_bg || theme.toolbar_bgrectcolor, retuiPreviewDefaults.toolbar_bg));
+      mock.style.setProperty("--mock-panel-bg", retuiNormalizeColor(panel, retuiPreviewDefaults.input_bgrectcolor, true));
+      mock.style.setProperty("--mock-border", retuiNormalizeColor(theme.dashed_border_color || theme.device_color, retuiPreviewDefaults.device_color));
+      mock.style.setProperty("--mock-suggestion-bg", retuiNormalizeColor(suggestions.apps_bg_color || suggestions.default_bg_color, retuiPreviewDefaults.default_bg_color));
+      mock.style.setProperty("--mock-suggestion-text", retuiNormalizeColor(suggestions.apps_text_color || suggestions.default_text_color, retuiPreviewDefaults.default_text_color));
+      mock.style.setProperty("--mock-wallpaper", wallpaperUrl ? `url("${wallpaperUrl}")` : "none");
+
+      const name = manifest.name || fileName || "preset";
+      const version = manifest.appVersion ? ` · ${manifest.appVersion}` : "";
+      const noWallpaper = wallpaperUrl ? "" : " No wallpaper was found in this export.";
+      if (title) title.textContent = name;
+      if (description) description.textContent = manifest.description || "Mock preview generated from theme.xml and suggestions.xml.";
+      if (download) {
+        if (manifest.downloadUrl) {
+          download.href = manifest.downloadUrl;
+          download.textContent = "Download preset";
+          download.classList.remove("disabled");
+          download.removeAttribute("aria-disabled");
+        } else {
+          download.href = "#";
+          download.textContent = "Download pending";
+          download.classList.add("disabled");
+          download.setAttribute("aria-disabled", "true");
+        }
+      }
+      status.textContent = `Previewing ${name}${version}.${noWallpaper}`;
+    }
+
+    function retuiSelectGalleryPreset(button) {
+      const theme = {
+        bg_color: button.dataset.bg,
+        input_color: button.dataset.input,
+        output_color: button.dataset.output,
+        device_color: button.dataset.device,
+        ascii_color: button.dataset.device,
+        time_color: button.dataset.time,
+        enter_color: button.dataset.enter,
+        toolbar_bg: button.dataset.toolbarBg,
+        input_bgrectcolor: button.dataset.panelBg,
+        dashed_border_color: button.dataset.border
+      };
+      const suggestions = {
+        apps_bg_color: button.dataset.suggestionBg,
+        apps_text_color: button.dataset.suggestionText
+      };
+      const manifest = {
+        name: button.dataset.name,
+        appVersion: button.dataset.version,
+        description: button.dataset.description,
+        downloadUrl: button.dataset.download
+      };
+
+      document.querySelectorAll("[data-gallery-preset]").forEach((preset) => {
+        preset.classList.toggle("active", preset === button);
+      });
+      retuiApplyPreview(theme, suggestions, "", manifest, button.dataset.name);
+    }
+
+    async function retuiPreviewPresetFile(file) {
+      const status = document.getElementById("presetPreviewStatus");
+      if (!file || !status) return;
+      status.textContent = "Reading preset package...";
+      try {
+        const entries = await retuiReadZipEntries(file);
+        const theme = retuiParseXmlValues(retuiEntryText(entries, "theme.xml"));
+        const suggestions = retuiParseXmlValues(retuiEntryText(entries, "suggestions.xml"));
+        const manifest = retuiParseManifest(retuiEntryText(entries, "manifest.json") || retuiEntryText(entries, "manifest.txt"));
+        const wallpaperUrl = retuiEntryUrl(entries, "wallpaper.png");
+        if (!Object.keys(theme).length || !Object.keys(suggestions).length) {
+          throw new Error("Preset is missing theme.xml or suggestions.xml.");
+        }
+        document.querySelectorAll("[data-gallery-preset]").forEach((preset) => {
+          preset.classList.remove("active");
+        });
+        retuiApplyPreview(theme, suggestions, wallpaperUrl, manifest, file.name);
+      } catch (error) {
+        status.textContent = error.message || "Unable to preview this preset.";
+      }
+    }
+
+    const presetInput = document.getElementById("presetPreviewInput");
+    if (presetInput) {
+      presetInput.addEventListener("change", (event) => {
+        retuiPreviewPresetFile(event.target.files[0]);
+      });
+    }
+
+    const galleryPresets = Array.from(document.querySelectorAll("[data-gallery-preset]"));
+    galleryPresets.forEach((preset) => {
+      preset.addEventListener("click", () => retuiSelectGalleryPreset(preset));
+    });
+    if (galleryPresets.length) retuiSelectGalleryPreset(galleryPresets[0]);
+  </script>
+</body>
+</html>
