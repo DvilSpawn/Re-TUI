@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for sharing a Re:T-UI look. Gallery presets should contain visual configuration only: palette/theme values, suggestion styling, and an optional wallpaper. The exported preset includes its Re:T-UI app version in the manifest, so you only need to attach the file.
+        Thanks for sharing a Re:T-UI look. Gallery presets should contain visual configuration only: palette/theme values, suggestion styling, and an optional wallpaper. The exported preset includes its Re:T-UI app version in the manifest, and the gallery can generate a preview mockup from the file.
   - type: input
     id: preset-name
     attributes:
@@ -32,9 +32,9 @@ body:
   - type: textarea
     id: attachments
     attributes:
-      label: Preset file and screenshot
-      description: Drag the exported preset file and a screenshot into this box. Re:T-UI version will be read from the preset manifest.
-      placeholder: Attach the files here.
+      label: Preset file
+      description: Drag the exported preset file into this box. Re:T-UI version and preview colors will be read from the preset manifest and XML files.
+      placeholder: Attach the preset file here.
     validations:
       required: true
   - type: checkboxes
@@ -44,5 +44,5 @@ body:
       options:
         - label: This preset is a visual look only and does not include modules, scripts, aliases, tokens, contacts, calendar data, app lists, or other personal information.
           required: true
-        - label: I am okay with this preset and screenshot being reviewed and published on the Re:T-UI website gallery.
+        - label: I am okay with this preset being reviewed and published on the Re:T-UI website gallery.
           required: true
