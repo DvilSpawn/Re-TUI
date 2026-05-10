@@ -27,6 +27,7 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.XMLConstants;
 
 import ohi.andre.consolelauncher.BuildConfig;
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings;
@@ -98,6 +99,10 @@ public final class PresetManager {
     }
 
     public static void save(String name) throws Exception {
+        save(null, name);
+    }
+
+    public static void save(Context context, String name) throws Exception {
         String cleanName = cleanName(name);
         File presetFolder = new File(getPresetsDir(), cleanName);
         if (!presetFolder.exists() && !presetFolder.mkdirs()) {
@@ -108,11 +113,16 @@ public final class PresetManager {
                 XMLPrefsManager.XMLPrefsRoot.THEME, Theme.values());
         writeXml(new File(presetFolder, XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS.path),
                 XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS, Suggestions.values());
+        BackupManager.saveWallpaperSnapshot(context, new File(presetFolder, BackupManager.WALLPAPER_FILE));
 
-        apply(cleanName);
+        apply(context, cleanName);
     }
 
     public static void apply(String name) throws Exception {
+        apply(null, name);
+    }
+
+    public static void apply(Context context, String name) throws Exception {
         String cleanName = cleanPresetPackageName(name);
         File presetFolder = new File(getPresetsDir(), cleanName);
         if (!presetFolder.isDirectory()) {
@@ -142,6 +152,7 @@ public final class PresetManager {
         Tuils.insertOld(currentSuggestions);
         Tuils.copy(presetTheme, currentTheme);
         Tuils.copy(presetSuggestions, currentSuggestions);
+        BackupManager.applyWallpaperFile(context, new File(presetFolder, BackupManager.WALLPAPER_FILE));
         LauncherSettings.setAutoColorPick(false);
     }
 
@@ -164,6 +175,10 @@ public final class PresetManager {
             addTextEntry(zip, MANIFEST_FILE, manifest(cleanName));
             addFileEntry(zip, XMLPrefsManager.XMLPrefsRoot.THEME.path, presetTheme);
             addFileEntry(zip, XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS.path, presetSuggestions);
+            File wallpaper = new File(presetFolder, BackupManager.WALLPAPER_FILE);
+            if (wallpaper.isFile()) {
+                addFileEntry(zip, BackupManager.WALLPAPER_FILE, wallpaper);
+            }
         } finally {
             zip.close();
         }
@@ -229,6 +244,14 @@ public final class PresetManager {
                 }
                 Tuils.copy(new File(tempFolder, fileName), dest);
             }
+            File wallpaper = new File(tempFolder, BackupManager.WALLPAPER_FILE);
+            if (wallpaper.isFile()) {
+                File dest = new File(presetFolder, BackupManager.WALLPAPER_FILE);
+                if (dest.exists()) {
+                    Tuils.insertOld(dest);
+                }
+                Tuils.copy(wallpaper, dest);
+            }
             return cleanName;
         } finally {
             Tuils.delete(tempFolder);
@@ -283,6 +306,14 @@ public final class PresetManager {
                     Tuils.insertOld(dest);
                 }
                 Tuils.copy(new File(tempFolder, fileName), dest);
+            }
+            File wallpaper = new File(tempFolder, BackupManager.WALLPAPER_FILE);
+            if (wallpaper.isFile()) {
+                File dest = new File(presetFolder, BackupManager.WALLPAPER_FILE);
+                if (dest.exists()) {
+                    Tuils.insertOld(dest);
+                }
+                Tuils.copy(wallpaper, dest);
             }
         } finally {
             Tuils.delete(tempFolder);
@@ -600,7 +631,7 @@ public final class PresetManager {
                 }
 
                 boolean allowedXml = required.contains(name);
-                if (!allowedXml && !MANIFEST_FILE.equals(name)) {
+                if (!allowedXml && !MANIFEST_FILE.equals(name) && !BackupManager.WALLPAPER_FILE.equals(name)) {
                     throw new IllegalArgumentException("Unsupported preset package file: " + name);
                 }
 
@@ -622,7 +653,7 @@ public final class PresetManager {
 
                 if (MANIFEST_FILE.equals(name)) {
                     hasManifest = true;
-                } else {
+                } else if (allowedXml) {
                     required.remove(name);
                 }
             }
@@ -646,6 +677,12 @@ public final class PresetManager {
         }
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setExpandEntityReferences(false);
+        try {
+            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        } catch (Exception ignored) {}
+        try {
+            factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+        } catch (Exception ignored) {}
         Document doc = factory.newDocumentBuilder().parse(file);
         if (doc == null || doc.getDocumentElement() == null || !expectedRoot.equals(doc.getDocumentElement().getNodeName())) {
             throw new IllegalArgumentException("Invalid preset XML: " + file.getName());

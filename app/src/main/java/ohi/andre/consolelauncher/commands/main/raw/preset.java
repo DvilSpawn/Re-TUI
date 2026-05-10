@@ -21,7 +21,7 @@ public class preset extends ParamCommand {
             public String exec(ExecutePack pack) {
                 String name = pack.getString();
                 try {
-                    PresetManager.save(name);
+                    PresetManager.save(pack.context, name);
                     if (pack.context instanceof Reloadable) {
                         ((Reloadable) pack.context).addMessage("preset", "Saved preset: " + name.trim());
                         ((Reloadable) pack.context).reload();
@@ -44,7 +44,7 @@ public class preset extends ParamCommand {
             public String exec(ExecutePack pack) {
                 String name = pack.getString();
                 try {
-                    PresetManager.apply(name);
+                    PresetManager.apply(pack.context, name);
 
                     if (pack.context instanceof Reloadable) {
                         ((Reloadable) pack.context).addMessage("preset", "Applied preset: " + name.trim());

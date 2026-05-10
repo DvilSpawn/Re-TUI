@@ -174,7 +174,7 @@ public class ThemerActivity extends AppCompatActivity {
                         }
                     } else if (fileName.equals("Backup")) {
                         launchBackupPicker();
-                    } else if (fileName.equals("Create Shareable Configuration")) {
+                    } else if (fileName.equals("Create Shareable Snapshot")) {
                         launchShareableConfigurationPicker();
                     } else if (fileName.equals("Restore")) {
                         launchRestorePicker();
@@ -285,7 +285,7 @@ public class ThemerActivity extends AppCompatActivity {
 
     private void savePreset(String name) {
         try {
-            PresetManager.save(name);
+            PresetManager.save(this, name);
             Toast.makeText(ThemerActivity.this, "Preset saved! Reloading...", Toast.LENGTH_SHORT).show();
             recyclerView.postDelayed(() -> {
                 if (LauncherActivity.instance != null) {
@@ -300,7 +300,7 @@ public class ThemerActivity extends AppCompatActivity {
 
     private void applyPreset(String name) {
         try {
-            PresetManager.apply(name);
+            PresetManager.apply(this, name);
 
             Toast.makeText(ThemerActivity.this, "Preset applied! Reloading...", Toast.LENGTH_SHORT).show();
             recyclerView.postDelayed(() -> {
@@ -357,7 +357,7 @@ public class ThemerActivity extends AppCompatActivity {
         } else if (SECTION_INTEGRATIONS.equals(section)) {
             return Arrays.asList("Preferred Music App: " + getPreferredMusicAppSummary());
         } else if (SECTION_SYSTEM.equals(section)) {
-            return Arrays.asList("Backup", "Create Shareable Configuration", "Restore", "View Crash Log");
+            return Arrays.asList("Backup", "Create Shareable Snapshot", "Restore", "View Crash Log");
         }
 
         return Arrays.asList(

@@ -2,6 +2,11 @@ package ohi.andre.consolelauncher.managers;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.app.WallpaperManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.util.Base64;
 
@@ -32,17 +37,28 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
+import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import ohi.andre.consolelauncher.BuildConfig;
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager;
 import ohi.andre.consolelauncher.tuils.Tuils;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
 public final class BackupManager {
 
     private static final String BACKUP_SUFFIX = ".retui-backup";
     private static final String MANIFEST_FILE = "manifest.txt";
     private static final String SHARED_PREFS_DIR = "shared_prefs/";
+    public static final String WALLPAPER_FILE = "wallpaper.png";
     private static final long MAX_BACKUP_BYTES = 32L * 1024L * 1024L;
+    private static final int MAX_WALLPAPER_EDGE = 1080;
     private static final byte[] ENCRYPTED_MAGIC = new byte[] {'R', 'E', 'T', 'U', 'I', 'E', 'N', 'C', '1'};
     private static final int SALT_BYTES = 16;
     private static final int IV_BYTES = 12;
@@ -53,7 +69,26 @@ public final class BackupManager {
     private static final String TYPE_SHAREABLE = "retui-shareable-config";
     private static final String[] SHAREABLE_FILES = {
             XMLPrefsManager.XMLPrefsRoot.THEME.path,
-            XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS.path
+            XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS.path,
+            XMLPrefsManager.XMLPrefsRoot.TOOLBAR.path,
+            XMLPrefsManager.XMLPrefsRoot.CMD.path
+    };
+    private static final String[] SHAREABLE_SANITIZED_FILES = {
+            XMLPrefsManager.XMLPrefsRoot.UI.path,
+            XMLPrefsManager.XMLPrefsRoot.BEHAVIOR.path
+    };
+    private static final String[] SHAREABLE_UI_EXCLUDES = {
+            "username",
+            "deviceName",
+            "font_file"
+    };
+    private static final String[] SHAREABLE_BEHAVIOR_EXCLUDES = {
+            "external_storage_path",
+            "home_path",
+            "weather_key",
+            "weather_location",
+            "tui_notification_click_cmd",
+            "preferred_music_package"
     };
     private static final String[] PERSONAL_PREFS = {
             "ui",
@@ -122,7 +157,7 @@ public final class BackupManager {
                             + "schema=1\n"
                             + "profile=shareable\n"
                             + "appVersion=" + BuildConfig.VERSION_NAME + "\n"
-                            + "sections=theme,suggestions\n");
+                            + "sections=theme,suggestions,toolbar,cmd,ui,behavior,presets,wallpaper\n");
             File root = Tuils.getFolder();
             for (String name : SHAREABLE_FILES) {
                 File file = new File(root, name);
@@ -130,6 +165,14 @@ public final class BackupManager {
                     addFileEntry(zip, name, file);
                 }
             }
+            for (String name : SHAREABLE_SANITIZED_FILES) {
+                File file = new File(root, name);
+                if (file.isFile()) {
+                    addSanitizedXmlEntry(zip, name, file, excludesForShareableFile(name));
+                }
+            }
+            addShareablePresetEntries(zip, root);
+            addWallpaperEntry(context, zip);
         } finally {
             zip.close();
         }
@@ -211,10 +254,17 @@ public final class BackupManager {
             throw new IllegalArgumentException("Unsupported backup package");
         }
         boolean personal = TYPE_BACKUP.equals(type);
+        if (!personal) {
+            validateShareableRestore(tempDir);
+            sanitizeShareableRestore(tempDir);
+        }
         if (personal) {
             clearForPersonalRestore(Tuils.getFolder());
         }
         restoreDirectory(tempDir, Tuils.getFolder(), personal);
+        if (!personal) {
+            applyWallpaperFile(context, new File(tempDir, WALLPAPER_FILE));
+        }
         if (personal) {
             restoreSharedPreferences(context, tempDir);
         }
@@ -320,6 +370,67 @@ public final class BackupManager {
         zip.closeEntry();
     }
 
+    private static void addSanitizedXmlEntry(ZipOutputStream zip, String name, File file, String[] excludes) throws Exception {
+        byte[] xml = sanitizedXml(file, excludes);
+        ZipEntry entry = new ZipEntry(name);
+        zip.putNextEntry(entry);
+        zip.write(xml);
+        zip.closeEntry();
+    }
+
+    private static void removeElements(Document document, String tagName) {
+        if (document == null || tagName == null) return;
+        org.w3c.dom.NodeList nodes = document.getElementsByTagName(tagName);
+        for (int i = nodes.getLength() - 1; i >= 0; i--) {
+            Node node = nodes.item(i);
+            if (node != null && node.getParentNode() != null) {
+                node.getParentNode().removeChild(node);
+            }
+        }
+    }
+
+    private static String[] excludesForShareableFile(String name) {
+        if (XMLPrefsManager.XMLPrefsRoot.UI.path.equals(name)) {
+            return SHAREABLE_UI_EXCLUDES;
+        }
+        if (XMLPrefsManager.XMLPrefsRoot.BEHAVIOR.path.equals(name)) {
+            return SHAREABLE_BEHAVIOR_EXCLUDES;
+        }
+        return new String[0];
+    }
+
+    private static void addShareablePresetEntries(ZipOutputStream zip, File root) throws Exception {
+        File presets = new File(root, "presets");
+        File[] files = presets.listFiles();
+        if (files == null) return;
+
+        for (File preset : files) {
+            if (!preset.isDirectory() || !isSafePresetName(preset.getName())) continue;
+            for (String name : new String[] {
+                    XMLPrefsManager.XMLPrefsRoot.THEME.path,
+                    XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS.path,
+                    WALLPAPER_FILE
+            }) {
+                File file = new File(preset, name);
+                if (file.isFile()) {
+                    addFileEntry(zip, "presets/" + preset.getName() + "/" + name, file);
+                }
+            }
+        }
+    }
+
+    private static void addWallpaperEntry(Context context, ZipOutputStream zip) {
+        try {
+            Bitmap bitmap = currentWallpaperBitmap(context);
+            if (bitmap == null) return;
+            ZipEntry entry = new ZipEntry(WALLPAPER_FILE);
+            zip.putNextEntry(entry);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 92, zip);
+            zip.closeEntry();
+        } catch (Exception ignored) {
+        }
+    }
+
     private static void addFileEntry(ZipOutputStream zip, String name, File file) throws Exception {
         ZipEntry entry = new ZipEntry(name);
         zip.putNextEntry(entry);
@@ -375,6 +486,196 @@ public final class BackupManager {
                     .clear();
             applyPrefs(editor, readText(file));
             editor.apply();
+        }
+    }
+
+    private static void validateShareableRestore(File dir) {
+        List<File> files = new ArrayList<>();
+        collectFiles(dir, files);
+        for (File file : files) {
+            String name = relativeName(dir, file);
+            if (MANIFEST_FILE.equals(name)) continue;
+            if (isDirectShareableFile(name)) {
+                validateShareableFile(name, file);
+                continue;
+            }
+            if (isShareablePresetFile(name)) {
+                validateShareableFile(name, file);
+                continue;
+            }
+            throw new IllegalArgumentException("Unsupported shareable configuration file: " + name);
+        }
+    }
+
+    private static void sanitizeShareableRestore(File dir) throws Exception {
+        for (String name : SHAREABLE_SANITIZED_FILES) {
+            File file = new File(dir, name);
+            if (file.isFile()) {
+                writeBytes(file, sanitizedXml(file, excludesForShareableFile(name)));
+            }
+        }
+    }
+
+    private static void validateShareableFile(String name, File file) {
+        try {
+            if (XMLPrefsManager.XMLPrefsRoot.THEME.path.equals(name) || name.endsWith("/" + XMLPrefsManager.XMLPrefsRoot.THEME.path)) {
+                validateXmlRoot(file, XMLPrefsManager.XMLPrefsRoot.THEME.name());
+            } else if (XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS.path.equals(name) || name.endsWith("/" + XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS.path)) {
+                validateXmlRoot(file, XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS.name());
+            } else if (XMLPrefsManager.XMLPrefsRoot.TOOLBAR.path.equals(name)) {
+                validateXmlRoot(file, XMLPrefsManager.XMLPrefsRoot.TOOLBAR.name());
+            } else if (XMLPrefsManager.XMLPrefsRoot.CMD.path.equals(name)) {
+                validateXmlRoot(file, XMLPrefsManager.XMLPrefsRoot.CMD.name());
+            } else if (XMLPrefsManager.XMLPrefsRoot.UI.path.equals(name)) {
+                validateXmlRoot(file, XMLPrefsManager.XMLPrefsRoot.UI.name());
+            } else if (XMLPrefsManager.XMLPrefsRoot.BEHAVIOR.path.equals(name)) {
+                validateXmlRoot(file, XMLPrefsManager.XMLPrefsRoot.BEHAVIOR.name());
+            }
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Invalid shareable configuration file: " + name);
+        }
+    }
+
+    private static void validateXmlRoot(File file, String expectedRoot) throws Exception {
+        Document document = secureDocumentFactory().newDocumentBuilder().parse(file);
+        if (document == null || document.getDocumentElement() == null || !expectedRoot.equals(document.getDocumentElement().getNodeName())) {
+            throw new IllegalArgumentException("Invalid XML root");
+        }
+    }
+
+    private static void collectFiles(File dir, List<File> out) {
+        File[] files = dir.listFiles();
+        if (files == null) return;
+        for (File file : files) {
+            if (file.isDirectory()) {
+                collectFiles(file, out);
+            } else if (file.isFile()) {
+                out.add(file);
+            }
+        }
+    }
+
+    private static boolean isDirectShareableFile(String name) {
+        if (WALLPAPER_FILE.equals(name)) return true;
+        for (String allowed : SHAREABLE_FILES) {
+            if (allowed.equals(name)) return true;
+        }
+        for (String allowed : SHAREABLE_SANITIZED_FILES) {
+            if (allowed.equals(name)) return true;
+        }
+        return false;
+    }
+
+    private static boolean isShareablePresetFile(String name) {
+        if (name == null || !name.startsWith("presets/")) return false;
+        String[] parts = name.split("/");
+        if (parts.length != 3 || !isSafePresetName(parts[1])) return false;
+        return XMLPrefsManager.XMLPrefsRoot.THEME.path.equals(parts[2])
+                || XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS.path.equals(parts[2])
+                || WALLPAPER_FILE.equals(parts[2]);
+    }
+
+    private static boolean isSafePresetName(String name) {
+        if (name == null || name.length() == 0 || name.startsWith(".")) return false;
+        if (name.contains("/") || name.contains("\\") || name.contains("..")) return false;
+        return true;
+    }
+
+    private static byte[] sanitizedXml(File file, String[] excludes) throws Exception {
+        Document document = secureDocumentFactory().newDocumentBuilder().parse(file);
+        if (excludes != null) {
+            for (String exclude : excludes) {
+                removeElements(document, exclude);
+            }
+        }
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        Transformer transformer = TransformerFactory.newInstance().newTransformer();
+        transformer.transform(new DOMSource(document), new StreamResult(out));
+        return out.toByteArray();
+    }
+
+    private static DocumentBuilderFactory secureDocumentFactory() {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setExpandEntityReferences(false);
+        try {
+            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        } catch (Exception ignored) {}
+        try {
+            factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+        } catch (Exception ignored) {}
+        return factory;
+    }
+
+    private static void writeBytes(File file, byte[] bytes) throws Exception {
+        FileOutputStream stream = new FileOutputStream(file, false);
+        try {
+            stream.write(bytes);
+        } finally {
+            stream.close();
+        }
+    }
+
+    public static boolean saveWallpaperSnapshot(Context context, File out) {
+        if (context == null || out == null) return false;
+        try {
+            Bitmap bitmap = currentWallpaperBitmap(context);
+            if (bitmap == null) return false;
+            File parent = out.getParentFile();
+            if (parent != null && !parent.exists() && !parent.mkdirs()) return false;
+            FileOutputStream stream = new FileOutputStream(out, false);
+            try {
+                return bitmap.compress(Bitmap.CompressFormat.PNG, 92, stream);
+            } finally {
+                stream.close();
+            }
+        } catch (Exception ignored) {
+            return false;
+        }
+    }
+
+    public static boolean applyWallpaperFile(Context context, File file) {
+        if (context == null || file == null || !file.isFile()) return false;
+        try {
+            InputStream in = new BufferedInputStream(new FileInputStream(file));
+            try {
+                WallpaperManager.getInstance(context.getApplicationContext()).setStream(in);
+                return true;
+            } finally {
+                in.close();
+            }
+        } catch (Exception ignored) {
+            return false;
+        }
+    }
+
+    private static Bitmap currentWallpaperBitmap(Context context) {
+        if (context == null) return null;
+        try {
+            Drawable drawable = WallpaperManager.getInstance(context.getApplicationContext()).getDrawable();
+            if (drawable == null) return null;
+            Bitmap source;
+            if (drawable instanceof BitmapDrawable) {
+                source = ((BitmapDrawable) drawable).getBitmap();
+            } else {
+                int width = Math.max(1, drawable.getIntrinsicWidth());
+                int height = Math.max(1, drawable.getIntrinsicHeight());
+                source = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+                Canvas canvas = new Canvas(source);
+                drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+                drawable.draw(canvas);
+            }
+            if (source == null) return null;
+            int width = source.getWidth();
+            int height = source.getHeight();
+            int max = Math.max(width, height);
+            if (max <= MAX_WALLPAPER_EDGE) {
+                return source;
+            }
+            float scale = MAX_WALLPAPER_EDGE / (float) max;
+            return Bitmap.createScaledBitmap(source, Math.max(1, Math.round(width * scale)), Math.max(1, Math.round(height * scale)), true);
+        } catch (Exception ignored) {
+            return null;
         }
     }
 
