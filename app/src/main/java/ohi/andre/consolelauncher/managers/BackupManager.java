@@ -39,17 +39,12 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import ohi.andre.consolelauncher.BuildConfig;
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager;
 import ohi.andre.consolelauncher.tuils.Tuils;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 
 public final class BackupManager {
 
@@ -69,26 +64,7 @@ public final class BackupManager {
     private static final String TYPE_SHAREABLE = "retui-shareable-config";
     private static final String[] SHAREABLE_FILES = {
             XMLPrefsManager.XMLPrefsRoot.THEME.path,
-            XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS.path,
-            XMLPrefsManager.XMLPrefsRoot.TOOLBAR.path,
-            XMLPrefsManager.XMLPrefsRoot.CMD.path
-    };
-    private static final String[] SHAREABLE_SANITIZED_FILES = {
-            XMLPrefsManager.XMLPrefsRoot.UI.path,
-            XMLPrefsManager.XMLPrefsRoot.BEHAVIOR.path
-    };
-    private static final String[] SHAREABLE_UI_EXCLUDES = {
-            "username",
-            "deviceName",
-            "font_file"
-    };
-    private static final String[] SHAREABLE_BEHAVIOR_EXCLUDES = {
-            "external_storage_path",
-            "home_path",
-            "weather_key",
-            "weather_location",
-            "tui_notification_click_cmd",
-            "preferred_music_package"
+            XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS.path
     };
     private static final String[] PERSONAL_PREFS = {
             "ui",
@@ -157,7 +133,7 @@ public final class BackupManager {
                             + "schema=1\n"
                             + "profile=shareable\n"
                             + "appVersion=" + BuildConfig.VERSION_NAME + "\n"
-                            + "sections=theme,suggestions,toolbar,cmd,ui,behavior,presets,wallpaper\n");
+                            + "sections=theme,suggestions,wallpaper\n");
             File root = Tuils.getFolder();
             for (String name : SHAREABLE_FILES) {
                 File file = new File(root, name);
@@ -165,13 +141,6 @@ public final class BackupManager {
                     addFileEntry(zip, name, file);
                 }
             }
-            for (String name : SHAREABLE_SANITIZED_FILES) {
-                File file = new File(root, name);
-                if (file.isFile()) {
-                    addSanitizedXmlEntry(zip, name, file, excludesForShareableFile(name));
-                }
-            }
-            addShareablePresetEntries(zip, root);
             addWallpaperEntry(context, zip);
         } finally {
             zip.close();
@@ -256,7 +225,6 @@ public final class BackupManager {
         boolean personal = TYPE_BACKUP.equals(type);
         if (!personal) {
             validateShareableRestore(tempDir);
-            sanitizeShareableRestore(tempDir);
         }
         if (personal) {
             clearForPersonalRestore(Tuils.getFolder());
@@ -370,55 +338,6 @@ public final class BackupManager {
         zip.closeEntry();
     }
 
-    private static void addSanitizedXmlEntry(ZipOutputStream zip, String name, File file, String[] excludes) throws Exception {
-        byte[] xml = sanitizedXml(file, excludes);
-        ZipEntry entry = new ZipEntry(name);
-        zip.putNextEntry(entry);
-        zip.write(xml);
-        zip.closeEntry();
-    }
-
-    private static void removeElements(Document document, String tagName) {
-        if (document == null || tagName == null) return;
-        org.w3c.dom.NodeList nodes = document.getElementsByTagName(tagName);
-        for (int i = nodes.getLength() - 1; i >= 0; i--) {
-            Node node = nodes.item(i);
-            if (node != null && node.getParentNode() != null) {
-                node.getParentNode().removeChild(node);
-            }
-        }
-    }
-
-    private static String[] excludesForShareableFile(String name) {
-        if (XMLPrefsManager.XMLPrefsRoot.UI.path.equals(name)) {
-            return SHAREABLE_UI_EXCLUDES;
-        }
-        if (XMLPrefsManager.XMLPrefsRoot.BEHAVIOR.path.equals(name)) {
-            return SHAREABLE_BEHAVIOR_EXCLUDES;
-        }
-        return new String[0];
-    }
-
-    private static void addShareablePresetEntries(ZipOutputStream zip, File root) throws Exception {
-        File presets = new File(root, "presets");
-        File[] files = presets.listFiles();
-        if (files == null) return;
-
-        for (File preset : files) {
-            if (!preset.isDirectory() || !isSafePresetName(preset.getName())) continue;
-            for (String name : new String[] {
-                    XMLPrefsManager.XMLPrefsRoot.THEME.path,
-                    XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS.path,
-                    WALLPAPER_FILE
-            }) {
-                File file = new File(preset, name);
-                if (file.isFile()) {
-                    addFileEntry(zip, "presets/" + preset.getName() + "/" + name, file);
-                }
-            }
-        }
-    }
-
     private static void addWallpaperEntry(Context context, ZipOutputStream zip) {
         try {
             Bitmap bitmap = currentWallpaperBitmap(context);
@@ -499,37 +418,16 @@ public final class BackupManager {
                 validateShareableFile(name, file);
                 continue;
             }
-            if (isShareablePresetFile(name)) {
-                validateShareableFile(name, file);
-                continue;
-            }
             throw new IllegalArgumentException("Unsupported shareable configuration file: " + name);
-        }
-    }
-
-    private static void sanitizeShareableRestore(File dir) throws Exception {
-        for (String name : SHAREABLE_SANITIZED_FILES) {
-            File file = new File(dir, name);
-            if (file.isFile()) {
-                writeBytes(file, sanitizedXml(file, excludesForShareableFile(name)));
-            }
         }
     }
 
     private static void validateShareableFile(String name, File file) {
         try {
-            if (XMLPrefsManager.XMLPrefsRoot.THEME.path.equals(name) || name.endsWith("/" + XMLPrefsManager.XMLPrefsRoot.THEME.path)) {
+            if (XMLPrefsManager.XMLPrefsRoot.THEME.path.equals(name)) {
                 validateXmlRoot(file, XMLPrefsManager.XMLPrefsRoot.THEME.name());
-            } else if (XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS.path.equals(name) || name.endsWith("/" + XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS.path)) {
+            } else if (XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS.path.equals(name)) {
                 validateXmlRoot(file, XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS.name());
-            } else if (XMLPrefsManager.XMLPrefsRoot.TOOLBAR.path.equals(name)) {
-                validateXmlRoot(file, XMLPrefsManager.XMLPrefsRoot.TOOLBAR.name());
-            } else if (XMLPrefsManager.XMLPrefsRoot.CMD.path.equals(name)) {
-                validateXmlRoot(file, XMLPrefsManager.XMLPrefsRoot.CMD.name());
-            } else if (XMLPrefsManager.XMLPrefsRoot.UI.path.equals(name)) {
-                validateXmlRoot(file, XMLPrefsManager.XMLPrefsRoot.UI.name());
-            } else if (XMLPrefsManager.XMLPrefsRoot.BEHAVIOR.path.equals(name)) {
-                validateXmlRoot(file, XMLPrefsManager.XMLPrefsRoot.BEHAVIOR.name());
             }
         } catch (Exception e) {
             throw new IllegalArgumentException("Invalid shareable configuration file: " + name);
@@ -560,39 +458,7 @@ public final class BackupManager {
         for (String allowed : SHAREABLE_FILES) {
             if (allowed.equals(name)) return true;
         }
-        for (String allowed : SHAREABLE_SANITIZED_FILES) {
-            if (allowed.equals(name)) return true;
-        }
         return false;
-    }
-
-    private static boolean isShareablePresetFile(String name) {
-        if (name == null || !name.startsWith("presets/")) return false;
-        String[] parts = name.split("/");
-        if (parts.length != 3 || !isSafePresetName(parts[1])) return false;
-        return XMLPrefsManager.XMLPrefsRoot.THEME.path.equals(parts[2])
-                || XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS.path.equals(parts[2])
-                || WALLPAPER_FILE.equals(parts[2]);
-    }
-
-    private static boolean isSafePresetName(String name) {
-        if (name == null || name.length() == 0 || name.startsWith(".")) return false;
-        if (name.contains("/") || name.contains("\\") || name.contains("..")) return false;
-        return true;
-    }
-
-    private static byte[] sanitizedXml(File file, String[] excludes) throws Exception {
-        Document document = secureDocumentFactory().newDocumentBuilder().parse(file);
-        if (excludes != null) {
-            for (String exclude : excludes) {
-                removeElements(document, exclude);
-            }
-        }
-
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Transformer transformer = TransformerFactory.newInstance().newTransformer();
-        transformer.transform(new DOMSource(document), new StreamResult(out));
-        return out.toByteArray();
     }
 
     private static DocumentBuilderFactory secureDocumentFactory() {
@@ -605,15 +471,6 @@ public final class BackupManager {
             factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
         } catch (Exception ignored) {}
         return factory;
-    }
-
-    private static void writeBytes(File file, byte[] bytes) throws Exception {
-        FileOutputStream stream = new FileOutputStream(file, false);
-        try {
-            stream.write(bytes);
-        } finally {
-            stream.close();
-        }
     }
 
     public static boolean saveWallpaperSnapshot(Context context, File out) {

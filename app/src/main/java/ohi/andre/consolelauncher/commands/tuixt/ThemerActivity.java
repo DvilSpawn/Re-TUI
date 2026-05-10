@@ -174,7 +174,7 @@ public class ThemerActivity extends AppCompatActivity {
                         }
                     } else if (fileName.equals("Backup")) {
                         launchBackupPicker();
-                    } else if (fileName.equals("Create Shareable Snapshot")) {
+                    } else if (fileName.equals("Create Shareable Look")) {
                         launchShareableConfigurationPicker();
                     } else if (fileName.equals("Restore")) {
                         launchRestorePicker();
@@ -357,7 +357,7 @@ public class ThemerActivity extends AppCompatActivity {
         } else if (SECTION_INTEGRATIONS.equals(section)) {
             return Arrays.asList("Preferred Music App: " + getPreferredMusicAppSummary());
         } else if (SECTION_SYSTEM.equals(section)) {
-            return Arrays.asList("Backup", "Create Shareable Snapshot", "Restore", "View Crash Log");
+            return Arrays.asList("Backup", "Create Shareable Look", "Restore", "View Crash Log");
         }
 
         return Arrays.asList(
