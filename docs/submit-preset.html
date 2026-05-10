@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Submit a Re:T-UI Preset</title>
+  <meta name="description" content="Submit a Re:T-UI visual preset and screenshot for marketplace review.">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #080909;
+      --panel: #151717;
+      --ink: #f4eee7;
+      --muted: #c8b9b5;
+      --accent: #d98b99;
+      --line: #4b393d;
+      --green: #b8db88;
+      --cyan: #81cad6;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 18% 8%, rgba(217, 139, 153, 0.14), transparent 28rem),
+        linear-gradient(140deg, #070808 0%, #111413 58%, #090a0a 100%);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    main {
+      width: min(960px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 24px 0 60px;
+    }
+
+    nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 10px 0 28px;
+    }
+
+    nav a,
+    .submit-link {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: rgba(32, 35, 34, 0.78);
+      color: var(--muted);
+      padding: 8px 11px;
+      text-decoration: none;
+      font: 0.8rem "SFMono-Regular", Consolas, monospace;
+    }
+
+    nav a:hover,
+    nav a:focus-visible,
+    .submit-link:hover,
+    .submit-link:focus-visible {
+      border-color: var(--cyan);
+      color: var(--ink);
+      outline: none;
+    }
+
+    .kicker {
+      color: var(--green);
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 0.82rem;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 12px 0 14px;
+      font-size: clamp(2.1rem, 5vw, 4.5rem);
+      line-height: 0.98;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      margin: 0 0 10px;
+      color: var(--ink);
+    }
+
+    p,
+    li {
+      color: var(--muted);
+      font-size: 1rem;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(21, 23, 23, 0.74);
+      padding: 18px;
+      margin-top: 18px;
+    }
+
+    .checklist {
+      display: grid;
+      gap: 10px;
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .submit-link.primary {
+      display: inline-flex;
+      margin-top: 16px;
+      border-color: var(--accent);
+      background: rgba(217, 139, 153, 0.17);
+      color: var(--ink);
+    }
+
+    code {
+      color: var(--cyan);
+      font-family: "SFMono-Regular", Consolas, monospace;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <nav aria-label="Submission navigation">
+      <a href="gallery.html">Marketplace</a>
+      <a href="index.html">Home</a>
+      <a href="modules.html">Modules</a>
+    </nav>
+
+    <section>
+      <div class="kicker">Submit preset</div>
+      <h1>Share a Re:T-UI look for marketplace review.</h1>
+      <p>Preset submissions are moderated before they appear in the marketplace. A screenshot is required because the gallery shows real user captures, not generated previews.</p>
+    </section>
+
+    <section class="panel">
+      <h2>Required Files</h2>
+      <ul class="checklist">
+        <li>A visual-only Re:T-UI preset export, such as <code>.retui-preset</code> or <code>.retui-backup.zip</code>.</li>
+        <li>A screenshot showing the preset applied on your device.</li>
+        <li>No modules, scripts, aliases, tokens, contacts, app lists, or personal data.</li>
+      </ul>
+    </section>
+
+    <section class="panel">
+      <h2>Review Flow</h2>
+      <p>The final upload step opens a moderated submission form. The preset and screenshot are reviewed before anything is published to the marketplace.</p>
+      <a class="submit-link primary" href="https://github.com/DvilSpawn/Re-TUI/issues/new?template=look_submission.yml">Continue to upload files</a>
+    </section>
+  </main>
+</body>
+</html>
