@@ -60,6 +60,7 @@ public class ThemerActivity extends AppCompatActivity {
     private String section;
     private Uri pendingBackupUri;
     private Uri pendingRestoreUri;
+    private String pendingShareablePresetName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -175,7 +176,7 @@ public class ThemerActivity extends AppCompatActivity {
                     } else if (fileName.equals("Backup")) {
                         launchBackupPicker();
                     } else if (fileName.equals("Create Shareable Configuration")) {
-                        launchShareableConfigurationPicker();
+                        showShareableConfigurationSourcePicker();
                     } else if (fileName.equals("Restore")) {
                         launchRestorePicker();
                     } else {
@@ -421,14 +422,29 @@ public class ThemerActivity extends AppCompatActivity {
         }
     }
 
+    private void showShareableConfigurationSourcePicker() {
+        List<String> presets = PresetManager.listSavedPresetFolders();
+        List<String> options = new ArrayList<>();
+        options.add("Current Active Look");
+        for (String preset : presets) {
+            options.add("Preset: " + preset);
+        }
+
+        TuixtDialog.showOptions(this, "Shareable Source", options, which -> {
+            pendingShareablePresetName = which == 0 ? null : presets.get(which - 1);
+            launchShareableConfigurationPicker();
+        });
+    }
+
     private void launchShareableConfigurationPicker() {
         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("application/zip");
-        intent.putExtra(Intent.EXTRA_TITLE, BackupManager.defaultShareableConfigurationName());
+        intent.putExtra(Intent.EXTRA_TITLE, BackupManager.defaultShareableConfigurationName(pendingShareablePresetName));
         try {
             startActivityForResult(intent, SHAREABLE_CONFIG_EXPORT_REQUEST);
         } catch (ActivityNotFoundException e) {
+            pendingShareablePresetName = null;
             Toast.makeText(this, "Configuration picker is unavailable on this device.", Toast.LENGTH_SHORT).show();
         }
     }
@@ -591,15 +607,18 @@ public class ThemerActivity extends AppCompatActivity {
 
     private void handleShareableConfigurationResult(int resultCode, Intent data) {
         if (resultCode != RESULT_OK || data == null || data.getData() == null) {
+            pendingShareablePresetName = null;
             Toast.makeText(this, "Configuration export cancelled.", Toast.LENGTH_SHORT).show();
             return;
         }
 
         try {
-            BackupManager.exportShareableConfiguration(this, data.getData());
+            BackupManager.exportShareableConfiguration(this, data.getData(), pendingShareablePresetName);
             Toast.makeText(this, "Shareable configuration exported.", Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
             Toast.makeText(this, e.getMessage() == null ? "Configuration export failed." : e.getMessage(), Toast.LENGTH_LONG).show();
+        } finally {
+            pendingShareablePresetName = null;
         }
     }
 

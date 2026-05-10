@@ -280,9 +280,8 @@
     <string name="hint_wallpaper_auto_confirm">Yes/No</string>
     <string name="help_preset">-save [name] -> save the current theme.xml and suggestions.xml colors as a preset
         \n-apply [name] -> apply a saved or built-in preset and disable auto_color_pick
-        \n-export [name] -> create a shareable .retui-preset file and open Android save picker
-        \n-import -> open Android folder picker and import a preset folder containing theme.xml and suggestions.xml
         \n-ls -> list saved and built-in presets
+        \nTo share a look, use Settings > System &amp; Support > Create Shareable Configuration
     </string>
     <string name="help_alias">-add [aliasName] [alias content] -> add a home alias
         \n-add -a [aliasName] [alias content] -> add a home alias

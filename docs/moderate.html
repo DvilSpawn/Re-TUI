@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Re:T-UI Preset Moderation</title>
+  <meta name="robots" content="noindex">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #080909;
+      --panel: #151717;
+      --ink: #f4eee7;
+      --muted: #c8b9b5;
+      --accent: #d98b99;
+      --line: #4b393d;
+      --green: #b8db88;
+      --cyan: #81cad6;
+      --danger: #ff8a8a;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: linear-gradient(180deg, #070808 0%, #111413 56%, #080909 100%);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    main {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 24px 0 60px;
+    }
+
+    nav,
+    .toolbar,
+    .actions,
+    .meta,
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    nav {
+      padding: 10px 0 28px;
+    }
+
+    nav a,
+    button {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: rgba(32, 35, 34, 0.78);
+      color: var(--muted);
+      padding: 8px 11px;
+      text-decoration: none;
+      font: 0.8rem "SFMono-Regular", Consolas, monospace;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    button.primary {
+      border-color: var(--accent);
+      background: rgba(217, 139, 153, 0.17);
+      color: var(--ink);
+    }
+
+    button.danger {
+      border-color: var(--danger);
+    }
+
+    nav a:hover,
+    nav a:focus-visible,
+    button:hover,
+    button:focus-visible {
+      border-color: var(--cyan);
+      color: var(--ink);
+      outline: none;
+    }
+
+    .kicker,
+    .status,
+    label,
+    .meta,
+    .tags {
+      font-family: "SFMono-Regular", Consolas, monospace;
+    }
+
+    .kicker {
+      color: var(--green);
+      font-size: 0.82rem;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 12px 0 14px;
+      font-size: clamp(2.1rem, 5vw, 4.5rem);
+      line-height: 0.98;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      margin: 0 0 8px;
+    }
+
+    p {
+      margin: 0 0 14px;
+      color: var(--muted);
+    }
+
+    .toolbar {
+      align-items: end;
+      margin: 22px 0;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(21, 23, 23, 0.74);
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      color: var(--ink);
+      font-size: 0.78rem;
+    }
+
+    input,
+    select,
+    textarea {
+      min-width: 220px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: rgba(8, 9, 9, 0.82);
+      color: var(--ink);
+      padding: 10px 11px;
+      font: 0.95rem Inter, ui-sans-serif, system-ui, sans-serif;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 76px;
+      resize: vertical;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--cyan);
+      outline: none;
+    }
+
+    .status {
+      min-height: 1.4em;
+      color: var(--cyan);
+      font-size: 0.82rem;
+    }
+
+    .status.error {
+      color: var(--danger);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(21, 23, 23, 0.74);
+      overflow: hidden;
+      min-width: 0;
+    }
+
+    .shot {
+      display: block;
+      width: 100%;
+      aspect-ratio: 9 / 19.8;
+      object-fit: cover;
+      object-position: top;
+      background: #050505;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .body {
+      padding: 16px;
+    }
+
+    .meta,
+    .tags {
+      margin-top: 12px;
+      color: var(--cyan);
+      font-size: 0.76rem;
+    }
+
+    .tags {
+      color: var(--green);
+    }
+
+    .actions {
+      margin-top: 14px;
+    }
+
+    @media (max-width: 940px) {
+      .grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 560px) {
+      main {
+        width: min(100% - 18px, 520px);
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      input,
+      select,
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <nav aria-label="Moderation navigation">
+      <a href="gallery.html">Marketplace</a>
+      <a href="submit-preset.html">Submit</a>
+      <a href="index.html">Home</a>
+    </nav>
+
+    <section>
+      <div class="kicker">Preset moderation</div>
+      <h1>Review uploaded looks before they go public.</h1>
+      <p>This page is token protected by the API. Pending screenshots and downloads are fetched through staff-only endpoints.</p>
+    </section>
+
+    <section class="toolbar">
+      <label>
+        Admin token
+        <input id="token" type="password" autocomplete="off">
+      </label>
+      <label>
+        Queue
+        <select id="status">
+          <option value="pending">Pending</option>
+          <option value="approved">Approved</option>
+          <option value="rejected">Rejected</option>
+        </select>
+      </label>
+      <button class="primary" id="load">Load queue</button>
+      <div class="status" id="status-line" role="status" aria-live="polite"></div>
+    </section>
+
+    <section class="grid" id="queue" aria-label="Preset queue"></section>
+  </main>
+
+  <script>
+    const tokenInput = document.querySelector("#token");
+    const statusSelect = document.querySelector("#status");
+    const loadButton = document.querySelector("#load");
+    const statusLine = document.querySelector("#status-line");
+    const queue = document.querySelector("#queue");
+
+    tokenInput.value = sessionStorage.getItem("retuiAdminToken") || "";
+    loadButton.addEventListener("click", loadQueue);
+
+    async function loadQueue() {
+      setStatus("Loading queue...");
+      queue.textContent = "";
+      const token = tokenInput.value.trim();
+      sessionStorage.setItem("retuiAdminToken", token);
+
+      try {
+        const response = await fetch(`/api/presets/moderate?status=${encodeURIComponent(statusSelect.value)}`, {
+          headers: authHeaders(token)
+        });
+        const body = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(body.error || "Unable to load queue.");
+
+        const presets = Array.isArray(body.presets) ? body.presets : [];
+        presets.forEach((preset) => queue.appendChild(createCard(preset, token)));
+        setStatus(`${presets.length} ${statusSelect.value} preset${presets.length === 1 ? "" : "s"}.`);
+      } catch (error) {
+        setStatus(error.message || "Unable to load queue.", true);
+      }
+    }
+
+    function createCard(preset, token) {
+      const card = document.createElement("article");
+      card.className = "card";
+
+      const image = document.createElement("img");
+      image.className = "shot";
+      image.alt = `${preset.name} preset screenshot`;
+      image.loading = "lazy";
+      card.appendChild(image);
+      loadAsset(preset.id, "screenshot", token).then((url) => {
+        image.src = url;
+      }).catch(() => {
+        image.alt = "Screenshot unavailable";
+      });
+
+      const body = document.createElement("div");
+      body.className = "body";
+      body.appendChild(textNode("h2", preset.name || "Untitled preset"));
+      body.appendChild(textNode("p", preset.description || "No description."));
+
+      const meta = document.createElement("div");
+      meta.className = "meta";
+      [preset.appVersion || "version unknown", preset.submitterName || "anonymous", preset.hasWallpaper ? "wallpaper attached" : "no wallpaper"].forEach((value) => {
+        meta.appendChild(textNode("span", value));
+      });
+      body.appendChild(meta);
+
+      if (Array.isArray(preset.tags) && preset.tags.length > 0) {
+        const tags = document.createElement("div");
+        tags.className = "tags";
+        preset.tags.slice(0, 6).forEach((value) => tags.appendChild(textNode("span", `#${value}`)));
+        body.appendChild(tags);
+      }
+
+      const notes = document.createElement("textarea");
+      notes.placeholder = "Review notes";
+      notes.value = preset.reviewNotes || "";
+      body.appendChild(notes);
+
+      const actions = document.createElement("div");
+      actions.className = "actions";
+      actions.appendChild(actionButton("Download", () => downloadAsset(preset, "preset", token)));
+      if (preset.hasWallpaper) actions.appendChild(actionButton("Wallpaper", () => downloadAsset(preset, "wallpaper", token)));
+      actions.appendChild(actionButton("Approve", () => moderate(preset.id, "approve", notes.value), "primary"));
+      actions.appendChild(actionButton("Reject", () => moderate(preset.id, "reject", notes.value), "danger"));
+      body.appendChild(actions);
+
+      card.appendChild(body);
+      return card;
+    }
+
+    async function moderate(id, action, notes) {
+      setStatus(`${action === "approve" ? "Approving" : "Rejecting"} preset...`);
+      try {
+        const response = await fetch("/api/presets/moderate", {
+          method: "POST",
+          headers: { ...authHeaders(tokenInput.value.trim()), "content-type": "application/json" },
+          body: JSON.stringify({ id, action, notes })
+        });
+        const body = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(body.error || "Moderation failed.");
+        await loadQueue();
+      } catch (error) {
+        setStatus(error.message || "Moderation failed.", true);
+      }
+    }
+
+    async function loadAsset(id, kind, token) {
+      const response = await fetch(`/api/presets/moderate/assets/${id}/${kind}`, {
+        headers: authHeaders(token)
+      });
+      if (!response.ok) throw new Error("Asset unavailable.");
+      return URL.createObjectURL(await response.blob());
+    }
+
+    async function downloadAsset(preset, kind, token) {
+      try {
+        const url = await loadAsset(preset.id, kind, token);
+        const anchor = document.createElement("a");
+        anchor.href = url;
+        anchor.download = `${preset.slug || preset.id}-${kind === "preset" ? "preset.retui-backup.zip" : "wallpaper"}`;
+        anchor.click();
+      } catch (error) {
+        setStatus(error.message || "Download failed.", true);
+      }
+    }
+
+    function actionButton(label, onClick, className = "") {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = label;
+      button.className = className;
+      button.addEventListener("click", onClick);
+      return button;
+    }
+
+    function textNode(tagName, value) {
+      const node = document.createElement(tagName);
+      node.textContent = value;
+      return node;
+    }
+
+    function authHeaders(token) {
+      return { authorization: `Bearer ${token}` };
+    }
+
+    function setStatus(message, isError = false) {
+      statusLine.textContent = message;
+      statusLine.classList.toggle("error", isError);
+    }
+  </script>
+</body>
+</html>

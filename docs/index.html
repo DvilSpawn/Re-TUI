@@ -388,6 +388,37 @@
       margin-top: 22px;
     }
 
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+
+    .section-header .heading-copy {
+      max-width: 760px;
+    }
+
+    .upload-preset {
+      flex: 0 0 auto;
+      border: 1px solid var(--accent);
+      border-radius: 6px;
+      background: rgba(217, 139, 153, 0.17);
+      color: var(--ink);
+      padding: 9px 12px;
+      text-decoration: none;
+      font: 0.82rem "SFMono-Regular", Consolas, monospace;
+      white-space: nowrap;
+    }
+
+    .upload-preset:focus-visible,
+    .upload-preset:hover {
+      border-color: var(--cyan);
+      color: var(--ink);
+      outline: none;
+    }
+
     .tile,
     .step,
     .download-card {
@@ -617,6 +648,16 @@
         padding-block: 30px;
       }
 
+      .section-header {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .upload-preset {
+        width: 100%;
+        text-align: center;
+      }
+
       .cta-row a {
         flex: 1 1 150px;
         text-align: center;
@@ -687,6 +728,7 @@
     <nav aria-label="Guide sections">
       <a href="#start">Start</a>
       <a href="#downloads">Downloads</a>
+      <a href="#preset-gallery">Gallery</a>
       <a href="#commands">Commands</a>
       <a href="#customize">Customize</a>
       <a href="modules.html">Modules</a>
@@ -747,6 +789,33 @@
           <h3>GitHub download</h3>
           <p>Use this path to get the launcher for free if you cannot pay, do not want to pay, or prefer to install the APK directly from GitHub releases.</p>
           <a class="download-link secondary" href="https://github.com/DvilSpawn/Re-TUI/releases/latest/download/app-github-release.apk">Download APK from GitHub</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="guide" id="preset-gallery">
+      <div class="section-header">
+        <div class="heading-copy">
+          <div class="kicker">Preset gallery</div>
+          <h2>Browse terminal looks in the preset marketplace.</h2>
+          <p>Community presets are curated palette and wallpaper combos exported from Re:T-UI. The marketplace has its own page so the homepage stays focused, while Cloudflare handles uploads, moderation storage, and approved downloads.</p>
+        </div>
+        <a class="upload-preset" href="submit-preset.html">Upload preset</a>
+      </div>
+      <div class="download-grid">
+        <div class="download-card">
+          <h3>Preset marketplace</h3>
+          <p>Open the dedicated gallery to browse approved screenshots, inspect compatibility, and download visual shareable configurations.</p>
+          <a class="download-link" href="gallery.html">View presets in marketplace</a>
+        </div>
+        <div class="download-card">
+          <h3>Create a shareable look</h3>
+          <p>In Re:T-UI, open Settings, go to System &amp; Support, choose Create Shareable Configuration, then pick the current active look or a saved preset.</p>
+        </div>
+        <div class="download-card">
+          <h3>Submit a look</h3>
+          <p>Upload the shareable configuration file with a real screenshot. Add the wallpaper image separately when the look depends on it.</p>
+          <a class="download-link secondary" href="submit-preset.html">Upload preset</a>
         </div>
       </div>
     </section>

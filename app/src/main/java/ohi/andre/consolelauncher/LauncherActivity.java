@@ -4,13 +4,11 @@ import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
-import android.net.Uri;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -47,7 +45,6 @@ import java.util.Set;
 
 import ohi.andre.consolelauncher.tuils.CustomExceptionHandler;
 import ohi.andre.consolelauncher.MainManager;
-import ohi.andre.consolelauncher.managers.PresetManager;
 import ohi.andre.consolelauncher.managers.RegexManager;
 import ohi.andre.consolelauncher.managers.TerminalManager;
 import ohi.andre.consolelauncher.managers.TimeManager;
@@ -85,12 +82,9 @@ public class LauncherActivity extends AppCompatActivity implements Reloadable {
 
     public static final int TUIXT_REQUEST = 110;
     public static final int MANAGE_STORAGE_REQUEST = 100;
-    public static final int PRESET_IMPORT_REQUEST = 120;
-    public static final int PRESET_EXPORT_REQUEST = 121;
 
     private UIManager ui;
     private MainManager main;
-    private File pendingPresetExportFile;
 
     private PrivateIOReceiver privateIOReceiver;
     private PublicIOReceiver publicIOReceiver;
@@ -511,34 +505,6 @@ public class LauncherActivity extends AppCompatActivity implements Reloadable {
         }
     }
 
-    public String openPresetImportPicker() {
-        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-        try {
-            startActivityForResult(intent, PRESET_IMPORT_REQUEST);
-            return "Select a preset folder containing theme.xml and suggestions.xml.";
-        } catch (ActivityNotFoundException e) {
-            return "No file picker found.";
-        }
-    }
-
-    public String openPresetExportPicker(File packageFile) {
-        if (packageFile == null || !packageFile.isFile()) {
-            return "Preset package not found.";
-        }
-        pendingPresetExportFile = packageFile;
-        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.setType("application/zip");
-        intent.putExtra(Intent.EXTRA_TITLE, PresetManager.packageFileName(packageFile));
-        try {
-            startActivityForResult(intent, PRESET_EXPORT_REQUEST);
-            return "Choose where to save " + PresetManager.packageFileName(packageFile) + ".";
-        } catch (ActivityNotFoundException e) {
-            pendingPresetExportFile = null;
-            return "No file picker found. Exported package remains at: " + packageFile.getAbsolutePath();
-        }
-    }
-
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
@@ -566,10 +532,6 @@ public class LauncherActivity extends AppCompatActivity implements Reloadable {
             if (resultCode == TuixtActivity.SAVE_PRESSED) {
                 reload();
             }
-        } else if (requestCode == PRESET_IMPORT_REQUEST) {
-            handlePresetImportResult(resultCode, data);
-        } else if (requestCode == PRESET_EXPORT_REQUEST) {
-            handlePresetExportResult(resultCode, data);
         } else if (requestCode == MANAGE_STORAGE_REQUEST) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 if (android.os.Environment.isExternalStorageManager()) {
@@ -579,52 +541,6 @@ public class LauncherActivity extends AppCompatActivity implements Reloadable {
                     finish();
                 }
             }
-        }
-    }
-
-    private void handlePresetImportResult(int resultCode, Intent data) {
-        if (resultCode != RESULT_OK || data == null || data.getData() == null) {
-            addMessage("preset", "Import cancelled.");
-            return;
-        }
-
-        Uri uri = data.getData();
-        try {
-            int flags = data.getFlags();
-            if ((flags & Intent.FLAG_GRANT_READ_URI_PERMISSION) != 0) {
-                getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            }
-            if ((flags & Intent.FLAG_GRANT_WRITE_URI_PERMISSION) != 0) {
-                getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-            }
-        } catch (Exception ignored) {
-        }
-
-        try {
-            String name = PresetManager.importFolder(this, uri);
-            addMessage("preset", "Imported preset: " + name);
-        } catch (IllegalArgumentException e) {
-            addMessage("preset", e.getMessage());
-        } catch (Exception e) {
-            addMessage("preset", getString(R.string.output_error));
-        }
-    }
-
-    private void handlePresetExportResult(int resultCode, Intent data) {
-        File packageFile = pendingPresetExportFile;
-        pendingPresetExportFile = null;
-        if (resultCode != RESULT_OK || data == null || data.getData() == null) {
-            addMessage("preset", "Export cancelled.");
-            return;
-        }
-
-        try {
-            PresetManager.exportPackage(this, packageFile, data.getData());
-            addMessage("preset", "Exported preset: " + PresetManager.packageFileName(packageFile));
-        } catch (IllegalArgumentException e) {
-            addMessage("preset", e.getMessage());
-        } catch (Exception e) {
-            addMessage("preset", getString(R.string.output_error));
         }
     }
 

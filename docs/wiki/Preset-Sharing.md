@@ -58,25 +58,25 @@ That is useful when you treat a preset name as a living theme slot instead of a 
 
 ## Sharing Strategy
 
-Re:T-UI is not yet using a full packaged preset export/import format as the main flow.
+Use Settings > System & Support > Create Shareable Configuration.
 
-For now, the most realistic sharing approaches are:
+That flow lets you export either:
 
-- publish screenshots plus the preset name and setup notes
-- share the related config files or preset folder contents manually
-- maintain a community collection in GitHub or Reddit posts
+- the current active look
+- one of your saved user presets
+
+The exported file is visual-only. It contains `theme.xml`, `suggestions.xml`, and manifest metadata. It does not include modules, aliases, app lists, tokens, contacts, scripts, or other personal backup data.
 
 ## Suggested Community Flow
 
-If the community starts actively trading themes, the cleanest pattern would be:
+For the preset marketplace:
 
-1. Screenshot
-2. Wallpaper source note
-3. Font name
-4. Preset name
-5. Optional config bundle or preset folder contents
+1. Create a shareable configuration.
+2. Take a screenshot of the look applied in Re:T-UI.
+3. Attach the wallpaper separately if the look depends on it.
+4. Upload the shareable file and screenshot to the marketplace.
 
-That keeps presets social without pretending there is already a polished theme marketplace.
+That keeps presets social without asking users to share full backups.
 
 ## Practical Advice
 

@@ -1,0 +1,12 @@
+name = "re-tui"
+compatibility_date = "2026-05-10"
+pages_build_output_dir = "docs"
+
+[[d1_databases]]
+binding = "RETUI_PRESETS"
+database_name = "retui-presets"
+database_id = "97f12e5d-6066-44b4-b463-33d94263c3e3"
+
+[[r2_buckets]]
+binding = "RETUI_PRESET_ASSETS"
+bucket_name = "retui-preset-assets"

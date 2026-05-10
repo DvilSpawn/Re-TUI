@@ -76,6 +76,20 @@ public final class PresetManager {
         return presets;
     }
 
+    public static List<String> listSavedPresetFolders() {
+        File[] files = getPresetsDir().listFiles();
+        List<String> presets = new ArrayList<>();
+        if (files != null) {
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    presets.add(file.getName());
+                }
+            }
+        }
+        Collections.sort(presets, String.CASE_INSENSITIVE_ORDER);
+        return presets;
+    }
+
     public static List<String> listBuiltInPresets() {
         List<String> presets = new ArrayList<>();
         Collections.addAll(presets, BUILT_IN_PRESETS);
@@ -95,6 +109,10 @@ public final class PresetManager {
 
     public static boolean isBuiltInPreset(String name) {
         return containsIgnoreCase(listBuiltInPresets(), name);
+    }
+
+    public static File getSavedPresetFolder(String name) {
+        return new File(getPresetsDir(), cleanName(name));
     }
 
     public static void save(String name) throws Exception {

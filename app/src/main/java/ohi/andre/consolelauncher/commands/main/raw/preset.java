@@ -1,9 +1,6 @@
 package ohi.andre.consolelauncher.commands.main.raw;
 
 import java.util.List;
-import java.io.File;
-
-import ohi.andre.consolelauncher.LauncherActivity;
 import ohi.andre.consolelauncher.R;
 import ohi.andre.consolelauncher.commands.CommandAbstraction;
 import ohi.andre.consolelauncher.commands.ExecutePack;
@@ -62,42 +59,6 @@ public class preset extends ParamCommand {
             @Override
             public int[] args() {
                 return new int[] {CommandAbstraction.PRESET_NAME};
-            }
-        },
-        export {
-            @Override
-            public String exec(ExecutePack pack) {
-                String name = pack.getString();
-                try {
-                    File file = PresetManager.exportPackage(name);
-                    if (pack.context instanceof LauncherActivity) {
-                        return ((LauncherActivity) pack.context).openPresetExportPicker(file);
-                    }
-                    return "Preset exported: " + file.getAbsolutePath();
-                } catch (IllegalArgumentException e) {
-                    return e.getMessage();
-                } catch (Exception e) {
-                    return pack.context.getString(R.string.output_error);
-                }
-            }
-
-            @Override
-            public int[] args() {
-                return new int[] {CommandAbstraction.PRESET_NAME};
-            }
-        },
-        import_ {
-            @Override
-            public String exec(ExecutePack pack) {
-                if (pack.context instanceof LauncherActivity) {
-                    return ((LauncherActivity) pack.context).openPresetImportPicker();
-                }
-                return "Preset import picker is not available.";
-            }
-
-            @Override
-            public int[] args() {
-                return new int[0];
             }
         },
         ls {

@@ -39,4 +39,5 @@ Thumbs.db
 *.swp
 *.hprof
 perf-results/
+.wrangler/
 docs/store-assets/firebase-alpha-testers.*

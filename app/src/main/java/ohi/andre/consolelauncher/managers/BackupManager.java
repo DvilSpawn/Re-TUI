@@ -75,7 +75,15 @@ public final class BackupManager {
     }
 
     public static String defaultShareableConfigurationName() {
+        return defaultShareableConfigurationName(null);
+    }
+
+    public static String defaultShareableConfigurationName(String sourceName) {
         String stamp = new SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US).format(new Date());
+        String source = fileSafeName(sourceName);
+        if (source.length() > 0) {
+            return "retui-config-" + source + "-" + stamp + BACKUP_SUFFIX;
+        }
         return "retui-config-" + stamp + BACKUP_SUFFIX;
     }
 
@@ -106,8 +114,25 @@ public final class BackupManager {
     }
 
     public static void exportShareableConfiguration(Context context, Uri uri) throws Exception {
+        exportShareableConfiguration(context, uri, null);
+    }
+
+    public static void exportShareableConfiguration(Context context, Uri uri, String presetName) throws Exception {
         if (context == null || uri == null) {
             throw new IllegalArgumentException("Configuration destination is required");
+        }
+
+        String preset = presetName == null ? null : presetName.trim();
+        File sourceRoot = Tuils.getFolder();
+        String sourceType = "current";
+        String sourceLabel = null;
+        if (preset != null && preset.length() > 0) {
+            sourceRoot = PresetManager.getSavedPresetFolder(preset);
+            if (!sourceRoot.isDirectory()) {
+                throw new IllegalArgumentException("Preset not found");
+            }
+            sourceType = "preset";
+            sourceLabel = sourceRoot.getName();
         }
 
         OutputStream out = new BufferedOutputStream(context.getContentResolver().openOutputStream(uri, "w"));
@@ -122,13 +147,15 @@ public final class BackupManager {
                             + "schema=1\n"
                             + "profile=shareable\n"
                             + "appVersion=" + BuildConfig.VERSION_NAME + "\n"
+                            + "source=" + sourceType + "\n"
+                            + (sourceLabel == null ? "" : "presetName=" + manifestSafeValue(sourceLabel) + "\n")
                             + "sections=theme,suggestions\n");
-            File root = Tuils.getFolder();
             for (String name : SHAREABLE_FILES) {
-                File file = new File(root, name);
-                if (file.isFile()) {
-                    addFileEntry(zip, name, file);
+                File file = new File(sourceRoot, name);
+                if (!file.isFile()) {
+                    throw new IllegalArgumentException(sourceLabel == null ? "Configuration is incomplete" : "Preset is incomplete");
                 }
+                addFileEntry(zip, name, file);
             }
         } finally {
             zip.close();
@@ -274,6 +301,18 @@ public final class BackupManager {
         if (name.startsWith(".restore-importing") || name.endsWith(BACKUP_SUFFIX)) return false;
         if (name.startsWith("crash.txt")) return false;
         return file.isDirectory() || file.isFile();
+    }
+
+    private static String fileSafeName(String value) {
+        if (value == null) return "";
+        String trimmed = value.trim().toLowerCase(Locale.US);
+        if (trimmed.length() == 0) return "";
+        return trimmed.replaceAll("[^a-z0-9._-]+", "-").replaceAll("^-+|-+$", "");
+    }
+
+    private static String manifestSafeValue(String value) {
+        if (value == null) return "";
+        return value.replace('\r', ' ').replace('\n', ' ').trim();
     }
 
     private static void addSharedPreferences(ZipOutputStream zip, Context context) throws Exception {
