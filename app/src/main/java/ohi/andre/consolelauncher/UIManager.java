@@ -4007,7 +4007,7 @@ public class UIManager implements OnTouchListener {
         row.setFocusable(true);
         row.setOnClickListener(v -> {
             try {
-                notification.pendingIntent.send();
+                Tuils.sendPendingIntent(mContext, notification.pendingIntent);
             } catch (PendingIntent.CanceledException e) {
                 Tuils.sendOutput(Color.RED, mContext, e.toString());
             }

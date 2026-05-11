@@ -105,7 +105,7 @@ public class LongClickableSpan extends ClickableSpan {
             PendingIntent pi = (PendingIntent) o;
 
             try {
-                pi.send();
+                Tuils.sendPendingIntent(v.getContext(), pi);
             } catch (PendingIntent.CanceledException e) {
                 Tuils.log(e);
             }

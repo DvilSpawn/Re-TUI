@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.ActivityManager;
 import android.app.ActivityManager.MemoryInfo;
+import android.app.ActivityOptions;
+import android.app.PendingIntent;
 import android.app.admin.DevicePolicyManager;
 import android.content.BroadcastReceiver;
 import android.content.ClipData;
@@ -1551,6 +1553,26 @@ public class Tuils {
             return flags | android.app.PendingIntent.FLAG_IMMUTABLE;
         }
         return flags;
+    }
+
+    public static void sendPendingIntent(Context context, PendingIntent pendingIntent) throws PendingIntent.CanceledException {
+        if (pendingIntent == null) {
+            return;
+        }
+
+        if (context == null) {
+            pendingIntent.send();
+            return;
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            ActivityOptions options = ActivityOptions.makeBasic();
+            options.setPendingIntentBackgroundActivityStartMode(ActivityOptions.MODE_BACKGROUND_ACTIVITY_START_ALLOWED);
+            pendingIntent.send(context, 0, null, null, null, null, options.toBundle());
+            return;
+        }
+
+        pendingIntent.send(context, 0, null);
     }
 
     public static int nOfBytes(File file) {
