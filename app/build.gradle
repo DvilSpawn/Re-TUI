@@ -26,8 +26,8 @@ android {
         applicationId "com.dvil.tui_renewed"
         minSdk 23
         targetSdk 36
-        versionCode 329
-        versionName "v6.16.4-STABLE"
+        versionCode 330
+        versionName "v6.16.5-STABLE"
         manifestPlaceholders = [
                 retuiCallbackAction: "com.dvil.tui_renewed.RETUI_CALLBACK"
         ]
