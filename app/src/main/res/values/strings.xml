@@ -610,6 +610,7 @@
         \nUsage:
         \n$ events
         \n$ events -access
+        \n$ events -lookahead 3
         \n$ events -module
         \n$ module -add events termux:/data/data/com.termux/files/home/retui/events.sh
         \n$ module -refresh events

@@ -17,9 +17,13 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
+import ohi.andre.consolelauncher.managers.settings.LauncherSettings;
+import ohi.andre.consolelauncher.managers.xml.options.Behavior;
+
 public final class UpcomingEventsManager {
 
     private static final int MAX_EVENTS = 20;
+    public static final int MAX_LOOKAHEAD_DAYS = 366;
 
     private static final String[] PROJECTION = {
             CalendarContract.Instances.TITLE,
@@ -36,18 +40,20 @@ public final class UpcomingEventsManager {
     }
 
     public static String formatUpcoming(Context context) {
+        int lookaheadDays = getLookaheadDays();
+        String heading = formatHeading(lookaheadDays);
         if (!hasCalendarPermission(context)) {
-            return "[Upcoming events this month]\nCalendar access is required.\nRun: events -access";
+            return heading + "\nCalendar access is required.\nRun: events -access";
         }
 
         long now = System.currentTimeMillis();
-        long end = endOfCurrentMonth(now);
+        long end = endOfLookaheadDay(now, lookaheadDays);
 
         Uri.Builder builder = CalendarContract.Instances.CONTENT_URI.buildUpon();
         ContentUris.appendId(builder, now);
         ContentUris.appendId(builder, end);
 
-        StringBuilder out = new StringBuilder("[Upcoming events this month]");
+        StringBuilder out = new StringBuilder(heading);
         Set<String> seen = new HashSet<>();
         int count = 0;
 
@@ -80,11 +86,11 @@ public final class UpcomingEventsManager {
                 }
             }
         } catch (Exception e) {
-            return "[Upcoming events this month]\nUnable to read Android Calendar.";
+            return heading + "\nUnable to read Android Calendar.";
         }
 
         if (count == 0) {
-            out.append('\n').append("No upcoming events this month.");
+            out.append('\n').append(formatEmptyMessage(lookaheadDays));
         }
         return out.toString();
     }
@@ -157,6 +163,28 @@ public final class UpcomingEventsManager {
         return out.toString();
     }
 
+    public static int getLookaheadDays() {
+        return sanitizeLookaheadDays(LauncherSettings.getInt(Behavior.events_lookahead_days));
+    }
+
+    public static int sanitizeLookaheadDays(int days) {
+        if (days < 0) {
+            return 0;
+        }
+        return Math.min(days, MAX_LOOKAHEAD_DAYS);
+    }
+
+    private static long endOfLookaheadDay(long now, int lookaheadDays) {
+        Calendar end = Calendar.getInstance();
+        end.setTimeInMillis(now);
+        end.add(Calendar.DAY_OF_YEAR, sanitizeLookaheadDays(lookaheadDays));
+        end.set(Calendar.HOUR_OF_DAY, 23);
+        end.set(Calendar.MINUTE, 59);
+        end.set(Calendar.SECOND, 59);
+        end.set(Calendar.MILLISECOND, 999);
+        return end.getTimeInMillis();
+    }
+
     private static long endOfCurrentMonth(long now) {
         Calendar end = Calendar.getInstance();
         end.setTimeInMillis(now);
@@ -166,6 +194,26 @@ public final class UpcomingEventsManager {
         end.set(Calendar.SECOND, 59);
         end.set(Calendar.MILLISECOND, 999);
         return end.getTimeInMillis();
+    }
+
+    private static String formatHeading(int lookaheadDays) {
+        if (lookaheadDays <= 0) {
+            return "[Upcoming events today]";
+        }
+        if (lookaheadDays == 1) {
+            return "[Upcoming events today + 1 day]";
+        }
+        return "[Upcoming events today + " + lookaheadDays + " days]";
+    }
+
+    private static String formatEmptyMessage(int lookaheadDays) {
+        if (lookaheadDays <= 0) {
+            return "No upcoming events today.";
+        }
+        if (lookaheadDays == 1) {
+            return "No upcoming events today or tomorrow.";
+        }
+        return "No upcoming events through today + " + lookaheadDays + " days.";
     }
 
     private static String formatWhen(long millis, boolean allDay) {

@@ -11,8 +11,10 @@ import ohi.andre.consolelauncher.R;
 import ohi.andre.consolelauncher.UIManager;
 import ohi.andre.consolelauncher.commands.CommandAbstraction;
 import ohi.andre.consolelauncher.commands.ExecutePack;
+import ohi.andre.consolelauncher.managers.settings.LauncherSettings;
 import ohi.andre.consolelauncher.managers.modules.ModuleManager;
 import ohi.andre.consolelauncher.managers.modules.UpcomingEventsManager;
+import ohi.andre.consolelauncher.managers.xml.options.Behavior;
 
 public class events implements CommandAbstraction {
 
@@ -34,6 +36,28 @@ public class events implements CommandAbstraction {
             return "Calendar access must be granted from Android settings.";
         }
 
+        String[] parts = input.split("\\s+");
+        if (parts.length > 0 && ("-lookahead".equals(parts[0]) || "lookahead".equals(parts[0]))) {
+            if (parts.length < 2 || parts[1].length() == 0) {
+                return "Events lookahead: " + UpcomingEventsManager.getLookaheadDays()
+                        + " days after today.\nUsage: events -lookahead [days]";
+            }
+
+            int days;
+            try {
+                days = Integer.parseInt(parts[1]);
+            } catch (Exception e) {
+                return "Invalid lookahead: " + parts[1];
+            }
+            days = UpcomingEventsManager.sanitizeLookaheadDays(days);
+            LauncherSettings.set(pack.context, Behavior.events_lookahead_days, String.valueOf(days));
+            refreshLauncherEventsIfKnown(pack);
+            if (days == 0) {
+                return "Launcher events lookahead set: today only.";
+            }
+            return "Launcher events lookahead set: today + " + days + " days.";
+        }
+
         if ("-module".equals(input) || "module".equals(input) || "-print".equals(input)) {
             return exampleScript();
         }
@@ -47,11 +71,25 @@ public class events implements CommandAbstraction {
         if (!ModuleManager.isKnown(pack.context, ModuleManager.EVENTS)) {
             return "Events is an editable Termux module. Run events -module for the script, then module -add events termux:/data/data/com.termux/files/home/retui/events.sh";
         }
+        send(pack, "show");
+        return "Module opened: events";
+    }
+
+    private void refreshLauncherEventsIfKnown(ExecutePack pack) {
+        if (!ModuleManager.isKnown(pack.context, ModuleManager.EVENTS)) {
+            return;
+        }
+        String source = ModuleManager.getModuleSource(pack.context, ModuleManager.EVENTS);
+        if (ModuleManager.isLauncherSource(source)) {
+            send(pack, "refresh");
+        }
+    }
+
+    private void send(ExecutePack pack, String command) {
         Intent intent = new Intent(UIManager.ACTION_MODULE_COMMAND);
-        intent.putExtra(UIManager.EXTRA_MODULE_COMMAND, "show");
+        intent.putExtra(UIManager.EXTRA_MODULE_COMMAND, command);
         intent.putExtra(UIManager.EXTRA_MODULE_NAME, ModuleManager.EVENTS);
         LocalBroadcastManager.getInstance(pack.context.getApplicationContext()).sendBroadcast(intent);
-        return "Module opened: events";
     }
 
     private String exampleScript() {

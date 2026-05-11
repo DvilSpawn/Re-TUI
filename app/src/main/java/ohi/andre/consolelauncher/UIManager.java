@@ -308,6 +308,8 @@ public class UIManager implements OnTouchListener {
     private static final String OUTPUT_HEADER_MODE_NORMAL = "normal";
     private static final String OUTPUT_HEADER_MODE_ARROWS = "arrows";
     private static final String OUTPUT_HEADER_MODE_NONE = "none";
+    private static final long EVENTS_REFRESH_GRACE_MS = 1000;
+    private static final long EVENTS_REFRESH_FALLBACK_MS = 60 * 1000;
     private boolean keyboardVisible = false;
     private boolean hasLastLayoutState = false;
     private int lastObservedRootHeight = -1;
@@ -399,6 +401,21 @@ public class UIManager implements OnTouchListener {
             if (shouldContinue) {
                 handler.postDelayed(this, 1000);
             }
+        }
+    };
+
+    private final Runnable eventsRefreshRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (!ModuleManager.EVENTS.equals(activeModule)) {
+                return;
+            }
+            String source = ModuleManager.getModuleSource(mContext, ModuleManager.EVENTS);
+            if (!ModuleManager.isLauncherSource(source)) {
+                return;
+            }
+            refreshLauncherModule(ModuleManager.EVENTS, source, false);
+            scheduleEventsRefreshIfNeeded();
         }
     };
 
@@ -1129,6 +1146,9 @@ public class UIManager implements OnTouchListener {
             return;
         }
 
+        if (handler != null) {
+            handler.removeCallbacks(eventsRefreshRunnable);
+        }
         activeModule = id;
         ModuleManager.setActiveModule(mContext, id);
         updateModuleDockSelection();
@@ -1146,10 +1166,24 @@ public class UIManager implements OnTouchListener {
         } else if (ModuleManager.REMINDER.equals(id)) {
             showTextModule(ModuleManager.REMINDER, buildReminderModuleText());
         } else {
+            refreshLauncherModuleTextIfNeeded(id);
             String text = ModuleManager.getScriptText(mContext, id);
             showTextModule(id, TextUtils.isEmpty(text) ? "No module output yet." : text);
         }
         refreshSuggestionsForActiveModule();
+        scheduleEventsRefreshIfNeeded();
+    }
+
+    private void refreshLauncherModuleTextIfNeeded(String module) {
+        String id = ModuleManager.normalize(module);
+        String source = ModuleManager.getModuleSource(mContext, id);
+        if (!ModuleManager.isLauncherSource(source)) {
+            return;
+        }
+        String provider = ModuleManager.launcherProvider(source);
+        if (ModuleManager.EVENTS.equals(provider)) {
+            ModuleManager.setScriptText(mContext, id, UpcomingEventsManager.formatModulePayload(mContext));
+        }
     }
 
     private void showMusicModule() {
@@ -1222,6 +1256,7 @@ public class UIManager implements OnTouchListener {
         TextView label = moduleView.findViewById(R.id.module_text_label);
         TextView body = moduleView.findViewById(R.id.module_text_body);
         TextView close = moduleView.findViewById(R.id.module_text_close);
+        ScrollView scroll = moduleView.findViewById(R.id.module_text_scroll);
         if (label != null) {
             label.setText(ModuleManager.displayTitle(mContext, module));
         }
@@ -1229,6 +1264,7 @@ public class UIManager implements OnTouchListener {
             body.setText(text);
             body.setTextColor(AppearanceSettings.notificationWidgetTextColor());
             body.setTypeface(Tuils.getTypeface(mContext));
+            constrainEventModuleScroll(module, scroll, body);
         }
         if (close != null) {
             close.setOnClickListener(v -> closeHomeModule());
@@ -1244,6 +1280,60 @@ public class UIManager implements OnTouchListener {
                 AppearanceSettings.notificationWidgetBorderColor(),
                 AppearanceSettings.moduleNameTextColor());
         styleModuleClose(close);
+    }
+
+    private void constrainEventModuleScroll(String module, ScrollView scroll, TextView body) {
+        String id = ModuleManager.normalize(module);
+        String source = ModuleManager.getModuleSource(mContext, id);
+        if (!ModuleManager.EVENTS.equals(id) || !ModuleManager.isLauncherSource(source)
+                || scroll == null || body == null) {
+            return;
+        }
+
+        scroll.setFillViewport(false);
+        scroll.setOverScrollMode(View.OVER_SCROLL_IF_CONTENT_SCROLLS);
+        scroll.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+            @Override
+            public boolean onPreDraw() {
+                if (scroll.getViewTreeObserver().isAlive()) {
+                    scroll.getViewTreeObserver().removeOnPreDrawListener(this);
+                }
+
+                int maxHeight = calculateCalendarTextHeight(body);
+                int contentHeight = body.getHeight();
+                if (maxHeight <= 0 || contentHeight <= 0) {
+                    return true;
+                }
+
+                int targetHeight = Math.min(contentHeight, maxHeight);
+                ViewGroup.LayoutParams params = scroll.getLayoutParams();
+                if (params != null && params.height != targetHeight) {
+                    params.height = targetHeight;
+                    scroll.setLayoutParams(params);
+                }
+                scroll.setVerticalScrollBarEnabled(contentHeight > targetHeight);
+                return true;
+            }
+        });
+    }
+
+    private int calculateCalendarTextHeight(TextView body) {
+        int lineHeight = body.getLineHeight();
+        int lines = countVisibleLines(buildCalendarModuleText());
+        int padding = body.getPaddingTop() + body.getPaddingBottom();
+        return Math.max(lineHeight, lineHeight * lines + padding);
+    }
+
+    private int countVisibleLines(String text) {
+        if (TextUtils.isEmpty(text)) {
+            return 1;
+        }
+        String[] lines = text.split("\\r?\\n", -1);
+        int count = lines.length;
+        while (count > 1 && TextUtils.isEmpty(lines[count - 1])) {
+            count--;
+        }
+        return count;
     }
 
     private void styleModuleClose(TextView close) {
@@ -1264,6 +1354,9 @@ public class UIManager implements OnTouchListener {
     }
 
     private void closeHomeModule() {
+        if (handler != null) {
+            handler.removeCallbacks(eventsRefreshRunnable);
+        }
         activeModule = "";
         ModuleManager.setActiveModule(mContext, "");
         if (homeWidgetsContainer != null) {
@@ -1287,6 +1380,24 @@ public class UIManager implements OnTouchListener {
         } else if (ModuleManager.REMINDER.equals(activeModule)) {
             showHomeModule(ModuleManager.REMINDER);
         }
+    }
+
+    private void scheduleEventsRefreshIfNeeded() {
+        if (handler == null) {
+            return;
+        }
+        handler.removeCallbacks(eventsRefreshRunnable);
+        if (!ModuleManager.EVENTS.equals(activeModule)) {
+            return;
+        }
+        String source = ModuleManager.getModuleSource(mContext, ModuleManager.EVENTS);
+        if (!ModuleManager.isLauncherSource(source)) {
+            return;
+        }
+
+        long now = System.currentTimeMillis();
+        long delay = EVENTS_REFRESH_FALLBACK_MS - (now % EVENTS_REFRESH_FALLBACK_MS) + EVENTS_REFRESH_GRACE_MS;
+        handler.postDelayed(eventsRefreshRunnable, delay);
     }
 
     private void updateMusicModuleText(View musicWidget) {
@@ -1403,6 +1514,10 @@ public class UIManager implements OnTouchListener {
     }
 
     private void refreshLauncherModule(String module, String source) {
+        refreshLauncherModule(module, source, true);
+    }
+
+    private void refreshLauncherModule(String module, String source, boolean announce) {
         String provider = ModuleManager.launcherProvider(source);
         String payload;
         if (ModuleManager.EVENTS.equals(provider)) {
@@ -1418,7 +1533,9 @@ public class UIManager implements OnTouchListener {
             showHomeModule(id);
         }
         rebuildModuleDock();
-        Tuils.sendOutput(mContext, "Module refreshed: " + id);
+        if (announce) {
+            Tuils.sendOutput(mContext, "Module refreshed: " + id);
+        }
     }
 
     private void setupTermuxConsole(ViewGroup rootView) {
@@ -4812,6 +4929,7 @@ public class UIManager implements OnTouchListener {
     public void pause() {
         closeKeyboard();
         handler.removeCallbacks(musicTimeRunnable);
+        handler.removeCallbacks(eventsRefreshRunnable);
         if (handler != null) {
             handler.removeCallbacks(fontRefreshRunnable);
         }
@@ -4844,6 +4962,7 @@ public class UIManager implements OnTouchListener {
 
     public void resume() {
         scheduleInternalMusicTickerIfNeeded();
+        scheduleEventsRefreshIfNeeded();
         scheduleTypefaceRefreshes();
 
         if (ramManager != null) ramManager.start();
