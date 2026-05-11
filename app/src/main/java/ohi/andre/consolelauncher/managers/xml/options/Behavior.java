@@ -1493,6 +1493,22 @@ public enum Behavior implements XMLPrefsSave {
         public String type() {
             return XMLPrefsSave.TEXT;
         }
+    },
+    events_lookahead_days {
+        @Override
+        public String defaultValue() {
+            return "0";
+        }
+
+        @Override
+        public String info() {
+            return "Number of days after today to include in the launcher Events module. 0 shows only upcoming events today";
+        }
+
+        @Override
+        public String type() {
+            return XMLPrefsSave.INTEGER;
+        }
     };
 
     @Override
