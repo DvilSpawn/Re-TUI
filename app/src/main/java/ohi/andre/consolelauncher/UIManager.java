@@ -69,7 +69,10 @@ import ohi.andre.consolelauncher.managers.modules.ModuleManager;
 import ohi.andre.consolelauncher.managers.modules.ModuleVariableManager;
 import ohi.andre.consolelauncher.managers.modules.ReminderManager;
 import ohi.andre.consolelauncher.managers.modules.UpcomingEventsManager;
+import ohi.andre.consolelauncher.managers.widgets.LuaWidgetEngine;
+import ohi.andre.consolelauncher.managers.widgets.LuaWidgetManager;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -186,6 +189,7 @@ public class UIManager implements OnTouchListener {
     public static final String ACTION_MODULE_COMMAND = BuildConfig.APPLICATION_ID + ".ui_module_command";
     public static final String EXTRA_MODULE_COMMAND = "module_command";
     public static final String EXTRA_MODULE_NAME = "module_name";
+    public static final String EXTRA_WIDGET_ACTION_INDEX = "widget_action_index";
     private static final String TERMUX_PACKAGE = "com.termux";
     private static final String TERMUX_RUN_COMMAND_PERMISSION = "com.termux.permission.RUN_COMMAND";
     private static final String TERMUX_RUN_COMMAND_ACTION = "com.termux.RUN_COMMAND";
@@ -315,6 +319,7 @@ public class UIManager implements OnTouchListener {
     private int lastObservedRootHeight = -1;
     private LinearLayout moduleDock;
     private final LinkedHashMap<String, TextView> moduleDockButtons = new LinkedHashMap<>();
+    private final HashMap<String, LuaWidgetEngine> luaWidgetEngines = new HashMap<>();
     private String activeModule = "";
     private Intent lastClockStateIntent;
     private Intent lastPomodoroStateIntent;
@@ -1166,6 +1171,10 @@ public class UIManager implements OnTouchListener {
         } else if (ModuleManager.REMINDER.equals(id)) {
             showTextModule(ModuleManager.REMINDER, buildReminderModuleText());
         } else {
+            String source = ModuleManager.getModuleSource(mContext, id);
+            if (ModuleManager.isLuaSource(source)) {
+                renderLuaWidgetModule(id, false, false);
+            }
             refreshLauncherModuleTextIfNeeded(id);
             String text = ModuleManager.getScriptText(mContext, id);
             showTextModule(id, TextUtils.isEmpty(text) ? "No module output yet." : text);
@@ -1496,6 +1505,9 @@ public class UIManager implements OnTouchListener {
             rebuildModuleDock();
         } else if ("refresh".equals(command)) {
             refreshScriptModule(module);
+        } else if ("lua_click".equals(command)) {
+            int index = intent.getIntExtra(EXTRA_WIDGET_ACTION_INDEX, 0);
+            clickLuaWidget(module, index);
         }
     }
 
@@ -1508,6 +1520,10 @@ public class UIManager implements OnTouchListener {
         }
         if (ModuleManager.isLauncherSource(source)) {
             refreshLauncherModule(id, source);
+            return;
+        }
+        if (ModuleManager.isLuaSource(source)) {
+            renderLuaWidgetModule(id, true, true);
             return;
         }
         runTermuxScript(source, new ArrayList<>(), id, false);
@@ -1536,6 +1552,71 @@ public class UIManager implements OnTouchListener {
         if (announce) {
             Tuils.sendOutput(mContext, "Module refreshed: " + id);
         }
+    }
+
+    private void renderLuaWidgetModule(String module, boolean repaint, boolean announce) {
+        String id = ModuleManager.normalize(module);
+        String source = ModuleManager.getModuleSource(mContext, id);
+        String widgetId = ModuleManager.luaWidgetId(source);
+        if (TextUtils.isEmpty(widgetId) || !LuaWidgetManager.exists(widgetId)) {
+            ModuleManager.setScriptText(mContext, id, "::title " + ModuleManager.displayName(id)
+                    + "\n::body Lua widget source not found: " + widgetId);
+        } else {
+            LuaWidgetEngine engine = getLuaWidgetEngine(widgetId);
+            LuaWidgetEngine.RenderResult result = engine.render();
+            ModuleManager.setScriptText(mContext, id, LuaWidgetManager.modulePayload(widgetId, result));
+        }
+
+        if (repaint && id.equals(activeModule)) {
+            repaintActiveTextModule(id);
+        }
+        rebuildModuleDock();
+        if (announce) {
+            Tuils.sendOutput(mContext, "Widget refreshed: " + id);
+        }
+    }
+
+    private void clickLuaWidget(String module, int index) {
+        String id = ModuleManager.normalize(module);
+        if (TextUtils.isEmpty(id) || index <= 0) {
+            return;
+        }
+        String source = ModuleManager.getModuleSource(mContext, id);
+        String widgetId = ModuleManager.luaWidgetId(source);
+        if (TextUtils.isEmpty(widgetId) || !LuaWidgetManager.exists(widgetId)) {
+            Tuils.sendOutput(mContext, "Lua widget source not found: " + id);
+            return;
+        }
+
+        LuaWidgetEngine engine = getLuaWidgetEngine(widgetId);
+        LuaWidgetEngine.RenderResult result = engine.click(index);
+        ModuleManager.setScriptText(mContext, id, LuaWidgetManager.modulePayload(widgetId, result));
+        if (id.equals(activeModule)) {
+            repaintActiveTextModule(id);
+        }
+        rebuildModuleDock();
+    }
+
+    private LuaWidgetEngine getLuaWidgetEngine(String widgetId) {
+        String id = LuaWidgetManager.normalizeId(widgetId);
+        long version = LuaWidgetManager.version(id);
+        LuaWidgetEngine engine = luaWidgetEngines.get(id);
+        if (engine == null || engine.version() != version) {
+            engine = new LuaWidgetEngine(id, LuaWidgetManager.readScript(id), version);
+            luaWidgetEngines.put(id, engine);
+        }
+        return engine;
+    }
+
+    private void repaintActiveTextModule(String id) {
+        if (homeWidgetsContainer == null) {
+            return;
+        }
+        homeWidgetsContainer.removeAllViews();
+        String text = ModuleManager.getScriptText(mContext, id);
+        showTextModule(id, TextUtils.isEmpty(text) ? "No module output yet." : text);
+        refreshSuggestionsForActiveModule();
+        scheduleEventsRefreshIfNeeded();
     }
 
     private void setupTermuxConsole(ViewGroup rootView) {
@@ -4825,16 +4906,10 @@ public class UIManager implements OnTouchListener {
     }
 
     public void openKeyboard() {
-        if (mTerminalAdapter.getInputView() instanceof EditText) {
-            EditText terminalInput = (EditText) mTerminalAdapter.getInputView();
-            terminalInput.setCursorVisible(true);
-            terminalInput.setShowSoftInputOnFocus(true);
-            if (terminalInput instanceof OutlineEditText) {
-                ((OutlineEditText) terminalInput).setIdleCursorVisible(false);
-            }
+        activateTerminalInput(true);
+        if (mTerminalAdapter != null) {
+            imm.showSoftInput(mTerminalAdapter.getInputView(), InputMethodManager.SHOW_FORCED);
         }
-        mTerminalAdapter.requestInputFocus();
-        imm.showSoftInput(mTerminalAdapter.getInputView(), InputMethodManager.SHOW_FORCED);
     }
 
     public void closeKeyboard() {
@@ -4851,7 +4926,7 @@ public class UIManager implements OnTouchListener {
     }
 
     public void onStart(boolean openKeyboardOnStart) {
-        if(openKeyboardOnStart) openKeyboard();
+        activateTerminalInput(openKeyboardOnStart);
     }
 
     public void setInput(String s) {
@@ -4921,8 +4996,28 @@ public class UIManager implements OnTouchListener {
     }
 
     public void focusTerminal() {
-        if (mTerminalAdapter != null) {
-            mTerminalAdapter.requestInputFocus();
+        activateTerminalInput(false);
+    }
+
+    public void activateTerminalInput(boolean showSoftKeyboard) {
+        if (mTerminalAdapter == null) {
+            return;
+        }
+
+        View input = mTerminalAdapter.getInputView();
+        if (input instanceof EditText) {
+            EditText terminalInput = (EditText) input;
+            terminalInput.setShowSoftInputOnFocus(showSoftKeyboard);
+            terminalInput.setCursorVisible(true);
+            if (terminalInput instanceof OutlineEditText) {
+                ((OutlineEditText) terminalInput).setIdleCursorVisible(false);
+            }
+        }
+
+        mTerminalAdapter.requestInputFocus();
+        mTerminalAdapter.focusInputEnd();
+        if (showSoftKeyboard) {
+            input.post(() -> imm.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT));
         }
     }
 

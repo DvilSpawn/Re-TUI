@@ -235,7 +235,7 @@ TBridge is not the file browser. Use `files` for interactive file navigation, or
 
 ### `module`
 
-Show and manage built-in modules and script-backed custom modules.
+Show and manage built-in modules, Termux-backed modules, launcher-backed modules, and prototype Lua widgets.
 
 Built-in modules:
 
@@ -256,6 +256,7 @@ Common commands:
 - `module -dock add notifications`
 - `module -dock remove music`
 - `module -add server termux:/data/data/com.termux/files/home/retui/server-health.sh`
+- `module -add counter lua:aio_counter`
 - `module -refresh server`
 - `module -rm server`
 - `module -hide music`
@@ -272,11 +273,26 @@ Design direction:
 - script modules should stay text/callback based, with no arbitrary code loaded into Re:T-UI
 - future module sessions will let modules ask users for values step by step
 
-Script modules use Termux for execution and render text back inside a Re:T-UI module window. `module -rm` removes only Re:T-UI's registry entry; it does not delete the Termux script.
+Script modules use Termux for execution and render text back inside a Re:T-UI module window. Prototype Lua widgets use app-local source files and the same dock. `module -rm` removes only Re:T-UI's registry entry; it does not delete the Termux script.
 
 See also: [Modules](./Modules.md).
 
 TBridge is no longer positioned as the file manager backend. Use `files` for file navigation.
+
+### `widget`
+
+Create, edit, and test prototype Lua widgets from inside Re:T-UI.
+
+Useful forms:
+
+- `widget -samples`
+- `widget -new counter`
+- `widget -edit counter`
+- `widget -show counter`
+- `widget -refresh counter`
+- `widget -rm counter`
+
+Widgets are saved under Re:T-UI's local widget folder and registered as `lua:<id>` modules. This is the paste/write-your-own test surface for a future verified widget marketplace.
 
 ### `webhook`
 

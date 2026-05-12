@@ -242,6 +242,7 @@
         \n$ module -prompt reminder edit
         \n$ module -prompt reminder remove
         \n$ module -add server termux:/data/data/com.termux/files/home/retui/server-health.sh
+        \n$ module -add counter lua:aio_counter
         \n$ module -add events termux:/data/data/com.termux/files/home/retui/events.sh
         \n$ module -refresh server
         \n$ module -rm server
@@ -249,7 +250,17 @@
         \n$ module -dock add server
         \n$ module -dock remove music
         \n$ module -close
-        \n\nModules are backed by Termux scripts. Re:T-UI can safely resolve %RETUI_* placeholders before dispatch so scripts can consume launcher-provided values. Scripts emit ::title, ::body, and ::suggest metadata. Native prompt sessions let supported modules ask for user input step by step.</string>
+        \n\nModules are backed by native panels, Termux scripts, launcher providers, or prototype Lua widgets. Re:T-UI can safely resolve %RETUI_* placeholders before Termux dispatch so scripts can consume launcher-provided values. Scripts emit ::title, ::body, and ::suggest metadata. Native prompt sessions let supported modules ask for user input step by step.</string>
+    <string name="help_widget">Create, edit, and test prototype Lua widgets inside Re:T-UI.
+        \n\nUsage:
+        \n$ widget -ls
+        \n$ widget -samples
+        \n$ widget -new counter
+        \n$ widget -edit counter
+        \n$ widget -show counter
+        \n$ widget -refresh counter
+        \n$ widget -rm counter
+        \n\nWidgets are saved locally under Re:T-UI\'s widgets folder, registered as lua:[name] modules, and shown in the shared module dock. This is a test surface for paste/write-your-own widgets, not a production marketplace runtime yet.</string>
     <!-- status -->
     <string name="battery_label">Battery:</string>
     <string name="mobile_data_label">Mobile data:</string>

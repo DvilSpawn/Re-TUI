@@ -51,6 +51,36 @@ module -show server
 
 Simple stdout becomes the module body.
 
+## Prototype Lua Widgets
+
+Lua widgets are an experimental in-app scripting surface for regular users who do not want to manage Termux files. They are saved in Re:T-UI's local `widgets/<id>/main.lua` folder, included in personal backup/restore, and registered as `lua:<id>` modules so they share the same module dock as built-ins and Termux modules.
+
+Test commands:
+
+```text
+widget -samples
+widget -new counter
+widget -edit counter
+widget -show counter
+widget -refresh counter
+widget -rm counter
+```
+
+The current prototype supports a deliberately small API:
+
+- `on_load()`
+- `on_resume()`
+- `on_click(index)`
+- `ui:set_title(text)`
+- `ui:show_text(text)`
+- `ui:show_lines(lines)`
+- `ui:show_buttons(labels)`
+- `ui:show_progress_bar(label, current, max)`
+
+Button labels become module suggestion chips. Tapping a chip dispatches `widget -click <id> <index>`, which calls the widget's `on_click(index)` handler and repaints the active module.
+
+This is a test surface, not the final marketplace runtime. The bundled samples are adapted from the AIO Launcher sample style and are intentionally dev-only.
+
 ## Launcher Variables For Scripts
 
 Before Re:T-UI dispatches a script module to Termux, it materializes a small set of read-only launcher values and replaces `%RETUI_*` tokens in a temporary runtime copy of the script. The original script is not edited.

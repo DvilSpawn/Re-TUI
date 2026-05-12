@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import ohi.andre.consolelauncher.managers.widgets.LuaWidgetManager;
+
 public final class ModuleManager {
 
     public static final String MUSIC = "music";
@@ -21,6 +23,7 @@ public final class ModuleManager {
     public static final String REMINDER = "reminder";
     public static final String SOURCE_LAUNCHER_PREFIX = "launcher:";
     public static final String SOURCE_TERMUX_PREFIX = "termux:";
+    public static final String SOURCE_LUA_PREFIX = "lua:";
 
     private static final String PREFS = "retui_modules";
     private static final String KEY_DOCK = "dock";
@@ -189,7 +192,18 @@ public final class ModuleManager {
     }
 
     public static boolean isTermuxSource(String source) {
-        return !TextUtils.isEmpty(source) && !isLauncherSource(source);
+        return !TextUtils.isEmpty(source) && !isLauncherSource(source) && !isLuaSource(source);
+    }
+
+    public static boolean isLuaSource(String source) {
+        return source != null && source.trim().toLowerCase(Locale.US).startsWith(SOURCE_LUA_PREFIX);
+    }
+
+    public static String luaWidgetId(String source) {
+        if (!isLuaSource(source)) {
+            return "";
+        }
+        return LuaWidgetManager.normalizeId(source.trim().substring(SOURCE_LUA_PREFIX.length()));
     }
 
     public static String launcherProvider(String source) {
@@ -236,6 +250,10 @@ public final class ModuleManager {
         String title = getScriptTitle(context, id);
         if (!TextUtils.isEmpty(title)) {
             return title;
+        }
+        String source = getModuleSource(context, id);
+        if (isLuaSource(source)) {
+            return LuaWidgetManager.getName(luaWidgetId(source));
         }
         return displayName(id);
     }
@@ -433,6 +451,9 @@ public final class ModuleManager {
         }
         if (lower.startsWith(SOURCE_LAUNCHER_PREFIX)) {
             return SOURCE_LAUNCHER_PREFIX + trimmed.substring(SOURCE_LAUNCHER_PREFIX.length()).trim().toLowerCase(Locale.US);
+        }
+        if (lower.startsWith(SOURCE_LUA_PREFIX)) {
+            return SOURCE_LUA_PREFIX + LuaWidgetManager.normalizeId(trimmed.substring(SOURCE_LUA_PREFIX.length()));
         }
         return trimmed;
     }

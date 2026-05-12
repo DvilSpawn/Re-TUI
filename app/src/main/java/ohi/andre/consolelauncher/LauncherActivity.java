@@ -374,7 +374,7 @@ public class LauncherActivity extends AppCompatActivity implements Reloadable {
         ui.pack = main.getMainPack();
 
         in.in(Tuils.EMPTYSTRING);
-        ui.focusTerminal();
+        ui.activateTerminalInput(openKeyboardOnStart);
 
         System.gc();
     }
@@ -416,7 +416,10 @@ public class LauncherActivity extends AppCompatActivity implements Reloadable {
     @Override
     protected void onResume() {
         super.onResume();
-        if (ui != null) ui.resume();
+        if (ui != null) {
+            ui.resume();
+            ui.activateTerminalInput(openKeyboardOnStart);
+        }
     }
 
     private void fixOrientation() {
@@ -509,7 +512,7 @@ public class LauncherActivity extends AppCompatActivity implements Reloadable {
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
         if (hasFocus && ui != null) {
-            ui.focusTerminal();
+            ui.activateTerminalInput(openKeyboardOnStart);
             ui.scheduleTypefaceRefreshes();
         }
     }
