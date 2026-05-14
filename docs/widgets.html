@@ -1,0 +1,806 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Re:T-UI Widgets Guide</title>
+  <meta name="description" content="A practical guide to Re:T-UI widgets, Lua scripting, config forms, widget persistence, suggestion scripts, commands, permissions, and widget-friendly launcher UI patterns.">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #080909;
+      --panel: #151717;
+      --panel-soft: #202322;
+      --ink: #f4eee7;
+      --muted: #c8b9b5;
+      --accent: #d98b99;
+      --accent-strong: #f0a7b0;
+      --line: #4b393d;
+      --green: #b8db88;
+      --cyan: #81cad6;
+      --violet: #b7a2e8;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 14% 8%, rgba(184, 219, 136, 0.13), transparent 25rem),
+        radial-gradient(circle at 86% 28%, rgba(129, 202, 214, 0.12), transparent 24rem),
+        linear-gradient(140deg, #070808 0%, #111413 60%, #090a0a 100%);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.6;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    main {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 72px;
+    }
+
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 12px 0;
+      background: linear-gradient(180deg, rgba(8, 9, 9, 0.96), rgba(8, 9, 9, 0.72));
+      backdrop-filter: blur(12px);
+    }
+
+    nav a,
+    .button-link {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: rgba(32, 35, 34, 0.78);
+      color: var(--muted);
+      padding: 7px 10px;
+      text-decoration: none;
+      font: 0.78rem "SFMono-Regular", Consolas, monospace;
+    }
+
+    nav a:hover,
+    nav a:focus-visible,
+    .button-link:hover,
+    .button-link:focus-visible {
+      border-color: var(--cyan);
+      color: var(--ink);
+      outline: none;
+    }
+
+    .hero {
+      scroll-margin-top: 132px;
+      min-height: 58vh;
+      display: grid;
+      align-content: end;
+      padding: 48px 0 44px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .eyebrow,
+    .kicker {
+      color: var(--green);
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 0.82rem;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      max-width: 900px;
+      margin: 14px 0 18px;
+      font-size: clamp(2.5rem, 7vw, 6rem);
+      line-height: 0.96;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      margin: 0 0 12px;
+      font-size: clamp(1.55rem, 3vw, 2.45rem);
+      line-height: 1.08;
+      letter-spacing: 0;
+    }
+
+    h3 {
+      margin: 0 0 8px;
+      color: var(--ink);
+      font-size: 1.04rem;
+      letter-spacing: 0;
+    }
+
+    p {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 1rem;
+    }
+
+    .lead {
+      max-width: 760px;
+      color: var(--muted);
+      font-size: clamp(1.05rem, 2vw, 1.23rem);
+    }
+
+    .cta-row,
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 22px;
+    }
+
+    .cta-row a,
+    .primary-link {
+      border: 1px solid var(--accent);
+      border-radius: 6px;
+      background: rgba(217, 139, 153, 0.17);
+      color: var(--ink);
+      padding: 9px 12px;
+      text-decoration: none;
+      font: 0.82rem "SFMono-Regular", Consolas, monospace;
+    }
+
+    .cta-row a.secondary {
+      border-color: var(--line);
+      background: rgba(32, 35, 34, 0.76);
+      color: var(--muted);
+    }
+
+    .cta-row a:hover,
+    .cta-row a:focus-visible,
+    .primary-link:hover,
+    .primary-link:focus-visible {
+      border-color: var(--cyan);
+      color: var(--ink);
+      outline: none;
+    }
+
+    .chips span {
+      border: 1px solid var(--line);
+      background: rgba(32, 35, 34, 0.76);
+      color: var(--muted);
+      padding: 8px 11px;
+      border-radius: 6px;
+      font: 0.8rem "SFMono-Regular", Consolas, monospace;
+    }
+
+    section.guide {
+      scroll-margin-top: 132px;
+      padding: 44px 0;
+      border-bottom: 1px solid rgba(75, 57, 61, 0.82);
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(280px, 0.76fr);
+      gap: 26px;
+      align-items: start;
+    }
+
+    .wide-split {
+      display: grid;
+      grid-template-columns: minmax(0, 0.8fr) minmax(340px, 1fr);
+      gap: 26px;
+      align-items: start;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 22px;
+    }
+
+    .two-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 22px;
+    }
+
+    .steps {
+      display: grid;
+      gap: 14px;
+      margin-top: 22px;
+    }
+
+    .tile,
+    .step,
+    .note,
+    figure {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(21, 23, 23, 0.74);
+    }
+
+    .tile,
+    .step,
+    .note {
+      padding: 16px;
+    }
+
+    .tile {
+      min-height: 164px;
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 44px minmax(0, 1fr);
+      gap: 14px;
+      align-items: start;
+    }
+
+    .step-number {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      border: 1px solid var(--accent);
+      border-radius: 6px;
+      color: var(--accent-strong);
+      font: 0.9rem "SFMono-Regular", Consolas, monospace;
+    }
+
+    .tile p,
+    .step p,
+    .note p {
+      margin-bottom: 0;
+      font-size: 0.92rem;
+    }
+
+    figure {
+      margin: 0;
+      overflow: hidden;
+    }
+
+    figure img {
+      width: 100%;
+      aspect-ratio: 9 / 19.8;
+      object-fit: cover;
+      object-position: top;
+      display: block;
+      background: #050505;
+    }
+
+    figcaption {
+      padding: 11px 13px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.88rem;
+      background: rgba(32, 35, 34, 0.72);
+    }
+
+    code,
+    pre,
+    .command-list,
+    table {
+      font-family: "SFMono-Regular", Consolas, monospace;
+    }
+
+    code {
+      color: var(--accent-strong);
+      overflow-wrap: anywhere;
+    }
+
+    pre {
+      margin: 14px 0 0;
+      border: 1px solid rgba(75, 57, 61, 0.72);
+      border-radius: 8px;
+      background: rgba(5, 5, 5, 0.54);
+      color: var(--ink);
+      padding: 14px;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      font-size: 0.86rem;
+    }
+
+    .command-list {
+      display: grid;
+      gap: 9px;
+      margin-top: 18px;
+      color: var(--muted);
+    }
+
+    .command-list div {
+      border: 1px solid rgba(75, 57, 61, 0.72);
+      border-radius: 6px;
+      background: rgba(32, 35, 34, 0.62);
+      padding: 9px 11px;
+    }
+
+    .command-list strong {
+      color: var(--cyan);
+      font-weight: 700;
+    }
+
+    .table-wrap {
+      margin-top: 20px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow-x: auto;
+      background: rgba(21, 23, 23, 0.72);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 760px;
+      color: var(--muted);
+      font-size: 0.86rem;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid rgba(75, 57, 61, 0.72);
+      padding: 10px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--green);
+      background: rgba(32, 35, 34, 0.74);
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .section-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .section-header span {
+      color: var(--cyan);
+      font: 0.82rem "SFMono-Regular", Consolas, monospace;
+    }
+
+    @media (max-width: 900px) {
+      main {
+        width: min(100% - 24px, 720px);
+      }
+
+      nav {
+        position: static;
+      }
+
+      .split,
+      .wide-split,
+      .grid,
+      .two-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        min-height: auto;
+      }
+    }
+
+    @media (max-width: 560px) {
+      main {
+        width: min(100% - 18px, 520px);
+      }
+
+      nav {
+        gap: 6px;
+      }
+
+      nav a {
+        padding: 6px 8px;
+        font-size: 0.72rem;
+      }
+
+      .hero,
+      section.guide {
+        padding-block: 30px;
+      }
+
+      .cta-row a {
+        flex: 1 1 150px;
+        text-align: center;
+      }
+
+      .step {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <nav aria-label="Widget guide sections">
+      <a href="index.html">Showcase</a>
+      <a href="modules.html">Modules</a>
+      <a href="#start">Start</a>
+      <a href="#surfaces">Surfaces</a>
+      <a href="#commands">Commands</a>
+      <a href="#first-widget">First Widget</a>
+      <a href="#config">Config</a>
+      <a href="#persistence">Persistence</a>
+      <a href="#suggestions">Suggestions</a>
+      <a href="#api">API</a>
+      <a href="#safety">Safety</a>
+    </nav>
+
+    <section class="hero" id="start">
+      <div class="eyebrow">Re:T-UI widgets</div>
+      <h1>Build small launcher tools without turning the launcher into an IDE.</h1>
+      <p class="lead">Widgets are Re:T-UI-owned surfaces for quick, inspectable tools. Lua gives regular users a native scripting layer for timers, todos, notes, status panels, action chips, config forms, and command suggestions without needing Termux plumbing.</p>
+      <div class="chips" aria-label="Widget guide topics">
+        <span>Lua widgets</span>
+        <span>Config surfaces</span>
+        <span>Persistent prefs</span>
+        <span>Widget-local files</span>
+        <span>Suggestion scripts</span>
+      </div>
+      <div class="cta-row">
+        <a href="#first-widget">Create a widget</a>
+        <a class="secondary" href="#config">Config forms</a>
+        <a class="secondary" href="index.html#lua-scripting">Back to screenshots</a>
+      </div>
+    </section>
+
+    <section class="guide wide-split" id="surfaces">
+      <div>
+        <div class="kicker">Mental model</div>
+        <h2>Keep preview, config, and source editing separate.</h2>
+        <p>A widget has a live launcher surface, optional config UI, and a script editor path. Those surfaces should stay separate so the launcher remains predictable instead of becoming a tangle of custom mini-apps.</p>
+        <div class="command-list">
+          <div><strong>Preview:</strong> the active module panel rendered by Lua with <code>ui:show_text</code>, <code>ui:show_kv</code>, buttons, actions, tables, or progress.</div>
+          <div><strong>Config:</strong> a launcher-owned form declared by Lua through <code>ui:show_config</code>. Use it for user-editable values.</div>
+          <div><strong>Source:</strong> the Lua editor opened explicitly through <code>widget -edit &lt;id&gt;</code> or the <code>edit script</code> chip.</div>
+        </div>
+      </div>
+      <div class="two-grid" aria-label="Lua widget screenshots">
+        <figure>
+          <img src="phone-blog-assets/lua-widget-preview.png" alt="Re:T-UI Lua Focus widget preview rendered in the module dock">
+          <figcaption>A Lua widget renders live state into the module dock and exposes widget-specific action chips.</figcaption>
+        </figure>
+        <figure>
+          <img src="phone-blog-assets/lua-widget-config.png" alt="Re:T-UI Lua widget config panel with text, number, toggle, select, and textarea fields">
+          <figcaption>The same widget opens a terminal-styled config panel generated from the Lua schema.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="guide" id="commands">
+      <div class="section-header">
+        <div>
+          <div class="kicker">Command surface</div>
+          <h2>The root widget command should stay quiet.</h2>
+        </div>
+        <span>command id: widget</span>
+      </div>
+      <p>The widget command is for managing Lua widgets, not for dumping every possible maintenance action into the suggestion row. Common actions should be obvious; advanced recovery commands should still exist but appear once the user narrows the command.</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Command</th>
+              <th>Use it for</th>
+              <th>Surface rule</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>widget -ls</code></td>
+              <td>List saved widgets, ids, metadata, state, and dock registration.</td>
+              <td>High-intent root chip.</td>
+            </tr>
+            <tr>
+              <td><code>widget -add &lt;name&gt;</code></td>
+              <td>Create a widget and open the editor with starter Lua.</td>
+              <td>High-intent root chip.</td>
+            </tr>
+            <tr>
+              <td><code>widget -show &lt;id&gt;</code></td>
+              <td>Open a widget as the active dock panel.</td>
+              <td>High-intent root chip.</td>
+            </tr>
+            <tr>
+              <td><code>widget -config &lt;id&gt;</code></td>
+              <td>Open the widget config form when the script declares one.</td>
+              <td>High-intent root chip; active widgets expose this as <code>edit</code>.</td>
+            </tr>
+            <tr>
+              <td><code>widget -edit &lt;id&gt;</code></td>
+              <td>Open the Lua source editor.</td>
+              <td>High-intent root chip; active widgets expose this as <code>edit script</code>.</td>
+            </tr>
+            <tr>
+              <td><code>widget -check &lt;id&gt;</code></td>
+              <td>Load and render once, reporting metadata, schema, or runtime errors.</td>
+              <td>Advanced chip after narrowing, also shown on error surfaces.</td>
+            </tr>
+            <tr>
+              <td><code>widget -refresh &lt;id&gt;</code></td>
+              <td>Re-render a saved widget.</td>
+              <td>Usually a widget-specific chip, not root noise.</td>
+            </tr>
+            <tr>
+              <td><code>widget -rm &lt;id&gt;</code></td>
+              <td>Delete a widget after confirmation.</td>
+              <td>Advanced chip after narrowing.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <pre>$ widget -add focus_sprint
+$ widget -check focus_sprint
+$ widget -show focus_sprint
+$ widget -config focus_sprint
+$ widget -edit focus_sprint</pre>
+    </section>
+
+    <section class="guide split" id="first-widget">
+      <div>
+        <div class="kicker">First widget</div>
+        <h2>Start with a tiny durable script.</h2>
+        <p>A good first widget should render a small body, expose one or two actions, and keep state in <code>prefs</code>. That proves the lifecycle without dragging in networking, files, or complex config.</p>
+        <div class="steps">
+          <div class="step">
+            <div class="step-number">1</div>
+            <div><h3>Create</h3><p>Run <code>widget -add counter</code>, paste the script, then Save/Run.</p></div>
+          </div>
+          <div class="step">
+            <div class="step-number">2</div>
+            <div><h3>Validate</h3><p>Run <code>widget -check counter</code> before treating it as a daily tool.</p></div>
+          </div>
+          <div class="step">
+            <div class="step-number">3</div>
+            <div><h3>Open</h3><p>Run <code>widget -show counter</code>. Button chips call <code>on_click(index)</code>.</p></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <h3>Counter widget</h3>
+        <pre>-- name = "Counter"
+-- type = "widget"
+-- retui = "1"
+
+local prefs = require "prefs"
+
+local function render()
+    if prefs.count == nil then prefs.count = 0 end
+    ui:set_title("Counter")
+    ui:show_kv({ count = prefs.count })
+    ui:show_buttons({"+1", "Reset"})
+end
+
+function on_resume()
+    render()
+end
+
+function on_click(index)
+    if index == 1 then prefs.count = prefs.count + 1 end
+    if index == 2 then prefs.count = 0 end
+    render()
+end</pre>
+      </div>
+    </section>
+
+    <section class="guide" id="config">
+      <div class="section-header">
+        <div>
+          <div class="kicker">Config surface</div>
+          <h2>Lua declares the form; Re:T-UI owns the UI.</h2>
+        </div>
+        <span>entry point: on_config</span>
+      </div>
+      <p>Use config for user-editable values such as task names, intervals, units, display preferences, note bodies, todo text, and widget modes. Runtime buttons still belong in the live preview surface.</p>
+      <div class="two-grid">
+        <div>
+          <h3>Declare fields</h3>
+          <pre>function on_config()
+    ui:show_config({
+        title = "Focus Settings",
+        fields = {
+            { id = "task", label = "Task", type = "text", value = prefs.task, required = true },
+            { id = "minutes", label = "Sprint length", type = "number", value = prefs.minutes, min = 1, max = 180 },
+            { id = "breaks", label = "Break reminders", type = "toggle", value = prefs.breaks },
+            { id = "mode", label = "Mode", type = "select", value = prefs.mode, options = {
+                { value = "focus", label = "Focus" },
+                { value = "study", label = "Study" },
+                { value = "writing", label = "Writing" },
+            } },
+            { id = "notes", label = "Notes", type = "textarea", value = prefs.notes or "", lines = 6 },
+        }
+    })
+end</pre>
+        </div>
+        <div>
+          <h3>Save intentionally</h3>
+          <pre>function on_config_submit(action, values)
+    if action == "save" then
+        prefs.task = values.task
+        prefs.minutes = values.minutes
+        prefs.breaks = values.breaks
+        prefs.mode = values.mode
+        prefs.notes = values.notes
+    end
+    render()
+end</pre>
+          <div class="note">
+            <p>Cancel and back should not mutate widget state. Save mutates only through <code>on_config_submit(action, values)</code>, then the widget renders again.</p>
+          </div>
+        </div>
+      </div>
+      <div class="grid">
+        <div class="tile"><h3>Text</h3><p>Single-line string input for labels, queries, names, and short values.</p></div>
+        <div class="tile"><h3>Number</h3><p>Integer or decimal input with optional <code>min</code> and <code>max</code>.</p></div>
+        <div class="tile"><h3>Toggle</h3><p>Boolean on/off state submitted as a Lua boolean.</p></div>
+        <div class="tile"><h3>Select</h3><p>One string value from a declared option list.</p></div>
+        <div class="tile"><h3>Textarea</h3><p>Multiline string input. Newlines are preserved.</p></div>
+        <div class="tile"><h3>Scroll</h3><p>The panel grows toward the top margin and scrolls fields when there are many of them.</p></div>
+      </div>
+    </section>
+
+    <section class="guide split" id="persistence">
+      <div>
+        <div class="kicker">Persistence</div>
+        <h2>Use prefs for settings, files for user content.</h2>
+        <p>Widgets live under Re:T-UI's local <code>widgets/&lt;id&gt;/</code> folder and are included in personal backup/restore. Keep small settings in <code>prefs</code>. Put larger notes, logs, JSON blobs, and user-generated text in widget-local <code>files</code>.</p>
+        <div class="command-list">
+          <div><strong>Prefs:</strong> good for flags, counters, selected mode, last city, sprint length, compact state.</div>
+          <div><strong>Files:</strong> good for note bodies, todo archives, logs, cached JSON, or text that may grow.</div>
+          <div><strong>Boundary:</strong> file names are local to the widget and cannot include path separators.</div>
+        </div>
+      </div>
+      <div>
+        <h3>Notes widget storage</h3>
+        <pre>local prefs = require "prefs"
+local files = require "files"
+
+function save_notes(text)
+    prefs.last_saved = os.time()
+    files:write("notes.txt", text)
+end
+
+function load_notes()
+    if files:exists("notes.txt") then
+        return files:read("notes.txt")
+    end
+    return ""
+end</pre>
+      </div>
+    </section>
+
+    <section class="guide" id="suggestions">
+      <div class="kicker">Suggestion scripts</div>
+      <h2>Not every Lua script needs to become a dock widget.</h2>
+      <p>Lua suggestion scripts use <code>-- type = "suggest"</code>. They are installed like widgets, but they do not render into the dock. They add command chips while the user types at the root prompt.</p>
+      <div class="two-grid">
+        <div>
+          <h3>Suggestion script</h3>
+          <pre>-- name = "Quick Config"
+-- type = "suggest"
+-- retui = "1"
+
+local strings = require "strings"
+local fmt = require "fmt"
+
+function on_suggest(query)
+    local q = strings.trim(fmt.lower(query))
+    if strings.starts_with(q, "cfg") then
+        suggest:command("Open settings", "settings")
+        suggest:command("Edit behavior", "config -file behavior.xml")
+        suggest:command("Theme colors", "settings appearance theme")
+    end
+end</pre>
+        </div>
+        <div>
+          <h3>Use this when</h3>
+          <div class="command-list">
+            <div><strong>Good fit:</strong> command shortcuts, context-aware chips, search helpers, aliases with logic.</div>
+            <div><strong>Poor fit:</strong> visible panels, timers, status cards, note editors, or anything needing config UI.</div>
+            <div><strong>Rule:</strong> if users need to inspect state, make a widget. If users need command hints, make a suggestion script.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="guide" id="api">
+      <div class="kicker">Lua API map</div>
+      <h2>Use the smallest API surface that solves the widget.</h2>
+      <div class="grid">
+        <div class="tile">
+          <h3>Lifecycle</h3>
+          <p><code>on_load</code>, <code>on_resume</code>, <code>on_click(index)</code>, <code>on_action(value)</code>, <code>on_dialog_action(index)</code>, <code>on_tick(n)</code>, <code>on_alarm</code>, <code>on_config</code>, <code>on_config_submit</code>.</p>
+        </div>
+        <div class="tile">
+          <h3>Render</h3>
+          <p><code>ui:set_title</code>, <code>ui:show_text</code>, <code>ui:show_lines</code>, <code>ui:show_kv</code>, <code>ui:show_table</code>, <code>ui:show_buttons</code>, <code>ui:show_action</code>, <code>ui:show_command</code>.</p>
+        </div>
+        <div class="tile">
+          <h3>Panels</h3>
+          <p><code>ui:set_expandable</code>, <code>ui:is_expanded</code>, <code>ui:expand</code>, <code>ui:collapse</code>, <code>ui:toggle</code>, <code>ui:show_progress_bar</code>, <code>ui:set_progress</code>.</p>
+        </div>
+        <div class="tile">
+          <h3>Storage</h3>
+          <p><code>prefs</code> for small persistent values. <code>files</code> for widget-local text files. <code>json</code> for encoding and decoding structured data.</p>
+        </div>
+        <div class="tile">
+          <h3>Helpers</h3>
+          <p><code>date</code>, <code>fmt</code>, <code>strings</code>, <code>colors</code>, <code>debug</code>, <code>system</code>, and <code>aio</code> cover common launcher-safe work.</p>
+        </div>
+        <div class="tile">
+          <h3>Network</h3>
+          <p><code>http:get</code>, <code>http:post</code>, <code>http:put</code>, and <code>http:delete</code> return through network callbacks and require declared permission.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="guide" id="safety">
+      <div class="section-header">
+        <div>
+          <div class="kicker">Safety and limits</div>
+          <h2>Lua is launcher-native, not a general shell escape.</h2>
+        </div>
+        <span>api version: retui 1</span>
+      </div>
+      <p>The runtime uses a Re:T-UI-owned Lua environment. Scripts can use safe Lua basics plus the widget APIs, not arbitrary Java, shell execution, package loading, or global filesystem access. Shell automation belongs in Termux modules.</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Permission</th>
+              <th>What it allows</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>network</code></td>
+              <td>HTTP requests through the Lua <code>http</code> helper.</td>
+              <td>Responses are size-limited to protect launcher memory.</td>
+            </tr>
+            <tr>
+              <td><code>clipboard</code></td>
+              <td>Read or write clipboard helpers exposed by Re:T-UI.</td>
+              <td>Use only when the widget clearly needs clipboard behavior.</td>
+            </tr>
+            <tr>
+              <td><code>vibrate</code></td>
+              <td>Trigger launcher vibration feedback.</td>
+              <td>Keep it sparse; widgets should not become noisy.</td>
+            </tr>
+            <tr>
+              <td><code>local-files</code></td>
+              <td>Use widget-local files through <code>files</code>.</td>
+              <td>No global filesystem access.</td>
+            </tr>
+            <tr>
+              <td><code>active-tick</code></td>
+              <td>Run <code>on_tick(n)</code> while the widget is the active open module.</td>
+              <td>Intervals are clamped; use this for visible live state only.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <pre>-- permissions = "network,clipboard,local-files,active-tick,vibrate"
+-- retui = "1"</pre>
+      <div class="note">
+        <p><strong>Reality check:</strong> widgets should stay small. If a script needs background daemons, Linux CLIs, Android shell access, or heavy parsing, build a Termux-backed module and let the widget surface remain light.</p>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
