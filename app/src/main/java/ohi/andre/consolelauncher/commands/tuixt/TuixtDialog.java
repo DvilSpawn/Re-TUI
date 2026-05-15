@@ -33,6 +33,10 @@ public final class TuixtDialog {
         void onConfirm();
     }
 
+    public interface ContentFactory {
+        View create(Dialog dialog);
+    }
+
     private TuixtDialog() {
     }
 
@@ -115,6 +119,15 @@ public final class TuixtDialog {
 
             LinearLayout buttons = buttons(context, dialog, positive, negative, action);
             dialog.setContentView(wrap(context, title, content, buttons));
+            show(dialog);
+        });
+    }
+
+    public static void showCustom(Context context, String title, ContentFactory factory) {
+        new Handler(Looper.getMainLooper()).post(() -> {
+            Dialog dialog = createDialog(context);
+            View content = factory.create(dialog);
+            dialog.setContentView(wrap(context, title, content, null));
             show(dialog);
         });
     }

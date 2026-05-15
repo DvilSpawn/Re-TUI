@@ -8,6 +8,7 @@ The website uses Cloudflare Pages Functions for preset uploads and browsing.
 - Public asset downloads only work for approved presets.
 - Uploads land in `pending` status through `/api/presets/submit`.
 - Staff moderation is available at `/moderate.html` after setting `RETUI_ADMIN_TOKEN` as a Pages secret.
+- Experimental ASCII rendering is client-side at `/ascii.html`.
 
 ## Initial Setup
 
@@ -28,3 +29,7 @@ wrangler pages secret put RETUI_ADMIN_TOKEN --project-name re-tui
 ```
 
 R2 is the production asset store. D1 remains the source of truth for moderation and public listing status.
+
+## Experimental ASCII Renderer
+
+The static UI lives at `/ascii.html`. Users can choose a wallpaper image, and the page renders it into ASCII locally with an offscreen canvas. The image is not uploaded to Cloudflare, there is no Workers AI dependency, and exports are generated in the browser as text, PNG, or SVG.

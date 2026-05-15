@@ -505,7 +505,11 @@ public class LauncherActivity extends AppCompatActivity implements Reloadable {
         XMLPrefsManager.dispose();
         LauncherSettings.invalidate();
         Tuils.cancelFont();
-        Intent intent = getIntent();
+        Intent intent = new Intent(this, LauncherActivity.class);
+        CharSequence message = getIntent().getCharSequenceExtra(Reloadable.MESSAGE);
+        if (message != null) {
+            intent.putExtra(Reloadable.MESSAGE, message);
+        }
         finish();
         startActivity(intent);
     }

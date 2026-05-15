@@ -21,6 +21,7 @@ import android.os.Parcelable;
 import android.os.Process;
 import android.util.Log;
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import org.w3c.dom.Document;
@@ -182,7 +183,7 @@ public class AppsManager implements XMLPrefsElement {
         intentFilter.addAction(Intent.ACTION_PACKAGE_REMOVED);
         intentFilter.addDataScheme("package");
 
-        c.registerReceiver(appsBroadcast, intentFilter);
+        ContextCompat.registerReceiver(c, appsBroadcast, intentFilter, ContextCompat.RECEIVER_NOT_EXPORTED);
     }
 
     public void fill() {

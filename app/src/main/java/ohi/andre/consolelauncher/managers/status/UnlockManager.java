@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.text.TextUtils;
+import androidx.core.content.ContextCompat;
 
 import java.util.Calendar;
 import java.util.regex.Matcher;
@@ -130,7 +131,7 @@ public class UnlockManager extends StatusManager {
                 }
             }
         };
-        context.getApplicationContext().registerReceiver(lockReceiver, theFilter);
+        ContextCompat.registerReceiver(context.getApplicationContext(), lockReceiver, theFilter, ContextCompat.RECEIVER_NOT_EXPORTED);
     }
 
     private void unregisterLockReceiver() {

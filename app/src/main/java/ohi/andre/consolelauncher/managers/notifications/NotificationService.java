@@ -379,7 +379,6 @@ public class NotificationService extends NotificationListenerService {
             intent.putExtra("package", packageName);
         }
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-        sendBroadcast(intent);
     }
 
     private final Runnable progressUpdateRunnable = new Runnable() {

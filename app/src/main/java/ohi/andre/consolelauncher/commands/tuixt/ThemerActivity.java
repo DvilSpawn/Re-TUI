@@ -4,10 +4,13 @@ import android.content.Intent;
 import android.content.ActivityNotFoundException;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.database.Cursor;
+import android.app.Dialog;
 import android.graphics.Color;
 import android.net.Uri;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.provider.OpenableColumns;
 import android.text.InputType;
 import android.util.Log;
 import android.view.Gravity;
@@ -24,11 +27,15 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 import ohi.andre.consolelauncher.LauncherActivity;
 import ohi.andre.consolelauncher.managers.BackupManager;
@@ -52,6 +59,7 @@ public class ThemerActivity extends AppCompatActivity {
     private static final int BACKUP_EXPORT_REQUEST = 201;
     private static final int BACKUP_RESTORE_REQUEST = 202;
     private static final int SHAREABLE_CONFIG_EXPORT_REQUEST = 203;
+    private static final int FONT_IMPORT_REQUEST = 204;
 
     private RecyclerView recyclerView;
     private TextView header;
@@ -141,27 +149,7 @@ public class ThemerActivity extends AppCompatActivity {
                     } else if (fileName.startsWith("Preferred Music App")) {
                         showPreferredMusicAppPicker();
                     } else if (fileName.equals("Fonts")) {
-                        File tui = Tuils.getFolder();
-                        File fontsDir = new File(tui, "fonts");
-                        if (!fontsDir.exists()) {
-                            fontsDir.mkdirs();
-                        }
-
-                        File[] fonts = fontsDir.listFiles((dir, name) -> name.toLowerCase().endsWith(".ttf") || name.toLowerCase().endsWith(".otf"));
-                        
-                        List<String> options = new ArrayList<>();
-                        options.add("Default (System Font)");
-                        if (fonts != null) {
-                            for (File f : fonts) options.add(f.getName());
-                        }
-
-                        TuixtDialog.showOptions(ThemerActivity.this, "Select Font", options, which -> {
-                            if (which == 0) {
-                                applySystemFont();
-                            } else {
-                                applyFont(fonts[which - 1]);
-                            }
-                        });
+                        showFontsDialog();
                     } else if (fileName.equals("Presets")) {
                         showPresetsDialog();
                     } else if (fileName.equals("View Crash Log")) {
@@ -188,71 +176,6 @@ public class ThemerActivity extends AppCompatActivity {
             @Override
             public int getItemCount() {
                 return sectionItems.size();
-            }
-
-            private void applySystemFont() {
-                // Set system_font to true in ui.xml
-                LauncherSettings.set(ThemerActivity.this, Ui.system_font, "true");
-                LauncherSettings.set(ThemerActivity.this, Ui.font_file, "");
-
-                // Sweep any current font files in root to 'old'
-                sweepCurrentFonts();
-
-                finalizeFontChange("System font applied!");
-            }
-
-            private void applyFont(File source) {
-                // Set system_font to false in ui.xml
-                LauncherSettings.set(ThemerActivity.this, Ui.system_font, "false");
-                LauncherSettings.set(ThemerActivity.this, Ui.font_file, source.getName());
-
-                sweepCurrentFonts();
-
-                // Copy selected font to root TUI folder
-                File tuiFolder = Tuils.getFolder();
-                File dest = new File(tuiFolder, source.getName());
-                try {
-                    Log.e("TUI-THEMER", "Copying font from " + source.getAbsolutePath() + " to " + dest.getAbsolutePath());
-                    Tuils.copy(source, dest);
-                    
-                    if (dest.exists() && dest.length() > 0) {
-                        Log.e("TUI-THEMER", "Copy successful! Size: " + dest.length());
-                    } else {
-                        Log.e("TUI-THEMER", "Copy failed or file is empty!");
-                    }
-                    
-                    finalizeFontChange("Font applied!");
-                } catch (Exception e) {
-                    Toast.makeText(ThemerActivity.this, "Error applying font: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                }
-            }
-
-            private void sweepCurrentFonts() {
-                File tuiFolder = Tuils.getFolder();
-                File[] currentFiles = tuiFolder.listFiles();
-                if (currentFiles != null) {
-                    for (File f : currentFiles) {
-                        String name = f.getName().toLowerCase();
-                        if (name.endsWith(".ttf") || name.endsWith(".otf")) {
-                            Tuils.insertOld(f);
-                        }
-                    }
-                }
-            }
-
-            private void finalizeFontChange(String message) {
-                // Clear font cache before reload
-                Tuils.cancelFont();
-                
-                Toast.makeText(ThemerActivity.this, message + " Reloading...", Toast.LENGTH_SHORT).show();
-                
-                // Trigger reload with a slight delay for FS stability
-                recyclerView.postDelayed(() -> {
-                    if (LauncherActivity.instance != null) {
-                        LauncherActivity.instance.reload();
-                    }
-                    finish();
-                }, 500);
             }
         };
 
@@ -392,6 +315,213 @@ public class ThemerActivity extends AppCompatActivity {
         Intent intent = new Intent(ThemerActivity.this, TuixtActivity.class);
         intent.putExtra(TuixtActivity.PATH, new File(Tuils.getFolder(), fileName).getAbsolutePath());
         startActivityForResult(intent, LauncherActivity.TUIXT_REQUEST);
+    }
+
+    private void showFontsDialog() {
+        File fontsDir = getFontsDir();
+        File[] fonts = listFontFiles(fontsDir);
+
+        TuixtDialog.showCustom(this, "Select Font", dialog -> {
+            LinearLayout content = new LinearLayout(this);
+            content.setOrientation(LinearLayout.VERTICAL);
+
+            addFontActionRow(content, dialog, "Default (System Font)", this::applySystemFont);
+            addFontActionRow(content, dialog, "Import Font...", this::launchFontImportPicker);
+            for (File font : fonts) {
+                addFontFileRow(content, dialog, font);
+            }
+
+            return content;
+        });
+    }
+
+    private void addFontActionRow(LinearLayout content, Dialog dialog, String label, Runnable action) {
+        TextView row = new TextView(this);
+        row.setText(label.toUpperCase(Locale.US));
+        TuixtTheme.styleListItem(this, row, false);
+        row.setOnClickListener(v -> {
+            dialog.dismiss();
+            action.run();
+        });
+
+        LinearLayout.LayoutParams rowParams = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+        rowParams.bottomMargin = TuixtTheme.dp(this, 8);
+        content.addView(row, rowParams);
+    }
+
+    private void addFontFileRow(LinearLayout content, Dialog dialog, File font) {
+        LinearLayout row = new LinearLayout(this);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+
+        TextView label = new TextView(this);
+        label.setText(font.getName().toUpperCase(Locale.US));
+        TuixtTheme.styleListItem(this, label, false);
+        label.setOnClickListener(v -> {
+            dialog.dismiss();
+            applyFont(font);
+        });
+
+        TextView delete = new TextView(this);
+        delete.setText("X");
+        TuixtTheme.styleButton(this, delete, false);
+        delete.setMinWidth(TuixtTheme.dp(this, 52));
+        delete.setMinHeight(TuixtTheme.dp(this, 48));
+        delete.setOnClickListener(v -> confirmDeleteFont(dialog, font));
+
+        row.addView(label, new LinearLayout.LayoutParams(
+                0,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                1));
+
+        View spacer = new View(this);
+        row.addView(spacer, new LinearLayout.LayoutParams(TuixtTheme.dp(this, 8), 1));
+
+        row.addView(delete, new LinearLayout.LayoutParams(
+                TuixtTheme.dp(this, 58),
+                TuixtTheme.dp(this, 48)));
+
+        LinearLayout.LayoutParams rowParams = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+        rowParams.bottomMargin = TuixtTheme.dp(this, 8);
+        content.addView(row, rowParams);
+    }
+
+    private void confirmDeleteFont(Dialog fontsDialog, File font) {
+        TuixtDialog.showConfirm(
+                this,
+                "Delete Font",
+                "Delete " + font.getName() + "?",
+                "Delete",
+                "Cancel",
+                () -> {
+                    fontsDialog.dismiss();
+                    deleteFont(font);
+                });
+    }
+
+    private void deleteFont(File font) {
+        String deletedName = font.getName();
+        boolean deleted = !font.exists() || font.delete();
+
+        File rootCopy = new File(Tuils.getFolder(), deletedName);
+        if (rootCopy.exists() && rootCopy.isFile()) {
+            Tuils.insertOld(rootCopy);
+        }
+
+        if (!deleted) {
+            Toast.makeText(this, "Could not delete font.", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        String selected = LauncherSettings.get(Ui.font_file);
+        if (selected != null && selected.equals(deletedName)) {
+            LauncherSettings.set(this, Ui.system_font, "true");
+            LauncherSettings.set(this, Ui.font_file, "");
+            finalizeFontChange("Font deleted. System font applied!");
+            return;
+        }
+
+        Toast.makeText(this, "Font deleted.", Toast.LENGTH_SHORT).show();
+        showFontsDialog();
+    }
+
+    private File getFontsDir() {
+        File fontsDir = new File(Tuils.getFolder(), "fonts");
+        if (!fontsDir.exists() && !fontsDir.mkdirs()) {
+            Log.e("TUI-THEMER", "Unable to create fonts folder: " + fontsDir.getAbsolutePath());
+        }
+        return fontsDir;
+    }
+
+    private File[] listFontFiles(File fontsDir) {
+        File[] fonts = fontsDir.listFiles((dir, name) -> isFontFileName(name));
+        if (fonts == null) {
+            return new File[0];
+        }
+        Arrays.sort(fonts, (left, right) -> left.getName().compareToIgnoreCase(right.getName()));
+        return fonts;
+    }
+
+    private void launchFontImportPicker() {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("*/*");
+        intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[] {
+                "font/ttf",
+                "font/otf",
+                "application/x-font-ttf",
+                "application/x-font-otf",
+                "application/vnd.ms-opentype",
+                "application/font-sfnt",
+                "application/octet-stream"
+        });
+        try {
+            startActivityForResult(intent, FONT_IMPORT_REQUEST);
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(this, "Font picker is unavailable on this device.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void applySystemFont() {
+        LauncherSettings.set(this, Ui.system_font, "true");
+        LauncherSettings.set(this, Ui.font_file, "");
+
+        sweepCurrentFonts();
+        finalizeFontChange("System font applied!");
+    }
+
+    private void applyFont(File source) {
+        LauncherSettings.set(this, Ui.system_font, "false");
+        LauncherSettings.set(this, Ui.font_file, source.getName());
+
+        sweepCurrentFonts();
+
+        File tuiFolder = Tuils.getFolder();
+        File dest = new File(tuiFolder, source.getName());
+        try {
+            Log.e("TUI-THEMER", "Copying font from " + source.getAbsolutePath() + " to " + dest.getAbsolutePath());
+            Tuils.copy(source, dest);
+
+            if (dest.exists() && dest.length() > 0) {
+                Log.e("TUI-THEMER", "Copy successful! Size: " + dest.length());
+            } else {
+                Log.e("TUI-THEMER", "Copy failed or file is empty!");
+            }
+
+            finalizeFontChange("Font applied!");
+        } catch (Exception e) {
+            Toast.makeText(this, "Error applying font: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void sweepCurrentFonts() {
+        File tuiFolder = Tuils.getFolder();
+        File[] currentFiles = tuiFolder.listFiles();
+        if (currentFiles != null) {
+            for (File f : currentFiles) {
+                String name = f.getName().toLowerCase(Locale.US);
+                if (name.endsWith(".ttf") || name.endsWith(".otf")) {
+                    Tuils.insertOld(f);
+                }
+            }
+        }
+    }
+
+    private void finalizeFontChange(String message) {
+        Tuils.cancelFont();
+
+        Toast.makeText(this, message + " Reloading...", Toast.LENGTH_SHORT).show();
+
+        recyclerView.postDelayed(() -> {
+            if (LauncherActivity.instance != null) {
+                LauncherActivity.instance.reload();
+            }
+            finish();
+        }, 500);
     }
 
     private void launchWallpaperPicker() {
@@ -549,6 +679,120 @@ public class ThemerActivity extends AppCompatActivity {
             handleShareableConfigurationResult(resultCode, data);
         } else if (requestCode == BACKUP_RESTORE_REQUEST) {
             handleRestoreResult(resultCode, data);
+        } else if (requestCode == FONT_IMPORT_REQUEST) {
+            handleFontImportResult(resultCode, data);
+        }
+    }
+
+    private void handleFontImportResult(int resultCode, Intent data) {
+        if (resultCode != RESULT_OK || data == null || data.getData() == null) {
+            Toast.makeText(this, "Font import cancelled.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Uri uri = data.getData();
+        String sourceName = getDisplayName(uri);
+        if (sourceName == null || sourceName.trim().length() == 0) {
+            sourceName = uri.getLastPathSegment();
+        }
+
+        String fileName = sanitizeFontFileName(sourceName);
+        if (!isFontFileName(fileName)) {
+            Toast.makeText(this, "Choose a .ttf or .otf font file.", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        File dest = uniqueFontFile(getFontsDir(), fileName);
+        try (InputStream in = getContentResolver().openInputStream(uri);
+             OutputStream out = new FileOutputStream(dest)) {
+            if (in == null) {
+                throw new IllegalStateException("Unable to read selected font.");
+            }
+
+            byte[] buffer = new byte[8192];
+            int read;
+            while ((read = in.read(buffer)) != -1) {
+                out.write(buffer, 0, read);
+            }
+        } catch (Exception e) {
+            if (dest.exists()) {
+                dest.delete();
+            }
+            Toast.makeText(this, "Font import failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        if (!dest.exists() || dest.length() == 0) {
+            dest.delete();
+            Toast.makeText(this, "Font import failed: empty file.", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        Toast.makeText(this, "Font imported.", Toast.LENGTH_SHORT).show();
+        applyFont(dest);
+    }
+
+    private String getDisplayName(Uri uri) {
+        Cursor cursor = null;
+        try {
+            cursor = getContentResolver().query(uri, new String[] { OpenableColumns.DISPLAY_NAME }, null, null, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                int index = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                if (index >= 0) {
+                    return cursor.getString(index);
+                }
+            }
+        } catch (Exception ignored) {
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return null;
+    }
+
+    private String sanitizeFontFileName(String name) {
+        if (name == null) {
+            return "font.ttf";
+        }
+
+        name = name.replace('\\', '/');
+        int slash = name.lastIndexOf('/');
+        if (slash >= 0 && slash < name.length() - 1) {
+            name = name.substring(slash + 1);
+        }
+
+        name = name.trim().replaceAll("[^A-Za-z0-9._ -]", "_").replaceAll("\\s+", "_");
+        if (name.length() == 0) {
+            return "font.ttf";
+        }
+        return name;
+    }
+
+    private boolean isFontFileName(String name) {
+        if (name == null) {
+            return false;
+        }
+        String lower = name.toLowerCase(Locale.US);
+        return lower.endsWith(".ttf") || lower.endsWith(".otf");
+    }
+
+    private File uniqueFontFile(File fontsDir, String fileName) {
+        File file = new File(fontsDir, fileName);
+        if (!file.exists()) {
+            return file;
+        }
+
+        int dot = fileName.lastIndexOf('.');
+        String base = dot > 0 ? fileName.substring(0, dot) : fileName;
+        String extension = dot > 0 ? fileName.substring(dot) : "";
+        int counter = 2;
+        while (true) {
+            File candidate = new File(fontsDir, base + "-" + counter + extension);
+            if (!candidate.exists()) {
+                return candidate;
+            }
+            counter++;
         }
     }
 

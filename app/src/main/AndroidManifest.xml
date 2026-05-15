@@ -90,6 +90,8 @@
 
     <application
         android:allowBackup="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/full_backup_content"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/Custom.Solid"
@@ -224,7 +226,9 @@
 
         <receiver
             android:name=".managers.callback.RetuiCallbackReceiver"
-            android:exported="true">
+            android:exported="true"
+            tools:ignore="ExportedReceiver">
+            <!-- Exported for Termux/script callbacks; receiver code requires the local callback token before doing work. -->
             <intent-filter>
                 <action android:name="com.dvil.tui_renewed.RETUI_CALLBACK" />
             </intent-filter>

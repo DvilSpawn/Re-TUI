@@ -110,7 +110,7 @@ public class MusicManager2 implements MediaController.MediaPlayerControl {
             action = Intent.ACTION_HEADSET_PLUG;
         }
 
-        ContextCompat.registerReceiver(mContext.getApplicationContext(), headsetBroadcast, new IntentFilter(action), ContextCompat.RECEIVER_EXPORTED);
+        ContextCompat.registerReceiver(mContext.getApplicationContext(), headsetBroadcast, new IntentFilter(action), ContextCompat.RECEIVER_NOT_EXPORTED);
         headsetReceiverRegistered = true;
     }
 

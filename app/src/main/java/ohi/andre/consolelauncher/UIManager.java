@@ -2820,7 +2820,6 @@ public class UIManager implements OnTouchListener {
         OutlineTextView.redrawTimes = drawTimes;
 
         LocalBroadcastManager.getInstance(context.getApplicationContext()).registerReceiver(receiver, filter);
-        ContextCompat.registerReceiver(context.getApplicationContext(), receiver, filter, ContextCompat.RECEIVER_EXPORTED);
         if (NotificationSettings.showTerminal()) {
             final LocalBroadcastManager lbm = LocalBroadcastManager.getInstance(context.getApplicationContext());
             lbm.sendBroadcast(new Intent(ACTION_REQUEST_NOTIFICATION_FEED));

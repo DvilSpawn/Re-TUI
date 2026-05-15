@@ -90,7 +90,7 @@ This project has been audited and hardened following the **OWASP Mobile Applicat
 
 ### 📦 MASVS-STORAGE: Data Storage and Privacy
 *   **Storage Work In Progress:** Re:T-UI is being modernized for safer storage handling across recent Android versions, with active work around launcher config compatibility and recovery.
-*   **Backup Protection:** `android:allowBackup` is set to `false` to prevent sensitive data extraction via ADB backups (MASVS-STORAGE-1).
+*   **Backup Protection:** `android:allowBackup` is set to `false`, with backup/data-extraction rules excluding app data from cloud backup and device transfer (MASVS-STORAGE-1).
 *   **Secure File Sharing:** Uses `FileProvider` for secure, permission-based file sharing instead of vulnerable `file://` URIs.
 
 ### 🌐 MASVS-NETWORK: Network Communication
@@ -98,9 +98,9 @@ This project has been audited and hardened following the **OWASP Mobile Applicat
 *   **Hardened Service Endpoints:** Internal services (Weather API, Connectivity checks) have been upgraded to secure HTTPS endpoints (MASVS-NETWORK-1).
 
 ### ⚙️ MASVS-PLATFORM: Platform Interaction
-*   **Signature-Level Protection:** Implemented a custom permission `ohi.andre.consolelauncher.permission.RECEIVE_CMD` with `protectionLevel="signature"`. This ensures only apps signed with the same developer key can programmatically send commands to the launcher.
-*   **Intent Security:** All system-bound `PendingIntents` use the `FLAG_IMMUTABLE` flag to prevent intent redirection attacks (Android 12+ requirement).
-*   **Receiver Security:** All Broadcast Receivers are registered with appropriate export flags (`RECEIVER_EXPORTED` or `RECEIVER_NOT_EXPORTED`) to prevent unauthorized external triggers.
+*   **Signature-Level Protection:** Implemented a custom permission `${applicationId}.permission.RECEIVE_CMD` (for the current package, `com.dvil.tui_renewed.permission.RECEIVE_CMD`) with `protectionLevel="signature"`. This ensures only apps signed with the same developer key can programmatically send commands to the launcher.
+*   **Intent Security:** App-created `PendingIntents` are immutable by default to prevent intent redirection attacks; mutable flags are reserved for Android APIs that require caller-filled results, such as notification `RemoteInput` and Termux command callbacks.
+*   **Receiver Security:** Broadcast Receivers use explicit export settings. Internal app events use in-process broadcasts; platform dynamic receivers are registered as `RECEIVER_NOT_EXPORTED`; externally callable command/callback surfaces are signature-permission protected or token-gated.
 
 ### 🛠 MASVS-CODE: Code Quality & Build Settings
 *   **Minification & Obfuscation:** Release builds have R8/Proguard enabled (`minifyEnabled true`) to shrink resources and obfuscate code, making reverse engineering more difficult (MASVS-RESILIENCE-1).
