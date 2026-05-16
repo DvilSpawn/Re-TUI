@@ -77,8 +77,9 @@ public class TuixtWindow extends FrameLayout {
 
         GradientDrawable border = new GradientDrawable();
         border.setColor(bgColor);
+        border.setCornerRadius(UIUtils.dpToPx(context, AppearanceSettings.outputCornerRadius()));
         if (AppearanceSettings.dashedBorders()) {
-            border.setStroke((int) UIUtils.dpToPx(context, 2), borderColor,
+            border.setStroke((int) UIUtils.dpToPx(context, AppearanceSettings.dashedBorderStrokeWidthDp(1.33f)), borderColor,
                     UIUtils.dpToPx(context, AppearanceSettings.dashLength()),
                     UIUtils.dpToPx(context, AppearanceSettings.dashGap()));
         }

@@ -26,6 +26,8 @@ import ohi.andre.consolelauncher.managers.settings.LauncherSettings;
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager;
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave;
 import ohi.andre.consolelauncher.managers.xml.options.Behavior;
+import ohi.andre.consolelauncher.tuils.LauncherSystemUi;
+
 public class TuixtActivity extends Activity {
 
     public static final String PATH = "path";
@@ -43,7 +45,9 @@ public class TuixtActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        LauncherSystemUi.requestNoTitleIfFullscreen(this);
         super.onCreate(savedInstanceState);
+        LauncherSystemUi.applyFullscreen(this);
 
         Intent intent = getIntent();
         String path = intent.getStringExtra(PATH);
@@ -182,6 +186,20 @@ public class TuixtActivity extends Activity {
         }
 
         setContentView(screen);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        LauncherSystemUi.applyFullscreen(this);
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) {
+            LauncherSystemUi.applyFullscreen(this);
+        }
     }
 
     private void filter(String query) {

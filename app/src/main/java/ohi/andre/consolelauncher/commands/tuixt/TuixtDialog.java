@@ -19,6 +19,8 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import ohi.andre.consolelauncher.tuils.LauncherSystemUi;
+
 public final class TuixtDialog {
 
     public interface ItemAction {
@@ -236,6 +238,7 @@ public final class TuixtDialog {
 
     private static void show(Dialog dialog) {
         dialog.show();
+        LauncherSystemUi.applyFullscreen(dialog);
         Window window = dialog.getWindow();
         if (window != null) {
             window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));

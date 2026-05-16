@@ -26,6 +26,7 @@ import ohi.andre.consolelauncher.managers.modules.ModuleManager;
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings;
 import ohi.andre.consolelauncher.managers.widgets.LuaWidgetManager;
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager;
+import ohi.andre.consolelauncher.tuils.LauncherSystemUi;
 import ohi.andre.consolelauncher.tuils.Tuils;
 
 public class WidgetEditorActivity extends Activity {
@@ -45,7 +46,9 @@ public class WidgetEditorActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        LauncherSystemUi.requestNoTitleIfFullscreen(this);
         super.onCreate(savedInstanceState);
+        LauncherSystemUi.applyFullscreen(this);
 
         Intent intent = getIntent();
         String filePath = intent.getStringExtra(EXTRA_FILE_PATH);
@@ -198,6 +201,20 @@ public class WidgetEditorActivity extends Activity {
 
         root.addView(bottomBar);
         setContentView(screen);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        LauncherSystemUi.applyFullscreen(this);
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) {
+            LauncherSystemUi.applyFullscreen(this);
+        }
     }
 
     @Override

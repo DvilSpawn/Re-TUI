@@ -45,6 +45,7 @@ import ohi.andre.consolelauncher.managers.settings.LauncherSettings;
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager;
 import ohi.andre.consolelauncher.managers.xml.options.Behavior;
 import ohi.andre.consolelauncher.managers.xml.options.Ui;
+import ohi.andre.consolelauncher.tuils.LauncherSystemUi;
 import ohi.andre.consolelauncher.tuils.Tuils;
 
 public class ThemerActivity extends AppCompatActivity {
@@ -72,7 +73,9 @@ public class ThemerActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        LauncherSystemUi.requestNoTitleIfFullscreen(this);
         super.onCreate(savedInstanceState);
+        LauncherSystemUi.applyFullscreen(this);
 
         section = getIntent() != null ? getIntent().getStringExtra(EXTRA_SECTION) : null;
         if (section == null || section.length() == 0) {
@@ -183,6 +186,20 @@ public class ThemerActivity extends AppCompatActivity {
 
         root.addView(recyclerView);
         setContentView(screen);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        LauncherSystemUi.applyFullscreen(this);
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) {
+            LauncherSystemUi.applyFullscreen(this);
+        }
     }
 
     private void showPresetsDialog() {

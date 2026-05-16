@@ -4,6 +4,7 @@ import android.graphics.Color;
 
 import androidx.core.graphics.ColorUtils;
 
+import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager;
 import ohi.andre.consolelauncher.managers.xml.options.Theme;
 import ohi.andre.consolelauncher.managers.xml.options.Ui;
 import ohi.andre.consolelauncher.managers.xml.options.Behavior;
@@ -90,12 +91,33 @@ public final class AppearanceSettings {
         return LauncherSettings.getInt(Ui.dashed_border_gap_length);
     }
 
+    public static float dashedBorderStrokeWidthDp() {
+        return dashedBorderStrokeWidthDp(1f);
+    }
+
+    public static float dashedBorderStrokeWidthDp(float scale) {
+        float width;
+        try {
+            width = Float.parseFloat(LauncherSettings.get(Ui.dashed_border_stroke_width));
+        } catch (Exception e) {
+            width = 1.5f;
+        }
+        if (Float.isNaN(width) || Float.isInfinite(width)) {
+            width = 1.5f;
+        }
+        return clampStrokeWidth(width * scale);
+    }
+
+    public static int dashedBorderCornerRadius() {
+        return clampRadius(LauncherSettings.getInt(Ui.dashed_border_corner_radius));
+    }
+
     public static int moduleCornerRadius() {
-        return clampRadius(LauncherSettings.getInt(Ui.module_corner_radius));
+        return cornerRadiusWithFallback(Ui.module_corner_radius);
     }
 
     public static int outputCornerRadius() {
-        return clampRadius(LauncherSettings.getInt(Ui.output_corner_radius));
+        return cornerRadiusWithFallback(Ui.output_corner_radius);
     }
 
     public static int outputTrayMaxHeightDp() {
@@ -105,7 +127,7 @@ public final class AppearanceSettings {
     }
 
     public static int headerCornerRadius() {
-        return clampRadius(LauncherSettings.getInt(Ui.header_corner_radius));
+        return cornerRadiusWithFallback(Ui.header_corner_radius);
     }
 
     public static int moduleHeaderTextSize() {
@@ -129,6 +151,18 @@ public final class AppearanceSettings {
     private static int clampRadius(int radius) {
         if (radius < 0) return 0;
         return Math.min(radius, 48);
+    }
+
+    private static int cornerRadiusWithFallback(Ui setting) {
+        if (XMLPrefsManager.wasChanged(setting, false)) {
+            return clampRadius(LauncherSettings.getInt(setting));
+        }
+        return dashedBorderCornerRadius();
+    }
+
+    private static float clampStrokeWidth(float width) {
+        if (width < 0.5f) return 0.5f;
+        return Math.min(width, 8f);
     }
 
     private static int clampTextSize(int size) {

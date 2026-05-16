@@ -119,6 +119,11 @@ public class debug extends ParamCommand {
         output.append("system_wallpaper: ").append(LauncherSettings.getBoolean(Ui.system_wallpaper)).append(Tuils.NEWLINE);
         output.append("system_font: ").append(AppearanceSettings.useSystemFont()).append(Tuils.NEWLINE);
         output.append("font_file: ").append(AppearanceSettings.fontFile()).append(Tuils.NEWLINE);
+        appendValue(output, Ui.enable_dashed_border);
+        appendValue(output, Ui.dashed_border_dash_length);
+        appendValue(output, Ui.dashed_border_gap_length);
+        appendValue(output, Ui.dashed_border_stroke_width);
+        appendValue(output, Ui.dashed_border_corner_radius);
         output.append("notification_terminal: ").append(NotificationSettings.showTerminal()).append(Tuils.NEWLINE);
         output.append("notification_output: ").append(NotificationSettings.printToOutput()).append(Tuils.NEWLINE);
         output.append("music_enabled: ").append(MusicSettings.enabled()).append(Tuils.NEWLINE);

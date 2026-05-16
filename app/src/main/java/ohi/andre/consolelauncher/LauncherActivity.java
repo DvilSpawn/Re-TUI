@@ -21,8 +21,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.view.WindowInsets;
-import android.view.WindowInsetsController;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -60,6 +58,7 @@ import ohi.andre.consolelauncher.managers.xml.options.Behavior;
 import ohi.andre.consolelauncher.managers.xml.options.Notifications;
 import ohi.andre.consolelauncher.managers.xml.options.Theme;
 import ohi.andre.consolelauncher.managers.xml.options.Ui;
+import ohi.andre.consolelauncher.tuils.LauncherSystemUi;
 import ohi.andre.consolelauncher.tuils.LongClickableSpan;
 import ohi.andre.consolelauncher.tuils.PrivateIOReceiver;
 import ohi.andre.consolelauncher.tuils.PublicIOReceiver;
@@ -190,9 +189,7 @@ public class LauncherActivity extends AppCompatActivity implements Reloadable {
             setTheme(R.style.Custom_Solid);
         }
 
-        if (XMLPrefsManager.getBoolean(Ui.fullscreen)) {
-            requestWindowFeature(Window.FEATURE_NO_TITLE);
-        }
+        LauncherSystemUi.requestNoTitleIfFullscreen(this);
 
         super.onCreate(savedInstanceState);
 
@@ -283,22 +280,7 @@ public class LauncherActivity extends AppCompatActivity implements Reloadable {
             } catch (Exception e) {}
         }
 
-        boolean fullscreen = XMLPrefsManager.getBoolean(Ui.fullscreen);
-        if (fullscreen) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                getWindow().setDecorFitsSystemWindows(false);
-                View decorView = getWindow().getDecorView();
-                decorView.post(() -> {
-                    WindowInsetsController controller = getWindow().getInsetsController();
-                    if (controller != null) {
-                        controller.hide(WindowInsets.Type.statusBars());
-                        controller.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
-                    }
-                });
-            } else {
-                getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-            }
-        }
+        LauncherSystemUi.applyFullscreen(this);
 
         try {
             NotificationManager.create(this);
@@ -406,12 +388,13 @@ public class LauncherActivity extends AppCompatActivity implements Reloadable {
         final int originalBottom = mainView.getPaddingBottom();
 
         ViewCompat.setOnApplyWindowInsetsListener(mainView, (view, insets) -> {
+            boolean imeVisible = insets.isVisible(WindowInsetsCompat.Type.ime());
             int imeBottom = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom;
             int systemBottom = insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom;
             int keyboardOffset = Math.max(0, imeBottom - systemBottom);
 
             if (ui != null) {
-                ui.applyImeBottomOffset(keyboardOffset);
+                ui.applyImeBottomOffset(keyboardOffset, imeVisible);
             } else {
                 view.setPadding(
                         originalLeft,
@@ -428,6 +411,7 @@ public class LauncherActivity extends AppCompatActivity implements Reloadable {
     @Override
     protected void onResume() {
         super.onResume();
+        LauncherSystemUi.applyFullscreen(this);
         if (ui != null) {
             ui.resume();
             ui.activateTerminalInput(openKeyboardOnStart);
@@ -537,6 +521,9 @@ public class LauncherActivity extends AppCompatActivity implements Reloadable {
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) {
+            LauncherSystemUi.applyFullscreen(this);
+        }
         if (hasFocus && ui != null) {
             ui.activateTerminalInput(openKeyboardOnStart);
             ui.scheduleTypefaceRefreshes();

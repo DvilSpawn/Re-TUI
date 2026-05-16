@@ -100,7 +100,7 @@ final class TuixtTheme {
     }
 
     static GradientDrawable rect(Context context, int fill, int stroke, float strokeDp) {
-        return rect(context, fill, stroke, strokeDp, 1);
+        return rect(context, fill, stroke, strokeDp, AppearanceSettings.dashedBorderCornerRadius());
     }
 
     static GradientDrawable rect(Context context, int fill, int stroke, float strokeDp, int radiusDp) {
@@ -109,7 +109,7 @@ final class TuixtTheme {
         drawable.setCornerRadius(dp(context, radiusDp));
         if (AppearanceSettings.dashedBorders()) {
             drawable.setStroke(
-                    Math.max(1, dp(context, strokeDp)),
+                    Math.max(1, dp(context, AppearanceSettings.dashedBorderStrokeWidthDp(strokeDp / 1.5f))),
                     stroke,
                     Tuils.dpToPx(context, AppearanceSettings.dashLength()),
                     Tuils.dpToPx(context, AppearanceSettings.dashGap()));

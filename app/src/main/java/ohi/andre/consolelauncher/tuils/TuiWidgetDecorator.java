@@ -58,7 +58,7 @@ public class TuiWidgetDecorator {
                     gd = (GradientDrawable) gd.mutate();
                     gd.setCornerRadius(Tuils.dpToPx(context, AppearanceSettings.headerCornerRadius()));
                     if (useDashed) {
-                        gd.setStroke((int) Tuils.dpToPx(context, 1.5f), AppearanceSettings.terminalBorderColor(),
+                        gd.setStroke(dashedStrokePx(context, 1f), AppearanceSettings.terminalBorderColor(),
                                 Tuils.dpToPx(context, AppearanceSettings.dashLength()),
                                 Tuils.dpToPx(context, AppearanceSettings.dashGap()));
                     } else {
@@ -85,7 +85,7 @@ public class TuiWidgetDecorator {
         bg.setCornerRadius(Tuils.dpToPx(context, AppearanceSettings.moduleCornerRadius()));
         bg.setColor(rowBackground);
         if (AppearanceSettings.dashedBorders()) {
-            bg.setStroke((int) Tuils.dpToPx(context, 1.2f), strokeColor,
+            bg.setStroke(dashedStrokePx(context, 0.8f), strokeColor,
                     Tuils.dpToPx(context, AppearanceSettings.dashLength()),
                     Tuils.dpToPx(context, AppearanceSettings.dashGap()));
         }
@@ -99,10 +99,14 @@ public class TuiWidgetDecorator {
         gd.setCornerRadius(Tuils.dpToPx(context, radiusDp));
         gd.setColor(fillColor);
         if (dashed) {
-            gd.setStroke((int) Tuils.dpToPx(context, strokeDp), borderColor,
+            gd.setStroke(dashedStrokePx(context, strokeDp / 1.5f), borderColor,
                     Tuils.dpToPx(context, AppearanceSettings.dashLength()),
                     Tuils.dpToPx(context, AppearanceSettings.dashGap()));
         }
         return gd;
+    }
+
+    private static int dashedStrokePx(Context context, float scale) {
+        return Math.max(1, (int) Tuils.dpToPx(context, AppearanceSettings.dashedBorderStrokeWidthDp(scale)));
     }
 }

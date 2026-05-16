@@ -922,7 +922,7 @@ public enum Ui implements XMLPrefsSave {
 
         @Override
         public String info() {
-            return "Legacy rect sizing for dashed borders: [stroke width],[corner radius]";
+            return "Deprecated: use dashed_border_stroke_width and dashed_border_corner_radius";
         }
     },
     shadow_params {
@@ -1115,6 +1115,38 @@ public enum Ui implements XMLPrefsSave {
         @Override
         public String info() {
             return "Length of the gap in the dashed border (dp)";
+        }
+    },
+    dashed_border_stroke_width {
+        @Override
+        public String defaultValue() {
+            return "1.5";
+        }
+
+        @Override
+        public String type() {
+            return XMLPrefsSave.TEXT;
+        }
+
+        @Override
+        public String info() {
+            return "Stroke width for dashed borders (dp). Decimal values are allowed";
+        }
+    },
+    dashed_border_corner_radius {
+        @Override
+        public String defaultValue() {
+            return "0";
+        }
+
+        @Override
+        public String type() {
+            return XMLPrefsSave.INTEGER;
+        }
+
+        @Override
+        public String info() {
+            return "Default rounded corner radius for dashed borders (dp). Specific module, output, and header corner radius settings override this when changed";
         }
     },
     module_corner_radius {
