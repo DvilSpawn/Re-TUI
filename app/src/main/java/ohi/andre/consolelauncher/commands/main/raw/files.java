@@ -63,7 +63,10 @@ public class files implements CommandAbstraction {
         intent.putExtra("output_border_color", terminalBorderColor);
         intent.putExtra("top_margin", 18);
         intent.putExtra("input_font_size", XMLPrefsManager.getInt(Ui.input_output_size));
-        intent.putExtra("display_margin_mm", XMLPrefsManager.get(Ui.display_margin_mm));
+        String topDisplayMargin = XMLPrefsManager.get(Ui.display_margin_top_section);
+        intent.putExtra("display_margin_mm", topDisplayMargin);
+        intent.putExtra("display_margin_top_section", topDisplayMargin);
+        intent.putExtra("display_margin_bottom_section", XMLPrefsManager.get(Ui.display_margin_bottom_section));
         intent.putExtra("module_corner_radius", AppearanceSettings.moduleCornerRadius());
         intent.putExtra("header_corner_radius", AppearanceSettings.headerCornerRadius());
         intent.putExtra("output_corner_radius", AppearanceSettings.outputCornerRadius());

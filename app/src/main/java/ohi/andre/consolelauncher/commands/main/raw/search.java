@@ -1,10 +1,11 @@
 package ohi.andre.consolelauncher.commands.main.raw;
 
-import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import ohi.andre.consolelauncher.R;
@@ -12,92 +13,129 @@ import ohi.andre.consolelauncher.commands.CommandAbstraction;
 import ohi.andre.consolelauncher.commands.ExecutePack;
 import ohi.andre.consolelauncher.commands.main.MainPack;
 import ohi.andre.consolelauncher.commands.main.specific.ParamCommand;
+import ohi.andre.consolelauncher.managers.SearchProviderManager;
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave;
 import ohi.andre.consolelauncher.managers.xml.options.Cmd;
+import ohi.andre.consolelauncher.tuils.SimpleMutableEntry;
 import ohi.andre.consolelauncher.tuils.Tuils;
 
 public class search extends ParamCommand {
 
-    private static final String YOUTUBE_PREFIX = "https://www.youtube.com/results?search_query=";
-    private static final String YOUTUBE_PACKAGE = "com.google.android.youtube";
-    private static final String GOOGLE_PREFIX = "https://www.google.com/#q=";
-    private static final String GOOGLE_PACKAGE = "com.google.android.googlequicksearchbox";
-    private static final String GOOGLE_ACTIVITY = ".SearchActivity";
-    private static final String PLAYSTORE_PREFIX = "market://search?q=";
-    private static final String PLAYSTORE_BROWSER_PREFIX = "https://play.google.com/store/search?q=";
-    private static final String DUCKDUCKGO_PREFIX = "https://duckduckgo.com/?q=";
-    private static final String DUCKDUCKGO_PACKAGE = "com.duckduckgo.mobile.android";
-    private static final String DUCKDUCKGO_ACTIVITY = ".activity.DuckDuckGo";
-
     private enum Param implements ohi.andre.consolelauncher.commands.main.Param {
 
-        ps {
+        add {
             @Override
             public String exec(ExecutePack pack) {
-                List<String> args = pack.getList();
-                return playstoreSearch(args, pack.context);
+                ArrayList<String> args = pack.getList();
+                if (args == null || args.size() < 2) {
+                    return usageAdd();
+                }
+
+                String name = args.get(0);
+                if (isReserved(name)) {
+                    return "Search param " + name + " is reserved.";
+                }
+
+                String template = args.get(1);
+                String fallback = null;
+                if (args.size() > 2) {
+                    List<String> rest = args.subList(2, args.size());
+                    if (!rest.isEmpty() && "=>".equals(rest.get(0))) {
+                        rest = rest.subList(1, rest.size());
+                    }
+                    fallback = Tuils.toPlanString(rest, Tuils.SPACE);
+                }
+
+                boolean saved = SearchProviderManager.add(name, template, fallback);
+                return saved
+                        ? "Search provider -" + stripParam(name) + " saved."
+                        : usageAdd();
+            }
+
+            @Override
+            public int[] args() {
+                return new int[] {CommandAbstraction.TEXTLIST};
             }
         },
-//        file {
-//            @Override
-//            public String exec(ExecutePack pack) {
-//                List<String> args = pack.get(ArrayList.class, 1);
-//                MainPack p = ((MainPack) pack);
-//                return file(args, p.currentDirectory, p.res, p.outputable);
-//            }
-//        },
-        gg {
+        rm {
             @Override
             public String exec(ExecutePack pack) {
-                List<String> args = pack.getList();
-                return google(args, pack.context);
+                ArrayList<String> args = pack.getList();
+                if (args == null || args.isEmpty()) return "Usage: search -rm [param]";
+
+                String name = args.get(0);
+                if (isReserved(name)) {
+                    return "Search param " + name + " is reserved.";
+                }
+
+                boolean removed = SearchProviderManager.remove(name);
+                return removed
+                        ? "Search provider -" + stripParam(name) + " removed."
+                        : "Search provider -" + stripParam(name) + " not found.";
+            }
+
+            @Override
+            public int[] args() {
+                return new int[] {CommandAbstraction.TEXTLIST};
             }
         },
-        yt {
+        ls {
             @Override
             public String exec(ExecutePack pack) {
-                List<String> args = pack.getList();
-                return youTube(args, pack.context);
+                return listProviders();
+            }
+
+            @Override
+            public int[] args() {
+                return new int[0];
             }
         },
-        u {
+        file {
             @Override
             public String exec(ExecutePack pack) {
-                List<String> args = pack.getList();
-                return url(Tuils.toPlanString(args, Tuils.SPACE), pack.context);
+                File file = SearchProviderManager.file();
+                pack.context.startActivity(Tuils.openFile(pack.context, file));
+                return null;
+            }
+
+            @Override
+            public int[] args() {
+                return new int[0];
             }
         },
-        dd {
+        reset {
             @Override
             public String exec(ExecutePack pack) {
-                List<String> args = pack.getList();
-                return duckDuck(args, pack.context);
+                boolean reset = SearchProviderManager.reset();
+                return reset ? "Search providers reset." : "Unable to reset search providers.";
+            }
+
+            @Override
+            public int[] args() {
+                return new int[0];
             }
         };
 
-        @Override
-        public int[] args() {
-            return new int[] {CommandAbstraction.TEXTLIST};
-        }
-
         static Param get(String p) {
-            p = p.toLowerCase();
-            Param[] ps = values();
-            for (Param p1 : ps)
-                if (p.endsWith(p1.label()))
-                    return p1;
+            p = stripParam(p);
+            if (p == null) return null;
+
+            for (Param param : values()) {
+                if (p.equals(param.name())) {
+                    return param;
+                }
+            }
+
             return null;
         }
 
         static String[] labels() {
             Param[] ps = values();
-            String[] ss = new String[ps.length];
-
-            for (int count = 0; count < ps.length; count++) {
-                ss[count] = ps[count].label();
+            String[] labels = new String[ps.length];
+            for (int i = 0; i < ps.length; i++) {
+                labels[i] = ps[i].label();
             }
-
-            return ss;
+            return labels;
         }
 
         @Override
@@ -116,9 +154,63 @@ public class search extends ParamCommand {
         }
     }
 
+    private static class SearchProviderParam implements ohi.andre.consolelauncher.commands.main.Param {
+        private final SearchProviderManager.Provider provider;
+
+        SearchProviderParam(SearchProviderManager.Provider provider) {
+            this.provider = provider;
+        }
+
+        @Override
+        public int[] args() {
+            return new int[] {CommandAbstraction.TEXTLIST};
+        }
+
+        @Override
+        public String exec(ExecutePack pack) {
+            ArrayList<String> args = pack.getList();
+            String query = args == null ? Tuils.EMPTYSTRING : Tuils.toPlanString(args, Tuils.SPACE);
+            return open(provider, query, pack);
+        }
+
+        @Override
+        public String label() {
+            return Tuils.MINUS + provider.name;
+        }
+
+        @Override
+        public String onNotArgEnough(ExecutePack pack, int n) {
+            return pack.context.getString(R.string.help_search);
+        }
+
+        @Override
+        public String onArgNotFound(ExecutePack pack, int index) {
+            return null;
+        }
+    }
+
+    @Override
+    public SimpleMutableEntry<Boolean, ohi.andre.consolelauncher.commands.main.Param> getParam(MainPack pack, String param) {
+        ohi.andre.consolelauncher.commands.main.Param managementParam = Param.get(param);
+        if (managementParam != null) {
+            return new SimpleMutableEntry<>(false, managementParam);
+        }
+
+        SearchProviderManager.Provider provider = SearchProviderManager.get(param);
+        if (provider != null) {
+            return new SimpleMutableEntry<>(false, new SearchProviderParam(provider));
+        }
+
+        return super.getParam(pack, param);
+    }
+
     @Override
     protected ohi.andre.consolelauncher.commands.main.Param paramForString(MainPack pack, String param) {
-        return Param.get(param);
+        ohi.andre.consolelauncher.commands.main.Param managementParam = Param.get(param);
+        if (managementParam != null) return managementParam;
+
+        SearchProviderManager.Provider provider = SearchProviderManager.get(param);
+        return provider == null ? null : new SearchProviderParam(provider);
     }
 
     @Override
@@ -128,46 +220,52 @@ public class search extends ParamCommand {
 
     @Override
     protected String doThings(ExecutePack pack) {
+        if (!(pack instanceof MainPack)) return null;
+
+        String input = ((MainPack) pack).lastCommand;
+        List<String> split = Tuils.splitArgs(input);
+        if (split.size() < 2) {
+            return pack.context.getString(R.string.help_search)
+                    + Tuils.NEWLINE
+                    + Tuils.NEWLINE
+                    + listProviders();
+        }
+
         return null;
     }
 
     @Override
     public String[] params() {
-        return Param.labels();
+        return SearchProviderManager.labelsWith(Param.labels());
     }
 
-    private static String google(List<String> args, Context c) {
-
-        try {
-            String toSearch = Tuils.toPlanString(args, " ");
-
-            Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
-            intent.setClassName(GOOGLE_PACKAGE, GOOGLE_PACKAGE + GOOGLE_ACTIVITY);
-            intent.putExtra(SearchManager.QUERY, toSearch);
-            c.startActivity(intent);
-        } catch (Exception e) {
-            String toSearch = Tuils.toPlanString(args, "+");
-
-            Uri uri = Uri.parse(GOOGLE_PREFIX + toSearch);
-            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-            c.startActivity(intent);
+    public static String playstoreSearch(String query, android.content.Context c) {
+        SearchProviderManager.Provider provider = SearchProviderManager.get("ps");
+        if (provider == null) {
+            provider = new SearchProviderManager.Provider(
+                    "ps",
+                    "market://search?q={query}",
+                    "https://play.google.com/store/search?q={query}&c=apps");
         }
 
-        return Tuils.EMPTYSTRING;
+        return open(provider, query, c);
     }
 
-    public static String playstoreSearch(List<String> args, Context c) {
-        return playstoreSearch(Tuils.toPlanString(args, " "), c);
+    private static String open(SearchProviderManager.Provider provider, String query, ExecutePack pack) {
+        return open(provider, query, pack.context);
     }
 
-    public static String playstoreSearch(String query, Context c) {
-        String toSearch = Uri.encode(query);
-
+    private static String open(SearchProviderManager.Provider provider, String query, Context context) {
         try {
-            c.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(PLAYSTORE_PREFIX + toSearch)));
+            start(provider.render(query), context);
         } catch (Exception firstError) {
+            String fallback = provider.renderFallback(query);
+            if (fallback == null) {
+                return firstError.toString();
+            }
+
             try {
-                c.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(PLAYSTORE_BROWSER_PREFIX + toSearch + "&c=apps")));
+                start(fallback, context);
             } catch (Exception secondError) {
                 return secondError.toString();
             }
@@ -176,92 +274,49 @@ public class search extends ParamCommand {
         return Tuils.EMPTYSTRING;
     }
 
-    private static String url(String url, Context c) {
-                    if (!url.startsWith("http://") && !url.startsWith("https://")) {
-                        url = "https://" + url;
-                    }
-                Uri uri = Uri.parse(url);
-        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-        c.startActivity(intent);
-
-        return Tuils.EMPTYSTRING;
+    private static void start(String rendered, Context context) {
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(rendered));
+        context.startActivity(intent);
     }
 
-    private static String duckDuck(List<String> args, Context c) {
-        try {
-            String toSearch = Tuils.toPlanString(args, " ");
+    private static String listProviders() {
+        List<SearchProviderManager.Provider> providers = SearchProviderManager.load();
+        if (providers.isEmpty()) return "No search providers configured.";
 
-            Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
-            intent.setClassName(DUCKDUCKGO_PACKAGE, DUCKDUCKGO_PACKAGE + DUCKDUCKGO_ACTIVITY);
-            intent.putExtra(SearchManager.QUERY, toSearch);
-            c.startActivity(intent);
-        } catch (Exception e) {
-            String toSearch = Tuils.toPlanString(args, "+");
-
-            Uri uri = Uri.parse(DUCKDUCKGO_PREFIX + toSearch);
-            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-            c.startActivity(intent);
+        StringBuilder output = new StringBuilder("Search providers:");
+        for (SearchProviderManager.Provider provider : providers) {
+            output.append(Tuils.NEWLINE)
+                    .append(Tuils.MINUS)
+                    .append(provider.name)
+                    .append(" -> ")
+                    .append(provider.template);
+            if (provider.fallbackTemplate != null) {
+                output.append(" => ").append(provider.fallbackTemplate);
+            }
         }
-        return Tuils.EMPTYSTRING;
+
+        return output.toString();
     }
 
-//    private static String file(final List<String> args, final File cd, final Resources res, final Outputable outputable) {
-//        new Thread() {
-//            @Override
-//            public void run() {
-//                super.run();
-//
-//                String name = Tuils.toPlanString(args);
-//                List<String> paths = rightPaths(cd, name);
-//                if(paths.size() == 0) {
-//                    outputable.onOutput(res.getString(R.string.output_nothing_found));
-//                } else {
-//                    outputable.onOutput(Tuils.toPlanString(paths, Tuils.NEWLINE));
-//                }
-//            }
-//        };
-//
-//        return Tuils.EMPTYSTRING;
-//    }
-//
-//    private static List<String> rightPaths(File dir, String name) {
-//        File[] files = dir.listFiles();
-//        List<String> rightPaths = new ArrayList<>(files.length);
-//
-//        boolean check = false;
-//        for (File file : files) {
-//            if (fileMatch(file, name)) {
-//                if (!check)
-//                    rightPaths.add(dir.getAbsolutePath());
-//                check = true;
-//                rightPaths.add(Tuils.NEWLINE + Tuils.DOUBLE_SPACE + file.getAbsolutePath());
-//            }
-//            if (file.isDirectory())
-//                rightPaths.addAll(rightPaths(file, name));
-//        }
-//
-//        return rightPaths;
-//    }
-//
-//    private static boolean fileMatch(File f, String name) {
-//        return f.getName().equalsIgnoreCase(name);
-//    }
+    private static String usageAdd() {
+        return "Usage: search -add [param] [url_template]"
+                + Tuils.NEWLINE
+                + "Example: search -add sdw https://stardewvalleywiki.com/{slug}";
+    }
 
-    private static String youTube(List<String> args, Context c) {
-        try {
-            String toSearch = Tuils.toPlanString(args, " ");
-            Intent intent = new Intent(Intent.ACTION_SEARCH);
-            intent.setPackage(YOUTUBE_PACKAGE);
-            intent.putExtra("query", toSearch);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            c.startActivity(intent);
-        } catch (Exception e) {
-            String toSearch = Tuils.toPlanString(args, "+");
-            Uri uri = Uri.parse(YOUTUBE_PREFIX + toSearch);
-            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-            c.startActivity(intent);
+    private static boolean isReserved(String param) {
+        return Param.get(param) != null;
+    }
+
+    private static String stripParam(String param) {
+        if (param == null) return null;
+
+        param = param.trim().toLowerCase();
+        while (param.startsWith(Tuils.MINUS)) {
+            param = param.substring(1);
         }
-        return Tuils.EMPTYSTRING;
+
+        return param.length() == 0 ? null : param;
     }
 
     @Override

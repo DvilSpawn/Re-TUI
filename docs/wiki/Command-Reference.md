@@ -28,7 +28,7 @@ Refresh launcher-managed data such as apps, aliases, music, and contacts.
 
 ### `search`
 
-Open a provider-specific search. Pick a provider chip first, then enter the query.
+Open a file-backed search provider. Providers live in `search.txt`, so the default providers and user-defined providers use the same registry.
 
 Useful forms:
 
@@ -37,6 +37,27 @@ Useful forms:
 - `search -yt <query>` for YouTube
 - `search -dd <query>` for DuckDuckGo
 - `search -u <url>` for a URL
+- `search -add <provider> <url_template>` to add or replace a provider
+- `search -rm <provider>` to remove a provider
+- `search -ls` to list providers
+- `search -file` to edit `search.txt`
+- `search -reset` to restore default providers
+
+Template tokens:
+
+- `{query}` URL-encodes the query
+- `{query+}` URL-encodes the query and uses `+` for spaces
+- `{slug}` replaces spaces with underscores before URL encoding
+- `{raw}` inserts the query unchanged
+- `{url}` opens a URL and adds `https://` if needed
+
+Example:
+
+`search -add sdw https://stardewvalleywiki.com/{slug}`
+
+Then:
+
+`search -sdw Ancient Fruit`
 
 `install` remains as a deprecated compatibility command, but new flows should use `search -ps`.
 

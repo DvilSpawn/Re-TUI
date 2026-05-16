@@ -444,12 +444,15 @@
         \n-check [ID or packageName] -> check the last notification from the application bound with the given ID
         \n-tutorial -> open the tutorial page on GitHub</string>
     <string name="help_restart">Restart Re:T-UI and load modified values</string>
-    <string name="help_search">Choose a search provider before entering a query.
-        \n\n-gg [search this...] -> Google Search
-        \n-ps [search this...] -> Google Play Store
-        \n-u [URL] -> open the URL
-        \n-yt [search this...] -> YouTube
-        \n-dd [search this...] -> DuckDuck Go
+    <string name="help_search">Use a file-backed search provider before entering a query.
+        \n\n-[provider] [search this...] -> use a provider from search.txt
+        \n-add [provider] [url_template] -> add or replace a provider
+        \n-rm [provider] -> remove a provider
+        \n-ls -> list providers
+        \n-file -> open search.txt
+        \n-reset -> restore the default providers
+        \n\nTemplate tokens: {query}, {query+}, {slug}, {raw}, {url}
+        \nExample: search -add sdw https://stardewvalleywiki.com/{slug}
     </string>
     <string name="help_share">$ share [pathToFile]
     </string>

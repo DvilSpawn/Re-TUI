@@ -830,10 +830,9 @@ public class UIManager implements OnTouchListener {
     }
 
     private void applyResponsiveLandscapeLayout(Configuration configuration) {
-        applyDisplayMarginsForConfiguration(configuration);
-
         if (mainContainer == null || terminalTrayContainer == null || landscapeSplitContainer == null
                 || landscapeLeftPane == null || landscapeRightPane == null || !(mRootView instanceof ViewGroup)) {
+            applyDisplayMarginsForConfiguration(configuration);
             return;
         }
 
@@ -841,6 +840,7 @@ public class UIManager implements OnTouchListener {
                 && configuration.orientation == Configuration.ORIENTATION_LANDSCAPE;
         if (shouldUseLandscape == landscapeLayoutActive) {
             applyLandscapeStatusChrome(shouldUseLandscape);
+            applyDisplayMarginsForConfiguration(configuration);
             applyTerminalTrayState(false);
             return;
         }
@@ -851,6 +851,7 @@ public class UIManager implements OnTouchListener {
             restorePortraitLayout();
         }
         applyLandscapeStatusChrome(shouldUseLandscape);
+        applyDisplayMarginsForConfiguration(configuration);
         applyTerminalTrayState(false);
     }
 
@@ -960,16 +961,41 @@ public class UIManager implements OnTouchListener {
 
         boolean landscape = configuration != null
                 && configuration.orientation == Configuration.ORIENTATION_LANDSCAPE;
-        int[] displayMargins = getListOfIntValues(
-                XMLPrefsManager.get(landscape ? Ui.display_margin_landscape_mm : Ui.display_margin_mm),
-                4,
-                0);
+        int[] topMargins = getDisplayMargins(Ui.display_margin_top_section);
+        int[] bottomMargins = getDisplayMargins(Ui.display_margin_bottom_section);
+        if (landscape && XMLPrefsManager.wasChanged(Ui.display_margin_landscape_mm, false)) {
+            topMargins = getDisplayMargins(Ui.display_margin_landscape_mm);
+            bottomMargins = topMargins;
+        }
+
+        mRootView.setPadding(0, 0, 0, 0);
         DisplayMetrics metrics = mContext.getResources().getDisplayMetrics();
-        mRootView.setPadding(
-                Tuils.mmToPx(metrics, displayMargins[0]),
-                Tuils.mmToPx(metrics, displayMargins[1]),
-                Tuils.mmToPx(metrics, displayMargins[2]),
-                Tuils.mmToPx(metrics, displayMargins[3]) + imeBottomOffset);
+        applySectionDisplayMargins(mainContainer, topMargins, metrics, 0);
+        applySectionDisplayMargins(terminalTrayContainer, bottomMargins, metrics, imeBottomOffset);
+    }
+
+    private int[] getDisplayMargins(Ui save) {
+        return getListOfIntValues(XMLPrefsManager.get(save), 4, 0);
+    }
+
+    private void applySectionDisplayMargins(View view, int[] marginMm, DisplayMetrics metrics, int extraBottomPx) {
+        if (view == null) {
+            return;
+        }
+
+        int left = Tuils.mmToPx(metrics, marginMm[0]);
+        int top = Tuils.mmToPx(metrics, marginMm[1]);
+        int right = Tuils.mmToPx(metrics, marginMm[2]);
+        int bottom = Tuils.mmToPx(metrics, marginMm[3]) + extraBottomPx;
+
+        ViewGroup.LayoutParams params = view.getLayoutParams();
+        if (params instanceof ViewGroup.MarginLayoutParams) {
+            ViewGroup.MarginLayoutParams marginParams = (ViewGroup.MarginLayoutParams) params;
+            marginParams.setMargins(left, top, right, bottom);
+            view.setLayoutParams(marginParams);
+        } else {
+            view.setPadding(left, top, right, bottom);
+        }
     }
 
     private void styleTerminalTrayToggle() {

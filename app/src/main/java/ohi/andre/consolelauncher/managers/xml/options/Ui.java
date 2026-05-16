@@ -605,7 +605,7 @@ public enum Ui implements XMLPrefsSave {
             return "The prefix placed before a root command (\"su ...\")";
         }
     },
-    display_margin_mm {
+    display_margin_top_section {
         @Override
         public String defaultValue() {
             return "0,0,0,0";
@@ -618,7 +618,23 @@ public enum Ui implements XMLPrefsSave {
 
         @Override
         public String info() {
-            return "Portrait/default display margin in millimeters. [left margin],[top margin],[right margin],[bottom margin]";
+            return "Top launcher section display margin in millimeters. [left margin],[top margin],[right margin],[bottom margin]";
+        }
+    },
+    display_margin_bottom_section {
+        @Override
+        public String defaultValue() {
+            return "0,0,0,0";
+        }
+
+        @Override
+        public String type() {
+            return XMLPrefsSave.TEXT;
+        }
+
+        @Override
+        public String info() {
+            return "Bottom terminal/input section display margin in millimeters. [left margin],[top margin],[right margin],[bottom margin]";
         }
     },
     display_margin_landscape_mm {

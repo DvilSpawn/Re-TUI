@@ -70,7 +70,7 @@ public class config extends ParamCommand {
                     LocalBroadcastManager.getInstance(pack.context.getApplicationContext()).sendBroadcast(intent);
                 } else if(save == Behavior.orientation && pack.context instanceof LauncherActivity) {
                     ((LauncherActivity) pack.context).applyOrientationPreference();
-                } else if((save == Ui.display_margin_mm || save == Ui.display_margin_landscape_mm)
+                } else if(isDisplayMarginSetting(save)
                         && pack.context instanceof LauncherActivity
                         && ((LauncherActivity) pack.context).getUIManager() != null) {
                     ((LauncherActivity) pack.context).getUIManager().refreshDisplayMargins();
@@ -294,7 +294,7 @@ public class config extends ParamCommand {
                 ((Reloadable) pack.context).addMessage(save.parent().path(), save.label() + " -> " + save.defaultValue());
                 if(save == Behavior.orientation && pack.context instanceof LauncherActivity) {
                     ((LauncherActivity) pack.context).applyOrientationPreference();
-                } else if((save == Ui.display_margin_mm || save == Ui.display_margin_landscape_mm)
+                } else if(isDisplayMarginSetting(save)
                         && pack.context instanceof LauncherActivity
                         && ((LauncherActivity) pack.context).getUIManager() != null) {
                     ((LauncherActivity) pack.context).getUIManager().refreshDisplayMargins();
@@ -396,6 +396,12 @@ public class config extends ParamCommand {
     @Override
     protected String doThings(ExecutePack pack) {
         return null;
+    }
+
+    private static boolean isDisplayMarginSetting(XMLPrefsSave save) {
+        return save == Ui.display_margin_top_section
+                || save == Ui.display_margin_bottom_section
+                || save == Ui.display_margin_landscape_mm;
     }
 
     @Override

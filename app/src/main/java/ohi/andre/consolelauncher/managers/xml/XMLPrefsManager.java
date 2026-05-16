@@ -229,6 +229,11 @@ public class XMLPrefsManager {
                 } catch (Exception e) {}
                 root = (Element) d.getElementsByTagName(element.name()).item(0);
             }
+
+            if (element == XMLPrefsRoot.UI) {
+                needToWrite |= migrateRenamedUiValue(d, root, "display_margin_mm", Ui.display_margin_top_section.label());
+            }
+
             NodeList nodes = root.getElementsByTagName("*");
 
             for(int count = 0; count < nodes.getLength(); count++) {
@@ -303,6 +308,45 @@ public class XMLPrefsManager {
 
             writeTo(d, file);
         }
+    }
+
+    private static boolean migrateRenamedUiValue(Document d, Element root, String oldName, String newName) {
+        Element oldElement = findDirectChild(root, oldName);
+        if (oldElement == null) {
+            return false;
+        }
+
+        Element newElement = findDirectChild(root, newName);
+        if (newElement == null) {
+            String value = Ui.display_margin_top_section.defaultValue();
+            try {
+                String oldValue = oldElement.getAttribute(VALUE_ATTRIBUTE);
+                if (oldValue != null && oldValue.length() > 0) {
+                    value = oldValue;
+                }
+            } catch (Exception ignored) {}
+
+            newElement = d.createElement(newName);
+            newElement.setAttribute(VALUE_ATTRIBUTE, value);
+            root.appendChild(newElement);
+        }
+        root.removeChild(oldElement);
+        return true;
+    }
+
+    private static Element findDirectChild(Element root, String name) {
+        if (root == null) {
+            return null;
+        }
+
+        NodeList nodes = root.getElementsByTagName(name);
+        for (int count = 0; count < nodes.getLength(); count++) {
+            Node node = nodes.item(count);
+            if (node instanceof Element && node.getParentNode() == root) {
+                return (Element) node;
+            }
+        }
+        return null;
     }
 
     public static Object transform(String s, Class<?> c) throws Exception {
