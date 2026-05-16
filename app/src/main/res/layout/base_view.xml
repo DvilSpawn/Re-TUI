@@ -168,13 +168,14 @@
         android:clipChildren="false"
         android:clipToPadding="false"
         android:orientation="horizontal"
+        android:weightSum="100"
         android:visibility="gone">
 
         <FrameLayout
             android:id="@+id/landscape_left_pane"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_weight="48"
             android:clipChildren="false"
             android:clipToPadding="false"
             android:paddingEnd="4dp" />
@@ -183,7 +184,7 @@
             android:id="@+id/landscape_right_pane"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_weight="52"
             android:clipChildren="false"
             android:clipToPadding="false"
             android:orientation="vertical"

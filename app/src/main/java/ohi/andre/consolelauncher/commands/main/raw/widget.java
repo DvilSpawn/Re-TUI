@@ -132,7 +132,7 @@ public class widget implements CommandAbstraction {
             LuaWidgetManager.approve(id);
             if (LuaWidgetManager.isDockable(id)) {
                 ModuleManager.setScriptModule(pack.context, id, LuaWidgetManager.SOURCE_PREFIX + id);
-                send(pack, "refresh", id, 0);
+                send(pack, "update", id, 0);
             }
             return "Lua widget approved: " + formatWidget(id)
                     + "\nPermissions: " + LuaWidgetManager.describeRequiredPermissions(LuaWidgetManager.readScript(id));

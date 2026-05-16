@@ -216,11 +216,7 @@ public final class AutoColorManager {
             case notes_locked_color:
             case weather_color:
             case unlock_counter_color:
-            case music_widget_color:
             case dashed_border_color:
-            case music_widget_text_color:
-            case notification_widget_text_color:
-            case music_widget_button_color:
             case module_name_text_color:
             case module_button_border_color:
                 return palette.accent;
@@ -238,11 +234,9 @@ public final class AutoColorManager {
             case app_uninstalled_color:
             case apps_drawer_color:
                 return palette.text;
-            case battery_color_high:
-            case battery_color_medium:
-            case battery_color_low:
-            case battery_progress_bar_full_color:
-            case battery_progress_bar_empty_color:
+            case battery_text_high:
+            case battery_text_medium:
+            case battery_text_low:
             case status_lines_bgrectcolor:
             case status_lines_bg:
             case status_lines_shadow_color:

@@ -282,7 +282,7 @@ public enum Ui implements XMLPrefsSave {
 
         @Override
         public String info() {
-            return "If true, battery color will change when your battery level reach different percentages battery_color high, battery_color_medium, battery_color_low. If false, only battery_color_high is used";
+            return "If true, battery text color will change when your battery level reaches different percentages: battery_text_high, battery_text_medium, battery_text_low. If false, only battery_text_high is used";
         }
     },
     show_time {

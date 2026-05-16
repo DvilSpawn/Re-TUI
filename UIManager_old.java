@@ -387,9 +387,9 @@ public class UIManager implements OnTouchListener {
                 loaded = true;
 
                 manyStatus = XMLPrefsManager.getBoolean(Ui.enable_battery_status);
-                colorHigh = XMLPrefsManager.getColor(Theme.battery_color_high);
-                colorMedium = XMLPrefsManager.getColor(Theme.battery_color_medium);
-                colorLow = XMLPrefsManager.getColor(Theme.battery_color_low);
+                colorHigh = XMLPrefsManager.getColor(Theme.battery_text_high);
+                colorMedium = XMLPrefsManager.getColor(Theme.battery_text_medium);
+                colorLow = XMLPrefsManager.getColor(Theme.battery_text_low);
             }
 
             int percentage = (int) p;
@@ -397,8 +397,8 @@ public class UIManager implements OnTouchListener {
             if (XMLPrefsManager.getBoolean(Behavior.battery_progress_bar)) {
                 int length = XMLPrefsManager.getInt(Behavior.battery_progress_bar_length);
                 String symbol = XMLPrefsManager.get(Behavior.battery_progress_bar_symbol);
-                int fullColor = XMLPrefsManager.getColor(Theme.battery_progress_bar_full_color);
-                int emptyColor = XMLPrefsManager.getColor(Theme.battery_progress_bar_empty_color);
+                int fullColor = colorHigh;
+                int emptyColor = colorLow;
 
                 int fullCount = Math.round((p / 100f) * length);
                 int emptyCount = length - fullCount;
@@ -1149,7 +1149,7 @@ public class UIManager implements OnTouchListener {
                     }
                     updateContextContainerVisibility(rootView);
 
-                    int widgetColor = XMLPrefsManager.getColor(Theme.music_widget_color);
+                    int widgetColor = XMLPrefsManager.getColor(Theme.module_name_text_color);
                     int widgetBgColor = XMLPrefsManager.getColor(Theme.window_terminal_bg);
 
                     MusicVisualizerView visualizerView = rootView.findViewById(R.id.music_visualizer);
@@ -1889,7 +1889,7 @@ public class UIManager implements OnTouchListener {
             return;
         }
 
-        int widgetColor = XMLPrefsManager.getColor(Theme.music_widget_color);
+        int widgetColor = XMLPrefsManager.getColor(Theme.module_name_text_color);
         int widgetBgColor = XMLPrefsManager.getColor(Theme.window_terminal_bg);
         boolean useDashed = XMLPrefsManager.getBoolean(Ui.enable_dashed_border);
 
@@ -2003,7 +2003,7 @@ public class UIManager implements OnTouchListener {
             return;
         }
 
-        int accent = XMLPrefsManager.getColor(Theme.music_widget_color);
+        int accent = XMLPrefsManager.getColor(Theme.module_name_text_color);
         int surface = ColorUtils.setAlphaComponent(XMLPrefsManager.getColor(Theme.window_terminal_bg), 238);
         int border = ColorUtils.setAlphaComponent(accent, 220);
 
@@ -2093,8 +2093,7 @@ public class UIManager implements OnTouchListener {
             return;
         }
 
-        // Use music_widget_color to ensure synchronization with music widget as requested
-        int widgetColor = XMLPrefsManager.getColor(Theme.music_widget_color);
+        int widgetColor = XMLPrefsManager.getColor(Theme.module_name_text_color);
         int widgetBgColor = XMLPrefsManager.getColor(Theme.window_terminal_bg);
         boolean useDashed = XMLPrefsManager.getBoolean(Ui.enable_dashed_border);
 
@@ -2162,7 +2161,7 @@ public class UIManager implements OnTouchListener {
         }
 
         rows.removeAllViews();
-        int widgetColor = XMLPrefsManager.getColor(Theme.music_widget_color);
+        int widgetColor = XMLPrefsManager.getColor(Theme.module_name_text_color);
         int widgetBgColor = XMLPrefsManager.getColor(Theme.window_terminal_bg);
         int rowBackground = ColorUtils.blendARGB(widgetBgColor, Color.BLACK, 0.22f);
         int strokeColor = ColorUtils.setAlphaComponent(widgetColor, 140);

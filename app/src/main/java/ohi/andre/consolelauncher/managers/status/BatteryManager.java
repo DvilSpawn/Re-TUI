@@ -100,9 +100,9 @@ public class BatteryManager implements OnBatteryUpdate {
         if (!loaded) {
             loaded = true;
             manyStatus = XMLPrefsManager.getBoolean(Ui.enable_battery_status);
-            colorHigh = XMLPrefsManager.getColor(Theme.battery_color_high);
-            colorMedium = XMLPrefsManager.getColor(Theme.battery_color_medium);
-            colorLow = XMLPrefsManager.getColor(Theme.battery_color_low);
+            colorHigh = XMLPrefsManager.getColor(Theme.battery_text_high);
+            colorMedium = XMLPrefsManager.getColor(Theme.battery_text_medium);
+            colorLow = XMLPrefsManager.getColor(Theme.battery_text_low);
         }
 
         int percentage = (int) p;
@@ -110,8 +110,8 @@ public class BatteryManager implements OnBatteryUpdate {
         if (XMLPrefsManager.getBoolean(Behavior.battery_progress_bar)) {
             int length = XMLPrefsManager.getInt(Behavior.battery_progress_bar_length);
             String symbol = XMLPrefsManager.get(Behavior.battery_progress_bar_symbol);
-            int fullColor = XMLPrefsManager.getColor(Theme.battery_progress_bar_full_color);
-            int emptyColor = XMLPrefsManager.getColor(Theme.battery_progress_bar_empty_color);
+            int fullColor = colorHigh;
+            int emptyColor = colorLow;
 
             int fullCount = Math.round((p / 100f) * length);
             int emptyCount = length - fullCount;

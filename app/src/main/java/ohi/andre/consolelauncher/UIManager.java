@@ -135,6 +135,7 @@ import ohi.andre.consolelauncher.tuils.MusicVisualizerView;
 import ohi.andre.consolelauncher.tuils.NetworkUtils;
 import ohi.andre.consolelauncher.tuils.OutlineEditText;
 import ohi.andre.consolelauncher.tuils.OutlineTextView;
+import ohi.andre.consolelauncher.tuils.StableHorizontalScrollView;
 import ohi.andre.consolelauncher.tuils.UIUtils;
 import ohi.andre.consolelauncher.tuils.Tuils;
 import ohi.andre.consolelauncher.managers.status.NetworkManager;
@@ -323,6 +324,9 @@ public class UIManager implements OnTouchListener {
     private View moduleDockScroll;
     private LinearLayout moduleDock;
     private final LinkedHashMap<String, TextView> moduleDockButtons = new LinkedHashMap<>();
+    private String styledModuleDockSelection = null;
+    private int pendingModuleDockScrollX = -1;
+    private int lastModuleDockScrollX = 0;
     private final HashMap<String, LuaWidgetEngine> luaWidgetEngines = new HashMap<>();
     private boolean bundledLuaSamplesPruned = false;
     private String activeModule = "";
@@ -372,7 +376,11 @@ public class UIManager implements OnTouchListener {
     private final StatusUpdateListener statusUpdateListener = this::updateText;
 
     private TextView getLabelView(Label l) {
-        return labelViews[(int) labelIndexes[l.ordinal()]];
+        int index = (int) labelIndexes[l.ordinal()];
+        if (index < 0 || index >= labelViews.length) {
+            return null;
+        }
+        return labelViews[index];
     }
 
     private int notesMaxLines;
@@ -833,6 +841,7 @@ public class UIManager implements OnTouchListener {
         boolean shouldUseLandscape = configuration != null
                 && configuration.orientation == Configuration.ORIENTATION_LANDSCAPE;
         if (shouldUseLandscape == landscapeLayoutActive) {
+            applyLandscapeStatusChrome(shouldUseLandscape);
             applyTerminalTrayState(false);
             return;
         }
@@ -842,7 +851,20 @@ public class UIManager implements OnTouchListener {
         } else {
             restorePortraitLayout();
         }
+        applyLandscapeStatusChrome(shouldUseLandscape);
         applyTerminalTrayState(false);
+    }
+
+    private void applyLandscapeStatusChrome(boolean landscape) {
+        TextView asciiView = getLabelView(Label.ascii);
+        if (asciiView == null) {
+            return;
+        }
+        if (landscape) {
+            asciiView.setVisibility(View.GONE);
+        } else if (!TextUtils.isEmpty(asciiView.getText())) {
+            asciiView.setVisibility(View.VISIBLE);
+        }
     }
 
     private void activateLandscapeLayout() {
@@ -1224,6 +1246,14 @@ public class UIManager implements OnTouchListener {
 
     private void setupHomeWidgetsPage(View homePage) {
         moduleDockScroll = homePage.findViewById(R.id.module_dock_scroll);
+        if (moduleDockScroll != null) {
+            moduleDockScroll.getViewTreeObserver().addOnScrollChangedListener(() -> {
+                int scrollX = currentModuleDockScrollX();
+                if (scrollX > 0) {
+                    lastModuleDockScrollX = scrollX;
+                }
+            });
+        }
         moduleDock = homePage.findViewById(R.id.module_dock);
         homeWidgetsContainer = homePage.findViewById(R.id.home_widgets_container);
         if (homeWidgetsContainer == null) return;
@@ -1263,13 +1293,14 @@ public class UIManager implements OnTouchListener {
 
         moduleDock.removeAllViews();
         moduleDockButtons.clear();
+        styledModuleDockSelection = null;
         if (!showDock) return;
 
         for (String module : ModuleManager.getDock(mContext)) {
             addModuleDockButton(module);
         }
         addModuleDockButton("close");
-        updateModuleDockSelection();
+        restyleAllModuleDockButtons();
     }
 
     private void addModuleDockButton(String module) {
@@ -1292,6 +1323,13 @@ public class UIManager implements OnTouchListener {
         button.setOnClickListener(v -> {
             if ("close".equals(module)) closeHomeModule();
             else showHomeModule(module);
+        });
+        button.setOnTouchListener((v, event) -> {
+            if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
+                int scrollX = preservedModuleDockScrollX();
+                pendingModuleDockScrollX = scrollX > 0 ? scrollX : lastModuleDockScrollX;
+            }
+            return false;
         });
 
         moduleDock.addView(button);
@@ -1319,8 +1357,66 @@ public class UIManager implements OnTouchListener {
     }
 
     private void updateModuleDockSelection() {
+        if (styledModuleDockSelection == null) {
+            for (Map.Entry<String, TextView> entry : moduleDockButtons.entrySet()) {
+                styleModuleDockButton(entry.getValue(), entry.getKey().equals(activeModule));
+            }
+            styledModuleDockSelection = activeModule;
+            return;
+        }
+        if (TextUtils.equals(styledModuleDockSelection, activeModule)) {
+            return;
+        }
+        TextView previous = moduleDockButtons.get(styledModuleDockSelection);
+        if (previous != null) {
+            styleModuleDockButton(previous, false);
+        }
+        TextView current = moduleDockButtons.get(activeModule);
+        if (current != null) {
+            styleModuleDockButton(current, true);
+        }
+        styledModuleDockSelection = activeModule;
+    }
+
+    private void restyleAllModuleDockButtons() {
+        styledModuleDockSelection = null;
         for (Map.Entry<String, TextView> entry : moduleDockButtons.entrySet()) {
             styleModuleDockButton(entry.getValue(), entry.getKey().equals(activeModule));
+        }
+        styledModuleDockSelection = activeModule;
+    }
+
+    private int currentModuleDockScrollX() {
+        if (moduleDockScroll instanceof HorizontalScrollView) {
+            return ((HorizontalScrollView) moduleDockScroll).getScrollX();
+        }
+        return 0;
+    }
+
+    private int preservedModuleDockScrollX() {
+        if (moduleDockScroll instanceof StableHorizontalScrollView) {
+            return ((StableHorizontalScrollView) moduleDockScroll).getPreservedScrollX();
+        }
+        return currentModuleDockScrollX();
+    }
+
+    private int consumeModuleDockScrollX() {
+        int scrollX = pendingModuleDockScrollX >= 0 ? pendingModuleDockScrollX : preservedModuleDockScrollX();
+        pendingModuleDockScrollX = -1;
+        return scrollX;
+    }
+
+    private void preserveModuleDockScrollX(int scrollX) {
+        if (scrollX > 0) {
+            lastModuleDockScrollX = scrollX;
+        }
+        if (moduleDockScroll instanceof StableHorizontalScrollView) {
+            ((StableHorizontalScrollView) moduleDockScroll).preserveScrollX(scrollX);
+        } else if (moduleDockScroll instanceof HorizontalScrollView) {
+            HorizontalScrollView scroll = (HorizontalScrollView) moduleDockScroll;
+            int target = Math.max(0, scrollX);
+            scroll.scrollTo(target, 0);
+            scroll.post(() -> scroll.scrollTo(target, 0));
         }
     }
 
@@ -1343,6 +1439,7 @@ public class UIManager implements OnTouchListener {
             return;
         }
 
+        int dockScrollX = consumeModuleDockScrollX();
         if (handler != null) {
             handler.removeCallbacks(eventsRefreshRunnable);
             handler.removeCallbacks(luaWidgetTickRunnable);
@@ -1376,6 +1473,7 @@ public class UIManager implements OnTouchListener {
         }
         refreshSuggestionsForActiveModule();
         scheduleEventsRefreshIfNeeded();
+        preserveModuleDockScrollX(dockScrollX);
     }
 
     private void ensureSystemLuaModules() {
@@ -1608,6 +1706,7 @@ public class UIManager implements OnTouchListener {
     }
 
     private void closeHomeModule() {
+        int dockScrollX = consumeModuleDockScrollX();
         if (handler != null) {
             handler.removeCallbacks(eventsRefreshRunnable);
             handler.removeCallbacks(luaWidgetTickRunnable);
@@ -1620,6 +1719,7 @@ public class UIManager implements OnTouchListener {
         updateModuleDockSelection();
         applyTerminalTrayState(false);
         refreshSuggestionsForActiveModule();
+        preserveModuleDockScrollX(dockScrollX);
     }
 
     private void refreshSuggestionsForActiveModule() {
@@ -1686,7 +1786,7 @@ public class UIManager implements OnTouchListener {
             ModuleManager.setScriptText(mContext, id, LuaWidgetManager.disabledPayload(widgetId));
             if (id.equals(activeModule)) {
                 repaintActiveTextModule(id);
-                rebuildModuleDock();
+                updateModuleDockSelection();
             }
             return;
         }
@@ -1695,7 +1795,7 @@ public class UIManager implements OnTouchListener {
             ModuleManager.setScriptText(mContext, id, LuaWidgetManager.consentPayload(widgetId));
             if (id.equals(activeModule)) {
                 repaintActiveTextModule(id);
-                rebuildModuleDock();
+                updateModuleDockSelection();
             }
             return;
         }
@@ -1858,7 +1958,7 @@ public class UIManager implements OnTouchListener {
         if (id.equals(activeModule)) {
             showHomeModule(id);
         }
-        rebuildModuleDock();
+        updateModuleDockSelection();
         if (announce) {
             Tuils.sendOutput(mContext, "Module refreshed: " + id);
         }
@@ -1887,7 +1987,7 @@ public class UIManager implements OnTouchListener {
         if (repaint && id.equals(activeModule)) {
             repaintActiveTextModule(id);
         }
-        rebuildModuleDock();
+        updateModuleDockSelection();
         if (announce) {
             Tuils.sendOutput(mContext, "Widget refreshed: " + id);
         }
@@ -1909,7 +2009,7 @@ public class UIManager implements OnTouchListener {
             if (id.equals(activeModule)) {
                 repaintActiveTextModule(id);
             }
-            rebuildModuleDock();
+            updateModuleDockSelection();
             return;
         }
         if (!LuaWidgetManager.isTrusted(widgetId)) {
@@ -1917,7 +2017,7 @@ public class UIManager implements OnTouchListener {
             if (id.equals(activeModule)) {
                 repaintActiveTextModule(id);
             }
-            rebuildModuleDock();
+            updateModuleDockSelection();
             return;
         }
 
@@ -1928,7 +2028,7 @@ public class UIManager implements OnTouchListener {
         if (id.equals(activeModule)) {
             repaintActiveTextModule(id);
         }
-        rebuildModuleDock();
+        updateModuleDockSelection();
     }
 
     private void actionLuaWidget(String module, String value) {
@@ -1947,7 +2047,7 @@ public class UIManager implements OnTouchListener {
             if (id.equals(activeModule)) {
                 repaintActiveTextModule(id);
             }
-            rebuildModuleDock();
+            updateModuleDockSelection();
             return;
         }
         if (!LuaWidgetManager.isTrusted(widgetId)) {
@@ -1955,7 +2055,7 @@ public class UIManager implements OnTouchListener {
             if (id.equals(activeModule)) {
                 repaintActiveTextModule(id);
             }
-            rebuildModuleDock();
+            updateModuleDockSelection();
             return;
         }
 
@@ -1965,7 +2065,7 @@ public class UIManager implements OnTouchListener {
         if (id.equals(activeModule)) {
             repaintActiveTextModule(id);
         }
-        rebuildModuleDock();
+        updateModuleDockSelection();
     }
 
     private void dialogLuaWidget(String module, int index) {
@@ -1984,7 +2084,7 @@ public class UIManager implements OnTouchListener {
             if (id.equals(activeModule)) {
                 repaintActiveTextModule(id);
             }
-            rebuildModuleDock();
+            updateModuleDockSelection();
             return;
         }
         if (!LuaWidgetManager.isTrusted(widgetId)) {
@@ -1992,7 +2092,7 @@ public class UIManager implements OnTouchListener {
             if (id.equals(activeModule)) {
                 repaintActiveTextModule(id);
             }
-            rebuildModuleDock();
+            updateModuleDockSelection();
             return;
         }
 
@@ -2002,7 +2102,7 @@ public class UIManager implements OnTouchListener {
         if (id.equals(activeModule)) {
             repaintActiveTextModule(id);
         }
-        rebuildModuleDock();
+        updateModuleDockSelection();
     }
 
     private void setLuaWidgetExpanded(String module, boolean expanded) {
@@ -2021,7 +2121,7 @@ public class UIManager implements OnTouchListener {
             if (id.equals(activeModule)) {
                 repaintActiveTextModule(id);
             }
-            rebuildModuleDock();
+            updateModuleDockSelection();
             return;
         }
         if (!LuaWidgetManager.isTrusted(widgetId)) {
@@ -2029,7 +2129,7 @@ public class UIManager implements OnTouchListener {
             if (id.equals(activeModule)) {
                 repaintActiveTextModule(id);
             }
-            rebuildModuleDock();
+            updateModuleDockSelection();
             return;
         }
 
@@ -2039,7 +2139,7 @@ public class UIManager implements OnTouchListener {
         if (id.equals(activeModule)) {
             repaintActiveTextModule(id);
         }
-        rebuildModuleDock();
+        updateModuleDockSelection();
     }
 
     private void toggleLuaWidgetExpanded(String module) {
@@ -2058,7 +2158,7 @@ public class UIManager implements OnTouchListener {
             if (id.equals(activeModule)) {
                 repaintActiveTextModule(id);
             }
-            rebuildModuleDock();
+            updateModuleDockSelection();
             return;
         }
         if (!LuaWidgetManager.isTrusted(widgetId)) {
@@ -2066,7 +2166,7 @@ public class UIManager implements OnTouchListener {
             if (id.equals(activeModule)) {
                 repaintActiveTextModule(id);
             }
-            rebuildModuleDock();
+            updateModuleDockSelection();
             return;
         }
 
@@ -2076,7 +2176,7 @@ public class UIManager implements OnTouchListener {
         if (id.equals(activeModule)) {
             repaintActiveTextModule(id);
         }
-        rebuildModuleDock();
+        updateModuleDockSelection();
     }
 
     private LuaWidgetEngine getLuaWidgetEngine(String widgetId) {
@@ -2104,7 +2204,7 @@ public class UIManager implements OnTouchListener {
                         scheduleLuaWidgetTickIfNeeded(module, result);
                     }
                 }
-                rebuildModuleDock();
+                updateModuleDockSelection();
             });
             luaWidgetEngines.put(id, engine);
         }
@@ -3060,9 +3160,9 @@ public class UIManager implements OnTouchListener {
 
         // Style control buttons
         int widgetColor = AppearanceSettings.musicWidgetTextColor();
+        int widgetBorderColor = AppearanceSettings.moduleButtonBorderColor();
         boolean useDashed = AppearanceSettings.dashedBorders();
 
-        int buttonColor = widgetColor;
         TextView prevBtn = musicWidget.findViewById(R.id.music_prev);
         TextView nextBtn = musicWidget.findViewById(R.id.music_next);
         TextView playPauseBtn = musicWidget.findViewById(R.id.music_play_pause);
@@ -3071,7 +3171,7 @@ public class UIManager implements OnTouchListener {
         for (View b : buttons) {
             if (b instanceof TextView) {
                 TextView btn = (TextView) b;
-                btn.setTextColor(buttonColor);
+                btn.setTextColor(widgetColor);
                 btn.setTypeface(Tuils.getTypeface(mContext));
                 btn.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12f);
                 btn.setIncludeFontPadding(false);
@@ -3082,7 +3182,7 @@ public class UIManager implements OnTouchListener {
                 gd.setShape(GradientDrawable.RECTANGLE);
                 gd.setCornerRadius(Tuils.dpToPx(mContext, AppearanceSettings.moduleCornerRadius()));
                 if (useDashed) {
-                    gd.setStroke((int) Tuils.dpToPx(mContext, 1.2f), buttonColor,
+                    gd.setStroke((int) Tuils.dpToPx(mContext, 1.2f), widgetBorderColor,
                             Tuils.dpToPx(mContext, AppearanceSettings.dashLength() / 2),
                             Tuils.dpToPx(mContext, AppearanceSettings.dashGap() / 2));
                 }
@@ -3138,7 +3238,7 @@ public class UIManager implements OnTouchListener {
             return;
         }
 
-        int accent = AppearanceSettings.musicWidgetColor();
+        int accent = AppearanceSettings.moduleNameTextColor();
         int surface = ColorUtils.setAlphaComponent(AppearanceSettings.terminalWindowBackground(), 238);
         int border = ColorUtils.setAlphaComponent(accent, 220);
 
@@ -4003,7 +4103,7 @@ public class UIManager implements OnTouchListener {
         if (id.equals(activeModule)) {
             showHomeModule(id);
         }
-        rebuildModuleDock();
+        updateModuleDockSelection();
         Tuils.sendOutput(mContext, "Module refreshed: " + id);
     }
 

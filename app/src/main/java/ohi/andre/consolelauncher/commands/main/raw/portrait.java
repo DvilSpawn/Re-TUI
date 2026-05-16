@@ -4,11 +4,11 @@ import ohi.andre.consolelauncher.R;
 import ohi.andre.consolelauncher.commands.CommandAbstraction;
 import ohi.andre.consolelauncher.commands.ExecutePack;
 
-public class landscape implements CommandAbstraction {
+public class portrait implements CommandAbstraction {
 
     @Override
     public String exec(ExecutePack pack) {
-        return orientation.apply(pack, orientation.MODE_LANDSCAPE);
+        return orientation.apply(pack, orientation.MODE_PORTRAIT);
     }
 
     @Override
@@ -23,7 +23,7 @@ public class landscape implements CommandAbstraction {
 
     @Override
     public int helpRes() {
-        return R.string.help_landscape;
+        return R.string.help_portrait;
     }
 
     @Override

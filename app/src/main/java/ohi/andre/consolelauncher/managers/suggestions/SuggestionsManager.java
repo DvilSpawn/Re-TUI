@@ -56,7 +56,6 @@ import ohi.andre.consolelauncher.managers.notifications.reply.BoundApp;
 import ohi.andre.consolelauncher.managers.notifications.reply.ReplyManager;
 import ohi.andre.consolelauncher.managers.WebhookManager;
 import ohi.andre.consolelauncher.managers.modules.ModuleManager;
-import ohi.andre.consolelauncher.managers.settings.LauncherSettings;
 import ohi.andre.consolelauncher.managers.termux.TermuxBridgeCache;
 import ohi.andre.consolelauncher.managers.termux.TermuxBridgeManager;
 import ohi.andre.consolelauncher.managers.widgets.LuaWidgetManager;
@@ -593,12 +592,12 @@ public class SuggestionsManager {
             if (beforeLastSpace .length() == 0) {
                 comparator.noInput = true;
 
-                suggestLandscapeCommandIfPortrait(suggestionList);
-
                 if (suggestActiveModule(suggestionList)) {
                     Collections.sort(suggestionList, comparator);
                     return suggestionList;
                 }
+
+                suggestOrientationCommand(suggestionList);
 
                 AppsManager.LaunchInfo[] apps = pack.appsManager.getSuggestedApps();
                 if (apps != null) {
@@ -755,10 +754,8 @@ public class SuggestionsManager {
         return suggestionList;
     }
 
-    private void suggestLandscapeCommandIfPortrait(List<Suggestion> suggestions) {
-        if (LauncherSettings.getInt(Behavior.orientation) == 1) {
-            suggestions.add(new Suggestion(null, "landscape", true, Suggestion.TYPE_PERMANENT));
-        }
+    private void suggestOrientationCommand(List<Suggestion> suggestions) {
+        suggestions.add(new Suggestion(null, "orientation", false, Suggestion.TYPE_PERMANENT));
     }
 
     private boolean needsFileSuggestion(String cmd) {
@@ -1129,6 +1126,13 @@ public class SuggestionsManager {
             suggestions.add(new Suggestion(null, "module -dock remove", false, Suggestion.TYPE_PERMANENT));
         }
 
+        if ("orientation".startsWith(lower)) {
+            suggestions.add(new Suggestion(null, "orientation", false, Suggestion.TYPE_PERMANENT));
+            for (String option : new String[]{"portrait", "landscape", "auto"}) {
+                suggestions.add(new Suggestion(null, "orientation " + option, true, Suggestion.TYPE_PERMANENT));
+            }
+        }
+
     }
 
     private void suggestClockCommandArgs(MainPack pack, List<Suggestion> suggestions, String afterLastSpace, String beforeLastSpace) {
@@ -1221,6 +1225,17 @@ public class SuggestionsManager {
                 || "widget -toggle".equals(normalized)
                 || "widget -click".equals(normalized)) {
             suggestWidgetIds(suggestions, afterLastSpace, beforeLastSpace, true);
+        } else if ("orientation".equals(normalized)) {
+            suggestOrientationOptions(suggestions, afterLastSpace, beforeLastSpace);
+        }
+    }
+
+    private void suggestOrientationOptions(List<Suggestion> suggestions, String lastWord, String beforeLastSpace) {
+        String filter = lastWord == null ? Tuils.EMPTYSTRING : lastWord.toLowerCase();
+        for (String option : new String[]{"portrait", "landscape", "auto"}) {
+            if (filter.length() == 0 || option.startsWith(filter)) {
+                suggestions.add(new Suggestion(beforeLastSpace, option, true, Suggestion.TYPE_COMMAND));
+            }
         }
     }
 

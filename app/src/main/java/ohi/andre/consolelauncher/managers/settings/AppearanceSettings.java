@@ -20,12 +20,8 @@ public final class AppearanceSettings {
         return LauncherSettings.get(Ui.font_file);
     }
 
-    public static int musicWidgetColor() {
-        return LauncherSettings.getColor(Theme.music_widget_color);
-    }
-
     public static int musicWidgetBorderColor() {
-        return dashedBorderColor();
+        return moduleButtonBorderColor();
     }
 
     public static int musicWidgetTextColor() {
@@ -33,7 +29,7 @@ public final class AppearanceSettings {
     }
 
     public static int notificationWidgetBorderColor() {
-        return dashedBorderColor();
+        return moduleButtonBorderColor();
     }
 
     public static int notificationWidgetTextColor() {

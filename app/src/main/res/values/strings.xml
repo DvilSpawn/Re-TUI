@@ -405,7 +405,17 @@
     <string name="help_landscape">Force Re:T-UI into landscape mode and enable the split landscape overlay.
         \n\nUsage:
         \n$ landscape
-        \n\nThis sets orientation to landscape. Use config -set orientation 1 for portrait or config -set orientation 2 for auto-rotate.</string>
+        \n\nShortcut for orientation landscape.</string>
+    <string name="help_portrait">Force Re:T-UI into portrait mode.
+        \n\nUsage:
+        \n$ portrait
+        \n\nShortcut for orientation portrait.</string>
+    <string name="help_orientation">Set Re:T-UI screen orientation.
+        \n\nUsage:
+        \n$ orientation portrait
+        \n$ orientation landscape
+        \n$ orientation auto
+        \n\nLandscape enables the split landscape overlay. Auto restores Android auto-rotate.</string>
     <string name="help_music">-next -> play the next song
         \n-previous -> play the previous song
         \n-play -> play/pause the player

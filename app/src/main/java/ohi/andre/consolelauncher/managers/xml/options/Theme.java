@@ -54,7 +54,7 @@ public enum Theme implements XMLPrefsSave {
             return "Device label color";
         }
     },
-    battery_color_high {
+    battery_text_high {
         @Override
         public String defaultValue() {
             return "#4CAF50";
@@ -62,10 +62,10 @@ public enum Theme implements XMLPrefsSave {
 
         @Override
         public String info() {
-            return "Battery label color when the battery level is high";
+            return "Battery text color when the battery level is high";
         }
     },
-    battery_color_medium {
+    battery_text_medium {
         @Override
         public String defaultValue() {
             return "#FFEB3B";
@@ -73,10 +73,10 @@ public enum Theme implements XMLPrefsSave {
 
         @Override
         public String info() {
-            return "Battery label color when the battery level is medium";
+            return "Battery text color when the battery level is medium";
         }
     },
-    battery_color_low {
+    battery_text_low {
         @Override
         public String defaultValue() {
             return "#FF5722";
@@ -84,29 +84,7 @@ public enum Theme implements XMLPrefsSave {
 
         @Override
         public String info() {
-            return "Battery label color when the battery level is low";
-        }
-    },
-    battery_progress_bar_full_color {
-        @Override
-        public String defaultValue() {
-            return "#4CAF50";
-        }
-
-        @Override
-        public String info() {
-            return "The color of the full part of the battery progress bar";
-        }
-    },
-    battery_progress_bar_empty_color {
-        @Override
-        public String defaultValue() {
-            return "#555555";
-        }
-
-        @Override
-        public String info() {
-            return "The color of the empty part of the battery progress bar";
+            return "Battery text color when the battery level is low";
         }
     },
     ascii_color {
@@ -576,17 +554,6 @@ public enum Theme implements XMLPrefsSave {
             return "The color of the apps drawer";
         }
     },
-    music_widget_color {
-        @Override
-        public String defaultValue() {
-            return "#ffffffff";
-        }
-
-        @Override
-        public String info() {
-            return "Legacy fallback color for terminal widgets";
-        }
-    },
     dashed_border_color {
         @Override
         public String defaultValue() {
@@ -596,39 +563,6 @@ public enum Theme implements XMLPrefsSave {
         @Override
         public String info() {
             return "The color of dashed terminal borders";
-        }
-    },
-    music_widget_text_color {
-        @Override
-        public String defaultValue() {
-            return "#ffffffff";
-        }
-
-        @Override
-        public String info() {
-            return "Legacy music widget text color. Current modules use module_name_text_color";
-        }
-    },
-    notification_widget_text_color {
-        @Override
-        public String defaultValue() {
-            return "#ffffffff";
-        }
-
-        @Override
-        public String info() {
-            return "Legacy notification terminal text color. Current modules use module_name_text_color";
-        }
-    },
-    music_widget_button_color {
-        @Override
-        public String defaultValue() {
-            return "#ffffffff";
-        }
-
-        @Override
-        public String info() {
-            return "Legacy music widget button border color. Current modules use module_button_border_color";
         }
     },
     module_button_bg_color {
