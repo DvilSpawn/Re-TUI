@@ -653,6 +653,22 @@ public enum Ui implements XMLPrefsSave {
             return "Landscape display margin in millimeters. [left margin],[top margin],[right margin],[bottom margin]";
         }
     },
+    landscape_fold_gutter_mm {
+        @Override
+        public String defaultValue() {
+            return "0";
+        }
+
+        @Override
+        public String type() {
+            return XMLPrefsSave.INTEGER;
+        }
+
+        @Override
+        public String info() {
+            return "Landscape-only center gutter in millimeters for fold hinges or screen creases";
+        }
+    },
     ignore_bar_color {
         @Override
         public String defaultValue() {

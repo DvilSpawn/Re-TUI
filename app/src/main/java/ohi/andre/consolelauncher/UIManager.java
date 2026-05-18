@@ -647,6 +647,7 @@ public class UIManager implements OnTouchListener {
     private View landscapeSplitContainer;
     private ViewGroup landscapeLeftPane;
     private ViewGroup landscapeRightPane;
+    private View landscapeFoldGutter;
     private FrameLayout.LayoutParams portraitMainParams;
     private FrameLayout.LayoutParams portraitTrayParams;
     private boolean landscapeLayoutActive = false;
@@ -826,6 +827,7 @@ public class UIManager implements OnTouchListener {
         landscapeSplitContainer = rootView.findViewById(R.id.landscape_split_container);
         landscapeLeftPane = rootView.findViewById(R.id.landscape_left_pane);
         landscapeRightPane = rootView.findViewById(R.id.landscape_right_pane);
+        landscapeFoldGutter = rootView.findViewById(R.id.landscape_fold_gutter);
 
         if (mainContainer != null && portraitMainParams == null
                 && mainContainer.getLayoutParams() instanceof FrameLayout.LayoutParams) {
@@ -854,6 +856,7 @@ public class UIManager implements OnTouchListener {
         } else {
             restorePortraitLayout();
         }
+        applyLandscapeFoldGutter(configuration);
         applyLandscapeStatusChrome(shouldUseLandscape);
         applyDisplayMarginsForConfiguration(configuration);
         applyTerminalTrayState(false);
@@ -878,6 +881,7 @@ public class UIManager implements OnTouchListener {
 
         landscapeLayoutActive = true;
         landscapeSplitContainer.setVisibility(View.VISIBLE);
+        applyLandscapeFoldGutter(mContext != null ? mContext.getResources().getConfiguration() : null);
 
         landscapeLeftPane.addView(mainContainer, new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -908,6 +912,36 @@ public class UIManager implements OnTouchListener {
 
         root.addView(mainContainer, 0, mainParams);
         root.addView(terminalTrayContainer, Math.min(1, root.getChildCount()), trayParams);
+    }
+
+    private void applyLandscapeFoldGutter(Configuration configuration) {
+        if (landscapeFoldGutter == null || mContext == null) {
+            return;
+        }
+
+        boolean landscape = configuration != null
+                && configuration.orientation == Configuration.ORIENTATION_LANDSCAPE;
+        int gutterWidth = landscape ? getLandscapeFoldGutterWidth() : 0;
+        ViewGroup.LayoutParams params = landscapeFoldGutter.getLayoutParams();
+        if (params != null && params.width != gutterWidth) {
+            params.width = gutterWidth;
+            landscapeFoldGutter.setLayoutParams(params);
+        }
+        landscapeFoldGutter.setVisibility(gutterWidth > 0 ? View.VISIBLE : View.GONE);
+    }
+
+    private int getLandscapeFoldGutterWidth() {
+        int gutterMm = Math.max(0, Math.min(LauncherSettings.getInt(Ui.landscape_fold_gutter_mm), 80));
+        if (gutterMm == 0) {
+            return 0;
+        }
+
+        int gutterPx = Tuils.mmToPx(mContext.getResources().getDisplayMetrics(), gutterMm);
+        int splitWidth = landscapeSplitContainer != null ? landscapeSplitContainer.getWidth() : 0;
+        if (splitWidth > 0) {
+            gutterPx = Math.min(gutterPx, splitWidth / 3);
+        }
+        return gutterPx;
     }
 
     private void detachFromParent(View view) {
@@ -965,6 +999,7 @@ public class UIManager implements OnTouchListener {
 
         boolean landscape = configuration != null
                 && configuration.orientation == Configuration.ORIENTATION_LANDSCAPE;
+        applyLandscapeFoldGutter(configuration);
         int[] topMargins = getDisplayMargins(Ui.display_margin_top_section);
         int[] bottomMargins = getDisplayMargins(Ui.display_margin_bottom_section);
         if (landscape && XMLPrefsManager.wasChanged(Ui.display_margin_landscape_mm, false)) {

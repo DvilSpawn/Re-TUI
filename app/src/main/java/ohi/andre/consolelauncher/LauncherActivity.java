@@ -386,12 +386,16 @@ public class LauncherActivity extends AppCompatActivity implements Reloadable {
         final int originalTop = mainView.getPaddingTop();
         final int originalRight = mainView.getPaddingRight();
         final int originalBottom = mainView.getPaddingBottom();
+        final int originalNavigationBarColor = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
+                ? getWindow().getNavigationBarColor()
+                : Color.BLACK;
 
         ViewCompat.setOnApplyWindowInsetsListener(mainView, (view, insets) -> {
             boolean imeVisible = insets.isVisible(WindowInsetsCompat.Type.ime());
             int imeBottom = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom;
             int systemBottom = insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom;
             int keyboardOffset = Math.max(0, imeBottom - systemBottom);
+            applyImeBackgroundColor(imeVisible, originalNavigationBarColor);
 
             if (ui != null) {
                 ui.applyImeBottomOffset(keyboardOffset, imeVisible);
@@ -406,6 +410,41 @@ public class LauncherActivity extends AppCompatActivity implements Reloadable {
             return insets;
         });
         ViewCompat.requestApplyInsets(mainView);
+    }
+
+    private void applyImeBackgroundColor(boolean imeVisible, int originalNavigationBarColor) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP
+                || !LauncherSettings.getBoolean(Ui.system_wallpaper)) {
+            return;
+        }
+
+        Window window = getWindow();
+        if (window == null) {
+            return;
+        }
+
+        window.setNavigationBarColor(imeVisible
+                ? resolveImeBackgroundColor()
+                : originalNavigationBarColor);
+    }
+
+    private int resolveImeBackgroundColor() {
+        int overlayColor = LauncherSettings.getColor(Theme.overlay_color);
+        if (Color.alpha(overlayColor) > 0) {
+            return overlayColor;
+        }
+
+        int terminalColor = LauncherSettings.getColor(Theme.window_terminal_bg);
+        if (Color.alpha(terminalColor) > 0) {
+            return terminalColor;
+        }
+
+        int backgroundColor = LauncherSettings.getColor(Theme.bg_color);
+        if (Color.alpha(backgroundColor) > 0) {
+            return backgroundColor;
+        }
+
+        return Color.BLACK;
     }
 
     @Override
