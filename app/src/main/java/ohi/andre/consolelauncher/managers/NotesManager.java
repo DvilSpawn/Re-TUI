@@ -67,7 +67,9 @@ public class NotesManager {
     public static String BROADCAST_COUNT = "broadcastCount";
     public static String CREATION_TIME = "creationTime", TEXT = "text", LOCK = "lock";
 
-    private final String PATH = "notes.xml", NAME = "NOTES", NOTE_NODE = "note";
+    public static final String PATH = "notes.xml";
+    public static final String NAME = "NOTES";
+    public static final String NOTE_NODE = "note";
 
     CharSequence oldNotes;
     public boolean hasChanged;
@@ -189,7 +191,7 @@ public class NotesManager {
         if(loadClasses) classes.clear();
         notes.clear();
 
-        File file = new File(Tuils.getFolder(), PATH);
+        File file = notesFile();
         if(!file.exists()) {
             resetFile(file, NAME);
         }
@@ -249,6 +251,87 @@ public class NotesManager {
         Collections.sort(notes);
 
         invalidateNotes();
+    }
+
+    public static File notesFile() {
+        return new File(Tuils.getFolder(), PATH);
+    }
+
+    public static List<NoteRecord> loadRecords(Context context) {
+        ArrayList<NoteRecord> records = new ArrayList<>();
+        File file = notesFile();
+        if(!file.exists()) {
+            resetFile(file, NAME);
+        }
+
+        Object[] o;
+        try {
+            o = XMLPrefsManager.buildDocument(file, NAME);
+            if(o == null) {
+                Tuils.sendXMLParseError(context, PATH);
+                return records;
+            }
+        } catch (SAXParseException e) {
+            Tuils.sendXMLParseError(context, PATH, e);
+            return records;
+        } catch (Exception e) {
+            Tuils.log(e);
+            return records;
+        }
+
+        Element root = (Element) o[1];
+        NodeList nodes = root.getElementsByTagName(NOTE_NODE);
+        for(int count = 0; count < nodes.getLength(); count++) {
+            Node node = nodes.item(count);
+            if(node.getNodeType() != Node.ELEMENT_NODE) continue;
+
+            Element e = (Element) node;
+            long time = XMLPrefsManager.getLongAttribute(e, CREATION_TIME);
+            String text = XMLPrefsManager.getStringAttribute(e, XMLPrefsManager.VALUE_ATTRIBUTE);
+            boolean lock = XMLPrefsManager.getBooleanAttribute(e, LOCK);
+            records.add(new NoteRecord(time, text, lock));
+        }
+        return records;
+    }
+
+    public static void saveRecords(Context context, List<NoteRecord> records) throws Exception {
+        File file = notesFile();
+        if(!file.exists()) {
+            resetFile(file, NAME);
+        }
+
+        Object[] o = XMLPrefsManager.buildDocument(file, NAME);
+        if(o == null) {
+            throw new IllegalStateException(context.getString(R.string.output_error));
+        }
+
+        org.w3c.dom.Document document = (org.w3c.dom.Document) o[0];
+        Element root = (Element) o[1];
+        NodeList oldNotes = root.getElementsByTagName(NOTE_NODE);
+        ArrayList<Node> nodes = new ArrayList<>();
+        for(int count = 0; count < oldNotes.getLength(); count++) {
+            nodes.add(oldNotes.item(count));
+        }
+        for(Node node : nodes) {
+            node.getParentNode().removeChild(node);
+        }
+
+        long createdAt = System.currentTimeMillis();
+        for(int count = 0; count < records.size(); count++) {
+            NoteRecord record = records.get(count);
+            if(record == null || record.text == null || record.text.trim().length() == 0) {
+                continue;
+            }
+
+            long time = record.creationTime > 0 ? record.creationTime : createdAt + count;
+            Element element = document.createElement(NOTE_NODE);
+            element.setAttribute(CREATION_TIME, String.valueOf(time));
+            element.setAttribute(VALUE_ATTRIBUTE, record.text);
+            element.setAttribute(LOCK, String.valueOf(record.lock));
+            root.appendChild(element);
+        }
+
+        XMLPrefsManager.writeTo(document, file);
     }
 
     Pattern colorPattern = Pattern.compile("(\\d+|#[\\da-zA-Z]{6,8})\\(([^)]*)\\)");
@@ -614,6 +697,18 @@ public class NotesManager {
         @Override
         public String toString() {
             return creationTime + " : " + text;
+        }
+    }
+
+    public static class NoteRecord {
+        public long creationTime;
+        public String text;
+        public boolean lock;
+
+        public NoteRecord(long creationTime, String text, boolean lock) {
+            this.creationTime = creationTime;
+            this.text = text;
+            this.lock = lock;
         }
     }
 }

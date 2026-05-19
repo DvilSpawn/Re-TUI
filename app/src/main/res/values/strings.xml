@@ -435,14 +435,7 @@
         \n-select [song] -> play the selected song
         \n-info -> get info about the current song
         \n-seekto [seconds] -> seek to the selected part of the current song</string>
-    <string name="help_notes">-add [optional: lock {true/false}] [text] -> add a new note
-        \n-rm [row] OR [text] -> remove an existing note
-        \n-cp [row] OR [text] -> copy an existing note to clipboard
-        \n-ls -> list all your notes
-        \n-clear -> remove all notes (except the locked ones)
-        \n-lock [id] OR [text] -> lock an existing note
-        \n-unlock [id] OR [text] -> unlock an existing note
-        \n-tutorial -> open the tutorial page on GitHub</string>
+    <string name="help_notes">Open the notes editor.</string>
     <string name="help_rate">Leave a feedback on the Play Store page</string>
     <string name="help_refresh">Refresh apps, alias, music, contacts</string>
     <string name="help_regex">-add [ID] [regex] -> add a new regex with the given ID

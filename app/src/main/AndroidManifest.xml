@@ -203,6 +203,18 @@
                 android:value=".LauncherActivity" />
         </activity>
 
+        <activity
+            android:name=".commands.tuixt.NotesEditorActivity"
+            android:excludeFromRecents="true"
+            android:label="Re:T-UI Notes"
+            android:theme="@style/Custom.Popup"
+            android:windowSoftInputMode="stateAlwaysVisible|adjustResize"
+            android:exported="false">
+            <meta-data
+                android:name="androidx.core.app.PARENT_ACTIVITY"
+                android:value=".LauncherActivity" />
+        </activity>
+
         <service
             android:name=".managers.notifications.NotificationService"
             android:label="@string/notification_reader"
