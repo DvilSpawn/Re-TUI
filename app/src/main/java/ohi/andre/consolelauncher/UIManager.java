@@ -3536,6 +3536,7 @@ public class UIManager implements OnTouchListener {
         if (musicWidget == null) return;
         ohi.andre.consolelauncher.tuils.TuiWidgetDecorator.decorateWidget(musicWidget, R.id.music_widget_border, R.id.music_widget_label);
         styleModuleClose(musicWidget.findViewById(R.id.music_widget_close));
+        sizeMusicVisualizer(musicWidget);
 
         TextView titleView = musicWidget.findViewById(R.id.music_song_title);
         TextView singerView = musicWidget.findViewById(R.id.music_singer);
@@ -3619,6 +3620,23 @@ public class UIManager implements OnTouchListener {
                 }
             });
         }
+    }
+
+    private void sizeMusicVisualizer(View musicWidget) {
+        MusicVisualizerView visualizer = musicWidget.findViewById(R.id.music_visualizer);
+        View border = musicWidget.findViewById(R.id.music_widget_border);
+        if (visualizer == null || border == null) return;
+
+        border.post(() -> {
+            int height = border.getHeight() - border.getPaddingTop() - border.getPaddingBottom();
+            if (height <= 0) return;
+
+            ViewGroup.LayoutParams params = visualizer.getLayoutParams();
+            if (params != null && params.height != height) {
+                params.height = height;
+                visualizer.setLayoutParams(params);
+            }
+        });
     }
 
     private void styleHackOverlay(View rootView) {

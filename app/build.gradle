@@ -34,7 +34,7 @@ android {
         applicationId = "com.dvil.tui_renewed"
         minSdk = 23
         targetSdk = 36
-        versionCode = 338
+        versionCode = 339
         versionName = "v6.16.7-STABLE"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
