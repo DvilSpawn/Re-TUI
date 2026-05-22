@@ -67,6 +67,10 @@ public class TermuxBridgeManager {
     }
 
     public static boolean requestRunCommandPermissionIfPossible(Context context) {
+        return requestRunCommandPermissionIfPossible(context, 8127);
+    }
+
+    public static boolean requestRunCommandPermissionIfPossible(Context context, int requestCode) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || !(context instanceof Activity)) {
             return false;
         }
@@ -76,7 +80,7 @@ public class TermuxBridgeManager {
             return false;
         }
 
-        ActivityCompat.requestPermissions((Activity) context, new String[] {TERMUX_RUN_COMMAND_PERMISSION}, 8127);
+        ActivityCompat.requestPermissions((Activity) context, new String[] {TERMUX_RUN_COMMAND_PERMISSION}, requestCode);
         return true;
     }
 
@@ -89,32 +93,45 @@ public class TermuxBridgeManager {
     }
 
     public static boolean dispatchShell(Context context, String label, String script, String workDir, String... args) {
-        Intent intent = new Intent(TERMUX_RUN_COMMAND_ACTION);
-        intent.setClassName(TERMUX_PACKAGE, TERMUX_RUN_COMMAND_SERVICE);
-        intent.putExtra(TERMUX_RUN_COMMAND_PATH, TERMUX_SH);
-        intent.putExtra(TERMUX_RUN_COMMAND_WORKDIR, workDir == null ? TERMUX_HOME : workDir);
-        intent.putExtra(TERMUX_RUN_COMMAND_BACKGROUND, true);
-        intent.putExtra(TERMUX_RUN_COMMAND_PENDING_INTENT, createResultPendingIntent(context, label));
-
         String[] commandArgs = new String[args.length + 3];
         commandArgs[0] = "-c";
         commandArgs[1] = script;
         // sh -c uses the first extra argument as $0. Keep caller args starting at $1.
         commandArgs[2] = "retui";
         System.arraycopy(args, 0, commandArgs, 3, args.length);
-        intent.putExtra(TERMUX_RUN_COMMAND_ARGUMENTS, commandArgs);
+
+        startRunCommand(context,
+                TERMUX_SH,
+                workDir == null ? TERMUX_HOME : workDir,
+                createResultPendingIntent(context, RESULT_PREFIX + label, null),
+                commandArgs);
+        return true;
+    }
+
+    public static void startRunCommand(Context context, String path, String workDir, PendingIntent resultPendingIntent, String[] args) {
+        Intent intent = new Intent(TERMUX_RUN_COMMAND_ACTION);
+        intent.setClassName(TERMUX_PACKAGE, TERMUX_RUN_COMMAND_SERVICE);
+        intent.putExtra(TERMUX_RUN_COMMAND_PATH, path);
+        intent.putExtra(TERMUX_RUN_COMMAND_WORKDIR, workDir == null ? TERMUX_HOME : workDir);
+        intent.putExtra(TERMUX_RUN_COMMAND_BACKGROUND, true);
+        intent.putExtra(TERMUX_RUN_COMMAND_PENDING_INTENT, resultPendingIntent);
+        if (args != null && args.length > 0) {
+            intent.putExtra(TERMUX_RUN_COMMAND_ARGUMENTS, args);
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             ContextCompat.startForegroundService(context, intent);
         } else {
             context.startService(intent);
         }
-        return true;
     }
 
-    private static PendingIntent createResultPendingIntent(Context context, String label) {
+    public static PendingIntent createResultPendingIntent(Context context, String path, String module) {
         Intent resultIntent = new Intent(context, TermuxResultService.class);
-        resultIntent.putExtra(UIManager.EXTRA_TERMUX_RESULT_PATH, RESULT_PREFIX + label);
+        resultIntent.putExtra(UIManager.EXTRA_TERMUX_RESULT_PATH, path);
+        if (module != null && module.length() > 0) {
+            resultIntent.putExtra(UIManager.EXTRA_TERMUX_RESULT_MODULE, module);
+        }
 
         int flags = PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_UPDATE_CURRENT;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {

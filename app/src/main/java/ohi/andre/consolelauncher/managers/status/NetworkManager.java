@@ -15,7 +15,7 @@ import ohi.andre.consolelauncher.UIManager;
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager;
 import ohi.andre.consolelauncher.managers.xml.options.Behavior;
 import ohi.andre.consolelauncher.managers.xml.options.Theme;
-import ohi.andre.consolelauncher.tuils.NetworkUtils;
+import ohi.andre.consolelauncher.tuils.NetUtils;
 import ohi.andre.consolelauncher.tuils.Tuils;
 
 public class NetworkManager extends StatusManager {
@@ -158,8 +158,8 @@ public class NetworkManager extends StatusManager {
         copy = b2.matcher(copy).replaceAll(bluetoothOn ? ON : OFF);
         copy = b3.matcher(copy).replaceAll(bluetoothOn ? _true : _false);
         copy = b4.matcher(copy).replaceAll(bluetoothOn ? TRUE : FALSE);
-        copy = ip4.matcher(copy).replaceAll(NetworkUtils.getIPAddress(true));
-        copy = ip6.matcher(copy).replaceAll(NetworkUtils.getIPAddress(false));
+        copy = ip4.matcher(copy).replaceAll(NetUtils.getIPAddress(true));
+        copy = ip6.matcher(copy).replaceAll(NetUtils.getIPAddress(false));
         copy = dt.matcher(copy).replaceAll(mobileType);
         copy = Tuils.patternNewline.matcher(copy).replaceAll(Tuils.NEWLINE);
 

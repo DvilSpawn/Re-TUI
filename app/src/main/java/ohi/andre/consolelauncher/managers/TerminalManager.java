@@ -344,9 +344,6 @@ public class TerminalManager {
 
         executer.execute(cmd, obj);
 
-//        because it will clear suggestions without refilling them, because "aftertextchanged" wont be called
-//        if(cmd.length() > 0) LocalBroadcastManager.getInstance(mContext.getApplicationContext()).sendBroadcast(new Intent(UIManager.ACTION_CLEAR_SUGGESTIONS));
-
         setupNewInput();
 
         return true;

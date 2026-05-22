@@ -34,7 +34,6 @@ import it.andreuzzi.comparestring2.CompareStrings;
 import it.andreuzzi.comparestring2.StringableObject;
 import it.andreuzzi.comparestring2.algs.interfaces.Algorithm;
 import ohi.andre.consolelauncher.R;
-import ohi.andre.consolelauncher.UIManager;
 import ohi.andre.consolelauncher.commands.Command;
 import ohi.andre.consolelauncher.commands.CommandAbstraction;
 import ohi.andre.consolelauncher.commands.CommandTuils;
@@ -159,7 +158,7 @@ public class SuggestionsManager {
 
         minCmdPriority = XMLPrefsManager.getInt(Suggestions.noinput_min_command_priority);
 
-        spaces = UIManager.getListOfIntValues(XMLPrefsManager.get(Suggestions.suggestions_spaces), 4, 0);
+        spaces = XMLPrefsManager.getListOfIntValues(XMLPrefsManager.get(Suggestions.suggestions_spaces), 4, 0);
 
         try {
             hideViewValue = HideSuggestionViewValues.valueOf(XMLPrefsManager.get(Suggestions.hide_suggestions_when_empty).toUpperCase());

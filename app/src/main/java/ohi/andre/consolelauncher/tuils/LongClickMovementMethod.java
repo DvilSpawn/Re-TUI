@@ -7,15 +7,7 @@ import android.text.method.MovementMethod;
 import android.view.MotionEvent;
 import android.widget.TextView;
 
-/**
- * Created by francescoandreuzzi on 17/11/2017.
- */
-
 public class LongClickMovementMethod extends LinkMovementMethod {
-
-//    private Long lastClickTime = 0l;
-//    private int lastX = 0;
-//    private int lastY = 0;
 
     private int longClickDuration, lastLine = -1;
 
@@ -34,15 +26,10 @@ public class LongClickMovementMethod extends LinkMovementMethod {
     @Override
     public boolean onTouchEvent(final TextView widget, Spannable buffer, MotionEvent event) {
         int action = event.getAction();
-//        Tuils.log("action", action);
 
         if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_MOVE || action == MotionEvent.ACTION_CANCEL) {
             int x = (int) event.getX();
             int y = (int) event.getY();
-//            lastX = x;
-//            lastY = y;
-//            int deltaX = Math.abs(x-lastX);
-//            int deltaY = Math.abs(y-lastY);
 
             x -= widget.getTotalPaddingLeft();
             y -= widget.getTotalPaddingTop();
@@ -62,23 +49,9 @@ public class LongClickMovementMethod extends LinkMovementMethod {
                 return super.onTouchEvent(widget, buffer, event);
             }
 
-//            Tuils.log("lastline", lastLine);
-//            Tuils.log("line", line);
             if (action == MotionEvent.ACTION_UP) {
-//                Tuils.log("action up");
-
-//                    if (System.currentTimeMillis() - lastClickTime < longClickDuration) {
-//                        link[0].onClick(widget);
-//                    }
-//                    else if (deltaX < 10 && deltaY < 10) {
-//                        link[0].onLongClick(widget);
-//                    }
-
                 if(runnable != null) {
-//                        long click, do nothing
-                    if(runnable.wasActivated) {}
-//                        single click
-                    else {
+                    if(!runnable.wasActivated) {
                         widget.removeCallbacks(runnable);
                         if(link.length > 0) link[0].onClick(widget);
                     }
@@ -87,14 +60,6 @@ public class LongClickMovementMethod extends LinkMovementMethod {
                 }
 
             } else if (action == MotionEvent.ACTION_DOWN) {
-
-//                Tuils.log("action down");
-
-//                    Selection.setSelection(buffer,
-//                            buffer.getSpanStart(link[0]),
-//                            buffer.getSpanEnd(link[0]));
-
-//                    lastClickTime = System.currentTimeMillis();
 
                 if(link.length > 0) {
                     final LongClickableSpan span = link[0];
@@ -110,19 +75,13 @@ public class LongClickMovementMethod extends LinkMovementMethod {
                 }
 
             } else {
-//                Tuils.log("action move or cancel");
-
-//                action_move
                 if(line != lastLine && runnable != null) {
-//                    Tuils.log("line != last line");
                     widget.removeCallbacks(runnable);
                     runnable = null;
                 }
             }
 
             lastLine = line;
-//            Tuils.log("updated kast line", lastLine);
-//            Tuils.log("#####");
 
             return true;
         }

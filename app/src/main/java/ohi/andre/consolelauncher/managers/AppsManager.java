@@ -534,9 +534,6 @@ public class AppsManager implements XMLPrefsElement {
 
         for(LaunchInfo i : infos) appsHolder.remove(i);
 
-//        for(Group g : groups) {
-//            removeAppFromGroup(g.getName(), packageName);
-//        }
     }
 
     public LaunchInfo findLaunchInfoWithLabel(String label, int type) {
@@ -761,49 +758,6 @@ public class AppsManager implements XMLPrefsElement {
 
         return null;
     }
-
-//    public String removeAppFromGroup(String group, String app) {
-//        Object[] o;
-//        try {
-//            o = XMLPrefsManager.buildDocument(file, NAME);
-//        } catch (Exception e) {
-//            return e.toString();
-//        }
-//
-//        Document d = (Document) o[0];
-//        Element root = (Element) o[1];
-//
-//        Node node = XMLPrefsManager.findNode(root, group);
-//        if(node == null) return context.getString(R.string.output_groupnotfound);
-//
-//        Element e = (Element) node;
-//
-//        String apps = e.getAttribute(APPS_ATTRIBUTE);
-//        if(apps == null) return null;
-//
-//        if(!apps.contains(app)) return null;
-//
-//        String temp = Pattern.compile(app.replaceAll(".", "\\.") + "(" + LaunchInfo.COMPONENT_SEPARATOR + "[^\\" + APPS_SEPARATOR + "]+)?").matcher(apps).replaceAll(Tuils.EMPTYSTRING);
-//        if(temp.length() < apps.length()) {
-//            apps = temp;
-//
-//            apps = apps.replaceAll(APPS_SEPARATOR + APPS_SEPARATOR, APPS_SEPARATOR);
-//            if(apps.startsWith(APPS_SEPARATOR)) apps = apps.substring(1);
-//            if(apps.endsWith(APPS_SEPARATOR)) apps = apps.substring(0, apps.length() - 1);
-//
-//            e.setAttribute(APPS_ATTRIBUTE, apps);
-//
-//            XMLPrefsManager.writeTo(d, file);
-//
-//            int index = Tuils.find(group, groups);
-//            if(index != -1) {
-//                Group g = groups.get(index);
-//                g.remove(app);
-//            }
-//        }
-//
-//        return null;
-//    }
 
     public String listGroup(String group) {
         Object[] o;
@@ -1387,24 +1341,6 @@ public class AppsManager implements XMLPrefsElement {
                 }
                 return list;
             }
-
-//            public List<String> labels() {
-//                List<LaunchInfo> list = new ArrayList<>();
-//
-//                List<SuggestedApp> cp = new ArrayList<>(suggested);
-//                Collections.sort(cp, new Comparator<SuggestedApp>() {
-//                    @Override
-//                    public int compare(SuggestedApp o1, SuggestedApp o2) {
-//                        return o1.index - o2.index;
-//                    }
-//                });
-//
-//                for(int count = 0; count < cp.size(); count++) {
-//                    SuggestedApp app = cp.get(count);
-//                    if(app.type != NULL && app.app != null) list.add(app.app);
-//                }
-//                return AppUtils.labelList(list, false);
-//            }
 
             private class SuggestedApp implements Comparable {
                 int type;

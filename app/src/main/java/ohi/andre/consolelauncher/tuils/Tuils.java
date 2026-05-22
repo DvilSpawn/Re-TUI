@@ -117,6 +117,8 @@ import ohi.andre.consolelauncher.tuils.stuff.FakeLauncherActivity;
 
 public class Tuils {
 
+    private static final String TAG = "TUI";
+
     public static final String SPACE = " ";
     public static final String DOUBLE_SPACE = "  ";
     public static final String NEWLINE = "\n";
@@ -314,7 +316,14 @@ public class Tuils {
     }
 
     public static String readerToString(Reader initialReader) throws IOException {
-        return IOUtils.readerToString(initialReader);
+        char[] arr = new char[8 * 1024];
+        StringBuilder buffer = new StringBuilder();
+        int numCharsRead;
+        while ((numCharsRead = initialReader.read(arr, 0, arr.length)) != -1) {
+            buffer.append(arr, 0, numCharsRead);
+        }
+        initialReader.close();
+        return buffer.toString();
     }
 
     private static OnBatteryUpdate batteryUpdate;
@@ -400,19 +409,47 @@ public class Tuils {
     }
 
     public static String convertStreamToString(java.io.InputStream is) {
-        return IOUtils.convertStreamToString(is);
+        if (is == null) return Tuils.EMPTYSTRING;
+
+        java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
+        return s.hasNext() ? s.next() : Tuils.EMPTYSTRING;
     }
 
     public static void copy(File from, File to) throws Exception {
-        IOUtils.copy(from, to);
+        download(new FileInputStream(from), to);
     }
 
     public static long download(InputStream in, File file) throws Exception {
-        return IOUtils.download(in, file);
+        OutputStream out = new FileOutputStream(file, false);
+
+        byte data[] = new byte[1024];
+
+        long bytes = 0;
+
+        int count;
+        while ((count = in.read(data)) != -1) {
+            out.write(data, 0, count);
+            bytes += count;
+        }
+
+        out.flush();
+        out.close();
+        in.close();
+
+        return bytes;
     }
 
     public static void write(File file, String separator, String... ss) throws Exception {
-        IOUtils.write(file, separator, ss);
+        FileOutputStream headerStream = new FileOutputStream(file, false);
+
+        for(int c = 0; c < ss.length - 1; c++) {
+            headerStream.write(ss[c].getBytes());
+            headerStream.write(separator.getBytes());
+        }
+        headerStream.write(ss[ss.length - 1].getBytes());
+
+        headerStream.flush();
+        headerStream.close();
     }
 
     public static float dpToPx(Context context, float valueInDp) {
@@ -510,7 +547,7 @@ public class Tuils {
     }
 
     public static double percentage(double part, double total) {
-        return MathUtils.percentage(part, total);
+        return round(part * 100 / total, 2);
     }
 
     public static double formatSize(long bytes, int unit) {
@@ -592,7 +629,8 @@ public class Tuils {
     }
 
     public static String inputStreamToString(InputStream is) {
-        return IOUtils.inputStreamToString(is);
+        java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
+        return s.hasNext() ? s.next() : Tuils.EMPTYSTRING;
     }
 
 //    static final int WEATHER_TIMEOUT = 6000;
@@ -706,11 +744,27 @@ public class Tuils {
     }
 
     public static void deleteContentOnly(File dir) {
-        IOUtils.deleteContentOnly(dir);
+        File[] files = dir.listFiles();
+        if(files == null) return;
+
+        for(File f : files) {
+            if(f.isDirectory()) delete(f);
+            f.delete();
+        }
     }
 
     public static void delete(File dir) {
-        IOUtils.delete(dir);
+        File[] files = dir.listFiles();
+        if(files == null) {
+            dir.delete();
+            return;
+        }
+
+        for(File f : files) {
+            if(f.isDirectory()) delete(f);
+            f.delete();
+        }
+        dir.delete();
     }
 
     public static boolean insertOld(File oldFile) {
@@ -936,7 +990,15 @@ public class Tuils {
     }
 
     public static double round(double value, int places) {
-        return MathUtils.round(value, places);
+        if (places < 0) places = 0;
+
+        try {
+            BigDecimal bd = new BigDecimal(value);
+            bd = bd.setScale(places, RoundingMode.HALF_UP);
+            return bd.doubleValue();
+        } catch (Exception e) {
+            return value;
+        }
     }
 
     public static List<String> getClassesInPackage(String packageName, Context c) throws IOException {
@@ -954,7 +1016,7 @@ public class Tuils {
     }
 
     public static int scale(int[] from, int[] to, int n) {
-        return MathUtils.scale(from, to, n);
+        return (to[1] - to[0]) * (n - from[0]) / (from[1] - from[0]) + to[0];
     }
 
     public static String[] toString(Enum[] enums) {
@@ -1121,11 +1183,11 @@ public class Tuils {
     }
 
     public static void log(Object o) {
-        LogUtils.log(o);
+        Log.e(TAG, String.valueOf(o));
     }
 
     public static void log(Object o, Object o2) {
-        LogUtils.log(o, o2);
+        Log.e(TAG, String.valueOf(o) + " -- " + String.valueOf(o2));
     }
 
     public static void log(Object o, PrintStream to) {
@@ -1139,13 +1201,21 @@ public class Tuils {
             try {
                 to.write(text.getBytes());
             } catch (IOException e) {
-                LogUtils.log(e);
+                Log.e(TAG, e.getMessage(), e);
             }
         }
     }
 
     public static void log(Object o, Object o2, OutputStream to) {
-        LogUtils.log(o, o2, to);
+        try {
+            if (o instanceof Object[] && o2 instanceof Object[]) {
+                to.write((Arrays.toString((Object[]) o) + " -- " + Arrays.toString((Object[]) o2)).getBytes());
+            } else {
+                to.write((String.valueOf(o) + " -- " + String.valueOf(o2)).getBytes());
+            }
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage(), e);
+        }
     }
 
     public static boolean hasInternetAccess() {
@@ -1157,11 +1227,33 @@ public class Tuils {
     }
 
     public static void toFile(String s) {
-        LogUtils.toFile(s);
+        if (s == null) return;
+        try {
+            File f = new File(Tuils.getFolder(), "crash.txt");
+            PrintWriter pw = new PrintWriter(new FileOutputStream(f, true));
+            pw.println(new Date().toString());
+            pw.println(s);
+            pw.println();
+            pw.flush();
+            pw.close();
+        } catch (Exception e1) {}
     }
 
     public static void toFile(Object o) {
-        LogUtils.toFile(o);
+        if (o == null) return;
+        try {
+            File f = new File(Tuils.getFolder(), "crash.txt");
+            PrintWriter pw = new PrintWriter(new FileOutputStream(f, true));
+            pw.println(new Date().toString());
+            if (o instanceof Throwable) {
+                ((Throwable) o).printStackTrace(pw);
+            } else {
+                pw.println(o.toString());
+            }
+            pw.println();
+            pw.flush();
+            pw.close();
+        } catch (Exception e) {}
     }
 
     public static String toPlanString(List<String> strings, String separator) {
@@ -1349,7 +1441,77 @@ public class Tuils {
     }
 
     public static double eval(final String str) {
-        return MathUtils.eval(str);
+        return new Object() {
+            int pos = -1, ch;
+
+            void nextChar() {
+                ch = (++pos < str.length()) ? str.charAt(pos) : -1;
+            }
+
+            boolean eat(int charToEat) {
+                while (ch == ' ') nextChar();
+                if (ch == charToEat) {
+                    nextChar();
+                    return true;
+                }
+                return false;
+            }
+
+            double parse() {
+                nextChar();
+                double x = parseExpression();
+                if (pos < str.length()) throw new RuntimeException("Unexpected: " + (char) ch);
+                return x;
+            }
+
+            double parseExpression() {
+                double x = parseTerm();
+                for (; ; ) {
+                    if (eat('+')) x += parseTerm();
+                    else if (eat('-')) x -= parseTerm();
+                    else return x;
+                }
+            }
+
+            double parseTerm() {
+                double x = parseFactor();
+                for (; ; ) {
+                    if (eat('*')) x *= parseFactor();
+                    else if (eat('/')) x /= parseFactor();
+                    else return x;
+                }
+            }
+
+            double parseFactor() {
+                if (eat('+')) return parseFactor();
+                if (eat('-')) return -parseFactor();
+
+                double x;
+                int startPos = this.pos;
+                if (eat('(')) {
+                    x = parseExpression();
+                    eat(')');
+                } else if ((ch >= '0' && ch <= '9') || ch == '.') {
+                    while ((ch >= '0' && ch <= '9') || ch == '.') nextChar();
+                    x = Double.parseDouble(str.substring(startPos, this.pos));
+                } else if (ch >= 'a' && ch <= 'z') {
+                    while (ch >= 'a' && ch <= 'z') nextChar();
+                    String func = str.substring(startPos, this.pos);
+                    x = parseFactor();
+                    if (func.equals("sqrt")) x = Math.sqrt(x);
+                    else if (func.equals("sin")) x = Math.sin(Math.toRadians(x));
+                    else if (func.equals("cos")) x = Math.cos(Math.toRadians(x));
+                    else if (func.equals("tan")) x = Math.tan(Math.toRadians(x));
+                    else throw new RuntimeException("Unknown function: " + func);
+                } else {
+                    throw new RuntimeException("Unexpected: " + (char) ch);
+                }
+
+                if (eat('^')) x = Math.pow(x, parseFactor());
+
+                return x;
+            }
+        }.parse();
     }
 
     public static String getTextFromClipboard(Context context) {
@@ -1373,6 +1535,8 @@ public class Tuils {
     }
 
     private static final int FILEUPDATE_DELAY = 100;
+    private static final String FORK_FOLDER_NAME = "Re-T-UI";
+    private static File folder = null;
 
     public static void init(Context context) {
         Log.e("TUI-INIT", "Starting Tuils.init()");
@@ -1387,11 +1551,11 @@ public class Tuils {
                 // Play Store flavor does not request shared-storage permissions.
                 // Keep the folder name Linux/path friendly, but store it in app-owned
                 // external storage so normal File APIs can read/write reliably.
-                newFolder = new File(appExternalRoot, FileUtils.getForkFolderName());
+                newFolder = new File(appExternalRoot, FORK_FOLDER_NAME);
                 Log.e("TUI-INIT", "Play Store app-owned folder: " + newFolder.getAbsolutePath());
             } else {
                 // F-Droid/debug channel can own the shared user-facing root.
-                newFolder = new File(sharedRoot, FileUtils.getForkFolderName());
+                newFolder = new File(sharedRoot, FORK_FOLDER_NAME);
             }
             
             Log.e("TUI-INIT", "Target folder: " + newFolder.getAbsolutePath());
@@ -1406,7 +1570,7 @@ public class Tuils {
                     if (appExternalRoot == null) {
                         appExternalRoot = context.getFilesDir();
                     }
-                    newFolder = new File(appExternalRoot, FileUtils.getForkFolderName());
+                    newFolder = new File(appExternalRoot, FORK_FOLDER_NAME);
                     newFolder.mkdirs();
                     Log.e("TUI-INIT", "Fallback to private storage: " + newFolder.getAbsolutePath());
                 }
@@ -1426,7 +1590,7 @@ public class Tuils {
             }
 
             if (newFolder.exists()) {
-                FileUtils.setInternalFolder(newFolder);
+                folder = newFolder;
                 String[] subfolders = {"fonts", "rss", "old"};
                 for (String sub : subfolders) {
                     File f = new File(newFolder, sub);
@@ -1485,7 +1649,7 @@ public class Tuils {
     }
 
     public static File getFolder() {
-        return FileUtils.getInternalFolder();
+        return folder;
     }
 
     public static int alphabeticCompare(String s1, String s2) {

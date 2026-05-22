@@ -664,10 +664,13 @@ public class NotificationService extends NotificationListenerService {
                                 st = s.toString();
                             }
 
-                            try {
-                                s = TimeManager.instance.replace(s);
-                            } catch (Exception e) {
-                                Tuils.log(e);
+                            TimeManager timeManager = TimeManager.instance;
+                            if (timeManager != null) {
+                                try {
+                                    s = timeManager.replace(s);
+                                } catch (Exception e) {
+                                    Tuils.log(e);
+                                }
                             }
 
 //                        Tuils.log("text", text);

@@ -13,8 +13,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -29,7 +27,6 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import androidx.core.content.ContextCompat;
-import androidx.core.app.ActivityCompat;
 import androidx.core.graphics.ColorUtils;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.core.widget.TextViewCompat;
@@ -138,7 +135,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import ohi.andre.consolelauncher.managers.xml.options.Ui;
 import ohi.andre.consolelauncher.tuils.AllowEqualsSequence;
 import ohi.andre.consolelauncher.tuils.MusicVisualizerView;
-import ohi.andre.consolelauncher.tuils.NetworkUtils;
 import ohi.andre.consolelauncher.tuils.OutlineEditText;
 import ohi.andre.consolelauncher.tuils.OutlineTextView;
 import ohi.andre.consolelauncher.tuils.StableHorizontalScrollView;
@@ -200,14 +196,6 @@ public class UIManager implements OnTouchListener {
     public static final String EXTRA_MODULE_NAME = "module_name";
     public static final String EXTRA_WIDGET_ACTION_INDEX = "widget_action_index";
     public static final String EXTRA_WIDGET_ACTION_VALUE = "widget_action_value";
-    private static final String TERMUX_PACKAGE = "com.termux";
-    private static final String TERMUX_RUN_COMMAND_PERMISSION = "com.termux.permission.RUN_COMMAND";
-    private static final String TERMUX_RUN_COMMAND_ACTION = "com.termux.RUN_COMMAND";
-    private static final String TERMUX_RUN_COMMAND_SERVICE = "com.termux.app.RunCommandService";
-    private static final String TERMUX_RUN_COMMAND_PATH = "com.termux.RUN_COMMAND_PATH";
-    private static final String TERMUX_RUN_COMMAND_ARGUMENTS = "com.termux.RUN_COMMAND_ARGUMENTS";
-    private static final String TERMUX_RUN_COMMAND_BACKGROUND = "com.termux.RUN_COMMAND_BACKGROUND";
-    private static final String TERMUX_RUN_COMMAND_PENDING_INTENT = "com.termux.RUN_COMMAND_PENDING_INTENT";
     private static final int[] TERMUX_FOCUS_CAPTURE_DELAYS_MS = new int[] {0, 80, 180, 360};
     private static final String TERMUX_CONSOLE_RESULT_PREFIX = "retui-console:";
     private static final String TERMUX_CONSOLE_SHELL_RESULT_PREFIX = TERMUX_CONSOLE_RESULT_PREFIX + "shell:";
@@ -401,7 +389,6 @@ public class UIManager implements OnTouchListener {
     private int notesMaxLines;
     private ohi.andre.consolelauncher.managers.status.NotesManager tuiNotesManager;
     private NotesManager notesManager;
-//    private NotesRunnable notesRunnable;
 
     private String activeMusicSource = "internal";
 
@@ -1402,7 +1389,7 @@ public class UIManager implements OnTouchListener {
     }
 
     private int[] getDisplayMargins(Ui save) {
-        return getListOfIntValues(XMLPrefsManager.get(save), 4, 0);
+        return XMLPrefsManager.getListOfIntValues(XMLPrefsManager.get(save), 4, 0);
     }
 
     private void applySectionDisplayMargins(View view, int[] marginMm, DisplayMetrics metrics, int extraBottomPx) {
@@ -2253,31 +2240,13 @@ public class UIManager implements OnTouchListener {
         if (TextUtils.isEmpty(widgetId) || !LuaWidgetManager.exists(widgetId)) {
             return;
         }
-        if (!LuaWidgetManager.isEnabled(widgetId)) {
-            handler.removeCallbacks(luaWidgetTickRunnable);
-            ModuleManager.setScriptText(mContext, id, LuaWidgetManager.disabledPayload(widgetId));
-            if (id.equals(activeModule)) {
-                repaintActiveTextModule(id);
-                updateModuleDockSelection();
-            }
-            return;
-        }
-        if (!LuaWidgetManager.isTrusted(widgetId)) {
-            handler.removeCallbacks(luaWidgetTickRunnable);
-            ModuleManager.setScriptText(mContext, id, LuaWidgetManager.consentPayload(widgetId));
-            if (id.equals(activeModule)) {
-                repaintActiveTextModule(id);
-                updateModuleDockSelection();
-            }
+        if (applyLuaWidgetUnavailablePayload(id, widgetId, true, id.equals(activeModule), id.equals(activeModule))) {
             return;
         }
 
         LuaWidgetEngine.RenderResult result = getLuaWidgetEngine(widgetId).tick();
-        ModuleManager.setScriptText(mContext, id, LuaWidgetManager.modulePayload(widgetId, result));
-        if (id.equals(activeModule)) {
-            repaintActiveTextModule(id);
-            scheduleLuaWidgetTickIfNeeded(id, result);
-        }
+        boolean active = id.equals(activeModule);
+        applyLuaWidgetResult(id, widgetId, result, active, active, false);
     }
 
     private void updateMusicModuleText(View musicWidget) {
@@ -2514,17 +2483,10 @@ public class UIManager implements OnTouchListener {
         if (TextUtils.isEmpty(widgetId) || !LuaWidgetManager.exists(widgetId)) {
             ModuleManager.setScriptText(mContext, id, "::title " + ModuleManager.displayName(id)
                     + "\n::body Lua widget source not found: " + widgetId);
-        } else if (!LuaWidgetManager.isEnabled(widgetId)) {
-            handler.removeCallbacks(luaWidgetTickRunnable);
-            ModuleManager.setScriptText(mContext, id, LuaWidgetManager.disabledPayload(widgetId));
-        } else if (!LuaWidgetManager.isTrusted(widgetId)) {
-            handler.removeCallbacks(luaWidgetTickRunnable);
-            ModuleManager.setScriptText(mContext, id, LuaWidgetManager.consentPayload(widgetId));
-        } else {
+        } else if (!applyLuaWidgetUnavailablePayload(id, widgetId, true, false, false)) {
             LuaWidgetEngine engine = getLuaWidgetEngine(widgetId);
             LuaWidgetEngine.RenderResult result = engine.render(announce);
-            ModuleManager.setScriptText(mContext, id, LuaWidgetManager.modulePayload(widgetId, result));
-            scheduleLuaWidgetTickIfNeeded(id, result);
+            applyLuaWidgetResult(id, widgetId, result, true, false, false);
         }
 
         if (repaint && id.equals(activeModule)) {
@@ -2537,155 +2499,29 @@ public class UIManager implements OnTouchListener {
     }
 
     private void clickLuaWidget(String module, int index) {
-        String id = ModuleManager.normalize(module);
-        if (TextUtils.isEmpty(id) || index <= 0) {
+        if (index <= 0) {
             return;
         }
-        String source = ModuleManager.getModuleSource(mContext, id);
-        String widgetId = ModuleManager.luaWidgetId(source);
-        if (TextUtils.isEmpty(widgetId) || !LuaWidgetManager.exists(widgetId)) {
-            Tuils.sendOutput(mContext, "Lua widget source not found: " + id);
-            return;
-        }
-        if (!LuaWidgetManager.isEnabled(widgetId)) {
-            ModuleManager.setScriptText(mContext, id, LuaWidgetManager.disabledPayload(widgetId));
-            if (id.equals(activeModule)) {
-                repaintActiveTextModule(id);
-            }
-            updateModuleDockSelection();
-            return;
-        }
-        if (!LuaWidgetManager.isTrusted(widgetId)) {
-            ModuleManager.setScriptText(mContext, id, LuaWidgetManager.consentPayload(widgetId));
-            if (id.equals(activeModule)) {
-                repaintActiveTextModule(id);
-            }
-            updateModuleDockSelection();
-            return;
-        }
-
-        LuaWidgetEngine engine = getLuaWidgetEngine(widgetId);
-        LuaWidgetEngine.RenderResult result = engine.click(index);
-        ModuleManager.setScriptText(mContext, id, LuaWidgetManager.modulePayload(widgetId, result));
-        scheduleLuaWidgetTickIfNeeded(id, result);
-        if (id.equals(activeModule)) {
-            repaintActiveTextModule(id);
-        }
-        updateModuleDockSelection();
+        runLuaWidgetOperation(module, engine -> engine.click(index));
     }
 
     private void actionLuaWidget(String module, String value) {
-        String id = ModuleManager.normalize(module);
-        if (TextUtils.isEmpty(id)) {
-            return;
-        }
-        String source = ModuleManager.getModuleSource(mContext, id);
-        String widgetId = ModuleManager.luaWidgetId(source);
-        if (TextUtils.isEmpty(widgetId) || !LuaWidgetManager.exists(widgetId)) {
-            Tuils.sendOutput(mContext, "Lua widget source not found: " + id);
-            return;
-        }
-        if (!LuaWidgetManager.isEnabled(widgetId)) {
-            ModuleManager.setScriptText(mContext, id, LuaWidgetManager.disabledPayload(widgetId));
-            if (id.equals(activeModule)) {
-                repaintActiveTextModule(id);
-            }
-            updateModuleDockSelection();
-            return;
-        }
-        if (!LuaWidgetManager.isTrusted(widgetId)) {
-            ModuleManager.setScriptText(mContext, id, LuaWidgetManager.consentPayload(widgetId));
-            if (id.equals(activeModule)) {
-                repaintActiveTextModule(id);
-            }
-            updateModuleDockSelection();
-            return;
-        }
-
-        LuaWidgetEngine.RenderResult result = getLuaWidgetEngine(widgetId).action(value);
-        ModuleManager.setScriptText(mContext, id, LuaWidgetManager.modulePayload(widgetId, result));
-        scheduleLuaWidgetTickIfNeeded(id, result);
-        if (id.equals(activeModule)) {
-            repaintActiveTextModule(id);
-        }
-        updateModuleDockSelection();
+        runLuaWidgetOperation(module, engine -> engine.action(value));
     }
 
     private void dialogLuaWidget(String module, int index) {
-        String id = ModuleManager.normalize(module);
-        if (TextUtils.isEmpty(id)) {
-            return;
-        }
-        String source = ModuleManager.getModuleSource(mContext, id);
-        String widgetId = ModuleManager.luaWidgetId(source);
-        if (TextUtils.isEmpty(widgetId) || !LuaWidgetManager.exists(widgetId)) {
-            Tuils.sendOutput(mContext, "Lua widget source not found: " + id);
-            return;
-        }
-        if (!LuaWidgetManager.isEnabled(widgetId)) {
-            ModuleManager.setScriptText(mContext, id, LuaWidgetManager.disabledPayload(widgetId));
-            if (id.equals(activeModule)) {
-                repaintActiveTextModule(id);
-            }
-            updateModuleDockSelection();
-            return;
-        }
-        if (!LuaWidgetManager.isTrusted(widgetId)) {
-            ModuleManager.setScriptText(mContext, id, LuaWidgetManager.consentPayload(widgetId));
-            if (id.equals(activeModule)) {
-                repaintActiveTextModule(id);
-            }
-            updateModuleDockSelection();
-            return;
-        }
-
-        LuaWidgetEngine.RenderResult result = getLuaWidgetEngine(widgetId).dialog(index);
-        ModuleManager.setScriptText(mContext, id, LuaWidgetManager.modulePayload(widgetId, result));
-        scheduleLuaWidgetTickIfNeeded(id, result);
-        if (id.equals(activeModule)) {
-            repaintActiveTextModule(id);
-        }
-        updateModuleDockSelection();
+        runLuaWidgetOperation(module, engine -> engine.dialog(index));
     }
 
     private void setLuaWidgetExpanded(String module, boolean expanded) {
-        String id = ModuleManager.normalize(module);
-        if (TextUtils.isEmpty(id)) {
-            return;
-        }
-        String source = ModuleManager.getModuleSource(mContext, id);
-        String widgetId = ModuleManager.luaWidgetId(source);
-        if (TextUtils.isEmpty(widgetId) || !LuaWidgetManager.exists(widgetId)) {
-            Tuils.sendOutput(mContext, "Lua widget source not found: " + id);
-            return;
-        }
-        if (!LuaWidgetManager.isEnabled(widgetId)) {
-            ModuleManager.setScriptText(mContext, id, LuaWidgetManager.disabledPayload(widgetId));
-            if (id.equals(activeModule)) {
-                repaintActiveTextModule(id);
-            }
-            updateModuleDockSelection();
-            return;
-        }
-        if (!LuaWidgetManager.isTrusted(widgetId)) {
-            ModuleManager.setScriptText(mContext, id, LuaWidgetManager.consentPayload(widgetId));
-            if (id.equals(activeModule)) {
-                repaintActiveTextModule(id);
-            }
-            updateModuleDockSelection();
-            return;
-        }
-
-        LuaWidgetEngine.RenderResult result = getLuaWidgetEngine(widgetId).setExpanded(expanded);
-        ModuleManager.setScriptText(mContext, id, LuaWidgetManager.modulePayload(widgetId, result));
-        scheduleLuaWidgetTickIfNeeded(id, result);
-        if (id.equals(activeModule)) {
-            repaintActiveTextModule(id);
-        }
-        updateModuleDockSelection();
+        runLuaWidgetOperation(module, engine -> engine.setExpanded(expanded));
     }
 
     private void toggleLuaWidgetExpanded(String module) {
+        runLuaWidgetOperation(module, LuaWidgetEngine::toggleExpanded);
+    }
+
+    private void runLuaWidgetOperation(String module, LuaWidgetOperation operation) {
         String id = ModuleManager.normalize(module);
         if (TextUtils.isEmpty(id)) {
             return;
@@ -2696,30 +2532,61 @@ public class UIManager implements OnTouchListener {
             Tuils.sendOutput(mContext, "Lua widget source not found: " + id);
             return;
         }
-        if (!LuaWidgetManager.isEnabled(widgetId)) {
-            ModuleManager.setScriptText(mContext, id, LuaWidgetManager.disabledPayload(widgetId));
-            if (id.equals(activeModule)) {
-                repaintActiveTextModule(id);
-            }
-            updateModuleDockSelection();
-            return;
-        }
-        if (!LuaWidgetManager.isTrusted(widgetId)) {
-            ModuleManager.setScriptText(mContext, id, LuaWidgetManager.consentPayload(widgetId));
-            if (id.equals(activeModule)) {
-                repaintActiveTextModule(id);
-            }
-            updateModuleDockSelection();
+        if (applyLuaWidgetUnavailablePayload(id, widgetId, false, true, true)) {
             return;
         }
 
-        LuaWidgetEngine.RenderResult result = getLuaWidgetEngine(widgetId).toggleExpanded();
-        ModuleManager.setScriptText(mContext, id, LuaWidgetManager.modulePayload(widgetId, result));
-        scheduleLuaWidgetTickIfNeeded(id, result);
-        if (id.equals(activeModule)) {
-            repaintActiveTextModule(id);
+        LuaWidgetEngine.RenderResult result = operation.run(getLuaWidgetEngine(widgetId));
+        applyLuaWidgetResult(id, widgetId, result, true, true, true);
+    }
+
+    private boolean applyLuaWidgetUnavailablePayload(
+            String module,
+            String widgetId,
+            boolean stopTicks,
+            boolean repaint,
+            boolean updateDock) {
+        if (LuaWidgetManager.isEnabled(widgetId) && LuaWidgetManager.isTrusted(widgetId)) {
+            return false;
         }
-        updateModuleDockSelection();
+
+        if (stopTicks) {
+            handler.removeCallbacks(luaWidgetTickRunnable);
+        }
+        String payload = LuaWidgetManager.isEnabled(widgetId)
+                ? LuaWidgetManager.consentPayload(widgetId)
+                : LuaWidgetManager.disabledPayload(widgetId);
+        ModuleManager.setScriptText(mContext, module, payload);
+        if (repaint && module.equals(activeModule)) {
+            repaintActiveTextModule(module);
+        }
+        if (updateDock) {
+            updateModuleDockSelection();
+        }
+        return true;
+    }
+
+    private void applyLuaWidgetResult(
+            String module,
+            String widgetId,
+            LuaWidgetEngine.RenderResult result,
+            boolean scheduleTicks,
+            boolean repaint,
+            boolean updateDock) {
+        ModuleManager.setScriptText(mContext, module, LuaWidgetManager.modulePayload(widgetId, result));
+        if (scheduleTicks) {
+            scheduleLuaWidgetTickIfNeeded(module, result);
+        }
+        if (repaint && module.equals(activeModule)) {
+            repaintActiveTextModule(module);
+        }
+        if (updateDock) {
+            updateModuleDockSelection();
+        }
+    }
+
+    private interface LuaWidgetOperation {
+        LuaWidgetEngine.RenderResult run(LuaWidgetEngine engine);
     }
 
     private LuaWidgetEngine getLuaWidgetEngine(String widgetId) {
@@ -2942,7 +2809,6 @@ public class UIManager implements OnTouchListener {
         filter.addAction(ACTION_UPDATE_HINT);
         filter.addAction(ACTION_ROOT);
         filter.addAction(ACTION_NOROOT);
-//        filter.addAction(ACTION_CLEAR_SUGGESTIONS);
         filter.addAction(ACTION_LOGTOFILE);
         filter.addAction(ACTION_CLEAR);
         filter.addAction(ACTION_HACK);
@@ -2989,8 +2855,6 @@ public class UIManager implements OnTouchListener {
                     handleModuleCommand(intent);
                 } else if(action.equals(ACTION_NOROOT)) {
                     mTerminalAdapter.onStandard();
-//                } else if(action.equals(ACTION_CLEAR_SUGGESTIONS)) {
-//                    if(suggestionsManager != null) suggestionsManager.clear();
                 } else if(action.equals(ACTION_LOGTOFILE)) {
                     String fileName = intent.getStringExtra(FILE_NAME);
                     if(fileName == null || fileName.contains(File.separator)) return;
@@ -3399,9 +3263,9 @@ public class UIManager implements OnTouchListener {
         indexes[Label.unlock.ordinal()] = show[Label.unlock.ordinal()] ? XMLPrefsManager.getFloat(Ui.unlock_index) : Integer.MAX_VALUE;
         indexes[Label.ascii.ordinal()] = show[Label.ascii.ordinal()] ? XMLPrefsManager.getFloat(Ui.ascii_index) : Integer.MAX_VALUE;
 
-        int[] statusLineAlignments = getListOfIntValues(XMLPrefsManager.get(Ui.status_lines_alignment), 10, -1);
+        int[] statusLineAlignments = XMLPrefsManager.getListOfIntValues(XMLPrefsManager.get(Ui.status_lines_alignment), 10, -1);
 
-        String[] statusLineBgColors = getListOfStringValues(XMLPrefsManager.get(Theme.status_lines_bg), 10, "#00000000");
+        String[] statusLineBgColors = XMLPrefsManager.getListOfStringValues(XMLPrefsManager.get(Theme.status_lines_bg), 10, "#00000000");
         String[] otherBgColors = {
                 XMLPrefsManager.get(Theme.input_bg),
                 XMLPrefsManager.get(Theme.output_bg),
@@ -3412,7 +3276,7 @@ public class UIManager implements OnTouchListener {
         System.arraycopy(statusLineBgColors, 0, bgColors, 0, statusLineBgColors.length);
         System.arraycopy(otherBgColors, 0, bgColors, statusLineBgColors.length, otherBgColors.length);
 
-        String[] statusLineOutlineColors = getListOfStringValues(XMLPrefsManager.get(Theme.status_lines_shadow_color), 10, "#00000000");
+        String[] statusLineOutlineColors = XMLPrefsManager.getListOfStringValues(XMLPrefsManager.get(Theme.status_lines_shadow_color), 10, "#00000000");
         String[] otherOutlineColors = {
                 XMLPrefsManager.get(Theme.input_shadow_color),
                 XMLPrefsManager.get(Theme.output_shadow_color),
@@ -3421,7 +3285,7 @@ public class UIManager implements OnTouchListener {
         System.arraycopy(statusLineOutlineColors, 0, outlineColors, 0, statusLineOutlineColors.length);
         System.arraycopy(otherOutlineColors, 0, outlineColors, 10, otherOutlineColors.length);
 
-        String[] shadowParams = getListOfStringValues(XMLPrefsManager.get(Ui.shadow_params), 3, "0");
+        String[] shadowParams = XMLPrefsManager.getListOfStringValues(XMLPrefsManager.get(Ui.shadow_params), 3, "0");
         shadowXOffset = Integer.parseInt(shadowParams[0]);
         shadowYOffset = Integer.parseInt(shadowParams[1]);
         shadowRadius = Float.parseFloat(shadowParams[2]);
@@ -3431,12 +3295,12 @@ public class UIManager implements OnTouchListener {
         useDashed = AppearanceSettings.dashedBorders();
 
         margins = new int[6][4];
-        margins[0] = getListOfIntValues(XMLPrefsManager.get(Ui.status_lines_margins), 4, 0);
-        margins[1] = getListOfIntValues(XMLPrefsManager.get(Ui.output_field_margins), 4, 0);
-        margins[2] = getListOfIntValues(XMLPrefsManager.get(Ui.input_area_margins), 4, 0);
-        margins[3] = getListOfIntValues(XMLPrefsManager.get(Ui.input_field_margins), 4, 0);
-        margins[4] = getListOfIntValues(XMLPrefsManager.get(Ui.toolbar_margins), 4, 0);
-        margins[5] = getListOfIntValues(XMLPrefsManager.get(Ui.suggestions_area_margin), 4, 0);
+        margins[0] = XMLPrefsManager.getListOfIntValues(XMLPrefsManager.get(Ui.status_lines_margins), 4, 0);
+        margins[1] = XMLPrefsManager.getListOfIntValues(XMLPrefsManager.get(Ui.output_field_margins), 4, 0);
+        margins[2] = XMLPrefsManager.getListOfIntValues(XMLPrefsManager.get(Ui.input_area_margins), 4, 0);
+        margins[3] = XMLPrefsManager.getListOfIntValues(XMLPrefsManager.get(Ui.input_field_margins), 4, 0);
+        margins[4] = XMLPrefsManager.getListOfIntValues(XMLPrefsManager.get(Ui.toolbar_margins), 4, 0);
+        margins[5] = XMLPrefsManager.getListOfIntValues(XMLPrefsManager.get(Ui.suggestions_area_margin), 4, 0);
 
         AllowEqualsSequence sequence = new AllowEqualsSequence(indexes, Label.values());
 
@@ -3579,8 +3443,6 @@ public class UIManager implements OnTouchListener {
             if(notesMaxLines > 0) {
                 notesView.setMaxLines(notesMaxLines);
                 notesView.setEllipsize(TextUtils.TruncateAt.MARQUEE);
-//                notesView.setScrollBarStyle(View.SCROLLBARS_OUTSIDE_OVERLAY);
-//                notesView.setVerticalScrollBarEnabled(true);
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB && XMLPrefsManager.getBoolean(Ui.show_scroll_notes_message)) {
                     notesView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -4539,21 +4401,19 @@ public class UIManager implements OnTouchListener {
     }
 
     private void appendTermuxStatus() {
-        boolean installed = isPackageInstalled(TERMUX_PACKAGE);
-        boolean bridgeAvailable = installed && termuxDeclaresRunCommandPermission();
-        boolean permissionGranted = hasTermuxRunCommandPermission();
+        TermuxBridgeManager.BridgeStatus status = TermuxBridgeManager.status(mContext);
 
-        appendTermuxLine("Termux installed: " + installed);
-        appendTermuxLine("RunCommand bridge: " + (bridgeAvailable ? "available" : "not available"));
-        appendTermuxLine("RunCommand permission: " + (permissionGranted ? "granted" : "not granted"));
+        appendTermuxLine("Termux installed: " + status.termuxInstalled);
+        appendTermuxLine("RunCommand bridge: " + (status.runCommandDeclared ? "available" : "not available"));
+        appendTermuxLine("RunCommand permission: " + (status.runCommandGranted ? "granted" : "not granted"));
         appendTermuxLine("Console cwd: " + termuxWorkingDirectory);
         appendTermuxLine("Required Termux setting: allow-external-apps=true");
-        if (!installed) {
+        if (!status.termuxInstalled) {
             appendTermuxLine("Install Termux before enabling script dispatch.");
-        } else if (!bridgeAvailable) {
+        } else if (!status.runCommandDeclared) {
             appendTermuxLine("This Termux build does not expose RUN_COMMAND.");
             appendTermuxLine("Install the current Termux build from F-Droid/GitHub, not the old Play Store build.");
-        } else if (!permissionGranted) {
+        } else if (!status.runCommandGranted) {
             appendTermuxLine("Grant Re:T-UI permission to run commands in Termux when prompted by Android/Termux.");
         } else {
             appendTermuxLine("Bridge prerequisites look ready for the next phase.");
@@ -4595,20 +4455,12 @@ public class UIManager implements OnTouchListener {
             return false;
         }
 
-        Intent intent = new Intent(TERMUX_RUN_COMMAND_ACTION);
-        intent.setClassName(TERMUX_PACKAGE, TERMUX_RUN_COMMAND_SERVICE);
-        intent.putExtra(TERMUX_RUN_COMMAND_PATH, TermuxBridgeManager.TERMUX_SH);
-        intent.putExtra(TermuxBridgeManager.TERMUX_RUN_COMMAND_WORKDIR, termuxWorkingDirectory);
-        intent.putExtra(TERMUX_RUN_COMMAND_BACKGROUND, true);
-        intent.putExtra(TERMUX_RUN_COMMAND_PENDING_INTENT, createTermuxResultPendingIntent(resultLabel, null));
-        intent.putExtra(TERMUX_RUN_COMMAND_ARGUMENTS, new String[] {"-lc", shellCommand});
-
         try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                ContextCompat.startForegroundService(mContext, intent);
-            } else {
-                mContext.startService(intent);
-            }
+            TermuxBridgeManager.startRunCommand(mContext,
+                    TermuxBridgeManager.TERMUX_SH,
+                    termuxWorkingDirectory,
+                    TermuxBridgeManager.createResultPendingIntent(mContext, resultLabel, null),
+                    new String[] {"-lc", shellCommand});
             if (echoDispatch) {
                 appendTermuxLine("shell: " + shellCommand);
             }
@@ -4668,22 +4520,7 @@ public class UIManager implements OnTouchListener {
 
     private boolean runTermuxScript(String path, ArrayList<String> args, String module, boolean echoToConsole, String aliasName) {
         path = expandTermuxPath(path);
-        if (!isPackageInstalled(TERMUX_PACKAGE)) {
-            reportTermuxDispatch("Termux is not installed.", echoToConsole);
-            return false;
-        }
-
-        if (!termuxDeclaresRunCommandPermission()) {
-            reportTermuxDispatch("This Termux build does not expose RUN_COMMAND.", echoToConsole);
-            reportTermuxDispatch("Install/update Termux from F-Droid or GitHub, then retry.", echoToConsole);
-            return false;
-        }
-
-        if (!hasTermuxRunCommandPermission()) {
-            requestTermuxRunCommandPermission();
-            reportTermuxDispatch("RunCommand permission is not granted yet.", echoToConsole);
-            reportTermuxDispatch("If Android shows a permission prompt, allow Re:T-UI and retry.", echoToConsole);
-            reportTermuxDispatch("Termux must also have allow-external-apps=true.", echoToConsole);
+        if (!ensureTermuxBridgeReady(echoToConsole)) {
             return false;
         }
 
@@ -4704,22 +4541,14 @@ public class UIManager implements OnTouchListener {
             dispatchArgs.addAll(args);
         }
 
-        Intent intent = new Intent(TERMUX_RUN_COMMAND_ACTION);
-        intent.setClassName(TERMUX_PACKAGE, TERMUX_RUN_COMMAND_SERVICE);
-        intent.putExtra(TERMUX_RUN_COMMAND_PATH, dispatchPath);
-        intent.putExtra(TermuxBridgeManager.TERMUX_RUN_COMMAND_WORKDIR, termuxWorkingDirectory);
-        intent.putExtra(TERMUX_RUN_COMMAND_BACKGROUND, true);
-        intent.putExtra(TERMUX_RUN_COMMAND_PENDING_INTENT, createTermuxResultPendingIntent(path, module));
-        if (!dispatchArgs.isEmpty()) {
-            intent.putExtra(TERMUX_RUN_COMMAND_ARGUMENTS, dispatchArgs.toArray(new String[0]));
-        }
-
         try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                ContextCompat.startForegroundService(mContext, intent);
-            } else {
-                mContext.startService(intent);
-            }
+            TermuxBridgeManager.startRunCommand(mContext,
+                    dispatchPath,
+                    termuxWorkingDirectory,
+                    TermuxBridgeManager.createResultPendingIntent(mContext,
+                            path,
+                            TextUtils.isEmpty(module) ? null : ModuleManager.normalize(module)),
+                    dispatchArgs.isEmpty() ? null : dispatchArgs.toArray(new String[0]));
             if (echoToConsole) {
                 appendTermuxLine("dispatched to Termux: " + path);
                 if (aliasName != null && !aliasName.equals(path)) {
@@ -4741,19 +4570,20 @@ public class UIManager implements OnTouchListener {
     }
 
     private boolean ensureTermuxBridgeReady(boolean echoToConsole) {
-        if (!isPackageInstalled(TERMUX_PACKAGE)) {
+        TermuxBridgeManager.BridgeStatus status = TermuxBridgeManager.status(mContext);
+        if (!status.termuxInstalled) {
             reportTermuxDispatch("Termux is not installed.", echoToConsole);
             return false;
         }
 
-        if (!termuxDeclaresRunCommandPermission()) {
+        if (!status.runCommandDeclared) {
             reportTermuxDispatch("This Termux build does not expose RUN_COMMAND.", echoToConsole);
             reportTermuxDispatch("Install/update Termux from F-Droid or GitHub, then retry.", echoToConsole);
             return false;
         }
 
-        if (!hasTermuxRunCommandPermission()) {
-            requestTermuxRunCommandPermission();
+        if (!status.runCommandGranted) {
+            TermuxBridgeManager.requestRunCommandPermissionIfPossible(mContext, LauncherActivity.COMMAND_REQUEST_PERMISSION);
             reportTermuxDispatch("RunCommand permission is not granted yet.", echoToConsole);
             reportTermuxDispatch("If Android shows a permission prompt, allow Re:T-UI and retry.", echoToConsole);
             reportTermuxDispatch("Termux must also have allow-external-apps=true.", echoToConsole);
@@ -4864,21 +4694,6 @@ public class UIManager implements OnTouchListener {
         }
 
         return alias[0].trim();
-    }
-
-    private PendingIntent createTermuxResultPendingIntent(String path, String module) {
-        Intent resultIntent = new Intent(mContext, ohi.andre.consolelauncher.managers.termux.TermuxResultService.class);
-        resultIntent.putExtra(EXTRA_TERMUX_RESULT_PATH, path);
-        if (!TextUtils.isEmpty(module)) {
-            resultIntent.putExtra(EXTRA_TERMUX_RESULT_MODULE, ModuleManager.normalize(module));
-        }
-
-        int flags = PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_UPDATE_CURRENT;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            flags |= PendingIntent.FLAG_MUTABLE;
-        }
-
-        return PendingIntent.getService(mContext, (int) System.currentTimeMillis(), resultIntent, flags);
     }
 
     private void appendTermuxResult(Intent intent) {
@@ -5121,49 +4936,8 @@ public class UIManager implements OnTouchListener {
         }
     }
 
-    private boolean hasTermuxRunCommandPermission() {
-        return Build.VERSION.SDK_INT < Build.VERSION_CODES.M
-                || ContextCompat.checkSelfPermission(mContext, TERMUX_RUN_COMMAND_PERMISSION) == PackageManager.PERMISSION_GRANTED;
-    }
-
-    private boolean termuxDeclaresRunCommandPermission() {
-        try {
-            PackageInfo info;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                info = mContext.getPackageManager().getPackageInfo(TERMUX_PACKAGE,
-                        PackageManager.PackageInfoFlags.of(PackageManager.GET_PERMISSIONS));
-            } else {
-                info = mContext.getPackageManager().getPackageInfo(TERMUX_PACKAGE, PackageManager.GET_PERMISSIONS);
-            }
-
-            if (info.permissions == null) {
-                return false;
-            }
-
-            for (android.content.pm.PermissionInfo permission : info.permissions) {
-                if (permission != null && TERMUX_RUN_COMMAND_PERMISSION.equals(permission.name)) {
-                    return true;
-                }
-            }
-        } catch (Exception ignored) {
-            return false;
-        }
-
-        return false;
-    }
-
-    private void requestTermuxRunCommandPermission() {
-        if (!(mContext instanceof Activity) || Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            return;
-        }
-
-        ActivityCompat.requestPermissions((Activity) mContext,
-                new String[] {TERMUX_RUN_COMMAND_PERMISSION},
-                LauncherActivity.COMMAND_REQUEST_PERMISSION);
-    }
-
     private void openTermuxApp() {
-        Intent launchIntent = mContext.getPackageManager().getLaunchIntentForPackage(TERMUX_PACKAGE);
+        Intent launchIntent = mContext.getPackageManager().getLaunchIntentForPackage(TermuxBridgeManager.TERMUX_PACKAGE);
         if (launchIntent == null) {
             appendTermuxLine("Termux is not installed.");
             return;
@@ -5174,19 +4948,6 @@ public class UIManager implements OnTouchListener {
             appendTermuxLine("opened Termux.");
         } catch (Exception e) {
             appendTermuxLine("unable to open Termux: " + e.getClass().getSimpleName());
-        }
-    }
-
-    private boolean isPackageInstalled(String packageName) {
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                mContext.getPackageManager().getPackageInfo(packageName, PackageManager.PackageInfoFlags.of(0));
-            } else {
-                mContext.getPackageManager().getPackageInfo(packageName, 0);
-            }
-            return true;
-        } catch (Exception e) {
-            return false;
         }
     }
 
@@ -6447,44 +6208,6 @@ public class UIManager implements OnTouchListener {
         }
     }
 
-    public static int[] getListOfIntValues(String values, int length, int defaultValue) {
-        int[] is = new int[length];
-        values = removeSquareBrackets(values);
-        String[] split = values.split(",");
-        int c = 0;
-        for(; c < split.length; c++) {
-            try {
-                is[c] = Integer.parseInt(split[c]);
-            } catch (Exception e) {
-                is[c] = defaultValue;
-            }
-        }
-        while(c < split.length) is[c] = defaultValue;
-
-        return is;
-    }
-
-    public static String[] getListOfStringValues(String values, int length, String defaultValue) {
-        String[] is = new String[length];
-        String[] split = values.split(",");
-
-        int len = Math.min(split.length, is.length);
-        System.arraycopy(split, 0, is, 0, len);
-
-        while(len < is.length) is[len++] = defaultValue;
-
-        return is;
-    }
-
-    private static Pattern sbPattern = Pattern.compile("[\\[\\]\\s]");
-    private static String removeSquareBrackets(String s) {
-        return sbPattern.matcher(s).replaceAll(Tuils.EMPTYSTRING);
-    }
-
-//    0 = ext hor
-//    1 = ext ver
-//    2 = int hor
-//    3 = int ver
     private static int dashedStrokePx(Context context) {
         return dashedStrokePx(context, 1f);
     }

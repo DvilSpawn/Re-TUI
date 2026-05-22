@@ -5,7 +5,11 @@ import android.telephony.TelephonyManager;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.net.URL;
+import java.util.Collections;
+import java.util.List;
 
 public class NetUtils {
 
@@ -53,5 +57,32 @@ public class NetUtils {
         } catch (SecurityException e) {
             return "unknown";
         }
+    }
+
+    public static String getIPAddress(boolean useIPv4) {
+        try {
+            List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
+            for (NetworkInterface intf : interfaces) {
+                List<InetAddress> addrs = Collections.list(intf.getInetAddresses());
+                for (InetAddress addr : addrs) {
+                    if (!addr.isLoopbackAddress()) {
+                        String value = addr.getHostAddress();
+                        boolean isIPv4 = value.indexOf(':') < 0;
+
+                        if (useIPv4 && isIPv4) {
+                            return value;
+                        }
+                        if (!useIPv4 && !isIPv4) {
+                            int delimiter = value.indexOf('%');
+                            return delimiter < 0
+                                    ? value.toUpperCase()
+                                    : value.substring(0, delimiter).toUpperCase();
+                        }
+                    }
+                }
+            }
+        } catch (Exception ignored) {
+        }
+        return "";
     }
 }

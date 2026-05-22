@@ -41,7 +41,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import ohi.andre.consolelauncher.tuils.CustomExceptionHandler;
 import ohi.andre.consolelauncher.MainManager;
 import ohi.andre.consolelauncher.managers.RegexManager;
 import ohi.andre.consolelauncher.managers.TerminalManager;
@@ -229,7 +228,11 @@ public class LauncherActivity extends AppCompatActivity implements Reloadable {
 
     private void finishOnCreate() {
 
-        Thread.currentThread().setUncaughtExceptionHandler(new CustomExceptionHandler());
+        Thread.UncaughtExceptionHandler defaultExceptionHandler = Thread.getDefaultUncaughtExceptionHandler();
+        Thread.currentThread().setUncaughtExceptionHandler((thread, ex) -> {
+            Tuils.toFile(ex);
+            defaultExceptionHandler.uncaughtException(thread, ex);
+        });
 
         new RegexManager(LauncherActivity.this);
         new TimeManager(this);

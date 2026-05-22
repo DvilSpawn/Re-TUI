@@ -36,16 +36,16 @@ public class TermuxResultReceiver extends BroadcastReceiver {
 
             Bundle bundle = findResultBundle(intent);
             if (bundle != null) {
-                result.putExtra(UIManager.EXTRA_TERMUX_RESULT_STDOUT, bundle.getString(BUNDLE_STDOUT));
-                result.putExtra(UIManager.EXTRA_TERMUX_RESULT_STDERR, bundle.getString(BUNDLE_STDERR));
+                result.putExtra(UIManager.EXTRA_TERMUX_RESULT_STDOUT, stringValue(bundle, BUNDLE_STDOUT));
+                result.putExtra(UIManager.EXTRA_TERMUX_RESULT_STDERR, stringValue(bundle, BUNDLE_STDERR));
                 result.putExtra(UIManager.EXTRA_TERMUX_RESULT_EXIT_CODE,
                         bundle.containsKey(BUNDLE_EXIT_CODE)
                                 ? bundle.getInt(BUNDLE_EXIT_CODE, Integer.MIN_VALUE)
                                 : bundle.getInt(BUNDLE_EXIT_CODE_ALT, Integer.MIN_VALUE));
 
-                String error = bundle.getString(BUNDLE_ERRMSG);
+                String error = stringValue(bundle, BUNDLE_ERRMSG);
                 if (error == null) {
-                    error = bundle.getString(BUNDLE_ERR);
+                    error = errorValue(bundle, BUNDLE_ERR);
                 }
                 result.putExtra(UIManager.EXTRA_TERMUX_RESULT_ERROR, error);
             } else {
@@ -90,18 +90,39 @@ public class TermuxResultReceiver extends BroadcastReceiver {
     }
 
     private static void copyDirectExtras(Intent source, Intent result) {
-        result.putExtra(UIManager.EXTRA_TERMUX_RESULT_STDOUT, source.getStringExtra(BUNDLE_STDOUT));
-        result.putExtra(UIManager.EXTRA_TERMUX_RESULT_STDERR, source.getStringExtra(BUNDLE_STDERR));
+        result.putExtra(UIManager.EXTRA_TERMUX_RESULT_STDOUT, stringValue(source.getExtras(), BUNDLE_STDOUT));
+        result.putExtra(UIManager.EXTRA_TERMUX_RESULT_STDERR, stringValue(source.getExtras(), BUNDLE_STDERR));
         result.putExtra(UIManager.EXTRA_TERMUX_RESULT_EXIT_CODE,
                 source.hasExtra(BUNDLE_EXIT_CODE)
                         ? source.getIntExtra(BUNDLE_EXIT_CODE, Integer.MIN_VALUE)
                         : source.getIntExtra(BUNDLE_EXIT_CODE_ALT, Integer.MIN_VALUE));
 
-        String error = source.getStringExtra(BUNDLE_ERRMSG);
+        String error = stringValue(source.getExtras(), BUNDLE_ERRMSG);
         if (error == null) {
-            error = source.getStringExtra(BUNDLE_ERR);
+            error = errorValue(source.getExtras(), BUNDLE_ERR);
         }
         result.putExtra(UIManager.EXTRA_TERMUX_RESULT_ERROR, error);
+    }
+
+    private static String stringValue(Bundle bundle, String key) {
+        if (bundle == null || !bundle.containsKey(key)) {
+            return null;
+        }
+
+        Object value = bundle.get(key);
+        return value == null ? null : String.valueOf(value);
+    }
+
+    private static String errorValue(Bundle bundle, String key) {
+        if (bundle == null || !bundle.containsKey(key)) {
+            return null;
+        }
+
+        Object value = bundle.get(key);
+        if (value instanceof Number && ((Number) value).intValue() == -1) {
+            return null;
+        }
+        return value == null ? null : String.valueOf(value);
     }
 
     private static String describeExtras(Bundle extras) {

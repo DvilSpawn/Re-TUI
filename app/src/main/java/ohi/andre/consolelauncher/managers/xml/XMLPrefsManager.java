@@ -451,6 +451,41 @@ public class XMLPrefsManager {
         return get(String.class, root, s);
     }
 
+    private static final Pattern LIST_DECORATION = Pattern.compile("[\\[\\]\\s]");
+
+    public static int[] getListOfIntValues(String values, int length, int defaultValue) {
+        int[] parsed = new int[length];
+        values = removeListDecoration(values);
+        String[] split = values.split(",");
+        int count = 0;
+        for(; count < split.length; count++) {
+            try {
+                parsed[count] = Integer.parseInt(split[count]);
+            } catch (Exception e) {
+                parsed[count] = defaultValue;
+            }
+        }
+        while(count < split.length) parsed[count] = defaultValue;
+
+        return parsed;
+    }
+
+    public static String[] getListOfStringValues(String values, int length, String defaultValue) {
+        String[] parsed = new String[length];
+        String[] split = values.split(",");
+
+        int len = Math.min(split.length, parsed.length);
+        System.arraycopy(split, 0, parsed, 0, len);
+
+        while(len < parsed.length) parsed[len++] = defaultValue;
+
+        return parsed;
+    }
+
+    private static String removeListDecoration(String value) {
+        return LIST_DECORATION.matcher(value).replaceAll(Tuils.EMPTYSTRING);
+    }
+
     public static boolean wasChanged(XMLPrefsSave save, boolean allowLengthZero) {
         String value = get(save);
         return (allowLengthZero || value.length() > 0) && !value.equals(save.defaultValue());
