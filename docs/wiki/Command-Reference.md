@@ -20,12 +20,16 @@ Examples:
 
 Run a non-blocking walkthrough in the terminal. Active guide steps use the normal suggestion row for the current command and guide controls.
 
+When a guide is active, it owns the suggestion row until `guide -off`. Saved progress survives launcher restarts and can be restored with `guide -resume`.
+
 Useful forms:
 
 - `guide`
 - `guide -start basics`
 - `guide -start customize`
 - `guide -start modules`
+- `guide -resume`
+- `guide -restart basics`
 - `guide -next`
 - `guide -back`
 - `guide -off`

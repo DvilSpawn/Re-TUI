@@ -609,6 +609,15 @@ class SuggestionsManager(
         beforeLastSpace = beforeLastSpace.trim { it <= ' ' }
         lastWord = lastWord.trim { it <= ' ' }
 
+        if (GuideManager.isActive(pack.context)) {
+            comparator.noInput = beforeLastSpace.length == 0 && lastWord.length == 0
+            if (!suggestActiveGuide(suggestionList)) {
+                suggestGuideRootActions(suggestionList)
+            }
+            Collections.sort<Suggestion?>(suggestionList, comparator)
+            return suggestionList
+        }
+
         //        lastword = 0
         if (lastWord.length == 0) {
             //            lastword = 0 && beforeLastSpace = 0

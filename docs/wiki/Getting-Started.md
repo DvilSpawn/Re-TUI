@@ -37,6 +37,8 @@ Run:
 
 The guide is a non-blocking walkthrough. It prints paths in the terminal and, when active, uses the normal suggestion row for the current step. It does not show a first-run modal.
 
+While a guide is active, guide suggestions take over the suggestion row. Use `guide -off` to return to normal app, alias, module, and command suggestions.
+
 Useful paths:
 
 - `guide -start basics`
@@ -48,6 +50,8 @@ Controls:
 - `guide -next`
 - `guide -back`
 - `guide -off`
+- `guide -resume`
+- `guide -restart basics`
 
 ## Basic Navigation
 

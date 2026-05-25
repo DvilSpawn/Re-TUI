@@ -60,10 +60,16 @@ Use this as the phone test pass for the workstation rollout. Test on a clean ins
   - `guide -back`
   - `guide -off`
 - With the input empty, confirm guide suggestions show the current step command and guide controls.
+- Type a normal app or command prefix while the guide is active.
+- Confirm the suggestion row still shows only the guide step command plus `guide -next`, `guide -back`, and `guide -off`.
 - Tap/run the current step command.
 - Confirm the guide advances to the next step in the empty-input suggestions.
 - Run `guide -off`.
 - Confirm normal blank input suggestions return.
+- Run `guide -resume`.
+- Confirm it returns to the saved path and step instead of restarting at 1/4.
+- Run `guide -reset`.
+- Confirm `guide -start basics` starts from 1/4 again.
 
 ## Phase 2 - Search And Suggestions 2.0
 

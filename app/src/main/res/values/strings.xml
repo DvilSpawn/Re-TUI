@@ -403,12 +403,14 @@
         \n$ guide -start basics
         \n$ guide -start customize
         \n$ guide -start modules
+        \n$ guide -resume
+        \n$ guide -restart basics
         \n$ guide -next
         \n$ guide -back
         \n$ guide -status
         \n$ guide -off
         \n$ guide -reset
-        \n\nWhen a guide is active, blank input suggestions show the current step command plus guide controls. No first-run modal is shown.
+        \n\nWhen a guide is active, the suggestion row stays locked to the current step command plus guide controls until guide -off. Progress is saved so guide -resume returns to the saved path and step.
     </string>
     <string name="help_workstation_quickstart">Re:T-UI workstation quickstart
         \nThis launcher expects you to drive. Use commands first; UI surfaces are helpers.

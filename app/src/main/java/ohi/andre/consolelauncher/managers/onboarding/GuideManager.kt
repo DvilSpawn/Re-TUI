@@ -132,24 +132,46 @@ object GuideManager {
                 .append(Tuils.NEWLINE)
             output.append(currentStepText(context, active))
         } else {
-            output.append("Start with: guide -start basics")
+            val saved = savedPath(context)
+            if (saved != null && savedStepIndex(context, saved) > 0) {
+                output.append("Resume with: guide -resume").append(Tuils.NEWLINE)
+                output.append("Restart with: guide -reset, then guide -start ").append(saved.id)
+            } else {
+                output.append("Start with: guide -start basics")
+            }
         }
         return output.toString()
     }
 
     fun start(context: Context, requestedPath: String?): String {
+        return start(context, requestedPath, false)
+    }
+
+    fun restart(context: Context, requestedPath: String?): String {
+        return start(context, requestedPath, true)
+    }
+
+    private fun start(context: Context, requestedPath: String?, reset: Boolean): String {
         val path = findPath(requestedPath)
         if (path == null) {
             return "Unknown guide path: " + (requestedPath ?: "") + Tuils.NEWLINE + overview(context)
         }
 
+        val step = if (reset) 0 else savedStepIndex(context, path)
         prefs(context).edit()
             .putBoolean(KEY_ACTIVE, true)
             .putString(KEY_PATH, path.id)
-            .putInt(KEY_STEP, 0)
-            .apply()
+            .putInt(KEY_STEP, step)
+            .putInt(stepKey(path.id), step)
+            .commit()
 
-        return "Started guide: " + path.title + Tuils.NEWLINE + currentStepText(context, path)
+        val action = if (step > 0 && !reset) "Resumed guide: " else "Started guide: "
+        return action + path.title + Tuils.NEWLINE + currentStepText(context, path)
+    }
+
+    fun resume(context: Context): String {
+        val path = savedPath(context) ?: findPath(DEFAULT_PATH) ?: return overview(context)
+        return start(context, path.id, false)
     }
 
     fun status(context: Context): String {
@@ -164,14 +186,14 @@ object GuideManager {
             stopInternal(context)
             return "Guide complete: " + path.title + Tuils.NEWLINE + "Start another path with guide -start customize or guide -start modules."
         }
-        prefs(context).edit().putInt(KEY_STEP, next).apply()
+        saveStep(context, path, next)
         return currentStepText(context, path)
     }
 
     fun back(context: Context): String {
         val path = activePath(context) ?: return overview(context)
         val previous = (stepIndex(context) - 1).coerceAtLeast(0)
-        prefs(context).edit().putInt(KEY_STEP, previous).apply()
+        saveStep(context, path, previous)
         return currentStepText(context, path)
     }
 
@@ -181,7 +203,7 @@ object GuideManager {
     }
 
     fun reset(context: Context): String {
-        prefs(context).edit().clear().apply()
+        prefs(context).edit().clear().commit()
         return "Guide reset." + Tuils.NEWLINE + overview(context)
     }
 
@@ -215,6 +237,8 @@ object GuideManager {
         "-start basics",
         "-start customize",
         "-start modules",
+        "-resume",
+        "-restart basics",
         "-status",
         "-next",
         "-back",
@@ -237,10 +261,12 @@ object GuideManager {
             if (next >= path.steps.size) {
                 stopInternal(context)
             } else {
-                prefs(context).edit().putInt(KEY_STEP, next).apply()
+                saveStep(context, path, next)
             }
         }
     }
+
+    fun isActive(context: Context): Boolean = activePath(context) != null
 
     private fun currentStepText(context: Context, path: Path): String {
         val index = stepIndex(context).coerceIn(0, path.steps.size - 1)
@@ -282,15 +308,48 @@ object GuideManager {
         return findPath(prefs(context).getString(KEY_PATH, DEFAULT_PATH))
     }
 
-    private fun stepIndex(context: Context): Int = prefs(context).getInt(KEY_STEP, 0)
+    private fun stepIndex(context: Context): Int {
+        val path = activePath(context)
+        if (path != null) {
+            return savedStepIndex(context, path)
+        }
+        return prefs(context).getInt(KEY_STEP, 0)
+    }
+
+    private fun savedPath(context: Context): Path? = findPath(prefs(context).getString(KEY_PATH, DEFAULT_PATH))
+
+    private fun savedStepIndex(context: Context, path: Path): Int {
+        val fallback = if (path.id == prefs(context).getString(KEY_PATH, DEFAULT_PATH)) {
+            prefs(context).getInt(KEY_STEP, 0)
+        } else {
+            0
+        }
+        return prefs(context).getInt(stepKey(path.id), fallback).coerceIn(0, path.steps.size - 1)
+    }
+
+    private fun saveStep(context: Context, path: Path, index: Int) {
+        val normalized = index.coerceIn(0, path.steps.size - 1)
+        prefs(context).edit()
+            .putString(KEY_PATH, path.id)
+            .putInt(KEY_STEP, normalized)
+            .putInt(stepKey(path.id), normalized)
+            .commit()
+    }
 
     private fun findPath(id: String?): Path? {
-        val normalized = (id ?: DEFAULT_PATH).trim { it <= ' ' }.lowercase(Locale.getDefault())
+        val normalized = normalizePathId(id)
         return paths.firstOrNull { it.id == normalized }
     }
 
+    private fun normalizePathId(id: String?): String {
+        val normalized = (id ?: DEFAULT_PATH).trim { it <= ' ' }.lowercase(Locale.getDefault())
+        return if (normalized == "basic") "basics" else normalized
+    }
+
+    private fun stepKey(pathId: String): String = KEY_STEP + "_" + pathId
+
     private fun stopInternal(context: Context) {
-        prefs(context).edit().putBoolean(KEY_ACTIVE, false).apply()
+        prefs(context).edit().putBoolean(KEY_ACTIVE, false).commit()
     }
 
     private fun prefs(context: Context) = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
