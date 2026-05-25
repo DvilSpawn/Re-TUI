@@ -1,7 +1,10 @@
 package ohi.andre.consolelauncher.managers.onboarding
 
 import android.content.Context
+import android.content.Intent
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import java.util.Locale
+import ohi.andre.consolelauncher.UIManager
 import ohi.andre.consolelauncher.tuils.Tuils
 
 object GuideManager {
@@ -164,6 +167,7 @@ object GuideManager {
             .putInt(KEY_STEP, step)
             .putInt(stepKey(path.id), step)
             .commit()
+        notifySuggestionsChanged(context)
 
         val action = if (step > 0 && !reset) "Resumed guide: " else "Started guide: "
         return action + path.title + Tuils.NEWLINE + currentStepText(context, path)
@@ -204,6 +208,7 @@ object GuideManager {
 
     fun reset(context: Context): String {
         prefs(context).edit().clear().commit()
+        notifySuggestionsChanged(context)
         return "Guide reset." + Tuils.NEWLINE + overview(context)
     }
 
@@ -260,6 +265,7 @@ object GuideManager {
             val next = stepIndex(context) + 1
             if (next >= path.steps.size) {
                 stopInternal(context)
+                notifySuggestionsChanged(context)
             } else {
                 saveStep(context, path, next)
             }
@@ -334,6 +340,7 @@ object GuideManager {
             .putInt(KEY_STEP, normalized)
             .putInt(stepKey(path.id), normalized)
             .commit()
+        notifySuggestionsChanged(context)
     }
 
     private fun findPath(id: String?): Path? {
@@ -350,6 +357,11 @@ object GuideManager {
 
     private fun stopInternal(context: Context) {
         prefs(context).edit().putBoolean(KEY_ACTIVE, false).commit()
+    }
+
+    private fun notifySuggestionsChanged(context: Context) {
+        LocalBroadcastManager.getInstance(context.applicationContext)
+            .sendBroadcast(Intent(UIManager.ACTION_UPDATE_SUGGESTIONS))
     }
 
     private fun prefs(context: Context) = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
