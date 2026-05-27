@@ -341,6 +341,11 @@ class UIManager(
     private var suggestionsContainer: View? = null
     private var suggestionsVisibilityBeforeTermux = View.VISIBLE
     private var termuxConsoleOpen = false
+    private var launcherChromeHiddenForSurface = false
+    private var restoreLauncherChromeOnResume = false
+    private var launcherChromeMainVisibility = View.VISIBLE
+    private var launcherChromeTrayVisibility = View.VISIBLE
+    private var launcherChromeLandscapeVisibility = View.GONE
     private var terminalTrayContainer: View? = null
     private var terminalContainer: ViewGroup? = null
     private var terminalOutputBorder: View? = null
@@ -1042,12 +1047,36 @@ class UIManager(
     }
 
     private fun openToolbarShortcutSettings() {
+        openSettingsSurface(ThemerActivity.SECTION_PERSONALIZATION)
+    }
+
+    fun openSettingsSurface(section: String?) {
+        if (Looper.myLooper() != Looper.getMainLooper()) {
+            runOnMainThread { openSettingsSurface(section) }
+            return
+        }
+
+        hideLauncherChromeForSurface()
+        restoreLauncherChromeOnResume = true
+
         val intent = Intent(mContext, ThemerActivity::class.java)
-        intent.putExtra(ThemerActivity.EXTRA_SECTION, ThemerActivity.SECTION_PERSONALIZATION)
+        intent.putExtra(
+            ThemerActivity.EXTRA_SECTION,
+            if (TextUtils.isEmpty(section)) ThemerActivity.SECTION_HOME else section
+        )
         if (mContext !is Activity) {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
-        mContext!!.startActivity(intent)
+        startActivityAfterChromeHidden(intent)
+    }
+
+    private fun startActivityAfterChromeHidden(intent: Intent) {
+        val start = Runnable { mContext!!.startActivity(intent) }
+        if (mRootView == null || !launcherChromeHiddenForSurface) {
+            start.run()
+            return
+        }
+        mRootView!!.postDelayed(start, 48L)
     }
 
     private fun setupResponsiveLandscapeLayout(rootView: ViewGroup) {
@@ -5221,6 +5250,11 @@ class UIManager(
     }
 
     fun openTermuxConsole(command: String?) {
+        if (Looper.myLooper() != Looper.getMainLooper()) {
+            runOnMainThread { openTermuxConsole(command) }
+            return
+        }
+
         if (termuxOverlay == null) {
             return
         }
@@ -5253,6 +5287,11 @@ class UIManager(
     }
 
     fun openLuaApp(appId: String?) {
+        if (Looper.myLooper() != Looper.getMainLooper()) {
+            runOnMainThread { openLuaApp(appId) }
+            return
+        }
+
         if (termuxOverlay == null) {
             return
         }
@@ -5299,6 +5338,11 @@ class UIManager(
     }
 
     fun openFileConsole(command: String?) {
+        if (Looper.myLooper() != Looper.getMainLooper()) {
+            runOnMainThread { openFileConsole(command) }
+            return
+        }
+
         if (fileOverlay == null) {
             return
         }
@@ -5750,6 +5794,7 @@ class UIManager(
     }
 
     private fun hideHomeSuggestionsForTermux() {
+        hideLauncherChromeForSurface()
         if (termuxConsoleOpen) {
             return
         }
@@ -5762,11 +5807,50 @@ class UIManager(
 
     private fun restoreHomeSuggestionsAfterTermux() {
         if (!termuxConsoleOpen) {
+            restoreLauncherChromeAfterSurface()
             return
         }
         termuxConsoleOpen = false
         if (suggestionsContainer != null) {
             suggestionsContainer!!.setVisibility(suggestionsVisibilityBeforeTermux)
+        }
+        restoreLauncherChromeAfterSurface()
+    }
+
+    private fun hideLauncherChromeForSurface() {
+        if (launcherChromeHiddenForSurface) {
+            return
+        }
+        launcherChromeHiddenForSurface = true
+
+        if (mainContainer != null) {
+            launcherChromeMainVisibility = mainContainer!!.getVisibility()
+            mainContainer!!.setVisibility(View.GONE)
+        }
+        if (terminalTrayContainer != null) {
+            launcherChromeTrayVisibility = terminalTrayContainer!!.getVisibility()
+            terminalTrayContainer!!.setVisibility(View.GONE)
+        }
+        if (landscapeSplitContainer != null) {
+            launcherChromeLandscapeVisibility = landscapeSplitContainer!!.getVisibility()
+            landscapeSplitContainer!!.setVisibility(View.GONE)
+        }
+    }
+
+    private fun restoreLauncherChromeAfterSurface() {
+        if (!launcherChromeHiddenForSurface) {
+            return
+        }
+        launcherChromeHiddenForSurface = false
+
+        if (mainContainer != null) {
+            mainContainer!!.setVisibility(launcherChromeMainVisibility)
+        }
+        if (terminalTrayContainer != null) {
+            terminalTrayContainer!!.setVisibility(launcherChromeTrayVisibility)
+        }
+        if (landscapeSplitContainer != null) {
+            landscapeSplitContainer!!.setVisibility(launcherChromeLandscapeVisibility)
         }
     }
 
@@ -6324,6 +6408,11 @@ class UIManager(
     }
 
     private fun openTermuxAppSession(app: TermuxAppManager.TermuxApp) {
+        if (Looper.myLooper() != Looper.getMainLooper()) {
+            runOnMainThread { openTermuxAppSession(app) }
+            return
+        }
+
         if (termuxOverlay == null) {
             return
         }
@@ -9245,6 +9334,10 @@ class UIManager(
     fun resume() {
         if (handler == null) {
             return
+        }
+        if (restoreLauncherChromeOnResume) {
+            restoreLauncherChromeOnResume = false
+            restoreLauncherChromeAfterSurface()
         }
         setMusicVisualizerPlaying(lastMusicPlaying)
         scheduleInternalMusicTickerIfNeeded()
