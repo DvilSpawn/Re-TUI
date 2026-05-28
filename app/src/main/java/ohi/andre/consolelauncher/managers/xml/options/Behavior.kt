@@ -167,6 +167,19 @@ enum class Behavior : XMLPrefsSave {
             return XMLPrefsSave.BOOLEAN
         }
     },
+    enable_crt_filter {
+        override fun defaultValue(): String? {
+            return "false"
+        }
+
+        override fun info(): String? {
+            return "If true, Re:T-UI draws a CRT scanline overlay over the launcher"
+        }
+
+        override fun type(): String? {
+            return XMLPrefsSave.BOOLEAN
+        }
+    },
     clear_after_cmds {
         override fun defaultValue(): String? {
             return "-1"

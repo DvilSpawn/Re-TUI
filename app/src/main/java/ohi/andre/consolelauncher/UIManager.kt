@@ -151,6 +151,7 @@ import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.managers.xml.options.Toolbar
 import ohi.andre.consolelauncher.managers.xml.options.Ui
 import ohi.andre.consolelauncher.tuils.AllowEqualsSequence
+import ohi.andre.consolelauncher.tuils.CrtOverlayDrawable
 import ohi.andre.consolelauncher.tuils.CyberpunkBackdropDrawable
 import ohi.andre.consolelauncher.tuils.CyberpunkIconFrameDrawable
 import ohi.andre.consolelauncher.tuils.DuoSwitchButtonFactory
@@ -341,6 +342,7 @@ class UIManager(
     private var suggestionsContainer: View? = null
     private var suggestionsVisibilityBeforeTermux = View.VISIBLE
     private var termuxConsoleOpen = false
+    private var termuxFocusCapturePending = false
     private var launcherChromeHiddenForSurface = false
     private var restoreLauncherChromeOnResume = false
     private var launcherChromeMainVisibility = View.VISIBLE
@@ -350,6 +352,7 @@ class UIManager(
     private var terminalContainer: ViewGroup? = null
     private var terminalOutputBorder: View? = null
     private var terminalTrayToggle: TextView? = null
+    private var crtOverlayDrawable: CrtOverlayDrawable? = null
     private var hackOverlay: View? = null
     private var hackOverlayBasePaddingLeft = 0
     private var hackOverlayBasePaddingTop = 0
@@ -4780,6 +4783,7 @@ class UIManager(
         applyResponsiveLandscapeLayout(mContext!!.getResources().getConfiguration())
 
         styleClockOverlay(rootView)
+        installCrtOverlay(rootView)
 
         var drawTimes = XMLPrefsManager.getInt(Ui.text_redraw_times)
         if (drawTimes <= 0) drawTimes = 1
@@ -4808,6 +4812,16 @@ class UIManager(
         ClockManager.getInstance(context.getApplicationContext()).broadcastState()
 
         scheduleTypefaceRefreshes()
+    }
+
+    private fun installCrtOverlay(rootView: ViewGroup) {
+        if (!AppearanceSettings.crtFilter()) {
+            return
+        }
+        val overlay = CrtOverlayDrawable(rootView.getContext())
+        overlay.setAccentColor(XMLPrefsManager.getColor(Theme.output_text_color))
+        rootView.foreground = overlay
+        crtOverlayDrawable = overlay
     }
 
     private fun styleMusicWidget(musicWidget: View?) {
@@ -5539,6 +5553,7 @@ class UIManager(
     }
 
     private fun closeTermuxConsole() {
+        termuxFocusCapturePending = false
         if (termuxOverlay != null) {
             termuxOverlay!!.setVisibility(View.GONE)
         }
@@ -5568,25 +5583,39 @@ class UIManager(
         if (!this.isTermuxConsoleVisible) {
             return
         }
+        if (termuxInput != null && termuxInput!!.hasFocus()) {
+            if (showKeyboard) {
+                focusTermuxInput(true)
+            }
+            return
+        }
         releaseLauncherInputFocusForOverlay()
         if (termuxOverlay != null) {
             termuxOverlay!!.setFocusableInTouchMode(true)
-            termuxOverlay!!.requestFocus()
         }
         focusTermuxInput(showKeyboard)
     }
 
     private fun scheduleTermuxConsoleFocusCapture(showKeyboard: Boolean) {
-        if (!this.isTermuxConsoleVisible || termuxOverlay == null) {
+        if (!this.isTermuxConsoleVisible || termuxOverlay == null || termuxInput == null) {
             return
         }
-        for (delay in TERMUX_FOCUS_CAPTURE_DELAYS_MS) {
-            termuxOverlay!!.postDelayed(Runnable {
-                if (this.isTermuxConsoleVisible) {
-                    takeTermuxConsoleFocus(showKeyboard)
-                }
-            }, delay.toLong())
+        if (termuxInput!!.hasFocus()) {
+            if (showKeyboard) {
+                focusTermuxInput(true)
+            }
+            return
         }
+        if (termuxFocusCapturePending) {
+            return
+        }
+        termuxFocusCapturePending = true
+        termuxOverlay!!.postDelayed(Runnable {
+            termuxFocusCapturePending = false
+            if (this.isTermuxConsoleVisible && termuxInput != null && !termuxInput!!.hasFocus()) {
+                takeTermuxConsoleFocus(showKeyboard)
+            }
+        }, TERMUX_FOCUS_CAPTURE_DELAY_MS.toLong())
     }
 
     private fun releaseLauncherInputFocusForOverlay() {
@@ -5628,17 +5657,20 @@ class UIManager(
         if (termuxInput == null) {
             return
         }
+        val hadFocus = termuxInput!!.hasFocus()
         termuxInput!!.setFocusableInTouchMode(true)
         termuxInput!!.setShowSoftInputOnFocus(true)
         termuxInput!!.setCursorVisible(true)
-        termuxInput!!.requestFocusFromTouch()
-        termuxInput!!.requestFocus()
+        if (!hadFocus) {
+            termuxInput!!.requestFocusFromTouch()
+            termuxInput!!.requestFocus()
+        }
         if (!showKeyboard) {
             return
         }
         val immediateManager =
             mContext!!.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager?
-        if (immediateManager != null) {
+        if (immediateManager != null && !hadFocus) {
             immediateManager.restartInput(termuxInput)
         }
         termuxInput!!.post(Runnable {
@@ -9262,6 +9294,11 @@ class UIManager(
     }
 
     fun activateTerminalInput(showSoftKeyboard: Boolean) {
+        if (this.isTermuxConsoleVisible) {
+            takeTermuxConsoleFocus(showSoftKeyboard)
+            return
+        }
+
         if (mTerminalAdapter == null) {
             return
         }
@@ -9533,7 +9570,7 @@ class UIManager(
         const val EXTRA_MODULE_NAME: String = "module_name"
         const val EXTRA_WIDGET_ACTION_INDEX: String = "widget_action_index"
         const val EXTRA_WIDGET_ACTION_VALUE: String = "widget_action_value"
-        private val TERMUX_FOCUS_CAPTURE_DELAYS_MS = intArrayOf(0, 80, 180, 360)
+        private const val TERMUX_FOCUS_CAPTURE_DELAY_MS = 80
         private val TERMUX_APP_REFRESH_BURST_DELAYS_MS = intArrayOf(700, 1600, 3500, 8000, 15000, 30000)
         private const val TERMUX_APP_ADAPTIVE_REFRESH_INTERVAL_MS = 3000
         private const val TERMUX_APP_INPUT_WATCH_MS = 30000L

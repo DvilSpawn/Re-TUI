@@ -17,6 +17,9 @@ object AppearanceSettings {
     fun cyberdeckMode(): Boolean = LauncherSettings.getBoolean(Behavior.enable_cyberdeck_mode)
 
     @JvmStatic
+    fun crtFilter(): Boolean = LauncherSettings.getBoolean(Behavior.enable_crt_filter)
+
+    @JvmStatic
     fun useSystemFont(): Boolean = LauncherSettings.getBoolean(Ui.system_font)
 
     @JvmStatic
