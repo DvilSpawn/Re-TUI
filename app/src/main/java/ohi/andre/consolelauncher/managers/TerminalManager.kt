@@ -85,8 +85,13 @@ class TerminalManager(
 
     private val mScrollRunnable: Runnable = object : Runnable {
         override fun run() {
-            mScrollView.fullScroll(ScrollView.FOCUS_DOWN)
-            mInputView!!.requestFocus()
+            val restoreInputFocus = mInputView != null && mInputView!!.hasFocus()
+            val child = if (mScrollView.childCount > 0) mScrollView.getChildAt(0) else null
+            val scrollY = if (child == null) 0 else child.bottom - mScrollView.height
+            mScrollView.scrollTo(0, if (scrollY > 0) scrollY else 0)
+            if (restoreInputFocus && mInputView != null) {
+                mInputView!!.requestFocus()
+            }
         }
     }
 
