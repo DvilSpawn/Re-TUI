@@ -4876,7 +4876,7 @@ class UIManager(
                 btn.setBackgroundDrawable(
                     TerminalBorderRuntime.panelDrawable(
                         mContext!!,
-                        Color.TRANSPARENT,
+                        moduleButtonBackgroundColor(),
                         widgetBorderColor,
                         1.2f,
                         moduleCornerRadius(),
