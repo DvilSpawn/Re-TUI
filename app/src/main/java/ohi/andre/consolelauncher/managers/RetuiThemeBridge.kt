@@ -49,9 +49,34 @@ object RetuiThemeBridge {
 
     private fun buildKeyboardPrivateOptions(contextLabel: String?, mode: String?): String {
         val bundle = buildLauncherThemeBundle(null, contextLabel, mode)
-        return KEYBOARD_PRIVATE_OPTIONS_PREFIX + ":" + KEYBOARD_PRIVATE_KEYS
-            .filter { key -> bundle.containsKey(key) }
-            .joinToString(";") { key -> key + "=" + bundle.get(key).toString() }
+        val options = buildList {
+            KEYBOARD_COLOR_KEYS.forEach { key ->
+                if (bundle.containsKey(key)) {
+                    add(key + "=" + colorOption(bundle.getInt(key)))
+                }
+            }
+            KEYBOARD_INT_KEYS.forEach { key ->
+                if (bundle.containsKey(key)) {
+                    add(key + "=" + bundle.getInt(key))
+                }
+            }
+            KEYBOARD_FLOAT_KEYS.forEach { key ->
+                if (bundle.containsKey(key)) {
+                    add(key + "=" + bundle.getFloat(key))
+                }
+            }
+            KEYBOARD_BOOLEAN_KEYS.forEach { key ->
+                if (bundle.containsKey(key)) {
+                    add(key + "=" + bundle.getBoolean(key))
+                }
+            }
+            KEYBOARD_STRING_KEYS.forEach { key ->
+                bundle.getString(key)?.takeIf { it.isNotBlank() }?.let { value ->
+                    add(key + "=" + value)
+                }
+            }
+        }
+        return KEYBOARD_PRIVATE_OPTIONS_PREFIX + ":" + options.joinToString(";")
     }
 
     private fun buildLauncherThemeBundle(
@@ -142,7 +167,11 @@ object RetuiThemeBridge {
         return if (Color.alpha(outputBg) > 0) outputBg else terminalBg
     }
 
-    private val KEYBOARD_PRIVATE_KEYS = arrayOf(
+    private fun colorOption(color: Int): String {
+        return "#" + Integer.toHexString(color).padStart(8, '0').takeLast(8)
+    }
+
+    private val KEYBOARD_COLOR_KEYS = arrayOf(
         "theme_bg",
         "theme_text",
         "theme_border",
@@ -163,23 +192,35 @@ object RetuiThemeBridge {
         "output_bg_color",
         "output_background_color",
         "output_text_color",
-        "output_border_color",
+        "output_border_color"
+    )
+
+    private val KEYBOARD_INT_KEYS = arrayOf(
         "input_font_size",
-        "enable_dashed_border",
-        "dashed_borders",
         "dashed_border_dash_length",
         "dashed_border_gap_length",
-        "dashed_border_stroke_width_dp",
         "module_corner_radius",
         "header_corner_radius",
         "output_corner_radius",
         "module_header_text_size",
         "module_body_text_size",
-        "output_header_text_size",
+        "output_header_text_size"
+    )
+
+    private val KEYBOARD_FLOAT_KEYS = arrayOf(
+        "dashed_border_stroke_width_dp"
+    )
+
+    private val KEYBOARD_BOOLEAN_KEYS = arrayOf(
+        "enable_dashed_border",
+        "dashed_borders",
         "enable_cyberdeck_mode",
         "cyberdeck_mode",
         "enable_crt_filter",
-        "crt_filter",
+        "crt_filter"
+    )
+
+    private val KEYBOARD_STRING_KEYS = arrayOf(
         "keyboard_context",
         "retui_context",
         "keyboard_mode",
