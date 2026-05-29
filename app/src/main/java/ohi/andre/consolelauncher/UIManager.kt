@@ -80,6 +80,7 @@ import ohi.andre.consolelauncher.managers.AppsManager.LaunchInfo
 import ohi.andre.consolelauncher.managers.ClockManager
 import ohi.andre.consolelauncher.managers.PomodoroManager
 import ohi.andre.consolelauncher.managers.PomodoroManager.SessionType
+import ohi.andre.consolelauncher.managers.RetuiThemeBridge
 import ohi.andre.consolelauncher.managers.TerminalManager
 import ohi.andre.consolelauncher.managers.ToolbarShortcutManager
 import ohi.andre.consolelauncher.managers.ToolbarShortcutManager.slot
@@ -790,9 +791,11 @@ class UIManager(
             }
             inputView.setCursorVisible(true)
             inputView.setShowSoftInputOnFocus(true)
+            sendRetuiKeyboardTheme(inputView, "launcher")
             inputView.requestFocus()
             imm.showSoftInput(inputView, InputMethodManager.SHOW_IMPLICIT)
         })
+        applyRetuiKeyboardTheme(inputView, "launcher")
 
         Companion.applyBgRect(
             mContext!!,
@@ -3759,6 +3762,7 @@ class UIManager(
         }
 
         if (termuxInput != null) {
+            applyRetuiKeyboardTheme(termuxInput, "termux")
             termuxInput!!.setOnFocusChangeListener(OnFocusChangeListener { v: View?, hasFocus: Boolean ->
                 termuxInput!!.setCursorVisible(hasFocus)
                 termuxInput!!.setShowSoftInputOnFocus(hasFocus)
@@ -3861,6 +3865,7 @@ class UIManager(
         }
 
         if (fileInput != null) {
+            applyRetuiKeyboardTheme(fileInput, "files")
             fileInput!!.setOnEditorActionListener(OnEditorActionListener { v: TextView?, actionId: Int, event: KeyEvent? ->
                 val enter =
                     event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_UP
@@ -5374,11 +5379,13 @@ class UIManager(
         }
 
         if (fileInput != null) {
+            sendRetuiKeyboardTheme(fileInput, "files")
             fileInput!!.requestFocus()
             fileInput!!.postDelayed(Runnable {
                 val manager =
                     mContext!!.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager?
                 if (manager != null) {
+                    sendRetuiKeyboardTheme(fileInput, "files")
                     manager.showSoftInput(fileInput, InputMethodManager.SHOW_IMPLICIT)
                 }
             }, 120)
@@ -5661,6 +5668,7 @@ class UIManager(
         termuxInput!!.setFocusableInTouchMode(true)
         termuxInput!!.setShowSoftInputOnFocus(true)
         termuxInput!!.setCursorVisible(true)
+        sendRetuiKeyboardTheme(termuxInput, "termux")
         if (!hadFocus) {
             termuxInput!!.requestFocusFromTouch()
             termuxInput!!.requestFocus()
@@ -5677,6 +5685,7 @@ class UIManager(
             val manager =
                 mContext!!.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager?
             if (manager != null) {
+                sendRetuiKeyboardTheme(termuxInput, "termux")
                 manager.showSoftInput(termuxInput, InputMethodManager.SHOW_IMPLICIT)
             }
         })
@@ -5685,6 +5694,7 @@ class UIManager(
                 val manager =
                     mContext!!.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager?
                 if (manager != null) {
+                    sendRetuiKeyboardTheme(termuxInput, "termux")
                     manager.showSoftInput(termuxInput, InputMethodManager.SHOW_IMPLICIT)
                 }
             }
@@ -9155,9 +9165,18 @@ class UIManager(
         Tuils.cancelFont()
     }
 
+    private fun applyRetuiKeyboardTheme(input: EditText?, mode: String) {
+        RetuiThemeBridge.applyToKeyboardInput(input, mainPack.currentDirectory.absolutePath, mode)
+    }
+
+    private fun sendRetuiKeyboardTheme(input: EditText?, mode: String) {
+        RetuiThemeBridge.sendToKeyboard(mContext, input, mainPack.currentDirectory.absolutePath, mode)
+    }
+
     fun openKeyboard() {
         activateTerminalInput(true)
         if (mTerminalAdapter != null) {
+            sendRetuiKeyboardTheme(mTerminalAdapter!!.inputView as? EditText, "launcher")
             imm.showSoftInput(mTerminalAdapter!!.inputView, InputMethodManager.SHOW_FORCED)
         }
     }
@@ -9311,6 +9330,7 @@ class UIManager(
         val input = mTerminalAdapter!!.inputView
         if (input is EditText) {
             val terminalInput = input
+            applyRetuiKeyboardTheme(terminalInput, "launcher")
             terminalInput.setShowSoftInputOnFocus(showSoftKeyboard)
             terminalInput.setCursorVisible(true)
             if (terminalInput is OutlineEditText) {
@@ -9321,7 +9341,11 @@ class UIManager(
         mTerminalAdapter!!.requestInputFocus()
         mTerminalAdapter!!.focusInputEnd()
         if (showSoftKeyboard) {
-            input?.post(Runnable { imm.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT) })
+            sendRetuiKeyboardTheme(input as? EditText, "launcher")
+            input?.post(Runnable {
+                sendRetuiKeyboardTheme(input as? EditText, "launcher")
+                imm.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT)
+            })
         }
     }
 
