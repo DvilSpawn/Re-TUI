@@ -1,6 +1,6 @@
 # Automation and Chaining
 
-Re:T-UI already has several automation surfaces. Phase 6 does not add a second command-chain system; aliases remain the main workflow layer.
+Re:T-UI has several automation surfaces. Aliases remain the main workflow layer.
 
 ## Current Surfaces
 
@@ -85,16 +85,6 @@ timer -add 5m
 stopwatch
 pomodoro deep-work
 ```
-
-## Known Gaps
-
-These are the places a future automation feature could matter:
-
-- conditions: run only if a state is true
-- confirmations: ask before sensitive commands
-- scheduling: run a command or alias at a time or interval
-- failure handling: stop or continue when one command fails
-- external triggers: react to narrow trusted events
 
 ## Product Rule
 

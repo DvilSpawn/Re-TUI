@@ -315,12 +315,21 @@ Built-in modules:
 - `timer`
 - `calendar`
 - `reminder`
+- `notes`
+- `rss`
+- `weather`
 
 Common commands:
 
 - `module -ls`
 - `module -show music`
+- `module -show notifications`
+- `module -show timer`
+- `module -show calendar`
 - `module -show reminder`
+- `module -show notes`
+- `module -show rss`
+- `module -show weather`
 - `module -prompt reminder add`
 - `module -prompt reminder edit`
 - `module -prompt reminder remove`
@@ -348,7 +357,7 @@ Design direction:
 - active modules can provide suggestion chips when input is empty
 - Termux modules should stay text/callback based, with no arbitrary shell code loaded into Re:T-UI
 - Lua modules use the launcher-native Lua runtime for safe panels, buttons, config, and app/intent/shortcut helpers
-- future module sessions will let modules ask users for values step by step
+- reminder prompt sessions ask users for values step by step and keep normal command execution paused until the session ends
 
 Termux modules use Termux for execution and render text back inside a Re:T-UI module window. Lua modules use app-local source files and the same dock. `module -rm` removes only Re:T-UI's registry entry; it does not delete the Termux script.
 
@@ -428,9 +437,14 @@ Open Re:T-UI Files, the companion terminal-style file console.
 Examples:
 
 - `files`
-- `files open notes.txt`
 
-Use the Files app for file navigation, opening, sharing, and future text/config editing. The launcher passes theme, font, and margin values so the app can visually match Re:T-UI.
+After it opens, use commands inside Re:T-UI Files:
+
+- `open notes.txt`
+- `share backup.zip`
+- `cd configs`
+
+Use the Files app for file navigation, opening, and sharing. The launcher passes theme, font, and margin values so the app can visually match Re:T-UI.
 
 See also: [Re:T-UI Files](./ReTUI-Files.md).
 
@@ -451,7 +465,7 @@ This is the old-school power-user path.
 
 Legacy launcher text-editor infrastructure.
 
-It is kept for internal compatibility, but it is no longer the recommended file-editing surface and should not appear as a general Android file editor. Future text/config editing belongs in Re:T-UI Files.
+It is kept for internal compatibility, but it is no longer the recommended file surface and should not appear as a general Android file editor.
 
 ## Inspection and Troubleshooting
 

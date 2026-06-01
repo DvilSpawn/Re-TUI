@@ -1,6 +1,6 @@
 # Preset Sharing
 
-Presets are the current Re:T-UI way to keep, re-apply, and eventually share theme states.
+Presets are the current Re:T-UI way to keep, re-apply, and share theme states.
 
 ## What A Preset Captures
 

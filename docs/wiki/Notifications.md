@@ -87,7 +87,7 @@ You can inspect bindings with:
 reply -ls
 ```
 
-Some apps may expose multiple conversation notifications. Re:T-UI should reply to the selected notification action, not just the package name, so replies go to the intended conversation.
+Some apps may expose multiple conversation notifications. Re:T-UI replies through the selected notification action, not just the package name, so replies go to the intended conversation.
 
 ## Output vs Widget
 

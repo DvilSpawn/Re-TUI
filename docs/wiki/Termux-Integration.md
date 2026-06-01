@@ -1,8 +1,8 @@
 # Termux Integration
 
-Re:T-UI can dispatch non-interactive Termux scripts from its own terminal surface.
+Re:T-UI can dispatch Termux scripts from its own terminal surface.
 
-This is not a full embedded Termux shell. Termux remains the real shell. Re:T-UI sends script runs to Termux and prints returned output when Termux provides it.
+Termux remains the real shell. Re:T-UI can open a launcher-styled Termux console, dispatch scripts, and host tmux-backed app sessions, but it does not replace Termux as the Linux environment.
 
 TBridge is the Termux capability bridge for scripts, modules, callbacks, and automation diagnostics. Re:T-UI Files owns file navigation.
 
@@ -15,6 +15,13 @@ The old BusyBox manager has been removed; use Termux for Linux packages and main
 - `termux -setup`
 - `termux -open`
 - `termux -run <script_path> [args...]`
+- `termux -apps`
+- `termux -app <id>`
+- `termux -app-add <id> <command>`
+- `termux -app-info <id>`
+- `termux -app-sync <id>`
+- `termux -app-action <id> <label> [input]`
+- `termux -app-rm <id>`
 
 TBridge diagnostics:
 
@@ -29,6 +36,13 @@ Inside the Termux console, you can also type:
 - `setup`
 - `open`
 - `run <script_path> [args...]`
+- `apps`
+- `app <id>`
+- `app-add <id> <command>`
+- `app-info <id>`
+- `app-sync <id>`
+- `app-action <id> <label> [input]`
+- `app-rm <id>`
 - `clear`
 - `exit`
 
@@ -172,7 +186,7 @@ You can also update modules by callback. This is better for scripts that run on 
 
 ## Termux Apps
 
-Termux apps are a first-pass session surface for interactive Bash tools that should feel closer to an application than a one-shot module. Re:T-UI owns the app window, input field, styling, suggestions, and local commands. Termux owns the running process through `tmux`.
+Termux apps are persistent session surfaces for interactive Bash tools that should feel closer to an application than a one-shot module. Re:T-UI owns the app window, input field, styling, suggestions, and local commands. Termux owns the running process through `tmux`.
 
 Common commands:
 
@@ -225,7 +239,7 @@ Inside the app surface:
 :open
 ```
 
-Plain input is sent into the tmux session and followed by Enter. Colon-prefixed input is handled by Re:T-UI. This v2 bridge keeps sessions alive, mirrors a RetUI-owned manifest, exposes static actions, and lets Re:T-UI capture the current tmux pane, but it is not a full streaming PTY. Captures are sequenced so stale RunCommand results cannot overwrite newer frames, and refresh polling now backs off unless the captured pane is still changing.
+Plain input is sent into the tmux session and followed by Enter. Colon-prefixed input is handled by Re:T-UI. This bridge keeps sessions alive, mirrors a RetUI-owned manifest, exposes static actions, and lets Re:T-UI capture the current tmux pane. It is not a full streaming PTY. Captures are sequenced so stale RunCommand results cannot overwrite newer frames, and refresh polling backs off unless the captured pane is still changing.
 
 ## TBridge Role
 
@@ -236,7 +250,6 @@ Use TBridge for:
 - script runtime support
 - script-module refreshes
 - callback/token tests
-- future helper installation
 
 Do not use TBridge as the primary file manager. Use:
 
@@ -246,25 +259,9 @@ files
 
 The older `tbridge -ls`, `tbridge -dirs`, and `tbridge -files` entry points are retired from the public command surface. If you want bridge-backed quick file actions, use `ls`, `open`, or `share` with `file_backend=termux`; if you want browsing, use `files`.
 
-## Module Suggestions
+## Module Output
 
-Re:T-UI modules are intended to become small workstation panels that can also offer contextual suggestions while they are active.
-
-The first contract should stay narrow and inspectable:
-
-- `body`: text rendered inside the module panel
-- `title`: short module label or status
-- `suggest`: suggestion chip text
-- `action`: what should happen when a suggestion is clicked
-- `mode`: how the action is dispatched
-
-Possible action modes:
-
-- `command`: Re:T-UI runs a normal command
-- `termux-run`: Re:T-UI dispatches a Termux script with arguments
-- `callback`: Re:T-UI sends a narrow callback-style action back through the existing bridge
-
-Current parser format:
+Termux modules print text and optional metadata lines. Re:T-UI parses those lines into a module title, body, monospace blocks, and suggestion chips.
 
 ```text
 ::title Timer
@@ -272,7 +269,7 @@ Current parser format:
 ::suggest +5 minutes | command | timer -add 5m
 ```
 
-For Termux-backed modules, the equivalent might be:
+Example:
 
 ```text
 ::title Server
@@ -281,10 +278,6 @@ For Termux-backed modules, the equivalent might be:
 ::suggest refresh | command | module -refresh server
 ::suggest logs | command | termux -run logs
 ```
-
-This is not arbitrary plugin execution. Re:T-UI should keep rendering and suggestion behavior under its control.
-
-Current implementation notes:
 
 - `::title` changes the module label.
 - `::body` adds a line to the rendered module body.
@@ -324,7 +317,7 @@ The first prompt types are:
 - `time`
 - `confirm`
 
-Scripts should request Android reminders/alarms through Re:T-UI. Re:T-UI should own notification channels, alarm scheduling, and tones for reliability.
+Scripts should request Android reminders/alarms through Re:T-UI. Re:T-UI owns notification channels, alarm scheduling, and tones for reliability.
 
 ## Arguments
 

@@ -3,22 +3,25 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Re:T-UI</title>
-  <meta name="description" content="Re:T-UI is a command-first Android launcher with terminal styling, app drawer management, Lua modules, Termux modules, presets, Termux integration, and practical wiki-style guides.">
+  <title>Re:T-UI Docs</title>
+  <meta name="description" content="Re:T-UI documentation presented as a terminal-style file tree with guides for commands, apps, modules, Lua, Termux, presets, downloads, and privacy.">
   <style>
     :root {
       color-scheme: dark;
-      --bg: #080909;
-      --panel: #151717;
-      --panel-soft: #202322;
-      --ink: #f4eee7;
-      --muted: #c8b9b5;
-      --accent: #d98b99;
-      --accent-strong: #f0a7b0;
-      --line: #4b393d;
+      --bg: #050606;
+      --terminal: #080a09;
+      --pane: #0c0f0e;
+      --pane-soft: #111514;
+      --ink: #ece7df;
+      --muted: #a79e97;
+      --dim: #6f7770;
+      --line: #24312d;
+      --line-hot: #5f7468;
       --green: #b8db88;
       --cyan: #81cad6;
-      --violet: #b7a2e8;
+      --amber: #e8c982;
+      --rose: #d98b99;
+      --red: #ef7b72;
     }
 
     * {
@@ -30,230 +33,340 @@
     }
 
     body {
+      min-height: 100vh;
       margin: 0;
-      background: #080909;
+      background:
+        linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+        radial-gradient(circle at 88% 8%, rgba(129, 202, 214, 0.08), transparent 28rem),
+        radial-gradient(circle at 12% 82%, rgba(184, 219, 136, 0.07), transparent 30rem),
+        var(--bg);
+      background-size: 100% 4px, auto, auto, auto;
       color: var(--ink);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      line-height: 1.58;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      line-height: 1.55;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0));
+      mix-blend-mode: overlay;
+      opacity: 0.4;
+      z-index: 20;
     }
 
     a {
       color: inherit;
     }
 
-    main {
-      width: min(1180px, calc(100% - 32px));
-      margin: 0 auto;
-      padding: 0 0 72px;
+    .terminal-shell {
+      width: min(1560px, calc(100% - 28px));
+      min-height: calc(100vh - 28px);
+      margin: 14px auto;
+      border: 1px solid var(--line-hot);
+      background: rgba(8, 10, 9, 0.96);
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.52);
     }
 
-    nav {
+    .titlebar,
+    .statusbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 38px;
+      padding: 0 14px;
+      border-bottom: 1px solid var(--line);
+      background: #0a0d0c;
+      color: var(--muted);
+      font-size: 0.82rem;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .statusbar {
+      min-height: 34px;
+      border-top: 1px solid var(--line);
+      border-bottom: 0;
+    }
+
+    .traffic {
+      display: inline-flex;
+      gap: 7px;
+      flex: 0 0 auto;
+    }
+
+    .traffic span {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: var(--dim);
+    }
+
+    .traffic span:nth-child(1) {
+      background: var(--red);
+    }
+
+    .traffic span:nth-child(2) {
+      background: var(--amber);
+    }
+
+    .traffic span:nth-child(3) {
+      background: var(--green);
+    }
+
+    .title-path,
+    .status-path {
+      color: var(--green);
+    }
+
+    .title-spacer,
+    .status-spacer {
+      flex: 1 1 auto;
+    }
+
+    .viewport {
+      display: grid;
+      grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
+      min-height: calc(100vh - 114px);
+    }
+
+    .tree-pane {
       position: sticky;
       top: 0;
-      z-index: 4;
+      align-self: start;
+      height: calc(100vh - 76px);
+      border-right: 1px solid var(--line);
+      background: rgba(10, 13, 12, 0.96);
+      overflow: auto;
+    }
+
+    .tree-header,
+    .pane-header {
       display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      padding: 12px 0;
-      background: linear-gradient(180deg, rgba(8, 9, 9, 0.96), rgba(8, 9, 9, 0.72));
-      backdrop-filter: blur(12px);
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 40px;
+      padding: 0 13px;
+      border-bottom: 1px solid var(--line);
+      background: var(--pane-soft);
+      color: var(--cyan);
+      font-size: 0.8rem;
+      text-transform: uppercase;
     }
 
-    nav a,
-    .button-link,
-    .doc-link {
-      border: 1px solid var(--line);
-      border-radius: 6px;
-      background: rgba(32, 35, 34, 0.78);
+    .tree {
+      padding: 14px 12px 24px;
+      font-size: 0.86rem;
+    }
+
+    .tree-group {
+      margin: 0 0 18px;
+    }
+
+    .tree-dir {
+      color: var(--green);
+      margin: 0 0 6px;
+    }
+
+    .tree a {
+      display: block;
+      position: relative;
+      margin: 0;
+      padding: 3px 6px 3px 29px;
       color: var(--muted);
-      padding: 7px 10px;
       text-decoration: none;
-      font: 0.78rem "SFMono-Regular", Consolas, monospace;
     }
 
-    nav a:hover,
-    nav a:focus-visible,
-    .button-link:hover,
-    .button-link:focus-visible,
-    .doc-link:hover,
-    .doc-link:focus-visible {
-      border-color: var(--cyan);
+    .tree a::before {
+      content: "|--";
+      position: absolute;
+      left: 6px;
+      color: var(--dim);
+    }
+
+    .tree a:hover,
+    .tree a:focus-visible {
+      background: rgba(129, 202, 214, 0.09);
       color: var(--ink);
-      outline: none;
+      outline: 1px solid rgba(129, 202, 214, 0.36);
+      outline-offset: -1px;
     }
 
-    .donate-button {
-      position: fixed;
-      right: max(16px, env(safe-area-inset-right));
-      bottom: max(16px, env(safe-area-inset-bottom));
-      z-index: 5;
-      border: 1px solid var(--accent);
-      border-radius: 6px;
-      background: rgba(217, 139, 153, 0.92);
-      color: #080909;
-      padding: 10px 13px;
-      text-decoration: none;
-      font: 0.82rem "SFMono-Regular", Consolas, monospace;
-      box-shadow: 0 14px 38px rgba(0, 0, 0, 0.42);
+    .tree .external::after {
+      content: " ->";
+      color: var(--dim);
     }
 
-    .donate-button:hover,
-    .donate-button:focus-visible {
-      border-color: var(--cyan);
-      background: var(--cyan);
-      color: #080909;
-      outline: none;
+    .content-pane {
+      min-width: 0;
+      background: var(--terminal);
     }
 
-    .hero {
-      min-height: 74vh;
+    .buffer {
+      min-height: calc(100vh - 154px);
+      padding: 22px;
+      overflow: hidden;
+    }
+
+    .terminal-card,
+    .terminal-section {
+      border: 1px solid var(--line);
+      background: rgba(6, 8, 7, 0.82);
+    }
+
+    .terminal-card {
+      margin-bottom: 18px;
+    }
+
+    .terminal-section {
+      scroll-margin-top: 22px;
+      margin: 0 0 18px;
+    }
+
+    .cmd-line {
+      display: flex;
+      gap: 10px;
+      align-items: baseline;
+      padding: 11px 13px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(17, 21, 20, 0.88);
+      color: var(--green);
+      font-size: 0.84rem;
+    }
+
+    .prompt {
+      color: var(--green);
+      flex: 0 0 auto;
+    }
+
+    .cmd {
+      color: var(--cyan);
+      overflow-wrap: anywhere;
+    }
+
+    .output {
+      padding: 16px;
+    }
+
+    .output.hero-output {
+      min-height: 520px;
       display: grid;
       align-content: end;
-      padding: 88px 0 56px;
-      border-bottom: 1px solid var(--line);
       background-image:
-        linear-gradient(90deg, rgba(8, 9, 9, 0.98) 0%, rgba(8, 9, 9, 0.83) 44%, rgba(8, 9, 9, 0.28) 100%),
+        linear-gradient(90deg, rgba(6, 8, 7, 0.98) 0%, rgba(6, 8, 7, 0.9) 46%, rgba(6, 8, 7, 0.34) 100%),
         url("phone-blog-assets/01-launcher.png");
       background-repeat: no-repeat;
       background-size: cover;
       background-position: right center;
     }
 
-    .eyebrow,
-    .kicker {
-      color: var(--green);
-      font-family: "SFMono-Regular", Consolas, monospace;
-      font-size: 0.82rem;
-      letter-spacing: 0;
-      text-transform: uppercase;
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
     }
 
     h1 {
-      max-width: 760px;
-      margin: 14px 0 18px;
-      font-size: 5.9rem;
+      max-width: 780px;
+      margin-bottom: 14px;
+      color: var(--ink);
+      font-size: clamp(3.2rem, 7vw, 6.6rem);
       line-height: 0.94;
       letter-spacing: 0;
     }
 
     h2 {
-      margin: 0 0 12px;
-      font-size: 2.15rem;
-      line-height: 1.08;
+      margin-bottom: 12px;
+      color: var(--ink);
+      font-size: clamp(1.55rem, 3vw, 2.5rem);
+      line-height: 1.1;
       letter-spacing: 0;
     }
 
     h3 {
-      margin: 0 0 8px;
       color: var(--ink);
-      font-size: 1.04rem;
-      letter-spacing: 0;
+      font-size: 1rem;
     }
 
     p {
-      margin: 0 0 14px;
+      max-width: 920px;
       color: var(--muted);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       font-size: 1rem;
     }
 
     .lead {
-      max-width: 720px;
-      color: var(--muted);
-      font-size: 1.2rem;
+      max-width: 760px;
+      font-size: 1.15rem;
     }
 
-    .meta,
-    .chips,
-    .cta-row,
-    .doc-links {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 22px;
+    .kicker {
+      margin-bottom: 10px;
+      color: var(--green);
+      font-size: 0.82rem;
+      text-transform: uppercase;
     }
 
-    .meta span,
-    .chips span {
-      border: 1px solid var(--line);
-      border-radius: 6px;
-      background: rgba(32, 35, 34, 0.76);
-      color: var(--muted);
-      padding: 8px 11px;
-      font: 0.8rem "SFMono-Regular", Consolas, monospace;
-    }
-
-    .cta-row a,
-    .primary-link {
-      border: 1px solid var(--accent);
-      border-radius: 6px;
-      background: rgba(217, 139, 153, 0.17);
-      color: var(--ink);
-      padding: 9px 12px;
-      text-decoration: none;
-      font: 0.82rem "SFMono-Regular", Consolas, monospace;
-    }
-
-    .cta-row a.secondary,
-    .primary-link.secondary {
-      border-color: var(--line);
-      background: rgba(32, 35, 34, 0.76);
-      color: var(--muted);
-    }
-
-    .cta-row a:hover,
-    .cta-row a:focus-visible,
-    .primary-link:hover,
-    .primary-link:focus-visible {
-      border-color: var(--cyan);
-      color: var(--ink);
-      outline: none;
-    }
-
-    section.guide {
-      scroll-margin-top: 132px;
-      padding: 46px 0;
-      border-bottom: 1px solid rgba(75, 57, 61, 0.82);
-    }
-
-    .section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 18px;
-      margin-bottom: 22px;
-    }
-
-    .section-header .heading-copy {
-      max-width: 800px;
-    }
-
-    .split {
-      display: grid;
-      grid-template-columns: minmax(0, 0.94fr) minmax(300px, 0.78fr);
-      gap: 28px;
-      align-items: start;
-    }
-
-    .grid,
-    .wiki-grid,
+    .terminal-links,
+    .doc-grid,
     .command-grid,
     .download-grid,
     .shot-grid {
       display: grid;
-      gap: 14px;
-      margin-top: 22px;
+      gap: 10px;
+      margin-top: 16px;
     }
 
-    .grid {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+    .terminal-links {
+      display: flex;
+      flex-wrap: wrap;
     }
 
-    .wiki-grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+    .terminal-link,
+    .action-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      border: 1px solid rgba(129, 202, 214, 0.38);
+      background: rgba(129, 202, 214, 0.06);
+      color: var(--cyan);
+      padding: 7px 9px;
+      text-decoration: none;
+      font-size: 0.82rem;
+    }
+
+    .terminal-link::before,
+    .action-link::before {
+      content: "$";
+      color: var(--green);
+    }
+
+    .terminal-link.primary,
+    .action-link.primary {
+      border-color: rgba(184, 219, 136, 0.7);
+      background: rgba(184, 219, 136, 0.14);
+      color: var(--ink);
+    }
+
+    .terminal-link:hover,
+    .terminal-link:focus-visible,
+    .action-link:hover,
+    .action-link:focus-visible {
+      border-color: var(--rose);
+      color: var(--ink);
+      outline: none;
+    }
+
+    .doc-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .command-grid {
-      grid-template-columns: repeat(5, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
     .download-grid {
@@ -264,101 +377,78 @@
       grid-template-columns: repeat(4, minmax(0, 1fr));
     }
 
-    .tile,
-    .wiki-card,
-    .command-card,
-    .download-card,
-    .note,
-    .terminal-list,
-    figure {
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: rgba(21, 23, 23, 0.78);
-    }
-
-    .tile,
-    .wiki-card,
-    .command-card,
-    .download-card,
+    .file-row,
+    .command-row,
+    .download-row,
+    figure,
     .note {
       min-width: 0;
-      padding: 16px;
+      border: 1px solid rgba(36, 49, 45, 0.95);
+      background: rgba(17, 21, 20, 0.72);
+      padding: 12px;
     }
 
-    .tile,
-    .download-card {
-      min-height: 160px;
-    }
-
-    .wiki-card {
-      min-height: 210px;
+    .file-row {
       display: grid;
-      align-content: start;
+      gap: 8px;
     }
 
-    .command-card {
-      min-height: 142px;
-      display: grid;
-      align-content: start;
+    .file-row .path,
+    .command-row strong,
+    code {
+      color: var(--cyan);
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
     }
 
-    .download-card {
-      display: grid;
-      align-content: start;
+    .file-row .path::before {
+      content: "./";
+      color: var(--dim);
     }
 
-    .tile p,
-    .wiki-card p,
-    .command-card p,
-    .download-card p {
-      margin: 8px 0 0;
+    .file-row p,
+    .command-row p,
+    .download-row p,
+    .note p {
+      margin-bottom: 0;
       font-size: 0.92rem;
     }
 
-    code,
-    pre,
-    .terminal-list,
-    .command-card strong,
-    .wiki-card .path {
-      font-family: "SFMono-Regular", Consolas, monospace;
+    .inline-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
     }
 
-    code {
-      color: var(--cyan);
-    }
-
-    .command-card strong {
-      color: var(--accent-strong);
-      overflow-wrap: anywhere;
-    }
-
-    .wiki-card .path {
+    .inline-links a {
       color: var(--green);
-      font-size: 0.78rem;
-      margin-bottom: 10px;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(184, 219, 136, 0.34);
+      font-size: 0.82rem;
     }
 
-    .terminal-list {
+    .inline-links a:hover,
+    .inline-links a:focus-visible {
+      color: var(--ink);
+      border-color: var(--rose);
+      outline: none;
+    }
+
+    .command-row {
       display: grid;
-      overflow: hidden;
+      gap: 7px;
+      align-content: start;
+      min-height: 110px;
     }
 
-    .terminal-list div {
-      padding: 12px 14px;
-      border-bottom: 1px solid rgba(75, 57, 61, 0.72);
-      color: var(--muted);
-    }
-
-    .terminal-list div:last-child {
-      border-bottom: 0;
-    }
-
-    .terminal-list strong {
-      color: var(--cyan);
+    .download-row {
+      display: grid;
+      gap: 10px;
+      align-content: start;
     }
 
     figure {
       margin: 0;
+      padding: 0;
       overflow: hidden;
     }
 
@@ -368,427 +458,454 @@
       aspect-ratio: 9 / 19.8;
       object-fit: cover;
       object-position: top;
-      background: #050505;
+      background: #020303;
     }
 
     figcaption {
-      padding: 11px 13px;
+      padding: 10px;
       border-top: 1px solid var(--line);
       color: var(--muted);
-      font-size: 0.88rem;
-    }
-
-    .download-link {
-      justify-self: start;
-      margin-top: 18px;
-      border: 1px solid var(--accent);
-      border-radius: 6px;
-      background: rgba(217, 139, 153, 0.17);
-      color: var(--ink);
-      padding: 9px 12px;
-      text-decoration: none;
-      font: 0.82rem "SFMono-Regular", Consolas, monospace;
-    }
-
-    .download-link.secondary {
-      border-color: var(--line);
-      background: rgba(32, 35, 34, 0.76);
-      color: var(--muted);
-    }
-
-    .download-link:hover,
-    .download-link:focus-visible {
-      border-color: var(--cyan);
-      color: var(--ink);
-      outline: none;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 0.84rem;
     }
 
     .note {
-      border-color: rgba(129, 202, 214, 0.46);
-      background: rgba(129, 202, 214, 0.08);
+      border-color: rgba(217, 139, 153, 0.42);
+      background: rgba(217, 139, 153, 0.06);
     }
 
-    .note p:last-child {
-      margin-bottom: 0;
-    }
-
-    .index-band {
+    .terminal-list {
+      margin: 14px 0 0;
+      padding: 0;
+      list-style: none;
       border: 1px solid var(--line);
-      border-radius: 8px;
-      background: #060707;
-      padding: 18px;
     }
 
-    .index-band pre {
-      margin: 0;
-      white-space: pre-wrap;
+    .terminal-list li {
+      padding: 9px 11px;
+      color: var(--muted);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .terminal-list li:last-child {
+      border-bottom: 0;
+    }
+
+    .terminal-list strong {
+      color: var(--cyan);
+    }
+
+    .quick-commands {
+      margin: 14px 0 0;
+      padding: 13px;
+      border: 1px solid var(--line);
+      background: #050606;
       color: var(--green);
-      font: 0.9rem "SFMono-Regular", Consolas, monospace;
+      white-space: pre-wrap;
+      overflow-x: auto;
     }
 
-    @media (max-width: 980px) {
-      h1 {
-        font-size: 4.6rem;
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (max-width: 1080px) {
+      .viewport {
+        grid-template-columns: minmax(210px, 260px) minmax(0, 1fr);
       }
 
-      .grid,
+      .doc-grid,
+      .command-grid,
       .shot-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
-
-      .wiki-grid,
-      .command-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
     }
 
-    @media (max-width: 760px) {
-      main {
-        width: min(100% - 22px, 720px);
+    @media (max-width: 780px) {
+      .terminal-shell {
+        width: calc(100% - 16px);
+        margin: 8px auto;
       }
 
-      nav {
-        position: static;
+      .viewport {
+        display: block;
       }
 
-      .donate-button {
-        position: static;
-        display: table;
-        margin: 8px 0 0 auto;
+      .tree-pane {
+        position: relative;
+        height: auto;
+        max-height: 42vh;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
       }
 
-      nav a {
-        padding: 6px 8px;
-        font-size: 0.72rem;
+      .buffer {
+        padding: 12px;
       }
 
-      .hero {
-        min-height: 70vh;
-        padding: 60px 0 38px;
+      .output.hero-output {
+        min-height: 560px;
         background-image:
-          linear-gradient(180deg, rgba(8, 9, 9, 0.93), rgba(8, 9, 9, 0.72)),
+          linear-gradient(180deg, rgba(6, 8, 7, 0.94), rgba(6, 8, 7, 0.76)),
           url("phone-blog-assets/01-launcher.png");
         background-position: center top;
       }
 
-      h1 {
-        font-size: 3.5rem;
+      .titlebar,
+      .statusbar {
+        font-size: 0.72rem;
       }
 
-      h2 {
-        font-size: 1.62rem;
-      }
-
-      .lead {
-        font-size: 1.05rem;
-      }
-
-      section.guide {
-        padding: 34px 0;
-      }
-
-      .section-header,
-      .split {
-        display: block;
-      }
-
-      .note {
-        margin-top: 18px;
-      }
-
-      .download-grid,
-      .grid,
-      .wiki-grid,
+      .doc-grid,
       .command-grid,
+      .download-grid,
       .shot-grid {
         grid-template-columns: 1fr;
       }
 
-      .cta-row a {
-        flex: 1 1 150px;
-        text-align: center;
-      }
-    }
-
-    @media (max-width: 440px) {
-      main {
-        width: min(100% - 18px, 440px);
-      }
-
-      h1 {
-        font-size: 2.8rem;
-      }
-
-      .donate-button {
-        padding: 9px 11px;
+      .terminal-links {
+        display: grid;
       }
     }
   </style>
 </head>
 <body>
-  <main>
-    <nav aria-label="Site navigation">
-      <a href="#paths">Start</a>
-      <a href="#product">Product</a>
-      <a href="#wiki">Wiki</a>
-      <a href="apps.html">Apps</a>
-      <a href="modules.html">Modules</a>
-      <a href="widgets.html">Lua modules</a>
-      <a href="ascii.html">ASCII Lab</a>
-      <a href="gallery.html">Presets</a>
-      <a href="#downloads">Downloads</a>
-      <a href="privacy.html">Privacy</a>
-    </nav>
+  <div class="terminal-shell">
+    <header class="titlebar">
+      <span class="traffic" aria-hidden="true"><span></span><span></span><span></span></span>
+      <span>retui-docs</span>
+      <span class="title-path">~/Re-TUI/docs/index.html</span>
+      <span class="title-spacer"></span>
+      <span>mode: read-only</span>
+    </header>
 
-    <a class="donate-button" href="https://github.com/DvilSpawn/Re-TUI/blob/master/.github/FUNDING.yml" aria-label="Open Re:T-UI funding options on GitHub">Donate</a>
+    <main class="viewport">
+      <aside class="tree-pane" aria-label="Documentation file tree">
+        <div class="tree-header">
+          <span>tree</span>
+          <span>docs/</span>
+        </div>
+        <nav class="tree">
+          <div class="tree-group">
+            <p class="tree-dir">docs</p>
+            <a href="#start-here">README.start</a>
+            <a href="#product-showcase">screenshots.log</a>
+            <a href="#wiki-map">wiki.map</a>
+            <a href="#daily-commands">commands.ref</a>
+            <a href="#downloads">downloads.env</a>
+            <a href="#preset-marketplace">presets.market</a>
+            <a href="#support-release-channels">support.channels</a>
+          </div>
+          <div class="tree-group">
+            <p class="tree-dir">guides</p>
+            <a class="external" href="apps.html">apps.html</a>
+            <a class="external" href="modules.html">modules.html</a>
+            <a class="external" href="widgets.html">lua-modules.html</a>
+            <a class="external" href="ascii.html">ascii-lab.html</a>
+            <a class="external" href="gallery.html">presets.html</a>
+          </div>
+          <div class="tree-group">
+            <p class="tree-dir">wiki</p>
+            <a class="external" href="wiki/Getting-Started.md">Getting-Started.md</a>
+            <a class="external" href="wiki/Command-Reference.md">Command-Reference.md</a>
+            <a class="external" href="wiki/Apps.md">Apps.md</a>
+            <a class="external" href="wiki/Modules.md">Modules.md</a>
+            <a class="external" href="wiki/Termux-Integration.md">Termux-Integration.md</a>
+            <a class="external" href="wiki/Automation-and-Chaining.md">Automation.md</a>
+            <a class="external" href="wiki/FAQ-and-Troubleshooting.md">FAQ.md</a>
+          </div>
+          <div class="tree-group">
+            <p class="tree-dir">release</p>
+            <a class="external" href="https://play.google.com/store/apps/details?id=com.dvil.tui_renewed">play-store.url</a>
+            <a class="external" href="https://github.com/DvilSpawn/Re-TUI/releases/latest/download/app-github-release.apk">github-apk.url</a>
+            <a class="external" href="privacy.html">privacy.html</a>
+            <a class="external" href="https://github.com/DvilSpawn/Re-TUI">source.git</a>
+          </div>
+        </nav>
+      </aside>
 
-    <section class="hero" id="top">
-      <div class="eyebrow">Command-first Android launcher</div>
-      <h1>Re:T-UI</h1>
-      <p class="lead">A terminal-styled home screen for people who want Android to feel like a small workstation: launch apps by typing, keep modules docked, script with Lua and Termux, and tune the interface from readable docs instead of hunting through hidden menus.</p>
-      <div class="meta" aria-label="Site roles">
-        <span>Product showcase</span>
-        <span>Command wiki</span>
-        <span>Preset marketplace</span>
-        <span>Module guides</span>
-      </div>
-      <div class="cta-row" aria-label="Primary actions">
-        <a href="#wiki">Find a guide</a>
-        <a href="#product">See the product</a>
-        <a href="#downloads">Install</a>
-        <a class="secondary" href="https://github.com/DvilSpawn/Re-TUI">GitHub repo</a>
-      </div>
-    </section>
+      <section class="content-pane" aria-label="Selected documentation output">
+        <div class="pane-header">
+          <span>output</span>
+          <span>cat selected files</span>
+        </div>
+        <div class="buffer">
+          <section class="terminal-card" id="top">
+            <div class="cmd-line">
+              <span class="prompt">mako@retui:~/docs$</span>
+              <span class="cmd">cat README.start</span>
+            </div>
+            <div class="output hero-output">
+              <div class="kicker">Command-first Android launcher</div>
+              <h1>Re:T-UI</h1>
+              <p class="lead">A terminal-styled home screen for people who want Android to feel like a small workstation: launch apps by typing, keep modules docked, script with Lua and Termux, and tune the interface from readable docs instead of hunting through hidden menus.</p>
+              <div class="terminal-links" aria-label="Primary actions">
+                <a class="terminal-link primary" href="#wiki-map">open wiki.map</a>
+                <a class="terminal-link" href="#product-showcase">less screenshots.log</a>
+                <a class="terminal-link" href="#downloads">cat downloads.env</a>
+                <a class="terminal-link" href="https://github.com/DvilSpawn/Re-TUI">git remote</a>
+              </div>
+            </div>
+          </section>
 
-    <section class="guide" id="paths">
-      <div class="section-header">
-        <div class="heading-copy">
-          <div class="kicker">Start here</div>
-          <h2>Choose the path that matches what you are trying to do.</h2>
-          <p>The homepage now doubles as the wiki index. If you already know the command, jump to a reference. If you are evaluating the launcher, start with the product sections and screenshots.</p>
-        </div>
-      </div>
-      <div class="grid">
-        <div class="tile">
-          <h3>New user</h3>
-          <p>Learn the command-first basics, opening settings, and using help without blocking the terminal.</p>
-          <div class="doc-links">
-            <a class="doc-link" href="wiki/Getting-Started.md">Getting started</a>
-            <a class="doc-link" href="#commands">Daily commands</a>
-          </div>
-        </div>
-        <div class="tile">
-          <h3>App control</h3>
-          <p>Hide noisy apps, restore hidden apps, inspect packages, and build app drawer groups.</p>
-          <div class="doc-links">
-            <a class="doc-link" href="apps.html">Apps guide</a>
-            <a class="doc-link" href="wiki/App-Drawer.md">Drawer wiki</a>
-          </div>
-        </div>
-        <div class="tile">
-          <h3>Modules</h3>
-          <p>Use dock panels, native modules, Termux modules, and Lua modules that feel built into the launcher.</p>
-          <div class="doc-links">
-            <a class="doc-link" href="modules.html">Modules</a>
-            <a class="doc-link" href="widgets.html">Lua modules</a>
-          </div>
-        </div>
-        <div class="tile">
-          <h3>Themes and presets</h3>
-          <p>Work from wallpaper auto-color, save presets, browse marketplace looks, or submit a setup.</p>
-          <div class="doc-links">
-            <a class="doc-link" href="gallery.html">Preset gallery</a>
-            <a class="doc-link" href="ascii.html">ASCII Lab</a>
-          </div>
-        </div>
-      </div>
-    </section>
+          <section class="terminal-section" id="start-here">
+            <div class="cmd-line">
+              <span class="prompt">mako@retui:~/docs$</span>
+              <span class="cmd">ls -la start-here/</span>
+            </div>
+            <div class="output">
+              <div class="kicker">Start here</div>
+              <h2>Choose the file that matches what you are trying to do.</h2>
+              <p>The homepage is the docs file browser. If you already know the command, jump to a reference. If you are evaluating the launcher, start with screenshots and product sections.</p>
+              <div class="doc-grid">
+                <div class="file-row">
+                  <div class="path">new-user.guide</div>
+                  <p>Learn the command-first basics, opening settings, and using help without blocking the terminal.</p>
+                  <div class="inline-links">
+                    <a href="wiki/Getting-Started.md">Getting started</a>
+                    <a href="#daily-commands">Daily commands</a>
+                  </div>
+                </div>
+                <div class="file-row">
+                  <div class="path">app-control.guide</div>
+                  <p>Hide noisy apps, restore hidden apps, inspect packages, and build app drawer groups.</p>
+                  <div class="inline-links">
+                    <a href="apps.html">Apps guide</a>
+                    <a href="wiki/App-Drawer.md">Drawer wiki</a>
+                  </div>
+                </div>
+                <div class="file-row">
+                  <div class="path">modules.guide</div>
+                  <p>Use dock panels, native modules, Termux modules, and Lua modules that feel built into the launcher.</p>
+                  <div class="inline-links">
+                    <a href="modules.html">Modules</a>
+                    <a href="widgets.html">Lua modules</a>
+                  </div>
+                </div>
+                <div class="file-row">
+                  <div class="path">themes-presets.guide</div>
+                  <p>Work from wallpaper auto-color, save presets, browse marketplace looks, or submit a setup.</p>
+                  <div class="inline-links">
+                    <a href="gallery.html">Preset gallery</a>
+                    <a href="ascii.html">ASCII Lab</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
 
-    <section class="guide" id="product">
-      <div class="section-header">
-        <div class="heading-copy">
-          <div class="kicker">Product showcase</div>
-          <h2>The launcher is the terminal, the dashboard, and the control surface.</h2>
-          <p>These are real app screens from the current site assets. The point is not just retro styling; it is keeping daily phone operations inspectable and fast.</p>
-        </div>
-      </div>
-      <div class="shot-grid">
-        <figure>
-          <img src="phone-blog-assets/01-launcher.png" alt="Re:T-UI launcher home screen on Android">
-          <figcaption>Home screen with terminal input, status surfaces, and command-first navigation.</figcaption>
-        </figure>
-        <figure>
-          <img src="phone-blog-assets/02-help-command.png" alt="Re:T-UI help command output listing commands">
-          <figcaption><code>help</code> turns the launcher into its own quick manual.</figcaption>
-        </figure>
-        <figure>
-          <img src="phone-blog-assets/06-settings-hub-clean.png" alt="Re:T-UI settings hub">
-          <figcaption>The settings hub groups setup while preserving the terminal look.</figcaption>
-        </figure>
-        <figure>
-          <img src="phone-blog-assets/lua-widget-preview.png" alt="Lua module preview in Re:T-UI">
-          <figcaption>Lua modules bring small tools directly into the home surface.</figcaption>
-        </figure>
-      </div>
-    </section>
+          <section class="terminal-section" id="product-showcase">
+            <div class="cmd-line">
+              <span class="prompt">mako@retui:~/docs$</span>
+              <span class="cmd">feh phone-blog-assets/*.png</span>
+            </div>
+            <div class="output">
+              <div class="kicker">Product showcase</div>
+              <h2>The launcher is the terminal, the dashboard, and the control surface.</h2>
+              <p>These are real app screens from the current site assets. The point is not just retro styling; it is keeping daily phone operations inspectable and fast.</p>
+              <div class="shot-grid">
+                <figure>
+                  <img src="phone-blog-assets/01-launcher.png" alt="Re:T-UI launcher home screen on Android">
+                  <figcaption>Home screen with terminal input, status surfaces, and command-first navigation.</figcaption>
+                </figure>
+                <figure>
+                  <img src="phone-blog-assets/02-help-command.png" alt="Re:T-UI help command output listing commands">
+                  <figcaption><code>help</code> turns the launcher into its own quick manual.</figcaption>
+                </figure>
+                <figure>
+                  <img src="phone-blog-assets/06-settings-hub-clean.png" alt="Re:T-UI settings hub">
+                  <figcaption>The settings hub groups setup while preserving the terminal look.</figcaption>
+                </figure>
+                <figure>
+                  <img src="phone-blog-assets/lua-widget-preview.png" alt="Lua module preview in Re:T-UI">
+                  <figcaption>Lua modules bring small tools directly into the home surface.</figcaption>
+                </figure>
+              </div>
+            </div>
+          </section>
 
-    <section class="guide" id="wiki">
-      <div class="section-header">
-        <div class="heading-copy">
-          <div class="kicker">Wiki map</div>
-          <h2>Documentation by job, not by folder structure.</h2>
-          <p>The public site links polished HTML guides where they exist and repo wiki pages for deeper reference. The command pages remain command-first so they match how the launcher is actually used.</p>
-        </div>
-        <a class="primary-link secondary" href="wiki/Home.md">Open wiki index</a>
-      </div>
-      <div class="wiki-grid">
-        <div class="wiki-card">
-          <div class="path">core / first run</div>
-          <h3>Start and command reference</h3>
-          <p>Learn the base command vocabulary, launcher habits, and command categories.</p>
-          <div class="doc-links">
-            <a class="doc-link" href="wiki/Getting-Started.md">Getting started</a>
-            <a class="doc-link" href="wiki/Command-Reference.md">Command reference</a>
-          </div>
-        </div>
-        <div class="wiki-card">
-          <div class="path">apps / drawer</div>
-          <h3>Apps command</h3>
-          <p>Open the drawer, hide apps, restore apps, set default app slots, and maintain app groups.</p>
-          <div class="doc-links">
-            <a class="doc-link" href="apps.html">Apps HTML guide</a>
-            <a class="doc-link" href="wiki/Apps.md">Apps wiki</a>
-          </div>
-        </div>
-        <div class="wiki-card">
-          <div class="path">modules / lua</div>
-          <h3>Panels and scripts</h3>
-          <p>Use native modules, Termux modules, Lua modules, suggestion chips, and Lua config surfaces.</p>
-          <div class="doc-links">
-            <a class="doc-link" href="modules.html">Modules guide</a>
-            <a class="doc-link" href="widgets.html">Lua modules guide</a>
-          </div>
-        </div>
-        <div class="wiki-card">
-          <div class="path">theme / presets</div>
-          <h3>Customize the workstation</h3>
-          <p>Use the settings hub, editable XML files, wallpaper auto-color, presets, and shareable looks.</p>
-          <div class="doc-links">
-            <a class="doc-link" href="wiki/Customization-and-Config-Files.md">Config files</a>
-            <a class="doc-link" href="wiki/Preset-Sharing.md">Preset sharing</a>
-          </div>
-        </div>
-        <div class="wiki-card">
-          <div class="path">termux / automation</div>
-          <h3>Integrations</h3>
-          <p>Route non-interactive scripts through Termux and keep automation narrow, explicit, and inspectable.</p>
-          <div class="doc-links">
-            <a class="doc-link" href="wiki/Termux-Integration.md">Termux</a>
-            <a class="doc-link" href="wiki/Automation-and-Chaining.md">Automation</a>
-          </div>
-        </div>
-        <div class="wiki-card">
-          <div class="path">support / safety</div>
-          <h3>Privacy and troubleshooting</h3>
-          <p>Find permission explanations, release channels, and quick fixes for common setup issues.</p>
-          <div class="doc-links">
-            <a class="doc-link" href="privacy.html">Privacy</a>
-            <a class="doc-link" href="wiki/FAQ-and-Troubleshooting.md">FAQ</a>
-          </div>
-        </div>
-      </div>
-    </section>
+          <section class="terminal-section" id="wiki-map">
+            <div class="cmd-line">
+              <span class="prompt">mako@retui:~/docs$</span>
+              <span class="cmd">find wiki guides -maxdepth 2 -type f</span>
+            </div>
+            <div class="output">
+              <div class="kicker">Wiki map</div>
+              <h2>Documentation by job, not by folder structure.</h2>
+              <p>The public site links polished HTML guides where they exist and repo wiki pages for deeper reference. The command pages remain command-first so they match how the launcher is actually used.</p>
+              <div class="doc-grid">
+                <div class="file-row">
+                  <div class="path">core/first-run</div>
+                  <p>Base command vocabulary, launcher habits, and command categories.</p>
+                  <div class="inline-links">
+                    <a href="wiki/Getting-Started.md">Getting started</a>
+                    <a href="wiki/Command-Reference.md">Command reference</a>
+                  </div>
+                </div>
+                <div class="file-row">
+                  <div class="path">apps/drawer</div>
+                  <p>Open the drawer, hide apps, restore apps, set default app slots, and maintain app groups.</p>
+                  <div class="inline-links">
+                    <a href="apps.html">Apps HTML guide</a>
+                    <a href="wiki/Apps.md">Apps wiki</a>
+                  </div>
+                </div>
+                <div class="file-row">
+                  <div class="path">modules/lua</div>
+                  <p>Use native modules, Termux modules, Lua modules, suggestion chips, and Lua config surfaces.</p>
+                  <div class="inline-links">
+                    <a href="modules.html">Modules guide</a>
+                    <a href="widgets.html">Lua modules guide</a>
+                  </div>
+                </div>
+                <div class="file-row">
+                  <div class="path">theme/presets</div>
+                  <p>Use the settings hub, editable XML files, wallpaper auto-color, presets, and shareable looks.</p>
+                  <div class="inline-links">
+                    <a href="wiki/Customization-and-Config-Files.md">Config files</a>
+                    <a href="wiki/Preset-Sharing.md">Preset sharing</a>
+                  </div>
+                </div>
+                <div class="file-row">
+                  <div class="path">termux/automation</div>
+                  <p>Route scripts through Termux and keep automation narrow, explicit, and inspectable.</p>
+                  <div class="inline-links">
+                    <a href="wiki/Termux-Integration.md">Termux</a>
+                    <a href="wiki/Automation-and-Chaining.md">Automation</a>
+                  </div>
+                </div>
+                <div class="file-row">
+                  <div class="path">support/safety</div>
+                  <p>Permission explanations, release channels, and quick fixes for common setup issues.</p>
+                  <div class="inline-links">
+                    <a href="privacy.html">Privacy</a>
+                    <a href="wiki/FAQ-and-Troubleshooting.md">FAQ</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
 
-    <section class="guide" id="commands">
-      <div class="section-header">
-        <div class="heading-copy">
-          <div class="kicker">Daily commands</div>
-          <h2>Small command vocabulary, large surface area.</h2>
-          <p>These commands are now linked as wiki entry points rather than isolated examples.</p>
-        </div>
-      </div>
-      <div class="command-grid">
-        <div class="command-card"><strong>help</strong><p>List commands and open focused help for a command.</p></div>
-        <div class="command-card"><strong>guide</strong><p>Run a non-blocking walkthrough through terminal output and suggestions.</p></div>
-        <div class="command-card"><strong>settings</strong><p>Open the terminal-style settings hub.</p></div>
-        <div class="command-card"><strong>apps -tutorial</strong><p>Open the new Apps command guide.</p></div>
-        <div class="command-card"><strong>apps -ls</strong><p>Open the app drawer or list visible apps.</p></div>
-        <div class="command-card"><strong>module -ls</strong><p>Inspect native and custom modules.</p></div>
-        <div class="command-card"><strong>module -new lua focus</strong><p>Create a launcher-native Lua module.</p></div>
-        <div class="command-card"><strong>termux -setup</strong><p>Print the Termux dispatch checklist.</p></div>
-        <div class="command-card"><strong>wallpaper -auto</strong><p>Derive a theme palette from wallpaper.</p></div>
-        <div class="command-card"><strong>preset -save name</strong><p>Save a stable theme snapshot.</p></div>
-        <div class="command-card"><strong>notifications -access</strong><p>Open Android notification access setup.</p></div>
-      </div>
-    </section>
+          <section class="terminal-section" id="daily-commands">
+            <div class="cmd-line">
+              <span class="prompt">mako@retui:~/docs$</span>
+              <span class="cmd">grep -R "daily" Command-Reference.md</span>
+            </div>
+            <div class="output">
+              <div class="kicker">Daily commands</div>
+              <h2>Small command vocabulary, large surface area.</h2>
+              <p>These commands are linked as wiki entry points rather than isolated examples.</p>
+              <div class="command-grid">
+                <div class="command-row"><strong>help</strong><p>List commands and open focused help for a command.</p></div>
+                <div class="command-row"><strong>guide</strong><p>Run a non-blocking walkthrough through terminal output and suggestions.</p></div>
+                <div class="command-row"><strong>settings</strong><p>Open the terminal-style settings hub.</p></div>
+                <div class="command-row"><strong>apps -tutorial</strong><p>Open the Apps command guide.</p></div>
+                <div class="command-row"><strong>apps -ls</strong><p>Open the app drawer or list visible apps.</p></div>
+                <div class="command-row"><strong>module -ls</strong><p>Inspect native and custom modules.</p></div>
+                <div class="command-row"><strong>module -new lua focus</strong><p>Create a launcher-native Lua module.</p></div>
+                <div class="command-row"><strong>termux -setup</strong><p>Print the Termux dispatch checklist.</p></div>
+                <div class="command-row"><strong>wallpaper -auto</strong><p>Derive a theme palette from wallpaper.</p></div>
+                <div class="command-row"><strong>preset -save name</strong><p>Save a stable theme snapshot.</p></div>
+                <div class="command-row"><strong>notifications -access</strong><p>Open Android notification access setup.</p></div>
+              </div>
+            </div>
+          </section>
 
-    <section class="guide split" id="downloads">
-      <div>
-        <div class="kicker">Downloads</div>
-        <h2>Choose the install path that matches your comfort level.</h2>
-        <p>The Play Store build is the simplest supported install and update path. GitHub releases remain available for users who prefer direct APK installation or cannot use Play Store.</p>
-        <div class="download-grid">
-          <div class="download-card">
-            <h3>Play Store</h3>
-            <p>Best for normal installs, automatic updates, and supporting continued development.</p>
-            <a class="download-link" href="https://play.google.com/store/apps/details?id=com.dvil.tui_renewed">Open Play Store</a>
-          </div>
-          <div class="download-card">
-            <h3>GitHub APK</h3>
-            <p>Direct download for testers, power users, and anyone who wants the free APK channel.</p>
-            <a class="download-link secondary" href="https://github.com/DvilSpawn/Re-TUI/releases/latest/download/app-github-release.apk">Download APK</a>
-          </div>
-        </div>
-      </div>
-      <div class="note">
-        <p><strong>Release boundary:</strong> Play Store and GitHub artifacts are separate. Use the Play Store channel for the easiest consumer path, and GitHub when you intentionally want direct release assets.</p>
-      </div>
-    </section>
+          <section class="terminal-section" id="downloads">
+            <div class="cmd-line">
+              <span class="prompt">mako@retui:~/docs$</span>
+              <span class="cmd">cat release/downloads.env</span>
+            </div>
+            <div class="output">
+              <div class="kicker">Downloads</div>
+              <h2>Choose the install path that matches your comfort level.</h2>
+              <p>The Play Store build is the simplest supported install and update path. GitHub releases remain available for users who prefer direct APK installation or cannot use Play Store.</p>
+              <div class="download-grid">
+                <div class="download-row">
+                  <h3>Play Store</h3>
+                  <p>Best for normal installs, automatic updates, and supporting continued development.</p>
+                  <a class="action-link primary" href="https://play.google.com/store/apps/details?id=com.dvil.tui_renewed">open PLAY_STORE_URL</a>
+                </div>
+                <div class="download-row">
+                  <h3>GitHub APK</h3>
+                  <p>Direct download for testers, power users, and anyone who wants the free APK channel.</p>
+                  <a class="action-link" href="https://github.com/DvilSpawn/Re-TUI/releases/latest/download/app-github-release.apk">curl -LO app-github-release.apk</a>
+                </div>
+              </div>
+              <div class="note" style="margin-top: 12px;">
+                <p><strong>Release boundary:</strong> Play Store and GitHub artifacts are separate. Use the Play Store channel for the easiest consumer path, and GitHub when you intentionally want direct release assets.</p>
+              </div>
+            </div>
+          </section>
 
-    <section class="guide" id="presets">
-      <div class="section-header">
-        <div class="heading-copy">
-          <div class="kicker">Preset marketplace</div>
-          <h2>Browse, create, and share terminal looks.</h2>
-          <p>Presets are the bridge between product showcase and user documentation: they show what the launcher can look like and teach the exact flow for sharing a setup.</p>
-        </div>
-        <a class="primary-link" href="submit-preset.html">Upload preset</a>
-      </div>
-      <div class="download-grid">
-        <div class="download-card">
-          <h3>Browse presets</h3>
-          <p>Open the gallery to inspect approved screenshots, compatibility notes, and downloads.</p>
-          <a class="download-link" href="gallery.html">View gallery</a>
-        </div>
-        <div class="download-card">
-          <h3>Create ASCII wallpaper</h3>
-          <p>Use ASCII Lab to turn a source image into terminal-style text, PNG, or SVG output.</p>
-          <a class="download-link secondary" href="ascii.html">Open ASCII Lab</a>
-        </div>
-      </div>
-    </section>
+          <section class="terminal-section" id="preset-marketplace">
+            <div class="cmd-line">
+              <span class="prompt">mako@retui:~/docs$</span>
+              <span class="cmd">ls presets/ ascii-lab/</span>
+            </div>
+            <div class="output">
+              <div class="kicker">Preset marketplace</div>
+              <h2>Browse, create, and share terminal looks.</h2>
+              <p>Presets are the bridge between product showcase and user documentation: they show what the launcher can look like and teach the exact flow for sharing a setup.</p>
+              <div class="download-grid">
+                <div class="download-row">
+                  <h3>Browse presets</h3>
+                  <p>Open the gallery to inspect approved screenshots, compatibility notes, and downloads.</p>
+                  <a class="action-link primary" href="gallery.html">open gallery.html</a>
+                </div>
+                <div class="download-row">
+                  <h3>Create ASCII wallpaper</h3>
+                  <p>Use ASCII Lab to turn a source image into terminal-style text, PNG, or SVG output.</p>
+                  <a class="action-link" href="ascii.html">open ascii.html</a>
+                </div>
+              </div>
+              <div class="terminal-links">
+                <a class="terminal-link" href="submit-preset.html">open submit-preset.html</a>
+              </div>
+            </div>
+          </section>
 
-    <section class="guide split" id="support">
-      <div>
-        <div class="kicker">Support and release channels</div>
-        <h2>Open development, practical reports.</h2>
-        <p>Useful feedback includes the command used, visible output, Android version, build channel, and whether the issue affects Play Store, GitHub, or a local debug install.</p>
-        <div class="terminal-list">
-          <div><strong>Issues:</strong> <a href="https://github.com/DvilSpawn/Re-TUI/issues">GitHub issues</a> for reproducible bugs.</div>
-          <div><strong>Privacy:</strong> <a href="privacy.html">Permission and data behavior</a> for app review and user trust.</div>
-          <div><strong>Files:</strong> Re:T-UI Files owns file navigation; the launcher remains the command desk.</div>
-        </div>
-      </div>
-      <div class="index-band" aria-label="Quick command reminder">
-        <pre>$ help
+          <section class="terminal-section" id="support-release-channels">
+            <div class="cmd-line">
+              <span class="prompt">mako@retui:~/docs$</span>
+              <span class="cmd">tail -n +1 support.channels</span>
+            </div>
+            <div class="output">
+              <div class="kicker">Support and release channels</div>
+              <h2>Open development, practical reports.</h2>
+              <p>Useful feedback includes the command used, visible output, Android version, build channel, and whether the issue affects Play Store, GitHub, or a local debug install.</p>
+              <ul class="terminal-list">
+                <li><strong>Issues:</strong> <a href="https://github.com/DvilSpawn/Re-TUI/issues">GitHub issues</a> for reproducible bugs.</li>
+                <li><strong>Privacy:</strong> <a href="privacy.html">Permission and data behavior</a> for app review and user trust.</li>
+                <li><strong>Files:</strong> Re:T-UI Files owns file navigation; the launcher remains the command desk.</li>
+              </ul>
+              <pre class="quick-commands">$ help
 $ apps -tutorial
 $ module -ls
 $ module -new lua focus
 $ termux -setup
 $ debug -settings
 $ refresh</pre>
-      </div>
-    </section>
-  </main>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <footer class="statusbar">
+      <span class="status-path">~/Re-TUI/docs</span>
+      <span>7 entries</span>
+      <span class="status-spacer"></span>
+      <span>links: local + release</span>
+    </footer>
+  </div>
 </body>
 </html>

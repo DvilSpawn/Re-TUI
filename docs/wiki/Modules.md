@@ -1,6 +1,6 @@
 # Modules
 
-Modules are Re:T-UI-owned terminal panels. They are meant to be small workstation instruments: status surfaces, quick controls, script output, and eventually guided input flows.
+Modules are Re:T-UI-owned terminal panels. They are small workstation instruments: status surfaces, quick controls, script output, and guided input flows.
 
 They are not arbitrary Android plugins and they do not load user Java/Kotlin code into the launcher.
 
@@ -14,9 +14,16 @@ For the phone-friendly walkthrough, use the hosted module guide: [Module Walkthr
 - `module -show timer`
 - `module -show calendar`
 - `module -show reminder`
+- `module -show notes`
+- `module -show rss`
+- `module -show weather`
 - `module -prompt reminder add`
 - `module -prompt reminder edit`
 - `module -prompt reminder remove`
+- `module -new lua counter`
+- `module -edit counter`
+- `module -check counter`
+- `module -approve counter`
 - `module -add server termux:/data/data/com.termux/files/home/retui/server-health.sh`
 - `module -refresh server`
 - `module -rm server`
@@ -34,9 +41,14 @@ Current built-ins:
 - `timer`
 - `calendar`
 - `reminder`
+- `notes`
+- `rss`
+- `weather`
 
 The dock is intentionally deliberate. Hiding a module from the dock does not delete it from the registry.
 Removing every module from the dock now leaves the dock intentionally empty instead of restoring the default module list. To hide the dock row itself, turn off `show_module_dock` in Behavior settings or run `config -set show_module_dock false`; modules remain available through `module -show`, `module -dock add`, and related commands.
+
+New installs keep the default dock focused on `music`, `notifications`, `timer`, `calendar`, and `reminder`. Add `notes`, `rss`, or `weather` when you want those panels visible in the dock.
 
 ## Script Modules
 
@@ -81,7 +93,7 @@ module -expand counter
 module -collapse counter
 ```
 
-The current platform supports launcher-native UI output, native module buttons, declarative rows/containers/progress layouts, persistent `prefs`, module-local `files`, JSON, small standard libraries, async HTTP callbacks, expandable state, indexed buttons, parameterized actions, choice-dialog buttons, direct command buttons, suggestion-row chips, app/intent/shortcut buttons, active ticking, Lua suggestion scripts, editor paste flow, clipboard export, and launcher/system helpers. See the full scripting reference: [Lua Modules](./Lua-Widgets.md).
+The Lua runtime supports launcher-native text/layout output, module buttons, suggestion chips, config forms, persistent `prefs`, module-local `files`, JSON, async HTTP callbacks, app/intent/shortcut helpers, active ticking, Lua suggestion scripts, clipboard export, and launcher/system helpers. See the full scripting reference: [Lua Modules](./Lua-Widgets.md).
 
 Lua permissions are script-level consent only. Scripts that use `network`, `clipboard`, `vibrate`, `local-files`, `active-tick`, `notifications`, `apps`, `intents`, or `shortcuts` must declare `-- permissions = "..."` and be approved with `module -approve <id>`. Re:T-UI does not add Android manifest permissions for Lua.
 
@@ -224,7 +236,7 @@ Prompt types used today:
 - `time`
 - `confirm`
 
-Re:T-UI should own Android scheduling for reminder/alarm reliability. Scripts can request scheduling, but the launcher should handle notification channels, alarm timing, and tones.
+Re:T-UI owns reminder scheduling, notification channels, alarm timing, and tones. Scripts should request reminder behavior through launcher-owned surfaces instead of trying to own Android alarm reliability.
 
 ## Pager Modules
 
@@ -245,11 +257,11 @@ The module pane is split vertically:
 
 This keeps navigation visible without shrinking the message body too much.
 
-Module controls are quiet actions. Tapping a module suggestion such as `prev`, `next`, `reply`, or `open` should execute the action without adding the backing command to output history. If the user types the same command manually, it should still appear in the terminal as normal input.
+Module controls are quiet actions. Tapping a module suggestion such as `prev`, `next`, `reply`, or `open` executes the action without adding the backing command to output history. If the user types the same command manually, it still appears in the terminal as normal input.
 
 ## Reply Sessions
 
-Reply-capable modules should preserve the selected item while the user is typing. If a new item arrives mid-reply, it should not steal focus.
+Reply-capable modules preserve the selected item while the user is typing. If a new item arrives mid-reply, it does not steal focus.
 
 For notifications, the reply flow is:
 
@@ -259,16 +271,3 @@ For notifications, the reply flow is:
 4. Re:T-UI sends the text through Android inline reply using the selected notification action
 
 While the reply prompt is active, previous/next navigation is disabled. This avoids sending a reply to the wrong conversation if another notification arrives before submit.
-
-## Planned Power-User Improvements
-
-- `module -inspect <name>`
-- `module -logs <name>`
-- `module -refresh-all`
-- `module -refresh-dock`
-- `module -interval <name> 60s|5m|off`
-- `module -new <template>`
-- `module -profile save <name>`
-- `module -profile apply <name>`
-
-The goal is inspectable power, not hidden automation.

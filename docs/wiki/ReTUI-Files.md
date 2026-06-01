@@ -2,7 +2,7 @@
 
 Re:T-UI Files is the companion file console for Re:T-UI.
 
-The launcher should stay the command desk. Re:T-UI Files owns file navigation, opening, sharing, and the visual file tree.
+The launcher stays the command desk. Re:T-UI Files owns file navigation, opening, sharing, and the visual file tree.
 
 ## Launcher Command
 
@@ -58,5 +58,3 @@ Older TBridge file listing commands may remain for debug use, but they are not t
 ## Boundary With TUIXT
 
 TUIXT is legacy launcher editor infrastructure. It should not appear as a general Android file editor.
-
-Text/config editing should eventually move into Re:T-UI Files as a native viewer/editor surface.
