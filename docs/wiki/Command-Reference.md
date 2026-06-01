@@ -485,9 +485,14 @@ This is the best command when a setting looks correct in XML but behaves differe
 
 If you only memorize a handful of commands, make it these:
 
-- `themer`
+This list uses public current-build commands and avoids hidden compatibility aliases.
+
+- `help`
 - `settings`
+- `guide`
+- `apps -ls`
 - `files`
+- `module -ls`
 - `wallpaper -auto`
 - `preset -save <name>`
 - `preset -apply <name>`
@@ -496,6 +501,5 @@ If you only memorize a handful of commands, make it these:
 - `notifications -access`
 - `termux -setup`
 - `tbridge -doctor`
-- `apps -ls`
 - `restart`
 - `debug -settings`

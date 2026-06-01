@@ -4,8 +4,9 @@ Re:T-UI now includes a terminal-style settings hub.
 
 Open it with:
 
-- `themer`
 - `settings`
+
+Older builds may still accept `themer` as a compatibility alias, but `settings` is the current public command.
 
 ## Sections
 

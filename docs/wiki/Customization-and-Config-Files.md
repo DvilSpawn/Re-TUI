@@ -86,13 +86,13 @@ Controls app-specific behavior and app groups.
 
 For most users:
 
-1. Use `themer`
+1. Use `settings`
 2. Change settings through the terminal UI
 3. Save clean visual states as presets
 
 For power users:
 
-1. Use `themer` to discover the setting
+1. Use `settings` to discover the setting
 2. Edit the XML directly if needed
 3. Save and reload
 

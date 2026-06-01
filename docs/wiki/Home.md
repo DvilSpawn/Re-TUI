@@ -53,18 +53,22 @@ UI surfaces like the app drawer and settings hub exist to make the launcher easi
 
 ## Main Commands Worth Knowing
 
-- `themer`
+These are public current-build commands. Hidden compatibility aliases are intentionally left out.
+
+- `help`
 - `settings`
 - `guide`
+- `apps -ls`
 - `files`
 - `module -ls`
 - `module -new lua <name>`
 - `preset -save <name>`
 - `preset -apply <name>`
-- `wallpaper`
+- `wallpaper -static`
 - `wallpaper -live`
 - `wallpaper -auto`
-- `notifications`
+- `notifications -access`
+- `notifications -on`
 - `termux -setup`
 - `tbridge -doctor`
 

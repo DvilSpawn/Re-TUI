@@ -39,8 +39,7 @@ If `system_font` is `true`, the launcher will prefer the system font.
 
 If you want a custom font, confirm it again in:
 
-- `themer`
-- `Appearance > Fonts`
+- `settings` > Appearance > Fonts
 
 Then save and retest.
 
@@ -112,7 +111,7 @@ The current settings hub is designed to behave as an in-place terminal popup, wi
 
 Useful checks:
 
-- `settings -integrations`
+- `settings` > Integrations
 - `debug -settings`
 
 Look for:

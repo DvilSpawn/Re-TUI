@@ -28,8 +28,9 @@ Older T-UI expected users to hunt through files for almost everything.
 
 Re:T-UI still allows that, but now includes a settings hub:
 
-- `themer`
 - `settings`
+
+The old `themer` command remains as a hidden compatibility alias, but `settings` is the command to teach new users.
 
 This makes discovery easier without taking away the underlying files.
 
@@ -77,7 +78,7 @@ Rather than trying to be a full Android widget clone, the current music surface 
 
 If you are coming from old T-UI, this is the cleanest adjustment path:
 
-1. Open `themer`
+1. Open `settings`
 2. Confirm font and wallpaper settings
 3. Run `wallpaper -auto`
 4. Tweak colors if needed
@@ -107,7 +108,6 @@ The practical rule is:
 ## Good Commands for Returning Users
 
 - `help`
-- `themer`
 - `settings`
 - `wallpaper -auto`
 - `preset -ls`

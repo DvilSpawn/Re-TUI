@@ -22,8 +22,7 @@ The current direction is intentionally not a full media widget. It is a terminal
 
 You can choose the preferred music app from:
 
-- `settings -music`
-- `themer > Integrations`
+- `settings` > Integrations
 
 This helps the launcher decide which media session to trust first when multiple apps expose playback state.
 
