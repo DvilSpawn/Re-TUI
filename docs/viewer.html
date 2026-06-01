@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Re:T-UI Markdown Viewer</title>
+  <meta name="description" content="Terminal-style Re:T-UI documentation viewer for wiki and Markdown files.">
+  <link rel="stylesheet" href="terminal-docs.css">
+</head>
+<body>
+  <div class="terminal-shell">
+    <header class="titlebar">
+      <span class="traffic" aria-hidden="true"><span></span><span></span><span></span></span>
+      <span>retui-wiki</span>
+      <span class="title-path" id="title-path">~/Re-TUI/docs/wiki/Home.md</span>
+      <span class="title-spacer"></span>
+      <span>mode: markdown</span>
+    </header>
+
+    <main class="viewport">
+      <aside class="tree-pane" aria-label="Markdown file tree">
+        <div class="tree-header">
+          <span>tree</span>
+          <span>docs/</span>
+        </div>
+        <nav class="tree" id="doc-tree" aria-label="Markdown files">
+          <div class="empty-state">loading tree...</div>
+        </nav>
+      </aside>
+
+      <section class="content-pane" aria-label="Markdown output">
+        <div class="pane-header">
+          <span>output</span>
+          <span id="pane-path">cat wiki/Home.md</span>
+        </div>
+        <div class="buffer">
+          <section class="terminal-card">
+            <div class="cmd-line">
+              <span class="prompt">mako@retui:~/docs$</span>
+              <span class="cmd" id="cmd-line">cat wiki/Home.md</span>
+            </div>
+            <div class="output page-output">
+              <div class="kicker">Markdown Viewer</div>
+              <h1 id="doc-title">Loading...</h1>
+              <p class="lead" id="doc-lead">Opening the selected Markdown file inside the Re:T-UI docs terminal.</p>
+              <p class="doc-meta" id="doc-meta">status: pending</p>
+            </div>
+          </section>
+
+          <section class="terminal-section">
+            <div class="cmd-line">
+              <span class="prompt">mako@retui:~/docs$</span>
+              <span class="cmd" id="less-line">less wiki/Home.md</span>
+            </div>
+            <div class="output markdown-body" id="markdown-output" aria-live="polite">
+              <div class="empty-state">loading markdown...</div>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <footer class="statusbar">
+      <span class="status-path" id="status-path">~/Re-TUI/docs/wiki/Home.md</span>
+      <span id="status-count">files: 0</span>
+      <span class="status-spacer"></span>
+      <span>renderer: static markdown</span>
+    </footer>
+  </div>
+
+  <script src="viewer-content.js"></script>
+  <script>
+    const DOC_GROUPS = [
+      {
+        name: "wiki",
+        files: [
+          "wiki/Home.md",
+          "wiki/Getting-Started.md",
+          "wiki/Command-Reference.md",
+          "wiki/Apps.md",
+          "wiki/App-Drawer.md",
+          "wiki/Modules.md",
+          "wiki/Lua-Widgets.md",
+          "wiki/Termux-Integration.md",
+          "wiki/Automation-and-Chaining.md",
+          "wiki/Aliases.md",
+          "wiki/Customization-and-Config-Files.md",
+          "wiki/Settings-Hub.md",
+          "wiki/Preset-Sharing.md",
+          "wiki/Presets-and-Wallpaper-Auto-Color.md",
+          "wiki/Notifications.md",
+          "wiki/Music-Visualizer.md",
+          "wiki/ReTUI-Files.md",
+          "wiki/Migration-Guide.md",
+          "wiki/FAQ-and-Troubleshooting.md",
+          "wiki/Support-and-Release-Channels.md"
+        ]
+      },
+      {
+        name: "root-md",
+        files: [
+          "Play-Store-Listing.md",
+          "TESTBOOK.md",
+          "TODO.md",
+          "design/cyberpunk-visual-pass/idea-board.md"
+        ]
+      }
+    ];
+
+    const DOC_COUNT = DOC_GROUPS.reduce((total, group) => total + group.files.length, 0);
+    const params = new URLSearchParams(window.location.search);
+    const selectedFile = safeFile(params.get("file")) || "wiki/Home.md";
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      })[char]);
+    }
+
+    function safeFile(value) {
+      const raw = String(value || "").trim().replace(/\\/g, "/").replace(/^\.\//, "");
+      if (!raw || raw.startsWith("/") || !raw.endsWith(".md")) return null;
+      const parts = raw.split("/");
+      if (parts.some((part) => !part || part === "." || part === "..")) return null;
+      return parts.join("/");
+    }
+
+    function fileUrl(file) {
+      return "viewer.html?file=" + file.split("/").map(encodeURIComponent).join("/");
+    }
+
+    function fetchUrl(file) {
+      return file.split("/").map(encodeURIComponent).join("/");
+    }
+
+    function labelFor(file) {
+      return file.split("/").pop();
+    }
+
+    function resolveRelative(baseFile, target) {
+      if (target.startsWith("/")) return target.replace(/^\/+/, "");
+      const base = baseFile.split("/").slice(0, -1);
+      for (const part of target.split("/")) {
+        if (!part || part === ".") continue;
+        if (part === "..") base.pop();
+        else base.push(part);
+      }
+      return base.join("/");
+    }
+
+    function resolveHref(href, baseFile) {
+      const trimmed = href.trim();
+      if (/^(https?:|mailto:|tel:)/i.test(trimmed) || trimmed.startsWith("#")) {
+        return trimmed;
+      }
+
+      const hashIndex = trimmed.indexOf("#");
+      const target = hashIndex >= 0 ? trimmed.slice(0, hashIndex) : trimmed;
+      const hash = hashIndex >= 0 ? trimmed.slice(hashIndex + 1) : "";
+      if (!target) return hash ? "#" + encodeURIComponent(hash) : trimmed;
+
+      if (target.endsWith(".md")) {
+        const resolved = safeFile(resolveRelative(baseFile, target));
+        if (resolved) {
+          return fileUrl(resolved) + (hash ? "#" + encodeURIComponent(hash) : "");
+        }
+      }
+
+      return trimmed;
+    }
+
+    function renderInline(text, baseFile) {
+      const parts = String(text).split(/(`[^`]*`)/g);
+      return parts.map((part) => {
+        if (part.startsWith("`") && part.endsWith("`")) {
+          return "<code>" + escapeHtml(part.slice(1, -1)) + "</code>";
+        }
+
+        return renderLinks(part, baseFile);
+      }).join("");
+    }
+
+    function renderLinks(text, baseFile) {
+      const pattern = /!?\[([^\]]+)\]\(([^)]+)\)/g;
+      let output = "";
+      let cursor = 0;
+      let match;
+
+      while ((match = pattern.exec(text)) !== null) {
+        output += formatPlain(text.slice(cursor, match.index));
+        const [raw, label, href] = match;
+        if (raw.startsWith("!")) {
+          output += formatPlain(label);
+        } else {
+          const resolved = resolveHref(href.replace(/\s+".*"$/, ""), baseFile);
+          output += '<a href="' + escapeHtml(resolved) + '">' + formatPlain(label) + "</a>";
+        }
+        cursor = pattern.lastIndex;
+      }
+
+      output += formatPlain(text.slice(cursor));
+      return output;
+    }
+
+    function formatPlain(text) {
+      return escapeHtml(text)
+        .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+        .replace(/__([^_]+)__/g, "<strong>$1</strong>")
+        .replace(/\*([^*]+)\*/g, "<em>$1</em>");
+    }
+
+    function slugify(text) {
+      return text.toLowerCase()
+        .replace(/<[^>]*>/g, "")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "") || "section";
+    }
+
+    function isTableDivider(line) {
+      return /^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?\s*$/.test(line);
+    }
+
+    function isTableStart(lines, index) {
+      return lines[index] && lines[index].includes("|") && lines[index + 1] && isTableDivider(lines[index + 1]);
+    }
+
+    function isBlockStart(lines, index) {
+      const line = lines[index] || "";
+      return /^```/.test(line)
+        || /^#{1,6}\s+/.test(line)
+        || /^\s*[-*]\s+/.test(line)
+        || /^\s*\d+\.\s+/.test(line)
+        || /^>\s?/.test(line)
+        || /^-{3,}\s*$/.test(line)
+        || isTableStart(lines, index);
+    }
+
+    function splitTableRow(line) {
+      return line.trim().replace(/^\|/, "").replace(/\|$/, "").split("|").map((cell) => cell.trim());
+    }
+
+    function renderTable(rows, baseFile) {
+      const headers = splitTableRow(rows[0]);
+      const bodyRows = rows.slice(2).map(splitTableRow);
+      const head = headers.map((cell) => "<th>" + renderInline(cell, baseFile) + "</th>").join("");
+      const body = bodyRows.map((row) => "<tr>" + row.map((cell) => "<td>" + renderInline(cell, baseFile) + "</td>").join("") + "</tr>").join("");
+      return "<table><thead><tr>" + head + "</tr></thead><tbody>" + body + "</tbody></table>";
+    }
+
+    function renderMarkdown(markdown, baseFile) {
+      const lines = markdown.replace(/\r\n/g, "\n").split("\n");
+      let html = "";
+      let listType = null;
+
+      function closeList() {
+        if (listType) {
+          html += "</" + listType + ">";
+          listType = null;
+        }
+      }
+
+      for (let i = 0; i < lines.length; i += 1) {
+        const line = lines[i];
+
+        if (!line.trim()) {
+          closeList();
+          continue;
+        }
+
+        if (/^```/.test(line)) {
+          closeList();
+          const language = line.replace(/^```/, "").trim();
+          const code = [];
+          i += 1;
+          while (i < lines.length && !/^```/.test(lines[i])) {
+            code.push(lines[i]);
+            i += 1;
+          }
+          html += '<pre><code data-lang="' + escapeHtml(language) + '">' + escapeHtml(code.join("\n")) + "</code></pre>";
+          continue;
+        }
+
+        const heading = line.match(/^(#{1,6})\s+(.+)$/);
+        if (heading) {
+          closeList();
+          const level = Math.min(heading[1].length, 4);
+          const content = renderInline(heading[2].trim(), baseFile);
+          const id = slugify(content);
+          html += "<h" + level + ' id="' + escapeHtml(id) + '">' + content + "</h" + level + ">";
+          continue;
+        }
+
+        if (isTableStart(lines, i)) {
+          closeList();
+          const rows = [];
+          while (i < lines.length && lines[i].includes("|") && lines[i].trim()) {
+            rows.push(lines[i]);
+            i += 1;
+          }
+          i -= 1;
+          html += renderTable(rows, baseFile);
+          continue;
+        }
+
+        const ul = line.match(/^\s*[-*]\s+(.+)$/);
+        const ol = line.match(/^\s*\d+\.\s+(.+)$/);
+        if (ul || ol) {
+          const nextType = ul ? "ul" : "ol";
+          if (listType !== nextType) {
+            closeList();
+            listType = nextType;
+            html += "<" + listType + ">";
+          }
+          html += "<li>" + renderInline((ul || ol)[1], baseFile) + "</li>";
+          continue;
+        }
+
+        if (/^>\s?/.test(line)) {
+          closeList();
+          const quote = [line.replace(/^>\s?/, "")];
+          while (i + 1 < lines.length && /^>\s?/.test(lines[i + 1])) {
+            i += 1;
+            quote.push(lines[i].replace(/^>\s?/, ""));
+          }
+          html += "<blockquote><p>" + renderInline(quote.join(" "), baseFile) + "</p></blockquote>";
+          continue;
+        }
+
+        if (/^-{3,}\s*$/.test(line)) {
+          closeList();
+          html += "<hr>";
+          continue;
+        }
+
+        closeList();
+        const paragraph = [line.trim()];
+        while (i + 1 < lines.length && lines[i + 1].trim() && !isBlockStart(lines, i + 1)) {
+          i += 1;
+          paragraph.push(lines[i].trim());
+        }
+        html += "<p>" + renderInline(paragraph.join(" "), baseFile) + "</p>";
+      }
+
+      closeList();
+      return html || '<div class="empty-state">No content found.</div>';
+    }
+
+    function buildTree(activeFile) {
+      const guideLinks = [
+        ["index.html", "index.html"],
+        ["apps.html", "apps.html"],
+        ["modules.html", "modules.html"],
+        ["widgets.html", "lua-modules.html"],
+        ["privacy.html", "privacy.html"]
+      ];
+
+      const groups = DOC_GROUPS.map((group) => {
+        const links = group.files.map((file) => {
+          const current = file === activeFile ? ' aria-current="page"' : "";
+          return '<a class="external" href="' + fileUrl(file) + '"' + current + ">" + escapeHtml(labelFor(file)) + "</a>";
+        }).join("");
+        return '<div class="tree-group"><p class="tree-dir">' + escapeHtml(group.name) + "</p>" + links + "</div>";
+      }).join("");
+
+      const guides = '<div class="tree-group"><p class="tree-dir">html</p>'
+        + guideLinks.map(([href, label]) => '<a class="external" href="' + escapeHtml(href) + '">' + escapeHtml(label) + "</a>").join("")
+        + "</div>";
+
+      document.getElementById("doc-tree").innerHTML = groups + guides;
+    }
+
+    async function loadMarkdown(file) {
+      buildTree(file);
+      document.getElementById("title-path").textContent = "~/Re-TUI/docs/" + file;
+      document.getElementById("pane-path").textContent = "cat " + file;
+      document.getElementById("cmd-line").textContent = "cat " + file;
+      document.getElementById("less-line").textContent = "less " + file;
+      document.getElementById("status-path").textContent = "~/Re-TUI/docs/" + file;
+      document.getElementById("status-count").textContent = "files: " + DOC_COUNT;
+      document.getElementById("doc-title").textContent = labelFor(file).replace(/\.md$/, "");
+      document.getElementById("doc-lead").textContent = "Rendered from " + file + " using the site terminal skin.";
+      document.getElementById("doc-meta").textContent = "status: loading";
+
+      try {
+        const bundled = window.RETUI_MARKDOWN_CONTENT && window.RETUI_MARKDOWN_CONTENT[file];
+        let markdown = bundled;
+        let source = "bundle";
+
+        if (window.location.protocol !== "file:") {
+          try {
+            const response = await fetch(fetchUrl(file));
+            if (!response.ok) throw new Error("HTTP " + response.status);
+            markdown = await response.text();
+            source = "network";
+          } catch (fetchError) {
+            if (bundled === undefined) throw fetchError;
+          }
+        }
+
+        if (markdown === undefined) throw new Error("Missing bundled markdown");
+        document.getElementById("markdown-output").innerHTML = renderMarkdown(markdown, file);
+        document.getElementById("doc-meta").textContent = "status: loaded from " + source;
+        const firstHeading = document.querySelector("#markdown-output h1");
+        if (firstHeading) document.getElementById("doc-title").textContent = firstHeading.textContent;
+        if (window.location.hash) {
+          const id = decodeURIComponent(window.location.hash.slice(1));
+          const target = document.getElementById(id) || document.getElementById(slugify(id));
+          if (target) target.scrollIntoView();
+        }
+      } catch (error) {
+        document.getElementById("doc-meta").textContent = "status: error";
+        document.getElementById("markdown-output").innerHTML =
+          '<div class="error-state">Could not load '
+          + escapeHtml(file)
+          + '. The source Markdown file is missing from the viewer manifest.</div>';
+      }
+    }
+
+    loadMarkdown(selectedFile);
+  </script>
+</body>
+</html>

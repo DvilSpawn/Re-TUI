@@ -5,577 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Re:T-UI Docs</title>
   <meta name="description" content="Re:T-UI documentation presented as a terminal-style file tree with guides for commands, apps, modules, Lua, Termux, presets, downloads, and privacy.">
-  <style>
-    :root {
-      color-scheme: dark;
-      --bg: #050606;
-      --terminal: #080a09;
-      --pane: #0c0f0e;
-      --pane-soft: #111514;
-      --ink: #ece7df;
-      --muted: #a79e97;
-      --dim: #6f7770;
-      --line: #24312d;
-      --line-hot: #5f7468;
-      --green: #b8db88;
-      --cyan: #81cad6;
-      --amber: #e8c982;
-      --rose: #d98b99;
-      --red: #ef7b72;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    html {
-      scroll-behavior: smooth;
-    }
-
-    body {
-      min-height: 100vh;
-      margin: 0;
-      background:
-        linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
-        radial-gradient(circle at 88% 8%, rgba(129, 202, 214, 0.08), transparent 28rem),
-        radial-gradient(circle at 12% 82%, rgba(184, 219, 136, 0.07), transparent 30rem),
-        var(--bg);
-      background-size: 100% 4px, auto, auto, auto;
-      color: var(--ink);
-      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
-      line-height: 1.55;
-    }
-
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      background: linear-gradient(rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0));
-      mix-blend-mode: overlay;
-      opacity: 0.4;
-      z-index: 20;
-    }
-
-    a {
-      color: inherit;
-    }
-
-    .terminal-shell {
-      width: min(1560px, calc(100% - 28px));
-      min-height: calc(100vh - 28px);
-      margin: 14px auto;
-      border: 1px solid var(--line-hot);
-      background: rgba(8, 10, 9, 0.96);
-      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.52);
-    }
-
-    .titlebar,
-    .statusbar {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      min-height: 38px;
-      padding: 0 14px;
-      border-bottom: 1px solid var(--line);
-      background: #0a0d0c;
-      color: var(--muted);
-      font-size: 0.82rem;
-      white-space: nowrap;
-      overflow: hidden;
-    }
-
-    .statusbar {
-      min-height: 34px;
-      border-top: 1px solid var(--line);
-      border-bottom: 0;
-    }
-
-    .traffic {
-      display: inline-flex;
-      gap: 7px;
-      flex: 0 0 auto;
-    }
-
-    .traffic span {
-      width: 10px;
-      height: 10px;
-      border-radius: 999px;
-      background: var(--dim);
-    }
-
-    .traffic span:nth-child(1) {
-      background: var(--red);
-    }
-
-    .traffic span:nth-child(2) {
-      background: var(--amber);
-    }
-
-    .traffic span:nth-child(3) {
-      background: var(--green);
-    }
-
-    .title-path,
-    .status-path {
-      color: var(--green);
-    }
-
-    .title-spacer,
-    .status-spacer {
-      flex: 1 1 auto;
-    }
-
-    .viewport {
-      display: grid;
-      grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
-      min-height: calc(100vh - 114px);
-    }
-
-    .tree-pane {
-      position: sticky;
-      top: 0;
-      align-self: start;
-      height: calc(100vh - 76px);
-      border-right: 1px solid var(--line);
-      background: rgba(10, 13, 12, 0.96);
-      overflow: auto;
-    }
-
-    .tree-header,
-    .pane-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      min-height: 40px;
-      padding: 0 13px;
-      border-bottom: 1px solid var(--line);
-      background: var(--pane-soft);
-      color: var(--cyan);
-      font-size: 0.8rem;
-      text-transform: uppercase;
-    }
-
-    .tree {
-      padding: 14px 12px 24px;
-      font-size: 0.86rem;
-    }
-
-    .tree-group {
-      margin: 0 0 18px;
-    }
-
-    .tree-dir {
-      color: var(--green);
-      margin: 0 0 6px;
-    }
-
-    .tree a {
-      display: block;
-      position: relative;
-      margin: 0;
-      padding: 3px 6px 3px 29px;
-      color: var(--muted);
-      text-decoration: none;
-    }
-
-    .tree a::before {
-      content: "|--";
-      position: absolute;
-      left: 6px;
-      color: var(--dim);
-    }
-
-    .tree a:hover,
-    .tree a:focus-visible {
-      background: rgba(129, 202, 214, 0.09);
-      color: var(--ink);
-      outline: 1px solid rgba(129, 202, 214, 0.36);
-      outline-offset: -1px;
-    }
-
-    .tree .external::after {
-      content: " ->";
-      color: var(--dim);
-    }
-
-    .content-pane {
-      min-width: 0;
-      background: var(--terminal);
-    }
-
-    .buffer {
-      min-height: calc(100vh - 154px);
-      padding: 22px;
-      overflow: hidden;
-    }
-
-    .terminal-card,
-    .terminal-section {
-      border: 1px solid var(--line);
-      background: rgba(6, 8, 7, 0.82);
-    }
-
-    .terminal-card {
-      margin-bottom: 18px;
-    }
-
-    .terminal-section {
-      scroll-margin-top: 22px;
-      margin: 0 0 18px;
-    }
-
-    .cmd-line {
-      display: flex;
-      gap: 10px;
-      align-items: baseline;
-      padding: 11px 13px;
-      border-bottom: 1px solid var(--line);
-      background: rgba(17, 21, 20, 0.88);
-      color: var(--green);
-      font-size: 0.84rem;
-    }
-
-    .prompt {
-      color: var(--green);
-      flex: 0 0 auto;
-    }
-
-    .cmd {
-      color: var(--cyan);
-      overflow-wrap: anywhere;
-    }
-
-    .output {
-      padding: 16px;
-    }
-
-    .output.hero-output {
-      min-height: 520px;
-      display: grid;
-      align-content: end;
-      background-image:
-        linear-gradient(90deg, rgba(6, 8, 7, 0.98) 0%, rgba(6, 8, 7, 0.9) 46%, rgba(6, 8, 7, 0.34) 100%),
-        url("phone-blog-assets/01-launcher.png");
-      background-repeat: no-repeat;
-      background-size: cover;
-      background-position: right center;
-    }
-
-    h1,
-    h2,
-    h3,
-    p {
-      margin-top: 0;
-    }
-
-    h1 {
-      max-width: 780px;
-      margin-bottom: 14px;
-      color: var(--ink);
-      font-size: clamp(3.2rem, 7vw, 6.6rem);
-      line-height: 0.94;
-      letter-spacing: 0;
-    }
-
-    h2 {
-      margin-bottom: 12px;
-      color: var(--ink);
-      font-size: clamp(1.55rem, 3vw, 2.5rem);
-      line-height: 1.1;
-      letter-spacing: 0;
-    }
-
-    h3 {
-      color: var(--ink);
-      font-size: 1rem;
-    }
-
-    p {
-      max-width: 920px;
-      color: var(--muted);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      font-size: 1rem;
-    }
-
-    .lead {
-      max-width: 760px;
-      font-size: 1.15rem;
-    }
-
-    .kicker {
-      margin-bottom: 10px;
-      color: var(--green);
-      font-size: 0.82rem;
-      text-transform: uppercase;
-    }
-
-    .terminal-links,
-    .doc-grid,
-    .command-grid,
-    .download-grid,
-    .shot-grid {
-      display: grid;
-      gap: 10px;
-      margin-top: 16px;
-    }
-
-    .terminal-links {
-      display: flex;
-      flex-wrap: wrap;
-    }
-
-    .terminal-link,
-    .action-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      border: 1px solid rgba(129, 202, 214, 0.38);
-      background: rgba(129, 202, 214, 0.06);
-      color: var(--cyan);
-      padding: 7px 9px;
-      text-decoration: none;
-      font-size: 0.82rem;
-    }
-
-    .terminal-link::before,
-    .action-link::before {
-      content: "$";
-      color: var(--green);
-    }
-
-    .terminal-link.primary,
-    .action-link.primary {
-      border-color: rgba(184, 219, 136, 0.7);
-      background: rgba(184, 219, 136, 0.14);
-      color: var(--ink);
-    }
-
-    .terminal-link:hover,
-    .terminal-link:focus-visible,
-    .action-link:hover,
-    .action-link:focus-visible {
-      border-color: var(--rose);
-      color: var(--ink);
-      outline: none;
-    }
-
-    .doc-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .command-grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-
-    .download-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .shot-grid {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-    }
-
-    .file-row,
-    .command-row,
-    .download-row,
-    figure,
-    .note {
-      min-width: 0;
-      border: 1px solid rgba(36, 49, 45, 0.95);
-      background: rgba(17, 21, 20, 0.72);
-      padding: 12px;
-    }
-
-    .file-row {
-      display: grid;
-      gap: 8px;
-    }
-
-    .file-row .path,
-    .command-row strong,
-    code {
-      color: var(--cyan);
-      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
-    }
-
-    .file-row .path::before {
-      content: "./";
-      color: var(--dim);
-    }
-
-    .file-row p,
-    .command-row p,
-    .download-row p,
-    .note p {
-      margin-bottom: 0;
-      font-size: 0.92rem;
-    }
-
-    .inline-links {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .inline-links a {
-      color: var(--green);
-      text-decoration: none;
-      border-bottom: 1px solid rgba(184, 219, 136, 0.34);
-      font-size: 0.82rem;
-    }
-
-    .inline-links a:hover,
-    .inline-links a:focus-visible {
-      color: var(--ink);
-      border-color: var(--rose);
-      outline: none;
-    }
-
-    .command-row {
-      display: grid;
-      gap: 7px;
-      align-content: start;
-      min-height: 110px;
-    }
-
-    .download-row {
-      display: grid;
-      gap: 10px;
-      align-content: start;
-    }
-
-    figure {
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-    }
-
-    figure img {
-      display: block;
-      width: 100%;
-      aspect-ratio: 9 / 19.8;
-      object-fit: cover;
-      object-position: top;
-      background: #020303;
-    }
-
-    figcaption {
-      padding: 10px;
-      border-top: 1px solid var(--line);
-      color: var(--muted);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      font-size: 0.84rem;
-    }
-
-    .note {
-      border-color: rgba(217, 139, 153, 0.42);
-      background: rgba(217, 139, 153, 0.06);
-    }
-
-    .terminal-list {
-      margin: 14px 0 0;
-      padding: 0;
-      list-style: none;
-      border: 1px solid var(--line);
-    }
-
-    .terminal-list li {
-      padding: 9px 11px;
-      color: var(--muted);
-      border-bottom: 1px solid var(--line);
-    }
-
-    .terminal-list li:last-child {
-      border-bottom: 0;
-    }
-
-    .terminal-list strong {
-      color: var(--cyan);
-    }
-
-    .quick-commands {
-      margin: 14px 0 0;
-      padding: 13px;
-      border: 1px solid var(--line);
-      background: #050606;
-      color: var(--green);
-      white-space: pre-wrap;
-      overflow-x: auto;
-    }
-
-    .sr-only {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      border: 0;
-    }
-
-    @media (max-width: 1080px) {
-      .viewport {
-        grid-template-columns: minmax(210px, 260px) minmax(0, 1fr);
-      }
-
-      .doc-grid,
-      .command-grid,
-      .shot-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-    }
-
-    @media (max-width: 780px) {
-      .terminal-shell {
-        width: calc(100% - 16px);
-        margin: 8px auto;
-      }
-
-      .viewport {
-        display: block;
-      }
-
-      .tree-pane {
-        position: relative;
-        height: auto;
-        max-height: 42vh;
-        border-right: 0;
-        border-bottom: 1px solid var(--line);
-      }
-
-      .buffer {
-        padding: 12px;
-      }
-
-      .output.hero-output {
-        min-height: 560px;
-        background-image:
-          linear-gradient(180deg, rgba(6, 8, 7, 0.94), rgba(6, 8, 7, 0.76)),
-          url("phone-blog-assets/01-launcher.png");
-        background-position: center top;
-      }
-
-      .titlebar,
-      .statusbar {
-        font-size: 0.72rem;
-      }
-
-      .doc-grid,
-      .command-grid,
-      .download-grid,
-      .shot-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .terminal-links {
-        display: grid;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="terminal-docs.css">
 </head>
 <body>
   <div class="terminal-shell">
@@ -614,13 +44,13 @@
           </div>
           <div class="tree-group">
             <p class="tree-dir">wiki</p>
-            <a class="external" href="wiki/Getting-Started.md">Getting-Started.md</a>
-            <a class="external" href="wiki/Command-Reference.md">Command-Reference.md</a>
-            <a class="external" href="wiki/Apps.md">Apps.md</a>
-            <a class="external" href="wiki/Modules.md">Modules.md</a>
-            <a class="external" href="wiki/Termux-Integration.md">Termux-Integration.md</a>
-            <a class="external" href="wiki/Automation-and-Chaining.md">Automation.md</a>
-            <a class="external" href="wiki/FAQ-and-Troubleshooting.md">FAQ.md</a>
+            <a class="external" href="viewer.html?file=wiki/Getting-Started.md">Getting-Started.md</a>
+            <a class="external" href="viewer.html?file=wiki/Command-Reference.md">Command-Reference.md</a>
+            <a class="external" href="viewer.html?file=wiki/Apps.md">Apps.md</a>
+            <a class="external" href="viewer.html?file=wiki/Modules.md">Modules.md</a>
+            <a class="external" href="viewer.html?file=wiki/Termux-Integration.md">Termux-Integration.md</a>
+            <a class="external" href="viewer.html?file=wiki/Automation-and-Chaining.md">Automation.md</a>
+            <a class="external" href="viewer.html?file=wiki/FAQ-and-Troubleshooting.md">FAQ.md</a>
           </div>
           <div class="tree-group">
             <p class="tree-dir">release</p>
@@ -670,7 +100,7 @@
                   <div class="path">new-user.guide</div>
                   <p>Learn the command-first basics, opening settings, and using help without blocking the terminal.</p>
                   <div class="inline-links">
-                    <a href="wiki/Getting-Started.md">Getting started</a>
+                    <a href="viewer.html?file=wiki/Getting-Started.md">Getting started</a>
                     <a href="#daily-commands">Daily commands</a>
                   </div>
                 </div>
@@ -679,7 +109,7 @@
                   <p>Hide noisy apps, restore hidden apps, inspect packages, and build app drawer groups.</p>
                   <div class="inline-links">
                     <a href="apps.html">Apps guide</a>
-                    <a href="wiki/App-Drawer.md">Drawer wiki</a>
+                    <a href="viewer.html?file=wiki/App-Drawer.md">Drawer wiki</a>
                   </div>
                 </div>
                 <div class="file-row">
@@ -746,8 +176,8 @@
                   <div class="path">core/first-run</div>
                   <p>Base command vocabulary, launcher habits, and command categories.</p>
                   <div class="inline-links">
-                    <a href="wiki/Getting-Started.md">Getting started</a>
-                    <a href="wiki/Command-Reference.md">Command reference</a>
+                    <a href="viewer.html?file=wiki/Getting-Started.md">Getting started</a>
+                    <a href="viewer.html?file=wiki/Command-Reference.md">Command reference</a>
                   </div>
                 </div>
                 <div class="file-row">
@@ -755,7 +185,7 @@
                   <p>Open the drawer, hide apps, restore apps, set default app slots, and maintain app groups.</p>
                   <div class="inline-links">
                     <a href="apps.html">Apps HTML guide</a>
-                    <a href="wiki/Apps.md">Apps wiki</a>
+                    <a href="viewer.html?file=wiki/Apps.md">Apps wiki</a>
                   </div>
                 </div>
                 <div class="file-row">
@@ -770,16 +200,16 @@
                   <div class="path">theme/presets</div>
                   <p>Use the settings hub, editable XML files, wallpaper auto-color, presets, and shareable looks.</p>
                   <div class="inline-links">
-                    <a href="wiki/Customization-and-Config-Files.md">Config files</a>
-                    <a href="wiki/Preset-Sharing.md">Preset sharing</a>
+                    <a href="viewer.html?file=wiki/Customization-and-Config-Files.md">Config files</a>
+                    <a href="viewer.html?file=wiki/Preset-Sharing.md">Preset sharing</a>
                   </div>
                 </div>
                 <div class="file-row">
                   <div class="path">termux/automation</div>
                   <p>Route scripts through Termux and keep automation narrow, explicit, and inspectable.</p>
                   <div class="inline-links">
-                    <a href="wiki/Termux-Integration.md">Termux</a>
-                    <a href="wiki/Automation-and-Chaining.md">Automation</a>
+                    <a href="viewer.html?file=wiki/Termux-Integration.md">Termux</a>
+                    <a href="viewer.html?file=wiki/Automation-and-Chaining.md">Automation</a>
                   </div>
                 </div>
                 <div class="file-row">
@@ -787,7 +217,7 @@
                   <p>Permission explanations, release channels, and quick fixes for common setup issues.</p>
                   <div class="inline-links">
                     <a href="privacy.html">Privacy</a>
-                    <a href="wiki/FAQ-and-Troubleshooting.md">FAQ</a>
+                    <a href="viewer.html?file=wiki/FAQ-and-Troubleshooting.md">FAQ</a>
                   </div>
                 </div>
               </div>
