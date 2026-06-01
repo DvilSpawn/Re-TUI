@@ -31,26 +31,13 @@
       <section class="content-pane" aria-label="Markdown output">
         <div class="pane-header">
           <span>output</span>
-          <span id="pane-path">cat wiki/Home.md</span>
+          <span id="pane-path">less wiki/Home.md</span>
         </div>
         <div class="buffer">
-          <section class="terminal-card">
-            <div class="cmd-line">
-              <span class="prompt">mako@retui:~/docs$</span>
-              <span class="cmd" id="cmd-line">cat wiki/Home.md</span>
-            </div>
-            <div class="output page-output">
-              <div class="kicker">Markdown Viewer</div>
-              <h1 id="doc-title">Loading...</h1>
-              <p class="lead" id="doc-lead">Opening the selected Markdown file inside the Re:T-UI docs terminal.</p>
-              <p class="doc-meta" id="doc-meta">status: pending</p>
-            </div>
-          </section>
-
           <section class="terminal-section">
             <div class="cmd-line">
               <span class="prompt">mako@retui:~/docs$</span>
-              <span class="cmd" id="less-line">less wiki/Home.md</span>
+              <span class="cmd" id="cmd-line">less wiki/Home.md</span>
             </div>
             <div class="output markdown-body" id="markdown-output" aria-live="polite">
               <div class="empty-state">loading markdown...</div>
@@ -64,7 +51,7 @@
       <span class="status-path" id="status-path">~/Re-TUI/docs/wiki/Home.md</span>
       <span id="status-count">files: 0</span>
       <span class="status-spacer"></span>
-      <span>renderer: static markdown</span>
+      <span id="doc-meta">status: pending</span>
     </footer>
   </div>
 
@@ -376,13 +363,10 @@
     async function loadMarkdown(file) {
       buildTree(file);
       document.getElementById("title-path").textContent = "~/Re-TUI/docs/" + file;
-      document.getElementById("pane-path").textContent = "cat " + file;
-      document.getElementById("cmd-line").textContent = "cat " + file;
-      document.getElementById("less-line").textContent = "less " + file;
+      document.getElementById("pane-path").textContent = "less " + file;
+      document.getElementById("cmd-line").textContent = "less " + file;
       document.getElementById("status-path").textContent = "~/Re-TUI/docs/" + file;
       document.getElementById("status-count").textContent = "files: " + DOC_COUNT;
-      document.getElementById("doc-title").textContent = labelFor(file).replace(/\.md$/, "");
-      document.getElementById("doc-lead").textContent = "Rendered from " + file + " using the site terminal skin.";
       document.getElementById("doc-meta").textContent = "status: loading";
 
       try {
@@ -405,7 +389,7 @@
         document.getElementById("markdown-output").innerHTML = renderMarkdown(markdown, file);
         document.getElementById("doc-meta").textContent = "status: loaded from " + source;
         const firstHeading = document.querySelector("#markdown-output h1");
-        if (firstHeading) document.getElementById("doc-title").textContent = firstHeading.textContent;
+        document.title = (firstHeading ? firstHeading.textContent : labelFor(file).replace(/\.md$/, "")) + " | Re:T-UI Docs";
         if (window.location.hash) {
           const id = decodeURIComponent(window.location.hash.slice(1));
           const target = document.getElementById(id) || document.getElementById(slugify(id));
