@@ -241,6 +241,20 @@ Inside the app surface:
 
 Plain input is sent into the tmux session and followed by Enter. Colon-prefixed input is handled by Re:T-UI. This bridge keeps sessions alive, mirrors a RetUI-owned manifest, exposes static actions, and lets Re:T-UI capture the current tmux pane. It is not a full streaming PTY. Captures are sequenced so stale RunCommand results cannot overwrite newer frames, and refresh polling backs off unless the captured pane is still changing.
 
+### Codex CLI Custom App
+
+Codex CLI works well as a plain Termux app after it is installed inside Termux. Register the normal CLI directly so Re:T-UI owns the outer tmux session:
+
+```text
+termux -app-add codex codex
+termux -app-add codex-resume codex resume --last
+termux -app codex
+```
+
+Do not wrap this with a second tmux launcher such as `ccva-tmux-run`; Re:T-UI already keeps the session persistent. After opening the app, complete the Codex sign-in flow in the pane. Plain typed prompts are sent to Codex and submitted with Enter. Use `:refresh` if you want to force a pane capture, `:detach` to leave the session running, and `:stop` to kill the session.
+
+Voice-specific Codex Android helpers, realtime audio, and shim APK setup are separate from the plain CLI app. Keep those out of the default Re:T-UI custom app unless the user has intentionally installed and validated the Android audio stack.
+
 ## TBridge Role
 
 Use TBridge for:

@@ -291,6 +291,14 @@ Termux apps are tmux-backed sessions shown inside the Re:T-UI Termux surface. Re
 
 Re:T-UI mirrors a small app manifest into `~/.retui/apps/<id>/app.json` when an app is registered or opened. Scripts launched through the app surface receive `RETUI_APP_ID`, `RETUI_APP_HOME`, `RETUI_APP_STATE`, and `RETUI_APP_MANIFEST`. Use `termux -app-info <id>` to inspect the local registration and `termux -app-sync <id>` to explicitly rewrite the Termux-side manifest. Static action chips can be added with `termux -app-action <id> <label> [input]`.
 
+Example plain Codex CLI app:
+
+- `termux -app-add codex codex`
+- `termux -app-add codex-resume codex resume --last`
+- `termux -app codex`
+
+Register Codex directly, not through another tmux wrapper. Re:T-UI already owns the persistent session and sends typed input followed by Enter.
+
 ### `tbridge`
 
 Inspect and set up the Termux bridge used by scripts, modules, callbacks, and automation.

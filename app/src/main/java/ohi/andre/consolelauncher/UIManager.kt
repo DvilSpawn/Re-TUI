@@ -6707,10 +6707,12 @@ class UIManager(
 
     private fun buildTermuxAppSendScript(app: TermuxAppManager.TermuxApp, input: String): String {
         val session = shellQuote(TermuxAppManager.tmuxSessionName(app.id))
-        val send = if (input.length == 0)
+        val send = if (input.length == 0) {
             "tmux send-keys -t " + session + " C-m"
-        else
-            "tmux send-keys -t " + session + " -- " + shellQuote(input) + " C-m"
+        } else {
+            "tmux send-keys -t " + session + " -- " + shellQuote(input) + "\n" +
+                    "tmux send-keys -t " + session + " C-m"
+        }
         return buildTermuxAppEnsureScript(app) + "\n" + send + "\nsleep 0.25\n" +
                 buildTermuxAppPostInputCaptureScript(session)
     }

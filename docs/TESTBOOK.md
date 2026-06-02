@@ -233,12 +233,13 @@ Create or update a script to output:
 - In Re:T-UI, run `termux -app-add testapp bash ~/retui/test-app.sh`.
 - Run `termux -app testapp`.
 - Confirm the Termux app surface opens with a `testapp` label.
+- Confirm the app title tab is on the outer window border and the `SESSION` tab sits on the output pane border, not floating inside the pane.
 - Run `termux -app-action testapp "continue"`.
 - Confirm `CONTINUE` appears as an action chip.
 - Tap `CONTINUE`.
 - Confirm input is sent to the session and the pane refreshes.
 - Type `hello` and press Enter.
-- Confirm the tmux pane refreshes inside Re:T-UI.
+- Confirm the tmux pane receives `hello`, submits it with one Enter, and refreshes inside Re:T-UI without needing a second blank Enter.
 - Type `:refresh`.
 - Confirm Re:T-UI captures the existing session instead of starting a new process.
 - In Termux, run `cat ~/.retui/apps/testapp/app.json`.
@@ -258,6 +259,21 @@ Create or update a script to output:
 - Confirm `continue` no longer appears in `termux -app-actions testapp`.
 - Run `termux -app-rm testapp`.
 - Confirm `testapp` no longer appears in `termux -apps`.
+
+### Codex CLI Custom App
+
+- In Termux, install the Codex CLI.
+- In Re:T-UI, register the plain CLI directly:
+  - `termux -app-add codex codex`
+  - `termux -app-add codex-resume codex resume --last`
+- Run `termux -app codex`.
+- Complete Codex sign-in if needed.
+- Type a short prompt such as `say hi` and press Enter.
+- Confirm Codex responds without requiring a second blank Enter.
+- Run `:refresh`.
+- Confirm Re:T-UI captures the existing Codex pane.
+- Run `:detach`, then reopen with `termux -app codex`.
+- Confirm the same persistent Codex session is still available.
 
 ## Cross-Phase Regression
 
