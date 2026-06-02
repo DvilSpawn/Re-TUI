@@ -5,63 +5,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Re:T-UI ASCII Lab</title>
   <meta name="description" content="Experimental Re:T-UI ASCII wallpaper generator.">
+  <link rel="stylesheet" href="terminal-docs.css">
   <style>
     :root {
-      color-scheme: dark;
-      --bg: #080909;
-      --panel: #151717;
-      --panel-soft: #202322;
-      --ink: #f4eee7;
-      --muted: #c8b9b5;
-      --accent: #d98b99;
-      --accent-strong: #f0a7b0;
-      --line: #4b393d;
-      --green: #b8db88;
-      --cyan: #81cad6;
       --preview-bg: #080909;
       --preview-fg: #f4eee7;
       --preview-accent: #d98b99;
     }
 
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      background:
-        linear-gradient(180deg, rgba(8, 9, 9, 0.96), rgba(17, 20, 19, 0.98)),
-        #080909;
-      color: var(--ink);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      line-height: 1.5;
-    }
-
-    a {
-      color: inherit;
-    }
-
-    main {
-      width: min(1180px, calc(100% - 32px));
-      margin: 0 auto;
-      padding: 24px 0 58px;
-    }
-
-    nav {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      padding: 10px 0 28px;
-    }
-
-    nav a,
     button,
     .download-link {
-      border: 1px solid var(--line);
-      border-radius: 6px;
-      background: rgba(32, 35, 34, 0.78);
-      color: var(--muted);
-      padding: 8px 11px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 34px;
+      border: 1px solid rgba(129, 202, 214, 0.38);
+      border-radius: 0;
+      background: rgba(129, 202, 214, 0.06);
+      color: var(--cyan);
+      padding: 7px 9px;
       text-decoration: none;
       font: 0.8rem "SFMono-Regular", Consolas, monospace;
     }
@@ -70,46 +32,36 @@
       cursor: pointer;
     }
 
-    nav a:hover,
-    nav a:focus-visible,
     button:hover,
     button:focus-visible,
     .download-link:hover,
     .download-link:focus-visible {
-      border-color: var(--cyan);
+      border-color: var(--rose);
       color: var(--ink);
       outline: none;
     }
 
-    h1 {
-      margin: 0;
-      font-size: clamp(2.1rem, 5vw, 5.4rem);
-      line-height: 0.96;
-      letter-spacing: 0;
-    }
-
-    p {
-      margin: 0;
-      color: var(--muted);
-    }
-
-    .kicker,
-    .status,
-    label,
-    output {
-      font-family: "SFMono-Regular", Consolas, monospace;
-    }
-
-    .kicker {
-      color: var(--green);
-      font-size: 0.82rem;
-      text-transform: uppercase;
-    }
-
-    .shell {
+    .lab-output {
       display: grid;
-      grid-template-columns: minmax(280px, 0.54fr) minmax(0, 1fr);
-      gap: 20px;
+      gap: 18px;
+    }
+
+    .lab-header {
+      display: grid;
+      gap: 10px;
+    }
+
+    .lab-header h1 {
+      max-width: 980px;
+      margin: 0;
+      font-size: clamp(2.2rem, 5vw, 4.8rem);
+      line-height: 1;
+    }
+
+    .lab-shell {
+      display: grid;
+      grid-template-columns: minmax(280px, 380px) minmax(0, 1fr);
+      gap: 14px;
       align-items: start;
     }
 
@@ -128,8 +80,8 @@
     form,
     .panel {
       border: 1px solid var(--line);
-      border-radius: 8px;
-      background: rgba(21, 23, 23, 0.72);
+      border-radius: 0;
+      background: rgba(17, 21, 20, 0.72);
       padding: 14px;
     }
 
@@ -145,10 +97,11 @@
       font-size: 0.78rem;
     }
 
-    input[type="number"] {
+    input[type="number"],
+    input[type="file"] {
       width: 100%;
       border: 1px solid rgba(75, 57, 61, 0.9);
-      border-radius: 6px;
+      border-radius: 0;
       background: #080909;
       color: var(--ink);
       padding: 10px;
@@ -162,9 +115,8 @@
       min-height: 116px;
       align-content: center;
       border: 1px dashed rgba(129, 202, 214, 0.6);
-      border-radius: 6px;
+      border-radius: 0;
       background:
-        linear-gradient(135deg, rgba(129, 202, 214, 0.08), rgba(217, 139, 153, 0.08)),
         #080909;
       color: var(--ink);
       padding: 14px;
@@ -190,9 +142,9 @@
     }
 
     .file-field.dragging {
-      border-color: var(--accent);
+      border-color: var(--rose);
       background:
-        linear-gradient(135deg, rgba(129, 202, 214, 0.14), rgba(217, 139, 153, 0.16)),
+        linear-gradient(135deg, rgba(129, 202, 214, 0.12), rgba(217, 139, 153, 0.12)),
         #080909;
     }
 
@@ -221,8 +173,8 @@
     }
 
     .primary {
-      border-color: var(--accent);
-      background: rgba(217, 139, 153, 0.18);
+      border-color: rgba(184, 219, 136, 0.7);
+      background: rgba(184, 219, 136, 0.14);
       color: var(--ink);
     }
 
@@ -249,7 +201,7 @@
       width: 14px;
       height: 14px;
       border: 1px solid rgba(244, 238, 231, 0.36);
-      border-radius: 50%;
+      border-radius: 0;
     }
 
     .panel {
@@ -282,10 +234,9 @@
       grid-template-rows: auto minmax(360px, 1fr) auto;
       min-height: min(820px, calc(100vh - 68px));
       border: 1px solid var(--line);
-      border-radius: 8px;
+      border-radius: 0;
       background: var(--preview-bg);
       overflow: hidden;
-      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.32);
     }
 
     .preview-top,
@@ -315,7 +266,7 @@
     .terminal-dots span {
       width: 9px;
       height: 9px;
-      border-radius: 999px;
+      border-radius: 0;
       background: var(--preview-accent);
       opacity: 0.82;
     }
@@ -365,11 +316,7 @@
     }
 
     @media (max-width: 920px) {
-      main {
-        width: min(100% - 24px, 720px);
-      }
-
-      .shell {
+      .lab-shell {
         grid-template-columns: 1fr;
       }
 
@@ -379,15 +326,6 @@
     }
 
     @media (max-width: 560px) {
-      main {
-        width: min(100% - 18px, 520px);
-      }
-
-      nav {
-        gap: 6px;
-      }
-
-      nav a,
       button,
       .download-link {
         padding: 7px 9px;
@@ -405,158 +343,152 @@
   </style>
 </head>
 <body>
-  <main>
-    <nav aria-label="ASCII lab navigation">
-      <a href="index.html">Home</a>
-      <a href="gallery.html">Marketplace</a>
-      <a href="submit-preset.html">Upload preset</a>
-      <a href="modules.html">Modules</a>
-      <a href="widgets.html">Lua modules</a>
-      <a href="privacy.html">Privacy</a>
-    </nav>
+  <div class="terminal-shell">
+    <header class="titlebar">
+      <span class="traffic" aria-hidden="true"><span></span><span></span><span></span></span>
+      <span>retui-ascii</span>
+      <span class="title-path">~/Re-TUI/docs/ascii.html</span>
+      <span class="title-spacer"></span>
+      <span>mode: lab</span>
+    </header>
 
-    <div class="shell">
-      <div class="controls">
-        <section class="intro" aria-labelledby="page-title">
-          <div class="kicker">Experimental ASCII lab</div>
-          <h1 id="page-title">Render Wallpaper ASCII</h1>
-        </section>
+    <main class="viewport">
+      <aside class="tree-pane" aria-label="ASCII lab file tree">
+        <div class="tree-header">
+          <span>tree</span>
+          <span>docs/</span>
+        </div>
+        <nav class="tree">
+          <div class="tree-group">
+            <p class="tree-dir">docs</p>
+            <a class="external" href="index.html">index.html</a>
+            <a aria-current="page" href="ascii.html">ascii.html</a>
+            <a class="external" href="gallery.html">gallery.html</a>
+            <a class="external" href="submit-preset.html">submit-preset.html</a>
+          </div>
+          <div class="tree-group">
+            <p class="tree-dir">guides</p>
+            <a class="external" href="modules.html">modules.html</a>
+            <a class="external" href="widgets.html">lua-modules.html</a>
+            <a class="external" href="apps.html">apps.html</a>
+          </div>
+          <div class="tree-group">
+            <p class="tree-dir">wiki</p>
+            <a class="external" href="viewer.html?file=wiki/Presets-and-Wallpaper-Auto-Color.md">Presets.md</a>
+            <a class="external" href="viewer.html?file=wiki/Customization-and-Config-Files.md">Config.md</a>
+          </div>
+          <div class="tree-group">
+            <p class="tree-dir">release</p>
+            <a class="external" href="privacy.html">privacy.html</a>
+            <a class="external" href="https://github.com/DvilSpawn/Re-TUI">source.git</a>
+          </div>
+        </nav>
+      </aside>
 
-        <form id="ascii-form">
-          <label class="file-field" id="file-field">
-            Wallpaper image
-            <span class="file-name" id="file-name">Choose or drop an image</span>
-            <span class="file-meta" id="file-meta">image stays in this browser</span>
-            <input id="image-file" type="file" accept="image/*">
-          </label>
-          <div class="number-row">
-            <label>
-              Columns
-              <input id="width" type="number" min="24" max="120" value="72">
-            </label>
-            <label>
-              Rows
-              <input id="height" type="number" min="12" max="120" value="64">
-            </label>
-          </div>
-          <div class="number-row">
-            <label>
-              Contrast
-              <input id="contrast" type="number" min="0.5" max="3" step="0.1" value="1.35">
-            </label>
-            <label>
-              Detail
-              <input id="detail" type="number" min="0" max="2" step="0.1" value="0.7">
-            </label>
-          </div>
-          <div class="generate-row">
-            <output id="status" class="status">ready</output>
-            <button class="primary" id="generate" type="submit">Render</button>
-          </div>
-        </form>
+      <section class="content-pane" aria-label="ASCII lab output">
+        <div class="pane-header">
+          <span>output</span>
+          <span>./ascii-lab --interactive</span>
+        </div>
+        <div class="buffer">
+          <section class="terminal-section">
+            <div class="cmd-line">
+              <span class="prompt">mako@retui:~/docs$</span>
+              <span class="cmd">./ascii-lab --interactive</span>
+            </div>
+            <div class="output lab-output">
+              <div class="lab-header" aria-labelledby="page-title">
+                <div class="kicker">Experimental ASCII lab</div>
+                <h1 id="page-title">Render Wallpaper ASCII</h1>
+                <p class="lead">Drop a wallpaper, tune the terminal density, and export text, PNG, or SVG output from the browser.</p>
+              </div>
 
-        <section class="panel" aria-label="ASCII style">
-          <div class="panel-title">Style</div>
-          <div class="button-grid" id="style-buttons"></div>
-        </section>
+              <div class="lab-shell">
+                <div class="controls">
+                  <form id="ascii-form">
+                    <label class="file-field" id="file-field">
+                      Wallpaper image
+                      <span class="file-name" id="file-name">Choose or drop an image</span>
+                      <span class="file-meta" id="file-meta">image stays in this browser</span>
+                      <input id="image-file" type="file" accept="image/*">
+                    </label>
+                    <div class="number-row">
+                      <label>
+                        Columns
+                        <input id="width" type="number" min="24" max="120" value="72">
+                      </label>
+                      <label>
+                        Rows
+                        <input id="height" type="number" min="12" max="120" value="64">
+                      </label>
+                    </div>
+                    <div class="number-row">
+                      <label>
+                        Contrast
+                        <input id="contrast" type="number" min="0.5" max="3" step="0.1" value="1.35">
+                      </label>
+                      <label>
+                        Detail
+                        <input id="detail" type="number" min="0" max="2" step="0.1" value="0.7">
+                      </label>
+                    </div>
+                    <div class="generate-row">
+                      <output id="status" class="status">ready</output>
+                      <button class="primary" id="generate" type="submit">Render</button>
+                    </div>
+                  </form>
 
-        <section class="panel" aria-label="Palette">
-          <div class="panel-title">Palette</div>
-          <div class="palette-grid" id="palette-buttons"></div>
-        </section>
+                  <section class="panel" aria-label="ASCII style">
+                    <div class="panel-title">Style</div>
+                    <div class="button-grid" id="style-buttons"></div>
+                  </section>
 
-        <section class="panel" aria-label="Export">
-          <div class="panel-title">Export</div>
-          <div class="action-row">
-            <button type="button" id="copy-text">Copy text</button>
-            <button type="button" id="copy-link">Copy link</button>
-            <button type="button" id="save-png">Save PNG</button>
-            <button type="button" id="save-svg">Save SVG</button>
-            <a class="download-link" id="download-txt" download="retui-ascii.txt" href="data:text/plain;charset=utf-8,">Download txt</a>
-          </div>
-        </section>
-      </div>
+                  <section class="panel" aria-label="Palette">
+                    <div class="panel-title">Palette</div>
+                    <div class="palette-grid" id="palette-buttons"></div>
+                  </section>
 
-      <section class="preview-wrap" aria-label="ASCII preview">
-        <div class="preview-frame">
-          <div class="preview-top">
-            <span>retui://ascii-lab</span>
-            <span class="terminal-dots" aria-hidden="true"><span></span><span></span><span></span></span>
-          </div>
-          <div class="preview-stage">
-            <pre id="preview" aria-live="polite">                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                         upload wallpaper                             
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                       
-                                                                      </pre>
-          </div>
-          <div class="preview-bottom">
-            <span id="preview-meta">72 x 64</span>
-            <span>ascii.txt</span>
-          </div>
+                  <section class="panel" aria-label="Export">
+                    <div class="panel-title">Export</div>
+                    <div class="action-row">
+                      <button type="button" id="copy-text">Copy text</button>
+                      <button type="button" id="copy-link">Copy link</button>
+                      <button type="button" id="save-png">Save PNG</button>
+                      <button type="button" id="save-svg">Save SVG</button>
+                      <a class="download-link" id="download-txt" download="retui-ascii.txt" href="data:text/plain;charset=utf-8,">Download txt</a>
+                    </div>
+                  </section>
+                </div>
+
+                <section class="preview-wrap" aria-label="ASCII preview">
+                  <div class="preview-frame">
+                    <div class="preview-top">
+                      <span>retui://ascii-lab</span>
+                      <span class="terminal-dots" aria-hidden="true"><span></span><span></span><span></span></span>
+                    </div>
+                    <div class="preview-stage">
+                      <pre id="preview" aria-live="polite">upload wallpaper</pre>
+                    </div>
+                    <div class="preview-bottom">
+                      <span id="preview-meta">72 x 64</span>
+                      <span>ascii.txt</span>
+                    </div>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </section>
         </div>
       </section>
-    </div>
-  </main>
+    </main>
+
+    <footer class="statusbar">
+      <span class="status-path">~/Re-TUI/docs/ascii.html</span>
+      <span>client-only renderer</span>
+      <span class="status-spacer"></span>
+      <span>exports: txt png svg</span>
+    </footer>
+  </div>
 
   <script>
     const styles = [

@@ -379,449 +379,508 @@
       }
     }
   </style>
+  <link rel="stylesheet" href="terminal-docs.css">
 </head>
 <body>
-  <main>
-    <nav aria-label="Module guide sections">
-      <a href="index.html">Showcase</a>
-      <a href="widgets.html">Lua modules</a>
-      <a href="#start">Start</a>
-      <a href="#dock">Dock</a>
-      <a href="#built-ins">Built-ins</a>
-      <a href="#music">Music</a>
-      <a href="#notifications">Notifications</a>
-      <a href="#timer">Timer</a>
-      <a href="#calendar">Calendar</a>
-      <a href="#reminder">Reminder</a>
-      <a href="#notes">Notes</a>
-      <a href="#rss">RSS</a>
-      <a href="#weather">Weather</a>
-      <a href="#custom">Custom</a>
-      <a href="#lua-modules">Lua</a>
-      <a href="#module-maker">Build</a>
-      <a href="#troubleshooting">Troubleshooting</a>
-    </nav>
+  <div class="terminal-shell">
+    <header class="titlebar">
+      <span class="traffic" aria-hidden="true"><span></span><span></span><span></span></span>
+      <span>retui-modules</span>
+      <span class="title-path">~/Re-TUI/docs/modules.html</span>
+      <span class="title-spacer"></span>
+      <span>mode: guide</span>
+    </header>
 
-    <section class="hero" id="start">
-      <div class="eyebrow">Re:T-UI module walkthrough</div>
-      <h1>Use modules without mixing up the dock, the panel, and the registry.</h1>
-      <p class="lead">Modules are small terminal panels for status, controls, script output, and guided input. This page is the practical walkthrough: what each module does, how the dock works, and which commands change the visible panel versus the saved module list.</p>
-      <div class="chips" aria-label="Module guide topics">
-        <span>Built-in modules</span>
-        <span>Dock commands</span>
-        <span>Reminder prompts</span>
-        <span>Termux script modules</span>
-        <span>Lua modules</span>
-        <span>Battery-friendly habits</span>
-      </div>
-      <div class="cta-row">
-        <a href="#dock">Start with dock behavior</a>
-        <a class="secondary" href="widgets.html">Lua module guide</a>
-        <a class="secondary" href="#built-ins">Jump to modules</a>
-        <a class="secondary" href="index.html">Back to showcase</a>
-      </div>
-    </section>
+    <main class="viewport">
+      <aside class="tree-pane" aria-label="Modules guide file tree">
+        <div class="tree-header">
+          <span>tree</span>
+          <span>docs/</span>
+        </div>
+        <nav class="tree">
+          <div class="tree-group">
+            <p class="tree-dir">docs</p>
+            <a class="external" href="index.html">index.html</a>
+            <a class="external" href="apps.html">apps.html</a>
+            <a class="external" aria-current="page" href="modules.html">modules.html</a>
+            <a class="external" href="widgets.html">lua-modules.html</a>
+            <a class="external" href="ascii.html">ascii-lab.html</a>
+            <a class="external" href="gallery.html">presets.html</a>
+          </div>
+          <div class="tree-group">
+            <p class="tree-dir">sections</p>
+            <a href="#start">start</a>
+            <a href="#mental-model">mental-model</a>
+            <a href="#dock">dock</a>
+            <a href="#built-ins">built-ins</a>
+            <a href="#music">music</a>
+            <a href="#notifications">notifications</a>
+            <a href="#timer">timer</a>
+            <a href="#calendar">calendar</a>
+            <a href="#reminder">reminder</a>
+            <a href="#notes">notes</a>
+            <a href="#rss">rss</a>
+            <a href="#weather">weather</a>
+            <a href="#custom">custom</a>
+            <a href="#lua-modules">lua-modules</a>
+            <a href="#module-maker">module-maker</a>
+            <a href="#troubleshooting">troubleshooting</a>
+          </div>
+          <div class="tree-group">
+            <p class="tree-dir">wiki</p>
+            <a class="external" href="viewer.html?file=wiki/Modules.md">Modules.md</a>
+            <a class="external" href="viewer.html?file=wiki/Lua-Widgets.md">Lua-Widgets.md</a>
+            <a class="external" href="viewer.html?file=wiki/Termux-Integration.md">Termux.md</a>
+          </div>
+        </nav>
+      </aside>
 
-    <section class="guide split" id="mental-model">
-      <div>
-        <div class="kicker">Mental model</div>
-        <h2>There are three separate things.</h2>
-        <p>The module system is easier once these are separate in your head. A module can exist in the registry, appear in the dock, and be open on screen. Those are related, but they are not the same state.</p>
-      </div>
-      <div class="command-list">
-        <div><strong>Registry:</strong> all known modules. Built-ins always exist; custom script modules are registered with <code>module -add</code>.</div>
-        <div><strong>Dock:</strong> the row of module buttons shown on the home module page. Change it with <code>module -dock add</code>, <code>module -dock remove</code>, or <code>module -hide</code>.</div>
-        <div><strong>Active panel:</strong> the module currently visible above the terminal tray. Change it with <code>module -show</code> or close it with <code>module -close</code>.</div>
-      </div>
-    </section>
+      <section class="content-pane" aria-label="Modules guide output">
+        <div class="pane-header">
+          <span>output</span>
+          <span>less modules.html</span>
+        </div>
+        <div class="buffer">
+          <section class="terminal-section">
+            <div class="cmd-line">
+              <span class="prompt">mako@retui:~/docs$</span>
+              <span class="cmd">less modules.html</span>
+            </div>
+            <div class="output page-output legacy-page">
 
-    <section class="guide" id="dock">
-      <div class="kicker">Dock commands</div>
-      <h2>The dock controls buttons, not whether a module exists.</h2>
-      <p>The dock is a saved ordered list. Re:T-UI renders one button for each module in that list, then appends an <code>X</code> button that closes the active panel.</p>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Command</th>
-              <th>What it changes</th>
-              <th>What it does not do</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><code>module -ls</code></td>
-              <td>Prints all known modules and the current dock order.</td>
-              <td>Does not open or change anything.</td>
-            </tr>
-            <tr>
-              <td><code>module -show music</code></td>
-              <td>Opens the music module as the active panel.</td>
-              <td>Does not add music to the dock.</td>
-            </tr>
-            <tr>
-              <td><code>module -close</code></td>
-              <td>Clears the active panel and unselects the dock button.</td>
-              <td>Does not remove anything from the dock.</td>
-            </tr>
-            <tr>
-              <td><code>module -dock add music timer</code></td>
-              <td>Adds known modules to the dock row.</td>
-              <td>Does not create custom modules.</td>
-            </tr>
-            <tr>
-              <td><code>module -dock remove music</code></td>
-              <td>Removes module buttons from the dock row.</td>
-              <td>Does not delete the module.</td>
-            </tr>
-            <tr>
-              <td><code>module -hide music</code></td>
-              <td>Convenience command for removing one module from the dock.</td>
-              <td>Does not delete built-in modules.</td>
-            </tr>
-            <tr>
-              <td><code>module -add server termux:/path/script.sh</code></td>
-              <td>Registers a custom script module and adds it to the dock.</td>
-              <td>Does not run forever; refreshes are explicit.</td>
-            </tr>
-            <tr>
-              <td><code>module -rm server</code></td>
-              <td>Deletes a custom script module from Re:T-UI's registry and dock.</td>
-              <td>Does not delete the Termux script file.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <pre>$ module -ls
-$ module -dock add notifications timer reminder
-$ module -show notifications
-$ module -close</pre>
-    </section>
 
-    <section class="guide" id="built-ins">
-      <div class="kicker">Built-in modules</div>
-      <h2>Start with the native panels before adding scripts.</h2>
-      <p>These modules are built into the launcher: <code>music</code>, <code>notifications</code>, <code>timer</code>, <code>calendar</code>, <code>reminder</code>, <code>notes</code>, <code>rss</code>, and <code>weather</code>. They are available even if they are hidden from the dock. New installs keep the core default dock small; add extra modules when you want them.</p>
-      <div class="grid">
-        <div class="tile">
-          <h3>Music</h3>
-          <p>Playback controls and now-playing state. Suggestions expose previous, play, next, info, and stop.</p>
-        </div>
-        <div class="tile">
-          <h3>Notifications</h3>
-          <p>A pager for selected Android notifications, with open and reply actions when Android exposes them.</p>
-        </div>
-        <div class="tile">
-          <h3>Timer</h3>
-          <p>A focused countdown panel backed by the same <code>timer</code> command used from the terminal.</p>
-        </div>
-        <div class="tile">
-          <h3>Calendar</h3>
-          <p>A small month surface for orientation. Use it as a glanceable home panel.</p>
-        </div>
-        <div class="tile">
-          <h3>Reminder</h3>
-          <p>Local reminders with guided add, edit, and remove prompt sessions.</p>
-        </div>
-        <div class="tile">
-          <h3>Notes</h3>
-          <p>A compact panel for existing notes. Use <code>TODO:</code> notes as lightweight tasks without a second task store.</p>
-        </div>
-        <div class="tile">
-          <h3>RSS</h3>
-          <p>A feed glance panel backed by the existing <code>rss</code> command, including Reddit RSS feeds.</p>
-        </div>
-        <div class="tile">
-          <h3>Weather</h3>
-          <p>A dockable weather status panel over the existing <code>tuiweather</code> setup and update flow.</p>
-        </div>
-        <div class="tile">
-          <h3>Custom scripts</h3>
-          <p>Termux scripts can become modules when they print clean output and exit.</p>
-        </div>
-      </div>
-    </section>
+                  <section class="hero" id="start">
+                    <div class="eyebrow">Re:T-UI module walkthrough</div>
+                    <h1>Use modules without mixing up the dock, the panel, and the registry.</h1>
+                    <p class="lead">Modules are small terminal panels for status, controls, script output, and guided input. This page is the practical walkthrough: what each module does, how the dock works, and which commands change the visible panel versus the saved module list.</p>
+                    <div class="chips" aria-label="Module guide topics">
+                      <span>Built-in modules</span>
+                      <span>Dock commands</span>
+                      <span>Reminder prompts</span>
+                      <span>Termux script modules</span>
+                      <span>Lua modules</span>
+                      <span>Battery-friendly habits</span>
+                    </div>
+                    <div class="cta-row">
+                      <a href="#dock">Start with dock behavior</a>
+                      <a class="secondary" href="widgets.html">Lua module guide</a>
+                      <a class="secondary" href="#built-ins">Jump to modules</a>
+                      <a class="secondary" href="index.html">Back to showcase</a>
+                    </div>
+                  </section>
 
-    <section class="guide" id="music">
-      <div class="module-header">
-        <div>
-          <div class="kicker">Music module</div>
-          <h2>Use media controls without leaving the launcher.</h2>
-        </div>
-        <span>module id: music</span>
-      </div>
-      <p>Open the panel with <code>module -show music</code>. When active, suggestions give quick controls. The raw music command also works from the terminal.</p>
-      <div class="command-list">
-        <div><strong>Open:</strong> <code>module -show music</code></div>
-        <div><strong>Dock:</strong> <code>module -dock add music</code> or <code>module -hide music</code></div>
-        <div><strong>Controls:</strong> <code>music -play</code>, <code>music -next</code>, <code>music -previous</code>, <code>music -stop</code></div>
-        <div><strong>Library:</strong> <code>music -ls</code>, <code>music -select song</code>, <code>music -info</code>, <code>music -seekto seconds</code></div>
-      </div>
-    </section>
+                  <section class="guide split" id="mental-model">
+                    <div>
+                      <div class="kicker">Mental model</div>
+                      <h2>There are three separate things.</h2>
+                      <p>The module system is easier once these are separate in your head. A module can exist in the registry, appear in the dock, and be open on screen. Those are related, but they are not the same state.</p>
+                    </div>
+                    <div class="command-list">
+                      <div><strong>Registry:</strong> all known modules. Built-ins always exist; custom script modules are registered with <code>module -add</code>.</div>
+                      <div><strong>Dock:</strong> the row of module buttons shown on the home module page. Change it with <code>module -dock add</code>, <code>module -dock remove</code>, or <code>module -hide</code>.</div>
+                      <div><strong>Active panel:</strong> the module currently visible above the terminal tray. Change it with <code>module -show</code> or close it with <code>module -close</code>.</div>
+                    </div>
+                  </section>
 
-    <section class="guide" id="notifications">
-      <div class="module-header">
-        <div>
-          <div class="kicker">Notifications module</div>
-          <h2>Page through notifications and reply from the terminal flow.</h2>
-        </div>
-        <span>module id: notifications</span>
-      </div>
-      <p>The notification module needs Android notification access. It shows one selected notification at a time, so the panel stays readable instead of becoming a noisy feed.</p>
-      <div class="steps">
-        <div class="step">
-          <div class="step-number">1</div>
-          <div><h3>Grant access</h3><p>Run <code>notifications -access</code>, then enable Re:T-UI in Android notification access settings.</p></div>
-        </div>
-        <div class="step">
-          <div class="step-number">2</div>
-          <div><h3>Open or dock it</h3><p>Run <code>module -show notifications</code> to open now, or <code>notifications -on</code> / <code>module -dock add notifications</code> to keep the button visible.</p></div>
-        </div>
-        <div class="step">
-          <div class="step-number">3</div>
-          <div><h3>Navigate safely</h3><p>Use <code>notifications -prev</code>, <code>notifications -next</code>, and <code>notifications -open</code>. Suggestion chips run these quietly when the module is active.</p></div>
-        </div>
-        <div class="step">
-          <div class="step-number">4</div>
-          <div><h3>Reply intentionally</h3><p>Bind an app with <code>reply -bind app</code>, select the target notification, then run <code>notifications -reply</code>. The selected item is preserved while you type.</p></div>
-        </div>
-      </div>
-      <pre>$ notifications -access
-$ module -show notifications
-$ notifications -next
-$ reply -bind signal
-$ notifications -reply</pre>
-    </section>
+                  <section class="guide" id="dock">
+                    <div class="kicker">Dock commands</div>
+                    <h2>The dock controls buttons, not whether a module exists.</h2>
+                    <p>The dock is a saved ordered list. Re:T-UI renders one button for each module in that list, then appends an <code>X</code> button that closes the active panel.</p>
+                    <div class="table-wrap">
+                      <table>
+                        <thead>
+                          <tr>
+                            <th>Command</th>
+                            <th>What it changes</th>
+                            <th>What it does not do</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td><code>module -ls</code></td>
+                            <td>Prints all known modules and the current dock order.</td>
+                            <td>Does not open or change anything.</td>
+                          </tr>
+                          <tr>
+                            <td><code>module -show music</code></td>
+                            <td>Opens the music module as the active panel.</td>
+                            <td>Does not add music to the dock.</td>
+                          </tr>
+                          <tr>
+                            <td><code>module -close</code></td>
+                            <td>Clears the active panel and unselects the dock button.</td>
+                            <td>Does not remove anything from the dock.</td>
+                          </tr>
+                          <tr>
+                            <td><code>module -dock add music timer</code></td>
+                            <td>Adds known modules to the dock row.</td>
+                            <td>Does not create custom modules.</td>
+                          </tr>
+                          <tr>
+                            <td><code>module -dock remove music</code></td>
+                            <td>Removes module buttons from the dock row.</td>
+                            <td>Does not delete the module.</td>
+                          </tr>
+                          <tr>
+                            <td><code>module -hide music</code></td>
+                            <td>Convenience command for removing one module from the dock.</td>
+                            <td>Does not delete built-in modules.</td>
+                          </tr>
+                          <tr>
+                            <td><code>module -add server termux:/path/script.sh</code></td>
+                            <td>Registers a custom script module and adds it to the dock.</td>
+                            <td>Does not run forever; refreshes are explicit.</td>
+                          </tr>
+                          <tr>
+                            <td><code>module -rm server</code></td>
+                            <td>Deletes a custom script module from Re:T-UI's registry and dock.</td>
+                            <td>Does not delete the Termux script file.</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <pre>$ module -ls
+              $ module -dock add notifications timer reminder
+              $ module -show notifications
+              $ module -close</pre>
+                  </section>
 
-    <section class="guide" id="timer">
-      <div class="module-header">
-        <div>
-          <div class="kicker">Timer module</div>
-          <h2>Use a timer as both a command and a docked panel.</h2>
-        </div>
-        <span>module id: timer</span>
-      </div>
-      <p>The timer panel reflects the timer command. If a timer is already running, <code>timer -add</code> extends it directly. Typing a plain new duration while one is active asks for confirmation.</p>
-      <div class="command-list">
-        <div><strong>Open:</strong> <code>module -show timer</code></div>
-        <div><strong>Start:</strong> <code>timer 5m</code> or <code>timer -add 30s</code></div>
-        <div><strong>Inspect:</strong> <code>timer -status</code></div>
-        <div><strong>Stop:</strong> <code>timer -stop</code></div>
-      </div>
-    </section>
+                  <section class="guide" id="built-ins">
+                    <div class="kicker">Built-in modules</div>
+                    <h2>Start with the native panels before adding scripts.</h2>
+                    <p>These modules are built into the launcher: <code>music</code>, <code>notifications</code>, <code>timer</code>, <code>calendar</code>, <code>reminder</code>, <code>notes</code>, <code>rss</code>, and <code>weather</code>. They are available even if they are hidden from the dock. New installs keep the core default dock small; add extra modules when you want them.</p>
+                    <div class="grid">
+                      <div class="tile">
+                        <h3>Music</h3>
+                        <p>Playback controls and now-playing state. Suggestions expose previous, play, next, info, and stop.</p>
+                      </div>
+                      <div class="tile">
+                        <h3>Notifications</h3>
+                        <p>A pager for selected Android notifications, with open and reply actions when Android exposes them.</p>
+                      </div>
+                      <div class="tile">
+                        <h3>Timer</h3>
+                        <p>A focused countdown panel backed by the same <code>timer</code> command used from the terminal.</p>
+                      </div>
+                      <div class="tile">
+                        <h3>Calendar</h3>
+                        <p>A small month surface for orientation. Use it as a glanceable home panel.</p>
+                      </div>
+                      <div class="tile">
+                        <h3>Reminder</h3>
+                        <p>Local reminders with guided add, edit, and remove prompt sessions.</p>
+                      </div>
+                      <div class="tile">
+                        <h3>Notes</h3>
+                        <p>A compact panel for existing notes. Use <code>TODO:</code> notes as lightweight tasks without a second task store.</p>
+                      </div>
+                      <div class="tile">
+                        <h3>RSS</h3>
+                        <p>A feed glance panel backed by the existing <code>rss</code> command, including Reddit RSS feeds.</p>
+                      </div>
+                      <div class="tile">
+                        <h3>Weather</h3>
+                        <p>A dockable weather status panel over the existing <code>tuiweather</code> setup and update flow.</p>
+                      </div>
+                      <div class="tile">
+                        <h3>Custom scripts</h3>
+                        <p>Termux scripts can become modules when they print clean output and exit.</p>
+                      </div>
+                    </div>
+                  </section>
 
-    <section class="guide" id="calendar">
-      <div class="module-header">
-        <div>
-          <div class="kicker">Calendar module</div>
-          <h2>Keep a small date surface in the dock.</h2>
-        </div>
-        <span>module id: calendar</span>
-      </div>
-      <p>The calendar module is intentionally simple: a glanceable month panel for the home screen. It also ships as the built-in module-button example, while the other default modules keep their controls in the suggestion row.</p>
-      <pre>$ module -show calendar
-$ module -dock add calendar
-$ module -dock remove calendar</pre>
-    </section>
+                  <section class="guide" id="music">
+                    <div class="module-header">
+                      <div>
+                        <div class="kicker">Music module</div>
+                        <h2>Use media controls without leaving the launcher.</h2>
+                      </div>
+                      <span>module id: music</span>
+                    </div>
+                    <p>Open the panel with <code>module -show music</code>. When active, suggestions give quick controls. The raw music command also works from the terminal.</p>
+                    <div class="command-list">
+                      <div><strong>Open:</strong> <code>module -show music</code></div>
+                      <div><strong>Dock:</strong> <code>module -dock add music</code> or <code>module -hide music</code></div>
+                      <div><strong>Controls:</strong> <code>music -play</code>, <code>music -next</code>, <code>music -previous</code>, <code>music -stop</code></div>
+                      <div><strong>Library:</strong> <code>music -ls</code>, <code>music -select song</code>, <code>music -info</code>, <code>music -seekto seconds</code></div>
+                    </div>
+                  </section>
 
-    <section class="guide" id="reminder">
-      <div class="module-header">
-        <div>
-          <div class="kicker">Reminder module</div>
-          <h2>Let the launcher own reminder scheduling.</h2>
-        </div>
-        <span>module id: reminder</span>
-      </div>
-      <p>The reminder module uses native prompt sessions. During a session, normal command execution pauses until you save, edit, remove, or cancel.</p>
-      <div class="grid">
-        <div class="tile"><h3>Add</h3><p><code>module -prompt reminder add</code> asks for reminder text, date, time, and confirmation.</p></div>
-        <div class="tile"><h3>Edit</h3><p><code>module -prompt reminder edit</code> asks which reminder to change, then walks through replacement values.</p></div>
-        <div class="tile"><h3>Remove</h3><p><code>module -prompt reminder remove</code> asks which reminder to delete and confirms before removal.</p></div>
-      </div>
-      <pre>$ module -show reminder
-$ module -prompt reminder add
-> What do you want to be reminded about?
-$ submit Play Store update
-> What date?
-$ 08/05/2026
-> What time?
-$ 10:30AM</pre>
-    </section>
+                  <section class="guide" id="notifications">
+                    <div class="module-header">
+                      <div>
+                        <div class="kicker">Notifications module</div>
+                        <h2>Page through notifications and reply from the terminal flow.</h2>
+                      </div>
+                      <span>module id: notifications</span>
+                    </div>
+                    <p>The notification module needs Android notification access. It shows one selected notification at a time, so the panel stays readable instead of becoming a noisy feed.</p>
+                    <div class="steps">
+                      <div class="step">
+                        <div class="step-number">1</div>
+                        <div><h3>Grant access</h3><p>Run <code>notifications -access</code>, then enable Re:T-UI in Android notification access settings.</p></div>
+                      </div>
+                      <div class="step">
+                        <div class="step-number">2</div>
+                        <div><h3>Open or dock it</h3><p>Run <code>module -show notifications</code> to open now, or <code>notifications -on</code> / <code>module -dock add notifications</code> to keep the button visible.</p></div>
+                      </div>
+                      <div class="step">
+                        <div class="step-number">3</div>
+                        <div><h3>Navigate safely</h3><p>Use <code>notifications -prev</code>, <code>notifications -next</code>, and <code>notifications -open</code>. Suggestion chips run these quietly when the module is active.</p></div>
+                      </div>
+                      <div class="step">
+                        <div class="step-number">4</div>
+                        <div><h3>Reply intentionally</h3><p>Bind an app with <code>reply -bind app</code>, select the target notification, then run <code>notifications -reply</code>. The selected item is preserved while you type.</p></div>
+                      </div>
+                    </div>
+                    <pre>$ notifications -access
+              $ module -show notifications
+              $ notifications -next
+              $ reply -bind signal
+              $ notifications -reply</pre>
+                  </section>
 
-    <section class="guide" id="notes">
-      <div class="module-header">
-        <div>
-          <div class="kicker">Notes module</div>
-          <h2>Use notes as a small persistent task surface.</h2>
-        </div>
-        <span>module id: notes</span>
-      </div>
-      <p>The notes module reads the same notes file as the editor and status label. It does not create a separate todo database; task-like items are just notes with a convention such as <code>TODO:</code>.</p>
-      <div class="command-list">
-        <div><strong>Open:</strong> <code>module -show notes</code></div>
-        <div><strong>Dock:</strong> <code>module -dock add notes</code> or <code>module -hide notes</code></div>
-        <div><strong>Add task:</strong> <code>notes -add TODO: follow up with tester</code></div>
-        <div><strong>Manage:</strong> <code>notes -ls</code>, <code>notes -rm 1</code>, <code>notes -cp 1</code>, <code>notes -clear</code></div>
-      </div>
-      <pre>$ module -dock add notes
-$ notes -add TODO: review theme preset
-$ module -show notes</pre>
-    </section>
+                  <section class="guide" id="timer">
+                    <div class="module-header">
+                      <div>
+                        <div class="kicker">Timer module</div>
+                        <h2>Use a timer as both a command and a docked panel.</h2>
+                      </div>
+                      <span>module id: timer</span>
+                    </div>
+                    <p>The timer panel reflects the timer command. If a timer is already running, <code>timer -add</code> extends it directly. Typing a plain new duration while one is active asks for confirmation.</p>
+                    <div class="command-list">
+                      <div><strong>Open:</strong> <code>module -show timer</code></div>
+                      <div><strong>Start:</strong> <code>timer 5m</code> or <code>timer -add 30s</code></div>
+                      <div><strong>Inspect:</strong> <code>timer -status</code></div>
+                      <div><strong>Stop:</strong> <code>timer -stop</code></div>
+                    </div>
+                  </section>
 
-    <section class="guide" id="rss">
-      <div class="module-header">
-        <div>
-          <div class="kicker">RSS module</div>
-          <h2>Keep feeds glanceable without turning the terminal into a feed reader.</h2>
-        </div>
-        <span>module id: rss</span>
-      </div>
-      <p>The RSS module shows cached feed items and offers suggestion chips for listing, refreshing, and opening the first configured feed. Network behavior stays with the existing <code>rss</code> command and its per-feed update interval.</p>
-      <div class="command-list">
-        <div><strong>Open:</strong> <code>module -show rss</code></div>
-        <div><strong>Dock:</strong> <code>module -dock add rss</code> or <code>module -hide rss</code></div>
-        <div><strong>Add Reddit:</strong> <code>rss -add 1 900 https://www.reddit.com/r/android/.rss</code></div>
-        <div><strong>Refresh/read:</strong> <code>rss -frc 1</code>, <code>rss -l 1</code>, <code>rss -ls</code></div>
-      </div>
-      <pre>$ rss -add 1 900 https://www.reddit.com/r/android/.rss
-$ rss -frc 1
-$ module -dock add rss
-$ module -show rss</pre>
-    </section>
+                  <section class="guide" id="calendar">
+                    <div class="module-header">
+                      <div>
+                        <div class="kicker">Calendar module</div>
+                        <h2>Keep a small date surface in the dock.</h2>
+                      </div>
+                      <span>module id: calendar</span>
+                    </div>
+                    <p>The calendar module is intentionally simple: a glanceable month panel for the home screen. It also ships as the built-in module-button example, while the other default modules keep their controls in the suggestion row.</p>
+                    <pre>$ module -show calendar
+              $ module -dock add calendar
+              $ module -dock remove calendar</pre>
+                  </section>
 
-    <section class="guide" id="weather">
-      <div class="module-header">
-        <div>
-          <div class="kicker">Weather module</div>
-          <h2>Dock the existing weather status instead of adding another service.</h2>
-        </div>
-        <span>module id: weather</span>
-      </div>
-      <p>The weather module uses the same <code>tuiweather</code> setup and update behavior as the status label. If weather is disabled or not configured, the panel tells you which command to run instead of silently polling.</p>
-      <div class="command-list">
-        <div><strong>Open:</strong> <code>module -show weather</code></div>
-        <div><strong>Dock:</strong> <code>module -dock add weather</code> or <code>module -hide weather</code></div>
-        <div><strong>Setup:</strong> <code>tuiweather -enable</code>, <code>tuiweather -tutorial</code>, <code>tuiweather -set_key key</code></div>
-        <div><strong>Refresh:</strong> <code>tuiweather -update</code></div>
-      </div>
-      <pre>$ tuiweather -enable
-$ module -dock add weather
-$ module -show weather
-$ tuiweather -update</pre>
-    </section>
+                  <section class="guide" id="reminder">
+                    <div class="module-header">
+                      <div>
+                        <div class="kicker">Reminder module</div>
+                        <h2>Let the launcher own reminder scheduling.</h2>
+                      </div>
+                      <span>module id: reminder</span>
+                    </div>
+                    <p>The reminder module uses native prompt sessions. During a session, normal command execution pauses until you save, edit, remove, or cancel.</p>
+                    <div class="grid">
+                      <div class="tile"><h3>Add</h3><p><code>module -prompt reminder add</code> asks for reminder text, date, time, and confirmation.</p></div>
+                      <div class="tile"><h3>Edit</h3><p><code>module -prompt reminder edit</code> asks which reminder to change, then walks through replacement values.</p></div>
+                      <div class="tile"><h3>Remove</h3><p><code>module -prompt reminder remove</code> asks which reminder to delete and confirms before removal.</p></div>
+                    </div>
+                    <pre>$ module -show reminder
+              $ module -prompt reminder add
+              > What do you want to be reminded about?
+              $ submit Play Store update
+              > What date?
+              $ 08/05/2026
+              > What time?
+              $ 10:30AM</pre>
+                  </section>
 
-    <section class="guide" id="custom">
-      <div class="kicker">Custom Termux modules</div>
-      <h2>Scripts should print output, then exit.</h2>
-      <p>A good module script is boring in the best way: gather data, print a small body, offer a few suggestions, and finish. Avoid infinite loops and high-frequency polling; Re:T-UI should refresh modules on demand or through deliberate callbacks.</p>
-      <div class="split">
-        <div>
-          <h3>Minimal script</h3>
-          <pre>#!/data/data/com.termux/files/usr/bin/sh
+                  <section class="guide" id="notes">
+                    <div class="module-header">
+                      <div>
+                        <div class="kicker">Notes module</div>
+                        <h2>Use notes as a small persistent task surface.</h2>
+                      </div>
+                      <span>module id: notes</span>
+                    </div>
+                    <p>The notes module reads the same notes file as the editor and status label. It does not create a separate todo database; task-like items are just notes with a convention such as <code>TODO:</code>.</p>
+                    <div class="command-list">
+                      <div><strong>Open:</strong> <code>module -show notes</code></div>
+                      <div><strong>Dock:</strong> <code>module -dock add notes</code> or <code>module -hide notes</code></div>
+                      <div><strong>Add task:</strong> <code>notes -add TODO: follow up with tester</code></div>
+                      <div><strong>Manage:</strong> <code>notes -ls</code>, <code>notes -rm 1</code>, <code>notes -cp 1</code>, <code>notes -clear</code></div>
+                    </div>
+                    <pre>$ module -dock add notes
+              $ notes -add TODO: review theme preset
+              $ module -show notes</pre>
+                  </section>
 
-echo "::title Server"
-echo "::body prod-api ONLINE"
-echo "::body checked: $(date +%H:%M)"
-echo "::suggest refresh | command | module -refresh server"</pre>
-        </div>
-        <div>
-          <h3>Register it</h3>
-          <pre>$ termux -setup
-$ module -add server termux:/data/data/com.termux/files/home/retui/server-health.sh
-$ module -refresh server
-$ module -show server
-$ module -dock add server</pre>
-        </div>
-      </div>
-      <div class="note">
-        <p><strong>Battery rule:</strong> do not build modules around <code>while true</code> loops or one-second polling. Let the launcher show cached output while idle, then refresh from a command, suggestion, callback, or Android event.</p>
-      </div>
-      <div class="note">
-        <p><strong>Preformatted output:</strong> normal script output uses the selected launcher font. Wrap terminal art, tables, or code in <code>::pre</code>, <code>::ascii</code>, or <code>::code</code>, then close it with <code>::end</code>, when alignment must stay monospace. One-line forms such as <code>::pre text</code>, <code>::ascii text</code>, and <code>::code text</code> are also supported.</p>
-        <pre>echo "::title Weather: Chennai"
-echo "::body Weather report: Chennai"
-echo "::ascii"
-curl -s 'wttr.in/Chennai?0T'
-echo "::end"</pre>
-      </div>
-    </section>
+                  <section class="guide" id="rss">
+                    <div class="module-header">
+                      <div>
+                        <div class="kicker">RSS module</div>
+                        <h2>Keep feeds glanceable without turning the terminal into a feed reader.</h2>
+                      </div>
+                      <span>module id: rss</span>
+                    </div>
+                    <p>The RSS module shows cached feed items and offers suggestion chips for listing, refreshing, and opening the first configured feed. Network behavior stays with the existing <code>rss</code> command and its per-feed update interval.</p>
+                    <div class="command-list">
+                      <div><strong>Open:</strong> <code>module -show rss</code></div>
+                      <div><strong>Dock:</strong> <code>module -dock add rss</code> or <code>module -hide rss</code></div>
+                      <div><strong>Add Reddit:</strong> <code>rss -add 1 900 https://www.reddit.com/r/android/.rss</code></div>
+                      <div><strong>Refresh/read:</strong> <code>rss -frc 1</code>, <code>rss -l 1</code>, <code>rss -ls</code></div>
+                    </div>
+                    <pre>$ rss -add 1 900 https://www.reddit.com/r/android/.rss
+              $ rss -frc 1
+              $ module -dock add rss
+              $ module -show rss</pre>
+                  </section>
 
-    <section class="guide" id="lua-modules">
-      <div class="module-header">
-        <div>
-          <div class="kicker">Lua modules</div>
-          <h2>Use Lua when the module needs launcher-native controls.</h2>
-        </div>
-        <span>module source: lua:&lt;id&gt;</span>
-      </div>
-      <p>Lua modules share the same dock as built-ins and Termux modules. They are launcher-native scripts stored locally by Re:T-UI, so they can render text, rows, containers, progress glyphs, and native buttons inside the active module panel, or keep the panel clean and publish suggestion chips for keyboard-first use.</p>
-      <div class="command-list">
-        <div><strong>Create:</strong> <code>module -new lua name</code>, save the Lua source, then <code>module -show name</code>.</div>
-        <div><strong>Edit/check:</strong> <code>module -edit name</code>, <code>module -config name</code>, <code>module -check name</code>, and <code>module -approve name</code>.</div>
-        <div><strong>Module buttons:</strong> <code>ui:button</code>, <code>ui:command_button</code>, <code>ui:module_button</code>, <code>ui:app_button</code>, <code>ui:intent_button</code>, and <code>ui:shortcut_button</code>.</div>
-        <div><strong>Suggestion chips:</strong> <code>ui:suggest_action</code>, <code>ui:suggest_command</code>, <code>ui:suggest_module</code>, and <code>ui:suggest_text</code>.</div>
-        <div><strong>Layout:</strong> <code>ui:render</code> / <code>ui:layout</code> can declare small rows, columns, text, buttons, progress bars, dividers, spacers, and explicit preformatted blocks with <code>pre</code>, <code>ascii</code>, or <code>code</code>.</div>
-        <div><strong>Refresh:</strong> opening the module renders it; tapping the module title forces a refresh. Manual <code>module -refresh</code> remains available.</div>
-      </div>
-      <div class="note">
-        <p><strong>Font contract:</strong> Lua text follows the active launcher font by default. Renderer-owned progress bars, dividers, and explicit <code>pre</code>/<code>ascii</code>/<code>code</code> layout blocks stay monospace so tables and terminal art keep their shape.</p>
-      </div>
-      <div class="note">
-        <p><strong>Boundary:</strong> keep Linux tools, long-running jobs, and shell automation in Termux modules. Use Lua when the user needs a compact launcher-owned UI surface with safe app, intent, shortcut, config, and storage helpers.</p>
-      </div>
-    </section>
+                  <section class="guide" id="weather">
+                    <div class="module-header">
+                      <div>
+                        <div class="kicker">Weather module</div>
+                        <h2>Dock the existing weather status instead of adding another service.</h2>
+                      </div>
+                      <span>module id: weather</span>
+                    </div>
+                    <p>The weather module uses the same <code>tuiweather</code> setup and update behavior as the status label. If weather is disabled or not configured, the panel tells you which command to run instead of silently polling.</p>
+                    <div class="command-list">
+                      <div><strong>Open:</strong> <code>module -show weather</code></div>
+                      <div><strong>Dock:</strong> <code>module -dock add weather</code> or <code>module -hide weather</code></div>
+                      <div><strong>Setup:</strong> <code>tuiweather -enable</code>, <code>tuiweather -tutorial</code>, <code>tuiweather -set_key key</code></div>
+                      <div><strong>Refresh:</strong> <code>tuiweather -update</code></div>
+                    </div>
+                    <pre>$ tuiweather -enable
+              $ module -dock add weather
+              $ module -show weather
+              $ tuiweather -update</pre>
+                  </section>
 
-    <section class="guide split" id="module-maker">
-      <div>
-        <div class="kicker">Build modules with Codex</div>
-        <h2>Generate Termux-backed modules without guessing the plumbing.</h2>
-        <p>The Re:T-UI module maker skill teaches Codex how to create launcher-friendly shell modules: scripts that print <code>::title</code>, <code>::body</code>, <code>::pre</code>/<code>::ascii</code>/<code>::code</code>, and <code>::suggest</code> lines, keep expensive work in Termux only when needed, and let Re:T-UI own UI behaviors such as pagination, reply prompts, refresh chips, and quiet module controls.</p>
-        <div class="command-list">
-          <div><strong>Launcher first:</strong> use Re:T-UI variables and module primitives when the launcher already knows the state.</div>
-          <div><strong>Termux when needed:</strong> use Linux tools and Termux:API for data Android only exposes through the shell layer.</div>
-          <div><strong>Clean setup:</strong> keep Termux script commands separate from Re:T-UI registration commands.</div>
-        </div>
-      </div>
-      <div class="note">
-        <p><strong>Share the skill as a folder.</strong> A Codex user can install it by copying the folder below into their Codex skills directory.</p>
-        <pre>~/.codex/skills/retui-module-maker/
-  SKILL.md
-  references/module-contract.md
-  references/linux-termux-programming.md
-  references/pagination-and-reply.md</pre>
-      </div>
-    </section>
+                  <section class="guide" id="custom">
+                    <div class="kicker">Custom Termux modules</div>
+                    <h2>Scripts should print output, then exit.</h2>
+                    <p>A good module script is boring in the best way: gather data, print a small body, offer a few suggestions, and finish. Avoid infinite loops and high-frequency polling; Re:T-UI should refresh modules on demand or through deliberate callbacks.</p>
+                    <div class="split">
+                      <div>
+                        <h3>Minimal script</h3>
+                        <pre>#!/data/data/com.termux/files/usr/bin/sh
 
-    <section class="guide" id="troubleshooting">
-      <div class="kicker">Troubleshooting</div>
-      <h2>Fast checks when modules feel confusing.</h2>
-      <div class="grid">
-        <div class="tile">
-          <h3>A module vanished from the dock</h3>
-          <p>Run <code>module -ls</code>. If it still exists, add it back with <code>module -dock add name</code>.</p>
+              echo "::title Server"
+              echo "::body prod-api ONLINE"
+              echo "::body checked: $(date +%H:%M)"
+              echo "::suggest refresh | command | module -refresh server"</pre>
+                      </div>
+                      <div>
+                        <h3>Register it</h3>
+                        <pre>$ termux -setup
+              $ module -add server termux:/data/data/com.termux/files/home/retui/server-health.sh
+              $ module -refresh server
+              $ module -show server
+              $ module -dock add server</pre>
+                      </div>
+                    </div>
+                    <div class="note">
+                      <p><strong>Battery rule:</strong> do not build modules around <code>while true</code> loops or one-second polling. Let the launcher show cached output while idle, then refresh from a command, suggestion, callback, or Android event.</p>
+                    </div>
+                    <div class="note">
+                      <p><strong>Preformatted output:</strong> normal script output uses the selected launcher font. Wrap terminal art, tables, or code in <code>::pre</code>, <code>::ascii</code>, or <code>::code</code>, then close it with <code>::end</code>, when alignment must stay monospace. One-line forms such as <code>::pre text</code>, <code>::ascii text</code>, and <code>::code text</code> are also supported.</p>
+                      <pre>echo "::title Weather: Chennai"
+              echo "::body Weather report: Chennai"
+              echo "::ascii"
+              curl -s 'wttr.in/Chennai?0T'
+              echo "::end"</pre>
+                    </div>
+                  </section>
+
+                  <section class="guide" id="lua-modules">
+                    <div class="module-header">
+                      <div>
+                        <div class="kicker">Lua modules</div>
+                        <h2>Use Lua when the module needs launcher-native controls.</h2>
+                      </div>
+                      <span>module source: lua:&lt;id&gt;</span>
+                    </div>
+                    <p>Lua modules share the same dock as built-ins and Termux modules. They are launcher-native scripts stored locally by Re:T-UI, so they can render text, rows, containers, progress glyphs, and native buttons inside the active module panel, or keep the panel clean and publish suggestion chips for keyboard-first use.</p>
+                    <div class="command-list">
+                      <div><strong>Create:</strong> <code>module -new lua name</code>, save the Lua source, then <code>module -show name</code>.</div>
+                      <div><strong>Edit/check:</strong> <code>module -edit name</code>, <code>module -config name</code>, <code>module -check name</code>, and <code>module -approve name</code>.</div>
+                      <div><strong>Module buttons:</strong> <code>ui:button</code>, <code>ui:command_button</code>, <code>ui:module_button</code>, <code>ui:app_button</code>, <code>ui:intent_button</code>, and <code>ui:shortcut_button</code>.</div>
+                      <div><strong>Suggestion chips:</strong> <code>ui:suggest_action</code>, <code>ui:suggest_command</code>, <code>ui:suggest_module</code>, and <code>ui:suggest_text</code>.</div>
+                      <div><strong>Layout:</strong> <code>ui:render</code> / <code>ui:layout</code> can declare small rows, columns, text, buttons, progress bars, dividers, spacers, and explicit preformatted blocks with <code>pre</code>, <code>ascii</code>, or <code>code</code>.</div>
+                      <div><strong>Refresh:</strong> opening the module renders it; tapping the module title forces a refresh. Manual <code>module -refresh</code> remains available.</div>
+                    </div>
+                    <div class="note">
+                      <p><strong>Font contract:</strong> Lua text follows the active launcher font by default. Renderer-owned progress bars, dividers, and explicit <code>pre</code>/<code>ascii</code>/<code>code</code> layout blocks stay monospace so tables and terminal art keep their shape.</p>
+                    </div>
+                    <div class="note">
+                      <p><strong>Boundary:</strong> keep Linux tools, long-running jobs, and shell automation in Termux modules. Use Lua when the user needs a compact launcher-owned UI surface with safe app, intent, shortcut, config, and storage helpers.</p>
+                    </div>
+                  </section>
+
+                  <section class="guide split" id="module-maker">
+                    <div>
+                      <div class="kicker">Build modules with Codex</div>
+                      <h2>Generate Termux-backed modules without guessing the plumbing.</h2>
+                      <p>The Re:T-UI module maker skill teaches Codex how to create launcher-friendly shell modules: scripts that print <code>::title</code>, <code>::body</code>, <code>::pre</code>/<code>::ascii</code>/<code>::code</code>, and <code>::suggest</code> lines, keep expensive work in Termux only when needed, and let Re:T-UI own UI behaviors such as pagination, reply prompts, refresh chips, and quiet module controls.</p>
+                      <div class="command-list">
+                        <div><strong>Launcher first:</strong> use Re:T-UI variables and module primitives when the launcher already knows the state.</div>
+                        <div><strong>Termux when needed:</strong> use Linux tools and Termux:API for data Android only exposes through the shell layer.</div>
+                        <div><strong>Clean setup:</strong> keep Termux script commands separate from Re:T-UI registration commands.</div>
+                      </div>
+                    </div>
+                    <div class="note">
+                      <p><strong>Share the skill as a folder.</strong> A Codex user can install it by copying the folder below into their Codex skills directory.</p>
+                      <pre>~/.codex/skills/retui-module-maker/
+                SKILL.md
+                references/module-contract.md
+                references/linux-termux-programming.md
+                references/pagination-and-reply.md</pre>
+                    </div>
+                  </section>
+
+                  <section class="guide" id="troubleshooting">
+                    <div class="kicker">Troubleshooting</div>
+                    <h2>Fast checks when modules feel confusing.</h2>
+                    <div class="grid">
+                      <div class="tile">
+                        <h3>A module vanished from the dock</h3>
+                        <p>Run <code>module -ls</code>. If it still exists, add it back with <code>module -dock add name</code>.</p>
+                      </div>
+                      <div class="tile">
+                        <h3><code>-close</code> did not remove it</h3>
+                        <p>That is expected. <code>module -close</code> only closes the active panel. Use <code>module -dock remove name</code> to remove the button.</p>
+                      </div>
+                      <div class="tile">
+                        <h3>A custom module has stale output</h3>
+                        <p>Run <code>module -refresh name</code>. Script modules store the last output until refreshed.</p>
+                      </div>
+                      <div class="tile">
+                        <h3>Notifications do not appear</h3>
+                        <p>Run <code>notifications -access</code>, enable access, then reopen with <code>module -show notifications</code>.</p>
+                      </div>
+                      <div class="tile">
+                        <h3>Reminder prompt got stuck</h3>
+                        <p>Type <code>cancel</code> in the prompt. Then reopen the module with <code>module -show reminder</code>.</p>
+                      </div>
+                      <div class="tile">
+                        <h3>Dock order feels wrong</h3>
+                        <p>Remove and add modules in the order you want. The dock preserves insertion order.</p>
+                      </div>
+                    </div>
+                  </section>
+            </div>
+          </section>
         </div>
-        <div class="tile">
-          <h3><code>-close</code> did not remove it</h3>
-          <p>That is expected. <code>module -close</code> only closes the active panel. Use <code>module -dock remove name</code> to remove the button.</p>
-        </div>
-        <div class="tile">
-          <h3>A custom module has stale output</h3>
-          <p>Run <code>module -refresh name</code>. Script modules store the last output until refreshed.</p>
-        </div>
-        <div class="tile">
-          <h3>Notifications do not appear</h3>
-          <p>Run <code>notifications -access</code>, enable access, then reopen with <code>module -show notifications</code>.</p>
-        </div>
-        <div class="tile">
-          <h3>Reminder prompt got stuck</h3>
-          <p>Type <code>cancel</code> in the prompt. Then reopen the module with <code>module -show reminder</code>.</p>
-        </div>
-        <div class="tile">
-          <h3>Dock order feels wrong</h3>
-          <p>Remove and add modules in the order you want. The dock preserves insertion order.</p>
-        </div>
-      </div>
-    </section>
-  </main>
+      </section>
+    </main>
+
+    <footer class="statusbar">
+      <span class="status-path">~/Re-TUI/docs/modules.html</span>
+      <span>guide: modules and dock</span>
+      <span class="status-spacer"></span>
+      <span>sections: dock built-ins custom lua</span>
+    </footer>
+  </div>
 </body>
 </html>

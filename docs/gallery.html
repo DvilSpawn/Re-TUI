@@ -256,39 +256,97 @@
       }
     }
   </style>
+  <link rel="stylesheet" href="terminal-docs.css">
 </head>
 <body>
-  <main>
-    <nav aria-label="Gallery navigation">
-      <a href="index.html">Home</a>
-      <a href="index.html#downloads">Downloads</a>
-      <a href="ascii.html">ASCII Lab</a>
-      <a href="modules.html">Modules</a>
-      <a href="privacy.html">Privacy</a>
-    </nav>
+  <div class="terminal-shell">
+    <header class="titlebar">
+      <span class="traffic" aria-hidden="true"><span></span><span></span><span></span></span>
+      <span>retui-presets</span>
+      <span class="title-path">~/Re-TUI/docs/gallery.html</span>
+      <span class="title-spacer"></span>
+      <span>mode: market</span>
+    </header>
 
-    <section class="hero">
-      <div>
-        <div class="kicker">Preset marketplace</div>
-        <h1>Browse Re:T-UI looks from real user screenshots.</h1>
-        <p>Marketplace entries are moderated before they go live. Published presets include a user screenshot, a visual shareable configuration file, and compatibility metadata read from the export where available.</p>
-      </div>
-      <div class="action-row">
-        <a class="action-link primary" href="submit-preset.html">Upload preset</a>
-        <a class="action-link" href="index.html#preset-marketplace">Back to gallery intro</a>
-      </div>
-    </section>
+    <main class="viewport">
+      <aside class="tree-pane" aria-label="Preset marketplace file tree">
+        <div class="tree-header">
+          <span>tree</span>
+          <span>docs/</span>
+        </div>
+        <nav class="tree">
+          <div class="tree-group">
+            <p class="tree-dir">docs</p>
+            <a class="external" href="index.html">index.html</a>
+            <a class="external" aria-current="page" href="gallery.html">gallery.html</a>
+            <a class="external" href="submit-preset.html">submit-preset.html</a>
+            <a class="external" href="ascii.html">ascii-lab.html</a>
+            <a class="external" href="modules.html">modules.html</a>
+            <a class="external" href="privacy.html">privacy.html</a>
+          </div>
+          <div class="tree-group">
+            <p class="tree-dir">market</p>
+            <a class="external" href="index.html#downloads">downloads.env</a>
+            <a class="external" href="index.html#preset-marketplace">preset-marketplace</a>
+            <a class="external" href="preset-assets/northern-violet/northern-violet.retui-backup.zip">northern-violet.zip</a>
+          </div>
+          <div class="tree-group">
+            <p class="tree-dir">wiki</p>
+            <a class="external" href="viewer.html?file=wiki/Preset-Sharing.md">Preset-Sharing.md</a>
+            <a class="external" href="viewer.html?file=wiki/Presets-and-Wallpaper-Auto-Color.md">Wallpaper-Auto-Color.md</a>
+          </div>
+        </nav>
+      </aside>
 
-    <section class="marketplace-header" aria-label="Marketplace status">
-      <div>
-        <h2>Approved Presets</h2>
-        <p>Downloads are visual-only shareable configuration packages. Wallpaper images may be attached separately when the export cannot carry them.</p>
-      </div>
-      <div class="status" id="marketplace-status">Loading marketplace...</div>
-    </section>
+      <section class="content-pane" aria-label="Preset marketplace output">
+        <div class="pane-header">
+          <span>output</span>
+          <span>./presets --approved</span>
+        </div>
+        <div class="buffer">
+          <section class="terminal-section">
+            <div class="cmd-line">
+              <span class="prompt">mako@retui:~/docs$</span>
+              <span class="cmd">./presets --approved</span>
+            </div>
+            <div class="output page-output legacy-page">
 
-    <section class="marketplace" id="marketplace" aria-label="Preset marketplace"></section>
-  </main>
+
+                  <section class="hero">
+                    <div>
+                      <div class="kicker">Preset marketplace</div>
+                      <h1>Browse Re:T-UI looks from real user screenshots.</h1>
+                      <p>Marketplace entries are moderated before they go live. Published presets include a user screenshot, a visual shareable configuration file, and compatibility metadata read from the export where available.</p>
+                    </div>
+                    <div class="action-row">
+                      <a class="action-link primary" href="submit-preset.html">Upload preset</a>
+                      <a class="action-link" href="index.html#preset-marketplace">Back to gallery intro</a>
+                    </div>
+                  </section>
+
+                  <section class="marketplace-header" aria-label="Marketplace status">
+                    <div>
+                      <h2>Approved Presets</h2>
+                      <p>Downloads are visual-only shareable configuration packages. Wallpaper images may be attached separately when the export cannot carry them.</p>
+                    </div>
+                    <div class="status" id="marketplace-status">Loading marketplace...</div>
+                  </section>
+
+                  <section class="marketplace" id="marketplace" aria-label="Preset marketplace"></section>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <footer class="statusbar">
+      <span class="status-path">~/Re-TUI/docs/gallery.html</span>
+      <span>marketplace: approved presets</span>
+      <span class="status-spacer"></span>
+      <span>api: /api/presets</span>
+    </footer>
+  </div>
+
 
   <template id="empty-card-template">
     <article class="preset-card empty-card">

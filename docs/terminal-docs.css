@@ -121,7 +121,10 @@ a {
 .viewport {
   display: grid;
   grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
+  width: auto;
   min-height: calc(100vh - 114px);
+  margin: 0;
+  padding: 0;
 }
 
 .tree-pane {
@@ -150,7 +153,15 @@ a {
 }
 
 .tree {
+  display: block;
+  position: static;
+  top: auto;
+  z-index: auto;
+  flex-wrap: nowrap;
+  gap: 0;
   padding: 14px 12px 24px;
+  background: transparent;
+  backdrop-filter: none;
   font-size: 0.86rem;
 }
 
@@ -167,9 +178,13 @@ a {
   display: block;
   position: relative;
   margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   padding: 3px 6px 3px 29px;
   color: var(--muted);
   text-decoration: none;
+  font: inherit;
 }
 
 .tree a::before {
@@ -670,6 +685,152 @@ figcaption {
 .error-state {
   border-color: rgba(239, 123, 114, 0.56);
   color: var(--red);
+}
+
+.legacy-page {
+  display: grid;
+  gap: 18px;
+}
+
+.legacy-page > nav {
+  display: none;
+}
+
+.legacy-page .hero,
+.legacy-page section.guide,
+.legacy-page .marketplace-header,
+.legacy-page .layout,
+.legacy-page .toolbar {
+  min-height: 0;
+  margin: 0;
+  padding: 0 0 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.legacy-page .hero {
+  display: block;
+}
+
+.legacy-page .split,
+.legacy-page .wide-split,
+.legacy-page .layout {
+  gap: 14px;
+}
+
+.legacy-page .chips,
+.legacy-page .cta-row,
+.legacy-page .action-row,
+.legacy-page .preset-actions,
+.legacy-page .actions,
+.legacy-page .toolbar {
+  gap: 8px;
+}
+
+.legacy-page .tile,
+.legacy-page .note,
+.legacy-page .command-list,
+.legacy-page .table-wrap,
+.legacy-page .panel,
+.legacy-page .preset-card,
+.legacy-page .card,
+.legacy-page .toolbar,
+.legacy-page pre,
+.legacy-page input,
+.legacy-page textarea,
+.legacy-page select {
+  border-color: var(--line);
+  border-radius: 0;
+  background-color: rgba(17, 21, 20, 0.72);
+}
+
+.legacy-page input,
+.legacy-page textarea,
+.legacy-page select {
+  background: #050606;
+  color: var(--ink);
+}
+
+.legacy-page input:focus,
+.legacy-page textarea:focus,
+.legacy-page select:focus {
+  border-color: var(--cyan);
+  outline: none;
+}
+
+.legacy-page .chips span,
+.legacy-page .cta-row a,
+.legacy-page .button-link,
+.legacy-page .action-link,
+.legacy-page .download-link,
+.legacy-page .wallpaper-link,
+.legacy-page button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  border: 1px solid rgba(129, 202, 214, 0.38);
+  border-radius: 0;
+  background: rgba(129, 202, 214, 0.06);
+  color: var(--cyan);
+  padding: 7px 9px;
+  text-decoration: none;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 0.82rem;
+}
+
+.legacy-page .cta-row a:first-child,
+.legacy-page .primary-link,
+.legacy-page .action-link.primary,
+.legacy-page .download-link,
+.legacy-page button.primary,
+.legacy-page button[type="submit"] {
+  border-color: rgba(184, 219, 136, 0.7);
+  background: rgba(184, 219, 136, 0.14);
+  color: var(--ink);
+}
+
+.legacy-page button.danger {
+  border-color: rgba(239, 123, 114, 0.72);
+  background: rgba(239, 123, 114, 0.1);
+}
+
+.legacy-page .chips span {
+  color: var(--muted);
+}
+
+.legacy-page .cta-row a:hover,
+.legacy-page .cta-row a:focus-visible,
+.legacy-page .button-link:hover,
+.legacy-page .button-link:focus-visible,
+.legacy-page .action-link:hover,
+.legacy-page .action-link:focus-visible,
+.legacy-page .download-link:hover,
+.legacy-page .download-link:focus-visible,
+.legacy-page .wallpaper-link:hover,
+.legacy-page .wallpaper-link:focus-visible,
+.legacy-page button:hover,
+.legacy-page button:focus-visible {
+  border-color: var(--rose);
+  color: var(--ink);
+  outline: none;
+}
+
+.legacy-page table {
+  border-collapse: collapse;
+}
+
+.legacy-page th,
+.legacy-page td {
+  border-color: var(--line);
+}
+
+.legacy-page .preset-shot.placeholder {
+  background: #050606;
+}
+
+.legacy-page .preset-shot,
+.legacy-page .shot {
+  border-bottom: 1px solid var(--line);
 }
 
 .sr-only {

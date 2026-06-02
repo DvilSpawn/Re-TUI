@@ -423,448 +423,506 @@
       }
     }
   </style>
+  <link rel="stylesheet" href="terminal-docs.css">
 </head>
 <body>
-  <main>
-    <nav aria-label="Lua module guide sections">
-      <a href="index.html">Showcase</a>
-      <a href="modules.html">Modules</a>
-      <a href="#start">Start</a>
-      <a href="#surfaces">Surfaces</a>
-      <a href="#commands">Commands</a>
-      <a href="#first-widget">First Lua Module</a>
-      <a href="#config">Config</a>
-      <a href="#persistence">Persistence</a>
-      <a href="#suggestions">Suggestions</a>
-      <a href="#api">API</a>
-      <a href="#safety">Safety</a>
-    </nav>
+  <div class="terminal-shell">
+    <header class="titlebar">
+      <span class="traffic" aria-hidden="true"><span></span><span></span><span></span></span>
+      <span>retui-lua</span>
+      <span class="title-path">~/Re-TUI/docs/widgets.html</span>
+      <span class="title-spacer"></span>
+      <span>mode: guide</span>
+    </header>
 
-    <section class="hero" id="start">
-      <div class="eyebrow">Re:T-UI Lua modules</div>
-      <h1>Build small launcher tools without turning the launcher into an IDE.</h1>
-      <p class="lead">Lua modules are Re:T-UI-owned surfaces for quick, inspectable tools. Lua gives regular users a native scripting layer for timers, todos, notes, status panels, module buttons, config forms, app/intent shortcuts, and command suggestions without needing Termux plumbing.</p>
-      <div class="chips" aria-label="Lua module guide topics">
-        <span>Lua modules</span>
-        <span>Config surfaces</span>
-        <span>Persistent prefs</span>
-        <span>Module-local files</span>
-        <span>Native controls</span>
-        <span>Suggestion scripts</span>
-      </div>
-      <div class="cta-row">
-        <a href="#first-widget">Create a Lua module</a>
-        <a class="secondary" href="#config">Config forms</a>
-        <a class="secondary" href="#native-controls">Native controls</a>
-        <a class="secondary" href="index.html#product-showcase">Back to screenshots</a>
-      </div>
-    </section>
-
-    <section class="guide wide-split" id="surfaces">
-      <div>
-        <div class="kicker">Mental model</div>
-        <h2>Keep preview, config, and source editing separate.</h2>
-        <p>A Lua module has a live launcher surface, optional config UI, and a script editor path. Those surfaces should stay separate so the launcher remains predictable instead of becoming a tangle of custom mini-apps.</p>
-        <div class="command-list">
-          <div><strong>Preview:</strong> the active module panel rendered by Lua with <code>ui:show_text</code>, <code>ui:render</code>, native buttons, rows, containers, tables, or progress.</div>
-          <div><strong>Config:</strong> a launcher-owned form declared by Lua through <code>ui:show_config</code>. Use it for user-editable values.</div>
-          <div><strong>Source:</strong> the Lua editor opened explicitly through <code>module -edit &lt;id&gt;</code> or the <code>edit script</code> chip.</div>
+    <main class="viewport">
+      <aside class="tree-pane" aria-label="Lua module guide file tree">
+        <div class="tree-header">
+          <span>tree</span>
+          <span>docs/</span>
         </div>
-      </div>
-      <div class="two-grid" aria-label="Lua module screenshots">
-        <figure>
-          <img src="phone-blog-assets/lua-widget-preview.png" alt="Re:T-UI Lua Focus module preview rendered in the module dock">
-          <figcaption>A Lua module renders live state into the module dock and can expose both in-panel buttons and matching action chips.</figcaption>
-        </figure>
-        <figure>
-          <img src="phone-blog-assets/lua-widget-config.png" alt="Re:T-UI Lua module config panel with text, number, toggle, select, and textarea fields">
-          <figcaption>The same Lua module opens a terminal-styled config panel generated from the Lua schema.</figcaption>
-        </figure>
-      </div>
-    </section>
-
-    <section class="guide" id="commands">
-      <div class="section-header">
-        <div>
-          <div class="kicker">Command surface</div>
-          <h2>The root module command is the public gateway.</h2>
-        </div>
-        <span>command id: module</span>
-      </div>
-      <p>Everything visible in the dock is a module. Use <code>module</code> for Lua creation, editing, config, validation, approval, and refresh. The older <code>widget</code> command remains as a compatibility alias for existing scripts and shared packages.</p>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Command</th>
-              <th>Use it for</th>
-              <th>Surface rule</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><code>module -ls</code></td>
-              <td>List known modules, the dock order, and locally saved Lua modules.</td>
-              <td>High-intent root chip.</td>
-            </tr>
-            <tr>
-              <td><code>module -new lua &lt;name&gt;</code></td>
-              <td>Create a Lua module and open the editor with starter Lua.</td>
-              <td>High-intent root chip.</td>
-            </tr>
-            <tr>
-              <td><code>module -show &lt;id&gt;</code></td>
-              <td>Open a Lua module as the active dock panel.</td>
-              <td>High-intent root chip.</td>
-            </tr>
-            <tr>
-              <td><code>module -config &lt;id&gt;</code></td>
-              <td>Open the Lua module config form when the script declares one.</td>
-              <td>High-intent root chip; active Lua modules expose this as <code>edit</code>.</td>
-            </tr>
-            <tr>
-              <td><code>module -edit &lt;id&gt;</code></td>
-              <td>Open the Lua source editor.</td>
-              <td>High-intent root chip; active Lua modules expose this as <code>edit script</code>.</td>
-            </tr>
-            <tr>
-              <td><code>module -check &lt;id&gt;</code></td>
-              <td>Load and render once, reporting metadata, schema, or runtime errors.</td>
-              <td>Advanced chip after narrowing, also shown on error surfaces.</td>
-            </tr>
-            <tr>
-              <td><code>module -refresh &lt;id&gt;</code></td>
-              <td>Manually re-render a saved Lua module.</td>
-              <td>Advanced/manual path. Active Lua modules refresh when shown, and tapping the module title forces a refresh.</td>
-            </tr>
-            <tr>
-              <td><code>widget -rm &lt;id&gt;</code></td>
-              <td>Legacy package deletion for a locally saved Lua module.</td>
-              <td>Compatibility path while the public module command owns day-to-day work.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <pre>$ module -new lua focus_sprint
-$ module -check focus_sprint
-$ module -show focus_sprint
-$ module -config focus_sprint
-$ module -edit focus_sprint</pre>
-    </section>
-
-    <section class="guide split" id="first-widget">
-      <div>
-        <div class="kicker">First Lua module</div>
-        <h2>Start with a tiny durable script.</h2>
-        <p>A good first Lua module should render a small body, expose one or two buttons, and keep state in <code>prefs</code>. That proves the lifecycle without dragging in networking, files, or complex config.</p>
-        <div class="steps">
-          <div class="step">
-            <div class="step-number">1</div>
-            <div><h3>Create</h3><p>Run <code>module -new lua counter</code>, paste the script, then Save/Run.</p></div>
+        <nav class="tree">
+          <div class="tree-group">
+            <p class="tree-dir">docs</p>
+            <a class="external" href="index.html">index.html</a>
+            <a class="external" href="apps.html">apps.html</a>
+            <a class="external" href="modules.html">modules.html</a>
+            <a class="external" aria-current="page" href="widgets.html">lua-modules.html</a>
+            <a class="external" href="ascii.html">ascii-lab.html</a>
+            <a class="external" href="gallery.html">presets.html</a>
           </div>
-          <div class="step">
-            <div class="step-number">2</div>
-            <div><h3>Validate</h3><p>Run <code>module -check counter</code> before treating it as a daily tool.</p></div>
+          <div class="tree-group">
+            <p class="tree-dir">sections</p>
+            <a href="#start">start</a>
+            <a href="#surfaces">surfaces</a>
+            <a href="#commands">commands</a>
+            <a href="#first-widget">first-widget</a>
+            <a href="#config">config</a>
+            <a href="#persistence">persistence</a>
+            <a href="#suggestions">suggestions</a>
+            <a href="#api">api</a>
+            <a href="#safety">safety</a>
           </div>
-          <div class="step">
-            <div class="step-number">3</div>
-            <div><h3>Open</h3><p>Run <code>module -show counter</code>. The panel stays clean while suggestion chips call <code>on_action(value)</code>.</p></div>
+          <div class="tree-group">
+            <p class="tree-dir">wiki</p>
+            <a class="external" href="viewer.html?file=wiki/Lua-Widgets.md">Lua-Widgets.md</a>
+            <a class="external" href="viewer.html?file=wiki/Modules.md">Modules.md</a>
+            <a class="external" href="viewer.html?file=wiki/Automation-and-Chaining.md">Automation.md</a>
           </div>
-        </div>
-      </div>
-      <div>
-        <h3>Counter Lua module</h3>
-        <pre>-- name = "Counter"
--- type = "module"
--- retui = "1"
+        </nav>
+      </aside>
 
-local prefs = require "prefs"
+      <section class="content-pane" aria-label="Lua module guide output">
+        <div class="pane-header">
+          <span>output</span>
+          <span>less widgets.html</span>
+        </div>
+        <div class="buffer">
+          <section class="terminal-section">
+            <div class="cmd-line">
+              <span class="prompt">mako@retui:~/docs$</span>
+              <span class="cmd">less widgets.html</span>
+            </div>
+            <div class="output page-output legacy-page">
 
-local function render()
-    if prefs.count == nil then prefs.count = 0 end
-    ui:set_title("Counter")
-    ui:show_kv({ count = prefs.count })
-    ui:suggest_action("+1", "inc")
-    ui:suggest_action("Reset", "reset")
-end
 
-function on_resume()
-    render()
-end
+                  <section class="hero" id="start">
+                    <div class="eyebrow">Re:T-UI Lua modules</div>
+                    <h1>Build small launcher tools without turning the launcher into an IDE.</h1>
+                    <p class="lead">Lua modules are Re:T-UI-owned surfaces for quick, inspectable tools. Lua gives regular users a native scripting layer for timers, todos, notes, status panels, module buttons, config forms, app/intent shortcuts, and command suggestions without needing Termux plumbing.</p>
+                    <div class="chips" aria-label="Lua module guide topics">
+                      <span>Lua modules</span>
+                      <span>Config surfaces</span>
+                      <span>Persistent prefs</span>
+                      <span>Module-local files</span>
+                      <span>Native controls</span>
+                      <span>Suggestion scripts</span>
+                    </div>
+                    <div class="cta-row">
+                      <a href="#first-widget">Create a Lua module</a>
+                      <a class="secondary" href="#config">Config forms</a>
+                      <a class="secondary" href="#native-controls">Native controls</a>
+                      <a class="secondary" href="index.html#product-showcase">Back to screenshots</a>
+                    </div>
+                  </section>
 
-function on_action(action)
-    if action == "inc" then prefs.count = prefs.count + 1 end
-    if action == "reset" then prefs.count = 0 end
-    render()
-end</pre>
-      </div>
-    </section>
+                  <section class="guide wide-split" id="surfaces">
+                    <div>
+                      <div class="kicker">Mental model</div>
+                      <h2>Keep preview, config, and source editing separate.</h2>
+                      <p>A Lua module has a live launcher surface, optional config UI, and a script editor path. Those surfaces should stay separate so the launcher remains predictable instead of becoming a tangle of custom mini-apps.</p>
+                      <div class="command-list">
+                        <div><strong>Preview:</strong> the active module panel rendered by Lua with <code>ui:show_text</code>, <code>ui:render</code>, native buttons, rows, containers, tables, or progress.</div>
+                        <div><strong>Config:</strong> a launcher-owned form declared by Lua through <code>ui:show_config</code>. Use it for user-editable values.</div>
+                        <div><strong>Source:</strong> the Lua editor opened explicitly through <code>module -edit &lt;id&gt;</code> or the <code>edit script</code> chip.</div>
+                      </div>
+                    </div>
+                    <div class="two-grid" aria-label="Lua module screenshots">
+                      <figure>
+                        <img src="phone-blog-assets/lua-widget-preview.png" alt="Re:T-UI Lua Focus module preview rendered in the module dock">
+                        <figcaption>A Lua module renders live state into the module dock and can expose both in-panel buttons and matching action chips.</figcaption>
+                      </figure>
+                      <figure>
+                        <img src="phone-blog-assets/lua-widget-config.png" alt="Re:T-UI Lua module config panel with text, number, toggle, select, and textarea fields">
+                        <figcaption>The same Lua module opens a terminal-styled config panel generated from the Lua schema.</figcaption>
+                      </figure>
+                    </div>
+                  </section>
 
-    <section class="guide" id="config">
-      <div class="section-header">
-        <div>
-          <div class="kicker">Config surface</div>
-          <h2>Lua declares the form; Re:T-UI owns the UI.</h2>
-        </div>
-        <span>entry point: on_config</span>
-      </div>
-      <p>Use config for user-editable values such as task names, intervals, units, display preferences, note bodies, todo text, and module modes. Runtime module buttons belong in the live preview surface; runtime suggestion chips belong in the launcher suggestion row.</p>
-      <div class="two-grid">
-        <div>
-          <h3>Declare fields</h3>
-          <pre>function on_config()
-    ui:show_config({
-        title = "Focus Settings",
-        fields = {
-            { id = "task", label = "Task", type = "text", value = prefs.task, required = true },
-            { id = "minutes", label = "Sprint length", type = "number", value = prefs.minutes, min = 1, max = 180 },
-            { id = "breaks", label = "Break reminders", type = "toggle", value = prefs.breaks },
-            { id = "mode", label = "Mode", type = "select", value = prefs.mode, options = {
-                { value = "focus", label = "Focus" },
-                { value = "study", label = "Study" },
-                { value = "writing", label = "Writing" },
-            } },
-            { id = "notes", label = "Notes", type = "textarea", value = prefs.notes or "", lines = 6 },
-        }
-    })
-end</pre>
-        </div>
-        <div>
-          <h3>Save intentionally</h3>
-          <pre>function on_config_submit(action, values)
-    if action == "save" then
-        prefs.task = values.task
-        prefs.minutes = values.minutes
-        prefs.breaks = values.breaks
-        prefs.mode = values.mode
-        prefs.notes = values.notes
-    end
-    render()
-end</pre>
-          <div class="note">
-            <p>Cancel and back should not mutate module state. Save mutates only through <code>on_config_submit(action, values)</code>, then the module renders again.</p>
-          </div>
-        </div>
-      </div>
-      <div class="grid">
-        <div class="tile"><h3>Text</h3><p>Single-line string input for labels, queries, names, and short values.</p></div>
-        <div class="tile"><h3>Number</h3><p>Integer or decimal input with optional <code>min</code> and <code>max</code>.</p></div>
-        <div class="tile"><h3>Toggle</h3><p>Boolean on/off state submitted as a Lua boolean.</p></div>
-        <div class="tile"><h3>Select</h3><p>One string value from a declared option list.</p></div>
-        <div class="tile"><h3>Textarea</h3><p>Multiline string input. Newlines are preserved.</p></div>
-        <div class="tile"><h3>Scroll</h3><p>The panel grows toward the top margin and scrolls fields when there are many of them.</p></div>
-      </div>
-    </section>
+                  <section class="guide" id="commands">
+                    <div class="section-header">
+                      <div>
+                        <div class="kicker">Command surface</div>
+                        <h2>The root module command is the public gateway.</h2>
+                      </div>
+                      <span>command id: module</span>
+                    </div>
+                    <p>Everything visible in the dock is a module. Use <code>module</code> for Lua creation, editing, config, validation, approval, and refresh. The older <code>widget</code> command remains as a compatibility alias for existing scripts and shared packages.</p>
+                    <div class="table-wrap">
+                      <table>
+                        <thead>
+                          <tr>
+                            <th>Command</th>
+                            <th>Use it for</th>
+                            <th>Surface rule</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td><code>module -ls</code></td>
+                            <td>List known modules, the dock order, and locally saved Lua modules.</td>
+                            <td>High-intent root chip.</td>
+                          </tr>
+                          <tr>
+                            <td><code>module -new lua &lt;name&gt;</code></td>
+                            <td>Create a Lua module and open the editor with starter Lua.</td>
+                            <td>High-intent root chip.</td>
+                          </tr>
+                          <tr>
+                            <td><code>module -show &lt;id&gt;</code></td>
+                            <td>Open a Lua module as the active dock panel.</td>
+                            <td>High-intent root chip.</td>
+                          </tr>
+                          <tr>
+                            <td><code>module -config &lt;id&gt;</code></td>
+                            <td>Open the Lua module config form when the script declares one.</td>
+                            <td>High-intent root chip; active Lua modules expose this as <code>edit</code>.</td>
+                          </tr>
+                          <tr>
+                            <td><code>module -edit &lt;id&gt;</code></td>
+                            <td>Open the Lua source editor.</td>
+                            <td>High-intent root chip; active Lua modules expose this as <code>edit script</code>.</td>
+                          </tr>
+                          <tr>
+                            <td><code>module -check &lt;id&gt;</code></td>
+                            <td>Load and render once, reporting metadata, schema, or runtime errors.</td>
+                            <td>Advanced chip after narrowing, also shown on error surfaces.</td>
+                          </tr>
+                          <tr>
+                            <td><code>module -refresh &lt;id&gt;</code></td>
+                            <td>Manually re-render a saved Lua module.</td>
+                            <td>Advanced/manual path. Active Lua modules refresh when shown, and tapping the module title forces a refresh.</td>
+                          </tr>
+                          <tr>
+                            <td><code>widget -rm &lt;id&gt;</code></td>
+                            <td>Legacy package deletion for a locally saved Lua module.</td>
+                            <td>Compatibility path while the public module command owns day-to-day work.</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <pre>$ module -new lua focus_sprint
+              $ module -check focus_sprint
+              $ module -show focus_sprint
+              $ module -config focus_sprint
+              $ module -edit focus_sprint</pre>
+                  </section>
 
-    <section class="guide split" id="native-controls">
-      <div>
-        <div class="kicker">Native controls</div>
-        <h2>Buttons and suggestions are separate surfaces.</h2>
-        <p>Lua modules can render clickable controls directly inside the module panel, or they can publish suggestion chips for keyboard-first use. Use module buttons for always-visible controls and suggestion chips when the panel should stay clean.</p>
-        <div class="command-list">
-          <div><strong>Callbacks:</strong> <code>ui:button(label)</code> maps to <code>on_click(index)</code>.</div>
-          <div><strong>Commands:</strong> <code>ui:command_button</code> and <code>ui:module_button</code> run launcher commands from the module.</div>
-          <div><strong>Suggestions:</strong> <code>ui:suggest_action</code>, <code>ui:suggest_command</code>, <code>ui:suggest_module</code>, and <code>ui:suggest_text</code> add suggestion-row chips without adding module buttons.</div>
-          <div><strong>Android:</strong> <code>ui:app_button</code>, <code>ui:intent_button</code>, and <code>ui:shortcut_button</code> require declared permissions and route through Re:T-UI commands.</div>
-          <div><strong>Preformatted:</strong> plain text follows the theme font; <code>progress</code>, <code>divider</code>, <code>pre</code>, <code>ascii</code>, and <code>code</code> layout objects stay monospace.</div>
-          <div><strong>Refresh:</strong> opening a Lua module re-renders it; tapping its title forces a refresh, so a default refresh chip is no longer needed.</div>
-        </div>
-      </div>
-      <div>
-        <h3>Control snippet</h3>
-        <pre>-- permissions = "apps,intents"
+                  <section class="guide split" id="first-widget">
+                    <div>
+                      <div class="kicker">First Lua module</div>
+                      <h2>Start with a tiny durable script.</h2>
+                      <p>A good first Lua module should render a small body, expose one or two buttons, and keep state in <code>prefs</code>. That proves the lifecycle without dragging in networking, files, or complex config.</p>
+                      <div class="steps">
+                        <div class="step">
+                          <div class="step-number">1</div>
+                          <div><h3>Create</h3><p>Run <code>module -new lua counter</code>, paste the script, then Save/Run.</p></div>
+                        </div>
+                        <div class="step">
+                          <div class="step-number">2</div>
+                          <div><h3>Validate</h3><p>Run <code>module -check counter</code> before treating it as a daily tool.</p></div>
+                        </div>
+                        <div class="step">
+                          <div class="step-number">3</div>
+                          <div><h3>Open</h3><p>Run <code>module -show counter</code>. The panel stays clean while suggestion chips call <code>on_action(value)</code>.</p></div>
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <h3>Counter Lua module</h3>
+                      <pre>-- name = "Counter"
+              -- type = "module"
+              -- retui = "1"
 
-function render()
-    ui:set_title("Control Pad")
-    ui:render({
-        { type = "text", text = "Launcher-native controls" },
-        { type = "progress", label = "Done", value = 2, max = 5, width = 8 },
-        { type = "pre", text = "CPU  [####....] 50%" },
-    })
-    ui:button("+1")
-    ui:command_button("Modules", "module -ls")
-    ui:app_button("Settings", "Settings")
-    ui:intent_button("Open Web", { view = "https://example.com" })
-end</pre>
-      </div>
-    </section>
+              local prefs = require "prefs"
 
-    <section class="guide split" id="persistence">
-      <div>
-        <div class="kicker">Persistence</div>
-        <h2>Use prefs for settings, files for user content.</h2>
-        <p>Lua modules live under Re:T-UI's local <code>widgets/&lt;id&gt;/</code> storage folder for compatibility and are included in personal backup/restore. Keep small settings in <code>prefs</code>. Put larger notes, logs, JSON blobs, and user-generated text in module-local <code>files</code>.</p>
-        <div class="command-list">
-          <div><strong>Prefs:</strong> good for flags, counters, selected mode, last city, sprint length, compact state.</div>
-          <div><strong>Files:</strong> good for note bodies, todo archives, logs, cached JSON, or text that may grow.</div>
-          <div><strong>Boundary:</strong> file names are local to the Lua module and cannot include path separators.</div>
-        </div>
-      </div>
-      <div>
-        <h3>Notes module storage</h3>
-        <pre>local prefs = require "prefs"
-local files = require "files"
+              local function render()
+                  if prefs.count == nil then prefs.count = 0 end
+                  ui:set_title("Counter")
+                  ui:show_kv({ count = prefs.count })
+                  ui:suggest_action("+1", "inc")
+                  ui:suggest_action("Reset", "reset")
+              end
 
-function save_notes(text)
-    prefs.last_saved = os.time()
-    files:write("notes.txt", text)
-end
+              function on_resume()
+                  render()
+              end
 
-function load_notes()
-    if files:exists("notes.txt") then
-        return files:read("notes.txt")
-    end
-    return ""
-end</pre>
-      </div>
-    </section>
+              function on_action(action)
+                  if action == "inc" then prefs.count = prefs.count + 1 end
+                  if action == "reset" then prefs.count = 0 end
+                  render()
+              end</pre>
+                    </div>
+                  </section>
 
-    <section class="guide" id="suggestions">
-      <div class="kicker">Suggestion scripts</div>
-      <h2>Not every Lua script needs to become a dock module.</h2>
-      <p>Lua suggestion scripts use <code>-- type = "suggest"</code>. They are installed locally like Lua modules, but they do not render into the dock. They add suggestion chips while the user types at the root prompt.</p>
-      <div class="two-grid">
-        <div>
-          <h3>Suggestion script</h3>
-          <pre>-- name = "Quick Config"
--- type = "suggest"
--- retui = "1"
+                  <section class="guide" id="config">
+                    <div class="section-header">
+                      <div>
+                        <div class="kicker">Config surface</div>
+                        <h2>Lua declares the form; Re:T-UI owns the UI.</h2>
+                      </div>
+                      <span>entry point: on_config</span>
+                    </div>
+                    <p>Use config for user-editable values such as task names, intervals, units, display preferences, note bodies, todo text, and module modes. Runtime module buttons belong in the live preview surface; runtime suggestion chips belong in the launcher suggestion row.</p>
+                    <div class="two-grid">
+                      <div>
+                        <h3>Declare fields</h3>
+                        <pre>function on_config()
+                  ui:show_config({
+                      title = "Focus Settings",
+                      fields = {
+                          { id = "task", label = "Task", type = "text", value = prefs.task, required = true },
+                          { id = "minutes", label = "Sprint length", type = "number", value = prefs.minutes, min = 1, max = 180 },
+                          { id = "breaks", label = "Break reminders", type = "toggle", value = prefs.breaks },
+                          { id = "mode", label = "Mode", type = "select", value = prefs.mode, options = {
+                              { value = "focus", label = "Focus" },
+                              { value = "study", label = "Study" },
+                              { value = "writing", label = "Writing" },
+                          } },
+                          { id = "notes", label = "Notes", type = "textarea", value = prefs.notes or "", lines = 6 },
+                      }
+                  })
+              end</pre>
+                      </div>
+                      <div>
+                        <h3>Save intentionally</h3>
+                        <pre>function on_config_submit(action, values)
+                  if action == "save" then
+                      prefs.task = values.task
+                      prefs.minutes = values.minutes
+                      prefs.breaks = values.breaks
+                      prefs.mode = values.mode
+                      prefs.notes = values.notes
+                  end
+                  render()
+              end</pre>
+                        <div class="note">
+                          <p>Cancel and back should not mutate module state. Save mutates only through <code>on_config_submit(action, values)</code>, then the module renders again.</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="grid">
+                      <div class="tile"><h3>Text</h3><p>Single-line string input for labels, queries, names, and short values.</p></div>
+                      <div class="tile"><h3>Number</h3><p>Integer or decimal input with optional <code>min</code> and <code>max</code>.</p></div>
+                      <div class="tile"><h3>Toggle</h3><p>Boolean on/off state submitted as a Lua boolean.</p></div>
+                      <div class="tile"><h3>Select</h3><p>One string value from a declared option list.</p></div>
+                      <div class="tile"><h3>Textarea</h3><p>Multiline string input. Newlines are preserved.</p></div>
+                      <div class="tile"><h3>Scroll</h3><p>The panel grows toward the top margin and scrolls fields when there are many of them.</p></div>
+                    </div>
+                  </section>
 
-local strings = require "strings"
-local fmt = require "fmt"
+                  <section class="guide split" id="native-controls">
+                    <div>
+                      <div class="kicker">Native controls</div>
+                      <h2>Buttons and suggestions are separate surfaces.</h2>
+                      <p>Lua modules can render clickable controls directly inside the module panel, or they can publish suggestion chips for keyboard-first use. Use module buttons for always-visible controls and suggestion chips when the panel should stay clean.</p>
+                      <div class="command-list">
+                        <div><strong>Callbacks:</strong> <code>ui:button(label)</code> maps to <code>on_click(index)</code>.</div>
+                        <div><strong>Commands:</strong> <code>ui:command_button</code> and <code>ui:module_button</code> run launcher commands from the module.</div>
+                        <div><strong>Suggestions:</strong> <code>ui:suggest_action</code>, <code>ui:suggest_command</code>, <code>ui:suggest_module</code>, and <code>ui:suggest_text</code> add suggestion-row chips without adding module buttons.</div>
+                        <div><strong>Android:</strong> <code>ui:app_button</code>, <code>ui:intent_button</code>, and <code>ui:shortcut_button</code> require declared permissions and route through Re:T-UI commands.</div>
+                        <div><strong>Preformatted:</strong> plain text follows the theme font; <code>progress</code>, <code>divider</code>, <code>pre</code>, <code>ascii</code>, and <code>code</code> layout objects stay monospace.</div>
+                        <div><strong>Refresh:</strong> opening a Lua module re-renders it; tapping its title forces a refresh, so a default refresh chip is no longer needed.</div>
+                      </div>
+                    </div>
+                    <div>
+                      <h3>Control snippet</h3>
+                      <pre>-- permissions = "apps,intents"
 
-function on_suggest(query)
-    local q = strings.trim(fmt.lower(query))
-    if strings.starts_with(q, "cfg") then
-        suggest:command("Open settings", "settings")
-        suggest:command("Edit behavior", "config -file behavior.xml")
-        suggest:command("Theme colors", "settings appearance theme")
-    end
-end</pre>
-        </div>
-        <div>
-          <h3>Use this when</h3>
-          <div class="command-list">
-            <div><strong>Good fit:</strong> command shortcuts, context-aware chips, search helpers, aliases with logic.</div>
-            <div><strong>Poor fit:</strong> visible panels, timers, status cards, note editors, or anything needing config UI.</div>
-            <div><strong>Rule:</strong> if users need to inspect state, make a Lua module. If the same module needs a clean panel with chips below, use <code>ui:suggest_*</code>. If users only need command hints, make a suggestion script.</div>
-          </div>
-        </div>
-      </div>
-    </section>
+              function render()
+                  ui:set_title("Control Pad")
+                  ui:render({
+                      { type = "text", text = "Launcher-native controls" },
+                      { type = "progress", label = "Done", value = 2, max = 5, width = 8 },
+                      { type = "pre", text = "CPU  [####....] 50%" },
+                  })
+                  ui:button("+1")
+                  ui:command_button("Modules", "module -ls")
+                  ui:app_button("Settings", "Settings")
+                  ui:intent_button("Open Web", { view = "https://example.com" })
+              end</pre>
+                    </div>
+                  </section>
 
-    <section class="guide" id="api">
-      <div class="kicker">Lua API map</div>
-      <h2>Use the smallest API surface that solves the module.</h2>
-      <div class="grid">
-        <div class="tile">
-          <h3>Lifecycle</h3>
-          <p><code>on_load</code>, <code>on_resume</code>, <code>on_click(index)</code>, <code>on_action(value)</code>, <code>on_dialog_action(index)</code>, <code>on_tick(n)</code>, <code>on_alarm</code>, <code>on_config</code>, <code>on_config_submit</code>.</p>
-        </div>
-        <div class="tile">
-          <h3>Render</h3>
-          <p><code>ui:set_title</code>, <code>ui:show_text</code>, <code>ui:render</code>, <code>ui:layout</code>, <code>ui:show_lines</code>, <code>ui:show_kv</code>, <code>ui:show_table</code>, <code>ui:show_buttons</code>, <code>ui:button</code>, <code>ui:show_action</code>, <code>ui:show_command</code>, <code>ui:suggest_action</code>, <code>ui:suggest_command</code>, <code>ui:suggest_module</code>, <code>ui:suggest_text</code>.</p>
-        </div>
-        <div class="tile">
-          <h3>Panels</h3>
-          <p><code>ui:set_expandable</code>, <code>ui:is_expanded</code>, <code>ui:expand</code>, <code>ui:collapse</code>, <code>ui:toggle</code>, <code>ui:show_progress_bar(label, current, max, width)</code>, <code>ui:set_progress</code>.</p>
-        </div>
-        <div class="tile">
-          <h3>Storage</h3>
-          <p><code>prefs</code> for small persistent values. <code>files</code> for module-local text files. <code>json</code> for encoding and decoding structured data.</p>
-        </div>
-        <div class="tile">
-          <h3>Helpers</h3>
-          <p><code>launcher</code>, <code>date</code>, <code>fmt</code> including bounded Unicode <code>progress_bar(value, max, width)</code>, <code>clock</code> for timer, stopwatch, and Pomodoro state, <code>strings</code>, <code>colors</code>, <code>debug</code>, <code>system</code>, and <code>aio</code> cover common launcher-safe work.</p>
-        </div>
-        <div class="tile">
-          <h3>Launcher Buttons</h3>
-          <p><code>apps:list</code>, <code>apps:find</code>, <code>apps:launch_command</code>, <code>intents:view</code>, <code>intents:activity</code>, <code>shortcuts:use_command</code>, and their button helpers create visible launcher/app actions.</p>
-        </div>
-        <div class="tile">
-          <h3>Reminders</h3>
-          <p><code>reminders:daily(id, title, "HH:MM")</code>, <code>reminders:once(id, title, "yyyy-mm-dd HH:MM")</code>, <code>reminders:cancel(id)</code>, and <code>reminders:cancel_prefix(prefix)</code> schedule local notifications and require declared permission.</p>
-        </div>
-        <div class="tile">
-          <h3>Network</h3>
-          <p><code>http:get</code>, <code>http:post</code>, <code>http:put</code>, and <code>http:delete</code> return through network callbacks and require declared permission.</p>
-        </div>
-      </div>
-    </section>
+                  <section class="guide split" id="persistence">
+                    <div>
+                      <div class="kicker">Persistence</div>
+                      <h2>Use prefs for settings, files for user content.</h2>
+                      <p>Lua modules live under Re:T-UI's local <code>widgets/&lt;id&gt;/</code> storage folder for compatibility and are included in personal backup/restore. Keep small settings in <code>prefs</code>. Put larger notes, logs, JSON blobs, and user-generated text in module-local <code>files</code>.</p>
+                      <div class="command-list">
+                        <div><strong>Prefs:</strong> good for flags, counters, selected mode, last city, sprint length, compact state.</div>
+                        <div><strong>Files:</strong> good for note bodies, todo archives, logs, cached JSON, or text that may grow.</div>
+                        <div><strong>Boundary:</strong> file names are local to the Lua module and cannot include path separators.</div>
+                      </div>
+                    </div>
+                    <div>
+                      <h3>Notes module storage</h3>
+                      <pre>local prefs = require "prefs"
+              local files = require "files"
 
-    <section class="guide" id="safety">
-      <div class="section-header">
-        <div>
-          <div class="kicker">Safety and limits</div>
-          <h2>Lua is launcher-native, not a general shell escape.</h2>
+              function save_notes(text)
+                  prefs.last_saved = os.time()
+                  files:write("notes.txt", text)
+              end
+
+              function load_notes()
+                  if files:exists("notes.txt") then
+                      return files:read("notes.txt")
+                  end
+                  return ""
+              end</pre>
+                    </div>
+                  </section>
+
+                  <section class="guide" id="suggestions">
+                    <div class="kicker">Suggestion scripts</div>
+                    <h2>Not every Lua script needs to become a dock module.</h2>
+                    <p>Lua suggestion scripts use <code>-- type = "suggest"</code>. They are installed locally like Lua modules, but they do not render into the dock. They add suggestion chips while the user types at the root prompt.</p>
+                    <div class="two-grid">
+                      <div>
+                        <h3>Suggestion script</h3>
+                        <pre>-- name = "Quick Config"
+              -- type = "suggest"
+              -- retui = "1"
+
+              local strings = require "strings"
+              local fmt = require "fmt"
+
+              function on_suggest(query)
+                  local q = strings.trim(fmt.lower(query))
+                  if strings.starts_with(q, "cfg") then
+                      suggest:command("Open settings", "settings")
+                      suggest:command("Edit behavior", "config -file behavior.xml")
+                      suggest:command("Theme colors", "settings appearance theme")
+                  end
+              end</pre>
+                      </div>
+                      <div>
+                        <h3>Use this when</h3>
+                        <div class="command-list">
+                          <div><strong>Good fit:</strong> command shortcuts, context-aware chips, search helpers, aliases with logic.</div>
+                          <div><strong>Poor fit:</strong> visible panels, timers, status cards, note editors, or anything needing config UI.</div>
+                          <div><strong>Rule:</strong> if users need to inspect state, make a Lua module. If the same module needs a clean panel with chips below, use <code>ui:suggest_*</code>. If users only need command hints, make a suggestion script.</div>
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section class="guide" id="api">
+                    <div class="kicker">Lua API map</div>
+                    <h2>Use the smallest API surface that solves the module.</h2>
+                    <div class="grid">
+                      <div class="tile">
+                        <h3>Lifecycle</h3>
+                        <p><code>on_load</code>, <code>on_resume</code>, <code>on_click(index)</code>, <code>on_action(value)</code>, <code>on_dialog_action(index)</code>, <code>on_tick(n)</code>, <code>on_alarm</code>, <code>on_config</code>, <code>on_config_submit</code>.</p>
+                      </div>
+                      <div class="tile">
+                        <h3>Render</h3>
+                        <p><code>ui:set_title</code>, <code>ui:show_text</code>, <code>ui:render</code>, <code>ui:layout</code>, <code>ui:show_lines</code>, <code>ui:show_kv</code>, <code>ui:show_table</code>, <code>ui:show_buttons</code>, <code>ui:button</code>, <code>ui:show_action</code>, <code>ui:show_command</code>, <code>ui:suggest_action</code>, <code>ui:suggest_command</code>, <code>ui:suggest_module</code>, <code>ui:suggest_text</code>.</p>
+                      </div>
+                      <div class="tile">
+                        <h3>Panels</h3>
+                        <p><code>ui:set_expandable</code>, <code>ui:is_expanded</code>, <code>ui:expand</code>, <code>ui:collapse</code>, <code>ui:toggle</code>, <code>ui:show_progress_bar(label, current, max, width)</code>, <code>ui:set_progress</code>.</p>
+                      </div>
+                      <div class="tile">
+                        <h3>Storage</h3>
+                        <p><code>prefs</code> for small persistent values. <code>files</code> for module-local text files. <code>json</code> for encoding and decoding structured data.</p>
+                      </div>
+                      <div class="tile">
+                        <h3>Helpers</h3>
+                        <p><code>launcher</code>, <code>date</code>, <code>fmt</code> including bounded Unicode <code>progress_bar(value, max, width)</code>, <code>clock</code> for timer, stopwatch, and Pomodoro state, <code>strings</code>, <code>colors</code>, <code>debug</code>, <code>system</code>, and <code>aio</code> cover common launcher-safe work.</p>
+                      </div>
+                      <div class="tile">
+                        <h3>Launcher Buttons</h3>
+                        <p><code>apps:list</code>, <code>apps:find</code>, <code>apps:launch_command</code>, <code>intents:view</code>, <code>intents:activity</code>, <code>shortcuts:use_command</code>, and their button helpers create visible launcher/app actions.</p>
+                      </div>
+                      <div class="tile">
+                        <h3>Reminders</h3>
+                        <p><code>reminders:daily(id, title, "HH:MM")</code>, <code>reminders:once(id, title, "yyyy-mm-dd HH:MM")</code>, <code>reminders:cancel(id)</code>, and <code>reminders:cancel_prefix(prefix)</code> schedule local notifications and require declared permission.</p>
+                      </div>
+                      <div class="tile">
+                        <h3>Network</h3>
+                        <p><code>http:get</code>, <code>http:post</code>, <code>http:put</code>, and <code>http:delete</code> return through network callbacks and require declared permission.</p>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section class="guide" id="safety">
+                    <div class="section-header">
+                      <div>
+                        <div class="kicker">Safety and limits</div>
+                        <h2>Lua is launcher-native, not a general shell escape.</h2>
+                      </div>
+                      <span>api version: retui 1</span>
+                    </div>
+                    <p>The runtime uses a Re:T-UI-owned Lua environment. Scripts can use safe Lua basics plus the Lua module APIs, not arbitrary Java, shell execution, package loading, or global filesystem access. Shell automation belongs in Termux modules.</p>
+                    <div class="table-wrap">
+                      <table>
+                        <thead>
+                          <tr>
+                            <th>Permission</th>
+                            <th>What it allows</th>
+                            <th>Notes</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td><code>network</code></td>
+                            <td>HTTP requests through the Lua <code>http</code> helper.</td>
+                            <td>Responses are size-limited to protect launcher memory.</td>
+                          </tr>
+                          <tr>
+                            <td><code>clipboard</code></td>
+                            <td>Read or write clipboard helpers exposed by Re:T-UI.</td>
+                            <td>Use only when the module clearly needs clipboard behavior.</td>
+                          </tr>
+                          <tr>
+                            <td><code>vibrate</code></td>
+                            <td>Trigger launcher vibration feedback.</td>
+                            <td>Keep it sparse; modules should not become noisy.</td>
+                          </tr>
+                          <tr>
+                            <td><code>local-files</code></td>
+                            <td>Use module-local files through <code>files</code>.</td>
+                            <td>No global filesystem access.</td>
+                          </tr>
+                          <tr>
+                            <td><code>active-tick</code></td>
+                            <td>Run <code>on_tick(n)</code> while the Lua module is the active open module.</td>
+                            <td>Intervals are clamped; use this for visible live state only.</td>
+                          </tr>
+                          <tr>
+                            <td><code>notifications</code></td>
+                            <td>Schedule local notifications through the Lua <code>reminders</code> helper.</td>
+                            <td>Use stable ids so modules can replace or cancel their own reminders.</td>
+                          </tr>
+                          <tr>
+                            <td><code>apps</code></td>
+                            <td>List launchable apps and create app-launch buttons through the Lua <code>apps</code> helper.</td>
+                            <td>Routes through explicit Re:T-UI launch commands.</td>
+                          </tr>
+                          <tr>
+                            <td><code>intents</code></td>
+                            <td>Create view/activity intent buttons through the Lua <code>intents</code> helper.</td>
+                            <td>Android may still block unsafe or unavailable targets.</td>
+                          </tr>
+                          <tr>
+                            <td><code>shortcuts</code></td>
+                            <td>Create buttons for pinned or app shortcuts through the Lua <code>shortcuts</code> helper.</td>
+                            <td>Shortcut availability depends on the target app and Android version.</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <pre>-- permissions = "network,clipboard,local-files,active-tick,vibrate,notifications,apps,intents,shortcuts"
+              -- retui = "1"</pre>
+                    <div class="note">
+                      <p><strong>Reality check:</strong> Lua modules should stay small. If a script needs background daemons, Linux CLIs, Android shell access, or heavy parsing, build a Termux-backed module and let the Lua surface remain light.</p>
+                    </div>
+                  </section>
+            </div>
+          </section>
         </div>
-        <span>api version: retui 1</span>
-      </div>
-      <p>The runtime uses a Re:T-UI-owned Lua environment. Scripts can use safe Lua basics plus the Lua module APIs, not arbitrary Java, shell execution, package loading, or global filesystem access. Shell automation belongs in Termux modules.</p>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Permission</th>
-              <th>What it allows</th>
-              <th>Notes</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><code>network</code></td>
-              <td>HTTP requests through the Lua <code>http</code> helper.</td>
-              <td>Responses are size-limited to protect launcher memory.</td>
-            </tr>
-            <tr>
-              <td><code>clipboard</code></td>
-              <td>Read or write clipboard helpers exposed by Re:T-UI.</td>
-              <td>Use only when the module clearly needs clipboard behavior.</td>
-            </tr>
-            <tr>
-              <td><code>vibrate</code></td>
-              <td>Trigger launcher vibration feedback.</td>
-              <td>Keep it sparse; modules should not become noisy.</td>
-            </tr>
-            <tr>
-              <td><code>local-files</code></td>
-              <td>Use module-local files through <code>files</code>.</td>
-              <td>No global filesystem access.</td>
-            </tr>
-            <tr>
-              <td><code>active-tick</code></td>
-              <td>Run <code>on_tick(n)</code> while the Lua module is the active open module.</td>
-              <td>Intervals are clamped; use this for visible live state only.</td>
-            </tr>
-            <tr>
-              <td><code>notifications</code></td>
-              <td>Schedule local notifications through the Lua <code>reminders</code> helper.</td>
-              <td>Use stable ids so modules can replace or cancel their own reminders.</td>
-            </tr>
-            <tr>
-              <td><code>apps</code></td>
-              <td>List launchable apps and create app-launch buttons through the Lua <code>apps</code> helper.</td>
-              <td>Routes through explicit Re:T-UI launch commands.</td>
-            </tr>
-            <tr>
-              <td><code>intents</code></td>
-              <td>Create view/activity intent buttons through the Lua <code>intents</code> helper.</td>
-              <td>Android may still block unsafe or unavailable targets.</td>
-            </tr>
-            <tr>
-              <td><code>shortcuts</code></td>
-              <td>Create buttons for pinned or app shortcuts through the Lua <code>shortcuts</code> helper.</td>
-              <td>Shortcut availability depends on the target app and Android version.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <pre>-- permissions = "network,clipboard,local-files,active-tick,vibrate,notifications,apps,intents,shortcuts"
--- retui = "1"</pre>
-      <div class="note">
-        <p><strong>Reality check:</strong> Lua modules should stay small. If a script needs background daemons, Linux CLIs, Android shell access, or heavy parsing, build a Termux-backed module and let the Lua surface remain light.</p>
-      </div>
-    </section>
-  </main>
+      </section>
+    </main>
+
+    <footer class="statusbar">
+      <span class="status-path">~/Re-TUI/docs/widgets.html</span>
+      <span>guide: lua modules</span>
+      <span class="status-spacer"></span>
+      <span>sections: commands api safety</span>
+    </footer>
+  </div>
 </body>
 </html>
