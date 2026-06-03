@@ -377,6 +377,7 @@ class UIManager(
     private var lastMusicSong: String? = null
     private var lastMusicSinger: String? = null
     private var lastMusicPlaying = false
+    private var lastMusicAppPackage: String? = null
 
     var preferences: SharedPreferences = context.getSharedPreferences(PREFS_NAME, 0)
 
@@ -3241,6 +3242,7 @@ class UIManager(
             )
             singer.setTextColor(textColor)
         }
+        updateMusicAppRow(musicWidget, textColor)
         if (visualizer != null) {
             visualizer.setBarColor(textColor)
             visualizer.setPlaying(lastMusicPlaying)
@@ -4116,6 +4118,12 @@ class UIManager(
                     lastMusicSong = song
                     lastMusicSinger = singer
                     lastMusicPlaying = isPlaying
+                    lastMusicAppPackage =
+                        if (MusicService.SOURCE_EXTERNAL == activeMusicSource
+                            && isPreferred
+                            && showMusicWidget
+                            && !TextUtils.isEmpty(pkg)
+                        ) pkg else null
 
                     if (isPlaying && autoShowWidget() && ModuleManager.MUSIC != activeModule) {
                         showHomeModule(ModuleManager.MUSIC)
@@ -4152,6 +4160,8 @@ class UIManager(
                         )
                         singerView.setTextColor(widgetTextColor)
                     }
+
+                    updateMusicAppRow(rootView, widgetTextColor)
 
                     decorateWidget(
                         rootView,
@@ -4844,6 +4854,8 @@ class UIManager(
 
         val titleView = musicWidget.findViewById<TextView?>(R.id.music_song_title)
         val singerView = musicWidget.findViewById<TextView?>(R.id.music_singer)
+        val appPrefixView = musicWidget.findViewById<TextView?>(R.id.music_app_prefix)
+        val appLabelView = musicWidget.findViewById<TextView?>(R.id.music_app_label)
         if (titleView != null) {
             titleView.setTextSize(TypedValue.COMPLEX_UNIT_SP, moduleBodyTextSize().toFloat())
             titleView.setIncludeFontPadding(true)
@@ -4852,6 +4864,23 @@ class UIManager(
             singerView.setTextSize(TypedValue.COMPLEX_UNIT_SP, moduleBodyTextSize().toFloat())
             singerView.setIncludeFontPadding(true)
         }
+        if (appPrefixView != null) {
+            appPrefixView.setTextColor(musicWidgetTextColor())
+            appPrefixView.setTypeface(Tuils.getTypeface(mContext))
+            appPrefixView.setTextSize(TypedValue.COMPLEX_UNIT_SP, moduleBodyTextSize().toFloat())
+            appPrefixView.setIncludeFontPadding(true)
+            appPrefixView.setSingleLine(true)
+        }
+        if (appLabelView != null) {
+            appLabelView.setTextColor(musicWidgetTextColor())
+            appLabelView.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
+            appLabelView.setTextSize(TypedValue.COMPLEX_UNIT_SP, moduleBodyTextSize().toFloat())
+            appLabelView.setIncludeFontPadding(true)
+            appLabelView.setSingleLine(true)
+            appLabelView.setEllipsize(TextUtils.TruncateAt.END)
+            appLabelView.setOnClickListener(View.OnClickListener { v: View? -> launchCurrentMusicApp() })
+        }
+        updateMusicAppRow(musicWidget, musicWidgetTextColor())
 
         // Style control buttons
         val widgetColor = musicWidgetTextColor()
@@ -4927,6 +4956,59 @@ class UIManager(
                 }
             })
         }
+    }
+
+    private fun updateMusicAppRow(rootView: View?, textColor: Int) {
+        if (rootView == null) return
+        val row = rootView.findViewById<View?>(R.id.music_app_row)
+        val prefix = rootView.findViewById<TextView?>(R.id.music_app_prefix)
+        val label = rootView.findViewById<TextView?>(R.id.music_app_label)
+        if (row == null || prefix == null || label == null) return
+
+        val packageName = lastMusicAppPackage
+        val launchIntent =
+            if (!packageName.isNullOrEmpty()) mContext!!.getPackageManager()
+                .getLaunchIntentForPackage(packageName)
+            else null
+
+        if (packageName.isNullOrEmpty() || launchIntent == null) {
+            row.setVisibility(View.GONE)
+            label.setText(Tuils.EMPTYSTRING)
+            label.setOnClickListener(null)
+            label.setEnabled(false)
+            return
+        }
+
+        prefix.setTextColor(textColor)
+        label.setTextColor(textColor)
+        label.setText(resolveMusicAppLabel(packageName))
+        label.setEnabled(true)
+        label.setOnClickListener(View.OnClickListener { v: View? -> launchCurrentMusicApp() })
+        row.setVisibility(View.VISIBLE)
+    }
+
+    private fun resolveMusicAppLabel(packageName: String?): String {
+        val resolvedPackage = packageName ?: return Tuils.EMPTYSTRING
+        if (TextUtils.isEmpty(resolvedPackage)) return Tuils.EMPTYSTRING
+        return try {
+            val packageManager = mContext!!.getPackageManager()
+            val info = packageManager.getApplicationInfo(resolvedPackage, 0)
+            val label = info.loadLabel(packageManager)
+            if (label.length > 0) label.toString() else resolvedPackage
+        } catch (e: Exception) {
+            resolvedPackage
+        }
+    }
+
+    private fun launchCurrentMusicApp() {
+        val packageName = lastMusicAppPackage ?: return
+        if (packageName.isEmpty()) return
+        val intent = mContext!!.getPackageManager().getLaunchIntentForPackage(packageName)
+            ?: return
+        if (mContext !is Activity) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        startActivityAfterChromeHidden(intent)
     }
 
     private fun sizeMusicVisualizer(musicWidget: View) {
