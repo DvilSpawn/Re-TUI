@@ -320,6 +320,27 @@ class UIManager(
     private var luaAppLastStatus: String? = null
     private var luaAppTickGeneration = 0
     private val termuxAnsiPattern = Pattern.compile("\\u001B\\[[0-?]*[ -/]*[@-~]")
+    private val termuxWorkspaceBuffer = StringBuilder()
+    private var termuxWorkspaceRoot: View? = null
+    private var termuxWorkspaceBorder: View? = null
+    private var termuxWorkspaceLabel: TextView? = null
+    private var termuxWorkspaceOutput: TextView? = null
+    private var termuxWorkspacePrefix: TextView? = null
+    private var termuxWorkspaceInput: EditText? = null
+    private var termuxWorkspaceSend: TextView? = null
+    private var termuxWorkspaceScroll: ScrollView? = null
+    private var termuxWorkspaceInputGroup: View? = null
+    private var termuxWorkspaceOutputPanel: View? = null
+    private var termuxWorkspaceOutputLabel: TextView? = null
+    private var termuxWorkspaceTools: View? = null
+    private var termuxWorkspaceBasePaddingLeft = 0
+    private var termuxWorkspaceBasePaddingTop = 0
+    private var termuxWorkspaceBasePaddingRight = 0
+    private var termuxWorkspaceBasePaddingBottom = 0
+    private var termuxWorkspaceDispatchSequence = 0
+    private var termuxWorkspaceAcceptedSequence = 0
+    private var termuxWorkspaceTouchStartX = 0f
+    private var termuxWorkspaceTouchStartY = 0f
     private var fileOverlay: View? = null
     private var fileOverlayBasePaddingLeft = 0
     private var fileOverlayBasePaddingTop = 0
@@ -349,6 +370,9 @@ class UIManager(
     private var launcherChromeMainVisibility = View.VISIBLE
     private var launcherChromeTrayVisibility = View.VISIBLE
     private var launcherChromeLandscapeVisibility = View.GONE
+    private var termuxWorkspaceChromeActive = false
+    private var termuxWorkspaceHeaderVisibility = View.VISIBLE
+    private var termuxWorkspaceTrayVisibility = View.VISIBLE
     private var terminalTrayContainer: View? = null
     private var terminalContainer: ViewGroup? = null
     private var terminalOutputBorder: View? = null
@@ -640,9 +664,16 @@ class UIManager(
     private inner class PagerAdapter : RecyclerView.Adapter<PagerViewHolder>() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PagerViewHolder {
             val inflater = LayoutInflater.from(parent.getContext())
-            val view: View
-            view = inflater.inflate(R.layout.home_widgets_page, parent, false)
-            setupHomeWidgetsPage(view)
+            val view: View = if (viewType == TERMUX_WORKSPACE_PAGE_INDEX) {
+                inflater.inflate(R.layout.termux_workspace_page, parent, false)
+            } else {
+                inflater.inflate(R.layout.home_widgets_page, parent, false)
+            }
+            if (viewType == TERMUX_WORKSPACE_PAGE_INDEX) {
+                setupTermuxWorkspacePage(view)
+            } else {
+                setupHomeWidgetsPage(view)
+            }
             // ViewPager2 requires match_parent for its children
             view.setLayoutParams(
                 ViewGroup.LayoutParams(
@@ -658,7 +689,7 @@ class UIManager(
         }
 
         override fun getItemCount(): Int {
-            return 1
+            return TERMUX_WORKSPACE_PAGE_COUNT
         }
 
         override fun getItemViewType(position: Int): Int {
@@ -839,6 +870,7 @@ class UIManager(
         var deleteView: ImageButton? = null
         var pasteView: ImageButton? = null
         var appDrawerView: ImageButton? = null
+        var termuxWorkspaceView: ImageButton? = null
 
         if (!showToolbar) {
             mRootView.findViewById<View?>(R.id.tools_view).setVisibility(View.GONE)
@@ -849,6 +881,7 @@ class UIManager(
             deleteView = mRootView.findViewById<View?>(R.id.delete_view) as ImageButton?
             pasteView = mRootView.findViewById<View?>(R.id.paste_view) as ImageButton?
             appDrawerView = mRootView.findViewById<View?>(R.id.app_drawer_view) as ImageButton?
+            termuxWorkspaceView = mRootView.findViewById<View?>(R.id.termux_workspace_view) as ImageButton?
 
             toolbarView = mRootView.findViewById<View?>(R.id.tools_view)
             hideToolbarNoInput = XMLPrefsManager.getBoolean(Toolbar.hide_toolbar_no_input)
@@ -872,6 +905,21 @@ class UIManager(
                     appDrawerView.setVisibility(View.GONE)
                 }
             }
+            if (termuxWorkspaceView != null) {
+                termuxWorkspaceView.setColorFilter(
+                    XMLPrefsManager.getColor(Theme.toolbar_icon_color),
+                    PorterDuff.Mode.SRC_IN
+                )
+                termuxWorkspaceView.setBackgroundColor(0)
+                termuxWorkspaceView.setOnClickListener(View.OnClickListener { v: View? ->
+                    openTermuxWorkspacePage(true)
+                })
+            }
+            if (toolbarView is LinearLayout) {
+                (toolbarView as LinearLayout).setWeightSum(
+                    countVisibleWeightedChildren(toolbarView as LinearLayout).toFloat()
+                )
+            }
         }
 
         mTerminalAdapter = TerminalManager(
@@ -887,7 +935,7 @@ class UIManager(
             mainPack,
             mExecuter
         )
-        styleToolbarButtonChrome(backView, nextView, deleteView, pasteView, appDrawerView)
+        styleToolbarButtonChrome(backView, nextView, deleteView, pasteView, appDrawerView, termuxWorkspaceView)
         if (showToolbar && toolbarView is LinearLayout) {
             addToolbarShortcutButtons(toolbarView as LinearLayout)
         }
@@ -1509,6 +1557,7 @@ class UIManager(
             imeBottomOffset = max(0, keyboardOffset)
             applyDisplayMarginsForConfiguration(currentConfiguration)
             applyTermuxImeBottomPadding()
+            applyTermuxWorkspaceImeBottomPadding()
             updateKeyboardLayoutState(
                 imeVisible || imeBottomOffset > 0,
                 if (mRootView != null) mRootView.getHeight() else 0
@@ -1525,6 +1574,18 @@ class UIManager(
             termuxOverlayBasePaddingTop + overlayDisplayMarginTop,
             termuxOverlayBasePaddingRight + overlayDisplayMarginRight,
             termuxOverlayBasePaddingBottom + overlayDisplayMarginBottom + imeBottomOffset
+        )
+    }
+
+    private fun applyTermuxWorkspaceImeBottomPadding() {
+        if (termuxWorkspaceRoot == null) {
+            return
+        }
+        termuxWorkspaceRoot!!.setPadding(
+            termuxWorkspaceBasePaddingLeft,
+            termuxWorkspaceBasePaddingTop,
+            termuxWorkspaceBasePaddingRight,
+            termuxWorkspaceBasePaddingBottom + imeBottomOffset
         )
     }
 
@@ -2000,6 +2061,624 @@ class UIManager(
         rebuildModuleDock()
         refreshSuggestionsForActiveModule()
     }
+
+    private fun setupTermuxWorkspacePage(workspacePage: View) {
+        termuxWorkspaceRoot = workspacePage.findViewById<View?>(R.id.termux_workspace_root)
+        termuxWorkspaceBorder = workspacePage.findViewById<View?>(R.id.termux_workspace_border)
+        termuxWorkspaceLabel = workspacePage.findViewById<TextView?>(R.id.termux_workspace_label)
+        termuxWorkspaceOutput = workspacePage.findViewById<TextView?>(R.id.termux_workspace_output)
+        termuxWorkspacePrefix = workspacePage.findViewById<TextView?>(R.id.termux_workspace_prefix)
+        termuxWorkspaceInput = workspacePage.findViewById<EditText?>(R.id.termux_workspace_input)
+        termuxWorkspaceSend = workspacePage.findViewById<TextView?>(R.id.termux_workspace_send)
+        termuxWorkspaceScroll = workspacePage.findViewById<ScrollView?>(R.id.termux_workspace_scroll)
+        termuxWorkspaceInputGroup = workspacePage.findViewById<View?>(R.id.termux_workspace_input_group)
+        termuxWorkspaceOutputPanel = workspacePage.findViewById<View?>(R.id.termux_workspace_output_panel)
+        termuxWorkspaceOutputLabel = workspacePage.findViewById<TextView?>(R.id.termux_workspace_output_label)
+        termuxWorkspaceTools = workspacePage.findViewById<View?>(R.id.termux_workspace_tools)
+        termuxWorkspaceRoot?.let { root ->
+            termuxWorkspaceBasePaddingLeft = root.paddingLeft
+            termuxWorkspaceBasePaddingTop = root.paddingTop
+            termuxWorkspaceBasePaddingRight = root.paddingRight
+            termuxWorkspaceBasePaddingBottom = root.paddingBottom
+        }
+
+        applyTermuxWorkspaceImeBottomPadding()
+        styleTermuxWorkspace()
+        renderTermuxWorkspaceStatus("Tap the terminal toolbar button or run :refresh to start.")
+
+        termuxWorkspaceRoot?.setOnTouchListener(OnTouchListener { v, event ->
+            handleTermuxWorkspaceTouch(event)
+        })
+        termuxWorkspaceBorder?.setOnTouchListener(OnTouchListener { v, event ->
+            handleTermuxWorkspaceTouch(event)
+        })
+
+        termuxWorkspaceInput?.let { input ->
+            applyRetuiKeyboardTheme(input, "termux")
+            input.setOnFocusChangeListener(OnFocusChangeListener { v: View?, hasFocus: Boolean ->
+                input.setCursorVisible(hasFocus)
+                input.setShowSoftInputOnFocus(hasFocus)
+            })
+            input.setOnKeyListener(View.OnKeyListener { v: View?, keyCode: Int, event: KeyEvent? ->
+                if (keyCode == KeyEvent.KEYCODE_ENTER && event != null && event.action == KeyEvent.ACTION_UP) {
+                    submitTermuxWorkspaceInputFromField()
+                    true
+                } else {
+                    false
+                }
+            })
+            input.setOnEditorActionListener(OnEditorActionListener { v: TextView?, actionId: Int, event: KeyEvent? ->
+                if (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+                    if (event.getAction() != KeyEvent.ACTION_UP) {
+                        return@OnEditorActionListener true
+                    }
+                    submitTermuxWorkspaceInputFromField()
+                    return@OnEditorActionListener true
+                }
+                if (actionId == EditorInfo.IME_ACTION_GO) {
+                    submitTermuxWorkspaceInputFromField()
+                    true
+                } else {
+                    false
+                }
+            })
+        }
+        termuxWorkspaceSend?.let { send ->
+            send.setOnClickListener(View.OnClickListener { v: View? -> submitTermuxWorkspaceInputFromField() })
+            styleTermuxWorkspaceButton(send)
+        }
+
+        bindTermuxWorkspaceButton(workspacePage, R.id.termux_workspace_home, Runnable { openHomePage() })
+        bindTermuxWorkspaceButton(workspacePage, R.id.termux_workspace_prev, Runnable { switchTermuxWorkspaceWindow("prev") })
+        bindTermuxWorkspaceButton(workspacePage, R.id.termux_workspace_new, Runnable { newTermuxWorkspaceWindow(null) })
+        bindTermuxWorkspaceButton(workspacePage, R.id.termux_workspace_next, Runnable { switchTermuxWorkspaceWindow("next") })
+        bindTermuxWorkspaceButton(workspacePage, R.id.termux_workspace_refresh, Runnable { refreshTermuxWorkspace(true) })
+        bindTermuxWorkspaceButton(workspacePage, R.id.termux_workspace_ime, Runnable { focusTermuxWorkspaceInput(true) })
+    }
+
+    private fun bindTermuxWorkspaceButton(root: View, id: Int, action: Runnable) {
+        val key = root.findViewById<TextView?>(id)
+        if (key == null) {
+            return
+        }
+        key.setOnClickListener(View.OnClickListener { v: View? -> action.run() })
+        styleTermuxWorkspaceButton(key)
+    }
+
+    private fun styleTermuxWorkspace() {
+        val borderColor = terminalBorderColor()
+        val textColor = notificationWidgetTextColor()
+        val bgColor = terminalWindowBackground()
+        val labelBg = terminalHeaderTabBackground()
+
+        termuxWorkspaceBorder?.setBackground(
+            TerminalBorderRuntime.panelDrawable(
+                mContext!!,
+                bgColor,
+                borderColor,
+                1.5f,
+                outputCornerRadius(),
+                dashedBorders()
+            )
+        )
+        termuxWorkspaceLabel?.let { label ->
+            label.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
+            label.setTextSize(outputHeaderTextSize().toFloat())
+            label.setTextColor(textColor)
+            label.setBackground(TerminalBorderRuntime.tabDrawable(mContext!!, labelBg))
+        }
+        TerminalBorderRuntime.bind(termuxWorkspaceBorder, termuxWorkspaceLabel)
+
+        termuxWorkspaceOutput?.let { output ->
+            output.setTypeface(Tuils.getTypeface(mContext))
+            output.setTextColor(textColor)
+            output.setTextIsSelectable(true)
+        }
+        termuxWorkspaceOutputPanel?.setBackground(
+            TerminalBorderRuntime.panelDrawable(
+                mContext!!,
+                ColorUtils.blendARGB(bgColor, Color.BLACK, 0.1f),
+                ColorUtils.setAlphaComponent(borderColor, 210),
+                1.2f,
+                outputCornerRadius(),
+                dashedBorders()
+            )
+        )
+        termuxWorkspaceOutputLabel?.let { label ->
+            label.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
+            label.setTextSize(max(10f, outputHeaderTextSize().toFloat() - 2f))
+            label.setTextColor(textColor)
+            label.setBackground(TerminalBorderRuntime.tabDrawable(mContext!!, labelBg))
+        }
+        TerminalBorderRuntime.bind(termuxWorkspaceOutputPanel, termuxWorkspaceOutputLabel)
+
+        termuxWorkspacePrefix?.let { prefix ->
+            prefix.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
+            prefix.setTextColor(textColor)
+        }
+        termuxWorkspaceInput?.let { input ->
+            input.setTypeface(Tuils.getTypeface(mContext))
+            input.setTextColor(textColor)
+            input.setHintTextColor(ColorUtils.setAlphaComponent(textColor, 150))
+        }
+        termuxWorkspaceSend?.let { send ->
+            send.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
+            send.setTextColor(textColor)
+        }
+        termuxWorkspaceInputGroup?.setBackground(
+            TerminalBorderRuntime.panelDrawable(
+                mContext!!,
+                ColorUtils.blendARGB(bgColor, Color.BLACK, 0.16f),
+                ColorUtils.setAlphaComponent(borderColor, 180),
+                1.2f,
+                outputCornerRadius(),
+                dashedBorders()
+            )
+        )
+        if (termuxWorkspaceTools != null) {
+            termuxWorkspaceTools!!.setBackgroundColor(Color.TRANSPARENT)
+            styleTermuxToolButtons(termuxWorkspaceTools, textColor)
+        }
+    }
+
+    private fun styleTermuxWorkspaceButton(button: TextView) {
+        button.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
+        button.setTextColor(notificationWidgetTextColor())
+        button.setBackground(
+            TerminalBorderRuntime.panelDrawable(
+                mContext!!,
+                Color.TRANSPARENT,
+                ColorUtils.setAlphaComponent(terminalBorderColor(), 190),
+                1f,
+                outputCornerRadius(),
+                dashedBorders()
+            )
+        )
+    }
+
+    private fun openTermuxWorkspacePage(startSession: Boolean) {
+        if (Looper.myLooper() != Looper.getMainLooper()) {
+            runOnMainThread { openTermuxWorkspacePage(startSession) }
+            return
+        }
+        if (viewPager.currentItem != TERMUX_WORKSPACE_PAGE_INDEX) {
+            viewPager.setCurrentItem(TERMUX_WORKSPACE_PAGE_INDEX, true)
+        }
+        setTermuxWorkspaceChromeActive(true)
+        styleTermuxWorkspace()
+        focusTermuxWorkspaceInput(false)
+        if (startSession) {
+            refreshTermuxWorkspace(true)
+        }
+    }
+
+    private fun openHomePage() {
+        if (Looper.myLooper() != Looper.getMainLooper()) {
+            runOnMainThread { openHomePage() }
+            return
+        }
+        setTermuxWorkspaceChromeActive(false)
+        viewPager.setCurrentItem(0, true)
+        viewPager.setUserInputEnabled(true)
+    }
+
+    private fun setTermuxWorkspaceChromeActive(active: Boolean) {
+        if (termuxWorkspaceChromeActive == active) {
+            return
+        }
+        termuxWorkspaceChromeActive = active
+        if (active) {
+            headerContainer?.let { header ->
+                termuxWorkspaceHeaderVisibility = header.visibility
+                header.visibility = View.GONE
+            }
+            terminalTrayContainer?.let { tray ->
+                termuxWorkspaceTrayVisibility = tray.visibility
+                tray.visibility = View.GONE
+            }
+            return
+        }
+        headerContainer?.visibility = termuxWorkspaceHeaderVisibility
+        terminalTrayContainer?.visibility = termuxWorkspaceTrayVisibility
+    }
+
+    private fun focusTermuxWorkspaceInput(showKeyboard: Boolean) {
+        val input = termuxWorkspaceInput ?: return
+        input.setShowSoftInputOnFocus(showKeyboard)
+        input.setCursorVisible(true)
+        input.requestFocusFromTouch()
+        input.requestFocus()
+        if (showKeyboard) {
+            imm.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT)
+        }
+    }
+
+    private fun handleTermuxWorkspaceTouch(event: MotionEvent?): Boolean {
+        if (event == null) {
+            return false
+        }
+        when (event.actionMasked) {
+            MotionEvent.ACTION_DOWN -> {
+                termuxWorkspaceTouchStartX = event.rawX
+                termuxWorkspaceTouchStartY = event.rawY
+                return true
+            }
+            MotionEvent.ACTION_UP -> {
+                val dx = event.rawX - termuxWorkspaceTouchStartX
+                val dy = event.rawY - termuxWorkspaceTouchStartY
+                if (abs(dx) > TERMUX_WORKSPACE_SWIPE_THRESHOLD_PX && abs(dx) > abs(dy) * 1.4f) {
+                    switchTermuxWorkspaceWindow(if (dx < 0) "next" else "prev")
+                    return true
+                }
+                focusTermuxWorkspaceInput(true)
+                return true
+            }
+        }
+        return true
+    }
+
+    private fun submitTermuxWorkspaceInput(rawCommand: String?) {
+        val command = rawCommand?.trim { it <= ' ' } ?: Tuils.EMPTYSTRING
+        if (command.startsWith(":")) {
+            handleTermuxWorkspaceCommand(command.substring(1).trim { it <= ' ' })
+            return
+        }
+        renderTermuxWorkspaceStatus(if (command.isEmpty()) "sent enter" else "sent: " + command)
+        dispatchTermuxWorkspaceScript("send", buildTermuxWorkspaceSendScript(command), true)
+    }
+
+    private fun submitTermuxWorkspaceInputFromField() {
+        val input = termuxWorkspaceInput ?: return
+        val command = input.text?.toString() ?: Tuils.EMPTYSTRING
+        input.setText(Tuils.EMPTYSTRING)
+        submitTermuxWorkspaceInput(command)
+    }
+
+    private fun handleTermuxWorkspaceCommand(command: String) {
+        val lower = command.lowercase(Locale.getDefault())
+        if (lower.isEmpty() || "help" == lower) {
+            renderTermuxWorkspaceStatus(
+                "local commands: :help :new [name] :prev :next :refresh :home. Normal input is sent to tmux."
+            )
+        } else if ("new" == lower || lower.startsWith("new ")) {
+            newTermuxWorkspaceWindow(command.substringAfter("new", "").trim { it <= ' ' })
+        } else if ("prev" == lower || "left" == lower) {
+            switchTermuxWorkspaceWindow("prev")
+        } else if ("next" == lower || "right" == lower) {
+            switchTermuxWorkspaceWindow("next")
+        } else if ("refresh" == lower || "r" == lower) {
+            refreshTermuxWorkspace(true)
+        } else if ("home" == lower || "back" == lower) {
+            openHomePage()
+        } else {
+            renderTermuxWorkspaceStatus("Unknown workspace command: :" + command)
+        }
+    }
+
+    private fun refreshTermuxWorkspace(announce: Boolean) {
+        if (announce) {
+            renderTermuxWorkspaceStatus("refreshing")
+        }
+        dispatchTermuxWorkspaceScript("capture", buildTermuxWorkspaceCaptureScript(), true)
+    }
+
+    private fun newTermuxWorkspaceWindow(name: String?) {
+        val clean = name?.trim { it <= ' ' } ?: Tuils.EMPTYSTRING
+        renderTermuxWorkspaceStatus(if (clean.isEmpty()) "new tmux window" else "new tmux window: " + clean)
+        dispatchTermuxWorkspaceScript("new", buildTermuxWorkspaceNewWindowScript(clean), true)
+    }
+
+    private fun switchTermuxWorkspaceWindow(direction: String) {
+        renderTermuxWorkspaceStatus(direction + " tmux window")
+        dispatchTermuxWorkspaceScript("switch", buildTermuxWorkspaceSwitchScript(direction), true)
+    }
+
+    private fun dispatchTermuxWorkspaceScript(action: String, script: String, echoFailure: Boolean): Boolean {
+        if (!ensureTermuxWorkspaceBridgeReady(echoFailure)) {
+            return false
+        }
+        try {
+            val sequence = ++termuxWorkspaceDispatchSequence
+            TermuxBridgeManager.startRunCommand(
+                mContext!!,
+                TermuxBridgeManager.TERMUX_SH,
+                TermuxBridgeManager.TERMUX_HOME,
+                createResultPendingIntent(
+                    mContext,
+                    TERMUX_WORKSPACE_RESULT_PREFIX + action + ":" + sequence,
+                    null
+                ),
+                arrayOf<String?>("-c", script, "retui-workspace")
+            )
+            return true
+        } catch (e: SecurityException) {
+            renderTermuxWorkspaceStatus("Termux rejected the workspace command: permission denied.")
+        } catch (e: Exception) {
+            renderTermuxWorkspaceStatus("unable to dispatch workspace command: " + e.javaClass.getSimpleName())
+        }
+        return false
+    }
+
+    private fun ensureTermuxWorkspaceBridgeReady(echoFailure: Boolean): Boolean {
+        val status = TermuxBridgeManager.status(mContext!!)
+        if (!status.termuxInstalled) {
+            if (echoFailure) renderTermuxWorkspaceStatus("Termux is not installed.")
+            return false
+        }
+        if (!status.runCommandDeclared) {
+            if (echoFailure) renderTermuxWorkspaceStatus("This Termux build does not expose RUN_COMMAND.")
+            return false
+        }
+        if (!status.runCommandGranted) {
+            requestRunCommandPermissionIfPossible(
+                mContext,
+                LauncherActivity.COMMAND_REQUEST_PERMISSION
+            )
+            if (echoFailure) {
+                renderTermuxWorkspaceStatus("RunCommand permission is not granted yet. Allow Re:T-UI and retry.")
+            }
+            return false
+        }
+        return true
+    }
+
+    private fun buildTermuxWorkspaceCaptureScript(): String {
+        return buildTermuxWorkspacePreambleScript() + "\n" +
+                buildTermuxWorkspaceBridgeScript("capture") + "\n" +
+                buildTermuxWorkspaceEnsureScript() + "\n" +
+                buildTermuxWorkspaceFrameScript()
+    }
+
+    private fun buildTermuxWorkspaceSendScript(input: String): String {
+        val session = shellQuote(TERMUX_WORKSPACE_SESSION)
+        val send = if (input.isEmpty()) {
+            "tmux send-keys -t " + session + " C-m"
+        } else {
+            "tmux send-keys -t " + session + " -l -- " + shellQuote(input) + "\n" +
+                    "tmux send-keys -t " + session + " C-m"
+        }
+        return buildTermuxWorkspacePreambleScript() + "\n" +
+                buildTermuxWorkspaceBridgeScript("send", "RETUI_INPUT", input) + "\n" +
+                buildTermuxWorkspaceEnsureScript() + "\n" + send + "\nsleep 0.25\n" +
+                buildTermuxWorkspaceFrameScript()
+    }
+
+    private fun buildTermuxWorkspaceNewWindowScript(name: String): String {
+        val session = shellQuote(TERMUX_WORKSPACE_SESSION)
+        val home = shellQuote(TermuxBridgeManager.TERMUX_HOME)
+        val nameArg = if (name.isEmpty()) "" else " -n " + shellQuote(name)
+        return buildTermuxWorkspacePreambleScript() + "\n" +
+                buildTermuxWorkspaceBridgeScript("new", "RETUI_WINDOW_NAME", name) + "\n" +
+                buildTermuxWorkspaceEnsureScript() + "\n" +
+                buildTermuxWorkspaceTmuxCommand("new-window -t " + session + nameArg + " -c " + home) + "\n" +
+                "sleep 0.15\n" +
+                buildTermuxWorkspaceFrameScript()
+    }
+
+    private fun buildTermuxWorkspaceSwitchScript(direction: String): String {
+        val session = shellQuote(TERMUX_WORKSPACE_SESSION)
+        val flag = if ("prev" == direction) "-p" else "-n"
+        return buildTermuxWorkspacePreambleScript() + "\n" +
+                buildTermuxWorkspaceBridgeScript("switch", "RETUI_DIRECTION", direction) + "\n" +
+                buildTermuxWorkspaceEnsureScript() + "\n" +
+                "tmux select-window -t " + session + " " + flag + "\n" +
+                "sleep 0.1\n" +
+                buildTermuxWorkspaceFrameScript()
+    }
+
+    private fun buildTermuxWorkspacePreambleScript(): String {
+        val home = shellQuote(TermuxBridgeManager.TERMUX_HOME)
+        val termuxBin = shellQuote(TermuxBridgeManager.TERMUX_SH.substringBeforeLast('/'))
+        return ("export HOME=" + home + "\n"
+                + "export PATH=" + termuxBin + ":\$PATH\n"
+                + "cd " + home + " 2>/dev/null || true")
+    }
+
+    private fun buildTermuxWorkspaceBridgeScript(action: String): String {
+        return buildTermuxWorkspaceBridgeScript(action, null, null)
+    }
+
+    private fun buildTermuxWorkspaceBridgeScript(action: String, envName: String?, envValue: String?): String {
+        val env = if (envName == null) "" else envName + "=" + shellQuote(envValue ?: Tuils.EMPTYSTRING) + " "
+        return ("if command -v retui >/dev/null 2>&1; then\n"
+                + "  RETUI_SESSION=" + shellQuote(TERMUX_WORKSPACE_SESSION) + " " + env + "retui bridge " + action + "\n"
+                + "  exit \$?\n"
+                + "fi")
+    }
+
+    private fun buildTermuxWorkspaceEnsureScript(): String {
+        val session = shellQuote(TERMUX_WORKSPACE_SESSION)
+        val home = shellQuote(TermuxBridgeManager.TERMUX_HOME)
+        val fallbackShell = shellQuote(TermuxBridgeManager.TERMUX_SH)
+        return ("retui_workspace_shell=\"\$(command -v bash 2>/dev/null || printf '%s\\n' " + fallbackShell + ")\"\n"
+                + "if ! command -v tmux >/dev/null 2>&1; then\n"
+                + "  printf '%s\\n' 'tmux missing: pkg install tmux'\n"
+                + "  exit 127\n"
+                + "fi\n"
+                + "if ! tmux has-session -t " + session + " 2>/dev/null; then\n"
+                + "  " + buildTermuxWorkspaceTmuxCommand("new-session -d -s " + session + " -n 1 -c " + home) + "\n"
+                + "  sleep 0.25\n"
+                + "fi")
+    }
+
+    private fun buildTermuxWorkspaceTmuxCommand(tmuxArgs: String): String {
+        return ("if [ \"\${retui_workspace_shell##*/}\" = \"bash\" ]; then\n"
+                + "  tmux " + tmuxArgs + " \"\$retui_workspace_shell\" --noprofile --norc\n"
+                + "else\n"
+                + "  tmux " + tmuxArgs + " \"\$retui_workspace_shell\"\n"
+                + "fi")
+    }
+
+    private fun buildTermuxWorkspaceFrameScript(): String {
+        val session = shellQuote(TERMUX_WORKSPACE_SESSION)
+        return ("printf '%s ' '__RETUI_WINDOW__'\n"
+                + "tmux display-message -p -t " + session + " '#I:#W'\n"
+                + "printf '%s ' '__RETUI_WINDOWS__'\n"
+                + "tmux list-windows -t " + session + " -F '#I:#W#{?window_active,*,}' | tr '\\n' ' '\n"
+                + "printf '\\n'\n"
+                + "tmux capture-pane -t " + session + " -p")
+    }
+
+    private fun renderTermuxWorkspaceStatus(status: String?) {
+        val out = StringBuilder()
+        out.append("Re:T-UI tmux workspace").append('\n')
+        out.append("session: ").append(TERMUX_WORKSPACE_SESSION).append('\n')
+        if (!TextUtils.isEmpty(status)) {
+            out.append("status: ").append(status).append('\n')
+        }
+        out.append("----")
+        updateTermuxWorkspaceOutput(out.toString())
+    }
+
+    private fun appendTermuxWorkspaceResult(
+        label: String,
+        stdout: String?,
+        stderr: String?,
+        error: String?,
+        exitCode: Int,
+        debug: String?
+    ) {
+        val sequence = termuxWorkspaceResultSequence(label)
+        if (sequence > 0 && sequence < termuxWorkspaceAcceptedSequence) {
+            return
+        }
+        if (sequence > 0) {
+            termuxWorkspaceAcceptedSequence = max(termuxWorkspaceAcceptedSequence, sequence)
+        }
+        val parsed = parseTermuxWorkspaceFrame(stdout)
+        val out = StringBuilder()
+        out.append("Re:T-UI tmux workspace").append('\n')
+        out.append("session: ").append(TERMUX_WORKSPACE_SESSION).append('\n')
+        if (!TextUtils.isEmpty(parsed.bridge)) {
+            out.append("bridge: ").append(parsed.bridge)
+            if (!TextUtils.isEmpty(parsed.version)) {
+                out.append(' ').append(parsed.version)
+            }
+            out.append('\n')
+        }
+        if (!TextUtils.isEmpty(parsed.window)) {
+            out.append("window: ").append(parsed.window).append('\n')
+        }
+        if (!TextUtils.isEmpty(parsed.windows)) {
+            out.append("windows: ").append(parsed.windows).append('\n')
+        }
+        if (exitCode != Int.MIN_VALUE && exitCode != 0) {
+            out.append("exit: ").append(exitCode).append('\n')
+        }
+        if (!TextUtils.isEmpty(stderr)) {
+            out.append("stderr: ").append(stderr!!.trim { it <= ' ' }).append('\n')
+        }
+        if (!TextUtils.isEmpty(error)) {
+            out.append("error: ").append(error!!.trim { it <= ' ' }).append('\n')
+        }
+        if (!TextUtils.isEmpty(debug)) {
+            out.append("debug: ").append(debug!!.trim { it <= ' ' }).append('\n')
+        }
+        out.append("----")
+        if (!TextUtils.isEmpty(parsed.frame)) {
+            out.append('\n').append(parsed.frame)
+        }
+        updateTermuxWorkspaceChrome(parsed)
+        updateTermuxWorkspaceOutput(out.toString())
+    }
+
+    private fun termuxWorkspaceResultSequence(label: String): Int {
+        if (!label.startsWith(TERMUX_WORKSPACE_RESULT_PREFIX)) {
+            return -1
+        }
+        val rest = label.substring(TERMUX_WORKSPACE_RESULT_PREFIX.length)
+        val separator = rest.indexOf(':')
+        if (separator < 0 || separator == rest.length - 1) {
+            return -1
+        }
+        return try {
+            rest.substring(separator + 1).toInt()
+        } catch (e: Exception) {
+            -1
+        }
+    }
+
+    private fun parseTermuxWorkspaceFrame(stdout: String?): TermuxWorkspaceFrame {
+        if (TextUtils.isEmpty(stdout)) {
+            return TermuxWorkspaceFrame(null, null, null, null, null)
+        }
+        val frame = StringBuilder()
+        var window: String? = null
+        var windows: String? = null
+        var bridge: String? = null
+        var version: String? = null
+        var hasFrameMarkers = false
+        val lines = stdout!!.split("\n".toRegex()).dropLastWhile { it.isEmpty() }
+        for (line in lines) {
+            if (line.startsWith("__RETUI_WINDOW__")) {
+                window = line.substring("__RETUI_WINDOW__".length).trim { it <= ' ' }
+            } else if (line.startsWith("__RETUI_WINDOWS__")) {
+                windows = line.substring("__RETUI_WINDOWS__".length).trim { it <= ' ' }
+            } else if (line.startsWith("__RETUI_BRIDGE__")) {
+                bridge = line.substring("__RETUI_BRIDGE__".length).trim { it <= ' ' }
+            } else if (line.startsWith("__RETUI_VERSION__")) {
+                version = line.substring("__RETUI_VERSION__".length).trim { it <= ' ' }
+            } else if (line.startsWith("__RETUI_FRAME_BEGIN__")) {
+                hasFrameMarkers = true
+            } else if (line.startsWith("__RETUI_FRAME_END__")) {
+                break
+            } else if (line.startsWith("__RETUI_") && !hasFrameMarkers) {
+                // Bridge metadata line.
+            } else {
+                if (frame.isNotEmpty()) {
+                    frame.append('\n')
+                }
+                frame.append(line)
+            }
+        }
+        return TermuxWorkspaceFrame(bridge, version, window, windows, stripTermuxAnsi(frame.toString())?.trimEnd { it <= ' ' })
+    }
+
+    private fun updateTermuxWorkspaceChrome(frame: TermuxWorkspaceFrame) {
+        if (termuxWorkspaceLabel != null) {
+            termuxWorkspaceLabel!!.text = if (TextUtils.isEmpty(frame.window))
+                "TERMUX WORKSPACE"
+            else
+                ("TMUX " + frame.window).uppercase(Locale.getDefault())
+        }
+        if (termuxWorkspaceOutputLabel != null) {
+            val windows = frame.windows
+            termuxWorkspaceOutputLabel!!.text = if (TextUtils.isEmpty(windows))
+                "WINDOW"
+            else
+                ellipsizeWorkspaceLabel(windows!!)
+        }
+    }
+
+    private fun ellipsizeWorkspaceLabel(value: String): String {
+        val clean = value.trim { it <= ' ' }
+        return if (clean.length <= 42) clean else clean.substring(0, 39) + "..."
+    }
+
+    private fun updateTermuxWorkspaceOutput(value: String?) {
+        termuxWorkspaceBuffer.setLength(0)
+        if (value != null && value.length > TERMUX_WORKSPACE_MAX_OUTPUT_CHARS) {
+            termuxWorkspaceBuffer.append(value.substring(value.length - TERMUX_WORKSPACE_MAX_OUTPUT_CHARS))
+        } else if (value != null) {
+            termuxWorkspaceBuffer.append(value)
+        }
+        termuxWorkspaceOutput?.setText(termuxWorkspaceBuffer.toString())
+        termuxWorkspaceScroll?.post(Runnable {
+            val scroll = termuxWorkspaceScroll ?: return@Runnable
+            val scrollChild = scroll.getChildAt(0)
+            if (scrollChild != null) {
+                scroll.scrollTo(0, scrollChild.getBottom())
+            }
+        })
+    }
+
+    private class TermuxWorkspaceFrame(
+        val bridge: String?,
+        val version: String?,
+        val window: String?,
+        val windows: String?,
+        val frame: String?
+    )
 
     private fun pruneBundledLuaSamples() {
         if (bundledLuaSamplesPruned || mContext == null) return
@@ -4794,6 +5473,17 @@ class UIManager(
         viewPager = mRootView.findViewById<ViewPager2>(R.id.view_pager)
         viewPager.setAdapter(PagerAdapter())
         viewPager.setOffscreenPageLimit(1)
+        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                viewPager.setUserInputEnabled(position != TERMUX_WORKSPACE_PAGE_INDEX)
+                if (position == TERMUX_WORKSPACE_PAGE_INDEX) {
+                    setTermuxWorkspaceChromeActive(true)
+                    openTermuxWorkspacePage(false)
+                } else {
+                    setTermuxWorkspaceChromeActive(false)
+                }
+            }
+        })
         setupTerminalPage(mRootView)
         applyResponsiveLandscapeLayout(mContext!!.getResources().getConfiguration())
 
@@ -7453,6 +8143,10 @@ class UIManager(
             appendTermuxAppSyncResult(path, stdout, stderr, error, exitCode, debug)
             return
         }
+        if (!TextUtils.isEmpty(path) && path!!.startsWith(TERMUX_WORKSPACE_RESULT_PREFIX)) {
+            appendTermuxWorkspaceResult(path, stdout, stderr, error, exitCode, debug)
+            return
+        }
         if (!TextUtils.isEmpty(path) && path!!.startsWith(TERMUX_CONSOLE_RESULT_PREFIX)) {
             appendTermuxConsoleCommandResult(path, stdout, stderr, error, exitCode, debug)
             return
@@ -9692,6 +10386,12 @@ class UIManager(
         private const val TERMUX_CONSOLE_RESULT_PREFIX = "retui-console:"
         private const val TERMUX_APP_RESULT_PREFIX = "retui-app:"
         private const val TERMUX_APP_SYNC_RESULT_PREFIX = "retui-app-sync:"
+        private const val TERMUX_WORKSPACE_PAGE_INDEX = 1
+        private const val TERMUX_WORKSPACE_PAGE_COUNT = 2
+        private const val TERMUX_WORKSPACE_SESSION = "retui_workspace"
+        private const val TERMUX_WORKSPACE_RESULT_PREFIX = "retui-workspace:"
+        private const val TERMUX_WORKSPACE_SWIPE_THRESHOLD_PX = 80f
+        private const val TERMUX_WORKSPACE_MAX_OUTPUT_CHARS = 24000
         private val TERMUX_CONSOLE_SHELL_RESULT_PREFIX: String =
             TERMUX_CONSOLE_RESULT_PREFIX + "shell:"
         private val TERMUX_CONSOLE_CD_RESULT_PREFIX: String = TERMUX_CONSOLE_RESULT_PREFIX + "cd:"

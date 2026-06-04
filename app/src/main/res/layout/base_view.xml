@@ -109,7 +109,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/tools_height"
                 android:orientation="horizontal"
-                android:weightSum="@integer/tools_view_weightsum">
+                android:weightSum="6">
 
                 <ImageButton android:id="@+id/delete_view"
                     style="@style/ToolsBar"
@@ -131,6 +131,12 @@
                     style="@style/ToolsBar"
                     android:background="@null"
                     android:src="@drawable/ic_menu"/>
+
+                <ImageButton android:id="@+id/termux_workspace_view"
+                    style="@style/ToolsBar"
+                    android:background="@null"
+                    android:contentDescription="Termux workspace"
+                    android:src="@drawable/ic_toolbar_terminal_24"/>
 
             </LinearLayout>
 
