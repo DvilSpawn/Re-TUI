@@ -1,7 +1,7 @@
 # Re:T-UI Termux Bridge
 
 `retui` is the Termux-side bridge used by the Re:T-UI launcher Termux workspace.
-Version `0.3.0` manages a dedicated tmux session, emits a stable frame protocol,
+Version `0.3.1` manages a dedicated tmux session, emits a stable frame protocol,
 and can expose a token-protected abstract Android local socket for live workspace
 input plus changed-frame streaming, with a token-protected `127.0.0.1` fallback
 for Android builds that block cross-app abstract sockets.
@@ -71,7 +71,7 @@ The bridge prints metadata lines followed by a captured pane:
 
 ```text
 __RETUI_BRIDGE__ retui-bridge-v1
-__RETUI_VERSION__ 0.3.0
+__RETUI_VERSION__ 0.3.1
 __RETUI_SESSION__ retui_workspace
 __RETUI_WINDOW__ 0:1
 __RETUI_WINDOWS__ 0:1*

@@ -1,7 +1,7 @@
 #!/data/data/com.termux/files/usr/bin/sh
 set -eu
 
-RETUI_VERSION="0.3.0"
+RETUI_VERSION="0.3.1"
 RETUI_DEFAULT_BASE_URL="https://raw.githubusercontent.com/DvilSpawn/Re-TUI/main/termux/retui"
 RETUI_INSTALL_BASE_URL="${RETUI_INSTALL_BASE_URL:-$RETUI_DEFAULT_BASE_URL}"
 PREFIX="${PREFIX:-/data/data/com.termux/files/usr}"

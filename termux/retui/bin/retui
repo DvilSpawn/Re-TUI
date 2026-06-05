@@ -1,7 +1,7 @@
 #!/data/data/com.termux/files/usr/bin/sh
 set -eu
 
-RETUI_VERSION="0.3.0"
+RETUI_VERSION="0.3.1"
 RETUI_BRIDGE_PROTOCOL="retui-bridge-v1"
 RETUI_SOCKET_PROTOCOL="retui-bridge-socket-v2"
 TERMUX_PREFIX_DEFAULT="/data/data/com.termux/files/usr"
@@ -19,7 +19,7 @@ die() {
 
 usage() {
     cat <<'EOF'
-retui 0.3.0
+retui 0.3.1
 
 Usage:
   retui version
@@ -75,6 +75,10 @@ bridge_stream_interval() {
 
 bridge_socket_token_path() {
     printf '%s\n' "$(bridge_runtime_dir)/bridge.token"
+}
+
+bridge_daemon_pid_path() {
+    printf '%s\n' "$(bridge_runtime_dir)/bridge.$1.pid"
 }
 
 bridge_shell() {
@@ -243,6 +247,7 @@ bridge_key() {
 bridge_kill() {
     ensure_tmux
     session="$(bridge_session)"
+    stop_bridge_daemons
     tmux kill-session -t "$session" 2>/dev/null || true
     printf '%s %s\n' "__RETUI_BRIDGE__" "$RETUI_BRIDGE_PROTOCOL"
     printf '%s %s\n' "__RETUI_STATUS__" "killed"
@@ -284,6 +289,41 @@ socket_error() {
     printf '%s %s\n' "__RETUI_SOCKET_ERROR__" "$*"
 }
 
+stop_pid_file_process() {
+    pid_path="$1"
+    pid="$(sed -n '1p' "$pid_path" 2>/dev/null || true)"
+    if [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null; then
+        kill "$pid" 2>/dev/null || true
+        sleep 0.05
+        kill -0 "$pid" 2>/dev/null && kill -9 "$pid" 2>/dev/null || true
+    fi
+    rm -f "$pid_path" 2>/dev/null || true
+}
+
+stop_matching_bridge_daemons() {
+    socket_name="$(bridge_socket_name)"
+    tcp_port="$(bridge_tcp_port)"
+    current_pid="$$"
+    ps -A -o PID,ARGS 2>/dev/null | while read -r pid args; do
+        [ "$pid" = "PID" ] && continue
+        [ -n "$pid" ] || continue
+        [ "$pid" = "$current_pid" ] && continue
+        case "$args" in
+            *"socat ABSTRACT-LISTEN:$socket_name"*|\
+            *"socat TCP-LISTEN:$tcp_port,"*|\
+            *"retui bridge socket-client"*)
+                kill "$pid" 2>/dev/null || true
+                ;;
+        esac
+    done
+}
+
+stop_bridge_daemons() {
+    stop_pid_file_process "$(bridge_daemon_pid_path socket)"
+    stop_pid_file_process "$(bridge_daemon_pid_path tcp)"
+    stop_matching_bridge_daemons
+}
+
 bridge_socket_start() {
     have socat || die "socat missing: pkg install socat"
     ensure_bridge_session
@@ -291,19 +331,18 @@ bridge_socket_start() {
     socket_name="$(bridge_socket_name)"
     token="$(ensure_socket_token)"
     log_file="$(bridge_runtime_dir)/bridge.log"
-    (
-        RETUI_SESSION="$(bridge_session)" \
-        RETUI_SOCKET_NAME="$socket_name" \
-        RETUI_SOCKET_TOKEN="$token" \
-        nohup "$PREFIX/bin/retui" bridge socket-daemon >> "$log_file" 2>&1 &
-    )
-    (
-        RETUI_SESSION="$(bridge_session)" \
-        RETUI_SOCKET_NAME="$socket_name" \
-        RETUI_SOCKET_TOKEN="$token" \
-        RETUI_TCP_PORT="$(bridge_tcp_port)" \
-        nohup "$PREFIX/bin/retui" bridge tcp-daemon >> "$log_file" 2>&1 &
-    )
+    stop_bridge_daemons
+    RETUI_SESSION="$(bridge_session)" \
+    RETUI_SOCKET_NAME="$socket_name" \
+    RETUI_SOCKET_TOKEN="$token" \
+    nohup "$PREFIX/bin/retui" bridge socket-daemon >> "$log_file" 2>&1 &
+    printf '%s\n' "$!" > "$(bridge_daemon_pid_path socket)"
+    RETUI_SESSION="$(bridge_session)" \
+    RETUI_SOCKET_NAME="$socket_name" \
+    RETUI_SOCKET_TOKEN="$token" \
+    RETUI_TCP_PORT="$(bridge_tcp_port)" \
+    nohup "$PREFIX/bin/retui" bridge tcp-daemon >> "$log_file" 2>&1 &
+    printf '%s\n' "$!" > "$(bridge_daemon_pid_path tcp)"
     sleep 0.25
     printf '%s %s\n' "__RETUI_SOCKET__" "$RETUI_SOCKET_PROTOCOL"
     printf '%s %s\n' "__RETUI_SOCKET_NAME__" "$socket_name"
