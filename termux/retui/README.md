@@ -19,7 +19,9 @@ pkg install curl tmux socat -y
 curl -fsSL https://raw.githubusercontent.com/DvilSpawn/Re-TUI/main/termux/retui/install.sh | sh
 ```
 
-For a development branch, replace `main` in both URLs with the branch name.
+For a development branch, replace `main` in the install URL, or set
+`RETUI_INSTALL_BASE_URL` to the matching `termux/retui` directory before
+running `install.sh`.
 
 ## Test
 

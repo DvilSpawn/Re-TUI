@@ -5975,6 +5975,7 @@ class UIManager(
             val key = rootView.findViewById<TextView?>(id)
             if (key != null) {
                 termuxKeySlots.add(key)
+                bindTermuxAppKeyModeSwipe(key)
             }
         }
         bindTermuxAppKeyModeSwipe(termuxTools)

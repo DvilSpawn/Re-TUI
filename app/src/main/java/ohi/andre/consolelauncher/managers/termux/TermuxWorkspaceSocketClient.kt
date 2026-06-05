@@ -11,6 +11,7 @@ import java.nio.charset.StandardCharsets
 import java.net.InetSocketAddress
 import java.net.Socket
 import java.util.concurrent.Executors
+import java.util.concurrent.RejectedExecutionException
 import kotlin.math.max
 
 class TermuxWorkspaceSocketClient(private val listener: Listener) {
@@ -250,22 +251,27 @@ class TermuxWorkspaceSocketClient(private val listener: Listener) {
     }
 
     private fun sendRaw(line: String): Boolean {
-        synchronized(writeLock) {
-            if (writer == null) {
+        val executor = synchronized(writeLock) {
+            if (writer == null || writerExecutor.isShutdown) {
                 return false
             }
+            writerExecutor
         }
-        writerExecutor.execute {
-            synchronized(writeLock) {
-                val out = writer ?: return@synchronized
-                try {
-                    out.write(line)
-                    out.newLine()
-                    out.flush()
-                } catch (e: Exception) {
-                    listener.onError(e.message ?: e.javaClass.simpleName)
+        try {
+            executor.execute {
+                synchronized(writeLock) {
+                    val out = writer ?: return@synchronized
+                    try {
+                        out.write(line)
+                        out.newLine()
+                        out.flush()
+                    } catch (e: Exception) {
+                        listener.onError(e.message ?: e.javaClass.simpleName)
+                    }
                 }
             }
+        } catch (e: RejectedExecutionException) {
+            return false
         }
         return true
     }
