@@ -41,9 +41,7 @@ import ohi.andre.consolelauncher.managers.PresetManager.listPresets
 import ohi.andre.consolelauncher.managers.TerminalManager
 import ohi.andre.consolelauncher.managers.file.FileBackendManager
 import ohi.andre.consolelauncher.managers.file.FileBackendManager.activeBackend
-import ohi.andre.consolelauncher.managers.modules.ModuleManager.ModuleSuggestion
 import ohi.andre.consolelauncher.managers.modules.ModuleManager.displayTitle
-import ohi.andre.consolelauncher.managers.modules.ModuleManager.getActiveSuggestions
 import ohi.andre.consolelauncher.managers.modules.ModuleManager.getDock
 import ohi.andre.consolelauncher.managers.modules.ModuleManager.isKnown
 import ohi.andre.consolelauncher.managers.modules.ModuleManager.listAll
@@ -643,11 +641,6 @@ class SuggestionsManager(
             if (beforeLastSpace.length == 0) {
                 comparator.noInput = true
 
-                if (suggestActiveModule(suggestionList)) {
-                    Collections.sort<Suggestion?>(suggestionList, comparator)
-                    return suggestionList
-                }
-
                 suggestOrientationCommand(suggestionList)
 
                 val apps = pack.appsManager.suggestedApps
@@ -1038,30 +1031,6 @@ class SuggestionsManager(
         } catch (e: Exception) {
             Tuils.log(e)
         }
-    }
-
-    private fun suggestActiveModule(suggestions: MutableList<Suggestion?>): Boolean {
-        val moduleSuggestions: MutableList<ModuleSuggestion> =
-            getActiveSuggestions(pack.context).filterNotNull().toMutableList()
-        if (moduleSuggestions == null || moduleSuggestions.size == 0) {
-            return false
-        }
-
-        for (moduleSuggestion in moduleSuggestions) {
-            if (ModuleSuggestion.MODE_COMMAND != moduleSuggestion.mode) {
-                continue
-            }
-            suggestions.add(
-                SuggestionsManager.Suggestion(
-                    null,
-                    moduleSuggestion.label!!,
-                    true,
-                    Suggestion.Companion.TYPE_MODULE,
-                    moduleSuggestion.action
-                )
-            )
-        }
-        return suggestions.size > 0
     }
 
     private fun suggestContactsFlow(

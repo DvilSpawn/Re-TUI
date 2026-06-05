@@ -14,15 +14,23 @@ import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.PorterDuff
+import android.graphics.Rect
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.text.Editable
+import android.text.Layout
+import android.text.SpannableStringBuilder
+import android.text.Spanned
+import android.text.StaticLayout
 import android.text.TextUtils
 import android.text.TextWatcher
 import android.text.method.LinkMovementMethod
+import android.text.style.BackgroundColorSpan
+import android.text.style.ForegroundColorSpan
+import android.text.style.StyleSpan
 import android.util.DisplayMetrics
 import android.util.Log
 import android.util.TypedValue
@@ -142,6 +150,8 @@ import ohi.andre.consolelauncher.managers.termux.TermuxBridgeCache.shouldRequest
 import ohi.andre.consolelauncher.managers.termux.TermuxBridgeManager
 import ohi.andre.consolelauncher.managers.termux.TermuxBridgeManager.createResultPendingIntent
 import ohi.andre.consolelauncher.managers.termux.TermuxBridgeManager.requestRunCommandPermissionIfPossible
+import ohi.andre.consolelauncher.managers.termux.TerminalGridView
+import ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceSocketClient
 import ohi.andre.consolelauncher.managers.widgets.LuaWidgetEngine
 import ohi.andre.consolelauncher.managers.widgets.LuaWidgetEngine.UpdateListener
 import ohi.andre.consolelauncher.managers.widgets.LuaWidgetManager
@@ -183,6 +193,7 @@ import kotlin.math.abs
 import kotlin.math.hypot
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.roundToInt
 import android.app.ActivityManager
 import android.app.KeyguardManager
 import android.app.PendingIntent
@@ -292,6 +303,7 @@ class UIManager(
     private var termuxWindowBorder: View? = null
     private var termuxWindowLabel: TextView? = null
     private var termuxClose: TextView? = null
+    private var termuxGrid: TerminalGridView? = null
     private var termuxOutput: TextView? = null
     private var termuxRichOutput: LinearLayout? = null
     private var termuxPrefix: TextView? = null
@@ -314,6 +326,24 @@ class UIManager(
     private var termuxAppAcceptedSequence = 0
     private var termuxAppWatchUntilMs = 0L
     private var termuxAppLastFrameText: String? = null
+    private var termuxAppLastCols = 80
+    private var termuxAppLastRows = 24
+    private var termuxAppMeasuredLineHeight = 0
+    private val termuxKeySlots = ArrayList<TextView>()
+    private var termuxCtrlKey: TextView? = null
+    private var termuxAltKey: TextView? = null
+    private var termuxShiftKey: TextView? = null
+    private var termuxCtrlPending = false
+    private var termuxAltPending = false
+    private var termuxShiftPending = false
+    private var termuxFnKeyMode = false
+    private var termuxKeyModeAnimating = false
+    private var termuxKeySwipeConsumed = false
+    private var termuxKeyTouchStartX = 0f
+    private var termuxKeyTouchStartY = 0f
+    private var termuxSuppressInputWatcher = false
+    private var termuxInsertedStart = -1
+    private var termuxInsertedText: String? = null
     private var luaAppId: String? = null
     private var luaAppEngine: LuaWidgetEngine? = null
     private var luaAppLastResult: LuaWidgetEngine.RenderResult? = null
@@ -324,6 +354,7 @@ class UIManager(
     private var termuxWorkspaceRoot: View? = null
     private var termuxWorkspaceBorder: View? = null
     private var termuxWorkspaceLabel: TextView? = null
+    private var termuxWorkspaceGrid: TerminalGridView? = null
     private var termuxWorkspaceOutput: TextView? = null
     private var termuxWorkspacePrefix: TextView? = null
     private var termuxWorkspaceInput: EditText? = null
@@ -337,10 +368,33 @@ class UIManager(
     private var termuxWorkspaceBasePaddingTop = 0
     private var termuxWorkspaceBasePaddingRight = 0
     private var termuxWorkspaceBasePaddingBottom = 0
+    private var termuxWorkspaceSocketClient: TermuxWorkspaceSocketClient? = null
+    private var termuxWorkspaceSocketName: String? = null
+    private var termuxWorkspaceSocketToken: String? = null
+    private var termuxWorkspaceLastCols = 80
+    private var termuxWorkspaceLastRows = 24
+    private var termuxWorkspaceLastRenderedFrameKey: String? = null
+    private var termuxWorkspaceMeasuredLineHeight = 0
     private var termuxWorkspaceDispatchSequence = 0
     private var termuxWorkspaceAcceptedSequence = 0
+    private var termuxWorkspaceImeResizeGeneration = 0
     private var termuxWorkspaceTouchStartX = 0f
     private var termuxWorkspaceTouchStartY = 0f
+    private var termuxWorkspaceKeyTouchStartX = 0f
+    private var termuxWorkspaceKeyTouchStartY = 0f
+    private var termuxWorkspaceKeySwipeConsumed = false
+    private var termuxWorkspaceKeyModeAnimating = false
+    private val termuxWorkspaceKeySlots = ArrayList<TextView>()
+    private var termuxWorkspaceCtrlKey: TextView? = null
+    private var termuxWorkspaceAltKey: TextView? = null
+    private var termuxWorkspaceShiftKey: TextView? = null
+    private var termuxWorkspaceCtrlPending = false
+    private var termuxWorkspaceAltPending = false
+    private var termuxWorkspaceShiftPending = false
+    private var termuxWorkspaceFnKeyMode = false
+    private var termuxWorkspaceSuppressInputWatcher = false
+    private var termuxWorkspaceInsertedStart = -1
+    private var termuxWorkspaceInsertedText: String? = null
     private var fileOverlay: View? = null
     private var fileOverlayBasePaddingLeft = 0
     private var fileOverlayBasePaddingTop = 0
@@ -393,6 +447,8 @@ class UIManager(
     private var styledModuleDockSelection: String? = null
     private var pendingModuleDockScrollX = -1
     private var lastModuleDockScrollX = 0
+    private var moduleSuggestionsScroll: HorizontalScrollView? = null
+    private var moduleSuggestionsGroup: LinearLayout? = null
     private val luaWidgetEngines = HashMap<String?, LuaWidgetEngine?>()
     private var bundledLuaSamplesPruned = false
     private var activeModule: String? = ""
@@ -738,6 +794,8 @@ class UIManager(
     private var systemInsetRight = 0
     private var systemInsetBottom = 0
     private var imeBottomOffset = 0
+    private var imeInsetVisible = false
+    private var termuxWorkspaceImeFrameRoot: View? = null
 
     private val genericBorderCornerRadius: Int
     private var bgColors: Array<String?>
@@ -825,6 +883,7 @@ class UIManager(
             inputView.setShowSoftInputOnFocus(true)
             sendRetuiKeyboardTheme(inputView, "launcher")
             inputView.requestFocus()
+            refreshStockSuggestions()
             imm.showSoftInput(inputView, InputMethodManager.SHOW_IMPLICIT)
         })
         applyRetuiKeyboardTheme(inputView, "launcher")
@@ -906,20 +965,9 @@ class UIManager(
                 }
             }
             if (termuxWorkspaceView != null) {
-                termuxWorkspaceView.setColorFilter(
-                    XMLPrefsManager.getColor(Theme.toolbar_icon_color),
-                    PorterDuff.Mode.SRC_IN
-                )
-                termuxWorkspaceView.setBackgroundColor(0)
-                termuxWorkspaceView.setOnClickListener(View.OnClickListener { v: View? ->
-                    openTermuxWorkspacePage(true)
-                })
+                configureTermuxWorkspaceToolbarButton(termuxWorkspaceView)
             }
-            if (toolbarView is LinearLayout) {
-                (toolbarView as LinearLayout).setWeightSum(
-                    countVisibleWeightedChildren(toolbarView as LinearLayout).toFloat()
-                )
-            }
+            refreshToolbarWeightSum()
         }
 
         mTerminalAdapter = TerminalManager(
@@ -955,6 +1003,8 @@ class UIManager(
         pendingOutputs.clear()
 
         mTerminalAdapter!!.focusInputEnd()
+
+        setupModuleSuggestionsStrip()
 
         if (XMLPrefsManager.getBoolean(Suggestions.show_suggestions)) {
             val sv =
@@ -998,6 +1048,7 @@ class UIManager(
         } else {
             val sugGroup = mRootView.findViewById<View?>(R.id.suggestions_group)
             if (sugGroup != null) sugGroup.setVisibility(View.GONE)
+            hideModuleSuggestionsStrip()
         }
 
 
@@ -1046,6 +1097,37 @@ class UIManager(
 
         if (added > 0) {
             toolbarLayout.setWeightSum(countVisibleWeightedChildren(toolbarLayout).toFloat())
+        }
+    }
+
+    fun refreshTermuxWorkspaceToolbarButton() {
+        val button = mRootView?.findViewById<ImageButton?>(R.id.termux_workspace_view)
+        configureTermuxWorkspaceToolbarButton(button)
+        refreshToolbarWeightSum()
+    }
+
+    private fun configureTermuxWorkspaceToolbarButton(button: ImageButton?) {
+        if (button == null) {
+            return
+        }
+        val enabled = XMLPrefsManager.getBoolean(Behavior.show_tmux_workspace_button)
+        button.visibility = if (enabled) View.VISIBLE else View.GONE
+        button.setColorFilter(
+            XMLPrefsManager.getColor(Theme.toolbar_icon_color),
+            PorterDuff.Mode.SRC_IN
+        )
+        button.setBackgroundColor(0)
+        button.setOnClickListener(View.OnClickListener { v: View? ->
+            openTermuxWorkspacePage(true)
+        })
+        styleToolbarButtonChrome(button)
+    }
+
+    private fun refreshToolbarWeightSum() {
+        if (toolbarView is LinearLayout) {
+            (toolbarView as LinearLayout).setWeightSum(
+                countVisibleWeightedChildren(toolbarView as LinearLayout).toFloat()
+            )
         }
     }
 
@@ -1554,7 +1636,8 @@ class UIManager(
             systemInsetTop = max(0, top)
             systemInsetRight = max(0, right)
             systemInsetBottom = max(0, bottom)
-            imeBottomOffset = max(0, keyboardOffset)
+            imeInsetVisible = imeVisible
+            imeBottomOffset = if (imeInsetVisible) max(0, keyboardOffset) else 0
             applyDisplayMarginsForConfiguration(currentConfiguration)
             applyTermuxImeBottomPadding()
             applyTermuxWorkspaceImeBottomPadding()
@@ -1578,15 +1661,41 @@ class UIManager(
     }
 
     private fun applyTermuxWorkspaceImeBottomPadding() {
-        if (termuxWorkspaceRoot == null) {
-            return
-        }
-        termuxWorkspaceRoot!!.setPadding(
+        val root = termuxWorkspaceRoot ?: return
+        val bottomPadding = termuxWorkspaceBasePaddingBottom + imeBottomOffset
+        val changed = root.paddingBottom != bottomPadding
+        root.setPadding(
             termuxWorkspaceBasePaddingLeft,
             termuxWorkspaceBasePaddingTop,
             termuxWorkspaceBasePaddingRight,
-            termuxWorkspaceBasePaddingBottom + imeBottomOffset
+            bottomPadding
         )
+        if (changed) {
+            scheduleTermuxWorkspaceImeGeometryRefresh()
+        }
+    }
+
+    private fun scheduleTermuxWorkspaceImeGeometryRefresh() {
+        val root = termuxWorkspaceRoot ?: return
+        if (!termuxWorkspaceChromeActive) {
+            return
+        }
+        val generation = ++termuxWorkspaceImeResizeGeneration
+        root.requestLayout()
+        root.post(Runnable {
+            refreshTermuxWorkspaceAfterImeResize(generation)
+        })
+        root.postDelayed(Runnable {
+            refreshTermuxWorkspaceAfterImeResize(generation)
+        }, TERMUX_WORKSPACE_IME_RESIZE_REFRESH_DELAY_MS)
+    }
+
+    private fun refreshTermuxWorkspaceAfterImeResize(generation: Int) {
+        if (generation != termuxWorkspaceImeResizeGeneration || !termuxWorkspaceChromeActive) {
+            return
+        }
+        termuxWorkspaceLastRenderedFrameKey = null
+        refreshTermuxWorkspace(false)
     }
 
     private fun updateKeyboardLayoutState(newKeyboardVisible: Boolean, rootHeight: Int) {
@@ -1598,6 +1707,7 @@ class UIManager(
         if (!layoutStateChanged) {
             return
         }
+        scheduleTermuxWorkspaceImeGeometryRefresh()
         if (mTerminalAdapter != null && mTerminalAdapter!!.inputView is EditText) {
             val terminalInput = mTerminalAdapter!!.inputView as EditText
             terminalInput.setCursorVisible(keyboardVisible)
@@ -2066,6 +2176,7 @@ class UIManager(
         termuxWorkspaceRoot = workspacePage.findViewById<View?>(R.id.termux_workspace_root)
         termuxWorkspaceBorder = workspacePage.findViewById<View?>(R.id.termux_workspace_border)
         termuxWorkspaceLabel = workspacePage.findViewById<TextView?>(R.id.termux_workspace_label)
+        termuxWorkspaceGrid = workspacePage.findViewById<TerminalGridView?>(R.id.termux_workspace_grid)
         termuxWorkspaceOutput = workspacePage.findViewById<TextView?>(R.id.termux_workspace_output)
         termuxWorkspacePrefix = workspacePage.findViewById<TextView?>(R.id.termux_workspace_prefix)
         termuxWorkspaceInput = workspacePage.findViewById<EditText?>(R.id.termux_workspace_input)
@@ -2080,18 +2191,34 @@ class UIManager(
             termuxWorkspaceBasePaddingTop = root.paddingTop
             termuxWorkspaceBasePaddingRight = root.paddingRight
             termuxWorkspaceBasePaddingBottom = root.paddingBottom
+            if (termuxWorkspaceImeFrameRoot !== root) {
+                termuxWorkspaceImeFrameRoot = root
+                root.viewTreeObserver.addOnGlobalLayoutListener {
+                    syncTermuxWorkspaceImeFromVisibleFrame()
+                }
+            }
         }
 
         applyTermuxWorkspaceImeBottomPadding()
         styleTermuxWorkspace()
         renderTermuxWorkspaceStatus("Tap the terminal toolbar button or run :refresh to start.")
 
-        termuxWorkspaceRoot?.setOnTouchListener(OnTouchListener { v, event ->
-            handleTermuxWorkspaceTouch(event)
-        })
-        termuxWorkspaceBorder?.setOnTouchListener(OnTouchListener { v, event ->
-            handleTermuxWorkspaceTouch(event)
-        })
+        val terminalSwipeListener = OnTouchListener { v, event ->
+            handleTermuxWorkspaceOutputTouch(event)
+        }
+        termuxWorkspaceOutputPanel?.setOnTouchListener(terminalSwipeListener)
+        termuxWorkspaceScroll?.setOnTouchListener(terminalSwipeListener)
+        termuxWorkspaceGrid?.setOnTouchListener(terminalSwipeListener)
+        termuxWorkspaceOutput?.setOnTouchListener(terminalSwipeListener)
+        val terminalGeometryListener = View.OnLayoutChangeListener { _, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom ->
+            val sizeChanged = right - left != oldRight - oldLeft || bottom - top != oldBottom - oldTop
+            if (sizeChanged) {
+                termuxWorkspaceLastRenderedFrameKey = null
+                refreshTermuxWorkspaceSocketGeometry(true)
+            }
+        }
+        termuxWorkspaceOutputPanel?.addOnLayoutChangeListener(terminalGeometryListener)
+        termuxWorkspaceScroll?.addOnLayoutChangeListener(terminalGeometryListener)
 
         termuxWorkspaceInput?.let { input ->
             applyRetuiKeyboardTheme(input, "termux")
@@ -2100,7 +2227,9 @@ class UIManager(
                 input.setShowSoftInputOnFocus(hasFocus)
             })
             input.setOnKeyListener(View.OnKeyListener { v: View?, keyCode: Int, event: KeyEvent? ->
-                if (keyCode == KeyEvent.KEYCODE_ENTER && event != null && event.action == KeyEvent.ACTION_UP) {
+                if (handleTermuxWorkspaceHardwareModifiedKey(keyCode, event)) {
+                    true
+                } else if (keyCode == KeyEvent.KEYCODE_ENTER && event != null && event.action == KeyEvent.ACTION_UP) {
                     submitTermuxWorkspaceInputFromField()
                     true
                 } else {
@@ -2122,6 +2251,25 @@ class UIManager(
                     false
                 }
             })
+            input.addTextChangedListener(object : TextWatcher {
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    termuxWorkspaceInsertedStart = -1
+                    termuxWorkspaceInsertedText = null
+                    if (termuxWorkspaceSuppressInputWatcher || !hasTermuxWorkspacePendingModifiers()) {
+                        return
+                    }
+                    if (before == 0 && count == 1 && s != null && start >= 0 && start + count <= s.length) {
+                        termuxWorkspaceInsertedStart = start
+                        termuxWorkspaceInsertedText = s.subSequence(start, start + count).toString()
+                    }
+                }
+
+                override fun afterTextChanged(s: Editable?) {
+                    consumeTermuxWorkspaceInsertedCombo(s)
+                }
+            })
         }
         termuxWorkspaceSend?.let { send ->
             send.setOnClickListener(View.OnClickListener { v: View? -> submitTermuxWorkspaceInputFromField() })
@@ -2129,11 +2277,13 @@ class UIManager(
         }
 
         bindTermuxWorkspaceButton(workspacePage, R.id.termux_workspace_home, Runnable { openHomePage() })
-        bindTermuxWorkspaceButton(workspacePage, R.id.termux_workspace_prev, Runnable { switchTermuxWorkspaceWindow("prev") })
         bindTermuxWorkspaceButton(workspacePage, R.id.termux_workspace_new, Runnable { newTermuxWorkspaceWindow(null) })
-        bindTermuxWorkspaceButton(workspacePage, R.id.termux_workspace_next, Runnable { switchTermuxWorkspaceWindow("next") })
-        bindTermuxWorkspaceButton(workspacePage, R.id.termux_workspace_refresh, Runnable { refreshTermuxWorkspace(true) })
         bindTermuxWorkspaceButton(workspacePage, R.id.termux_workspace_ime, Runnable { focusTermuxWorkspaceInput(true) })
+        bindTermuxWorkspaceTerminalKeys(workspacePage)
+        bindTermuxWorkspaceKeyModeSwipe(termuxWorkspaceTools)
+        bindTermuxWorkspaceKeyModeSwipe(workspacePage.findViewById<View?>(R.id.termux_workspace_keys_row_one))
+        bindTermuxWorkspaceKeyModeSwipe(workspacePage.findViewById<View?>(R.id.termux_workspace_keys_row_two))
+        styleTermuxWorkspaceChromeButtons()
     }
 
     private fun bindTermuxWorkspaceButton(root: View, id: Int, action: Runnable) {
@@ -2142,7 +2292,287 @@ class UIManager(
             return
         }
         key.setOnClickListener(View.OnClickListener { v: View? -> action.run() })
-        styleTermuxWorkspaceButton(key)
+        styleTermuxWorkspaceChromeButton(key)
+    }
+
+    private fun bindTermuxWorkspaceTerminalKeys(root: View) {
+        termuxWorkspaceKeySlots.clear()
+        val ids = intArrayOf(
+            R.id.termux_workspace_key_slot_01,
+            R.id.termux_workspace_key_slot_02,
+            R.id.termux_workspace_key_slot_03,
+            R.id.termux_workspace_key_slot_04,
+            R.id.termux_workspace_key_slot_05,
+            R.id.termux_workspace_key_slot_06,
+            R.id.termux_workspace_key_slot_07,
+            R.id.termux_workspace_key_slot_08,
+            R.id.termux_workspace_key_slot_09,
+            R.id.termux_workspace_key_slot_10,
+            R.id.termux_workspace_key_slot_11,
+            R.id.termux_workspace_key_slot_12,
+            R.id.termux_workspace_key_slot_13,
+            R.id.termux_workspace_key_slot_14,
+            R.id.termux_workspace_key_slot_15,
+            R.id.termux_workspace_key_slot_16
+        )
+        for (id in ids) {
+            val key = root.findViewById<TextView?>(id) ?: continue
+            termuxWorkspaceKeySlots.add(key)
+            bindTermuxWorkspaceKeyModeSwipe(key)
+        }
+        updateTermuxWorkspaceKeyMode()
+    }
+
+    private fun bindTermuxWorkspaceKeyModeSwipe(view: View?) {
+        view?.setOnTouchListener(OnTouchListener { v: View?, event: MotionEvent? ->
+            handleTermuxWorkspaceKeyModeTouch(event)
+        })
+    }
+
+    private fun updateTermuxWorkspaceKeyMode() {
+        val specs = if (termuxWorkspaceFnKeyMode) termuxWorkspaceFnKeySpecs() else termuxWorkspaceNavKeySpecs()
+        termuxWorkspaceCtrlKey = null
+        termuxWorkspaceAltKey = null
+        termuxWorkspaceShiftKey = null
+        val normalColor = notificationWidgetTextColor()
+        for (i in termuxWorkspaceKeySlots.indices) {
+            val key = termuxWorkspaceKeySlots[i]
+            if (i >= specs.size) {
+                key.visibility = View.INVISIBLE
+                key.setOnClickListener(null)
+                continue
+            }
+            val spec = specs[i]
+            key.visibility = View.VISIBLE
+            key.text = spec.label
+            key.textSize = if (spec.label.length >= 5) 10f else 11f
+            key.alpha = 0.82f
+            key.setTextColor(normalColor)
+            key.setBackgroundColor(Color.TRANSPARENT)
+            styleTermuxToolButton(key, normalColor)
+            when (spec.modifier) {
+                TermuxWorkspaceModifier.CTRL -> termuxWorkspaceCtrlKey = key
+                TermuxWorkspaceModifier.ALT -> termuxWorkspaceAltKey = key
+                TermuxWorkspaceModifier.SHIFT -> termuxWorkspaceShiftKey = key
+                null -> {}
+            }
+            key.setOnClickListener(View.OnClickListener { v: View? ->
+                if (termuxWorkspaceKeySwipeConsumed) {
+                    termuxWorkspaceKeySwipeConsumed = false
+                    return@OnClickListener
+                }
+                handleTermuxWorkspaceKeySpec(spec)
+            })
+        }
+        updateTermuxWorkspaceModifierButtons()
+    }
+
+    private fun termuxWorkspaceNavKeySpecs(): Array<TermuxWorkspaceKeySpec> {
+        return arrayOf(
+            termuxWorkspaceRefreshSpec("REFRESH"),
+            termuxWorkspaceKeySpec("ESC", "Escape"),
+            termuxWorkspaceKeySpec("/", "/"),
+            termuxWorkspaceKeySpec("-", "-"),
+            termuxWorkspaceKeySpec("HOME", "Home"),
+            termuxWorkspaceKeySpec("UP", "Up"),
+            termuxWorkspaceKeySpec("END", "End"),
+            termuxWorkspaceKeySpec("PGUP", "PageUp"),
+            termuxWorkspaceKeySpec("TAB", "Tab"),
+            termuxWorkspaceModifierSpec("CTRL", TermuxWorkspaceModifier.CTRL),
+            termuxWorkspaceModifierSpec("ALT", TermuxWorkspaceModifier.ALT),
+            termuxWorkspaceModifierSpec("SHIFT", TermuxWorkspaceModifier.SHIFT),
+            termuxWorkspaceKeySpec("LEFT", "Left"),
+            termuxWorkspaceKeySpec("DOWN", "Down"),
+            termuxWorkspaceKeySpec("RIGHT", "Right"),
+            termuxWorkspaceKeySpec("PGDN", "PageDown")
+        )
+    }
+
+    private fun termuxWorkspaceFnKeySpecs(): Array<TermuxWorkspaceKeySpec> {
+        return arrayOf(
+            termuxWorkspaceRefreshSpec("REFRESH"),
+            termuxWorkspaceKeySpec("F1", "F1"),
+            termuxWorkspaceKeySpec("F2", "F2"),
+            termuxWorkspaceKeySpec("F3", "F3"),
+            termuxWorkspaceKeySpec("F4", "F4"),
+            termuxWorkspaceKeySpec("F5", "F5"),
+            termuxWorkspaceKeySpec("F6", "F6"),
+            termuxWorkspaceKeySpec("F7", "F7"),
+            termuxWorkspaceKeySpec("INS", "Insert"),
+            termuxWorkspaceKeySpec("DEL", "Delete"),
+            termuxWorkspaceKeySpec("F8", "F8"),
+            termuxWorkspaceKeySpec("F9", "F9"),
+            termuxWorkspaceKeySpec("F10", "F10"),
+            termuxWorkspaceKeySpec("BTAB", "BTab"),
+            termuxWorkspaceKeySpec("ENTER", "Enter"),
+            termuxWorkspaceKeySpec("BKSP", "BSpace")
+        )
+    }
+
+    private fun termuxWorkspaceKeySpec(label: String, keyName: String): TermuxWorkspaceKeySpec {
+        return TermuxWorkspaceKeySpec(label, keyName, null, false, false)
+    }
+
+    private fun termuxWorkspaceRefreshSpec(label: String): TermuxWorkspaceKeySpec {
+        return TermuxWorkspaceKeySpec(label, null, null, false, true)
+    }
+
+    private fun termuxWorkspaceModifierSpec(
+        label: String,
+        modifier: TermuxWorkspaceModifier
+    ): TermuxWorkspaceKeySpec {
+        return TermuxWorkspaceKeySpec(label, null, modifier, false, false)
+    }
+
+    private fun handleTermuxWorkspaceKeySpec(spec: TermuxWorkspaceKeySpec) {
+        if (spec.togglesMode) {
+            setTermuxWorkspaceFnKeyMode(!termuxWorkspaceFnKeyMode)
+            return
+        }
+        if (spec.refreshes) {
+            clearTermuxWorkspaceModifiers()
+            refreshTermuxWorkspace(true)
+            return
+        }
+        when (spec.modifier) {
+            TermuxWorkspaceModifier.CTRL -> termuxWorkspaceCtrlPending = !termuxWorkspaceCtrlPending
+            TermuxWorkspaceModifier.ALT -> termuxWorkspaceAltPending = !termuxWorkspaceAltPending
+            TermuxWorkspaceModifier.SHIFT -> termuxWorkspaceShiftPending = !termuxWorkspaceShiftPending
+            null -> {
+                val keyName = spec.keyName ?: return
+                sendTermuxWorkspaceKey(applyTermuxWorkspaceModifiers(keyName))
+                return
+            }
+        }
+        updateTermuxWorkspaceModifierButtons()
+    }
+
+    private fun setTermuxWorkspaceFnKeyMode(enabled: Boolean): Boolean {
+        if (termuxWorkspaceFnKeyMode == enabled) {
+            return false
+        }
+        termuxWorkspaceTools?.animate()?.cancel()
+        termuxWorkspaceKeyModeAnimating = false
+        termuxWorkspaceTools?.translationX = 0f
+        termuxWorkspaceTools?.alpha = 1f
+        termuxWorkspaceFnKeyMode = enabled
+        updateTermuxWorkspaceKeyMode()
+        return true
+    }
+
+    private fun animateTermuxWorkspaceFnKeyMode(enabled: Boolean, direction: Int): Boolean {
+        if (termuxWorkspaceFnKeyMode == enabled || termuxWorkspaceKeyModeAnimating) {
+            return false
+        }
+        val tools = termuxWorkspaceTools
+        val width = tools?.width ?: 0
+        if (tools == null || width <= 0) {
+            return setTermuxWorkspaceFnKeyMode(enabled)
+        }
+        val cleanDirection = if (direction < 0) -1 else 1
+        termuxWorkspaceKeyModeAnimating = true
+        tools.animate().cancel()
+        tools.animate()
+            .translationX((-cleanDirection * width).toFloat())
+            .alpha(0.08f)
+            .setDuration(TERMUX_WORKSPACE_KEY_MODE_CAROUSEL_OUT_MS)
+            .withEndAction(Runnable {
+                termuxWorkspaceFnKeyMode = enabled
+                updateTermuxWorkspaceKeyMode()
+                tools.translationX = (cleanDirection * width).toFloat()
+                tools.alpha = 0.08f
+                tools.animate()
+                    .translationX(0f)
+                    .alpha(1f)
+                    .setDuration(TERMUX_WORKSPACE_KEY_MODE_CAROUSEL_IN_MS)
+                    .withEndAction(Runnable {
+                        tools.translationX = 0f
+                        tools.alpha = 1f
+                        termuxWorkspaceKeyModeAnimating = false
+                    })
+                    .start()
+            })
+            .start()
+        return true
+    }
+
+    private fun applyTermuxWorkspaceModifiers(keyName: String): String {
+        val ctrl = termuxWorkspaceCtrlPending
+        val alt = termuxWorkspaceAltPending
+        val shift = termuxWorkspaceShiftPending
+        if (!ctrl && !alt && !shift) {
+            return keyName
+        }
+        termuxWorkspaceCtrlPending = false
+        termuxWorkspaceAltPending = false
+        termuxWorkspaceShiftPending = false
+        updateTermuxWorkspaceModifierButtons()
+        val prefix = StringBuilder()
+        if (ctrl) {
+            prefix.append("C-")
+        }
+        if (alt) {
+            prefix.append("M-")
+        }
+        if (shift) {
+            prefix.append("S-")
+        }
+        return prefix.append(keyName).toString()
+    }
+
+    private fun clearTermuxWorkspaceModifiers() {
+        if (!termuxWorkspaceCtrlPending && !termuxWorkspaceAltPending && !termuxWorkspaceShiftPending) {
+            return
+        }
+        termuxWorkspaceCtrlPending = false
+        termuxWorkspaceAltPending = false
+        termuxWorkspaceShiftPending = false
+        updateTermuxWorkspaceModifierButtons()
+    }
+
+    private fun hasTermuxWorkspacePendingModifiers(): Boolean {
+        return termuxWorkspaceCtrlPending || termuxWorkspaceAltPending || termuxWorkspaceShiftPending
+    }
+
+    private fun updateTermuxWorkspaceModifierButtons() {
+        val normalColor = notificationWidgetTextColor()
+        val activeColor = terminalBorderColor()
+        termuxWorkspaceCtrlKey?.let { key ->
+            updateTermuxWorkspaceModifierButton(key, "CTRL", termuxWorkspaceCtrlPending, normalColor, activeColor)
+        }
+        termuxWorkspaceAltKey?.let { key ->
+            updateTermuxWorkspaceModifierButton(key, "ALT", termuxWorkspaceAltPending, normalColor, activeColor)
+        }
+        termuxWorkspaceShiftKey?.let { key ->
+            updateTermuxWorkspaceModifierButton(key, "SHIFT", termuxWorkspaceShiftPending, normalColor, activeColor)
+        }
+    }
+
+    private fun updateTermuxWorkspaceModifierButton(
+        key: TextView,
+        label: String,
+        active: Boolean,
+        normalColor: Int,
+        activeColor: Int
+    ) {
+        key.text = if (active) "$label*" else label
+        key.alpha = if (active) 1f else 0.82f
+        if (active && mContext != null) {
+            key.setTextColor(terminalWindowBackground())
+            key.setBackground(
+                TerminalBorderRuntime.panelDrawable(
+                    mContext!!,
+                    activeColor,
+                    notificationWidgetTextColor(),
+                    1f,
+                    outputCornerRadius(),
+                    dashedBorders()
+                )
+            )
+        } else {
+            key.setTextColor(normalColor)
+            key.setBackgroundColor(Color.TRANSPARENT)
+        }
     }
 
     private fun styleTermuxWorkspace() {
@@ -2165,14 +2595,27 @@ class UIManager(
             label.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
             label.setTextSize(outputHeaderTextSize().toFloat())
             label.setTextColor(textColor)
+            label.includeFontPadding = false
             label.setBackground(TerminalBorderRuntime.tabDrawable(mContext!!, labelBg))
         }
+        styleTermuxWorkspaceChromeButtons()
         TerminalBorderRuntime.bind(termuxWorkspaceBorder, termuxWorkspaceLabel)
 
         termuxWorkspaceOutput?.let { output ->
             output.setTypeface(Tuils.getTypeface(mContext))
             output.setTextColor(textColor)
-            output.setTextIsSelectable(true)
+            output.setTextIsSelectable(false)
+            output.setHorizontallyScrolling(true)
+            output.isFocusable = false
+            output.isFocusableInTouchMode = false
+            output.includeFontPadding = false
+            output.setLineSpacing(0f, 1f)
+            output.visibility = View.GONE
+        }
+        termuxWorkspaceGrid?.let { grid ->
+            grid.setTerminalTypeface(Tuils.getTypeface(mContext))
+            grid.setTerminalTextSizeSp(12f)
+            grid.updateThemeColors(textColor, bgColor, borderColor)
         }
         termuxWorkspaceOutputPanel?.setBackground(
             TerminalBorderRuntime.panelDrawable(
@@ -2218,6 +2661,7 @@ class UIManager(
         if (termuxWorkspaceTools != null) {
             termuxWorkspaceTools!!.setBackgroundColor(Color.TRANSPARENT)
             styleTermuxToolButtons(termuxWorkspaceTools, textColor)
+            updateTermuxWorkspaceModifierButtons()
         }
     }
 
@@ -2234,6 +2678,44 @@ class UIManager(
                 dashedBorders()
             )
         )
+    }
+
+    private fun styleTermuxWorkspaceChromeButtons() {
+        val root = termuxWorkspaceRoot ?: return
+        styleTermuxWorkspaceChromeIcon(root.findViewById<TextView?>(R.id.termux_workspace_home), R.drawable.ic_toolbar_home_24)
+        styleTermuxWorkspaceChromeIcon(root.findViewById<TextView?>(R.id.termux_workspace_new), R.drawable.ic_workspace_add_24)
+        styleTermuxWorkspaceChromeIcon(root.findViewById<TextView?>(R.id.termux_workspace_ime), R.drawable.ic_workspace_keyboard_24)
+    }
+
+    private fun styleTermuxWorkspaceChromeButton(button: TextView?) {
+        if (button == null || mContext == null) {
+            return
+        }
+        button.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
+        button.setTextColor(notificationWidgetTextColor())
+        button.includeFontPadding = false
+        button.setPadding(
+            Tuils.dpToPx(mContext, 3),
+            0,
+            Tuils.dpToPx(mContext, 3),
+            0
+        )
+        button.setBackground(TerminalBorderRuntime.tabDrawable(mContext!!, terminalHeaderTabBackground()))
+    }
+
+    private fun styleTermuxWorkspaceChromeIcon(button: TextView?, drawableId: Int) {
+        styleTermuxWorkspaceChromeButton(button)
+        if (button == null || mContext == null) {
+            return
+        }
+        val icon = ContextCompat.getDrawable(mContext!!, drawableId) ?: return
+        val wrapped = DrawableCompat.wrap(icon).mutate()
+        DrawableCompat.setTint(wrapped, notificationWidgetTextColor())
+        val size = Tuils.dpToPx(mContext, 12)
+        wrapped.setBounds(0, 0, size, size)
+        button.text = Tuils.EMPTYSTRING
+        button.compoundDrawablePadding = 0
+        button.setCompoundDrawables(wrapped, null, null, null)
     }
 
     private fun openTermuxWorkspacePage(startSession: Boolean) {
@@ -2257,9 +2739,9 @@ class UIManager(
             runOnMainThread { openHomePage() }
             return
         }
+        stopTermuxWorkspaceSocketClient()
         setTermuxWorkspaceChromeActive(false)
         viewPager.setCurrentItem(0, true)
-        viewPager.setUserInputEnabled(true)
     }
 
     private fun setTermuxWorkspaceChromeActive(active: Boolean) {
@@ -2293,7 +2775,64 @@ class UIManager(
         }
     }
 
-    private fun handleTermuxWorkspaceTouch(event: MotionEvent?): Boolean {
+    private fun hideTermuxWorkspaceKeyboard() {
+        val input = termuxWorkspaceInput
+        if (input != null) {
+            imm.hideSoftInputFromWindow(input.windowToken, 0)
+            input.setShowSoftInputOnFocus(false)
+        }
+        imeInsetVisible = false
+        imeBottomOffset = 0
+        applyTermuxWorkspaceImeBottomPadding()
+        updateKeyboardLayoutState(false, if (mRootView != null) mRootView.getHeight() else 0)
+        val root = termuxWorkspaceRoot ?: return
+        root.post(Runnable {
+            termuxWorkspaceLastRenderedFrameKey = null
+            refreshTermuxWorkspaceSocketGeometry(true)
+        })
+        root.postDelayed(Runnable {
+            termuxWorkspaceLastRenderedFrameKey = null
+            refreshTermuxWorkspaceSocketGeometry(true)
+        }, TERMUX_WORKSPACE_IME_RESIZE_REFRESH_DELAY_MS)
+    }
+
+    private fun syncTermuxWorkspaceImeFromVisibleFrame() {
+        val root = termuxWorkspaceRoot ?: return
+        if (!termuxWorkspaceChromeActive || root.height <= 0) {
+            return
+        }
+        val visibleFrame = Rect()
+        root.getWindowVisibleDisplayFrame(visibleFrame)
+        val rootLocation = IntArray(2)
+        root.getLocationOnScreen(rootLocation)
+        val hiddenBottom = max(0, rootLocation[1] + root.height - visibleFrame.bottom)
+        val threshold = UIUtils.dpToPx(mContext!!, TERMUX_WORKSPACE_IME_VISIBLE_THRESHOLD_DP)
+        val imeVisibleNow = hiddenBottom > threshold
+        val bottomOffsetNow = if (imeVisibleNow) hiddenBottom else 0
+        if (imeVisibleNow == imeInsetVisible && bottomOffsetNow == imeBottomOffset) {
+            return
+        }
+        imeInsetVisible = imeVisibleNow
+        imeBottomOffset = bottomOffsetNow
+        applyTermuxWorkspaceImeBottomPadding()
+        updateKeyboardLayoutState(imeVisibleNow, if (mRootView != null) mRootView.getHeight() else root.height)
+        termuxWorkspaceLastRenderedFrameKey = null
+        refreshTermuxWorkspaceSocketGeometry(true)
+    }
+
+    private fun handleTermuxWorkspaceBackPressed(): Boolean {
+        if (!termuxWorkspaceChromeActive) {
+            return false
+        }
+        if (keyboardVisible || imeInsetVisible || imeBottomOffset > 0) {
+            hideTermuxWorkspaceKeyboard()
+            return true
+        }
+        openHomePage()
+        return true
+    }
+
+    private fun handleTermuxWorkspaceOutputTouch(event: MotionEvent?): Boolean {
         if (event == null) {
             return false
         }
@@ -2317,10 +2856,130 @@ class UIManager(
         return true
     }
 
+    private fun handleTermuxWorkspaceKeyModeTouch(event: MotionEvent?): Boolean {
+        if (event == null) {
+            return false
+        }
+        if (termuxWorkspaceKeyModeAnimating) {
+            return true
+        }
+        when (event.actionMasked) {
+            MotionEvent.ACTION_DOWN -> {
+                termuxWorkspaceKeyTouchStartX = event.rawX
+                termuxWorkspaceKeyTouchStartY = event.rawY
+                termuxWorkspaceKeySwipeConsumed = false
+                return false
+            }
+            MotionEvent.ACTION_UP -> {
+                val dx = event.rawX - termuxWorkspaceKeyTouchStartX
+                val dy = event.rawY - termuxWorkspaceKeyTouchStartY
+                if (abs(dx) > TERMUX_WORKSPACE_KEY_MODE_SWIPE_THRESHOLD_PX && abs(dx) > abs(dy) * 1.35f) {
+                    termuxWorkspaceKeySwipeConsumed = true
+                    animateTermuxWorkspaceFnKeyMode(!termuxWorkspaceFnKeyMode, if (dx < 0) 1 else -1)
+                    return true
+                }
+            }
+            MotionEvent.ACTION_CANCEL -> {
+                termuxWorkspaceKeyTouchStartX = 0f
+                termuxWorkspaceKeyTouchStartY = 0f
+                termuxWorkspaceKeySwipeConsumed = false
+            }
+        }
+        return false
+    }
+
+    private fun handleTermuxWorkspaceHardwareModifiedKey(keyCode: Int, event: KeyEvent?): Boolean {
+        if (event == null || event.action != KeyEvent.ACTION_DOWN || !hasTermuxWorkspacePendingModifiers()) {
+            return false
+        }
+        val text = termuxWorkspaceHardwarePrintableText(keyCode, event) ?: return false
+        val key = mapTermuxWorkspacePrintableCombo(text) ?: return false
+        clearTermuxWorkspaceModifiers()
+        sendTermuxWorkspaceKey(key)
+        return true
+    }
+
+    private fun termuxWorkspaceHardwarePrintableText(keyCode: Int, event: KeyEvent): String? {
+        val unicode = event.unicodeChar
+        if (unicode > 0) {
+            return unicode.toChar().toString()
+        }
+        if (keyCode >= KeyEvent.KEYCODE_A && keyCode <= KeyEvent.KEYCODE_Z) {
+            return ('a'.code + keyCode - KeyEvent.KEYCODE_A).toChar().toString()
+        }
+        return when (keyCode) {
+            KeyEvent.KEYCODE_SPACE -> " "
+            KeyEvent.KEYCODE_LEFT_BRACKET -> "["
+            KeyEvent.KEYCODE_SLASH -> "/"
+            KeyEvent.KEYCODE_MINUS -> "-"
+            else -> null
+        }
+    }
+
+    private fun consumeTermuxWorkspaceInsertedCombo(text: Editable?) {
+        val inserted = termuxWorkspaceInsertedText
+        val start = termuxWorkspaceInsertedStart
+        termuxWorkspaceInsertedText = null
+        termuxWorkspaceInsertedStart = -1
+        if (text == null || inserted.isNullOrEmpty() || start < 0) {
+            return
+        }
+        val key = mapTermuxWorkspacePrintableCombo(inserted) ?: return
+        if (start + inserted.length > text.length ||
+            text.subSequence(start, start + inserted.length).toString() != inserted
+        ) {
+            return
+        }
+        termuxWorkspaceSuppressInputWatcher = true
+        try {
+            text.delete(start, start + inserted.length)
+        } finally {
+            termuxWorkspaceSuppressInputWatcher = false
+        }
+        clearTermuxWorkspaceModifiers()
+        sendTermuxWorkspaceKey(key)
+    }
+
+    private fun mapTermuxWorkspacePrintableCombo(text: String): String? {
+        if (text.length != 1 || !hasTermuxWorkspacePendingModifiers()) {
+            return null
+        }
+        val ch = text[0]
+        val ctrl = termuxWorkspaceCtrlPending
+        val alt = termuxWorkspaceAltPending
+        if (!ctrl && !alt) {
+            return null
+        }
+        if (ctrl && !alt && ch == '[') {
+            return "Escape"
+        }
+        if (ctrl) {
+            val ctrlKey = when {
+                ch in 'a'..'z' || ch in 'A'..'Z' -> ch.lowercaseChar().toString()
+                ch == ' ' -> "Space"
+                else -> null
+            } ?: return null
+            return if (alt) "C-M-$ctrlKey" else "C-$ctrlKey"
+        }
+        val altKey = tmuxWorkspacePrintableKeyName(ch) ?: return null
+        return "M-$altKey"
+    }
+
+    private fun tmuxWorkspacePrintableKeyName(ch: Char): String? {
+        if (Character.isISOControl(ch)) {
+            return null
+        }
+        return if (ch == ' ') "Space" else ch.toString()
+    }
+
     private fun submitTermuxWorkspaceInput(rawCommand: String?) {
         val command = rawCommand?.trim { it <= ' ' } ?: Tuils.EMPTYSTRING
+        clearTermuxWorkspaceModifiers()
         if (command.startsWith(":")) {
             handleTermuxWorkspaceCommand(command.substring(1).trim { it <= ' ' })
+            return
+        }
+        if (sendTermuxWorkspaceSocketInput(command)) {
             return
         }
         renderTermuxWorkspaceStatus(if (command.isEmpty()) "sent enter" else "sent: " + command)
@@ -2356,6 +3015,9 @@ class UIManager(
     }
 
     private fun refreshTermuxWorkspace(announce: Boolean) {
+        if (captureTermuxWorkspaceSocket()) {
+            return
+        }
         if (announce) {
             renderTermuxWorkspaceStatus("refreshing")
         }
@@ -2364,13 +3026,202 @@ class UIManager(
 
     private fun newTermuxWorkspaceWindow(name: String?) {
         val clean = name?.trim { it <= ' ' } ?: Tuils.EMPTYSTRING
+        if (newTermuxWorkspaceSocketWindow(clean)) {
+            return
+        }
         renderTermuxWorkspaceStatus(if (clean.isEmpty()) "new tmux window" else "new tmux window: " + clean)
         dispatchTermuxWorkspaceScript("new", buildTermuxWorkspaceNewWindowScript(clean), true)
     }
 
     private fun switchTermuxWorkspaceWindow(direction: String) {
+        if (switchTermuxWorkspaceSocketWindow(direction)) {
+            return
+        }
         renderTermuxWorkspaceStatus(direction + " tmux window")
         dispatchTermuxWorkspaceScript("switch", buildTermuxWorkspaceSwitchScript(direction), true)
+    }
+
+    private fun sendTermuxWorkspaceKey(key: String) {
+        val clean = key.trim { it <= ' ' }
+        if (clean.isEmpty()) {
+            return
+        }
+        if (sendTermuxWorkspaceSocketKey(clean)) {
+            return
+        }
+        renderTermuxWorkspaceStatus("key: " + clean)
+        dispatchTermuxWorkspaceScript("key", buildTermuxWorkspaceKeyScript(clean), true)
+    }
+
+    private fun captureTermuxWorkspaceSocket(): Boolean {
+        val client = termuxWorkspaceSocketClient ?: return false
+        if (!client.connected) {
+            return false
+        }
+        val geometry = calculateTermuxWorkspaceGeometry()
+        return client.capture(geometry.cols, geometry.rows)
+    }
+
+    private fun sendTermuxWorkspaceSocketInput(input: String): Boolean {
+        val client = termuxWorkspaceSocketClient ?: return false
+        if (!client.connected) {
+            return false
+        }
+        val geometry = calculateTermuxWorkspaceGeometry()
+        return client.sendInput(input, geometry.cols, geometry.rows)
+    }
+
+    private fun sendTermuxWorkspaceSocketKey(key: String): Boolean {
+        val client = termuxWorkspaceSocketClient ?: return false
+        if (!client.connected) {
+            return false
+        }
+        val geometry = calculateTermuxWorkspaceGeometry()
+        return client.key(key, geometry.cols, geometry.rows)
+    }
+
+    private fun newTermuxWorkspaceSocketWindow(name: String): Boolean {
+        val client = termuxWorkspaceSocketClient ?: return false
+        if (!client.connected) {
+            return false
+        }
+        val geometry = calculateTermuxWorkspaceGeometry()
+        return client.newWindow(name, geometry.cols, geometry.rows)
+    }
+
+    private fun switchTermuxWorkspaceSocketWindow(direction: String): Boolean {
+        val client = termuxWorkspaceSocketClient ?: return false
+        if (!client.connected) {
+            return false
+        }
+        val geometry = calculateTermuxWorkspaceGeometry()
+        return client.switchWindow(direction, geometry.cols, geometry.rows)
+    }
+
+    private fun refreshTermuxWorkspaceSocketGeometry(forceCapture: Boolean) {
+        val client = termuxWorkspaceSocketClient ?: return
+        if (!client.connected) {
+            return
+        }
+        val geometry = calculateTermuxWorkspaceGeometry()
+        if (forceCapture || geometry.cols != termuxWorkspaceLastCols || geometry.rows != termuxWorkspaceLastRows) {
+            termuxWorkspaceLastCols = geometry.cols
+            termuxWorkspaceLastRows = geometry.rows
+            client.capture(geometry.cols, geometry.rows)
+        }
+    }
+
+    private fun calculateTermuxWorkspaceGeometry(): TermuxWorkspaceGeometry {
+        val output = termuxWorkspaceOutput
+        val grid = termuxWorkspaceGrid
+        val host = termuxWorkspaceScroll ?: termuxWorkspaceOutputPanel
+        val width = max(0, (host?.width ?: 0) - (host?.paddingLeft ?: 0) - (host?.paddingRight ?: 0))
+        val height = max(0, visibleTermuxWorkspaceHostHeight(host) - (host?.paddingTop ?: 0) - (host?.paddingBottom ?: 0))
+        val charWidth = grid?.characterWidth() ?: termuxWorkspaceCharWidth(output)
+        val lineHeight = grid?.lineHeight() ?: termuxWorkspaceLineHeight(output)
+        val cols = if (width > 0) (width / charWidth).toInt() else termuxWorkspaceLastCols
+        val rows = if (height > 0) height / max(1, lineHeight) else termuxWorkspaceLastRows
+        val geometry = TermuxWorkspaceGeometry(
+            max(TERMUX_WORKSPACE_MIN_COLS, min(TERMUX_WORKSPACE_MAX_COLS, cols)),
+            max(TERMUX_WORKSPACE_MIN_ROWS, min(TERMUX_WORKSPACE_MAX_ROWS, rows))
+        )
+        applyTermuxWorkspaceCellViewport(geometry, charWidth, lineHeight)
+        return geometry
+    }
+
+    private fun visibleTermuxWorkspaceHostHeight(host: View?): Int {
+        if (host == null) {
+            return 0
+        }
+        val rawHeight = host.height
+        if (rawHeight <= 0 || !imeInsetVisible || imeBottomOffset <= 0) {
+            return max(0, rawHeight)
+        }
+        val root = termuxWorkspaceRoot ?: mRootView ?: return max(0, rawHeight)
+        if (root.height <= 0) {
+            return max(0, rawHeight)
+        }
+        val rootLocation = IntArray(2)
+        val hostLocation = IntArray(2)
+        root.getLocationInWindow(rootLocation)
+        host.getLocationInWindow(hostLocation)
+        val visibleRootBottom = rootLocation[1] + root.height - imeBottomOffset
+        val visibleHeight = visibleRootBottom - hostLocation[1]
+        return max(0, min(rawHeight, visibleHeight))
+    }
+
+    private fun termuxWorkspaceCharWidth(output: TextView?): Float {
+        return if (output != null) {
+            max(1f, output.paint.measureText("M"))
+        } else {
+            max(1f, UIUtils.dpToPx(mContext!!, 8).toFloat())
+        }
+    }
+
+    private fun termuxWorkspaceLineHeight(output: TextView?): Int {
+        if (output == null) {
+            return UIUtils.dpToPx(mContext!!, 18)
+        }
+        val baseLineHeight = max(1, output.lineHeight)
+        val fallbackLineHeight = max(
+            baseLineHeight,
+            (baseLineHeight * TERMUX_WORKSPACE_LINE_HEIGHT_FALLBACK_MULTIPLIER).roundToInt()
+        )
+        val sampledLineHeight = try {
+            val layout = StaticLayout.Builder.obtain(
+                TERMUX_WORKSPACE_LINE_HEIGHT_SAMPLE,
+                0,
+                TERMUX_WORKSPACE_LINE_HEIGHT_SAMPLE.length,
+                output.paint,
+                max(1, output.paint.measureText("MMMM").roundToInt())
+            )
+                .setAlignment(Layout.Alignment.ALIGN_NORMAL)
+                .setLineSpacing(0f, 1f)
+                .setIncludePad(false)
+                .build()
+            var previousBottom = 0
+            var measuredLineHeight = baseLineHeight
+            for (index in 0 until layout.lineCount) {
+                val bottom = layout.getLineBottom(index)
+                measuredLineHeight = max(measuredLineHeight, bottom - previousBottom)
+                previousBottom = bottom
+            }
+            measuredLineHeight
+        } catch (ignored: Exception) {
+            baseLineHeight
+        }
+        return max(fallbackLineHeight, max(sampledLineHeight, termuxWorkspaceMeasuredLineHeight))
+    }
+
+    private fun applyTermuxWorkspaceCellViewport(
+        geometry: TermuxWorkspaceGeometry,
+        charWidth: Float,
+        lineHeight: Int
+    ) {
+        if (Looper.myLooper() != Looper.getMainLooper()) {
+            return
+        }
+        val output = termuxWorkspaceGrid ?: termuxWorkspaceOutput ?: return
+        val targetWidth = max(1, (geometry.cols * charWidth).roundToInt())
+        val targetHeight = max(1, geometry.rows * lineHeight)
+        output.minimumWidth = targetWidth
+        output.minimumHeight = targetHeight
+        val params = output.layoutParams ?: return
+        var changed = false
+        if (params.width != targetWidth) {
+            params.width = targetWidth
+            changed = true
+        }
+        if (params.height != targetHeight) {
+            params.height = targetHeight
+            changed = true
+        }
+        if (changed) {
+            output.layoutParams = params
+        }
+        output.requestLayout()
+        termuxWorkspaceScroll?.requestLayout()
+        termuxWorkspaceOutputPanel?.requestLayout()
     }
 
     private fun dispatchTermuxWorkspaceScript(action: String, script: String, echoFailure: Boolean): Boolean {
@@ -2424,8 +3275,9 @@ class UIManager(
 
     private fun buildTermuxWorkspaceCaptureScript(): String {
         return buildTermuxWorkspacePreambleScript() + "\n" +
-                buildTermuxWorkspaceBridgeScript("capture") + "\n" +
+                buildTermuxWorkspaceBridgeScript("socket-start") + "\n" +
                 buildTermuxWorkspaceEnsureScript() + "\n" +
+                buildTermuxWorkspaceResizeScript() + "\n" +
                 buildTermuxWorkspaceFrameScript()
     }
 
@@ -2439,7 +3291,9 @@ class UIManager(
         }
         return buildTermuxWorkspacePreambleScript() + "\n" +
                 buildTermuxWorkspaceBridgeScript("send", "RETUI_INPUT", input) + "\n" +
-                buildTermuxWorkspaceEnsureScript() + "\n" + send + "\nsleep 0.25\n" +
+                buildTermuxWorkspaceEnsureScript() + "\n" +
+                buildTermuxWorkspaceResizeScript() + "\n" +
+                send + "\nsleep 0.25\n" +
                 buildTermuxWorkspaceFrameScript()
     }
 
@@ -2450,6 +3304,7 @@ class UIManager(
         return buildTermuxWorkspacePreambleScript() + "\n" +
                 buildTermuxWorkspaceBridgeScript("new", "RETUI_WINDOW_NAME", name) + "\n" +
                 buildTermuxWorkspaceEnsureScript() + "\n" +
+                buildTermuxWorkspaceResizeScript() + "\n" +
                 buildTermuxWorkspaceTmuxCommand("new-window -t " + session + nameArg + " -c " + home) + "\n" +
                 "sleep 0.15\n" +
                 buildTermuxWorkspaceFrameScript()
@@ -2461,8 +3316,20 @@ class UIManager(
         return buildTermuxWorkspacePreambleScript() + "\n" +
                 buildTermuxWorkspaceBridgeScript("switch", "RETUI_DIRECTION", direction) + "\n" +
                 buildTermuxWorkspaceEnsureScript() + "\n" +
+                buildTermuxWorkspaceResizeScript() + "\n" +
                 "tmux select-window -t " + session + " " + flag + "\n" +
                 "sleep 0.1\n" +
+                buildTermuxWorkspaceFrameScript()
+    }
+
+    private fun buildTermuxWorkspaceKeyScript(key: String): String {
+        val session = shellQuote(TERMUX_WORKSPACE_SESSION)
+        return buildTermuxWorkspacePreambleScript() + "\n" +
+                buildTermuxWorkspaceBridgeScript("key", "RETUI_KEY", key) + "\n" +
+                buildTermuxWorkspaceEnsureScript() + "\n" +
+                buildTermuxWorkspaceResizeScript() + "\n" +
+                "tmux send-keys -t " + session + " -- " + shellQuote(key) + "\n" +
+                "sleep 0.08\n" +
                 buildTermuxWorkspaceFrameScript()
     }
 
@@ -2479,10 +3346,19 @@ class UIManager(
     }
 
     private fun buildTermuxWorkspaceBridgeScript(action: String, envName: String?, envValue: String?): String {
-        val env = if (envName == null) "" else envName + "=" + shellQuote(envValue ?: Tuils.EMPTYSTRING) + " "
+        val env = StringBuilder()
+        val geometry = calculateTermuxWorkspaceGeometry()
+        env.append("RETUI_COLS=").append(shellQuote(geometry.cols.toString())).append(' ')
+        env.append("RETUI_ROWS=").append(shellQuote(geometry.rows.toString())).append(' ')
+        env.append("RETUI_SOCKET_NAME=").append(shellQuote(TERMUX_WORKSPACE_SOCKET_NAME)).append(' ')
+        if (envName != null) {
+            env.append(envName).append('=').append(shellQuote(envValue ?: Tuils.EMPTYSTRING)).append(' ')
+        }
+        env.append("RETUI_TCP_PORT=").append(shellQuote(TERMUX_WORKSPACE_TCP_PORT.toString())).append(' ')
         return ("if command -v retui >/dev/null 2>&1; then\n"
                 + "  RETUI_SESSION=" + shellQuote(TERMUX_WORKSPACE_SESSION) + " " + env + "retui bridge " + action + "\n"
-                + "  exit \$?\n"
+                + "  retui_status=\$?\n"
+                + "  if [ \"\$retui_status\" -eq 0 ]; then exit 0; fi\n"
                 + "fi")
     }
 
@@ -2501,6 +3377,13 @@ class UIManager(
                 + "fi")
     }
 
+    private fun buildTermuxWorkspaceResizeScript(): String {
+        val session = shellQuote(TERMUX_WORKSPACE_SESSION)
+        val geometry = calculateTermuxWorkspaceGeometry()
+        return ("tmux resize-window -t " + session + " -x " + geometry.cols + " -y " + geometry.rows + " 2>/dev/null || true\n"
+                + "tmux resize-pane -t " + session + " -x " + geometry.cols + " -y " + geometry.rows + " 2>/dev/null || true")
+    }
+
     private fun buildTermuxWorkspaceTmuxCommand(tmuxArgs: String): String {
         return ("if [ \"\${retui_workspace_shell##*/}\" = \"bash\" ]; then\n"
                 + "  tmux " + tmuxArgs + " \"\$retui_workspace_shell\" --noprofile --norc\n"
@@ -2516,7 +3399,13 @@ class UIManager(
                 + "printf '%s ' '__RETUI_WINDOWS__'\n"
                 + "tmux list-windows -t " + session + " -F '#I:#W#{?window_active,*,}' | tr '\\n' ' '\n"
                 + "printf '\\n'\n"
-                + "tmux capture-pane -t " + session + " -p")
+                + "printf '%s %s\\n' '__RETUI_COLS__' '" + calculateTermuxWorkspaceGeometry().cols + "'\n"
+                + "printf '%s %s\\n' '__RETUI_ROWS__' '" + calculateTermuxWorkspaceGeometry().rows + "'\n"
+                + "printf '%s ' '__RETUI_CURSOR__'\n"
+                + "tmux display-message -p -t " + session + " '#{cursor_x}:#{cursor_y}' 2>/dev/null || printf '%s\\n' '0:0'\n"
+                + "printf '%s\\n' '__RETUI_FRAME_BEGIN__'\n"
+                + "tmux capture-pane -t " + session + " -p -e -N\n"
+                + "printf '%s\\n' '__RETUI_FRAME_END__'")
     }
 
     private fun renderTermuxWorkspaceStatus(status: String?) {
@@ -2546,6 +3435,18 @@ class UIManager(
             termuxWorkspaceAcceptedSequence = max(termuxWorkspaceAcceptedSequence, sequence)
         }
         val parsed = parseTermuxWorkspaceFrame(stdout)
+        if (!TextUtils.isEmpty(parsed.socketName) && !TextUtils.isEmpty(parsed.socketToken)) {
+            startTermuxWorkspaceSocketClient(parsed)
+        }
+        updateTermuxWorkspaceChrome(parsed)
+        val hasDiagnostics = (exitCode != Int.MIN_VALUE && exitCode != 0)
+                || !TextUtils.isEmpty(stderr)
+                || !TextUtils.isEmpty(error)
+                || !TextUtils.isEmpty(debug)
+        if (!hasDiagnostics && parsed.frame != null) {
+            updateTermuxWorkspaceOutput(parsed.frame, parsed.cursorX, parsed.cursorY, parsed.cols, parsed.rows)
+            return
+        }
         val out = StringBuilder()
         out.append("Re:T-UI tmux workspace").append('\n')
         out.append("session: ").append(TERMUX_WORKSPACE_SESSION).append('\n')
@@ -2561,6 +3462,9 @@ class UIManager(
         }
         if (!TextUtils.isEmpty(parsed.windows)) {
             out.append("windows: ").append(parsed.windows).append('\n')
+        }
+        if (!TextUtils.isEmpty(parsed.socketProtocol)) {
+            out.append("socket: ").append(parsed.socketProtocol).append('\n')
         }
         if (exitCode != Int.MIN_VALUE && exitCode != 0) {
             out.append("exit: ").append(exitCode).append('\n')
@@ -2578,8 +3482,72 @@ class UIManager(
         if (!TextUtils.isEmpty(parsed.frame)) {
             out.append('\n').append(parsed.frame)
         }
-        updateTermuxWorkspaceChrome(parsed)
         updateTermuxWorkspaceOutput(out.toString())
+    }
+
+    private fun startTermuxWorkspaceSocketClient(frame: TermuxWorkspaceFrame) {
+        val socketName = frame.socketName ?: return
+        val token = frame.socketToken ?: return
+        val current = termuxWorkspaceSocketClient
+        if (current != null && current.connected
+            && socketName == termuxWorkspaceSocketName
+            && token == termuxWorkspaceSocketToken
+        ) {
+            refreshTermuxWorkspaceSocketGeometry(true)
+            return
+        }
+
+        stopTermuxWorkspaceSocketClient()
+        termuxWorkspaceSocketName = socketName
+        termuxWorkspaceSocketToken = token
+        val geometry = calculateTermuxWorkspaceGeometry()
+        termuxWorkspaceLastCols = geometry.cols
+        termuxWorkspaceLastRows = geometry.rows
+        val client = TermuxWorkspaceSocketClient(object : TermuxWorkspaceSocketClient.Listener {
+            override fun onFrame(frame: String) {
+                runOnUiThread(Runnable {
+                    val parsed = parseTermuxWorkspaceFrame(frame)
+                    updateTermuxWorkspaceChrome(parsed)
+                    updateTermuxWorkspaceOutput(
+                        parsed.frame ?: Tuils.EMPTYSTRING,
+                        parsed.cursorX,
+                        parsed.cursorY,
+                        parsed.cols,
+                        parsed.rows
+                    )
+                })
+            }
+
+            override fun onStatus(status: String) {
+                if (!TextUtils.isEmpty(status) && !"ok".equals(status, ignoreCase = true)) {
+                    runOnUiThread(Runnable { renderTermuxWorkspaceStatus("socket: $status") })
+                }
+            }
+
+            override fun onError(message: String) {
+                runOnUiThread(Runnable {
+                    renderTermuxWorkspaceStatus("socket bridge error: $message")
+                })
+            }
+
+            override fun onClosed() {
+                runOnUiThread(Runnable {
+                    if (socketName == termuxWorkspaceSocketName && token == termuxWorkspaceSocketToken) {
+                        termuxWorkspaceSocketClient = null
+                    }
+                })
+            }
+        })
+        termuxWorkspaceSocketClient = client
+        client.connect(socketName, token, geometry.cols, geometry.rows, frame.tcpHost, frame.tcpPort, true)
+    }
+
+    private fun stopTermuxWorkspaceSocketClient() {
+        termuxWorkspaceSocketClient?.close()
+        termuxWorkspaceSocketClient = null
+        termuxWorkspaceSocketName = null
+        termuxWorkspaceSocketToken = null
+        termuxWorkspaceLastRenderedFrameKey = null
     }
 
     private fun termuxWorkspaceResultSequence(label: String): Int {
@@ -2600,13 +3568,22 @@ class UIManager(
 
     private fun parseTermuxWorkspaceFrame(stdout: String?): TermuxWorkspaceFrame {
         if (TextUtils.isEmpty(stdout)) {
-            return TermuxWorkspaceFrame(null, null, null, null, null)
+            return TermuxWorkspaceFrame(null, null, null, null, null, null, null, null, null, null, null, null, null, null)
         }
         val frame = StringBuilder()
         var window: String? = null
         var windows: String? = null
         var bridge: String? = null
         var version: String? = null
+        var socketProtocol: String? = null
+        var socketName: String? = null
+        var socketToken: String? = null
+        var tcpHost: String? = null
+        var tcpPort: Int? = null
+        var cols: Int? = null
+        var rows: Int? = null
+        var cursorX: Int? = null
+        var cursorY: Int? = null
         var hasFrameMarkers = false
         val lines = stdout!!.split("\n".toRegex()).dropLastWhile { it.isEmpty() }
         for (line in lines) {
@@ -2618,6 +3595,26 @@ class UIManager(
                 bridge = line.substring("__RETUI_BRIDGE__".length).trim { it <= ' ' }
             } else if (line.startsWith("__RETUI_VERSION__")) {
                 version = line.substring("__RETUI_VERSION__".length).trim { it <= ' ' }
+            } else if (line.startsWith("__RETUI_SOCKET__")) {
+                socketProtocol = line.substring("__RETUI_SOCKET__".length).trim { it <= ' ' }
+            } else if (line.startsWith("__RETUI_SOCKET_NAME__")) {
+                socketName = line.substring("__RETUI_SOCKET_NAME__".length).trim { it <= ' ' }
+            } else if (line.startsWith("__RETUI_TOKEN__")) {
+                socketToken = line.substring("__RETUI_TOKEN__".length).trim { it <= ' ' }
+            } else if (line.startsWith("__RETUI_TCP_HOST__")) {
+                tcpHost = line.substring("__RETUI_TCP_HOST__".length).trim { it <= ' ' }
+            } else if (line.startsWith("__RETUI_TCP_PORT__")) {
+                tcpPort = line.substring("__RETUI_TCP_PORT__".length).trim { it <= ' ' }.toIntOrNull()
+            } else if (line.startsWith("__RETUI_COLS__")) {
+                cols = line.substring("__RETUI_COLS__".length).trim { it <= ' ' }.toIntOrNull()
+            } else if (line.startsWith("__RETUI_ROWS__")) {
+                rows = line.substring("__RETUI_ROWS__".length).trim { it <= ' ' }.toIntOrNull()
+            } else if (line.startsWith("__RETUI_CURSOR__")) {
+                val cursor = parseTermuxWorkspaceCursor(
+                    line.substring("__RETUI_CURSOR__".length).trim { it <= ' ' }
+                )
+                cursorX = cursor?.first
+                cursorY = cursor?.second
             } else if (line.startsWith("__RETUI_FRAME_BEGIN__")) {
                 hasFrameMarkers = true
             } else if (line.startsWith("__RETUI_FRAME_END__")) {
@@ -2631,7 +3628,32 @@ class UIManager(
                 frame.append(line)
             }
         }
-        return TermuxWorkspaceFrame(bridge, version, window, windows, stripTermuxAnsi(frame.toString())?.trimEnd { it <= ' ' })
+        return TermuxWorkspaceFrame(
+            bridge,
+            version,
+            window,
+            windows,
+            frame.toString(),
+            socketProtocol,
+            socketName,
+            socketToken,
+            tcpHost,
+            tcpPort,
+            cols,
+            rows,
+            cursorX,
+            cursorY
+        )
+    }
+
+    private fun parseTermuxWorkspaceCursor(value: String): Pair<Int, Int>? {
+        val parts = value.replace(':', ' ').split(" ").filter { it.isNotEmpty() }
+        if (parts.size < 2) {
+            return null
+        }
+        val x = parts[0].toIntOrNull() ?: return null
+        val y = parts[1].toIntOrNull() ?: return null
+        return Pair(max(0, x), max(0, y))
     }
 
     private fun updateTermuxWorkspaceChrome(frame: TermuxWorkspaceFrame) {
@@ -2655,21 +3677,326 @@ class UIManager(
         return if (clean.length <= 42) clean else clean.substring(0, 39) + "..."
     }
 
-    private fun updateTermuxWorkspaceOutput(value: String?) {
+    private fun updateTermuxWorkspaceOutput(
+        value: String?,
+        cursorX: Int? = null,
+        cursorY: Int? = null,
+        frameCols: Int? = null,
+        frameRows: Int? = null
+    ) {
         termuxWorkspaceBuffer.setLength(0)
-        if (value != null && value.length > TERMUX_WORKSPACE_MAX_OUTPUT_CHARS) {
-            termuxWorkspaceBuffer.append(value.substring(value.length - TERMUX_WORKSPACE_MAX_OUTPUT_CHARS))
-        } else if (value != null) {
-            termuxWorkspaceBuffer.append(value)
+        val raw = if (value != null && value.length > TERMUX_WORKSPACE_MAX_OUTPUT_CHARS) {
+            value.substring(value.length - TERMUX_WORKSPACE_MAX_OUTPUT_CHARS)
+        } else {
+            value
         }
-        termuxWorkspaceOutput?.setText(termuxWorkspaceBuffer.toString())
-        termuxWorkspaceScroll?.post(Runnable {
-            val scroll = termuxWorkspaceScroll ?: return@Runnable
-            val scrollChild = scroll.getChildAt(0)
-            if (scrollChild != null) {
-                scroll.scrollTo(0, scrollChild.getBottom())
+        val geometry = calculateTermuxWorkspaceGeometry()
+        val cols = frameCols ?: geometry.cols
+        val rows = frameRows ?: geometry.rows
+        val frameKey = cols.toString() + "x" + rows + ":" + (cursorX?.toString() ?: "-") + ":" + (cursorY?.toString() ?: "-") + "\n" + (raw ?: Tuils.EMPTYSTRING)
+        if (frameKey == termuxWorkspaceLastRenderedFrameKey) {
+            return
+        }
+        termuxWorkspaceLastRenderedFrameKey = frameKey
+        if (raw != null) {
+            termuxWorkspaceBuffer.append(raw)
+        }
+        val grid = termuxWorkspaceGrid
+        if (grid != null) {
+            grid.visibility = View.VISIBLE
+            termuxWorkspaceOutput?.visibility = View.GONE
+            grid.setFrame(raw, cols, rows, cursorX, cursorY)
+        } else {
+            val rendered = renderTermuxWorkspaceAnsi(raw)
+            applyTermuxWorkspaceCursor(rendered, cursorX, cursorY)
+            termuxWorkspaceOutput?.visibility = View.VISIBLE
+            termuxWorkspaceOutput?.setText(rendered)
+        }
+        updateTermuxWorkspaceMeasuredLineHeight()
+        resetTermuxWorkspaceViewportOrigin()
+        termuxWorkspaceScroll?.post(Runnable { resetTermuxWorkspaceViewportOrigin() })
+    }
+
+    private fun updateTermuxWorkspaceMeasuredLineHeight() {
+        val grid = termuxWorkspaceGrid
+        if (grid != null) {
+            val lineHeight = grid.lineHeight()
+            if (lineHeight > termuxWorkspaceMeasuredLineHeight) {
+                termuxWorkspaceMeasuredLineHeight = lineHeight
+                refreshTermuxWorkspaceSocketGeometry(true)
+            }
+            return
+        }
+        val output = termuxWorkspaceOutput ?: return
+        output.post(Runnable {
+            val layout = output.layout ?: return@Runnable
+            if (layout.lineCount <= 0) {
+                return@Runnable
+            }
+            var previousBottom = 0
+            var maxLineHeight = 0
+            val linesToCheck = min(layout.lineCount, TERMUX_WORKSPACE_LINE_HEIGHT_MAX_SAMPLE_LINES)
+            for (index in 0 until linesToCheck) {
+                val bottom = layout.getLineBottom(index)
+                maxLineHeight = max(maxLineHeight, bottom - previousBottom)
+                previousBottom = bottom
+            }
+            if (maxLineHeight > termuxWorkspaceMeasuredLineHeight) {
+                termuxWorkspaceMeasuredLineHeight = maxLineHeight
+                refreshTermuxWorkspaceSocketGeometry(true)
             }
         })
+    }
+
+    private fun resetTermuxWorkspaceViewportOrigin() {
+        termuxWorkspaceOutput?.scrollTo(0, 0)
+        termuxWorkspaceScroll?.scrollTo(0, 0)
+    }
+
+    private fun renderTermuxWorkspaceAnsi(value: String?): SpannableStringBuilder {
+        val out = SpannableStringBuilder()
+        if (TextUtils.isEmpty(value)) {
+            return out
+        }
+        val baseForeground = notificationWidgetTextColor()
+        val baseBackground = terminalWindowBackground()
+        val style = TermuxAnsiStyle()
+        var spanStart = 0
+        var index = 0
+        val text = value!!
+        while (index < text.length) {
+            val ch = text[index]
+            if (ch == '\u001B' && index + 1 < text.length && text[index + 1] == '[') {
+                val end = findTermuxAnsiSequenceEnd(text, index + 2)
+                if (end > index) {
+                    applyTermuxAnsiSpan(out, spanStart, out.length, style, baseForeground, baseBackground)
+                    if (text[end] == 'm') {
+                        updateTermuxAnsiStyle(style, text.substring(index + 2, end))
+                    }
+                    spanStart = out.length
+                    index = end + 1
+                    continue
+                }
+            }
+            if (ch != '\r') {
+                out.append(ch)
+            }
+            index++
+        }
+        applyTermuxAnsiSpan(out, spanStart, out.length, style, baseForeground, baseBackground)
+        return out
+    }
+
+    private fun applyTermuxWorkspaceCursor(out: SpannableStringBuilder, cursorX: Int?, cursorY: Int?) {
+        if (out.isEmpty() || cursorX == null || cursorY == null) {
+            return
+        }
+        var x = 0
+        var y = 0
+        var index = 0
+        while (index < out.length) {
+            if (x == cursorX && y == cursorY && out[index] != '\n') {
+                out.setSpan(
+                    ForegroundColorSpan(Color.BLACK),
+                    index,
+                    index + 1,
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+                out.setSpan(
+                    BackgroundColorSpan(notificationWidgetTextColor()),
+                    index,
+                    index + 1,
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+                return
+            }
+            if (out[index] == '\n') {
+                y++
+                x = 0
+            } else {
+                x++
+            }
+            index++
+        }
+    }
+
+    private fun findTermuxAnsiSequenceEnd(text: String, start: Int): Int {
+        var index = start
+        while (index < text.length) {
+            val code = text[index].code
+            if (code in 0x40..0x7e) {
+                return index
+            }
+            index++
+        }
+        return -1
+    }
+
+    private fun updateTermuxAnsiStyle(style: TermuxAnsiStyle, params: String) {
+        val codes = parseTermuxAnsiCodes(params)
+        if (codes.isEmpty()) {
+            style.reset()
+            return
+        }
+        var index = 0
+        while (index < codes.size) {
+            when (val code = codes[index]) {
+                0 -> style.reset()
+                1 -> style.bold = true
+                22 -> style.bold = false
+                7 -> style.reverse = true
+                27 -> style.reverse = false
+                39 -> style.foreground = null
+                49 -> style.background = null
+                in 30..37 -> style.foreground = termuxAnsiColor(code - 30, false, false)
+                in 90..97 -> style.foreground = termuxAnsiColor(code - 90, true, false)
+                in 40..47 -> style.background = termuxAnsiColor(code - 40, false, true)
+                in 100..107 -> style.background = termuxAnsiColor(code - 100, true, true)
+                38, 48 -> {
+                    val foreground = code == 38
+                    val parsed = parseTermuxExtendedAnsiColor(codes, index + 1, !foreground)
+                    if (parsed != null) {
+                        if (foreground) {
+                            style.foreground = parsed.first
+                        } else {
+                            style.background = parsed.first
+                        }
+                        index = parsed.second
+                    }
+                }
+            }
+            index++
+        }
+    }
+
+    private fun parseTermuxAnsiCodes(params: String): List<Int> {
+        if (params.isEmpty()) {
+            return listOf(0)
+        }
+        val codes = ArrayList<Int>()
+        val parts = params.replace(':', ';').split(";")
+        for (part in parts) {
+            codes.add(part.toIntOrNull() ?: 0)
+        }
+        return codes
+    }
+
+    private fun parseTermuxExtendedAnsiColor(codes: List<Int>, start: Int, background: Boolean): Pair<Int, Int>? {
+        if (start >= codes.size) {
+            return null
+        }
+        return when (codes[start]) {
+            5 -> {
+                if (start + 1 >= codes.size) null
+                else Pair(termuxAnsi256Color(codes[start + 1], background), start + 1)
+            }
+            2 -> {
+                if (start + 3 >= codes.size) null
+                else Pair(
+                    Color.rgb(
+                        codes[start + 1].coerceIn(0, 255),
+                        codes[start + 2].coerceIn(0, 255),
+                        codes[start + 3].coerceIn(0, 255)
+                    ),
+                    start + 3
+                )
+            }
+            else -> null
+        }
+    }
+
+    private fun applyTermuxAnsiSpan(
+        out: SpannableStringBuilder,
+        start: Int,
+        end: Int,
+        style: TermuxAnsiStyle,
+        baseForeground: Int,
+        baseBackground: Int
+    ) {
+        if (start >= end) {
+            return
+        }
+        var foreground = style.foreground ?: baseForeground
+        var background = style.background
+        if (style.reverse) {
+            val originalForeground = foreground
+            foreground = background ?: Color.BLACK
+            background = originalForeground
+        }
+        if (foreground != baseForeground || style.reverse || style.foreground != null) {
+            out.setSpan(ForegroundColorSpan(foreground), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+        if (background != null && background != baseBackground) {
+            out.setSpan(BackgroundColorSpan(background), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+        if (style.bold) {
+            out.setSpan(StyleSpan(Typeface.BOLD), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+    }
+
+    private fun termuxAnsiColor(index: Int, bright: Boolean, background: Boolean): Int {
+        val clean = index.coerceIn(0, 7)
+        val bg = terminalWindowBackground()
+        val fg = notificationWidgetTextColor()
+        val accent = terminalBorderColor()
+        if (background) {
+            val panel = ColorUtils.blendARGB(bg, accent, if (bright) 0.34f else 0.22f)
+            val active = ColorUtils.blendARGB(accent, fg, if (bright) 0.30f else 0.12f)
+            return when (clean) {
+                0 -> bg
+                1 -> ColorUtils.blendARGB(bg, Color.rgb(190, 62, 62), if (bright) 0.42f else 0.26f)
+                2 -> ColorUtils.blendARGB(bg, accent, if (bright) 0.42f else 0.28f)
+                3 -> ColorUtils.blendARGB(bg, fg, if (bright) 0.32f else 0.18f)
+                4 -> panel
+                5 -> ColorUtils.blendARGB(bg, accent, if (bright) 0.48f else 0.32f)
+                6 -> active
+                else -> ColorUtils.blendARGB(bg, fg, if (bright) 0.38f else 0.24f)
+            }
+        }
+        return when (clean) {
+            0 -> Color.BLACK
+            1 -> ColorUtils.blendARGB(fg, Color.rgb(255, 70, 70), if (bright) 0.55f else 0.34f)
+            2 -> ColorUtils.blendARGB(accent, fg, if (bright) 0.28f else 0.10f)
+            3 -> ColorUtils.blendARGB(fg, accent, if (bright) 0.42f else 0.24f)
+            4 -> ColorUtils.blendARGB(fg, accent, if (bright) 0.42f else 0.25f)
+            5 -> ColorUtils.blendARGB(accent, Color.rgb(220, 150, 255), if (bright) 0.36f else 0.20f)
+            6 -> ColorUtils.blendARGB(accent, fg, if (bright) 0.32f else 0.16f)
+            else -> fg
+        }
+    }
+
+    private fun termuxAnsi256Color(code: Int, background: Boolean): Int {
+        val clean = code.coerceIn(0, 255)
+        if (clean < 16) {
+            return termuxAnsiColor(clean % 8, clean >= 8, background)
+        }
+        if (clean in 16..231) {
+            val value = clean - 16
+            val red = value / 36
+            val green = (value / 6) % 6
+            val blue = value % 6
+            return Color.rgb(termuxAnsiCubeValue(red), termuxAnsiCubeValue(green), termuxAnsiCubeValue(blue))
+        }
+        val gray = 8 + (clean - 232) * 10
+        return Color.rgb(gray, gray, gray)
+    }
+
+    private fun termuxAnsiCubeValue(value: Int): Int {
+        return if (value <= 0) 0 else 55 + value * 40
+    }
+
+    private class TermuxAnsiStyle {
+        var foreground: Int? = null
+        var background: Int? = null
+        var bold: Boolean = false
+        var reverse: Boolean = false
+
+        fun reset() {
+            foreground = null
+            background = null
+            bold = false
+            reverse = false
+        }
     }
 
     private class TermuxWorkspaceFrame(
@@ -2677,7 +4004,35 @@ class UIManager(
         val version: String?,
         val window: String?,
         val windows: String?,
-        val frame: String?
+        val frame: String?,
+        val socketProtocol: String?,
+        val socketName: String?,
+        val socketToken: String?,
+        val tcpHost: String?,
+        val tcpPort: Int?,
+        val cols: Int?,
+        val rows: Int?,
+        val cursorX: Int?,
+        val cursorY: Int?
+    )
+
+    private class TermuxWorkspaceGeometry(
+        val cols: Int,
+        val rows: Int
+    )
+
+    private enum class TermuxWorkspaceModifier {
+        CTRL,
+        ALT,
+        SHIFT
+    }
+
+    private class TermuxWorkspaceKeySpec(
+        val label: String,
+        val keyName: String?,
+        val modifier: TermuxWorkspaceModifier?,
+        val togglesMode: Boolean,
+        val refreshes: Boolean
     )
 
     private fun pruneBundledLuaSamples() {
@@ -2714,6 +4069,109 @@ class UIManager(
         }
         addModuleDockButton("close")
         restyleAllModuleDockButtons()
+    }
+
+    private fun setupModuleSuggestionsStrip() {
+        moduleSuggestionsScroll = mRootView?.findViewById(R.id.module_suggestions_container)
+        moduleSuggestionsGroup = mRootView?.findViewById(R.id.module_suggestions_group)
+        if (moduleSuggestionsScroll == null || moduleSuggestionsGroup == null) {
+            return
+        }
+        val stripBackground = ColorUtils.blendARGB(terminalWindowBackground(), Color.BLACK, 0.12f)
+        moduleSuggestionsScroll!!.setFocusable(false)
+        Companion.applyBgRect(
+            mContext!!,
+            moduleSuggestionsScroll!!,
+            String.format("#%08X", stripBackground),
+            margins[SUGGESTIONS_MARGINS_INDEX]!!,
+            genericBorderCornerRadius,
+            useDashed,
+            ColorUtils.setAlphaComponent(terminalBorderColor(), 175),
+            true
+        )
+        hideModuleSuggestionsStrip()
+    }
+
+    private fun refreshStockSuggestions() {
+        if (suggestionsManager != null && mTerminalAdapter != null) {
+            suggestionsManager!!.requestSuggestion(mTerminalAdapter!!.input)
+        }
+    }
+
+    private fun refreshModuleSuggestionsStrip() {
+        val scroll = moduleSuggestionsScroll
+        val group = moduleSuggestionsGroup
+        if (scroll == null || group == null) {
+            return
+        }
+        val context = mContext ?: return
+        group.removeAllViews()
+        if (!XMLPrefsManager.getBoolean(Suggestions.show_suggestions) || TextUtils.isEmpty(activeModule)) {
+            hideModuleSuggestionsStrip()
+            return
+        }
+        val suggestions = ModuleManager.getActiveSuggestions(mContext).filterNotNull()
+            .filter { suggestion ->
+                ModuleManager.ModuleSuggestion.MODE_COMMAND == suggestion.mode
+                        && !TextUtils.isEmpty(suggestion.label)
+                        && !TextUtils.isEmpty(suggestion.action)
+            }
+        if (suggestions.isEmpty()) {
+            hideModuleSuggestionsStrip()
+            return
+        }
+        val suggestionSpaces = XMLPrefsManager.getListOfIntValues(
+            XMLPrefsManager.get(Suggestions.suggestions_spaces),
+            4,
+            0
+        )
+        val horizontalPadding = suggestionSpaces[2]
+        val verticalPadding = suggestionSpaces[3]
+        val textSize = XMLPrefsManager.getInt(Suggestions.suggestions_size).toFloat()
+        for (suggestion in suggestions) {
+            val chip = TextView(context)
+            chip.text = suggestion.label
+            chip.gravity = Gravity.CENTER
+            chip.setLines(1)
+            chip.maxLines = 1
+            chip.ellipsize = TextUtils.TruncateAt.END
+            chip.minWidth = Tuils.dpToPx(context, 56)
+            chip.setPadding(
+                horizontalPadding,
+                verticalPadding,
+                horizontalPadding,
+                verticalPadding
+            )
+            chip.setTypeface(Tuils.getTypeface(context), Typeface.BOLD)
+            chip.setTextColor(notificationWidgetTextColor())
+            chip.textSize = textSize
+            chip.setBackground(
+                TerminalBorderRuntime.tabDrawable(context, terminalHeaderTabBackground())
+            )
+            chip.setOnClickListener(View.OnClickListener { v: View? ->
+                mTerminalAdapter?.executeQuietly(suggestion.action, suggestion.action)
+                refreshSuggestionsForActiveModule()
+            })
+            val params = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            params.setMargins(
+                suggestionSpaces[0],
+                suggestionSpaces[1],
+                suggestionSpaces[0],
+                suggestionSpaces[1]
+            )
+            params.gravity = Gravity.CENTER_VERTICAL
+            group.addView(chip, params)
+        }
+        scroll.visibility = View.VISIBLE
+        scroll.post(Runnable { scroll.fullScroll(View.FOCUS_LEFT) })
+    }
+
+    private fun hideModuleSuggestionsStrip() {
+        moduleSuggestionsGroup?.removeAllViews()
+        moduleSuggestionsScroll?.visibility = View.GONE
     }
 
     private fun addModuleDockButton(module: String?) {
@@ -3820,6 +5278,7 @@ class UIManager(
     }
 
     private fun refreshSuggestionsForActiveModule() {
+        refreshModuleSuggestionsStrip()
         if (suggestionsManager != null && mTerminalAdapter != null && TextUtils.isEmpty(
                 mTerminalAdapter!!.input
             )
@@ -4410,6 +5869,7 @@ class UIManager(
         termuxWindowBorder = rootView.findViewById<View?>(R.id.termux_window_border)
         termuxWindowLabel = rootView.findViewById<TextView?>(R.id.termux_window_label)
         termuxClose = rootView.findViewById<TextView?>(R.id.termux_close)
+        termuxGrid = rootView.findViewById<TerminalGridView?>(R.id.termux_output_grid)
         termuxOutput = rootView.findViewById<TextView?>(R.id.termux_output)
         termuxRichOutput = rootView.findViewById<LinearLayout?>(R.id.termux_rich_output)
         termuxPrefix = rootView.findViewById<TextView?>(R.id.termux_prefix)
@@ -4467,51 +5927,369 @@ class UIManager(
                     false
                 }
             })
+            termuxInput!!.addTextChangedListener(object : TextWatcher {
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    termuxInsertedStart = -1
+                    termuxInsertedText = null
+                    if (termuxSuppressInputWatcher || termuxAppSession == null || !hasTermuxAppPendingModifiers()) {
+                        return
+                    }
+                    if (before == 0 && count == 1 && s != null && start >= 0 && start + count <= s.length) {
+                        termuxInsertedStart = start
+                        termuxInsertedText = s.subSequence(start, start + count).toString()
+                    }
+                }
+
+                override fun afterTextChanged(s: Editable?) {
+                    consumeTermuxAppInsertedCombo(s)
+                }
+            })
         }
 
         bindTermuxExtraKeys(rootView)
     }
 
     private fun bindTermuxExtraKeys(rootView: View) {
-        bindTermuxKey(rootView, R.id.termux_key_esc, Runnable { this.handleTermuxEscapeKey() })
-        bindTermuxKey(rootView, R.id.termux_key_slash, Runnable { insertIntoTermuxInput("/") })
-        bindTermuxKey(rootView, R.id.termux_key_dash, Runnable { insertIntoTermuxInput("-") })
-        bindTermuxKey(rootView, R.id.termux_key_home, Runnable {
-            moveTermuxInputCursorToBoundary(
-                true
-            )
-        })
-        bindTermuxKey(rootView, R.id.termux_key_up, Runnable { recallTermuxHistory(-1) })
-        bindTermuxKey(rootView, R.id.termux_key_end, Runnable {
-            moveTermuxInputCursorToBoundary(
-                false
-            )
-        })
-        bindTermuxKey(rootView, R.id.termux_key_pgup, Runnable { scrollTermuxOutput(-1) })
-        bindTermuxKey(
-            rootView,
+        termuxKeySlots.clear()
+        val ids = intArrayOf(
+            R.id.termux_key_esc,
+            R.id.termux_key_slash,
+            R.id.termux_key_dash,
+            R.id.termux_key_home,
+            R.id.termux_key_up,
+            R.id.termux_key_end,
+            R.id.termux_key_pgup,
             R.id.termux_key_setup,
-            Runnable { submitTermuxConsoleCommand("setup") })
-        bindTermuxKey(rootView, R.id.termux_key_tab, Runnable { insertIntoTermuxInput("\t") })
-        bindTermuxKey(rootView, R.id.termux_key_ctrl, Runnable { this.interruptTermuxInput() })
-        bindTermuxKey(rootView, R.id.termux_key_alt, Runnable { focusTermuxInput(false) })
-        bindTermuxKey(rootView, R.id.termux_key_left, Runnable { moveTermuxInputCursorBy(-1) })
-        bindTermuxKey(rootView, R.id.termux_key_down, Runnable { recallTermuxHistory(1) })
-        bindTermuxKey(rootView, R.id.termux_key_right, Runnable { moveTermuxInputCursorBy(1) })
-        bindTermuxKey(rootView, R.id.termux_key_pgdn, Runnable { scrollTermuxOutput(1) })
-        bindTermuxKey(rootView, R.id.termux_key_ime, Runnable { this.toggleTermuxKeyboard() })
+            R.id.termux_key_tab,
+            R.id.termux_key_ctrl,
+            R.id.termux_key_alt,
+            R.id.termux_key_left,
+            R.id.termux_key_down,
+            R.id.termux_key_right,
+            R.id.termux_key_pgdn,
+            R.id.termux_key_ime
+        )
+        for (id in ids) {
+            val key = rootView.findViewById<TextView?>(id)
+            if (key != null) {
+                termuxKeySlots.add(key)
+            }
+        }
+        bindTermuxAppKeyModeSwipe(termuxTools)
+        bindTermuxAppKeyModeSwipe(rootView.findViewById<View?>(R.id.termux_keys_row_one))
+        bindTermuxAppKeyModeSwipe(rootView.findViewById<View?>(R.id.termux_keys_row_two))
+        updateTermuxConsoleKeyMode()
     }
 
-    private fun bindTermuxKey(rootView: View, id: Int, action: Runnable?) {
-        val key = rootView.findViewById<TextView?>(id)
-        if (key == null) {
+    private fun updateTermuxConsoleKeyMode() {
+        if (termuxAppSession == null) {
+            bindPlainTermuxConsoleKeys()
+        } else {
+            updateTermuxAppKeyMode()
+        }
+    }
+
+    private fun bindPlainTermuxConsoleKeys() {
+        clearTermuxAppModifiers(false)
+        termuxFnKeyMode = false
+        termuxKeyModeAnimating = false
+        termuxKeySwipeConsumed = false
+        val labels = arrayOf(
+            "ESC", "/", "-", "HOME", "UP", "END", "PGUP", "CFG",
+            "TAB", "CTRL", "ALT", "LEFT", "DOWN", "RIGHT", "PGDN", "IME"
+        )
+        val actions = arrayOf(
+            Runnable { this.handleTermuxEscapeKey() },
+            Runnable { insertIntoTermuxInput("/") },
+            Runnable { insertIntoTermuxInput("-") },
+            Runnable { moveTermuxInputCursorToBoundary(true) },
+            Runnable { recallTermuxHistory(-1) },
+            Runnable { moveTermuxInputCursorToBoundary(false) },
+            Runnable { scrollTermuxOutput(-1) },
+            Runnable { submitTermuxConsoleCommand("setup") },
+            Runnable { insertIntoTermuxInput("\t") },
+            Runnable { this.interruptTermuxInput() },
+            Runnable { focusTermuxInput(false) },
+            Runnable { moveTermuxInputCursorBy(-1) },
+            Runnable { recallTermuxHistory(1) },
+            Runnable { moveTermuxInputCursorBy(1) },
+            Runnable { scrollTermuxOutput(1) },
+            Runnable { this.toggleTermuxKeyboard() }
+        )
+        val color = notificationWidgetTextColor()
+        for (i in termuxKeySlots.indices) {
+            val key = termuxKeySlots[i]
+            val label = labels.getOrNull(i) ?: ""
+            val action = actions.getOrNull(i)
+            key.text = label
+            key.textSize = if (label.length >= 5) 10f else 11f
+            key.alpha = 0.82f
+            styleTermuxToolButton(key, color)
+            key.setOnClickListener(View.OnClickListener { v: View? ->
+                if (action != null) {
+                    action.run()
+                }
+            })
+        }
+    }
+
+    private fun updateTermuxAppKeyMode() {
+        if (termuxKeySlots.isEmpty()) {
             return
         }
-        key.setOnClickListener(View.OnClickListener { v: View? ->
-            if (action != null) {
-                action.run()
+        termuxCtrlKey = null
+        termuxAltKey = null
+        termuxShiftKey = null
+        val specs = if (termuxFnKeyMode) termuxWorkspaceFnKeySpecs() else termuxWorkspaceNavKeySpecs()
+        val normalColor = notificationWidgetTextColor()
+        for (i in termuxKeySlots.indices) {
+            val key = termuxKeySlots[i]
+            val spec = specs.getOrNull(i) ?: continue
+            key.text = spec.label
+            key.textSize = if (spec.label.length >= 5) 10f else 11f
+            key.alpha = 0.82f
+            styleTermuxToolButton(key, normalColor)
+            when (spec.modifier) {
+                TermuxWorkspaceModifier.CTRL -> termuxCtrlKey = key
+                TermuxWorkspaceModifier.ALT -> termuxAltKey = key
+                TermuxWorkspaceModifier.SHIFT -> termuxShiftKey = key
+                null -> {}
+            }
+            key.setOnClickListener(View.OnClickListener { v: View? ->
+                if (termuxKeySwipeConsumed) {
+                    termuxKeySwipeConsumed = false
+                    return@OnClickListener
+                }
+                handleTermuxAppKeySpec(spec)
+            })
+        }
+        updateTermuxAppModifierButtons()
+    }
+
+    private fun handleTermuxAppKeySpec(spec: TermuxWorkspaceKeySpec) {
+        if (termuxAppSession == null) {
+            bindPlainTermuxConsoleKeys()
+            return
+        }
+        if (spec.togglesMode) {
+            setTermuxAppFnKeyMode(!termuxFnKeyMode)
+            return
+        }
+        if (spec.refreshes) {
+            clearTermuxAppModifiers(true)
+            refreshTermuxAppSession(true)
+            scheduleTermuxAppRefreshBurst(termuxAppSession?.id, TERMUX_APP_MANUAL_REFRESH_WATCH_MS)
+            return
+        }
+        when (spec.modifier) {
+            TermuxWorkspaceModifier.CTRL -> termuxCtrlPending = !termuxCtrlPending
+            TermuxWorkspaceModifier.ALT -> termuxAltPending = !termuxAltPending
+            TermuxWorkspaceModifier.SHIFT -> termuxShiftPending = !termuxShiftPending
+            null -> {
+                val keyName = spec.keyName ?: return
+                sendTermuxAppKey(applyTermuxAppModifiers(keyName))
+                return
+            }
+        }
+        updateTermuxAppModifierButtons()
+    }
+
+    private fun setTermuxAppFnKeyMode(enabled: Boolean): Boolean {
+        if (termuxFnKeyMode == enabled) {
+            return false
+        }
+        termuxTools?.animate()?.cancel()
+        termuxKeyModeAnimating = false
+        termuxTools?.translationX = 0f
+        termuxTools?.alpha = 1f
+        termuxFnKeyMode = enabled
+        updateTermuxAppKeyMode()
+        return true
+    }
+
+    private fun animateTermuxAppFnKeyMode(enabled: Boolean, direction: Int): Boolean {
+        if (termuxFnKeyMode == enabled || termuxKeyModeAnimating) {
+            return false
+        }
+        val tools = termuxTools
+        val width = tools?.width ?: 0
+        if (tools == null || width <= 0) {
+            return setTermuxAppFnKeyMode(enabled)
+        }
+        val cleanDirection = if (direction < 0) -1 else 1
+        termuxKeyModeAnimating = true
+        tools.animate().cancel()
+        tools.animate()
+            .translationX((-cleanDirection * width).toFloat())
+            .alpha(0.08f)
+            .setDuration(TERMUX_WORKSPACE_KEY_MODE_CAROUSEL_OUT_MS)
+            .withEndAction(Runnable {
+                termuxFnKeyMode = enabled
+                updateTermuxAppKeyMode()
+                tools.translationX = (cleanDirection * width).toFloat()
+                tools.alpha = 0.08f
+                tools.animate()
+                    .translationX(0f)
+                    .alpha(1f)
+                    .setDuration(TERMUX_WORKSPACE_KEY_MODE_CAROUSEL_IN_MS)
+                    .withEndAction(Runnable {
+                        tools.translationX = 0f
+                        tools.alpha = 1f
+                        termuxKeyModeAnimating = false
+                    })
+                    .start()
+            })
+            .start()
+        return true
+    }
+
+    private fun bindTermuxAppKeyModeSwipe(view: View?) {
+        if (view == null) {
+            return
+        }
+        view.setOnTouchListener(OnTouchListener { v: View?, event: MotionEvent? ->
+            if (event == null || termuxAppSession == null) {
+                return@OnTouchListener false
+            }
+            when (event.actionMasked) {
+                MotionEvent.ACTION_DOWN -> {
+                    termuxKeyTouchStartX = event.rawX
+                    termuxKeyTouchStartY = event.rawY
+                    termuxKeySwipeConsumed = false
+                    false
+                }
+                MotionEvent.ACTION_UP -> {
+                    val dx = event.rawX - termuxKeyTouchStartX
+                    val dy = event.rawY - termuxKeyTouchStartY
+                    if (abs(dx) > TERMUX_WORKSPACE_KEY_MODE_SWIPE_THRESHOLD_PX && abs(dx) > abs(dy) * 1.35f) {
+                        termuxKeySwipeConsumed = true
+                        animateTermuxAppFnKeyMode(!termuxFnKeyMode, if (dx < 0f) 1 else -1)
+                        true
+                    } else {
+                        false
+                    }
+                }
+                MotionEvent.ACTION_CANCEL -> {
+                    termuxKeySwipeConsumed = false
+                    false
+                }
+                else -> false
             }
         })
+    }
+
+    private fun applyTermuxAppModifiers(keyName: String): String {
+        val ctrl = termuxCtrlPending
+        val alt = termuxAltPending
+        val shift = termuxShiftPending
+        if (!ctrl && !alt && !shift) {
+            return keyName
+        }
+        termuxCtrlPending = false
+        termuxAltPending = false
+        termuxShiftPending = false
+        updateTermuxAppModifierButtons()
+        val prefix = StringBuilder()
+        if (ctrl) {
+            prefix.append("C-")
+        }
+        if (alt) {
+            prefix.append("M-")
+        }
+        if (shift) {
+            prefix.append("S-")
+        }
+        return prefix.append(keyName).toString()
+    }
+
+    private fun clearTermuxAppModifiers(updateButtons: Boolean) {
+        termuxCtrlPending = false
+        termuxAltPending = false
+        termuxShiftPending = false
+        if (updateButtons) {
+            updateTermuxAppModifierButtons()
+        }
+    }
+
+    private fun hasTermuxAppPendingModifiers(): Boolean {
+        return termuxCtrlPending || termuxAltPending || termuxShiftPending
+    }
+
+    private fun consumeTermuxAppInsertedCombo(text: Editable?) {
+        val inserted = termuxInsertedText
+        val start = termuxInsertedStart
+        termuxInsertedText = null
+        termuxInsertedStart = -1
+        if (termuxAppSession == null || text == null || inserted.isNullOrEmpty() || start < 0) {
+            return
+        }
+        val key = mapTermuxAppPrintableCombo(inserted) ?: return
+        if (start + inserted.length > text.length ||
+            text.subSequence(start, start + inserted.length).toString() != inserted
+        ) {
+            return
+        }
+        termuxSuppressInputWatcher = true
+        try {
+            text.delete(start, start + inserted.length)
+        } finally {
+            termuxSuppressInputWatcher = false
+        }
+        clearTermuxAppModifiers(true)
+        sendTermuxAppKey(key)
+    }
+
+    private fun mapTermuxAppPrintableCombo(text: String): String? {
+        if (text.length != 1 || !hasTermuxAppPendingModifiers()) {
+            return null
+        }
+        val ch = text[0]
+        val ctrl = termuxCtrlPending
+        val alt = termuxAltPending
+        if (!ctrl && !alt) {
+            return null
+        }
+        if (ctrl && !alt && ch == '[') {
+            return "Escape"
+        }
+        if (ctrl) {
+            val ctrlKey = when {
+                ch in 'a'..'z' || ch in 'A'..'Z' -> ch.lowercaseChar().toString()
+                ch == ' ' -> "Space"
+                else -> null
+            } ?: return null
+            return if (alt) "C-M-$ctrlKey" else "C-$ctrlKey"
+        }
+        val altKey = tmuxWorkspacePrintableKeyName(ch) ?: return null
+        return "M-$altKey"
+    }
+
+    private fun updateTermuxAppModifierButtons() {
+        val normalColor = notificationWidgetTextColor()
+        val activeColor = terminalBorderColor()
+        termuxCtrlKey?.let { key ->
+            updateTermuxWorkspaceModifierButton(key, "CTRL", termuxCtrlPending, normalColor, activeColor)
+        }
+        termuxAltKey?.let { key ->
+            updateTermuxWorkspaceModifierButton(key, "ALT", termuxAltPending, normalColor, activeColor)
+        }
+        termuxShiftKey?.let { key ->
+            updateTermuxWorkspaceModifierButton(key, "SHIFT", termuxShiftPending, normalColor, activeColor)
+        }
+    }
+
+    private fun sendTermuxAppKey(key: String) {
+        val app = termuxAppSession ?: return
+        val clean = key.trim { it <= ' ' }
+        if (clean.length == 0) {
+            return
+        }
+        termuxAppLastStatus = "key: " + clean
+        dispatchTermuxAppScript("key", buildTermuxAppControlScript(app, clean), true)
+        scheduleTermuxAppRefreshBurst(app.id, TERMUX_APP_INPUT_WATCH_MS)
+        scheduleTermuxConsoleFocusCapture(true)
     }
 
     private fun setupFileConsole(rootView: ViewGroup) {
@@ -4629,6 +6407,7 @@ class UIManager(
 
                 if (action == ACTION_UPDATE_SUGGESTIONS) {
                     if (suggestionsManager != null) suggestionsManager!!.requestSuggestion(Tuils.EMPTYSTRING)
+                    refreshModuleSuggestionsStrip()
                 } else if (action == ACTION_UPDATE_HINT) {
                     mTerminalAdapter!!.setDefaultHint()
                     refreshFileConsole(false)
@@ -5473,9 +7252,9 @@ class UIManager(
         viewPager = mRootView.findViewById<ViewPager2>(R.id.view_pager)
         viewPager.setAdapter(PagerAdapter())
         viewPager.setOffscreenPageLimit(1)
+        viewPager.setUserInputEnabled(false)
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
-                viewPager.setUserInputEnabled(position != TERMUX_WORKSPACE_PAGE_INDEX)
                 if (position == TERMUX_WORKSPACE_PAGE_INDEX) {
                     setTermuxWorkspaceChromeActive(true)
                     openTermuxWorkspacePage(false)
@@ -5792,7 +7571,13 @@ class UIManager(
         if (termuxOutput != null) {
             termuxOutput!!.setTypeface(Tuils.getTypeface(mContext))
             termuxOutput!!.setTextColor(textColor)
-            termuxOutput!!.setTextIsSelectable(true)
+            termuxOutput!!.setTextIsSelectable(termuxAppSession == null)
+            termuxOutput!!.setHorizontallyScrolling(termuxAppSession != null)
+        }
+        termuxGrid?.let { grid ->
+            grid.setTerminalTypeface(Tuils.getTypeface(mContext))
+            grid.setTerminalTextSizeSp(12f)
+            grid.updateThemeColors(textColor, bgColor, borderColor)
         }
 
         if (termuxOutputPanel != null) {
@@ -5865,6 +7650,7 @@ class UIManager(
         if (termuxInput != null) {
             termuxInput!!.hint = if (app == null && luaId == null) "command" else "type input or :help"
         }
+        updateTermuxConsoleKeyMode()
         updateTermuxAppActions()
     }
 
@@ -6055,6 +7841,7 @@ class UIManager(
         termuxAppSession = null
         termuxAppLastStatus = null
         resetTermuxAppRuntimeState(true)
+        resetTermuxAppCellViewport()
         styleTermuxConsole()
         termuxOverlay!!.setVisibility(View.VISIBLE)
         termuxOverlay!!.bringToFront()
@@ -6101,6 +7888,7 @@ class UIManager(
         termuxAppSession = null
         termuxAppLastStatus = null
         resetTermuxAppRuntimeState(true)
+        resetTermuxAppCellViewport()
 
         luaAppId = id
         luaAppLastStatus = "opening"
@@ -6340,6 +8128,7 @@ class UIManager(
         termuxAppSession = null
         termuxAppLastStatus = null
         resetTermuxAppRuntimeState(true)
+        resetTermuxAppCellViewport()
         updateTermuxConsoleLabels()
         restoreHomeSuggestionsAfterTermux()
         if (termuxInput != null) {
@@ -6429,7 +8218,7 @@ class UIManager(
     }
 
     fun consumeBackPressed(): Boolean {
-        return handleTermuxBackPressed()
+        return handleTermuxWorkspaceBackPressed() || handleTermuxBackPressed()
     }
 
     private fun focusTermuxInput(showKeyboard: Boolean) {
@@ -6962,8 +8751,15 @@ class UIManager(
         termuxAppDispatchSequence = 0
         termuxAppAcceptedSequence = 0
         termuxAppWatchUntilMs = 0L
+        clearTermuxAppModifiers(false)
+        termuxSuppressInputWatcher = false
+        termuxInsertedStart = -1
+        termuxInsertedText = null
+        termuxFnKeyMode = false
+        termuxKeyModeAnimating = false
         if (clearFrame) {
             termuxAppLastFrameText = null
+            termuxAppMeasuredLineHeight = 0
         }
     }
 
@@ -7434,6 +9230,138 @@ class UIManager(
         }
     }
 
+    private fun calculateTermuxAppGeometry(): TermuxWorkspaceGeometry {
+        val output = termuxOutput
+        val grid = if (termuxAppSession != null) termuxGrid else null
+        val host = termuxScroll ?: termuxOutputPanel
+        val width = max(0, (host?.width ?: 0) - (host?.paddingLeft ?: 0) - (host?.paddingRight ?: 0))
+        val height = max(0, visibleTermuxAppHostHeight(host) - (host?.paddingTop ?: 0) - (host?.paddingBottom ?: 0))
+        val charWidth = grid?.characterWidth() ?: termuxWorkspaceCharWidth(output)
+        val lineHeight = grid?.lineHeight() ?: termuxAppLineHeight(output)
+        val cols = if (width > 0) (width / charWidth).toInt() else termuxAppLastCols
+        val rows = if (height > 0) height / max(1, lineHeight) else termuxAppLastRows
+        val geometry = TermuxWorkspaceGeometry(
+            max(TERMUX_WORKSPACE_MIN_COLS, min(TERMUX_WORKSPACE_MAX_COLS, cols)),
+            max(TERMUX_WORKSPACE_MIN_ROWS, min(TERMUX_WORKSPACE_MAX_ROWS, rows))
+        )
+        termuxAppLastCols = geometry.cols
+        termuxAppLastRows = geometry.rows
+        applyTermuxAppCellViewport(geometry, charWidth, lineHeight)
+        return geometry
+    }
+
+    private fun visibleTermuxAppHostHeight(host: View?): Int {
+        if (host == null) {
+            return 0
+        }
+        val rawHeight = host.height
+        if (rawHeight <= 0 || !imeInsetVisible || imeBottomOffset <= 0) {
+            return max(0, rawHeight)
+        }
+        val root = termuxOverlay ?: mRootView ?: return max(0, rawHeight)
+        if (root.height <= 0) {
+            return max(0, rawHeight)
+        }
+        val rootLocation = IntArray(2)
+        val hostLocation = IntArray(2)
+        root.getLocationInWindow(rootLocation)
+        host.getLocationInWindow(hostLocation)
+        val visibleRootBottom = rootLocation[1] + root.height - imeBottomOffset
+        val visibleHeight = visibleRootBottom - hostLocation[1]
+        return max(0, min(rawHeight, visibleHeight))
+    }
+
+    private fun termuxAppLineHeight(output: TextView?): Int {
+        if (output == null) {
+            return UIUtils.dpToPx(mContext!!, 18)
+        }
+        val baseLineHeight = max(1, output.lineHeight)
+        val fallbackLineHeight = max(
+            baseLineHeight,
+            (baseLineHeight * TERMUX_WORKSPACE_LINE_HEIGHT_FALLBACK_MULTIPLIER).roundToInt()
+        )
+        val sampledLineHeight = try {
+            val layout = StaticLayout.Builder.obtain(
+                TERMUX_WORKSPACE_LINE_HEIGHT_SAMPLE,
+                0,
+                TERMUX_WORKSPACE_LINE_HEIGHT_SAMPLE.length,
+                output.paint,
+                max(1, output.paint.measureText("MMMM").roundToInt())
+            )
+                .setAlignment(Layout.Alignment.ALIGN_NORMAL)
+                .setLineSpacing(0f, 1f)
+                .setIncludePad(false)
+                .build()
+            var previousBottom = 0
+            var measuredLineHeight = baseLineHeight
+            for (index in 0 until layout.lineCount) {
+                val bottom = layout.getLineBottom(index)
+                measuredLineHeight = max(measuredLineHeight, bottom - previousBottom)
+                previousBottom = bottom
+            }
+            measuredLineHeight
+        } catch (ignored: Exception) {
+            baseLineHeight
+        }
+        return max(fallbackLineHeight, max(sampledLineHeight, termuxAppMeasuredLineHeight))
+    }
+
+    private fun applyTermuxAppCellViewport(
+        geometry: TermuxWorkspaceGeometry,
+        charWidth: Float,
+        lineHeight: Int
+    ) {
+        if (Looper.myLooper() != Looper.getMainLooper()) {
+            return
+        }
+        val output = (if (termuxAppSession != null) termuxGrid else null) ?: termuxOutput ?: return
+        val targetWidth = max(1, (geometry.cols * charWidth).roundToInt())
+        val targetHeight = max(1, geometry.rows * lineHeight)
+        output.minimumWidth = targetWidth
+        output.minimumHeight = targetHeight
+        val params = output.layoutParams ?: return
+        var changed = false
+        if (params.width != targetWidth) {
+            params.width = targetWidth
+            changed = true
+        }
+        if (params.height != targetHeight) {
+            params.height = targetHeight
+            changed = true
+        }
+        if (changed) {
+            output.layoutParams = params
+        }
+        output.requestLayout()
+        termuxScroll?.requestLayout()
+        termuxOutputPanel?.requestLayout()
+    }
+
+    private fun resetTermuxAppCellViewport() {
+        resetTermuxAppViewportTarget(termuxOutput, ViewGroup.LayoutParams.MATCH_PARENT)
+        resetTermuxAppViewportTarget(termuxGrid, ViewGroup.LayoutParams.WRAP_CONTENT)
+        termuxGrid?.visibility = View.GONE
+    }
+
+    private fun resetTermuxAppViewportTarget(target: View?, width: Int) {
+        val output = target ?: return
+        val params = output.layoutParams
+        if (params != null) {
+            params.width = width
+            params.height = ViewGroup.LayoutParams.WRAP_CONTENT
+            output.layoutParams = params
+        }
+        output.minimumWidth = 0
+        output.minimumHeight = 0
+        output.requestLayout()
+    }
+
+    private fun buildTermuxAppResizeScript(session: String): String {
+        val geometry = calculateTermuxAppGeometry()
+        return ("tmux resize-window -t " + session + " -x " + geometry.cols + " -y " + geometry.rows + " 2>/dev/null || true\n"
+                + "tmux resize-pane -t " + session + " -x " + geometry.cols + " -y " + geometry.rows + " 2>/dev/null || true")
+    }
+
     private fun buildTermuxAppStartScript(app: TermuxAppManager.TermuxApp): String {
         val session = shellQuote(TermuxAppManager.tmuxSessionName(app.id))
         val workDir = shellQuote(app.workDir)
@@ -7458,7 +9386,8 @@ class UIManager(
                 + " " + sh + " -lc " + command + "\n"
                 + "  sleep 0.35\n"
                 + "fi\n"
-                + "tmux capture-pane -t " + session + " -p")
+                + buildTermuxAppResizeScript(session) + "\n"
+                + "tmux capture-pane -t " + session + " -p -e -N")
     }
 
     private fun buildTermuxAppPrepareScript(app: TermuxAppManager.TermuxApp, echo: Boolean): String {
@@ -7485,21 +9414,26 @@ class UIManager(
             "tmux send-keys -t " + session + " -- " + shellQuote(input) + "\n" +
                     "tmux send-keys -t " + session + " C-m"
         }
-        return buildTermuxAppEnsureScript(app) + "\n" + send + "\nsleep 0.25\n" +
+        return buildTermuxAppEnsureScript(app) + "\n" +
+                buildTermuxAppResizeScript(session) + "\n" +
+                send + "\nsleep 0.25\n" +
                 buildTermuxAppPostInputCaptureScript(session)
     }
 
     private fun buildTermuxAppControlScript(app: TermuxAppManager.TermuxApp, key: String): String {
         val session = shellQuote(TermuxAppManager.tmuxSessionName(app.id))
         return buildTermuxAppEnsureScript(app) + "\n" +
-                "tmux send-keys -t " + session + " " + key + "\n" +
+                buildTermuxAppResizeScript(session) + "\n" +
+                "tmux send-keys -t " + session + " -- " + shellQuote(key) + "\n" +
                 "sleep 0.25\n" +
                 buildTermuxAppPostInputCaptureScript(session)
     }
 
     private fun buildTermuxAppCaptureScript(app: TermuxAppManager.TermuxApp): String {
         val session = shellQuote(TermuxAppManager.tmuxSessionName(app.id))
-        return buildTermuxAppEnsureScript(app) + "\ntmux capture-pane -t " + session + " -p"
+        return buildTermuxAppEnsureScript(app) + "\n" +
+                buildTermuxAppResizeScript(session) + "\n" +
+                "tmux capture-pane -t " + session + " -p -e -N"
     }
 
     private fun buildTermuxAppPostInputCaptureScript(session: String): String {
@@ -7507,7 +9441,7 @@ class UIManager(
                 + "  printf '%s\\n' 'session ended. Type :restart to start it.'\n"
                 + "  exit 0\n"
                 + "fi\n"
-                + "tmux capture-pane -t " + session + " -p")
+                + "tmux capture-pane -t " + session + " -p -e -N")
     }
 
     private fun buildTermuxAppKillScript(app: TermuxAppManager.TermuxApp): String {
@@ -7706,21 +9640,84 @@ class UIManager(
 
     private fun renderTermuxAppFrame(frame: String?, status: String?) {
         val app = termuxAppSession ?: return
-        val out = StringBuilder()
-        out.append("Re:T-UI app: ").append(app.title).append('\n')
-        out.append("session: ").append(TermuxAppManager.tmuxSessionName(app.id)).append('\n')
-        out.append("local commands: :help :refresh :restart :stop :detach :open").append('\n')
-        if (!TextUtils.isEmpty(status)) {
-            out.append("status: ").append(status).append('\n')
+        val hasFrame = !TextUtils.isEmpty(frame)
+        if (TextUtils.isEmpty(frame) && !TextUtils.isEmpty(termuxAppLastFrameText)
+            && isTransientTermuxAppStatus(status)
+        ) {
+            return
         }
-        out.append("----")
-        val cleanFrame = stripTermuxAnsi(frame)
-        if (!TextUtils.isEmpty(cleanFrame)) {
-            out.append('\n').append(cleanFrame!!.trimEnd { it <= ' ' })
+        if (hasFrame && termuxGrid != null) {
+            showTermuxAppGridOutput()
+        } else {
+            showPlainTermuxOutput()
+        }
+        val raw = if (hasFrame) {
+            frame!!
+        } else {
+            ("Re:T-UI app: " + app.title
+                    + "\nsession: " + TermuxAppManager.tmuxSessionName(app.id)
+                    + "\nlocal commands: :help :refresh :restart :stop :detach :open"
+                    + if (TextUtils.isEmpty(status)) "\nstarting..." else "\nstatus: " + status)
         }
         termuxBuffer.setLength(0)
-        termuxBuffer.append(out.toString().trimEnd { it <= ' ' })
-        updateTermuxOutput()
+        termuxBuffer.append(stripTermuxAnsi(raw)?.trimEnd { it <= ' ' } ?: Tuils.EMPTYSTRING)
+        if (hasFrame && termuxGrid != null) {
+            val geometry = calculateTermuxAppGeometry()
+            termuxGrid?.setFrame(raw, geometry.cols, geometry.rows, null, null)
+        } else {
+            val rendered = if (hasFrame) renderTermuxWorkspaceAnsi(raw) else SpannableStringBuilder(raw)
+            termuxOutput?.setText(rendered)
+        }
+        updateTermuxAppMeasuredLineHeight()
+        resetTermuxAppViewportOrigin()
+        termuxScroll?.post(Runnable { resetTermuxAppViewportOrigin() })
+    }
+
+    private fun isTransientTermuxAppStatus(status: String?): Boolean {
+        if (TextUtils.isEmpty(status)) {
+            return true
+        }
+        val clean = status!!.lowercase(Locale.getDefault())
+        return clean.startsWith("sent")
+                || clean.startsWith("action:")
+                || clean.startsWith("key:")
+                || clean == "refreshing"
+                || clean == "restarting"
+                || clean == "starting"
+    }
+
+    private fun updateTermuxAppMeasuredLineHeight() {
+        val grid = if (termuxAppSession != null) termuxGrid else null
+        if (grid != null && grid.visibility == View.VISIBLE) {
+            val lineHeight = grid.lineHeight()
+            if (lineHeight > termuxAppMeasuredLineHeight) {
+                termuxAppMeasuredLineHeight = lineHeight
+            }
+            return
+        }
+        val output = termuxOutput ?: return
+        output.post(Runnable {
+            val layout = output.layout ?: return@Runnable
+            if (layout.lineCount <= 0) {
+                return@Runnable
+            }
+            var previousBottom = 0
+            var maxLineHeight = 0
+            val linesToCheck = min(layout.lineCount, TERMUX_WORKSPACE_LINE_HEIGHT_MAX_SAMPLE_LINES)
+            for (index in 0 until linesToCheck) {
+                val bottom = layout.getLineBottom(index)
+                maxLineHeight = max(maxLineHeight, bottom - previousBottom)
+                previousBottom = bottom
+            }
+            if (maxLineHeight > termuxAppMeasuredLineHeight) {
+                termuxAppMeasuredLineHeight = maxLineHeight
+            }
+        })
+    }
+
+    private fun resetTermuxAppViewportOrigin() {
+        termuxOutput?.scrollTo(0, 0)
+        termuxScroll?.scrollTo(0, 0)
     }
 
     private fun stripTermuxAnsi(text: String?): String? {
@@ -8471,14 +10468,33 @@ class UIManager(
             termuxRichOutput!!.removeAllViews()
             termuxRichOutput!!.visibility = View.GONE
         }
+        if (termuxGrid != null) {
+            termuxGrid!!.visibility = View.GONE
+        }
         if (termuxOutput != null) {
             termuxOutput!!.visibility = View.VISIBLE
+        }
+    }
+
+    private fun showTermuxAppGridOutput() {
+        if (termuxRichOutput != null) {
+            termuxRichOutput!!.removeAllViews()
+            termuxRichOutput!!.visibility = View.GONE
+        }
+        if (termuxOutput != null) {
+            termuxOutput!!.visibility = View.GONE
+        }
+        if (termuxGrid != null) {
+            termuxGrid!!.visibility = View.VISIBLE
         }
     }
 
     private fun showRichTermuxOutput() {
         if (termuxOutput != null) {
             termuxOutput!!.visibility = View.GONE
+        }
+        if (termuxGrid != null) {
+            termuxGrid!!.visibility = View.GONE
         }
         if (termuxRichOutput != null) {
             termuxRichOutput!!.removeAllViews()
@@ -10072,6 +12088,9 @@ class UIManager(
     }
 
     fun onBackPressed() {
+        if (handleTermuxWorkspaceBackPressed()) {
+            return
+        }
         if (handleTermuxBackPressed()) {
             return
         }
@@ -10390,8 +12409,22 @@ class UIManager(
         private const val TERMUX_WORKSPACE_PAGE_COUNT = 2
         private const val TERMUX_WORKSPACE_SESSION = "retui_workspace"
         private const val TERMUX_WORKSPACE_RESULT_PREFIX = "retui-workspace:"
+        private const val TERMUX_WORKSPACE_SOCKET_NAME = "retui_bridge_com_dvil_tui_renewed_v2"
+        private const val TERMUX_WORKSPACE_TCP_PORT = 8927
         private const val TERMUX_WORKSPACE_SWIPE_THRESHOLD_PX = 80f
+        private const val TERMUX_WORKSPACE_KEY_MODE_SWIPE_THRESHOLD_PX = 70f
+        private const val TERMUX_WORKSPACE_KEY_MODE_CAROUSEL_OUT_MS = 92L
+        private const val TERMUX_WORKSPACE_KEY_MODE_CAROUSEL_IN_MS = 124L
+        private const val TERMUX_WORKSPACE_IME_VISIBLE_THRESHOLD_DP = 80
+        private const val TERMUX_WORKSPACE_IME_RESIZE_REFRESH_DELAY_MS = 180L
         private const val TERMUX_WORKSPACE_MAX_OUTPUT_CHARS = 24000
+        private const val TERMUX_WORKSPACE_LINE_HEIGHT_SAMPLE = "M\n\u2502\n\u2500\n\u2514\n\u2588"
+        private const val TERMUX_WORKSPACE_LINE_HEIGHT_FALLBACK_MULTIPLIER = 1.36f
+        private const val TERMUX_WORKSPACE_LINE_HEIGHT_MAX_SAMPLE_LINES = 16
+        private const val TERMUX_WORKSPACE_MIN_COLS = 20
+        private const val TERMUX_WORKSPACE_MAX_COLS = 240
+        private const val TERMUX_WORKSPACE_MIN_ROWS = 8
+        private const val TERMUX_WORKSPACE_MAX_ROWS = 120
         private val TERMUX_CONSOLE_SHELL_RESULT_PREFIX: String =
             TERMUX_CONSOLE_RESULT_PREFIX + "shell:"
         private val TERMUX_CONSOLE_CD_RESULT_PREFIX: String = TERMUX_CONSOLE_RESULT_PREFIX + "cd:"

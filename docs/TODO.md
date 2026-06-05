@@ -54,10 +54,10 @@ It should not chase casual launcher expectations. It should reward users who are
   - module title/status
   - suggestion entries
   - optional action payloads
-- [x] When a module is active, allow its suggestions to temporarily own the suggestion row.
+- [x] When a module is active, show its suggestions in a separate module action strip.
   - First slice implemented for command-backed built-in modules.
-  - Suggestions appear only when input is empty.
-  - Normal typing still wins.
+  - Stock launcher suggestions stay available in the normal strip.
+  - Module actions stay visually separate from normal typing suggestions.
 - [x] For Termux-backed modules, define how suggestion clicks are sent back to the script or callback bridge.
   - First implementation supports script-provided `command` suggestions.
   - `termux-run` and `callback` modes remain parsed contract values, but are not executable suggestion modes yet.
@@ -69,7 +69,7 @@ It should not chase casual launcher expectations. It should reward users who are
   - action: command/script payload tied to a suggestion
   - mode: how action is dispatched, such as `command`, `termux-run`, or `callback`
 - First design target:
-  - [x] active module can temporarily replace normal suggestions
+  - [x] active module can expose action chips without replacing normal suggestions
   - [x] inactive modules do not hijack suggestions
   - [x] suggestion clicks are explicit and inspectable for command-mode built-ins
   - no arbitrary code is loaded into Re:T-UI

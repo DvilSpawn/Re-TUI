@@ -133,7 +133,8 @@ Use this as the phone test pass for the workstation rollout. Test on a clean ins
 ### Built-In Module Suggestions
 
 - Show the timer module.
-- With empty input, confirm module suggestions replace normal suggestions.
+- With empty input, confirm normal launcher suggestions remain in the stock strip.
+- Confirm module suggestions appear in a separate compact strip above the input.
 - Confirm timer suggestions include useful actions such as:
   - `+5m`
   - `+15m`
@@ -146,7 +147,7 @@ Use this as the phone test pass for the workstation rollout. Test on a clean ins
 - With that timer running, tap `+15m`.
 - Confirm it adds 15 minutes to the existing timer instead of prompting.
 - Start typing any normal input.
-- Confirm normal typing wins and module suggestions disappear.
+- Confirm normal typing updates the stock suggestion strip while the module strip stays visually separate.
 
 - Show the music module.
 - Confirm empty input shows music actions such as `prev`, `play`, `next`, `info`, `stop`.
@@ -408,6 +409,6 @@ These are not done yet, but keep notes when testing:
 - The launcher remains terminal-first and direct.
 - Suggestions help without feeling like a casual launcher overlay.
 - Apps launch directly unless the user explicitly enters app-management commands.
-- Modules can temporarily own suggestions only when active and input is empty.
+- Modules use a separate action strip while the stock suggestion strip remains available.
 - Script modules are useful without arbitrary plugin loading.
 - No phase introduces surprise automation or hand-holding.

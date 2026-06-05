@@ -353,8 +353,7 @@ Common commands:
 - `module -refresh server`
 - `module -rm server`
 - `module -hide music`
-- `module -dock add server`
-- `module -dock remove music`
+- `module -dock -toggle`
 - `module -close`
 
 The reminder module is the first native conversational module. It asks for text, date, time, and confirmation through the normal terminal input surface, then schedules an Android notification.
@@ -362,7 +361,7 @@ The reminder module is the first native conversational module. It asks for text,
 Design direction:
 
 - modules are Re:T-UI-owned terminal panels, not Android widgets
-- active modules can provide suggestion chips when input is empty
+- active modules provide action chips in a separate module strip while the normal suggestion strip stays available
 - Termux modules should stay text/callback based, with no arbitrary shell code loaded into Re:T-UI
 - Lua modules use the launcher-native Lua runtime for safe panels, buttons, config, and app/intent/shortcut helpers
 - reminder prompt sessions ask users for values step by step and keep normal command execution paused until the session ends

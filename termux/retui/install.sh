@@ -1,7 +1,7 @@
 #!/data/data/com.termux/files/usr/bin/sh
 set -eu
 
-RETUI_VERSION="0.1.0"
+RETUI_VERSION="0.3.0"
 RETUI_DEFAULT_BASE_URL="https://raw.githubusercontent.com/DvilSpawn/Re-TUI/main/termux/retui"
 RETUI_INSTALL_BASE_URL="${RETUI_INSTALL_BASE_URL:-$RETUI_DEFAULT_BASE_URL}"
 PREFIX="${PREFIX:-/data/data/com.termux/files/usr}"
@@ -44,6 +44,17 @@ install_tmux() {
     die "tmux missing and pkg was not found"
 }
 
+install_socat() {
+    if command -v socat >/dev/null 2>&1; then
+        return
+    fi
+    if command -v pkg >/dev/null 2>&1; then
+        pkg install -y socat
+        return
+    fi
+    die "socat missing and pkg was not found"
+}
+
 install_retui() {
     bin_dir="$PREFIX/bin"
     share_dir="$PREFIX/share/retui"
@@ -65,6 +76,7 @@ install_retui() {
 }
 
 install_tmux
+install_socat
 install_retui
 
 say "retui $RETUI_VERSION installed"
