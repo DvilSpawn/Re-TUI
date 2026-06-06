@@ -732,10 +732,14 @@ figcaption {
 .legacy-page .marketplace-header,
 .legacy-page .layout,
 .legacy-page .toolbar {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   min-height: 0;
   margin: 0;
   padding: 0 0 18px;
   border-bottom: 1px solid var(--line);
+  overflow-wrap: anywhere;
 }
 
 .legacy-page .hero {
@@ -745,7 +749,20 @@ figcaption {
 .legacy-page .split,
 .legacy-page .wide-split,
 .legacy-page .layout {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   gap: 14px;
+}
+
+.legacy-page .split > *,
+.legacy-page .wide-split > *,
+.legacy-page .layout > *,
+.legacy-page .grid > *,
+.legacy-page .two-grid > *,
+.legacy-page .marketplace > * {
+  min-width: 0;
+  max-width: 100%;
 }
 
 .legacy-page .chips,
@@ -760,6 +777,7 @@ figcaption {
 .legacy-page .tile,
 .legacy-page .note,
 .legacy-page .command-list,
+.legacy-page .command-list div,
 .legacy-page .table-wrap,
 .legacy-page .panel,
 .legacy-page .preset-card,
@@ -770,9 +788,21 @@ figcaption {
 .legacy-page textarea,
 .legacy-page select {
   min-width: 0;
+  max-width: 100%;
   border-color: var(--line);
   border-radius: 0;
   background-color: rgba(17, 21, 20, 0.72);
+  overflow-wrap: anywhere;
+}
+
+.legacy-page code,
+.legacy-page p,
+.legacy-page li,
+.legacy-page h1,
+.legacy-page h2,
+.legacy-page h3 {
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 
 .legacy-page .table-wrap,
@@ -908,6 +938,7 @@ figcaption {
   .legacy-page .split,
   .legacy-page .wide-split,
   .legacy-page .layout {
+    display: grid;
     grid-template-columns: 1fr;
   }
 }
