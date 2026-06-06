@@ -82,15 +82,6 @@
           "wiki/FAQ-and-Troubleshooting.md",
           "wiki/Support-and-Release-Channels.md"
         ]
-      },
-      {
-        name: "root-md",
-        files: [
-          "Play-Store-Listing.md",
-          "TESTBOOK.md",
-          "TODO.md",
-          "design/cyberpunk-visual-pass/idea-board.md"
-        ]
       }
     ];
 
@@ -338,22 +329,25 @@
 
     function buildTree(activeFile) {
       const guideLinks = [
-        ["index.html", "index.html"],
-        ["apps.html", "apps.html"],
-        ["modules.html", "modules.html"],
-        ["widgets.html", "lua-modules.html"],
-        ["privacy.html", "privacy.html"]
+        ["index.html", "Docs home"],
+        ["apps.html", "Apps guide"],
+        ["modules.html", "Modules guide"],
+        ["widgets.html", "Lua modules"],
+        ["ascii.html", "ASCII Lab"],
+        ["gallery.html", "Preset gallery"],
+        ["submit-preset.html", "Submit preset"],
+        ["privacy.html", "Privacy"]
       ];
 
       const groups = DOC_GROUPS.map((group) => {
         const links = group.files.map((file) => {
           const current = file === activeFile ? ' aria-current="page"' : "";
-          return '<a class="external" href="' + fileUrl(file) + '"' + current + ">" + escapeHtml(labelFor(file)) + "</a>";
+          return '<a href="' + fileUrl(file) + '"' + current + ">" + escapeHtml(labelFor(file)) + "</a>";
         }).join("");
         return '<div class="tree-group"><p class="tree-dir">' + escapeHtml(group.name) + "</p>" + links + "</div>";
       }).join("");
 
-      const guides = '<div class="tree-group"><p class="tree-dir">html</p>'
+      const guides = '<div class="tree-group"><p class="tree-dir">guides</p>'
         + guideLinks.map(([href, label]) => '<a class="external" href="' + escapeHtml(href) + '">' + escapeHtml(label) + "</a>").join("")
         + "</div>";
 
