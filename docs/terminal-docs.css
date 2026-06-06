@@ -22,6 +22,7 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
@@ -36,6 +37,7 @@ body {
   color: var(--ink);
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   line-height: 1.55;
+  overflow-x: hidden;
 }
 
 body::before {
@@ -51,6 +53,13 @@ body::before {
 
 a {
   color: inherit;
+}
+
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
 }
 
 .terminal-shell {
@@ -110,7 +119,10 @@ a {
 
 .title-path,
 .status-path {
+  min-width: 0;
+  overflow: hidden;
   color: var(--green);
+  text-overflow: ellipsis;
 }
 
 .title-spacer,
@@ -150,6 +162,12 @@ a {
   color: var(--cyan);
   font-size: 0.8rem;
   text-transform: uppercase;
+}
+
+.tree-header span,
+.pane-header span {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .tree {
@@ -209,6 +227,7 @@ a {
 
 .content-pane {
   min-width: 0;
+  overflow: hidden;
   background: var(--terminal);
 }
 
@@ -220,6 +239,7 @@ a {
 
 .terminal-card,
 .terminal-section {
+  min-width: 0;
   border: 1px solid var(--line);
   background: rgba(6, 8, 7, 0.82);
 }
@@ -255,7 +275,9 @@ a {
 }
 
 .output {
+  min-width: 0;
   padding: 16px;
+  overflow-wrap: anywhere;
 }
 
 .output.hero-output {
@@ -363,12 +385,14 @@ p {
   display: inline-flex;
   align-items: center;
   gap: 7px;
+  min-width: 0;
   border: 1px solid rgba(129, 202, 214, 0.38);
   background: rgba(129, 202, 214, 0.06);
   color: var(--cyan);
   padding: 7px 9px;
   text-decoration: none;
   font-size: 0.82rem;
+  overflow-wrap: anywhere;
 }
 
 .terminal-link::before,
@@ -551,7 +575,9 @@ figcaption {
 }
 
 .markdown-body {
+  width: 100%;
   max-width: 1040px;
+  min-width: 0;
 }
 
 .markdown-body h1,
@@ -634,6 +660,8 @@ figcaption {
   padding: 13px;
   color: var(--green);
   overflow-x: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
 .markdown-body pre code {
@@ -649,7 +677,8 @@ figcaption {
 
 .markdown-body table {
   display: block;
-  width: 100%;
+  width: max-content;
+  max-width: 100%;
   border-collapse: collapse;
   overflow-x: auto;
 }
@@ -688,6 +717,8 @@ figcaption {
 }
 
 .legacy-page {
+  width: 100%;
+  min-width: 0;
   display: grid;
   gap: 18px;
 }
@@ -738,9 +769,25 @@ figcaption {
 .legacy-page input,
 .legacy-page textarea,
 .legacy-page select {
+  min-width: 0;
   border-color: var(--line);
   border-radius: 0;
   background-color: rgba(17, 21, 20, 0.72);
+}
+
+.legacy-page .table-wrap,
+.legacy-page pre {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.legacy-page pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.legacy-page table {
+  max-width: 100%;
 }
 
 .legacy-page input,
@@ -857,6 +904,14 @@ figcaption {
   }
 }
 
+@media (max-width: 920px) {
+  .legacy-page .split,
+  .legacy-page .wide-split,
+  .legacy-page .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 780px) {
   .terminal-shell {
     width: calc(100% - 16px);
@@ -870,9 +925,23 @@ figcaption {
   .tree-pane {
     position: relative;
     height: auto;
-    max-height: 42vh;
+    max-height: 36vh;
     border-right: 0;
     border-bottom: 1px solid var(--line);
+  }
+
+  .tree {
+    display: flex;
+    gap: 12px;
+    padding: 12px;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+  }
+
+  .tree-group {
+    flex: 0 0 min(250px, 78vw);
+    margin: 0;
+    scroll-snap-align: start;
   }
 
   .buffer {
@@ -889,7 +958,23 @@ figcaption {
 
   .titlebar,
   .statusbar {
+    flex-wrap: wrap;
+    gap: 6px 10px;
+    height: auto;
+    padding-block: 8px;
     font-size: 0.72rem;
+    white-space: normal;
+  }
+
+  .title-path,
+  .status-path {
+    flex-basis: 100%;
+    order: 2;
+  }
+
+  .title-spacer,
+  .status-spacer {
+    display: none;
   }
 
   .doc-grid,
@@ -901,5 +986,50 @@ figcaption {
 
   .terminal-links {
     display: grid;
+  }
+}
+
+@media (max-width: 520px) {
+  .terminal-shell {
+    width: 100%;
+    min-height: 100vh;
+    margin: 0;
+    border-right: 0;
+    border-left: 0;
+  }
+
+  .tree-pane {
+    max-height: 32vh;
+  }
+
+  .tree-group {
+    flex-basis: min(220px, 82vw);
+  }
+
+  .buffer,
+  .output {
+    padding: 10px;
+  }
+
+  .cmd-line {
+    flex-wrap: wrap;
+    gap: 4px 8px;
+  }
+
+  .prompt {
+    flex-basis: 100%;
+  }
+
+  h1,
+  .markdown-body h1,
+  .page-output h1 {
+    font-size: 2rem;
+    line-height: 1.05;
+  }
+
+  h2,
+  .markdown-body h2,
+  .page-output h2 {
+    font-size: 1.35rem;
   }
 }
