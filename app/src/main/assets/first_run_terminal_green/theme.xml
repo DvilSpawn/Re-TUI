@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<THEME>
+<!-- #Launcher -->
+<background_color value="#FF161931"/>
+<wallpaper_overlay_color value="#2A485C44"/>
+
+<!-- #Content Text -->
+<input_text_color value="#FFA2C164"/>
+<output_text_color value="#FFE7E8EA"/>
+<restart_message_text_color value="#FFE7E8EA"/>
+<session_info_text_color value="#FFE7E8EA"/>
+<alias_content_text_color value="#FFA2C164"/>
+<app_installed_text_color value="#FFE7E8EA"/>
+<app_uninstalled_text_color value="#FFE7E8EA"/>
+<notes_text_color value="#FFA2C164"/>
+<locked_notes_text_color value="#FFA2C164"/>
+<link_text_color value="#FFE7E8EA"/>
+<apps_drawer_text_color value="#FFE7E8EA"/>
+
+<!-- #Terminal Controls -->
+<cursor_color value="#FFE7E8EA"/>
+<enter_icon_color value="#FFE7E8EA"/>
+<toolbar_icon_color value="#FFE7E8EA"/>
+
+<!-- #Terminal Surfaces -->
+<toolbar_background_color value="#FF2F373A"/>
+<regex_match_background_color value="#FFA2C164"/>
+<input_background_color value="#D02F373A"/>
+<output_background_color value="#D02F373A"/>
+<suggestions_background_color value="#D02F373A"/>
+<input_text_shadow_color value="#00000000"/>
+<output_text_shadow_color value="#00000000"/>
+<terminal_border_color value="#FFA2C164"/>
+<module_button_background_color value="#D02F373A"/>
+<terminal_window_background_color value="#FF2F373A"/>
+<terminal_header_background_color value="#FF2F373A"/>
+<terminal_header_border_color value="#FFA2C164"/>
+
+<!-- #Status Lines -->
+<device_text_color value="#FFA2C164"/>
+<battery_text_high value="#c0fc04"/>
+<battery_text_medium value="#FFEB3B"/>
+<battery_text_low value="#FF5722"/>
+<ascii_text_color value="#FFA2C164"/>
+<time_text_color value="#FFA2C164"/>
+<storage_text_color value="#FFA2C164"/>
+<ram_text_color value="#FFA2C164"/>
+<network_info_text_color value="#FFA2C164"/>
+<weather_text_color value="#FFA2C164"/>
+<unlock_counter_text_color value="#FFA2C164"/>
+<ram_status_background_color value="#D02F373A"/>
+<device_status_background_color value="#D02F373A"/>
+<time_status_background_color value="#D02F373A"/>
+<battery_status_background_color value="#D02F373A"/>
+<storage_status_background_color value="#D02F373A"/>
+<network_status_background_color value="#D02F373A"/>
+<notes_status_background_color value="#D02F373A"/>
+<weather_status_background_color value="#D02F373A"/>
+<unlock_status_background_color value="#D02F373A"/>
+<ascii_status_background_color value="#D02F373A"/>
+<ram_status_text_shadow_color value="#00000000"/>
+<device_status_text_shadow_color value="#00000000"/>
+<time_status_text_shadow_color value="#00000000"/>
+<battery_status_text_shadow_color value="#00000000"/>
+<storage_status_text_shadow_color value="#00000000"/>
+<network_status_text_shadow_color value="#00000000"/>
+<notes_status_text_shadow_color value="#00000000"/>
+<weather_status_text_shadow_color value="#00000000"/>
+<unlock_status_text_shadow_color value="#00000000"/>
+<ascii_status_text_shadow_color value="#00000000"/>
+
+<!-- #Modules And Panels -->
+<module_text_color value="#FFA2C164"/>
+</THEME>
