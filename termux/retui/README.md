@@ -16,7 +16,7 @@ From Termux:
 
 ```sh
 pkg install curl tmux socat -y
-curl -fsSL https://raw.githubusercontent.com/DvilSpawn/Re-TUI/main/termux/retui/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/DvilSpawn/Re-TUI/master/termux/retui/install.sh | sh
 ```
 
 For a development branch, replace `main` in the install URL, or set

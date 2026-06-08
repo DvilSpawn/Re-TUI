@@ -87,7 +87,7 @@ Install the Termux-side `retui` helper from Termux:
 
 ```sh
 pkg install curl tmux socat -y
-curl -fsSL https://raw.githubusercontent.com/DvilSpawn/Re-TUI/main/termux/retui/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/DvilSpawn/Re-TUI/master/termux/retui/install.sh | sh
 ```
 
 Then enable the toolbar button in Re:T-UI:

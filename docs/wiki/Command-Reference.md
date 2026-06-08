@@ -301,7 +301,7 @@ Register Codex directly, not through another tmux wrapper. Re:T-UI already owns 
 
 Optional tmux workspace:
 
-- install the Termux helper with `curl -fsSL https://raw.githubusercontent.com/DvilSpawn/Re-TUI/main/termux/retui/install.sh | sh`
+- install the Termux helper with `curl -fsSL https://raw.githubusercontent.com/DvilSpawn/Re-TUI/master/termux/retui/install.sh | sh`
 - enable the toolbar entry with `config -set show_tmux_workspace_button true`
 - open the workspace button to use the launcher-owned tmux surface
 
