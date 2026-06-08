@@ -2,7 +2,7 @@
 
 Re:T-UI can dispatch Termux scripts from its own terminal surface.
 
-Termux remains the real shell. Re:T-UI can open a launcher-styled Termux console, dispatch scripts, and host tmux-backed app sessions, but it does not replace Termux as the Linux environment.
+Termux remains the real shell. Re:T-UI can open a launcher-styled Termux console, dispatch scripts, host tmux-backed app sessions, and show an opt-in tmux workspace surface, but it does not replace Termux as the Linux environment.
 
 TBridge is the Termux capability bridge for scripts, modules, callbacks, and automation diagnostics. Re:T-UI Files owns file navigation.
 
@@ -22,6 +22,7 @@ The old BusyBox manager has been removed; use Termux for Linux packages and main
 - `termux -app-sync <id>`
 - `termux -app-action <id> <label> [input]`
 - `termux -app-rm <id>`
+- `config -set show_tmux_workspace_button true`
 
 TBridge diagnostics:
 
@@ -77,6 +78,40 @@ Example test script:
 echo "termux is working"
 date
 ```
+
+## Tmux Workspace
+
+The tmux workspace is an optional launcher page for persistent Termux TUI sessions. It is hidden by default so regular users do not see an advanced terminal control unless they opt in.
+
+Install the Termux-side `retui` helper from Termux:
+
+```sh
+pkg install curl tmux socat -y
+curl -fsSL https://raw.githubusercontent.com/DvilSpawn/Re-TUI/main/termux/retui/install.sh | sh
+```
+
+Then enable the toolbar button in Re:T-UI:
+
+```text
+config -set show_tmux_workspace_button true
+```
+
+You can also enable it from Behavior settings. The button appears in the launcher toolbar after the setting is enabled.
+
+What lives where:
+
+- Termux owns the shell, tmux session, running commands, and network access.
+- Re:T-UI owns the visual surface, input field, key tray, workspace chrome, and local gestures.
+- The bridge stays local. Re:T-UI bootstraps through Termux `RUN_COMMAND`, then talks to the `retui` helper over a token-protected local socket when available.
+
+Inside the workspace:
+
+- use the key tray for `ESC`, `TAB`, arrows, page keys, `CTRL`, `ALT`, `SHIFT`, function keys, insert/delete, enter, and backspace
+- swipe the key tray horizontally to switch between NAV and function-key modes
+- swipe the terminal pane horizontally to move between tmux windows
+- use `:help`, `:new [name]`, `:prev`, `:next`, `:refresh`, and `:home` for local workspace commands
+
+The workspace is the best Re:T-UI surface for tools such as Midnight Commander, htop, SSH, REPLs, and other TUIs that need persistent tmux state. For one-shot scripts that print output and exit, keep using `termux -run`.
 
 ## Script Aliases
 

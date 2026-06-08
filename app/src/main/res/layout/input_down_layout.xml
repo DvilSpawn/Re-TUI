@@ -107,11 +107,30 @@
 
     </LinearLayout>
 
+    <HorizontalScrollView
+        android:id="@+id/module_suggestions_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/input_group"
+        android:focusable="false"
+        android:overScrollMode="never"
+        android:scrollbars="none"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:id="@+id/module_suggestions_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="left|center_vertical"
+            android:orientation="horizontal" />
+
+    </HorizontalScrollView>
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
 
-        android:layout_above="@id/input_group"
+        android:layout_above="@id/module_suggestions_container"
 
         android:fillViewport="true">
 

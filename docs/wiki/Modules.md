@@ -28,6 +28,7 @@ For the phone-friendly walkthrough, use the hosted module guide: [Module Walkthr
 - `module -refresh server`
 - `module -rm server`
 - `module -hide music`
+- `module -dock -toggle`
 - `module -dock add server`
 - `module -dock remove music`
 - `module -close`
@@ -46,9 +47,11 @@ Current built-ins:
 - `weather`
 
 The dock is intentionally deliberate. Hiding a module from the dock does not delete it from the registry.
-Removing every module from the dock now leaves the dock intentionally empty instead of restoring the default module list. To hide the dock row itself, turn off `show_module_dock` in Behavior settings or run `config -set show_module_dock false`; modules remain available through `module -show`, `module -dock add`, and related commands.
+Removing every module from the dock now leaves the dock intentionally empty instead of restoring the default module list. To hide or show the dock row live, run `module -dock -toggle`. You can also turn off `show_module_dock` in Behavior settings or run `config -set show_module_dock false`; modules remain available through `module -show`, `module -dock add`, and related commands.
 
 New installs keep the default dock focused on `music`, `notifications`, `timer`, `calendar`, and `reminder`. Add `notes`, `rss`, or `weather` when you want those panels visible in the dock.
+
+When an active module exposes actions, Re:T-UI shows those actions in their own compact strip above the input. The normal suggestion strip stays available for apps, aliases, shortcuts, guide actions, and commands, so tapping back into the input returns regular suggestions without closing the module.
 
 ## Script Modules
 
@@ -194,7 +197,7 @@ Current behavior:
 - normal stdout becomes body text.
 - `::pre`, `::ascii`, and `::code` mark monospace blocks for terminal art, tables, and code; `::end` returns to normal themed text.
 - `::pre text`, `::ascii text`, and `::code text` add one monospace line without opening a longer block.
-- `::suggest label | command | command text` adds suggestion chips while the module is active and input is empty.
+- `::suggest label | command | command text` adds action chips to the separate module strip while the module is active.
 - `termux-run` and `callback` are reserved modes; only `command` suggestions execute today.
 
 ## Native Module Sessions

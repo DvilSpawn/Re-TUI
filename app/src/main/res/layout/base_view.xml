@@ -57,6 +57,24 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <HorizontalScrollView
+                android:id="@+id/module_suggestions_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:focusable="false"
+                android:overScrollMode="never"
+                android:scrollbars="none"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:id="@+id/module_suggestions_group"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="left|center_vertical"
+                    android:orientation="horizontal" />
+
+            </HorizontalScrollView>
+
             <LinearLayout android:id="@+id/input_group"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -109,7 +127,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/tools_height"
                 android:orientation="horizontal"
-                android:weightSum="@integer/tools_view_weightsum">
+                android:weightSum="6">
 
                 <ImageButton android:id="@+id/delete_view"
                     style="@style/ToolsBar"
@@ -131,6 +149,12 @@
                     style="@style/ToolsBar"
                     android:background="@null"
                     android:src="@drawable/ic_menu"/>
+
+                <ImageButton android:id="@+id/termux_workspace_view"
+                    style="@style/ToolsBar"
+                    android:background="@null"
+                    android:contentDescription="Termux workspace"
+                    android:src="@drawable/ic_toolbar_terminal_24"/>
 
             </LinearLayout>
 

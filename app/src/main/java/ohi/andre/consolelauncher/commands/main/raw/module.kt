@@ -9,9 +9,12 @@ import ohi.andre.consolelauncher.UIManager
 import ohi.andre.consolelauncher.commands.CommandAbstraction
 import ohi.andre.consolelauncher.commands.ExecutePack
 import ohi.andre.consolelauncher.commands.tuixt.WidgetEditorActivity
+import ohi.andre.consolelauncher.managers.settings.LauncherSettings
 import ohi.andre.consolelauncher.managers.modules.ModuleManager
 import ohi.andre.consolelauncher.managers.modules.ModulePromptManager
 import ohi.andre.consolelauncher.managers.widgets.LuaWidgetManager
+import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
+import ohi.andre.consolelauncher.managers.xml.options.Behavior
 import ohi.andre.consolelauncher.tuils.Tuils
 import java.util.Arrays
 import java.util.Locale
@@ -138,6 +141,15 @@ class module : CommandAbstraction {
         }
 
         if ("-dock" == option) {
+            if (parts.size >= 2) {
+                val dockMode = parts[1]!!.lowercase(Locale.getDefault())
+                if ("-toggle" == dockMode || "toggle" == dockMode) {
+                    val next = !XMLPrefsManager.getBoolean(Behavior.show_module_dock)
+                    LauncherSettings.set(pack.context, Behavior.show_module_dock, next.toString())
+                    send(pack, "rebuild", null)
+                    return "Module dock " + (if (next) "shown." else "hidden.")
+                }
+            }
             if (parts.size < 3) return pack.context.getString(R.string.help_module)
             val mode = parts[1]!!.lowercase(Locale.getDefault())
             val verb: String?
@@ -147,7 +159,7 @@ class module : CommandAbstraction {
                 verb = "removed"
             } else {
                 return (pack.context.getString(R.string.output_invalid_param) + " " + parts[1]
-                        + "\nUse module -dock add [name] or module -dock remove [name].")
+                        + "\nUse module -dock -toggle, module -dock add [name], or module -dock remove [name].")
             }
 
             val modules: MutableList<String?> =
@@ -175,7 +187,7 @@ class module : CommandAbstraction {
         return ("Modules: " + TextUtils.join(", ", modules)
                 + (if (localLua.isEmpty()) "" else "\nLocal Lua modules: " + TextUtils.join(", ", localLua))
                 + "\nDock: " + formatDock(pack)
-                + "\nUse module -new lua [name], module -edit [name], module -config [name], module -check [name], module -add [name] termux:/path/script.sh, module -refresh [name], module -show [name], events -access, module -prompt reminder add|edit|remove, module -hide [name], module -dock add [name], module -dock remove [name], module -rm [name], module -close.")
+                + "\nUse module -new lua [name], module -edit [name], module -config [name], module -check [name], module -add [name] termux:/path/script.sh, module -refresh [name], module -show [name], events -access, module -prompt reminder add|edit|remove, module -hide [name], module -dock -toggle, module -dock add [name], module -dock remove [name], module -rm [name], module -close.")
     }
 
     private fun formatDock(pack: ExecutePack): String? {

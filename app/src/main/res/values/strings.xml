@@ -255,11 +255,12 @@
         \n$ module -refresh server
         \n$ module -rm server
         \n$ module -hide music
+        \n$ module -dock -toggle
         \n$ module -dock add server
         \n$ module -dock remove music
         \n$ module -close
         \n\nModules are the single dock/panel category in Re:T-UI. A module can be native, Termux/shell-backed, launcher-backed, or Lua-backed. Built-in modules include music, notifications, timer, calendar, reminder, notes, rss, and weather. Lua modules are edited locally in Re:T-UI, can render native buttons/layouts, and use module -new lua, module -edit, module -config, module -check, and module -approve. Termux modules execute shell scripts and render ::title, ::body, and ::suggest metadata. Suggestion-only Lua scripts remain helpers because they do not render a dock panel.
-        \n\nAn empty dock stays empty. To hide the dock row entirely, turn off show_module_dock in Behavior settings or run config -set show_module_dock false.</string>
+        \n\nAn empty dock stays empty. To hide or show the dock row live, run module -dock -toggle. You can also turn off show_module_dock in Behavior settings or run config -set show_module_dock false.</string>
     <string name="help_lua">Create and open launcher-native Lua apps.
         \n\nUsage:
         \n$ lua -apps

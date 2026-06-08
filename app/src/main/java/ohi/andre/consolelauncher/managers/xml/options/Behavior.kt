@@ -154,6 +154,19 @@ enum class Behavior : XMLPrefsSave {
             return XMLPrefsSave.BOOLEAN
         }
     },
+    show_tmux_workspace_button {
+        override fun defaultValue(): String? {
+            return "false"
+        }
+
+        override fun info(): String? {
+            return "If true, Re:T-UI will show the tmux workspace button in the launcher toolbar"
+        }
+
+        override fun type(): String? {
+            return XMLPrefsSave.BOOLEAN
+        }
+    },
     enable_cyberdeck_mode {
         override fun defaultValue(): String? {
             return "false"

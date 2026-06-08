@@ -64,6 +64,11 @@ class config : ParamCommand() {
                     intent.putExtra(UIManager.EXTRA_MODULE_COMMAND, "rebuild")
                     LocalBroadcastManager.getInstance(pack.context.getApplicationContext())
                         .sendBroadcast(intent)
+                } else if (save === Behavior.show_tmux_workspace_button
+                    && pack.context is LauncherActivity
+                    && (pack.context as LauncherActivity).uiManager != null
+                ) {
+                    (pack.context as LauncherActivity).uiManager!!.refreshTermuxWorkspaceToolbarButton()
                 } else if ((save === Behavior.enable_cyberdeck_mode || save === Behavior.enable_crt_filter) && pack.context is Reloadable) {
                     (pack.context as Reloadable).reload()
                 } else if (save === Behavior.duo_mode && !"true".equals(

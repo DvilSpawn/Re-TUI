@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Color
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.managers.AppsManager
+import ohi.andre.consolelauncher.managers.FirstRunPresetManager
 import ohi.andre.consolelauncher.managers.xml.AutoColorManager.getColor
 import ohi.andre.consolelauncher.managers.xml.AutoColorManager.init
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsElement
@@ -80,6 +81,7 @@ object XMLPrefsManager {
             Tuils.sendOutput(Color.RED, context, R.string.tuinotfound_xmlprefs)
             return
         }
+        FirstRunPresetManager.seedIfNeeded(context, folder)
 
         for (element in XMLPrefsRoot.entries) {
             if (element === XMLPrefsRoot.APPS) continue

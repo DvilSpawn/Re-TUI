@@ -299,6 +299,14 @@ Example plain Codex CLI app:
 
 Register Codex directly, not through another tmux wrapper. Re:T-UI already owns the persistent session and sends typed input followed by Enter.
 
+Optional tmux workspace:
+
+- install the Termux helper with `curl -fsSL https://raw.githubusercontent.com/DvilSpawn/Re-TUI/main/termux/retui/install.sh | sh`
+- enable the toolbar entry with `config -set show_tmux_workspace_button true`
+- open the workspace button to use the launcher-owned tmux surface
+
+The workspace is meant for persistent TUI tools such as Midnight Commander, htop, SSH, and REPL sessions. Termux owns the tmux process; Re:T-UI owns the visual surface, key tray, and swipe window switching.
+
 ### `tbridge`
 
 Inspect and set up the Termux bridge used by scripts, modules, callbacks, and automation.
@@ -349,12 +357,11 @@ Common commands:
 - `module -export counter`
 - `module -dock add notifications`
 - `module -dock remove music`
+- `module -dock -toggle`
 - `module -add server termux:/data/data/com.termux/files/home/retui/server-health.sh`
 - `module -refresh server`
 - `module -rm server`
 - `module -hide music`
-- `module -dock add server`
-- `module -dock remove music`
 - `module -close`
 
 The reminder module is the first native conversational module. It asks for text, date, time, and confirmation through the normal terminal input surface, then schedules an Android notification.
@@ -362,7 +369,8 @@ The reminder module is the first native conversational module. It asks for text,
 Design direction:
 
 - modules are Re:T-UI-owned terminal panels, not Android widgets
-- active modules can provide suggestion chips when input is empty
+- active modules provide action chips in a separate module strip while the normal suggestion strip stays available
+- `module -dock -toggle` hides or shows the dock live without closing the currently displayed module
 - Termux modules should stay text/callback based, with no arbitrary shell code loaded into Re:T-UI
 - Lua modules use the launcher-native Lua runtime for safe panels, buttons, config, and app/intent/shortcut helpers
 - reminder prompt sessions ask users for values step by step and keep normal command execution paused until the session ends
