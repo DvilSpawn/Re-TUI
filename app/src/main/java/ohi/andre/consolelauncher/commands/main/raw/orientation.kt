@@ -44,12 +44,12 @@ class orientation : CommandAbstraction {
 
             if (mode == MODE_LANDSCAPE || mode == VALUE_LANDSCAPE) {
                 setOrientation(pack, VALUE_LANDSCAPE)
-                return "Landscape preference saved. Android controls the window orientation; rotate the device or resize the window to use landscape."
+                return "Landscape preference saved. Re:T-UI will use the split layout only when the window is wide enough."
             }
 
             if (mode == MODE_PORTRAIT || mode == VALUE_PORTRAIT) {
                 setOrientation(pack, VALUE_PORTRAIT)
-                return "Portrait preference saved. Android controls the window orientation; rotate the device or resize the window to use portrait."
+                return "Portrait preference saved. Re:T-UI will keep the portrait layout even if Android reports landscape."
             }
 
             if (mode == MODE_AUTO || mode == VALUE_AUTO || mode == "autorotate" || mode == "auto-rotate") {

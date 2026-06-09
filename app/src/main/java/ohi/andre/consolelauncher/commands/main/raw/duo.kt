@@ -1,6 +1,5 @@
 package ohi.andre.consolelauncher.commands.main.raw
 
-import android.content.res.Configuration
 import java.util.Locale
 import ohi.andre.consolelauncher.LauncherActivity
 import ohi.andre.consolelauncher.R
@@ -68,10 +67,10 @@ class duo : CommandAbstraction {
     }
 
     private fun appliedMessage(pack: ExecutePack, side: String): String {
-        val landscape = pack.context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        val landscape = UIManager.isResponsiveLandscapeConfiguration(pack.context.resources.configuration)
         var message = "Duo layout active on the $side side."
         if (!landscape) {
-            message += " Rotate to landscape to see it."
+            message += " Use a wide landscape window to see it."
         }
         return message
     }

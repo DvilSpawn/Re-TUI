@@ -1250,8 +1250,7 @@ class UIManager(
             return
         }
 
-        val shouldUseLandscape = configuration != null
-                && configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        val shouldUseLandscape = shouldUseResponsiveLandscape(configuration)
         if (termuxWorkspaceChromeActive) {
             if (landscapeLayoutActive || mainContainer!!.getParent() !== mRootView) {
                 restorePortraitLayout()
@@ -1290,6 +1289,13 @@ class UIManager(
     private fun shouldUseDuoLayout(): Boolean {
         return getBoolean(Behavior.duo_mode)
                 && DUO_LAYOUT_OFF != getDuoLayoutMode()
+    }
+
+    private fun shouldUseResponsiveLandscape(configuration: Configuration?): Boolean {
+        if (getInt(Behavior.orientation) == 1) {
+            return false
+        }
+        return isResponsiveLandscapeConfiguration(configuration)
     }
 
     private fun shouldUseSplitDuoLauncher(): Boolean {
@@ -1587,8 +1593,7 @@ class UIManager(
             return
         }
 
-        val landscape = configuration != null
-                && configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        val landscape = shouldUseResponsiveLandscape(configuration)
         val gutterWidth = if (landscape) this.landscapeFoldGutterWidth else 0
         val params = landscapeFoldGutter!!.getLayoutParams()
         if (params != null && params.width != gutterWidth) {
@@ -1757,8 +1762,7 @@ class UIManager(
             return
         }
 
-        val landscape = configuration != null
-                && configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        val landscape = shouldUseResponsiveLandscape(configuration)
         applyLandscapeFoldGutter(configuration)
         var topMargins = getDisplayMargins(Ui.display_margin_top_section)
         var bottomMargins = getDisplayMargins(Ui.display_margin_bottom_section)
@@ -2443,7 +2447,7 @@ class UIManager(
     }
 
     private fun isTermuxLandscapeKeyTray(): Boolean {
-        return currentConfiguration?.orientation == Configuration.ORIENTATION_LANDSCAPE
+        return shouldUseResponsiveLandscape(currentConfiguration)
     }
 
     private fun termuxWorkspaceCombinedKeyTray(): Boolean {
@@ -12778,8 +12782,28 @@ class UIManager(
         const val DUO_LAYOUT_LEFT: String = "left"
         const val DUO_LAYOUT_RIGHT: String = "right"
         const val MAX_LANDSCAPE_FOLD_GUTTER_MM: Int = 80
+        private const val RESPONSIVE_LANDSCAPE_MIN_ASPECT = 1.15f
         private const val DUO_LAYOUT_PREF = "duo_layout"
         private const val DUO_LAST_SIDE_PREF = "duo_last_side"
+
+        @JvmStatic
+        fun isResponsiveLandscapeConfiguration(configuration: Configuration?): Boolean {
+            if (configuration == null || configuration.orientation != Configuration.ORIENTATION_LANDSCAPE) {
+                return false
+            }
+
+            val widthDp = configuration.screenWidthDp
+            val heightDp = configuration.screenHeightDp
+            if (widthDp > 0 && heightDp > 0
+                && widthDp != Configuration.SCREEN_WIDTH_DP_UNDEFINED
+                && heightDp != Configuration.SCREEN_HEIGHT_DP_UNDEFINED
+            ) {
+                return widthDp.toFloat() / heightDp.toFloat() >= RESPONSIVE_LANDSCAPE_MIN_ASPECT
+            }
+
+            return true
+        }
+
         fun normalizeDuoLayoutMode(mode: String?): String {
             if (mode == null) {
                 return DUO_LAYOUT_OFF

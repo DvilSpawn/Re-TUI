@@ -455,11 +455,11 @@
         \n-ls [type] -> shows the expressions of the given type
         \n-tutorial -> show the tutorial on GitHub
         \n-file -> open the file htmlextract.xml</string>
-    <string name="help_landscape">Save the Re:T-UI landscape preference and enable adaptive landscape behavior when the window is landscape.
+    <string name="help_landscape">Save the Re:T-UI landscape preference and enable adaptive split layout when the window is wide enough.
         \n\nUsage:
         \n$ landscape
         \n\nShortcut for orientation landscape.</string>
-    <string name="help_portrait">Save the Re:T-UI portrait preference while Android controls the current window orientation.
+    <string name="help_portrait">Save the Re:T-UI portrait preference and keep portrait layout even if Android reports landscape.
         \n\nUsage:
         \n$ portrait
         \n\nShortcut for orientation portrait.</string>
@@ -468,7 +468,7 @@
         \n$ orientation portrait
         \n$ orientation landscape
         \n$ orientation auto
-        \n\nAndroid controls the current window orientation. Re:T-UI adapts its layout when the device or window rotates.</string>
+        \n\nRe:T-UI uses split landscape only when the current window is wide enough. Portrait keeps the portrait layout.</string>
     <string name="help_music">-next -> play the next song
         \n-previous -> play the previous song
         \n-play -> play/pause the player

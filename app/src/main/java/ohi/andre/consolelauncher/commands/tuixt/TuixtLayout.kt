@@ -1,7 +1,6 @@
 package ohi.andre.consolelauncher.commands.tuixt
 
 import android.content.Context
-import android.content.res.Configuration
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -58,7 +57,7 @@ object TuixtLayout {
     }
 
     private fun getLandscapeGutterWidth(context: Context?): Int {
-        if (context == null || context.resources.configuration.orientation != Configuration.ORIENTATION_LANDSCAPE) {
+        if (context == null || !UIManager.isResponsiveLandscapeConfiguration(context.resources.configuration)) {
             return 0
         }
 
