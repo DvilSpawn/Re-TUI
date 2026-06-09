@@ -21,6 +21,7 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.text.Editable
+import android.text.InputType
 import android.text.Layout
 import android.text.SpannableStringBuilder
 import android.text.Spanned
@@ -151,6 +152,7 @@ import ohi.andre.consolelauncher.managers.termux.TermuxBridgeManager
 import ohi.andre.consolelauncher.managers.termux.TermuxBridgeManager.createResultPendingIntent
 import ohi.andre.consolelauncher.managers.termux.TermuxBridgeManager.requestRunCommandPermissionIfPossible
 import ohi.andre.consolelauncher.managers.termux.TerminalGridView
+import ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceInputEditText
 import ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceSocketClient
 import ohi.andre.consolelauncher.managers.widgets.LuaWidgetEngine
 import ohi.andre.consolelauncher.managers.widgets.LuaWidgetEngine.UpdateListener
@@ -315,6 +317,8 @@ class UIManager(
     private var termuxActionsScroll: HorizontalScrollView? = null
     private var termuxActions: LinearLayout? = null
     private var termuxTools: View? = null
+    private var termuxKeysRowOne: ViewGroup? = null
+    private var termuxKeysRowTwo: ViewGroup? = null
     private val termuxCommandHistory = ArrayList<String?>()
     private var termuxHistoryCursor = -1
     private var termuxHistoryDraft = ""
@@ -364,6 +368,8 @@ class UIManager(
     private var termuxWorkspaceOutputPanel: View? = null
     private var termuxWorkspaceOutputLabel: TextView? = null
     private var termuxWorkspaceTools: View? = null
+    private var termuxWorkspaceKeysRowOne: ViewGroup? = null
+    private var termuxWorkspaceKeysRowTwo: ViewGroup? = null
     private var termuxWorkspaceBasePaddingLeft = 0
     private var termuxWorkspaceBasePaddingTop = 0
     private var termuxWorkspaceBasePaddingRight = 0
@@ -378,6 +384,7 @@ class UIManager(
     private var termuxWorkspaceDispatchSequence = 0
     private var termuxWorkspaceAcceptedSequence = 0
     private var termuxWorkspaceImeResizeGeneration = 0
+    private var termuxWorkspaceConfigurationRefreshGeneration = 0
     private var termuxWorkspaceTouchStartX = 0f
     private var termuxWorkspaceTouchStartY = 0f
     private var termuxWorkspaceKeyTouchStartX = 0f
@@ -392,6 +399,7 @@ class UIManager(
     private var termuxWorkspaceAltPending = false
     private var termuxWorkspaceShiftPending = false
     private var termuxWorkspaceFnKeyMode = false
+    private var termuxWorkspaceDirectInput = true
     private var termuxWorkspaceSuppressInputWatcher = false
     private var termuxWorkspaceInsertedStart = -1
     private var termuxWorkspaceInsertedText: String? = null
@@ -1244,6 +1252,16 @@ class UIManager(
 
         val shouldUseLandscape = configuration != null
                 && configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        if (termuxWorkspaceChromeActive) {
+            if (landscapeLayoutActive || mainContainer!!.getParent() !== mRootView) {
+                restorePortraitLayout()
+            }
+            applyLandscapeFoldGutter(configuration)
+            applyLandscapeStatusChrome(false)
+            applyDisplayMarginsForConfiguration(configuration)
+            applyTerminalTrayState(false)
+            return
+        }
         val shouldUseDuoLayout = shouldUseLandscape && shouldUseDuoLayout()
         val requestedDuoLayoutMode = if (shouldUseDuoLayout) getDuoLayoutMode() else DUO_LAYOUT_OFF
         val duoSideChanged = shouldUseDuoLayout && requestedDuoLayoutMode != activeDuoLayoutMode
@@ -2186,6 +2204,7 @@ class UIManager(
         termuxWorkspaceOutputPanel = workspacePage.findViewById<View?>(R.id.termux_workspace_output_panel)
         termuxWorkspaceOutputLabel = workspacePage.findViewById<TextView?>(R.id.termux_workspace_output_label)
         termuxWorkspaceTools = workspacePage.findViewById<View?>(R.id.termux_workspace_tools)
+        collapseTermuxWorkspaceInputHost()
         termuxWorkspaceRoot?.let { root ->
             termuxWorkspaceBasePaddingLeft = root.paddingLeft
             termuxWorkspaceBasePaddingTop = root.paddingTop
@@ -2222,15 +2241,38 @@ class UIManager(
 
         termuxWorkspaceInput?.let { input ->
             applyRetuiKeyboardTheme(input, "termux")
+            input.inputType = InputType.TYPE_CLASS_TEXT or
+                InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+            if (input is TermuxWorkspaceInputEditText) {
+                input.setBackspaceListener {
+                    if (termuxWorkspaceDirectInput) {
+                        sendTermuxWorkspaceKey("BSpace")
+                    }
+                }
+                input.setTextListener { text ->
+                    if (termuxWorkspaceDirectInput) {
+                        sendTermuxWorkspaceText(text)
+                    }
+                }
+            }
             input.setOnFocusChangeListener(OnFocusChangeListener { v: View?, hasFocus: Boolean ->
-                input.setCursorVisible(hasFocus)
+                input.setCursorVisible(false)
                 input.setShowSoftInputOnFocus(hasFocus)
             })
             input.setOnKeyListener(View.OnKeyListener { v: View?, keyCode: Int, event: KeyEvent? ->
-                if (handleTermuxWorkspaceHardwareModifiedKey(keyCode, event)) {
+                if (termuxWorkspaceDirectInput && event != null && event.action == KeyEvent.ACTION_DOWN
+                    && keyCode == KeyEvent.KEYCODE_DEL
+                ) {
+                    sendTermuxWorkspaceKey("BSpace")
+                    true
+                } else if (handleTermuxWorkspaceHardwareModifiedKey(keyCode, event)) {
                     true
                 } else if (keyCode == KeyEvent.KEYCODE_ENTER && event != null && event.action == KeyEvent.ACTION_UP) {
-                    submitTermuxWorkspaceInputFromField()
+                    if (termuxWorkspaceDirectInput) {
+                        sendTermuxWorkspaceKey("Enter")
+                    } else {
+                        submitTermuxWorkspaceInputFromField()
+                    }
                     true
                 } else {
                     false
@@ -2241,11 +2283,19 @@ class UIManager(
                     if (event.getAction() != KeyEvent.ACTION_UP) {
                         return@OnEditorActionListener true
                     }
-                    submitTermuxWorkspaceInputFromField()
+                    if (termuxWorkspaceDirectInput) {
+                        sendTermuxWorkspaceKey("Enter")
+                    } else {
+                        submitTermuxWorkspaceInputFromField()
+                    }
                     return@OnEditorActionListener true
                 }
                 if (actionId == EditorInfo.IME_ACTION_GO) {
-                    submitTermuxWorkspaceInputFromField()
+                    if (termuxWorkspaceDirectInput) {
+                        sendTermuxWorkspaceKey("Enter")
+                    } else {
+                        submitTermuxWorkspaceInputFromField()
+                    }
                     true
                 } else {
                     false
@@ -2257,6 +2307,9 @@ class UIManager(
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                     termuxWorkspaceInsertedStart = -1
                     termuxWorkspaceInsertedText = null
+                    if (termuxWorkspaceDirectInput) {
+                        return
+                    }
                     if (termuxWorkspaceSuppressInputWatcher || !hasTermuxWorkspacePendingModifiers()) {
                         return
                     }
@@ -2267,7 +2320,11 @@ class UIManager(
                 }
 
                 override fun afterTextChanged(s: Editable?) {
-                    consumeTermuxWorkspaceInsertedCombo(s)
+                    if (termuxWorkspaceDirectInput) {
+                        clearTermuxWorkspaceDirectInput(s)
+                    } else {
+                        consumeTermuxWorkspaceInsertedCombo(s)
+                    }
                 }
             })
         }
@@ -2279,11 +2336,40 @@ class UIManager(
         bindTermuxWorkspaceButton(workspacePage, R.id.termux_workspace_home, Runnable { openHomePage() })
         bindTermuxWorkspaceButton(workspacePage, R.id.termux_workspace_new, Runnable { newTermuxWorkspaceWindow(null) })
         bindTermuxWorkspaceButton(workspacePage, R.id.termux_workspace_ime, Runnable { focusTermuxWorkspaceInput(true) })
+        termuxWorkspaceKeysRowOne = workspacePage.findViewById<ViewGroup?>(R.id.termux_workspace_keys_row_one)
+        termuxWorkspaceKeysRowTwo = workspacePage.findViewById<ViewGroup?>(R.id.termux_workspace_keys_row_two)
         bindTermuxWorkspaceTerminalKeys(workspacePage)
         bindTermuxWorkspaceKeyModeSwipe(termuxWorkspaceTools)
-        bindTermuxWorkspaceKeyModeSwipe(workspacePage.findViewById<View?>(R.id.termux_workspace_keys_row_one))
-        bindTermuxWorkspaceKeyModeSwipe(workspacePage.findViewById<View?>(R.id.termux_workspace_keys_row_two))
+        bindTermuxWorkspaceKeyModeSwipe(termuxWorkspaceKeysRowOne)
+        bindTermuxWorkspaceKeyModeSwipe(termuxWorkspaceKeysRowTwo)
         styleTermuxWorkspaceChromeButtons()
+    }
+
+    private fun collapseTermuxWorkspaceInputHost() {
+        val group = termuxWorkspaceInputGroup ?: return
+        group.minimumHeight = 1
+        group.alpha = 0f
+        group.isClickable = false
+        group.isFocusable = false
+        group.setPadding(0, 0, 0, 0)
+        group.background = null
+        val params = group.layoutParams
+        if (params != null) {
+            params.height = 1
+            group.layoutParams = params
+        }
+        termuxWorkspacePrefix?.visibility = View.GONE
+        termuxWorkspaceSend?.visibility = View.GONE
+        termuxWorkspaceInput?.let { input ->
+            input.setText(Tuils.EMPTYSTRING)
+            input.hint = Tuils.EMPTYSTRING
+            input.minimumHeight = 1
+            input.minHeight = 1
+            input.height = 1
+            input.alpha = 0f
+            input.background = null
+            input.setPadding(0, 0, 0, 0)
+        }
     }
 
     private fun bindTermuxWorkspaceButton(root: View, id: Int, action: Runnable) {
@@ -2296,29 +2382,11 @@ class UIManager(
     }
 
     private fun bindTermuxWorkspaceTerminalKeys(root: View) {
-        termuxWorkspaceKeySlots.clear()
-        val ids = intArrayOf(
-            R.id.termux_workspace_key_slot_01,
-            R.id.termux_workspace_key_slot_02,
-            R.id.termux_workspace_key_slot_03,
-            R.id.termux_workspace_key_slot_04,
-            R.id.termux_workspace_key_slot_05,
-            R.id.termux_workspace_key_slot_06,
-            R.id.termux_workspace_key_slot_07,
-            R.id.termux_workspace_key_slot_08,
-            R.id.termux_workspace_key_slot_09,
-            R.id.termux_workspace_key_slot_10,
-            R.id.termux_workspace_key_slot_11,
-            R.id.termux_workspace_key_slot_12,
-            R.id.termux_workspace_key_slot_13,
-            R.id.termux_workspace_key_slot_14,
-            R.id.termux_workspace_key_slot_15,
-            R.id.termux_workspace_key_slot_16
-        )
-        for (id in ids) {
-            val key = root.findViewById<TextView?>(id) ?: continue
-            termuxWorkspaceKeySlots.add(key)
-            bindTermuxWorkspaceKeyModeSwipe(key)
+        if (termuxWorkspaceKeysRowOne == null) {
+            termuxWorkspaceKeysRowOne = root.findViewById<ViewGroup?>(R.id.termux_workspace_keys_row_one)
+        }
+        if (termuxWorkspaceKeysRowTwo == null) {
+            termuxWorkspaceKeysRowTwo = root.findViewById<ViewGroup?>(R.id.termux_workspace_keys_row_two)
         }
         updateTermuxWorkspaceKeyMode()
     }
@@ -2330,7 +2398,14 @@ class UIManager(
     }
 
     private fun updateTermuxWorkspaceKeyMode() {
-        val specs = if (termuxWorkspaceFnKeyMode) termuxWorkspaceFnKeySpecs() else termuxWorkspaceNavKeySpecs()
+        syncTermuxKeyRows(
+            termuxWorkspaceKeysRowOne,
+            termuxWorkspaceKeysRowTwo,
+            termuxWorkspaceKeySlots,
+            termuxWorkspaceCombinedKeyTray(),
+            this::bindTermuxWorkspaceKeyModeSwipe
+        )
+        val specs = activeTermuxWorkspaceKeySpecs()
         termuxWorkspaceCtrlKey = null
         termuxWorkspaceAltKey = null
         termuxWorkspaceShiftKey = null
@@ -2367,6 +2442,136 @@ class UIManager(
         updateTermuxWorkspaceModifierButtons()
     }
 
+    private fun isTermuxLandscapeKeyTray(): Boolean {
+        return currentConfiguration?.orientation == Configuration.ORIENTATION_LANDSCAPE
+    }
+
+    private fun termuxWorkspaceCombinedKeyTray(): Boolean {
+        return isTermuxLandscapeKeyTray()
+    }
+
+    private fun termuxAppCombinedKeyTray(): Boolean {
+        return termuxAppSession != null && isTermuxLandscapeKeyTray()
+    }
+
+    private fun activeTermuxWorkspaceKeySpecs(): Array<TermuxWorkspaceKeySpec> {
+        return if (termuxWorkspaceCombinedKeyTray()) {
+            termuxWorkspaceCombinedKeySpecs()
+        } else if (termuxWorkspaceFnKeyMode) {
+            termuxWorkspaceFnKeySpecs()
+        } else {
+            termuxWorkspaceNavKeySpecs()
+        }
+    }
+
+    private fun activeTermuxAppKeySpecs(): Array<TermuxWorkspaceKeySpec> {
+        return if (termuxAppCombinedKeyTray()) {
+            termuxWorkspaceCombinedKeySpecs()
+        } else if (termuxFnKeyMode) {
+            termuxWorkspaceFnKeySpecs()
+        } else {
+            termuxWorkspaceNavKeySpecs()
+        }
+    }
+
+    private fun termuxWorkspaceCombinedKeySpecs(): Array<TermuxWorkspaceKeySpec> {
+        return arrayOf(
+            termuxWorkspaceRefreshSpec("REFRESH"),
+            termuxWorkspaceKeySpec("ESC", "Escape"),
+            termuxWorkspaceKeySpec("F1", "F1"),
+            termuxWorkspaceKeySpec("F2", "F2"),
+            termuxWorkspaceKeySpec("F3", "F3"),
+            termuxWorkspaceKeySpec("F4", "F4"),
+            termuxWorkspaceKeySpec("F5", "F5"),
+            termuxWorkspaceKeySpec("F6", "F6"),
+            termuxWorkspaceKeySpec("F7", "F7"),
+            termuxWorkspaceKeySpec("F8", "F8"),
+            termuxWorkspaceKeySpec("F9", "F9"),
+            termuxWorkspaceKeySpec("F10", "F10"),
+            termuxWorkspaceKeySpec("↑", "Up"),
+            termuxWorkspaceKeySpec("BTAB", "BTab"),
+            termuxWorkspaceKeySpec("INS", "Insert"),
+            termuxWorkspaceKeySpec("DEL", "Delete"),
+            termuxWorkspaceRefreshSpec("REFRESH"),
+            termuxWorkspaceKeySpec("/", "/"),
+            termuxWorkspaceKeySpec("-", "-"),
+            termuxWorkspaceKeySpec("TAB", "Tab"),
+            termuxWorkspaceModifierSpec("CTRL", TermuxWorkspaceModifier.CTRL),
+            termuxWorkspaceModifierSpec("ALT", TermuxWorkspaceModifier.ALT),
+            termuxWorkspaceModifierSpec("SHIFT", TermuxWorkspaceModifier.SHIFT),
+            termuxWorkspaceKeySpec("HOME", "Home"),
+            termuxWorkspaceKeySpec("END", "End"),
+            termuxWorkspaceKeySpec("PGUP", "PageUp"),
+            termuxWorkspaceKeySpec("BKSP", "BSpace"),
+            termuxWorkspaceKeySpec("←", "Left"),
+            termuxWorkspaceKeySpec("↓", "Down"),
+            termuxWorkspaceKeySpec("→", "Right"),
+            termuxWorkspaceKeySpec("PGDN", "PageDown"),
+            termuxWorkspaceKeySpec("ENTER", "Enter")
+        )
+    }
+
+    private fun syncTermuxKeyRows(
+        rowOne: ViewGroup?,
+        rowTwo: ViewGroup?,
+        slots: MutableList<TextView>,
+        combined: Boolean,
+        bindSwipe: (View?) -> Unit
+    ) {
+        slots.clear()
+        val keysPerRow = if (combined) TERMUX_LANDSCAPE_KEYS_PER_ROW else TERMUX_PORTRAIT_KEYS_PER_ROW
+        collectTermuxKeyRowSlots(rowOne, keysPerRow, slots, bindSwipe)
+        collectTermuxKeyRowSlots(rowTwo, keysPerRow, slots, bindSwipe)
+    }
+
+    private fun collectTermuxKeyRowSlots(
+        row: ViewGroup?,
+        desiredCount: Int,
+        slots: MutableList<TextView>,
+        bindSwipe: (View?) -> Unit
+    ) {
+        if (row == null) {
+            return
+        }
+        while (row.childCount < desiredCount) {
+            val key = TextView(row.context)
+            key.layoutParams = LinearLayout.LayoutParams(
+                0,
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                1f
+            )
+            key.gravity = Gravity.CENTER
+            key.includeFontPadding = false
+            key.isAllCaps = false
+            key.textSize = 11f
+            row.addView(key)
+        }
+        for (i in 0 until row.childCount) {
+            val child = row.getChildAt(i)
+            if (child !is TextView) {
+                child.visibility = if (i < desiredCount) View.VISIBLE else View.GONE
+                continue
+            }
+            val params = child.layoutParams
+            if (params is LinearLayout.LayoutParams) {
+                if (params.width != 0 || params.height != ViewGroup.LayoutParams.MATCH_PARENT || params.weight != 1f) {
+                    params.width = 0
+                    params.height = ViewGroup.LayoutParams.MATCH_PARENT
+                    params.weight = 1f
+                    child.layoutParams = params
+                }
+            }
+            if (i < desiredCount) {
+                child.visibility = View.VISIBLE
+                slots.add(child)
+                bindSwipe(child)
+            } else {
+                child.visibility = View.GONE
+                child.setOnClickListener(null)
+            }
+        }
+    }
+
     private fun termuxWorkspaceNavKeySpecs(): Array<TermuxWorkspaceKeySpec> {
         return arrayOf(
             termuxWorkspaceRefreshSpec("REFRESH"),
@@ -2374,16 +2579,16 @@ class UIManager(
             termuxWorkspaceKeySpec("/", "/"),
             termuxWorkspaceKeySpec("-", "-"),
             termuxWorkspaceKeySpec("HOME", "Home"),
-            termuxWorkspaceKeySpec("UP", "Up"),
+            termuxWorkspaceKeySpec("↑", "Up"),
             termuxWorkspaceKeySpec("END", "End"),
             termuxWorkspaceKeySpec("PGUP", "PageUp"),
             termuxWorkspaceKeySpec("TAB", "Tab"),
             termuxWorkspaceModifierSpec("CTRL", TermuxWorkspaceModifier.CTRL),
             termuxWorkspaceModifierSpec("ALT", TermuxWorkspaceModifier.ALT),
             termuxWorkspaceModifierSpec("SHIFT", TermuxWorkspaceModifier.SHIFT),
-            termuxWorkspaceKeySpec("LEFT", "Left"),
-            termuxWorkspaceKeySpec("DOWN", "Down"),
-            termuxWorkspaceKeySpec("RIGHT", "Right"),
+            termuxWorkspaceKeySpec("←", "Left"),
+            termuxWorkspaceKeySpec("↓", "Down"),
+            termuxWorkspaceKeySpec("→", "Right"),
             termuxWorkspaceKeySpec("PGDN", "PageDown")
         )
     }
@@ -2448,6 +2653,9 @@ class UIManager(
     }
 
     private fun setTermuxWorkspaceFnKeyMode(enabled: Boolean): Boolean {
+        if (termuxWorkspaceCombinedKeyTray()) {
+            return false
+        }
         if (termuxWorkspaceFnKeyMode == enabled) {
             return false
         }
@@ -2461,7 +2669,7 @@ class UIManager(
     }
 
     private fun animateTermuxWorkspaceFnKeyMode(enabled: Boolean, direction: Int): Boolean {
-        if (termuxWorkspaceFnKeyMode == enabled || termuxWorkspaceKeyModeAnimating) {
+        if (termuxWorkspaceCombinedKeyTray() || termuxWorkspaceFnKeyMode == enabled || termuxWorkspaceKeyModeAnimating) {
             return false
         }
         val tools = termuxWorkspaceTools
@@ -2663,6 +2871,7 @@ class UIManager(
             styleTermuxToolButtons(termuxWorkspaceTools, textColor)
             updateTermuxWorkspaceModifierButtons()
         }
+        collapseTermuxWorkspaceInputHost()
     }
 
     private fun styleTermuxWorkspaceButton(button: TextView) {
@@ -2749,6 +2958,7 @@ class UIManager(
             return
         }
         termuxWorkspaceChromeActive = active
+        applyResponsiveLandscapeLayout(currentConfiguration)
         if (active) {
             headerContainer?.let { header ->
                 termuxWorkspaceHeaderVisibility = header.visibility
@@ -2762,6 +2972,7 @@ class UIManager(
         }
         headerContainer?.visibility = termuxWorkspaceHeaderVisibility
         terminalTrayContainer?.visibility = termuxWorkspaceTrayVisibility
+        applyResponsiveLandscapeLayout(currentConfiguration)
     }
 
     private fun focusTermuxWorkspaceInput(showKeyboard: Boolean) {
@@ -2794,6 +3005,50 @@ class UIManager(
             termuxWorkspaceLastRenderedFrameKey = null
             refreshTermuxWorkspaceSocketGeometry(true)
         }, TERMUX_WORKSPACE_IME_RESIZE_REFRESH_DELAY_MS)
+    }
+
+    private fun scheduleTermuxWorkspaceConfigurationRecovery() {
+        if (!termuxWorkspaceChromeActive) {
+            return
+        }
+        val root = termuxWorkspaceRoot ?: return
+        val generation = ++termuxWorkspaceConfigurationRefreshGeneration
+        imeInsetVisible = false
+        imeBottomOffset = 0
+        termuxWorkspaceMeasuredLineHeight = 0
+        applyTermuxWorkspaceImeBottomPadding()
+        val delays = longArrayOf(0L, 90L, 220L, 420L, 760L, 1180L)
+        for (delay in delays) {
+            val action = Runnable {
+                recoverTermuxWorkspaceAfterConfigurationChange(generation, delay >= 220L)
+            }
+            if (delay == 0L) {
+                root.post(action)
+            } else {
+                root.postDelayed(action, delay)
+            }
+        }
+    }
+
+    private fun recoverTermuxWorkspaceAfterConfigurationChange(generation: Int, refocus: Boolean) {
+        if (generation != termuxWorkspaceConfigurationRefreshGeneration || !termuxWorkspaceChromeActive) {
+            return
+        }
+        val host = termuxWorkspaceScroll ?: termuxWorkspaceOutputPanel
+        if ((host?.width ?: 0) <= 0 || visibleTermuxWorkspaceHostHeight(host) <= 0) {
+            return
+        }
+        collapseTermuxWorkspaceInputHost()
+        termuxWorkspaceLastRenderedFrameKey = null
+        resetTermuxWorkspaceViewportOrigin()
+        if (termuxWorkspaceSocketClient?.connected == true) {
+            refreshTermuxWorkspaceSocketGeometry(true)
+        } else {
+            refreshTermuxWorkspace(false)
+        }
+        if (refocus) {
+            focusTermuxWorkspaceInput(false)
+        }
     }
 
     private fun syncTermuxWorkspaceImeFromVisibleFrame() {
@@ -2873,7 +3128,10 @@ class UIManager(
             MotionEvent.ACTION_UP -> {
                 val dx = event.rawX - termuxWorkspaceKeyTouchStartX
                 val dy = event.rawY - termuxWorkspaceKeyTouchStartY
-                if (abs(dx) > TERMUX_WORKSPACE_KEY_MODE_SWIPE_THRESHOLD_PX && abs(dx) > abs(dy) * 1.35f) {
+                if (!termuxWorkspaceCombinedKeyTray()
+                    && abs(dx) > TERMUX_WORKSPACE_KEY_MODE_SWIPE_THRESHOLD_PX
+                    && abs(dx) > abs(dy) * 1.35f
+                ) {
                     termuxWorkspaceKeySwipeConsumed = true
                     animateTermuxWorkspaceFnKeyMode(!termuxWorkspaceFnKeyMode, if (dx < 0) 1 else -1)
                     return true
@@ -2938,6 +3196,18 @@ class UIManager(
         }
         clearTermuxWorkspaceModifiers()
         sendTermuxWorkspaceKey(key)
+    }
+
+    private fun clearTermuxWorkspaceDirectInput(text: Editable?) {
+        if (termuxWorkspaceSuppressInputWatcher || text == null || text.isEmpty()) {
+            return
+        }
+        termuxWorkspaceSuppressInputWatcher = true
+        try {
+            text.clear()
+        } finally {
+            termuxWorkspaceSuppressInputWatcher = false
+        }
     }
 
     private fun mapTermuxWorkspacePrintableCombo(text: String): String? {
@@ -3053,6 +3323,17 @@ class UIManager(
         dispatchTermuxWorkspaceScript("key", buildTermuxWorkspaceKeyScript(clean), true)
     }
 
+    private fun sendTermuxWorkspaceText(text: String) {
+        if (text.isEmpty()) {
+            return
+        }
+        if (sendTermuxWorkspaceSocketText(text)) {
+            return
+        }
+        renderTermuxWorkspaceStatus("typing")
+        dispatchTermuxWorkspaceScript("type", buildTermuxWorkspaceTypeScript(text), true)
+    }
+
     private fun captureTermuxWorkspaceSocket(): Boolean {
         val client = termuxWorkspaceSocketClient ?: return false
         if (!client.connected) {
@@ -3069,6 +3350,15 @@ class UIManager(
         }
         val geometry = calculateTermuxWorkspaceGeometry()
         return client.sendInput(input, geometry.cols, geometry.rows)
+    }
+
+    private fun sendTermuxWorkspaceSocketText(text: String): Boolean {
+        val client = termuxWorkspaceSocketClient ?: return false
+        if (!client.connected) {
+            return false
+        }
+        val geometry = calculateTermuxWorkspaceGeometry()
+        return client.typeInput(text, geometry.cols, geometry.rows)
     }
 
     private fun sendTermuxWorkspaceSocketKey(key: String): Boolean {
@@ -3198,6 +3488,9 @@ class UIManager(
         charWidth: Float,
         lineHeight: Int
     ) {
+        if (termuxWorkspaceGrid != null) {
+            return
+        }
         if (Looper.myLooper() != Looper.getMainLooper()) {
             return
         }
@@ -3294,6 +3587,17 @@ class UIManager(
                 buildTermuxWorkspaceEnsureScript() + "\n" +
                 buildTermuxWorkspaceResizeScript() + "\n" +
                 send + "\nsleep 0.25\n" +
+                buildTermuxWorkspaceFrameScript()
+    }
+
+    private fun buildTermuxWorkspaceTypeScript(input: String): String {
+        val session = shellQuote(TERMUX_WORKSPACE_SESSION)
+        return buildTermuxWorkspacePreambleScript() + "\n" +
+                buildTermuxWorkspaceBridgeScript("type", "RETUI_INPUT", input) + "\n" +
+                buildTermuxWorkspaceEnsureScript() + "\n" +
+                buildTermuxWorkspaceResizeScript() + "\n" +
+                "tmux send-keys -t " + session + " -l -- " + shellQuote(input) + "\n" +
+                "sleep 0.08\n" +
                 buildTermuxWorkspaceFrameScript()
     }
 
@@ -5881,6 +6185,8 @@ class UIManager(
         termuxActionsScroll = rootView.findViewById<HorizontalScrollView?>(R.id.termux_actions_scroll)
         termuxActions = rootView.findViewById<LinearLayout?>(R.id.termux_actions)
         termuxTools = rootView.findViewById<View?>(R.id.termux_tools)
+        termuxKeysRowOne = rootView.findViewById<ViewGroup?>(R.id.termux_keys_row_one)
+        termuxKeysRowTwo = rootView.findViewById<ViewGroup?>(R.id.termux_keys_row_two)
         suggestionsContainer = rootView.findViewById<View?>(R.id.suggestions_container)
 
         applyTermuxImeBottomPadding()
@@ -5952,35 +6258,15 @@ class UIManager(
     }
 
     private fun bindTermuxExtraKeys(rootView: View) {
-        termuxKeySlots.clear()
-        val ids = intArrayOf(
-            R.id.termux_key_esc,
-            R.id.termux_key_slash,
-            R.id.termux_key_dash,
-            R.id.termux_key_home,
-            R.id.termux_key_up,
-            R.id.termux_key_end,
-            R.id.termux_key_pgup,
-            R.id.termux_key_setup,
-            R.id.termux_key_tab,
-            R.id.termux_key_ctrl,
-            R.id.termux_key_alt,
-            R.id.termux_key_left,
-            R.id.termux_key_down,
-            R.id.termux_key_right,
-            R.id.termux_key_pgdn,
-            R.id.termux_key_ime
-        )
-        for (id in ids) {
-            val key = rootView.findViewById<TextView?>(id)
-            if (key != null) {
-                termuxKeySlots.add(key)
-                bindTermuxAppKeyModeSwipe(key)
-            }
+        if (termuxKeysRowOne == null) {
+            termuxKeysRowOne = rootView.findViewById<ViewGroup?>(R.id.termux_keys_row_one)
+        }
+        if (termuxKeysRowTwo == null) {
+            termuxKeysRowTwo = rootView.findViewById<ViewGroup?>(R.id.termux_keys_row_two)
         }
         bindTermuxAppKeyModeSwipe(termuxTools)
-        bindTermuxAppKeyModeSwipe(rootView.findViewById<View?>(R.id.termux_keys_row_one))
-        bindTermuxAppKeyModeSwipe(rootView.findViewById<View?>(R.id.termux_keys_row_two))
+        bindTermuxAppKeyModeSwipe(termuxKeysRowOne)
+        bindTermuxAppKeyModeSwipe(termuxKeysRowTwo)
         updateTermuxConsoleKeyMode()
     }
 
@@ -5997,9 +6283,16 @@ class UIManager(
         termuxFnKeyMode = false
         termuxKeyModeAnimating = false
         termuxKeySwipeConsumed = false
+        syncTermuxKeyRows(
+            termuxKeysRowOne,
+            termuxKeysRowTwo,
+            termuxKeySlots,
+            false,
+            this::bindTermuxAppKeyModeSwipe
+        )
         val labels = arrayOf(
-            "ESC", "/", "-", "HOME", "UP", "END", "PGUP", "CFG",
-            "TAB", "CTRL", "ALT", "LEFT", "DOWN", "RIGHT", "PGDN", "IME"
+            "ESC", "/", "-", "HOME", "↑", "END", "PGUP", "CFG",
+            "TAB", "CTRL", "ALT", "←", "↓", "→", "PGDN", "IME"
         )
         val actions = arrayOf(
             Runnable { this.handleTermuxEscapeKey() },
@@ -6037,17 +6330,30 @@ class UIManager(
     }
 
     private fun updateTermuxAppKeyMode() {
+        syncTermuxKeyRows(
+            termuxKeysRowOne,
+            termuxKeysRowTwo,
+            termuxKeySlots,
+            termuxAppCombinedKeyTray(),
+            this::bindTermuxAppKeyModeSwipe
+        )
         if (termuxKeySlots.isEmpty()) {
             return
         }
         termuxCtrlKey = null
         termuxAltKey = null
         termuxShiftKey = null
-        val specs = if (termuxFnKeyMode) termuxWorkspaceFnKeySpecs() else termuxWorkspaceNavKeySpecs()
+        val specs = activeTermuxAppKeySpecs()
         val normalColor = notificationWidgetTextColor()
         for (i in termuxKeySlots.indices) {
             val key = termuxKeySlots[i]
-            val spec = specs.getOrNull(i) ?: continue
+            val spec = specs.getOrNull(i)
+            if (spec == null) {
+                key.visibility = View.INVISIBLE
+                key.setOnClickListener(null)
+                continue
+            }
+            key.visibility = View.VISIBLE
             key.text = spec.label
             key.textSize = if (spec.label.length >= 5) 10f else 11f
             key.alpha = 0.82f
@@ -6098,6 +6404,9 @@ class UIManager(
     }
 
     private fun setTermuxAppFnKeyMode(enabled: Boolean): Boolean {
+        if (termuxAppCombinedKeyTray()) {
+            return false
+        }
         if (termuxFnKeyMode == enabled) {
             return false
         }
@@ -6111,7 +6420,7 @@ class UIManager(
     }
 
     private fun animateTermuxAppFnKeyMode(enabled: Boolean, direction: Int): Boolean {
-        if (termuxFnKeyMode == enabled || termuxKeyModeAnimating) {
+        if (termuxAppCombinedKeyTray() || termuxFnKeyMode == enabled || termuxKeyModeAnimating) {
             return false
         }
         val tools = termuxTools
@@ -6156,6 +6465,9 @@ class UIManager(
             }
             when (event.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
+                    if (termuxAppCombinedKeyTray()) {
+                        return@OnTouchListener false
+                    }
                     termuxKeyTouchStartX = event.rawX
                     termuxKeyTouchStartY = event.rawY
                     termuxKeySwipeConsumed = false
@@ -6164,7 +6476,10 @@ class UIManager(
                 MotionEvent.ACTION_UP -> {
                     val dx = event.rawX - termuxKeyTouchStartX
                     val dy = event.rawY - termuxKeyTouchStartY
-                    if (abs(dx) > TERMUX_WORKSPACE_KEY_MODE_SWIPE_THRESHOLD_PX && abs(dx) > abs(dy) * 1.35f) {
+                    if (!termuxAppCombinedKeyTray()
+                        && abs(dx) > TERMUX_WORKSPACE_KEY_MODE_SWIPE_THRESHOLD_PX
+                        && abs(dx) > abs(dy) * 1.35f
+                    ) {
                         termuxKeySwipeConsumed = true
                         animateTermuxAppFnKeyMode(!termuxFnKeyMode, if (dx < 0f) 1 else -1)
                         true
@@ -12231,6 +12546,9 @@ class UIManager(
 
     fun onConfigurationChanged(newConfig: Configuration?) {
         applyResponsiveLandscapeLayout(newConfig)
+        updateTermuxWorkspaceKeyMode()
+        updateTermuxConsoleKeyMode()
+        scheduleTermuxWorkspaceConfigurationRecovery()
         if (mTerminalAdapter != null) {
             mTerminalAdapter!!.scrollToEnd()
             mTerminalAdapter!!.focusInputEnd()
@@ -12416,6 +12734,8 @@ class UIManager(
         private const val TERMUX_WORKSPACE_KEY_MODE_SWIPE_THRESHOLD_PX = 70f
         private const val TERMUX_WORKSPACE_KEY_MODE_CAROUSEL_OUT_MS = 92L
         private const val TERMUX_WORKSPACE_KEY_MODE_CAROUSEL_IN_MS = 124L
+        private const val TERMUX_PORTRAIT_KEYS_PER_ROW = 8
+        private const val TERMUX_LANDSCAPE_KEYS_PER_ROW = 16
         private const val TERMUX_WORKSPACE_IME_VISIBLE_THRESHOLD_DP = 80
         private const val TERMUX_WORKSPACE_IME_RESIZE_REFRESH_DELAY_MS = 180L
         private const val TERMUX_WORKSPACE_MAX_OUTPUT_CHARS = 24000

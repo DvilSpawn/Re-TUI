@@ -270,32 +270,36 @@
             <LinearLayout
                 android:id="@+id/termux_workspace_input_group"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_height="1dp"
+                android:layout_marginTop="0dp"
+                android:alpha="0"
                 android:gravity="center_vertical"
-                android:minHeight="42dp"
+                android:minHeight="1dp"
                 android:orientation="horizontal"
-                android:paddingStart="8dp"
-                android:paddingTop="6dp"
-                android:paddingEnd="8dp"
-                android:paddingBottom="6dp">
+                android:paddingStart="0dp"
+                android:paddingTop="0dp"
+                android:paddingEnd="0dp"
+                android:paddingBottom="0dp">
 
                 <TextView
                     android:id="@+id/termux_workspace_prefix"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:visibility="gone"
                     android:text="tmux>"
                     android:textSize="14sp" />
 
-                <EditText
+                <ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceInputEditText
                     android:id="@+id/termux_workspace_input"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
+                    android:layout_width="1dp"
+                    android:layout_height="1dp"
                     android:background="@null"
-                    android:hint="type input or :help"
+                    android:hint=""
                     android:imeOptions="actionGo|flagNoFullscreen"
                     android:importantForAutofill="no"
+                    android:inputType="text|textNoSuggestions"
+                    android:minHeight="1dp"
+                    android:padding="0dp"
                     android:singleLine="true"
                     android:textSize="14sp" />
 
@@ -305,7 +309,8 @@
                     android:layout_height="match_parent"
                     android:gravity="center"
                     android:text="SEND"
-                    android:textSize="11sp" />
+                    android:textSize="11sp"
+                    android:visibility="gone" />
             </LinearLayout>
         </LinearLayout>
     </FrameLayout>

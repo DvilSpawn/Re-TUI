@@ -92,7 +92,7 @@ class TerminalGridView @JvmOverloads constructor(
         cursorY = cursorRow?.coerceIn(0, rows - 1)
         parseIntoGrid(value)
         if (sizeChanged) {
-            requestLayout()
+            requestLayoutSafely()
         }
         invalidate()
     }
@@ -141,8 +141,16 @@ class TerminalGridView @JvmOverloads constructor(
         val metrics = textPaint.fontMetrics
         cellHeightPx = max(1, ceil(metrics.descent - metrics.ascent).toInt())
         baselineOffsetPx = -metrics.ascent
-        requestLayout()
+        requestLayoutSafely()
         invalidate()
+    }
+
+    private fun requestLayoutSafely() {
+        if (isInLayout) {
+            post { requestLayout() }
+        } else {
+            requestLayout()
+        }
     }
 
     private fun clearCells() {

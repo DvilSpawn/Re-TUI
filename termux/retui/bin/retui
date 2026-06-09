@@ -204,6 +204,18 @@ bridge_send() {
     capture_frame
 }
 
+bridge_type() {
+    ensure_bridge_session
+    resize_bridge_from_env
+    session="$(bridge_session)"
+    input="${RETUI_INPUT-}"
+    if [ -n "$input" ]; then
+        tmux send-keys -t "$session" -l -- "$input"
+    fi
+    sleep "${RETUI_CAPTURE_DELAY:-0.08}"
+    capture_frame
+}
+
 bridge_new() {
     ensure_bridge_session
     resize_bridge_from_env
@@ -444,6 +456,18 @@ bridge_socket_client() {
                     capture_frame
                 fi
                 ;;
+            TYPE)
+                [ "$authed" -eq 1 ] || { socket_error "auth required"; exit 1; }
+                resize_bridge "${2:-}" "${3:-}"
+                input="$(decode_payload "${4:-}" || true)"
+                if [ -n "$input" ]; then
+                    tmux send-keys -t "$(bridge_session)" -l -- "$input"
+                fi
+                if [ "$streaming" -eq 0 ]; then
+                    sleep "${RETUI_CAPTURE_DELAY:-0.08}"
+                    capture_frame
+                fi
+                ;;
             NEW)
                 [ "$authed" -eq 1 ] || { socket_error "auth required"; exit 1; }
                 resize_bridge "${2:-}" "${3:-}"
@@ -513,6 +537,7 @@ bridge_main() {
         socket-client) bridge_socket_client ;;
         tcp-daemon) bridge_tcp_daemon ;;
         send) bridge_send ;;
+        type) bridge_type ;;
         new) bridge_new ;;
         switch) bridge_switch ;;
         key) bridge_key ;;
