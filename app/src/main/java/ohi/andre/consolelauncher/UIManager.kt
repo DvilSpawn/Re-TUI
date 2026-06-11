@@ -3434,7 +3434,7 @@ class UIManager(
         out.append("Re:T-UI tmux workspace").append('\n')
         out.append("session: ").append(TERMUX_WORKSPACE_SESSION).append('\n')
         out.append("local commands").append('\n')
-        out.append(":launch [id] - list or open a launcher").append('\n')
+        out.append(":launch [id] - list or focus/create a launcher").append('\n')
         out.append(":save <id> <command> - save a launcher").append('\n')
         out.append(":rm <id> - remove a saved launcher").append('\n')
         out.append(":switch <window> - jump to a tmux window index/name").append('\n')
@@ -3455,7 +3455,7 @@ class UIManager(
             renderTermuxWorkspaceLocalStatus("Unknown launcher: " + rawId + ". Run :launch to list available launchers.")
             return
         }
-        newTermuxWorkspaceWindow(launcher.id, launcher.command)
+        openTermuxWorkspaceLauncher(launcher)
     }
 
     private fun renderTermuxWorkspaceLauncherList() {
@@ -3489,6 +3489,18 @@ class UIManager(
         clearTermuxWorkspaceLocalOutputHold()
         renderTermuxWorkspaceStatus("select tmux window: " + target)
         dispatchTermuxWorkspaceScript("select", buildTermuxWorkspaceSelectScript(target), true)
+    }
+
+    private fun openTermuxWorkspaceLauncher(launcher: TermuxWorkspaceLauncherManager.Launcher) {
+        val name = launcher.id.trim { it <= ' ' }
+        if (name.isEmpty()) {
+            renderTermuxWorkspaceLocalStatus("launcher id is empty")
+            return
+        }
+        val command = launcher.command.trim { it <= ' ' }
+        clearTermuxWorkspaceLocalOutputHold()
+        renderTermuxWorkspaceStatus("open tmux launcher: " + name)
+        dispatchTermuxWorkspaceScript("launch", buildTermuxWorkspaceLauncherScript(name, command), true)
     }
 
     private fun normalizeTermuxWorkspaceWindowTarget(rawTarget: String): String {
@@ -3913,6 +3925,36 @@ class UIManager(
                 buildTermuxWorkspaceResizeScript() + "\n" +
                 buildTermuxWorkspaceTmuxCommand("new-window -t " + session + nameArg + " -c " + home) +
                 sendCommand + "\n" +
+                "sleep 0.15\n" +
+                buildTermuxWorkspaceFrameScript()
+    }
+
+    private fun buildTermuxWorkspaceLauncherScript(name: String, initialCommand: String): String {
+        val session = shellQuote(TERMUX_WORKSPACE_SESSION)
+        val home = shellQuote(TermuxBridgeManager.TERMUX_HOME)
+        val windowName = shellQuote(name)
+        val tmuxTarget = shellQuote(TERMUX_WORKSPACE_SESSION + ":" + name)
+        val command = initialCommand.trim { it <= ' ' }
+        val sendCommand = if (command.isEmpty()) {
+            Tuils.EMPTYSTRING
+        } else {
+            "\n  sleep 0.08\n" +
+                    "  tmux send-keys -t " + session + " -l -- " + shellQuote(command) + "\n" +
+                    "  tmux send-keys -t " + session + " C-m"
+        }
+        return buildTermuxWorkspacePreambleScript() + "\n" +
+                buildTermuxWorkspaceBridgeScript(
+                    "launch",
+                    listOf(Pair("RETUI_WINDOW_NAME", name), Pair("RETUI_COMMAND", command))
+                ) + "\n" +
+                buildTermuxWorkspaceEnsureScript() + "\n" +
+                buildTermuxWorkspaceResizeScript() + "\n" +
+                "if tmux list-windows -t " + session + " -F '#W' | grep -F -x -- " + windowName + " >/dev/null 2>&1; then\n" +
+                "  tmux select-window -t " + tmuxTarget + "\n" +
+                "else\n" +
+                "  " + buildTermuxWorkspaceTmuxCommand("new-window -t " + session + " -n " + windowName + " -c " + home) +
+                sendCommand + "\n" +
+                "fi\n" +
                 "sleep 0.15\n" +
                 buildTermuxWorkspaceFrameScript()
     }

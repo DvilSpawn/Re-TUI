@@ -124,7 +124,7 @@ Workspace v2 adds quick launchers without changing ownership of the process:
 :rm notes
 ```
 
-Built-in launchers include `shell`, `htop`, `mc`, `nano`, `vim`, `python`, `node`, and `logs`. Saved launchers are Re:T-UI preferences that create a named tmux window and send the configured command into Termux. Termux still owns the shell, installed packages, and command execution. If a launcher command is missing, install it in Termux with `pkg`.
+Built-in launchers include `shell`, `htop`, `mc`, `nano`, `vim`, `python`, `node`, and `logs`. Saved launchers are Re:T-UI preferences that focus an existing matching tmux window first, and create a named tmux window with the configured command only when needed. Termux still owns the shell, installed packages, and command execution. If a launcher command is missing, install it in Termux with `pkg`.
 
 The same workspace actions are available from the main launcher prompt with the `tmux` command:
 
@@ -146,7 +146,7 @@ alias -add LOGS tmux launch logs
 alias -add BASH2 tmux switch 2
 ```
 
-Use launcher ids such as `mc` and `logs` when you want to open a tool. Use a tmux window index such as `2`, or the visible token `2:bash`, when you want to jump to an already-open tmux window.
+Use launcher ids such as `mc` and `logs` when you want to open or return to a tool. Repeating `tmux launch mc` should focus the existing `mc` window instead of creating another one. Use a tmux window index such as `2`, or the visible token `2:bash`, when you want to jump to an already-open tmux window.
 
 Use `:status` to check Termux install state, `RUN_COMMAND` availability, socket connection state, current geometry, and saved launcher count. Use `:reconnect` if the live socket stream is stale after Termux restarts.
 

@@ -224,6 +224,7 @@
         \ntmux status
         \ntmux reconnect
         \n\nLauncher ids include shell, htop, mc, nano, vim, python, node, logs, plus saved launchers.
+        \nLaunch focuses an existing matching tmux window first, and creates one only when needed.
         \nWindow targets can be an index such as 2 or a visible token such as 2:bash.
         \n\nAlias examples:
         \nalias -add MC tmux launch mc

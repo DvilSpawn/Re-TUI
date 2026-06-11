@@ -68,7 +68,7 @@ Now:
 
 `MC`
 
-opens the tmux workspace and launches Midnight Commander in a named tmux window.
+opens the tmux workspace and launches Midnight Commander in a named tmux window. Running `MC` again focuses the existing `mc` window instead of creating another one.
 
 You can also alias existing tmux windows by index:
 

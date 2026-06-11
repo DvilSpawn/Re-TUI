@@ -87,6 +87,8 @@ Open the tmux workspace from the toolbar and verify:
 - `:rm test` removes the saved launcher.
 - From the main launcher prompt, `tmux launch mc` opens the workspace and
   launches the `mc` workspace launcher.
+- Run `tmux launch mc` again and verify it focuses the existing `mc` window
+  instead of creating another `mc` window.
 - From the main launcher prompt, `tmux switch 2:bash` opens the workspace and
   selects tmux window `2` when that window exists.
 - `alias -add MC tmux launch mc`, then `MC`, opens the workspace launcher.

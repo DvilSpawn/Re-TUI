@@ -258,6 +258,23 @@ bridge_switch() {
     capture_frame
 }
 
+bridge_launch() {
+    ensure_bridge_session
+    resize_bridge_from_env
+    session="$(bridge_session)"
+    name="${RETUI_WINDOW_NAME-}"
+    command="${RETUI_COMMAND-}"
+    [ -n "$name" ] || die "missing RETUI_WINDOW_NAME"
+    if tmux list-windows -t "$session" -F '#W' | grep -F -x -- "$name" >/dev/null 2>&1; then
+        tmux select-window -t "$session:$name"
+    else
+        tmux_new_with_shell new-window -t "$session" -n "$name" -c "$HOME"
+        tmux_send_initial_command "$session" "$command"
+    fi
+    sleep 0.15
+    capture_frame
+}
+
 bridge_select() {
     ensure_bridge_session
     resize_bridge_from_env
@@ -565,6 +582,7 @@ bridge_main() {
         send) bridge_send ;;
         type) bridge_type ;;
         new) bridge_new ;;
+        launch) bridge_launch ;;
         switch) bridge_switch ;;
         select) bridge_select ;;
         key) bridge_key ;;

@@ -32,6 +32,7 @@ retui bridge capture
 RETUI_COLS=80 RETUI_ROWS=24 retui bridge socket-start
 RETUI_INPUT='echo retui-ok' retui bridge send
 RETUI_WINDOW_NAME='htop' RETUI_COMMAND='htop' retui bridge new
+RETUI_WINDOW_NAME='mc' RETUI_COMMAND='mc' retui bridge launch
 RETUI_TARGET='2' retui bridge select
 RETUI_KEY=Tab retui bridge key
 ```
@@ -105,6 +106,11 @@ socket path is unavailable.
 `NEW <cols> <rows> <name> [command]` remains backward-compatible. Newer
 launcher builds can pass an optional command payload so quick launchers create a
 named tmux window and then send the initial command into the shell.
+
+`retui bridge launch` focuses an existing window matching `RETUI_WINDOW_NAME`,
+or creates that named window and sends `RETUI_COMMAND` when no match exists.
+Launcher aliases use this behavior so repeated commands such as
+`tmux launch mc` return to the existing `mc` window.
 
 `retui bridge select` selects an existing tmux window by index or name via
 `RETUI_TARGET`. Launcher builds use this for command aliases such as
