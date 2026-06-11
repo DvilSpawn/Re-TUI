@@ -27,6 +27,7 @@ These updates ensure the launcher remains functional, secure, and performant on 
 
 ### ✨ Enhanced Features
 *   **Termux Execution Layer:** Keep Linux tooling, scripts, and custom modules in Termux while Re:T-UI stays focused on launcher UI and command routing.
+*   **Termux Tmux Workspace:** Optional tmux workspace for persistent TUIs, quick launchers, saved launch commands, reconnect, and status diagnostics.
 *   **Theme Preset Shortcut Buttons:** Enhanced the `theme -preset` command to show interactive shortcut buttons for presets.
 *   **Synchronized Theme UI:** Applying a preset now automatically colors the shortcut buttons (suggestions) to match the overall theme.
 *   **One-Tap Application:** Shortcut buttons for theme presets execute immediately upon clicking.
@@ -42,7 +43,8 @@ For a full Linux environment, use Termux as the execution layer:
 2.  Run `termux-setup-storage` in Termux.
 3.  Enable `allow-external-apps=true` in Termux properties.
 4.  Run `tbridge -doctor` in Re:T-UI to verify the bridge.
-5.  Use `termux`, `module`, and `files` for scripts, modules, and file workflows.
+5.  Enable `show_tmux_workspace_button` when you want the optional persistent tmux workspace.
+6.  Use `termux`, `module`, and `files` for scripts, modules, and file workflows.
 
 This keeps the launcher lean for Play Store builds while preserving power-user Linux workflows through an app that is designed to own them. The old BusyBox manager has been scrapped in favor of this Termux-first model.
 

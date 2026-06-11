@@ -59,3 +59,32 @@ In `System & Support`, verify:
 - `Send Feedback` opens email to `DvilSpawn@gmail.com`
 - `Backup`, `Create Shareable Configuration`, `Restore`, `Rate the App`,
   `Learn More`, and `View Crash Log` still open their existing flows.
+
+## Termux Tmux Workspace Smoke
+
+Prerequisites in Termux:
+
+```sh
+pkg install curl tmux socat -y
+curl -fsSL https://raw.githubusercontent.com/DvilSpawn/Re-TUI/master/termux/retui/install.sh | sh
+```
+
+Enable the workspace button in Re:T-UI:
+
+```text
+config -set show_tmux_workspace_button true
+```
+
+Open the tmux workspace from the toolbar and verify:
+
+- `:status` shows Termux install state, `RUN_COMMAND`, socket state, geometry,
+  and launcher counts.
+- `:launch` lists built-in launchers plus any saved launchers.
+- `:launch shell` opens a named shell tmux window.
+- `:launch logs` opens `tail -f ~/.retui/bridge.log`.
+- `:save test echo retui-workspace-ok` saves a launcher.
+- `:launch test` creates a `test` tmux window and sends the command.
+- `:rm test` removes the saved launcher.
+- `:reconnect` restarts the socket bootstrap and refreshes the pane.
+- Existing `:new [name]`, `:prev`, `:next`, `:refresh`, `:home`, key tray,
+  and horizontal window swipe behavior still work.

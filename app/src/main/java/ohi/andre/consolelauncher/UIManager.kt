@@ -152,6 +152,7 @@ import ohi.andre.consolelauncher.managers.termux.TermuxBridgeManager
 import ohi.andre.consolelauncher.managers.termux.TermuxBridgeManager.createResultPendingIntent
 import ohi.andre.consolelauncher.managers.termux.TermuxBridgeManager.requestRunCommandPermissionIfPossible
 import ohi.andre.consolelauncher.managers.termux.TerminalGridView
+import ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceLauncherManager
 import ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceInputEditText
 import ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceSocketClient
 import ohi.andre.consolelauncher.managers.widgets.LuaWidgetEngine
@@ -385,6 +386,7 @@ class UIManager(
     private var termuxWorkspaceAcceptedSequence = 0
     private var termuxWorkspaceImeResizeGeneration = 0
     private var termuxWorkspaceConfigurationRefreshGeneration = 0
+    private var termuxWorkspaceLocalOutputHoldUntilMs = 0L
     private var termuxWorkspaceTouchStartX = 0f
     private var termuxWorkspaceTouchStartY = 0f
     private var termuxWorkspaceKeyTouchStartX = 0f
@@ -400,6 +402,8 @@ class UIManager(
     private var termuxWorkspaceShiftPending = false
     private var termuxWorkspaceFnKeyMode = false
     private var termuxWorkspaceDirectInput = true
+    private var termuxWorkspaceLocalCommandMode = false
+    private val termuxWorkspaceLocalCommandBuffer = StringBuilder()
     private var termuxWorkspaceSuppressInputWatcher = false
     private var termuxWorkspaceInsertedStart = -1
     private var termuxWorkspaceInsertedText: String? = null
@@ -2250,12 +2254,14 @@ class UIManager(
             if (input is TermuxWorkspaceInputEditText) {
                 input.setBackspaceListener {
                     if (termuxWorkspaceDirectInput) {
-                        sendTermuxWorkspaceKey("BSpace")
+                        if (!handleTermuxWorkspaceLocalCommandBackspace()) {
+                            sendTermuxWorkspaceKey("BSpace")
+                        }
                     }
                 }
                 input.setTextListener { text ->
                     if (termuxWorkspaceDirectInput) {
-                        sendTermuxWorkspaceText(text)
+                        handleTermuxWorkspaceDirectText(text)
                     }
                 }
             }
@@ -2267,13 +2273,17 @@ class UIManager(
                 if (termuxWorkspaceDirectInput && event != null && event.action == KeyEvent.ACTION_DOWN
                     && keyCode == KeyEvent.KEYCODE_DEL
                 ) {
-                    sendTermuxWorkspaceKey("BSpace")
+                    if (!handleTermuxWorkspaceLocalCommandBackspace()) {
+                        sendTermuxWorkspaceKey("BSpace")
+                    }
                     true
                 } else if (handleTermuxWorkspaceHardwareModifiedKey(keyCode, event)) {
                     true
                 } else if (keyCode == KeyEvent.KEYCODE_ENTER && event != null && event.action == KeyEvent.ACTION_UP) {
                     if (termuxWorkspaceDirectInput) {
-                        sendTermuxWorkspaceKey("Enter")
+                        if (!submitTermuxWorkspaceLocalCommandIfActive()) {
+                            sendTermuxWorkspaceKey("Enter")
+                        }
                     } else {
                         submitTermuxWorkspaceInputFromField()
                     }
@@ -2288,7 +2298,9 @@ class UIManager(
                         return@OnEditorActionListener true
                     }
                     if (termuxWorkspaceDirectInput) {
-                        sendTermuxWorkspaceKey("Enter")
+                        if (!submitTermuxWorkspaceLocalCommandIfActive()) {
+                            sendTermuxWorkspaceKey("Enter")
+                        }
                     } else {
                         submitTermuxWorkspaceInputFromField()
                     }
@@ -2296,7 +2308,9 @@ class UIManager(
                 }
                 if (actionId == EditorInfo.IME_ACTION_GO) {
                     if (termuxWorkspaceDirectInput) {
-                        sendTermuxWorkspaceKey("Enter")
+                        if (!submitTermuxWorkspaceLocalCommandIfActive()) {
+                            sendTermuxWorkspaceKey("Enter")
+                        }
                     } else {
                         submitTermuxWorkspaceInputFromField()
                     }
@@ -3214,6 +3228,61 @@ class UIManager(
         }
     }
 
+    private fun handleTermuxWorkspaceDirectText(text: String) {
+        if (text.isEmpty()) {
+            return
+        }
+        if (termuxWorkspaceLocalCommandMode) {
+            termuxWorkspaceLocalCommandBuffer.append(text)
+            renderTermuxWorkspaceLocalCommandDraft()
+            return
+        }
+        if (text.startsWith(":")) {
+            termuxWorkspaceLocalCommandMode = true
+            termuxWorkspaceLocalCommandBuffer.setLength(0)
+            if (text.length > 1) {
+                termuxWorkspaceLocalCommandBuffer.append(text.substring(1))
+            }
+            renderTermuxWorkspaceLocalCommandDraft()
+            return
+        }
+        sendTermuxWorkspaceText(text)
+    }
+
+    private fun handleTermuxWorkspaceLocalCommandBackspace(): Boolean {
+        if (!termuxWorkspaceLocalCommandMode) {
+            return false
+        }
+        if (termuxWorkspaceLocalCommandBuffer.isNotEmpty()) {
+            termuxWorkspaceLocalCommandBuffer.deleteCharAt(termuxWorkspaceLocalCommandBuffer.length - 1)
+            renderTermuxWorkspaceLocalCommandDraft()
+        } else {
+            termuxWorkspaceLocalCommandMode = false
+            renderTermuxWorkspaceLocalStatus("command cancelled")
+        }
+        return true
+    }
+
+    private fun submitTermuxWorkspaceLocalCommandIfActive(): Boolean {
+        if (!termuxWorkspaceLocalCommandMode) {
+            return false
+        }
+        val command = termuxWorkspaceLocalCommandBuffer.toString()
+        termuxWorkspaceLocalCommandMode = false
+        termuxWorkspaceLocalCommandBuffer.setLength(0)
+        handleTermuxWorkspaceCommand(command)
+        return true
+    }
+
+    private fun renderTermuxWorkspaceLocalCommandDraft() {
+        val out = StringBuilder()
+        out.append("Re:T-UI tmux workspace").append('\n')
+        out.append("session: ").append(TERMUX_WORKSPACE_SESSION).append('\n')
+        out.append("command: :").append(termuxWorkspaceLocalCommandBuffer).append('\n')
+        out.append("press Enter to run, Backspace on empty command to cancel")
+        updateTermuxWorkspaceLocalOutput(out.toString())
+    }
+
     private fun mapTermuxWorkspacePrintableCombo(text: String): String? {
         if (text.length != 1 || !hasTermuxWorkspacePendingModifiers()) {
             return null
@@ -3268,27 +3337,161 @@ class UIManager(
     }
 
     private fun handleTermuxWorkspaceCommand(command: String) {
-        val lower = command.lowercase(Locale.getDefault())
-        if (lower.isEmpty() || "help" == lower) {
-            renderTermuxWorkspaceStatus(
-                "local commands: :help :new [name] :prev :next :refresh :home. Normal input is sent to tmux."
-            )
-        } else if ("new" == lower || lower.startsWith("new ")) {
-            newTermuxWorkspaceWindow(command.substringAfter("new", "").trim { it <= ' ' })
-        } else if ("prev" == lower || "left" == lower) {
+        val parsed = splitTermuxWorkspaceCommand(command)
+        val verb = parsed.first.lowercase(Locale.getDefault())
+        val rest = parsed.second
+        if (verb.isEmpty() || "help" == verb) {
+            renderTermuxWorkspaceHelp()
+        } else if ("new" == verb) {
+            newTermuxWorkspaceWindow(rest)
+        } else if ("launch" == verb || "run" == verb) {
+            launchTermuxWorkspaceLauncher(rest)
+        } else if ("save" == verb) {
+            saveTermuxWorkspaceLauncher(rest)
+        } else if ("rm" == verb || "remove" == verb) {
+            removeTermuxWorkspaceLauncher(rest)
+        } else if ("status" == verb || "diagnostics" == verb) {
+            renderTermuxWorkspaceStatusReport()
+        } else if ("reconnect" == verb) {
+            reconnectTermuxWorkspace()
+        } else if ("prev" == verb || "left" == verb) {
             switchTermuxWorkspaceWindow("prev")
-        } else if ("next" == lower || "right" == lower) {
+        } else if ("next" == verb || "right" == verb) {
             switchTermuxWorkspaceWindow("next")
-        } else if ("refresh" == lower || "r" == lower) {
+        } else if ("refresh" == verb || "r" == verb) {
             refreshTermuxWorkspace(true)
-        } else if ("home" == lower || "back" == lower) {
+        } else if ("home" == verb || "back" == verb) {
             openHomePage()
         } else {
-            renderTermuxWorkspaceStatus("Unknown workspace command: :" + command)
+            renderTermuxWorkspaceLocalStatus("Unknown workspace command: :" + command)
         }
     }
 
+    private fun splitTermuxWorkspaceCommand(command: String): Pair<String, String> {
+        val clean = command.trim { it <= ' ' }
+        if (clean.isEmpty()) {
+            return Pair(Tuils.EMPTYSTRING, Tuils.EMPTYSTRING)
+        }
+        val separator = clean.indexOf(' ')
+        if (separator < 0) {
+            return Pair(clean, Tuils.EMPTYSTRING)
+        }
+        return Pair(
+            clean.substring(0, separator).trim { it <= ' ' },
+            clean.substring(separator + 1).trim { it <= ' ' }
+        )
+    }
+
+    private fun renderTermuxWorkspaceHelp() {
+        val out = StringBuilder()
+        out.append("Re:T-UI tmux workspace").append('\n')
+        out.append("session: ").append(TERMUX_WORKSPACE_SESSION).append('\n')
+        out.append("local commands").append('\n')
+        out.append(":launch [id] - list or open a launcher").append('\n')
+        out.append(":save <id> <command> - save a launcher").append('\n')
+        out.append(":rm <id> - remove a saved launcher").append('\n')
+        out.append(":new [name] :prev :next :refresh :status :reconnect :home").append('\n')
+        out.append("Normal input is sent to tmux.")
+        updateTermuxWorkspaceLocalOutput(out.toString())
+    }
+
+    private fun launchTermuxWorkspaceLauncher(rawId: String) {
+        val context = mContext ?: return
+        val id = TermuxWorkspaceLauncherManager.normalizeId(rawId)
+        if (id.isEmpty()) {
+            renderTermuxWorkspaceLauncherList()
+            return
+        }
+        val launcher = TermuxWorkspaceLauncherManager.resolve(context, id)
+        if (launcher == null) {
+            renderTermuxWorkspaceLocalStatus("Unknown launcher: " + rawId + ". Run :launch to list available launchers.")
+            return
+        }
+        newTermuxWorkspaceWindow(launcher.id, launcher.command)
+    }
+
+    private fun renderTermuxWorkspaceLauncherList() {
+        val context = mContext ?: return
+        val launchers = TermuxWorkspaceLauncherManager.list(context)
+        val out = StringBuilder()
+        out.append("tmux launchers").append('\n')
+        for (launcher in launchers) {
+            out.append(if (launcher.builtIn) "* " else "+ ")
+                .append(launcher.id)
+                .append(" - ")
+                .append(launcher.title)
+            if (!TextUtils.isEmpty(launcher.command)) {
+                out.append(" -> ").append(launcher.command)
+            }
+            out.append('\n')
+        }
+        out.append("----").append('\n')
+        out.append(":launch <id>").append('\n')
+        out.append(":save <id> <command>").append('\n')
+        out.append(":rm <id>")
+        updateTermuxWorkspaceLocalOutput(out.toString())
+    }
+
+    private fun saveTermuxWorkspaceLauncher(args: String) {
+        val context = mContext ?: return
+        val parsed = splitTermuxWorkspaceCommand(args)
+        val id = parsed.first
+        val command = parsed.second
+        if (id.isEmpty() || command.isEmpty()) {
+            renderTermuxWorkspaceLocalStatus("usage: :save <id> <command>")
+            return
+        }
+        if (TermuxWorkspaceLauncherManager.save(context, id, command)) {
+            renderTermuxWorkspaceLocalStatus("saved launcher: " + TermuxWorkspaceLauncherManager.normalizeId(id))
+        } else {
+            renderTermuxWorkspaceLocalStatus("Could not save launcher. Use a custom id and a non-empty command.")
+        }
+    }
+
+    private fun removeTermuxWorkspaceLauncher(args: String) {
+        val context = mContext ?: return
+        val id = TermuxWorkspaceLauncherManager.normalizeId(args)
+        if (id.isEmpty()) {
+            renderTermuxWorkspaceLocalStatus("usage: :rm <id>")
+            return
+        }
+        if (TermuxWorkspaceLauncherManager.remove(context, id)) {
+            renderTermuxWorkspaceLocalStatus("removed launcher: $id")
+        } else {
+            renderTermuxWorkspaceLocalStatus("No saved launcher removed: $id")
+        }
+    }
+
+    private fun renderTermuxWorkspaceStatusReport() {
+        val context = mContext ?: return
+        val status = TermuxBridgeManager.status(context)
+        val geometry = calculateTermuxWorkspaceGeometry()
+        val client = termuxWorkspaceSocketClient
+        val launchers = TermuxWorkspaceLauncherManager.list(context)
+        val savedCount = launchers.count { !it.builtIn }
+        val out = StringBuilder()
+        out.append("tmux workspace diagnostics").append('\n')
+        out.append("session: ").append(TERMUX_WORKSPACE_SESSION).append('\n')
+        out.append("geometry: ").append(geometry.cols).append('x').append(geometry.rows).append('\n')
+        out.append("termux installed: ").append(status.termuxInstalled).append('\n')
+        out.append("RUN_COMMAND declared: ").append(status.runCommandDeclared).append('\n')
+        out.append("RUN_COMMAND granted: ").append(status.runCommandGranted).append('\n')
+        out.append("socket connected: ").append(client?.connected == true).append('\n')
+        out.append("socket name cached: ").append(!TextUtils.isEmpty(termuxWorkspaceSocketName)).append('\n')
+        out.append("launchers: ").append(launchers.size - savedCount).append(" built-in, ")
+            .append(savedCount).append(" saved").append('\n')
+        out.append("recovery: run :reconnect, then :refresh if the pane is stale")
+        updateTermuxWorkspaceLocalOutput(out.toString())
+    }
+
+    private fun reconnectTermuxWorkspace() {
+        stopTermuxWorkspaceSocketClient()
+        renderTermuxWorkspaceStatus("reconnecting")
+        refreshTermuxWorkspace(true)
+    }
+
     private fun refreshTermuxWorkspace(announce: Boolean) {
+        clearTermuxWorkspaceLocalOutputHold()
         if (captureTermuxWorkspaceSocket()) {
             return
         }
@@ -3298,16 +3501,20 @@ class UIManager(
         dispatchTermuxWorkspaceScript("capture", buildTermuxWorkspaceCaptureScript(), true)
     }
 
-    private fun newTermuxWorkspaceWindow(name: String?) {
+    private fun newTermuxWorkspaceWindow(name: String?, initialCommand: String? = null) {
+        clearTermuxWorkspaceLocalOutputHold()
         val clean = name?.trim { it <= ' ' } ?: Tuils.EMPTYSTRING
-        if (newTermuxWorkspaceSocketWindow(clean)) {
+        val command = initialCommand?.trim { it <= ' ' } ?: Tuils.EMPTYSTRING
+        if (newTermuxWorkspaceSocketWindow(clean, command)) {
             return
         }
-        renderTermuxWorkspaceStatus(if (clean.isEmpty()) "new tmux window" else "new tmux window: " + clean)
-        dispatchTermuxWorkspaceScript("new", buildTermuxWorkspaceNewWindowScript(clean), true)
+        val label = if (clean.isEmpty()) "new tmux window" else "new tmux window: " + clean
+        renderTermuxWorkspaceStatus(if (command.isEmpty()) label else "$label -> $command")
+        dispatchTermuxWorkspaceScript("new", buildTermuxWorkspaceNewWindowScript(clean, command), true)
     }
 
     private fun switchTermuxWorkspaceWindow(direction: String) {
+        clearTermuxWorkspaceLocalOutputHold()
         if (switchTermuxWorkspaceSocketWindow(direction)) {
             return
         }
@@ -3316,6 +3523,7 @@ class UIManager(
     }
 
     private fun sendTermuxWorkspaceKey(key: String) {
+        clearTermuxWorkspaceLocalOutputHold()
         val clean = key.trim { it <= ' ' }
         if (clean.isEmpty()) {
             return
@@ -3328,6 +3536,7 @@ class UIManager(
     }
 
     private fun sendTermuxWorkspaceText(text: String) {
+        clearTermuxWorkspaceLocalOutputHold()
         if (text.isEmpty()) {
             return
         }
@@ -3374,13 +3583,13 @@ class UIManager(
         return client.key(key, geometry.cols, geometry.rows)
     }
 
-    private fun newTermuxWorkspaceSocketWindow(name: String): Boolean {
+    private fun newTermuxWorkspaceSocketWindow(name: String, initialCommand: String): Boolean {
         val client = termuxWorkspaceSocketClient ?: return false
         if (!client.connected) {
             return false
         }
         val geometry = calculateTermuxWorkspaceGeometry()
-        return client.newWindow(name, geometry.cols, geometry.rows)
+        return client.newWindow(name, initialCommand, geometry.cols, geometry.rows)
     }
 
     private fun switchTermuxWorkspaceSocketWindow(direction: String): Boolean {
@@ -3605,15 +3814,27 @@ class UIManager(
                 buildTermuxWorkspaceFrameScript()
     }
 
-    private fun buildTermuxWorkspaceNewWindowScript(name: String): String {
+    private fun buildTermuxWorkspaceNewWindowScript(name: String, initialCommand: String = Tuils.EMPTYSTRING): String {
         val session = shellQuote(TERMUX_WORKSPACE_SESSION)
         val home = shellQuote(TermuxBridgeManager.TERMUX_HOME)
         val nameArg = if (name.isEmpty()) "" else " -n " + shellQuote(name)
+        val command = initialCommand.trim { it <= ' ' }
+        val sendCommand = if (command.isEmpty()) {
+            Tuils.EMPTYSTRING
+        } else {
+            "\nsleep 0.08\n" +
+                    "tmux send-keys -t " + session + " -l -- " + shellQuote(command) + "\n" +
+                    "tmux send-keys -t " + session + " C-m"
+        }
         return buildTermuxWorkspacePreambleScript() + "\n" +
-                buildTermuxWorkspaceBridgeScript("new", "RETUI_WINDOW_NAME", name) + "\n" +
+                buildTermuxWorkspaceBridgeScript(
+                    "new",
+                    listOf(Pair("RETUI_WINDOW_NAME", name), Pair("RETUI_COMMAND", command))
+                ) + "\n" +
                 buildTermuxWorkspaceEnsureScript() + "\n" +
                 buildTermuxWorkspaceResizeScript() + "\n" +
-                buildTermuxWorkspaceTmuxCommand("new-window -t " + session + nameArg + " -c " + home) + "\n" +
+                buildTermuxWorkspaceTmuxCommand("new-window -t " + session + nameArg + " -c " + home) +
+                sendCommand + "\n" +
                 "sleep 0.15\n" +
                 buildTermuxWorkspaceFrameScript()
     }
@@ -3650,17 +3871,26 @@ class UIManager(
     }
 
     private fun buildTermuxWorkspaceBridgeScript(action: String): String {
-        return buildTermuxWorkspaceBridgeScript(action, null, null)
+        return buildTermuxWorkspaceBridgeScript(action, emptyList())
     }
 
     private fun buildTermuxWorkspaceBridgeScript(action: String, envName: String?, envValue: String?): String {
+        if (envName == null) {
+            return buildTermuxWorkspaceBridgeScript(action, emptyList())
+        }
+        return buildTermuxWorkspaceBridgeScript(action, listOf(Pair(envName, envValue)))
+    }
+
+    private fun buildTermuxWorkspaceBridgeScript(action: String, envValues: List<Pair<String, String?>>): String {
         val env = StringBuilder()
         val geometry = calculateTermuxWorkspaceGeometry()
         env.append("RETUI_COLS=").append(shellQuote(geometry.cols.toString())).append(' ')
         env.append("RETUI_ROWS=").append(shellQuote(geometry.rows.toString())).append(' ')
         env.append("RETUI_SOCKET_NAME=").append(shellQuote(TERMUX_WORKSPACE_SOCKET_NAME)).append(' ')
-        if (envName != null) {
-            env.append(envName).append('=').append(shellQuote(envValue ?: Tuils.EMPTYSTRING)).append(' ')
+        for (entry in envValues) {
+            if (!TextUtils.isEmpty(entry.first)) {
+                env.append(entry.first).append('=').append(shellQuote(entry.second ?: Tuils.EMPTYSTRING)).append(' ')
+            }
         }
         env.append("RETUI_TCP_PORT=").append(shellQuote(TERMUX_WORKSPACE_TCP_PORT.toString())).append(' ')
         return ("if command -v retui >/dev/null 2>&1; then\n"
@@ -3725,6 +3955,17 @@ class UIManager(
         }
         out.append("----")
         updateTermuxWorkspaceOutput(out.toString())
+    }
+
+    private fun renderTermuxWorkspaceLocalStatus(status: String?) {
+        val out = StringBuilder()
+        out.append("Re:T-UI tmux workspace").append('\n')
+        out.append("session: ").append(TERMUX_WORKSPACE_SESSION).append('\n')
+        if (!TextUtils.isEmpty(status)) {
+            out.append("status: ").append(status).append('\n')
+        }
+        out.append("----")
+        updateTermuxWorkspaceLocalOutput(out.toString())
     }
 
     private fun appendTermuxWorkspaceResult(
@@ -3814,6 +4055,9 @@ class UIManager(
         val client = TermuxWorkspaceSocketClient(object : TermuxWorkspaceSocketClient.Listener {
             override fun onFrame(frame: String) {
                 runOnUiThread(Runnable {
+                    if (System.currentTimeMillis() < termuxWorkspaceLocalOutputHoldUntilMs) {
+                        return@Runnable
+                    }
                     val parsed = parseTermuxWorkspaceFrame(frame)
                     updateTermuxWorkspaceChrome(parsed)
                     updateTermuxWorkspaceOutput(
@@ -4023,6 +4267,16 @@ class UIManager(
         updateTermuxWorkspaceMeasuredLineHeight()
         resetTermuxWorkspaceViewportOrigin()
         termuxWorkspaceScroll?.post(Runnable { resetTermuxWorkspaceViewportOrigin() })
+    }
+
+    private fun updateTermuxWorkspaceLocalOutput(value: String?) {
+        termuxWorkspaceLocalOutputHoldUntilMs =
+            System.currentTimeMillis() + TERMUX_WORKSPACE_LOCAL_OUTPUT_HOLD_MS
+        updateTermuxWorkspaceOutput(value)
+    }
+
+    private fun clearTermuxWorkspaceLocalOutputHold() {
+        termuxWorkspaceLocalOutputHoldUntilMs = 0L
     }
 
     private fun updateTermuxWorkspaceMeasuredLineHeight() {
@@ -12742,6 +12996,7 @@ class UIManager(
         private const val TERMUX_LANDSCAPE_KEYS_PER_ROW = 16
         private const val TERMUX_WORKSPACE_IME_VISIBLE_THRESHOLD_DP = 80
         private const val TERMUX_WORKSPACE_IME_RESIZE_REFRESH_DELAY_MS = 180L
+        private const val TERMUX_WORKSPACE_LOCAL_OUTPUT_HOLD_MS = 7000L
         private const val TERMUX_WORKSPACE_MAX_OUTPUT_CHARS = 24000
         private const val TERMUX_WORKSPACE_LINE_HEIGHT_SAMPLE = "M\n\u2502\n\u2500\n\u2514\n\u2588"
         private const val TERMUX_WORKSPACE_LINE_HEIGHT_FALLBACK_MULTIPLIER = 1.36f

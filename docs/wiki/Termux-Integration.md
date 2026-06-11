@@ -109,7 +109,21 @@ Inside the workspace:
 - use the key tray for `ESC`, `TAB`, arrows, page keys, `CTRL`, `ALT`, `SHIFT`, function keys, insert/delete, enter, and backspace
 - swipe the key tray horizontally to switch between NAV and function-key modes
 - swipe the terminal pane horizontally to move between tmux windows
-- use `:help`, `:new [name]`, `:prev`, `:next`, `:refresh`, and `:home` for local workspace commands
+- use `:help`, `:new [name]`, `:prev`, `:next`, `:refresh`, `:status`, `:reconnect`, and `:home` for local workspace commands
+
+Workspace v2 adds quick launchers without changing ownership of the process:
+
+```text
+:launch
+:launch htop
+:launch mc
+:save notes nano ~/notes.txt
+:rm notes
+```
+
+Built-in launchers include `shell`, `htop`, `mc`, `nano`, `vim`, `python`, `node`, and `logs`. Saved launchers are Re:T-UI preferences that create a named tmux window and send the configured command into Termux. Termux still owns the shell, installed packages, and command execution. If a launcher command is missing, install it in Termux with `pkg`.
+
+Use `:status` to check Termux install state, `RUN_COMMAND` availability, socket connection state, current geometry, and saved launcher count. Use `:reconnect` if the live socket stream is stale after Termux restarts.
 
 The workspace is the best Re:T-UI surface for tools such as Midnight Commander, htop, SSH, REPLs, and other TUIs that need persistent tmux state. For one-shot scripts that print output and exit, keep using `termux -run`.
 

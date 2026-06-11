@@ -125,9 +125,10 @@ class TermuxWorkspaceSocketClient(private val listener: Listener) {
         return sendRaw("TYPE ${cleanCols(cols)} ${cleanRows(rows)} ${encode(input)}")
     }
 
-    fun newWindow(name: String?, cols: Int, rows: Int): Boolean {
+    fun newWindow(name: String?, command: String?, cols: Int, rows: Int): Boolean {
         val payload = if (name.isNullOrBlank()) "-" else encode(name)
-        return sendRaw("NEW ${cleanCols(cols)} ${cleanRows(rows)} $payload")
+        val commandPayload = if (command.isNullOrBlank()) "-" else encode(command)
+        return sendRaw("NEW ${cleanCols(cols)} ${cleanRows(rows)} $payload $commandPayload")
     }
 
     fun switchWindow(direction: String, cols: Int, rows: Int): Boolean {
