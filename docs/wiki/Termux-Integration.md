@@ -22,6 +22,9 @@ The old BusyBox manager has been removed; use Termux for Linux packages and main
 - `termux -app-sync <id>`
 - `termux -app-action <id> <label> [input]`
 - `termux -app-rm <id>`
+- `tmux`
+- `tmux launch <id>`
+- `tmux switch <window>`
 - `config -set show_tmux_workspace_button true`
 
 TBridge diagnostics:
@@ -122,6 +125,28 @@ Workspace v2 adds quick launchers without changing ownership of the process:
 ```
 
 Built-in launchers include `shell`, `htop`, `mc`, `nano`, `vim`, `python`, `node`, and `logs`. Saved launchers are Re:T-UI preferences that create a named tmux window and send the configured command into Termux. Termux still owns the shell, installed packages, and command execution. If a launcher command is missing, install it in Termux with `pkg`.
+
+The same workspace actions are available from the main launcher prompt with the `tmux` command:
+
+```text
+tmux
+tmux launch mc
+tmux launch logs
+tmux switch 2
+tmux switch 2:bash
+tmux status
+tmux reconnect
+```
+
+That means normal launcher aliases can jump straight into workspace tools:
+
+```text
+alias -add MC tmux launch mc
+alias -add LOGS tmux launch logs
+alias -add BASH2 tmux switch 2
+```
+
+Use launcher ids such as `mc` and `logs` when you want to open a tool. Use a tmux window index such as `2`, or the visible token `2:bash`, when you want to jump to an already-open tmux window.
 
 Use `:status` to check Termux install state, `RUN_COMMAND` availability, socket connection state, current geometry, and saved launcher count. Use `:reconnect` if the live socket stream is stale after Termux restarts.
 

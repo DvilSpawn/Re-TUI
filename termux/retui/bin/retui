@@ -1,7 +1,7 @@
 #!/data/data/com.termux/files/usr/bin/sh
 set -eu
 
-RETUI_VERSION="0.3.2"
+RETUI_VERSION="0.3.3"
 RETUI_BRIDGE_PROTOCOL="retui-bridge-v1"
 RETUI_SOCKET_PROTOCOL="retui-bridge-socket-v2"
 TERMUX_PREFIX_DEFAULT="/data/data/com.termux/files/usr"
@@ -19,7 +19,7 @@ die() {
 
 usage() {
     cat <<'EOF'
-retui 0.3.2
+retui 0.3.3
 
 Usage:
   retui version
@@ -41,6 +41,7 @@ Bridge environment:
   RETUI_WINDOW_NAME   optional name for "bridge new"
   RETUI_COMMAND       optional command sent after "bridge new" creates a window
   RETUI_DIRECTION     next or prev for "bridge switch"
+  RETUI_TARGET        tmux window index/name for "bridge select"
   RETUI_KEY           tmux key for "bridge key", e.g. C-c
   RETUI_COLS          optional tmux width
   RETUI_ROWS          optional tmux height
@@ -253,6 +254,17 @@ bridge_switch() {
         *) die "unknown switch direction: $direction" ;;
     esac
     tmux select-window -t "$session" "$flag"
+    sleep 0.1
+    capture_frame
+}
+
+bridge_select() {
+    ensure_bridge_session
+    resize_bridge_from_env
+    session="$(bridge_session)"
+    target="${RETUI_TARGET-}"
+    [ -n "$target" ] || die "missing RETUI_TARGET"
+    tmux select-window -t "$session:$target"
     sleep 0.1
     capture_frame
 }
@@ -554,6 +566,7 @@ bridge_main() {
         type) bridge_type ;;
         new) bridge_new ;;
         switch) bridge_switch ;;
+        select) bridge_select ;;
         key) bridge_key ;;
         kill) bridge_kill ;;
         *) die "unknown bridge action: $action" ;;

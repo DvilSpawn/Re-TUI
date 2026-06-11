@@ -2961,6 +2961,53 @@ class UIManager(
         }
     }
 
+    private fun handleTermuxWorkspaceExternalCommand(rawCommand: String?) {
+        if (Looper.myLooper() != Looper.getMainLooper()) {
+            runOnMainThread { handleTermuxWorkspaceExternalCommand(rawCommand) }
+            return
+        }
+        val command = rawCommand?.trim { it <= ' ' }?.removePrefix(":")?.trim { it <= ' ' } ?: Tuils.EMPTYSTRING
+        if (command.isEmpty() || "open".equals(command, ignoreCase = true) || "show".equals(command, ignoreCase = true)) {
+            openTermuxWorkspacePage(true)
+            return
+        }
+
+        openTermuxWorkspacePage(false)
+        val parsed = splitTermuxWorkspaceCommand(command)
+        val verb = parsed.first.lowercase(Locale.getDefault())
+        val rest = parsed.second
+        val context = mContext
+        if ("launch" == verb || "run" == verb || "app" == verb) {
+            launchTermuxWorkspaceLauncher(rest)
+        } else if ("switch" == verb || "select" == verb || "window" == verb || "tab" == verb || "focus" == verb) {
+            selectTermuxWorkspaceWindow(rest)
+        } else if ("new" == verb) {
+            newTermuxWorkspaceWindow(rest)
+        } else if ("save" == verb) {
+            saveTermuxWorkspaceLauncher(rest)
+        } else if ("rm" == verb || "remove" == verb) {
+            removeTermuxWorkspaceLauncher(rest)
+        } else if ("status" == verb || "diagnostics" == verb) {
+            renderTermuxWorkspaceStatusReport()
+        } else if ("reconnect" == verb) {
+            reconnectTermuxWorkspace()
+        } else if ("prev" == verb || "left" == verb) {
+            switchTermuxWorkspaceWindow("prev")
+        } else if ("next" == verb || "right" == verb) {
+            switchTermuxWorkspaceWindow("next")
+        } else if ("refresh" == verb || "r" == verb) {
+            refreshTermuxWorkspace(true)
+        } else if ("help" == verb) {
+            renderTermuxWorkspaceHelp()
+        } else if (context != null && rest.isEmpty() && TermuxWorkspaceLauncherManager.resolve(context, verb) != null) {
+            launchTermuxWorkspaceLauncher(verb)
+        } else if (isLikelyTermuxWorkspaceWindowTarget(command)) {
+            selectTermuxWorkspaceWindow(command)
+        } else {
+            renderTermuxWorkspaceLocalStatus("Unknown tmux command: " + command + ". Try tmux launch mc or tmux switch 2.")
+        }
+    }
+
     private fun openHomePage() {
         if (Looper.myLooper() != Looper.getMainLooper()) {
             runOnMainThread { openHomePage() }
@@ -3390,6 +3437,7 @@ class UIManager(
         out.append(":launch [id] - list or open a launcher").append('\n')
         out.append(":save <id> <command> - save a launcher").append('\n')
         out.append(":rm <id> - remove a saved launcher").append('\n')
+        out.append(":switch <window> - jump to a tmux window index/name").append('\n')
         out.append(":new [name] :prev :next :refresh :status :reconnect :home").append('\n')
         out.append("Normal input is sent to tmux.")
         updateTermuxWorkspaceLocalOutput(out.toString())
@@ -3430,6 +3478,36 @@ class UIManager(
         out.append(":save <id> <command>").append('\n')
         out.append(":rm <id>")
         updateTermuxWorkspaceLocalOutput(out.toString())
+    }
+
+    private fun selectTermuxWorkspaceWindow(rawTarget: String) {
+        val target = normalizeTermuxWorkspaceWindowTarget(rawTarget)
+        if (target.isEmpty()) {
+            renderTermuxWorkspaceLocalStatus("usage: tmux switch <window> or :switch <window>")
+            return
+        }
+        clearTermuxWorkspaceLocalOutputHold()
+        renderTermuxWorkspaceStatus("select tmux window: " + target)
+        dispatchTermuxWorkspaceScript("select", buildTermuxWorkspaceSelectScript(target), true)
+    }
+
+    private fun normalizeTermuxWorkspaceWindowTarget(rawTarget: String): String {
+        val token = rawTarget.trim { it <= ' ' }
+            .split("\\s+".toRegex())
+            .firstOrNull()
+            ?.trim('[', ']')
+            ?.removeSuffix("*")
+            ?: Tuils.EMPTYSTRING
+        if (token.isEmpty()) {
+            return Tuils.EMPTYSTRING
+        }
+        val separator = token.indexOf(':')
+        return if (separator > 0) token.substring(0, separator) else token
+    }
+
+    private fun isLikelyTermuxWorkspaceWindowTarget(value: String): Boolean {
+        val target = normalizeTermuxWorkspaceWindowTarget(value)
+        return target.isNotEmpty() && (target[0].isDigit() || value.contains(":"))
     }
 
     private fun saveTermuxWorkspaceLauncher(args: String) {
@@ -3847,6 +3925,17 @@ class UIManager(
                 buildTermuxWorkspaceEnsureScript() + "\n" +
                 buildTermuxWorkspaceResizeScript() + "\n" +
                 "tmux select-window -t " + session + " " + flag + "\n" +
+                "sleep 0.1\n" +
+                buildTermuxWorkspaceFrameScript()
+    }
+
+    private fun buildTermuxWorkspaceSelectScript(target: String): String {
+        val tmuxTarget = shellQuote(TERMUX_WORKSPACE_SESSION + ":" + target)
+        return buildTermuxWorkspacePreambleScript() + "\n" +
+                buildTermuxWorkspaceBridgeScript("select", "RETUI_TARGET", target) + "\n" +
+                buildTermuxWorkspaceEnsureScript() + "\n" +
+                buildTermuxWorkspaceResizeScript() + "\n" +
+                "tmux select-window -t " + tmuxTarget + "\n" +
                 "sleep 0.1\n" +
                 buildTermuxWorkspaceFrameScript()
     }
@@ -6995,6 +7084,7 @@ class UIManager(
         filter.addAction(ACTION_CLOCK_STATE)
         filter.addAction(ACTION_POMODORO_STATE)
         filter.addAction(ACTION_TERMUX_CONSOLE)
+        filter.addAction(ACTION_TMUX_WORKSPACE)
         filter.addAction(ACTION_LUA_APP)
         filter.addAction(ACTION_FILE_CONSOLE)
         filter.addAction(ACTION_TERMUX_RESULT)
@@ -7022,6 +7112,8 @@ class UIManager(
                     refreshActiveModuleIfNeeded()
                 } else if (action == ACTION_TERMUX_CONSOLE) {
                     openTermuxConsole(intent.getStringExtra(EXTRA_TERMUX_COMMAND))
+                } else if (action == ACTION_TMUX_WORKSPACE) {
+                    handleTermuxWorkspaceExternalCommand(intent.getStringExtra(EXTRA_TMUX_WORKSPACE_COMMAND))
                 } else if (action == ACTION_LUA_APP) {
                     openLuaApp(intent.getStringExtra(EXTRA_LUA_APP_ID))
                 } else if (action == ACTION_FILE_CONSOLE) {
@@ -12989,6 +13081,8 @@ class UIManager(
         val ACTION_POMODORO_STATE: String = PomodoroManager.ACTION_POMODORO_STATE
         val ACTION_TERMUX_CONSOLE: String = BuildConfig.APPLICATION_ID + ".ui_termux_console"
         const val EXTRA_TERMUX_COMMAND: String = "termux_command"
+        val ACTION_TMUX_WORKSPACE: String = BuildConfig.APPLICATION_ID + ".ui_tmux_workspace"
+        const val EXTRA_TMUX_WORKSPACE_COMMAND: String = "tmux_workspace_command"
         val ACTION_LUA_APP: String = BuildConfig.APPLICATION_ID + ".ui_lua_app"
         const val EXTRA_LUA_APP_ID: String = "lua_app_id"
         val ACTION_FILE_CONSOLE: String = BuildConfig.APPLICATION_ID + ".ui_file_console"

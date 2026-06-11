@@ -304,8 +304,18 @@ Optional tmux workspace:
 - install the Termux helper with `curl -fsSL https://raw.githubusercontent.com/DvilSpawn/Re-TUI/master/termux/retui/install.sh | sh`
 - enable the toolbar entry with `config -set show_tmux_workspace_button true`
 - open the workspace button to use the launcher-owned tmux surface
+- use `tmux launch mc` or `tmux launch logs` from the main prompt to open a workspace launcher directly
+- use `tmux switch 2` or `tmux switch 2:bash` to jump to an existing tmux window
 
 The workspace is meant for persistent TUI tools such as Midnight Commander, htop, SSH, and REPL sessions. Termux owns the tmux process; Re:T-UI owns the visual surface, key tray, and swipe window switching.
+
+Aliases can target the tmux workspace command:
+
+```text
+alias -add MC tmux launch mc
+alias -add LOGS tmux launch logs
+alias -add BASH2 tmux switch 2
+```
 
 ### `tbridge`
 

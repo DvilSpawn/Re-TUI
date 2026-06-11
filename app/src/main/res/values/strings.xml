@@ -215,6 +215,21 @@
         \n\nFor bridge-backed quick file actions, use ls/open/share with file_backend=termux.
         \n\nThis bridge requires Termux, RUN_COMMAND permission, allow-external-apps=true, and termux-setup-storage.
     </string>
+    <string name="help_tmux">Open and control the optional Termux tmux workspace.
+        \nUsage:
+        \ntmux
+        \ntmux launch &lt;id&gt;
+        \ntmux switch &lt;window&gt;
+        \ntmux new [name]
+        \ntmux status
+        \ntmux reconnect
+        \n\nLauncher ids include shell, htop, mc, nano, vim, python, node, logs, plus saved launchers.
+        \nWindow targets can be an index such as 2 or a visible token such as 2:bash.
+        \n\nAlias examples:
+        \nalias -add MC tmux launch mc
+        \nalias -add LOGS tmux launch logs
+        \nalias -add BASH2 tmux switch 2
+    </string>
     <string name="help_retuitoken">Manage the Re:T-UI callback token for Termux, Tasker, and future modules.
         \n\nUsage:
         \n$ retui-token -status

@@ -85,6 +85,11 @@ Open the tmux workspace from the toolbar and verify:
 - `:save test echo retui-workspace-ok` saves a launcher.
 - `:launch test` creates a `test` tmux window and sends the command.
 - `:rm test` removes the saved launcher.
+- From the main launcher prompt, `tmux launch mc` opens the workspace and
+  launches the `mc` workspace launcher.
+- From the main launcher prompt, `tmux switch 2:bash` opens the workspace and
+  selects tmux window `2` when that window exists.
+- `alias -add MC tmux launch mc`, then `MC`, opens the workspace launcher.
 - `:reconnect` restarts the socket bootstrap and refreshes the pane.
 - Existing `:new [name]`, `:prev`, `:next`, `:refresh`, `:home`, key tray,
   and horizontal window swipe behavior still work.

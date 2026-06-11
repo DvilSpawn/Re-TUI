@@ -60,6 +60,30 @@ Now:
 
 The `-s` scope means the alias appears where script aliases make sense, such as after `termux -run`.
 
+### Open a tmux workspace tool
+
+`alias -add MC tmux launch mc`
+
+Now:
+
+`MC`
+
+opens the tmux workspace and launches Midnight Commander in a named tmux window.
+
+You can also alias existing tmux windows by index:
+
+```text
+alias -add BASH2 tmux switch 2
+```
+
+Visible tokens such as `2:bash` also work:
+
+```text
+alias -add BASH2 tmux switch 2:bash
+```
+
+Use `tmux launch <id>` for workspace launchers and `tmux switch <window>` for already-open tmux windows.
+
 ## Workflow Aliases
 
 Aliases can also chain multiple Re:T-UI commands. The default command separator is `;`.

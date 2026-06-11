@@ -27,7 +27,7 @@ These updates ensure the launcher remains functional, secure, and performant on 
 
 ### ✨ Enhanced Features
 *   **Termux Execution Layer:** Keep Linux tooling, scripts, and custom modules in Termux while Re:T-UI stays focused on launcher UI and command routing.
-*   **Termux Tmux Workspace:** Optional tmux workspace for persistent TUIs, quick launchers, saved launch commands, reconnect, and status diagnostics.
+*   **Termux Tmux Workspace:** Optional tmux workspace for persistent TUIs, quick launchers, saved launch commands, prompt aliases, reconnect, and status diagnostics.
 *   **Theme Preset Shortcut Buttons:** Enhanced the `theme -preset` command to show interactive shortcut buttons for presets.
 *   **Synchronized Theme UI:** Applying a preset now automatically colors the shortcut buttons (suggestions) to match the overall theme.
 *   **One-Tap Application:** Shortcut buttons for theme presets execute immediately upon clicking.
