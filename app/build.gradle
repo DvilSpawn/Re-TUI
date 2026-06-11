@@ -87,6 +87,202 @@ android {
     }
 }
 
+def guardedSourceSetNames = ["main", "fdroid", "playstore"]
+def allowedSourceSetDirs = [
+        "aidl",
+        "assets",
+        "java",
+        "jni",
+        "jniLibs",
+        "kotlin",
+        "res",
+        "rs"
+] as Set
+def blockedPathSegments = [
+        "build",
+        "captures",
+        "perf-results",
+        "screenshots",
+        "testbook",
+        "testbooks",
+        "traces"
+] as Set
+def blockedFileNames = [
+        ".DS_Store",
+        "Thumbs.db",
+        "desktop.ini",
+        "google-services.json",
+        "local.properties",
+        "signing.properties",
+        "keystore.properties"
+] as Set
+def blockedExtensions = [
+        ".apk",
+        ".csv",
+        ".dm",
+        ".gz",
+        ".hprof",
+        ".idsig",
+        ".jks",
+        ".keystore",
+        ".log",
+        ".markdown",
+        ".md",
+        ".p12",
+        ".swp",
+        ".tar",
+        ".trace",
+        ".tsv",
+        ".tmp",
+        ".txt",
+        ".zip"
+] as Set
+def allowedResourceExtensions = [
+        ".9.png",
+        ".avif",
+        ".gif",
+        ".jpeg",
+        ".jpg",
+        ".otf",
+        ".png",
+        ".ttf",
+        ".webp",
+        ".xml"
+] as Set
+
+def projectRelativePath = { File sourceFile ->
+    projectDir.toPath().relativize(sourceFile.toPath()).toString().replace(File.separator, "/")
+}
+
+def fileExtension = { File sourceFile ->
+    def lowerName = sourceFile.name.toLowerCase(Locale.ROOT)
+    if (lowerName.endsWith(".9.png")) {
+        return ".9.png"
+    }
+    def lastDot = lowerName.lastIndexOf(".")
+    return lastDot >= 0 ? lowerName.substring(lastDot) : ""
+}
+
+def addCommonSourceInputErrors = { File sourceFile, List<String> errors ->
+    def relativePath = projectRelativePath(sourceFile)
+    def lowerName = sourceFile.name.toLowerCase(Locale.ROOT)
+    def segments = relativePath.split("/") as List
+
+    if (blockedFileNames.contains(sourceFile.name) || blockedFileNames.contains(lowerName)) {
+        errors.add("${relativePath} uses a blocked local/generated file name")
+    }
+
+    if (segments.any { blockedPathSegments.contains(it.toLowerCase(Locale.ROOT)) }) {
+        errors.add("${relativePath} is under a blocked local/generated folder")
+    }
+
+    def extension = fileExtension(sourceFile)
+    if (blockedExtensions.contains(extension)) {
+        errors.add("${relativePath} uses blocked extension ${extension}")
+    }
+}
+
+def isAllowedAsset = { File assetsDir, File sourceFile ->
+    def relativeAssetPath = assetsDir.toPath().relativize(sourceFile.toPath()).toString().replace(File.separator, "/")
+    return relativeAssetPath == "lucida_console.ttf"
+            || (relativeAssetPath.startsWith("first_run_terminal_green/")
+            && !relativeAssetPath.substring("first_run_terminal_green/".length()).contains("/")
+            && relativeAssetPath.endsWith(".xml"))
+}
+
+def validateSourceTree = { File sourceDir, String kind, List<String> errors ->
+    if (!sourceDir.exists()) {
+        return
+    }
+
+    sourceDir.eachFileRecurse { File sourceFile ->
+        if (!sourceFile.isFile()) {
+            return
+        }
+
+        addCommonSourceInputErrors(sourceFile, errors)
+
+        def relativePath = projectRelativePath(sourceFile)
+        def extension = fileExtension(sourceFile)
+        if (kind == "java" && extension != ".java" && extension != ".kt") {
+            errors.add("${relativePath} is not a Kotlin or Java source file")
+        } else if (kind == "res" && !allowedResourceExtensions.contains(extension)) {
+            errors.add("${relativePath} is not an allowed Android resource file type")
+        } else if (kind == "assets" && !isAllowedAsset(sourceDir, sourceFile)) {
+            errors.add("${relativePath} is not an explicit allowed asset")
+        }
+    }
+}
+
+tasks.register("validateSourceInputs") {
+    group = "verification"
+    description = "Fails Android builds when source-set packaging inputs contain local clutter or unexpected artifacts."
+
+    doLast {
+        def errors = []
+
+        guardedSourceSetNames.each { sourceSetName ->
+            def sourceRoot = file("src/${sourceSetName}")
+            if (!sourceRoot.exists()) {
+                return
+            }
+
+            sourceRoot.eachFile { File child ->
+                def relativePath = projectRelativePath(child)
+                if (child.isFile()) {
+                    if (child.name != "AndroidManifest.xml") {
+                        errors.add("${relativePath} is an unexpected top-level source-set file")
+                    }
+                    addCommonSourceInputErrors(child, errors)
+                } else if (child.isDirectory() && !allowedSourceSetDirs.contains(child.name)) {
+                    errors.add("${relativePath} is an unexpected top-level source-set directory")
+                }
+            }
+
+            validateSourceTree(file("src/${sourceSetName}/java"), "java", errors)
+            validateSourceTree(file("src/${sourceSetName}/kotlin"), "java", errors)
+            validateSourceTree(file("src/${sourceSetName}/res"), "res", errors)
+            validateSourceTree(file("src/${sourceSetName}/assets"), "assets", errors)
+        }
+
+        if (!errors.isEmpty()) {
+            throw new GradleException(
+                    "Unexpected app source input files were found. Move durable test notes to docs/TESTBOOK.md and keep runtime captures under ignored output folders.\n - "
+                            + errors.unique().sort().join("\n - ")
+            )
+        }
+    }
+}
+
+tasks.matching { it.name == "preBuild" || (it.name.startsWith("pre") && it.name.endsWith("Build")) }.configureEach {
+    dependsOn(tasks.named("validateSourceInputs"))
+}
+
+tasks.register("cleanLocalArtifacts", Delete) {
+    group = "cleanup"
+    description = "Removes ignored local build/cache clutter while leaving signing and local config files untouched."
+
+    delete rootProject.file("build")
+    delete project.file("build")
+    delete rootProject.file("perf-results")
+    delete rootProject.file(".wrangler")
+    delete fileTree(rootProject.projectDir) {
+        include "**/.DS_Store"
+        exclude ".git/**"
+    }
+
+    doFirst {
+        def dsStoreFiles = []
+        rootProject.projectDir.eachFileRecurse { File localFile ->
+            if (localFile.name == ".DS_Store"
+                    && !localFile.toPath().startsWith(rootProject.file(".git").toPath())) {
+                dsStoreFiles.add(localFile)
+            }
+        }
+        delete dsStoreFiles
+    }
+}
+
 dependencies {
     implementation 'androidx.activity:activity:1.13.0'
     implementation 'androidx.appcompat:appcompat:1.7.1'
