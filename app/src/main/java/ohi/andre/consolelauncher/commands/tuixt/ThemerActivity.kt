@@ -201,6 +201,12 @@ class ThemerActivity : AppCompatActivity() {
                         launchRestorePicker()
                     } else if (fileName == "Rate the App") {
                         openPlayStoreListing()
+                    } else if (fileName == "GitHub") {
+                        openExternalUrl(GITHUB_URL)
+                    } else if (fileName == "Discord") {
+                        openExternalUrl(DISCORD_URL)
+                    } else if (fileName == "Reddit") {
+                        openExternalUrl(REDDIT_URL)
                     } else if (fileName == "Send Feedback") {
                         openFeedbackEmail()
                     } else if (fileName == "Learn More") {
@@ -261,7 +267,15 @@ class ThemerActivity : AppCompatActivity() {
     }
 
     private fun openLearnMore() {
-        startActivity(Tuils.webPage(LEARN_MORE_URL))
+        openExternalUrl(LEARN_MORE_URL)
+    }
+
+    private fun openExternalUrl(url: String) {
+        try {
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+        } catch (e: ActivityNotFoundException) {
+            Toast.makeText(this, "No browser app found.", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun showPresetsDialog() {
@@ -378,6 +392,9 @@ class ThemerActivity : AppCompatActivity() {
                 "Backup",
                 "Create Shareable Configuration",
                 "Restore",
+                "GitHub",
+                "Discord",
+                "Reddit",
                 "Rate the App",
                 "Send Feedback",
                 "Learn More",
@@ -1330,7 +1347,10 @@ class ThemerActivity : AppCompatActivity() {
         private const val PLAY_STORE_MARKET_URL = "market://details?id=$PLAY_STORE_PACKAGE_ID"
         private const val PLAY_STORE_WEB_URL =
             "https://play.google.com/store/apps/details?id=$PLAY_STORE_PACKAGE_ID"
-        private const val FEEDBACK_EMAIL = "dvilspawn@gmail.com"
+        private const val GITHUB_URL = "https://github.com/DvilSpawn/Re-TUI.git"
+        private const val DISCORD_URL = "https://discord.gg/n6zsVYuV"
+        private const val REDDIT_URL = "https://www.reddit.com/r/RE_TUI_launcher/"
+        private const val FEEDBACK_EMAIL = "DvilSpawn@gmail.com"
         private const val FEEDBACK_MAILTO_URI = "mailto:$FEEDBACK_EMAIL"
         private const val GMAIL_PACKAGE = "com.google.android.gm"
         private const val LEARN_MORE_URL = "https://re-tui.pages.dev"
