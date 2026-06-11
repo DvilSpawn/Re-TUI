@@ -4220,13 +4220,38 @@ class UIManager(
             termuxWorkspaceOutputLabel!!.text = if (TextUtils.isEmpty(windows))
                 "WINDOW"
             else
-                ellipsizeWorkspaceLabel(windows!!)
+                formatTermuxWorkspaceWindowList(windows!!)
         }
     }
 
-    private fun ellipsizeWorkspaceLabel(value: String): String {
+    private fun formatTermuxWorkspaceWindowList(value: String): CharSequence {
         val clean = value.trim { it <= ' ' }
-        return if (clean.length <= 42) clean else clean.substring(0, 39) + "..."
+        if (clean.isEmpty()) {
+            return "WINDOW"
+        }
+        val out = SpannableStringBuilder()
+        val tokens = clean.split("\\s+".toRegex()).filter { it.isNotEmpty() }
+        for (token in tokens) {
+            if (out.isNotEmpty()) {
+                out.append(' ')
+            }
+            val active = token.endsWith("*")
+            val display = if (active) token.removeSuffix("*") else token
+            val start = out.length
+            out.append(display)
+            if (active) {
+                val activeBg = notificationWidgetTextColor()
+                val activeFg = if (ColorUtils.calculateLuminance(activeBg) > 0.45) Color.BLACK else Color.WHITE
+                out.setSpan(BackgroundColorSpan(activeBg), start, out.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                out.setSpan(ForegroundColorSpan(activeFg), start, out.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                out.setSpan(StyleSpan(Typeface.BOLD), start, out.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
+        }
+        if (out.length > 42) {
+            out.delete(39, out.length)
+            out.append("...")
+        }
+        return out
     }
 
     private fun updateTermuxWorkspaceOutput(
