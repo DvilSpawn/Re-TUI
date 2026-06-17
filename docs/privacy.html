@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Re:T-UI Privacy Policy</title>
+  <meta name="description" content="Privacy policy for Re:T-UI, an Android terminal-style launcher.">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0c0f12;
+      --panel: #151a1f;
+      --panel-2: #1b2229;
+      --text: #e8ecef;
+      --muted: #a8b3bc;
+      --accent: #b6d56c;
+      --border: #2c343d;
+      --link: #cbe97b;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.6;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .page {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 20px 48px;
+    }
+
+    .shell {
+      border: 1px solid var(--border);
+      background: var(--panel);
+      box-shadow: 0 18px 48px rgba(0, 0, 0, 0.35);
+    }
+
+    .header,
+    .footer {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      padding: 14px 18px;
+      background: var(--panel-2);
+      border-bottom: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .footer {
+      border-bottom: 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .spacer {
+      flex: 1 1 auto;
+    }
+
+    .content {
+      padding: 28px 20px 8px;
+    }
+
+    .kicker {
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 12px;
+      margin-bottom: 10px;
+    }
+
+    h1,
+    h2 {
+      margin: 0 0 12px;
+      line-height: 1.2;
+    }
+
+    h1 {
+      font-size: clamp(28px, 4vw, 40px);
+    }
+
+    h2 {
+      font-size: 22px;
+      color: var(--accent);
+    }
+
+    p,
+    li {
+      color: var(--text);
+    }
+
+    .lead,
+    .meta {
+      color: var(--muted);
+    }
+
+    .section {
+      padding: 20px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    a {
+      color: var(--link);
+    }
+
+    .links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .links a {
+      display: inline-block;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.95em;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="shell">
+      <div class="header">
+        <span>retui-privacy</span>
+        <span class="spacer"></span>
+        <span>source: master:/docs/privacy.html</span>
+      </div>
+
+      <main class="content">
+        <div class="kicker">Privacy Policy</div>
+        <h1>Re:T-UI keeps launcher data on your device unless a feature needs Android or a service provider.</h1>
+        <p class="lead">Re:T-UI is a terminal-style Android launcher by DvilSpawn. This policy explains what the app accesses, why it asks for certain permissions, and what data may leave the device.</p>
+        <p class="meta">Effective date: 6 May 2026</p>
+
+        <section class="section" id="summary">
+          <h2>Summary</h2>
+          <ul>
+            <li><strong>Camera:</strong> used only to control the flashlight command. Re:T-UI does not take photos, record video, scan images, or upload camera content.</li>
+            <li><strong>Notifications:</strong> used only if you enable notification access so the launcher can display, open, filter, or reply to notifications.</li>
+            <li><strong>Contacts, phone, calendar, and location:</strong> used only for user-requested launcher commands and surfaces.</li>
+            <li><strong>Files and presets:</strong> stored in the app folder or files you choose through Android pickers. Backup and restore happen only when you start them.</li>
+            <li><strong>Diagnostics:</strong> Re:T-UI does not include third-party analytics or crash reporting in the Play Store build. Users can share crash logs or issue details manually when asking for support.</li>
+          </ul>
+        </section>
+
+        <section class="section" id="data">
+          <h2>Information Re:T-UI Handles</h2>
+          <p>Re:T-UI stores launcher configuration on your device, including theme settings, UI settings, aliases, command history, presets, module configuration, notification filters, and other files that make the launcher behave the way you configured it.</p>
+          <p>The app may access Android data only after you grant the relevant permission or trigger a feature that requires it.</p>
+        </section>
+
+        <section class="section" id="permissions">
+          <h2>Permissions And Why They Exist</h2>
+          <ul>
+            <li><strong>Camera.</strong> The camera permission is used for the <code>flash</code> command, which controls the device torch or flashlight through Android camera APIs. Re:T-UI does not capture photos, record videos, analyze images, or transmit camera data.</li>
+            <li><strong>Notifications.</strong> Notification access lets Re:T-UI show notification summaries in the launcher, navigate through notifications, open notifications, apply notification filters, and send replies when Android exposes a reply action.</li>
+            <li><strong>Contacts and phone.</strong> Contact and phone permissions support launcher commands such as searching contacts, showing contact actions, and placing calls when you choose to do so.</li>
+            <li><strong>Calendar.</strong> Calendar access supports user-facing calendar and upcoming-event surfaces.</li>
+            <li><strong>Location and network.</strong> Location and network access may support weather, connectivity, and status commands when enabled by the user.</li>
+            <li><strong>Storage and document access.</strong> The Play Store build uses app-owned storage and Android file pickers for backup, restore, and shareable configuration export. Files selected through Android pickers are used for the action you requested.</li>
+            <li><strong>Termux integration.</strong> If Termux is installed and configured, Re:T-UI can ask Termux to run user-selected scripts. Script behavior is controlled by your Termux setup and the script content you choose to run.</li>
+          </ul>
+        </section>
+
+        <section class="section" id="diagnostics">
+          <h2>Analytics And Crash Reports</h2>
+          <p>The Play Store build does not include third-party analytics or automatic crash reporting. If you report a bug, you may choose to share details such as the command used, Android version, app version, screenshots, exported backup files, or crash logs.</p>
+          <p>Re:T-UI does not sell personal data.</p>
+        </section>
+
+        <section class="section" id="sharing">
+          <h2>Data Sharing, Backups, Presets, And Files</h2>
+          <p>Re:T-UI does not sell your personal data. Data may be shared with Android, Termux, or another app only when you use a feature that intentionally opens, shares, imports, exports, replies, calls, or runs a script through that app or system surface.</p>
+          <p>Backup, restore, and shareable configuration export are user-initiated. Backup files can contain your launcher configuration, aliases, themes, presets, fonts, scripts, and other files in your Re:T-UI app folder. Only share backup files with people you trust.</p>
+        </section>
+
+        <section class="section" id="contact">
+          <h2>Children, Changes, Contact</h2>
+          <p>Re:T-UI is a customization and productivity launcher. It is not directed to children. If you believe a child has provided personal information through the app, contact the developer so the issue can be reviewed.</p>
+          <p>This policy may be updated when Re:T-UI adds or changes features, permissions, diagnostics, or distribution channels. The effective date at the top of this page will be updated when material changes are made.</p>
+          <p>For privacy questions, open an issue on the project page, use the current support channels linked from Re:T-UI, or email the developer directly.</p>
+
+          <div class="links">
+            <a href="https://github.com/DvilSpawn/Re-TUI.git">Project source</a>
+            <a href="mailto:DvilSpawn@gmail.com">DvilSpawn@gmail.com</a>
+          </div>
+        </section>
+      </main>
+
+      <div class="footer">
+        <span>privacy policy</span>
+        <span class="spacer"></span>
+        <span>effective: 2026-05-06</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
