@@ -1,6 +1,5 @@
 package ohi.andre.consolelauncher.managers
 
-import android.annotation.TargetApi
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.LauncherApps
@@ -10,6 +9,7 @@ import android.os.Build
 import android.os.Process
 import android.os.UserHandle
 import android.os.UserManager
+import androidx.annotation.RequiresApi
 import ohi.andre.consolelauncher.tuils.Tuils
 import org.json.JSONObject
 import java.util.Collections
@@ -122,7 +122,7 @@ object PinnedShortcutManager {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.N_MR1)
+    @RequiresApi(Build.VERSION_CODES.N_MR1)
     private fun resolve(context: Context, apps: LauncherApps, record: Record): ShortcutInfo? {
         var profiles: MutableList<UserHandle>
         try {
@@ -149,7 +149,7 @@ object PinnedShortcutManager {
         return null
     }
 
-    @TargetApi(Build.VERSION_CODES.N_MR1)
+    @RequiresApi(Build.VERSION_CODES.N_MR1)
     private fun findShortcut(
         apps: LauncherApps,
         record: Record,
@@ -196,7 +196,7 @@ object PinnedShortcutManager {
         return if (profile == Process.myUserHandle()) 0L else Integer.toUnsignedLong(profile.hashCode())
     }
 
-    @TargetApi(Build.VERSION_CODES.N_MR1)
+    @RequiresApi(Build.VERSION_CODES.N_MR1)
     private fun safeLabel(info: ShortcutInfo): String {
         val shortLabel = info.getShortLabel()
         if (shortLabel != null && shortLabel.length > 0) return shortLabel.toString()

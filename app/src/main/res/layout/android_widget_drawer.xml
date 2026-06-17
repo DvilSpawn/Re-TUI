@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/android_widget_drawer_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent"
+    android:clickable="true"
+    android:focusable="true"
+    android:visibility="gone">
+
+    <View
+        android:id="@+id/android_widget_drawer_dummy_input_anchor"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_alignParentBottom="true"
+        android:visibility="invisible" />
+
+    <LinearLayout
+        android:id="@+id/android_widget_drawer_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/android_widget_drawer_dummy_input_anchor"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="18dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="4dp"
+        android:background="@drawable/apps_drawer_border"
+        android:orientation="vertical"
+        android:padding="2dp">
+
+        <ScrollView
+            android:id="@+id/android_widget_drawer_scroll"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:fillViewport="false"
+            android:overScrollMode="ifContentScrolls"
+            android:paddingStart="14dp"
+            android:paddingTop="20dp"
+            android:paddingEnd="14dp"
+            android:paddingBottom="18dp"
+            android:scrollbars="none">
+
+            <GridLayout
+                android:id="@+id/android_widget_grid"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:columnCount="4"
+                android:orientation="horizontal" />
+
+        </ScrollView>
+
+        <LinearLayout
+            android:id="@+id/android_widget_input_group"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:gravity="center_vertical"
+            android:minHeight="42dp"
+            android:orientation="horizontal"
+            android:paddingStart="8dp"
+            android:paddingTop="6dp"
+            android:paddingEnd="8dp"
+            android:paddingBottom="6dp">
+
+            <TextView
+                android:id="@+id/android_widget_prefix"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="$W "
+                android:textSize="14sp" />
+
+            <EditText
+                android:id="@+id/android_widget_input"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@null"
+                android:hint="add | show | resize | remove"
+                android:imeOptions="actionGo|flagNoFullscreen"
+                android:importantForAutofill="no"
+                android:inputType="text|textNoSuggestions"
+                android:singleLine="true"
+                android:textCursorDrawable="@drawable/cursor"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/android_widget_send"
+                android:layout_width="42dp"
+                android:layout_height="30dp"
+                android:gravity="center"
+                android:text="RUN"
+                android:textSize="11sp" />
+
+        </LinearLayout>
+
+        <HorizontalScrollView
+            android:id="@+id/android_widget_suggestions_container"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_marginTop="2dp"
+            android:fillViewport="false"
+            android:focusable="false"
+            android:overScrollMode="never"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:id="@+id/android_widget_suggestions_group"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" />
+
+        </HorizontalScrollView>
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/android_widget_drawer_header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@id/android_widget_drawer_container"
+        android:layout_alignTop="@id/android_widget_drawer_container"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="-10dp"
+        android:background="@drawable/apps_drawer_header_border"
+        android:fontFamily="monospace"
+        android:paddingStart="12dp"
+        android:paddingTop="2dp"
+        android:paddingEnd="12dp"
+        android:paddingBottom="2dp"
+        android:text="Widgets/ [0]"
+        android:textColor="#A5D6A7"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/android_widget_drawer_add"
+        android:layout_width="42dp"
+        android:layout_height="34dp"
+        android:layout_alignTop="@id/android_widget_drawer_container"
+        android:layout_alignEnd="@id/android_widget_drawer_container"
+        android:layout_marginTop="-10dp"
+        android:layout_marginEnd="24dp"
+        android:background="@drawable/apps_drawer_header_border"
+        android:fontFamily="monospace"
+        android:gravity="center"
+        android:text="X"
+        android:textColor="#A5D6A7"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/android_widget_drawer_footer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@id/android_widget_drawer_container"
+        android:layout_alignBottom="@id/android_widget_drawer_container"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="78dp"
+        android:background="@drawable/apps_drawer_header_border"
+        android:fontFamily="monospace"
+        android:paddingStart="12dp"
+        android:paddingTop="2dp"
+        android:paddingEnd="12dp"
+        android:paddingBottom="2dp"
+        android:text="grid 4"
+        android:textColor="#A5D6A7"
+        android:textSize="12sp" />
+
+</RelativeLayout>

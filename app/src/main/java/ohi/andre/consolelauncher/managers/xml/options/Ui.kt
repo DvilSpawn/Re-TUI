@@ -998,6 +998,45 @@ enum class Ui : XMLPrefsSave {
             return "[horizontal_margin],[vertical_margin],[horizontal_padding],[vertical_padding]"
         }
     },
+    android_widget_grid_columns {
+        override fun defaultValue(): String? {
+            return "4"
+        }
+
+        override fun type(): String? {
+            return XMLPrefsSave.INTEGER
+        }
+
+        override fun info(): String? {
+            return "Base column count for the Android widget drawer. Rows and landscape columns are computed from square cells"
+        }
+    },
+    android_widget_min_columns {
+        override fun defaultValue(): String? {
+            return "2"
+        }
+
+        override fun type(): String? {
+            return XMLPrefsSave.INTEGER
+        }
+
+        override fun info(): String? {
+            return "Minimum widget width in grid columns. Use 1 to allow 1x1 widgets"
+        }
+    },
+    android_widget_min_rows {
+        override fun defaultValue(): String? {
+            return "2"
+        }
+
+        override fun type(): String? {
+            return XMLPrefsSave.INTEGER
+        }
+
+        override fun info(): String? {
+            return "Minimum widget height in grid rows. Use 1 to allow 1x1 widgets"
+        }
+    },
     suggestions_area_margin {
         override fun defaultValue(): String? {
             return "3,3,0,0"

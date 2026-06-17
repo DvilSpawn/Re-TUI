@@ -167,6 +167,19 @@ enum class Behavior : XMLPrefsSave {
             return XMLPrefsSave.BOOLEAN
         }
     },
+    show_android_widget_drawer_button {
+        override fun defaultValue(): String? {
+            return "true"
+        }
+
+        override fun info(): String? {
+            return "If true, Re:T-UI will show the Android widgets button in the launcher toolbar"
+        }
+
+        override fun type(): String? {
+            return XMLPrefsSave.BOOLEAN
+        }
+    },
     enable_cyberdeck_mode {
         override fun defaultValue(): String? {
             return "false"

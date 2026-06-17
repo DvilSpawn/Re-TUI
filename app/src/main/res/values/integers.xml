@@ -8,7 +8,6 @@
     <integer name="input_view_weight">7</integer>
     <integer name="input_group_weightsum">8</integer>
 
-    <integer name="tools_view_weightsum">5</integer>
     <integer name="tools_view_weight">1</integer>
 
 </resources>

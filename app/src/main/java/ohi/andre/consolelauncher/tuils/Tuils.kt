@@ -57,7 +57,6 @@ import kotlin.math.sin
 import kotlin.math.sqrt
 import kotlin.math.tan
 import android.annotation.SuppressLint
-import android.annotation.TargetApi
 import android.app.ActivityManager
 import android.app.ActivityManager.MemoryInfo
 import android.app.ActivityOptions
@@ -497,7 +496,6 @@ object Tuils {
         )
     }
 
-    @TargetApi(Build.VERSION_CODES.GINGERBREAD)
     fun openSettingsPage(c: Context, packageName: String?) {
         val intent: Intent = Intent()
         intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
@@ -1076,9 +1074,9 @@ object Tuils {
         val hours = (millis / (1000 * 60 * 60)) % 24
 
         if (hours > 0) {
-            return String.format("%d:%02d:%02d", hours, minutes, seconds)
+            return String.format(Locale.US, "%d:%02d:%02d", hours, minutes, seconds)
         } else {
-            return String.format("%d:%02d", minutes, seconds)
+            return String.format(Locale.US, "%d:%02d", minutes, seconds)
         }
     }
 
@@ -1339,13 +1337,8 @@ object Tuils {
 
         intent.setDataAndType(u, mimetype)
 
-        val flags: Int
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            flags =
-                Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_PREFIX_URI_PERMISSION
-        } else {
-            flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-        }
+        val flags: Int =
+            Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_PREFIX_URI_PERMISSION
 
         intent.addFlags(flags)
 
@@ -1369,13 +1362,7 @@ object Tuils {
     }
 
     private fun buildFile(context: Context, file: File): Uri? {
-        val uri: Uri?
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            uri = Uri.fromFile(file)
-        } else {
-            uri = FileProvider.getUriForFile(context, GenericFileProvider.PROVIDER_NAME, file)
-        }
-        return uri
+        return FileProvider.getUriForFile(context, GenericFileProvider.PROVIDER_NAME, file)
     }
 
     fun eval(str: String): Double {
@@ -1455,16 +1442,10 @@ object Tuils {
 
     fun getTextFromClipboard(context: Context): String? {
         try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-                val manager =
-                    context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                val item: ClipData.Item = manager.getPrimaryClip()!!.getItemAt(0)
-                return item.getText().toString()
-            } else {
-                val manager =
-                    context.getSystemService(Context.CLIPBOARD_SERVICE) as android.text.ClipboardManager
-                return manager.getText().toString()
-            }
+            val manager =
+                context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val item: ClipData.Item = manager.getPrimaryClip()!!.getItemAt(0)
+            return item.getText().toString()
         } catch (e: Exception) {
             return null
         }
@@ -1637,33 +1618,11 @@ object Tuils {
             if (cursorDrawable != null) {
                 cursorDrawable.setColorFilter(color, PorterDuff.Mode.SRC_IN)
             }
-            return
-        }
-        try {
-            val fCursorDrawableRes = TextView::class.java.getDeclaredField("mCursorDrawableRes")
-            fCursorDrawableRes.setAccessible(true)
-            val mCursorDrawableRes = fCursorDrawableRes.getInt(editText)
-            val fEditor = TextView::class.java.getDeclaredField("mEditor")
-            fEditor.setAccessible(true)
-            val editor = fEditor.get(editText)
-            val clazz: Class<*> = editor!!.javaClass
-            val fCursorDrawable = clazz.getDeclaredField("mCursorDrawable")
-            fCursorDrawable.setAccessible(true)
-            val drawables = arrayOfNulls<Drawable>(2)
-            drawables[0] = editText.getContext().getResources().getDrawable(mCursorDrawableRes)
-            drawables[1] = editText.getContext().getResources().getDrawable(mCursorDrawableRes)
-            drawables[0]!!.setColorFilter(color, PorterDuff.Mode.SRC_IN)
-            drawables[1]!!.setColorFilter(color, PorterDuff.Mode.SRC_IN)
-            fCursorDrawable.set(editor, drawables)
-        } catch (ignored: Throwable) {
         }
     }
 
     fun pendingIntentFlags(flags: Int): Int {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            return flags or PendingIntent.FLAG_IMMUTABLE
-        }
-        return flags
+        return flags or PendingIntent.FLAG_IMMUTABLE
     }
 
     @Throws(CanceledException::class)

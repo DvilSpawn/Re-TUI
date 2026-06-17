@@ -11,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
@@ -278,7 +279,11 @@ class TuixtAdapter(rows: MutableList<SettingsRow>, private val file: File?) :
 
     private fun showColorPicker(holder: ViewHolder, item: XMLPrefsSave?, currentHex: String?) {
         val dialogView = LayoutInflater.from(holder.itemView.getContext())
-            .inflate(R.layout.color_picker_dialog, null)
+            .inflate(
+                R.layout.color_picker_dialog,
+                FrameLayout(holder.itemView.getContext()),
+                false
+            )
         styleColorPicker(dialogView)
         val preview = dialogView.findViewById<View>(R.id.color_preview)
         val seekAlpha = dialogView.findViewById<SeekBar>(R.id.seek_alpha)

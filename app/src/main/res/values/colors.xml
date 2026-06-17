@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="default_input_color">#0f0</color>
-    <color name="default_output_color">#fff</color>
-    <color name="default_bg_color">#000</color>
-
     <color name="hint_color">#AAA</color>
 
 </resources>

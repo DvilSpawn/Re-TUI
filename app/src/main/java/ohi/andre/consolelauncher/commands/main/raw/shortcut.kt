@@ -1,10 +1,10 @@
 package ohi.andre.consolelauncher.commands.main.raw
 
-import android.annotation.TargetApi
 import android.content.Context
 import android.content.pm.LauncherApps
 import android.content.pm.ShortcutInfo
 import android.os.Build
+import androidx.annotation.RequiresApi
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.commands.CommandAbstraction
 import ohi.andre.consolelauncher.commands.ExecutePack
@@ -19,7 +19,7 @@ import ohi.andre.consolelauncher.managers.AppsManager
 /**
  * Created by francescoandreuzzi on 24/03/2018.
  */
-@TargetApi(Build.VERSION_CODES.N_MR1)
+@RequiresApi(Build.VERSION_CODES.N_MR1)
 class shortcut : ParamCommand(), APICommand {
     private enum class Param : ohi.andre.consolelauncher.commands.main.Param {
         use {

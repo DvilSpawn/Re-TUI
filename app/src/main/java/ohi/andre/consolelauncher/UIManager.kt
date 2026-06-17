@@ -52,10 +52,6 @@ import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.view.ViewTreeObserver.OnScrollChangedListener
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import android.widget.AbsListView
-import android.widget.AdapterView
-import android.widget.AdapterView.OnItemClickListener
-import android.widget.BaseAdapter
 import android.widget.Button
 import android.widget.EditText
 import android.widget.FrameLayout
@@ -63,7 +59,6 @@ import android.widget.HorizontalScrollView
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.ListView
 import android.widget.RelativeLayout
 import android.widget.ScrollView
 import android.widget.TextView
@@ -84,8 +79,6 @@ import ohi.andre.consolelauncher.commands.tuixt.ThemerActivity
 import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog
 import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog.ConfirmAction
 import ohi.andre.consolelauncher.managers.AliasManager
-import ohi.andre.consolelauncher.managers.AppsManager
-import ohi.andre.consolelauncher.managers.AppsManager.LaunchInfo
 import ohi.andre.consolelauncher.managers.ClockManager
 import ohi.andre.consolelauncher.managers.PomodoroManager
 import ohi.andre.consolelauncher.managers.PomodoroManager.SessionType
@@ -155,6 +148,9 @@ import ohi.andre.consolelauncher.managers.termux.TerminalGridView
 import ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceLauncherManager
 import ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceInputEditText
 import ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceSocketClient
+import ohi.andre.consolelauncher.managers.ui.AndroidWidgetDrawerManager
+import ohi.andre.consolelauncher.managers.ui.AppDrawerPaneManager
+import ohi.andre.consolelauncher.managers.ui.OverlayLayoutManager
 import ohi.andre.consolelauncher.managers.widgets.LuaWidgetEngine
 import ohi.andre.consolelauncher.managers.widgets.LuaWidgetEngine.UpdateListener
 import ohi.andre.consolelauncher.managers.widgets.LuaWidgetManager
@@ -269,18 +265,8 @@ class UIManager(
     private var swipeDownNotifications: Boolean
     private var swipeUpAppsDrawer: Boolean
     private var gestureDetector: GestureDetectorCompat? = null
-    private var appsDrawerRoot: View?
-    private val appsDrawerContainer: View?
-    private val appsDrawerContainerBaseMargins = IntArray(4)
-    private val appsList: ListView?
-    private val appsGroupTabs: LinearLayout?
-    private val appsAlphaTabs: LinearLayout?
-    private val appsDrawerHeader: TextView
-    private val appsDrawerFooter: TextView
-    private var appsDrawerAdapter: AppsDrawerAdapter? = null
-    private val appsDrawerEntries: MutableList<AppDrawerEntry> = ArrayList<AppDrawerEntry>()
-    private val appsDrawerAlphaPositions = LinkedHashMap<String?, Int?>()
-    private val appsDrawerAlphaViews = LinkedHashMap<String?, TextView?>()
+    private var appDrawerPaneManager: AppDrawerPaneManager? = null
+    private var androidWidgetDrawerManager: AndroidWidgetDrawerManager? = null
     private val currentOverlayNotifications = ArrayList<NotificationService.Notification>()
     private var currentNotificationIndex = 0
     private var notificationReplyFocusKey: String? = null
@@ -292,8 +278,6 @@ class UIManager(
     private var stopwatchTabDockReady = false
     var isPomodoroOverlayVisible: Boolean = false
         private set
-    private var selectedAppsDrawerGroup: String? = null
-    private var selectedAppsDrawerAlpha: String? = null
     private var termuxOverlay: View? = null
     private var termuxOverlayBasePaddingLeft = 0
     private var termuxOverlayBasePaddingTop = 0
@@ -941,6 +925,7 @@ class UIManager(
         var deleteView: ImageButton? = null
         var pasteView: ImageButton? = null
         var appDrawerView: ImageButton? = null
+        var androidWidgetDrawerView: ImageButton? = null
         var termuxWorkspaceView: ImageButton? = null
 
         if (!showToolbar) {
@@ -952,6 +937,8 @@ class UIManager(
             deleteView = mRootView.findViewById<View?>(R.id.delete_view) as ImageButton?
             pasteView = mRootView.findViewById<View?>(R.id.paste_view) as ImageButton?
             appDrawerView = mRootView.findViewById<View?>(R.id.app_drawer_view) as ImageButton?
+            androidWidgetDrawerView =
+                mRootView.findViewById<View?>(R.id.android_widget_drawer_view) as ImageButton?
             termuxWorkspaceView = mRootView.findViewById<View?>(R.id.termux_workspace_view) as ImageButton?
 
             toolbarView = mRootView.findViewById<View?>(R.id.tools_view)
@@ -976,6 +963,7 @@ class UIManager(
                     appDrawerView.setVisibility(View.GONE)
                 }
             }
+            configureAndroidWidgetDrawerToolbarButton(androidWidgetDrawerView)
             if (termuxWorkspaceView != null) {
                 configureTermuxWorkspaceToolbarButton(termuxWorkspaceView)
             }
@@ -995,7 +983,15 @@ class UIManager(
             mainPack,
             mExecuter
         )
-        styleToolbarButtonChrome(backView, nextView, deleteView, pasteView, appDrawerView, termuxWorkspaceView)
+        styleToolbarButtonChrome(
+            backView,
+            nextView,
+            deleteView,
+            pasteView,
+            appDrawerView,
+            androidWidgetDrawerView,
+            termuxWorkspaceView
+        )
         if (showToolbar && toolbarView is LinearLayout) {
             addToolbarShortcutButtons(toolbarView as LinearLayout)
         }
@@ -1116,6 +1112,29 @@ class UIManager(
         val button = mRootView?.findViewById<ImageButton?>(R.id.termux_workspace_view)
         configureTermuxWorkspaceToolbarButton(button)
         refreshToolbarWeightSum()
+    }
+
+    fun refreshAndroidWidgetDrawerToolbarButton() {
+        val button = mRootView?.findViewById<ImageButton?>(R.id.android_widget_drawer_view)
+        configureAndroidWidgetDrawerToolbarButton(button)
+        refreshToolbarWeightSum()
+    }
+
+    private fun configureAndroidWidgetDrawerToolbarButton(button: ImageButton?) {
+        if (button == null) {
+            return
+        }
+        val enabled = XMLPrefsManager.getBoolean(Behavior.show_android_widget_drawer_button)
+        button.visibility = if (enabled) View.VISIBLE else View.GONE
+        button.setColorFilter(
+            XMLPrefsManager.getColor(Theme.toolbar_icon_color),
+            PorterDuff.Mode.SRC_IN
+        )
+        button.setBackgroundColor(0)
+        button.setOnClickListener(View.OnClickListener { v: View? ->
+            showAndroidWidgetDrawer()
+        })
+        styleToolbarButtonChrome(button)
     }
 
     private fun configureTermuxWorkspaceToolbarButton(button: ImageButton?) {
@@ -1846,16 +1865,20 @@ class UIManager(
         )
         overlayDisplayMarginBottom = Tuils.mmToPx(metrics, bottomMargins[3])
 
-        applyMarginsWithBase(
-            appsDrawerContainer,
-            appsDrawerContainerBaseMargins,
+        appDrawerPaneManager?.applyDisplayMargins(
             overlayDisplayMarginLeft,
             overlayDisplayMarginTop,
             overlayDisplayMarginRight,
             overlayDisplayMarginBottom
         )
+        androidWidgetDrawerManager?.applyDisplayMargins(
+            overlayDisplayMarginLeft,
+            overlayDisplayMarginTop,
+            overlayDisplayMarginRight,
+            overlayDisplayMarginBottom + imeBottomOffset
+        )
         applyTermuxImeBottomPadding()
-        applyOverlayPaddingWithBase(
+        OverlayLayoutManager.applyPaddingWithBase(
             fileOverlay,
             fileOverlayBasePaddingLeft,
             fileOverlayBasePaddingTop,
@@ -1866,7 +1889,7 @@ class UIManager(
             overlayDisplayMarginRight,
             overlayDisplayMarginBottom
         )
-        applyOverlayPaddingWithBase(
+        OverlayLayoutManager.applyPaddingWithBase(
             hackOverlay,
             hackOverlayBasePaddingLeft,
             hackOverlayBasePaddingTop,
@@ -1877,73 +1900,6 @@ class UIManager(
             overlayDisplayMarginRight,
             overlayDisplayMarginBottom
         )
-    }
-
-    private fun captureBaseMargins(view: View?, out: IntArray?) {
-        if (view == null || out == null || out.size < 4) {
-            return
-        }
-
-        val params = view.getLayoutParams()
-        if (params is MarginLayoutParams) {
-            val marginParams = params
-            out[0] = marginParams.leftMargin
-            out[1] = marginParams.topMargin
-            out[2] = marginParams.rightMargin
-            out[3] = marginParams.bottomMargin
-        }
-    }
-
-    private fun applyMarginsWithBase(
-        view: View?,
-        baseMargins: IntArray?,
-        left: Int,
-        top: Int,
-        right: Int,
-        bottom: Int
-    ) {
-        if (view == null || baseMargins == null || baseMargins.size < 4) {
-            return
-        }
-
-        val params = view.getLayoutParams()
-        if (params !is MarginLayoutParams) {
-            return
-        }
-
-        val marginParams = params
-        val newLeft = baseMargins[0] + left
-        val newTop = baseMargins[1] + top
-        val newRight = baseMargins[2] + right
-        val newBottom = baseMargins[3] + bottom
-        if (marginParams.leftMargin != newLeft || marginParams.topMargin != newTop || marginParams.rightMargin != newRight || marginParams.bottomMargin != newBottom) {
-            marginParams.setMargins(newLeft, newTop, newRight, newBottom)
-            view.setLayoutParams(marginParams)
-        }
-    }
-
-    private fun applyOverlayPaddingWithBase(
-        view: View?,
-        baseLeft: Int,
-        baseTop: Int,
-        baseRight: Int,
-        baseBottom: Int,
-        left: Int,
-        top: Int,
-        right: Int,
-        bottom: Int
-    ) {
-        if (view == null) {
-            return
-        }
-
-        val newLeft = baseLeft + left
-        val newTop = baseTop + top
-        val newRight = baseRight + right
-        val newBottom = baseBottom + bottom
-        if (view.getPaddingLeft() != newLeft || view.getPaddingTop() != newTop || view.getPaddingRight() != newRight || view.getPaddingBottom() != newBottom) {
-            view.setPadding(newLeft, newTop, newRight, newBottom)
-        }
     }
 
     private fun styleTerminalTrayToggle() {
@@ -2231,7 +2187,11 @@ class UIManager(
         renderTermuxWorkspaceStatus("Tap the terminal toolbar button or run :refresh to start.")
 
         val terminalSwipeListener = OnTouchListener { v, event ->
-            handleTermuxWorkspaceOutputTouch(event)
+            val handled = handleTermuxWorkspaceOutputTouch(event)
+            if (event?.actionMasked == MotionEvent.ACTION_UP) {
+                v?.performClick()
+            }
+            handled
         }
         termuxWorkspaceOutputPanel?.setOnTouchListener(terminalSwipeListener)
         termuxWorkspaceScroll?.setOnTouchListener(terminalSwipeListener)
@@ -2411,7 +2371,12 @@ class UIManager(
 
     private fun bindTermuxWorkspaceKeyModeSwipe(view: View?) {
         view?.setOnTouchListener(OnTouchListener { v: View?, event: MotionEvent? ->
-            handleTermuxWorkspaceKeyModeTouch(event)
+            val handled = handleTermuxWorkspaceKeyModeTouch(event)
+            if (!handled && event?.actionMasked == MotionEvent.ACTION_UP) {
+                v?.performClick()
+                return@OnTouchListener true
+            }
+            handled
         })
     }
 
@@ -5196,7 +5161,7 @@ class UIManager(
 
         val label = moduleView.findViewById<TextView?>(R.id.module_text_label)
         val close = moduleView.findViewById<TextView?>(R.id.module_text_close)
-        val scroll = moduleView.findViewById<ScrollView?>(R.id.module_text_scroll)
+        val scroll = moduleView.findViewById<ScrollView?>(R.id.module_text_border)
         val body = moduleView.findViewById<TextView?>(R.id.module_text_body)
 
         if (label != null) {
@@ -5648,7 +5613,7 @@ class UIManager(
         val label = moduleView.findViewById<TextView?>(R.id.module_text_label)
         val body = moduleView.findViewById<TextView?>(R.id.module_text_body)
         val close = moduleView.findViewById<TextView?>(R.id.module_text_close)
-        val scroll = moduleView.findViewById<ScrollView?>(R.id.module_text_scroll)
+        val scroll = moduleView.findViewById<ScrollView?>(R.id.module_text_border)
         if (label != null) {
             label.setText(ModuleManager.displayTitle(mContext, module))
         }
@@ -6898,7 +6863,8 @@ class UIManager(
                         animateTermuxAppFnKeyMode(!termuxFnKeyMode, if (dx < 0f) 1 else -1)
                         true
                     } else {
-                        false
+                        v?.performClick()
+                        true
                     }
                 }
                 MotionEvent.ACTION_CANCEL -> {
@@ -7519,40 +7485,22 @@ class UIManager(
             })
         }
 
-        appsDrawerRoot = rootView.findViewById<View?>(R.id.apps_drawer_root)
-        appsDrawerContainer = rootView.findViewById<View?>(R.id.apps_drawer_container)
-        captureBaseMargins(appsDrawerContainer, appsDrawerContainerBaseMargins)
-        appsList = rootView.findViewById<ListView?>(R.id.apps_list)
-        appsGroupTabs = rootView.findViewById<LinearLayout?>(R.id.apps_group_tabs)
-        appsAlphaTabs = rootView.findViewById<LinearLayout?>(R.id.apps_alpha_tabs)
-        appsDrawerHeader = rootView.findViewById<TextView>(R.id.apps_drawer_header)
-        appsDrawerFooter = rootView.findViewById<TextView>(R.id.apps_drawer_footer)
-
-        val dummyAnchor = rootView.findViewById<View?>(R.id.apps_drawer_dummy_input_anchor)
-        if (dummyAnchor != null) {
-            rootView.post(Runnable {
-                val lp = dummyAnchor.getLayoutParams() as RelativeLayout.LayoutParams
-                var height = 0
-                val inputGroup = rootView.findViewById<View?>(R.id.input_group)
-                if (inputGroup != null) height += inputGroup.getHeight()
-
-                val toolsView = rootView.findViewById<View?>(R.id.tools_view)
-                if (toolsView != null && toolsView.getVisibility() == View.VISIBLE) {
-                    height += toolsView.getHeight()
-                }
-                val suggestions = rootView.findViewById<View?>(R.id.suggestions_container)
-                if (suggestions != null && suggestions.getVisibility() == View.VISIBLE) {
-                    height += suggestions.getHeight()
-                }
-                lp.height = height
-                lp.removeRule(RelativeLayout.ALIGN_PARENT_TOP)
-                lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
-                dummyAnchor.setLayoutParams(lp)
-            })
-        }
-
-        if (appsDrawerRoot != null) {
-            appsDrawerRoot!!.setOnClickListener(View.OnClickListener { v: View? -> hideAppsDrawer() })
+        appDrawerPaneManager = AppDrawerPaneManager(
+            mContext!!,
+            rootView,
+            { if (mTerminalAdapter != null) mTerminalAdapter!!.mainPack else mainPack },
+            { closeKeyboard() },
+            { hideLauncherChromeForSurface() },
+            { restoreLauncherChromeAfterSurface() }
+        )
+        if (mContext is Activity) {
+            androidWidgetDrawerManager = AndroidWidgetDrawerManager(
+                mContext as Activity,
+                rootView,
+                { closeKeyboard() },
+                { hideLauncherChromeForSurface() },
+                { restoreLauncherChromeAfterSurface() }
+            )
         }
 
         applyDisplayMarginsForConfiguration(mContext!!.getResources().getConfiguration())
@@ -7776,7 +7724,7 @@ class UIManager(
 
                 //                -1 = left     0 = center     1 = right
                 val p = statusLineAlignments[ec]
-                if (p >= 0) labelViews[count]!!.setGravity(if (p == 0) Gravity.CENTER_HORIZONTAL else Gravity.RIGHT)
+                if (p >= 0) labelViews[count]!!.setGravity(if (p == 0) Gravity.CENTER_HORIZONTAL else Gravity.END)
 
                 if (count.toFloat() != labelIndexes[Label.notes.ordinal]) {
                     labelViews[count]!!.setVerticalScrollBarEnabled(false)
@@ -11686,7 +11634,7 @@ class UIManager(
     private fun playHackOverlay() {
         val overlay = mRootView!!.findViewById<View?>(R.id.hack_overlay)
         val hackText = mRootView.findViewById<TextView?>(R.id.hack_text)
-        val hackScroll = mRootView.findViewById<ScrollView?>(R.id.hack_scroll)
+        val hackScroll = overlay as? ScrollView
         if (overlay == null || hackText == null || hackScroll == null || handler == null) {
             return
         }
@@ -12247,431 +12195,42 @@ class UIManager(
     }
 
     val isAppsDrawerOpen: Boolean
-        get() = appsDrawerRoot != null && appsDrawerRoot!!.getVisibility() == View.VISIBLE
+        get() = appDrawerPaneManager?.isOpen == true
+
+    val isAndroidWidgetDrawerOpen: Boolean
+        get() = androidWidgetDrawerManager?.isOpen == true
 
     fun hideAppsDrawer() {
-        if (appsDrawerRoot != null) {
-            appsDrawerRoot!!.setVisibility(View.GONE)
-        }
+        appDrawerPaneManager?.hide()
+    }
+
+    fun hideAndroidWidgetDrawer() {
+        androidWidgetDrawerManager?.hide()
     }
 
     fun showAppsDrawer() {
-        if (appsDrawerRoot == null || appsList == null) return
-
-        closeKeyboard()
-
-        val mainPack = mTerminalAdapter!!.mainPack
-        if (mainPack == null || mainPack.appsManager == null) return
-
-        val drawerColor = XMLPrefsManager.getColor(Theme.apps_drawer_text_color)
-        val borderColor = terminalBorderColor()
-        val widgetBgColor = terminalWindowBackground()
-        val headerBgColor = terminalHeaderTabBackground()
-
-        appsDrawerHeader.setTextColor(drawerColor)
-        appsDrawerFooter.setTextColor(drawerColor)
-        appsDrawerHeader.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
-        appsDrawerFooter.setTypeface(Tuils.getTypeface(mContext))
-
-        val useDashed = dashedBorders()
-        val drawerPanel = appsDrawerContainer
-            ?: appsDrawerRoot!!.findViewById<View?>(R.id.apps_drawer_container)
-        drawerPanel?.setBackground(
-            TerminalBorderRuntime.panelDrawable(
-                mContext!!,
-                widgetBgColor,
-                borderColor,
-                1.5f,
-                moduleCornerRadius(),
-                useDashed
-            )
-        )
-        appsDrawerHeader.setBackground(TerminalBorderRuntime.tabDrawable(mContext!!, headerBgColor))
-        appsDrawerFooter.setBackground(TerminalBorderRuntime.tabDrawable(mContext!!, headerBgColor))
-        TerminalBorderRuntime.bind(drawerPanel, appsDrawerHeader, appsDrawerFooter)
-
-        if (appsDrawerAdapter == null) {
-            appsDrawerAdapter = AppsDrawerAdapter(mContext!!, drawerColor, widgetBgColor)
-            appsList.setAdapter(appsDrawerAdapter)
-            appsList.setOnItemClickListener(OnItemClickListener { parent: AdapterView<*>?, view: View?, position: Int, id: Long ->
-                val entry = appsDrawerEntries.get(position)
-                if (entry is AppEntry) {
-                    val app: LaunchInfo? = entry.app
-                    mainPack.appsManager.launch(mContext, app)
-                    hideAppsDrawer()
-                }
-            })
-            appsList.setOnScrollListener(object : AbsListView.OnScrollListener {
-                override fun onScrollStateChanged(view: AbsListView?, scrollState: Int) {
-                }
-
-                override fun onScroll(
-                    view: AbsListView?,
-                    firstVisibleItem: Int,
-                    visibleItemCount: Int,
-                    totalItemCount: Int
-                ) {
-                    updateSelectedAlphaFromPosition(firstVisibleItem)
-                }
-            })
-        } else {
-            appsDrawerAdapter!!.setColors(drawerColor, widgetBgColor)
-        }
-
-        buildGroupTabs(mainPack.appsManager, drawerColor, borderColor, widgetBgColor)
-        rebuildAppsDrawerContents(mainPack.appsManager, drawerColor, borderColor, widgetBgColor)
-        appsDrawerRoot!!.setVisibility(View.VISIBLE)
+        androidWidgetDrawerManager?.hide()
+        appDrawerPaneManager?.show()
     }
 
-    private fun buildGroupTabs(
-        appsManager: AppsManager,
-        drawerColor: Int,
-        borderColor: Int,
-        widgetBgColor: Int
-    ) {
-        if (appsGroupTabs == null) return
-
-        appsGroupTabs.removeAllViews()
-
-        addGroupTab("ALL", null, drawerColor, borderColor, widgetBgColor, true)
-
-        val groups: MutableList<AppsManager.Group> =
-            ArrayList<AppsManager.Group>(appsManager.groups)
-        Collections.sort<AppsManager.Group>(
-            groups,
-            Comparator { a: AppsManager.Group, b: AppsManager.Group ->
-                Tuils.alphabeticCompare(
-                    a.name(),
-                    b.name()
-                )
-            })
-        for (group in groups) {
-            val groupName = group.name()
-            val tabLabel = if (groupName.length <= 3)
-                groupName.uppercase(Locale.getDefault())
-            else
-                groupName.substring(0, 3).uppercase(Locale.getDefault())
-            addGroupTab(tabLabel, groupName, drawerColor, borderColor, widgetBgColor, false)
-        }
+    fun showAndroidWidgetDrawer() {
+        appDrawerPaneManager?.hide()
+        androidWidgetDrawerManager?.show()
     }
 
-    private fun addGroupTab(
-        label: String?,
-        groupName: String?,
-        drawerColor: Int,
-        borderColor: Int,
-        widgetBgColor: Int,
-        isAll: Boolean
-    ) {
-        val tab = TextView(mContext)
-        val lp = LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            Tuils.dpToPx(mContext, 34)
-        )
-        lp.bottomMargin = Tuils.dpToPx(mContext, 4)
-        tab.setLayoutParams(lp)
-        tab.setGravity(Gravity.CENTER)
-        tab.setPadding(Tuils.dpToPx(mContext, 2), 0, Tuils.dpToPx(mContext, 2), 0)
-        tab.setText(label)
-        tab.setMaxLines(1)
-        tab.setEllipsize(TextUtils.TruncateAt.END)
-        tab.setTextSize(9.5f)
-        tab.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
-        tab.setMinWidth(0)
-        tab.setMinimumWidth(0)
-
-        val selected =
-            (isAll && selectedAppsDrawerGroup == null) || (groupName != null && groupName == selectedAppsDrawerGroup)
-        val selectedColor = getDrawerSelectionColor(drawerColor, widgetBgColor)
-        var fgColor = drawerColor
-        var bgColor = widgetBgColor
-        if (groupName != null) {
-            val group = findAppsGroup(groupName)
-            if (group != null) {
-                if (group.foreColor != Int.Companion.MAX_VALUE) {
-                    fgColor = group.foreColor
-                }
-                if (group.bgColor != Int.Companion.MAX_VALUE) {
-                    bgColor = group.bgColor
-                }
-            }
-        }
-
-        tab.setBackground(
-            TerminalBorderRuntime.panelDrawable(
-                mContext!!,
-                if (selected) selectedColor else bgColor,
-                borderColor,
-                1.5f,
-                2,
-                dashedBorders()
-            )
-        )
-        tab.setTextColor(if (selected) widgetBgColor else fgColor)
-        tab.setAlpha(1f)
-
-        tab.setOnClickListener(View.OnClickListener { v: View? ->
-            selectedAppsDrawerGroup = groupName
-            buildGroupTabs(mainPack!!.appsManager, drawerColor, borderColor, widgetBgColor)
-            rebuildAppsDrawerContents(
-                mainPack!!.appsManager,
-                drawerColor,
-                borderColor,
-                widgetBgColor
-            )
-        })
-
-        appsGroupTabs!!.addView(tab)
+    fun refreshAndroidWidgetDrawerGrid() {
+        androidWidgetDrawerManager?.refreshGrid()
     }
 
-    private fun findAppsGroup(name: String?): AppsManager.Group? {
-        if (mainPack == null || mainPack!!.appsManager == null) return null
-        for (group in mainPack!!.appsManager.groups) {
-            if (group.name() == name) {
-                return group
-            }
-        }
-        return null
-    }
-
-    private fun rebuildAppsDrawerContents(
-        appsManager: AppsManager,
-        drawerColor: Int,
-        borderColor: Int,
-        widgetBgColor: Int
-    ) {
-        val visibleApps = getAppsForDrawer(appsManager)
-        appsDrawerEntries.clear()
-        appsDrawerAlphaPositions.clear()
-        selectedAppsDrawerAlpha = null
-
-        var currentSection: String? = null
-        for (app in visibleApps) {
-            val section = sectionForApp(app)
-            if (section != currentSection) {
-                appsDrawerAlphaPositions.put(section, appsDrawerEntries.size)
-                appsDrawerEntries.add(SectionEntry(section))
-                currentSection = section
-            }
-            appsDrawerEntries.add(AppEntry(app))
-        }
-
-        appsDrawerAdapter!!.notifyDataSetChanged()
-        buildAlphabetTabs(drawerColor, borderColor, widgetBgColor)
-
-        val scope = (if (selectedAppsDrawerGroup == null) "all" else selectedAppsDrawerGroup)!!
-        appsDrawerHeader.setText("Applications/ [" + visibleApps.size + "] <" + scope + ">")
-        appsDrawerFooter.setText("groups " + appsManager.groups.size + " | tabs " + appsDrawerAlphaPositions.size)
-        appsList!!.setSelection(0)
-        updateSelectedAlphaFromPosition(0)
-    }
-
-    private fun getAppsForDrawer(appsManager: AppsManager): MutableList<LaunchInfo> {
-        val apps: MutableList<LaunchInfo> = ArrayList<LaunchInfo>()
-        val shownApps: List<LaunchInfo> = appsManager.shownApps() ?: emptyList()
-
-        if (selectedAppsDrawerGroup == null) {
-            apps.addAll(shownApps)
-        } else {
-            val group = findAppsGroup(selectedAppsDrawerGroup)
-            if (group != null) {
-                val members = group.members()
-                for (member in members) {
-                    if (member is LaunchInfo && shownApps.contains(member)) {
-                        apps.add(member)
-                    }
-                }
-            }
-        }
-
-        Collections.sort<LaunchInfo>(
-            apps,
-            Comparator { a: LaunchInfo, b: LaunchInfo ->
-                Tuils.alphabeticCompare(
-                    a.publicLabel ?: Tuils.EMPTYSTRING,
-                    b.publicLabel ?: Tuils.EMPTYSTRING
-                )
-            })
-        return apps
-    }
-
-    private fun sectionForApp(app: LaunchInfo?): String {
-        val publicLabel = app?.publicLabel
-        if (publicLabel.isNullOrEmpty()) {
-            return "#"
-        }
-
-        val first = publicLabel.get(0).uppercaseChar()
-        if (first < 'A' || first > 'Z') {
-            return "#"
-        }
-        return first.toString()
-    }
-
-    private fun buildAlphabetTabs(drawerColor: Int, borderColor: Int, widgetBgColor: Int) {
-        if (appsAlphaTabs == null) return
-
-        appsAlphaTabs.removeAllViews()
-        appsDrawerAlphaViews.clear()
-        for (entry in appsDrawerAlphaPositions.entries) {
-            val tab = TextView(mContext)
-            val lp = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f)
-            lp.bottomMargin = Tuils.dpToPx(mContext, 3)
-            tab.setLayoutParams(lp)
-            tab.setGravity(Gravity.CENTER)
-            tab.setMinHeight(0)
-            tab.setMinimumHeight(0)
-            tab.setPadding(0, 0, 0, 0)
-            tab.setText(entry.key)
-            tab.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
-            tab.setTextSize(9.5f)
-            styleAlphaTab(tab, entry.key, drawerColor, borderColor, widgetBgColor)
-            tab.setOnClickListener(View.OnClickListener { v: View? ->
-                appsList!!.setSelection(entry.value!!)
-                updateSelectedAlpha(entry.key)
-            })
-            appsDrawerAlphaViews.put(entry.key, tab)
-            appsAlphaTabs.addView(tab)
-        }
-    }
-
-    private fun styleAlphaTab(
-        tab: TextView,
-        letter: String?,
-        drawerColor: Int,
-        borderColor: Int,
-        widgetBgColor: Int
-    ) {
-        val selected = letter != null && letter == selectedAppsDrawerAlpha
-        tab.setTextColor(if (selected) widgetBgColor else drawerColor)
-        val selectedColor = getDrawerSelectionColor(drawerColor, widgetBgColor)
-
-        tab.setBackground(
-            TerminalBorderRuntime.panelDrawable(
-                mContext!!,
-                if (selected) selectedColor else widgetBgColor,
-                borderColor,
-                1.2f,
-                2,
-                dashedBorders()
-            )
-        )
-    }
-
-    private fun getDrawerSelectionColor(drawerColor: Int, widgetBgColor: Int): Int {
-        val hsv = FloatArray(3)
-        Color.colorToHSV(drawerColor, hsv)
-        hsv[1] = max(0f, hsv[1] * 0.55f)
-        hsv[2] = min(1f, 0.88f + (0.12f * hsv[2]))
-        val lightBase = Color.HSVToColor(hsv)
-        return ColorUtils.blendARGB(lightBase, widgetBgColor, 0.18f)
-    }
-
-    private fun updateSelectedAlphaFromPosition(position: Int) {
-        if (position < 0 || position >= appsDrawerEntries.size) {
-            return
-        }
-
-        for (i in position..<appsDrawerEntries.size) {
-            val entry = appsDrawerEntries.get(i)
-            if (entry is SectionEntry) {
-                updateSelectedAlpha(entry.title)
-                return
-            }
-        }
-    }
-
-    private fun updateSelectedAlpha(letter: String?) {
-        if (letter == null || letter == selectedAppsDrawerAlpha) {
-            return
-        }
-
-        selectedAppsDrawerAlpha = letter
-        val drawerColor = XMLPrefsManager.getColor(Theme.apps_drawer_text_color)
-        val borderColor = terminalBorderColor()
-        val widgetBgColor = terminalWindowBackground()
-        for (entry in appsDrawerAlphaViews.entries) {
-            styleAlphaTab(entry.value!!, entry.key, drawerColor, borderColor, widgetBgColor)
-        }
-    }
-
-    private abstract class AppDrawerEntry {
-        abstract val viewType: Int
-    }
-
-    private class SectionEntry(val title: String?) : AppDrawerEntry() {
-        override val viewType: Int = 0
-    }
-
-    private class AppEntry(val app: LaunchInfo) : AppDrawerEntry() {
-        override val viewType: Int = 1
+    fun handleAndroidWidgetActivityResult(
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?
+    ): Boolean {
+        return androidWidgetDrawerManager?.handleActivityResult(requestCode, resultCode, data) == true
     }
 
     private class LuaSurfaceAction(val label: String, val run: Runnable)
-
-    private inner class AppsDrawerAdapter(
-        private val context: Context,
-        private var color: Int,
-        private var bgColor: Int
-    ) : BaseAdapter() {
-        fun setColors(color: Int, bgColor: Int) {
-            this.color = color
-            this.bgColor = bgColor
-        }
-
-        override fun getCount(): Int {
-            return appsDrawerEntries.size
-        }
-
-        override fun getItem(position: Int): Any? {
-            return appsDrawerEntries.get(position)
-        }
-
-        override fun getItemId(position: Int): Long {
-            return position.toLong()
-        }
-
-        override fun getViewTypeCount(): Int {
-            return 2
-        }
-
-        override fun getItemViewType(position: Int): Int {
-            return appsDrawerEntries.get(position).viewType
-        }
-
-        override fun isEnabled(position: Int): Boolean {
-            return getItemViewType(position) == 1
-        }
-
-        override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-            val entry = appsDrawerEntries.get(position)
-            val tv = if (convertView is TextView) convertView else TextView(context)
-
-            if (entry is SectionEntry) {
-                tv.setPadding(0, Tuils.dpToPx(context, 8), 0, Tuils.dpToPx(context, 6))
-                tv.setTextColor(color)
-                tv.setTextSize(12f)
-                tv.setTypeface(Tuils.getTypeface(context), Typeface.BOLD)
-                tv.setBackgroundColor(Color.TRANSPARENT)
-                tv.setText("[" + entry.title + "]")
-                return tv
-            }
-
-            val app: LaunchInfo = (entry as AppEntry).app
-            tv.setPadding(
-                Tuils.dpToPx(context, 6),
-                Tuils.dpToPx(context, 12),
-                Tuils.dpToPx(context, 6),
-                Tuils.dpToPx(context, 12)
-            )
-            tv.setTextColor(color)
-            tv.setTextSize(16f)
-            tv.setTypeface(Tuils.getTypeface(context))
-            tv.setBackgroundColor(Color.TRANSPARENT)
-            tv.setText(app.publicLabel)
-            return tv
-        }
-    }
 
     fun dispose() {
         if (handler != null) {
@@ -12681,6 +12240,7 @@ class UIManager(
 
         if (suggestionsManager != null) suggestionsManager!!.dispose()
         if (notesManager != null) notesManager!!.dispose(mContext)
+        androidWidgetDrawerManager?.dispose()
         LocalBroadcastManager.getInstance(mContext!!.getApplicationContext())
             .unregisterReceiver(receiver)
         try {
@@ -12830,6 +12390,10 @@ class UIManager(
         if (this.isPomodoroOverlayVisible) {
             return
         }
+        if (this.isAndroidWidgetDrawerOpen) {
+            hideAndroidWidgetDrawer()
+            return
+        }
         if (this.isAppsDrawerOpen) {
             hideAppsDrawer()
             return
@@ -12902,6 +12466,7 @@ class UIManager(
         if (networkManager != null) networkManager!!.stop()
         if (tuiTimeManager != null) tuiTimeManager!!.stop()
         if (unlockManager != null) unlockManager!!.stop()
+        androidWidgetDrawerManager?.stopListening()
     }
 
     private fun setMusicVisualizerPlaying(playing: Boolean) {
@@ -12946,6 +12511,7 @@ class UIManager(
         if (networkManager != null) networkManager!!.start()
         if (tuiTimeManager != null) tuiTimeManager!!.start()
         if (unlockManager != null) unlockManager!!.start()
+        androidWidgetDrawerManager?.startListening()
 
         // Refresh Pomodoro overlay on resume
         val pomodoro = PomodoroManager.getInstance(mContext)
@@ -13035,6 +12601,9 @@ class UIManager(
 
     override fun onTouch(v: View, event: MotionEvent): Boolean {
         gestureDetector!!.onTouchEvent(event)
+        if (event.actionMasked == MotionEvent.ACTION_UP) {
+            v.performClick()
+        }
         return v.onTouchEvent(event)
     }
 

@@ -14,33 +14,29 @@
     android:paddingEnd="0dp"
     android:paddingBottom="4dp">
 
-    <FrameLayout
+    <LinearLayout
         android:id="@+id/termux_workspace_border"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="18dp"
         android:layout_marginBottom="2dp"
+        android:orientation="vertical"
         android:paddingStart="6dp"
         android:paddingTop="28dp"
         android:paddingEnd="6dp"
         android:paddingBottom="10dp">
 
-        <LinearLayout
+        <FrameLayout
+            android:id="@+id/termux_workspace_output_panel"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-
-            <FrameLayout
-                android:id="@+id/termux_workspace_output_panel"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:clipChildren="false"
-                android:clipToPadding="false"
-                android:paddingStart="0dp"
-                android:paddingTop="8dp"
-                android:paddingEnd="0dp"
-                android:paddingBottom="0dp">
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:paddingStart="0dp"
+            android:paddingTop="8dp"
+            android:paddingEnd="0dp"
+            android:paddingBottom="0dp">
 
                 <ScrollView
                     android:id="@+id/termux_workspace_scroll"
@@ -94,21 +90,20 @@
                     android:text="WINDOW"
                     android:textAllCaps="true"
                     android:textSize="12sp" />
-            </FrameLayout>
+        </FrameLayout>
 
-            <LinearLayout
-                android:id="@+id/termux_workspace_tools"
-                android:layout_width="match_parent"
-                android:layout_height="64dp"
-                android:layout_marginTop="8dp"
-                android:gravity="center"
-                android:orientation="vertical">
+        <LinearLayout
+            android:id="@+id/termux_workspace_tools"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:orientation="vertical">
 
                 <LinearLayout
                     android:id="@+id/termux_workspace_keys_row_one"
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
+                    android:layout_height="32dp"
                     android:gravity="center"
                     android:orientation="horizontal">
 
@@ -188,8 +183,7 @@
                 <LinearLayout
                     android:id="@+id/termux_workspace_keys_row_two"
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
+                    android:layout_height="32dp"
                     android:gravity="center"
                     android:orientation="horizontal">
 
@@ -227,7 +221,7 @@
                         android:layout_weight="1"
                         android:gravity="center"
                         android:text="SHIFT"
-                        android:textSize="10sp" />
+                        android:textSize="11sp" />
 
                     <TextView
                         android:id="@+id/termux_workspace_key_slot_13"
@@ -265,21 +259,21 @@
                         android:text="PGDN"
                         android:textSize="11sp" />
                 </LinearLayout>
-            </LinearLayout>
+        </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/termux_workspace_input_group"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="0dp"
-                android:alpha="0"
-                android:gravity="center_vertical"
-                android:minHeight="1dp"
-                android:orientation="horizontal"
-                android:paddingStart="0dp"
-                android:paddingTop="0dp"
-                android:paddingEnd="0dp"
-                android:paddingBottom="0dp">
+        <LinearLayout
+            android:id="@+id/termux_workspace_input_group"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="0dp"
+            android:alpha="0"
+            android:gravity="center_vertical"
+            android:minHeight="1dp"
+            android:orientation="horizontal"
+            android:paddingStart="0dp"
+            android:paddingTop="0dp"
+            android:paddingEnd="0dp"
+            android:paddingBottom="0dp">
 
                 <TextView
                     android:id="@+id/termux_workspace_prefix"
@@ -311,9 +305,8 @@
                     android:text="SEND"
                     android:textSize="11sp"
                     android:visibility="gone" />
-            </LinearLayout>
         </LinearLayout>
-    </FrameLayout>
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/termux_workspace_chrome"

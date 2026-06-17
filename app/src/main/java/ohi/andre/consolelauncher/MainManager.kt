@@ -601,7 +601,7 @@ class MainManager(private val mContext: LauncherActivity) {
             Tuils.log("Unable to remove empty legacy binary directory: " + legacyBinDir.getAbsolutePath())
         }
 
-        mContext.getSharedPreferences("busybox_prefs", Context.MODE_PRIVATE).edit().clear().commit()
+        mContext.getSharedPreferences("busybox_prefs", Context.MODE_PRIVATE).edit().clear().apply()
         val prefsDir = File(mContext.getApplicationInfo().dataDir, "shared_prefs")
         deleteLegacyBusyBoxFile(File(prefsDir, "busybox_prefs.xml"))
         deleteLegacyBusyBoxFile(File(prefsDir, "busybox_prefs.xml.bak"))

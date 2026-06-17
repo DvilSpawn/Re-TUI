@@ -19,7 +19,6 @@ import java.util.Collections
 import java.util.Queue
 import java.util.concurrent.ArrayBlockingQueue
 import java.util.regex.Pattern
-import android.annotation.TargetApi
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Intent
@@ -57,7 +56,6 @@ import ohi.andre.consolelauncher.managers.xml.options.Notifications
 import ohi.andre.consolelauncher.tuils.StoppableThread
 import ohi.andre.consolelauncher.tuils.Tuils
 
-@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 class NotificationService : NotificationListenerService() {
     private val UPDATE_TIME = 2000
     private val LINES_LABEL = "Lines"

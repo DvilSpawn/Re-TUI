@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/clock_overlay_container"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:clipChildren="false"
-    android:clipToPadding="false">
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <TextView
         android:id="@+id/timer_tab"
@@ -16,7 +12,7 @@
         android:fontFamily="monospace"
         android:gravity="center"
         android:padding="4dp"
-        android:drawableTop="@drawable/timer_24"
+        app:drawableTopCompat="@drawable/timer_24"
         android:drawablePadding="2dp"
         android:text="--:--"
         android:textColor="#FFFFFF"
@@ -34,12 +30,11 @@
         android:fontFamily="monospace"
         android:gravity="center"
         android:padding="4dp"
-        android:drawableTop="@drawable/hourglass_24"
+        app:drawableTopCompat="@drawable/hourglass_24"
         android:drawablePadding="2dp"
         android:text="--:--"
         android:textColor="#FFFFFF"
         android:textSize="12sp"
         android:textStyle="bold"
         android:visibility="gone" />
-
-</FrameLayout>
+</merge>

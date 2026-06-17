@@ -1,92 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/pomodoro_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:clickable="true"
-    android:focusable="true">
+    android:focusable="true"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="20dp">
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/pomodoro_title"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:orientation="vertical"
-        android:padding="20dp">
+        android:gravity="center"
+        android:paddingLeft="12dp"
+        android:paddingRight="12dp"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp"
+        android:text="FOCUS MODE ACTIVE"
+        android:textColor="#FFFF0000"
+        android:textSize="18sp"
+        android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/pomodoro_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:paddingLeft="12dp"
-            android:paddingRight="12dp"
-            android:paddingTop="2dp"
-            android:paddingBottom="2dp"
-            android:text="FOCUS MODE ACTIVE"
-            android:textColor="#FFFF0000"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+    <TextView
+        android:id="@+id/pomodoro_task_display"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:layout_marginTop="8dp"
+        android:paddingLeft="12dp"
+        android:paddingRight="12dp"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp"
+        android:text="Task: Focus"
+        android:textColor="#FFAAAAAA"
+        android:textSize="14sp" />
 
-        <TextView
-            android:id="@+id/pomodoro_task_display"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:layout_marginTop="8dp"
-            android:paddingLeft="12dp"
-            android:paddingRight="12dp"
-            android:paddingTop="2dp"
-            android:paddingBottom="2dp"
-            android:text="Task: Focus"
-            android:textColor="#FFAAAAAA"
-            android:textSize="14sp" />
+    <TextView
+        android:id="@+id/pomodoro_countdown"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:layout_marginTop="20dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:text="25:00"
+        android:textColor="#FF889955"
+        android:textSize="64sp"
+        android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/pomodoro_countdown"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:layout_marginTop="20dp"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp"
-            android:paddingTop="4dp"
-            android:paddingBottom="4dp"
-            android:text="25:00"
-            android:textColor="#FF889955"
-            android:textSize="64sp"
-            android:textStyle="bold" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="------------------------------------------------"
+        android:textColor="#FF889955"
+        android:textSize="14sp" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="------------------------------------------------"
-            android:textColor="#FF889955"
-            android:textSize="14sp" />
+    <ProgressBar
+        android:id="@+id/pomodoro_progress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        android:layout_marginTop="10dp"
+        android:progressDrawable="@android:drawable/progress_horizontal"
+        android:visibility="gone" />
 
-        <ProgressBar
-            android:id="@+id/pomodoro_progress"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="match_parent"
-            android:layout_height="4dp"
-            android:layout_marginTop="10dp"
-            android:progressDrawable="@android:drawable/progress_horizontal"
-            android:visibility="gone" />
+    <Button
+        android:id="@+id/pomodoro_terminate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="30dp"
+        android:background="@android:color/transparent"
+        android:padding="10dp"
+        android:text="TERMINATE SESSION"
+        android:textColor="#FF889955"
+        android:textSize="14sp" />
 
-        <Button
-            android:id="@+id/pomodoro_terminate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="30dp"
-            android:background="@android:color/transparent"
-            android:padding="10dp"
-            android:text="TERMINATE SESSION"
-            android:textColor="#FF889955"
-            android:textSize="14sp" />
-
-    </LinearLayout>
-</FrameLayout>
+</LinearLayout>

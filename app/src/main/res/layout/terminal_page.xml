@@ -8,43 +8,37 @@
     android:clipToPadding="false"
     android:paddingTop="8dp">
 
-    <FrameLayout
+    <ScrollView
         android:id="@+id/terminal_output_border"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:fillViewport="true"
         android:layout_marginTop="10dp"
         android:paddingStart="8dp"
         android:paddingTop="12dp"
         android:paddingEnd="8dp"
         android:paddingBottom="6dp">
 
-        <ScrollView
-            android:id="@+id/terminal_scroll"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fillViewport="true">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-            <LinearLayout
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <ohi.andre.consolelauncher.tuils.OutlineTextView
+                android:id="@+id/terminal_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_weight="1" />
-
-                <ohi.andre.consolelauncher.tuils.OutlineTextView
-                    android:id="@+id/terminal_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="bottom"
-                    android:scrollHorizontally="false"
-                    android:scrollbars="vertical"
-                    android:textIsSelectable="true" />
-            </LinearLayout>
-        </ScrollView>
-    </FrameLayout>
+                android:gravity="bottom"
+                android:scrollHorizontally="false"
+                android:scrollbars="vertical"
+                android:textIsSelectable="true" />
+        </LinearLayout>
+    </ScrollView>
 
     <TextView
         android:id="@+id/terminal_tray_toggle"

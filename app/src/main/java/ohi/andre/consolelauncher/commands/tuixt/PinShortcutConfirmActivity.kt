@@ -1,7 +1,6 @@
 package ohi.andre.consolelauncher.commands.tuixt
 
 import android.annotation.SuppressLint
-import android.annotation.TargetApi
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.LauncherApps
@@ -18,6 +17,7 @@ import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import android.widget.Toast
 import androidx.core.graphics.ColorUtils
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -38,7 +38,7 @@ import android.content.Context
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi
 
-@TargetApi(Build.VERSION_CODES.O)
+@RequiresApi(Build.VERSION_CODES.O)
 class PinShortcutConfirmActivity : Activity() {
     private var request: PinItemRequest? = null
     private var shortcutInfo: ShortcutInfo? = null

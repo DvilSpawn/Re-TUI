@@ -9,35 +9,29 @@
     android:paddingEnd="16dp"
     android:paddingBottom="12dp">
 
-    <FrameLayout
+    <ScrollView
         android:id="@+id/module_text_border"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:background="@drawable/terminal_border"
+        android:fillViewport="false"
         android:minHeight="112dp"
         android:paddingStart="14dp"
         android:paddingTop="24dp"
         android:paddingEnd="14dp"
-        android:paddingBottom="14dp">
+        android:paddingBottom="14dp"
+        android:scrollbars="none">
 
-        <ScrollView
-            android:id="@+id/module_text_scroll"
+        <TextView
+            android:id="@+id/module_text_body"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fillViewport="false"
-            android:scrollbars="none">
-
-            <TextView
-                android:id="@+id/module_text_body"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFamily="monospace"
-                android:lineSpacingExtra="2dp"
-                android:textColor="#FFFFFF"
-                android:textSize="14sp" />
-        </ScrollView>
-    </FrameLayout>
+            android:fontFamily="monospace"
+            android:lineSpacingExtra="2dp"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp" />
+    </ScrollView>
 
     <TextView
         android:id="@+id/module_text_label"

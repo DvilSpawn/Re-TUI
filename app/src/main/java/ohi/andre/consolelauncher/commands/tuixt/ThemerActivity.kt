@@ -8,6 +8,7 @@ import android.content.Intent
 import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
+import android.graphics.PorterDuff
 import android.provider.OpenableColumns
 import android.text.InputType
 import android.util.Log
@@ -16,20 +17,26 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.FrameLayout
+import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.LauncherActivity
 import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog.ConfirmAction
 import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog.ContentFactory
 import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog.InputAction
 import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog.ItemAction
 import ohi.andre.consolelauncher.commands.tuixt.TuixtLayout.addFoldAwareHost
+import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.accentColor
+import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.borderColor
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.dp
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.overlayColor
+import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.rect
+import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.surfaceColor
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleButton
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleInput
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleListItem
@@ -73,6 +80,7 @@ import ohi.andre.consolelauncher.tuils.LauncherSystemUi
 class ThemerActivity : AppCompatActivity() {
     private var recyclerView: RecyclerView? = null
     private var header: TextView? = null
+    private var supportFooter: LinearLayout? = null
     private var sectionsAdapter: RecyclerView.Adapter<ViewHolder?>? = null
     private val sectionItems: MutableList<String> = ArrayList<String>()
     private var section: String? = null
@@ -225,6 +233,9 @@ class ThemerActivity : AppCompatActivity() {
         recyclerView!!.setAdapter(sectionsAdapter)
 
         root.addView(recyclerView)
+        supportFooter = buildSupportFooter()
+        root.addView(supportFooter)
+        updateSupportFooter()
         setContentView(screen)
     }
 
@@ -392,12 +403,8 @@ class ThemerActivity : AppCompatActivity() {
                 "Backup",
                 "Create Shareable Configuration",
                 "Restore",
-                "GitHub",
-                "Discord",
-                "Reddit",
                 "Rate the App",
                 "Send Feedback",
-                "Learn More",
                 "View Crash Log"
             )
         }
@@ -418,6 +425,74 @@ class ThemerActivity : AppCompatActivity() {
         sectionItems.addAll(getItemsForSection(section))
         sectionsAdapter!!.notifyDataSetChanged()
         recyclerView!!.scrollToPosition(0)
+        updateSupportFooter()
+    }
+
+    private fun buildSupportFooter(): LinearLayout {
+        val footer = LinearLayout(this)
+        footer.orientation = LinearLayout.HORIZONTAL
+        footer.gravity = Gravity.CENTER
+        footer.setPadding(0, dp(this, 8f), 0, 0)
+
+        addSupportButton(
+            footer,
+            R.drawable.ic_tuixt_github_24,
+            "Open GitHub"
+        ) { openExternalUrl(GITHUB_URL) }
+        addSupportButton(
+            footer,
+            R.drawable.ic_tuixt_discord_24,
+            "Open Discord"
+        ) { openExternalUrl(DISCORD_URL) }
+        addSupportButton(
+            footer,
+            R.drawable.ic_tuixt_reddit_24,
+            "Open Reddit"
+        ) { openExternalUrl(REDDIT_URL) }
+        addSupportButton(
+            footer,
+            R.drawable.ic_tuixt_web_24,
+            "Open Re:T-UI website"
+        ) { openLearnMore() }
+
+        footer.visibility = View.GONE
+        return footer
+    }
+
+    private fun addSupportButton(
+        container: LinearLayout,
+        imageRes: Int,
+        description: String,
+        onClick: () -> Unit
+    ) {
+        val button = ImageButton(this)
+        button.setImageResource(imageRes)
+        button.setContentDescription(description)
+        button.setBackground(rect(this, surfaceColor(), borderColor(), 1.25f))
+        button.setScaleType(android.widget.ImageView.ScaleType.CENTER_INSIDE)
+        button.setPadding(dp(this, 10f), dp(this, 10f), dp(this, 10f), dp(this, 10f))
+        button.setColorFilter(accentColor(), PorterDuff.Mode.SRC_IN)
+        button.setOnClickListener { onClick() }
+
+        val params = LinearLayout.LayoutParams(0, dp(this, 52f), 1f)
+        params.marginEnd = dp(this, 8f)
+        container.addView(button, params)
+    }
+
+    private fun updateSupportFooter() {
+        val footer = supportFooter ?: return
+        val isSystemSection = SECTION_SYSTEM == section
+        footer.visibility = if (isSystemSection) View.VISIBLE else View.GONE
+        if (!isSystemSection) {
+            return
+        }
+
+        for (index in 0 until footer.childCount) {
+            val child = footer.getChildAt(index)
+            val params = child.layoutParams as? LinearLayout.LayoutParams ?: continue
+            params.marginEnd = if (index == footer.childCount - 1) 0 else dp(this, 8f)
+            child.layoutParams = params
+        }
     }
 
     @SuppressLint("GestureBackNavigation")

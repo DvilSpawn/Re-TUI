@@ -4,13 +4,13 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:layout_marginBottom="8dp"
-    android:padding="12dp"
-    android:background="#000000">
+    android:padding="12dp">
 
     <TextView
         android:id="@+id/setting_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:labelFor="@+id/setting_input"
         android:textColor="#00FF00"
         android:textSize="14sp"
         android:fontFamily="monospace"
@@ -54,6 +54,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="#111111"
+            android:importantForAutofill="no"
             android:padding="6dp"
             android:textColor="#FFFFFF"
             android:textSize="13sp"

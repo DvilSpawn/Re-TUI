@@ -65,6 +65,7 @@ import android.graphics.drawable.Drawable
 import android.os.Handler
 import android.os.Looper
 import android.widget.EditText
+import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.annotation.NonNull
 import java.lang.reflect.Field
@@ -95,13 +96,7 @@ class LauncherActivity : AppCompatActivity(), Reloadable {
 
     private var categories: MutableSet<ReloadMessageCategory?>? = null
 
-    private val stopActivity = Runnable {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            finishAndRemoveTask()
-        } else {
-            finish()
-        }
-    }
+    private val stopActivity = Runnable { finishAndRemoveTask() }
 
     private val `in`: Inputable = object : Inputable {
         override fun `in`(s: String?) {
@@ -212,34 +207,32 @@ class LauncherActivity : AppCompatActivity(), Reloadable {
         }
 
         val permissionsToRequest: MutableList<String?> = ArrayList<String?>()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-                if (shouldRequestLegacyExternalStoragePermissions()) {
-                    if (ContextCompat.checkSelfPermission(
-                            this,
-                            Manifest.permission.READ_EXTERNAL_STORAGE
-                        ) != PackageManager.PERMISSION_GRANTED
-                    ) {
-                        permissionsToRequest.add(Manifest.permission.READ_EXTERNAL_STORAGE)
-                    }
-                    if (ContextCompat.checkSelfPermission(
-                            this,
-                            Manifest.permission.WRITE_EXTERNAL_STORAGE
-                        ) != PackageManager.PERMISSION_GRANTED
-                    ) {
-                        permissionsToRequest.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    }
-                }
-            }
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            if (shouldRequestLegacyExternalStoragePermissions()) {
                 if (ContextCompat.checkSelfPermission(
                         this,
-                        Manifest.permission.POST_NOTIFICATIONS
+                        Manifest.permission.READ_EXTERNAL_STORAGE
                     ) != PackageManager.PERMISSION_GRANTED
                 ) {
-                    permissionsToRequest.add(Manifest.permission.POST_NOTIFICATIONS)
+                    permissionsToRequest.add(Manifest.permission.READ_EXTERNAL_STORAGE)
                 }
+                if (ContextCompat.checkSelfPermission(
+                        this,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                    ) != PackageManager.PERMISSION_GRANTED
+                ) {
+                    permissionsToRequest.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                }
+            }
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                permissionsToRequest.add(Manifest.permission.POST_NOTIFICATIONS)
             }
         }
 
@@ -323,38 +316,34 @@ class LauncherActivity : AppCompatActivity(), Reloadable {
                 || printToOutput()
                 || ModuleManager.NOTIFICATIONS == ModuleManager.getActiveModule(this)
         if (notifications) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                try {
-                    val notificationComponent = ComponentName(this, NotificationService::class.java)
-                    val pm = getPackageManager()
-                    pm.setComponentEnabledSetting(
-                        notificationComponent,
-                        PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-                        PackageManager.DONT_KILL_APP
-                    )
+            try {
+                val notificationComponent = ComponentName(this, NotificationService::class.java)
+                val pm = getPackageManager()
+                pm.setComponentEnabledSetting(
+                    notificationComponent,
+                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                    PackageManager.DONT_KILL_APP
+                )
 
-                    if (!Tuils.hasNotificationAccess(this)) {
-                        val i = Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS")
-                        if (i.resolveActivity(getPackageManager()) == null) {
-                            Toast.makeText(this, R.string.no_notification_access, Toast.LENGTH_LONG)
-                                .show()
-                        } else {
-                            startActivity(i)
-                        }
+                if (!Tuils.hasNotificationAccess(this)) {
+                    val i = Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS")
+                    if (i.resolveActivity(getPackageManager()) == null) {
+                        Toast.makeText(this, R.string.no_notification_access, Toast.LENGTH_LONG)
+                            .show()
+                    } else {
+                        startActivity(i)
                     }
-
-                    NotificationService.requestListenerRebind(this)
-                } catch (er: NoClassDefFoundError) {
-                    val intent = Intent(PrivateIOReceiver.ACTION_OUTPUT)
-                    intent.putExtra(
-                        PrivateIOReceiver.TEXT,
-                        getString(R.string.output_notification_error) + Tuils.SPACE + er.toString()
-                    )
-                } catch (er: RuntimeException) {
-                    Tuils.toFile(er)
                 }
-            } else {
-                Tuils.sendOutput(Color.RED, this, R.string.notification_low_api)
+
+                NotificationService.requestListenerRebind(this)
+            } catch (er: NoClassDefFoundError) {
+                val intent = Intent(PrivateIOReceiver.ACTION_OUTPUT)
+                intent.putExtra(
+                    PrivateIOReceiver.TEXT,
+                    getString(R.string.output_notification_error) + Tuils.SPACE + er.toString()
+                )
+            } catch (er: RuntimeException) {
+                Tuils.toFile(er)
             }
         }
 
@@ -367,7 +356,14 @@ class LauncherActivity : AppCompatActivity(), Reloadable {
                 .setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN or WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
         }
 
-        setContentView(R.layout.base_view)
+        val mainView = FrameLayout(this)
+        mainView.id = R.id.mainview
+        mainView.layoutParams = ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
+        layoutInflater.inflate(R.layout.base_view, mainView, true)
+        setContentView(mainView)
 
         if (XMLPrefsManager.getBoolean(Ui.show_restart_message)) {
             val s = getIntent().getCharSequenceExtra(Reloadable.MESSAGE)
@@ -383,14 +379,14 @@ class LauncherActivity : AppCompatActivity(), Reloadable {
 
         main = MainManager(this)
 
-        val mainView = findViewById<View?>(R.id.mainview) as ViewGroup
+        val rootView = findViewById<View?>(R.id.mainview) as ViewGroup
 
         applySystemBarIconAppearance()
 
         this@LauncherActivity.uiManager =
-            UIManager(this, mainView, main!!.mainPack, canApplyTheme, main!!.executer())
+            UIManager(this, rootView, main!!.mainPack, canApplyTheme, main!!.executer())
         uiManager!!.scheduleTypefaceRefreshes()
-        installWindowInsetsHandler(mainView)
+        installWindowInsetsHandler(rootView)
 
         main!!.setRedirectionListener(uiManager!!.buildRedirectionListener())
         uiManager!!.pack = main!!.mainPack
@@ -625,6 +621,10 @@ class LauncherActivity : AppCompatActivity(), Reloadable {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+
+        if (uiManager?.handleAndroidWidgetActivityResult(requestCode, resultCode, data) == true) {
+            return
+        }
 
         if (requestCode == TUIXT_REQUEST) {
             if (resultCode == TuixtActivity.SAVE_PRESSED) {

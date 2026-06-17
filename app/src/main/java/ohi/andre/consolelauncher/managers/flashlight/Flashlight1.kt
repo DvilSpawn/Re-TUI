@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.SurfaceTexture
 import android.hardware.Camera
-import android.os.Build
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import ohi.andre.consolelauncher.tuils.PrivateIOReceiver
 
@@ -16,15 +15,9 @@ class Flashlight1(context: Context) : Flashlight(context) {
     override fun turnOn() {
         if (ready() && !getStatus()) {
             try {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                    mCamera!!.setPreviewTexture(SurfaceTexture(0))
-                    mCamera!!.startPreview()
-                    updateStatus(true)
-                } else {
-                    val parameters = mCamera!!.parameters
-                    parameters.flashMode = Camera.Parameters.FLASH_MODE_TORCH
-                    mCamera!!.parameters = parameters
-                }
+                mCamera!!.setPreviewTexture(SurfaceTexture(0))
+                mCamera!!.startPreview()
+                updateStatus(true)
             } catch (e: Exception) {
                 if (mCamera != null) {
                     try {
@@ -43,15 +36,9 @@ class Flashlight1(context: Context) : Flashlight(context) {
 
     override fun turnOff() {
         if (getStatus() && mCamera != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                mCamera!!.stopPreview()
-                mCamera!!.release()
-                mCamera = null
-            } else {
-                val parameters = mCamera!!.parameters
-                parameters.flashMode = Camera.Parameters.FLASH_MODE_OFF
-                mCamera!!.parameters = parameters
-            }
+            mCamera!!.stopPreview()
+            mCamera!!.release()
+            mCamera = null
             updateStatus(false)
         }
     }

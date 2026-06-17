@@ -59,7 +59,7 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
     private val LINK_CHILD = "link"
     private val HREF_ATTRIBUTE = "href"
 
-    private val defaultRSSDateFormat = SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z")
+    private val defaultRSSDateFormat = SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.US)
 
     override fun delete(): Array<String?>? {
         return null
@@ -566,7 +566,7 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
         )
         if (output == null) {
             val r = findId(id)
-            if (r != null) r.timeFormat = SimpleDateFormat(format)
+            if (r != null) r.timeFormat = SimpleDateFormat(format, Locale.getDefault())
             return null
         } else {
             if (output.length > 0) return output
@@ -1359,7 +1359,7 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
 
             if (timeFormat == null) this.timeFormat = null
             else try {
-                this.timeFormat = SimpleDateFormat(timeFormat)
+                this.timeFormat = SimpleDateFormat(timeFormat, Locale.getDefault())
             } catch (e: Exception) {
                 this.timeFormat = null
             }

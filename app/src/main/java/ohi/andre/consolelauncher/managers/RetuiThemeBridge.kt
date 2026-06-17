@@ -8,7 +8,9 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.core.graphics.ColorUtils
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings
+import ohi.andre.consolelauncher.managers.settings.LauncherSettings
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
+import ohi.andre.consolelauncher.managers.xml.options.Suggestions
 import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.managers.xml.options.Ui
 import ohi.andre.consolelauncher.tuils.Tuils
@@ -90,6 +92,7 @@ object RetuiThemeBridge {
         val terminalBorderColor = AppearanceSettings.terminalBorderColor()
         val outputSurfaceColor = ColorUtils.blendARGB(terminalSurfaceColor, Color.BLACK, 0.10f)
         val inputSurfaceColor = ColorUtils.blendARGB(terminalSurfaceColor, Color.BLACK, 0.16f)
+        val fileSelectionColor = LauncherSettings.getColor(Suggestions.file_background_color)
         val topDisplayMargin = XMLPrefsManager.get(Ui.display_margin_top_section)
 
         bundle.putInt("theme_bg", XMLPrefsManager.getColor(Theme.background_color))
@@ -113,6 +116,17 @@ object RetuiThemeBridge {
         bundle.putInt("output_background_color", outputSurfaceColor)
         bundle.putInt("output_text_color", XMLPrefsManager.getColor(Theme.output_text_color))
         bundle.putInt("output_border_color", terminalBorderColor)
+        bundle.putInt("fm_panel_background_color", outputSurfaceColor)
+        bundle.putInt("fm_border_color", terminalBorderColor)
+        bundle.putInt("fm_text_color", XMLPrefsManager.getColor(Theme.output_text_color))
+        bundle.putInt("fm_directory_text_color", AppearanceSettings.moduleNameTextColor())
+        bundle.putInt("fm_selection_background_color", fileSelectionColor)
+        bundle.putInt("fm_selection_text_color", readableTextFor(fileSelectionColor))
+        bundle.putInt("fm_header_background_color", terminalHeaderColor)
+        bundle.putInt("fm_header_text_color", AppearanceSettings.moduleNameTextColor())
+        bundle.putInt("fm_button_background_color", AppearanceSettings.moduleButtonBackgroundColor())
+        bundle.putInt("fm_button_text_color", AppearanceSettings.moduleNameTextColor())
+        bundle.putInt("fm_button_border_color", terminalBorderColor)
         bundle.putInt("top_margin", 18)
         bundle.putInt("input_font_size", XMLPrefsManager.getInt(Ui.input_output_size))
         bundle.putString("display_margin_mm", topDisplayMargin)
@@ -169,6 +183,10 @@ object RetuiThemeBridge {
 
     private fun colorOption(color: Int): String {
         return "#" + Integer.toHexString(color).padStart(8, '0').takeLast(8)
+    }
+
+    private fun readableTextFor(background: Int): Int {
+        return if (ColorUtils.calculateLuminance(background) > 0.45) Color.BLACK else Color.WHITE
     }
 
     private val KEYBOARD_COLOR_KEYS = arrayOf(

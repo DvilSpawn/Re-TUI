@@ -69,6 +69,11 @@ class config : ParamCommand() {
                     && (pack.context as LauncherActivity).uiManager != null
                 ) {
                     (pack.context as LauncherActivity).uiManager!!.refreshTermuxWorkspaceToolbarButton()
+                } else if (save === Behavior.show_android_widget_drawer_button
+                    && pack.context is LauncherActivity
+                    && (pack.context as LauncherActivity).uiManager != null
+                ) {
+                    (pack.context as LauncherActivity).uiManager!!.refreshAndroidWidgetDrawerToolbarButton()
                 } else if ((save === Behavior.enable_cyberdeck_mode || save === Behavior.enable_crt_filter) && pack.context is Reloadable) {
                     (pack.context as Reloadable).reload()
                 } else if (save === Behavior.duo_mode && !"true".equals(
@@ -90,6 +95,11 @@ class config : ParamCommand() {
                     && (pack.context as LauncherActivity).uiManager != null
                 ) {
                     (pack.context as LauncherActivity).uiManager!!.refreshDisplayMargins()
+                } else if (isAndroidWidgetGridSetting(save)
+                    && pack.context is LauncherActivity
+                    && (pack.context as LauncherActivity).uiManager != null
+                ) {
+                    (pack.context as LauncherActivity).uiManager!!.refreshAndroidWidgetDrawerGrid()
                 }
 
                 return null
@@ -305,6 +315,16 @@ class config : ParamCommand() {
                     (pack.context as LauncherActivity).applyOrientationPreference()
                 } else if ((save === Behavior.enable_cyberdeck_mode || save === Behavior.enable_crt_filter) && pack.context is Reloadable) {
                     (pack.context as Reloadable).reload()
+                } else if (save === Behavior.show_tmux_workspace_button
+                    && pack.context is LauncherActivity
+                    && (pack.context as LauncherActivity).uiManager != null
+                ) {
+                    (pack.context as LauncherActivity).uiManager!!.refreshTermuxWorkspaceToolbarButton()
+                } else if (save === Behavior.show_android_widget_drawer_button
+                    && pack.context is LauncherActivity
+                    && (pack.context as LauncherActivity).uiManager != null
+                ) {
+                    (pack.context as LauncherActivity).uiManager!!.refreshAndroidWidgetDrawerToolbarButton()
                 } else if (save === Behavior.duo_mode && pack.context is LauncherActivity
                     && (pack.context as LauncherActivity).uiManager != null
                 ) {
@@ -319,6 +339,11 @@ class config : ParamCommand() {
                     && (pack.context as LauncherActivity).uiManager != null
                 ) {
                     (pack.context as LauncherActivity).uiManager!!.refreshDisplayMargins()
+                } else if (isAndroidWidgetGridSetting(save)
+                    && pack.context is LauncherActivity
+                    && (pack.context as LauncherActivity).uiManager != null
+                ) {
+                    (pack.context as LauncherActivity).uiManager!!.refreshAndroidWidgetDrawerGrid()
                 }
 
                 return null
@@ -431,6 +456,12 @@ class config : ParamCommand() {
         private fun isResponsiveLandscapeSetting(save: XMLPrefsSave?): Boolean {
             return save === Ui.split_duo_launcher
                     || save === Ui.show_ascii_landscape
+        }
+
+        private fun isAndroidWidgetGridSetting(save: XMLPrefsSave?): Boolean {
+            return save === Ui.android_widget_grid_columns
+                    || save === Ui.android_widget_min_columns
+                    || save === Ui.android_widget_min_rows
         }
     }
 }

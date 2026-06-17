@@ -12,7 +12,6 @@ import java.io.File
 import java.lang.ref.WeakReference
 import java.util.Arrays
 import java.util.Locale
-import android.annotation.TargetApi
 import android.content.BroadcastReceiver
 import android.content.Intent
 import android.content.IntentFilter
@@ -223,7 +222,6 @@ class ReplyManager(context: Context) : XMLPrefsElement {
         nextUsableId = nextUsableId()
     }
 
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
     fun onNotification(notification: StatusBarNotification, text: CharSequence?) {
         if (!enabled) return
 
@@ -270,7 +268,6 @@ class ReplyManager(context: Context) : XMLPrefsElement {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.KITKAT_WATCH)
     private fun replyTo(context: Context, notificationWear: NotificationWear, what: String?) {
         val remoteInputs: Array<RemoteInput>? = notificationWear.remoteInputs
 
@@ -292,7 +289,6 @@ class ReplyManager(context: Context) : XMLPrefsElement {
         LocalBroadcastManager.getInstance(context.getApplicationContext()).sendBroadcast(i)
     }
 
-    @TargetApi(Build.VERSION_CODES.KITKAT_WATCH)
     private fun extractWearNotification(statusBarNotification: StatusBarNotification?): NotificationWear? {
         if (statusBarNotification == null || statusBarNotification.getNotification() == null) {
             return null
@@ -344,7 +340,6 @@ class ReplyManager(context: Context) : XMLPrefsElement {
         return notificationWear
     }
 
-    @TargetApi(Build.VERSION_CODES.KITKAT_WATCH)
     private fun betterReplyAction(
         current: NotificationWear?,
         action: Notification.Action?

@@ -3,8 +3,6 @@ package ohi.andre.consolelauncher.managers.xml
 import android.app.WallpaperColors
 import android.app.WallpaperManager
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.Canvas
 import android.graphics.Color
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -15,7 +13,6 @@ import ohi.andre.consolelauncher.managers.xml.options.Suggestions
 import ohi.andre.consolelauncher.managers.xml.options.Theme
 import kotlin.math.max
 import kotlin.math.min
-import android.graphics.drawable.Drawable
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings
 
 object AutoColorManager {
@@ -70,26 +67,13 @@ object AutoColorManager {
 
     private fun buildPalette(): Palette? {
         try {
-            val wallpaperManager = WallpaperManager.getInstance(appContext)
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-                val colors = wallpaperManager.getWallpaperColors(WallpaperManager.FLAG_SYSTEM)
-                if (colors != null) {
-                    return buildFromWallpaperColors(colors)
-                }
-            }
-
-            val drawable = wallpaperManager.getDrawable()
-            if (drawable == null) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O_MR1) {
                 return null
             }
 
-            val bitmap = Bitmap.createBitmap(48, 48, Bitmap.Config.ARGB_8888)
-            val canvas = Canvas(bitmap)
-            drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight())
-            drawable.draw(canvas)
-
-            return buildFromBitmap(bitmap)
+            val wallpaperManager = WallpaperManager.getInstance(appContext)
+            val colors = wallpaperManager.getWallpaperColors(WallpaperManager.FLAG_SYSTEM)
+            return colors?.let { buildFromWallpaperColors(it) }
         } catch (ignored: Exception) {
             return null
         }
@@ -112,76 +96,6 @@ object AutoColorManager {
         val accent = ensureReadable(accentSeed, background, 4.2)
         val text = readableTextFor(background)
         val mutedText = ColorUtils.blendARGB(text, accent, 0.28f)
-        val overlay =
-            Color.argb(196, Color.red(background), Color.green(background), Color.blue(background))
-
-        return Palette(
-            background, surface, surfaceStrong, accent, text, mutedText, overlay,
-            buildSuggestionStyle(accent, background, 0f, 0.96f, 0.04f),
-            buildSuggestionStyle(accent, background, 18f, 0.82f, 0.10f),
-            buildSuggestionStyle(accent, background, -18f, 1.12f, -0.02f),
-            buildSuggestionStyle(accent, background, 34f, 0.78f, 0.18f),
-            buildSuggestionStyle(accent, background, -34f, 0.88f, 0.20f),
-            buildSuggestionStyle(accent, background, 52f, 0.74f, 0.08f),
-            buildSuggestionStyle(accent, background, -8f, 0.60f, 0.14f)
-        )
-    }
-
-    private fun buildFromBitmap(bitmap: Bitmap): Palette? {
-        var red = 0L
-        var green = 0L
-        var blue = 0L
-        var count = 0L
-        var darkest = Color.BLACK
-        var mostSaturated = Color.WHITE
-        var darkestLuma = 1f
-        var highestSaturation = 0f
-        val hsl = FloatArray(3)
-
-        var y = 0
-        while (y < bitmap.getHeight()) {
-            var x = 0
-            while (x < bitmap.getWidth()) {
-                val color = bitmap.getPixel(x, y)
-                if (Color.alpha(color) < 16) {
-                    x += 2
-                    continue
-                }
-
-                red += Color.red(color).toLong()
-                green += Color.green(color).toLong()
-                blue += Color.blue(color).toLong()
-                count++
-
-                val luma = ColorUtils.calculateLuminance(color).toFloat()
-                if (luma < darkestLuma) {
-                    darkestLuma = luma
-                    darkest = color
-                }
-
-                ColorUtils.colorToHSL(color, hsl)
-                if (hsl[1] > highestSaturation) {
-                    highestSaturation = hsl[1]
-                    mostSaturated = color
-                }
-                x += 2
-            }
-            y += 2
-        }
-
-        if (count == 0L) {
-            return null
-        }
-
-        val average =
-            Color.rgb((red / count).toInt(), (green / count).toInt(), (blue / count).toInt())
-        val background = clampLuminance(ColorUtils.blendARGB(darkest, average, 0.15f), 0.14f)
-        val accentSeed = if (mostSaturated == Color.WHITE) average else mostSaturated
-        val surface = ColorUtils.blendARGB(background, average, 0.20f)
-        val surfaceStrong = ColorUtils.blendARGB(background, accentSeed, 0.26f)
-        val accent = ensureReadable(accentSeed, background, 4.2)
-        val text = readableTextFor(background)
-        val mutedText = ColorUtils.blendARGB(text, accent, 0.25f)
         val overlay =
             Color.argb(196, Color.red(background), Color.green(background), Color.blue(background))
 

@@ -1340,7 +1340,7 @@ object Shell {
             }
             watchdogCount = 0
             watchdog = ScheduledThreadPoolExecutor(1)
-            watchdog!!.scheduleAtFixedRate(
+            watchdog!!.scheduleWithFixedDelay(
                 Runnable { this.handleWatchdog() },
                 1,
                 1,

@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/mainview"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
 
     <LinearLayout
         android:id="@+id/main_container"
@@ -70,7 +67,7 @@
                     android:id="@+id/module_suggestions_group"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="left|center_vertical"
+                    android:gravity="start|center_vertical"
                     android:orientation="horizontal" />
 
             </HorizontalScrollView>
@@ -117,6 +114,7 @@
                         android:id="@+id/submit_tv"
 
                         android:background="@null"
+                        android:contentDescription="@string/cd_submit_command"
                         android:src="@drawable/ic_enter"/>
 
                 </LinearLayout>
@@ -127,28 +125,39 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/tools_height"
                 android:orientation="horizontal"
-                android:weightSum="6">
+                android:weightSum="7">
 
                 <ImageButton android:id="@+id/delete_view"
                     style="@style/ToolsBar"
+                    android:contentDescription="@string/cd_clear_input"
                     android:src="@drawable/ic_clear"/>
 
                 <ImageButton android:id="@+id/back_view"
                     style="@style/ToolsBar"
+                    android:contentDescription="@string/cd_history_back"
                     android:src="@drawable/ic_back"/>
 
                 <ImageButton android:id="@+id/next_view"
                     style="@style/ToolsBar"
+                    android:contentDescription="@string/cd_history_forward"
                     android:src="@drawable/ic_next"/>
 
                 <ImageButton android:id="@+id/paste_view"
                     style="@style/ToolsBar"
+                    android:contentDescription="@string/cd_paste_clipboard"
                     android:src="@drawable/ic_paste"/>
 
                 <ImageButton android:id="@+id/app_drawer_view"
                     style="@style/ToolsBar"
                     android:background="@null"
+                    android:contentDescription="@string/cd_open_app_drawer"
                     android:src="@drawable/ic_menu"/>
+
+                <ImageButton android:id="@+id/android_widget_drawer_view"
+                    style="@style/ToolsBar"
+                    android:background="@null"
+                    android:contentDescription="Android widgets"
+                    android:src="@drawable/ic_toolbar_widgets_24"/>
 
                 <ImageButton android:id="@+id/termux_workspace_view"
                     style="@style/ToolsBar"
@@ -171,7 +180,7 @@
                         android:id="@+id/suggestions_group"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:gravity="left|center_vertical"
+                        android:gravity="start|center_vertical"
                         android:orientation="horizontal">
 
                     </LinearLayout>
@@ -217,29 +226,21 @@
 
     </LinearLayout>
 
-    <RelativeLayout
+    <ScrollView
         android:id="@+id/hack_overlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone"
-        android:padding="20dp">
+        android:fillViewport="true"
+        android:padding="20dp"
+        android:visibility="gone">
 
-        <ScrollView
-            android:id="@+id/hack_scroll"
+        <TextView
+            android:id="@+id/hack_text"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fillViewport="true">
-
-            <TextView
-                android:id="@+id/hack_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="12dp"
-                android:textSize="13sp" />
-
-        </ScrollView>
-
-    </RelativeLayout>
+            android:layout_height="wrap_content"
+            android:padding="12dp"
+            android:textSize="13sp" />
+    </ScrollView>
 
     <include
         layout="@layout/clock_overlay"
@@ -261,4 +262,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-</FrameLayout>
+    <include
+        layout="@layout/android_widget_drawer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</merge>

@@ -13,6 +13,7 @@ import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.tuils.Tuils
 import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Locale
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 import java.util.ArrayList
@@ -102,12 +103,12 @@ class TimeManager(context: Context) {
             return
         }
 
-        segments.add(FormatSegment(SimpleDateFormat(pattern), explicitSize))
+        segments.add(FormatSegment(SimpleDateFormat(pattern, Locale.getDefault()), explicitSize))
     }
 
     private fun buildFallbackEntry(): FormatEntry {
         val segments: MutableList<FormatSegment?> = ArrayList<FormatSegment?>()
-        segments.add(FormatSegment(SimpleDateFormat("HH:mm:ss"), null))
+        segments.add(FormatSegment(SimpleDateFormat("HH:mm:ss", Locale.getDefault()), null))
         return FormatEntry(Color.RED, segments)
     }
 

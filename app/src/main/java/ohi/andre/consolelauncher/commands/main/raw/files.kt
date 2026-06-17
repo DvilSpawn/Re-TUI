@@ -10,14 +10,9 @@ import ohi.andre.consolelauncher.managers.RetuiThemeBridge
 
 class files : CommandAbstraction {
     override fun exec(info: ExecutePack): String? {
-        var command: String? = null
-        val args = info.args
-        if (args != null && args.isNotEmpty()) {
-            val arg = info.get()
-            if (arg != null) {
-                command = arg.toString()
-            }
-        }
+        val command = info.args
+            ?.takeIf { it.isNotEmpty() }
+            ?.let { info.getString().trim() }
 
         val intent = Intent(FM_ACTION)
         intent.setPackage(FM_PACKAGE)
@@ -40,7 +35,7 @@ class files : CommandAbstraction {
         return null
     }
 
-    override fun argType(): IntArray = IntArray(0)
+    override fun argType(): IntArray = intArrayOf(CommandAbstraction.PLAIN_TEXT)
 
     override fun priority(): Int = 4
 

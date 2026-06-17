@@ -1,6 +1,5 @@
 package ohi.andre.consolelauncher.managers.flashlight
 
-import android.annotation.TargetApi
 import android.content.Context
 import android.content.Intent
 import android.hardware.camera2.CameraAccessException
@@ -9,7 +8,6 @@ import android.hardware.camera2.CameraManager
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import ohi.andre.consolelauncher.tuils.PrivateIOReceiver
 
-@TargetApi(23)
 class Flashlight2(context: Context) : Flashlight(context) {
     private var mCameraIDList: Array<String>? = null
     private var flashSupported = false

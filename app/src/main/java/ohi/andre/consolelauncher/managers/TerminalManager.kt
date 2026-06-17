@@ -325,24 +325,7 @@ class TerminalManager(
 
         val hintColor = XMLPrefsManager.getColor(Theme.session_info_text_color)
 
-        val list = mTerminalView!!.getHintTextColors()
-        try {
-            val colors = list.javaClass.getDeclaredField("mColors")
-            val dColor = list.javaClass.getDeclaredField("mDefaultColor")
-
-            colors.setAccessible(true)
-            dColor.setAccessible(true)
-
-            val a = colors.get(list) as IntArray?
-            for (c in a!!.indices) {
-                a[c] = hintColor
-            }
-
-            colors.set(list, a)
-            dColor.set(list, hintColor)
-        } catch (e: Exception) {
-            Tuils.log(e)
-        }
+        mTerminalView!!.setHintTextColor(hintColor)
 
         if (clearAfterMs > 0) this.mTerminalView!!.postDelayed(clearRunnable, clearAfterMs.toLong())
         if (maxLines > 0) {

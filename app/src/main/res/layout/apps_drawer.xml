@@ -3,7 +3,7 @@
     android:id="@+id/apps_drawer_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#77000000"
+    android:background="@android:color/transparent"
     android:visibility="gone"
     android:clickable="true"
     android:focusable="true">
@@ -11,7 +11,7 @@
     <View
         android:id="@+id/apps_drawer_dummy_input_anchor"
         android:layout_width="match_parent"
-        android:layout_height="1dp"
+        android:layout_height="0dp"
         android:layout_alignParentBottom="true"
         android:visibility="invisible" />
 
@@ -21,10 +21,10 @@
         android:layout_height="match_parent"
         android:layout_above="@id/apps_drawer_dummy_input_anchor"
         android:orientation="vertical"
-        android:layout_marginStart="28dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="28dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="18dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="4dp"
         android:background="@drawable/apps_drawer_border"
         android:padding="2dp">
 

@@ -47,11 +47,18 @@ object ModuleDockButtonFactory {
         button.layoutParams = lp
 
         button.setOnClickListener { onClick(module) }
-        button.setOnTouchListener { _: View?, event: MotionEvent? ->
-            if (event?.actionMasked == MotionEvent.ACTION_DOWN) {
-                onTouchDown()
+        button.setOnTouchListener { view: View, event: MotionEvent? ->
+            when (event?.actionMasked) {
+                MotionEvent.ACTION_DOWN -> {
+                    onTouchDown()
+                    false
+                }
+                MotionEvent.ACTION_UP -> {
+                    view.performClick()
+                    true
+                }
+                else -> false
             }
-            false
         }
 
         return button

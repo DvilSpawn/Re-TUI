@@ -408,51 +408,49 @@ class AppsManager(context: Context) : XMLPrefsElement {
         val currentSerial = profileSerial(userManager, currentProfile)
         var canReadShortcuts = false
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            try {
-                launcherApps =
-                    context.getSystemService(Context.LAUNCHER_APPS_SERVICE) as LauncherApps?
-                canReadShortcuts =
-                    launcherApps != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1 && Tuils.isMyLauncherDefault(
-                        context.getPackageManager()
-                    )
+        try {
+            launcherApps =
+                context.getSystemService(Context.LAUNCHER_APPS_SERVICE) as LauncherApps?
+            canReadShortcuts =
+                launcherApps != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1 && Tuils.isMyLauncherDefault(
+                    context.getPackageManager()
+                )
 
-                var profiles = if (userManager != null) userManager.getUserProfiles() else null
-                if (profiles == null || profiles.size == 0) {
-                    profiles = ArrayList<UserHandle>()
-                    profiles.add(currentProfile!!)
-                }
-
-                for (profile in profiles) {
-                    val activities = if (launcherApps != null)
-                        launcherApps.getActivityList(null, profile)
-                    else
-                        null
-                    if (activities == null) {
-                        continue
-                    }
-
-                    val current = profile == currentProfile
-                    val serial = profileSerial(userManager, profile)
-                    for (activity in activities) {
-                        val component = activity.getComponentName()
-                        val label = if (activity.getLabel() != null) activity.getLabel()
-                            .toString() else component.getClassName()
-                        val li = LaunchInfo(
-                            component.getPackageName(),
-                            component.getClassName(),
-                            label,
-                            profile,
-                            serial,
-                            current
-                        )
-                        maybeLoadShortcuts(launcherApps, li, canReadShortcuts)
-                        deduped.put(li.write(), li)
-                    }
-                }
-            } catch (e: Throwable) {
-                Tuils.log(e)
+            var profiles = if (userManager != null) userManager.getUserProfiles() else null
+            if (profiles == null || profiles.size == 0) {
+                profiles = ArrayList<UserHandle>()
+                profiles.add(currentProfile!!)
             }
+
+            for (profile in profiles) {
+                val activities = if (launcherApps != null)
+                    launcherApps.getActivityList(null, profile)
+                else
+                    null
+                if (activities == null) {
+                    continue
+                }
+
+                val current = profile == currentProfile
+                val serial = profileSerial(userManager, profile)
+                for (activity in activities) {
+                    val component = activity.getComponentName()
+                    val label = if (activity.getLabel() != null) activity.getLabel()
+                        .toString() else component.getClassName()
+                    val li = LaunchInfo(
+                        component.getPackageName(),
+                        component.getClassName(),
+                        label,
+                        profile,
+                        serial,
+                        current
+                    )
+                    maybeLoadShortcuts(launcherApps, li, canReadShortcuts)
+                    deduped.put(li.write(), li)
+                }
+            }
+        } catch (e: Throwable) {
+            Tuils.log(e)
         }
 
         val i = Intent(Intent.ACTION_MAIN)
@@ -689,11 +687,7 @@ class AppsManager(context: Context) : XMLPrefsElement {
 
     fun writeLaunchTimes(info: LaunchInfo) {
         editor.putInt(info.write(), info.launchedTimes)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
-            editor.apply()
-        } else {
-            editor.commit()
-        }
+        editor.apply()
 
         if (appsHolder != null) appsHolder!!.update(true)
     }
@@ -713,7 +707,7 @@ class AppsManager(context: Context) : XMLPrefsElement {
             }
         }.start()
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && !info.currentProfile) {
+        if (!info.currentProfile) {
             try {
                 val launcherApps =
                     launchContext.getSystemService(Context.LAUNCHER_APPS_SERVICE) as LauncherApps?
@@ -1743,15 +1737,13 @@ class AppsManager(context: Context) : XMLPrefsElement {
             builder.append("launched_times: ").append(app.launchedTimes).append(Tuils.NEWLINE)
                 .append(Tuils.NEWLINE)
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
-                builder.append("Install: ").append(
-                    TimeManager.instance!!.replace(
-                        "%t0",
-                        info.firstInstallTime,
-                        Int.Companion.MAX_VALUE
-                    )
-                ).append(Tuils.NEWLINE).append(Tuils.NEWLINE)
-            }
+            builder.append("Install: ").append(
+                TimeManager.instance!!.replace(
+                    "%t0",
+                    info.firstInstallTime,
+                    Int.Companion.MAX_VALUE
+                )
+            ).append(Tuils.NEWLINE).append(Tuils.NEWLINE)
 
             val a = info.activities
             if (a != null && a.size > 0) {

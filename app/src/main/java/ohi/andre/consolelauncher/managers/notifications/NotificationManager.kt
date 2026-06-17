@@ -1,6 +1,5 @@
 package ohi.andre.consolelauncher.managers.notifications
 
-import android.annotation.TargetApi
 import android.content.Context
 import android.graphics.Color
 import android.os.Build
@@ -35,7 +34,6 @@ import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager.writeTo
 /**
  * Created by francescoandreuzzi on 29/04/2017.
  */
-@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 class NotificationManager private constructor(context: Context?) : XMLPrefsElement {
     var default_app_state: Boolean = appNotificationsEnabledByDefault()
     var default_color: String? = defaultColorRaw()
