@@ -1,15 +1,25 @@
 package ohi.andre.consolelauncher.commands.tuixt
 
 import android.annotation.SuppressLint
+import android.Manifest
 import android.app.Dialog
 import android.app.WallpaperManager
 import android.content.ActivityNotFoundException
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.database.Cursor
-import android.net.Uri
-import android.os.Bundle
+import android.graphics.Color
 import android.graphics.PorterDuff
+import android.graphics.Typeface
+import android.net.Uri
+import android.os.Build
+import android.os.Bundle
+import android.os.Environment
 import android.provider.OpenableColumns
+import android.provider.Settings
 import android.text.InputType
 import android.util.Log
 import android.view.Gravity
@@ -22,10 +32,12 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import ohi.andre.consolelauncher.R
+import ohi.andre.consolelauncher.BuildConfig
 import ohi.andre.consolelauncher.LauncherActivity
+import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog.ConfirmAction
 import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog.ContentFactory
 import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog.InputAction
@@ -52,7 +64,11 @@ import ohi.andre.consolelauncher.managers.ToolbarShortcutManager.saveSlot
 import ohi.andre.consolelauncher.managers.ToolbarShortcutManager.slot
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings.get
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings.set
+import ohi.andre.consolelauncher.managers.settings.NotificationSettings
 import ohi.andre.consolelauncher.managers.settings.MusicSettings.preferredPackage
+import ohi.andre.consolelauncher.managers.termux.TermuxAppManager
+import ohi.andre.consolelauncher.managers.termux.TermuxBridgeManager
+import ohi.andre.consolelauncher.managers.widgets.LuaWidgetManager
 import ohi.andre.consolelauncher.managers.xml.options.Behavior
 import ohi.andre.consolelauncher.managers.xml.options.Ui
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi.applyFullscreen
@@ -63,11 +79,9 @@ import java.io.FileOutputStream
 import java.io.FilenameFilter
 import java.util.Arrays
 import java.util.Collections
+import java.util.Date
 import java.util.Locale
-import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
-import android.graphics.Color
-import android.graphics.Typeface
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.ArrayList
@@ -189,24 +203,15 @@ class ThemerActivity : AppCompatActivity() {
                     } else if (fileName == "Toolbar Buttons") {
                         showToolbarButtonsDialog()
                     } else if (fileName == "View Crash Log") {
-                        val crashFile = File(Tuils.getFolder(), "crash.txt")
-                        if (!crashFile.exists() || crashFile.length() == 0L) {
-                            Toast.makeText(
-                                this@ThemerActivity,
-                                "No crash log found.",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        } else {
-                            val intent = Intent(this@ThemerActivity, TuixtActivity::class.java)
-                            intent.putExtra(TuixtActivity.PATH, crashFile.getAbsolutePath())
-                            startActivity(intent)
-                        }
+                        openCrashLog()
                     } else if (fileName == "Backup") {
                         launchBackupPicker()
                     } else if (fileName == "Create Shareable Configuration") {
                         showShareableConfigurationSourcePicker()
                     } else if (fileName == "Restore") {
                         launchRestorePicker()
+                    } else if (fileName == "Diagnostics") {
+                        showDiagnosticsDialog()
                     } else if (fileName == "Rate the App") {
                         openPlayStoreListing()
                     } else if (fileName == "GitHub") {
@@ -288,6 +293,250 @@ class ThemerActivity : AppCompatActivity() {
             Toast.makeText(this, "No browser app found.", Toast.LENGTH_SHORT).show()
         }
     }
+
+    private fun showDiagnosticsDialog() {
+        TuixtDialog.showCustom(this, "Diagnostics", ContentFactory { dialog: Dialog? ->
+            val content = LinearLayout(this)
+            content.orientation = LinearLayout.VERTICAL
+
+            val report = buildDiagnosticsReport()
+            val reportView = TextView(this)
+            reportView.text = report
+            reportView.setTextColor(textColor())
+            reportView.typeface = Tuils.getTypeface(this)
+            reportView.textSize = 13f
+            reportView.setTextIsSelectable(true)
+            reportView.setPadding(
+                dp(this, 10f),
+                dp(this, 10f),
+                dp(this, 10f),
+                dp(this, 10f)
+            )
+            reportView.setBackground(
+                TuixtTheme.rect(
+                    this,
+                    TuixtTheme.surfaceColor(),
+                    TuixtTheme.borderColor(),
+                    1.25f
+                )
+            )
+            content.addView(reportView, inputParams())
+
+            addDiagnosticsButton(content, "Copy Report") { copyDiagnosticsReport(report) }
+            addDiagnosticsButton(content, "App Settings") { openAppSettings() }
+            addDiagnosticsButton(content, "Notification Access") { openNotificationAccessSettings() }
+            addDiagnosticsButton(content, "Request Termux Permission") { requestTermuxPermission() }
+            addDiagnosticsButton(content, "View Crash Log") { openCrashLog() }
+            addDiagnosticsButton(content, "Close") { dialog?.dismiss() }
+            content
+        })
+    }
+
+    private fun addDiagnosticsButton(content: LinearLayout, label: String, action: () -> Unit) {
+        val button = TextView(this)
+        button.text = label.uppercase(Locale.getDefault())
+        styleButton(this, button, false)
+        button.setOnClickListener { action() }
+        content.addView(button, inputParams())
+    }
+
+    private fun buildDiagnosticsReport(): String {
+        val out = StringBuilder()
+        out.append("Re:T-UI Diagnostics").append('\n')
+        out.append("generated: ").append(Date().toString()).append('\n')
+        out.append('\n')
+
+        appendInfo(out, "app", BuildConfig.APPLICATION_ID)
+        appendInfo(out, "version", BuildConfig.VERSION_NAME + " (" + BuildConfig.VERSION_CODE + ")")
+        appendInfo(out, "flavor", BuildConfig.FLAVOR + " / " + BuildConfig.BUILD_TYPE)
+        appendInfo(out, "android", Build.VERSION.RELEASE + " (SDK " + Build.VERSION.SDK_INT + ")")
+        out.append('\n')
+
+        appendStorageDiagnostics(out)
+        out.append('\n')
+
+        appendNotificationDiagnostics(out)
+        out.append('\n')
+
+        appendTermuxDiagnostics(out)
+        out.append('\n')
+
+        appendLuaDiagnostics(out)
+        out.append('\n')
+
+        appendCrashDiagnostics(out)
+        return out.toString()
+    }
+
+    private fun appendStorageDiagnostics(out: StringBuilder) {
+        val folder = Tuils.getFolder()
+        val playStore = isPlayStoreFlavor()
+        appendInfo(out, "storage mode", if (playStore) "app-owned external" else "shared external")
+        appendCheck(out, "root folder", folder.exists() && folder.isDirectory, folder.absolutePath)
+        appendCheck(out, "root writable", folder.canWrite(), if (folder.canWrite()) "yes" else "no")
+
+        if (!playStore && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            appendCheck(
+                out,
+                "all files access",
+                Environment.isExternalStorageManager(),
+                if (Environment.isExternalStorageManager()) "granted" else "missing"
+            )
+        }
+
+        var present = 0
+        var missing = 0
+        var unreadable = 0
+        val missingNames = ArrayList<String>()
+        val unreadableNames = ArrayList<String>()
+        for (root in XMLPrefsManager.XMLPrefsRoot.entries) {
+            val file = File(folder, root.path)
+            if (!file.exists()) {
+                missing++
+                missingNames.add(root.path)
+            } else {
+                present++
+                if (!file.canRead()) {
+                    unreadable++
+                    unreadableNames.add(root.path)
+                }
+            }
+        }
+        val details = "$present present, $missing missing, $unreadable unreadable"
+        appendCheck(out, "config files", missing == 0 && unreadable == 0, details)
+        if (missingNames.isNotEmpty()) {
+            appendInfo(out, "missing config", missingNames.joinToString(", "))
+        }
+        if (unreadableNames.isNotEmpty()) {
+            appendInfo(out, "unreadable config", unreadableNames.joinToString(", "))
+        }
+    }
+
+    private fun appendNotificationDiagnostics(out: StringBuilder) {
+        val canPost = Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+            ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+        val listenerAccess = Tuils.hasNotificationAccess(this)
+        val serviceRunning = Tuils.notificationServiceIsRunning(this)
+        appendCheck(out, "post notifications", canPost, if (canPost) "granted or not required" else "missing")
+        appendCheck(out, "notification listener", listenerAccess, if (listenerAccess) "enabled" else "disabled")
+        appendInfo(out, "notification service", if (serviceRunning) "running" else "not running")
+        appendInfo(out, "terminal notifications", if (NotificationSettings.showTerminal()) "on" else "off")
+        appendInfo(out, "notification output", if (NotificationSettings.printToOutput()) "on" else "off")
+    }
+
+    private fun appendTermuxDiagnostics(out: StringBuilder) {
+        val status = TermuxBridgeManager.status(this)
+        appendCheck(out, "termux installed", status.termuxInstalled, yesNo(status.termuxInstalled))
+        appendCheck(out, "RUN_COMMAND declared", status.runCommandDeclared, yesNo(status.runCommandDeclared))
+        appendCheck(out, "RUN_COMMAND granted", status.runCommandGranted, yesNo(status.runCommandGranted))
+        val apps = TermuxAppManager.list(this)
+        appendInfo(out, "registered Termux apps", apps.size.toString())
+        appendInfo(
+            out,
+            "tmux workspace button",
+            if (XMLPrefsManager.getBoolean(Behavior.show_tmux_workspace_button)) "enabled" else "disabled"
+        )
+    }
+
+    private fun appendLuaDiagnostics(out: StringBuilder) {
+        try {
+            val ids = LuaWidgetManager.listIds().filterNotNull()
+            var disabled = 0
+            var untrusted = 0
+            var withErrors = 0
+            for (id in ids) {
+                if (!LuaWidgetManager.isEnabled(id)) {
+                    disabled++
+                }
+                if (!LuaWidgetManager.trustStatus(id).trusted) {
+                    untrusted++
+                }
+                if (LuaWidgetManager.lastError(id).isNotEmpty()) {
+                    withErrors++
+                }
+            }
+            appendInfo(out, "Lua modules", ids.size.toString())
+            appendCheck(out, "Lua approvals", untrusted == 0, "$untrusted pending or blocked")
+            appendCheck(out, "Lua runtime errors", withErrors == 0, "$withErrors with saved errors")
+            appendInfo(out, "Lua disabled", disabled.toString())
+        } catch (e: Exception) {
+            appendCheck(out, "Lua modules", false, "unable to read local state: " + safeMessage(e))
+        }
+    }
+
+    private fun appendCrashDiagnostics(out: StringBuilder) {
+        val crashFile = crashLogFile()
+        val hasCrashLog = crashFile.exists() && crashFile.length() > 0L
+        appendCheck(
+            out,
+            "crash log",
+            !hasCrashLog,
+            if (hasCrashLog) crashFile.length().toString() + " bytes" else "none"
+        )
+    }
+
+    private fun appendInfo(out: StringBuilder, label: String, detail: String) {
+        out.append("[INFO] ").append(label).append(": ").append(detail).append('\n')
+    }
+
+    private fun appendCheck(out: StringBuilder, label: String, ok: Boolean, detail: String) {
+        out.append(if (ok) "[OK] " else "[WARN] ")
+            .append(label)
+            .append(": ")
+            .append(detail)
+            .append('\n')
+    }
+
+    private fun copyDiagnosticsReport(report: String) {
+        val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        clipboard.setPrimaryClip(ClipData.newPlainText("Re:T-UI diagnostics", report))
+        Toast.makeText(this, "Diagnostics copied.", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun openAppSettings() {
+        val intent = Intent(
+            Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+            Uri.fromParts("package", packageName, null)
+        )
+        startActivity(intent)
+    }
+
+    private fun openNotificationAccessSettings() {
+        val intent = Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
+        if (intent.resolveActivity(packageManager) == null) {
+            Toast.makeText(this, "Notification access settings unavailable.", Toast.LENGTH_SHORT).show()
+            return
+        }
+        startActivity(intent)
+    }
+
+    private fun requestTermuxPermission() {
+        if (!TermuxBridgeManager.requestRunCommandPermissionIfPossible(this)) {
+            Toast.makeText(this, "Termux RUN_COMMAND permission is not requestable here.", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun openCrashLog() {
+        val crashFile = crashLogFile()
+        if (!crashFile.exists() || crashFile.length() == 0L) {
+            Toast.makeText(this, "No crash log found.", Toast.LENGTH_SHORT).show()
+            return
+        }
+        val intent = Intent(this, TuixtActivity::class.java)
+        intent.putExtra(TuixtActivity.PATH, crashFile.absolutePath)
+        startActivity(intent)
+    }
+
+    private fun crashLogFile(): File = File(Tuils.getFolder(), "crash.txt")
+
+    private fun isPlayStoreFlavor(): Boolean = "playstore".equals(BuildConfig.FLAVOR, ignoreCase = true)
+
+    private fun yesNo(value: Boolean): String = if (value) "yes" else "no"
+
+    private fun safeMessage(error: Exception): String = error.message ?: error.javaClass.simpleName
 
     private fun showPresetsDialog() {
         val options = mutableListOf<String?>("Save Current as Preset", "Apply Preset")
@@ -403,6 +652,7 @@ class ThemerActivity : AppCompatActivity() {
                 "Backup",
                 "Create Shareable Configuration",
                 "Restore",
+                "Diagnostics",
                 "Rate the App",
                 "Send Feedback",
                 "View Crash Log"
