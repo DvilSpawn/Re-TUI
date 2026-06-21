@@ -423,7 +423,20 @@ enum class Ui : XMLPrefsSave {
         }
 
         override fun info(): String? {
-            return "ASCII art size"
+            return "Legacy ASCII art text size. ASCII now auto-fits to the pane width."
+        }
+    },
+    ascii_max_lines {
+        override fun defaultValue(): String? {
+            return "-1"
+        }
+
+        override fun type(): String? {
+            return XMLPrefsSave.INTEGER
+        }
+
+        override fun info(): String? {
+            return "Number of source rows shown in the ASCII viewport. Use -1 to auto-zoom wide art."
         }
     },
     storage_index {

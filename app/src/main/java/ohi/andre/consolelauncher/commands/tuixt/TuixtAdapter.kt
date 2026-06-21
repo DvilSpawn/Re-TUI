@@ -102,7 +102,7 @@ class TuixtAdapter(rows: MutableList<SettingsRow>, private val file: File?) :
 
         val settingHolder = holder as ViewHolder
         val item = row.item ?: return
-        settingHolder.title.setText(item.label())
+        settingHolder.title.setText(displayLabel(item))
         settingHolder.description.setText(item.info())
 
         val currentValue = getCurrentValue(item)
@@ -218,6 +218,24 @@ class TuixtAdapter(rows: MutableList<SettingsRow>, private val file: File?) :
             rebuildVisibleRows()
             notifyDataSetChanged()
         }
+    }
+
+    private fun displayLabel(item: XMLPrefsSave): String {
+        return when (item.label()) {
+            "show_ascii" -> "Show ASCII TXT"
+            "show_ascii_landscape" -> "Show ASCII In Landscape"
+            "ascii_max_lines" -> "ASCII Viewport Rows"
+            "ascii_animation" -> "Enable Animated ASCII"
+            "ascii_animation_frame_delay_ms" -> "Animation Frame Delay"
+            "ascii_animation_max_file_kb" -> "Max ASCII Import File Size"
+            "ascii_index" -> "ASCII Position"
+            "ascii_size" -> "Legacy ASCII Text Size"
+            "ascii_status_alignment" -> "ASCII Alignment"
+            "ascii_text_color" -> "ASCII Text Color"
+            "ascii_status_background_color" -> "ASCII Background Color"
+            "ascii_status_text_shadow_color" -> "ASCII Text Shadow Color"
+            else -> item.label()
+        } ?: ""
     }
 
     private fun rebuildVisibleRows() {

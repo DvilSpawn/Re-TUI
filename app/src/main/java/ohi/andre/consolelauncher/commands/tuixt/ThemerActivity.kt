@@ -172,6 +172,8 @@ class ThemerActivity : AppCompatActivity() {
                         openSection(SECTION_BEHAVIOR)
                     } else if (fileName == "Personalization") {
                         openSection(SECTION_PERSONALIZATION)
+                    } else if (fileName == "ASCII Settings") {
+                        openAsciiSettings()
                     } else if (fileName == "Integrations") {
                         openSection(SECTION_INTEGRATIONS)
                     } else if (fileName == "System & Support") {
@@ -393,7 +395,7 @@ class ThemerActivity : AppCompatActivity() {
             return mutableListOf(
                 "alias.txt",
                 "Toolbar Buttons",
-                "ascii.txt",
+                "ASCII Settings",
                 "rss.xml"
             )
         } else if (SECTION_INTEGRATIONS == section) {
@@ -507,6 +509,12 @@ class ThemerActivity : AppCompatActivity() {
     private fun openConfigFile(fileName: String) {
         val intent = Intent(this@ThemerActivity, TuixtActivity::class.java)
         intent.putExtra(TuixtActivity.PATH, File(Tuils.getFolder(), fileName).getAbsolutePath())
+        startActivityForResult(intent, LauncherActivity.TUIXT_REQUEST)
+    }
+
+    private fun openAsciiSettings() {
+        val intent = Intent(this@ThemerActivity, TuixtActivity::class.java)
+        intent.putExtra(TuixtActivity.MODE, TuixtActivity.MODE_ASCII_SETTINGS)
         startActivityForResult(intent, LauncherActivity.TUIXT_REQUEST)
     }
 

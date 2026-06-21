@@ -125,6 +125,7 @@ import ohi.andre.consolelauncher.managers.settings.MusicSettings.autoShowWidget
 import ohi.andre.consolelauncher.managers.settings.MusicSettings.preferredPackage
 import ohi.andre.consolelauncher.managers.settings.MusicSettings.showWidget
 import ohi.andre.consolelauncher.managers.settings.NotificationSettings.showTerminal
+import ohi.andre.consolelauncher.managers.status.AsciiAnimationManager
 import ohi.andre.consolelauncher.managers.status.BatteryManager
 import ohi.andre.consolelauncher.managers.status.NetworkManager
 import ohi.andre.consolelauncher.managers.status.NotesManager
@@ -161,6 +162,7 @@ import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.managers.xml.options.Toolbar
 import ohi.andre.consolelauncher.managers.xml.options.Ui
 import ohi.andre.consolelauncher.tuils.AllowEqualsSequence
+import ohi.andre.consolelauncher.tuils.AsciiArtTextView
 import ohi.andre.consolelauncher.tuils.CrtOverlayDrawable
 import ohi.andre.consolelauncher.tuils.CyberpunkBackdropDrawable
 import ohi.andre.consolelauncher.tuils.CyberpunkIconFrameDrawable
@@ -180,7 +182,6 @@ import ohi.andre.consolelauncher.tuils.interfaces.OnRedirectionListener
 import ohi.andre.consolelauncher.tuils.interfaces.OnTextChanged
 import ohi.andre.consolelauncher.tuils.stuff.PolicyReceiver
 import java.io.File
-import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.util.Arrays
 import java.util.Calendar
@@ -202,7 +203,6 @@ import android.net.ConnectivityManager
 import android.net.wifi.WifiInfo
 import android.net.wifi.WifiManager
 import android.widget.ProgressBar
-import android.text.SpannableString
 import android.view.GestureDetector.OnDoubleTapListener
 import android.view.ViewParent
 import ohi.andre.consolelauncher.managers.FileManager
@@ -492,8 +492,8 @@ class UIManager(
     private val labelSizes = IntArray(labelViews.size)
     private val labelTexts = arrayOfNulls<CharSequence>(labelViews.size)
 
-    private var asciiContent: String? = null
     private var asciiColor = 0
+    private var asciiAnimationManager: AsciiAnimationManager? = null
 
     private val statusUpdateListener: StatusUpdateListener =
         StatusUpdateListener { l: Label?, s: CharSequence? -> this.updateText(l!!, s) }
@@ -708,8 +708,103 @@ class UIManager(
 
         if (sequence.length == 0) labelViews[base]!!.setVisibility(View.GONE)
         else {
-            labelViews[base]!!.setVisibility(View.VISIBLE)
-            labelViews[base]!!.setText(sequence)
+            val view = labelViews[base]!!
+            view.setVisibility(View.VISIBLE)
+            if (shouldUseAsciiViewport(base) && view is AsciiArtTextView) {
+                val frame = labelTexts[Label.ascii.ordinal]
+                val frameColor = if (frame is AsciiAnimationManager.AsciiFrameText) frame.color() else asciiColor
+                view.setAsciiFrame(frame?.toString(), frameColor, XMLPrefsManager.getInt(Ui.ascii_max_lines))
+            } else {
+                view.setText(sequence)
+            }
+        }
+    }
+
+    private fun shouldUseAsciiViewport(base: Int): Boolean {
+        val asciiBase = labelIndexes[Label.ascii.ordinal].toInt()
+        if (base != asciiBase || labelTexts[Label.ascii.ordinal] == null) {
+            return false
+        }
+
+        for (i in Label.entries.toTypedArray().indices) {
+            if (i != Label.ascii.ordinal && labelIndexes[i].toInt() == base && labelTexts[i] != null) {
+                return false
+            }
+        }
+        return true
+    }
+
+    private fun ensureAsciiViewportView(parent: LinearLayout, index: Int): TextView {
+        val existing = labelViews[index] ?: return AsciiArtTextView(mContext!!)
+        if (existing is AsciiArtTextView) {
+            return existing
+        }
+
+        val asciiView = AsciiArtTextView(existing.context)
+        asciiView.id = existing.id
+        asciiView.layoutParams = existing.layoutParams
+        asciiView.setPadding(
+            existing.paddingLeft,
+            existing.paddingTop,
+            existing.paddingRight,
+            existing.paddingBottom
+        )
+        asciiView.isFocusable = existing.isFocusable
+        asciiView.isFocusableInTouchMode = existing.isFocusableInTouchMode
+        asciiView.isClickable = existing.isClickable
+        asciiView.setOnTouchListener(this)
+
+        val childIndex = parent.indexOfChild(existing)
+        if (childIndex >= 0) {
+            parent.removeViewAt(childIndex)
+            parent.addView(asciiView, childIndex)
+        }
+        labelViews[index] = asciiView
+        return asciiView
+    }
+
+    private fun ensureAsciiFile(asciiFile: File) {
+        if (asciiFile.exists()) {
+            return
+        }
+
+        try {
+            val parent = asciiFile.parentFile
+            if (parent != null && !parent.exists()) {
+                parent.mkdirs()
+            }
+
+            val sample = "  _____         _______     _    _ _____ \n" +
+                    " |  __ \\       |__   __|   | |  | |_   _|\n" +
+                    " | |__) | ___     | |______| |  | | | |  \n" +
+                    " |  _  / / _ \\    | |______| |  | | | |  \n" +
+                    " | | \\ \\|  __/    | |      | |__| |_| |_ \n" +
+                    " |_|  \\_\\\\___|    |_|       \\____/|_____|\n"
+            FileOutputStream(asciiFile).use { stream ->
+                stream.write(sample.toByteArray(charset("UTF-8")))
+                stream.flush()
+            }
+        } catch (e: Exception) {
+            Log.e("TUI-UI", "Error creating ascii.txt", e)
+        }
+    }
+
+    private fun applyAsciiDisplayLimits(asciiView: TextView?) {
+        if (asciiView == null) {
+            return
+        }
+
+        asciiView.setSingleLine(false)
+        asciiView.setEllipsize(null)
+        asciiView.setHorizontallyScrolling(false)
+        asciiView.setIncludeFontPadding(false)
+
+        val maxLines = XMLPrefsManager.getInt(Ui.ascii_max_lines)
+        if (maxLines > 0) {
+            asciiView.setMaxLines(maxLines)
+            asciiView.setVerticalScrollBarEnabled(false)
+        } else {
+            asciiView.setMaxLines(Int.MAX_VALUE)
         }
     }
 
@@ -7655,50 +7750,6 @@ class UIManager(
 
         val sequence = AllowEqualsSequence(indexes, Label.entries.toTypedArray())
 
-        if (show[Label.ascii.ordinal]) {
-            asciiColor = XMLPrefsManager.getColor(Theme.ascii_text_color)
-            val asciiFile = File(Tuils.getFolder(), "ascii.txt")
-            if (!asciiFile.exists()) {
-                try {
-                    asciiFile.createNewFile()
-                    val sample = " ____  _____  _____  _   _ ___ \n" +
-                            "|  _ \\| ____||_   _|| | | |_ _|\n" +
-                            "| |_) |  _|    | |  | | | || | \n" +
-                            "|  _ <| |___   | |  | |_| || | \n" +
-                            "|_| \\_\\_____|  |_|   \\___/|___|\n"
-                    val fos = FileOutputStream(asciiFile)
-                    fos.write(sample.toByteArray())
-                    fos.close()
-                } catch (e: Exception) {
-                    Log.e("TUI-UI", "Error creating ascii.txt", e)
-                }
-            }
-
-            try {
-                if (asciiFile.exists()) {
-                    val fis = FileInputStream(asciiFile)
-                    val data = ByteArray(asciiFile.length().toInt())
-                    fis.read(data)
-                    fis.close()
-                    asciiContent = Tuils.NEWLINE + String(data, charset("UTF-8"))
-                } else {
-                    asciiContent = "ascii.txt not found after creation attempt"
-                }
-            } catch (e: Exception) {
-                asciiContent = "Error loading ascii.txt: " + e.message
-                Log.e("TUI-UI", "Error loading ascii.txt", e)
-            }
-
-            updateText(
-                Label.ascii,
-                Tuils.span(mContext, asciiContent, asciiColor, labelSizes[Label.ascii.ordinal])
-            )
-            val asciiView = getLabelView(Label.ascii)
-            if (asciiView != null) {
-                asciiView.setTypeface(Typeface.MONOSPACE)
-            }
-        }
-
         val lViewsParent = labelViews[0]!!.getParent() as LinearLayout
 
         var effectiveCount = 0
@@ -7718,7 +7769,15 @@ class UIManager(
             }
 
             if (count >= sequence.getMinKey() && count <= sequence.getMaxKey() && os.size > 0) {
-                labelViews[count]!!.setTypeface(Tuils.getTypeface(context))
+                if (os.size == 1 && os[0] == Label.ascii) {
+                    ensureAsciiViewportView(lViewsParent, count)
+                }
+
+                if (labelViews[count] is AsciiArtTextView) {
+                    labelViews[count]!!.setTypeface(Typeface.MONOSPACE)
+                } else {
+                    labelViews[count]!!.setTypeface(Tuils.getTypeface(context))
+                }
 
                 val ec = effectiveCount++
 
@@ -7890,37 +7949,29 @@ class UIManager(
 
         if (show[Label.ascii.ordinal]) {
             val asciiFile = File(Tuils.getFolder(), "ascii.txt")
-            if (!asciiFile.exists()) {
-                try {
-                    Tuils.write(
-                        asciiFile, "  _____         _______     _    _ _____ \n" +
-                                " |  __ \\       |__   __|   | |  | |_   _|\n" +
-                                " | |__) | ___     | |______| |  | | | |  \n" +
-                                " |  _  / / _ \\    | |______| |  | | | |  \n" +
-                                " | | \\ \\|  __/    | |      | |__| |_| |_ \n" +
-                                " |_|  \\_\\\\___|    |_|       \\____/|_____|\n"
-                    )
-                } catch (e: Exception) {
-                    Log.e("TUI-UI", "Error creating ascii.txt", e)
-                }
+            ensureAsciiFile(asciiFile)
+            asciiColor = XMLPrefsManager.getColor(Theme.ascii_text_color)
+
+            val asciiView = getLabelView(Label.ascii)
+            if (asciiView != null) {
+                asciiView.setTypeface(Typeface.MONOSPACE)
             }
+            applyAsciiDisplayLimits(asciiView)
 
-            try {
-                asciiContent = Tuils.NEWLINE + Tuils.inputStreamToString(FileInputStream(asciiFile))
-                asciiColor = XMLPrefsManager.getColor(Theme.ascii_text_color)
+            asciiAnimationManager = AsciiAnimationManager(
+                XMLPrefsManager.getInt(Behavior.ascii_animation_frame_delay_ms).toLong(),
+                asciiColor,
+                statusUpdateListener
+            )
 
-                updateText(
-                    Label.ascii,
-                    Tuils.span(mContext, asciiContent, asciiColor, labelSizes[Label.ascii.ordinal])
+            updateText(
+                Label.ascii,
+                asciiAnimationManager!!.load(
+                    asciiFile,
+                    XMLPrefsManager.getBoolean(Behavior.ascii_animation)
                 )
-
-                val asciiView = getLabelView(Label.ascii)
-                if (asciiView != null) {
-                    asciiView.setTypeface(Typeface.MONOSPACE)
-                }
-            } catch (e: Exception) {
-                Log.e("TUI-UI", "Error loading ascii.txt", e)
-            }
+            )
+            asciiAnimationManager!!.start()
         }
 
         if (show[Label.unlock.ordinal]) {
@@ -12238,6 +12289,7 @@ class UIManager(
             handler = null
         }
 
+        asciiAnimationManager?.stop()
         if (suggestionsManager != null) suggestionsManager!!.dispose()
         if (notesManager != null) notesManager!!.dispose(mContext)
         androidWidgetDrawerManager?.dispose()
@@ -12466,6 +12518,7 @@ class UIManager(
         if (networkManager != null) networkManager!!.stop()
         if (tuiTimeManager != null) tuiTimeManager!!.stop()
         if (unlockManager != null) unlockManager!!.stop()
+        asciiAnimationManager?.stop()
         androidWidgetDrawerManager?.stopListening()
     }
 
@@ -12511,6 +12564,7 @@ class UIManager(
         if (networkManager != null) networkManager!!.start()
         if (tuiTimeManager != null) tuiTimeManager!!.start()
         if (unlockManager != null) unlockManager!!.start()
+        asciiAnimationManager?.start()
         androidWidgetDrawerManager?.startListening()
 
         // Refresh Pomodoro overlay on resume

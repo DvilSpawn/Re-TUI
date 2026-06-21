@@ -2,10 +2,15 @@ package ohi.andre.consolelauncher.commands.tuixt
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.ActivityNotFoundException
+import android.database.Cursor
 import android.os.Bundle
+import android.net.Uri
+import android.provider.OpenableColumns
 import android.text.Editable
 import android.text.TextUtils
 import android.text.TextWatcher
+import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -39,12 +44,21 @@ import java.io.File
 import java.io.FileInputStream
 import java.util.Locale
 import android.content.Intent
+import ohi.andre.consolelauncher.LauncherActivity
 import java.util.ArrayList
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings
+import ohi.andre.consolelauncher.managers.settings.LauncherSettings.getInt
+import ohi.andre.consolelauncher.managers.status.AsciiAnimationManager
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi
+import ohi.andre.consolelauncher.managers.xml.options.Theme
+import ohi.andre.consolelauncher.managers.xml.options.Ui
+import java.io.ByteArrayOutputStream
 import javax.xml.parsers.DocumentBuilderFactory
 import org.w3c.dom.Element
 import org.w3c.dom.Node
+import java.nio.ByteBuffer
+import java.nio.charset.CodingErrorAction
+import java.nio.charset.StandardCharsets
 
 class TuixtActivity : Activity() {
     private var file: File? = null
@@ -54,6 +68,7 @@ class TuixtActivity : Activity() {
     private var originalRows: MutableList<TuixtAdapter.SettingsRow>? = null
     private var plainTextEditor: EditText? = null
     private var originalRawText: String? = null
+    private var asciiSettingsMode = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         requestNoTitleIfFullscreen(this)
@@ -61,12 +76,13 @@ class TuixtActivity : Activity() {
         applyFullscreen(this)
 
         val intent = getIntent()
+        asciiSettingsMode = MODE_ASCII_SETTINGS == intent.getStringExtra(MODE)
         val path = intent.getStringExtra(PATH)
-        if (path == null) {
+        if (path == null && !asciiSettingsMode) {
             finish()
             return
         }
-        file = File(path)
+        file = if (asciiSettingsMode) asciiFile else File(path!!)
 
         val screen = FrameLayout(this)
         screen.setBackgroundColor(overlayColor())
@@ -88,7 +104,7 @@ class TuixtActivity : Activity() {
         contentHost.addView(root, panelParams)
 
         val header = TextView(this)
-        header.setText("Themer/ " + file!!.getName())
+        header.setText(if (asciiSettingsMode) "ASCII Settings" else "Themer/ " + file!!.getName())
         styleHeader(this, header)
         val headerParams = FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -109,6 +125,9 @@ class TuixtActivity : Activity() {
             )
         )
         recyclerView!!.setLayoutManager(LinearLayoutManager(this))
+        if (asciiSettingsMode) {
+            root.addView(buildAsciiActions())
+        }
         root.addView(recyclerView)
 
         // Bottom Bar (Search + Buttons)
@@ -172,7 +191,27 @@ class TuixtActivity : Activity() {
             }
         }
 
-        if (xmlRoot != null) {
+        if (asciiSettingsMode) {
+            originalRows = buildAsciiSettingsRows()
+            adapter = TuixtAdapter(originalRows!!.toMutableList(), null)
+            recyclerView!!.setAdapter(adapter)
+
+            searchBox.addTextChangedListener(object : TextWatcher {
+                override fun beforeTextChanged(
+                    s: CharSequence?,
+                    start: Int,
+                    count: Int,
+                    after: Int
+                ) {
+                }
+
+                override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                    filter(s.toString())
+                }
+
+                override fun afterTextChanged(s: Editable?) {}
+            })
+        } else if (xmlRoot != null) {
             originalRows = buildRows(xmlRoot!!, file!!)
             adapter = TuixtAdapter(originalRows!!.toMutableList(), file)
             recyclerView!!.setAdapter(adapter)
@@ -235,6 +274,64 @@ class TuixtActivity : Activity() {
         }
     }
 
+    private val asciiFile: File
+        get() = File(Tuils.getFolder(), "ascii.txt")
+
+    private fun buildAsciiActions(): View {
+        val actions = LinearLayout(this)
+        actions.setOrientation(LinearLayout.VERTICAL)
+        actions.setPadding(0, 0, 0, dp(this, 10f))
+
+        addAsciiAction(actions, "ASCII TXT") {
+            openAsciiTxt()
+        }
+        addAsciiAction(actions, "IMPORT ASCII TXT") {
+            launchAsciiImportPicker()
+        }
+
+        return actions
+    }
+
+    private fun addAsciiAction(container: LinearLayout, label: String, action: () -> Unit) {
+        val button = TextView(this)
+        button.setText(label)
+        button.setGravity(Gravity.CENTER)
+        styleButton(this, button, false)
+        button.setOnClickListener { action() }
+
+        val params = LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        params.setMargins(0, 0, 0, dp(this, 8f))
+        container.addView(button, params)
+    }
+
+    private fun buildAsciiSettingsRows(): MutableList<TuixtAdapter.SettingsRow> {
+        val rows: MutableList<TuixtAdapter.SettingsRow> = ArrayList()
+
+        addSection(rows, "ASCII TXT")
+        rows.add(TuixtAdapter.SettingsRow.setting(Ui.show_ascii, "ASCII TXT"))
+        rows.add(TuixtAdapter.SettingsRow.setting(Ui.show_ascii_landscape, "ASCII TXT"))
+        rows.add(TuixtAdapter.SettingsRow.setting(Ui.ascii_max_lines, "ASCII TXT"))
+
+        addSection(rows, "Animation")
+        rows.add(TuixtAdapter.SettingsRow.setting(Behavior.ascii_animation, "Animation"))
+        rows.add(TuixtAdapter.SettingsRow.setting(Behavior.ascii_animation_frame_delay_ms, "Animation"))
+        rows.add(TuixtAdapter.SettingsRow.setting(Behavior.ascii_animation_max_file_kb, "Animation"))
+
+        addSection(rows, "Layout")
+        rows.add(TuixtAdapter.SettingsRow.setting(Ui.ascii_index, "Layout"))
+        rows.add(TuixtAdapter.SettingsRow.setting(Ui.ascii_status_alignment, "Layout"))
+
+        addSection(rows, "Colors")
+        rows.add(TuixtAdapter.SettingsRow.setting(Theme.ascii_text_color, "Colors"))
+        rows.add(TuixtAdapter.SettingsRow.setting(Theme.ascii_status_background_color, "Colors"))
+        rows.add(TuixtAdapter.SettingsRow.setting(Theme.ascii_status_text_shadow_color, "Colors"))
+
+        return rows
+    }
+
     private fun filter(query: String) {
         val rows = originalRows ?: return
         if (query.trim().isEmpty()) {
@@ -268,6 +365,9 @@ class TuixtActivity : Activity() {
         val remaining: LinkedHashMap<String, XMLPrefsSave> = LinkedHashMap<String, XMLPrefsSave>()
         for (save in root.enums) {
             if (save === Behavior.toggle_output_state) {
+                continue
+            }
+            if (XMLPrefsManager.isAsciiArtSetting(save)) {
                 continue
             }
             remaining[save.label()!!] = save
@@ -380,6 +480,183 @@ class TuixtActivity : Activity() {
         return rows
     }
 
+    private fun openAsciiTxt() {
+        val file = asciiFile
+        try {
+            val parent = file.parentFile
+            if (parent != null && !parent.exists()) {
+                parent.mkdirs()
+            }
+            if (!file.exists()) {
+                Tuils.write(file, "", "")
+            }
+        } catch (e: Exception) {
+            Toast.makeText(this, "Could not create ascii.txt: " + e.message, Toast.LENGTH_LONG).show()
+            return
+        }
+
+        val intent = Intent(this, TuixtActivity::class.java)
+        intent.putExtra(PATH, file.absolutePath)
+        startActivityForResult(intent, ASCII_TXT_REQUEST)
+    }
+
+    private fun launchAsciiImportPicker() {
+        notifyAsciiImport("Opening ASCII file picker...", false)
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+        intent.addCategory(Intent.CATEGORY_OPENABLE)
+        intent.setType("*/*")
+        intent.putExtra(
+            Intent.EXTRA_MIME_TYPES,
+            arrayOf<String>("text/plain", "text/*", "application/octet-stream")
+        )
+        try {
+            startActivityForResult(intent, ASCII_IMPORT_REQUEST)
+        } catch (e: ActivityNotFoundException) {
+            notifyAsciiImport("ASCII file picker is unavailable on this device.", true)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        Log.i("TUI-ASCII", "onActivityResult request=" + requestCode + " result=" + resultCode + " data=" + (data != null))
+        if (requestCode == ASCII_TXT_REQUEST) {
+            if (resultCode == SAVE_PRESSED) {
+                reloadLauncherForAscii("ascii.txt saved.")
+                setResult(SAVE_PRESSED)
+            }
+        } else if (requestCode == ASCII_IMPORT_REQUEST) {
+            handleAsciiImportResult(resultCode, data)
+        }
+    }
+
+    private fun handleAsciiImportResult(resultCode: Int, data: Intent?) {
+        if (resultCode != RESULT_OK || data == null || data.data == null) {
+            notifyAsciiImport("ASCII import cancelled.", false)
+            return
+        }
+
+        val uri = data.data ?: return
+        var sourceName = getDisplayName(uri)
+        if (sourceName == null || sourceName.trim { it <= ' ' }.isEmpty()) {
+            sourceName = uri.lastPathSegment
+        }
+        if (!isAsciiImportFileName(sourceName)) {
+            notifyAsciiImport("Choose a .txt ASCII file.", true)
+            return
+        }
+
+        val maxBytes = maxOf(32, getInt(Behavior.ascii_animation_max_file_kb)) * 1024
+        val text = try {
+            decodeUtf8(readUriBytes(uri, maxBytes))
+        } catch (e: Exception) {
+            notifyAsciiImport(
+                if (e.message == null) "ASCII import failed." else "ASCII import failed: " + e.message,
+                true
+            )
+            return
+        }
+
+        if (text.trim { it <= ' ' }.isEmpty()) {
+            notifyAsciiImport("ASCII import failed: empty file.", true)
+            return
+        }
+
+        val frameCount = AsciiAnimationManager.supportedFrameCount(text)
+        try {
+            Tuils.write(asciiFile, "", text)
+        } catch (e: Exception) {
+            notifyAsciiImport("Could not write ascii.txt: " + e.message, true)
+            return
+        }
+
+        val message = if (frameCount < 2) {
+            "Imported ASCII TXT."
+        } else if (LauncherSettings.getBoolean(Behavior.ascii_animation)) {
+            "Imported animated ASCII: " + frameCount + " frames."
+        } else {
+            "Imported " + frameCount + " frames. Enable animated ASCII to play it."
+        }
+        reloadLauncherForAscii(message)
+        setResult(SAVE_PRESSED)
+    }
+
+    private fun readUriBytes(uri: Uri, maxBytes: Int): ByteArray {
+        val out = ByteArrayOutputStream()
+        getContentResolver().openInputStream(uri).use { input ->
+            checkNotNull(input) { "Unable to read selected file." }
+            val buffer = ByteArray(8192)
+            var total = 0
+            while (true) {
+                val read = input.read(buffer)
+                if (read == -1) {
+                    break
+                }
+                total += read
+                if (total > maxBytes) {
+                    throw IllegalArgumentException("file exceeds " + (maxBytes / 1024) + " KB limit")
+                }
+                out.write(buffer, 0, read)
+            }
+        }
+        return out.toByteArray()
+    }
+
+    private fun getDisplayName(uri: Uri): String? {
+        var cursor: Cursor? = null
+        try {
+            cursor = getContentResolver().query(
+                uri,
+                arrayOf<String>(OpenableColumns.DISPLAY_NAME),
+                null,
+                null,
+                null
+            )
+            if (cursor != null && cursor.moveToFirst()) {
+                val index = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                if (index >= 0) {
+                    return cursor.getString(index)
+                }
+            }
+        } catch (ignored: Exception) {
+        } finally {
+            if (cursor != null) {
+                cursor.close()
+            }
+        }
+        return null
+    }
+
+    private fun decodeUtf8(bytes: ByteArray): String {
+        return StandardCharsets.UTF_8.newDecoder()
+            .onMalformedInput(CodingErrorAction.REPORT)
+            .onUnmappableCharacter(CodingErrorAction.REPORT)
+            .decode(ByteBuffer.wrap(bytes))
+            .toString()
+    }
+
+    private fun isAsciiImportFileName(name: String?): Boolean {
+        if (name == null) {
+            return false
+        }
+        return name.lowercase(Locale.getDefault()).endsWith(".txt")
+    }
+
+    private fun reloadLauncherForAscii(message: String) {
+        notifyAsciiImport(message, false)
+        if (LauncherActivity.instance != null) {
+            LauncherActivity.instance!!.reload()
+        }
+    }
+
+    private fun notifyAsciiImport(message: String, error: Boolean) {
+        if (error) {
+            Log.w("TUI-ASCII", message)
+        } else {
+            Log.i("TUI-ASCII", message)
+        }
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+    }
+
     @SuppressLint("GestureBackNavigation")
     override fun onBackPressed() {
         attemptClose()
@@ -416,8 +693,12 @@ class TuixtActivity : Activity() {
 
     companion object {
         const val PATH: String = "path"
+        const val MODE: String = "mode"
+        const val MODE_ASCII_SETTINGS: String = "ascii_settings"
         const val ERROR_KEY: String = "error"
         const val BACK_PRESSED: Int = 2
         const val SAVE_PRESSED: Int = 3
+        private const val ASCII_TXT_REQUEST: Int = 11
+        private const val ASCII_IMPORT_REQUEST: Int = 12
     }
 }

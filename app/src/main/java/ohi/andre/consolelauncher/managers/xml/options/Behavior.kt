@@ -206,6 +206,45 @@ enum class Behavior : XMLPrefsSave {
             return XMLPrefsSave.BOOLEAN
         }
     },
+    ascii_animation {
+        override fun defaultValue(): String? {
+            return "false"
+        }
+
+        override fun info(): String? {
+            return "If true, Re:T-UI will animate framed content pasted into ascii.txt"
+        }
+
+        override fun type(): String? {
+            return XMLPrefsSave.BOOLEAN
+        }
+    },
+    ascii_animation_frame_delay_ms {
+        override fun defaultValue(): String? {
+            return "750"
+        }
+
+        override fun info(): String? {
+            return "Default delay between animated ASCII frames in milliseconds"
+        }
+
+        override fun type(): String? {
+            return XMLPrefsSave.INTEGER
+        }
+    },
+    ascii_animation_max_file_kb {
+        override fun defaultValue(): String? {
+            return "512"
+        }
+
+        override fun info(): String? {
+            return "Maximum ASCII TXT import size, in KB"
+        }
+
+        override fun type(): String? {
+            return XMLPrefsSave.INTEGER
+        }
+    },
     clear_after_cmds {
         override fun defaultValue(): String? {
             return "-1"

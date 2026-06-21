@@ -180,7 +180,6 @@
             android:name=".commands.tuixt.TuixtActivity"
             android:excludeFromRecents="true"
             android:label="@string/tuixt_label"
-            android:noHistory="true"
             android:theme="@style/Custom.Popup"
             android:windowSoftInputMode="stateAlwaysVisible|adjustResize"
             android:exported="false">

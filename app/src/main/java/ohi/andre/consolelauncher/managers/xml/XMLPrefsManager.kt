@@ -523,6 +523,21 @@ object XMLPrefsManager {
         }
     }
 
+    fun isAsciiArtSetting(save: XMLPrefsSave?): Boolean {
+        return save === Ui.show_ascii ||
+            save === Ui.show_ascii_landscape ||
+            save === Ui.ascii_index ||
+            save === Ui.ascii_size ||
+            save === Ui.ascii_max_lines ||
+            save === Ui.ascii_status_alignment ||
+            save === Behavior.ascii_animation ||
+            save === Behavior.ascii_animation_frame_delay_ms ||
+            save === Behavior.ascii_animation_max_file_kb ||
+            save === Theme.ascii_text_color ||
+            save === Theme.ascii_status_background_color ||
+            save === Theme.ascii_status_text_shadow_color
+    }
+
     private fun themeSection(label: String): String = when {
         label == "background_color" || label == "wallpaper_overlay_color" -> "Launcher"
         label.contains("_status_") || label.startsWith("battery_text_") ||
@@ -543,6 +558,7 @@ object XMLPrefsManager {
     }
 
     private fun uiSection(label: String): String = when {
+        label.contains("ascii") -> "Status Lines"
         label.startsWith("show_") && (label.contains("ram") || label.contains("battery") || label.contains("time") ||
             label.contains("storage") || label.contains("network") || label.contains("notes") || label.contains("weather") ||
             label.contains("unlock") || label.contains("ascii") || label.contains("device")) -> "Status Lines"
