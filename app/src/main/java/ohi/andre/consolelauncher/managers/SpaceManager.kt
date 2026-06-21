@@ -23,37 +23,54 @@ object SpaceManager {
     private const val DEFAULT_SPACE_ID = "space-1"
     private const val DEFAULT_SPACE_NAME = "Space 1"
 
-    private val CONFIG_FILES = arrayOf(
-        XMLPrefsManager.XMLPrefsRoot.THEME.path,
-        XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS.path,
-        XMLPrefsManager.XMLPrefsRoot.UI.path,
-        XMLPrefsManager.XMLPrefsRoot.BEHAVIOR.path,
-        XMLPrefsManager.XMLPrefsRoot.APPS.path,
-        XMLPrefsManager.XMLPrefsRoot.NOTIFICATIONS.path,
-        XMLPrefsManager.XMLPrefsRoot.TOOLBAR.path,
-        XMLPrefsManager.XMLPrefsRoot.CMD.path,
-        XMLPrefsManager.XMLPrefsRoot.RSS.path,
-        AliasManager.PATH,
-        NotesManager.PATH,
-        SearchProviderManager.PATH,
-        ReplyManager.PATH,
-        "ascii.txt",
-        "webhooks.xml",
-        "htmlextract.xml"
-    )
-
-    private val SPACE_PREFS = arrayOf(
-        "ui",
-        "apps",
-        "retui_modules",
-        "retui_reminders",
-        "retui_module_prompt",
-        "retui_tmux_workspace_launchers",
-        "android_widget_drawer",
-        "pomodoro_state",
-        PinnedShortcutManager.PREFS,
-        LuaWidgetReminderManager.PREFS,
-        TermuxAppManager.PREFS
+    private val PROVIDERS = listOf(
+        FilesProvider(
+            id = "xml-config",
+            paths = arrayOf(
+                XMLPrefsManager.XMLPrefsRoot.THEME.path,
+                XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS.path,
+                XMLPrefsManager.XMLPrefsRoot.UI.path,
+                XMLPrefsManager.XMLPrefsRoot.BEHAVIOR.path,
+                XMLPrefsManager.XMLPrefsRoot.APPS.path,
+                XMLPrefsManager.XMLPrefsRoot.NOTIFICATIONS.path,
+                XMLPrefsManager.XMLPrefsRoot.TOOLBAR.path,
+                XMLPrefsManager.XMLPrefsRoot.CMD.path,
+                XMLPrefsManager.XMLPrefsRoot.RSS.path
+            )
+        ),
+        FilesProvider(
+            id = "launcher-files",
+            paths = arrayOf(
+                AliasManager.PATH,
+                NotesManager.PATH,
+                SearchProviderManager.PATH,
+                ReplyManager.PATH,
+                "ascii.txt",
+                "webhooks.xml",
+                "htmlextract.xml"
+            )
+        ),
+        SharedPrefsProvider(
+            id = "launcher-prefs",
+            names = arrayOf(
+                "ui",
+                "apps",
+                "android_widget_drawer",
+                "pomodoro_state",
+                PinnedShortcutManager.PREFS
+            )
+        ),
+        SharedPrefsProvider(
+            id = "module-prefs",
+            names = arrayOf(
+                "retui_modules",
+                "retui_reminders",
+                "retui_module_prompt",
+                "retui_tmux_workspace_launchers",
+                LuaWidgetReminderManager.PREFS,
+                TermuxAppManager.PREFS
+            )
+        )
     )
 
     data class Space(val id: String, val name: String, val updatedAt: Long)
@@ -176,62 +193,32 @@ object SpaceManager {
 
     private fun snapshotToSpace(context: Context, id: String) {
         val root = Tuils.getFolder()
-        val dir = spaceDir(id)
-        val filesDir = File(dir, FILES_FOLDER)
-        val prefsDir = File(dir, SHARED_PREFS_FOLDER)
-        ensureDir(filesDir)
-        ensureDir(prefsDir)
-
-        for (path in CONFIG_FILES) {
-            val source = File(root, path)
-            val target = File(filesDir, path)
-            if (source.isFile) {
-                copyFile(source, target)
-            } else if (target.exists()) {
-                Tuils.delete(target)
-            }
+        val staging = File(spacesDir(), ".$id-staging")
+        val previous = File(spacesDir(), ".$id-previous")
+        val target = spaceDir(id)
+        if (staging.exists()) {
+            Tuils.delete(staging)
         }
+        if (previous.exists()) {
+            Tuils.delete(previous)
+        }
+        ensureDir(staging)
 
-        for (name in SPACE_PREFS) {
-            val values = context.applicationContext
-                .getSharedPreferences(name, Context.MODE_PRIVATE)
-                .all
-            val target = File(prefsDir, "$name.properties")
-            writeText(target, serializePrefs(values))
+        for (provider in PROVIDERS) {
+            provider.snapshot(context, root, staging)
         }
 
         val current = readSpace(id) ?: Space(id, DEFAULT_SPACE_NAME, System.currentTimeMillis())
-        writeManifest(dir, current.copy(updatedAt = System.currentTimeMillis()))
+        writeManifest(staging, current.copy(updatedAt = System.currentTimeMillis()))
+        replaceSpaceDirectory(staging, target, previous)
     }
 
     private fun restoreFromSpace(context: Context, id: String) {
         val root = Tuils.getFolder()
         val dir = spaceDir(id)
         require(dir.isDirectory) { "Space not found." }
-        val filesDir = File(dir, FILES_FOLDER)
-        val prefsDir = File(dir, SHARED_PREFS_FOLDER)
-
-        for (path in CONFIG_FILES) {
-            val target = File(root, path)
-            if (target.exists()) {
-                Tuils.delete(target)
-            }
-            val source = File(filesDir, path)
-            if (source.isFile) {
-                copyFile(source, target)
-            }
-        }
-
-        for (name in SPACE_PREFS) {
-            val file = File(prefsDir, "$name.properties")
-            val editor = context.applicationContext
-                .getSharedPreferences(name, Context.MODE_PRIVATE)
-                .edit()
-                .clear()
-            if (file.isFile) {
-                applyPrefs(editor, readText(file))
-            }
-            editor.apply()
+        for (provider in PROVIDERS) {
+            provider.restore(context, root, dir)
         }
 
         XMLPrefsManager.dispose()
@@ -304,8 +291,14 @@ object SpaceManager {
             .append("id=").append(space.id).append('\n')
             .append("name=").append(encode(space.name)).append('\n')
             .append("updatedAt=").append(space.updatedAt).append('\n')
-            .toString()
-        writeText(File(dir, MANIFEST_FILE), text)
+        for (provider in PROVIDERS) {
+            text.append("provider.")
+                .append(provider.id)
+                .append('=')
+                .append(provider.version)
+                .append('\n')
+        }
+        writeText(File(dir, MANIFEST_FILE), text.toString())
     }
 
     private fun nextSpaceId(context: Context): String {
@@ -359,6 +352,24 @@ object SpaceManager {
             }
         } else if (source.isFile) {
             copyFile(source, target)
+        }
+    }
+
+    private fun replaceSpaceDirectory(staging: File, target: File, previous: File) {
+        if (target.exists()) {
+            check(target.renameTo(previous)) { "Unable to prepare Space folder: " + target.name }
+        }
+
+        try {
+            check(staging.renameTo(target)) { "Unable to activate Space snapshot: " + target.name }
+            if (previous.exists()) {
+                Tuils.delete(previous)
+            }
+        } catch (e: RuntimeException) {
+            if (!target.exists() && previous.exists()) {
+                previous.renameTo(target)
+            }
+            throw e
         }
     }
 
@@ -453,4 +464,80 @@ object SpaceManager {
         } catch (e: Exception) {
             value
         }
+
+    private interface SpaceStateProvider {
+        val id: String
+        val version: Int
+
+        fun snapshot(context: Context, liveRoot: File, spaceRoot: File)
+
+        fun restore(context: Context, liveRoot: File, spaceRoot: File)
+    }
+
+    private class FilesProvider(
+        override val id: String,
+        private val paths: Array<String>,
+        override val version: Int = 1
+    ) : SpaceStateProvider {
+        override fun snapshot(context: Context, liveRoot: File, spaceRoot: File) {
+            val filesDir = File(spaceRoot, FILES_FOLDER)
+            ensureDir(filesDir)
+            for (path in paths) {
+                val source = File(liveRoot, path)
+                val target = File(filesDir, path)
+                if (source.isFile) {
+                    copyFile(source, target)
+                } else if (target.exists()) {
+                    Tuils.delete(target)
+                }
+            }
+        }
+
+        override fun restore(context: Context, liveRoot: File, spaceRoot: File) {
+            val filesDir = File(spaceRoot, FILES_FOLDER)
+            for (path in paths) {
+                val target = File(liveRoot, path)
+                if (target.exists()) {
+                    Tuils.delete(target)
+                }
+                val source = File(filesDir, path)
+                if (source.isFile) {
+                    copyFile(source, target)
+                }
+            }
+        }
+    }
+
+    private class SharedPrefsProvider(
+        override val id: String,
+        private val names: Array<String>,
+        override val version: Int = 1
+    ) : SpaceStateProvider {
+        override fun snapshot(context: Context, liveRoot: File, spaceRoot: File) {
+            val prefsDir = File(spaceRoot, SHARED_PREFS_FOLDER)
+            ensureDir(prefsDir)
+            for (name in names) {
+                val values = context.applicationContext
+                    .getSharedPreferences(name, Context.MODE_PRIVATE)
+                    .all
+                val target = File(prefsDir, "$name.properties")
+                writeText(target, serializePrefs(values))
+            }
+        }
+
+        override fun restore(context: Context, liveRoot: File, spaceRoot: File) {
+            val prefsDir = File(spaceRoot, SHARED_PREFS_FOLDER)
+            for (name in names) {
+                val file = File(prefsDir, "$name.properties")
+                val editor = context.applicationContext
+                    .getSharedPreferences(name, Context.MODE_PRIVATE)
+                    .edit()
+                    .clear()
+                if (file.isFile) {
+                    applyPrefs(editor, readText(file))
+                }
+                check(editor.commit()) { "Unable to restore Space preferences: $name" }
+            }
+        }
+    }
 }
