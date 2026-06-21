@@ -32,6 +32,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import ohi.andre.consolelauncher.commands.tuixt.TuixtActivity
 import ohi.andre.consolelauncher.managers.RegexManager
+import ohi.andre.consolelauncher.managers.SpaceManager
 import ohi.andre.consolelauncher.managers.TerminalManager
 import ohi.andre.consolelauncher.managers.TimeManager
 import ohi.andre.consolelauncher.managers.modules.ModuleManager
@@ -187,6 +188,7 @@ class LauncherActivity : AppCompatActivity(), Reloadable {
 
         XMLPrefsManager.loadCommons(this)
         refreshFromLoadedPrefs()
+        SpaceManager.ensureInitialized(this)
 
         val useSystemWP = XMLPrefsManager.getBoolean(Ui.system_wallpaper)
         if (useSystemWP) {
