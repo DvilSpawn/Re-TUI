@@ -74,6 +74,7 @@ object BackupManager {
         "retui_module_prompt",
         "retui_callback_auth",
         "pomodoro_state",
+        SpaceManager.PREFS,
         GuideManager.PREFS,
         "changelogPrefs"
     )
@@ -255,6 +256,7 @@ object BackupManager {
                 context,
                 tempDir
             )
+            SpaceManager.ensureInitialized(context)
         }
         Tuils.delete(tempDir)
     }
@@ -282,6 +284,8 @@ object BackupManager {
 
     @Throws(java.lang.Exception::class)
     private fun createPersonalBackup(context: android.content.Context): kotlin.ByteArray {
+        SpaceManager.saveActive(context)
+
         val out = java.io.ByteArrayOutputStream()
         val zip = java.util.zip.ZipOutputStream(out)
         try {
@@ -329,6 +333,7 @@ object BackupManager {
     private fun isBackupCandidate(file: java.io.File, name: kotlin.String?): kotlin.Boolean {
         if (name == null || name.length == 0) return false
         if (name.startsWith(ohi.andre.consolelauncher.managers.BackupManager.SHARED_PREFS_DIR)) return false
+        if (name.startsWith("spaces/.")) return false
         if (name.startsWith(".restore-importing") || name.endsWith(ohi.andre.consolelauncher.managers.BackupManager.BACKUP_SUFFIX)) return false
         if (name.startsWith("crash.txt")) return false
         return file.isDirectory() || file.isFile()

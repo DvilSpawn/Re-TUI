@@ -52,7 +52,7 @@ class space : ParamCommand() {
             }
         },
         rename {
-            override fun args(): IntArray = intArrayOf(CommandAbstraction.PLAIN_TEXT)
+            override fun args(): IntArray = intArrayOf(CommandAbstraction.SPACE_RENAME_NAME)
 
             override fun exec(pack: ExecutePack): String {
                 return safe(pack) {
@@ -62,7 +62,7 @@ class space : ParamCommand() {
             }
         },
         switch {
-            override fun args(): IntArray = intArrayOf(CommandAbstraction.PLAIN_TEXT)
+            override fun args(): IntArray = intArrayOf(CommandAbstraction.SPACE_TARGET)
 
             override fun exec(pack: ExecutePack): String {
                 return safe(pack) {
@@ -77,7 +77,7 @@ class space : ParamCommand() {
             }
         },
         rm {
-            override fun args(): IntArray = intArrayOf(CommandAbstraction.PLAIN_TEXT)
+            override fun args(): IntArray = intArrayOf(CommandAbstraction.SPACE_TARGET)
 
             override fun exec(pack: ExecutePack): String {
                 return safe(pack) {

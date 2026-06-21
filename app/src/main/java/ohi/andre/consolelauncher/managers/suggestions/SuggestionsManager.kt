@@ -91,6 +91,7 @@ import ohi.andre.consolelauncher.managers.ContactManager
 import ohi.andre.consolelauncher.managers.FileManager
 import ohi.andre.consolelauncher.managers.PresetManager
 import ohi.andre.consolelauncher.managers.RssManager
+import ohi.andre.consolelauncher.managers.SpaceManager
 import ohi.andre.consolelauncher.managers.notifications.NotificationManager
 import ohi.andre.consolelauncher.managers.WebhookManager
 import ohi.andre.consolelauncher.managers.modules.ModuleManager
@@ -1382,6 +1383,18 @@ class SuggestionsManager(
             )
 
             CommandAbstraction.PRESET_NAME -> suggestSavedPresetNames(
+                suggestions,
+                afterLastSpace,
+                beforeLastSpace
+            )
+
+            CommandAbstraction.SPACE_TARGET -> suggestSpaceTargets(
+                suggestions,
+                afterLastSpace,
+                beforeLastSpace
+            )
+
+            CommandAbstraction.SPACE_RENAME_NAME -> suggestActiveSpaceName(
                 suggestions,
                 afterLastSpace,
                 beforeLastSpace
@@ -2821,6 +2834,88 @@ class SuggestionsManager(
                 )
             }
         }
+    }
+
+    private fun suggestActiveSpaceName(
+        suggestions: MutableList<Suggestion?>,
+        afterLastSpace: String?,
+        beforeLastSpace: String?
+    ) {
+        val active = SpaceManager.activeSpace(pack.context)
+        val filter = afterLastSpace?.lowercase(Locale.getDefault()) ?: Tuils.EMPTYSTRING
+        if (filter.isNotEmpty() && !active.name.lowercase(Locale.getDefault()).startsWith(filter)) {
+            return
+        }
+
+        suggestions.add(
+            Suggestion(
+                beforeLastSpace,
+                active.name,
+                false,
+                Suggestion.Companion.TYPE_COMMAND
+            )
+        )
+    }
+
+    private fun suggestSpaceTargets(
+        suggestions: MutableList<Suggestion?>,
+        afterLastSpace: String?,
+        beforeLastSpace: String?
+    ) {
+        val param = spaceParamName(beforeLastSpace)
+        val removeCommand = "rm" == param
+        val switchCommand = "switch" == param
+        val filter = afterLastSpace?.lowercase(Locale.getDefault()) ?: Tuils.EMPTYSTRING
+        val active = SpaceManager.activeSpace(pack.context)
+        val emitted: MutableSet<String> = LinkedHashSet<String>()
+
+        for (space in SpaceManager.listSpaces(pack.context)) {
+            if (removeCommand && space.id == active.id) {
+                continue
+            }
+
+            val name = space.name
+            val nameMatches = filter.isEmpty() || name.lowercase(Locale.getDefault()).startsWith(filter)
+            val idMatches = filter.isNotEmpty() && space.id.lowercase(Locale.getDefault()).startsWith(filter)
+
+            if (nameMatches && emitted.add(name.lowercase(Locale.getDefault()))) {
+                suggestions.add(
+                    Suggestion(
+                        beforeLastSpace,
+                        name,
+                        switchCommand && clickToLaunch,
+                        Suggestion.Companion.TYPE_COMMAND
+                    )
+                )
+            }
+
+            if (idMatches && emitted.add(space.id.lowercase(Locale.getDefault()))) {
+                suggestions.add(
+                    Suggestion(
+                        beforeLastSpace,
+                        space.id,
+                        switchCommand && clickToLaunch,
+                        Suggestion.Companion.TYPE_COMMAND
+                    )
+                )
+            }
+        }
+    }
+
+    private fun spaceParamName(beforeLastSpace: String?): String {
+        if (beforeLastSpace == null) {
+            return Tuils.EMPTYSTRING
+        }
+        val split = beforeLastSpace.trim { it <= ' ' }
+            .split(Tuils.SPACE.toRegex())
+            .dropLastWhile { it.isEmpty() }
+            .toTypedArray()
+        if (split.isEmpty()) {
+            return Tuils.EMPTYSTRING
+        }
+        return split[split.size - 1]
+            .removePrefix(Tuils.MINUS)
+            .lowercase(Locale.getDefault())
     }
 
     private fun presetDisplayName(preset: String?): String {

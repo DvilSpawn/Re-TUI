@@ -16,7 +16,7 @@ object SpaceManager {
     private const val MANIFEST_FILE = "manifest.properties"
     private const val FILES_FOLDER = "files"
     private const val SHARED_PREFS_FOLDER = "shared_prefs"
-    private const val PREFS = "retui_spaces"
+    const val PREFS = "retui_spaces"
     private const val KEY_ACTIVE_SPACE_ID = "active_space_id"
     private const val KEY_NEXT_SPACE_NUMBER = "next_space_number"
     private const val SCHEMA = 1
