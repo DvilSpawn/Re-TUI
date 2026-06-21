@@ -60,6 +60,49 @@ In `System & Support`, verify:
 - `Backup`, `Create Shareable Configuration`, `Restore`, `Rate the App`,
   `Learn More`, and `View Crash Log` still open their existing flows.
 
+## Spaces Smoke
+
+Open the launcher and run:
+
+```text
+space -ls
+```
+
+Verify the default Space exists and is marked active:
+
+```text
+* Space 1 [space-1]
+```
+
+Create a second Space from the current launcher state:
+
+```text
+space -new Work
+space -ls
+```
+
+Verify `Work [space-2]` appears. Then switch away and back:
+
+```text
+space -switch Work
+space -switch space-1
+space -ls
+```
+
+Verify `Space 1` is active again, and confirm the on-device Space manifests
+include provider entries for XML config, launcher files, launcher preferences,
+and module preferences:
+
+```sh
+adb shell 'for f in /storage/emulated/0/Android/data/com.dvil.tui_renewed/files/Re-T-UI/spaces/*/manifest.properties; do echo "$f"; cat "$f"; done'
+```
+
+Also verify no incomplete swap folders remain:
+
+```sh
+adb shell 'find /storage/emulated/0/Android/data/com.dvil.tui_renewed/files/Re-T-UI/spaces -maxdepth 1 \( -name ".*staging" -o -name ".*previous" \) -print'
+```
+
 ## Termux Tmux Workspace Smoke
 
 Prerequisites in Termux:

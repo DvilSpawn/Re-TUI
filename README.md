@@ -22,6 +22,7 @@ These updates ensure the launcher remains functional, secure, and performant on 
 *   **`post [url] [body]`**: Send raw HTTP POST requests directly from the terminal.
 *   **`module`**: Native, Lua, and Termux-backed modules are the recommended way to add launcher panels and scripted workflows.
 *   **`guide`**: A non-blocking command-first walkthrough that uses terminal output and the existing suggestion row instead of a first-run modal.
+*   **`space`**: Create, duplicate, rename, save, list, switch, and remove launcher Spaces, each with its own snapshot of launcher settings, module state, and command-facing configuration.
 *   **BusyBox manager removed**: Re:T-UI no longer downloads BusyBox; use `shell` for Android's built-in shell and Termux for maintained Linux tooling.
 *   **ASCII Art System**: A new header system that displays custom ASCII art on the dashboard. Controlled via `show_ascii`, `show_ascii_landscape`, `ascii_index`, and `ascii_size` in `Ui.xml`.
 
