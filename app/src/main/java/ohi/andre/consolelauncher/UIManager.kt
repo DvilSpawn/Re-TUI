@@ -161,7 +161,6 @@ import ohi.andre.consolelauncher.managers.xml.options.Suggestions
 import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.managers.xml.options.Toolbar
 import ohi.andre.consolelauncher.managers.xml.options.Ui
-import ohi.andre.consolelauncher.tuils.AllowEqualsSequence
 import ohi.andre.consolelauncher.tuils.AsciiArtTextView
 import ohi.andre.consolelauncher.tuils.CrtOverlayDrawable
 import ohi.andre.consolelauncher.tuils.CyberpunkBackdropDrawable
@@ -7812,7 +7811,23 @@ class UIManager(
             0
         )
 
-        val sequence = AllowEqualsSequence(indexes, Label.entries.toTypedArray())
+        val labelRows = ArrayList<MutableList<Label>>()
+        val visibleLabels = ArrayList<Pair<Float, Label>>()
+        for (ordinal in indexes.indices) {
+            val value = indexes[ordinal]
+            if (value != Int.Companion.MAX_VALUE.toFloat()) {
+                visibleLabels.add(value to Label.entries[ordinal])
+            }
+        }
+        var lastLabelRow: Int? = null
+        visibleLabels.sortedBy { it.first }.forEach { (value, label) ->
+            val row = value.toInt()
+            if (row != lastLabelRow) {
+                labelRows.add(ArrayList())
+                lastLabelRow = row
+            }
+            labelRows.last().add(label)
+        }
 
         val lViewsParent = labelViews[0]!!.getParent() as LinearLayout
 
@@ -7820,19 +7835,19 @@ class UIManager(
         for (count in labelViews.indices) {
             labelViews[count]!!.setOnTouchListener(this)
 
-            val os = sequence.get(count)
+            val os = labelRows.getOrNull(count).orEmpty()
 
             //            views on the same line
             for (j in os.indices) {
 //                i is the object gave to the constructor
-                val i = (os[j] as Label).ordinal
+                val i = os[j].ordinal
                 //                v is the adjusted index (2.0, 2.1, 2.2, ...)
                 val v = count.toFloat() + (j.toFloat() * 0.1f)
 
                 labelIndexes[i] = v
             }
 
-            if (count >= sequence.getMinKey() && count <= sequence.getMaxKey() && os.size > 0) {
+            if (os.isNotEmpty()) {
                 if (os.size == 1 && os[0] == Label.ascii) {
                     ensureAsciiViewportView(lViewsParent, count)
                 }

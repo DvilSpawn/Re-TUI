@@ -18,8 +18,6 @@ import ohi.andre.consolelauncher.managers.xml.options.Apps
 import ohi.andre.consolelauncher.tuils.Tuils
 import java.io.File
 import java.util.Locale
-import android.content.pm.PackageInfo
-import ohi.andre.consolelauncher.managers.settings.LauncherSettings
 
 class apps : ParamCommand() {
     private enum class Param : ohi.andre.consolelauncher.commands.main.Param {
@@ -193,86 +191,6 @@ class apps : ParamCommand() {
             }
         },
 
-        //        services {
-        //            @Override
-        //            public int[] args() {
-        //                return new int[] {CommandAbstraction.VISIBLE_PACKAGE};
-        //            }
-        //
-        //            @Override
-        //            public String exec(ExecutePack pack) {
-        //                AppsManager.LaunchInfo info = pack.get(AppsManager.LaunchInfo.class, 1);
-        //
-        //                List<String> services = new ArrayList<>();
-        //
-        //                ActivityManager activityManager = (ActivityManager) pack.context.getSystemService(Context.ACTIVITY_SERVICE);
-        //                for(ActivityManager.RunningServiceInfo i : activityManager.getRunningServices(Integer.MAX_VALUE)) {
-        //                    ComponentName name = i.service;
-        //
-        //                    if(info.equals(name.getPackageName())) {
-        //                        services.add(name.getClassName().replace(name.getPackageName(), Tuils.EMPTYSTRING));
-        //                    }
-        //                }
-        //
-        //                if(services.size() == 0) return "[]";
-        //                Collections.sort(services);
-        //                return Tuils.toPlanString(services, Tuils.NEWLINE);
-        //            }
-        //
-        //            @Override
-        //            public String onNotArgEnough(ExecutePack pack, int n) {
-        //
-        //                List<SimpleMutableEntry<String, ArrayList<String>>> services = new ArrayList<>();
-        //
-        //                ActivityManager activityManager = (ActivityManager) pack.context.getSystemService(Context.ACTIVITY_SERVICE);
-        //                Tuils.log(activityManager.getRunningServices(Integer.MAX_VALUE).toString());
-        //                for(ActivityManager.RunningServiceInfo i : activityManager.getRunningServices(Integer.MAX_VALUE)) {
-        //
-        //                    boolean check = false;
-        //                    for(SimpleMutableEntry<String, ArrayList<String>> s : services) {
-        //                        if(s.getKey().equals(i.service.getPackageName())) {
-        //                            s.getValue().add(i.service.getClassName().replace(i.service.getPackageName(), Tuils.EMPTYSTRING));
-        //
-        //                            check = true;
-        //                            break;
-        //                        }
-        //                    }
-        //
-        //                    if(!check) {
-        //                        SimpleMutableEntry<String,ArrayList<String>> s = new SimpleMutableEntry<>(i.service.getPackageName(), new ArrayList<String>());
-        //                        s.getValue().add(i.service.getClassName().replace(i.service.getPackageName(), Tuils.EMPTYSTRING));
-        //                        services.add(s);
-        //                    }
-        //                }
-        //
-        //                if(services.size() == 0) return "[]";
-        //                Collections.sort(services, new Comparator<SimpleMutableEntry<String, ArrayList<String>>>() {
-        //                    @Override
-        //                    public int compare(SimpleMutableEntry<String, ArrayList<String>> o1, SimpleMutableEntry<String, ArrayList<String>> o2) {
-        //                        return o1.getKey().compareTo(o2.getKey());
-        //                    }
-        //                });
-        //
-        //                PackageManager manager = pack.context.getPackageManager();
-        //                StringBuilder b = new StringBuilder();
-        //                for(SimpleMutableEntry<String, ArrayList<String>> s : services) {
-        //                    String appName = null;
-        //                    try {
-        //                        appName = manager.getApplicationInfo(s.getKey(), 0).loadLabel(manager).toString();
-        //                    } catch (PackageManager.NameNotFoundException e) {}
-        //
-        //                    if(appName != null) b.append(appName).append(Tuils.SPACE).append("(").append(s.getKey()).append(")");
-        //                    else b.append(s.getKey());
-        //                    b.append(Tuils.NEWLINE);
-        //
-        //                    for(String st : s.getValue()) {
-        //                        b.append(" - ").append(st).append(Tuils.NEWLINE);
-        //                    }
-        //                    b.append(Tuils.NEWLINE);
-        //                }
-        //                return b.toString().trim();
-        //            }
-        //        },
         reset {
             override fun args(): IntArray? {
                 return intArrayOf(CommandAbstraction.VISIBLE_PACKAGE)
