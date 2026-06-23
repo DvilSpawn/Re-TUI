@@ -2014,6 +2014,11 @@ class UIManager(
             }
         )
         updateTerminalTrayToggleText()
+        applyTerminalOutputContentInsets()
+        terminalTrayToggle?.post(Runnable {
+            applyTerminalOutputContentInsets()
+            applyTerminalTrayState(false)
+        })
     }
 
     private fun setTerminalTrayExpanded(expanded: Boolean) {
@@ -2193,7 +2198,7 @@ class UIManager(
         }
         val contentHeight =
             ((lineCount * max(terminalView!!.getLineHeight(), UIUtils.dpToPx(mContext!!, 18)))
-                    + UIUtils.dpToPx(mContext!!, 38))
+                    + terminalOutputChromeHeight())
         return max(minHeight, min(maxHeight, contentHeight))
     }
 
@@ -2210,8 +2215,67 @@ class UIManager(
         }
         val contentHeight =
             ((lineCount * max(terminalView!!.getLineHeight(), UIUtils.dpToPx(mContext!!, 18)))
-                    + UIUtils.dpToPx(mContext!!, 38))
+                    + terminalOutputChromeHeight())
         return max(minHeight, min(maxHeight, contentHeight))
+    }
+
+    private fun applyTerminalOutputContentInsets() {
+        val context = mContext ?: return
+        val outputBorder = terminalOutputBorder ?: return
+        val outputMargins = margins[OUTPUT_MARGINS_INDEX] ?: return
+        val horizontalInset = max(0, outputMargins[2]) +
+                UIUtils.dpToPx(context, TERMINAL_OUTPUT_HORIZONTAL_PADDING_DP)
+        val verticalUserInset = max(0, outputMargins[3])
+        val topInset = verticalUserInset + terminalOutputTopContentInset()
+        val bottomInset = verticalUserInset +
+                UIUtils.dpToPx(context, TERMINAL_OUTPUT_BOTTOM_PADDING_DP)
+
+        if (outputBorder.paddingLeft == horizontalInset
+            && outputBorder.paddingTop == topInset
+            && outputBorder.paddingRight == horizontalInset
+            && outputBorder.paddingBottom == bottomInset
+        ) {
+            return
+        }
+
+        outputBorder.setPadding(horizontalInset, topInset, horizontalInset, bottomInset)
+    }
+
+    private fun terminalOutputChromeHeight(): Int {
+        val context = mContext ?: return 0
+        val fallback = UIUtils.dpToPx(context, TERMINAL_OUTPUT_HEIGHT_ALLOWANCE_DP)
+        val outputBorder = terminalOutputBorder ?: return fallback
+        val borderMargins = outputBorder.layoutParams as? MarginLayoutParams
+        val containerPadding = (terminalContainer?.paddingTop ?: 0) +
+                (terminalContainer?.paddingBottom ?: 0)
+        val dynamicHeight = containerPadding +
+                (borderMargins?.topMargin ?: 0) +
+                (borderMargins?.bottomMargin ?: 0) +
+                outputBorder.paddingTop +
+                outputBorder.paddingBottom
+        return max(fallback, dynamicHeight)
+    }
+
+    private fun terminalOutputTopContentInset(): Int {
+        val context = mContext ?: return 0
+        val baseInset = UIUtils.dpToPx(context, TERMINAL_OUTPUT_TOP_PADDING_DP)
+        if (this.isOutputHeaderNone) {
+            return baseInset
+        }
+
+        val toggle = terminalTrayToggle ?: return baseInset
+        val headerHeight = when {
+            toggle.height > 0 -> toggle.height
+            toggle.measuredHeight > 0 -> toggle.measuredHeight
+            else -> (toggle.textSize + toggle.paddingTop + toggle.paddingBottom).roundToInt()
+        }
+        val headerTopMargin = (toggle.layoutParams as? MarginLayoutParams)?.topMargin ?: 0
+        val headerClearance = max(
+            0,
+            headerHeight + headerTopMargin +
+                    UIUtils.dpToPx(context, TERMINAL_OUTPUT_HEADER_GAP_DP)
+        )
+        return max(baseInset, headerClearance)
     }
 
     private fun resolveTerminalWindowBgColor(bgColor: String?): Int {
@@ -12710,6 +12774,11 @@ class UIManager(
         const val UNLOCK_KEY: String = "unlockTimes"
         const val PREFS_NAME: String = "ui"
         private const val PREF_OUTPUT_TRAY_EXPANDED = "output_tray_expanded"
+        private const val TERMINAL_OUTPUT_HORIZONTAL_PADDING_DP = 8
+        private const val TERMINAL_OUTPUT_TOP_PADDING_DP = 12
+        private const val TERMINAL_OUTPUT_BOTTOM_PADDING_DP = 6
+        private const val TERMINAL_OUTPUT_HEADER_GAP_DP = 6
+        private const val TERMINAL_OUTPUT_HEIGHT_ALLOWANCE_DP = 38
         private const val CLOCK_EDGE_LEFT = "left"
         private const val CLOCK_EDGE_RIGHT = "right"
         private const val CLOCK_EDGE_TOP = "top"

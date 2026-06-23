@@ -19,9 +19,9 @@ import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsList
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave
 import ohi.andre.consolelauncher.tuils.StoppableThread
 import ohi.andre.consolelauncher.tuils.Tuils
-import ohi.andre.consolelauncher.tuils.html_escape.HtmlEscape
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import org.jsoup.parser.Parser
 import org.w3c.dom.Document
 import org.w3c.dom.Element
 import org.w3c.dom.Node
@@ -1035,7 +1035,7 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
                             Int.Companion.MAX_VALUE
                         ).toString()
                     } else {
-                        value = HtmlEscape.unescapeHtml(value)
+                        value = unescapeHtml(value)
 
                         for (p in hideTagPatterns!!) {
                             if (p != null) {
@@ -1231,7 +1231,7 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
     private fun cleanModuleText(value: String?): String {
         var value = value
         if (value == null) return Tuils.EMPTYSTRING
-        value = HtmlEscape.unescapeHtml(value)
+        value = unescapeHtml(value)
         if (hideTagPatterns != null) {
             for (p in hideTagPatterns) {
                 if (p != null) value = p.matcher(value).replaceAll(Tuils.EMPTYSTRING)
@@ -1239,6 +1239,10 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
         }
         value = removeTags.matcher(value).replaceAll(Tuils.EMPTYSTRING)
         return value.replace("\\s+".toRegex(), Tuils.SPACE).trim { it <= ' ' }
+    }
+
+    private fun unescapeHtml(value: String?): String {
+        return if (value == null) Tuils.EMPTYSTRING else Parser.unescapeEntities(value, false)
     }
 
     private fun shorten(value: String?, max: Int): String? {
