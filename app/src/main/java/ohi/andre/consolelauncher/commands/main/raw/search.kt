@@ -11,8 +11,8 @@ import ohi.andre.consolelauncher.commands.main.specific.ParamCommand
 import ohi.andre.consolelauncher.managers.SearchProviderManager
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave
 import ohi.andre.consolelauncher.managers.xml.options.Cmd
-import ohi.andre.consolelauncher.tuils.SimpleMutableEntry
 import ohi.andre.consolelauncher.tuils.Tuils
+import java.util.AbstractMap.SimpleEntry
 import java.util.Locale
 import java.io.File
 import java.util.ArrayList
@@ -171,11 +171,11 @@ class search : ParamCommand() {
     public override fun getParam(
         pack: MainPack,
         param: String
-    ): SimpleMutableEntry<Boolean, ohi.andre.consolelauncher.commands.main.Param?> {
+    ): SimpleEntry<Boolean, ohi.andre.consolelauncher.commands.main.Param?> {
         val managementParam: ohi.andre.consolelauncher.commands.main.Param? =
             Param.Companion.get(param)
         if (managementParam != null) {
-            return SimpleMutableEntry<Boolean, ohi.andre.consolelauncher.commands.main.Param?>(
+            return SimpleEntry<Boolean, ohi.andre.consolelauncher.commands.main.Param?>(
                 false,
                 managementParam
             )
@@ -183,7 +183,7 @@ class search : ParamCommand() {
 
         val provider = SearchProviderManager.get(param)
         if (provider != null) {
-            return SimpleMutableEntry<Boolean, ohi.andre.consolelauncher.commands.main.Param?>(
+            return SimpleEntry<Boolean, ohi.andre.consolelauncher.commands.main.Param?>(
                 false,
                 SearchProviderParam(provider)
             )

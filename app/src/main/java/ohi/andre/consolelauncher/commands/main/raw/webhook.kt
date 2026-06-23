@@ -8,7 +8,6 @@ import ohi.andre.consolelauncher.commands.ExecutePack
 import ohi.andre.consolelauncher.commands.main.MainPack
 import ohi.andre.consolelauncher.commands.main.specific.ParamCommand
 import ohi.andre.consolelauncher.managers.WebhookManager.Webhook
-import ohi.andre.consolelauncher.tuils.SimpleMutableEntry
 import ohi.andre.consolelauncher.tuils.Tuils
 import okhttp3.Call
 import okhttp3.Callback
@@ -21,6 +20,7 @@ import okhttp3.Response
 import org.json.JSONException
 import java.io.IOException
 import java.lang.ref.WeakReference
+import java.util.AbstractMap.SimpleEntry
 import java.util.Locale
 import java.util.ArrayList
 import ohi.andre.consolelauncher.managers.WebhookManager
@@ -138,10 +138,10 @@ class webhook : ParamCommand() {
     public override fun getParam(
         pack: MainPack,
         param: String
-    ): SimpleMutableEntry<Boolean, ohi.andre.consolelauncher.commands.main.Param?> {
+    ): SimpleEntry<Boolean, ohi.andre.consolelauncher.commands.main.Param?> {
         packRef = WeakReference<MainPack>(pack)
         val p: ohi.andre.consolelauncher.commands.main.Param? = Param.Companion.get(param)
-        if (p != null) return SimpleMutableEntry<Boolean, ohi.andre.consolelauncher.commands.main.Param?>(
+        if (p != null) return SimpleEntry<Boolean, ohi.andre.consolelauncher.commands.main.Param?>(
             false,
             p
         )
@@ -151,7 +151,7 @@ class webhook : ParamCommand() {
             if (firstWord.startsWith(Tuils.MINUS)) firstWord.substring(1) else firstWord
         val w = pack.webhookManager.getWebhook(webhookName)
         if (w != null) {
-            return SimpleMutableEntry<Boolean, ohi.andre.consolelauncher.commands.main.Param?>(
+            return SimpleEntry<Boolean, ohi.andre.consolelauncher.commands.main.Param?>(
                 false,
                 WebhookParam(w)
             )

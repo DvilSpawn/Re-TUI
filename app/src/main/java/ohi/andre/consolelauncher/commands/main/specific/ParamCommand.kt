@@ -6,8 +6,8 @@ import ohi.andre.consolelauncher.commands.ExecutePack
 import ohi.andre.consolelauncher.commands.main.MainPack
 import ohi.andre.consolelauncher.commands.main.Param
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave
-import ohi.andre.consolelauncher.tuils.SimpleMutableEntry
 import ohi.andre.consolelauncher.tuils.Tuils
+import java.util.AbstractMap.SimpleEntry
 
 abstract class ParamCommand : CommandAbstraction {
     final override fun argType(): IntArray = intArrayOf(CommandAbstraction.PARAM)
@@ -31,12 +31,12 @@ abstract class ParamCommand : CommandAbstraction {
         return param.exec(pack)
     }
 
-    open fun getParam(pack: MainPack, param: String): SimpleMutableEntry<Boolean, Param?> {
+    open fun getParam(pack: MainPack, param: String): SimpleEntry<Boolean, Param?> {
         val p = paramForString(pack, param)
         if (p == null && defaultParamReference() != null) {
-            return SimpleMutableEntry(true, paramForString(pack, defaultParam(pack)))
+            return SimpleEntry(true, paramForString(pack, defaultParam(pack)))
         }
-        return SimpleMutableEntry(false, p)
+        return SimpleEntry(false, p)
     }
 
     fun defaultParam(pack: MainPack): String {

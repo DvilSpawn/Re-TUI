@@ -22,9 +22,9 @@ import ohi.andre.consolelauncher.managers.xml.options.Apps
 import ohi.andre.consolelauncher.managers.xml.options.Behavior
 import ohi.andre.consolelauncher.managers.xml.options.Notifications
 import ohi.andre.consolelauncher.managers.xml.options.Rss
-import ohi.andre.consolelauncher.tuils.SimpleMutableEntry
 import ohi.andre.consolelauncher.tuils.Tuils
 import java.io.File
+import java.util.AbstractMap.SimpleEntry
 import java.util.Arrays
 import java.util.Collections
 import java.util.ArrayList
@@ -502,7 +502,7 @@ object CommandTuils {
         var param = input.substring(0, indexOfFirstSpace).trim { it <= ' ' }
         if (!param.startsWith("-")) param = "-" + param
 
-        val sm: SimpleMutableEntry<Boolean, Param?> = cmd.getParam(pack, param)
+        val sm: SimpleEntry<Boolean, Param?> = cmd.getParam(pack, param)
         val p = sm.value
         val df: Boolean = sm.key
 

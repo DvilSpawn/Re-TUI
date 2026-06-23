@@ -165,7 +165,6 @@ import ohi.andre.consolelauncher.tuils.AsciiArtTextView
 import ohi.andre.consolelauncher.tuils.CrtOverlayDrawable
 import ohi.andre.consolelauncher.tuils.CyberpunkBackdropDrawable
 import ohi.andre.consolelauncher.tuils.CyberpunkIconFrameDrawable
-import ohi.andre.consolelauncher.tuils.DuoSwitchButtonFactory
 import ohi.andre.consolelauncher.tuils.MusicVisualizerView
 import ohi.andre.consolelauncher.tuils.OutlineEditText
 import ohi.andre.consolelauncher.tuils.OutlineTextView
@@ -1693,16 +1692,24 @@ class UIManager(
     }
 
     private fun createDuoSwitchButton(targetMode: String?, moveToLeft: Boolean): TextView {
-        return DuoSwitchButtonFactory.create(
+        val button = TextView(mContext)
+        val textColor = terminalBorderColor()
+        button.text = if (moveToLeft) "<<" else ">>"
+        button.contentDescription = "Move Re:T-UI to $targetMode screen"
+        button.gravity = Gravity.CENTER
+        button.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
+        button.textSize = 18f
+        button.setTextColor(textColor)
+        button.background = TerminalBorderRuntime.panelDrawablePx(
             mContext,
-            targetMode,
-            moveToLeft,
-            terminalBorderColor(),
-            terminalHeaderBackground(),
-            max(genericBorderCornerRadius, Tuils.dpToPx(mContext, 6)),
-            useDashed,
-            onClick = { mode -> setDuoLayoutMode(mode) }
+            ColorUtils.setAlphaComponent(terminalHeaderBackground(), 224),
+            textColor,
+            1.5f,
+            max(genericBorderCornerRadius, Tuils.dpToPx(mContext, 6)).toFloat(),
+            useDashed
         )
+        button.setOnClickListener { setDuoLayoutMode(targetMode) }
+        return button
     }
 
     private fun applyLandscapeFoldGutter(configuration: Configuration?) {
