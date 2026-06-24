@@ -1,7 +1,5 @@
 package ohi.andre.consolelauncher.commands.main.raw
 
-import android.os.Handler
-import android.os.Looper
 import ohi.andre.consolelauncher.commands.CommandAbstraction
 import ohi.andre.consolelauncher.commands.ExecutePack
 import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog
@@ -12,9 +10,10 @@ class pomodoro : CommandAbstraction {
 
     override fun exec(pack: ExecutePack): String {
         val input = pack.get(String::class.java, 0)
+        val task = input?.trim()
         val manager = PomodoroManager.getInstance(pack.context)
 
-        if (input != null && input == "-stop") {
+        if (task == "-stop") {
             return if (manager.isRunning) {
                 manager.stopSession()
                 "Pomodoro session stopped."
@@ -27,11 +26,22 @@ class pomodoro : CommandAbstraction {
             return "A Pomodoro session is already active."
         }
 
-        Handler(Looper.getMainLooper()).post {
-            TuixtDialog.showInput(pack.context, "NEW POMODORO", "What task are we focusing on?", "START", "CANCEL") { value ->
-                if (value != null && value.trim().isNotEmpty()) {
-                    PomodoroManager.getInstance(pack.context).startPomodoro(value.trim())
-                }
+        if (!task.isNullOrEmpty()) {
+            manager.startPomodoro(task)
+            return "Pomodoro started: $task"
+        }
+
+        TuixtDialog.showInput(
+            pack.context,
+            "NEW POMODORO",
+            "What task are we focusing on?",
+            "START",
+            "CANCEL"
+        ) { value ->
+            val taskName = value?.trim().orEmpty().ifEmpty { DEFAULT_TASK }
+            val currentManager = PomodoroManager.getInstance(pack.context)
+            if (!currentManager.isRunning) {
+                currentManager.startPomodoro(taskName)
             }
         }
 
@@ -45,4 +55,8 @@ class pomodoro : CommandAbstraction {
     override fun onArgNotFound(pack: ExecutePack, indexNotFound: Int): String = exec(pack)
 
     override fun onNotArgEnough(pack: ExecutePack, nArgs: Int): String = exec(pack)
+
+    companion object {
+        private const val DEFAULT_TASK = "Focus"
+    }
 }
