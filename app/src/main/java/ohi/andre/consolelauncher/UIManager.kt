@@ -11712,7 +11712,13 @@ class UIManager(
             terminateBtn.setText("EXIT SESSION")
         } else {
             countdown.setVisibility(View.VISIBLE)
-            terminateBtn.setText("TERMINATE SESSION")
+            if (!RetuiCreditManager.isDystopiaEnabled(mContext)) {
+                terminateBtn.setText("TERMINATE SESSION")
+            } else if (RetuiCreditManager.wallet(mContext).credits >= RetuiCreditManager.ESCAPE_COST) {
+                terminateBtn.setText("SKIP POMODORO -${RetuiCreditManager.ESCAPE_COST} CREDITS")
+            } else {
+                terminateBtn.setText("EMERGENCY BREACH")
+            }
             if (type == SessionType.BREAK) {
                 title.setText("TAKE A BREAK")
                 title.setTextColor(XMLPrefsManager.getColor(Theme.input_text_color))
@@ -11773,7 +11779,7 @@ class UIManager(
                 TuixtDialog.showConfirm(
                     mContext,
                     "TERMINATE",
-                    "Do you really want to stop the focus session?",
+                    pomodoroStopConfirmText(),
                     "YES",
                     "NO",
                     ConfirmAction {
@@ -11781,6 +11787,17 @@ class UIManager(
                     })
             }
         })
+    }
+
+    private fun pomodoroStopConfirmText(): String {
+        if (!RetuiCreditManager.isDystopiaEnabled(mContext)) {
+            return "Do you really want to stop the focus session?"
+        }
+        return if (RetuiCreditManager.wallet(mContext).credits >= RetuiCreditManager.ESCAPE_COST) {
+            "Stop this Pomodoro for ${RetuiCreditManager.ESCAPE_COST} credits?"
+        } else {
+            "Not enough credits. Try an emergency breach?"
+        }
     }
 
     private fun terminatePomodoroEarly(manager: PomodoroManager) {
