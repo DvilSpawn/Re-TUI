@@ -4,6 +4,7 @@ import java.util.Locale
 import ohi.andre.consolelauncher.commands.CommandAbstraction
 import ohi.andre.consolelauncher.commands.ExecutePack
 import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog
+import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog.FormField
 import ohi.andre.consolelauncher.managers.ClockManager
 import ohi.andre.consolelauncher.managers.LockdownManager
 import ohi.andre.consolelauncher.managers.RetuiCreditManager
@@ -33,14 +34,21 @@ class lockdown : CommandAbstraction {
         }
 
         if (input.isEmpty()) {
-            TuixtDialog.showInput(
+            TuixtDialog.showValidatedForm(
                 pack.context,
                 "NEW LOCKDOWN",
-                "Duration and reason, e.g. 30m deep work",
+                listOf(
+                    FormField(FIELD_DURATION, "Duration", "00h 00m"),
+                    FormField(FIELD_REASON, "Reason", "Reason")
+                ),
                 "START",
-                "CANCEL"
-            ) { value ->
-                val result = startFromInput(manager, value?.trim().orEmpty())
+                "CANCEL",
+                { values -> validateLockdownForm(values) }
+            ) { values ->
+                val result = manager.start(
+                    ClockManager.parseDurationMillis(values[FIELD_DURATION]),
+                    values[FIELD_REASON]
+                )
                 Tuils.sendOutput(pack.context, result)
             }
             return "Opening Lockdown setup..."
@@ -59,12 +67,28 @@ class lockdown : CommandAbstraction {
 
     companion object {
         private const val HELP = "Usage: lockdown [duration] [reason]\nExample: lockdown 30m deep work\nOptions: -status, -stop"
+        private const val FIELD_DURATION = "duration"
+        private const val FIELD_REASON = "reason"
 
         private fun startFromInput(manager: LockdownManager, input: String): String {
             val split = input.split("\\s+".toRegex(), limit = 2)
-            val duration = ClockManager.parseDurationMillis(split.getOrNull(0))
+            val durationText = split.getOrNull(0).orEmpty()
             val reason = if (split.size > 1) split[1] else ""
+            val error = validateDurationReason(durationText, reason)
+            if (error != null) return error
+            val duration = ClockManager.parseDurationMillis(durationText)
             return manager.start(duration, reason)
+        }
+
+        private fun validateLockdownForm(values: Map<String, String>): String? {
+            return validateDurationReason(values[FIELD_DURATION].orEmpty(), values[FIELD_REASON].orEmpty())
+        }
+
+        private fun validateDurationReason(duration: String, reason: String): String? {
+            if (duration.isBlank()) return "Duration is missing."
+            if (reason.isBlank()) return "Reason is missing."
+            if (ClockManager.parseDurationMillis(duration) <= 0L) return "Duration is invalid."
+            return null
         }
     }
 }

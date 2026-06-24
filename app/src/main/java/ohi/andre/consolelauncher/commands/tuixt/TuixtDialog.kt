@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Handler
 import android.os.Looper
+import android.text.InputType
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -31,6 +32,13 @@ import java.util.Locale
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi
 
 object TuixtDialog {
+    data class FormField(
+        val key: String,
+        val label: String,
+        val hint: String? = null,
+        val inputType: Int = InputType.TYPE_CLASS_TEXT
+    )
+
     fun showOptions(
         context: Context,
         title: String,
@@ -95,6 +103,81 @@ object TuixtDialog {
             show(dialog)
             dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
             input.post {
+                input.requestFocus()
+                (context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager)
+                    ?.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT)
+            }
+        })
+    }
+
+    fun showValidatedForm(
+        context: Context,
+        title: String,
+        fields: List<FormField>,
+        positive: String,
+        negative: String,
+        validator: FormValidator,
+        action: FormAction
+    ) {
+        Handler(Looper.getMainLooper()).post(Runnable {
+            val dialog = createDialog(context)
+            val content = createContent(context)
+            val inputs = LinkedHashMap<String, EditText>()
+
+            fields.forEach { field ->
+                val label = TextView(context)
+                label.text = field.label.uppercase(Locale.getDefault())
+                label.setTextColor(textColor())
+                label.setTypeface(Tuils.getTypeface(context))
+                label.textSize = 12f
+                label.setPadding(0, dp(context, 6f), 0, dp(context, 4f))
+                content.addView(label)
+
+                val input = EditText(context)
+                input.hint = field.hint
+                input.inputType = field.inputType
+                styleInput(context, input)
+                content.addView(
+                    input,
+                    LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                    )
+                )
+                inputs[field.key] = input
+            }
+
+            val error = TextView(context)
+            error.setTextColor(Color.RED)
+            error.setTypeface(Tuils.getTypeface(context))
+            error.textSize = 12f
+            error.visibility = View.GONE
+            error.setPadding(0, dp(context, 8f), 0, 0)
+            content.addView(error)
+
+            val buttons = buttons(
+                context,
+                dialog,
+                positive,
+                negative,
+                ConfirmAction {
+                    val values = inputs.mapValues { it.value.text.toString().trim() }
+                    val message = validator.validate(values)
+                    if (message != null) {
+                        error.text = message
+                        error.visibility = View.VISIBLE
+                        return@ConfirmAction
+                    }
+                    dialog.dismiss()
+                    action.onSubmit(values)
+                },
+                false
+            )
+            dialog.setContentView(wrap(context, title, content, buttons))
+            show(dialog)
+            dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+            inputs.values.firstOrNull()?.post {
+                val input = inputs.values.firstOrNull() ?: return@post
                 input.requestFocus()
                 (context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager)
                     ?.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT)
@@ -260,6 +343,15 @@ object TuixtDialog {
         positive: String,
         negative: String,
         action: ConfirmAction
+    ): LinearLayout = buttons(context, dialog, positive, negative, action, true)
+
+    private fun buttons(
+        context: Context,
+        dialog: Dialog,
+        positive: String,
+        negative: String,
+        action: ConfirmAction,
+        dismissOnConfirm: Boolean
     ): LinearLayout {
         val row = LinearLayout(context)
         row.setOrientation(LinearLayout.HORIZONTAL)
@@ -285,7 +377,9 @@ object TuixtDialog {
         confirm.setText(positive.uppercase(Locale.getDefault()))
         styleButton(context, confirm, true)
         confirm.setOnClickListener(View.OnClickListener { v: View? ->
-            dialog.dismiss()
+            if (dismissOnConfirm) {
+                dialog.dismiss()
+            }
             action.onConfirm()
         })
         row.addView(
@@ -324,6 +418,14 @@ object TuixtDialog {
 
     fun interface ConfirmAction {
         fun onConfirm()
+    }
+
+    fun interface FormValidator {
+        fun validate(values: Map<String, String>): String?
+    }
+
+    fun interface FormAction {
+        fun onSubmit(values: Map<String, String>)
     }
 
     fun interface ContentFactory {

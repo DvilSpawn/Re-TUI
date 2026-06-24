@@ -231,9 +231,10 @@ class ClockManager private constructor(context: Context) {
         const val EXTRA_STOPWATCH_ELAPSED: String = "stopwatch_elapsed"
         const val EXTRA_MESSAGE: String = "message"
 
-        private val DURATION_PATTERN: Pattern = Pattern.compile("(?i)^\\s*(\\d+)\\s*([smh])\\s*$")
+        private val DURATION_PATTERN: Pattern = Pattern.compile("(?i)(\\d+)\\s*([smh])")
 
         private var instance: ClockManager? = null
+        private var durationSelfChecked = false
 
         @Synchronized
         fun getInstance(context: Context): ClockManager {
@@ -244,23 +245,50 @@ class ClockManager private constructor(context: Context) {
         }
 
         fun parseDurationMillis(value: String?): Long {
+            ensureDurationSelfCheck()
+            return parseDurationMillisUnchecked(value)
+        }
+
+        private fun parseDurationMillisUnchecked(value: String?): Long {
             if (value == null) {
                 return -1L
             }
 
-            val matcher: Matcher = DURATION_PATTERN.matcher(value)
-            if (!matcher.matches()) {
-                return -1L
+            val input = value.trim()
+            val matcher: Matcher = DURATION_PATTERN.matcher(input)
+            var total = 0L
+            var end = 0
+            var found = false
+
+            while (matcher.find()) {
+                if (input.substring(end, matcher.start()).isNotBlank()) {
+                    return -1L
+                }
+                val amount = matcher.group(1).toLong()
+                val unit = matcher.group(2).lowercase(Locale.getDefault())
+                total += when (unit) {
+                    "s" -> amount * 1000L
+                    "m" -> amount * 60000L
+                    "h" -> amount * 3600000L
+                    else -> return -1L
+                }
+                end = matcher.end()
+                found = true
             }
 
-            val amount = matcher.group(1).toLong()
-            val unit = matcher.group(2).lowercase(Locale.getDefault())
-            when (unit) {
-                "s" -> return amount * 1000L
-                "m" -> return amount * 60000L
-                "h" -> return amount * 3600000L
-                else -> return -1L
+            if (!found || input.substring(end).isNotBlank()) {
+                return -1L
             }
+            return total
+        }
+
+        private fun ensureDurationSelfCheck() {
+            if (durationSelfChecked) return
+            check(parseDurationMillisUnchecked("30m") == 1800000L)
+            check(parseDurationMillisUnchecked("1h 30m") == 5400000L)
+            check(parseDurationMillisUnchecked("00h 00m") == 0L)
+            check(parseDurationMillisUnchecked("1h nope") == -1L)
+            durationSelfChecked = true
         }
 
         fun formatDuration(millis: Long): String {

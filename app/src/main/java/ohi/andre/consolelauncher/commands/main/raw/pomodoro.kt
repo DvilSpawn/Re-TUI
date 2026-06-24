@@ -4,6 +4,7 @@ import ohi.andre.consolelauncher.commands.CommandAbstraction
 import ohi.andre.consolelauncher.commands.ExecutePack
 import ohi.andre.consolelauncher.commands.tuixt.BreachDialog
 import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog
+import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog.FormField
 import ohi.andre.consolelauncher.managers.BreachManager
 import ohi.andre.consolelauncher.managers.PomodoroManager
 import ohi.andre.consolelauncher.managers.PomodoroManager.SessionType
@@ -50,14 +51,15 @@ class pomodoro : CommandAbstraction {
             return "Pomodoro started: $task"
         }
 
-        TuixtDialog.showInput(
+        TuixtDialog.showValidatedForm(
             pack.context,
             "NEW POMODORO",
-            "What task are we focusing on?",
+            listOf(FormField(FIELD_GOAL, "Goal", "What task are we focusing on?")),
             "START",
-            "CANCEL"
-        ) { value ->
-            val taskName = value?.trim().orEmpty().ifEmpty { DEFAULT_TASK }
+            "CANCEL",
+            { values -> validatePomodoroForm(values) }
+        ) { values ->
+            val taskName = values[FIELD_GOAL].orEmpty()
             val currentManager = PomodoroManager.getInstance(pack.context)
             if (!currentManager.isRunning) {
                 currentManager.startPomodoro(taskName)
@@ -76,6 +78,9 @@ class pomodoro : CommandAbstraction {
     override fun onNotArgEnough(pack: ExecutePack, nArgs: Int): String = exec(pack)
 
     companion object {
-        private const val DEFAULT_TASK = "Focus"
+        private const val FIELD_GOAL = "goal"
+
+        private fun validatePomodoroForm(values: Map<String, String>): String? =
+            if (values[FIELD_GOAL].isNullOrBlank()) "Goal is missing." else null
     }
 }
