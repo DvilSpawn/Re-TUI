@@ -3,6 +3,9 @@ package ohi.andre.consolelauncher.managers
 import android.content.Context
 import android.graphics.Color
 import android.graphics.Typeface
+import android.os.Build
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.view.Gravity
 import android.widget.TextView
 import androidx.core.graphics.ColorUtils
@@ -52,6 +55,22 @@ object FocusFrictionStyle {
             maxOf(1, dp(context, 1.5f)),
             dp(context, 10f).toFloat()
         )
+    }
+
+    fun vibrate(context: Context, pattern: LongArray) {
+        val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator ?: return
+        if (!vibrator.hasVibrator()) return
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            vibrator.vibrate(VibrationEffect.createWaveform(pattern, -1))
+        } else {
+            @Suppress("DEPRECATION")
+            vibrator.vibrate(pattern, -1)
+        }
+    }
+
+    fun cancelVibration(context: Context) {
+        val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator ?: return
+        vibrator.cancel()
     }
 
     fun dp(context: Context, value: Float): Int = Tuils.dpToPx(context, value).toInt()

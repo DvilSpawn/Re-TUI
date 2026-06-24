@@ -46,6 +46,7 @@ import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleListItem
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.stylePanel
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.textColor
 import ohi.andre.consolelauncher.managers.BackupManager
+import ohi.andre.consolelauncher.managers.FocusFrictionStyle
 import ohi.andre.consolelauncher.managers.LockdownManager
 import ohi.andre.consolelauncher.managers.PresetManager
 import ohi.andre.consolelauncher.managers.RetuiCreditManager
@@ -510,11 +511,13 @@ class ThemerActivity : AppCompatActivity() {
                 when (event.actionMasked) {
                     MotionEvent.ACTION_DOWN -> {
                         view.isPressed = true
+                        FocusFrictionStyle.vibrate(this, DYSTOPIA_HOLD_PATTERN)
                         handler.postDelayed(enable, DYSTOPIA_HOLD_MS)
                         true
                     }
                     MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                         handler.removeCallbacks(enable)
+                        FocusFrictionStyle.cancelVibration(this)
                         view.isPressed = false
                         if (event.actionMasked == MotionEvent.ACTION_UP) {
                             view.performClick()
@@ -1530,6 +1533,7 @@ class ThemerActivity : AppCompatActivity() {
         private const val SHAREABLE_CONFIG_EXPORT_REQUEST = 203
         private const val FONT_IMPORT_REQUEST = 204
         private const val DYSTOPIA_HOLD_MS = 3000L
+        private val DYSTOPIA_HOLD_PATTERN = longArrayOf(0L, 55L, 945L, 55L, 945L, 55L)
         private const val PLAY_STORE_PACKAGE_ID = "com.dvil.tui_renewed"
         private const val PLAY_STORE_MARKET_URL = "market://details?id=$PLAY_STORE_PACKAGE_ID"
         private const val PLAY_STORE_WEB_URL =

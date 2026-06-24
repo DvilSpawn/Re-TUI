@@ -1,12 +1,15 @@
 package ohi.andre.consolelauncher.commands.tuixt
 
+import android.animation.ObjectAnimator
 import android.app.Dialog
 import android.content.Context
+import android.graphics.Color
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.graphics.ColorUtils
 import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog.ConfirmAction
 import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog.ContentFactory
 import ohi.andre.consolelauncher.managers.BreachManager
@@ -50,6 +53,7 @@ object BreachDialog {
         val root = LinearLayout(context)
         root.orientation = LinearLayout.VERTICAL
         root.gravity = Gravity.CENTER
+        var closing = false
 
         addText(context, root, "TARGET: " + session.targets.joinToString("  ") { it.joinToString(" ") }, 12f)
         addText(context, root, "BUFFER: " + if (session.buffer.isEmpty()) "-" else session.buffer.joinToString(" "), 12f)
@@ -92,12 +96,25 @@ object BreachDialog {
 
                 if (session.isAvailable(cell)) {
                     token.setOnClickListener {
-                        dialog?.dismiss()
+                        if (closing) return@setOnClickListener
                         val result = session.pick(cell)
                         when {
-                            result.won -> finish(context, session, true, reward, onComplete)
-                            result.lost -> finish(context, session, false, reward, onComplete)
-                            else -> showSession(context, session, reward, onComplete)
+                            result.won -> {
+                                closing = true
+                                dialog?.dismiss()
+                                finish(context, session, true, reward, onComplete)
+                            }
+                            result.lost -> {
+                                closing = true
+                                failFeedback(context, root) {
+                                    dialog?.dismiss()
+                                    finish(context, session, false, reward, onComplete)
+                                }
+                            }
+                            else -> {
+                                dialog?.dismiss()
+                                showSession(context, session, reward, onComplete)
+                            }
                         }
                     }
                 }
@@ -105,6 +122,15 @@ object BreachDialog {
         }
 
         return root
+    }
+
+    private fun failFeedback(context: Context, root: View, after: () -> Unit) {
+        FocusFrictionStyle.vibrate(context, longArrayOf(0L, 60L, 45L, 60L, 45L, 120L))
+        root.setBackgroundColor(ColorUtils.setAlphaComponent(Color.RED, 95))
+        ObjectAnimator.ofFloat(root, View.TRANSLATION_X, 0f, -14f, 14f, -9f, 9f, 0f)
+            .setDuration(280L)
+            .start()
+        root.postDelayed(after, 340L)
     }
 
     private fun finish(
