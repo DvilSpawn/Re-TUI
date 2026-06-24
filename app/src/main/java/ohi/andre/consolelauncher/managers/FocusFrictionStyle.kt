@@ -9,11 +9,12 @@ import android.os.Vibrator
 import android.view.Gravity
 import android.widget.TextView
 import androidx.core.graphics.ColorUtils
+import ohi.andre.consolelauncher.managers.settings.AppearanceSettings
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings
 import ohi.andre.consolelauncher.managers.xml.options.Suggestions
 import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.managers.xml.options.Ui
-import ohi.andre.consolelauncher.tuils.FocusStickerDrawable
+import ohi.andre.consolelauncher.tuils.TerminalBorderRuntime
 import ohi.andre.consolelauncher.tuils.Tuils
 
 object FocusFrictionStyle {
@@ -49,11 +50,13 @@ object FocusFrictionStyle {
         view.gravity = Gravity.CENTER
         view.textSize = 13f
         view.setPadding(dp(context, 14f), dp(context, 10f), dp(context, 14f), dp(context, 10f))
-        view.background = FocusStickerDrawable(
+        view.background = TerminalBorderRuntime.panelDrawable(
+            context,
             fill,
             if (filled) text else buttonFill(),
-            maxOf(1, dp(context, 1.5f)),
-            dp(context, 10f).toFloat()
+            1.5f,
+            AppearanceSettings.moduleCornerRadius(),
+            false
         )
     }
 
