@@ -74,6 +74,7 @@ object BackupManager {
         "retui_module_prompt",
         "retui_callback_auth",
         "pomodoro_state",
+        RetuiCreditManager.PREFS,
         SpaceManager.PREFS,
         GuideManager.PREFS,
         "changelogPrefs"

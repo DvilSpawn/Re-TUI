@@ -4,13 +4,17 @@ V1 is an offline-only focus system. It is not DRM, anti-cheat, or secure device
 lockdown. If a user clears app data or edits a backup, they can bypass it. That
 is fine: this is local friction for a self-control tool.
 
+V1 is opt-in. Until the user enables `Opt into Dystopia` under Personalization,
+existing Pomodoro behavior stays unchanged and the credit, breach, and lockdown
+commands stay inactive.
+
 ## Scope
 
 - Retui Credits: local points used to end focus gates early.
 - Breach Keys: rare local tokens used to bypass a focus gate.
 - Pomodoro escape: spend credits to terminate early.
-- Lockdown: timer-driven focus mode that keeps Re:T-UI in front and blocks easy
-  app launch paths while active.
+- Lockdown: timer-driven full-screen overlay that takes over the launcher UI
+  while active.
 - Breach: small Cyberpunk-style sequence puzzle used to earn credits or escape
   when the user cannot pay.
 - Alarm integration: later feature using the same escape rules.
@@ -27,12 +31,23 @@ Persist in one SharedPreferences file, probably `retui_focus_friction`:
 | `credits` | int | Current Retui Credit balance. |
 | `breach_keys` | int | Current breach key count. |
 | `grant_version` | int | Last local grant version applied. |
+| `dystopia_enabled` | boolean | Whether the local focus-friction system is active. |
 | `lockdown_end_elapsed` | long | Active lockdown end time, or `-1`. |
 | `lockdown_total_ms` | long | Active lockdown total duration. |
 | `lockdown_reason` | string | Optional user label. |
 
 Initial grant: when `grant_version < 1`, add `1000` credits and set it to `1`.
 Do not grant on every app update unless we intentionally bump the grant version.
+
+Enablement flow:
+
+1. User opens Personalization.
+2. User selects `Opt into Dystopia`.
+3. Dialog explains that this enables local credits, breach keys, paid Pomodoro
+   exits, breach puzzles, and Lockdown.
+4. User must hold the fingerprint icon for `3` seconds.
+5. On completion, set `dystopia_enabled = true` and apply the one-time grant.
+6. Turning it off disables the system without deleting the stored wallet.
 
 ## Economy Rules
 
@@ -98,8 +113,8 @@ state.
 
 1. User starts `lockdown [duration] [reason]`.
 2. Re:T-UI shows a full-screen lockdown surface until the timer ends.
-3. App launch commands and obvious drawer launch paths return the lockdown
-   screen while active.
+3. The overlay hides the launcher chrome, input, suggestions, drawers, and
+   normal command surface while active.
 4. Early exit choices:
    - spend `500` credits
    - spend `1` breach key
@@ -127,6 +142,10 @@ state.
 
 Keep UI code as rendering glue. Do not put economy or lockdown policy in
 `UIManager`.
+
+V1 visual rule: use the warning-label/sticker shapes from the reference image,
+but take colors from the active launcher suggestion buttons and text. Do not
+hardcode the acid green/black palette.
 
 ## V1 Build Order
 

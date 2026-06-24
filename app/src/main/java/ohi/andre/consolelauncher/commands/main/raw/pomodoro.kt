@@ -2,8 +2,12 @@ package ohi.andre.consolelauncher.commands.main.raw
 
 import ohi.andre.consolelauncher.commands.CommandAbstraction
 import ohi.andre.consolelauncher.commands.ExecutePack
+import ohi.andre.consolelauncher.commands.tuixt.BreachDialog
 import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog
+import ohi.andre.consolelauncher.managers.BreachManager
 import ohi.andre.consolelauncher.managers.PomodoroManager
+import ohi.andre.consolelauncher.managers.PomodoroManager.SessionType
+import ohi.andre.consolelauncher.managers.RetuiCreditManager
 
 class pomodoro : CommandAbstraction {
     override fun argType(): IntArray = intArrayOf(CommandAbstraction.PLAIN_TEXT)
@@ -15,8 +19,23 @@ class pomodoro : CommandAbstraction {
 
         if (task == "-stop") {
             return if (manager.isRunning) {
-                manager.stopSession()
-                "Pomodoro session stopped."
+                if (manager.currentType == SessionType.FINISHED) {
+                    manager.stopSession()
+                    "Pomodoro session closed."
+                } else if (!RetuiCreditManager.isDystopiaEnabled(pack.context)) {
+                    manager.stopSession()
+                    "Pomodoro session stopped."
+                } else if (RetuiCreditManager.spendCredits(pack.context)) {
+                    manager.stopSession()
+                    "Pomodoro stopped. -${RetuiCreditManager.ESCAPE_COST} credits."
+                } else {
+                    BreachDialog.show(pack.context, BreachManager.Mode.EMERGENCY) { won ->
+                        if (won) {
+                            PomodoroManager.getInstance(pack.context).stopSession()
+                        }
+                    }
+                    "Not enough credits. Opening emergency breach..."
+                }
             } else {
                 "No Pomodoro session is running."
             }

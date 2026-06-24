@@ -75,13 +75,18 @@ import androidx.viewpager2.widget.ViewPager2
 import ohi.andre.consolelauncher.commands.main.MainPack
 import ohi.andre.consolelauncher.commands.main.raw.tbridge
 import ohi.andre.consolelauncher.commands.main.specific.RedirectCommand
+import ohi.andre.consolelauncher.commands.tuixt.BreachDialog
 import ohi.andre.consolelauncher.commands.tuixt.ThemerActivity
 import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog
 import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog.ConfirmAction
 import ohi.andre.consolelauncher.managers.AliasManager
+import ohi.andre.consolelauncher.managers.BreachManager
 import ohi.andre.consolelauncher.managers.ClockManager
+import ohi.andre.consolelauncher.managers.FocusFrictionStyle
+import ohi.andre.consolelauncher.managers.LockdownManager
 import ohi.andre.consolelauncher.managers.PomodoroManager
 import ohi.andre.consolelauncher.managers.PomodoroManager.SessionType
+import ohi.andre.consolelauncher.managers.RetuiCreditManager
 import ohi.andre.consolelauncher.managers.RetuiThemeBridge
 import ohi.andre.consolelauncher.managers.TerminalManager
 import ohi.andre.consolelauncher.managers.ToolbarShortcutManager
@@ -276,6 +281,8 @@ class UIManager(
     private var stopwatchTabDockReady = false
     var isPomodoroOverlayVisible: Boolean = false
         private set
+    var isLockdownOverlayVisible: Boolean = false
+        private set
     private var termuxOverlay: View? = null
     private var termuxOverlayBasePaddingLeft = 0
     private var termuxOverlayBasePaddingTop = 0
@@ -448,6 +455,7 @@ class UIManager(
     private var activeModule: String? = ""
     private var lastClockStateIntent: Intent? = null
     private var lastPomodoroStateIntent: Intent? = null
+    private var lastLockdownStateIntent: Intent? = null
     private var lastMusicSong: String? = null
     private var lastMusicSinger: String? = null
     private var lastMusicPlaying = false
@@ -7256,6 +7264,7 @@ class UIManager(
         filter.addAction(ACTION_NOTIFICATION_FEED)
         filter.addAction(ACTION_CLOCK_STATE)
         filter.addAction(ACTION_POMODORO_STATE)
+        filter.addAction(ACTION_LOCKDOWN_STATE)
         filter.addAction(ACTION_TERMUX_CONSOLE)
         filter.addAction(ACTION_TMUX_WORKSPACE)
         filter.addAction(ACTION_LUA_APP)
@@ -7282,6 +7291,10 @@ class UIManager(
                 } else if (action == ACTION_POMODORO_STATE) {
                     lastPomodoroStateIntent = Intent(intent)
                     updatePomodoroOverlay(intent)
+                    refreshActiveModuleIfNeeded()
+                } else if (action == ACTION_LOCKDOWN_STATE) {
+                    lastLockdownStateIntent = Intent(intent)
+                    updateLockdownOverlay(intent)
                     refreshActiveModuleIfNeeded()
                 } else if (action == ACTION_TERMUX_CONSOLE) {
                     openTermuxConsole(intent.getStringExtra(EXTRA_TERMUX_COMMAND))
@@ -11659,10 +11672,12 @@ class UIManager(
         if (!running) {
             (mRootView as ViewGroup).removeView(overlay)
             this.isPomodoroOverlayVisible = false
-            mRootView.findViewById<View?>(R.id.main_container).setVisibility(View.VISIBLE)
-            val terminalTray = mRootView.findViewById<View?>(R.id.terminal_tray_container)
-            if (terminalTray != null) {
-                terminalTray.setVisibility(View.VISIBLE)
+            if (!isLockdownOverlayVisible) {
+                mRootView.findViewById<View?>(R.id.main_container)?.setVisibility(View.VISIBLE)
+                val terminalTray = mRootView.findViewById<View?>(R.id.terminal_tray_container)
+                if (terminalTray != null) {
+                    terminalTray.setVisibility(View.VISIBLE)
+                }
             }
             if (message != null) {
                 Tuils.sendOutput(mContext, message)
@@ -11672,7 +11687,7 @@ class UIManager(
 
         this.isPomodoroOverlayVisible = true
         closeKeyboard()
-        mRootView.findViewById<View?>(R.id.main_container).setVisibility(View.GONE)
+        mRootView.findViewById<View?>(R.id.main_container)?.setVisibility(View.GONE)
         val terminalTray = mRootView.findViewById<View?>(R.id.terminal_tray_container)
         if (terminalTray != null) {
             terminalTray.setVisibility(View.GONE)
@@ -11762,10 +11777,144 @@ class UIManager(
                     "YES",
                     "NO",
                     ConfirmAction {
-                        manager.stopSession()
+                        terminatePomodoroEarly(manager)
                     })
             }
         })
+    }
+
+    private fun terminatePomodoroEarly(manager: PomodoroManager) {
+        if (!RetuiCreditManager.isDystopiaEnabled(mContext)) {
+            manager.stopSession()
+            return
+        }
+
+        if (RetuiCreditManager.spendCredits(mContext)) {
+            manager.stopSession()
+            Tuils.sendOutput(mContext, "Pomodoro terminated. -${RetuiCreditManager.ESCAPE_COST} credits.")
+            return
+        }
+
+        BreachDialog.show(mContext, BreachManager.Mode.EMERGENCY) { won ->
+            if (won) {
+                PomodoroManager.getInstance(mContext).stopSession()
+            }
+        }
+    }
+
+    private fun updateLockdownOverlay(intent: Intent) {
+        val running = intent.getBooleanExtra(LockdownManager.EXTRA_LOCKDOWN_RUNNING, false)
+        val remaining = intent.getLongExtra(LockdownManager.EXTRA_LOCKDOWN_REMAINING, 0L)
+        val reason = intent.getStringExtra(LockdownManager.EXTRA_LOCKDOWN_REASON)
+        val message = intent.getStringExtra(LockdownManager.EXTRA_MESSAGE)
+
+        var overlay = mRootView!!.findViewById<View?>(R.id.lockdown_root)
+        if (overlay == null) {
+            if (!running) return
+            overlay = View.inflate(mContext, R.layout.lockdown_overlay, mRootView as ViewGroup)
+            setupLockdownOverlay(overlay)
+        }
+
+        if (!running) {
+            (mRootView as ViewGroup).removeView(overlay)
+            isLockdownOverlayVisible = false
+            if (!isPomodoroOverlayVisible) {
+                mRootView.findViewById<View?>(R.id.main_container)?.setVisibility(View.VISIBLE)
+                val terminalTray = mRootView.findViewById<View?>(R.id.terminal_tray_container)
+                if (terminalTray != null) {
+                    terminalTray.setVisibility(View.VISIBLE)
+                }
+            }
+            if (message != null) {
+                Tuils.sendOutput(mContext, message)
+            }
+            return
+        }
+
+        isLockdownOverlayVisible = true
+        closeKeyboard()
+        mRootView.findViewById<View?>(R.id.main_container)?.setVisibility(View.GONE)
+        val terminalTray = mRootView.findViewById<View?>(R.id.terminal_tray_container)
+        if (terminalTray != null) {
+            terminalTray.setVisibility(View.GONE)
+        }
+        overlay.bringToFront()
+        overlay.setElevation(Tuils.dpToPx(mContext, 160).toFloat())
+        overlay.setKeepScreenOn(true)
+
+        val countdown = overlay.findViewById<TextView>(R.id.lockdown_countdown)
+        val reasonView = overlay.findViewById<TextView>(R.id.lockdown_reason)
+        countdown.setText(ClockManager.formatDuration(remaining))
+        reasonView.setText(if (reason.isNullOrBlank()) "Focus mode" else reason)
+        refreshLockdownActions(overlay)
+    }
+
+    private fun setupLockdownOverlay(overlay: View) {
+        overlay.setBackgroundColor(FocusFrictionStyle.overlayBackground())
+
+        val title = overlay.findViewById<TextView>(R.id.lockdown_title)
+        val countdown = overlay.findViewById<TextView>(R.id.lockdown_countdown)
+        val reason = overlay.findViewById<TextView>(R.id.lockdown_reason)
+        val wallet = overlay.findViewById<TextView>(R.id.lockdown_wallet)
+        val skip = overlay.findViewById<TextView>(R.id.lockdown_skip)
+        val key = overlay.findViewById<TextView>(R.id.lockdown_key)
+        val breach = overlay.findViewById<TextView>(R.id.lockdown_breach)
+
+        title.setTextColor(FocusFrictionStyle.buttonFill())
+        countdown.setTextColor(FocusFrictionStyle.bodyText())
+        reason.setTextColor(FocusFrictionStyle.bodyText())
+        wallet.setTextColor(FocusFrictionStyle.bodyText())
+
+        title.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
+        countdown.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
+        reason.setTypeface(Tuils.getTypeface(mContext))
+        wallet.setTypeface(Tuils.getTypeface(mContext))
+
+        FocusFrictionStyle.styleSticker(mContext, skip)
+        FocusFrictionStyle.styleSticker(mContext, key)
+        FocusFrictionStyle.styleSticker(mContext, breach)
+
+        skip.setOnClickListener {
+            if (RetuiCreditManager.spendCredits(mContext)) {
+                LockdownManager.getInstance(mContext).stop("Lockdown skipped. -${RetuiCreditManager.ESCAPE_COST} credits.")
+            } else {
+                refreshLockdownActions(overlay)
+            }
+        }
+        key.setOnClickListener {
+            if (RetuiCreditManager.spendKey(mContext)) {
+                LockdownManager.getInstance(mContext).stop("Lockdown skipped with breach key.")
+            } else {
+                refreshLockdownActions(overlay)
+            }
+        }
+        breach.setOnClickListener {
+            BreachDialog.show(mContext, BreachManager.Mode.EMERGENCY) { won ->
+                if (won) {
+                    LockdownManager.getInstance(mContext).stop("Emergency breach accepted.")
+                } else {
+                    refreshLockdownActions(overlay)
+                }
+            }
+        }
+
+        refreshLockdownActions(overlay)
+    }
+
+    private fun refreshLockdownActions(overlay: View) {
+        val current = RetuiCreditManager.wallet(mContext)
+        val wallet = overlay.findViewById<TextView>(R.id.lockdown_wallet)
+        val skip = overlay.findViewById<TextView>(R.id.lockdown_skip)
+        val key = overlay.findViewById<TextView>(R.id.lockdown_key)
+        val breach = overlay.findViewById<TextView>(R.id.lockdown_breach)
+
+        wallet.setText("Credits: ${current.credits} | Keys: ${current.keys}")
+        skip.setVisibility(if (current.credits >= RetuiCreditManager.ESCAPE_COST) View.VISIBLE else View.GONE)
+        key.setText("USE BREACH KEY (${current.keys})")
+        key.setVisibility(if (current.keys > 0) View.VISIBLE else View.GONE)
+        breach.setVisibility(
+            if (current.credits < RetuiCreditManager.ESCAPE_COST && current.keys <= 0) View.VISIBLE else View.GONE
+        )
     }
 
     private fun playHackOverlay() {
@@ -12665,6 +12814,16 @@ class UIManager(
             intent.putExtra(PomodoroManager.EXTRA_POMODORO_CYCLE, pomodoro.completedFocuses)
             updatePomodoroOverlay(intent)
         }
+
+        val lockdown = LockdownManager.getInstance(mContext)
+        if (lockdown.isRunning) {
+            val intent = Intent(LockdownManager.ACTION_LOCKDOWN_STATE)
+            intent.putExtra(LockdownManager.EXTRA_LOCKDOWN_RUNNING, true)
+            intent.putExtra(LockdownManager.EXTRA_LOCKDOWN_REMAINING, lockdown.remainingMillis)
+            intent.putExtra(LockdownManager.EXTRA_LOCKDOWN_TOTAL, lockdown.totalDuration)
+            intent.putExtra(LockdownManager.EXTRA_LOCKDOWN_REASON, lockdown.reason)
+            updateLockdownOverlay(intent)
+        }
     }
 
     fun onConfigurationChanged(newConfig: Configuration?) {
@@ -12835,6 +12994,7 @@ class UIManager(
             NotificationService.ACTION_REQUEST_NOTIFICATION_FEED
         val ACTION_CLOCK_STATE: String = ClockManager.ACTION_CLOCK_STATE
         val ACTION_POMODORO_STATE: String = PomodoroManager.ACTION_POMODORO_STATE
+        val ACTION_LOCKDOWN_STATE: String = LockdownManager.ACTION_LOCKDOWN_STATE
         val ACTION_TERMUX_CONSOLE: String = BuildConfig.APPLICATION_ID + ".ui_termux_console"
         const val EXTRA_TERMUX_COMMAND: String = "termux_command"
         val ACTION_TMUX_WORKSPACE: String = BuildConfig.APPLICATION_ID + ".ui_tmux_workspace"

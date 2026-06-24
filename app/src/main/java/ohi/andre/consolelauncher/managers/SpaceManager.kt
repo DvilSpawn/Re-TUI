@@ -57,6 +57,7 @@ object SpaceManager {
                 "apps",
                 "android_widget_drawer",
                 "pomodoro_state",
+                RetuiCreditManager.PREFS,
                 PinnedShortcutManager.PREFS
             )
         ),
