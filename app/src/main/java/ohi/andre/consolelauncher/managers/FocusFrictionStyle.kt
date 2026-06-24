@@ -9,6 +9,7 @@ import androidx.core.graphics.ColorUtils
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings
 import ohi.andre.consolelauncher.managers.xml.options.Suggestions
 import ohi.andre.consolelauncher.managers.xml.options.Theme
+import ohi.andre.consolelauncher.managers.xml.options.Ui
 import ohi.andre.consolelauncher.tuils.FocusStickerDrawable
 import ohi.andre.consolelauncher.tuils.Tuils
 
@@ -26,6 +27,9 @@ object FocusFrictionStyle {
     fun bodyText(): Int = LauncherSettings.getColor(Theme.output_text_color)
 
     fun overlayBackground(): Int {
+        if (LauncherSettings.getBoolean(Ui.system_wallpaper)) {
+            return LauncherSettings.getColor(Theme.wallpaper_overlay_color)
+        }
         val terminal = LauncherSettings.getColor(Theme.terminal_window_background_color)
         if (Color.alpha(terminal) > 0) {
             return ColorUtils.setAlphaComponent(terminal, 255)
