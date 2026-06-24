@@ -3,9 +3,9 @@ package ohi.andre.consolelauncher.managers
 import kotlin.random.Random
 
 object BreachManager {
-    enum class Mode(val reward: Int, val gridSize: Int, val bufferSize: Int, val targetCount: Int) {
-        NORMAL(500, 4, 4, 2),
-        EMERGENCY(1000, 4, 5, 1)
+    enum class Mode(val reward: Int, val gridSize: Int, val bufferSize: Int) {
+        NORMAL(500, 4, 4),
+        EMERGENCY(1000, 4, 5)
     }
 
     enum class Axis {
@@ -115,13 +115,7 @@ object BreachManager {
     }
 
     private fun targetsFor(mode: Mode, path: List<Cell>, grid: Array<Array<String>>): List<List<String>> {
-        val targets = ArrayList<List<String>>()
-        val firstLength = if (mode.bufferSize >= 5) 3 else 2
-        targets.add(writeTarget(path, grid, 0, firstLength))
-        if (mode.targetCount > 1) {
-            targets.add(writeTarget(path, grid, firstLength, 2))
-        }
-        return targets
+        return listOf(writeTarget(path, grid, 0, mode.bufferSize))
     }
 
     private fun writeTarget(path: List<Cell>, grid: Array<Array<String>>, start: Int, length: Int): List<String> {
@@ -168,6 +162,16 @@ object BreachManager {
         if (selfChecked) return
         check(containsTarget(listOf("1C", "55", "7A"), listOf("55", "7A")))
         check(!containsTarget(listOf("1C", "55", "7A"), listOf("7A", "55")))
+        val session = Session(
+            Mode.NORMAL,
+            arrayOf(arrayOf("1C", "55"), arrayOf("7A", "BD")),
+            listOf(listOf("1C", "7A", "BD", "55")),
+            4
+        )
+        check(!session.pick(Cell(0, 0)).won)
+        check(!session.pick(Cell(1, 0)).won)
+        check(!session.pick(Cell(1, 1)).won)
+        check(session.pick(Cell(0, 1)).won)
         selfChecked = true
     }
 

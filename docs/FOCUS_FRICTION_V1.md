@@ -84,15 +84,15 @@ V1 rules:
 5. Next choice must come from the selected cell's column.
 6. After that, next choice must come from the selected cell's row.
 7. Continue alternating row, column, row, column.
-8. Win if any target sequence appears contiguously in the buffer.
-9. Lose if the buffer fills without a target sequence.
+8. Win if the target sequence fills the buffer.
+9. Lose if the buffer fills without the full target sequence.
 
 V1 difficulty:
 
 | Mode | Grid | Buffer | Targets | Reward |
 | --- | --- | --- | --- | --- |
-| Normal | `4x4` | `4` | `2` sequences of length `2-3` | `500` credits |
-| Emergency | `4x4` | `5` | `1` sequence of length `2-3` | `1000` credits |
+| Normal | `4x4` | `4` | `1` sequence of length `4` | `500` credits |
+| Emergency | `4x4` | `5` | `1` sequence of length `5` | `1000` credits |
 | Later hard mode | `5x5` or `6x6` | `5-6` | `3` sequences | Not V1 |
 
 Implementation rule: keep game logic independent from UI. The article makes the
