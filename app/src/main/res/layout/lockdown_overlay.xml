@@ -9,14 +9,14 @@
     android:orientation="vertical"
     android:padding="20dp">
 
-    <TextView
+    <ImageView
         android:id="@+id/lockdown_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="LOCKDOWN"
-        android:textSize="22sp"
-        android:textStyle="bold" />
+        android:layout_width="match_parent"
+        android:layout_height="58dp"
+        android:adjustViewBounds="true"
+        android:contentDescription="LOCKDOWN"
+        android:scaleType="fitCenter"
+        android:src="@drawable/lockdown_wordmark" />
 
     <TextView
         android:id="@+id/lockdown_reason"

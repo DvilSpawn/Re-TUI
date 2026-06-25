@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher.commands.main.raw
 
+import android.text.InputType
 import java.util.Locale
 import ohi.andre.consolelauncher.commands.CommandAbstraction
 import ohi.andre.consolelauncher.commands.ExecutePack
@@ -38,7 +39,8 @@ class lockdown : CommandAbstraction {
                 pack.context,
                 "NEW LOCKDOWN",
                 listOf(
-                    FormField(FIELD_DURATION, "Duration", "00h 00m"),
+                    FormField(FIELD_HOURS, "Hours", "00", InputType.TYPE_CLASS_NUMBER),
+                    FormField(FIELD_MINUTES, "Minutes", "00", InputType.TYPE_CLASS_NUMBER),
                     FormField(FIELD_REASON, "Reason", "Reason")
                 ),
                 "START",
@@ -46,7 +48,7 @@ class lockdown : CommandAbstraction {
                 { values -> validateLockdownForm(values) }
             ) { values ->
                 val result = manager.start(
-                    ClockManager.parseDurationMillis(values[FIELD_DURATION]),
+                    durationFromParts(values),
                     values[FIELD_REASON]
                 )
                 Tuils.sendOutput(pack.context, result)
@@ -67,7 +69,8 @@ class lockdown : CommandAbstraction {
 
     companion object {
         private const val HELP = "Usage: lockdown [duration] [reason]\nExample: lockdown 30m deep work\nOptions: -status, -stop"
-        private const val FIELD_DURATION = "duration"
+        private const val FIELD_HOURS = "hours"
+        private const val FIELD_MINUTES = "minutes"
         private const val FIELD_REASON = "reason"
 
         private fun startFromInput(manager: LockdownManager, input: String): String {
@@ -81,7 +84,12 @@ class lockdown : CommandAbstraction {
         }
 
         private fun validateLockdownForm(values: Map<String, String>): String? {
-            return validateDurationReason(values[FIELD_DURATION].orEmpty(), values[FIELD_REASON].orEmpty())
+            val hours = values[FIELD_HOURS].orEmpty()
+            val minutes = values[FIELD_MINUTES].orEmpty()
+            if (hours.isBlank() && minutes.isBlank()) return "Duration is missing."
+            if (durationFromParts(values) <= 0L) return "Duration is invalid."
+            if (values[FIELD_REASON].isNullOrBlank()) return "Reason is missing."
+            return null
         }
 
         private fun validateDurationReason(duration: String, reason: String): String? {
@@ -89,6 +97,14 @@ class lockdown : CommandAbstraction {
             if (reason.isBlank()) return "Reason is missing."
             if (ClockManager.parseDurationMillis(duration) <= 0L) return "Duration is invalid."
             return null
+        }
+
+        private fun durationFromParts(values: Map<String, String>): Long {
+            val hoursText = values[FIELD_HOURS].orEmpty()
+            val minutesText = values[FIELD_MINUTES].orEmpty()
+            val hours = if (hoursText.isBlank()) 0L else hoursText.toLongOrNull() ?: return 0L
+            val minutes = if (minutesText.isBlank()) 0L else minutesText.toLongOrNull() ?: return 0L
+            return ((hours * 60L) + minutes) * 60_000L
         }
     }
 }

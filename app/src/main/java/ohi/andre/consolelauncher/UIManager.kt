@@ -11869,7 +11869,7 @@ class UIManager(
     private fun setupLockdownOverlay(overlay: View) {
         overlay.setBackgroundColor(FocusFrictionStyle.overlayBackground())
 
-        val title = overlay.findViewById<TextView>(R.id.lockdown_title)
+        val title = overlay.findViewById<ImageView>(R.id.lockdown_title)
         val countdown = overlay.findViewById<TextView>(R.id.lockdown_countdown)
         val reason = overlay.findViewById<TextView>(R.id.lockdown_reason)
         val wallet = overlay.findViewById<TextView>(R.id.lockdown_wallet)
@@ -11877,12 +11877,11 @@ class UIManager(
         val key = overlay.findViewById<TextView>(R.id.lockdown_key)
         val breach = overlay.findViewById<TextView>(R.id.lockdown_breach)
 
-        title.setTextColor(FocusFrictionStyle.buttonFill())
+        title.setColorFilter(FocusFrictionStyle.buttonFill(), PorterDuff.Mode.SRC_IN)
         countdown.setTextColor(FocusFrictionStyle.bodyText())
         reason.setTextColor(FocusFrictionStyle.bodyText())
         wallet.setTextColor(FocusFrictionStyle.bodyText())
 
-        title.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
         countdown.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
         reason.setTypeface(Tuils.getTypeface(mContext))
         wallet.setTypeface(Tuils.getTypeface(mContext))
