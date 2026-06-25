@@ -440,16 +440,16 @@ class ThemerActivity : AppCompatActivity() {
     }
 
     private fun dystopiaRowLabel(): String =
-        "Opt into Dystopia: " + if (RetuiCreditManager.isDystopiaEnabled(this)) "on" else "off"
+        "Sign up for Retui Credits: " + if (RetuiCreditManager.isDystopiaEnabled(this)) "on" else "off"
 
     private fun isDystopiaRow(label: String?): Boolean =
-        label != null && label.startsWith("Opt into Dystopia")
+        label != null && label.startsWith("Sign up for Retui Credits")
 
     private fun handleDystopiaOptIn() {
         if (RetuiCreditManager.isDystopiaEnabled(this)) {
             RetuiCreditManager.setDystopiaEnabled(this, false)
             LockdownManager.getInstance(this).stop("Lockdown disabled.")
-            Toast.makeText(this, "Dystopia disabled.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Retui Credits disabled.", Toast.LENGTH_SHORT).show()
             openSection(SECTION_PERSONALIZATION)
             return
         }
@@ -457,13 +457,13 @@ class ThemerActivity : AppCompatActivity() {
     }
 
     private fun showDystopiaConsentDialog() {
-        TuixtDialog.showCustom(this, "Opt into Dystopia", ContentFactory { dialog: Dialog? ->
+        TuixtDialog.showCustom(this, "Sign up for Retui Credits", ContentFactory { dialog: Dialog? ->
             val content = LinearLayout(this)
             content.orientation = LinearLayout.VERTICAL
             content.gravity = Gravity.CENTER
 
             val description = TextView(this)
-            description.text = "Enables local Retui Credits, breach keys, breach puzzles, paid Pomodoro exits, and Lockdown. This is offline local friction only."
+            description.text = "Enables local Retui Credits, breach keys, breach puzzles, paid Pomodoro exits, and Lockdown. Retui Credits are fictional app points only: no cash value, no purchase value, and nothing leaves this device."
             description.setTextColor(textColor())
             description.setTypeface(Tuils.getTypeface(this))
             description.textSize = 13f
@@ -497,14 +497,14 @@ class ThemerActivity : AppCompatActivity() {
             fingerprint.setColorFilter(accentColor(), PorterDuff.Mode.SRC_IN)
             fingerprint.setBackground(rect(this, surfaceColor(), borderColor(), 1.25f))
             fingerprint.setPadding(dp(this, 18f), dp(this, 18f), dp(this, 18f), dp(this, 18f))
-            fingerprint.contentDescription = "Hold to opt into Dystopia"
+            fingerprint.contentDescription = "Hold to sign up for Retui Credits"
             fingerprint.setOnClickListener { }
 
             val handler = Handler(Looper.getMainLooper())
             val enable = Runnable {
                 RetuiCreditManager.setDystopiaEnabled(this, true)
                 dialog?.dismiss()
-                Toast.makeText(this, "Dystopia enabled. 1000 credits granted.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Retui Credits enabled. 1000 fake credits granted.", Toast.LENGTH_SHORT).show()
                 openSection(SECTION_PERSONALIZATION)
             }
             fingerprint.setOnTouchListener { view, event ->

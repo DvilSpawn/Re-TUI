@@ -4,9 +4,9 @@ V1 is an offline-only focus system. It is not DRM, anti-cheat, or secure device
 lockdown. If a user clears app data or edits a backup, they can bypass it. That
 is fine: this is local friction for a self-control tool.
 
-V1 is opt-in. Until the user enables `Opt into Dystopia` under Personalization,
-existing Pomodoro behavior stays unchanged and the credit, breach, and lockdown
-commands stay inactive.
+V1 is opt-in. Until the user enables `Sign up for Retui Credits` under
+Personalization, existing Pomodoro behavior stays unchanged and the credit,
+breach, and lockdown commands stay inactive.
 
 ## Scope
 
@@ -42,9 +42,10 @@ Do not grant on every app update unless we intentionally bump the grant version.
 Enablement flow:
 
 1. User opens Personalization.
-2. User selects `Opt into Dystopia`.
+2. User selects `Sign up for Retui Credits`.
 3. Dialog explains that this enables local credits, breach keys, paid Pomodoro
-   exits, breach puzzles, and Lockdown.
+   exits, breach puzzles, and Lockdown. It also states that Retui Credits are
+   fictional app points with no cash value, purchase value, or off-device state.
 4. User must hold the fingerprint icon for `3` seconds.
 5. On completion, set `dystopia_enabled = true` and apply the one-time grant.
 6. Turning it off disables the system without deleting the stored wallet.

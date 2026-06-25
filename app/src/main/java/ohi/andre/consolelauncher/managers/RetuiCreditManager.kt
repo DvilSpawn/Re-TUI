@@ -93,7 +93,7 @@ object RetuiCreditManager {
 
     fun status(context: Context): String {
         if (!isDystopiaEnabled(context)) {
-            return "Dystopia is disabled. Enable Opt into Dystopia under Personalization."
+            return "Retui Credits are disabled. Enable 'Sign up for Retui Credits' under Personalization."
         }
         val wallet = wallet(context)
         return "Retui Credits: ${wallet.credits}\nBreach Keys: ${wallet.keys}"
