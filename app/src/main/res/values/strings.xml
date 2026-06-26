@@ -545,16 +545,17 @@
         \n\nExample:
         \n$ vibrate 300
         \n$ vibrate 0,300,500,300</string>
-    <string name="help_volume">-set [stream] [volume: 0-100] -> set the volume for the selected stream
+    <string name="help_volume">-set [stream] [step] -> set the volume for the selected stream
         \n-profile [mode] -> set the profile mode
         \n-get [stream] -> get info about the selected stream
+        \n\nUse volume -get [stream] to see the current step and max step.
         \n\nstream:
         \n\t* voice call -> 0
         \n\t* system -> 1
         \n\t* ringer -> 2
         \n\t* media -> 3
         \n\t* alarm -> 4
-        \n\t* notificaton -> 5
+        \n\t* notification -> 5
         \n\nmode:
         \n\t* silent -> 0
         \n\t* vibrate -> 1
@@ -669,14 +670,18 @@
         \n\nFor interactive browsing, use:
         \n$ files
     </string>
-    <string name="help_intent">Dispatch Android intents from Re:T-UI.
+    <string name="help_intent">Inspect or dispatch Android intents from Re:T-UI.
         \nUsage:
+        \n$ intent -check [app or package]
         \n$ intent -view &lt;uri&gt;
         \n$ intent -activity -a &lt;action&gt; [-d &lt;data&gt;] [-t &lt;mime&gt;] [-p &lt;package&gt;] [-n &lt;package/class&gt;] [--es key value] [--ei key value] [--ez key true|false]
         \n$ intent -broadcast -a &lt;action&gt; [-p &lt;package&gt;] [-n &lt;package/class&gt;] [--es key value]
         \n$ intent -uri &lt;intent-uri&gt;
-        \n$ intent -check ...
+        \n$ intent -check -activity ...
+        \n\nOptions: -p package, -a action, -d data URI, -t MIME type, -n component. Advanced extras: --es string, --ei integer, --ez boolean.
         \nExamples:
+        \n$ intent -check ChatGPT
+        \n$ intent -check com.openai.chatgpt
         \n$ intent -view geo:0,0?q=home
         \n$ intent -activity -a android.intent.action.SEND -t text/plain --es android.intent.extra.TEXT "standup notes"
         \n$ intent -broadcast -a net.dinglisch.android.tasker.ACTION_TASK -p net.dinglisch.android.taskerm --es task_name Work

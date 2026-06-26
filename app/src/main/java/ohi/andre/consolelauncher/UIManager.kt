@@ -1487,7 +1487,7 @@ class UIManager(
         if (asciiView == null) {
             return
         }
-        val showAscii = !TextUtils.isEmpty(asciiView.getText())
+        val showAscii = !TextUtils.isEmpty(labelTexts[Label.ascii.ordinal])
                 && (!landscape || getBoolean(Ui.show_ascii_landscape))
         asciiView.setVisibility(if (showAscii) View.VISIBLE else View.GONE)
     }
@@ -5897,13 +5897,14 @@ class UIManager(
                         scroll.getViewTreeObserver().removeOnPreDrawListener(this)
                     }
 
-                    val maxHeight = calculateCalendarTextHeight(body)
-                    val contentHeight = body.getHeight()
+                    val viewportPadding = scroll.getPaddingTop() + scroll.getPaddingBottom()
+                    val maxHeight = calculateCalendarTextHeight(body) + viewportPadding
+                    val contentHeight = body.getHeight() + viewportPadding
                     if (maxHeight <= 0 || contentHeight <= 0) {
                         return true
                     }
 
-                    val targetHeight = min(contentHeight, maxHeight)
+                    val targetHeight = max(scroll.getMinimumHeight(), min(contentHeight, maxHeight))
                     val params = scroll.getLayoutParams()
                     if (params != null && params.height != targetHeight) {
                         params.height = targetHeight
