@@ -1416,10 +1416,11 @@ class AppsManager(context: Context) : XMLPrefsElement {
                     if (vl == Apps.MOST_USED) suggested.add(SuggestedApp(MOST_USED, count + 1))
                     else {
                         val identity = LaunchInfo.Companion.identityInfo(vl)
-                        if (identity == null) continue
-
-                        val info: LaunchInfo? =
+                        var info: LaunchInfo? =
                             AppUtils.findLaunchInfoWithIdentity(this.apps, identity)
+                        if (info == null) {
+                            info = AppUtils.findLaunchInfosWithPackage(vl, this.apps).firstOrNull()
+                        }
                         if (info == null) continue
                         suggested.add(SuggestedApp(info, USER_DEFINIED, count + 1))
                     }
