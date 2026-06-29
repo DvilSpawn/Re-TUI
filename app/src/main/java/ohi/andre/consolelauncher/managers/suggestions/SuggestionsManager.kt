@@ -116,6 +116,8 @@ class SuggestionsManager(
     private val SPLITTERS = arrayOf<String?>(Tuils.SPACE)
     private val FILE_SPLITTERS = arrayOf<String?>(Tuils.SPACE, "-", "_")
     private val XML_PREFS_SPLITTERS = arrayOf<String?>("_")
+    private val VOLUME_SET_STREAMS = arrayOf("system", "ringer", "media", "alarm", "notification")
+    private val VOLUME_GET_STREAMS = arrayOf("voice call", "system", "ringer", "media", "alarm", "notification")
     private val showAliasDefault: Boolean
     private val clickToLaunch: Boolean
     private val showAppsGpDefault: Boolean
@@ -1279,6 +1281,10 @@ class SuggestionsManager(
         afterLastSpace: String?,
         beforeLastSpace: String
     ) {
+        if (suggestVolumeStreams(suggestions, afterLastSpace, beforeLastSpace)) {
+            return
+        }
+
         when (type) {
             CommandAbstraction.FILE -> suggestFile(
                 info,
@@ -1409,6 +1415,26 @@ class SuggestionsManager(
         }
 
         suggestClockCommandArgs(info, suggestions, afterLastSpace, beforeLastSpace)
+    }
+
+    private fun suggestVolumeStreams(
+        suggestions: MutableList<Suggestion?>,
+        afterLastSpace: String?,
+        beforeLastSpace: String
+    ): Boolean {
+        val before = beforeLastSpace.trim { it <= ' ' }.lowercase(Locale.getDefault())
+        if (before != "volume -set" && before != "volume -get") {
+            return false
+        }
+
+        val filter = afterLastSpace?.trim { it <= ' ' }?.lowercase(Locale.getDefault()) ?: Tuils.EMPTYSTRING
+        val streams = if (before == "volume -set") VOLUME_SET_STREAMS else VOLUME_GET_STREAMS
+        for (stream in streams) {
+            if (filter.length == 0 || stream.startsWith(filter)) {
+                suggestions.add(Suggestion(beforeLastSpace, stream, false, Suggestion.Companion.TYPE_COMMAND))
+            }
+        }
+        return true
     }
 
     private fun suggestClockCommandRoots(suggestions: MutableList<Suggestion?>, lastWord: String?) {
@@ -1818,6 +1844,10 @@ class SuggestionsManager(
         }
 
         val normalized = beforeLastSpace.trim { it <= ' ' }.lowercase(Locale.getDefault())
+        if (suggestIntentCommandArgs(pack, suggestions, afterLastSpace, beforeLastSpace, normalized)) {
+            return
+        }
+
         if ("timer" == normalized) {
             suggestions.add(
                 Suggestion(
@@ -2444,6 +2474,139 @@ class SuggestionsManager(
                     Suggestion.Companion.TYPE_COMMAND
                 )
             )
+        }
+    }
+
+    private fun suggestIntentCommandArgs(
+        pack: MainPack,
+        suggestions: MutableList<Suggestion?>,
+        afterLastSpace: String?,
+        beforeLastSpace: String?,
+        normalized: String
+    ): Boolean {
+        if (!isIntentCommand(normalized)) {
+            return false
+        }
+
+        val lastToken = normalized.split("\\s+".toRegex()).lastOrNull()
+        if ("-p" == lastToken) {
+            suggestIntentPackages(pack, suggestions, afterLastSpace, beforeLastSpace)
+            return true
+        }
+
+        if (isIntentValueToken(lastToken)) {
+            return true
+        }
+
+        if ("intent" == normalized) {
+            addIntentOptions(
+                suggestions,
+                beforeLastSpace,
+                afterLastSpace,
+                "-check"
+            )
+            return true
+        }
+
+        if ("intent -check" == normalized) {
+            suggestIntentPackages(pack, suggestions, afterLastSpace, beforeLastSpace)
+            return true
+        }
+
+        if ("intent -activity" == normalized || "intent activity" == normalized) {
+            addIntentOptions(suggestions, beforeLastSpace, afterLastSpace, "-a", "-d", "-t", "-p", "-n")
+            return true
+        }
+
+        if ("intent -broadcast" == normalized || "intent broadcast" == normalized) {
+            addIntentOptions(suggestions, beforeLastSpace, afterLastSpace, "-a", "-p", "-n")
+            return true
+        }
+
+        addIntentOptions(
+            suggestions,
+            beforeLastSpace,
+            afterLastSpace,
+            "-a",
+            "-d",
+            "-t",
+            "-p",
+            "-n"
+        )
+        return true
+    }
+
+    private fun isIntentCommand(normalized: String): Boolean {
+        return "intent" == normalized || normalized.startsWith("intent ")
+    }
+
+    private fun isIntentValueToken(token: String?): Boolean {
+        return "-a" == token || "-d" == token || "-t" == token || "-n" == token
+            || "--es" == token || "--ei" == token || "--ez" == token
+    }
+
+    private fun addIntentOptions(
+        suggestions: MutableList<Suggestion?>,
+        beforeLastSpace: String?,
+        afterLastSpace: String?,
+        vararg options: String
+    ) {
+        val filter = afterLastSpace?.trim { it <= ' ' } ?: Tuils.EMPTYSTRING
+        val normalizedFilter = filter.replace("-", Tuils.EMPTYSTRING)
+        for (option in options) {
+            val normalizedOption = option.replace("-", Tuils.EMPTYSTRING)
+            if (filter.length == 0 || option.startsWith(filter) || normalizedOption.startsWith(normalizedFilter)) {
+                suggestions.add(Suggestion(beforeLastSpace, option, false, Suggestion.Companion.TYPE_COMMAND))
+            }
+        }
+    }
+
+    private fun suggestIntentPackages(
+        pack: MainPack,
+        suggestions: MutableList<Suggestion?>,
+        afterLastSpace: String?,
+        beforeLastSpace: String?
+    ) {
+        val apps: MutableList<LaunchInfo> = ArrayList<LaunchInfo>(pack.appsManager.shownApps())
+        try {
+            apps.addAll(pack.appsManager.hiddenApps())
+        } catch (e: Exception) {
+            Tuils.log(e)
+        }
+
+        val filter = afterLastSpace?.trim { it <= ' ' }?.lowercase(Locale.getDefault()) ?: Tuils.EMPTYSTRING
+        val added = LinkedHashSet<String?>()
+        var canInsert = counts!![Suggestion.Companion.TYPE_APP]
+        for (app in apps) {
+            if (canInsert == 0) {
+                return
+            }
+
+            val pkg = app.componentName?.getPackageName() ?: continue
+            if (!added.add(pkg)) {
+                continue
+            }
+
+            val label = app.publicLabel ?: pkg
+            if (filter.length > 0
+                && !pkg.lowercase(Locale.getDefault()).startsWith(filter)
+                && !label.lowercase(Locale.getDefault()).startsWith(filter)
+            ) {
+                continue
+            }
+
+            val prefix = beforeLastSpace?.trim { it <= ' ' } ?: Tuils.EMPTYSTRING
+            val command = if (prefix.length == 0) pkg else prefix + Tuils.SPACE + pkg
+            suggestions.add(
+                Suggestion(
+                    null,
+                    label,
+                    false,
+                    Suggestion.Companion.TYPE_MODULE,
+                    command
+                )
+            )
+            canInsert--
         }
     }
 

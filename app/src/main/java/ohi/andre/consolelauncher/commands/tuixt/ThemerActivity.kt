@@ -8,11 +8,14 @@ import android.content.Intent
 import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.graphics.PorterDuff
 import android.provider.OpenableColumns
 import android.text.InputType
 import android.util.Log
 import android.view.Gravity
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
@@ -43,7 +46,10 @@ import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleListItem
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.stylePanel
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.textColor
 import ohi.andre.consolelauncher.managers.BackupManager
+import ohi.andre.consolelauncher.managers.FocusFrictionStyle
+import ohi.andre.consolelauncher.managers.LockdownManager
 import ohi.andre.consolelauncher.managers.PresetManager
+import ohi.andre.consolelauncher.managers.RetuiCreditManager
 import ohi.andre.consolelauncher.managers.ToolbarShortcutManager
 import ohi.andre.consolelauncher.managers.ToolbarShortcutManager.IconChoice
 import ohi.andre.consolelauncher.managers.ToolbarShortcutManager.clearSlot
@@ -190,6 +196,8 @@ class ThemerActivity : AppCompatActivity() {
                         showPresetsDialog()
                     } else if (fileName == "Toolbar Buttons") {
                         showToolbarButtonsDialog()
+                    } else if (isDystopiaRow(fileName)) {
+                        handleDystopiaOptIn()
                     } else if (fileName == "View Crash Log") {
                         val crashFile = File(Tuils.getFolder(), "crash.txt")
                         if (!crashFile.exists() || crashFile.length() == 0L) {
@@ -393,6 +401,7 @@ class ThemerActivity : AppCompatActivity() {
             )
         } else if (SECTION_PERSONALIZATION == section) {
             return mutableListOf(
+                dystopiaRowLabel(),
                 "alias.txt",
                 "Toolbar Buttons",
                 "ASCII Settings",
@@ -428,6 +437,103 @@ class ThemerActivity : AppCompatActivity() {
         sectionsAdapter!!.notifyDataSetChanged()
         recyclerView!!.scrollToPosition(0)
         updateSupportFooter()
+    }
+
+    private fun dystopiaRowLabel(): String =
+        "Sign up for Retui Credits: " + if (RetuiCreditManager.isDystopiaEnabled(this)) "on" else "off"
+
+    private fun isDystopiaRow(label: String?): Boolean =
+        label != null && label.startsWith("Sign up for Retui Credits")
+
+    private fun handleDystopiaOptIn() {
+        if (RetuiCreditManager.isDystopiaEnabled(this)) {
+            RetuiCreditManager.setDystopiaEnabled(this, false)
+            LockdownManager.getInstance(this).stop("Lockdown disabled.")
+            Toast.makeText(this, "Retui Credits disabled.", Toast.LENGTH_SHORT).show()
+            openSection(SECTION_PERSONALIZATION)
+            return
+        }
+        showDystopiaConsentDialog()
+    }
+
+    private fun showDystopiaConsentDialog() {
+        TuixtDialog.showCustom(this, "Sign up for Retui Credits", ContentFactory { dialog: Dialog? ->
+            val content = LinearLayout(this)
+            content.orientation = LinearLayout.VERTICAL
+            content.gravity = Gravity.CENTER
+
+            val description = TextView(this)
+            description.text = "Enables local Retui Credits, breach keys, breach puzzles, paid Pomodoro exits, and Lockdown. Retui Credits are fictional app points only: no cash value, no purchase value, and nothing leaves this device."
+            description.setTextColor(textColor())
+            description.setTypeface(Tuils.getTypeface(this))
+            description.textSize = 13f
+            description.gravity = Gravity.CENTER
+            description.setPadding(0, 0, 0, dp(this, 14f))
+            content.addView(
+                description,
+                LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+            )
+
+            val prompt = TextView(this)
+            prompt.text = "HOLD FINGERPRINT FOR 3 SECONDS"
+            prompt.setTextColor(accentColor())
+            prompt.setTypeface(Tuils.getTypeface(this), Typeface.BOLD)
+            prompt.textSize = 12f
+            prompt.gravity = Gravity.CENTER
+            prompt.setPadding(0, 0, 0, dp(this, 10f))
+            content.addView(
+                prompt,
+                LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+            )
+
+            val fingerprint = ImageButton(this)
+            fingerprint.setImageResource(R.drawable.ic_dystopia_fingerprint_24)
+            fingerprint.setColorFilter(accentColor(), PorterDuff.Mode.SRC_IN)
+            fingerprint.setBackground(rect(this, surfaceColor(), borderColor(), 1.25f))
+            fingerprint.setPadding(dp(this, 18f), dp(this, 18f), dp(this, 18f), dp(this, 18f))
+            fingerprint.contentDescription = "Hold to sign up for Retui Credits"
+            fingerprint.setOnClickListener { }
+
+            val handler = Handler(Looper.getMainLooper())
+            val enable = Runnable {
+                RetuiCreditManager.setDystopiaEnabled(this, true)
+                dialog?.dismiss()
+                Toast.makeText(this, "Retui Credits enabled. 1000 fake credits granted.", Toast.LENGTH_SHORT).show()
+                openSection(SECTION_PERSONALIZATION)
+            }
+            fingerprint.setOnTouchListener { view, event ->
+                when (event.actionMasked) {
+                    MotionEvent.ACTION_DOWN -> {
+                        view.isPressed = true
+                        FocusFrictionStyle.vibrate(this, DYSTOPIA_HOLD_PATTERN)
+                        handler.postDelayed(enable, DYSTOPIA_HOLD_MS)
+                        true
+                    }
+                    MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                        handler.removeCallbacks(enable)
+                        FocusFrictionStyle.cancelVibration(this)
+                        view.isPressed = false
+                        if (event.actionMasked == MotionEvent.ACTION_UP) {
+                            view.performClick()
+                        }
+                        true
+                    }
+                    else -> true
+                }
+            }
+
+            content.addView(
+                fingerprint,
+                LinearLayout.LayoutParams(dp(this, 88f), dp(this, 88f))
+            )
+            content
+        })
     }
 
     private fun buildSupportFooter(): LinearLayout {
@@ -1426,6 +1532,8 @@ class ThemerActivity : AppCompatActivity() {
         private const val BACKUP_RESTORE_REQUEST = 202
         private const val SHAREABLE_CONFIG_EXPORT_REQUEST = 203
         private const val FONT_IMPORT_REQUEST = 204
+        private const val DYSTOPIA_HOLD_MS = 3000L
+        private val DYSTOPIA_HOLD_PATTERN = longArrayOf(0L, 55L, 945L, 55L, 945L, 55L)
         private const val PLAY_STORE_PACKAGE_ID = "com.dvil.tui_renewed"
         private const val PLAY_STORE_MARKET_URL = "market://details?id=$PLAY_STORE_PACKAGE_ID"
         private const val PLAY_STORE_WEB_URL =

@@ -370,6 +370,9 @@ class TuixtActivity : Activity() {
             if (XMLPrefsManager.isAsciiArtSetting(save)) {
                 continue
             }
+            if (XMLPrefsManager.isAdvancedSuggestionSetting(save)) {
+                continue
+            }
             remaining[save.label()!!] = save
         }
 

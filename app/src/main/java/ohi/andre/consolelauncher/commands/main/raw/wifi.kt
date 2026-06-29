@@ -40,11 +40,6 @@ class wifi : CommandAbstraction {
     override fun onArgNotFound(pack: ExecutePack, indexNotFound: Int): String? = null
 
     private fun openWifiSettings(info: MainPack) {
-        val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            Intent(Settings.Panel.ACTION_WIFI)
-        } else {
-            Intent(Settings.ACTION_WIFI_SETTINGS)
-        }
-        info.context.startActivity(intent)
+        info.context.startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
     }
 }

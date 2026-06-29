@@ -538,6 +538,12 @@ object XMLPrefsManager {
             save === Theme.ascii_status_text_shadow_color
     }
 
+    fun isAdvancedSuggestionSetting(save: XMLPrefsSave?): Boolean {
+        return save === Suggestions.suggestions_deadline ||
+            save === Suggestions.suggestions_algorithm ||
+            save === Suggestions.suggestions_quickcompare_n
+    }
+
     private fun themeSection(label: String): String = when {
         label == "background_color" || label == "wallpaper_overlay_color" -> "Launcher"
         label.contains("_status_") || label.startsWith("battery_text_") ||

@@ -29,15 +29,15 @@ class CommandGroup(private val packageName: String) {
             if (packageName == "ohi.andre.consolelauncher.commands.main.raw") {
                 cmds.addAll(
                     listOf(
-                        "airplane", "alias", "apps", "beep", "bluetooth", "brightness", "calc", "call", "cd",
-                        "changelog", "clear", "cntcts", "config", "contacts", "ctrlc", "data", "debug", "devutils",
+                        "airplane", "alias", "apps", "beep", "bluetooth", "breach", "brightness", "calc", "call", "cd",
+                        "changelog", "clear", "cntcts", "config", "contacts", "credits", "ctrlc", "data", "debug", "devutils",
                         "donate", "duo", "exit", "files", "flash", "guide", "hack", "help", "htmlextract", "install",
-                        "intent", "landscape", "location", "ls", "lua", "module", "music", "notes", "notifications", "open",
+                        "intent", "landscape", "location", "lockdown", "ls", "lua", "module", "music", "notes", "notifications", "open",
                         "orientation", "pomodoro", "portrait", "post", "preset", "pwd", "rate", "refresh", "regex",
                         "reply", "restart", "retuitoken", "rss", "search", "settings", "share", "shell", "shortcut",
                         "status", "stopwatch", "tbridge", "termux", "termuxopen", "theme", "themer", "time", "timer", "tmux",
                         "tui", "tuiweather", "tuixt", "tutorial", "uninstall", "username", "vibrate", "volume",
-                        "wallpaper", "webhook", "widget", "wifi"
+                        "wallet", "wallpaper", "webhook", "widget", "wifi"
                     )
                 )
             } else if (packageName == "ohi.andre.consolelauncher.commands.tuixt.raw") {

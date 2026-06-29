@@ -2,8 +2,13 @@ package ohi.andre.consolelauncher.commands.main.raw
 
 import ohi.andre.consolelauncher.commands.CommandAbstraction
 import ohi.andre.consolelauncher.commands.ExecutePack
+import ohi.andre.consolelauncher.commands.tuixt.BreachDialog
 import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog
+import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog.FormField
+import ohi.andre.consolelauncher.managers.BreachManager
 import ohi.andre.consolelauncher.managers.PomodoroManager
+import ohi.andre.consolelauncher.managers.PomodoroManager.SessionType
+import ohi.andre.consolelauncher.managers.RetuiCreditManager
 
 class pomodoro : CommandAbstraction {
     override fun argType(): IntArray = intArrayOf(CommandAbstraction.PLAIN_TEXT)
@@ -15,8 +20,23 @@ class pomodoro : CommandAbstraction {
 
         if (task == "-stop") {
             return if (manager.isRunning) {
-                manager.stopSession()
-                "Pomodoro session stopped."
+                if (manager.currentType == SessionType.FINISHED) {
+                    manager.stopSession()
+                    "Pomodoro session closed."
+                } else if (!RetuiCreditManager.isDystopiaEnabled(pack.context)) {
+                    manager.stopSession()
+                    "Pomodoro session stopped."
+                } else if (RetuiCreditManager.spendCredits(pack.context)) {
+                    manager.stopSession()
+                    "Pomodoro stopped. -${RetuiCreditManager.ESCAPE_COST} credits."
+                } else {
+                    BreachDialog.show(pack.context, BreachManager.Mode.EMERGENCY) { won ->
+                        if (won) {
+                            PomodoroManager.getInstance(pack.context).stopSession()
+                        }
+                    }
+                    "Not enough credits. Opening emergency breach..."
+                }
             } else {
                 "No Pomodoro session is running."
             }
@@ -31,14 +51,15 @@ class pomodoro : CommandAbstraction {
             return "Pomodoro started: $task"
         }
 
-        TuixtDialog.showInput(
+        TuixtDialog.showValidatedForm(
             pack.context,
             "NEW POMODORO",
-            "What task are we focusing on?",
+            listOf(FormField(FIELD_GOAL, "Goal", "What task are we focusing on?")),
             "START",
-            "CANCEL"
-        ) { value ->
-            val taskName = value?.trim().orEmpty().ifEmpty { DEFAULT_TASK }
+            "CANCEL",
+            { values -> validatePomodoroForm(values) }
+        ) { values ->
+            val taskName = values[FIELD_GOAL].orEmpty()
             val currentManager = PomodoroManager.getInstance(pack.context)
             if (!currentManager.isRunning) {
                 currentManager.startPomodoro(taskName)
@@ -57,6 +78,9 @@ class pomodoro : CommandAbstraction {
     override fun onNotArgEnough(pack: ExecutePack, nArgs: Int): String = exec(pack)
 
     companion object {
-        private const val DEFAULT_TASK = "Focus"
+        private const val FIELD_GOAL = "goal"
+
+        private fun validatePomodoroForm(values: Map<String, String>): String? =
+            if (values[FIELD_GOAL].isNullOrBlank()) "Goal is missing." else null
     }
 }
