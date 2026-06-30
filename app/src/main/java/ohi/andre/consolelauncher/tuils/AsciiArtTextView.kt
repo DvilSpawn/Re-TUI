@@ -21,6 +21,7 @@ class AsciiArtTextView : AppCompatTextView {
     private var textColor = currentTextColor
     private var viewportRowsSetting = DEFAULT_VIEWPORT_ROWS
     private var contentBounds = ContentBounds.EMPTY
+    private var frameHash = 1
     private val bitmapCache = LinkedHashMap<String, Bitmap>(16, 0.75f, true)
     private var bitmapCacheBytes = 0
 
@@ -45,6 +46,10 @@ class AsciiArtTextView : AppCompatTextView {
     }
 
     fun setAsciiFrame(text: String?, color: Int, viewportRows: Int) {
+        val oldLineCount = lines.size
+        val oldBoundsWidth = contentBounds.width()
+        val oldViewportRowsSetting = viewportRowsSetting
+
         val normalized = text.orEmpty()
             .replace("\r\n", "\n")
             .replace('\r', '\n')
@@ -57,7 +62,13 @@ class AsciiArtTextView : AppCompatTextView {
         textColor = color
         viewportRowsSetting = if (viewportRows > 0) viewportRows else DEFAULT_VIEWPORT_ROWS
         contentBounds = ContentBounds.from(lines)
-        requestLayout()
+        frameHash = lines.hashCode()
+        if (oldLineCount != lines.size ||
+            oldBoundsWidth != contentBounds.width() ||
+            oldViewportRowsSetting != viewportRowsSetting
+        ) {
+            requestLayout()
+        }
         invalidate()
     }
 
@@ -211,11 +222,7 @@ class AsciiArtTextView : AppCompatTextView {
     }
 
     private fun frameCacheKey(availableWidth: Int, availableHeight: Int): String {
-        var hash = 1
-        for (line in lines) {
-            hash = 31 * hash + line.hashCode()
-        }
-        return hash.toString() + ":" +
+        return frameHash.toString() + ":" +
                 lines.size + ":" +
                 textColor + ":" +
                 viewportRowsSetting + ":" +

@@ -60,6 +60,20 @@
                     android:textSize="14sp" />
 
                 <TextView
+                    android:id="@+id/notification_widget_clear"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="28dp"
+                    android:layout_marginStart="4dp"
+                    android:layout_weight="1"
+                    android:background="@android:color/transparent"
+                    android:fontFamily="monospace"
+                    android:gravity="center"
+                    android:text="[clear]"
+                    android:textColor="#FFFFFF"
+                    android:textSize="14sp" />
+
+                <TextView
                     android:id="@+id/notification_widget_next"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -94,6 +108,20 @@
         android:text="NOTIFICATIONS"
         android:textColor="#FFFFFF"
         android:textSize="14sp" />
+
+    <ImageButton
+        android:id="@+id/notification_widget_settings"
+        android:layout_width="42dp"
+        android:layout_height="34dp"
+        android:layout_toStartOf="@id/notification_widget_close"
+        android:layout_alignTop="@id/notification_widget_border"
+        android:layout_marginTop="-10dp"
+        android:layout_marginEnd="4dp"
+        android:background="@drawable/apps_drawer_header_border"
+        android:contentDescription="@string/notification_settings"
+        android:padding="7dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_menu" />
 
     <TextView
         android:id="@+id/notification_widget_close"

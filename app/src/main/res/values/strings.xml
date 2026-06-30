@@ -37,6 +37,7 @@
     <string name="reply_notification_not_found">0 notifications from this app</string>
 
     <!-- notifications menu -->
+    <string name="notification_settings">Notification settings</string>
     <string name="exclude_notification">Exclude notification</string>
     <string name="exclude_app">Exclude app</string>
     <string name="reply_notification">Reply to the last notification</string>

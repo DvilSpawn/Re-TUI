@@ -141,6 +141,8 @@ class apps : ParamCommand() {
                 try {
                     val save: XMLPrefsSave = Apps.valueOf("default_app_n" + index)
                     set(pack.context, save, marker)
+                    (pack as MainPack).appsManager.refreshDefaultSuggestions()
+                    (pack.context as? LauncherActivity)?.uiManager?.refreshSuggestionsSoon()
                     return null
                 } catch (e: Exception) {
                     return pack.context.getString(R.string.invalid_integer)

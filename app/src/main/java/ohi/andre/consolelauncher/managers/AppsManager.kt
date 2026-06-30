@@ -1000,6 +1000,10 @@ class AppsManager(context: Context) : XMLPrefsElement {
             return appsHolder!!.suggestedApps
         }
 
+    fun refreshDefaultSuggestions() {
+        if (appsHolder != null) appsHolder!!.update(true)
+    }
+
     fun printApps(type: Int): String? {
         return printNApps(type, -1)
     }
@@ -1419,7 +1423,10 @@ class AppsManager(context: Context) : XMLPrefsElement {
                         var info: LaunchInfo? =
                             AppUtils.findLaunchInfoWithIdentity(this.apps, identity)
                         if (info == null) {
-                            info = AppUtils.findLaunchInfosWithPackage(vl, this.apps).firstOrNull()
+                            info = AppUtils.findLaunchInfosWithPackage(
+                                identity?.componentName?.packageName ?: vl,
+                                this.apps
+                            ).firstOrNull()
                         }
                         if (info == null) continue
                         suggested.add(SuggestedApp(info, USER_DEFINIED, count + 1))

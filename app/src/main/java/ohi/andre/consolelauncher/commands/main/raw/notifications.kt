@@ -285,6 +285,19 @@ class notifications : ParamCommand(), APICommand {
                 return "Notification module is not available."
             }
         },
+        clear {
+            override fun args(): IntArray? {
+                return IntArray(0)
+            }
+
+            override fun exec(pack: ExecutePack): String? {
+                if (LauncherActivity.instance != null && LauncherActivity.instance!!.uiManager != null) {
+                    LauncherActivity.instance!!.runOnUiThread(Runnable { LauncherActivity.instance!!.uiManager!!.dismissCurrentNotification() })
+                    return null
+                }
+                return "Notification module is not available."
+            }
+        },
         tutorial {
             override fun args(): IntArray? {
                 return IntArray(0)

@@ -108,6 +108,13 @@ class NotificationService : NotificationListenerService() {
             }
         }
     }
+    private val dismissReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent != null && ACTION_DISMISS_NOTIFICATION == intent.getAction()) {
+                dismissNotification(intent.getStringExtra(EXTRA_NOTIFICATION_KEY))
+            }
+        }
+    }
     private var lastMediaTitle: String? = null
     private var lastMediaArtist: String? = null
     private var lastMediaDuration = 0
@@ -116,6 +123,7 @@ class NotificationService : NotificationListenerService() {
     private var controlReceiverRegistered = false
     private var feedRequestReceiverRegistered = false
     private var reloadReceiverRegistered = false
+    private var dismissReceiverRegistered = false
     private val clearExternalMusicRunnable: Runnable = object : Runnable {
         override fun run() {
             clearRememberedMediaState()
@@ -690,7 +698,8 @@ class NotificationService : NotificationListenerService() {
                                 System.currentTimeMillis(),
                                 text,
                                 pack,
-                                notification.contentIntent
+                                notification.contentIntent,
+                                currentSbn.getKey()
                             )
 
                             if (found == 1) {
@@ -788,6 +797,14 @@ class NotificationService : NotificationListenerService() {
             )
             reloadReceiverRegistered = true
         }
+        if (!dismissReceiverRegistered) {
+            LocalBroadcastManager.getInstance(this).registerReceiver(
+                dismissReceiver, IntentFilter(
+                    ACTION_DISMISS_NOTIFICATION
+                )
+            )
+            dismissReceiverRegistered = true
+        }
         loadConfig()
         seedActiveNotifications()
         bgThread?.start()
@@ -878,6 +895,13 @@ class NotificationService : NotificationListenerService() {
             }
             reloadReceiverRegistered = false
         }
+        if (dismissReceiverRegistered) {
+            try {
+                LocalBroadcastManager.getInstance(this).unregisterReceiver(dismissReceiver)
+            } catch (ignored: Exception) {
+            }
+            dismissReceiverRegistered = false
+        }
 
         if (queue != null) {
             queue!!.clear()
@@ -956,7 +980,7 @@ class NotificationService : NotificationListenerService() {
             return
         }
 
-        removeOverlayNotification(sbn.getPackageName(), sbn.getNotification())
+        removeOverlayNotification(sbn.getKey(), sbn.getPackageName(), sbn.getNotification())
     }
 
     private fun seedActiveNotifications() {
@@ -1108,11 +1132,12 @@ class NotificationService : NotificationListenerService() {
 
         for (i in overlayNotifications.indices) {
             val existing = overlayNotifications.get(i)
-            if (TextUtils.equals(
+            val keyMatches = !TextUtils.isEmpty(notification.key) && TextUtils.equals(existing.key, notification.key)
+            val fallbackMatches = TextUtils.equals(
                     existing.pkg,
                     notification.pkg
                 ) && TextUtils.equals(existing.preview, notification.preview)
-            ) {
+            if (keyMatches || fallbackMatches) {
                 overlayNotifications.removeAt(i)
                 break
             }
@@ -1126,15 +1151,52 @@ class NotificationService : NotificationListenerService() {
         broadcastOverlayNotifications()
     }
 
-    private fun removeOverlayNotification(pkg: String?, rawNotification: android.app.Notification) {
+    private fun dismissNotification(key: String?) {
+        if (TextUtils.isEmpty(key)) {
+            return
+        }
+
+        try {
+            cancelNotification(key)
+            removeOverlayNotificationByKey(key)
+        } catch (e: SecurityException) {
+            Tuils.log("Unable to clear notification: " + e.message)
+        } catch (e: Exception) {
+            Tuils.log(e)
+        }
+    }
+
+    private fun removeOverlayNotificationByKey(key: String?) {
+        if (TextUtils.isEmpty(key)) {
+            return
+        }
+
+        var changed = false
+        var i = 0
+        while (i < overlayNotifications.size) {
+            if (TextUtils.equals(overlayNotifications.get(i).key, key)) {
+                overlayNotifications.removeAt(i)
+                changed = true
+                i--
+            }
+            i++
+        }
+
+        if (changed) {
+            broadcastOverlayNotifications()
+        }
+    }
+
+    private fun removeOverlayNotification(key: String?, pkg: String?, rawNotification: android.app.Notification) {
         val preview = buildNotificationPreview(NotificationCompat.getExtras(rawNotification), null)
 
         var i = 0
         while (i < overlayNotifications.size) {
             val existing = overlayNotifications.get(i)
+            val keyMatches = !TextUtils.isEmpty(key) && TextUtils.equals(existing.key, key)
             val packageMatches = TextUtils.equals(existing.pkg, pkg)
             val previewMatches = TextUtils.equals(existing.preview, preview)
-            if (packageMatches && (previewMatches || TextUtils.isEmpty(preview))) {
+            if (keyMatches || (packageMatches && (previewMatches || TextUtils.isEmpty(preview)))) {
                 overlayNotifications.removeAt(i)
                 i--
             }
@@ -1161,13 +1223,15 @@ class NotificationService : NotificationListenerService() {
         var preview: String? = null
         var title: String? = null
         var body: String? = null
+        var key: String? = null
         var pendingIntent: PendingIntent?
 
-        constructor(time: Long, text: String?, pkg: String?, pi: PendingIntent?) {
+        constructor(time: Long, text: String?, pkg: String?, pi: PendingIntent?, key: String?) {
             this.time = time
             this.text = text
             this.pkg = pkg
             this.pendingIntent = pi
+            this.key = key
         }
 
         protected constructor(`in`: Parcel) {
@@ -1178,6 +1242,7 @@ class NotificationService : NotificationListenerService() {
             preview = `in`.readString()
             title = `in`.readString()
             body = `in`.readString()
+            key = `in`.readString()
             pendingIntent =
                 `in`.readParcelable<PendingIntent?>(PendingIntent::class.java.getClassLoader())
         }
@@ -1194,6 +1259,7 @@ class NotificationService : NotificationListenerService() {
             dest.writeString(preview)
             dest.writeString(title)
             dest.writeString(body)
+            dest.writeString(key)
             dest.writeParcelable(pendingIntent, flags)
         }
 
@@ -1220,6 +1286,9 @@ class NotificationService : NotificationListenerService() {
             BuildConfig.APPLICATION_ID + ".notification_feed_request"
         val ACTION_RELOAD_NOTIFICATION_CONFIG: String =
             BuildConfig.APPLICATION_ID + ".notification_reload"
+        val ACTION_DISMISS_NOTIFICATION: String =
+            BuildConfig.APPLICATION_ID + ".notification_dismiss"
+        const val EXTRA_NOTIFICATION_KEY: String = "notification_key"
         private const val MEDIA_SESSION_EMPTY_GRACE_MS = 3000L
         private const val MAX_OVERLAY_NOTIFICATIONS = 12
 
@@ -1232,6 +1301,16 @@ class NotificationService : NotificationListenerService() {
 
             LocalBroadcastManager.getInstance(context.getApplicationContext())
                 .sendBroadcast(Intent(ACTION_RELOAD_NOTIFICATION_CONFIG))
+        }
+
+        fun requestDismiss(context: Context?, key: String?) {
+            if (context == null || TextUtils.isEmpty(key)) {
+                return
+            }
+
+            val intent = Intent(ACTION_DISMISS_NOTIFICATION)
+            intent.putExtra(EXTRA_NOTIFICATION_KEY, key)
+            LocalBroadcastManager.getInstance(context.getApplicationContext()).sendBroadcast(intent)
         }
 
         fun requestListenerRebind(context: Context?) {

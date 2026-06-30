@@ -67,12 +67,13 @@ class AsciiAnimationManager(
             return span(text)
         }
 
+        val minFrameDelay = minFrameDelayFor(text)
         val parsed = parseFrames(text, defaultDelayMillis)
         if (parsed.size < 2) {
             return span(text)
         }
 
-        frames = parsed.map { Frame(span(it.text), it.delayMillis) }
+        frames = parsed.map { Frame(span(it.text), max(it.delayMillis, minFrameDelay)) }
         nextFrameIndex = 1
         return frames[0].text
     }
@@ -106,6 +107,8 @@ class AsciiAnimationManager(
     companion object {
         private const val MIN_DELAY_MS = 250L
         private const val MAX_DELAY_MS = 10_000L
+        private const val LARGE_ANIMATION_CHARS = 256 * 1024
+        private const val LARGE_ANIMATION_MIN_DELAY_MS = 1000L
         private val FRAME_DIRECTIVE: Pattern =
             Pattern.compile("^\\s*::frame(?:\\s+(?:delay=)?(\\d{2,6}))?\\s*$", Pattern.CASE_INSENSITIVE)
         private val FRAME_LABEL: Pattern =
@@ -118,6 +121,10 @@ class AsciiAnimationManager(
 
         fun supportedFrameCount(text: String): Int {
             return parseFrames(text, MIN_DELAY_MS).size
+        }
+
+        private fun minFrameDelayFor(text: String): Long {
+            return if (text.length >= LARGE_ANIMATION_CHARS) LARGE_ANIMATION_MIN_DELAY_MS else MIN_DELAY_MS
         }
 
         private fun parseFrames(text: String, defaultDelayMillis: Long): List<RawFrame> {

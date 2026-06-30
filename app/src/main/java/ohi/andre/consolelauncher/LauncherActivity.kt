@@ -604,6 +604,9 @@ class LauncherActivity : AppCompatActivity(), Reloadable {
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
+        if (this@LauncherActivity.uiManager != null) {
+            uiManager!!.onLauncherWindowFocusChanged(hasFocus)
+        }
         if (hasFocus) {
             applyFullscreen(this)
         }

@@ -59,6 +59,7 @@ import android.widget.HorizontalScrollView
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.PopupMenu
 import android.widget.RelativeLayout
 import android.widget.ScrollView
 import android.widget.TextView
@@ -100,6 +101,7 @@ import ohi.andre.consolelauncher.managers.modules.ModuleVariableManager
 import ohi.andre.consolelauncher.managers.modules.ReminderManager
 import ohi.andre.consolelauncher.managers.modules.UpcomingEventsManager
 import ohi.andre.consolelauncher.managers.music.MusicService
+import ohi.andre.consolelauncher.managers.notifications.NotificationManager
 import ohi.andre.consolelauncher.managers.notifications.NotificationService
 import ohi.andre.consolelauncher.managers.notifications.reply.ReplyManager
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings
@@ -500,6 +502,12 @@ class UIManager(
 
     private var asciiColor = 0
     private var asciiAnimationManager: AsciiAnimationManager? = null
+    private var asciiIdlePaused = false
+    private var launcherWindowFocused = true
+    private val asciiIdlePauseRunnable = Runnable {
+        asciiIdlePaused = true
+        asciiAnimationManager?.stop()
+    }
 
     private val statusUpdateListener: StatusUpdateListener =
         StatusUpdateListener { l: Label?, s: CharSequence? -> this.updateText(l!!, s) }
@@ -685,6 +693,9 @@ class UIManager(
 
     //    you need to use labelIndexes[i]
     private fun updateText(l: Label, s: CharSequence?) {
+        if (labelTexts[l.ordinal] === s) {
+            return
+        }
         labelTexts[l.ordinal] = s
 
         val base = labelIndexes[l.ordinal].toInt()
@@ -5281,6 +5292,17 @@ class UIManager(
             next.setTextColor(moduleNameTextColor())
             next.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
         }
+        val clear = notificationWidget.findViewById<TextView?>(R.id.notification_widget_clear)
+        if (clear != null) {
+            clear.setOnClickListener(View.OnClickListener { v: View? -> dismissCurrentNotification() })
+            clear.setTextColor(moduleNameTextColor())
+            clear.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
+        }
+        val settings = notificationWidget.findViewById<ImageButton?>(R.id.notification_widget_settings)
+        if (settings != null) {
+            settings.setOnClickListener(View.OnClickListener { v: View? -> showNotificationSettingsPopup(settings) })
+            styleNotificationSettingsButton(settings)
+        }
         val close = notificationWidget.findViewById<TextView?>(R.id.notification_widget_close)
         if (close != null) {
             close.setOnClickListener(View.OnClickListener { v: View? -> closeHomeModule() })
@@ -7651,18 +7673,21 @@ class UIManager(
                 }
             })
 
-            rootView.setOnTouchListener(OnTouchListener { v: View?, event: MotionEvent? ->
-                if (gestureDetector != null) {
-                    val handled = gestureDetector!!.onTouchEvent(event!!)
-                    if (!handled && event.getAction() == MotionEvent.ACTION_UP) {
-                        v!!.performClick()
-                    }
-                    handled
-                } else {
-                    false
-                }
-            })
         }
+        rootView.setOnTouchListener(OnTouchListener { v: View?, event: MotionEvent? ->
+            if (event != null) {
+                onLauncherInteraction()
+            }
+            if (gestureDetector != null && event != null) {
+                val handled = gestureDetector!!.onTouchEvent(event)
+                if (!handled && event.action == MotionEvent.ACTION_UP) {
+                    v!!.performClick()
+                }
+                handled
+            } else {
+                false
+            }
+        })
 
         appDrawerPaneManager = AppDrawerPaneManager(
             mContext!!,
@@ -8072,6 +8097,7 @@ class UIManager(
                 )
             )
             asciiAnimationManager!!.start()
+            scheduleAsciiIdlePause()
         }
 
         if (show[Label.unlock.ordinal]) {
@@ -11846,10 +11872,14 @@ class UIManager(
             if (message != null) {
                 Tuils.sendOutput(mContext, message)
             }
+            if (launcherWindowFocused) {
+                resumeAsciiAnimation()
+            }
             return
         }
 
         isLockdownOverlayVisible = true
+        pauseAsciiAnimation()
         closeKeyboard()
         mRootView.findViewById<View?>(R.id.main_container)?.setVisibility(View.GONE)
         val terminalTray = mRootView.findViewById<View?>(R.id.terminal_tray_container)
@@ -12008,8 +12038,10 @@ class UIManager(
             notificationWidgetTextColor()
         )
         styleModuleClose(notificationWidget.findViewById<TextView?>(R.id.notification_widget_close))
+        styleNotificationSettingsButton(notificationWidget.findViewById<ImageButton?>(R.id.notification_widget_settings))
         styleNotificationPagerButton(notificationWidget.findViewById<View?>(R.id.notification_widget_prev))
         styleNotificationPagerButton(notificationWidget.findViewById<View?>(R.id.notification_widget_next))
+        styleNotificationPagerButton(notificationWidget.findViewById<View?>(R.id.notification_widget_clear))
         applyNotificationWidgetSize(notificationWidget)
         renderNotificationRows(notificationWidget)
     }
@@ -12332,6 +12364,12 @@ class UIManager(
         )
     }
 
+    private fun styleNotificationSettingsButton(button: ImageButton?) {
+        if (button == null) return
+        button.setColorFilter(moduleNameTextColor(), PorterDuff.Mode.SRC_IN)
+        button.setBackground(TerminalBorderRuntime.tabDrawable(mContext, terminalHeaderTabBackground()))
+    }
+
     private fun clampNotificationIndex() {
         if (currentOverlayNotifications.isEmpty()) {
             currentNotificationIndex = 0
@@ -12390,6 +12428,7 @@ class UIManager(
 
     private fun notificationKey(notification: NotificationService.Notification?): String? {
         if (notification == null) return null
+        if (!TextUtils.isEmpty(notification.key)) return notification.key
         return (safeNotificationPart(notification.pkg)
                 + "|"
                 + safeNotificationPart(notification.title)
@@ -12408,8 +12447,11 @@ class UIManager(
         val replyActive = ModulePromptManager.isNotificationReplyActive(mContext)
         val enabled =
             ModuleManager.NOTIFICATIONS == activeModule && currentOverlayNotifications.size > 1 && !replyActive
+        val clearEnabled =
+            ModuleManager.NOTIFICATIONS == activeModule && !replyActive && !TextUtils.isEmpty(currentNotification()?.key)
         val prev = notificationWidget.findViewById<TextView?>(R.id.notification_widget_prev)
         val next = notificationWidget.findViewById<TextView?>(R.id.notification_widget_next)
+        val clear = notificationWidget.findViewById<TextView?>(R.id.notification_widget_clear)
         if (prev != null) {
             prev.setVisibility(if (ModuleManager.NOTIFICATIONS == activeModule) View.VISIBLE else View.GONE)
             prev.setEnabled(enabled)
@@ -12419,6 +12461,11 @@ class UIManager(
             next.setVisibility(if (ModuleManager.NOTIFICATIONS == activeModule) View.VISIBLE else View.GONE)
             next.setEnabled(enabled)
             next.setAlpha(if (enabled) 1f else 0.35f)
+        }
+        if (clear != null) {
+            clear.setVisibility(if (ModuleManager.NOTIFICATIONS == activeModule) View.VISIBLE else View.GONE)
+            clear.setEnabled(clearEnabled)
+            clear.setAlpha(if (clearEnabled) 1f else 0.35f)
         }
     }
 
@@ -12457,6 +12504,55 @@ class UIManager(
             notification.appName
         )
         refreshSuggestionsForActiveModule()
+    }
+
+    fun dismissCurrentNotification() {
+        if (ModulePromptManager.isNotificationReplyActive(mContext)) return
+        val notification = currentNotification()
+        if (notification == null) {
+            Tuils.sendOutput(mContext, "No notification selected.")
+            return
+        }
+        val key = notification.key
+        if (TextUtils.isEmpty(key)) {
+            Tuils.sendOutput(mContext, "Selected notification cannot be cleared.")
+            return
+        }
+
+        NotificationService.requestDismiss(mContext, key)
+        currentOverlayNotifications.removeAt(currentNotificationIndex)
+        clampNotificationIndex()
+        refreshNotificationModuleView()
+    }
+
+    private fun showNotificationSettingsPopup(anchor: View) {
+        val notification = currentNotification()
+        if (notification == null) {
+            Tuils.sendOutput(mContext, "No notification selected.")
+            return
+        }
+
+        val menu = PopupMenu(anchor.context, anchor)
+        menu.menu.add(R.string.exclude_notification)
+        menu.setOnMenuItemClickListener {
+                excludeNotificationFromPanel(notification)
+            true
+        }
+        menu.show()
+    }
+
+    private fun excludeNotificationFromPanel(notification: NotificationService.Notification) {
+        if (TextUtils.isEmpty(notification.text)) {
+            Tuils.sendOutput(mContext, "Selected notification cannot be excluded.")
+            return
+        }
+
+        NotificationManager.addLiteralFilter(notification.text)
+        NotificationService.requestReload(mContext)
+        currentOverlayNotifications.remove(notification)
+        clampNotificationIndex()
+        refreshNotificationModuleView()
+        Tuils.sendOutput(mContext, "Notification excluded from launcher panel.")
     }
 
     private val isCurrentNotificationReplyable: Boolean
@@ -12716,6 +12812,7 @@ class UIManager(
     }
 
     fun activateTerminalInput(showSoftKeyboard: Boolean) {
+        onLauncherInteraction()
         if (this.isTermuxConsoleVisible) {
             takeTermuxConsoleFocus(showSoftKeyboard)
             return
@@ -12748,6 +12845,7 @@ class UIManager(
     }
 
     fun pause() {
+        launcherWindowFocused = false
         if (mTerminalAdapter != null) {
             closeKeyboard()
         }
@@ -12770,7 +12868,7 @@ class UIManager(
         if (networkManager != null) networkManager!!.stop()
         if (tuiTimeManager != null) tuiTimeManager!!.stop()
         if (unlockManager != null) unlockManager!!.stop()
-        asciiAnimationManager?.stop()
+        pauseAsciiAnimation()
         androidWidgetDrawerManager?.stopListening()
     }
 
@@ -12801,6 +12899,7 @@ class UIManager(
         if (handler == null) {
             return
         }
+        launcherWindowFocused = true
         if (restoreLauncherChromeOnResume) {
             restoreLauncherChromeOnResume = false
             restoreLauncherChromeAfterSurface()
@@ -12816,7 +12915,7 @@ class UIManager(
         if (networkManager != null) networkManager!!.start()
         if (tuiTimeManager != null) tuiTimeManager!!.start()
         if (unlockManager != null) unlockManager!!.start()
-        asciiAnimationManager?.start()
+        resumeAsciiAnimation()
         androidWidgetDrawerManager?.startListening()
 
         // Refresh Pomodoro overlay on resume
@@ -12840,6 +12939,15 @@ class UIManager(
             intent.putExtra(LockdownManager.EXTRA_LOCKDOWN_TOTAL, lockdown.totalDuration)
             intent.putExtra(LockdownManager.EXTRA_LOCKDOWN_REASON, lockdown.reason)
             updateLockdownOverlay(intent)
+        }
+    }
+
+    fun onLauncherWindowFocusChanged(hasFocus: Boolean) {
+        launcherWindowFocused = hasFocus
+        if (hasFocus) {
+            resumeAsciiAnimation()
+        } else {
+            pauseAsciiAnimation()
         }
     }
 
@@ -12916,11 +13024,45 @@ class UIManager(
     }
 
     override fun onTouch(v: View, event: MotionEvent): Boolean {
-        gestureDetector!!.onTouchEvent(event)
+        onLauncherInteraction()
+        gestureDetector?.onTouchEvent(event)
         if (event.actionMasked == MotionEvent.ACTION_UP) {
             v.performClick()
         }
         return v.onTouchEvent(event)
+    }
+
+    private fun onLauncherInteraction() {
+        if (!launcherWindowFocused || isLockdownOverlayVisible) {
+            return
+        }
+        if (asciiIdlePaused) {
+            asciiIdlePaused = false
+            asciiAnimationManager?.start()
+        }
+        scheduleAsciiIdlePause()
+    }
+
+    private fun pauseAsciiAnimation() {
+        handler?.removeCallbacks(asciiIdlePauseRunnable)
+        asciiAnimationManager?.stop()
+    }
+
+    private fun resumeAsciiAnimation() {
+        if (isLockdownOverlayVisible) {
+            return
+        }
+        asciiIdlePaused = false
+        asciiAnimationManager?.start()
+        scheduleAsciiIdlePause()
+    }
+
+    private fun scheduleAsciiIdlePause() {
+        val currentHandler = handler ?: return
+        currentHandler.removeCallbacks(asciiIdlePauseRunnable)
+        if (launcherWindowFocused && asciiAnimationManager != null) {
+            currentHandler.postDelayed(asciiIdlePauseRunnable, ASCII_IDLE_PAUSE_MS)
+        }
     }
 
     fun buildRedirectionListener(): OnRedirectionListener {
@@ -12985,6 +13127,7 @@ class UIManager(
         private const val PREF_TIMER_BADGE_FRACTION = "timer_badge_fraction"
         private const val PREF_STOPWATCH_BADGE_EDGE = "stopwatch_badge_edge"
         private const val PREF_STOPWATCH_BADGE_FRACTION = "stopwatch_badge_fraction"
+        private const val ASCII_IDLE_PAUSE_MS = 120_000L
         val ACTION_UPDATE_SUGGESTIONS: String =
             BuildConfig.APPLICATION_ID + ".ui_update_suggestions"
         val ACTION_UPDATE_HINT: String = BuildConfig.APPLICATION_ID + ".ui_update_hint"
