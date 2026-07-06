@@ -75,9 +75,16 @@ class AsciiArtTextView : AppCompatTextView {
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         configurePaint(baseTextSizePx())
         val availableWidth = max(1, MeasureSpec.getSize(widthMeasureSpec) - paddingLeft - paddingRight)
-        val sourceRows = viewportRows(availableWidth)
-        val paneRows = min(sourceRows, DEFAULT_PANE_ROWS)
-        val desiredHeight = paddingTop + paddingBottom + ceil(lineHeightPx() * paneRows).toInt()
+        val desiredHeight = if (isAutoFitMode()) {
+            val targetHeight = ceil(lineHeightPx() * DEFAULT_PANE_ROWS).toInt()
+            val scale = fitScale(availableWidth, targetHeight)
+            paddingTop + paddingBottom +
+                    max(1, ceil(lineHeightPx() * contentBounds.height() * scale + FIT_INSET_PX * 2).toInt())
+        } else {
+            val sourceRows = viewportRows(availableWidth)
+            val paneRows = min(sourceRows, DEFAULT_PANE_ROWS)
+            paddingTop + paddingBottom + ceil(lineHeightPx() * paneRows).toInt()
+        }
         val desiredWidth = suggestedMinimumWidth
         setMeasuredDimension(
             resolveSize(desiredWidth, widthMeasureSpec),
@@ -133,6 +140,11 @@ class AsciiArtTextView : AppCompatTextView {
         val bitmapCanvas = Canvas(bitmap)
         bitmap.eraseColor(Color.TRANSPARENT)
 
+        if (isAutoFitMode()) {
+            drawFittedFrame(bitmapCanvas, availableWidth, availableHeight)
+            return bitmap
+        }
+
         configurePaint(scaledTextSizePx(availableWidth, availableHeight))
         val cellWidth = cellWidthPx()
         val lineHeight = lineHeightPx()
@@ -174,6 +186,51 @@ class AsciiArtTextView : AppCompatTextView {
         }
 
         return bitmap
+    }
+
+    private fun drawFittedFrame(canvas: Canvas, availableWidth: Int, availableHeight: Int) {
+        if (!contentBounds.hasContent) {
+            return
+        }
+
+        configurePaint(baseTextSizePx())
+        val cellWidth = cellWidthPx()
+        val lineHeight = lineHeightPx()
+        val scale = fitScale(availableWidth, availableHeight)
+        val contentWidth = cellWidth * contentBounds.width() * scale
+        val contentHeight = lineHeight * contentBounds.height() * scale
+        val offsetX = max(0f, (availableWidth - contentWidth) / 2f)
+        val offsetY = max(0f, (availableHeight - contentHeight) / 2f)
+
+        val metrics = asciiPaint.fontMetrics
+        var baseline = -metrics.ascent
+        var top = 0f
+        canvas.save()
+        canvas.translate(offsetX, offsetY)
+        canvas.scale(scale, scale)
+        for (row in contentBounds.top..contentBounds.bottom) {
+            val line = lines[row]
+            if (contentBounds.left < line.length) {
+                val end = min(line.length, contentBounds.right + 1)
+                for (col in contentBounds.left until end) {
+                    val ch = line[col]
+                    if (!ch.isWhitespace()) {
+                        drawCell(
+                            canvas,
+                            ch,
+                            (col - contentBounds.left) * cellWidth,
+                            top,
+                            baseline,
+                            cellWidth,
+                            lineHeight
+                        )
+                    }
+                }
+            }
+            baseline += lineHeight
+            top += lineHeight
+        }
+        canvas.restore()
     }
 
     private fun configurePaint(textSizePx: Float) {
@@ -278,6 +335,14 @@ class AsciiArtTextView : AppCompatTextView {
         return max(minTextSizePx(), baseTextSizePx() * scale)
     }
 
+    private fun fitScale(availableWidth: Int, availableHeight: Int): Float {
+        val fitWidth = max(1f, availableWidth - FIT_INSET_PX * 2)
+        val fitHeight = max(1f, availableHeight - FIT_INSET_PX * 2)
+        val widthScale = fitWidth / max(1f, contentBounds.width() * cellWidthPx())
+        val heightScale = fitHeight / max(1f, contentBounds.height() * lineHeightPx())
+        return min(1f, min(widthScale, heightScale))
+    }
+
     private fun viewportRows(availableWidth: Int): Int {
         val contentRows = max(1, lines.size)
         if (viewportRowsSetting > 0) {
@@ -352,6 +417,10 @@ class AsciiArtTextView : AppCompatTextView {
         )
     }
 
+    private fun isAutoFitMode(): Boolean {
+        return viewportRowsSetting <= 0
+    }
+
     private fun clamp(value: Int, minValue: Int, maxValue: Int): Int {
         return max(minValue, min(value, maxValue))
     }
@@ -365,6 +434,10 @@ class AsciiArtTextView : AppCompatTextView {
     ) {
         fun width(): Int {
             return if (hasContent) right - left + 1 else 1
+        }
+
+        fun height(): Int {
+            return if (hasContent) bottom - top + 1 else 1
         }
 
         companion object {
@@ -399,6 +472,7 @@ class AsciiArtTextView : AppCompatTextView {
     companion object {
         private const val VIEWPORT_TEXT_SIZE_SP = 12f
         private const val MIN_VIEWPORT_TEXT_SIZE_SP = 2.5f
+        private const val FIT_INSET_PX = 4f
         private const val DEFAULT_PANE_ROWS = 10
         private const val DEFAULT_VIEWPORT_ROWS = -1
         private const val MAX_AUTO_VIEWPORT_ROWS = 48
