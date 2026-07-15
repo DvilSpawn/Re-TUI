@@ -12,6 +12,8 @@ import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.content.res.ColorStateList
 import android.content.res.Configuration
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.graphics.Rect
@@ -31,8 +33,10 @@ import android.text.TextWatcher
 import android.text.method.LinkMovementMethod
 import android.text.style.BackgroundColorSpan
 import android.text.style.ForegroundColorSpan
+import android.text.style.RelativeSizeSpan
 import android.text.style.StyleSpan
 import android.util.DisplayMetrics
+import android.util.LruCache
 import android.util.Log
 import android.util.TypedValue
 import android.view.GestureDetector
@@ -62,6 +66,7 @@ import android.widget.LinearLayout
 import android.widget.PopupMenu
 import android.widget.RelativeLayout
 import android.widget.ScrollView
+import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.TextView.OnEditorActionListener
 import android.widget.Toast
@@ -73,6 +78,7 @@ import androidx.core.widget.TextViewCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
+import okhttp3.Request
 import ohi.andre.consolelauncher.commands.main.MainPack
 import ohi.andre.consolelauncher.commands.main.raw.tbridge
 import ohi.andre.consolelauncher.commands.main.specific.RedirectCommand
@@ -178,6 +184,8 @@ import ohi.andre.consolelauncher.tuils.OutlineTextView
 import ohi.andre.consolelauncher.tuils.StableHorizontalScrollView
 import ohi.andre.consolelauncher.tuils.TerminalBorderRuntime
 import ohi.andre.consolelauncher.tuils.TerminalTrayToggleView
+import ohi.andre.consolelauncher.tuils.LongClickMovementMethod
+import ohi.andre.consolelauncher.tuils.LongClickableSpan
 import ohi.andre.consolelauncher.tuils.TuiWidgetDecorator
 import ohi.andre.consolelauncher.tuils.TuiWidgetDecorator.decorateWidget
 import ohi.andre.consolelauncher.tuils.Tuils
@@ -218,6 +226,10 @@ import java.lang.reflect.Method
 import java.util.ArrayList
 import ohi.andre.consolelauncher.managers.HTMLExtractManager
 import ohi.andre.consolelauncher.managers.RssManager
+import ohi.andre.consolelauncher.managers.podcast.PodcastEpisode
+import ohi.andre.consolelauncher.managers.podcast.PodcastManager
+import ohi.andre.consolelauncher.managers.podcast.PodcastRecent
+import ohi.andre.consolelauncher.managers.podcast.PodcastShow
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings
 import ohi.andre.consolelauncher.managers.settings.MusicSettings
 import ohi.andre.consolelauncher.managers.settings.NotificationSettings
@@ -380,6 +392,9 @@ class UIManager(
     private var termuxWorkspaceLocalOutputHoldUntilMs = 0L
     private var termuxWorkspaceTouchStartX = 0f
     private var termuxWorkspaceTouchStartY = 0f
+    private var rssModuleTouchSpan: LongClickableSpan? = null
+    private var rssModuleTouchStartX = 0f
+    private var rssModuleTouchStartY = 0f
     private var termuxWorkspaceKeyTouchStartX = 0f
     private var termuxWorkspaceKeyTouchStartY = 0f
     private var termuxWorkspaceKeySwipeConsumed = false
@@ -417,6 +432,53 @@ class UIManager(
     private var fileUp: TextView? = null
     private var fileOpen: TextView? = null
     private var filePaste: TextView? = null
+    private var podcastOverlay: View? = null
+    private var podcastOverlayBasePaddingLeft = 0
+    private var podcastOverlayBasePaddingTop = 0
+    private var podcastOverlayBasePaddingRight = 0
+    private var podcastOverlayBasePaddingBottom = 0
+    private var podcastWindowBorder: View? = null
+    private var podcastWindowLabel: TextView? = null
+    private var podcastClose: TextView? = null
+    private var podcastTabs: View? = null
+    private var podcastTabShows: TextView? = null
+    private var podcastAdd: TextView? = null
+    private var podcastRefresh: TextView? = null
+    private var podcastPlayShow: TextView? = null
+    private var podcastContentPanel: View? = null
+    private var podcastContentLabel: TextView? = null
+    private var podcastContent: LinearLayout? = null
+    private var podcastScroll: ScrollView? = null
+    private var podcastPaneActions: LinearLayout? = null
+    private var podcastPlayerControls: LinearLayout? = null
+    private var podcastPlayerProgress: TextView? = null
+    private var podcastPlayerSeek: SeekBar? = null
+    private var podcastPlayerTransport: View? = null
+    private var podcastPlayerPrev: TextView? = null
+    private var podcastPlayerRewind: TextView? = null
+    private var podcastPlayerPlay: TextView? = null
+    private var podcastPlayerForward: TextView? = null
+    private var podcastPlayerNext: TextView? = null
+    private var podcastNowPlaying: View? = null
+    private var podcastArtwork: ImageView? = null
+    private var podcastNowTitle: TextView? = null
+    private var podcastNowMeta: TextView? = null
+    private var podcastNowProgress: TextView? = null
+    private var podcastSeek: SeekBar? = null
+    private var podcastTransport: View? = null
+    private var podcastPrev: TextView? = null
+    private var podcastRewind: TextView? = null
+    private var podcastPlay: TextView? = null
+    private var podcastForward: TextView? = null
+    private var podcastNext: TextView? = null
+    private var podcastMode = PODCAST_MODE_SHOWS
+    private var podcastTagFilter: String? = null
+    private var podcastSeekDragging = false
+    private var podcastArtworkUrl: String? = null
+    private var podcastStatus: String? = null
+    private val podcastImageCache = object : LruCache<String, Bitmap>(6 * 1024 * 1024) {
+        override fun sizeOf(key: String, value: Bitmap): Int = value.byteCount
+    }
     private val lastFileListingPath = ""
     private var suggestionsContainer: View? = null
     private var suggestionsVisibilityBeforeTermux = View.VISIBLE
@@ -529,9 +591,24 @@ class UIManager(
     private val musicTimeRunnable: Runnable = object : Runnable {
         override fun run() {
             var shouldContinue = false
-            if ("internal" == activeMusicSource) {
-                val musicWidget = mRootView!!.findViewById<View?>(R.id.music_widget)
-                if (musicWidget != null && musicWidget.getVisibility() == View.VISIBLE) {
+            val musicWidget = mRootView!!.findViewById<View?>(R.id.music_widget)
+            if (MusicService.SOURCE_PODCAST == activeMusicSource) {
+                val manager = mainPack.podcastManager
+                val current = manager.currentSong()
+                if (current != null && manager.isPlaying()) {
+                    manager.saveCurrentProgress()
+                    shouldContinue = true
+                    val intent = Intent(ACTION_MUSIC_CHANGED)
+                    intent.putExtra(SONG_TITLE, current.getTitle())
+                    intent.putExtra(SONG_SINGER, current.getSinger())
+                    intent.putExtra(SONG_DURATION, manager.duration())
+                    intent.putExtra(SONG_POSITION, manager.currentPosition())
+                    intent.putExtra(MUSIC_PLAYING, true)
+                    intent.putExtra(MusicService.MUSIC_SOURCE, MusicService.SOURCE_PODCAST)
+                    LocalBroadcastManager.getInstance(mContext!!).sendBroadcast(intent)
+                }
+            } else if (musicWidget != null && musicWidget.getVisibility() == View.VISIBLE) {
+                if (MusicService.SOURCE_INTERNAL == activeMusicSource) {
                     if (mainPack != null && mainPack.player != null && mainPack.player!!.isPlaying()) {
                         shouldContinue = true
                         val intent: Intent = Intent(ACTION_MUSIC_CHANGED)
@@ -546,7 +623,7 @@ class UIManager(
                         intent.putExtra(SONG_DURATION, mainPack.player!!.getDuration())
                         intent.putExtra(SONG_POSITION, mainPack.player!!.getCurrentPosition())
                         intent.putExtra(MUSIC_PLAYING, mainPack.player!!.isPlaying())
-                        intent.putExtra("source", "internal")
+                        intent.putExtra(MusicService.MUSIC_SOURCE, MusicService.SOURCE_INTERNAL)
                         LocalBroadcastManager.getInstance(mContext!!).sendBroadcast(intent)
                     }
                 }
@@ -2009,6 +2086,18 @@ class UIManager(
             overlayDisplayMarginRight,
             overlayDisplayMarginBottom
         )
+        OverlayLayoutManager.applyPaddingWithBase(
+            podcastOverlay,
+            podcastOverlayBasePaddingLeft,
+            podcastOverlayBasePaddingTop,
+            podcastOverlayBasePaddingRight,
+            podcastOverlayBasePaddingBottom,
+            overlayDisplayMarginLeft,
+            overlayDisplayMarginTop,
+            overlayDisplayMarginRight,
+            overlayDisplayMarginBottom
+        )
+        applyPodcastPaneGeometry()
         OverlayLayoutManager.applyPaddingWithBase(
             hackOverlay,
             hackOverlayBasePaddingLeft,
@@ -5800,7 +5889,7 @@ class UIManager(
         mTerminalAdapter!!.executeInput(command)
     }
 
-    private fun showTextModule(module: String?, text: String?) {
+    private fun showTextModule(module: String?, text: CharSequence?) {
         val moduleView = LayoutInflater.from(mContext)
             .inflate(R.layout.module_text_widget, homeWidgetsContainer, false)
         homeWidgetsContainer!!.addView(moduleView)
@@ -5816,10 +5905,16 @@ class UIManager(
             scroll.removeAllViews()
             body?.setVisibility(View.GONE)
             scroll.addView(buildCalendarModuleView())
+        } else if (ModuleManager.RSS == ModuleManager.normalize(module) && body != null && scroll != null) {
+            renderRssModuleLines(text, body, scroll, module)
         } else if (shouldRenderScriptSegments(module) && body != null && scroll != null) {
-            renderScriptModuleSegments(module, text, body, scroll)
+            renderScriptModuleSegments(module, text?.toString(), body, scroll)
         } else if (body != null) {
-            body.setText(text)
+            if (ModuleManager.RSS == ModuleManager.normalize(module) && text is Spanned) {
+                body.setText(text, TextView.BufferType.SPANNABLE)
+            } else {
+                body.setText(text)
+            }
             body.setTextColor(notificationWidgetTextColor())
             body.setTextSize(moduleBodyTextSize().toFloat())
             applyModuleBodyTypeface(body, module)
@@ -5841,6 +5936,211 @@ class UIManager(
             moduleNameTextColor()
         )
         styleModuleClose(close)
+    }
+
+    private fun handleRssModuleLinkTouch(body: TextView, event: MotionEvent): Boolean {
+        val action = event.actionMasked
+        if (
+            action != MotionEvent.ACTION_DOWN &&
+            action != MotionEvent.ACTION_MOVE &&
+            action != MotionEvent.ACTION_UP &&
+            action != MotionEvent.ACTION_CANCEL
+        ) {
+            return false
+        }
+
+        if (action == MotionEvent.ACTION_DOWN) {
+            val span = findRssModuleSpan(body, event) ?: return false
+            rssModuleTouchSpan = span
+            rssModuleTouchStartX = event.x
+            rssModuleTouchStartY = event.y
+            body.parent?.requestDisallowInterceptTouchEvent(true)
+            return true
+        }
+
+        val span = rssModuleTouchSpan ?: return false
+        if (action == MotionEvent.ACTION_MOVE) {
+            val slop = ViewConfiguration.get(body.context).scaledTouchSlop
+            if (abs(event.x - rssModuleTouchStartX) > slop || abs(event.y - rssModuleTouchStartY) > slop) {
+                rssModuleTouchSpan = null
+                body.parent?.requestDisallowInterceptTouchEvent(false)
+                return false
+            }
+            return true
+        }
+
+        rssModuleTouchSpan = null
+        body.parent?.requestDisallowInterceptTouchEvent(false)
+        if (action == MotionEvent.ACTION_UP && findRssModuleSpan(body, event) === span) {
+            span.onClick(body)
+            body.performClick()
+            return true
+        }
+
+        return action == MotionEvent.ACTION_CANCEL
+    }
+
+    private fun findRssModuleSpan(body: TextView, event: MotionEvent): LongClickableSpan? {
+        val text = body.text
+        if (text !is Spanned) {
+            return null
+        }
+
+        val layout = body.layout ?: return null
+        val x = event.x.toInt() - body.totalPaddingLeft + body.scrollX
+        val y = event.y.toInt() - body.totalPaddingTop + body.scrollY
+        if (y < 0 || y > body.height) {
+            return null
+        }
+
+        val line = layout.getLineForVertical(y)
+        if (x < layout.getLineLeft(line) || x > layout.getLineRight(line)) {
+            return null
+        }
+
+        val offset = layout.getOffsetForHorizontal(line, x.toFloat())
+        val spans = text.getSpans(offset, offset, LongClickableSpan::class.java)
+        if (!spans.isEmpty()) {
+            return spans[0]
+        }
+
+        val lineSpans = text.getSpans(
+            layout.getLineStart(line),
+            layout.getLineEnd(line),
+            LongClickableSpan::class.java
+        )
+        return if (lineSpans.isEmpty()) null else lineSpans[0]
+    }
+
+    private fun renderRssModuleLines(
+        text: CharSequence?,
+        body: TextView,
+        scroll: ScrollView,
+        module: String?
+    ) {
+        scroll.removeAllViews()
+        body.setVisibility(View.GONE)
+
+        val content = LinearLayout(mContext)
+        content.setOrientation(LinearLayout.VERTICAL)
+        content.setLayoutParams(
+            FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+        )
+        scroll.addView(content)
+
+        val value = text ?: Tuils.EMPTYSTRING
+        val raw = value.toString()
+        var start = 0
+        while (start <= raw.length) {
+            val next = raw.indexOf('\n', start)
+            val end = if (next == -1) raw.length else next
+            addRssModuleLine(content, value.subSequence(start, end), module)
+            if (next == -1) {
+                break
+            }
+            start = next + 1
+        }
+
+        constrainRssModuleScroll(scroll, content)
+    }
+
+    private fun addRssModuleLine(
+        parent: LinearLayout,
+        text: CharSequence,
+        module: String?
+    ) {
+        val view = TextView(mContext)
+        if (text is Spanned) {
+            view.setText(text, TextView.BufferType.SPANNABLE)
+        } else {
+            view.setText(text)
+        }
+        view.setTextColor(notificationWidgetTextColor())
+        view.setTextSize(moduleBodyTextSize().toFloat())
+        view.setIncludeFontPadding(true)
+        view.setLineSpacing(Tuils.dpToPx(mContext, 2).toFloat(), 1f)
+        applyModuleBodyTypeface(view, module)
+
+        val span = firstRssModuleSpan(text)
+        if (span != null) {
+            view.setOnClickListener { v -> span.onClick(v) }
+            view.setOnTouchListener { v, event ->
+                when (event.actionMasked) {
+                    MotionEvent.ACTION_DOWN -> {
+                        v.parent?.requestDisallowInterceptTouchEvent(true)
+                        true
+                    }
+                    MotionEvent.ACTION_UP -> {
+                        v.parent?.requestDisallowInterceptTouchEvent(false)
+                        v.performClick()
+                        true
+                    }
+                    MotionEvent.ACTION_CANCEL -> {
+                        v.parent?.requestDisallowInterceptTouchEvent(false)
+                        true
+                    }
+                    else -> true
+                }
+            }
+            view.setClickable(true)
+            view.setFocusable(true)
+        }
+
+        view.setLayoutParams(
+            LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+        )
+        parent.addView(view)
+    }
+
+    private fun firstRssModuleSpan(text: CharSequence): LongClickableSpan? {
+        if (text !is Spanned) {
+            return null
+        }
+        val spans = text.getSpans(0, text.length, LongClickableSpan::class.java)
+        return if (spans.isEmpty()) null else spans[0]
+    }
+
+    private fun constrainRssModuleScroll(scroll: ScrollView, content: LinearLayout) {
+        scroll.setFillViewport(false)
+        scroll.setOverScrollMode(View.OVER_SCROLL_IF_CONTENT_SCROLLS)
+        scroll.getViewTreeObserver()
+            .addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
+                override fun onPreDraw(): Boolean {
+                    if (scroll.getViewTreeObserver().isAlive()) {
+                        scroll.getViewTreeObserver().removeOnPreDrawListener(this)
+                    }
+
+                    val viewportPadding = scroll.getPaddingTop() + scroll.getPaddingBottom()
+                    var lineHeight = UIUtils.dpToPx(mContext, 18)
+                    for (i in 0..<content.getChildCount()) {
+                        val child = content.getChildAt(i)
+                        if (child is TextView) {
+                            lineHeight = max(lineHeight, child.getLineHeight())
+                        }
+                    }
+
+                    val maxHeight = lineHeight * RSS_MODULE_VISIBLE_LINES + viewportPadding
+                    val contentHeight = content.getHeight() + viewportPadding
+                    if (maxHeight <= 0 || contentHeight <= 0) {
+                        return true
+                    }
+
+                    val targetHeight = max(scroll.getMinimumHeight(), min(contentHeight, maxHeight))
+                    val params = scroll.getLayoutParams()
+                    if (params != null && params.height != targetHeight) {
+                        params.height = targetHeight
+                        scroll.setLayoutParams(params)
+                    }
+                    scroll.setVerticalScrollBarEnabled(contentHeight > targetHeight)
+                    return true
+                }
+            })
     }
 
     private fun shouldRenderScriptSegments(module: String?): Boolean {
@@ -5906,7 +6206,9 @@ class UIManager(
     private fun constrainEventModuleScroll(module: String?, scroll: ScrollView?, body: TextView?) {
         val id = ModuleManager.normalize(module)
         val source = ModuleManager.getModuleSource(mContext, id)
-        if ((ModuleManager.EVENTS != id) || !ModuleManager.isLauncherSource(source) || scroll == null || body == null) {
+        val eventsModule = ModuleManager.EVENTS == id && ModuleManager.isLauncherSource(source)
+        val rssModule = ModuleManager.RSS == id
+        if ((!eventsModule && !rssModule) || scroll == null || body == null) {
             return
         }
 
@@ -5920,7 +6222,11 @@ class UIManager(
                     }
 
                     val viewportPadding = scroll.getPaddingTop() + scroll.getPaddingBottom()
-                    val maxHeight = calculateCalendarTextHeight(body) + viewportPadding
+                    val maxHeight = if (rssModule) {
+                        calculateModuleLineHeight(body, RSS_MODULE_VISIBLE_LINES) + viewportPadding
+                    } else {
+                        calculateCalendarTextHeight(body) + viewportPadding
+                    }
                     val contentHeight = body.getHeight() + viewportPadding
                     if (maxHeight <= 0 || contentHeight <= 0) {
                         return true
@@ -6120,6 +6426,13 @@ class UIManager(
         return max(lineHeight, lineHeight * lines + padding)
     }
 
+    private fun calculateModuleLineHeight(body: TextView, maxLines: Int): Int {
+        val lineHeight = body.getLineHeight()
+        val lines = min(maxLines, max(1, countVisibleLines(body.getText().toString())))
+        val padding = body.getPaddingTop() + body.getPaddingBottom()
+        return max(lineHeight, lineHeight * lines + padding)
+    }
+
     private fun countVisibleLines(text: String?): Int {
         if (TextUtils.isEmpty(text)) {
             return 1
@@ -6245,17 +6558,17 @@ class UIManager(
         val textColor = musicWidgetTextColor()
         if (title != null) {
             title.setText(
-                if (!TextUtils.isEmpty(lastMusicSong)) "Title: " + lastMusicSong!!.uppercase(
+                if (!TextUtils.isEmpty(lastMusicSong)) musicTitlePrefix() + lastMusicSong!!.uppercase(
                     Locale.getDefault()
-                ) else "Title: -"
+                ) else musicTitlePrefix() + "-"
             )
             title.setTextColor(textColor)
         }
         if (singer != null) {
             singer.setText(
-                if (!TextUtils.isEmpty(lastMusicSinger)) "Singer      : " + lastMusicSinger!!.uppercase(
+                if (!TextUtils.isEmpty(lastMusicSinger)) musicSubtitlePrefix() + lastMusicSinger!!.uppercase(
                     Locale.getDefault()
-                ) else "Singer      : -"
+                ) else musicSubtitlePrefix() + "-"
             )
             singer.setTextColor(textColor)
         }
@@ -6265,6 +6578,12 @@ class UIManager(
             visualizer.setPlaying(lastMusicPlaying)
         }
     }
+
+    private fun musicTitlePrefix(): String =
+        if (MusicService.SOURCE_PODCAST == activeMusicSource) "Episode: " else "Title: "
+
+    private fun musicSubtitlePrefix(): String =
+        if (MusicService.SOURCE_PODCAST == activeMusicSource) "Show       : " else "Singer      : "
 
     private fun buildTimerModuleText(): String {
         val out = StringBuilder()
@@ -6316,7 +6635,7 @@ class UIManager(
         return out.toString().trim { it <= ' ' }
     }
 
-    private fun buildRssModuleText(): String? {
+    private fun buildRssModuleText(): CharSequence? {
         val manager = if (mainPack != null) mainPack!!.rssManager else null
         if (manager == null) {
             return "RSS manager unavailable."
@@ -7266,6 +7585,140 @@ class UIManager(
         }
     }
 
+    private fun setupPodcastSurface(rootView: ViewGroup) {
+        podcastOverlay = rootView.findViewById<View?>(R.id.podcast_overlay)
+        if (podcastOverlay == null) {
+            return
+        }
+
+        podcastOverlayBasePaddingLeft = podcastOverlay!!.paddingLeft
+        podcastOverlayBasePaddingTop = podcastOverlay!!.paddingTop
+        podcastOverlayBasePaddingRight = podcastOverlay!!.paddingRight
+        podcastOverlayBasePaddingBottom = podcastOverlay!!.paddingBottom
+
+        podcastWindowBorder = rootView.findViewById<View?>(R.id.podcast_window_border)
+        podcastWindowLabel = rootView.findViewById<TextView?>(R.id.podcast_window_label)
+        podcastClose = rootView.findViewById<TextView?>(R.id.podcast_close)
+        podcastTabs = rootView.findViewById<View?>(R.id.podcast_tabs)
+        podcastTabShows = rootView.findViewById<TextView?>(R.id.podcast_tab_shows)
+        podcastAdd = rootView.findViewById<TextView?>(R.id.podcast_add)
+        podcastRefresh = rootView.findViewById<TextView?>(R.id.podcast_refresh)
+        podcastPlayShow = rootView.findViewById<TextView?>(R.id.podcast_play_show)
+        podcastContentPanel = rootView.findViewById<View?>(R.id.podcast_content_panel)
+        podcastContentLabel = rootView.findViewById<TextView?>(R.id.podcast_content_label)
+        podcastContent = rootView.findViewById<LinearLayout?>(R.id.podcast_content)
+        podcastScroll = rootView.findViewById<ScrollView?>(R.id.podcast_scroll)
+        podcastPaneActions = rootView.findViewById<LinearLayout?>(R.id.podcast_pane_actions)
+        podcastPlayerControls = rootView.findViewById<LinearLayout?>(R.id.podcast_player_controls)
+        podcastPlayerProgress = rootView.findViewById<TextView?>(R.id.podcast_player_progress)
+        podcastPlayerSeek = rootView.findViewById<SeekBar?>(R.id.podcast_player_seek)
+        podcastPlayerTransport = rootView.findViewById<View?>(R.id.podcast_player_transport)
+        podcastPlayerPrev = rootView.findViewById<TextView?>(R.id.podcast_player_prev)
+        podcastPlayerRewind = rootView.findViewById<TextView?>(R.id.podcast_player_rewind)
+        podcastPlayerPlay = rootView.findViewById<TextView?>(R.id.podcast_player_play)
+        podcastPlayerForward = rootView.findViewById<TextView?>(R.id.podcast_player_forward)
+        podcastPlayerNext = rootView.findViewById<TextView?>(R.id.podcast_player_next)
+        podcastNowPlaying = rootView.findViewById<View?>(R.id.podcast_now_playing)
+        podcastArtwork = rootView.findViewById<ImageView?>(R.id.podcast_artwork)
+        podcastNowTitle = rootView.findViewById<TextView?>(R.id.podcast_now_title)
+        podcastNowMeta = rootView.findViewById<TextView?>(R.id.podcast_now_meta)
+        podcastNowProgress = rootView.findViewById<TextView?>(R.id.podcast_now_progress)
+        podcastSeek = rootView.findViewById<SeekBar?>(R.id.podcast_seek)
+        podcastTransport = rootView.findViewById<View?>(R.id.podcast_transport)
+        podcastPrev = rootView.findViewById<TextView?>(R.id.podcast_prev)
+        podcastRewind = rootView.findViewById<TextView?>(R.id.podcast_rewind)
+        podcastPlay = rootView.findViewById<TextView?>(R.id.podcast_play)
+        podcastForward = rootView.findViewById<TextView?>(R.id.podcast_forward)
+        podcastNext = rootView.findViewById<TextView?>(R.id.podcast_next)
+        podcastTabs?.visibility = View.GONE
+
+        stylePodcastSurface()
+        setupPodcastPaneActions()
+
+        podcastClose?.setOnClickListener(View.OnClickListener { closePodcastSurface() })
+        podcastTabShows?.setOnClickListener(View.OnClickListener {
+            podcastMode = PODCAST_MODE_SHOWS
+            renderPodcastSurface(null)
+        })
+        podcastAdd?.setOnClickListener(View.OnClickListener { showPodcastAddDialog() })
+        podcastRefresh?.setOnClickListener(View.OnClickListener {
+            renderPodcastSurface("Refreshing selected podcast...")
+            mainPack.podcastManager.refreshSelectedShow { message -> renderPodcastSurface(message ?: "Podcast refreshed.") }
+        })
+        podcastPlayShow?.setOnClickListener(View.OnClickListener {
+            podcastMode = PODCAST_MODE_RECENTS
+            renderPodcastSurface(null)
+        })
+        podcastNowPlaying?.setOnClickListener(View.OnClickListener {
+            podcastMode = PODCAST_MODE_PLAYER
+            renderPodcastSurface(null)
+        })
+        podcastPlay?.setOnClickListener(View.OnClickListener {
+            renderPodcastSurface(mainPack.podcastManager.toggle())
+        })
+        podcastPrev?.setOnClickListener(View.OnClickListener {
+            renderPodcastSurface(mainPack.podcastManager.previous())
+        })
+        podcastNext?.setOnClickListener(View.OnClickListener {
+            renderPodcastSurface(mainPack.podcastManager.next())
+        })
+        podcastRewind?.setOnClickListener(View.OnClickListener {
+            renderPodcastSurface("-30s: " + mainPack.podcastManager.seekBy(-30000))
+        })
+        podcastForward?.setOnClickListener(View.OnClickListener {
+            renderPodcastSurface("+30s: " + mainPack.podcastManager.seekBy(30000))
+        })
+        podcastPlayerPlay?.setOnClickListener(View.OnClickListener {
+            renderPodcastSurface(mainPack.podcastManager.toggle())
+        })
+        podcastPlayerPrev?.setOnClickListener(View.OnClickListener {
+            renderPodcastSurface(mainPack.podcastManager.previous())
+        })
+        podcastPlayerNext?.setOnClickListener(View.OnClickListener {
+            renderPodcastSurface(mainPack.podcastManager.next())
+        })
+        podcastPlayerRewind?.setOnClickListener(View.OnClickListener {
+            renderPodcastSurface("-30s: " + mainPack.podcastManager.seekBy(-30000))
+        })
+        podcastPlayerForward?.setOnClickListener(View.OnClickListener {
+            renderPodcastSurface("+30s: " + mainPack.podcastManager.seekBy(30000))
+        })
+        podcastPlayerSeek?.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                if (fromUser) {
+                    podcastPlayerProgress?.text = PodcastManager.formatMillis(progress)
+                }
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+                podcastSeekDragging = true
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                podcastSeekDragging = false
+                val target = seekBar?.progress ?: return
+                renderPodcastSurface(mainPack.podcastManager.seekTo(target))
+            }
+        })
+        podcastSeek?.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                if (fromUser) {
+                    podcastNowProgress?.text = PodcastManager.formatMillis(progress)
+                }
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+                podcastSeekDragging = true
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                podcastSeekDragging = false
+                val target = seekBar?.progress ?: return
+                renderPodcastSurface(mainPack.podcastManager.seekTo(target))
+            }
+        })
+    }
+
     init {
         this.mRootView = rootView
         this.mainPack = mainPack
@@ -7292,6 +7745,7 @@ class UIManager(
         filter.addAction(ACTION_TMUX_WORKSPACE)
         filter.addAction(ACTION_LUA_APP)
         filter.addAction(ACTION_FILE_CONSOLE)
+        filter.addAction(ACTION_PODCAST_SURFACE)
         filter.addAction(ACTION_TERMUX_RESULT)
         filter.addAction(ACTION_MODULE_COMMAND)
 
@@ -7327,6 +7781,8 @@ class UIManager(
                     openLuaApp(intent.getStringExtra(EXTRA_LUA_APP_ID))
                 } else if (action == ACTION_FILE_CONSOLE) {
                     openFileConsole(intent.getStringExtra(EXTRA_FILE_COMMAND))
+                } else if (action == ACTION_PODCAST_SURFACE) {
+                    openPodcastSurface(intent.getStringExtra(EXTRA_PODCAST_COMMAND))
                 } else if (action == ACTION_TERMUX_RESULT) {
                     appendTermuxResult(intent)
                 } else if (action == ACTION_MODULE_COMMAND) {
@@ -7505,16 +7961,16 @@ class UIManager(
 
                     val songTitleView = rootView.findViewById<TextView?>(R.id.music_song_title)
                     if (songTitleView != null) {
-                        songTitleView.setText(if (song != null) "Title: " + song.uppercase(Locale.getDefault()) else "Title: -")
+                        songTitleView.setText(if (song != null) musicTitlePrefix() + song.uppercase(Locale.getDefault()) else musicTitlePrefix() + "-")
                         songTitleView.setTextColor(widgetTextColor)
                     }
 
                     val singerView = rootView.findViewById<TextView?>(R.id.music_singer)
                     if (singerView != null) {
                         singerView.setText(
-                            if (singer != null) "Singer      : " + singer.uppercase(
+                            if (singer != null) musicSubtitlePrefix() + singer.uppercase(
                                 Locale.getDefault()
-                            ) else "Singer      : -"
+                            ) else musicSubtitlePrefix() + "-"
                         )
                         singerView.setTextColor(widgetTextColor)
                     }
@@ -7531,6 +7987,10 @@ class UIManager(
                     )
                     styleModuleClose(rootView.findViewById<TextView?>(R.id.music_widget_close))
                     sizeMusicVisualizer(rootView)
+                    if (MusicService.SOURCE_PODCAST == source && podcastOverlay != null && podcastOverlay!!.visibility == View.VISIBLE) {
+                        if (podcastMode == PODCAST_MODE_PLAYER) renderPodcastSurface(null)
+                        else updatePodcastNowPlaying()
+                    }
                     scheduleInternalMusicTickerIfNeeded()
                 } else if (action == ACTION_NOTIFICATION_FEED) {
                     val notifications =
@@ -7579,6 +8039,7 @@ class UIManager(
         styleHackOverlay(rootView)
         setupTermuxConsole(rootView)
         setupFileConsole(rootView)
+        setupPodcastSurface(rootView)
         setupResponsiveLandscapeLayout(rootView)
 
         //        Recalculate tray sizing after real layout changes; IME visibility comes from WindowInsets.
@@ -8244,7 +8705,9 @@ class UIManager(
 
         if (prevBtn != null) {
             prevBtn.setOnClickListener(View.OnClickListener { v: View? ->
-                if ("internal" == activeMusicSource) {
+                if (MusicService.SOURCE_PODCAST == activeMusicSource) {
+                    mainPack.podcastManager.previous()
+                } else if (MusicService.SOURCE_INTERNAL == activeMusicSource) {
                     if (mainPack!!.player != null) mainPack!!.player!!.playPrev()
                 } else {
                     val intent = Intent(MusicService.ACTION_MUSIC_CONTROL)
@@ -8256,7 +8719,9 @@ class UIManager(
 
         if (nextBtn != null) {
             nextBtn.setOnClickListener(View.OnClickListener { v: View? ->
-                if ("internal" == activeMusicSource) {
+                if (MusicService.SOURCE_PODCAST == activeMusicSource) {
+                    mainPack.podcastManager.next()
+                } else if (MusicService.SOURCE_INTERNAL == activeMusicSource) {
                     if (mainPack!!.player != null) mainPack!!.player!!.playNext()
                 } else {
                     val intent = Intent(MusicService.ACTION_MUSIC_CONTROL)
@@ -8268,7 +8733,9 @@ class UIManager(
 
         if (playPauseBtn != null) {
             playPauseBtn.setOnClickListener(View.OnClickListener { v: View? ->
-                if ("internal" == activeMusicSource) {
+                if (MusicService.SOURCE_PODCAST == activeMusicSource) {
+                    mainPack.podcastManager.toggle()
+                } else if (MusicService.SOURCE_INTERNAL == activeMusicSource) {
                     if (mainPack!!.player != null) {
                         if (mainPack!!.player!!.isPlaying()) mainPack!!.player!!.pause()
                         else mainPack!!.player!!.play()
@@ -8684,6 +9151,223 @@ class UIManager(
         styleTermuxToolButton(filePaste, textColor)
     }
 
+    private fun stylePodcastSurface() {
+        if (podcastOverlay == null) {
+            return
+        }
+
+        val borderColor = terminalBorderColor()
+        val textColor = notificationWidgetTextColor()
+        val bgColor = terminalWindowBackground()
+        val labelBg = terminalHeaderTabBackground()
+        val typeface = Tuils.getTypeface(mContext)
+
+        podcastWindowBorder?.setBackground(
+            TerminalBorderRuntime.panelDrawable(
+                mContext,
+                bgColor,
+                borderColor,
+                1.5f,
+                outputCornerRadius(),
+                dashedBorders()
+            )
+        )
+
+        listOf(podcastWindowLabel, podcastClose).forEach { label ->
+            label?.setTypeface(typeface, Typeface.BOLD)
+            label?.textSize = PODCAST_TEXT_LARGE
+            label?.setTextColor(textColor)
+            label?.setBackground(TerminalBorderRuntime.tabDrawable(mContext, labelBg))
+        }
+        TerminalBorderRuntime.bind(podcastWindowBorder, podcastWindowLabel, podcastClose)
+
+        listOf(podcastTabs, podcastTransport, podcastPlayerTransport).forEach { view ->
+            view?.setBackgroundColor(Color.TRANSPARENT)
+            styleTermuxToolButtons(view, textColor)
+        }
+        updatePodcastTabStyle()
+
+        podcastContentPanel?.setBackground(
+            TerminalBorderRuntime.panelDrawable(
+                mContext,
+                ColorUtils.blendARGB(bgColor, Color.BLACK, 0.1f),
+                ColorUtils.setAlphaComponent(borderColor, 210),
+                1.2f,
+                outputCornerRadius(),
+                dashedBorders()
+            )
+        )
+        podcastContentLabel?.setTypeface(typeface, Typeface.BOLD)
+        podcastContentLabel?.textSize = PODCAST_TEXT_MEDIUM
+        podcastContentLabel?.setTextColor(textColor)
+        podcastContentLabel?.setBackground(TerminalBorderRuntime.tabDrawable(mContext, labelBg))
+        TerminalBorderRuntime.bind(podcastContentPanel, podcastContentLabel)
+
+        podcastNowPlaying?.setBackground(
+            TerminalBorderRuntime.panelDrawable(
+                mContext,
+                ColorUtils.blendARGB(bgColor, Color.BLACK, 0.16f),
+                ColorUtils.setAlphaComponent(borderColor, 180),
+                1.2f,
+                outputCornerRadius(),
+                dashedBorders()
+            )
+        )
+
+        podcastArtwork?.setBackground(
+            TerminalBorderRuntime.panelDrawable(
+                mContext,
+                Color.TRANSPARENT,
+                ColorUtils.setAlphaComponent(borderColor, 160),
+                1f,
+                moduleCornerRadius(),
+                dashedBorders()
+            )
+        )
+
+        listOf(podcastNowTitle, podcastNowMeta, podcastNowProgress, podcastPlayerProgress).forEach { view ->
+            view?.setTypeface(typeface)
+            view?.setTextColor(textColor)
+        }
+
+        podcastPaneActions?.setBackgroundColor(Color.TRANSPARENT)
+        val actions = podcastPaneActions
+        if (actions != null) {
+            for (i in 0 until actions.childCount) {
+                stylePodcastPaneActionButton(actions.getChildAt(i) as? TextView)
+            }
+        }
+
+        podcastSeek?.progressTintList = ColorStateList.valueOf(textColor)
+        podcastSeek?.thumbTintList = ColorStateList.valueOf(textColor)
+        podcastSeek?.progressBackgroundTintList =
+            ColorStateList.valueOf(ColorUtils.setAlphaComponent(borderColor, 110))
+        podcastPlayerSeek?.progressTintList = ColorStateList.valueOf(textColor)
+        podcastPlayerSeek?.thumbTintList = ColorStateList.valueOf(textColor)
+        podcastPlayerSeek?.progressBackgroundTintList =
+            ColorStateList.valueOf(ColorUtils.setAlphaComponent(borderColor, 110))
+    }
+
+    private fun setupPodcastPaneActions() {
+        val row = podcastPaneActions ?: return
+        row.removeAllViews()
+        row.addView(podcastPaneActionButton("↻", "Refresh selected podcast") {
+            renderPodcastSurface("Refreshing selected podcast...")
+            mainPack.podcastManager.refreshSelectedShow { message -> renderPodcastSurface(message ?: "Podcast refreshed.") }
+        })
+        row.addView(podcastPaneActionButton("+", "Add podcast") { showPodcastAddDialog() })
+    }
+
+    private fun podcastPaneActionButton(label: String, description: String, action: Runnable): TextView {
+        val button = TextView(mContext)
+        button.text = label
+        button.contentDescription = description
+        button.gravity = Gravity.CENTER
+        button.setOnClickListener { action.run() }
+        stylePodcastPaneActionButton(button)
+        val params = LinearLayout.LayoutParams(
+            Tuils.dpToPx(mContext, 40),
+            Tuils.dpToPx(mContext, 40)
+        )
+        params.marginStart = Tuils.dpToPx(mContext, 8)
+        button.layoutParams = params
+        return button
+    }
+
+    private fun stylePodcastPaneActionButton(button: TextView?) {
+        val target = button ?: return
+        target.textSize = PODCAST_TEXT_MEDIUM
+        target.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
+        target.setTextColor(notificationWidgetTextColor())
+        target.setBackground(TerminalBorderRuntime.tabDrawable(mContext, terminalHeaderTabBackground()))
+    }
+
+    private fun applyPodcastPaneGeometry() {
+        val overlay = podcastOverlay ?: return
+        val border = podcastWindowBorder ?: return
+        val availableHeight = overlay.height - overlay.paddingTop - overlay.paddingBottom
+        if (availableHeight <= 0) {
+            overlay.post { applyPodcastPaneGeometry() }
+            return
+        }
+
+        val safeMargin = Tuils.dpToPx(mContext, 16)
+        val maxHeight = max(1, availableHeight - safeMargin)
+        val minHeight = min(Tuils.dpToPx(mContext, PODCAST_PANE_MIN_HEIGHT_DP), maxHeight)
+        val paneHeight = (availableHeight * PODCAST_PANE_HEIGHT_FRACTION)
+            .roundToInt()
+            .coerceIn(minHeight, maxHeight)
+        val topOffset = max(0, (availableHeight - paneHeight) / 2)
+
+        val borderParams = (border.layoutParams as? FrameLayout.LayoutParams)
+            ?: FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, paneHeight)
+        var geometryChanged = false
+        if (borderParams.width != FrameLayout.LayoutParams.MATCH_PARENT ||
+            borderParams.height != paneHeight ||
+            borderParams.gravity != Gravity.CENTER_VERTICAL ||
+            borderParams.topMargin != 0 ||
+            borderParams.bottomMargin != 0
+        ) {
+            borderParams.width = FrameLayout.LayoutParams.MATCH_PARENT
+            borderParams.height = paneHeight
+            borderParams.gravity = Gravity.CENTER_VERTICAL
+            borderParams.setMargins(0, 0, 0, 0)
+            border.layoutParams = borderParams
+            geometryChanged = true
+        }
+
+        geometryChanged = positionPodcastHeaderTab(podcastWindowLabel, Gravity.TOP or Gravity.START, topOffset, 38) || geometryChanged
+        geometryChanged = positionPodcastHeaderTab(podcastClose, Gravity.TOP or Gravity.END, topOffset, 0) || geometryChanged
+        if (geometryChanged) {
+            TerminalBorderRuntime.bind(podcastWindowBorder, podcastWindowLabel, podcastClose)
+            TerminalBorderRuntime.bind(podcastContentPanel, podcastContentLabel)
+        }
+    }
+
+    private fun positionPodcastHeaderTab(view: TextView?, gravity: Int, paneTopOffset: Int, startMarginDp: Int): Boolean {
+        val tab = view ?: return false
+        val params = (tab.layoutParams as? FrameLayout.LayoutParams)
+            ?: FrameLayout.LayoutParams(tab.layoutParams?.width ?: FrameLayout.LayoutParams.WRAP_CONTENT, tab.layoutParams?.height ?: FrameLayout.LayoutParams.WRAP_CONTENT)
+        val topMargin = max(0, paneTopOffset - Tuils.dpToPx(mContext, 10))
+        val startMargin = Tuils.dpToPx(mContext, startMarginDp)
+        if (params.gravity != gravity || params.topMargin != topMargin || params.leftMargin != startMargin) {
+            params.gravity = gravity
+            params.topMargin = topMargin
+            params.leftMargin = startMargin
+            tab.layoutParams = params
+            return true
+        }
+        return false
+    }
+
+    private fun updatePodcastTabStyle() {
+        val textColor = notificationWidgetTextColor()
+        val labelBg = terminalHeaderTabBackground()
+        val tabs = arrayOf(podcastTabShows to PODCAST_MODE_SHOWS, podcastPlayShow to PODCAST_MODE_RECENTS)
+        for ((tabView, mode) in tabs) {
+            val tab = tabView ?: continue
+            styleTermuxToolButton(tab, textColor)
+            tab.setBackgroundColor(Color.TRANSPARENT)
+            if (mode == podcastMode || (mode == PODCAST_MODE_SHOWS && podcastMode == PODCAST_MODE_SHOW_DETAIL)) {
+                tab.setBackground(TerminalBorderRuntime.tabDrawable(mContext, labelBg))
+            }
+        }
+    }
+
+    private fun updatePodcastContentLabel() {
+        val label = podcastContentLabel ?: return
+        val next = when (podcastMode) {
+            PODCAST_MODE_RECENTS -> "RECENTS"
+            PODCAST_MODE_SHOW_DETAIL -> "EPISODES"
+            PODCAST_MODE_PLAYER -> "PLAYER"
+            else -> "SHOWS"
+        }
+        if (label.text != next) {
+            label.text = next
+            TerminalBorderRuntime.bind(podcastContentPanel, podcastContentLabel)
+        }
+    }
+
     fun openTermuxConsole(command: String?) {
         if (Looper.myLooper() != Looper.getMainLooper()) {
             runOnMainThread { openTermuxConsole(command) }
@@ -8695,6 +9379,7 @@ class UIManager(
         }
 
         closeFileConsole(false)
+        closePodcastSurface(false)
         closeLuaAppSession(true)
         termuxAppSession = null
         termuxAppLastStatus = null
@@ -8742,6 +9427,7 @@ class UIManager(
         }
 
         closeFileConsole(false)
+        closePodcastSurface(false)
         closeLuaAppSession(true)
         termuxAppSession = null
         termuxAppLastStatus = null
@@ -8784,7 +9470,8 @@ class UIManager(
             return
         }
 
-        closeTermuxConsole()
+        closeTermuxConsole(false)
+        closePodcastSurface(false)
         styleFileConsole()
         fileOverlay!!.setVisibility(View.VISIBLE)
         fileOverlay!!.bringToFront()
@@ -8828,6 +9515,861 @@ class UIManager(
         if (mTerminalAdapter != null && restoreSuggestions) {
             mTerminalAdapter!!.focusInputEnd()
         }
+    }
+
+    fun openPodcastSurface(command: String?) {
+        if (Looper.myLooper() != Looper.getMainLooper()) {
+            runOnMainThread { openPodcastSurface(command) }
+            return
+        }
+
+        if (podcastOverlay == null) {
+            return
+        }
+
+        closeTermuxConsole(false)
+        closeFileConsole(false)
+        closeLuaAppSession(true)
+        stylePodcastSurface()
+        podcastMode = PODCAST_MODE_SHOWS
+        podcastOverlay!!.visibility = View.VISIBLE
+        podcastOverlay!!.bringToFront()
+        applyPodcastPaneGeometry()
+        hideHomeSuggestionsForTermux()
+
+        val normalized = command?.trim { it <= ' ' }.orEmpty()
+        if (normalized.isNotEmpty()) {
+            executePodcastCommand(normalized)
+            return
+        }
+
+        renderPodcastSurface(null)
+    }
+
+    private fun closePodcastSurface(restoreSuggestions: Boolean = true) {
+        podcastOverlay?.visibility = View.GONE
+        if (restoreSuggestions) {
+            restoreHomeSuggestionsAfterTermux()
+        }
+        if (mTerminalAdapter != null && restoreSuggestions) {
+            mTerminalAdapter!!.focusInputEnd()
+        }
+    }
+
+    private fun executePodcastCommand(rawCommand: String?) {
+        val command = rawCommand?.trim { it <= ' ' }.orEmpty()
+        if (command.isEmpty()) {
+            return
+        }
+        val lower = command.lowercase(Locale.getDefault())
+        when {
+            lower == "exit" || lower == "close" -> closePodcastSurface()
+            lower == "help" -> renderPodcastSurface("Commands: add <feed-url>, refresh, play, next, prev, rewind, forward, close")
+            lower == "refresh" || lower == "reload" -> {
+                renderPodcastSurface("Refreshing selected podcast...")
+                mainPack.podcastManager.refreshSelectedShow { message -> renderPodcastSurface(message ?: "Podcast refreshed.") }
+            }
+            lower == "play" -> renderPodcastSurface(mainPack.podcastManager.play())
+            lower == "next" -> renderPodcastSurface(mainPack.podcastManager.next())
+            lower == "prev" || lower == "previous" -> renderPodcastSurface(mainPack.podcastManager.previous())
+            lower == "rewind" || lower == "back" -> renderPodcastSurface("-30s: " + mainPack.podcastManager.seekBy(-30000))
+            lower == "forward" || lower == "fwd" -> renderPodcastSurface("+30s: " + mainPack.podcastManager.seekBy(30000))
+            lower.startsWith("add ") -> {
+                val url = command.substring(4).trim { it <= ' ' }
+                renderPodcastSurface("Adding podcast...")
+                mainPack.podcastManager.subscribe(url) { message ->
+                    podcastMode = PODCAST_MODE_SHOW_DETAIL
+                    renderPodcastSurface(message ?: "Podcast added.")
+                }
+            }
+            else -> renderPodcastSurface("Unknown podcast command. Try: add <feed-url>, refresh, play, next, prev, rewind, forward, close")
+        }
+    }
+
+    private fun showPodcastAddDialog() {
+        TuixtDialog.showValidatedForm(
+            mContext,
+            "ADD PODCAST",
+            listOf(
+                TuixtDialog.FormField(
+                    "url",
+                    "Feed URL",
+                    "https://example.com/feed.xml",
+                    InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_URI
+                )
+            ),
+            "ADD",
+            "CANCEL",
+            { values ->
+                val url = values["url"].orEmpty()
+                if (!url.startsWith("http://") && !url.startsWith("https://")) {
+                    "Podcast URL must start with http:// or https://."
+                } else {
+                    null
+                }
+            }
+        ) { values ->
+            renderPodcastSurface("Adding podcast...")
+            mainPack.podcastManager.subscribe(values["url"].orEmpty()) { message ->
+                podcastMode = PODCAST_MODE_SHOW_DETAIL
+                renderPodcastSurface(message ?: "Podcast added.")
+            }
+        }
+    }
+
+    private fun renderPodcastSurface(status: String?) {
+        if (Looper.myLooper() != Looper.getMainLooper()) {
+            runOnMainThread { renderPodcastSurface(status) }
+            return
+        }
+
+        podcastStatus = status
+        applyPodcastPaneGeometry()
+        updatePodcastTabStyle()
+        updatePodcastContentLabel()
+        updatePodcastNowPlaying()
+        podcastNowPlaying?.visibility = if (podcastMode == PODCAST_MODE_PLAYER) View.GONE else View.VISIBLE
+        podcastPaneActions?.visibility = if (podcastMode == PODCAST_MODE_SHOWS) View.VISIBLE else View.GONE
+        podcastPlayerControls?.visibility = if (podcastMode == PODCAST_MODE_PLAYER) View.VISIBLE else View.GONE
+        podcastScroll?.setPadding(
+            podcastScroll?.paddingLeft ?: 0,
+            podcastScroll?.paddingTop ?: 0,
+            podcastScroll?.paddingRight ?: 0,
+            Tuils.dpToPx(mContext, if (podcastMode == PODCAST_MODE_PLAYER) 116 else 52)
+        )
+        podcastPlayShow?.text = "RECENTS"
+
+        val content = podcastContent ?: return
+        content.removeAllViews()
+
+        val detailStatus = if (podcastMode == PODCAST_MODE_SHOW_DETAIL) podcastStatus else null
+        if (!podcastStatus.isNullOrEmpty() && detailStatus == null) {
+            addPodcastRow(podcastStatus!!, false, null)
+        }
+
+        val manager = mainPack.podcastManager
+        if (podcastMode == PODCAST_MODE_PLAYER) {
+            renderPodcastPlayer()
+            podcastScroll?.post(Runnable { podcastScroll?.fullScroll(View.FOCUS_UP) })
+            return
+        }
+
+        val shows = manager.shows()
+        if (shows.isEmpty()) {
+            val feedCount = manager.feeds().size
+            addPodcastRow(
+                if (feedCount == 0) {
+                    "No subscriptions yet.\nUse ADD or type podcast add <feed-url>."
+                } else {
+                    "Subscriptions are saved.\nTap a show to refresh it."
+                },
+                false,
+                null
+            )
+            return
+        }
+
+        when (podcastMode) {
+            PODCAST_MODE_RECENTS -> renderPodcastRecents()
+            PODCAST_MODE_SHOW_DETAIL -> renderPodcastEpisodes(manager.selectedShow(), detailStatus)
+            else -> renderPodcastShows(shows)
+        }
+
+        podcastScroll?.post(Runnable { podcastScroll?.fullScroll(View.FOCUS_UP) })
+    }
+
+    private fun updatePodcastNowPlaying() {
+        val manager = mainPack.podcastManager
+        val current = manager.currentSong()
+        val isPodcast = current != null
+        val active = manager.activeEpisode()
+        val selected = manager.selectedShow()
+        val displayShow = active?.let { episode ->
+            manager.shows().firstOrNull { it.id == episode.showId }
+        } ?: selected
+        val playing = manager.isPlaying()
+
+        podcastNowTitle?.text = when {
+            active != null -> active.title
+            isPodcast && current != null -> current.getTitle()
+            selected != null -> selected.title
+            else -> "No podcast playing"
+        }
+
+        val position = if (isPodcast) manager.currentPosition() else -1
+        val saved = active?.let { manager.progress(it) } ?: 0
+        val progress = if (position >= 0) position else saved
+        val duration = if (isPodcast) manager.duration() else -1
+        podcastNowMeta?.text = displayShow?.title ?: "Add a feed, then play a show."
+        podcastNowProgress?.text = if (duration > 0) {
+            PodcastManager.formatMillis(progress) + " / " + PodcastManager.formatMillis(duration)
+        } else {
+            PodcastManager.formatMillis(progress)
+        }
+        podcastPlayerProgress?.text = podcastNowProgress?.text
+        val playText = podcastTransportLabel(if (playing) "PAUSE" else "PLAY")
+        podcastPlay?.text = playText
+        podcastPlayerPlay?.text = playText
+        if (!podcastSeekDragging) {
+            podcastSeek?.max = if (duration > 0) duration else 100
+            podcastSeek?.progress = if (duration > 0) min(progress, duration) else 0
+            podcastSeek?.isEnabled = duration > 0
+            podcastPlayerSeek?.max = if (duration > 0) duration else 100
+            podcastPlayerSeek?.progress = if (duration > 0) min(progress, duration) else 0
+            podcastPlayerSeek?.isEnabled = duration > 0
+        }
+        updatePodcastArtwork(displayShow?.imageUrl)
+    }
+
+    private fun renderPodcastRecents() {
+        val manager = mainPack.podcastManager
+        val recents = filterPodcastRecents(manager.recents())
+        addPodcastTagChips(manager.shows())
+        addPodcastSectionHeader("Recent shows", "Tap a row to resume that show's last episode.")
+        if (recents.isEmpty()) {
+            addPodcastRow("No recent podcast episodes yet.", false, null)
+            return
+        }
+        addPodcastRecentGrid(recents)
+    }
+
+    private fun podcastTransportLabel(label: String): String = "[ " + label + " ]"
+
+    private fun updatePodcastArtwork(url: String?) {
+        val clean = url?.trim()?.takeIf { it.isNotEmpty() }
+        if (clean == podcastArtworkUrl) return
+
+        podcastArtworkUrl = clean
+        val target = podcastArtwork ?: return
+        loadPodcastImage(clean, target)
+    }
+
+    private fun loadPodcastImage(url: String?, target: ImageView) {
+        val clean = url?.trim()?.takeIf { it.isNotEmpty() }
+        target.tag = clean ?: Tuils.EMPTYSTRING
+        target.setImageResource(R.mipmap.ic_launcher)
+        if (clean == null) return
+
+        val cached = synchronized(podcastImageCache) { podcastImageCache.get(clean) }
+        if (cached != null) {
+            target.setImageBitmap(cached)
+            return
+        }
+
+        Thread {
+            val bitmap = try {
+                val request = Request.Builder().url(clean).get().build()
+                mainPack.client.newCall(request).execute().use { response ->
+                    if (!response.isSuccessful) null
+                    else response.body?.byteStream()?.use { BitmapFactory.decodeStream(it) }
+                }
+            } catch (_: Exception) {
+                null
+            }
+            runOnMainThread {
+                if (target.tag != clean) return@runOnMainThread
+                if (bitmap != null) {
+                    synchronized(podcastImageCache) { podcastImageCache.put(clean, bitmap) }
+                    target.setImageBitmap(bitmap)
+                } else {
+                    target.setImageResource(R.mipmap.ic_launcher)
+                }
+            }
+        }.start()
+    }
+
+    private fun renderPodcastShows(shows: List<PodcastShow>) {
+        val selected = mainPack.podcastManager.selectedShow()
+        val filteredShows = filterPodcastShows(shows)
+        addPodcastTagChips(shows)
+        addPodcastSectionHeader("Subscriptions", tagFilterSummary("Tap a show to refresh/open it."))
+        if (filteredShows.isEmpty()) addPodcastRow("No podcasts match this tag.", false, null)
+        else addPodcastShowGrid(filteredShows, selected)
+
+        val recents = filterPodcastRecents(mainPack.podcastManager.recents())
+        if (recents.isNotEmpty()) {
+            addPodcastSectionLabel("Recent")
+            addPodcastRecentGrid(recents)
+        }
+    }
+
+    private fun filterPodcastShows(shows: List<PodcastShow>): List<PodcastShow> {
+        val filter = podcastTagFilter ?: return shows
+        return shows.filter { show -> show.tags.any { it.equals(filter, ignoreCase = true) } }
+    }
+
+    private fun filterPodcastRecents(recents: List<PodcastRecent>): List<PodcastRecent> {
+        val filter = podcastTagFilter ?: return recents
+        return recents.filter { recent -> recent.show.tags.any { it.equals(filter, ignoreCase = true) } }
+    }
+
+    private fun tagFilterSummary(defaultText: String): String {
+        val filter = podcastTagFilter
+        return if (filter.isNullOrBlank()) defaultText else "Filtered by #" + filter
+    }
+
+    private fun addPodcastTagChips(shows: List<PodcastShow>) {
+        val tags = mainPack.podcastManager.tags()
+        if (tags.isEmpty()) return
+
+        if (podcastTagFilter != null && tags.none { it.equals(podcastTagFilter, ignoreCase = true) }) {
+            podcastTagFilter = null
+        }
+
+        val scroll = HorizontalScrollView(mContext)
+        scroll.isHorizontalScrollBarEnabled = false
+        scroll.overScrollMode = View.OVER_SCROLL_NEVER
+        val row = LinearLayout(mContext)
+        row.orientation = LinearLayout.HORIZONTAL
+        scroll.addView(row, ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        ))
+        addPodcastTagChip(row, "ALL", podcastTagFilter == null) {
+            podcastTagFilter = null
+            renderPodcastSurface(null)
+        }
+        for (tag in tags) {
+            addPodcastTagChip(row, tag.uppercase(Locale.getDefault()), tag.equals(podcastTagFilter, ignoreCase = true)) {
+                podcastTagFilter = tag
+                renderPodcastSurface(null)
+            }
+        }
+        addPodcastView(scroll)
+    }
+
+    private fun addPodcastTagChip(row: LinearLayout, label: String, selected: Boolean, action: Runnable) {
+        val chip = TextView(mContext)
+        chip.text = label
+        chip.gravity = Gravity.CENTER
+        chip.textSize = PODCAST_TEXT_SMALL
+        chip.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
+        chip.setTextColor(notificationWidgetTextColor())
+        chip.setPadding(
+            Tuils.dpToPx(mContext, 12),
+            Tuils.dpToPx(mContext, 6),
+            Tuils.dpToPx(mContext, 12),
+            Tuils.dpToPx(mContext, 6)
+        )
+        chip.setBackground(
+            if (selected) TerminalBorderRuntime.tabDrawable(mContext, terminalHeaderTabBackground())
+            else TerminalBorderRuntime.panelDrawable(
+                mContext,
+                Color.TRANSPARENT,
+                ColorUtils.setAlphaComponent(terminalBorderColor(), 150),
+                1f,
+                moduleCornerRadius(),
+                dashedBorders()
+            )
+        )
+        chip.setOnClickListener { action.run() }
+        val params = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+        params.marginEnd = Tuils.dpToPx(mContext, 6)
+        row.addView(chip, params)
+    }
+
+    private fun addPodcastShowGrid(shows: List<PodcastShow>, selected: PodcastShow?) {
+        val manager = mainPack.podcastManager
+        addPodcastCardRows(shows) { parent, show ->
+            addPodcastCard(
+                parent,
+                show.imageUrl,
+                show.title,
+                show.episodes.size.toString() + " episodes",
+                show.tags.joinToString("  ") { "#$it" },
+                Runnable {
+                    manager.selectShow(show.id)
+                    podcastMode = PODCAST_MODE_SHOW_DETAIL
+                    renderPodcastSurface("Refreshing " + show.title + "...")
+                    manager.refreshShow(show) { message -> renderPodcastSurface(message ?: "Podcast refreshed.") }
+                },
+                Runnable { showPodcastShowMenu(show, parent) },
+                selected?.id == show.id
+            )
+        }
+    }
+
+    private fun addPodcastRecentGrid(recents: List<PodcastRecent>) {
+        val manager = mainPack.podcastManager
+        addPodcastCardRows(recents) { parent, recent ->
+            val resume = if (recent.progressMs > 0) PodcastManager.formatMillis(recent.progressMs) else "Not started"
+            addPodcastCard(
+                parent,
+                recent.show.imageUrl,
+                recent.show.title,
+                recent.episode.title,
+                resume,
+                Runnable {
+                    podcastMode = PODCAST_MODE_PLAYER
+                    renderPodcastSurface(manager.play(recent.show, recent.episode))
+                },
+                null,
+                false
+            )
+        }
+    }
+
+    private fun <T> addPodcastCardRows(items: List<T>, addCard: (LinearLayout, T) -> Unit) {
+        var index = 0
+        while (index < items.size) {
+            val row = LinearLayout(mContext)
+            row.orientation = LinearLayout.HORIZONTAL
+            row.gravity = Gravity.TOP
+            for (i in 0 until 3) {
+                if (index + i < items.size) {
+                    addCard(row, items[index + i])
+                } else {
+                    val spacer = View(mContext)
+                    row.addView(spacer, LinearLayout.LayoutParams(0, 1, 1f))
+                }
+            }
+            addPodcastView(row)
+            index += 3
+        }
+    }
+
+    private fun addPodcastCard(
+        parent: LinearLayout,
+        imageUrl: String?,
+        title: String,
+        meta: String,
+        subMeta: String,
+        action: Runnable,
+        menuAction: Runnable?,
+        selected: Boolean
+    ) {
+        val card = LinearLayout(mContext)
+        card.orientation = LinearLayout.VERTICAL
+        card.setPadding(Tuils.dpToPx(mContext, 5), Tuils.dpToPx(mContext, 5), Tuils.dpToPx(mContext, 5), Tuils.dpToPx(mContext, 8))
+        card.setOnClickListener { action.run() }
+        if (menuAction != null) {
+            card.setOnLongClickListener {
+                menuAction.run()
+                true
+            }
+        }
+
+        val image = ImageView(mContext)
+        image.scaleType = ImageView.ScaleType.CENTER_CROP
+        loadPodcastImage(imageUrl, image)
+        card.addView(image, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, Tuils.dpToPx(mContext, 112)))
+
+        val titleRow = LinearLayout(mContext)
+        titleRow.orientation = LinearLayout.HORIZONTAL
+        titleRow.gravity = Gravity.CENTER_VERTICAL
+        val titleView = TextView(mContext)
+        titleView.text = title
+        titleView.setTextColor(notificationWidgetTextColor())
+        titleView.setTypeface(Tuils.getTypeface(mContext), if (selected) Typeface.BOLD else Typeface.NORMAL)
+        titleView.textSize = PODCAST_TEXT_LARGE
+        titleView.maxLines = 3
+        titleView.ellipsize = TextUtils.TruncateAt.END
+        titleRow.addView(titleView, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
+        if (menuAction != null) {
+            val menu = TextView(mContext)
+            menu.text = "..."
+            menu.gravity = Gravity.CENTER
+            menu.textSize = PODCAST_TEXT_LARGE
+            menu.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
+            menu.setTextColor(notificationWidgetTextColor())
+            menu.setOnClickListener { menuAction.run() }
+            titleRow.addView(menu, LinearLayout.LayoutParams(Tuils.dpToPx(mContext, 28), Tuils.dpToPx(mContext, 28)))
+        }
+        card.addView(titleRow)
+
+        val metaView = TextView(mContext)
+        metaView.text = meta
+        metaView.setTextColor(notificationWidgetTextColor())
+        metaView.setTypeface(Tuils.getTypeface(mContext))
+        metaView.textSize = PODCAST_TEXT_MEDIUM
+        metaView.maxLines = 2
+        metaView.ellipsize = TextUtils.TruncateAt.END
+        card.addView(metaView)
+
+        if (subMeta.isNotBlank()) {
+            val sub = TextView(mContext)
+            sub.text = subMeta
+            sub.setTextColor(ColorUtils.setAlphaComponent(notificationWidgetTextColor(), 190))
+            sub.setTypeface(Tuils.getTypeface(mContext))
+            sub.textSize = PODCAST_TEXT_SMALL
+            sub.maxLines = 1
+            sub.ellipsize = TextUtils.TruncateAt.END
+            card.addView(sub)
+        }
+
+        val params = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+        params.marginEnd = Tuils.dpToPx(mContext, 6)
+        parent.addView(card, params)
+    }
+
+    private fun addPodcastSectionLabel(title: String) {
+        val label = TextView(mContext)
+        label.text = title.uppercase(Locale.getDefault())
+        label.setTextColor(notificationWidgetTextColor())
+        label.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
+        label.textSize = PODCAST_TEXT_MEDIUM
+        label.setPadding(
+            Tuils.dpToPx(mContext, 8),
+            Tuils.dpToPx(mContext, 12),
+            Tuils.dpToPx(mContext, 8),
+            Tuils.dpToPx(mContext, 4)
+        )
+        addPodcastView(label)
+    }
+
+    private fun confirmRemovePodcastShow(show: PodcastShow) {
+        TuixtDialog.showConfirm(
+            mContext,
+            "REMOVE PODCAST",
+            "Remove " + show.title + " from Podcasts?",
+            "REMOVE",
+            "CANCEL",
+            TuixtDialog.ConfirmAction {
+                podcastMode = PODCAST_MODE_SHOWS
+                renderPodcastSurface(mainPack.podcastManager.removeShow(show))
+            }
+        )
+    }
+
+    private fun showPodcastTagsDialog(show: PodcastShow) {
+        TuixtDialog.showValidatedForm(
+            mContext,
+            "PODCAST TAGS",
+            listOf(
+                TuixtDialog.FormField(
+                    "tags",
+                    "Tags",
+                    "workout, travel, calming",
+                    InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_WORDS,
+                    show.tags.joinToString(", ")
+                )
+            ),
+            "SAVE",
+            "CANCEL",
+            { null }
+        ) { values ->
+            val message = mainPack.podcastManager.setTags(show, values["tags"].orEmpty())
+            val filter = podcastTagFilter
+            if (filter != null && mainPack.podcastManager.tags().none { it.equals(filter, ignoreCase = true) }) {
+                podcastTagFilter = null
+            }
+            podcastMode = PODCAST_MODE_SHOWS
+            renderPodcastSurface(message)
+        }
+    }
+
+    private fun renderPodcastEpisodes(show: PodcastShow?, status: String?) {
+        if (show == null) {
+            addPodcastRow("No show selected.", false, null)
+            return
+        }
+        addPodcastEpisodeHeader(show, status)
+        val episodes = mainPack.podcastManager.episodesFor(show)
+        if (episodes.isEmpty()) {
+            addPodcastRow("No playable episodes found in this feed.", false, null)
+            return
+        }
+        for (i in episodes.indices) {
+            val episode = episodes[i]
+            addPodcastRow(
+                episodeRowText(i, episode),
+                false,
+                Runnable { renderPodcastSurface(mainPack.podcastManager.play(show, episode)) }
+            )
+        }
+    }
+
+    private fun episodeRowText(index: Int, episode: PodcastEpisode): CharSequence {
+        val played = mainPack.podcastManager.isPlayed(episode)
+        val progress = mainPack.podcastManager.progress(episode)
+        val state = if (played) "[x]" else if (progress > 0) "[>]" else "[ ]"
+        val date = episode.publishedAt?.let {
+            android.text.format.DateFormat.format("yyyy-MM-dd", it).toString()
+        } ?: "undated"
+        val resume = if (progress > 0 && !played) " | " + PodcastManager.formatMillis(progress) else ""
+        val title = state + " " + (index + 1) + ". " + episode.title
+        return SpannableStringBuilder(title)
+            .append('\n')
+            .append(date)
+            .append(resume)
+            .also {
+                it.setSpan(
+                    RelativeSizeSpan(PODCAST_TEXT_LARGE / PODCAST_TEXT_MEDIUM),
+                    0,
+                    title.length,
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+            }
+    }
+
+    private fun addPodcastSectionHeader(title: String, body: String) {
+        val text = SpannableStringBuilder(title).append('\n').append(body)
+        text.setSpan(StyleSpan(Typeface.BOLD), 0, title.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        addPodcastRow(text, false, null)
+    }
+
+    private fun addPodcastEpisodeHeader(show: PodcastShow, status: String?) {
+        val manager = mainPack.podcastManager
+        val newestFirst = manager.isNewestFirst(show)
+        val detail = status ?: if (newestFirst) "Newest first autoplay" else "Oldest first autoplay"
+        val row = LinearLayout(mContext)
+        row.orientation = LinearLayout.HORIZONTAL
+        row.gravity = Gravity.CENTER_VERTICAL
+        row.setPadding(
+            Tuils.dpToPx(mContext, 8),
+            Tuils.dpToPx(mContext, 7),
+            Tuils.dpToPx(mContext, 8),
+            Tuils.dpToPx(mContext, 7)
+        )
+
+        val title = TextView(mContext)
+        val text = SpannableStringBuilder(show.title).append('\n').append(detail)
+        text.setSpan(StyleSpan(Typeface.BOLD), 0, show.title.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        title.text = text
+        title.setTextColor(notificationWidgetTextColor())
+        title.setTypeface(Tuils.getTypeface(mContext))
+        title.textSize = PODCAST_TEXT_SMALL
+        title.maxLines = 3
+        title.ellipsize = TextUtils.TruncateAt.END
+        row.addView(title, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
+
+        val sort = TextView(mContext)
+        sort.text = if (newestFirst) "NEWEST FIRST" else "OLDEST FIRST"
+        sort.contentDescription = if (newestFirst) {
+            "Sort newest first. Tap to switch to oldest first."
+        } else {
+            "Sort oldest first. Tap to switch to newest first."
+        }
+        sort.gravity = Gravity.CENTER
+        sort.textSize = PODCAST_TEXT_SMALL
+        sort.minWidth = Tuils.dpToPx(mContext, 104)
+        styleTermuxToolButton(sort, notificationWidgetTextColor())
+        sort.setBackground(TerminalBorderRuntime.tabDrawable(mContext, terminalHeaderTabBackground()))
+        sort.setOnClickListener {
+            manager.toggleNewestFirst(show)
+            renderPodcastSurface(null)
+        }
+        row.addView(sort, LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, Tuils.dpToPx(mContext, 30)))
+        addPodcastView(row)
+    }
+
+    private fun addPodcastShowRow(
+        show: PodcastShow,
+        selected: Boolean,
+        action: Runnable,
+        longAction: Runnable
+    ) {
+        val row = LinearLayout(mContext)
+        row.orientation = LinearLayout.HORIZONTAL
+        row.gravity = Gravity.CENTER_VERTICAL
+        row.setPadding(
+            Tuils.dpToPx(mContext, 8),
+            Tuils.dpToPx(mContext, 6),
+            Tuils.dpToPx(mContext, 4),
+            Tuils.dpToPx(mContext, 6)
+        )
+        row.setOnClickListener { action.run() }
+        row.setOnLongClickListener {
+            longAction.run()
+            true
+        }
+
+        val image = ImageView(mContext)
+        image.scaleType = ImageView.ScaleType.CENTER_CROP
+        loadPodcastImage(show.imageUrl, image)
+        row.addView(image, LinearLayout.LayoutParams(Tuils.dpToPx(mContext, 42), Tuils.dpToPx(mContext, 42)))
+
+        val text = TextView(mContext)
+        val showText = SpannableStringBuilder(show.title)
+            .append('\n')
+            .append(show.episodes.size.toString())
+            .append(" episodes")
+        showText.setSpan(
+            RelativeSizeSpan(PODCAST_TEXT_LARGE / PODCAST_TEXT_MEDIUM),
+            0,
+            show.title.length,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        text.text = showText
+        text.setTextColor(notificationWidgetTextColor())
+        text.setTypeface(Tuils.getTypeface(mContext), if (selected) Typeface.BOLD else Typeface.NORMAL)
+        text.textSize = PODCAST_TEXT_MEDIUM
+        text.maxLines = 3
+        text.ellipsize = TextUtils.TruncateAt.END
+        val textParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+        textParams.marginStart = Tuils.dpToPx(mContext, 8)
+        row.addView(text, textParams)
+
+        val menu = TextView(mContext)
+        menu.text = "..."
+        menu.gravity = Gravity.CENTER
+        menu.textSize = PODCAST_TEXT_LARGE
+        menu.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
+        menu.setTextColor(notificationWidgetTextColor())
+        menu.setOnClickListener { showPodcastShowMenu(show, menu) }
+        row.addView(menu, LinearLayout.LayoutParams(Tuils.dpToPx(mContext, 42), Tuils.dpToPx(mContext, 36)))
+
+        addPodcastView(row)
+    }
+
+    private fun showPodcastShowMenu(show: PodcastShow, anchor: View) {
+        val menu = PopupMenu(anchor.context, anchor)
+        menu.menu.add(0, 1, 0, "Edit tags")
+        menu.menu.add(0, 2, 1, "Remove")
+        menu.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                1 -> showPodcastTagsDialog(show)
+                2 -> confirmRemovePodcastShow(show)
+            }
+            true
+        }
+        menu.show()
+    }
+
+    private fun renderPodcastPlayer() {
+        val manager = mainPack.podcastManager
+        val current = manager.currentSong()
+        val active = manager.activeEpisode()
+        val selected = manager.selectedShow()
+        val displayShow = active?.let { episode ->
+            manager.shows().firstOrNull { it.id == episode.showId }
+        } ?: selected
+
+        val panel = LinearLayout(mContext)
+        panel.orientation = LinearLayout.VERTICAL
+        panel.gravity = Gravity.CENTER_HORIZONTAL
+        panel.setPadding(
+            Tuils.dpToPx(mContext, 12),
+            Tuils.dpToPx(mContext, 12),
+            Tuils.dpToPx(mContext, 12),
+            Tuils.dpToPx(mContext, 12)
+        )
+        val viewportHeight = podcastScroll?.height ?: 0
+        if (viewportHeight > 0) {
+            panel.minimumHeight = viewportHeight
+        }
+
+        val back = TextView(mContext)
+        back.text = "[BACK]"
+        back.gravity = Gravity.CENTER
+        back.textSize = PODCAST_TEXT_SMALL
+        back.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
+        back.setTextColor(notificationWidgetTextColor())
+        back.setOnClickListener {
+            podcastMode = PODCAST_MODE_SHOWS
+            renderPodcastSurface(null)
+        }
+        val backRow = LinearLayout(mContext)
+        backRow.gravity = Gravity.START
+        backRow.addView(back, LinearLayout.LayoutParams(
+            Tuils.dpToPx(mContext, 86),
+            Tuils.dpToPx(mContext, 36)
+        ))
+        panel.addView(backRow, LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        ))
+
+        val artFrame = FrameLayout(mContext)
+        val art = ImageView(mContext)
+        art.scaleType = ImageView.ScaleType.CENTER_CROP
+        loadPodcastImage(displayShow?.imageUrl, art)
+        val panelWidth = podcastContentPanel?.width ?: 0
+        val paneHeight = podcastWindowBorder?.height ?: viewportHeight
+        val artSize = if (panelWidth > 0 && paneHeight > 0) {
+            min((panelWidth * 0.82f).roundToInt(), (paneHeight * 0.46f).roundToInt())
+        } else {
+            Tuils.dpToPx(mContext, 300)
+        }.coerceAtLeast(Tuils.dpToPx(mContext, 240))
+        artFrame.addView(art, FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.MATCH_PARENT,
+            FrameLayout.LayoutParams.MATCH_PARENT
+        ))
+        val artParams = LinearLayout.LayoutParams(artSize, artSize)
+        artParams.gravity = Gravity.CENTER_HORIZONTAL
+        panel.addView(artFrame, artParams)
+
+        val details = LinearLayout(mContext)
+        details.orientation = LinearLayout.VERTICAL
+        details.gravity = Gravity.CENTER_HORIZONTAL
+
+        val title = TextView(mContext)
+        title.text = active?.title ?: current?.getTitle() ?: "No podcast loaded"
+        title.setTextColor(notificationWidgetTextColor())
+        title.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
+        title.textSize = PODCAST_TEXT_LARGE
+        title.maxLines = 3
+        title.ellipsize = TextUtils.TruncateAt.END
+        title.setPadding(0, Tuils.dpToPx(mContext, 16), 0, Tuils.dpToPx(mContext, 2))
+        details.addView(title)
+
+        val show = TextView(mContext)
+        show.text = displayShow?.title ?: "Pick a show to start listening."
+        show.setTextColor(ColorUtils.setAlphaComponent(notificationWidgetTextColor(), 210))
+        show.setTypeface(Tuils.getTypeface(mContext))
+        show.textSize = PODCAST_TEXT_MEDIUM
+        details.addView(show)
+
+        panel.addView(details, LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        ))
+
+        val content = podcastContent ?: return
+        content.addView(panel, LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            if (viewportHeight > 0) viewportHeight else LinearLayout.LayoutParams.WRAP_CONTENT
+        ))
+    }
+
+    private fun addPodcastRow(
+        text: CharSequence,
+        bold: Boolean,
+        action: Runnable?,
+        longAction: Runnable? = null
+    ) {
+        val content = podcastContent ?: return
+        val row = TextView(mContext)
+        row.text = text
+        row.setTextColor(notificationWidgetTextColor())
+        row.setTypeface(Tuils.getTypeface(mContext), if (bold) Typeface.BOLD else Typeface.NORMAL)
+        row.textSize = PODCAST_TEXT_MEDIUM
+        row.maxLines = 5
+        row.ellipsize = TextUtils.TruncateAt.END
+        row.setPadding(
+            Tuils.dpToPx(mContext, 8),
+            Tuils.dpToPx(mContext, 7),
+            Tuils.dpToPx(mContext, 8),
+            Tuils.dpToPx(mContext, 7)
+        )
+        if (action != null) {
+            row.setOnClickListener(View.OnClickListener { action.run() })
+        }
+        if (longAction != null) {
+            row.setOnLongClickListener {
+                longAction.run()
+                true
+            }
+        }
+        val params = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+        params.bottomMargin = Tuils.dpToPx(mContext, 4)
+        content.addView(row, params)
+    }
+
+    private fun addPodcastView(row: View) {
+        val content = podcastContent ?: return
+        val params = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+        params.bottomMargin = Tuils.dpToPx(mContext, 4)
+        content.addView(row, params)
     }
 
     private fun executeFileConsoleCommand(rawCommand: String?) {
@@ -8977,7 +10519,7 @@ class UIManager(
         }
     }
 
-    private fun closeTermuxConsole() {
+    private fun closeTermuxConsole(restoreSuggestions: Boolean = true) {
         termuxFocusCapturePending = false
         if (termuxOverlay != null) {
             termuxOverlay!!.setVisibility(View.GONE)
@@ -8988,7 +10530,9 @@ class UIManager(
         resetTermuxAppRuntimeState(true)
         resetTermuxAppCellViewport()
         updateTermuxConsoleLabels()
-        restoreHomeSuggestionsAfterTermux()
+        if (restoreSuggestions) {
+            restoreHomeSuggestionsAfterTermux()
+        }
         if (termuxInput != null) {
             val manager =
                 mContext!!.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager?
@@ -8997,7 +10541,7 @@ class UIManager(
             }
             termuxInput!!.clearFocus()
         }
-        if (mTerminalAdapter != null) {
+        if (mTerminalAdapter != null && restoreSuggestions) {
             activateTerminalInput(false)
         }
     }
@@ -12885,12 +14429,16 @@ class UIManager(
             return
         }
         handler!!.removeCallbacks(musicTimeRunnable)
-        if ("internal" != activeMusicSource) {
-            return
-        }
         val musicWidget =
             if (mRootView != null) mRootView.findViewById<View?>(R.id.music_widget) else null
-        if (musicWidget != null && musicWidget.getVisibility() == View.VISIBLE && mainPack != null && mainPack!!.player != null && mainPack!!.player!!.isPlaying()) {
+        val internalPlaying = MusicService.SOURCE_INTERNAL == activeMusicSource
+            && mainPack.player != null
+            && mainPack.player!!.isPlaying()
+            && musicWidget != null
+            && musicWidget.getVisibility() == View.VISIBLE
+        val podcastPlaying = MusicService.SOURCE_PODCAST == activeMusicSource
+            && mainPack.podcastManager.isPlaying()
+        if (internalPlaying || podcastPlaying) {
             handler!!.post(musicTimeRunnable)
         }
     }
@@ -13128,6 +14676,7 @@ class UIManager(
         private const val PREF_STOPWATCH_BADGE_EDGE = "stopwatch_badge_edge"
         private const val PREF_STOPWATCH_BADGE_FRACTION = "stopwatch_badge_fraction"
         private const val ASCII_IDLE_PAUSE_MS = 120_000L
+        private const val RSS_MODULE_VISIBLE_LINES = 14
         val ACTION_UPDATE_SUGGESTIONS: String =
             BuildConfig.APPLICATION_ID + ".ui_update_suggestions"
         val ACTION_UPDATE_HINT: String = BuildConfig.APPLICATION_ID + ".ui_update_hint"
@@ -13163,6 +14712,8 @@ class UIManager(
         const val EXTRA_LUA_APP_ID: String = "lua_app_id"
         val ACTION_FILE_CONSOLE: String = BuildConfig.APPLICATION_ID + ".ui_file_console"
         const val EXTRA_FILE_COMMAND: String = "file_command"
+        val ACTION_PODCAST_SURFACE: String = BuildConfig.APPLICATION_ID + ".ui_podcast_surface"
+        const val EXTRA_PODCAST_COMMAND: String = "podcast_command"
         val ACTION_MODULE_COMMAND: String = BuildConfig.APPLICATION_ID + ".ui_module_command"
         const val EXTRA_MODULE_COMMAND: String = "module_command"
         const val EXTRA_MODULE_NAME: String = "module_name"
@@ -13178,6 +14729,15 @@ class UIManager(
         private const val TERMUX_APP_RESULT_PREFIX = "retui-app:"
         private const val TERMUX_APP_SYNC_RESULT_PREFIX = "retui-app-sync:"
         private const val TERMUX_WORKSPACE_PAGE_INDEX = 1
+        private const val PODCAST_MODE_SHOWS = 0
+        private const val PODCAST_MODE_RECENTS = 1
+        private const val PODCAST_MODE_SHOW_DETAIL = 2
+        private const val PODCAST_MODE_PLAYER = 3
+        private const val PODCAST_TEXT_SMALL = 11f
+        private const val PODCAST_TEXT_MEDIUM = 12f
+        private const val PODCAST_TEXT_LARGE = 15f
+        private const val PODCAST_PANE_HEIGHT_FRACTION = 0.64f
+        private const val PODCAST_PANE_MIN_HEIGHT_DP = 620
         private const val TERMUX_WORKSPACE_PAGE_COUNT = 2
         private const val TERMUX_WORKSPACE_SESSION = "retui_workspace"
         private const val TERMUX_WORKSPACE_RESULT_PREFIX = "retui-workspace:"

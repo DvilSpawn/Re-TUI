@@ -28,11 +28,12 @@ import java.util.ArrayList
 /**
  * Created by francescoandreuzzi on 17/08/2017.
  */
-class MusicManager2(var mContext: Context) : MediaPlayerControl {
+class MusicManager2(var mContext: Context, private val loadLocalLibrary: Boolean = true) : MediaPlayerControl {
     val WAITING_NEXT: Int = 10
     val WAITING_PREVIOUS: Int = 11
     val WAITING_PLAY: Int = 12
     val WAITING_LISTEN: Int = 13
+    val WAITING_PODCAST: Int = 14
 
     @get:JvmName("getSongList")
     @set:JvmName("setSongList")
@@ -49,6 +50,9 @@ class MusicManager2(var mContext: Context) : MediaPlayerControl {
 
     var waitingMethod: Int = 0
     var savedParam: String? = null
+    private var waitingPodcastSongs: MutableList<Song>? = null
+    private var waitingPodcastIndex: Int = 0
+    private var waitingPodcastListener: MusicService.PlaybackListener? = null
 
     var headsetBroadcast: BroadcastReceiver?
     var headsetReceiverRegistered: Boolean = false
@@ -60,6 +64,7 @@ class MusicManager2(var mContext: Context) : MediaPlayerControl {
     }
 
     fun refresh() {
+        if (!loadLocalLibrary) return
         destroy()
         updateSongs()
         registerHeadsetReceiver()
@@ -141,6 +146,39 @@ class MusicManager2(var mContext: Context) : MediaPlayerControl {
         stopped = false
 
         return musicSrv!!.playPrev()
+    }
+
+    fun playPodcast(
+        playlist: MutableList<Song>,
+        index: Int,
+        listener: MusicService.PlaybackListener?
+    ): String? {
+        if (playlist.isEmpty()) return "No playable episodes."
+        val safeIndex = index.coerceIn(0, playlist.lastIndex)
+        if (!musicBound) {
+            init()
+            waitingMethod = WAITING_PODCAST
+            waitingPodcastSongs = playlist
+            waitingPodcastIndex = safeIndex
+            waitingPodcastListener = listener
+            return null
+        }
+
+        playbackPaused = false
+        stopped = false
+        musicSrv!!.setShuffle(false)
+        musicSrv!!.setPlaybackListener(listener)
+        musicSrv!!.setList(playlist)
+        musicSrv!!.setSong(safeIndex)
+        return musicSrv!!.playSong()
+    }
+
+    fun useLocalSongs() {
+        if (musicSrv != null && musicBound) {
+            musicSrv!!.setPlaybackListener(null)
+            musicSrv!!.setShuffle(XMLPrefsManager.getBoolean(Behavior.random_play))
+            musicSrv!!.setList(songs)
+        }
     }
 
     override fun pause() {
@@ -243,10 +281,12 @@ class MusicManager2(var mContext: Context) : MediaPlayerControl {
             musicSrv = binder.service
             musicSrv!!.setShuffle(XMLPrefsManager.getBoolean(Behavior.random_play))
 
-            if (loader!!.isAlive()) {
-                synchronized(songs!!) {
+            val currentLoader = loader
+            val currentSongs = songs ?: ArrayList<Song>().also { songs = it }
+            if (currentLoader != null && currentLoader.isAlive()) {
+                synchronized(currentSongs) {
                     try {
-                        (songs as Object).wait()
+                        (currentSongs as Object).wait()
                     } catch (e: InterruptedException) {
                     }
                 }
@@ -260,10 +300,17 @@ class MusicManager2(var mContext: Context) : MediaPlayerControl {
                 WAITING_PREVIOUS -> playPrev()
                 WAITING_PLAY -> play()
                 WAITING_LISTEN -> select(savedParam)
+                WAITING_PODCAST -> playPodcast(
+                    waitingPodcastSongs ?: ArrayList<Song>(),
+                    waitingPodcastIndex,
+                    waitingPodcastListener
+                )
             }
 
             waitingMethod = 0
             savedParam = null
+            waitingPodcastSongs = null
+            waitingPodcastListener = null
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {
@@ -272,17 +319,18 @@ class MusicManager2(var mContext: Context) : MediaPlayerControl {
     }
 
     init {
-        updateSongs()
-
         headsetBroadcast = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent) {
                 if (intent.getIntExtra("state", 0) == 0) pause()
             }
         }
 
-        registerHeadsetReceiver()
-
-        init()
+        songs = ArrayList<Song>()
+        if (loadLocalLibrary) {
+            updateSongs()
+            registerHeadsetReceiver()
+            init()
+        }
     }
 
     override fun canPause(): Boolean {
@@ -333,6 +381,11 @@ class MusicManager2(var mContext: Context) : MediaPlayerControl {
     fun get(index: Int): Song? {
         if (index < 0 || index >= songs!!.size) return null
         return songs!!.get(index)
+    }
+
+    fun currentSong(): Song? {
+        if (musicSrv != null && musicBound) return musicSrv!!.currentSong()
+        return null
     }
 
     override fun seekTo(pos: Int) {

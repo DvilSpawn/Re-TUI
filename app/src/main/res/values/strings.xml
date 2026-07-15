@@ -117,6 +117,7 @@
     <string name="rss_invalid_date">Invalid publication date tag:</string>
     <string name="rss_invalid_entry_tag">Invalid entry tag:</string>
     <string name="rss_invalid_empty">Invalid RSS: the file is empty:</string>
+    <string name="rss_no_entries">RSS feed has no entries:</string>
 
     <!-- alias -->
     <string name="output_notaddingalias1">The name of your alias:</string>
@@ -159,6 +160,16 @@
         \n$ files
         \n$ files &lt;command&gt;
         \n\nLaunches the Re:T-UI Files app with the current path, theme colors, terminal background, top margin, and font.
+    </string>
+    <string name="help_podcast">Open the Re:T-UI podcast surface.
+        \nUsage:
+        \n$ podcast
+        \n$ podcast add &lt;feed-url&gt;
+        \n$ podcast refresh
+        \n$ podcast play
+        \n$ podcast next
+        \n$ podcast prev
+        \n\nPodcasts stream from RSS/Atom feeds and play oldest first for first-time listening.
     </string>
     <string name="help_tbridge">Use Termux as Re:T-UI\'s power-user bridge for scripts, modules, callbacks, and automation.
         \nUsage:
@@ -612,12 +623,15 @@
         \n-edit [contactName] -> edit an existing contact
         \n-rm [contactName] -> remove a contact</string>
     <string name="help_exit">Close Re:T-UI and reset the default launcher</string>
-    <string name="help_rss">-add [ID] [update_time_in_seconds] [url] -> add a new RSS feed. Re:T-UI will try to get new contents every [update_time_in_seconds] seconds
+    <string name="help_rss">-add -> open the RSS setup form
+        \n-add [ID] [update_time_in_seconds] [url] -> add a new RSS feed. Re:T-UI will try to get new contents every [update_time_in_seconds] seconds
         \n-rm [ID] -> remove this RSS feed
-        \n-ls -> list your RSS feeds
+        \n-ls -> open your RSS feed list; tap a feed to edit it
         \n-l [ID] -> show the whole content of the corresponding RSS feed
         \n-show [ID] [boolean] -> toggle the [show] property of the given saved RSS feed
         \n-update_time [ID] [update_time_in_seconds] -> set the update time of the corresponding RSS feed
+        \n-url [ID] [url] -> update the URL of the corresponding RSS feed
+        \n-alias [ID] [alias] -> rename the corresponding RSS feed in lists and modules
         \n-format [ID] [format] -> set the format of the corresponding RSS feed ([format] can be both a string or the ID of an existing format)
         \n-color [ID] [color] -> set the base color of the corresponding RSS feed
         \n-wifi_only [ID] [boolean] -> if [boolean] is true, the corresponding feed will be updated only if your device is connected to a WiFi network

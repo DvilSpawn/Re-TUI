@@ -40,6 +40,7 @@ class MusicService : Service(), OnPreparedListener, MediaPlayer.OnErrorListener,
     private val musicBind: IBinder = MusicBinder()
     private var songTitle: String? = Tuils.EMPTYSTRING
     private var shuffle = false
+    private var playbackListener: PlaybackListener? = null
 
     private var lastNotificationChange: Long = 0
 
@@ -57,8 +58,14 @@ class MusicService : Service(), OnPreparedListener, MediaPlayer.OnErrorListener,
         if (intent != null && intent.hasExtra(EXTRA_CONTROL_CMD)) {
             val cmd = intent.getIntExtra(EXTRA_CONTROL_CMD, -1)
             when (cmd) {
-                CONTROL_NEXT_INT -> playNext()
-                CONTROL_PREV_INT -> playPrev()
+                CONTROL_NEXT_INT -> {
+                    savePodcastProgress()
+                    playNext()
+                }
+                CONTROL_PREV_INT -> {
+                    savePodcastProgress()
+                    playPrev()
+                }
                 CONTROL_PLAY_PAUSE_INT -> if (this.isPlaying) pausePlayer()
                 else playPlayer()
             }
@@ -74,11 +81,13 @@ class MusicService : Service(), OnPreparedListener, MediaPlayer.OnErrorListener,
         intent.putExtra(MUSIC_PLAYING, this.isPlaying)
         intent.putExtra(SONG_POSITION, this.posn)
         intent.putExtra(SONG_DURATION, this.dur)
-        intent.putExtra(MUSIC_SOURCE, SOURCE_INTERNAL)
+        val song = currentSong()
+        intent.putExtra(MUSIC_SOURCE, song?.getSource() ?: SOURCE_INTERNAL)
 
-        if (songs != null && this.songIndex >= 0 && this.songIndex < songs!!.size) {
-            val s = songs!!.get(this.songIndex)
-            intent.putExtra(SONG_SINGER, s.getSinger())
+        if (song != null) {
+            intent.putExtra(SONG_SINGER, song.getSinger())
+            intent.putExtra(PODCAST_SHOW_ID, song.getPodcastShowId())
+            intent.putExtra(PODCAST_EPISODE_KEY, song.getPodcastEpisodeKey())
         }
 
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
@@ -109,6 +118,14 @@ class MusicService : Service(), OnPreparedListener, MediaPlayer.OnErrorListener,
 
     override fun onPrepared(mp: MediaPlayer) {
         if (songTitle == null || songTitle!!.length == 0) return
+        val startPosition = currentSong()?.getStartPositionMs() ?: 0
+        if (startPosition > 0) {
+            try {
+                mp.seekTo(startPosition)
+            } catch (e: Exception) {
+                Tuils.log(e)
+            }
+        }
         mp.start()
         broadcastMusicState()
     }
@@ -126,6 +143,17 @@ class MusicService : Service(), OnPreparedListener, MediaPlayer.OnErrorListener,
         if (shuffle) Collections.shuffle(songs)
     }
 
+    fun setPlaybackListener(listener: PlaybackListener?) {
+        playbackListener = listener
+    }
+
+    private fun savePodcastProgress() {
+        val song = currentSong()
+        if (song?.getSource() == SOURCE_PODCAST) {
+            playbackListener?.onProgress(song, posn, dur)
+        }
+    }
+
     inner class MusicBinder : Binder() {
         val service: MusicService
             get() = this@MusicService
@@ -140,6 +168,7 @@ class MusicService : Service(), OnPreparedListener, MediaPlayer.OnErrorListener,
     }
 
     fun playSong(): String? {
+        currentSong()?.let { playbackListener?.onProgress(it, posn, dur) }
         try {
             player!!.reset()
         } catch (e: Exception) {
@@ -173,6 +202,7 @@ class MusicService : Service(), OnPreparedListener, MediaPlayer.OnErrorListener,
             }
         }
         player!!.prepareAsync()
+        playbackListener?.onTrackChanged(playSong)
 
         return playSong.getTitle()
     }
@@ -183,6 +213,8 @@ class MusicService : Service(), OnPreparedListener, MediaPlayer.OnErrorListener,
 
     override fun onCompletion(mp: MediaPlayer) {
         if (player!!.getCurrentPosition() > 0) {
+            val completed = currentSong()
+            playbackListener?.onTrackCompleted(completed, posn, dur)
             mp.reset()
             playNext()
         }
@@ -221,6 +253,7 @@ class MusicService : Service(), OnPreparedListener, MediaPlayer.OnErrorListener,
         }
 
     fun pausePlayer() {
+        currentSong()?.let { playbackListener?.onProgress(it, posn, dur) }
         if (this.isPlaying) {
             player!!.pause()
         }
@@ -252,20 +285,35 @@ class MusicService : Service(), OnPreparedListener, MediaPlayer.OnErrorListener,
 
     fun seek(posn: Int) {
         player!!.seekTo(posn)
+        currentSong()?.let { playbackListener?.onProgress(it, this.posn, dur) }
     }
 
     fun go() {
         player!!.start()
+        broadcastMusicState()
     }
 
     fun playPrev(): String? {
         if (songs!!.size == 0) return getString(R.string.no_songs)
+        if (currentSong()?.getSource() == SOURCE_PODCAST && this.songIndex <= 0) {
+            seek(0)
+            return currentSong()?.getTitle()
+        }
         this.songIndex = previous()
         return playSong()
     }
 
     fun playNext(): String? {
         if (songs!!.size == 0) return getString(R.string.no_songs)
+        if (currentSong()?.getSource() == SOURCE_PODCAST && this.songIndex >= songs!!.lastIndex) {
+            try {
+                player!!.stop()
+            } catch (e: Exception) {
+            }
+            songTitle = null
+            broadcastMusicState()
+            return "End of show."
+        }
         this.songIndex = next()
         return playSong()
     }
@@ -295,6 +343,17 @@ class MusicService : Service(), OnPreparedListener, MediaPlayer.OnErrorListener,
         this.shuffle = shuffle
     }
 
+    fun currentSong(): Song? {
+        if (songs == null || songIndex < 0 || songIndex >= songs!!.size) return null
+        return songs!!.get(songIndex)
+    }
+
+    interface PlaybackListener {
+        fun onTrackChanged(song: Song?) {}
+        fun onTrackCompleted(song: Song?, positionMs: Int, durationMs: Int) {}
+        fun onProgress(song: Song?, positionMs: Int, durationMs: Int) {}
+    }
+
     companion object {
         const val ACTION_MUSIC_CHANGED: String = "ohi.andre.consolelauncher.music_changed"
         const val ACTION_MUSIC_CONTROL: String = "ohi.andre.consolelauncher.music_control"
@@ -307,6 +366,9 @@ class MusicService : Service(), OnPreparedListener, MediaPlayer.OnErrorListener,
         const val MUSIC_SOURCE: String = "music_source"
         const val SOURCE_INTERNAL: String = "internal"
         const val SOURCE_EXTERNAL: String = "external"
+        const val SOURCE_PODCAST: String = "podcast"
+        const val PODCAST_SHOW_ID: String = "podcast_show_id"
+        const val PODCAST_EPISODE_KEY: String = "podcast_episode_key"
         const val MUSIC_CONTROL: String = "music_control"
         const val CONTROL_PREVIOUS: String = "previous"
         const val CONTROL_PLAY_PAUSE: String = "play_pause"
@@ -351,6 +413,22 @@ class MusicService : Service(), OnPreparedListener, MediaPlayer.OnErrorListener,
                 .setContentTitle("Playing")
                 .setContentText(songTitle)
 
+            builder.addAction(
+                R.mipmap.ic_launcher,
+                "PREV",
+                controlIntent(context, CONTROL_PREV_INT, 21)
+            )
+            builder.addAction(
+                R.mipmap.ic_launcher,
+                "PLAY/PAUSE",
+                controlIntent(context, CONTROL_PLAY_PAUSE_INT, 22)
+            )
+            builder.addAction(
+                R.mipmap.ic_launcher,
+                "NEXT",
+                controlIntent(context, CONTROL_NEXT_INT, 23)
+            )
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 val label = "cmd"
                 val remoteInput = RemoteInput.Builder(PrivateIOReceiver.TEXT)
@@ -379,6 +457,17 @@ class MusicService : Service(), OnPreparedListener, MediaPlayer.OnErrorListener,
 
             notification = builder.build()
             return notification
+        }
+
+        private fun controlIntent(context: Context, cmd: Int, requestCode: Int): PendingIntent {
+            val intent = Intent(context, MusicService::class.java)
+            intent.putExtra(EXTRA_CONTROL_CMD, cmd)
+            return PendingIntent.getService(
+                context,
+                requestCode,
+                intent,
+                Tuils.pendingIntentFlags(PendingIntent.FLAG_UPDATE_CURRENT)
+            )
         }
     }
 }

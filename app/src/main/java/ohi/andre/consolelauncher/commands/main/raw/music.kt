@@ -20,6 +20,7 @@ class music : ParamCommand() {
                     return null
                 }
 
+                pack.player!!.useLocalSongs()
                 val title = pack.player!!.playNext()
                 if (title != null) return pack.context.getString(R.string.output_playing) + Tuils.SPACE + title
                 return null
@@ -32,6 +33,7 @@ class music : ParamCommand() {
                     return null
                 }
 
+                pack.player!!.useLocalSongs()
                 val title = pack.player!!.playPrev()
                 if (title != null) return pack.context.getString(R.string.output_playing) + Tuils.SPACE + title
                 return null
@@ -51,6 +53,7 @@ class music : ParamCommand() {
                     return null
                 }
 
+                pack.player!!.useLocalSongs()
                 val title = pack.player!!.play()
                 if (title == null) return null
                 return pack.context.getString(R.string.output_playing) + Tuils.SPACE + title
@@ -76,6 +79,7 @@ class music : ParamCommand() {
                 if ((pack as MainPack).player == null) return pack.context.getString(R.string.output_musicdisabled)
 
                 val s = pack.getString()
+                pack.player!!.useLocalSongs()
                 pack.player!!.select(s)
                 return null
             }

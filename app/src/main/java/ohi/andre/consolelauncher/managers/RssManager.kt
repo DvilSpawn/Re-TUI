@@ -6,6 +6,8 @@ import android.graphics.Color
 import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Handler
+import android.text.SpannableStringBuilder
+import android.text.Spanned
 import android.text.TextUtils
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import ohi.andre.consolelauncher.MainManager
@@ -18,6 +20,7 @@ import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsElement
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsList
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave
 import ohi.andre.consolelauncher.tuils.StoppableThread
+import ohi.andre.consolelauncher.tuils.LongClickableSpan
 import ohi.andre.consolelauncher.tuils.Tuils
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -29,6 +32,7 @@ import org.w3c.dom.NodeList
 import org.xml.sax.SAXParseException
 import java.io.BufferedInputStream
 import java.io.File
+import java.io.FileOutputStream
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Arrays
@@ -36,6 +40,7 @@ import java.util.Date
 import java.util.regex.Pattern
 import javax.xml.parsers.DocumentBuilderFactory
 import kotlin.math.max
+import kotlin.math.min
 import java.util.ArrayList
 import java.util.Locale
 import java.util.regex.Matcher
@@ -56,10 +61,20 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
 
     private val PUBDATE_CHILD = "pubDate"
     private val ENTRY_CHILD = "item"
+    private val ATOM_ENTRY_CHILD = "entry"
+    private val UPDATED_CHILD = "updated"
+    private val PUBLISHED_CHILD = "published"
+    private val DESCRIPTION_CHILD = "description"
+    private val SUMMARY_CHILD = "summary"
+    private val CONTENT_CHILD = "content"
     private val LINK_CHILD = "link"
     private val HREF_ATTRIBUTE = "href"
+    private val RSS_USER_AGENT = "ReTUI/1.0 Android RSS reader"
+    private val MODULE_MAX_FEEDS = 3
+    private val MODULE_MAX_ITEMS_PER_FEED = 10
 
     private val defaultRSSDateFormat = SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.US)
+    private val defaultAtomDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US)
 
     override fun delete(): Array<String?>? {
         return null
@@ -354,16 +369,24 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
     }
 
     fun add(id: Int, timeInSeconds: Long, url: String): String? {
+        return add(id, timeInSeconds, url, null)
+    }
+
+    fun add(id: Int, timeInSeconds: Long, url: String, alias: String?): String? {
+        val cleanUrl = url.trim()
+        if (findExistingId(id) != null) return "RSS ID already exists: $id"
+        findExistingUrl(cleanUrl)?.let { return duplicateUrlMessage(it) }
+
         val output = XMLPrefsManager.add(
             rssIndexFile,
             RSS_LABEL,
-            arrayOf<String?>(ID_ATTRIBUTE, TIME_ATTRIBUTE, SHOW_ATTRIBUTE, URL_ATTRIBUTE),
-            arrayOf<String?>(id.toString(), timeInSeconds.toString(), true.toString(), url)
+            arrayOf<String?>(ID_ATTRIBUTE, TIME_ATTRIBUTE, SHOW_ATTRIBUTE, URL_ATTRIBUTE, ALIAS_ATTRIBUTE),
+            arrayOf<String?>(id.toString(), timeInSeconds.toString(), true.toString(), cleanUrl, cleanAlias(alias))
         )
 
         if (output == null) {
             try {
-                val r = Rss(url, timeInSeconds, id, true)
+                val r = Rss(cleanUrl, timeInSeconds, id, true, cleanAlias(alias))
 
                 r.lastShownItem = System.currentTimeMillis()
                 r.format = defaultFormat
@@ -441,7 +464,25 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
         return output
     }
 
-    fun buildModuleText(): String {
+    fun nextId(): Int {
+        var next = 1
+        if (feeds != null) {
+            for (feed in feeds!!) {
+                next = max(next, feed.id + 1)
+            }
+        }
+        return next
+    }
+
+    fun snapshot(): List<Rss> {
+        return if (feeds == null) emptyList() else ArrayList(feeds!!)
+    }
+
+    fun displayLabel(feed: Rss): String? {
+        return feedLabel(feed)
+    }
+
+    fun buildModuleText(): CharSequence {
         val snapshot = ArrayList<Rss>()
         if (feeds != null) {
             for (feed in feeds) {
@@ -455,25 +496,25 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
                     + "\nThen: rss -frc 1")
         }
 
-        val out = StringBuilder()
+        val out = SpannableStringBuilder()
         var shown = 0
         for (feed in snapshot) {
-            if (shown >= 3) break
+            if (shown >= MODULE_MAX_FEEDS) break
 
             if (out.length > 0) out.append('\n')
-            out.append('[').append(feed.id).append("] ").append(feedLabel(feed)).append('\n')
+            out.append('[').append(feed.id.toString()).append("] ").append(feedLabel(feed)).append('\n')
             if (feed.lastCheckedClient > 0) {
                 out.append("checked ").append(formatModuleTime(feed.lastCheckedClient))
                 if (feed.wifiOnly) out.append(" (wifi only)")
                 out.append('\n')
             }
 
-            val items = latestItemTitles(feed, 3)
-            if (items.size == 0) {
-                out.append("  no cached items; run rss -frc ").append(feed.id).append('\n')
+            val result = latestModuleItems(feed, MODULE_MAX_ITEMS_PER_FEED)
+            if (result.items.size == 0) {
+                out.append(result.message ?: "  feed has no entries").append('\n')
             } else {
-                for (item in items) {
-                    out.append("  - ").append(item).append('\n')
+                for (item in result.items) {
+                    appendModuleItem(out, item)
                 }
             }
             shown++
@@ -481,12 +522,12 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
 
         val remaining = snapshot.size - shown
         if (remaining > 0) {
-            out.append("... ").append(remaining).append(" more feed")
+            out.append("... ").append(remaining.toString()).append(" more feed")
             if (remaining != 1) out.append('s')
             out.append('\n')
         }
         out.append("Commands: rss -l [id], rss -frc [id], rss -add")
-        return out.toString().trim { it <= ' ' }
+        return out
     }
 
     fun l(id: Int): String? {
@@ -545,6 +586,55 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
         if (output == null) {
             val r = findId(id)
             if (r != null) r.updateTimeSeconds = timeSeconds
+            return null
+        } else {
+            if (output.length > 0) return output
+            return context.getString(R.string.rss_not_found)
+        }
+    }
+
+    fun setUrl(id: Int, url: String): String? {
+        val cleanUrl = url.trim()
+        findExistingUrl(cleanUrl, id)?.let { return duplicateUrlMessage(it) }
+
+        val output = XMLPrefsManager.set(
+            rssIndexFile,
+            RSS_LABEL,
+            arrayOf<String?>(ID_ATTRIBUTE),
+            arrayOf<String>(id.toString()),
+            arrayOf<String?>(URL_ATTRIBUTE),
+            arrayOf<String>(cleanUrl),
+            false
+        )
+        if (output == null) {
+            val r = findId(id)
+            if (r != null) {
+                r.url = cleanUrl
+                r.lastCheckedClient = -1
+                r.lastShownItem = -1
+                updateRss(r, true, true)
+            }
+            return null
+        } else {
+            if (output.length > 0) return output
+            return context.getString(R.string.rss_not_found)
+        }
+    }
+
+    fun setAlias(id: Int, alias: String?): String? {
+        val output = XMLPrefsManager.set(
+            rssIndexFile,
+            RSS_LABEL,
+            arrayOf<String?>(ID_ATTRIBUTE),
+            arrayOf<String>(id.toString()),
+            arrayOf<String?>(ALIAS_ATTRIBUTE),
+            arrayOf<String?>(cleanAlias(alias) ?: Tuils.EMPTYSTRING),
+            false
+        )
+        if (output == null) {
+            val r = findId(id)
+            if (r != null) r.alias = cleanAlias(alias)
+            notifyRssModuleUpdated()
             return null
         } else {
             if (output.length > 0) return output
@@ -803,17 +893,34 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
                 try {
                     val builder = Request.Builder()
                         .url(feed.url!!)
+                        .header("User-Agent", RSS_USER_AGENT)
+                        .header("Accept", "application/rss+xml, application/atom+xml, application/xml, text/xml;q=0.9, */*;q=0.1")
                         .get()
 
                     client.newCall(builder.build()).execute().use { response ->
-                        if (response.isSuccessful && (firstTime || response.code != 304)) {
+                        if (firstTime || response.code != 304) {
                             val body = response.body
+                            val rssFile = File(root, RSS_LABEL + feed.id + ".xml")
 
                             var bytes: Long = 0
-                            if (body != null) bytes = Tuils.download(
-                                BufferedInputStream(body.byteStream()),
-                                File(root, RSS_LABEL + feed.id + ".xml")
-                            )
+                            if (body != null) {
+                                if (response.isSuccessful) {
+                                    bytes = Tuils.download(
+                                        BufferedInputStream(body.byteStream()),
+                                        rssFile
+                                    )
+                                } else {
+                                    val responseBytes = body.bytes()
+                                    if (looksLikeFeedXml(responseBytes)) {
+                                        FileOutputStream(rssFile, false).use { out ->
+                                            out.write(responseBytes)
+                                        }
+                                        bytes = responseBytes.size.toLong()
+                                    } else {
+                                        return
+                                    }
+                                }
+                            }
 
                             if (showDownloadMessage) {
                                 var c: CharSequence =
@@ -881,7 +988,7 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
         try {
             doc = dBuilder.parse(rssFile)
         } catch (e: SAXParseException) {
-            Tuils.sendXMLParseError(context, PATH, e)
+            Tuils.sendXMLParseError(context, rssFile.getName(), e)
             return false
         }
 
@@ -890,15 +997,12 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
         var greatestTime: Long = -1
         var foundOneDateAtLeast = false
 
-        val entryTag = (if (feed.entryTag != null) feed.entryTag else ENTRY_CHILD)!!
-        val dateTag = (if (feed.dateTag != null) feed.dateTag else PUBDATE_CHILD)!!
-
-        val list = doc.getElementsByTagName(entryTag)
+        val list = entryNodes(doc, feed)
         if (list.getLength() == 0) {
             Tuils.sendOutput(
                 Color.RED,
                 context,
-                context.getString(R.string.rss_invalid_entry_tag) + Tuils.SPACE + (entryTag)
+                context.getString(R.string.rss_no_entries) + Tuils.SPACE + feed.id
             )
             return false
         }
@@ -910,19 +1014,14 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
             }
 
             if (time) {
-                val l = element.getElementsByTagName(dateTag)
-                if (l.getLength() == 0) continue
+                val date = firstText(element, *dateTags(feed))
+                if (TextUtils.isEmpty(date)) continue
 
                 foundOneDateAtLeast = true
 
-                val date = l.item(0).getTextContent()
-
                 val d: Date?
                 try {
-                    d =
-                        if (feed.timeFormat != null) feed.timeFormat!!.parse(date) else defaultRSSDateFormat.parse(
-                            date
-                        )
+                    d = parseFeedDate(feed, date)
                 } catch (e: Exception) {
                     Tuils.sendOutput(
                         Color.RED,
@@ -950,7 +1049,7 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
             Tuils.sendOutput(
                 Color.RED,
                 context,
-                context.getString(R.string.rss_invalid_date) + Tuils.SPACE + (dateTag)
+                context.getString(R.string.rss_invalid_date) + Tuils.SPACE + Tuils.toPlanString(dateTags(feed), "/")
             )
         } else if (greatestTime != -1L) {
             feed.lastShownItem = greatestTime
@@ -958,6 +1057,48 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
         }
 
         return updated
+    }
+
+    private fun entryNodes(doc: Document, feed: Rss): NodeList {
+        if (!TextUtils.isEmpty(feed.entryTag)) return doc.getElementsByTagName(feed.entryTag)
+
+        val items = doc.getElementsByTagName(ENTRY_CHILD)
+        if (items.getLength() > 0) return items
+        return doc.getElementsByTagName(ATOM_ENTRY_CHILD)
+    }
+
+    private fun entryTagLabel(feed: Rss): String {
+        return if (!TextUtils.isEmpty(feed.entryTag)) feed.entryTag!! else ENTRY_CHILD + "/" + ATOM_ENTRY_CHILD
+    }
+
+    private fun dateTags(feed: Rss): Array<String> {
+        return if (!TextUtils.isEmpty(feed.dateTag)) {
+            arrayOf(feed.dateTag!!)
+        } else {
+            arrayOf(PUBDATE_CHILD, UPDATED_CHILD, PUBLISHED_CHILD)
+        }
+    }
+
+    private fun parseFeedDate(feed: Rss, value: String): Date {
+        if (feed.timeFormat != null) return feed.timeFormat!!.parse(value)
+        try {
+            return defaultRSSDateFormat.parse(value)
+        } catch (rssError: ParseException) {
+            return defaultAtomDateFormat.parse(normalizeAtomDate(value))
+        }
+    }
+
+    private fun normalizeAtomDate(value: String): String {
+        var date = value.trim()
+        if (date.endsWith("Z")) {
+            date = date.dropLast(1) + "+0000"
+        }
+        val timeStart = date.indexOf('T')
+        val offsetStart = max(date.lastIndexOf('+'), date.lastIndexOf('-'))
+        if (timeStart != -1 && offsetStart > timeStart && date.length - offsetStart == 6 && date[offsetStart + 3] == ':') {
+            date = date.substring(0, offsetStart + 3) + date.substring(offsetStart + 4)
+        }
+        return date
     }
 
     private val formatPattern: Pattern =
@@ -1009,20 +1150,15 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
                 var value: String?
                 var cl = feed.color
 
-                val ls = item.getElementsByTagName(tag)
-                if (ls.getLength() == 0) value = Tuils.EMPTYSTRING
-                else {
-                    value = ls.item(0).getTextContent()
-                    if (value != null) value = value.trim { it <= ' ' }
-                    else value = Tuils.EMPTYSTRING
+                value = itemText(item, tag, feed)
+                if (TextUtils.isEmpty(value)) {
+                    value = Tuils.EMPTYSTRING
+                } else {
 
                     if (tag == dateTag) {
                         val d: Date?
                         try {
-                            d =
-                                if (feed.timeFormat != null) feed.timeFormat!!.parse(value) else defaultRSSDateFormat.parse(
-                                    value
-                                )
+                            d = parseFeedDate(feed, value)
                         } catch (e: ParseException) {
                             Tuils.log(e)
                             continue
@@ -1106,22 +1242,52 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
             }
         }
 
-        var url: String? = null
-        val list = item.getElementsByTagName(LINK_CHILD)
-        if (list.getLength() != 0) {
-            val n = list.item(0)
-            url = n.getTextContent()
-
-            if (n.getNodeType() == Node.ELEMENT_NODE && (url == null || url.length == 0)) {
-                url = (n as Element).getAttribute(HREF_ATTRIBUTE)
-            }
-        }
-
+        val url = itemLink(item)
         val action: String?
         if (url == null || url.length == 0) action = null
         else action = OPEN_URL + url
 
         Tuils.sendOutput(context, s, TerminalManager.CATEGORY_NO_COLOR, if (click) action else null)
+    }
+
+    private fun itemText(item: Element, tag: String, feed: Rss): String {
+        if (feed.dateTag == null && tag == PUBDATE_CHILD) {
+            return firstText(item, PUBDATE_CHILD, UPDATED_CHILD, PUBLISHED_CHILD).trim { it <= ' ' }
+        }
+        if (tag == DESCRIPTION_CHILD) {
+            return firstText(item, DESCRIPTION_CHILD, SUMMARY_CHILD, CONTENT_CHILD).trim { it <= ' ' }
+        }
+        if (tag == LINK_CHILD) {
+            return itemLink(item) ?: Tuils.EMPTYSTRING
+        }
+        return firstText(item, tag).trim { it <= ' ' }
+    }
+
+    private fun itemLink(item: Element): String? {
+        val list = item.getElementsByTagName(LINK_CHILD)
+        for (i in 0..<list.getLength()) {
+            val node = list.item(i) ?: continue
+            val text = node.getTextContent()
+            if (!TextUtils.isEmpty(text)) return text.trim { it <= ' ' }
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                val href = (node as Element).getAttribute(HREF_ATTRIBUTE)
+                if (!TextUtils.isEmpty(href)) return href.trim { it <= ' ' }
+            }
+        }
+        return null
+    }
+
+    private fun looksLikeFeedXml(bytes: ByteArray): Boolean {
+        if (bytes.size == 0) return false
+
+        val prefix = String(bytes, 0, min(bytes.size, 512), Charsets.UTF_8)
+            .trimStart()
+            .lowercase(Locale.US)
+        return prefix.startsWith("<rss")
+                || prefix.startsWith("<feed")
+                || prefix.startsWith("<rdf")
+                || (prefix.startsWith("<?xml")
+                && (prefix.contains("<rss") || prefix.contains("<feed") || prefix.contains("<rdf")))
     }
 
     private fun notifyRssModuleUpdated() {
@@ -1132,6 +1298,7 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
     }
 
     private fun feedLabel(feed: Rss): String? {
+        if (!TextUtils.isEmpty(feed.alias)) return feed.alias
         try {
             val uri = Uri.parse(feed.url)
             var host = uri.getHost()
@@ -1146,6 +1313,11 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
         return feed.url
     }
 
+    private fun cleanAlias(alias: String?): String? {
+        val cleaned = alias?.trim()
+        return if (TextUtils.isEmpty(cleaned)) null else cleaned
+    }
+
     private fun formatModuleTime(time: Long): String {
         try {
             return TimeManager.instance!!.replace(timeFormat ?: Tuils.EMPTYSTRING, time, Int.Companion.MAX_VALUE)
@@ -1155,10 +1327,12 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
         }
     }
 
-    private fun latestItemTitles(feed: Rss, max: Int): MutableList<String?> {
-        val out = ArrayList<String?>()
+    private fun latestModuleItems(feed: Rss, max: Int): ModuleItems {
+        val out = ArrayList<ModuleItem>()
         val rssFile = File(root, RSS_LABEL + feed.id + ".xml")
-        if (!rssFile.exists()) return out
+        if (!rssFile.exists()) {
+            return ModuleItems(out, "  no cache yet; run rss -frc " + feed.id)
+        }
 
         try {
             val dbFactory = DocumentBuilderFactory.newInstance()
@@ -1167,6 +1341,10 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
             doc.getDocumentElement().normalize()
 
             val nodes = moduleEntryNodes(doc, feed)
+            if (nodes.getLength() == 0) {
+                return ModuleItems(out, "  feed downloaded but has no entries")
+            }
+
             var count = 0
             while (count < nodes.getLength() && out.size < max) {
                 val node = nodes.item(count)
@@ -1191,27 +1369,94 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
                     "published"
                 )
                 date = cleanModuleText(date)
+                val text: String?
                 if (!TextUtils.isEmpty(date)) {
-                    out.add(shorten(title, 72) + " (" + shorten(date, 24) + ")")
+                    text = shorten(title, 72) + " (" + shorten(date, 24) + ")"
                 } else {
-                    out.add(shorten(title, 96))
+                    text = shorten(title, 96)
                 }
+                out.add(ModuleItem(text ?: Tuils.EMPTYSTRING, itemLink(node)))
                 count++
+            }
+        } catch (e: SAXParseException) {
+            Tuils.log(e)
+            return ModuleItems(out, "  " + rssFile.getName() + " XML parse error; run rss -frc " + feed.id)
+        } catch (e: Exception) {
+            Tuils.log(e)
+            return ModuleItems(out, "  cached feed could not be read; run rss -frc " + feed.id)
+        }
+        return ModuleItems(
+            out,
+            if (out.size == 0) "  feed has no displayable entries" else null
+        )
+    }
+
+    private fun appendModuleItem(out: SpannableStringBuilder, item: ModuleItem) {
+        out.append("  - ")
+        val start = out.length
+        out.append(item.text)
+        val end = out.length
+        if (click && !TextUtils.isEmpty(item.url)) {
+            out.setSpan(LongClickableSpan(OPEN_URL + item.url), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+        out.append('\n')
+    }
+
+    private fun findUrl(url: String, ignoreId: Int = -1): Rss? {
+        if (feeds == null) return null
+        for (feed in feeds!!) {
+            if (feed.id == ignoreId) continue
+            if (feed.url?.trim() == url) return feed
+        }
+        return null
+    }
+
+    private fun findExistingId(id: Int): Rss? {
+        findId(id)?.let { return it }
+        return findFeedInIndexFile { it.getAttribute(ID_ATTRIBUTE).toIntOrNull() == id }
+    }
+
+    private fun findExistingUrl(url: String, ignoreId: Int = -1): Rss? {
+        findUrl(url, ignoreId)?.let { return it }
+        return findFeedInIndexFile { node ->
+            val id = node.getAttribute(ID_ATTRIBUTE).toIntOrNull()
+            id != ignoreId && node.getAttribute(URL_ATTRIBUTE)?.trim() == url
+        }
+    }
+
+    private fun findFeedInIndexFile(matches: (Element) -> Boolean): Rss? {
+        if (!rssIndexFile.exists()) return null
+
+        try {
+            val dbFactory = DocumentBuilderFactory.newInstance()
+            val dBuilder = dbFactory.newDocumentBuilder()
+            val doc = dBuilder.parse(rssIndexFile)
+            doc.getDocumentElement().normalize()
+
+            val nodes = doc.getElementsByTagName(RSS_LABEL)
+            for (i in 0..<nodes.getLength()) {
+                val node = nodes.item(i)
+                if (node.getNodeType() != Node.ELEMENT_NODE) continue
+
+                val element = node as Element
+                if (matches(element)) return Rss.fromElement(element)
             }
         } catch (e: Exception) {
             Tuils.log(e)
         }
-        return out
+        return null
     }
 
-    private fun moduleEntryNodes(doc: Document, feed: Rss): NodeList {
-        val entryTag = (if (feed.entryTag != null) feed.entryTag else ENTRY_CHILD)!!
-        var nodes = doc.getElementsByTagName(entryTag)
-        if (nodes.getLength() > 0) return nodes
+    private fun duplicateUrlMessage(feed: Rss): String {
+        return "RSS URL already exists as ID " + feed.id
+    }
 
-        nodes = doc.getElementsByTagName(ENTRY_CHILD)
-        if (nodes.getLength() > 0) return nodes
-        return doc.getElementsByTagName("entry")
+    private class ModuleItem(val text: String, val url: String?)
+
+    private class ModuleItems(val items: MutableList<ModuleItem>, val message: String?)
+
+    private fun moduleEntryNodes(doc: Document, feed: Rss): NodeList {
+        return entryNodes(doc, feed)
     }
 
     private fun firstText(item: Element, vararg tags: String?): String {
@@ -1265,7 +1510,8 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
         wifiOnly: Boolean,
         timeFormat: String?,
         rootNode: String?,
-        timeNode: String?
+        timeNode: String?,
+        alias: String?
     ) {
         var url: String? = null
         var updateTimeSeconds: Long = 0
@@ -1290,8 +1536,9 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
         var wifiOnly: Boolean = false
 
         var timeFormat: SimpleDateFormat? = null
+        var alias: String? = null
 
-        constructor(url: String, updateTimeSeconds: Long, id: Int, show: Boolean) : this(
+        constructor(url: String, updateTimeSeconds: Long, id: Int, show: Boolean, alias: String? = null) : this(
             url,
             updateTimeSeconds,
             -1,
@@ -1305,7 +1552,8 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
             false,
             null,
             null,
-            null
+            null,
+            alias
         )
 
         init {
@@ -1323,7 +1571,8 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
                 wifiOnly,
                 timeFormat,
                 rootNode,
-                timeNode
+                timeNode,
+                alias
             )
         }
 
@@ -1341,7 +1590,8 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
             wifiOnly: Boolean,
             timeFormat: String?,
             rootNode: String?,
-            timeNode: String?
+            timeNode: String?,
+            alias: String?
         ) {
             this.url = url
             this.updateTimeSeconds = updateTimeSeconds
@@ -1370,6 +1620,7 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
 
             this.entryTag = rootNode
             this.dateTag = timeNode
+            this.alias = alias
         }
 
         fun needUpdate(): Boolean {
@@ -1465,6 +1716,7 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
             val dots = ":"
             return StringBuilder().append(ID_LABEL).append(dots).append(Tuils.SPACE).append(id)
                 .append(Tuils.SPACE)
+                .append(ALIAS_LABEL).append(dots).append(Tuils.SPACE).append(alias ?: Tuils.EMPTYSTRING).append(Tuils.SPACE)
                 .append(URL_LABEL).append(dots).append(Tuils.SPACE).append(url).append(Tuils.SPACE)
                 .append(UPDATE_TIME_LABEL).append(dots).append(Tuils.SPACE)
                 .append(updateTimeSeconds).append(Tuils.SPACE)
@@ -1474,6 +1726,7 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
 
         companion object {
             const val ID_LABEL = "ID"
+            private const val ALIAS_LABEL = "alias"
             private const val URL_LABEL = "URL"
             private const val UPDATE_TIME_LABEL = "update time"
             private const val SHOW_LABEL = "show"
@@ -1507,8 +1760,10 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
                 val lastShown = XMLPrefsManager.getLongAttribute(t, LAST_SHOWN_ITEM_ATTRIBUTE)
 
                 val format = XMLPrefsManager.getStringAttribute(t, FORMAT_ATTRIBUTE)
-                val includeIfMatches = XMLPrefsManager.getStringAttribute(t, INCLUDE_ATTRIBUTE)
-                val excludeIfMatches = XMLPrefsManager.getStringAttribute(t, EXCLUDE_ATTRIBUTE)
+                val includeIfMatches =
+                    XMLPrefsManager.getStringAttribute(t, INCLUDE_ATTRIBUTE) ?: Tuils.EMPTYSTRING
+                val excludeIfMatches =
+                    XMLPrefsManager.getStringAttribute(t, EXCLUDE_ATTRIBUTE) ?: Tuils.EMPTYSTRING
                 var color: Int
                 try {
                     color = Color.parseColor(t.getAttribute(COLOR_ATTRIBUTE))
@@ -1526,6 +1781,7 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
 
                 val rootNode = XMLPrefsManager.getStringAttribute(t, ENTRY_TAG_ATTRIBUTE)
                 val timeNode = XMLPrefsManager.getStringAttribute(t, DATE_TAG_ATTRIBUTE)
+                val alias = XMLPrefsManager.getStringAttribute(t, ALIAS_ATTRIBUTE)
 
                 return RssManager.Rss(
                     url,
@@ -1535,13 +1791,14 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
                     id,
                     show,
                     format,
-                    includeIfMatches!!,
-                    excludeIfMatches!!,
+                    includeIfMatches,
+                    excludeIfMatches,
                     color,
                     wifiOnly,
                     timeFormat,
                     rootNode,
-                    timeNode
+                    timeNode,
+                    alias
                 )
             }
         }
@@ -1638,6 +1895,7 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
         var TIME_ATTRIBUTE: String = "updateTimeSec"
         var SHOW_ATTRIBUTE: String = "show"
         var URL_ATTRIBUTE: String = "url"
+        var ALIAS_ATTRIBUTE: String = "alias"
         var LASTCHECKED_ATTRIBUTE: String = "lastChecked"
         var LAST_SHOWN_ITEM_ATTRIBUTE: String = "lastShownItem"
         var ID_ATTRIBUTE: String = "id"

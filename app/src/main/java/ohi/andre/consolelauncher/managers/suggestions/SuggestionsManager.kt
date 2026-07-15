@@ -2201,110 +2201,7 @@ class SuggestionsManager(
                 )
             )
         } else if ("module" == normalized) {
-            suggestions.add(
-                Suggestion(
-                    beforeLastSpace,
-                    "-ls",
-                    true,
-                    Suggestion.Companion.TYPE_COMMAND
-                )
-            )
-            suggestions.add(
-                Suggestion(
-                    beforeLastSpace,
-                    "-add",
-                    false,
-                    Suggestion.Companion.TYPE_COMMAND
-                )
-            )
-            suggestions.add(
-                Suggestion(
-                    beforeLastSpace,
-                    "-new",
-                    false,
-                    Suggestion.Companion.TYPE_COMMAND
-                )
-            )
-            suggestions.add(
-                Suggestion(
-                    beforeLastSpace,
-                    "-edit",
-                    false,
-                    Suggestion.Companion.TYPE_COMMAND
-                )
-            )
-            suggestions.add(
-                Suggestion(
-                    beforeLastSpace,
-                    "-config",
-                    false,
-                    Suggestion.Companion.TYPE_COMMAND
-                )
-            )
-            suggestions.add(
-                Suggestion(
-                    beforeLastSpace,
-                    "-check",
-                    false,
-                    Suggestion.Companion.TYPE_COMMAND
-                )
-            )
-            suggestions.add(
-                Suggestion(
-                    beforeLastSpace,
-                    "-approve",
-                    false,
-                    Suggestion.Companion.TYPE_COMMAND
-                )
-            )
-            suggestions.add(
-                Suggestion(
-                    beforeLastSpace,
-                    "-refresh",
-                    false,
-                    Suggestion.Companion.TYPE_COMMAND
-                )
-            )
-            suggestions.add(
-                Suggestion(
-                    beforeLastSpace,
-                    "-rm",
-                    false,
-                    Suggestion.Companion.TYPE_COMMAND
-                )
-            )
-            suggestions.add(
-                Suggestion(
-                    beforeLastSpace,
-                    "-show",
-                    false,
-                    Suggestion.Companion.TYPE_COMMAND
-                )
-            )
-            suggestions.add(
-                Suggestion(
-                    beforeLastSpace,
-                    "-hide",
-                    false,
-                    Suggestion.Companion.TYPE_COMMAND
-                )
-            )
-            suggestions.add(
-                Suggestion(
-                    beforeLastSpace,
-                    "-dock",
-                    false,
-                    Suggestion.Companion.TYPE_COMMAND
-                )
-            )
-            suggestions.add(
-                Suggestion(
-                    beforeLastSpace,
-                    "-close",
-                    true,
-                    Suggestion.Companion.TYPE_COMMAND
-                )
-            )
+            suggestModuleRootOptions(suggestions, afterLastSpace, beforeLastSpace)
         } else if ("module -show" == normalized
             || "module -hide" == normalized
             || "module -refresh" == normalized
@@ -2719,6 +2616,25 @@ class SuggestionsManager(
             suggestDockModules(suggestions, lastWord, beforeLastSpace, true)
         } else if ("remove" == mode || "-remove" == mode || "rm" == mode || "-rm" == mode) {
             suggestDockModules(suggestions, lastWord, beforeLastSpace, false)
+        }
+    }
+
+    private fun suggestModuleRootOptions(
+        suggestions: MutableList<Suggestion?>,
+        lastWord: String?,
+        beforeLastSpace: String?
+    ) {
+        for (option in MODULE_ROOT_OPTIONS) {
+            if (moduleRootOptionMatches(option.first, lastWord)) {
+                suggestions.add(
+                    Suggestion(
+                        beforeLastSpace,
+                        option.first,
+                        option.second && clickToLaunch,
+                        Suggestion.Companion.TYPE_COMMAND
+                    )
+                )
+            }
         }
     }
 
@@ -4743,5 +4659,29 @@ class SuggestionsManager(
         const val DOUBLE_QUOTES: String = "\""
         private const val HIDDEN_SUGGESTION_COMMAND = "time"
         private const val MAX_LUA_SUGGESTION_ENGINES = 8
+        private val MODULE_ROOT_OPTIONS = arrayOf(
+            "-ls" to true,
+            "-add" to false,
+            "-new" to false,
+            "-edit" to false,
+            "-config" to false,
+            "-check" to false,
+            "-approve" to false,
+            "-refresh" to false,
+            "-rm" to false,
+            "-show" to false,
+            "-hide" to false,
+            "-dock" to false,
+            "-close" to true
+        )
+
+        internal fun moduleRootOptionMatches(option: String, typed: String?): Boolean {
+            val filter = typed?.trim { it <= ' ' }?.lowercase(Locale.getDefault()).orEmpty()
+            if (filter.isEmpty()) return true
+
+            val normalizedOption = option.lowercase(Locale.getDefault())
+            return normalizedOption.startsWith(filter) ||
+                normalizedOption.removePrefix("-").startsWith(filter.removePrefix("-"))
+        }
     }
 }

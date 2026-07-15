@@ -19,6 +19,7 @@ import ohi.andre.consolelauncher.managers.TerminalManager
 import ohi.andre.consolelauncher.managers.WebhookManager
 import ohi.andre.consolelauncher.managers.flashlight.TorchManager
 import ohi.andre.consolelauncher.managers.music.MusicManager2
+import ohi.andre.consolelauncher.managers.podcast.PodcastManager
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.options.Behavior
 import ohi.andre.consolelauncher.tuils.Tuils
@@ -34,6 +35,7 @@ class MainPack(
     @JvmField var contacts: ContactManager,
     @JvmField var redirectator: Redirectator?,
     @JvmField var rssManager: RssManager?,
+    @JvmField var podcastManager: PodcastManager,
     @JvmField var client: OkHttpClient,
     @JvmField var webhookManager: WebhookManager,
     @JvmField var historyManager: HistoryManager
@@ -76,6 +78,7 @@ class MainPack(
 
     fun destroy() {
         player?.destroy()
+        podcastManager.destroy()
         appsManager.onDestroy()
         rssManager?.dispose()
         contacts.destroy(context)

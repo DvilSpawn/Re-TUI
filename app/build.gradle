@@ -34,7 +34,7 @@ android {
         applicationId = "com.dvil.tui_renewed"
         minSdk = 23
         targetSdk = 36
-        versionCode = 365
+        versionCode = 366
         versionName = "1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -296,4 +296,6 @@ dependencies {
     implementation 'org.luaj:luaj-jse:3.0.1'
     implementation 'org.jsoup:jsoup:1.22.1'
     implementation 'it.andreuzzi:CompareString2:1.0.9'
+
+    testImplementation 'junit:junit:4.13.2'
 }

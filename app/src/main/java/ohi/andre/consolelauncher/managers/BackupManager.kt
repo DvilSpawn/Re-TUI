@@ -31,6 +31,7 @@ import javax.crypto.spec.GCMParameterSpec
 import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.SecretKeySpec
 import ohi.andre.consolelauncher.managers.onboarding.GuideManager
+import ohi.andre.consolelauncher.managers.podcast.PodcastManager
 import ohi.andre.consolelauncher.managers.termux.TermuxAppManager
 import ohi.andre.consolelauncher.managers.widgets.LuaWidgetReminderManager
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
@@ -77,6 +78,7 @@ object BackupManager {
         RetuiCreditManager.PREFS,
         SpaceManager.PREFS,
         GuideManager.PREFS,
+        PodcastManager.PREFS,
         "changelogPrefs"
     )
 

@@ -31,6 +31,7 @@ import ohi.andre.consolelauncher.managers.music.MusicManager2
 import ohi.andre.consolelauncher.managers.music.MusicService
 import ohi.andre.consolelauncher.managers.notifications.KeeperService
 import ohi.andre.consolelauncher.managers.onboarding.GuideManager
+import ohi.andre.consolelauncher.managers.podcast.PodcastManager
 import ohi.andre.consolelauncher.managers.settings.MusicSettings.enabled
 import ohi.andre.consolelauncher.managers.termux.TermuxAppManager
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
@@ -125,6 +126,7 @@ class MainManager(private val mContext: LauncherActivity) {
     private val appsManager: AppsManager
     private var contactManager: ContactManager? = null
     private val musicManager2: MusicManager2?
+    private val podcastManager: PodcastManager
     private val themeManager: ThemeManager
     private val htmlExtractManager: HTMLExtractManager
     private val webhookManager: WebhookManager
@@ -358,6 +360,8 @@ class MainManager(private val mContext: LauncherActivity) {
         rssManager = RssManager(mContext, client)
         themeManager = ThemeManager(client, mContext, mContext)
         musicManager2 = if (enabled()) MusicManager2(mContext) else null
+        val podcastPlayer = musicManager2 ?: MusicManager2(mContext, false)
+        podcastManager = PodcastManager(mContext, client, podcastPlayer, musicManager2 == null)
         htmlExtractManager = HTMLExtractManager(mContext, client)
         webhookManager = WebhookManager(mContext)
         historyManager = HistoryManager()
@@ -371,6 +375,7 @@ class MainManager(private val mContext: LauncherActivity) {
             contactManager!!,
             redirectator,
             rssManager,
+            podcastManager,
             client,
             webhookManager,
             historyManager

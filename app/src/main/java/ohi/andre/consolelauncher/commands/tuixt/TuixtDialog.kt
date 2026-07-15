@@ -36,7 +36,8 @@ object TuixtDialog {
         val key: String,
         val label: String,
         val hint: String? = null,
-        val inputType: Int = InputType.TYPE_CLASS_TEXT
+        val inputType: Int = InputType.TYPE_CLASS_TEXT,
+        val value: String? = null
     )
 
     fun showOptions(
@@ -136,6 +137,7 @@ object TuixtDialog {
                 val input = EditText(context)
                 input.hint = field.hint
                 input.inputType = field.inputType
+                if (field.value != null) input.setText(field.value)
                 styleInput(context, input)
                 content.addView(
                     input,

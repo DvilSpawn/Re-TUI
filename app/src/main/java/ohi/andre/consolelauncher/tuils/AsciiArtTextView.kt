@@ -202,6 +202,11 @@ class AsciiArtTextView : AppCompatTextView {
         val offsetX = max(0f, (availableWidth - contentWidth) / 2f)
         val offsetY = max(0f, (availableHeight - contentHeight) / 2f)
 
+        if (cellWidth * scale < MIN_FIT_GLYPH_PX || lineHeight * scale < MIN_FIT_GLYPH_PX) {
+            drawFittedCellFrame(canvas, cellWidth, lineHeight, scale, offsetX, offsetY)
+            return
+        }
+
         val metrics = asciiPaint.fontMetrics
         var baseline = -metrics.ascent
         var top = 0f
@@ -231,6 +236,55 @@ class AsciiArtTextView : AppCompatTextView {
             top += lineHeight
         }
         canvas.restore()
+    }
+
+    private fun drawFittedCellFrame(
+        canvas: Canvas,
+        cellWidth: Float,
+        lineHeight: Float,
+        scale: Float,
+        offsetX: Float,
+        offsetY: Float
+    ) {
+        for (row in contentBounds.top..contentBounds.bottom) {
+            val line = lines[row]
+            if (contentBounds.left < line.length) {
+                val end = min(line.length, contentBounds.right + 1)
+                for (col in contentBounds.left until end) {
+                    val ch = line[col]
+                    if (!ch.isWhitespace()) {
+                        drawScaledCell(
+                            canvas,
+                            ch,
+                            offsetX + (col - contentBounds.left) * cellWidth * scale,
+                            offsetY + (row - contentBounds.top) * lineHeight * scale,
+                            cellWidth * scale,
+                            lineHeight * scale
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun drawScaledCell(
+        canvas: Canvas,
+        ch: Char,
+        left: Float,
+        top: Float,
+        width: Float,
+        height: Float
+    ) {
+        val oldAlpha = asciiPaint.alpha
+        asciiPaint.alpha = shadeAlpha(ch)
+        canvas.drawRect(
+            left,
+            top,
+            max(left + 1f, left + ceil(width.toDouble()).toFloat()),
+            max(top + 1f, top + ceil(height.toDouble()).toFloat()),
+            asciiPaint
+        )
+        asciiPaint.alpha = oldAlpha
     }
 
     private fun configurePaint(textSizePx: Float) {
@@ -276,6 +330,15 @@ class AsciiArtTextView : AppCompatTextView {
             asciiPaint
         )
         asciiPaint.alpha = oldAlpha
+    }
+
+    private fun shadeAlpha(ch: Char): Int {
+        return when (ch) {
+            '\u2593' -> 205
+            '\u2592' -> 145
+            '\u2591' -> 85
+            else -> 255
+        }
     }
 
     private fun frameCacheKey(availableWidth: Int, availableHeight: Int): String {
@@ -473,6 +536,7 @@ class AsciiArtTextView : AppCompatTextView {
         private const val VIEWPORT_TEXT_SIZE_SP = 12f
         private const val MIN_VIEWPORT_TEXT_SIZE_SP = 2.5f
         private const val FIT_INSET_PX = 4f
+        private const val MIN_FIT_GLYPH_PX = 4f
         private const val DEFAULT_PANE_ROWS = 10
         private const val DEFAULT_VIEWPORT_ROWS = -1
         private const val MAX_AUTO_VIEWPORT_ROWS = 48
