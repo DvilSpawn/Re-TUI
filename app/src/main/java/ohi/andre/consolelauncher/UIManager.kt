@@ -447,6 +447,7 @@ class UIManager(
     private var podcastPlayShow: TextView? = null
     private var podcastContentPanel: View? = null
     private var podcastContentLabel: TextView? = null
+    private var podcastContentBack: TextView? = null
     private var podcastContent: LinearLayout? = null
     private var podcastScroll: ScrollView? = null
     private var podcastPaneActions: LinearLayout? = null
@@ -7606,6 +7607,7 @@ class UIManager(
         podcastPlayShow = rootView.findViewById<TextView?>(R.id.podcast_play_show)
         podcastContentPanel = rootView.findViewById<View?>(R.id.podcast_content_panel)
         podcastContentLabel = rootView.findViewById<TextView?>(R.id.podcast_content_label)
+        podcastContentBack = rootView.findViewById<TextView?>(R.id.podcast_content_back)
         podcastContent = rootView.findViewById<LinearLayout?>(R.id.podcast_content)
         podcastScroll = rootView.findViewById<ScrollView?>(R.id.podcast_scroll)
         podcastPaneActions = rootView.findViewById<LinearLayout?>(R.id.podcast_pane_actions)
@@ -7647,6 +7649,10 @@ class UIManager(
         })
         podcastPlayShow?.setOnClickListener(View.OnClickListener {
             podcastMode = PODCAST_MODE_RECENTS
+            renderPodcastSurface(null)
+        })
+        podcastContentBack?.setOnClickListener(View.OnClickListener {
+            podcastMode = PODCAST_MODE_SHOWS
             renderPodcastSurface(null)
         })
         podcastNowPlaying?.setOnClickListener(View.OnClickListener {
@@ -9197,11 +9203,13 @@ class UIManager(
                 dashedBorders()
             )
         )
-        podcastContentLabel?.setTypeface(typeface, Typeface.BOLD)
-        podcastContentLabel?.textSize = PODCAST_TEXT_MEDIUM
-        podcastContentLabel?.setTextColor(textColor)
-        podcastContentLabel?.setBackground(TerminalBorderRuntime.tabDrawable(mContext, labelBg))
-        TerminalBorderRuntime.bind(podcastContentPanel, podcastContentLabel)
+        listOf(podcastContentLabel, podcastContentBack).forEach { label ->
+            label?.setTypeface(typeface, Typeface.BOLD)
+            label?.textSize = PODCAST_TEXT_MEDIUM
+            label?.setTextColor(textColor)
+            label?.setBackground(TerminalBorderRuntime.tabDrawable(mContext, labelBg))
+        }
+        bindPodcastContentFrame()
 
         podcastNowPlaying?.setBackground(
             TerminalBorderRuntime.panelDrawable(
@@ -9320,7 +9328,7 @@ class UIManager(
         geometryChanged = positionPodcastHeaderTab(podcastClose, Gravity.TOP or Gravity.END, topOffset, 0) || geometryChanged
         if (geometryChanged) {
             TerminalBorderRuntime.bind(podcastWindowBorder, podcastWindowLabel, podcastClose)
-            TerminalBorderRuntime.bind(podcastContentPanel, podcastContentLabel)
+            bindPodcastContentFrame()
         }
     }
 
@@ -9362,10 +9370,25 @@ class UIManager(
             PODCAST_MODE_PLAYER -> "PLAYER"
             else -> "SHOWS"
         }
+        val backVisibility = if (podcastMode == PODCAST_MODE_SHOW_DETAIL || podcastMode == PODCAST_MODE_PLAYER) View.VISIBLE else View.GONE
+        val back = podcastContentBack
+        var changed = label.text != next || back?.visibility != backVisibility
         if (label.text != next) {
             label.text = next
-            TerminalBorderRuntime.bind(podcastContentPanel, podcastContentLabel)
         }
+        back?.visibility = backVisibility
+        val labelParams = label.layoutParams as? FrameLayout.LayoutParams
+        val labelStart = Tuils.dpToPx(mContext, if (backVisibility == View.VISIBLE) 60 else 12)
+        if (labelParams != null && labelParams.leftMargin != labelStart) {
+            labelParams.leftMargin = labelStart
+            label.layoutParams = labelParams
+            changed = true
+        }
+        if (changed) bindPodcastContentFrame()
+    }
+
+    private fun bindPodcastContentFrame() {
+        TerminalBorderRuntime.bind(podcastContentPanel, podcastContentLabel, podcastContentBack)
     }
 
     fun openTermuxConsole(command: String?) {
@@ -9631,6 +9654,11 @@ class UIManager(
         podcastNowPlaying?.visibility = if (podcastMode == PODCAST_MODE_PLAYER) View.GONE else View.VISIBLE
         podcastPaneActions?.visibility = if (podcastMode == PODCAST_MODE_SHOWS) View.VISIBLE else View.GONE
         podcastPlayerControls?.visibility = if (podcastMode == PODCAST_MODE_PLAYER) View.VISIBLE else View.GONE
+        podcastContentBack?.bringToFront()
+        podcastContentLabel?.bringToFront()
+        if (podcastMode == PODCAST_MODE_PLAYER) {
+            podcastPlayerControls?.bringToFront()
+        }
         podcastScroll?.setPadding(
             podcastScroll?.paddingLeft ?: 0,
             podcastScroll?.paddingTop ?: 0,
@@ -10251,27 +10279,6 @@ class UIManager(
         if (viewportHeight > 0) {
             panel.minimumHeight = viewportHeight
         }
-
-        val back = TextView(mContext)
-        back.text = "[BACK]"
-        back.gravity = Gravity.CENTER
-        back.textSize = PODCAST_TEXT_SMALL
-        back.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
-        back.setTextColor(notificationWidgetTextColor())
-        back.setOnClickListener {
-            podcastMode = PODCAST_MODE_SHOWS
-            renderPodcastSurface(null)
-        }
-        val backRow = LinearLayout(mContext)
-        backRow.gravity = Gravity.START
-        backRow.addView(back, LinearLayout.LayoutParams(
-            Tuils.dpToPx(mContext, 86),
-            Tuils.dpToPx(mContext, 36)
-        ))
-        panel.addView(backRow, LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
-        ))
 
         val artFrame = FrameLayout(mContext)
         val art = ImageView(mContext)
