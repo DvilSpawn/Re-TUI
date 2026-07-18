@@ -76,6 +76,7 @@ class NotificationService : NotificationListenerService() {
 
     var queue: Queue<StatusBarNotification?>? = null
     private val queueLock = Any()
+    private val pastNotificationsLock = Any()
 
     val PKG: String = "%pkg"
     val APP: String = "%app"
@@ -190,7 +191,6 @@ class NotificationService : NotificationListenerService() {
 
         override fun onPlaybackStateChanged(state: PlaybackState?) {
             broadcastMediaMetadata()
-            scheduleMediaProgressUpdates()
         }
     }
 
@@ -222,7 +222,6 @@ class NotificationService : NotificationListenerService() {
             }
         }
         broadcastMediaMetadata()
-        scheduleMediaProgressUpdates()
     }
 
     private fun broadcastMediaMetadata() {
@@ -356,9 +355,10 @@ class NotificationService : NotificationListenerService() {
             rank += 100
         }
 
-        if (controller != null && controller.getMetadata() != null) {
-            val title = controller.getMetadata()!!.getString(MediaMetadata.METADATA_KEY_TITLE)
-            val artist = controller.getMetadata()!!.getString(MediaMetadata.METADATA_KEY_ARTIST)
+        val metadata = controller?.metadata
+        if (metadata != null) {
+            val title = metadata.getString(MediaMetadata.METADATA_KEY_TITLE)
+            val artist = metadata.getString(MediaMetadata.METADATA_KEY_ARTIST)
             if (!TextUtils.isEmpty(title) || !TextUtils.isEmpty(artist)) {
                 rank += 1
             }
@@ -418,47 +418,30 @@ class NotificationService : NotificationListenerService() {
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
     }
 
-    private val progressUpdateRunnable: Runnable = object : Runnable {
-        override fun run() {
-            var anyPlaying = false
-            synchronized(activeControllers) {
-                for (controller in activeControllers) {
-                    val state: PlaybackState? = controller.getPlaybackState()
-                    if (state != null && state.getState() == PlaybackState.STATE_PLAYING) {
-                        anyPlaying = true
-                        break
-                    }
-                }
-            }
-            if (anyPlaying) {
-                broadcastMediaMetadata()
-                serviceHandler.postDelayed(this, 1000)
-            }
-        }
-    }
-
     private val pastNotificationCleanupRunnable: Runnable = object : Runnable {
         override fun run() {
             if (!active || pastNotifications == null || pastNotifications!!.isEmpty()) {
                 return
             }
 
-            val now = System.currentTimeMillis()
-            val entries = pastNotifications!!.entries.iterator()
-            while (entries.hasNext()) {
-                val entry = entries.next()
-                val notifications = entry.value ?: continue
-                val it = notifications.iterator()
-                while (it.hasNext()) {
-                    if (now - it.next().time >= UPDATE_TIME) it.remove()
+            synchronized(pastNotificationsLock) {
+                val now = System.currentTimeMillis()
+                val entries = pastNotifications!!.entries.iterator()
+                while (entries.hasNext()) {
+                    val entry = entries.next()
+                    val notifications = entry.value ?: continue
+                    val it = notifications.iterator()
+                    while (it.hasNext()) {
+                        if (now - it.next().time >= UPDATE_TIME) it.remove()
+                    }
+                    if (notifications.isEmpty()) {
+                        entries.remove()
+                    }
                 }
-                if (notifications.isEmpty()) {
-                    entries.remove()
-                }
-            }
 
-            if (!pastNotifications!!.isEmpty()) {
-                serviceHandler.postDelayed(this, UPDATE_TIME.toLong())
+                if (!pastNotifications!!.isEmpty()) {
+                    serviceHandler.postDelayed(this, UPDATE_TIME.toLong())
+                }
             }
         }
     }
@@ -684,16 +667,8 @@ class NotificationService : NotificationListenerService() {
 
                             val text = s.toString()
 
-                            if (notificationManager!!.match(text)) continue
+                            if (currentNotificationManager.match(text)) continue
 
-                            val found = isInPastNotifications(pack, text)
-
-                            //                        if(found == 0) {
-//                            Tuils.log("app " + pack, pastNotifications.get(pack).toString());
-//                        }
-                            if (found == 2) continue
-
-                            //                        else
                             val n = Notification(
                                 System.currentTimeMillis(),
                                 text,
@@ -702,15 +677,7 @@ class NotificationService : NotificationListenerService() {
                                 currentSbn.getKey()
                             )
 
-                            if (found == 1) {
-                                val ns: MutableList<Notification> = ArrayList<Notification>()
-                                ns.add(n)
-                                pastNotifications!!.put(pack, ns)
-                                schedulePastNotificationCleanup()
-                            } else if (found == 0) {
-                                pastNotifications!!.get(pack)!!.add(n)
-                                schedulePastNotificationCleanup()
-                            }
+                            if (!rememberPastNotification(pack, text, n)) continue
 
                             n.appName = appName
                             n.preview = buildNotificationPreview(bundle, text)
@@ -810,7 +777,6 @@ class NotificationService : NotificationListenerService() {
         bgThread?.start()
 
         setupMediaSession()
-        scheduleMediaProgressUpdates()
 
         active = true
     }
@@ -838,7 +804,6 @@ class NotificationService : NotificationListenerService() {
 
     private fun dispose() {
         cancelExternalMusicClear()
-        serviceHandler.removeCallbacks(progressUpdateRunnable)
         serviceHandler.removeCallbacks(pastNotificationCleanupRunnable)
         if (controlReceiverRegistered) {
             try {
@@ -874,9 +839,11 @@ class NotificationService : NotificationListenerService() {
             bgThread = null
         }
 
-        if (pastNotifications != null) {
-            pastNotifications!!.clear()
-            pastNotifications = null
+        synchronized(pastNotificationsLock) {
+            if (pastNotifications != null) {
+                pastNotifications!!.clear()
+                pastNotifications = null
+            }
         }
 
         overlayNotifications.clear()
@@ -966,13 +933,43 @@ class NotificationService : NotificationListenerService() {
     //    1 = the app wasnt found -> this is the first notification from this app
     //    2 = found
     private fun isInPastNotifications(pkg: String?, text: String?): Int {
-        try {
-            val notifications = pastNotifications!!.get(pkg)
-            if (notifications == null) return 1
-            for (n in notifications) if (n.text == text) return 2
-        } catch (e: ConcurrentModificationException) {
+        synchronized(pastNotificationsLock) {
+            try {
+                return isInPastNotificationsLocked(pkg, text)
+            } catch (e: ConcurrentModificationException) {
+            }
         }
         return 0
+    }
+
+    private fun isInPastNotificationsLocked(pkg: String?, text: String?): Int {
+        val notifications = pastNotifications ?: return 0
+        val packageNotifications = notifications[pkg] ?: return 1
+        for (n in packageNotifications) if (n.text == text) return 2
+        return 0
+    }
+
+    private fun rememberPastNotification(
+        pkg: String?,
+        text: String?,
+        notification: Notification
+    ): Boolean {
+        synchronized(pastNotificationsLock) {
+            val notifications = pastNotifications ?: return false
+            val found = isInPastNotificationsLocked(pkg, text)
+            if (found == 2) return false
+
+            val existing = notifications[pkg]
+            if (existing == null) {
+                val list: MutableList<Notification> = ArrayList<Notification>()
+                list.add(notification)
+                notifications[pkg] = list
+            } else {
+                existing.add(notification)
+            }
+        }
+        schedulePastNotificationCleanup()
+        return true
     }
 
     override fun onNotificationRemoved(sbn: StatusBarNotification?) {
@@ -1020,23 +1017,6 @@ class NotificationService : NotificationListenerService() {
             notificationManager!!.dispose()
         }
         notificationManager = NotificationManager.create(this)
-    }
-
-    private fun scheduleMediaProgressUpdates() {
-        serviceHandler.removeCallbacks(progressUpdateRunnable)
-        var anyPlaying = false
-        synchronized(activeControllers) {
-            for (controller in activeControllers) {
-                val state: PlaybackState? = controller.getPlaybackState()
-                if (state != null && state.getState() == PlaybackState.STATE_PLAYING) {
-                    anyPlaying = true
-                    break
-                }
-            }
-        }
-        if (anyPlaying) {
-            serviceHandler.post(progressUpdateRunnable)
-        }
     }
 
     private fun schedulePastNotificationCleanup() {

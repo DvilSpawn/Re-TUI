@@ -12,11 +12,12 @@ import ohi.andre.consolelauncher.managers.xml.options.Behavior
 import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.tuils.Tuils
 import java.text.SimpleDateFormat
+import java.util.ArrayList
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import java.util.regex.Matcher
 import java.util.regex.Pattern
-import java.util.ArrayList
 
 /**
  * Created by francescoandreuzzi on 26/07/2017.
@@ -45,19 +46,21 @@ class TimeManager(context: Context) {
         val list: Array<FormatEntry?> = arrayOfNulls<FormatEntry>(formats.size)
 
         for (c in list.indices) {
+            var currentFormat = formats[c] ?: Tuils.EMPTYSTRING
             try {
-                formats[c] = Tuils.patternNewline.matcher(formats[c]).replaceAll(Tuils.NEWLINE)
+                currentFormat = Tuils.patternNewline.matcher(currentFormat).replaceAll(Tuils.NEWLINE)
 
                 var color = XMLPrefsManager.getColor(Theme.time_text_color)
-                val m: Matcher = COLOR_PATTERN.matcher(formats[c])
+                val m: Matcher = COLOR_PATTERN.matcher(currentFormat)
                 if (m.find()) {
                     color = Color.parseColor(m.group())
-                    formats[c] = m.replaceAll(Tuils.EMPTYSTRING)
+                    currentFormat = m.replaceAll(Tuils.EMPTYSTRING)
                 }
 
-                list[c] = buildEntry(color, formats[c]!!)
+                formats[c] = currentFormat
+                list[c] = buildEntry(color, currentFormat)
             } catch (e: Exception) {
-                Tuils.sendOutput(Color.RED, context, "Invalid time format: " + formats[c])
+                Tuils.sendOutput(Color.RED, context, "Invalid time format: " + currentFormat)
                 if (c > 0) list[c] = list[0]
                 else list[c] = buildFallbackEntry()
             }
@@ -78,7 +81,11 @@ class TimeManager(context: Context) {
                 addSegment(segments, rawFormat.substring(cursor, matcher.start()), null)
             }
 
-            addSegment(segments, matcher.group(2), matcher.group(1).toInt())
+            addSegment(
+                segments,
+                matcher.group(2) ?: Tuils.EMPTYSTRING,
+                (matcher.group(1) ?: "0").toInt()
+            )
             cursor = matcher.end()
         }
 
@@ -103,6 +110,35 @@ class TimeManager(context: Context) {
             return
         }
 
+        val matcher = CLOCK_WORDS_PATTERN.matcher(pattern)
+        var cursor = 0
+        var foundClockWords = false
+        while (matcher.find()) {
+            foundClockWords = true
+            if (matcher.start() > cursor) {
+                addDateSegment(segments, pattern.substring(cursor, matcher.start()), explicitSize)
+            }
+            segments.add(FormatSegment(null, explicitSize, true))
+            cursor = matcher.end()
+        }
+
+        if (foundClockWords) {
+            if (cursor < pattern.length) {
+                addDateSegment(segments, pattern.substring(cursor), explicitSize)
+            }
+        } else {
+            addDateSegment(segments, pattern, explicitSize)
+        }
+    }
+
+    private fun addDateSegment(
+        segments: MutableList<FormatSegment?>,
+        pattern: String,
+        explicitSize: Int?
+    ) {
+        if (pattern.length == 0) {
+            return
+        }
         segments.add(FormatSegment(SimpleDateFormat(pattern, Locale.getDefault()), explicitSize))
     }
 
@@ -250,12 +286,17 @@ class TimeManager(context: Context) {
 
         val builder = SpannableStringBuilder()
         for (segment in entry.segments) {
-            if (segment == null || segment.formatter == null) {
+            if (segment == null || (!segment.clockWords && segment.formatter == null)) {
+                continue
+            }
+
+            val value = if (segment.clockWords) clockWords(date) else segment.formatter?.format(date)
+            if (value == null) {
                 continue
             }
 
             val start = builder.length
-            builder.append(segment.formatter.format(date))
+            builder.append(value)
             val end = builder.length
 
             if (end <= start) {
@@ -298,9 +339,23 @@ class TimeManager(context: Context) {
 
     private class FormatEntry(val color: Int, val segments: MutableList<FormatSegment?>)
 
-    private class FormatSegment(val formatter: SimpleDateFormat?, val explicitSize: Int?)
+    private class FormatSegment(
+        val formatter: SimpleDateFormat?,
+        val explicitSize: Int?,
+        val clockWords: Boolean = false
+    )
     companion object {
         private val COLOR_PATTERN: Pattern = Pattern.compile("#(?:\\d|[a-fA-F]){6}")
+        private val CLOCK_WORDS_PATTERN: Pattern = Pattern.compile(
+            Pattern.quote("{clock_words}"),
+            Pattern.CASE_INSENSITIVE
+        )
+        private val NUMBER_WORDS = arrayOf(
+            "Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine",
+            "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen",
+            "Seventeen", "Eighteen", "Nineteen"
+        )
+        private val TENS_WORDS = arrayOf("", "", "Twenty", "Thirty", "Forty", "Fifty")
         private val SIZE_PATTERN: Pattern = Pattern.compile(
             "\\[size=(\\d+)](.*?)\\[/size]",
             Pattern.CASE_INSENSITIVE or Pattern.DOTALL
@@ -309,5 +364,38 @@ class TimeManager(context: Context) {
         var extractor: Pattern = Pattern.compile("%t([0-9]*)", Pattern.CASE_INSENSITIVE)
 
         var instance: TimeManager? = null
+
+        fun clockWords(date: Date): String {
+            val calendar = Calendar.getInstance()
+            calendar.time = date
+            return clockWords(calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE))
+        }
+
+        fun clockWords(hour24: Int, minute: Int): String {
+            val hour = hourWord(hour24)
+            return when {
+                minute == 0 -> "$hour:O Clock"
+                minute < 10 -> "$hour:Oh ${numberWord(minute)}"
+                else -> "$hour:${numberWord(minute)}"
+            }
+        }
+
+        private fun hourWord(hour24: Int): String {
+            val hour12 = ((hour24 % 12) + 12) % 12
+            return numberWord(if (hour12 == 0) 12 else hour12)
+        }
+
+        private fun numberWord(number: Int): String {
+            if (number in NUMBER_WORDS.indices) {
+                return NUMBER_WORDS[number]
+            }
+
+            val ten = number / 10
+            val one = number % 10
+            if (ten !in TENS_WORDS.indices || one !in NUMBER_WORDS.indices) {
+                return number.toString()
+            }
+            return if (one == 0) TENS_WORDS[ten] else TENS_WORDS[ten] + " " + NUMBER_WORDS[one]
+        }
     }
 }

@@ -25,12 +25,12 @@ import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog.ConfirmAction
 import ohi.andre.consolelauncher.commands.tuixt.TuixtLayout.addFoldAwareHost
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.borderColor
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.dp
-import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.overlayColor
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.rect
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleButton
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleHeader
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleInput
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.stylePanel
+import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleScreen
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.surfaceColor
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings.refreshFromLoadedPrefs
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
@@ -85,7 +85,7 @@ class TuixtActivity : Activity() {
         file = if (asciiSettingsMode) asciiFile else File(path!!)
 
         val screen = FrameLayout(this)
-        screen.setBackgroundColor(overlayColor())
+        styleScreen(this, screen)
         screen.setFitsSystemWindows(true)
         val contentHost = addFoldAwareHost(this, screen, ViewGroup.LayoutParams.MATCH_PARENT)
 

@@ -266,7 +266,8 @@ class NotificationManager private constructor(context: Context?) : XMLPrefsEleme
     fun match(text: String): Boolean {
 //        if(pkg.equals(BuildConfig.APPLICATION_ID)) return true;
 
-        for (f in filters!!) {
+        val rules = filters ?: return false
+        for (f in rules) {
             val m = f.pattern.matcher(text)
             if (m.matches() || m.find() || text == f.rawPattern) {
                 return true
@@ -324,9 +325,10 @@ class NotificationManager private constructor(context: Context?) : XMLPrefsEleme
     }
 
     fun getAppState(pkg: String?): NotificatedApp? {
-        val index = Tuils.find(pkg, apps)
+        val currentApps = apps ?: return null
+        val index = Tuils.find(pkg, currentApps)
         if (index == -1) return null
-        return apps!!.get(index)
+        return currentApps.get(index)
     }
 
     class NotificatedApp(

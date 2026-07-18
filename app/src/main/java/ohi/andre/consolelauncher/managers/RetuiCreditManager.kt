@@ -10,6 +10,8 @@ object RetuiCreditManager {
     const val FIRST_GRANT: Int = 1000
     const val GRANT_VERSION: Int = 1
     const val KEY_CHANCE_PERCENT: Int = 5
+    const val BREACH_EXIT_COST: Int = 1
+    const val BREACH_FAILURE_COST: Int = 25
 
     data class Wallet(val credits: Int, val keys: Int)
     data class Reward(val credits: Int, val keyAwarded: Boolean, val wallet: Wallet)
@@ -86,7 +88,7 @@ object RetuiCreditManager {
         if (!isDystopiaEnabled(context)) return Wallet(0, 0)
         ensureGrant(context)
         val prefs = prefs(context)
-        val next = max(0, prefs.getInt(KEY_CREDITS, 0) - 1)
+        val next = max(0, prefs.getInt(KEY_CREDITS, 0) - BREACH_FAILURE_COST)
         prefs.edit().putInt(KEY_CREDITS, next).apply()
         return wallet(context)
     }

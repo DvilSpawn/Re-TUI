@@ -37,13 +37,13 @@ import ohi.andre.consolelauncher.commands.tuixt.TuixtLayout.addFoldAwareHost
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.accentColor
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.borderColor
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.dp
-import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.overlayColor
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.rect
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.surfaceColor
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleButton
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleInput
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleListItem
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.stylePanel
+import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleScreen
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.textColor
 import ohi.andre.consolelauncher.managers.BackupManager
 import ohi.andre.consolelauncher.managers.FocusFrictionStyle
@@ -84,6 +84,8 @@ import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi
 
 class ThemerActivity : AppCompatActivity() {
+    private var screenRoot: View? = null
+    private var childSettingsOpen = false
     private var recyclerView: RecyclerView? = null
     private var header: TextView? = null
     private var supportFooter: LinearLayout? = null
@@ -105,7 +107,8 @@ class ThemerActivity : AppCompatActivity() {
         }
 
         val screen = FrameLayout(this)
-        screen.setBackgroundColor(overlayColor())
+        screenRoot = screen
+        styleScreen(this, screen)
         screen.setFitsSystemWindows(true)
         val contentHost = addFoldAwareHost(this, screen, ViewGroup.LayoutParams.MATCH_PARENT)
 
@@ -209,7 +212,7 @@ class ThemerActivity : AppCompatActivity() {
                         } else {
                             val intent = Intent(this@ThemerActivity, TuixtActivity::class.java)
                             intent.putExtra(TuixtActivity.PATH, crashFile.getAbsolutePath())
-                            startActivity(intent)
+                            openSettingsChild(intent)
                         }
                     } else if (fileName == "Backup") {
                         launchBackupPicker()
@@ -252,6 +255,10 @@ class ThemerActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         applyFullscreen(this)
+        if (childSettingsOpen) {
+            childSettingsOpen = false
+            screenRoot?.visibility = View.VISIBLE
+        }
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
@@ -615,12 +622,18 @@ class ThemerActivity : AppCompatActivity() {
     private fun openConfigFile(fileName: String) {
         val intent = Intent(this@ThemerActivity, TuixtActivity::class.java)
         intent.putExtra(TuixtActivity.PATH, File(Tuils.getFolder(), fileName).getAbsolutePath())
-        startActivityForResult(intent, LauncherActivity.TUIXT_REQUEST)
+        openSettingsChild(intent)
     }
 
     private fun openAsciiSettings() {
         val intent = Intent(this@ThemerActivity, TuixtActivity::class.java)
         intent.putExtra(TuixtActivity.MODE, TuixtActivity.MODE_ASCII_SETTINGS)
+        openSettingsChild(intent)
+    }
+
+    private fun openSettingsChild(intent: Intent) {
+        childSettingsOpen = true
+        screenRoot?.visibility = View.INVISIBLE
         startActivityForResult(intent, LauncherActivity.TUIXT_REQUEST)
     }
 

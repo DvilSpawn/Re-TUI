@@ -8,6 +8,7 @@ import android.graphics.Paint
 import android.graphics.Typeface
 import android.util.AttributeSet
 import android.util.TypedValue
+import android.view.Gravity
 import androidx.appcompat.widget.AppCompatTextView
 import java.util.LinkedHashMap
 import kotlin.math.ceil
@@ -151,7 +152,7 @@ class AsciiArtTextView : AppCompatTextView {
         val requestedRows = viewportRows(availableWidth)
         val visibleCols = max(1, floor(availableWidth / cellWidth).toInt())
         val visibleRows = min(requestedRows, max(1, floor(availableHeight / lineHeight).toInt()))
-        val startCol = viewportStartCol(visibleCols)
+        val columnWindow = viewportColumnWindow(visibleCols)
         val startRow = viewportStartRow(visibleRows)
 
         val metrics = asciiPaint.fontMetrics
@@ -164,15 +165,15 @@ class AsciiArtTextView : AppCompatTextView {
             }
 
             val line = lines[lineIndex]
-            if (startCol < line.length) {
-                val end = min(line.length, startCol + visibleCols)
-                for (col in startCol until end) {
+            if (columnWindow.start < line.length) {
+                val end = min(line.length, columnWindow.end)
+                for (col in columnWindow.start until end) {
                     val ch = line[col]
                     if (!ch.isWhitespace()) {
                         drawCell(
                             bitmapCanvas,
                             ch,
-                            (col - startCol) * cellWidth,
+                            (col - columnWindow.start + columnWindow.offset) * cellWidth,
                             top,
                             baseline,
                             cellWidth,
@@ -199,7 +200,7 @@ class AsciiArtTextView : AppCompatTextView {
         val scale = fitScale(availableWidth, availableHeight)
         val contentWidth = cellWidth * contentBounds.width() * scale
         val contentHeight = lineHeight * contentBounds.height() * scale
-        val offsetX = max(0f, (availableWidth - contentWidth) / 2f)
+        val offsetX = horizontalOffset(availableWidth.toFloat(), contentWidth)
         val offsetY = max(0f, (availableHeight - contentHeight) / 2f)
 
         if (cellWidth * scale < MIN_FIT_GLYPH_PX || lineHeight * scale < MIN_FIT_GLYPH_PX) {
@@ -346,6 +347,8 @@ class AsciiArtTextView : AppCompatTextView {
                 lines.size + ":" +
                 textColor + ":" +
                 viewportRowsSetting + ":" +
+                gravity + ":" +
+                layoutDirection + ":" +
                 availableWidth + ":" +
                 availableHeight
     }
@@ -441,18 +444,60 @@ class AsciiArtTextView : AppCompatTextView {
         return clamp(center - visibleRows / 2, 0, lines.size - visibleRows)
     }
 
-    private fun viewportStartCol(visibleCols: Int): Int {
-        val maxColumns = lines.maxOfOrNull { it.length } ?: 0
-        if (maxColumns <= visibleCols) {
-            return 0
+    private fun viewportColumnWindow(visibleCols: Int): ColumnWindow {
+        if (contentBounds.hasContent) {
+            val contentWidth = contentBounds.width()
+            if (contentWidth <= visibleCols) {
+                return ColumnWindow(
+                    contentBounds.left,
+                    contentBounds.right + 1,
+                    horizontalOffsetColumns(visibleCols, contentWidth)
+                )
+            }
+
+            val start = when (horizontalGravity()) {
+                Gravity.RIGHT -> contentBounds.right - visibleCols + 1
+                Gravity.CENTER_HORIZONTAL -> contentBounds.left + (contentWidth - visibleCols) / 2
+                else -> contentBounds.left
+            }
+            val clamped = clamp(start, contentBounds.left, contentBounds.right - visibleCols + 1)
+            return ColumnWindow(clamped, clamped + visibleCols, 0)
         }
 
-        val center = if (contentBounds.hasContent) {
-            (contentBounds.left + contentBounds.right) / 2
-        } else {
-            maxColumns / 2
+        val maxColumns = lines.maxOfOrNull { it.length } ?: 0
+        if (maxColumns <= visibleCols) {
+            return ColumnWindow(0, maxColumns, horizontalOffsetColumns(visibleCols, maxColumns))
         }
-        return clamp(center - visibleCols / 2, 0, maxColumns - visibleCols)
+
+        val start = when (horizontalGravity()) {
+            Gravity.RIGHT -> maxColumns - visibleCols
+            Gravity.CENTER_HORIZONTAL -> (maxColumns - visibleCols) / 2
+            else -> 0
+        }
+        return ColumnWindow(clamp(start, 0, maxColumns - visibleCols), clamp(start, 0, maxColumns - visibleCols) + visibleCols, 0)
+    }
+
+    private fun horizontalOffset(availableWidth: Float, contentWidth: Float): Float {
+        val free = max(0f, availableWidth - contentWidth)
+        return when (horizontalGravity()) {
+            Gravity.RIGHT -> free
+            Gravity.CENTER_HORIZONTAL -> free / 2f
+            else -> 0f
+        }
+    }
+
+    private fun horizontalOffsetColumns(visibleCols: Int, contentCols: Int): Int {
+        val free = max(0, visibleCols - contentCols)
+        return when (horizontalGravity()) {
+            Gravity.RIGHT -> free
+            Gravity.CENTER_HORIZONTAL -> free / 2
+            else -> 0
+        }
+    }
+
+    private fun horizontalGravity(): Int {
+        val absoluteGravity = Gravity.getAbsoluteGravity(gravity, layoutDirection)
+        return absoluteGravity and Gravity.HORIZONTAL_GRAVITY_MASK
     }
 
     private fun cellWidthPx(): Float {
@@ -531,6 +576,8 @@ class AsciiArtTextView : AppCompatTextView {
             }
         }
     }
+
+    private data class ColumnWindow(val start: Int, val end: Int, val offset: Int)
 
     companion object {
         private const val VIEWPORT_TEXT_SIZE_SP = 12f

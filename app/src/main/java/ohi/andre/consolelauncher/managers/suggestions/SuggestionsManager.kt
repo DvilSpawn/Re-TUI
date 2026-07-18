@@ -397,7 +397,7 @@ class SuggestionsManager(
             mTerminalAdapter.input = input + text
         } else {
             val addSpace =
-                suggestion.type != Suggestion.Companion.TYPE_FILE && suggestion.type != Suggestion.Companion.TYPE_COLOR
+                !execOnClick && suggestion.type != Suggestion.Companion.TYPE_FILE && suggestion.type != Suggestion.Companion.TYPE_COLOR
 
             if (multipleCmdSeparator.length > 0) {
 //                try to understand if the user is using a multiple cmd
@@ -3971,8 +3971,7 @@ class SuggestionsManager(
 
                 if (s.startsWith(afterLastSpace)) {
                     val cmd = info.commandGroup.getCommandByName(s)
-                    val args = cmd!!.argType()
-                    val exec = args == null || args.size == 0
+                    val exec = commandSuggestionExecutes(s, cmd!!.argType())
                     suggestions.add(
                         Suggestion(
                             beforeLastSpace,
@@ -4009,8 +4008,7 @@ class SuggestionsManager(
             ) continue
 
             if (info.cmdPrefs.getPriority(cmd) >= minCmdPriority) {
-                val args = cmd.argType()
-                val exec = args == null || args.size == 0
+                val exec = commandSuggestionExecutes(cmd.javaClass.getSimpleName(), cmd.argType())
 
                 suggestions.add(
                     Suggestion(
@@ -4682,6 +4680,10 @@ class SuggestionsManager(
             val normalizedOption = option.lowercase(Locale.getDefault())
             return normalizedOption.startsWith(filter) ||
                 normalizedOption.removePrefix("-").startsWith(filter.removePrefix("-"))
+        }
+
+        internal fun commandSuggestionExecutes(commandName: String?, argTypes: IntArray?): Boolean {
+            return argTypes == null || argTypes.isEmpty() || "podcast".equals(commandName, ignoreCase = true)
         }
     }
 }

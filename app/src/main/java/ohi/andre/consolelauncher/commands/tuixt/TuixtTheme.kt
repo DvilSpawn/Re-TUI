@@ -13,6 +13,7 @@ import kotlin.math.max
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings
 import ohi.andre.consolelauncher.managers.xml.options.Theme
+import ohi.andre.consolelauncher.tuils.CrtOverlayDrawable
 import ohi.andre.consolelauncher.tuils.TerminalBorderDrawable
 import ohi.andre.consolelauncher.tuils.Tuils
 
@@ -31,6 +32,16 @@ object TuixtTheme {
 
     @JvmStatic
     fun overlayColor(): Int = LauncherSettings.getColor(Theme.wallpaper_overlay_color)
+
+    @JvmStatic
+    fun styleScreen(context: Context, view: View) {
+        view.setBackgroundColor(overlayColor())
+        if (AppearanceSettings.crtFilter()) {
+            val overlay = CrtOverlayDrawable(context)
+            overlay.setAccentColor(textColor())
+            view.foreground = overlay
+        }
+    }
 
     @JvmStatic
     fun stylePanel(context: Context, view: View) {

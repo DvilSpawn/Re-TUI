@@ -256,6 +256,24 @@ object TuixtDialog {
         })
     }
 
+    fun showCustomCompact(context: Context, title: String, factory: ContentFactory) {
+        Handler(Looper.getMainLooper()).post(Runnable {
+            val dialog = createDialog(context)
+            val content = factory.create(dialog)
+            dialog.setContentView(wrap(context, title, content, null, true))
+            show(dialog)
+        })
+    }
+
+    fun showCustomCompactDimmed(context: Context, title: String, factory: ContentFactory) {
+        Handler(Looper.getMainLooper()).post(Runnable {
+            val dialog = createDialog(context)
+            val content = factory.create(dialog)
+            dialog.setContentView(wrap(context, title, content, null, true))
+            show(dialog, 0.42f)
+        })
+    }
+
     private fun createDialog(context: Context): Dialog {
         val dialog = Dialog(context)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -269,7 +287,10 @@ object TuixtDialog {
         return content
     }
 
-    private fun wrap(context: Context, title: String, content: View?, buttons: View?): View {
+    private fun wrap(context: Context, title: String, content: View?, buttons: View?): View =
+        wrap(context, title, content, buttons, false)
+
+    private fun wrap(context: Context, title: String, content: View?, buttons: View?, compact: Boolean): View {
         val root = FrameLayout(context)
         root.setPadding(
             dp(context, 18f),
@@ -310,7 +331,7 @@ object TuixtDialog {
         }
 
         val panelParams = FrameLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
+            if (compact) ViewGroup.LayoutParams.WRAP_CONTENT else ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
         panelParams.topMargin = dp(context, 12f)
@@ -329,8 +350,9 @@ object TuixtDialog {
 
         val contentHost = addFoldAwareHost(context, root, ViewGroup.LayoutParams.WRAP_CONTENT)
         contentHost.addView(
-            container, FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
+            container,
+            FrameLayout.LayoutParams(
+                if (compact) ViewGroup.LayoutParams.WRAP_CONTENT else ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 Gravity.CENTER
             )
@@ -395,13 +417,22 @@ object TuixtDialog {
         return row
     }
 
-    private fun show(dialog: Dialog) {
+    private fun show(dialog: Dialog, dimAmount: Float = 0f) {
         dialog.show()
         applyFullscreen(dialog)
         val window = dialog.getWindow()
         if (window != null) {
             window.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            window.setDimAmount(0f)
+            window.setDimAmount(dimAmount)
+            if (dimAmount > 0f) {
+                window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+                val barDim = Color.argb((255 * dimAmount).toInt(), 0, 0, 0)
+                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+                window.setStatusBarColor(barDim)
+                window.setNavigationBarColor(barDim)
+            } else {
+                window.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+            }
             val params = WindowManager.LayoutParams()
             params.copyFrom(window.getAttributes())
             params.width = WindowManager.LayoutParams.MATCH_PARENT

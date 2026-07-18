@@ -8344,7 +8344,6 @@ class UIManager(
 
         val lViewsParent = labelViews[0]!!.getParent() as LinearLayout
 
-        var effectiveCount = 0
         for (count in labelViews.indices) {
             labelViews[count]!!.setOnTouchListener(this)
 
@@ -8371,20 +8370,26 @@ class UIManager(
                     labelViews[count]!!.setTypeface(Tuils.getTypeface(context))
                 }
 
-                val ec = effectiveCount++
+                val styleLabel = os[0].ordinal
 
                 //                -1 = left     0 = center     1 = right
-                val p = statusLineAlignments[ec]
-                if (p >= 0) labelViews[count]!!.setGravity(if (p == 0) Gravity.CENTER_HORIZONTAL else Gravity.END)
+                val p = statusLineAlignments[styleLabel]
+                labelViews[count]!!.setGravity(
+                    when {
+                        p == 0 -> Gravity.CENTER_HORIZONTAL
+                        p > 0 -> Gravity.END
+                        else -> Gravity.START
+                    }
+                )
 
-                if (count.toFloat() != labelIndexes[Label.notes.ordinal]) {
+                if (!os.contains(Label.notes)) {
                     labelViews[count]!!.setVerticalScrollBarEnabled(false)
                 }
 
                 Companion.applyBgRect(
                     mContext!!,
                     labelViews[count]!!,
-                    bgColors[count],
+                    bgColors[styleLabel],
                     margins[0]!!,
                     Tuils.dpToPx(mContext, moduleCornerRadius()),
                     useDashed,
@@ -8393,7 +8398,7 @@ class UIManager(
                 )
                 Companion.applyShadow(
                     labelViews[count]!!,
-                    outlineColors[count]!!,
+                    outlineColors[styleLabel]!!,
                     shadowXOffset,
                     shadowYOffset,
                     shadowRadius
@@ -9572,10 +9577,19 @@ class UIManager(
     private fun closePodcastSurface(restoreSuggestions: Boolean = true) {
         podcastOverlay?.visibility = View.GONE
         if (restoreSuggestions) {
+            clearPodcastCommandFromInput()
             restoreHomeSuggestionsAfterTermux()
         }
         if (mTerminalAdapter != null && restoreSuggestions) {
             mTerminalAdapter!!.focusInputEnd()
+        }
+    }
+
+    private fun clearPodcastCommandFromInput() {
+        val input = mTerminalAdapter?.input?.trim { it <= ' ' } ?: return
+        val lower = input.lowercase(Locale.getDefault())
+        if (lower == "podcast" || lower.startsWith("podcast ")) {
+            mTerminalAdapter!!.input = Tuils.EMPTYSTRING
         }
     }
 
@@ -10556,6 +10570,9 @@ class UIManager(
     private val isTermuxConsoleVisible: Boolean
         get() = termuxOverlay != null && termuxOverlay!!.getVisibility() == View.VISIBLE
 
+    private val isPodcastSurfaceVisible: Boolean
+        get() = podcastOverlay != null && podcastOverlay!!.getVisibility() == View.VISIBLE
+
     private fun takeTermuxConsoleFocus(showKeyboard: Boolean) {
         if (!this.isTermuxConsoleVisible) {
             return
@@ -10827,6 +10844,7 @@ class UIManager(
             suggestionsContainer!!.setVisibility(suggestionsVisibilityBeforeTermux)
         }
         restoreLauncherChromeAfterSurface()
+        refreshSuggestionsSoon()
     }
 
     private fun hideLauncherChromeForSurface() {
@@ -14338,6 +14356,9 @@ class UIManager(
         if (handleTermuxBackPressed()) {
             return
         }
+        if (this.isPodcastSurfaceVisible) {
+            return
+        }
         if (this.isPomodoroOverlayVisible) {
             return
         }
@@ -14436,6 +14457,9 @@ class UIManager(
             return
         }
         handler!!.removeCallbacks(musicTimeRunnable)
+        if (!launcherWindowFocused) {
+            return
+        }
         val musicWidget =
             if (mRootView != null) mRootView.findViewById<View?>(R.id.music_widget) else null
         val internalPlaying = MusicService.SOURCE_INTERNAL == activeMusicSource
