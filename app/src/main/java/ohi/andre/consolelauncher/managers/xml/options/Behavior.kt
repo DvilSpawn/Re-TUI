@@ -290,7 +290,7 @@ enum class Behavior : XMLPrefsSave {
         }
 
         override fun info(): String? {
-            return "Define the time format for the status lines at the top. You can resize parts with [size=30]HH:mm[/size], use {clock_words} for Six:Fifty Seven, and use %n for a new line"
+            return "Define the time format for the status lines at the top. You can resize parts with [size=30]HH:mm[/size], use {clock_words} for Six Fifty Seven, and use %n for a new line"
         }
 
         override fun type(): String? {

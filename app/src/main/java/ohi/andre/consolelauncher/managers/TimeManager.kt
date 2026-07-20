@@ -374,9 +374,9 @@ class TimeManager(context: Context) {
         fun clockWords(hour24: Int, minute: Int): String {
             val hour = hourWord(hour24)
             return when {
-                minute == 0 -> "$hour:O Clock"
-                minute < 10 -> "$hour:Oh ${numberWord(minute)}"
-                else -> "$hour:${numberWord(minute)}"
+                minute == 0 -> "$hour O' Clock"
+                minute < 10 -> "$hour Oh ${numberWord(minute)}"
+                else -> "$hour ${numberWord(minute)}"
             }
         }
 

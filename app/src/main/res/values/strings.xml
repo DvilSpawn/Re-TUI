@@ -1,4 +1,5 @@
 <resources>
+    <string name="retui_wallpaper_description">csakura live wallpaper for Re:T-UI</string>
 
     <!-- various text -->
     <string name="app_name">Re:T-UI</string>

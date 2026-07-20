@@ -81,6 +81,7 @@ import java.util.Comparator
 import ohi.andre.consolelauncher.managers.settings.MusicSettings
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
+import ohi.andre.consolelauncher.wallpaper.RetuiWallpaperActivity
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi
 
 class ThemerActivity : AppCompatActivity() {
@@ -191,6 +192,8 @@ class ThemerActivity : AppCompatActivity() {
                         launchWallpaperPicker()
                     } else if (fileName == "Open Live Wallpaper Picker") {
                         launchLiveWallpaperPicker()
+                    } else if (fileName == "RETUI WALLPAPER") {
+                        openSettingsChild(Intent(this@ThemerActivity, RetuiWallpaperActivity::class.java))
                     } else if (fileName.startsWith("Preferred Music App")) {
                         showPreferredMusicAppPicker()
                     } else if (fileName == "Fonts") {
@@ -408,6 +411,7 @@ class ThemerActivity : AppCompatActivity() {
             )
         } else if (SECTION_PERSONALIZATION == section) {
             return mutableListOf(
+                "RETUI WALLPAPER",
                 dystopiaRowLabel(),
                 "alias.txt",
                 "Toolbar Buttons",

@@ -4,6 +4,9 @@
 
     <queries>
         <package android:name="com.termux" />
+        <intent>
+            <action android:name="android.service.wallpaper.WallpaperService" />
+        </intent>
     </queries>
 
     <supports-screens
@@ -175,6 +178,27 @@
                 android:name="androidx.core.app.PARENT_ACTIVITY"
                 android:value=".LauncherActivity" />
         </activity>
+
+        <activity
+            android:name=".wallpaper.RetuiWallpaperActivity"
+            android:excludeFromRecents="true"
+            android:label="RETUI WALLPAPER"
+            android:screenOrientation="unspecified"
+            android:theme="@style/Custom.Solid"
+            android:exported="false" />
+
+        <service
+            android:name=".wallpaper.RetuiWallpaperService"
+            android:label="csakura — Re:T-UI"
+            android:permission="android.permission.BIND_WALLPAPER"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.service.wallpaper.WallpaperService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.service.wallpaper"
+                android:resource="@xml/retui_wallpaper" />
+        </service>
 
         <activity
             android:name=".commands.tuixt.TuixtActivity"
