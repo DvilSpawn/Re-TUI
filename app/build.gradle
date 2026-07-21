@@ -296,6 +296,7 @@ dependencies {
     implementation 'org.luaj:luaj-jse:3.0.1'
     implementation 'org.jsoup:jsoup:1.22.1'
     implementation 'it.andreuzzi:CompareString2:1.0.9'
+    implementation 'com.google.zxing:core:3.5.4'
 
     testImplementation 'junit:junit:4.13.2'
 }

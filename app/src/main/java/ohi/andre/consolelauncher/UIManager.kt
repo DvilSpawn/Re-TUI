@@ -230,6 +230,7 @@ import ohi.andre.consolelauncher.managers.podcast.PodcastEpisode
 import ohi.andre.consolelauncher.managers.podcast.PodcastManager
 import ohi.andre.consolelauncher.managers.podcast.PodcastRecent
 import ohi.andre.consolelauncher.managers.podcast.PodcastShow
+import ohi.andre.consolelauncher.profile.ProfilePaneController
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings
 import ohi.andre.consolelauncher.managers.settings.MusicSettings
 import ohi.andre.consolelauncher.managers.settings.NotificationSettings
@@ -433,6 +434,7 @@ class UIManager(
     private var fileOpen: TextView? = null
     private var filePaste: TextView? = null
     private var podcastOverlay: View? = null
+    private var profilePaneController: ProfilePaneController? = null
     private var podcastOverlayBasePaddingLeft = 0
     private var podcastOverlayBasePaddingTop = 0
     private var podcastOverlayBasePaddingRight = 0
@@ -7752,6 +7754,7 @@ class UIManager(
         filter.addAction(ACTION_LUA_APP)
         filter.addAction(ACTION_FILE_CONSOLE)
         filter.addAction(ACTION_PODCAST_SURFACE)
+        filter.addAction(ACTION_PROFILE_SURFACE)
         filter.addAction(ACTION_TERMUX_RESULT)
         filter.addAction(ACTION_MODULE_COMMAND)
 
@@ -7789,6 +7792,8 @@ class UIManager(
                     openFileConsole(intent.getStringExtra(EXTRA_FILE_COMMAND))
                 } else if (action == ACTION_PODCAST_SURFACE) {
                     openPodcastSurface(intent.getStringExtra(EXTRA_PODCAST_COMMAND))
+                } else if (action == ACTION_PROFILE_SURFACE) {
+                    openProfileSurface()
                 } else if (action == ACTION_TERMUX_RESULT) {
                     appendTermuxResult(intent)
                 } else if (action == ACTION_MODULE_COMMAND) {
@@ -8046,6 +8051,7 @@ class UIManager(
         setupTermuxConsole(rootView)
         setupFileConsole(rootView)
         setupPodcastSurface(rootView)
+        profilePaneController = ProfilePaneController(mContext!!, rootView) { closeProfileSurface() }
         setupResponsiveLandscapeLayout(rootView)
 
         //        Recalculate tray sizing after real layout changes; IME visibility comes from WindowInsets.
@@ -9408,6 +9414,7 @@ class UIManager(
 
         closeFileConsole(false)
         closePodcastSurface(false)
+        profilePaneController?.hide()
         closeLuaAppSession(true)
         termuxAppSession = null
         termuxAppLastStatus = null
@@ -9456,6 +9463,7 @@ class UIManager(
 
         closeFileConsole(false)
         closePodcastSurface(false)
+        profilePaneController?.hide()
         closeLuaAppSession(true)
         termuxAppSession = null
         termuxAppLastStatus = null
@@ -9500,6 +9508,7 @@ class UIManager(
 
         closeTermuxConsole(false)
         closePodcastSurface(false)
+        profilePaneController?.hide()
         styleFileConsole()
         fileOverlay!!.setVisibility(View.VISIBLE)
         fileOverlay!!.bringToFront()
@@ -9558,6 +9567,7 @@ class UIManager(
         closeTermuxConsole(false)
         closeFileConsole(false)
         closeLuaAppSession(true)
+        profilePaneController?.hide()
         stylePodcastSurface()
         podcastMode = PODCAST_MODE_SHOWS
         podcastOverlay!!.visibility = View.VISIBLE
@@ -9572,6 +9582,29 @@ class UIManager(
         }
 
         renderPodcastSurface(null)
+    }
+
+    fun openProfileSurface() {
+        if (Looper.myLooper() != Looper.getMainLooper()) {
+            runOnMainThread { openProfileSurface() }
+            return
+        }
+        closeTermuxConsole(false)
+        closeFileConsole(false)
+        closeLuaAppSession(true)
+        closePodcastSurface(false)
+        profilePaneController?.show()
+        hideHomeSuggestionsForTermux()
+    }
+
+    private fun closeProfileSurface(restoreSuggestions: Boolean = true) {
+        profilePaneController?.hide()
+        if (restoreSuggestions) {
+            val input = mTerminalAdapter?.input?.trim { it <= ' ' }.orEmpty()
+            if (input.equals("profile", ignoreCase = true)) mTerminalAdapter?.input = Tuils.EMPTYSTRING
+            restoreHomeSuggestionsAfterTermux()
+            mTerminalAdapter?.focusInputEnd()
+        }
     }
 
     private fun closePodcastSurface(restoreSuggestions: Boolean = true) {
@@ -14359,6 +14392,10 @@ class UIManager(
         if (this.isPodcastSurfaceVisible) {
             return
         }
+        if (profilePaneController?.visible == true) {
+            closeProfileSurface()
+            return
+        }
         if (this.isPomodoroOverlayVisible) {
             return
         }
@@ -14531,6 +14568,7 @@ class UIManager(
     }
 
     fun onConfigurationChanged(newConfig: Configuration?) {
+        if (newConfig != null) profilePaneController?.onConfigurationChanged(newConfig)
         applyResponsiveLandscapeLayout(newConfig)
         updateTermuxWorkspaceKeyMode()
         updateTermuxConsoleKeyMode()
@@ -14745,6 +14783,7 @@ class UIManager(
         const val EXTRA_FILE_COMMAND: String = "file_command"
         val ACTION_PODCAST_SURFACE: String = BuildConfig.APPLICATION_ID + ".ui_podcast_surface"
         const val EXTRA_PODCAST_COMMAND: String = "podcast_command"
+        val ACTION_PROFILE_SURFACE: String = BuildConfig.APPLICATION_ID + ".ui_profile_surface"
         val ACTION_MODULE_COMMAND: String = BuildConfig.APPLICATION_ID + ".ui_module_command"
         const val EXTRA_MODULE_COMMAND: String = "module_command"
         const val EXTRA_MODULE_NAME: String = "module_name"
