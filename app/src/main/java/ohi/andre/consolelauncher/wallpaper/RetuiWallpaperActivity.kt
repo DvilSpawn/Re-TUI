@@ -18,14 +18,21 @@ import androidx.appcompat.app.AppCompatActivity
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi.applyFullscreen
 
 class RetuiWallpaperActivity : AppCompatActivity() {
-    private lateinit var preview: CsakuraView
+    private lateinit var root: FrameLayout
+    private lateinit var preview: android.view.View
+    private lateinit var colorSpinner: Spinner
+    private lateinit var densityLabel: TextView
+    private lateinit var heightLabel: TextView
+    private lateinit var boundsLabel: TextView
+    private var scene = "csakura"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         applyFullscreen(this)
 
-        val root = FrameLayout(this)
-        preview = CsakuraView(this).apply { loadPosition() }
+        root = FrameLayout(this)
+        scene = RetuiWallpaperSettings.scene(this)
+        preview = createPreview(scene)
         root.addView(preview, FrameLayout.LayoutParams(-1, -1))
 
         root.addView(control("↑") { move(0f, -16f) }, edge(Gravity.TOP or Gravity.CENTER_HORIZONTAL, top = 278))
@@ -40,32 +47,40 @@ class RetuiWallpaperActivity : AppCompatActivity() {
         }
         val selectors = row()
         selectors.addView(label("WALLPAPER"))
-        selectors.addView(spinner(listOf("csakura"), 0) { })
+        selectors.addView(spinner(listOf("csakura", "black hole"), if (scene == "black hole") 1 else 0, ::switchScene))
         selectors.addView(label("COLOR"))
-        val paletteIndex = CsakuraView.PALETTE_NAMES.indexOf(preview.paletteName).coerceAtLeast(0)
-        selectors.addView(spinner(CsakuraView.PALETTE_NAMES, paletteIndex, preview::setPalette))
+        colorSpinner = paletteSpinner()
+        selectors.addView(colorSpinner)
         panel.addView(selectors)
 
         val tuning = row()
-        tuning.addView(label("HEIGHT"))
-        tuning.addView(compactControl("−") { preview.treeHeight -= 0.05f })
-        tuning.addView(compactControl("+") { preview.treeHeight += 0.05f })
+        heightLabel = label(if (scene == "black hole") "TILT" else "HEIGHT")
+        tuning.addView(heightLabel)
+        tuning.addView(compactControl("−") { adjustHeight(-0.05f) })
+        tuning.addView(compactControl("+") { adjustHeight(0.05f) })
         tuning.addView(label("ZOOM"))
-        tuning.addView(compactControl("−") { preview.treeScale -= 0.1f })
-        tuning.addView(compactControl("+") { preview.treeScale += 0.1f })
+        tuning.addView(compactControl("−") { adjustScale(-0.1f) })
+        tuning.addView(compactControl("+") { adjustScale(0.1f) })
         panel.addView(tuning)
 
         val shape = row()
-        shape.addView(label("BOUNDS"))
-        shape.addView(compactControl("−") { preview.treeWidth -= 0.1f })
-        shape.addView(compactControl("+") { preview.treeWidth += 0.1f })
-        shape.addView(label("PETALS"))
-        shape.addView(compactControl("−") { preview.petalDensity-- })
-        shape.addView(compactControl("+") { preview.petalDensity++ })
+        boundsLabel = label(if (scene == "black hole") "RADIUS" else "BOUNDS")
+        shape.addView(boundsLabel)
+        shape.addView(compactControl("−") { adjustWidth(-0.1f) })
+        shape.addView(compactControl("+") { adjustWidth(0.1f) })
+        densityLabel = label(if (scene == "black hole") "DUST" else "PETALS")
+        shape.addView(densityLabel)
+        shape.addView(compactControl("−") { adjustDensity(-1) })
+        shape.addView(compactControl("+") { adjustDensity(1) })
         panel.addView(shape)
 
         val regrow = row()
-        regrow.addView(compactControl("REGROW") { preview.regrow() })
+        regrow.addView(compactControl("REGENERATE") {
+            when (val current = preview) {
+                is CsakuraView -> current.regrow()
+                is BlackHoleView -> current.regenerate()
+            }
+        })
         panel.addView(regrow)
 
         val apply = row()
@@ -83,15 +98,82 @@ class RetuiWallpaperActivity : AppCompatActivity() {
     }
 
     private fun move(dx: Float, dy: Float) {
-        preview.offsetX += dx
-        preview.offsetY += dy
+        when (val current = preview) {
+            is CsakuraView -> { current.offsetX += dx; current.offsetY += dy }
+            is BlackHoleView -> { current.offsetX += dx; current.offsetY += dy }
+        }
     }
 
-    private fun save() = RetuiWallpaperSettings.save(
-        this, preview.offsetX, preview.offsetY, preview.treeScale,
-        preview.treeHeight, preview.treeWidth, preview.petalDensity, preview.treeSeed,
-        preview.paletteName
-    )
+    private fun save() {
+        RetuiWallpaperSettings.saveScene(this, scene)
+        when (val current = preview) {
+            is CsakuraView -> RetuiWallpaperSettings.save(
+                this, current.offsetX, current.offsetY, current.treeScale,
+                current.treeHeight, current.treeWidth, current.petalDensity, current.treeSeed,
+                current.paletteName
+            )
+            is BlackHoleView -> {
+                RetuiWallpaperSettings.save(
+                    this, current.offsetX, current.offsetY, current.sceneScale,
+                    current.diskTilt, current.diskWidth,
+                    current.particleDensity, RetuiWallpaperSettings.treeSeed(this), RetuiWallpaperSettings.palette(this)
+                )
+                RetuiWallpaperSettings.saveBlackHolePalette(this, current.paletteName)
+            }
+        }
+    }
+
+    private fun createPreview(name: String): android.view.View = if (name == "black hole") {
+        BlackHoleView(this).apply { loadPosition() }
+    } else {
+        CsakuraView(this).apply { loadPosition() }
+    }
+
+    private fun switchScene(name: String) {
+        if (name == scene) return
+        save()
+        scene = name
+        root.removeView(preview)
+        preview = createPreview(scene)
+        root.addView(preview, 0, FrameLayout.LayoutParams(-1, -1))
+        densityLabel.text = if (scene == "black hole") "DUST" else "PETALS"
+        heightLabel.text = if (scene == "black hole") "TILT" else "HEIGHT"
+        boundsLabel.text = if (scene == "black hole") "RADIUS" else "BOUNDS"
+        val replacement = paletteSpinner()
+        (colorSpinner.parent as ViewGroup).let { parent ->
+            val index = parent.indexOfChild(colorSpinner)
+            parent.removeView(colorSpinner)
+            colorSpinner = replacement
+            parent.addView(colorSpinner, index)
+        }
+        RetuiWallpaperSettings.saveScene(this, scene)
+    }
+
+    private fun paletteSpinner(): Spinner = when (val current = preview) {
+        is BlackHoleView -> spinner(BlackHoleView.PALETTE_NAMES, BlackHoleView.PALETTE_NAMES.indexOf(current.paletteName).coerceAtLeast(0), current::setPalette)
+        else -> (current as CsakuraView).let { spinner(CsakuraView.PALETTE_NAMES, CsakuraView.PALETTE_NAMES.indexOf(it.paletteName).coerceAtLeast(0), it::setPalette) }
+    }
+
+    private fun adjustHeight(delta: Float) = when (val current = preview) {
+        is CsakuraView -> current.treeHeight += delta
+        is BlackHoleView -> current.diskTilt += delta
+        else -> Unit
+    }
+    private fun adjustWidth(delta: Float) = when (val current = preview) {
+        is CsakuraView -> current.treeWidth += delta
+        is BlackHoleView -> current.diskWidth += delta
+        else -> Unit
+    }
+    private fun adjustScale(delta: Float) = when (val current = preview) {
+        is CsakuraView -> current.treeScale += delta
+        is BlackHoleView -> current.sceneScale += delta
+        else -> Unit
+    }
+    private fun adjustDensity(delta: Int) = when (val current = preview) {
+        is CsakuraView -> current.petalDensity += delta
+        is BlackHoleView -> current.particleDensity += delta
+        else -> Unit
+    }
 
     private fun useOnPhone() {
         save()

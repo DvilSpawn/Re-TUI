@@ -189,7 +189,7 @@
 
         <service
             android:name=".wallpaper.RetuiWallpaperService"
-            android:label="csakura — Re:T-UI"
+            android:label="Re:T-UI Live Scenes"
             android:permission="android.permission.BIND_WALLPAPER"
             android:exported="true">
             <intent-filter>

@@ -172,6 +172,7 @@
         \n$ podcast prev
         \n\nPodcasts stream from RSS/Atom feeds and play oldest first for first-time listening.
     </string>
+    <string name="help_profile">Open your local Re:T-UI profile card.\nUsage:\nprofile</string>
     <string name="help_tbridge">Use Termux as Re:T-UI\'s power-user bridge for scripts, modules, callbacks, and automation.
         \nUsage:
         \ntbridge -status

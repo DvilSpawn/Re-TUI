@@ -13,6 +13,7 @@ package ohi.andre.consolelauncher.wallpaper
 import android.content.Context
 import android.app.WallpaperColors
 import android.graphics.Canvas
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.LinearGradient
 import android.graphics.Paint
@@ -20,6 +21,7 @@ import android.graphics.Shader
 import android.graphics.Typeface
 import android.util.AttributeSet
 import android.view.View
+import androidx.annotation.RequiresApi
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.exp
@@ -52,6 +54,8 @@ class CsakuraView @JvmOverloads constructor(
     private val blobs = mutableListOf<Blob>()
     private val tips = mutableListOf<Coord>()
     private val petals = mutableListOf<Petal?>()
+    private var staticLayer: Bitmap? = null
+    private var staticLayerDirty = true
     private var gw = 0
     private var screenGw = 0
     private var gh = 0
@@ -68,11 +72,11 @@ class CsakuraView @JvmOverloads constructor(
     private var ramp = PALETTES.getValue("sakura").map(Color::parseColor)
     private var faded = ramp[5]
     var offsetX = 0f
-        set(value) { field = value; invalidate() }
+        set(value) { field = value; invalidateStaticLayer() }
     var offsetY = 0f
-        set(value) { field = value; invalidate() }
+        set(value) { field = value; invalidateStaticLayer() }
     var treeScale = 1f
-        set(value) { field = value.coerceIn(0.5f, 2f); invalidate() }
+        set(value) { field = value.coerceIn(0.5f, 2f); invalidateStaticLayer() }
     var treeHeight = 0.72f
         set(value) {
             val height = value.coerceIn(0.45f, 1f)
@@ -139,6 +143,7 @@ class CsakuraView @JvmOverloads constructor(
         }
     }
 
+    @RequiresApi(27)
     fun wallpaperColors(): WallpaperColors = WallpaperColors(
         Color.valueOf(BG_BOTTOM),
         Color.valueOf(ramp[4]),
@@ -176,6 +181,9 @@ class CsakuraView @JvmOverloads constructor(
     override fun onDetachedFromWindow() {
         running = false
         removeCallbacks(frame)
+        staticLayer?.recycle()
+        staticLayer = null
+        staticLayerDirty = true
         super.onDetachedFromWindow()
     }
 
@@ -188,6 +196,28 @@ class CsakuraView @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
+        ensureStaticLayer()
+        staticLayer?.let { canvas.drawBitmap(it, 0f, 0f, paint) }
+        paint.typeface = Typeface.MONOSPACE
+        for (p in petals) {
+            p ?: continue
+            val px = p.x.toInt()
+            val py = p.y.toInt()
+            if (px !in 0 until screenGw || py !in 0 until petalGh) continue
+            paint.color = p.color
+            canvas.drawText(p.g, px * cellW, py * cellH - paint.ascent(), paint)
+        }
+    }
+
+    private fun ensureStaticLayer() {
+        if (!staticLayerDirty || width == 0 || height == 0) return
+        staticLayer?.recycle()
+        staticLayer = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888).also(::drawStaticLayer)
+        staticLayerDirty = false
+    }
+
+    private fun drawStaticLayer(bitmap: Bitmap) {
+        val canvas = Canvas(bitmap)
         paint.shader = LinearGradient(0f, 0f, 0f, height.toFloat(), BG_TOP, BG_BOTTOM, Shader.TileMode.CLAMP)
         canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), paint)
         paint.shader = null
@@ -204,15 +234,11 @@ class CsakuraView @JvmOverloads constructor(
             canvas.drawText(c.g, x * cellW, y * cellH - paint.ascent(), paint)
         }
         canvas.restore()
-        paint.typeface = Typeface.MONOSPACE
-        for (p in petals) {
-            p ?: continue
-            val px = p.x.toInt()
-            val py = p.y.toInt()
-            if (px !in 0 until screenGw || py !in 0 until petalGh) continue
-            paint.color = p.color
-            canvas.drawText(p.g, px * cellW, py * cellH - paint.ascent(), paint)
-        }
+    }
+
+    private fun invalidateStaticLayer() {
+        staticLayerDirty = true
+        invalidate()
     }
 
     private fun resizeGrid() {
@@ -355,6 +381,7 @@ class CsakuraView @JvmOverloads constructor(
         }
         repeat(5) { if (blobs.size < 28) blobs += Blob(cx + rand(-0.70, 0.70) * rx, cy + rand(0.25, 0.60) * ry, rx * rand(0.18, 0.28), ry * rand(0.24, 0.34)) }
         genCanopy()
+        staticLayerDirty = true
     }
 
     private fun spawnPetal(scatter: Boolean): Petal {
@@ -397,7 +424,7 @@ class CsakuraView @JvmOverloads constructor(
 
     companion object {
         private const val FONT_SIZE = 15f
-        private const val FPS = 24
+        const val FPS = 12
         private const val G_FULL = "█"
         private const val G_DARK = "▓"
         private const val G_MED = "▒"

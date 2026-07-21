@@ -13,6 +13,8 @@ object RetuiWallpaperSettings {
     private const val PETAL_DENSITY = "petal_density"
     private const val TREE_SEED = "tree_seed"
     private const val PALETTE = "palette"
+    private const val SCENE = "scene"
+    private const val BLACK_HOLE_PALETTE = "black_hole_palette"
 
     fun offsetX(context: Context): Float = prefs(context).getFloat(OFFSET_X, 0f)
     fun offsetY(context: Context): Float = prefs(context).getFloat(OFFSET_Y, 0f)
@@ -26,6 +28,20 @@ object RetuiWallpaperSettings {
         return Random.nextInt().also { prefs.edit().putInt(TREE_SEED, it).apply() }
     }
     fun palette(context: Context): String = prefs(context).getString(PALETTE, "sakura") ?: "sakura"
+    fun scene(context: Context): String = when (val saved = prefs(context).getString(SCENE, "csakura") ?: "csakura") {
+        "waterfall" -> "black hole"
+        else -> saved
+    }
+    fun blackHolePalette(context: Context): String =
+        prefs(context).getString(BLACK_HOLE_PALETTE, "amber") ?: "amber"
+
+    fun saveScene(context: Context, scene: String) {
+        prefs(context).edit().putString(SCENE, scene).apply()
+    }
+
+    fun saveBlackHolePalette(context: Context, palette: String) {
+        prefs(context).edit().putString(BLACK_HOLE_PALETTE, palette).apply()
+    }
 
     fun save(context: Context, offsetX: Float, offsetY: Float, scale: Float, height: Float,
              treeWidth: Float, petalDensity: Int, treeSeed: Int, palette: String) {
