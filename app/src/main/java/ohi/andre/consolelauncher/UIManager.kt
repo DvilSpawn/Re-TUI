@@ -9306,7 +9306,9 @@ class UIManager(
         val border = podcastWindowBorder ?: return
         val availableHeight = overlay.height - overlay.paddingTop - overlay.paddingBottom
         if (availableHeight <= 0) {
-            overlay.post { applyPodcastPaneGeometry() }
+            if (overlay.visibility == View.VISIBLE && launcherWindowFocused) {
+                overlay.postOnAnimation { applyPodcastPaneGeometry() }
+            }
             return
         }
 
@@ -14532,7 +14534,11 @@ class UIManager(
         if (tuiTimeManager != null) tuiTimeManager!!.start()
         if (unlockManager != null) unlockManager!!.start()
         resumeAsciiAnimation()
-        androidWidgetDrawerManager?.startListening()
+        if (androidWidgetDrawerManager?.isOpen == true) {
+            androidWidgetDrawerManager?.startListening()
+        } else {
+            androidWidgetDrawerManager?.stopListening()
+        }
 
         // Refresh Pomodoro overlay on resume
         val pomodoro = PomodoroManager.getInstance(mContext)

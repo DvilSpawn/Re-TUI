@@ -51,7 +51,7 @@ class MusicVisualizerView : View {
         this.playing = playing
         if (playing) {
             lastFrameTime = 0L
-            postInvalidateOnAnimation()
+            postInvalidateDelayed(FRAME_DELAY_MS)
         } else {
             for (i in 0 until BAR_COUNT) {
                 targets[i] = MIN_BAR
@@ -96,10 +96,10 @@ class MusicVisualizerView : View {
             canvas.drawRect(left, top, right, height.toFloat(), paint)
         }
 
-        if (playing) {
-            postInvalidateOnAnimation()
+        if (playing && isShown) {
+            postInvalidateDelayed(FRAME_DELAY_MS)
         } else if (!isCollapsed() && isCollapsing()) {
-            postInvalidateOnAnimation()
+            postInvalidateDelayed(FRAME_DELAY_MS)
         }
     }
 
