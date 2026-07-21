@@ -11,6 +11,7 @@ import android.view.View
 import androidx.core.graphics.ColorUtils
 import kotlin.math.ceil
 import kotlin.math.max
+import kotlin.math.min
 
 class TerminalGridView @JvmOverloads constructor(
     context: Context,
@@ -37,6 +38,8 @@ class TerminalGridView @JvmOverloads constructor(
     private var cellHeightPx = 1
     private var baselineOffsetPx = 1f
     private var cells = Array(cols * rows) { Cell() }
+    private val normalGlyphWidths = HashMap<String, Float>()
+    private val boldGlyphWidths = HashMap<String, Float>()
 
     init {
         setWillNotDraw(false)
@@ -125,7 +128,7 @@ class TerminalGridView @JvmOverloads constructor(
                 if (cell.text.isNotEmpty() && cell.text != " ") {
                     textPaint.color = if (isCursor) terminalBackground else cell.foreground
                     textPaint.typeface = if (cell.bold) boldTypeface else normalTypeface
-                    canvas.drawText(cell.text, left, top + baseline, textPaint)
+                    drawCellText(canvas, cell.text, left, top + baseline, width, cell.bold)
                 } else if (isCursor) {
                     textPaint.color = terminalBackground
                     textPaint.typeface = normalTypeface
@@ -137,12 +140,42 @@ class TerminalGridView @JvmOverloads constructor(
 
     private fun recalculateMetrics() {
         textPaint.typeface = normalTypeface
-        cellWidthPx = max(1f, textPaint.measureText("M"))
+        normalGlyphWidths.clear()
+        boldGlyphWidths.clear()
+        cellWidthPx = max(1f, textPaint.measureText(CELL_WIDTH_SAMPLE) / CELL_WIDTH_SAMPLE.length)
         val metrics = textPaint.fontMetrics
         cellHeightPx = max(1, ceil(metrics.descent - metrics.ascent).toInt())
         baselineOffsetPx = -metrics.ascent
         requestLayoutSafely()
         invalidate()
+    }
+
+    private fun drawCellText(
+        canvas: Canvas,
+        text: String,
+        left: Float,
+        baseline: Float,
+        cellWidth: Float,
+        bold: Boolean
+    ) {
+        val widthCache = if (bold) boldGlyphWidths else normalGlyphWidths
+        val glyphWidth = widthCache.getOrPut(text) { textPaint.measureText(text) }
+        if (glyphWidth <= 0f) return
+
+        val cellSpan = terminalCellWidth(text.codePointAt(0)).coerceAtLeast(1)
+        val availableWidth = cellWidth * cellSpan
+        val scaleX = min(1f, availableWidth / glyphWidth)
+        val renderedWidth = glyphWidth * scaleX
+        val drawLeft = left + (availableWidth - renderedWidth) / 2f
+        if (scaleX < 1f) {
+            canvas.save()
+            canvas.translate(drawLeft, 0f)
+            canvas.scale(scaleX, 1f)
+            canvas.drawText(text, 0f, baseline, textPaint)
+            canvas.restore()
+        } else {
+            canvas.drawText(text, drawLeft, baseline, textPaint)
+        }
     }
 
     private fun requestLayoutSafely() {
@@ -437,5 +470,7 @@ class TerminalGridView @JvmOverloads constructor(
 
     companion object {
         private const val TAB_WIDTH = 8
+        private const val CELL_WIDTH_SAMPLE =
+            "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
     }
 }
