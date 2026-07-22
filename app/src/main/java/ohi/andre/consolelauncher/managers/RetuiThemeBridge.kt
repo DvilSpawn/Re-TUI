@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.core.graphics.ColorUtils
+import java.io.File
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
@@ -159,18 +160,54 @@ object RetuiThemeBridge {
 
         if (context != null) {
             Tuils.getTypeface(context)
-            val fontPath = Tuils.fontPath
-            if (fontPath != null && fontPath.startsWith("/")) {
-                bundle.putString("font_path", fontPath)
-            } else if (AppearanceSettings.useSystemFont()) {
-                bundle.putString("font_name", "system")
-            } else {
-                bundle.putString("font_name", "lucida_console")
-            }
+            val font = resolveLauncherFontExtras(
+                AppearanceSettings.useSystemFont(),
+                AppearanceSettings.fontFile(),
+                Tuils.getFolder(),
+                Tuils.fontPath
+            )
+            font.path?.let { bundle.putString("font_path", it) }
+            font.file?.let { bundle.putString("font_file", it) }
+            font.name?.let { bundle.putString("font_name", it) }
         }
 
         return bundle
     }
+
+    internal fun resolveLauncherFontExtras(
+        useSystemFont: Boolean,
+        configuredFont: String?,
+        launcherRoot: File,
+        cachedFontPath: String?
+    ): LauncherFontExtras {
+        if (useSystemFont) return LauncherFontExtras(name = "system")
+
+        val configured = configuredFont?.trim()?.takeIf { it.isNotEmpty() }
+        val resolved = Tuils.resolveConfiguredFontFile(launcherRoot, configured)
+        if (resolved != null) {
+            return LauncherFontExtras(path = resolved.absolutePath, file = resolved.name)
+        }
+
+        val cached = cachedFontPath
+            ?.takeIf { it.startsWith("/") }
+            ?.let(::File)
+            ?.takeIf { it.exists() && it.isFile }
+        if (cached != null && configured != null && cached.name == File(configured).name) {
+            return LauncherFontExtras(path = cached.absolutePath, file = cached.name)
+        }
+
+        return if (cachedFontPath == "asset://lucida_console.ttf") {
+            LauncherFontExtras(name = "lucida_console")
+        } else {
+            LauncherFontExtras()
+        }
+    }
+
+    internal data class LauncherFontExtras(
+        val path: String? = null,
+        val file: String? = null,
+        val name: String? = null
+    )
 
     private fun terminalSurfaceColor(): Int {
         val terminalBg = AppearanceSettings.terminalWindowBackground()

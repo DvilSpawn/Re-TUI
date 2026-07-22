@@ -211,7 +211,7 @@ object Tuils {
         return globalTypeface
     }
 
-    private fun resolveConfiguredFontFile(tui: File?, configuredFont: String?): File? {
+    internal fun resolveConfiguredFontFile(tui: File?, configuredFont: String?): File? {
         var configuredFont = configuredFont
         if (tui == null || configuredFont == null) {
             return null

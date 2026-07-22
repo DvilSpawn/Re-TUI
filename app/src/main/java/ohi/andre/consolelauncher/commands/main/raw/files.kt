@@ -7,12 +7,14 @@ import ohi.andre.consolelauncher.commands.CommandAbstraction
 import ohi.andre.consolelauncher.commands.ExecutePack
 import ohi.andre.consolelauncher.commands.main.MainPack
 import ohi.andre.consolelauncher.managers.RetuiThemeBridge
+import ohi.andre.consolelauncher.tuils.Tuils
 
 class files : CommandAbstraction {
     override fun exec(info: ExecutePack): String? {
-        val command = info.args
+        val search = info.args
             ?.takeIf { it.isNotEmpty() }
             ?.let { info.getString().trim() }
+            ?.let(::parseSearch)
 
         val intent = Intent(FM_ACTION)
         intent.setPackage(FM_PACKAGE)
@@ -21,9 +23,8 @@ class files : CommandAbstraction {
         if (info is MainPack && info.currentDirectory != null) {
             intent.putExtra("path", info.currentDirectory.absolutePath)
         }
-        if (command != null && command.trim().isNotEmpty()) {
-            intent.putExtra("command", command)
-        }
+        search?.name?.let { intent.putExtra("search_name", it) }
+        search?.type?.let { intent.putExtra("search_type", it) }
 
         RetuiThemeBridge.putLauncherThemeExtras(intent, info.context)
 
@@ -49,5 +50,13 @@ class files : CommandAbstraction {
     companion object {
         private const val FM_PACKAGE = "com.dvil.retui.fm"
         private const val FM_ACTION = "com.dvil.retui.fm.OPEN_CONSOLE"
+
+        internal fun parseSearch(input: String): SearchHandoff? {
+            val tokens = Tuils.splitArgs(input).filterNotNull()
+            if (tokens.isEmpty()) return null
+            return SearchHandoff(tokens[0], tokens.getOrNull(1))
+        }
     }
+
+    internal data class SearchHandoff(val name: String, val type: String?)
 }
