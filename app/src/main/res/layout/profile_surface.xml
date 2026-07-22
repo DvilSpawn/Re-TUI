@@ -59,14 +59,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:text="PHONE // HOLD TO REVEAL"
+                    android:text="PHONE // TAP TO REVEAL 30S"
                     android:textSize="10sp" />
 
                 <TextView
                     android:id="@+id/profile_phone"
                     android:layout_width="match_parent"
                     android:layout_height="44dp"
-                    android:contentDescription="Masked phone number. Hold to reveal."
+                    android:contentDescription="Masked phone number. Tap to reveal for 30 seconds."
                     android:gravity="center_vertical"
                     android:text="NOT SET"
                     android:textSize="16sp" />

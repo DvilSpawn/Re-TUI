@@ -1,6 +1,8 @@
 package ohi.andre.consolelauncher.profile
 
 import android.content.Context
+import java.net.URI
+import java.util.Locale
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -55,4 +57,45 @@ object ProfileStore {
         val visible = phone.takeLast(2)
         return if (phone.isEmpty()) "NOT SET" else "*".repeat((phone.length - visible.length).coerceAtLeast(5)) + visible
     }
+
+    fun contactVCard(name: String, phone: String): String =
+        "BEGIN:VCARD\r\n" +
+            "VERSION:3.0\r\n" +
+            "FN:${escapeVCard(name)}\r\n" +
+            "TEL;TYPE=CELL:${escapeVCard(phone)}\r\n" +
+            "END:VCARD"
+
+    fun qrValueValidationError(value: String): String? {
+        val host = urlHost(value) ?: return null
+        if (YOUTUBE_DOMAINS.any { host == it || host.endsWith(".$it") }) {
+            return "YouTube links are not allowed in profile QR codes."
+        }
+        if (SHORTENER_DOMAINS.any { host == it || host.endsWith(".$it") }) {
+            return "Shortened links are not allowed. Use the full destination URL."
+        }
+        return null
+    }
+
+    private fun urlHost(value: String): String? {
+        val trimmed = value.trim()
+        if (trimmed.isEmpty() || trimmed.any(Char::isWhitespace)) return null
+        val candidate = if (SCHEME.containsMatchIn(trimmed)) trimmed else "https://$trimmed"
+        return runCatching { URI(candidate).host?.lowercase(Locale.ROOT)?.trimEnd('.') }.getOrNull()
+    }
+
+    private fun escapeVCard(value: String): String = value
+        .replace("\\", "\\\\")
+        .replace("\r\n", "\\n")
+        .replace('\r', '\n')
+        .replace("\n", "\\n")
+        .replace(";", "\\;")
+        .replace(",", "\\,")
+
+    private val SCHEME = Regex("^[a-z][a-z0-9+.-]*://", RegexOption.IGNORE_CASE)
+    private val YOUTUBE_DOMAINS = setOf("youtube.com", "youtu.be", "youtube-nocookie.com")
+    private val SHORTENER_DOMAINS = setOf(
+        "aka.ms", "bit.ly", "bitly.com", "buff.ly", "cutt.ly", "goo.gl", "is.gd",
+        "lnkd.in", "ow.ly", "rb.gy", "rebrand.ly", "s.id", "shorturl.at", "t.co",
+        "tiny.cc", "tinyurl.com", "trib.al", "v.gd"
+    )
 }

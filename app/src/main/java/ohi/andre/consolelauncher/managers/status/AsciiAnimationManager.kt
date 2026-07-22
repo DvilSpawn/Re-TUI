@@ -14,7 +14,11 @@ class AsciiAnimationManager(
     private val color: Int,
     private val listener: StatusUpdateListener?
 ) {
-    class AsciiFrameText(val text: String, private val color: Int) : CharSequence {
+    class AsciiFrameText(
+        val text: String,
+        private val color: Int,
+        private val colors: IntArray? = null
+    ) : CharSequence {
         override val length: Int
             get() = text.length
 
@@ -33,6 +37,8 @@ class AsciiAnimationManager(
         fun color(): Int {
             return color
         }
+
+        fun colors(): IntArray? = colors
     }
 
     private data class RawFrame(val text: String, val delayMillis: Long)
@@ -63,6 +69,9 @@ class AsciiAnimationManager(
         nextFrameIndex = 0
 
         val text = readAsciiFile(file)
+        ColoredAsciiHtmlParser.parseOrNull(text)?.let { parsed ->
+            return AsciiFrameText(cleanFrameText(parsed.text), color, parsed.colors)
+        }
         if (!animationEnabled) {
             return span(text)
         }

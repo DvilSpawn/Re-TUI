@@ -314,6 +314,7 @@ class TuixtActivity : Activity() {
         rows.add(TuixtAdapter.SettingsRow.setting(Ui.show_ascii, "ASCII TXT"))
         rows.add(TuixtAdapter.SettingsRow.setting(Ui.show_ascii_landscape, "ASCII TXT"))
         rows.add(TuixtAdapter.SettingsRow.setting(Ui.ascii_max_lines, "ASCII TXT"))
+        rows.add(TuixtAdapter.SettingsRow.setting(Ui.ascii_pane_height_rows, "ASCII TXT"))
 
         addSection(rows, "Animation")
         rows.add(TuixtAdapter.SettingsRow.setting(Behavior.ascii_animation, "Animation"))
@@ -510,7 +511,7 @@ class TuixtActivity : Activity() {
         intent.setType("*/*")
         intent.putExtra(
             Intent.EXTRA_MIME_TYPES,
-            arrayOf<String>("text/plain", "text/*", "application/octet-stream")
+            arrayOf<String>("text/plain", "text/html", "text/*", "application/octet-stream")
         )
         try {
             startActivityForResult(intent, ASCII_IMPORT_REQUEST)
@@ -544,13 +545,16 @@ class TuixtActivity : Activity() {
             sourceName = uri.lastPathSegment
         }
         if (!isAsciiImportFileName(sourceName)) {
-            notifyAsciiImport("Choose a .txt ASCII file.", true)
+            notifyAsciiImport("Choose a .txt or .html ASCII file.", true)
             return
         }
 
         val maxBytes = maxOf(32, getInt(Behavior.ascii_animation_max_file_kb)) * 1024
+        val htmlSource = sourceName?.lowercase(Locale.ROOT)?.endsWith(".html") == true ||
+            sourceName?.lowercase(Locale.ROOT)?.endsWith(".htm") == true
+        val sourceLimit = if (htmlSource) maxBytes.coerceAtMost(Int.MAX_VALUE / 16) * 16 else maxBytes
         val text = try {
-            decodeUtf8(readUriBytes(uri, maxBytes))
+            decodeUtf8(readUriBytes(uri, sourceLimit))
         } catch (e: Exception) {
             notifyAsciiImport(
                 if (e.message == null) "ASCII import failed." else "ASCII import failed: " + e.message,
@@ -573,7 +577,7 @@ class TuixtActivity : Activity() {
         }
 
         val message = if (frameCount < 2) {
-            "Imported ASCII TXT."
+            if (htmlSource) "Imported colored ASCII HTML." else "Imported ASCII TXT."
         } else if (LauncherSettings.getBoolean(Behavior.ascii_animation)) {
             "Imported animated ASCII: " + frameCount + " frames."
         } else {
@@ -641,7 +645,8 @@ class TuixtActivity : Activity() {
         if (name == null) {
             return false
         }
-        return name.lowercase(Locale.getDefault()).endsWith(".txt")
+        val lower = name.lowercase(Locale.ROOT)
+        return lower.endsWith(".txt") || lower.endsWith(".html") || lower.endsWith(".htm")
     }
 
     private fun reloadLauncherForAscii(message: String) {

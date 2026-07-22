@@ -19,8 +19,10 @@ import kotlin.math.min
 class AsciiArtTextView : AppCompatTextView {
     private val asciiPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private var lines: List<String> = emptyList()
+    private var lineColors: List<IntArray> = emptyList()
     private var textColor = currentTextColor
     private var viewportRowsSetting = DEFAULT_VIEWPORT_ROWS
+    private var paneHeightRowsSetting = DEFAULT_PANE_ROWS
     private var contentBounds = ContentBounds.EMPTY
     private var frameHash = 1
     private val bitmapCache = LinkedHashMap<String, Bitmap>(16, 0.75f, true)
@@ -46,10 +48,17 @@ class AsciiArtTextView : AppCompatTextView {
         text = ""
     }
 
-    fun setAsciiFrame(text: String?, color: Int, viewportRows: Int) {
+    fun setAsciiFrame(
+        text: String?,
+        color: Int,
+        viewportRows: Int,
+        paneHeightRows: Int,
+        colors: IntArray? = null
+    ) {
         val oldLineCount = lines.size
         val oldBoundsWidth = contentBounds.width()
         val oldViewportRowsSetting = viewportRowsSetting
+        val oldPaneHeightRowsSetting = paneHeightRowsSetting
 
         val normalized = text.orEmpty()
             .replace("\r\n", "\n")
@@ -60,13 +69,16 @@ class AsciiArtTextView : AppCompatTextView {
         }
 
         lines = if (parsed.isEmpty()) listOf("") else parsed
+        lineColors = splitColors(lines, colors)
         textColor = color
         viewportRowsSetting = if (viewportRows > 0) viewportRows else DEFAULT_VIEWPORT_ROWS
+        paneHeightRowsSetting = if (paneHeightRows > 0) paneHeightRows else DEFAULT_PANE_ROWS
         contentBounds = ContentBounds.from(lines)
-        frameHash = lines.hashCode()
+        frameHash = 31 * lines.hashCode() + (colors?.contentHashCode() ?: 0)
         if (oldLineCount != lines.size ||
             oldBoundsWidth != contentBounds.width() ||
-            oldViewportRowsSetting != viewportRowsSetting
+            oldViewportRowsSetting != viewportRowsSetting ||
+            oldPaneHeightRowsSetting != paneHeightRowsSetting
         ) {
             requestLayout()
         }
@@ -77,13 +89,13 @@ class AsciiArtTextView : AppCompatTextView {
         configurePaint(baseTextSizePx())
         val availableWidth = max(1, MeasureSpec.getSize(widthMeasureSpec) - paddingLeft - paddingRight)
         val desiredHeight = if (isAutoFitMode()) {
-            val targetHeight = ceil(lineHeightPx() * DEFAULT_PANE_ROWS).toInt()
+            val targetHeight = ceil(lineHeightPx() * paneHeightRowsSetting).toInt()
             val scale = fitScale(availableWidth, targetHeight)
             paddingTop + paddingBottom +
                     max(1, ceil(lineHeightPx() * contentBounds.height() * scale + FIT_INSET_PX * 2).toInt())
         } else {
             val sourceRows = viewportRows(availableWidth)
-            val paneRows = min(sourceRows, DEFAULT_PANE_ROWS)
+            val paneRows = min(sourceRows, paneHeightRowsSetting)
             paddingTop + paddingBottom + ceil(lineHeightPx() * paneRows).toInt()
         }
         val desiredWidth = suggestedMinimumWidth
@@ -170,6 +182,7 @@ class AsciiArtTextView : AppCompatTextView {
                 for (col in columnWindow.start until end) {
                     val ch = line[col]
                     if (!ch.isWhitespace()) {
+                        asciiPaint.color = cellColor(lineIndex, col)
                         drawCell(
                             bitmapCanvas,
                             ch,
@@ -221,6 +234,7 @@ class AsciiArtTextView : AppCompatTextView {
                 for (col in contentBounds.left until end) {
                     val ch = line[col]
                     if (!ch.isWhitespace()) {
+                        asciiPaint.color = cellColor(row, col)
                         drawCell(
                             canvas,
                             ch,
@@ -254,6 +268,7 @@ class AsciiArtTextView : AppCompatTextView {
                 for (col in contentBounds.left until end) {
                     val ch = line[col]
                     if (!ch.isWhitespace()) {
+                        asciiPaint.color = cellColor(row, col)
                         drawScaledCell(
                             canvas,
                             ch,
@@ -293,6 +308,19 @@ class AsciiArtTextView : AppCompatTextView {
         asciiPaint.typeface = Typeface.MONOSPACE
         asciiPaint.textSize = textSizePx
         asciiPaint.isAntiAlias = false
+    }
+
+    private fun cellColor(row: Int, col: Int): Int =
+        lineColors.getOrNull(row)?.getOrNull(col)?.takeIf { it != 0 } ?: textColor
+
+    private fun splitColors(lines: List<String>, colors: IntArray?): List<IntArray> {
+        if (colors == null) return emptyList()
+        var offset = 0
+        return lines.map { line ->
+            IntArray(line.length) { index -> colors.getOrElse(offset + index) { 0 } }.also {
+                offset += line.length + 1
+            }
+        }
     }
 
     private fun drawCell(
@@ -347,6 +375,7 @@ class AsciiArtTextView : AppCompatTextView {
                 lines.size + ":" +
                 textColor + ":" +
                 viewportRowsSetting + ":" +
+                paneHeightRowsSetting + ":" +
                 gravity + ":" +
                 layoutDirection + ":" +
                 availableWidth + ":" +

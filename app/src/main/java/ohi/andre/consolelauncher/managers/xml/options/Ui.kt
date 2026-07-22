@@ -439,6 +439,19 @@ enum class Ui : XMLPrefsSave {
             return "Number of source rows shown in the ASCII viewport. Use -1 to auto-zoom wide art."
         }
     },
+    ascii_pane_height_rows {
+        override fun defaultValue(): String? {
+            return "10"
+        }
+
+        override fun type(): String? {
+            return XMLPrefsSave.INTEGER
+        }
+
+        override fun info(): String? {
+            return "Maximum physical height of the ASCII pane, measured in text rows."
+        }
+    },
     storage_index {
         override fun defaultValue(): String? {
             return "4"

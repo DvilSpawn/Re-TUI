@@ -225,6 +225,7 @@ class TuixtAdapter(rows: MutableList<SettingsRow>, private val file: File?) :
             "show_ascii" -> "Show ASCII TXT"
             "show_ascii_landscape" -> "Show ASCII In Landscape"
             "ascii_max_lines" -> "ASCII Viewport Rows"
+            "ascii_pane_height_rows" -> "ASCII Pane Height"
             "ascii_animation" -> "Enable Animated ASCII"
             "ascii_animation_frame_delay_ms" -> "Animation Frame Delay"
             "ascii_animation_max_file_kb" -> "Max ASCII Import File Size"

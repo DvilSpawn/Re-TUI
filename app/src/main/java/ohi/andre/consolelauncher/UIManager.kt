@@ -810,7 +810,13 @@ class UIManager(
             if (shouldUseAsciiViewport(base) && view is AsciiArtTextView) {
                 val frame = labelTexts[Label.ascii.ordinal]
                 val frameColor = if (frame is AsciiAnimationManager.AsciiFrameText) frame.color() else asciiColor
-                view.setAsciiFrame(frame?.toString(), frameColor, XMLPrefsManager.getInt(Ui.ascii_max_lines))
+                view.setAsciiFrame(
+                    frame?.toString(),
+                    frameColor,
+                    XMLPrefsManager.getInt(Ui.ascii_max_lines),
+                    XMLPrefsManager.getInt(Ui.ascii_pane_height_rows),
+                    (frame as? AsciiAnimationManager.AsciiFrameText)?.colors()
+                )
             } else {
                 view.setText(sequence)
             }
