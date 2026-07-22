@@ -159,8 +159,10 @@
     <string name="help_files">Open Re:T-UI Files.
         \nUsage:
         \n$ files
-        \n$ files &lt;command&gt;
-        \n\nLaunches the Re:T-UI Files app with the current path, theme colors, terminal background, top margin, and font.
+        \n$ files -search &lt;name&gt; [type]
+        \n$ files -open &lt;directory&gt;
+        \n$ files &lt;name&gt; [type] (legacy search shorthand)
+        \n\nOpens Re:T-UI FM, searches by name and optional file type, or opens a directory. Relative directories resolve from the launcher current path. Theme colors, terminal background, margins, and font are included.
     </string>
     <string name="help_podcast">Open the Re:T-UI podcast surface.
         \nUsage:

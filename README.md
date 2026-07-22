@@ -45,7 +45,7 @@ For a full Linux environment, use Termux as the execution layer:
 3.  Enable `allow-external-apps=true` in Termux properties.
 4.  Run `tbridge -doctor` in Re:T-UI to verify the bridge.
 5.  Enable `show_tmux_workspace_button` when you want the optional persistent tmux workspace.
-6.  Use `termux`, `module`, and `files` for scripts, modules, and file workflows.
+6.  Use `termux`, `module`, and `files` for scripts, modules, and file workflows. `files -search <name> [type]` searches in Re:T-UI FM, while `files -open <directory>` opens a directory relative to the launcher path.
 
 This keeps the launcher lean for Play Store builds while preserving power-user Linux workflows through an app that is designed to own them. The old BusyBox manager has been scrapped in favor of this Termux-first model.
 

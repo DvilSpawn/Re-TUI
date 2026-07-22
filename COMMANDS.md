@@ -47,6 +47,20 @@ termux -run /data/data/com.termux/files/home/retui/script.sh
 module -add server termux:/data/data/com.termux/files/home/retui/server-health.sh
 ```
 
+### Re:T-UI FM handoff
+
+The Launcher owns parsing for the public `files` command and sends structured requests to Re:T-UI FM:
+
+```bash
+files
+files -search note txt
+files -open Download
+files -open "Download/My Folder"
+files note txt
+```
+
+The final form is the temporary legacy alias for `files -search note txt`. Relative open paths resolve against the Launcher current directory. File mutations such as ZIP, move, copy, trash, and share remain owned by FM's long-press selection UI.
+
 ---
 
 ## 🔍 Useful ADB Debugging Commands
