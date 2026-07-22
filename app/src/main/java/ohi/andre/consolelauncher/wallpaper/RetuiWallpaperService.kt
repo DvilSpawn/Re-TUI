@@ -23,6 +23,7 @@ class RetuiWallpaperService : WallpaperService() {
         private val powerManager = getSystemService(PowerManager::class.java)
         private var view: View = createView()
         private var visible = false
+        private var fullRedrawPending = true
         private var receiverRegistered = false
         private val screenReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
@@ -35,7 +36,7 @@ class RetuiWallpaperService : WallpaperService() {
         private val drawFrame = object : Runnable {
             override fun run() {
                 if (!canDraw()) return
-                draw()
+                if (draw(fullSurface = fullRedrawPending)) fullRedrawPending = false
                 if (canDraw()) {
                     handler.postDelayed(this, frameDelayMs())
                 }
@@ -66,6 +67,7 @@ class RetuiWallpaperService : WallpaperService() {
                     layoutView(surfaceHolder.surfaceFrame.width(), surfaceHolder.surfaceFrame.height())
                 }
                 loadPosition()
+                fullRedrawPending = true
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
                     notifyColorsChanged()
                 }
@@ -81,7 +83,12 @@ class RetuiWallpaperService : WallpaperService() {
 
         override fun onSurfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
             layoutView(width, height)
-            draw(fullSurface = true)
+            fullRedrawPending = !draw(fullSurface = true)
+        }
+
+        override fun onSurfaceRedrawNeeded(holder: SurfaceHolder) {
+            fullRedrawPending = !draw(fullSurface = true)
+            scheduleIfVisible()
         }
 
         private fun layoutView(width: Int, height: Int) {
@@ -118,7 +125,7 @@ class RetuiWallpaperService : WallpaperService() {
             powerManager.isInteractive &&
             surfaceHolder.surface.isValid
 
-        private fun draw(fullSurface: Boolean = false) {
+        private fun draw(fullSurface: Boolean = false): Boolean {
             val current = view
             val canvas = try {
                 if (current is CsakuraView && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -128,7 +135,7 @@ class RetuiWallpaperService : WallpaperService() {
                 } else {
                     surfaceHolder.lockCanvas()
                 }
-            } catch (_: Exception) { null } ?: return
+            } catch (_: Exception) { null } ?: return false
             try {
                 when (current) {
                     is BlackHoleView -> current.advance()
@@ -138,6 +145,7 @@ class RetuiWallpaperService : WallpaperService() {
             } finally {
                 surfaceHolder.unlockCanvasAndPost(canvas)
             }
+            return true
         }
 
         private fun frameDelayMs() = when (view) {

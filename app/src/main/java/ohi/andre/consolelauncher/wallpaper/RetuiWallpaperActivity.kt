@@ -92,11 +92,6 @@ class RetuiWallpaperActivity : AppCompatActivity() {
         setContentView(root)
     }
 
-    override fun onPause() {
-        save()
-        super.onPause()
-    }
-
     private fun move(dx: Float, dy: Float) {
         when (val current = preview) {
             is CsakuraView -> { current.offsetX += dx; current.offsetY += dy }
@@ -131,7 +126,6 @@ class RetuiWallpaperActivity : AppCompatActivity() {
 
     private fun switchScene(name: String) {
         if (name == scene) return
-        save()
         scene = name
         root.removeView(preview)
         preview = createPreview(scene)
@@ -146,7 +140,6 @@ class RetuiWallpaperActivity : AppCompatActivity() {
             colorSpinner = replacement
             parent.addView(colorSpinner, index)
         }
-        RetuiWallpaperSettings.saveScene(this, scene)
     }
 
     private fun paletteSpinner(): Spinner = when (val current = preview) {
