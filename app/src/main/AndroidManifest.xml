@@ -4,6 +4,7 @@
 
     <queries>
         <package android:name="com.termux" />
+        <package android:name="net.dinglisch.android.taskerm" />
         <intent>
             <action android:name="android.service.wallpaper.WallpaperService" />
         </intent>
@@ -48,6 +49,7 @@
         android:name="android.permission.WRITE_SETTINGS"
         tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="com.termux.permission.RUN_COMMAND" />
+    <uses-permission android:name="net.dinglisch.android.tasker.PERMISSION_RUN_TASKS" />
 
     <!-- features -->
     <uses-feature
@@ -300,6 +302,16 @@
                 <action android:name="com.dvil.tui_renewed.RETUI_CALLBACK" />
             </intent-filter>
         </receiver>
+
+        <activity
+            android:name=".integrations.tasker.RetuiTaskerConfigActivity"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher"
+            android:label="RETUI Action">
+            <intent-filter>
+                <action android:name="com.twofortyfouram.locale.intent.action.EDIT_SETTING" />
+            </intent-filter>
+        </activity>
 
         <service
             android:name=".managers.termux.TermuxResultService"

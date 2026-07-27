@@ -705,6 +705,22 @@
         \n$ intent -activity -a android.intent.action.SEND -t text/plain --es android.intent.extra.TEXT "standup notes"
         \n$ intent -broadcast -a net.dinglisch.android.tasker.ACTION_TASK -p net.dinglisch.android.taskerm --es task_name Work
     </string>
+    <string name="help_tasker">Run a named Tasker task.
+        \nUsage:
+        \n$ tasker &lt;task name&gt;
+        \n$ tasker -run &lt;task name&gt;
+        \n\nTask names containing spaces are supported. Tasker must be installed.</string>
+    <string name="tasker_action">Action</string>
+    <string name="tasker_preset">Preset</string>
+    <string name="tasker_theme_element">Theme element</string>
+    <string name="tasker_value">Value</string>
+    <string name="tasker_module">Module</string>
+    <string name="tasker_text">Text</string>
+    <!-- F-Droid SMS command resources (required by the existing fdroid source set). -->
+    <string name="help_sms">Send an SMS to a contact or number.\nUsage:\n$ sms &lt;contact or number&gt;\nThen enter the message.</string>
+    <string name="output_smsnotsent">SMS not sent: the message was empty.</string>
+    <string name="output_smssent">SMS sent.</string>
+    <string name="sms_hint">Enter SMS message</string>
     <string name="help_events">Create or open the editable upcoming events Termux module.
         \nUsage:
         \n$ events

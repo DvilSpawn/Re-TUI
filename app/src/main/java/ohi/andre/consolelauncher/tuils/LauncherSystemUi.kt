@@ -4,6 +4,7 @@ package ohi.andre.consolelauncher.tuils
 
 import android.app.Activity
 import android.app.Dialog
+import android.graphics.Color
 import android.os.Build
 import android.view.View
 import android.view.Window
@@ -44,6 +45,7 @@ object LauncherSystemUi {
         if (window == null) {
             return
         }
+        window.statusBarColor = Color.TRANSPARENT
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             window.setDecorFitsSystemWindows(false)
             val decorView = window.decorView

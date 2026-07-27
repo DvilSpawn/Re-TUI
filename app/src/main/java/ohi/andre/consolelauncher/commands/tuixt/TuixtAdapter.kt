@@ -61,13 +61,29 @@ class TuixtAdapter(rows: MutableList<SettingsRow>, private val file: File?) :
     }
 
     @JvmOverloads
-    fun saveAll(context: Context? = null) {
+    fun saveAll(context: Context? = null, recyclerView: RecyclerView? = null) {
+        recyclerView?.let { captureVisibleInputs(it) }
         for (entry in pendingChanges.entries) {
             val item = entry.key
             val value = entry.value
             set(context, item, value)
         }
         pendingChanges.clear()
+    }
+
+    private fun captureVisibleInputs(recyclerView: RecyclerView) {
+        for (index in 0 until recyclerView.childCount) {
+            val holder = recyclerView.getChildViewHolder(recyclerView.getChildAt(index))
+            if (holder !is ViewHolder || holder.input.visibility != View.VISIBLE) continue
+
+            val position = holder.bindingAdapterPosition
+            if (position == RecyclerView.NO_POSITION) continue
+            val item = visibleRows[position].item ?: continue
+            val value = holder.input.text.toString()
+            if (item.type() != XMLPrefsSave.COLOR || value.matches("^#[0-9A-Fa-f]{6,8}$".toRegex())) {
+                pendingChanges[item] = value
+            }
+        }
     }
 
     fun hasPendingChanges(): Boolean {

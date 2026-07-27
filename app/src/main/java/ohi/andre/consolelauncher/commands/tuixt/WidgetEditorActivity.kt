@@ -2,12 +2,16 @@ package ohi.andre.consolelauncher.commands.tuixt
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.Dialog
 import android.content.Intent
 import android.graphics.Typeface
 import android.os.Bundle
 import android.text.Editable
+import android.text.Spanned
 import android.text.TextUtils
 import android.text.TextWatcher
+import android.text.style.BackgroundColorSpan
+import android.text.style.ForegroundColorSpan
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -16,15 +20,19 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.graphics.ColorUtils
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import ohi.andre.consolelauncher.LauncherActivity
 import ohi.andre.consolelauncher.UIManager
 import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog.ConfirmAction
 import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog.showConfirm
 import ohi.andre.consolelauncher.commands.tuixt.TuixtLayout.addFoldAwareHost
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.dp
+import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.accentColor
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.overlayColor
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleButton
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.stylePanel
+import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.surfaceColor
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.textColor
 import ohi.andre.consolelauncher.managers.modules.ModuleManager
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings.refreshFromLoadedPrefs
@@ -49,6 +57,8 @@ class WidgetEditorActivity : Activity() {
     private var capabilityView: TextView? = null
     private var originalDocumentName: String? = ""
     private var originalCode: String? = ""
+    private var findHighlightBackground: BackgroundColorSpan? = null
+    private var findHighlightForeground: ForegroundColorSpan? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         requestNoTitleIfFullscreen(this)
@@ -203,6 +213,10 @@ class WidgetEditorActivity : Activity() {
         cancel.setOnClickListener(View.OnClickListener { v: View? -> attemptClose() })
         bottomBar.addView(cancel)
 
+        val findReplace = button("FIND/REPLACE", false)
+        findReplace.setOnClickListener { showFindReplaceDialog() }
+        bottomBar.addView(findReplace)
+
         val spacer = View(this)
         bottomBar.addView(spacer, LinearLayout.LayoutParams(0, 1, 1f))
 
@@ -218,6 +232,153 @@ class WidgetEditorActivity : Activity() {
 
         root.addView(bottomBar)
         setContentView(screen)
+    }
+
+    private fun showFindReplaceDialog() {
+        TuixtDialog.showCustomCompact(this, "Find/Replace", TuixtDialog.ContentFactory { dialog: Dialog? ->
+            dialog?.setCanceledOnTouchOutside(false)
+            dialog?.setOnDismissListener { clearFindHighlight() }
+            val content = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                minimumWidth = dp(this@WidgetEditorActivity, 320f)
+            }
+            val closeRow = LinearLayout(this).apply {
+                gravity = Gravity.END
+            }
+            closeRow.addView(button("X", false).apply {
+                contentDescription = "Close find and replace"
+                setOnClickListener { dialog?.dismiss() }
+            })
+            content.addView(closeRow)
+            val find = EditText(this).apply {
+                hint = "Find"
+                setSingleLine(true)
+                TuixtTheme.styleInput(this@WidgetEditorActivity, this)
+            }
+            val replacement = EditText(this).apply {
+                hint = "Replace with"
+                setSingleLine(true)
+                TuixtTheme.styleInput(this@WidgetEditorActivity, this)
+            }
+            content.addView(find, LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            ))
+            content.addView(replacement, LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            ).apply { topMargin = dp(this@WidgetEditorActivity, 8f) })
+
+            val actions = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                setPadding(0, dp(this@WidgetEditorActivity, 12f), 0, 0)
+            }
+            val findActions = LinearLayout(this).apply { gravity = Gravity.CENTER }
+            findActions.addView(button("FIND PREVIOUS", false).apply {
+                setOnClickListener { findPrevious(find.text.toString()) }
+            })
+            findActions.addView(button("FIND NEXT", false).apply {
+                setOnClickListener { findNext(find.text.toString()) }
+            })
+            actions.addView(findActions)
+            val replaceActions = LinearLayout(this).apply {
+                gravity = Gravity.CENTER
+                setPadding(0, dp(this@WidgetEditorActivity, 8f), 0, 0)
+            }
+            replaceActions.addView(button("REPLACE", true).apply {
+                setOnClickListener {
+                    replaceSelection(find.text.toString(), replacement.text.toString())
+                }
+            })
+            replaceActions.addView(button("REPLACE ALL", false).apply {
+                setOnClickListener {
+                    replaceAll(find.text.toString(), replacement.text.toString())
+                }
+            })
+            actions.addView(replaceActions)
+            content.addView(actions)
+            find.post { find.requestFocus() }
+            content
+        })
+    }
+
+    private fun findNext(query: String): Boolean {
+        if (query.isEmpty()) return false
+        val editor = codeEditor ?: return false
+        val text = editor.text.toString()
+        var match = text.indexOf(query, editor.selectionEnd.coerceAtLeast(0))
+        if (match < 0) match = text.indexOf(query)
+        if (match < 0) {
+            Toast.makeText(this, "Not found: $query", Toast.LENGTH_SHORT).show()
+            return false
+        }
+        showMatch(editor, match, query.length)
+        return true
+    }
+
+    private fun findPrevious(query: String): Boolean {
+        if (query.isEmpty()) return false
+        val editor = codeEditor ?: return false
+        val text = editor.text.toString()
+        var match = text.lastIndexOf(query, editor.selectionStart - 1)
+        if (match < 0) match = text.lastIndexOf(query)
+        if (match < 0) {
+            Toast.makeText(this, "Not found: $query", Toast.LENGTH_SHORT).show()
+            return false
+        }
+        showMatch(editor, match, query.length)
+        return true
+    }
+
+    private fun showMatch(editor: EditText, match: Int, length: Int) {
+        editor.setSelection(match, match + length)
+        clearFindHighlight()
+        findHighlightBackground = BackgroundColorSpan(ColorUtils.setAlphaComponent(accentColor(), 220))
+        findHighlightForeground = ForegroundColorSpan(surfaceColor())
+        editor.text.setSpan(findHighlightBackground, match, match + length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        editor.text.setSpan(findHighlightForeground, match, match + length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        editor.post {
+            val layout = editor.layout ?: return@post
+            editor.scrollTo(editor.scrollX, layout.getLineTop(layout.getLineForOffset(match)))
+        }
+    }
+
+    private fun clearFindHighlight() {
+        codeEditor?.text?.removeSpan(findHighlightBackground)
+        codeEditor?.text?.removeSpan(findHighlightForeground)
+        findHighlightBackground = null
+        findHighlightForeground = null
+    }
+
+    private fun replaceSelection(query: String, replacement: String) {
+        if (query.isEmpty()) return
+        val editor = codeEditor ?: return
+        val selected = editor.text.substring(editor.selectionStart, editor.selectionEnd)
+        if (selected != query) {
+            findNext(query)
+            return
+        }
+        editor.text.replace(editor.selectionStart, editor.selectionEnd, replacement)
+        findNext(query)
+    }
+
+    private fun replaceAll(query: String, replacement: String) {
+        if (query.isEmpty()) return
+        val editor = codeEditor ?: return
+        val text = editor.text.toString()
+        var count = 0
+        var index = text.indexOf(query)
+        while (index >= 0) {
+            count++
+            index = text.indexOf(query, index + query.length)
+        }
+        if (count == 0) {
+            Toast.makeText(this, "Not found: $query", Toast.LENGTH_SHORT).show()
+            return
+        }
+        clearFindHighlight()
+        editor.setText(text.replace(query, replacement))
+        Toast.makeText(this, "Replaced $count matches", Toast.LENGTH_SHORT).show()
     }
 
     override fun onResume() {
@@ -259,7 +420,13 @@ class WidgetEditorActivity : Activity() {
                 XMLPrefsManager.dispose()
                 XMLPrefsManager.loadCommons(this)
                 refreshFromLoadedPrefs()
-                setResult(TuixtActivity.SAVE_PRESSED)
+                val launcher = LauncherActivity.instance
+                if (launcher != null) {
+                    setResult(Activity.RESULT_CANCELED)
+                    launcher.reload()
+                } else {
+                    setResult(TuixtActivity.SAVE_PRESSED)
+                }
                 finish()
                 return
             }

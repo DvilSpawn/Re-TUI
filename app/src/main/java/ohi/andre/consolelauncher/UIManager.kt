@@ -1154,6 +1154,7 @@ class UIManager(
             )
 
             if (appDrawerView != null) {
+                appDrawerView.setColorFilter(XMLPrefsManager.getColor(Theme.toolbar_icon_color), PorterDuff.Mode.SRC_IN)
                 if (XMLPrefsManager.getBoolean(Behavior.swipe_up_apps_drawer)) {
                     appDrawerView.setVisibility(View.VISIBLE)
                     appDrawerView.setOnClickListener(View.OnClickListener { v: View? -> showAppsDrawer() })
@@ -2002,11 +2003,11 @@ class UIManager(
             bottomMargins = topMargins
         }
 
-        mRootView.setPadding(systemInsetLeft, systemInsetTop, systemInsetRight, systemInsetBottom)
+        mRootView.setPadding(systemInsetLeft, 0, systemInsetRight, systemInsetBottom)
         val metrics = mContext!!.getResources().getDisplayMetrics()
-        applySectionDisplayMargins(mainContainer, topMargins, metrics, 0)
+        applySectionDisplayMargins(mainContainer, topMargins, metrics, 0, systemInsetTop)
         if (splitDuoStatusActive) {
-            applySectionDisplayMargins(headerContainer, topMargins, metrics, 0)
+            applySectionDisplayMargins(headerContainer, topMargins, metrics, 0, systemInsetTop)
         }
         applySectionDisplayMargins(terminalTrayContainer, bottomMargins, metrics, imeBottomOffset)
         applyTerminalOverlayDisplayMargins(topMargins, bottomMargins, metrics)
@@ -2020,14 +2021,15 @@ class UIManager(
         view: View?,
         marginMm: IntArray,
         metrics: DisplayMetrics?,
-        extraBottomPx: Int
+        extraBottomPx: Int,
+        extraTopPx: Int = 0
     ) {
         if (view == null) {
             return
         }
 
         val left = Tuils.mmToPx(metrics, marginMm[0])
-        val top = Tuils.mmToPx(metrics, marginMm[1])
+        val top = extraTopPx + Tuils.mmToPx(metrics, marginMm[1])
         val right = Tuils.mmToPx(metrics, marginMm[2])
         val bottom = Tuils.mmToPx(metrics, marginMm[3]) + extraBottomPx
 

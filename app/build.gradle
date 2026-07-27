@@ -34,7 +34,7 @@ android {
         applicationId = "com.dvil.tui_renewed"
         minSdk = 23
         targetSdk = 36
-        versionCode = 374
+        versionCode = 375
         versionName = "1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -297,6 +297,7 @@ dependencies {
     implementation 'org.jsoup:jsoup:1.22.1'
     implementation 'it.andreuzzi:CompareString2:1.0.9'
     implementation 'com.google.zxing:core:3.5.4'
+    implementation 'com.joaomgcd:taskerpluginlibrary:0.4.10'
 
     testImplementation 'junit:junit:4.13.2'
 }

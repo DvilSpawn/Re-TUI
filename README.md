@@ -36,6 +36,21 @@ These updates ensure the launcher remains functional, secure, and performant on 
 
 ---
 
+## Tasker Integration
+
+RETUI includes an optional native Tasker action plugin. Enable it in **Settings → Integrations → Tasker Integration**, then add **Plugin → RETUI Action** to a Tasker task.
+
+Supported actions apply a preset, set a theme color, show or refresh a module, update an existing script module's text, and print terminal output. Text fields accept Tasker variables. The integration is disabled by default and does not expose arbitrary RETUI commands, shell access, calls, messages, or destructive actions.
+
+RETUI can also start an existing named Tasker task. Grant the Tasker run-task permission when enabling the integration, and enable **Allow External Access** in Tasker:
+
+```text
+tasker Work
+tasker -run "Evening Setup"
+```
+
+Tasker is optional; RETUI works normally when it is not installed.
+
 ## 🐧 Termux Integration
 
 For a full Linux environment, use Termux as the execution layer:

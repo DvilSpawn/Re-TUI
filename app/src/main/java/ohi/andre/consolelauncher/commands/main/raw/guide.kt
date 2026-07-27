@@ -44,5 +44,5 @@ class guide : CommandAbstraction, PermanentSuggestionCommand {
 
     override fun onNotArgEnough(pack: ExecutePack, nArgs: Int): String = GuideManager.overview(pack.context)
 
-    override fun permanentSuggestions(): Array<String> = GuideManager.subcommandSuggestions()
+    override fun permanentSuggestions(context: android.content.Context): Array<String> = GuideManager.subcommandSuggestions()
 }

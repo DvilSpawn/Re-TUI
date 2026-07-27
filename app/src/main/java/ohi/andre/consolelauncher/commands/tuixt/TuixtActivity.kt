@@ -163,7 +163,7 @@ class TuixtActivity : Activity() {
         btnSave.setOnClickListener(View.OnClickListener { v: View? ->
             Toast.makeText(this, "Applying changes...", Toast.LENGTH_SHORT).show()
             if (adapter != null) {
-                adapter!!.saveAll(this)
+                adapter!!.saveAll(this, recyclerView)
             } else if (plainTextEditor != null) {
                 try {
                     Tuils.write(file, "", plainTextEditor!!.getText().toString())

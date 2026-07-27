@@ -29,5 +29,5 @@ class calc : PermanentSuggestionCommand {
         return info.res.getString(helpRes())
     }
 
-    override fun permanentSuggestions(): Array<String> = arrayOf("(", ")", "+", "-", "*", "/", "%", "^", "sqrt")
+    override fun permanentSuggestions(context: android.content.Context): Array<String> = arrayOf("(", ")", "+", "-", "*", "/", "%", "^", "sqrt")
 }

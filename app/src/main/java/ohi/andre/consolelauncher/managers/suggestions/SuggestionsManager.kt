@@ -394,7 +394,12 @@ class SuggestionsManager(
         val input = mTerminalAdapter.input
 
         if (suggestion.type == Suggestion.Companion.TYPE_PERMANENT) {
-            mTerminalAdapter.input = input + text
+            val typedPrefixLength = suggestion.`object` as? Int ?: 0
+            mTerminalAdapter.input = if (typedPrefixLength > 0) {
+                input.dropLast(typedPrefixLength) + text
+            } else {
+                input + text
+            }
         } else {
             val addSpace =
                 !execOnClick && suggestion.type != Suggestion.Companion.TYPE_FILE && suggestion.type != Suggestion.Companion.TYPE_COLOR
@@ -708,8 +713,10 @@ class SuggestionsManager(
                 if (cmd != null) {
                     if (cmd.cmd is PermanentSuggestionCommand) {
                         suggestPermanentSuggestions(
+                            pack.context,
                             suggestionList,
-                            cmd.cmd as PermanentSuggestionCommand
+                            cmd.cmd as PermanentSuggestionCommand,
+                            null
                         )
                     }
 
@@ -781,8 +788,10 @@ class SuggestionsManager(
                 if (cmd != null) {
                     if (cmd.cmd is PermanentSuggestionCommand) {
                         suggestPermanentSuggestions(
+                            pack.context,
                             suggestionList,
-                            cmd.cmd as PermanentSuggestionCommand
+                            cmd.cmd as PermanentSuggestionCommand,
+                            lastWord
                         )
                     }
 
@@ -1193,11 +1202,20 @@ class SuggestionsManager(
 
 
     private fun suggestPermanentSuggestions(
+        context: Context,
         suggestions: MutableList<Suggestion?>,
-        cmd: PermanentSuggestionCommand
+        cmd: PermanentSuggestionCommand,
+        typedPrefix: String?
     ) {
-        for (s in cmd.permanentSuggestions()!!) {
-            val sugg = Suggestion(null, s, false, Suggestion.Companion.TYPE_PERMANENT)
+        val prefix = typedPrefix.orEmpty()
+        for (s in cmd.permanentSuggestions(context).orEmpty().filter { it.startsWith(prefix, ignoreCase = true) }) {
+            val sugg = Suggestion(
+                null,
+                s,
+                cmd.permanentSuggestionsExecuteOnClick(),
+                Suggestion.Companion.TYPE_PERMANENT,
+                prefix.length
+            )
             suggestions.add(sugg)
         }
     }

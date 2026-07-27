@@ -386,7 +386,7 @@ class config : ParamCommand() {
             }
 
             override fun exec(pack: ExecutePack): String? {
-                pack.context.startActivity(Tuils.webPage("https://github.com/DvilSpawn/Re-TUI/wiki/Customize-T_UI"))
+                pack.context.startActivity(Tuils.webPage("https://re-tui.pages.dev"))
                 return null
             }
         };

@@ -9,6 +9,7 @@
 -keep class ohi.andre.consolelauncher.managers.suggestions.HideSuggestionViewValues
 -keep public class it.andreuzzi.comparestring2.**
 -keep class org.luaj.** { *; }
+-keep class ohi.andre.consolelauncher.integrations.tasker.** { *; }
 
 -dontwarn ohi.andre.consolelauncher.commands.main.raw.**
 

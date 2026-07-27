@@ -25,6 +25,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ohi.andre.consolelauncher.R
@@ -44,6 +45,7 @@ import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleInput
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleListItem
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.stylePanel
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleScreen
+import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleToggle
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.textColor
 import ohi.andre.consolelauncher.managers.BackupManager
 import ohi.andre.consolelauncher.managers.FocusFrictionStyle
@@ -80,6 +82,7 @@ import java.util.ArrayList
 import java.util.Comparator
 import ohi.andre.consolelauncher.managers.settings.MusicSettings
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings
+import ohi.andre.consolelauncher.managers.tasker.TaskerIntegrationManager
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.wallpaper.RetuiWallpaperActivity
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi
@@ -196,6 +199,8 @@ class ThemerActivity : AppCompatActivity() {
                         openSettingsChild(Intent(this@ThemerActivity, RetuiWallpaperActivity::class.java))
                     } else if (fileName.startsWith("Preferred Music App")) {
                         showPreferredMusicAppPicker()
+                    } else if (fileName.startsWith("Tasker Integration")) {
+                        showTaskerIntegrationDialog()
                     } else if (fileName == "Fonts") {
                         showFontsDialog()
                     } else if (fileName == "Presets") {
@@ -419,7 +424,10 @@ class ThemerActivity : AppCompatActivity() {
                 "rss.xml"
             )
         } else if (SECTION_INTEGRATIONS == section) {
-            return mutableListOf("Preferred Music App: " + this.preferredMusicAppSummary)
+            return mutableListOf(
+                "Preferred Music App: " + this.preferredMusicAppSummary,
+                "Tasker Integration: " + if (TaskerIntegrationManager.isEnabled(this)) "on" else "off"
+            )
         } else if (SECTION_SYSTEM == section) {
             return mutableListOf(
                 "Backup",
@@ -1137,6 +1145,142 @@ class ThemerActivity : AppCompatActivity() {
             return packageName
         }
 
+    private fun showTaskerIntegrationDialog() {
+        TuixtDialog.showCustom(this, "Tasker integration", ContentFactory { _: Dialog? ->
+            val content = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+            }
+
+            val status = TextView(this).apply {
+                setTextColor(textColor())
+                setTypeface(Tuils.getTypeface(this@ThemerActivity))
+                textSize = 13f
+                setPadding(dp(this@ThemerActivity, 12f), dp(this@ThemerActivity, 10f), dp(this@ThemerActivity, 12f), dp(this@ThemerActivity, 10f))
+                background = rect(this@ThemerActivity, surfaceColor(), borderColor(), 1.25f)
+            }
+
+            fun updateStatus() {
+                status.text = buildString {
+                    append("INTEGRATION  ").append(if (TaskerIntegrationManager.isEnabled(this@ThemerActivity)) "ON" else "OFF")
+                    append("\nTASKER       ").append(if (TaskerIntegrationManager.isTaskerInstalled(this@ThemerActivity)) "INSTALLED" else "NOT INSTALLED")
+                    append("\nPERMISSION   ").append(if (TaskerIntegrationManager.hasRunTasksPermission(this@ThemerActivity)) "GRANTED" else "NOT GRANTED")
+                    append("\nTASK STATUS  ").append(if (TaskerIntegrationManager.showTaskStatuses(this@ThemerActivity)) "SHOWN" else "HIDDEN")
+                    append("\n\nPRESETS · THEME · MODULES · TERMINAL OUTPUT")
+                }
+            }
+            updateStatus()
+            content.addView(status, inputParams())
+
+            val toggleRow = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER_VERTICAL
+                setPadding(dp(this@ThemerActivity, 10f), dp(this@ThemerActivity, 8f), dp(this@ThemerActivity, 10f), dp(this@ThemerActivity, 8f))
+                background = rect(this@ThemerActivity, surfaceColor(), borderColor(), 1.25f)
+            }
+            val toggleLabel = TextView(this).apply {
+                text = "ENABLE INTEGRATION"
+                setTextColor(textColor())
+                setTypeface(Tuils.getTypeface(this@ThemerActivity), Typeface.BOLD)
+                textSize = 13f
+            }
+            val toggle = TextView(this)
+            fun updateToggle() = styleToggle(this, toggle, TaskerIntegrationManager.isEnabled(this))
+            updateToggle()
+            toggle.setOnClickListener {
+                val enable = !TaskerIntegrationManager.isEnabled(this)
+                TaskerIntegrationManager.setEnabled(this, enable)
+                if (enable && TaskerIntegrationManager.isTaskerInstalled(this) && !TaskerIntegrationManager.hasRunTasksPermission(this)) {
+                    ActivityCompat.requestPermissions(
+                        this,
+                        arrayOf(TaskerIntegrationManager.TASKER_PERMISSION_RUN_TASKS),
+                        TASKER_PERMISSION_REQUEST
+                    )
+                }
+                updateToggle()
+                updateStatus()
+                openSection(SECTION_INTEGRATIONS)
+            }
+            toggleRow.addView(toggleLabel, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
+            toggleRow.addView(toggle, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT))
+            content.addView(toggleRow, inputParams())
+
+            val statusToggleRow = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER_VERTICAL
+                setPadding(dp(this@ThemerActivity, 10f), dp(this@ThemerActivity, 8f), dp(this@ThemerActivity, 10f), dp(this@ThemerActivity, 8f))
+                background = rect(this@ThemerActivity, surfaceColor(), borderColor(), 1.25f)
+            }
+            val statusToggleLabel = TextView(this).apply {
+                text = "SHOW TASK STATUSES"
+                setTextColor(textColor())
+                setTypeface(Tuils.getTypeface(this@ThemerActivity), Typeface.BOLD)
+                textSize = 13f
+            }
+            val statusToggle = TextView(this)
+            fun updateStatusToggle() = styleToggle(this, statusToggle, TaskerIntegrationManager.showTaskStatuses(this))
+            updateStatusToggle()
+            statusToggle.setOnClickListener {
+                TaskerIntegrationManager.setShowTaskStatuses(this, !TaskerIntegrationManager.showTaskStatuses(this))
+                updateStatusToggle()
+                updateStatus()
+            }
+            statusToggleRow.addView(statusToggleLabel, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
+            statusToggleRow.addView(statusToggle, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT))
+            content.addView(statusToggleRow, inputParams())
+
+            fun actionButton(label: String, action: () -> Unit): TextView = TextView(this).apply {
+                text = label
+                styleListItem(this@ThemerActivity, this, false)
+                setOnClickListener { action() }
+            }
+
+            content.addView(actionButton("TEST INTEGRATION") {
+                val result = TaskerIntegrationManager.execute(
+                    this,
+                    TaskerIntegrationManager.Request(TaskerIntegrationManager.ACTION_TERMINAL_OUTPUT, text = "Tasker integration test OK")
+                )
+                Toast.makeText(this, result.message, Toast.LENGTH_SHORT).show()
+                updateStatus()
+            }, inputParams())
+            content.addView(actionButton("SETUP & EXAMPLES") { showTaskerSetupDialog() }, inputParams())
+            content
+        })
+    }
+
+    private fun showTaskerSetupDialog() {
+        TuixtDialog.showCustom(this, "Tasker setup", ContentFactory { _: Dialog? ->
+            val content = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+            val instructions = TextView(this).apply {
+                text = "SETUP\n" +
+                    "1. Enable Tasker integration in RETUI.\n" +
+                    "2. Grant the Tasker run-task permission.\n" +
+                    "3. In Tasker, enable Allow External Access.\n" +
+                    "4. Add an action: Plugin → RETUI Action.\n\n" +
+                    "TASKER → RETUI\n" +
+                    "• Apply a night preset at sunset\n" +
+                    "• Change a theme color from a profile\n" +
+                    "• Show or refresh a module\n" +
+                    "• Send text to the RETUI terminal\n\n" +
+                    "RETUI → TASKER\n" +
+                    "tasker Work\n" +
+                    "tasker -run \"Evening Setup\""
+                setTextColor(textColor())
+                setTypeface(Tuils.getTypeface(this@ThemerActivity))
+                textSize = 13f
+                setPadding(dp(this@ThemerActivity, 12f), dp(this@ThemerActivity, 10f), dp(this@ThemerActivity, 12f), dp(this@ThemerActivity, 10f))
+                background = rect(this@ThemerActivity, surfaceColor(), borderColor(), 1.25f)
+            }
+            content.addView(instructions, inputParams())
+            val docs = TextView(this).apply {
+                text = "OPEN FULL DOCUMENTATION"
+                styleListItem(this@ThemerActivity, this, false)
+                setOnClickListener { openExternalUrl(TASKER_HELP_URL) }
+            }
+            content.addView(docs, inputParams())
+            content
+        })
+    }
+
     private fun showPreferredMusicAppPicker() {
         val choices = this.launchableAppChoices
         val labels: MutableList<String?> = ArrayList<String?>()
@@ -1549,6 +1693,7 @@ class ThemerActivity : AppCompatActivity() {
         private const val BACKUP_RESTORE_REQUEST = 202
         private const val SHAREABLE_CONFIG_EXPORT_REQUEST = 203
         private const val FONT_IMPORT_REQUEST = 204
+        private const val TASKER_PERMISSION_REQUEST = 205
         private const val DYSTOPIA_HOLD_MS = 3000L
         private val DYSTOPIA_HOLD_PATTERN = longArrayOf(0L, 55L, 945L, 55L, 945L, 55L)
         private const val PLAY_STORE_PACKAGE_ID = "com.dvil.tui_renewed"
@@ -1562,5 +1707,6 @@ class ThemerActivity : AppCompatActivity() {
         private const val FEEDBACK_MAILTO_URI = "mailto:$FEEDBACK_EMAIL"
         private const val GMAIL_PACKAGE = "com.google.android.gm"
         private const val LEARN_MORE_URL = "https://re-tui.pages.dev"
+        private const val TASKER_HELP_URL = "https://github.com/DvilSpawn/Re-TUI#tasker-integration"
     }
 }

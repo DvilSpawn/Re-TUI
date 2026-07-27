@@ -35,7 +35,7 @@ class CommandGroup(private val packageName: String) {
                         "intent", "landscape", "location", "lockdown", "ls", "lua", "module", "music", "notes", "notifications", "open",
                         "orientation", "podcast", "pomodoro", "portrait", "post", "preset", "profile", "pwd", "rate", "refresh", "regex",
                         "reply", "restart", "retuitoken", "rss", "search", "settings", "share", "shell", "shortcut",
-                        "status", "stopwatch", "tbridge", "termux", "termuxopen", "theme", "themer", "time", "timer", "tmux",
+                        "status", "stopwatch", "tasker", "tbridge", "termux", "termuxopen", "theme", "themer", "time", "timer", "tmux",
                         "tui", "tuiweather", "tuixt", "tutorial", "uninstall", "username", "vibrate", "volume",
                         "wallet", "wallpaper", "webhook", "widget", "wifi"
                     )
