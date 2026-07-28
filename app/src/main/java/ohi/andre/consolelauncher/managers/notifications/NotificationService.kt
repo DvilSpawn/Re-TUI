@@ -74,7 +74,12 @@ class NotificationService : NotificationListenerService() {
     var active: Boolean = false
     var terminalNotifications: Boolean = false
 
-    var queue: Queue<StatusBarNotification?>? = null
+    private data class QueuedNotification(
+        val notification: StatusBarNotification,
+        val printToTerminal: Boolean
+    )
+
+    private var queue: Queue<QueuedNotification>? = null
     private val queueLock = Any()
     private val pastNotificationsLock = Any()
 
@@ -534,9 +539,10 @@ class NotificationService : NotificationListenerService() {
                     if (isInterrupted()) return
 
                     if (queue != null) {
-                        var sbn: StatusBarNotification?
-                        while ((queue!!.poll().also { sbn = it }) != null) {
-                            val currentSbn = sbn ?: continue
+                        var queuedNotification: QueuedNotification?
+                        while ((queue!!.poll().also { queuedNotification = it }) != null) {
+                            val queued = queuedNotification ?: continue
+                            val currentSbn = queued.notification
                             Log.d(
                                 "TUI-Notif",
                                 "Processing notification from: " + currentSbn.getPackageName()
@@ -711,7 +717,7 @@ class NotificationService : NotificationListenerService() {
 
                             //                        Tuils.log("text", text);
 //                        Tuils.log("--------");
-                            if (terminalNotifications) {
+                            if (terminalNotifications && queued.printToTerminal) {
                                 Tuils.sendOutput(
                                     this@NotificationService.getApplicationContext(),
                                     s,
@@ -747,7 +753,7 @@ class NotificationService : NotificationListenerService() {
         manager = getPackageManager()
         pastNotifications = HashMap<String?, MutableList<Notification>?>()
 
-        queue = ArrayBlockingQueue<StatusBarNotification?>(5)
+        queue = ArrayBlockingQueue<QueuedNotification>(5)
         if (!feedRequestReceiverRegistered) {
             LocalBroadcastManager.getInstance(this).registerReceiver(
                 feedRequestReceiver, IntentFilter(
@@ -899,7 +905,7 @@ class NotificationService : NotificationListenerService() {
             }
         }
 
-        queue!!.offer(sbn)
+        queue!!.offer(QueuedNotification(sbn, true))
         notifyNotificationWorker()
     }
 
@@ -980,7 +986,7 @@ class NotificationService : NotificationListenerService() {
         removeOverlayNotification(sbn.getKey(), sbn.getPackageName(), sbn.getNotification())
     }
 
-    private fun seedActiveNotifications() {
+    private fun seedActiveNotifications(printToTerminal: Boolean = true) {
         if (!enabled || Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2 || queue == null) {
             return
         }
@@ -993,7 +999,7 @@ class NotificationService : NotificationListenerService() {
 
             for (sbn in activeNotifications) {
                 if (sbn != null) {
-                    queue!!.offer(sbn)
+                    queue!!.offer(QueuedNotification(sbn, printToTerminal))
                     notifyNotificationWorker()
                 }
             }
@@ -1044,7 +1050,7 @@ class NotificationService : NotificationListenerService() {
             return
         }
 
-        seedActiveNotifications()
+        seedActiveNotifications(printToTerminal = false)
         broadcastOverlayNotifications()
     }
 
@@ -1276,8 +1282,6 @@ class NotificationService : NotificationListenerService() {
             if (context == null) {
                 return
             }
-
-            requestListenerRebind(context)
 
             LocalBroadcastManager.getInstance(context.getApplicationContext())
                 .sendBroadcast(Intent(ACTION_RELOAD_NOTIFICATION_CONFIG))

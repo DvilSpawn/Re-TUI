@@ -190,11 +190,19 @@ class NotificationManager private constructor(context: Context?) : XMLPrefsEleme
 
                         val app: NotificatedApp?
 
-                        val enabled = XMLPrefsManager.getBooleanAttribute(e, ENABLED_ATTRIBUTE)
+                        val enabled = if (e.hasAttribute(ENABLED_ATTRIBUTE)) {
+                            XMLPrefsManager.getBooleanAttribute(e, ENABLED_ATTRIBUTE)
+                        } else {
+                            default_app_state
+                        }
                         val color = XMLPrefsManager.getStringAttribute(e, COLOR_ATTRIBUTE)
+                            ?: default_color
+                            ?: Notifications.notification_text_color.defaultValue()
                         val format = XMLPrefsManager.getStringAttribute(e, FORMAT_ATTRIBUTE)
+                            ?: NotificationSettings.format()
+                            ?: Notifications.notification_format.defaultValue()
 
-                        app = NotificatedApp(nn, color!!, format!!, enabled)
+                        app = NotificatedApp(nn, color, format, enabled)
                         apps!!.add(app)
                     }
                 }

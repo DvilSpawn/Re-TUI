@@ -64,6 +64,17 @@ object BackupManager {
         XMLPrefsManager.XMLPrefsRoot.THEME.path,
         XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS.path
     )
+    private val SHAREABLE_ENTRIES = setOf(
+        MANIFEST_FILE,
+        *SHAREABLE_FILES
+    )
+    private val REQUIRED_PERSONAL_ENTRIES = setOf(
+        MANIFEST_FILE,
+        XMLPrefsManager.XMLPrefsRoot.THEME.path,
+        XMLPrefsManager.XMLPrefsRoot.UI.path,
+        XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS.path,
+        SHARED_PREFS_DIR + "ui.properties"
+    )
     private val PERSONAL_PREFS = kotlin.arrayOf<kotlin.String?>(
         "ui",
         "apps",
@@ -79,6 +90,10 @@ object BackupManager {
         SpaceManager.PREFS,
         GuideManager.PREFS,
         PodcastManager.PREFS,
+        "tasker_integration",
+        "retui_wallpaper",
+        "retui_profile",
+        "retui_tmux_workspace_launchers",
         "changelogPrefs"
     )
 
@@ -195,6 +210,7 @@ object BackupManager {
         var hasManifest = false
         var manifest: kotlin.String? = null
         var totalBytes: kotlin.Long = 0
+        val entries = java.util.HashSet<kotlin.String>()
         val packageStream = ohi.andre.consolelauncher.managers.BackupManager.backupInputStream(
             context,
             uri,
@@ -208,6 +224,7 @@ object BackupManager {
                 val name = entry!!.getName()
                 if (entry.isDirectory()) continue
                 kotlin.require(ohi.andre.consolelauncher.managers.BackupManager.isSafeEntry(name)) { "Unsafe backup package" }
+                kotlin.require(entries.add(name)) { "Backup package contains duplicate entries" }
 
                 if (ohi.andre.consolelauncher.managers.BackupManager.MANIFEST_FILE == name) {
                     hasManifest = true
@@ -243,9 +260,7 @@ object BackupManager {
 
         kotlin.require(hasManifest) { "Backup package is incomplete" }
 
-        val type = ohi.andre.consolelauncher.managers.BackupManager.manifestValue(manifest, "type")
-        kotlin.require(!(ohi.andre.consolelauncher.managers.BackupManager.TYPE_BACKUP != type && ohi.andre.consolelauncher.managers.BackupManager.TYPE_SHAREABLE != type)) { "Unsupported backup package" }
-        val personal = ohi.andre.consolelauncher.managers.BackupManager.TYPE_BACKUP == type
+        val personal = validatePackage(manifest, entries)
         if (personal) {
             ohi.andre.consolelauncher.managers.BackupManager.clearForPersonalRestore(Tuils.getFolder())
         }
@@ -262,6 +277,30 @@ object BackupManager {
             SpaceManager.ensureInitialized(context)
         }
         Tuils.delete(tempDir)
+    }
+
+    internal fun validatePackage(manifest: kotlin.String?, entries: kotlin.collections.Set<kotlin.String>): kotlin.Boolean {
+        val type = manifestValue(manifest, "type")
+        val schema = manifestValue(manifest, "schema")
+        val profile = manifestValue(manifest, "profile")
+        kotlin.require(schema == "1") { "Unsupported backup schema" }
+
+        return when (type) {
+            TYPE_BACKUP -> {
+                kotlin.require(profile == "personal") { "Invalid personal backup profile" }
+                kotlin.require(entries.containsAll(REQUIRED_PERSONAL_ENTRIES)) { "Personal backup is incomplete" }
+                true
+            }
+            TYPE_SHAREABLE -> {
+                kotlin.require(profile == "shareable") { "Invalid shareable configuration profile" }
+                kotlin.require(manifestValue(manifest, "sections") == "theme,suggestions") {
+                    "Unsupported shareable configuration sections"
+                }
+                kotlin.require(entries == SHAREABLE_ENTRIES) { "Shareable configuration contains unsupported files" }
+                false
+            }
+            else -> throw java.lang.IllegalArgumentException("Unsupported backup package")
+        }
     }
 
     @Throws(java.lang.Exception::class)
