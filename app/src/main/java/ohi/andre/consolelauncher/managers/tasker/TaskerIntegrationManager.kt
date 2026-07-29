@@ -15,7 +15,9 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import ohi.andre.consolelauncher.LauncherActivity
 import ohi.andre.consolelauncher.UIManager
 import ohi.andre.consolelauncher.managers.PresetManager
+import ohi.andre.consolelauncher.managers.SpaceManager
 import ohi.andre.consolelauncher.managers.modules.ModuleManager
+import ohi.andre.consolelauncher.managers.notifications.NotificationService
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings
 import ohi.andre.consolelauncher.managers.widgets.LuaWidgetManager
 import ohi.andre.consolelauncher.managers.xml.options.Theme
@@ -44,6 +46,7 @@ object TaskerIntegrationManager {
     const val ACTION_REFRESH_MODULE = "refresh_module"
     const val ACTION_UPDATE_MODULE_TEXT = "update_module_text"
     const val ACTION_TERMINAL_OUTPUT = "terminal_output"
+    const val ACTION_SWITCH_SPACE = "switch_space"
 
     data class Request(
         val action: String?,
@@ -51,7 +54,8 @@ object TaskerIntegrationManager {
         val themeElement: String? = null,
         val value: String? = null,
         val module: String? = null,
-        val text: String? = null
+        val text: String? = null,
+        val space: String? = null
     )
 
     data class Result(val success: Boolean, val message: String)
@@ -94,6 +98,7 @@ object TaskerIntegrationManager {
                 ACTION_REFRESH_MODULE -> refreshModule(context, request.module)
                 ACTION_UPDATE_MODULE_TEXT -> updateModuleText(context, request.module, request.text)
                 ACTION_TERMINAL_OUTPUT -> terminalOutput(context, request.text)
+                ACTION_SWITCH_SPACE -> switchSpace(context, request.space)
                 else -> Result(false, "Unsupported RETUI action.")
             }
         } catch (e: IllegalArgumentException) {
@@ -251,6 +256,14 @@ object TaskerIntegrationManager {
         val output = required(text, "Terminal text is required.")
         Tuils.sendOutput(context.applicationContext, output)
         return Result(true, "Terminal output sent.")
+    }
+
+    private fun switchSpace(context: Context, space: String?): Result {
+        Tuils.init(context.applicationContext)
+        val target = SpaceManager.switchTo(context, required(space, "Space name is required."))
+        NotificationService.requestReload(context)
+        refreshLauncher()
+        return Result(true, "Switched to Space: ${target.name}")
     }
 
     private fun validModule(context: Context, raw: String?): String? {

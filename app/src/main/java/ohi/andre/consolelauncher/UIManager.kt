@@ -476,6 +476,7 @@ class UIManager(
     private var podcastNext: TextView? = null
     private var podcastMode = PODCAST_MODE_SHOWS
     private var podcastTagFilter: String? = null
+    private var podcastEpisodeQuery = ""
     private var podcastSeekDragging = false
     private var podcastArtworkUrl: String? = null
     private var podcastStatus: String? = null
@@ -2066,7 +2067,7 @@ class UIManager(
             Tuils.mmToPx(metrics, topMargins[0]),
             Tuils.mmToPx(metrics, bottomMargins[0])
         )
-        overlayDisplayMarginTop = Tuils.mmToPx(metrics, topMargins[1])
+        overlayDisplayMarginTop = systemInsetTop + Tuils.mmToPx(metrics, topMargins[1])
         overlayDisplayMarginRight = max(
             Tuils.mmToPx(metrics, topMargins[2]),
             Tuils.mmToPx(metrics, bottomMargins[2])
@@ -2451,6 +2452,9 @@ class UIManager(
         termuxWorkspaceInputGroup = workspacePage.findViewById<View?>(R.id.termux_workspace_input_group)
         termuxWorkspaceOutputPanel = workspacePage.findViewById<View?>(R.id.termux_workspace_output_panel)
         termuxWorkspaceOutputLabel = workspacePage.findViewById<TextView?>(R.id.termux_workspace_output_label)
+        termuxWorkspaceOutputLabel?.addOnLayoutChangeListener { view, _, _, _, _, _, _, _, _ ->
+            view.translationY = -(view.top + view.height / 2f)
+        }
         termuxWorkspaceTools = workspacePage.findViewById<View?>(R.id.termux_workspace_tools)
         collapseTermuxWorkspaceInputHost()
         termuxWorkspaceRoot?.let { root ->
@@ -4618,7 +4622,9 @@ class UIManager(
             val active = token.endsWith("*")
             val display = if (active) token.removeSuffix("*") else token
             val start = out.length
+            if (active) out.append('\u00A0')
             out.append(display)
+            if (active) out.append('\u00A0')
             if (active) {
                 val activeBg = notificationWidgetTextColor()
                 val activeFg = if (ColorUtils.calculateLuminance(activeBg) > 0.45) Color.BLACK else Color.WHITE
@@ -7087,6 +7093,9 @@ class UIManager(
         termuxInputGroup = rootView.findViewById<View?>(R.id.termux_input_group)
         termuxOutputPanel = rootView.findViewById<View?>(R.id.termux_output_panel)
         termuxOutputLabel = rootView.findViewById<TextView?>(R.id.termux_output_label)
+        termuxOutputLabel?.addOnLayoutChangeListener { view, _, _, _, _, _, _, _, _ ->
+            view.translationY = -(view.top + view.height / 2f)
+        }
         termuxActionsScroll = rootView.findViewById<HorizontalScrollView?>(R.id.termux_actions_scroll)
         termuxActions = rootView.findViewById<LinearLayout?>(R.id.termux_actions)
         termuxTools = rootView.findViewById<View?>(R.id.termux_tools)
@@ -7662,8 +7671,7 @@ class UIManager(
             renderPodcastSurface(null)
         })
         podcastContentBack?.setOnClickListener(View.OnClickListener {
-            podcastMode = PODCAST_MODE_SHOWS
-            renderPodcastSurface(null)
+            navigatePodcastToShows()
         })
         podcastNowPlaying?.setOnClickListener(View.OnClickListener {
             podcastMode = PODCAST_MODE_PLAYER
@@ -9644,7 +9652,7 @@ class UIManager(
         val lower = command.lowercase(Locale.getDefault())
         when {
             lower == "exit" || lower == "close" -> closePodcastSurface()
-            lower == "help" -> renderPodcastSurface("Commands: add <feed-url>, refresh, play, next, prev, rewind, forward, close")
+            lower == "help" -> renderPodcastSurface("Commands: add <https-feed-url>, refresh, play, next, prev, rewind, forward, speed <0.5-2.0>, close")
             lower == "refresh" || lower == "reload" -> {
                 renderPodcastSurface("Refreshing selected podcast...")
                 mainPack.podcastManager.refreshSelectedShow { message -> renderPodcastSurface(message ?: "Podcast refreshed.") }
@@ -9654,6 +9662,13 @@ class UIManager(
             lower == "prev" || lower == "previous" -> renderPodcastSurface(mainPack.podcastManager.previous())
             lower == "rewind" || lower == "back" -> renderPodcastSurface("-30s: " + mainPack.podcastManager.seekBy(-30000))
             lower == "forward" || lower == "fwd" -> renderPodcastSurface("+30s: " + mainPack.podcastManager.seekBy(30000))
+            lower.startsWith("speed ") -> {
+                val speed = command.substringAfter(' ').trim().removeSuffix("x").toFloatOrNull()
+                renderPodcastSurface(
+                    if (speed == null) "Playback speed must be a number from 0.5 to 2.0."
+                    else mainPack.podcastManager.setPlaybackSpeed(speed)
+                )
+            }
             lower.startsWith("add ") -> {
                 val url = command.substring(4).trim { it <= ' ' }
                 renderPodcastSurface("Adding podcast...")
@@ -9662,7 +9677,7 @@ class UIManager(
                     renderPodcastSurface(message ?: "Podcast added.")
                 }
             }
-            else -> renderPodcastSurface("Unknown podcast command. Try: add <feed-url>, refresh, play, next, prev, rewind, forward, close")
+            else -> renderPodcastSurface("Unknown podcast command. Try: add <https-feed-url>, refresh, play, next, prev, rewind, forward, speed <0.5-2.0>, close")
         }
     }
 
@@ -9682,8 +9697,8 @@ class UIManager(
             "CANCEL",
             { values ->
                 val url = values["url"].orEmpty()
-                if (!url.startsWith("http://") && !url.startsWith("https://")) {
-                    "Podcast URL must start with http:// or https://."
+                if (!PodcastManager.isSecureFeedUrl(url)) {
+                    "Podcast feed URL must be a valid https:// address."
                 } else {
                     null
                 }
@@ -9967,6 +9982,7 @@ class UIManager(
                 show.tags.joinToString("  ") { "#$it" },
                 Runnable {
                     manager.selectShow(show.id)
+                    podcastEpisodeQuery = ""
                     podcastMode = PODCAST_MODE_SHOW_DETAIL
                     renderPodcastSurface("Refreshing " + show.title + "...")
                     manager.refreshShow(show) { message -> renderPodcastSurface(message ?: "Podcast refreshed.") }
@@ -10152,9 +10168,15 @@ class UIManager(
             return
         }
         addPodcastEpisodeHeader(show, status)
-        val episodes = mainPack.podcastManager.episodesFor(show)
+        addPodcastEpisodeSearch(show)
+        val episodes = mainPack.podcastManager.episodesFor(show, podcastEpisodeQuery)
         if (episodes.isEmpty()) {
-            addPodcastRow("No playable episodes found in this feed.", false, null)
+            addPodcastRow(
+                if (podcastEpisodeQuery.isBlank()) "No playable episodes found in this feed."
+                else "No episodes match \"$podcastEpisodeQuery\".",
+                false,
+                null
+            )
             return
         }
         for (i in episodes.indices) {
@@ -10162,8 +10184,69 @@ class UIManager(
             addPodcastRow(
                 episodeRowText(i, episode),
                 false,
-                Runnable { renderPodcastSurface(mainPack.podcastManager.play(show, episode)) }
+                Runnable { renderPodcastSurface(mainPack.podcastManager.play(show, episode)) },
+                Runnable {
+                    val played = !mainPack.podcastManager.isPlayed(episode)
+                    mainPack.podcastManager.markPlayed(episode, played)
+                    renderPodcastSurface(if (played) "Marked played: ${episode.title}" else "Marked unplayed: ${episode.title}")
+                }
             )
+        }
+    }
+
+    private fun addPodcastEpisodeSearch(show: PodcastShow) {
+        val row = LinearLayout(mContext)
+        row.orientation = LinearLayout.HORIZONTAL
+        row.gravity = Gravity.CENTER_VERTICAL
+
+        val search = TextView(mContext)
+        search.text = if (podcastEpisodeQuery.isBlank()) "SEARCH EPISODES" else "SEARCH: $podcastEpisodeQuery"
+        search.contentDescription = "Search episodes in ${show.title}"
+        search.gravity = Gravity.CENTER
+        search.textSize = PODCAST_TEXT_SMALL
+        styleTermuxToolButton(search, notificationWidgetTextColor())
+        search.setBackground(TerminalBorderRuntime.tabDrawable(mContext, terminalHeaderTabBackground()))
+        search.setOnClickListener { showPodcastEpisodeSearchDialog(show) }
+        row.addView(search, LinearLayout.LayoutParams(0, Tuils.dpToPx(mContext, 34), 1f))
+
+        if (podcastEpisodeQuery.isNotBlank()) {
+            val clear = TextView(mContext)
+            clear.text = "CLEAR"
+            clear.contentDescription = "Clear episode search"
+            clear.gravity = Gravity.CENTER
+            clear.textSize = PODCAST_TEXT_SMALL
+            styleTermuxToolButton(clear, notificationWidgetTextColor())
+            clear.setBackground(TerminalBorderRuntime.tabDrawable(mContext, terminalHeaderTabBackground()))
+            clear.setOnClickListener {
+                podcastEpisodeQuery = ""
+                renderPodcastSurface(null)
+            }
+            val clearParams = LinearLayout.LayoutParams(Tuils.dpToPx(mContext, 72), Tuils.dpToPx(mContext, 34))
+            clearParams.marginStart = Tuils.dpToPx(mContext, 6)
+            row.addView(clear, clearParams)
+        }
+        addPodcastView(row)
+    }
+
+    private fun showPodcastEpisodeSearchDialog(show: PodcastShow) {
+        TuixtDialog.showValidatedForm(
+            mContext,
+            "SEARCH EPISODES",
+            listOf(
+                TuixtDialog.FormField(
+                    "query",
+                    "Title or description",
+                    "Search ${show.title}",
+                    InputType.TYPE_CLASS_TEXT,
+                    podcastEpisodeQuery
+                )
+            ),
+            "SEARCH",
+            "CANCEL",
+            { null }
+        ) { values ->
+            podcastEpisodeQuery = values["query"].orEmpty().trim()
+            renderPodcastSurface(null)
         }
     }
 
@@ -10199,7 +10282,8 @@ class UIManager(
     private fun addPodcastEpisodeHeader(show: PodcastShow, status: String?) {
         val manager = mainPack.podcastManager
         val newestFirst = manager.isNewestFirst(show)
-        val detail = status ?: if (newestFirst) "Newest first autoplay" else "Oldest first autoplay"
+        val detail = (status ?: if (newestFirst) "Newest first autoplay" else "Oldest first autoplay") +
+            " · Long-press an episode to mark it played"
         val row = LinearLayout(mContext)
         row.orientation = LinearLayout.HORIZONTAL
         row.gravity = Gravity.CENTER_VERTICAL
@@ -10377,6 +10461,22 @@ class UIManager(
         show.textSize = PODCAST_TEXT_MEDIUM
         details.addView(show)
 
+        val speed = TextView(mContext)
+        speed.text = "[ SPEED ${PodcastManager.formatSpeed(manager.playbackSpeed())} ]"
+        speed.contentDescription = "Podcast playback speed ${PodcastManager.formatSpeed(manager.playbackSpeed())}"
+        speed.gravity = Gravity.CENTER
+        speed.textSize = PODCAST_TEXT_SMALL
+        styleTermuxToolButton(speed, notificationWidgetTextColor())
+        speed.setBackground(TerminalBorderRuntime.tabDrawable(mContext, terminalHeaderTabBackground()))
+        speed.setOnClickListener { showPodcastSpeedMenu(speed) }
+        val speedParams = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            Tuils.dpToPx(mContext, 34)
+        )
+        speedParams.gravity = Gravity.CENTER_HORIZONTAL
+        speedParams.topMargin = Tuils.dpToPx(mContext, 10)
+        details.addView(speed, speedParams)
+
         panel.addView(details, LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT,
             LinearLayout.LayoutParams.WRAP_CONTENT
@@ -10387,6 +10487,20 @@ class UIManager(
             LinearLayout.LayoutParams.MATCH_PARENT,
             if (viewportHeight > 0) viewportHeight else LinearLayout.LayoutParams.WRAP_CONTENT
         ))
+    }
+
+    private fun showPodcastSpeedMenu(anchor: View) {
+        val menu = PopupMenu(anchor.context, anchor)
+        PodcastManager.PLAYBACK_SPEEDS.forEachIndexed { index, speed ->
+            menu.menu.add(0, index + 1, index, PodcastManager.formatSpeed(speed))
+        }
+        menu.setOnMenuItemClickListener { item ->
+            val speed = PodcastManager.PLAYBACK_SPEEDS.getOrNull(item.itemId - 1)
+                ?: return@setOnMenuItemClickListener false
+            renderPodcastSurface(mainPack.podcastManager.setPlaybackSpeed(speed))
+            true
+        }
+        menu.show()
     }
 
     private fun addPodcastRow(
@@ -10686,8 +10800,20 @@ class UIManager(
         return true
     }
 
+    private fun handlePodcastBackPressed(): Boolean {
+        if (!isPodcastSurfaceVisible || podcastMode == PODCAST_MODE_SHOWS) return false
+        navigatePodcastToShows()
+        return true
+    }
+
+    private fun navigatePodcastToShows() {
+        podcastMode = PODCAST_MODE_SHOWS
+        podcastEpisodeQuery = ""
+        renderPodcastSurface(null)
+    }
+
     fun consumeBackPressed(): Boolean {
-        return handleTermuxWorkspaceBackPressed() || handleTermuxBackPressed()
+        return handleTermuxWorkspaceBackPressed() || handleTermuxBackPressed() || handlePodcastBackPressed()
     }
 
     private fun focusTermuxInput(showKeyboard: Boolean) {
