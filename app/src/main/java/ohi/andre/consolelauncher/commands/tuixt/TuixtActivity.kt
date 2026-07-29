@@ -44,7 +44,6 @@ import java.io.File
 import java.io.FileInputStream
 import java.util.Locale
 import android.content.Intent
-import ohi.andre.consolelauncher.LauncherActivity
 import java.util.ArrayList
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings.getInt
@@ -161,21 +160,28 @@ class TuixtActivity : Activity() {
         btnSave.setText("SAVE")
         styleButton(this, btnSave, true)
         btnSave.setOnClickListener(View.OnClickListener { v: View? ->
-            Toast.makeText(this, "Applying changes...", Toast.LENGTH_SHORT).show()
+            var saved = false
             if (adapter != null) {
                 adapter!!.saveAll(this, recyclerView)
+                saved = true
             } else if (plainTextEditor != null) {
                 try {
-                    Tuils.write(file, "", plainTextEditor!!.getText().toString())
+                    val currentText = plainTextEditor!!.getText().toString()
+                    Tuils.write(file, "", currentText)
                     XMLPrefsManager.dispose()
                     XMLPrefsManager.loadCommons(this)
                     refreshFromLoadedPrefs()
+                    originalRawText = currentText
+                    saved = true
                 } catch (e: Exception) {
                     Toast.makeText(this, "Error saving: " + e.message, Toast.LENGTH_LONG).show()
                 }
             }
-            setResult(SAVE_PRESSED)
-            finish()
+            if (saved) {
+                Toast.makeText(this, "Changes saved. Previewing launcher...", Toast.LENGTH_SHORT)
+                    .show()
+                ThemerActivity.previewLauncher(this)
+            }
         })
         btnLayout.addView(btnSave)
 
@@ -526,7 +532,6 @@ class TuixtActivity : Activity() {
         if (requestCode == ASCII_TXT_REQUEST) {
             if (resultCode == SAVE_PRESSED) {
                 reloadLauncherForAscii("ascii.txt saved.")
-                setResult(SAVE_PRESSED)
             }
         } else if (requestCode == ASCII_IMPORT_REQUEST) {
             handleAsciiImportResult(resultCode, data)
@@ -584,7 +589,6 @@ class TuixtActivity : Activity() {
             "Imported " + frameCount + " frames. Enable animated ASCII to play it."
         }
         reloadLauncherForAscii(message)
-        setResult(SAVE_PRESSED)
     }
 
     private fun readUriBytes(uri: Uri, maxBytes: Int): ByteArray {
@@ -651,9 +655,7 @@ class TuixtActivity : Activity() {
 
     private fun reloadLauncherForAscii(message: String) {
         notifyAsciiImport(message, false)
-        if (LauncherActivity.instance != null) {
-            LauncherActivity.instance!!.reload()
-        }
+        ThemerActivity.previewLauncher(this)
     }
 
     private fun notifyAsciiImport(message: String, error: Boolean) {
