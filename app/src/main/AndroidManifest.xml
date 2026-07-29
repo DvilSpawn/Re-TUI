@@ -172,8 +172,10 @@
 
         <activity
             android:name=".commands.tuixt.ThemerActivity"
-            android:excludeFromRecents="true"
-            android:label="Re:T-UI Settings Hub"
+            android:alwaysRetainTaskState="true"
+            android:excludeFromRecents="false"
+            android:label="Re:T-UI Settings"
+            android:taskAffinity="${applicationId}.settings"
             android:theme="@style/Custom.Popup"
             android:exported="false">
             <meta-data

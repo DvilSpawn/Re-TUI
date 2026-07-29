@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Dialog
 import android.app.WallpaperManager
 import android.content.ActivityNotFoundException
+import android.content.Context
 import android.content.Intent
 import android.database.Cursor
 import android.net.Uri
@@ -350,14 +351,8 @@ class ThemerActivity : AppCompatActivity() {
     private fun savePreset(name: String?) {
         try {
             PresetManager.save(name ?: return)
-            Toast.makeText(this@ThemerActivity, "Preset saved! Reloading...", Toast.LENGTH_SHORT)
+            Toast.makeText(this@ThemerActivity, "Preset saved.", Toast.LENGTH_SHORT)
                 .show()
-            recyclerView!!.postDelayed(Runnable {
-                if (LauncherActivity.instance != null) {
-                    LauncherActivity.instance!!.reload()
-                }
-                finish()
-            }, 500)
         } catch (e: Exception) {
             Toast.makeText(this@ThemerActivity, e.message, Toast.LENGTH_SHORT).show()
         }
@@ -370,10 +365,7 @@ class ThemerActivity : AppCompatActivity() {
             Toast.makeText(this@ThemerActivity, "Preset applied! Reloading...", Toast.LENGTH_SHORT)
                 .show()
             recyclerView!!.postDelayed(Runnable {
-                if (LauncherActivity.instance != null) {
-                    LauncherActivity.instance!!.reload()
-                }
-                finish()
+                previewLauncher(this)
             }, 500)
         } catch (e: Exception) {
             Toast.makeText(this@ThemerActivity, e.message, Toast.LENGTH_SHORT).show()
@@ -628,7 +620,7 @@ class ThemerActivity : AppCompatActivity() {
             openSection(SECTION_HOME)
             return
         }
-        super.onBackPressed()
+        finishAndRemoveTask()
     }
 
     private fun openConfigFile(fileName: String) {
@@ -761,9 +753,7 @@ class ThemerActivity : AppCompatActivity() {
 
     private fun reloadLauncherForToolbarButtons(message: String?) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-        if (LauncherActivity.instance != null) {
-            LauncherActivity.instance!!.reload()
-        }
+        previewLauncher(this)
     }
 
     private fun commandInput(hint: String?): EditText {
@@ -1019,10 +1009,7 @@ class ThemerActivity : AppCompatActivity() {
         Toast.makeText(this, message + " Reloading...", Toast.LENGTH_SHORT).show()
 
         recyclerView!!.postDelayed(Runnable {
-            if (LauncherActivity.instance != null) {
-                LauncherActivity.instance!!.reload()
-            }
-            finish()
+            previewLauncher(this)
         }, 500)
     }
 
@@ -1355,10 +1342,7 @@ class ThemerActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == LauncherActivity.TUIXT_REQUEST && resultCode == TuixtActivity.SAVE_PRESSED) {
-            if (LauncherActivity.instance != null) {
-                LauncherActivity.instance!!.reload()
-            }
-            finish()
+            previewLauncher(this)
         } else if (requestCode == BACKUP_EXPORT_REQUEST) {
             handleBackupResult(resultCode, data)
         } else if (requestCode == SHAREABLE_CONFIG_EXPORT_REQUEST) {
@@ -1645,10 +1629,9 @@ class ThemerActivity : AppCompatActivity() {
             Toast.makeText(this, "Backup restored. Reloading...", Toast.LENGTH_SHORT).show()
             pendingRestoreUri = null
             recyclerView!!.postDelayed(Runnable {
-                if (LauncherActivity.instance != null) {
-                    LauncherActivity.instance!!.reload()
-                }
-                finish()
+                intent.putExtra(EXTRA_SECTION, SECTION_SYSTEM)
+                recreate()
+                previewLauncher(this)
             }, 500)
         } catch (e: Exception) {
             Toast.makeText(
@@ -1683,6 +1666,28 @@ class ThemerActivity : AppCompatActivity() {
 
     private class AppChoice(val label: String, val packageName: String?)
     companion object {
+        @JvmStatic
+        fun launchIntent(context: Context, section: String?): Intent =
+            Intent(context, ThemerActivity::class.java).apply {
+                putExtra(EXTRA_SECTION, if (section.isNullOrEmpty()) SECTION_HOME else section)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+
+        @JvmStatic
+        fun previewLauncher(context: Context) {
+            val launcher = LauncherActivity.instance
+            if (launcher != null) {
+                launcher.reload()
+                return
+            }
+
+            context.startActivity(
+                Intent(context, LauncherActivity::class.java).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                }
+            )
+        }
+
         const val EXTRA_SECTION: String = "section"
         const val SECTION_HOME: String = "home"
         const val SECTION_APPEARANCE: String = "appearance"

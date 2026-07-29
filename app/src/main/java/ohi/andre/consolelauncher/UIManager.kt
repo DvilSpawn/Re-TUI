@@ -1427,14 +1427,7 @@ class UIManager(
         hideLauncherChromeForSurface()
         restoreLauncherChromeOnResume = true
 
-        val intent = Intent(mContext, ThemerActivity::class.java)
-        intent.putExtra(
-            ThemerActivity.EXTRA_SECTION,
-            if (TextUtils.isEmpty(section)) ThemerActivity.SECTION_HOME else section
-        )
-        if (mContext !is Activity) {
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        }
+        val intent = ThemerActivity.launchIntent(mContext!!, section)
         startActivityAfterChromeHidden(intent)
     }
 

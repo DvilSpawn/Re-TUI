@@ -1,6 +1,5 @@
 package ohi.andre.consolelauncher.commands.main.raw
 
-import android.content.Intent
 import ohi.andre.consolelauncher.LauncherActivity
 import ohi.andre.consolelauncher.commands.CommandAbstraction
 import ohi.andre.consolelauncher.commands.ExecutePack
@@ -18,8 +17,9 @@ class themer : CommandAbstraction {
             return Tuils.EMPTYSTRING
         }
 
-        val intent = Intent(info.context, ThemerActivity::class.java)
-        info.context.startActivity(intent)
+        info.context.startActivity(
+            ThemerActivity.launchIntent(info.context, ThemerActivity.SECTION_HOME)
+        )
         return Tuils.EMPTYSTRING
     }
 
