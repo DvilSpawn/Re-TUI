@@ -167,11 +167,12 @@
     <string name="help_podcast">Open the Re:T-UI podcast surface.
         \nUsage:
         \n$ podcast
-        \n$ podcast add &lt;feed-url&gt;
+        \n$ podcast add &lt;https-feed-url&gt;
         \n$ podcast refresh
         \n$ podcast play
         \n$ podcast next
         \n$ podcast prev
+        \n$ podcast speed &lt;0.5-2.0&gt;
         \n\nPodcasts stream from RSS/Atom feeds and play oldest first for first-time listening.
     </string>
     <string name="help_profile">Open your local Re:T-UI profile card.\nUsage:\nprofile</string>
@@ -716,6 +717,7 @@
     <string name="tasker_value">Value</string>
     <string name="tasker_module">Module</string>
     <string name="tasker_text">Text</string>
+    <string name="tasker_space">Space</string>
     <!-- F-Droid SMS command resources (required by the existing fdroid source set). -->
     <string name="help_sms">Send an SMS to a contact or number.\nUsage:\n$ sms &lt;contact or number&gt;\nThen enter the message.</string>
     <string name="output_smsnotsent">SMS not sent: the message was empty.</string>

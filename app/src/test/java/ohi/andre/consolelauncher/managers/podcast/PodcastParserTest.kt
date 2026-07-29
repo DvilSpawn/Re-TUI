@@ -1,7 +1,9 @@
 package ohi.andre.consolelauncher.managers.podcast
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.ByteArrayInputStream
 
@@ -67,6 +69,55 @@ class PodcastParserTest {
             listOf("workout", "travel", "calming"),
             PodcastManager.parseTags("Workout, travel #Calming, workout")
         )
+    }
+
+    @Test
+    fun rejectsDocumentTypesAndExternalEntities() {
+        val unsafe = """
+            <!DOCTYPE rss [<!ENTITY leak SYSTEM "file:///etc/passwd">]>
+            <rss><channel><title>&leak;</title></channel></rss>
+        """.trimIndent()
+
+        var rejected = false
+        try {
+            PodcastParser.parse(ByteArrayInputStream(unsafe.toByteArray()), "https://example.com/feed.xml")
+        } catch (_: Exception) {
+            rejected = true
+        }
+
+        assertTrue(rejected)
+    }
+
+    @Test
+    fun capsVeryLargeEpisodeLists() {
+        val items = (0 until PodcastParser.MAX_EPISODES + 5).joinToString("") {
+            "<item><title>Episode $it</title><enclosure url=\"https://example.com/$it.mp3\" /></item>"
+        }
+        val rss = "<rss><channel><title>Large show</title>$items</channel></rss>"
+
+        val show = PodcastParser.parse(ByteArrayInputStream(rss.toByteArray()), "https://example.com/feed.xml")
+
+        assertEquals(PodcastParser.MAX_EPISODES, show.episodes.size)
+    }
+
+    @Test
+    fun validatesSecureFeedUrls() {
+        assertTrue(PodcastManager.isSecureFeedUrl("https://example.com/feed.xml"))
+        assertFalse(PodcastManager.isSecureFeedUrl("http://example.com/feed.xml"))
+        assertFalse(PodcastManager.isSecureFeedUrl("https://"))
+        assertFalse(PodcastManager.isSecureFeedUrl("not a url"))
+    }
+
+    @Test
+    fun filtersEpisodesByTitleOrDescription() {
+        val episodes = listOf(
+            episode("Android news", 1000L, 0).copy(description = "Weekly roundup"),
+            episode("Design chat", 2000L, 1).copy(description = "Launcher accessibility")
+        )
+
+        assertEquals(listOf("Android news"), PodcastManager.filterEpisodes(episodes, "android").map { it.title })
+        assertEquals(listOf("Design chat"), PodcastManager.filterEpisodes(episodes, "ACCESS").map { it.title })
+        assertEquals(episodes, PodcastManager.filterEpisodes(episodes, " "))
     }
 
     private fun episode(title: String, publishedAt: Long?, feedOrder: Int): PodcastEpisode =

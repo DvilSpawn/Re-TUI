@@ -10,6 +10,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONArray
 import org.json.JSONObject
+import java.net.URI
 import java.util.LinkedHashSet
 import kotlin.math.max
 import kotlin.math.min
@@ -50,8 +51,8 @@ class PodcastManager(
         return next
     }
 
-    fun episodesFor(show: PodcastShow): List<PodcastEpisode> =
-        orderedEpisodes(show.episodes, isNewestFirst(show))
+    fun episodesFor(show: PodcastShow, query: String? = null): List<PodcastEpisode> =
+        filterEpisodes(orderedEpisodes(show.episodes, isNewestFirst(show)), query)
 
     fun recents(): List<PodcastRecent> =
         shows.mapNotNull { show ->
@@ -97,8 +98,8 @@ class PodcastManager(
 
     fun subscribe(feedUrl: String, done: (String?) -> Unit) {
         val clean = feedUrl.trim()
-        if (!clean.startsWith("http://") && !clean.startsWith("https://")) {
-            done("Podcast URL must start with http:// or https://.")
+        if (!isSecureFeedUrl(clean)) {
+            done("Podcast feed URL must be a valid https:// address.")
             return
         }
         val next = LinkedHashSet(feeds())
@@ -180,8 +181,21 @@ class PodcastManager(
             .putString(recentEpisodeKey(show.id), episode.key)
             .putLong(recentUpdatedKey(show.id), System.currentTimeMillis())
             .apply()
+        manager.setPodcastPlaybackSpeed(playbackSpeed())
         val title = manager.playPodcast(songs, index, this)
         return if (title == null) "Starting podcast..." else "Playing: " + title
+    }
+
+    fun playbackSpeed(): Float = prefs.getFloat(KEY_PLAYBACK_SPEED, 1f)
+
+    fun setPlaybackSpeed(speed: Float): String {
+        if (!speed.isFinite() || speed < MIN_PLAYBACK_SPEED || speed > MAX_PLAYBACK_SPEED) {
+            return "Playback speed must be between ${formatSpeed(MIN_PLAYBACK_SPEED)} and ${formatSpeed(MAX_PLAYBACK_SPEED)}."
+        }
+        val normalized = (speed * 100f).toInt() / 100f
+        prefs.edit().putFloat(KEY_PLAYBACK_SPEED, normalized).apply()
+        player?.setPodcastPlaybackSpeed(normalized)
+        return "Playback speed: ${formatSpeed(normalized)}"
     }
 
     fun toggle(): String {
@@ -320,7 +334,12 @@ class PodcastManager(
             .build()
         client.newCall(request).execute().use { response ->
             if (!response.isSuccessful) throw IllegalStateException(response.code.toString())
+            if (!response.request.url.isHttps) throw IllegalStateException("insecure feed redirect")
             val body = response.body ?: throw IllegalStateException("empty feed")
+            val contentLength = body.contentLength()
+            if (contentLength > PodcastParser.MAX_FEED_BYTES) {
+                throw IllegalStateException("feed exceeds ${PodcastParser.MAX_FEED_BYTES / (1024 * 1024)} MB")
+            }
             return PodcastParser.parse(body.byteStream(), feedUrl)
         }
     }
@@ -477,6 +496,32 @@ class PodcastManager(
         private const val KEY_ACTIVE_SHOW = "active_show"
         private const val KEY_ACTIVE_EPISODE = "active_episode"
         private const val KEY_SHOW_CACHE = "show_cache"
+        private const val KEY_PLAYBACK_SPEED = "playback_speed"
+        private const val MIN_PLAYBACK_SPEED = 0.5f
+        private const val MAX_PLAYBACK_SPEED = 2f
+
+        val PLAYBACK_SPEEDS = floatArrayOf(0.75f, 1f, 1.25f, 1.5f, 1.75f, 2f)
+
+        fun isSecureFeedUrl(value: String?): Boolean = try {
+            val uri = URI(value.orEmpty().trim())
+            uri.scheme.equals("https", ignoreCase = true) && !uri.host.isNullOrBlank()
+        } catch (_: Exception) {
+            false
+        }
+
+        fun filterEpisodes(episodes: List<PodcastEpisode>, query: String?): List<PodcastEpisode> {
+            val needle = query.orEmpty().trim()
+            if (needle.isEmpty()) return episodes
+            return episodes.filter {
+                it.title.contains(needle, ignoreCase = true) ||
+                    it.description.contains(needle, ignoreCase = true)
+            }
+        }
+
+        fun formatSpeed(speed: Float): String {
+            val value = if (speed % 1f == 0f) speed.toInt().toString() else speed.toString().trimEnd('0')
+            return value + "x"
+        }
 
         fun orderedEpisodes(episodes: List<PodcastEpisode>, newestFirst: Boolean): List<PodcastEpisode> {
             if (!newestFirst) return episodes

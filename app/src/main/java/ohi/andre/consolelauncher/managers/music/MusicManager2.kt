@@ -53,6 +53,7 @@ class MusicManager2(var mContext: Context, private val loadLocalLibrary: Boolean
     private var waitingPodcastSongs: MutableList<Song>? = null
     private var waitingPodcastIndex: Int = 0
     private var waitingPodcastListener: MusicService.PlaybackListener? = null
+    private var podcastPlaybackSpeed = 1f
 
     var headsetBroadcast: BroadcastReceiver?
     var headsetReceiverRegistered: Boolean = false
@@ -167,14 +168,21 @@ class MusicManager2(var mContext: Context, private val loadLocalLibrary: Boolean
         playbackPaused = false
         stopped = false
         musicSrv!!.setShuffle(false)
+        musicSrv!!.setPlaybackSpeed(podcastPlaybackSpeed)
         musicSrv!!.setPlaybackListener(listener)
         musicSrv!!.setList(playlist)
         musicSrv!!.setSong(safeIndex)
         return musicSrv!!.playSong()
     }
 
+    fun setPodcastPlaybackSpeed(speed: Float) {
+        podcastPlaybackSpeed = speed.coerceIn(0.5f, 2f)
+        if (musicBound) musicSrv?.setPlaybackSpeed(podcastPlaybackSpeed)
+    }
+
     fun useLocalSongs() {
         if (musicSrv != null && musicBound) {
+            musicSrv!!.setPlaybackSpeed(1f)
             musicSrv!!.setPlaybackListener(null)
             musicSrv!!.setShuffle(XMLPrefsManager.getBoolean(Behavior.random_play))
             musicSrv!!.setList(songs)
@@ -354,12 +362,12 @@ class MusicManager2(var mContext: Context, private val loadLocalLibrary: Boolean
     }
 
     override fun getCurrentPosition(): Int {
-        if (musicSrv != null && musicBound && musicSrv!!.isPlaying) return musicSrv!!.posn
+        if (musicSrv != null && musicBound) return musicSrv!!.posn
         else return -1
     }
 
     override fun getDuration(): Int {
-        if (musicSrv != null && musicBound && musicSrv!!.isPlaying) return musicSrv!!.dur
+        if (musicSrv != null && musicBound) return musicSrv!!.dur
         else return -1
     }
 

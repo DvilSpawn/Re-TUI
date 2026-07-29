@@ -1260,6 +1260,7 @@ class ThemerActivity : AppCompatActivity() {
                     "• Apply a night preset at sunset\n" +
                     "• Change a theme color from a profile\n" +
                     "• Show or refresh a module\n" +
+                    "• Switch Spaces; RETUI saves the current Space automatically\n" +
                     "• Send text to the RETUI terminal\n\n" +
                     "RETUI → TASKER\n" +
                     "tasker Work\n" +

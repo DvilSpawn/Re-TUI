@@ -41,6 +41,8 @@ class MusicService : Service(), OnPreparedListener, MediaPlayer.OnErrorListener,
     private var songTitle: String? = Tuils.EMPTYSTRING
     private var shuffle = false
     private var playbackListener: PlaybackListener? = null
+    private var playbackSpeed = 1f
+    private var playerPrepared = false
 
     private var lastNotificationChange: Long = 0
 
@@ -118,6 +120,7 @@ class MusicService : Service(), OnPreparedListener, MediaPlayer.OnErrorListener,
 
     override fun onPrepared(mp: MediaPlayer) {
         if (songTitle == null || songTitle!!.length == 0) return
+        playerPrepared = true
         val startPosition = currentSong()?.getStartPositionMs() ?: 0
         if (startPosition > 0) {
             try {
@@ -126,6 +129,7 @@ class MusicService : Service(), OnPreparedListener, MediaPlayer.OnErrorListener,
                 Tuils.log(e)
             }
         }
+        applyPlaybackSpeed(mp)
         mp.start()
         broadcastMusicState()
     }
@@ -145,6 +149,19 @@ class MusicService : Service(), OnPreparedListener, MediaPlayer.OnErrorListener,
 
     fun setPlaybackListener(listener: PlaybackListener?) {
         playbackListener = listener
+    }
+
+    fun setPlaybackSpeed(speed: Float) {
+        playbackSpeed = speed.coerceIn(0.5f, 2f)
+        if (playerPrepared) player?.let(::applyPlaybackSpeed)
+    }
+
+    private fun applyPlaybackSpeed(mediaPlayer: MediaPlayer) {
+        try {
+            mediaPlayer.playbackParams = mediaPlayer.playbackParams.setSpeed(playbackSpeed)
+        } catch (e: Exception) {
+            Tuils.log(e)
+        }
     }
 
     private fun savePodcastProgress() {
@@ -169,6 +186,7 @@ class MusicService : Service(), OnPreparedListener, MediaPlayer.OnErrorListener,
 
     fun playSong(): String? {
         currentSong()?.let { playbackListener?.onProgress(it, posn, dur) }
+        playerPrepared = false
         try {
             player!!.reset()
         } catch (e: Exception) {
@@ -215,12 +233,14 @@ class MusicService : Service(), OnPreparedListener, MediaPlayer.OnErrorListener,
         if (player!!.getCurrentPosition() > 0) {
             val completed = currentSong()
             playbackListener?.onTrackCompleted(completed, posn, dur)
+            playerPrepared = false
             mp.reset()
             playNext()
         }
     }
 
     override fun onError(mp: MediaPlayer, what: Int, extra: Int): Boolean {
+        playerPrepared = false
         mp.reset()
         return false
     }
@@ -261,6 +281,7 @@ class MusicService : Service(), OnPreparedListener, MediaPlayer.OnErrorListener,
     }
 
     fun stop() {
+        playerPrepared = false
         try {
             player!!.stop()
         } catch (e: Exception) {
