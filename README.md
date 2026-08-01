@@ -14,9 +14,7 @@ Re:TUI supports Android 6.0 and newer and targets current Android APIs.
 
 ### ⌨️ Commands and Launcher Tools
 *   **`username [user] [device]`**: Instantly customize your terminal prompt. Changes both the username and device name and reloads the UI to apply.
-*   **`theme -preset [name]`**: Switch between the bundled themes.
-    *   **Available Presets:** `blue`, `red`, `green`, `pink`, `bw`, `cyberpunk`.
-    *   **Smart Suggestions:** Applying a preset automatically colors the suggestion bar and shortcut buttons to match the aesthetic.
+*   **`preset`**: Save, apply, list, and remove appearance presets with `preset -save`, `preset -apply`, `preset -ls`, and `preset -rm`. The same controls are available from **Settings → Appearance → Presets**.
 *   **`webhook`**: A scalable Webhook system featuring template-based HTTP POST requests.
     *   **Substitution:** Supports `%n` parameter substitution (e.g., `%1` for the first argument).
     *   **History:** Automatically tracks the last 5 unique sets of arguments for each webhook.
@@ -36,9 +34,6 @@ Re:TUI supports Android 6.0 and newer and targets current Android APIs.
 ### ✨ Enhanced Features
 *   **Termux Execution Layer:** Keep Linux tooling, scripts, and custom modules in Termux while Re:TUI stays focused on launcher UI and command routing.
 *   **Termux Tmux Workspace:** Optional tmux workspace for persistent TUIs, quick launchers, saved launch commands, prompt aliases, reconnect, and status diagnostics.
-*   **Theme Preset Shortcut Buttons:** Enhanced the `theme -preset` command to show interactive shortcut buttons for presets.
-*   **Synchronized Theme UI:** Applying a preset now automatically colors the shortcut buttons (suggestions) to match the overall theme.
-*   **One-Tap Application:** Shortcut buttons for theme presets execute immediately upon clicking.
 *   **Expanded Status Bar:** Support for up to 10 status lines (tv0-tv9) for richer information display.
 *   **Reminder Pane:** The dashboard module is a quick preview; the separate pane handles adding, editing, and removing reminders.
 *   **Native Weather:** The native `weather_native` module uses the location you choose, remains separate from Termux/wttr.in weather modules, and does not depend on Android location permission. Forecast data is provided by [MET Norway Locationforecast](https://api.met.no/weatherapi/locationforecast/2.0/documentation).
