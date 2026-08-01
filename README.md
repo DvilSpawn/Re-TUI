@@ -1,18 +1,20 @@
-# Re:T-UI Console Launcher
+# Re:TUI Console Launcher
 
-Personal fork and continuation of the original T-UI launcher, updated for modern Android versions and ongoing device testing.
+Re:TUI is my continuation of the original T-UI Launcher: a terminal-style Android home screen that still expects you to type, experiment, and make the phone feel like your own.
+
+The goal is not to turn T-UI into a conventional launcher with a terminal theme painted over it. I want to keep the command-first character that made the original special while making it practical on current Android versions. That means modern storage, safer integrations, touch-friendly panes where they genuinely help, and physical-device testing instead of assuming the emulator tells the whole story.
 
 ---
 
-## 🚀 Recent Changes & Modernization
+## 🚀 What Re:TUI Includes
 
-These updates ensure the launcher remains functional, secure, and performant on modern Android devices (Android 11 through Android 14+).
+Re:TUI supports Android 6.0 and newer and targets current Android APIs.
 
-> **Pro Tip:** On the very first install, if background transparency does not take effect immediately, simply type \`restart\` in the terminal and press enter.
+> **First-install note:** If background transparency does not take effect immediately, type `restart` and press Enter.
 
-### ⌨️ New Commands
+### ⌨️ Commands and Launcher Tools
 *   **`username [user] [device]`**: Instantly customize your terminal prompt. Changes both the username and device name and reloads the UI to apply.
-*   **`theme -preset [name]`**: Rapidly switch between high-quality pre-configured themes.
+*   **`theme -preset [name]`**: Switch between the bundled themes.
     *   **Available Presets:** `blue`, `red`, `green`, `pink`, `bw`, `cyberpunk`.
     *   **Smart Suggestions:** Applying a preset automatically colors the suggestion bar and shortcut buttons to match the aesthetic.
 *   **`webhook`**: A scalable Webhook system featuring template-based HTTP POST requests.
@@ -23,33 +25,42 @@ These updates ensure the launcher remains functional, secure, and performant on 
 *   **`module`**: Native, Lua, and Termux-backed modules are the recommended way to add launcher panels and scripted workflows.
 *   **`guide`**: A non-blocking command-first walkthrough that uses terminal output and the existing suggestion row instead of a first-run modal.
 *   **`space`**: Create, duplicate, rename, save, list, switch, and remove launcher Spaces, each with its own snapshot of launcher settings, module state, and command-facing configuration.
-*   **BusyBox manager removed**: Re:T-UI no longer downloads BusyBox; use `shell` for Android's built-in shell and Termux for maintained Linux tooling.
-*   **ASCII Art System**: A new header system that displays custom ASCII art on the dashboard. Controlled via `show_ascii`, `show_ascii_landscape`, `ascii_index`, and `ascii_size` in `Ui.xml`.
+*   **`reminder`**: Open the reminder pane or manage reminders directly from the terminal.
+    *   `reminder -add <task name> <dd/mm/yy> <HH:mm>` creates one using 24-hour time.
+    *   `reminder -ls` lists reminders with their IDs.
+    *   `reminder -rm <id>` removes one.
+*   **`tuiweather`**: Configure and refresh the native Weather module without granting Re:TUI location permission. Use `tuiweather -set_location <place or lat,lon>` and Re:TUI will reuse that saved location.
+*   **BusyBox manager removed**: Re:TUI no longer downloads BusyBox; use `shell` for Android's built-in shell and Termux for maintained Linux tooling.
+*   **ASCII Art System**: Display static or animated ASCII on the dashboard. The settings hub handles text import, frame animation, timing, placement, and landscape visibility.
 
 ### ✨ Enhanced Features
-*   **Termux Execution Layer:** Keep Linux tooling, scripts, and custom modules in Termux while Re:T-UI stays focused on launcher UI and command routing.
+*   **Termux Execution Layer:** Keep Linux tooling, scripts, and custom modules in Termux while Re:TUI stays focused on launcher UI and command routing.
 *   **Termux Tmux Workspace:** Optional tmux workspace for persistent TUIs, quick launchers, saved launch commands, prompt aliases, reconnect, and status diagnostics.
 *   **Theme Preset Shortcut Buttons:** Enhanced the `theme -preset` command to show interactive shortcut buttons for presets.
 *   **Synchronized Theme UI:** Applying a preset now automatically colors the shortcut buttons (suggestions) to match the overall theme.
 *   **One-Tap Application:** Shortcut buttons for theme presets execute immediately upon clicking.
 *   **Expanded Status Bar:** Support for up to 10 status lines (tv0-tv9) for richer information display.
+*   **Reminder Pane:** The dashboard module is a quick preview; the separate pane handles adding, editing, and removing reminders.
+*   **Native Weather:** The native `weather_native` module uses the location you choose, remains separate from Termux/wttr.in weather modules, and does not depend on Android location permission. Forecast data is provided by [MET Norway Locationforecast](https://api.met.no/weatherapi/locationforecast/2.0/documentation).
+*   **Shareable Presets:** Shareable configurations include `theme.xml`, `ui.xml`, and `suggestions.xml` while keeping personal values local. Imports enter the preset library instead of immediately overwriting the active launcher, and saved presets can be removed.
+*   **Optional Launcher Sounds:** A bundled sound pack can be enabled from **Settings → Behavior → Sounds**. Boot, command input, success, failure, notification, reminder, and timer sounds can each be switched on or off independently.
 
 ---
 
 ## Tasker Integration
 
-RETUI includes an optional native Tasker action plugin. Enable it in **Settings → Integrations → Tasker Integration**, then add **Plugin → RETUI Action** to a Tasker task.
+Re:TUI includes an optional native Tasker action plugin. Enable it in **Settings → Integrations → Tasker Integration**, then add **Plugin → RETUI Action** to a Tasker task.
 
-Supported actions apply a preset, set a theme color, show or refresh a module, update an existing script module's text, and print terminal output. Text fields accept Tasker variables. The integration is disabled by default and does not expose arbitrary RETUI commands, shell access, calls, messages, or destructive actions.
+Supported actions apply a preset, set a theme color, show or refresh a module, update an existing script module's text, print terminal output, and switch Re:TUI Spaces. Text fields accept Tasker variables, including the Space name. The integration is disabled by default and does not expose arbitrary Re:TUI commands, shell access, calls, messages, or destructive actions.
 
-RETUI can also start an existing named Tasker task. Grant the Tasker run-task permission when enabling the integration, and enable **Allow External Access** in Tasker:
+Re:TUI can also start an existing named Tasker task. Grant the Tasker run-task permission when enabling the integration, and enable **Allow External Access** in Tasker:
 
 ```text
 tasker Work
 tasker -run "Evening Setup"
 ```
 
-Tasker is optional; RETUI works normally when it is not installed.
+Tasker is optional; Re:TUI works normally when it is not installed.
 
 ## 🐧 Termux Integration
 
@@ -58,9 +69,9 @@ For a full Linux environment, use Termux as the execution layer:
 1.  Install Termux.
 2.  Run `termux-setup-storage` in Termux.
 3.  Enable `allow-external-apps=true` in Termux properties.
-4.  Run `tbridge -doctor` in Re:T-UI to verify the bridge.
+4.  Run `tbridge -doctor` in Re:TUI to verify the bridge.
 5.  Enable `show_tmux_workspace_button` when you want the optional persistent tmux workspace.
-6.  Use `termux`, `module`, and `files` for scripts, modules, and file workflows. `files -search <name> [type]` searches in Re:T-UI FM, while `files -open <directory>` opens a directory relative to the launcher path.
+6.  Use `termux`, `module`, and `files` for scripts, modules, and file workflows. `files -search <name> [type]` searches in Re:TUI FM, while `files -open <directory>` opens a directory relative to the launcher path.
 
 This keeps the launcher lean for Play Store builds while preserving power-user Linux workflows through an app that is designed to own them. The old BusyBox manager has been scrapped in favor of this Termux-first model.
 
@@ -71,18 +82,13 @@ This keeps the launcher lean for Play Store builds while preserving power-user L
 *   **Min SDK:** API 23 (Android 6.0).
 *   **AndroidX Migration:** Fully migrated from legacy Support Libraries to **AndroidX**.
 *   **Gradle & AGP:** Updated to Gradle 9.4.1 and Android Gradle Plugin 9.2.0.
-*   **Java Compatibility:** Built with **Java 17** support.
-
----
-
-## 🧪 Future Ideas
-*   **Animated ASCII Art:** Explore a low-power animated ASCII header using an AsciiAnimator-style plain text format with `[frame]` separators, capped FPS, and lifecycle-aware playback.
+*   **Build JDK:** Gradle builds run on **JDK 17+**; app bytecode remains compatible with Java 8.
 
 ---
 
 ## 📦 Release Channels and Support
 
-Re:T-UI now has a clear channel split:
+Re:TUI has a clear channel split:
 
 *   **Play Store:** Official stable release for normal users and the primary way to support development.
 *   **Firebase App Distribution:** Official beta/testing channel for invited testers, preview builds, and rapid validation.
@@ -94,9 +100,7 @@ Support expectations follow that split:
 *   **Firebase builds:** Supported on a testing / best-effort basis.
 *   **Self-built or forked builds:** Community / best-effort only.
 
-The project stays public because Re:T-UI benefits from open development, but the Play Store build is the canonical polished release for everyday use.
-
-For more detail, see **[docs/wiki/Support-and-Release-Channels.md](./docs/wiki/Support-and-Release-Channels.md)**.
+The project stays public because Re:TUI benefits from open development, but the Play Store build is the canonical polished release for everyday use.
 
 ---
 
@@ -105,13 +109,13 @@ For more detail, see **[docs/wiki/Support-and-Release-Channels.md](./docs/wiki/S
 This project uses the **OWASP Mobile Application Security Verification Standard (MASVS)** as a practical hardening checklist where it applies to a terminal-style launcher. This is an engineering posture, not a formal certification.
 
 ### 📦 MASVS-STORAGE: Data Storage and Privacy
-*   **Storage Work In Progress:** Re:T-UI is being modernized for safer storage handling across recent Android versions, with active work around launcher config compatibility and recovery.
+*   **Storage Work In Progress:** Re:TUI is being modernized for safer storage handling across recent Android versions, with active work around launcher config compatibility and recovery.
 *   **Backup Protection:** `android:allowBackup` is set to `false`, with backup/data-extraction rules excluding app data from cloud backup and device transfer.
 *   **Secure File Sharing:** Uses `FileProvider` for secure, permission-based file sharing instead of vulnerable `file://` URIs.
 
 ### 🌐 MASVS-NETWORK: Network Communication
 *   **Enforced TLS:** `android:usesCleartextTraffic` is disabled globally. All network communications are forced over **HTTPS** (TLS 1.2+).
-*   **Hardened Service Endpoints:** Internal services (Weather API, Connectivity checks) use secure HTTPS endpoints.
+*   **Hardened Service Endpoints:** Internal services, including MET Norway weather and connectivity checks, use secure HTTPS endpoints.
 
 ### ⚙️ MASVS-PLATFORM: Platform Interaction
 *   **Signature-Level Protection:** Implemented a custom permission `${applicationId}.permission.RECEIVE_CMD` (for the current package, `com.dvil.tui_renewed.permission.RECEIVE_CMD`) with `protectionLevel="signature"`. This ensures only apps signed with the same developer key can programmatically send commands to the launcher.
@@ -128,7 +132,6 @@ This project uses the **OWASP Mobile Application Security Verification Standard 
 
 **Project repo**&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**[GitHub.com](https://github.com/DvilSpawn/Re-TUI.git)**<br>
 **Project wiki**&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**[GitHub Wiki](https://github.com/DvilSpawn/Re-TUI/wiki)**<br>
-**Wiki in repo**&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**[docs/wiki/Home.md](./docs/wiki/Home.md)**<br>
 **Community**&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**[Reddit](https://www.reddit.com/r/RE_TUI_launcher/)**<br>
 **Chat**&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**[Discord](https://discord.gg/n6zsVYuV)**<br>
 **Email**&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**[DvilSpawn@gmail.com](mailto:DvilSpawn@gmail.com)**<br>
