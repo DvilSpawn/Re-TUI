@@ -50,6 +50,54 @@ enum class Behavior : XMLPrefsSave {
             return XMLPrefsSave.BOOLEAN
         }
     },
+    launcher_sounds {
+        override fun defaultValue(): String? {
+            return "false"
+        }
+
+        override fun info(): String? {
+            return "If true, Re:T-UI will play its bundled launcher sound pack"
+        }
+
+        override fun type(): String? {
+            return XMLPrefsSave.BOOLEAN
+        }
+    },
+    sound_boot {
+        override fun defaultValue(): String? = "true"
+        override fun info(): String? = "Play the launcher startup sound"
+        override fun type(): String? = XMLPrefsSave.BOOLEAN
+    },
+    sound_click {
+        override fun defaultValue(): String? = "true"
+        override fun info(): String? = "Play a sound when submitting launcher input"
+        override fun type(): String? = XMLPrefsSave.BOOLEAN
+    },
+    sound_success {
+        override fun defaultValue(): String? = "true"
+        override fun info(): String? = "Play the successful action sound"
+        override fun type(): String? = XMLPrefsSave.BOOLEAN
+    },
+    sound_failure {
+        override fun defaultValue(): String? = "true"
+        override fun info(): String? = "Play the failed or invalid action sound"
+        override fun type(): String? = XMLPrefsSave.BOOLEAN
+    },
+    sound_notification {
+        override fun defaultValue(): String? = "true"
+        override fun info(): String? = "Play the launcher module notification sound"
+        override fun type(): String? = XMLPrefsSave.BOOLEAN
+    },
+    sound_reminder {
+        override fun defaultValue(): String? = "true"
+        override fun info(): String? = "Play the launcher reminder sound"
+        override fun type(): String? = XMLPrefsSave.BOOLEAN
+    },
+    sound_timer {
+        override fun defaultValue(): String? = "true"
+        override fun info(): String? = "Play the timer completion sound"
+        override fun type(): String? = XMLPrefsSave.BOOLEAN
+    },
     songs_folder {
         override fun defaultValue(): String? {
             return ""
@@ -972,7 +1020,7 @@ enum class Behavior : XMLPrefsSave {
         }
 
         override fun info(): String? {
-            return "The key of your account on OpenWeatherMap. You can keep the default one, or create your custom key (check the wiki)"
+            return "Legacy OpenWeather setting. It is no longer used."
         }
 
         override fun type(): String? {
@@ -998,11 +1046,11 @@ enum class Behavior : XMLPrefsSave {
         }
 
         override fun info(): String? {
-            return "The ID of your country (check the wiki) or your coords separated by a comma (lat,lon)"
+            return "Place name or fixed coordinates separated by a comma (lat,lon). Weather never requests device location."
         }
 
         override fun type(): String? {
-            return XMLPrefsSave.INTEGER
+            return XMLPrefsSave.TEXT
         }
     },
     weather_format {
@@ -1128,7 +1176,7 @@ enum class Behavior : XMLPrefsSave {
         }
 
         override fun info(): String? {
-            return "The weather update time in seconds. This can only be used if you\'re using a custom weather key"
+            return "The weather update time in seconds"
         }
 
         override fun type(): String? {

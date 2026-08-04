@@ -42,10 +42,17 @@ object PresetManager {
     private val MAX_ENTRY_BYTES = 256 * 1024
     private val BUILT_IN_PRESETS =
         arrayOf<String?>("blue", "red", "green", "pink", "bw", "cyberpunk")
-    private val PRESET_XML_FILES = arrayOf<String>(
+    private val REQUIRED_PRESET_XML_FILES = arrayOf<String>(
         XMLPrefsManager.XMLPrefsRoot.THEME.path,
         XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS.path
     )
+    private val PRESET_XML_FILES = arrayOf<String>(
+        *REQUIRED_PRESET_XML_FILES,
+        XMLPrefsManager.XMLPrefsRoot.UI.path
+    )
+    private val SHAREABLE_UI = Ui.entries.filterNot {
+        it == Ui.username || it == Ui.deviceName || it == Ui.font_file || it == Ui.auto_color_pick
+    }.toTypedArray()
 
     val presetsDir: File
         get() = File(Tuils.getFolder(), PRESETS_FOLDER)
@@ -114,6 +121,34 @@ object PresetManager {
         return File(presetsDir, cleanName(name))
     }
 
+    fun remove(name: kotlin.String) {
+        val cleanName = cleanPresetPackageName(name)
+        val folder = File(presetsDir, cleanName)
+        val file = packageFile(cleanName)
+        require(folder.isDirectory || file.isFile) { "Saved preset not found" }
+        if (folder.exists()) Tuils.delete(folder)
+        if (file.exists() && !file.delete()) throw IllegalStateException("Unable to remove preset")
+        check(!folder.exists()) { "Unable to remove preset" }
+    }
+
+    internal fun importExtractedFolder(name: kotlin.String, source: File): kotlin.String {
+        validatePresetFolder(source)
+        val base = cleanPresetPackageName(name)
+        var cleanName = base
+        var suffix = 2
+        while (File(presetsDir, cleanName).exists() || packageFile(cleanName).exists()) {
+            cleanName = "$base ($suffix)"
+            suffix++
+        }
+        val presetFolder = File(presetsDir, cleanName)
+        check(presetFolder.mkdirs()) { "Unable to create preset folder" }
+        for (fileName in PRESET_XML_FILES) {
+            val sourceFile = File(source, fileName)
+            if (sourceFile.isFile) Tuils.copy(sourceFile, File(presetFolder, fileName))
+        }
+        return cleanName
+    }
+
     @Throws(Exception::class)
     fun save(name: kotlin.String) {
         val cleanName = cleanName(name)
@@ -127,6 +162,10 @@ object PresetManager {
         writeXml(
             File(presetFolder, XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS.path),
             XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS, Suggestions.entries.toTypedArray()
+        )
+        writeXml(
+            File(presetFolder, XMLPrefsManager.XMLPrefsRoot.UI.path),
+            XMLPrefsManager.XMLPrefsRoot.UI, SHAREABLE_UI
         )
 
         apply(cleanName)
@@ -162,6 +201,8 @@ object PresetManager {
         Tuils.insertOld(currentSuggestions)
         Tuils.copy(presetTheme, currentTheme)
         Tuils.copy(presetSuggestions, currentSuggestions)
+        val presetUi = File(presetFolder, XMLPrefsManager.XMLPrefsRoot.UI.path)
+        if (presetUi.isFile) applyUi(presetUi)
         LauncherSettings.setAutoColorPick(false)
     }
 
@@ -181,6 +222,8 @@ object PresetManager {
             addTextEntry(zip, MANIFEST_FILE, manifest(cleanName))
             addFileEntry(zip, XMLPrefsManager.XMLPrefsRoot.THEME.path, presetTheme)
             addFileEntry(zip, XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS.path, presetSuggestions)
+            val presetUi = File(presetFolder, XMLPrefsManager.XMLPrefsRoot.UI.path)
+            if (presetUi.isFile) addFileEntry(zip, XMLPrefsManager.XMLPrefsRoot.UI.path, presetUi)
         } finally {
             zip.close()
         }
@@ -220,10 +263,13 @@ object PresetManager {
 
         try {
             val children = folderChildren(context, treeUri)
-            for (fileName in PRESET_XML_FILES) {
+            for (fileName in REQUIRED_PRESET_XML_FILES) {
                 val child = children.get(fileName.lowercase(Locale.getDefault()))
                 requireNotNull(child) { "Preset folder is incomplete" }
                 copyUriToFile(context, child, File(tempFolder, fileName))
+            }
+            children[XMLPrefsManager.XMLPrefsRoot.UI.path.lowercase(Locale.getDefault())]?.let {
+                copyUriToFile(context, it, File(tempFolder, XMLPrefsManager.XMLPrefsRoot.UI.path))
             }
             validatePresetFolder(tempFolder)
 
@@ -231,6 +277,7 @@ object PresetManager {
             check(!(!presetFolder.exists() && !presetFolder.mkdirs())) { "Unable to create preset folder" }
 
             for (fileName in PRESET_XML_FILES) {
+                if (!File(tempFolder, fileName).isFile) continue
                 val dest = File(presetFolder, fileName)
                 if (dest.exists()) {
                     Tuils.insertOld(dest)
@@ -282,6 +329,7 @@ object PresetManager {
             check(!(!presetFolder.exists() && !presetFolder.mkdirs())) { "Unable to create preset folder" }
 
             for (fileName in PRESET_XML_FILES) {
+                if (!File(tempFolder, fileName).isFile) continue
                 val dest = File(presetFolder, fileName)
                 if (dest.exists()) {
                     Tuils.insertOld(dest)
@@ -391,6 +439,22 @@ object PresetManager {
             out.write(buffer, 0, read)
         }
         out.flush()
+    }
+
+    internal fun shareableUiXml(): String = xml(XMLPrefsRoot.UI, SHAREABLE_UI)
+
+    internal fun applyUi(file: File) {
+        validateXmlRoot(file, XMLPrefsRoot.UI.name)
+        val root = DocumentBuilderFactory.newInstance().apply { setExpandEntityReferences(false) }
+            .newDocumentBuilder().parse(file).documentElement
+        val allowed = SHAREABLE_UI.associateBy { it.label() }
+        val children = root.childNodes
+        for (index in 0 until children.length) {
+            val node = children.item(index)
+            val setting = allowed[node.nodeName] ?: continue
+            val value = node.attributes?.getNamedItem(XMLPrefsManager.VALUE_ATTRIBUTE)?.nodeValue ?: continue
+            LauncherSettings.setUi(setting, value)
+        }
     }
 
     fun applyBuiltIn(name: kotlin.String?): Boolean {
@@ -598,7 +662,8 @@ object PresetManager {
     @Throws(Exception::class)
     private fun extractPackage(packageFile: File?, tempFolder: File?) {
         val required: MutableSet<kotlin.String> = HashSet<kotlin.String>()
-        Collections.addAll<kotlin.String?>(required, *PRESET_XML_FILES)
+        Collections.addAll<kotlin.String?>(required, *REQUIRED_PRESET_XML_FILES)
+        val seen: MutableSet<kotlin.String> = HashSet<kotlin.String>()
         var hasManifest = false
 
         val zip = ZipInputStream(BufferedInputStream(FileInputStream(packageFile)))
@@ -612,8 +677,9 @@ object PresetManager {
 
                 val name = entry.getName()
                 require(!(name.contains("/") || name.contains("\\") || name.contains(".."))) { "Unsafe preset package" }
+                require(seen.add(name)) { "Preset package contains duplicate entries" }
 
-                val allowedXml = required.contains(name)
+                val allowedXml = PRESET_XML_FILES.contains(name)
                 require(!(!allowedXml && MANIFEST_FILE != name)) { "Unsupported preset package file: " + name }
 
                 val out = File(tempFolder, name)
@@ -632,7 +698,7 @@ object PresetManager {
 
                 if (MANIFEST_FILE == name) {
                     hasManifest = true
-                } else {
+                } else if (required.contains(name)) {
                     required.remove(name)
                 }
             }
@@ -653,6 +719,8 @@ object PresetManager {
             File(folder, XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS.path),
             XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS.name
         )
+        val ui = File(folder, XMLPrefsManager.XMLPrefsRoot.UI.path)
+        if (ui.isFile) validateXmlRoot(ui, XMLPrefsManager.XMLPrefsRoot.UI.name)
     }
 
     @Throws(Exception::class)
@@ -683,21 +751,27 @@ object PresetManager {
     }
 
     @Throws(Exception::class)
-    private fun writeXml(file: File?, root: XMLPrefsRoot, values: Array<XMLPrefsSave>) {
+    private fun writeXml(file: File?, root: XMLPrefsRoot, values: Array<out XMLPrefsSave>) {
+        val stream = FileOutputStream(file, false)
+        stream.write(xml(root, values).toByteArray())
+        stream.flush()
+        stream.close()
+    }
+
+    private fun xml(root: XMLPrefsRoot, values: Array<out XMLPrefsSave>): String {
         val xml: StringBuilder = StringBuilder(XMLPrefsManager.XML_DEFAULT)
         xml.append("<").append(root.name).append(">\n")
         for (value in values) {
             xml.append("\t<")
                 .append(value.label())
                 .append(" value=\"")
-                .append(LauncherSettings.getEffective(value))
+                .append(xmlEscape(LauncherSettings.getEffective(value)))
                 .append("\" />\n")
         }
         xml.append("</").append(root.name).append(">\n")
-
-        val stream = FileOutputStream(file, false)
-        stream.write(xml.toString().toByteArray())
-        stream.flush()
-        stream.close()
+        return xml.toString()
     }
+
+    private fun xmlEscape(value: String?): String = value.orEmpty()
+        .replace("&", "&amp;").replace("\"", "&quot;").replace("<", "&lt;").replace(">", "&gt;")
 }

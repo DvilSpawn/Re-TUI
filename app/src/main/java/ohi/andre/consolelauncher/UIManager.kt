@@ -98,7 +98,6 @@ import ohi.andre.consolelauncher.managers.RetuiThemeBridge
 import ohi.andre.consolelauncher.managers.TerminalManager
 import ohi.andre.consolelauncher.managers.ToolbarShortcutManager
 import ohi.andre.consolelauncher.managers.ToolbarShortcutManager.slot
-import ohi.andre.consolelauncher.managers.TuiLocationManager
 import ohi.andre.consolelauncher.managers.file.FileBackendManager
 import ohi.andre.consolelauncher.managers.modules.ModuleManager
 import ohi.andre.consolelauncher.managers.modules.ModuleDockButtonFactory
@@ -148,6 +147,7 @@ import ohi.andre.consolelauncher.managers.status.StorageManager
 import ohi.andre.consolelauncher.managers.status.TimeManager
 import ohi.andre.consolelauncher.managers.status.UnlockManager
 import ohi.andre.consolelauncher.managers.status.WeatherManager
+import ohi.andre.consolelauncher.managers.status.WeatherResponseParser
 import ohi.andre.consolelauncher.managers.suggestions.SuggestionTextWatcher
 import ohi.andre.consolelauncher.managers.suggestions.SuggestionsManager
 import ohi.andre.consolelauncher.managers.termux.TermuxBridgeCache.dirs
@@ -329,6 +329,10 @@ class UIManager(
     private var termuxHistoryDraft = ""
     private var termuxWorkingDirectory = TermuxBridgeManager.TERMUX_HOME
     private var termuxAppSession: TermuxAppManager.TermuxApp? = null
+    private var retainedTermuxAppId: String? = null
+    private var retainedTermuxInputDraft = ""
+    private var retainedTermuxAppFnKeyMode = false
+    private var pendingTermuxScrollRestore = -1
     private var termuxAppLastStatus: String? = null
     private var termuxAppRefreshGeneration = 0
     private var termuxAppDispatchSequence = 0
@@ -477,6 +481,9 @@ class UIManager(
     private var podcastMode = PODCAST_MODE_SHOWS
     private var podcastTagFilter: String? = null
     private var podcastEpisodeQuery = ""
+    private var podcastLastRenderedMode = -1
+    private var podcastRenderGeneration = 0
+    private var pendingPodcastScrollRestore = 0
     private var podcastSeekDragging = false
     private var podcastArtworkUrl: String? = null
     private var podcastStatus: String? = null
@@ -770,6 +777,7 @@ class UIManager(
     var showWeatherUpdate: Boolean = false
     private var weatherManager: WeatherManager? = null
     private var lastWeatherText: CharSequence? = null
+    private var lastWeatherSymbol: String? = null
     private var lastWeatherUpdateMillis: Long = 0
 
     //    you need to use labelIndexes[i]
@@ -3205,6 +3213,9 @@ class UIManager(
         if (startSession) {
             refreshTermuxWorkspace(true)
         }
+        if (termuxWorkspaceLocalCommandMode) {
+            renderTermuxWorkspaceLocalCommandDraft()
+        }
     }
 
     private fun handleTermuxWorkspaceExternalCommand(rawCommand: String?) {
@@ -5115,7 +5126,12 @@ class UIManager(
                 TerminalBorderRuntime.tabDrawable(context, terminalHeaderTabBackground())
             )
             chip.setOnClickListener(View.OnClickListener { v: View? ->
-                mTerminalAdapter?.executeQuietly(suggestion.action, suggestion.action)
+                val action = suggestion.action.orEmpty()
+                if (action.endsWith(" ")) {
+                    mTerminalAdapter?.setInput(action, null)
+                } else {
+                    mTerminalAdapter?.executeQuietly(action, action)
+                }
                 refreshSuggestionsForActiveModule()
             })
             val params = LinearLayout.LayoutParams(
@@ -5282,8 +5298,17 @@ class UIManager(
             showTextModule(ModuleManager.NOTES, buildNotesModuleText())
         } else if (ModuleManager.RSS == id) {
             showTextModule(ModuleManager.RSS, buildRssModuleText())
-        } else if (ModuleManager.WEATHER == id) {
-            showTextModule(ModuleManager.WEATHER, buildWeatherModuleText())
+        } else if (ModuleManager.WEATHER_NATIVE == id) {
+            if (weatherManager == null) {
+                weatherDelay = XMLPrefsManager.getInt(Behavior.weather_update_time) * 1000
+                weatherManager = WeatherManager(
+                    mContext!!,
+                    weatherDelay.toLong(),
+                    labelSizes[Label.weather.ordinal],
+                    statusUpdateListener
+                ).also { it.start() }
+            }
+            showTextModule(id, buildWeatherModuleText())
         } else {
             val source = ModuleManager.getModuleSource(mContext, id)
             if (ModuleManager.isLuaSource(source)) {
@@ -6616,7 +6641,7 @@ class UIManager(
     }
 
     private fun buildReminderModuleText(): String {
-        return ReminderManager.formatList(mContext!!) + "\nCommands: -add, -edit, -rm"
+        return ReminderManager.formatPreview(mContext!!) + "\nOpen: reminder -open"
     }
 
     private fun buildNotesModuleText(): String {
@@ -6654,23 +6679,21 @@ class UIManager(
     }
 
     private fun buildWeatherModuleText(): String {
-        if (!XMLPrefsManager.getBoolean(Ui.show_weather)) {
-            return ("Weather is disabled."
-                    + "\nEnable: tuiweather -enable"
-                    + "\nSetup: tuiweather -tutorial")
-        }
-
         var weather = lastWeatherText
         if (TextUtils.isEmpty(weather)) {
             weather = labelTexts[Label.weather.ordinal]
         }
         if (TextUtils.isEmpty(weather)) {
-            return ("No weather yet."
-                    + "\nUpdate: tuiweather -update"
-                    + "\nSetup: tuiweather -tutorial")
+            return "No weather yet."
         }
 
-        val out = StringBuilder(weather.toString().trim { it <= ' ' })
+        val out = StringBuilder()
+        val ascii = WeatherResponseParser.ascii(lastWeatherSymbol)
+        if (ascii.isNotEmpty()) out.append(ascii).append('\n')
+        XMLPrefsManager.get(Behavior.weather_location)?.trim()?.takeIf { it.isNotEmpty() }?.let {
+            out.append("Location: ").append(it).append('\n')
+        }
+        out.append(weather.toString().trim { it <= ' ' })
         if (lastWeatherUpdateMillis > 0) {
             val calendar = Calendar.getInstance()
             calendar.setTimeInMillis(lastWeatherUpdateMillis)
@@ -6683,7 +6706,7 @@ class UIManager(
                     )
                 )
         }
-        out.append("\nCommands: tuiweather -update, tuiweather -tutorial")
+        out.append("\nData: MET Norway (https://api.met.no/doc/License)")
         return out.toString()
     }
 
@@ -7117,6 +7140,8 @@ class UIManager(
 
         if (termuxInput != null) {
             applyRetuiKeyboardTheme(termuxInput, "termux")
+            termuxInput!!.setText(retainedTermuxInputDraft)
+            termuxInput!!.setSelection(termuxInput!!.text.length)
             termuxInput!!.setOnFocusChangeListener(OnFocusChangeListener { v: View?, hasFocus: Boolean ->
                 termuxInput!!.setCursorVisible(hasFocus)
                 termuxInput!!.setShowSoftInputOnFocus(hasFocus)
@@ -7839,6 +7864,7 @@ class UIManager(
                     if (s == null) return
 
                     lastWeatherText = s
+                    lastWeatherSymbol = intent.getStringExtra(WEATHER_SYMBOL)
                     lastWeatherUpdateMillis = System.currentTimeMillis()
                     s = Tuils.span(context, s, weatherColor, labelSizes[Label.weather.ordinal])
 
@@ -7851,39 +7877,8 @@ class UIManager(
                             ) + "." + c.get(Calendar.MINUTE) + Tuils.SPACE + "(" + lastLatitude + ", " + lastLongitude + ")"
                         Tuils.sendOutput(context, message, TerminalManager.CATEGORY_OUTPUT)
                     }
-                    if (ModuleManager.WEATHER == activeModule) {
-                        showHomeModule(ModuleManager.WEATHER)
-                    }
-                } else if (action == WeatherManager.ACTION_WEATHER_GOT_LOCATION) {
-                    if (intent.getBooleanExtra(TuiLocationManager.FAIL, false)) {
-                        if (weatherManager != null) {
-                            weatherManager!!.stop()
-                            weatherManager = null
-                        }
-
-                        val raw: CharSequence = context.getString(R.string.location_error)
-                        lastWeatherText = raw
-                        lastWeatherUpdateMillis = System.currentTimeMillis()
-                        val s: CharSequence = Tuils.span(
-                            context,
-                            raw,
-                            weatherColor,
-                            labelSizes[Label.weather.ordinal]
-                        )
-
-                        updateText(Label.weather, s)
-                        if (ModuleManager.WEATHER == activeModule) {
-                            showHomeModule(ModuleManager.WEATHER)
-                        }
-                    } else {
-                        lastLatitude = intent.getDoubleExtra(TuiLocationManager.LATITUDE, 0.0)
-                        lastLongitude = intent.getDoubleExtra(TuiLocationManager.LONGITUDE, 0.0)
-
-                        location = Tuils.locationName(context, lastLatitude, lastLongitude)
-
-                        if (weatherManager != null) {
-                            weatherManager!!.setLocation(lastLatitude, lastLongitude)
-                        }
+                    if (ModuleManager.WEATHER_NATIVE == activeModule) {
+                        showHomeModule(activeModule)
                     }
                 } else if (action == ACTION_WEATHER_DELAY) {
                     val c = Calendar.getInstance()
@@ -8039,6 +8034,8 @@ class UIManager(
         handler = Handler(Looper.getMainLooper())
 
         imm = mContext!!.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+
+        restoreLauncherSurfaceSession()
 
         if (cyberdeckMode()) {
             val bgColor =
@@ -9427,22 +9424,35 @@ class UIManager(
         closePodcastSurface(false)
         profilePaneController?.hide()
         closeLuaAppSession(true)
-        termuxAppSession = null
-        termuxAppLastStatus = null
-        resetTermuxAppRuntimeState(true)
-        resetTermuxAppCellViewport()
+        var normalized = if (command == null) Tuils.EMPTYSTRING else command.trim { it <= ' ' }
+        val restoringApp = normalized.isEmpty() && restoreRetainedTermuxApp()
+        if (!restoringApp) {
+            termuxAppSession = null
+            retainedTermuxAppId = null
+            termuxAppLastStatus = null
+            resetTermuxAppRuntimeState(true)
+            resetTermuxAppCellViewport()
+        }
         styleTermuxConsole()
         termuxOverlay!!.setVisibility(View.VISIBLE)
         termuxOverlay!!.bringToFront()
         hideHomeSuggestionsForTermux()
 
-        if (termuxBuffer.length == 0) {
+        if (restoringApp) {
+            renderTermuxAppFrame(
+                termuxBuffer.toString().takeIf { it.isNotBlank() },
+                "reattaching"
+            )
+            refreshTermuxAppSession(false)
+            scheduleTermuxAppRefreshBurst(termuxAppSession?.id, TERMUX_APP_MANUAL_REFRESH_WATCH_MS)
+        } else if (termuxBuffer.length == 0) {
             appendTermuxLine("Re:T-UI Termux console")
             appendTermuxLine("Type shell commands, help, status, open, run, clear, or exit.")
             appendTermuxLine("Non-interactive Termux commands run from here.")
+        } else {
+            updateTermuxOutput()
         }
 
-        var normalized = if (command == null) Tuils.EMPTYSTRING else command.trim { it <= ' ' }
         if (normalized.length > 0) {
             if (normalized.startsWith("-")) {
                 normalized = normalized.substring(1)
@@ -9450,6 +9460,7 @@ class UIManager(
             executeTermuxConsoleCommand(normalized)
         }
 
+        restoreTermuxScrollIfPending()
         scheduleTermuxConsoleFocusCapture(true)
     }
 
@@ -9477,6 +9488,8 @@ class UIManager(
         profilePaneController?.hide()
         closeLuaAppSession(true)
         termuxAppSession = null
+        retainedTermuxAppId = null
+        retainedTermuxAppFnKeyMode = false
         termuxAppLastStatus = null
         resetTermuxAppRuntimeState(true)
         resetTermuxAppCellViewport()
@@ -9580,7 +9593,6 @@ class UIManager(
         closeLuaAppSession(true)
         profilePaneController?.hide()
         stylePodcastSurface()
-        podcastMode = PODCAST_MODE_SHOWS
         podcastOverlay!!.visibility = View.VISIBLE
         podcastOverlay!!.bringToFront()
         applyPodcastPaneGeometry()
@@ -9619,6 +9631,11 @@ class UIManager(
     }
 
     private fun closePodcastSurface(restoreSuggestions: Boolean = true) {
+        if (restoreSuggestions) {
+            resetPodcastSurfaceSession()
+        } else {
+            capturePodcastSurfaceSession()
+        }
         podcastOverlay?.visibility = View.GONE
         if (restoreSuggestions) {
             clearPodcastCommandFromInput()
@@ -9635,6 +9652,120 @@ class UIManager(
         if (lower == "podcast" || lower.startsWith("podcast ")) {
             mTerminalAdapter!!.input = Tuils.EMPTYSTRING
         }
+    }
+
+    private fun restoreLauncherSurfaceSession() {
+        val session = LauncherSurfaceSessionStore.snapshot()
+        val podcast = session.podcast
+        podcastMode = podcast.mode.takeIf { it in PODCAST_MODE_SHOWS..PODCAST_MODE_PLAYER }
+            ?: PODCAST_MODE_SHOWS
+        podcastTagFilter = podcast.tagFilter
+        podcastEpisodeQuery = podcast.episodeQuery
+        pendingPodcastScrollRestore = podcast.scrollY.coerceAtLeast(0)
+
+        val termux = session.termux
+        termuxBuffer.setLength(0)
+        termuxBuffer.append(termux.consoleBuffer)
+        retainedTermuxInputDraft = termux.inputDraft
+        retainedTermuxAppId = termux.appId
+        retainedTermuxAppFnKeyMode = termux.appFnKeyMode
+        pendingTermuxScrollRestore = if (
+            termux.consoleBuffer.isNotEmpty() || termux.inputDraft.isNotEmpty() || termux.appId != null
+        ) termux.scrollY.coerceAtLeast(0) else -1
+        termuxWorkspaceFnKeyMode = termux.workspaceFnKeyMode
+        termuxWorkspaceLocalCommandMode = termux.workspaceLocalCommandMode
+        termuxWorkspaceLocalCommandBuffer.setLength(0)
+        termuxWorkspaceLocalCommandBuffer.append(termux.workspaceLocalCommandDraft)
+    }
+
+    private fun captureLauncherSurfaceSession() {
+        capturePodcastSurfaceSession()
+        captureTermuxSurfaceSession(termuxAppSession?.id ?: retainedTermuxAppId)
+    }
+
+    private fun capturePodcastSurfaceSession() {
+        val scrollY = if (isPodcastSurfaceVisible && podcastLastRenderedMode >= 0) {
+            podcastScroll?.scrollY ?: pendingPodcastScrollRestore
+        } else {
+            pendingPodcastScrollRestore
+        }
+        pendingPodcastScrollRestore = scrollY.coerceAtLeast(0)
+        LauncherSurfaceSessionStore.savePodcast(
+            PodcastSurfaceSession(
+                podcastMode,
+                podcastTagFilter,
+                podcastEpisodeQuery,
+                pendingPodcastScrollRestore
+            )
+        )
+    }
+
+    private fun resetPodcastSurfaceSession() {
+        podcastMode = PODCAST_MODE_SHOWS
+        podcastTagFilter = null
+        podcastEpisodeQuery = ""
+        podcastStatus = null
+        podcastLastRenderedMode = -1
+        pendingPodcastScrollRestore = 0
+        LauncherSurfaceSessionStore.resetPodcast()
+    }
+
+    private fun restorePodcastScrollAfterRender(generation: Int, scrollY: Int) {
+        pendingPodcastScrollRestore = scrollY.coerceAtLeast(0)
+        podcastScroll?.post(Runnable {
+            if (generation != podcastRenderGeneration) return@Runnable
+            podcastScroll?.scrollTo(0, pendingPodcastScrollRestore)
+        })
+    }
+
+    private fun captureTermuxSurfaceSession(appId: String?) {
+        val inputDraft = termuxInput?.text?.toString() ?: retainedTermuxInputDraft
+        val scrollY = if (isTermuxConsoleVisible) {
+            termuxScroll?.scrollY ?: pendingTermuxScrollRestore.coerceAtLeast(0)
+        } else {
+            pendingTermuxScrollRestore.coerceAtLeast(0)
+        }
+        retainedTermuxInputDraft = inputDraft
+        retainedTermuxAppId = appId
+        retainedTermuxAppFnKeyMode = if (appId == null) false else termuxFnKeyMode
+        pendingTermuxScrollRestore = scrollY.coerceAtLeast(0)
+        LauncherSurfaceSessionStore.saveTermux(
+            TermuxSurfaceSession(
+                termuxBuffer.toString(),
+                inputDraft,
+                pendingTermuxScrollRestore,
+                appId,
+                retainedTermuxAppFnKeyMode,
+                termuxWorkspaceFnKeyMode,
+                termuxWorkspaceLocalCommandMode,
+                termuxWorkspaceLocalCommandBuffer.toString()
+            )
+        )
+    }
+
+    private fun restoreRetainedTermuxApp(): Boolean {
+        val id = termuxAppSession?.id ?: retainedTermuxAppId ?: return false
+        val app = termuxAppSession ?: TermuxAppManager.resolve(mContext!!, id)
+        if (app == null) {
+            retainedTermuxAppId = null
+            retainedTermuxAppFnKeyMode = false
+            return false
+        }
+        termuxAppSession = app
+        retainedTermuxAppId = app.id
+        termuxAppLastStatus = null
+        resetTermuxAppRuntimeState(true)
+        termuxFnKeyMode = retainedTermuxAppFnKeyMode
+        resetTermuxAppCellViewport()
+        updateTermuxConsoleLabels()
+        return true
+    }
+
+    private fun restoreTermuxScrollIfPending() {
+        val scrollY = pendingTermuxScrollRestore
+        if (scrollY < 0) return
+        pendingTermuxScrollRestore = -1
+        termuxScroll?.post(Runnable { termuxScroll?.scrollTo(0, scrollY) })
     }
 
     private fun executePodcastCommand(rawCommand: String?) {
@@ -9711,6 +9842,13 @@ class UIManager(
             return
         }
 
+        val generation = ++podcastRenderGeneration
+        val targetScrollY = when {
+            podcastLastRenderedMode == podcastMode -> podcastScroll?.scrollY ?: pendingPodcastScrollRestore
+            podcastLastRenderedMode < 0 -> pendingPodcastScrollRestore
+            else -> 0
+        }.coerceAtLeast(0)
+        podcastLastRenderedMode = podcastMode
         podcastStatus = status
         applyPodcastPaneGeometry()
         updatePodcastTabStyle()
@@ -9743,7 +9881,7 @@ class UIManager(
         val manager = mainPack.podcastManager
         if (podcastMode == PODCAST_MODE_PLAYER) {
             renderPodcastPlayer()
-            podcastScroll?.post(Runnable { podcastScroll?.fullScroll(View.FOCUS_UP) })
+            restorePodcastScrollAfterRender(generation, targetScrollY)
             return
         }
 
@@ -9759,6 +9897,7 @@ class UIManager(
                 false,
                 null
             )
+            restorePodcastScrollAfterRender(generation, targetScrollY)
             return
         }
 
@@ -9768,7 +9907,7 @@ class UIManager(
             else -> renderPodcastShows(shows)
         }
 
-        podcastScroll?.post(Runnable { podcastScroll?.fullScroll(View.FOCUS_UP) })
+        restorePodcastScrollAfterRender(generation, targetScrollY)
     }
 
     private fun updatePodcastNowPlaying() {
@@ -10692,14 +10831,20 @@ class UIManager(
 
     private fun closeTermuxConsole(restoreSuggestions: Boolean = true) {
         termuxFocusCapturePending = false
+        captureTermuxSurfaceSession(
+            if (restoreSuggestions) null else (termuxAppSession?.id ?: retainedTermuxAppId)
+        )
         if (termuxOverlay != null) {
             termuxOverlay!!.setVisibility(View.GONE)
         }
         closeLuaAppSession(true)
-        termuxAppSession = null
-        termuxAppLastStatus = null
-        resetTermuxAppRuntimeState(true)
-        resetTermuxAppCellViewport()
+        if (restoreSuggestions) {
+            termuxAppSession = null
+            retainedTermuxAppId = null
+            termuxAppLastStatus = null
+            resetTermuxAppRuntimeState(true)
+            resetTermuxAppCellViewport()
+        }
         updateTermuxConsoleLabels()
         if (restoreSuggestions) {
             restoreHomeSuggestionsAfterTermux()
@@ -11623,6 +11768,8 @@ class UIManager(
         closeFileConsole(false)
         closeLuaAppSession(true)
         termuxAppSession = app
+        retainedTermuxAppId = app.id
+        retainedTermuxAppFnKeyMode = false
         termuxAppLastStatus = "starting"
         resetTermuxAppRuntimeState(true)
         styleTermuxConsole()
@@ -14362,7 +14509,12 @@ class UIManager(
 
     private class LuaSurfaceAction(val label: String, val run: Runnable)
 
+    fun preserveSurfaceSessionForReload() {
+        captureLauncherSurfaceSession()
+    }
+
     fun dispose() {
+        captureLauncherSurfaceSession()
         if (handler != null) {
             handler!!.removeCallbacksAndMessages(null)
             handler = null
@@ -14380,7 +14532,6 @@ class UIManager(
         }
         Tuils.unregisterBatteryReceiver(mContext)
 
-        Tuils.cancelFont()
     }
 
     private fun applyRetuiKeyboardTheme(input: EditText?, mode: String) {
@@ -14892,6 +15043,7 @@ class UIManager(
             BuildConfig.APPLICATION_ID + ".ui_weather_location"
         var ACTION_WEATHER_DELAY: String = BuildConfig.APPLICATION_ID + ".ui_weather_delay"
         var ACTION_WEATHER_MANUAL_UPDATE: String = BuildConfig.APPLICATION_ID + ".ui_weather_update"
+        const val WEATHER_SYMBOL: String = "weatherSymbol"
 
         val ACTION_MUSIC_CHANGED: String = MusicService.ACTION_MUSIC_CHANGED
         val SONG_TITLE: String = MusicService.SONG_TITLE

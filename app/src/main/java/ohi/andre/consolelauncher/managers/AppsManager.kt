@@ -1,6 +1,7 @@
 package ohi.andre.consolelauncher.managers
 
 import android.content.BroadcastReceiver
+import android.content.ActivityNotFoundException
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -725,8 +726,7 @@ class AppsManager(context: Context) : XMLPrefsElement {
         if (intent == null) {
             return false
         }
-        launchContext.startActivity(intent)
-        return true
+        return startActivitySafely { launchContext.startActivity(intent) }
     }
 
     fun getIntent(info: LaunchInfo?): Intent? {
@@ -734,8 +734,8 @@ class AppsManager(context: Context) : XMLPrefsElement {
             return null
         }
 
-        return Intent(Intent.ACTION_MAIN)
-            .addCategory(Intent.CATEGORY_LAUNCHER)
+        return Intent(APP_LAUNCH_ACTION)
+            .addCategory(APP_LAUNCH_CATEGORY)
             .setComponent(info.componentName)
             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED)
     }
@@ -1818,6 +1818,20 @@ class AppsManager(context: Context) : XMLPrefsElement {
     }
 
     companion object {
+        internal const val APP_LAUNCH_ACTION = Intent.ACTION_MAIN
+        internal const val APP_LAUNCH_CATEGORY = Intent.CATEGORY_LAUNCHER
+
+        internal fun startActivitySafely(startActivity: () -> Unit): Boolean = try {
+            startActivity()
+            true
+        } catch (_: ActivityNotFoundException) {
+            false
+        } catch (_: SecurityException) {
+            false
+        } catch (_: Throwable) {
+            false
+        }
+
         const val SHOWN_APPS: Int = 10
         const val HIDDEN_APPS: Int = 11
 

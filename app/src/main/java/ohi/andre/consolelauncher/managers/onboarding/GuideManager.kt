@@ -64,7 +64,7 @@ object GuideManager {
         Path(
             "customize",
             "Customize",
-            "Try wallpaper color, presets, theme commands, and config discovery.",
+            "Try wallpaper color, presets, appearance settings, and config discovery.",
             listOf(
                 Step(
                     "Derive colors",
@@ -77,9 +77,10 @@ object GuideManager {
                     "preset -ls"
                 ),
                 Step(
-                    "Read theme controls",
-                    "Theme command help shows the command route for precise color changes.",
-                    "help theme"
+                    "Open appearance settings",
+                    "The settings hub is the main route for precise appearance changes.",
+                    "settings",
+                    restoreOutputOnResume = true
                 ),
                 Step(
                     "Browse config",

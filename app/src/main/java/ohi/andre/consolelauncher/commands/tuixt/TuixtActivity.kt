@@ -21,6 +21,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import ohi.andre.consolelauncher.LauncherActivity
 import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog.ConfirmAction
 import ohi.andre.consolelauncher.commands.tuixt.TuixtLayout.addFoldAwareHost
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.borderColor
@@ -76,6 +77,8 @@ class TuixtActivity : Activity() {
 
         val intent = getIntent()
         asciiSettingsMode = MODE_ASCII_SETTINGS == intent.getStringExtra(MODE)
+        val onlySection = intent.getStringExtra(ONLY_SECTION)
+        val excludeSection = intent.getStringExtra(EXCLUDE_SECTION)
         val path = intent.getStringExtra(PATH)
         if (path == null && !asciiSettingsMode) {
             finish()
@@ -103,7 +106,13 @@ class TuixtActivity : Activity() {
         contentHost.addView(root, panelParams)
 
         val header = TextView(this)
-        header.setText(if (asciiSettingsMode) "ASCII Settings" else "Themer/ " + file!!.getName())
+        header.setText(
+            when {
+                asciiSettingsMode -> "ASCII Settings"
+                onlySection != null -> "Behavior/ $onlySection"
+                else -> "Themer/ " + file!!.getName()
+            }
+        )
         styleHeader(this, header)
         val headerParams = FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -180,7 +189,7 @@ class TuixtActivity : Activity() {
             if (saved) {
                 Toast.makeText(this, "Changes saved. Previewing launcher...", Toast.LENGTH_SHORT)
                     .show()
-                ThemerActivity.previewLauncher(this)
+                LauncherActivity.preview(this)
             }
         })
         btnLayout.addView(btnSave)
@@ -218,7 +227,13 @@ class TuixtActivity : Activity() {
                 override fun afterTextChanged(s: Editable?) {}
             })
         } else if (xmlRoot != null) {
-            originalRows = buildRows(xmlRoot!!, file!!)
+            originalRows = buildRows(xmlRoot!!, file!!).filter {
+                when {
+                    onlySection != null -> it.section == onlySection
+                    excludeSection != null -> it.section != excludeSection
+                    else -> true
+                }
+            }.toMutableList()
             adapter = TuixtAdapter(originalRows!!.toMutableList(), file)
             recyclerView!!.setAdapter(adapter)
 
@@ -655,7 +670,7 @@ class TuixtActivity : Activity() {
 
     private fun reloadLauncherForAscii(message: String) {
         notifyAsciiImport(message, false)
-        ThemerActivity.previewLauncher(this)
+        LauncherActivity.preview(this)
     }
 
     private fun notifyAsciiImport(message: String, error: Boolean) {
@@ -705,6 +720,8 @@ class TuixtActivity : Activity() {
         const val PATH: String = "path"
         const val MODE: String = "mode"
         const val MODE_ASCII_SETTINGS: String = "ascii_settings"
+        const val ONLY_SECTION: String = "only_section"
+        const val EXCLUDE_SECTION: String = "exclude_section"
         const val ERROR_KEY: String = "error"
         const val BACK_PRESSED: Int = 2
         const val SAVE_PRESSED: Int = 3

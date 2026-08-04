@@ -154,6 +154,7 @@ class TerminalManager(
         }
 
         if (input.length > 0) {
+            LauncherSoundManager.play(mContext, LauncherSoundManager.Event.CLICK)
             clearCmdsCount++
             if (clearCmdsCount != 0 && clearAfterCmds > 0 && clearCmdsCount % clearAfterCmds == 0) clear()
 

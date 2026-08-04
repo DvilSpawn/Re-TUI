@@ -148,6 +148,8 @@ object RetuiThemeBridge {
         bundle.putBoolean("cyberdeck_mode", AppearanceSettings.cyberdeckMode())
         bundle.putBoolean("enable_crt_filter", AppearanceSettings.crtFilter())
         bundle.putBoolean("crt_filter", AppearanceSettings.crtFilter())
+        bundle.putBoolean("enable_crt_vignette", AppearanceSettings.crtVignette())
+        bundle.putBoolean("crt_vignette", AppearanceSettings.crtVignette())
 
         contextLabel?.takeIf { it.isNotBlank() }?.let {
             bundle.putString("keyboard_context", it)

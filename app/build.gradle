@@ -34,7 +34,7 @@ android {
         applicationId = "com.dvil.tui_renewed"
         minSdk = 23
         targetSdk = 36
-        versionCode = 376
+        versionCode = 377
         versionName = "1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -146,6 +146,7 @@ def allowedResourceExtensions = [
         ".otf",
         ".png",
         ".ttf",
+        ".wav",
         ".webp",
         ".xml"
 ] as Set

@@ -2,6 +2,7 @@ package ohi.andre.consolelauncher.managers.suggestions
 
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Assert.assertEquals
 import org.junit.Test
 import ohi.andre.consolelauncher.commands.CommandAbstraction
 
@@ -29,5 +30,24 @@ class SuggestionsManagerTest {
                 intArrayOf(CommandAbstraction.PLAIN_TEXT)
             )
         )
+    }
+
+    @Test
+    fun intentSuggestionsUseReadableLabelsAndDispatchCommands() {
+        assertEquals(
+            listOf("intent -view", "intent -activity", "intent -broadcast", "intent -uri"),
+            SuggestionsManager.INTENT_ROOT_ACTIONS.map { it.second }
+        )
+        assertEquals(
+            listOf("Action (-a)", "Data URI (-d)", "MIME type (-t)", "Package (-p)", "Component (-n)"),
+            SuggestionsManager.INTENT_PARAMETERS.map { it.second }
+        )
+        assertFalse(SuggestionsManager.INTENT_ROOT_ACTIONS.any { it.second.contains("check") })
+    }
+
+    @Test
+    fun multiWordContactSuggestionReplacesPartialName() {
+        assertEquals("call", SuggestionsManager.Suggestion.contactCommandPrefix("call mako", "Mako Harish"))
+        assertEquals("cntcts -rm", SuggestionsManager.Suggestion.contactCommandPrefix("cntcts -rm mako", "Mako Harish"))
     }
 }

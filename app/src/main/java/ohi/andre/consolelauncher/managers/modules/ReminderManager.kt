@@ -11,6 +11,7 @@ import java.text.SimpleDateFormat
 import java.util.Collections
 import java.util.Date
 import java.util.Locale
+import java.util.Calendar
 import kotlin.math.abs
 import java.util.ArrayList
 
@@ -106,13 +107,45 @@ object ReminderManager {
         var index = 1
         for (reminder in reminders) {
             if (out.length > 0) out.append('\n')
-            out.append(index++)
-                .append(". ")
+            out.append("ID ").append(index++)
+                .append(": ")
                 .append(reminder.title)
                 .append(" @ ")
                 .append(formatWhen(reminder.atMillis))
         }
         return out.toString()
+    }
+
+    @JvmStatic
+    fun formatPreview(context: Context): String {
+        val reminders = list(context)
+        if (reminders.isEmpty()) return "No reminders."
+        val out = StringBuilder()
+        val limit = minOf(reminders.size, 3)
+        for (index in 0 until limit) {
+            if (out.isNotEmpty()) out.append('\n')
+            val reminder = reminders[index]
+            out.append(index + 1).append(". ").append(reminder.title)
+                .append(" @ ").append(formatWhen(reminder.atMillis))
+        }
+        if (reminders.size > limit) out.append("\n+").append(reminders.size - limit).append(" more")
+        return out.toString()
+    }
+
+    @JvmStatic
+    fun parseCliDateTime(date: String?, time: String?): Long? {
+        if (!safe(date).matches(Regex("\\d{2}/\\d{2}/\\d{2}")) ||
+            !safe(time).matches(Regex("(?:[01]\\d|2[0-3]):[0-5]\\d"))) return null
+        val (day, month, year) = safe(date).split('/').map(String::toInt)
+        return try {
+            Calendar.getInstance().apply {
+                isLenient = false
+                set(2000 + year, month - 1, day, safe(time).substring(0, 2).toInt(), safe(time).substring(3).toInt(), 0)
+                set(Calendar.MILLISECOND, 0)
+            }.timeInMillis
+        } catch (_: IllegalArgumentException) {
+            null
+        }
     }
 
     @JvmStatic

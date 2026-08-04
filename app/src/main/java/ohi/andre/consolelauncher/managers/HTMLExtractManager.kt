@@ -32,6 +32,7 @@ import org.w3c.dom.Node
 import org.w3c.dom.NodeList
 import java.util.ArrayList
 import java.util.LinkedHashMap
+import java.util.concurrent.atomic.AtomicBoolean
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.tuils.LongClickableSpan
@@ -40,6 +41,7 @@ import okhttp3.CacheControl
 import okhttp3.OkHttpClient
 import okhttp3.Response
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager.resetFile
+import ohi.andre.consolelauncher.managers.status.WeatherResponseParser
 
 /**
  * Created by francescoandreuzzi on 29/03/2018.
@@ -77,24 +79,30 @@ class HTMLExtractManager(context: Context, client: OkHttpClient) {
         url: String,
         weatherArea: Boolean
     ) {
+        if (weatherArea && !weatherQueryInFlight.compareAndSet(false, true)) return
         object : Thread() {
             override fun run() {
                 super.run()
 
                 if (!Tuils.hasInternetAccess()) {
                     Companion.output(R.string.no_internet, context, weatherArea)
+                    if (weatherArea) weatherQueryInFlight.set(false)
                     return
                 }
 
                 try {
                     val builder = Request.Builder()
                         .url(url)
-                        .cacheControl(CacheControl.Companion.FORCE_NETWORK)
                         .addHeader(
                             "User-Agent",
-                            "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:15.0) Gecko/20100101 Firefox/15.0.1"
+                            if (weatherArea) {
+                                "ReTUI-Launcher/${BuildConfig.VERSION_NAME} github.com/DvilSpawn/Re-TUI"
+                            } else {
+                                "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:15.0) Gecko/20100101 Firefox/15.0.1"
+                            }
                         )
                         .get()
+                    if (!weatherArea) builder.cacheControl(CacheControl.Companion.FORCE_NETWORK)
 
                     client.newCall(builder.build()).execute().use { response ->
                         if (response.code == 429 && weatherArea) {
@@ -129,8 +137,11 @@ class HTMLExtractManager(context: Context, client: OkHttpClient) {
                         var output: CharSequence? = Tuils.span(Tuils.EMPTYSTRING, outputColor) ?: SpannableString(Tuils.EMPTYSTRING)
                         if (weatherArea) {
                             val json: String = Tuils.inputStreamToString(inputStream) ?: Tuils.EMPTYSTRING
+                            val snapshot = WeatherResponseParser.parse(
+                                json,
+                                XMLPrefsManager.get(Behavior.weather_temperature_measure) ?: "metric"
+                            ) ?: throw IllegalArgumentException(context.getString(R.string.weather_response_invalid))
 
-                            //                        json = json.replaceAll("\"temp\":([\\d\\.]*)", "\"temp\":-4.3");
                             var o: CharSequence = Tuils.span(weatherFormat, weatherColor) ?: SpannableString(weatherFormat)
 
                             val m = weatherFormatPattern.matcher(weatherFormat)
@@ -140,16 +151,9 @@ class HTMLExtractManager(context: Context, client: OkHttpClient) {
                                 if (delay == null || delay.length == 0) delay = "1"
                                 val converter = m.group(3)
 
-                                val stopAt = delay.toInt()
-
-                                val p =
-                                    Pattern.compile("\"" + name + "\":(?:\"([^\"]+)\"|(-?\\d+\\.?\\d*))")
-                                val m1 = p.matcher(json)
-                                var c = 1
-                                while (m1.find()) {
-                                    if (c == stopAt) {
-                                        var value = m1.group(1)
-                                        if (value == null || value.length == 0) value = m1.group(2)
+                                if (delay.toInt() == 1) {
+                                    var value = snapshot.values[name]
+                                    if (value != null) {
 
                                         if (converter != null && converter.length > 0) {
                                             try {
@@ -166,9 +170,7 @@ class HTMLExtractManager(context: Context, client: OkHttpClient) {
                                                 delimiterStart + value + delimiterEnd
                                             )
                                         )
-
-                                        break
-                                    } else c++
+                                    }
                                 }
                             }
 
@@ -177,6 +179,7 @@ class HTMLExtractManager(context: Context, client: OkHttpClient) {
 
                             val i: Intent = Intent(UIManager.ACTION_WEATHER)
                             i.putExtra(XMLPrefsManager.VALUE_ATTRIBUTE, o)
+                            i.putExtra(UIManager.WEATHER_SYMBOL, snapshot.symbolCode)
                             LocalBroadcastManager.getInstance(context.getApplicationContext())
                                 .sendBroadcast(i)
                         } else if (pathType == StoreableValue.Type.xpath) {
@@ -285,6 +288,8 @@ class HTMLExtractManager(context: Context, client: OkHttpClient) {
                     output(e.toString(), context, weatherArea)
                     Tuils.toFile(e)
                     Tuils.log(e)
+                } finally {
+                    if (weatherArea) weatherQueryInFlight.set(false)
                 }
             }
         }.start()
@@ -714,6 +719,7 @@ class HTMLExtractManager(context: Context, client: OkHttpClient) {
         var NAME: String = "HTMLEXTRACT"
 
         var broadcastCount: Int = 0
+        private val weatherQueryInFlight = AtomicBoolean(false)
 
         private fun output(string: Int, context: Context, weatherArea: Boolean) {
             output(context.getString(string), context, weatherArea)

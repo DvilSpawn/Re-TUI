@@ -33,7 +33,6 @@ interface CommandAbstraction {
         const val LONG = 30
         const val BOUND_REPLY_APP = 31
         const val DATASTORE_PATH_TYPE = 32
-        const val THEME_PRESET = 33
         const val PRESET_NAME = 34
         const val SPACE_TARGET = 35
         const val SPACE_RENAME_NAME = 36

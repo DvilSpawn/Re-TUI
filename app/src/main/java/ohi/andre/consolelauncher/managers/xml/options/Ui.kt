@@ -296,6 +296,19 @@ enum class Ui : XMLPrefsSave {
             return "If true, Re:T-UI will derive runtime theme colors from your wallpaper and override manual theme colors"
         }
     },
+    enable_crt_vignette {
+        override fun defaultValue(): String? {
+            return "true"
+        }
+
+        override fun type(): String? {
+            return XMLPrefsSave.BOOLEAN
+        }
+
+        override fun info(): String? {
+            return "If true, the CRT filter darkens screen edges with a radial vignette"
+        }
+    },
     font_file {
         override fun defaultValue(): String? {
             return ""

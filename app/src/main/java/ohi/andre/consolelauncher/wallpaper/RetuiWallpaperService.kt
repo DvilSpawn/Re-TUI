@@ -14,13 +14,26 @@ import android.view.SurfaceHolder
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.annotation.RequiresApi
+import ohi.andre.consolelauncher.managers.settings.AppearanceSettings
+import ohi.andre.consolelauncher.managers.settings.LauncherSettings
+import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
+import ohi.andre.consolelauncher.managers.xml.options.Theme
+import ohi.andre.consolelauncher.tuils.CrtOverlayDrawable
 
 class RetuiWallpaperService : WallpaperService() {
+    override fun onCreate() {
+        super.onCreate()
+        XMLPrefsManager.loadCommons(this)
+    }
+
     override fun onCreateEngine(): Engine = RetuiEngine()
 
     private inner class RetuiEngine : Engine() {
         private val handler = Handler(Looper.getMainLooper())
         private val powerManager = getSystemService(PowerManager::class.java)
+        private val crtOverlay = CrtOverlayDrawable(this@RetuiWallpaperService).apply {
+            setAccentColor(LauncherSettings.getColor(Theme.output_text_color))
+        }
         private var view: View = createView()
         private var visible = false
         private var fullRedrawPending = true
@@ -37,7 +50,7 @@ class RetuiWallpaperService : WallpaperService() {
             override fun run() {
                 if (!canDraw()) return
                 if (draw(fullSurface = fullRedrawPending)) fullRedrawPending = false
-                if (canDraw()) {
+                if (canDraw() && view !is SolidColorView) {
                     handler.postDelayed(this, frameDelayMs())
                 }
             }
@@ -62,7 +75,7 @@ class RetuiWallpaperService : WallpaperService() {
             handler.removeCallbacks(drawFrame)
             if (visible) {
                 val selected = RetuiWallpaperSettings.scene(this@RetuiWallpaperService)
-                if ((selected == "black hole") != (view is BlackHoleView)) {
+                if (!viewMatchesScene(selected)) {
                     view = createView()
                     layoutView(surfaceHolder.surfaceFrame.width(), surfaceHolder.surfaceFrame.height())
                 }
@@ -78,7 +91,8 @@ class RetuiWallpaperService : WallpaperService() {
         @RequiresApi(27)
         override fun onComputeColors(): WallpaperColors = when (val current = view) {
             is BlackHoleView -> current.wallpaperColors()
-            else -> (current as CsakuraView).wallpaperColors()
+            is CsakuraView -> current.wallpaperColors()
+            else -> (current as SolidColorView).wallpaperColors()
         }
 
         override fun onSurfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
@@ -142,6 +156,10 @@ class RetuiWallpaperService : WallpaperService() {
                     is CsakuraView -> current.advance()
                 }
                 current.draw(canvas)
+                if (AppearanceSettings.crtFilter()) {
+                    crtOverlay.setBounds(0, 0, current.width, current.height)
+                    crtOverlay.draw(canvas)
+                }
             } finally {
                 surfaceHolder.unlockCanvasAndPost(canvas)
             }
@@ -153,10 +171,16 @@ class RetuiWallpaperService : WallpaperService() {
             else -> 1000L / CsakuraView.FPS
         }
 
-        private fun createView(): View = if (RetuiWallpaperSettings.scene(this@RetuiWallpaperService) == "black hole") {
-            BlackHoleView(this@RetuiWallpaperService).apply { loadPosition() }
-        } else {
-            CsakuraView(this@RetuiWallpaperService).apply { loadPosition() }
+        private fun createView(): View = when (RetuiWallpaperSettings.scene(this@RetuiWallpaperService)) {
+            "black hole" -> BlackHoleView(this@RetuiWallpaperService).apply { loadPosition() }
+            "solid" -> SolidColorView(this@RetuiWallpaperService)
+            else -> CsakuraView(this@RetuiWallpaperService).apply { loadPosition() }
+        }
+
+        private fun viewMatchesScene(scene: String): Boolean = when (scene) {
+            "black hole" -> view is BlackHoleView
+            "solid" -> view is SolidColorView
+            else -> view is CsakuraView
         }
 
         private fun loadPosition() = when (val current = view) {

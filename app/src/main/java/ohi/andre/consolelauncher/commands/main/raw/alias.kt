@@ -7,6 +7,7 @@ import ohi.andre.consolelauncher.commands.CommandAbstraction
 import ohi.andre.consolelauncher.commands.ExecutePack
 import ohi.andre.consolelauncher.commands.main.MainPack
 import ohi.andre.consolelauncher.commands.main.specific.ParamCommand
+import ohi.andre.consolelauncher.commands.tuixt.WidgetEditorActivity
 import ohi.andre.consolelauncher.managers.AliasManager
 import ohi.andre.consolelauncher.tuils.Tuils
 import java.util.ArrayList
@@ -48,7 +49,7 @@ class alias : ParamCommand() {
         },
         file {
             override fun exec(pack: ExecutePack): String? {
-                pack.context.startActivity(Tuils.openFile(pack.context, File(Tuils.getFolder(), AliasManager.PATH)))
+                WidgetEditorActivity.openFile(pack.context, File(Tuils.getFolder(), AliasManager.PATH))
                 return null
             }
 

@@ -40,6 +40,8 @@ import java.util.ArrayList
 import java.util.HashMap
 import java.util.Map
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings
+import ohi.andre.consolelauncher.managers.ToolbarShortcutManager
+import ohi.andre.consolelauncher.managers.xml.options.Toolbar
 
 class TuixtAdapter(rows: MutableList<SettingsRow>, private val file: File?) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -152,6 +154,12 @@ class TuixtAdapter(rows: MutableList<SettingsRow>, private val file: File?) :
             settingHolder.input.setVisibility(View.GONE)
             settingHolder.options.setVisibility(View.VISIBLE)
             bindOptionSwitch(settingHolder, item, arrayOf<String>("normal", "arrows", "none"))
+        } else if (item === Toolbar.shortcut_button_1_icon || item === Toolbar.shortcut_button_2_icon) {
+            settingHolder.toggle.setVisibility(View.GONE)
+            settingHolder.colorPreview.setVisibility(View.GONE)
+            settingHolder.input.setVisibility(View.GONE)
+            settingHolder.options.setVisibility(View.VISIBLE)
+            bindToolbarIconPicker(settingHolder, item, currentValue)
         } else if (XMLPrefsSave.BOOLEAN == item.type()) {
             settingHolder.toggle.setVisibility(View.VISIBLE)
             settingHolder.colorPreview.setVisibility(View.GONE)
@@ -298,6 +306,51 @@ class TuixtAdapter(rows: MutableList<SettingsRow>, private val file: File?) :
             })
             holder.options.addView(button)
         }
+    }
+
+    private fun bindToolbarIconPicker(holder: ViewHolder, item: XMLPrefsSave, currentValue: String?) {
+        val context = holder.itemView.context
+        val selected = ToolbarShortcutManager.normalizeIcon(currentValue)
+        val choice = ToolbarShortcutManager.icons().first { it.key == selected }
+        val button = TextView(context)
+        button.text = choice.label.uppercase()
+        button.gravity = Gravity.CENTER_VERTICAL
+        button.setCompoundDrawablesWithIntrinsicBounds(choice.drawableRes, 0, 0, 0)
+        button.compoundDrawablePadding = dp(context, 10f)
+        styleButton(context, button, true)
+        button.setOnClickListener {
+            TuixtDialog.showCustom(context, "Toolbar Icon", TuixtDialog.ContentFactory { dialog ->
+                val content = LinearLayout(context)
+                content.orientation = LinearLayout.VERTICAL
+                for (icon in ToolbarShortcutManager.icons()) {
+                    val row = TextView(context)
+                    row.text = icon.label.uppercase()
+                    row.gravity = Gravity.CENTER_VERTICAL
+                    row.setCompoundDrawablesWithIntrinsicBounds(icon.drawableRes, 0, 0, 0)
+                    row.compoundDrawablePadding = dp(context, 12f)
+                    TuixtTheme.styleListItem(context, row, icon.key == selected)
+                    val params = LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                    )
+                    params.bottomMargin = dp(context, 8f)
+                    content.addView(row, params)
+                    row.setOnClickListener {
+                        pendingChanges[item] = icon.key
+                        dialog?.dismiss()
+                        notifyDataSetChanged()
+                    }
+                }
+                content
+            })
+        }
+        holder.options.addView(
+            button,
+            LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+        )
     }
 
     private fun updateColorPreview(view: View, hex: String?) {

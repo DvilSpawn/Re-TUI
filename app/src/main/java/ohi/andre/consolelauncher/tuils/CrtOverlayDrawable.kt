@@ -11,6 +11,7 @@ import android.graphics.Rect
 import android.graphics.Shader
 import android.graphics.drawable.Drawable
 import kotlin.math.max
+import ohi.andre.consolelauncher.managers.settings.AppearanceSettings
 
 class CrtOverlayDrawable(context: Context) : Drawable() {
     private val density = context.resources.displayMetrics.density
@@ -31,9 +32,9 @@ class CrtOverlayDrawable(context: Context) : Drawable() {
         strokeWidth = 1f
         color = Color.argb(18, 0, 0, 0)
     }
-    private val vignettePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        style = Paint.Style.FILL
-    }
+    private val vignettePaint = if (AppearanceSettings.crtVignette()) {
+        Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.FILL }
+    } else null
     private val scanlineStepPx = max(3f, density * 3f)
     private val scanlineHeightPx = max(1f, density)
     private val beamHeightPx = max(1f, density * 0.5f)
@@ -51,11 +52,7 @@ class CrtOverlayDrawable(context: Context) : Drawable() {
 
     override fun onBoundsChange(bounds: Rect) {
         super.onBoundsChange(bounds)
-        if (bounds.isEmpty) {
-            vignettePaint.shader = null
-            return
-        }
-        vignettePaint.shader = RadialGradient(
+        vignettePaint?.shader = if (bounds.isEmpty) null else RadialGradient(
             bounds.exactCenterX(),
             bounds.exactCenterY(),
             max(bounds.width(), bounds.height()) * 0.72f,
@@ -91,8 +88,7 @@ class CrtOverlayDrawable(context: Context) : Drawable() {
             canvas.drawLine(x, b.top.toFloat(), x, b.bottom.toFloat(), maskPaint)
             x += maskStepPx
         }
-
-        canvas.drawRect(b, vignettePaint)
+        vignettePaint?.let { canvas.drawRect(b, it) }
     }
 
     override fun setAlpha(alpha: Int) {
@@ -100,7 +96,7 @@ class CrtOverlayDrawable(context: Context) : Drawable() {
         scanlinePaint.alpha = alpha
         beamPaint.alpha = alpha
         maskPaint.alpha = alpha
-        vignettePaint.alpha = alpha
+        vignettePaint?.alpha = alpha
         invalidateSelf()
     }
 
@@ -109,7 +105,7 @@ class CrtOverlayDrawable(context: Context) : Drawable() {
         scanlinePaint.colorFilter = colorFilter
         beamPaint.colorFilter = colorFilter
         maskPaint.colorFilter = colorFilter
-        vignettePaint.colorFilter = colorFilter
+        vignettePaint?.colorFilter = colorFilter
         invalidateSelf()
     }
 

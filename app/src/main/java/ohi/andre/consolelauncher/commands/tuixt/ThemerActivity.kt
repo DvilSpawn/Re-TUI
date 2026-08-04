@@ -13,6 +13,7 @@ import android.os.Handler
 import android.os.Looper
 import android.graphics.PorterDuff
 import android.provider.OpenableColumns
+import android.provider.DocumentsContract
 import android.text.InputType
 import android.util.Log
 import android.view.Gravity
@@ -97,7 +98,8 @@ class ThemerActivity : AppCompatActivity() {
     private var sectionsAdapter: RecyclerView.Adapter<ViewHolder?>? = null
     private val sectionItems: MutableList<String> = ArrayList<String>()
     private var section: String? = null
-    private var pendingBackupUri: Uri? = null
+    private var pendingBackupPassword: String? = null
+    private var backupExportPending = false
     private var pendingRestoreUri: Uri? = null
     private var pendingShareablePresetName: String? = null
 
@@ -184,6 +186,8 @@ class ThemerActivity : AppCompatActivity() {
                         openSection(SECTION_APPEARANCE)
                     } else if (fileName == "Behavior") {
                         openSection(SECTION_BEHAVIOR)
+                    } else if (fileName == "Sounds") {
+                        openSoundsSettings()
                     } else if (fileName == "Personalization") {
                         openSection(SECTION_PERSONALIZATION)
                     } else if (fileName == "ASCII Settings") {
@@ -224,7 +228,7 @@ class ThemerActivity : AppCompatActivity() {
                             openSettingsChild(intent)
                         }
                     } else if (fileName == "Backup") {
-                        launchBackupPicker()
+                        showBackupProtectionDialog()
                     } else if (fileName == "Create Shareable Configuration") {
                         showShareableConfigurationSourcePicker()
                     } else if (fileName == "Restore") {
@@ -316,7 +320,7 @@ class ThemerActivity : AppCompatActivity() {
     }
 
     private fun showPresetsDialog() {
-        val options = mutableListOf<String?>("Save Current as Preset", "Apply Preset")
+        val options = mutableListOf<String?>("Save Current as Preset", "Apply Preset", "Remove Preset")
         TuixtDialog.showOptions(this@ThemerActivity, "Presets", options, ItemAction { which: Int ->
             if (which == 0) {
                 TuixtDialog.showInput(
@@ -331,7 +335,7 @@ class ThemerActivity : AppCompatActivity() {
                             savePreset(name)
                         }
                     })
-            } else {
+            } else if (which == 1) {
                 val presetNames = PresetManager.listAllPresetNames()
                 if (presetNames.isEmpty()) {
                     Toast.makeText(this@ThemerActivity, "No presets found.", Toast.LENGTH_SHORT)
@@ -344,6 +348,26 @@ class ThemerActivity : AppCompatActivity() {
                     "Select Preset",
                     presetNames,
                     ItemAction { w: Int -> applyPreset(presetNames.get(w)) })
+            } else {
+                val presetNames = PresetManager.listSavedPresetFolders()
+                if (presetNames.isEmpty()) {
+                    Toast.makeText(this@ThemerActivity, "No removable presets found.", Toast.LENGTH_SHORT).show()
+                    return@ItemAction
+                }
+                TuixtDialog.showOptions(this@ThemerActivity, "Remove Preset", presetNames, ItemAction { w: Int ->
+                    val name = presetNames[w] ?: return@ItemAction
+                    TuixtDialog.showConfirm(
+                        this@ThemerActivity, "Remove Preset", "Remove $name?", "Remove", "Cancel",
+                        ConfirmAction {
+                            try {
+                                PresetManager.remove(name)
+                                Toast.makeText(this@ThemerActivity, "Preset removed.", Toast.LENGTH_SHORT).show()
+                            } catch (e: Exception) {
+                                Toast.makeText(this@ThemerActivity, e.message, Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    )
+                })
             }
         })
     }
@@ -365,7 +389,7 @@ class ThemerActivity : AppCompatActivity() {
             Toast.makeText(this@ThemerActivity, "Preset applied! Reloading...", Toast.LENGTH_SHORT)
                 .show()
             recyclerView!!.postDelayed(Runnable {
-                previewLauncher(this)
+                LauncherActivity.preview(this)
             }, 500)
         } catch (e: Exception) {
             Toast.makeText(this@ThemerActivity, e.message, Toast.LENGTH_SHORT).show()
@@ -401,6 +425,7 @@ class ThemerActivity : AppCompatActivity() {
             )
         } else if (SECTION_BEHAVIOR == section) {
             return mutableListOf(
+                "Sounds",
                 "behavior.xml",
                 "apps.xml",
                 "notifications.xml",
@@ -626,6 +651,16 @@ class ThemerActivity : AppCompatActivity() {
     private fun openConfigFile(fileName: String) {
         val intent = Intent(this@ThemerActivity, TuixtActivity::class.java)
         intent.putExtra(TuixtActivity.PATH, File(Tuils.getFolder(), fileName).getAbsolutePath())
+        if (fileName == "behavior.xml") {
+            intent.putExtra(TuixtActivity.EXCLUDE_SECTION, "Sounds")
+        }
+        openSettingsChild(intent)
+    }
+
+    private fun openSoundsSettings() {
+        val intent = Intent(this@ThemerActivity, TuixtActivity::class.java)
+        intent.putExtra(TuixtActivity.PATH, File(Tuils.getFolder(), "behavior.xml").getAbsolutePath())
+        intent.putExtra(TuixtActivity.ONLY_SECTION, "Sounds")
         openSettingsChild(intent)
     }
 
@@ -753,7 +788,7 @@ class ThemerActivity : AppCompatActivity() {
 
     private fun reloadLauncherForToolbarButtons(message: String?) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-        previewLauncher(this)
+        LauncherActivity.preview(this)
     }
 
     private fun commandInput(hint: String?): EditText {
@@ -1009,7 +1044,7 @@ class ThemerActivity : AppCompatActivity() {
         Toast.makeText(this, message + " Reloading...", Toast.LENGTH_SHORT).show()
 
         recyclerView!!.postDelayed(Runnable {
-            previewLauncher(this)
+            LauncherActivity.preview(this)
         }, 500)
     }
 
@@ -1050,9 +1085,27 @@ class ThemerActivity : AppCompatActivity() {
         try {
             startActivityForResult(intent, BACKUP_EXPORT_REQUEST)
         } catch (e: ActivityNotFoundException) {
+            pendingBackupPassword = null
+            backupExportPending = false
             Toast.makeText(this, "Backup picker is unavailable on this device.", Toast.LENGTH_SHORT)
                 .show()
         }
+    }
+
+    private fun showBackupProtectionDialog() {
+        TuixtDialog.showOptions(
+            this,
+            "Backup Protection",
+            mutableListOf<String?>("Encrypt with Password", "Export Without Password"),
+            ItemAction { which: Int ->
+                if (which == 0) {
+                    showBackupPasswordDialog()
+                } else {
+                    pendingBackupPassword = null
+                    backupExportPending = true
+                    launchBackupPicker()
+                }
+            })
     }
 
     private fun showShareableConfigurationSourcePicker() {
@@ -1342,7 +1395,7 @@ class ThemerActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == LauncherActivity.TUIXT_REQUEST && resultCode == TuixtActivity.SAVE_PRESSED) {
-            previewLauncher(this)
+            LauncherActivity.preview(this)
         } else if (requestCode == BACKUP_EXPORT_REQUEST) {
             handleBackupResult(resultCode, data)
         } else if (requestCode == SHAREABLE_CONFIG_EXPORT_REQUEST) {
@@ -1476,22 +1529,19 @@ class ThemerActivity : AppCompatActivity() {
 
     private fun handleBackupResult(resultCode: Int, data: Intent?) {
         if (resultCode != RESULT_OK || data == null || data.getData() == null) {
+            pendingBackupPassword = null
+            backupExportPending = false
             Toast.makeText(this, "Backup cancelled.", Toast.LENGTH_SHORT).show()
             return
         }
 
-        pendingBackupUri = data.getData()
-        TuixtDialog.showOptions(
-            this,
-            "Backup Protection",
-            mutableListOf<String?>("Encrypt with Password", "Export Without Password"),
-            ItemAction { which: Int ->
-                if (which == 0) {
-                    showBackupPasswordDialog()
-                } else {
-                    exportBackup(null)
-                }
-            })
+        val uri = data.getData() ?: return
+        if (!backupExportPending) {
+            deleteCreatedDocument(uri)
+            Toast.makeText(this, "Backup cancelled before export.", Toast.LENGTH_LONG).show()
+            return
+        }
+        exportBackup(uri, pendingBackupPassword)
     }
 
     private fun showBackupPasswordDialog() {
@@ -1522,22 +1572,39 @@ class ThemerActivity : AppCompatActivity() {
                     recyclerView!!.postDelayed(Runnable { this.showBackupPasswordDialog() }, 250)
                     return@ConfirmAction
                 }
-                exportBackup(first)
+                pendingBackupPassword = first
+                backupExportPending = true
+                launchBackupPicker()
             })
     }
 
-    private fun exportBackup(password: String?) {
+    private fun exportBackup(uri: Uri, password: String?) {
         try {
-            BackupManager.exportBackup(this, pendingBackupUri ?: return, password)
-            Toast.makeText(this, "Backup exported.", Toast.LENGTH_SHORT).show()
+            BackupManager.exportBackup(this, uri, password)
+            Toast.makeText(this, "Backup exported and verified.", Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
+            deleteCreatedDocument(uri)
             Toast.makeText(
                 this,
                 if (e.message == null) "Backup failed." else e.message,
                 Toast.LENGTH_LONG
             ).show()
         } finally {
-            pendingBackupUri = null
+            pendingBackupPassword = null
+            backupExportPending = false
+        }
+    }
+
+    private fun deleteCreatedDocument(uri: Uri) {
+        try {
+            if (!DocumentsContract.deleteDocument(contentResolver, uri)) {
+                contentResolver.delete(uri, null, null)
+            }
+        } catch (_: Exception) {
+            try {
+                contentResolver.delete(uri, null, null)
+            } catch (_: Exception) {
+            }
         }
     }
 
@@ -1554,8 +1621,9 @@ class ThemerActivity : AppCompatActivity() {
                 data.getData() ?: return,
                 pendingShareablePresetName
             )
-            Toast.makeText(this, "Shareable configuration exported.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Shareable configuration exported and verified.", Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
+            data.getData()?.let { deleteCreatedDocument(it) }
             Toast.makeText(
                 this,
                 if (e.message == null) "Configuration export failed." else e.message,
@@ -1625,13 +1693,17 @@ class ThemerActivity : AppCompatActivity() {
 
     private fun restoreBackup(password: String?) {
         try {
-            BackupManager.importBackup(this, pendingRestoreUri ?: return, password)
-            Toast.makeText(this, "Backup restored. Reloading...", Toast.LENGTH_SHORT).show()
+            val importedPreset = BackupManager.importBackup(this, pendingRestoreUri ?: return, password)
             pendingRestoreUri = null
+            if (importedPreset != null) {
+                Toast.makeText(this, "Preset imported: $importedPreset", Toast.LENGTH_LONG).show()
+                return
+            }
+            Toast.makeText(this, "Backup restored. Reloading...", Toast.LENGTH_SHORT).show()
             recyclerView!!.postDelayed(Runnable {
                 intent.putExtra(EXTRA_SECTION, SECTION_SYSTEM)
                 recreate()
-                previewLauncher(this)
+                LauncherActivity.preview(this)
             }, 500)
         } catch (e: Exception) {
             Toast.makeText(
@@ -1672,21 +1744,6 @@ class ThemerActivity : AppCompatActivity() {
                 putExtra(EXTRA_SECTION, if (section.isNullOrEmpty()) SECTION_HOME else section)
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
-
-        @JvmStatic
-        fun previewLauncher(context: Context) {
-            val launcher = LauncherActivity.instance
-            if (launcher != null) {
-                launcher.reload()
-                return
-            }
-
-            context.startActivity(
-                Intent(context, LauncherActivity::class.java).apply {
-                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                }
-            )
-        }
 
         const val EXTRA_SECTION: String = "section"
         const val SECTION_HOME: String = "home"

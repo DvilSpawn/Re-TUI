@@ -1,9 +1,6 @@
 package ohi.andre.consolelauncher.commands.main.raw
 
-import android.app.Activity
-import android.content.Intent
 import java.io.File
-import ohi.andre.consolelauncher.LauncherActivity
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.commands.CommandAbstraction
 import ohi.andre.consolelauncher.commands.ExecutePack
@@ -27,9 +24,7 @@ class tuixt : CommandAbstraction {
             return info.res.getString(R.string.output_isdirectory)
         }
 
-        val intent = Intent(info.context, WidgetEditorActivity::class.java)
-        intent.putExtra(WidgetEditorActivity.EXTRA_FILE_PATH, file.absolutePath)
-        (info.context as Activity).startActivityForResult(intent, LauncherActivity.TUIXT_REQUEST)
+        WidgetEditorActivity.openFile(info.context, file)
 
         return Tuils.EMPTYSTRING
     }

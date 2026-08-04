@@ -3,6 +3,7 @@ package ohi.andre.consolelauncher.commands.tuixt
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
+import android.content.Context
 import android.content.Intent
 import android.graphics.Typeface
 import android.os.Bundle
@@ -234,6 +235,23 @@ class WidgetEditorActivity : Activity() {
         setContentView(screen)
     }
 
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        if (targetKey(getIntent()) == targetKey(intent)) {
+            return
+        }
+        if (hasUnsavedChanges()) {
+            Toast.makeText(
+                this,
+                "Save or discard the current changes before opening another document.",
+                Toast.LENGTH_LONG
+            ).show()
+            return
+        }
+        setIntent(intent)
+        recreate()
+    }
+
     private fun showFindReplaceDialog() {
         TuixtDialog.showCustomCompact(this, "Find/Replace", TuixtDialog.ContentFactory { dialog: Dialog? ->
             dialog?.setCanceledOnTouchOutside(false)
@@ -420,14 +438,11 @@ class WidgetEditorActivity : Activity() {
                 XMLPrefsManager.dispose()
                 XMLPrefsManager.loadCommons(this)
                 refreshFromLoadedPrefs()
-                val launcher = LauncherActivity.instance
-                if (launcher != null) {
-                    setResult(Activity.RESULT_CANCELED)
-                    launcher.reload()
-                } else {
-                    setResult(TuixtActivity.SAVE_PRESSED)
-                }
-                finish()
+                originalCode = code
+                originalDocumentName = documentFile!!.name
+                Toast.makeText(this, "Document saved: ${documentFile!!.name}", Toast.LENGTH_SHORT)
+                    .show()
+                LauncherActivity.preview(this)
                 return
             }
 
@@ -470,7 +485,11 @@ class WidgetEditorActivity : Activity() {
             if (run && dockable) {
                 sendModule("show")
                 sendModule("refresh")
-                finish()
+                originalDocumentName = LuaWidgetManager.getName(widgetId)
+                originalCode = code
+                documentNameEditor!!.setText(originalDocumentName)
+                updateHeader()
+                LauncherActivity.preview(this)
                 return
             } else if (run) {
                 Toast.makeText(this, "Suggestion script saved: " + name, Toast.LENGTH_SHORT).show()
@@ -546,7 +565,7 @@ class WidgetEditorActivity : Activity() {
 
     private fun attemptClose() {
         if (!hasUnsavedChanges()) {
-            finish()
+            finishAndRemoveTask()
             return
         }
         showConfirm(
@@ -555,7 +574,7 @@ class WidgetEditorActivity : Activity() {
             "Unsaved document changes will be lost.",
             "Discard",
             "Keep Editing",
-            ConfirmAction { this.finish() })
+            ConfirmAction { this.finishAndRemoveTask() })
     }
 
     private fun hasUnsavedChanges(): Boolean {
@@ -568,5 +587,34 @@ class WidgetEditorActivity : Activity() {
     companion object {
         const val EXTRA_WIDGET_ID: String = "widget_id"
         const val EXTRA_FILE_PATH: String = "file_path"
+
+        @JvmStatic
+        fun openFile(context: Context, file: File) {
+            context.startActivity(
+                Intent(context, WidgetEditorActivity::class.java).apply {
+                    putExtra(EXTRA_FILE_PATH, file.absolutePath)
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+            )
+        }
+
+        @JvmStatic
+        fun openWidget(context: Context, widgetId: String?) {
+            context.startActivity(
+                Intent(context, WidgetEditorActivity::class.java).apply {
+                    putExtra(EXTRA_WIDGET_ID, widgetId)
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+            )
+        }
+
+        private fun targetKey(intent: Intent): String? {
+            val filePath = intent.getStringExtra(EXTRA_FILE_PATH)
+            if (!filePath.isNullOrEmpty()) {
+                return "file:${File(filePath).absolutePath}"
+            }
+            val id = LuaWidgetManager.normalizeId(intent.getStringExtra(EXTRA_WIDGET_ID))
+            return if (id.isNullOrEmpty()) null else "widget:$id"
+        }
     }
 }

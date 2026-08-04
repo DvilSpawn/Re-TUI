@@ -21,9 +21,9 @@ import ohi.andre.consolelauncher.managers.AppsManager.LaunchInfo
 import ohi.andre.consolelauncher.managers.ContactManager
 import ohi.andre.consolelauncher.managers.HTMLExtractManager
 import ohi.andre.consolelauncher.managers.HistoryManager
+import ohi.andre.consolelauncher.managers.LauncherSoundManager
 import ohi.andre.consolelauncher.managers.RssManager
 import ohi.andre.consolelauncher.managers.TerminalManager
-import ohi.andre.consolelauncher.managers.ThemeManager
 import ohi.andre.consolelauncher.managers.TuiLocationManager
 import ohi.andre.consolelauncher.managers.WebhookManager
 import ohi.andre.consolelauncher.managers.modules.ModulePromptManager
@@ -127,7 +127,6 @@ class MainManager(private val mContext: LauncherActivity) {
     private var contactManager: ContactManager? = null
     private val musicManager2: MusicManager2?
     private val podcastManager: PodcastManager
-    private val themeManager: ThemeManager
     private val htmlExtractManager: HTMLExtractManager
     private val webhookManager: WebhookManager
     private val historyManager: HistoryManager?
@@ -261,7 +260,6 @@ class MainManager(private val mContext: LauncherActivity) {
         mainPack.destroy()
         TuiLocationManager.disposeStatic()
 
-        themeManager.dispose()
         htmlExtractManager.dispose(mContext)
         aliasManager.dispose()
         LocalBroadcastManager.getInstance(mContext.getApplicationContext())
@@ -358,7 +356,6 @@ class MainManager(private val mContext: LauncherActivity) {
 //            }
 //        }.start();
         rssManager = RssManager(mContext, client)
-        themeManager = ThemeManager(client, mContext, mContext)
         musicManager2 = if (enabled()) MusicManager2(mContext) else null
         val podcastPlayer = musicManager2 ?: MusicManager2(mContext, false)
         podcastManager = PodcastManager(mContext, client, podcastPlayer, musicManager2 == null)
@@ -481,7 +478,9 @@ class MainManager(private val mContext: LauncherActivity) {
             Tuils.sendOutput(mainPack, text, TerminalManager.CATEGORY_NO_COLOR)
         }
 
-        return appsManager.launch(mainPack.context, i)
+        val launched = appsManager.launch(mainPack.context, i)
+        if (launched) LauncherSoundManager.play(mContext, LauncherSoundManager.Event.SUCCESS)
+        return launched
     }
 
     //
@@ -566,6 +565,7 @@ class MainManager(private val mContext: LauncherActivity) {
             val trimmed = input.trim { it <= ' ' }
             val parts = Tuils.splitArgs(trimmed)
             if (!parts.isEmpty() && info.commandGroup.getCommandByName(parts.get(0)) != null) {
+                LauncherSoundManager.play(mContext, LauncherSoundManager.Event.ERROR)
                 Tuils.sendOutput(
                     mContext,
                     "Command did not execute: " + parts.get(0),
@@ -575,6 +575,7 @@ class MainManager(private val mContext: LauncherActivity) {
             }
 
             if (XMLPrefsManager.getBoolean(Behavior.shell_requires_prefix)) {
+                LauncherSoundManager.play(mContext, LauncherSoundManager.Event.ERROR)
                 Tuils.sendOutput(
                     mContext,
                     mContext.getString(R.string.output_commandnotfound),
@@ -663,6 +664,7 @@ class MainManager(private val mContext: LauncherActivity) {
             if (command == null) {
                 val parts = Tuils.splitArgs(trimmed)
                 if (!parts.isEmpty() && info.commandGroup.getCommandByName(parts.get(0)) != null) {
+                    LauncherSoundManager.play(mContext, LauncherSoundManager.Event.ERROR)
                     Tuils.sendOutput(
                         mContext,
                         "Invalid command input: " + parts.get(0),
@@ -691,6 +693,7 @@ class MainManager(private val mContext: LauncherActivity) {
                             publishGuideProgress(input)
                         }
                     } catch (e: Exception) {
+                        LauncherSoundManager.play(mContext, LauncherSoundManager.Event.ERROR)
                         Tuils.sendOutput(mContext, Tuils.getStackTrace(e))
                         Tuils.log(e)
                     }

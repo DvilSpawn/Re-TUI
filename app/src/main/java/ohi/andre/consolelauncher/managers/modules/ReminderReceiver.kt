@@ -12,6 +12,7 @@ import androidx.core.app.NotificationCompat
 import kotlin.math.abs
 import ohi.andre.consolelauncher.LauncherActivity
 import ohi.andre.consolelauncher.R
+import ohi.andre.consolelauncher.managers.LauncherSoundManager
 
 class ReminderReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
@@ -32,6 +33,8 @@ class ReminderReceiver : BroadcastReceiver() {
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
 
+        val soundPackEnabled = LauncherSoundManager.isEnabled()
+        LauncherSoundManager.play(context, LauncherSoundManager.Event.REMINDER)
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.mipmap.ic_launcher)
             .setContentTitle("Re:T-UI reminder")
@@ -40,7 +43,8 @@ class ReminderReceiver : BroadcastReceiver() {
             .setContentIntent(content)
             .setAutoCancel(true)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+            .setSound(if (soundPackEnabled) null else RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+            .setSilent(soundPackEnabled)
 
         val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager?
         manager?.notify(if (id == null) 4001 else abs(id.hashCode()), builder.build())

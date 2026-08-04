@@ -24,6 +24,7 @@ object ModuleManager {
     const val NOTES: String = "notes"
     const val RSS: String = "rss"
     const val WEATHER: String = "weather"
+    const val WEATHER_NATIVE: String = "weather_native"
     const val SOURCE_LAUNCHER_PREFIX: String = "launcher:"
     const val SOURCE_TERMUX_PREFIX: String = "termux:"
     const val SOURCE_LUA_PREFIX: String = "lua:"
@@ -40,7 +41,7 @@ object ModuleManager {
     private val DEFAULT_DOCK: MutableList<String?> =
         Arrays.asList<String?>(MUSIC, NOTIFICATIONS, TIMER, CALENDAR, REMINDER)
     private val BUILT_INS: MutableList<String?> =
-        Arrays.asList<String?>(MUSIC, NOTIFICATIONS, TIMER, CALENDAR, REMINDER, NOTES, RSS, WEATHER)
+        Arrays.asList<String?>(MUSIC, NOTIFICATIONS, TIMER, CALENDAR, REMINDER, NOTES, RSS, WEATHER, WEATHER_NATIVE)
 
     val builtIns: MutableList<String?>
         get() = ArrayList<String?>(BUILT_INS)
@@ -95,6 +96,9 @@ object ModuleManager {
     fun getActiveSuggestions(context: Context): MutableList<ModuleSuggestion?> {
         return getSuggestionsForModule(context, getActiveModule(context))
     }
+
+    internal fun usesNativeWeatherControls(module: String?): Boolean =
+        normalize(module) == WEATHER_NATIVE
 
     fun hideFromDock(context: Context, module: String?) {
         val id = normalize(module)
@@ -355,6 +359,9 @@ object ModuleManager {
         if ("weath" == id || "wttr" == id) {
             return WEATHER
         }
+        if ("nativeweather" == id || "weathernative" == id) {
+            return WEATHER_NATIVE
+        }
         return id
     }
 
@@ -368,6 +375,9 @@ object ModuleManager {
         }
         if (RSS == id) {
             return "RSS"
+        }
+        if (WEATHER_NATIVE == id) {
+            return "WEATHER (NATIVE)"
         }
         return id.uppercase()
     }
@@ -428,29 +438,7 @@ object ModuleManager {
         } else if (CALENDAR == id) {
             // Calendar is the built-in module-button example; its controls live in-panel.
         } else if (REMINDER == id) {
-            if (ModulePromptManager.isActive(context)) {
-                suggestions.addAll(ModulePromptManager.getSuggestions(context))
-            } else {
-                suggestions.add(
-                    ModuleSuggestion.Companion.command(
-                        "-add",
-                        "module -prompt reminder add"
-                    )
-                )
-                suggestions.add(
-                    ModuleSuggestion.Companion.command(
-                        "-edit",
-                        "module -prompt reminder edit"
-                    )
-                )
-                suggestions.add(
-                    ModuleSuggestion.Companion.command(
-                        "-rm",
-                        "module -prompt reminder remove"
-                    )
-                )
-                suggestions.add(ModuleSuggestion.Companion.command("-ls", "module -show reminder"))
-            }
+            suggestions.add(ModuleSuggestion.Companion.command("open", "reminder -open"))
         } else if (NOTES == id) {
             suggestions.add(ModuleSuggestion.Companion.command("edit", "notes"))
             suggestions.add(ModuleSuggestion.Companion.command("list", "notes -ls"))
@@ -482,12 +470,12 @@ object ModuleManager {
                 )
             )
             suggestions.add(ModuleSuggestion.Companion.command("file", "rss -file"))
-        } else if (WEATHER == id) {
+        } else if (usesNativeWeatherControls(id)) {
             suggestions.add(ModuleSuggestion.Companion.command("update", "tuiweather -update"))
-            suggestions.add(ModuleSuggestion.Companion.command("enable", "tuiweather -enable"))
-            suggestions.add(ModuleSuggestion.Companion.command("disable", "tuiweather -disable"))
+            suggestions.add(ModuleSuggestion.Companion.command("location", "tuiweather -set_location "))
+            suggestions.add(ModuleSuggestion.Companion.command("show status", "tuiweather -enable"))
+            suggestions.add(ModuleSuggestion.Companion.command("hide status", "tuiweather -disable"))
             suggestions.add(ModuleSuggestion.Companion.command("setup", "tuiweather -tutorial"))
-            suggestions.add(ModuleSuggestion.Companion.command("key", "tuiweather -set_key "))
         } else {
             suggestions.addAll(getScriptSuggestions(context, id))
         }

@@ -2,6 +2,7 @@ package ohi.andre.consolelauncher.integrations.tasker
 
 import ohi.andre.consolelauncher.managers.tasker.TaskerIntegrationManager
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -21,5 +22,20 @@ class RetuiTaskerInputTest {
         assertTrue(RetuiTaskerHelper.ACTIONS.contains(TaskerIntegrationManager.ACTION_TERMINAL_OUTPUT))
         assertTrue(RetuiTaskerHelper.ACTIONS.contains(TaskerIntegrationManager.ACTION_SWITCH_SPACE))
         assertTrue(RetuiTaskerHelper.ACTIONS.none { it.contains("command") || it.contains("shell") })
+    }
+
+    @Test
+    fun switchSpaceRequiresTargetBeforeSavingToTasker() {
+        assertEquals(
+            "Choose a Space.",
+            RetuiTaskerHelper.validationError(
+                RetuiTaskerInput(TaskerIntegrationManager.ACTION_SWITCH_SPACE, space = " ")
+            )
+        )
+        assertNull(
+            RetuiTaskerHelper.validationError(
+                RetuiTaskerInput(TaskerIntegrationManager.ACTION_SWITCH_SPACE, space = "%space")
+            )
+        )
     }
 }

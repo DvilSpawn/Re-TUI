@@ -1,6 +1,5 @@
 package ohi.andre.consolelauncher.commands.main.raw
 
-import android.app.Activity
 import android.content.Intent
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import ohi.andre.consolelauncher.LauncherActivity
@@ -74,7 +73,7 @@ class config : ParamCommand() {
                     && (pack.context as LauncherActivity).uiManager != null
                 ) {
                     (pack.context as LauncherActivity).uiManager!!.refreshAndroidWidgetDrawerToolbarButton()
-                } else if ((save === Behavior.enable_cyberdeck_mode || save === Behavior.enable_crt_filter) && pack.context is Reloadable) {
+                } else if ((save === Behavior.enable_cyberdeck_mode || save === Behavior.enable_crt_filter || save === Ui.enable_crt_vignette) && pack.context is Reloadable) {
                     (pack.context as Reloadable).reload()
                 } else if (save === Behavior.duo_mode && !"true".equals(
                         value,
@@ -131,17 +130,7 @@ class config : ParamCommand() {
             override fun exec(pack: ExecutePack): String? {
                 val file = File(Tuils.getFolder(), pack.getString())
 
-                val intent = Intent(pack.context, WidgetEditorActivity::class.java)
-                intent.putExtra(WidgetEditorActivity.EXTRA_FILE_PATH, file.getAbsolutePath())
-                if (pack.context is Activity) {
-                    (pack.context as Activity).startActivityForResult(
-                        intent,
-                        LauncherActivity.TUIXT_REQUEST
-                    )
-                } else {
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    pack.context.startActivity(intent)
-                }
+                WidgetEditorActivity.openFile(pack.context, file)
 
                 return null
             }
@@ -313,7 +302,7 @@ class config : ParamCommand() {
                 )
                 if (save === Behavior.orientation && pack.context is LauncherActivity) {
                     (pack.context as LauncherActivity).applyOrientationPreference()
-                } else if ((save === Behavior.enable_cyberdeck_mode || save === Behavior.enable_crt_filter) && pack.context is Reloadable) {
+                } else if ((save === Behavior.enable_cyberdeck_mode || save === Behavior.enable_crt_filter || save === Ui.enable_crt_vignette) && pack.context is Reloadable) {
                     (pack.context as Reloadable).reload()
                 } else if (save === Behavior.show_tmux_workspace_button
                     && pack.context is LauncherActivity

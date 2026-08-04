@@ -47,7 +47,6 @@ object CommandTuils {
         "install",
         "shell",
         "termuxopen",
-        "theme",
         "themer",
         "tuixt"
     )
@@ -198,7 +197,7 @@ object CommandTuils {
         } else if (type == CommandAbstraction.CONTACTNUMBER && info is MainPack) {
             val pack = info
             return contactNumber(input, pack.contacts)
-        } else if (type == CommandAbstraction.PLAIN_TEXT || type == CommandAbstraction.THEME_PRESET || type == CommandAbstraction.PRESET_NAME || type == CommandAbstraction.SPACE_TARGET || type == CommandAbstraction.SPACE_RENAME_NAME) {
+        } else if (type == CommandAbstraction.PLAIN_TEXT || type == CommandAbstraction.PRESET_NAME || type == CommandAbstraction.SPACE_TARGET || type == CommandAbstraction.SPACE_RENAME_NAME) {
             return plainText(input)
         } else if (type == CommandAbstraction.VISIBLE_PACKAGE && info is MainPack) {
             val pack = info

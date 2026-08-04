@@ -50,8 +50,8 @@ class files : CommandAbstraction {
     override fun onNotArgEnough(info: ExecutePack, nArgs: Int): String? = exec(info)
 
     companion object {
-        private const val FM_PACKAGE = "com.dvil.retui.fm"
-        private const val FM_ACTION = "com.dvil.retui.fm.OPEN_CONSOLE"
+        internal const val FM_PACKAGE = "com.dvil.retui.fm"
+        internal const val FM_ACTION = "com.dvil.retui.fm.OPEN_CONSOLE"
 
         internal fun parseRequest(input: String?, currentDirectory: File?): FilesRequest {
             val tokens = Tuils.splitArgs(input).filterNotNull()

@@ -9,6 +9,12 @@ class FilesCommandTest {
     private val currentDirectory = File("/storage/emulated/0")
 
     @Test
+    fun usesPackagedOpenConsoleContract() {
+        assertEquals("com.dvil.retui.fm", files.FM_PACKAGE)
+        assertEquals("com.dvil.retui.fm.OPEN_CONSOLE", files.FM_ACTION)
+    }
+
+    @Test
     fun parsesNoArguments() {
         assertEquals(files.FilesRequest(), files.parseRequest(null, currentDirectory))
     }

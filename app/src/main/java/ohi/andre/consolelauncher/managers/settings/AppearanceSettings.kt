@@ -20,6 +20,9 @@ object AppearanceSettings {
     fun crtFilter(): Boolean = LauncherSettings.getBoolean(Behavior.enable_crt_filter)
 
     @JvmStatic
+    fun crtVignette(): Boolean = LauncherSettings.getBoolean(Ui.enable_crt_vignette)
+
+    @JvmStatic
     fun useSystemFont(): Boolean = LauncherSettings.getBoolean(Ui.system_font)
 
     @JvmStatic

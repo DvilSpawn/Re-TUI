@@ -1,55 +1,58 @@
 package ohi.andre.consolelauncher.managers.flashlight
 
 import android.content.Context
-import android.os.Build
+import android.content.Intent
+import android.hardware.camera2.CameraCharacteristics
+import android.hardware.camera2.CameraManager
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import ohi.andre.consolelauncher.tuils.PrivateIOReceiver
 
 class TorchManager private constructor() {
-    private val flashType: String =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) Flashlight2.TYPE else Flashlight.TYPE
-    private var mTorch: Torch? = null
-    private var torchType: String? = null
+    private var cameraManager: CameraManager? = null
+    private var cameraId: String? = null
+    private var context: Context? = null
 
-    init {
-        setTorchType(Constants.ID_DEVICE_OUTPUT_TORCH_FLASH)
-    }
-
-    fun isOn(): Boolean = mTorch != null
-
-    fun setTorchType(torchType: String?) {
-        this.torchType = torchType
-    }
+    fun isOn(): Boolean = cameraId != null
 
     fun turnOn(context: Context) {
-        if (mTorch == null) {
-            if (torchType == Flashlight.TYPE) {
-                mTorch = if (flashType == Flashlight.TYPE) {
-                    Flashlight1(context)
-                } else if (flashType == Flashlight2.TYPE) {
-                    Flashlight2(context)
-                } else {
-                    null
-                }
-            }
+        if (isOn()) return
+
+        try {
+            val manager = context.getSystemService(CameraManager::class.java)
+            val id = manager.cameraIdList.firstOrNull {
+                manager.getCameraCharacteristics(it)
+                    .get(CameraCharacteristics.FLASH_INFO_AVAILABLE) == true
+            } ?: return
+            manager.setTorchMode(id, true)
+            cameraManager = manager
+            cameraId = id
+            this.context = context.applicationContext
+        } catch (e: Exception) {
+            sendError(context, e)
         }
-        mTorch!!.setEnabled(true)
-        mTorch!!.start(true)
     }
 
     fun turnOff() {
-        if (mTorch != null) {
-            mTorch!!.start(false)
-            mTorch = null
+        val manager = cameraManager ?: return
+        val id = cameraId ?: return
+        try {
+            manager.setTorchMode(id, false)
+            cameraManager = null
+            cameraId = null
+            context = null
+        } catch (e: Exception) {
+            context?.let { sendError(it, e) }
         }
     }
 
     fun toggle(context: Context) {
-        if (mTorch == null) {
-            turnOn(context)
-        } else if (mTorch!!.getStatus()) {
-            turnOff()
-        } else {
-            turnOn(context)
-        }
+        if (isOn()) turnOff() else turnOn(context)
+    }
+
+    private fun sendError(context: Context, error: Exception) {
+        val intent = Intent(PrivateIOReceiver.ACTION_OUTPUT)
+            .putExtra(PrivateIOReceiver.TEXT, error.toString())
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
     }
 
     companion object {

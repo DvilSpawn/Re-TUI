@@ -579,6 +579,7 @@ object XMLPrefsManager {
     }
 
     private fun behaviorSection(label: String): String = when {
+        label.contains("sound") -> "Sounds"
         label.contains("notification") -> "Notifications"
         label.contains("weather") || label.contains("location") -> "Weather"
         label.contains("unlock") -> "Unlock Counter"

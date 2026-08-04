@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.text.TextUtils
+import android.view.Gravity
 import android.view.View
 import android.widget.TextView
 import androidx.core.content.ContextCompat
@@ -38,13 +39,14 @@ object TerminalTrayToggleView {
         toggle.setTextColor(outputColor)
         toggle.setTypeface(Tuils.getTypeface(context), Typeface.BOLD)
         toggle.textSize = outputHeaderTextSize.toFloat()
+        toggle.gravity = Gravity.CENTER
         if (outputHeaderArrowsOnly) {
             toggle.minWidth = Tuils.dpToPx(context, 48)
             toggle.setPadding(
                 Tuils.dpToPx(context, 9),
-                Tuils.dpToPx(context, 3),
+                Tuils.dpToPx(context, 2),
                 Tuils.dpToPx(context, 9),
-                Tuils.dpToPx(context, 3)
+                Tuils.dpToPx(context, 2)
             )
         } else {
             toggle.minWidth = Tuils.dpToPx(context, 130)
@@ -80,6 +82,7 @@ object TerminalTrayToggleView {
         toggle.visibility = View.VISIBLE
 
         if (landscapeLayoutActive) {
+            toggle.foreground = null
             toggle.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null, null, null)
             if (!TextUtils.equals(toggle.text, "OUTPUT")) {
                 toggle.text = "OUTPUT"
@@ -90,16 +93,13 @@ object TerminalTrayToggleView {
         val collapsed = !terminalTrayExpanded
         if (outputHeaderArrowsOnly) {
             toggle.text = ""
-            toggle.compoundDrawablePadding = 0
-            toggle.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                null,
-                outputHeaderArrow(context, collapsed, outputColor),
-                null,
-                null
-            )
+            toggle.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null, null, null)
+            toggle.foregroundGravity = Gravity.CENTER
+            toggle.foreground = outputHeaderArrow(context, collapsed, outputColor)
             return
         }
 
+        toggle.foreground = null
         toggle.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null, null, null)
         val text = when {
             outputTrayNativeMode -> "OUTPUT"
@@ -114,6 +114,7 @@ object TerminalTrayToggleView {
     private fun hide(toggle: TextView) {
         toggle.visibility = View.GONE
         toggle.setOnClickListener(null)
+        toggle.foreground = null
         toggle.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null, null, null)
     }
 

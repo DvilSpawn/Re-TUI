@@ -66,9 +66,8 @@ class RetuiTaskerHelper(config: TaskerPluginConfig<RetuiTaskerInput>) :
     override val addDefaultStringBlurb = false
 
     override fun isInputValid(input: TaskerInput<RetuiTaskerInput>): SimpleResult {
-        val action = input.regular.action.orEmpty()
-        return if (ACTIONS.contains(action)) SimpleResultSuccess()
-        else SimpleResultError("Choose a RETUI action.")
+        val error = validationError(input.regular)
+        return if (error == null) SimpleResultSuccess() else SimpleResultError(error)
     }
 
     override fun addToStringBlurb(input: TaskerInput<RetuiTaskerInput>, blurbBuilder: StringBuilder) {
@@ -107,6 +106,13 @@ class RetuiTaskerHelper(config: TaskerPluginConfig<RetuiTaskerInput>) :
             TaskerIntegrationManager.ACTION_TERMINAL_OUTPUT -> "Terminal output"
             TaskerIntegrationManager.ACTION_SWITCH_SPACE -> "Switch Space"
             else -> "RETUI action"
+        }
+
+        fun validationError(input: RetuiTaskerInput): String? = when {
+            input.action !in ACTIONS -> "Choose a RETUI action."
+            input.action == TaskerIntegrationManager.ACTION_SWITCH_SPACE && input.space.isNullOrBlank() ->
+                "Choose a Space."
+            else -> null
         }
     }
 }

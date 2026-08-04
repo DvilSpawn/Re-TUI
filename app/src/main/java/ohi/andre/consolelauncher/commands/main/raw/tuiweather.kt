@@ -21,15 +21,8 @@ class tuiweather : ParamCommand() {
     private enum class Param : ohi.andre.consolelauncher.commands.main.Param {
         update {
             override fun exec(pack: ExecutePack): String? {
-                if (!XMLPrefsManager.getBoolean(Ui.show_weather)) {
-                    return pack.context.getString(R.string.weather_disabled)
-                } else if (!XMLPrefsManager.wasChanged(Behavior.weather_key, false)) {
-                    return pack.context.getString(R.string.weather_cant_update)
-                } else {
-                    LocalBroadcastManager.getInstance(pack.context.applicationContext)
-                        .sendBroadcast(Intent(UIManager.ACTION_WEATHER_MANUAL_UPDATE))
-                }
-
+                LocalBroadcastManager.getInstance(pack.context.applicationContext)
+                    .sendBroadcast(Intent(UIManager.ACTION_WEATHER_MANUAL_UPDATE))
                 return null
             }
         },
@@ -63,12 +56,16 @@ class tuiweather : ParamCommand() {
                 return null
             }
         },
-        set_key {
+        set_location {
             override fun args(): IntArray = intArrayOf(CommandAbstraction.PLAIN_TEXT)
 
-            override fun exec(pack: ExecutePack): String? {
-                LauncherSettings.set(pack.context, Behavior.weather_key, pack.getString())
-                return null
+            override fun exec(pack: ExecutePack): String {
+                val location = pack.getString().trim()
+                if (location.isEmpty()) return "Usage: tuiweather -set_location <place or lat,lon>"
+                LauncherSettings.set(pack.context, Behavior.weather_location, location)
+                LocalBroadcastManager.getInstance(pack.context.applicationContext)
+                    .sendBroadcast(Intent(UIManager.ACTION_WEATHER_MANUAL_UPDATE))
+                return "Weather location set: $location"
             }
         };
 

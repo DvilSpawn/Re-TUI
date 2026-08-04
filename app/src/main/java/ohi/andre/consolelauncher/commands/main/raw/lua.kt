@@ -240,9 +240,7 @@ class lua : CommandAbstraction {
     }
 
     private fun openEditor(pack: ExecutePack, id: String?) {
-        val intent = Intent(pack.context, WidgetEditorActivity::class.java)
-        intent.putExtra(WidgetEditorActivity.EXTRA_WIDGET_ID, id)
-        (pack.context as Activity).startActivity(intent)
+        WidgetEditorActivity.openWidget(pack.context, id)
     }
 
     private fun openConfig(pack: ExecutePack, id: String?) {

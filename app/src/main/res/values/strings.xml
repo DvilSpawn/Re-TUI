@@ -26,12 +26,14 @@
     <string name="weather_error">The weather API is busy. Trying again at:</string>
     <string name="weather_disabled">Weather is not enabled</string>
     <string name="weather_updated">Weather updated at</string>
+    <string name="weather_location_required">Weather location is not configured.</string>
+    <string name="weather_location_not_found">Couldn\'t find that Weather location. Try a more specific place name or latitude,longitude.</string>
+    <string name="weather_response_invalid">The weather service returned an invalid response.</string>
 
     <!-- shortcuts -->
     <string name="shortcut_index_greater">The index is greater than the shortcuts count</string>
 
     <!-- reload message -->
-    <string name="theme_applied">Theme applied:</string>
 
     <!-- reply -->
     <string name="reply_id_not_found">No bound app found with ID:</string>
@@ -45,10 +47,6 @@
 
     <!-- regex -->
     <string name="invalid_regex">Invalid regex:</string>
-
-    <!-- theme -->
-    <string name="theme_not_found">Theme not found</string>
-    <string name="theme_unable">Couldn\'t apply this theme</string>
 
     <!-- files -->
     <string name="output_isdirectory">This is a directory</string>
@@ -315,6 +313,7 @@
     <string name="help_preset">-save [name] -> save the current theme.xml and suggestions.xml colors as a preset
         \n-apply [name] -> apply a saved or built-in preset and disable auto_color_pick
         \n-ls -> list saved and built-in presets
+        \n-rm [name] -> remove a saved or imported preset
         \nTo share a look, use Settings > System &amp; Support > Create Shareable Configuration
     </string>
     <string name="help_space">-ls -> list Spaces
@@ -510,11 +509,6 @@
         \n-use @alias -> use a pinned shortcut accepted by Re:T-UI
         \n-cp [index] [appName] -> copy to clipboard the nth shortcut of the selected app (first: 0)</string>
     <string name="help_status">Get info about battery charge, wifi status and mobile data</string>
-    <string name="help_theme">-apply [themeName] -> apply a shared upstream theme by ID
-        \n-set [element] [color] -> manually set a color
-        \n-preset [name] -> apply a built-in preset (blue, red, green, pink, bw, cyberpunk)
-        \n-old -> re-apply the theme that was replaced by the current one
-        \n-standard -> apply the standard theme</string>
     <string name="help_time">Print the current time with the given format
         \n\nUsage:
         \n$ time [index] (index means the index of the desired time_format</string>
@@ -597,6 +591,14 @@
         \n\nExamples:
         \n$ timer 5m
         \n$ timer -add 30s</string>
+    <string name="help_reminder">Manage reminders.
+        \n\nUsage:
+        \n$ reminder -open
+        \n$ reminder -add &lt;task name&gt; &lt;dd/mm/yy&gt; &lt;HH:mm&gt;
+        \n$ reminder -ls
+        \n$ reminder -rm &lt;ID&gt;
+        \n\nExample:
+        \n$ reminder -add Buy milk 31/08/26 21:30</string>
     <string name="help_stopwatch">Start or manage a stopwatch.
         \n\nUsage:
         \n$ stopwatch
@@ -690,18 +692,22 @@
         \n\nFor interactive browsing, use:
         \n$ files
     </string>
-    <string name="help_intent">Inspect or dispatch Android intents from Re:T-UI.
+    <string name="help_inspect">Inspect an installed application.
         \nUsage:
-        \n$ intent -check [app or package]
+        \n$ inspect &lt;app or package&gt;
+        \nExamples:
+        \n$ inspect ChatGPT
+        \n$ inspect com.openai.chatgpt
+        \n\nThe report includes common intent handlers, exported components, and required component permissions.
+    </string>
+    <string name="help_intent">Construct and dispatch Android intents from Re:T-UI.
+        \nUsage:
         \n$ intent -view &lt;uri&gt;
         \n$ intent -activity -a &lt;action&gt; [-d &lt;data&gt;] [-t &lt;mime&gt;] [-p &lt;package&gt;] [-n &lt;package/class&gt;] [--es key value] [--ei key value] [--ez key true|false]
         \n$ intent -broadcast -a &lt;action&gt; [-p &lt;package&gt;] [-n &lt;package/class&gt;] [--es key value]
         \n$ intent -uri &lt;intent-uri&gt;
-        \n$ intent -check -activity ...
-        \n\nOptions: -p package, -a action, -d data URI, -t MIME type, -n component. Advanced extras: --es string, --ei integer, --ez boolean.
+        \n\nOptions: -a action, -d data URI, -t MIME type, -p package, -n component. Advanced extras: --es string, --ei integer, --ez boolean.
         \nExamples:
-        \n$ intent -check ChatGPT
-        \n$ intent -check com.openai.chatgpt
         \n$ intent -view geo:0,0?q=home
         \n$ intent -activity -a android.intent.action.SEND -t text/plain --es android.intent.extra.TEXT "standup notes"
         \n$ intent -broadcast -a net.dinglisch.android.tasker.ACTION_TASK -p net.dinglisch.android.taskerm --es task_name Work

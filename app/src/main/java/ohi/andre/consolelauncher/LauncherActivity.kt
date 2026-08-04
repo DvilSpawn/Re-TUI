@@ -76,6 +76,7 @@ import java.util.Set
 import ohi.andre.consolelauncher.MainManager
 import ohi.andre.consolelauncher.UIManager
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings
+import ohi.andre.consolelauncher.managers.LauncherSoundManager
 import ohi.andre.consolelauncher.managers.settings.NotificationSettings
 import ohi.andre.consolelauncher.managers.xml.options.Notifications
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi
@@ -392,6 +393,7 @@ class LauncherActivity : AppCompatActivity(), Reloadable {
 
         main!!.setRedirectionListener(uiManager!!.buildRedirectionListener())
         uiManager!!.pack = main!!.mainPack
+        LauncherSoundManager.playBoot(this)
 
         `in`.`in`(Tuils.EMPTYSTRING)
         uiManager!!.activateTerminalInput(openKeyboardOnStart)
@@ -564,6 +566,7 @@ class LauncherActivity : AppCompatActivity(), Reloadable {
     }
 
     override fun reload() {
+        uiManager?.preserveSurfaceSessionForReload()
         XMLPrefsManager.dispose()
         invalidate()
         Tuils.cancelFont()
@@ -693,6 +696,21 @@ class LauncherActivity : AppCompatActivity(), Reloadable {
     companion object {
         @JvmField
         var instance: LauncherActivity? = null
+
+        @JvmStatic
+        fun preview(context: Context) {
+            val launcher = instance
+            if (launcher != null) {
+                launcher.reload()
+                return
+            }
+
+            context.startActivity(
+                Intent(context, LauncherActivity::class.java).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                }
+            )
+        }
 
         const val COMMAND_REQUEST_PERMISSION: Int = 10
         const val STARTING_PERMISSION: Int = 11

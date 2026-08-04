@@ -1,7 +1,9 @@
 package ohi.andre.consolelauncher.wallpaper
 
 import android.content.Context
+import java.io.File
 import kotlin.random.Random
+import ohi.andre.consolelauncher.tuils.Tuils
 
 object RetuiWallpaperSettings {
     private const val PREFS = "retui_wallpaper"
@@ -15,6 +17,7 @@ object RetuiWallpaperSettings {
     private const val PALETTE = "palette"
     private const val SCENE = "scene"
     private const val BLACK_HOLE_PALETTE = "black_hole_palette"
+    private const val SOLID_COLOR = "solid_color"
 
     fun offsetX(context: Context): Float = prefs(context).getFloat(OFFSET_X, 0f)
     fun offsetY(context: Context): Float = prefs(context).getFloat(OFFSET_Y, 0f)
@@ -34,6 +37,12 @@ object RetuiWallpaperSettings {
     }
     fun blackHolePalette(context: Context): String =
         prefs(context).getString(BLACK_HOLE_PALETTE, "amber") ?: "amber"
+    fun solidColor(context: Context): String =
+        prefs(context).getString(SOLID_COLOR, "#FF000000") ?: "#FF000000"
+
+    fun themeColors(): List<String> = runCatching {
+        uniqueThemeColors(File(Tuils.getFolder(), "theme.xml").readText())
+    }.getOrDefault(emptyList())
 
     fun saveScene(context: Context, scene: String) {
         prefs(context).edit().putString(SCENE, scene).apply()
@@ -41,6 +50,10 @@ object RetuiWallpaperSettings {
 
     fun saveBlackHolePalette(context: Context, palette: String) {
         prefs(context).edit().putString(BLACK_HOLE_PALETTE, palette).apply()
+    }
+
+    fun saveSolidColor(context: Context, color: String) {
+        prefs(context).edit().putString(SOLID_COLOR, color).apply()
     }
 
     fun save(context: Context, offsetX: Float, offsetY: Float, scale: Float, height: Float,
@@ -59,4 +72,11 @@ object RetuiWallpaperSettings {
 
     private fun prefs(context: Context) =
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+
+    internal fun uniqueThemeColors(xml: String): List<String> =
+        Regex("value=\"(#[0-9a-fA-F]{6}|#[0-9a-fA-F]{8})\"")
+            .findAll(xml)
+            .map { it.groupValues[1].uppercase() }
+            .distinct()
+            .toList()
 }

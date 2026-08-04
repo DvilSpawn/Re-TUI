@@ -1466,6 +1466,7 @@ object Tuils {
     }
 
     fun init(context: Context) {
+        if (folder?.isDirectory == true) return
         Log.e("TUI-INIT", "Starting Tuils.init()")
         try {
             val sharedRoot: File? = Environment.getExternalStorageDirectory()

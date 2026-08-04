@@ -215,6 +215,11 @@ class ClockManager private constructor(context: Context) {
     }
 
     private fun playCompletionTone() {
+        val context = appContext ?: return
+        if (LauncherSoundManager.isEnabled()) {
+            LauncherSoundManager.play(context, LauncherSoundManager.Event.TIMER)
+            return
+        }
         try {
             val toneGenerator: ToneGenerator = ToneGenerator(AudioManager.STREAM_ALARM, 70)
             toneGenerator.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 1200)

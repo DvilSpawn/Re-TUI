@@ -167,6 +167,10 @@ class PomodoroManager private constructor(private val appContext: Context) {
         }
 
     private fun playTone() {
+        if (LauncherSoundManager.isEnabled()) {
+            LauncherSoundManager.play(appContext, LauncherSoundManager.Event.SUCCESS)
+            return
+        }
         try {
             val toneGenerator: ToneGenerator = ToneGenerator(AudioManager.STREAM_ALARM, 100)
             toneGenerator.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 2000)

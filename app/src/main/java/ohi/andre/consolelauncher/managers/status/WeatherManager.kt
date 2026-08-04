@@ -4,12 +4,13 @@ package ohi.andre.consolelauncher.managers.status
 
 import android.content.Context
 import android.content.Intent
+import android.location.Geocoder
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import java.util.Locale
+import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.managers.HTMLExtractManager
-import ohi.andre.consolelauncher.managers.TuiLocationManager
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.options.Behavior
-import ohi.andre.consolelauncher.tuils.Tuils
 import ohi.andre.consolelauncher.UIManager
 
 class WeatherManager(
@@ -18,34 +19,20 @@ class WeatherManager(
     private val size: Int,
     private val listener: StatusUpdateListener?
 ) : StatusManager(context, delay) {
-    private var key: String? = null
     private var url: String? = null
-
-    private var fixedLocation = false
-    private var lastLatitude = 0.0
-    private var lastLongitude = 0.0
-    private var hasLocation = false
+    private var configurationError: String? = null
+    private var locationQuery: String? = null
+    private var resolvingLocation = false
 
     init {
-        key = if (XMLPrefsManager.wasChanged(Behavior.weather_key, false)) {
-            XMLPrefsManager.get(Behavior.weather_key)
+        val where = XMLPrefsManager.get(Behavior.weather_location)?.trim()
+        val coordinates = WeatherResponseParser.parseCoordinates(where)
+        if (where.isNullOrEmpty() || where == "null") {
+            configurationError = context.getString(R.string.weather_location_required)
+        } else if (coordinates != null) {
+            setUrl(coordinates.first, coordinates.second)
         } else {
-            Behavior.weather_key.defaultValue()
-        }
-
-        var where = XMLPrefsManager.get(Behavior.weather_location)
-        if (where == null || where.isEmpty() || (!Tuils.isNumber(where) && !where.contains(","))) {
-            val location = TuiLocationManager.instance(context)
-            location?.add(ACTION_WEATHER_GOT_LOCATION)
-        } else {
-            fixedLocation = true
-            if (where.contains(",")) {
-                val split = where.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-                where = "lat=" + split[0] + "&lon=" + split[1]
-            } else {
-                where = "id=$where"
-            }
-            setUrl(where)
+            locationQuery = where
         }
     }
 
@@ -54,12 +41,21 @@ class WeatherManager(
     }
 
     fun updateWeather() {
-        if (!fixedLocation && !hasLocation) {
+        configurationError?.let {
+            val intent = Intent(UIManager.ACTION_WEATHER)
+            intent.putExtra(XMLPrefsManager.VALUE_ATTRIBUTE, it)
+            LocalBroadcastManager.getInstance(context.applicationContext).sendBroadcast(intent)
             return
         }
-
-        if (!fixedLocation) {
-            setUrl(lastLatitude, lastLongitude)
+        if (url == null && !resolvingLocation) {
+            val query = locationQuery ?: return
+            val cached = cachedCoordinates(query)
+            if (cached != null) {
+                setUrl(cached.first, cached.second)
+            } else {
+                resolveLocation(query)
+                return
+            }
         }
 
         val currentUrl = url
@@ -71,21 +67,59 @@ class WeatherManager(
         }
     }
 
-    fun setLocation(lat: Double, lon: Double) {
-        lastLatitude = lat
-        lastLongitude = lon
-        hasLocation = true
+    private fun resolveLocation(query: String) {
+        resolvingLocation = true
+        Thread {
+            try {
+                if (!Geocoder.isPresent()) throw IllegalStateException()
+                val address = Geocoder(context, Locale.getDefault())
+                    .getFromLocationName(query, 1)
+                    ?.firstOrNull()
+                    ?: throw IllegalArgumentException()
+                context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit()
+                    .putString(CACHE_QUERY, query)
+                    .putLong(CACHE_LATITUDE, java.lang.Double.doubleToRawLongBits(address.latitude))
+                    .putLong(CACHE_LONGITUDE, java.lang.Double.doubleToRawLongBits(address.longitude))
+                    .apply()
+                setUrl(address.latitude, address.longitude)
+                if (running) updateWeather()
+            } catch (_: Exception) {
+                sendOutput(context.getString(R.string.weather_location_not_found))
+            } finally {
+                resolvingLocation = false
+            }
+        }.start()
+    }
+
+    private fun cachedCoordinates(query: String): Pair<Double, Double>? {
+        val preferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        if (preferences.getString(CACHE_QUERY, null) != query ||
+            !preferences.contains(CACHE_LATITUDE) || !preferences.contains(CACHE_LONGITUDE)
+        ) return null
+        return java.lang.Double.longBitsToDouble(preferences.getLong(CACHE_LATITUDE, 0)) to
+            java.lang.Double.longBitsToDouble(preferences.getLong(CACHE_LONGITUDE, 0))
+    }
+
+    fun setLocation(latitude: Double, longitude: Double) {
+        locationQuery = null
+        configurationError = null
+        setUrl(latitude, longitude)
         updateWeather()
     }
 
-    private fun setUrl(where: String) {
-        url = "https://api.openweathermap.org/data/2.5/weather?$where&appid=$key&units=" +
-            XMLPrefsManager.get(Behavior.weather_temperature_measure)
+    private fun sendOutput(message: String) {
+        val intent = Intent(UIManager.ACTION_WEATHER)
+        intent.putExtra(XMLPrefsManager.VALUE_ATTRIBUTE, message)
+        LocalBroadcastManager.getInstance(context.applicationContext).sendBroadcast(intent)
     }
 
     private fun setUrl(latitude: Double, longitude: Double) {
-        url = "https://api.openweathermap.org/data/2.5/weather?lat=$latitude&lon=$longitude&appid=$key&units=" +
-            XMLPrefsManager.get(Behavior.weather_temperature_measure)
+        url = String.format(
+            Locale.US,
+            "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=%.4f&lon=%.4f",
+            latitude,
+            longitude
+        )
     }
 
     fun setDelay(delay: Int) {
@@ -93,6 +127,9 @@ class WeatherManager(
     }
 
     companion object {
-        const val ACTION_WEATHER_GOT_LOCATION: String = "ohi.andre.consolelauncher.WEATHER_GOT_LOCATION"
+        private const val PREFS_NAME = "retui_weather"
+        private const val CACHE_QUERY = "location_query"
+        private const val CACHE_LATITUDE = "latitude"
+        private const val CACHE_LONGITUDE = "longitude"
     }
 }

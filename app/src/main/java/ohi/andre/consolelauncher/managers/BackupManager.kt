@@ -62,6 +62,7 @@ object BackupManager {
     private const val TYPE_SHAREABLE = "retui-shareable-config"
     private val SHAREABLE_FILES = kotlin.arrayOf<kotlin.String>(
         XMLPrefsManager.XMLPrefsRoot.THEME.path,
+        XMLPrefsManager.XMLPrefsRoot.UI.path,
         XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS.path
     )
     private val SHAREABLE_ENTRIES = setOf(
@@ -122,26 +123,9 @@ object BackupManager {
         password: kotlin.String? = null
     ) {
         kotlin.require(!(context == null || uri == null)) { "Backup destination is required" }
-
-        val out: java.io.OutputStream =
-            java.io.BufferedOutputStream(context.getContentResolver().openOutputStream(uri, "w"))
-        kotlin.requireNotNull(out) { "Unable to open backup destination" }
-
         val backup = ohi.andre.consolelauncher.managers.BackupManager.createPersonalBackup(context)
-        try {
-            if (password != null && password.length > 0) {
-                out.write(
-                    ohi.andre.consolelauncher.managers.BackupManager.encrypt(
-                        backup,
-                        password
-                    )
-                )
-            } else {
-                out.write(backup)
-            }
-        } finally {
-            out.close()
-        }
+        val payload = if (!password.isNullOrEmpty()) encrypt(backup, password) else backup
+        writeVerified(context, uri, payload)
     }
 
     @JvmOverloads
@@ -164,10 +148,7 @@ object BackupManager {
             sourceLabel = sourceRoot.getName()
         }
 
-        val out: java.io.OutputStream =
-            java.io.BufferedOutputStream(context.getContentResolver().openOutputStream(uri, "w"))
-        kotlin.requireNotNull(out) { "Unable to open configuration destination" }
-
+        val out = java.io.ByteArrayOutputStream()
         val zip = java.util.zip.ZipOutputStream(out)
         try {
             ohi.andre.consolelauncher.managers.BackupManager.addTextEntry(
@@ -180,9 +161,13 @@ object BackupManager {
                         + (if (sourceLabel == null) "" else "presetName=" + ohi.andre.consolelauncher.managers.BackupManager.manifestSafeValue(
                     sourceLabel
                 ) + "\n")
-                        + "sections=theme,suggestions\n")
+                        + "sections=theme,ui,suggestions\n")
             )
             for (name in ohi.andre.consolelauncher.managers.BackupManager.SHAREABLE_FILES) {
+                if (sourceLabel == null && name == XMLPrefsManager.XMLPrefsRoot.UI.path) {
+                    ohi.andre.consolelauncher.managers.BackupManager.addTextEntry(zip, name, PresetManager.shareableUiXml())
+                    continue
+                }
                 val file = java.io.File(sourceRoot, name)
                 kotlin.require(file.isFile()) { if (sourceLabel == null) "Configuration is incomplete" else "Preset is incomplete" }
                 ohi.andre.consolelauncher.managers.BackupManager.addFileEntry(zip, name, file)
@@ -190,6 +175,38 @@ object BackupManager {
         } finally {
             zip.close()
         }
+        writeVerified(context, uri, out.toByteArray())
+    }
+
+    private fun writeVerified(context: Context, uri: Uri, payload: ByteArray) {
+        require(payload.isNotEmpty() && payload.size <= MAX_BACKUP_BYTES) { "Backup package is empty or too large" }
+        val raw = requireNotNull(context.contentResolver.openOutputStream(uri, "w")) {
+            "Unable to open backup destination"
+        }
+        BufferedOutputStream(raw).use {
+            it.write(payload)
+            it.flush()
+        }
+        val written = requireNotNull(context.contentResolver.openInputStream(uri)) {
+            "Unable to verify backup destination"
+        }
+        BufferedInputStream(written).use { verifyExport(payload, it) }
+    }
+
+    internal fun verifyExport(expected: ByteArray, actual: InputStream) {
+        require(expected.isNotEmpty()) { "Backup verification failed" }
+        val buffer = ByteArray(8192)
+        var offset = 0
+        while (true) {
+            val read = actual.read(buffer)
+            if (read == -1) break
+            require(offset + read <= expected.size) { "Backup verification failed" }
+            for (index in 0 until read) {
+                require(buffer[index] == expected[offset + index]) { "Backup verification failed" }
+            }
+            offset += read
+        }
+        require(offset == expected.size) { "Backup verification failed" }
     }
 
     @JvmOverloads
@@ -198,7 +215,7 @@ object BackupManager {
         context: android.content.Context,
         uri: android.net.Uri,
         password: kotlin.String? = null
-    ) {
+    ): kotlin.String? {
         kotlin.require(!(context == null || uri == null)) { "Backup package is required" }
 
         val tempDir: java.io.File = java.io.File(Tuils.getFolder(), ".restore-importing")
@@ -263,20 +280,21 @@ object BackupManager {
         val personal = validatePackage(manifest, entries)
         if (personal) {
             ohi.andre.consolelauncher.managers.BackupManager.clearForPersonalRestore(Tuils.getFolder())
-        }
-        ohi.andre.consolelauncher.managers.BackupManager.restoreDirectory(
-            tempDir,
-            Tuils.getFolder(),
-            personal
-        )
-        if (personal) {
+            ohi.andre.consolelauncher.managers.BackupManager.restoreDirectory(tempDir, Tuils.getFolder(), true)
             ohi.andre.consolelauncher.managers.BackupManager.restoreSharedPreferences(
                 context,
                 tempDir
             )
             SpaceManager.ensureInitialized(context)
+            Tuils.delete(tempDir)
+            return null
         }
+        val importedName = PresetManager.importExtractedFolder(
+            manifestValue(manifest, "presetName")?.takeIf { it.isNotBlank() } ?: "Imported preset",
+            tempDir
+        )
         Tuils.delete(tempDir)
+        return importedName
     }
 
     internal fun validatePackage(manifest: kotlin.String?, entries: kotlin.collections.Set<kotlin.String>): kotlin.Boolean {
@@ -293,10 +311,13 @@ object BackupManager {
             }
             TYPE_SHAREABLE -> {
                 kotlin.require(profile == "shareable") { "Invalid shareable configuration profile" }
-                kotlin.require(manifestValue(manifest, "sections") == "theme,suggestions") {
+                val sections = manifestValue(manifest, "sections")
+                kotlin.require(sections == "theme,suggestions" || sections == "theme,ui,suggestions") {
                     "Unsupported shareable configuration sections"
                 }
-                kotlin.require(entries == SHAREABLE_ENTRIES) { "Shareable configuration contains unsupported files" }
+                val expected = if (sections == "theme,ui,suggestions") SHAREABLE_ENTRIES else
+                    setOf(MANIFEST_FILE, XMLPrefsManager.XMLPrefsRoot.THEME.path, XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS.path)
+                kotlin.require(entries == expected) { "Shareable configuration contains unsupported files" }
                 false
             }
             else -> throw java.lang.IllegalArgumentException("Unsupported backup package")

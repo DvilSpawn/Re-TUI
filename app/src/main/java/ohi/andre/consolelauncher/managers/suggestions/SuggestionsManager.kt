@@ -36,7 +36,6 @@ import ohi.andre.consolelauncher.managers.AppsManager.LaunchInfo
 import ohi.andre.consolelauncher.managers.ContactManager.Contact
 import ohi.andre.consolelauncher.managers.FileManager.cd
 import ohi.andre.consolelauncher.managers.PresetManager.listAllPresetNames
-import ohi.andre.consolelauncher.managers.PresetManager.listBuiltInPresets
 import ohi.andre.consolelauncher.managers.PresetManager.listPresets
 import ohi.andre.consolelauncher.managers.TerminalManager
 import ohi.andre.consolelauncher.managers.file.FileBackendManager
@@ -639,6 +638,33 @@ class SuggestionsManager(
                 suggestGuideRootActions(suggestionList)
             }
             Collections.sort<Suggestion?>(suggestionList, comparator)
+            return suggestionList
+        }
+
+        if (beforeLastSpace.isEmpty() && ("intent".equals(lastWord, ignoreCase = true)
+                || "inspect".equals(lastWord, ignoreCase = true))) {
+            comparator.noInput = false
+            suggestIntentCommandArgs(
+                pack,
+                suggestionList,
+                null,
+                lastWord,
+                lastWord.lowercase(Locale.getDefault())
+            )
+            Collections.sort<Suggestion?>(suggestionList, comparator)
+            return suggestionList
+        }
+
+        val fullInput = (beforeLastSpace + Tuils.SPACE + lastWord).trim().lowercase(Locale.getDefault())
+        if (fullInput == "intent -activity" || fullInput == "intent activity"
+            || fullInput == "intent -broadcast" || fullInput == "intent broadcast") {
+            comparator.noInput = false
+            suggestIntentCommandArgs(pack, suggestionList, null, fullInput, fullInput)
+            Collections.sort<Suggestion?>(suggestionList, comparator)
+            return suggestionList
+        }
+        if (fullInput == "intent -view" || fullInput == "intent view"
+            || fullInput == "intent -uri" || fullInput == "intent uri") {
             return suggestionList
         }
 
@@ -1397,12 +1423,6 @@ class SuggestionsManager(
 
             CommandAbstraction.DATASTORE_PATH_TYPE -> suggestDataStoreType(
                 suggestions,
-                beforeLastSpace
-            )
-
-            CommandAbstraction.THEME_PRESET -> suggestThemePresets(
-                suggestions,
-                afterLastSpace,
                 beforeLastSpace
             )
 
@@ -2399,6 +2419,13 @@ class SuggestionsManager(
         beforeLastSpace: String?,
         normalized: String
     ): Boolean {
+        if ("inspect" == normalized) {
+            suggestIntentPackages(pack, suggestions, afterLastSpace, beforeLastSpace)
+            return true
+        }
+        if (normalized.startsWith("inspect ")) {
+            return true
+        }
         if (!isIntentCommand(normalized)) {
             return false
         }
@@ -2414,27 +2441,17 @@ class SuggestionsManager(
         }
 
         if ("intent" == normalized) {
-            addIntentOptions(
-                suggestions,
-                beforeLastSpace,
-                afterLastSpace,
-                "-check"
-            )
-            return true
-        }
-
-        if ("intent -check" == normalized) {
-            suggestIntentPackages(pack, suggestions, afterLastSpace, beforeLastSpace)
+            addIntentActions(suggestions, afterLastSpace)
             return true
         }
 
         if ("intent -activity" == normalized || "intent activity" == normalized) {
-            addIntentOptions(suggestions, beforeLastSpace, afterLastSpace, "-a", "-d", "-t", "-p", "-n")
+            addIntentOptions(suggestions, beforeLastSpace, afterLastSpace, *INTENT_PARAMETERS)
             return true
         }
 
         if ("intent -broadcast" == normalized || "intent broadcast" == normalized) {
-            addIntentOptions(suggestions, beforeLastSpace, afterLastSpace, "-a", "-p", "-n")
+            addIntentOptions(suggestions, beforeLastSpace, afterLastSpace, *INTENT_BROADCAST_PARAMETERS)
             return true
         }
 
@@ -2442,11 +2459,7 @@ class SuggestionsManager(
             suggestions,
             beforeLastSpace,
             afterLastSpace,
-            "-a",
-            "-d",
-            "-t",
-            "-p",
-            "-n"
+            *INTENT_PARAMETERS
         )
         return true
     }
@@ -2464,14 +2477,27 @@ class SuggestionsManager(
         suggestions: MutableList<Suggestion?>,
         beforeLastSpace: String?,
         afterLastSpace: String?,
-        vararg options: String
+        vararg options: Pair<String, String>
     ) {
         val filter = afterLastSpace?.trim { it <= ' ' } ?: Tuils.EMPTYSTRING
         val normalizedFilter = filter.replace("-", Tuils.EMPTYSTRING)
-        for (option in options) {
+        for ((option, label) in options) {
             val normalizedOption = option.replace("-", Tuils.EMPTYSTRING)
-            if (filter.length == 0 || option.startsWith(filter) || normalizedOption.startsWith(normalizedFilter)) {
-                suggestions.add(Suggestion(beforeLastSpace, option, false, Suggestion.Companion.TYPE_COMMAND))
+            if (filter.length == 0 || option.startsWith(filter) || normalizedOption.startsWith(normalizedFilter)
+                || label.lowercase(Locale.getDefault()).startsWith(filter.lowercase(Locale.getDefault()))) {
+                val prefix = beforeLastSpace?.trim { it <= ' ' } ?: Tuils.EMPTYSTRING
+                val command = if (prefix.isEmpty()) option else prefix + Tuils.SPACE + option
+                suggestions.add(Suggestion(null, label, false, Suggestion.Companion.TYPE_MODULE, command))
+            }
+        }
+    }
+
+    private fun addIntentActions(suggestions: MutableList<Suggestion?>, afterLastSpace: String?) {
+        val filter = afterLastSpace?.trim()?.lowercase(Locale.getDefault()) ?: Tuils.EMPTYSTRING
+        for ((label, command) in INTENT_ROOT_ACTIONS) {
+            if (filter.isEmpty() || label.lowercase(Locale.getDefault()).startsWith(filter)
+                || command.substringAfterLast(' ').removePrefix("-").startsWith(filter.removePrefix("-"))) {
+                suggestions.add(Suggestion(null, label, false, Suggestion.Companion.TYPE_MODULE, command))
             }
         }
     }
@@ -2516,7 +2542,7 @@ class SuggestionsManager(
                 Suggestion(
                     null,
                     label,
-                    false,
+                    prefix.equals("inspect", ignoreCase = true),
                     Suggestion.Companion.TYPE_MODULE,
                     command
                 )
@@ -2876,25 +2902,6 @@ class SuggestionsManager(
                         entry,
                         clickToLaunch,
                         Suggestion.Companion.TYPE_WEBHOOK_HISTORY
-                    )
-                )
-            }
-        }
-    }
-
-    private fun suggestThemePresets(
-        suggestions: MutableList<Suggestion?>,
-        afterLastSpace: String?,
-        beforeLastSpace: String?
-    ) {
-        for (p in listBuiltInPresets()) {
-            if (afterLastSpace == null || afterLastSpace.length == 0 || p.startsWith(afterLastSpace)) {
-                suggestions.add(
-                    Suggestion(
-                        beforeLastSpace,
-                        p,
-                        true,
-                        Suggestion.Companion.TYPE_PERMANENT
                     )
                 )
             }
@@ -4579,7 +4586,7 @@ class SuggestionsManager(
 
                 if (c.numbers.size <= c.selectedNumber) c.selectedNumber = 0
 
-                return textBefore + Tuils.SPACE + c.numbers.get(c.selectedNumber)
+                return contactCommandPrefix(textBefore, c.string) + Tuils.SPACE + c.numbers.get(c.selectedNumber)
             } else if (type == TYPE_PERMANENT) {
                 return text
             } else if (type == TYPE_MODULE) {
@@ -4618,6 +4625,15 @@ class SuggestionsManager(
         }
 
         companion object {
+            internal fun contactCommandPrefix(textBefore: String?, contactName: String): String {
+                val words = textBefore?.trim().orEmpty().split(Regex("\\s+")).toMutableList()
+                val name = contactName.lowercase(Locale.getDefault())
+                while (words.size > 1 && name.startsWith(words.last().lowercase(Locale.getDefault()))) {
+                    words.removeAt(words.lastIndex)
+                }
+                return words.joinToString(Tuils.SPACE)
+            }
+
             //        these suggestions will appear together
             const val TYPE_APP: Int = 0
             const val TYPE_ALIAS: Int = 1
@@ -4675,6 +4691,22 @@ class SuggestionsManager(
         const val DOUBLE_QUOTES: String = "\""
         private const val HIDDEN_SUGGESTION_COMMAND = "time"
         private const val MAX_LUA_SUGGESTION_ENGINES = 8
+        internal val INTENT_ROOT_ACTIONS = arrayOf(
+            "Open URI" to "intent -view",
+            "Start activity" to "intent -activity",
+            "Send broadcast" to "intent -broadcast",
+            "Parse intent URI" to "intent -uri"
+        )
+        internal val INTENT_PARAMETERS = arrayOf(
+            "-a" to "Action (-a)",
+            "-d" to "Data URI (-d)",
+            "-t" to "MIME type (-t)",
+            "-p" to "Package (-p)",
+            "-n" to "Component (-n)"
+        )
+        private val INTENT_BROADCAST_PARAMETERS = arrayOf(
+            INTENT_PARAMETERS[0], INTENT_PARAMETERS[3], INTENT_PARAMETERS[4]
+        )
         private val MODULE_ROOT_OPTIONS = arrayOf(
             "-ls" to true,
             "-add" to false,

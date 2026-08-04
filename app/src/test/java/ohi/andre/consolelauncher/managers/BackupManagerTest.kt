@@ -1,10 +1,21 @@
 package ohi.andre.consolelauncher.managers
 
+import java.io.ByteArrayInputStream
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class BackupManagerTest {
+    @Test
+    fun acceptsExactWrittenBackup() {
+        BackupManager.verifyExport(byteArrayOf(1, 2, 3), ByteArrayInputStream(byteArrayOf(1, 2, 3)))
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun rejectsEmptyOrTruncatedWrittenBackup() {
+        BackupManager.verifyExport(byteArrayOf(1, 2, 3), ByteArrayInputStream(byteArrayOf()))
+    }
+
     @Test
     fun acceptsCompletePersonalBackup() {
         assertTrue(
@@ -33,6 +44,16 @@ class BackupManagerTest {
     fun acceptsExactShareableConfiguration() {
         assertFalse(
             BackupManager.validatePackage(
+                "type=retui-shareable-config\nschema=1\nprofile=shareable\nsections=theme,ui,suggestions\n",
+                setOf("manifest.txt", "theme.xml", "ui.xml", "suggestions.xml")
+            )
+        )
+    }
+
+    @Test
+    fun acceptsLegacyShareableConfiguration() {
+        assertFalse(
+            BackupManager.validatePackage(
                 "type=retui-shareable-config\nschema=1\nprofile=shareable\nsections=theme,suggestions\n",
                 setOf("manifest.txt", "theme.xml", "suggestions.xml")
             )
@@ -42,8 +63,8 @@ class BackupManagerTest {
     @Test(expected = IllegalArgumentException::class)
     fun rejectsExtraFilesInShareableConfiguration() {
         BackupManager.validatePackage(
-            "type=retui-shareable-config\nschema=1\nprofile=shareable\nsections=theme,suggestions\n",
-            setOf("manifest.txt", "theme.xml", "suggestions.xml", "alias.xml")
+            "type=retui-shareable-config\nschema=1\nprofile=shareable\nsections=theme,ui,suggestions\n",
+            setOf("manifest.txt", "theme.xml", "ui.xml", "suggestions.xml", "alias.xml")
         )
     }
 }

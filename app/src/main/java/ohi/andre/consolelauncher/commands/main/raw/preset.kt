@@ -60,6 +60,19 @@ class preset : ParamCommand() {
             }
 
             override fun args(): IntArray = IntArray(0)
+        },
+        rm {
+            override fun exec(pack: ExecutePack): String {
+                val name = pack.getString()!!
+                return try {
+                    PresetManager.remove(name)
+                    "Preset '${name.trim()}' removed."
+                } catch (e: Exception) {
+                    e.message ?: pack.context.getString(R.string.output_error)
+                }
+            }
+
+            override fun args(): IntArray = intArrayOf(CommandAbstraction.PRESET_NAME)
         };
 
         override fun label(): String = Tuils.MINUS + name.replace("_", "")

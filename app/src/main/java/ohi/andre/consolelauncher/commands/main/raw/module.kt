@@ -208,9 +208,7 @@ class module : CommandAbstraction {
         if (!LuaWidgetManager.exists(id)) {
             LuaWidgetManager.save(id, requestedName, LuaWidgetManager.newWidgetTemplate(id))
         }
-        val intent = Intent(pack.context, WidgetEditorActivity::class.java)
-        intent.putExtra(WidgetEditorActivity.EXTRA_WIDGET_ID, id)
-        (pack.context as Activity).startActivity(intent)
+        WidgetEditorActivity.openWidget(pack.context, id)
         return "Lua module created: " + id
     }
 
