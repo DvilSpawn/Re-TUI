@@ -438,7 +438,7 @@ object ModuleManager {
         } else if (CALENDAR == id) {
             // Calendar is the built-in module-button example; its controls live in-panel.
         } else if (REMINDER == id) {
-            suggestions.add(ModuleSuggestion.Companion.command("open", "reminder -open"))
+            suggestions.add(ModuleSuggestion.Companion.command("open", "reminder"))
         } else if (NOTES == id) {
             suggestions.add(ModuleSuggestion.Companion.command("edit", "notes"))
             suggestions.add(ModuleSuggestion.Companion.command("list", "notes -ls"))

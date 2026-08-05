@@ -1,5 +1,9 @@
 apply plugin: 'com.android.application'
 
+dependencies {
+    implementation project(':retui-datetime-picker')
+}
+
 android {
     namespace = "ohi.andre.consolelauncher"
     compileSdk = 36

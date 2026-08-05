@@ -1,37 +1,43 @@
 package ohi.andre.consolelauncher.commands.tuixt
 
 import android.app.Activity
-import android.app.AlertDialog
-import android.app.DatePickerDialog
-import android.app.TimePickerDialog
+import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.dvil.retui.datetimepicker.RetuiDateTimePickerView
 import ohi.andre.consolelauncher.UIManager
 import ohi.andre.consolelauncher.commands.tuixt.TuixtLayout.addFoldAwareHost
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.dp
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.accentColor
+import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.borderColor
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.overlayColor
+import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.rect
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleButton
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleHeader
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleInput
+import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleListItem
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.stylePanel
+import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.surfaceColor
+import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.textColor
 import ohi.andre.consolelauncher.managers.modules.ModuleManager
 import ohi.andre.consolelauncher.managers.modules.ReminderManager
 import ohi.andre.consolelauncher.managers.modules.ReminderManager.Reminder
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi.applyFullscreen
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi.requestNoTitleIfFullscreen
 import ohi.andre.consolelauncher.tuils.Tuils
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Locale
 
 class ReminderActivity : Activity() {
     private lateinit var list: LinearLayout
@@ -81,33 +87,82 @@ class ReminderActivity : Activity() {
     }
 
     private fun edit(reminder: Reminder?) {
-        val input = EditText(this).apply { hint = "Task name"; setText(reminder?.title.orEmpty()); styleInput(this@ReminderActivity, this) }
-        AlertDialog.Builder(this).setTitle(if (reminder == null) "Add reminder" else "Edit reminder").setView(input)
-            .setNegativeButton("Cancel", null).setPositiveButton("Next") { _, _ ->
-                val title = input.text.toString().trim()
-                if (title.isEmpty()) Toast.makeText(this, "Task name cannot be empty.", Toast.LENGTH_SHORT).show()
-                else pickDate(reminder, title)
-            }.show()
+        val selected = Calendar.getInstance().apply { timeInMillis = reminder?.atMillis ?: System.currentTimeMillis() + 60 * 60 * 1000 }
+        TuixtDialog.showCustom(this, if (reminder == null) "Add reminder" else "Edit reminder", TuixtDialog.ContentFactory { dialog: Dialog? ->
+            val content = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+            val title = EditText(this).apply { hint = "Task name"; setText(reminder?.title.orEmpty()); styleInput(this@ReminderActivity, this) }
+            val whenView = TextView(this).apply {
+                styleListItem(this@ReminderActivity, this, false)
+                textSize = 13f
+                minHeight = title.minimumHeight
+                setPadding(dp(this@ReminderActivity, 10f), dp(this@ReminderActivity, 8f), dp(this@ReminderActivity, 10f), dp(this@ReminderActivity, 8f))
+                text = formatPickerValue(selected)
+                setOnClickListener {
+                    (getSystemService(INPUT_METHOD_SERVICE) as? InputMethodManager)?.hideSoftInputFromWindow(title.windowToken, 0)
+                    pickDateTime(selected) { text = formatPickerValue(selected) }
+                }
+            }
+            val error = TextView(this).apply { setTextColor(textColor()); typeface = Tuils.getTypeface(this@ReminderActivity); visibility = View.GONE }
+            content.addView(title)
+            content.addView(TextView(this).apply { text = "DATE / TIME"; setTextColor(textColor()); typeface = Tuils.getTypeface(this@ReminderActivity) })
+            content.addView(whenView)
+            content.addView(error)
+            content.addView(LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                setPadding(0, dp(this@ReminderActivity, 12f), 0, 0)
+                addView(button("CANCEL", false).apply { setOnClickListener { dialog?.dismiss() } }, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
+                addView(button("SAVE", true).apply { setOnClickListener {
+                    val cleanTitle = title.text.toString().trim()
+                    if (cleanTitle.isEmpty() || selected.timeInMillis <= System.currentTimeMillis()) {
+                        error.text = if (cleanTitle.isEmpty()) "Task name cannot be empty." else "Reminder time must be in the future."
+                        error.visibility = View.VISIBLE
+                        return@setOnClickListener
+                    }
+                    dialog?.dismiss()
+                    if (reminder == null) ReminderManager.add(this@ReminderActivity, cleanTitle, selected.timeInMillis)
+                    else ReminderManager.save(this@ReminderActivity, Reminder(reminder.id, cleanTitle, selected.timeInMillis))
+                    changed()
+                } }, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
+            })
+            content
+        })
     }
 
-    private fun pickDate(reminder: Reminder?, title: String) {
-        val selected = Calendar.getInstance().apply { reminder?.let { timeInMillis = it.atMillis } }
-        DatePickerDialog(this, { _, year, month, day ->
-            selected.set(year, month, day)
-            TimePickerDialog(this, { _, hour, minute ->
-                selected.set(Calendar.HOUR_OF_DAY, hour); selected.set(Calendar.MINUTE, minute); selected.set(Calendar.SECOND, 0); selected.set(Calendar.MILLISECOND, 0)
-                if (selected.timeInMillis > System.currentTimeMillis()) {
-                    if (reminder == null) ReminderManager.add(this, title, selected.timeInMillis)
-                    else ReminderManager.save(this, Reminder(reminder.id, title, selected.timeInMillis))
-                    changed()
-                } else Toast.makeText(this, "Reminder time must be in the future.", Toast.LENGTH_SHORT).show()
-            }, selected.get(Calendar.HOUR_OF_DAY), selected.get(Calendar.MINUTE), true).show()
-        }, selected.get(Calendar.YEAR), selected.get(Calendar.MONTH), selected.get(Calendar.DAY_OF_MONTH)).show()
+    private fun pickDateTime(selected: Calendar, done: () -> Unit) {
+        val picker = RetuiDateTimePickerView(this, selected.timeInMillis, System.currentTimeMillis(), object : RetuiDateTimePickerView.Theme {
+            override fun styleLabel(view: TextView) {
+                view.setTextColor(textColor()); view.typeface = Tuils.getTypeface(this@ReminderActivity)
+            }
+
+            override fun styleControl(view: TextView, selected: Boolean) {
+                styleButton(this@ReminderActivity, view, selected); view.gravity = Gravity.CENTER
+            }
+
+            override fun styleDropdown(view: TextView) {
+                styleListItem(this@ReminderActivity, view, false)
+            }
+
+            override fun styleDay(view: TextView, selected: Boolean, enabled: Boolean) {
+                styleListItem(this@ReminderActivity, view, selected)
+                view.setTextColor(accentColor()); view.setPadding(0, 0, 0, 0); view.minHeight = 0; view.gravity = Gravity.CENTER
+                view.background = if (selected) view.background else null
+                view.alpha = if (enabled || view.text.singleOrNull()?.isLetter() == true) 1f else 0.35f
+            }
+
+            override fun dropdownBackground() = rect(this@ReminderActivity, surfaceColor(), borderColor(), 1.25f)
+        })
+        TuixtDialog.showContent(this, "Pick date / time", picker, "Use", "Cancel", TuixtDialog.ConfirmAction {
+            selected.timeInMillis = picker.selectedTimeMillis()
+            selected.set(Calendar.SECOND, 0); selected.set(Calendar.MILLISECOND, 0)
+            done()
+        })
     }
+
+    private fun formatPickerValue(value: Calendar): String = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.US).format(value.time)
 
     private fun confirmRemove(reminder: Reminder) {
-        AlertDialog.Builder(this).setTitle("Remove reminder?").setMessage(reminder.title)
-            .setNegativeButton("Cancel", null).setPositiveButton("Remove") { _, _ -> ReminderManager.remove(this, reminder.id); changed() }.show()
+        TuixtDialog.showConfirm(this, "Remove reminder?", reminder.title, "Remove", "Cancel",
+            TuixtDialog.ConfirmAction { ReminderManager.remove(this, reminder.id); changed() })
     }
 
     private fun changed() {

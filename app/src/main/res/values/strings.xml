@@ -593,7 +593,7 @@
         \n$ timer -add 30s</string>
     <string name="help_reminder">Manage reminders.
         \n\nUsage:
-        \n$ reminder -open
+        \n$ reminder
         \n$ reminder -add &lt;task name&gt; &lt;dd/mm/yy&gt; &lt;HH:mm&gt;
         \n$ reminder -ls
         \n$ reminder -rm &lt;ID&gt;

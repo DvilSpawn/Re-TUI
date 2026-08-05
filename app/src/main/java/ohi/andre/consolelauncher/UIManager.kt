@@ -6641,7 +6641,7 @@ class UIManager(
     }
 
     private fun buildReminderModuleText(): String {
-        return ReminderManager.formatPreview(mContext!!) + "\nOpen: reminder -open"
+        return ReminderManager.formatPreview(mContext!!) + "\nOpen: reminder"
     }
 
     private fun buildNotesModuleText(): String {
