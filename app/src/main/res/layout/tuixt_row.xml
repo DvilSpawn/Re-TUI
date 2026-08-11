@@ -69,6 +69,20 @@
 
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/setting_action"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:visibility="gone" />
+
+    <FrameLayout
+        android:id="@+id/setting_color_picker"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+
     <View
         android:layout_width="match_parent"
         android:layout_height="0dp"

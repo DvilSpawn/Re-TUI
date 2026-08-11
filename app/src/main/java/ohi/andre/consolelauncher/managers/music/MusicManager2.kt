@@ -382,6 +382,10 @@ class MusicManager2(var mContext: Context, private val loadLocalLibrary: Boolean
         return false
     }
 
+    fun isPreparing(): Boolean {
+        return musicSrv != null && musicBound && musicSrv!!.isPreparing
+    }
+
     fun stop() {
         destroy()
     }

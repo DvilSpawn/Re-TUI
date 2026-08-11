@@ -11,7 +11,7 @@ enum class Apps(
 ) : XMLPrefsSave {
     default_app_n1("most_used", "The first default-suggested app"),
     default_app_n2("most_used", "The second default-suggested app"),
-    default_app_n3("com.android.vending", "The third default-suggested app"),
+    default_app_n3("null", "The third default-suggested app"),
     default_app_n4("null", "The fourth default-suggested app"),
     default_app_n5("null", "The fifth default-suggested app"),
     app_groups_sorting(

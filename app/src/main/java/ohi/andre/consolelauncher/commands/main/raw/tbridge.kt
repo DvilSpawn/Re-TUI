@@ -89,7 +89,7 @@ class tbridge : CommandAbstraction {
 
     private fun retiredFileListingMessage(): String =
         "TBridge file listing is retired from the public command surface.\n" +
-            "Use files for interactive file navigation, or use ls/open/share with file_backend=termux for bridge-backed quick actions.\n" +
+            "Use files, ls, open, or share through Re:T-UI Files.\n" +
             "TBridge now focuses on Termux runtime checks, scripts, modules, callbacks, and automation."
 
     override fun helpRes(): Int = R.string.help_tbridge

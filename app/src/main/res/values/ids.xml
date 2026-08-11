@@ -2,4 +2,6 @@
 <resources>
     <item name="mainview" type="id" />
     <item name="notification_terminal_widget" type="id" />
+    <item name="retui_font_base_size_sp" type="id" />
+    <item name="retui_font_scaled_size_sp" type="id" />
 </resources>

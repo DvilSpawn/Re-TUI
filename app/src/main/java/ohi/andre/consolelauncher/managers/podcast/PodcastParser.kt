@@ -207,5 +207,6 @@ object PodcastParser {
     }
 
     const val MAX_FEED_BYTES = 25L * 1024L * 1024L
-    const val MAX_EPISODES = 5000
+    // ponytail: 400 covers recent browsing; raise if catch-up-from-episode-1 needs deeper archive
+    const val MAX_EPISODES = 400
 }

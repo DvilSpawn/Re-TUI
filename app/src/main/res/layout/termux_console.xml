@@ -93,7 +93,7 @@
                     android:paddingBottom="1dp"
                     android:text="OUTPUT"
                     android:textAllCaps="true"
-                    android:textSize="12sp" />
+                    style="@style/Retui.Text.Control" />
         </FrameLayout>
 
         <LinearLayout
@@ -114,7 +114,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="$ "
-                    android:textSize="14sp" />
+                    style="@style/Retui.Text.Body" />
 
                 <EditText
                     android:id="@+id/termux_input"
@@ -126,7 +126,7 @@
                     android:imeOptions="actionGo|flagNoFullscreen"
                     android:importantForAutofill="no"
                     android:singleLine="true"
-                    android:textSize="14sp" />
+                    style="@style/Retui.Text.Body" />
         </LinearLayout>
 
         <HorizontalScrollView
@@ -171,7 +171,7 @@
                         android:layout_weight="1"
                         android:gravity="center"
                         android:text="ESC"
-                        android:textSize="11sp" />
+                        style="@style/Retui.Text.Caption" />
 
                     <TextView
                         android:id="@+id/termux_key_slash"
@@ -198,7 +198,7 @@
                         android:layout_weight="1"
                         android:gravity="center"
                         android:text="HOME"
-                        android:textSize="11sp" />
+                        style="@style/Retui.Text.Caption" />
 
                     <TextView
                         android:id="@+id/termux_key_up"
@@ -207,7 +207,7 @@
                         android:layout_weight="1"
                         android:gravity="center"
                         android:text="UP"
-                        android:textSize="11sp" />
+                        style="@style/Retui.Text.Caption" />
 
                     <TextView
                         android:id="@+id/termux_key_end"
@@ -216,7 +216,7 @@
                         android:layout_weight="1"
                         android:gravity="center"
                         android:text="END"
-                        android:textSize="11sp" />
+                        style="@style/Retui.Text.Caption" />
 
                     <TextView
                         android:id="@+id/termux_key_pgup"
@@ -225,7 +225,7 @@
                         android:layout_weight="1"
                         android:gravity="center"
                         android:text="PGUP"
-                        android:textSize="11sp" />
+                        style="@style/Retui.Text.Caption" />
 
                     <TextView
                         android:id="@+id/termux_key_setup"
@@ -234,7 +234,7 @@
                         android:layout_weight="1"
                         android:gravity="center"
                         android:text="CFG"
-                        android:textSize="11sp" />
+                        style="@style/Retui.Text.Caption" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -251,7 +251,7 @@
                         android:layout_weight="1"
                         android:gravity="center"
                         android:text="TAB"
-                        android:textSize="11sp" />
+                        style="@style/Retui.Text.Caption" />
 
                     <TextView
                         android:id="@+id/termux_key_ctrl"
@@ -260,7 +260,7 @@
                         android:layout_weight="1"
                         android:gravity="center"
                         android:text="CTRL"
-                        android:textSize="11sp" />
+                        style="@style/Retui.Text.Caption" />
 
                     <TextView
                         android:id="@+id/termux_key_alt"
@@ -269,7 +269,7 @@
                         android:layout_weight="1"
                         android:gravity="center"
                         android:text="ALT"
-                        android:textSize="11sp" />
+                        style="@style/Retui.Text.Caption" />
 
                     <TextView
                         android:id="@+id/termux_key_left"
@@ -278,7 +278,7 @@
                         android:layout_weight="1"
                         android:gravity="center"
                         android:text="LEFT"
-                        android:textSize="11sp" />
+                        style="@style/Retui.Text.Caption" />
 
                     <TextView
                         android:id="@+id/termux_key_down"
@@ -287,7 +287,7 @@
                         android:layout_weight="1"
                         android:gravity="center"
                         android:text="DOWN"
-                        android:textSize="11sp" />
+                        style="@style/Retui.Text.Caption" />
 
                     <TextView
                         android:id="@+id/termux_key_right"
@@ -296,7 +296,7 @@
                         android:layout_weight="1"
                         android:gravity="center"
                         android:text="RIGHT"
-                        android:textSize="11sp" />
+                        style="@style/Retui.Text.Caption" />
 
                     <TextView
                         android:id="@+id/termux_key_pgdn"
@@ -305,7 +305,7 @@
                         android:layout_weight="1"
                         android:gravity="center"
                         android:text="PGDN"
-                        android:textSize="11sp" />
+                        style="@style/Retui.Text.Caption" />
 
                     <TextView
                         android:id="@+id/termux_key_ime"
@@ -314,7 +314,7 @@
                         android:layout_weight="1"
                         android:gravity="center"
                         android:text="IME"
-                        android:textSize="11sp" />
+                        style="@style/Retui.Text.Caption" />
                 </LinearLayout>
         </LinearLayout>
 
@@ -333,7 +333,7 @@
         android:paddingEnd="12dp"
         android:paddingBottom="2dp"
         android:text="TERMUX"
-        android:textSize="14sp" />
+        style="@style/Retui.Text.Body" />
 
     <TextView
         android:id="@+id/termux_close"
@@ -343,6 +343,6 @@
         android:layout_marginTop="8dp"
         android:gravity="center"
         android:text="X"
-        android:textSize="15sp" />
+        style="@style/Retui.Text.Header" />
 
 </FrameLayout>

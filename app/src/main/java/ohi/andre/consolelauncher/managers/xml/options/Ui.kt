@@ -322,6 +322,19 @@ enum class Ui : XMLPrefsSave {
             return "Selected custom font file name from the fonts folder"
         }
     },
+    font_size_offset {
+        override fun defaultValue(): String? {
+            return "0"
+        }
+
+        override fun type(): String? {
+            return XMLPrefsSave.INTEGER
+        }
+
+        override fun info(): String? {
+            return "Adds this many points to Launcher text sizes without changing their individual size settings"
+        }
+    },
     fullscreen {
         override fun defaultValue(): String? {
             return "true"
@@ -415,7 +428,7 @@ enum class Ui : XMLPrefsSave {
     },
     ascii_index {
         override fun defaultValue(): String? {
-            return "9"
+            return "10"
         }
 
         override fun type(): String? {

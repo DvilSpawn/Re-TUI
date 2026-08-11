@@ -18,6 +18,7 @@ import ohi.andre.consolelauncher.managers.RssManager
 import ohi.andre.consolelauncher.managers.TerminalManager
 import ohi.andre.consolelauncher.managers.WebhookManager
 import ohi.andre.consolelauncher.managers.flashlight.TorchManager
+import ohi.andre.consolelauncher.managers.file.RetuiFilesContract
 import ohi.andre.consolelauncher.managers.music.MusicManager2
 import ohi.andre.consolelauncher.managers.podcast.PodcastManager
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
@@ -53,6 +54,7 @@ class MainPack(
 
     init {
         this.context = context
+        currentDirectory = File(RetuiFilesContract.currentPath(context))
     }
 
     private fun resolveHomeDirectory(preferred: File?): File {

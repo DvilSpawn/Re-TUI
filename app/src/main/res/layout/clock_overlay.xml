@@ -16,7 +16,7 @@
         android:drawablePadding="2dp"
         android:text="--:--"
         android:textColor="#FFFFFF"
-        android:textSize="12sp"
+        style="@style/Retui.Text.Control"
         android:textStyle="bold"
         android:visibility="gone" />
 
@@ -34,7 +34,22 @@
         android:drawablePadding="2dp"
         android:text="--:--"
         android:textColor="#FFFFFF"
-        android:textSize="12sp"
+        style="@style/Retui.Text.Control"
         android:textStyle="bold"
+        android:visibility="gone" />
+
+    <ImageView
+        android:id="@+id/podcast_tab"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_gravity="end|center_vertical"
+        android:layout_marginEnd="6dp"
+        android:background="@drawable/terminal_border"
+        android:contentDescription="@string/podcast_pill_description"
+        android:padding="16dp"
+        android:scaleType="centerInside"
+        android:clickable="true"
+        android:focusable="true"
+        android:src="@drawable/podcast_24"
         android:visibility="gone" />
 </merge>

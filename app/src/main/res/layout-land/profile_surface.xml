@@ -43,7 +43,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="IDENTITY"
-                android:textSize="10sp" />
+                style="@style/Retui.Text.Micro" />
 
             <TextView
                 android:id="@+id/profile_name"
@@ -101,14 +101,14 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="CONNECTION CODES"
-                    android:textSize="10sp" />
+                    style="@style/Retui.Text.Micro" />
 
                 <TextView
                     android:id="@+id/profile_qr_position"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="00/00"
-                    android:textSize="10sp" />
+                    style="@style/Retui.Text.Micro" />
             </LinearLayout>
 
             <androidx.viewpager2.widget.ViewPager2
@@ -157,7 +157,7 @@
         android:paddingEnd="12dp"
         android:paddingBottom="2dp"
         android:text="PROFILE // LOCAL ID"
-        android:textSize="14sp" />
+        style="@style/Retui.Text.Body" />
 
     <TextView
         android:id="@+id/profile_close"
@@ -167,5 +167,5 @@
         android:layout_marginTop="8dp"
         android:gravity="center"
         android:text="X"
-        android:textSize="15sp" />
+        style="@style/Retui.Text.Header" />
 </FrameLayout>

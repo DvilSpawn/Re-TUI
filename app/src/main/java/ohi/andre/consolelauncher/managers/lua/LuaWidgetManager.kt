@@ -1,4 +1,4 @@
-package ohi.andre.consolelauncher.managers.widgets
+package ohi.andre.consolelauncher.managers.lua
 
 import android.text.TextUtils
 import ohi.andre.consolelauncher.tuils.Tuils
@@ -20,6 +20,12 @@ import java.util.Map
 import java.util.Set
 import java.util.regex.Matcher
 
+/**
+ * Lua script store/runtime helpers for dock modules (and Lua apps/suggest scripts).
+ * These are module backends, not Android AppWidgets. AppWidget hosting is
+ * [ohi.andre.consolelauncher.managers.widgets.AndroidWidgetDrawerManager].
+ * On-disk folder remains "widgets" for backup compatibility.
+ */
 object LuaWidgetManager {
     const val ENGINE: String = "lua"
     const val SOURCE_PREFIX: String = "lua:"

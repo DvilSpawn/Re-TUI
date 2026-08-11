@@ -1,4 +1,4 @@
-package ohi.andre.consolelauncher.managers.widgets
+package ohi.andre.consolelauncher.managers.lua
 
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue

@@ -69,7 +69,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="$W "
-                android:textSize="14sp" />
+                style="@style/Retui.Text.Body" />
 
             <EditText
                 android:id="@+id/android_widget_input"
@@ -83,7 +83,7 @@
                 android:inputType="text|textNoSuggestions"
                 android:singleLine="true"
                 android:textCursorDrawable="@drawable/cursor"
-                android:textSize="14sp" />
+                style="@style/Retui.Text.Body" />
 
             <TextView
                 android:id="@+id/android_widget_send"
@@ -91,7 +91,7 @@
                 android:layout_height="30dp"
                 android:gravity="center"
                 android:text="RUN"
-                android:textSize="11sp" />
+                style="@style/Retui.Text.Caption" />
 
         </LinearLayout>
 
@@ -132,7 +132,7 @@
         android:paddingBottom="2dp"
         android:text="Widgets/ [0]"
         android:textColor="#A5D6A7"
-        android:textSize="14sp" />
+        style="@style/Retui.Text.Body" />
 
     <TextView
         android:id="@+id/android_widget_drawer_add"
@@ -165,6 +165,6 @@
         android:paddingBottom="2dp"
         android:text="grid 4"
         android:textColor="#A5D6A7"
-        android:textSize="12sp" />
+        style="@style/Retui.Text.Control" />
 
 </RelativeLayout>

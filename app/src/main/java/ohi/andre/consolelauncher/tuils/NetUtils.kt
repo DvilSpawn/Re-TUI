@@ -20,7 +20,12 @@ object NetUtils {
     fun hasInternetAccess(): Boolean {
         return try {
             val urlc = URL("https://clients3.google.com/generate_204").openConnection() as HttpURLConnection
-            urlc.responseCode == 204 && urlc.contentLength == 0
+            // Offline/DNS stalls used to hang RSS/weather/changelog threads for minutes.
+            urlc.connectTimeout = 2_000
+            urlc.readTimeout = 2_000
+            urlc.instanceFollowRedirects = false
+            urlc.useCaches = false
+            urlc.responseCode == 204
         } catch (e: IOException) {
             false
         }

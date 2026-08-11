@@ -58,6 +58,6 @@
         android:paddingBottom="2dp"
         android:text="OUTPUT ^"
         android:textAllCaps="true"
-        android:textSize="14sp" />
+        style="@style/Retui.Text.Body" />
 
 </RelativeLayout>

@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.core.graphics.ColorUtils
+import com.dvil.retui.contract.RetuiVisualContract
 import java.io.File
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings
@@ -21,7 +22,7 @@ object RetuiThemeBridge {
     private const val KEYBOARD_APPLY_CONTEXT_ACTION = "com.dvil.retui.keyboard.APPLY_CONTEXT"
 
     fun putLauncherThemeExtras(intent: Intent, context: Context) {
-        intent.putExtras(buildLauncherThemeBundle(context))
+        RetuiVisualContract.putInto(intent, buildLauncherThemeBundle(context))
     }
 
     fun applyToKeyboardInput(
@@ -55,7 +56,7 @@ object RetuiThemeBridge {
         val options = buildList {
             KEYBOARD_COLOR_KEYS.forEach { key ->
                 if (bundle.containsKey(key)) {
-                    add(key + "=" + colorOption(bundle.getInt(key)))
+                    add(key + "=" + RetuiVisualContract.colorToOption(bundle.getInt(key)))
                 }
             }
             KEYBOARD_INT_KEYS.forEach { key ->
@@ -95,69 +96,58 @@ object RetuiThemeBridge {
         val inputSurfaceColor = ColorUtils.blendARGB(terminalSurfaceColor, Color.BLACK, 0.16f)
         val fileSelectionColor = LauncherSettings.getColor(Suggestions.file_background_color)
         val topDisplayMargin = XMLPrefsManager.get(Ui.display_margin_top_section)
+        val panelText = AppearanceSettings.moduleNameTextColor()
+        val buttonBg = AppearanceSettings.moduleButtonBackgroundColor()
 
-        bundle.putInt("theme_bg", XMLPrefsManager.getColor(Theme.background_color))
-        bundle.putInt("theme_text", XMLPrefsManager.getColor(Theme.output_text_color))
-        bundle.putInt("theme_border", terminalBorderColor)
-        bundle.putInt("terminal_bg", terminalSurfaceColor)
-        bundle.putInt("terminal_window_background_color", terminalSurfaceColor)
-        bundle.putInt("module_bg_color", terminalSurfaceColor)
-        bundle.putInt("module_text_color", AppearanceSettings.moduleNameTextColor())
-        bundle.putInt("module_border_color", terminalBorderColor)
-        bundle.putInt("module_header_bg_color", terminalHeaderColor)
-        bundle.putInt("module_header_text_color", AppearanceSettings.moduleNameTextColor())
-        bundle.putInt("module_button_bg_color", AppearanceSettings.moduleButtonBackgroundColor())
-        bundle.putInt("module_button_background_color", AppearanceSettings.moduleButtonBackgroundColor())
-        bundle.putInt("module_button_text_color", AppearanceSettings.moduleNameTextColor())
-        bundle.putInt("module_button_border_color", terminalBorderColor)
-        bundle.putInt("input_bg_color", inputSurfaceColor)
-        bundle.putInt("input_background_color", inputSurfaceColor)
-        bundle.putInt("input_text_color", XMLPrefsManager.getColor(Theme.input_text_color))
-        bundle.putInt("output_bg_color", outputSurfaceColor)
-        bundle.putInt("output_background_color", outputSurfaceColor)
-        bundle.putInt("output_text_color", XMLPrefsManager.getColor(Theme.output_text_color))
-        bundle.putInt("output_border_color", terminalBorderColor)
-        bundle.putInt("fm_panel_background_color", outputSurfaceColor)
-        bundle.putInt("fm_border_color", terminalBorderColor)
-        bundle.putInt("fm_text_color", XMLPrefsManager.getColor(Theme.output_text_color))
-        bundle.putInt("fm_directory_text_color", AppearanceSettings.moduleNameTextColor())
-        bundle.putInt("fm_selection_background_color", fileSelectionColor)
-        bundle.putInt("fm_selection_text_color", readableTextFor(fileSelectionColor))
-        bundle.putInt("fm_header_background_color", terminalHeaderColor)
-        bundle.putInt("fm_header_text_color", AppearanceSettings.moduleNameTextColor())
-        bundle.putInt("fm_button_background_color", AppearanceSettings.moduleButtonBackgroundColor())
-        bundle.putInt("fm_button_text_color", AppearanceSettings.moduleNameTextColor())
-        bundle.putInt("fm_button_border_color", terminalBorderColor)
-        bundle.putInt("top_margin", 18)
-        bundle.putInt("input_font_size", XMLPrefsManager.getInt(Ui.input_output_size))
-        bundle.putString("display_margin_mm", topDisplayMargin)
-        bundle.putString("display_margin_top_section", topDisplayMargin)
-        bundle.putString("display_margin_bottom_section", XMLPrefsManager.get(Ui.display_margin_bottom_section))
-        bundle.putBoolean("enable_dashed_border", AppearanceSettings.dashedBorders())
-        bundle.putBoolean("dashed_borders", AppearanceSettings.dashedBorders())
-        bundle.putInt("dashed_border_dash_length", AppearanceSettings.dashLength())
-        bundle.putInt("dashed_border_gap_length", AppearanceSettings.dashGap())
-        bundle.putFloat("dashed_border_stroke_width_dp", AppearanceSettings.dashedBorderStrokeWidthDp())
-        bundle.putInt("module_corner_radius", AppearanceSettings.moduleCornerRadius())
-        bundle.putInt("header_corner_radius", AppearanceSettings.headerCornerRadius())
-        bundle.putInt("output_corner_radius", AppearanceSettings.outputCornerRadius())
-        bundle.putInt("module_header_text_size", AppearanceSettings.moduleHeaderTextSize())
-        bundle.putInt("module_body_text_size", AppearanceSettings.moduleBodyTextSize())
-        bundle.putInt("output_header_text_size", AppearanceSettings.outputHeaderTextSize())
-        bundle.putBoolean("enable_cyberdeck_mode", AppearanceSettings.cyberdeckMode())
-        bundle.putBoolean("cyberdeck_mode", AppearanceSettings.cyberdeckMode())
-        bundle.putBoolean("enable_crt_filter", AppearanceSettings.crtFilter())
-        bundle.putBoolean("crt_filter", AppearanceSettings.crtFilter())
-        bundle.putBoolean("enable_crt_vignette", AppearanceSettings.crtVignette())
-        bundle.putBoolean("crt_vignette", AppearanceSettings.crtVignette())
+        bundle.putInt(RetuiVisualContract.BG, XMLPrefsManager.getColor(Theme.background_color))
+        bundle.putInt(RetuiVisualContract.TEXT, XMLPrefsManager.getColor(Theme.output_text_color))
+        bundle.putInt(RetuiVisualContract.BORDER, terminalBorderColor)
+        bundle.putInt(RetuiVisualContract.TERMINAL_BG, terminalSurfaceColor)
+        bundle.putInt(RetuiVisualContract.PANEL_BG, terminalSurfaceColor)
+        bundle.putInt(RetuiVisualContract.PANEL_TEXT, panelText)
+        bundle.putInt(RetuiVisualContract.PANEL_BORDER, terminalBorderColor)
+        bundle.putInt(RetuiVisualContract.HEADER_BG, terminalHeaderColor)
+        bundle.putInt(RetuiVisualContract.HEADER_TEXT, panelText)
+        bundle.putInt(RetuiVisualContract.BUTTON_BG, buttonBg)
+        bundle.putInt(RetuiVisualContract.BUTTON_TEXT, panelText)
+        bundle.putInt(RetuiVisualContract.BUTTON_BORDER, terminalBorderColor)
+        bundle.putInt(RetuiVisualContract.INPUT_BG, inputSurfaceColor)
+        bundle.putInt(RetuiVisualContract.INPUT_TEXT, XMLPrefsManager.getColor(Theme.input_text_color))
+        bundle.putInt(RetuiVisualContract.OUTPUT_BG, outputSurfaceColor)
+        bundle.putInt(RetuiVisualContract.OUTPUT_TEXT, XMLPrefsManager.getColor(Theme.output_text_color))
+        bundle.putInt(RetuiVisualContract.OUTPUT_BORDER, terminalBorderColor)
+        bundle.putInt(RetuiVisualContract.DIRECTORY_TEXT, panelText)
+        bundle.putInt(RetuiVisualContract.SELECTION_BG, fileSelectionColor)
+        bundle.putInt(RetuiVisualContract.SELECTION_TEXT, readableTextFor(fileSelectionColor))
+        bundle.putInt(RetuiVisualContract.TOP_MARGIN, 18)
+        bundle.putInt(RetuiVisualContract.INPUT_FONT_SIZE, XMLPrefsManager.getInt(Ui.input_output_size))
+        bundle.putString(RetuiVisualContract.DISPLAY_MARGIN_TOP, topDisplayMargin)
+        bundle.putString(
+            RetuiVisualContract.DISPLAY_MARGIN_BOTTOM,
+            XMLPrefsManager.get(Ui.display_margin_bottom_section)
+        )
+        bundle.putBoolean(RetuiVisualContract.DASHED_BORDERS, AppearanceSettings.dashedBorders())
+        bundle.putInt(RetuiVisualContract.DASHED_BORDER_DASH_LENGTH, AppearanceSettings.dashLength())
+        bundle.putInt(RetuiVisualContract.DASHED_BORDER_GAP_LENGTH, AppearanceSettings.dashGap())
+        bundle.putFloat(
+            RetuiVisualContract.DASHED_BORDER_STROKE_WIDTH_DP,
+            AppearanceSettings.dashedBorderStrokeWidthDp()
+        )
+        bundle.putInt(RetuiVisualContract.MODULE_CORNER_RADIUS, AppearanceSettings.moduleCornerRadius())
+        bundle.putInt(RetuiVisualContract.HEADER_CORNER_RADIUS, AppearanceSettings.headerCornerRadius())
+        bundle.putInt(RetuiVisualContract.OUTPUT_CORNER_RADIUS, AppearanceSettings.outputCornerRadius())
+        bundle.putInt(RetuiVisualContract.HEADER_TEXT_SIZE, AppearanceSettings.moduleHeaderTextSize())
+        bundle.putInt(RetuiVisualContract.BODY_TEXT_SIZE, AppearanceSettings.moduleBodyTextSize())
+        bundle.putInt(RetuiVisualContract.OUTPUT_HEADER_TEXT_SIZE, AppearanceSettings.outputHeaderTextSize())
+        bundle.putBoolean(RetuiVisualContract.CYBERDECK_MODE, AppearanceSettings.cyberdeckMode())
+        bundle.putBoolean(RetuiVisualContract.CRT_FILTER, AppearanceSettings.crtFilter())
+        bundle.putBoolean(RetuiVisualContract.CRT_VIGNETTE, AppearanceSettings.crtVignette())
 
         contextLabel?.takeIf { it.isNotBlank() }?.let {
-            bundle.putString("keyboard_context", it)
-            bundle.putString("retui_context", it)
+            bundle.putString(RetuiVisualContract.CONTEXT, it)
         }
         mode?.takeIf { it.isNotBlank() }?.let {
-            bundle.putString("keyboard_mode", it)
-            bundle.putString("retui_mode", it)
+            bundle.putString(RetuiVisualContract.MODE, it)
         }
 
         if (context != null) {
@@ -168,9 +158,9 @@ object RetuiThemeBridge {
                 Tuils.getFolder(),
                 Tuils.fontPath
             )
-            font.path?.let { bundle.putString("font_path", it) }
-            font.file?.let { bundle.putString("font_file", it) }
-            font.name?.let { bundle.putString("font_name", it) }
+            font.path?.let { bundle.putString(RetuiVisualContract.FONT_PATH, it) }
+            font.file?.let { bundle.putString(RetuiVisualContract.FONT_FILE, it) }
+            font.name?.let { bundle.putString(RetuiVisualContract.FONT_NAME, it) }
         }
 
         return bundle
@@ -220,67 +210,55 @@ object RetuiThemeBridge {
         return if (Color.alpha(outputBg) > 0) outputBg else terminalBg
     }
 
-    private fun colorOption(color: Int): String {
-        return "#" + Integer.toHexString(color).padStart(8, '0').takeLast(8)
-    }
-
     private fun readableTextFor(background: Int): Int {
         return if (ColorUtils.calculateLuminance(background) > 0.45) Color.BLACK else Color.WHITE
     }
 
     private val KEYBOARD_COLOR_KEYS = arrayOf(
-        "theme_bg",
-        "theme_text",
-        "theme_border",
-        "terminal_bg",
-        "terminal_window_background_color",
-        "module_bg_color",
-        "module_text_color",
-        "module_border_color",
-        "module_header_bg_color",
-        "module_header_text_color",
-        "module_button_bg_color",
-        "module_button_background_color",
-        "module_button_text_color",
-        "module_button_border_color",
-        "input_bg_color",
-        "input_background_color",
-        "input_text_color",
-        "output_bg_color",
-        "output_background_color",
-        "output_text_color",
-        "output_border_color"
+        RetuiVisualContract.BG,
+        RetuiVisualContract.TEXT,
+        RetuiVisualContract.BORDER,
+        RetuiVisualContract.TERMINAL_BG,
+        RetuiVisualContract.PANEL_BG,
+        RetuiVisualContract.PANEL_TEXT,
+        RetuiVisualContract.PANEL_BORDER,
+        RetuiVisualContract.HEADER_BG,
+        RetuiVisualContract.HEADER_TEXT,
+        RetuiVisualContract.BUTTON_BG,
+        RetuiVisualContract.BUTTON_TEXT,
+        RetuiVisualContract.BUTTON_BORDER,
+        RetuiVisualContract.INPUT_BG,
+        RetuiVisualContract.INPUT_TEXT,
+        RetuiVisualContract.OUTPUT_BG,
+        RetuiVisualContract.OUTPUT_TEXT,
+        RetuiVisualContract.OUTPUT_BORDER
     )
 
     private val KEYBOARD_INT_KEYS = arrayOf(
-        "input_font_size",
-        "dashed_border_dash_length",
-        "dashed_border_gap_length",
-        "module_corner_radius",
-        "header_corner_radius",
-        "output_corner_radius",
-        "module_header_text_size",
-        "module_body_text_size",
-        "output_header_text_size"
+        RetuiVisualContract.INPUT_FONT_SIZE,
+        RetuiVisualContract.DASHED_BORDER_DASH_LENGTH,
+        RetuiVisualContract.DASHED_BORDER_GAP_LENGTH,
+        RetuiVisualContract.MODULE_CORNER_RADIUS,
+        RetuiVisualContract.HEADER_CORNER_RADIUS,
+        RetuiVisualContract.OUTPUT_CORNER_RADIUS,
+        RetuiVisualContract.HEADER_TEXT_SIZE,
+        RetuiVisualContract.BODY_TEXT_SIZE,
+        RetuiVisualContract.OUTPUT_HEADER_TEXT_SIZE
     )
 
     private val KEYBOARD_FLOAT_KEYS = arrayOf(
-        "dashed_border_stroke_width_dp"
+        RetuiVisualContract.DASHED_BORDER_STROKE_WIDTH_DP
     )
 
     private val KEYBOARD_BOOLEAN_KEYS = arrayOf(
-        "enable_dashed_border",
-        "dashed_borders",
-        "enable_cyberdeck_mode",
-        "cyberdeck_mode",
-        "enable_crt_filter",
-        "crt_filter"
+        RetuiVisualContract.DASHED_BORDERS,
+        RetuiVisualContract.CYBERDECK_MODE,
+        RetuiVisualContract.CRT_FILTER,
+        RetuiVisualContract.CRT_VIGNETTE
     )
 
     private val KEYBOARD_STRING_KEYS = arrayOf(
-        "keyboard_context",
-        "retui_context",
-        "keyboard_mode",
-        "retui_mode"
+        RetuiVisualContract.CONTEXT,
+        RetuiVisualContract.MODE
     )
 }

@@ -5,7 +5,9 @@ import android.app.Dialog
 import android.app.WallpaperManager
 import android.content.ActivityNotFoundException
 import android.content.Context
+import android.content.ComponentName
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
@@ -15,6 +17,7 @@ import android.graphics.PorterDuff
 import android.provider.OpenableColumns
 import android.provider.DocumentsContract
 import android.text.InputType
+import android.text.TextUtils
 import android.util.Log
 import android.view.Gravity
 import android.view.MotionEvent
@@ -22,8 +25,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.FrameLayout
+import android.widget.HorizontalScrollView
 import android.widget.ImageButton
 import android.widget.LinearLayout
+import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -44,6 +49,7 @@ import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.rect
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.surfaceColor
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleButton
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleInput
+import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleIconButton
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleListItem
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.stylePanel
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleScreen
@@ -67,6 +73,7 @@ import ohi.andre.consolelauncher.managers.xml.options.Behavior
 import ohi.andre.consolelauncher.managers.xml.options.Ui
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi.applyFullscreen
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi.requestNoTitleIfFullscreen
+import ohi.andre.consolelauncher.tuils.LauncherFontScale
 import ohi.andre.consolelauncher.tuils.Tuils
 import java.io.File
 import java.io.FileOutputStream
@@ -87,25 +94,31 @@ import ohi.andre.consolelauncher.managers.settings.LauncherSettings
 import ohi.andre.consolelauncher.managers.tasker.TaskerIntegrationManager
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.wallpaper.RetuiWallpaperActivity
+import ohi.andre.consolelauncher.wallpaper.RetuiWallpaperService
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi
 
 class ThemerActivity : AppCompatActivity() {
     private var screenRoot: View? = null
-    private var childSettingsOpen = false
+    private var panelRoot: LinearLayout? = null
     private var recyclerView: RecyclerView? = null
     private var header: TextView? = null
     private var supportFooter: LinearLayout? = null
-    private var sectionsAdapter: RecyclerView.Adapter<ViewHolder?>? = null
+    private var sectionsAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>? = null
     private val sectionItems: MutableList<String> = ArrayList<String>()
+    private val sectionBackStack = ArrayDeque<String>()
     private var section: String? = null
     private var pendingBackupPassword: String? = null
     private var backupExportPending = false
     private var pendingRestoreUri: Uri? = null
     private var pendingShareablePresetName: String? = null
+    private var pendingFontSizeOffset: Int? = null
+    private var pendingUseSystemFont: Boolean? = null
+    private var pendingFontFileName: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         requestNoTitleIfFullscreen(this)
         super.onCreate(savedInstanceState)
+        overridePendingTransition(0, 0)
         applyFullscreen(this)
 
         section = if (getIntent() != null) getIntent().getStringExtra(EXTRA_SECTION) else null
@@ -120,6 +133,7 @@ class ThemerActivity : AppCompatActivity() {
         val contentHost = addFoldAwareHost(this, screen, ViewGroup.LayoutParams.MATCH_PARENT)
 
         val root = LinearLayout(this)
+        panelRoot = root
         root.setOrientation(LinearLayout.VERTICAL)
         root.setPadding(dp(this, 14f), dp(this, 50f), dp(this, 14f), dp(this, 14f))
         stylePanel(this, root)
@@ -158,8 +172,30 @@ class ThemerActivity : AppCompatActivity() {
         sectionItems.clear()
         sectionItems.addAll(getItemsForSection(section))
 
-        sectionsAdapter = object : RecyclerView.Adapter<ViewHolder?>() {
-            override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        sectionsAdapter = object : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+            override fun getItemViewType(position: Int): Int =
+                when {
+                    sectionItems[position] == FONT_SCALE_PANEL -> VIEW_TYPE_FONT_SCALE
+                    section == SECTION_FONTS && isFontFileName(sectionItems[position]) -> VIEW_TYPE_FONT
+                    else -> VIEW_TYPE_STANDARD
+                }
+
+            override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+                if (viewType == VIEW_TYPE_FONT_SCALE) {
+                    return createFontScaleViewHolder(parent)
+                }
+                if (viewType == VIEW_TYPE_FONT) {
+                    val row = LinearLayout(parent.context).apply {
+                        orientation = LinearLayout.HORIZONTAL
+                        gravity = Gravity.CENTER_VERTICAL
+                    }
+                    val label = TextView(parent.context)
+                    val delete = TextView(parent.context)
+                    row.addView(label, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
+                    row.addView(View(parent.context), LinearLayout.LayoutParams(dp(parent.context, 8f), 1))
+                    row.addView(delete, LinearLayout.LayoutParams(dp(parent.context, 58f), dp(parent.context, 48f)))
+                    return FontViewHolder(row, label, delete)
+                }
                 val tv = TextView(parent.getContext())
                 tv.setLayoutParams(
                     ViewGroup.LayoutParams(
@@ -170,18 +206,29 @@ class ThemerActivity : AppCompatActivity() {
                 return ViewHolder(tv)
             }
 
-            override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
                 val fileName = sectionItems.get(position)
+                if (holder is FontScaleViewHolder) {
+                    bindFontScalePanel(holder)
+                    return
+                }
+                if (holder is FontViewHolder) {
+                    bindFontRow(holder, fileName)
+                    return
+                }
                 val itemView = holder.itemView as TextView
                 itemView.setText(fileName.uppercase(Locale.getDefault()))
-                styleListItem(this@ThemerActivity, itemView, false)
+                val selected = section == SECTION_FONTS &&
+                    fileName == "Default (System Font)" &&
+                    pendingUseSystemFont == true
+                styleListItem(this@ThemerActivity, itemView, selected)
                 val params = RecyclerView.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT
                 )
                 params.setMargins(0, 0, 0, dp(this@ThemerActivity, 8f))
                 itemView.setLayoutParams(params)
-                holder.itemView.setOnClickListener(View.OnClickListener { v: View? ->
+                holder.itemView.setOnClickListener(View.OnClickListener { _: View? ->
                     if (fileName == "Appearance") {
                         openSection(SECTION_APPEARANCE)
                     } else if (fileName == "Behavior") {
@@ -207,9 +254,23 @@ class ThemerActivity : AppCompatActivity() {
                     } else if (fileName.startsWith("Tasker Integration")) {
                         showTaskerIntegrationDialog()
                     } else if (fileName == "Fonts") {
-                        showFontsDialog()
+                        openSection(SECTION_FONTS)
                     } else if (fileName == "Presets") {
-                        showPresetsDialog()
+                        openSection(SECTION_PRESETS)
+                    } else if (section == SECTION_PRESETS && fileName == "Save Current as Preset") {
+                        showSavePresetInput()
+                    } else if (section == SECTION_PRESETS && fileName == "Apply Preset") {
+                        openSection(SECTION_PRESET_APPLY)
+                    } else if (section == SECTION_PRESETS && fileName == "Remove Preset") {
+                        openSection(SECTION_PRESET_REMOVE)
+                    } else if (section == SECTION_PRESET_APPLY) {
+                        applyPreset(fileName)
+                    } else if (section == SECTION_PRESET_REMOVE) {
+                        confirmRemovePreset(fileName)
+                    } else if (section == SECTION_FONTS && fileName == "Default (System Font)") {
+                        applySystemFont()
+                    } else if (section == SECTION_FONTS && fileName == "Import Font...") {
+                        launchFontImportPicker()
                     } else if (fileName == "Toolbar Buttons") {
                         showToolbarButtonsDialog()
                     } else if (isDystopiaRow(fileName)) {
@@ -268,9 +329,16 @@ class ThemerActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         applyFullscreen(this)
-        if (childSettingsOpen) {
-            childSettingsOpen = false
-            screenRoot?.visibility = View.VISIBLE
+        screenRoot?.let { styleScreen(this, it) }
+        panelRoot?.let { stylePanel(this, it) }
+        header?.let { TuixtTheme.styleHeader(this, it) }
+        sectionsAdapter?.notifyDataSetChanged()
+        supportFooter?.let { footer ->
+            for (index in 0 until footer.childCount) {
+                val button = footer.getChildAt(index) as? ImageButton ?: continue
+                styleIconButton(this, button)
+                button.setColorFilter(accentColor(), PorterDuff.Mode.SRC_IN)
+            }
         }
     }
 
@@ -319,57 +387,37 @@ class ThemerActivity : AppCompatActivity() {
         }
     }
 
-    private fun showPresetsDialog() {
-        val options = mutableListOf<String?>("Save Current as Preset", "Apply Preset", "Remove Preset")
-        TuixtDialog.showOptions(this@ThemerActivity, "Presets", options, ItemAction { which: Int ->
-            if (which == 0) {
-                TuixtDialog.showInput(
-                    this@ThemerActivity,
-                    "Save Preset",
-                    "Preset name",
-                    "Save",
-                    "Cancel",
-                    InputAction { value: String? ->
-                        val name = value!!.trim { it <= ' ' }
-                        if (name.length > 0) {
-                            savePreset(name)
-                        }
-                    })
-            } else if (which == 1) {
-                val presetNames = PresetManager.listAllPresetNames()
-                if (presetNames.isEmpty()) {
-                    Toast.makeText(this@ThemerActivity, "No presets found.", Toast.LENGTH_SHORT)
-                        .show()
-                    return@ItemAction
-                }
-
-                TuixtDialog.showOptions(
-                    this@ThemerActivity,
-                    "Select Preset",
-                    presetNames,
-                    ItemAction { w: Int -> applyPreset(presetNames.get(w)) })
-            } else {
-                val presetNames = PresetManager.listSavedPresetFolders()
-                if (presetNames.isEmpty()) {
-                    Toast.makeText(this@ThemerActivity, "No removable presets found.", Toast.LENGTH_SHORT).show()
-                    return@ItemAction
-                }
-                TuixtDialog.showOptions(this@ThemerActivity, "Remove Preset", presetNames, ItemAction { w: Int ->
-                    val name = presetNames[w] ?: return@ItemAction
-                    TuixtDialog.showConfirm(
-                        this@ThemerActivity, "Remove Preset", "Remove $name?", "Remove", "Cancel",
-                        ConfirmAction {
-                            try {
-                                PresetManager.remove(name)
-                                Toast.makeText(this@ThemerActivity, "Preset removed.", Toast.LENGTH_SHORT).show()
-                            } catch (e: Exception) {
-                                Toast.makeText(this@ThemerActivity, e.message, Toast.LENGTH_SHORT).show()
-                            }
-                        }
-                    )
-                })
+    private fun showSavePresetInput() {
+        TuixtDialog.showInput(
+            this,
+            "Save Preset",
+            "Preset name",
+            "Save",
+            "Cancel",
+            InputAction { value ->
+                val name = value?.trim().orEmpty()
+                if (name.isNotEmpty()) savePreset(name)
             }
-        })
+        )
+    }
+
+    private fun confirmRemovePreset(name: String) {
+        TuixtDialog.showConfirm(
+            this,
+            "Remove Preset",
+            "Remove $name?",
+            "Remove",
+            "Cancel",
+            ConfirmAction {
+                try {
+                    PresetManager.remove(name)
+                    Toast.makeText(this, "Preset removed.", Toast.LENGTH_SHORT).show()
+                    openSection(SECTION_PRESET_REMOVE)
+                } catch (e: Exception) {
+                    Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        )
     }
 
     private fun savePreset(name: String?) {
@@ -407,6 +455,14 @@ class ThemerActivity : AppCompatActivity() {
             return "Re:T-UI Integrations"
         } else if (SECTION_SYSTEM == section) {
             return "Re:T-UI System & Support"
+        } else if (SECTION_FONTS == section) {
+            return "Re:T-UI Fonts"
+        } else if (SECTION_PRESETS == section) {
+            return "Re:T-UI Presets"
+        } else if (SECTION_PRESET_APPLY == section) {
+            return "Apply Preset"
+        } else if (SECTION_PRESET_REMOVE == section) {
+            return "Remove Preset"
         }
         return "Re:T-UI Settings Hub"
     }
@@ -454,6 +510,21 @@ class ThemerActivity : AppCompatActivity() {
                 "Send Feedback",
                 "View Crash Log"
             )
+        } else if (SECTION_FONTS == section) {
+            ensurePendingFontChanges()
+            return mutableListOf(
+                FONT_SCALE_PANEL,
+                "Default (System Font)",
+                "Import Font..."
+            ).apply {
+                addAll(listFontFiles(fontsDir).map { it.name })
+            }
+        } else if (SECTION_PRESETS == section) {
+            return mutableListOf("Save Current as Preset", "Apply Preset", "Remove Preset")
+        } else if (SECTION_PRESET_APPLY == section) {
+            return PresetManager.listAllPresetNames().toMutableList()
+        } else if (SECTION_PRESET_REMOVE == section) {
+            return PresetManager.listSavedPresetFolders().filterNotNull().toMutableList()
         }
 
         return mutableListOf(
@@ -465,7 +536,16 @@ class ThemerActivity : AppCompatActivity() {
         )
     }
 
-    private fun openSection(targetSection: String?) {
+    private fun openSection(targetSection: String?, addToHistory: Boolean = true) {
+        if (targetSection == null) return
+        if (addToHistory && section != null && section != targetSection) {
+            sectionBackStack.addLast(section!!)
+        }
+        if (section == SECTION_FONTS && targetSection != SECTION_FONTS) {
+            pendingFontSizeOffset = null
+            pendingUseSystemFont = null
+            pendingFontFileName = null
+        }
         section = targetSection
         header!!.setText(getHeaderText(section))
         sectionItems.clear()
@@ -473,6 +553,260 @@ class ThemerActivity : AppCompatActivity() {
         sectionsAdapter!!.notifyDataSetChanged()
         recyclerView!!.scrollToPosition(0)
         updateSupportFooter()
+    }
+
+    private fun bindFontRow(holder: FontViewHolder, fileName: String) {
+        val font = File(fontsDir, fileName)
+        holder.label.text = fileName.uppercase(Locale.getDefault())
+        styleListItem(
+            this,
+            holder.label,
+            pendingUseSystemFont == false && pendingFontFileName == fileName
+        )
+        holder.label.setOnClickListener { applyFont(font) }
+        holder.delete.text = "X"
+        styleButton(this, holder.delete, false)
+        holder.delete.setOnClickListener { confirmDeleteFont(font) }
+        holder.itemView.layoutParams = RecyclerView.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        ).apply { bottomMargin = dp(this@ThemerActivity, 8f) }
+    }
+
+    private fun createFontScaleViewHolder(parent: ViewGroup): FontScaleViewHolder {
+        val root = LinearLayout(parent.context).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(context, 12f), dp(context, 10f), dp(context, 12f), dp(context, 10f))
+        }
+
+        val previewRow = LinearLayout(parent.context).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+        }
+        val previewGlyphs = FONT_PREVIEW_SIZES.map { baseSize ->
+            TextView(parent.context).apply {
+                text = "A"
+                includeFontPadding = false
+                gravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
+                contentDescription = "${baseSize.toInt()}sp font preview"
+                setPadding(dp(context, 8f), 0, dp(context, 8f), 0)
+                previewRow.addView(
+                    this,
+                    LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                        dp(context, 78f)
+                    )
+                )
+            }
+        }
+        root.addView(
+            HorizontalScrollView(parent.context).apply {
+                isHorizontalScrollBarEnabled = false
+                addView(previewRow)
+            },
+            LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(parent.context, 82f))
+        )
+
+        val scaleRow = LinearLayout(parent.context).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+        }
+        val smaller = TextView(parent.context).apply {
+            text = "A"
+            gravity = Gravity.CENTER
+            contentDescription = "Decrease font size offset"
+            isClickable = true
+            isFocusable = true
+        }
+        val slider = SeekBar(parent.context).apply {
+            max = LauncherFontScale.MAX_OFFSET - LauncherFontScale.MIN_OFFSET
+            contentDescription = "Font size offset"
+        }
+        val larger = TextView(parent.context).apply {
+            text = "A"
+            gravity = Gravity.CENTER
+            contentDescription = "Increase font size offset"
+            isClickable = true
+            isFocusable = true
+        }
+        scaleRow.addView(smaller, LinearLayout.LayoutParams(dp(parent.context, 42f), dp(parent.context, 48f)))
+        scaleRow.addView(slider, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
+        scaleRow.addView(larger, LinearLayout.LayoutParams(dp(parent.context, 42f), dp(parent.context, 48f)))
+        root.addView(scaleRow)
+
+        val footer = LinearLayout(parent.context).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+        }
+        val status = TextView(parent.context)
+        val reset = TextView(parent.context).apply { text = "RESET" }
+        val save = TextView(parent.context).apply { text = "SAVE" }
+        footer.addView(status, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
+        footer.addView(reset, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(parent.context, 48f)))
+        footer.addView(View(parent.context), LinearLayout.LayoutParams(dp(parent.context, 8f), 1))
+        footer.addView(save, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(parent.context, 48f)))
+        root.addView(footer)
+
+        root.layoutParams = RecyclerView.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        ).apply { bottomMargin = dp(parent.context, 8f) }
+        return FontScaleViewHolder(root, previewGlyphs, smaller, slider, larger, status, reset, save)
+    }
+
+    private fun bindFontScalePanel(holder: FontScaleViewHolder) {
+        ensurePendingFontChanges()
+        val pending = pendingFontSizeOffset!!
+        val typeface = pendingFontTypeface()
+        stylePanel(this, holder.itemView)
+        holder.previewGlyphs.forEach { glyph ->
+            glyph.setTextColor(textColor())
+            glyph.setTypeface(typeface)
+        }
+        holder.smaller.apply {
+            setTextColor(textColor())
+            setTypeface(typeface, Typeface.BOLD)
+            textSize = 12f
+        }
+        holder.larger.apply {
+            setTextColor(textColor())
+            setTypeface(typeface, Typeface.BOLD)
+            textSize = 24f
+        }
+        holder.status.apply {
+            setTextColor(accentColor())
+            setTypeface(typeface, Typeface.BOLD)
+            textSize = 13f
+            isSingleLine = true
+            ellipsize = TextUtils.TruncateAt.END
+        }
+        styleButton(this, holder.reset, false)
+        styleButton(this, holder.save, true)
+        holder.slider.progressTintList = ColorStateList.valueOf(accentColor())
+        holder.slider.thumbTintList = ColorStateList.valueOf(accentColor())
+        holder.slider.setOnSeekBarChangeListener(null)
+        holder.slider.progress = pending - LauncherFontScale.MIN_OFFSET
+
+        fun preview(offset: Int) {
+            pendingFontSizeOffset = offset
+            holder.previewGlyphs.forEachIndexed { index, glyph ->
+                glyph.textSize = LauncherFontScale.scaledSp(FONT_PREVIEW_SIZES[index], offset)
+            }
+            val signed = if (offset > 0) "+$offset" else offset.toString()
+            holder.status.text = "${pendingFontLabel()}  /  ${signed}SP"
+            val changed = hasPendingFontChanges()
+            holder.save.isEnabled = changed
+            holder.save.alpha = if (changed) 1f else 0.45f
+        }
+
+        fun move(delta: Int) {
+            val next = ((pendingFontSizeOffset ?: savedFontSizeOffset()) + delta).coerceIn(
+                LauncherFontScale.MIN_OFFSET,
+                LauncherFontScale.MAX_OFFSET
+            )
+            holder.slider.progress = next - LauncherFontScale.MIN_OFFSET
+            preview(next)
+        }
+
+        holder.slider.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                if (fromUser) preview(progress + LauncherFontScale.MIN_OFFSET)
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) = Unit
+            override fun onStopTrackingTouch(seekBar: SeekBar?) = Unit
+        })
+        holder.smaller.setOnClickListener { move(-1) }
+        holder.larger.setOnClickListener { move(1) }
+        holder.reset.setOnClickListener {
+            holder.slider.progress = -LauncherFontScale.MIN_OFFSET
+            preview(0)
+        }
+        holder.save.setOnClickListener {
+            savePendingFontChanges()
+        }
+        preview(pending)
+    }
+
+    private fun savedFontSizeOffset(): Int =
+        LauncherSettings.getInt(Ui.font_size_offset).coerceIn(
+            LauncherFontScale.MIN_OFFSET,
+            LauncherFontScale.MAX_OFFSET
+        )
+
+    private fun savedUseSystemFont(): Boolean = LauncherSettings.getBoolean(Ui.system_font)
+
+    private fun savedFontFileName(): String = get(Ui.font_file)?.trim().orEmpty()
+
+    private fun ensurePendingFontChanges() {
+        if (pendingFontSizeOffset == null) pendingFontSizeOffset = savedFontSizeOffset()
+        if (pendingUseSystemFont == null) pendingUseSystemFont = savedUseSystemFont()
+        if (pendingFontFileName == null) pendingFontFileName = savedFontFileName()
+    }
+
+    private fun pendingFontTypeface(): Typeface {
+        ensurePendingFontChanges()
+        if (pendingUseSystemFont == true) return Typeface.DEFAULT
+
+        val file = File(fontsDir, pendingFontFileName.orEmpty())
+        return try {
+            Typeface.createFromFile(file)
+        } catch (_: Exception) {
+            Tuils.getTypeface(this) ?: Typeface.DEFAULT
+        }
+    }
+
+    private fun pendingFontLabel(): String {
+        ensurePendingFontChanges()
+        return if (pendingUseSystemFont == true) {
+            "SYSTEM"
+        } else {
+            pendingFontFileName.orEmpty().uppercase(Locale.getDefault())
+        }
+    }
+
+    private fun hasPendingFontChanges(): Boolean {
+        ensurePendingFontChanges()
+        return pendingFontSizeOffset != savedFontSizeOffset() ||
+            pendingUseSystemFont != savedUseSystemFont() ||
+            pendingFontFileName.orEmpty() != savedFontFileName()
+    }
+
+    private fun discardPendingFontChanges() {
+        pendingFontSizeOffset = savedFontSizeOffset()
+        pendingUseSystemFont = savedUseSystemFont()
+        pendingFontFileName = savedFontFileName()
+    }
+
+    private fun savePendingFontChanges() {
+        ensurePendingFontChanges()
+        if (!hasPendingFontChanges()) return
+
+        val useSystem = pendingUseSystemFont == true
+        val fileName = if (useSystem) "" else pendingFontFileName.orEmpty()
+        val fontChanged = useSystem != savedUseSystemFont() || fileName != savedFontFileName()
+        try {
+            val source = if (useSystem) null else File(fontsDir, fileName)
+            if (source != null) {
+                check(source.exists() && source.isFile) { "Selected font is no longer available." }
+                Typeface.createFromFile(source)
+            }
+            if (fontChanged) {
+                sweepCurrentFonts()
+                if (source != null) {
+                    Tuils.copy(source, File(Tuils.getFolder(), source.name))
+                }
+            }
+
+            set(this, Ui.system_font, useSystem.toString())
+            set(this, Ui.font_file, fileName)
+            set(this, Ui.font_size_offset, pendingFontSizeOffset!!.toString())
+            Tuils.cancelFont()
+            Toast.makeText(this, "Font and scale saved. Applying...", Toast.LENGTH_SHORT).show()
+            LauncherActivity.preview(this)
+        } catch (e: Exception) {
+            Toast.makeText(this, "Could not apply font: " + e.message, Toast.LENGTH_LONG).show()
+        }
     }
 
     private fun dystopiaRowLabel(): String =
@@ -531,7 +865,7 @@ class ThemerActivity : AppCompatActivity() {
             val fingerprint = ImageButton(this)
             fingerprint.setImageResource(R.drawable.ic_dystopia_fingerprint_24)
             fingerprint.setColorFilter(accentColor(), PorterDuff.Mode.SRC_IN)
-            fingerprint.setBackground(rect(this, surfaceColor(), borderColor(), 1.25f))
+            styleIconButton(this, fingerprint)
             fingerprint.setPadding(dp(this, 18f), dp(this, 18f), dp(this, 18f), dp(this, 18f))
             fingerprint.contentDescription = "Hold to sign up for Retui Credits"
             fingerprint.setOnClickListener { }
@@ -612,7 +946,7 @@ class ThemerActivity : AppCompatActivity() {
         val button = ImageButton(this)
         button.setImageResource(imageRes)
         button.setContentDescription(description)
-        button.setBackground(rect(this, surfaceColor(), borderColor(), 1.25f))
+        styleIconButton(this, button)
         button.setScaleType(android.widget.ImageView.ScaleType.CENTER_INSIDE)
         button.setPadding(dp(this, 10f), dp(this, 10f), dp(this, 10f), dp(this, 10f))
         button.setColorFilter(accentColor(), PorterDuff.Mode.SRC_IN)
@@ -641,8 +975,26 @@ class ThemerActivity : AppCompatActivity() {
 
     @SuppressLint("GestureBackNavigation")
     override fun onBackPressed() {
+        if (section == SECTION_FONTS && hasPendingFontChanges()) {
+            TuixtDialog.showConfirm(
+                this,
+                "Discard Changes?",
+                "Unsaved font and scale changes will be lost.",
+                "Discard",
+                "Keep Editing",
+                ConfirmAction {
+                    discardPendingFontChanges()
+                    onBackPressed()
+                }
+            )
+            return
+        }
+        if (sectionBackStack.isNotEmpty()) {
+            openSection(sectionBackStack.removeLast(), false)
+            return
+        }
         if (SECTION_HOME != section) {
-            openSection(SECTION_HOME)
+            openSection(SECTION_HOME, false)
             return
         }
         finishAndRemoveTask()
@@ -671,9 +1023,8 @@ class ThemerActivity : AppCompatActivity() {
     }
 
     private fun openSettingsChild(intent: Intent) {
-        childSettingsOpen = true
-        screenRoot?.visibility = View.INVISIBLE
         startActivityForResult(intent, LauncherActivity.TUIXT_REQUEST)
+        overridePendingTransition(0, 0)
     }
 
     private fun showToolbarButtonsDialog() {
@@ -804,105 +1155,7 @@ class ThemerActivity : AppCompatActivity() {
         return if (value == null || value.trim { it <= ' ' }.length == 0) fallback else value.trim { it <= ' ' }
     }
 
-    private fun showFontsDialog() {
-        val fontsDir = this.fontsDir
-        val fonts = listFontFiles(fontsDir)
-
-        TuixtDialog.showCustom(this, "Select Font", ContentFactory { dialog: Dialog? ->
-            val content = LinearLayout(this)
-            content.setOrientation(LinearLayout.VERTICAL)
-
-            addFontActionRow(
-                content,
-                dialog!!,
-                "Default (System Font)",
-                Runnable { this.applySystemFont() })
-            addFontActionRow(
-                content,
-                dialog,
-                "Import Font...",
-                Runnable { this.launchFontImportPicker() })
-            for (font in fonts) {
-                addFontFileRow(content, dialog, font)
-            }
-            content
-        })
-    }
-
-    private fun addFontActionRow(
-        content: LinearLayout,
-        dialog: Dialog,
-        label: String,
-        action: Runnable
-    ) {
-        val row = TextView(this)
-        row.setText(label.uppercase())
-        styleListItem(this, row, false)
-        row.setOnClickListener(View.OnClickListener { v: View? ->
-            dialog.dismiss()
-            action.run()
-        })
-
-        val rowParams = LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-        rowParams.bottomMargin = dp(this, 8f)
-        content.addView(row, rowParams)
-    }
-
-    private fun addFontFileRow(content: LinearLayout, dialog: Dialog, font: File) {
-        val row = LinearLayout(this)
-        row.setOrientation(LinearLayout.HORIZONTAL)
-        row.setGravity(Gravity.CENTER_VERTICAL)
-
-        val label = TextView(this)
-        label.setText(font.getName().uppercase())
-        styleListItem(this, label, false)
-        label.setOnClickListener(View.OnClickListener { v: View? ->
-            dialog.dismiss()
-            applyFont(font)
-        })
-
-        val delete = TextView(this)
-        delete.setText("X")
-        styleButton(this, delete, false)
-        delete.setMinWidth(dp(this, 52f))
-        delete.setMinHeight(dp(this, 48f))
-        delete.setOnClickListener(View.OnClickListener { v: View? ->
-            confirmDeleteFont(
-                dialog,
-                font
-            )
-        })
-
-        row.addView(
-            label, LinearLayout.LayoutParams(
-                0,
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                1f
-            )
-        )
-
-        val spacer = View(this)
-        row.addView(spacer, LinearLayout.LayoutParams(dp(this, 8f), 1))
-
-        row.addView(
-            delete, LinearLayout.LayoutParams(
-                dp(this, 58f),
-                dp(this, 48f)
-            )
-        )
-
-        val rowParams = LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-        rowParams.bottomMargin = dp(this, 8f)
-        content.addView(row, rowParams)
-    }
-
-    private fun confirmDeleteFont(fontsDialog: Dialog, font: File) {
+    private fun confirmDeleteFont(font: File) {
         TuixtDialog.showConfirm(
             this,
             "Delete Font",
@@ -910,13 +1163,20 @@ class ThemerActivity : AppCompatActivity() {
             "Delete",
             "Cancel",
             ConfirmAction {
-                fontsDialog.dismiss()
                 deleteFont(font)
             })
     }
 
     private fun deleteFont(font: File) {
         val deletedName = font.getName()
+        if (!savedUseSystemFont() && savedFontFileName() == deletedName) {
+            Toast.makeText(
+                this,
+                "Select and save another font before deleting the active font.",
+                Toast.LENGTH_LONG
+            ).show()
+            return
+        }
         val deleted = !font.exists() || font.delete()
 
         val rootCopy = File(Tuils.getFolder(), deletedName)
@@ -929,16 +1189,13 @@ class ThemerActivity : AppCompatActivity() {
             return
         }
 
-        val selected = get(Ui.font_file)
-        if (selected != null && selected == deletedName) {
-            set(this, Ui.system_font, "true")
-            set(this, Ui.font_file, "")
-            finalizeFontChange("Font deleted. System font applied!")
-            return
+        if (pendingUseSystemFont == false && pendingFontFileName == deletedName) {
+            pendingUseSystemFont = savedUseSystemFont()
+            pendingFontFileName = savedFontFileName()
         }
 
         Toast.makeText(this, "Font deleted.", Toast.LENGTH_SHORT).show()
-        showFontsDialog()
+        openSection(SECTION_FONTS, false)
     }
 
     private val fontsDir: File
@@ -991,37 +1248,19 @@ class ThemerActivity : AppCompatActivity() {
     }
 
     private fun applySystemFont() {
-        set(this, Ui.system_font, "true")
-        set(this, Ui.font_file, "")
-
-        sweepCurrentFonts()
-        finalizeFontChange("System font applied!")
+        pendingUseSystemFont = true
+        pendingFontFileName = ""
+        sectionsAdapter?.notifyDataSetChanged()
     }
 
     private fun applyFont(source: File) {
-        set(this, Ui.system_font, "false")
-        set(this, Ui.font_file, source.getName())
-
-        sweepCurrentFonts()
-
-        val tuiFolder = Tuils.getFolder()
-        val dest = File(tuiFolder, source.getName())
         try {
-            Log.e(
-                "TUI-THEMER",
-                "Copying font from " + source.getAbsolutePath() + " to " + dest.getAbsolutePath()
-            )
-            Tuils.copy(source, dest)
-
-            if (dest.exists() && dest.length() > 0) {
-                Log.e("TUI-THEMER", "Copy successful! Size: " + dest.length())
-            } else {
-                Log.e("TUI-THEMER", "Copy failed or file is empty!")
-            }
-
-            finalizeFontChange("Font applied!")
+            Typeface.createFromFile(source)
+            pendingUseSystemFont = false
+            pendingFontFileName = source.name
+            sectionsAdapter?.notifyDataSetChanged()
         } catch (e: Exception) {
-            Toast.makeText(this, "Error applying font: " + e.message, Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Could not preview font: " + e.message, Toast.LENGTH_LONG).show()
         }
     }
 
@@ -1036,16 +1275,6 @@ class ThemerActivity : AppCompatActivity() {
                 }
             }
         }
-    }
-
-    private fun finalizeFontChange(message: String?) {
-        Tuils.cancelFont()
-
-        Toast.makeText(this, message + " Reloading...", Toast.LENGTH_SHORT).show()
-
-        recyclerView!!.postDelayed(Runnable {
-            LauncherActivity.preview(this)
-        }, 500)
     }
 
     private fun launchWallpaperPicker() {
@@ -1067,13 +1296,20 @@ class ThemerActivity : AppCompatActivity() {
 
     private fun launchLiveWallpaperPicker() {
         try {
-            startActivity(Intent(WallpaperManager.ACTION_LIVE_WALLPAPER_CHOOSER))
+            startActivity(
+                Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER).apply {
+                    putExtra(
+                        WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT,
+                        ComponentName(this@ThemerActivity, RetuiWallpaperService::class.java)
+                    )
+                }
+            )
         } catch (e: Exception) {
-            Toast.makeText(
-                this,
-                "Live wallpaper picker is unavailable on this device.",
-                Toast.LENGTH_SHORT
-            ).show()
+            try {
+                startActivity(Intent(WallpaperManager.ACTION_LIVE_WALLPAPER_CHOOSER))
+            } catch (fallback: Exception) {
+                Toast.makeText(this, "Live wallpaper picker is unavailable on this device.", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -1453,6 +1689,7 @@ class ThemerActivity : AppCompatActivity() {
 
         Toast.makeText(this, "Font imported.", Toast.LENGTH_SHORT).show()
         applyFont(dest)
+        openSection(SECTION_FONTS, false)
     }
 
     private fun getDisplayName(uri: Uri): String? {
@@ -1735,6 +1972,21 @@ class ThemerActivity : AppCompatActivity() {
     }
 
     private class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
+    private class FontViewHolder(
+        itemView: View,
+        val label: TextView,
+        val delete: TextView
+    ) : RecyclerView.ViewHolder(itemView)
+    private class FontScaleViewHolder(
+        itemView: View,
+        val previewGlyphs: List<TextView>,
+        val smaller: TextView,
+        val slider: SeekBar,
+        val larger: TextView,
+        val status: TextView,
+        val reset: TextView,
+        val save: TextView
+    ) : RecyclerView.ViewHolder(itemView)
 
     private class AppChoice(val label: String, val packageName: String?)
     companion object {
@@ -1752,6 +2004,15 @@ class ThemerActivity : AppCompatActivity() {
         const val SECTION_PERSONALIZATION: String = "personalization"
         const val SECTION_INTEGRATIONS: String = "integrations"
         const val SECTION_SYSTEM: String = "system"
+        const val SECTION_FONTS: String = "fonts"
+        const val SECTION_PRESETS: String = "presets"
+        const val SECTION_PRESET_APPLY: String = "preset_apply"
+        const val SECTION_PRESET_REMOVE: String = "preset_remove"
+        private const val VIEW_TYPE_STANDARD = 0
+        private const val VIEW_TYPE_FONT = 1
+        private const val VIEW_TYPE_FONT_SCALE = 2
+        private const val FONT_SCALE_PANEL = "__font_scale_panel__"
+        private val FONT_PREVIEW_SIZES = floatArrayOf(10f, 11f, 12f, 14f, 15f, 18f, 64f)
         private const val BACKUP_EXPORT_REQUEST = 201
         private const val BACKUP_RESTORE_REQUEST = 202
         private const val SHAREABLE_CONFIG_EXPORT_REQUEST = 203

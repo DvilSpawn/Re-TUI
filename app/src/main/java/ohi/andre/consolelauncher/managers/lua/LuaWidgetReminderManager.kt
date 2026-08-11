@@ -1,4 +1,4 @@
-package ohi.andre.consolelauncher.managers.widgets
+package ohi.andre.consolelauncher.managers.lua
 
 import android.app.AlarmManager
 import android.app.PendingIntent

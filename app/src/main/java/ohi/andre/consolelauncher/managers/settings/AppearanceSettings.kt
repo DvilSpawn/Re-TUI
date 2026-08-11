@@ -8,6 +8,8 @@ import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.options.Behavior
 import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.managers.xml.options.Ui
+import ohi.andre.consolelauncher.managers.xml.options.SurfaceBorder
+import ohi.andre.consolelauncher.managers.xml.options.SurfaceBorderOption
 
 object AppearanceSettings {
     @JvmStatic
@@ -72,6 +74,17 @@ object AppearanceSettings {
 
     @JvmStatic
     fun terminalBorderColor(): Int = dashedBorderColor()
+
+    @JvmStatic
+    fun surfaceBorderEnabled(surface: SurfaceBorder): Boolean =
+        SurfaceBorder.isEnabled(dashedBorders(), LauncherSettings.getBoolean(surface.enabled))
+
+    @JvmStatic
+    fun surfaceBorderColor(surface: SurfaceBorder): Int =
+        SurfaceBorder.resolveColor(LauncherSettings.get(surface.color), terminalBorderColor())
+
+    @JvmStatic
+    fun unifiedStatusBorder(): Boolean = LauncherSettings.getBoolean(SurfaceBorderOption.unified_status_border)
 
     @JvmStatic
     fun moduleButtonBackgroundColor(): Int = LauncherSettings.getColor(Theme.module_button_background_color)

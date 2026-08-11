@@ -54,6 +54,7 @@ import ohi.andre.consolelauncher.tuils.LongClickableSpan
 import ohi.andre.consolelauncher.tuils.PrivateIOReceiver
 import ohi.andre.consolelauncher.tuils.PublicIOReceiver
 import ohi.andre.consolelauncher.tuils.Tuils
+import ohi.andre.consolelauncher.tuils.stuff.FakeLauncherActivity
 import ohi.andre.consolelauncher.tuils.interfaces.Inputable
 import ohi.andre.consolelauncher.tuils.interfaces.Outputable
 import ohi.andre.consolelauncher.tuils.interfaces.Reloadable
@@ -379,6 +380,16 @@ class LauncherActivity : AppCompatActivity(), Reloadable {
         }
 
         categories = HashSet<ReloadMessageCategory?>()
+
+        // exit's home-chooser briefly enables FakeLauncher; if killed mid-chooser it can stick.
+        try {
+            packageManager.setComponentEnabledSetting(
+                ComponentName(this, FakeLauncherActivity::class.java),
+                PackageManager.COMPONENT_ENABLED_STATE_DEFAULT,
+                PackageManager.DONT_KILL_APP
+            )
+        } catch (_: Exception) {
+        }
 
         main = MainManager(this)
 

@@ -12,7 +12,7 @@ import ohi.andre.consolelauncher.commands.tuixt.WidgetEditorActivity
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings
 import ohi.andre.consolelauncher.managers.modules.ModuleManager
 import ohi.andre.consolelauncher.managers.modules.ModulePromptManager
-import ohi.andre.consolelauncher.managers.widgets.LuaWidgetManager
+import ohi.andre.consolelauncher.managers.lua.LuaWidgetManager
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.options.Behavior
 import ohi.andre.consolelauncher.tuils.Tuils
@@ -130,6 +130,9 @@ class module : CommandAbstraction {
             if (parts.size < 2) return pack.context.getString(R.string.help_module)
             val module = ModuleManager.normalize(parts[1])
             if (!ModuleManager.isKnown(pack.context, module)) {
+                if (LuaWidgetManager.exists(module)) {
+                    return delegateLuaCommand(pack, "-rm " + module)
+                }
                 return "Unknown module: " + parts[1]
             }
             if (ModuleManager.builtIns.contains(module)) {
@@ -242,7 +245,7 @@ class module : CommandAbstraction {
         return try {
             pack.set(arrayOf(input))
             pack.currentIndex = 0
-            widget().exec(pack)
+            LuaModuleCommands.exec(pack)
         } finally {
             pack.set(previousArgs)
             pack.currentIndex = previousIndex

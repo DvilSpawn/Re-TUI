@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/home_widgets_root"
+    android:id="@+id/home_modules_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/transparent"
@@ -35,7 +35,7 @@
     </ohi.andre.consolelauncher.tuils.StableHorizontalScrollView>
 
     <ScrollView
-        android:id="@+id/home_widgets_content_scroll"
+        android:id="@+id/home_modules_content_scroll"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
@@ -43,7 +43,7 @@
         android:fillViewport="true">
 
         <LinearLayout
-            android:id="@+id/home_widgets_container"
+            android:id="@+id/home_modules_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical" />

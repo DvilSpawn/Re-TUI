@@ -523,32 +523,6 @@ object Tuils {
         return getTotaleSpace(Environment.getDataDirectory(), unit)
     }
 
-    fun getAvailableExternalMemorySize(unit: Int): Double {
-        try {
-            return Tuils.getAvailableSpace(
-                XMLPrefsManager.get(
-                    File::class.java,
-                    Behavior.external_storage_path
-                ), unit
-            )
-        } catch (e: Exception) {
-            return -1.0
-        }
-    }
-
-    fun getTotalExternalMemorySize(unit: Int): Double {
-        try {
-            return Tuils.getTotaleSpace(
-                XMLPrefsManager.get(
-                    File::class.java,
-                    Behavior.external_storage_path
-                ), unit
-            )
-        } catch (e: Exception) {
-            return -1.0
-        }
-    }
-
     fun getAvailableSpace(dir: File?, unit: Int): Double {
         if (dir == null) return -1.0
 

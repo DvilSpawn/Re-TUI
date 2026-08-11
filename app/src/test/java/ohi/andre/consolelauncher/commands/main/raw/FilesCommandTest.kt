@@ -1,13 +1,9 @@
 package ohi.andre.consolelauncher.commands.main.raw
 
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
 import org.junit.Test
-import java.io.File
 
 class FilesCommandTest {
-    private val currentDirectory = File("/storage/emulated/0")
-
     @Test
     fun usesPackagedOpenConsoleContract() {
         assertEquals("com.dvil.retui.fm", files.FM_PACKAGE)
@@ -16,14 +12,14 @@ class FilesCommandTest {
 
     @Test
     fun parsesNoArguments() {
-        assertEquals(files.FilesRequest(), files.parseRequest(null, currentDirectory))
+        assertEquals(files.FilesRequest(), files.parseRequest(null))
     }
 
     @Test
     fun parsesStructuredSearch() {
         assertEquals(
             files.FilesRequest(action = "search", searchName = "note"),
-            files.parseRequest("-search note", currentDirectory)
+            files.parseRequest("-search note")
         )
     }
 
@@ -31,52 +27,69 @@ class FilesCommandTest {
     fun parsesSearchWithType() {
         assertEquals(
             files.FilesRequest(action = "search", searchName = "note", searchType = "txt"),
-            files.parseRequest("-search note txt", currentDirectory)
+            files.parseRequest("-search note txt")
         )
     }
 
     @Test
-    fun resolvesRelativeOpenPath() {
+    fun opensRelativeFileFromSharedDirectory() {
         assertEquals(
-            files.FilesRequest(action = "open", path = "/storage/emulated/0/Download"),
-            files.parseRequest("-open Download", currentDirectory)
+            files.FilesRequest(action = "open", target = "photo.jpg"),
+            files.parseRequest("-open photo.jpg")
         )
     }
 
     @Test
-    fun preservesAbsoluteOpenPath() {
+    fun preservesAbsoluteOpenTarget() {
         assertEquals(
-            files.FilesRequest(action = "open", path = "/storage/emulated/0/Documents"),
-            files.parseRequest("-open /storage/emulated/0/Documents", currentDirectory)
+            files.FilesRequest(action = "open", target = "/storage/emulated/0/Documents/photo.jpg"),
+            files.parseRequest("-open /storage/emulated/0/Documents/photo.jpg")
         )
     }
 
     @Test
     fun preservesQuotedPathWithSpaces() {
         assertEquals(
-            files.FilesRequest(action = "open", path = "/storage/emulated/0/Download/My Folder"),
-            files.parseRequest("-open \"Download/My Folder\"", currentDirectory)
+            files.FilesRequest(action = "open", target = "My File.jpg"),
+            files.parseRequest("-open \"My File.jpg\"")
         )
+    }
+
+    @Test
+    fun parsesListActionAndSuggestionReplacements() {
+        assertEquals(
+            files.FilesRequest(action = "ls"),
+            files.parseRequest("-ls")
+        )
+        assertEquals(
+            files.FilesRequest(action = "share"),
+            files.parseRequest("-share")
+        )
+        assertEquals(
+            files.FilesRequest(action = "share", target = "photo.jpg"),
+            files.parseRequest("-share photo.jpg")
+        )
+        assertEquals(files.FilesRequest(changeDirectory = "Download"), files.parseRequest("-cd Download"))
+        val command = files()
+        assertEquals(listOf("-open", "-ls", "-share", "-search", "-cd"), files.SUGGESTIONS.toList())
+        assertEquals("files -ls", command.permanentSuggestionReplacement("-ls"))
+        assertEquals("files -cd", command.permanentSuggestionReplacement("-cd"))
     }
 
     @Test
     fun rejectsMissingStructuredArguments() {
         assertEquals(
             "Usage: files -search <name> [type]",
-            files.parseRequest("-search", currentDirectory).error
+            files.parseRequest("-search").error
         )
         assertEquals(
-            "Usage: files -open <directory>",
-            files.parseRequest("-open", currentDirectory).error
+            "Usage: files -open <file>",
+            files.parseRequest("-open").error
         )
     }
 
     @Test
-    fun keepsLegacySearchShorthand() {
-        val request = files.parseRequest("note txt", currentDirectory)
-        assertEquals("search", request.action)
-        assertEquals("note", request.searchName)
-        assertEquals("txt", request.searchType)
-        assertNull(request.error)
+    fun rejectsRemovedLegacySearchShorthand() {
+        assertEquals("Unknown files option: note", files.parseRequest("note txt").error)
     }
 }

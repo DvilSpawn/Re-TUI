@@ -3,8 +3,8 @@ package ohi.andre.consolelauncher.managers
 import android.content.Context
 import android.content.SharedPreferences
 import ohi.andre.consolelauncher.managers.notifications.reply.ReplyManager
-import ohi.andre.consolelauncher.managers.termux.TermuxAppManager
-import ohi.andre.consolelauncher.managers.widgets.LuaWidgetReminderManager
+import ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceLauncherManager
+import ohi.andre.consolelauncher.managers.lua.LuaWidgetReminderManager
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.tuils.Tuils
 import java.io.File
@@ -67,9 +67,8 @@ object SpaceManager {
                 "retui_modules",
                 "retui_reminders",
                 "retui_module_prompt",
-                "retui_tmux_workspace_launchers",
                 LuaWidgetReminderManager.PREFS,
-                TermuxAppManager.PREFS
+                TermuxWorkspaceLauncherManager.PREFS
             )
         )
     )

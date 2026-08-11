@@ -1,41 +1,32 @@
 package ohi.andre.consolelauncher.commands.main.raw
 
-import android.content.ActivityNotFoundException
-import android.content.Intent
-import java.io.File
+import android.content.Context
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.commands.CommandAbstraction
 import ohi.andre.consolelauncher.commands.ExecutePack
 import ohi.andre.consolelauncher.commands.main.MainPack
-import ohi.andre.consolelauncher.managers.RetuiThemeBridge
+import ohi.andre.consolelauncher.commands.main.specific.PermanentSuggestionCommand
+import ohi.andre.consolelauncher.managers.file.RetuiFilesContract
 import ohi.andre.consolelauncher.tuils.Tuils
 
-class files : CommandAbstraction {
+class files : CommandAbstraction, PermanentSuggestionCommand {
     override fun exec(info: ExecutePack): String? {
-        val currentDirectory = (info as? MainPack)?.currentDirectory
         val input = info.args
             ?.takeIf { it.isNotEmpty() }
             ?.let { info.getString().trim() }
-        val request = parseRequest(input, currentDirectory)
+        val request = parseRequest(input)
         request.error?.let { return it }
-
-        val intent = Intent(FM_ACTION)
-        intent.setPackage(FM_PACKAGE)
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-
-        request.action?.let { intent.putExtra("action", it) }
-        (request.path ?: currentDirectory?.absolutePath)?.let { intent.putExtra("path", it) }
-        request.searchName?.let { intent.putExtra("search_name", it) }
-        request.searchType?.let { intent.putExtra("search_type", it) }
-
-        RetuiThemeBridge.putLauncherThemeExtras(intent, info.context)
-
-        try {
-            info.context.startActivity(intent)
-        } catch (e: ActivityNotFoundException) {
-            return "Re:T-UI Files is not installed."
+        request.changeDirectory?.let { target ->
+            return cd.changeDirectory(info as MainPack, target)
         }
-        return null
+
+        return RetuiFilesContract.launch(
+            context = info.context,
+            action = request.action,
+            target = request.target,
+            searchName = request.searchName,
+            searchType = request.searchType
+        )
     }
 
     override fun argType(): IntArray = intArrayOf(CommandAbstraction.PLAIN_TEXT)
@@ -49,11 +40,18 @@ class files : CommandAbstraction {
 
     override fun onNotArgEnough(info: ExecutePack, nArgs: Int): String? = exec(info)
 
-    companion object {
-        internal const val FM_PACKAGE = "com.dvil.retui.fm"
-        internal const val FM_ACTION = "com.dvil.retui.fm.OPEN_CONSOLE"
+    override fun permanentSuggestions(context: Context): Array<String> =
+        SUGGESTIONS.copyOf()
 
-        internal fun parseRequest(input: String?, currentDirectory: File?): FilesRequest {
+    override fun permanentSuggestionReplacement(suggestion: String): String =
+        if (suggestion.startsWith("-")) "files $suggestion" else suggestion
+
+    companion object {
+        internal val SUGGESTIONS = arrayOf("-open", "-ls", "-share", "-search", "-cd")
+        internal const val FM_PACKAGE = RetuiFilesContract.PACKAGE
+        internal const val FM_ACTION = RetuiFilesContract.OPEN_CONSOLE
+
+        internal fun parseRequest(input: String?): FilesRequest {
             val tokens = Tuils.splitArgs(input).filterNotNull()
             if (tokens.isEmpty()) return FilesRequest()
 
@@ -62,34 +60,37 @@ class files : CommandAbstraction {
                     val name = tokens.getOrNull(1)
                         ?: return FilesRequest(error = "Usage: files -search <name> [type]")
                     FilesRequest(
-                        action = "search",
+                        action = RetuiFilesContract.ACTION_SEARCH,
                         searchName = name,
                         searchType = tokens.getOrNull(2)
                     )
                 }
                 "-open" -> {
-                    val path = tokens.getOrNull(1)
-                        ?: return FilesRequest(error = "Usage: files -open <directory>")
-                    val resolved = if (File(path).isAbsolute) {
-                        File(path)
-                    } else {
-                        currentDirectory?.let { File(it, path) }
-                            ?: return FilesRequest(error = "Unable to resolve relative path without a current directory.")
-                    }
-                    FilesRequest(action = "open", path = resolved.absoluteFile.normalize().path)
+                    val target = tokens.getOrNull(1)
+                        ?: return FilesRequest(error = "Usage: files -open <file>")
+                    FilesRequest(
+                        action = RetuiFilesContract.ACTION_OPEN,
+                        target = target
+                    )
                 }
-                else -> FilesRequest(
-                    action = "search",
-                    searchName = tokens[0],
-                    searchType = tokens.getOrNull(1)
+                "-ls" -> FilesRequest(action = RetuiFilesContract.ACTION_LIST)
+                "-share" -> FilesRequest(
+                    action = RetuiFilesContract.ACTION_SHARE,
+                    target = tokens.getOrNull(1)
                 )
+                "-cd" -> FilesRequest(
+                    changeDirectory = tokens.getOrNull(1)
+                        ?: return FilesRequest(error = "Usage: files -cd <directory>")
+                )
+                else -> FilesRequest(error = "Unknown files option: ${tokens[0]}")
             }
         }
     }
 
     internal data class FilesRequest(
         val action: String? = null,
-        val path: String? = null,
+        val target: String? = null,
+        val changeDirectory: String? = null,
         val searchName: String? = null,
         val searchType: String? = null,
         val error: String? = null

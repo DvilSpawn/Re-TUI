@@ -1,5 +1,11 @@
 package ohi.andre.consolelauncher
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
+import android.view.animation.AccelerateInterpolator
+import android.view.animation.DecelerateInterpolator
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.PendingIntent.CanceledException
@@ -19,9 +25,11 @@ import android.graphics.PorterDuff
 import android.graphics.Rect
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
+import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.os.SystemClock
 import android.text.Editable
 import android.text.InputType
 import android.text.Layout
@@ -59,11 +67,13 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.FrameLayout
+import android.widget.GridLayout
 import android.widget.HorizontalScrollView
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.PopupMenu
+import android.widget.PopupWindow
 import android.widget.RelativeLayout
 import android.widget.ScrollView
 import android.widget.SeekBar
@@ -98,7 +108,6 @@ import ohi.andre.consolelauncher.managers.RetuiThemeBridge
 import ohi.andre.consolelauncher.managers.TerminalManager
 import ohi.andre.consolelauncher.managers.ToolbarShortcutManager
 import ohi.andre.consolelauncher.managers.ToolbarShortcutManager.slot
-import ohi.andre.consolelauncher.managers.file.FileBackendManager
 import ohi.andre.consolelauncher.managers.modules.ModuleManager
 import ohi.andre.consolelauncher.managers.modules.ModuleDockButtonFactory
 import ohi.andre.consolelauncher.managers.modules.ModulePromptManager
@@ -162,22 +171,24 @@ import ohi.andre.consolelauncher.managers.termux.TerminalGridView
 import ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceLauncherManager
 import ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceInputEditText
 import ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceSocketClient
-import ohi.andre.consolelauncher.managers.ui.AndroidWidgetDrawerManager
+import ohi.andre.consolelauncher.managers.widgets.AndroidWidgetDrawerManager
 import ohi.andre.consolelauncher.managers.ui.AppDrawerPaneManager
 import ohi.andre.consolelauncher.managers.ui.OverlayLayoutManager
-import ohi.andre.consolelauncher.managers.widgets.LuaWidgetEngine
-import ohi.andre.consolelauncher.managers.widgets.LuaWidgetEngine.UpdateListener
-import ohi.andre.consolelauncher.managers.widgets.LuaWidgetManager
+import ohi.andre.consolelauncher.managers.lua.LuaWidgetEngine
+import ohi.andre.consolelauncher.managers.lua.LuaWidgetEngine.UpdateListener
+import ohi.andre.consolelauncher.managers.lua.LuaWidgetManager
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.options.Behavior
 import ohi.andre.consolelauncher.managers.xml.options.Suggestions
 import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.managers.xml.options.Toolbar
 import ohi.andre.consolelauncher.managers.xml.options.Ui
+import ohi.andre.consolelauncher.managers.xml.options.SurfaceBorder
 import ohi.andre.consolelauncher.tuils.AsciiArtTextView
 import ohi.andre.consolelauncher.tuils.CrtOverlayDrawable
 import ohi.andre.consolelauncher.tuils.CyberpunkBackdropDrawable
 import ohi.andre.consolelauncher.tuils.CyberpunkIconFrameDrawable
+import ohi.andre.consolelauncher.tuils.LauncherFontScale
 import ohi.andre.consolelauncher.tuils.MusicVisualizerView
 import ohi.andre.consolelauncher.tuils.OutlineEditText
 import ohi.andre.consolelauncher.tuils.OutlineTextView
@@ -186,6 +197,7 @@ import ohi.andre.consolelauncher.tuils.TerminalBorderRuntime
 import ohi.andre.consolelauncher.tuils.TerminalTrayToggleView
 import ohi.andre.consolelauncher.tuils.LongClickMovementMethod
 import ohi.andre.consolelauncher.tuils.LongClickableSpan
+import ohi.andre.consolelauncher.tuils.LauncherPillStyle
 import ohi.andre.consolelauncher.tuils.TuiWidgetDecorator
 import ohi.andre.consolelauncher.tuils.TuiWidgetDecorator.decorateWidget
 import ohi.andre.consolelauncher.tuils.Tuils
@@ -294,6 +306,12 @@ class UIManager(
     private var stopwatchTabVisible = false
     private var timerTabDockReady = false
     private var stopwatchTabDockReady = false
+    private var podcastTab: ImageView? = null
+    private var podcastTabDockReady = false
+    private var podcastSessionActive = false
+    private var podcastFocusChromeActive = false
+    private var podcastChromeAnim: AnimatorSet? = null
+    private var podcastWindowAnim: AnimatorSet? = null
     var isPomodoroOverlayVisible: Boolean = false
         private set
     var isLockdownOverlayVisible: Boolean = false
@@ -468,6 +486,9 @@ class UIManager(
     private var podcastPlayerNext: TextView? = null
     private var podcastNowPlaying: View? = null
     private var podcastArtwork: ImageView? = null
+    private var podcastPlayerArt: ImageView? = null
+    private var podcastPlayerEpisodeTitle: TextView? = null
+    private var podcastPlayerShowName: TextView? = null
     private var podcastNowTitle: TextView? = null
     private var podcastNowMeta: TextView? = null
     private var podcastNowProgress: TextView? = null
@@ -490,6 +511,21 @@ class UIManager(
     private val podcastImageCache = object : LruCache<String, Bitmap>(6 * 1024 * 1024) {
         override fun sizeOf(key: String, value: Bitmap): Int = value.byteCount
     }
+    private var calculatorOverlay: View? = null
+    private var calculatorOverlayBasePaddingLeft = 0
+    private var calculatorOverlayBasePaddingTop = 0
+    private var calculatorOverlayBasePaddingRight = 0
+    private var calculatorOverlayBasePaddingBottom = 0
+    private var calculatorWindowBorder: View? = null
+    private var calculatorWindowLabel: TextView? = null
+    private var calculatorClose: TextView? = null
+    private var calculatorDisplayPanel: View? = null
+    private var calculatorDisplayLabel: TextView? = null
+    private var calculatorExpression: TextView? = null
+    private var calculatorResult: TextView? = null
+    private var calculatorKeypad: GridLayout? = null
+    private val calculatorInput = StringBuilder()
+    private var calculatorWindowAnim: AnimatorSet? = null
     private val lastFileListingPath = ""
     private var suggestionsContainer: View? = null
     private var suggestionsVisibilityBeforeTermux = View.VISIBLE
@@ -598,25 +634,36 @@ class UIManager(
     private var notesManager: ohi.andre.consolelauncher.managers.NotesManager?
 
     private var activeMusicSource: String? = "internal"
+    // Ticker must not removeCallbacks+repost on every MUSIC_CHANGED — that cancels the 1s delay.
+    private var musicTickerScheduled = false
 
     private val musicTimeRunnable: Runnable = object : Runnable {
         override fun run() {
             var shouldContinue = false
-            val musicWidget = mRootView!!.findViewById<View?>(R.id.music_widget)
+            var delayMs = 1000L
+            val musicWidget = mRootView!!.findViewById<View?>(R.id.music_module)
             if (MusicService.SOURCE_PODCAST == activeMusicSource) {
                 val manager = mainPack.podcastManager
                 val current = manager.currentSong()
-                if (current != null && manager.isPlaying()) {
-                    manager.saveCurrentProgress()
+                if (current != null && (manager.isPlaying() || manager.isPreparing())) {
+                    if (manager.isPlaying()) manager.saveCurrentProgress()
                     shouldContinue = true
-                    val intent = Intent(ACTION_MUSIC_CHANGED)
-                    intent.putExtra(SONG_TITLE, current.getTitle())
-                    intent.putExtra(SONG_SINGER, current.getSinger())
-                    intent.putExtra(SONG_DURATION, manager.duration())
-                    intent.putExtra(SONG_POSITION, manager.currentPosition())
-                    intent.putExtra(MUSIC_PLAYING, true)
-                    intent.putExtra(MusicService.MUSIC_SOURCE, MusicService.SOURCE_PODCAST)
-                    LocalBroadcastManager.getInstance(mContext!!).sendBroadcast(intent)
+                    val preparing = manager.isPreparing()
+                    delayMs = if (preparing) 120L else 1000L
+                    lastMusicSong = current.getTitle()
+                    lastMusicSinger = current.getSinger()
+                    lastMusicPlaying = manager.isPlaying()
+                    // Progress UI directly — broadcasting here used to restart this ticker.
+                    if (podcastOverlay != null && podcastOverlay!!.visibility == View.VISIBLE) {
+                        updatePodcastNowPlaying()
+                    }
+                    if (musicWidget != null && musicWidget.visibility == View.VISIBLE) {
+                        val songTitleView = musicWidget.findViewById<TextView?>(R.id.music_song_title)
+                        songTitleView?.text = musicTitlePrefix() + (current.getTitle() ?: "-").uppercase(Locale.getDefault())
+                        val singerView = musicWidget.findViewById<TextView?>(R.id.music_singer)
+                        singerView?.text = musicSubtitlePrefix() + (current.getSinger() ?: "-").uppercase(Locale.getDefault())
+                        setMusicVisualizerPlaying(manager.isPlaying())
+                    }
                 }
             } else if (musicWidget != null && musicWidget.getVisibility() == View.VISIBLE) {
                 if (MusicService.SOURCE_INTERNAL == activeMusicSource) {
@@ -640,7 +687,9 @@ class UIManager(
                 }
             }
             if (shouldContinue) {
-                handler!!.postDelayed(this, 1000)
+                handler!!.postDelayed(this, delayMs)
+            } else {
+                musicTickerScheduled = false
             }
         }
     }
@@ -926,7 +975,7 @@ class UIManager(
             val view: View = if (viewType == TERMUX_WORKSPACE_PAGE_INDEX) {
                 inflater.inflate(R.layout.termux_workspace_page, parent, false)
             } else {
-                inflater.inflate(R.layout.home_widgets_page, parent, false)
+                inflater.inflate(R.layout.home_modules_page, parent, false)
             }
             if (viewType == TERMUX_WORKSPACE_PAGE_INDEX) {
                 setupTermuxWorkspacePage(view)
@@ -975,7 +1024,7 @@ class UIManager(
     private val mRootView: View?
 
     private val viewPager: ViewPager2
-    private var homeWidgetsContainer: ViewGroup? = null
+    private var homeModulesContainer: ViewGroup? = null
     private var mainContainer: View? = null
     private var headerContainer: ViewGroup? = null
     private var headerOriginalParent: ViewGroup? = null
@@ -1043,8 +1092,9 @@ class UIManager(
             margins[OUTPUT_MARGINS_INDEX]!!,
             Tuils.dpToPx(mContext, outputCornerRadius()),
             useDashed,
-            terminalBorderColor(),
-            true
+            AppearanceSettings.surfaceBorderColor(SurfaceBorder.OUTPUT),
+            true,
+            SurfaceBorder.OUTPUT
         )
         terminalView!!.setBackgroundColor(Color.TRANSPARENT)
         terminalView!!.addTextChangedListener(object : TextWatcher {
@@ -1098,8 +1148,9 @@ class UIManager(
             margins[INPUTAREA_MARGINS_INDEX]!!,
             genericBorderCornerRadius,
             useDashed,
-            terminalBorderColor(),
-            false
+            AppearanceSettings.surfaceBorderColor(SurfaceBorder.INPUT),
+            false,
+            SurfaceBorder.INPUT
         )
         Companion.applyShadow(
             inputView,
@@ -1158,8 +1209,9 @@ class UIManager(
                 margins[TOOLBAR_MARGINS_INDEX]!!,
                 genericBorderCornerRadius,
                 useDashed,
-                terminalBorderColor(),
-                false
+                AppearanceSettings.surfaceBorderColor(SurfaceBorder.TOOLBAR),
+                false,
+                SurfaceBorder.TOOLBAR
             )
 
             if (appDrawerView != null) {
@@ -1239,8 +1291,9 @@ class UIManager(
                     margins[SUGGESTIONS_MARGINS_INDEX]!!,
                     genericBorderCornerRadius,
                     useDashed,
-                    terminalBorderColor(),
-                    true
+                    AppearanceSettings.surfaceBorderColor(SurfaceBorder.SUGGESTIONS),
+                    true,
+                    SurfaceBorder.SUGGESTIONS
                 )
 
                 val suggestionsView =
@@ -1893,11 +1946,24 @@ class UIManager(
             systemInsetBottom = max(0, bottom)
             imeInsetVisible = imeVisible
             imeBottomOffset = if (imeInsetVisible) max(0, keyboardOffset) else 0
+            if ((isPodcastSurfaceVisible || isCalculatorSurfaceVisible) && imeVisible) {
+                // Focus panes own the launcher viewport; the IME must not resize them.
+                closeKeyboard()
+                mTerminalAdapter?.inputView?.clearFocus()
+                imeInsetVisible = false
+                imeBottomOffset = 0
+            }
             applyDisplayMarginsForConfiguration(currentConfiguration)
             applyTermuxImeBottomPadding()
             applyTermuxWorkspaceImeBottomPadding()
+            if (isPodcastSurfaceVisible) {
+                applyPodcastPaneGeometry()
+            }
+            if (isCalculatorSurfaceVisible) {
+                applyCalculatorPaneGeometry()
+            }
             updateKeyboardLayoutState(
-                imeVisible || imeBottomOffset > 0,
+                imeInsetVisible || imeBottomOffset > 0,
                 if (mRootView != null) mRootView.getHeight() else 0
             )
         }
@@ -2111,6 +2177,18 @@ class UIManager(
             overlayDisplayMarginBottom
         )
         applyPodcastPaneGeometry()
+        OverlayLayoutManager.applyPaddingWithBase(
+            calculatorOverlay,
+            calculatorOverlayBasePaddingLeft,
+            calculatorOverlayBasePaddingTop,
+            calculatorOverlayBasePaddingRight,
+            calculatorOverlayBasePaddingBottom,
+            overlayDisplayMarginLeft,
+            overlayDisplayMarginTop,
+            overlayDisplayMarginRight,
+            overlayDisplayMarginBottom
+        )
+        applyCalculatorPaneGeometry()
         OverlayLayoutManager.applyPaddingWithBase(
             hackOverlay,
             hackOverlayBasePaddingLeft,
@@ -2428,14 +2506,14 @@ class UIManager(
                 })
         }
         moduleDock = homePage.findViewById<LinearLayout?>(R.id.module_dock)
-        homeWidgetsContainer = homePage.findViewById<ViewGroup?>(R.id.home_widgets_container)
-        if (homeWidgetsContainer == null) return
+        homeModulesContainer = homePage.findViewById<ViewGroup?>(R.id.home_modules_container)
+        if (homeModulesContainer == null) return
 
         ensureSystemLuaModules()
         pruneBundledLuaSamples()
         activeModule = ""
         ModuleManager.setActiveModule(mContext, "")
-        homeWidgetsContainer!!.removeAllViews()
+        homeModulesContainer!!.removeAllViews()
         rebuildModuleDock()
         refreshSuggestionsForActiveModule()
     }
@@ -3094,7 +3172,7 @@ class UIManager(
         }
         termuxWorkspaceGrid?.let { grid ->
             grid.setTerminalTypeface(Tuils.getTypeface(mContext))
-            grid.setTerminalTextSizeSp(12f)
+            grid.setTerminalTextSizeSp(LauncherFontScale.scaledSp(12f))
             grid.updateThemeColors(textColor, bgColor, borderColor)
         }
         termuxWorkspaceOutputPanel?.setBackground(
@@ -5063,8 +5141,9 @@ class UIManager(
             margins[SUGGESTIONS_MARGINS_INDEX]!!,
             genericBorderCornerRadius,
             useDashed,
-            ColorUtils.setAlphaComponent(terminalBorderColor(), 175),
-            true
+            AppearanceSettings.surfaceBorderColor(SurfaceBorder.SUGGESTIONS),
+            true,
+            SurfaceBorder.SUGGESTIONS
         )
         hideModuleSuggestionsStrip()
     }
@@ -5083,6 +5162,11 @@ class UIManager(
         }
         val context = mContext ?: return
         group.removeAllViews()
+        // Music chips only while actually playing; pause/stop used to leave prev/play/next up.
+        if (ModuleManager.MUSIC == activeModule && !lastMusicPlaying) {
+            hideModuleSuggestionsStrip()
+            return
+        }
         if (!XMLPrefsManager.getBoolean(Suggestions.show_suggestions) || TextUtils.isEmpty(activeModule)) {
             hideModuleSuggestionsStrip()
             return
@@ -5264,7 +5348,7 @@ class UIManager(
     }
 
     private fun showHomeModule(module: String?) {
-        if (homeWidgetsContainer == null) return
+        if (homeModulesContainer == null) return
 
         val id = ModuleManager.normalize(module)
         if (!ModuleManager.isKnown(mContext, id)) {
@@ -5280,7 +5364,7 @@ class UIManager(
         ModuleManager.setActiveModule(mContext, id)
         updateModuleDockSelection()
         applyTerminalTrayState(false)
-        homeWidgetsContainer!!.removeAllViews()
+        homeModulesContainer!!.removeAllViews()
 
         if (showLuaModuleIfSource(id)) {
             // Rendered above.
@@ -5321,6 +5405,7 @@ class UIManager(
         refreshSuggestionsForActiveModule()
         scheduleEventsRefreshIfNeeded()
         preserveModuleDockScrollX(dockScrollX)
+        scheduleTypefaceRefreshes()
     }
 
     private fun ensureSystemLuaModules() {
@@ -5374,10 +5459,10 @@ class UIManager(
 
     private fun showMusicModule() {
         val musicWidget = LayoutInflater.from(mContext)
-            .inflate(R.layout.music_widget, homeWidgetsContainer, false)
-        homeWidgetsContainer!!.addView(musicWidget)
+            .inflate(R.layout.music_module, homeModulesContainer, false)
+        homeModulesContainer!!.addView(musicWidget)
         musicWidget.setVisibility(View.VISIBLE)
-        val close = musicWidget.findViewById<TextView?>(R.id.music_widget_close)
+        val close = musicWidget.findViewById<TextView?>(R.id.music_module_close)
         if (close != null) {
             close.setOnClickListener(View.OnClickListener { v: View? -> closeHomeModule() })
             close.setTextColor(moduleNameTextColor())
@@ -5392,42 +5477,42 @@ class UIManager(
     private fun showNotificationsModule() {
         ensureNotificationServiceForModule()
         val notificationWidget = LayoutInflater.from(mContext)
-            .inflate(R.layout.notification_widget, homeWidgetsContainer, false)
-        homeWidgetsContainer!!.addView(notificationWidget)
+            .inflate(R.layout.notification_module, homeModulesContainer, false)
+        homeModulesContainer!!.addView(notificationWidget)
         notificationWidget.setVisibility(View.VISIBLE)
         notificationWidget.setClickable(true)
         notificationWidget.setFocusable(true)
         val notificationBorder =
-            notificationWidget.findViewById<View?>(R.id.notification_widget_border)
+            notificationWidget.findViewById<View?>(R.id.notification_module_border)
         val notificationLabel =
-            notificationWidget.findViewById<View?>(R.id.notification_widget_label)
+            notificationWidget.findViewById<View?>(R.id.notification_module_label)
         if (notificationLabel != null) {
             notificationLabel.setOnClickListener(View.OnClickListener { v: View? -> openNotificationShade() })
         }
-        val prev = notificationWidget.findViewById<TextView?>(R.id.notification_widget_prev)
+        val prev = notificationWidget.findViewById<TextView?>(R.id.notification_module_prev)
         if (prev != null) {
             prev.setOnClickListener(View.OnClickListener { v: View? -> previousNotificationPage() })
             prev.setTextColor(moduleNameTextColor())
             prev.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
         }
-        val next = notificationWidget.findViewById<TextView?>(R.id.notification_widget_next)
+        val next = notificationWidget.findViewById<TextView?>(R.id.notification_module_next)
         if (next != null) {
             next.setOnClickListener(View.OnClickListener { v: View? -> nextNotificationPage() })
             next.setTextColor(moduleNameTextColor())
             next.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
         }
-        val clear = notificationWidget.findViewById<TextView?>(R.id.notification_widget_clear)
+        val clear = notificationWidget.findViewById<TextView?>(R.id.notification_module_clear)
         if (clear != null) {
             clear.setOnClickListener(View.OnClickListener { v: View? -> dismissCurrentNotification() })
             clear.setTextColor(moduleNameTextColor())
             clear.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
         }
-        val settings = notificationWidget.findViewById<ImageButton?>(R.id.notification_widget_settings)
+        val settings = notificationWidget.findViewById<ImageButton?>(R.id.notification_module_settings)
         if (settings != null) {
             settings.setOnClickListener(View.OnClickListener { v: View? -> showNotificationSettingsPopup(settings) })
             styleNotificationSettingsButton(settings)
         }
-        val close = notificationWidget.findViewById<TextView?>(R.id.notification_widget_close)
+        val close = notificationWidget.findViewById<TextView?>(R.id.notification_module_close)
         if (close != null) {
             close.setOnClickListener(View.OnClickListener { v: View? -> closeHomeModule() })
             close.setTextColor(moduleNameTextColor())
@@ -5461,10 +5546,10 @@ class UIManager(
         widgetId: String?,
         result: LuaWidgetEngine.RenderResult
     ) {
-        if (homeWidgetsContainer == null) {
+        if (homeModulesContainer == null) {
             return
         }
-        homeWidgetsContainer!!.removeAllViews()
+        homeModulesContainer!!.removeAllViews()
         showLuaWidgetModule(module, widgetId, result)
         refreshSuggestionsForActiveModule()
     }
@@ -5475,8 +5560,8 @@ class UIManager(
         result: LuaWidgetEngine.RenderResult
     ) {
         val moduleView = LayoutInflater.from(mContext)
-            .inflate(R.layout.module_text_widget, homeWidgetsContainer, false)
-        homeWidgetsContainer!!.addView(moduleView)
+            .inflate(R.layout.module_text_panel, homeModulesContainer, false)
+        homeModulesContainer!!.addView(moduleView)
 
         val label = moduleView.findViewById<TextView?>(R.id.module_text_label)
         val close = moduleView.findViewById<TextView?>(R.id.module_text_close)
@@ -5926,8 +6011,8 @@ class UIManager(
 
     private fun showTextModule(module: String?, text: CharSequence?) {
         val moduleView = LayoutInflater.from(mContext)
-            .inflate(R.layout.module_text_widget, homeWidgetsContainer, false)
-        homeWidgetsContainer!!.addView(moduleView)
+            .inflate(R.layout.module_text_panel, homeModulesContainer, false)
+        homeModulesContainer!!.addView(moduleView)
 
         val label = moduleView.findViewById<TextView?>(R.id.module_text_label)
         val body = moduleView.findViewById<TextView?>(R.id.module_text_body)
@@ -6495,8 +6580,8 @@ class UIManager(
         }
         activeModule = ""
         ModuleManager.setActiveModule(mContext, "")
-        if (homeWidgetsContainer != null) {
-            homeWidgetsContainer!!.removeAllViews()
+        if (homeModulesContainer != null) {
+            homeModulesContainer!!.removeAllViews()
         }
         updateModuleDockSelection()
         applyTerminalTrayState(false)
@@ -6506,11 +6591,11 @@ class UIManager(
 
     private fun refreshSuggestionsForActiveModule() {
         refreshModuleSuggestionsStrip()
-        if (suggestionsManager != null && mTerminalAdapter != null && TextUtils.isEmpty(
-                mTerminalAdapter!!.input
-            )
-        ) {
-            suggestionsManager!!.requestSuggestion(Tuils.EMPTYSTRING)
+        // Always rebuild stock chips for current input. Empty-only skipped cases where
+        // setText("") didn't fire the watcher (already empty) after module/music actions.
+        if (suggestionsManager != null) {
+            val input = mTerminalAdapter?.input ?: Tuils.EMPTYSTRING
+            suggestionsManager!!.requestSuggestion(input)
         }
     }
 
@@ -6768,7 +6853,7 @@ class UIManager(
 
         if ("rebuild" == command) {
             rebuildModuleDock()
-            if (homeWidgetsContainer != null && !TextUtils.isEmpty(activeModule) && ModuleManager.getDock(
+            if (homeModulesContainer != null && !TextUtils.isEmpty(activeModule) && ModuleManager.getDock(
                     mContext
                 ).contains(activeModule)
             ) {
@@ -7077,10 +7162,10 @@ class UIManager(
     }
 
     private fun repaintActiveTextModule(id: String?) {
-        if (homeWidgetsContainer == null) {
+        if (homeModulesContainer == null) {
             return
         }
-        homeWidgetsContainer!!.removeAllViews()
+        homeModulesContainer!!.removeAllViews()
         val text = ModuleManager.getScriptText(mContext, id)
         showTextModule(id, if (TextUtils.isEmpty(text)) "No module output yet." else text)
         refreshSuggestionsForActiveModule()
@@ -7623,6 +7708,126 @@ class UIManager(
         }
     }
 
+    private fun setupCalculatorSurface(rootView: ViewGroup) {
+        calculatorOverlay = rootView.findViewById(R.id.calculator_overlay)
+        val overlay = calculatorOverlay ?: return
+        calculatorOverlayBasePaddingLeft = overlay.paddingLeft
+        calculatorOverlayBasePaddingTop = overlay.paddingTop
+        calculatorOverlayBasePaddingRight = overlay.paddingRight
+        calculatorOverlayBasePaddingBottom = overlay.paddingBottom
+
+        calculatorWindowBorder = rootView.findViewById(R.id.calculator_window_border)
+        calculatorWindowLabel = rootView.findViewById(R.id.calculator_window_label)
+        calculatorClose = rootView.findViewById(R.id.calculator_close)
+        calculatorDisplayPanel = rootView.findViewById(R.id.calculator_display_panel)
+        calculatorDisplayLabel = rootView.findViewById(R.id.calculator_display_label)
+        calculatorExpression = rootView.findViewById(R.id.calculator_expression)
+        calculatorResult = rootView.findViewById(R.id.calculator_result)
+        calculatorKeypad = rootView.findViewById(R.id.calculator_keypad)
+
+        buildCalculatorKeypad()
+        styleCalculatorSurface()
+        renderCalculator()
+        calculatorClose?.setOnClickListener { closeCalculatorSurface() }
+    }
+
+    private fun buildCalculatorKeypad() {
+        val keypad = calculatorKeypad ?: return
+        keypad.removeAllViews()
+        val rows = arrayOf(
+            arrayOf("C", "(", ")", "⌫"),
+            arrayOf("√", "^", "%", "/"),
+            arrayOf("7", "8", "9", "*"),
+            arrayOf("4", "5", "6", "-"),
+            arrayOf("1", "2", "3", "+")
+        )
+        rows.forEachIndexed { row, labels ->
+            labels.forEachIndexed { column, label ->
+                addCalculatorKey(keypad, label, row, column)
+            }
+        }
+        addCalculatorKey(keypad, "", 5, 0)
+        addCalculatorKey(keypad, "0", 5, 1)
+        addCalculatorKey(keypad, ".", 5, 2)
+        addCalculatorKey(keypad, "=", 5, 3)
+    }
+
+    private fun addCalculatorKey(
+        keypad: GridLayout,
+        label: String,
+        row: Int,
+        column: Int,
+        span: Int = 1
+    ) {
+        val button = TextView(mContext).apply {
+            text = label
+            contentDescription = when (label) {
+                "⌫" -> "Backspace"
+                "√" -> "Square root"
+                "C" -> "Clear"
+                "=" -> "Equals"
+                else -> label
+            }
+            gravity = Gravity.CENTER
+            if (label.isEmpty()) {
+                importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+            } else {
+                setOnClickListener { onCalculatorKey(label) }
+            }
+        }
+        styleCalculatorKey(button)
+        val margin = Tuils.dpToPx(mContext, 3)
+        val params = GridLayout.LayoutParams(
+            GridLayout.spec(row, 1, 1f),
+            GridLayout.spec(column, span, span.toFloat())
+        ).apply {
+            width = 0
+            height = 0
+            setMargins(margin, margin, margin, margin)
+        }
+        keypad.addView(button, params)
+    }
+
+    private fun onCalculatorKey(label: String) {
+        when (label) {
+            "C" -> calculatorInput.clear()
+            "⌫" -> if (calculatorInput.isNotEmpty()) calculatorInput.deleteCharAt(calculatorInput.lastIndex)
+            "=" -> {
+                val value = try {
+                    formatCalculatorValue(Tuils.eval(calculatorInput.toString()))
+                } catch (_: Exception) {
+                    calculatorResult?.text = "ERROR"
+                    return
+                }
+                calculatorInput.clear()
+                calculatorInput.append(value)
+            }
+            else -> if (calculatorInput.length < CALCULATOR_MAX_EXPRESSION_LENGTH) {
+                calculatorInput.append(if (label == "√") "sqrt" else label)
+            }
+        }
+        renderCalculator()
+    }
+
+    private fun renderCalculator() {
+        val expression = calculatorInput.toString()
+        calculatorExpression?.text = expression.ifEmpty { "0" }
+        calculatorResult?.text = if (expression.isEmpty()) {
+            ""
+        } else {
+            try {
+                formatCalculatorValue(Tuils.eval(expression))
+            } catch (_: Exception) {
+                ""
+            }
+        }
+    }
+
+    private fun formatCalculatorValue(value: Double): String {
+        val whole = value.toLong()
+        return if (value.isFinite() && value == whole.toDouble()) whole.toString() else value.toString()
+    }
+
     private fun setupPodcastSurface(rootView: ViewGroup) {
         podcastOverlay = rootView.findViewById<View?>(R.id.podcast_overlay)
         if (podcastOverlay == null) {
@@ -7674,7 +7879,8 @@ class UIManager(
         stylePodcastSurface()
         setupPodcastPaneActions()
 
-        podcastClose?.setOnClickListener(View.OnClickListener { closePodcastSurface() })
+        podcastClose?.setOnClickListener(View.OnClickListener { minimizePodcastSurface() })
+        bindPodcastCloseGesture()
         podcastTabShows?.setOnClickListener(View.OnClickListener {
             podcastMode = PODCAST_MODE_SHOWS
             renderPodcastSurface(null)
@@ -7696,34 +7902,44 @@ class UIManager(
             renderPodcastSurface(null)
         })
         podcastPlay?.setOnClickListener(View.OnClickListener {
-            renderPodcastSurface(mainPack.podcastManager.toggle())
+            mainPack.podcastManager.toggle()
+            updatePodcastNowPlaying()
         })
         podcastPrev?.setOnClickListener(View.OnClickListener {
-            renderPodcastSurface(mainPack.podcastManager.previous())
+            mainPack.podcastManager.previous()
+            updatePodcastNowPlaying()
         })
         podcastNext?.setOnClickListener(View.OnClickListener {
-            renderPodcastSurface(mainPack.podcastManager.next())
+            mainPack.podcastManager.next()
+            updatePodcastNowPlaying()
         })
         podcastRewind?.setOnClickListener(View.OnClickListener {
-            renderPodcastSurface("-30s: " + mainPack.podcastManager.seekBy(-30000))
+            mainPack.podcastManager.seekBy(-30000)
+            updatePodcastNowPlaying()
         })
         podcastForward?.setOnClickListener(View.OnClickListener {
-            renderPodcastSurface("+30s: " + mainPack.podcastManager.seekBy(30000))
+            mainPack.podcastManager.seekBy(30000)
+            updatePodcastNowPlaying()
         })
         podcastPlayerPlay?.setOnClickListener(View.OnClickListener {
-            renderPodcastSurface(mainPack.podcastManager.toggle())
+            mainPack.podcastManager.toggle()
+            updatePodcastNowPlaying()
         })
         podcastPlayerPrev?.setOnClickListener(View.OnClickListener {
-            renderPodcastSurface(mainPack.podcastManager.previous())
+            mainPack.podcastManager.previous()
+            updatePodcastNowPlaying()
         })
         podcastPlayerNext?.setOnClickListener(View.OnClickListener {
-            renderPodcastSurface(mainPack.podcastManager.next())
+            mainPack.podcastManager.next()
+            updatePodcastNowPlaying()
         })
         podcastPlayerRewind?.setOnClickListener(View.OnClickListener {
-            renderPodcastSurface("-30s: " + mainPack.podcastManager.seekBy(-30000))
+            mainPack.podcastManager.seekBy(-30000)
+            updatePodcastNowPlaying()
         })
         podcastPlayerForward?.setOnClickListener(View.OnClickListener {
-            renderPodcastSurface("+30s: " + mainPack.podcastManager.seekBy(30000))
+            mainPack.podcastManager.seekBy(30000)
+            updatePodcastNowPlaying()
         })
         podcastPlayerSeek?.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
@@ -7739,7 +7955,8 @@ class UIManager(
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
                 podcastSeekDragging = false
                 val target = seekBar?.progress ?: return
-                renderPodcastSurface(mainPack.podcastManager.seekTo(target))
+                mainPack.podcastManager.seekTo(target)
+                updatePodcastNowPlaying()
             }
         })
         podcastSeek?.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
@@ -7756,9 +7973,96 @@ class UIManager(
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
                 podcastSeekDragging = false
                 val target = seekBar?.progress ?: return
-                renderPodcastSurface(mainPack.podcastManager.seekTo(target))
+                mainPack.podcastManager.seekTo(target)
+                updatePodcastNowPlaying()
             }
         })
+    }
+
+    private fun bindPodcastCloseGesture() {
+        val button = podcastClose ?: return
+        var popup: PopupWindow? = null
+        var targetBounds: Rect? = null
+        var longPressed = false
+        var closed = false
+
+        fun dismissTarget() {
+            popup?.dismiss()
+            popup = null
+            targetBounds = null
+        }
+
+        val showTarget = Runnable {
+            longPressed = true
+            val textColor = notificationWidgetTextColor()
+            val closeTarget = TextView(mContext).apply {
+                text = "X"
+                gravity = Gravity.CENTER
+                setTextColor(textColor)
+                setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
+                textSize = PODCAST_TEXT_LARGE
+                contentDescription = "Slide here to close podcasts"
+                background = TerminalBorderRuntime.tabDrawable(mContext, terminalHeaderTabBackground(), textColor, true)
+            }
+            val width = button.width.coerceAtLeast(Tuils.dpToPx(mContext, 48))
+            val height = button.height.coerceAtLeast(Tuils.dpToPx(mContext, 36))
+            val gap = Tuils.dpToPx(mContext, 8)
+            val xOffset = (button.width - width) / 2
+            popup = PopupWindow(closeTarget, width, height, false).apply {
+                setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+                isOutsideTouchable = false
+                isClippingEnabled = false
+                elevation = Tuils.dpToPx(mContext, 8).toFloat()
+                showAsDropDown(button, xOffset, -button.height - height - gap)
+            }
+            val location = IntArray(2)
+            button.getLocationOnScreen(location)
+            targetBounds = Rect(
+                location[0] + xOffset,
+                location[1] - height - gap,
+                location[0] + xOffset + width,
+                location[1] - gap
+            )
+            button.performHapticFeedback(android.view.HapticFeedbackConstants.LONG_PRESS)
+        }
+
+        button.setOnTouchListener { view, event ->
+            when (event.actionMasked) {
+                MotionEvent.ACTION_DOWN -> {
+                    dismissTarget()
+                    longPressed = false
+                    closed = false
+                    view.isPressed = true
+                    view.parent?.requestDisallowInterceptTouchEvent(true)
+                    view.postDelayed(showTarget, ViewConfiguration.getLongPressTimeout().toLong())
+                    true
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    if (longPressed && targetBounds?.contains(event.rawX.toInt(), event.rawY.toInt()) == true) {
+                        closed = true
+                        dismissTarget()
+                        closePodcastSurface(true)
+                    }
+                    true
+                }
+                MotionEvent.ACTION_UP -> {
+                    view.removeCallbacks(showTarget)
+                    view.isPressed = false
+                    view.parent?.requestDisallowInterceptTouchEvent(false)
+                    if (!longPressed && !closed) view.performClick()
+                    dismissTarget()
+                    true
+                }
+                MotionEvent.ACTION_CANCEL -> {
+                    view.removeCallbacks(showTarget)
+                    view.isPressed = false
+                    view.parent?.requestDisallowInterceptTouchEvent(false)
+                    dismissTarget()
+                    true
+                }
+                else -> true
+            }
+        }
     }
 
     init {
@@ -7788,6 +8092,7 @@ class UIManager(
         filter.addAction(ACTION_LUA_APP)
         filter.addAction(ACTION_FILE_CONSOLE)
         filter.addAction(ACTION_PODCAST_SURFACE)
+        filter.addAction(ACTION_CALCULATOR_SURFACE)
         filter.addAction(ACTION_PROFILE_SURFACE)
         filter.addAction(ACTION_TERMUX_RESULT)
         filter.addAction(ACTION_MODULE_COMMAND)
@@ -7826,6 +8131,8 @@ class UIManager(
                     openFileConsole(intent.getStringExtra(EXTRA_FILE_COMMAND))
                 } else if (action == ACTION_PODCAST_SURFACE) {
                     openPodcastSurface(intent.getStringExtra(EXTRA_PODCAST_COMMAND))
+                } else if (action == ACTION_CALCULATOR_SURFACE) {
+                    openCalculatorSurface(intent.getStringExtra(EXTRA_CALCULATOR_EXPRESSION))
                 } else if (action == ACTION_PROFILE_SURFACE) {
                     openProfileSurface()
                 } else if (action == ACTION_TERMUX_RESULT) {
@@ -7954,11 +8261,18 @@ class UIManager(
                             && !TextUtils.isEmpty(pkg)
                         ) pkg else null
 
+                    // Gone widget left activeModule=MUSIC, so prev/play/next chips stayed up.
+                    if (!showMusicWidget && ModuleManager.MUSIC == activeModule) {
+                        closeHomeModule()
+                        scheduleInternalMusicTickerIfNeeded()
+                        return
+                    }
+
                     if (isPlaying && autoShowWidget() && ModuleManager.MUSIC != activeModule) {
                         showHomeModule(ModuleManager.MUSIC)
                     }
 
-                    val musicWidget = rootView.findViewById<View?>(R.id.music_widget)
+                    val musicWidget = rootView.findViewById<View?>(R.id.music_module)
                     if (musicWidget != null) {
                         musicWidget.setVisibility(if (showMusicWidget) View.VISIBLE else View.GONE)
                     }
@@ -7994,17 +8308,20 @@ class UIManager(
 
                     decorateWidget(
                         rootView,
-                        R.id.music_widget_border,
-                        R.id.music_widget_label,
-                        R.id.music_widget_close,
+                        R.id.music_module_border,
+                        R.id.music_module_label,
+                        R.id.music_module_close,
                         widgetBorderColor,
                         widgetTextColor
                     )
-                    styleModuleClose(rootView.findViewById<TextView?>(R.id.music_widget_close))
+                    styleModuleClose(rootView.findViewById<TextView?>(R.id.music_module_close))
                     sizeMusicVisualizer(rootView)
                     if (MusicService.SOURCE_PODCAST == source && podcastOverlay != null && podcastOverlay!!.visibility == View.VISIBLE) {
-                        if (podcastMode == PODCAST_MODE_PLAYER) renderPodcastSurface(null)
-                        else updatePodcastNowPlaying()
+                        // Progress ticks must not rebuild the whole player surface.
+                        updatePodcastNowPlaying()
+                    }
+                    if (ModuleManager.MUSIC == activeModule) {
+                        refreshSuggestionsForActiveModule()
                     }
                     scheduleInternalMusicTickerIfNeeded()
                 } else if (action == ACTION_NOTIFICATION_FEED) {
@@ -8057,6 +8374,7 @@ class UIManager(
         setupTermuxConsole(rootView)
         setupFileConsole(rootView)
         setupPodcastSurface(rootView)
+        setupCalculatorSurface(rootView)
         profilePaneController = ProfilePaneController(mContext!!, rootView) { closeProfileSurface() }
         setupResponsiveLandscapeLayout(rootView)
 
@@ -8355,6 +8673,25 @@ class UIManager(
         }
 
         val lViewsParent = labelViews[0]!!.getParent() as LinearLayout
+        val unifiedStatusBorder = AppearanceSettings.unifiedStatusBorder()
+        if (unifiedStatusBorder) {
+            val outerMargins = margins[0]!!.copyOf()
+            val strokeInset = Tuils.dpToPx(mContext, 2)
+            outerMargins[2] = max(outerMargins[2], strokeInset)
+            outerMargins[3] = max(outerMargins[3], strokeInset)
+            Companion.applyMargins(lViewsParent, outerMargins)
+            lViewsParent.background = TerminalBorderRuntime.panelDrawablePx(
+                mContext!!,
+                Color.TRANSPARENT,
+                terminalBorderColor(),
+                1.5f,
+                Tuils.dpToPx(mContext, moduleCornerRadius()).toFloat(),
+                useDashed,
+                false,
+                useDashed
+            )
+        }
+        val statusRowMargins = if (unifiedStatusBorder) IntArray(4) else margins[0]!!
 
         for (count in labelViews.indices) {
             labelViews[count]!!.setOnTouchListener(this)
@@ -8402,11 +8739,13 @@ class UIManager(
                     mContext!!,
                     labelViews[count]!!,
                     bgColors[styleLabel],
-                    margins[0]!!,
-                    Tuils.dpToPx(mContext, moduleCornerRadius()),
+                    statusRowMargins,
+                    if (unifiedStatusBorder) 0 else Tuils.dpToPx(mContext, moduleCornerRadius()),
                     useDashed,
-                    terminalBorderColor(),
-                    false
+                    AppearanceSettings.surfaceBorderColor(SurfaceBorder.entries[styleLabel]),
+                    false,
+                    SurfaceBorder.entries[styleLabel],
+                    !unifiedStatusBorder
                 )
                 Companion.applyShadow(
                     labelViews[count]!!,
@@ -8654,13 +8993,13 @@ class UIManager(
         if (musicWidget == null) return
         decorateWidget(
             musicWidget,
-            R.id.music_widget_border,
-            R.id.music_widget_label,
-            R.id.music_widget_close,
+            R.id.music_module_border,
+            R.id.music_module_label,
+            R.id.music_module_close,
             musicWidgetBorderColor(),
             musicWidgetTextColor()
         )
-        styleModuleClose(musicWidget.findViewById<TextView?>(R.id.music_widget_close))
+        styleModuleClose(musicWidget.findViewById<TextView?>(R.id.music_module_close))
         sizeMusicVisualizer(musicWidget)
 
         val titleView = musicWidget.findViewById<TextView?>(R.id.music_song_title)
@@ -8830,7 +9169,7 @@ class UIManager(
 
     private fun sizeMusicVisualizer(musicWidget: View) {
         val visualizer = musicWidget.findViewById<MusicVisualizerView?>(R.id.music_visualizer)
-        val border = musicWidget.findViewById<View?>(R.id.music_widget_border)
+        val border = musicWidget.findViewById<View?>(R.id.music_module_border)
         if (visualizer == null || border == null) return
 
         border.post(Runnable {
@@ -8924,7 +9263,7 @@ class UIManager(
         }
         termuxGrid?.let { grid ->
             grid.setTerminalTypeface(Tuils.getTypeface(mContext))
-            grid.setTerminalTextSizeSp(12f)
+            grid.setTerminalTextSizeSp(LauncherFontScale.scaledSp(12f))
             grid.updateThemeColors(textColor, bgColor, borderColor)
         }
 
@@ -9174,6 +9513,77 @@ class UIManager(
         styleTermuxToolButton(filePaste, textColor)
     }
 
+    private fun styleCalculatorSurface() {
+        val overlay = calculatorOverlay ?: return
+        val borderColor = terminalBorderColor()
+        val textColor = notificationWidgetTextColor()
+        val bgColor = terminalWindowBackground()
+        val labelBg = terminalHeaderTabBackground()
+        val typeface = Tuils.getTypeface(mContext)
+
+        overlay.setBackgroundColor(Color.TRANSPARENT)
+        calculatorWindowBorder?.background = TerminalBorderRuntime.panelDrawable(
+            mContext,
+            bgColor,
+            borderColor,
+            1.5f,
+            outputCornerRadius(),
+            dashedBorders()
+        )
+        listOf(calculatorWindowLabel, calculatorClose).forEach { label ->
+            label?.setTypeface(typeface, Typeface.BOLD)
+            label?.textSize = PODCAST_TEXT_LARGE
+            label?.setTextColor(textColor)
+        }
+        calculatorWindowLabel?.background = TerminalBorderRuntime.tabDrawable(mContext, labelBg)
+        calculatorClose?.background = TerminalBorderRuntime.tabDrawable(mContext, labelBg, textColor, true)
+        TerminalBorderRuntime.bind(calculatorWindowBorder, calculatorWindowLabel, calculatorClose)
+
+        calculatorDisplayPanel?.background = TerminalBorderRuntime.panelDrawable(
+            mContext,
+            ColorUtils.blendARGB(bgColor, Color.BLACK, 0.1f),
+            ColorUtils.setAlphaComponent(borderColor, 210),
+            1.2f,
+            outputCornerRadius(),
+            dashedBorders()
+        )
+        calculatorDisplayLabel?.apply {
+            setTypeface(typeface, Typeface.BOLD)
+            setTextColor(textColor)
+            background = TerminalBorderRuntime.tabDrawable(mContext, labelBg)
+        }
+        TerminalBorderRuntime.bind(calculatorDisplayPanel, calculatorDisplayLabel)
+        calculatorExpression?.apply {
+            setTypeface(typeface, Typeface.BOLD)
+            setTextColor(textColor)
+        }
+        calculatorResult?.apply {
+            setTypeface(typeface, Typeface.BOLD)
+            setTextColor(moduleNameTextColor())
+        }
+        calculatorKeypad?.let { keypad ->
+            for (index in 0 until keypad.childCount) {
+                styleCalculatorKey(keypad.getChildAt(index) as? TextView)
+            }
+        }
+    }
+
+    private fun styleCalculatorKey(button: TextView?) {
+        val target = button ?: return
+        target.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
+        target.setTextColor(moduleNameTextColor())
+        target.textSize = PODCAST_TEXT_LARGE
+        target.background = TerminalBorderRuntime.panelDrawable(
+            mContext,
+            moduleButtonBackgroundColor(),
+            moduleButtonBorderColor(),
+            1.2f,
+            moduleCornerRadius(),
+            dashedBorders(),
+            false
+        )
+    }
+
     private fun stylePodcastSurface() {
         if (podcastOverlay == null) {
             return
@@ -9200,8 +9610,9 @@ class UIManager(
             label?.setTypeface(typeface, Typeface.BOLD)
             label?.textSize = PODCAST_TEXT_LARGE
             label?.setTextColor(textColor)
-            label?.setBackground(TerminalBorderRuntime.tabDrawable(mContext, labelBg))
         }
+        podcastWindowLabel?.setBackground(TerminalBorderRuntime.tabDrawable(mContext, labelBg))
+        podcastClose?.setBackground(TerminalBorderRuntime.tabDrawable(mContext, labelBg, textColor, true))
         TerminalBorderRuntime.bind(podcastWindowBorder, podcastWindowLabel, podcastClose)
 
         listOf(podcastTabs, podcastTransport, podcastPlayerTransport).forEach { view ->
@@ -9307,65 +9718,65 @@ class UIManager(
         target.setBackground(TerminalBorderRuntime.tabDrawable(mContext, terminalHeaderTabBackground()))
     }
 
-    private fun applyPodcastPaneGeometry() {
-        val overlay = podcastOverlay ?: return
-        val border = podcastWindowBorder ?: return
-        val availableHeight = overlay.height - overlay.paddingTop - overlay.paddingBottom
-        if (availableHeight <= 0) {
+    private fun applyPodcastPaneGeometry() =
+        applyFocusPaneGeometry(podcastOverlay, podcastWindowBorder)
+
+    private fun applyCalculatorPaneGeometry() =
+        applyFocusPaneGeometry(calculatorOverlay, calculatorWindowBorder)
+
+    private fun applyFocusPaneGeometry(overlay: View?, border: View?) {
+        overlay ?: return
+        border ?: return
+        // Don't size against the keyboard — short landscape + IME was crushing the pane.
+        val imeReserve = if (imeInsetVisible) imeBottomOffset else 0
+        val availableHeight = overlay.height - overlay.paddingTop - overlay.paddingBottom - imeReserve
+        val availableWidth = overlay.width - overlay.paddingLeft - overlay.paddingRight
+        if (availableHeight <= 0 || availableWidth <= 0) {
             if (overlay.visibility == View.VISIBLE && launcherWindowFocused) {
-                overlay.postOnAnimation { applyPodcastPaneGeometry() }
+                overlay.postOnAnimation { applyFocusPaneGeometry(overlay, border) }
             }
             return
         }
 
-        val safeMargin = Tuils.dpToPx(mContext, 16)
+        val landscape = podcastLandscapePresentation()
+        // Landscape keeps home chrome in-place — dim so status/dock don't bleed through the sides.
+        overlay.setBackgroundColor(
+            if (landscape) ColorUtils.setAlphaComponent(Color.BLACK, 210) else Color.TRANSPARENT
+        )
+        val safeMargin = Tuils.dpToPx(mContext, if (landscape) 8 else 16)
         val maxHeight = max(1, availableHeight - safeMargin)
-        val minHeight = min(Tuils.dpToPx(mContext, PODCAST_PANE_MIN_HEIGHT_DP), maxHeight)
-        val paneHeight = (availableHeight * PODCAST_PANE_HEIGHT_FRACTION)
+        val minHeight = min(
+            Tuils.dpToPx(mContext, if (landscape) PODCAST_PANE_LAND_MIN_HEIGHT_DP else PODCAST_PANE_MIN_HEIGHT_DP),
+            maxHeight
+        )
+        val fraction = if (landscape) PODCAST_PANE_LAND_HEIGHT_FRACTION else PODCAST_PANE_HEIGHT_FRACTION
+        val paneHeight = (availableHeight * fraction)
             .roundToInt()
             .coerceIn(minHeight, maxHeight)
-        val topOffset = max(0, (availableHeight - paneHeight) / 2)
+        val sideInset = if (landscape) Tuils.dpToPx(mContext, PODCAST_PANE_LAND_SIDE_INSET_DP) else 0
 
         val borderParams = (border.layoutParams as? FrameLayout.LayoutParams)
             ?: FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, paneHeight)
-        var geometryChanged = false
+        // CENTER_VERTICAL only — Gravity.CENTER + independent tab margins parked chrome on the screen corners.
+        val targetGravity = Gravity.CENTER_VERTICAL
         if (borderParams.width != FrameLayout.LayoutParams.MATCH_PARENT ||
             borderParams.height != paneHeight ||
-            borderParams.gravity != Gravity.CENTER_VERTICAL ||
+            borderParams.gravity != targetGravity ||
+            borderParams.leftMargin != sideInset ||
+            borderParams.rightMargin != sideInset ||
             borderParams.topMargin != 0 ||
             borderParams.bottomMargin != 0
         ) {
             borderParams.width = FrameLayout.LayoutParams.MATCH_PARENT
             borderParams.height = paneHeight
-            borderParams.gravity = Gravity.CENTER_VERTICAL
-            borderParams.setMargins(0, 0, 0, 0)
+            borderParams.gravity = targetGravity
+            borderParams.setMargins(sideInset, 0, sideInset, 0)
             border.layoutParams = borderParams
-            geometryChanged = true
-        }
-
-        geometryChanged = positionPodcastHeaderTab(podcastWindowLabel, Gravity.TOP or Gravity.START, topOffset, 38) || geometryChanged
-        geometryChanged = positionPodcastHeaderTab(podcastClose, Gravity.TOP or Gravity.END, topOffset, 0) || geometryChanged
-        if (geometryChanged) {
-            TerminalBorderRuntime.bind(podcastWindowBorder, podcastWindowLabel, podcastClose)
-            bindPodcastContentFrame()
         }
     }
 
-    private fun positionPodcastHeaderTab(view: TextView?, gravity: Int, paneTopOffset: Int, startMarginDp: Int): Boolean {
-        val tab = view ?: return false
-        val params = (tab.layoutParams as? FrameLayout.LayoutParams)
-            ?: FrameLayout.LayoutParams(tab.layoutParams?.width ?: FrameLayout.LayoutParams.WRAP_CONTENT, tab.layoutParams?.height ?: FrameLayout.LayoutParams.WRAP_CONTENT)
-        val topMargin = max(0, paneTopOffset - Tuils.dpToPx(mContext, 10))
-        val startMargin = Tuils.dpToPx(mContext, startMarginDp)
-        if (params.gravity != gravity || params.topMargin != topMargin || params.leftMargin != startMargin) {
-            params.gravity = gravity
-            params.topMargin = topMargin
-            params.leftMargin = startMargin
-            tab.layoutParams = params
-            return true
-        }
-        return false
-    }
+    private fun podcastLandscapePresentation(): Boolean =
+        shouldUseResponsiveLandscape(currentConfiguration)
 
     private fun updatePodcastTabStyle() {
         val textColor = notificationWidgetTextColor()
@@ -9420,8 +9831,9 @@ class UIManager(
             return
         }
 
+        closeCalculatorSurface(false, false)
         closeFileConsole(false)
-        closePodcastSurface(false)
+        minimizePodcastSurface()
         profilePaneController?.hide()
         closeLuaAppSession(true)
         var normalized = if (command == null) Tuils.EMPTYSTRING else command.trim { it <= ' ' }
@@ -9483,8 +9895,9 @@ class UIManager(
             return
         }
 
+        closeCalculatorSurface(false, false)
         closeFileConsole(false)
-        closePodcastSurface(false)
+        minimizePodcastSurface()
         profilePaneController?.hide()
         closeLuaAppSession(true)
         termuxAppSession = null
@@ -9530,8 +9943,9 @@ class UIManager(
             return
         }
 
+        closeCalculatorSurface(false, false)
         closeTermuxConsole(false)
-        closePodcastSurface(false)
+        minimizePodcastSurface()
         profilePaneController?.hide()
         styleFileConsole()
         fileOverlay!!.setVisibility(View.VISIBLE)
@@ -9578,6 +9992,238 @@ class UIManager(
         }
     }
 
+    fun openCalculatorSurface(expression: String?) {
+        if (Looper.myLooper() != Looper.getMainLooper()) {
+            runOnMainThread { openCalculatorSurface(expression) }
+            return
+        }
+        val overlay = calculatorOverlay ?: return
+
+        closeCalculatorSurface(false, false)
+        closeTermuxConsole(false)
+        closeFileConsole(false)
+        closeLuaAppSession(true)
+        minimizePodcastSurface()
+        profilePaneController?.hide()
+        closeKeyboard()
+        mTerminalAdapter?.inputView?.clearFocus()
+
+        calculatorInput.clear()
+        calculatorInput.append(expression?.trim().orEmpty().take(CALCULATOR_MAX_EXPRESSION_LENGTH))
+        renderCalculator()
+        styleCalculatorSurface()
+
+        val landscape = podcastLandscapePresentation()
+        if (landscape) {
+            snapCalculatorLandIdle()
+            overlay.alpha = 0f
+        } else {
+            snapCalculatorCrtCollapsed()
+            overlay.alpha = 1f
+        }
+        overlay.visibility = View.VISIBLE
+        overlay.bringToFront()
+        applyCalculatorPaneGeometry()
+        suggestionsContainer?.takeIf { it.visibility == View.VISIBLE }?.visibility = View.INVISIBLE
+        overlay.post {
+            if (landscape) {
+                resetPodcastFocusChromeImmediate()
+                playCalculatorLandExpand()
+            } else {
+                setPodcastFocusChrome(true)
+                playCalculatorCrtExpand()
+            }
+        }
+    }
+
+    private fun closeCalculatorSurface(restoreSuggestions: Boolean = true, animate: Boolean = true) {
+        val overlay = calculatorOverlay ?: return
+        if (overlay.visibility != View.VISIBLE) return
+
+        val finish = {
+            overlay.visibility = View.GONE
+            overlay.setBackgroundColor(Color.TRANSPARENT)
+            if (podcastLandscapePresentation()) snapCalculatorLandIdle() else snapCalculatorCrtCollapsed()
+            calculatorInput.clear()
+            renderCalculator()
+            if (restoreSuggestions && suggestionsContainer?.visibility == View.INVISIBLE) {
+                suggestionsContainer?.visibility = View.VISIBLE
+            }
+            if (restoreSuggestions) {
+                mTerminalAdapter?.focusInputEnd()
+                refreshSuggestionsSoon()
+            }
+        }
+        if (!animate) {
+            calculatorWindowAnim?.cancel()
+            calculatorWindowAnim = null
+            resetPodcastFocusChromeImmediate()
+            finish()
+        } else if (podcastLandscapePresentation()) {
+            resetPodcastFocusChromeImmediate()
+            playCalculatorLandCollapse(finish)
+        } else {
+            setPodcastFocusChrome(false)
+            playCalculatorCrtCollapse(finish)
+        }
+    }
+
+    private fun snapCalculatorCrtCollapsed() {
+        val border = calculatorWindowBorder ?: return
+        if (border.width > 0) {
+            border.pivotX = border.width / 2f
+            border.pivotY = border.height / 2f
+        }
+        border.scaleX = 0.06f
+        border.scaleY = 0.018f
+        border.alpha = 1f
+        calculatorWindowLabel?.alpha = 0f
+        calculatorClose?.alpha = 0f
+    }
+
+    private fun snapCalculatorLandIdle() {
+        calculatorWindowBorder?.apply {
+            scaleX = 1f
+            scaleY = 1f
+            alpha = 1f
+            translationY = 0f
+        }
+        calculatorWindowLabel?.alpha = 1f
+        calculatorClose?.alpha = 1f
+    }
+
+    private fun playCalculatorCrtExpand() {
+        val border = calculatorWindowBorder ?: return
+        calculatorWindowAnim?.cancel()
+        if (border.width <= 0 || border.height <= 0) {
+            border.post { playCalculatorCrtExpand() }
+            return
+        }
+        border.pivotX = border.width / 2f
+        border.pivotY = border.height / 2f
+        snapCalculatorCrtCollapsed()
+        val beam = AnimatorSet().apply {
+            duration = 90L
+            interpolator = AccelerateInterpolator()
+            playTogether(
+                ObjectAnimator.ofFloat(border, View.SCALE_X, 0.06f, 1f),
+                ObjectAnimator.ofFloat(border, View.SCALE_Y, 0.018f, 0.03f)
+            )
+        }
+        val fill = AnimatorSet().apply {
+            duration = 210L
+            interpolator = DecelerateInterpolator()
+            play(ObjectAnimator.ofFloat(border, View.SCALE_Y, 0.03f, 1f))
+        }
+        calculatorWindowAnim = AnimatorSet().apply {
+            val body = AnimatorSet().apply { playSequentially(beam, fill) }
+            val tabs = listOfNotNull(calculatorWindowLabel, calculatorClose)
+            if (tabs.isEmpty()) {
+                play(body)
+            } else {
+                val fade = AnimatorSet().apply {
+                    duration = 140L
+                    startDelay = 100L
+                    playTogether(tabs.map { ObjectAnimator.ofFloat(it, View.ALPHA, 0f, 1f) })
+                }
+                playTogether(body, fade)
+            }
+            start()
+        }
+    }
+
+    private fun playCalculatorCrtCollapse(onEnd: () -> Unit) {
+        val border = calculatorWindowBorder
+        val overlay = calculatorOverlay
+        if (border == null || overlay?.visibility != View.VISIBLE || border.width <= 0) {
+            onEnd()
+            return
+        }
+        calculatorWindowAnim?.cancel()
+        border.pivotX = border.width / 2f
+        border.pivotY = border.height / 2f
+        val beam = AnimatorSet().apply {
+            duration = 160L
+            interpolator = AccelerateInterpolator()
+            play(ObjectAnimator.ofFloat(border, View.SCALE_Y, border.scaleY.coerceAtLeast(0.03f), 0.03f))
+        }
+        val dot = AnimatorSet().apply {
+            duration = 90L
+            interpolator = AccelerateInterpolator()
+            playTogether(
+                ObjectAnimator.ofFloat(border, View.SCALE_X, border.scaleX.coerceAtLeast(0.06f), 0.06f),
+                ObjectAnimator.ofFloat(border, View.SCALE_Y, 0.03f, 0.018f)
+            )
+        }
+        val set = AnimatorSet().apply {
+            val body = AnimatorSet().apply { playSequentially(beam, dot) }
+            val tabs = listOfNotNull(calculatorWindowLabel, calculatorClose)
+            if (tabs.isEmpty()) {
+                play(body)
+            } else {
+                val fade = AnimatorSet().apply {
+                    duration = 70L
+                    playTogether(tabs.map { ObjectAnimator.ofFloat(it, View.ALPHA, it.alpha, 0f) })
+                }
+                play(fade).before(body)
+            }
+            addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    if (calculatorWindowAnim === animation) {
+                        calculatorWindowAnim = null
+                        onEnd()
+                    }
+                }
+            })
+        }
+        calculatorWindowAnim = set
+        set.start()
+    }
+
+    private fun playCalculatorLandExpand() {
+        val overlay = calculatorOverlay ?: return
+        val border = calculatorWindowBorder
+        calculatorWindowAnim?.cancel()
+        snapCalculatorLandIdle()
+        border?.translationY = Tuils.dpToPx(mContext, 18).toFloat()
+        overlay.alpha = 0f
+        calculatorWindowAnim = AnimatorSet().apply {
+            duration = 180L
+            interpolator = DecelerateInterpolator()
+            val parts = arrayListOf<Animator>(ObjectAnimator.ofFloat(overlay, View.ALPHA, 0f, 1f))
+            border?.let { parts.add(ObjectAnimator.ofFloat(it, View.TRANSLATION_Y, it.translationY, 0f)) }
+            playTogether(parts)
+            start()
+        }
+    }
+
+    private fun playCalculatorLandCollapse(onEnd: () -> Unit) {
+        val overlay = calculatorOverlay ?: return onEnd()
+        val border = calculatorWindowBorder
+        calculatorWindowAnim?.cancel()
+        val set = AnimatorSet().apply {
+            duration = 140L
+            interpolator = AccelerateInterpolator()
+            val parts = arrayListOf<Animator>(ObjectAnimator.ofFloat(overlay, View.ALPHA, overlay.alpha, 0f))
+            border?.let {
+                parts.add(ObjectAnimator.ofFloat(it, View.TRANSLATION_Y, it.translationY, Tuils.dpToPx(mContext, 14).toFloat()))
+            }
+            playTogether(parts)
+            addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    if (calculatorWindowAnim === animation) {
+                        calculatorWindowAnim = null
+                        overlay.alpha = 1f
+                        border?.translationY = 0f
+                        onEnd()
+                    }
+                }
+            })
+        }
+        calculatorWindowAnim = set
+        set.start()
+    }
+
     fun openPodcastSurface(command: String?) {
         if (Looper.myLooper() != Looper.getMainLooper()) {
             runOnMainThread { openPodcastSurface(command) }
@@ -9588,15 +10234,12 @@ class UIManager(
             return
         }
 
+        closeCalculatorSurface(false, false)
         closeTermuxConsole(false)
         closeFileConsole(false)
         closeLuaAppSession(true)
         profilePaneController?.hide()
-        stylePodcastSurface()
-        podcastOverlay!!.visibility = View.VISIBLE
-        podcastOverlay!!.bringToFront()
-        applyPodcastPaneGeometry()
-        hideHomeSuggestionsForTermux()
+        expandPodcastSurface()
 
         val normalized = command?.trim { it <= ' ' }.orEmpty()
         if (normalized.isNotEmpty()) {
@@ -9607,15 +10250,286 @@ class UIManager(
         renderPodcastSurface(null)
     }
 
+    private fun expandPodcastSurface() {
+        podcastSessionActive = true
+        hidePodcastPill()
+        closeKeyboard()
+        mTerminalAdapter?.inputView?.clearFocus()
+        // Podcast keeps home chrome in-tree and slides it; never GONE it (that's for settings/termux).
+        if (launcherChromeHiddenForSurface) {
+            restoreLauncherChromeAfterSurface()
+        }
+        stylePodcastSurface()
+        val landscape = podcastLandscapePresentation()
+        if (landscape) {
+            // Landscape: no CRT beam — short panes + split layout fight scale pivots.
+            snapPodcastLandIdle()
+            podcastOverlay!!.alpha = 0f
+        } else {
+            snapPodcastCrtCollapsed()
+            podcastOverlay!!.alpha = 1f
+        }
+        podcastOverlay!!.visibility = View.VISIBLE
+        podcastOverlay!!.bringToFront()
+        applyPodcastPaneGeometry()
+        suggestionsContainer?.let { suggestions ->
+            if (suggestions.visibility == View.VISIBLE) {
+                suggestions.visibility = View.INVISIBLE
+            }
+        }
+        podcastOverlay!!.post {
+            if (landscape) {
+                resetPodcastFocusChromeImmediate()
+                playPodcastLandExpand()
+            } else {
+                setPodcastFocusChrome(true)
+                playPodcastCrtExpand()
+            }
+        }
+        podcastTab?.bringToFront()
+    }
+
+    private fun minimizePodcastSurface() {
+        if (podcastOverlay == null) {
+            return
+        }
+        if (!podcastSessionActive && !isPodcastSurfaceVisible) {
+            return
+        }
+        podcastSessionActive = true
+        capturePodcastSurfaceSession()
+        val afterCollapse = {
+            podcastOverlay?.visibility = View.GONE
+            podcastOverlay?.setBackgroundColor(Color.TRANSPARENT)
+            if (podcastLandscapePresentation()) snapPodcastLandIdle()
+            else snapPodcastCrtCollapsed()
+            if (suggestionsContainer != null && suggestionsContainer!!.visibility == View.INVISIBLE) {
+                suggestionsContainer!!.visibility = View.VISIBLE
+            }
+            showPodcastPill()
+            mTerminalAdapter?.focusInputEnd()
+            refreshSuggestionsSoon()
+        }
+        if (podcastLandscapePresentation()) {
+            resetPodcastFocusChromeImmediate()
+            playPodcastLandCollapse(afterCollapse)
+        } else {
+            setPodcastFocusChrome(false)
+            playPodcastCrtCollapse(afterCollapse)
+        }
+    }
+
+    private fun snapPodcastCrtCollapsed() {
+        val border = podcastWindowBorder ?: return
+        if (border.width > 0) {
+            border.pivotX = border.width / 2f
+            border.pivotY = border.height / 2f
+        }
+        border.scaleX = 0.06f
+        border.scaleY = 0.018f
+        border.alpha = 1f
+        podcastWindowLabel?.alpha = 0f
+        podcastClose?.alpha = 0f
+    }
+
+    private fun snapPodcastLandIdle() {
+        val border = podcastWindowBorder ?: return
+        border.scaleX = 1f
+        border.scaleY = 1f
+        border.alpha = 1f
+        podcastWindowLabel?.alpha = 1f
+        podcastClose?.alpha = 1f
+    }
+
+    private fun snapPodcastPresentationForCurrentOrientation() {
+        podcastWindowAnim?.cancel()
+        podcastWindowAnim = null
+        val border = podcastWindowBorder
+        if (border != null) {
+            border.animate().cancel()
+            border.scaleX = 1f
+            border.scaleY = 1f
+            border.alpha = 1f
+        }
+        podcastOverlay?.alpha = 1f
+        podcastWindowLabel?.alpha = 1f
+        podcastClose?.alpha = 1f
+        if (podcastLandscapePresentation()) {
+            resetPodcastFocusChromeImmediate()
+        } else if (isPodcastSurfaceVisible) {
+            setPodcastFocusChrome(true)
+        }
+    }
+
+    private fun playPodcastCrtExpand() {
+        val border = podcastWindowBorder ?: return
+        val tabs = listOfNotNull(podcastWindowLabel, podcastClose)
+        val prev = podcastWindowAnim
+        podcastWindowAnim = null
+        prev?.cancel()
+
+        if (border.width <= 0 || border.height <= 0) {
+            border.post { playPodcastCrtExpand() }
+            return
+        }
+        // Already snapped before VISIBLE — only fix pivot and run.
+        border.pivotX = border.width / 2f
+        border.pivotY = border.height / 2f
+        snapPodcastCrtCollapsed()
+
+        // CRT power-on: thin center beam → vertical fill.
+        val toBeam = AnimatorSet().apply {
+            duration = 90L
+            interpolator = AccelerateInterpolator()
+            playTogether(
+                ObjectAnimator.ofFloat(border, View.SCALE_X, 0.06f, 1f),
+                ObjectAnimator.ofFloat(border, View.SCALE_Y, 0.018f, 0.03f)
+            )
+        }
+        val toFull = AnimatorSet().apply {
+            duration = 210L
+            interpolator = DecelerateInterpolator()
+            play(ObjectAnimator.ofFloat(border, View.SCALE_Y, 0.03f, 1f))
+        }
+        val body = AnimatorSet().apply { playSequentially(toBeam, toFull) }
+        val set = AnimatorSet()
+        if (tabs.isEmpty()) {
+            set.play(body)
+        } else {
+            val fadeChrome = AnimatorSet().apply {
+                duration = 140L
+                startDelay = 100L
+                playTogether(tabs.map { ObjectAnimator.ofFloat(it, View.ALPHA, 0f, 1f) })
+            }
+            set.playTogether(body, fadeChrome)
+        }
+        podcastWindowAnim = set
+        set.start()
+    }
+
+    private fun playPodcastCrtCollapse(onEnd: () -> Unit) {
+        val border = podcastWindowBorder
+        if (border == null || !isPodcastSurfaceVisible || border.width <= 0) {
+            onEnd()
+            return
+        }
+        val tabs = listOfNotNull(podcastWindowLabel, podcastClose)
+        val prev = podcastWindowAnim
+        podcastWindowAnim = null
+        prev?.cancel()
+        border.pivotX = border.width / 2f
+        border.pivotY = border.height / 2f
+
+        // CRT power-off: vertical collapse → horizontal beam → center dot.
+        val toBeam = AnimatorSet().apply {
+            duration = 160L
+            interpolator = AccelerateInterpolator()
+            play(ObjectAnimator.ofFloat(border, View.SCALE_Y, border.scaleY.coerceAtLeast(0.03f), 0.03f))
+        }
+        val toDot = AnimatorSet().apply {
+            duration = 90L
+            interpolator = AccelerateInterpolator()
+            playTogether(
+                ObjectAnimator.ofFloat(border, View.SCALE_X, border.scaleX.coerceAtLeast(0.06f), 0.06f),
+                ObjectAnimator.ofFloat(border, View.SCALE_Y, 0.03f, 0.018f)
+            )
+        }
+        val body = AnimatorSet().apply { playSequentially(toBeam, toDot) }
+        val set = AnimatorSet()
+        if (tabs.isEmpty()) {
+            set.play(body)
+        } else {
+            val fadeChrome = AnimatorSet().apply {
+                duration = 70L
+                playTogether(tabs.map { ObjectAnimator.ofFloat(it, View.ALPHA, it.alpha, 0f) })
+            }
+            set.play(fadeChrome).before(body)
+        }
+        set.addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator) {
+                // Skip if cancelled (field cleared/replaced before cancel).
+                if (podcastWindowAnim === animation) {
+                    podcastWindowAnim = null
+                    onEnd()
+                }
+            }
+        })
+        podcastWindowAnim = set
+        set.start()
+    }
+
+    private fun playPodcastLandExpand() {
+        val overlay = podcastOverlay ?: return
+        val border = podcastWindowBorder
+        podcastWindowAnim?.cancel()
+        podcastWindowAnim = null
+        snapPodcastLandIdle()
+        border?.translationY = Tuils.dpToPx(mContext, 18).toFloat()
+        overlay.alpha = 0f
+        val set = AnimatorSet().apply {
+            duration = 180L
+            interpolator = DecelerateInterpolator()
+            val parts = ArrayList<Animator>()
+            parts.add(ObjectAnimator.ofFloat(overlay, View.ALPHA, 0f, 1f))
+            if (border != null) {
+                parts.add(ObjectAnimator.ofFloat(border, View.TRANSLATION_Y, border.translationY, 0f))
+            }
+            playTogether(parts)
+        }
+        podcastWindowAnim = set
+        set.start()
+    }
+
+    private fun playPodcastLandCollapse(onEnd: () -> Unit) {
+        val overlay = podcastOverlay
+        if (overlay == null || !isPodcastSurfaceVisible) {
+            onEnd()
+            return
+        }
+        val border = podcastWindowBorder
+        podcastWindowAnim?.cancel()
+        podcastWindowAnim = null
+        val set = AnimatorSet().apply {
+            duration = 140L
+            interpolator = AccelerateInterpolator()
+            val parts = ArrayList<Animator>()
+            parts.add(ObjectAnimator.ofFloat(overlay, View.ALPHA, overlay.alpha, 0f))
+            if (border != null) {
+                parts.add(
+                    ObjectAnimator.ofFloat(
+                        border,
+                        View.TRANSLATION_Y,
+                        border.translationY,
+                        Tuils.dpToPx(mContext, 14).toFloat()
+                    )
+                )
+            }
+            playTogether(parts)
+        }
+        set.addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator) {
+                if (podcastWindowAnim === animation) {
+                    podcastWindowAnim = null
+                    border?.translationY = 0f
+                    overlay.alpha = 1f
+                    onEnd()
+                }
+            }
+        })
+        podcastWindowAnim = set
+        set.start()
+    }
+
     fun openProfileSurface() {
         if (Looper.myLooper() != Looper.getMainLooper()) {
             runOnMainThread { openProfileSurface() }
             return
         }
+        closeCalculatorSurface(false, false)
         closeTermuxConsole(false)
         closeFileConsole(false)
         closeLuaAppSession(true)
-        closePodcastSurface(false)
+        minimizePodcastSurface()
         profilePaneController?.show()
         hideHomeSuggestionsForTermux()
     }
@@ -9631,18 +10545,32 @@ class UIManager(
     }
 
     private fun closePodcastSurface(restoreSuggestions: Boolean = true) {
+        podcastSessionActive = false
+        hidePodcastPill()
+        setPodcastFocusChrome(false)
+        if (launcherChromeHiddenForSurface) {
+            restoreLauncherChromeAfterSurface()
+        }
+        if (suggestionsContainer != null && suggestionsContainer!!.visibility == View.INVISIBLE) {
+            suggestionsContainer!!.visibility = View.VISIBLE
+        }
         if (restoreSuggestions) {
             resetPodcastSurfaceSession()
         } else {
             capturePodcastSurfaceSession()
         }
         podcastOverlay?.visibility = View.GONE
+        podcastOverlay?.setBackgroundColor(Color.TRANSPARENT)
+        if (podcastLandscapePresentation()) snapPodcastLandIdle()
+        else snapPodcastCrtCollapsed()
         if (restoreSuggestions) {
             clearPodcastCommandFromInput()
-            restoreHomeSuggestionsAfterTermux()
         }
         if (mTerminalAdapter != null && restoreSuggestions) {
             mTerminalAdapter!!.focusInputEnd()
+        }
+        if (restoreSuggestions) {
+            refreshSuggestionsSoon()
         }
     }
 
@@ -9716,6 +10644,7 @@ class UIManager(
             if (generation != podcastRenderGeneration) return@Runnable
             podcastScroll?.scrollTo(0, pendingPodcastScrollRestore)
         })
+        scheduleTypefaceRefreshes()
     }
 
     private fun captureTermuxSurfaceSession(appId: String?) {
@@ -9776,6 +10705,7 @@ class UIManager(
         val lower = command.lowercase(Locale.getDefault())
         when {
             lower == "exit" || lower == "close" -> closePodcastSurface()
+            lower == "minimize" || lower == "min" -> minimizePodcastSurface()
             lower == "help" -> renderPodcastSurface("Commands: add <https-feed-url>, refresh, play, next, prev, rewind, forward, speed <0.5-2.0>, close")
             lower == "refresh" || lower == "reload" -> {
                 renderPodcastSurface("Refreshing selected podcast...")
@@ -9854,7 +10784,9 @@ class UIManager(
         updatePodcastTabStyle()
         updatePodcastContentLabel()
         updatePodcastNowPlaying()
-        podcastNowPlaying?.visibility = if (podcastMode == PODCAST_MODE_PLAYER) View.GONE else View.VISIBLE
+        val showNowPlaying = podcastMode != PODCAST_MODE_PLAYER
+            && (mainPack.podcastManager.isPlaying() || mainPack.podcastManager.isPreparing())
+        podcastNowPlaying?.visibility = if (showNowPlaying) View.VISIBLE else View.GONE
         podcastPaneActions?.visibility = if (podcastMode == PODCAST_MODE_SHOWS) View.VISIBLE else View.GONE
         podcastPlayerControls?.visibility = if (podcastMode == PODCAST_MODE_PLAYER) View.VISIBLE else View.GONE
         podcastContentBack?.bringToFront()
@@ -9866,12 +10798,22 @@ class UIManager(
             podcastScroll?.paddingLeft ?: 0,
             podcastScroll?.paddingTop ?: 0,
             podcastScroll?.paddingRight ?: 0,
-            Tuils.dpToPx(mContext, if (podcastMode == PODCAST_MODE_PLAYER) 116 else 52)
+            Tuils.dpToPx(
+                mContext,
+                when {
+                    podcastMode == PODCAST_MODE_PLAYER -> 116
+                    showNowPlaying -> 52
+                    else -> 8
+                }
+            )
         )
         podcastPlayShow?.text = "RECENTS"
 
         val content = podcastContent ?: return
         content.removeAllViews()
+        podcastPlayerArt = null
+        podcastPlayerEpisodeTitle = null
+        podcastPlayerShowName = null
 
         val detailStatus = if (podcastMode == PODCAST_MODE_SHOW_DETAIL) podcastStatus else null
         if (!podcastStatus.isNullOrEmpty() && detailStatus == null) {
@@ -9919,6 +10861,7 @@ class UIManager(
         val displayShow = active?.let { episode ->
             manager.shows().firstOrNull { it.id == episode.showId }
         } ?: selected
+        val preparing = manager.isPreparing()
         val playing = manager.isPlaying()
 
         podcastNowTitle?.text = when {
@@ -9933,24 +10876,39 @@ class UIManager(
         val progress = if (position >= 0) position else saved
         val duration = if (isPodcast) manager.duration() else -1
         podcastNowMeta?.text = displayShow?.title ?: "Add a feed, then play a show."
-        podcastNowProgress?.text = if (duration > 0) {
-            PodcastManager.formatMillis(progress) + " / " + PodcastManager.formatMillis(duration)
-        } else {
-            PodcastManager.formatMillis(progress)
+        podcastNowProgress?.text = when {
+            preparing -> "buffering " + podcastPrepareGlyph()
+            duration > 0 -> PodcastManager.formatMillis(progress) + " / " + PodcastManager.formatMillis(duration)
+            else -> PodcastManager.formatMillis(progress)
         }
         podcastPlayerProgress?.text = podcastNowProgress?.text
-        val playText = podcastTransportLabel(if (playing) "PAUSE" else "PLAY")
+        val playText = podcastTransportLabel(
+            when {
+                preparing -> "···"
+                playing -> "PAUSE"
+                else -> "PLAY"
+            }
+        )
         podcastPlay?.text = playText
         podcastPlayerPlay?.text = playText
+        podcastPlay?.isEnabled = !preparing
+        podcastPlayerPlay?.isEnabled = !preparing
         if (!podcastSeekDragging) {
             podcastSeek?.max = if (duration > 0) duration else 100
             podcastSeek?.progress = if (duration > 0) min(progress, duration) else 0
-            podcastSeek?.isEnabled = duration > 0
+            podcastSeek?.isEnabled = duration > 0 && !preparing
             podcastPlayerSeek?.max = if (duration > 0) duration else 100
             podcastPlayerSeek?.progress = if (duration > 0) min(progress, duration) else 0
-            podcastPlayerSeek?.isEnabled = duration > 0
+            podcastPlayerSeek?.isEnabled = duration > 0 && !preparing
         }
+        podcastPlayerEpisodeTitle?.text = active?.title ?: current?.getTitle() ?: "No podcast loaded"
+        podcastPlayerShowName?.text = displayShow?.title ?: "Pick a show to start listening."
         updatePodcastArtwork(displayShow?.imageUrl)
+    }
+
+    private fun podcastPrepareGlyph(): String {
+        val frames = arrayOf("[·    ]", "[··   ]", "[···  ]", "[···· ]", "[·····]", "[ ····]", "[  ···]", "[   ··]", "[    ·]")
+        return frames[((SystemClock.uptimeMillis() / 120L) % frames.size).toInt()]
     }
 
     private fun renderPodcastRecents() {
@@ -9969,45 +10927,69 @@ class UIManager(
 
     private fun updatePodcastArtwork(url: String?) {
         val clean = url?.trim()?.takeIf { it.isNotEmpty() }
-        if (clean == podcastArtworkUrl) return
-
+        podcastArtwork?.let { loadPodcastImage(clean, it) }
+        podcastPlayerArt?.let { loadPodcastImage(clean, it) }
         podcastArtworkUrl = clean
-        val target = podcastArtwork ?: return
-        loadPodcastImage(clean, target)
     }
 
     private fun loadPodcastImage(url: String?, target: ImageView) {
         val clean = url?.trim()?.takeIf { it.isNotEmpty() }
-        target.tag = clean ?: Tuils.EMPTYSTRING
-        target.setImageResource(R.mipmap.ic_launcher)
-        if (clean == null) return
+        if (clean == null) {
+            target.tag = Tuils.EMPTYSTRING
+            target.setImageResource(R.mipmap.ic_launcher)
+            return
+        }
 
         val cached = synchronized(podcastImageCache) { podcastImageCache.get(clean) }
         if (cached != null) {
+            target.tag = clean
             target.setImageBitmap(cached)
             return
         }
 
+        // Same URL already loading/showing — don't flash launcher or spawn another fetch.
+        if (target.tag == clean) return
+
+        target.tag = clean
+        target.setImageResource(R.mipmap.ic_launcher)
         Thread {
-            val bitmap = try {
-                val request = Request.Builder().url(clean).get().build()
-                mainPack.client.newCall(request).execute().use { response ->
-                    if (!response.isSuccessful) null
-                    else response.body?.byteStream()?.use { BitmapFactory.decodeStream(it) }
-                }
-            } catch (_: Exception) {
-                null
-            }
+            val bitmap = decodePodcastBitmap(clean)
             runOnMainThread {
                 if (target.tag != clean) return@runOnMainThread
                 if (bitmap != null) {
                     synchronized(podcastImageCache) { podcastImageCache.put(clean, bitmap) }
                     target.setImageBitmap(bitmap)
                 } else {
+                    target.tag = Tuils.EMPTYSTRING
                     target.setImageResource(R.mipmap.ic_launcher)
                 }
             }
         }.start()
+    }
+
+    private fun decodePodcastBitmap(url: String): Bitmap? {
+        return try {
+            val request = Request.Builder()
+                .url(url)
+                .header("User-Agent", "ReTUI/1.0 Android Podcast")
+                .get()
+                .build()
+            mainPack.client.newCall(request).execute().use { response ->
+                if (!response.isSuccessful) return null
+                val bytes = response.body?.bytes() ?: return null
+                val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+                BitmapFactory.decodeByteArray(bytes, 0, bytes.size, bounds)
+                var sample = 1
+                val maxPx = 512
+                while (bounds.outWidth / sample > maxPx || bounds.outHeight / sample > maxPx) {
+                    sample *= 2
+                }
+                val opts = BitmapFactory.Options().apply { inSampleSize = sample }
+                BitmapFactory.decodeByteArray(bytes, 0, bytes.size, opts)
+            }
+        } catch (_: Exception) {
+            null
+        }
     }
 
     private fun renderPodcastShows(shows: List<PodcastShow>) {
@@ -10146,12 +11128,13 @@ class UIManager(
     }
 
     private fun <T> addPodcastCardRows(items: List<T>, addCard: (LinearLayout, T) -> Unit) {
+        val columns = if (podcastLandscapePresentation()) 4 else 3
         var index = 0
         while (index < items.size) {
             val row = LinearLayout(mContext)
             row.orientation = LinearLayout.HORIZONTAL
             row.gravity = Gravity.TOP
-            for (i in 0 until 3) {
+            for (i in 0 until columns) {
                 if (index + i < items.size) {
                     addCard(row, items[index + i])
                 } else {
@@ -10160,7 +11143,7 @@ class UIManager(
                 }
             }
             addPodcastView(row)
-            index += 3
+            index += columns
         }
     }
 
@@ -10548,22 +11531,26 @@ class UIManager(
             Tuils.dpToPx(mContext, 12),
             Tuils.dpToPx(mContext, 12)
         )
-        val viewportHeight = podcastScroll?.height ?: 0
-        if (viewportHeight > 0) {
-            panel.minimumHeight = viewportHeight
-        }
 
         val artFrame = FrameLayout(mContext)
         val art = ImageView(mContext)
         art.scaleType = ImageView.ScaleType.CENTER_CROP
+        podcastPlayerArt = art
         loadPodcastImage(displayShow?.imageUrl, art)
         val panelWidth = podcastContentPanel?.width ?: 0
-        val paneHeight = podcastWindowBorder?.height ?: viewportHeight
+        val paneHeight = podcastWindowBorder?.height ?: (podcastScroll?.height ?: 0)
+        val controlsBudget = Tuils.dpToPx(mContext, if (podcastLandscapePresentation()) 120 else 130)
+        val metaBudget = Tuils.dpToPx(mContext, if (podcastLandscapePresentation()) 88 else 110)
+        val artCeiling = max(
+            Tuils.dpToPx(mContext, if (podcastLandscapePresentation()) 72 else 96),
+            paneHeight - controlsBudget - metaBudget
+        )
         val artSize = if (panelWidth > 0 && paneHeight > 0) {
-            min((panelWidth * 0.82f).roundToInt(), (paneHeight * 0.46f).roundToInt())
+            val widthFrac = if (podcastLandscapePresentation()) 0.42f else 0.72f
+            min((panelWidth * widthFrac).roundToInt(), artCeiling)
         } else {
-            Tuils.dpToPx(mContext, 300)
-        }.coerceAtLeast(Tuils.dpToPx(mContext, 240))
+            min(Tuils.dpToPx(mContext, 220), artCeiling)
+        }.coerceAtMost(Tuils.dpToPx(mContext, if (podcastLandscapePresentation()) 200 else 300))
         artFrame.addView(art, FrameLayout.LayoutParams(
             FrameLayout.LayoutParams.MATCH_PARENT,
             FrameLayout.LayoutParams.MATCH_PARENT
@@ -10584,6 +11571,7 @@ class UIManager(
         title.maxLines = 3
         title.ellipsize = TextUtils.TruncateAt.END
         title.setPadding(0, Tuils.dpToPx(mContext, 16), 0, Tuils.dpToPx(mContext, 2))
+        podcastPlayerEpisodeTitle = title
         details.addView(title)
 
         val show = TextView(mContext)
@@ -10591,6 +11579,7 @@ class UIManager(
         show.setTextColor(ColorUtils.setAlphaComponent(notificationWidgetTextColor(), 210))
         show.setTypeface(Tuils.getTypeface(mContext))
         show.textSize = PODCAST_TEXT_MEDIUM
+        podcastPlayerShowName = show
         details.addView(show)
 
         val speed = TextView(mContext)
@@ -10617,7 +11606,7 @@ class UIManager(
         val content = podcastContent ?: return
         content.addView(panel, LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT,
-            if (viewportHeight > 0) viewportHeight else LinearLayout.LayoutParams.WRAP_CONTENT
+            LinearLayout.LayoutParams.WRAP_CONTENT
         ))
     }
 
@@ -10711,11 +11700,7 @@ class UIManager(
         }
 
         if (lower == "cd" || lower.startsWith("cd ")) {
-            if (FileBackendManager.activeBackend(mContext!!) != FileBackendManager.Active.TERMUX) {
-                refreshFileConsole(true)
-            } else {
-                renderFileConsole("Changing directory...")
-            }
+            refreshFileConsole(true)
         } else if (lower.startsWith("open ") || lower.startsWith("termux-open ") || lower.startsWith(
                 "share "
             )
@@ -10734,18 +11719,6 @@ class UIManager(
         val path = mainPack!!.currentDirectory.getAbsolutePath()
         if (filePath != null) {
             filePath!!.setText(path)
-        }
-
-        if (FileBackendManager.activeBackend(mContext!!) == FileBackendManager.Active.TERMUX) {
-            val dirs: List<String?> = dirs(path)
-            val files: List<String?> = files(path)
-            if (dirs.isEmpty() && files.isEmpty()) {
-                renderFileConsole("Loading " + path + "...")
-            } else {
-                renderFileConsole(buildFileListing(dirs, files, null))
-            }
-            requestFileConsoleTermuxListing(path, forceTermuxRequest)
-            return
         }
 
         renderFileConsole(buildNativeFileListing(mainPack!!.currentDirectory))
@@ -10867,6 +11840,9 @@ class UIManager(
 
     private val isPodcastSurfaceVisible: Boolean
         get() = podcastOverlay != null && podcastOverlay!!.getVisibility() == View.VISIBLE
+
+    private val isCalculatorSurfaceVisible: Boolean
+        get() = calculatorOverlay?.visibility == View.VISIBLE
 
     private fun takeTermuxConsoleFocus(showKeyboard: Boolean) {
         if (!this.isTermuxConsoleVisible) {
@@ -11525,17 +12501,11 @@ class UIManager(
             appendTermuxLine("cd [dir] -> change the Termux console working directory")
             appendTermuxLine("status  -> check Termux bridge readiness")
             appendTermuxLine("setup   -> show Termux bridge setup checklist")
-            appendTermuxLine("open    -> launch Termux for interactive programs")
+            appendTermuxLine("open    -> launch the Termux Android app")
             appendTermuxLine("run <script|alias> [args...] -> dispatch a Termux script")
-            appendTermuxLine("apps    -> list Re:T-UI Termux apps")
-            appendTermuxLine("app <id> -> open a persistent tmux-backed app session")
-            appendTermuxLine("app-add/add-app <id> <command> -> register a custom Termux app")
-            appendTermuxLine("app-info <id> -> inspect a registered Termux app")
-            appendTermuxLine("app-sync <id> -> write its manifest into Termux")
-            appendTermuxLine("app-actions <id> -> list static app action chips")
-            appendTermuxLine("app-action <id> <label> [input] -> add an app action chip")
-            appendTermuxLine("app-action-rm <id> <label> -> remove a custom app action")
-            appendTermuxLine("app-rm/rm-app <id> -> remove a custom Termux app")
+            appendTermuxLine("apps / app <id> -> tmux workspace launchers (interactive TUIs)")
+            appendTermuxLine("app-add <id> <command> -> save a workspace launcher")
+            appendTermuxLine("Prefer: tmux launch mc   or alias MC")
             appendTermuxLine("clear   -> clear this console")
             appendTermuxLine("exit    -> close this console")
         } else if ("status" == lower) {
@@ -11578,18 +12548,12 @@ class UIManager(
     }
 
     private fun appendTermuxApps() {
-        val apps = TermuxAppManager.list(mContext!!)
-        if (apps.isEmpty()) {
-            appendTermuxLine("No Termux apps registered.")
-            return
+        val launchers = TermuxWorkspaceLauncherManager.list(mContext!!)
+        appendTermuxLine("Workspace launchers (use: tmux launch <id> or MC)")
+        for (launcher in launchers) {
+            val cmd = if (launcher.command.isEmpty()) "(shell)" else launcher.command
+            appendTermuxLine(launcher.id + " -> " + launcher.title + " [" + cmd + "]")
         }
-        appendTermuxLine("Termux apps")
-        for (app in apps) {
-            val actionInfo = if (app.actions.isEmpty()) "" else " [" + app.actions.size + " actions]"
-            appendTermuxLine(app.id + " -> " + app.title + actionInfo)
-            appendTermuxLine("  home: " + app.homeDir)
-        }
-        appendTermuxLine("Open with: app <id>")
     }
 
     private fun appendTermuxAppActions(command: String?) {
@@ -11654,17 +12618,11 @@ class UIManager(
     private fun openTermuxCustomApp(command: String?) {
         val parts = Tuils.splitArgs(command)
         if (parts.size < 2) {
-            appendTermuxLine("usage: app <id>")
+            appendTermuxLine("usage: app <id>  (opens tmux workspace launcher)")
             appendTermuxApps()
             return
         }
-        val app = TermuxAppManager.resolve(mContext!!, parts.get(1))
-        if (app == null) {
-            appendTermuxLine("Unknown Termux app: " + parts.get(1))
-            appendTermuxLine("Register one with: app-add <id> <command>")
-            return
-        }
-        openTermuxAppSession(app)
+        handleTermuxWorkspaceExternalCommand("launch " + parts[1])
     }
 
     private fun addTermuxCustomApp(command: String?) {
@@ -11672,20 +12630,17 @@ class UIManager(
         if (parts.size < 3) {
             appendTermuxLine("usage: app-add <id> <command>")
             appendTermuxLine("example: app-add radio bash ~/retui/radio.sh")
+            appendTermuxLine("Saved as a tmux workspace launcher: tmux launch <id>")
             return
         }
-        val id = parts.get(1)
+        val id = parts[1]
         val appCommand = Tuils.toPlanString(parts.subList(2, parts.size), Tuils.SPACE)
-        if (TermuxAppManager.add(mContext!!, id, id, appCommand, termuxWorkingDirectory)) {
-            val normalized = TermuxAppManager.normalizeId(id)
-            val app = TermuxAppManager.resolve(mContext!!, normalized)
-            if (app != null) {
-                syncTermuxAppManifest(app, true)
-            }
-            appendTermuxLine("Termux app registered: " + normalized)
-            appendTermuxLine("Open with: app " + normalized)
+        if (TermuxWorkspaceLauncherManager.save(mContext!!, id, appCommand)) {
+            val normalized = TermuxWorkspaceLauncherManager.normalizeId(id)
+            appendTermuxLine("Workspace launcher saved: " + normalized)
+            appendTermuxLine("Open with: tmux launch " + normalized + "  (or: " + normalized + ")")
         } else {
-            appendTermuxLine("Unable to register Termux app.")
+            appendTermuxLine("Unable to save launcher (built-in ids cannot be overwritten).")
         }
     }
 
@@ -11757,31 +12712,8 @@ class UIManager(
     }
 
     private fun openTermuxAppSession(app: TermuxAppManager.TermuxApp) {
-        if (Looper.myLooper() != Looper.getMainLooper()) {
-            runOnMainThread { openTermuxAppSession(app) }
-            return
-        }
-
-        if (termuxOverlay == null) {
-            return
-        }
-        closeFileConsole(false)
-        closeLuaAppSession(true)
-        termuxAppSession = app
-        retainedTermuxAppId = app.id
-        retainedTermuxAppFnKeyMode = false
-        termuxAppLastStatus = "starting"
-        resetTermuxAppRuntimeState(true)
-        styleTermuxConsole()
-        updateTermuxConsoleLabels()
-        termuxOverlay!!.setVisibility(View.VISIBLE)
-        termuxOverlay!!.bringToFront()
-        hideHomeSuggestionsForTermux()
-        renderTermuxAppFrame(null, "starting " + app.title + "...")
-        syncTermuxAppManifest(app, false)
-        dispatchTermuxAppScript("start", buildTermuxAppStartScript(app), true)
-        scheduleTermuxAppRefreshBurst(app.id, TERMUX_APP_START_WATCH_MS)
-        scheduleTermuxConsoleFocusCapture(true)
+        // ponytail: interactive Termux apps live on the tmux workspace only.
+        handleTermuxWorkspaceExternalCommand("launch " + app.id)
     }
 
     private fun submitTermuxAppInput(rawCommand: String?) {
@@ -13291,6 +14223,7 @@ class UIManager(
     private fun styleClockOverlay(rootView: View) {
         val timerTab = rootView.findViewById<TextView?>(R.id.timer_tab)
         val stopwatchTab = rootView.findViewById<TextView?>(R.id.stopwatch_tab)
+        podcastTab = rootView.findViewById(R.id.podcast_tab)
 
         styleClockTab(timerTab, View.OnClickListener { v: View? ->
             val message = ClockManager.getInstance(mContext).stopTimer()
@@ -13300,35 +14233,240 @@ class UIManager(
             val message = ClockManager.getInstance(mContext).stopStopwatch()
             Tuils.sendOutput(mContext, message, TerminalManager.CATEGORY_OUTPUT)
         })
+        stylePodcastPill(podcastTab)
+    }
+
+    private fun stylePodcastPill(tab: ImageView?) {
+        if (tab == null) {
+            return
+        }
+        LauncherPillStyle.apply(mContext!!, tab)
+        tab.setOnClickListener { openPodcastSurface(null) }
+    }
+
+    private fun showPodcastPill() {
+        val tab = podcastTab ?: mRootView?.findViewById(R.id.podcast_tab)
+        podcastTab = tab
+        if (tab == null) {
+            return
+        }
+        if (!podcastSessionActive || isPodcastSurfaceVisible) {
+            tab.visibility = View.GONE
+            return
+        }
+        stylePodcastPill(tab)
+        tab.visibility = View.VISIBLE
+        if (!podcastTabDockReady) {
+            makeClockTabDockable(
+                tab,
+                PREF_PODCAST_BADGE_EDGE,
+                PREF_PODCAST_BADGE_FRACTION,
+                CLOCK_EDGE_RIGHT,
+                0.35f
+            )
+            podcastTabDockReady = true
+        }
+        applyPodcastPillDock(tab)
+        // Rotate→minimize can run before insets/layout settle — redock next frames.
+        tab.post { applyPodcastPillDock(tab) }
+        mRootView?.postDelayed({ applyPodcastPillDock(tab) }, 120)
+    }
+
+    private fun applyPodcastPillDock(tab: View) {
+        val land = podcastLandscapePresentation()
+        val frac = if (preferences != null) {
+            preferences.getFloat(PREF_PODCAST_BADGE_FRACTION, if (land) 0.42f else 0.35f)
+        } else {
+            if (land) 0.42f else 0.35f
+        }.coerceIn(0f, 1f)
+        if (land) {
+            // Portrait right-edge dock lands on the terminal pane / bezel — park left instead.
+            forceClockTabEdge(tab, CLOCK_EDGE_LEFT, frac)
+        } else {
+            applyClockTabDock(
+                tab,
+                PREF_PODCAST_BADGE_EDGE,
+                PREF_PODCAST_BADGE_FRACTION,
+                CLOCK_EDGE_RIGHT,
+                0.35f
+            )
+        }
+        tab.elevation = Tuils.dpToPx(mContext, 16).toFloat()
+        tab.bringToFront()
+    }
+
+    private fun forceClockTabEdge(view: View, edge: String, fraction: Float) {
+        val parent = view.parent as? View ?: return
+        if (parent.width <= 0 || parent.height <= 0 || view.width <= 0 || view.height <= 0) {
+            view.post { forceClockTabEdge(view, edge, fraction) }
+            return
+        }
+        val margin = Tuils.dpToPx(mContext, if (podcastLandscapePresentation()) 14 else 6)
+        // Prefer system insets — parent padding can lag one frame after rotate.
+        val padL = max(parent.paddingLeft, systemInsetLeft)
+        val padR = max(parent.paddingRight, systemInsetRight)
+        val padT = max(parent.paddingTop, systemInsetTop)
+        val padB = max(parent.paddingBottom, systemInsetBottom)
+        val minX = (padL + margin).toFloat()
+        val minY = (padT + margin).toFloat()
+        val maxX = max(minX, (parent.width - padR - view.width - margin).toFloat())
+        val maxY = max(minY, (parent.height - padB - view.height - margin).toFloat())
+        val frac = fraction.coerceIn(0f, 1f)
+        val x: Float
+        val y: Float
+        when (edge) {
+            CLOCK_EDGE_LEFT -> {
+                x = minX
+                y = minY + frac * max(0f, maxY - minY)
+            }
+            CLOCK_EDGE_TOP -> {
+                x = minX + frac * max(0f, maxX - minX)
+                y = minY
+            }
+            CLOCK_EDGE_BOTTOM -> {
+                x = minX + frac * max(0f, maxX - minX)
+                y = maxY
+            }
+            else -> {
+                x = maxX
+                y = minY + frac * max(0f, maxY - minY)
+            }
+        }
+        setClockTabPosition(view, x, y, parent)
+    }
+
+    private fun hidePodcastPill() {
+        podcastTab?.visibility = View.GONE
+    }
+
+    private fun setPodcastFocusChrome(expanded: Boolean) {
+        if (podcastLandscapePresentation()) {
+            // Portrait-only: landscape uses fade pane and keeps the split chrome put.
+            resetPodcastFocusChromeImmediate()
+            return
+        }
+        val top = mainContainer
+        val tray = terminalTrayContainer
+        if (top == null && tray == null) {
+            podcastFocusChromeActive = expanded
+            return
+        }
+
+        val headerH = headerContainer?.height ?: 0
+        val dockH = moduleDockScroll?.height ?: 0
+        val topH = top?.height ?: 0
+        val trayH = tray?.height ?: 0
+        // Heights can be 0 on first expand before layout — retry once.
+        if (expanded && ((top != null && topH <= 0) || (tray != null && trayH <= 0))) {
+            (top ?: tray)?.post { setPodcastFocusChrome(true) }
+            return
+        }
+
+        podcastChromeAnim?.cancel()
+        val peek = Tuils.dpToPx(mContext, PODCAST_CHROME_PEEK_DP).toFloat()
+        val anims = ArrayList<Animator>()
+        val duration = 260L
+        val module = homeModulesContainer
+
+        if (!expanded) {
+            module?.visibility = View.VISIBLE
+        }
+
+        if (top != null) {
+            // Move header + module dock with the home column; leave a peek in the top gap.
+            val chromeBand = max(headerH + dockH, Tuils.dpToPx(mContext, 96)).toFloat()
+            val target = if (expanded) {
+                -max(0f, chromeBand - peek)
+            } else {
+                0f
+            }
+            anims.add(ObjectAnimator.ofFloat(top, View.TRANSLATION_Y, top.translationY, target))
+            anims.add(
+                ObjectAnimator.ofFloat(
+                    top,
+                    View.ALPHA,
+                    top.alpha,
+                    if (expanded) PODCAST_CHROME_PEEK_ALPHA else 1f
+                )
+            )
+        }
+        if (tray != null) {
+            // Slide input tray down; leave a peek strip in the bottom gap.
+            val target = if (expanded) {
+                max(0f, trayH - peek)
+            } else {
+                0f
+            }
+            anims.add(ObjectAnimator.ofFloat(tray, View.TRANSLATION_Y, tray.translationY, target))
+            anims.add(
+                ObjectAnimator.ofFloat(
+                    tray,
+                    View.ALPHA,
+                    tray.alpha,
+                    if (expanded) PODCAST_CHROME_PEEK_ALPHA else 1f
+                )
+            )
+        }
+        if (module != null) {
+            anims.add(
+                ObjectAnimator.ofFloat(
+                    module,
+                    View.ALPHA,
+                    module.alpha,
+                    if (expanded) 0f else 1f
+                )
+            )
+        }
+
+        if (anims.isEmpty()) {
+            podcastFocusChromeActive = expanded
+            return
+        }
+
+        val set = AnimatorSet()
+        set.playTogether(anims)
+        set.duration = duration
+        set.addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator) {
+                podcastFocusChromeActive = expanded
+                if (expanded) {
+                    module?.visibility = View.INVISIBLE
+                } else {
+                    module?.alpha = 1f
+                    module?.visibility = View.VISIBLE
+                    top?.translationY = 0f
+                    top?.alpha = 1f
+                    tray?.translationY = 0f
+                    tray?.alpha = 1f
+                }
+            }
+        })
+        podcastChromeAnim = set
+        set.start()
+    }
+
+    private fun resetPodcastFocusChromeImmediate() {
+        podcastChromeAnim?.cancel()
+        podcastChromeAnim = null
+        podcastFocusChromeActive = false
+        mainContainer?.translationY = 0f
+        mainContainer?.alpha = 1f
+        terminalTrayContainer?.translationY = 0f
+        terminalTrayContainer?.alpha = 1f
+        homeModulesContainer?.alpha = 1f
+        homeModulesContainer?.visibility = View.VISIBLE
     }
 
     private fun styleClockTab(tab: TextView?, listener: View.OnClickListener?) {
         if (tab == null) {
             return
         }
-
-        val borderColor = terminalBorderColor()
-        val bgColor = terminalHeaderBackground()
-        val useDashed = dashedBorders()
-
-        tab.setBackground(
-            TerminalBorderRuntime.panelDrawable(
-                mContext!!,
-                bgColor,
-                borderColor,
-                1.4f,
-                3,
-                useDashed
-            )
-        )
-        tab.setTextColor(borderColor)
-        TextViewCompat.setCompoundDrawableTintList(tab, ColorStateList.valueOf(borderColor))
-        tab.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
+        LauncherPillStyle.apply(mContext!!, tab)
         tab.setOnClickListener(listener)
     }
 
     private fun makeClockTabDockable(
-        tab: TextView?,
+        tab: View?,
         edgeKey: String?,
         fractionKey: String?,
         defaultEdge: String?,
@@ -13432,23 +14570,25 @@ class UIManager(
         fraction = max(0f, min(1f, fraction))
 
         val margin = Tuils.dpToPx(mContext, 6)
-        val maxX = max(margin, parent.getWidth() - view.getWidth() - margin).toFloat()
-        val maxY = max(margin, parent.getHeight() - view.getHeight() - margin).toFloat()
+        val minX = (parent.paddingLeft + margin).toFloat()
+        val minY = (parent.paddingTop + margin).toFloat()
+        val maxX = max(minX, (parent.width - parent.paddingRight - view.width - margin).toFloat())
+        val maxY = max(minY, (parent.height - parent.paddingBottom - view.height - margin).toFloat())
         val x: Float
         val y: Float
 
         if (CLOCK_EDGE_LEFT == edge) {
-            x = margin.toFloat()
-            y = margin + fraction * max(0f, maxY - margin)
+            x = minX
+            y = minY + fraction * max(0f, maxY - minY)
         } else if (CLOCK_EDGE_TOP == edge) {
-            x = margin + fraction * max(0f, maxX - margin)
-            y = margin.toFloat()
+            x = minX + fraction * max(0f, maxX - minX)
+            y = minY
         } else if (CLOCK_EDGE_BOTTOM == edge) {
-            x = margin + fraction * max(0f, maxX - margin)
+            x = minX + fraction * max(0f, maxX - minX)
             y = maxY
         } else {
             x = maxX
-            y = margin + fraction * max(0f, maxY - margin)
+            y = minY + fraction * max(0f, maxY - minY)
         }
 
         setClockTabPosition(view, x, y, parent)
@@ -13456,10 +14596,16 @@ class UIManager(
 
     private fun setClockTabPosition(view: View, x: Float, y: Float, parent: View) {
         val margin = Tuils.dpToPx(mContext, 6)
-        val maxX = max(margin, parent.getWidth() - view.getWidth() - margin).toFloat()
-        val maxY = max(margin, parent.getHeight() - view.getHeight() - margin).toFloat()
-        view.setX(max(margin.toFloat(), min(x, maxX)))
-        view.setY(max(margin.toFloat(), min(y, maxY)))
+        val padL = max(parent.paddingLeft, systemInsetLeft)
+        val padR = max(parent.paddingRight, systemInsetRight)
+        val padT = max(parent.paddingTop, systemInsetTop)
+        val padB = max(parent.paddingBottom, systemInsetBottom)
+        val minX = (padL + margin).toFloat()
+        val minY = (padT + margin).toFloat()
+        val maxX = max(minX, (parent.width - padR - view.width - margin).toFloat())
+        val maxY = max(minY, (parent.height - padB - view.height - margin).toFloat())
+        view.setX(max(minX, min(x, maxX)))
+        view.setY(max(minY, min(y, maxY)))
     }
 
     private fun snapClockTabToNearestEdge(
@@ -13469,10 +14615,14 @@ class UIManager(
         fractionKey: String?
     ) {
         val margin = Tuils.dpToPx(mContext, 6)
-        val leftDistance = view.getX()
-        val topDistance = view.getY()
-        val rightDistance = parent.getWidth() - (view.getX() + view.getWidth())
-        val bottomDistance = parent.getHeight() - (view.getY() + view.getHeight())
+        val minX = (parent.paddingLeft + margin).toFloat()
+        val minY = (parent.paddingTop + margin).toFloat()
+        val maxX = max(minX, (parent.width - parent.paddingRight - view.width - margin).toFloat())
+        val maxY = max(minY, (parent.height - parent.paddingBottom - view.height - margin).toFloat())
+        val leftDistance = view.getX() - minX
+        val topDistance = view.getY() - minY
+        val rightDistance = maxX - view.getX()
+        val bottomDistance = maxY - view.getY()
 
         var edge: String = CLOCK_EDGE_LEFT
         var nearest = leftDistance
@@ -13488,13 +14638,11 @@ class UIManager(
             edge = CLOCK_EDGE_BOTTOM
         }
 
-        val maxX = max(margin, parent.getWidth() - view.getWidth() - margin).toFloat()
-        val maxY = max(margin, parent.getHeight() - view.getHeight() - margin).toFloat()
         var fraction: Float
         if (CLOCK_EDGE_TOP == edge || CLOCK_EDGE_BOTTOM == edge) {
-            fraction = (view.getX() - margin) / max(1f, maxX - margin)
+            fraction = (view.getX() - minX) / max(1f, maxX - minX)
         } else {
-            fraction = (view.getY() - margin) / max(1f, maxY - margin)
+            fraction = (view.getY() - minY) / max(1f, maxY - minY)
         }
         fraction = max(0f, min(1f, fraction))
 
@@ -13909,17 +15057,17 @@ class UIManager(
     private fun styleNotificationWidget(notificationWidget: View) {
         decorateWidget(
             notificationWidget,
-            R.id.notification_widget_border,
-            R.id.notification_widget_label,
-            R.id.notification_widget_close,
+            R.id.notification_module_border,
+            R.id.notification_module_label,
+            R.id.notification_module_close,
             notificationWidgetBorderColor(),
             notificationWidgetTextColor()
         )
-        styleModuleClose(notificationWidget.findViewById<TextView?>(R.id.notification_widget_close))
-        styleNotificationSettingsButton(notificationWidget.findViewById<ImageButton?>(R.id.notification_widget_settings))
-        styleNotificationPagerButton(notificationWidget.findViewById<View?>(R.id.notification_widget_prev))
-        styleNotificationPagerButton(notificationWidget.findViewById<View?>(R.id.notification_widget_next))
-        styleNotificationPagerButton(notificationWidget.findViewById<View?>(R.id.notification_widget_clear))
+        styleModuleClose(notificationWidget.findViewById<TextView?>(R.id.notification_module_close))
+        styleNotificationSettingsButton(notificationWidget.findViewById<ImageButton?>(R.id.notification_module_settings))
+        styleNotificationPagerButton(notificationWidget.findViewById<View?>(R.id.notification_module_prev))
+        styleNotificationPagerButton(notificationWidget.findViewById<View?>(R.id.notification_module_next))
+        styleNotificationPagerButton(notificationWidget.findViewById<View?>(R.id.notification_module_clear))
         applyNotificationWidgetSize(notificationWidget)
         renderNotificationRows(notificationWidget)
     }
@@ -13944,7 +15092,7 @@ class UIManager(
         preserveNotificationReplyFocus(previousFocusKey)
         clampNotificationIndex()
 
-        val notificationWidget = rootView.findViewById<View?>(R.id.notification_widget)
+        val notificationWidget = rootView.findViewById<View?>(R.id.notification_module)
         if (notificationWidget != null) {
             val visible = ModuleManager.NOTIFICATIONS == activeModule
             notificationWidget.setVisibility(if (visible) View.VISIBLE else View.GONE)
@@ -14150,7 +15298,7 @@ class UIManager(
         }
 
         notificationCompactForKeyboard = compact
-        val notificationWidget = rootView.findViewById<View?>(R.id.notification_widget)
+        val notificationWidget = rootView.findViewById<View?>(R.id.notification_module)
         if (notificationWidget != null && notificationWidget.getVisibility() == View.VISIBLE) {
             applyNotificationWidgetSize(notificationWidget)
             renderNotificationRows(notificationWidget)
@@ -14158,7 +15306,7 @@ class UIManager(
     }
 
     private fun applyNotificationWidgetSize(notificationWidget: View) {
-        val border = notificationWidget.findViewById<View?>(R.id.notification_widget_border)
+        val border = notificationWidget.findViewById<View?>(R.id.notification_module_border)
         if (border != null) {
             val lp = border.getLayoutParams()
             if (lp != null && lp.height != ViewGroup.LayoutParams.WRAP_CONTENT) {
@@ -14327,9 +15475,9 @@ class UIManager(
             ModuleManager.NOTIFICATIONS == activeModule && currentOverlayNotifications.size > 1 && !replyActive
         val clearEnabled =
             ModuleManager.NOTIFICATIONS == activeModule && !replyActive && !TextUtils.isEmpty(currentNotification()?.key)
-        val prev = notificationWidget.findViewById<TextView?>(R.id.notification_widget_prev)
-        val next = notificationWidget.findViewById<TextView?>(R.id.notification_widget_next)
-        val clear = notificationWidget.findViewById<TextView?>(R.id.notification_widget_clear)
+        val prev = notificationWidget.findViewById<TextView?>(R.id.notification_module_prev)
+        val next = notificationWidget.findViewById<TextView?>(R.id.notification_module_next)
+        val clear = notificationWidget.findViewById<TextView?>(R.id.notification_module_clear)
         if (prev != null) {
             prev.setVisibility(if (ModuleManager.NOTIFICATIONS == activeModule) View.VISIBLE else View.GONE)
             prev.setEnabled(enabled)
@@ -14488,11 +15636,13 @@ class UIManager(
     fun showAppsDrawer() {
         androidWidgetDrawerManager?.hide()
         appDrawerPaneManager?.show()
+        scheduleTypefaceRefreshes()
     }
 
     fun showAndroidWidgetDrawer() {
         appDrawerPaneManager?.hide()
         androidWidgetDrawerManager?.show()
+        scheduleTypefaceRefreshes()
     }
 
     fun refreshAndroidWidgetDrawerGrid() {
@@ -14670,6 +15820,11 @@ class UIManager(
             return
         }
         if (this.isPodcastSurfaceVisible) {
+            minimizePodcastSurface()
+            return
+        }
+        if (this.isCalculatorSurfaceVisible) {
+            closeCalculatorSurface()
             return
         }
         if (profilePaneController?.visible == true) {
@@ -14740,6 +15895,7 @@ class UIManager(
         }
         if (handler != null) {
             handler!!.removeCallbacks(musicTimeRunnable)
+            musicTickerScheduled = false
             handler!!.removeCallbacks(eventsRefreshRunnable)
             handler!!.removeCallbacks(luaWidgetTickRunnable)
             handler!!.removeCallbacks(fontRefreshRunnable)
@@ -14773,22 +15929,28 @@ class UIManager(
         if (handler == null) {
             return
         }
-        handler!!.removeCallbacks(musicTimeRunnable)
         if (!launcherWindowFocused) {
+            handler!!.removeCallbacks(musicTimeRunnable)
+            musicTickerScheduled = false
             return
         }
         val musicWidget =
-            if (mRootView != null) mRootView.findViewById<View?>(R.id.music_widget) else null
+            if (mRootView != null) mRootView.findViewById<View?>(R.id.music_module) else null
         val internalPlaying = MusicService.SOURCE_INTERNAL == activeMusicSource
             && mainPack.player != null
             && mainPack.player!!.isPlaying()
             && musicWidget != null
             && musicWidget.getVisibility() == View.VISIBLE
         val podcastPlaying = MusicService.SOURCE_PODCAST == activeMusicSource
-            && mainPack.podcastManager.isPlaying()
-        if (internalPlaying || podcastPlaying) {
-            handler!!.post(musicTimeRunnable)
+            && (mainPack.podcastManager.isPlaying() || mainPack.podcastManager.isPreparing())
+        if (!internalPlaying && !podcastPlaying) {
+            handler!!.removeCallbacks(musicTimeRunnable)
+            musicTickerScheduled = false
+            return
         }
+        if (musicTickerScheduled) return
+        musicTickerScheduled = true
+        handler!!.post(musicTimeRunnable)
     }
 
     fun resume() {
@@ -14862,7 +16024,65 @@ class UIManager(
             mTerminalAdapter!!.focusInputEnd()
         }
         if (mRootView != null) {
+            mRootView.post {
+                if (isPodcastSurfaceVisible) {
+                    closeKeyboard()
+                    snapPodcastPresentationForCurrentOrientation()
+                    applyPodcastPaneGeometry()
+                    renderPodcastSurface(null)
+                }
+                if (isCalculatorSurfaceVisible) {
+                    closeKeyboard()
+                    calculatorWindowAnim?.cancel()
+                    calculatorWindowAnim = null
+                    if (podcastLandscapePresentation()) {
+                        resetPodcastFocusChromeImmediate()
+                        snapCalculatorLandIdle()
+                    } else {
+                        setPodcastFocusChrome(true)
+                        calculatorWindowBorder?.scaleX = 1f
+                        calculatorWindowBorder?.scaleY = 1f
+                        calculatorWindowLabel?.alpha = 1f
+                        calculatorClose?.alpha = 1f
+                    }
+                    applyCalculatorPaneGeometry()
+                }
+                // Docked pills keep portrait translation across layout — clamp after rotate.
+                reapplyVisibleClockTabDocks()
+            }
             mRootView.postDelayed(Runnable { this.scheduleTypefaceRefreshes() }, 48)
+        }
+    }
+
+    private fun reapplyVisibleClockTabDocks() {
+        val root = mRootView ?: return
+        val podcast = podcastTab ?: root.findViewById(R.id.podcast_tab)
+        if (podcast != null
+            && podcast.visibility == View.VISIBLE
+            && podcastSessionActive
+            && !isPodcastSurfaceVisible
+        ) {
+            applyPodcastPillDock(podcast)
+        }
+        val timer = root.findViewById<TextView?>(R.id.timer_tab)
+        if (timer != null && timer.visibility == View.VISIBLE) {
+            applyClockTabDock(
+                timer,
+                PREF_TIMER_BADGE_EDGE,
+                PREF_TIMER_BADGE_FRACTION,
+                CLOCK_EDGE_RIGHT,
+                0.45f
+            )
+        }
+        val stopwatch = root.findViewById<TextView?>(R.id.stopwatch_tab)
+        if (stopwatch != null && stopwatch.visibility == View.VISIBLE) {
+            applyClockTabDock(
+                stopwatch,
+                PREF_STOPWATCH_BADGE_EDGE,
+                PREF_STOPWATCH_BADGE_FRACTION,
+                CLOCK_EDGE_RIGHT,
+                0.55f
+            )
         }
     }
 
@@ -14883,11 +16103,14 @@ class UIManager(
 
     private fun refreshLauncherTypeface() {
         val typeface = Tuils.getTypeface(mContext)
-        if (typeface == null || mRootView == null) {
+        if (mRootView == null) {
             return
         }
 
-        applyTypefaceRecursively(mRootView, typeface)
+        if (typeface != null) {
+            applyTypefaceRecursively(mRootView, typeface)
+        }
+        LauncherFontScale.applyRecursively(mRootView)
 
         if (mTerminalAdapter != null) {
             mTerminalAdapter!!.refreshTypeface()
@@ -15028,6 +16251,8 @@ class UIManager(
         private const val PREF_TIMER_BADGE_FRACTION = "timer_badge_fraction"
         private const val PREF_STOPWATCH_BADGE_EDGE = "stopwatch_badge_edge"
         private const val PREF_STOPWATCH_BADGE_FRACTION = "stopwatch_badge_fraction"
+        private const val PREF_PODCAST_BADGE_EDGE = "podcast_badge_edge"
+        private const val PREF_PODCAST_BADGE_FRACTION = "podcast_badge_fraction"
         private const val ASCII_IDLE_PAUSE_MS = 120_000L
         private const val RSS_MODULE_VISIBLE_LINES = 14
         val ACTION_UPDATE_SUGGESTIONS: String =
@@ -15068,6 +16293,8 @@ class UIManager(
         const val EXTRA_FILE_COMMAND: String = "file_command"
         val ACTION_PODCAST_SURFACE: String = BuildConfig.APPLICATION_ID + ".ui_podcast_surface"
         const val EXTRA_PODCAST_COMMAND: String = "podcast_command"
+        val ACTION_CALCULATOR_SURFACE: String = BuildConfig.APPLICATION_ID + ".ui_calculator_surface"
+        const val EXTRA_CALCULATOR_EXPRESSION: String = "calculator_expression"
         val ACTION_PROFILE_SURFACE: String = BuildConfig.APPLICATION_ID + ".ui_profile_surface"
         val ACTION_MODULE_COMMAND: String = BuildConfig.APPLICATION_ID + ".ui_module_command"
         const val EXTRA_MODULE_COMMAND: String = "module_command"
@@ -15093,6 +16320,12 @@ class UIManager(
         private const val PODCAST_TEXT_LARGE = 15f
         private const val PODCAST_PANE_HEIGHT_FRACTION = 0.64f
         private const val PODCAST_PANE_MIN_HEIGHT_DP = 620
+        private const val PODCAST_PANE_LAND_HEIGHT_FRACTION = 0.92f
+        private const val PODCAST_PANE_LAND_MIN_HEIGHT_DP = 260
+        private const val PODCAST_PANE_LAND_SIDE_INSET_DP = 16
+        private const val PODCAST_CHROME_PEEK_DP = 36
+        private const val PODCAST_CHROME_PEEK_ALPHA = 0.92f
+        private const val CALCULATOR_MAX_EXPRESSION_LENGTH = 96
         private const val TERMUX_WORKSPACE_PAGE_COUNT = 2
         private const val TERMUX_WORKSPACE_SESSION = "retui_workspace"
         private const val TERMUX_WORKSPACE_RESULT_PREFIX = "retui-workspace:"
@@ -15209,7 +16442,9 @@ class UIManager(
             cornerRadius: Int,
             dashed: Boolean,
             borderColor: Int,
-            cyberdeckNotch: Boolean
+            cyberdeckNotch: Boolean,
+            surface: SurfaceBorder,
+            allowBorder: Boolean = true
         ) {
             try {
                 applyMargins(v, spaces)
@@ -15231,7 +16466,8 @@ class UIManager(
                         1.5f,
                         cornerRadius.toFloat(),
                         dashed,
-                        cyberdeckNotch
+                        cyberdeckNotch,
+                        allowBorder && AppearanceSettings.surfaceBorderEnabled(surface)
                     )
                 )
             } catch (e: Exception) {

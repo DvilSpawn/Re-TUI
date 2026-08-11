@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 
 dependencies {
     implementation project(':retui-datetime-picker')
+    implementation project(':retui-contract')
 }
 
 android {
@@ -38,7 +39,7 @@ android {
         applicationId = "com.dvil.tui_renewed"
         minSdk = 23
         targetSdk = 36
-        versionCode = 377
+        versionCode = 378
         versionName = "1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

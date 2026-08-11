@@ -19,6 +19,8 @@ import ohi.andre.consolelauncher.managers.xml.options.Suggestions
 import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.managers.xml.options.Toolbar
 import ohi.andre.consolelauncher.managers.xml.options.Ui
+import ohi.andre.consolelauncher.managers.xml.options.SurfaceBorderOption
+import ohi.andre.consolelauncher.managers.settings.StatusRowResolver
 import ohi.andre.consolelauncher.tuils.Tuils
 import org.w3c.dom.Document
 import org.w3c.dom.Element
@@ -157,6 +159,15 @@ object XMLPrefsManager {
                     if (opt.label() == nn) {
                         val s = enums.removeAt(en)
 
+                        if (s.type() == XMLPrefsSave.AUTO_COLOR &&
+                            !value.equals("auto", true) &&
+                            value?.matches("^#[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?$".toRegex()) != true
+                        ) {
+                            value = s.defaultValue()
+                            (node as Element).setAttribute(VALUE_ATTRIBUTE, value)
+                            needToWrite = true
+                        }
+
                         val iv = s.invalidValues()
                         if (iv != null) {
                             for (temp in iv) {
@@ -192,15 +203,27 @@ object XMLPrefsManager {
                 }
             }
 
-            if (enums.size == 0) {
-                if (needToWrite) writeTo(d, file)
-                continue
+            if (enums.isNotEmpty()) {
+                appendMissingPrefs(d, root, element, enums)
+                needToWrite = true
             }
-
-            appendMissingPrefs(d, root, element, enums)
-
-            writeTo(d, file)
+            if (element === XMLPrefsRoot.UI) {
+                needToWrite = normalizeStatusRows(root, element) || needToWrite
+            }
+            if (needToWrite) writeTo(d, file)
         }
+    }
+
+    private fun normalizeStatusRows(root: Element, element: XMLPrefsRoot): Boolean {
+        val raw = StatusRowResolver.settings.associateWith { setting ->
+            findDirectChild(root, setting.label() ?: "")?.getAttribute(VALUE_ATTRIBUTE)
+        }
+        val result = StatusRowResolver.normalize(raw)
+        for ((setting, value) in result.values) {
+            findDirectChild(root, setting.label() ?: "")?.setAttribute(VALUE_ATTRIBUTE, value)
+            element.getValues()!!.add(setting.label(), value)
+        }
+        return result.changed
     }
 
     private val STATUS_KEYS = arrayOf(
@@ -511,6 +534,7 @@ object XMLPrefsManager {
         val label = save.label() ?: return "General"
         return when (save) {
             is Theme -> themeSection(label)
+            is SurfaceBorderOption -> "Surface Borders"
             is Ui -> uiSection(label)
             is Behavior -> behaviorSection(label)
             is Suggestions -> suggestionsSection(label)
@@ -546,7 +570,8 @@ object XMLPrefsManager {
     }
 
     private fun themeSection(label: String): String = when {
-        label == "background_color" || label == "wallpaper_overlay_color" -> "Launcher"
+        label == "background_color" || label == "wallpaper_overlay_color" ||
+            label == "settings_wallpaper_overlay_color" -> "Launcher"
         label.contains("_status_") || label.startsWith("battery_text_") ||
             label in arrayOf(
                 "device_text_color",
@@ -1379,7 +1404,7 @@ object XMLPrefsManager {
                 return arrayOf<String?>()
             }
         },
-        UI(Ui.entries.toTypedArray()) {
+        UI(arrayOf(*Ui.entries.toTypedArray(), *SurfaceBorderOption.entries.toTypedArray())) {
             override fun delete(): Array<String?>? {
                 return arrayOf<String?>(
                     "status_lines_alignment",
@@ -1397,7 +1422,9 @@ object XMLPrefsManager {
                     "network_info_update_ms",
                     "htmlextractor_notfound_message",
                     "tui_notification_time_color",
-                    "tui_notification_input_color"
+                    "tui_notification_input_color",
+                    "external_storage_path",
+                    "file_backend"
                 )
             }
         },

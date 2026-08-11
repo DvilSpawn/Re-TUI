@@ -50,7 +50,7 @@ object PresetManager {
         *REQUIRED_PRESET_XML_FILES,
         XMLPrefsManager.XMLPrefsRoot.UI.path
     )
-    private val SHAREABLE_UI = Ui.entries.filterNot {
+    private val SHAREABLE_UI = XMLPrefsManager.XMLPrefsRoot.UI.enums.filterNot {
         it == Ui.username || it == Ui.deviceName || it == Ui.font_file || it == Ui.auto_color_pick
     }.toTypedArray()
 
@@ -453,7 +453,7 @@ object PresetManager {
             val node = children.item(index)
             val setting = allowed[node.nodeName] ?: continue
             val value = node.attributes?.getNamedItem(XMLPrefsManager.VALUE_ATTRIBUTE)?.nodeValue ?: continue
-            LauncherSettings.setUi(setting, value)
+            LauncherSettings.set(setting, value)
         }
     }
 

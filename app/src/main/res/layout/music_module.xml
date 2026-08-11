@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/music_widget"
+    android:id="@+id/music_module"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingStart="16dp"
@@ -11,7 +11,7 @@
     android:visibility="gone">
 
     <FrameLayout
-        android:id="@+id/music_widget_border"
+        android:id="@+id/music_module_border"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="104dp"
@@ -45,7 +45,7 @@
                 android:ellipsize="end"
                 android:text="Title: -"
                 android:textColor="#FFFFFF"
-                android:textSize="14sp"
+                style="@style/Retui.Text.Body"
                 android:textStyle="bold" />
 
             <ohi.andre.consolelauncher.tuils.OutlineTextView
@@ -57,7 +57,7 @@
                 android:ellipsize="end"
                 android:text="Singer      : -"
                 android:textColor="#FFFFFF"
-                android:textSize="14sp" />
+                style="@style/Retui.Text.Body" />
 
             <LinearLayout
                 android:id="@+id/music_app_row"
@@ -76,7 +76,7 @@
                     android:singleLine="true"
                     android:text="Currently playing app: "
                     android:textColor="#FFFFFF"
-                    android:textSize="14sp" />
+                    style="@style/Retui.Text.Body" />
 
                 <TextView
                     android:id="@+id/music_app_label"
@@ -89,7 +89,7 @@
                     android:fontFamily="monospace"
                     android:singleLine="true"
                     android:textColor="#FFFFFF"
-                    android:textSize="14sp"
+                    style="@style/Retui.Text.Body"
                     android:textStyle="bold" />
             </LinearLayout>
 
@@ -110,7 +110,7 @@
                     android:singleLine="true"
                     android:ellipsize="end"
                     android:text="PREV"
-                    android:textSize="14sp"
+                    style="@style/Retui.Text.Body"
                     android:fontFamily="monospace"
                     android:textColor="#FFFFFF" />
 
@@ -126,7 +126,7 @@
                     android:singleLine="true"
                     android:ellipsize="end"
                     android:text="PLAY/PAUSE"
-                    android:textSize="14sp"
+                    style="@style/Retui.Text.Body"
                     android:fontFamily="monospace"
                     android:textColor="#FFFFFF" />
 
@@ -140,7 +140,7 @@
                     android:singleLine="true"
                     android:ellipsize="end"
                     android:text="NEXT"
-                    android:textSize="14sp"
+                    style="@style/Retui.Text.Body"
                     android:fontFamily="monospace"
                     android:textColor="#FFFFFF" />
             </LinearLayout>
@@ -148,11 +148,11 @@
     </FrameLayout>
 
     <TextView
-        android:id="@+id/music_widget_label"
+        android:id="@+id/music_module_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@id/music_widget_border"
-        android:layout_alignStart="@id/music_widget_border"
+        android:layout_alignTop="@id/music_module_border"
+        android:layout_alignStart="@id/music_module_border"
         android:layout_marginTop="-10dp"
         android:layout_marginStart="24dp"
         android:background="@drawable/apps_drawer_header_border"
@@ -165,20 +165,20 @@
         android:paddingBottom="2dp"
         android:text="NOW PLAYING"
         android:textColor="#FFFFFF"
-        android:textSize="14sp" />
+        style="@style/Retui.Text.Body" />
 
     <TextView
-        android:id="@+id/music_widget_close"
+        android:id="@+id/music_module_close"
         android:layout_width="48dp"
         android:layout_height="34dp"
-        android:layout_alignEnd="@id/music_widget_border"
-        android:layout_alignTop="@id/music_widget_border"
+        android:layout_alignEnd="@id/music_module_border"
+        android:layout_alignTop="@id/music_module_border"
         android:layout_marginTop="-10dp"
         android:background="@drawable/apps_drawer_header_border"
         android:fontFamily="monospace"
         android:gravity="center"
         android:text="X"
         android:textColor="#FFFFFF"
-        android:textSize="14sp" />
+        style="@style/Retui.Text.Body" />
 
 </RelativeLayout>

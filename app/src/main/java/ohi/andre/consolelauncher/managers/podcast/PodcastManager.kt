@@ -122,7 +122,9 @@ class PodcastManager(
             var lastError: String? = null
             for (url in feedUrls) {
                 try {
-                    nextShows.add(mergeStoredTags(fetch(url)))
+                    val fetched = mergeStoredTags(fetch(url))
+                    val previous = shows.firstOrNull { it.feedUrl == url || it.id == fetched.id }
+                    nextShows.add(mergeRetainedEpisodes(previous, fetched))
                 } catch (e: Exception) {
                     lastError = "Podcast refresh failed: " + (e.message ?: url)
                 }
@@ -200,11 +202,16 @@ class PodcastManager(
 
     fun toggle(): String {
         val manager = player ?: return "Podcast playback is unavailable."
+        if (manager.isPreparing()) return "Buffering episode..."
         val current = manager.currentSong()
         return if (current?.getSource() == MusicService.SOURCE_PODCAST && manager.isPlaying()) {
             saveProgress(current, manager.getCurrentPosition(), manager.getDuration())
             manager.pause()
             "Podcast paused."
+        } else if (current?.getSource() == MusicService.SOURCE_PODCAST) {
+            // Resume the loaded track — full play() re-prepares and used to race getDuration.
+            manager.play()
+            "Playing: " + current.getTitle()
         } else {
             play()
         }
@@ -269,6 +276,9 @@ class PodcastManager(
     }
 
     fun isPlaying(): Boolean = currentSong() != null && player?.isPlaying() == true
+
+    fun isPreparing(): Boolean =
+        currentSong() != null && player?.isPreparing() == true
 
     fun currentPosition(): Int = if (currentSong() != null) player?.getCurrentPosition() ?: -1 else -1
 
@@ -348,7 +358,9 @@ class PodcastManager(
         Thread {
             try {
                 val show = mergeStoredTags(fetch(feedUrl))
-                shows = sortedShows(shows.filterNot { it.feedUrl == feedUrl || it.id == show.id } + show)
+                val previous = shows.firstOrNull { it.feedUrl == feedUrl || it.id == show.id }
+                val merged = mergeRetainedEpisodes(previous, show)
+                shows = sortedShows(shows.filterNot { it.feedUrl == feedUrl || it.id == show.id } + merged)
                 cacheShows()
                 if (prefs.getString(KEY_SELECTED_SHOW, null) == null) {
                     prefs.edit().putString(KEY_SELECTED_SHOW, show.id).apply()
@@ -370,12 +382,17 @@ class PodcastManager(
 
     private fun loadCachedShows(): List<PodcastShow> {
         val cached = ArrayList<PodcastShow>()
+        var needsRewrite = false
         val raw = prefs.getString(KEY_SHOW_CACHE, null)
         if (!raw.isNullOrEmpty()) {
             try {
                 val array = JSONArray(raw)
                 for (i in 0 until array.length()) {
-                    cached.add(readShow(array.getJSONObject(i)))
+                    val show = trimCachedShow(readShow(array.getJSONObject(i)))
+                    if (show.episodes.size < (array.getJSONObject(i).optJSONArray("episodes")?.length() ?: 0)) {
+                        needsRewrite = true
+                    }
+                    cached.add(show)
                 }
             } catch (_: Exception) {
                 cached.clear()
@@ -386,13 +403,44 @@ class PodcastManager(
         val placeholders = feeds()
             .filterNot { existingUrls.contains(it) }
             .map { PodcastShow(PodcastParser.stableId(it), it, it, "", null, emptyList()) }
-        return sortedShows(cached + placeholders)
+        val result = sortedShows(cached + placeholders)
+        // Shrink legacy caches (The Daily was ~7MB with full blurbs + 3k episodes).
+        if (needsRewrite || (raw?.length ?: 0) > 400_000) {
+            val array = JSONArray()
+            for (show in result) array.put(writeShow(show))
+            prefs.edit().putString(KEY_SHOW_CACHE, array.toString()).apply()
+        }
+        return result
     }
 
     private fun cacheShows() {
         val array = JSONArray()
-        for (show in shows) array.put(writeShow(show))
+        for (show in shows) array.put(writeShow(trimCachedShow(show)))
         prefs.edit().putString(KEY_SHOW_CACHE, array.toString()).apply()
+    }
+
+    // Keep newest N, plus whatever is actively playing / last resumed.
+    private fun trimCachedShow(show: PodcastShow): PodcastShow {
+        val max = PodcastParser.MAX_EPISODES
+        if (show.episodes.size <= max) return show
+        val keepKeys = LinkedHashSet<String>()
+        prefs.getString(recentEpisodeKey(show.id), null)?.let { keepKeys.add(it) }
+        if (prefs.getString(KEY_ACTIVE_SHOW, null) == show.id) {
+            prefs.getString(KEY_ACTIVE_EPISODE, null)?.let { keepKeys.add(it) }
+        }
+        val pinned = show.episodes.filter { keepKeys.contains(it.key) }
+        val newest = show.episodes
+            .filterNot { keepKeys.contains(it.key) }
+            .sortedWith(
+                compareByDescending<PodcastEpisode> { it.publishedAt ?: Long.MIN_VALUE }
+                    .thenByDescending { it.feedOrder }
+            )
+            .take((max - pinned.size).coerceAtLeast(0))
+        val merged = (pinned + newest).sortedWith(
+            compareBy<PodcastEpisode> { it.publishedAt ?: Long.MAX_VALUE }
+                .thenBy { it.feedOrder }
+        )
+        return show.copy(episodes = merged)
     }
 
     private fun writeShow(show: PodcastShow): JSONObject {
@@ -404,7 +452,6 @@ class PodcastManager(
                 .put("title", episode.title)
                 .put("audioUrl", episode.audioUrl)
                 .put("link", episode.link)
-                .put("description", episode.description)
                 .put("duration", episode.duration)
                 .put("publishedAt", episode.publishedAt)
                 .put("feedOrder", episode.feedOrder))
@@ -456,6 +503,26 @@ class PodcastManager(
     private fun mergeStoredTags(show: PodcastShow): PodcastShow {
         val existing = shows.firstOrNull { it.id == show.id || it.feedUrl == show.feedUrl }
         return if (existing == null || existing.tags.isEmpty()) show else show.copy(tags = existing.tags)
+    }
+
+    private fun mergeRetainedEpisodes(previous: PodcastShow?, fetched: PodcastShow): PodcastShow {
+        if (previous == null) return trimCachedShow(fetched)
+        val keepKeys = LinkedHashSet<String>()
+        prefs.getString(recentEpisodeKey(fetched.id), null)?.let { keepKeys.add(it) }
+        if (prefs.getString(KEY_ACTIVE_SHOW, null) == fetched.id) {
+            prefs.getString(KEY_ACTIVE_EPISODE, null)?.let { keepKeys.add(it) }
+        }
+        if (keepKeys.isEmpty()) return trimCachedShow(fetched)
+        val byKey = LinkedHashMap<String, PodcastEpisode>()
+        for (ep in fetched.episodes) byKey[ep.key] = ep
+        for (ep in previous.episodes) {
+            if (keepKeys.contains(ep.key)) byKey.putIfAbsent(ep.key, ep)
+        }
+        val merged = byKey.values.sortedWith(
+            compareBy<PodcastEpisode> { it.publishedAt ?: Long.MAX_VALUE }
+                .thenBy { it.feedOrder }
+        )
+        return trimCachedShow(fetched.copy(episodes = merged))
     }
 
     private fun currentEpisode(show: PodcastShow): PodcastEpisode? {

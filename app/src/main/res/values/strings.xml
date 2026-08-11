@@ -153,16 +153,18 @@
     <string name="output_invalid_param">Invalid option:</string>
 
     <!-- flash -->
-    <string name="help_termux">Open the Re:T-UI Termux console.\n\nUsage:\ntermux\ntermux -status\ntermux -setup\ntermux -open\ntermux -run &lt;script_path&gt; [args...]\ntermux -apps\ntermux -app &lt;id&gt;\ntermux -app-add &lt;id&gt; &lt;command&gt;\ntermux -add-app &lt;id&gt; &lt;command&gt;\ntermux -app-info &lt;id&gt;\ntermux -app-sync &lt;id&gt;\ntermux -app-actions &lt;id&gt;\ntermux -app-action &lt;id&gt; &lt;label&gt; [input]\ntermux -app-action-rm &lt;id&gt; &lt;label&gt;\ntermux -app-rm &lt;id&gt;\ntermux -rm-app &lt;id&gt;\n\nInside the console:\nstatus, setup, open, run, apps, app, app-add, add-app, app-info, app-sync, app-actions, app-action, app-action-rm, app-rm, rm-app, help, clear, exit\n\nFor script modules:\nmodule -add server termux:/data/data/com.termux/files/home/retui/server-health.sh\nmodule -refresh server</string>
+    <string name="help_termux">Termux surface (workspace-first).\n\nUsage:\ntermux\ntermux -status\ntermux -setup\ntermux -open\ntermux -run &lt;script_path&gt; [args...]\ntermux -apps\ntermux -app &lt;id&gt;\ntermux -app-add &lt;id&gt; &lt;command&gt;\n\nInteractive TUIs (mc, htop, …) open the tmux workspace.\nPrefer: tmux launch mc   or alias MC\nOne-shot scripts: termux -run &lt;path&gt;\nDock modules: module -add name termux:/path/script.sh</string>
     <string name="help_files">Open Re:T-UI Files.
         \nUsage:
         \n$ files
         \n$ files -search &lt;name&gt; [type]
-        \n$ files -open &lt;directory&gt;
-        \n$ files &lt;name&gt; [type] (legacy search shorthand)
-        \n\nOpens Re:T-UI FM, searches by name and optional file type, or opens a directory. Relative directories resolve from the launcher current path. Theme colors, terminal background, margins, and font are included.
+        \n$ files -open &lt;file&gt;
+        \n$ files -ls
+        \n$ files -share [file]
+        \n$ files -cd &lt;directory&gt;
+        \n\nOpens Re:T-UI FM, searches, lists the current directory, opens or shares a file, or changes the shared directory. Relative paths resolve from the launcher current path. Theme colors, terminal background, margins, and font are included.
     </string>
-    <string name="help_podcast">Open the Re:T-UI podcast surface.
+    <string name="help_podcast">Open podcasts on the home screen. Minimize to an edge pill; expand again with podcast or the pill.
         \nUsage:
         \n$ podcast
         \n$ podcast add &lt;https-feed-url&gt;
@@ -171,8 +173,10 @@
         \n$ podcast next
         \n$ podcast prev
         \n$ podcast speed &lt;0.5-2.0&gt;
-        \n\nPodcasts stream from RSS/Atom feeds and play oldest first for first-time listening.
+        \n$ podcast close
+        \n\nPodcasts stream from RSS/Atom feeds and play oldest first for first-time listening. Now-playing title lives on the music module.
     </string>
+    <string name="podcast_pill_description">Podcast</string>
     <string name="help_profile">Open your local Re:T-UI profile card.\nUsage:\nprofile</string>
     <string name="help_tbridge">Use Termux as Re:T-UI\'s power-user bridge for scripts, modules, callbacks, and automation.
         \nUsage:
@@ -261,28 +265,7 @@
         \n$ lua -disable habit
         \n$ lua -enable habit
         \n\nLua apps run inside Re:T-UI, not Termux. They use the same sandbox, prefs, files, permissions, editor, and ui:render layout objects as Lua modules, but open in a focused terminal-styled surface. Inside a Lua app, plain input is sent to on_input(text), and renderer buttons with action/value are sent to on_action(value). Local commands use a colon prefix: :help, :refresh, :restart, :config, :edit, :clear, and :close.</string>
-    <string name="help_widget">Legacy aliases for Lua modules. Prefer the module command for new work.
-        \n\nUsage:
-        \n$ widget -ls
-        \n$ widget -add counter
-        \n$ widget -new counter
-        \n$ widget -edit counter
-        \n$ widget -config counter
-        \n$ widget -rename counter better_counter
-        \n$ widget -show counter
-        \n$ widget -refresh counter
-        \n$ widget -check counter
-        \n$ widget -info counter
-        \n$ widget -approve counter
-        \n$ widget -copy-error counter
-        \n$ widget -disable counter
-        \n$ widget -enable counter
-        \n$ widget -export counter
-        \n$ widget -toggle counter
-        \n$ widget -expand counter
-        \n$ widget -collapse counter
-        \n$ widget -rm counter
-        \n\nThe public category is module. Use module -new lua [name], module -edit [id], module -config [id], module -show [id], module -refresh [id], module -check [id], module -approve [id], and module -export [id]. Existing widget commands remain for compatibility with saved packages and older docs. Lua modules are stored locally under Re:T-UI\'s widgets folder for backup/restore compatibility, can register as lua:[id] modules in the shared dock, and support ui, prefs, files, json, date, fmt, strings, colors, debug, async http, config forms, expandable state, native buttons, command/action/dialog chips, app/intent/shortcut buttons, notification reminders, active ticking, suggestion scripts, system helpers, export, on_load/on_resume/on_alarm/on_tick/on_click/on_action/on_dialog_action/on_config/on_config_submit/on_suggest, and backup/restore.</string>
+    <string name="help_widget">widget is retired.\n\nDock Lua scripts use the module command:\n$ module -ls\n$ module -new lua counter\n$ module -edit counter\n$ module -show counter\n\nAndroid AppWidgets use the widgets pane (toolbar button), not this command.</string>
     <!-- status -->
     <string name="battery_label">Battery:</string>
     <string name="mobile_data_label">Mobile data:</string>

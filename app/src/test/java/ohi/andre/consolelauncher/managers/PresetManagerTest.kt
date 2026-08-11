@@ -13,6 +13,9 @@ class PresetManagerTest {
         assertTrue(xml.contains("<system_font "))
         assertTrue(xml.contains("<module_corner_radius "))
         assertTrue(xml.contains("<enable_crt_vignette "))
+        assertTrue(xml.contains("<ram_border_enabled "))
+        assertTrue(xml.contains("<unified_status_border "))
+        assertTrue(xml.contains("<suggestions_border_color "))
         assertFalse(xml.contains("<username "))
         assertFalse(xml.contains("<deviceName "))
         assertFalse(xml.contains("<font_file "))
@@ -21,5 +24,9 @@ class PresetManagerTest {
 
     @Test fun crtVignetteDefaultsOn() {
         assertEquals("true", Ui.enable_crt_vignette.defaultValue())
+    }
+
+    @Test fun unifiedStatusBorderPreservesIndividualFramesByDefault() {
+        assertEquals("false", ohi.andre.consolelauncher.managers.xml.options.SurfaceBorderOption.unified_status_border.defaultValue())
     }
 }

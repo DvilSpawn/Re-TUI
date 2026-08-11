@@ -4,8 +4,6 @@ import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsElement
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave
 import ohi.andre.consolelauncher.tuils.Tuils
-import java.io.File
-import android.os.Environment
 
 /**
  * Created by francescoandreuzzi on 24/09/2017.
@@ -657,25 +655,6 @@ enum class Behavior : XMLPrefsSave {
             return XMLPrefsSave.TEXT
         }
     },
-    external_storage_path {
-        override fun defaultValue(): String? {
-            val path = System.getenv("SECONDARY_STORAGE")
-            if (path == null) return Tuils.EMPTYSTRING
-
-            val file = File(path)
-            if (file != null && file.exists()) return file.getAbsolutePath()
-
-            return Tuils.EMPTYSTRING
-        }
-
-        override fun info(): String? {
-            return "The path to your external storage (used to evaluate free/total space)"
-        }
-
-        override fun type(): String? {
-            return XMLPrefsSave.TEXT
-        }
-    },
     home_path {
         override fun defaultValue(): String? {
             return Tuils.getFolder().getAbsolutePath()
@@ -1311,19 +1290,6 @@ enum class Behavior : XMLPrefsSave {
 
         override fun type(): String? {
             return XMLPrefsSave.BOOLEAN
-        }
-    },
-    file_backend {
-        override fun defaultValue(): String? {
-            return "auto"
-        }
-
-        override fun info(): String? {
-            return "File backend used by Re:T-UI file commands. Values: auto, native, termux, off"
-        }
-
-        override fun type(): String? {
-            return XMLPrefsSave.TEXT
         }
     },
     events_lookahead_days {

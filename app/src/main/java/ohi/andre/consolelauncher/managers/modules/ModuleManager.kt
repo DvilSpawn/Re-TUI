@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.text.TextUtils
 import ohi.andre.consolelauncher.managers.RssManager.Companion.firstConfiguredFeedId
-import ohi.andre.consolelauncher.managers.widgets.LuaWidgetManager
+import ohi.andre.consolelauncher.managers.lua.LuaWidgetManager
 import java.util.Arrays
 import java.util.ArrayList
 import java.util.LinkedHashSet
@@ -14,6 +14,11 @@ import ohi.andre.consolelauncher.managers.RssManager
 import org.json.JSONArray
 import org.json.JSONObject
 
+/**
+ * Dock module registry: anything that can appear on the home module dock/panel.
+ * Backends are native, Termux (`termux:`), launcher (`launcher:`), or Lua (`lua:`).
+ * Not Android AppWidgets — those live in [ohi.andre.consolelauncher.managers.widgets].
+ */
 object ModuleManager {
     const val MUSIC: String = "music"
     const val NOTIFICATIONS: String = "notifications"

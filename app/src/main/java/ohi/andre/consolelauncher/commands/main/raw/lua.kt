@@ -16,9 +16,9 @@ import ohi.andre.consolelauncher.commands.ExecutePack
 import ohi.andre.consolelauncher.commands.tuixt.WidgetConfigActivity
 import ohi.andre.consolelauncher.commands.tuixt.WidgetEditorActivity
 import ohi.andre.consolelauncher.managers.modules.ModuleManager
-import ohi.andre.consolelauncher.managers.widgets.LuaWidgetEngine
-import ohi.andre.consolelauncher.managers.widgets.LuaWidgetManager
-import ohi.andre.consolelauncher.managers.widgets.LuaWidgetManager.TrustStatus
+import ohi.andre.consolelauncher.managers.lua.LuaWidgetEngine
+import ohi.andre.consolelauncher.managers.lua.LuaWidgetManager
+import ohi.andre.consolelauncher.managers.lua.LuaWidgetManager.TrustStatus
 import ohi.andre.consolelauncher.tuils.Tuils
 import java.util.Locale
 

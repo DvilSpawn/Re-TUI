@@ -271,7 +271,9 @@ class SuggestionRunnable(
                     suggContactBg
                 )
 
-                SuggestionsManager.Suggestion.TYPE_FILE, SuggestionsManager.Suggestion.TYPE_CONFIGFILE -> return getSuggestionColorBg(
+                SuggestionsManager.Suggestion.TYPE_FILE,
+                SuggestionsManager.Suggestion.TYPE_CONFIGFILE,
+                SuggestionsManager.Suggestion.TYPE_FILE_ACTION -> return getSuggestionColorBg(
                     context,
                     suggFileBg
                 )
@@ -319,7 +321,9 @@ class SuggestionRunnable(
             SuggestionsManager.Suggestion.TYPE_CONTACT, SuggestionsManager.Suggestion.TYPE_CONTACT_ROOT -> chosen =
                 suggContactText
 
-            SuggestionsManager.Suggestion.TYPE_FILE, SuggestionsManager.Suggestion.TYPE_CONFIGFILE -> chosen =
+            SuggestionsManager.Suggestion.TYPE_FILE,
+            SuggestionsManager.Suggestion.TYPE_CONFIGFILE,
+            SuggestionsManager.Suggestion.TYPE_FILE_ACTION -> chosen =
                 suggFileText
 
             SuggestionsManager.Suggestion.TYPE_SONG -> chosen = suggSongText

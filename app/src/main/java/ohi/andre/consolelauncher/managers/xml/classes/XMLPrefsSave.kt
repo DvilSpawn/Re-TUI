@@ -16,5 +16,6 @@ interface XMLPrefsSave : StringableObject {
         const val BOOLEAN = "boolean"
         const val TEXT = "text"
         const val COLOR = "color"
+        const val AUTO_COLOR = "auto_color"
     }
 }

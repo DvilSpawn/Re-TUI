@@ -59,7 +59,7 @@
         android:paddingBottom="2dp"
         android:text="Applications/ [s]"
         android:textColor="#A5D6A7"
-        android:textSize="14sp"
+        style="@style/Retui.Text.Body"
         android:fontFamily="monospace" />
 
     <ScrollView
@@ -117,7 +117,7 @@
         android:paddingBottom="2dp"
         android:text="total 0 [~]"
         android:textColor="#A5D6A7"
-        android:textSize="12sp"
+        style="@style/Retui.Text.Control"
         android:fontFamily="monospace" />
 
 </RelativeLayout>

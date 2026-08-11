@@ -8,6 +8,7 @@
     <style name="Custom.SystemWP" parent="Theme.AppCompat.NoActionBar">
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowShowWallpaper">true</item>
+        <item name="android:windowDisablePreview">true</item>
         <item name="android:textColorHint">@color/hint_color</item>
     </style>
 
@@ -25,6 +26,29 @@
         <item name="android:layout_weight">@integer/tools_view_weight</item>
         <item name="android:padding">@dimen/tools_padding</item>
         <item name="android:scaleType">fitCenter</item>
+    </style>
+
+    <style name="Retui.Text" parent="" />
+    <style name="Retui.Text.Micro">
+        <item name="android:textSize">10sp</item>
+    </style>
+    <style name="Retui.Text.Caption">
+        <item name="android:textSize">11sp</item>
+    </style>
+    <style name="Retui.Text.Control">
+        <item name="android:textSize">12sp</item>
+    </style>
+    <style name="Retui.Text.Body">
+        <item name="android:textSize">14sp</item>
+    </style>
+    <style name="Retui.Text.Header">
+        <item name="android:textSize">15sp</item>
+    </style>
+    <style name="Retui.Text.Title">
+        <item name="android:textSize">18sp</item>
+    </style>
+    <style name="Retui.Text.Display">
+        <item name="android:textSize">64sp</item>
     </style>
 
 </resources>

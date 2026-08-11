@@ -2,15 +2,23 @@ package ohi.andre.consolelauncher.tuils
 
 import android.content.Context
 import android.graphics.Color
+import android.graphics.Rect
 import android.graphics.RectF
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
 import android.view.View
+import android.view.ViewGroup
 import kotlin.math.max
 import kotlin.math.min
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings
 
 object TerminalBorderRuntime {
+    internal fun drawsBorder(borderEnabled: Boolean, cyberdeck: Boolean, dashed: Boolean): Boolean =
+        borderEnabled && (cyberdeck || dashed)
+
+    internal fun drawsTabBorder(alwaysBorder: Boolean, cyberdeck: Boolean, dashed: Boolean, alpha: Int): Boolean =
+        alpha > 0 && (alwaysBorder || cyberdeck || dashed)
+
     fun panelDrawable(
         context: Context,
         fillColor: Int,
@@ -18,7 +26,8 @@ object TerminalBorderRuntime {
         strokeDp: Float,
         radiusDp: Int,
         dashed: Boolean,
-        cyberdeckNotch: Boolean = true
+        cyberdeckNotch: Boolean = true,
+        borderEnabled: Boolean = true
     ): TerminalBorderDrawable {
         return panelDrawablePx(
             context,
@@ -27,7 +36,8 @@ object TerminalBorderRuntime {
             strokeDp,
             Tuils.dpToPx(context, radiusDp.toFloat()).toFloat(),
             dashed,
-            cyberdeckNotch
+            cyberdeckNotch,
+            borderEnabled
         )
     }
 
@@ -38,15 +48,16 @@ object TerminalBorderRuntime {
         strokeDp: Float,
         radiusPx: Float,
         dashed: Boolean,
-        cyberdeckNotch: Boolean = true
+        cyberdeckNotch: Boolean = true,
+        borderEnabled: Boolean = true
     ): TerminalBorderDrawable {
         val cyberdeck = AppearanceSettings.cyberdeckMode()
-        val stroke = if (cyberdeck) {
-            max(1, Tuils.dpToPx(context, strokeDp).toInt())
-        } else if (dashed) {
-            max(1, Tuils.dpToPx(context, AppearanceSettings.dashedBorderStrokeWidthDp(strokeDp / 1.5f)).toInt())
-        } else {
+        val stroke = if (!drawsBorder(borderEnabled, cyberdeck, dashed)) {
             0
+        } else if (cyberdeck) {
+            max(1, Tuils.dpToPx(context, strokeDp).toInt())
+        } else {
+            max(1, Tuils.dpToPx(context, AppearanceSettings.dashedBorderStrokeWidthDp(strokeDp / 1.5f)).toInt())
         }
         return TerminalBorderDrawable(
             fillColor,
@@ -62,10 +73,14 @@ object TerminalBorderRuntime {
     }
 
     fun tabDrawable(context: Context, fillColor: Int): Drawable {
+        return tabDrawable(context, fillColor, AppearanceSettings.terminalHeaderTabBorderColor())
+    }
+
+    fun tabDrawable(context: Context, fillColor: Int, borderColor: Int, alwaysBorder: Boolean = false): Drawable {
         if (AppearanceSettings.cyberdeckMode()) {
             return TerminalBorderDrawable(
                 fillColor,
-                AppearanceSettings.terminalHeaderTabBorderColor(),
+                borderColor,
                 max(1, Tuils.dpToPx(context, 1.2f).toInt()),
                 0f,
                 false,
@@ -79,12 +94,12 @@ object TerminalBorderRuntime {
         bg.shape = GradientDrawable.RECTANGLE
         bg.cornerRadius = Tuils.dpToPx(context, AppearanceSettings.headerCornerRadius().toFloat())
         bg.setColor(fillColor)
-        val borderColor = AppearanceSettings.terminalHeaderTabBorderColor()
-        if (AppearanceSettings.dashedBorders() && Color.alpha(borderColor) > 0) {
+        val dashed = AppearanceSettings.dashedBorders()
+        if (drawsTabBorder(alwaysBorder, false, dashed, Color.alpha(borderColor))) {
             val stroke = max(1, Tuils.dpToPx(context, AppearanceSettings.dashedBorderStrokeWidthDp()).toInt())
             val dashLength = AppearanceSettings.dashLength()
             val dashGap = AppearanceSettings.dashGap()
-            if (dashLength > 0 && dashGap > 0) {
+            if (dashed && dashLength > 0 && dashGap > 0) {
                 bg.setStroke(
                     stroke,
                     borderColor,
@@ -136,12 +151,15 @@ object TerminalBorderRuntime {
                 if (view.visibility != View.VISIBLE || view.width <= 0 || view.height <= 0) {
                     continue
                 }
+                val localBounds = descendantBounds(panel, view)
                 val childLocation = IntArray(2)
-                view.getLocationOnScreen(childLocation)
-                val relativeTop = childLocation[1] - panelLocation[1]
-                val relativeBottom = relativeTop + view.height
-                val left = childLocation[0] - panelLocation[0] - gutter
-                val right = childLocation[0] - panelLocation[0] + view.width + gutter
+                if (localBounds == null) {
+                    view.getLocationOnScreen(childLocation)
+                }
+                val relativeTop = localBounds?.top ?: (childLocation[1] - panelLocation[1])
+                val relativeBottom = localBounds?.bottom ?: (relativeTop + view.height)
+                val left = (localBounds?.left ?: (childLocation[0] - panelLocation[0])) - gutter
+                val right = (localBounds?.right ?: (childLocation[0] - panelLocation[0] + view.width)) + gutter
                 val cutout = RectF(
                     max(0, left).toFloat(),
                     0f,
@@ -165,6 +183,18 @@ object TerminalBorderRuntime {
                 topOut,
                 bottomOut
             )
+        }
+
+        private fun descendantBounds(panel: View, child: View): Rect? {
+            val group = panel as? ViewGroup ?: return null
+            var parent = child.parent
+            while (parent != null && parent !== group) {
+                parent = parent.parent
+            }
+            if (parent !== group) return null
+            return Rect(0, 0, child.width, child.height).also {
+                group.offsetDescendantRectToMyCoords(child, it)
+            }
         }
     }
 }

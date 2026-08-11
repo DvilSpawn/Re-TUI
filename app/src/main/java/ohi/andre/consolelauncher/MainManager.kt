@@ -33,7 +33,7 @@ import ohi.andre.consolelauncher.managers.notifications.KeeperService
 import ohi.andre.consolelauncher.managers.onboarding.GuideManager
 import ohi.andre.consolelauncher.managers.podcast.PodcastManager
 import ohi.andre.consolelauncher.managers.settings.MusicSettings.enabled
-import ohi.andre.consolelauncher.managers.termux.TermuxAppManager
+import ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceLauncherManager
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.options.Behavior
 import ohi.andre.consolelauncher.managers.xml.options.Theme
@@ -109,7 +109,7 @@ class MainManager(private val mContext: LauncherActivity) {
         GroupTrigger(),
         AliasTrigger(),
         TuiCommandTrigger(),
-        TermuxAppTrigger(),
+        TermuxWorkspaceLauncherTrigger(),
         AppTrigger(),
         ShellCommandTrigger()
     )
@@ -563,6 +563,7 @@ class MainManager(private val mContext: LauncherActivity) {
             val info = info ?: return false
             val input = input ?: return false
             val trimmed = input.trim { it <= ' ' }
+            if (trimmed.isEmpty()) return false
             val parts = Tuils.splitArgs(trimmed)
             if (!parts.isEmpty() && info.commandGroup.getCommandByName(parts.get(0)) != null) {
                 LauncherSoundManager.play(mContext, LauncherSoundManager.Event.ERROR)
@@ -583,9 +584,6 @@ class MainManager(private val mContext: LauncherActivity) {
                 )
                 return true
             }
-
-            val cmd: String? =
-                trimmed.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[0]
 
             object : StoppableThread() {
                 override fun run() {
@@ -637,17 +635,14 @@ class MainManager(private val mContext: LauncherActivity) {
         }
     }
 
-    private inner class TermuxAppTrigger : CmdTrigger {
+    private inner class TermuxWorkspaceLauncherTrigger : CmdTrigger {
         override fun trigger(info: MainPack?, input: String?): Boolean {
             val info = info ?: return false
             val raw = input?.trim { it <= ' ' } ?: return false
-            val id = TermuxAppManager.normalizeId(input)
-            if (id.length == 0 || raw.contains(Tuils.SPACE) || !raw.equals(id, ignoreCase = true)) {
-                return false
-            }
-            val app = TermuxAppManager.resolve(info.context, id) ?: return false
-            val intent = Intent(UIManager.ACTION_TERMUX_CONSOLE)
-            intent.putExtra(UIManager.EXTRA_TERMUX_COMMAND, "app " + app.id)
+            if (raw.contains(Tuils.SPACE)) return false
+            val launcher = TermuxWorkspaceLauncherManager.resolve(info.context, raw) ?: return false
+            val intent = Intent(UIManager.ACTION_TMUX_WORKSPACE)
+            intent.putExtra(UIManager.EXTRA_TMUX_WORKSPACE_COMMAND, "launch " + launcher.id)
             LocalBroadcastManager.getInstance(info.context.applicationContext).sendBroadcast(intent)
             return true
         }

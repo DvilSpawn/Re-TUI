@@ -21,7 +21,7 @@
         android:paddingBottom="2dp"
         android:text="FOCUS MODE ACTIVE"
         android:textColor="#FFFF0000"
-        android:textSize="18sp"
+        style="@style/Retui.Text.Title"
         android:textStyle="bold" />
 
     <TextView
@@ -37,7 +37,7 @@
         android:paddingBottom="2dp"
         android:text="Task: Focus"
         android:textColor="#FFAAAAAA"
-        android:textSize="14sp" />
+        style="@style/Retui.Text.Body" />
 
     <TextView
         android:id="@+id/pomodoro_countdown"
@@ -52,7 +52,7 @@
         android:paddingBottom="4dp"
         android:text="25:00"
         android:textColor="#FF889955"
-        android:textSize="64sp"
+        style="@style/Retui.Text.Display"
         android:textStyle="bold" />
 
     <TextView
@@ -61,7 +61,7 @@
         android:gravity="center"
         android:text="------------------------------------------------"
         android:textColor="#FF889955"
-        android:textSize="14sp" />
+        style="@style/Retui.Text.Body" />
 
     <ProgressBar
         android:id="@+id/pomodoro_progress"
@@ -82,6 +82,6 @@
         android:padding="10dp"
         android:text="TERMINATE SESSION"
         android:textColor="#FF889955"
-        android:textSize="14sp" />
+        style="@style/Retui.Text.Body" />
 
 </LinearLayout>

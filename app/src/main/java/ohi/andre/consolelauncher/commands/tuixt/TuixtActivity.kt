@@ -25,6 +25,7 @@ import ohi.andre.consolelauncher.LauncherActivity
 import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog.ConfirmAction
 import ohi.andre.consolelauncher.commands.tuixt.TuixtLayout.addFoldAwareHost
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.borderColor
+import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.clearModuleButtonBackgroundPreview
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.dp
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.rect
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleButton
@@ -48,6 +49,7 @@ import android.content.Intent
 import java.util.ArrayList
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings.getInt
+import ohi.andre.consolelauncher.managers.SearchProviderManager
 import ohi.andre.consolelauncher.managers.status.AsciiAnimationManager
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi
 import ohi.andre.consolelauncher.managers.xml.options.Theme
@@ -73,6 +75,8 @@ class TuixtActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         requestNoTitleIfFullscreen(this)
         super.onCreate(savedInstanceState)
+        clearModuleButtonBackgroundPreview()
+        overridePendingTransition(0, 0)
         applyFullscreen(this)
 
         val intent = getIntent()
@@ -187,15 +191,25 @@ class TuixtActivity : Activity() {
                 }
             }
             if (saved) {
+                clearModuleButtonBackgroundPreview()
                 Toast.makeText(this, "Changes saved. Previewing launcher...", Toast.LENGTH_SHORT)
                     .show()
                 LauncherActivity.preview(this)
+                if (xmlRoot == XMLPrefsRoot.THEME) {
+                    recreate()
+                }
             }
         })
         btnLayout.addView(btnSave)
 
         bottomBar.addView(btnLayout)
         root.addView(bottomBar)
+
+        val refreshButtonTheme: () -> Unit = {
+            styleButton(this, btnCancel, false)
+            styleButton(this, btnSave, true)
+            adapter?.restyleVisibleControls(recyclerView)
+        }
 
         // Load data
         val fileName = file!!.getName().lowercase(Locale.getDefault())
@@ -208,7 +222,7 @@ class TuixtActivity : Activity() {
 
         if (asciiSettingsMode) {
             originalRows = buildAsciiSettingsRows()
-            adapter = TuixtAdapter(originalRows!!.toMutableList(), null)
+            adapter = TuixtAdapter(originalRows!!.toMutableList(), null, refreshButtonTheme)
             recyclerView!!.setAdapter(adapter)
 
             searchBox.addTextChangedListener(object : TextWatcher {
@@ -234,7 +248,14 @@ class TuixtActivity : Activity() {
                     else -> true
                 }
             }.toMutableList()
-            adapter = TuixtAdapter(originalRows!!.toMutableList(), file)
+            adapter = TuixtAdapter(
+                originalRows!!.toMutableList(),
+                file,
+                refreshButtonTheme,
+                ::openSearchProviders,
+                accordionSections = true,
+                initialSection = onlySection
+            )
             recyclerView!!.setAdapter(adapter)
 
             searchBox.addTextChangedListener(object : TextWatcher {
@@ -357,7 +378,7 @@ class TuixtActivity : Activity() {
     private fun filter(query: String) {
         val rows = originalRows ?: return
         if (query.trim().isEmpty()) {
-            adapter!!.updateRows(rows.toMutableList())
+            adapter!!.updateRows(rows.toMutableList(), false)
             return
         }
 
@@ -380,7 +401,7 @@ class TuixtActivity : Activity() {
                 filtered.add(row)
             }
         }
-        adapter!!.updateRows(filtered)
+        adapter!!.updateRows(filtered, true)
     }
 
     private fun buildRows(root: XMLPrefsRoot, source: File): MutableList<TuixtAdapter.SettingsRow> {
@@ -523,6 +544,14 @@ class TuixtActivity : Activity() {
         val intent = Intent(this, TuixtActivity::class.java)
         intent.putExtra(PATH, file.absolutePath)
         startActivityForResult(intent, ASCII_TXT_REQUEST)
+    }
+
+    private fun openSearchProviders() {
+        SearchProviderManager.load()
+        val intent = Intent(this, TuixtActivity::class.java)
+        intent.putExtra(PATH, SearchProviderManager.file().absolutePath)
+        startActivityForResult(intent, LauncherActivity.TUIXT_REQUEST)
+        overridePendingTransition(0, 0)
     }
 
     private fun launchAsciiImportPicker() {
@@ -689,8 +718,10 @@ class TuixtActivity : Activity() {
 
     private fun attemptClose() {
         if (!hasUnsavedChanges()) {
+            clearModuleButtonBackgroundPreview()
             setResult(BACK_PRESSED)
             finish()
+            overridePendingTransition(0, 0)
             return
         }
 
@@ -701,9 +732,16 @@ class TuixtActivity : Activity() {
             "Discard",
             "Keep Editing",
             ConfirmAction {
+                clearModuleButtonBackgroundPreview()
                 setResult(BACK_PRESSED)
                 finish()
+                overridePendingTransition(0, 0)
             })
+    }
+
+    override fun onDestroy() {
+        clearModuleButtonBackgroundPreview()
+        super.onDestroy()
     }
 
     private fun hasUnsavedChanges(): Boolean {

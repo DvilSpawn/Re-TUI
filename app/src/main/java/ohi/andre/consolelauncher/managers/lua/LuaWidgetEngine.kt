@@ -1,4 +1,4 @@
-package ohi.andre.consolelauncher.managers.widgets
+package ohi.andre.consolelauncher.managers.lua
 
 import android.content.ClipboardManager
 import android.content.ComponentName

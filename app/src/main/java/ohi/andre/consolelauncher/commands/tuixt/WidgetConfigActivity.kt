@@ -29,8 +29,8 @@ import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleInput
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.stylePanel
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleToggle
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.textColor
-import ohi.andre.consolelauncher.managers.widgets.LuaWidgetEngine
-import ohi.andre.consolelauncher.managers.widgets.LuaWidgetManager
+import ohi.andre.consolelauncher.managers.lua.LuaWidgetEngine
+import ohi.andre.consolelauncher.managers.lua.LuaWidgetManager
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi.applyFullscreen
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi.requestNoTitleIfFullscreen
 import ohi.andre.consolelauncher.tuils.Tuils

@@ -38,6 +38,9 @@ import android.text.Layout
 import java.lang.reflect.Field
 import java.util.ArrayList
 import ohi.andre.consolelauncher.tuils.LongClickMovementMethod
+import ohi.andre.consolelauncher.UIManager
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import android.content.Intent
 
 /*Copyright Francesco Andreuzzi
 
@@ -124,10 +127,17 @@ class TerminalManager(
     private val executer: CommandExecuter
 
     private fun setupNewInput() {
+        val alreadyEmpty = mInputView!!.text.isNullOrEmpty()
         mInputView!!.setText(Tuils.EMPTYSTRING)
 
         if (defaultHint) {
             mInputView!!.setHint(Tuils.getHint(mainPack.currentDirectory.getAbsolutePath()))
+        }
+
+        // setText("") skips TextWatcher when already empty — force no-input suggestions.
+        if (alreadyEmpty) {
+            LocalBroadcastManager.getInstance(mContext.applicationContext)
+                .sendBroadcast(Intent(UIManager.ACTION_UPDATE_SUGGESTIONS))
         }
 
         requestInputFocus()

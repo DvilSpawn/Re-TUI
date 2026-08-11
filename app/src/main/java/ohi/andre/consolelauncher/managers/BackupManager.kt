@@ -32,8 +32,8 @@ import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.SecretKeySpec
 import ohi.andre.consolelauncher.managers.onboarding.GuideManager
 import ohi.andre.consolelauncher.managers.podcast.PodcastManager
-import ohi.andre.consolelauncher.managers.termux.TermuxAppManager
-import ohi.andre.consolelauncher.managers.widgets.LuaWidgetReminderManager
+import ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceLauncherManager
+import ohi.andre.consolelauncher.managers.lua.LuaWidgetReminderManager
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.tuils.Tuils
 
@@ -83,7 +83,7 @@ object BackupManager {
         "retui_modules",
         "retui_reminders",
         LuaWidgetReminderManager.PREFS,
-        TermuxAppManager.PREFS,
+        "retui_termux_apps",
         "retui_module_prompt",
         "retui_callback_auth",
         "pomodoro_state",
@@ -94,7 +94,7 @@ object BackupManager {
         "tasker_integration",
         "retui_wallpaper",
         "retui_profile",
-        "retui_tmux_workspace_launchers",
+        TermuxWorkspaceLauncherManager.PREFS,
         "changelogPrefs"
     )
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/module_text_widget"
+    android:id="@+id/module_text_panel"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@android:color/transparent"
@@ -30,7 +30,7 @@
             android:fontFamily="monospace"
             android:lineSpacingExtra="2dp"
             android:textColor="#FFFFFF"
-            android:textSize="14sp" />
+            style="@style/Retui.Text.Body" />
     </ScrollView>
 
     <TextView
@@ -51,7 +51,7 @@
         android:paddingBottom="2dp"
         android:text="MODULE"
         android:textColor="#FFFFFF"
-        android:textSize="14sp" />
+        style="@style/Retui.Text.Body" />
 
     <TextView
         android:id="@+id/module_text_close"
@@ -65,5 +65,5 @@
         android:gravity="center"
         android:text="X"
         android:textColor="#FFFFFF"
-        android:textSize="14sp" />
+        style="@style/Retui.Text.Body" />
 </RelativeLayout>

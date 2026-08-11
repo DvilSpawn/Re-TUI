@@ -25,7 +25,7 @@
         android:layout_marginTop="8dp"
         android:gravity="center"
         android:text="Focus mode"
-        android:textSize="14sp" />
+        style="@style/Retui.Text.Body" />
 
     <TextView
         android:id="@+id/lockdown_countdown"
@@ -34,7 +34,7 @@
         android:layout_marginTop="24dp"
         android:gravity="center"
         android:text="25:00"
-        android:textSize="64sp"
+        style="@style/Retui.Text.Display"
         android:textStyle="bold" />
 
     <TextView

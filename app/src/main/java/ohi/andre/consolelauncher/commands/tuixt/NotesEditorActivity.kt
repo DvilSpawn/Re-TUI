@@ -28,6 +28,7 @@ import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.overlayColor
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.rect
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleButton
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleHeader
+import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleIconButton
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleInput
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.stylePanel
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.surfaceColor
@@ -239,7 +240,7 @@ class NotesEditorActivity : Activity() {
         val button = ImageButton(this)
         button.setImageResource(imageRes)
         button.setContentDescription(description)
-        button.setBackground(rect(this, surfaceColor(), borderColor(), 1.25f))
+        styleIconButton(this, button)
         button.setPadding(dp(this, 8f), dp(this, 8f), dp(this, 8f), dp(this, 8f))
         button.setScaleType(android.widget.ImageView.ScaleType.CENTER)
         button.setColorFilter(textColor(), PorterDuff.Mode.SRC_IN)

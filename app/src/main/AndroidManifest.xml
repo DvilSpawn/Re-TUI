@@ -176,7 +176,7 @@
             android:excludeFromRecents="false"
             android:label="Re:T-UI Settings"
             android:taskAffinity="${applicationId}.settings"
-            android:theme="@style/Custom.Popup"
+            android:theme="@style/Custom.SystemWP"
             android:exported="false">
             <meta-data
                 android:name="androidx.core.app.PARENT_ACTIVITY"
@@ -208,7 +208,7 @@
             android:name=".commands.tuixt.TuixtActivity"
             android:excludeFromRecents="true"
             android:label="@string/tuixt_label"
-            android:theme="@style/Custom.Popup"
+            android:theme="@style/Custom.SystemWP"
             android:windowSoftInputMode="stateAlwaysVisible|adjustResize"
             android:exported="false">
             <meta-data
@@ -306,7 +306,7 @@
             android:exported="false" />
 
         <receiver
-            android:name=".managers.widgets.LuaWidgetReminderReceiver"
+            android:name=".managers.lua.LuaWidgetReminderReceiver"
             android:exported="false" />
 
         <receiver

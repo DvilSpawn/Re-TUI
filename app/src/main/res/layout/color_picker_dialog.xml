@@ -91,4 +91,14 @@
         android:fontFamily="monospace"
         android:textSize="16sp" />
 
+    <TextView
+        android:id="@+id/auto_color"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:padding="10dp"
+        android:text="AUTO"
+        android:visibility="gone" />
+
 </LinearLayout>

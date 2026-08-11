@@ -1,4 +1,4 @@
-package ohi.andre.consolelauncher.managers.ui
+package ohi.andre.consolelauncher.managers.widgets
 
 import android.app.Activity
 import android.appwidget.AppWidgetHost
@@ -43,6 +43,7 @@ import ohi.andre.consolelauncher.managers.settings.AppearanceSettings.moduleCorn
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings.terminalBorderColor
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings.terminalHeaderTabBackground
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings.terminalWindowBackground
+import ohi.andre.consolelauncher.managers.ui.OverlayLayoutManager
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.options.Suggestions
 import ohi.andre.consolelauncher.managers.xml.options.Theme
@@ -57,6 +58,10 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
 
+/**
+ * Android AppWidget host for the widgets pane (toolbar drawer).
+ * Not dock modules — dock items are [ohi.andre.consolelauncher.managers.modules.ModuleManager].
+ */
 class AndroidWidgetDrawerManager(
     private val activity: Activity,
     private val rootView: ViewGroup,

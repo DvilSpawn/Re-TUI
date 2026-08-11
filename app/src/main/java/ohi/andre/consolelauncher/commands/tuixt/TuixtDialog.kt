@@ -417,7 +417,7 @@ object TuixtDialog {
         return row
     }
 
-    private fun show(dialog: Dialog, dimAmount: Float = 0f) {
+    private fun show(dialog: Dialog, dimAmount: Float = 0.42f) {
         dialog.show()
         applyFullscreen(dialog)
         val window = dialog.getWindow()

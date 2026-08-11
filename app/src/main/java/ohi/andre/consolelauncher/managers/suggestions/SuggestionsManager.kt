@@ -27,6 +27,7 @@ import ohi.andre.consolelauncher.commands.CommandTuils.parse
 import ohi.andre.consolelauncher.commands.main.MainPack
 import ohi.andre.consolelauncher.commands.main.Param
 import ohi.andre.consolelauncher.commands.main.raw.tbridge
+import ohi.andre.consolelauncher.commands.main.raw.files as FilesCommand
 import ohi.andre.consolelauncher.commands.main.specific.ParamCommand
 import ohi.andre.consolelauncher.commands.main.specific.PermanentSuggestionCommand
 import ohi.andre.consolelauncher.managers.AliasManager
@@ -38,8 +39,7 @@ import ohi.andre.consolelauncher.managers.FileManager.cd
 import ohi.andre.consolelauncher.managers.PresetManager.listAllPresetNames
 import ohi.andre.consolelauncher.managers.PresetManager.listPresets
 import ohi.andre.consolelauncher.managers.TerminalManager
-import ohi.andre.consolelauncher.managers.file.FileBackendManager
-import ohi.andre.consolelauncher.managers.file.FileBackendManager.activeBackend
+import ohi.andre.consolelauncher.managers.file.RetuiFilesContract
 import ohi.andre.consolelauncher.managers.modules.ModuleManager.displayTitle
 import ohi.andre.consolelauncher.managers.modules.ModuleManager.getDock
 import ohi.andre.consolelauncher.managers.modules.ModuleManager.isKnown
@@ -52,11 +52,11 @@ import ohi.andre.consolelauncher.managers.settings.LauncherSettings.getBoolean
 import ohi.andre.consolelauncher.managers.termux.TermuxBridgeCache.dirs
 import ohi.andre.consolelauncher.managers.termux.TermuxBridgeCache.files
 import ohi.andre.consolelauncher.managers.termux.TermuxBridgeCache.shouldRequest
-import ohi.andre.consolelauncher.managers.termux.TermuxAppManager
+import ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceLauncherManager
 import ohi.andre.consolelauncher.managers.termux.TermuxBridgeManager
 import ohi.andre.consolelauncher.managers.termux.TermuxBridgeManager.dispatchShell
-import ohi.andre.consolelauncher.managers.widgets.LuaWidgetEngine
-import ohi.andre.consolelauncher.managers.widgets.LuaWidgetManager
+import ohi.andre.consolelauncher.managers.lua.LuaWidgetEngine
+import ohi.andre.consolelauncher.managers.lua.LuaWidgetManager
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager.XMLPrefsRoot
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave
@@ -392,9 +392,14 @@ class SuggestionsManager(
 
         val input = mTerminalAdapter.input
 
-        if (suggestion.type == Suggestion.Companion.TYPE_PERMANENT) {
+        if (suggestion.type == Suggestion.Companion.TYPE_PERMANENT ||
+            suggestion.type == Suggestion.Companion.TYPE_FILE_ACTION
+        ) {
+            val replacement = suggestion.`object` as? String
             val typedPrefixLength = suggestion.`object` as? Int ?: 0
-            mTerminalAdapter.input = if (typedPrefixLength > 0) {
+            mTerminalAdapter.input = if (replacement != null) {
+                replacement
+            } else if (typedPrefixLength > 0) {
                 input.dropLast(typedPrefixLength) + text
             } else {
                 input + text
@@ -656,6 +661,30 @@ class SuggestionsManager(
         }
 
         val fullInput = (beforeLastSpace + Tuils.SPACE + lastWord).trim().lowercase(Locale.getDefault())
+        if (fullInput == "files") {
+            suggestFilesActions(suggestionList)
+            Collections.sort<Suggestion?>(suggestionList, comparator)
+            return suggestionList
+        }
+        val filesSubcommand = when {
+            fullInput == "files -open" || beforeLastSpace.equals("files -open", true) -> "files -open" to false
+            fullInput == "files -share" || beforeLastSpace.equals("files -share", true) -> "files -share" to false
+            fullInput == "files -cd" || beforeLastSpace.equals("files -cd", true) -> "files -cd" to true
+            else -> null
+        }
+        if (filesSubcommand != null) {
+            comparator.noInput = false
+            val prefix = if (beforeLastSpace.equals("files", true)) null else lastWord.ifEmpty { null }
+            suggestRetuiFiles(
+                pack,
+                suggestionList,
+                prefix,
+                filesSubcommand.first,
+                filesSubcommand.second
+            )
+            Collections.sort<Suggestion?>(suggestionList, comparator)
+            return suggestionList
+        }
         if (fullInput == "intent -activity" || fullInput == "intent activity"
             || fullInput == "intent -broadcast" || fullInput == "intent broadcast") {
             comparator.noInput = false
@@ -746,8 +775,8 @@ class SuggestionsManager(
                         )
                     }
 
-                    if (isFileOpenCommand(beforeLastSpace)) {
-                        suggestOpenableFile(pack, suggestionList, null, beforeLastSpace)
+                    if (isCdCommand(beforeLastSpace) || isFileOpenCommand(beforeLastSpace)) {
+                        suggestFile(pack, suggestionList, null, beforeLastSpace)
                         Collections.sort<Suggestion?>(suggestionList, comparator)
                         return suggestionList
                     }
@@ -821,8 +850,8 @@ class SuggestionsManager(
                         )
                     }
 
-                    if (isFileOpenCommand(beforeLastSpace)) {
-                        suggestOpenableFile(pack, suggestionList, lastWord, beforeLastSpace)
+                    if (isCdCommand(beforeLastSpace) || isFileOpenCommand(beforeLastSpace)) {
+                        suggestFile(pack, suggestionList, lastWord, beforeLastSpace)
                         Collections.sort<Suggestion?>(suggestionList, comparator)
                         return suggestionList
                     }
@@ -1015,6 +1044,15 @@ class SuggestionsManager(
             )
         )
         suggestions.add(Suggestion(null, "module -ls", true, Suggestion.Companion.TYPE_PERMANENT))
+    }
+
+    private fun suggestFilesActions(suggestions: MutableList<Suggestion?>) {
+        FilesCommand.SUGGESTIONS.forEach { label ->
+            val command = "files $label"
+            suggestions.add(
+                Suggestion(null, label, false, Suggestion.Companion.TYPE_FILE_ACTION, command)
+            )
+        }
     }
 
     private fun suggestActiveGuide(suggestions: MutableList<Suggestion?>): Boolean {
@@ -1239,8 +1277,8 @@ class SuggestionsManager(
                 null,
                 s,
                 cmd.permanentSuggestionsExecuteOnClick(),
-                Suggestion.Companion.TYPE_PERMANENT,
-                prefix.length
+                if (cmd is FilesCommand) Suggestion.Companion.TYPE_FILE_ACTION else Suggestion.Companion.TYPE_PERMANENT,
+                cmd.permanentSuggestionReplacement(s) ?: prefix.length
             )
             suggestions.add(sugg)
         }
@@ -1589,7 +1627,7 @@ class SuggestionsManager(
             suggestions.add(
                 Suggestion(
                     null,
-                    "termux -app-add",
+                    "tmux launch",
                     false,
                     Suggestion.Companion.TYPE_PERMANENT
                 )
@@ -1597,56 +1635,8 @@ class SuggestionsManager(
             suggestions.add(
                 Suggestion(
                     null,
-                    "termux -add-app",
-                    false,
-                    Suggestion.Companion.TYPE_PERMANENT
-                )
-            )
-            suggestions.add(
-                Suggestion(
-                    null,
-                    "termux -app-info",
-                    false,
-                    Suggestion.Companion.TYPE_PERMANENT
-                )
-            )
-            suggestions.add(
-                Suggestion(
-                    null,
-                    "termux -app-sync",
-                    false,
-                    Suggestion.Companion.TYPE_PERMANENT
-                )
-            )
-            suggestions.add(
-                Suggestion(
-                    null,
-                    "termux -app-action",
-                    false,
-                    Suggestion.Companion.TYPE_PERMANENT
-                )
-            )
-            suggestions.add(
-                Suggestion(
-                    null,
-                    "termux -app-actions",
-                    false,
-                    Suggestion.Companion.TYPE_PERMANENT
-                )
-            )
-            suggestions.add(
-                Suggestion(
-                    null,
-                    "termux -app-action-rm",
-                    false,
-                    Suggestion.Companion.TYPE_PERMANENT
-                )
-            )
-            suggestions.add(
-                Suggestion(
-                    null,
-                    "termux -app-rm",
-                    false,
+                    "tmux status",
+                    true,
                     Suggestion.Companion.TYPE_PERMANENT
                 )
             )
@@ -2286,32 +2276,6 @@ class SuggestionsManager(
             )
         } else if ("module -dock" == normalized || normalized.startsWith("module -dock ")) {
             suggestDockCommand(suggestions, afterLastSpace, beforeLastSpace)
-        } else if ("widget" == normalized) {
-            suggestWidgetOptions(suggestions, afterLastSpace, beforeLastSpace)
-        } else if ("widget -edit" == normalized
-            || "widget -config" == normalized
-            || "widget -prefs" == normalized
-            || "widget -check" == normalized
-            || "widget -info" == normalized
-            || "widget -approve" == normalized
-            || "widget -trust" == normalized
-            || "widget -copy-error" == normalized
-            || "widget -export" == normalized
-            || "widget -disable" == normalized
-            || "widget -enable" == normalized
-            || "widget -rename" == normalized
-            || "widget -rm" == normalized
-            || "widget -remove" == normalized
-        ) {
-            suggestWidgetIds(suggestions, afterLastSpace, beforeLastSpace, false)
-        } else if ("widget -show" == normalized
-            || "widget -refresh" == normalized
-            || "widget -expand" == normalized
-            || "widget -collapse" == normalized
-            || "widget -toggle" == normalized
-            || "widget -click" == normalized
-        ) {
-            suggestWidgetIds(suggestions, afterLastSpace, beforeLastSpace, true)
         } else if ("orientation" == normalized) {
             suggestOrientationOptions(suggestions, afterLastSpace, beforeLastSpace)
         } else if (getBoolean(Behavior.duo_mode) && CommandTuils.DUO_COMMAND == normalized) {
@@ -2357,58 +2321,6 @@ class SuggestionsManager(
                     )
                 )
             }
-        }
-    }
-
-    private fun suggestWidgetOptions(
-        suggestions: MutableList<Suggestion?>,
-        lastWord: String?,
-        beforeLastSpace: String?
-    ) {
-        val filter =
-            if (lastWord == null) Tuils.EMPTYSTRING else lastWord.lowercase(Locale.getDefault())
-        addWidgetOption(suggestions, beforeLastSpace, "-ls", true, filter)
-        addWidgetOption(suggestions, beforeLastSpace, "-add", false, filter)
-        addWidgetOption(suggestions, beforeLastSpace, "-new", false, filter)
-        addWidgetOption(suggestions, beforeLastSpace, "-edit", false, filter)
-        addWidgetOption(suggestions, beforeLastSpace, "-show", false, filter)
-        addWidgetOption(suggestions, beforeLastSpace, "-refresh", false, filter)
-        addWidgetOption(suggestions, beforeLastSpace, "-check", false, filter)
-        addWidgetOption(suggestions, beforeLastSpace, "-info", false, filter)
-        addWidgetOption(suggestions, beforeLastSpace, "-approve", false, filter)
-        addWidgetOption(suggestions, beforeLastSpace, "-copy-error", false, filter)
-        addWidgetOption(suggestions, beforeLastSpace, "-disable", false, filter)
-        addWidgetOption(suggestions, beforeLastSpace, "-enable", false, filter)
-        addWidgetOption(suggestions, beforeLastSpace, "-export", false, filter)
-        addWidgetOption(suggestions, beforeLastSpace, "-expand", false, filter)
-        addWidgetOption(suggestions, beforeLastSpace, "-collapse", false, filter)
-        addWidgetOption(suggestions, beforeLastSpace, "-toggle", false, filter)
-        addWidgetOption(suggestions, beforeLastSpace, "-rename", false, filter)
-        addWidgetOption(suggestions, beforeLastSpace, "-rm", false, filter)
-    }
-
-    private fun addWidgetOption(
-        suggestions: MutableList<Suggestion?>,
-        beforeLastSpace: String?,
-        option: String,
-        exec: Boolean,
-        filter: String?
-    ) {
-        val normalizedFilter =
-            if (filter == null) Tuils.EMPTYSTRING else filter.replace("-", Tuils.EMPTYSTRING)
-        val normalizedOption = option.replace("-", Tuils.EMPTYSTRING)
-        if (filter == null || filter.length == 0 || option.startsWith(filter) || normalizedOption.startsWith(
-                normalizedFilter
-            )
-        ) {
-            suggestions.add(
-                Suggestion(
-                    beforeLastSpace,
-                    option,
-                    exec && clickToLaunch,
-                    Suggestion.Companion.TYPE_COMMAND
-                )
-            )
         }
     }
 
@@ -2555,12 +2467,12 @@ class SuggestionsManager(
         if (lower.length == 0) {
             return
         }
-        for (app in TermuxAppManager.list(pack.context)) {
-            if (app.id.startsWith(lower)) {
+        for (launcher in TermuxWorkspaceLauncherManager.list(pack.context)) {
+            if (launcher.id.startsWith(lower)) {
                 suggestions.add(
                     Suggestion(
                         null,
-                        app.id,
+                        launcher.id,
                         true,
                         Suggestion.Companion.TYPE_COMMAND
                     )
@@ -2792,12 +2704,12 @@ class SuggestionsManager(
         beforeLastSpace: String?
     ) {
         val filter = if (lastWord == null) Tuils.EMPTYSTRING else lastWord.lowercase(Locale.getDefault())
-        for (app in TermuxAppManager.list(pack.context)) {
-            if (filter.length == 0 || app.id.startsWith(filter)) {
+        for (launcher in TermuxWorkspaceLauncherManager.list(pack.context)) {
+            if (filter.length == 0 || launcher.id.startsWith(filter)) {
                 suggestions.add(
                     Suggestion(
                         beforeLastSpace,
-                        app.id,
+                        launcher.id,
                         true,
                         Suggestion.Companion.TYPE_COMMAND
                     )
@@ -3202,47 +3114,11 @@ class SuggestionsManager(
         afterLastSpace: String?,
         beforeLastSpace: String?
     ) {
-        if (activeBackend(info.context) == FileBackendManager.Active.TERMUX) {
+        if (beforeLastSpace?.trim()?.equals("termux-open", ignoreCase = true) == true) {
             suggestTermuxFiles(info, suggestions, afterLastSpace, beforeLastSpace)
             return
         }
-
-        val noAfterLastSpace = afterLastSpace == null || afterLastSpace.length == 0
-        if (noAfterLastSpace) {
-            suggestFilesOnlyInDir(null, suggestions, info.currentDirectory, beforeLastSpace)
-            return
-        }
-
-        if (!afterLastSpace.contains(File.separator)) {
-            suggestFilesOnlyInDir(
-                suggestions,
-                info.currentDirectory,
-                afterLastSpace,
-                beforeLastSpace,
-                null
-            )
-            return
-        }
-
-        if (afterLastSpace.endsWith(File.separator)) {
-            val base = afterLastSpace.substring(0, afterLastSpace.length - 1)
-            val dirInfo =
-                cd(info.currentDirectory, rmQuotes.matcher(base).replaceAll(Tuils.EMPTYSTRING))
-            suggestFilesOnlyInDir(afterLastSpace, suggestions, dirInfo.file, beforeLastSpace)
-            return
-        }
-
-        val clean = rmQuotes.matcher(afterLastSpace).replaceAll(Tuils.EMPTYSTRING)
-        val index = clean.lastIndexOf(File.separator)
-        if (index < 0) {
-            suggestFilesOnlyInDir(suggestions, info.currentDirectory, clean, beforeLastSpace, null)
-            return
-        }
-
-        val dirInfo = cd(info.currentDirectory, clean.substring(0, index))
-        val holder = afterLastSpace.substring(0, afterLastSpace.lastIndexOf(File.separator) + 1)
-        val leaf = clean.substring(index + 1)
-        suggestFilesOnlyInDir(suggestions, dirInfo.file, leaf, beforeLastSpace, holder)
+        suggestRetuiFiles(info, suggestions, afterLastSpace, beforeLastSpace, false)
     }
 
     private fun suggestDirectory(
@@ -3251,69 +3127,21 @@ class SuggestionsManager(
         afterLastSpace: String?,
         beforeLastSpace: String?
     ) {
-        if (activeBackend(info.context) == FileBackendManager.Active.TERMUX) {
-            suggestTermuxDirs(info, suggestions, afterLastSpace, beforeLastSpace)
-            return
-        }
+        suggestRetuiFiles(info, suggestions, afterLastSpace, beforeLastSpace, true)
+    }
 
-        val noAfterLastSpace = afterLastSpace == null || afterLastSpace.length == 0
-        if (noAfterLastSpace || "..".startsWith(afterLastSpace)) {
+    private fun suggestRetuiFiles(
+        info: MainPack,
+        suggestions: MutableList<Suggestion?>,
+        prefix: String?,
+        command: String?,
+        directoriesOnly: Boolean
+    ) {
+        RetuiFilesContract.entries(info.context, directoriesOnly, prefix).forEach { entry ->
             suggestions.add(
-                Suggestion(
-                    beforeLastSpace,
-                    "..",
-                    false,
-                    Suggestion.Companion.TYPE_FILE
-                )
+                Suggestion(command, entry.name, false, Suggestion.Companion.TYPE_FILE, prefix)
             )
         }
-        if (noAfterLastSpace || File.separator.startsWith(afterLastSpace)) {
-            suggestions.add(
-                Suggestion(
-                    beforeLastSpace,
-                    File.separator,
-                    false,
-                    Suggestion.Companion.TYPE_FILE,
-                    afterLastSpace
-                )
-            )
-        }
-
-        if (noAfterLastSpace) {
-            suggestDirsInDir(null, suggestions, info.currentDirectory, beforeLastSpace)
-            return
-        }
-
-        if (!afterLastSpace.contains(File.separator)) {
-            suggestDirsInDir(
-                suggestions,
-                info.currentDirectory,
-                afterLastSpace,
-                beforeLastSpace,
-                null
-            )
-            return
-        }
-
-        if (afterLastSpace.endsWith(File.separator)) {
-            val base = afterLastSpace.substring(0, afterLastSpace.length - 1)
-            val dirInfo =
-                cd(info.currentDirectory, rmQuotes.matcher(base).replaceAll(Tuils.EMPTYSTRING))
-            suggestDirsInDir(afterLastSpace, suggestions, dirInfo.file, beforeLastSpace)
-            return
-        }
-
-        val clean = rmQuotes.matcher(afterLastSpace).replaceAll(Tuils.EMPTYSTRING)
-        val index = clean.lastIndexOf(File.separator)
-        if (index < 0) {
-            suggestDirsInDir(suggestions, info.currentDirectory, clean, beforeLastSpace, null)
-            return
-        }
-
-        val dirInfo = cd(info.currentDirectory, clean.substring(0, index))
-        val holder = afterLastSpace.substring(0, afterLastSpace.lastIndexOf(File.separator) + 1)
-        val leaf = clean.substring(index + 1)
-        suggestDirsInDir(suggestions, dirInfo.file, leaf, beforeLastSpace, holder)
     }
 
     private fun suggestTermuxDirs(
@@ -4587,7 +4415,7 @@ class SuggestionsManager(
                 if (c.numbers.size <= c.selectedNumber) c.selectedNumber = 0
 
                 return contactCommandPrefix(textBefore, c.string) + Tuils.SPACE + c.numbers.get(c.selectedNumber)
-            } else if (type == TYPE_PERMANENT) {
+            } else if (type == TYPE_PERMANENT || type == TYPE_FILE_ACTION) {
                 return text
             } else if (type == TYPE_MODULE) {
                 return if (`object` is String) `object` as String else text
@@ -4651,6 +4479,7 @@ class SuggestionsManager(
             const val TYPE_WEBHOOK_HISTORY: Int = 17
             const val TYPE_CONTACT_ROOT: Int = 18
             const val TYPE_MODULE: Int = 19
+            const val TYPE_FILE_ACTION: Int = 20
 
             var appendQuotesBeforeFile: Boolean = false
         }

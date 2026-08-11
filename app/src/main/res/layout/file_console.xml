@@ -29,7 +29,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:singleLine="true"
-            android:textSize="12sp" />
+            style="@style/Retui.Text.Control" />
 
         <ScrollView
             android:id="@+id/file_scroll"
@@ -61,7 +61,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="$ "
-                    android:textSize="14sp" />
+                    style="@style/Retui.Text.Body" />
 
                 <EditText
                     android:id="@+id/file_input"
@@ -73,7 +73,7 @@
                     android:imeOptions="actionGo|flagNoFullscreen"
                     android:importantForAutofill="no"
                     android:singleLine="true"
-                    android:textSize="14sp" />
+                    style="@style/Retui.Text.Body" />
         </LinearLayout>
 
         <LinearLayout
@@ -93,7 +93,7 @@
                     android:layout_weight="1"
                     android:gravity="center"
                     android:text="REFRESH"
-                    android:textSize="11sp" />
+                    style="@style/Retui.Text.Caption" />
 
                 <TextView
                     android:id="@+id/file_up"
@@ -102,7 +102,7 @@
                     android:layout_weight="1"
                     android:gravity="center"
                     android:text="UP"
-                    android:textSize="11sp" />
+                    style="@style/Retui.Text.Caption" />
 
                 <TextView
                     android:id="@+id/file_open"
@@ -111,7 +111,7 @@
                     android:layout_weight="1"
                     android:gravity="center"
                     android:text="OPEN"
-                    android:textSize="11sp" />
+                    style="@style/Retui.Text.Caption" />
 
                 <TextView
                     android:id="@+id/file_paste"
@@ -120,7 +120,7 @@
                     android:layout_weight="1"
                     android:gravity="center"
                     android:text="PASTE"
-                    android:textSize="11sp" />
+                    style="@style/Retui.Text.Caption" />
         </LinearLayout>
     </LinearLayout>
 
@@ -137,7 +137,7 @@
         android:paddingEnd="12dp"
         android:paddingBottom="2dp"
         android:text="FILES"
-        android:textSize="14sp" />
+        style="@style/Retui.Text.Body" />
 
     <TextView
         android:id="@+id/file_close"
@@ -147,6 +147,6 @@
         android:layout_marginTop="8dp"
         android:gravity="center"
         android:text="X"
-        android:textSize="15sp" />
+        style="@style/Retui.Text.Header" />
 
 </FrameLayout>

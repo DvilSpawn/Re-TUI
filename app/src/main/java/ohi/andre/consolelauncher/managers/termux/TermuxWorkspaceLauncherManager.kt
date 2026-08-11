@@ -8,7 +8,7 @@ import java.util.LinkedHashSet
 import java.util.Locale
 
 object TermuxWorkspaceLauncherManager {
-    private const val PREFS = "retui_tmux_workspace_launchers"
+    const val PREFS = "retui_tmux_workspace_launchers"
     private const val KEY_IDS = "ids"
     private const val KEY_COMMAND_PREFIX = "command_"
 

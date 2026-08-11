@@ -18,6 +18,7 @@ google-services.json
 
 # IDE Files
 **/.idea/
+.cursor/
 **/*.iml
 **/.classpath
 **/.project
@@ -39,6 +40,7 @@ Thumbs.db
 *.swp
 *.hprof
 perf-results/
+tmp-podcast-smoke/
 .wrangler/
 wrangler.toml
 docs/store-assets/firebase-alpha-testers.*
