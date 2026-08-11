@@ -27,6 +27,7 @@ import ohi.andre.consolelauncher.managers.settings.AppearanceSettings.terminalWi
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.tuils.TerminalBorderRuntime
+import ohi.andre.consolelauncher.tuils.FrameTarget
 import ohi.andre.consolelauncher.tuils.Tuils
 import java.util.Collections
 import java.util.Locale
@@ -99,10 +100,11 @@ class AppDrawerPaneManager(
             borderColor,
             1.5f,
             moduleCornerRadius(),
-            dashedBorders()
+            dashedBorders(),
+            target = FrameTarget.APP_DRAWER
         )
-        header.background = TerminalBorderRuntime.tabDrawable(context, headerBackgroundColor)
-        footer.background = TerminalBorderRuntime.tabDrawable(context, headerBackgroundColor)
+        header.background = TerminalBorderRuntime.tabDrawable(context, headerBackgroundColor, FrameTarget.APP_DRAWER)
+        footer.background = TerminalBorderRuntime.tabDrawable(context, headerBackgroundColor, FrameTarget.APP_DRAWER)
         TerminalBorderRuntime.bind(drawerPanel, header, footer)
 
         if (adapter == null) {
@@ -255,7 +257,8 @@ class AppDrawerPaneManager(
             borderColor,
             1.5f,
             2,
-            dashedBorders()
+            dashedBorders(),
+            target = FrameTarget.APP_DRAWER
         )
         tab.setTextColor(if (selected) backgroundColor else foregroundColor)
         tab.alpha = 1f
@@ -400,7 +403,8 @@ class AppDrawerPaneManager(
             borderColor,
             1.2f,
             2,
-            dashedBorders()
+            dashedBorders(),
+            target = FrameTarget.APP_DRAWER
         )
     }
 

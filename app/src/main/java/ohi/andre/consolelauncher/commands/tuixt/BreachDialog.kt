@@ -21,6 +21,7 @@ import ohi.andre.consolelauncher.managers.BreachManager
 import ohi.andre.consolelauncher.managers.FocusFrictionStyle
 import ohi.andre.consolelauncher.managers.RetuiCreditManager
 import ohi.andre.consolelauncher.tuils.TerminalBorderRuntime
+import ohi.andre.consolelauncher.tuils.FrameTarget
 import ohi.andre.consolelauncher.tuils.Tuils
 import java.util.Locale
 import kotlin.math.max
@@ -138,7 +139,8 @@ object BreachDialog {
                 FocusFrictionStyle.buttonText(),
                 1.4f,
                 0,
-                false
+                false,
+                target = FrameTarget.SETTINGS
             )
             keypadPanel.addView(keypad)
             val keypadParams = LinearLayout.LayoutParams(
@@ -305,7 +307,8 @@ object BreachDialog {
                 if (available) FocusFrictionStyle.buttonText() else FocusFrictionStyle.buttonFill(),
                 1.5f,
                 0,
-                false
+                false,
+                target = FrameTarget.SETTINGS
             )
         }
 
@@ -326,7 +329,8 @@ object BreachDialog {
                 FocusFrictionStyle.buttonText(),
                 1.6f,
                 0,
-                false
+                false,
+                target = FrameTarget.SETTINGS
             )
         }
 

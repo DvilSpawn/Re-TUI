@@ -188,6 +188,8 @@ import ohi.andre.consolelauncher.tuils.AsciiArtTextView
 import ohi.andre.consolelauncher.tuils.CrtOverlayDrawable
 import ohi.andre.consolelauncher.tuils.CyberpunkBackdropDrawable
 import ohi.andre.consolelauncher.tuils.CyberpunkIconFrameDrawable
+import ohi.andre.consolelauncher.tuils.FrameManager
+import ohi.andre.consolelauncher.tuils.FrameTarget
 import ohi.andre.consolelauncher.tuils.LauncherFontScale
 import ohi.andre.consolelauncher.tuils.MusicVisualizerView
 import ohi.andre.consolelauncher.tuils.OutlineEditText
@@ -1424,7 +1426,8 @@ class UIManager(
     }
 
     private fun styleToolbarButtonChrome(vararg buttons: ImageButton?) {
-        if (!cyberdeckMode()) {
+        val context = mContext ?: return
+        if (!cyberdeckMode() && FrameManager.drawable(context, FrameTarget.TOOLBAR) == null) {
             return
         }
         for (button in buttons) {
@@ -1432,11 +1435,12 @@ class UIManager(
                 continue
             }
             button.setBackground(
-                CyberpunkIconFrameDrawable(
+                TerminalBorderRuntime.customFrame(context, ColorDrawable(Color.TRANSPARENT), FrameTarget.TOOLBAR)
+                    ?: CyberpunkIconFrameDrawable(
                     ColorUtils.setAlphaComponent(terminalBorderColor(), 230),
-                    Tuils.dpToPx(mContext!!, 1.6f),
-                    Tuils.dpToPx(mContext!!, 9f),
-                    Tuils.dpToPx(mContext!!, 9f)
+                    Tuils.dpToPx(context, 1.6f),
+                    Tuils.dpToPx(context, 9f),
+                    Tuils.dpToPx(context, 9f)
                 )
             )
         }
@@ -3124,7 +3128,8 @@ class UIManager(
                     notificationWidgetTextColor(),
                     1f,
                     outputCornerRadius(),
-                    dashedBorders()
+                    dashedBorders(),
+                    target = FrameTarget.OVERLAYS
                 )
             )
         } else {
@@ -3146,7 +3151,8 @@ class UIManager(
                 borderColor,
                 1.5f,
                 outputCornerRadius(),
-                dashedBorders()
+                dashedBorders(),
+                target = FrameTarget.OVERLAYS
             )
         )
         termuxWorkspaceLabel?.let { label ->
@@ -3154,7 +3160,7 @@ class UIManager(
             label.setTextSize(outputHeaderTextSize().toFloat())
             label.setTextColor(textColor)
             label.includeFontPadding = false
-            label.setBackground(TerminalBorderRuntime.tabDrawable(mContext!!, labelBg))
+            label.setBackground(TerminalBorderRuntime.tabDrawable(mContext!!, labelBg, FrameTarget.OVERLAYS))
         }
         styleTermuxWorkspaceChromeButtons()
         TerminalBorderRuntime.bind(termuxWorkspaceBorder, termuxWorkspaceLabel)
@@ -3182,14 +3188,15 @@ class UIManager(
                 ColorUtils.setAlphaComponent(borderColor, 210),
                 1.2f,
                 outputCornerRadius(),
-                dashedBorders()
+                dashedBorders(),
+                target = FrameTarget.OVERLAYS
             )
         )
         termuxWorkspaceOutputLabel?.let { label ->
             label.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
             label.setTextSize(max(10f, outputHeaderTextSize().toFloat() - 2f))
             label.setTextColor(textColor)
-            label.setBackground(TerminalBorderRuntime.tabDrawable(mContext!!, labelBg))
+            label.setBackground(TerminalBorderRuntime.tabDrawable(mContext!!, labelBg, FrameTarget.OVERLAYS))
         }
         TerminalBorderRuntime.bind(termuxWorkspaceOutputPanel, termuxWorkspaceOutputLabel)
 
@@ -3213,7 +3220,8 @@ class UIManager(
                 ColorUtils.setAlphaComponent(borderColor, 180),
                 1.2f,
                 outputCornerRadius(),
-                dashedBorders()
+                dashedBorders(),
+                target = FrameTarget.OVERLAYS
             )
         )
         if (termuxWorkspaceTools != null) {
@@ -3234,7 +3242,8 @@ class UIManager(
                 ColorUtils.setAlphaComponent(terminalBorderColor(), 190),
                 1f,
                 outputCornerRadius(),
-                dashedBorders()
+                dashedBorders(),
+                target = FrameTarget.OVERLAYS
             )
         )
     }
@@ -3259,7 +3268,7 @@ class UIManager(
             Tuils.dpToPx(mContext, 3),
             0
         )
-        button.setBackground(TerminalBorderRuntime.tabDrawable(mContext!!, terminalHeaderTabBackground()))
+        button.setBackground(TerminalBorderRuntime.tabDrawable(mContext!!, terminalHeaderTabBackground(), FrameTarget.OVERLAYS))
     }
 
     private fun styleTermuxWorkspaceChromeIcon(button: TextView?, drawableId: Int) {
@@ -5207,7 +5216,7 @@ class UIManager(
             chip.setTextColor(notificationWidgetTextColor())
             chip.textSize = textSize
             chip.setBackground(
-                TerminalBorderRuntime.tabDrawable(context, terminalHeaderTabBackground())
+                TerminalBorderRuntime.tabDrawable(context, terminalHeaderTabBackground(), FrameTarget.SUGGESTIONS)
             )
             chip.setOnClickListener(View.OnClickListener { v: View? ->
                 val action = suggestion.action.orEmpty()
@@ -5244,6 +5253,7 @@ class UIManager(
         val button = ModuleDockButtonFactory.create(
             mContext,
             module,
+            LauncherSettings.getInt(Ui.module_dock_spacing_dp),
             onClick = { clickedModule ->
                 if ("close" == clickedModule) closeHomeModule()
                 else showHomeModule(clickedModule)
@@ -5627,7 +5637,8 @@ class UIManager(
             R.id.module_text_label,
             R.id.module_text_close,
             notificationWidgetBorderColor(),
-            moduleNameTextColor()
+            moduleNameTextColor(),
+            FrameTarget.MODULES
         )
         styleModuleClose(close)
     }
@@ -5789,7 +5800,8 @@ class UIManager(
             moduleButtonBorderColor(),
             1.2f,
             moduleCornerRadius(),
-            dashedBorders()
+            dashedBorders(),
+            target = FrameTarget.MODULES
         )
     }
 
@@ -6053,7 +6065,8 @@ class UIManager(
             R.id.module_text_label,
             R.id.module_text_close,
             notificationWidgetBorderColor(),
-            moduleNameTextColor()
+            moduleNameTextColor(),
+            FrameTarget.MODULES
         )
         styleModuleClose(close)
     }
@@ -6565,10 +6578,10 @@ class UIManager(
         return count
     }
 
-    private fun styleModuleClose(close: TextView?) {
+    private fun styleModuleClose(close: TextView?, target: FrameTarget = FrameTarget.MODULES) {
         if (close == null) return
         val bgColor = terminalHeaderTabBackground()
-        close.setBackground(TerminalBorderRuntime.tabDrawable(mContext!!, bgColor))
+        close.setBackground(TerminalBorderRuntime.tabDrawable(mContext!!, bgColor, target))
         close.setTextSize(moduleHeaderTextSize().toFloat())
     }
 
@@ -8312,9 +8325,10 @@ class UIManager(
                         R.id.music_module_label,
                         R.id.music_module_close,
                         widgetBorderColor,
-                        widgetTextColor
+                        widgetTextColor,
+                        FrameTarget.MUSIC
                     )
-                    styleModuleClose(rootView.findViewById<TextView?>(R.id.music_module_close))
+                    styleModuleClose(rootView.findViewById<TextView?>(R.id.music_module_close), FrameTarget.MUSIC)
                     sizeMusicVisualizer(rootView)
                     if (MusicService.SOURCE_PODCAST == source && podcastOverlay != null && podcastOverlay!!.visibility == View.VISIBLE) {
                         // Progress ticks must not rebuild the whole player surface.
@@ -8354,20 +8368,18 @@ class UIManager(
 
         restoreLauncherSurfaceSession()
 
+        val bgColor =
+            if (!XMLPrefsManager.getBoolean(Ui.system_wallpaper) || !canApplyTheme)
+                getColor(Theme.background_color)
+            else getColor(Theme.wallpaper_overlay_color)
         if (cyberdeckMode()) {
-            val bgColor =
-                if (!XMLPrefsManager.getBoolean(Ui.system_wallpaper) || !canApplyTheme)
-                    getColor(Theme.background_color)
-                else getColor(Theme.wallpaper_overlay_color)
             rootView.background = CyberpunkBackdropDrawable(
                 bgColor,
                 terminalBorderColor(),
                 getColor(Theme.device_text_color)
             )
-        } else if (!XMLPrefsManager.getBoolean(Ui.system_wallpaper) || !canApplyTheme) {
-            rootView.setBackgroundColor(getColor(Theme.background_color))
         } else {
-            rootView.setBackgroundColor(getColor(Theme.wallpaper_overlay_color))
+            rootView.setBackgroundColor(bgColor)
         }
 
         styleHackOverlay(rootView)
@@ -8674,12 +8686,8 @@ class UIManager(
 
         val lViewsParent = labelViews[0]!!.getParent() as LinearLayout
         val unifiedStatusBorder = AppearanceSettings.unifiedStatusBorder()
+        Companion.applyMargins(lViewsParent, IntArray(4))
         if (unifiedStatusBorder) {
-            val outerMargins = margins[0]!!.copyOf()
-            val strokeInset = Tuils.dpToPx(mContext, 2)
-            outerMargins[2] = max(outerMargins[2], strokeInset)
-            outerMargins[3] = max(outerMargins[3], strokeInset)
-            Companion.applyMargins(lViewsParent, outerMargins)
             lViewsParent.background = TerminalBorderRuntime.panelDrawablePx(
                 mContext!!,
                 Color.TRANSPARENT,
@@ -8688,10 +8696,13 @@ class UIManager(
                 Tuils.dpToPx(mContext, moduleCornerRadius()).toFloat(),
                 useDashed,
                 false,
-                useDashed
+                true,
+                target = FrameTarget.STATUS_GROUP
             )
+        } else {
+            lViewsParent.background = null
         }
-        val statusRowMargins = if (unifiedStatusBorder) IntArray(4) else margins[0]!!
+        val statusTextInsets = margins[0]!!
 
         for (count in labelViews.indices) {
             labelViews[count]!!.setOnTouchListener(this)
@@ -8739,13 +8750,20 @@ class UIManager(
                     mContext!!,
                     labelViews[count]!!,
                     bgColors[styleLabel],
-                    statusRowMargins,
+                    IntArray(4),
                     if (unifiedStatusBorder) 0 else Tuils.dpToPx(mContext, moduleCornerRadius()),
                     useDashed,
                     AppearanceSettings.surfaceBorderColor(SurfaceBorder.entries[styleLabel]),
                     false,
                     SurfaceBorder.entries[styleLabel],
+                    !unifiedStatusBorder,
                     !unifiedStatusBorder
+                )
+                labelViews[count]!!.setPadding(
+                    statusTextInsets[0],
+                    statusTextInsets[1],
+                    statusTextInsets[2],
+                    statusTextInsets[3]
                 )
                 Companion.applyShadow(
                     labelViews[count]!!,
@@ -8997,9 +9015,10 @@ class UIManager(
             R.id.music_module_label,
             R.id.music_module_close,
             musicWidgetBorderColor(),
-            musicWidgetTextColor()
+            musicWidgetTextColor(),
+            FrameTarget.MUSIC
         )
-        styleModuleClose(musicWidget.findViewById<TextView?>(R.id.music_module_close))
+        styleModuleClose(musicWidget.findViewById<TextView?>(R.id.music_module_close), FrameTarget.MUSIC)
         sizeMusicVisualizer(musicWidget)
 
         val titleView = musicWidget.findViewById<TextView?>(R.id.music_song_title)
@@ -9059,7 +9078,8 @@ class UIManager(
                         widgetBorderColor,
                         1.2f,
                         moduleCornerRadius(),
-                        useDashed
+                        useDashed,
+                        target = FrameTarget.MUSIC
                     )
                 )
             }
@@ -9207,7 +9227,8 @@ class UIManager(
                 border,
                 1.5f,
                 0,
-                dashedBorders()
+                dashedBorders(),
+                target = FrameTarget.OVERLAYS
             )
         )
         overlay.setOnClickListener(View.OnClickListener { v: View? -> dismissHackOverlay() })
@@ -9235,7 +9256,8 @@ class UIManager(
                     borderColor,
                     1.5f,
                     outputCornerRadius(),
-                    dashedBorders()
+                    dashedBorders(),
+                    target = FrameTarget.OVERLAYS
                 )
             )
         }
@@ -9244,14 +9266,14 @@ class UIManager(
             termuxWindowLabel!!.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
             termuxWindowLabel!!.setTextSize(outputHeaderTextSize().toFloat())
             termuxWindowLabel!!.setTextColor(textColor)
-            termuxWindowLabel!!.setBackground(TerminalBorderRuntime.tabDrawable(mContext!!, labelBg))
+            termuxWindowLabel!!.setBackground(TerminalBorderRuntime.tabDrawable(mContext!!, labelBg, FrameTarget.OVERLAYS))
         }
 
         if (termuxClose != null) {
             termuxClose!!.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
             termuxClose!!.setTextSize(outputHeaderTextSize().toFloat())
             termuxClose!!.setTextColor(textColor)
-            termuxClose!!.setBackground(TerminalBorderRuntime.tabDrawable(mContext!!, labelBg))
+            termuxClose!!.setBackground(TerminalBorderRuntime.tabDrawable(mContext!!, labelBg, FrameTarget.OVERLAYS))
         }
         TerminalBorderRuntime.bind(termuxWindowBorder, termuxWindowLabel, termuxClose)
 
@@ -9275,7 +9297,8 @@ class UIManager(
                     ColorUtils.setAlphaComponent(borderColor, 210),
                     1.2f,
                     outputCornerRadius(),
-                    dashedBorders()
+                    dashedBorders(),
+                    target = FrameTarget.OVERLAYS
                 )
             )
         }
@@ -9284,7 +9307,7 @@ class UIManager(
             termuxOutputLabel!!.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
             termuxOutputLabel!!.setTextSize(max(10f, outputHeaderTextSize().toFloat() - 2f))
             termuxOutputLabel!!.setTextColor(textColor)
-            termuxOutputLabel!!.setBackground(TerminalBorderRuntime.tabDrawable(mContext!!, labelBg))
+            termuxOutputLabel!!.setBackground(TerminalBorderRuntime.tabDrawable(mContext!!, labelBg, FrameTarget.OVERLAYS))
         }
         TerminalBorderRuntime.bind(termuxOutputPanel, termuxOutputLabel)
 
@@ -9307,7 +9330,8 @@ class UIManager(
                     ColorUtils.setAlphaComponent(borderColor, 180),
                     1.2f,
                     outputCornerRadius(),
-                    dashedBorders()
+                    dashedBorders(),
+                    target = FrameTarget.OVERLAYS
                 )
             )
         }
@@ -9398,7 +9422,7 @@ class UIManager(
         button.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
         button.setTextColor(textColor)
         button.setTextSize(10f)
-        button.setBackground(TerminalBorderRuntime.tabDrawable(mContext!!, labelBg))
+        button.setBackground(TerminalBorderRuntime.tabDrawable(mContext!!, labelBg, FrameTarget.OVERLAYS))
         button.setOnClickListener(View.OnClickListener { action.run() })
         val params = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -9456,7 +9480,8 @@ class UIManager(
                     borderColor,
                     1.5f,
                     outputCornerRadius(),
-                    dashedBorders()
+                    dashedBorders(),
+                    target = FrameTarget.OVERLAYS
                 )
             )
         }
@@ -9465,13 +9490,13 @@ class UIManager(
             fileWindowLabel!!.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
             fileWindowLabel!!.setTextSize(outputHeaderTextSize().toFloat())
             fileWindowLabel!!.setTextColor(textColor)
-            fileWindowLabel!!.setBackground(TerminalBorderRuntime.tabDrawable(mContext!!, labelBg))
+            fileWindowLabel!!.setBackground(TerminalBorderRuntime.tabDrawable(mContext!!, labelBg, FrameTarget.OVERLAYS))
         }
         if (fileClose != null) {
             fileClose!!.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
             fileClose!!.setTextSize(outputHeaderTextSize().toFloat())
             fileClose!!.setTextColor(textColor)
-            fileClose!!.setBackground(TerminalBorderRuntime.tabDrawable(mContext!!, labelBg))
+            fileClose!!.setBackground(TerminalBorderRuntime.tabDrawable(mContext!!, labelBg, FrameTarget.OVERLAYS))
         }
         TerminalBorderRuntime.bind(fileWindowBorder, fileWindowLabel, fileClose)
         if (filePath != null) {
@@ -9500,7 +9525,8 @@ class UIManager(
                     ColorUtils.setAlphaComponent(borderColor, 180),
                     1.2f,
                     outputCornerRadius(),
-                    dashedBorders()
+                    dashedBorders(),
+                    target = FrameTarget.OVERLAYS
                 )
             )
         }
@@ -9528,15 +9554,16 @@ class UIManager(
             borderColor,
             1.5f,
             outputCornerRadius(),
-            dashedBorders()
+            dashedBorders(),
+            target = FrameTarget.OVERLAYS
         )
         listOf(calculatorWindowLabel, calculatorClose).forEach { label ->
             label?.setTypeface(typeface, Typeface.BOLD)
             label?.textSize = PODCAST_TEXT_LARGE
             label?.setTextColor(textColor)
         }
-        calculatorWindowLabel?.background = TerminalBorderRuntime.tabDrawable(mContext, labelBg)
-        calculatorClose?.background = TerminalBorderRuntime.tabDrawable(mContext, labelBg, textColor, true)
+        calculatorWindowLabel?.background = TerminalBorderRuntime.tabDrawable(mContext, labelBg, FrameTarget.OVERLAYS)
+        calculatorClose?.background = TerminalBorderRuntime.tabDrawable(mContext, labelBg, textColor, true, FrameTarget.OVERLAYS)
         TerminalBorderRuntime.bind(calculatorWindowBorder, calculatorWindowLabel, calculatorClose)
 
         calculatorDisplayPanel?.background = TerminalBorderRuntime.panelDrawable(
@@ -9545,12 +9572,13 @@ class UIManager(
             ColorUtils.setAlphaComponent(borderColor, 210),
             1.2f,
             outputCornerRadius(),
-            dashedBorders()
+            dashedBorders(),
+            target = FrameTarget.OVERLAYS
         )
         calculatorDisplayLabel?.apply {
             setTypeface(typeface, Typeface.BOLD)
             setTextColor(textColor)
-            background = TerminalBorderRuntime.tabDrawable(mContext, labelBg)
+            background = TerminalBorderRuntime.tabDrawable(mContext, labelBg, FrameTarget.OVERLAYS)
         }
         TerminalBorderRuntime.bind(calculatorDisplayPanel, calculatorDisplayLabel)
         calculatorExpression?.apply {
@@ -9580,7 +9608,8 @@ class UIManager(
             1.2f,
             moduleCornerRadius(),
             dashedBorders(),
-            false
+            false,
+            target = FrameTarget.OVERLAYS
         )
     }
 
@@ -9602,7 +9631,8 @@ class UIManager(
                 borderColor,
                 1.5f,
                 outputCornerRadius(),
-                dashedBorders()
+                dashedBorders(),
+                target = FrameTarget.OVERLAYS
             )
         )
 
@@ -9611,8 +9641,8 @@ class UIManager(
             label?.textSize = PODCAST_TEXT_LARGE
             label?.setTextColor(textColor)
         }
-        podcastWindowLabel?.setBackground(TerminalBorderRuntime.tabDrawable(mContext, labelBg))
-        podcastClose?.setBackground(TerminalBorderRuntime.tabDrawable(mContext, labelBg, textColor, true))
+        podcastWindowLabel?.setBackground(TerminalBorderRuntime.tabDrawable(mContext, labelBg, FrameTarget.OVERLAYS))
+        podcastClose?.setBackground(TerminalBorderRuntime.tabDrawable(mContext, labelBg, textColor, true, FrameTarget.OVERLAYS))
         TerminalBorderRuntime.bind(podcastWindowBorder, podcastWindowLabel, podcastClose)
 
         listOf(podcastTabs, podcastTransport, podcastPlayerTransport).forEach { view ->
@@ -9628,14 +9658,15 @@ class UIManager(
                 ColorUtils.setAlphaComponent(borderColor, 210),
                 1.2f,
                 outputCornerRadius(),
-                dashedBorders()
+                dashedBorders(),
+                target = FrameTarget.OVERLAYS
             )
         )
         listOf(podcastContentLabel, podcastContentBack).forEach { label ->
             label?.setTypeface(typeface, Typeface.BOLD)
             label?.textSize = PODCAST_TEXT_MEDIUM
             label?.setTextColor(textColor)
-            label?.setBackground(TerminalBorderRuntime.tabDrawable(mContext, labelBg))
+            label?.setBackground(TerminalBorderRuntime.tabDrawable(mContext, labelBg, FrameTarget.OVERLAYS))
         }
         bindPodcastContentFrame()
 
@@ -9646,7 +9677,8 @@ class UIManager(
                 ColorUtils.setAlphaComponent(borderColor, 180),
                 1.2f,
                 outputCornerRadius(),
-                dashedBorders()
+                dashedBorders(),
+                target = FrameTarget.OVERLAYS
             )
         )
 
@@ -9657,7 +9689,8 @@ class UIManager(
                 ColorUtils.setAlphaComponent(borderColor, 160),
                 1f,
                 moduleCornerRadius(),
-                dashedBorders()
+                dashedBorders(),
+                target = FrameTarget.OVERLAYS
             )
         )
 
@@ -9715,7 +9748,7 @@ class UIManager(
         target.textSize = PODCAST_TEXT_MEDIUM
         target.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
         target.setTextColor(notificationWidgetTextColor())
-        target.setBackground(TerminalBorderRuntime.tabDrawable(mContext, terminalHeaderTabBackground()))
+        target.setBackground(TerminalBorderRuntime.tabDrawable(mContext, terminalHeaderTabBackground(), FrameTarget.OVERLAYS))
     }
 
     private fun applyPodcastPaneGeometry() =
@@ -9787,7 +9820,7 @@ class UIManager(
             styleTermuxToolButton(tab, textColor)
             tab.setBackgroundColor(Color.TRANSPARENT)
             if (mode == podcastMode || (mode == PODCAST_MODE_SHOWS && podcastMode == PODCAST_MODE_SHOW_DETAIL)) {
-                tab.setBackground(TerminalBorderRuntime.tabDrawable(mContext, labelBg))
+                tab.setBackground(TerminalBorderRuntime.tabDrawable(mContext, labelBg, FrameTarget.OVERLAYS))
             }
         }
     }
@@ -11066,14 +11099,15 @@ class UIManager(
             Tuils.dpToPx(mContext, 6)
         )
         chip.setBackground(
-            if (selected) TerminalBorderRuntime.tabDrawable(mContext, terminalHeaderTabBackground())
+            if (selected) TerminalBorderRuntime.tabDrawable(mContext, terminalHeaderTabBackground(), FrameTarget.OVERLAYS)
             else TerminalBorderRuntime.panelDrawable(
                 mContext,
                 Color.TRANSPARENT,
                 ColorUtils.setAlphaComponent(terminalBorderColor(), 150),
                 1f,
                 moduleCornerRadius(),
-                dashedBorders()
+                dashedBorders(),
+                target = FrameTarget.OVERLAYS
             )
         )
         chip.setOnClickListener { action.run() }
@@ -11320,7 +11354,7 @@ class UIManager(
         search.gravity = Gravity.CENTER
         search.textSize = PODCAST_TEXT_SMALL
         styleTermuxToolButton(search, notificationWidgetTextColor())
-        search.setBackground(TerminalBorderRuntime.tabDrawable(mContext, terminalHeaderTabBackground()))
+        search.setBackground(TerminalBorderRuntime.tabDrawable(mContext, terminalHeaderTabBackground(), FrameTarget.OVERLAYS))
         search.setOnClickListener { showPodcastEpisodeSearchDialog(show) }
         row.addView(search, LinearLayout.LayoutParams(0, Tuils.dpToPx(mContext, 34), 1f))
 
@@ -11331,7 +11365,7 @@ class UIManager(
             clear.gravity = Gravity.CENTER
             clear.textSize = PODCAST_TEXT_SMALL
             styleTermuxToolButton(clear, notificationWidgetTextColor())
-            clear.setBackground(TerminalBorderRuntime.tabDrawable(mContext, terminalHeaderTabBackground()))
+            clear.setBackground(TerminalBorderRuntime.tabDrawable(mContext, terminalHeaderTabBackground(), FrameTarget.OVERLAYS))
             clear.setOnClickListener {
                 podcastEpisodeQuery = ""
                 renderPodcastSurface(null)
@@ -11431,7 +11465,7 @@ class UIManager(
         sort.textSize = PODCAST_TEXT_SMALL
         sort.minWidth = Tuils.dpToPx(mContext, 104)
         styleTermuxToolButton(sort, notificationWidgetTextColor())
-        sort.setBackground(TerminalBorderRuntime.tabDrawable(mContext, terminalHeaderTabBackground()))
+        sort.setBackground(TerminalBorderRuntime.tabDrawable(mContext, terminalHeaderTabBackground(), FrameTarget.OVERLAYS))
         sort.setOnClickListener {
             manager.toggleNewestFirst(show)
             renderPodcastSurface(null)
@@ -11588,7 +11622,7 @@ class UIManager(
         speed.gravity = Gravity.CENTER
         speed.textSize = PODCAST_TEXT_SMALL
         styleTermuxToolButton(speed, notificationWidgetTextColor())
-        speed.setBackground(TerminalBorderRuntime.tabDrawable(mContext, terminalHeaderTabBackground()))
+        speed.setBackground(TerminalBorderRuntime.tabDrawable(mContext, terminalHeaderTabBackground(), FrameTarget.OVERLAYS))
         speed.setOnClickListener { showPodcastSpeedMenu(speed) }
         val speedParams = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -14820,7 +14854,8 @@ class UIManager(
                 color,
                 1.4f,
                 moduleCornerRadius(),
-                dashedBorders()
+                dashedBorders(),
+                target = FrameTarget.MODULES
             )
         )
 
@@ -15061,9 +15096,10 @@ class UIManager(
             R.id.notification_module_label,
             R.id.notification_module_close,
             notificationWidgetBorderColor(),
-            notificationWidgetTextColor()
+            notificationWidgetTextColor(),
+            FrameTarget.NOTIFICATIONS
         )
-        styleModuleClose(notificationWidget.findViewById<TextView?>(R.id.notification_module_close))
+        styleModuleClose(notificationWidget.findViewById<TextView?>(R.id.notification_module_close), FrameTarget.NOTIFICATIONS)
         styleNotificationSettingsButton(notificationWidget.findViewById<ImageButton?>(R.id.notification_module_settings))
         styleNotificationPagerButton(notificationWidget.findViewById<View?>(R.id.notification_module_prev))
         styleNotificationPagerButton(notificationWidget.findViewById<View?>(R.id.notification_module_next))
@@ -15393,7 +15429,7 @@ class UIManager(
     private fun styleNotificationSettingsButton(button: ImageButton?) {
         if (button == null) return
         button.setColorFilter(moduleNameTextColor(), PorterDuff.Mode.SRC_IN)
-        button.setBackground(TerminalBorderRuntime.tabDrawable(mContext, terminalHeaderTabBackground()))
+        button.setBackground(TerminalBorderRuntime.tabDrawable(mContext, terminalHeaderTabBackground(), FrameTarget.NOTIFICATIONS))
     }
 
     private fun clampNotificationIndex() {
@@ -16444,7 +16480,8 @@ class UIManager(
             borderColor: Int,
             cyberdeckNotch: Boolean,
             surface: SurfaceBorder,
-            allowBorder: Boolean = true
+            allowBorder: Boolean = true,
+            allowFrame: Boolean = true
         ) {
             try {
                 applyMargins(v, spaces)
@@ -16467,7 +16504,9 @@ class UIManager(
                         cornerRadius.toFloat(),
                         dashed,
                         cyberdeckNotch,
-                        allowBorder && AppearanceSettings.surfaceBorderEnabled(surface)
+                        allowBorder && AppearanceSettings.surfaceBorderEnabled(surface),
+                        allowFrame,
+                        FrameTarget.fromSurface(surface)
                     )
                 )
             } catch (e: Exception) {

@@ -60,6 +60,40 @@ class BackupManagerTest {
         )
     }
 
+    @Test
+    fun acceptsShareableConfigurationWithFrames() {
+        assertFalse(
+            BackupManager.validatePackage(
+                "type=retui-shareable-config\nschema=1\nprofile=shareable\nsections=theme,ui,suggestions,frames\n",
+                setOf(
+                    "manifest.txt",
+                    "theme.xml",
+                    "ui.xml",
+                    "suggestions.xml",
+                    "frames/state.json",
+                    "frames/output.retui-frame"
+                )
+            )
+        )
+    }
+
+    @Test
+    fun acceptsShareableConfigurationWithFrameLibrary() {
+        assertFalse(
+            BackupManager.validatePackage(
+                "type=retui-shareable-config\nschema=1\nprofile=shareable\nsections=theme,ui,suggestions,frames\n",
+                setOf(
+                    "manifest.txt",
+                    "theme.xml",
+                    "ui.xml",
+                    "suggestions.xml",
+                    "frames/state.json",
+                    "frames/library-${"a".repeat(64)}.retui-frame"
+                )
+            )
+        )
+    }
+
     @Test(expected = IllegalArgumentException::class)
     fun rejectsExtraFilesInShareableConfiguration() {
         BackupManager.validatePackage(

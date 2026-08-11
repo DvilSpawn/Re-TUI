@@ -34,6 +34,7 @@ import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave
 import ohi.andre.consolelauncher.managers.xml.options.Suggestions
 import ohi.andre.consolelauncher.managers.xml.options.Ui
 import ohi.andre.consolelauncher.tuils.Tuils
+import ohi.andre.consolelauncher.tuils.FrameManager
 
 object PresetManager {
     private const val PRESETS_FOLDER = "presets"
@@ -146,11 +147,12 @@ object PresetManager {
             val sourceFile = File(source, fileName)
             if (sourceFile.isFile) Tuils.copy(sourceFile, File(presetFolder, fileName))
         }
+        FrameManager.copyPortableState(source, presetFolder)
         return cleanName
     }
 
     @Throws(Exception::class)
-    fun save(name: kotlin.String) {
+    fun save(context: Context, name: kotlin.String) {
         val cleanName = cleanName(name)
         val presetFolder: File = File(presetsDir, cleanName)
         check(!(!presetFolder.exists() && !presetFolder.mkdirs())) { "Unable to create preset folder" }
@@ -167,6 +169,7 @@ object PresetManager {
             File(presetFolder, XMLPrefsManager.XMLPrefsRoot.UI.path),
             XMLPrefsManager.XMLPrefsRoot.UI, SHAREABLE_UI
         )
+        FrameManager.copyCurrentTo(context, presetFolder)
 
         apply(cleanName)
     }
@@ -203,6 +206,7 @@ object PresetManager {
         Tuils.copy(presetSuggestions, currentSuggestions)
         val presetUi = File(presetFolder, XMLPrefsManager.XMLPrefsRoot.UI.path)
         if (presetUi.isFile) applyUi(presetUi)
+        FrameManager.applyPortableState(presetFolder)
         LauncherSettings.setAutoColorPick(false)
     }
 
@@ -224,6 +228,9 @@ object PresetManager {
             addFileEntry(zip, XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS.path, presetSuggestions)
             val presetUi = File(presetFolder, XMLPrefsManager.XMLPrefsRoot.UI.path)
             if (presetUi.isFile) addFileEntry(zip, XMLPrefsManager.XMLPrefsRoot.UI.path, presetUi)
+            for (frame in FrameManager.portableFiles(presetFolder)) {
+                addFileEntry(zip, "${FrameManager.FRAME_FOLDER}/${frame.name}", frame)
+            }
         } finally {
             zip.close()
         }
@@ -336,6 +343,7 @@ object PresetManager {
                 }
                 Tuils.copy(File(tempFolder, fileName), dest)
             }
+            FrameManager.copyPortableState(tempFolder, presetFolder)
         } finally {
             Tuils.delete(tempFolder)
         }
@@ -676,20 +684,24 @@ object PresetManager {
                 }
 
                 val name = entry.getName()
-                require(!(name.contains("/") || name.contains("\\") || name.contains(".."))) { "Unsafe preset package" }
+                val allowedFrame = FrameManager.isPortableEntry(name)
+                require(allowedFrame || !(name.contains("/") || name.contains("\\") || name.contains(".."))) { "Unsafe preset package" }
                 require(seen.add(name)) { "Preset package contains duplicate entries" }
 
                 val allowedXml = PRESET_XML_FILES.contains(name)
-                require(!(!allowedXml && MANIFEST_FILE != name)) { "Unsupported preset package file: " + name }
+                require(!(!allowedXml && !allowedFrame && MANIFEST_FILE != name)) { "Unsupported preset package file: " + name }
 
                 val out = File(tempFolder, name)
+                val parent = out.parentFile
+                check(!(parent != null && !parent.exists() && !parent.mkdirs())) { "Unable to create preset folder" }
                 val stream = FileOutputStream(out, false)
                 var total = 0
                 try {
                     var read: Int
                     while ((zip.read(buffer).also { read = it }) != -1) {
                         total += read
-                        require(total <= MAX_ENTRY_BYTES) { "Preset package file too large: " + name }
+                        val limit = if (allowedFrame && name.endsWith(".retui-frame")) FrameManager.MAX_BUNDLE_BYTES else MAX_ENTRY_BYTES
+                        require(total <= limit) { "Preset package file too large: " + name }
                         stream.write(buffer, 0, read)
                     }
                 } finally {
@@ -721,6 +733,7 @@ object PresetManager {
         )
         val ui = File(folder, XMLPrefsManager.XMLPrefsRoot.UI.path)
         if (ui.isFile) validateXmlRoot(ui, XMLPrefsManager.XMLPrefsRoot.UI.name)
+        FrameManager.validatePortableState(folder!!)
     }
 
     @Throws(Exception::class)

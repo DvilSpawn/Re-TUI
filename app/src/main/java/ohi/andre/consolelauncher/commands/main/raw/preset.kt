@@ -16,7 +16,7 @@ class preset : ParamCommand() {
             override fun exec(pack: ExecutePack): String {
                 val name = pack.getString()!!
                 try {
-                    PresetManager.save(name)
+                    PresetManager.save(pack.context, name)
                     if (pack.context is Reloadable) {
                         (pack.context as Reloadable).addMessage("preset", "Saved preset: " + name.trim())
                         (pack.context as Reloadable).reload()

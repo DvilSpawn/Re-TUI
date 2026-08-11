@@ -57,7 +57,7 @@ object TerminalTrayToggleView {
                 Tuils.dpToPx(context, 2)
             )
         }
-        toggle.background = TerminalBorderRuntime.tabDrawable(context, tabBackgroundColor)
+        toggle.background = TerminalBorderRuntime.tabDrawable(context, tabBackgroundColor, FrameTarget.OUTPUT)
         TerminalBorderRuntime.bind(terminalOutputBorder, toggle)
         toggle.setOnClickListener { onClick() }
     }

@@ -49,6 +49,7 @@ import ohi.andre.consolelauncher.managers.xml.options.Suggestions
 import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.managers.xml.options.Ui
 import ohi.andre.consolelauncher.tuils.TerminalBorderRuntime
+import ohi.andre.consolelauncher.tuils.FrameTarget
 import ohi.andre.consolelauncher.tuils.Tuils
 import org.json.JSONArray
 import org.json.JSONObject
@@ -601,14 +602,15 @@ class AndroidWidgetDrawerManager(
         }
 
         val backgroundColor = XMLPrefsManager.getColor(Suggestions.apps_background_color)
-        if (cyberdeckMode()) {
+        if (cyberdeckMode() || TerminalBorderRuntime.customFrameActive(context, FrameTarget.WIDGET_DRAWER)) {
             return TerminalBorderRuntime.panelDrawable(
                 context,
                 backgroundColor,
                 terminalBorderColor(),
                 1.0f,
                 0,
-                true
+                true,
+                target = FrameTarget.WIDGET_DRAWER
             )
         }
 
@@ -673,7 +675,8 @@ class AndroidWidgetDrawerManager(
                 terminalBorderColor(),
                 1.5f,
                 moduleCornerRadius(),
-                dashedBorders()
+                dashedBorders(),
+                target = FrameTarget.WIDGET_DRAWER
             )
         }
 
@@ -857,7 +860,8 @@ class AndroidWidgetDrawerManager(
                 terminalBorderColor(),
                 1.0f,
                 moduleCornerRadius(),
-                dashedBorders()
+                dashedBorders(),
+                target = FrameTarget.WIDGET_DRAWER
             )
             contentDescription = "${option.appLabel} ${option.widgetLabel}"
             setOnClickListener {
@@ -937,7 +941,7 @@ class AndroidWidgetDrawerManager(
             setTextColor(XMLPrefsManager.getColor(Theme.apps_drawer_text_color))
             textSize = 14f
             setTypeface(Tuils.getTypeface(context), Typeface.BOLD)
-            background = TerminalBorderRuntime.tabDrawable(context, terminalHeaderTabBackground())
+            background = TerminalBorderRuntime.tabDrawable(context, terminalHeaderTabBackground(), FrameTarget.WIDGET_DRAWER)
         }
     }
 
@@ -1143,7 +1147,8 @@ class AndroidWidgetDrawerManager(
                 terminalBorderColor(),
                 1.0f,
                 moduleCornerRadius(),
-                dashedBorders()
+                dashedBorders(),
+                target = FrameTarget.WIDGET_DRAWER
             )
             frame.setPadding(0, 0, 0, 0)
             frame.addView(
@@ -1221,7 +1226,7 @@ class AndroidWidgetDrawerManager(
                 Tuils.dpToPx(context, 7),
                 Tuils.dpToPx(context, 2)
             )
-            background = TerminalBorderRuntime.tabDrawable(context, terminalHeaderTabBackground())
+            background = TerminalBorderRuntime.tabDrawable(context, terminalHeaderTabBackground(), FrameTarget.WIDGET_DRAWER)
         }
     }
 
@@ -1389,7 +1394,7 @@ class AndroidWidgetDrawerManager(
             setTextColor(XMLPrefsManager.getColor(Theme.apps_drawer_text_color))
             textSize = if (label.length > 1) 10f else 16f
             setTypeface(Tuils.getTypeface(context), Typeface.BOLD)
-            background = TerminalBorderRuntime.tabDrawable(context, terminalHeaderTabBackground())
+            background = TerminalBorderRuntime.tabDrawable(context, terminalHeaderTabBackground(), FrameTarget.WIDGET_DRAWER)
         }
     }
 
@@ -1761,7 +1766,8 @@ class AndroidWidgetDrawerManager(
                 terminalBorderColor(),
                 1.0f,
                 moduleCornerRadius(),
-                dashedBorders()
+                dashedBorders(),
+                target = FrameTarget.WIDGET_DRAWER
             )
             contentDescription = "$label widget failed to render. Tap to remove."
             setOnClickListener { removeWidgetById(appWidgetId) }
@@ -1935,7 +1941,8 @@ class AndroidWidgetDrawerManager(
             borderColor,
             1.5f,
             moduleCornerRadius(),
-            dashedBorders()
+            dashedBorders(),
+            target = FrameTarget.WIDGET_DRAWER
         )
         header?.setTextColor(drawerColor)
         footer?.setTextColor(drawerColor)
@@ -1950,16 +1957,17 @@ class AndroidWidgetDrawerManager(
         commandPrefix?.setTypeface(Tuils.getTypeface(context), Typeface.BOLD)
         commandInput?.typeface = Tuils.getTypeface(context)
         commandSend?.setTypeface(Tuils.getTypeface(context), Typeface.BOLD)
-        header?.background = TerminalBorderRuntime.tabDrawable(context, headerBackgroundColor)
-        footer?.background = TerminalBorderRuntime.tabDrawable(context, headerBackgroundColor)
-        closeButton?.background = TerminalBorderRuntime.tabDrawable(context, headerBackgroundColor)
+        header?.background = TerminalBorderRuntime.tabDrawable(context, headerBackgroundColor, FrameTarget.WIDGET_DRAWER)
+        footer?.background = TerminalBorderRuntime.tabDrawable(context, headerBackgroundColor, FrameTarget.WIDGET_DRAWER)
+        closeButton?.background = TerminalBorderRuntime.tabDrawable(context, headerBackgroundColor, FrameTarget.WIDGET_DRAWER)
         commandInputGroup?.background = TerminalBorderRuntime.panelDrawable(
             context,
             ColorUtils.blendARGB(backgroundColor, Color.BLACK, 0.16f),
             ColorUtils.setAlphaComponent(borderColor, 180),
             1.2f,
             moduleCornerRadius(),
-            dashedBorders()
+            dashedBorders(),
+            target = FrameTarget.WIDGET_DRAWER
         )
         commandSend?.background = TerminalBorderRuntime.panelDrawable(
             context,
@@ -1967,7 +1975,8 @@ class AndroidWidgetDrawerManager(
             ColorUtils.setAlphaComponent(borderColor, 190),
             1f,
             moduleCornerRadius(),
-            dashedBorders()
+            dashedBorders(),
+            target = FrameTarget.WIDGET_DRAWER
         )
         TerminalBorderRuntime.bind(drawerContainer, header, footer)
         updateWidgetCommandSuggestions()

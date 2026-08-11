@@ -45,6 +45,14 @@ object TuixtDialog {
         title: String,
         items: List<String?>,
         action: ItemAction
+    ) = showOptions(context, title, items, -1, action)
+
+    fun showOptions(
+        context: Context,
+        title: String,
+        items: List<String?>,
+        selectedIndex: Int,
+        action: ItemAction
     ) {
         Handler(Looper.getMainLooper()).post(Runnable {
             val dialog = createDialog(context)
@@ -54,7 +62,7 @@ object TuixtDialog {
                 val index = i
                 val row = TextView(context)
                 row.setText(items.get(i)!!.uppercase(Locale.getDefault()))
-                styleListItem(context, row, false)
+                styleListItem(context, row, i == selectedIndex)
                 val rowParams = LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT

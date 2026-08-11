@@ -683,7 +683,7 @@ enum class Ui : XMLPrefsSave {
         }
 
         override fun info(): String? {
-            return "Top launcher section display margin in millimeters. [left margin],[top margin],[right margin],[bottom margin]"
+            return "Complete top pane group margins in millimeters: [left],[top],[right],[bottom]"
         }
     },
     display_margin_bottom_section {
@@ -982,7 +982,7 @@ enum class Ui : XMLPrefsSave {
         }
 
         override fun info(): String? {
-            return "[horizontal_margin],[vertical_margin],[horizontal_padding],[vertical_padding]"
+            return "Status-row text padding in pixels: [left],[top],[right],[bottom]"
         }
     },
     output_field_margins {
@@ -1099,7 +1099,20 @@ enum class Ui : XMLPrefsSave {
         }
 
         override fun info(): String? {
-            return "[horizontal_margin],[vertical_margin],[horizontal_padding],[vertical_padding]"
+            return "Suggestion pane spacing in pixels: [outer horizontal margin],[outer vertical margin],[inner horizontal padding],[inner vertical padding]. Also applies to contextual module suggestions; it does not control spacing between chips or module-dock buttons."
+        }
+    },
+    module_dock_spacing_dp {
+        override fun defaultValue(): String? {
+            return "8"
+        }
+
+        override fun type(): String? {
+            return XMLPrefsSave.INTEGER
+        }
+
+        override fun info(): String? {
+            return "Space between module-dock buttons in density-independent pixels."
         }
     },
     enable_dashed_border {
