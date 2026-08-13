@@ -419,7 +419,7 @@ object BackupManager {
         }
     }
 
-    private fun isBackupCandidate(file: java.io.File, name: kotlin.String?): kotlin.Boolean {
+    internal fun isBackupCandidate(file: java.io.File, name: kotlin.String?): kotlin.Boolean {
         if (name == null || name.length == 0) return false
         if (name.startsWith(ohi.andre.consolelauncher.managers.BackupManager.SHARED_PREFS_DIR)) return false
         if (name.startsWith("spaces/.")) return false

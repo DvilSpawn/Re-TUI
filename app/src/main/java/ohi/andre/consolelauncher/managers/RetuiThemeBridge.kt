@@ -4,25 +4,43 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import androidx.core.content.FileProvider
 import androidx.core.graphics.ColorUtils
 import com.dvil.retui.contract.RetuiVisualContract
 import java.io.File
+import java.io.FileOutputStream
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.options.Suggestions
 import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.managers.xml.options.Ui
+import ohi.andre.consolelauncher.tuils.FrameManager
+import ohi.andre.consolelauncher.tuils.FrameTarget
+import ohi.andre.consolelauncher.tuils.GenericFileProvider
 import ohi.andre.consolelauncher.tuils.Tuils
 
 object RetuiThemeBridge {
     private const val KEYBOARD_PRIVATE_OPTIONS_PREFIX = "com.dvil.retui.keyboard"
     private const val KEYBOARD_APPLY_CONTEXT_ACTION = "com.dvil.retui.keyboard.APPLY_CONTEXT"
+    private const val KEYBOARD_PACKAGE = "com.dvil.retui.keyboard"
 
     fun putLauncherThemeExtras(intent: Intent, context: Context) {
         RetuiVisualContract.putInto(intent, buildLauncherThemeBundle(context))
+    }
+
+    fun putLauncherThemeExtras(
+        intent: Intent,
+        context: Context,
+        frameTarget: FrameTarget,
+        recipientPackage: String
+    ) {
+        val bundle = buildLauncherThemeBundle(context)
+        addFrame(context, bundle, frameTarget, recipientPackage, "retui-${frameTarget.id}-frame")
+        RetuiVisualContract.putInto(intent, bundle)
     }
 
     fun applyToKeyboardInput(
@@ -46,9 +64,53 @@ object RetuiThemeBridge {
             return
         }
         val bundle = buildLauncherThemeBundle(context, contextLabel, mode)
+        addFrame(context, bundle, FrameTarget.KEYBOARD, KEYBOARD_PACKAGE, "retui-keyboard-frame")
         applyToKeyboardInput(input, contextLabel, mode)
         val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager?
         imm?.sendAppPrivateCommand(input, KEYBOARD_APPLY_CONTEXT_ACTION, bundle)
+    }
+
+    private fun addFrame(
+        context: Context,
+        bundle: Bundle,
+        target: FrameTarget,
+        recipientPackage: String,
+        cacheFolder: String
+    ) {
+        bundle.putBoolean(RetuiVisualContract.FRAME_AVAILABLE, false)
+        val source = FrameManager.sharedSource(context, target) ?: return
+        try {
+            val directory = File(context.cacheDir, cacheFolder)
+            check(directory.exists() || directory.mkdirs()) { "Unable to create frame share folder." }
+            val image = File(directory, "active.png")
+            val temporary = File(directory, "active.png.tmp")
+            temporary.delete()
+            FileOutputStream(temporary).use { it.write(source.png) }
+            check(!image.exists() || image.delete()) { "Unable to replace shared frame image." }
+            check(temporary.renameTo(image)) { "Unable to publish shared frame image." }
+
+            val uri = FileProvider.getUriForFile(context, GenericFileProvider.PROVIDER_NAME, image)
+            context.grantUriPermission(recipientPackage, uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            bundle.putBoolean(RetuiVisualContract.FRAME_AVAILABLE, true)
+            bundle.putString(RetuiVisualContract.FRAME_ASSET_ID, source.assetId)
+            bundle.putString(RetuiVisualContract.FRAME_IMAGE_URI, uri.toString())
+            bundle.putInt(RetuiVisualContract.FRAME_SLICE_LEFT_PX, source.leftPx)
+            bundle.putInt(RetuiVisualContract.FRAME_SLICE_TOP_PX, source.topPx)
+            bundle.putInt(RetuiVisualContract.FRAME_SLICE_RIGHT_PX, source.rightPx)
+            bundle.putInt(RetuiVisualContract.FRAME_SLICE_BOTTOM_PX, source.bottomPx)
+            bundle.putFloat(RetuiVisualContract.FRAME_BORDER_LEFT_DP, source.leftDp)
+            bundle.putFloat(RetuiVisualContract.FRAME_BORDER_TOP_DP, source.topDp)
+            bundle.putFloat(RetuiVisualContract.FRAME_BORDER_RIGHT_DP, source.rightDp)
+            bundle.putFloat(RetuiVisualContract.FRAME_BORDER_BOTTOM_DP, source.bottomDp)
+            bundle.putString(RetuiVisualContract.FRAME_MODE_TOP, source.topMode)
+            bundle.putString(RetuiVisualContract.FRAME_MODE_RIGHT, source.rightMode)
+            bundle.putString(RetuiVisualContract.FRAME_MODE_BOTTOM, source.bottomMode)
+            bundle.putString(RetuiVisualContract.FRAME_MODE_LEFT, source.leftMode)
+            bundle.putString(RetuiVisualContract.FRAME_MODE_CENTER, source.centerMode)
+            bundle.putString(RetuiVisualContract.FRAME_FILTERING, source.filtering)
+        } catch (error: Exception) {
+            Log.e("TUI-FRAME", "Unable to share ${target.id} frame with $recipientPackage", error)
+        }
     }
 
     private fun buildKeyboardPrivateOptions(contextLabel: String?, mode: String?): String {

@@ -160,7 +160,12 @@ object TuixtTheme {
 
     @JvmStatic
     fun styleColorPreview(context: Context, view: View, color: Int) {
-        view.background = rect(context, color, borderColor(), 1.25f)
+        view.background = GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            cornerRadius = dp(context, 4f).toFloat()
+            setColor(color)
+            setStroke(dp(context, 1.25f).coerceAtLeast(1), borderColor())
+        }
     }
 
     @JvmStatic

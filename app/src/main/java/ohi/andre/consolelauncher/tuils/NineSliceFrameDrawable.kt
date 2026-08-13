@@ -10,6 +10,7 @@ import android.graphics.RectF
 import android.graphics.Shader
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.LayerDrawable
+import kotlin.math.roundToInt
 
 class NineSliceFrameDrawable(frame: LoadedFrame, private val density: Float) : Drawable() {
     private val spec = frame.spec
@@ -23,10 +24,18 @@ class NineSliceFrameDrawable(frame: LoadedFrame, private val density: Float) : D
 
     override fun draw(canvas: Canvas) {
         if (bounds.isEmpty) return
-        val horizontal = fitBorders(bounds.width().toFloat(), spec.leftDp * density, spec.rightDp * density)
-        val vertical = fitBorders(bounds.height().toFloat(), spec.topDp * density, spec.bottomDp * density)
-        val dx = floatArrayOf(bounds.left.toFloat(), bounds.left + horizontal.first, bounds.right - horizontal.second, bounds.right.toFloat())
-        val dy = floatArrayOf(bounds.top.toFloat(), bounds.top + vertical.first, bounds.bottom - vertical.second, bounds.bottom.toFloat())
+        val scale = fitScale(
+            bounds.width().toFloat(),
+            bounds.height().toFloat(),
+            spec.leftDp * density,
+            spec.topDp * density,
+            spec.rightDp * density,
+            spec.bottomDp * density
+        )
+        val horizontal = spec.leftDp * density * scale to spec.rightDp * density * scale
+        val vertical = spec.topDp * density * scale to spec.bottomDp * density * scale
+        val dx = destinationBoundaries(bounds.left, bounds.right, horizontal.first, horizontal.second)
+        val dy = destinationBoundaries(bounds.top, bounds.bottom, vertical.first, vertical.second)
 
         drawStretch(canvas, 0, 0, dx[0], dy[0], dx[1], dy[1])
         drawStretch(canvas, 2, 0, dx[2], dy[0], dx[3], dy[1])
@@ -37,7 +46,7 @@ class NineSliceFrameDrawable(frame: LoadedFrame, private val density: Float) : D
         drawEdge(canvas, 1, 2, dx[1], dy[2], dx[2], dy[3], spec.bottomMode, true)
         drawEdge(canvas, 0, 1, dx[0], dy[1], dx[1], dy[2], spec.leftMode, false)
         if (spec.centerMode != "none") {
-            drawRegion(canvas, 1, 1, RectF(dx[1], dy[1], dx[2], dy[2]), spec.centerMode, null)
+            drawRegion(canvas, 1, 1, RectF(dx[1], dy[1], dx[2], dy[2]), spec.centerMode, null, scale)
         }
     }
 
@@ -45,7 +54,15 @@ class NineSliceFrameDrawable(frame: LoadedFrame, private val density: Float) : D
         drawRegion(canvas, column, row, RectF(left, top, right, bottom), mode, horizontal)
     }
 
-    private fun drawRegion(canvas: Canvas, column: Int, row: Int, destination: RectF, mode: String, horizontal: Boolean?) {
+    private fun drawRegion(
+        canvas: Canvas,
+        column: Int,
+        row: Int,
+        destination: RectF,
+        mode: String,
+        horizontal: Boolean?,
+        frameScale: Float = 1f
+    ) {
         if (destination.width() <= 0f || destination.height() <= 0f) return
         if (mode == "stretch") {
             drawStretch(canvas, column, row, destination.left, destination.top, destination.right, destination.bottom)
@@ -56,7 +73,7 @@ class NineSliceFrameDrawable(frame: LoadedFrame, private val density: Float) : D
         val scale = when (horizontal) {
             true -> destination.height() / tile.height
             false -> destination.width() / tile.width
-            null -> tileScale()
+            null -> tileScale() * frameScale
         }.coerceAtLeast(0.01f)
         val scaleX = if (horizontal == false) destination.width() / tile.width else scale
         val scaleY = if (horizontal == true) destination.height() / tile.height else scale
@@ -109,12 +126,25 @@ class NineSliceFrameDrawable(frame: LoadedFrame, private val density: Float) : D
     override fun getOpacity(): Int = PixelFormat.TRANSLUCENT
 
     companion object {
-        internal fun fitBorders(available: Float, first: Float, second: Float): Pair<Float, Float> {
-            val total = first + second
-            if (total <= available || total <= 0f) return first to second
-            val scale = available / total
-            return first * scale to second * scale
-        }
+        internal fun destinationBoundaries(start: Int, end: Int, leading: Float, trailing: Float) = floatArrayOf(
+            start.toFloat(),
+            (start + leading).roundToInt().toFloat(),
+            (end - trailing).roundToInt().toFloat(),
+            end.toFloat()
+        )
+
+        internal fun fitScale(
+            availableWidth: Float,
+            availableHeight: Float,
+            left: Float,
+            top: Float,
+            right: Float,
+            bottom: Float
+        ): Float = minOf(
+            1f,
+            (availableWidth / (left + right)).coerceAtLeast(0f),
+            (availableHeight / (top + bottom)).coerceAtLeast(0f)
+        )
     }
 }
 

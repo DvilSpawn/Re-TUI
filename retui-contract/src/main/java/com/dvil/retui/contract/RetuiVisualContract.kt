@@ -61,6 +61,24 @@ object RetuiVisualContract {
     const val FONT_NAME = "font_name"
     const val TERMINAL_BG_IMAGE = "terminal_bg_image"
 
+    const val FRAME_AVAILABLE = "frame_available"
+    const val FRAME_ASSET_ID = "frame_asset_id"
+    const val FRAME_IMAGE_URI = "frame_image_uri"
+    const val FRAME_SLICE_LEFT_PX = "frame_slice_left_px"
+    const val FRAME_SLICE_TOP_PX = "frame_slice_top_px"
+    const val FRAME_SLICE_RIGHT_PX = "frame_slice_right_px"
+    const val FRAME_SLICE_BOTTOM_PX = "frame_slice_bottom_px"
+    const val FRAME_BORDER_LEFT_DP = "frame_border_left_dp"
+    const val FRAME_BORDER_TOP_DP = "frame_border_top_dp"
+    const val FRAME_BORDER_RIGHT_DP = "frame_border_right_dp"
+    const val FRAME_BORDER_BOTTOM_DP = "frame_border_bottom_dp"
+    const val FRAME_MODE_TOP = "frame_mode_top"
+    const val FRAME_MODE_RIGHT = "frame_mode_right"
+    const val FRAME_MODE_BOTTOM = "frame_mode_bottom"
+    const val FRAME_MODE_LEFT = "frame_mode_left"
+    const val FRAME_MODE_CENTER = "frame_mode_center"
+    const val FRAME_FILTERING = "frame_filtering"
+
     const val CONTEXT = "retui_context"
     const val MODE = "retui_mode"
 
@@ -77,6 +95,11 @@ object RetuiVisualContract {
         DASHED_BORDERS, DASHED_BORDER_DASH_LENGTH, DASHED_BORDER_GAP_LENGTH, DASHED_BORDER_STROKE_WIDTH_DP,
         CYBERDECK_MODE, CRT_FILTER, CRT_VIGNETTE,
         FONT_PATH, FONT_FILE, FONT_NAME, TERMINAL_BG_IMAGE,
+        FRAME_AVAILABLE, FRAME_ASSET_ID, FRAME_IMAGE_URI,
+        FRAME_SLICE_LEFT_PX, FRAME_SLICE_TOP_PX, FRAME_SLICE_RIGHT_PX, FRAME_SLICE_BOTTOM_PX,
+        FRAME_BORDER_LEFT_DP, FRAME_BORDER_TOP_DP, FRAME_BORDER_RIGHT_DP, FRAME_BORDER_BOTTOM_DP,
+        FRAME_MODE_TOP, FRAME_MODE_RIGHT, FRAME_MODE_BOTTOM, FRAME_MODE_LEFT, FRAME_MODE_CENTER,
+        FRAME_FILTERING,
         CONTEXT, MODE
     )
 

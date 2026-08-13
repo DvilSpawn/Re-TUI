@@ -13,11 +13,14 @@ import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
+import android.os.Build
 import android.os.Bundle
+import android.util.SizeF
 import android.text.Editable
 import android.text.InputType
 import android.text.TextWatcher
 import android.view.Gravity
+import android.view.HapticFeedbackConstants
 import android.view.ContextThemeWrapper
 import android.view.KeyEvent
 import android.view.MotionEvent
@@ -55,6 +58,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.util.Locale
 import kotlin.math.abs
+import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -264,7 +268,7 @@ class AndroidWidgetDrawerManager(
         if (requestCode == REQUEST_PICK_WIDGET) {
             val providerInfo = appWidgetManager.getAppWidgetInfo(appWidgetId)
             if (providerInfo?.configure != null) {
-                configureWidget(appWidgetId, providerInfo)
+                configureWidget(appWidgetId)
             } else {
                 finishAddWidget(appWidgetId)
             }
@@ -274,7 +278,7 @@ class AndroidWidgetDrawerManager(
         if (requestCode == REQUEST_BIND_WIDGET) {
             val providerInfo = appWidgetManager.getAppWidgetInfo(appWidgetId)
             if (providerInfo?.configure != null) {
-                configureWidget(appWidgetId, providerInfo)
+                configureWidget(appWidgetId)
             } else {
                 finishAddWidget(appWidgetId)
             }
@@ -389,13 +393,11 @@ class AndroidWidgetDrawerManager(
             return
         }
 
-        val baseColumns = baseColumnCount()
-        val resizedRecord = normalizeRecord(
+        val resizedRecord = constrainRecordToProvider(
             record.copy(
                 rowSpan = requestedRows.coerceAtLeast(1),
-                colSpan = requestedColumns.coerceIn(1, baseColumns)
-            ),
-            baseColumns
+                colSpan = requestedColumns.coerceIn(1, baseColumnCount())
+            )
         )
         saveRecords(compactRecordsWithLocked(resizedRecord, records))
         editingWidgetId = resizedRecord.appWidgetId
@@ -517,9 +519,11 @@ class AndroidWidgetDrawerManager(
             return
         }
 
+        val providerInfo = appWidgetManager.getAppWidgetInfo(targetRecord.appWidgetId) ?: return
+        val bounds = widgetSpanBounds(providerInfo)
         val typedHeight = parts.getOrNull(2)?.toIntOrNull()
         if (typedHeight == null) {
-            for (height in 1..MAX_COMMAND_SPAN_SUGGESTION) {
+            for (height in bounds.minRows..min(bounds.maxRows, MAX_COMMAND_SPAN_SUGGESTION)) {
                 suggestions.add(
                     WidgetCommandSuggestion(
                         "h:$height",
@@ -530,11 +534,12 @@ class AndroidWidgetDrawerManager(
             return
         }
 
-        for (width in 1..baseColumnCount()) {
+        val supportedHeight = typedHeight.coerceIn(bounds.minRows, bounds.maxRows)
+        for (width in bounds.minColumns..bounds.maxColumns) {
             suggestions.add(
                 WidgetCommandSuggestion(
                     "w:$width",
-                    "resize ${targetRecord.wid} $typedHeight $width"
+                    "resize ${targetRecord.wid} $supportedHeight $width"
                 )
             )
         }
@@ -998,7 +1003,7 @@ class AndroidWidgetDrawerManager(
     ) {
         val providerInfo = appWidgetManager.getAppWidgetInfo(appWidgetId) ?: fallbackProviderInfo
         if (providerInfo.configure != null) {
-            configureWidget(appWidgetId, providerInfo)
+            configureWidget(appWidgetId)
         } else {
             finishAddWidget(appWidgetId)
         }
@@ -1023,14 +1028,18 @@ class AndroidWidgetDrawerManager(
         }
     }
 
-    private fun configureWidget(appWidgetId: Int, providerInfo: AppWidgetProviderInfo) {
-        val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_CONFIGURE)
-        intent.component = providerInfo.configure
-        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+    private fun configureWidget(appWidgetId: Int) {
         try {
-            activity.startActivityForResult(intent, REQUEST_CONFIGURE_WIDGET)
+            appWidgetHost.startAppWidgetConfigureActivityForResult(
+                activity,
+                appWidgetId,
+                0,
+                REQUEST_CONFIGURE_WIDGET,
+                null
+            )
         } catch (e: Exception) {
-            finishAddWidget(appWidgetId)
+            deletePendingWidget(appWidgetId)
+            Toast.makeText(context, "Couldn't configure widget.", Toast.LENGTH_SHORT).show()
             Tuils.log(e)
         }
     }
@@ -1055,7 +1064,7 @@ class AndroidWidgetDrawerManager(
         }
 
         val baseColumns = baseColumnCount()
-        val span = spanFor(providerInfo, baseColumns)
+        val span = widgetSpanBounds(providerInfo).initial
         val position = nextOpenPosition(records, span.colSpan, span.rowSpan, columnCount = baseColumns)
         records.add(
             WidgetRecord(
@@ -1124,21 +1133,23 @@ class AndroidWidgetDrawerManager(
         val cellSize = uniformCellSize(grid, baseColumns)
         lastRenderedCellSize = cellSize
         val displayColumns = displayColumnCount(grid, cellSize, baseColumns)
-        val displayRecords = layoutRecordsForColumns(validRecords, displayColumns)
+        val cellMargin = Tuils.dpToPx(context, 4)
+        val supportedRecords = validRecords.map { constrainRecordToProvider(it, cellSize, cellMargin) }
+        if (supportedRecords != validRecords) {
+            saveRecords(supportedRecords)
+        }
+        val displayRecords = layoutRecordsForColumns(supportedRecords, displayColumns)
         val displayRows = displayRowCount(displayRecords, cellSize)
         grid.columnCount = displayColumns
         grid.rowCount = displayRows
         grid.minimumHeight = displayRows * cellSize
 
-        val cellMargin = Tuils.dpToPx(context, 4)
         for (record in displayRecords) {
             val providerInfo = appWidgetManager.getAppWidgetInfo(record.appWidgetId) ?: continue
             val widgetWidth = max(1, (cellSize * record.colSpan) - (cellMargin * 2))
             val widgetHeight = max(1, (cellSize * record.rowSpan) - (cellMargin * 2))
-            val sizeOptions = widgetSizeOptions(widgetWidth, widgetHeight)
-            updateWidgetOptions(record.appWidgetId, sizeOptions)
             val hostView = appWidgetHost.createView(widgetHostContext, record.appWidgetId, providerInfo)
-            updateHostWidgetSize(hostView, sizeOptions, widgetWidth, widgetHeight)
+            updateHostWidgetSize(hostView, widgetWidth, widgetHeight)
 
             val frame = WidgetFrame(context, record.appWidgetId)
             frame.background = TerminalBorderRuntime.panelDrawable(
@@ -1208,7 +1219,7 @@ class AndroidWidgetDrawerManager(
             grid.addView(frame)
         }
 
-        updateLabels(validRecords.size, displayColumns, displayRows)
+        updateLabels(supportedRecords.size, displayColumns, displayRows)
         updateWidgetCommandSuggestions()
     }
 
@@ -1233,61 +1244,63 @@ class AndroidWidgetDrawerManager(
     private fun addEditControls(frame: FrameLayout, record: WidgetRecord) {
         val controlSize = Tuils.dpToPx(context, 30)
         val controlGap = Tuils.dpToPx(context, 4)
+        val providerInfo = appWidgetManager.getAppWidgetInfo(record.appWidgetId)
+        val bounds = providerInfo?.let(::widgetSpanBounds)
 
-        frame.addView(
-            resizeControl(
-                "↑",
-                "Drag to resize the top edge.",
-                record,
-                ResizeEdge.TOP
-            ),
-            FrameLayout.LayoutParams(
-                controlSize,
-                controlSize,
-                Gravity.TOP or Gravity.CENTER_HORIZONTAL
-            ).apply {
-                setMargins(0, controlGap, 0, 0)
-            }
-        )
-        frame.addView(
-            resizeControl(
-                "↓",
-                "Drag to resize the bottom edge.",
-                record,
-                ResizeEdge.BOTTOM
-            ),
-            FrameLayout.LayoutParams(
-                controlSize,
-                controlSize,
-                Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
+        if (bounds != null && bounds.maxRows > bounds.minRows) {
+            frame.addView(
+                resizeControl(
+                    "Drag to resize the top edge.",
+                    record,
+                    ResizeEdge.TOP
+                ),
+                FrameLayout.LayoutParams(
+                    controlSize,
+                    controlSize,
+                    Gravity.TOP or Gravity.CENTER_HORIZONTAL
+                ).apply {
+                    setMargins(0, controlGap, 0, 0)
+                }
             )
-        )
-        frame.addView(
-            resizeControl(
-                "←",
-                "Drag to resize the left edge.",
-                record,
-                ResizeEdge.LEFT
-            ),
-            FrameLayout.LayoutParams(
-                controlSize,
-                controlSize,
-                Gravity.START or Gravity.CENTER_VERTICAL
+            frame.addView(
+                resizeControl(
+                    "Drag to resize the bottom edge.",
+                    record,
+                    ResizeEdge.BOTTOM
+                ),
+                FrameLayout.LayoutParams(
+                    controlSize,
+                    controlSize,
+                    Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
+                )
             )
-        )
-        frame.addView(
-            resizeControl(
-                "→",
-                "Drag to resize the right edge.",
-                record,
-                ResizeEdge.RIGHT
-            ),
-            FrameLayout.LayoutParams(
-                controlSize,
-                controlSize,
-                Gravity.END or Gravity.CENTER_VERTICAL
+        }
+        if (bounds != null && bounds.maxColumns > bounds.minColumns) {
+            frame.addView(
+                resizeControl(
+                    "Drag to resize the left edge.",
+                    record,
+                    ResizeEdge.LEFT
+                ),
+                FrameLayout.LayoutParams(
+                    controlSize,
+                    controlSize,
+                    Gravity.START or Gravity.CENTER_VERTICAL
+                )
             )
-        )
+            frame.addView(
+                resizeControl(
+                    "Drag to resize the right edge.",
+                    record,
+                    ResizeEdge.RIGHT
+                ),
+                FrameLayout.LayoutParams(
+                    controlSize,
+                    controlSize,
+                    Gravity.END or Gravity.CENTER_VERTICAL
+                )
+            )
+        }
 
         val topActions = LinearLayout(context).apply {
             orientation = LinearLayout.HORIZONTAL
@@ -1314,17 +1327,38 @@ class AndroidWidgetDrawerManager(
     }
 
     private fun resizeControl(
-        label: String,
         description: String,
         record: WidgetRecord,
         edge: ResizeEdge
-    ): TextView {
+    ): ImageView {
         val touchSlop = ViewConfiguration.get(context).scaledTouchSlop
         var startRawX = 0f
         var startRawY = 0f
         var moved = false
 
-        return baseEditControl(label, description).apply {
+        return ImageView(context).apply {
+            contentDescription = description
+            isClickable = true
+            isFocusable = true
+            setImageResource(R.drawable.ic_widget_resize_arrow)
+            setColorFilter(XMLPrefsManager.getColor(Theme.apps_drawer_text_color))
+            setPadding(
+                Tuils.dpToPx(context, 8),
+                Tuils.dpToPx(context, 8),
+                Tuils.dpToPx(context, 8),
+                Tuils.dpToPx(context, 8)
+            )
+            setImageLevel(when (edge) {
+                ResizeEdge.TOP -> 0
+                ResizeEdge.RIGHT -> 2_500
+                ResizeEdge.BOTTOM -> 5_000
+                ResizeEdge.LEFT -> 7_500
+            })
+            background = TerminalBorderRuntime.tabDrawable(
+                context,
+                terminalHeaderTabBackground(),
+                FrameTarget.WIDGET_DRAWER
+            )
             setOnTouchListener { view, event ->
                 when (event.actionMasked) {
                     MotionEvent.ACTION_DOWN -> {
@@ -1413,11 +1447,13 @@ class AndroidWidgetDrawerManager(
         val records = loadRecords().filterValid()
         val currentRecord = records.firstOrNull { it.appWidgetId == record.appWidgetId } ?: return
         val otherRecords = records.filter { it.appWidgetId != currentRecord.appWidgetId }
+        val providerInfo = appWidgetManager.getAppWidgetInfo(currentRecord.appWidgetId) ?: return
+        val bounds = widgetSpanBounds(providerInfo)
         val updatedRecord = when (edge) {
             ResizeEdge.LEFT,
-            ResizeEdge.RIGHT -> resizeHorizontalEdgeByCells(currentRecord, otherRecords, edge, deltaCells)
+            ResizeEdge.RIGHT -> resizeHorizontalEdgeByCells(currentRecord, otherRecords, edge, deltaCells, bounds)
             ResizeEdge.TOP,
-            ResizeEdge.BOTTOM -> resizeVerticalEdgeByCells(currentRecord, edge, deltaCells)
+            ResizeEdge.BOTTOM -> resizeVerticalEdgeByCells(currentRecord, edge, deltaCells, bounds)
         }
 
         if (updatedRecord.col == currentRecord.col
@@ -1468,27 +1504,26 @@ class AndroidWidgetDrawerManager(
         record: WidgetRecord,
         otherRecords: List<WidgetRecord>,
         edge: ResizeEdge,
-        deltaCells: Int
+        deltaCells: Int,
+        bounds: WidgetSpanBounds
     ): WidgetRecord {
-        val baseColumns = baseColumnCount()
-        val minimumColumns = minWidgetColumns(baseColumns)
         return if (deltaCells > 0) {
-            expandHorizontalEdge(record, otherRecords, edge, baseColumns, deltaCells)
+            expandHorizontalEdge(record, otherRecords, edge, bounds.maxColumns, deltaCells)
         } else {
-            shrinkHorizontalEdge(record, edge, minimumColumns, -deltaCells)
+            shrinkHorizontalEdge(record, edge, bounds.minColumns, -deltaCells)
         }
     }
 
     private fun resizeVerticalEdgeByCells(
         record: WidgetRecord,
         edge: ResizeEdge,
-        deltaCells: Int
+        deltaCells: Int,
+        bounds: WidgetSpanBounds
     ): WidgetRecord {
-        val minimumRows = minWidgetRows()
         return if (deltaCells > 0) {
-            expandVerticalEdge(record, edge, deltaCells)
+            expandVerticalEdge(record, edge, deltaCells, bounds.maxRows)
         } else {
-            shrinkVerticalEdge(record, edge, minimumRows, -deltaCells)
+            shrinkVerticalEdge(record, edge, bounds.minRows, -deltaCells)
         }
     }
 
@@ -1496,11 +1531,13 @@ class AndroidWidgetDrawerManager(
         val records = loadRecords().filterValid()
         val currentRecord = records.firstOrNull { it.appWidgetId == record.appWidgetId } ?: return
         val otherRecords = records.filter { it.appWidgetId != currentRecord.appWidgetId }
+        val providerInfo = appWidgetManager.getAppWidgetInfo(currentRecord.appWidgetId) ?: return
+        val bounds = widgetSpanBounds(providerInfo)
         val updatedRecord = when (edge) {
             ResizeEdge.LEFT,
-            ResizeEdge.RIGHT -> resizeHorizontalEdge(currentRecord, otherRecords, edge, mode)
+            ResizeEdge.RIGHT -> resizeHorizontalEdge(currentRecord, otherRecords, edge, mode, bounds)
             ResizeEdge.TOP,
-            ResizeEdge.BOTTOM -> resizeVerticalEdge(currentRecord, edge, mode)
+            ResizeEdge.BOTTOM -> resizeVerticalEdge(currentRecord, edge, mode, bounds)
         }
 
         if (updatedRecord.col == currentRecord.col
@@ -1522,15 +1559,13 @@ class AndroidWidgetDrawerManager(
         record: WidgetRecord,
         otherRecords: List<WidgetRecord>,
         edge: ResizeEdge,
-        mode: ResizeMode
+        mode: ResizeMode,
+        bounds: WidgetSpanBounds
     ): WidgetRecord {
-        val baseColumns = baseColumnCount()
-        val minimumColumns = minWidgetColumns(baseColumns)
-        val resizeStep = resizeColumnStep(baseColumns)
         return if (mode == ResizeMode.SHRINK) {
-            shrinkHorizontalEdge(record, edge, minimumColumns, resizeStep)
+            shrinkHorizontalEdge(record, edge, bounds.minColumns, 1)
         } else {
-            expandHorizontalEdge(record, otherRecords, edge, baseColumns, resizeStep)
+            expandHorizontalEdge(record, otherRecords, edge, bounds.maxColumns, 1)
         }
     }
 
@@ -1580,14 +1615,13 @@ class AndroidWidgetDrawerManager(
     private fun resizeVerticalEdge(
         record: WidgetRecord,
         edge: ResizeEdge,
-        mode: ResizeMode
+        mode: ResizeMode,
+        bounds: WidgetSpanBounds
     ): WidgetRecord {
-        val minimumRows = minWidgetRows()
-        val resizeStep = resizeRowStep()
         return if (mode == ResizeMode.SHRINK) {
-            shrinkVerticalEdge(record, edge, minimumRows, resizeStep)
+            shrinkVerticalEdge(record, edge, bounds.minRows, 1)
         } else {
-            expandVerticalEdge(record, edge, resizeStep)
+            expandVerticalEdge(record, edge, 1, bounds.maxRows)
         }
     }
 
@@ -1612,14 +1646,17 @@ class AndroidWidgetDrawerManager(
     private fun expandVerticalEdge(
         record: WidgetRecord,
         edge: ResizeEdge,
-        resizeStep: Int
+        resizeStep: Int,
+        maximumRows: Int
     ): WidgetRecord {
+        val growBy = min(resizeStep, maximumRows - record.rowSpan)
+        if (growBy <= 0) return record
         if (edge == ResizeEdge.TOP) {
-            val newRow = max(0, record.row - resizeStep)
+            val newRow = max(0, record.row - growBy)
             return record.copy(row = newRow, rowSpan = record.row + record.rowSpan - newRow)
         }
 
-        return record.copy(rowSpan = record.rowSpan + resizeStep)
+        return record.copy(rowSpan = record.rowSpan + growBy)
     }
 
     private fun moveRecordBelow(
@@ -1697,48 +1734,20 @@ class AndroidWidgetDrawerManager(
         )
     }
 
-    private fun widgetSizeOptions(widthPx: Int, heightPx: Int): Bundle {
-        val widthDp = pxToDp(widthPx)
-        val heightDp = pxToDp(heightPx)
-        return Bundle().apply {
-            putInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH, widthDp)
-            putInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH, widthDp)
-            putInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, heightDp)
-            putInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT, heightDp)
-        }
-    }
-
-    private fun updateWidgetOptions(appWidgetId: Int, options: Bundle) {
-        try {
-            val widthDp = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH)
-            val maxWidthDp = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH)
-            val heightDp = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT)
-            val maxHeightDp = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT)
-            val currentOptions = appWidgetManager.getAppWidgetOptions(appWidgetId)
-            val optionsChanged =
-                currentOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH, -1) != widthDp
-                    || currentOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH, -1) != maxWidthDp
-                    || currentOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, -1) != heightDp
-                    || currentOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT, -1) != maxHeightDp
-            if (optionsChanged) {
-                appWidgetManager.updateAppWidgetOptions(appWidgetId, options)
-            }
-        } catch (e: RuntimeException) {
-            Tuils.log(e)
-        }
-
-    }
-
     private fun updateHostWidgetSize(
         hostView: AppWidgetHostView,
-        options: Bundle,
         widthPx: Int,
         heightPx: Int
     ) {
         val widthDp = pxToDp(widthPx)
         val heightDp = pxToDp(heightPx)
         try {
-            hostView.updateAppWidgetSize(options, widthDp, heightDp, widthDp, heightDp)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                hostView.updateAppWidgetSize(Bundle(), listOf(SizeF(widthDp.toFloat(), heightDp.toFloat())))
+            } else {
+                @Suppress("DEPRECATION")
+                hostView.updateAppWidgetSize(Bundle(), widthDp, heightDp, widthDp, heightDp)
+            }
         } catch (e: RuntimeException) {
             Tuils.log(e)
         }
@@ -2017,14 +2026,6 @@ class AndroidWidgetDrawerManager(
             .coerceIn(1, MAX_MIN_WIDGET_SPAN)
     }
 
-    private fun resizeColumnStep(baseColumns: Int): Int {
-        return minWidgetColumns(baseColumns).coerceAtMost(RESIZE_COLUMN_STEP)
-    }
-
-    private fun resizeRowStep(): Int {
-        return minWidgetRows().coerceAtMost(RESIZE_ROW_STEP)
-    }
-
     private fun uniformCellSize(grid: GridLayout, baseColumns: Int): Int {
         val rootWidth = (drawerRoot?.width ?: rootView.width).takeIf { it > 0 }
             ?: context.resources.displayMetrics.widthPixels
@@ -2066,17 +2067,49 @@ class AndroidWidgetDrawerManager(
         onSurfaceClose()
     }
 
-    private fun spanFor(providerInfo: AppWidgetProviderInfo, baseColumns: Int): WidgetSpan {
-        val minWidth = max(1, providerInfo.minWidth)
-        val minHeight = max(1, providerInfo.minHeight)
-        val ratio = minWidth.toFloat() / minHeight.toFloat()
-        val minColumns = minWidgetColumns(baseColumns)
-        val minRows = minWidgetRows()
-        return when {
-            ratio >= 1.45f -> WidgetSpan(baseColumns, minRows)
-            ratio <= 0.70f -> WidgetSpan(minColumns, max(minRows * 2, minRows))
-            else -> WidgetSpan(minColumns, minRows)
-        }
+    private fun widgetSpanBounds(
+        providerInfo: AppWidgetProviderInfo,
+        cellSize: Int = lastRenderedCellSize.takeIf { it > 0 }
+            ?: Tuils.dpToPx(context, MIN_WIDGET_CELL_DP),
+        cellMargin: Int = Tuils.dpToPx(context, 4)
+    ): WidgetSpanBounds {
+        val supportsModernSizing = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+        return calculateWidgetSpanBounds(
+            WidgetSizeSpec(
+                minWidth = providerInfo.minWidth,
+                minHeight = providerInfo.minHeight,
+                minResizeWidth = providerInfo.minResizeWidth,
+                minResizeHeight = providerInfo.minResizeHeight,
+                maxResizeWidth = if (supportsModernSizing) providerInfo.maxResizeWidth else 0,
+                maxResizeHeight = if (supportsModernSizing) providerInfo.maxResizeHeight else 0,
+                targetColumns = if (supportsModernSizing) providerInfo.targetCellWidth else 0,
+                targetRows = if (supportsModernSizing) providerInfo.targetCellHeight else 0,
+                horizontalResizable = providerInfo.resizeMode and AppWidgetProviderInfo.RESIZE_HORIZONTAL != 0,
+                verticalResizable = providerInfo.resizeMode and AppWidgetProviderInfo.RESIZE_VERTICAL != 0
+            ),
+            cellSize,
+            cellMargin,
+            min(baseColumnCount(), MAX_WIDGET_COLUMNS),
+            minWidgetColumns(),
+            minWidgetRows(),
+            MAX_PLACEMENT_SCAN_ROWS
+        )
+    }
+
+    private fun constrainRecordToProvider(
+        record: WidgetRecord,
+        cellSize: Int = lastRenderedCellSize.takeIf { it > 0 }
+            ?: Tuils.dpToPx(context, MIN_WIDGET_CELL_DP),
+        cellMargin: Int = Tuils.dpToPx(context, 4)
+    ): WidgetRecord {
+        val providerInfo = appWidgetManager.getAppWidgetInfo(record.appWidgetId) ?: return record
+        val span = widgetSpanBounds(providerInfo, cellSize, cellMargin)
+            .constrain(record.colSpan, record.rowSpan)
+        return record.copy(
+            col = record.col.coerceIn(0, baseColumnCount() - span.colSpan),
+            colSpan = span.colSpan,
+            rowSpan = span.rowSpan
+        )
     }
 
     private fun nextOpenPosition(
@@ -2273,8 +2306,6 @@ class AndroidWidgetDrawerManager(
         val rowSpan: Int
     )
 
-    private data class WidgetSpan(val colSpan: Int, val rowSpan: Int)
-
     private data class WidgetPosition(val col: Int, val row: Int)
 
     private data class WidgetProviderOption(
@@ -2329,6 +2360,7 @@ class AndroidWidgetDrawerManager(
             longPressTriggered = true
             dragMoved = false
             editingWidgetId = appWidgetId
+            performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
             parent?.requestDisallowInterceptTouchEvent(true)
             bringToFront()
             alpha = 0.82f
@@ -2425,9 +2457,8 @@ class AndroidWidgetDrawerManager(
         private const val INVALID_WIDGET_ID = -1
         private const val MIN_GRID_COLUMNS = 2
         private const val MAX_GRID_COLUMNS = 12
+        private const val MAX_WIDGET_COLUMNS = 4
         private const val MAX_MIN_WIDGET_SPAN = 2
-        private const val RESIZE_COLUMN_STEP = 2
-        private const val RESIZE_ROW_STEP = 2
         private const val MIN_WIDGET_CELL_DP = 72
         private const val MAX_COMMAND_SPAN_SUGGESTION = 8
         private const val MAX_PLACEMENT_SCAN_ROWS = 120
@@ -2435,4 +2466,89 @@ class AndroidWidgetDrawerManager(
         private const val LEGACY_CLEANUP_SCAN_RADIUS = 8
         private const val WIDGET_FAILURE_SCAN_DELAY_MS = 500L
     }
+}
+
+internal data class WidgetSizeSpec(
+    val minWidth: Int,
+    val minHeight: Int,
+    val minResizeWidth: Int,
+    val minResizeHeight: Int,
+    val maxResizeWidth: Int,
+    val maxResizeHeight: Int,
+    val targetColumns: Int,
+    val targetRows: Int,
+    val horizontalResizable: Boolean,
+    val verticalResizable: Boolean
+)
+
+internal data class WidgetSpan(val colSpan: Int, val rowSpan: Int)
+
+internal data class WidgetSpanBounds(
+    val initial: WidgetSpan,
+    val minColumns: Int,
+    val maxColumns: Int,
+    val minRows: Int,
+    val maxRows: Int
+) {
+    fun constrain(columns: Int, rows: Int) = WidgetSpan(
+        columns.coerceIn(minColumns, maxColumns),
+        rows.coerceIn(minRows, maxRows)
+    )
+}
+
+internal fun calculateWidgetSpanBounds(
+    spec: WidgetSizeSpec,
+    cellSize: Int,
+    cellMargin: Int,
+    maxColumns: Int,
+    fallbackColumns: Int,
+    fallbackRows: Int,
+    maxRows: Int
+): WidgetSpanBounds {
+    val safeCellSize = max(1, cellSize)
+    val safeMargin = max(0, cellMargin)
+
+    fun minimumSpan(size: Int, fallback: Int, limit: Int): Int = if (size > 0) {
+        ceil((size.toDouble() + safeMargin * 2.0) / safeCellSize).toInt().coerceIn(1, limit)
+    } else {
+        fallback.coerceIn(1, limit)
+    }
+
+    fun resizeMinimum(resizeValue: Int, defaultValue: Int, resizable: Boolean): Int =
+        resizeValue.takeIf { resizable && it > 0 && (defaultValue <= 0 || it <= defaultValue) }
+            ?: defaultValue
+
+    val defaultColumns = (spec.targetColumns.takeIf { it > 0 }
+        ?: minimumSpan(spec.minWidth, fallbackColumns, maxColumns)).coerceIn(1, maxColumns)
+    val defaultRows = (spec.targetRows.takeIf { it > 0 }
+        ?: minimumSpan(spec.minHeight, fallbackRows, maxRows)).coerceIn(1, maxRows)
+
+    val minColumns = if (spec.horizontalResizable) {
+        minimumSpan(
+            resizeMinimum(spec.minResizeWidth, spec.minWidth, true),
+            fallbackColumns,
+            maxColumns
+        )
+    } else defaultColumns
+    val maxSupportedColumns = if (spec.horizontalResizable) maxColumns else defaultColumns
+
+    val minRows = if (spec.verticalResizable) {
+        minimumSpan(
+            resizeMinimum(spec.minResizeHeight, spec.minHeight, true),
+            fallbackRows,
+            maxRows
+        )
+    } else defaultRows
+    val maxSupportedRows = if (spec.verticalResizable) maxRows else defaultRows
+
+    return WidgetSpanBounds(
+        WidgetSpan(
+            defaultColumns.coerceIn(minColumns, maxSupportedColumns),
+            defaultRows.coerceIn(minRows, maxSupportedRows)
+        ),
+        minColumns,
+        maxSupportedColumns,
+        minRows,
+        maxSupportedRows
+    )
 }

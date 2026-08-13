@@ -1,11 +1,19 @@
 package ohi.andre.consolelauncher.managers
 
 import java.io.ByteArrayInputStream
+import java.nio.file.Files
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class BackupManagerTest {
+    @Test
+    fun personalBackupIncludesSharedFrameLibraryAndSpaceSelections() {
+        val file = Files.createTempFile("retui-frame", ".retui-frame").toFile()
+        assertTrue(BackupManager.isBackupCandidate(file, "frames/library-${"a".repeat(64)}.retui-frame"))
+        assertTrue(BackupManager.isBackupCandidate(file, "spaces/space-1/frames/state.json"))
+    }
+
     @Test
     fun acceptsExactWrittenBackup() {
         BackupManager.verifyExport(byteArrayOf(1, 2, 3), ByteArrayInputStream(byteArrayOf(1, 2, 3)))

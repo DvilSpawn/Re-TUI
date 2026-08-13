@@ -39,6 +39,8 @@ enum class FrameTarget(val id: String, val label: String) {
     MODULE_DOCK("module_dock", "Module dock"),
     APP_DRAWER("app_drawer", "App drawer"),
     WIDGET_DRAWER("widget_drawer", "Widget drawer"),
+    KEYBOARD("keyboard", "Re:TUI Keyboard"),
+    FILES("files", "Re:TUI Files"),
     OVERLAYS("overlays", "Overlay windows"),
     SETTINGS("settings", "Settings and dialogs"),
     CONTROLS("controls", "Other launcher controls");
@@ -81,6 +83,25 @@ object FrameManager {
     @Volatile private var cachedState: FrameState? = null
 
     data class FrameAsset(val id: String, val name: String, val valid: Boolean)
+
+    data class SharedFrameSource(
+        val assetId: String,
+        val png: ByteArray,
+        val leftPx: Int,
+        val topPx: Int,
+        val rightPx: Int,
+        val bottomPx: Int,
+        val leftDp: Float,
+        val topDp: Float,
+        val rightDp: Float,
+        val bottomDp: Float,
+        val topMode: String,
+        val rightMode: String,
+        val bottomMode: String,
+        val leftMode: String,
+        val centerMode: String,
+        val filtering: String
+    )
 
     internal data class FrameState(
         var applyToAll: Boolean,
@@ -199,6 +220,38 @@ object FrameManager {
         return loadAsset(assetId)?.let { NineSliceFrameDrawable(it, context.resources.displayMetrics.density) }
     }
 
+    fun sharedSource(context: Context, target: FrameTarget): SharedFrameSource? {
+        ensureMigrated(context)
+        val state = currentState()
+        val assetId = state.assignments[assignmentKey(resolvedTarget(state.applyToAll, target))] ?: return null
+        return try {
+            val parsed = parseBundle(FileInputStream(assetFile(frameDir(), assetId)).use {
+                it.readLimited(MAX_BUNDLE_BYTES, "Frame bundle is too large.")
+            })
+            SharedFrameSource(
+                assetId,
+                parsed.png,
+                parsed.spec.leftPx,
+                parsed.spec.topPx,
+                parsed.spec.rightPx,
+                parsed.spec.bottomPx,
+                parsed.spec.leftDp,
+                parsed.spec.topDp,
+                parsed.spec.rightDp,
+                parsed.spec.bottomDp,
+                parsed.spec.topMode,
+                parsed.spec.rightMode,
+                parsed.spec.bottomMode,
+                parsed.spec.leftMode,
+                parsed.spec.centerMode,
+                parsed.spec.filtering
+            )
+        } catch (error: Exception) {
+            Log.e("TUI-FRAME", "Unable to share $assetId frame", error)
+            null
+        }
+    }
+
     internal fun resolvedTarget(applyToAll: Boolean, target: FrameTarget): FrameTarget? =
         if (applyToAll) null else target
 
@@ -212,6 +265,24 @@ object FrameManager {
         ensureMigrated(context)
         copyFrameFolder(frameDir(), File(destinationRoot, FRAME_FOLDER))
         removeUnreferencedAssets(File(destinationRoot, FRAME_FOLDER))
+    }
+
+    fun copyStateTo(context: Context, destinationRoot: File) {
+        ensureMigrated(context)
+        val destination = File(destinationRoot, FRAME_FOLDER)
+        check(destination.exists() || destination.mkdirs()) { "Unable to create Space frame settings." }
+        Tuils.copy(File(frameDir(), STATE_FILE), File(destination, STATE_FILE))
+    }
+
+    fun applyStateFrom(context: Context, sourceRoot: File) {
+        ensureMigrated(context)
+        writeStateFile(frameDir(), stateForSpace(sourceRoot))
+        clearCache()
+    }
+
+    internal fun stateForSpace(sourceRoot: File): FrameState {
+        val source = File(sourceRoot, FRAME_FOLDER)
+        return if (File(source, STATE_FILE).isFile) readState(source) else FrameState(true, HashMap())
     }
 
     fun copyPortableState(sourceRoot: File, destinationRoot: File) {

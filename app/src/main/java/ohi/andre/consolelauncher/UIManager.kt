@@ -2217,7 +2217,7 @@ class UIManager(
             outputHeaderTextSize(),
             terminalHeaderTabBackground(),
             onClick = {
-                if (!landscapeLayoutActive && this.isOutputTrayToggledMode) {
+                if (this.isOutputTrayToggledMode) {
                     setTerminalTrayExpanded(!terminalTrayExpanded)
                 }
             }
@@ -2263,7 +2263,43 @@ class UIManager(
             return
         }
 
-        if (landscapeLayoutActive && !duoLayoutActive) {
+        if (landscapeLayoutActive && this.isOutputTrayToggledMode) {
+            val trayParams = terminalTrayContainer?.layoutParams as? FrameLayout.LayoutParams
+            if (trayParams != null) {
+                trayParams.width = ViewGroup.LayoutParams.MATCH_PARENT
+                trayParams.height = if (terminalTrayExpanded) {
+                    ViewGroup.LayoutParams.MATCH_PARENT
+                } else {
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                }
+                trayParams.gravity = Gravity.BOTTOM
+                terminalTrayContainer?.layoutParams = trayParams
+            }
+            if (terminalTrayExpanded) {
+                val params = terminalContainer!!.layoutParams
+                if (params is LinearLayout.LayoutParams) {
+                    params.height = 0
+                    params.weight = 1f
+                    terminalContainer!!.layoutParams = params
+                } else if (params != null) {
+                    params.height = ViewGroup.LayoutParams.MATCH_PARENT
+                    terminalContainer!!.layoutParams = params
+                }
+                updateTerminalTrayToggleText()
+                if (refocusInput && mTerminalAdapter != null) {
+                    mTerminalAdapter!!.requestInputFocus()
+                    mTerminalAdapter!!.scrollToEnd()
+                }
+                return
+            }
+        }
+
+        if (landscapeLayoutActive && !duoLayoutActive && !this.isOutputTrayToggledMode) {
+            val trayParams = terminalTrayContainer?.layoutParams as? FrameLayout.LayoutParams
+            if (trayParams != null && trayParams.height != ViewGroup.LayoutParams.MATCH_PARENT) {
+                trayParams.height = ViewGroup.LayoutParams.MATCH_PARENT
+                terminalTrayContainer?.layoutParams = trayParams
+            }
             val params = terminalContainer!!.getLayoutParams()
             if (params is LinearLayout.LayoutParams) {
                 val lp = params
@@ -15878,7 +15914,7 @@ class UIManager(
             hideAppsDrawer()
             return
         }
-        if (!landscapeLayoutActive && terminalTrayExpanded) {
+        if (this.isOutputTrayToggledMode && terminalTrayExpanded) {
             setTerminalTrayExpanded(false)
             return
         }

@@ -1065,7 +1065,7 @@ enum class Ui : XMLPrefsSave {
     },
     android_widget_min_columns {
         override fun defaultValue(): String? {
-            return "2"
+            return "1"
         }
 
         override fun type(): String? {
@@ -1073,12 +1073,12 @@ enum class Ui : XMLPrefsSave {
         }
 
         override fun info(): String? {
-            return "Minimum widget width in grid columns. Use 1 to allow 1x1 widgets"
+            return "Fallback starting width when a widget app does not provide valid Android sizing metadata"
         }
     },
     android_widget_min_rows {
         override fun defaultValue(): String? {
-            return "2"
+            return "1"
         }
 
         override fun type(): String? {
@@ -1086,7 +1086,7 @@ enum class Ui : XMLPrefsSave {
         }
 
         override fun info(): String? {
-            return "Minimum widget height in grid rows. Use 1 to allow 1x1 widgets"
+            return "Fallback starting height when a widget app does not provide valid Android sizing metadata"
         }
     },
     suggestions_area_margin {
