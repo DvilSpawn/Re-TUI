@@ -248,6 +248,7 @@ import ohi.andre.consolelauncher.profile.ProfilePaneController
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings
 import ohi.andre.consolelauncher.managers.settings.MusicSettings
 import ohi.andre.consolelauncher.managers.settings.NotificationSettings
+import ohi.andre.consolelauncher.managers.settings.StatusRowResolver
 import ohi.andre.consolelauncher.managers.termux.TermuxBridgeCache
 import ohi.andre.consolelauncher.managers.termux.TermuxAppManager
 import ohi.andre.consolelauncher.managers.xml.options.Notifications
@@ -8702,7 +8703,6 @@ class UIManager(
             0
         )
 
-        val labelRows = ArrayList<MutableList<Label>>()
         val visibleLabels = ArrayList<Pair<Float, Label>>()
         for (ordinal in indexes.indices) {
             val value = indexes[ordinal]
@@ -8710,15 +8710,7 @@ class UIManager(
                 visibleLabels.add(value to Label.entries[ordinal])
             }
         }
-        var lastLabelRow: Int? = null
-        visibleLabels.sortedBy { it.first }.forEach { (value, label) ->
-            val row = value.toInt()
-            if (row != lastLabelRow) {
-                labelRows.add(ArrayList())
-                lastLabelRow = row
-            }
-            labelRows.last().add(label)
-        }
+        val labelRows = StatusRowResolver.groupVisible(visibleLabels)
 
         val lViewsParent = labelViews[0]!!.getParent() as LinearLayout
         val unifiedStatusBorder = AppearanceSettings.unifiedStatusBorder()

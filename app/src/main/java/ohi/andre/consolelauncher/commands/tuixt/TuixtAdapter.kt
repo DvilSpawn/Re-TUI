@@ -75,7 +75,6 @@ class TuixtAdapter(
     private val pendingChanges: MutableMap<XMLPrefsSave?, String?> =
         HashMap<XMLPrefsSave?, String?>()
     private var expandedColorItem: XMLPrefsSave? = null
-    private var lastEditedStatusIndex: Ui? = null
 
     init {
         this.rows = ArrayList<SettingsRow>(rows)
@@ -94,7 +93,7 @@ class TuixtAdapter(
         recyclerView?.let { captureVisibleInputs(it) }
         if (rows.any { StatusRowResolver.isStatusIndex(it.item) }) {
             val rawRows = StatusRowResolver.settings.associateWith { pendingChanges[it] ?: get(it) }
-            for ((item, value) in StatusRowResolver.normalize(rawRows, lastEditedStatusIndex).values) {
+            for ((item, value) in StatusRowResolver.normalize(rawRows).values) {
                 pendingChanges[item] = value
             }
         }
@@ -284,12 +283,6 @@ class TuixtAdapter(
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
                 override fun afterTextChanged(s: Editable) {
                     pendingChanges.put(item, s.toString())
-                    if (item is Ui && StatusRowResolver.isStatusIndex(item)) {
-                        lastEditedStatusIndex = item
-                        val values = StatusRowResolver.settings.associateWith { pendingChanges[it] ?: get(it) }
-                        val occupied = StatusRowResolver.occupiedRow(values, item, s.toString())
-                        settingHolder.input.error = occupied?.let { "Row is used by ${displayLabel(it)}; it will move when saved" }
-                    }
                 }
             }
             settingHolder.input.addTextChangedListener(settingHolder.textWatcher)

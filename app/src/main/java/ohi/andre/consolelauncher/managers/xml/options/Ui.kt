@@ -358,7 +358,7 @@ enum class Ui : XMLPrefsSave {
         }
 
         override fun info(): String? {
-            return "This is used to order the labels on top of the screen"
+            return "Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."
         }
     },
     ram_index {
@@ -371,7 +371,7 @@ enum class Ui : XMLPrefsSave {
         }
 
         override fun info(): String? {
-            return "This is used to order the labels on top of the screen"
+            return "Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."
         }
     },
     battery_index {
@@ -384,7 +384,7 @@ enum class Ui : XMLPrefsSave {
         }
 
         override fun info(): String? {
-            return "This is used to order the labels on top of the screen"
+            return "Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."
         }
     },
     time_index {
@@ -397,7 +397,7 @@ enum class Ui : XMLPrefsSave {
         }
 
         override fun info(): String? {
-            return "This is used to order the labels on top of the screen"
+            return "Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."
         }
     },
     show_ascii {
@@ -436,7 +436,7 @@ enum class Ui : XMLPrefsSave {
         }
 
         override fun info(): String? {
-            return "Order of the ASCII art in the status area"
+            return "ASCII always uses its own status row so the dedicated viewport remains active. If that whole-number row is occupied, ASCII moves to the next free row."
         }
     },
     ascii_size {
@@ -488,7 +488,7 @@ enum class Ui : XMLPrefsSave {
         }
 
         override fun info(): String? {
-            return "This is used to order the labels on top of the screen"
+            return "Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."
         }
     },
     network_index {
@@ -501,7 +501,7 @@ enum class Ui : XMLPrefsSave {
         }
 
         override fun info(): String? {
-            return "This is used to order the labels on top of the screen"
+            return "Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."
         }
     },
     notes_index {
@@ -514,7 +514,7 @@ enum class Ui : XMLPrefsSave {
         }
 
         override fun info(): String? {
-            return "This is used to order the labels on top of the screen"
+            return "Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."
         }
     },
     ram_status_alignment {
@@ -878,7 +878,7 @@ enum class Ui : XMLPrefsSave {
         }
 
         override fun info(): String? {
-            return "This is used to order the labels on top of the screen"
+            return "Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."
         }
     },
     weather_size {
@@ -917,7 +917,7 @@ enum class Ui : XMLPrefsSave {
         }
 
         override fun info(): String? {
-            return "This is used to order the labels on top of the screen"
+            return "Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."
         }
     },
     unlock_size {
