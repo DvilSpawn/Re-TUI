@@ -260,7 +260,8 @@ object GuideManager {
         "-next",
         "-back",
         "-off",
-        "-reset"
+        "-reset",
+        "-startup-test"
     )
 
     fun observeCommand(context: Context, rawCommand: String?): String? {

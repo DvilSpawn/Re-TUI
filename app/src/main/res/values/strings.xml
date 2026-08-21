@@ -400,6 +400,7 @@
         \n$ guide -status
         \n$ guide -off
         \n$ guide -reset
+        \n$ guide -startup-test
         \n\nWhen a guide is active, the suggestion row stays locked to the current step command plus guide controls until guide -off. Progress is saved so guide -resume returns to the saved path and step.
     </string>
     <string name="help_workstation_quickstart">Re:T-UI workstation quickstart

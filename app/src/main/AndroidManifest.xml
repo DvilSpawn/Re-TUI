@@ -184,6 +184,13 @@
         </activity>
 
         <activity
+            android:name=".managers.onboarding.StartupMenuActivity"
+            android:excludeFromRecents="true"
+            android:label="Re:T-UI Startup"
+            android:theme="@style/Custom.SystemWP"
+            android:exported="false" />
+
+        <activity
             android:name=".wallpaper.RetuiWallpaperActivity"
             android:excludeFromRecents="true"
             android:label="RETUI WALLPAPER"

@@ -40,6 +40,7 @@ import ohi.andre.consolelauncher.managers.notifications.KeeperService
 import ohi.andre.consolelauncher.managers.notifications.NotificationManager
 import ohi.andre.consolelauncher.managers.notifications.NotificationService
 import ohi.andre.consolelauncher.managers.onboarding.GuideManager
+import ohi.andre.consolelauncher.managers.onboarding.StartupMenuManager
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings.invalidate
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings.refreshFromLoadedPrefs
 import ohi.andre.consolelauncher.managers.settings.NotificationSettings.printToOutput
@@ -230,7 +231,10 @@ class LauncherActivity : AppCompatActivity(), Reloadable {
             }
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+            && XMLPrefsManager.getBoolean(Behavior.tui_notification)
+            && !StartupMenuManager.isFirstInstallPending(this)
+        ) {
             if (ContextCompat.checkSelfPermission(
                     this,
                     Manifest.permission.POST_NOTIFICATIONS
@@ -316,9 +320,9 @@ class LauncherActivity : AppCompatActivity(), Reloadable {
             Tuils.toFile(e)
         }
 
-        val notifications = showTerminal()
+        val notifications = !StartupMenuManager.isFirstInstallPending(this) && (showTerminal()
                 || printToOutput()
-                || ModuleManager.NOTIFICATIONS == ModuleManager.getActiveModule(this)
+                || ModuleManager.NOTIFICATIONS == ModuleManager.getActiveModule(this))
         if (notifications) {
             try {
                 val notificationComponent = ComponentName(this, NotificationService::class.java)
@@ -407,8 +411,10 @@ class LauncherActivity : AppCompatActivity(), Reloadable {
         LauncherSoundManager.playBoot(this)
 
         `in`.`in`(Tuils.EMPTYSTRING)
-        uiManager!!.activateTerminalInput(openKeyboardOnStart)
-        restoreGuideSessionAfterReload()
+        if (!StartupMenuManager.maybeOpen(this)) {
+            uiManager!!.activateTerminalInput(openKeyboardOnStart)
+            restoreGuideSessionAfterReload()
+        }
 
         System.gc()
     }

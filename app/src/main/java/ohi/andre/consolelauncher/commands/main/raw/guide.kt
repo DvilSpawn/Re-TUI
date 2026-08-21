@@ -6,6 +6,7 @@ import ohi.andre.consolelauncher.commands.CommandAbstraction
 import ohi.andre.consolelauncher.commands.ExecutePack
 import ohi.andre.consolelauncher.commands.main.specific.PermanentSuggestionCommand
 import ohi.andre.consolelauncher.managers.onboarding.GuideManager
+import ohi.andre.consolelauncher.managers.onboarding.StartupMenuManager
 import ohi.andre.consolelauncher.tuils.Tuils
 
 class guide : CommandAbstraction, PermanentSuggestionCommand {
@@ -30,6 +31,7 @@ class guide : CommandAbstraction, PermanentSuggestionCommand {
             "-status", "status" -> GuideManager.status(pack.context)
             "-off", "off", "-skip", "skip" -> GuideManager.off(pack.context)
             "-reset", "reset" -> GuideManager.reset(pack.context)
+            "-startup-test", "startup-test" -> StartupMenuManager.startTest(pack.context)
             else -> GuideManager.overview(pack.context)
         }
     }
