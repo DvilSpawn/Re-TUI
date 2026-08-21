@@ -6,6 +6,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Environment
 import ohi.andre.consolelauncher.managers.RetuiThemeBridge
+import ohi.andre.consolelauncher.tuils.FrameTarget
 
 object RetuiFilesContract {
     const val PACKAGE = "com.dvil.retui.fm"
@@ -73,7 +74,7 @@ object RetuiFilesContract {
         target?.let { intent.putExtra("target", it) }
         searchName?.let { intent.putExtra("search_name", it) }
         searchType?.let { intent.putExtra("search_type", it) }
-        RetuiThemeBridge.putLauncherThemeExtras(intent, context)
+        RetuiThemeBridge.putLauncherThemeExtras(intent, context, FrameTarget.FILES, PACKAGE)
 
         return try {
             context.startActivity(intent)

@@ -339,7 +339,7 @@ enum class Suggestions : XMLPrefsSave {
         }
 
         override fun info(): String? {
-            return "[External horizontal margin],[E. vertical margin],[Internal horizontal margin],[I. vertical margin]"
+            return "Suggestion chip spacing in pixels: [outer horizontal margin],[outer vertical margin],[inner horizontal padding],[inner vertical padding]."
         }
     };
 

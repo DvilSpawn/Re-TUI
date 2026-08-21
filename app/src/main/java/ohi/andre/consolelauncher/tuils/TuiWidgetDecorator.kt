@@ -18,13 +18,14 @@ object TuiWidgetDecorator {
             labelViewId,
             0,
             AppearanceSettings.musicWidgetBorderColor(),
-            AppearanceSettings.musicWidgetTextColor()
+            AppearanceSettings.musicWidgetTextColor(),
+            FrameTarget.MUSIC
         )
     }
 
     @JvmStatic
     fun decorateWidget(widgetRoot: View?, borderViewId: Int, labelViewId: Int, borderColor: Int, textColor: Int) {
-        decorateWidget(widgetRoot, borderViewId, labelViewId, 0, borderColor, textColor)
+        decorateWidget(widgetRoot, borderViewId, labelViewId, 0, borderColor, textColor, FrameTarget.MODULES)
     }
 
     @JvmStatic
@@ -34,7 +35,8 @@ object TuiWidgetDecorator {
         labelViewId: Int,
         closeViewId: Int,
         borderColor: Int,
-        textColor: Int
+        textColor: Int,
+        target: FrameTarget = FrameTarget.MODULES
     ) {
         if (widgetRoot == null) {
             return
@@ -53,7 +55,8 @@ object TuiWidgetDecorator {
                 borderColor,
                 1.5f,
                 AppearanceSettings.moduleCornerRadius(),
-                useDashed
+                useDashed,
+                target = target
             )
         }
 
@@ -62,7 +65,7 @@ object TuiWidgetDecorator {
             widgetLabel.setTextColor(textColor)
             widgetLabel.setTypeface(Tuils.getTypeface(context), Typeface.BOLD)
             widgetLabel.textSize = AppearanceSettings.moduleHeaderTextSize().toFloat()
-            widgetLabel.background = TerminalBorderRuntime.tabDrawable(context, labelMaskColor)
+            widgetLabel.background = TerminalBorderRuntime.tabDrawable(context, labelMaskColor, target)
         }
 
         if (borderView != null) {
@@ -73,10 +76,14 @@ object TuiWidgetDecorator {
 
     @JvmStatic
     fun getRowBackground(context: Context): Drawable =
-        getRowBackground(context, AppearanceSettings.notificationWidgetBorderColor())
+        getRowBackground(context, AppearanceSettings.notificationWidgetBorderColor(), FrameTarget.NOTIFICATIONS)
 
     @JvmStatic
-    fun getRowBackground(context: Context, borderColor: Int): Drawable {
+    fun getRowBackground(
+        context: Context,
+        borderColor: Int,
+        target: FrameTarget = FrameTarget.NOTIFICATIONS
+    ): Drawable {
         val widgetBgColor = AppearanceSettings.terminalWindowBackground()
         val rowBackground = ColorUtils.blendARGB(widgetBgColor, Color.BLACK, 0.22f)
         val strokeColor = ColorUtils.setAlphaComponent(borderColor, 140)
@@ -87,7 +94,8 @@ object TuiWidgetDecorator {
             strokeColor,
             1.2f,
             AppearanceSettings.moduleCornerRadius(),
-            AppearanceSettings.dashedBorders()
+            AppearanceSettings.dashedBorders(),
+            target = target
         )
     }
 
@@ -98,14 +106,16 @@ object TuiWidgetDecorator {
         borderColor: Int,
         strokeDp: Float,
         radiusDp: Int,
-        dashed: Boolean
-    ): TerminalBorderDrawable = TerminalBorderRuntime.panelDrawable(
+        dashed: Boolean,
+        target: FrameTarget = FrameTarget.MODULES
+    ): Drawable = TerminalBorderRuntime.panelDrawable(
         context,
         fillColor,
         borderColor,
         strokeDp,
         radiusDp,
-        dashed
+        dashed,
+        target = target
     )
 
 }

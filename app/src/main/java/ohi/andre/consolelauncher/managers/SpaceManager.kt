@@ -6,6 +6,7 @@ import ohi.andre.consolelauncher.managers.notifications.reply.ReplyManager
 import ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceLauncherManager
 import ohi.andre.consolelauncher.managers.lua.LuaWidgetReminderManager
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
+import ohi.andre.consolelauncher.tuils.FrameManager
 import ohi.andre.consolelauncher.tuils.Tuils
 import java.io.File
 import java.util.LinkedHashSet
@@ -70,8 +71,22 @@ object SpaceManager {
                 LuaWidgetReminderManager.PREFS,
                 TermuxWorkspaceLauncherManager.PREFS
             )
-        )
+        ),
+        FrameStateProvider()
     )
+
+    private class FrameStateProvider : SpaceStateProvider {
+        override val id = "frame-selections"
+        override val version = 1
+
+        override fun snapshot(context: Context, liveRoot: File, spaceRoot: File) {
+            FrameManager.copyStateTo(context, spaceRoot)
+        }
+
+        override fun restore(context: Context, liveRoot: File, spaceRoot: File) {
+            FrameManager.applyStateFrom(context, spaceRoot)
+        }
+    }
 
     data class Space(val id: String, val name: String, val updatedAt: Long)
 

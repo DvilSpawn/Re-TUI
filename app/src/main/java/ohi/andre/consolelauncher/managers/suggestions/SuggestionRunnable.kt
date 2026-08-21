@@ -20,6 +20,7 @@ import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.options.Suggestions
 import ohi.andre.consolelauncher.tuils.Tuils
 import ohi.andre.consolelauncher.tuils.TerminalBorderRuntime
+import ohi.andre.consolelauncher.tuils.FrameTarget
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings
 
 /*Copyright Francesco Andreuzzi
@@ -289,14 +290,15 @@ class SuggestionRunnable(
     }
 
     private fun getSuggestionColorBg(context: Context, color: Int): Drawable {
-        if (AppearanceSettings.cyberdeckMode()) {
+        if (AppearanceSettings.cyberdeckMode() || TerminalBorderRuntime.customFrameActive(context, FrameTarget.SUGGESTIONS)) {
             return TerminalBorderRuntime.panelDrawable(
                 context,
                 color,
                 AppearanceSettings.terminalBorderColor(),
                 1.0f,
                 0,
-                true
+                true,
+                target = FrameTarget.SUGGESTIONS
             )
         }
 

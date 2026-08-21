@@ -11,6 +11,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.graphics.ColorUtils
 import ohi.andre.consolelauncher.tuils.TerminalBorderRuntime
+import ohi.andre.consolelauncher.tuils.FrameTarget
 import ohi.andre.consolelauncher.tuils.Tuils
 
 /**
@@ -24,6 +25,7 @@ object ModuleDockButtonFactory {
     fun create(
         context: Context,
         module: String?,
+        spacingDp: Int,
         onClick: (String?) -> Unit,
         onTouchDown: () -> Unit
     ): TextView {
@@ -43,7 +45,7 @@ object ModuleDockButtonFactory {
             ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
-        lp.setMargins(0, 0, Tuils.dpToPx(context, 8), 0)
+        lp.setMargins(0, 0, Tuils.dpToPx(context, spacingDp.coerceAtLeast(0)), 0)
         button.layoutParams = lp
 
         button.setOnClickListener { onClick(module) }
@@ -74,6 +76,9 @@ object ModuleDockButtonFactory {
         cornerRadius: Int,
         dashedBorders: Boolean
     ) {
+        val label = button.text.toString().removePrefix("✓ ")
+        button.text = if (selected) "✓ $label" else label
+        button.isSelected = selected
         val bg = if (selected) {
             ColorUtils.blendARGB(backgroundColor, textColor, 0.25f)
         } else {
@@ -87,7 +92,8 @@ object ModuleDockButtonFactory {
             borderColor,
             1.2f,
             cornerRadius,
-            dashedBorders
+            dashedBorders,
+            target = FrameTarget.MODULE_DOCK
         )
     }
 }

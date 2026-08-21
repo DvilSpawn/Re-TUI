@@ -11,12 +11,12 @@ import android.view.View
 import android.widget.EditText
 import android.widget.TextView
 import androidx.core.graphics.ColorUtils
-import kotlin.math.max
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings
 import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.tuils.CrtOverlayDrawable
-import ohi.andre.consolelauncher.tuils.TerminalBorderDrawable
+import ohi.andre.consolelauncher.tuils.TerminalBorderRuntime
+import ohi.andre.consolelauncher.tuils.FrameTarget
 import ohi.andre.consolelauncher.tuils.Tuils
 
 object TuixtTheme {
@@ -64,6 +64,7 @@ object TuixtTheme {
 
     @JvmStatic
     fun styleListItem(context: Context, view: TextView, selected: Boolean) {
+        markSelection(view, selected)
         view.setTextColor(if (selected) selectionColor() else AppearanceSettings.moduleNameTextColor())
         view.setTypeface(Tuils.getTypeface(context), Typeface.BOLD)
         view.textSize = 15f
@@ -114,8 +115,15 @@ object TuixtTheme {
     }
 
     @JvmStatic
+    fun styleChoice(context: Context, view: TextView, selected: Boolean) {
+        styleButton(context, view, selected)
+        markSelection(view, selected)
+    }
+
+    @JvmStatic
     fun styleToggle(context: Context, view: TextView, checked: Boolean) {
         view.text = if (checked) "ON" else "OFF"
+        markSelection(view, checked)
         view.setTextColor(if (checked) selectionColor() else AppearanceSettings.moduleNameTextColor())
         view.setTypeface(Tuils.getTypeface(context), Typeface.BOLD)
         view.textSize = 13f
@@ -152,7 +160,12 @@ object TuixtTheme {
 
     @JvmStatic
     fun styleColorPreview(context: Context, view: View, color: Int) {
-        view.background = rect(context, color, borderColor(), 1.25f)
+        view.background = GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            cornerRadius = dp(context, 4f).toFloat()
+            setColor(color)
+            setStroke(dp(context, 1.25f).coerceAtLeast(1), borderColor())
+        }
     }
 
     @JvmStatic
@@ -161,43 +174,16 @@ object TuixtTheme {
 
     @JvmStatic
     fun rect(context: Context, fill: Int, stroke: Int, strokeDp: Float, radiusDp: Int): Drawable {
-        if (AppearanceSettings.cyberdeckMode()) {
-            return TerminalBorderDrawable(
-                fill,
-                stroke,
-                max(1, dp(context, strokeDp)),
-                0f,
-                false,
-                0f,
-                0f,
-                true,
-                false
-            )
-        }
-
-        val drawable = GradientDrawable()
-        drawable.shape = GradientDrawable.RECTANGLE
-        drawable.cornerRadius = dp(context, radiusDp.toFloat()).toFloat()
-        if (AppearanceSettings.dashedBorders()) {
-            val strokePx = max(
-                1,
-                dp(context, AppearanceSettings.dashedBorderStrokeWidthDp(strokeDp / 1.5f).toFloat())
-            )
-            val dashLength = AppearanceSettings.dashLength()
-            val dashGap = AppearanceSettings.dashGap()
-            if (dashLength <= 0 || dashGap <= 0) {
-                drawable.setStroke(strokePx, stroke)
-            } else {
-                drawable.setStroke(
-                    strokePx,
-                    stroke,
-                    Tuils.dpToPx(context, dashLength.toFloat()),
-                    Tuils.dpToPx(context, dashGap.toFloat())
-                )
-            }
-        }
-        drawable.setColor(fill)
-        return drawable
+        return TerminalBorderRuntime.panelDrawable(
+            context,
+            fill,
+            stroke,
+            strokeDp,
+            radiusDp,
+            AppearanceSettings.dashedBorders(),
+            cyberdeckNotch = false,
+            target = FrameTarget.SETTINGS
+        )
     }
 
     @JvmStatic
@@ -208,4 +194,10 @@ object TuixtTheme {
 
     private fun moduleButtonBackgroundColor(): Int =
         moduleButtonBackgroundPreview ?: AppearanceSettings.moduleButtonBackgroundColor()
+
+    private fun markSelection(view: TextView, selected: Boolean) {
+        val label = view.text.toString().removePrefix("✓ ")
+        view.text = if (selected) "✓ $label" else label
+        view.isSelected = selected
+    }
 }

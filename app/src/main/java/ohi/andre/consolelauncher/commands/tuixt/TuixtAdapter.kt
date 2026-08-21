@@ -23,6 +23,7 @@ import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.dp
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.rect
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.previewModuleButtonBackground
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleButton
+import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleChoice
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleColorPreview
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleInput
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleToggle
@@ -74,7 +75,6 @@ class TuixtAdapter(
     private val pendingChanges: MutableMap<XMLPrefsSave?, String?> =
         HashMap<XMLPrefsSave?, String?>()
     private var expandedColorItem: XMLPrefsSave? = null
-    private var lastEditedStatusIndex: Ui? = null
 
     init {
         this.rows = ArrayList<SettingsRow>(rows)
@@ -93,7 +93,7 @@ class TuixtAdapter(
         recyclerView?.let { captureVisibleInputs(it) }
         if (rows.any { StatusRowResolver.isStatusIndex(it.item) }) {
             val rawRows = StatusRowResolver.settings.associateWith { pendingChanges[it] ?: get(it) }
-            for ((item, value) in StatusRowResolver.normalize(rawRows, lastEditedStatusIndex).values) {
+            for ((item, value) in StatusRowResolver.normalize(rawRows).values) {
                 pendingChanges[item] = value
             }
         }
@@ -283,12 +283,6 @@ class TuixtAdapter(
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
                 override fun afterTextChanged(s: Editable) {
                     pendingChanges.put(item, s.toString())
-                    if (item is Ui && StatusRowResolver.isStatusIndex(item)) {
-                        lastEditedStatusIndex = item
-                        val values = StatusRowResolver.settings.associateWith { pendingChanges[it] ?: get(it) }
-                        val occupied = StatusRowResolver.occupiedRow(values, item, s.toString())
-                        settingHolder.input.error = occupied?.let { "Row is used by ${displayLabel(it)}; it will move when saved" }
-                    }
                 }
             }
             settingHolder.input.addTextChangedListener(settingHolder.textWatcher)
@@ -330,10 +324,9 @@ class TuixtAdapter(
                 val current = getCurrentValue(item)?.trim()?.lowercase().orEmpty()
                 for (childIndex in 0 until holder.options.childCount) {
                     val button = holder.options.getChildAt(childIndex) as? TextView ?: continue
-                    val selected = item === Toolbar.shortcut_button_1_icon ||
-                        item === Toolbar.shortcut_button_2_icon ||
-                        button.text.toString().trim().lowercase() == current
-                    styleButton(context, button, selected)
+                    val iconPicker = item === Toolbar.shortcut_button_1_icon || item === Toolbar.shortcut_button_2_icon
+                    if (iconPicker) styleButton(context, button, true)
+                    else styleChoice(context, button, button.tag == current)
                 }
             }
         }
@@ -387,6 +380,7 @@ class TuixtAdapter(
             }
             button.setLayoutParams(params)
             button.setText(option.uppercase())
+            button.tag = option
             button.setGravity(Gravity.CENTER)
             button.setSingleLine(true)
             button.setPadding(
@@ -395,7 +389,7 @@ class TuixtAdapter(
                 dp(holder.itemView.getContext(), 6f),
                 dp(holder.itemView.getContext(), 8f)
             )
-            styleButton(holder.itemView.getContext(), button, option == current)
+            styleChoice(holder.itemView.getContext(), button, option == current)
             button.setOnClickListener(View.OnClickListener { v: View? ->
                 pendingChanges.put(item, option)
                 notifyDataSetChanged()
@@ -521,7 +515,7 @@ class TuixtAdapter(
 
         if (item.type() == XMLPrefsSave.AUTO_COLOR) {
             autoButton.visibility = View.VISIBLE
-            styleButton(holder.itemView.context, autoButton, currentHex.equals("auto", true))
+            styleChoice(holder.itemView.context, autoButton, currentHex.equals("auto", true))
             autoButton.setOnClickListener {
                 holder.input.setText("auto")
                 holder.input.setSelection(4)

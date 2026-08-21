@@ -26,7 +26,8 @@ object LauncherPillStyle {
             AppearanceSettings.terminalHeaderTabBorderColor(),
             1.4f,
             3,
-            AppearanceSettings.dashedBorders()
+            AppearanceSettings.dashedBorders(),
+            target = FrameTarget.CONTROLS
         )
 
         val contentColor = ColorStateList.valueOf(AppearanceSettings.moduleNameTextColor())

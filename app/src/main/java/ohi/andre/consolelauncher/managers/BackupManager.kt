@@ -36,6 +36,7 @@ import ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceLauncherManager
 import ohi.andre.consolelauncher.managers.lua.LuaWidgetReminderManager
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.tuils.Tuils
+import ohi.andre.consolelauncher.tuils.FrameManager
 
 object BackupManager {
     private const val BACKUP_SUFFIX = ".retui-backup"
@@ -64,10 +65,6 @@ object BackupManager {
         XMLPrefsManager.XMLPrefsRoot.THEME.path,
         XMLPrefsManager.XMLPrefsRoot.UI.path,
         XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS.path
-    )
-    private val SHAREABLE_ENTRIES = setOf(
-        MANIFEST_FILE,
-        *SHAREABLE_FILES
     )
     private val REQUIRED_PERSONAL_ENTRIES = setOf(
         MANIFEST_FILE,
@@ -146,7 +143,12 @@ object BackupManager {
             kotlin.require(sourceRoot.isDirectory()) { "Preset not found" }
             sourceType = "preset"
             sourceLabel = sourceRoot.getName()
+        } else {
+            FrameManager.ensureCurrentState(context)
         }
+
+        val frameFiles = FrameManager.portableFiles(sourceRoot)
+        val sections = "theme,ui,suggestions" + if (frameFiles.isEmpty()) "" else ",frames"
 
         val out = java.io.ByteArrayOutputStream()
         val zip = java.util.zip.ZipOutputStream(out)
@@ -161,7 +163,7 @@ object BackupManager {
                         + (if (sourceLabel == null) "" else "presetName=" + ohi.andre.consolelauncher.managers.BackupManager.manifestSafeValue(
                     sourceLabel
                 ) + "\n")
-                        + "sections=theme,ui,suggestions\n")
+                        + "sections=" + sections + "\n")
             )
             for (name in ohi.andre.consolelauncher.managers.BackupManager.SHAREABLE_FILES) {
                 if (sourceLabel == null && name == XMLPrefsManager.XMLPrefsRoot.UI.path) {
@@ -171,6 +173,13 @@ object BackupManager {
                 val file = java.io.File(sourceRoot, name)
                 kotlin.require(file.isFile()) { if (sourceLabel == null) "Configuration is incomplete" else "Preset is incomplete" }
                 ohi.andre.consolelauncher.managers.BackupManager.addFileEntry(zip, name, file)
+            }
+            for (frame in frameFiles) {
+                ohi.andre.consolelauncher.managers.BackupManager.addFileEntry(
+                    zip,
+                    FrameManager.FRAME_FOLDER + "/" + frame.name,
+                    frame
+                )
             }
         } finally {
             zip.close()
@@ -285,6 +294,7 @@ object BackupManager {
                 context,
                 tempDir
             )
+            FrameManager.onFilesRestored(context)
             SpaceManager.ensureInitialized(context)
             Tuils.delete(tempDir)
             return null
@@ -312,12 +322,28 @@ object BackupManager {
             TYPE_SHAREABLE -> {
                 kotlin.require(profile == "shareable") { "Invalid shareable configuration profile" }
                 val sections = manifestValue(manifest, "sections")
-                kotlin.require(sections == "theme,suggestions" || sections == "theme,ui,suggestions") {
+                kotlin.require(
+                    sections == "theme,suggestions" ||
+                        sections == "theme,ui,suggestions" ||
+                        sections == "theme,ui,suggestions,frames"
+                ) {
                     "Unsupported shareable configuration sections"
                 }
-                val expected = if (sections == "theme,ui,suggestions") SHAREABLE_ENTRIES else
+                val expected = if (sections == "theme,suggestions")
                     setOf(MANIFEST_FILE, XMLPrefsManager.XMLPrefsRoot.THEME.path, XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS.path)
-                kotlin.require(entries == expected) { "Shareable configuration contains unsupported files" }
+                else setOf(MANIFEST_FILE, *SHAREABLE_FILES)
+                kotlin.require(entries.containsAll(expected)) { "Shareable configuration is incomplete" }
+                val extras = entries - expected
+                if (sections == "theme,ui,suggestions,frames") {
+                    kotlin.require(extras.contains(FrameManager.FRAME_FOLDER + "/" + FrameManager.STATE_FILE)) {
+                        "Shareable frame settings are incomplete"
+                    }
+                    kotlin.require(extras.all(FrameManager::isPortableEntry)) {
+                        "Shareable configuration contains unsupported files"
+                    }
+                } else {
+                    kotlin.require(extras.isEmpty()) { "Shareable configuration contains unsupported files" }
+                }
                 false
             }
             else -> throw java.lang.IllegalArgumentException("Unsupported backup package")
@@ -393,7 +419,7 @@ object BackupManager {
         }
     }
 
-    private fun isBackupCandidate(file: java.io.File, name: kotlin.String?): kotlin.Boolean {
+    internal fun isBackupCandidate(file: java.io.File, name: kotlin.String?): kotlin.Boolean {
         if (name == null || name.length == 0) return false
         if (name.startsWith(ohi.andre.consolelauncher.managers.BackupManager.SHARED_PREFS_DIR)) return false
         if (name.startsWith("spaces/.")) return false

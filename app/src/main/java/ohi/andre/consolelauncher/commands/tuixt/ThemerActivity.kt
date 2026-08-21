@@ -24,15 +24,18 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.CheckBox
 import android.widget.FrameLayout
 import android.widget.HorizontalScrollView
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.graphics.ColorUtils
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ohi.andre.consolelauncher.R
@@ -74,6 +77,8 @@ import ohi.andre.consolelauncher.managers.xml.options.Ui
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi.applyFullscreen
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi.requestNoTitleIfFullscreen
 import ohi.andre.consolelauncher.tuils.LauncherFontScale
+import ohi.andre.consolelauncher.tuils.FrameManager
+import ohi.andre.consolelauncher.tuils.FrameTarget
 import ohi.andre.consolelauncher.tuils.Tuils
 import java.io.File
 import java.io.FileOutputStream
@@ -114,6 +119,8 @@ class ThemerActivity : AppCompatActivity() {
     private var pendingFontSizeOffset: Int? = null
     private var pendingUseSystemFont: Boolean? = null
     private var pendingFontFileName: String? = null
+    private var pendingFrameTarget: FrameTarget? = null
+    private var frameEditSession: FrameManager.EditSession? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         requestNoTitleIfFullscreen(this)
@@ -176,6 +183,7 @@ class ThemerActivity : AppCompatActivity() {
             override fun getItemViewType(position: Int): Int =
                 when {
                     sectionItems[position] == FONT_SCALE_PANEL -> VIEW_TYPE_FONT_SCALE
+                    sectionItems[position] == FRAME_PANEL -> VIEW_TYPE_FRAME_PANEL
                     section == SECTION_FONTS && isFontFileName(sectionItems[position]) -> VIEW_TYPE_FONT
                     else -> VIEW_TYPE_STANDARD
                 }
@@ -183,6 +191,11 @@ class ThemerActivity : AppCompatActivity() {
             override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
                 if (viewType == VIEW_TYPE_FONT_SCALE) {
                     return createFontScaleViewHolder(parent)
+                }
+                if (viewType == VIEW_TYPE_FRAME_PANEL) {
+                    return FramePanelViewHolder(LinearLayout(parent.context).apply {
+                        orientation = LinearLayout.VERTICAL
+                    })
                 }
                 if (viewType == VIEW_TYPE_FONT) {
                     val row = LinearLayout(parent.context).apply {
@@ -214,6 +227,10 @@ class ThemerActivity : AppCompatActivity() {
                 }
                 if (holder is FontViewHolder) {
                     bindFontRow(holder, fileName)
+                    return
+                }
+                if (holder is FramePanelViewHolder) {
+                    bindFramePanel(holder)
                     return
                 }
                 val itemView = holder.itemView as TextView
@@ -257,6 +274,10 @@ class ThemerActivity : AppCompatActivity() {
                         openSection(SECTION_FONTS)
                     } else if (fileName == "Presets") {
                         openSection(SECTION_PRESETS)
+                    } else if (fileName == "Frames") {
+                        openSection(SECTION_FRAMES)
+                    } else if (section == SECTION_FRAMES) {
+                        return@OnClickListener
                     } else if (section == SECTION_PRESETS && fileName == "Save Current as Preset") {
                         showSavePresetInput()
                     } else if (section == SECTION_PRESETS && fileName == "Apply Preset") {
@@ -422,7 +443,7 @@ class ThemerActivity : AppCompatActivity() {
 
     private fun savePreset(name: String?) {
         try {
-            PresetManager.save(name ?: return)
+            PresetManager.save(this, name ?: return)
             Toast.makeText(this@ThemerActivity, "Preset saved.", Toast.LENGTH_SHORT)
                 .show()
         } catch (e: Exception) {
@@ -459,6 +480,8 @@ class ThemerActivity : AppCompatActivity() {
             return "Re:T-UI Fonts"
         } else if (SECTION_PRESETS == section) {
             return "Re:T-UI Presets"
+        } else if (SECTION_FRAMES == section) {
+            return "Re:T-UI Frames"
         } else if (SECTION_PRESET_APPLY == section) {
             return "Apply Preset"
         } else if (SECTION_PRESET_REMOVE == section) {
@@ -476,6 +499,7 @@ class ThemerActivity : AppCompatActivity() {
                 "suggestions.xml",
                 "Fonts",
                 "Presets",
+                "Frames",
                 "Open Wallpaper Picker",
                 "Open Live Wallpaper Picker"
             )
@@ -521,6 +545,8 @@ class ThemerActivity : AppCompatActivity() {
             }
         } else if (SECTION_PRESETS == section) {
             return mutableListOf("Save Current as Preset", "Apply Preset", "Remove Preset")
+        } else if (SECTION_FRAMES == section) {
+            return mutableListOf(FRAME_PANEL)
         } else if (SECTION_PRESET_APPLY == section) {
             return PresetManager.listAllPresetNames().toMutableList()
         } else if (SECTION_PRESET_REMOVE == section) {
@@ -553,6 +579,199 @@ class ThemerActivity : AppCompatActivity() {
         sectionsAdapter!!.notifyDataSetChanged()
         recyclerView!!.scrollToPosition(0)
         updateSupportFooter()
+    }
+
+    private fun bindFramePanel(holder: FramePanelViewHolder) {
+        val root = holder.root
+        root.removeAllViews()
+        root.layoutParams = RecyclerView.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+
+        val session = frameSession()
+        val applyAll = session.applyToAll
+        val toggle = CheckBox(this).apply {
+            text = "Apply one frame to all surfaces"
+            isChecked = applyAll
+            setTextColor(textColor())
+            setTypeface(Tuils.getTypeface(this@ThemerActivity), Typeface.BOLD)
+            setPadding(dp(this@ThemerActivity, 12f), dp(this@ThemerActivity, 10f), dp(this@ThemerActivity, 12f), dp(this@ThemerActivity, 10f))
+            background = rect(this@ThemerActivity, surfaceColor(), borderColor(), 1.25f)
+            buttonTintList = ColorStateList.valueOf(accentColor())
+            setOnCheckedChangeListener { _, checked ->
+                session.applyToAll = checked
+                sectionsAdapter?.notifyDataSetChanged()
+            }
+        }
+        root.addView(toggle, inputParams())
+
+        root.addView(TextView(this).apply {
+            text = if (applyAll) {
+                "The imported frame replaces generated borders on every supported surface. Without a frame, existing border behavior is unchanged."
+            } else {
+                "Assign frames by surface. Missing assignments use the existing border and cyberdeck settings."
+            }
+            setTextColor(textColor())
+            setTypeface(Tuils.getTypeface(this@ThemerActivity))
+            textSize = 12f
+            setPadding(dp(this@ThemerActivity, 8f), 0, dp(this@ThemerActivity, 8f), dp(this@ThemerActivity, 10f))
+        }, inputParams())
+
+        root.addView(TextView(this).apply {
+            text = "SAVE FRAME SETTINGS"
+            styleButton(this@ThemerActivity, this, true)
+            isEnabled = session.hasChanges()
+            alpha = if (isEnabled) 1f else 0.45f
+            setOnClickListener { saveFrameChanges() }
+        }, inputParams())
+
+        val targets: List<FrameTarget?> = if (applyAll) listOf(null) else FrameTarget.entries
+        for (target in targets) {
+            root.addView(frameAssignmentRow(target), inputParams())
+        }
+
+        val assets = session.assets()
+        if (assets.isNotEmpty()) {
+            root.addView(TextView(this).apply {
+                text = "FRAME LIBRARY"
+                setTextColor(accentColor())
+                setTypeface(Tuils.getTypeface(this@ThemerActivity), Typeface.BOLD)
+                textSize = 14f
+                setPadding(dp(this@ThemerActivity, 8f), dp(this@ThemerActivity, 12f), 0, dp(this@ThemerActivity, 8f))
+            }, inputParams())
+            assets.forEach { root.addView(frameLibraryRow(it), inputParams()) }
+        }
+    }
+
+    private fun frameAssignmentRow(target: FrameTarget?): View {
+        val session = frameSession()
+        val hasBundle = session.hasAssignedFrame(target)
+        val preview = session.previewBitmap(target)
+        val invalid = session.assignedFrameIsInvalid(target)
+
+        val row = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(this@ThemerActivity, 10f), dp(this@ThemerActivity, 10f), dp(this@ThemerActivity, 10f), dp(this@ThemerActivity, 10f))
+            background = rect(this@ThemerActivity, surfaceColor(), borderColor(), 1.25f)
+        }
+        row.addView(TextView(this).apply {
+            text = (target?.label ?: "All surfaces").uppercase(Locale.getDefault())
+            setTextColor(textColor())
+            setTypeface(Tuils.getTypeface(this@ThemerActivity), Typeface.BOLD)
+            textSize = 13f
+        })
+
+        val previewRow = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            setPadding(0, dp(this@ThemerActivity, 8f), 0, dp(this@ThemerActivity, 8f))
+        }
+        val image = ImageView(this).apply {
+            scaleType = ImageView.ScaleType.CENTER_INSIDE
+            adjustViewBounds = true
+            setBackgroundColor(ColorUtils.setAlphaComponent(surfaceColor(), 190))
+            if (preview != null) {
+                setImageBitmap(preview)
+                contentDescription = "Original frame PNG preview"
+            } else {
+                setImageResource(if (invalid) android.R.drawable.ic_menu_report_image else android.R.drawable.ic_menu_gallery)
+                alpha = if (invalid) 1f else 0.4f
+                contentDescription = if (invalid) "Frame PNG missing or corrupt" else "No frame imported"
+            }
+        }
+        previewRow.addView(image, LinearLayout.LayoutParams(dp(this, 104f), dp(this, 72f)))
+        previewRow.addView(TextView(this).apply {
+            text = when {
+                invalid -> "PNG MISSING OR CORRUPT\nDEFAULT BORDER FALLBACK"
+                preview != null -> "${session.assignedName(target) ?: "Imported frame"}\nORIGINAL PNG"
+                else -> "NO FRAME\nDEFAULT BORDER FALLBACK"
+            }
+            setTextColor(if (invalid) Color.RED else textColor())
+            setTypeface(Tuils.getTypeface(this@ThemerActivity))
+            textSize = 11f
+            setPadding(dp(this@ThemerActivity, 12f), 0, 0, 0)
+        }, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
+        row.addView(previewRow)
+
+        row.addView(TextView(this).apply {
+            val selected = session.selectedAssetId(target)
+            text = if (selected == null) "FRAME: DEFAULT BORDER" else
+                "FRAME: ${session.assignedName(target) ?: "MISSING OR CORRUPT"}"
+            styleButton(this@ThemerActivity, this, false)
+            setOnClickListener { showFrameSelector(target) }
+        }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(this, 46f)))
+
+        val actions = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
+        actions.addView(TextView(this).apply {
+            text = if (hasBundle) "REPLACE" else "IMPORT"
+            styleButton(this@ThemerActivity, this, false)
+            setOnClickListener { launchFrameImportPicker(target) }
+        }, LinearLayout.LayoutParams(0, dp(this, 46f), 1f))
+        if (hasBundle) {
+            actions.addView(View(this), LinearLayout.LayoutParams(dp(this, 8f), 1))
+            actions.addView(TextView(this).apply {
+                text = "USE DEFAULT"
+                styleButton(this@ThemerActivity, this, false)
+                setOnClickListener {
+                    session.select(target, null)
+                    reloadForFrame("Default border selected.")
+                }
+            }, LinearLayout.LayoutParams(0, dp(this, 46f), 1f))
+        }
+        row.addView(actions)
+        return row
+    }
+
+    private fun frameLibraryRow(asset: FrameManager.FrameAsset): View {
+        val session = frameSession()
+        val row = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            setPadding(dp(this@ThemerActivity, 10f), dp(this@ThemerActivity, 8f), dp(this@ThemerActivity, 10f), dp(this@ThemerActivity, 8f))
+            background = rect(this@ThemerActivity, surfaceColor(), borderColor(), 1.25f)
+        }
+        row.addView(TextView(this).apply {
+            text = if (asset.valid) asset.name else "⚠ ${asset.name}"
+            setTextColor(if (asset.valid) textColor() else Color.RED)
+            setTypeface(Tuils.getTypeface(this@ThemerActivity), Typeface.BOLD)
+        }, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
+        row.addView(TextView(this).apply {
+            text = "DELETE"
+            styleButton(this@ThemerActivity, this, false)
+            setOnClickListener { confirmDeleteFrameAsset(asset, session.references(asset.id)) }
+        }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(this, 44f)))
+        return row
+    }
+
+    private fun showFrameSelector(target: FrameTarget?) {
+        val session = frameSession()
+        val assets = session.assets()
+        val labels = mutableListOf("Default border")
+        labels.addAll(assets.map { if (it.valid) it.name else "⚠ ${it.name}" })
+        val selectedId = session.selectedAssetId(target)
+        val selectedIndex = if (selectedId == null) 0 else
+            assets.indexOfFirst { it.id == selectedId }.takeIf { it >= 0 }?.plus(1) ?: -1
+        TuixtDialog.showOptions(this, "Select Frame", labels, selectedIndex, TuixtDialog.ItemAction { index ->
+            session.select(target, if (index == 0) null else assets[index - 1].id)
+            reloadForFrame("Frame selection updated.")
+        })
+    }
+
+    private fun confirmDeleteFrameAsset(asset: FrameManager.FrameAsset, references: List<String>) {
+        val detail = if (references.isEmpty()) "" else
+            " It is currently selected for: ${references.joinToString()}. Those surfaces will use their default borders."
+        TuixtDialog.showConfirm(
+            this,
+            "Delete Frame",
+            "Delete ${asset.name}?$detail",
+            "Delete",
+            "Cancel",
+            ConfirmAction {
+                frameSession().deleteAsset(asset.id)
+                reloadForFrame("Frame deleted from library.")
+            }
+        )
     }
 
     private fun bindFontRow(holder: FontViewHolder, fileName: String) {
@@ -975,6 +1194,20 @@ class ThemerActivity : AppCompatActivity() {
 
     @SuppressLint("GestureBackNavigation")
     override fun onBackPressed() {
+        if (section == SECTION_FRAMES && frameEditSession?.hasChanges() == true) {
+            TuixtDialog.showConfirm(
+                this,
+                "Discard Changes?",
+                "Unsaved frame settings and imports will be lost.",
+                "Discard",
+                "Keep Editing",
+                ConfirmAction {
+                    discardFrameChanges()
+                    onBackPressed()
+                }
+            )
+            return
+        }
         if (section == SECTION_FONTS && hasPendingFontChanges()) {
             TuixtDialog.showConfirm(
                 this,
@@ -1245,6 +1478,46 @@ class ThemerActivity : AppCompatActivity() {
             Toast.makeText(this, "Font picker is unavailable on this device.", Toast.LENGTH_SHORT)
                 .show()
         }
+    }
+
+    private fun launchFrameImportPicker(target: FrameTarget?) {
+        pendingFrameTarget = target
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "*/*"
+            putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("application/zip", "application/octet-stream"))
+        }
+        try {
+            startActivityForResult(intent, FRAME_IMPORT_REQUEST)
+        } catch (e: ActivityNotFoundException) {
+            Toast.makeText(this, "File picker is unavailable on this device.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun reloadForFrame(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        sectionsAdapter?.notifyDataSetChanged()
+    }
+
+    private fun frameSession(): FrameManager.EditSession =
+        frameEditSession ?: FrameManager.beginEdit(this).also { frameEditSession = it }
+
+    private fun saveFrameChanges() {
+        val session = frameEditSession ?: return
+        if (!session.hasChanges()) return
+        try {
+            session.save()
+            frameEditSession = null
+            Toast.makeText(this, "Frame settings saved. Applying...", Toast.LENGTH_SHORT).show()
+            LauncherActivity.preview(this)
+        } catch (e: Exception) {
+            Toast.makeText(this, "Could not save frame settings: ${e.message}", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun discardFrameChanges() {
+        frameEditSession?.discard()
+        frameEditSession = null
     }
 
     private fun applySystemFont() {
@@ -1640,6 +1913,28 @@ class ThemerActivity : AppCompatActivity() {
             handleRestoreResult(resultCode, data)
         } else if (requestCode == FONT_IMPORT_REQUEST) {
             handleFontImportResult(resultCode, data)
+        } else if (requestCode == FRAME_IMPORT_REQUEST) {
+            handleFrameImportResult(resultCode, data)
+        }
+    }
+
+    private fun handleFrameImportResult(resultCode: Int, data: Intent?) {
+        val uri = data?.data
+        if (resultCode != RESULT_OK || uri == null) {
+            pendingFrameTarget = null
+            Toast.makeText(this, "Frame import cancelled.", Toast.LENGTH_SHORT).show()
+            return
+        }
+        try {
+            val target = pendingFrameTarget
+            val asset = contentResolver.openInputStream(uri).use { input ->
+                frameSession().importBundle(target, requireNotNull(input) { "Unable to read the selected frame." })
+            }
+            pendingFrameTarget = null
+            reloadForFrame("Frame imported: ${asset.name}")
+        } catch (e: Exception) {
+            pendingFrameTarget = null
+            Toast.makeText(this, "Frame import failed: ${e.message}", Toast.LENGTH_LONG).show()
         }
     }
 
@@ -1987,6 +2282,7 @@ class ThemerActivity : AppCompatActivity() {
         val reset: TextView,
         val save: TextView
     ) : RecyclerView.ViewHolder(itemView)
+    private class FramePanelViewHolder(val root: LinearLayout) : RecyclerView.ViewHolder(root)
 
     private class AppChoice(val label: String, val packageName: String?)
     companion object {
@@ -2006,18 +2302,22 @@ class ThemerActivity : AppCompatActivity() {
         const val SECTION_SYSTEM: String = "system"
         const val SECTION_FONTS: String = "fonts"
         const val SECTION_PRESETS: String = "presets"
+        const val SECTION_FRAMES: String = "frames"
         const val SECTION_PRESET_APPLY: String = "preset_apply"
         const val SECTION_PRESET_REMOVE: String = "preset_remove"
         private const val VIEW_TYPE_STANDARD = 0
         private const val VIEW_TYPE_FONT = 1
         private const val VIEW_TYPE_FONT_SCALE = 2
+        private const val VIEW_TYPE_FRAME_PANEL = 3
         private const val FONT_SCALE_PANEL = "__font_scale_panel__"
+        private const val FRAME_PANEL = "__frame_panel__"
         private val FONT_PREVIEW_SIZES = floatArrayOf(10f, 11f, 12f, 14f, 15f, 18f, 64f)
         private const val BACKUP_EXPORT_REQUEST = 201
         private const val BACKUP_RESTORE_REQUEST = 202
         private const val SHAREABLE_CONFIG_EXPORT_REQUEST = 203
         private const val FONT_IMPORT_REQUEST = 204
         private const val TASKER_PERMISSION_REQUEST = 205
+        private const val FRAME_IMPORT_REQUEST = 206
         private const val DYSTOPIA_HOLD_MS = 3000L
         private val DYSTOPIA_HOLD_PATTERN = longArrayOf(0L, 55L, 945L, 55L, 945L, 55L)
         private const val PLAY_STORE_PACKAGE_ID = "com.dvil.tui_renewed"

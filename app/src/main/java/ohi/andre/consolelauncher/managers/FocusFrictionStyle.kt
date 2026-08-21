@@ -15,6 +15,7 @@ import ohi.andre.consolelauncher.managers.xml.options.Suggestions
 import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.managers.xml.options.Ui
 import ohi.andre.consolelauncher.tuils.TerminalBorderRuntime
+import ohi.andre.consolelauncher.tuils.FrameTarget
 import ohi.andre.consolelauncher.tuils.Tuils
 
 object FocusFrictionStyle {
@@ -56,7 +57,8 @@ object FocusFrictionStyle {
             if (filled) text else buttonFill(),
             1.5f,
             AppearanceSettings.moduleCornerRadius(),
-            false
+            false,
+            target = FrameTarget.SETTINGS
         )
     }
 

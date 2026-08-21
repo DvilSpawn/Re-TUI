@@ -20,33 +20,38 @@ object StatusRowResolver {
 
     data class Result(val values: Map<Ui, String>, val changed: Boolean)
 
-    fun normalize(raw: Map<Ui, String?>, preferred: Ui? = null): Result {
-        val requested = settings.associateWith { parse(raw[it], it.defaultValue()) }
-        val order = settings.sortedWith(compareBy<Ui> { requested.getValue(it) }.thenBy { settings.indexOf(it) })
-            .toMutableList()
-        if (preferred in order) {
-            order.remove(preferred)
-            order.add(0, preferred!!)
-        }
-
-        val occupied = HashSet<Int>()
-        val resolved = LinkedHashMap<Ui, String>()
-        for (setting in order) {
-            var value = requested.getValue(setting)
-            while (whole(value) < 1 || !occupied.add(whole(value))) value = value.add(BigDecimal.ONE)
-            resolved[setting] = value.stripTrailingZeros().toPlainString()
-        }
-        return Result(settings.associateWith { resolved.getValue(it) }, settings.any {
+    fun normalize(raw: Map<Ui, String?>): Result {
+        val resolved = settings.associateWith { setting ->
+            var value = parse(raw[setting], setting.defaultValue())
+            while (whole(value) < 1) value = value.add(BigDecimal.ONE)
+            value.stripTrailingZeros().toPlainString()
+        }.toMutableMap()
+        val occupied = settings.asSequence()
+            .filterNot { it == Ui.ascii_index }
+            .mapTo(HashSet()) { whole(BigDecimal(resolved.getValue(it))) }
+        var ascii = BigDecimal(resolved.getValue(Ui.ascii_index))
+        while (!occupied.add(whole(ascii))) ascii = ascii.add(BigDecimal.ONE)
+        resolved[Ui.ascii_index] = ascii.stripTrailingZeros().toPlainString()
+        return Result(resolved, settings.any {
             format(parse(raw[it], it.defaultValue())) != resolved.getValue(it)
         })
     }
 
-    fun occupiedRow(raw: Map<Ui, String?>, edited: Ui, value: String): Ui? {
-        val row = whole(parse(value, edited.defaultValue()))
-        return settings.firstOrNull { it != edited && whole(parse(raw[it], it.defaultValue())) == row }
-    }
-
     fun isStatusIndex(value: Any?): Boolean = value in settings
+
+    internal fun <T> groupVisible(items: List<Pair<Float, T>>): List<List<T>> {
+        val rows = ArrayList<MutableList<T>>()
+        var lastRow: Int? = null
+        for ((value, item) in items.sortedBy { it.first }) {
+            val row = value.toInt()
+            if (row != lastRow) {
+                rows.add(ArrayList())
+                lastRow = row
+            }
+            rows.last().add(item)
+        }
+        return rows
+    }
 
     private fun parse(value: String?, fallback: String?): BigDecimal =
         try { BigDecimal(value ?: fallback ?: "1") } catch (_: Exception) { BigDecimal(fallback ?: "1") }

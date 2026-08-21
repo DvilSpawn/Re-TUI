@@ -57,7 +57,7 @@ object TerminalTrayToggleView {
                 Tuils.dpToPx(context, 2)
             )
         }
-        toggle.background = TerminalBorderRuntime.tabDrawable(context, tabBackgroundColor)
+        toggle.background = TerminalBorderRuntime.tabDrawable(context, tabBackgroundColor, FrameTarget.OUTPUT)
         TerminalBorderRuntime.bind(terminalOutputBorder, toggle)
         toggle.setOnClickListener { onClick() }
     }
@@ -81,7 +81,7 @@ object TerminalTrayToggleView {
         }
         toggle.visibility = View.VISIBLE
 
-        if (landscapeLayoutActive) {
+        if (landscapeLayoutActive && (outputTrayNativeMode || outputTrayAutoMode)) {
             toggle.foreground = null
             toggle.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null, null, null)
             if (!TextUtils.equals(toggle.text, "OUTPUT")) {

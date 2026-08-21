@@ -358,7 +358,7 @@ enum class Ui : XMLPrefsSave {
         }
 
         override fun info(): String? {
-            return "This is used to order the labels on top of the screen"
+            return "Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."
         }
     },
     ram_index {
@@ -371,7 +371,7 @@ enum class Ui : XMLPrefsSave {
         }
 
         override fun info(): String? {
-            return "This is used to order the labels on top of the screen"
+            return "Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."
         }
     },
     battery_index {
@@ -384,7 +384,7 @@ enum class Ui : XMLPrefsSave {
         }
 
         override fun info(): String? {
-            return "This is used to order the labels on top of the screen"
+            return "Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."
         }
     },
     time_index {
@@ -397,7 +397,7 @@ enum class Ui : XMLPrefsSave {
         }
 
         override fun info(): String? {
-            return "This is used to order the labels on top of the screen"
+            return "Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."
         }
     },
     show_ascii {
@@ -436,7 +436,7 @@ enum class Ui : XMLPrefsSave {
         }
 
         override fun info(): String? {
-            return "Order of the ASCII art in the status area"
+            return "ASCII always uses its own status row so the dedicated viewport remains active. If that whole-number row is occupied, ASCII moves to the next free row."
         }
     },
     ascii_size {
@@ -488,7 +488,7 @@ enum class Ui : XMLPrefsSave {
         }
 
         override fun info(): String? {
-            return "This is used to order the labels on top of the screen"
+            return "Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."
         }
     },
     network_index {
@@ -501,7 +501,7 @@ enum class Ui : XMLPrefsSave {
         }
 
         override fun info(): String? {
-            return "This is used to order the labels on top of the screen"
+            return "Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."
         }
     },
     notes_index {
@@ -514,7 +514,7 @@ enum class Ui : XMLPrefsSave {
         }
 
         override fun info(): String? {
-            return "This is used to order the labels on top of the screen"
+            return "Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."
         }
     },
     ram_status_alignment {
@@ -683,7 +683,7 @@ enum class Ui : XMLPrefsSave {
         }
 
         override fun info(): String? {
-            return "Top launcher section display margin in millimeters. [left margin],[top margin],[right margin],[bottom margin]"
+            return "Complete top pane group margins in millimeters: [left],[top],[right],[bottom]"
         }
     },
     display_margin_bottom_section {
@@ -878,7 +878,7 @@ enum class Ui : XMLPrefsSave {
         }
 
         override fun info(): String? {
-            return "This is used to order the labels on top of the screen"
+            return "Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."
         }
     },
     weather_size {
@@ -917,7 +917,7 @@ enum class Ui : XMLPrefsSave {
         }
 
         override fun info(): String? {
-            return "This is used to order the labels on top of the screen"
+            return "Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."
         }
     },
     unlock_size {
@@ -982,7 +982,7 @@ enum class Ui : XMLPrefsSave {
         }
 
         override fun info(): String? {
-            return "[horizontal_margin],[vertical_margin],[horizontal_padding],[vertical_padding]"
+            return "Status-row text padding in pixels: [left],[top],[right],[bottom]"
         }
     },
     output_field_margins {
@@ -1065,7 +1065,7 @@ enum class Ui : XMLPrefsSave {
     },
     android_widget_min_columns {
         override fun defaultValue(): String? {
-            return "2"
+            return "1"
         }
 
         override fun type(): String? {
@@ -1073,12 +1073,12 @@ enum class Ui : XMLPrefsSave {
         }
 
         override fun info(): String? {
-            return "Minimum widget width in grid columns. Use 1 to allow 1x1 widgets"
+            return "Fallback starting width when a widget app does not provide valid Android sizing metadata"
         }
     },
     android_widget_min_rows {
         override fun defaultValue(): String? {
-            return "2"
+            return "1"
         }
 
         override fun type(): String? {
@@ -1086,7 +1086,7 @@ enum class Ui : XMLPrefsSave {
         }
 
         override fun info(): String? {
-            return "Minimum widget height in grid rows. Use 1 to allow 1x1 widgets"
+            return "Fallback starting height when a widget app does not provide valid Android sizing metadata"
         }
     },
     suggestions_area_margin {
@@ -1099,7 +1099,20 @@ enum class Ui : XMLPrefsSave {
         }
 
         override fun info(): String? {
-            return "[horizontal_margin],[vertical_margin],[horizontal_padding],[vertical_padding]"
+            return "Suggestion pane spacing in pixels: [outer horizontal margin],[outer vertical margin],[inner horizontal padding],[inner vertical padding]. Also applies to contextual module suggestions; it does not control spacing between chips or module-dock buttons."
+        }
+    },
+    module_dock_spacing_dp {
+        override fun defaultValue(): String? {
+            return "8"
+        }
+
+        override fun type(): String? {
+            return XMLPrefsSave.INTEGER
+        }
+
+        override fun info(): String? {
+            return "Space between module-dock buttons in density-independent pixels."
         }
     },
     enable_dashed_border {
