@@ -219,6 +219,8 @@ class SuggestionsManager(
 
     fun dispose() {
         cancelPendingSuggestionRequests()
+        luaSuggestionEngines.values.filterNotNull().forEach(LuaWidgetEngine::dispose)
+        luaSuggestionEngines.clear()
     }
 
     fun clear() {
@@ -998,6 +1000,7 @@ class SuggestionsManager(
         val version = LuaWidgetManager.version(normalized)
         var engine = luaSuggestionEngines.get(normalized)
         if (engine == null || engine.version() != version) {
+            engine?.dispose()
             engine = LuaWidgetEngine(pack.context, normalized, script, version, null)
             luaSuggestionEngines.put(normalized, engine)
             while (luaSuggestionEngines.size > MAX_LUA_SUGGESTION_ENGINES) {
@@ -1006,7 +1009,7 @@ class SuggestionsManager(
                 if (!iterator.hasNext()) {
                     break
                 }
-                iterator.next()
+                iterator.next()?.value?.dispose()
                 iterator.remove()
             }
         }

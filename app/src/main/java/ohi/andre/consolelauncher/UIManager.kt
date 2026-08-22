@@ -5120,7 +5120,7 @@ class UIManager(
         for (id in ids) {
             LuaWidgetManager.delete(id)
             ModuleManager.removeScriptModule(mContext, id)
-            luaWidgetEngines.remove(id)
+            luaWidgetEngines.remove(id)?.dispose()
         }
     }
 
@@ -6931,7 +6931,7 @@ class UIManager(
         if (TextUtils.isEmpty(id)) {
             return
         }
-        luaWidgetEngines.remove(id)
+        luaWidgetEngines.remove(id)?.dispose()
         val modules = modulesForLuaWidget(id)
         if (modules.isEmpty()) {
             return
@@ -7023,6 +7023,7 @@ class UIManager(
         val version = LuaWidgetManager.version(id)
         var engine = luaWidgetEngines.get(id)
         if (engine == null || engine.version() != version) {
+            engine?.dispose()
             engine = LuaWidgetEngine(
                 mContext,
                 id,
@@ -10487,12 +10488,7 @@ class UIManager(
 
     private fun closePodcastSurface(restoreSuggestions: Boolean = true) {
         podcastSessionActive = false
-        listOfNotNull(podcastArtwork, podcastPlayerArt).forEach {
-            it.tag = Tuils.EMPTYSTRING
-            it.setImageDrawable(null)
-        }
-        synchronized(podcastImageCache) { podcastImageCache.evictAll() }
-        podcastArtworkUrl = null
+        clearPodcastImages()
         hidePodcastPill()
         setPodcastFocusChrome(false)
         if (launcherChromeHiddenForSurface) {
@@ -10519,6 +10515,15 @@ class UIManager(
         if (restoreSuggestions) {
             refreshSuggestionsSoon()
         }
+    }
+
+    private fun clearPodcastImages() {
+        listOfNotNull(podcastArtwork, podcastPlayerArt).forEach {
+            it.tag = Tuils.EMPTYSTRING
+            it.setImageDrawable(null)
+        }
+        synchronized(podcastImageCache) { podcastImageCache.evictAll() }
+        podcastArtworkUrl = null
     }
 
     private fun clearPodcastCommandFromInput() {
@@ -12315,6 +12320,7 @@ class UIManager(
                 Tuils.log(e)
             }
         }
+        engine?.dispose()
         luaAppTickGeneration++
         luaAppId = null
         luaAppEngine = null
@@ -15522,6 +15528,12 @@ class UIManager(
 
     fun dispose() {
         captureLauncherSurfaceSession()
+        stopTermuxWorkspaceSocketClient()
+        profilePaneController?.hide()
+        clearPodcastImages()
+        closeLuaAppSession(false)
+        luaWidgetEngines.values.filterNotNull().forEach(LuaWidgetEngine::dispose)
+        luaWidgetEngines.clear()
         if (handler != null) {
             handler!!.removeCallbacksAndMessages(null)
             handler = null

@@ -76,6 +76,7 @@ class RetuiWallpaperService : WallpaperService() {
             if (visible) {
                 val selected = RetuiWallpaperSettings.scene(this@RetuiWallpaperService)
                 if (!viewMatchesScene(selected)) {
+                    releaseView()
                     view = createView()
                     layoutView(surfaceHolder.surfaceFrame.width(), surfaceHolder.surfaceFrame.height())
                 }
@@ -121,6 +122,7 @@ class RetuiWallpaperService : WallpaperService() {
 
         override fun onDestroy() {
             handler.removeCallbacks(drawFrame)
+            releaseView()
             if (receiverRegistered) {
                 unregisterReceiver(screenReceiver)
                 receiverRegistered = false
@@ -169,6 +171,13 @@ class RetuiWallpaperService : WallpaperService() {
         private fun frameDelayMs() = when (view) {
             is BlackHoleView -> BlackHoleView.FRAME_DELAY_MS
             else -> 1000L / CsakuraView.FPS
+        }
+
+        private fun releaseView() {
+            when (val current = view) {
+                is BlackHoleView -> current.release()
+                is CsakuraView -> current.release()
+            }
         }
 
         private fun createView(): View = when (RetuiWallpaperSettings.scene(this@RetuiWallpaperService)) {

@@ -95,6 +95,7 @@ class LuaWidgetEngine(
     private var executionDeadlineMs: Long = 0
     private var executionInstructions = 0
     private var executionStage: String? = ""
+    @Volatile private var disposed = false
     private var lastResult = RenderResult()
     private val httpHeaders: MutableMap<String?, String?> = LinkedHashMap<String?, String?>()
     private val debugLines = ArrayList<String?>()
@@ -225,6 +226,18 @@ class LuaWidgetEngine(
                 lastResult = errorResult(e)
             }
             return lastResult.copy()
+        }
+    }
+
+    fun dispose() {
+        disposed = true
+        mainHandler.removeCallbacksAndMessages(null)
+        synchronized(this) {
+            globals = null
+            prefsTable = null
+            loaded = false
+            httpHeaders.clear()
+            debugLines.clear()
         }
     }
 
@@ -1641,7 +1654,9 @@ class LuaWidgetEngine(
         code: Int,
         headers: Headers?
     ) {
+        if (disposed) return
         mainHandler.post(Runnable {
+            if (disposed) return@Runnable
             val result: RenderResult?
             synchronized(this@LuaWidgetEngine) {
                 try {
@@ -1675,7 +1690,9 @@ class LuaWidgetEngine(
     }
 
     private fun handleNetworkError(callbackId: String?, error: String?) {
+        if (disposed) return
         mainHandler.post(Runnable {
+            if (disposed) return@Runnable
             val result: RenderResult?
             synchronized(this@LuaWidgetEngine) {
                 try {

@@ -181,10 +181,14 @@ class CsakuraView @JvmOverloads constructor(
     override fun onDetachedFromWindow() {
         running = false
         removeCallbacks(frame)
+        release()
+        super.onDetachedFromWindow()
+    }
+
+    fun release() {
         staticLayer?.recycle()
         staticLayer = null
         staticLayerDirty = true
-        super.onDetachedFromWindow()
     }
 
     override fun onWindowVisibilityChanged(visibility: Int) {
