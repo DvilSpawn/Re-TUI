@@ -616,7 +616,7 @@ class AsciiArtTextView : AppCompatTextView {
         private const val DEFAULT_PANE_ROWS = 10
         private const val DEFAULT_VIEWPORT_ROWS = -1
         private const val MAX_AUTO_VIEWPORT_ROWS = 48
-        private const val MAX_BITMAP_CACHE_FRAMES = 32
-        private const val MAX_BITMAP_CACHE_BYTES = 24 * 1024 * 1024
+        private const val MAX_BITMAP_CACHE_FRAMES = 8
+        private const val MAX_BITMAP_CACHE_BYTES = 8 * 1024 * 1024
     }
 }

@@ -56,12 +56,6 @@
     <!-- helps texts -->
     <string name="output_usedefapp">You can use \"apps -default_app\" instead</string>
 
-    <!-- tui folder not found -->
-    <string name="tuinotfound_app">Your apps preferences couldn\'t be loaded because your \"Re:T-UI\" folder is not readable at the moment (you should try to use the command \"restart\")</string>
-    <string name="tuinotfound_rss">Your rss preferences couldn\'t be loaded because your \"Re:T-UI\" folder is not readable at the moment (you should try to use the command \"restart\")</string>
-    <string name="tuinotfound_notifications">Your notifications preferences couldn\'t be loaded because your \"Re:T-UI\" folder is not readable at the moment (you should try to use the command \"restart\")</string>
-    <string name="tuinotfound_xmlprefs">Your xml preferences couldn\'t be loaded because your \"Re:T-UI\" folder is not readable at the moment (you should try to use the command \"restart\")</string>
-
     <!-- apps -->
     <string name="output_appnotfound">Application not found</string>
     <string name="activity_not_found">Activity not found</string>

@@ -10589,6 +10589,12 @@ class UIManager(
 
     private fun closePodcastSurface(restoreSuggestions: Boolean = true) {
         podcastSessionActive = false
+        listOfNotNull(podcastArtwork, podcastPlayerArt).forEach {
+            it.tag = Tuils.EMPTYSTRING
+            it.setImageDrawable(null)
+        }
+        synchronized(podcastImageCache) { podcastImageCache.evictAll() }
+        podcastArtworkUrl = null
         hidePodcastPill()
         setPodcastFocusChrome(false)
         if (launcherChromeHiddenForSurface) {

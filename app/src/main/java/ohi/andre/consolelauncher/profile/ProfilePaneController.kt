@@ -125,6 +125,8 @@ class ProfilePaneController(
     fun hide() {
         maskPhone()
         (pager.adapter as? QrAdapter)?.maskAll()
+        qrCache.evictAll()
+        maskedQrCache.evictAll()
         overlay.visibility = View.GONE
     }
 
