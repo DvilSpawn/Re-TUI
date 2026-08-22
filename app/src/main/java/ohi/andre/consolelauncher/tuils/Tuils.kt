@@ -1428,7 +1428,6 @@ object Tuils {
         return Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT))
     }
 
-    private const val FILEUPDATE_DELAY = 100
     private const val FORK_FOLDER_NAME = "Re-T-UI"
     private var folder: File? = null
 

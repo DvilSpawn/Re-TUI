@@ -100,7 +100,6 @@ class LauncherActivity : AppCompatActivity(), Reloadable {
 
     private var categories: MutableSet<ReloadMessageCategory?>? = null
 
-    private val stopActivity = Runnable { finishAndRemoveTask() }
 
     private val `in`: Inputable = object : Inputable {
         override fun `in`(s: String?) {

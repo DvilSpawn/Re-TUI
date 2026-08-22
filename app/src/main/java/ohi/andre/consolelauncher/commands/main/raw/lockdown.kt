@@ -68,7 +68,6 @@ class lockdown : CommandAbstraction {
     override fun onNotArgEnough(pack: ExecutePack, nArgs: Int): String = exec(pack)
 
     companion object {
-        private const val HELP = "Usage: lockdown [duration] [reason]\nExample: lockdown 30m deep work\nOptions: -status, -stop"
         private const val FIELD_HOURS = "hours"
         private const val FIELD_MINUTES = "minutes"
         private const val FIELD_REASON = "reason"

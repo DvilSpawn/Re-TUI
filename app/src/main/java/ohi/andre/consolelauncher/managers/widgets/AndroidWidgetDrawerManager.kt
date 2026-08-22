@@ -249,8 +249,7 @@ class AndroidWidgetDrawerManager(
     }
 
     fun handleActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
-        if (requestCode != REQUEST_PICK_WIDGET
-            && requestCode != REQUEST_BIND_WIDGET
+        if (requestCode != REQUEST_BIND_WIDGET
             && requestCode != REQUEST_CONFIGURE_WIDGET
         ) {
             return false
@@ -262,16 +261,6 @@ class AndroidWidgetDrawerManager(
 
         if (resultCode != Activity.RESULT_OK || appWidgetId == INVALID_WIDGET_ID) {
             deletePendingWidget(appWidgetId)
-            return true
-        }
-
-        if (requestCode == REQUEST_PICK_WIDGET) {
-            val providerInfo = appWidgetManager.getAppWidgetInfo(appWidgetId)
-            if (providerInfo?.configure != null) {
-                configureWidget(appWidgetId)
-            } else {
-                finishAddWidget(appWidgetId)
-            }
             return true
         }
 
@@ -1009,25 +998,6 @@ class AndroidWidgetDrawerManager(
         }
     }
 
-    private fun pickWidget() {
-        cleanupWidgetState()
-        val appWidgetId = appWidgetHost.allocateAppWidgetId()
-        trackAllocatedWidgetId(appWidgetId)
-        preferences.edit()
-            .putInt(KEY_PENDING_WIDGET_ID, appWidgetId)
-            .putLong(KEY_PENDING_WIDGET_STARTED_AT, System.currentTimeMillis())
-            .apply()
-        val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_PICK)
-        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-        try {
-            activity.startActivityForResult(intent, REQUEST_PICK_WIDGET)
-        } catch (e: Exception) {
-            deletePendingWidget(appWidgetId)
-            Toast.makeText(context, "Widget picker unavailable.", Toast.LENGTH_SHORT).show()
-            Tuils.log(e)
-        }
-    }
-
     private fun configureWidget(appWidgetId: Int) {
         try {
             appWidgetHost.startAppWidgetConfigureActivityForResult(
@@ -1527,48 +1497,6 @@ class AndroidWidgetDrawerManager(
         }
     }
 
-    private fun resizeWidgetFromEdge(record: WidgetRecord, edge: ResizeEdge, mode: ResizeMode) {
-        val records = loadRecords().filterValid()
-        val currentRecord = records.firstOrNull { it.appWidgetId == record.appWidgetId } ?: return
-        val otherRecords = records.filter { it.appWidgetId != currentRecord.appWidgetId }
-        val providerInfo = appWidgetManager.getAppWidgetInfo(currentRecord.appWidgetId) ?: return
-        val bounds = widgetSpanBounds(providerInfo)
-        val updatedRecord = when (edge) {
-            ResizeEdge.LEFT,
-            ResizeEdge.RIGHT -> resizeHorizontalEdge(currentRecord, otherRecords, edge, mode, bounds)
-            ResizeEdge.TOP,
-            ResizeEdge.BOTTOM -> resizeVerticalEdge(currentRecord, edge, mode, bounds)
-        }
-
-        if (updatedRecord.col == currentRecord.col
-            && updatedRecord.row == currentRecord.row
-            && updatedRecord.colSpan == currentRecord.colSpan
-            && updatedRecord.rowSpan == currentRecord.rowSpan
-        ) {
-            return
-        }
-
-        val updatedRecords = compactRecordsWithLocked(updatedRecord, records)
-
-        saveRecords(updatedRecords)
-        editingWidgetId = updatedRecord.appWidgetId
-        renderWidgets()
-    }
-
-    private fun resizeHorizontalEdge(
-        record: WidgetRecord,
-        otherRecords: List<WidgetRecord>,
-        edge: ResizeEdge,
-        mode: ResizeMode,
-        bounds: WidgetSpanBounds
-    ): WidgetRecord {
-        return if (mode == ResizeMode.SHRINK) {
-            shrinkHorizontalEdge(record, edge, bounds.minColumns, 1)
-        } else {
-            expandHorizontalEdge(record, otherRecords, edge, bounds.maxColumns, 1)
-        }
-    }
-
     private fun shrinkHorizontalEdge(
         record: WidgetRecord,
         edge: ResizeEdge,
@@ -1610,19 +1538,6 @@ class AndroidWidgetDrawerManager(
         }
 
         return moveRecordBelow(record, otherRecords, newColSpan, record.rowSpan)
-    }
-
-    private fun resizeVerticalEdge(
-        record: WidgetRecord,
-        edge: ResizeEdge,
-        mode: ResizeMode,
-        bounds: WidgetSpanBounds
-    ): WidgetRecord {
-        return if (mode == ResizeMode.SHRINK) {
-            shrinkVerticalEdge(record, edge, bounds.minRows, 1)
-        } else {
-            expandVerticalEdge(record, edge, 1, bounds.maxRows)
-        }
     }
 
     private fun shrinkVerticalEdge(
@@ -2328,11 +2243,6 @@ class AndroidWidgetDrawerManager(
         BOTTOM
     }
 
-    private enum class ResizeMode {
-        EXPAND,
-        SHRINK
-    }
-
     private inner class RetuiAppWidgetHost(context: Context, hostId: Int) :
         AppWidgetHost(context, hostId) {
 
@@ -2444,7 +2354,6 @@ class AndroidWidgetDrawerManager(
     }
 
     companion object {
-        const val REQUEST_PICK_WIDGET = 7301
         const val REQUEST_BIND_WIDGET = 7303
         const val REQUEST_CONFIGURE_WIDGET = 7302
         private const val HOST_ID = 0x5744

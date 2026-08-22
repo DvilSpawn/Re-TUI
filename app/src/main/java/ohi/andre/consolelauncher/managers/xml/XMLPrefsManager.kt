@@ -485,22 +485,6 @@ object XMLPrefsManager {
         return false
     }
 
-    private fun hasSectionComment(root: Element): Boolean {
-        val children = root.childNodes
-        for (index in 0..<children.length) {
-            val node = children.item(index)
-            if (node.nodeType != Node.COMMENT_NODE) {
-                continue
-            }
-
-
-            if (node.nodeValue.trim().startsWith("#")) {
-                return true
-            }
-        }
-        return false
-    }
-
     private fun appendSectionCommentIfNeeded(d: Document, root: Element, section: String) {
         if (lastSectionComment(root) == section.trim().lowercase(Locale.US)) {
             return

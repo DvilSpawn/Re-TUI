@@ -3137,40 +3137,6 @@ class SuggestionsManager(
         }
     }
 
-    private fun suggestTermuxDirs(
-        info: MainPack,
-        suggestions: MutableList<Suggestion?>,
-        afterLastSpace: String?,
-        beforeLastSpace: String?
-    ) {
-        val noAfterLastSpace = afterLastSpace == null || afterLastSpace.length == 0
-        if (noAfterLastSpace || "..".startsWith(afterLastSpace)) {
-            suggestions.add(
-                Suggestion(
-                    beforeLastSpace,
-                    "..",
-                    false,
-                    Suggestion.Companion.TYPE_FILE
-                )
-            )
-        }
-        if (noAfterLastSpace || File.separator.startsWith(afterLastSpace)) {
-            suggestions.add(
-                Suggestion(
-                    beforeLastSpace,
-                    File.separator,
-                    false,
-                    Suggestion.Companion.TYPE_FILE,
-                    afterLastSpace
-                )
-            )
-        }
-
-        val target = termuxTarget(info.currentDirectory, afterLastSpace)
-        requestTermuxListing(info, "dirs", target.dir)
-        addTermuxMatches(dirs(target.dir), target.leaf, suggestions, beforeLastSpace, target.holder)
-    }
-
     private fun suggestTermuxFiles(
         info: MainPack,
         suggestions: MutableList<Suggestion?>,

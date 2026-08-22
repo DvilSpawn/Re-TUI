@@ -16,7 +16,6 @@ import kotlin.math.min
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings
 
 object AutoColorManager {
-    private val NO_OVERRIDE = Int.Companion.MAX_VALUE
 
     private var appContext: Context? = null
     private var cachedPalette: Palette? = null

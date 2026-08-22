@@ -1065,10 +1065,6 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
         return doc.getElementsByTagName(ATOM_ENTRY_CHILD)
     }
 
-    private fun entryTagLabel(feed: Rss): String {
-        return if (!TextUtils.isEmpty(feed.entryTag)) feed.entryTag!! else ENTRY_CHILD + "/" + ATOM_ENTRY_CHILD
-    }
-
     private fun dateTags(feed: Rss): Array<String> {
         return if (!TextUtils.isEmpty(feed.dateTag)) {
             arrayOf(feed.dateTag!!)

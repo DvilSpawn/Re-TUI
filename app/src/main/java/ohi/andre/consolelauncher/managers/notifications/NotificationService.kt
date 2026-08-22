@@ -38,7 +38,6 @@ import android.service.notification.StatusBarNotification
 import androidx.core.app.NotificationCompat
 import android.content.ComponentName
 import java.util.ArrayList
-import java.util.ConcurrentModificationException
 import java.util.HashMap
 import java.util.Iterator
 import java.util.Map
@@ -931,19 +930,6 @@ class NotificationService : NotificationListenerService() {
                 }
             }
         }
-    }
-
-    //    0 = not found
-    //    1 = the app wasnt found -> this is the first notification from this app
-    //    2 = found
-    private fun isInPastNotifications(pkg: String?, text: String?): Int {
-        synchronized(pastNotificationsLock) {
-            try {
-                return isInPastNotificationsLocked(pkg, text)
-            } catch (e: ConcurrentModificationException) {
-            }
-        }
-        return 0
     }
 
     private fun isInPastNotificationsLocked(pkg: String?, text: String?): Int {

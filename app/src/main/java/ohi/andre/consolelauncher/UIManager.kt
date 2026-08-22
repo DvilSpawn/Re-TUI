@@ -163,7 +163,6 @@ import ohi.andre.consolelauncher.managers.termux.TermuxBridgeCache.dirs
 import ohi.andre.consolelauncher.managers.termux.TermuxBridgeCache.files
 import ohi.andre.consolelauncher.managers.termux.TermuxBridgeCache.putDirs
 import ohi.andre.consolelauncher.managers.termux.TermuxBridgeCache.putFiles
-import ohi.andre.consolelauncher.managers.termux.TermuxBridgeCache.shouldRequest
 import ohi.andre.consolelauncher.managers.termux.TermuxBridgeManager
 import ohi.andre.consolelauncher.managers.termux.TermuxBridgeManager.createResultPendingIntent
 import ohi.andre.consolelauncher.managers.termux.TermuxBridgeManager.requestRunCommandPermissionIfPossible
@@ -418,9 +417,6 @@ class UIManager(
     private var termuxWorkspaceLocalOutputHoldUntilMs = 0L
     private var termuxWorkspaceTouchStartX = 0f
     private var termuxWorkspaceTouchStartY = 0f
-    private var rssModuleTouchSpan: LongClickableSpan? = null
-    private var rssModuleTouchStartX = 0f
-    private var rssModuleTouchStartY = 0f
     private var termuxWorkspaceKeyTouchStartX = 0f
     private var termuxWorkspaceKeyTouchStartY = 0f
     private var termuxWorkspaceKeySwipeConsumed = false
@@ -529,7 +525,6 @@ class UIManager(
     private var calculatorKeypad: GridLayout? = null
     private val calculatorInput = StringBuilder()
     private var calculatorWindowAnim: AnimatorSet? = null
-    private val lastFileListingPath = ""
     private var suggestionsContainer: View? = null
     private var suggestionsVisibilityBeforeTermux = View.VISIBLE
     private var termuxConsoleOpen = false
@@ -825,7 +820,6 @@ class UIManager(
     private var lastLatitude = 0.0
     private var lastLongitude = 0.0
     private var location: String? = null
-    private val fixedLocation = false
 
     private var weatherColor = 0
     var showWeatherUpdate: Boolean = false
@@ -2511,17 +2505,6 @@ class UIManager(
                     UIUtils.dpToPx(context, TERMINAL_OUTPUT_HEADER_GAP_DP)
         )
         return max(baseInset, headerClearance)
-    }
-
-    private fun resolveTerminalWindowBgColor(bgColor: String?): Int {
-        try {
-            val color = Color.parseColor(bgColor)
-            if (color != Color.TRANSPARENT) {
-                return color
-            }
-        } catch (ignored: Exception) {
-        }
-        return terminalWindowBackground()
     }
 
     private fun setupHomeWidgetsPage(homePage: View) {
@@ -5372,17 +5355,6 @@ class UIManager(
         }
     }
 
-    private fun chooseDefaultModule(): String? {
-        val dock = ModuleManager.getDock(mContext)
-        if (dock.contains(ModuleManager.NOTIFICATIONS) && showTerminal()) {
-            return ModuleManager.NOTIFICATIONS
-        }
-        if (dock.contains(ModuleManager.MUSIC) && showWidget()) {
-            return ModuleManager.MUSIC
-        }
-        return if (dock.isEmpty()) ModuleManager.TIMER else dock.get(0)
-    }
-
     private fun showHomeModule(module: String?) {
         if (homeModulesContainer == null) return
 
@@ -6089,80 +6061,6 @@ class UIManager(
             FrameTarget.MODULES
         )
         styleModuleClose(close)
-    }
-
-    private fun handleRssModuleLinkTouch(body: TextView, event: MotionEvent): Boolean {
-        val action = event.actionMasked
-        if (
-            action != MotionEvent.ACTION_DOWN &&
-            action != MotionEvent.ACTION_MOVE &&
-            action != MotionEvent.ACTION_UP &&
-            action != MotionEvent.ACTION_CANCEL
-        ) {
-            return false
-        }
-
-        if (action == MotionEvent.ACTION_DOWN) {
-            val span = findRssModuleSpan(body, event) ?: return false
-            rssModuleTouchSpan = span
-            rssModuleTouchStartX = event.x
-            rssModuleTouchStartY = event.y
-            body.parent?.requestDisallowInterceptTouchEvent(true)
-            return true
-        }
-
-        val span = rssModuleTouchSpan ?: return false
-        if (action == MotionEvent.ACTION_MOVE) {
-            val slop = ViewConfiguration.get(body.context).scaledTouchSlop
-            if (abs(event.x - rssModuleTouchStartX) > slop || abs(event.y - rssModuleTouchStartY) > slop) {
-                rssModuleTouchSpan = null
-                body.parent?.requestDisallowInterceptTouchEvent(false)
-                return false
-            }
-            return true
-        }
-
-        rssModuleTouchSpan = null
-        body.parent?.requestDisallowInterceptTouchEvent(false)
-        if (action == MotionEvent.ACTION_UP && findRssModuleSpan(body, event) === span) {
-            span.onClick(body)
-            body.performClick()
-            return true
-        }
-
-        return action == MotionEvent.ACTION_CANCEL
-    }
-
-    private fun findRssModuleSpan(body: TextView, event: MotionEvent): LongClickableSpan? {
-        val text = body.text
-        if (text !is Spanned) {
-            return null
-        }
-
-        val layout = body.layout ?: return null
-        val x = event.x.toInt() - body.totalPaddingLeft + body.scrollX
-        val y = event.y.toInt() - body.totalPaddingTop + body.scrollY
-        if (y < 0 || y > body.height) {
-            return null
-        }
-
-        val line = layout.getLineForVertical(y)
-        if (x < layout.getLineLeft(line) || x > layout.getLineRight(line)) {
-            return null
-        }
-
-        val offset = layout.getOffsetForHorizontal(line, x.toFloat())
-        val spans = text.getSpans(offset, offset, LongClickableSpan::class.java)
-        if (!spans.isEmpty()) {
-            return spans[0]
-        }
-
-        val lineSpans = text.getSpans(
-            layout.getLineStart(line),
-            layout.getLineEnd(line),
-            LongClickableSpan::class.java
-        )
-        return if (lineSpans.isEmpty()) null else lineSpans[0]
     }
 
     private fun renderRssModuleLines(
@@ -11490,65 +11388,6 @@ class UIManager(
         addPodcastView(row)
     }
 
-    private fun addPodcastShowRow(
-        show: PodcastShow,
-        selected: Boolean,
-        action: Runnable,
-        longAction: Runnable
-    ) {
-        val row = LinearLayout(mContext)
-        row.orientation = LinearLayout.HORIZONTAL
-        row.gravity = Gravity.CENTER_VERTICAL
-        row.setPadding(
-            Tuils.dpToPx(mContext, 8),
-            Tuils.dpToPx(mContext, 6),
-            Tuils.dpToPx(mContext, 4),
-            Tuils.dpToPx(mContext, 6)
-        )
-        row.setOnClickListener { action.run() }
-        row.setOnLongClickListener {
-            longAction.run()
-            true
-        }
-
-        val image = ImageView(mContext)
-        image.scaleType = ImageView.ScaleType.CENTER_CROP
-        loadPodcastImage(show.imageUrl, image)
-        row.addView(image, LinearLayout.LayoutParams(Tuils.dpToPx(mContext, 42), Tuils.dpToPx(mContext, 42)))
-
-        val text = TextView(mContext)
-        val showText = SpannableStringBuilder(show.title)
-            .append('\n')
-            .append(show.episodes.size.toString())
-            .append(" episodes")
-        showText.setSpan(
-            RelativeSizeSpan(PODCAST_TEXT_LARGE / PODCAST_TEXT_MEDIUM),
-            0,
-            show.title.length,
-            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-        )
-        text.text = showText
-        text.setTextColor(notificationWidgetTextColor())
-        text.setTypeface(Tuils.getTypeface(mContext), if (selected) Typeface.BOLD else Typeface.NORMAL)
-        text.textSize = PODCAST_TEXT_MEDIUM
-        text.maxLines = 3
-        text.ellipsize = TextUtils.TruncateAt.END
-        val textParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
-        textParams.marginStart = Tuils.dpToPx(mContext, 8)
-        row.addView(text, textParams)
-
-        val menu = TextView(mContext)
-        menu.text = "..."
-        menu.gravity = Gravity.CENTER
-        menu.textSize = PODCAST_TEXT_LARGE
-        menu.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
-        menu.setTextColor(notificationWidgetTextColor())
-        menu.setOnClickListener { showPodcastShowMenu(show, menu) }
-        row.addView(menu, LinearLayout.LayoutParams(Tuils.dpToPx(mContext, 42), Tuils.dpToPx(mContext, 36)))
-
-        addPodcastView(row)
-    }
-
     private fun showPodcastShowMenu(show: PodcastShow, anchor: View) {
         val menu = PopupMenu(anchor.context, anchor)
         menu.menu.add(0, 1, 0, "Edit tags")
@@ -11770,27 +11609,6 @@ class UIManager(
         }
 
         renderFileConsole(buildNativeFileListing(mainPack!!.currentDirectory))
-    }
-
-    private fun requestFileConsoleTermuxListing(path: String, force: Boolean) {
-        if (force || shouldRequest("dirs", path)) {
-            TermuxBridgeManager.dispatchShell(
-                mContext!!,
-                "fm-dirs " + path,
-                tbridge.LIST_DIRS_SCRIPT,
-                TermuxBridgeManager.TERMUX_HOME,
-                path
-            )
-        }
-        if (force || shouldRequest("files", path)) {
-            TermuxBridgeManager.dispatchShell(
-                mContext!!,
-                "fm-files " + path,
-                tbridge.LIST_FILES_SCRIPT,
-                TermuxBridgeManager.TERMUX_HOME,
-                path
-            )
-        }
     }
 
     private fun buildNativeFileListing(directory: File?): String {
@@ -12757,11 +12575,6 @@ class UIManager(
         } else {
             appendTermuxLine("Termux app not removed: " + id)
         }
-    }
-
-    private fun openTermuxAppSession(app: TermuxAppManager.TermuxApp) {
-        // ponytail: interactive Termux apps live on the tmux workspace only.
-        handleTermuxWorkspaceExternalCommand("launch " + app.id)
     }
 
     private fun submitTermuxAppInput(rawCommand: String?) {
@@ -16411,7 +16224,6 @@ class UIManager(
         private const val OUTPUT_TRAY_MODE_NATIVE = "native"
         private const val OUTPUT_TRAY_MODE_AUTO = "auto"
         private const val OUTPUT_TRAY_MODE_TOGGLED = "toggled"
-        private const val OUTPUT_HEADER_MODE_NORMAL = "normal"
         private const val OUTPUT_HEADER_MODE_ARROWS = "arrows"
         private const val OUTPUT_HEADER_MODE_NONE = "none"
         private const val MODULE_TEXT_FONT_THEME = "theme"
