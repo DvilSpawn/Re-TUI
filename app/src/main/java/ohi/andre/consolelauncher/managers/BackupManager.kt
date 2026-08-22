@@ -119,7 +119,6 @@ object BackupManager {
         uri: android.net.Uri,
         password: kotlin.String? = null
     ) {
-        kotlin.require(!(context == null || uri == null)) { "Backup destination is required" }
         val backup = ohi.andre.consolelauncher.managers.BackupManager.createPersonalBackup(context)
         val payload = if (!password.isNullOrEmpty()) encrypt(backup, password) else backup
         writeVerified(context, uri, payload)
@@ -132,8 +131,6 @@ object BackupManager {
         uri: android.net.Uri,
         presetName: kotlin.String? = null
     ) {
-        kotlin.require(!(context == null || uri == null)) { "Configuration destination is required" }
-
         val preset = if (presetName == null) null else presetName.trim { it <= ' ' }
         var sourceRoot: java.io.File = Tuils.getFolder()
         var sourceType = "current"
@@ -225,8 +222,6 @@ object BackupManager {
         uri: android.net.Uri,
         password: kotlin.String? = null
     ): kotlin.String? {
-        kotlin.require(!(context == null || uri == null)) { "Backup package is required" }
-
         val tempDir: java.io.File = java.io.File(Tuils.getFolder(), ".restore-importing")
         if (tempDir.exists()) {
             Tuils.delete(tempDir)
@@ -356,9 +351,8 @@ object BackupManager {
         uri: android.net.Uri?
     ): kotlin.Boolean {
         if (context == null || uri == null) return false
-        val `in`: java.io.InputStream =
-            java.io.BufferedInputStream(context.getContentResolver().openInputStream(uri))
-        if (`in` == null) return false
+        val source = context.getContentResolver().openInputStream(uri) ?: return false
+        val `in`: java.io.InputStream = java.io.BufferedInputStream(source)
         try {
             val header =
                 kotlin.ByteArray(ohi.andre.consolelauncher.managers.BackupManager.ENCRYPTED_MAGIC.size)

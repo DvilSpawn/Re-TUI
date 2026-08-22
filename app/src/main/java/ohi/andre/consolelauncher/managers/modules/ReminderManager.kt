@@ -206,7 +206,7 @@ object ReminderManager {
             reminder.title,
             reminder.atMillis,
             PendingIntent.FLAG_UPDATE_CURRENT
-        )
+        ) ?: return
         alarm.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, reminder.atMillis, pendingIntent)
     }
 
@@ -214,9 +214,7 @@ object ReminderManager {
         val alarm = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager?
         if (alarm == null) return
         val pendingIntent = pendingIntent(context, id, "", 0L, PendingIntent.FLAG_NO_CREATE)
-        if (pendingIntent != null) {
-            alarm.cancel(pendingIntent)
-        }
+        if (pendingIntent != null) alarm.cancel(pendingIntent)
     }
 
     private fun pendingIntent(
@@ -225,7 +223,7 @@ object ReminderManager {
         title: String?,
         atMillis: kotlin.Long,
         flag: Int
-    ): PendingIntent {
+    ): PendingIntent? {
         val intent = Intent(context, ReminderReceiver::class.java)
         intent.putExtra(EXTRA_ID, id)
         intent.putExtra(EXTRA_TITLE, title)

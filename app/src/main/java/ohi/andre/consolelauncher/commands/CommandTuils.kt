@@ -407,7 +407,7 @@ object CommandTuils {
             toVerify = toVerify + strings.get(count)
 
             val info = getFile(toVerify, cd)
-            if (info.file != null && info.notFound == null) {
+            if (info.notFound == null) {
                 while (count-- >= 0) strings.removeAt(0)
 
                 val residual = Tuils.toPlanString(strings, Tuils.SPACE)

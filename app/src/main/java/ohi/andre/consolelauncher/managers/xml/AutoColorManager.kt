@@ -81,8 +81,7 @@ object AutoColorManager {
 
     @RequiresApi(api = Build.VERSION_CODES.O_MR1)
     private fun buildFromWallpaperColors(colors: WallpaperColors): Palette {
-        val primary =
-            if (colors.getPrimaryColor() != null) colors.getPrimaryColor().toArgb() else Color.BLACK
+        val primary = colors.getPrimaryColor().toArgb()
         val secondary = if (colors.getSecondaryColor() != null) colors.getSecondaryColor()!!
             .toArgb() else primary
         val tertiary = if (colors.getTertiaryColor() != null) colors.getTertiaryColor()!!

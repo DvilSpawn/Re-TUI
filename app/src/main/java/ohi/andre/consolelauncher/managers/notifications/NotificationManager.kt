@@ -76,11 +76,6 @@ class NotificationManager private constructor(context: Context?) : XMLPrefsEleme
         run loadPrefs@ {
         try {
             val r = Tuils.getFolder()
-            if (r == null) {
-                context?.let { Tuils.sendOutput(Color.RED, it, R.string.tuinotfound_notifications) }
-                return@loadPrefs
-            }
-
             val file = File(r, PATH)
             if (!file.exists()) {
                 XMLPrefsManager.resetFile(file, NAME)

@@ -1802,7 +1802,6 @@ object Shell {
                 }
 
                 if ((handler != null) &&
-                    (handler.getLooper() != null) &&
                     (handler.getLooper() != Looper.myLooper())
                 ) {
                     // If the callbacks are posted to a different thread than

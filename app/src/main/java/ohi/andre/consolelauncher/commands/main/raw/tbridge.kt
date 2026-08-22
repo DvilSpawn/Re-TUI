@@ -12,7 +12,7 @@ class tbridge : CommandAbstraction {
     override fun exec(pack: ExecutePack): String? {
         val info = pack as MainPack
         val input = info.getString()
-        if (input == null || input.trim().isEmpty()) {
+        if (input.trim().isEmpty()) {
             return info.res.getString(helpRes())
         }
 

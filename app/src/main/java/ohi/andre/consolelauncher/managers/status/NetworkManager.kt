@@ -65,7 +65,7 @@ class NetworkManager(
 
     private val wifiManager: WifiManager
     private val mBluetoothAdapter: BluetoothAdapter?
-    private val connectivityManager: ConnectivityManager?
+    private val connectivityManager: ConnectivityManager
 
     private var cmClass: Class<*>? = null
     private var method: Method? = null
@@ -74,13 +74,13 @@ class NetworkManager(
 
     init {
         connectivityManager =
-            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         wifiManager =
             context.getApplicationContext().getSystemService(Context.WIFI_SERVICE) as WifiManager
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
 
         try {
-            cmClass = Class.forName(connectivityManager!!.javaClass.getName())
+            cmClass = Class.forName(connectivityManager.javaClass.getName())
             method = cmClass!!.getDeclaredMethod("getMobileDataEnabled")
             method!!.setAccessible(true)
         } catch (e: Exception) {
@@ -116,15 +116,13 @@ class NetworkManager(
         var wifiName: String? = null
         if (wifiOn) {
             val connectionInfo = wifiManager.getConnectionInfo()
-            if (connectionInfo != null) {
-                wifiName = cleanWifiName(connectionInfo.getSSID())
-            }
+            wifiName = cleanWifiName(connectionInfo.getSSID())
         }
 
         var mobileOn = false
         try {
             mobileOn =
-                method != null && connectivityManager != null && method!!.invoke(connectivityManager) as? Boolean == true
+                method != null && method!!.invoke(connectivityManager) as? Boolean == true
         } catch (e: Exception) {
         }
 

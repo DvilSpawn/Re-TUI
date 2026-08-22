@@ -387,7 +387,7 @@ class ReplyManager(context: Context) : XMLPrefsElement {
         val out = ArrayList<RemoteInput>()
         for (i in compatRemoteInputs.indices) {
             val compat = compatRemoteInputs[i]
-            if (compat == null || compat.getResultKey() == null) continue
+            if (compat == null) continue
 
             val builder = RemoteInput.Builder(compat.getResultKey())
                 .setLabel(compat.getLabel())

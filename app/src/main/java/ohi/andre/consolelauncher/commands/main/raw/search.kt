@@ -22,7 +22,7 @@ class search : ParamCommand() {
         add {
             override fun exec(pack: ExecutePack): String? {
                 val args = pack.getList<String?>()
-                if (args == null || args.size < 2) {
+                if (args.size < 2) {
                     return usageAdd()
                 }
 
@@ -55,7 +55,7 @@ class search : ParamCommand() {
         rm {
             override fun exec(pack: ExecutePack): String? {
                 val args = pack.getList<String?>()
-                if (args == null || args.isEmpty()) return "Usage: search -rm [param]"
+                if (args.isEmpty()) return "Usage: search -rm [param]"
 
                 val name = args.get(0) ?: return "Usage: search -rm [param]"
                 if (isReserved(name)) {
@@ -150,8 +150,7 @@ class search : ParamCommand() {
 
         override fun exec(pack: ExecutePack): String {
             val args = pack.getList<String?>()
-            val query =
-                if (args == null) Tuils.EMPTYSTRING else Tuils.toPlanString(args, Tuils.SPACE)
+            val query = Tuils.toPlanString(args, Tuils.SPACE)
             return open(provider, query, pack)
         }
 

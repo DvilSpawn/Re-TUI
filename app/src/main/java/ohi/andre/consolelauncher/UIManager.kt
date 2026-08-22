@@ -672,7 +672,7 @@ class UIManager(
                 }
             } else if (musicWidget != null && musicWidget.getVisibility() == View.VISIBLE) {
                 if (MusicService.SOURCE_INTERNAL == activeMusicSource) {
-                    if (mainPack != null && mainPack.player != null && mainPack.player!!.isPlaying()) {
+                    if (mainPack.player != null && mainPack.player!!.isPlaying()) {
                         shouldContinue = true
                         val intent: Intent = Intent(ACTION_MUSIC_CHANGED)
                         val index = mainPack.player!!.songIndex
@@ -1478,9 +1478,7 @@ class UIManager(
             return
         }
 
-        if (mExecuter != null) {
-            mExecuter.execute(normalized, null)
-        }
+        mExecuter.execute(normalized, null)
     }
 
     private fun openToolbarShortcutSettings() {
@@ -1595,13 +1593,10 @@ class UIManager(
     }
 
     fun enableLastDuoSide(): String {
-        var side: String = (if (preferences != null)
-            preferences.getString(
-                ohi.andre.consolelauncher.UIManager.Companion.DUO_LAST_SIDE_PREF,
-                ohi.andre.consolelauncher.UIManager.Companion.DUO_LAYOUT_RIGHT
-            )
-        else
-            ohi.andre.consolelauncher.UIManager.Companion.DUO_LAYOUT_RIGHT)!!
+        var side: String = preferences.getString(
+            ohi.andre.consolelauncher.UIManager.Companion.DUO_LAST_SIDE_PREF,
+            ohi.andre.consolelauncher.UIManager.Companion.DUO_LAYOUT_RIGHT
+        )!!
         if (DUO_LAYOUT_OFF == normalizeDuoLayoutMode(side)) {
             side = DUO_LAYOUT_RIGHT
         }
@@ -1611,13 +1606,11 @@ class UIManager(
     fun setDuoLayoutMode(mode: String?): String {
         val normalized: String = normalizeDuoLayoutMode(mode)
         duoLayoutMode = normalized
-        if (preferences != null) {
-            val editor = preferences!!.edit().putString(DUO_LAYOUT_PREF, normalized)
-            if (DUO_LAYOUT_OFF != normalized) {
-                editor.putString(DUO_LAST_SIDE_PREF, normalized)
-            }
-            editor.apply()
+        val editor = preferences.edit().putString(DUO_LAYOUT_PREF, normalized)
+        if (DUO_LAYOUT_OFF != normalized) {
+            editor.putString(DUO_LAST_SIDE_PREF, normalized)
         }
+        editor.apply()
         applyResponsiveLandscapeLayoutOnMainThread()
         return normalized
     }
@@ -1664,9 +1657,7 @@ class UIManager(
         duoLayoutActive = false
         activeDuoLayoutMode = DUO_LAYOUT_OFF
         landscapeSplitContainer!!.setVisibility(View.VISIBLE)
-        applyLandscapeFoldGutter(
-            if (mContext != null) mContext!!.getResources().getConfiguration() else null
-        )
+        applyLandscapeFoldGutter(mContext.resources.configuration)
 
         landscapeLeftPane!!.addView(
             mainContainer, FrameLayout.LayoutParams(
@@ -1698,9 +1689,7 @@ class UIManager(
         val activeMode = getDuoLayoutMode()
         activeDuoLayoutMode = activeMode
         landscapeSplitContainer!!.setVisibility(View.VISIBLE)
-        applyLandscapeFoldGutter(
-            if (mContext != null) mContext!!.getResources().getConfiguration() else null
-        )
+        applyLandscapeFoldGutter(mContext.resources.configuration)
 
         val targetPane =
             (if (ohi.andre.consolelauncher.UIManager.Companion.DUO_LAYOUT_LEFT == activeMode) landscapeLeftPane else landscapeRightPane)!!
@@ -1838,10 +1827,6 @@ class UIManager(
     }
 
     private fun attachDuoSwitchButton(activeMode: String?) {
-        if (mContext == null) {
-            return
-        }
-
         val moveToLeft = DUO_LAYOUT_RIGHT == activeMode
         val emptyPane = getDuoEmptyPane(activeMode)
         if (emptyPane == null) {
@@ -1882,7 +1867,7 @@ class UIManager(
     }
 
     private fun applyLandscapeFoldGutter(configuration: Configuration?) {
-        if (landscapeFoldGutter == null || mContext == null) {
+        if (landscapeFoldGutter == null) {
             return
         }
 
@@ -2064,9 +2049,7 @@ class UIManager(
     }
 
     private fun applyDisplayMarginsForConfiguration(configuration: Configuration?) {
-        if (mRootView == null || mContext == null) {
-            return
-        }
+        if (mRootView == null) return
 
         val landscape = shouldUseResponsiveLandscape(configuration)
         applyLandscapeFoldGutter(configuration)
@@ -2244,21 +2227,19 @@ class UIManager(
     }
 
     private fun restoreTerminalTrayState() {
-        if (this.isOutputTrayToggledMode && preferences != null) {
-            terminalTrayExpanded = preferences!!.getBoolean(PREF_OUTPUT_TRAY_EXPANDED, false)
+        if (this.isOutputTrayToggledMode) {
+            terminalTrayExpanded = preferences.getBoolean(PREF_OUTPUT_TRAY_EXPANDED, false)
         } else if (this.isOutputTrayAutoMode) {
             terminalTrayExpanded = TextUtils.isEmpty(activeModule)
         } else {
             terminalTrayExpanded = false
-            if (preferences != null) {
-                preferences!!.edit().remove(PREF_OUTPUT_TRAY_EXPANDED).apply()
-            }
+            preferences.edit().remove(PREF_OUTPUT_TRAY_EXPANDED).apply()
         }
     }
 
     private fun saveTerminalTrayState() {
-        if (this.isOutputTrayToggledMode && preferences != null) {
-            preferences!!.edit().putBoolean(PREF_OUTPUT_TRAY_EXPANDED, terminalTrayExpanded).apply()
+        if (this.isOutputTrayToggledMode) {
+            preferences.edit().putBoolean(PREF_OUTPUT_TRAY_EXPANDED, terminalTrayExpanded).apply()
         }
     }
 
@@ -2422,10 +2403,7 @@ class UIManager(
     }
 
     private fun outputTrayMode(): String {
-        var mode = XMLPrefsManager.get(Behavior.output_tray_mode)
-        if (mode != null) {
-            mode = mode.trim { it <= ' ' }.lowercase()
-        }
+        val mode = XMLPrefsManager.get(Behavior.output_tray_mode).trim { it <= ' ' }.lowercase()
         if (OUTPUT_TRAY_MODE_TOGGLED == mode && this.isOutputHeaderNone) {
             return OUTPUT_TRAY_MODE_NATIVE
         }
@@ -3167,7 +3145,7 @@ class UIManager(
     ) {
         key.text = if (active) "$label*" else label
         key.alpha = if (active) 1f else 0.82f
-        if (active && mContext != null) {
+        if (active) {
             key.setTextColor(terminalWindowBackground())
             key.setBackground(
                 TerminalBorderRuntime.panelDrawable(
@@ -3304,7 +3282,7 @@ class UIManager(
     }
 
     private fun styleTermuxWorkspaceChromeButton(button: TextView?) {
-        if (button == null || mContext == null) {
+        if (button == null) {
             return
         }
         button.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
@@ -3316,15 +3294,15 @@ class UIManager(
             Tuils.dpToPx(mContext, 3),
             0
         )
-        button.setBackground(TerminalBorderRuntime.tabDrawable(mContext!!, terminalHeaderTabBackground(), FrameTarget.OVERLAYS))
+        button.setBackground(TerminalBorderRuntime.tabDrawable(mContext, terminalHeaderTabBackground(), FrameTarget.OVERLAYS))
     }
 
     private fun styleTermuxWorkspaceChromeIcon(button: TextView?, drawableId: Int) {
         styleTermuxWorkspaceChromeButton(button)
-        if (button == null || mContext == null) {
+        if (button == null) {
             return
         }
-        val icon = ContextCompat.getDrawable(mContext!!, drawableId) ?: return
+        val icon = ContextCompat.getDrawable(mContext, drawableId) ?: return
         val wrapped = DrawableCompat.wrap(icon).mutate()
         DrawableCompat.setTint(wrapped, notificationWidgetTextColor())
         val size = Tuils.dpToPx(mContext, 12)
@@ -3391,7 +3369,7 @@ class UIManager(
             refreshTermuxWorkspace(true)
         } else if ("help" == verb) {
             renderTermuxWorkspaceHelp()
-        } else if (context != null && rest.isEmpty() && TermuxWorkspaceLauncherManager.resolve(context, verb) != null) {
+        } else if (rest.isEmpty() && TermuxWorkspaceLauncherManager.resolve(context, verb) != null) {
             launchTermuxWorkspaceLauncher(verb)
         } else if (isLikelyTermuxWorkspaceWindowTarget(command)) {
             selectTermuxWorkspaceWindow(command)
@@ -5148,7 +5126,7 @@ class UIManager(
     )
 
     private fun pruneBundledLuaSamples() {
-        if (bundledLuaSamplesPruned || mContext == null) return
+        if (bundledLuaSamplesPruned) return
         bundledLuaSamplesPruned = true
         val ids = ArrayList<String?>(LuaWidgetManager.bundledSampleIds())
         for (id in LuaWidgetManager.listIds()) {
@@ -5467,9 +5445,6 @@ class UIManager(
     }
 
     private fun ensureSystemLuaModules() {
-        if (mContext == null) {
-            return
-        }
         try {
             LuaWidgetManager.ensureSystemTimerWidget()
             val timerSource =
@@ -6814,11 +6789,7 @@ class UIManager(
     }
 
     private fun buildRssModuleText(): CharSequence? {
-        val manager = if (mainPack != null) mainPack!!.rssManager else null
-        if (manager == null) {
-            return "RSS manager unavailable."
-        }
-        return manager.buildModuleText()
+        return mainPack.rssManager?.buildModuleText() ?: "RSS manager unavailable."
     }
 
     private fun buildWeatherModuleText(): String {
@@ -7179,7 +7150,7 @@ class UIManager(
                                 LuaWidgetManager.consentPayload(updatedWidgetId)
                             )
                             handler!!.removeCallbacks(luaWidgetTickRunnable)
-                        } else if (result != null) {
+                        } else {
                             ModuleManager.setScriptText(
                                 mContext,
                                 module,
@@ -7187,8 +7158,7 @@ class UIManager(
                             )
                         }
                         if (module == activeModule) {
-                            if (result != null
-                                && LuaWidgetManager.isEnabled(updatedWidgetId)
+                            if (LuaWidgetManager.isEnabled(updatedWidgetId)
                                 && LuaWidgetManager.isTrusted(updatedWidgetId)
                             ) {
                                 repaintActiveLuaWidgetModule(module, updatedWidgetId, result)
@@ -8849,12 +8819,12 @@ class UIManager(
 
             val username = XMLPrefsManager.get(Ui.username)
             var deviceName = XMLPrefsManager.get(Ui.deviceName)
-            if (deviceName == null || deviceName.length == 0) {
+            if (deviceName.length == 0) {
                 deviceName = Build.DEVICE
             }
 
             deviceFormat = USERNAME.matcher(deviceFormat)
-                .replaceAll(Matcher.quoteReplacement(if (username != null) username else "null"))
+                .replaceAll(Matcher.quoteReplacement(username))
             deviceFormat = DV.matcher(deviceFormat).replaceAll(Matcher.quoteReplacement(deviceName))
             deviceFormat = Tuils.patternNewline.matcher(deviceFormat)
                 .replaceAll(Matcher.quoteReplacement(Tuils.NEWLINE))
@@ -10939,7 +10909,7 @@ class UIManager(
 
         podcastNowTitle?.text = when {
             active != null -> active.title
-            isPodcast && current != null -> current.getTitle()
+            current != null -> current.getTitle()
             selected != null -> selected.title
             else -> "No podcast playing"
         }
@@ -11769,9 +11739,7 @@ class UIManager(
             return
         }
 
-        if (mExecuter != null) {
-            mExecuter.execute(command, null)
-        }
+        mExecuter.execute(command, null)
 
         if (lower == "cd" || lower.startsWith("cd ")) {
             refreshFileConsole(true)
@@ -11786,7 +11754,7 @@ class UIManager(
     }
 
     private fun refreshFileConsole(forceTermuxRequest: Boolean) {
-        if (fileOverlay == null || fileOverlay!!.getVisibility() != View.VISIBLE || mainPack == null || mainPack!!.currentDirectory == null) {
+        if (fileOverlay == null || fileOverlay!!.getVisibility() != View.VISIBLE) {
             return
         }
 
@@ -13841,16 +13809,16 @@ class UIManager(
     }
 
     private fun resolveTermuxAlias(candidate: String?): String {
-        if (candidate == null || candidate.length == 0 || mainPack == null || mainPack!!.aliasManager == null) {
-            return candidate!!
+        if (candidate == null || candidate.length == 0) {
+            return candidate ?: Tuils.EMPTYSTRING
         }
 
-        var alias = mainPack!!.aliasManager.getAlias(candidate, false, AliasManager.SCOPE_SCRIPT)
-        if (alias == null || alias.size == 0 || alias[0] == null || alias[0]!!.trim { it <= ' ' }.length == 0) {
-            alias = mainPack!!.aliasManager.getAlias(candidate, false)
+        var alias = mainPack.aliasManager.getAlias(candidate, false, AliasManager.SCOPE_SCRIPT)
+        if (alias.size == 0 || alias[0] == null || alias[0]!!.trim { it <= ' ' }.length == 0) {
+            alias = mainPack.aliasManager.getAlias(candidate, false)
         }
 
-        if (alias == null || alias.size == 0 || alias[0] == null || alias[0]!!.trim { it <= ' ' }.length == 0) {
+        if (alias.size == 0 || alias[0] == null || alias[0]!!.trim { it <= ' ' }.length == 0) {
             return candidate
         }
 
@@ -14050,11 +14018,9 @@ class UIManager(
                     .toTypedArray()[0].trim { it <= ' ' }
             val folder = File(newPath)
             mainPack!!.currentDirectory = folder
-            if (MainManager.interactive != null) {
-                MainManager.interactive.addCommand(
-                    "cd '" + folder.getAbsolutePath().replace("'", "'\\''") + "'"
-                )
-            }
+            MainManager.interactive.addCommand(
+                "cd '" + folder.getAbsolutePath().replace("'", "'\\''") + "'"
+            )
             LocalBroadcastManager.getInstance(mContext!!.getApplicationContext()).sendBroadcast(
                 Intent(
                     ACTION_UPDATE_HINT
@@ -14123,7 +14089,7 @@ class UIManager(
     }
 
     private fun updateFileConsoleFromTermux(path: String?, error: String?) {
-        if (fileOverlay == null || fileOverlay!!.getVisibility() != View.VISIBLE || mainPack == null || mainPack!!.currentDirectory == null) {
+        if (fileOverlay == null || fileOverlay!!.getVisibility() != View.VISIBLE) {
             return
         }
         val current = mainPack!!.currentDirectory.getAbsolutePath()
@@ -14348,11 +14314,10 @@ class UIManager(
 
     private fun applyPodcastPillDock(tab: View) {
         val land = podcastLandscapePresentation()
-        val frac = if (preferences != null) {
-            preferences.getFloat(PREF_PODCAST_BADGE_FRACTION, if (land) 0.42f else 0.35f)
-        } else {
+        val frac = preferences.getFloat(
+            PREF_PODCAST_BADGE_FRACTION,
             if (land) 0.42f else 0.35f
-        }.coerceIn(0f, 1f)
+        ).coerceIn(0f, 1f)
         if (land) {
             // Portrait right-edge dock lands on the terminal pane / bezel — park left instead.
             forceClockTabEdge(tab, CLOCK_EDGE_LEFT, frac)
@@ -14635,12 +14600,11 @@ class UIManager(
             return
         }
 
-        val edge =
-            if (preferences != null) preferences!!.getString(edgeKey, defaultEdge) else defaultEdge
-        var fraction = if (preferences != null) preferences!!.getFloat(
+        val edge = preferences.getString(edgeKey, defaultEdge)
+        var fraction = preferences.getFloat(
             fractionKey,
             defaultFraction
-        ) else defaultFraction
+        )
         fraction = max(0f, min(1f, fraction))
 
         val margin = Tuils.dpToPx(mContext, 6)
@@ -14720,12 +14684,10 @@ class UIManager(
         }
         fraction = max(0f, min(1f, fraction))
 
-        if (preferences != null) {
-            preferences!!.edit()
-                .putString(edgeKey, edge)
-                .putFloat(fractionKey, fraction)
-                .apply()
-        }
+        preferences.edit()
+            .putString(edgeKey, edge)
+            .putFloat(fractionKey, fraction)
+            .apply()
         applyClockTabDock(view, edgeKey, fractionKey, edge, fraction)
     }
 
@@ -16133,8 +16095,7 @@ class UIManager(
     private fun reapplyVisibleClockTabDocks() {
         val root = mRootView ?: return
         val podcast = podcastTab ?: root.findViewById(R.id.podcast_tab)
-        if (podcast != null
-            && podcast.visibility == View.VISIBLE
+        if (podcast.visibility == View.VISIBLE
             && podcastSessionActive
             && !isPodcastSurfaceVisible
         ) {

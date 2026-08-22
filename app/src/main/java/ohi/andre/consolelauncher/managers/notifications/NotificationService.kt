@@ -499,7 +499,7 @@ class NotificationService : NotificationListenerService() {
             val sessions = sessionManager.getActiveSessions(componentName)
             Log.d(
                 "TUI-Music",
-                "Initial active sessions count: " + (if (sessions != null) sessions.size else 0)
+                "Initial active sessions count: " + sessions.size
             )
             updateActiveSessions(sessions)
         } catch (e: SecurityException) {

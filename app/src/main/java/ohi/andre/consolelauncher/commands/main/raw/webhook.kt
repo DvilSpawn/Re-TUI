@@ -63,7 +63,7 @@ class webhook : ParamCommand() {
         ls {
             override fun exec(pack: ExecutePack): String? {
                 val hooks = (pack as MainPack).webhookManager.getWebhooks()
-                if (hooks == null || hooks.isEmpty()) return "No webhooks configured."
+                if (hooks.isEmpty()) return "No webhooks configured."
                 val sb = StringBuilder()
                 for (w in hooks) {
                     sb.append(w.name).append(" -> ").append(w.url).append(Tuils.NEWLINE)
@@ -118,7 +118,7 @@ class webhook : ParamCommand() {
 
         override fun exec(pack: ExecutePack): String {
             val list = pack.getList<String?>()
-            val args = if (list != null) list.toTypedArray<String?>() else arrayOfNulls<String>(0)
+            val args = list.toTypedArray<String?>()
             return triggerWebhook(pack as MainPack, w, args)
         }
 
@@ -171,10 +171,10 @@ class webhook : ParamCommand() {
     public override fun params(): Array<String?> {
         val labels: Array<String?> = Param.Companion.labels()
         val pack: MainPack? = if (packRef != null) packRef!!.get() else null
-        if (pack == null || pack.webhookManager == null) return labels
+        if (pack == null) return labels
 
         val hooks = pack.webhookManager.getWebhooks()
-        if (hooks == null || hooks.isEmpty()) return labels
+        if (hooks.isEmpty()) return labels
 
         val all = arrayOfNulls<String>(labels.size + hooks.size)
         System.arraycopy(labels, 0, all, 0, labels.size)
@@ -196,7 +196,7 @@ class webhook : ParamCommand() {
             val hooks = info.webhookManager.getWebhooks()
             val sb = StringBuilder()
             sb.append(info.context.getString(helpRes())).append(Tuils.NEWLINE)
-            if (hooks != null && !hooks.isEmpty()) {
+            if (!hooks.isEmpty()) {
                 sb.append(Tuils.NEWLINE).append("Configured Webhooks:").append(Tuils.NEWLINE)
                 for (w in hooks) sb.append("  • ").append(w.name).append(Tuils.NEWLINE)
             }

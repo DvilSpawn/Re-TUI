@@ -17,17 +17,11 @@ import ohi.andre.consolelauncher.tuils.Tuils
 
 class notes : CommandAbstraction {
     override fun exec(pack: ExecutePack): String? {
-        var input = pack.getString()
-        if (input == null || input.trim().isEmpty()) {
+        val input = pack.getString().trim()
+        if (input.isEmpty()) {
             return openEditor(pack)
         }
-
-        input = input.trim()
         val parts = Tuils.splitArgs(input)
-        if (parts.size == 0) {
-            return openEditor(pack)
-        }
-
         val option = parts[0]?.lowercase(Locale.US) ?: Tuils.EMPTYSTRING
         val optionLength = parts[0]?.length ?: 0
         val rest = if (input.length > optionLength) input.substring(optionLength).trim() else Tuils.EMPTYSTRING

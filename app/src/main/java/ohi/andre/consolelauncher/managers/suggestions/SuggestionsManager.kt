@@ -707,25 +707,23 @@ class SuggestionsManager(
                 suggestOrientationCommand(suggestionList)
 
                 val apps = pack.appsManager.suggestedApps
-                if (apps != null) {
-                    var count = 0
-                    while (count < apps.size && count < noInputCounts!![Suggestion.Companion.TYPE_APP]) {
-                        if (apps[count] == null) {
-                            count++
-                            continue
-                        }
-
-                        suggestionList.add(
-                            SuggestionsManager.Suggestion(
-                                beforeLastSpace,
-                                apps[count]!!.publicLabel!!,
-                                clickToLaunch,
-                                Suggestion.Companion.TYPE_APP,
-                                apps[count]
-                            )
-                        )
+                var count = 0
+                while (count < apps.size && count < noInputCounts!![Suggestion.Companion.TYPE_APP]) {
+                    if (apps[count] == null) {
                         count++
+                        continue
                     }
+
+                    suggestionList.add(
+                        SuggestionsManager.Suggestion(
+                            beforeLastSpace,
+                            apps[count]!!.publicLabel!!,
+                            clickToLaunch,
+                            Suggestion.Companion.TYPE_APP,
+                            apps[count]
+                        )
+                    )
+                    count++
                 }
 
                 suggestFirstPresetAction(suggestionList)
@@ -1172,7 +1170,7 @@ class SuggestionsManager(
         query: String?
     ) {
         val contacts: MutableList<Contact> = info.contacts.getContacts()
-        if (contacts == null || contacts.size == 0) {
+        if (contacts.size == 0) {
             return
         }
 
@@ -1234,7 +1232,7 @@ class SuggestionsManager(
         suggestions: MutableList<Suggestion?>,
         contact: Contact?
     ): Boolean {
-        if (contact == null || contact.numbers == null || contact.numbers.size == 0) {
+        if (contact == null || contact.numbers.size == 0) {
             return false
         }
 
@@ -1316,11 +1314,6 @@ class SuggestionsManager(
         beforeLastSpace: String?,
         lastWord: String?
     ) {
-        val params: Array<out String?> = cmd.params()
-        if (params == null) {
-            return
-        }
-
         if (lastWord == null || lastWord.length == 0) {
             for (s in cmd.params()) {
                 val p = cmd.getParam(pack, s!!).value
@@ -3657,7 +3650,7 @@ class SuggestionsManager(
         beforeLastSpace: String?
     ) {
         val contacts: MutableList<Contact> = info.contacts.getContacts()
-        if (contacts == null || contacts.size == 0) return
+        if (contacts.size == 0) return
 
         if (afterLastSpace == null || afterLastSpace.length == 0) {
             for (contact in contacts) suggestions.add(
@@ -3814,8 +3807,6 @@ class SuggestionsManager(
             afterLastSpace = afterLastSpace.lowercase(Locale.getDefault()).trim { it <= ' ' }
 
             val cmds = info.commandGroup.commandNames
-            if (cmds == null) return
-
             var canInsert = counts!![Suggestion.Companion.TYPE_COMMAND]
             for (s in cmds) {
                 if (canInsert == 0 || Thread.currentThread().isInterrupted()) return
@@ -3845,8 +3836,6 @@ class SuggestionsManager(
         beforeLastSpace: String?
     ) {
         val cmds = info.commandGroup.commands
-        if (cmds == null) return
-
         //        if there's a beforelastspace -> help ...
         var canInsert =
             if (beforeLastSpace != null && beforeLastSpace.length > 0) Int.Companion.MAX_VALUE else noInputCounts!![Suggestion.Companion.TYPE_COMMAND]

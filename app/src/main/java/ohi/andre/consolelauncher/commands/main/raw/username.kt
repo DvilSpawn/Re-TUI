@@ -12,10 +12,6 @@ class username : CommandAbstraction {
         val newUser = pack.getString()
         val newDevice = pack.getString()
 
-        if (newUser == null || newDevice == null) {
-            return onNotArgEnough(pack, 0)
-        }
-
         LauncherSettings.setUi(Ui.username, newUser)
         LauncherSettings.setUi(Ui.deviceName, newDevice)
 

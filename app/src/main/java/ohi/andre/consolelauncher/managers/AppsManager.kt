@@ -207,171 +207,166 @@ class AppsManager(context: Context) : XMLPrefsElement {
         try {
             prefsList = XMLPrefsList()
 
-            if (file != null) {
-                if (!file.exists()) {
-                    XMLPrefsManager.resetFile(file, NAME)
-                }
-
-                val o: Array<Any?>?
-                try {
-                    o = XMLPrefsManager.buildDocument(file, NAME)
-                    if (o == null) {
-                        Tuils.sendXMLParseError(context, PATH)
-                        return
-                    }
-                } catch (e: SAXParseException) {
-                    Tuils.sendXMLParseError(context, PATH, e)
-                    return
-                } catch (e: Exception) {
-                    Tuils.log(e)
-                    return
-                }
-
-                val d = o[0] as Document
-                val root = o[1] as Element
-
-                val enums: MutableList<Apps> = ArrayList<Apps>(Arrays.asList<Apps>(*Apps.values()))
-                val nodes = root.getElementsByTagName("*")
-
-                for (count in 0..<nodes.getLength()) {
-                    val node = nodes.item(count)
-
-                    val nn = node.getNodeName()
-                    val nodeIndex = Tuils.find(nn, enums as MutableList<*>)
-                    if (nodeIndex != -1) {
-//                        default_app...
-                        if (nn.startsWith("d")) {
-                            prefsList!!.add(
-                                nn,
-                                node.getAttributes().getNamedItem(XMLPrefsManager.VALUE_ATTRIBUTE)
-                                    .getNodeValue()
-                            )
-                        } else {
-                            prefsList!!.add(
-                                nn,
-                                XMLPrefsManager.getStringAttribute(
-                                    node as Element,
-                                    XMLPrefsManager.VALUE_ATTRIBUTE
-                                )
-                            )
-                        }
-
-                        for (en in enums.indices) {
-                            if (enums.get(en).label() == nn) {
-                                enums.removeAt(en)
-                                break
-                            }
-                        }
-                    } else {
-                        if (node.getNodeType() == Node.ELEMENT_NODE) {
-                            val e = node as Element
-
-                            if (e.hasAttribute(APPS_ATTRIBUTE)) {
-                                val name = e.getNodeName()
-                                if (name.contains(Tuils.SPACE)) {
-                                    Tuils.sendOutput(
-                                        Color.RED,
-                                        context,
-                                        PATH + ": " + context.getString(R.string.output_groupspace) + ": " + name
-                                    )
-                                    continue
-                                }
-
-                                object : StoppableThread() {
-                                    override fun run() {
-                                        super.run()
-
-                                        val g = Group(name)
-
-                                        val apps = e.getAttribute(APPS_ATTRIBUTE)
-                                        val split: Array<String> =
-                                            apps.split(APPS_SEPARATOR.toRegex())
-                                                .dropLastWhile { it.isEmpty() }.toTypedArray()
-
-                                        val `as`: MutableList<LaunchInfo?> =
-                                            ArrayList<LaunchInfo?>(allApps)
-
-                                        External@ for (s in split) {
-                                            for (c in `as`.indices) {
-                                                if (`as`.get(c)?.`is`(s) == true) {
-                                                    g.add(`as`.removeAt(c)!!, false)
-                                                    continue@External
-                                                }
-                                            }
-                                        }
-
-                                        g.sort()
-
-                                        if (e.hasAttribute(BGCOLOR_ATTRIBUTE)) {
-                                            val c = e.getAttribute(BGCOLOR_ATTRIBUTE)
-                                            if (c.length > 0) {
-                                                try {
-                                                    g.bgColor = Color.parseColor(c)
-                                                } catch (e: Exception) {
-                                                    Tuils.sendOutput(
-                                                        Color.RED,
-                                                        context,
-                                                        PATH + ": " + context.getString(R.string.output_invalidcolor) + ": " + c
-                                                    )
-                                                }
-                                            }
-                                        }
-
-                                        if (e.hasAttribute(FORECOLOR_ATTRIBUTE)) {
-                                            val c = e.getAttribute(FORECOLOR_ATTRIBUTE)
-                                            if (c.length > 0) {
-                                                try {
-                                                    g.foreColor =
-                                                        Color.parseColor(c)
-                                                } catch (e: Exception) {
-                                                    Tuils.sendOutput(
-                                                        Color.RED,
-                                                        context,
-                                                        PATH + ": " + context.getString(R.string.output_invalidcolor) + ": " + c
-                                                    )
-                                                }
-                                            }
-                                        }
-
-                                        groups.add(g)
-                                    }
-                                }.start()
-                            } else {
-                                val shown =
-                                    !e.hasAttribute(SHOW_ATTRIBUTE) || e.getAttribute(SHOW_ATTRIBUTE)
-                                        .toBoolean()
-                                if (!shown) {
-                                    val identity = LaunchInfo.Companion.identityInfo(nn)
-                                    if (identity == null) continue
-
-                                    val removed: LaunchInfo? =
-                                        AppUtils.findLaunchInfoWithIdentity(allApps, identity)
-                                    if (removed != null) {
-                                        allApps.remove(removed)
-                                        hiddenApps!!.add(removed)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if (enums.size > 0) {
-                    for (s in enums) {
-                        val value: String? = s.defaultValue()
-
-                        val em = d.createElement(s.label())
-                        em.setAttribute(XMLPrefsManager.VALUE_ATTRIBUTE, value)
-                        root.appendChild(em)
-
-                        prefsList!!.add(s.label(), value!!)
-                    }
-                    XMLPrefsManager.writeTo(d, file)
-                }
-            } else {
-                Tuils.sendOutput(Color.RED, context, R.string.tuinotfound_app)
+            if (!file.exists()) {
+                XMLPrefsManager.resetFile(file, NAME)
             }
 
+            val o: Array<Any?>?
+            try {
+                o = XMLPrefsManager.buildDocument(file, NAME)
+                if (o == null) {
+                    Tuils.sendXMLParseError(context, PATH)
+                    return
+                }
+            } catch (e: SAXParseException) {
+                Tuils.sendXMLParseError(context, PATH, e)
+                return
+            } catch (e: Exception) {
+                Tuils.log(e)
+                return
+            }
+
+            val d = o[0] as Document
+            val root = o[1] as Element
+
+            val enums: MutableList<Apps> = ArrayList<Apps>(Arrays.asList<Apps>(*Apps.values()))
+            val nodes = root.getElementsByTagName("*")
+
+            for (count in 0..<nodes.getLength()) {
+                val node = nodes.item(count)
+
+                val nn = node.getNodeName()
+                val nodeIndex = Tuils.find(nn, enums as MutableList<*>)
+                if (nodeIndex != -1) {
+//                        default_app...
+                    if (nn.startsWith("d")) {
+                        prefsList!!.add(
+                            nn,
+                            node.getAttributes().getNamedItem(XMLPrefsManager.VALUE_ATTRIBUTE)
+                                .getNodeValue()
+                        )
+                    } else {
+                        prefsList!!.add(
+                            nn,
+                            XMLPrefsManager.getStringAttribute(
+                                node as Element,
+                                XMLPrefsManager.VALUE_ATTRIBUTE
+                            )
+                        )
+                    }
+
+                    for (en in enums.indices) {
+                        if (enums.get(en).label() == nn) {
+                            enums.removeAt(en)
+                            break
+                        }
+                    }
+                } else {
+                    if (node.getNodeType() == Node.ELEMENT_NODE) {
+                        val e = node as Element
+
+                        if (e.hasAttribute(APPS_ATTRIBUTE)) {
+                            val name = e.getNodeName()
+                            if (name.contains(Tuils.SPACE)) {
+                                Tuils.sendOutput(
+                                    Color.RED,
+                                    context,
+                                    PATH + ": " + context.getString(R.string.output_groupspace) + ": " + name
+                                )
+                                continue
+                            }
+
+                            object : StoppableThread() {
+                                override fun run() {
+                                    super.run()
+
+                                    val g = Group(name)
+
+                                    val apps = e.getAttribute(APPS_ATTRIBUTE)
+                                    val split: Array<String> =
+                                        apps.split(APPS_SEPARATOR.toRegex())
+                                            .dropLastWhile { it.isEmpty() }.toTypedArray()
+
+                                    val `as`: MutableList<LaunchInfo?> =
+                                        ArrayList<LaunchInfo?>(allApps)
+
+                                    External@ for (s in split) {
+                                        for (c in `as`.indices) {
+                                            if (`as`.get(c)?.`is`(s) == true) {
+                                                g.add(`as`.removeAt(c)!!, false)
+                                                continue@External
+                                            }
+                                        }
+                                    }
+
+                                    g.sort()
+
+                                    if (e.hasAttribute(BGCOLOR_ATTRIBUTE)) {
+                                        val c = e.getAttribute(BGCOLOR_ATTRIBUTE)
+                                        if (c.length > 0) {
+                                            try {
+                                                g.bgColor = Color.parseColor(c)
+                                            } catch (e: Exception) {
+                                                Tuils.sendOutput(
+                                                    Color.RED,
+                                                    context,
+                                                    PATH + ": " + context.getString(R.string.output_invalidcolor) + ": " + c
+                                                )
+                                            }
+                                        }
+                                    }
+
+                                    if (e.hasAttribute(FORECOLOR_ATTRIBUTE)) {
+                                        val c = e.getAttribute(FORECOLOR_ATTRIBUTE)
+                                        if (c.length > 0) {
+                                            try {
+                                                g.foreColor =
+                                                    Color.parseColor(c)
+                                            } catch (e: Exception) {
+                                                Tuils.sendOutput(
+                                                    Color.RED,
+                                                    context,
+                                                    PATH + ": " + context.getString(R.string.output_invalidcolor) + ": " + c
+                                                )
+                                            }
+                                        }
+                                    }
+
+                                    groups.add(g)
+                                }
+                            }.start()
+                        } else {
+                            val shown =
+                                !e.hasAttribute(SHOW_ATTRIBUTE) || e.getAttribute(SHOW_ATTRIBUTE)
+                                    .toBoolean()
+                            if (!shown) {
+                                val identity = LaunchInfo.Companion.identityInfo(nn)
+                                if (identity == null) continue
+
+                                val removed: LaunchInfo? =
+                                    AppUtils.findLaunchInfoWithIdentity(allApps, identity)
+                                if (removed != null) {
+                                    allApps.remove(removed)
+                                    hiddenApps!!.add(removed)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (enums.size > 0) {
+                for (s in enums) {
+                    val value: String? = s.defaultValue()
+
+                    val em = d.createElement(s.label())
+                    em.setAttribute(XMLPrefsManager.VALUE_ATTRIBUTE, value)
+                    root.appendChild(em)
+
+                    prefsList!!.add(s.label(), value!!)
+                }
+                XMLPrefsManager.writeTo(d, file)
+            }
             for (entry in this.preferences.getAll().entries) {
                 val value: Any? = entry.value
                 if (value is Int) {
@@ -543,7 +538,7 @@ class AppsManager(context: Context) : XMLPrefsElement {
         cp = pp!!.matcher(cp).replaceAll(packageName)
         if (packageInfo != null) {
             val sequence = packageInfo.applicationInfo!!.loadLabel(manager)
-            if (sequence != null) cp = pl!!.matcher(cp).replaceAll(sequence.toString())
+            cp = pl!!.matcher(cp).replaceAll(sequence.toString())
         } else if (infos != null && infos.size > 0) {
             cp = pl!!.matcher(cp).replaceAll(infos.get(0)!!.publicLabel)
         } else {
@@ -628,7 +623,7 @@ class AppsManager(context: Context) : XMLPrefsElement {
     }
 
     private fun appUninstalled(packageName: String, replacing: Boolean) {
-        if (appsHolder == null || context == null) return
+        if (appsHolder == null) return
 
         if (replacing || shouldSuppressPackageEvent(
                 packageName,
@@ -682,7 +677,7 @@ class AppsManager(context: Context) : XMLPrefsElement {
         }
 
         val `is`: MutableList<LaunchInfo?> = AppUtils.findLaunchInfosWithPackage(label, appList)
-        if (`is` == null || `is`.size == 0) return null
+        if (`is`.size == 0) return null
         return `is`.get(0)
     }
 
@@ -1637,7 +1632,7 @@ class AppsManager(context: Context) : XMLPrefsElement {
 
         fun checkEquality(list: MutableList<LaunchInfo>) {
             for (info in list) {
-                if (info == null || info.publicLabel == null) {
+                if (info.publicLabel == null) {
                     continue
                 }
 

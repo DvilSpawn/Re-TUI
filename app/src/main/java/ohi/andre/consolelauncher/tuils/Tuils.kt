@@ -392,9 +392,7 @@ object Tuils {
         for (file in files) {
             if (file.isDirectory()) {
                 val s: MutableList<Song?> = getSongsInFolder(file)
-                if (s != null) {
-                    songs.addAll(s)
-                }
+                songs.addAll(s)
             } else if (containsExtension(MusicManager2.MUSIC_EXTENSIONS, file.getName())) {
                 songs.add(Song(file))
             }
@@ -992,7 +990,7 @@ object Tuils {
         if (format.length == 0) return null
 
         var deviceName: String = XMLPrefsManager.get(Ui.deviceName)
-        if (deviceName == null || deviceName.length == 0) {
+        if (deviceName.length == 0) {
             deviceName = Build.DEVICE
         }
 

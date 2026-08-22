@@ -64,7 +64,7 @@ object LauncherSettings {
         } catch (e: Exception) {
             XMLPrefsManager.getColor(value)
         }
-        return if (value == null) color else AutoColorManager.getColor(value, color)
+        return AutoColorManager.getColor(value, color)
     }
 
     @JvmStatic

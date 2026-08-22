@@ -449,7 +449,7 @@ class LuaWidgetEngine(
             return false
         }
         runGuarded(name, Runnable {
-            if (args == null || args.size == 0) {
+            if (args.size == 0) {
                 function.call()
             } else if (args.size == 1) {
                 function.call(args[0])
@@ -1532,10 +1532,7 @@ class LuaWidgetEngine(
         val pomodoro: PomodoroManager = PomodoroManager.getInstance(context)
         val remaining: Long = pomodoro.remainingMillis
         val total: Long = pomodoro.totalDuration
-        val type = if (pomodoro.currentType == null)
-            "idle"
-        else
-            pomodoro.currentType.name.lowercase()
+        val type = pomodoro.currentType.name.lowercase()
         table.set("running", if (pomodoro.isRunning) LuaValue.TRUE else LuaValue.FALSE)
         table.set("remaining_ms", LuaValue.valueOf(remaining.toDouble()))
         table.set("total_ms", LuaValue.valueOf(total.toDouble()))

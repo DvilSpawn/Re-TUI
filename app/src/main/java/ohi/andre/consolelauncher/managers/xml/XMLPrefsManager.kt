@@ -79,10 +79,6 @@ object XMLPrefsManager {
         commonsLoaded = true
 
         val folder = Tuils.getFolder()
-        if (folder == null) {
-            Tuils.sendOutput(Color.RED, context, R.string.tuinotfound_xmlprefs)
-            return
-        }
         FirstRunPresetManager.seedIfNeeded(context, folder)
 
         for (element in XMLPrefsRoot.entries) {
@@ -686,8 +682,6 @@ object XMLPrefsManager {
 
     @Throws(Exception::class)
     fun transform(s: String, c: Class<*>?): Any? {
-        if (s == null) throw UnsupportedOperationException()
-
         if (c == Int::class.javaPrimitiveType) return s.toInt()
         if (c == Color::class.java) {
             try {

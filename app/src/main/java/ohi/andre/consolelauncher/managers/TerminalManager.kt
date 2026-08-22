@@ -263,8 +263,6 @@ class TerminalManager(
     }
 
     init {
-        if (terminalView == null || inputView == null || prefixView == null) throw UnsupportedOperationException()
-
         this.mContext = context
         this.executer = executer
 

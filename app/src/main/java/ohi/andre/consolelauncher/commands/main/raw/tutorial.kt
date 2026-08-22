@@ -4,16 +4,13 @@ import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.commands.CommandAbstraction
 import ohi.andre.consolelauncher.commands.ExecutePack
 import ohi.andre.consolelauncher.tuils.Tuils
-import android.content.Intent
 
 class tutorial : CommandAbstraction {
     private val url = "https://github.com/DvilSpawn/Re-TUI/wiki"
 
     override fun exec(pack: ExecutePack): String? {
         val intent = Tuils.webPage(url)
-        if (intent != null) {
-            pack.context.startActivity(intent)
-        }
+        pack.context.startActivity(intent)
         return null
     }
 

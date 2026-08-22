@@ -247,8 +247,6 @@ object PresetManager {
 
     @Throws(Exception::class)
     fun importPackage(context: Context, uri: Uri): kotlin.String {
-        require(!(context == null || uri == null)) { "Preset package is required" }
-
         val displayName = displayName(context, uri)
         val cleanName = cleanPresetPackageName(displayName)
         val packageFile = packageFile(cleanName)
@@ -259,8 +257,6 @@ object PresetManager {
 
     @Throws(Exception::class)
     fun importFolder(context: Context, treeUri: Uri): kotlin.String {
-        require(!(context == null || treeUri == null)) { "Preset folder is required" }
-
         val cleanName = cleanName(treeName(treeUri))
         val tempFolder: File = File(presetsDir, "." + cleanName + ".importing")
         if (tempFolder.exists()) {
@@ -299,15 +295,15 @@ object PresetManager {
 
     @Throws(Exception::class)
     fun exportPackage(context: Context, packageFile: File, uri: Uri) {
-        require(!(context == null || packageFile == null || uri == null || !packageFile.isFile())) { "Preset package not found" }
+        require(packageFile.isFile()) { "Preset package not found" }
 
         val `in`: InputStream = BufferedInputStream(FileInputStream(packageFile))
-        val out: OutputStream =
-            BufferedOutputStream(context.getContentResolver().openOutputStream(uri, "w"))
-        if (out == null) {
+        val destination = context.getContentResolver().openOutputStream(uri, "w")
+        if (destination == null) {
             `in`.close()
             throw IllegalArgumentException("Unable to open export destination")
         }
+        val out: OutputStream = BufferedOutputStream(destination)
         try {
             copyStream(`in`, out)
         } finally {

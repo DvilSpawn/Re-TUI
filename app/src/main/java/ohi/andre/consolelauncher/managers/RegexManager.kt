@@ -39,11 +39,6 @@ class RegexManager(context: Context) {
 
                 try {
                     val root = Tuils.getFolder()
-                    if (root == null) {
-                        Tuils.sendOutput(Color.RED, context, R.string.tuinotfound_rss)
-                        return
-                    }
-
                     val file = File(root, PATH)
                     if (!file.exists()) {
                         file.createNewFile()

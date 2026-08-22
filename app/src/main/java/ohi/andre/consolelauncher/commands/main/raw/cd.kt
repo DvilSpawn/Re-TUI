@@ -30,9 +30,7 @@ class cd : CommandAbstraction {
             val folder = File(path)
             RetuiFilesContract.rememberPath(info.context, path)
             info.currentDirectory = folder
-            if (MainManager.interactive != null) {
-                MainManager.interactive.addCommand("cd '" + folder.absolutePath.replace("'", "'\\''") + "'")
-            }
+            MainManager.interactive.addCommand("cd '" + folder.absolutePath.replace("'", "'\\''") + "'")
             LocalBroadcastManager.getInstance(info.context.applicationContext)
                 .sendBroadcast(Intent(UIManager.ACTION_UPDATE_HINT))
             return path

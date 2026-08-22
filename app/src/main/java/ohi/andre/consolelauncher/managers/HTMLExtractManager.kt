@@ -823,7 +823,7 @@ class HTMLExtractManager(context: Context, client: OkHttpClient) {
                     replace = tag
                 } else if (attributes != null) {
                     replace = attributes[attribute].toString()
-                    if (replace == null || replace.length == 0) replace = "null"
+                    if (replace.length == 0) replace = "null"
                 }
 
                 return TextUtils.replace(

@@ -454,7 +454,6 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
         if (feeds == null) return "[]"
         val builder = StringBuilder()
         for (r in feeds) {
-            if (r == null) continue
             builder.append(Rss.Companion.ID_LABEL).append(":").append(Tuils.SPACE).append(r.id)
                 .append(Tuils.NEWLINE).append(r.url).append(Tuils.NEWLINE)
         }
@@ -486,7 +485,7 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
         val snapshot = ArrayList<Rss>()
         if (feeds != null) {
             for (feed in feeds) {
-                if (feed != null) snapshot.add(feed)
+                snapshot.add(feed)
             }
         }
 
@@ -533,7 +532,6 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
     fun l(id: Int): String? {
         if (feeds == null) return context.getString(R.string.rss_not_found)
         for (feed in feeds) {
-            if (feed == null) continue
             if (feed.id == id) {
                 try {
                     parse(feed, false)

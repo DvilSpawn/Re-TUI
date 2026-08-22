@@ -491,7 +491,7 @@ class MainManager(private val mContext: LauncherActivity) {
 
     private inner class ModulePromptTrigger : CmdTrigger {
         override fun trigger(info: MainPack?, input: String?): Boolean {
-            if (info == null || info.context == null || !ModulePromptManager.isActive(info.context)) {
+            if (info == null || !ModulePromptManager.isActive(info.context)) {
                 return false
             }
             return ModulePromptManager.handleInput(info.context, input)
