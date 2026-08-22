@@ -1,7 +1,6 @@
 package ohi.andre.consolelauncher.commands.main.raw
 
 import android.content.Intent
-import android.os.Build.VERSION_CODES
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import ohi.andre.consolelauncher.LauncherActivity
 import ohi.andre.consolelauncher.R
@@ -9,7 +8,6 @@ import ohi.andre.consolelauncher.UIManager
 import ohi.andre.consolelauncher.commands.CommandAbstraction
 import ohi.andre.consolelauncher.commands.ExecutePack
 import ohi.andre.consolelauncher.commands.main.MainPack
-import ohi.andre.consolelauncher.commands.main.specific.APICommand
 import ohi.andre.consolelauncher.commands.main.specific.ParamCommand
 import ohi.andre.consolelauncher.managers.modules.ModuleManager
 import ohi.andre.consolelauncher.managers.notifications.NotificationManager
@@ -22,16 +20,11 @@ import ohi.andre.consolelauncher.managers.settings.LauncherSettings
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.options.Notifications
 import ohi.andre.consolelauncher.tuils.interfaces.Reloadable
-import android.os.Build.VERSION_CODES.JELLY_BEAN_MR2
 
 /**
  * Created by francescoandreuzzi on 29/04/2017.
  */
-class notifications : ParamCommand(), APICommand {
-    override fun willWorkOn(api: Int): Boolean {
-        return api >= VERSION_CODES.JELLY_BEAN_MR2
-    }
-
+class notifications : ParamCommand() {
     private enum class Param : ohi.andre.consolelauncher.commands.main.Param {
         inc {
             override fun exec(pack: ExecutePack): String? {

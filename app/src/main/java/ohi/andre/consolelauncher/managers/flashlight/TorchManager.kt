@@ -7,10 +7,9 @@ import android.hardware.camera2.CameraManager
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import ohi.andre.consolelauncher.tuils.PrivateIOReceiver
 
-class TorchManager private constructor() {
+object TorchManager {
     private var cameraManager: CameraManager? = null
     private var cameraId: String? = null
-    private var context: Context? = null
 
     fun isOn(): Boolean = cameraId != null
 
@@ -26,27 +25,26 @@ class TorchManager private constructor() {
             manager.setTorchMode(id, true)
             cameraManager = manager
             cameraId = id
-            this.context = context.applicationContext
         } catch (e: Exception) {
             sendError(context, e)
         }
     }
 
-    fun turnOff() {
+    fun turnOff(context: Context) {
         val manager = cameraManager ?: return
         val id = cameraId ?: return
         try {
             manager.setTorchMode(id, false)
+        } catch (e: Exception) {
+            sendError(context, e)
+        } finally {
             cameraManager = null
             cameraId = null
-            context = null
-        } catch (e: Exception) {
-            context?.let { sendError(it, e) }
         }
     }
 
     fun toggle(context: Context) {
-        if (isOn()) turnOff() else turnOn(context)
+        if (isOn()) turnOff(context) else turnOn(context)
     }
 
     private fun sendError(context: Context, error: Exception) {
@@ -55,15 +53,4 @@ class TorchManager private constructor() {
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
     }
 
-    companion object {
-        private var mInstance: TorchManager? = null
-
-        @JvmStatic
-        fun getInstance(): TorchManager {
-            if (mInstance == null) {
-                mInstance = TorchManager()
-            }
-            return mInstance!!
-        }
-    }
 }

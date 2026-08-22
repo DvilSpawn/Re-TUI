@@ -58,78 +58,75 @@ class ReplyManager(context: Context) : XMLPrefsElement {
     }
 
     init {
-        enabled = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH
         this.context = context.getApplicationContext()
 
-        if (enabled) {
-            notificationWears = HashSet<NotificationWear>()
-            values = XMLPrefsList()
+        notificationWears = HashSet<NotificationWear>()
+        values = XMLPrefsList()
 
-            instance = WeakReference<ReplyManager?>(this)
+        instance = WeakReference<ReplyManager?>(this)
 
-            load(true)
+        load(true)
 
-            val enabledEntry: XMLPrefsEntry? = values?.get(Reply.reply_enabled)
-            enabled = enabledEntry != null && enabledEntry.value.toBoolean()
-            if (!enabled) {
-                notificationWears = null
-                boundApps = null
-            } else {
-                val filter: IntentFilter = IntentFilter()
-                filter.addAction(ACTION)
-                filter.addAction(ACTION_UPDATE)
-                filter.addAction(ACTION_LS)
+        val enabledEntry: XMLPrefsEntry? = values?.get(Reply.reply_enabled)
+        enabled = enabledEntry != null && enabledEntry.value.toBoolean()
+        if (!enabled) {
+            notificationWears = null
+            boundApps = null
+        } else {
+            val filter: IntentFilter = IntentFilter()
+            filter.addAction(ACTION)
+            filter.addAction(ACTION_UPDATE)
+            filter.addAction(ACTION_LS)
 
-                receiver = object : BroadcastReceiver() {
-                    override fun onReceive(context: Context, intent: Intent) {
-                        if (intent.getAction() == ACTION) {
-                            val app: String? = intent.getStringExtra(ID)
-                            val what: String? = intent.getStringExtra(WHAT)
-                            Log.i(
-                                "RetuiReplyDebug", ("ReplyManager ACTION received id=" + app
-                                        + " hasText=" + (what != null))
-                            )
+            receiver = object : BroadcastReceiver() {
+                override fun onReceive(context: Context, intent: Intent) {
+                    if (intent.getAction() == ACTION) {
+                        val app: String? = intent.getStringExtra(ID)
+                        val what: String? = intent.getStringExtra(WHAT)
+                        Log.i(
+                            "RetuiReplyDebug", ("ReplyManager ACTION received id=" + app
+                                    + " hasText=" + (what != null))
+                        )
 
-                            var id: Int
-                            try {
-                                id = app!!.toInt()
-                            } catch (e: Exception) {
-                                val bapp = findApp(app)
-                                if (bapp == null) {
-                                    Log.w("RetuiReplyDebug", "ReplyManager app not bound pkg=" + app)
-                                    Tuils.sendOutput(
-                                        context,
-                                        context.getString(R.string.reply_app_not_found) + Tuils.SPACE + app
-                                    )
-                                    return
-                                }
-
-                                id = bapp.applicationId
-                            }
-
-                            if (what == null) {
-                                check(id)
-                            } else {
-                                if (id == -1) return
-                                Log.i(
-                                    "RetuiReplyDebug", ("ReplyManager dispatching reply appId=" + id
-                                            + " text=" + what)
+                        var id: Int
+                        try {
+                            id = app!!.toInt()
+                        } catch (e: Exception) {
+                            val bapp = findApp(app)
+                            if (bapp == null) {
+                                Log.w("RetuiReplyDebug", "ReplyManager app not bound pkg=" + app)
+                                Tuils.sendOutput(
+                                    context,
+                                    context.getString(R.string.reply_app_not_found) + Tuils.SPACE + app
                                 )
-                                replyTo(this@ReplyManager.context!!, id, what)
+                                return
                             }
-                        } else if (intent.getAction() == ACTION_UPDATE) {
-                            if (notificationWears != null) {
-                                notificationWears!!.clear()
-                            }
-                            load(false)
-                        } else if (intent.getAction() == ACTION_LS) {
-                            ls(context)
+
+                            id = bapp.applicationId
                         }
+
+                        if (what == null) {
+                            check(id)
+                        } else {
+                            if (id == -1) return
+                            Log.i(
+                                "RetuiReplyDebug", ("ReplyManager dispatching reply appId=" + id
+                                        + " text=" + what)
+                            )
+                            replyTo(this@ReplyManager.context!!, id, what)
+                        }
+                    } else if (intent.getAction() == ACTION_UPDATE) {
+                        if (notificationWears != null) {
+                            notificationWears!!.clear()
+                        }
+                        load(false)
+                    } else if (intent.getAction() == ACTION_LS) {
+                        ls(context)
                     }
                 }
-
-                LocalBroadcastManager.getInstance(this.context!!).registerReceiver(receiver!!, filter)
             }
+
+            LocalBroadcastManager.getInstance(this.context!!).registerReceiver(receiver!!, filter)
         }
     }
 
@@ -297,7 +294,7 @@ class ReplyManager(context: Context) : XMLPrefsElement {
         var notificationWear: NotificationWear? = null
         val notification: Notification = statusBarNotification.getNotification()
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH && notification.actions != null) {
+        if (notification.actions != null) {
             for (i in notification.actions.indices) {
                 val action = notification.actions[i]
                 if (action == null) continue

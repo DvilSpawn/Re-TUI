@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
-import android.os.Build
 import android.os.Vibrator
 import android.text.TextPaint
 import android.text.style.ClickableSpan
@@ -111,8 +110,7 @@ class LongClickableSpan(
             } else if (o is NotificationService.Notification) {
                 val n = o
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                    if (showMenu) {
+                if (showMenu) {
                         val menu = PopupMenu(v.getContext().getApplicationContext(), v)
                         menu.getMenuInflater().inflate(R.menu.notification_menu, menu.getMenu())
 
@@ -158,7 +156,6 @@ class LongClickableSpan(
                             ).sendBroadcast(intent)
                         } else if (showExcludeNotification) excludeNotification(v.getContext(), n)
                         else if (showExcludeApp) excludeApp(v.getContext(), n)
-                    }
                 }
             }
 

@@ -51,7 +51,7 @@ class PinShortcutConfirmActivity : Activity() {
         super.onCreate(savedInstanceState)
         applyFullscreen(this)
 
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O || !loadRequest()) {
+        if (!loadRequest()) {
             finishWithToast("Shortcut pin request unavailable.")
             return
         }

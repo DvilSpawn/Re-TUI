@@ -7,7 +7,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.ServiceConnection
 import android.media.AudioManager
-import android.os.Build
 import android.os.IBinder
 import android.provider.MediaStore
 import android.widget.MediaController.MediaPlayerControl
@@ -91,17 +90,10 @@ class MusicManager2(var mContext: Context, private val loadLocalLibrary: Boolean
             return
         }
 
-        val action: String?
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            action = AudioManager.ACTION_HEADSET_PLUG
-        } else {
-            action = Intent.ACTION_HEADSET_PLUG
-        }
-
         ContextCompat.registerReceiver(
             mContext.getApplicationContext(),
             headsetBroadcast,
-            IntentFilter(action),
+            IntentFilter(AudioManager.ACTION_HEADSET_PLUG),
             ContextCompat.RECEIVER_NOT_EXPORTED
         )
         headsetReceiverRegistered = true

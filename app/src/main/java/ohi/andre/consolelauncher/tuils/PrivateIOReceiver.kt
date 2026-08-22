@@ -81,7 +81,7 @@ class PrivateIOReceiver(activity: Activity?, outputable: Outputable, inputable: 
                 }
             } else if (intent.getAction() == ACTION_INPUT) {
                 inputable.`in`(text.toString())
-            } else if (intent.getAction() == ACTION_REPLY && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+            } else if (intent.getAction() == ACTION_REPLY) {
                 val b: Bundle? = intent.getBundleExtra(BUNDLE)
                 val ps: Array<Parcelable?>? = intent.getParcelableArrayExtra(REMOTE_INPUTS)
                 val pi: PendingIntent? = intent.getParcelableExtra<PendingIntent?>(PENDING_INTENT)

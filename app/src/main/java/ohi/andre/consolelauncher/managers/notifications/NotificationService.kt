@@ -484,30 +484,28 @@ class NotificationService : NotificationListenerService() {
     }
 
     private fun setupMediaSession() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            if (mediaSessionManager == null) {
-                mediaSessionManager =
-                    getSystemService(Context.MEDIA_SESSION_SERVICE) as MediaSessionManager?
-            }
-            val componentName: ComponentName = ComponentName(this, NotificationService::class.java)
-            try {
-                val sessionManager = mediaSessionManager ?: return
-                sessionManager.removeOnActiveSessionsChangedListener(sessionsChangedListener)
-                sessionManager.addOnActiveSessionsChangedListener(
-                    sessionsChangedListener,
-                    componentName
-                )
-                val sessions = sessionManager.getActiveSessions(componentName)
-                Log.d(
-                    "TUI-Music",
-                    "Initial active sessions count: " + (if (sessions != null) sessions.size else 0)
-                )
-                updateActiveSessions(sessions)
-            } catch (e: SecurityException) {
-                Log.e("TUI-Music", "MediaSession access denied: " + e.message)
-            } catch (e: Exception) {
-                Log.e("TUI-Music", "Error setting up MediaSession: " + e.message)
-            }
+        if (mediaSessionManager == null) {
+            mediaSessionManager =
+                getSystemService(Context.MEDIA_SESSION_SERVICE) as MediaSessionManager?
+        }
+        val componentName: ComponentName = ComponentName(this, NotificationService::class.java)
+        try {
+            val sessionManager = mediaSessionManager ?: return
+            sessionManager.removeOnActiveSessionsChangedListener(sessionsChangedListener)
+            sessionManager.addOnActiveSessionsChangedListener(
+                sessionsChangedListener,
+                componentName
+            )
+            val sessions = sessionManager.getActiveSessions(componentName)
+            Log.d(
+                "TUI-Music",
+                "Initial active sessions count: " + (if (sessions != null) sessions.size else 0)
+            )
+            updateActiveSessions(sessions)
+        } catch (e: SecurityException) {
+            Log.e("TUI-Music", "MediaSession access denied: " + e.message)
+        } catch (e: Exception) {
+            Log.e("TUI-Music", "Error setting up MediaSession: " + e.message)
         }
     }
 
@@ -987,7 +985,7 @@ class NotificationService : NotificationListenerService() {
     }
 
     private fun seedActiveNotifications(printToTerminal: Boolean = true) {
-        if (!enabled || Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2 || queue == null) {
+        if (!enabled || queue == null) {
             return
         }
 

@@ -1,16 +1,14 @@
 package ohi.andre.consolelauncher.commands.main.raw
 
 import android.content.Context
-import android.os.Build
 import ohi.andre.consolelauncher.BuildConfig
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.commands.CommandAbstraction
 import ohi.andre.consolelauncher.commands.ExecutePack
 import ohi.andre.consolelauncher.commands.main.MainPack
-import ohi.andre.consolelauncher.commands.main.specific.APICommand
 import ohi.andre.consolelauncher.managers.TuiLocationManager
 
-class location : APICommand, CommandAbstraction {
+class location : CommandAbstraction {
     override fun exec(pack: ExecutePack): String? {
         val context: Context = (pack as MainPack).context
 
@@ -33,8 +31,6 @@ class location : APICommand, CommandAbstraction {
     override fun onArgNotFound(pack: ExecutePack, indexNotFound: Int): String? = null
 
     override fun onNotArgEnough(pack: ExecutePack, nArgs: Int): String? = null
-
-    override fun willWorkOn(api: Int): Boolean = api >= Build.VERSION_CODES.GINGERBREAD
 
     companion object {
         @JvmField var ACTION_LOCATION_CMD_GOT: String = BuildConfig.APPLICATION_ID + ".loc_cmd_location"

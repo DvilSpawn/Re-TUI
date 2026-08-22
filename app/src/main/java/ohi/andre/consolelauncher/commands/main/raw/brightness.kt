@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.ContentResolver
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.provider.Settings
 import android.view.Window
 import android.view.WindowManager
@@ -19,7 +18,7 @@ import android.provider.Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL
 class brightness : CommandAbstraction {
     @Throws(Exception::class)
     override fun exec(pack: ExecutePack): String? {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.System.canWrite(pack.context)) {
+        if (!Settings.System.canWrite(pack.context)) {
             val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS)
             intent.data = Uri.parse("package:" + pack.context.packageName)
             pack.context.startActivity(intent)

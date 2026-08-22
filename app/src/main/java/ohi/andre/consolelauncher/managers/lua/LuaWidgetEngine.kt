@@ -38,7 +38,6 @@ import android.content.pm.ResolveInfo
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
-import android.net.NetworkInfo
 import android.os.Build
 import android.os.Looper
 import android.os.VibrationEffect
@@ -2347,41 +2346,24 @@ class LuaWidgetEngine(
             return table
         }
         try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                val network: Network? = manager.getActiveNetwork()
-                val capabilities: NetworkCapabilities? =
-                    if (network == null) null else manager.getNetworkCapabilities(network)
-                if (capabilities == null) {
-                    return table
-                }
-                table.set("connected", LuaValue.TRUE)
-                if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
-                    table.set("type", LuaValue.valueOf("wifi"))
-                    table.set("class", LuaValue.valueOf("WiFi"))
-                } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
-                    table.set("type", LuaValue.valueOf("mobile"))
-                    table.set("class", LuaValue.valueOf(""))
-                }
-                table.set(
-                    "metered",
-                    if (manager.isActiveNetworkMetered()) LuaValue.TRUE else LuaValue.FALSE
-                )
-            } else {
-                val info: NetworkInfo? = manager.getActiveNetworkInfo()
-                if (info != null && info.isConnected()) {
-                    table.set("connected", LuaValue.TRUE)
-                    table.set(
-                        "type",
-                        LuaValue.valueOf(if (info.getType() == ConnectivityManager.TYPE_WIFI) "wifi" else "mobile")
-                    )
-                    table.set("class", LuaValue.valueOf(info.getTypeName()))
-                    table.set(
-                        "metered",
-                        if (manager.isActiveNetworkMetered()) LuaValue.TRUE else LuaValue.FALSE
-                    )
-                    table.set("roaming", if (info.isRoaming()) LuaValue.TRUE else LuaValue.FALSE)
-                }
+            val network: Network? = manager.getActiveNetwork()
+            val capabilities: NetworkCapabilities? =
+                if (network == null) null else manager.getNetworkCapabilities(network)
+            if (capabilities == null) {
+                return table
             }
+            table.set("connected", LuaValue.TRUE)
+            if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+                table.set("type", LuaValue.valueOf("wifi"))
+                table.set("class", LuaValue.valueOf("WiFi"))
+            } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
+                table.set("type", LuaValue.valueOf("mobile"))
+                table.set("class", LuaValue.valueOf(""))
+            }
+            table.set(
+                "metered",
+                if (manager.isActiveNetworkMetered()) LuaValue.TRUE else LuaValue.FALSE
+            )
         } catch (ignored: Exception) {
         }
         return table

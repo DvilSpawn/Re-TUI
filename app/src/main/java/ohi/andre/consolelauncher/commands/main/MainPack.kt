@@ -2,10 +2,8 @@ package ohi.andre.consolelauncher.commands.main
 
 import android.content.Context
 import android.content.res.Resources
-import android.net.ConnectivityManager
 import android.net.wifi.WifiManager
 import java.io.File
-import java.lang.reflect.Method
 import okhttp3.OkHttpClient
 import ohi.andre.consolelauncher.commands.CommandGroup
 import ohi.andre.consolelauncher.commands.CommandsPreferences
@@ -44,9 +42,6 @@ class MainPack(
     @JvmField var currentDirectory: File = resolveHomeDirectory(XMLPrefsManager.get(File::class.java, Behavior.home_path))
     @JvmField var res: Resources = context.resources
     @JvmField var wifi: WifiManager? = null
-    @JvmField var setMobileDataEnabledMethod: Method? = null
-    @JvmField var connectivityMgr: ConnectivityManager? = null
-    @JvmField var connectMgr: Any? = null
     @JvmField var cmdPrefs: CommandsPreferences = CommandsPreferences()
     @JvmField var lastCommand: String? = null
     @JvmField var shellHolder: ShellHolder? = null
@@ -72,9 +67,8 @@ class MainPack(
     }
 
     fun dispose() {
-        val mgr = TorchManager.getInstance()
-        if (mgr.isOn()) {
-            mgr.turnOff()
+        if (TorchManager.isOn()) {
+            TorchManager.turnOff(context)
         }
     }
 

@@ -4,7 +4,6 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.graphics.Color
 import android.net.Uri
-import android.os.Build
 import android.text.TextUtils
 import ohi.andre.consolelauncher.BuildConfig
 import ohi.andre.consolelauncher.managers.xml.options.Behavior
@@ -411,11 +410,6 @@ class NotesManager(var mContext: Context, noteView: TextView?) {
     }
 
     private fun cpNote(s: String) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
-            Tuils.sendOutput(mContext, R.string.api_low)
-            return
-        }
-
         val index = findNote(s)
         if (index == -1) {
             Tuils.sendOutput(mContext, R.string.note_not_found)

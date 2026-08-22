@@ -277,82 +277,24 @@ class KeeperService : android.app.Service() {
                 pendingIntent = null
             }
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                    var oPriority: Int =
-                        Tuils.scale(kotlin.intArrayOf(0, 4), kotlin.intArrayOf(2, 4), priority + 2)
-                    if (oPriority < 2 || oPriority > 4) oPriority =
-                        android.app.NotificationManager.IMPORTANCE_UNSPECIFIED
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                var oPriority: Int =
+                    Tuils.scale(kotlin.intArrayOf(0, 4), kotlin.intArrayOf(2, 4), priority + 2)
+                if (oPriority < 2 || oPriority > 4) oPriority =
+                    android.app.NotificationManager.IMPORTANCE_UNSPECIFIED
 
-                    val notificationChannel: NotificationChannel = NotificationChannel(
-                        BuildConfig.APPLICATION_ID,
-                        c.getString(R.string.app_name),
-                        oPriority
-                    )
-                    (c.getSystemService(android.content.Context.NOTIFICATION_SERVICE) as android.app.NotificationManager).createNotificationChannel(
-                        notificationChannel
-                    )
-                }
+                val notificationChannel: NotificationChannel = NotificationChannel(
+                    BuildConfig.APPLICATION_ID,
+                    c.getString(R.string.app_name),
+                    oPriority
+                )
+                (c.getSystemService(android.content.Context.NOTIFICATION_SERVICE) as android.app.NotificationManager).createNotificationChannel(
+                    notificationChannel
+                )
+            }
 
-                val builder: NotificationCompat.Builder =
-                    NotificationCompat.Builder(c, BuildConfig.APPLICATION_ID)
-                        .setSmallIcon(R.mipmap.ic_launcher)
-                        .setTicker(c.getString(R.string.start_notification))
-                        .setWhen(java.lang.System.currentTimeMillis())
-                        .setPriority(priority)
-                        .setContentTitle(title)
-                        .setContentIntent(pendingIntent)
-
-                var style: NotificationCompat.Style? = null
-                if (lastCommands != null && lastCommands[0] != null) {
-                    val inboxStyle: NotificationCompat.InboxStyle = NotificationCompat.InboxStyle()
-
-                    if (upDown) {
-                        for (lastCommand in lastCommands) {
-                            if (lastCommand == null) break
-                            inboxStyle.addLine(lastCommand)
-                        }
-                    } else {
-                        for (j in lastCommands.indices.reversed()) {
-                            if (lastCommands[j] == null) continue
-                            inboxStyle.addLine(lastCommands[j])
-                        }
-                    }
-
-                    style = inboxStyle
-                }
-
-                if (style != null) builder.setStyle(style)
-                else {
-                    builder.setContentTitle(title)
-                    builder.setContentText(subtitle)
-                }
-
-                val remoteInput = androidx.core.app.RemoteInput.Builder(PrivateIOReceiver.TEXT)
-                    .setLabel(cmdLabel)
-                    .build()
-
-                val i: Intent = Intent(c, PublicIOReceiver::class.java)
-                i.setAction(PublicIOReceiver.ACTION_CMD)
-
-                val actionBuilder: androidx.core.app.NotificationCompat.Action.Builder =
-                    androidx.core.app.NotificationCompat.Action.Builder(
-                        R.mipmap.ic_launcher,
-                        cmdLabel,
-                        PendingIntent.getBroadcast(
-                            c.getApplicationContext(),
-                            40,
-                            i,
-                            KeeperService.Companion.remoteInputPendingIntentFlags(PendingIntent.FLAG_UPDATE_CURRENT)
-                        )
-                    )
-                        .addRemoteInput(remoteInput)
-
-                builder.addAction(actionBuilder.build())
-
-                return builder.build()
-            } else {
-                val builder: NotificationCompat.Builder = NotificationCompat.Builder(c)
+            val builder: NotificationCompat.Builder =
+                NotificationCompat.Builder(c, BuildConfig.APPLICATION_ID)
                     .setSmallIcon(R.mipmap.ic_launcher)
                     .setTicker(c.getString(R.string.start_notification))
                     .setWhen(java.lang.System.currentTimeMillis())
@@ -360,32 +302,54 @@ class KeeperService : android.app.Service() {
                     .setContentTitle(title)
                     .setContentIntent(pendingIntent)
 
-                var style: NotificationCompat.Style? = null
-                if (lastCommands != null && lastCommands[0] != null) {
-                    val inboxStyle: NotificationCompat.InboxStyle = NotificationCompat.InboxStyle()
+            var style: NotificationCompat.Style? = null
+            if (lastCommands != null && lastCommands[0] != null) {
+                val inboxStyle: NotificationCompat.InboxStyle = NotificationCompat.InboxStyle()
 
-                    if (upDown) {
-                        for (lastCommand in lastCommands) {
-                            if (lastCommand == null) break
-                            inboxStyle.addLine(lastCommand)
-                        }
-                    } else {
-                        for (j in lastCommands.indices.reversed()) {
-                            if (lastCommands[j] == null) continue
-                            inboxStyle.addLine(lastCommands[j])
-                        }
+                if (upDown) {
+                    for (lastCommand in lastCommands) {
+                        if (lastCommand == null) break
+                        inboxStyle.addLine(lastCommand)
                     }
-
-                    style = inboxStyle
+                } else {
+                    for (j in lastCommands.indices.reversed()) {
+                        if (lastCommands[j] == null) continue
+                        inboxStyle.addLine(lastCommands[j])
+                    }
                 }
 
-                if (style != null) builder.setStyle(style)
-                else {
-                    builder.setContentTitle(title)
-                    builder.setContentText(subtitle)
-                }
-                return builder.build()
+                style = inboxStyle
             }
+
+            if (style != null) builder.setStyle(style)
+            else {
+                builder.setContentTitle(title)
+                builder.setContentText(subtitle)
+            }
+
+            val remoteInput = androidx.core.app.RemoteInput.Builder(PrivateIOReceiver.TEXT)
+                .setLabel(cmdLabel)
+                .build()
+
+            val i: Intent = Intent(c, PublicIOReceiver::class.java)
+            i.setAction(PublicIOReceiver.ACTION_CMD)
+
+            val actionBuilder: androidx.core.app.NotificationCompat.Action.Builder =
+                androidx.core.app.NotificationCompat.Action.Builder(
+                    R.mipmap.ic_launcher,
+                    cmdLabel,
+                    PendingIntent.getBroadcast(
+                        c.getApplicationContext(),
+                        40,
+                        i,
+                        KeeperService.Companion.remoteInputPendingIntentFlags(PendingIntent.FLAG_UPDATE_CURRENT)
+                    )
+                )
+                    .addRemoteInput(remoteInput)
+
+            builder.addAction(actionBuilder.build())
+
+            return builder.build()
         }
 
         private fun remoteInputPendingIntentFlags(flags: Int): Int {

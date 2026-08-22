@@ -18,6 +18,7 @@ google-services.json
 
 # IDE Files
 **/.idea/
+.kotlin/
 .cursor/
 **/*.iml
 **/.classpath

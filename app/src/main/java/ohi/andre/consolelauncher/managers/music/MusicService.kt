@@ -479,31 +479,29 @@ class MusicService : Service(), OnPreparedListener, MediaPlayer.OnErrorListener,
                 controlIntent(context, CONTROL_NEXT_INT, 23)
             )
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                val label = "cmd"
-                val remoteInput = RemoteInput.Builder(PrivateIOReceiver.TEXT)
-                    .setLabel(label)
-                    .build()
+            val label = "cmd"
+            val remoteInput = RemoteInput.Builder(PrivateIOReceiver.TEXT)
+                .setLabel(label)
+                .build()
 
-                val i = Intent(context, PublicIOReceiver::class.java)
-                i.setAction(PublicIOReceiver.ACTION_CMD)
-                i.putExtra(MainManager.MUSIC_SERVICE, true)
+            val i = Intent(context, PublicIOReceiver::class.java)
+            i.setAction(PublicIOReceiver.ACTION_CMD)
+            i.putExtra(MainManager.MUSIC_SERVICE, true)
 
-                var flags = Tuils.pendingIntentFlags(PendingIntent.FLAG_UPDATE_CURRENT)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    flags =
-                        (flags and PendingIntent.FLAG_IMMUTABLE.inv()) or PendingIntent.FLAG_MUTABLE
-                }
-
-                val action = NotificationCompat.Action.Builder(
-                    R.mipmap.ic_launcher, label,
-                    PendingIntent.getBroadcast(context.getApplicationContext(), 10, i, flags)
-                )
-                    .addRemoteInput(remoteInput)
-                    .build()
-
-                builder.addAction(action)
+            var flags = Tuils.pendingIntentFlags(PendingIntent.FLAG_UPDATE_CURRENT)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                flags =
+                    (flags and PendingIntent.FLAG_IMMUTABLE.inv()) or PendingIntent.FLAG_MUTABLE
             }
+
+            val action = NotificationCompat.Action.Builder(
+                R.mipmap.ic_launcher, label,
+                PendingIntent.getBroadcast(context.getApplicationContext(), 10, i, flags)
+            )
+                .addRemoteInput(remoteInput)
+                .build()
+
+            builder.addAction(action)
 
             notification = builder.build()
             return notification

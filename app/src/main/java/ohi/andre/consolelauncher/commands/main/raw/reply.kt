@@ -1,20 +1,18 @@
 package ohi.andre.consolelauncher.commands.main.raw
 
 import android.content.Intent
-import android.os.Build
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import java.util.Locale
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.commands.CommandAbstraction
 import ohi.andre.consolelauncher.commands.ExecutePack
 import ohi.andre.consolelauncher.commands.main.MainPack
-import ohi.andre.consolelauncher.commands.main.specific.APICommand
 import ohi.andre.consolelauncher.commands.main.specific.ParamCommand
 import ohi.andre.consolelauncher.managers.notifications.NotificationService
 import ohi.andre.consolelauncher.managers.notifications.reply.ReplyManager
 import ohi.andre.consolelauncher.tuils.Tuils
 
-class reply : ParamCommand(), APICommand {
+class reply : ParamCommand() {
     private enum class Param : ohi.andre.consolelauncher.commands.main.Param {
         to {
             override fun args(): IntArray = intArrayOf(CommandAbstraction.BOUND_REPLY_APP, CommandAbstraction.PLAIN_TEXT)
@@ -127,5 +125,4 @@ class reply : ParamCommand(), APICommand {
 
     override fun helpRes(): Int = R.string.help_reply
 
-    override fun willWorkOn(api: Int): Boolean = api >= Build.VERSION_CODES.KITKAT_WATCH
 }

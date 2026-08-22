@@ -15,7 +15,6 @@
  */
 package ohi.andre.consolelauncher.tuils.libsuperuser
 
-import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import ohi.andre.consolelauncher.tuils.Tuils.log
@@ -470,10 +469,7 @@ object Shell {
          * @return Shell command
          */
         fun shellMountMaster(): String {
-            if (Build.VERSION.SDK_INT >= 17) {
-                return "su --mount-master"
-            }
-            return "su"
+            return "su --mount-master"
         }
 
         /**
@@ -487,35 +483,29 @@ object Shell {
             if (isSELinuxEnforcing == null) {
                 var enforcing: Boolean? = null
 
-                // First known firmware with SELinux built-in was a 4.2 (17)
-                // leak
-                if (Build.VERSION.SDK_INT >= 17) {
-                    // Detect enforcing through sysfs, not always present
-                    val f = File("/sys/fs/selinux/enforce")
-                    if (f.exists()) {
+                // Detect enforcing through sysfs, not always present
+                val f = File("/sys/fs/selinux/enforce")
+                if (f.exists()) {
+                    try {
+                        val `is`: InputStream = FileInputStream("/sys/fs/selinux/enforce")
                         try {
-                            val `is`: InputStream = FileInputStream("/sys/fs/selinux/enforce")
-                            try {
-                                enforcing = (`is`.read() == '1'.code)
-                            } finally {
-                                `is`.close()
-                            }
-                        } catch (e: Exception) {
-                            // we might not be allowed to read, thanks SELinux
+                            enforcing = (`is`.read() == '1'.code)
+                        } finally {
+                            `is`.close()
                         }
+                    } catch (e: Exception) {
+                        // we might not be allowed to read, thanks SELinux
                     }
+                }
 
-                    // 4.4+ has a new API to detect SELinux mode, so use it
-                    // SELinux is typically in enforced mode, but emulators may have SELinux disabled
-                    if (enforcing == null) {
-                        try {
-                            val seLinux = Class.forName("android.os.SELinux")
-                            val isSELinuxEnforced = seLinux.getMethod("isSELinuxEnforced")
-                            enforcing = isSELinuxEnforced.invoke(seLinux.newInstance()) as Boolean?
-                        } catch (e: Exception) {
-                            // 4.4+ release builds are enforcing by default, take the gamble
-                            enforcing = (Build.VERSION.SDK_INT >= 19)
-                        }
+                // SELinux is typically enforced, but emulators may have it disabled.
+                if (enforcing == null) {
+                    try {
+                        val seLinux = Class.forName("android.os.SELinux")
+                        val isSELinuxEnforced = seLinux.getMethod("isSELinuxEnforced")
+                        enforcing = isSELinuxEnforced.invoke(seLinux.newInstance()) as Boolean?
+                    } catch (e: Exception) {
+                        enforcing = true
                     }
                 }
 

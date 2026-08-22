@@ -55,10 +55,6 @@ object TermuxBridgeManager {
     }
 
     fun hasRunCommandPermission(context: Context): Boolean {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            return true
-        }
-
         val permission = findRunCommandPermission(context)
         return permission == null
                 || ContextCompat.checkSelfPermission(
@@ -70,7 +66,7 @@ object TermuxBridgeManager {
     @JvmStatic
     @JvmOverloads
     fun requestRunCommandPermissionIfPossible(context: Context?, requestCode: Int = 8127): Boolean {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || context !is Activity) {
+        if (context !is Activity) {
             return false
         }
 

@@ -22,7 +22,7 @@ class flash : CommandAbstraction {
             return pack.context.getString(R.string.output_waitingpermission)
         }
 
-        TorchManager.getInstance().toggle(pack.context)
+        TorchManager.toggle(pack.context)
         return null
     }
 

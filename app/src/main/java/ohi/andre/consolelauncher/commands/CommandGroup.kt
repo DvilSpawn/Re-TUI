@@ -29,8 +29,8 @@ class CommandGroup(private val packageName: String) {
             if (packageName == "ohi.andre.consolelauncher.commands.main.raw") {
                 cmds.addAll(
                     listOf(
-                        "airplane", "alias", "apps", "beep", "bluetooth", "breach", "brightness", "calc", "call", "cd",
-                        "changelog", "clear", "cntcts", "config", "contacts", "credits", "ctrlc", "data", "debug", "devutils",
+                        "alias", "apps", "beep", "bluetooth", "breach", "brightness", "calc", "call", "cd",
+                        "changelog", "clear", "cntcts", "config", "contacts", "credits", "ctrlc", "debug", "devutils",
                         "donate", "duo", "exit", "files", "flash", "guide", "hack", "help", "htmlextract", "install",
                         "inspect", "intent", "landscape", "location", "lockdown", "ls", "lua", "module", "music", "notes", "notifications", "open",
                         "orientation", "podcast", "pomodoro", "portrait", "post", "preset", "profile", "pwd", "rate", "refresh", "regex",

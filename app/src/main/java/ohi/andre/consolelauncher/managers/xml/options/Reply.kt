@@ -1,6 +1,5 @@
 package ohi.andre.consolelauncher.managers.xml.options
 
-import android.os.Build
 import ohi.andre.consolelauncher.managers.notifications.reply.ReplyManager
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsElement
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave
@@ -18,8 +17,7 @@ enum class Reply(
 
     override fun info(): String = info
 
-    override fun parent(): XMLPrefsElement? =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) ReplyManager.getInstance() else null
+    override fun parent(): XMLPrefsElement? = ReplyManager.getInstance()
 
     override fun label(): String = name
 

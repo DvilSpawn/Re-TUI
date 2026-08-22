@@ -5586,10 +5586,7 @@ class UIManager(
     }
 
     private fun ensureNotificationServiceForModule() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2 || !Tuils.hasNotificationAccess(
-                mContext
-            )
-        ) {
+        if (!Tuils.hasNotificationAccess(mContext)) {
             return
         }
         try {
@@ -8924,10 +8921,7 @@ class UIManager(
                 notesView.setMaxLines(notesMaxLines)
                 notesView.setEllipsize(TextUtils.TruncateAt.MARQUEE)
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB && XMLPrefsManager.getBoolean(
-                        Ui.show_scroll_notes_message
-                    )
-                ) {
+                if (XMLPrefsManager.getBoolean(Ui.show_scroll_notes_message)) {
                     notesView.getViewTreeObserver()
                         .addOnGlobalLayoutListener(object : OnGlobalLayoutListener {
                             var linesBefore: Int = Int.Companion.MIN_VALUE

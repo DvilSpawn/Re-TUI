@@ -93,7 +93,6 @@
     <string name="no_result">No results</string>
     <string name="unavailable_name">Name unavailable</string>
     <string name="invalid_name">Invalid name</string>
-    <string name="api_low">Low Android version</string>
     <string name="invalid_datastoretype">Invalid type</string>
 
     <!-- note -->
@@ -131,10 +130,8 @@
 
     <!-- phone -->
     <string name="output_wifi">WiFi active:</string>
-    <string name="output_data">Mobile Data active:</string>
     <string name="output_bluetooth">Bluetooth active:</string>
     <string name="output_bluetooth_unavailable">Bluetooth is not available on this device</string>
-    <string name="output_airplane">Airplane mode active:</string>
 
     <!-- music -->
     <string name="output_playing">Playing:</string>
@@ -272,7 +269,6 @@
     <string name="output_numbernotfound">Contact not found</string>
 
 
-    <string name="help_airplane">Toggle airplane mode</string>
     <string name="help_debug">-settings -> inspect runtime settings snapshot, notifications, music, fonts, and colors
         \n-theme -> inspect effective theme, auto color, and font state
         \n-presets -> inspect preset directory and available presets
@@ -358,7 +354,6 @@
         \n-apply [file] -> move a file to the Re:T-UI directory
         \n-tutorial -> open the tutorial page
     </string>
-    <string name="help_data">Toggle mobile data</string>
     <string name="help_devutils">Dev utilities.
         \n$ devutils -notify title body
         \n$ devutils -notify_reply title body
