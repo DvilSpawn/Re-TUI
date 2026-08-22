@@ -14,6 +14,8 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.InputStream
 import java.security.MessageDigest
+import java.util.Locale
+import java.util.UUID
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
@@ -105,7 +107,14 @@ object FrameManager {
     private val invalidAssets = HashSet<String>()
     @Volatile private var cachedState: FrameState? = null
 
-    data class FrameAsset(val id: String, val name: String, val valid: Boolean)
+    data class FrameAsset(val id: String, val name: String)
+
+    data class FramePack(
+        val id: String,
+        val name: String,
+        val applyToAll: Boolean,
+        val assignments: Map<String, String>
+    )
 
     data class SharedFrameSource(
         val assetId: String,
@@ -128,9 +137,11 @@ object FrameManager {
 
     internal data class FrameState(
         var applyToAll: Boolean,
-        val assignments: MutableMap<String, String>
+        val assignments: MutableMap<String, String>,
+        val packs: MutableMap<String, FramePack> = HashMap(),
+        var activePackId: String? = null
     ) {
-        fun copyState() = FrameState(applyToAll, HashMap(assignments))
+        fun copyState() = FrameState(applyToAll, HashMap(assignments), HashMap(packs), activePackId)
     }
 
     class EditSession internal constructor(
@@ -140,7 +151,12 @@ object FrameManager {
         private val state = original.copyState()
         var applyToAll: Boolean
             get() = state.applyToAll
-            set(value) { state.applyToAll = value }
+            set(value) {
+                if (state.applyToAll != value) {
+                    state.applyToAll = value
+                    state.activePackId = null
+                }
+            }
         private var libraryChanged = false
         private val previews = HashMap<String, FramePreview?>()
 
@@ -155,6 +171,7 @@ object FrameManager {
                 require(ASSET_ID.matches(assetId)) { "Invalid frame selection." }
                 state.assignments[key] = assetId
             }
+            state.activePackId = null
         }
 
         fun hasAssignedFrame(target: FrameTarget?): Boolean = selectedAssetId(target) != null
@@ -166,27 +183,55 @@ object FrameManager {
         fun assignedFrameIsInvalid(target: FrameTarget?): Boolean =
             hasAssignedFrame(target) && previewBitmap(target) == null
 
-        fun assets(): List<FrameAsset> = directory.listFiles().orEmpty()
-            .mapNotNull { assetId(it.name)?.let { id -> id to it } }
-            .map { (id, _) ->
-                val loaded = load(id)
-                FrameAsset(id, loaded?.name ?: "Missing or corrupt frame ${id.take(8)}", loaded != null)
-            }
+        fun packs(): List<FramePack> = state.packs.values
             .sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.name })
 
-        fun references(assetId: String): List<String> = state.assignments
-            .filterValues { it == assetId }
-            .keys
-            .mapNotNull { key ->
-                if (key == "global") "All surfaces" else FrameTarget.entries.firstOrNull { it.id == key }?.label
-            }
+        fun activePackId(): String? = state.activePackId
 
-        fun importBundle(target: FrameTarget?, input: InputStream): FrameAsset {
-            val bytes = input.readLimited(MAX_BUNDLE_BYTES, "Frame bundle is too large.")
-            val asset = registerBundle(bytes)
-            val id = asset.id
-            select(target, id)
-            return asset
+        fun packNameError(name: String): String? {
+            val clean = name.trim()
+            if (clean.isEmpty() || clean.length > 80) return "Pack name must be 1 to 80 characters."
+            if (state.packs.values.any { it.name.equals(clean, ignoreCase = true) }) {
+                return "A frame pack with that name already exists."
+            }
+            return null
+        }
+
+        fun createPack(name: String): FramePack {
+            val clean = name.trim()
+            require(packNameError(clean) == null) { packNameError(clean) ?: "Invalid frame pack name." }
+            val id = sha256(UUID.randomUUID().toString().toByteArray(Charsets.UTF_8))
+            return FramePack(id, clean, state.applyToAll, HashMap(state.assignments)).also {
+                state.packs[id] = it
+                state.activePackId = id
+            }
+        }
+
+        fun replacePack(packId: String): FramePack {
+            val current = requireNotNull(state.packs[packId]) { "Frame pack is missing." }
+            return current.copy(applyToAll = state.applyToAll, assignments = HashMap(state.assignments)).also {
+                state.packs[packId] = it
+                state.activePackId = packId
+            }
+        }
+
+        fun applyPack(packId: String) {
+            val pack = requireNotNull(state.packs[packId]) { "Frame pack is missing." }
+            state.applyToAll = pack.applyToAll
+            state.assignments.clear()
+            state.assignments.putAll(pack.assignments)
+            state.activePackId = packId
+        }
+
+        fun deletePack(packId: String): Boolean {
+            requireNotNull(state.packs.remove(packId)) { "Frame pack is missing." }
+            val wasActive = state.activePackId == packId
+            if (wasActive) {
+                state.applyToAll = true
+                state.assignments.clear()
+                state.activePackId = null
+            }
+            return wasActive
         }
 
         fun importFrame(target: FrameTarget?, displayName: String?, input: InputStream): FrameAsset {
@@ -202,14 +247,6 @@ object FrameManager {
             }
             select(target, asset.id)
             return asset
-        }
-
-        fun deleteAsset(assetId: String) {
-            state.assignments.entries.removeAll { it.value == assetId }
-            val file = assetFile(directory, assetId)
-            if (file.exists() && !file.delete()) throw IllegalStateException("Unable to delete frame.")
-            previews.remove(assetId)
-            libraryChanged = true
         }
 
         fun save() {
@@ -241,7 +278,7 @@ object FrameManager {
                 libraryChanged = true
             }
             previews.remove(id)
-            return FrameAsset(id, parsed.name, true)
+            return FrameAsset(id, parsed.name)
         }
     }
 
@@ -383,6 +420,9 @@ object FrameManager {
         require(state.assignments.keys.all(::isKnownRole)) {
             "Frame settings contain an unknown surface."
         }
+        require(state.packs.values.all { pack -> pack.assignments.keys.all(::isKnownRole) }) {
+            "Frame pack contains an unknown surface."
+        }
     }
 
     fun portableFiles(root: File): List<File> {
@@ -390,7 +430,7 @@ object FrameManager {
         if (!dir.isDirectory) return emptyList()
         validatePortableState(root)
         val state = readState(dir)
-        val referenced = state.assignments.values.toSet()
+        val referenced = referencedAssetIds(state)
         return dir.listFiles().orEmpty().filter {
             it.isFile && (it.name == STATE_FILE || assetId(it.name)?.let(referenced::contains) == true || stateSchema(dir) == 1)
         }.sortedBy { it.name }
@@ -489,13 +529,68 @@ object FrameManager {
                     "Unsupported frame settings."
                 }
                 val assignments = state.getJSONObject("assignments").assetMap()
-                FrameState(state.getBoolean("applyToAll"), assignments)
+                val packs = HashMap<String, FramePack>()
+                val values = state.getJSONObject("packs")
+                for (id in values.keys()) {
+                    require(ASSET_ID.matches(id)) { "Invalid frame pack reference." }
+                    val value = values.getJSONObject(id)
+                    require(value.stringSet() == setOf("name", "roles")) { "Unsupported frame pack record." }
+                    val name = value.getString("name").trim()
+                    require(name.isNotEmpty() && name.length <= 80) { "Frame pack name must be 1 to 80 characters." }
+                    val roles = value.getJSONObject("roles").assetMap()
+                    require(roles.keys.all(::isKnownRole)) { "Frame pack contains an unknown surface." }
+                    packs[id] = FramePack(id, name, "global" in roles, roles)
+                }
+                val active = packs.values.firstOrNull {
+                    it.applyToAll == state.getBoolean("applyToAll") && it.assignments == assignments
+                }?.id
+                FrameState(state.getBoolean("applyToAll"), assignments, packs, active)
+            }
+            4 -> {
+                require(state.stringSet() == setOf("schema", "applyToAll", "assignments", "packs", "activePackId")) {
+                    "Unsupported frame settings."
+                }
+                val assignments = state.getJSONObject("assignments").assetMap()
+                require(assignments.keys.all(::isKnownRole)) { "Frame settings contain an unknown surface." }
+                val packs = HashMap<String, FramePack>()
+                val values = state.getJSONObject("packs")
+                for (id in values.keys()) {
+                    require(ASSET_ID.matches(id)) { "Invalid frame pack reference." }
+                    val value = values.getJSONObject(id)
+                    require(value.stringSet() == setOf("name", "applyToAll", "assignments")) {
+                        "Unsupported frame pack record."
+                    }
+                    val name = value.getString("name").trim()
+                    require(name.isNotEmpty() && name.length <= 80) { "Frame pack name must be 1 to 80 characters." }
+                    require(packs.values.none { it.name.equals(name, ignoreCase = true) }) {
+                        "Frame pack names must be unique."
+                    }
+                    val packAssignments = value.getJSONObject("assignments").assetMap()
+                    require(packAssignments.keys.all(::isKnownRole)) { "Frame pack contains an unknown surface." }
+                    packs[id] = FramePack(id, name, value.getBoolean("applyToAll"), packAssignments)
+                }
+                val active = if (state.isNull("activePackId")) null else state.getString("activePackId").also {
+                    require(it in packs) { "Active frame pack is missing." }
+                }
+                FrameState(state.getBoolean("applyToAll"), assignments, packs, active)
             }
             else -> throw IllegalArgumentException("Unsupported frame settings.")
         }
     }
 
     private fun writeStateFile(dir: File, value: FrameState) {
+        require(value.assignments.keys.all(::isKnownRole) && value.packs.values.all {
+            it.assignments.keys.all(::isKnownRole)
+        }) { "Frame settings contain an unknown surface." }
+        require(value.packs.values.map { it.name.lowercase(Locale.ROOT) }.toSet().size == value.packs.size) {
+            "Frame pack names must be unique."
+        }
+        value.activePackId?.let { activeId ->
+            val active = requireNotNull(value.packs[activeId]) { "Active frame pack is missing." }
+            require(active.applyToAll == value.applyToAll && active.assignments == value.assignments) {
+                "Active frame settings do not match their pack."
+            }
+        }
         val state = File(dir, STATE_FILE)
         val temp = File(dir, "$STATE_FILE.tmp")
         val backup = File(dir, "$STATE_FILE.old")
@@ -503,9 +598,20 @@ object FrameManager {
         backup.delete()
         val assignments = JSONObject()
         for ((key, assetId) in value.assignments.toSortedMap()) assignments.put(key, assetId)
+        val packs = JSONObject()
+        for ((id, pack) in value.packs.toSortedMap()) {
+            val packAssignments = JSONObject()
+            for ((key, assetId) in pack.assignments.toSortedMap()) packAssignments.put(key, assetId)
+            packs.put(
+                id,
+                JSONObject().put("name", pack.name).put("applyToAll", pack.applyToAll)
+                    .put("assignments", packAssignments)
+            )
+        }
         temp.writeText(
-            JSONObject().put("schema", 2).put("applyToAll", value.applyToAll)
-                .put("assignments", assignments).toString(2),
+            JSONObject().put("schema", 4).put("applyToAll", value.applyToAll)
+                .put("assignments", assignments).put("packs", packs)
+                .put("activePackId", value.activePackId ?: JSONObject.NULL).toString(2),
             Charsets.UTF_8
         )
         if (state.exists()) check(state.renameTo(backup)) { "Unable to save frame settings." }
@@ -639,12 +745,15 @@ object FrameManager {
 
     private fun removeUnreferencedAssets(directory: File) {
         val state = readState(directory)
-        val referenced = state.assignments.values.toSet()
+        val referenced = referencedAssetIds(state)
         directory.listFiles().orEmpty().forEach { file ->
             val id = assetId(file.name)
             if (id != null && id !in referenced) file.delete()
         }
     }
+
+    internal fun referencedAssetIds(state: FrameState): Set<String> =
+        state.assignments.values.toSet() + state.packs.values.flatMap { it.assignments.values }
 
     private fun sha256(bytes: ByteArray): String = MessageDigest.getInstance("SHA-256")
         .digest(bytes).joinToString("") { "%02x".format(it) }

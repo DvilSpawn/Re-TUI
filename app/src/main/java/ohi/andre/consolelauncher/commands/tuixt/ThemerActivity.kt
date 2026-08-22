@@ -42,6 +42,9 @@ import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.LauncherActivity
 import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog.ConfirmAction
 import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog.ContentFactory
+import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog.FormAction
+import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog.FormField
+import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog.FormValidator
 import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog.InputAction
 import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog.ItemAction
 import ohi.andre.consolelauncher.commands.tuixt.TuixtLayout.addFoldAwareHost
@@ -632,8 +635,6 @@ class ThemerActivity : AppCompatActivity() {
         root.addView(TextView(this).apply {
             text = "SAVE FRAME SETTINGS"
             styleButton(this@ThemerActivity, this, true)
-            isEnabled = session.hasChanges()
-            alpha = if (isEnabled) 1f else 0.45f
             setOnClickListener { saveFrameChanges() }
         }, inputParams())
 
@@ -642,16 +643,16 @@ class ThemerActivity : AppCompatActivity() {
             root.addView(frameAssignmentRow(target), inputParams())
         }
 
-        val assets = session.assets()
-        if (assets.isNotEmpty()) {
+        val packs = session.packs()
+        if (packs.isNotEmpty()) {
             root.addView(TextView(this).apply {
-                text = "FRAME LIBRARY"
+                text = "FRAME PACKS"
                 setTextColor(accentColor())
                 setTypeface(Tuils.getTypeface(this@ThemerActivity), Typeface.BOLD)
                 textSize = 14f
                 setPadding(dp(this@ThemerActivity, 8f), dp(this@ThemerActivity, 12f), 0, dp(this@ThemerActivity, 8f))
             }, inputParams())
-            assets.forEach { root.addView(frameLibraryRow(it), inputParams()) }
+            packs.forEach { root.addView(framePackRow(it), inputParams()) }
         }
     }
 
@@ -710,7 +711,6 @@ class ThemerActivity : AppCompatActivity() {
             text = if (selected == null) "FRAME: DEFAULT BORDER" else
                 "FRAME: ${session.assignedName(target) ?: "MISSING OR CORRUPT"}"
             styleButton(this@ThemerActivity, this, false)
-            setOnClickListener { showFrameSelector(target) }
         }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(this, 46f)))
 
         val actions = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
@@ -734,66 +734,42 @@ class ThemerActivity : AppCompatActivity() {
         return row
     }
 
-    private fun frameLibraryRow(asset: FrameManager.FrameAsset): View {
-        val session = frameSession()
+    private fun framePackRow(pack: FrameManager.FramePack): View {
+        val active = frameSession().activePackId() == pack.id
         val row = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER_VERTICAL
+            orientation = LinearLayout.VERTICAL
             setPadding(dp(this@ThemerActivity, 10f), dp(this@ThemerActivity, 8f), dp(this@ThemerActivity, 10f), dp(this@ThemerActivity, 8f))
             background = rect(this@ThemerActivity, surfaceColor(), borderColor(), 1.25f)
         }
         row.addView(TextView(this).apply {
-            text = if (asset.valid) asset.name else "⚠ ${asset.name}"
-            setTextColor(if (asset.valid) textColor() else Color.RED)
-            setTypeface(Tuils.getTypeface(this@ThemerActivity), Typeface.BOLD)
-        }, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
-        row.addView(
-            frameIconButton(R.drawable.ic_tuixt_delete_24, "Delete ${asset.name}") {
-                confirmDeleteFrameAsset(asset, session.references(asset.id))
-            },
-            LinearLayout.LayoutParams(dp(this, 44f), dp(this, 44f))
-        )
-        return row
-    }
-
-    private fun frameIconButton(imageRes: Int, description: String, onClick: () -> Unit): ImageButton =
-        ImageButton(this).apply {
-            setImageResource(imageRes)
-            contentDescription = description
-            styleIconButton(this@ThemerActivity, this)
-            setColorFilter(textColor(), PorterDuff.Mode.SRC_IN)
-            setPadding(dp(this@ThemerActivity, 8f), dp(this@ThemerActivity, 8f), dp(this@ThemerActivity, 8f), dp(this@ThemerActivity, 8f))
-            setOnClickListener { onClick() }
-        }
-
-    private fun showFrameSelector(target: FrameTarget?) {
-        val session = frameSession()
-        val assets = session.assets()
-        val labels = mutableListOf("Default border")
-        labels.addAll(assets.map { if (it.valid) it.name else "⚠ ${it.name}" })
-        val selectedId = session.selectedAssetId(target)
-        val selectedIndex = if (selectedId == null) 0 else
-            assets.indexOfFirst { it.id == selectedId }.takeIf { it >= 0 }?.plus(1) ?: -1
-        TuixtDialog.showOptions(this, "Select Frame", labels, selectedIndex, TuixtDialog.ItemAction { index ->
-            session.select(target, if (index == 0) null else assets[index - 1].id)
-            reloadForFrame("Frame selection updated.")
-        })
-    }
-
-    private fun confirmDeleteFrameAsset(asset: FrameManager.FrameAsset, references: List<String>) {
-        val detail = if (references.isEmpty()) "" else
-            " It is currently selected for: ${references.joinToString()}. Those surfaces will use their default borders."
-        TuixtDialog.showConfirm(
-            this,
-            "Delete Frame",
-            "Delete ${asset.name}?$detail",
-            "Delete",
-            "Cancel",
-            ConfirmAction {
-                frameSession().deleteAsset(asset.id)
-                reloadForFrame("Frame deleted from library.")
+            text = buildString {
+                append(pack.name)
+                append("\n")
+                append(pack.assignments.size).append(if (pack.assignments.size == 1) " custom frame" else " custom frames")
+                if (active) append("  •  ACTIVE")
             }
-        )
+            setTextColor(if (active) accentColor() else textColor())
+            setTypeface(Tuils.getTypeface(this@ThemerActivity), Typeface.BOLD)
+        })
+        val actions = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            setPadding(0, dp(this@ThemerActivity, 8f), 0, 0)
+        }
+        actions.addView(TextView(this).apply {
+            text = if (active) "APPLIED" else "APPLY"
+            styleButton(this@ThemerActivity, this, false)
+            isEnabled = !active
+            alpha = if (active) 0.45f else 1f
+            setOnClickListener { applyFramePack(pack) }
+        }, LinearLayout.LayoutParams(0, dp(this, 46f), 1f))
+        actions.addView(View(this), LinearLayout.LayoutParams(dp(this, 8f), 1))
+        actions.addView(TextView(this).apply {
+            text = "DELETE"
+            styleButton(this@ThemerActivity, this, false)
+            setOnClickListener { confirmDeleteFramePack(pack) }
+        }, LinearLayout.LayoutParams(0, dp(this, 46f), 1f))
+        row.addView(actions)
+        return row
     }
 
     private fun bindFontRow(holder: FontViewHolder, fileName: String) {
@@ -1647,11 +1623,106 @@ class ThemerActivity : AppCompatActivity() {
 
     private fun saveFrameChanges() {
         val session = frameEditSession ?: return
-        if (!session.hasChanges()) return
+        val choices = mutableListOf("Create new pack")
+        if (session.packs().isNotEmpty()) choices.add("Replace existing pack")
+        TuixtDialog.showOptions(this, "Save Frame Settings", choices, ItemAction { choice ->
+            if (choice == 0) showCreateFramePack() else showReplaceFramePack()
+        })
+    }
+
+    private fun showCreateFramePack() {
+        val session = frameEditSession ?: return
+        TuixtDialog.showValidatedForm(
+            this,
+            "Create Frame Pack",
+            listOf(FormField("name", "Pack name", "My frame pack")),
+            "Create",
+            "Cancel",
+            FormValidator { values -> session.packNameError(values["name"].orEmpty()) },
+            FormAction { values ->
+                try {
+                    session.createPack(values["name"].orEmpty())
+                    persistFrameSession("Frame pack created and applied.")
+                } catch (e: Exception) {
+                    Toast.makeText(this, "Could not create frame pack: ${e.message}", Toast.LENGTH_LONG).show()
+                }
+            }
+        )
+    }
+
+    private fun showReplaceFramePack() {
+        val packs = frameEditSession?.packs().orEmpty()
+        if (packs.isEmpty()) return
+        TuixtDialog.showOptions(this, "Replace Frame Pack", packs.map { it.name }, ItemAction { index ->
+            val pack = packs[index]
+            TuixtDialog.showConfirm(
+                this,
+                "Replace ${pack.name}?",
+                "Replace this pack with the complete current frame setup?",
+                "Replace",
+                "Cancel",
+                ConfirmAction {
+                    try {
+                        frameEditSession?.replacePack(pack.id) ?: return@ConfirmAction
+                        persistFrameSession("${pack.name} replaced and applied.")
+                    } catch (e: Exception) {
+                        Toast.makeText(this, "Could not replace frame pack: ${e.message}", Toast.LENGTH_LONG).show()
+                    }
+                }
+            )
+        })
+    }
+
+    private fun applyFramePack(pack: FrameManager.FramePack) {
+        withCleanFrameSession("Unsaved element edits will be discarded before applying ${pack.name}.") { session ->
+            try {
+                session.applyPack(pack.id)
+                persistFrameSession("${pack.name} applied.")
+            } catch (e: Exception) {
+                Toast.makeText(this, "Could not apply frame pack: ${e.message}", Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    private fun confirmDeleteFramePack(pack: FrameManager.FramePack) {
+        val active = frameSession().activePackId() == pack.id
+        val message = buildString {
+            append("Delete ${pack.name}?")
+            if (active) append(" The active frame setup will return to defaults.")
+            if (frameSession().hasChanges()) append(" Unsaved element edits will be discarded.")
+        }
+        TuixtDialog.showConfirm(this, "Delete Frame Pack", message, "Delete", "Cancel", ConfirmAction {
+            val session = if (frameSession().hasChanges()) {
+                discardFrameChanges()
+                frameSession()
+            } else frameSession()
+            try {
+                session.deletePack(pack.id)
+                persistFrameSession("${pack.name} deleted.")
+            } catch (e: Exception) {
+                Toast.makeText(this, "Could not delete frame pack: ${e.message}", Toast.LENGTH_LONG).show()
+            }
+        })
+    }
+
+    private fun withCleanFrameSession(message: String, action: (FrameManager.EditSession) -> Unit) {
+        val session = frameSession()
+        if (!session.hasChanges()) {
+            action(session)
+            return
+        }
+        TuixtDialog.showConfirm(this, "Discard Unsaved Edits?", message, "Discard and Apply", "Cancel", ConfirmAction {
+            discardFrameChanges()
+            action(frameSession())
+        })
+    }
+
+    private fun persistFrameSession(message: String) {
+        val session = frameEditSession ?: return
         try {
             session.save()
             frameEditSession = null
-            Toast.makeText(this, "Frame settings saved. Applying...", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
             LauncherActivity.preview(this)
         } catch (e: Exception) {
             Toast.makeText(this, "Could not save frame settings: ${e.message}", Toast.LENGTH_LONG).show()

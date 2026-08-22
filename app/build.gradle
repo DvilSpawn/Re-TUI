@@ -306,4 +306,5 @@ dependencies {
     implementation 'com.joaomgcd:taskerpluginlibrary:0.4.10'
 
     testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.json:json:20250517'
 }
