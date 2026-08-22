@@ -14,7 +14,9 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.InputStream
 import java.security.MessageDigest
+import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
+import java.util.zip.ZipOutputStream
 import ohi.andre.consolelauncher.managers.xml.options.SurfaceBorder
 import org.json.JSONObject
 
@@ -184,6 +186,21 @@ object FrameManager {
             val asset = registerBundle(bytes)
             val id = asset.id
             select(target, id)
+            return asset
+        }
+
+        fun importFrame(target: FrameTarget?, displayName: String?, input: InputStream): FrameAsset {
+            val bytes = input.readLimited(MAX_BUNDLE_BYTES, "Frame file is too large.")
+            val asset = if (hasPngSignature(bytes)) {
+                require(bytes.size <= MAX_PNG_BYTES) { "Frame image is too large." }
+                val (width, height) = imageBounds(bytes)
+                val name = displayName.orEmpty().substringAfterLast('/').substringBeforeLast('.')
+                    .trim().take(80).ifEmpty { target?.label ?: "Imported frame" }
+                registerBundle(buildBundle(name, defaultPngSpec(width, height), bytes))
+            } else {
+                registerBundle(bytes)
+            }
+            select(target, asset.id)
             return asset
         }
 
@@ -633,7 +650,7 @@ object FrameManager {
         .digest(bytes).joinToString("") { "%02x".format(it) }
 
     private fun imageBounds(image: ByteArray): Pair<Int, Int> {
-        require(image.size >= 8 && image.copyOfRange(0, 8).contentEquals(byteArrayOf(0x89.toByte(), 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a))) {
+        require(hasPngSignature(image)) {
             "Frame image is not a PNG image."
         }
         val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
@@ -642,6 +659,60 @@ object FrameManager {
             "Frame image must be no larger than 2048 x 2048."
         }
         return options.outWidth to options.outHeight
+    }
+
+    internal fun hasPngSignature(image: ByteArray): Boolean =
+        image.size >= PNG_SIGNATURE.size && image.copyOfRange(0, PNG_SIGNATURE.size).contentEquals(PNG_SIGNATURE)
+
+    internal fun defaultPngSpec(width: Int, height: Int): FrameSpec {
+        require(width == height && width >= 24 && width % 24 == 0) {
+            "PNG frames must be square and sized 24 x 24, 48 x 48, 72 x 72, and so on."
+        }
+        val cell = width / 3
+        return FrameSpec(
+            leftPx = cell,
+            topPx = cell,
+            rightPx = cell,
+            bottomPx = cell,
+            leftDp = 8f,
+            topDp = 8f,
+            rightDp = 8f,
+            bottomDp = 8f,
+            topMode = "tile",
+            rightMode = "tile",
+            bottomMode = "tile",
+            leftMode = "tile",
+            centerMode = "stretch",
+            filtering = "nearest"
+        )
+    }
+
+    private fun buildBundle(name: String, spec: FrameSpec, png: ByteArray): ByteArray {
+        val slices = JSONObject().put("left", spec.leftPx).put("top", spec.topPx)
+            .put("right", spec.rightPx).put("bottom", spec.bottomPx)
+        val borders = JSONObject().put("left", spec.leftDp).put("top", spec.topDp)
+            .put("right", spec.rightDp).put("bottom", spec.bottomDp)
+        val modes = JSONObject().put("left", spec.leftMode).put("top", spec.topMode)
+            .put("right", spec.rightMode).put("bottom", spec.bottomMode).put("center", spec.centerMode)
+        val manifest = JSONObject()
+            .put("type", "retui-frame")
+            .put("schema", 1)
+            .put("name", name)
+            .put("image", "frame.png")
+            .put("slicePx", slices)
+            .put("borderDp", borders)
+            .put("modes", modes)
+            .put("filtering", spec.filtering)
+            .toString(2).toByteArray(Charsets.UTF_8)
+        return ByteArrayOutputStream(manifest.size + png.size + 256).also { out ->
+            ZipOutputStream(out).use { zip ->
+                for ((entryName, data) in listOf("manifest.json" to manifest, "frame.png" to png)) {
+                    zip.putNextEntry(ZipEntry(entryName).apply { time = 315532800000L })
+                    zip.write(data)
+                    zip.closeEntry()
+                }
+            }
+        }.toByteArray()
     }
 
     private fun parseBundle(bytes: ByteArray): ParsedFrame {
@@ -770,6 +841,8 @@ object FrameManager {
 
     private data class ParsedFrame(val name: String, val spec: FrameSpec, val png: ByteArray)
     private data class FramePreview(val name: String, val bitmap: Bitmap)
+
+    private val PNG_SIGNATURE = byteArrayOf(0x89.toByte(), 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a)
 }
 
 data class FrameSpec(

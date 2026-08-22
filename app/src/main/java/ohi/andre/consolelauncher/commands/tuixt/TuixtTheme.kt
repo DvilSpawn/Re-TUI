@@ -136,13 +136,14 @@ object TuixtTheme {
         } else {
             FrameTarget.BUTTON
         }
-        view.background = statefulFrame(context, normal, FrameTarget.BUTTON_PRESSED) ?: framedRect(
+        val base = framedRect(
             context,
             normal,
             moduleButtonBackgroundColor(),
             if (primary) selectionColor() else AppearanceSettings.moduleButtonBorderColor(),
             if (primary) 2f else 1.25f
         )
+        view.background = statefulFrame(context, base, FrameTarget.BUTTON_PRESSED)
     }
 
     @JvmStatic
@@ -204,36 +205,52 @@ object TuixtTheme {
 
     @JvmStatic
     fun styleSlider(context: Context, view: SeekBar, fallbackColor: Int = accentColor()) {
-        if (!styleFrameSlider(context, view)) {
-            view.progressTintList = ColorStateList.valueOf(fallbackColor)
-            view.progressBackgroundTintList = ColorStateList.valueOf(ColorUtils.setAlphaComponent(fallbackColor, 80))
-            view.thumbTintList = ColorStateList.valueOf(fallbackColor)
-        }
+        val track = FrameManager.drawable(context, FrameTarget.SLIDER_TRACK)
+        val progress = FrameManager.drawable(context, FrameTarget.SLIDER_PROGRESS)
+        val thumb = FrameManager.drawable(context, FrameTarget.SLIDER_THUMB, 24f)
+        view.progressTintList = if (progress == null) ColorStateList.valueOf(fallbackColor) else null
+        view.progressBackgroundTintList = if (track == null) {
+            ColorStateList.valueOf(ColorUtils.setAlphaComponent(fallbackColor, 80))
+        } else null
+        view.thumbTintList = if (thumb == null) ColorStateList.valueOf(fallbackColor) else null
+        styleFrameSlider(view, track, progress, thumb)
     }
 
-    private fun styleFrameSlider(context: Context, view: SeekBar): Boolean {
-        val track = FrameManager.drawable(context, FrameTarget.SLIDER_TRACK) ?: return false
-        val progress = FrameManager.drawable(context, FrameTarget.SLIDER_PROGRESS) ?: return false
-        view.progressDrawable = LayerDrawable(
-            arrayOf(track, ClipDrawable(progress, Gravity.START, ClipDrawable.HORIZONTAL))
-        ).apply {
-            setId(0, android.R.id.background)
-            setId(1, android.R.id.progress)
-        }
-        FrameManager.drawable(context, FrameTarget.SLIDER_THUMB, 24f)?.let { view.thumb = it }
-        view.splitTrack = false
-        return true
-    }
-
-    private fun statefulFrame(context: Context, normal: FrameTarget, pressed: FrameTarget): Drawable? {
-        val base = FrameManager.drawable(context, normal) ?: return null
-        return StateListDrawable().apply {
-            FrameManager.drawable(context, pressed)?.let {
-                addState(intArrayOf(android.R.attr.state_pressed), it)
+    private fun styleFrameSlider(
+        view: SeekBar,
+        track: Drawable?,
+        progress: Drawable?,
+        thumb: Drawable?
+    ) {
+        val layers = view.progressDrawable?.mutate() as? LayerDrawable
+        if (layers != null) {
+            track?.let { layers.setDrawableByLayerId(android.R.id.background, it) }
+            progress?.let {
+                layers.setDrawableByLayerId(
+                    android.R.id.progress,
+                    ClipDrawable(it, Gravity.START, ClipDrawable.HORIZONTAL)
+                )
             }
-            addState(intArrayOf(), base)
+            view.progressDrawable = layers
+        } else if (track != null && progress != null) {
+            view.progressDrawable = LayerDrawable(
+                arrayOf(track, ClipDrawable(progress, Gravity.START, ClipDrawable.HORIZONTAL))
+            ).apply {
+                setId(0, android.R.id.background)
+                setId(1, android.R.id.progress)
+            }
         }
+        thumb?.let { view.thumb = it }
+        if (track != null || progress != null || thumb != null) view.splitTrack = false
     }
+
+    private fun statefulFrame(context: Context, base: Drawable, pressed: FrameTarget): Drawable =
+        FrameManager.drawable(context, pressed)?.let { pressedFrame ->
+            StateListDrawable().apply {
+                addState(intArrayOf(android.R.attr.state_pressed), pressedFrame)
+                addState(intArrayOf(), base)
+            }
+        } ?: base
 
     @JvmStatic
     fun rect(context: Context, fill: Int, stroke: Int, strokeDp: Float): Drawable =

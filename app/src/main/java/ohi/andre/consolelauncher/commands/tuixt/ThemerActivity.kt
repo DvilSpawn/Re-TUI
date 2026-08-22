@@ -619,9 +619,9 @@ class ThemerActivity : AppCompatActivity() {
 
         root.addView(TextView(this).apply {
             text = if (applyAll) {
-                "The imported frame replaces generated borders on every supported surface. Without a frame, existing border behavior is unchanged."
+                "Import a square 3 x 3 PNG or a .retui-frame file. The imported frame replaces generated borders on every supported surface."
             } else {
-                "Import or assign a frame per surface. Missing assignments keep the existing border settings."
+                "Import a square 3 x 3 PNG or a .retui-frame file per surface. Button states, toggle states, and slider parts can be supplied independently; missing assignments keep their defaults."
             }
             setTextColor(textColor())
             setTypeface(Tuils.getTypeface(this@ThemerActivity))
@@ -1628,7 +1628,7 @@ class ThemerActivity : AppCompatActivity() {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
             addCategory(Intent.CATEGORY_OPENABLE)
             type = "*/*"
-            putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("application/zip", "application/octet-stream"))
+            putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("image/png", "application/zip", "application/octet-stream"))
         }
         try {
             startActivityForResult(intent, FRAME_IMPORT_REQUEST)
@@ -2069,7 +2069,11 @@ class ThemerActivity : AppCompatActivity() {
         try {
             val target = pendingFrameTarget
             val asset = contentResolver.openInputStream(uri).use { input ->
-                frameSession().importBundle(target, requireNotNull(input) { "Unable to read the selected frame." })
+                frameSession().importFrame(
+                    target,
+                    getDisplayName(uri) ?: uri.lastPathSegment,
+                    requireNotNull(input) { "Unable to read the selected frame." }
+                )
             }
             pendingFrameTarget = null
             reloadForFrame("Frame imported: ${asset.name}")
