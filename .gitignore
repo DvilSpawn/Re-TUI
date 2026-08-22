@@ -1,5 +1,7 @@
 # Android Build Artifacts
 **/build/
+local-skins/
+local-packs/
 **/.gradle/
 **/captures/
 **/output-metadata.json
@@ -35,6 +37,7 @@ google-services.json
 Thumbs.db
 
 # Temporary Files
+**/__pycache__/
 *.tmp
 *.log
 *.swp

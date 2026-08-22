@@ -1,5 +1,7 @@
 package ohi.andre.consolelauncher.tuils
 
+import android.graphics.Color
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -25,5 +27,10 @@ class TerminalBorderRuntimeTest {
         assertFalse(TerminalBorderRuntime.drawsFrame(false, true))
         assertFalse(TerminalBorderRuntime.drawsFrame(true, false))
         assertTrue(TerminalBorderRuntime.drawsFrame(true, true))
+    }
+
+    @Test fun customFrameSuppressesPresetPaneFill() {
+        assertEquals(Color.TRANSPARENT, TerminalBorderRuntime.effectiveFillColor(true, Color.RED))
+        assertEquals(Color.RED, TerminalBorderRuntime.effectiveFillColor(false, Color.RED))
     }
 }

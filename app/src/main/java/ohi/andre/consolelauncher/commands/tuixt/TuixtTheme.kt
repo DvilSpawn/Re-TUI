@@ -1,20 +1,26 @@
 package ohi.andre.consolelauncher.commands.tuixt
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
+import android.graphics.drawable.ClipDrawable
 import android.graphics.drawable.GradientDrawable
+import android.graphics.drawable.LayerDrawable
+import android.graphics.drawable.StateListDrawable
 import android.os.Build
 import android.view.Gravity
 import android.view.View
 import android.widget.EditText
+import android.widget.SeekBar
 import android.widget.TextView
 import androidx.core.graphics.ColorUtils
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings
 import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.tuils.CrtOverlayDrawable
+import ohi.andre.consolelauncher.tuils.FrameManager
 import ohi.andre.consolelauncher.tuils.TerminalBorderRuntime
 import ohi.andre.consolelauncher.tuils.FrameTarget
 import ohi.andre.consolelauncher.tuils.Tuils
@@ -49,7 +55,12 @@ object TuixtTheme {
 
     @JvmStatic
     fun stylePanel(context: Context, view: View) {
-        view.background = rect(context, surfaceColor(), borderColor(), 1.5f)
+        view.background = framedRect(context, FrameTarget.SETTINGS, surfaceColor(), borderColor(), 1.5f)
+    }
+
+    @JvmStatic
+    fun styleDialogPanel(context: Context, view: View) {
+        view.background = framedRect(context, FrameTarget.DIALOG, surfaceColor(), borderColor(), 1.5f)
     }
 
     @JvmStatic
@@ -59,7 +70,14 @@ object TuixtTheme {
         view.textSize = 15f
         view.gravity = Gravity.CENTER
         view.setPadding(dp(context, 12f), dp(context, 3f), dp(context, 12f), dp(context, 3f))
-        view.background = rect(context, surfaceColor(), borderColor(), 1.5f, AppearanceSettings.headerCornerRadius())
+        view.background = framedRect(
+            context,
+            FrameTarget.HEADER,
+            surfaceColor(),
+            borderColor(),
+            1.5f,
+            AppearanceSettings.headerCornerRadius()
+        )
     }
 
     @JvmStatic
@@ -71,8 +89,9 @@ object TuixtTheme {
         view.gravity = Gravity.CENTER_VERTICAL
         view.setPadding(dp(context, 14f), dp(context, 12f), dp(context, 14f), dp(context, 12f))
         view.minHeight = dp(context, 48f)
-        view.background = rect(
+        view.background = framedRect(
             context,
+            if (selected) FrameTarget.LIST_ITEM_SELECTED else FrameTarget.LIST_ITEM,
             moduleButtonBackgroundColor(),
             if (selected) selectionColor() else AppearanceSettings.moduleButtonBorderColor(),
             if (selected) 2f else 1.25f
@@ -96,7 +115,13 @@ object TuixtTheme {
         view.textSize = 13f
         view.setSingleLine(false)
         view.setPadding(dp(context, 10f), dp(context, 8f), dp(context, 10f), dp(context, 8f))
-        view.background = rect(context, ColorUtils.setAlphaComponent(surfaceColor(), 220), borderColor(), 1.25f)
+        view.background = framedRect(
+            context,
+            FrameTarget.UI_INPUT,
+            ColorUtils.setAlphaComponent(surfaceColor(), 220),
+            borderColor(),
+            1.25f
+        )
     }
 
     @JvmStatic
@@ -106,8 +131,14 @@ object TuixtTheme {
         view.textSize = 13f
         view.gravity = Gravity.CENTER
         view.setPadding(dp(context, 14f), dp(context, 8f), dp(context, 14f), dp(context, 8f))
-        view.background = rect(
+        val normal = if (primary && FrameManager.isActive(context, FrameTarget.BUTTON_PRIMARY)) {
+            FrameTarget.BUTTON_PRIMARY
+        } else {
+            FrameTarget.BUTTON
+        }
+        view.background = statefulFrame(context, normal, FrameTarget.BUTTON_PRESSED) ?: framedRect(
             context,
+            normal,
             moduleButtonBackgroundColor(),
             if (primary) selectionColor() else AppearanceSettings.moduleButtonBorderColor(),
             if (primary) 2f else 1.25f
@@ -130,8 +161,10 @@ object TuixtTheme {
         view.gravity = Gravity.CENTER
         view.setPadding(dp(context, 18f), dp(context, 9f), dp(context, 18f), dp(context, 9f))
         view.minWidth = dp(context, 76f)
-        view.background = rect(
+        val role = if (checked) FrameTarget.TOGGLE_ON else FrameTarget.TOGGLE_OFF
+        view.background = FrameManager.drawable(context, role) ?: framedRect(
             context,
+            role,
             moduleButtonBackgroundColor(),
             if (checked) selectionColor() else AppearanceSettings.moduleButtonBorderColor(),
             if (checked) 2f else 1.25f
@@ -140,8 +173,9 @@ object TuixtTheme {
 
     @JvmStatic
     fun styleIconButton(context: Context, view: View) {
-        view.background = rect(
+        view.background = framedRect(
             context,
+            FrameTarget.ICON_BUTTON,
             moduleButtonBackgroundColor(),
             AppearanceSettings.moduleButtonBorderColor(),
             1.25f
@@ -169,11 +203,55 @@ object TuixtTheme {
     }
 
     @JvmStatic
+    fun styleSlider(context: Context, view: SeekBar, fallbackColor: Int = accentColor()) {
+        if (!styleFrameSlider(context, view)) {
+            view.progressTintList = ColorStateList.valueOf(fallbackColor)
+            view.progressBackgroundTintList = ColorStateList.valueOf(ColorUtils.setAlphaComponent(fallbackColor, 80))
+            view.thumbTintList = ColorStateList.valueOf(fallbackColor)
+        }
+    }
+
+    private fun styleFrameSlider(context: Context, view: SeekBar): Boolean {
+        val track = FrameManager.drawable(context, FrameTarget.SLIDER_TRACK) ?: return false
+        val progress = FrameManager.drawable(context, FrameTarget.SLIDER_PROGRESS) ?: return false
+        view.progressDrawable = LayerDrawable(
+            arrayOf(track, ClipDrawable(progress, Gravity.START, ClipDrawable.HORIZONTAL))
+        ).apply {
+            setId(0, android.R.id.background)
+            setId(1, android.R.id.progress)
+        }
+        FrameManager.drawable(context, FrameTarget.SLIDER_THUMB, 24f)?.let { view.thumb = it }
+        view.splitTrack = false
+        return true
+    }
+
+    private fun statefulFrame(context: Context, normal: FrameTarget, pressed: FrameTarget): Drawable? {
+        val base = FrameManager.drawable(context, normal) ?: return null
+        return StateListDrawable().apply {
+            FrameManager.drawable(context, pressed)?.let {
+                addState(intArrayOf(android.R.attr.state_pressed), it)
+            }
+            addState(intArrayOf(), base)
+        }
+    }
+
+    @JvmStatic
     fun rect(context: Context, fill: Int, stroke: Int, strokeDp: Float): Drawable =
         rect(context, fill, stroke, strokeDp, AppearanceSettings.dashedBorderCornerRadius())
 
     @JvmStatic
     fun rect(context: Context, fill: Int, stroke: Int, strokeDp: Float, radiusDp: Int): Drawable {
+        return framedRect(context, FrameTarget.SETTINGS, fill, stroke, strokeDp, radiusDp)
+    }
+
+    private fun framedRect(
+        context: Context,
+        target: FrameTarget,
+        fill: Int,
+        stroke: Int,
+        strokeDp: Float,
+        radiusDp: Int = AppearanceSettings.dashedBorderCornerRadius()
+    ): Drawable {
         return TerminalBorderRuntime.panelDrawable(
             context,
             fill,
@@ -182,7 +260,7 @@ object TuixtTheme {
             radiusDp,
             AppearanceSettings.dashedBorders(),
             cyberdeckNotch = false,
-            target = FrameTarget.SETTINGS
+            target = target
         )
     }
 

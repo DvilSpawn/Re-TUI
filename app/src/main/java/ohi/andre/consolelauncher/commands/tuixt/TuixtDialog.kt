@@ -24,7 +24,7 @@ import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleButton
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleHeader
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleInput
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleListItem
-import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.stylePanel
+import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleDialogPanel
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.textColor
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi.applyFullscreen
 import ohi.andre.consolelauncher.tuils.Tuils
@@ -202,6 +202,16 @@ object TuixtDialog {
         positive: String,
         negative: String,
         action: ConfirmAction
+    ) = showConfirm(context, title, message, positive, negative, action, null)
+
+    fun showConfirm(
+        context: Context,
+        title: String,
+        message: String?,
+        positive: String,
+        negative: String,
+        action: ConfirmAction,
+        negativeAction: ConfirmAction?
     ) {
         Handler(Looper.getMainLooper()).post(Runnable {
             val dialog = createDialog(context)
@@ -225,7 +235,7 @@ object TuixtDialog {
                 )
             )
 
-            val buttons = buttons(context, dialog, positive, negative, action)
+            val buttons = buttons(context, dialog, positive, negative, action, true, negativeAction)
             dialog.setContentView(wrap(context, title, content, buttons))
             show(dialog)
         })
@@ -317,7 +327,7 @@ object TuixtDialog {
             dp(context, 14f),
             dp(context, 14f)
         )
-        stylePanel(context, panel)
+        styleDialogPanel(context, panel)
 
         val scrollView = ScrollView(context)
         scrollView.setFillViewport(false)
@@ -383,7 +393,8 @@ object TuixtDialog {
         positive: String,
         negative: String,
         action: ConfirmAction,
-        dismissOnConfirm: Boolean
+        dismissOnConfirm: Boolean,
+        negativeAction: ConfirmAction? = null
     ): LinearLayout {
         val row = LinearLayout(context)
         row.setOrientation(LinearLayout.HORIZONTAL)
@@ -393,7 +404,10 @@ object TuixtDialog {
         val cancel = TextView(context)
         cancel.setText(negative.uppercase(Locale.getDefault()))
         styleButton(context, cancel, false)
-        cancel.setOnClickListener(View.OnClickListener { v: View? -> dialog.dismiss() })
+        cancel.setOnClickListener(View.OnClickListener {
+            dialog.dismiss()
+            negativeAction?.onConfirm()
+        })
         row.addView(
             cancel, LinearLayout.LayoutParams(
                 0,

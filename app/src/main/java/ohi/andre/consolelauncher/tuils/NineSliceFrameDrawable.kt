@@ -12,7 +12,11 @@ import android.graphics.drawable.Drawable
 import android.graphics.drawable.LayerDrawable
 import kotlin.math.roundToInt
 
-class NineSliceFrameDrawable(frame: LoadedFrame, private val density: Float) : Drawable() {
+class NineSliceFrameDrawable(
+    frame: LoadedFrame,
+    private val density: Float,
+    private val intrinsicDp: Float? = null
+) : Drawable() {
     private val spec = frame.spec
     private val filter = spec.filtering == "linear"
     private val source = frame.bitmap
@@ -121,6 +125,10 @@ class NineSliceFrameDrawable(frame: LoadedFrame, private val density: Float) : D
         paint.colorFilter = colorFilter
         invalidateSelf()
     }
+
+    override fun getIntrinsicWidth(): Int = intrinsicDp?.let { (it * density).roundToInt() } ?: -1
+
+    override fun getIntrinsicHeight(): Int = intrinsicDp?.let { (it * density).roundToInt() } ?: -1
 
     @Deprecated("Deprecated in Java")
     override fun getOpacity(): Int = PixelFormat.TRANSLUCENT

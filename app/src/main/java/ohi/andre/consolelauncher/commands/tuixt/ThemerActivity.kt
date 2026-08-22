@@ -23,8 +23,8 @@ import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
 import android.widget.CheckBox
+import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.HorizontalScrollView
 import android.widget.ImageButton
@@ -73,7 +73,9 @@ import ohi.andre.consolelauncher.managers.settings.LauncherSettings.get
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings.set
 import ohi.andre.consolelauncher.managers.settings.MusicSettings.preferredPackage
 import ohi.andre.consolelauncher.managers.xml.options.Behavior
+import ohi.andre.consolelauncher.managers.xml.options.Suggestions
 import ohi.andre.consolelauncher.managers.xml.options.Ui
+import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi.applyFullscreen
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi.requestNoTitleIfFullscreen
 import ohi.andre.consolelauncher.tuils.LauncherFontScale
@@ -119,6 +121,7 @@ class ThemerActivity : AppCompatActivity() {
     private var pendingFontSizeOffset: Int? = null
     private var pendingUseSystemFont: Boolean? = null
     private var pendingFontFileName: String? = null
+    private var pendingTypographySizes: MutableMap<XMLPrefsSave, Int>? = null
     private var pendingFrameTarget: FrameTarget? = null
     private var frameEditSession: FrameManager.EditSession? = null
 
@@ -272,6 +275,8 @@ class ThemerActivity : AppCompatActivity() {
                         showTaskerIntegrationDialog()
                     } else if (fileName == "Fonts") {
                         openSection(SECTION_FONTS)
+                    } else if (fileName == "Typography") {
+                        openSection(SECTION_TYPOGRAPHY)
                     } else if (fileName == "Presets") {
                         openSection(SECTION_PRESETS)
                     } else if (fileName == "Frames") {
@@ -478,6 +483,8 @@ class ThemerActivity : AppCompatActivity() {
             return "Re:T-UI System & Support"
         } else if (SECTION_FONTS == section) {
             return "Re:T-UI Fonts"
+        } else if (SECTION_TYPOGRAPHY == section) {
+            return "Re:T-UI Typography"
         } else if (SECTION_PRESETS == section) {
             return "Re:T-UI Presets"
         } else if (SECTION_FRAMES == section) {
@@ -537,12 +544,15 @@ class ThemerActivity : AppCompatActivity() {
         } else if (SECTION_FONTS == section) {
             ensurePendingFontChanges()
             return mutableListOf(
-                FONT_SCALE_PANEL,
+                "Typography",
                 "Default (System Font)",
                 "Import Font..."
             ).apply {
                 addAll(listFontFiles(fontsDir).map { it.name })
             }
+        } else if (SECTION_TYPOGRAPHY == section) {
+            ensurePendingFontChanges()
+            return mutableListOf(FONT_SCALE_PANEL)
         } else if (SECTION_PRESETS == section) {
             return mutableListOf("Save Current as Preset", "Apply Preset", "Remove Preset")
         } else if (SECTION_FRAMES == section) {
@@ -567,10 +577,11 @@ class ThemerActivity : AppCompatActivity() {
         if (addToHistory && section != null && section != targetSection) {
             sectionBackStack.addLast(section!!)
         }
-        if (section == SECTION_FONTS && targetSection != SECTION_FONTS) {
+        if (section in FONT_SECTIONS && targetSection !in FONT_SECTIONS) {
             pendingFontSizeOffset = null
             pendingUseSystemFont = null
             pendingFontFileName = null
+            pendingTypographySizes = null
         }
         section = targetSection
         header!!.setText(getHeaderText(section))
@@ -610,7 +621,7 @@ class ThemerActivity : AppCompatActivity() {
             text = if (applyAll) {
                 "The imported frame replaces generated borders on every supported surface. Without a frame, existing border behavior is unchanged."
             } else {
-                "Assign frames by surface. Missing assignments use the existing border and cyberdeck settings."
+                "Import or assign a frame per surface. Missing assignments keep the existing border settings."
             }
             setTextColor(textColor())
             setTypeface(Tuils.getTypeface(this@ThemerActivity))
@@ -736,13 +747,24 @@ class ThemerActivity : AppCompatActivity() {
             setTextColor(if (asset.valid) textColor() else Color.RED)
             setTypeface(Tuils.getTypeface(this@ThemerActivity), Typeface.BOLD)
         }, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
-        row.addView(TextView(this).apply {
-            text = "DELETE"
-            styleButton(this@ThemerActivity, this, false)
-            setOnClickListener { confirmDeleteFrameAsset(asset, session.references(asset.id)) }
-        }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(this, 44f)))
+        row.addView(
+            frameIconButton(R.drawable.ic_tuixt_delete_24, "Delete ${asset.name}") {
+                confirmDeleteFrameAsset(asset, session.references(asset.id))
+            },
+            LinearLayout.LayoutParams(dp(this, 44f), dp(this, 44f))
+        )
         return row
     }
+
+    private fun frameIconButton(imageRes: Int, description: String, onClick: () -> Unit): ImageButton =
+        ImageButton(this).apply {
+            setImageResource(imageRes)
+            contentDescription = description
+            styleIconButton(this@ThemerActivity, this)
+            setColorFilter(textColor(), PorterDuff.Mode.SRC_IN)
+            setPadding(dp(this@ThemerActivity, 8f), dp(this@ThemerActivity, 8f), dp(this@ThemerActivity, 8f), dp(this@ThemerActivity, 8f))
+            setOnClickListener { onClick() }
+        }
 
     private fun showFrameSelector(target: FrameTarget?) {
         val session = frameSession()
@@ -840,6 +862,7 @@ class ThemerActivity : AppCompatActivity() {
         val slider = SeekBar(parent.context).apply {
             max = LauncherFontScale.MAX_OFFSET - LauncherFontScale.MIN_OFFSET
             contentDescription = "Font size offset"
+            TuixtTheme.styleSlider(parent.context, this)
         }
         val larger = TextView(parent.context).apply {
             text = "A"
@@ -853,13 +876,21 @@ class ThemerActivity : AppCompatActivity() {
         scaleRow.addView(larger, LinearLayout.LayoutParams(dp(parent.context, 42f), dp(parent.context, 48f)))
         root.addView(scaleRow)
 
+        val surfaces = LinearLayout(parent.context).apply {
+            orientation = LinearLayout.VERTICAL
+        }
+        root.addView(
+            surfaces,
+            LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        )
+
         val footer = LinearLayout(parent.context).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
         }
         val status = TextView(parent.context)
-        val reset = TextView(parent.context).apply { text = "RESET" }
-        val save = TextView(parent.context).apply { text = "SAVE" }
+        val reset = TextView(parent.context).apply { text = "RESET ALL" }
+        val save = TextView(parent.context).apply { text = "APPLY" }
         footer.addView(status, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
         footer.addView(reset, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(parent.context, 48f)))
         footer.addView(View(parent.context), LinearLayout.LayoutParams(dp(parent.context, 8f), 1))
@@ -870,13 +901,14 @@ class ThemerActivity : AppCompatActivity() {
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
         ).apply { bottomMargin = dp(parent.context, 8f) }
-        return FontScaleViewHolder(root, previewGlyphs, smaller, slider, larger, status, reset, save)
+        return FontScaleViewHolder(root, previewGlyphs, smaller, slider, larger, surfaces, status, reset, save)
     }
 
     private fun bindFontScalePanel(holder: FontScaleViewHolder) {
         ensurePendingFontChanges()
         val pending = pendingFontSizeOffset!!
         val typeface = pendingFontTypeface()
+        val rowRefreshers = ArrayList<() -> Unit>()
         stylePanel(this, holder.itemView)
         holder.previewGlyphs.forEach { glyph ->
             glyph.setTextColor(textColor())
@@ -905,17 +937,103 @@ class ThemerActivity : AppCompatActivity() {
         holder.slider.thumbTintList = ColorStateList.valueOf(accentColor())
         holder.slider.setOnSeekBarChangeListener(null)
         holder.slider.progress = pending - LauncherFontScale.MIN_OFFSET
+        holder.surfaces.removeAllViews()
+
+        fun refreshSaveState() {
+            val changed = hasPendingFontChanges()
+            holder.save.isEnabled = changed
+            holder.save.alpha = if (changed) 1f else 0.45f
+        }
+
+        TYPOGRAPHY_SETTINGS.forEach { spec ->
+            val row = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                setPadding(dp(this@ThemerActivity, 10f), dp(this@ThemerActivity, 8f), dp(this@ThemerActivity, 10f), dp(this@ThemerActivity, 8f))
+            }
+            stylePanel(this, row)
+            val title = TextView(this).apply {
+                text = spec.label.uppercase(Locale.getDefault())
+                setTextColor(accentColor())
+                setTypeface(typeface, Typeface.BOLD)
+                textSize = 12f
+            }
+            val sample = TextView(this).apply {
+                text = spec.sample
+                setTextColor(textColor())
+                setTypeface(typeface)
+                setPadding(0, dp(this@ThemerActivity, 5f), 0, dp(this@ThemerActivity, 5f))
+            }
+            val controls = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER_VERTICAL
+            }
+            val smaller = TextView(this).apply { text = "−" }
+            val value = TextView(this).apply {
+                gravity = Gravity.CENTER
+                setTextColor(textColor())
+                setTypeface(typeface, Typeface.BOLD)
+            }
+            val larger = TextView(this).apply { text = "+" }
+            val reset = TextView(this).apply { text = "RESET" }
+            styleButton(this, smaller, false)
+            styleButton(this, larger, false)
+            styleButton(this, reset, false)
+            smaller.contentDescription = "Decrease ${spec.label} size"
+            larger.contentDescription = "Increase ${spec.label} size"
+            reset.contentDescription = "Reset ${spec.label} size"
+            controls.addView(smaller, LinearLayout.LayoutParams(dp(this, 44f), dp(this, 44f)))
+            controls.addView(value, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
+            controls.addView(larger, LinearLayout.LayoutParams(dp(this, 44f), dp(this, 44f)))
+            controls.addView(View(this), LinearLayout.LayoutParams(dp(this, 8f), 1))
+            controls.addView(reset, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(this, 44f)))
+            row.addView(title)
+            row.addView(sample)
+            row.addView(controls)
+            holder.surfaces.addView(row, inputParams())
+
+            fun refreshRow() {
+                val base = pendingTypographySizes!!.getValue(spec.setting)
+                val effective = LauncherFontScale.effectiveSp(base, pendingFontSizeOffset!!, spec.followsMaster)
+                sample.textSize = effective
+                value.text = if (spec.followsMaster && pendingFontSizeOffset != 0) {
+                    "${effective.toInt()}SP  ·  BASE ${base}"
+                } else {
+                    "${effective.toInt()}SP"
+                }
+            }
+
+            fun move(delta: Int) {
+                val current = pendingTypographySizes!!.getValue(spec.setting)
+                pendingTypographySizes!![spec.setting] = LauncherFontScale.adjustedBaseSp(
+                    current,
+                    delta,
+                    MIN_TYPOGRAPHY_SP,
+                    MAX_TYPOGRAPHY_SP
+                )
+                refreshRow()
+                refreshSaveState()
+            }
+
+            smaller.setOnClickListener { move(-1) }
+            larger.setOnClickListener { move(1) }
+            reset.setOnClickListener {
+                pendingTypographySizes!![spec.setting] = defaultTypographySize(spec.setting)
+                refreshRow()
+                refreshSaveState()
+            }
+            rowRefreshers.add { refreshRow() }
+            refreshRow()
+        }
 
         fun preview(offset: Int) {
             pendingFontSizeOffset = offset
             holder.previewGlyphs.forEachIndexed { index, glyph ->
                 glyph.textSize = LauncherFontScale.scaledSp(FONT_PREVIEW_SIZES[index], offset)
             }
+            rowRefreshers.forEach { it() }
             val signed = if (offset > 0) "+$offset" else offset.toString()
-            holder.status.text = "${pendingFontLabel()}  /  ${signed}SP"
-            val changed = hasPendingFontChanges()
-            holder.save.isEnabled = changed
-            holder.save.alpha = if (changed) 1f else 0.45f
+            holder.status.text = "${pendingFontLabel()}  /  MASTER ${signed}SP"
+            refreshSaveState()
         }
 
         fun move(delta: Int) {
@@ -939,6 +1057,9 @@ class ThemerActivity : AppCompatActivity() {
         holder.larger.setOnClickListener { move(1) }
         holder.reset.setOnClickListener {
             holder.slider.progress = -LauncherFontScale.MIN_OFFSET
+            TYPOGRAPHY_SETTINGS.forEach { spec ->
+                pendingTypographySizes!![spec.setting] = defaultTypographySize(spec.setting)
+            }
             preview(0)
         }
         holder.save.setOnClickListener {
@@ -961,7 +1082,16 @@ class ThemerActivity : AppCompatActivity() {
         if (pendingFontSizeOffset == null) pendingFontSizeOffset = savedFontSizeOffset()
         if (pendingUseSystemFont == null) pendingUseSystemFont = savedUseSystemFont()
         if (pendingFontFileName == null) pendingFontFileName = savedFontFileName()
+        if (pendingTypographySizes == null) {
+            pendingTypographySizes = TYPOGRAPHY_SETTINGS.associateTo(LinkedHashMap()) {
+                it.setting to LauncherSettings.getInt(it.setting).coerceIn(MIN_TYPOGRAPHY_SP, MAX_TYPOGRAPHY_SP)
+            }
+        }
     }
+
+    private fun defaultTypographySize(setting: XMLPrefsSave): Int =
+        setting.defaultValue()?.toIntOrNull()?.coerceIn(MIN_TYPOGRAPHY_SP, MAX_TYPOGRAPHY_SP)
+            ?: MIN_TYPOGRAPHY_SP
 
     private fun pendingFontTypeface(): Typeface {
         ensurePendingFontChanges()
@@ -988,13 +1118,20 @@ class ThemerActivity : AppCompatActivity() {
         ensurePendingFontChanges()
         return pendingFontSizeOffset != savedFontSizeOffset() ||
             pendingUseSystemFont != savedUseSystemFont() ||
-            pendingFontFileName.orEmpty() != savedFontFileName()
+            pendingFontFileName.orEmpty() != savedFontFileName() ||
+            TYPOGRAPHY_SETTINGS.any {
+                pendingTypographySizes!!.getValue(it.setting) !=
+                    LauncherSettings.getInt(it.setting).coerceIn(MIN_TYPOGRAPHY_SP, MAX_TYPOGRAPHY_SP)
+            }
     }
 
     private fun discardPendingFontChanges() {
         pendingFontSizeOffset = savedFontSizeOffset()
         pendingUseSystemFont = savedUseSystemFont()
         pendingFontFileName = savedFontFileName()
+        pendingTypographySizes = TYPOGRAPHY_SETTINGS.associateTo(LinkedHashMap()) {
+            it.setting to LauncherSettings.getInt(it.setting).coerceIn(MIN_TYPOGRAPHY_SP, MAX_TYPOGRAPHY_SP)
+        }
     }
 
     private fun savePendingFontChanges() {
@@ -1020,8 +1157,14 @@ class ThemerActivity : AppCompatActivity() {
             set(this, Ui.system_font, useSystem.toString())
             set(this, Ui.font_file, fileName)
             set(this, Ui.font_size_offset, pendingFontSizeOffset!!.toString())
+            TYPOGRAPHY_SETTINGS.forEach { spec ->
+                val value = pendingTypographySizes!!.getValue(spec.setting)
+                if (value != LauncherSettings.getInt(spec.setting)) {
+                    set(this, spec.setting, value.toString())
+                }
+            }
             Tuils.cancelFont()
-            Toast.makeText(this, "Font and scale saved. Applying...", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Typography saved. Applying...", Toast.LENGTH_SHORT).show()
             LauncherActivity.preview(this)
         } catch (e: Exception) {
             Toast.makeText(this, "Could not apply font: " + e.message, Toast.LENGTH_LONG).show()
@@ -1523,7 +1666,7 @@ class ThemerActivity : AppCompatActivity() {
     private fun applySystemFont() {
         pendingUseSystemFont = true
         pendingFontFileName = ""
-        sectionsAdapter?.notifyDataSetChanged()
+        openSection(SECTION_TYPOGRAPHY)
     }
 
     private fun applyFont(source: File) {
@@ -1531,7 +1674,7 @@ class ThemerActivity : AppCompatActivity() {
             Typeface.createFromFile(source)
             pendingUseSystemFont = false
             pendingFontFileName = source.name
-            sectionsAdapter?.notifyDataSetChanged()
+            openSection(SECTION_TYPOGRAPHY)
         } catch (e: Exception) {
             Toast.makeText(this, "Could not preview font: " + e.message, Toast.LENGTH_LONG).show()
         }
@@ -2278,6 +2421,7 @@ class ThemerActivity : AppCompatActivity() {
         val smaller: TextView,
         val slider: SeekBar,
         val larger: TextView,
+        val surfaces: LinearLayout,
         val status: TextView,
         val reset: TextView,
         val save: TextView
@@ -2285,6 +2429,12 @@ class ThemerActivity : AppCompatActivity() {
     private class FramePanelViewHolder(val root: LinearLayout) : RecyclerView.ViewHolder(root)
 
     private class AppChoice(val label: String, val packageName: String?)
+    private data class TypographySetting(
+        val label: String,
+        val sample: String,
+        val setting: XMLPrefsSave,
+        val followsMaster: Boolean = true
+    )
     companion object {
         @JvmStatic
         fun launchIntent(context: Context, section: String?): Intent =
@@ -2301,6 +2451,7 @@ class ThemerActivity : AppCompatActivity() {
         const val SECTION_INTEGRATIONS: String = "integrations"
         const val SECTION_SYSTEM: String = "system"
         const val SECTION_FONTS: String = "fonts"
+        const val SECTION_TYPOGRAPHY: String = "typography"
         const val SECTION_PRESETS: String = "presets"
         const val SECTION_FRAMES: String = "frames"
         const val SECTION_PRESET_APPLY: String = "preset_apply"
@@ -2311,7 +2462,27 @@ class ThemerActivity : AppCompatActivity() {
         private const val VIEW_TYPE_FRAME_PANEL = 3
         private const val FONT_SCALE_PANEL = "__font_scale_panel__"
         private const val FRAME_PANEL = "__frame_panel__"
+        private const val MIN_TYPOGRAPHY_SP = 8
+        private const val MAX_TYPOGRAPHY_SP = 64
         private val FONT_PREVIEW_SIZES = floatArrayOf(10f, 11f, 12f, 14f, 15f, 18f, 64f)
+        private val FONT_SECTIONS = setOf(SECTION_FONTS, SECTION_TYPOGRAPHY)
+        private val TYPOGRAPHY_SETTINGS = listOf(
+            TypographySetting("Input and terminal output", "\$ help\nReady for the next command", Ui.input_output_size),
+            TypographySetting("Suggestions", "apps   settings   files", Suggestions.suggestions_size),
+            TypographySetting("Module headers", "WEATHER  [X]", Ui.module_header_text_size),
+            TypographySetting("Module body", "Forecast: clear", Ui.module_body_text_size),
+            TypographySetting("Output and overlay headers", "OUTPUT  ^", Ui.output_header_text_size),
+            TypographySetting("RAM status", "RAM 42%", Ui.ram_size, false),
+            TypographySetting("Battery status", "BAT 86%", Ui.battery_size, false),
+            TypographySetting("Device status", "DEVICE ONLINE", Ui.device_size, false),
+            TypographySetting("Time status", "22:08", Ui.time_size, false),
+            TypographySetting("Storage status", "STORAGE 64%", Ui.storage_size, false),
+            TypographySetting("Network status", "NETWORK WIFI", Ui.network_size, false),
+            TypographySetting("Notes status", "NOTES READY", Ui.notes_size, false),
+            TypographySetting("Weather status", "WEATHER 26°C", Ui.weather_size, false),
+            TypographySetting("Unlock status", "UNLOCKS 4", Ui.unlock_size, false),
+            TypographySetting("ASCII legacy size", "┌─ RE:TUI ─┐", Ui.ascii_size, false)
+        )
         private const val BACKUP_EXPORT_REQUEST = 201
         private const val BACKUP_RESTORE_REQUEST = 202
         private const val SHAREABLE_CONFIG_EXPORT_REQUEST = 203

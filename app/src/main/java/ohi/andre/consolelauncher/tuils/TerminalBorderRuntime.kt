@@ -19,6 +19,9 @@ object TerminalBorderRuntime {
     internal fun drawsFrame(frameAvailable: Boolean, frameEnabled: Boolean): Boolean =
         frameAvailable && frameEnabled
 
+    internal fun effectiveFillColor(frameActive: Boolean, fillColor: Int): Int =
+        if (frameActive) Color.TRANSPARENT else fillColor
+
     internal fun drawsTabBorder(frameActive: Boolean, alwaysBorder: Boolean, cyberdeck: Boolean, dashed: Boolean, alpha: Int): Boolean =
         !frameActive && alpha > 0 && (alwaysBorder || cyberdeck || dashed)
 
@@ -71,7 +74,7 @@ object TerminalBorderRuntime {
             max(1, Tuils.dpToPx(context, AppearanceSettings.dashedBorderStrokeWidthDp(strokeDp / 1.5f)).toInt())
         }
         val fallback = TerminalBorderDrawable(
-            fillColor,
+            effectiveFillColor(frame != null, fillColor),
             borderColor,
             stroke,
             if (cyberdeck) 0f else radiusPx,
@@ -116,7 +119,7 @@ object TerminalBorderRuntime {
         val bg = GradientDrawable()
         bg.shape = GradientDrawable.RECTANGLE
         bg.cornerRadius = Tuils.dpToPx(context, AppearanceSettings.headerCornerRadius().toFloat())
-        bg.setColor(fillColor)
+        bg.setColor(effectiveFillColor(frame != null, fillColor))
         val dashed = AppearanceSettings.dashedBorders()
         if (drawsTabBorder(frame != null, alwaysBorder, false, dashed, Color.alpha(borderColor))) {
             val stroke = max(1, Tuils.dpToPx(context, AppearanceSettings.dashedBorderStrokeWidthDp()).toInt())

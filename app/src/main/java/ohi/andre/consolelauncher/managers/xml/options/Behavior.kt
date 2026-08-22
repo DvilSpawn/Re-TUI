@@ -304,6 +304,19 @@ enum class Behavior : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
     },
+    clear_input_after_command {
+        override fun defaultValue(): String? {
+            return "true"
+        }
+
+        override fun info(): String? {
+            return "Clear the launcher input and refresh suggestions after running a command"
+        }
+
+        override fun type(): String? {
+            return XMLPrefsSave.BOOLEAN
+        }
+    },
     clear_after_seconds {
         override fun defaultValue(): String? {
             return "-1"

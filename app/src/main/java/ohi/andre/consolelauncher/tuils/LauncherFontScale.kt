@@ -23,6 +23,12 @@ object LauncherFontScale {
     internal fun scaledSp(baseSp: Float, offsetSp: Int): Float =
         (baseSp + offsetSp.coerceIn(MIN_OFFSET, MAX_OFFSET)).coerceAtLeast(1f)
 
+    internal fun effectiveSp(baseSp: Int, offsetSp: Int, followsMaster: Boolean): Float =
+        if (followsMaster) scaledSp(baseSp.toFloat(), offsetSp) else baseSp.coerceAtLeast(1).toFloat()
+
+    internal fun adjustedBaseSp(current: Int, delta: Int, min: Int, max: Int): Int =
+        (current + delta).coerceIn(min, max)
+
     @JvmStatic
     fun applyRecursively(view: View?) {
         if (view == null || view is AsciiArtTextView) return

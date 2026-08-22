@@ -544,6 +544,8 @@ class UIManager(
     private var termuxWorkspaceTrayVisibility = View.VISIBLE
     private var terminalTrayContainer: View? = null
     private var terminalContainer: ViewGroup? = null
+    private var persistentInputContainer: View? = null
+    private var lastPersistentInputHeight = -1
     private var terminalOutputBorder: View? = null
     private var terminalTrayToggle: TextView? = null
     private var crtOverlayDrawable: CrtOverlayDrawable? = null
@@ -1076,6 +1078,7 @@ class UIManager(
 
     private fun setupTerminalPage(terminalPage: View) {
         terminalTrayContainer = mRootView!!.findViewById<View?>(R.id.terminal_tray_container)
+        persistentInputContainer = mRootView!!.findViewById<View?>(R.id.persistent_input_container)
         if (terminalTrayContainer != null && portraitTrayParams == null && terminalTrayContainer!!.getLayoutParams() is FrameLayout.LayoutParams) {
             portraitTrayParams =
                 FrameLayout.LayoutParams((terminalTrayContainer!!.getLayoutParams() as FrameLayout.LayoutParams?)!!)
@@ -2329,19 +2332,27 @@ class UIManager(
         if (params is LinearLayout.LayoutParams) {
             params.weight = 0f
         }
-        val targetHeight: Int
+        val requestedHeight: Int
         if (this.isOutputTrayNativeMode) {
-            targetHeight = if (TextUtils.isEmpty(activeModule)) {
+            requestedHeight = if (TextUtils.isEmpty(activeModule)) {
                 calculateNativeTerminalTrayHeight(expandedHeight)
             } else {
                 collapsedHeight
             }
         } else if (this.isOutputTrayAutoMode) {
             terminalTrayExpanded = TextUtils.isEmpty(activeModule)
-            targetHeight = if (terminalTrayExpanded) expandedHeight else collapsedHeight
+            requestedHeight = if (terminalTrayExpanded) expandedHeight else collapsedHeight
         } else {
-            targetHeight = if (terminalTrayExpanded) expandedHeight else collapsedHeight
+            requestedHeight = if (terminalTrayExpanded) expandedHeight else collapsedHeight
         }
+        val targetHeight = constrainTerminalOutputHeight(
+            requestedHeight,
+            rootHeight,
+            imeBottomOffset,
+            systemInsetBottom,
+            persistentInputContainer?.measuredHeight ?: 0,
+            imeInsetVisible || imeBottomOffset > 0
+        )
         if (params != null && params.height != targetHeight) {
             params.height = targetHeight
             terminalContainer!!.setLayoutParams(params)
@@ -8429,6 +8440,13 @@ class UIManager(
 
         //        Recalculate tray sizing after real layout changes; IME visibility comes from WindowInsets.
         rootView.getViewTreeObserver().addOnGlobalLayoutListener(OnGlobalLayoutListener {
+            val inputHeight = persistentInputContainer?.measuredHeight ?: 0
+            if (inputHeight != lastPersistentInputHeight) {
+                lastPersistentInputHeight = inputHeight
+                if (imeInsetVisible || imeBottomOffset > 0) {
+                    applyTerminalTrayState(false)
+                }
+            }
             updateKeyboardLayoutState(keyboardVisible, rootView.getHeight())
         })
 
@@ -16479,6 +16497,23 @@ class UIManager(
                 return DUO_LAYOUT_RIGHT
             }
             return DUO_LAYOUT_OFF
+        }
+
+        internal fun constrainTerminalOutputHeight(
+            requestedHeight: Int,
+            rootHeight: Int,
+            imeBottomOffset: Int,
+            systemBottomInset: Int,
+            persistentInputHeight: Int,
+            imeVisible: Boolean
+        ): Int {
+            val requested = max(0, requestedHeight)
+            if (!imeVisible || rootHeight <= 0) return requested
+            val availableAboveIme = max(
+                0,
+                rootHeight - max(0, imeBottomOffset) - max(0, systemBottomInset)
+            )
+            return min(requested, max(0, availableAboveIme - max(0, persistentInputHeight)))
         }
 
         fun resolveSavedDuoSide(context: Context?): String? {

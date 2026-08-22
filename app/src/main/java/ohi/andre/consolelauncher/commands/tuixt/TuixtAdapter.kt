@@ -1,7 +1,6 @@
 package ohi.andre.consolelauncher.commands.tuixt
 
 import android.content.Context
-import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.Typeface
 import android.text.Editable
@@ -586,10 +585,7 @@ class TuixtAdapter(
         if (seekBar == null) {
             return
         }
-        val tint = ColorStateList.valueOf(color)
-        seekBar.setProgressTintList(tint)
-        seekBar.setThumbTintList(tint)
-        seekBar.setProgressBackgroundTintList(ColorStateList.valueOf(surfaceColor()))
+        TuixtTheme.styleSlider(seekBar.context, seekBar, color)
     }
 
     override fun getItemCount(): Int {

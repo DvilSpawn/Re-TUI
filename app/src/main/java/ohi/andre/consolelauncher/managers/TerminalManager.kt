@@ -105,6 +105,7 @@ class TerminalManager(
     private var clearCmdsCount = 0
 
     private val clearAfterCmds: Int
+    private val clearInputAfterCommand: Boolean
     private var clearAfterMs: Int
     private var maxLines: Int
     private val clearRunnable: Runnable = object : Runnable {
@@ -127,6 +128,10 @@ class TerminalManager(
     private val executer: CommandExecuter
 
     private fun setupNewInput() {
+        if (!clearInputAfterCommand) {
+            requestInputFocus()
+            return
+        }
         val alreadyEmpty = mInputView!!.text.isNullOrEmpty()
         mInputView!!.setText(Tuils.EMPTYSTRING)
 
@@ -270,6 +275,7 @@ class TerminalManager(
 
         this.clearAfterMs = XMLPrefsManager.getInt(Behavior.clear_after_seconds) * 1000
         this.clearAfterCmds = XMLPrefsManager.getInt(Behavior.clear_after_cmds)
+        this.clearInputAfterCommand = XMLPrefsManager.getBoolean(Behavior.clear_input_after_command)
         this.maxLines = XMLPrefsManager.getInt(Behavior.max_lines)
 
         inputFormat = XMLPrefsManager.get(Behavior.input_format)
