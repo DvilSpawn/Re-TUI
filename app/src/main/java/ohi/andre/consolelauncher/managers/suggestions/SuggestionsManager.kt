@@ -4041,10 +4041,11 @@ class SuggestionsManager(
                 alg
             )
             for (s in saves) {
+                val label = s?.label() ?: continue
                 suggestions.add(
                     SuggestionsManager.Suggestion(
                         beforeLastSpace,
-                        s.label()!!,
+                        label,
                         false,
                         Suggestion.Companion.TYPE_COMMAND
                     )

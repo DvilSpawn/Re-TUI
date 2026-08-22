@@ -1382,7 +1382,7 @@ object XMLPrefsManager {
                 return arrayOf<String?>()
             }
         },
-        UI(arrayOf(*Ui.entries.toTypedArray(), *SurfaceBorderOption.entries.toTypedArray())) {
+        UI(arrayOf<XMLPrefsSave>(*Ui.entries.toTypedArray(), *SurfaceBorderOption.entries.toTypedArray())) {
             override fun delete(): Array<String?>? {
                 return arrayOf<String?>(
                     "status_lines_alignment",

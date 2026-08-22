@@ -1143,7 +1143,7 @@ class UIManager(
 
         Companion.applyBgRect(
             mContext!!,
-            mRootView.findViewById<View?>(R.id.input_group),
+            mRootView.findViewById<View>(R.id.input_group),
             bgColors[INPUT_BGCOLOR_INDEX],
             margins[INPUTAREA_MARGINS_INDEX]!!,
             genericBorderCornerRadius,
@@ -1187,7 +1187,7 @@ class UIManager(
         var termuxWorkspaceView: ImageButton? = null
 
         if (!showToolbar) {
-            mRootView.findViewById<View?>(R.id.tools_view).setVisibility(View.GONE)
+            mRootView.findViewById<View?>(R.id.tools_view)?.setVisibility(View.GONE)
             toolbarView = null
         } else {
             backView = mRootView.findViewById<View?>(R.id.back_view) as ImageButton?
