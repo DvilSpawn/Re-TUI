@@ -4,8 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
-import android.net.Uri
-import android.provider.DocumentsContract
+import android.util.LruCache
 import android.util.Log
 import java.io.BufferedInputStream
 import java.io.ByteArrayInputStream
@@ -15,14 +14,11 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.InputStream
 import java.security.MessageDigest
-import java.util.Locale
-import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
-import java.util.zip.ZipOutputStream
 import ohi.andre.consolelauncher.managers.xml.options.SurfaceBorder
 import org.json.JSONObject
 
-enum class FrameTarget(val id: String, val label: String, val fileName: String = "$id.png") {
+enum class FrameTarget(val id: String, val label: String) {
     STATUS_GROUP("status_group", "Unified status group"),
     STATUS_RAM("status_ram", "RAM status"),
     STATUS_DEVICE("status_device", "Device status"),
@@ -37,7 +33,7 @@ enum class FrameTarget(val id: String, val label: String, val fileName: String =
     OUTPUT("output", "Terminal output"),
     INPUT("input", "Terminal input"),
     TOOLBAR("toolbar", "Toolbar buttons"),
-    SUGGESTIONS("suggestions", "Suggestion chips", "suggestion_chip.png"),
+    SUGGESTIONS("suggestions", "Suggestion chips"),
     MUSIC("music", "Music widget"),
     NOTIFICATIONS("notifications", "Notification widget"),
     MODULES("modules", "Modules"),
@@ -88,7 +84,6 @@ object FrameManager {
     internal const val FRAME_FOLDER = "frames"
     internal const val STATE_FILE = "state.json"
     internal const val MAX_BUNDLE_BYTES = 5 * 1024 * 1024
-    private const val MAX_PACK_BYTES = 32 * 1024 * 1024
     private const val PREFS = "retui_frames"
     private const val LEGACY_ENABLED = "enabled"
     private const val MIGRATED = "portable_storage_migrated"
@@ -97,16 +92,18 @@ object FrameManager {
     private const val MAX_MANIFEST_BYTES = 32 * 1024
     private const val MAX_PNG_BYTES = 4 * 1024 * 1024
     private const val MAX_IMAGE_SIZE = 2048
+    private const val FRAME_PREVIEW_MAX_PX = 256
     private val ASSET_ID = Regex("[0-9a-f]{64}")
 
-    private val cache = HashMap<String, LoadedFrame?>()
+    private val cache = object : LruCache<String, LoadedFrame>(
+        (Runtime.getRuntime().maxMemory() / 16L).coerceIn(4L * 1024 * 1024, 16L * 1024 * 1024).toInt()
+    ) {
+        override fun sizeOf(key: String, value: LoadedFrame): Int = value.bitmap.allocationByteCount
+    }
+    private val invalidAssets = HashSet<String>()
     @Volatile private var cachedState: FrameState? = null
 
     data class FrameAsset(val id: String, val name: String, val valid: Boolean)
-
-    data class ImportedPack(val id: String, val name: String, val frameCount: Int)
-
-    data class FramePack(val id: String, val name: String, val roles: Map<String, String>)
 
     data class SharedFrameSource(
         val assetId: String,
@@ -129,10 +126,9 @@ object FrameManager {
 
     internal data class FrameState(
         var applyToAll: Boolean,
-        val assignments: MutableMap<String, String>,
-        val packs: MutableMap<String, FramePack> = HashMap()
+        val assignments: MutableMap<String, String>
     ) {
-        fun copyState() = FrameState(applyToAll, HashMap(assignments), HashMap(packs))
+        fun copyState() = FrameState(applyToAll, HashMap(assignments))
     }
 
     class EditSession internal constructor(
@@ -144,7 +140,7 @@ object FrameManager {
             get() = state.applyToAll
             set(value) { state.applyToAll = value }
         private var libraryChanged = false
-        private val previews = HashMap<String, LoadedFrame?>()
+        private val previews = HashMap<String, FramePreview?>()
 
         fun hasChanges(): Boolean = libraryChanged || state != original
 
@@ -176,55 +172,12 @@ object FrameManager {
             }
             .sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.name })
 
-        fun packs(): List<FramePack> = state.packs.values
-            .sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.name })
-
-        fun packRoleSpec(packId: String, role: String): FrameSpec? =
-            state.packs[packId]?.roles?.get(role)?.let(::load)?.spec
-
-        fun updatePackRole(packId: String, role: String, spec: FrameSpec) {
-            val pack = requireNotNull(state.packs[packId]) { "UI pack is missing." }
-            val oldId = requireNotNull(pack.roles[role]) { "UI pack role is missing." }
-            val parsed = parseBundle(FileInputStream(assetFile(directory, oldId)).use {
-                it.readLimited(MAX_BUNDLE_BYTES, "Frame bundle is too large.")
-            })
-            val newId = registerBundle(buildBundle(parsed.name, spec.copy(filtering = "nearest"), parsed.png)).id
-            state.packs[packId] = pack.copy(roles = pack.roles.toMutableMap().apply { put(role, newId) })
-            if (state.assignments[role] == oldId) state.assignments[role] = newId
-
-            val retained = state.assignments.values.toSet() + state.packs.values.flatMap { it.roles.values }
-            if (oldId !in retained) {
-                assetFile(directory, oldId).delete()
-                previews.remove(oldId)
-            }
-            libraryChanged = true
-        }
-
-        fun applyPack(packId: String) {
-            val pack = requireNotNull(state.packs[packId]) { "UI pack is missing." }
-            state.assignments.clear()
-            state.applyToAll = "global" in pack.roles
-            state.assignments.putAll(pack.roles)
-        }
-
-        fun deletePack(packId: String) {
-            val pack = requireNotNull(state.packs.remove(packId)) { "UI pack is missing." }
-            val retained = state.packs.values.flatMapTo(HashSet()) { it.roles.values }
-            pack.roles.values.toSet().filterNot(retained::contains).forEach { assetId ->
-                state.assignments.entries.removeAll { it.value == assetId }
-                val file = assetFile(directory, assetId)
-                if (file.exists() && !file.delete()) throw IllegalStateException("Unable to delete frame.")
-                previews.remove(assetId)
-            }
-            libraryChanged = true
-        }
-
         fun references(assetId: String): List<String> = state.assignments
             .filterValues { it == assetId }
             .keys
             .mapNotNull { key ->
                 if (key == "global") "All surfaces" else FrameTarget.entries.firstOrNull { it.id == key }?.label
-            } + state.packs.values.filter { assetId in it.roles.values }.map { "${it.name} pack" }
+            }
 
         fun importBundle(target: FrameTarget?, input: InputStream): FrameAsset {
             val bytes = input.readLimited(MAX_BUNDLE_BYTES, "Frame bundle is too large.")
@@ -234,94 +187,8 @@ object FrameManager {
             return asset
         }
 
-        fun importNamedPack(context: Context, treeUri: Uri): ImportedPack {
-            val root = documentChildren(context, treeUri, treeUri)
-            require("frames" in root && root.keys.all { it == "frames" || it == "manifest.json" || it == "readme.md" }) {
-                "UI pack root must contain frames/ plus an optional manifest.json and readme.md."
-            }
-            val manifestEntry = root["manifest.json"]
-            val readmeEntry = root["readme.md"]
-            val framesEntry = requireNotNull(root["frames"])
-            require(manifestEntry == null || manifestEntry.mimeType != DocumentsContract.Document.MIME_TYPE_DIR) {
-                "manifest.json must be a file."
-            }
-            require(readmeEntry == null || readmeEntry.mimeType != DocumentsContract.Document.MIME_TYPE_DIR) {
-                "readme.md must be a file."
-            }
-            require(framesEntry.mimeType == DocumentsContract.Document.MIME_TYPE_DIR) { "frames must be a folder." }
-
-            val manifestBytes = manifestEntry?.let {
-                readDocument(context, it.uri, MAX_MANIFEST_BYTES, "Frame pack manifest is too large.")
-            }
-            val pack = manifestBytes?.let(::parsePackManifest) ?: ParsedPack(
-                documentName(context, treeUri).trim().take(80).ifEmpty { "UI Pack" },
-                emptyMap(),
-                null
-            )
-            val children = documentChildren(context, treeUri, framesEntry.uri)
-            require(children.isNotEmpty()) { "Frame pack contains no PNG files." }
-
-            var totalBytes = manifestBytes?.size?.toLong() ?: 0L
-            val roleFiles = if (manifestBytes == null || pack.roles.isEmpty()) {
-                children.keys.associate { fileName ->
-                    requireNotNull(namedPackAssignment(fileName)) {
-                        "Unsupported frame filename: $fileName. Use a filename from the UI pack guide."
-                    } to fileName
-                }
-            } else {
-                require(children.keys == pack.roles.values.mapTo(HashSet()) { it.file }) {
-                    "Frame pack manifest roles do not match frames/."
-                }
-                pack.roles.mapValues { it.value.file }
-            }
-            val pngs = HashMap<String, ByteArray>()
-            roleFiles.values.toCollection(LinkedHashSet()).forEach { fileName ->
-                val entry = requireNotNull(children[fileName]) { "Missing frame: $fileName" }
-                require(entry.mimeType != DocumentsContract.Document.MIME_TYPE_DIR) { "Frame pack cannot contain nested folders." }
-                val png = readDocument(context, entry.uri, MAX_PNG_BYTES, "$fileName is too large.")
-                totalBytes += png.size
-                require(totalBytes <= MAX_PACK_BYTES) { "Frame pack is too large." }
-                pngs[fileName] = png
-            }
-            val definitions = when {
-                manifestBytes == null -> roleFiles.mapValues { (role, fileName) ->
-                    PackRole(fileName, defaultFrameSpec(role, requireNotNull(pngs[fileName])))
-                }
-                pack.roles.isEmpty() -> roleFiles.mapValues { (_, fileName) ->
-                    PackRole(fileName, requireNotNull(pack.legacySpec))
-                }
-                else -> pack.roles
-            }
-            val importedRoles = LinkedHashMap<String, String>()
-            val importedAssets = HashMap<Pair<String, FrameSpec>, String>()
-            definitions.forEach { (role, definition) ->
-                val key = definition.file to definition.spec
-                importedRoles[role] = importedAssets.getOrPut(key) {
-                    val assetName = definition.file.removeSuffix(".png").replace('_', ' ')
-                    val bundle = buildBundle("${pack.name} - $assetName".take(80), definition.spec, requireNotNull(pngs[definition.file]))
-                    parseBundle(bundle)
-                    registerBundle(bundle).id
-                }
-            }
-            require("global" !in importedRoles || importedRoles.size == 1) {
-                "Use global.png by itself, or use named surface PNGs without global.png."
-            }
-            val packId = sha256(buildString {
-                append(pack.name).append('\n')
-                importedRoles.toSortedMap().forEach { (role, assetId) -> append(role).append('=').append(assetId).append('\n') }
-            }.toByteArray(Charsets.UTF_8))
-            state.packs[packId] = FramePack(packId, pack.name, importedRoles)
-            libraryChanged = true
-            return ImportedPack(packId, pack.name, importedRoles.size)
-        }
-
         fun deleteAsset(assetId: String) {
             state.assignments.entries.removeAll { it.value == assetId }
-            state.packs.entries.toList().forEach { (packId, pack) ->
-                val roles = pack.roles.filterValues { it != assetId }
-                if (roles.isEmpty()) state.packs.remove(packId)
-                else if (roles.size != pack.roles.size) state.packs[packId] = pack.copy(roles = roles)
-            }
             val file = assetFile(directory, assetId)
             if (file.exists() && !file.delete()) throw IllegalStateException("Unable to delete frame.")
             previews.remove(assetId)
@@ -330,6 +197,7 @@ object FrameManager {
 
         fun save() {
             writeStateFile(directory, state)
+            removeUnreferencedAssets(directory)
             validateFrameFolder(directory)
             applyFrameFolder(directory)
             discard()
@@ -339,10 +207,10 @@ object FrameManager {
             if (directory.exists()) Tuils.delete(directory)
         }
 
-        private fun load(assetId: String?): LoadedFrame? {
+        private fun load(assetId: String?): FramePreview? {
             if (assetId == null) return null
             if (previews.containsKey(assetId)) return previews[assetId]
-            val loaded = loadFrameFile(assetFile(directory, assetId), assetId)
+            val loaded = loadFramePreview(assetFile(directory, assetId), assetId)
             previews[assetId] = loaded
             return loaded
         }
@@ -421,37 +289,6 @@ object FrameManager {
     internal fun resolvedTarget(applyToAll: Boolean, target: FrameTarget): FrameTarget? =
         if (applyToAll) null else target
 
-    internal fun namedPackAssignment(fileName: String): String? = when (fileName) {
-        "global.png" -> "global"
-        else -> FrameTarget.entries.firstOrNull { fileName == it.fileName }?.id
-    }
-
-    internal fun defaultFrameSpec(_role: String, width: Int, height: Int): FrameSpec {
-        require(width == height && width >= 24 && width % 24 == 0) {
-            "Basic pack frames must be square and sized 24 x 24, 48 x 48, 72 x 72, and so on."
-        }
-        val cell = width / 3
-        return FrameSpec(
-            leftPx = cell,
-            topPx = cell,
-            rightPx = cell,
-            bottomPx = cell,
-            leftDp = 8f,
-            topDp = 8f,
-            rightDp = 8f,
-            bottomDp = 8f,
-            topMode = "tile",
-            rightMode = "tile",
-            bottomMode = "tile",
-            leftMode = "tile",
-            centerMode = "stretch",
-            filtering = "nearest"
-        )
-    }
-
-    internal fun isIgnoredPackEntry(name: String): Boolean =
-        name == ".DS_Store" || name.startsWith("._")
-
     fun wrap(context: Context, fallback: Drawable, target: FrameTarget = FrameTarget.CONTROLS): FramedDrawable? =
         drawable(context, target)?.let { FramedDrawable(fallback, it) }
 
@@ -526,9 +363,7 @@ object FrameManager {
                 parseBundle(FileInputStream(file).use { it.readLimited(MAX_BUNDLE_BYTES, "Frame bundle is too large.") })
             }
         }
-        require(state.assignments.keys.all(::isKnownRole) && state.packs.values.all { pack ->
-            pack.roles.keys.all(::isKnownRole) && pack.roles.values.all(ASSET_ID::matches)
-        }) {
+        require(state.assignments.keys.all(::isKnownRole)) {
             "Frame settings contain an unknown surface."
         }
     }
@@ -538,7 +373,7 @@ object FrameManager {
         if (!dir.isDirectory) return emptyList()
         validatePortableState(root)
         val state = readState(dir)
-        val referenced = state.assignments.values.toSet() + state.packs.values.flatMap { it.roles.values }
+        val referenced = state.assignments.values.toSet()
         return dir.listFiles().orEmpty().filter {
             it.isFile && (it.name == STATE_FILE || assetId(it.name)?.let(referenced::contains) == true || stateSchema(dir) == 1)
         }.sortedBy { it.name }
@@ -560,15 +395,17 @@ object FrameManager {
 
     @Synchronized
     private fun loadAsset(assetId: String): LoadedFrame? {
-        if (cache.containsKey(assetId)) return cache[assetId]
+        cache.get(assetId)?.let { return it }
+        if (assetId in invalidAssets) return null
         val loaded = loadFrameFile(assetFile(frameDir(), assetId), assetId)
-        cache[assetId] = loaded
+        if (loaded == null) invalidAssets.add(assetId) else cache.put(assetId, loaded)
         return loaded
     }
 
     @Synchronized
     private fun clearCache() {
-        cache.clear()
+        cache.evictAll()
+        invalidAssets.clear()
         cachedState = null
     }
 
@@ -612,7 +449,7 @@ object FrameManager {
             1 -> {
                 require(state.stringSet() == setOf("schema", "applyToAll")) { "Unsupported frame settings." }
                 val assignments = HashMap<String, String>()
-                legacyFiles(dir).forEach { (key, legacy) ->
+                for ((key, legacy) in legacyFiles(dir)) {
                     if (legacy.isFile) assignments[key] = sha256(FileInputStream(legacy).use {
                         it.readLimited(MAX_BUNDLE_BYTES, "Frame bundle is too large.")
                     })
@@ -635,19 +472,7 @@ object FrameManager {
                     "Unsupported frame settings."
                 }
                 val assignments = state.getJSONObject("assignments").assetMap()
-                val packs = HashMap<String, FramePack>()
-                val values = state.getJSONObject("packs")
-                for (id in values.keys()) {
-                    require(ASSET_ID.matches(id)) { "Invalid UI pack reference." }
-                    val value = values.getJSONObject(id)
-                    require(value.stringSet() == setOf("name", "roles")) { "Unsupported UI pack record." }
-                    val name = value.getString("name").trim()
-                    require(name.isNotEmpty() && name.length <= 80) { "UI pack name must be 1 to 80 characters." }
-                    val roles = value.getJSONObject("roles").assetMap()
-                    require(roles.keys.all(::isKnownRole)) { "UI pack contains an unknown role." }
-                    packs[id] = FramePack(id, name, roles)
-                }
-                FrameState(state.getBoolean("applyToAll"), assignments, packs)
+                FrameState(state.getBoolean("applyToAll"), assignments)
             }
             else -> throw IllegalArgumentException("Unsupported frame settings.")
         }
@@ -660,16 +485,10 @@ object FrameManager {
         temp.delete()
         backup.delete()
         val assignments = JSONObject()
-        value.assignments.toSortedMap().forEach(assignments::put)
-        val packs = JSONObject()
-        value.packs.toSortedMap().forEach { (id, pack) ->
-            val roles = JSONObject()
-            pack.roles.toSortedMap().forEach(roles::put)
-            packs.put(id, JSONObject().put("name", pack.name).put("roles", roles))
-        }
+        for ((key, assetId) in value.assignments.toSortedMap()) assignments.put(key, assetId)
         temp.writeText(
-            JSONObject().put("schema", 3).put("applyToAll", value.applyToAll)
-                .put("assignments", assignments).put("packs", packs).toString(2),
+            JSONObject().put("schema", 2).put("applyToAll", value.applyToAll)
+                .put("assignments", assignments).toString(2),
             Charsets.UTF_8
         )
         if (state.exists()) check(state.renameTo(backup)) { "Unable to save frame settings." }
@@ -707,7 +526,7 @@ object FrameManager {
             state.assignments[key] = id
         }
         writeStateFile(dir, state)
-        legacyFiles(dir).values.forEach { it.delete() }
+        for (legacy in legacyFiles(dir).values) legacy.delete()
     }
 
     private fun applyFrameFolder(source: File) {
@@ -755,6 +574,26 @@ object FrameManager {
         null
     }
 
+    private fun loadFramePreview(file: File, key: String): FramePreview? = try {
+        if (!file.isFile) null else parseBundle(FileInputStream(file).use {
+            it.readLimited(MAX_BUNDLE_BYTES, "Frame bundle is too large.")
+        }).let { parsed -> FramePreview(parsed.name, decodePreview(parsed.png)) }
+    } catch (error: Exception) {
+        Log.e("TUI-FRAME", "Unable to preview $key frame", error)
+        null
+    }
+
+    private fun decodePreview(image: ByteArray): Bitmap {
+        val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        BitmapFactory.decodeByteArray(image, 0, image.size, bounds)
+        var sample = 1
+        while (maxOf(bounds.outWidth, bounds.outHeight) / sample > FRAME_PREVIEW_MAX_PX) sample *= 2
+        val options = BitmapFactory.Options().apply { inSampleSize = sample }
+        return requireNotNull(BitmapFactory.decodeByteArray(image, 0, image.size, options)) {
+            "Unable to decode frame preview."
+        }
+    }
+
     private fun copyFrameFolder(source: File, destination: File) {
         if (destination.exists()) Tuils.delete(destination)
         check(destination.mkdirs()) { "Unable to create frame export folder." }
@@ -783,7 +622,7 @@ object FrameManager {
 
     private fun removeUnreferencedAssets(directory: File) {
         val state = readState(directory)
-        val referenced = state.assignments.values.toSet() + state.packs.values.flatMap { it.roles.values }
+        val referenced = state.assignments.values.toSet()
         directory.listFiles().orEmpty().forEach { file ->
             val id = assetId(file.name)
             if (id != null && id !in referenced) file.delete()
@@ -792,121 +631,6 @@ object FrameManager {
 
     private fun sha256(bytes: ByteArray): String = MessageDigest.getInstance("SHA-256")
         .digest(bytes).joinToString("") { "%02x".format(it) }
-
-    private fun documentChildren(context: Context, treeUri: Uri, directoryUri: Uri): Map<String, DocumentEntry> {
-        val documentId = if (directoryUri == treeUri) {
-            DocumentsContract.getTreeDocumentId(treeUri)
-        } else {
-            DocumentsContract.getDocumentId(directoryUri)
-        }
-        val childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(treeUri, documentId)
-        val result = LinkedHashMap<String, DocumentEntry>()
-        val cursor = requireNotNull(context.contentResolver.query(
-            childrenUri,
-            arrayOf(
-                DocumentsContract.Document.COLUMN_DOCUMENT_ID,
-                DocumentsContract.Document.COLUMN_DISPLAY_NAME,
-                DocumentsContract.Document.COLUMN_MIME_TYPE
-            ),
-            null,
-            null,
-            null
-        )) { "Unable to read frame pack folder." }
-        cursor.use {
-            while (it.moveToNext()) {
-                val name = requireNotNull(it.getString(1)) { "Frame pack contains an unnamed entry." }
-                if (isIgnoredPackEntry(name)) continue
-                require(name == name.lowercase(Locale.ROOT)) { "Frame pack names must be lowercase: $name" }
-                val uri = DocumentsContract.buildDocumentUriUsingTree(treeUri, requireNotNull(it.getString(0)))
-                require(result.put(name, DocumentEntry(uri, requireNotNull(it.getString(2)))) == null) {
-                    "Frame pack contains duplicate entry: $name"
-                }
-            }
-        }
-        return result
-    }
-
-    private fun documentName(context: Context, treeUri: Uri): String {
-        val uri = DocumentsContract.buildDocumentUriUsingTree(treeUri, DocumentsContract.getTreeDocumentId(treeUri))
-        return context.contentResolver.query(
-            uri,
-            arrayOf(DocumentsContract.Document.COLUMN_DISPLAY_NAME),
-            null,
-            null,
-            null
-        )?.use { cursor -> if (cursor.moveToFirst()) cursor.getString(0).orEmpty() else "" }.orEmpty()
-    }
-
-    private fun readDocument(context: Context, uri: Uri, limit: Int, message: String): ByteArray =
-        context.contentResolver.openInputStream(uri).use {
-            requireNotNull(it) { "Unable to read frame pack file." }.readLimited(limit, message)
-        }
-
-    private fun parsePackManifest(bytes: ByteArray): ParsedPack {
-        val manifest = JSONObject(String(bytes, Charsets.UTF_8))
-        require(manifest.getString("type") == "retui-frame-pack") { "Unsupported frame pack type." }
-        val name = manifest.getString("name").trim()
-        require(name.isNotEmpty() && name.length <= 80) { "Frame pack name must be 1 to 80 characters." }
-        return when (manifest.getInt("schema")) {
-            1 -> {
-                require(manifest.stringSet() == setOf("type", "schema", "name", "slicePx", "borderDp", "modes", "filtering")) {
-                    "Frame pack manifest has missing or unsupported fields."
-                }
-                ParsedPack(name, emptyMap(), parseSpec(manifest))
-            }
-            2 -> {
-                require(manifest.stringSet() == setOf("type", "schema", "name", "filtering", "roles")) {
-                    "UI pack manifest has missing or unsupported fields."
-                }
-                val filtering = manifest.getString("filtering")
-                require(filtering == "nearest") { "UI pack filtering must be nearest." }
-                val rolesJson = manifest.getJSONObject("roles")
-                require(rolesJson.length() > 0) { "UI pack contains no roles." }
-                val roles = LinkedHashMap<String, PackRole>()
-                for (role in rolesJson.keys()) {
-                    require(isKnownRole(role) && role != "global") { "Unsupported UI role: $role" }
-                    val value = rolesJson.getJSONObject(role)
-                    require(value.stringSet() == setOf("file", "slicePx", "borderDp", "modes")) {
-                        "UI role $role has missing or unsupported fields."
-                    }
-                    val file = value.getString("file")
-                    require(file.matches(Regex("[a-z0-9][a-z0-9_-]*\\.png"))) { "Invalid UI role filename: $file" }
-                    val specSource = JSONObject(value.toString()).put("filtering", filtering)
-                    roles[role] = PackRole(file, parseSpec(specSource))
-                }
-                ParsedPack(name, roles, null)
-            }
-            else -> throw IllegalArgumentException("Unsupported frame pack schema.")
-        }
-    }
-
-    private fun buildBundle(name: String, spec: FrameSpec, png: ByteArray): ByteArray {
-        val sides = JSONObject()
-            .put("left", spec.leftPx).put("top", spec.topPx).put("right", spec.rightPx).put("bottom", spec.bottomPx)
-        val borders = JSONObject()
-            .put("left", spec.leftDp).put("top", spec.topDp).put("right", spec.rightDp).put("bottom", spec.bottomDp)
-        val modes = JSONObject()
-            .put("left", spec.leftMode).put("top", spec.topMode).put("right", spec.rightMode)
-            .put("bottom", spec.bottomMode).put("center", spec.centerMode)
-        val manifest = JSONObject()
-            .put("type", "retui-frame").put("schema", 1).put("name", name).put("image", "frame.png")
-            .put("slicePx", sides).put("borderDp", borders).put("modes", modes).put("filtering", spec.filtering)
-            .toString(2).toByteArray(Charsets.UTF_8)
-        return ByteArrayOutputStream(manifest.size + png.size + 256).also { out ->
-            ZipOutputStream(out).use { zip ->
-                listOf("manifest.json" to manifest, "frame.png" to png).forEach { (entryName, data) ->
-                    zip.putNextEntry(ZipEntry(entryName).apply { time = 315532800000L })
-                    zip.write(data)
-                    zip.closeEntry()
-                }
-            }
-        }.toByteArray()
-    }
-
-    private fun defaultFrameSpec(role: String, png: ByteArray): FrameSpec {
-        val (width, height) = imageBounds(png)
-        return defaultFrameSpec(role, width, height)
-    }
 
     private fun imageBounds(image: ByteArray): Pair<Int, Int> {
         require(image.size >= 8 && image.copyOfRange(0, 8).contentEquals(byteArrayOf(0x89.toByte(), 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a))) {
@@ -1045,13 +769,7 @@ object FrameManager {
     }
 
     private data class ParsedFrame(val name: String, val spec: FrameSpec, val png: ByteArray)
-    private data class ParsedPack(
-        val name: String,
-        val roles: Map<String, PackRole>,
-        val legacySpec: FrameSpec?
-    )
-    private data class PackRole(val file: String, val spec: FrameSpec)
-    private data class DocumentEntry(val uri: Uri, val mimeType: String)
+    private data class FramePreview(val name: String, val bitmap: Bitmap)
 }
 
 data class FrameSpec(

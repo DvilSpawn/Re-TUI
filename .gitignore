@@ -1,7 +1,5 @@
 # Android Build Artifacts
 **/build/
-local-skins/
-local-packs/
 **/.gradle/
 **/captures/
 **/output-metadata.json
@@ -49,3 +47,5 @@ wrangler.toml
 docs/store-assets/firebase-alpha-testers.*
 docs/store-assets/build_promo_screenshots.py
 docs/store-assets/promo-screenshots/
+local-packs/
+local-skins/

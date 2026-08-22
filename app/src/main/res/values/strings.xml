@@ -3,7 +3,6 @@
 
     <!-- various text -->
     <string name="app_name">Re:T-UI</string>
-    <string name="share_label">Share</string>
     <string name="output_about">Francesco Andreuzzi (Italy)\n\t-> Programmer
         \n\nThanks to Luke Winward for his original idea</string>
     <string name="output_refresh">Refresh: apps, alias, music, contacts, rss feeds</string>
@@ -22,9 +21,7 @@
     <string name="hint_termux_input">Enter command</string>
 
     <!-- weather -->
-    <string name="weather_cant_update">You can\'t perform a manual update with the default key. You have to create a custom key on the website</string>
     <string name="weather_error">The weather API is busy. Trying again at:</string>
-    <string name="weather_disabled">Weather is not enabled</string>
     <string name="weather_updated">Weather updated at</string>
     <string name="weather_location_required">Weather location is not configured.</string>
     <string name="weather_location_not_found">Couldn\'t find that Weather location. Try a more specific place name or latitude,longitude.</string>
@@ -55,7 +52,6 @@
     <!-- notifications -->
     <string name="notification_reader">Re:T-UI notification reader</string>
     <string name="no_notification_access">Unfortunately Re:T-UI can\'t redirect you to the \"Notification access\" page of your system settings</string>
-    <string name="notification_low_api">Notifications are supported on Android 4.3+ only. Use \'config -set show_notifications false\' to disable this message</string>
 
     <!-- helps texts -->
     <string name="output_usedefapp">You can use \"apps -default_app\" instead</string>
@@ -99,7 +95,6 @@
     <string name="invalid_name">Invalid name</string>
     <string name="api_low">Low Android version</string>
     <string name="invalid_datastoretype">Invalid type</string>
-    <string name="location_error">Couldn\'t get your location</string>
 
     <!-- note -->
     <string name="note_not_found">Note not found</string>
@@ -114,7 +109,6 @@
     <string name="rss_never_checked">This RSS feed hasn\'t been checked yet</string>
     <string name="rss_invalid_timeformat">The time format couldn\'t be parsed</string>
     <string name="rss_invalid_date">Invalid publication date tag:</string>
-    <string name="rss_invalid_entry_tag">Invalid entry tag:</string>
     <string name="rss_invalid_empty">Invalid RSS: the file is empty:</string>
     <string name="rss_no_entries">RSS feed has no entries:</string>
 

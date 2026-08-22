@@ -516,7 +516,7 @@ class PodcastManager(
         val byKey = LinkedHashMap<String, PodcastEpisode>()
         for (ep in fetched.episodes) byKey[ep.key] = ep
         for (ep in previous.episodes) {
-            if (keepKeys.contains(ep.key)) byKey.putIfAbsent(ep.key, ep)
+            if (keepKeys.contains(ep.key) && ep.key !in byKey) byKey[ep.key] = ep
         }
         val merged = byKey.values.sortedWith(
             compareBy<PodcastEpisode> { it.publishedAt ?: Long.MAX_VALUE }

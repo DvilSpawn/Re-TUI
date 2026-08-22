@@ -202,16 +202,6 @@ object TuixtDialog {
         positive: String,
         negative: String,
         action: ConfirmAction
-    ) = showConfirm(context, title, message, positive, negative, action, null)
-
-    fun showConfirm(
-        context: Context,
-        title: String,
-        message: String?,
-        positive: String,
-        negative: String,
-        action: ConfirmAction,
-        negativeAction: ConfirmAction?
     ) {
         Handler(Looper.getMainLooper()).post(Runnable {
             val dialog = createDialog(context)
@@ -235,7 +225,7 @@ object TuixtDialog {
                 )
             )
 
-            val buttons = buttons(context, dialog, positive, negative, action, true, negativeAction)
+            val buttons = buttons(context, dialog, positive, negative, action, true)
             dialog.setContentView(wrap(context, title, content, buttons))
             show(dialog)
         })
@@ -393,8 +383,7 @@ object TuixtDialog {
         positive: String,
         negative: String,
         action: ConfirmAction,
-        dismissOnConfirm: Boolean,
-        negativeAction: ConfirmAction? = null
+        dismissOnConfirm: Boolean
     ): LinearLayout {
         val row = LinearLayout(context)
         row.setOrientation(LinearLayout.HORIZONTAL)
@@ -404,10 +393,7 @@ object TuixtDialog {
         val cancel = TextView(context)
         cancel.setText(negative.uppercase(Locale.getDefault()))
         styleButton(context, cancel, false)
-        cancel.setOnClickListener(View.OnClickListener {
-            dialog.dismiss()
-            negativeAction?.onConfirm()
-        })
+        cancel.setOnClickListener(View.OnClickListener { dialog.dismiss() })
         row.addView(
             cancel, LinearLayout.LayoutParams(
                 0,

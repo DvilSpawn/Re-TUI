@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.view.View
+import androidx.annotation.RequiresApi
 
 class SolidColorView(context: Context) : View(context) {
     var color: Int = Color.parseColor(RetuiWallpaperSettings.solidColor(context)) or Color.BLACK
@@ -17,5 +18,6 @@ class SolidColorView(context: Context) : View(context) {
         canvas.drawColor(color)
     }
 
+    @RequiresApi(27)
     fun wallpaperColors(): WallpaperColors = WallpaperColors(Color.valueOf(color), null, null)
 }

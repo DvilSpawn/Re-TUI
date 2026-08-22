@@ -1335,7 +1335,7 @@ class ThemerActivity : AppCompatActivity() {
         }
     }
 
-    @SuppressLint("GestureBackNavigation")
+    @SuppressLint("GestureBackNavigation", "MissingSuperCall")
     override fun onBackPressed() {
         if (section == SECTION_FRAMES && frameEditSession?.hasChanges() == true) {
             TuixtDialog.showConfirm(
@@ -1828,7 +1828,7 @@ class ThemerActivity : AppCompatActivity() {
                         0
                     )
                 )
-                if (label != null && label.length > 0) {
+                if (label.isNotEmpty()) {
                     return label.toString() + " (" + packageName + ")"
                 }
             } catch (ignored: Exception) {
@@ -2017,7 +2017,7 @@ class ThemerActivity : AppCompatActivity() {
                 ArrayList<String?>()
 
             for (info in resolved) {
-                if (info.activityInfo == null || info.activityInfo.packageName == null) {
+                if (info.activityInfo == null) {
                     continue
                 }
 
@@ -2027,9 +2027,7 @@ class ThemerActivity : AppCompatActivity() {
                 }
 
                 val loadedLabel = info.loadLabel(packageManager)
-                val label =
-                    if (loadedLabel != null) loadedLabel.toString() else packageName
-                choices.add(AppChoice(label, packageName))
+                choices.add(AppChoice(loadedLabel.toString(), packageName))
                 seenPackages.add(packageName)
             }
 
