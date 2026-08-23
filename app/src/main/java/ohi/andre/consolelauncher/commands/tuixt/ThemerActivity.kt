@@ -83,6 +83,7 @@ import ohi.andre.consolelauncher.tuils.LauncherSystemUi.applyFullscreen
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi.requestNoTitleIfFullscreen
 import ohi.andre.consolelauncher.tuils.LauncherFontScale
 import ohi.andre.consolelauncher.tuils.FrameManager
+import ohi.andre.consolelauncher.tuils.FrameSpec
 import ohi.andre.consolelauncher.tuils.FrameTarget
 import ohi.andre.consolelauncher.tuils.Tuils
 import java.io.File
@@ -720,6 +721,12 @@ class ThemerActivity : AppCompatActivity() {
             setOnClickListener { launchFrameImportPicker(target) }
         }, LinearLayout.LayoutParams(0, dp(this, 46f), 1f))
         if (hasBundle) {
+            actions.addView(View(this), LinearLayout.LayoutParams(dp(this, 8f), 1))
+            actions.addView(TextView(this).apply {
+                text = "EDIT"
+                styleButton(this@ThemerActivity, this, false)
+                setOnClickListener { showFrameEditor(target) }
+            }, LinearLayout.LayoutParams(0, dp(this, 46f), 1f))
             actions.addView(View(this), LinearLayout.LayoutParams(dp(this, 8f), 1))
             actions.addView(TextView(this).apply {
                 text = "USE DEFAULT"
@@ -1611,6 +1618,162 @@ class ThemerActivity : AppCompatActivity() {
         } catch (e: ActivityNotFoundException) {
             Toast.makeText(this, "File picker is unavailable on this device.", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun showFrameEditor(target: FrameTarget?) {
+        val session = frameSession()
+        val details = session.assignedDetails(target) ?: run {
+            Toast.makeText(this, "This frame cannot be edited.", Toast.LENGTH_SHORT).show()
+            return
+        }
+        TuixtDialog.showCustom(this, "Edit ${target?.label ?: "All surfaces"}", ContentFactory { dialog ->
+            val content = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+            content.addView(TextView(this).apply {
+                text = "${details.name}  •  ${details.width} x ${details.height} px\nChanges stay staged until Save Frame Settings."
+                setTextColor(textColor())
+                setTypeface(Tuils.getTypeface(this@ThemerActivity))
+                textSize = 12f
+                setPadding(0, 0, 0, dp(this@ThemerActivity, 10f))
+            })
+
+            val inputs = HashMap<String, EditText>()
+            fun numberGrid(title: String, prefix: String, values: List<Number>, decimal: Boolean) {
+                content.addView(TextView(this).apply {
+                    text = title
+                    setTextColor(accentColor())
+                    setTypeface(Tuils.getTypeface(this@ThemerActivity), Typeface.BOLD)
+                    textSize = 12f
+                    setPadding(0, dp(this@ThemerActivity, 8f), 0, dp(this@ThemerActivity, 4f))
+                })
+                val row = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
+                listOf("LEFT", "TOP", "RIGHT", "BOTTOM").forEachIndexed { index, side ->
+                    val column = LinearLayout(this).apply {
+                        orientation = LinearLayout.VERTICAL
+                        if (index > 0) setPadding(dp(this@ThemerActivity, 4f), 0, 0, 0)
+                    }
+                    column.addView(TextView(this).apply {
+                        text = side
+                        setTextColor(textColor())
+                        setTypeface(Tuils.getTypeface(this@ThemerActivity))
+                        textSize = 9f
+                    })
+                    val input = EditText(this).apply {
+                        setText(values[index].toString())
+                        inputType = InputType.TYPE_CLASS_NUMBER or
+                                if (decimal) InputType.TYPE_NUMBER_FLAG_DECIMAL else 0
+                        setSelectAllOnFocus(true)
+                        styleInput(this@ThemerActivity, this)
+                    }
+                    inputs["${prefix}_${side.lowercase(Locale.ROOT)}"] = input
+                    column.addView(input, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
+                    row.addView(column, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
+                }
+                content.addView(row)
+            }
+
+            numberGrid(
+                "BORDER SIZE (DP)", "border",
+                listOf(details.spec.leftDp, details.spec.topDp, details.spec.rightDp, details.spec.bottomDp),
+                true
+            )
+            numberGrid(
+                "IMAGE SLICES (PX)", "slice",
+                listOf(details.spec.leftPx, details.spec.topPx, details.spec.rightPx, details.spec.bottomPx),
+                false
+            )
+
+            val modes = hashMapOf(
+                "left" to details.spec.leftMode,
+                "top" to details.spec.topMode,
+                "right" to details.spec.rightMode,
+                "bottom" to details.spec.bottomMode,
+                "center" to details.spec.centerMode,
+                "filtering" to details.spec.filtering
+            )
+            content.addView(TextView(this).apply {
+                text = "DRAWING"
+                setTextColor(accentColor())
+                setTypeface(Tuils.getTypeface(this@ThemerActivity), Typeface.BOLD)
+                textSize = 12f
+                setPadding(0, dp(this@ThemerActivity, 12f), 0, dp(this@ThemerActivity, 4f))
+            })
+            val modeRows = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+            fun modeButton(label: String, key: String, choices: List<String>): TextView = TextView(this).apply {
+                fun refresh() { text = "$label: ${modes.getValue(key).uppercase(Locale.ROOT)}" }
+                refresh()
+                styleButton(this@ThemerActivity, this, false)
+                setOnClickListener {
+                    val current = modes.getValue(key)
+                    modes[key] = choices[(choices.indexOf(current) + 1) % choices.size]
+                    refresh()
+                }
+            }
+            listOf(
+                listOf("LEFT" to "left", "TOP" to "top"),
+                listOf("RIGHT" to "right", "BOTTOM" to "bottom"),
+                listOf("CENTER" to "center", "FILTER" to "filtering")
+            ).forEach { pair ->
+                val row = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
+                pair.forEachIndexed { index, (label, key) ->
+                    val choices = if (key == "center") listOf("stretch", "tile", "none") else
+                        if (key == "filtering") listOf("nearest", "linear") else listOf("tile", "stretch")
+                    val params = LinearLayout.LayoutParams(0, dp(this, 44f), 1f).apply {
+                        if (index > 0) leftMargin = dp(this@ThemerActivity, 8f)
+                        bottomMargin = dp(this@ThemerActivity, 8f)
+                    }
+                    row.addView(modeButton(label, key, choices), params)
+                }
+                modeRows.addView(row)
+            }
+            content.addView(modeRows)
+
+            val error = TextView(this).apply {
+                setTextColor(Color.RED)
+                setTypeface(Tuils.getTypeface(this@ThemerActivity))
+                textSize = 12f
+                visibility = View.GONE
+            }
+            content.addView(error)
+            val buttons = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                setPadding(0, dp(this@ThemerActivity, 6f), 0, 0)
+            }
+            buttons.addView(TextView(this).apply {
+                text = "CANCEL"
+                styleButton(this@ThemerActivity, this, false)
+                setOnClickListener { dialog?.dismiss() }
+            }, LinearLayout.LayoutParams(0, dp(this, 46f), 1f))
+            buttons.addView(View(this), LinearLayout.LayoutParams(dp(this, 8f), 1))
+            buttons.addView(TextView(this).apply {
+                text = "APPLY EDITS"
+                styleButton(this@ThemerActivity, this, true)
+                setOnClickListener {
+                    try {
+                        fun intValue(key: String) = requireNotNull(inputs[key]?.text?.toString()?.toIntOrNull()) {
+                            "Slice values must be positive whole pixels."
+                        }
+                        fun floatValue(key: String) = requireNotNull(inputs[key]?.text?.toString()?.toFloatOrNull()) {
+                            "Borders must be between 0 and 256 dp."
+                        }
+                        val spec = FrameSpec(
+                            intValue("slice_left"), intValue("slice_top"), intValue("slice_right"), intValue("slice_bottom"),
+                            floatValue("border_left"), floatValue("border_top"), floatValue("border_right"), floatValue("border_bottom"),
+                            modes.getValue("top"), modes.getValue("right"), modes.getValue("bottom"), modes.getValue("left"),
+                            modes.getValue("center"), modes.getValue("filtering")
+                        )
+                        FrameManager.frameSpecError(spec, details.width, details.height)?.let { throw IllegalArgumentException(it) }
+                        session.updateFrameSpec(target, spec)
+                        dialog?.dismiss()
+                        reloadForFrame("Frame controls updated.")
+                    } catch (e: Exception) {
+                        error.text = e.message ?: "Invalid frame settings."
+                        error.visibility = View.VISIBLE
+                    }
+                }
+            }, LinearLayout.LayoutParams(0, dp(this, 46f), 1f))
+            content.addView(buttons)
+            content
+        })
     }
 
     private fun reloadForFrame(message: String) {

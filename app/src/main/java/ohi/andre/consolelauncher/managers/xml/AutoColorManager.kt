@@ -94,11 +94,8 @@ object AutoColorManager {
         val accent = ensureReadable(accentSeed, background, 4.2)
         val text = readableTextFor(background)
         val mutedText = ColorUtils.blendARGB(text, accent, 0.28f)
-        val overlay =
-            Color.argb(196, Color.red(background), Color.green(background), Color.blue(background))
-
         return Palette(
-            background, surface, surfaceStrong, accent, text, mutedText, overlay,
+            background, surface, surfaceStrong, accent, text, mutedText,
             buildSuggestionStyle(accent, background, 0f, 0.96f, 0.04f),
             buildSuggestionStyle(accent, background, 18f, 0.82f, 0.10f),
             buildSuggestionStyle(accent, background, -18f, 1.12f, -0.02f),
@@ -112,7 +109,7 @@ object AutoColorManager {
     private fun resolveThemeColor(theme: Theme, palette: Palette, fallbackColor: Int): Int {
         when (theme) {
             Theme.background_color -> return palette.background
-            Theme.wallpaper_overlay_color -> return palette.overlay
+            Theme.wallpaper_overlay_color -> return Color.TRANSPARENT
             Theme.terminal_window_background_color, Theme.terminal_header_background_color, Theme.toolbar_background_color -> return palette.surface
             Theme.input_background_color, Theme.output_background_color, Theme.suggestions_background_color,
             Theme.ram_status_background_color, Theme.device_status_background_color, Theme.time_status_background_color,
@@ -133,8 +130,11 @@ object AutoColorManager {
             Theme.restart_message_text_color, Theme.session_info_text_color, Theme.link_text_color,
             Theme.app_installed_text_color, Theme.app_uninstalled_text_color, Theme.apps_drawer_text_color -> return palette.text
             Theme.regex_match_background_color -> return palette.accent
-            Theme.battery_text_high, Theme.battery_text_medium, Theme.battery_text_low,
-            Theme.ram_status_text_shadow_color, Theme.device_status_text_shadow_color, Theme.time_status_text_shadow_color,
+            Theme.battery_text_high -> return palette.accent
+            Theme.battery_text_medium -> return palette.mutedText
+            Theme.battery_text_low -> return palette.surfaceStrong
+            Theme.ram_status_text_shadow_color,
+            Theme.device_status_text_shadow_color, Theme.time_status_text_shadow_color,
             Theme.battery_status_text_shadow_color, Theme.storage_status_text_shadow_color,
             Theme.network_status_text_shadow_color, Theme.notes_status_text_shadow_color,
             Theme.weather_status_text_shadow_color, Theme.unlock_status_text_shadow_color,
@@ -271,7 +271,6 @@ object AutoColorManager {
         val accent: Int,
         val text: Int,
         val mutedText: Int,
-        val overlay: Int,
         val appSuggestionStyle: SuggestionStyle,
         val aliasSuggestionStyle: SuggestionStyle,
         val commandSuggestionStyle: SuggestionStyle,

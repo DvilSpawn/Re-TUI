@@ -109,6 +109,13 @@ object FrameManager {
 
     data class FrameAsset(val id: String, val name: String)
 
+    data class FrameDetails(
+        val name: String,
+        val spec: FrameSpec,
+        val width: Int,
+        val height: Int
+    )
+
     data class FramePack(
         val id: String,
         val name: String,
@@ -177,6 +184,9 @@ object FrameManager {
         fun hasAssignedFrame(target: FrameTarget?): Boolean = selectedAssetId(target) != null
 
         fun assignedName(target: FrameTarget?): String? = load(selectedAssetId(target))?.name
+
+        fun assignedDetails(target: FrameTarget?): FrameDetails? =
+            load(selectedAssetId(target))?.let { FrameDetails(it.name, it.spec, it.width, it.height) }
 
         fun previewBitmap(target: FrameTarget?): Bitmap? = load(selectedAssetId(target))?.bitmap
 
@@ -247,6 +257,18 @@ object FrameManager {
             }
             select(target, asset.id)
             return asset
+        }
+
+        fun updateFrameSpec(target: FrameTarget?, spec: FrameSpec) {
+            val oldId = requireNotNull(selectedAssetId(target)) { "No frame is assigned." }
+            val parsed = parseBundle(FileInputStream(assetFile(directory, oldId)).use {
+                it.readLimited(MAX_BUNDLE_BYTES, "Frame bundle is too large.")
+            })
+            val (width, height) = imageBounds(parsed.png)
+            require(frameSpecError(spec, width, height) == null) {
+                frameSpecError(spec, width, height) ?: "Invalid frame settings."
+            }
+            select(target, registerBundle(buildBundle(parsed.name, spec, parsed.png)).id)
         }
 
         fun save() {
@@ -700,7 +722,10 @@ object FrameManager {
     private fun loadFramePreview(file: File, key: String): FramePreview? = try {
         if (!file.isFile) null else parseBundle(FileInputStream(file).use {
             it.readLimited(MAX_BUNDLE_BYTES, "Frame bundle is too large.")
-        }).let { parsed -> FramePreview(parsed.name, decodePreview(parsed.png)) }
+        }).let { parsed ->
+            val (width, height) = imageBounds(parsed.png)
+            FramePreview(parsed.name, parsed.spec, width, height, decodePreview(parsed.png))
+        }
     } catch (error: Exception) {
         Log.e("TUI-FRAME", "Unable to preview $key frame", error)
         null
@@ -794,6 +819,22 @@ object FrameManager {
             centerMode = "stretch",
             filtering = "nearest"
         )
+    }
+
+    internal fun frameSpecError(spec: FrameSpec, width: Int, height: Int): String? = when {
+        listOf(spec.leftPx, spec.topPx, spec.rightPx, spec.bottomPx).any { it <= 0 } ->
+            "Slice values must be positive whole pixels."
+        spec.leftPx + spec.rightPx >= width || spec.topPx + spec.bottomPx >= height ->
+            "Slices must leave a center region inside the ${width} x ${height} PNG."
+        listOf(spec.leftDp, spec.topDp, spec.rightDp, spec.bottomDp).any { !it.isFinite() || it !in 0f..256f } ->
+            "Borders must be between 0 and 256 dp."
+        listOf(spec.leftMode, spec.topMode, spec.rightMode, spec.bottomMode).any { it != "stretch" && it != "tile" } ->
+            "Edge modes must be stretch or tile."
+        spec.centerMode !in setOf("stretch", "tile", "none") ->
+            "Center mode must be stretch, tile, or none."
+        spec.filtering != "nearest" && spec.filtering != "linear" ->
+            "Filtering must be nearest or linear."
+        else -> null
     }
 
     private fun buildBundle(name: String, spec: FrameSpec, png: ByteArray): ByteArray {
@@ -949,7 +990,13 @@ object FrameManager {
     }
 
     private data class ParsedFrame(val name: String, val spec: FrameSpec, val png: ByteArray)
-    private data class FramePreview(val name: String, val bitmap: Bitmap)
+    private data class FramePreview(
+        val name: String,
+        val spec: FrameSpec,
+        val width: Int,
+        val height: Int,
+        val bitmap: Bitmap
+    )
 
     private val PNG_SIGNATURE = byteArrayOf(0x89.toByte(), 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a)
 }

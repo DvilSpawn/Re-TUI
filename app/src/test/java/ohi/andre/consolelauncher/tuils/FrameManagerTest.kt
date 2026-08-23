@@ -59,6 +59,15 @@ class FrameManagerTest {
         FrameManager.defaultPngSpec(50, 50)
     }
 
+    @Test fun frameEditorRejectsSlicesThatConsumeTheCenter() {
+        val valid = FrameManager.defaultPngSpec(48, 48)
+        assertNull(FrameManager.frameSpecError(valid, 48, 48))
+        assertEquals(
+            "Slices must leave a center region inside the 48 x 48 PNG.",
+            FrameManager.frameSpecError(valid.copy(leftPx = 24, rightPx = 24), 48, 48)
+        )
+    }
+
     @Test fun packsReplaceTheCompleteFrameSetup() {
         val output = "a".repeat(64)
         val button = "b".repeat(64)
