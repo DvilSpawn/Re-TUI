@@ -20,7 +20,17 @@ import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.tuils.CrtOverlayDrawable
 
+internal fun shouldScheduleWallpaperFrame(
+    visible: Boolean,
+    fullRedrawPending: Boolean,
+    animated: Boolean
+): Boolean = visible && (fullRedrawPending || animated)
+
 class RetuiWallpaperService : WallpaperService() {
+    companion object {
+        const val ACTION_REFRESH = "com.dvil.tui_renewed.action.REFRESH_WALLPAPER"
+    }
+
     override fun onCreate() {
         super.onCreate()
         XMLPrefsManager.loadCommons(this)
@@ -43,14 +53,15 @@ class RetuiWallpaperService : WallpaperService() {
                 when (intent?.action) {
                     Intent.ACTION_SCREEN_OFF -> handler.removeCallbacks(drawFrame)
                     Intent.ACTION_SCREEN_ON -> scheduleIfVisible()
+                    ACTION_REFRESH -> refreshView(recreate = true)
                 }
             }
         }
         private val drawFrame = object : Runnable {
             override fun run() {
-                if (!canDraw()) return
-                if (draw(fullSurface = fullRedrawPending)) fullRedrawPending = false
-                if (canDraw() && view !is SolidColorView) {
+                if (!visible) return
+                if (canDraw() && draw(fullSurface = fullRedrawPending)) fullRedrawPending = false
+                if (shouldScheduleWallpaperFrame(visible, fullRedrawPending, view !is SolidColorView)) {
                     handler.postDelayed(this, frameDelayMs())
                 }
             }
@@ -64,6 +75,7 @@ class RetuiWallpaperService : WallpaperService() {
                 IntentFilter().apply {
                     addAction(Intent.ACTION_SCREEN_ON)
                     addAction(Intent.ACTION_SCREEN_OFF)
+                    addAction(ACTION_REFRESH)
                 },
                 ContextCompat.RECEIVER_NOT_EXPORTED
             )
@@ -73,20 +85,7 @@ class RetuiWallpaperService : WallpaperService() {
         override fun onVisibilityChanged(visible: Boolean) {
             this.visible = visible
             handler.removeCallbacks(drawFrame)
-            if (visible) {
-                val selected = RetuiWallpaperSettings.scene(this@RetuiWallpaperService)
-                if (!viewMatchesScene(selected)) {
-                    releaseView()
-                    view = createView()
-                    layoutView(surfaceHolder.surfaceFrame.width(), surfaceHolder.surfaceFrame.height())
-                }
-                loadPosition()
-                fullRedrawPending = true
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-                    notifyColorsChanged()
-                }
-            }
-            scheduleIfVisible()
+            if (visible) refreshView(recreate = false)
         }
 
         @RequiresApi(27)
@@ -99,6 +98,7 @@ class RetuiWallpaperService : WallpaperService() {
         override fun onSurfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
             layoutView(width, height)
             fullRedrawPending = !draw(fullSurface = true)
+            scheduleIfVisible()
         }
 
         override fun onSurfaceRedrawNeeded(holder: SurfaceHolder) {
@@ -131,10 +131,25 @@ class RetuiWallpaperService : WallpaperService() {
         }
 
         private fun scheduleIfVisible() {
-            if (canDraw()) {
-                handler.removeCallbacks(drawFrame)
+            handler.removeCallbacks(drawFrame)
+            if (shouldScheduleWallpaperFrame(visible, fullRedrawPending, view !is SolidColorView)) {
                 handler.post(drawFrame)
             }
+        }
+
+        private fun refreshView(recreate: Boolean) {
+            if (!visible) return
+            val selected = RetuiWallpaperSettings.scene(this@RetuiWallpaperService)
+            if (recreate || !viewMatchesScene(selected)) {
+                releaseView()
+                view = createView()
+                layoutView(surfaceHolder.surfaceFrame.width(), surfaceHolder.surfaceFrame.height())
+            } else {
+                loadPosition()
+            }
+            fullRedrawPending = true
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) notifyColorsChanged()
+            scheduleIfVisible()
         }
 
         private fun canDraw(): Boolean = visible &&

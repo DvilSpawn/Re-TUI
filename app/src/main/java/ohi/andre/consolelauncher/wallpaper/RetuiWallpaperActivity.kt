@@ -148,6 +148,7 @@ class RetuiWallpaperActivity : AppCompatActivity() {
             }
             is SolidColorView -> RetuiWallpaperSettings.saveSolidColor(this, hex(current.color))
         }
+        sendBroadcast(Intent(RetuiWallpaperService.ACTION_REFRESH).setPackage(packageName))
     }
 
     private fun createPreview(name: String): android.view.View = when (name) {
