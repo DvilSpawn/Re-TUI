@@ -4,6 +4,8 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.Assert.assertEquals
+import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
+import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.managers.xml.options.Ui
 
 class PresetManagerTest {
@@ -28,5 +30,10 @@ class PresetManagerTest {
 
     @Test fun unifiedStatusBorderPreservesIndividualFramesByDefault() {
         assertEquals("false", ohi.andre.consolelauncher.managers.xml.options.SurfaceBorderOption.unified_status_border.defaultValue())
+    }
+
+    @Test fun unifiedStatusPaneHasItsOwnTransparentThemeColor() {
+        assertEquals("#00000000", Theme.unified_status_background_color.defaultValue())
+        assertEquals("Status Lines", XMLPrefsManager.sectionFor(Theme.unified_status_background_color))
     }
 }

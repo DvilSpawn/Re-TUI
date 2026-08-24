@@ -8602,7 +8602,7 @@ class UIManager(
         if (unifiedStatusBorder) {
             lViewsParent.background = TerminalBorderRuntime.panelDrawablePx(
                 mContext!!,
-                Color.TRANSPARENT,
+                getColor(Theme.unified_status_background_color),
                 terminalBorderColor(),
                 1.5f,
                 Tuils.dpToPx(mContext, moduleCornerRadius()).toFloat(),

@@ -68,6 +68,17 @@ class FrameManagerTest {
         )
     }
 
+    @Test fun externalPresetChangeInvalidatesAnOpenFrameSession() {
+        val asset = "a".repeat(64)
+        val original = FrameManager.FrameState(true, mutableMapOf("global" to asset))
+        val session = FrameManager.EditSession(
+            Files.createTempDirectory("retui-frame-stale").toFile(), original
+        )
+
+        assertFalse(session.isStale(FrameManager.FrameState(true, mutableMapOf("global" to asset))))
+        assertTrue(session.isStale(FrameManager.FrameState(false, mutableMapOf())))
+    }
+
     @Test fun packsReplaceTheCompleteFrameSetup() {
         val output = "a".repeat(64)
         val button = "b".repeat(64)
@@ -98,9 +109,11 @@ class FrameManagerTest {
         assertEquals("Sprout Lands", pack.name)
         assertEquals(output, pack.assignments[FrameTarget.OUTPUT.id])
         assertEquals(pack.id, session.activePackId())
+        assertEquals(pack.id, session.currentPackId())
 
         session.select(FrameTarget.BUTTON, button)
         assertNull(session.activePackId())
+        assertEquals(pack.id, session.currentPackId())
         val replaced = session.replacePack(pack.id)
         assertEquals(pack.id, replaced.id)
         assertEquals("Sprout Lands", replaced.name)

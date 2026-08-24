@@ -115,7 +115,7 @@ object AutoColorManager {
             Theme.ram_status_background_color, Theme.device_status_background_color, Theme.time_status_background_color,
             Theme.battery_status_background_color, Theme.storage_status_background_color, Theme.network_status_background_color,
             Theme.notes_status_background_color, Theme.weather_status_background_color, Theme.unlock_status_background_color,
-            Theme.ascii_status_background_color -> return ColorUtils.setAlphaComponent(palette.surface, 208)
+            Theme.ascii_status_background_color, Theme.unified_status_background_color -> return ColorUtils.setAlphaComponent(palette.surface, 208)
 
             Theme.input_text_color, Theme.device_text_color, Theme.ascii_text_color, Theme.time_text_color,
             Theme.storage_text_color, Theme.ram_text_color, Theme.network_info_text_color, Theme.alias_content_text_color,

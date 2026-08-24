@@ -46,6 +46,7 @@ enum class Theme(
     weather_status_background_color("#00000000", "Weather status line background color", TRANSPARENT_INVALID),
     unlock_status_background_color("#00000000", "Unlock counter status line background color", TRANSPARENT_INVALID),
     ascii_status_background_color("#00000000", "ASCII status line background color", TRANSPARENT_INVALID),
+    unified_status_background_color("#00000000", "Unified status pane background color", TRANSPARENT_INVALID),
 
     ram_status_text_shadow_color("#00000000", "RAM status line text shadow color", TRANSPARENT_INVALID),
     device_status_text_shadow_color("#00000000", "Device status line text shadow color", TRANSPARENT_INVALID),

@@ -1781,16 +1781,39 @@ class ThemerActivity : AppCompatActivity() {
         sectionsAdapter?.notifyDataSetChanged()
     }
 
-    private fun frameSession(): FrameManager.EditSession =
-        frameEditSession ?: FrameManager.beginEdit(this).also { frameEditSession = it }
+    private fun frameSession(): FrameManager.EditSession {
+        if (frameEditSession?.isStale() == true) {
+            frameEditSession?.discard()
+            frameEditSession = null
+        }
+        return frameEditSession ?: FrameManager.beginEdit(this).also { frameEditSession = it }
+    }
 
     private fun saveFrameChanges() {
         val session = frameEditSession ?: return
-        val choices = mutableListOf("Create new pack")
+        val choices = mutableListOf<String>()
+        if (session.currentPackId() != null) choices.add("Save current pack")
+        choices.add("Create new pack")
         if (session.packs().isNotEmpty()) choices.add("Replace existing pack")
         TuixtDialog.showOptions(this, "Save Frame Settings", choices, ItemAction { choice ->
-            if (choice == 0) showCreateFramePack() else showReplaceFramePack()
+            when (choices[choice]) {
+                "Save current pack" -> saveCurrentFramePack()
+                "Create new pack" -> showCreateFramePack()
+                else -> showReplaceFramePack()
+            }
         })
+    }
+
+    private fun saveCurrentFramePack() {
+        val session = frameEditSession ?: return
+        val packId = session.currentPackId() ?: return
+        val pack = session.packs().firstOrNull { it.id == packId } ?: return
+        try {
+            session.replacePack(packId)
+            persistFrameSession("${pack.name} saved and applied.")
+        } catch (e: Exception) {
+            Toast.makeText(this, "Could not save frame pack: ${e.message}", Toast.LENGTH_LONG).show()
+        }
     }
 
     private fun showCreateFramePack() {

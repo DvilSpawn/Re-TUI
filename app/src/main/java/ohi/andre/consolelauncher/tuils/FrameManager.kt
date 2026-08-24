@@ -165,9 +165,14 @@ object FrameManager {
                 }
             }
         private var libraryChanged = false
+        private var currentPackId = state.activePackId
         private val previews = HashMap<String, FramePreview?>()
 
         fun hasChanges(): Boolean = libraryChanged || state != original
+
+        fun isStale(): Boolean = isStale(currentState())
+
+        internal fun isStale(active: FrameState): Boolean = active != original
 
         fun selectedAssetId(target: FrameTarget?): String? = state.assignments[assignmentKey(target)]
 
@@ -198,6 +203,8 @@ object FrameManager {
 
         fun activePackId(): String? = state.activePackId
 
+        fun currentPackId(): String? = currentPackId?.takeIf(state.packs::containsKey)
+
         fun packNameError(name: String): String? {
             val clean = name.trim()
             if (clean.isEmpty() || clean.length > 80) return "Pack name must be 1 to 80 characters."
@@ -214,6 +221,7 @@ object FrameManager {
             return FramePack(id, clean, state.applyToAll, HashMap(state.assignments)).also {
                 state.packs[id] = it
                 state.activePackId = id
+                currentPackId = id
             }
         }
 
@@ -222,6 +230,7 @@ object FrameManager {
             return current.copy(applyToAll = state.applyToAll, assignments = HashMap(state.assignments)).also {
                 state.packs[packId] = it
                 state.activePackId = packId
+                currentPackId = packId
             }
         }
 
@@ -231,10 +240,12 @@ object FrameManager {
             state.assignments.clear()
             state.assignments.putAll(pack.assignments)
             state.activePackId = packId
+            currentPackId = packId
         }
 
         fun deletePack(packId: String): Boolean {
             requireNotNull(state.packs.remove(packId)) { "Frame pack is missing." }
+            if (currentPackId == packId) currentPackId = null
             val wasActive = state.activePackId == packId
             if (wasActive) {
                 state.applyToAll = true
