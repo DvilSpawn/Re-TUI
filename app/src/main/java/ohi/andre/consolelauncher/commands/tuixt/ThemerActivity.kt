@@ -2657,7 +2657,7 @@ class ThemerActivity : AppCompatActivity() {
                 data.getData() ?: return,
                 pendingShareablePresetName
             )
-            Toast.makeText(this, "Shareable configuration exported and verified.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "PI-safe configuration exported and verified.", Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
             data.getData()?.let { deleteCreatedDocument(it) }
             Toast.makeText(

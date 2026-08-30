@@ -40,7 +40,7 @@ for the Basic and Advanced startup choices.
 *   **Expanded Status Bar:** Support for up to 10 status lines (tv0-tv9) for richer information display.
 *   **Reminder Pane:** The dashboard module is a quick preview; the separate pane handles adding, editing, and removing reminders.
 *   **Native Weather:** The native `weather_native` module uses the location you choose, remains separate from Termux/wttr.in weather modules, and does not depend on Android location permission. Forecast data is provided by [MET Norway Locationforecast](https://api.met.no/weatherapi/locationforecast/2.0/documentation).
-*   **Shareable Presets:** Shareable configurations include `theme.xml`, `ui.xml`, and `suggestions.xml` while keeping personal values local. Imports enter the preset library instead of immediately overwriting the active launcher, and saved presets can be removed.
+*   **PI-safe Shareable Presets:** Shareable configurations include canonical colors, suggestion styling, layout, and typed behavior settings from `theme.xml`, `suggestions.xml`, `ui.xml`, and `behavior.xml`. Free-form text, names, commands, paths, locations, custom frame images, hidden XML content, and local preset-name metadata stay on the device. Imports enter the preset library instead of immediately overwriting the active launcher, and saved presets can be removed.
 *   **Optional Launcher Sounds:** A bundled sound pack can be enabled from **Settings → Behavior → Sounds**. Boot, command input, success, failure, notification, reminder, and timer sounds can each be switched on or off independently.
 
 ---

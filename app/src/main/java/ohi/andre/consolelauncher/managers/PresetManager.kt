@@ -25,12 +25,14 @@ import android.provider.OpenableColumns
 import java.util.ArrayList
 import java.util.HashSet
 import java.util.HashMap
+import java.util.LinkedHashMap
 import java.util.Map
 import java.util.Set
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager.XMLPrefsRoot
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave
+import ohi.andre.consolelauncher.managers.xml.options.Behavior
 import ohi.andre.consolelauncher.managers.xml.options.Suggestions
 import ohi.andre.consolelauncher.managers.xml.options.Ui
 import ohi.andre.consolelauncher.tuils.Tuils
@@ -49,11 +51,97 @@ object PresetManager {
     )
     private val PRESET_XML_FILES = arrayOf<String>(
         *REQUIRED_PRESET_XML_FILES,
-        XMLPrefsManager.XMLPrefsRoot.UI.path
+        XMLPrefsManager.XMLPrefsRoot.UI.path,
+        XMLPrefsManager.XMLPrefsRoot.BEHAVIOR.path
     )
+    private val SHAREABLE_THEME = Theme.entries.toTypedArray()
+    private val SHAREABLE_SUGGESTIONS = Suggestions.entries.toTypedArray()
     private val SHAREABLE_UI = XMLPrefsManager.XMLPrefsRoot.UI.enums.filterNot {
         it == Ui.username || it == Ui.deviceName || it == Ui.font_file || it == Ui.auto_color_pick
     }.toTypedArray()
+    private val SHAREABLE_BEHAVIOR = arrayOf(
+        Behavior.double_tap_lock,
+        Behavior.random_play,
+        Behavior.launcher_sounds,
+        Behavior.sound_boot,
+        Behavior.sound_click,
+        Behavior.sound_success,
+        Behavior.sound_failure,
+        Behavior.sound_notification,
+        Behavior.sound_reminder,
+        Behavior.sound_timer,
+        Behavior.songs_from_mediastore,
+        Behavior.tui_notification,
+        Behavior.auto_show_keyboard,
+        Behavior.search_only_mode,
+        Behavior.auto_scroll,
+        Behavior.show_alias_content,
+        Behavior.show_launch_history,
+        Behavior.show_module_dock,
+        Behavior.show_tmux_workspace_button,
+        Behavior.show_android_widget_drawer_button,
+        Behavior.enable_cyberdeck_mode,
+        Behavior.enable_crt_filter,
+        Behavior.ascii_animation,
+        Behavior.ascii_animation_frame_delay_ms,
+        Behavior.ascii_animation_max_file_kb,
+        Behavior.clear_after_cmds,
+        Behavior.clear_input_after_command,
+        Behavior.clear_after_seconds,
+        Behavior.max_lines,
+        Behavior.time_format_separator,
+        Behavior.battery_medium,
+        Behavior.battery_low,
+        Behavior.battery_progress_bar,
+        Behavior.battery_progress_bar_symbol,
+        Behavior.battery_progress_bar_length,
+        Behavior.toggle_output_state,
+        Behavior.output_tray_mode,
+        Behavior.output_header_mode,
+        Behavior.auto_hide_output,
+        Behavior.output_auto_hide_seconds,
+        Behavior.enable_music,
+        Behavior.max_optional_depth,
+        Behavior.tui_notification_click_showhome,
+        Behavior.tui_notification_lastcmds_size,
+        Behavior.tui_notification_lastcmds_updown,
+        Behavior.tui_notification_priority,
+        Behavior.long_click_vibration_duration,
+        Behavior.long_click_duration,
+        Behavior.click_commands,
+        Behavior.long_click_commands,
+        Behavior.append_quote_before_file,
+        Behavior.notes_sorting,
+        Behavior.notes_allow_link,
+        Behavior.orientation,
+        Behavior.duo_mode,
+        Behavior.tui_notification_time_text_color,
+        Behavior.tui_notification_input_text_color,
+        Behavior.weather_temperature_measure,
+        Behavior.unlock_time_divider,
+        Behavior.unlock_time_order,
+        Behavior.unlock_counter_cycle_start,
+        Behavior.clear_on_lock,
+        Behavior.back_button_enabled,
+        Behavior.swipe_down_notifications,
+        Behavior.weather_update_time,
+        Behavior.location_update_mintime,
+        Behavior.location_update_mindistance,
+        Behavior.show_weather_updates,
+        Behavior.swipe_up_apps_drawer,
+        Behavior.show_music_widget,
+        Behavior.auto_show_music_widget,
+        Behavior.pomodoro_focus_minutes,
+        Behavior.pomodoro_relax_minutes,
+        Behavior.shell_requires_prefix,
+        Behavior.events_lookahead_days
+    )
+    private val COLOR_VALUE = Regex("^#[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?$")
+    private val DECIMAL_VALUE = Regex("^-?[0-9]{1,6}(\\.[0-9]{1,4})?$")
+    private val FOUR_NUMBERS = Regex("^-?[0-9]{1,5}(\\.[0-9]{1,3})?(,-?[0-9]{1,5}(\\.[0-9]{1,3})?){3}$")
+    private val THREE_NUMBERS = Regex("^-?[0-9]{1,5}(\\.[0-9]{1,3})?(,-?[0-9]{1,5}(\\.[0-9]{1,3})?){2}$")
+    private val SUGGESTION_ORDER = Regex("^([0-9]{1,2}\\([0-9]{1,3}\\)){1,16}$")
+    private val SAFE_PUNCTUATION = Regex("^[!#$%&()*+,./:;<=>?@\\[\\]^_{|}~-]{0,8}$")
 
     val presetsDir: File
         get() = File(Tuils.getFolder(), PRESETS_FOLDER)
@@ -143,10 +231,7 @@ object PresetManager {
         }
         val presetFolder = File(presetsDir, cleanName)
         check(presetFolder.mkdirs()) { "Unable to create preset folder" }
-        for (fileName in PRESET_XML_FILES) {
-            val sourceFile = File(source, fileName)
-            if (sourceFile.isFile) Tuils.copy(sourceFile, File(presetFolder, fileName))
-        }
+        copySanitizedXmlFiles(source, presetFolder)
         FrameManager.copyPortableState(source, presetFolder)
         return cleanName
     }
@@ -159,15 +244,19 @@ object PresetManager {
 
         writeXml(
             File(presetFolder, XMLPrefsManager.XMLPrefsRoot.THEME.path),
-            XMLPrefsManager.XMLPrefsRoot.THEME, Theme.entries.toTypedArray()
+            XMLPrefsManager.XMLPrefsRoot.THEME, SHAREABLE_THEME
         )
         writeXml(
             File(presetFolder, XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS.path),
-            XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS, Suggestions.entries.toTypedArray()
+            XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS, SHAREABLE_SUGGESTIONS
         )
         writeXml(
             File(presetFolder, XMLPrefsManager.XMLPrefsRoot.UI.path),
             XMLPrefsManager.XMLPrefsRoot.UI, SHAREABLE_UI
+        )
+        writeXml(
+            File(presetFolder, XMLPrefsManager.XMLPrefsRoot.BEHAVIOR.path),
+            XMLPrefsManager.XMLPrefsRoot.BEHAVIOR, SHAREABLE_BEHAVIOR
         )
         FrameManager.copyCurrentTo(context, presetFolder)
 
@@ -202,10 +291,12 @@ object PresetManager {
             File(Tuils.getFolder(), XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS.path)
         Tuils.insertOld(currentTheme)
         Tuils.insertOld(currentSuggestions)
-        Tuils.copy(presetTheme, currentTheme)
-        Tuils.copy(presetSuggestions, currentSuggestions)
+        writeText(currentTheme, sanitizeShareableXml(presetTheme, XMLPrefsRoot.THEME))
+        writeText(currentSuggestions, sanitizeShareableXml(presetSuggestions, XMLPrefsRoot.SUGGESTIONS))
         val presetUi = File(presetFolder, XMLPrefsManager.XMLPrefsRoot.UI.path)
-        if (presetUi.isFile) applyUi(presetUi)
+        if (presetUi.isFile) applyAllowed(presetUi, XMLPrefsRoot.UI, SHAREABLE_UI)
+        val presetBehavior = File(presetFolder, XMLPrefsManager.XMLPrefsRoot.BEHAVIOR.path)
+        if (presetBehavior.isFile) applyAllowed(presetBehavior, XMLPrefsRoot.BEHAVIOR, SHAREABLE_BEHAVIOR)
         FrameManager.applyPortableState(presetFolder)
         LauncherSettings.setAutoColorPick(false)
     }
@@ -223,14 +314,13 @@ object PresetManager {
         val out = packageFile(cleanName)
         val zip = ZipOutputStream(BufferedOutputStream(FileOutputStream(out, false)))
         try {
-            addTextEntry(zip, MANIFEST_FILE, manifest(cleanName))
-            addFileEntry(zip, XMLPrefsManager.XMLPrefsRoot.THEME.path, presetTheme)
-            addFileEntry(zip, XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS.path, presetSuggestions)
+            addTextEntry(zip, MANIFEST_FILE, manifest())
+            addTextEntry(zip, XMLPrefsManager.XMLPrefsRoot.THEME.path, sanitizeShareableXml(presetTheme, XMLPrefsRoot.THEME))
+            addTextEntry(zip, XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS.path, sanitizeShareableXml(presetSuggestions, XMLPrefsRoot.SUGGESTIONS))
             val presetUi = File(presetFolder, XMLPrefsManager.XMLPrefsRoot.UI.path)
-            if (presetUi.isFile) addFileEntry(zip, XMLPrefsManager.XMLPrefsRoot.UI.path, presetUi)
-            for (frame in FrameManager.portableFiles(presetFolder)) {
-                addFileEntry(zip, "${FrameManager.FRAME_FOLDER}/${frame.name}", frame)
-            }
+            if (presetUi.isFile) addTextEntry(zip, XMLPrefsManager.XMLPrefsRoot.UI.path, sanitizeShareableXml(presetUi, XMLPrefsRoot.UI))
+            val presetBehavior = File(presetFolder, XMLPrefsManager.XMLPrefsRoot.BEHAVIOR.path)
+            if (presetBehavior.isFile) addTextEntry(zip, XMLPrefsManager.XMLPrefsRoot.BEHAVIOR.path, sanitizeShareableXml(presetBehavior, XMLPrefsRoot.BEHAVIOR))
         } finally {
             zip.close()
         }
@@ -274,19 +364,15 @@ object PresetManager {
             children[XMLPrefsManager.XMLPrefsRoot.UI.path.lowercase(Locale.getDefault())]?.let {
                 copyUriToFile(context, it, File(tempFolder, XMLPrefsManager.XMLPrefsRoot.UI.path))
             }
+            children[XMLPrefsManager.XMLPrefsRoot.BEHAVIOR.path.lowercase(Locale.getDefault())]?.let {
+                copyUriToFile(context, it, File(tempFolder, XMLPrefsManager.XMLPrefsRoot.BEHAVIOR.path))
+            }
             validatePresetFolder(tempFolder)
 
             val presetFolder: File = File(presetsDir, cleanName)
             check(!(!presetFolder.exists() && !presetFolder.mkdirs())) { "Unable to create preset folder" }
 
-            for (fileName in PRESET_XML_FILES) {
-                if (!File(tempFolder, fileName).isFile) continue
-                val dest = File(presetFolder, fileName)
-                if (dest.exists()) {
-                    Tuils.insertOld(dest)
-                }
-                Tuils.copy(File(tempFolder, fileName), dest)
-            }
+            copySanitizedXmlFiles(tempFolder, presetFolder)
             return cleanName
         } finally {
             Tuils.delete(tempFolder)
@@ -331,14 +417,7 @@ object PresetManager {
             val presetFolder: File = File(presetsDir, cleanName)
             check(!(!presetFolder.exists() && !presetFolder.mkdirs())) { "Unable to create preset folder" }
 
-            for (fileName in PRESET_XML_FILES) {
-                if (!File(tempFolder, fileName).isFile) continue
-                val dest = File(presetFolder, fileName)
-                if (dest.exists()) {
-                    Tuils.insertOld(dest)
-                }
-                Tuils.copy(File(tempFolder, fileName), dest)
-            }
+            copySanitizedXmlFiles(tempFolder, presetFolder)
             FrameManager.copyPortableState(tempFolder, presetFolder)
         } finally {
             Tuils.delete(tempFolder)
@@ -445,19 +524,86 @@ object PresetManager {
         out.flush()
     }
 
-    internal fun shareableUiXml(): String = xml(XMLPrefsRoot.UI, SHAREABLE_UI)
+    internal fun shareableXml(root: XMLPrefsRoot): String = xml(root, shareableValues(root)) {
+        LauncherSettings.getEffective(it)
+    }
 
-    internal fun applyUi(file: File) {
-        validateXmlRoot(file, XMLPrefsRoot.UI.name)
-        val root = DocumentBuilderFactory.newInstance().apply { setExpandEntityReferences(false) }
-            .newDocumentBuilder().parse(file).documentElement
-        val allowed = SHAREABLE_UI.associateBy { it.label() }
+    internal fun shareableUiXml(): String = shareableXml(XMLPrefsRoot.UI)
+
+    internal fun shareableBehaviorXml(): String = shareableXml(XMLPrefsRoot.BEHAVIOR)
+
+    internal fun sanitizeShareableXml(file: File, root: XMLPrefsRoot): String {
+        val values = shareableValues(root)
+        val allowed = values.associateBy { it.label() }
+        val parsed = LinkedHashMap<XMLPrefsSave, String>()
+        val document = parseXml(file)
+        require(document.documentElement?.nodeName == root.name) { "Invalid preset XML: ${file.name}" }
+        val children = document.documentElement.childNodes
+        for (index in 0 until children.length) {
+            val node = children.item(index)
+            if (node.nodeType != org.w3c.dom.Node.ELEMENT_NODE) continue
+            val setting = allowed[node.nodeName] ?: continue
+            val value = node.attributes?.getNamedItem(XMLPrefsManager.VALUE_ATTRIBUTE)?.nodeValue ?: continue
+            if (!isShareableValue(setting, value)) continue
+            require(parsed.put(setting, value) == null) { "Duplicate preset setting: ${setting.label()}" }
+        }
+        return xml(root, values) { parsed[it] }
+    }
+
+    private fun applyAllowed(file: File, rootType: XMLPrefsRoot, values: Array<out XMLPrefsSave>) {
+        validateXmlRoot(file, rootType.name)
+        val root = parseXml(file).documentElement
+        val allowed = values.associateBy { it.label() }
         val children = root.childNodes
         for (index in 0 until children.length) {
             val node = children.item(index)
             val setting = allowed[node.nodeName] ?: continue
             val value = node.attributes?.getNamedItem(XMLPrefsManager.VALUE_ATTRIBUTE)?.nodeValue ?: continue
+            if (!isShareableValue(setting, value)) continue
             LauncherSettings.set(setting, value)
+        }
+    }
+
+    private fun shareableValues(root: XMLPrefsRoot): Array<out XMLPrefsSave> = when (root) {
+        XMLPrefsRoot.THEME -> SHAREABLE_THEME
+        XMLPrefsRoot.SUGGESTIONS -> SHAREABLE_SUGGESTIONS
+        XMLPrefsRoot.UI -> SHAREABLE_UI
+        XMLPrefsRoot.BEHAVIOR -> SHAREABLE_BEHAVIOR
+        else -> throw IllegalArgumentException("Unsupported shareable configuration")
+    }
+
+    private fun isShareableValue(setting: XMLPrefsSave, value: String): Boolean {
+        if (value.length > 128) return false
+        return when (setting.type()) {
+            XMLPrefsSave.BOOLEAN -> value == "true" || value == "false"
+            XMLPrefsSave.INTEGER -> value.toIntOrNull()?.let { it in -100_000..100_000 } == true
+            XMLPrefsSave.COLOR -> value.isEmpty() || COLOR_VALUE.matches(value)
+            XMLPrefsSave.AUTO_COLOR -> value.equals("auto", true) || COLOR_VALUE.matches(value)
+            XMLPrefsSave.TEXT -> when (setting) {
+                Ui.input_prefix, Ui.input_root_prefix,
+                Behavior.time_format_separator, Behavior.battery_progress_bar_symbol,
+                Behavior.unlock_time_divider -> value == "%n" || SAFE_PUNCTUATION.matches(value)
+
+                Ui.display_margin_top_section, Ui.display_margin_bottom_section,
+                Ui.display_margin_landscape_mm, Ui.status_lines_margins,
+                Ui.output_field_margins, Ui.input_field_margins, Ui.input_area_margins,
+                Ui.toolbar_margins, Ui.suggestions_area_margin,
+                Suggestions.suggestions_spaces -> FOUR_NUMBERS.matches(value)
+
+                Ui.shadow_params -> THREE_NUMBERS.matches(value)
+                Ui.dashed_border_stroke_width, Suggestions.suggestions_deadline ->
+                    DECIMAL_VALUE.matches(value)
+
+                Suggestions.noinput_suggestions_order, Suggestions.suggestions_order ->
+                    SUGGESTION_ORDER.matches(value)
+
+                Suggestions.hide_suggestions_when_empty -> value in setOf("always", "true", "false")
+                Behavior.output_tray_mode -> value in setOf("native", "auto", "toggled")
+                Behavior.output_header_mode -> value in setOf("normal", "arrows", "none")
+                Behavior.weather_temperature_measure -> value in setOf("metric", "imperial", "standard")
+                else -> false
+            }
+            else -> false
         }
     }
 
@@ -626,34 +772,17 @@ object PresetManager {
 
     @Throws(Exception::class)
     private fun addTextEntry(zip: ZipOutputStream, name: kotlin.String?, text: kotlin.String) {
-        val entry = ZipEntry(name)
+        val entry = ZipEntry(name).apply { time = 0L }
         zip.putNextEntry(entry)
         zip.write(text.toByteArray(charset("UTF-8")))
         zip.closeEntry()
     }
 
-    @Throws(Exception::class)
-    private fun addFileEntry(zip: ZipOutputStream, name: kotlin.String?, file: File?) {
-        val entry = ZipEntry(name)
-        zip.putNextEntry(entry)
-        val `in` = FileInputStream(file)
-        val buffer = ByteArray(4096)
-        try {
-            var read: Int
-            while ((`in`.read(buffer).also { read = it }) != -1) {
-                zip.write(buffer, 0, read)
-            }
-        } finally {
-            `in`.close()
-        }
-        zip.closeEntry()
-    }
-
-    private fun manifest(name: kotlin.String?): kotlin.String {
+    private fun manifest(): kotlin.String {
         return ("{\n"
                 + "  \"type\": \"retui-preset\",\n"
-                + "  \"schema\": 1,\n"
-                + "  \"name\": \"" + jsonEscape(name) + "\",\n"
+                + "  \"schema\": 2,\n"
+                + "  \"privacy\": \"pi-safe\",\n"
                 + "  \"appVersion\": \"" + jsonEscape(BuildConfig.VERSION_NAME) + "\"\n"
                 + "}\n")
     }
@@ -729,19 +858,37 @@ object PresetManager {
         )
         val ui = File(folder, XMLPrefsManager.XMLPrefsRoot.UI.path)
         if (ui.isFile) validateXmlRoot(ui, XMLPrefsManager.XMLPrefsRoot.UI.name)
+        val behavior = File(folder, XMLPrefsManager.XMLPrefsRoot.BEHAVIOR.path)
+        if (behavior.isFile) validateXmlRoot(behavior, XMLPrefsManager.XMLPrefsRoot.BEHAVIOR.name)
         FrameManager.validatePortableState(folder!!)
     }
 
     @Throws(Exception::class)
     private fun validateXmlRoot(file: File, expectedRoot: kotlin.String) {
         require(!(!file.isFile() || file.length() > MAX_ENTRY_BYTES)) { "Preset package is incomplete" }
+        val doc = parseXml(file)
+        require(doc.documentElement?.nodeName == expectedRoot) { "Invalid preset XML: " + file.getName() }
+    }
+
+    private fun parseXml(file: File): Document {
+        require(file.isFile && file.length() <= MAX_ENTRY_BYTES) { "Preset package is incomplete" }
         val factory = DocumentBuilderFactory.newInstance()
+        factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true)
+        factory.setFeature("http://xml.org/sax/features/external-general-entities", false)
+        factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false)
+        factory.isXIncludeAware = false
         factory.setExpandEntityReferences(false)
-        val doc = factory.newDocumentBuilder().parse(file)
-        require(
-            !(doc == null || doc.getDocumentElement() == null || (expectedRoot != doc.getDocumentElement()
-                .getNodeName()))
-        ) { "Invalid preset XML: " + file.getName() }
+        return factory.newDocumentBuilder().parse(file)
+    }
+
+    private fun copySanitizedXmlFiles(source: File, destination: File) {
+        for (root in arrayOf(XMLPrefsRoot.THEME, XMLPrefsRoot.SUGGESTIONS, XMLPrefsRoot.UI, XMLPrefsRoot.BEHAVIOR)) {
+            val sourceFile = File(source, root.path)
+            if (!sourceFile.isFile) continue
+            val destinationFile = File(destination, root.path)
+            if (destinationFile.exists()) Tuils.insertOld(destinationFile)
+            writeText(destinationFile, sanitizeShareableXml(sourceFile, root))
+        }
     }
 
     private fun containsIgnoreCase(
@@ -761,20 +908,30 @@ object PresetManager {
 
     @Throws(Exception::class)
     private fun writeXml(file: File?, root: XMLPrefsRoot, values: Array<out XMLPrefsSave>) {
-        val stream = FileOutputStream(file, false)
-        stream.write(xml(root, values).toByteArray())
-        stream.flush()
-        stream.close()
+        writeText(requireNotNull(file), xml(root, values) { LauncherSettings.getEffective(it) })
     }
 
-    private fun xml(root: XMLPrefsRoot, values: Array<out XMLPrefsSave>): String {
+    private fun writeText(file: File, text: String) {
+        FileOutputStream(file, false).use { stream ->
+            stream.write(text.toByteArray(Charsets.UTF_8))
+            stream.flush()
+        }
+    }
+
+    private fun xml(
+        root: XMLPrefsRoot,
+        values: Array<out XMLPrefsSave>,
+        valueFor: (XMLPrefsSave) -> String?
+    ): String {
         val xml: StringBuilder = StringBuilder(XMLPrefsManager.XML_DEFAULT)
         xml.append("<").append(root.name).append(">\n")
-        for (value in values) {
+        for (setting in values) {
+            val value = valueFor(setting) ?: continue
+            if (!isShareableValue(setting, value)) continue
             xml.append("\t<")
-                .append(value.label())
+                .append(setting.label())
                 .append(" value=\"")
-                .append(xmlEscape(LauncherSettings.getEffective(value)))
+                .append(xmlEscape(value))
                 .append("\" />\n")
         }
         xml.append("</").append(root.name).append(">\n")

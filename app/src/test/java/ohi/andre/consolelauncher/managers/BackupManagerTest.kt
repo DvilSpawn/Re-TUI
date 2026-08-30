@@ -59,6 +59,40 @@ class BackupManagerTest {
     }
 
     @Test
+    fun acceptsPiSafeShareableConfiguration() {
+        assertFalse(
+            BackupManager.validatePackage(
+                "type=retui-shareable-config\nschema=2\nprofile=shareable\nprivacy=pi-safe\nsections=theme,ui,suggestions,behavior\n",
+                setOf("manifest.txt", "theme.xml", "ui.xml", "suggestions.xml", "behavior.xml")
+            )
+        )
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun rejectsSchemaTwoShareableConfigurationWithoutPrivacyMarker() {
+        BackupManager.validatePackage(
+            "type=retui-shareable-config\nschema=2\nprofile=shareable\nsections=theme,ui,suggestions,behavior\n",
+            setOf("manifest.txt", "theme.xml", "ui.xml", "suggestions.xml", "behavior.xml")
+        )
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun rejectsCustomFramesFromPiSafeShareableConfiguration() {
+        BackupManager.validatePackage(
+            "type=retui-shareable-config\nschema=2\nprofile=shareable\nprivacy=pi-safe\nsections=theme,ui,suggestions,behavior,frames\n",
+            setOf(
+                "manifest.txt",
+                "theme.xml",
+                "ui.xml",
+                "suggestions.xml",
+                "behavior.xml",
+                "frames/state.json",
+                "frames/library-${"a".repeat(64)}.retui-frame"
+            )
+        )
+    }
+
+    @Test
     fun acceptsLegacyShareableConfiguration() {
         assertFalse(
             BackupManager.validatePackage(
@@ -82,6 +116,32 @@ class BackupManagerTest {
                     "frames/output.retui-frame"
                 )
             )
+        )
+    }
+
+    @Test
+    fun acceptsShareableConfigurationWithBehaviorAndFrames() {
+        assertFalse(
+            BackupManager.validatePackage(
+                "type=retui-shareable-config\nschema=1\nprofile=shareable\nsections=theme,ui,suggestions,behavior,frames\n",
+                setOf(
+                    "manifest.txt",
+                    "theme.xml",
+                    "ui.xml",
+                    "suggestions.xml",
+                    "behavior.xml",
+                    "frames/state.json",
+                    "frames/output.retui-frame"
+                )
+            )
+        )
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun rejectsShareableConfigurationMissingDeclaredBehavior() {
+        BackupManager.validatePackage(
+            "type=retui-shareable-config\nschema=1\nprofile=shareable\nsections=theme,ui,suggestions,behavior\n",
+            setOf("manifest.txt", "theme.xml", "ui.xml", "suggestions.xml")
         )
     }
 
