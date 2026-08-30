@@ -2,7 +2,7 @@
 <THEME>
 <!-- #Launcher -->
 <background_color value="#FF161931"/>
-<wallpaper_overlay_color value="#2A485C44"/>
+<wallpaper_overlay_color value="#00000000"/>
 
 <!-- #Content Text -->
 <input_text_color value="#FFA2C164"/>

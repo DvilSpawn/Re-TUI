@@ -30,4 +30,9 @@ class NineSliceFrameDrawableTest {
             0.001f
         )
     }
+
+    @Test fun intrinsicSizePreservesTallSliderThumbAspectRatio() {
+        assertEquals(43 to 72, NineSliceFrameDrawable.intrinsicDimensions(18, 30, 72f))
+        assertEquals(72 to 43, NineSliceFrameDrawable.intrinsicDimensions(30, 18, 72f))
+    }
 }

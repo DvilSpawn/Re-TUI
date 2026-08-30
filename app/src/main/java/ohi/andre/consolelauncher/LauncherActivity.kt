@@ -363,25 +363,6 @@ class LauncherActivity : AppCompatActivity(), Reloadable {
                 .setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN or WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
         }
 
-        val mainView = FrameLayout(this)
-        mainView.id = R.id.mainview
-        mainView.layoutParams = ViewGroup.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.MATCH_PARENT
-        )
-        layoutInflater.inflate(R.layout.base_view, mainView, true)
-        setContentView(mainView)
-
-        if (XMLPrefsManager.getBoolean(Ui.show_restart_message)) {
-            val s = getIntent().getCharSequenceExtra(Reloadable.MESSAGE)
-            if (s != null) out.onOutput(
-                Tuils.span(
-                    s,
-                    XMLPrefsManager.getColor(Theme.restart_message_text_color)
-                )
-            )
-        }
-
         categories = HashSet<ReloadMessageCategory?>()
 
         // exit's home-chooser briefly enables FakeLauncher; if killed mid-chooser it can stick.
@@ -395,6 +376,32 @@ class LauncherActivity : AppCompatActivity(), Reloadable {
         }
 
         main = MainManager(this)
+        attachLauncherUi(null, openStartupMenu = true, playBootSound = true)
+        System.gc()
+    }
+
+    private fun attachLauncherUi(
+        terminalState: TerminalManager.State?,
+        openStartupMenu: Boolean,
+        playBootSound: Boolean
+    ) {
+        applyWallpaperWindowMode()
+
+        val mainView = FrameLayout(this)
+        mainView.id = R.id.mainview
+        mainView.layoutParams = ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
+        layoutInflater.inflate(R.layout.base_view, mainView, true)
+        setContentView(mainView)
+
+        if (terminalState == null && XMLPrefsManager.getBoolean(Ui.show_restart_message)) {
+            val message = intent.getCharSequenceExtra(Reloadable.MESSAGE)
+            if (message != null) out.onOutput(
+                Tuils.span(message, XMLPrefsManager.getColor(Theme.restart_message_text_color))
+            )
+        }
 
         val rootView = findViewById<View?>(R.id.mainview) as ViewGroup
 
@@ -407,15 +414,50 @@ class LauncherActivity : AppCompatActivity(), Reloadable {
 
         main!!.setRedirectionListener(uiManager!!.buildRedirectionListener())
         uiManager!!.pack = main!!.mainPack
-        LauncherSoundManager.playBoot(this)
+        uiManager!!.restoreTerminalState(terminalState)
+        if (playBootSound) LauncherSoundManager.playBoot(this)
 
-        `in`.`in`(Tuils.EMPTYSTRING)
-        if (!StartupMenuManager.maybeOpen(this)) {
-            uiManager!!.activateTerminalInput(openKeyboardOnStart)
+        if (terminalState == null) `in`.`in`(Tuils.EMPTYSTRING)
+        if (!openStartupMenu || !StartupMenuManager.maybeOpen(this)) {
+            if (terminalState == null || hasWindowFocus()) {
+                uiManager!!.activateTerminalInput(openKeyboardOnStart)
+            }
             restoreGuideSessionAfterReload()
         }
+    }
 
-        System.gc()
+    private fun applyWallpaperWindowMode() {
+        if (LauncherSettings.getBoolean(Ui.system_wallpaper)) {
+            window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER)
+        } else {
+            window.clearFlags(WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER)
+        }
+    }
+
+    fun refreshUiInPlace() {
+        runOnUiThread {
+            val oldManager = uiManager
+            val terminalState = oldManager?.snapshotTerminalState()
+            oldManager?.preserveSurfaceSessionForReload()
+            oldManager?.pause()
+            oldManager?.dispose()
+
+            XMLPrefsManager.dispose()
+            invalidate()
+            XMLPrefsManager.loadCommons(this)
+            refreshFromLoadedPrefs()
+            Tuils.cancelFont()
+
+            backButtonEnabled = LauncherSettings.getBoolean(Behavior.back_button_enabled)
+            openKeyboardOnStart = LauncherSettings.getBoolean(Behavior.auto_show_keyboard)
+            window.setSoftInputMode(
+                if (openKeyboardOnStart) WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
+                else WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN or WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
+            )
+            LongClickableSpan.longPressVibrateDuration = LauncherSettings.getInt(Behavior.long_click_vibration_duration)
+            applyFullscreen(this)
+            attachLauncherUi(terminalState, openStartupMenu = false, playBootSound = false)
+        }
     }
 
     private fun startKeeperServiceSafely(keeperIntent: Intent) {
@@ -717,7 +759,7 @@ class LauncherActivity : AppCompatActivity(), Reloadable {
         fun preview(context: Context) {
             val launcher = instance
             if (launcher != null) {
-                launcher.reload()
+                launcher.refreshUiInPlace()
                 return
             }
 

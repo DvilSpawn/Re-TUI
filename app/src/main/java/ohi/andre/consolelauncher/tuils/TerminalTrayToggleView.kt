@@ -71,6 +71,7 @@ object TerminalTrayToggleView {
         outputHeaderArrowsOnly: Boolean,
         outputTrayNativeMode: Boolean,
         outputTrayAutoMode: Boolean,
+        outputAutoHideEnabled: Boolean,
         outputColor: Int
     ) {
         if (toggle == null) return
@@ -81,7 +82,7 @@ object TerminalTrayToggleView {
         }
         toggle.visibility = View.VISIBLE
 
-        if (landscapeLayoutActive && (outputTrayNativeMode || outputTrayAutoMode)) {
+        if (landscapeLayoutActive && !outputAutoHideEnabled && (outputTrayNativeMode || outputTrayAutoMode)) {
             toggle.foreground = null
             toggle.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null, null, null)
             if (!TextUtils.equals(toggle.text, "OUTPUT")) {
@@ -102,6 +103,7 @@ object TerminalTrayToggleView {
         toggle.foreground = null
         toggle.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null, null, null)
         val text = when {
+            outputAutoHideEnabled -> if (terminalTrayExpanded) "OUTPUT v" else "OUTPUT ^"
             outputTrayNativeMode -> "OUTPUT"
             outputTrayAutoMode -> if (terminalTrayExpanded) "OUTPUT AUTO v" else "OUTPUT AUTO ^"
             else -> if (terminalTrayExpanded) "OUTPUT v" else "OUTPUT ^"

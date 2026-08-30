@@ -88,16 +88,24 @@ object FrameManager {
     internal const val FRAME_FOLDER = "frames"
     internal const val STATE_FILE = "state.json"
     internal const val MAX_BUNDLE_BYTES = 5 * 1024 * 1024
+    private const val MAX_PACK_BYTES = 32 * 1024 * 1024
     private const val PREFS = "retui_frames"
     private const val LEGACY_ENABLED = "enabled"
+    private const val FRAMES_ENABLED = "frames_enabled"
     private const val MIGRATED = "portable_storage_migrated"
     private const val GLOBAL_BUNDLE = "active.retui-frame"
     private const val ASSET_PREFIX = "library-"
     private const val MAX_MANIFEST_BYTES = 32 * 1024
+    private const val MAX_README_BYTES = 256 * 1024
     private const val MAX_PNG_BYTES = 4 * 1024 * 1024
     private const val MAX_IMAGE_SIZE = 2048
     private const val FRAME_PREVIEW_MAX_PX = 256
+    internal const val SPROUT_LANDS_PACK_ID =
+        "1ac07ff867ef164c93e152ba09bb63806fea16f59cf730f0ff2b7e6b0b9b5383"
+    private const val SPROUT_LANDS_PACK_NAME = "Sprout Lands — Art by Cup Nooble"
+    private const val SPROUT_LANDS_ASSET_FOLDER = "frame_packs/sprout_lands"
     private val ASSET_ID = Regex("[0-9a-f]{64}")
+    private val PACK_FILE_NAME = Regex("[a-z0-9][a-z0-9_-]*\\.png")
 
     private val cache = object : LruCache<String, LoadedFrame>(
         (Runtime.getRuntime().maxMemory() / 16L).coerceIn(4L * 1024 * 1024, 16L * 1024 * 1024).toInt()
@@ -106,6 +114,7 @@ object FrameManager {
     }
     private val invalidAssets = HashSet<String>()
     @Volatile private var cachedState: FrameState? = null
+    @Volatile private var bundledPackReady = false
 
     data class FrameAsset(val id: String, val name: String)
 
@@ -123,8 +132,64 @@ object FrameManager {
         val assignments: Map<String, String>
     )
 
+    internal data class UiPackageRole(val file: String, val spec: FrameSpec)
+    internal data class UiPackageManifest(val name: String, val roles: Map<String, UiPackageRole>)
+
+    private data class BundledFrame(
+        val targets: Set<FrameTarget>,
+        val fileName: String,
+        val displayName: String,
+        val spec: FrameSpec
+    )
+
+    private val SPROUT_LANDS_FRAMES = listOf(
+        BundledFrame(
+            setOf(
+                FrameTarget.STATUS_GROUP, FrameTarget.STATUS_RAM, FrameTarget.STATUS_DEVICE,
+                FrameTarget.STATUS_TIME, FrameTarget.STATUS_BATTERY, FrameTarget.STATUS_STORAGE,
+                FrameTarget.STATUS_NETWORK, FrameTarget.STATUS_NOTES, FrameTarget.STATUS_WEATHER,
+                FrameTarget.STATUS_UNLOCK, FrameTarget.STATUS_ASCII, FrameTarget.OUTPUT,
+                FrameTarget.INPUT, FrameTarget.SUGGESTIONS, FrameTarget.MUSIC,
+                FrameTarget.NOTIFICATIONS, FrameTarget.MODULES, FrameTarget.MODULE_DOCK,
+                FrameTarget.APP_DRAWER, FrameTarget.WIDGET_DRAWER, FrameTarget.FILES,
+                FrameTarget.OVERLAYS, FrameTarget.SETTINGS, FrameTarget.DIALOG,
+                FrameTarget.HEADER, FrameTarget.LIST_ITEM, FrameTarget.UI_INPUT,
+                FrameTarget.BUTTON, FrameTarget.BUTTON_PRIMARY
+            ),
+            "rectangle_button.png",
+            "Sprout Lands panel and button",
+            bundledSpec(6, 6, 6, 8)
+        ),
+        BundledFrame(
+            setOf(FrameTarget.BUTTON_PRESSED, FrameTarget.LIST_ITEM_SELECTED),
+            "rectangle_button_pressed.png",
+            "Sprout Lands pressed button",
+            bundledSpec(6, 6, 6, 6)
+        ),
+        BundledFrame(
+            setOf(FrameTarget.TOOLBAR, FrameTarget.ICON_BUTTON, FrameTarget.CONTROLS),
+            "button.png",
+            "Sprout Lands icon button",
+            bundledSpec(6, 6, 6, 8)
+        ),
+        BundledFrame(setOf(FrameTarget.TOGGLE_OFF), "toggle_off.png", "Sprout Lands toggle off", bundledSpec(17, 8, 4, 8)),
+        BundledFrame(setOf(FrameTarget.TOGGLE_ON), "toggle_on.png", "Sprout Lands toggle on", bundledSpec(4, 8, 17, 8)),
+        BundledFrame(
+            setOf(FrameTarget.SLIDER_TRACK, FrameTarget.SLIDER_PROGRESS),
+            "slider.png",
+            "Sprout Lands slider",
+            bundledSpec(3, 3, 3, 3)
+        ),
+        BundledFrame(setOf(FrameTarget.SLIDER_THUMB), "slider_thumb.png", "Sprout Lands slider thumb", bundledSpec(5, 6, 5, 8)),
+        BundledFrame(setOf(FrameTarget.KEYBOARD), "keys.png", "Sprout Lands keyboard", bundledSpec(5, 6, 5, 8))
+    )
+
+    internal fun sproutLandsTargets(): Set<FrameTarget> =
+        SPROUT_LANDS_FRAMES.flatMapTo(LinkedHashSet()) { it.targets }
+
     data class SharedFrameSource(
         val assetId: String,
+        val imageId: String,
         val png: ByteArray,
         val leftPx: Int,
         val topPx: Int,
@@ -203,7 +268,9 @@ object FrameManager {
 
         fun activePackId(): String? = state.activePackId
 
-        fun currentPackId(): String? = currentPackId?.takeIf(state.packs::containsKey)
+        fun currentPackId(): String? = currentPackId
+            ?.takeIf(state.packs::containsKey)
+            ?.takeUnless(::isBuiltInPack)
 
         fun packNameError(name: String): String? {
             val clean = name.trim()
@@ -226,6 +293,7 @@ object FrameManager {
         }
 
         fun replacePack(packId: String): FramePack {
+            require(!isBuiltInPack(packId)) { "Built-in frame packs cannot be replaced." }
             val current = requireNotNull(state.packs[packId]) { "Frame pack is missing." }
             return current.copy(applyToAll = state.applyToAll, assignments = HashMap(state.assignments)).also {
                 state.packs[packId] = it
@@ -244,6 +312,7 @@ object FrameManager {
         }
 
         fun deletePack(packId: String): Boolean {
+            require(!isBuiltInPack(packId)) { "Built-in frame packs cannot be deleted." }
             requireNotNull(state.packs.remove(packId)) { "Frame pack is missing." }
             if (currentPackId == packId) currentPackId = null
             val wasActive = state.activePackId == packId
@@ -268,6 +337,104 @@ object FrameManager {
             }
             select(target, asset.id)
             return asset
+        }
+
+        fun importUiPackageZip(input: InputStream): FramePack {
+            var manifestBytes: ByteArray? = null
+            val pngs = LinkedHashMap<String, ByteArray>()
+            val seen = HashSet<String>()
+            var totalBytes = 0L
+            ZipInputStream(BufferedInputStream(input)).use { zip ->
+                while (true) {
+                    val entry = zip.nextEntry ?: break
+                    val name = entry.name
+                    require(seen.add(name)) { "UI package ZIP contains duplicate entry: $name" }
+                    when {
+                        name == "frames/" && entry.isDirectory -> Unit
+                        name == "manifest.json" && !entry.isDirectory -> {
+                            manifestBytes = zip.readLimited(
+                                MAX_MANIFEST_BYTES, "UI package manifest is too large."
+                            ).also { totalBytes += it.size }
+                        }
+                        name == "readme.md" && !entry.isDirectory -> {
+                            totalBytes += zip.readLimited(
+                                MAX_README_BYTES, "UI package readme is too large."
+                            ).size
+                        }
+                        name.startsWith("frames/") && !entry.isDirectory &&
+                            name.count { it == '/' } == 1 && PACK_FILE_NAME.matches(name.substringAfter('/')) -> {
+                            val fileName = name.substringAfter('/')
+                            val png = zip.readLimited(MAX_PNG_BYTES, "$fileName is too large.")
+                            require(pngs.put(fileName, png) == null) {
+                                "UI package ZIP contains duplicate PNG: $fileName"
+                            }
+                            totalBytes += png.size
+                        }
+                        else -> throw IllegalArgumentException(
+                            "Unsupported UI package ZIP entry: $name"
+                        )
+                    }
+                    require(totalBytes <= MAX_PACK_BYTES) { "UI package is too large." }
+                    zip.closeEntry()
+                }
+            }
+            val bytes = requireNotNull(manifestBytes) { "UI package ZIP is missing manifest.json." }
+            return installUiPackage(parseUiPackageManifest(bytes), bytes.size, pngs)
+        }
+
+        private fun installUiPackage(
+            manifest: UiPackageManifest,
+            manifestBytes: Int,
+            pngs: Map<String, ByteArray>
+        ): FramePack {
+            require(packNameError(manifest.name) == null) {
+                packNameError(manifest.name) ?: "Invalid UI package name."
+            }
+            val referencedFiles = manifest.roles.values.mapTo(LinkedHashSet()) { it.file }
+            require(pngs.keys == referencedFiles) {
+                "UI package manifest roles must exactly match the PNGs in frames/."
+            }
+            require(manifestBytes.toLong() + pngs.values.sumOf { it.size.toLong() } <= MAX_PACK_BYTES) {
+                "UI package is too large."
+            }
+            for ((fileName, png) in pngs) {
+                val (width, height) = imageBounds(png)
+                manifest.roles.filterValues { it.file == fileName }.forEach { (role, definition) ->
+                    require(frameSpecError(definition.spec, width, height) == null) {
+                        "$role: ${frameSpecError(definition.spec, width, height)}"
+                    }
+                }
+            }
+
+            val importedAssets = HashMap<Pair<String, FrameSpec>, String>()
+            val assignments = LinkedHashMap<String, String>()
+            manifest.roles.forEach { (role, definition) ->
+                val key = definition.file to definition.spec
+                assignments[role] = importedAssets.getOrPut(key) {
+                    val label = definition.file.removeSuffix(".png").replace('_', ' ')
+                    registerBundle(
+                        buildBundle(
+                            "${manifest.name} - $label".take(80),
+                            definition.spec,
+                            requireNotNull(pngs[definition.file])
+                        )
+                    ).id
+                }
+            }
+            return installImportedPack(manifest.name, assignments)
+        }
+
+        internal fun installImportedPack(name: String, assignments: Map<String, String>): FramePack {
+            require(packNameError(name) == null) { packNameError(name) ?: "Invalid UI package name." }
+            require(assignments.isNotEmpty() && assignments.keys.all { isKnownRole(it) && it != "global" }) {
+                "UI package contains an unsupported role."
+            }
+            require(assignments.values.all(ASSET_ID::matches)) { "UI package contains an invalid frame asset." }
+            val id = sha256(UUID.randomUUID().toString().toByteArray(Charsets.UTF_8))
+            return FramePack(id, name.trim(), false, HashMap(assignments)).also {
+                state.packs[id] = it
+                libraryChanged = true
+            }
         }
 
         fun updateFrameSpec(target: FrameTarget?, spec: FrameSpec) {
@@ -327,12 +494,24 @@ object FrameManager {
         return currentState().applyToAll
     }
 
+    fun isEnabled(context: Context): Boolean {
+        ensureMigrated(context)
+        return context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            .getBoolean(FRAMES_ENABLED, true)
+    }
+
+    fun setEnabled(context: Context, enabled: Boolean) {
+        ensureMigrated(context)
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            .edit().putBoolean(FRAMES_ENABLED, enabled).apply()
+    }
+
     fun drawable(
         context: Context,
         target: FrameTarget = FrameTarget.CONTROLS,
         intrinsicDp: Float? = null
     ): NineSliceFrameDrawable? {
-        ensureMigrated(context)
+        if (!isEnabled(context)) return null
         val state = currentState()
         val key = assignmentKey(resolvedTarget(state.applyToAll, target))
         val assetId = state.assignments[key] ?: return null
@@ -342,7 +521,7 @@ object FrameManager {
     }
 
     fun sharedSource(context: Context, target: FrameTarget): SharedFrameSource? {
-        ensureMigrated(context)
+        if (!isEnabled(context)) return null
         val state = currentState()
         val assetId = state.assignments[assignmentKey(resolvedTarget(state.applyToAll, target))] ?: return null
         return try {
@@ -351,6 +530,7 @@ object FrameManager {
             })
             SharedFrameSource(
                 assetId,
+                imageContentId(parsed.png),
                 parsed.png,
                 parsed.spec.leftPx,
                 parsed.spec.topPx,
@@ -384,8 +564,10 @@ object FrameManager {
 
     fun copyCurrentTo(context: Context, destinationRoot: File) {
         ensureMigrated(context)
-        copyFrameFolder(frameDir(), File(destinationRoot, FRAME_FOLDER))
-        removeUnreferencedAssets(File(destinationRoot, FRAME_FOLDER))
+        val destination = File(destinationRoot, FRAME_FOLDER)
+        copyFrameFolder(frameDir(), destination)
+        removeUnreferencedAssets(destination)
+        removeBundledAssets(destination)
     }
 
     fun copyStateTo(context: Context, destinationRoot: File) {
@@ -463,10 +645,20 @@ object FrameManager {
         if (!dir.isDirectory) return emptyList()
         validatePortableState(root)
         val state = readState(dir)
-        val referenced = referencedAssetIds(state)
+        val referenced = exportableAssetIds(state)
         return dir.listFiles().orEmpty().filter {
             it.isFile && (it.name == STATE_FILE || assetId(it.name)?.let(referenced::contains) == true || stateSchema(dir) == 1)
         }.sortedBy { it.name }
+    }
+
+    internal fun isBuiltInPack(packId: String): Boolean = packId == SPROUT_LANDS_PACK_ID
+
+    internal fun bundledAssetFileNames(root: File): Set<String> {
+        val dir = File(root, FRAME_FOLDER)
+        if (!File(dir, STATE_FILE).isFile) return emptySet()
+        return bundledAssetIds(readStateOrDefault(dir)).mapTo(HashSet()) {
+            assetFile(dir, it).name
+        }
     }
 
     internal fun isPortableEntry(name: String): Boolean {
@@ -497,6 +689,7 @@ object FrameManager {
         cache.evictAll()
         invalidAssets.clear()
         cachedState = null
+        bundledPackReady = false
     }
 
     @Synchronized
@@ -515,7 +708,36 @@ object FrameManager {
             writeLegacyStateFile(dir, applyAll)
         }
         normalizeFrameFolder(dir)
+        if (!bundledPackReady) {
+            installSproutLandsPack(context, dir)
+            bundledPackReady = true
+        }
         prefs.edit().putBoolean(MIGRATED, true).apply()
+    }
+
+    private fun installSproutLandsPack(context: Context, dir: File) {
+        val assignments = LinkedHashMap<String, String>()
+        for (frame in SPROUT_LANDS_FRAMES) {
+            val png = context.assets.open("$SPROUT_LANDS_ASSET_FOLDER/${frame.fileName}").use {
+                it.readLimited(MAX_PNG_BYTES, "Bundled frame image is too large.")
+            }
+            val (width, height) = imageBounds(png)
+            require(frameSpecError(frame.spec, width, height) == null) {
+                frameSpecError(frame.spec, width, height) ?: "Invalid bundled frame settings."
+            }
+            val bundle = buildBundle(frame.displayName, frame.spec, png)
+            val id = sha256(bundle)
+            val destination = assetFile(dir, id)
+            if (!destination.isFile) saveFile(destination, bundle)
+            frame.targets.forEach { assignments[it.id] = id }
+        }
+
+        val state = readStateOrDefault(dir)
+        if (mergeBuiltInPack(state, assignments)) {
+            writeStateFile(dir, state)
+            removeUnreferencedAssets(dir)
+            cachedState = null
+        }
     }
 
     @Synchronized
@@ -788,11 +1010,76 @@ object FrameManager {
         }
     }
 
+    private fun removeBundledAssets(directory: File) {
+        val state = readState(directory)
+        bundledAssetIds(state).forEach { assetFile(directory, it).delete() }
+    }
+
+    internal fun mergeBuiltInPack(state: FrameState, assignments: Map<String, String>): Boolean {
+        require(assignments.keys.all(::isKnownRole)) { "Built-in frame pack contains an unknown surface." }
+        val next = FramePack(SPROUT_LANDS_PACK_ID, SPROUT_LANDS_PACK_NAME, false, HashMap(assignments))
+        if (state.packs[SPROUT_LANDS_PACK_ID] == next) return false
+        val wasActive = state.activePackId == SPROUT_LANDS_PACK_ID
+        state.packs[SPROUT_LANDS_PACK_ID] = next
+        if (wasActive) {
+            state.applyToAll = false
+            state.assignments.clear()
+            state.assignments.putAll(assignments)
+        }
+        return true
+    }
+
     internal fun referencedAssetIds(state: FrameState): Set<String> =
         state.assignments.values.toSet() + state.packs.values.flatMap { it.assignments.values }
 
+    internal fun bundledAssetIds(state: FrameState): Set<String> =
+        state.packs[SPROUT_LANDS_PACK_ID]?.assignments?.values?.toSet().orEmpty()
+
+    internal fun exportableAssetIds(state: FrameState): Set<String> =
+        referencedAssetIds(state) - bundledAssetIds(state)
+
+    internal fun parseUiPackageManifest(bytes: ByteArray): UiPackageManifest {
+        val manifest = JSONObject(String(bytes, Charsets.UTF_8))
+        require(manifest.stringSet() == setOf("type", "schema", "name", "filtering", "roles")) {
+            "UI package manifest has missing or unsupported fields."
+        }
+        require(manifest.getString("type") == "retui-frame-pack") { "Unsupported UI package type." }
+        require(manifest.getInt("schema") == 2) { "Unsupported UI package schema." }
+        val name = manifest.getString("name").trim()
+        require(name.isNotEmpty() && name.length <= 80) { "UI package name must be 1 to 80 characters." }
+        val filtering = manifest.getString("filtering")
+        require(filtering == "nearest") { "UI package filtering must be nearest." }
+        val rolesJson = manifest.getJSONObject("roles")
+        require(rolesJson.length() > 0) { "UI package contains no roles." }
+        val roles = LinkedHashMap<String, UiPackageRole>()
+        for (role in rolesJson.keys()) {
+            require(isKnownRole(role) && role != "global") { "Unsupported UI package role: $role" }
+            val value = rolesJson.getJSONObject(role)
+            require(value.stringSet() == setOf("file", "slicePx", "borderDp", "modes")) {
+                "UI package role $role has missing or unsupported fields."
+            }
+            val file = value.getString("file")
+            require(PACK_FILE_NAME.matches(file)) { "Invalid UI package filename: $file" }
+            val expectedFile = uiPackageFileName(role)
+            require(file == expectedFile) { "UI package role $role must use $expectedFile." }
+            roles[role] = UiPackageRole(
+                file,
+                parseSpec(JSONObject(value.toString()).put("filtering", filtering))
+            )
+        }
+        return UiPackageManifest(name, roles)
+    }
+
+    internal fun uiPackageFileName(role: String): String =
+        if (role == FrameTarget.SUGGESTIONS.id) "suggestion_chip.png" else "$role.png"
+
+    internal fun isUiPackageZipName(name: String): Boolean =
+        name.lowercase(Locale.ROOT).endsWith(".retui_ui.zip")
+
     private fun sha256(bytes: ByteArray): String = MessageDigest.getInstance("SHA-256")
         .digest(bytes).joinToString("") { "%02x".format(it) }
+
+    internal fun imageContentId(png: ByteArray): String = sha256(png)
 
     private fun imageBounds(image: ByteArray): Pair<Int, Int> {
         require(hasPngSignature(image)) {
@@ -831,6 +1118,23 @@ object FrameManager {
             filtering = "nearest"
         )
     }
+
+    private fun bundledSpec(left: Int, top: Int, right: Int, bottom: Int) = FrameSpec(
+        leftPx = left,
+        topPx = top,
+        rightPx = right,
+        bottomPx = bottom,
+        leftDp = left.toFloat(),
+        topDp = top.toFloat(),
+        rightDp = right.toFloat(),
+        bottomDp = bottom.toFloat(),
+        topMode = "stretch",
+        rightMode = "stretch",
+        bottomMode = "stretch",
+        leftMode = "stretch",
+        centerMode = "stretch",
+        filtering = "nearest"
+    )
 
     internal fun frameSpecError(spec: FrameSpec, width: Int, height: Int): String? = when {
         listOf(spec.leftPx, spec.topPx, spec.rightPx, spec.bottomPx).any { it <= 0 } ->

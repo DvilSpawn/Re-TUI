@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher.managers
 
+import com.dvil.retui.contract.RetuiVisualContract
 import java.io.File
 import java.nio.file.Files
 import org.junit.Assert.assertEquals
@@ -7,6 +8,14 @@ import org.junit.Assert.assertNull
 import org.junit.Test
 
 class RetuiThemeBridgeTest {
+    @Test
+    fun keyboardFrameTargetsMatchTheSharedContract() {
+        assertEquals(
+            RetuiVisualContract.KEYBOARD_FRAME_ROLES.toSet(),
+            RetuiThemeBridge.KEYBOARD_FRAME_TARGETS.mapTo(HashSet()) { it.id }
+        )
+    }
+
     @Test
     fun resolvesConfiguredFontAndRejectsStaleCachedPath() {
         val root = Files.createTempDirectory("retui-fonts").toFile()

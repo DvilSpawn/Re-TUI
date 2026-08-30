@@ -606,6 +606,34 @@ class ThemerActivity : AppCompatActivity() {
 
         val session = frameSession()
         val applyAll = session.applyToAll
+        root.addView(CheckBox(this).apply {
+            text = "Enable custom frames"
+            isChecked = FrameManager.isEnabled(this@ThemerActivity)
+            setTextColor(textColor())
+            setTypeface(Tuils.getTypeface(this@ThemerActivity), Typeface.BOLD)
+            setPadding(dp(this@ThemerActivity, 12f), dp(this@ThemerActivity, 10f), dp(this@ThemerActivity, 12f), dp(this@ThemerActivity, 10f))
+            background = rect(this@ThemerActivity, surfaceColor(), borderColor(), 1.25f)
+            buttonTintList = ColorStateList.valueOf(accentColor())
+            setOnCheckedChangeListener { _, checked ->
+                FrameManager.setEnabled(this@ThemerActivity, checked)
+                Toast.makeText(
+                    this@ThemerActivity,
+                    if (checked) "Custom frames enabled." else "Custom frames disabled. Your active pack is preserved.",
+                    Toast.LENGTH_SHORT
+                ).show()
+                sectionsAdapter?.notifyDataSetChanged()
+                LauncherActivity.preview(this@ThemerActivity)
+            }
+        }, inputParams())
+
+        root.addView(TextView(this).apply {
+            text = "Turn frames off to use generated borders. Your active pack and assignments stay saved."
+            setTextColor(textColor())
+            setTypeface(Tuils.getTypeface(this@ThemerActivity))
+            textSize = 12f
+            setPadding(dp(this@ThemerActivity, 8f), 0, dp(this@ThemerActivity, 8f), dp(this@ThemerActivity, 10f))
+        }, inputParams())
+
         val toggle = CheckBox(this).apply {
             text = "Apply one frame to all surfaces"
             isChecked = applyAll
@@ -627,6 +655,20 @@ class ThemerActivity : AppCompatActivity() {
             } else {
                 "Import a square 3 x 3 PNG or a .retui-frame file per surface. Button states, toggle states, and slider parts can be supplied independently; missing assignments keep their defaults."
             }
+            setTextColor(textColor())
+            setTypeface(Tuils.getTypeface(this@ThemerActivity))
+            textSize = 12f
+            setPadding(dp(this@ThemerActivity, 8f), 0, dp(this@ThemerActivity, 8f), dp(this@ThemerActivity, 10f))
+        }, inputParams())
+
+        root.addView(TextView(this).apply {
+            text = "IMPORT UI PACKAGE"
+            styleButton(this@ThemerActivity, this, false)
+            setOnClickListener { launchUiPackagePicker() }
+        }, inputParams())
+
+        root.addView(TextView(this).apply {
+            text = "Import a .retui_ui.zip package. It is added to Frame Packs without replacing the active frames until you tap Apply."
             setTextColor(textColor())
             setTypeface(Tuils.getTypeface(this@ThemerActivity))
             textSize = 12f
@@ -753,6 +795,7 @@ class ThemerActivity : AppCompatActivity() {
                 append(pack.name)
                 append("\n")
                 append(pack.assignments.size).append(if (pack.assignments.size == 1) " custom frame" else " custom frames")
+                if (FrameManager.isBuiltInPack(pack.id)) append("  •  BUILT-IN")
                 if (active) append("  •  ACTIVE")
             }
             setTextColor(if (active) accentColor() else textColor())
@@ -769,12 +812,14 @@ class ThemerActivity : AppCompatActivity() {
             alpha = if (active) 0.45f else 1f
             setOnClickListener { applyFramePack(pack) }
         }, LinearLayout.LayoutParams(0, dp(this, 46f), 1f))
-        actions.addView(View(this), LinearLayout.LayoutParams(dp(this, 8f), 1))
-        actions.addView(TextView(this).apply {
-            text = "DELETE"
-            styleButton(this@ThemerActivity, this, false)
-            setOnClickListener { confirmDeleteFramePack(pack) }
-        }, LinearLayout.LayoutParams(0, dp(this, 46f), 1f))
+        if (!FrameManager.isBuiltInPack(pack.id)) {
+            actions.addView(View(this), LinearLayout.LayoutParams(dp(this, 8f), 1))
+            actions.addView(TextView(this).apply {
+                text = "DELETE"
+                styleButton(this@ThemerActivity, this, false)
+                setOnClickListener { confirmDeleteFramePack(pack) }
+            }, LinearLayout.LayoutParams(0, dp(this, 46f), 1f))
+        }
         row.addView(actions)
         return row
     }
@@ -1620,6 +1665,37 @@ class ThemerActivity : AppCompatActivity() {
         }
     }
 
+    private fun launchUiPackagePicker() {
+        if (frameSession().hasChanges()) {
+            TuixtDialog.showConfirm(
+                this,
+                "Discard Unsaved Frame Edits?",
+                "Importing a UI package installs a separate saved pack. Discard the current element edits first?",
+                "Discard and Continue",
+                "Cancel",
+                ConfirmAction {
+                    discardFrameChanges()
+                    openUiPackageZipPicker()
+                }
+            )
+        } else {
+            openUiPackageZipPicker()
+        }
+    }
+
+    private fun openUiPackageZipPicker() {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "application/zip"
+            putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("application/zip", "application/octet-stream"))
+        }
+        try {
+            startActivityForResult(intent, UI_PACKAGE_ZIP_IMPORT_REQUEST)
+        } catch (e: ActivityNotFoundException) {
+            Toast.makeText(this, "File picker is unavailable on this device.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     private fun showFrameEditor(target: FrameTarget?) {
         val session = frameSession()
         val details = session.assignedDetails(target) ?: run {
@@ -1794,7 +1870,7 @@ class ThemerActivity : AppCompatActivity() {
         val choices = mutableListOf<String>()
         if (session.currentPackId() != null) choices.add("Save current pack")
         choices.add("Create new pack")
-        if (session.packs().isNotEmpty()) choices.add("Replace existing pack")
+        if (session.packs().any { !FrameManager.isBuiltInPack(it.id) }) choices.add("Replace existing pack")
         TuixtDialog.showOptions(this, "Save Frame Settings", choices, ItemAction { choice ->
             when (choices[choice]) {
                 "Save current pack" -> saveCurrentFramePack()
@@ -1837,7 +1913,7 @@ class ThemerActivity : AppCompatActivity() {
     }
 
     private fun showReplaceFramePack() {
-        val packs = frameEditSession?.packs().orEmpty()
+        val packs = frameEditSession?.packs().orEmpty().filterNot { FrameManager.isBuiltInPack(it.id) }
         if (packs.isEmpty()) return
         TuixtDialog.showOptions(this, "Replace Frame Pack", packs.map { it.name }, ItemAction { index ->
             val pack = packs[index]
@@ -1909,6 +1985,7 @@ class ThemerActivity : AppCompatActivity() {
             session.save()
             frameEditSession = null
             Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+            sectionsAdapter?.notifyDataSetChanged()
             LauncherActivity.preview(this)
         } catch (e: Exception) {
             Toast.makeText(this, "Could not save frame settings: ${e.message}", Toast.LENGTH_LONG).show()
@@ -2313,6 +2390,31 @@ class ThemerActivity : AppCompatActivity() {
             handleFontImportResult(resultCode, data)
         } else if (requestCode == FRAME_IMPORT_REQUEST) {
             handleFrameImportResult(resultCode, data)
+        } else if (requestCode == UI_PACKAGE_ZIP_IMPORT_REQUEST) {
+            handleUiPackageZipImportResult(resultCode, data)
+        }
+    }
+
+    private fun handleUiPackageZipImportResult(resultCode: Int, data: Intent?) {
+        val uri = data?.data
+        if (resultCode != RESULT_OK || uri == null) {
+            Toast.makeText(this, "UI package ZIP import cancelled.", Toast.LENGTH_SHORT).show()
+            return
+        }
+        val fileName = getDisplayName(uri) ?: uri.lastPathSegment.orEmpty()
+        if (!FrameManager.isUiPackageZipName(fileName)) {
+            Toast.makeText(this, "Choose a file ending in .retui_ui.zip.", Toast.LENGTH_LONG).show()
+            return
+        }
+        try {
+            val pack = contentResolver.openInputStream(uri).use { input ->
+                frameSession().importUiPackageZip(
+                    requireNotNull(input) { "Unable to read the selected UI package ZIP." }
+                )
+            }
+            persistFrameSession("${pack.name} imported. Tap Apply when ready.")
+        } catch (e: Exception) {
+            Toast.makeText(this, "UI package ZIP import failed: ${e.message}", Toast.LENGTH_LONG).show()
         }
     }
 
@@ -2748,6 +2850,7 @@ class ThemerActivity : AppCompatActivity() {
         private const val FONT_IMPORT_REQUEST = 204
         private const val TASKER_PERMISSION_REQUEST = 205
         private const val FRAME_IMPORT_REQUEST = 206
+        private const val UI_PACKAGE_ZIP_IMPORT_REQUEST = 207
         private const val DYSTOPIA_HOLD_MS = 3000L
         private val DYSTOPIA_HOLD_PATTERN = longArrayOf(0L, 55L, 945L, 55L, 945L, 55L)
         private const val PLAY_STORE_PACKAGE_ID = "com.dvil.tui_renewed"

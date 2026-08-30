@@ -62,7 +62,10 @@ object RetuiVisualContract {
     const val TERMINAL_BG_IMAGE = "terminal_bg_image"
 
     const val FRAME_AVAILABLE = "frame_available"
+    /** Stable identity for the complete frame revision, including its rendering metadata. */
     const val FRAME_ASSET_ID = "frame_asset_id"
+    /** Lowercase SHA-256 of the exact PNG bytes; identical IDs always mean identical artwork. */
+    const val FRAME_IMAGE_ID = "frame_image_id"
     const val FRAME_IMAGE_URI = "frame_image_uri"
     const val FRAME_SLICE_LEFT_PX = "frame_slice_left_px"
     const val FRAME_SLICE_TOP_PX = "frame_slice_top_px"
@@ -78,6 +81,32 @@ object RetuiVisualContract {
     const val FRAME_MODE_LEFT = "frame_mode_left"
     const val FRAME_MODE_CENTER = "frame_mode_center"
     const val FRAME_FILTERING = "frame_filtering"
+    const val FRAME_ROLES = "frame_roles"
+
+    const val FRAME_ROLE_KEYBOARD = "keyboard"
+    const val FRAME_ROLE_SETTINGS = "settings"
+    const val FRAME_ROLE_DIALOG = "dialog"
+    const val FRAME_ROLE_HEADER = "header"
+    const val FRAME_ROLE_LIST_ITEM = "list_item"
+    const val FRAME_ROLE_LIST_ITEM_SELECTED = "list_item_selected"
+    const val FRAME_ROLE_UI_INPUT = "ui_input"
+    const val FRAME_ROLE_BUTTON = "button"
+    const val FRAME_ROLE_BUTTON_PRESSED = "button_pressed"
+    const val FRAME_ROLE_BUTTON_PRIMARY = "button_primary"
+    const val FRAME_ROLE_ICON_BUTTON = "icon_button"
+    const val FRAME_ROLE_TOGGLE_OFF = "toggle_off"
+    const val FRAME_ROLE_TOGGLE_ON = "toggle_on"
+    const val FRAME_ROLE_SLIDER_TRACK = "slider_track"
+    const val FRAME_ROLE_SLIDER_PROGRESS = "slider_progress"
+    const val FRAME_ROLE_SLIDER_THUMB = "slider_thumb"
+
+    val KEYBOARD_FRAME_ROLES = arrayOf(
+        FRAME_ROLE_KEYBOARD, FRAME_ROLE_SETTINGS, FRAME_ROLE_DIALOG, FRAME_ROLE_HEADER,
+        FRAME_ROLE_LIST_ITEM, FRAME_ROLE_LIST_ITEM_SELECTED, FRAME_ROLE_UI_INPUT,
+        FRAME_ROLE_BUTTON, FRAME_ROLE_BUTTON_PRESSED, FRAME_ROLE_BUTTON_PRIMARY,
+        FRAME_ROLE_ICON_BUTTON, FRAME_ROLE_TOGGLE_OFF, FRAME_ROLE_TOGGLE_ON,
+        FRAME_ROLE_SLIDER_TRACK, FRAME_ROLE_SLIDER_PROGRESS, FRAME_ROLE_SLIDER_THUMB
+    )
 
     const val CONTEXT = "retui_context"
     const val MODE = "retui_mode"
@@ -95,13 +124,17 @@ object RetuiVisualContract {
         DASHED_BORDERS, DASHED_BORDER_DASH_LENGTH, DASHED_BORDER_GAP_LENGTH, DASHED_BORDER_STROKE_WIDTH_DP,
         CYBERDECK_MODE, CRT_FILTER, CRT_VIGNETTE,
         FONT_PATH, FONT_FILE, FONT_NAME, TERMINAL_BG_IMAGE,
-        FRAME_AVAILABLE, FRAME_ASSET_ID, FRAME_IMAGE_URI,
+        FRAME_AVAILABLE, FRAME_ASSET_ID, FRAME_IMAGE_ID, FRAME_IMAGE_URI,
         FRAME_SLICE_LEFT_PX, FRAME_SLICE_TOP_PX, FRAME_SLICE_RIGHT_PX, FRAME_SLICE_BOTTOM_PX,
         FRAME_BORDER_LEFT_DP, FRAME_BORDER_TOP_DP, FRAME_BORDER_RIGHT_DP, FRAME_BORDER_BOTTOM_DP,
         FRAME_MODE_TOP, FRAME_MODE_RIGHT, FRAME_MODE_BOTTOM, FRAME_MODE_LEFT, FRAME_MODE_CENTER,
-        FRAME_FILTERING,
+        FRAME_FILTERING, FRAME_ROLES,
         CONTEXT, MODE
     )
+
+    fun frame(extras: Bundle?, role: String): Bundle? = extras?.getBundle(FRAME_ROLES)?.getBundle(role)
+
+    fun frame(intent: Intent?, role: String): Bundle? = frame(intent?.extras, role)
 
     fun putInto(intent: Intent, bundle: Bundle) {
         intent.putExtras(bundle)

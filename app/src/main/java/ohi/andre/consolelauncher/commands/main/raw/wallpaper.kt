@@ -3,15 +3,15 @@ package ohi.andre.consolelauncher.commands.main.raw
 import android.app.WallpaperManager
 import android.content.Intent
 import ohi.andre.consolelauncher.R
+import ohi.andre.consolelauncher.LauncherActivity
 import ohi.andre.consolelauncher.commands.ExecutePack
 import ohi.andre.consolelauncher.commands.main.MainPack
 import ohi.andre.consolelauncher.commands.main.specific.ParamCommand
 import ohi.andre.consolelauncher.commands.main.specific.RedirectCommand
-import ohi.andre.consolelauncher.managers.settings.LauncherSettings.setAutoColorPick
+import ohi.andre.consolelauncher.managers.settings.LauncherSettings.enableWallpaperAuto
 import ohi.andre.consolelauncher.tuils.Tuils
 import ohi.andre.consolelauncher.tuils.interfaces.Reloadable
 import java.util.Locale
-import ohi.andre.consolelauncher.managers.settings.LauncherSettings
 
 class wallpaper : ParamCommand() {
     private enum class Param : ohi.andre.consolelauncher.commands.main.Param {
@@ -201,14 +201,14 @@ class wallpaper : ParamCommand() {
         }
 
         private fun enableWallpaperAuto(pack: ExecutePack): String {
-            setAutoColorPick(true)
+            enableWallpaperAuto(pack.context)
 
             if (pack.context is Reloadable) {
                 (pack.context as Reloadable).addMessage(
                     "wallpaper",
                     "Enabled wallpaper-derived colors"
                 )
-                (pack.context as Reloadable).reload()
+                LauncherActivity.preview(pack.context)
                 return Tuils.EMPTYSTRING
             }
 

@@ -333,6 +333,7 @@ class TuixtAdapter(
 
     private fun displayLabel(item: XMLPrefsSave): String {
         return when (item.label()) {
+            "unified_status_border" -> "Unified Bottom Console"
             "show_ascii" -> "Show ASCII TXT"
             "show_ascii_landscape" -> "Show ASCII In Landscape"
             "ascii_max_lines" -> "ASCII Viewport Rows"

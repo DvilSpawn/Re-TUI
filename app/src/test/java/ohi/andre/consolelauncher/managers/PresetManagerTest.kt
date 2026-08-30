@@ -36,4 +36,9 @@ class PresetManagerTest {
         assertEquals("#00000000", Theme.unified_status_background_color.defaultValue())
         assertEquals("Status Lines", XMLPrefsManager.sectionFor(Theme.unified_status_background_color))
     }
+
+    @Test fun wallpaperDefaultsToSystemWithNoOverlay() {
+        assertEquals("true", Ui.system_wallpaper.defaultValue())
+        assertEquals("#00000000", Theme.wallpaper_overlay_color.defaultValue())
+    }
 }

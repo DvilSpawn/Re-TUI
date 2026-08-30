@@ -1,6 +1,8 @@
 package ohi.andre.consolelauncher.managers.status
 
 import android.content.Context
+import android.os.Environment
+import android.os.StatFs
 import java.util.ArrayList
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -26,6 +28,12 @@ class StorageManager(
     private var storagePatterns: MutableList<Pattern>? = null
     private var storageFormat: String? = null
     private var color = 0
+    private var compactInternal = ""
+    private var compactExternal = ""
+
+    fun compactInternal(): String = compactInternal
+
+    fun compactExternal(): String = compactExternal
 
     override fun update() {
         if (storageFormat == null) {
@@ -76,6 +84,12 @@ class StorageManager(
         val eav = SystemUtils.getAvailableExternalMemorySize(SystemUtils.BYTE)
         val etot = SystemUtils.getTotalExternalMemorySize(SystemUtils.BYTE)
 
+        compactInternal = UIManager.compactUnifiedCapacity(
+            SystemUtils.formatSize(iav.toLong(), SystemUtils.GIGA),
+            SystemUtils.formatSize(itot.toLong(), SystemUtils.GIGA)
+        )
+        compactExternal = removableStorageCapacity()
+
         var copy = storageFormat!!
 
         copy = patterns[0].matcher(copy).replaceAll(Matcher.quoteReplacement(SystemUtils.formatSize(iav.toLong(), SystemUtils.TERA).toString()))
@@ -112,5 +126,23 @@ class StorageManager(
         copy = patterns[26].matcher(copy).replaceAll(Matcher.quoteReplacement(SystemUtils.formatSize(etot.toLong(), SystemUtils.GIGA).toString()))
 
         listener?.onUpdate(UIManager.Label.storage, UIUtils.span(context, copy, color, size))
+    }
+
+    private fun removableStorageCapacity(): String {
+        val volume = context.getExternalFilesDirs(null)
+            .drop(1)
+            .firstOrNull {
+                it != null && Environment.isExternalStorageRemovable(it) &&
+                    Environment.getExternalStorageState(it) == Environment.MEDIA_MOUNTED
+            } ?: return "—"
+        return try {
+            val stat = StatFs(volume.path)
+            UIManager.compactUnifiedCapacity(
+                SystemUtils.formatSize(stat.availableBytes, SystemUtils.GIGA),
+                SystemUtils.formatSize(stat.totalBytes, SystemUtils.GIGA)
+            )
+        } catch (_: Exception) {
+            "—"
+        }
     }
 }

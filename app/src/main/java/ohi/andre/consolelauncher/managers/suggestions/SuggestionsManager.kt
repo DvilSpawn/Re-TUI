@@ -1,16 +1,26 @@
 package ohi.andre.consolelauncher.managers.suggestions
 
+import android.Manifest
 import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Color
+import android.net.Uri
 import android.os.Handler
 import android.os.Looper
+import android.provider.ContactsContract
+import android.provider.Settings
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.HorizontalScrollView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 import it.andreuzzi.comparestring2.AlgMap
 import it.andreuzzi.comparestring2.AlgMap.Alg
 import it.andreuzzi.comparestring2.CompareObjects
@@ -27,6 +37,7 @@ import ohi.andre.consolelauncher.commands.CommandTuils.parse
 import ohi.andre.consolelauncher.commands.main.MainPack
 import ohi.andre.consolelauncher.commands.main.Param
 import ohi.andre.consolelauncher.commands.main.raw.tbridge
+import ohi.andre.consolelauncher.commands.main.raw.search
 import ohi.andre.consolelauncher.commands.main.raw.files as FilesCommand
 import ohi.andre.consolelauncher.commands.main.specific.ParamCommand
 import ohi.andre.consolelauncher.commands.main.specific.PermanentSuggestionCommand
@@ -76,6 +87,7 @@ import java.util.Locale
 import java.util.regex.Pattern
 import kotlin.math.abs
 import kotlin.math.max
+import kotlin.math.min
 import android.os.Build
 import java.util.ArrayList
 import java.util.Comparator
@@ -91,7 +103,9 @@ import ohi.andre.consolelauncher.managers.FileManager
 import ohi.andre.consolelauncher.managers.PresetManager
 import ohi.andre.consolelauncher.managers.RssManager
 import ohi.andre.consolelauncher.managers.SpaceManager
+import ohi.andre.consolelauncher.managers.SearchProviderManager
 import ohi.andre.consolelauncher.managers.notifications.NotificationManager
+import ohi.andre.consolelauncher.managers.notifications.NotificationService
 import ohi.andre.consolelauncher.managers.WebhookManager
 import ohi.andre.consolelauncher.managers.modules.ModuleManager
 import ohi.andre.consolelauncher.managers.termux.TermuxBridgeCache
@@ -106,7 +120,9 @@ import ohi.andre.consolelauncher.commands.CommandTuils.xmlPrefsFiles
 class SuggestionsManager(
     private val suggestionsView: LinearLayout,
     private var pack: MainPack,
-    private val mTerminalAdapter: TerminalManager
+    private val mTerminalAdapter: TerminalManager,
+    private val searchResultsView: LinearLayout? = null,
+    private val searchMode: Boolean = false
 ) {
     private var hideViewValue: HideSuggestionViewValues? = null
 
@@ -132,6 +148,11 @@ class SuggestionsManager(
 
     private val luaSuggestionEngines = LinkedHashMap<String?, LuaWidgetEngine?>()
     private val suggestionRequestId = AtomicLong(0L)
+    private val searchRenderer = searchResultsView?.let {
+        SearchModeResultRenderer(pack, it, ::getSuggestionView, ::openSearchResult)
+    }
+    @Volatile private var searchNotifications: List<NotificationService.Notification> = emptyList()
+    @Volatile private var inlineOutput: CharSequence? = null
 
     private val clickListener = View.OnClickListener { v: View? ->
         val suggestion = v!!.getTag(R.id.suggestion_id) as Suggestion
@@ -226,6 +247,22 @@ class SuggestionsManager(
     fun clear() {
         cancelPendingSuggestionRequests()
         suggestionsView.removeAllViews()
+        searchRenderer?.clear()
+    }
+
+    fun setSearchNotifications(notifications: List<NotificationService.Notification>) {
+        searchNotifications = ArrayList(notifications)
+        if (searchMode && mTerminalAdapter.input.isNotBlank()) {
+            requestSuggestion(mTerminalAdapter.input)
+        }
+    }
+
+    fun showInlineOutput(output: CharSequence?) {
+        if (!searchMode || output.isNullOrBlank()) return
+        inlineOutput = output
+        (pack.context as Activity).runOnUiThread {
+            searchRenderer?.renderOutput(output)
+        }
     }
 
     var hideRunnable: Runnable = object : Runnable {
@@ -451,6 +488,10 @@ class SuggestionsManager(
 
     fun requestSuggestion(input: String) {
         if (!enabled) return
+        if (searchMode) {
+            requestSearchMode(input)
+            return
+        }
         val requestId = suggestionRequestId.incrementAndGet()
 
         if (suggestionViewParams == null) {
@@ -630,6 +671,307 @@ class SuggestionsManager(
         }
     }
 
+    private fun requestSearchMode(input: String) {
+        val query = input
+        val requestId = suggestionRequestId.incrementAndGet()
+        lastSuggestionThread?.interrupt()
+        if (query.trim().isEmpty()) {
+            if (inlineOutput == null) {
+                (pack.context as Activity).runOnUiThread { searchRenderer?.clear() }
+            }
+            return
+        }
+        inlineOutput = null
+        lastSuggestionThread = object : StoppableThread() {
+            override fun run() {
+                super.run()
+                val results = getSearchModeResults(query)
+                if (!isLatestSuggestionRequest(requestId) || interrupted()) return
+                (pack.context as Activity).runOnUiThread {
+                    if (isLatestSuggestionRequest(requestId)) searchRenderer?.render(results)
+                }
+            }
+        }
+        lastSuggestionThread!!.start()
+    }
+
+    internal fun getSearchModeResults(query: String): List<SearchResult> {
+        searchModeCommandResults(query)?.let { return it }
+        val cleanQuery = query.trim()
+        if (cleanQuery.isEmpty()) return emptyList()
+        val candidates = ArrayList<SearchResult>()
+
+        for (app in pack.appsManager.shownApps()) {
+            val label = app.publicLabel ?: continue
+            val packageName = app.componentName?.packageName.orEmpty()
+            candidates.add(
+                SearchResult(label, "APP · $packageName", SearchResult.TYPE_APP, app, "$label $packageName")
+            )
+        }
+
+        val contactsGranted = ContextCompat.checkSelfPermission(
+            pack.context,
+            Manifest.permission.READ_CONTACTS
+        ) == PackageManager.PERMISSION_GRANTED
+        if (contactsGranted) {
+            for (contact in pack.contacts.getContacts()) {
+                candidates.add(
+                    SearchResult(
+                        contact.string,
+                        "CONTACT · " + contact.numbers.joinToString(" · "),
+                        SearchResult.TYPE_CONTACT,
+                        contact,
+                        contact.string + " " + contact.numbers.joinToString(" ")
+                    )
+                )
+            }
+        }
+
+        val notificationsGranted = NotificationManagerCompat.getEnabledListenerPackages(pack.context)
+            .contains(pack.context.packageName)
+        if (notificationsGranted) {
+            for (notification in searchNotifications) {
+                val title = notification.title
+                    ?: notification.preview
+                    ?: notification.text
+                    ?: notification.appName
+                    ?: continue
+                val app = notification.appName ?: notification.pkg.orEmpty()
+                val body = notification.body ?: notification.preview ?: notification.text.orEmpty()
+                candidates.add(
+                    SearchResult(
+                        title,
+                        listOf("NOTIFICATION", app, body).filter { it.isNotBlank() }.joinToString(" · "),
+                        SearchResult.TYPE_NOTIFICATION,
+                        notification,
+                        "$title $app $body ${notification.pkg.orEmpty()}"
+                    )
+                )
+            }
+        }
+
+        for (alias in pack.aliasManager.getAliases(true, AliasManager.SCOPE_APP).filterNotNull()) {
+            val suggestion = Suggestion(
+                Tuils.EMPTYSTRING,
+                alias.name,
+                !alias.isParametrized,
+                Suggestion.TYPE_ALIAS
+            )
+            candidates.add(
+                SearchResult(
+                    alias.name,
+                    "ALIAS · ${alias.value}",
+                    SearchResult.TYPE_ALIAS,
+                    suggestion,
+                    "${alias.name} ${alias.value}"
+                )
+            )
+        }
+
+        for (name in pack.commandGroup.commandNames) {
+            if (isHiddenCommandName(name) || HIDDEN_SUGGESTION_COMMAND.equals(name, true)) continue
+            val command = pack.commandGroup.getCommandByName(name) ?: continue
+            val suggestion = Suggestion(
+                null,
+                name,
+                commandSuggestionExecutes(name, command.argType()),
+                Suggestion.TYPE_COMMAND
+            )
+            candidates.add(SearchResult(name, "COMMAND", SearchResult.TYPE_COMMAND, suggestion, name))
+        }
+        for (group in pack.appsManager.groups) {
+            candidates.add(
+                SearchResult(
+                    group.name(),
+                    "APP GROUP · ${group.apps.size} apps",
+                    SearchResult.TYPE_GROUP,
+                    group,
+                    group.name() + " " + group.apps.joinToString(" ") { it.publicLabel.orEmpty() }
+                )
+            )
+        }
+
+        val results = rankSearchResults(
+            cleanQuery,
+            candidates,
+            max(1, suggestionsPerCategory),
+            suggestionsDeadline,
+            algInstance,
+            alg
+        ).toMutableList()
+        val permissionRelevant = results.isEmpty()
+        val lower = cleanQuery.lowercase(Locale.getDefault())
+        if (!contactsGranted && (permissionRelevant || CONTACT_ACCESS_WORDS.any(lower::contains))) {
+            results.add(
+                SearchResult(
+                    "Enable contact search",
+                    "PERMISSION · Allow Re:T-UI to search contacts",
+                    SearchResult.TYPE_PERMISSION,
+                    PERMISSION_CONTACTS,
+                    "contacts call message people"
+                )
+            )
+        }
+        if (!notificationsGranted && (permissionRelevant || NOTIFICATION_ACCESS_WORDS.any(lower::contains))) {
+            results.add(
+                SearchResult(
+                    "Enable notification search",
+                    "ACCESS · Open Android notification access",
+                    SearchResult.TYPE_PERMISSION,
+                    PERMISSION_NOTIFICATIONS,
+                    "notifications alerts messages"
+                )
+            )
+        }
+        SearchProviderManager.load().take(max(1, suggestionsPerCategory)).forEach { provider ->
+            results.add(
+                SearchResult(
+                    providerTitle(provider.name),
+                    "WEB PROVIDER · -${provider.name}",
+                    SearchResult.TYPE_PROVIDER,
+                    ProviderAction(provider, cleanQuery),
+                    provider.name
+                )
+            )
+        }
+        return results
+    }
+
+    private fun searchModeCommandResults(input: String): List<SearchResult>? {
+        val (beforeLastSpace, lastWord) = searchModeSuggestionParts(input)
+            ?: if (input.trim().equals("mode", true)) "mode" to Tuils.EMPTYSTRING else return null
+        val commandName = beforeLastSpace.trim().substringBefore(Tuils.SPACE)
+        if (pack.commandGroup.getCommandByName(commandName) == null) return null
+
+        return getSuggestions(beforeLastSpace, lastWord).filterNotNull().mapNotNull { suggestion ->
+            val title = suggestion.text?.trim().orEmpty()
+            if (title.isEmpty()) null else SearchResult(
+                title,
+                "PARAMETER",
+                SearchResult.TYPE_PARAMETER,
+                suggestion,
+                suggestion.getText().orEmpty()
+            )
+        }
+    }
+
+    private fun openSearchResult(result: SearchResult) {
+        when (result.type) {
+            SearchResult.TYPE_APP -> {
+                pack.appsManager.launch(pack.context, result.payload as? LaunchInfo)
+                mTerminalAdapter.input = Tuils.EMPTYSTRING
+            }
+            SearchResult.TYPE_CONTACT -> renderContactActions(result.payload as? Contact)
+            SearchResult.TYPE_NOTIFICATION -> openNotification(result.payload as? NotificationService.Notification)
+            SearchResult.TYPE_ALIAS, SearchResult.TYPE_COMMAND ->
+                (result.payload as? Suggestion)?.let(::clickSuggestion)
+            SearchResult.TYPE_PARAMETER ->
+                (result.payload as? Suggestion)?.let(::clickSuggestion)
+            SearchResult.TYPE_GROUP -> renderGroup(result.payload as? AppsManager.Group)
+            SearchResult.TYPE_PROVIDER -> openProvider(result.payload as? ProviderAction)
+            SearchResult.TYPE_PERMISSION -> openPermission(result.payload as? String)
+            SearchResult.TYPE_CONTACT_ACTION -> openContactAction(result.payload as? ContactAction)
+        }
+    }
+
+    private fun renderContactActions(contact: Contact?) {
+        if (contact == null) return
+        val actions = ArrayList<SearchResult>()
+        for (number in contact.numbers.filterNotNull()) {
+            actions.add(contactAction("Call $number", "CONTACT ACTION", ContactAction(ACTION_CALL, number)))
+            actions.add(contactAction("Message $number", "CONTACT ACTION", ContactAction(ACTION_MESSAGE, number)))
+        }
+        contact.numbers.filterNotNull().firstOrNull()?.let { number ->
+            actions.add(contactAction("View ${contact.string}", "CONTACT ACTION", ContactAction(ACTION_VIEW, number)))
+        }
+        searchRenderer?.render(actions)
+    }
+
+    private fun contactAction(title: String, subtitle: String, action: ContactAction) = SearchResult(
+        title,
+        subtitle,
+        SearchResult.TYPE_CONTACT_ACTION,
+        action,
+        title
+    )
+
+    private fun renderGroup(group: AppsManager.Group?) {
+        if (group == null) return
+        searchRenderer?.render(group.apps.map { app ->
+            SearchResult(
+                app.publicLabel.orEmpty(),
+                "APP · ${app.componentName?.packageName.orEmpty()}",
+                SearchResult.TYPE_APP,
+                app,
+                app.publicLabel.orEmpty()
+            )
+        })
+    }
+
+    private fun openNotification(notification: NotificationService.Notification?) {
+        if (notification == null) return
+        if (notification.pendingIntent != null) {
+            Tuils.sendPendingIntent(pack.context, notification.pendingIntent)
+            mTerminalAdapter.input = Tuils.EMPTYSTRING
+            return
+        }
+        val details = listOfNotNull(notification.appName, notification.title, notification.body, notification.text)
+            .filter { it.isNotBlank() }
+            .distinct()
+            .joinToString(Tuils.NEWLINE)
+        showInlineOutput(details)
+    }
+
+    private fun openPermission(permission: String?) {
+        when (permission) {
+            PERMISSION_CONTACTS -> ActivityCompat.requestPermissions(
+                pack.context as Activity,
+                arrayOf(Manifest.permission.READ_CONTACTS),
+                ohi.andre.consolelauncher.LauncherActivity.COMMAND_SUGGESTION_REQUEST_PERMISSION
+            )
+            PERMISSION_NOTIFICATIONS -> pack.context.startActivity(
+                Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
+            )
+        }
+    }
+
+    private fun openProvider(action: ProviderAction?) {
+        if (action == null) return
+        val error = search.openProvider(action.provider, action.query, pack.context)
+        if (error.isEmpty()) mTerminalAdapter.input = Tuils.EMPTYSTRING
+        else showInlineOutput(error)
+    }
+
+    private fun openContactAction(action: ContactAction?) {
+        if (action == null) return
+        when (action.kind) {
+            ACTION_CALL -> {
+                mTerminalAdapter.setInput("call ${action.number}", null)
+                mTerminalAdapter.simulateEnter()
+            }
+            ACTION_MESSAGE -> {
+                try {
+                    pack.context.startActivity(Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:${Uri.encode(action.number)}")))
+                    mTerminalAdapter.input = Tuils.EMPTYSTRING
+                } catch (_: ActivityNotFoundException) {
+                    showInlineOutput("No messaging app is available.")
+                }
+            }
+            ACTION_VIEW -> {
+                val uri = pack.contacts.fromPhone(action.number) ?: return
+                try {
+                    pack.context.startActivity(Intent(Intent.ACTION_VIEW).setDataAndType(
+                        uri,
+                        ContactsContract.Contacts.CONTENT_ITEM_TYPE
+                    ))
+                    mTerminalAdapter.input = Tuils.EMPTYSTRING
+                } catch (_: ActivityNotFoundException) {
+                    showInlineOutput("No contacts app is available.")
+                }
+            }
+        }
+    }
+
     //    there's always a space between beforelastspace and lastword
     fun getSuggestions(beforeLastSpace: String, lastWord: String): MutableList<Suggestion?> {
         var beforeLastSpace = beforeLastSpace
@@ -663,6 +1005,18 @@ class SuggestionsManager(
         }
 
         val fullInput = (beforeLastSpace + Tuils.SPACE + lastWord).trim().lowercase(Locale.getDefault())
+        if (fullInput == "mode") {
+            comparator.noInput = false
+            suggestionList.add(
+                Suggestion(
+                    "mode",
+                    modeTarget(LauncherSettings.getBoolean(Behavior.search_only_mode)),
+                    true,
+                    Suggestion.TYPE_COMMAND
+                )
+            )
+            return suggestionList
+        }
         if (fullInput == "files") {
             suggestFilesActions(suggestionList)
             Collections.sort<Suggestion?>(suggestionList, comparator)
@@ -4334,6 +4688,35 @@ class SuggestionsManager(
         return true
     }
 
+    data class SearchResult(
+        val title: String,
+        val subtitle: String,
+        val type: Int,
+        val payload: Any?,
+        private val searchText: String,
+        val rank: Int = Int.MAX_VALUE
+    ) : StringableObject {
+        override fun getString(): String = searchText
+
+        override fun getLowercaseString(): String = searchText.lowercase(Locale.getDefault())
+
+        companion object {
+            const val TYPE_APP = 0
+            const val TYPE_CONTACT = 1
+            const val TYPE_NOTIFICATION = 2
+            const val TYPE_ALIAS = 3
+            const val TYPE_COMMAND = 4
+            const val TYPE_GROUP = 5
+            const val TYPE_PROVIDER = 6
+            const val TYPE_PERMISSION = 7
+            const val TYPE_CONTACT_ACTION = 8
+            const val TYPE_PARAMETER = 9
+        }
+    }
+
+    private data class ContactAction(val kind: String, val number: String)
+    private data class ProviderAction(val provider: SearchProviderManager.Provider, val query: String)
+
     class Suggestion {
         @get:JvmName("getRawText")
         @set:JvmName("setRawText")
@@ -4479,6 +4862,13 @@ class SuggestionsManager(
         const val DOUBLE_QUOTES: String = "\""
         private const val HIDDEN_SUGGESTION_COMMAND = "time"
         private const val MAX_LUA_SUGGESTION_ENGINES = 8
+        private const val PERMISSION_CONTACTS = "contacts"
+        private const val PERMISSION_NOTIFICATIONS = "notifications"
+        private const val ACTION_CALL = "call"
+        private const val ACTION_MESSAGE = "message"
+        private const val ACTION_VIEW = "view"
+        private val CONTACT_ACCESS_WORDS = listOf("contact", "call", "message", "people")
+        private val NOTIFICATION_ACCESS_WORDS = listOf("notification", "alert")
         internal val INTENT_ROOT_ACTIONS = arrayOf(
             "Open URI" to "intent -view",
             "Start activity" to "intent -activity",
@@ -4522,6 +4912,85 @@ class SuggestionsManager(
 
         internal fun commandSuggestionExecutes(commandName: String?, argTypes: IntArray?): Boolean {
             return argTypes == null || argTypes.isEmpty() || "podcast".equals(commandName, ignoreCase = true)
+        }
+
+        internal fun modeTarget(searchMode: Boolean): String = if (searchMode) "classic" else "search"
+
+        internal fun searchModeSuggestionParts(input: String): Pair<String, String>? {
+            val current = input.trimStart()
+            val lastSpace = current.lastIndexOf(Tuils.SPACE)
+            if (lastSpace < 0) return null
+            return current.substring(0, lastSpace) to current.substring(lastSpace + 1)
+        }
+
+        internal fun directSearchRank(query: String, value: String): Int? {
+            val needle = query.trim().lowercase(Locale.getDefault())
+            if (needle.isEmpty()) return null
+            val haystack = value.lowercase(Locale.getDefault())
+            if (haystack == needle) return 0
+            if (haystack.startsWith(needle)) return 1
+            if (haystack.split(Regex("[\\s._-]+")).any { it.startsWith(needle) }) return 2
+            if (haystack.contains(needle)) return 3
+            return null
+        }
+
+        internal fun providerTitle(name: String): String = when (name.lowercase(Locale.getDefault())) {
+            "gg" -> "Google"
+            "yt" -> "YouTube"
+            "dd" -> "DuckDuckGo"
+            "ps" -> "Play Store"
+            "u" -> "Open URL"
+            else -> name.replace('_', ' ').replaceFirstChar { it.titlecase(Locale.getDefault()) }
+        }
+
+        internal fun rankSearchResults(
+            query: String,
+            candidates: List<SearchResult>,
+            perCategory: Int,
+            deadline: Float,
+            algorithm: Algorithm?,
+            algorithmType: Alg?
+        ): List<SearchResult> {
+            if (query.isBlank()) return emptyList()
+            val unique = LinkedHashMap<String, SearchResult>()
+            for (candidate in candidates) {
+                val key = candidate.type.toString() + "|" + candidate.title.lowercase(Locale.getDefault()) +
+                    "|" + candidate.subtitle.lowercase(Locale.getDefault())
+                if (!unique.containsKey(key)) unique[key] = candidate
+            }
+            val categories = unique.values.groupBy { it.type }.toSortedMap()
+            val directResults = categories.mapValues { (_, category) ->
+                category.mapNotNull { candidate ->
+                    directSearchRank(query, candidate.getString())?.let { candidate.copy(rank = it) }
+                }.sortedWith(
+                    compareBy<SearchResult> { it.rank }
+                        .thenBy { it.title.lowercase(Locale.getDefault()) }
+                ).take(perCategory)
+            }
+            val ranked = directResults.values.flatten().toMutableList()
+            if (ranked.isEmpty() && query.trim().length >= 2) {
+                for ((_, category) in categories) {
+                val fuzzy = CompareObjects.topMatchesWithDeadline<SearchResult?>(
+                    SearchResult::class.java,
+                    query,
+                        category.size,
+                        category.toMutableList(),
+                        perCategory,
+                    deadline,
+                    arrayOf(" ", "_", "-", "."),
+                    algorithm,
+                    algorithmType
+                )
+                fuzzy.filterNotNull().forEachIndexed { index, result ->
+                    ranked.add(result.copy(rank = 4 + index))
+                }
+                }
+            }
+            return ranked.sortedWith(
+                compareBy<SearchResult> { it.rank }
+                    .thenBy { it.type }
+                    .thenBy { it.title.lowercase(Locale.getDefault()) }
+            )
         }
     }
 }

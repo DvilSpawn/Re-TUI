@@ -380,7 +380,12 @@ object BackupManager {
                         + "appVersion=" + BuildConfig.VERSION_NAME + "\n")
             )
             val root: java.io.File = Tuils.getFolder()
-            ohi.andre.consolelauncher.managers.BackupManager.addDirectory(zip, root, root)
+            ohi.andre.consolelauncher.managers.BackupManager.addDirectory(
+                zip,
+                root,
+                root,
+                FrameManager.bundledAssetFileNames(root)
+            )
             ohi.andre.consolelauncher.managers.BackupManager.addSharedPreferences(zip, context)
         } finally {
             zip.close()
@@ -392,7 +397,8 @@ object BackupManager {
     private fun addDirectory(
         zip: java.util.zip.ZipOutputStream,
         root: java.io.File,
-        dir: java.io.File
+        dir: java.io.File,
+        excludedFiles: kotlin.collections.Set<kotlin.String>
     ) {
         val files = dir.listFiles()
         if (files == null) return
@@ -404,9 +410,10 @@ object BackupManager {
                     name
                 )
             ) continue
+            if (file.name in excludedFiles) continue
 
             if (file.isDirectory()) {
-                ohi.andre.consolelauncher.managers.BackupManager.addDirectory(zip, root, file)
+                ohi.andre.consolelauncher.managers.BackupManager.addDirectory(zip, root, file, excludedFiles)
             } else if (file.isFile()) {
                 ohi.andre.consolelauncher.managers.BackupManager.addFileEntry(zip, name, file)
             }

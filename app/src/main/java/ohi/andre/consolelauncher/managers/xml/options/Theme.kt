@@ -12,7 +12,7 @@ enum class Theme(
     private val invalidValues: Array<String?>? = null
 ) : XMLPrefsSave {
     background_color("#00000000", "Launcher background color when system wallpaper is disabled"),
-    wallpaper_overlay_color("#80000000", "Overlay color applied over the system wallpaper"),
+    wallpaper_overlay_color("#00000000", "Overlay color applied over the system wallpaper"),
     settings_wallpaper_overlay_color("#66000000", "Overlay color applied over the wallpaper behind Settings"),
 
     input_text_color("#ff00ff00", "Command input text color"),

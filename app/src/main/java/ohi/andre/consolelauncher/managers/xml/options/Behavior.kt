@@ -148,6 +148,14 @@ enum class Behavior : XMLPrefsSave {
             return XMLPrefsSave.BOOLEAN
         }
     },
+    search_only_mode {
+        override fun defaultValue(): String? = "false"
+
+        override fun info(): String? =
+            "Use the launcher as a bottom search bar with universal results instead of the classic home surfaces"
+
+        override fun type(): String? = XMLPrefsSave.BOOLEAN
+    },
     auto_scroll {
         override fun defaultValue(): String? {
             return "true"
@@ -653,6 +661,32 @@ enum class Behavior : XMLPrefsSave {
 
         override fun type(): String? {
             return XMLPrefsSave.TEXT
+        }
+    },
+    auto_hide_output {
+        override fun defaultValue(): String? {
+            return "false"
+        }
+
+        override fun info(): String? {
+            return "Collapse output to its clickable header after a delay. Disabled when output_header_mode is none"
+        }
+
+        override fun type(): String? {
+            return XMLPrefsSave.BOOLEAN
+        }
+    },
+    output_auto_hide_seconds {
+        override fun defaultValue(): String? {
+            return "10"
+        }
+
+        override fun info(): String? {
+            return "Seconds before auto-hide collapses output to its header (1-3600)"
+        }
+
+        override fun type(): String? {
+            return XMLPrefsSave.INTEGER
         }
     },
     alias_content_format {

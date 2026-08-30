@@ -65,9 +65,21 @@ object RetuiThemeBridge {
         }
         val bundle = buildLauncherThemeBundle(context, contextLabel, mode)
         addFrame(context, bundle, FrameTarget.KEYBOARD, KEYBOARD_PACKAGE, "retui-keyboard-frame")
+        addKeyboardFrames(context, bundle)
         applyToKeyboardInput(input, contextLabel, mode)
         val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager?
         imm?.sendAppPrivateCommand(input, KEYBOARD_APPLY_CONTEXT_ACTION, bundle)
+    }
+
+    private fun addKeyboardFrames(context: Context, bundle: Bundle) {
+        val frames = Bundle()
+        KEYBOARD_FRAME_TARGETS.forEach { target ->
+            frames.putBundle(
+                target.id,
+                frameBundle(context, target, KEYBOARD_PACKAGE, "retui-keyboard-${target.id}-frame")
+            )
+        }
+        bundle.putBundle(RetuiVisualContract.FRAME_ROLES, frames)
     }
 
     private fun addFrame(
@@ -77,8 +89,17 @@ object RetuiThemeBridge {
         recipientPackage: String,
         cacheFolder: String
     ) {
-        bundle.putBoolean(RetuiVisualContract.FRAME_AVAILABLE, false)
-        val source = FrameManager.sharedSource(context, target) ?: return
+        bundle.putAll(frameBundle(context, target, recipientPackage, cacheFolder))
+    }
+
+    private fun frameBundle(
+        context: Context,
+        target: FrameTarget,
+        recipientPackage: String,
+        cacheFolder: String
+    ): Bundle {
+        val bundle = Bundle().apply { putBoolean(RetuiVisualContract.FRAME_AVAILABLE, false) }
+        val source = FrameManager.sharedSource(context, target) ?: return bundle
         try {
             val directory = File(context.cacheDir, cacheFolder)
             check(directory.exists() || directory.mkdirs()) { "Unable to create frame share folder." }
@@ -93,6 +114,7 @@ object RetuiThemeBridge {
             context.grantUriPermission(recipientPackage, uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
             bundle.putBoolean(RetuiVisualContract.FRAME_AVAILABLE, true)
             bundle.putString(RetuiVisualContract.FRAME_ASSET_ID, source.assetId)
+            bundle.putString(RetuiVisualContract.FRAME_IMAGE_ID, source.imageId)
             bundle.putString(RetuiVisualContract.FRAME_IMAGE_URI, uri.toString())
             bundle.putInt(RetuiVisualContract.FRAME_SLICE_LEFT_PX, source.leftPx)
             bundle.putInt(RetuiVisualContract.FRAME_SLICE_TOP_PX, source.topPx)
@@ -111,6 +133,7 @@ object RetuiThemeBridge {
         } catch (error: Exception) {
             Log.e("TUI-FRAME", "Unable to share ${target.id} frame with $recipientPackage", error)
         }
+        return bundle
     }
 
     private fun buildKeyboardPrivateOptions(contextLabel: String?, mode: String?): String {
@@ -322,5 +345,24 @@ object RetuiThemeBridge {
     private val KEYBOARD_STRING_KEYS = arrayOf(
         RetuiVisualContract.CONTEXT,
         RetuiVisualContract.MODE
+    )
+
+    internal val KEYBOARD_FRAME_TARGETS = setOf(
+        FrameTarget.KEYBOARD,
+        FrameTarget.SETTINGS,
+        FrameTarget.DIALOG,
+        FrameTarget.HEADER,
+        FrameTarget.LIST_ITEM,
+        FrameTarget.LIST_ITEM_SELECTED,
+        FrameTarget.UI_INPUT,
+        FrameTarget.BUTTON,
+        FrameTarget.BUTTON_PRESSED,
+        FrameTarget.BUTTON_PRIMARY,
+        FrameTarget.ICON_BUTTON,
+        FrameTarget.TOGGLE_OFF,
+        FrameTarget.TOGGLE_ON,
+        FrameTarget.SLIDER_TRACK,
+        FrameTarget.SLIDER_PROGRESS,
+        FrameTarget.SLIDER_THUMB
     )
 }

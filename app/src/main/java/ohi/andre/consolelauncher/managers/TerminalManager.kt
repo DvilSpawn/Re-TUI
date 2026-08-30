@@ -68,6 +68,14 @@ class TerminalManager(
     mainPack: MainPack,
     executer: CommandExecuter
 ) {
+    data class State(
+        val input: String,
+        val output: CharSequence,
+        val commands: List<String>,
+        val historyPosition: Int,
+        val root: Boolean
+    )
+
     private val SCROLL_DELAY = 200
     private val CMD_LIST_SIZE = 40
 
@@ -585,6 +593,24 @@ class TerminalManager(
         mTerminalView!!.post(Runnable { mTerminalView!!.setText(Tuils.EMPTYSTRING) })
         cmdList.clear()
         clearCmdsCount = 0
+    }
+
+    fun snapshotState(): State = State(
+        input,
+        SpannableString(mTerminalView?.text ?: Tuils.EMPTYSTRING),
+        cmdList.toList(),
+        howBack,
+        suMode
+    )
+
+    fun restoreState(state: State) {
+        mTerminalView?.text = state.output
+        input = state.input
+        cmdList.clear()
+        cmdList.addAll(state.commands)
+        howBack = state.historyPosition.coerceIn(-1, cmdList.size)
+        if (state.root) onRoot() else onStandard()
+        scrollToEnd()
     }
 
     fun onRoot() {

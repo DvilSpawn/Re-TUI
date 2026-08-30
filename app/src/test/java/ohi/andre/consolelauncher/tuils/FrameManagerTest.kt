@@ -1,6 +1,10 @@
 package ohi.andre.consolelauncher.tuils
 
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 import java.nio.file.Files
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
 import ohi.andre.consolelauncher.managers.xml.options.SurfaceBorder
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -9,6 +13,12 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class FrameManagerTest {
+    @Test fun imageContentIdOnlyChangesWhenPngBytesChange() {
+        val png = byteArrayOf(1, 2, 3)
+        assertEquals(FrameManager.imageContentId(png), FrameManager.imageContentId(png.copyOf()))
+        assertFalse(FrameManager.imageContentId(png) == FrameManager.imageContentId(byteArrayOf(1, 2, 4)))
+    }
+
     @Test fun globalModeIgnoresSurfaceAssignments() {
         assertNull(FrameManager.resolvedTarget(true, FrameTarget.OUTPUT))
         assertEquals(FrameTarget.OUTPUT, FrameManager.resolvedTarget(false, FrameTarget.OUTPUT))
@@ -39,6 +49,71 @@ class FrameManagerTest {
                 it.startsWith("button") || it == "icon_button" || it.startsWith("toggle_") || it.startsWith("slider_")
             }
         )
+    }
+
+    @Test fun schemaTwoUiPackageKeepsPerRoleNineSliceSettings() {
+        val manifest = FrameManager.parseUiPackageManifest(
+            """{
+                "type":"retui-frame-pack","schema":2,"name":"Leafy UI","filtering":"nearest",
+                "roles":{"output":{"file":"output.png",
+                    "slicePx":{"left":6,"top":7,"right":8,"bottom":9},
+                    "borderDp":{"left":3,"top":4,"right":5,"bottom":6},
+                    "modes":{"left":"tile","top":"stretch","right":"tile","bottom":"stretch","center":"none"}
+                }}
+            }""".toByteArray()
+        )
+
+        assertEquals("Leafy UI", manifest.name)
+        assertEquals("output.png", manifest.roles.getValue("output").file)
+        assertEquals(6, manifest.roles.getValue("output").spec.leftPx)
+        assertEquals("none", manifest.roles.getValue("output").spec.centerMode)
+        assertEquals("nearest", manifest.roles.getValue("output").spec.filtering)
+        assertEquals("suggestion_chip.png", FrameManager.uiPackageFileName("suggestions"))
+        assertTrue(FrameManager.isUiPackageZipName("leafy.retui_ui.zip"))
+        assertFalse(FrameManager.isUiPackageZipName("leafy.zip"))
+    }
+
+    @Test fun uiPackageZipRejectsFilesOutsideItsFlatContract() {
+        val zipBytes = ByteArrayOutputStream().also { output ->
+            ZipOutputStream(output).use { zip ->
+                zip.putNextEntry(ZipEntry("nested/manifest.json"))
+                zip.write("{}".toByteArray())
+                zip.closeEntry()
+            }
+        }.toByteArray()
+        val session = FrameManager.EditSession(
+            Files.createTempDirectory("retui-ui-package-zip").toFile(),
+            FrameManager.FrameState(true, mutableMapOf())
+        )
+
+        assertTrue(runCatching {
+            session.importUiPackageZip(ByteArrayInputStream(zipBytes))
+        }.isFailure)
+    }
+
+    @Test fun importedUiPackageIsInstalledWithoutReplacingTheActivePack() {
+        val activeAsset = "a".repeat(64)
+        val importedAsset = "b".repeat(64)
+        val active = FrameManager.FramePack(
+            "c".repeat(64), "Current", false, mapOf(FrameTarget.OUTPUT.id to activeAsset)
+        )
+        val session = FrameManager.EditSession(
+            Files.createTempDirectory("retui-ui-package").toFile(),
+            FrameManager.FrameState(
+                false,
+                mutableMapOf(FrameTarget.OUTPUT.id to activeAsset),
+                mutableMapOf(active.id to active),
+                active.id
+            )
+        )
+
+        val imported = session.installImportedPack(
+            "Imported", mapOf(FrameTarget.BUTTON.id to importedAsset)
+        )
+
+        assertEquals(active.id, session.activePackId())
+        assertEquals(activeAsset, session.selectedAssetId(FrameTarget.OUTPUT))
+        assertEquals(importedAsset, imported.assignments[FrameTarget.BUTTON.id])
     }
 
     @Test fun rawPngDefaultsToAThreeByThreeNearestNeighborFrame() {
@@ -119,6 +194,105 @@ class FrameManagerTest {
         assertEquals("Sprout Lands", replaced.name)
         assertEquals(button, replaced.assignments[FrameTarget.BUTTON.id])
         assertEquals(pack.id, session.activePackId())
+    }
+
+    @Test fun builtInPackIsAddedWithoutChangingTheActiveSetup() {
+        val userAsset = "a".repeat(64)
+        val userPack = FrameManager.FramePack(
+            "b".repeat(64), "User", false, mapOf(FrameTarget.OUTPUT.id to userAsset)
+        )
+        val state = FrameManager.FrameState(
+            false,
+            mutableMapOf(FrameTarget.OUTPUT.id to userAsset),
+            mutableMapOf(userPack.id to userPack),
+            userPack.id
+        )
+        val bundled = mapOf(FrameTarget.BUTTON.id to "c".repeat(64))
+
+        assertTrue(FrameManager.mergeBuiltInPack(state, bundled))
+        assertEquals(userPack.id, state.activePackId)
+        assertEquals(userAsset, state.assignments[FrameTarget.OUTPUT.id])
+        assertEquals(bundled, state.packs[FrameManager.SPROUT_LANDS_PACK_ID]?.assignments)
+        assertFalse(FrameManager.mergeBuiltInPack(state, bundled))
+    }
+
+    @Test fun sproutLandsPackCoversEveryFrameRole() {
+        assertEquals(FrameTarget.entries.toSet(), FrameManager.sproutLandsTargets())
+    }
+
+    @Test fun activeBuiltInPackTracksBundledUpdates() {
+        val oldAsset = "a".repeat(64)
+        val nextAsset = "b".repeat(64)
+        val oldPack = FrameManager.FramePack(
+            FrameManager.SPROUT_LANDS_PACK_ID,
+            "Old bundled pack",
+            false,
+            mapOf(FrameTarget.BUTTON.id to oldAsset)
+        )
+        val state = FrameManager.FrameState(
+            false,
+            mutableMapOf(FrameTarget.BUTTON.id to oldAsset),
+            mutableMapOf(oldPack.id to oldPack),
+            oldPack.id
+        )
+
+        assertTrue(FrameManager.mergeBuiltInPack(state, mapOf(FrameTarget.BUTTON.id to nextAsset)))
+        assertEquals(nextAsset, state.assignments[FrameTarget.BUTTON.id])
+        assertEquals(FrameManager.SPROUT_LANDS_PACK_ID, state.activePackId)
+    }
+
+    @Test fun builtInPackCannotBeSavedOverOrDeleted() {
+        val asset = "a".repeat(64)
+        val pack = FrameManager.FramePack(
+            FrameManager.SPROUT_LANDS_PACK_ID,
+            "Sprout Lands — Art by Cup Nooble",
+            false,
+            mapOf(FrameTarget.BUTTON.id to asset)
+        )
+        val session = FrameManager.EditSession(
+            Files.createTempDirectory("retui-built-in-pack").toFile(),
+            FrameManager.FrameState(
+                false,
+                mutableMapOf(FrameTarget.BUTTON.id to asset),
+                mutableMapOf(pack.id to pack),
+                pack.id
+            )
+        )
+
+        assertNull(session.currentPackId())
+        assertTrue(runCatching { session.replacePack(pack.id) }.isFailure)
+        assertTrue(runCatching { session.deletePack(pack.id) }.isFailure)
+    }
+
+    @Test fun exportsKeepUserAssetsButExcludeBundledArtwork() {
+        val bundled = "a".repeat(64)
+        val user = "b".repeat(64)
+        val pack = FrameManager.FramePack(
+            FrameManager.SPROUT_LANDS_PACK_ID,
+            "Sprout Lands — Art by Cup Nooble",
+            false,
+            mapOf(FrameTarget.BUTTON.id to bundled)
+        )
+        val state = FrameManager.FrameState(
+            false,
+            mutableMapOf(FrameTarget.BUTTON.id to bundled, FrameTarget.OUTPUT.id to user),
+            mutableMapOf(pack.id to pack),
+            pack.id
+        )
+
+        assertEquals(setOf(user), FrameManager.exportableAssetIds(state))
+    }
+
+    @Test fun personalBackupCanIdentifyBundledArtworkAtAnyDepth() {
+        val bundled = "a".repeat(64)
+        val root = frameStateRoot(
+            """{"schema":4,"applyToAll":true,"assignments":{},"packs":{"${FrameManager.SPROUT_LANDS_PACK_ID}":{"name":"Sprout Lands — Art by Cup Nooble","applyToAll":false,"assignments":{"button":"$bundled"}}},"activePackId":null}"""
+        )
+
+        assertEquals(
+            setOf("library-$bundled.retui-frame"),
+            FrameManager.bundledAssetFileNames(root)
+        )
     }
 
     @Test fun packNamesAreValidatedAndUniqueIgnoringCase() {

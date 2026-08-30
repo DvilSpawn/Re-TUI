@@ -26,6 +26,9 @@ class RamManager(
     private var ramPatterns: MutableList<Pattern>? = null
     private var ramFormat: String? = null
     private var color = 0
+    private var compactValue = ""
+
+    fun compactValue(): String = compactValue
 
     private val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
     private val memory = ActivityManager.MemoryInfo()
@@ -59,6 +62,10 @@ class RamManager(
 
         val available = SystemUtils.freeRam(activityManager, memory)
         val total = SystemUtils.totalRam() * 1024L.toDouble()
+        compactValue = UIManager.compactUnifiedCapacity(
+            SystemUtils.formatSize(available.toLong(), SystemUtils.GIGA),
+            SystemUtils.formatSize(total.toLong(), SystemUtils.GIGA)
+        )
 
         copy = patterns[0].matcher(copy).replaceAll(Matcher.quoteReplacement(SystemUtils.formatSize(available.toLong(), SystemUtils.TERA).toString()))
         copy = patterns[1].matcher(copy).replaceAll(Matcher.quoteReplacement(SystemUtils.formatSize(available.toLong(), SystemUtils.GIGA).toString()))

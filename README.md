@@ -12,6 +12,9 @@ Re:TUI supports Android 6.0 and newer and targets current Android APIs.
 
 > **First-install note:** If background transparency does not take effect immediately, type `restart` and press Enter.
 
+New users can follow the illustrated [Getting Started guide](docs/GETTING_STARTED.md)
+for the Basic and Advanced startup choices.
+
 ### ⌨️ Commands and Launcher Tools
 *   **`username [user] [device]`**: Instantly customize your terminal prompt. Changes both the username and device name and reloads the UI to apply.
 *   **`preset`**: Save, apply, list, and remove appearance presets with `preset -save`, `preset -apply`, `preset -ls`, and `preset -rm`. The same controls are available from **Settings → Appearance → Presets**.
@@ -21,7 +24,7 @@ Re:TUI supports Android 6.0 and newer and targets current Android APIs.
     *   **Suggestions:** Provides history-based autocomplete for `webhook [name]` arguments.
 *   **`post [url] [body]`**: Send raw HTTP POST requests directly from the terminal.
 *   **`module`**: Native, Lua, and Termux-backed modules are the recommended way to add launcher panels and scripted workflows.
-*   **`guide`**: A non-blocking command-first walkthrough that uses terminal output and the existing suggestion row instead of a first-run modal.
+*   **`guide`**: A non-blocking command-first walkthrough. Use `guide -startup-test` to preview the first-run startup pane without changing the current configuration.
 *   **`space`**: Create, duplicate, rename, save, list, switch, and remove launcher Spaces, each with its own snapshot of launcher settings, module state, and command-facing configuration.
 *   **`reminder`**: Open the reminder pane or manage reminders directly from the terminal.
     *   `reminder -add <task name> <dd/mm/yy> <HH:mm>` creates one using 24-hour time.

@@ -1,7 +1,6 @@
 package ohi.andre.consolelauncher.managers.suggestions
 
 import android.app.Activity
-import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
@@ -44,6 +43,7 @@ class SuggestionRunnable(
     parent: HorizontalScrollView?,
     spaces: IntArray
 ) : Runnable {
+    private val chipStyler = SuggestionChipStyler(pack)
     private val suggestionViewParams: LinearLayout.LayoutParams?
 
     private val scrollView: HorizontalScrollView?
@@ -62,51 +62,9 @@ class SuggestionRunnable(
 
     private var interrupted = false
 
-    var pack: MainPack
-
-    private var transparentSuggestions: Boolean
-    private var suggAppBg = 0
-    private var suggAliasBg = 0
-    private var suggCmdBg = 0
-    private var suggContactBg = 0
-    private var suggFileBg = 0
-    private var suggSongBg = 0
-    private var suggDefaultBg = 0
-    private val suggAppText: Int
-    private val suggAliasText: Int
-    private val suggCmdText: Int
-    private val suggContactText: Int
-    private val suggFileText: Int
-    private val suggSongText: Int
-    private val suggDefaultText: Int
-
-    private val spaces: IntArray?
-
     init {
         this.suggestionViewParams = suggestionViewParams
         this.scrollView = parent
-        this.pack = pack
-
-        transparentSuggestions = XMLPrefsManager.getBoolean(Suggestions.transparent_suggestions)
-        if (!transparentSuggestions) {
-            suggAppBg = XMLPrefsManager.getColor(Suggestions.apps_background_color)
-            suggAliasBg = XMLPrefsManager.getColor(Suggestions.alias_background_color)
-            suggCmdBg = XMLPrefsManager.getColor(Suggestions.cmd_background_color)
-            suggContactBg = XMLPrefsManager.getColor(Suggestions.contact_background_color)
-            suggFileBg = XMLPrefsManager.getColor(Suggestions.file_background_color)
-            suggSongBg = XMLPrefsManager.getColor(Suggestions.song_background_color)
-            suggDefaultBg = XMLPrefsManager.getColor(Suggestions.default_background_color)
-        }
-
-        suggAppText = XMLPrefsManager.getColor(Suggestions.apps_text_color)
-        suggAliasText = XMLPrefsManager.getColor(Suggestions.alias_text_color)
-        suggCmdText = XMLPrefsManager.getColor(Suggestions.cmd_text_color)
-        suggContactText = XMLPrefsManager.getColor(Suggestions.contact_text_color)
-        suggDefaultText = XMLPrefsManager.getColor(Suggestions.default_text_color)
-        suggFileText = XMLPrefsManager.getColor(Suggestions.file_text_color)
-        suggSongText = XMLPrefsManager.getColor(Suggestions.song_text_color)
-
-        this.spaces = spaces
 
         suggestionViewParams.setMargins(spaces[0], spaces[1], spaces[0], spaces[1])
 
@@ -172,37 +130,7 @@ class SuggestionRunnable(
 
                 sggView.setText(text)
 
-                //                bg and fore
-                var bgColor = Int.Companion.MAX_VALUE
-                var foreColor = Int.Companion.MAX_VALUE
-
-                if (s.type == SuggestionsManager.Suggestion.TYPE_APP || s.type == SuggestionsManager.Suggestion.TYPE_APPGP) {
-                    var o = s.`object`
-                    if (o != null && o is LaunchInfo) {
-                        val i = o
-
-                        for (g in pack.appsManager.groups) {
-                            if (g.contains(i)) {
-                                o = g
-                                break
-                            }
-                        }
-                    }
-
-                    if (o != null && o is AppsManager.Group) {
-                        bgColor = o.bgColor
-                        foreColor = o.foreColor
-                    }
-                }
-
-                if (bgColor != Int.Companion.MAX_VALUE) sggView.setBackgroundDrawable(
-                    getSuggestionColorBg(pack.context, bgColor)
-                )
-                else sggView.setBackgroundDrawable(getSuggestionBg(pack.context, s.type))
-                if (foreColor != Int.Companion.MAX_VALUE) sggView.setTextColor(foreColor)
-                else sggView.setTextColor(getSuggestionTextColor(s.type))
-
-                //                end bg and fore
+                chipStyler.apply(sggView, s.type, s.`object`)
                 if (s.type == SuggestionsManager.Suggestion.TYPE_CONTACT) {
                     sggView.setLongClickable(true)
                     (sggView.getContext() as Activity).registerForContextMenu(sggView)
@@ -247,49 +175,63 @@ class SuggestionRunnable(
         interrupted = false
     }
 
-    fun getSuggestionBg(context: Context, type: Int): Drawable {
+}
+
+internal class SuggestionChipStyler(private val pack: MainPack) {
+    private val transparentSuggestions = XMLPrefsManager.getBoolean(Suggestions.transparent_suggestions)
+    private val suggAppBg = XMLPrefsManager.getColor(Suggestions.apps_background_color)
+    private val suggAliasBg = XMLPrefsManager.getColor(Suggestions.alias_background_color)
+    private val suggCmdBg = XMLPrefsManager.getColor(Suggestions.cmd_background_color)
+    private val suggContactBg = XMLPrefsManager.getColor(Suggestions.contact_background_color)
+    private val suggFileBg = XMLPrefsManager.getColor(Suggestions.file_background_color)
+    private val suggSongBg = XMLPrefsManager.getColor(Suggestions.song_background_color)
+    private val suggDefaultBg = XMLPrefsManager.getColor(Suggestions.default_background_color)
+    private val suggAppText = XMLPrefsManager.getColor(Suggestions.apps_text_color)
+    private val suggAliasText = XMLPrefsManager.getColor(Suggestions.alias_text_color)
+    private val suggCmdText = XMLPrefsManager.getColor(Suggestions.cmd_text_color)
+    private val suggContactText = XMLPrefsManager.getColor(Suggestions.contact_text_color)
+    private val suggFileText = XMLPrefsManager.getColor(Suggestions.file_text_color)
+    private val suggSongText = XMLPrefsManager.getColor(Suggestions.song_text_color)
+    private val suggDefaultText = XMLPrefsManager.getColor(Suggestions.default_text_color)
+
+    fun apply(view: TextView, type: Int, payload: Any?) {
+        var bgColor = Int.MAX_VALUE
+        var textColor = Int.MAX_VALUE
+        var styledPayload = payload
+        if (type == SuggestionsManager.Suggestion.TYPE_APP || type == SuggestionsManager.Suggestion.TYPE_APPGP) {
+            if (styledPayload is LaunchInfo) {
+                styledPayload = pack.appsManager.groups.firstOrNull { it.contains(styledPayload) } ?: styledPayload
+            }
+            if (styledPayload is AppsManager.Group) {
+                bgColor = styledPayload.bgColor
+                textColor = styledPayload.foreColor
+            }
+        }
+        view.background = if (bgColor == Int.MAX_VALUE) suggestionBg(type) else suggestionColorBg(bgColor)
+        view.setTextColor(if (textColor == Int.MAX_VALUE) suggestionTextColor(type) else textColor)
+    }
+
+    private fun suggestionBg(type: Int): Drawable {
         if (transparentSuggestions) {
             return ColorDrawable(Color.TRANSPARENT)
         } else {
             when (type) {
-                SuggestionsManager.Suggestion.TYPE_APP, SuggestionsManager.Suggestion.TYPE_APPGP -> return getSuggestionColorBg(
-                    context,
-                    suggAppBg
-                )
-
-                SuggestionsManager.Suggestion.TYPE_ALIAS -> return getSuggestionColorBg(
-                    context,
-                    suggAliasBg
-                )
-
-                SuggestionsManager.Suggestion.TYPE_COMMAND, SuggestionsManager.Suggestion.TYPE_MODULE -> return getSuggestionColorBg(
-                    context,
-                    suggCmdBg
-                )
-
-                SuggestionsManager.Suggestion.TYPE_CONTACT, SuggestionsManager.Suggestion.TYPE_CONTACT_ROOT -> return getSuggestionColorBg(
-                    context,
-                    suggContactBg
-                )
+                SuggestionsManager.Suggestion.TYPE_APP, SuggestionsManager.Suggestion.TYPE_APPGP -> return suggestionColorBg(suggAppBg)
+                SuggestionsManager.Suggestion.TYPE_ALIAS -> return suggestionColorBg(suggAliasBg)
+                SuggestionsManager.Suggestion.TYPE_COMMAND, SuggestionsManager.Suggestion.TYPE_MODULE -> return suggestionColorBg(suggCmdBg)
+                SuggestionsManager.Suggestion.TYPE_CONTACT, SuggestionsManager.Suggestion.TYPE_CONTACT_ROOT -> return suggestionColorBg(suggContactBg)
 
                 SuggestionsManager.Suggestion.TYPE_FILE,
                 SuggestionsManager.Suggestion.TYPE_CONFIGFILE,
-                SuggestionsManager.Suggestion.TYPE_FILE_ACTION -> return getSuggestionColorBg(
-                    context,
-                    suggFileBg
-                )
-
-                SuggestionsManager.Suggestion.TYPE_SONG -> return getSuggestionColorBg(
-                    context,
-                    suggSongBg
-                )
-
-                else -> return getSuggestionColorBg(context, suggDefaultBg)
+                SuggestionsManager.Suggestion.TYPE_FILE_ACTION -> return suggestionColorBg(suggFileBg)
+                SuggestionsManager.Suggestion.TYPE_SONG -> return suggestionColorBg(suggSongBg)
+                else -> return suggestionColorBg(suggDefaultBg)
             }
         }
     }
 
-    private fun getSuggestionColorBg(context: Context, color: Int): Drawable {
+    private fun suggestionColorBg(color: Int): Drawable {
+        val context = pack.context
         if (AppearanceSettings.cyberdeckMode() || TerminalBorderRuntime.customFrameActive(context, FrameTarget.SUGGESTIONS)) {
             return TerminalBorderRuntime.panelDrawable(
                 context,
@@ -309,7 +251,7 @@ class SuggestionRunnable(
         return bg
     }
 
-    fun getSuggestionTextColor(type: Int): Int {
+    fun suggestionTextColor(type: Int): Int {
         var chosen: Int
 
         when (type) {

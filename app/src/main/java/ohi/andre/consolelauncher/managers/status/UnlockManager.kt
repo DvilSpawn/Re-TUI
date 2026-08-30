@@ -100,6 +100,8 @@ class UnlockManager(
         invalidateUnlockText()
     }
 
+    fun count(): Int = unlockTimes
+
     private fun registerLockReceiver() {
         if (lockReceiver != null) return
         val theFilter = IntentFilter()

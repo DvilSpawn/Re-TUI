@@ -272,7 +272,7 @@ enum class Ui : XMLPrefsSave {
     },
     system_wallpaper {
         override fun defaultValue(): String? {
-            return "false"
+            return "true"
         }
 
         override fun type(): String? {

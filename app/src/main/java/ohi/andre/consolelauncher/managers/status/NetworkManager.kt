@@ -62,6 +62,12 @@ class NetworkManager(
     private var format: String? = null
     private var optionalValueSeparator: String? = null
     private var color = 0
+    private var compactConnection = ""
+    private var compactConnectionUsesWifi = false
+
+    fun compactConnection(): String = compactConnection
+
+    fun compactConnectionUsesWifi(): Boolean = compactConnectionUsesWifi
 
     private val wifiManager: WifiManager
     private val mBluetoothAdapter: BluetoothAdapter?
@@ -131,6 +137,16 @@ class NetworkManager(
             mobileType = Tuils.getNetworkType(context)
         } else {
             mobileType = "unknown"
+        }
+
+        val activeNetwork = connectivityManager.activeNetworkInfo
+        compactConnectionUsesWifi = activeNetwork?.isConnected == true &&
+            activeNetwork.type == ConnectivityManager.TYPE_WIFI
+        compactConnection = when {
+            compactConnectionUsesWifi -> wifiName ?: "WiFi"
+            activeNetwork?.isConnected == true && activeNetwork.type == ConnectivityManager.TYPE_MOBILE ->
+                if (mobileType == "unknown") "Mobile data" else "Mobile data $mobileType"
+            else -> ""
         }
 
         val bluetoothOn = mBluetoothAdapter != null && mBluetoothAdapter.isEnabled()

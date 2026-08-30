@@ -245,7 +245,7 @@ class search : ParamCommand() {
                 )
             }
 
-            return open(provider, query, c)
+            return openProvider(provider, query, c)
         }
 
         private fun open(
@@ -253,10 +253,10 @@ class search : ParamCommand() {
             query: String?,
             pack: ExecutePack
         ): String {
-            return open(provider, query, pack.context)
+            return openProvider(provider, query, pack.context)
         }
 
-        private fun open(
+        internal fun openProvider(
             provider: SearchProviderManager.Provider,
             query: String?,
             context: Context

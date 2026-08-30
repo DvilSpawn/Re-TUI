@@ -138,6 +138,13 @@ object LauncherSettings {
     }
 
     @JvmStatic
+    fun enableWallpaperAuto(context: Context? = null) {
+        set(context, Ui.system_wallpaper, "true")
+        set(context, Theme.wallpaper_overlay_color, "#00000000")
+        set(context, Ui.auto_color_pick, "true")
+    }
+
+    @JvmStatic
     fun getEffective(value: XMLPrefsSave): String? {
         if (getBoolean(Ui.auto_color_pick)) {
             val color = AutoColorManager.getAutoColor(value, NO_AUTO_COLOR)

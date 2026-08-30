@@ -194,6 +194,9 @@ def isAllowedAsset = { File assetsDir, File sourceFile ->
             || (relativeAssetPath.startsWith("first_run_terminal_green/")
             && !relativeAssetPath.substring("first_run_terminal_green/".length()).contains("/")
             && relativeAssetPath.endsWith(".xml"))
+            || (relativeAssetPath.startsWith("frame_packs/sprout_lands/")
+            && !relativeAssetPath.substring("frame_packs/sprout_lands/".length()).contains("/")
+            && (relativeAssetPath.endsWith(".png") || relativeAssetPath.endsWith(".xml")))
 }
 
 def validateSourceTree = { File sourceDir, String kind, List<String> errors ->

@@ -9,7 +9,7 @@ enum class SurfaceBorderOption(
     private val kind: String,
     private val description: String
 ) : XMLPrefsSave {
-    unified_status_border("false", XMLPrefsSave.BOOLEAN, "Draw one frame around the full status area instead of framing each status row"),
+    unified_status_border("false", XMLPrefsSave.BOOLEAN, "Use one bottom console for output, status, modules, input, toolbar, and suggestions"),
     ram_border_enabled("true", XMLPrefsSave.BOOLEAN, "Show the RAM surface border"),
     ram_border_color("auto", XMLPrefsSave.AUTO_COLOR, "RAM border color; AUTO inherits the active accent"),
     device_border_enabled("true", XMLPrefsSave.BOOLEAN, "Show the device surface border"),

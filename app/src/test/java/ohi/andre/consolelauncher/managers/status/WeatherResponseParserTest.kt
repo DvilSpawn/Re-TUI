@@ -21,6 +21,10 @@ class WeatherResponseParserTest {
         assertEquals("29.7", snapshot.values["temp"])
         assertEquals("79.6", snapshot.values["humidity"])
         assertEquals("partlycloudy_night", snapshot.symbolCode)
+        assertEquals(
+            "29.7°C · 79.6% · 4.9 m/s",
+            WeatherResponseParser.compactDetails(snapshot.values, "metric")
+        )
         assertTrue(WeatherResponseParser.ascii(snapshot.symbolCode).contains(".-."))
     }
 

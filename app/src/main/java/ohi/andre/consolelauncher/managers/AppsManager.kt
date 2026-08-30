@@ -693,6 +693,26 @@ class AppsManager(context: Context) : XMLPrefsElement {
             return false
         }
 
+        if (!info.currentProfile) {
+            try {
+                val launcherApps =
+                    launchContext.getSystemService(Context.LAUNCHER_APPS_SERVICE) as LauncherApps?
+                if (launcherApps == null) return false
+                launcherApps.startMainActivity(info.componentName, info.userHandle, null, null)
+            } catch (e: Throwable) {
+                Tuils.log(e)
+                return false
+            }
+        } else {
+            val packageName = info.componentName?.packageName ?: return false
+            val launchedIntent = firstLaunchable(
+                getIntent(info),
+                launchContext.packageManager.getLaunchIntentForPackage(packageName),
+                { first, second -> first.component == second.component }
+            ) { intent -> startActivitySafely { launchContext.startActivity(intent) } } ?: return false
+            launchedIntent.component?.let { info.componentName = it }
+        }
+
         info.launchedTimes++
         object : StoppableThread() {
             override fun run() {
@@ -702,26 +722,7 @@ class AppsManager(context: Context) : XMLPrefsElement {
                 writeLaunchTimes(info)
             }
         }.start()
-
-        if (!info.currentProfile) {
-            try {
-                val launcherApps =
-                    launchContext.getSystemService(Context.LAUNCHER_APPS_SERVICE) as LauncherApps?
-                if (launcherApps != null) {
-                    launcherApps.startMainActivity(info.componentName, info.userHandle, null, null)
-                    return true
-                }
-            } catch (e: Throwable) {
-                Tuils.log(e)
-                return false
-            }
-        }
-
-        val intent = getIntent(info)
-        if (intent == null) {
-            return false
-        }
-        return startActivitySafely { launchContext.startActivity(intent) }
+        return true
     }
 
     fun getIntent(info: LaunchInfo?): Intent? {
@@ -1825,6 +1826,17 @@ class AppsManager(context: Context) : XMLPrefsElement {
             false
         } catch (_: Throwable) {
             false
+        }
+
+        internal fun <T> firstLaunchable(
+            primary: T?,
+            fallback: T?,
+            same: (T, T) -> Boolean,
+            launch: (T) -> Boolean
+        ): T? {
+            if (primary != null && launch(primary)) return primary
+            if (fallback != null && (primary == null || !same(primary, fallback)) && launch(fallback)) return fallback
+            return null
         }
 
         const val SHOWN_APPS: Int = 10

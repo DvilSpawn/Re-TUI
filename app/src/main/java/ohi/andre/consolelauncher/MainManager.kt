@@ -435,12 +435,11 @@ class MainManager(private val mContext: LauncherActivity) {
     }
 
     fun performLaunch(mainPack: MainPack, i: LaunchInfo, input: String?): Boolean {
-        val intent = appsManager.getIntent(i)
-        if (intent == null) {
-            return false
-        }
+        val launched = appsManager.launch(mainPack.context, i)
+        if (!launched) return false
 
         if (showAppHistory) {
+            val intent = appsManager.getIntent(i)!!
             appFormat = XMLPrefsManager.get(Behavior.app_launch_format)
             outputColor = XMLPrefsManager.getColor(Theme.output_text_color)
 
@@ -478,9 +477,8 @@ class MainManager(private val mContext: LauncherActivity) {
             Tuils.sendOutput(mainPack, text, TerminalManager.CATEGORY_NO_COLOR)
         }
 
-        val launched = appsManager.launch(mainPack.context, i)
-        if (launched) LauncherSoundManager.play(mContext, LauncherSoundManager.Event.SUCCESS)
-        return launched
+        LauncherSoundManager.play(mContext, LauncherSoundManager.Event.SUCCESS)
+        return true
     }
 
     //

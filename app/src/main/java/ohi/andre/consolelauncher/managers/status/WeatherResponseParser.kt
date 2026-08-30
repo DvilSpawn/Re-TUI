@@ -46,6 +46,20 @@ internal object WeatherResponseParser {
         return latitude to longitude
     }
 
+    fun compactDetails(values: Map<String, String>, measure: String): String {
+        val temperatureUnit = when (measure) {
+            "imperial" -> "°F"
+            "standard" -> " K"
+            else -> "°C"
+        }
+        val windUnit = if (measure == "imperial") " mph" else " m/s"
+        return listOfNotNull(
+            values["temp"]?.let { "$it$temperatureUnit" },
+            values["humidity"]?.let { "$it%" },
+            values["speed"]?.let { "$it$windUnit" }
+        ).joinToString(" · ")
+    }
+
     fun ascii(symbolCode: String?): String {
         val symbol = symbolCode.orEmpty()
         return when {

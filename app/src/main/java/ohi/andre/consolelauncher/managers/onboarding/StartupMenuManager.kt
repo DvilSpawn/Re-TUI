@@ -29,11 +29,11 @@ import ohi.andre.consolelauncher.managers.tasker.TaskerIntegrationManager
 import ohi.andre.consolelauncher.managers.termux.TermuxBridgeManager
 import ohi.andre.consolelauncher.managers.xml.options.Behavior
 import ohi.andre.consolelauncher.managers.xml.options.Notifications
+import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.managers.xml.options.Ui
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi.applyFullscreen
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi.requestNoTitleIfFullscreen
 import ohi.andre.consolelauncher.tuils.Tuils
-import ohi.andre.consolelauncher.tuils.interfaces.Reloadable
 
 object StartupMenuManager {
     private const val PREFS = "retui_startup"
@@ -41,9 +41,19 @@ object StartupMenuManager {
     private const val KEY_COMPLETE = "complete"
     private const val KEY_DRY_RUN = "dry_run"
     private const val KEY_MENU_VERSION = "menu_version"
-    private const val KEY_VISUAL = "visual"
+    private const val KEY_LEVEL = "level"
+    private const val KEY_AUTO_THEME = "auto_theme"
+    private const val KEY_BORDER = "border"
+    private const val KEY_CYBERDECK = "cyberdeck"
+    private const val KEY_CRT = "crt"
     private const val CHOICE_PREFIX = "choice_"
-    private const val MENU_VERSION = 2
+    private const val MENU_VERSION = 3
+
+    const val BASIC = "basic"
+    const val ADVANCED = "advanced"
+    const val BORDER_DASHED = "dashed"
+    const val BORDER_SOLID = "solid"
+    const val BORDER_NONE = "none"
 
     const val APP_DRAWER = "app_drawer"
     const val MODULE_DOCK = "module_dock"
@@ -79,7 +89,11 @@ object StartupMenuManager {
 
     fun isActive(context: Context): Boolean = prefs(context).getBoolean(KEY_ACTIVE, false)
     fun isDryRun(context: Context): Boolean = prefs(context).getBoolean(KEY_DRY_RUN, false)
-    fun visual(context: Context): String = prefs(context).getString(KEY_VISUAL, "classic") ?: "classic"
+    fun level(context: Context): String = prefs(context).getString(KEY_LEVEL, BASIC) ?: BASIC
+    fun autoTheme(context: Context): Boolean = prefs(context).getBoolean(KEY_AUTO_THEME, true)
+    fun border(context: Context): String = prefs(context).getString(KEY_BORDER, BORDER_SOLID) ?: BORDER_SOLID
+    fun cyberdeck(context: Context): Boolean = prefs(context).getBoolean(KEY_CYBERDECK, false)
+    fun crt(context: Context): Boolean = prefs(context).getBoolean(KEY_CRT, false)
 
     fun isFirstInstallPending(context: Context): Boolean {
         val preferences = prefs(context)
@@ -129,12 +143,26 @@ object StartupMenuManager {
         preferences.edit().putBoolean(choiceKey(id), !preferences.getBoolean(choiceKey(id), false)).apply()
     }
 
-    fun setVisual(context: Context, value: String) {
-        if (value in setOf("classic", "cyberdeck", "crt")) prefs(context).edit().putString(KEY_VISUAL, value).apply()
+    fun setLevel(context: Context, value: String) {
+        if (value == BASIC || value == ADVANCED) prefs(context).edit().putString(KEY_LEVEL, value).apply()
     }
 
-    fun resetClassic(context: Context) {
-        seedClassic(context)
+    fun toggleAutoTheme(context: Context) {
+        prefs(context).edit().putBoolean(KEY_AUTO_THEME, !autoTheme(context)).apply()
+    }
+
+    fun setBorder(context: Context, value: String) {
+        if (value in setOf(BORDER_DASHED, BORDER_SOLID, BORDER_NONE)) {
+            prefs(context).edit().putString(KEY_BORDER, value).apply()
+        }
+    }
+
+    fun toggleCyberdeck(context: Context) {
+        prefs(context).edit().putBoolean(KEY_CYBERDECK, !cyberdeck(context)).apply()
+    }
+
+    fun toggleCrt(context: Context) {
+        prefs(context).edit().putBoolean(KEY_CRT, !crt(context)).apply()
     }
 
     fun finish(context: Context): ActionResult {
@@ -146,8 +174,8 @@ object StartupMenuManager {
         applyChoices(context)
         prefs(context).edit().putBoolean(KEY_ACTIVE, false).putBoolean(KEY_COMPLETE, true).apply()
         val followUp = mutableListOf<String>()
-        if (enabled(context, TERMUX)) followUp.add("Termux: run tbridge -setup, then tbridge -status.")
-        if (enabled(context, TASKER)) followUp.add("Tasker: allow external access in Tasker if prompted.")
+        if (level(context) == ADVANCED && enabled(context, TERMUX)) followUp.add("Termux: run tbridge -setup, then tbridge -status.")
+        if (level(context) == ADVANCED && enabled(context, TASKER)) followUp.add("Tasker: allow external access in Tasker if prompted.")
         return ActionResult(
             buildString {
                 append("Startup setup applied.")
@@ -166,11 +194,17 @@ object StartupMenuManager {
         )
     }
 
-    internal fun visualFlags(value: String): Pair<Boolean, Boolean> = when (value) {
-        "cyberdeck" -> true to false
-        "crt" -> true to true
-        else -> false to false
+    internal fun borderValues(value: String): Pair<Boolean, Int> = when (value) {
+        BORDER_DASHED -> true to 4
+        BORDER_NONE -> false to 4
+        else -> true to 0
     }
+
+    internal fun selectedFeature(level: String, id: String, enabled: Boolean): Boolean =
+        if (level == ADVANCED) enabled else id == STATUS || id == LOCK
+
+    internal fun effectValues(level: String, cyberdeck: Boolean, crt: Boolean): Pair<Boolean, Boolean> =
+        if (level == ADVANCED) cyberdeck to crt else false to false
 
     private fun start(context: Context, dryRun: Boolean) {
         prefs(context).edit()
@@ -185,7 +219,11 @@ object StartupMenuManager {
         ids.forEach { editor.putBoolean(choiceKey(it), false) }
         editor.putBoolean(choiceKey(STATUS), true)
         editor.putBoolean(choiceKey(LOCK), true)
-        editor.putString(KEY_VISUAL, "classic")
+        editor.putString(KEY_LEVEL, BASIC)
+        editor.putBoolean(KEY_AUTO_THEME, true)
+        editor.putString(KEY_BORDER, BORDER_SOLID)
+        editor.putBoolean(KEY_CYBERDECK, false)
+        editor.putBoolean(KEY_CRT, false)
         editor.putInt(KEY_MENU_VERSION, MENU_VERSION)
         editor.apply()
     }
@@ -197,22 +235,34 @@ object StartupMenuManager {
     }
 
     private fun applyChoices(context: Context) {
-        LauncherSettings.set(context, Behavior.swipe_up_apps_drawer, enabled(context, APP_DRAWER).toString())
-        LauncherSettings.set(context, Behavior.show_module_dock, enabled(context, MODULE_DOCK).toString())
-        LauncherSettings.set(context, Behavior.show_android_widget_drawer_button, enabled(context, WIDGETS).toString())
-        val notifications = enabled(context, NOTIFICATIONS).toString()
+        fun selected(id: String): Boolean = selectedFeature(level(context), id, enabled(context, id))
+
+        LauncherSettings.set(context, Behavior.swipe_up_apps_drawer, selected(APP_DRAWER).toString())
+        LauncherSettings.set(context, Behavior.show_module_dock, selected(MODULE_DOCK).toString())
+        LauncherSettings.set(context, Behavior.show_android_widget_drawer_button, selected(WIDGETS).toString())
+        val notifications = selected(NOTIFICATIONS).toString()
         LauncherSettings.set(context, Notifications.show_notifications, notifications)
         LauncherSettings.set(context, Notifications.terminal_notifications, notifications)
-        val status = enabled(context, STATUS).toString()
+        val status = selected(STATUS).toString()
         LauncherSettings.set(context, Ui.show_weather, status)
         LauncherSettings.set(context, Ui.show_unlock_counter, status)
-        LauncherSettings.set(context, Behavior.double_tap_lock, enabled(context, LOCK).toString())
-        LauncherSettings.set(context, Behavior.show_tmux_workspace_button, enabled(context, TERMUX).toString())
-        TaskerIntegrationManager.setEnabled(context, enabled(context, TASKER))
-        LauncherSettings.set(context, Behavior.launcher_sounds, enabled(context, SOUNDS).toString())
-        val flags = visualFlags(visual(context))
-        LauncherSettings.set(context, Behavior.enable_cyberdeck_mode, flags.first.toString())
-        LauncherSettings.set(context, Behavior.enable_crt_filter, flags.second.toString())
+        LauncherSettings.set(context, Behavior.double_tap_lock, selected(LOCK).toString())
+        LauncherSettings.set(context, Behavior.show_tmux_workspace_button, selected(TERMUX).toString())
+        TaskerIntegrationManager.setEnabled(context, selected(TASKER))
+        LauncherSettings.set(context, Behavior.launcher_sounds, selected(SOUNDS).toString())
+        val effects = effectValues(level(context), cyberdeck(context), crt(context))
+        LauncherSettings.set(context, Behavior.enable_cyberdeck_mode, effects.first.toString())
+        LauncherSettings.set(context, Behavior.enable_crt_filter, effects.second.toString())
+
+        val border = borderValues(border(context))
+        LauncherSettings.set(context, Ui.enable_dashed_border, border.first.toString())
+        LauncherSettings.set(context, Ui.dashed_border_gap_length, border.second.toString())
+        if (autoTheme(context)) {
+            LauncherSettings.enableWallpaperAuto(context)
+        } else {
+            LauncherSettings.set(context, Ui.auto_color_pick, "false")
+            LauncherSettings.set(context, Theme.wallpaper_overlay_color, "#00000000")
+        }
     }
 
     private fun toggle(context: Context, id: String, label: String, description: String): Toggle =
@@ -282,21 +332,37 @@ class StartupMenuActivity : Activity() {
             leftMargin = dp(this@StartupMenuActivity, 30f)
         })
 
-        panel.addView(terminalText("Choose what you want", 21f).apply { setTypeface(typeface, Typeface.BOLD) }, blockParams(6f))
+        panel.addView(terminalText("Set up your launcher", 21f).apply { setTypeface(typeface, Typeface.BOLD) }, blockParams(6f))
         panel.addView(terminalText(
             if (StartupMenuManager.isDryRun(this)) "Preview only — changing switches here will not alter your launcher."
-            else "Review the switches, choose a visual style, then apply once.",
+            else "Choose a setup level, review it here, then apply once.",
             13f
         ), blockParams(10f))
 
-        val defaults = button("CLASSIC DEFAULTS", false)
-        defaults.setOnClickListener { StartupMenuManager.resetClassic(this); render() }
-        panel.addView(defaults, blockParams(10f))
-
         val list = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
-        StartupMenuManager.toggles(this).forEach { list.addView(toggleRow(it), blockParams(8f)) }
-        list.addView(terminalText("VISUAL STYLE", 13f).apply { setTypeface(typeface, Typeface.BOLD) }, blockParams(6f))
-        list.addView(visualStyleRow(), blockParams(4f))
+        list.addView(levelRow(), blockParams(10f))
+        list.addView(
+            choiceToggleRow(
+                "Auto-theme",
+                "Derive launcher colors from the system wallpaper.",
+                StartupMenuManager.autoTheme(this)
+            ) { StartupMenuManager.toggleAutoTheme(this); render() },
+            blockParams(8f)
+        )
+        list.addView(terminalText("BORDER", 13f).apply { setTypeface(typeface, Typeface.BOLD) }, blockParams(6f))
+        list.addView(borderRow(), blockParams(10f))
+
+        if (StartupMenuManager.level(this) == StartupMenuManager.ADVANCED) {
+            list.addView(terminalText("FEATURES", 13f).apply { setTypeface(typeface, Typeface.BOLD) }, blockParams(6f))
+            StartupMenuManager.toggles(this).forEach { list.addView(toggleRow(it), blockParams(8f)) }
+            list.addView(terminalText("VISUAL EFFECTS", 13f).apply { setTypeface(typeface, Typeface.BOLD) }, blockParams(6f))
+            list.addView(visualEffects(), blockParams(4f))
+        } else {
+            list.addView(terminalText(
+                "Basic keeps status extras and double-tap lock on. Optional drawers and integrations stay off.",
+                12f
+            ), blockParams(8f))
+        }
         panel.addView(ScrollView(this).apply { addView(list) }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f))
 
         val controls = LinearLayout(this).apply {
@@ -316,30 +382,37 @@ class StartupMenuActivity : Activity() {
     }
 
     private fun toggleRow(toggle: StartupMenuManager.Toggle): View {
+        return choiceToggleRow(toggle.label, toggle.description, toggle.enabled) {
+            StartupMenuManager.toggle(this, toggle.id)
+            render()
+        }
+    }
+
+    private fun choiceToggleRow(label: String, description: String, checked: Boolean, action: () -> Unit): View {
         val row = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
             setPadding(dp(this@StartupMenuActivity, 12f), dp(this@StartupMenuActivity, 9f), dp(this@StartupMenuActivity, 10f), dp(this@StartupMenuActivity, 9f))
-            contentDescription = toggle.label + ". " + toggle.description + ". " + if (toggle.enabled) "On" else "Off"
+            contentDescription = label + ". " + description + ". " + if (checked) "On" else "Off"
             isClickable = true
             isFocusable = true
-            setOnClickListener { StartupMenuManager.toggle(this@StartupMenuActivity, toggle.id); render() }
+            setOnClickListener { action() }
         }
         stylePanel(this, row)
-        row.addView(terminalText(toggle.label + "\n" + toggle.description, 13f), LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
+        row.addView(terminalText(label + "\n" + description, 13f), LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
         val switch = TextView(this)
-        styleToggle(this, switch, toggle.enabled)
+        styleToggle(this, switch, checked)
         row.addView(switch, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
             leftMargin = dp(this@StartupMenuActivity, 10f)
         })
         return row
     }
 
-    private fun visualStyleRow(): View {
+    private fun levelRow(): View {
         val row = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
-        listOf("classic", "cyberdeck", "crt").forEachIndexed { index, value ->
-            val choice = button(value.uppercase(), StartupMenuManager.visual(this) == value)
-            choice.setOnClickListener { StartupMenuManager.setVisual(this, value); render() }
+        listOf(StartupMenuManager.BASIC, StartupMenuManager.ADVANCED).forEachIndexed { index, value ->
+            val choice = button(value.uppercase(), StartupMenuManager.level(this) == value)
+            choice.setOnClickListener { StartupMenuManager.setLevel(this, value); render() }
             row.addView(choice, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f).apply {
                 if (index > 0) leftMargin = dp(this@StartupMenuActivity, 8f)
             })
@@ -347,14 +420,38 @@ class StartupMenuActivity : Activity() {
         return row
     }
 
+    private fun borderRow(): View {
+        val row = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
+        listOf(StartupMenuManager.BORDER_DASHED, StartupMenuManager.BORDER_SOLID, StartupMenuManager.BORDER_NONE).forEachIndexed { index, value ->
+            val choice = button(value.uppercase(), StartupMenuManager.border(this) == value)
+            choice.setOnClickListener { StartupMenuManager.setBorder(this, value); render() }
+            row.addView(choice, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f).apply {
+                if (index > 0) leftMargin = dp(this@StartupMenuActivity, 8f)
+            })
+        }
+        return row
+    }
+
+    private fun visualEffects(): View {
+        val group = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+        group.addView(choiceToggleRow("Classic base", "The standard launcher renderer is always active.", true) {}, blockParams(8f))
+        group.addView(choiceToggleRow("Cyberdeck", "Layer cyberdeck chrome over the classic base.", StartupMenuManager.cyberdeck(this)) {
+            StartupMenuManager.toggleCyberdeck(this); render()
+        }, blockParams(8f))
+        group.addView(choiceToggleRow("CRT", "Layer scanline and CRT effects over the classic base.", StartupMenuManager.crt(this)) {
+            StartupMenuManager.toggleCrt(this); render()
+        }, blockParams(8f))
+        group.getChildAt(0).isClickable = false
+        group.getChildAt(0).isFocusable = false
+        return group
+    }
+
     private fun close(result: StartupMenuManager.ActionResult) {
         Toast.makeText(this, result.message, Toast.LENGTH_LONG).show()
         finish()
         if (result.reload) {
-            startActivity(Intent(this, LauncherActivity::class.java).apply {
-                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-                putExtra(Reloadable.MESSAGE, result.message)
-            })
+            LauncherActivity.instance?.addMessage("startup", result.message)
+            LauncherActivity.preview(this)
         }
     }
 

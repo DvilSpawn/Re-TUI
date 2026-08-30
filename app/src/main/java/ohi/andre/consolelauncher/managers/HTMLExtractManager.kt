@@ -137,9 +137,11 @@ class HTMLExtractManager(context: Context, client: OkHttpClient) {
                         var output: CharSequence? = Tuils.span(Tuils.EMPTYSTRING, outputColor) ?: SpannableString(Tuils.EMPTYSTRING)
                         if (weatherArea) {
                             val json: String = Tuils.inputStreamToString(inputStream) ?: Tuils.EMPTYSTRING
+                            val temperatureMeasure =
+                                XMLPrefsManager.get(Behavior.weather_temperature_measure) ?: "metric"
                             val snapshot = WeatherResponseParser.parse(
                                 json,
-                                XMLPrefsManager.get(Behavior.weather_temperature_measure) ?: "metric"
+                                temperatureMeasure
                             ) ?: throw IllegalArgumentException(context.getString(R.string.weather_response_invalid))
 
                             var o: CharSequence = Tuils.span(weatherFormat, weatherColor) ?: SpannableString(weatherFormat)
@@ -180,6 +182,11 @@ class HTMLExtractManager(context: Context, client: OkHttpClient) {
                             val i: Intent = Intent(UIManager.ACTION_WEATHER)
                             i.putExtra(XMLPrefsManager.VALUE_ATTRIBUTE, o)
                             i.putExtra(UIManager.WEATHER_SYMBOL, snapshot.symbolCode)
+                            i.putExtra(UIManager.WEATHER_CONDITION, snapshot.values["main"])
+                            i.putExtra(
+                                UIManager.WEATHER_DETAILS,
+                                WeatherResponseParser.compactDetails(snapshot.values, temperatureMeasure)
+                            )
                             LocalBroadcastManager.getInstance(context.getApplicationContext())
                                 .sendBroadcast(i)
                         } else if (pathType == StoreableValue.Type.xpath) {

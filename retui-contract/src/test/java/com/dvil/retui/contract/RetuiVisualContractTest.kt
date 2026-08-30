@@ -16,7 +16,9 @@ class RetuiVisualContractTest {
         assertTrue(keys.contains(RetuiVisualContract.SELECTION_BG))
         assertTrue(keys.contains(RetuiVisualContract.FONT_PATH))
         assertTrue(keys.contains(RetuiVisualContract.FRAME_AVAILABLE))
+        assertTrue(keys.contains(RetuiVisualContract.FRAME_IMAGE_ID))
         assertTrue(keys.contains(RetuiVisualContract.FRAME_IMAGE_URI))
+        assertTrue(keys.contains(RetuiVisualContract.FRAME_ROLES))
         assertTrue(keys.contains(RetuiVisualContract.FRAME_SLICE_LEFT_PX))
         assertTrue(keys.contains(RetuiVisualContract.FRAME_SLICE_BOTTOM_PX))
         assertTrue(keys.toSet().containsAll(listOf(
@@ -31,5 +33,6 @@ class RetuiVisualContractTest {
             RetuiVisualContract.FRAME_MODE_CENTER,
             RetuiVisualContract.FRAME_FILTERING
         )))
+        assertEquals(16, RetuiVisualContract.KEYBOARD_FRAME_ROLES.toSet().size)
     }
 }

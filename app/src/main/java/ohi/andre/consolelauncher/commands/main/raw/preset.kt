@@ -2,6 +2,7 @@ package ohi.andre.consolelauncher.commands.main.raw
 
 import java.util.Locale
 import ohi.andre.consolelauncher.R
+import ohi.andre.consolelauncher.LauncherActivity
 import ohi.andre.consolelauncher.commands.CommandAbstraction
 import ohi.andre.consolelauncher.commands.ExecutePack
 import ohi.andre.consolelauncher.commands.main.MainPack
@@ -19,7 +20,7 @@ class preset : ParamCommand() {
                     PresetManager.save(pack.context, name)
                     if (pack.context is Reloadable) {
                         (pack.context as Reloadable).addMessage("preset", "Saved preset: " + name.trim())
-                        (pack.context as Reloadable).reload()
+                        LauncherActivity.preview(pack.context)
                     }
                     return "Preset '" + name.trim() + "' saved."
                 } catch (e: IllegalArgumentException) {
@@ -39,7 +40,7 @@ class preset : ParamCommand() {
 
                     if (pack.context is Reloadable) {
                         (pack.context as Reloadable).addMessage("preset", "Applied preset: " + name.trim())
-                        (pack.context as Reloadable).reload()
+                        LauncherActivity.preview(pack.context)
                     }
 
                     return "Preset '" + name.trim() + "' applied."

@@ -26,6 +26,7 @@ import android.graphics.Rect
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.GradientDrawable
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
@@ -79,6 +80,7 @@ import android.widget.ScrollView
 import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.TextView.OnEditorActionListener
+import android.widget.TextClock
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
@@ -550,6 +552,12 @@ class UIManager(
     private var hackOverlayBasePaddingRight = 0
     private var hackOverlayBasePaddingBottom = 0
     private var terminalTrayExpanded = false
+    private val terminalOutputAutoHideRunnable = Runnable {
+        if (this.isOutputAutoHideEnabled && terminalTrayExpanded) {
+            terminalTrayExpanded = false
+            applyTerminalTrayState(false)
+        }
+    }
     private var keyboardVisible = false
     private var hasLastLayoutState = false
     private var lastObservedRootHeight = -1
@@ -608,6 +616,28 @@ class UIManager(
     private val labelIndexes = FloatArray(labelViews.size)
     private val labelSizes = IntArray(labelViews.size)
     private val labelTexts = arrayOfNulls<CharSequence>(labelViews.size)
+    private var unifiedStatusActive = false
+    private var unifiedStatusVisible = BooleanArray(Label.entries.size)
+    private var unifiedStatusDate: TextView? = null
+    private var unifiedStatusTime: TextView? = null
+    private var unifiedStatusBattery: TextView? = null
+    private var unifiedStatusWeatherIcon: ImageView? = null
+    private var unifiedStatusWeather: TextView? = null
+    private var unifiedStatusWeatherLocation: TextView? = null
+    private var unifiedStatusWeatherDetails: TextView? = null
+    private var unifiedStatusStorageInternalIcon: ImageView? = null
+    private var unifiedStatusStorageInternal: TextView? = null
+    private var unifiedStatusStorageExternalIcon: ImageView? = null
+    private var unifiedStatusStorageExternal: TextView? = null
+    private var unifiedStatusNetwork: TextView? = null
+    private var unifiedStatusRamIcon: ImageView? = null
+    private var unifiedStatusRam: TextView? = null
+    private var unifiedStatusUnlock: TextView? = null
+    private var unifiedModulesToggle: ImageButton? = null
+    private var unifiedModulesVisible = true
+    private val unifiedModulesAutoHideRunnable = Runnable {
+        if (shouldAutoHideUnifiedModules(activeModule)) setUnifiedModulesVisible(false, false)
+    }
 
     private var asciiColor = 0
     private var asciiAnimationManager: AsciiAnimationManager? = null
@@ -826,6 +856,8 @@ class UIManager(
     private var weatherManager: WeatherManager? = null
     private var lastWeatherText: CharSequence? = null
     private var lastWeatherSymbol: String? = null
+    private var lastWeatherCondition: String? = null
+    private var lastWeatherDetails: String? = null
     private var lastWeatherUpdateMillis: Long = 0
 
     //    you need to use labelIndexes[i]
@@ -834,6 +866,11 @@ class UIManager(
             return
         }
         labelTexts[l.ordinal] = s
+
+        if (unifiedStatusActive) {
+            renderUnifiedStatus()
+            return
+        }
 
         val base = labelIndexes[l.ordinal].toInt()
         if (base < 0 || base >= labelViews.size || labelViews[base] == null) {
@@ -878,6 +915,192 @@ class UIManager(
                 view.setText(sequence)
             }
         }
+    }
+
+    private fun setupUnifiedStatus(show: BooleanArray, padding: IntArray) {
+        val root = mRootView ?: return
+        val container = root.findViewById<LinearLayout?>(R.id.unified_status_container) ?: return
+        unifiedStatusActive = true
+        unifiedStatusVisible = show.copyOf()
+        unifiedStatusDate = root.findViewById(R.id.unified_status_date)
+        unifiedStatusTime = root.findViewById(R.id.unified_status_time)
+        unifiedStatusBattery = root.findViewById(R.id.unified_status_battery)
+        unifiedStatusWeatherIcon = root.findViewById(R.id.unified_status_weather_icon)
+        unifiedStatusWeather = root.findViewById(R.id.unified_status_weather)
+        unifiedStatusWeatherLocation = root.findViewById(R.id.unified_status_weather_location)
+        unifiedStatusWeatherDetails = root.findViewById(R.id.unified_status_weather_details)
+        unifiedStatusStorageInternalIcon = root.findViewById(R.id.unified_status_storage_internal_icon)
+        unifiedStatusStorageInternal = root.findViewById(R.id.unified_status_storage_internal)
+        unifiedStatusStorageExternalIcon = root.findViewById(R.id.unified_status_storage_external_icon)
+        unifiedStatusStorageExternal = root.findViewById(R.id.unified_status_storage_external)
+        unifiedStatusNetwork = root.findViewById(R.id.unified_status_network)
+        unifiedStatusRamIcon = root.findViewById(R.id.unified_status_ram_icon)
+        unifiedStatusRam = root.findViewById(R.id.unified_status_ram)
+        unifiedStatusUnlock = root.findViewById(R.id.unified_status_unlock)
+        unifiedModulesToggle = root.findViewById(R.id.unified_modules_toggle)
+
+        container.visibility = View.VISIBLE
+        val horizontalInset = max(padding[0], Tuils.dpToPx(mContext, 8))
+        val verticalInset = max(padding[1], Tuils.dpToPx(mContext, 4))
+        container.setPadding(
+            horizontalInset,
+            verticalInset,
+            max(padding[2], Tuils.dpToPx(mContext, 8)),
+            max(padding[3], verticalInset)
+        )
+        val typeface = Tuils.getTypeface(mContext)
+        listOfNotNull(
+            unifiedStatusDate,
+            unifiedStatusTime,
+            unifiedStatusBattery,
+            unifiedStatusWeather,
+            unifiedStatusWeatherLocation,
+            unifiedStatusWeatherDetails,
+            unifiedStatusStorageInternal,
+            unifiedStatusStorageExternal,
+            unifiedStatusNetwork,
+            unifiedStatusRam,
+            unifiedStatusUnlock
+        ).forEach { it.typeface = typeface }
+        unifiedStatusDate?.setTextColor(getColor(Theme.time_text_color))
+        unifiedStatusTime?.setTextColor(getColor(Theme.time_text_color))
+        unifiedStatusBattery?.setTextColor(getColor(Theme.battery_text_high))
+        val timeSize = labelSizes[Label.time.ordinal].toFloat().coerceIn(18f, 28f)
+        val compactSize = (timeSize * 0.65f).coerceAtLeast(11f)
+        unifiedStatusDate?.setTextSize(TypedValue.COMPLEX_UNIT_SP, compactSize)
+        unifiedStatusTime?.setTextSize(TypedValue.COMPLEX_UNIT_SP, timeSize)
+        unifiedStatusBattery?.setTextSize(
+            TypedValue.COMPLEX_UNIT_SP,
+            labelSizes[Label.battery.ordinal].toFloat().coerceIn(11f, 16f)
+        )
+        unifiedStatusWeatherIcon?.imageTintList = ColorStateList.valueOf(getColor(Theme.weather_text_color))
+        unifiedStatusStorageInternalIcon?.imageTintList = ColorStateList.valueOf(getColor(Theme.storage_text_color))
+        unifiedStatusStorageExternalIcon?.imageTintList = ColorStateList.valueOf(getColor(Theme.storage_text_color))
+        unifiedStatusRamIcon?.imageTintList = ColorStateList.valueOf(getColor(Theme.ram_text_color))
+        styleUnifiedMetric(unifiedStatusWeather, 0, Theme.weather_text_color, compactSize)
+        styleUnifiedMetric(unifiedStatusWeatherLocation, 0, Theme.weather_text_color, compactSize)
+        styleUnifiedMetric(unifiedStatusWeatherDetails, 0, Theme.weather_text_color, compactSize)
+        styleUnifiedMetric(unifiedStatusStorageInternal, 0, Theme.storage_text_color, compactSize)
+        styleUnifiedMetric(unifiedStatusStorageExternal, 0, Theme.storage_text_color, compactSize)
+        styleUnifiedMetric(unifiedStatusNetwork, R.drawable.ic_status_wifi_40, Theme.network_info_text_color, compactSize)
+        styleUnifiedMetric(unifiedStatusRam, 0, Theme.ram_text_color, compactSize)
+        styleUnifiedMetric(unifiedStatusUnlock, R.drawable.ic_status_lock_open_40, Theme.unlock_counter_text_color, compactSize)
+
+        unifiedModulesToggle?.apply {
+            imageTintList = ColorStateList.valueOf(getColor(Theme.time_text_color))
+            background = TerminalBorderRuntime.panelDrawable(
+                mContext,
+                moduleButtonBackgroundColor(),
+                moduleButtonBorderColor(),
+                1.25f,
+                moduleCornerRadius(),
+                dashedBorders(),
+                false,
+                true,
+                true,
+                FrameTarget.ICON_BUTTON
+            )
+            visibility = if (getBoolean(Behavior.show_module_dock)) View.VISIBLE else View.GONE
+            setOnClickListener { setUnifiedModulesVisible(!unifiedModulesVisible, true) }
+            container.post { translationY = container.paddingBottom + height / 2f }
+        }
+        renderUnifiedStatus()
+        root.post {
+            attachUnifiedBottomConsoleIfReady()
+            setUnifiedModulesVisible(true, true)
+        }
+    }
+
+    private fun styleUnifiedMetric(view: TextView?, iconRes: Int, colorSetting: Theme, size: Float) {
+        if (view == null) return
+        val color = getColor(colorSetting)
+        view.setTextColor(color)
+        view.setTextSize(TypedValue.COMPLEX_UNIT_SP, size)
+        view.compoundDrawablePadding = Tuils.dpToPx(mContext, 3)
+        view.includeFontPadding = false
+        view.height = Tuils.dpToPx(mContext, 16)
+        view.gravity = view.gravity or Gravity.CENTER_VERTICAL
+        if (iconRes != 0) setUnifiedMetricIcon(view, iconRes, color)
+    }
+
+    private fun setUnifiedMetricIcon(view: TextView, iconRes: Int, color: Int) {
+        val icon = ContextCompat.getDrawable(mContext, iconRes)?.mutate()
+        val size = Tuils.dpToPx(mContext, 16)
+        icon?.setBounds(0, 0, size, size)
+        icon?.let { DrawableCompat.setTint(it, color) }
+        view.setCompoundDrawables(icon, null, null, null)
+    }
+
+    private fun renderUnifiedStatus() {
+        if (!unifiedStatusActive) return
+        val showTime = unifiedStatusVisible[Label.time.ordinal]
+        unifiedStatusDate?.visibility = if (showTime) View.VISIBLE else View.GONE
+        unifiedStatusTime?.visibility = if (showTime) View.VISIBLE else View.GONE
+        if (showTime) {
+            val now = java.util.Date()
+            unifiedStatusDate?.text = android.text.format.DateFormat.getMediumDateFormat(mContext).format(now)
+            unifiedStatusTime?.text = android.text.format.DateFormat.getTimeFormat(mContext).format(now)
+        }
+
+        val battery = compactUnifiedBattery(labelTexts[Label.battery.ordinal])
+        unifiedStatusBattery?.visibility =
+            if (unifiedStatusVisible[Label.battery.ordinal] && battery.isNotEmpty()) View.VISIBLE else View.GONE
+        unifiedStatusBattery?.text = battery
+
+        val weatherCondition = lastWeatherCondition
+            ?: compactUnifiedWeatherCondition(labelTexts[Label.weather.ordinal])
+        val weatherLocation = XMLPrefsManager.get(Behavior.weather_location)
+            ?.trim()
+            ?.takeUnless { it.isEmpty() || it == "null" }
+            .orEmpty()
+        val weatherDetails = lastWeatherDetails
+            ?: compactUnifiedWeatherDetails(labelTexts[Label.weather.ordinal])
+        val showWeather = unifiedStatusVisible[Label.weather.ordinal] && weatherCondition.isNotEmpty()
+        unifiedStatusWeatherIcon?.visibility = if (showWeather) View.VISIBLE else View.GONE
+        unifiedStatusWeather?.visibility = if (showWeather) View.VISIBLE else View.GONE
+        unifiedStatusWeather?.text = if (weatherCondition.isEmpty()) "" else ": $weatherCondition"
+        unifiedStatusWeatherLocation?.visibility =
+            if (showWeather && weatherLocation.isNotEmpty()) View.VISIBLE else View.GONE
+        unifiedStatusWeatherLocation?.text = weatherLocation
+        unifiedStatusWeatherDetails?.visibility =
+            if (showWeather && weatherDetails.isNotEmpty()) View.VISIBLE else View.GONE
+        unifiedStatusWeatherDetails?.text = weatherDetails
+
+        val showStorage = unifiedStatusVisible[Label.storage.ordinal]
+        val internalStorage = storageManager?.compactInternal().orEmpty()
+        val externalStorage = storageManager?.compactExternal().orEmpty()
+        unifiedStatusStorageInternal?.text = internalStorage
+        unifiedStatusStorageInternal?.visibility = if (showStorage && internalStorage.isNotEmpty()) View.VISIBLE else View.GONE
+        unifiedStatusStorageInternalIcon?.visibility = unifiedStatusStorageInternal?.visibility ?: View.GONE
+        unifiedStatusStorageExternal?.text = externalStorage
+        unifiedStatusStorageExternal?.visibility = if (showStorage && externalStorage.isNotEmpty()) View.VISIBLE else View.GONE
+        unifiedStatusStorageExternalIcon?.visibility = unifiedStatusStorageExternal?.visibility ?: View.GONE
+
+        val connection = networkManager?.compactConnection().orEmpty()
+        unifiedStatusNetwork?.visibility =
+            if (unifiedStatusVisible[Label.network.ordinal] && connection.isNotEmpty()) View.VISIBLE else View.GONE
+        unifiedStatusNetwork?.text = connection
+        unifiedStatusNetwork?.let {
+            val icon = if (networkManager?.compactConnectionUsesWifi() == true) {
+                R.drawable.ic_status_wifi_40
+            } else {
+                R.drawable.ic_material_signal_cellular_alt_24
+            }
+            if (it.tag != icon) {
+                it.tag = icon
+                setUnifiedMetricIcon(it, icon, getColor(Theme.network_info_text_color))
+            }
+        }
+
+        val ram = ramManager?.compactValue().orEmpty()
+        unifiedStatusRam?.text = ram
+        unifiedStatusRam?.visibility =
+            if (unifiedStatusVisible[Label.ram.ordinal] && ram.isNotEmpty()) View.VISIBLE else View.GONE
+        unifiedStatusRamIcon?.visibility = unifiedStatusRam?.visibility ?: View.GONE
+
+        unifiedStatusUnlock?.text = unlockManager?.count()?.toString().orEmpty()
+        unifiedStatusUnlock?.visibility =
+            if (unifiedStatusVisible[Label.unlock.ordinal] && unlockManager != null) View.VISIBLE else View.GONE
     }
 
     private fun shouldUseAsciiViewport(base: Int): Boolean {
@@ -1008,6 +1231,8 @@ class UIManager(
     private class PagerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
     private var suggestionsManager: SuggestionsManager? = null
+    private val searchOnlyMode: Boolean
+        get() = getBoolean(Behavior.search_only_mode)
 
     private var terminalView: TextView? = null
 
@@ -1026,6 +1251,11 @@ class UIManager(
     private var homeModulesContainer: ViewGroup? = null
     private var mainContainer: View? = null
     private var headerContainer: ViewGroup? = null
+    private var unifiedBottomConsole: ViewGroup? = null
+    private var unifiedStatusHost: ViewGroup? = null
+    private var unifiedDockHost: ViewGroup? = null
+    private var unifiedModuleScroll: ScrollView? = null
+    private var unifiedModuleHost: ViewGroup? = null
     private var headerOriginalParent: ViewGroup? = null
     private var headerOriginalParams: ViewGroup.LayoutParams? = null
     private var headerOriginalIndex = -1
@@ -1102,7 +1332,10 @@ class UIManager(
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (terminalContainer != null) {
-                    terminalContainer!!.post(Runnable { applyTerminalTrayState(false) })
+                    val appended = if (s != null && count > 0 && start + count <= s.length) {
+                        s.subSequence(start, start + count)
+                    } else null
+                    terminalContainer!!.post(Runnable { onTerminalOutputChanged(s, appended) })
                 }
             }
 
@@ -1274,7 +1507,8 @@ class UIManager(
 
         setupModuleSuggestionsStrip()
 
-        if (XMLPrefsManager.getBoolean(Suggestions.show_suggestions)) {
+        val classicSuggestionsEnabled = XMLPrefsManager.getBoolean(Suggestions.show_suggestions)
+        if (classicSuggestionsEnabled || searchOnlyMode) {
             val sv =
                 mRootView.findViewById<View?>(R.id.suggestions_container) as HorizontalScrollView?
             if (sv != null) {
@@ -1301,13 +1535,16 @@ class UIManager(
                 suggestionsManager = SuggestionsManager(
                     suggestionsView!!,
                     mainPack,
-                    mTerminalAdapter!!
+                    mTerminalAdapter!!,
+                    mRootView.findViewById(R.id.search_mode_results_group),
+                    searchOnlyMode
                 )
 
                 inputView.addTextChangedListener(
                     SuggestionTextWatcher(
                         suggestionsManager!!,
                         OnTextChanged { currentText: String?, before: Int ->
+                            if (searchOnlyMode) return@OnTextChanged
                             if (!hideToolbarNoInput) return@OnTextChanged
                             if (currentText!!.length == 0) toolbarView!!.setVisibility(View.GONE)
                             else if (before == 0) toolbarView!!.setVisibility(View.VISIBLE)
@@ -1318,6 +1555,14 @@ class UIManager(
             val sugGroup = mRootView.findViewById<View?>(R.id.suggestions_group)
             if (sugGroup != null) sugGroup.setVisibility(View.GONE)
             hideModuleSuggestionsStrip()
+        }
+
+        if (searchOnlyMode) {
+            configureSearchOnlyLayout()
+            suggestionsManager?.setSearchNotifications(currentOverlayNotifications)
+            if (!TextUtils.isEmpty(terminalView?.text)) {
+                suggestionsManager?.showInlineOutput(terminalView?.text)
+            }
         }
 
 
@@ -1504,6 +1749,11 @@ class UIManager(
     private fun setupResponsiveLandscapeLayout(rootView: ViewGroup) {
         mainContainer = rootView.findViewById<View?>(R.id.main_container)
         headerContainer = rootView.findViewById<ViewGroup?>(R.id.header_container)
+        unifiedBottomConsole = rootView.findViewById<ViewGroup?>(R.id.unified_bottom_console)
+        unifiedStatusHost = rootView.findViewById<ViewGroup?>(R.id.unified_status_host)
+        unifiedDockHost = rootView.findViewById<ViewGroup?>(R.id.unified_dock_host)
+        unifiedModuleScroll = rootView.findViewById<ScrollView?>(R.id.unified_module_scroll)
+        unifiedModuleHost = rootView.findViewById<ViewGroup?>(R.id.unified_module_host)
         landscapeSplitContainer = rootView.findViewById<View?>(R.id.landscape_split_container)
         landscapeLeftPane = rootView.findViewById<ViewGroup?>(R.id.landscape_left_pane)
         landscapeRightPane = rootView.findViewById<ViewGroup?>(R.id.landscape_right_pane)
@@ -1521,9 +1771,140 @@ class UIManager(
         }
     }
 
+    private fun attachUnifiedBottomConsoleIfReady() {
+        if (searchOnlyMode || !unifiedStatusActive || termuxWorkspaceChromeActive) return
+        val statusHost = unifiedStatusHost ?: return
+        val dockHost = unifiedDockHost ?: return
+        val moduleHost = unifiedModuleHost ?: return
+        val header = headerContainer ?: return
+        val dock = moduleDockScroll ?: return
+        val modules = homeModulesContainer ?: return
+
+        if (header.parent !== statusHost) {
+            detachFromParent(header)
+            statusHost.removeAllViews()
+            statusHost.addView(
+                header,
+                FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+            )
+        }
+        if (dock.parent !== dockHost) {
+            detachFromParent(dock)
+            dockHost.removeAllViews()
+            dockHost.addView(
+                dock,
+                FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+            )
+        }
+        if (modules.parent !== moduleHost) {
+            detachFromParent(modules)
+            moduleHost.removeAllViews()
+            moduleHost.addView(
+                modules,
+                FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+            )
+        }
+
+        unifiedBottomConsole?.visibility = View.VISIBLE
+        mainContainer?.visibility = View.GONE
+        updateUnifiedBottomModuleBounds()
+    }
+
+    private fun updateUnifiedBottomModuleBounds() {
+        if (!unifiedStatusActive) return
+        val scroll = unifiedModuleScroll ?: return
+        val content = homeModulesContainer ?: return
+        if (!unifiedModulesVisible || TextUtils.isEmpty(activeModule) || content.childCount == 0) {
+            scroll.visibility = View.GONE
+            scroll.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
+            return
+        }
+
+        scroll.visibility = View.VISIBLE
+        scroll.post {
+            if (TextUtils.isEmpty(activeModule) || content.childCount == 0) return@post
+            val rootHeight = mRootView?.height ?: 0
+            val availableHeight = max(0, rootHeight - imeBottomOffset - systemInsetBottom)
+            val cap = min(Tuils.dpToPx(mContext, 240), (availableHeight * 0.34f).roundToInt())
+            val width = max(1, scroll.width)
+            content.measure(
+                View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+            )
+            val targetHeight = boundedUnifiedModuleHeight(content.measuredHeight, cap)
+            if (scroll.layoutParams.height != targetHeight) {
+                scroll.layoutParams.height = targetHeight
+                scroll.requestLayout()
+                applyTerminalTrayState(false)
+            }
+        }
+    }
+
+    private fun setUnifiedModulesVisible(visible: Boolean, autoHide: Boolean) {
+        if (!unifiedStatusActive) return
+        val enabled = getBoolean(Behavior.show_module_dock)
+        unifiedModulesVisible = visible && enabled
+        unifiedDockHost?.visibility = if (unifiedModulesVisible) View.VISIBLE else View.GONE
+        unifiedModulesToggle?.apply {
+            visibility = if (enabled) View.VISIBLE else View.GONE
+            rotation = if (unifiedModulesVisible) 180f else 0f
+            contentDescription = if (unifiedModulesVisible) "Hide modules" else "Show modules"
+        }
+        handler?.removeCallbacks(unifiedModulesAutoHideRunnable)
+        if (unifiedModulesVisible) {
+            updateUnifiedBottomModuleBounds()
+            refreshModuleSuggestionsStrip()
+            if (autoHide) handler?.postDelayed(unifiedModulesAutoHideRunnable, UNIFIED_MODULE_AUTO_HIDE_MS)
+        } else {
+            unifiedModuleScroll?.visibility = View.GONE
+            hideModuleSuggestionsStrip()
+        }
+        unifiedBottomConsole?.post { applyTerminalTrayState(false) }
+    }
+
+    private fun persistentBottomChromeHeight(): Int {
+        val inputHeight = persistentInputContainer?.measuredHeight ?: 0
+        val consoleHeight = if (unifiedStatusActive && unifiedBottomConsole?.visibility == View.VISIBLE) {
+            unifiedBottomConsole?.measuredHeight ?: 0
+        } else 0
+        return inputHeight + consoleHeight
+    }
+
     private fun applyResponsiveLandscapeLayout(configuration: Configuration?) {
         if (mainContainer == null || terminalTrayContainer == null || landscapeSplitContainer == null || landscapeLeftPane == null || landscapeRightPane == null || (mRootView !is ViewGroup)) {
             applyDisplayMarginsForConfiguration(configuration)
+            return
+        }
+
+        if (searchOnlyMode) {
+            if (landscapeLayoutActive || mainContainer!!.parent !== mRootView || terminalTrayContainer!!.parent !== mRootView) {
+                restorePortraitLayout()
+            }
+            configureSearchOnlyLayout()
+            applyDisplayMarginsForConfiguration(configuration)
+            return
+        }
+
+        if (unifiedStatusActive && !termuxWorkspaceChromeActive) {
+            val root = mRootView as ViewGroup
+            if (landscapeLayoutActive
+                || mainContainer!!.parent !== root
+                || terminalTrayContainer!!.parent !== root
+            ) {
+                restorePortraitLayout()
+            }
+            attachUnifiedBottomConsoleIfReady()
+            applyDisplayMarginsForConfiguration(configuration)
+            applyTerminalTrayState(false)
             return
         }
 
@@ -1631,6 +2012,10 @@ class UIManager(
     }
 
     private fun applyLandscapeStatusChrome(landscape: Boolean) {
+        if (unifiedStatusActive) {
+            renderUnifiedStatus()
+            return
+        }
         val asciiView = getLabelView(Label.ascii)
         if (asciiView == null) {
             return
@@ -2028,6 +2413,7 @@ class UIManager(
             }
         }
         setNotificationWidgetCompact(mRootView!!, keyboardVisible)
+        updateUnifiedBottomModuleBounds()
         applyTerminalTrayState(false)
         if (keyboardVisible && XMLPrefsManager.getBoolean(Behavior.auto_scroll)) {
             if (mTerminalAdapter != null) mTerminalAdapter!!.scrollToEnd()
@@ -2062,7 +2448,14 @@ class UIManager(
         if (splitDuoStatusActive) {
             applySectionDisplayMargins(headerContainer, topMargins, metrics, 0, systemInsetTop)
         }
-        applySectionDisplayMargins(terminalTrayContainer, bottomMargins, metrics, imeBottomOffset)
+        val searchInset = if (searchOnlyMode) Tuils.dpToPx(mContext, SEARCH_MODE_EDGE_INSET_DP) else 0
+        applySectionDisplayMargins(
+            terminalTrayContainer,
+            bottomMargins,
+            metrics,
+            imeBottomOffset + searchInset,
+            extraHorizontalPx = searchInset
+        )
         applyTerminalOverlayDisplayMargins(topMargins, bottomMargins, metrics)
     }
 
@@ -2075,15 +2468,16 @@ class UIManager(
         marginMm: IntArray,
         metrics: DisplayMetrics?,
         extraBottomPx: Int,
-        extraTopPx: Int = 0
+        extraTopPx: Int = 0,
+        extraHorizontalPx: Int = 0
     ) {
         if (view == null) {
             return
         }
 
-        val left = Tuils.mmToPx(metrics, marginMm[0])
+        val left = Tuils.mmToPx(metrics, marginMm[0]) + extraHorizontalPx
         val top = extraTopPx + Tuils.mmToPx(metrics, marginMm[1])
-        val right = Tuils.mmToPx(metrics, marginMm[2])
+        val right = Tuils.mmToPx(metrics, marginMm[2]) + extraHorizontalPx
         val bottom = Tuils.mmToPx(metrics, marginMm[3]) + extraBottomPx
 
         val params = view.getLayoutParams()
@@ -2198,7 +2592,7 @@ class UIManager(
             outputHeaderTextSize(),
             terminalHeaderTabBackground(),
             onClick = {
-                if (this.isOutputTrayToggledMode) {
+                if (this.isOutputTrayToggleEnabled) {
                     setTerminalTrayExpanded(!terminalTrayExpanded)
                 }
             }
@@ -2212,16 +2606,48 @@ class UIManager(
     }
 
     private fun setTerminalTrayExpanded(expanded: Boolean) {
-        if (!this.isOutputTrayToggledMode) {
+        if (!this.isOutputTrayToggleEnabled) {
             return
         }
         terminalTrayExpanded = expanded
         saveTerminalTrayState()
+        if (this.isOutputAutoHideEnabled && expanded) {
+            scheduleTerminalOutputAutoHide()
+        } else {
+            cancelTerminalOutputAutoHide()
+        }
         applyTerminalTrayState(true)
     }
 
+    private fun onTerminalOutputChanged(output: CharSequence?, appended: CharSequence? = output) {
+        if (searchOnlyMode) {
+            suggestionsManager?.showInlineOutput(appended)
+            return
+        }
+        if (this.isOutputAutoHideEnabled) {
+            terminalTrayExpanded = !output.isNullOrEmpty()
+            if (terminalTrayExpanded) scheduleTerminalOutputAutoHide() else cancelTerminalOutputAutoHide()
+        }
+        applyTerminalTrayState(false)
+    }
+
+    private fun scheduleTerminalOutputAutoHide() {
+        val container = terminalContainer ?: return
+        container.removeCallbacks(terminalOutputAutoHideRunnable)
+        container.postDelayed(
+            terminalOutputAutoHideRunnable,
+            outputAutoHideDelayMs(XMLPrefsManager.getInt(Behavior.output_auto_hide_seconds))
+        )
+    }
+
+    private fun cancelTerminalOutputAutoHide() {
+        terminalContainer?.removeCallbacks(terminalOutputAutoHideRunnable)
+    }
+
     private fun restoreTerminalTrayState() {
-        if (this.isOutputTrayToggledMode) {
+        if (this.isOutputAutoHideEnabled) {
+            terminalTrayExpanded = false
+        } else if (this.isOutputTrayToggledMode) {
             terminalTrayExpanded = preferences.getBoolean(PREF_OUTPUT_TRAY_EXPANDED, false)
         } else if (this.isOutputTrayAutoMode) {
             terminalTrayExpanded = TextUtils.isEmpty(activeModule)
@@ -2232,7 +2658,7 @@ class UIManager(
     }
 
     private fun saveTerminalTrayState() {
-        if (this.isOutputTrayToggledMode) {
+        if (this.isOutputTrayToggledMode && !this.isOutputAutoHideEnabled) {
             preferences.edit().putBoolean(PREF_OUTPUT_TRAY_EXPANDED, terminalTrayExpanded).apply()
         }
     }
@@ -2242,7 +2668,18 @@ class UIManager(
             return
         }
 
-        if (landscapeLayoutActive && this.isOutputTrayToggledMode) {
+        if (searchOnlyMode) {
+            configureSearchOnlyLayout()
+            if (refocusInput) mTerminalAdapter?.requestInputFocus()
+            return
+        }
+
+        terminalOutputBorder?.visibility = outputPaneVisibility(
+            this.isOutputAutoHideEnabled,
+            terminalTrayExpanded
+        )
+
+        if (landscapeLayoutActive && this.isOutputTrayToggleEnabled) {
             val trayParams = terminalTrayContainer?.layoutParams as? FrameLayout.LayoutParams
             if (trayParams != null) {
                 trayParams.width = ViewGroup.LayoutParams.MATCH_PARENT
@@ -2273,7 +2710,7 @@ class UIManager(
             }
         }
 
-        if (landscapeLayoutActive && !duoLayoutActive && !this.isOutputTrayToggledMode) {
+        if (landscapeLayoutActive && !duoLayoutActive && !this.isOutputTrayToggleEnabled) {
             val trayParams = terminalTrayContainer?.layoutParams as? FrameLayout.LayoutParams
             if (trayParams != null && trayParams.height != ViewGroup.LayoutParams.MATCH_PARENT) {
                 trayParams.height = ViewGroup.LayoutParams.MATCH_PARENT
@@ -2308,7 +2745,13 @@ class UIManager(
             params.weight = 0f
         }
         val requestedHeight: Int
-        if (this.isOutputTrayNativeMode) {
+        if (this.isOutputAutoHideEnabled) {
+            requestedHeight = if (terminalTrayExpanded) {
+                calculateNativeTerminalTrayHeight(expandedHeight)
+            } else {
+                calculateHeaderOnlyTerminalTrayHeight()
+            }
+        } else if (this.isOutputTrayNativeMode) {
             requestedHeight = if (TextUtils.isEmpty(activeModule)) {
                 calculateNativeTerminalTrayHeight(expandedHeight)
             } else {
@@ -2325,7 +2768,7 @@ class UIManager(
             rootHeight,
             imeBottomOffset,
             systemInsetBottom,
-            persistentInputContainer?.measuredHeight ?: 0,
+            persistentBottomChromeHeight(),
             imeInsetVisible || imeBottomOffset > 0
         )
         if (params != null && params.height != targetHeight) {
@@ -2340,6 +2783,46 @@ class UIManager(
         if (refocusInput && mTerminalAdapter != null) {
             mTerminalAdapter!!.requestInputFocus()
         }
+    }
+
+    private fun configureSearchOnlyLayout() {
+        val tray = terminalTrayContainer ?: return
+        mainContainer?.visibility = View.GONE
+        unifiedBottomConsole?.visibility = View.GONE
+        landscapeSplitContainer?.visibility = View.GONE
+        terminalContainer?.visibility = View.GONE
+        mRootView?.findViewById<View?>(R.id.search_mode_results_scroll)?.visibility = View.VISIBLE
+        mRootView?.findViewById<View?>(R.id.module_suggestions_container)?.visibility = View.GONE
+        mRootView?.findViewById<View?>(R.id.tools_view)?.visibility = View.GONE
+        mRootView?.findViewById<View?>(R.id.suggestions_container)?.visibility = View.GONE
+        styleSearchModeClockTab()
+        appDrawerPaneManager?.hide()
+        androidWidgetDrawerManager?.hide()
+        (tray.layoutParams as? FrameLayout.LayoutParams)?.let { params ->
+            params.width = ViewGroup.LayoutParams.MATCH_PARENT
+            params.height = ViewGroup.LayoutParams.MATCH_PARENT
+            params.gravity = Gravity.BOTTOM
+            tray.layoutParams = params
+        }
+        (mTerminalAdapter?.inputView as? EditText)?.setHint(R.string.search_mode_hint)
+    }
+
+    private fun styleSearchModeClockTab() {
+        val clock = mRootView?.findViewById<TextClock?>(R.id.search_mode_clock_tab) ?: return
+        val input = mRootView?.findViewById<View?>(R.id.input_group)
+        clock.visibility = View.VISIBLE
+        clock.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
+        clock.setTextColor(getColor(Theme.time_text_color))
+        clock.background = TerminalBorderRuntime.tabDrawable(
+            mContext,
+            terminalHeaderTabBackground(),
+            FrameTarget.INPUT
+        )
+        (clock.layoutParams as? LinearLayout.LayoutParams)?.let { params ->
+            params.bottomMargin = -(margins[INPUTAREA_MARGINS_INDEX]?.get(1) ?: 0)
+            clock.layoutParams = params
+        }
+        TerminalBorderRuntime.bind(input, clock)
     }
 
     private fun calculateExpandedTerminalTrayHeight(rootHeight: Int, collapsedHeight: Int): Int {
@@ -2373,6 +2856,7 @@ class UIManager(
             this.isOutputHeaderArrowsOnly,
             this.isOutputTrayNativeMode,
             this.isOutputTrayAutoMode,
+            this.isOutputAutoHideEnabled,
             moduleNameTextColor()
         )
     }
@@ -2385,6 +2869,12 @@ class UIManager(
 
     private val isOutputTrayToggledMode: Boolean
         get() = OUTPUT_TRAY_MODE_TOGGLED == outputTrayMode()
+
+    private val isOutputAutoHideEnabled: Boolean
+        get() = !this.isOutputHeaderNone && XMLPrefsManager.getBoolean(Behavior.auto_hide_output)
+
+    private val isOutputTrayToggleEnabled: Boolean
+        get() = this.isOutputTrayToggledMode || this.isOutputAutoHideEnabled
 
     private val isOutputHeaderArrowsOnly: Boolean
         get() = OUTPUT_HEADER_MODE_ARROWS == outputHeaderMode()
@@ -2430,6 +2920,12 @@ class UIManager(
                     + terminalOutputChromeHeight())
         return max(minHeight, min(maxHeight, contentHeight))
     }
+
+    private fun calculateHeaderOnlyTerminalTrayHeight(): Int =
+        headerOnlyTerminalTrayHeight(
+            terminalTrayToggle?.bottom ?: 0,
+            UIUtils.dpToPx(mContext!!, 32)
+        )
 
     private fun calculateNativeTerminalTrayHeight(maxHeight: Int): Int {
         val minHeight = UIUtils.dpToPx(mContext!!, 66)
@@ -2529,6 +3025,7 @@ class UIManager(
         homeModulesContainer!!.removeAllViews()
         rebuildModuleDock()
         refreshSuggestionsForActiveModule()
+        attachUnifiedBottomConsoleIfReady()
     }
 
     private fun setupTermuxWorkspacePage(workspacePage: View) {
@@ -3378,6 +3875,9 @@ class UIManager(
         termuxWorkspaceChromeActive = active
         applyResponsiveLandscapeLayout(currentConfiguration)
         if (active) {
+            if (unifiedStatusActive) {
+                mainContainer?.visibility = View.VISIBLE
+            }
             headerContainer?.let { header ->
                 termuxWorkspaceHeaderVisibility = header.visibility
                 header.visibility = View.GONE
@@ -5178,6 +5678,10 @@ class UIManager(
         if (scroll == null || group == null) {
             return
         }
+        if (unifiedStatusActive && !unifiedModulesVisible) {
+            hideModuleSuggestionsStrip()
+            return
+        }
         val context = mContext ?: return
         group.removeAllViews()
         // Music chips only while actually playing; pause/stop used to leave prev/play/next up.
@@ -5414,6 +5918,11 @@ class UIManager(
         scheduleEventsRefreshIfNeeded()
         preserveModuleDockScrollX(dockScrollX)
         scheduleTypefaceRefreshes()
+        if (unifiedStatusActive) {
+            setUnifiedModulesVisible(true, true)
+        } else {
+            updateUnifiedBottomModuleBounds()
+        }
     }
 
     private fun ensureSystemLuaModules() {
@@ -6515,9 +7024,11 @@ class UIManager(
             homeModulesContainer!!.removeAllViews()
         }
         updateModuleDockSelection()
+        updateUnifiedBottomModuleBounds()
         applyTerminalTrayState(false)
         refreshSuggestionsForActiveModule()
         preserveModuleDockScrollX(dockScrollX)
+        if (unifiedStatusActive && unifiedModulesVisible) setUnifiedModulesVisible(true, true)
     }
 
     private fun refreshSuggestionsForActiveModule() {
@@ -8029,7 +8540,7 @@ class UIManager(
                 val action = intent.getAction()
 
                 if (action == ACTION_UPDATE_SUGGESTIONS) {
-                    if (suggestionsManager != null) suggestionsManager!!.requestSuggestion(Tuils.EMPTYSTRING)
+                    refreshSuggestionsNow()
                     refreshModuleSuggestionsStrip()
                 } else if (action == ACTION_UPDATE_HINT) {
                     mTerminalAdapter!!.setDefaultHint()
@@ -8099,6 +8610,8 @@ class UIManager(
 
                     lastWeatherText = s
                     lastWeatherSymbol = intent.getStringExtra(WEATHER_SYMBOL)
+                    lastWeatherCondition = intent.getStringExtra(WEATHER_CONDITION)
+                    lastWeatherDetails = intent.getStringExtra(WEATHER_DETAILS)
                     lastWeatherUpdateMillis = System.currentTimeMillis()
                     s = Tuils.span(context, s, weatherColor, labelSizes[Label.weather.ordinal])
 
@@ -8306,10 +8819,10 @@ class UIManager(
 
         //        Recalculate tray sizing after real layout changes; IME visibility comes from WindowInsets.
         rootView.getViewTreeObserver().addOnGlobalLayoutListener(OnGlobalLayoutListener {
-            val inputHeight = persistentInputContainer?.measuredHeight ?: 0
+            val inputHeight = persistentBottomChromeHeight()
             if (inputHeight != lastPersistentInputHeight) {
                 lastPersistentInputHeight = inputHeight
-                if (imeInsetVisible || imeBottomOffset > 0) {
+                if (unifiedStatusActive || imeInsetVisible || imeBottomOffset > 0) {
                     applyTerminalTrayState(false)
                 }
             }
@@ -8598,7 +9111,10 @@ class UIManager(
 
         val lViewsParent = labelViews[0]!!.getParent() as LinearLayout
         val unifiedStatusBorder = AppearanceSettings.unifiedStatusBorder()
-        Companion.applyMargins(lViewsParent, IntArray(4))
+        Companion.applyMargins(
+            lViewsParent,
+            if (unifiedStatusBorder) intArrayOf(0, 0, 0, Tuils.dpToPx(mContext, 4)) else IntArray(4)
+        )
         if (unifiedStatusBorder) {
             lViewsParent.background = TerminalBorderRuntime.panelDrawablePx(
                 mContext!!,
@@ -8688,6 +9204,11 @@ class UIManager(
                 lViewsParent.removeView(labelViews[count])
                 labelViews[count] = null
             }
+        }
+
+        if (unifiedStatusBorder) {
+            labelViews.forEach { it?.visibility = View.GONE }
+            setupUnifiedStatus(show, statusTextInsets)
         }
 
         if (show[Label.ram.ordinal]) {
@@ -14952,6 +15473,7 @@ class UIManager(
         if (notifications != null) {
             currentOverlayNotifications.addAll(notifications.filterNotNull())
         }
+        suggestionsManager?.setSearchNotifications(currentOverlayNotifications)
         preserveNotificationReplyFocus(previousFocusKey)
         clampNotificationIndex()
 
@@ -15526,8 +16048,15 @@ class UIManager(
         captureLauncherSurfaceSession()
     }
 
+    fun snapshotTerminalState(): TerminalManager.State? = mTerminalAdapter?.snapshotState()
+
+    fun restoreTerminalState(state: TerminalManager.State?) {
+        if (state != null) mTerminalAdapter?.restoreState(state)
+    }
+
     fun dispose() {
         captureLauncherSurfaceSession()
+        cancelTerminalOutputAutoHide()
         stopTermuxWorkspaceSocketClient()
         profilePaneController?.hide()
         clearPodcastImages()
@@ -15711,7 +16240,7 @@ class UIManager(
             hideAppsDrawer()
             return
         }
-        if (this.isOutputTrayToggledMode && terminalTrayExpanded) {
+        if (this.isOutputTrayToggleEnabled && terminalTrayExpanded) {
             setTerminalTrayExpanded(false)
             return
         }
@@ -15827,6 +16356,7 @@ class UIManager(
             return
         }
         launcherWindowFocused = true
+        refreshSuggestionsNow()
         if (restoreLauncherChromeOnResume) {
             restoreLauncherChromeOnResume = false
             restoreLauncherChromeAfterSurface()
@@ -16111,6 +16641,7 @@ class UIManager(
         private const val TERMINAL_OUTPUT_BOTTOM_PADDING_DP = 6
         private const val TERMINAL_OUTPUT_HEADER_GAP_DP = 6
         private const val TERMINAL_OUTPUT_HEIGHT_ALLOWANCE_DP = 38
+        private const val SEARCH_MODE_EDGE_INSET_DP = 6
         private const val CLOCK_EDGE_LEFT = "left"
         private const val CLOCK_EDGE_RIGHT = "right"
         private const val CLOCK_EDGE_TOP = "top"
@@ -16122,6 +16653,8 @@ class UIManager(
         private const val PREF_PODCAST_BADGE_EDGE = "podcast_badge_edge"
         private const val PREF_PODCAST_BADGE_FRACTION = "podcast_badge_fraction"
         private const val ASCII_IDLE_PAUSE_MS = 120_000L
+        private const val UNIFIED_MODULE_AUTO_HIDE_MS = 10_000L
+        internal fun shouldAutoHideUnifiedModules(activeModule: String?): Boolean = activeModule.isNullOrEmpty()
         private const val RSS_MODULE_VISIBLE_LINES = 14
         val ACTION_UPDATE_SUGGESTIONS: String =
             BuildConfig.APPLICATION_ID + ".ui_update_suggestions"
@@ -16137,6 +16670,8 @@ class UIManager(
         var ACTION_WEATHER_DELAY: String = BuildConfig.APPLICATION_ID + ".ui_weather_delay"
         var ACTION_WEATHER_MANUAL_UPDATE: String = BuildConfig.APPLICATION_ID + ".ui_weather_update"
         const val WEATHER_SYMBOL: String = "weatherSymbol"
+        const val WEATHER_CONDITION: String = "weatherCondition"
+        const val WEATHER_DETAILS: String = "weatherDetails"
 
         val ACTION_MUSIC_CHANGED: String = MusicService.ACTION_MUSIC_CHANGED
         val SONG_TITLE: String = MusicService.SONG_TITLE
@@ -16238,11 +16773,14 @@ class UIManager(
         private const val OUTPUT_TRAY_MODE_TOGGLED = "toggled"
         private const val OUTPUT_HEADER_MODE_ARROWS = "arrows"
         private const val OUTPUT_HEADER_MODE_NONE = "none"
+        private const val OUTPUT_AUTO_HIDE_MIN_SECONDS = 1
+        private const val OUTPUT_AUTO_HIDE_MAX_SECONDS = 3600
         private const val MODULE_TEXT_FONT_THEME = "theme"
         private const val MODULE_TEXT_FONT_MONO = "mono"
         private const val EVENTS_REFRESH_GRACE_MS: Long = 1000
         private val EVENTS_REFRESH_FALLBACK_MS = (60 * 1000).toLong()
         private val LABEL_INDEX_UNMAPPED = -1f
+        private val BATTERY_PERCENT = Regex("\\b\\d{1,3}%")
         const val DUO_LAYOUT_OFF: String = "off"
         const val DUO_LAYOUT_LEFT: String = "left"
         const val DUO_LAYOUT_RIGHT: String = "right"
@@ -16300,6 +16838,44 @@ class UIManager(
             )
             return min(requested, max(0, availableAboveIme - max(0, persistentInputHeight)))
         }
+
+        internal fun outputAutoHideDelayMs(seconds: Int): Long =
+            seconds.coerceIn(OUTPUT_AUTO_HIDE_MIN_SECONDS, OUTPUT_AUTO_HIDE_MAX_SECONDS) * 1000L
+
+        internal fun outputPaneVisibility(autoHideEnabled: Boolean, expanded: Boolean): Int =
+            if (autoHideEnabled && !expanded) View.INVISIBLE else View.VISIBLE
+
+        internal fun headerOnlyTerminalTrayHeight(headerBottom: Int, fallback: Int): Int =
+            if (headerBottom > 0) headerBottom else fallback
+
+        internal fun compactUnifiedBattery(value: CharSequence?): String {
+            val text = value?.toString().orEmpty()
+            return BATTERY_PERCENT.find(text)?.value?.let { "BAT: $it" }
+                ?: text.lineSequence().firstOrNull().orEmpty().trim()
+        }
+
+        internal fun compactUnifiedLine(value: CharSequence?): String =
+            value?.toString()?.lineSequence()?.firstOrNull()?.trim().orEmpty()
+
+        internal fun compactUnifiedWeatherCondition(value: CharSequence?): String {
+            val line = compactUnifiedLine(value)
+            return line.substringAfter("Weather:", line).substringBefore(',').trim()
+        }
+
+        internal fun compactUnifiedWeatherDetails(value: CharSequence?): String {
+            val line = compactUnifiedLine(value)
+            return line.substringAfter(',', "").trim()
+        }
+
+        internal fun compactUnifiedCapacity(availableGb: Double, totalGb: Double): String {
+            if (totalGb <= 0.0) return ""
+            fun number(value: Double): String =
+                if (value % 1.0 == 0.0) value.toLong().toString() else value.toString()
+            return "${number(availableGb)}/${number(totalGb)} GB"
+        }
+
+        internal fun boundedUnifiedModuleHeight(contentHeight: Int, capHeight: Int): Int =
+            min(max(0, contentHeight), max(0, capHeight))
 
         fun resolveSavedDuoSide(context: Context?): String? {
             if (context == null) {

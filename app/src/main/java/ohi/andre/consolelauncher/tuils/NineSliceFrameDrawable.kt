@@ -126,9 +126,13 @@ class NineSliceFrameDrawable(
         invalidateSelf()
     }
 
-    override fun getIntrinsicWidth(): Int = intrinsicDp?.let { (it * density).roundToInt() } ?: -1
+    override fun getIntrinsicWidth(): Int = intrinsicDp?.let {
+        intrinsicDimensions(source.width, source.height, it * density).first
+    } ?: -1
 
-    override fun getIntrinsicHeight(): Int = intrinsicDp?.let { (it * density).roundToInt() } ?: -1
+    override fun getIntrinsicHeight(): Int = intrinsicDp?.let {
+        intrinsicDimensions(source.width, source.height, it * density).second
+    } ?: -1
 
     @Deprecated("Deprecated in Java")
     override fun getOpacity(): Int = PixelFormat.TRANSLUCENT
@@ -153,6 +157,13 @@ class NineSliceFrameDrawable(
             (availableWidth / (left + right)).coerceAtLeast(0f),
             (availableHeight / (top + bottom)).coerceAtLeast(0f)
         )
+
+        internal fun intrinsicDimensions(sourceWidth: Int, sourceHeight: Int, maxSize: Float): Pair<Int, Int> {
+            if (sourceWidth <= 0 || sourceHeight <= 0 || maxSize <= 0f) return 1 to 1
+            val scale = maxSize / maxOf(sourceWidth, sourceHeight)
+            return (sourceWidth * scale).roundToInt().coerceAtLeast(1) to
+                (sourceHeight * scale).roundToInt().coerceAtLeast(1)
+        }
     }
 }
 

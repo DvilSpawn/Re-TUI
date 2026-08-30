@@ -2,7 +2,217 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:clipChildren="false"
+    android:clipToPadding="false"
     android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/unified_status_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ohi.andre.consolelauncher.tuils.OutlineTextView
+                android:id="@+id/unified_status_date"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <ohi.andre.consolelauncher.tuils.OutlineTextView
+                android:id="@+id/unified_status_battery"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="end" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="top"
+            android:orientation="horizontal">
+
+            <ohi.andre.consolelauncher.tuils.OutlineTextView
+                android:id="@+id/unified_status_time"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="end"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="end|center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/unified_status_weather_icon"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_marginEnd="3dp"
+                        android:src="@drawable/ic_material_partly_cloudy_day_24" />
+
+                    <ohi.andre.consolelauncher.tuils.OutlineTextView
+                        android:id="@+id/unified_status_weather"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:gravity="end|center_vertical"
+                        android:singleLine="true" />
+
+                </LinearLayout>
+
+                <ohi.andre.consolelauncher.tuils.OutlineTextView
+                    android:id="@+id/unified_status_weather_location"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:gravity="end|center_vertical"
+                    android:singleLine="true" />
+
+                <ohi.andre.consolelauncher.tuils.OutlineTextView
+                    android:id="@+id/unified_status_weather_details"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:gravity="end|center_vertical"
+                    android:singleLine="true" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/unified_status_storage_internal_icon"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_marginEnd="3dp"
+                    android:src="@drawable/ic_material_smartphone_24" />
+
+                <ohi.andre.consolelauncher.tuils.OutlineTextView
+                    android:id="@+id/unified_status_storage_internal"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:gravity="center_vertical"
+                    android:singleLine="true" />
+
+            </LinearLayout>
+
+            <ohi.andre.consolelauncher.tuils.OutlineTextView
+                android:id="@+id/unified_status_network"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:gravity="end|center_vertical"
+                android:singleLine="true" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/unified_status_storage_external_icon"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_marginEnd="3dp"
+                android:src="@drawable/ic_material_sd_card_24" />
+
+            <ohi.andre.consolelauncher.tuils.OutlineTextView
+                android:id="@+id/unified_status_storage_external"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:gravity="center_vertical"
+                android:singleLine="true" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/unified_status_ram_icon"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_marginEnd="3dp"
+                    android:src="@drawable/ic_status_memory_40" />
+
+                <ohi.andre.consolelauncher.tuils.OutlineTextView
+                    android:id="@+id/unified_status_ram"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:gravity="center_vertical"
+                    android:singleLine="true" />
+
+            </LinearLayout>
+
+            <ohi.andre.consolelauncher.tuils.OutlineTextView
+                android:id="@+id/unified_status_unlock"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:singleLine="true" />
+
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/unified_modules_toggle"
+            android:layout_width="48dp"
+            android:layout_height="26dp"
+            android:layout_gravity="center_horizontal"
+            android:contentDescription="Show modules"
+            android:elevation="2dp"
+            android:padding="4dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_material_keyboard_arrow_up_24" />
+
+    </LinearLayout>
 
     <ohi.andre.consolelauncher.tuils.OutlineTextView android:id="@+id/tv0"
         android:layout_width="match_parent"

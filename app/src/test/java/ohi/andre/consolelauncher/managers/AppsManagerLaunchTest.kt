@@ -21,4 +21,17 @@ class AppsManagerLaunchTest {
         assertFalse(AppsManager.startActivitySafely { error("unexpected") })
         assertTrue(AppsManager.startActivitySafely { })
     }
+
+    @Test
+    fun staleLauncherActivityFallsBackToCurrentPackageActivity() {
+        val attempts = mutableListOf<String>()
+
+        val launched = AppsManager.firstLaunchable("OldAlias", "CurrentAlias", String::equals) {
+            attempts.add(it)
+            it == "CurrentAlias"
+        }
+
+        assertEquals("CurrentAlias", launched)
+        assertEquals(listOf("OldAlias", "CurrentAlias"), attempts)
+    }
 }
