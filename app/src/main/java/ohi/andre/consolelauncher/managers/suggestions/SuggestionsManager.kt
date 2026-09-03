@@ -774,7 +774,7 @@ class SuggestionsManager(
             val suggestion = Suggestion(
                 null,
                 name,
-                commandSuggestionExecutes(name, command.argType()),
+                searchModeCommandSuggestionExecutes(name, command.argType()),
                 Suggestion.TYPE_COMMAND
             )
             candidates.add(SearchResult(name, "COMMAND", SearchResult.TYPE_COMMAND, suggestion, name))
@@ -4912,6 +4912,14 @@ class SuggestionsManager(
 
         internal fun commandSuggestionExecutes(commandName: String?, argTypes: IntArray?): Boolean {
             return argTypes == null || argTypes.isEmpty() || "podcast".equals(commandName, ignoreCase = true)
+        }
+
+        internal fun searchModeCommandSuggestionExecutes(commandName: String?, argTypes: IntArray?): Boolean {
+            if (commandSuggestionExecutes(commandName, argTypes)) return true
+            return when (commandName?.lowercase(Locale.ROOT)) {
+                "calc", "termux", "tmux" -> true
+                else -> false
+            }
         }
 
         internal fun modeTarget(searchMode: Boolean): String = if (searchMode) "classic" else "search"

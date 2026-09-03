@@ -17,15 +17,23 @@ class SuggestionsManagerTest {
     }
 
     @Test
-    fun podcastRootSuggestionExecutesDespitePlainTextArgs() {
-        assertTrue(
+    fun paneRootSuggestionsExecuteFromSearchDespitePlainTextArgs() {
+        listOf("calc", "podcast", "termux", "tmux").forEach { command ->
+            assertTrue(
+                SuggestionsManager.searchModeCommandSuggestionExecutes(
+                    command,
+                    intArrayOf(CommandAbstraction.PLAIN_TEXT)
+                )
+            )
+        }
+        assertFalse(
             SuggestionsManager.commandSuggestionExecutes(
-                "podcast",
+                "calc",
                 intArrayOf(CommandAbstraction.PLAIN_TEXT)
             )
         )
         assertFalse(
-            SuggestionsManager.commandSuggestionExecutes(
+            SuggestionsManager.searchModeCommandSuggestionExecutes(
                 "shell",
                 intArrayOf(CommandAbstraction.PLAIN_TEXT)
             )

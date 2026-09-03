@@ -2787,7 +2787,7 @@ class UIManager(
 
     private fun configureSearchOnlyLayout() {
         val tray = terminalTrayContainer ?: return
-        mainContainer?.visibility = View.GONE
+        mainContainer?.visibility = if (termuxWorkspaceChromeActive) View.VISIBLE else View.GONE
         unifiedBottomConsole?.visibility = View.GONE
         landscapeSplitContainer?.visibility = View.GONE
         terminalContainer?.visibility = View.GONE
