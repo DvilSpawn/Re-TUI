@@ -14,6 +14,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.graphics.PorterDuff
+import android.graphics.drawable.GradientDrawable
 import android.provider.OpenableColumns
 import android.provider.DocumentsContract
 import android.text.InputType
@@ -64,6 +65,7 @@ import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.textColor
 import ohi.andre.consolelauncher.managers.BackupManager
 import ohi.andre.consolelauncher.managers.FocusFrictionStyle
 import ohi.andre.consolelauncher.managers.LockdownManager
+import ohi.andre.consolelauncher.managers.KeyboardShortcutManager
 import ohi.andre.consolelauncher.managers.PresetManager
 import ohi.andre.consolelauncher.managers.RetuiCreditManager
 import ohi.andre.consolelauncher.managers.ToolbarShortcutManager
@@ -128,6 +130,7 @@ class ThemerActivity : AppCompatActivity() {
     private var pendingTypographySizes: MutableMap<XMLPrefsSave, Int>? = null
     private var pendingFrameTarget: FrameTarget? = null
     private var frameEditSession: FrameManager.EditSession? = null
+    private var selectedKeyboardShortcutKey: Char = 'a'
 
     override fun onCreate(savedInstanceState: Bundle?) {
         requestNoTitleIfFullscreen(this)
@@ -191,6 +194,7 @@ class ThemerActivity : AppCompatActivity() {
                 when {
                     sectionItems[position] == FONT_SCALE_PANEL -> VIEW_TYPE_FONT_SCALE
                     sectionItems[position] == FRAME_PANEL -> VIEW_TYPE_FRAME_PANEL
+                    sectionItems[position] == KEYBOARD_SHORTCUT_PANEL -> VIEW_TYPE_KEYBOARD_SHORTCUT_PANEL
                     section == SECTION_FONTS && isFontFileName(sectionItems[position]) -> VIEW_TYPE_FONT
                     else -> VIEW_TYPE_STANDARD
                 }
@@ -201,6 +205,11 @@ class ThemerActivity : AppCompatActivity() {
                 }
                 if (viewType == VIEW_TYPE_FRAME_PANEL) {
                     return FramePanelViewHolder(LinearLayout(parent.context).apply {
+                        orientation = LinearLayout.VERTICAL
+                    })
+                }
+                if (viewType == VIEW_TYPE_KEYBOARD_SHORTCUT_PANEL) {
+                    return KeyboardShortcutPanelViewHolder(LinearLayout(parent.context).apply {
                         orientation = LinearLayout.VERTICAL
                     })
                 }
@@ -240,6 +249,10 @@ class ThemerActivity : AppCompatActivity() {
                     bindFramePanel(holder)
                     return
                 }
+                if (holder is KeyboardShortcutPanelViewHolder) {
+                    bindKeyboardShortcutPanel(holder)
+                    return
+                }
                 val itemView = holder.itemView as TextView
                 itemView.setText(fileName.uppercase(Locale.getDefault()))
                 val selected = section == SECTION_FONTS &&
@@ -277,6 +290,8 @@ class ThemerActivity : AppCompatActivity() {
                         showPreferredMusicAppPicker()
                     } else if (fileName.startsWith("Tasker Integration")) {
                         showTaskerIntegrationDialog()
+                    } else if (fileName == "Re Keyboard Shortcuts") {
+                        openSection(SECTION_KEYBOARD_SHORTCUTS)
                     } else if (fileName == "Fonts") {
                         openSection(SECTION_FONTS)
                     } else if (fileName == "Typography") {
@@ -483,6 +498,8 @@ class ThemerActivity : AppCompatActivity() {
             return "Re:T-UI Personalization Settings"
         } else if (SECTION_INTEGRATIONS == section) {
             return "Re:T-UI Integrations"
+        } else if (SECTION_KEYBOARD_SHORTCUTS == section) {
+            return "Re Keyboard Shortcuts"
         } else if (SECTION_SYSTEM == section) {
             return "Re:T-UI System & Support"
         } else if (SECTION_FONTS == section) {
@@ -533,9 +550,12 @@ class ThemerActivity : AppCompatActivity() {
             )
         } else if (SECTION_INTEGRATIONS == section) {
             return mutableListOf(
+                "Re Keyboard Shortcuts",
                 "Preferred Music App: " + this.preferredMusicAppSummary,
                 "Tasker Integration: " + if (TaskerIntegrationManager.isEnabled(this)) "on" else "off"
             )
+        } else if (SECTION_KEYBOARD_SHORTCUTS == section) {
+            return mutableListOf(KEYBOARD_SHORTCUT_PANEL)
         } else if (SECTION_SYSTEM == section) {
             return mutableListOf(
                 "Backup",
@@ -2171,6 +2191,152 @@ class ThemerActivity : AppCompatActivity() {
             return packageName
         }
 
+    private fun bindKeyboardShortcutPanel(holder: KeyboardShortcutPanelViewHolder) {
+        val root = holder.root
+        root.removeAllViews()
+        root.setPadding(0, dp(this, 4f), 0, dp(this, 12f))
+
+        root.addView(TextView(this).apply {
+            text = "HOLD TO CONFIGURE"
+            setTextColor(accentColor())
+            setTypeface(Tuils.getTypeface(this@ThemerActivity), Typeface.BOLD)
+            textSize = 11f
+            letterSpacing = 0.12f
+            setPadding(dp(this@ThemerActivity, 4f), 0, 0, dp(this@ThemerActivity, 8f))
+        })
+
+        val card = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(this@ThemerActivity, 12f), dp(this@ThemerActivity, 12f), dp(this@ThemerActivity, 12f), dp(this@ThemerActivity, 12f))
+            background = rect(this@ThemerActivity, surfaceColor(), borderColor(), 1.25f, 14)
+        }
+        card.addView(TextView(this).apply {
+            text = "long-press a key"
+            setTextColor(textColor())
+            setTypeface(Tuils.getTypeface(this@ThemerActivity), Typeface.BOLD)
+            textSize = 16f
+        }, inputParams())
+        card.addView(TextView(this).apply {
+            text = "Hold or tap a letter to choose up to two apps. Hold that key on Re Keyboard to launch one."
+            setTextColor(textColor())
+            setTypeface(Tuils.getTypeface(this@ThemerActivity))
+            textSize = 12f
+            setLineSpacing(0f, 1.08f)
+        }, inputParams())
+
+        listOf("qwertyuiop", "asdfghjkl", "zxcvbnm").forEach { letters ->
+            val row = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER
+            }
+            letters.forEach { key -> row.addView(shortcutKeyView(key)) }
+            card.addView(row, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+                bottomMargin = dp(this@ThemerActivity, 4f)
+            })
+        }
+
+        card.addView(TextView(this).apply {
+            text = "•  1 APP     ••  2 APPS"
+            setTextColor(textColor())
+            setTypeface(Tuils.getTypeface(this@ThemerActivity), Typeface.BOLD)
+            textSize = 10f
+            setPadding(dp(this@ThemerActivity, 2f), dp(this@ThemerActivity, 5f), 0, dp(this@ThemerActivity, 5f))
+        })
+
+        val selected = selectedKeyboardShortcutKey
+        val mappings = KeyboardShortcutManager.mappings(this, selected)
+        card.addView(TextView(this).apply {
+            text = "HOLD ${selected.uppercaseChar()}"
+            setTextColor(accentColor())
+            setTypeface(Tuils.getTypeface(this@ThemerActivity), Typeface.BOLD)
+            textSize = 11f
+            setPadding(dp(this@ThemerActivity, 2f), dp(this@ThemerActivity, 6f), 0, dp(this@ThemerActivity, 5f))
+        })
+        repeat(KeyboardShortcutManager.MAX_PER_KEY) { slot ->
+            val mapping = mappings.getOrNull(slot)
+            card.addView(TextView(this).apply {
+                text = "SLOT ${slot + 1}   ${mapping?.label ?: "CHOOSE APP"}"
+                styleListItem(this@ThemerActivity, this, mapping != null)
+                textSize = 12f
+                setOnClickListener { showKeyboardShortcutAppPicker(selected, slot) }
+            }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+                topMargin = dp(this@ThemerActivity, 4f)
+            })
+        }
+        root.addView(card, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
+    }
+
+    private fun shortcutKeyView(key: Char): View {
+        val selected = key == selectedKeyboardShortcutKey
+        val occupied = KeyboardShortcutManager.mappings(this, key).size
+        val size = dp(this, 25f)
+        return FrameLayout(this).apply {
+            isClickable = true
+            isFocusable = true
+            contentDescription = "${key.uppercaseChar()}, $occupied app shortcuts"
+            background = GradientDrawable().apply {
+                shape = GradientDrawable.RECTANGLE
+                cornerRadius = dp(this@ThemerActivity, 5f).toFloat()
+                setColor(Color.TRANSPARENT)
+                val keyOutline = ColorUtils.blendARGB(surfaceColor(), textColor(), 0.45f)
+                setStroke(dp(this@ThemerActivity, if (selected) 2f else 1f).coerceAtLeast(1), if (selected) Color.RED else keyOutline)
+            }
+            addView(TextView(this@ThemerActivity).apply {
+                text = key.uppercaseChar().toString()
+                gravity = Gravity.CENTER
+                setTextColor(textColor())
+                setTypeface(Tuils.getTypeface(this@ThemerActivity), Typeface.BOLD)
+                textSize = 10f
+            }, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
+            if (occupied > 0) {
+                addView(TextView(this@ThemerActivity).apply {
+                    text = "•".repeat(occupied.coerceAtMost(2))
+                    gravity = Gravity.END
+                    setTextColor(if (selected) Color.RED else accentColor())
+                    setTypeface(Tuils.getTypeface(this@ThemerActivity), Typeface.BOLD)
+                    textSize = 8f
+                }, FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.TOP or Gravity.END).apply {
+                    topMargin = dp(this@ThemerActivity, 1f)
+                    rightMargin = dp(this@ThemerActivity, 2f)
+                })
+            }
+            val select = {
+                selectedKeyboardShortcutKey = key
+                sectionsAdapter?.notifyDataSetChanged()
+            }
+            setOnClickListener { select() }
+            setOnLongClickListener { select(); true }
+            layoutParams = LinearLayout.LayoutParams(size, dp(this@ThemerActivity, 38f)).apply {
+                leftMargin = dp(this@ThemerActivity, 1.5f)
+                rightMargin = dp(this@ThemerActivity, 1.5f)
+            }
+        }
+    }
+
+    private fun showKeyboardShortcutAppPicker(key: Char, slot: Int) {
+        val apps = LauncherActivity.instance?.keyboardShortcutApps().orEmpty()
+        if (apps.isEmpty()) {
+            Toast.makeText(this, "Launcher app list is not ready. Return home and reopen Settings.", Toast.LENGTH_SHORT).show()
+            return
+        }
+        val occupied = KeyboardShortcutManager.mappings(this, key).getOrNull(slot) != null
+        val labels = mutableListOf<String>()
+        if (occupied) labels.add("Clear slot")
+        labels.addAll(apps.map { app ->
+            val label = app.publicLabel ?: app.componentName?.packageName ?: "App"
+            "$label (${app.componentName?.packageName.orEmpty()})"
+        })
+        TuixtDialog.showSearchableOptions(this, "${key.uppercaseChar()} · SLOT ${slot + 1}", labels, "Search apps", ItemAction { which ->
+            if (occupied && which == 0) {
+                KeyboardShortcutManager.clear(this, key, slot)
+            } else {
+                val appIndex = which - if (occupied) 1 else 0
+                apps.getOrNull(appIndex)?.let { KeyboardShortcutManager.save(this, key, slot, it) }
+            }
+            sectionsAdapter?.notifyDataSetChanged()
+        })
+    }
+
     private fun showTaskerIntegrationDialog() {
         TuixtDialog.showCustom(this, "Tasker integration", ContentFactory { _: Dialog? ->
             val content = LinearLayout(this).apply {
@@ -2788,6 +2954,7 @@ class ThemerActivity : AppCompatActivity() {
         val save: TextView
     ) : RecyclerView.ViewHolder(itemView)
     private class FramePanelViewHolder(val root: LinearLayout) : RecyclerView.ViewHolder(root)
+    private class KeyboardShortcutPanelViewHolder(val root: LinearLayout) : RecyclerView.ViewHolder(root)
 
     private class AppChoice(val label: String, val packageName: String?)
     private data class TypographySetting(
@@ -2810,6 +2977,7 @@ class ThemerActivity : AppCompatActivity() {
         const val SECTION_BEHAVIOR: String = "behavior"
         const val SECTION_PERSONALIZATION: String = "personalization"
         const val SECTION_INTEGRATIONS: String = "integrations"
+        const val SECTION_KEYBOARD_SHORTCUTS: String = "keyboard_shortcuts"
         const val SECTION_SYSTEM: String = "system"
         const val SECTION_FONTS: String = "fonts"
         const val SECTION_TYPOGRAPHY: String = "typography"
@@ -2821,8 +2989,10 @@ class ThemerActivity : AppCompatActivity() {
         private const val VIEW_TYPE_FONT = 1
         private const val VIEW_TYPE_FONT_SCALE = 2
         private const val VIEW_TYPE_FRAME_PANEL = 3
+        private const val VIEW_TYPE_KEYBOARD_SHORTCUT_PANEL = 4
         private const val FONT_SCALE_PANEL = "__font_scale_panel__"
         private const val FRAME_PANEL = "__frame_panel__"
+        private const val KEYBOARD_SHORTCUT_PANEL = "__keyboard_shortcut_panel__"
         private const val MIN_TYPOGRAPHY_SP = 8
         private const val MAX_TYPOGRAPHY_SP = 64
         private val FONT_PREVIEW_SIZES = floatArrayOf(10f, 11f, 12f, 14f, 15f, 18f, 64f)

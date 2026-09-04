@@ -1,22 +1,18 @@
-# Re:TUI 2 — Build 412
+# Re:TUI 2 — Build 413
 
-Build 412 is a reliability update for presets, wallpaper auto-theming, and live Launcher customization.
+Build 413 adds Launcher-side Re Keyboard app shortcuts and repairs shareable configuration exports on Android XML providers.
 
-## Fixes
+## Changes
 
-- Fixed preset save and apply failures, including older presets that use legacy color-setting names.
-- Hardened preset XML parsing while continuing to reject unsafe document declarations.
-- Saving a preset no longer applies it or replaces the current appearance.
-- Wallpaper auto-theming now remains active while individual theme and suggestion colors are overridden manually.
-- Running `wallpaper -auto` starts a fresh derived palette and clears earlier manual overrides.
-- Settings color fields automatically use readable black or white text against their current background.
-- Live Launcher refreshes are posted safely after settings changes, avoiding Activity-state crashes.
-- Launcher refreshes preserve the loaded app preferences used by suggestion rows.
-- Added breathing room above the unified bottom status and dock area.
+- Added a miniature QWERTY shortcut editor under Integrations with up to two app mappings per letter.
+- Added live app-name and package filtering to the shortcut app picker.
+- Added secure opaque shortcut IDs, private pairing tokens, work-profile-aware app resolution, and cache-backed icon sharing through the existing Keyboard context channel.
+- Removed incompatible vendor-specific XML feature calls that prevented saved presets from being exported as shareable configurations on some phones.
+- Kept preset and podcast XML protected by explicit document-type rejection and external-entity blocking.
 
 ## Validation
 
 - Play Store unit tests and lint passed.
 - Signed GitHub APK and Play Store AAB were built from the same tagged source.
 
-Version 2, Play Store version code 412.
+Version 2, Play Store version code 413.

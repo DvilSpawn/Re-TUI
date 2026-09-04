@@ -877,11 +877,6 @@ object PresetManager {
         val xml = file.readText(Charsets.UTF_8)
         require(!xml.contains("<!DOCTYPE", ignoreCase = true)) { "Preset XML cannot contain a DOCTYPE" }
         val factory = DocumentBuilderFactory.newInstance()
-        runCatching { factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true) }
-        runCatching { factory.setFeature("http://xml.org/sax/features/external-general-entities", false) }
-        runCatching { factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false) }
-        runCatching { factory.isXIncludeAware = false }
-        factory.setExpandEntityReferences(false)
         val builder = factory.newDocumentBuilder().apply {
             setEntityResolver { _, _ -> InputSource(StringReader("")) }
         }

@@ -28,12 +28,6 @@ object PodcastParser {
 
         val factory = DocumentBuilderFactory.newInstance().apply {
             isNamespaceAware = true
-            trySetFeature(this, "http://apache.org/xml/features/disallow-doctype-decl", true)
-            trySetFeature(this, "http://xml.org/sax/features/external-general-entities", false)
-            trySetFeature(this, "http://xml.org/sax/features/external-parameter-entities", false)
-            trySetFeature(this, "http://apache.org/xml/features/nonvalidating/load-external-dtd", false)
-            runCatching { isXIncludeAware = false }
-            setExpandEntityReferences(false)
         }
         val builder = factory.newDocumentBuilder().apply {
             setEntityResolver { _, _ -> InputSource(StringReader("")) }
@@ -163,10 +157,6 @@ object PodcastParser {
 
     private fun org.w3c.dom.NodeList.asSequence(): Sequence<Node> =
         (0 until length).asSequence().map { item(it) }
-
-    private fun trySetFeature(factory: DocumentBuilderFactory, name: String, value: Boolean) {
-        runCatching { factory.setFeature(name, value) }
-    }
 
     private fun containsDoctype(bytes: ByteArray): Boolean {
         val marker = "<!DOCTYPE"

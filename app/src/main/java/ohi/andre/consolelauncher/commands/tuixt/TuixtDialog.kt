@@ -7,6 +7,8 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Handler
 import android.os.Looper
 import android.text.InputType
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -79,6 +81,65 @@ object TuixtDialog {
             show(dialog)
         })
     }
+
+    fun showSearchableOptions(
+        context: Context,
+        title: String,
+        items: List<String?>,
+        hint: String,
+        action: ItemAction
+    ) {
+        Handler(Looper.getMainLooper()).post {
+            val dialog = createDialog(context)
+            val content = createContent(context)
+            val search = EditText(context).apply {
+                this.hint = hint
+                inputType = InputType.TYPE_CLASS_TEXT
+                styleInput(context, this)
+                setSingleLine(true)
+            }
+
+            fun render(query: String) {
+                content.removeAllViews()
+                matchingOptionIndices(items, query).forEach { index ->
+                    val label = items[index] ?: return@forEach
+                    content.addView(TextView(context).apply {
+                        text = label.uppercase(Locale.getDefault())
+                        styleListItem(context, this, false)
+                        setOnClickListener {
+                            dialog.dismiss()
+                            action.onItemSelected(index)
+                        }
+                    }, LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                    ).apply { bottomMargin = dp(context, 8f) })
+                }
+                if (content.childCount == 0) {
+                    content.addView(TextView(context).apply {
+                        text = "NO APPS FOUND"
+                        setTextColor(textColor())
+                        setTypeface(Tuils.getTypeface(context))
+                        gravity = Gravity.CENTER
+                        setPadding(0, dp(context, 18f), 0, dp(context, 18f))
+                    })
+                }
+            }
+
+            search.addTextChangedListener(object : TextWatcher {
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) =
+                    render(s?.toString().orEmpty().trim())
+                override fun afterTextChanged(s: Editable?) = Unit
+            })
+            render("")
+            dialog.setContentView(wrap(context, title, content, search, false, true))
+            show(dialog, heightFraction = 0.82f)
+        }
+    }
+
+    internal fun matchingOptionIndices(items: List<String?>, query: String): List<Int> =
+        items.indices.filter { items[it]?.contains(query, ignoreCase = true) == true }
 
     fun showInput(
         context: Context,
@@ -298,7 +359,14 @@ object TuixtDialog {
     private fun wrap(context: Context, title: String, content: View?, buttons: View?): View =
         wrap(context, title, content, buttons, false)
 
-    private fun wrap(context: Context, title: String, content: View?, buttons: View?, compact: Boolean): View {
+    private fun wrap(
+        context: Context,
+        title: String,
+        content: View?,
+        buttons: View?,
+        compact: Boolean,
+        fillHeight: Boolean = false
+    ): View {
         val root = FrameLayout(context)
         root.setPadding(
             dp(context, 18f),
@@ -330,7 +398,8 @@ object TuixtDialog {
         panel.addView(
             scrollView, LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
+                if (fillHeight) 0 else ViewGroup.LayoutParams.WRAP_CONTENT,
+                if (fillHeight) 1f else 0f
             )
         )
 
@@ -340,7 +409,7 @@ object TuixtDialog {
 
         val panelParams = FrameLayout.LayoutParams(
             if (compact) ViewGroup.LayoutParams.WRAP_CONTENT else ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
+            if (fillHeight) ViewGroup.LayoutParams.MATCH_PARENT else ViewGroup.LayoutParams.WRAP_CONTENT
         )
         panelParams.topMargin = dp(context, 12f)
         container.addView(panel, panelParams)
@@ -356,14 +425,18 @@ object TuixtDialog {
         headerParams.leftMargin = dp(context, 42f)
         container.addView(header, headerParams)
 
-        val contentHost = addFoldAwareHost(context, root, ViewGroup.LayoutParams.WRAP_CONTENT)
+        val contentHost = addFoldAwareHost(
+            context,
+            root,
+            if (fillHeight) ViewGroup.LayoutParams.MATCH_PARENT else ViewGroup.LayoutParams.WRAP_CONTENT
+        )
         contentHost.addView(
-            container,
-            FrameLayout.LayoutParams(
-                if (compact) ViewGroup.LayoutParams.WRAP_CONTENT else ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                Gravity.CENTER
-            )
+                container,
+                FrameLayout.LayoutParams(
+                    if (compact) ViewGroup.LayoutParams.WRAP_CONTENT else ViewGroup.LayoutParams.MATCH_PARENT,
+                    if (fillHeight) ViewGroup.LayoutParams.MATCH_PARENT else ViewGroup.LayoutParams.WRAP_CONTENT,
+                    Gravity.CENTER
+                )
         )
 
         return root
@@ -425,7 +498,7 @@ object TuixtDialog {
         return row
     }
 
-    private fun show(dialog: Dialog, dimAmount: Float = 0.42f) {
+    private fun show(dialog: Dialog, dimAmount: Float = 0.42f, heightFraction: Float? = null) {
         dialog.show()
         applyFullscreen(dialog)
         val window = dialog.getWindow()
@@ -444,7 +517,9 @@ object TuixtDialog {
             val params = WindowManager.LayoutParams()
             params.copyFrom(window.getAttributes())
             params.width = WindowManager.LayoutParams.MATCH_PARENT
-            params.height = WindowManager.LayoutParams.WRAP_CONTENT
+            params.height = heightFraction?.let {
+                (dialog.context.resources.displayMetrics.heightPixels * it).toInt()
+            } ?: WindowManager.LayoutParams.WRAP_CONTENT
             window.setAttributes(params)
         }
     }

@@ -79,6 +79,8 @@ import ohi.andre.consolelauncher.MainManager
 import ohi.andre.consolelauncher.UIManager
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings
 import ohi.andre.consolelauncher.managers.LauncherSoundManager
+import ohi.andre.consolelauncher.managers.KeyboardShortcutManager
+import ohi.andre.consolelauncher.managers.AppsManager.LaunchInfo
 import ohi.andre.consolelauncher.managers.settings.NotificationSettings
 import ohi.andre.consolelauncher.managers.xml.options.Notifications
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi
@@ -377,7 +379,29 @@ class LauncherActivity : AppCompatActivity(), Reloadable {
 
         main = MainManager(this)
         attachLauncherUi(null, openStartupMenu = true, playBootSound = true)
+        handleKeyboardShortcutIntent(intent)
         System.gc()
+    }
+
+    fun keyboardShortcutApps(): List<LaunchInfo> {
+        val appsManager = main?.mainPack?.appsManager ?: return emptyList()
+        return runCatching {
+            (appsManager.shownApps() + appsManager.hiddenApps())
+                .distinctBy { it.write() }
+                .sortedBy { it.publicLabel?.lowercase() }
+        }.getOrDefault(emptyList())
+    }
+
+    private fun handleKeyboardShortcutIntent(request: Intent?): Boolean {
+        if (request?.action != KeyboardShortcutManager.ACTION_RUN) return false
+        val mapping = KeyboardShortcutManager.resolve(
+            this,
+            request.getStringExtra(KeyboardShortcutManager.EXTRA_TOKEN),
+            request.getStringExtra(KeyboardShortcutManager.EXTRA_ID)
+        ) ?: return true
+        val appsManager = main?.mainPack?.appsManager ?: return true
+        appsManager.findLaunchInfo(mapping.appIdentity)?.let { appsManager.launch(this, it) }
+        return true
     }
 
     private fun attachLauncherUi(
@@ -730,6 +754,8 @@ class LauncherActivity : AppCompatActivity(), Reloadable {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        setIntent(intent)
+        if (handleKeyboardShortcutIntent(intent)) return
         if (intent.hasExtra(Reloadable.MESSAGE)) {
             reload()
         }

@@ -990,6 +990,12 @@ class AppsManager(context: Context) : XMLPrefsElement {
         return hiddenApps!!
     }
 
+    fun findLaunchInfo(identity: String?): LaunchInfo? {
+        val parsed = LaunchInfo.identityInfo(identity) ?: return null
+        AppUtils.findLaunchInfoWithIdentity(shownApps(), parsed)?.let { return it }
+        return hiddenApps?.let { AppUtils.findLaunchInfoWithIdentity(it, parsed) }
+    }
+
     val suggestedApps: Array<LaunchInfo?>
         get() {
             if (appsHolder == null) return arrayOfNulls<LaunchInfo>(0)

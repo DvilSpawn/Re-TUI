@@ -66,6 +66,7 @@ object RetuiThemeBridge {
         val bundle = buildLauncherThemeBundle(context, contextLabel, mode)
         addFrame(context, bundle, FrameTarget.KEYBOARD, KEYBOARD_PACKAGE, "retui-keyboard-frame")
         addKeyboardFrames(context, bundle)
+        bundle.putString(KeyboardShortcutManager.BUNDLE_KEY, KeyboardShortcutManager.keyboardJson(context))
         applyToKeyboardInput(input, contextLabel, mode)
         val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager?
         imm?.sendAppPrivateCommand(input, KEYBOARD_APPLY_CONTEXT_ACTION, bundle)
