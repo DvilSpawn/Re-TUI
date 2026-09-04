@@ -100,8 +100,8 @@ object TuixtTheme {
 
     @JvmStatic
     fun styleInput(context: Context, view: EditText) {
-        val text = textColor()
         val surface = surfaceColor()
+        val text = if (ColorUtils.calculateLuminance(surface) > 0.45) Color.BLACK else Color.WHITE
         view.setTextColor(text)
         view.setHintTextColor(ColorUtils.setAlphaComponent(text, 150))
         view.highlightColor = ColorUtils.setAlphaComponent(ColorUtils.blendARGB(surface, text, 0.5f), 255)

@@ -63,6 +63,7 @@ object XMLPrefsManager {
         commonsLoaded = false
 
         for (element in XMLPrefsRoot.entries) {
+            if (element === XMLPrefsRoot.APPS) continue
             element.getValues()?.list?.clear()
         }
     }
@@ -297,21 +298,25 @@ object XMLPrefsManager {
         "tui_notification_input_color" to "tui_notification_input_text_color"
     )
 
+    private fun renamesFor(element: XMLPrefsRoot): Array<Pair<String, String>> = when (element) {
+        XMLPrefsRoot.THEME -> THEME_RENAMES
+        XMLPrefsRoot.SUGGESTIONS -> SUGGESTION_RENAMES
+        XMLPrefsRoot.NOTIFICATIONS -> NOTIFICATION_RENAMES
+        XMLPrefsRoot.RSS -> RSS_RENAMES
+        XMLPrefsRoot.BEHAVIOR -> BEHAVIOR_RENAMES
+        else -> emptyArray()
+    }
+
+    internal fun canonicalSettingLabel(element: XMLPrefsRoot, label: String): String =
+        renamesFor(element).firstOrNull { it.first == label }?.second ?: label
+
     private fun migrateRootValues(d: Document, root: Element?, element: XMLPrefsRoot): Boolean {
         var changed = false
         if (root == null) {
             return false
         }
 
-        val renames = when (element) {
-            XMLPrefsRoot.THEME -> THEME_RENAMES
-            XMLPrefsRoot.SUGGESTIONS -> SUGGESTION_RENAMES
-            XMLPrefsRoot.NOTIFICATIONS -> NOTIFICATION_RENAMES
-            XMLPrefsRoot.RSS -> RSS_RENAMES
-            XMLPrefsRoot.BEHAVIOR -> BEHAVIOR_RENAMES
-            else -> emptyArray<Pair<String, String>>()
-        }
-        for (rename in renames) {
+        for (rename in renamesFor(element)) {
             changed = renameDirectChild(d, root, rename.first, rename.second) or changed
         }
 

@@ -759,7 +759,9 @@ class LauncherActivity : AppCompatActivity(), Reloadable {
         fun preview(context: Context) {
             val launcher = instance
             if (launcher != null) {
-                launcher.refreshUiInPlace()
+                launcher.window.decorView.post {
+                    if (instance === launcher) launcher.refreshUiInPlace()
+                }
                 return
             }
 

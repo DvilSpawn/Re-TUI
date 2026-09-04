@@ -5,6 +5,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertThrows
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.managers.xml.options.Ui
@@ -96,6 +97,27 @@ class PresetManagerTest {
         assertTrue(suggestionsXml.contains("<apps_background_color value=\"#00897B\""))
         assertTrue(suggestionsXml.contains("<suggestions_order value=\"2(2)0(5)1(5)3(3)\""))
         assertFalse(suggestionsXml.contains("Mako"))
+    }
+
+    @Test fun sanitizerMigratesLegacyPresetColors() {
+        val theme = Files.createTempFile("legacy-theme", ".xml").toFile()
+        theme.writeText("<THEME><input_color value=\"#112233\" /></THEME>")
+        val suggestions = Files.createTempFile("legacy-suggestions", ".xml").toFile()
+        suggestions.writeText("<SUGGESTIONS><default_bg_color value=\"#445566\" /></SUGGESTIONS>")
+
+        assertTrue(PresetManager.sanitizeShareableXml(theme, XMLPrefsManager.XMLPrefsRoot.THEME)
+            .contains("<input_text_color value=\"#112233\""))
+        assertTrue(PresetManager.sanitizeShareableXml(suggestions, XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS)
+            .contains("<default_background_color value=\"#445566\""))
+    }
+
+    @Test fun sanitizerRejectsDoctypeWithoutParserFeatureSupport() {
+        val theme = Files.createTempFile("unsafe-theme", ".xml").toFile()
+        theme.writeText("<!DOCTYPE THEME SYSTEM \"file:///tmp/nope\"><THEME />")
+
+        assertThrows(IllegalArgumentException::class.java) {
+            PresetManager.sanitizeShareableXml(theme, XMLPrefsManager.XMLPrefsRoot.THEME)
+        }
     }
 
     @Test fun crtVignetteDefaultsOn() {

@@ -139,6 +139,8 @@ object LauncherSettings {
 
     @JvmStatic
     fun enableWallpaperAuto(context: Context? = null) {
+        AutoColorManager.init(context)
+        AutoColorManager.clearManualOverrides()
         set(context, Ui.system_wallpaper, "true")
         set(context, Theme.wallpaper_overlay_color, "#00000000")
         set(context, Ui.auto_color_pick, "true")

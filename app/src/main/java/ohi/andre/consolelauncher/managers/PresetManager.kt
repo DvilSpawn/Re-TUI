@@ -13,12 +13,14 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.InputStream
 import java.io.OutputStream
+import java.io.StringReader
 import java.util.Collections
 import java.util.Locale
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
 import javax.xml.parsers.DocumentBuilderFactory
+import org.xml.sax.InputSource
 import kotlin.math.max
 import android.provider.DocumentsContract
 import android.provider.OpenableColumns
@@ -259,8 +261,6 @@ object PresetManager {
             XMLPrefsManager.XMLPrefsRoot.BEHAVIOR, SHAREABLE_BEHAVIOR
         )
         FrameManager.copyCurrentTo(context, presetFolder)
-
-        apply(cleanName)
     }
 
     @Throws(Exception::class)
@@ -289,10 +289,12 @@ object PresetManager {
         val currentTheme: File = File(Tuils.getFolder(), XMLPrefsManager.XMLPrefsRoot.THEME.path)
         val currentSuggestions: File =
             File(Tuils.getFolder(), XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS.path)
+        val themeXml = sanitizeShareableXml(presetTheme, XMLPrefsRoot.THEME)
+        val suggestionsXml = sanitizeShareableXml(presetSuggestions, XMLPrefsRoot.SUGGESTIONS)
         Tuils.insertOld(currentTheme)
         Tuils.insertOld(currentSuggestions)
-        writeText(currentTheme, sanitizeShareableXml(presetTheme, XMLPrefsRoot.THEME))
-        writeText(currentSuggestions, sanitizeShareableXml(presetSuggestions, XMLPrefsRoot.SUGGESTIONS))
+        writeText(currentTheme, themeXml)
+        writeText(currentSuggestions, suggestionsXml)
         val presetUi = File(presetFolder, XMLPrefsManager.XMLPrefsRoot.UI.path)
         if (presetUi.isFile) applyAllowed(presetUi, XMLPrefsRoot.UI, SHAREABLE_UI)
         val presetBehavior = File(presetFolder, XMLPrefsManager.XMLPrefsRoot.BEHAVIOR.path)
@@ -542,7 +544,7 @@ object PresetManager {
         for (index in 0 until children.length) {
             val node = children.item(index)
             if (node.nodeType != org.w3c.dom.Node.ELEMENT_NODE) continue
-            val setting = allowed[node.nodeName] ?: continue
+            val setting = allowed[XMLPrefsManager.canonicalSettingLabel(root, node.nodeName)] ?: continue
             val value = node.attributes?.getNamedItem(XMLPrefsManager.VALUE_ATTRIBUTE)?.nodeValue ?: continue
             if (!isShareableValue(setting, value)) continue
             require(parsed.put(setting, value) == null) { "Duplicate preset setting: ${setting.label()}" }
@@ -872,13 +874,18 @@ object PresetManager {
 
     private fun parseXml(file: File): Document {
         require(file.isFile && file.length() <= MAX_ENTRY_BYTES) { "Preset package is incomplete" }
+        val xml = file.readText(Charsets.UTF_8)
+        require(!xml.contains("<!DOCTYPE", ignoreCase = true)) { "Preset XML cannot contain a DOCTYPE" }
         val factory = DocumentBuilderFactory.newInstance()
-        factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true)
-        factory.setFeature("http://xml.org/sax/features/external-general-entities", false)
-        factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false)
-        factory.isXIncludeAware = false
+        runCatching { factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true) }
+        runCatching { factory.setFeature("http://xml.org/sax/features/external-general-entities", false) }
+        runCatching { factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false) }
+        runCatching { factory.isXIncludeAware = false }
         factory.setExpandEntityReferences(false)
-        return factory.newDocumentBuilder().parse(file)
+        val builder = factory.newDocumentBuilder().apply {
+            setEntityResolver { _, _ -> InputSource(StringReader("")) }
+        }
+        return builder.parse(InputSource(StringReader(xml)))
     }
 
     private fun copySanitizedXmlFiles(source: File, destination: File) {

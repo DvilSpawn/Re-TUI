@@ -20,13 +20,12 @@ class preset : ParamCommand() {
                     PresetManager.save(pack.context, name)
                     if (pack.context is Reloadable) {
                         (pack.context as Reloadable).addMessage("preset", "Saved preset: " + name.trim())
-                        LauncherActivity.preview(pack.context)
                     }
                     return "Preset '" + name.trim() + "' saved."
                 } catch (e: IllegalArgumentException) {
                     return e.message!!
                 } catch (e: Exception) {
-                    return pack.context.getString(R.string.output_error)
+                    return e.message ?: pack.context.getString(R.string.output_error)
                 }
             }
 
@@ -47,7 +46,7 @@ class preset : ParamCommand() {
                 } catch (e: IllegalArgumentException) {
                     return e.message!!
                 } catch (e: Exception) {
-                    return pack.context.getString(R.string.output_error)
+                    return e.message ?: pack.context.getString(R.string.output_error)
                 }
             }
 

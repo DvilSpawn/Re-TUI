@@ -1793,6 +1793,7 @@ class UIManager(
         }
         if (dock.parent !== dockHost) {
             detachFromParent(dock)
+            dock.setPadding(dock.paddingLeft, dock.paddingBottom, dock.paddingRight, dock.paddingBottom)
             dockHost.removeAllViews()
             dockHost.addView(
                 dock,
