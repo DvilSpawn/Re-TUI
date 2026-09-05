@@ -21,7 +21,6 @@ import java.util.Date
 import java.util.HashSet
 import java.util.Locale
 import java.util.Map
-import java.util.Set
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
@@ -126,7 +125,8 @@ object BackupManager {
     fun exportShareableConfiguration(
         context: android.content.Context,
         uri: android.net.Uri,
-        presetName: kotlin.String? = null
+        presetName: kotlin.String? = null,
+        behaviorLabels: Set<String> = PresetManager.defaultShareableBehaviorLabels()
     ) {
         val preset = if (presetName == null) null else presetName.trim { it <= ' ' }
         var sourceRoot: java.io.File = Tuils.getFolder()
@@ -151,7 +151,12 @@ object BackupManager {
         try {
             ohi.andre.consolelauncher.managers.BackupManager.addTextEntry(
                 zip, ohi.andre.consolelauncher.managers.BackupManager.MANIFEST_FILE,
-                shareableManifest(sourceType, sections, if (presetSource) sourceRoot.name else null)
+                shareableManifest(
+                    sourceType,
+                    sections,
+                    if (presetSource) sourceRoot.name else null,
+                    behaviorLabels
+                )
             )
             val roots = mutableListOf(XMLPrefsManager.XMLPrefsRoot.THEME)
             if (includeUi) roots.add(XMLPrefsManager.XMLPrefsRoot.UI)
@@ -163,7 +168,10 @@ object BackupManager {
                 ohi.andre.consolelauncher.managers.BackupManager.addTextEntry(
                     zip,
                     root.path,
-                    if (presetSource) PresetManager.sanitizeShareableXml(file, root)
+                    if (root == XMLPrefsManager.XMLPrefsRoot.BEHAVIOR) {
+                        if (presetSource) PresetManager.sanitizeSelectedBehaviorXml(file, behaviorLabels)
+                        else PresetManager.shareableBehaviorXml(behaviorLabels)
+                    } else if (presetSource) PresetManager.sanitizeShareableXml(file, root)
                     else PresetManager.shareableXml(root)
                 )
             }
@@ -176,16 +184,20 @@ object BackupManager {
     internal fun shareableManifest(
         sourceType: String,
         sections: String,
-        presetName: String?
+        presetName: String?,
+        behaviorLabels: Set<String>? = null
     ): String = buildString {
         append("type=").append(TYPE_SHAREABLE).append('\n')
-        append("schema=2\n")
+        append("schema=").append(if (behaviorLabels == null) "2" else "3").append('\n')
         append("profile=shareable\n")
-        append("privacy=pi-safe\n")
+        append("privacy=").append(if (behaviorLabels == null) "pi-safe" else "user-selected").append('\n')
         append("appVersion=").append(BuildConfig.VERSION_NAME).append('\n')
         append("source=").append(sourceType).append('\n')
         if (!presetName.isNullOrBlank()) append("presetName=").append(presetName).append('\n')
         append("sections=").append(sections).append('\n')
+        if (behaviorLabels != null) {
+            append("behaviorFields=").append(behaviorLabels.sorted().joinToString(",")).append('\n')
+        }
     }
 
     private fun writeVerified(context: Context, uri: Uri, payload: ByteArray) {
@@ -300,7 +312,8 @@ object BackupManager {
         }
         val importedName = PresetManager.importExtractedFolder(
             manifestValue(manifest, "presetName")?.takeIf { it.isNotBlank() } ?: "Imported preset",
-            tempDir
+            tempDir,
+            if (manifestValue(manifest, "schema") == "3") behaviorFields(manifest) else null
         )
         Tuils.delete(tempDir)
         return importedName
@@ -319,13 +332,16 @@ object BackupManager {
                 true
             }
             TYPE_SHAREABLE -> {
-                kotlin.require(schema == "1" || schema == "2") { "Unsupported backup schema" }
+                kotlin.require(schema == "1" || schema == "2" || schema == "3") { "Unsupported backup schema" }
                 kotlin.require(profile == "shareable") { "Invalid shareable configuration profile" }
                 val sections = manifestValue(manifest, "sections")
-                if (schema == "2") {
-                    kotlin.require(manifestValue(manifest, "privacy") == "pi-safe") {
+                if (schema == "2" || schema == "3") {
+                    kotlin.require(
+                        manifestValue(manifest, "privacy") == if (schema == "2") "pi-safe" else "user-selected"
+                    ) {
                         "Shareable configuration privacy marker is missing"
                     }
+                    if (schema == "3") behaviorFields(manifest)
                     kotlin.require(
                         sections == "theme,suggestions" ||
                             sections == "theme,suggestions,behavior" ||
@@ -368,6 +384,16 @@ object BackupManager {
             }
             else -> throw java.lang.IllegalArgumentException("Unsupported backup package")
         }
+    }
+
+    internal fun behaviorFields(manifest: String?): Set<String> {
+        val value = manifestValue(manifest, "behaviorFields")
+        val fields = if (value.isBlank()) emptySet() else value.split(',').toSet()
+        val known = ohi.andre.consolelauncher.managers.xml.options.Behavior.entries
+            .mapNotNull { it.label() }
+            .toSet()
+        require(fields.all { it in known }) { "Shareable configuration contains unknown behavior settings" }
+        return fields
     }
 
     @Throws(java.lang.Exception::class)

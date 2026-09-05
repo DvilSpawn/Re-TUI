@@ -28,8 +28,6 @@ import java.util.ArrayList
 import java.util.HashSet
 import java.util.HashMap
 import java.util.LinkedHashMap
-import java.util.Map
-import java.util.Set
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager.XMLPrefsRoot
@@ -252,6 +250,14 @@ object PresetManager {
     }
 
     internal fun importExtractedFolder(name: kotlin.String, source: File): kotlin.String {
+        return importExtractedFolder(name, source, null)
+    }
+
+    internal fun importExtractedFolder(
+        name: kotlin.String,
+        source: File,
+        behaviorLabels: Set<String>?
+    ): kotlin.String {
         validatePresetFolder(source)
         val base = cleanPresetPackageName(name)
         var cleanName = base
@@ -262,7 +268,7 @@ object PresetManager {
         }
         val presetFolder = File(presetsDir, cleanName)
         check(presetFolder.mkdirs()) { "Unable to create preset folder" }
-        copySanitizedXmlFiles(source, presetFolder)
+        copySanitizedXmlFiles(source, presetFolder, behaviorLabels)
         FrameManager.copyPortableState(source, presetFolder)
         return cleanName
     }
@@ -285,11 +291,16 @@ object PresetManager {
             File(presetFolder, XMLPrefsManager.XMLPrefsRoot.UI.path),
             XMLPrefsManager.XMLPrefsRoot.UI, SHAREABLE_UI
         )
-        writeXml(
-            File(presetFolder, XMLPrefsManager.XMLPrefsRoot.BEHAVIOR.path),
-            XMLPrefsManager.XMLPrefsRoot.BEHAVIOR, SHAREABLE_BEHAVIOR
+        copyLocalBehavior(
+            File(Tuils.getFolder(), XMLPrefsManager.XMLPrefsRoot.BEHAVIOR.path),
+            File(presetFolder, XMLPrefsManager.XMLPrefsRoot.BEHAVIOR.path)
         )
         FrameManager.copyCurrentTo(context, presetFolder)
+    }
+
+    internal fun copyLocalBehavior(source: File, destination: File) {
+        require(source.isFile) { "Active behavior settings are missing" }
+        source.copyTo(destination, overwrite = true)
     }
 
     @Throws(Exception::class)
@@ -327,7 +338,12 @@ object PresetManager {
         val presetUi = File(presetFolder, XMLPrefsManager.XMLPrefsRoot.UI.path)
         if (presetUi.isFile) applyAllowed(presetUi, XMLPrefsRoot.UI, SHAREABLE_UI)
         val presetBehavior = File(presetFolder, XMLPrefsManager.XMLPrefsRoot.BEHAVIOR.path)
-        if (presetBehavior.isFile) applyAllowed(presetBehavior, XMLPrefsRoot.BEHAVIOR, SHAREABLE_BEHAVIOR)
+        if (presetBehavior.isFile) applyAllowed(
+            presetBehavior,
+            XMLPrefsRoot.BEHAVIOR,
+            Behavior.entries.toTypedArray(),
+            ::isSelectedBehaviorValue
+        )
         FrameManager.applyPortableState(presetFolder)
         LauncherSettings.setAutoColorPick(false)
     }
@@ -403,7 +419,7 @@ object PresetManager {
             val presetFolder: File = File(presetsDir, cleanName)
             check(!(!presetFolder.exists() && !presetFolder.mkdirs())) { "Unable to create preset folder" }
 
-            copySanitizedXmlFiles(tempFolder, presetFolder)
+            copySanitizedXmlFiles(tempFolder, presetFolder, null)
             return cleanName
         } finally {
             Tuils.delete(tempFolder)
@@ -448,7 +464,7 @@ object PresetManager {
             val presetFolder: File = File(presetsDir, cleanName)
             check(!(!presetFolder.exists() && !presetFolder.mkdirs())) { "Unable to create preset folder" }
 
-            copySanitizedXmlFiles(tempFolder, presetFolder)
+            copySanitizedXmlFiles(tempFolder, presetFolder, null)
             FrameManager.copyPortableState(tempFolder, presetFolder)
         } finally {
             Tuils.delete(tempFolder)
@@ -555,16 +571,57 @@ object PresetManager {
         out.flush()
     }
 
-    internal fun shareableXml(root: XMLPrefsRoot): String = xml(root, shareableValues(root)) {
-        LauncherSettings.getEffective(it)
-    }
+    internal fun shareableXml(root: XMLPrefsRoot): String =
+        xml(root, shareableValues(root), { LauncherSettings.getEffective(it) })
 
     internal fun shareableUiXml(): String = shareableXml(XMLPrefsRoot.UI)
 
     internal fun shareableBehaviorXml(): String = shareableXml(XMLPrefsRoot.BEHAVIOR)
 
+    internal fun defaultShareableBehaviorLabels(): Set<String> =
+        SHAREABLE_BEHAVIOR.mapNotNull { it.label() }.toSet()
+
+    internal fun shareableBehaviorValues(presetName: String?): Map<Behavior, String> {
+        if (presetName.isNullOrBlank()) {
+            return Behavior.entries.associateWith { LauncherSettings.getEffective(it).orEmpty() }
+        }
+        val file = File(getSavedPresetFolder(presetName), XMLPrefsRoot.BEHAVIOR.path)
+        if (!file.isFile) return emptyMap()
+        val known = Behavior.entries.associateBy { it.label() }
+        val root = parseXml(file).documentElement
+        require(root?.nodeName == XMLPrefsRoot.BEHAVIOR.name) { "Invalid preset XML: ${file.name}" }
+        val values = LinkedHashMap<Behavior, String>()
+        for (index in 0 until root.childNodes.length) {
+            val node = root.childNodes.item(index)
+            val setting = known[XMLPrefsManager.canonicalSettingLabel(XMLPrefsRoot.BEHAVIOR, node.nodeName)]
+                ?: continue
+            val value = node.attributes?.getNamedItem(XMLPrefsManager.VALUE_ATTRIBUTE)?.nodeValue ?: continue
+            require(values.put(setting, value) == null) { "Duplicate preset setting: ${setting.label()}" }
+        }
+        return values
+    }
+
+    internal fun shareableBehaviorXml(selectedLabels: Set<String>): String {
+        val settings = selectedBehaviorSettings(selectedLabels)
+        return xml(XMLPrefsRoot.BEHAVIOR, settings, { LauncherSettings.getEffective(it) }, ::isSelectedBehaviorValue)
+    }
+
+    internal fun sanitizeSelectedBehaviorXml(file: File, selectedLabels: Set<String>): String {
+        val values = selectedBehaviorSettings(selectedLabels)
+        return sanitizeXml(file, XMLPrefsRoot.BEHAVIOR, values, ::isSelectedBehaviorValue)
+    }
+
     internal fun sanitizeShareableXml(file: File, root: XMLPrefsRoot): String {
         val values = shareableValues(root)
+        return sanitizeXml(file, root, values, ::isShareableValue)
+    }
+
+    private fun sanitizeXml(
+        file: File,
+        root: XMLPrefsRoot,
+        values: Array<out XMLPrefsSave>,
+        validator: (XMLPrefsSave, String) -> Boolean
+    ): String {
         val allowed = values.associateBy { it.label() }
         val parsed = LinkedHashMap<XMLPrefsSave, String>()
         val document = parseXml(file)
@@ -575,13 +632,18 @@ object PresetManager {
             if (node.nodeType != org.w3c.dom.Node.ELEMENT_NODE) continue
             val setting = allowed[XMLPrefsManager.canonicalSettingLabel(root, node.nodeName)] ?: continue
             val value = node.attributes?.getNamedItem(XMLPrefsManager.VALUE_ATTRIBUTE)?.nodeValue ?: continue
-            if (!isShareableValue(setting, value)) continue
+            if (!validator(setting, value)) continue
             require(parsed.put(setting, value) == null) { "Duplicate preset setting: ${setting.label()}" }
         }
-        return xml(root, values) { parsed[it] }
+        return xml(root, values, { parsed[it] }, validator)
     }
 
-    private fun applyAllowed(file: File, rootType: XMLPrefsRoot, values: Array<out XMLPrefsSave>) {
+    private fun applyAllowed(
+        file: File,
+        rootType: XMLPrefsRoot,
+        values: Array<out XMLPrefsSave>,
+        validator: (XMLPrefsSave, String) -> Boolean = ::isShareableValue
+    ) {
         validateXmlRoot(file, rootType.name)
         val root = parseXml(file).documentElement
         val allowed = values.associateBy { it.label() }
@@ -590,7 +652,7 @@ object PresetManager {
             val node = children.item(index)
             val setting = allowed[node.nodeName] ?: continue
             val value = node.attributes?.getNamedItem(XMLPrefsManager.VALUE_ATTRIBUTE)?.nodeValue ?: continue
-            if (!isShareableValue(setting, value)) continue
+            if (!validator(setting, value)) continue
             LauncherSettings.set(setting, value)
         }
     }
@@ -636,6 +698,24 @@ object PresetManager {
             }
             else -> false
         }
+    }
+
+    private fun isSelectedBehaviorValue(setting: XMLPrefsSave, value: String): Boolean {
+        if (setting !is Behavior || value.length > 4096) return false
+        return when (setting.type()) {
+            XMLPrefsSave.BOOLEAN -> value == "true" || value == "false"
+            XMLPrefsSave.INTEGER -> value.toIntOrNull() != null
+            XMLPrefsSave.COLOR -> value.isEmpty() || COLOR_VALUE.matches(value)
+            XMLPrefsSave.AUTO_COLOR -> value.equals("auto", true) || COLOR_VALUE.matches(value)
+            XMLPrefsSave.TEXT -> true
+            else -> false
+        }
+    }
+
+    private fun selectedBehaviorSettings(labels: Set<String>): Array<Behavior> {
+        val known = Behavior.entries.associateBy { it.label() }
+        require(labels.all { it in known }) { "Unknown behavior setting selected" }
+        return Behavior.entries.filter { it.label() in labels }.toTypedArray()
     }
 
     fun applyBuiltIn(name: kotlin.String?): Boolean {
@@ -912,13 +992,24 @@ object PresetManager {
         return builder.parse(InputSource(StringReader(xml)))
     }
 
-    private fun copySanitizedXmlFiles(source: File, destination: File) {
+    private fun copySanitizedXmlFiles(
+        source: File,
+        destination: File,
+        behaviorLabels: Set<String>?
+    ) {
         for (root in arrayOf(XMLPrefsRoot.THEME, XMLPrefsRoot.SUGGESTIONS, XMLPrefsRoot.UI, XMLPrefsRoot.BEHAVIOR)) {
             val sourceFile = File(source, root.path)
             if (!sourceFile.isFile) continue
             val destinationFile = File(destination, root.path)
             if (destinationFile.exists()) Tuils.insertOld(destinationFile)
-            writeText(destinationFile, sanitizeShareableXml(sourceFile, root))
+            writeText(
+                destinationFile,
+                if (root == XMLPrefsRoot.BEHAVIOR && behaviorLabels != null) {
+                    sanitizeSelectedBehaviorXml(sourceFile, behaviorLabels)
+                } else {
+                    sanitizeShareableXml(sourceFile, root)
+                }
+            )
         }
     }
 
@@ -938,8 +1029,13 @@ object PresetManager {
     }
 
     @Throws(Exception::class)
-    private fun writeXml(file: File?, root: XMLPrefsRoot, values: Array<out XMLPrefsSave>) {
-        writeText(requireNotNull(file), xml(root, values) { LauncherSettings.getEffective(it) })
+    private fun writeXml(
+        file: File?,
+        root: XMLPrefsRoot,
+        values: Array<out XMLPrefsSave>,
+        validator: (XMLPrefsSave, String) -> Boolean = ::isShareableValue
+    ) {
+        writeText(requireNotNull(file), xml(root, values, { LauncherSettings.getEffective(it) }, validator))
     }
 
     private fun writeText(file: File, text: String) {
@@ -952,13 +1048,14 @@ object PresetManager {
     private fun xml(
         root: XMLPrefsRoot,
         values: Array<out XMLPrefsSave>,
-        valueFor: (XMLPrefsSave) -> String?
+        valueFor: (XMLPrefsSave) -> String?,
+        validator: (XMLPrefsSave, String) -> Boolean = ::isShareableValue
     ): String {
         val xml: StringBuilder = StringBuilder(XMLPrefsManager.XML_DEFAULT)
         xml.append("<").append(root.name).append(">\n")
         for (setting in values) {
             val value = valueFor(setting) ?: continue
-            if (!isShareableValue(setting, value)) continue
+            if (!validator(setting, value)) continue
             xml.append("\t<")
                 .append(setting.label())
                 .append(" value=\"")

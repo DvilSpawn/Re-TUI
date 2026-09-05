@@ -124,6 +124,7 @@ class ThemerActivity : AppCompatActivity() {
     private var backupExportPending = false
     private var pendingRestoreUri: Uri? = null
     private var pendingShareablePresetName: String? = null
+    private var pendingShareableBehaviorLabels: Set<String>? = null
     private var pendingFontSizeOffset: Int? = null
     private var pendingUseSystemFont: Boolean? = null
     private var pendingFontFileName: String? = null
@@ -2124,8 +2125,67 @@ class ThemerActivity : AppCompatActivity() {
 
         TuixtDialog.showOptions(this, "Shareable Source", options, ItemAction { which: Int ->
             pendingShareablePresetName = if (which == 0) null else presets.get(which - 1)
-            launchShareableConfigurationPicker()
+            showShareableBehaviorPicker()
         })
+    }
+
+    private fun showShareableBehaviorPicker() {
+        pendingShareableBehaviorLabels = null
+        val behaviorValues = try {
+            PresetManager.shareableBehaviorValues(pendingShareablePresetName)
+        } catch (error: Exception) {
+            pendingShareablePresetName = null
+            Toast.makeText(this, error.message ?: "Unable to read preset behavior.", Toast.LENGTH_LONG).show()
+            return
+        }
+        val defaults = PresetManager.defaultShareableBehaviorLabels()
+        val selected = LinkedHashSet<String>()
+        val content = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            addView(TextView(this@ThemerActivity).apply {
+                text = "Choose which behavior values to include. The existing safe set starts enabled. Optional values may contain locations, folders, API keys, notification text, or executable commands."
+                setTextColor(textColor())
+                setTypeface(Tuils.getTypeface(this@ThemerActivity))
+                textSize = 12f
+                setPadding(dp(this@ThemerActivity, 8f), dp(this@ThemerActivity, 4f), dp(this@ThemerActivity, 8f), dp(this@ThemerActivity, 10f))
+            })
+            behaviorValues.forEach { (setting, value) ->
+                val label = setting.label().orEmpty()
+                val checked = label in defaults
+                if (checked) selected.add(label)
+                addView(CheckBox(this@ThemerActivity).apply {
+                    text = buildString {
+                        append(label.replace('_', ' ').uppercase(Locale.getDefault()))
+                        append("\n")
+                        append("VALUE: ")
+                        append(value)
+                    }
+                    isChecked = checked
+                    setTextColor(textColor())
+                    setTypeface(Tuils.getTypeface(this@ThemerActivity))
+                    textSize = 12f
+                    setPadding(dp(this@ThemerActivity, 10f), dp(this@ThemerActivity, 8f), dp(this@ThemerActivity, 10f), dp(this@ThemerActivity, 8f))
+                    background = rect(this@ThemerActivity, surfaceColor(), borderColor(), 1.25f)
+                    buttonTintList = ColorStateList.valueOf(accentColor())
+                    setOnCheckedChangeListener { _, enabled ->
+                        if (enabled) selected.add(label) else selected.remove(label)
+                    }
+                }, inputParams())
+            }
+        }
+        TuixtDialog.showContent(
+            this,
+            "Behavior Sharing",
+            content,
+            "Continue",
+            "Cancel",
+            ConfirmAction {
+                pendingShareableBehaviorLabels = selected.toSet()
+                launchShareableConfigurationPicker()
+            },
+            fillHeight = true,
+            heightFraction = 0.88f
+        )
     }
 
     private fun launchShareableConfigurationPicker() {
@@ -2140,6 +2200,7 @@ class ThemerActivity : AppCompatActivity() {
             startActivityForResult(intent, SHAREABLE_CONFIG_EXPORT_REQUEST)
         } catch (e: ActivityNotFoundException) {
             pendingShareablePresetName = null
+            pendingShareableBehaviorLabels = null
             Toast.makeText(
                 this,
                 "Configuration picker is unavailable on this device.",
@@ -2813,6 +2874,7 @@ class ThemerActivity : AppCompatActivity() {
     private fun handleShareableConfigurationResult(resultCode: Int, data: Intent?) {
         if (resultCode != RESULT_OK || data == null || data.getData() == null) {
             pendingShareablePresetName = null
+            pendingShareableBehaviorLabels = null
             Toast.makeText(this, "Configuration export cancelled.", Toast.LENGTH_SHORT).show()
             return
         }
@@ -2821,9 +2883,10 @@ class ThemerActivity : AppCompatActivity() {
             BackupManager.exportShareableConfiguration(
                 this,
                 data.getData() ?: return,
-                pendingShareablePresetName
+                pendingShareablePresetName,
+                pendingShareableBehaviorLabels ?: PresetManager.defaultShareableBehaviorLabels()
             )
-            Toast.makeText(this, "PI-safe configuration exported and verified.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Shareable configuration exported and verified.", Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
             data.getData()?.let { deleteCreatedDocument(it) }
             Toast.makeText(
@@ -2833,6 +2896,7 @@ class ThemerActivity : AppCompatActivity() {
             ).show()
         } finally {
             pendingShareablePresetName = null
+            pendingShareableBehaviorLabels = null
         }
     }
 

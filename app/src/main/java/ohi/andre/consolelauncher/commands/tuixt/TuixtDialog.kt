@@ -298,7 +298,9 @@ object TuixtDialog {
         customContent: View?,
         positive: String,
         negative: String,
-        action: ConfirmAction
+        action: ConfirmAction,
+        fillHeight: Boolean = false,
+        heightFraction: Float? = null
     ) {
         Handler(Looper.getMainLooper()).post(Runnable {
             val dialog = createDialog(context)
@@ -311,8 +313,8 @@ object TuixtDialog {
             )
 
             val buttons = buttons(context, dialog, positive, negative, action)
-            dialog.setContentView(wrap(context, title, content, buttons))
-            show(dialog)
+            dialog.setContentView(wrap(context, title, content, buttons, false, fillHeight))
+            show(dialog, heightFraction = heightFraction)
         })
     }
 

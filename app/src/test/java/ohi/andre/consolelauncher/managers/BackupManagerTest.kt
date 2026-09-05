@@ -95,6 +95,36 @@ class BackupManagerTest {
         )
     }
 
+    @Test
+    fun userSelectedBehaviorManifestRecordsExactConsent() {
+        val manifest = BackupManager.shareableManifest(
+            "current",
+            "theme,ui,suggestions,behavior",
+            null,
+            setOf("status_time_format", "double_tap_cmd")
+        )
+
+        assertTrue(manifest.contains("schema=3\n"))
+        assertTrue(manifest.contains("privacy=user-selected\n"))
+        assertTrue(manifest.contains("behaviorFields=double_tap_cmd,status_time_format\n"))
+        assertFalse(
+            BackupManager.validatePackage(
+                manifest,
+                setOf("manifest.txt", "theme.xml", "ui.xml", "suggestions.xml", "behavior.xml")
+            )
+        )
+        assertEquals(setOf("double_tap_cmd", "status_time_format"), BackupManager.behaviorFields(manifest))
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun rejectsUnknownUserSelectedBehaviorField() {
+        BackupManager.validatePackage(
+            "type=retui-shareable-config\nschema=3\nprofile=shareable\nprivacy=user-selected\n" +
+                "sections=theme,ui,suggestions,behavior\nbehaviorFields=unknown_setting\n",
+            setOf("manifest.txt", "theme.xml", "ui.xml", "suggestions.xml", "behavior.xml")
+        )
+    }
+
     @Test(expected = IllegalArgumentException::class)
     fun rejectsSchemaTwoShareableConfigurationWithoutPrivacyMarker() {
         BackupManager.validatePackage(
