@@ -75,6 +75,18 @@ class PresetManagerTest {
         }
     }
 
+    @Test fun localPresetCopiesBehaviorWithoutSanitizing() {
+        val root = Files.createTempDirectory("preset-local-behavior").toFile()
+        val source = File(root, "behavior.xml").apply {
+            writeText("<BEHAVIOR><double_tap_cmd value=\"wallpaper -auto\" /><weather_location value=\"Home\" /></BEHAVIOR>")
+        }
+        val destination = File(root, "preset/behavior.xml").apply { parentFile?.mkdirs() }
+
+        PresetManager.copyLocalBehavior(source, destination)
+
+        assertEquals(source.readText(), destination.readText())
+    }
+
     @Test fun sanitizerRemovesPersonalTextUnknownFieldsAndInvalidValues() {
         val behavior = Files.createTempFile("preset-behavior", ".xml").toFile()
         behavior.writeText(
@@ -129,6 +141,35 @@ class PresetManagerTest {
         assertTrue(suggestionsXml.contains("<apps_background_color value=\"#00897B\""))
         assertTrue(suggestionsXml.contains("<suggestions_order value=\"2(2)0(5)1(5)3(3)\""))
         assertFalse(suggestionsXml.contains("Mako"))
+    }
+
+    @Test fun selectedBehaviorSanitizerKeepsOnlyExplicitKnownValues() {
+        val behavior = Files.createTempFile("selected-behavior", ".xml").toFile()
+        behavior.writeText(
+            """<BEHAVIOR>
+                    <enable_cyberdeck_mode value="true" />
+                    <status_time_format value="[size=30]HH:mm[/size]" />
+                    <double_tap_cmd value="wallpaper -auto &amp;&amp; apps" />
+                    <weather_location value="Home" />
+                </BEHAVIOR>""".trimIndent()
+        )
+
+        val xml = PresetManager.sanitizeSelectedBehaviorXml(
+            behavior,
+            setOf("status_time_format", "double_tap_cmd")
+        )
+
+        assertTrue(xml.contains("<status_time_format value=\"[size=30]HH:mm[/size]\""))
+        assertTrue(xml.contains("<double_tap_cmd value=\"wallpaper -auto &amp;&amp; apps\""))
+        assertFalse(xml.contains("enable_cyberdeck_mode"))
+        assertFalse(xml.contains("weather_location"))
+    }
+
+    @Test fun defaultBehaviorConsentRemainsPiSafe() {
+        val defaults = PresetManager.defaultShareableBehaviorLabels()
+        assertTrue("enable_cyberdeck_mode" in defaults)
+        assertFalse("status_time_format" in defaults)
+        assertFalse("double_tap_cmd" in defaults)
     }
 
     @Test fun sanitizerMigratesLegacyPresetColors() {
