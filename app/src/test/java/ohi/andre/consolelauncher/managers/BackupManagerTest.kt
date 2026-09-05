@@ -3,10 +3,37 @@ package ohi.andre.consolelauncher.managers
 import java.io.ByteArrayInputStream
 import java.nio.file.Files
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class BackupManagerTest {
+    @Test
+    fun shareablePresetManifestPreservesItsName() {
+        val manifest = BackupManager.shareableManifest(
+            "preset",
+            "theme,ui,suggestions,behavior",
+            "Black Dawn"
+        )
+
+        assertTrue(manifest.contains("presetName=Black Dawn\n"))
+        assertEquals(
+            1,
+            manifest.lineSequence().count { it.startsWith("presetName=") }
+        )
+    }
+
+    @Test
+    fun currentLookManifestHasNoPresetName() {
+        val manifest = BackupManager.shareableManifest(
+            "current",
+            "theme,ui,suggestions,behavior",
+            null
+        )
+
+        assertFalse(manifest.contains("presetName="))
+    }
+
     @Test
     fun personalBackupIncludesSharedFrameLibraryAndSpaceSelections() {
         val file = Files.createTempFile("retui-frame", ".retui-frame").toFile()

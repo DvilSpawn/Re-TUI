@@ -34,7 +34,6 @@ import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave
 import ohi.andre.consolelauncher.managers.xml.options.Behavior
 import ohi.andre.consolelauncher.managers.xml.options.Cmd
 import ohi.andre.consolelauncher.managers.xml.options.Theme
-import ohi.andre.consolelauncher.managers.xml.options.Suggestions
 import ohi.andre.consolelauncher.tuils.Tuils
 import java.io.File
 import androidx.annotation.NonNull
@@ -47,7 +46,6 @@ import ohi.andre.consolelauncher.managers.xml.options.Toolbar
 import ohi.andre.consolelauncher.managers.xml.options.Ui
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings
 import ohi.andre.consolelauncher.managers.settings.StatusRowResolver
-import ohi.andre.consolelauncher.managers.xml.AutoColorManager
 
 internal class SectionAccordionState(initial: String? = null) {
     var active: String? = initial
@@ -59,9 +57,6 @@ internal class SectionAccordionState(initial: String? = null) {
     fun search(enabled: Boolean) { searching = enabled }
     fun collapsed(section: String): Boolean = !searching && active != section
 }
-
-internal fun isManualThemeColorChange(item: XMLPrefsSave?, value: String?): Boolean =
-    (item is Theme || item is Suggestions) && value?.startsWith("#") == true
 
 class TuixtAdapter(
     rows: MutableList<SettingsRow>,
@@ -99,13 +94,6 @@ class TuixtAdapter(
             val rawRows = StatusRowResolver.settings.associateWith { pendingChanges[it] ?: get(it) }
             for ((item, value) in StatusRowResolver.normalize(rawRows).values) {
                 pendingChanges[item] = value
-            }
-        }
-        if (AppearanceSettings.autoColorPick()) {
-            pendingChanges.forEach { (item, value) ->
-                if (isManualThemeColorChange(item, value)) {
-                    AutoColorManager.setManualOverride(item ?: return@forEach, true)
-                }
             }
         }
         for (entry in pendingChanges.entries) {

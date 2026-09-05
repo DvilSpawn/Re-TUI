@@ -293,7 +293,7 @@ enum class Ui : XMLPrefsSave {
         }
 
         override fun info(): String? {
-            return "If true, Re:T-UI will derive runtime theme colors from your wallpaper and override manual theme colors"
+            return "Legacy migration flag; wallpaper -auto now saves a one-time color snapshot"
         }
     },
     enable_crt_vignette {

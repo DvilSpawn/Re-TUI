@@ -36,5 +36,6 @@ interface CommandAbstraction {
         const val PRESET_NAME = 34
         const val SPACE_TARGET = 35
         const val SPACE_RENAME_NAME = 36
+        const val SAVED_PRESET_NAME = 37
     }
 }

@@ -19,7 +19,6 @@ import ohi.andre.consolelauncher.tuils.UIUtils
 import java.util.Map
 
 object LauncherSettings {
-    private const val NO_AUTO_COLOR = Int.MAX_VALUE
     private val LOCK = Any()
     private val snapshot: MutableMap<String, String> = HashMap()
     private var snapshotLoaded = false
@@ -64,7 +63,7 @@ object LauncherSettings {
         } catch (e: Exception) {
             XMLPrefsManager.getColor(value)
         }
-        return AutoColorManager.getColor(value, color)
+        return color
     }
 
     @JvmStatic
@@ -138,23 +137,25 @@ object LauncherSettings {
     }
 
     @JvmStatic
-    fun enableWallpaperAuto(context: Context? = null) {
+    fun enableWallpaperAuto(context: Context? = null): Boolean {
         AutoColorManager.init(context)
-        AutoColorManager.clearManualOverrides()
+        val colors = AutoColorManager.currentWallpaperColorSnapshot()
         set(context, Ui.system_wallpaper, "true")
+        colors.forEach { (setting, color) ->
+            set(context, setting, String.format(Locale.US, "#%08X", color))
+        }
         set(context, Theme.wallpaper_overlay_color, "#00000000")
-        set(context, Ui.auto_color_pick, "true")
+        set(context, Ui.auto_color_pick, "false")
+        return colors.isNotEmpty()
+    }
+
+    @JvmStatic
+    fun freezeLegacyWallpaperAuto(context: Context) {
+        if (getBoolean(Ui.auto_color_pick)) enableWallpaperAuto(context)
     }
 
     @JvmStatic
     fun getEffective(value: XMLPrefsSave): String? {
-        if (getBoolean(Ui.auto_color_pick)) {
-            val color = AutoColorManager.getAutoColor(value, NO_AUTO_COLOR)
-            if (color != NO_AUTO_COLOR) {
-                return String.format(Locale.US, "#%08X", color)
-            }
-        }
-
         val current = get(value)
         if (current == null || current.isEmpty()) {
             return value.defaultValue()

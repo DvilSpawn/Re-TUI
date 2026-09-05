@@ -201,18 +201,20 @@ class wallpaper : ParamCommand() {
         }
 
         private fun enableWallpaperAuto(pack: ExecutePack): String {
-            enableWallpaperAuto(pack.context)
+            if (!enableWallpaperAuto(pack.context)) {
+                return "Unable to read wallpaper colors."
+            }
 
             if (pack.context is Reloadable) {
                 (pack.context as Reloadable).addMessage(
                     "wallpaper",
-                    "Enabled wallpaper-derived colors"
+                    "Applied wallpaper colors once"
                 )
                 LauncherActivity.preview(pack.context)
                 return Tuils.EMPTYSTRING
             }
 
-            return "Wallpaper-derived colors enabled."
+            return "Wallpaper colors applied."
         }
     }
 }

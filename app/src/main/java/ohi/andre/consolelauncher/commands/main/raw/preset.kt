@@ -7,6 +7,7 @@ import ohi.andre.consolelauncher.commands.CommandAbstraction
 import ohi.andre.consolelauncher.commands.ExecutePack
 import ohi.andre.consolelauncher.commands.main.MainPack
 import ohi.andre.consolelauncher.commands.main.specific.ParamCommand
+import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog
 import ohi.andre.consolelauncher.managers.PresetManager
 import ohi.andre.consolelauncher.tuils.Tuils
 import ohi.andre.consolelauncher.tuils.interfaces.Reloadable
@@ -51,6 +52,32 @@ class preset : ParamCommand() {
             }
 
             override fun args(): IntArray = intArrayOf(CommandAbstraction.PRESET_NAME)
+        },
+        duplicate {
+            override fun exec(pack: ExecutePack): String {
+                val sourceName = pack.getString()!!
+                TuixtDialog.showInput(
+                    pack.context,
+                    "Duplicate Preset",
+                    "New preset name",
+                    "Duplicate",
+                    "Cancel",
+                    TuixtDialog.InputAction { value ->
+                        val message = try {
+                            val duplicated = PresetManager.duplicate(sourceName, value.orEmpty())
+                            "Duplicated '$sourceName' as '$duplicated'."
+                        } catch (e: Exception) {
+                            e.message ?: pack.context.getString(R.string.output_error)
+                        }
+                        if (pack.context is Reloadable) {
+                            (pack.context as Reloadable).addMessage("preset", message)
+                        }
+                    }
+                )
+                return "Enter a name for the duplicate."
+            }
+
+            override fun args(): IntArray = intArrayOf(CommandAbstraction.SAVED_PRESET_NAME)
         },
         ls {
             override fun exec(pack: ExecutePack): String {

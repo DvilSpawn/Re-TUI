@@ -151,13 +151,7 @@ object BackupManager {
         try {
             ohi.andre.consolelauncher.managers.BackupManager.addTextEntry(
                 zip, ohi.andre.consolelauncher.managers.BackupManager.MANIFEST_FILE,
-                ("type=" + ohi.andre.consolelauncher.managers.BackupManager.TYPE_SHAREABLE + "\n"
-                        + "schema=2\n"
-                        + "profile=shareable\n"
-                        + "privacy=pi-safe\n"
-                        + "appVersion=" + BuildConfig.VERSION_NAME + "\n"
-                        + "source=" + sourceType + "\n"
-                        + "sections=" + sections + "\n")
+                shareableManifest(sourceType, sections, if (presetSource) sourceRoot.name else null)
             )
             val roots = mutableListOf(XMLPrefsManager.XMLPrefsRoot.THEME)
             if (includeUi) roots.add(XMLPrefsManager.XMLPrefsRoot.UI)
@@ -177,6 +171,21 @@ object BackupManager {
             zip.close()
         }
         writeVerified(context, uri, out.toByteArray())
+    }
+
+    internal fun shareableManifest(
+        sourceType: String,
+        sections: String,
+        presetName: String?
+    ): String = buildString {
+        append("type=").append(TYPE_SHAREABLE).append('\n')
+        append("schema=2\n")
+        append("profile=shareable\n")
+        append("privacy=pi-safe\n")
+        append("appVersion=").append(BuildConfig.VERSION_NAME).append('\n')
+        append("source=").append(sourceType).append('\n')
+        if (!presetName.isNullOrBlank()) append("presetName=").append(presetName).append('\n')
+        append("sections=").append(sections).append('\n')
     }
 
     private fun writeVerified(context: Context, uri: Uri, payload: ByteArray) {

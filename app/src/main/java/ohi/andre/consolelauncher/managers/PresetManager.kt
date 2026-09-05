@@ -222,6 +222,35 @@ object PresetManager {
         check(!folder.exists()) { "Unable to remove preset" }
     }
 
+    fun duplicate(existingName: String, newName: String): String {
+        val sourceName = cleanPresetPackageName(existingName)
+        require(!isBuiltInPreset(sourceName)) { "Only saved presets can be duplicated" }
+
+        var source = File(presetsDir, sourceName)
+        if (!source.isDirectory && packageFile(sourceName).isFile) {
+            importPackage(sourceName)
+            source = File(presetsDir, sourceName)
+        }
+        require(source.isDirectory) { "Saved preset not found" }
+
+        val targetName = cleanName(newName)
+        require(!containsIgnoreCase(listAllPresetNames(), targetName)) { "Preset already exists" }
+        val target = File(presetsDir, targetName)
+        copyPresetFolder(source, target)
+        return targetName
+    }
+
+    internal fun copyPresetFolder(source: File, target: File) {
+        require(source.isDirectory) { "Saved preset not found" }
+        require(!target.exists()) { "Preset already exists" }
+        try {
+            Tuils.copyDirectory(source, target)
+        } catch (error: Exception) {
+            if (target.exists()) Tuils.delete(target)
+            throw error
+        }
+    }
+
     internal fun importExtractedFolder(name: kotlin.String, source: File): kotlin.String {
         validatePresetFolder(source)
         val base = cleanPresetPackageName(name)
@@ -754,7 +783,7 @@ object PresetManager {
         require(
             !(cleanName.length == 0 || cleanName.contains("/") || cleanName.contains("\\") || cleanName.contains(
                 ".."
-            ))
+            ) || cleanName.contains('\n') || cleanName.contains('\r'))
         ) { "Invalid preset name" }
         return cleanName
     }

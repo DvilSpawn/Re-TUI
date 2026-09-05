@@ -17,7 +17,7 @@ for the Basic and Advanced startup choices.
 
 ### ⌨️ Commands and Launcher Tools
 *   **`username [user] [device]`**: Instantly customize your terminal prompt. Changes both the username and device name and reloads the UI to apply.
-*   **`preset`**: Save, apply, list, and remove appearance presets with `preset -save`, `preset -apply`, `preset -ls`, and `preset -rm`. The same controls are available from **Settings → Appearance → Presets**.
+*   **`preset`**: Save, apply, duplicate, list, and remove appearance presets with `preset -save`, `preset -apply`, `preset -duplicate`, `preset -ls`, and `preset -rm`. The same controls are available from **Settings → Appearance → Presets**.
 *   **`webhook`**: A scalable Webhook system featuring template-based HTTP POST requests.
     *   **Substitution:** Supports `%n` parameter substitution (e.g., `%1` for the first argument).
     *   **History:** Automatically tracks the last 5 unique sets of arguments for each webhook.

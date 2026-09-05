@@ -410,6 +410,9 @@ class TuixtActivity : Activity() {
             if (save === Behavior.toggle_output_state) {
                 continue
             }
+            if (save === Ui.auto_color_pick) {
+                continue
+            }
             if (XMLPrefsManager.isAsciiArtSetting(save)) {
                 continue
             }

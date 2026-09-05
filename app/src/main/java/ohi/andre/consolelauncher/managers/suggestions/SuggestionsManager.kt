@@ -1820,6 +1820,13 @@ class SuggestionsManager(
                 beforeLastSpace
             )
 
+            CommandAbstraction.SAVED_PRESET_NAME -> suggestSavedPresetNames(
+                suggestions,
+                afterLastSpace,
+                beforeLastSpace,
+                true
+            )
+
             CommandAbstraction.SPACE_TARGET -> suggestSpaceTargets(
                 suggestions,
                 afterLastSpace,
@@ -3173,12 +3180,13 @@ class SuggestionsManager(
     private fun suggestSavedPresetNames(
         suggestions: MutableList<Suggestion?>,
         afterLastSpace: String?,
-        beforeLastSpace: String?
+        beforeLastSpace: String?,
+        savedOnly: Boolean = false
     ) {
         val applyCommand = beforeLastSpace != null && beforeLastSpace.lowercase(Locale.getDefault())
             .contains(" -apply")
         val suggested: MutableSet<String?> = LinkedHashSet<String?>()
-        for (preset in listAllPresetNames()) {
+        for (preset in if (savedOnly) PresetManager.listPresets() else listAllPresetNames()) {
             val displayName = presetDisplayName(preset)
             if (!suggested.add(displayName.lowercase(Locale.getDefault()))) {
                 continue

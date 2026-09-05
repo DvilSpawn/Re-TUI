@@ -273,12 +273,13 @@
     </string>
     <string name="help_wallpaper">-static -> open the static wallpaper picker
         \n-live -> open the live wallpaper picker
-        \n-auto -> enable or refresh wallpaper-derived theme colors
+        \n-auto -> apply wallpaper-derived theme colors once
         \n(no args) -> open the wallpaper picker
     </string>
     <string name="hint_wallpaper_auto_confirm">Yes/No</string>
     <string name="help_preset">-save [name] -> save the current theme.xml and suggestions.xml colors as a preset
         \n-apply [name] -> apply a saved or built-in preset and disable auto_color_pick
+        \n-duplicate [saved name] -> copy a saved preset and prompt for its new name
         \n-ls -> list saved and built-in presets
         \n-rm [name] -> remove a saved or imported preset
         \nTo share a look, use Settings > System &amp; Support > Create Shareable Configuration

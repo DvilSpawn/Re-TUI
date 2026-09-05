@@ -192,6 +192,7 @@ class LauncherActivity : AppCompatActivity(), Reloadable {
 
         XMLPrefsManager.loadCommons(this)
         refreshFromLoadedPrefs()
+        LauncherSettings.freezeLegacyWallpaperAuto(this)
         SpaceManager.ensureInitialized(this)
 
         val useSystemWP = XMLPrefsManager.getBoolean(Ui.system_wallpaper)

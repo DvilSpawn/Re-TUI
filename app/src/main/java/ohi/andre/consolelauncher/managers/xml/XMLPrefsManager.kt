@@ -5,7 +5,6 @@ import android.graphics.Color
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.managers.AppsManager
 import ohi.andre.consolelauncher.managers.FirstRunPresetManager
-import ohi.andre.consolelauncher.managers.xml.AutoColorManager.getColor
 import ohi.andre.consolelauncher.managers.xml.AutoColorManager.init
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsElement
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsList
@@ -733,7 +732,7 @@ object XMLPrefsManager {
             }
         }
 
-        return getColor(prefsSave, color)
+        return color
     }
 
     fun getString(prefsSave: XMLPrefsSave?): String {

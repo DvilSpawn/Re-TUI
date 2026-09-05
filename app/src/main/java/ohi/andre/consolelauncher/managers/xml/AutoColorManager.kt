@@ -7,18 +7,15 @@ import android.graphics.Color
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.graphics.ColorUtils
-import ohi.andre.consolelauncher.managers.settings.AppearanceSettings.autoColorPick
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave
 import ohi.andre.consolelauncher.managers.xml.options.Suggestions
 import ohi.andre.consolelauncher.managers.xml.options.Theme
 import kotlin.math.max
 import kotlin.math.min
-import ohi.andre.consolelauncher.managers.settings.AppearanceSettings
 
 object AutoColorManager {
 
-    private const val PREFS = "retui_auto_color"
-    private const val MANUAL_OVERRIDES = "manual_overrides"
+    private const val NO_COLOR = Int.MAX_VALUE
     private var appContext: Context? = null
     private var cachedPalette: Palette? = null
 
@@ -32,57 +29,22 @@ object AutoColorManager {
         cachedPalette = null
     }
 
-    @Synchronized
-    fun setManualOverride(prefsSave: XMLPrefsSave, enabled: Boolean) {
-        if (prefsSave == Theme.wallpaper_overlay_color) return
-        val context = appContext ?: return
-        val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-        val values = prefs.getStringSet(MANUAL_OVERRIDES, emptySet()).orEmpty().toMutableSet()
-        val key = overrideKey(prefsSave)
-        if (enabled) values.add(key) else values.remove(key)
-        prefs.edit().putStringSet(MANUAL_OVERRIDES, values).apply()
-    }
-
-    fun clearManualOverrides() {
-        appContext?.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-            ?.edit()?.remove(MANUAL_OVERRIDES)?.apply()
-    }
-
-    fun getColor(prefsSave: XMLPrefsSave?, fallbackColor: Int): Int {
-        if (!autoColorPick()) {
-            return fallbackColor
+    fun currentWallpaperColorSnapshot(): Map<XMLPrefsSave, Int> {
+        invalidate()
+        val current = palette ?: return emptyMap()
+        return buildMap {
+            Theme.entries.forEach { value ->
+                resolveThemeColor(value, current, NO_COLOR)
+                    .takeUnless { it == NO_COLOR }
+                    ?.let { put(value, it) }
+            }
+            Suggestions.entries.forEach { value ->
+                resolveSuggestionsColor(value, current, NO_COLOR)
+                    .takeUnless { it == NO_COLOR }
+                    ?.let { put(value, it) }
+            }
         }
-        return getAutoColor(prefsSave, fallbackColor)
     }
-
-    fun getAutoColor(prefsSave: XMLPrefsSave?, fallbackColor: Int): Int {
-        if (prefsSave == null || appContext == null) {
-            return fallbackColor
-        }
-        if (isManualOverride(prefsSave)) return fallbackColor
-
-        val palette: Palette? = palette
-        if (palette == null) {
-            return fallbackColor
-        }
-
-        if (prefsSave is Theme) {
-            return resolveThemeColor(prefsSave, palette, fallbackColor)
-        } else if (prefsSave is Suggestions) {
-            return resolveSuggestionsColor(prefsSave, palette, fallbackColor)
-        }
-
-        return fallbackColor
-    }
-
-    private fun isManualOverride(prefsSave: XMLPrefsSave): Boolean {
-        val context = appContext ?: return false
-        return context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-            .getStringSet(MANUAL_OVERRIDES, emptySet()).orEmpty().contains(overrideKey(prefsSave))
-    }
-
-    private fun overrideKey(prefsSave: XMLPrefsSave): String =
-        "${prefsSave.parent()}:${prefsSave.label()}"
 
     private val palette: Palette?
         get() {

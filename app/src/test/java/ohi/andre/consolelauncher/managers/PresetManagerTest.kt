@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher.managers
 
+import java.io.File
 import java.nio.file.Files
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -41,6 +42,37 @@ class PresetManagerTest {
         assertFalse(xml.contains("<weather_format "))
         assertFalse(xml.contains("<status_time_format "))
         assertFalse(xml.contains("<preferred_music_app "))
+    }
+
+    @Test fun duplicatePresetCopiesRawBehaviorAndFramesWithoutSanitizing() {
+        val root = Files.createTempDirectory("preset-duplicate").toFile()
+        val source = File(root, "Black Dawn").apply { mkdirs() }
+        val target = File(root, "Black Dawn Copy")
+        File(source, "behavior.xml").writeText(
+            "<BEHAVIOR><double_tap_cmd value=\"wallpaper -auto\" /></BEHAVIOR>"
+        )
+        File(source, "frames/custom.retui-frame").apply {
+            parentFile?.mkdirs()
+            writeBytes(byteArrayOf(1, 2, 3))
+        }
+
+        PresetManager.copyPresetFolder(source, target)
+
+        assertEquals(
+            File(source, "behavior.xml").readText(),
+            File(target, "behavior.xml").readText()
+        )
+        assertTrue(File(target, "frames/custom.retui-frame").readBytes().contentEquals(byteArrayOf(1, 2, 3)))
+    }
+
+    @Test fun duplicatePresetRefusesToOverwriteExistingFolder() {
+        val root = Files.createTempDirectory("preset-duplicate-existing").toFile()
+        val source = File(root, "Source").apply { mkdirs() }
+        val target = File(root, "Target").apply { mkdirs() }
+
+        assertThrows(IllegalArgumentException::class.java) {
+            PresetManager.copyPresetFolder(source, target)
+        }
     }
 
     @Test fun sanitizerRemovesPersonalTextUnknownFieldsAndInvalidValues() {
