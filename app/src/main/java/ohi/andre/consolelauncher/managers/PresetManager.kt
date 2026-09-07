@@ -29,6 +29,7 @@ import java.util.HashSet
 import java.util.HashMap
 import java.util.LinkedHashMap
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings
+import ohi.andre.consolelauncher.managers.settings.StatusRowResolver
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager.XMLPrefsRoot
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave
@@ -669,7 +670,11 @@ object PresetManager {
         if (value.length > 128) return false
         return when (setting.type()) {
             XMLPrefsSave.BOOLEAN -> value == "true" || value == "false"
-            XMLPrefsSave.INTEGER -> value.toIntOrNull()?.let { it in -100_000..100_000 } == true
+            XMLPrefsSave.INTEGER -> if (StatusRowResolver.isStatusIndex(setting)) {
+                DECIMAL_VALUE.matches(value)
+            } else {
+                value.toIntOrNull()?.let { it in -100_000..100_000 } == true
+            }
             XMLPrefsSave.COLOR -> value.isEmpty() || COLOR_VALUE.matches(value)
             XMLPrefsSave.AUTO_COLOR -> value.equals("auto", true) || COLOR_VALUE.matches(value)
             XMLPrefsSave.TEXT -> when (setting) {

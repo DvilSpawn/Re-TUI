@@ -143,6 +143,23 @@ class PresetManagerTest {
         assertFalse(suggestionsXml.contains("Mako"))
     }
 
+    @Test fun sanitizerKeepsDecimalStatusIndexes() {
+        val ui = Files.createTempFile("preset-ui-status-index", ".xml").toFile()
+        ui.writeText(
+            """<UI>
+                    <storage_index value="2.1" />
+                    <ram_index value="5" />
+                    <battery_index value="bad" />
+                </UI>""".trimIndent()
+        )
+
+        val xml = PresetManager.sanitizeShareableXml(ui, XMLPrefsManager.XMLPrefsRoot.UI)
+
+        assertTrue(xml.contains("<storage_index value=\"2.1\""))
+        assertTrue(xml.contains("<ram_index value=\"5\""))
+        assertFalse(xml.contains("battery_index"))
+    }
+
     @Test fun selectedBehaviorSanitizerKeepsOnlyExplicitKnownValues() {
         val behavior = Files.createTempFile("selected-behavior", ".xml").toFile()
         behavior.writeText(
