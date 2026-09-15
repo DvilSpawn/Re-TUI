@@ -20,9 +20,9 @@ class preset : ParamCommand() {
                 try {
                     PresetManager.save(pack.context, name)
                     if (pack.context is Reloadable) {
-                        (pack.context as Reloadable).addMessage("preset", "Saved preset: " + name.trim())
+                        (pack.context as Reloadable).addMessage("preset", pack.context.getString(R.string.command_preset_saved_preset_4a339, name.trim()))
                     }
-                    return "Preset '" + name.trim() + "' saved."
+                    return pack.context.getString(R.string.command_preset_preset_saved_c599d, name.trim())
                 } catch (e: IllegalArgumentException) {
                     return e.message!!
                 } catch (e: Exception) {
@@ -39,11 +39,11 @@ class preset : ParamCommand() {
                     PresetManager.apply(name)
 
                     if (pack.context is Reloadable) {
-                        (pack.context as Reloadable).addMessage("preset", "Applied preset: " + name.trim())
+                        (pack.context as Reloadable).addMessage("preset", pack.context.getString(R.string.command_preset_applied_preset_c132b, name.trim()))
                         LauncherActivity.preview(pack.context)
                     }
 
-                    return "Preset '" + name.trim() + "' applied."
+                    return pack.context.getString(R.string.command_preset_preset_applied_0611f, name.trim())
                 } catch (e: IllegalArgumentException) {
                     return e.message!!
                 } catch (e: Exception) {
@@ -58,14 +58,14 @@ class preset : ParamCommand() {
                 val sourceName = pack.getString()!!
                 TuixtDialog.showInput(
                     pack.context,
-                    "Duplicate Preset",
-                    "New preset name",
-                    "Duplicate",
-                    "Cancel",
+                    pack.context.getString(R.string.command_preset_duplicate_preset_76c16),
+                    pack.context.getString(R.string.command_preset_new_preset_name_0ee29),
+                    pack.context.getString(R.string.command_preset_duplicate_972d5),
+                    pack.context.getString(R.string.command_preset_cancel_77dfd),
                     TuixtDialog.InputAction { value ->
                         val message = try {
                             val duplicated = PresetManager.duplicate(sourceName, value.orEmpty())
-                            "Duplicated '$sourceName' as '$duplicated'."
+                            pack.context.getString(R.string.command_preset_duplicated_as_0b74a, sourceName, duplicated)
                         } catch (e: Exception) {
                             e.message ?: pack.context.getString(R.string.output_error)
                         }
@@ -74,7 +74,7 @@ class preset : ParamCommand() {
                         }
                     }
                 )
-                return "Enter a name for the duplicate."
+                return pack.context.getString(R.string.command_preset_enter_a_name_for_the_duplicate_e815f)
             }
 
             override fun args(): IntArray = intArrayOf(CommandAbstraction.SAVED_PRESET_NAME)
@@ -82,7 +82,7 @@ class preset : ParamCommand() {
         ls {
             override fun exec(pack: ExecutePack): String {
                 val list = PresetManager.listAllPresetNames()
-                if (list.isEmpty()) return "No presets found."
+                if (list.isEmpty()) return pack.context.getString(R.string.command_preset_no_presets_found_a6efc)
                 return Tuils.toPlanString(list, "\n")
             }
 
@@ -93,7 +93,7 @@ class preset : ParamCommand() {
                 val name = pack.getString()!!
                 return try {
                     PresetManager.remove(name)
-                    "Preset '${name.trim()}' removed."
+                    pack.context.getString(R.string.command_preset_preset_removed_0fa34, name.trim())
                 } catch (e: Exception) {
                     e.message ?: pack.context.getString(R.string.output_error)
                 }
@@ -112,7 +112,7 @@ class preset : ParamCommand() {
 
         companion object {
             fun get(p: String): Param? {
-                val value = p.lowercase(Locale.getDefault())
+                val value = p.lowercase(Locale.ROOT)
                 val ps = entries
                 for (p1 in ps) {
                     if (value.endsWith(p1.label())) {

@@ -43,7 +43,7 @@
                 android:layout_height="wrap_content"
                 android:maxLines="1"
                 android:ellipsize="end"
-                android:text="Title: -"
+                android:text="@string/ui_music_module_title"
                 android:textColor="#FFFFFF"
                 style="@style/Retui.Text.Body"
                 android:textStyle="bold" />
@@ -55,7 +55,7 @@
                 android:layout_marginTop="2dp"
                 android:maxLines="1"
                 android:ellipsize="end"
-                android:text="Singer      : -"
+                android:text="@string/ui_music_module_singer"
                 android:textColor="#FFFFFF"
                 style="@style/Retui.Text.Body" />
 
@@ -74,7 +74,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="monospace"
                     android:singleLine="true"
-                    android:text="Currently playing app: "
+                    android:text="@string/ui_music_module_currently_playing_app"
                     android:textColor="#FFFFFF"
                     style="@style/Retui.Text.Body" />
 
@@ -109,7 +109,7 @@
                     android:gravity="center"
                     android:singleLine="true"
                     android:ellipsize="end"
-                    android:text="PREV"
+                    android:text="@string/ui_music_module_prev"
                     style="@style/Retui.Text.Body"
                     android:fontFamily="monospace"
                     android:textColor="#FFFFFF" />
@@ -125,7 +125,7 @@
                     android:gravity="center"
                     android:singleLine="true"
                     android:ellipsize="end"
-                    android:text="PLAY/PAUSE"
+                    android:text="@string/ui_music_module_play_pause"
                     style="@style/Retui.Text.Body"
                     android:fontFamily="monospace"
                     android:textColor="#FFFFFF" />
@@ -139,7 +139,7 @@
                     android:gravity="center"
                     android:singleLine="true"
                     android:ellipsize="end"
-                    android:text="NEXT"
+                    android:text="@string/ui_music_module_next"
                     style="@style/Retui.Text.Body"
                     android:fontFamily="monospace"
                     android:textColor="#FFFFFF" />
@@ -163,7 +163,7 @@
         android:paddingEnd="12dp"
         android:paddingTop="2dp"
         android:paddingBottom="2dp"
-        android:text="NOW PLAYING"
+        android:text="@string/ui_music_module_now_playing"
         android:textColor="#FFFFFF"
         style="@style/Retui.Text.Body" />
 
@@ -177,7 +177,7 @@
         android:background="@drawable/apps_drawer_header_border"
         android:fontFamily="monospace"
         android:gravity="center"
-        android:text="X"
+        android:text="@string/ui_music_module_x"
         android:textColor="#FFFFFF"
         style="@style/Retui.Text.Body" />
 

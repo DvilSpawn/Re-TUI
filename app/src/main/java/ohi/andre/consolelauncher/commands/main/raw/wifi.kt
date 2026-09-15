@@ -17,7 +17,7 @@ class wifi : CommandAbstraction {
         val info = pack as MainPack
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             openWifiSettings(info)
-            return "Opening Wi-Fi settings. Android no longer allows third-party launchers to toggle Wi-Fi directly."
+            return pack.context.getString(R.string.command_wifi_opening_wi_fi_settings_android_no_longer_a_15368)
         }
 
         if (info.wifi == null) {

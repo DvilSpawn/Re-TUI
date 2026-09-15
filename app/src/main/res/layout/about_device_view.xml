@@ -206,7 +206,7 @@
             android:layout_width="48dp"
             android:layout_height="26dp"
             android:layout_gravity="center_horizontal"
-            android:contentDescription="Show modules"
+            android:contentDescription="@string/ui_about_device_view_show_modules"
             android:elevation="2dp"
             android:padding="4dp"
             android:scaleType="centerInside"

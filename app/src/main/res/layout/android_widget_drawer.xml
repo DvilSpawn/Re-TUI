@@ -68,7 +68,7 @@
                 android:id="@+id/android_widget_prefix"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="$W "
+                android:text="@string/ui_android_widget_drawer_w"
                 style="@style/Retui.Text.Body" />
 
             <EditText
@@ -77,7 +77,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@null"
-                android:hint="add | show | resize | remove"
+                android:hint="@string/ui_android_widget_drawer_add_show_resize_remove"
                 android:imeOptions="actionGo|flagNoFullscreen"
                 android:importantForAutofill="no"
                 android:inputType="text|textNoSuggestions"
@@ -90,7 +90,7 @@
                 android:layout_width="42dp"
                 android:layout_height="30dp"
                 android:gravity="center"
-                android:text="RUN"
+                android:text="@string/ui_android_widget_drawer_run"
                 style="@style/Retui.Text.Caption" />
 
         </LinearLayout>
@@ -130,7 +130,7 @@
         android:paddingTop="2dp"
         android:paddingEnd="12dp"
         android:paddingBottom="2dp"
-        android:text="Widgets/ [0]"
+        android:text="@string/ui_android_widget_drawer_widgets_0"
         android:textColor="#A5D6A7"
         style="@style/Retui.Text.Body" />
 
@@ -145,7 +145,7 @@
         android:background="@drawable/apps_drawer_header_border"
         android:fontFamily="monospace"
         android:gravity="center"
-        android:text="X"
+        android:text="@string/ui_android_widget_drawer_x"
         android:textColor="#A5D6A7"
         android:textSize="20sp" />
 
@@ -163,7 +163,7 @@
         android:paddingTop="2dp"
         android:paddingEnd="12dp"
         android:paddingBottom="2dp"
-        android:text="grid 4"
+        android:text="@string/ui_android_widget_drawer_grid_4"
         android:textColor="#A5D6A7"
         style="@style/Retui.Text.Control" />
 

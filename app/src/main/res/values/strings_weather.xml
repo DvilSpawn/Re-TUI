@@ -1,0 +1,30 @@
+<resources>
+    <!-- Full condition phrases: adjectives can change position and agreement in translation. -->
+    <string name="weather_condition_light_thunderstorm">light thunderstorm</string>
+    <string name="weather_condition_heavy_thunderstorm">heavy thunderstorm</string>
+    <string name="weather_condition_thunderstorm">thunderstorm</string>
+    <string name="weather_condition_light_snow_showers">light snow showers</string>
+    <string name="weather_condition_heavy_snow_showers">heavy snow showers</string>
+    <string name="weather_condition_snow_showers">snow showers</string>
+    <string name="weather_condition_light_snow">light snow</string>
+    <string name="weather_condition_heavy_snow">heavy snow</string>
+    <string name="weather_condition_snow">snow</string>
+    <string name="weather_condition_light_sleet_showers">light sleet showers</string>
+    <string name="weather_condition_heavy_sleet_showers">heavy sleet showers</string>
+    <string name="weather_condition_sleet_showers">sleet showers</string>
+    <string name="weather_condition_light_sleet">light sleet</string>
+    <string name="weather_condition_heavy_sleet">heavy sleet</string>
+    <string name="weather_condition_sleet">sleet</string>
+    <string name="weather_condition_light_rain_showers">light rain showers</string>
+    <string name="weather_condition_heavy_rain_showers">heavy rain showers</string>
+    <string name="weather_condition_rain_showers">rain showers</string>
+    <string name="weather_condition_light_rain">light rain</string>
+    <string name="weather_condition_heavy_rain">heavy rain</string>
+    <string name="weather_condition_rain">rain</string>
+    <string name="weather_condition_partlycloudy">Partly cloudy</string>
+    <string name="weather_condition_cloudy">Cloudy</string>
+    <string name="weather_condition_fog">Fog</string>
+    <string name="weather_condition_fair">Fair</string>
+    <string name="weather_condition_clearsky">Clear</string>
+    <string name="weather_condition_unknown">Unknown</string>
+</resources>

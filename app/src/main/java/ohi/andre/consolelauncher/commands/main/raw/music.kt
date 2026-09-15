@@ -98,8 +98,8 @@ class music : ParamCommand() {
                 val song = m.get(m.songIndex)
                 if (song == null) return pack.context.getString(R.string.output_songnotfound)
 
-                builder.append("Name: ").append(song.getTitle()).append(Tuils.NEWLINE)
-                if (song.getID() == -1L) builder.append("Path: ").append(song.getPath())
+                builder.append(pack.context.getString(R.string.command_music_name_b3f69)).append(song.getTitle()).append(Tuils.NEWLINE)
+                if (song.getID() == -1L) builder.append(pack.context.getString(R.string.command_music_path_e97fe)).append(song.getPath())
                     .append(Tuils.NEWLINE)
                 builder.append(Tuils.NEWLINE)
 
@@ -118,7 +118,7 @@ class music : ParamCommand() {
                 }
 
                 builder.append(if (curMin > 0) curMin.toString() + "." + curS else curS.toString() + "s")
-                    .append(" of ")
+                    .append(pack.context.getString(R.string.command_music_of_607f2))
                     .append(if (min > 0) min.toString() + "." + s else s.toString() + "s")
                     .append(" (").append(
                         Tuils.percentage(
@@ -165,7 +165,7 @@ class music : ParamCommand() {
         companion object {
             fun get(p: String): Param? {
                 var p = p
-                p = p.lowercase(Locale.getDefault())
+                p = p.lowercase(Locale.ROOT)
                 val ps = entries.toTypedArray()
                 for (p1 in ps) if (p.endsWith(p1.label()!!)) return p1
                 return null

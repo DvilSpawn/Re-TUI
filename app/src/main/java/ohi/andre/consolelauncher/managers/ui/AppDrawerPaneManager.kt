@@ -189,7 +189,7 @@ class AppDrawerPaneManager(
         }
 
         groupTabs.removeAllViews()
-        addGroupTab("ALL", null, drawerColor, borderColor, backgroundColor, true)
+        addGroupTab(context.getString(R.string.manager_appdrawerpanemanager_all_6b428), null, drawerColor, borderColor, backgroundColor, true)
 
         val groups: MutableList<AppsManager.Group> = ArrayList(appsManager.groups)
         Collections.sort(
@@ -308,8 +308,8 @@ class AppDrawerPaneManager(
         buildAlphabetTabs(drawerColor, borderColor, backgroundColor)
 
         val scope = if (selectedGroup == null) "all" else selectedGroup
-        header?.text = "Applications/ [${visibleApps.size}] <$scope>"
-        footer?.text = "groups ${appsManager.groups.size} | tabs ${alphaPositions.size}"
+        header?.text = context.getString(R.string.manager_appdrawerpanemanager_applications_a46d2, visibleApps.size, scope)
+        footer?.text = context.getString(R.string.manager_appdrawerpanemanager_groups_tabs_ef814, appsManager.groups.size, alphaPositions.size)
         appsList?.setSelection(0)
         updateSelectedAlphaFromPosition(0)
     }

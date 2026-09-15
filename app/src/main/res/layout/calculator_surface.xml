@@ -55,7 +55,7 @@
                         android:ellipsize="start"
                         android:gravity="end|center_vertical"
                         android:maxLines="2"
-                        android:text="0"
+                        android:text="@string/ui_token_b6589fc6ab"
                         style="@style/Retui.Text.Title" />
 
                     <TextView
@@ -79,7 +79,7 @@
                     android:minWidth="112dp"
                     android:paddingStart="10dp"
                     android:paddingEnd="10dp"
-                    android:text="EXPRESSION"
+                    android:text="@string/ui_calculator_surface_expression"
                     style="@style/Retui.Text.Control" />
             </FrameLayout>
 
@@ -105,7 +105,7 @@
             android:paddingTop="2dp"
             android:paddingEnd="12dp"
             android:paddingBottom="2dp"
-            android:text="CALCULATOR"
+            android:text="@string/ui_calculator_surface_calculator"
             style="@style/Retui.Text.Body" />
 
         <TextView
@@ -114,9 +114,9 @@
             android:layout_height="36dp"
             android:layout_gravity="top|end"
             android:layout_marginTop="-10dp"
-            android:contentDescription="Close calculator"
+            android:contentDescription="@string/ui_calculator_surface_close_calculator"
             android:gravity="center"
-            android:text="X"
+            android:text="@string/ui_calculator_surface_x"
             style="@style/Retui.Text.Title" />
     </FrameLayout>
 </FrameLayout>

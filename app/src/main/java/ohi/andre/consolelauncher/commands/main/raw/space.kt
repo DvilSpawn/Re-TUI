@@ -37,7 +37,7 @@ class space : ParamCommand() {
             override fun exec(pack: ExecutePack): String {
                 return safe(pack) {
                     val active = SpaceManager.saveActive(pack.context)
-                    "Saved Space: " + active.name
+                    pack.context.getString(R.string.command_space_saved_space_e5292, active.name)
                 }
             }
         },
@@ -47,7 +47,7 @@ class space : ParamCommand() {
             override fun exec(pack: ExecutePack): String {
                 return safe(pack) {
                     val created = SpaceManager.createFromActive(pack.context, pack.getString())
-                    "Created and switched to Space: " + created.name
+                    pack.context.getString(R.string.command_space_created_and_switched_to_space_d546d, created.name)
                 }
             }
         },
@@ -57,7 +57,7 @@ class space : ParamCommand() {
             override fun exec(pack: ExecutePack): String {
                 return safe(pack) {
                     val renamed = SpaceManager.renameActive(pack.context, pack.getString())
-                    "Renamed active Space: " + renamed.name
+                    pack.context.getString(R.string.command_space_renamed_active_space_4855e, renamed.name)
                 }
             }
         },
@@ -69,10 +69,10 @@ class space : ParamCommand() {
                     val target = SpaceManager.switchTo(pack.context, pack.getString())
                     NotificationService.requestReload(pack.context)
                     if (pack.context is Reloadable) {
-                        (pack.context as Reloadable).addMessage("space", "Switched to " + target.name)
+                        (pack.context as Reloadable).addMessage("space", pack.context.getString(R.string.command_space_switched_to_c5720, target.name))
                         (pack.context as Reloadable).reload()
                     }
-                    "Switched to Space: " + target.name
+                    pack.context.getString(R.string.command_space_switched_to_space_c4781, target.name)
                 }
             }
         },
@@ -82,7 +82,7 @@ class space : ParamCommand() {
             override fun exec(pack: ExecutePack): String {
                 return safe(pack) {
                     val removed = SpaceManager.remove(pack.context, pack.getString())
-                    "Removed Space: " + removed.name
+                    pack.context.getString(R.string.command_space_removed_space_24a7b, removed.name)
                 }
             }
         };
@@ -110,7 +110,7 @@ class space : ParamCommand() {
 
         companion object {
             fun get(value: String): Param? {
-                val clean = value.lowercase(Locale.getDefault())
+                val clean = value.lowercase(Locale.ROOT)
                 for (param in entries) {
                     if (clean.endsWith(param.label())) {
                         return param

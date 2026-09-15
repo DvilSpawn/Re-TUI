@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher.commands.main.raw
 
+import ohi.andre.consolelauncher.R
 import android.text.InputType
 import java.util.Locale
 import ohi.andre.consolelauncher.commands.CommandAbstraction
@@ -25,27 +26,27 @@ class lockdown : CommandAbstraction {
             val split = input.split("\\s+".toRegex(), limit = 2)
             return when (split[0].lowercase(Locale.US)) {
                 "-status" -> manager.status
-                "-stop" -> "Use the lockdown screen to spend credits, use a breach key, or run emergency breach."
-                else -> "Invalid lockdown option: ${split[0]}"
+                "-stop" -> pack.context.getString(R.string.command_lockdown_use_the_lockdown_screen_to_spend_credits_u_7424e)
+                else -> pack.context.getString(R.string.command_lockdown_invalid_lockdown_option_716ed, split[0])
             }
         }
 
         if (manager.isRunning) {
-            return "A lockdown is already active."
+            return pack.context.getString(R.string.command_lockdown_a_lockdown_is_already_active_68d6d)
         }
 
         if (input.isEmpty()) {
             TuixtDialog.showValidatedForm(
                 pack.context,
-                "NEW LOCKDOWN",
+                pack.context.getString(R.string.command_lockdown_new_lockdown_eb76f),
                 listOf(
-                    FormField(FIELD_HOURS, "Hours", "00", InputType.TYPE_CLASS_NUMBER),
-                    FormField(FIELD_MINUTES, "Minutes", "00", InputType.TYPE_CLASS_NUMBER),
-                    FormField(FIELD_REASON, "Reason", "Reason")
+                    FormField(FIELD_HOURS, pack.context.getString(R.string.command_lockdown_hours_9e25a), "00", InputType.TYPE_CLASS_NUMBER),
+                    FormField(FIELD_MINUTES, pack.context.getString(R.string.command_lockdown_minutes_092f9), "00", InputType.TYPE_CLASS_NUMBER),
+                    FormField(FIELD_REASON, pack.context.getString(R.string.command_lockdown_reason_f219c), pack.context.getString(R.string.command_lockdown_reason_f219c))
                 ),
-                "START",
-                "CANCEL",
-                { values -> validateLockdownForm(values) }
+                pack.context.getString(R.string.command_lockdown_start_7196e),
+                pack.context.getString(R.string.command_lockdown_cancel_1507c),
+                { values -> validateLockdownForm(values)?.let(pack.context::getString) }
             ) { values ->
                 val result = manager.start(
                     durationFromParts(values),
@@ -53,10 +54,10 @@ class lockdown : CommandAbstraction {
                 )
                 Tuils.sendOutput(pack.context, result)
             }
-            return "Opening Lockdown setup..."
+            return pack.context.getString(R.string.command_lockdown_opening_lockdown_setup_25318)
         }
 
-        return startFromInput(manager, input)
+        return startFromInput(pack.context, manager, input)
     }
 
     override fun priority(): Int = 2
@@ -72,29 +73,29 @@ class lockdown : CommandAbstraction {
         private const val FIELD_MINUTES = "minutes"
         private const val FIELD_REASON = "reason"
 
-        private fun startFromInput(manager: LockdownManager, input: String): String {
+        private fun startFromInput(context: android.content.Context, manager: LockdownManager, input: String): String {
             val split = input.split("\\s+".toRegex(), limit = 2)
             val durationText = split.getOrNull(0).orEmpty()
             val reason = if (split.size > 1) split[1] else ""
             val error = validateDurationReason(durationText, reason)
-            if (error != null) return error
+            if (error != null) return context.getString(error)
             val duration = ClockManager.parseDurationMillis(durationText)
             return manager.start(duration, reason)
         }
 
-        private fun validateLockdownForm(values: Map<String, String>): String? {
+        private fun validateLockdownForm(values: Map<String, String>): Int? {
             val hours = values[FIELD_HOURS].orEmpty()
             val minutes = values[FIELD_MINUTES].orEmpty()
-            if (hours.isBlank() && minutes.isBlank()) return "Duration is missing."
-            if (durationFromParts(values) <= 0L) return "Duration is invalid."
-            if (values[FIELD_REASON].isNullOrBlank()) return "Reason is missing."
+            if (hours.isBlank() && minutes.isBlank()) return R.string.validation_duration_missing
+            if (durationFromParts(values) <= 0L) return R.string.validation_duration_invalid
+            if (values[FIELD_REASON].isNullOrBlank()) return R.string.validation_reason_missing
             return null
         }
 
-        private fun validateDurationReason(duration: String, reason: String): String? {
-            if (duration.isBlank()) return "Duration is missing."
-            if (reason.isBlank()) return "Reason is missing."
-            if (ClockManager.parseDurationMillis(duration) <= 0L) return "Duration is invalid."
+        private fun validateDurationReason(duration: String, reason: String): Int? {
+            if (duration.isBlank()) return R.string.validation_duration_missing
+            if (reason.isBlank()) return R.string.validation_reason_missing
+            if (ClockManager.parseDurationMillis(duration) <= 0L) return R.string.validation_duration_invalid
             return null
         }
 

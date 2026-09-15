@@ -1,0 +1,4 @@
+# Generated CSV inventories use the standard CSV CRLF record terminator.
+docs/localization/*.csv whitespace=cr-at-eol
+# The plain XML template preserves significant whitespace from compiled strings.
+language-packs/template/strings.xml whitespace=-blank-at-eol

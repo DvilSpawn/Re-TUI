@@ -150,8 +150,8 @@ class TuixtAdapter(
 
         val settingHolder = holder as ViewHolder
         val item = row.item ?: return
-        settingHolder.title.setText(displayLabel(item))
-        settingHolder.description.setText(item.info())
+        settingHolder.title.setText(displayLabel(settingHolder.itemView.context, item))
+        settingHolder.description.setText(item.info(settingHolder.itemView.context))
 
         val currentValue = getCurrentValue(item)
 
@@ -182,7 +182,7 @@ class TuixtAdapter(
             settingHolder.input.visibility = View.VISIBLE
             settingHolder.input.setText(currentValue)
             settingHolder.action.visibility = View.VISIBLE
-            settingHolder.action.text = "PROVIDERS"
+            settingHolder.action.text = settingHolder.itemView.context.getString(R.string.editor_tuixtadapter_providers_1bec3)
             styleButton(settingHolder.itemView.context, settingHolder.action, false)
             settingHolder.action.setOnClickListener { onOpenSearchProviders() }
             settingHolder.textWatcher = object : TextWatcher {
@@ -285,7 +285,7 @@ class TuixtAdapter(
     }
 
     private fun bindSection(holder: SectionHolder, row: SettingsRow) {
-        val title = row.section ?: "Unsectioned"
+        val title = row.section ?: holder.itemView.context.getString(R.string.editor_tuixtadapter_unsectioned_7d5f9)
         val collapsed = if (accordionSections) accordionState.collapsed(title) else collapsedSections.contains(title)
         holder.title.text = (if (collapsed) "[+] " else "[-] ") + title.uppercase()
         holder.title.setTextColor(accentColor())
@@ -327,22 +327,22 @@ class TuixtAdapter(
         }
     }
 
-    private fun displayLabel(item: XMLPrefsSave): String {
+    private fun displayLabel(context: Context, item: XMLPrefsSave): String {
         return when (item.label()) {
-            "unified_status_border" -> "Unified Bottom Console"
-            "show_ascii" -> "Show ASCII TXT"
-            "show_ascii_landscape" -> "Show ASCII In Landscape"
-            "ascii_max_lines" -> "ASCII Viewport Rows"
-            "ascii_pane_height_rows" -> "ASCII Pane Height"
-            "ascii_animation" -> "Enable Animated ASCII"
-            "ascii_animation_frame_delay_ms" -> "Animation Frame Delay"
-            "ascii_animation_max_file_kb" -> "Max ASCII Import File Size"
-            "ascii_index" -> "ASCII Position"
-            "ascii_size" -> "Legacy ASCII Text Size"
-            "ascii_status_alignment" -> "ASCII Alignment"
-            "ascii_text_color" -> "ASCII Text Color"
-            "ascii_status_background_color" -> "ASCII Background Color"
-            "ascii_status_text_shadow_color" -> "ASCII Text Shadow Color"
+            "unified_status_border" -> context.getString(R.string.editor_tuixtadapter_unified_bottom_console_d8bbf)
+            "show_ascii" -> context.getString(R.string.editor_tuixtadapter_show_ascii_txt_871d6)
+            "show_ascii_landscape" -> context.getString(R.string.editor_tuixtadapter_show_ascii_in_landscape_587c0)
+            "ascii_max_lines" -> context.getString(R.string.editor_tuixtadapter_ascii_viewport_rows_30da0)
+            "ascii_pane_height_rows" -> context.getString(R.string.editor_tuixtadapter_ascii_pane_height_2d2b7)
+            "ascii_animation" -> context.getString(R.string.editor_tuixtadapter_enable_animated_ascii_5a922)
+            "ascii_animation_frame_delay_ms" -> context.getString(R.string.editor_tuixtadapter_animation_frame_delay_46de0)
+            "ascii_animation_max_file_kb" -> context.getString(R.string.editor_tuixtadapter_max_ascii_import_file_size_7ae47)
+            "ascii_index" -> context.getString(R.string.editor_tuixtadapter_ascii_position_4b86a)
+            "ascii_size" -> context.getString(R.string.editor_tuixtadapter_legacy_ascii_text_size_37f49)
+            "ascii_status_alignment" -> context.getString(R.string.editor_tuixtadapter_ascii_alignment_bb48f)
+            "ascii_text_color" -> context.getString(R.string.editor_tuixtadapter_ascii_text_color_ee845)
+            "ascii_status_background_color" -> context.getString(R.string.editor_tuixtadapter_ascii_background_color_e5078)
+            "ascii_status_text_shadow_color" -> context.getString(R.string.editor_tuixtadapter_ascii_text_shadow_color_1219b)
             else -> item.label()
         } ?: ""
     }
@@ -399,18 +399,18 @@ class TuixtAdapter(
         val selected = ToolbarShortcutManager.normalizeIcon(currentValue)
         val choice = ToolbarShortcutManager.icons().first { it.key == selected }
         val button = TextView(context)
-        button.text = choice.label.uppercase()
+        button.text = context.getString(choice.labelRes).uppercase()
         button.gravity = Gravity.CENTER_VERTICAL
         button.setCompoundDrawablesWithIntrinsicBounds(choice.drawableRes, 0, 0, 0)
         button.compoundDrawablePadding = dp(context, 10f)
         styleButton(context, button, true)
         button.setOnClickListener {
-            TuixtDialog.showCustom(context, "Toolbar Icon", TuixtDialog.ContentFactory { dialog ->
+            TuixtDialog.showCustom(context, context.getString(R.string.editor_tuixtadapter_toolbar_icon_b7566), TuixtDialog.ContentFactory { dialog ->
                 val content = LinearLayout(context)
                 content.orientation = LinearLayout.VERTICAL
                 for (icon in ToolbarShortcutManager.icons()) {
                     val row = TextView(context)
-                    row.text = icon.label.uppercase()
+                    row.text = context.getString(icon.labelRes).uppercase()
                     row.gravity = Gravity.CENTER_VERTICAL
                     row.setCompoundDrawablesWithIntrinsicBounds(icon.drawableRes, 0, 0, 0)
                     row.compoundDrawablePadding = dp(context, 12f)
@@ -516,7 +516,7 @@ class TuixtAdapter(
                 holder.input.setText("auto")
                 holder.input.setSelection(4)
                 preview.setBackgroundColor(inheritedColor())
-                hexText.text = "AUTO  ${String.format("#%08X", inheritedColor())}"
+                hexText.text = holder.itemView.context.getString(R.string.editor_tuixtadapter_auto_a4b6e, String.format("#%08X", inheritedColor()))
             }
         } else {
             autoButton.visibility = View.GONE

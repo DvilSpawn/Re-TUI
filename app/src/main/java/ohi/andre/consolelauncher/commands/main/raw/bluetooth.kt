@@ -24,7 +24,7 @@ class bluetooth : CommandAbstraction {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             info.context.startActivity(Intent(Settings.ACTION_BLUETOOTH_SETTINGS))
-            return "Opening Bluetooth settings. Android no longer allows third-party launchers to toggle Bluetooth directly."
+            return pack.context.getString(R.string.command_bluetooth_opening_bluetooth_settings_android_no_long_c4672)
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -35,10 +35,10 @@ class bluetooth : CommandAbstraction {
 
         return if (adapter.isEnabled) {
             adapter.disable()
-            info.context.getString(R.string.output_bluetooth) + " false"
+            pack.context.getString(R.string.command_bluetooth_false_4603a, info.context.getString(R.string.output_bluetooth))
         } else {
             adapter.enable()
-            info.context.getString(R.string.output_bluetooth) + " true"
+            pack.context.getString(R.string.command_bluetooth_true_630fa, info.context.getString(R.string.output_bluetooth))
         }
     }
 

@@ -113,6 +113,9 @@ class LongClickableSpan(
                 if (showMenu) {
                         val menu = PopupMenu(v.getContext().getApplicationContext(), v)
                         menu.getMenuInflater().inflate(R.menu.notification_menu, menu.getMenu())
+                        menu.menu.findItem(R.id.exclude_app).title = v.context.getString(R.string.exclude_app)
+                        menu.menu.findItem(R.id.exclude_notification).title = v.context.getString(R.string.exclude_notification)
+                        menu.menu.findItem(R.id.reply_notification).title = v.context.getString(R.string.reply_notification)
 
                         menu.getMenu().findItem(R.id.exclude_app).setVisible(showExcludeApp)
                         menu.getMenu().findItem(R.id.exclude_notification).setVisible(

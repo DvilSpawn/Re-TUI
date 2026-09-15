@@ -9,7 +9,7 @@ class ToolbarShortcutManagerTest {
         val icons = ToolbarShortcutManager.icons()
         assertEquals(12, icons.size)
         assertEquals(icons.size, icons.map { it.key }.distinct().size)
-        assertEquals(icons.size, icons.map { it.label }.distinct().size)
+        assertEquals(icons.size, icons.map { it.labelRes }.distinct().size)
         assertEquals("star", ToolbarShortcutManager.normalizeIcon("not-supported"))
     }
 }

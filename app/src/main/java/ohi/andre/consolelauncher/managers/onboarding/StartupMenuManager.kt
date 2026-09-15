@@ -15,6 +15,7 @@ import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
+import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.LauncherActivity
 import ohi.andre.consolelauncher.commands.tuixt.TuixtLayout.addFoldAwareHost
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.dp
@@ -84,7 +85,7 @@ object StartupMenuManager {
     fun startTest(context: Context): String {
         start(context, dryRun = true)
         open(context)
-        return "Opening startup menu in dry-run mode."
+        return context.getString(R.string.startup_opening_startup_menu_in_dry_run_mode)
     }
 
     fun isActive(context: Context): Boolean = prefs(context).getBoolean(KEY_ACTIVE, false)
@@ -114,27 +115,27 @@ object StartupMenuManager {
     }
 
     fun toggles(context: Context): List<Toggle> = listOf(
-        toggle(context, APP_DRAWER, "App drawer", "Toolbar shortcut for browsing installed apps."),
-        toggle(context, MODULE_DOCK, "Module dock", "Quick-access row for launcher modules."),
-        toggle(context, WIDGETS, "Android widgets", "Toolbar shortcut for the Android widget drawer."),
-        toggle(context, NOTIFICATIONS, "Notifications and media", "Read notifications and external media sessions."),
-        toggle(context, STATUS, "Status extras", "Weather and unlock-count labels."),
-        toggle(context, LOCK, "Double-tap lock", "Lock the phone with a double tap."),
+        toggle(context, APP_DRAWER, context.getString(R.string.startup_app_drawer), context.getString(R.string.startup_toolbar_shortcut_for_browsing_installed_apps)),
+        toggle(context, MODULE_DOCK, context.getString(R.string.startup_module_dock), context.getString(R.string.startup_quick_access_row_for_launcher_modules)),
+        toggle(context, WIDGETS, context.getString(R.string.startup_android_widgets), context.getString(R.string.startup_toolbar_shortcut_for_the_android_widget_drawer)),
+        toggle(context, NOTIFICATIONS, context.getString(R.string.startup_notifications_and_media), context.getString(R.string.startup_read_notifications_and_external_media_sessions)),
+        toggle(context, STATUS, context.getString(R.string.startup_status_extras), context.getString(R.string.startup_weather_and_unlock_count_labels)),
+        toggle(context, LOCK, context.getString(R.string.startup_double_tap_lock), context.getString(R.string.startup_lock_the_phone_with_a_double_tap)),
         toggle(
             context,
             TERMUX,
-            "Termux and tmux",
-            if (TermuxBridgeManager.isTermuxInstalled(context)) "Termux detected; show the tmux workspace shortcut."
-            else "Termux not detected; keep the tmux shortcut available for later."
+            context.getString(R.string.startup_termux_and_tmux),
+            if (TermuxBridgeManager.isTermuxInstalled(context)) context.getString(R.string.startup_termux_detected_show_the_tmux_workspace_shortcut)
+            else context.getString(R.string.startup_termux_not_detected_keep_the_tmux_shortcut_available_for_later)
         ),
         toggle(
             context,
             TASKER,
-            "Tasker",
-            if (TaskerIntegrationManager.isTaskerInstalled(context)) "Tasker detected; allow Re:T-UI actions and tasks."
-            else "Tasker not detected; enable the integration for later."
+            context.getString(R.string.startup_tasker),
+            if (TaskerIntegrationManager.isTaskerInstalled(context)) context.getString(R.string.startup_tasker_detected_allow_re_t_ui_actions_and_tasks)
+            else context.getString(R.string.startup_tasker_not_detected_enable_the_integration_for_later)
         ),
-        toggle(context, SOUNDS, "Launcher sounds", "Boot, action, timer, and reminder sounds.")
+        toggle(context, SOUNDS, context.getString(R.string.startup_launcher_sounds), context.getString(R.string.startup_boot_action_timer_and_reminder_sounds))
     )
 
     fun toggle(context: Context, id: String) {
@@ -168,17 +169,17 @@ object StartupMenuManager {
     fun finish(context: Context): ActionResult {
         if (isDryRun(context)) {
             prefs(context).edit().putBoolean(KEY_ACTIVE, false).apply()
-            return ActionResult("Startup preview complete. No settings were changed.")
+            return ActionResult(context.getString(R.string.startup_startup_preview_complete_no_settings_were_changed))
         }
 
         applyChoices(context)
         prefs(context).edit().putBoolean(KEY_ACTIVE, false).putBoolean(KEY_COMPLETE, true).apply()
         val followUp = mutableListOf<String>()
-        if (level(context) == ADVANCED && enabled(context, TERMUX)) followUp.add("Termux: run tbridge -setup, then tbridge -status.")
-        if (level(context) == ADVANCED && enabled(context, TASKER)) followUp.add("Tasker: allow external access in Tasker if prompted.")
+        if (level(context) == ADVANCED && enabled(context, TERMUX)) followUp.add(context.getString(R.string.startup_termux_run_tbridge_setup_then_tbridge_status))
+        if (level(context) == ADVANCED && enabled(context, TASKER)) followUp.add(context.getString(R.string.startup_tasker_allow_external_access_in_tasker_if_prompted))
         return ActionResult(
             buildString {
-                append("Startup setup applied.")
+                append(context.getString(R.string.startup_startup_setup_applied))
                 if (followUp.isNotEmpty()) append("\n").append(followUp.joinToString("\n"))
             },
             reload = true
@@ -189,8 +190,8 @@ object StartupMenuManager {
         val dryRun = isDryRun(context)
         prefs(context).edit().putBoolean(KEY_ACTIVE, false).apply()
         return ActionResult(
-            if (dryRun) "Startup preview closed. No settings were changed."
-            else "Startup setup postponed until the next launch."
+            if (dryRun) context.getString(R.string.startup_startup_preview_closed_no_settings_were_changed)
+            else context.getString(R.string.startup_startup_setup_postponed_until_the_next_launch)
         )
     }
 
@@ -273,7 +274,7 @@ object StartupMenuManager {
     private fun prefs(context: Context) = context.applicationContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 }
 
-class StartupMenuActivity : Activity() {
+class StartupMenuActivity : ohi.andre.consolelauncher.localization.LocalizedActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         requestNoTitleIfFullscreen(this)
         super.onCreate(savedInstanceState)
@@ -325,17 +326,17 @@ class StartupMenuActivity : Activity() {
         })
 
         val header = TextView(this).apply {
-            text = if (StartupMenuManager.isDryRun(this@StartupMenuActivity)) "STARTUP · DRY RUN" else "STARTUP"
+            text = if (StartupMenuManager.isDryRun(this@StartupMenuActivity)) getString(R.string.startup_startup_dry_run) else getString(R.string.startup_startup)
         }
         styleHeader(this, header)
         shell.addView(header, FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.TOP or Gravity.START).apply {
             leftMargin = dp(this@StartupMenuActivity, 30f)
         })
 
-        panel.addView(terminalText("Set up your launcher", 21f).apply { setTypeface(typeface, Typeface.BOLD) }, blockParams(6f))
+        panel.addView(terminalText(getString(R.string.startup_set_up_your_launcher), 21f).apply { setTypeface(typeface, Typeface.BOLD) }, blockParams(6f))
         panel.addView(terminalText(
-            if (StartupMenuManager.isDryRun(this)) "Preview only — changing switches here will not alter your launcher."
-            else "Choose a setup level, review it here, then apply once.",
+            if (StartupMenuManager.isDryRun(this)) getString(R.string.startup_preview_only_changing_switches_here_will_not_alter_your_launcher)
+            else getString(R.string.startup_choose_a_setup_level_review_it_here_then_apply_once),
             13f
         ), blockParams(10f))
 
@@ -343,23 +344,23 @@ class StartupMenuActivity : Activity() {
         list.addView(levelRow(), blockParams(10f))
         list.addView(
             choiceToggleRow(
-                "Auto-theme",
-                "Derive launcher colors from the system wallpaper.",
+                getString(R.string.startup_auto_theme),
+                getString(R.string.startup_derive_launcher_colors_from_the_system_wallpaper),
                 StartupMenuManager.autoTheme(this)
             ) { StartupMenuManager.toggleAutoTheme(this); render() },
             blockParams(8f)
         )
-        list.addView(terminalText("BORDER", 13f).apply { setTypeface(typeface, Typeface.BOLD) }, blockParams(6f))
+        list.addView(terminalText(getString(R.string.startup_border), 13f).apply { setTypeface(typeface, Typeface.BOLD) }, blockParams(6f))
         list.addView(borderRow(), blockParams(10f))
 
         if (StartupMenuManager.level(this) == StartupMenuManager.ADVANCED) {
-            list.addView(terminalText("FEATURES", 13f).apply { setTypeface(typeface, Typeface.BOLD) }, blockParams(6f))
+            list.addView(terminalText(getString(R.string.startup_features), 13f).apply { setTypeface(typeface, Typeface.BOLD) }, blockParams(6f))
             StartupMenuManager.toggles(this).forEach { list.addView(toggleRow(it), blockParams(8f)) }
-            list.addView(terminalText("VISUAL EFFECTS", 13f).apply { setTypeface(typeface, Typeface.BOLD) }, blockParams(6f))
+            list.addView(terminalText(getString(R.string.startup_visual_effects), 13f).apply { setTypeface(typeface, Typeface.BOLD) }, blockParams(6f))
             list.addView(visualEffects(), blockParams(4f))
         } else {
             list.addView(terminalText(
-                "Basic keeps status extras and double-tap lock on. Optional drawers and integrations stay off.",
+                getString(R.string.startup_basic_keeps_status_extras_and_double_tap_lock_on_optional_drawers_and),
                 12f
             ), blockParams(8f))
         }
@@ -370,11 +371,11 @@ class StartupMenuActivity : Activity() {
             gravity = Gravity.CENTER_VERTICAL
             setPadding(0, dp(this@StartupMenuActivity, 10f), 0, 0)
         }
-        val later = button(if (StartupMenuManager.isDryRun(this)) "END PREVIEW" else "LATER", false)
+        val later = button(if (StartupMenuManager.isDryRun(this)) getString(R.string.startup_end_preview) else getString(R.string.startup_later), false)
         later.setOnClickListener { close(StartupMenuManager.cancel(this)) }
         controls.addView(later, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
         controls.addView(View(this), LinearLayout.LayoutParams(dp(this, 10f), 1))
-        val apply = button(if (StartupMenuManager.isDryRun(this)) "FINISH PREVIEW" else "APPLY", true)
+        val apply = button(if (StartupMenuManager.isDryRun(this)) getString(R.string.startup_finish_preview) else getString(R.string.startup_apply), true)
         apply.setOnClickListener { close(StartupMenuManager.finish(this)) }
         controls.addView(apply, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
         panel.addView(controls)
@@ -393,7 +394,7 @@ class StartupMenuActivity : Activity() {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
             setPadding(dp(this@StartupMenuActivity, 12f), dp(this@StartupMenuActivity, 9f), dp(this@StartupMenuActivity, 10f), dp(this@StartupMenuActivity, 9f))
-            contentDescription = label + ". " + description + ". " + if (checked) "On" else "Off"
+            contentDescription = getString(R.string.startup_toggle_description, label, description, getString(if (checked) R.string.startup_on else R.string.startup_off))
             isClickable = true
             isFocusable = true
             setOnClickListener { action() }
@@ -411,7 +412,7 @@ class StartupMenuActivity : Activity() {
     private fun levelRow(): View {
         val row = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
         listOf(StartupMenuManager.BASIC, StartupMenuManager.ADVANCED).forEachIndexed { index, value ->
-            val choice = button(value.uppercase(), StartupMenuManager.level(this) == value)
+            val choice = button(getString(if (value == StartupMenuManager.BASIC) R.string.startup_basic else R.string.startup_advanced), StartupMenuManager.level(this) == value)
             choice.setOnClickListener { StartupMenuManager.setLevel(this, value); render() }
             row.addView(choice, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f).apply {
                 if (index > 0) leftMargin = dp(this@StartupMenuActivity, 8f)
@@ -423,7 +424,11 @@ class StartupMenuActivity : Activity() {
     private fun borderRow(): View {
         val row = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
         listOf(StartupMenuManager.BORDER_DASHED, StartupMenuManager.BORDER_SOLID, StartupMenuManager.BORDER_NONE).forEachIndexed { index, value ->
-            val choice = button(value.uppercase(), StartupMenuManager.border(this) == value)
+            val choice = button(getString(when (value) {
+                StartupMenuManager.BORDER_DASHED -> R.string.startup_dashed
+                StartupMenuManager.BORDER_SOLID -> R.string.startup_solid
+                else -> R.string.startup_none
+            }), StartupMenuManager.border(this) == value)
             choice.setOnClickListener { StartupMenuManager.setBorder(this, value); render() }
             row.addView(choice, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f).apply {
                 if (index > 0) leftMargin = dp(this@StartupMenuActivity, 8f)
@@ -434,11 +439,11 @@ class StartupMenuActivity : Activity() {
 
     private fun visualEffects(): View {
         val group = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
-        group.addView(choiceToggleRow("Classic base", "The standard launcher renderer is always active.", true) {}, blockParams(8f))
-        group.addView(choiceToggleRow("Cyberdeck", "Layer cyberdeck chrome over the classic base.", StartupMenuManager.cyberdeck(this)) {
+        group.addView(choiceToggleRow(getString(R.string.startup_classic_base), getString(R.string.startup_the_standard_launcher_renderer_is_always_active), true) {}, blockParams(8f))
+        group.addView(choiceToggleRow(getString(R.string.startup_cyberdeck), getString(R.string.startup_layer_cyberdeck_chrome_over_the_classic_base), StartupMenuManager.cyberdeck(this)) {
             StartupMenuManager.toggleCyberdeck(this); render()
         }, blockParams(8f))
-        group.addView(choiceToggleRow("CRT", "Layer scanline and CRT effects over the classic base.", StartupMenuManager.crt(this)) {
+        group.addView(choiceToggleRow(getString(R.string.startup_crt), getString(R.string.startup_layer_scanline_and_crt_effects_over_the_classic_base), StartupMenuManager.crt(this)) {
             StartupMenuManager.toggleCrt(this); render()
         }, blockParams(8f))
         group.getChildAt(0).isClickable = false

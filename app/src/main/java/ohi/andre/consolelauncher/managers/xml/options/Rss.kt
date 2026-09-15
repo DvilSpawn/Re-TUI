@@ -1,37 +1,38 @@
 package ohi.andre.consolelauncher.managers.xml.options
 
+import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.managers.RssManager
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsElement
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave
 
 enum class Rss(
     private val defaultValue: String,
-    private val info: String,
+    private val info: Int,
     private val type: String
 ) : XMLPrefsSave {
-    rss_item_text_color("#f44336", "RSS item text color", XMLPrefsSave.COLOR),
+    rss_item_text_color("#f44336", R.string.setting_rss_rss_item_text_color_description, XMLPrefsSave.COLOR),
     rss_default_format(
         "%[50][green]title ### %[100][teal]description (%pubDate)",
-        "The default format",
+        R.string.setting_rss_rss_default_format_description,
         XMLPrefsSave.TEXT
     ),
     include_rss_default(
         "true",
-        "If true, a filter will exclude an item if it matches. If false, a filter will include an item if it matches",
+        R.string.setting_rss_include_rss_default_description,
         XMLPrefsSave.BOOLEAN
     ),
-    rss_hidden_tags("img", "A list of excluded tags (separated by comma)", XMLPrefsSave.TEXT),
-    rss_time_format("%t0", "The time format used by RSS items", XMLPrefsSave.TEXT),
-    show_rss_download("true", "If true, you will see a message when Re:T-UI downloads a feed", XMLPrefsSave.BOOLEAN),
-    rss_download_format("RSS: %id --- Downloaded %sb bytes", "The message shown when an RSS feed is downloaded", XMLPrefsSave.TEXT),
-    rss_download_message_text_color("aqua", "RSS download message text color", XMLPrefsSave.COLOR),
-    click_rss("true", "If true, you will be able to click on an RSS item to open the associated webpage", XMLPrefsSave.BOOLEAN);
+    rss_hidden_tags("img", R.string.setting_rss_rss_hidden_tags_description, XMLPrefsSave.TEXT),
+    rss_time_format("%t0", R.string.setting_rss_rss_time_format_description, XMLPrefsSave.TEXT),
+    show_rss_download("true", R.string.setting_rss_show_rss_download_description, XMLPrefsSave.BOOLEAN),
+    rss_download_format("RSS: %id --- Downloaded %sb bytes", R.string.setting_rss_rss_download_format_description, XMLPrefsSave.TEXT),
+    rss_download_message_text_color("aqua", R.string.setting_rss_rss_download_message_text_color_description, XMLPrefsSave.COLOR),
+    click_rss("true", R.string.setting_rss_click_rss_description, XMLPrefsSave.BOOLEAN);
 
     override fun defaultValue(): String = defaultValue
 
     override fun type(): String = type
 
-    override fun info(): String = info
+    override fun infoRes(): Int = info
 
     override fun parent(): XMLPrefsElement? = RssManager.instance
 

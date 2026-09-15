@@ -15,7 +15,7 @@ class files : CommandAbstraction, PermanentSuggestionCommand {
             ?.takeIf { it.isNotEmpty() }
             ?.let { info.getString().trim() }
         val request = parseRequest(input)
-        request.error?.let { return it }
+        request.error?.let { return info.context.getString(it, request.errorArgument) }
         request.changeDirectory?.let { target ->
             return cd.changeDirectory(info as MainPack, target)
         }
@@ -58,7 +58,7 @@ class files : CommandAbstraction, PermanentSuggestionCommand {
             return when (tokens[0]) {
                 "-search" -> {
                     val name = tokens.getOrNull(1)
-                        ?: return FilesRequest(error = "Usage: files -search <name> [type]")
+                        ?: return FilesRequest(error = R.string.files_usage_search)
                     FilesRequest(
                         action = RetuiFilesContract.ACTION_SEARCH,
                         searchName = name,
@@ -67,7 +67,7 @@ class files : CommandAbstraction, PermanentSuggestionCommand {
                 }
                 "-open" -> {
                     val target = tokens.getOrNull(1)
-                        ?: return FilesRequest(error = "Usage: files -open <file>")
+                        ?: return FilesRequest(error = R.string.files_usage_open)
                     FilesRequest(
                         action = RetuiFilesContract.ACTION_OPEN,
                         target = target
@@ -80,9 +80,9 @@ class files : CommandAbstraction, PermanentSuggestionCommand {
                 )
                 "-cd" -> FilesRequest(
                     changeDirectory = tokens.getOrNull(1)
-                        ?: return FilesRequest(error = "Usage: files -cd <directory>")
+                        ?: return FilesRequest(error = R.string.files_usage_cd)
                 )
-                else -> FilesRequest(error = "Unknown files option: ${tokens[0]}")
+                else -> FilesRequest(error = R.string.files_unknown_option, errorArgument = tokens[0])
             }
         }
     }
@@ -93,6 +93,7 @@ class files : CommandAbstraction, PermanentSuggestionCommand {
         val changeDirectory: String? = null,
         val searchName: String? = null,
         val searchType: String? = null,
-        val error: String? = null
+        val error: Int? = null,
+        val errorArgument: String = ""
     )
 }

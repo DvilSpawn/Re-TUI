@@ -23,7 +23,7 @@ object TermuxAppManager {
             return ""
         }
         return value.trim { it <= ' ' }
-            .lowercase(Locale.getDefault())
+            .lowercase(Locale.ROOT)
             .replace("[^a-z0-9_-]".toRegex(), "")
     }
 

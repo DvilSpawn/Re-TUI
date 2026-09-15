@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher.managers
 
+import ohi.andre.consolelauncher.R
 import android.content.Context
 import kotlin.math.max
 import kotlin.random.Random
@@ -95,10 +96,10 @@ object RetuiCreditManager {
 
     fun status(context: Context): String {
         if (!isDystopiaEnabled(context)) {
-            return "Retui Credits are disabled. Enable 'Sign up for Retui Credits' under Personalization."
+            return context.getString(R.string.manager_retuicreditmanager_retui_credits_are_disabled_enable_sign_up_23767)
         }
         val wallet = wallet(context)
-        return "Retui Credits: ${wallet.credits}\nBreach Keys: ${wallet.keys}"
+        return context.getString(R.string.manager_retuicreditmanager_retui_credits_breach_keys_de4a8, wallet.credits, wallet.keys)
     }
 
     private fun ensureGrant(context: Context) {

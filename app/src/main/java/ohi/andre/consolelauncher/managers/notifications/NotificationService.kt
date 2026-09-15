@@ -56,6 +56,9 @@ import ohi.andre.consolelauncher.tuils.StoppableThread
 import ohi.andre.consolelauncher.tuils.Tuils
 
 class NotificationService : NotificationListenerService() {
+    override fun getResources(): android.content.res.Resources =
+        ohi.andre.consolelauncher.localization.LanguagePacks.resources(super.getResources())
+
     private val UPDATE_TIME = 2000
     private val LINES_LABEL = "Lines"
     private val ANDROID_LABEL_PREFIX = "android."

@@ -17,18 +17,18 @@ class tbridge : CommandAbstraction {
         }
 
         val parts = input.trim().split("\\s+".toRegex(), limit = 2).toTypedArray()
-        val option = parts[0].lowercase(Locale.getDefault())
+        val option = parts[0].lowercase(Locale.ROOT)
 
         if (option == "-status" || option == "-doctor") {
             return localStatus(info)
         }
 
         if (option == "-setup") {
-            return setupText()
+            return setupText(pack.context)
         }
 
         if (option == "-dirs" || option == "-files" || option == "-ls") {
-            return retiredFileListingMessage()
+            return retiredFileListingMessage(pack.context)
         }
 
         if (!ensureReady(info)) {
@@ -37,7 +37,7 @@ class tbridge : CommandAbstraction {
 
         if (option == "-probe") {
             TermuxBridgeManager.dispatchShell(info.context, "probe", STATUS_SCRIPT, TermuxBridgeManager.TERMUX_HOME)
-            return "Termux bridge probe dispatched."
+            return pack.context.getString(R.string.command_tbridge_termux_bridge_probe_dispatched_9c2fe)
         }
 
         return info.res.getString(helpRes())
@@ -46,51 +46,42 @@ class tbridge : CommandAbstraction {
     private fun localStatus(info: MainPack): String {
         val status = TermuxBridgeManager.status(info.context)
         val builder = StringBuilder()
-        builder.append("Re:T-UI Termux Bridge").append('\n')
-        builder.append("role: scripts, modules, callbacks, automation").append('\n')
-        builder.append("termux: ").append(if (status.termuxInstalled) "installed" else "missing").append('\n')
-        builder.append("RUN_COMMAND declared: ").append(if (status.runCommandDeclared) "yes" else "no").append('\n')
-        builder.append("RUN_COMMAND granted: ").append(if (status.runCommandGranted) "yes" else "no").append('\n')
-        builder.append("files: use the files command / Re:T-UI Files app").append('\n')
-        builder.append("current path: ").append(info.currentDirectory.absolutePath).append('\n')
-        builder.append("probe: tbridge -probe").append('\n')
-        builder.append("setup: tbridge -setup")
+        builder.append(info.context.getString(R.string.command_tbridge_re_t_ui_termux_bridge_ca56e)).append('\n')
+        builder.append(info.context.getString(R.string.command_tbridge_role_scripts_modules_callbacks_automation_d1885)).append('\n')
+        builder.append(info.context.getString(R.string.command_tbridge_termux_f248d)).append(if (status.termuxInstalled) "installed" else "missing").append('\n')
+        builder.append(info.context.getString(R.string.command_tbridge_run_command_declared_3cdca)).append(if (status.runCommandDeclared) "yes" else "no").append('\n')
+        builder.append(info.context.getString(R.string.command_tbridge_run_command_granted_b7cc8)).append(if (status.runCommandGranted) "yes" else "no").append('\n')
+        builder.append(info.context.getString(R.string.command_tbridge_files_use_the_files_command_re_t_ui_files_4f43d)).append('\n')
+        builder.append(info.context.getString(R.string.command_tbridge_current_path_c14e7)).append(info.currentDirectory.absolutePath).append('\n')
+        builder.append(info.context.getString(R.string.command_tbridge_probe_tbridge_probe_b2fb9)).append('\n')
+        builder.append(info.context.getString(R.string.command_tbridge_setup_tbridge_setup_74582))
         return builder.toString()
     }
 
     private fun ensureReady(info: MainPack): Boolean {
         val status = TermuxBridgeManager.status(info.context)
         if (!status.termuxInstalled) {
-            Tuils.sendOutput(info.context, "Termux is not installed.")
+            Tuils.sendOutput(info.context, info.context.getString(R.string.command_tbridge_termux_is_not_installed_3aba0))
             return false
         }
         if (!status.runCommandDeclared) {
-            Tuils.sendOutput(info.context, "This Termux build does not expose RUN_COMMAND.")
+            Tuils.sendOutput(info.context, info.context.getString(R.string.command_tbridge_this_termux_build_does_not_expose_run_comm_b2ba8))
             return false
         }
         if (!status.runCommandGranted) {
             TermuxBridgeManager.requestRunCommandPermissionIfPossible(info.context)
-            Tuils.sendOutput(info.context, "Grant Re:T-UI the Termux RUN_COMMAND permission, then retry.")
-            Tuils.sendOutput(info.context, "Termux must also set allow-external-apps=true.")
+            Tuils.sendOutput(info.context, info.context.getString(R.string.command_tbridge_grant_re_t_ui_the_termux_run_command_permi_44e22))
+            Tuils.sendOutput(info.context, info.context.getString(R.string.command_tbridge_termux_must_also_set_allow_external_apps_t_b23b5))
             return false
         }
         return true
     }
 
-    private fun setupText(): String =
-        "Termux bridge setup for scripts, modules, and automation:\n" +
-            "1. Install Termux.\n" +
-            "2. In Termux run: termux-setup-storage\n" +
-            "3. In Termux run: mkdir -p ~/.termux && echo allow-external-apps=true >> ~/.termux/termux.properties\n" +
-            "4. Restart Termux.\n" +
-            "5. Grant Re:T-UI the RUN_COMMAND permission from Android app settings.\n" +
-            "6. Run: tbridge -doctor\n" +
-            "\nUse files for file navigation. TBridge is now the Termux runtime for scripts and modules."
+    private fun setupText(context: android.content.Context): String =
+        context.getString(R.string.command_detail_tbridge_termux_bridge_setup_for_scripts_modules_an_de1dc)
 
-    private fun retiredFileListingMessage(): String =
-        "TBridge file listing is retired from the public command surface.\n" +
-            "Use files, ls, open, or share through Re:T-UI Files.\n" +
-            "TBridge now focuses on Termux runtime checks, scripts, modules, callbacks, and automation."
+    private fun retiredFileListingMessage(context: android.content.Context): String =
+        context.getString(R.string.command_detail_tbridge_tbridge_file_listing_is_retired_from_the_p_d319c)
 
     override fun helpRes(): Int = R.string.help_tbridge
 

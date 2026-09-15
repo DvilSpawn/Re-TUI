@@ -1,24 +1,25 @@
 package ohi.andre.consolelauncher.managers.xml.options
 
+import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsElement
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave
 
 enum class Cmd(
     private val defaultValue: String,
-    private val info: String,
+    private val info: Int,
     private val type: String = XMLPrefsSave.TEXT
 ) : XMLPrefsSave {
     default_search(
         "-gg",
-        "The param that will be used if you type \"search apples\" instead of \"search -param apples\""
+        R.string.setting_cmd_default_search_description
     );
 
     override fun defaultValue(): String = defaultValue
 
     override fun type(): String = type
 
-    override fun info(): String = info
+    override fun infoRes(): Int = info
 
     override fun parent(): XMLPrefsElement = XMLPrefsManager.XMLPrefsRoot.CMD
 

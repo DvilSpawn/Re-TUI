@@ -45,7 +45,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="SHOWS"
+                android:text="@string/ui_podcast_surface_shows"
                 style="@style/Retui.Text.Caption" />
 
             <TextView
@@ -54,7 +54,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="RECENTS"
+                android:text="@string/ui_podcast_surface_recents"
                 style="@style/Retui.Text.Caption" />
 
             <TextView
@@ -63,7 +63,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="ADD"
+                android:text="@string/ui_podcast_surface_add"
                 style="@style/Retui.Text.Caption" />
 
             <TextView
@@ -72,7 +72,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="REFRESH"
+                android:text="@string/ui_podcast_surface_refresh"
                 style="@style/Retui.Text.Caption" />
         </LinearLayout>
 
@@ -112,14 +112,14 @@
                 android:layout_gravity="top|start"
                 android:layout_marginStart="12dp"
                 android:layout_marginTop="-12dp"
-                android:contentDescription="Back to shows"
+                android:contentDescription="@string/ui_podcast_surface_back_to_shows"
                 android:gravity="center"
                 android:minWidth="44dp"
                 android:paddingStart="8dp"
                 android:paddingTop="1dp"
                 android:paddingEnd="8dp"
                 android:paddingBottom="1dp"
-                android:text="[&lt;]"
+                android:text="@string/ui_token_3ef9bbcc6e"
                 style="@style/Retui.Text.Control"
                 android:visibility="gone" />
 
@@ -136,7 +136,7 @@
                 android:paddingTop="1dp"
                 android:paddingEnd="10dp"
                 android:paddingBottom="1dp"
-                android:text="SHOWS"
+                android:text="@string/ui_podcast_surface_shows"
                 android:textAllCaps="true"
                 style="@style/Retui.Text.Control"
                 android:visibility="visible" />
@@ -168,7 +168,7 @@
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:text="0:00"
+                    android:text="@string/ui_token_1ee7d42bf0"
                     style="@style/Retui.Text.Control" />
 
                 <SeekBar
@@ -192,7 +192,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="[ PREV ]"
+                        android:text="@string/ui_podcast_surface_prev"
                         style="@style/Retui.Text.Caption" />
 
                     <TextView
@@ -201,7 +201,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="[ -30 ]"
+                        android:text="@string/ui_token_4dbd0be334"
                         style="@style/Retui.Text.Caption" />
 
                     <TextView
@@ -210,7 +210,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="[ PLAY ]"
+                        android:text="@string/ui_podcast_surface_play"
                         style="@style/Retui.Text.Caption" />
 
                     <TextView
@@ -219,7 +219,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="[ +30 ]"
+                        android:text="@string/ui_token_572cc15594"
                         style="@style/Retui.Text.Caption" />
 
                     <TextView
@@ -228,7 +228,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="[ NEXT ]"
+                        android:text="@string/ui_podcast_surface_next"
                         style="@style/Retui.Text.Caption" />
                 </LinearLayout>
             </LinearLayout>
@@ -252,7 +252,7 @@
                     android:id="@+id/podcast_artwork"
                     android:layout_width="54dp"
                     android:layout_height="54dp"
-                    android:contentDescription="Podcast artwork"
+                    android:contentDescription="@string/ui_podcast_surface_podcast_artwork"
                     android:scaleType="centerCrop"
                     android:src="@mipmap/ic_launcher" />
 
@@ -269,7 +269,7 @@
                         android:layout_height="wrap_content"
                         android:ellipsize="end"
                         android:maxLines="1"
-                        android:text="Add a feed, then play a show."
+                        android:text="@string/ui_podcast_surface_add_a_feed_then_play_a_show"
                         style="@style/Retui.Text.Caption" />
 
                     <TextView
@@ -279,7 +279,7 @@
                         android:layout_marginTop="2dp"
                         android:ellipsize="end"
                         android:maxLines="2"
-                        android:text="No podcast playing"
+                        android:text="@string/ui_podcast_surface_no_podcast_playing"
                         style="@style/Retui.Text.Control" />
 
                     <TextView
@@ -289,7 +289,7 @@
                         android:layout_marginTop="2dp"
                         android:ellipsize="end"
                         android:maxLines="1"
-                        android:text="0:00"
+                        android:text="@string/ui_token_1ee7d42bf0"
                         style="@style/Retui.Text.Caption" />
                 </LinearLayout>
             </LinearLayout>
@@ -317,7 +317,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="[ PREV ]"
+                    android:text="@string/ui_podcast_surface_prev"
                     style="@style/Retui.Text.Caption" />
 
                 <TextView
@@ -326,7 +326,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="[ -30 ]"
+                    android:text="@string/ui_token_4dbd0be334"
                     style="@style/Retui.Text.Caption" />
 
                 <TextView
@@ -335,7 +335,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="[ PLAY ]"
+                    android:text="@string/ui_podcast_surface_play"
                     style="@style/Retui.Text.Caption" />
 
                 <TextView
@@ -344,7 +344,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="[ +30 ]"
+                    android:text="@string/ui_token_572cc15594"
                     style="@style/Retui.Text.Caption" />
 
                 <TextView
@@ -353,7 +353,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="[ NEXT ]"
+                    android:text="@string/ui_podcast_surface_next"
                     style="@style/Retui.Text.Caption" />
             </LinearLayout>
         </LinearLayout>
@@ -371,7 +371,7 @@
             android:paddingTop="2dp"
             android:paddingEnd="12dp"
             android:paddingBottom="2dp"
-            android:text="PODCASTS"
+            android:text="@string/ui_podcast_surface_podcasts"
             style="@style/Retui.Text.Body" />
 
         <TextView
@@ -381,7 +381,7 @@
             android:layout_gravity="top|end"
             android:layout_marginTop="-10dp"
             android:gravity="center"
-            android:text="−"
+            android:text="@string/ui_token_6a4e6e729f"
             style="@style/Retui.Text.Title" />
     </FrameLayout>
 

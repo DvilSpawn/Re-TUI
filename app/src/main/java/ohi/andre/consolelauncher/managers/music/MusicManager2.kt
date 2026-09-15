@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher.managers.music
 
+import ohi.andre.consolelauncher.R
 import android.content.BroadcastReceiver
 import android.content.ComponentName
 import android.content.Context
@@ -146,7 +147,7 @@ class MusicManager2(var mContext: Context, private val loadLocalLibrary: Boolean
         index: Int,
         listener: MusicService.PlaybackListener?
     ): String? {
-        if (playlist.isEmpty()) return "No playable episodes."
+        if (playlist.isEmpty()) return mContext.getString(R.string.integration_musicmanager2_no_playable_episodes_de295)
         val safeIndex = index.coerceIn(0, playlist.lastIndex)
         if (!musicBound) {
             init()

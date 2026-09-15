@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher.managers
 
+import ohi.andre.consolelauncher.R
 import android.content.Context
 import android.database.Cursor
 import android.net.Uri
@@ -279,7 +280,7 @@ object PresetManager {
     fun save(context: Context, name: kotlin.String) {
         val cleanName = cleanName(name)
         val presetFolder: File = File(presetsDir, cleanName)
-        check(!(!presetFolder.exists() && !presetFolder.mkdirs())) { "Unable to create preset folder" }
+        check(!(!presetFolder.exists() && !presetFolder.mkdirs())) { context.getString(R.string.manager_presetmanager_unable_to_create_preset_folder_4e6c1) }
 
         writeXml(
             File(presetFolder, XMLPrefsManager.XMLPrefsRoot.THEME.path),
@@ -401,13 +402,13 @@ object PresetManager {
         if (tempFolder.exists()) {
             Tuils.delete(tempFolder)
         }
-        check(tempFolder.mkdirs()) { "Unable to create import folder" }
+        check(tempFolder.mkdirs()) { context.getString(R.string.manager_presetmanager_unable_to_create_import_folder_c88fe) }
 
         try {
             val children = folderChildren(context, treeUri)
             for (fileName in REQUIRED_PRESET_XML_FILES) {
                 val child = children.get(fileName.lowercase(Locale.getDefault()))
-                requireNotNull(child) { "Preset folder is incomplete" }
+                requireNotNull(child) { context.getString(R.string.manager_presetmanager_preset_folder_is_incomplete_f679b) }
                 copyUriToFile(context, child, File(tempFolder, fileName))
             }
             children[XMLPrefsManager.XMLPrefsRoot.UI.path.lowercase(Locale.getDefault())]?.let {
@@ -419,7 +420,7 @@ object PresetManager {
             validatePresetFolder(tempFolder)
 
             val presetFolder: File = File(presetsDir, cleanName)
-            check(!(!presetFolder.exists() && !presetFolder.mkdirs())) { "Unable to create preset folder" }
+            check(!(!presetFolder.exists() && !presetFolder.mkdirs())) { context.getString(R.string.manager_presetmanager_unable_to_create_preset_folder_4e6c1) }
 
             copySanitizedXmlFiles(tempFolder, presetFolder, null)
             return cleanName
@@ -430,13 +431,13 @@ object PresetManager {
 
     @Throws(Exception::class)
     fun exportPackage(context: Context, packageFile: File, uri: Uri) {
-        require(packageFile.isFile()) { "Preset package not found" }
+        require(packageFile.isFile()) { context.getString(R.string.manager_presetmanager_preset_package_not_found_7f90e) }
 
         val `in`: InputStream = BufferedInputStream(FileInputStream(packageFile))
         val destination = context.getContentResolver().openOutputStream(uri, "w")
         if (destination == null) {
             `in`.close()
-            throw IllegalArgumentException("Unable to open export destination")
+            throw IllegalArgumentException(context.getString(R.string.manager_presetmanager_unable_to_open_export_destination_bd05d))
         }
         val out: OutputStream = BufferedOutputStream(destination)
         try {
@@ -526,7 +527,7 @@ object PresetManager {
                 null,
                 null
             )
-            requireNotNull(cursor) { "Unable to read preset folder" }
+            requireNotNull(cursor) { context.getString(R.string.manager_presetmanager_unable_to_read_preset_folder_a015f) }
             while (cursor.moveToNext()) {
                 val documentId = cursor.getString(0)
                 val name = cursor.getString(1)
@@ -546,11 +547,11 @@ object PresetManager {
     @Throws(Exception::class)
     private fun copyUriToFile(context: Context, uri: Uri, file: File) {
         val parent = file.getParentFile()
-        check(!(parent != null && !parent.exists() && !parent.mkdirs())) { "Unable to create preset folder" }
+        check(!(parent != null && !parent.exists() && !parent.mkdirs())) { context.getString(R.string.manager_presetmanager_unable_to_create_preset_folder_4e6c1) }
 
         val `in`: InputStream =
             BufferedInputStream(context.getContentResolver().openInputStream(uri))
-        requireNotNull(`in`) { "Unable to open preset package" }
+        requireNotNull(`in`) { context.getString(R.string.manager_presetmanager_unable_to_open_preset_package_e2e64) }
         val out: OutputStream = BufferedOutputStream(FileOutputStream(file, false))
         try {
             copyStream(`in`, out)

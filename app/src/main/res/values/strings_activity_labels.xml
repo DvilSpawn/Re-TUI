@@ -1,0 +1,12 @@
+<resources>
+    <string name="activity_label_2b3c932bd8">Re:T-UI Settings</string>
+    <string name="activity_label_ce041b1ca7">Re:T-UI Startup</string>
+    <string name="activity_label_7aa338ae1a">RETUI WALLPAPER</string>
+    <string name="activity_label_211d66f964">Re:T-UI Live Scenes</string>
+    <string name="activity_label_2496773d94">Re:T-UI Editor</string>
+    <string name="activity_label_846ff3e2eb">Re:T-UI Widget Config</string>
+    <string name="activity_label_afc97f0f35">Re:T-UI Notes</string>
+    <string name="activity_label_2480708afc">RETUI Reminders</string>
+    <string name="activity_label_82aae8bbc5">Re:T-UI Shortcut</string>
+    <string name="activity_label_746d5da73b">RETUI Action</string>
+</resources>

@@ -436,7 +436,7 @@ class AppsManager(context: Context) : XMLPrefsElement {
                     val li = LaunchInfo(
                         component.getPackageName(),
                         component.getClassName(),
-                        label,
+                        if (current) label else context.getString(R.string.app_work_profile_label, label),
                         profile,
                         serial,
                         current
@@ -1236,7 +1236,7 @@ class AppsManager(context: Context) : XMLPrefsElement {
             this.userHandle = if (userHandle != null) userHandle else Process.myUserHandle()
             this.profileSerial = profileSerial
             this.currentProfile = currentProfile
-            setLabel(displayLabel(label, currentProfile))
+            setLabel(label.orEmpty())
         }
 
         constructor(info: LaunchInfo) : this(
@@ -1361,17 +1361,6 @@ class AppsManager(context: Context) : XMLPrefsElement {
                         return arrayOfNulls<LaunchInfo>(size)
                     }
                 }
-
-            private fun displayLabel(label: String?, currentProfile: Boolean): String {
-                var label = label
-                if (label == null) {
-                    label = Tuils.EMPTYSTRING
-                }
-                if (currentProfile || label.endsWith(" (Work)")) {
-                    return label
-                }
-                return label + " (Work)"
-            }
 
             fun identityInfo(app: String?): Identity? {
                 if (app == null) {
@@ -1738,16 +1727,16 @@ class AppsManager(context: Context) : XMLPrefsElement {
             }
         }
 
-        fun format(app: LaunchInfo, info: PackageInfo): String {
+        fun format(context: Context, app: LaunchInfo, info: PackageInfo): String {
             val builder = StringBuilder()
 
             builder.append(info.packageName).append(Tuils.NEWLINE)
-            builder.append("vrs: ").append(info.versionCode).append(" - ").append(info.versionName)
+            builder.append(context.getString(R.string.manager_appsmanager_vrs_7256e)).append(info.versionCode).append(" - ").append(info.versionName)
                 .append(Tuils.NEWLINE).append(Tuils.NEWLINE)
-            builder.append("launched_times: ").append(app.launchedTimes).append(Tuils.NEWLINE)
+            builder.append(context.getString(R.string.manager_appsmanager_launched_times_53ab9)).append(app.launchedTimes).append(Tuils.NEWLINE)
                 .append(Tuils.NEWLINE)
 
-            builder.append("Install: ").append(
+            builder.append(context.getString(R.string.manager_appsmanager_install_d406f)).append(
                 TimeManager.instance!!.replace(
                     "%t0",
                     info.firstInstallTime,
@@ -1759,7 +1748,7 @@ class AppsManager(context: Context) : XMLPrefsElement {
             if (a != null && a.size > 0) {
                 val `as`: MutableList<String?> = ArrayList<String?>()
                 for (i in a) `as`.add(i.name.replace(info.packageName, Tuils.EMPTYSTRING))
-                builder.append("Activities: ").append(Tuils.NEWLINE)
+                builder.append(context.getString(R.string.manager_appsmanager_activities_3c20b)).append(Tuils.NEWLINE)
                     .append(Tuils.toPlanString(`as`, Tuils.NEWLINE)).append(Tuils.NEWLINE)
                     .append(Tuils.NEWLINE)
             }
@@ -1768,7 +1757,7 @@ class AppsManager(context: Context) : XMLPrefsElement {
             if (s != null && s.size > 0) {
                 val ss: MutableList<String?> = ArrayList<String?>()
                 for (i in s) ss.add(i.name.replace(info.packageName, Tuils.EMPTYSTRING))
-                builder.append("Services: ").append(Tuils.NEWLINE)
+                builder.append(context.getString(R.string.manager_appsmanager_services_dc973)).append(Tuils.NEWLINE)
                     .append(Tuils.toPlanString(ss, Tuils.NEWLINE)).append(Tuils.NEWLINE)
                     .append(Tuils.NEWLINE)
             }
@@ -1777,7 +1766,7 @@ class AppsManager(context: Context) : XMLPrefsElement {
             if (r != null && r.size > 0) {
                 val rs: MutableList<String?> = ArrayList<String?>()
                 for (i in r) rs.add(i.name.replace(info.packageName, Tuils.EMPTYSTRING))
-                builder.append("Receivers: ").append(Tuils.NEWLINE)
+                builder.append(context.getString(R.string.manager_appsmanager_receivers_420ad)).append(Tuils.NEWLINE)
                     .append(Tuils.toPlanString(rs, Tuils.NEWLINE)).append(Tuils.NEWLINE)
                     .append(Tuils.NEWLINE)
             }
@@ -1786,7 +1775,7 @@ class AppsManager(context: Context) : XMLPrefsElement {
             if (p != null && p.size > 0) {
                 val ps: MutableList<String?> = ArrayList<String?>()
                 for (i in p) ps.add(i.substring(i.lastIndexOf(".") + 1))
-                builder.append("Permissions: ").append(Tuils.NEWLINE)
+                builder.append(context.getString(R.string.manager_appsmanager_permissions_84fd6)).append(Tuils.NEWLINE)
                     .append(Tuils.toPlanString(ps, ", "))
             }
 

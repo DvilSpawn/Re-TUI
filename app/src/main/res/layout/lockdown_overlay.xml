@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="58dp"
         android:adjustViewBounds="true"
-        android:contentDescription="LOCKDOWN"
+        android:contentDescription="@string/ui_lockdown_overlay_lockdown"
         android:scaleType="fitCenter"
         android:src="@drawable/lockdown_wordmark" />
 
@@ -24,7 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:gravity="center"
-        android:text="Focus mode"
+        android:text="@string/ui_lockdown_overlay_focus_mode"
         style="@style/Retui.Text.Body" />
 
     <TextView
@@ -33,7 +33,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:gravity="center"
-        android:text="25:00"
+        android:text="@string/ui_token_155130c69f"
         style="@style/Retui.Text.Display"
         android:textStyle="bold" />
 
@@ -43,7 +43,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="18dp"
         android:gravity="center"
-        android:text="Credits: 1000 | Keys: 0"
+        android:text="@string/ui_lockdown_overlay_credits_1000_keys_0"
         android:textSize="13sp" />
 
     <LinearLayout
@@ -59,7 +59,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="SKIP LOCKDOWN  -500 CREDITS"
+            android:text="@string/ui_lockdown_overlay_skip_lockdown_500_credits"
             android:textSize="13sp"
             android:textStyle="bold" />
 
@@ -69,7 +69,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:gravity="center"
-            android:text="USE BREACH KEY"
+            android:text="@string/ui_lockdown_overlay_use_breach_key"
             android:textSize="13sp"
             android:textStyle="bold" />
 
@@ -79,7 +79,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:gravity="center"
-            android:text="EMERGENCY BREACH"
+            android:text="@string/ui_lockdown_overlay_emergency_breach"
             android:textSize="13sp"
             android:textStyle="bold" />
 

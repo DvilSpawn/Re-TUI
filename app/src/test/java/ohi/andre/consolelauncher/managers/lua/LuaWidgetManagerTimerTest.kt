@@ -11,7 +11,7 @@ class LuaWidgetManagerTimerTest {
         assertTrue(script.contains("fmt.progress_bar(remaining, total, BAR_WIDTH)"))
         assertTrue(script.contains("pct(remaining, total)"))
         assertFalse(script.contains("fmt.progress_bar(elapsed, total, BAR_WIDTH)"))
-        assertTrue(script.contains("Stopwatch: \" .. duration(elapsed)"))
+        assertTrue(script.contains("strings.localize(\"lua_builtin_f624afb9f371\", duration(elapsed))"))
         assertTrue(script.contains("countdown_line(label, state)"))
     }
 }

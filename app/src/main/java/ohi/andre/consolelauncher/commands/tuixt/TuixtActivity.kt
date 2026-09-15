@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher.commands.tuixt
 
+import ohi.andre.consolelauncher.R
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ActivityNotFoundException
@@ -62,7 +63,7 @@ import java.nio.ByteBuffer
 import java.nio.charset.CodingErrorAction
 import java.nio.charset.StandardCharsets
 
-class TuixtActivity : Activity() {
+class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity() {
     private var file: File? = null
     private var recyclerView: RecyclerView? = null
     private var adapter: TuixtAdapter? = null
@@ -112,9 +113,9 @@ class TuixtActivity : Activity() {
         val header = TextView(this)
         header.setText(
             when {
-                asciiSettingsMode -> "ASCII Settings"
-                onlySection != null -> "Behavior/ $onlySection"
-                else -> "Themer/ " + file!!.getName()
+                asciiSettingsMode -> getString(R.string.editor_tuixtactivity_ascii_settings_4a299)
+                onlySection != null -> getString(R.string.editor_tuixtactivity_behavior_70e30, onlySection)
+                else -> getString(R.string.editor_tuixtactivity_themer_93fef, file!!.getName())
             }
         )
         styleHeader(this, header)
@@ -150,7 +151,7 @@ class TuixtActivity : Activity() {
 
         // Search Box
         val searchBox = EditText(this)
-        searchBox.setHint("Search settings...")
+        searchBox.setHint(getString(R.string.editor_tuixtactivity_search_settings_d25ad))
         styleInput(this, searchBox)
         bottomBar.addView(searchBox)
 
@@ -160,7 +161,7 @@ class TuixtActivity : Activity() {
         btnLayout.setPadding(0, 10, 0, 0)
 
         val btnCancel = TextView(this)
-        btnCancel.setText("CANCEL")
+        btnCancel.setText(getString(R.string.editor_tuixtactivity_cancel_1507c))
         styleButton(this, btnCancel, false)
         btnCancel.setOnClickListener(View.OnClickListener { v: View? -> attemptClose() })
         btnLayout.addView(btnCancel)
@@ -170,7 +171,7 @@ class TuixtActivity : Activity() {
         btnLayout.addView(spacer)
 
         val btnSave = TextView(this)
-        btnSave.setText("SAVE")
+        btnSave.setText(getString(R.string.editor_tuixtactivity_save_50815))
         styleButton(this, btnSave, true)
         btnSave.setOnClickListener(View.OnClickListener { v: View? ->
             var saved = false
@@ -187,12 +188,12 @@ class TuixtActivity : Activity() {
                     originalRawText = currentText
                     saved = true
                 } catch (e: Exception) {
-                    Toast.makeText(this, "Error saving: " + e.message, Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, getString(R.string.editor_tuixtactivity_error_saving_540ec, e.message), Toast.LENGTH_LONG).show()
                 }
             }
             if (saved) {
                 clearModuleButtonBackgroundPreview()
-                Toast.makeText(this, "Changes saved. Previewing launcher...", Toast.LENGTH_SHORT)
+                Toast.makeText(this, getString(R.string.editor_tuixtactivity_changes_saved_previewing_launcher_8e180), Toast.LENGTH_SHORT)
                     .show()
                 LauncherActivity.preview(this)
                 if (xmlRoot == XMLPrefsRoot.THEME) {
@@ -212,7 +213,7 @@ class TuixtActivity : Activity() {
         }
 
         // Load data
-        val fileName = file!!.getName().lowercase(Locale.getDefault())
+        val fileName = file!!.getName().lowercase(Locale.ROOT)
         for (rootEnum in XMLPrefsRoot.entries.toTypedArray()) {
             if (fileName == rootEnum.path()) {
                 xmlRoot = rootEnum
@@ -324,10 +325,10 @@ class TuixtActivity : Activity() {
         actions.setOrientation(LinearLayout.VERTICAL)
         actions.setPadding(0, 0, 0, dp(this, 10f))
 
-        addAsciiAction(actions, "ASCII TXT") {
+        addAsciiAction(actions, getString(R.string.editor_tuixtactivity_ascii_txt_2739a)) {
             openAsciiTxt()
         }
-        addAsciiAction(actions, "IMPORT ASCII TXT") {
+        addAsciiAction(actions, getString(R.string.editor_tuixtactivity_import_ascii_txt_9b586)) {
             launchAsciiImportPicker()
         }
 
@@ -352,25 +353,25 @@ class TuixtActivity : Activity() {
     private fun buildAsciiSettingsRows(): MutableList<TuixtAdapter.SettingsRow> {
         val rows: MutableList<TuixtAdapter.SettingsRow> = ArrayList()
 
-        addSection(rows, "ASCII TXT")
-        rows.add(TuixtAdapter.SettingsRow.setting(Ui.show_ascii, "ASCII TXT"))
-        rows.add(TuixtAdapter.SettingsRow.setting(Ui.show_ascii_landscape, "ASCII TXT"))
-        rows.add(TuixtAdapter.SettingsRow.setting(Ui.ascii_max_lines, "ASCII TXT"))
-        rows.add(TuixtAdapter.SettingsRow.setting(Ui.ascii_pane_height_rows, "ASCII TXT"))
+        addSection(rows, getString(R.string.editor_tuixtactivity_ascii_txt_2739a))
+        rows.add(TuixtAdapter.SettingsRow.setting(Ui.show_ascii, getString(R.string.editor_tuixtactivity_ascii_txt_2739a)))
+        rows.add(TuixtAdapter.SettingsRow.setting(Ui.show_ascii_landscape, getString(R.string.editor_tuixtactivity_ascii_txt_2739a)))
+        rows.add(TuixtAdapter.SettingsRow.setting(Ui.ascii_max_lines, getString(R.string.editor_tuixtactivity_ascii_txt_2739a)))
+        rows.add(TuixtAdapter.SettingsRow.setting(Ui.ascii_pane_height_rows, getString(R.string.editor_tuixtactivity_ascii_txt_2739a)))
 
-        addSection(rows, "Animation")
-        rows.add(TuixtAdapter.SettingsRow.setting(Behavior.ascii_animation, "Animation"))
-        rows.add(TuixtAdapter.SettingsRow.setting(Behavior.ascii_animation_frame_delay_ms, "Animation"))
-        rows.add(TuixtAdapter.SettingsRow.setting(Behavior.ascii_animation_max_file_kb, "Animation"))
+        addSection(rows, getString(R.string.editor_tuixtactivity_animation_62afd))
+        rows.add(TuixtAdapter.SettingsRow.setting(Behavior.ascii_animation, getString(R.string.editor_tuixtactivity_animation_62afd)))
+        rows.add(TuixtAdapter.SettingsRow.setting(Behavior.ascii_animation_frame_delay_ms, getString(R.string.editor_tuixtactivity_animation_62afd)))
+        rows.add(TuixtAdapter.SettingsRow.setting(Behavior.ascii_animation_max_file_kb, getString(R.string.editor_tuixtactivity_animation_62afd)))
 
-        addSection(rows, "Layout")
-        rows.add(TuixtAdapter.SettingsRow.setting(Ui.ascii_index, "Layout"))
-        rows.add(TuixtAdapter.SettingsRow.setting(Ui.ascii_status_alignment, "Layout"))
+        addSection(rows, getString(R.string.editor_tuixtactivity_layout_972ad))
+        rows.add(TuixtAdapter.SettingsRow.setting(Ui.ascii_index, getString(R.string.editor_tuixtactivity_layout_972ad)))
+        rows.add(TuixtAdapter.SettingsRow.setting(Ui.ascii_status_alignment, getString(R.string.editor_tuixtactivity_layout_972ad)))
 
-        addSection(rows, "Colors")
-        rows.add(TuixtAdapter.SettingsRow.setting(Theme.ascii_text_color, "Colors"))
-        rows.add(TuixtAdapter.SettingsRow.setting(Theme.ascii_status_background_color, "Colors"))
-        rows.add(TuixtAdapter.SettingsRow.setting(Theme.ascii_status_text_shadow_color, "Colors"))
+        addSection(rows, getString(R.string.editor_tuixtactivity_colors_88d5e))
+        rows.add(TuixtAdapter.SettingsRow.setting(Theme.ascii_text_color, getString(R.string.editor_tuixtactivity_colors_88d5e)))
+        rows.add(TuixtAdapter.SettingsRow.setting(Theme.ascii_status_background_color, getString(R.string.editor_tuixtactivity_colors_88d5e)))
+        rows.add(TuixtAdapter.SettingsRow.setting(Theme.ascii_status_text_shadow_color, getString(R.string.editor_tuixtactivity_colors_88d5e)))
 
         return rows
     }
@@ -393,7 +394,7 @@ class TuixtActivity : Activity() {
 
             val item = row.item ?: continue
             val label = item.label()!!.lowercase(Locale.getDefault())
-            val info = item.info()!!.lowercase(Locale.getDefault())
+            val info = item.info(this).lowercase(Locale.getDefault())
             if (label.contains(lower) || info.contains(lower)) {
                 if (pendingSection != null && (filtered.isEmpty() || filtered.last().section != pendingSection.section)) {
                     filtered.add(pendingSection)
@@ -540,7 +541,7 @@ class TuixtActivity : Activity() {
                 Tuils.write(file, "", "")
             }
         } catch (e: Exception) {
-            Toast.makeText(this, "Could not create ascii.txt: " + e.message, Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.editor_tuixtactivity_could_not_create_ascii_txt_62630, e.message), Toast.LENGTH_LONG).show()
             return
         }
 
@@ -558,7 +559,7 @@ class TuixtActivity : Activity() {
     }
 
     private fun launchAsciiImportPicker() {
-        notifyAsciiImport("Opening ASCII file picker...", false)
+        notifyAsciiImport(getString(R.string.editor_tuixtactivity_opening_ascii_file_picker_0304c), false)
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
         intent.addCategory(Intent.CATEGORY_OPENABLE)
         intent.setType("*/*")
@@ -569,7 +570,7 @@ class TuixtActivity : Activity() {
         try {
             startActivityForResult(intent, ASCII_IMPORT_REQUEST)
         } catch (e: ActivityNotFoundException) {
-            notifyAsciiImport("ASCII file picker is unavailable on this device.", true)
+            notifyAsciiImport(getString(R.string.editor_tuixtactivity_ascii_file_picker_is_unavailable_on_this_d_f32c0), true)
         }
     }
 
@@ -578,7 +579,7 @@ class TuixtActivity : Activity() {
         Log.i("TUI-ASCII", "onActivityResult request=" + requestCode + " result=" + resultCode + " data=" + (data != null))
         if (requestCode == ASCII_TXT_REQUEST) {
             if (resultCode == SAVE_PRESSED) {
-                reloadLauncherForAscii("ascii.txt saved.")
+                reloadLauncherForAscii(getString(R.string.editor_tuixtactivity_ascii_txt_saved_55025))
             }
         } else if (requestCode == ASCII_IMPORT_REQUEST) {
             handleAsciiImportResult(resultCode, data)
@@ -587,7 +588,7 @@ class TuixtActivity : Activity() {
 
     private fun handleAsciiImportResult(resultCode: Int, data: Intent?) {
         if (resultCode != RESULT_OK || data == null || data.data == null) {
-            notifyAsciiImport("ASCII import cancelled.", false)
+            notifyAsciiImport(getString(R.string.editor_tuixtactivity_ascii_import_cancelled_1ca68), false)
             return
         }
 
@@ -597,7 +598,7 @@ class TuixtActivity : Activity() {
             sourceName = uri.lastPathSegment
         }
         if (!isAsciiImportFileName(sourceName)) {
-            notifyAsciiImport("Choose a .txt or .html ASCII file.", true)
+            notifyAsciiImport(getString(R.string.editor_tuixtactivity_choose_a_txt_or_html_ascii_file_4714f), true)
             return
         }
 
@@ -609,14 +610,14 @@ class TuixtActivity : Activity() {
             decodeUtf8(readUriBytes(uri, sourceLimit))
         } catch (e: Exception) {
             notifyAsciiImport(
-                if (e.message == null) "ASCII import failed." else "ASCII import failed: " + e.message,
+                if (e.message == null) getString(R.string.editor_tuixtactivity_ascii_import_failed_73d26) else getString(R.string.editor_tuixtactivity_ascii_import_failed_4b2e0, e.message),
                 true
             )
             return
         }
 
         if (text.trim { it <= ' ' }.isEmpty()) {
-            notifyAsciiImport("ASCII import failed: empty file.", true)
+            notifyAsciiImport(getString(R.string.editor_tuixtactivity_ascii_import_failed_empty_file_65e17), true)
             return
         }
 
@@ -624,16 +625,16 @@ class TuixtActivity : Activity() {
         try {
             Tuils.write(asciiFile, "", text)
         } catch (e: Exception) {
-            notifyAsciiImport("Could not write ascii.txt: " + e.message, true)
+            notifyAsciiImport(getString(R.string.editor_tuixtactivity_could_not_write_ascii_txt_5d089, e.message), true)
             return
         }
 
         val message = if (frameCount < 2) {
-            if (htmlSource) "Imported colored ASCII HTML." else "Imported ASCII TXT."
+            if (htmlSource) getString(R.string.editor_tuixtactivity_imported_colored_ascii_html_9668a) else getString(R.string.editor_tuixtactivity_imported_ascii_txt_e5ed8)
         } else if (LauncherSettings.getBoolean(Behavior.ascii_animation)) {
-            "Imported animated ASCII: " + frameCount + " frames."
+            getString(R.string.editor_tuixtactivity_imported_animated_ascii_frames_d5b9c, frameCount)
         } else {
-            "Imported " + frameCount + " frames. Enable animated ASCII to play it."
+            getString(R.string.editor_tuixtactivity_imported_frames_enable_animated_ascii_to_p_6960c, frameCount)
         }
         reloadLauncherForAscii(message)
     }
@@ -641,7 +642,7 @@ class TuixtActivity : Activity() {
     private fun readUriBytes(uri: Uri, maxBytes: Int): ByteArray {
         val out = ByteArrayOutputStream()
         getContentResolver().openInputStream(uri).use { input ->
-            checkNotNull(input) { "Unable to read selected file." }
+            checkNotNull(input) { getString(R.string.editor_tuixtactivity_unable_to_read_selected_file_8a911) }
             val buffer = ByteArray(8192)
             var total = 0
             while (true) {
@@ -651,7 +652,7 @@ class TuixtActivity : Activity() {
                 }
                 total += read
                 if (total > maxBytes) {
-                    throw IllegalArgumentException("file exceeds " + (maxBytes / 1024) + " KB limit")
+                    throw IllegalArgumentException(getString(R.string.editor_tuixtactivity_file_exceeds_kb_limit_9bba2, (maxBytes / 1024)))
                 }
                 out.write(buffer, 0, read)
             }
@@ -730,10 +731,10 @@ class TuixtActivity : Activity() {
 
         TuixtDialog.showConfirm(
             this,
-            "Discard Changes?",
-            "Unsaved settings changes will be lost.",
-            "Discard",
-            "Keep Editing",
+            getString(R.string.editor_tuixtactivity_discard_changes_f99ee),
+            getString(R.string.editor_tuixtactivity_unsaved_settings_changes_will_be_lost_697a2),
+            getString(R.string.editor_tuixtactivity_discard_36fff),
+            getString(R.string.editor_tuixtactivity_keep_editing_ced7d),
             ConfirmAction {
                 clearModuleButtonBackgroundPreview()
                 setResult(BACK_PRESSED)

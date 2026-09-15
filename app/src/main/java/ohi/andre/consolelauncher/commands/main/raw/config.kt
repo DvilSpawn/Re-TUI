@@ -117,9 +117,7 @@ class config : ParamCommand() {
             override fun exec(pack: ExecutePack): String? {
                 val save = pack.getPrefsSave()
 
-                return ("Type:" + Tuils.SPACE + save!!.type() + Tuils.NEWLINE
-                        + "Default:" + Tuils.SPACE + save.defaultValue() + Tuils.NEWLINE
-                        + save.info())
+                return (pack.context.getString(R.string.command_config_type_default_75261, Tuils.SPACE, save!!.type(), Tuils.NEWLINE, Tuils.SPACE, save.defaultValue(), Tuils.NEWLINE, save.info(pack.context)))
             }
         },
         file {
@@ -352,7 +350,7 @@ class config : ParamCommand() {
                     val files = tuiFolder.listFiles()
                     if (files != null) {
                         for (f in files) {
-                            val name = f.getName().lowercase(Locale.getDefault())
+                            val name = f.getName().lowercase(Locale.ROOT)
                             if (name.endsWith(".ttf") || name.endsWith(".otf")) {
                                 Tuils.insertOld(f)
                             }
@@ -366,7 +364,7 @@ class config : ParamCommand() {
                 val dest = File(Tuils.getFolder(), file.getName())
                 file.renameTo(dest)
 
-                return "Path: " + dest.getAbsolutePath()
+                return pack.context.getString(R.string.command_config_path_e8427, dest.getAbsolutePath())
             }
         },
         tutorial {
@@ -395,7 +393,7 @@ class config : ParamCommand() {
         companion object {
             fun get(p: String): Param? {
                 var p = p
-                p = p.lowercase(Locale.getDefault())
+                p = p.lowercase(Locale.ROOT)
                 val ps = entries.toTypedArray()
                 for (p1 in ps) if (p.endsWith(p1.label()!!)) return p1
                 return null

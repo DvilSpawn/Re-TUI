@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher.managers.lua
 
+import ohi.andre.consolelauncher.R
 import android.content.ClipboardManager
 import android.content.ComponentName
 import android.content.Context
@@ -74,7 +75,7 @@ import ohi.andre.consolelauncher.managers.settings.AppearanceSettings
 import ohi.andre.consolelauncher.tuils.Tuils
 
 class LuaWidgetEngine(
-    context: Context?,
+    context: Context,
     id: String?,
     script: String?,
     private val version: Long,
@@ -82,7 +83,7 @@ class LuaWidgetEngine(
 ) {
     private val id: String
     private val script: String
-    private val context: Context?
+    private val context: Context
     private val mainHandler: Handler = Handler(Looper.getMainLooper())
     private val approvedPermissions: MutableSet<String?>
 
@@ -101,7 +102,7 @@ class LuaWidgetEngine(
     private val debugLines = ArrayList<String?>()
 
     init {
-        this.context = if (context == null) null else context.getApplicationContext()
+        this.context = context.applicationContext
         this.id = LuaWidgetManager.normalizeId(id)
         this.script = if (script == null) "" else script
         this.approvedPermissions = HashSet<String?>(LuaWidgetManager.approvedPermissions(this.id))
@@ -142,7 +143,7 @@ class LuaWidgetEngine(
                 ensureLoaded()
                 val result = newResult()
                 if (!callIfPresent("on_open") && !callIfPresent("on_resume")) {
-                    result.body = "No on_open handler in " + id + "."
+                    result.body = context.getString(R.string.lua_runtime_luawidgetengine_no_on_open_handler_in_3a579, id)
                 }
                 persistPrefs()
                 lastResult = result
@@ -159,7 +160,7 @@ class LuaWidgetEngine(
                 ensureLoaded()
                 val result = newResult()
                 if (!callIfPresent("on_click", LuaValue.valueOf(index))) {
-                    result.body = "No on_click handler in " + id + "."
+                    result.body = context.getString(R.string.lua_runtime_luawidgetengine_no_on_click_handler_in_1f666, id)
                 }
                 persistPrefs()
                 lastResult = result
@@ -181,7 +182,7 @@ class LuaWidgetEngine(
                         payload
                     ) && !callIfPresent("on_command", payload)
                 ) {
-                    result.body = "No on_input handler in " + id + "."
+                    result.body = context.getString(R.string.lua_runtime_luawidgetengine_no_on_input_handler_in_e32dd, id)
                 }
                 persistPrefs()
                 lastResult = result
@@ -203,7 +204,7 @@ class LuaWidgetEngine(
                         payload
                     ) && !callIfPresent("on_submit", payload)
                 ) {
-                    result.body = "No on_action handler in " + id + "."
+                    result.body = context.getString(R.string.lua_runtime_luawidgetengine_no_on_action_handler_in_3b3e5, id)
                 }
                 persistPrefs()
                 lastResult = result
@@ -247,7 +248,7 @@ class LuaWidgetEngine(
                 ensureLoaded()
                 val result = newResult()
                 if (!callIfPresent("on_dialog_action", LuaValue.valueOf(index))) {
-                    result.body = "No on_dialog_action handler in " + id + "."
+                    result.body = context.getString(R.string.lua_runtime_luawidgetengine_no_on_dialog_action_handler_in_f25f4, id)
                 }
                 persistPrefs()
                 lastResult = result
@@ -264,7 +265,7 @@ class LuaWidgetEngine(
                 ensureLoaded()
                 val result = newResult()
                 if (!callIfPresent("on_config")) {
-                    result.body = "No on_config handler in " + id + "."
+                    result.body = context.getString(R.string.lua_runtime_luawidgetengine_no_on_config_handler_in_07f9f, id)
                 }
                 persistPrefs()
                 lastResult = result
@@ -287,7 +288,7 @@ class LuaWidgetEngine(
                         Companion.jsonToLua(payload)
                     )
                 ) {
-                    result.body = "No on_config_submit handler in " + id + "."
+                    result.body = context.getString(R.string.lua_runtime_luawidgetengine_no_on_config_submit_handler_in_7cbe2, id)
                 }
                 persistPrefs()
                 lastResult = result
@@ -500,7 +501,7 @@ class LuaWidgetEngine(
             return
         }
         if (System.currentTimeMillis() > executionDeadlineMs) {
-            throw LuaError("Lua runtime timeout in " + (if (TextUtils.isEmpty(executionStage)) "script" else executionStage))
+            throw LuaError(context.getString(R.string.lua_runtime_luawidgetengine_lua_runtime_timeout_in_9cd2d, (if (TextUtils.isEmpty(executionStage)) "script" else executionStage)))
         }
     }
 
@@ -734,7 +735,7 @@ class LuaWidgetEngine(
             val value: LuaValue = tableArg(args)
             if (!value.istable()) {
                 lastResult.configJson = ""
-                lastResult.body = appendLine(lastResult.body, "Invalid config schema.")
+                lastResult.body = appendLine(lastResult.body, context.getString(R.string.lua_runtime_luawidgetengine_invalid_config_schema_ce5a7))
                 return@UiAction
             }
             try {
@@ -743,18 +744,18 @@ class LuaWidgetEngine(
                     lastResult.configJson = jsonValue.toString()
                 } else {
                     lastResult.configJson = ""
-                    lastResult.body = appendLine(lastResult.body, "Invalid config schema.")
+                    lastResult.body = appendLine(lastResult.body, context.getString(R.string.lua_runtime_luawidgetengine_invalid_config_schema_ce5a7))
                 }
             } catch (e: Exception) {
                 lastResult.configJson = ""
-                lastResult.body = appendLine(lastResult.body, "Invalid config schema: " + e.message)
+                lastResult.body = appendLine(lastResult.body, context.getString(R.string.lua_runtime_luawidgetengine_invalid_config_schema_5adb8, e.message))
             }
         }))
         ui.set("config", UiFunction(UiAction { args: Varargs ->
             val value: LuaValue = tableArg(args)
             if (!value.istable()) {
                 lastResult.configJson = ""
-                lastResult.body = appendLine(lastResult.body, "Invalid config schema.")
+                lastResult.body = appendLine(lastResult.body, context.getString(R.string.lua_runtime_luawidgetengine_invalid_config_schema_ce5a7))
                 return@UiAction
             }
             try {
@@ -763,15 +764,15 @@ class LuaWidgetEngine(
                     lastResult.configJson = jsonValue.toString()
                 } else {
                     lastResult.configJson = ""
-                    lastResult.body = appendLine(lastResult.body, "Invalid config schema.")
+                    lastResult.body = appendLine(lastResult.body, context.getString(R.string.lua_runtime_luawidgetengine_invalid_config_schema_ce5a7))
                 }
             } catch (e: Exception) {
                 lastResult.configJson = ""
-                lastResult.body = appendLine(lastResult.body, "Invalid config schema: " + e.message)
+                lastResult.body = appendLine(lastResult.body, context.getString(R.string.lua_runtime_luawidgetengine_invalid_config_schema_5adb8, e.message))
             }
         }))
         ui.set("show_progress_bar", UiFunction(UiAction { args: Varargs ->
-            val label: String = stringAt(args, 1, "Progress")
+            val label: String = stringAt(args, 1, context.getString(R.string.lua_runtime_luawidgetengine_progress_1b902))
             val current: Double = numberAt(args, 2, 0.0)
             val max: Double = numberAt(args, 3, 100.0)
             val width = numberAt(args, 4, DEFAULT_PROGRESS_BAR_WIDTH.toDouble()).toInt()
@@ -794,7 +795,7 @@ class LuaWidgetEngine(
         ui.set("show_toast", UiFunction(UiAction { args: Varargs ->
             val text: String = stringArg(args)
             showToast(text)
-            lastResult.body = appendLine(lastResult.body, "[toast] " + text)
+            lastResult.body = appendLine(lastResult.body, context.getString(R.string.lua_runtime_luawidgetengine_toast_5bf86, text))
         }))
         ui.set(
             "is_folded",
@@ -1309,7 +1310,7 @@ class LuaWidgetEngine(
         debug.set("toast", UiFunction(UiAction { args: Varargs -> showToast(stringArg(args)) }))
         debug.set("show", UiFunction(UiAction { args: Varargs ->
             if (debugLines.isEmpty()) {
-                lastResult.body = appendLine(lastResult.body, "No debug lines.")
+                lastResult.body = appendLine(lastResult.body, context.getString(R.string.lua_runtime_luawidgetengine_no_debug_lines_3d01e))
             } else {
                 lastResult.body = appendLine(lastResult.body, TextUtils.join("\n", debugLines))
             }
@@ -1446,6 +1447,75 @@ class LuaWidgetEngine(
 
     private fun buildStringsTable(): LuaTable {
         val strings: LuaTable = LuaTable()
+        strings.set("localize", ValueFunction(ValueAction { args: Varargs ->
+            val first = rawIndex(args, 1)
+            val key = args.arg(first).tojstring()
+            val resource = when (key) {
+                "lua_builtin_pomodoro_break" -> R.string.lua_builtin_pomodoro_break
+                "lua_builtin_pomodoro_focus" -> R.string.lua_builtin_pomodoro_focus
+                "lua_builtin_04e9462c0ff0" -> R.string.lua_builtin_04e9462c0ff0
+                "lua_builtin_0aa811285aa0" -> R.string.lua_builtin_0aa811285aa0
+                "lua_builtin_0c483d574e48" -> R.string.lua_builtin_0c483d574e48
+                "lua_builtin_0eebb3417b5c" -> R.string.lua_builtin_0eebb3417b5c
+                "lua_builtin_116ebc4830ab" -> R.string.lua_builtin_116ebc4830ab
+                "lua_builtin_123a7f2fcc9a" -> R.string.lua_builtin_123a7f2fcc9a
+                "lua_builtin_158f91934e68" -> R.string.lua_builtin_158f91934e68
+                "lua_builtin_16b6ffdf1340" -> R.string.lua_builtin_16b6ffdf1340
+                "lua_builtin_1b480158e1f3" -> R.string.lua_builtin_1b480158e1f3
+                "lua_builtin_1df39aa58ad4" -> R.string.lua_builtin_1df39aa58ad4
+                "lua_builtin_232f662d82ef" -> R.string.lua_builtin_232f662d82ef
+                "lua_builtin_292b0901993f" -> R.string.lua_builtin_292b0901993f
+                "lua_builtin_2a86ca29df01" -> R.string.lua_builtin_2a86ca29df01
+                "lua_builtin_2eedfba70ea0" -> R.string.lua_builtin_2eedfba70ea0
+                "lua_builtin_30ee2b094f6a" -> R.string.lua_builtin_30ee2b094f6a
+                "lua_builtin_3babbd03dec4" -> R.string.lua_builtin_3babbd03dec4
+                "lua_builtin_3d7f56ffea75" -> R.string.lua_builtin_3d7f56ffea75
+                "lua_builtin_44c57abd888a" -> R.string.lua_builtin_44c57abd888a
+                "lua_builtin_44d6538e2c52" -> R.string.lua_builtin_44d6538e2c52
+                "lua_builtin_48a3661d8464" -> R.string.lua_builtin_48a3661d8464
+                "lua_builtin_4c7a8d14589c" -> R.string.lua_builtin_4c7a8d14589c
+                "lua_builtin_539b31b6587e" -> R.string.lua_builtin_539b31b6587e
+                "lua_builtin_549877f1bb31" -> R.string.lua_builtin_549877f1bb31
+                "lua_builtin_5586cf3db2af" -> R.string.lua_builtin_5586cf3db2af
+                "lua_builtin_55b12130ff65" -> R.string.lua_builtin_55b12130ff65
+                "lua_builtin_56e3badc4e6c" -> R.string.lua_builtin_56e3badc4e6c
+                "lua_builtin_5e03c82554bb" -> R.string.lua_builtin_5e03c82554bb
+                "lua_builtin_6a091eb355cc" -> R.string.lua_builtin_6a091eb355cc
+                "lua_builtin_719ea396ad92" -> R.string.lua_builtin_719ea396ad92
+                "lua_builtin_792c48c79564" -> R.string.lua_builtin_792c48c79564
+                "lua_builtin_7995059422d9" -> R.string.lua_builtin_7995059422d9
+                "lua_builtin_8362faf545e2" -> R.string.lua_builtin_8362faf545e2
+                "lua_builtin_8c1c89354410" -> R.string.lua_builtin_8c1c89354410
+                "lua_builtin_95992c12d846" -> R.string.lua_builtin_95992c12d846
+                "lua_builtin_9869e506c38f" -> R.string.lua_builtin_9869e506c38f
+                "lua_builtin_9c13915092a7" -> R.string.lua_builtin_9c13915092a7
+                "lua_builtin_9c3d5197daac" -> R.string.lua_builtin_9c3d5197daac
+                "lua_builtin_9d9cec22f36f" -> R.string.lua_builtin_9d9cec22f36f
+                "lua_builtin_9e253470c876" -> R.string.lua_builtin_9e253470c876
+                "lua_builtin_ac4735e1d1d9" -> R.string.lua_builtin_ac4735e1d1d9
+                "lua_builtin_af74f7c5362a" -> R.string.lua_builtin_af74f7c5362a
+                "lua_builtin_b04ba49f8486" -> R.string.lua_builtin_b04ba49f8486
+                "lua_builtin_b061094464b9" -> R.string.lua_builtin_b061094464b9
+                "lua_builtin_b52af31ecd75" -> R.string.lua_builtin_b52af31ecd75
+                "lua_builtin_bcc61965f271" -> R.string.lua_builtin_bcc61965f271
+                "lua_builtin_bd604d99e75e" -> R.string.lua_builtin_bd604d99e75e
+                "lua_builtin_c44623f31dda" -> R.string.lua_builtin_c44623f31dda
+                "lua_builtin_c5c27a7c4ac7" -> R.string.lua_builtin_c5c27a7c4ac7
+                "lua_builtin_c6f9a6dcc58b" -> R.string.lua_builtin_c6f9a6dcc58b
+                "lua_builtin_c7f73bb54d92" -> R.string.lua_builtin_c7f73bb54d92
+                "lua_builtin_df5493c10c23" -> R.string.lua_builtin_df5493c10c23
+                "lua_builtin_e9e0d8e560ea" -> R.string.lua_builtin_e9e0d8e560ea
+                "lua_builtin_edf830938e9f" -> R.string.lua_builtin_edf830938e9f
+                "lua_builtin_eee5eb604781" -> R.string.lua_builtin_eee5eb604781
+                "lua_builtin_ef56d82ad7ac" -> R.string.lua_builtin_ef56d82ad7ac
+                "lua_builtin_f168b719cf9f" -> R.string.lua_builtin_f168b719cf9f
+                "lua_builtin_f624afb9f371" -> R.string.lua_builtin_f624afb9f371
+                "lua_builtin_f6fdbe48dc54" -> R.string.lua_builtin_f6fdbe48dc54
+                else -> return@ValueAction LuaValue.valueOf(key)
+            }
+            val values = (first + 1..args.narg()).map { args.arg(it).tojstring() }.toTypedArray()
+            LuaValue.valueOf(if (values.isEmpty()) context.getString(resource) else context.getString(resource, *values))
+        }))
         strings.set(
             "trim",
             ValueFunction(ValueAction { args: Varargs -> LuaValue.valueOf(stringArg(args).trim { it <= ' ' }) })
@@ -1701,18 +1771,18 @@ class LuaWidgetEngine(
                     val callback: String? = callbackName("on_network_error", callbackId)
                     if (!callIfPresent(
                             callback,
-                            LuaValue.valueOf(if (error == null) "network error" else error)
+                            LuaValue.valueOf(if (error == null) context.getString(R.string.lua_runtime_luawidgetengine_network_error_7eb7b) else error)
                         )
                         && "on_network_error" != callback
                     ) {
                         callIfPresent(
                             "on_network_error",
-                            LuaValue.valueOf(if (error == null) "network error" else error)
+                            LuaValue.valueOf(if (error == null) context.getString(R.string.lua_runtime_luawidgetengine_network_error_7eb7b) else error)
                         )
                     }
                     if (TextUtils.isEmpty(lastResult.body) && lastResult.buttons.isEmpty()) {
                         lastResult.body =
-                            "Network error: " + (if (error == null) "unknown" else error)
+                            context.getString(R.string.lua_runtime_luawidgetengine_network_error_116eb, (if (error == null) "unknown" else error))
                     }
                     persistPrefs()
                 } catch (e: Throwable) {
@@ -1734,8 +1804,7 @@ class LuaWidgetEngine(
         val normalized = if (permission == null) "" else permission.trim { it <= ' ' }.lowercase()
         if (!approvedPermissions.contains(normalized)) {
             throw LuaError(
-                ("Permission required: " + normalized
-                        + ". Add -- permissions = \"" + normalized + "\" and run module -approve " + id + ".")
+                (context.getString(R.string.lua_runtime_luawidgetengine_permission_required_add_permissions_and_ru_aaa0a, normalized, normalized, id))
             )
         }
     }
@@ -1781,7 +1850,7 @@ class LuaWidgetEngine(
         val value: LuaValue = args.arg(rawIndex(args, 1))
         if (!value.istable()) {
             lastResult.layoutJson = ""
-            lastResult.body = appendLine(lastResult.body, "Invalid layout schema.")
+            lastResult.body = appendLine(lastResult.body, context.getString(R.string.lua_runtime_luawidgetengine_invalid_layout_schema_7cc62))
             return
         }
         try {
@@ -1793,7 +1862,7 @@ class LuaWidgetEngine(
             }
         } catch (e: Exception) {
             lastResult.layoutJson = ""
-            lastResult.body = appendLine(lastResult.body, "Invalid layout schema: " + e.message)
+            lastResult.body = appendLine(lastResult.body, context.getString(R.string.lua_runtime_luawidgetengine_invalid_layout_schema_02f61, e.message))
         }
     }
 
@@ -1827,7 +1896,7 @@ class LuaWidgetEngine(
         val target = stringAt(args, 2, label)
         val app = resolveLaunchableApp(target)
         if (app == null) {
-            lastResult.body = appendLine(lastResult.body, "App not found: " + target)
+            lastResult.body = appendLine(lastResult.body, context.getString(R.string.lua_runtime_luawidgetengine_app_not_found_ebb50, target))
             return
         }
         addCommandButton(if (TextUtils.isEmpty(label)) app.label else label, app.command())
@@ -1839,7 +1908,7 @@ class LuaWidgetEngine(
         val action = args.arg(rawIndex(args, 2))
         val command = commandFromIntentSpec(action)
         if (TextUtils.isEmpty(command)) {
-            lastResult.body = appendLine(lastResult.body, "Invalid intent button: " + label)
+            lastResult.body = appendLine(lastResult.body, context.getString(R.string.lua_runtime_luawidgetengine_invalid_intent_button_f9f82, label))
             return
         }
         addCommandButton(label, command)
@@ -2040,7 +2109,7 @@ class LuaWidgetEngine(
     }
 
     private fun showChoiceDialog(args: Varargs) {
-        var title: String? = stringAt(args, 1, "Choose")
+        var title: String? = stringAt(args, 1, context.getString(R.string.lua_runtime_luawidgetengine_choose_78b7c))
         var items: LuaValue = args.arg(rawIndex(args, 2))
         var selected = numberAt(args, 3, -1.0).toInt()
         if (items.isnil() && args.arg(rawIndex(args, 1)).istable()) {
@@ -2163,7 +2232,7 @@ class LuaWidgetEngine(
     }
 
     private fun prefsSummary(): String? {
-        val table = prefsTable ?: return "No editable prefs yet."
+        val table = prefsTable ?: return context.getString(R.string.lua_runtime_luawidgetengine_no_editable_prefs_yet_45ad6)
         val lines = ArrayList<String?>()
         var key: LuaValue = LuaValue.NIL
         while (true) {
@@ -2184,7 +2253,7 @@ class LuaWidgetEngine(
                 lines.add(name + " = " + value.tojstring())
             }
         }
-        return if (lines.isEmpty()) "No editable prefs yet." else TextUtils.join("\n", lines)
+        return if (lines.isEmpty()) context.getString(R.string.lua_runtime_luawidgetengine_no_editable_prefs_yet_45ad6) else TextUtils.join("\n", lines)
     }
 
     private fun dataFile(name: String?): File? {
@@ -2197,7 +2266,7 @@ class LuaWidgetEngine(
 
     private fun ensureReadableFile(file: File) {
         if (file.length() > MAX_WIDGET_FILE_BYTES) {
-            throw LuaError("Widget local file is too large: " + file.getName())
+            throw LuaError(context.getString(R.string.lua_runtime_luawidgetengine_widget_local_file_is_too_large_b3776, file.getName()))
         }
     }
 
@@ -2205,11 +2274,11 @@ class LuaWidgetEngine(
         val existing = if (file.isFile()) file.length() else 0L
         val nextSize = if (append) existing + incomingBytes else incomingBytes
         if (nextSize > MAX_WIDGET_FILE_BYTES) {
-            throw LuaError("Widget local file limit exceeded: " + file.getName())
+            throw LuaError(context.getString(R.string.lua_runtime_luawidgetengine_widget_local_file_limit_exceeded_5830f, file.getName()))
         }
         val total = widgetFilesSize() - existing + nextSize
         if (total > MAX_WIDGET_FILES_TOTAL_BYTES) {
-            throw LuaError("Widget local storage limit exceeded")
+            throw LuaError(context.getString(R.string.lua_runtime_luawidgetengine_widget_local_storage_limit_exceeded_523f9))
         }
     }
 
@@ -2260,7 +2329,7 @@ class LuaWidgetEngine(
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             context.startActivity(intent)
         } catch (e: Exception) {
-            showToast("Cannot open URL")
+            showToast(context.getString(R.string.lua_runtime_luawidgetengine_cannot_open_url_fce7a))
         }
     }
 
@@ -2272,7 +2341,7 @@ class LuaWidgetEngine(
         if (manager != null) {
             manager.setPrimaryClip(
                 ClipData.newPlainText(
-                    "Re:TUI widget",
+                    context.getString(R.string.lua_runtime_luawidgetengine_re_tui_widget_29fbe),
                     if (text == null) "" else text
                 )
             )

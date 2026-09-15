@@ -1,0 +1,243 @@
+<resources>
+    <!-- Command responses. Translate prose; preserve examples and format arguments. -->
+    <!-- NewNoteDialog.kt: showNewNotePrompt -->
+    <string name="notes_newnotedialog_a_note_named_already_exists_f9d40">"A note named \"%1$s\" already exists."</string>
+    <!-- NewNoteDialog.kt: editActions -->
+    <string name="notes_newnotedialog_cancel_1507c" formatted="false">"CANCEL"</string>
+    <!-- NewNoteDialog.kt: editActions -->
+    <string name="notes_newnotedialog_create_cabc2" formatted="false">"CREATE"</string>
+    <!-- NewNoteDialog.kt: showNewNotePrompt -->
+    <string name="notes_newnotedialog_directory_4b892" formatted="false">"Directory"</string>
+    <!-- NewNoteDialog.kt: showNewNotePrompt -->
+    <string name="notes_newnotedialog_directory_e084b" formatted="false">"DIRECTORY"</string>
+    <!-- NewNoteDialog.kt: showNewNotePrompt -->
+    <string name="notes_newnotedialog_new_note_d5bab" formatted="false">"New Note?"</string>
+    <!-- NewNoteDialog.kt: showNewNotePrompt -->
+    <string name="notes_newnotedialog_note_name_11bdf" formatted="false">"NOTE NAME"</string>
+    <!-- NewNoteDialog.kt: editActions -->
+    <string name="notes_newnotedialog_note_name_is_required_a8ad4" formatted="false">"Note name is required"</string>
+    <!-- NewNoteDialog.kt: showNewNotePrompt -->
+    <string name="notes_newnotedialog_open_original_e3452" formatted="false">"OPEN ORIGINAL"</string>
+    <!-- NewNoteDialog.kt: showNewNotePrompt -->
+    <string name="notes_newnotedialog_rename_47560" formatted="false">"RENAME"</string>
+    <!-- NewNoteDialog.kt: showNewNotePrompt -->
+    <string name="notes_newnotedialog_unfiled_c1aca" formatted="false">"Unfiled"</string>
+    <!-- RememberActivity.kt: renderToolbar -->
+    <string name="notes_rememberactivity_add_61cc5" formatted="false">"Add"</string>
+    <!-- RememberActivity.kt: confirmSmartRedact -->
+    <string name="notes_rememberactivity_all_non_mundane_body_text_will_be_encrypte_8fd63" formatted="false">"All non-mundane body text will be encrypted. The title stays visible."</string>
+    <!-- RememberActivity.kt: onAuthenticationError -->
+    <string name="notes_rememberactivity_authentication_failed_2db8d" formatted="false">"Authentication failed"</string>
+    <!-- RememberActivity.kt: showSelectionPopup -->
+    <string name="notes_rememberactivity_bold_19e07" formatted="false">"Bold"</string>
+    <!-- RememberActivity.kt: showSelectionPopup -->
+    <string name="notes_rememberactivity_bulleted_list_dd870" formatted="false">"Bulleted list"</string>
+    <!-- RememberActivity.kt: framedPrompt -->
+    <string name="notes_rememberactivity_cancel_1507c" formatted="false">"CANCEL"</string>
+    <!-- RememberActivity.kt: renderDeleteConfirmation -->
+    <string name="notes_rememberactivity_cancel_77dfd" formatted="false">"Cancel"</string>
+    <!-- RememberActivity.kt: showSelectionPopup -->
+    <string name="notes_rememberactivity_checklist_61b29" formatted="false">"Checklist"</string>
+    <!-- RememberActivity.kt: renderToolbar -->
+    <string name="notes_rememberactivity_close_bbfa7" formatted="false">"Close"</string>
+    <!-- RememberActivity.kt: showSelectionPopup -->
+    <string name="notes_rememberactivity_code_adac6" formatted="false">"Code"</string>
+    <!-- RememberActivity.kt: renderInput -->
+    <string name="notes_rememberactivity_confirm_04a21" formatted="false">"Confirm"</string>
+    <!-- RememberActivity.kt: renderDeleteConfirmation -->
+    <string name="notes_rememberactivity_confirm_delete_c9f28" formatted="false">"Confirm delete"</string>
+    <!-- RememberActivity.kt: shareSelected -->
+    <string name="notes_rememberactivity_could_not_prepare_export_e858c" formatted="false">"Could not prepare export"</string>
+    <!-- RememberActivity.kt: insertImages -->
+    <string name="notes_rememberactivity_could_not_read_an_image_c9e6a" formatted="false">"Could not read an image"</string>
+    <!-- RememberActivity.kt: renderDeleteConfirmation -->
+    <string name="notes_rememberactivity_delete_16fad">"DELETE %1$s?"</string>
+    <!-- RememberActivity.kt: confirmEditorDelete -->
+    <string name="notes_rememberactivity_delete_d6f56" formatted="false">"DELETE"</string>
+    <!-- RememberActivity.kt: renderSelectionTools -->
+    <string name="notes_rememberactivity_delete_f6fdb" formatted="false">"Delete"</string>
+    <!-- RememberActivity.kt: confirmEditorDelete -->
+    <string name="notes_rememberactivity_delete_note_38d68" formatted="false">"Delete note?"</string>
+    <!-- RememberActivity.kt: renderEditorToolbar -->
+    <string name="notes_rememberactivity_delete_note_a8ed4" formatted="false">"Delete note"</string>
+    <!-- RememberActivity.kt: renderEditorToolbar -->
+    <string name="notes_rememberactivity_edit_tags_d8a5f" formatted="false">"Edit tags"</string>
+    <!-- RememberActivity.kt: linkPrompt -->
+    <string name="notes_rememberactivity_enter_a_valid_http_or_https_link_15500" formatted="false">"Enter a valid http or https link"</string>
+    <!-- RememberActivity.kt: shareSelected -->
+    <string name="notes_rememberactivity_export_c0b96" formatted="false">"EXPORT"</string>
+    <!-- RememberActivity.kt: shareSelected -->
+    <string name="notes_rememberactivity_export_unredacted_notes_4269f" formatted="false">"Export unredacted notes"</string>
+    <!-- RememberActivity.kt: shareSelected -->
+    <string name="notes_rememberactivity_export_unredacted_notes_8c54e" formatted="false">"Export unredacted notes?"</string>
+    <!-- RememberActivity.kt: renderToolbar -->
+    <string name="notes_rememberactivity_folder_name_b2ce0" formatted="false">"Folder name"</string>
+    <!-- RememberActivity.kt: showHeadingPopup -->
+    <string name="notes_rememberactivity_heading_1_fdc7d" formatted="false">"Heading 1"</string>
+    <!-- RememberActivity.kt: showHeadingPopup -->
+    <string name="notes_rememberactivity_heading_2_6542d" formatted="false">"Heading 2"</string>
+    <!-- RememberActivity.kt: showHeadingPopup -->
+    <string name="notes_rememberactivity_heading_3_9694d" formatted="false">"Heading 3"</string>
+    <!-- RememberActivity.kt: headingButton -->
+    <string name="notes_rememberactivity_heading_style_a29f1" formatted="false">"Heading style"</string>
+    <!-- RememberActivity.kt: linkPrompt -->
+    <string name="notes_rememberactivity_insert_c20ea" formatted="false">"INSERT"</string>
+    <!-- RememberActivity.kt: renderEditorToolbar -->
+    <string name="notes_rememberactivity_insert_checklist_f1d30" formatted="false">"Insert checklist"</string>
+    <!-- RememberActivity.kt: renderEditorToolbar -->
+    <string name="notes_rememberactivity_insert_images_f4a26" formatted="false">"Insert images"</string>
+    <!-- RememberActivity.kt: linkPrompt -->
+    <string name="notes_rememberactivity_insert_link_4b9f9" formatted="false">"Insert Link?"</string>
+    <!-- RememberActivity.kt: renderEditorToolbar -->
+    <string name="notes_rememberactivity_insert_link_4d4ac" formatted="false">"Insert link"</string>
+    <!-- RememberActivity.kt: showSelectionPopup -->
+    <string name="notes_rememberactivity_italic_1616e" formatted="false">"Italic"</string>
+    <!-- RememberActivity.kt: treeHeader -->
+    <string name="notes_rememberactivity_last_modified_622cd" formatted="false">"LAST MODIFIED"</string>
+    <!-- RememberActivity.kt: linkPrompt -->
+    <string name="notes_rememberactivity_link_label_ee38f" formatted="false">"Link label"</string>
+    <!-- RememberActivity.kt: showSelectionPopup -->
+    <string name="notes_rememberactivity_link_selected_text_2971b" formatted="false">"Link selected text"</string>
+    <!-- RememberActivity.kt: showEditor -->
+    <string name="notes_rememberactivity_markdown_30d86" formatted="false">"MARKDOWN"</string>
+    <!-- RememberActivity.kt: showEditor -->
+    <string name="notes_rememberactivity_markdown_note_editor_0bd6e" formatted="false">"Markdown note editor"</string>
+    <!-- RememberActivity.kt: treeHeader -->
+    <string name="notes_rememberactivity_name_a9d37" formatted="false">"NAME"</string>
+    <!-- RememberActivity.kt: renderToolbar -->
+    <string name="notes_rememberactivity_new_folder_a7119" formatted="false">"New folder"</string>
+    <!-- RememberActivity.kt: renderEditorToolbar -->
+    <string name="notes_rememberactivity_new_note_2b7b0" formatted="false">"New note"</string>
+    <!-- RememberActivity.kt: confirmRename -->
+    <string name="notes_rememberactivity_note_title_is_required_3e39e" formatted="false">"Note title is required"</string>
+    <!-- RememberActivity.kt: loadStarterLibrary -->
+    <string name="notes_rememberactivity_notes_unavailable_e0386" formatted="false">"NOTES UNAVAILABLE"</string>
+    <!-- RememberActivity.kt: showSelectionPopup -->
+    <string name="notes_rememberactivity_numbered_list_8294e" formatted="false">"Numbered list"</string>
+    <!-- RememberActivity.kt: renderEditorToolbar -->
+    <string name="notes_rememberactivity_pin_note_db7ee" formatted="false">"Pin note"</string>
+    <!-- RememberActivity.kt: showSelectionPopup -->
+    <string name="notes_rememberactivity_quote_30902" formatted="false">"Quote"</string>
+    <!-- RememberActivity.kt: shareFiles -->
+    <string name="notes_rememberactivity_re_member_note_25d92" formatted="false">"Re:Member note"</string>
+    <!-- RememberActivity.kt: renderEditorToolbar -->
+    <string name="notes_rememberactivity_re_redact_57217" formatted="false">"Re-redact"</string>
+    <!-- RememberActivity.kt: confirmSmartRedact -->
+    <string name="notes_rememberactivity_redact_91089" formatted="false">"REDACT"</string>
+    <!-- RememberActivity.kt: redactSelection -->
+    <string name="notes_rememberactivity_redact_selected_text_bb190" formatted="false">"Redact selected text"</string>
+    <!-- RememberActivity.kt: treeRow -->
+    <string name="notes_rememberactivity_redacted_87807" formatted="false">"Redacted"</string>
+    <!-- RememberActivity.kt: treeRow -->
+    <string name="notes_rememberactivity_redacted_af2c6">"%1$s, redacted"</string>
+    <!-- RememberActivity.kt: redactionFailure -->
+    <string name="notes_rememberactivity_redaction_key_unavailable_note_was_not_cha_e1d2e" formatted="false">"Redaction key unavailable; note was not changed"</string>
+    <!-- RememberActivity.kt: revealRedactions -->
+    <string name="notes_rememberactivity_redactions_revealed_read_only_898bf" formatted="false">"Redactions revealed read-only"</string>
+    <!-- RememberActivity.kt: renderSelectionTools -->
+    <string name="notes_rememberactivity_rename_d3f4c" formatted="false">"Rename"</string>
+    <!-- RememberActivity.kt: revealRedactions -->
+    <string name="notes_rememberactivity_reveal_redacted_text_9dce3" formatted="false">"Reveal redacted text"</string>
+    <!-- RememberActivity.kt: tagPrompt -->
+    <string name="notes_rememberactivity_save_50815" formatted="false">"SAVE"</string>
+    <!-- RememberActivity.kt: redactSelection -->
+    <string name="notes_rememberactivity_select_unredacted_body_text_d4bf2" formatted="false">"Select unredacted body text"</string>
+    <!-- RememberActivity.kt: redactSelection -->
+    <string name="notes_rememberactivity_selection_changed_77e2c" formatted="false">"Selection changed"</string>
+    <!-- RememberActivity.kt: authenticate -->
+    <string name="notes_rememberactivity_set_a_device_pin_or_biometric_first_929bc" formatted="false">"Set a device PIN or biometric first"</string>
+    <!-- RememberActivity.kt: renderToolbar -->
+    <string name="notes_rememberactivity_settings_c7f73" formatted="false">"Settings"</string>
+    <!-- RememberActivity.kt: renderSelectionTools -->
+    <string name="notes_rememberactivity_share_09ca5" formatted="false">"Share"</string>
+    <!-- RememberActivity.kt: shareZip -->
+    <string name="notes_rememberactivity_share_directory_c7dac" formatted="false">"Share directory"</string>
+    <!-- RememberActivity.kt: shareFiles -->
+    <string name="notes_rememberactivity_share_note_81fd7" formatted="false">"Share note"</string>
+    <!-- RememberActivity.kt: showEditor -->
+    <string name="notes_rememberactivity_show_markdown_syntax_70e59" formatted="false">"Show Markdown syntax"</string>
+    <!-- RememberActivity.kt: confirmSmartRedact -->
+    <string name="notes_rememberactivity_smart_redact_4a9cf" formatted="false">"Smart redact?"</string>
+    <!-- RememberActivity.kt: renderEditorToolbar -->
+    <string name="notes_rememberactivity_smart_redact_72687" formatted="false">"Smart redact"</string>
+    <!-- RememberActivity.kt: confirmSmartRedact -->
+    <string name="notes_rememberactivity_smart_redact_note_9bdb5" formatted="false">"Smart redact note"</string>
+    <!-- RememberActivity.kt: showSelectionPopup -->
+    <string name="notes_rememberactivity_strikethrough_a93b9" formatted="false">"Strikethrough"</string>
+    <!-- RememberActivity.kt: tagPrompt -->
+    <string name="notes_rememberactivity_tags_a119e" formatted="false">"Tags?"</string>
+    <!-- RememberActivity.kt: tagPrompt -->
+    <string name="notes_rememberactivity_tags_comma_separated_9508e" formatted="false">"tags, comma separated"</string>
+    <!-- RememberActivity.kt: shareSelected -->
+    <string name="notes_rememberactivity_the_exported_markdown_and_attached_images_541c6" formatted="false">"The exported Markdown and attached images will be readable by anyone who receives the bundle."</string>
+    <!-- RememberActivity.kt: loadStarterLibrary -->
+    <string name="notes_rememberactivity_the_local_notes_file_was_preserved_and_no_de1b1" formatted="false">"The local notes file was preserved and no changes were written."</string>
+    <!-- RememberActivity.kt: confirmEditorDelete -->
+    <string name="notes_rememberactivity_this_permanently_deletes_the_note_and_its_e287a" formatted="false">"This permanently deletes the note and its attached images."</string>
+    <!-- RememberActivity.kt: showSelectionPopup -->
+    <string name="notes_rememberactivity_underline_39773" formatted="false">"Underline"</string>
+    <!-- RememberActivity.kt: shareSelected -->
+    <string name="notes_rememberactivity_unfiled_c1aca" formatted="false">"Unfiled"</string>
+    <!-- RememberActivity.kt: authenticate -->
+    <string name="notes_rememberactivity_unlock_redacted_text_1039f" formatted="false">"Unlock redacted text"</string>
+    <!-- RememberActivity.kt: renderEditorToolbar -->
+    <string name="notes_rememberactivity_unpin_note_4857f" formatted="false">"Unpin note"</string>
+    <!-- RememberActivity.kt: renderEditorToolbar -->
+    <string name="notes_rememberactivity_unredact_af440" formatted="false">"Unredact"</string>
+    <!-- RememberActivity.kt: linkPrompt -->
+    <string name="notes_rememberactivity_use_a_single_line_label_without_2884e" formatted="false">"Use a single-line label without ]"</string>
+    <!-- RememberActivity.kt: authenticate -->
+    <string name="notes_rememberactivity_use_biometrics_or_screen_lock_5c36d" formatted="false">"Use biometrics or screen lock"</string>
+    <!-- SettingsActivity.kt: appearancePane -->
+    <string name="notes_settingsactivity_appearance_13636" formatted="false">"APPEARANCE"</string>
+    <!-- SettingsActivity.kt: rebuild -->
+    <string name="notes_settingsactivity_back_587ea" formatted="false">"BACK"</string>
+    <!-- SettingsActivity.kt: previewPane -->
+    <string name="notes_settingsactivity_body_the_quick_brown_fox_jumps_over_the_la_5c0c6" formatted="false">"BODY  The quick brown fox jumps over the lazy dog."</string>
+    <!-- SettingsActivity.kt: importFont -->
+    <string name="notes_settingsactivity_could_not_import_font_69b2e" formatted="false">"Could not import font"</string>
+    <!-- SettingsActivity.kt: displayName -->
+    <string name="notes_settingsactivity_custom_font_1100c" formatted="false">"CUSTOM FONT"</string>
+    <!-- SettingsActivity.kt: importFont -->
+    <string name="notes_settingsactivity_font_cannot_be_read_88b9c" formatted="false">"Font cannot be read"</string>
+    <!-- SettingsActivity.kt: fontPane -->
+    <string name="notes_settingsactivity_font_d42e4" formatted="false">"FONT"</string>
+    <!-- SettingsActivity.kt: importFont -->
+    <string name="notes_settingsactivity_font_imported_8891b" formatted="false">"Font imported"</string>
+    <!-- SettingsActivity.kt: importFont -->
+    <string name="notes_settingsactivity_font_is_empty_02efe" formatted="false">"Font is empty"</string>
+    <!-- SettingsActivity.kt: importFont -->
+    <string name="notes_settingsactivity_font_is_larger_than_8_mib_29856" formatted="false">"Font is larger than 8 MiB"</string>
+    <!-- SettingsActivity.kt: scalePane -->
+    <string name="notes_settingsactivity_font_scale_43940" formatted="false">"FONT SCALE"</string>
+    <!-- SettingsActivity.kt: previewPane -->
+    <string name="notes_settingsactivity_h1_note_title_08053" formatted="false">"H1  NOTE TITLE"</string>
+    <!-- SettingsActivity.kt: previewPane -->
+    <string name="notes_settingsactivity_h2_section_d9ffa" formatted="false">"H2  SECTION"</string>
+    <!-- SettingsActivity.kt: previewPane -->
+    <string name="notes_settingsactivity_h3_label_4d5f9" formatted="false">"H3  LABEL"</string>
+    <!-- SettingsActivity.kt: fontPane -->
+    <string name="notes_settingsactivity_import_font_f6728" formatted="false">"IMPORT FONT"</string>
+    <!-- SettingsActivity.kt: fontPane -->
+    <string name="notes_settingsactivity_imports_only_the_font_you_choose_into_re_m_90643" formatted="false">"Imports only the font you choose into Re:Member storage. No storage permission is requested."</string>
+    <!-- SettingsActivity.kt: fontPane -->
+    <string name="notes_settingsactivity_launcher_default_monospace_fd9b4" formatted="false">"LAUNCHER / DEFAULT MONOSPACE"</string>
+    <!-- SettingsActivity.kt: rebuild -->
+    <string name="notes_settingsactivity_re_member_settings_0aff3" formatted="false">"RE:MEMBER SETTINGS"</string>
+    <!-- SettingsActivity.kt: previewPane -->
+    <string name="notes_settingsactivity_type_scale_f625d" formatted="false">"TYPE SCALE"</string>
+    <!-- SettingsActivity.kt: fontPane -->
+    <string name="notes_settingsactivity_use_default_8e95d" formatted="false">"USE DEFAULT"</string>
+    <!-- SettingsActivity.kt: appearancePane -->
+    <string name="notes_settingsactivity_use_launcher_appearance_9c22d" formatted="false">"Use Launcher appearance"</string>
+    <string name="notes_folder_required">Folder name is required</string>
+    <string name="notes_folder_long">Folder name is too long</string>
+    <string name="notes_folder_invalid">Folder name contains an invalid character</string>
+    <string name="notes_folder_duplicate">A folder with that name already exists</string>
+    <string name="notes_export_directory_failed">Could not create export directory</string>
+    <string name="notes_storage_error_0">"Unlock the note before deleting it"</string>
+    <string name="notes_storage_error_1">"Could not create note directory"</string>
+    <string name="notes_storage_error_2">"Invalid note file"</string>
+    <string name="notes_storage_error_3">"Invalid note path"</string>
+    <string name="notes_storage_error_4">"Missing note file"</string>
+</resources>

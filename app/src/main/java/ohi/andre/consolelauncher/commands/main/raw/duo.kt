@@ -13,7 +13,7 @@ import ohi.andre.consolelauncher.managers.xml.options.Behavior
 class duo : CommandAbstraction {
     override fun exec(pack: ExecutePack): String {
         if (!LauncherSettings.getBoolean(Behavior.duo_mode)) {
-            return "Duo command is disabled. Enable it with: config -set duo_mode true"
+            return pack.context.getString(R.string.command_duo_duo_command_is_disabled_enable_it_with_con_7aacc)
         }
 
         var ui: UIManager? = null
@@ -21,7 +21,7 @@ class duo : CommandAbstraction {
             ui = (pack.context as LauncherActivity).uiManager
         }
         if (ui == null) {
-            return "Duo layout is only available from the launcher screen."
+            return pack.context.getString(R.string.command_duo_duo_layout_is_only_available_from_the_laun_26934)
         }
 
         val input = pack.getString()
@@ -31,12 +31,12 @@ class duo : CommandAbstraction {
         }
 
         if ("status" == mode || "-status" == mode) {
-            return status(ui)
+            return status(pack, ui)
         }
 
         if ("off" == mode || "-off" == mode || "0" == mode) {
             ui.setDuoLayoutMode(UIManager.DUO_LAYOUT_OFF)
-            return "Duo layout off. Normal landscape split restored."
+            return pack.context.getString(R.string.command_duo_duo_layout_off_normal_landscape_split_rest_ab679)
         }
 
         if ("left" == mode || "-left" == mode) {
@@ -60,23 +60,23 @@ class duo : CommandAbstraction {
                 return appliedMessage(pack, side)
             }
             ui.setDuoLayoutMode(UIManager.DUO_LAYOUT_OFF)
-            return "Duo layout off. Normal landscape split restored."
+            return pack.context.getString(R.string.command_duo_duo_layout_off_normal_landscape_split_rest_ab679)
         }
 
-        return "Unknown duo option: $input\nUsage: " + CommandTuils.DUO_USAGE
+        return pack.context.getString(R.string.command_duo_unknown_duo_option_usage_b3f91, input, CommandTuils.DUO_USAGE)
     }
 
     private fun appliedMessage(pack: ExecutePack, side: String): String {
         val landscape = UIManager.isResponsiveLandscapeConfiguration(pack.context.resources.configuration)
-        var message = "Duo layout active on the $side side."
+        var message = pack.context.getString(R.string.command_duo_duo_layout_active_on_the_side_ff742, side)
         if (!landscape) {
-            message += " Use a wide landscape window to see it."
+            message += pack.context.getString(R.string.command_duo_use_a_wide_landscape_window_to_see_it_770de)
         }
         return message
     }
 
-    private fun status(ui: UIManager): String =
-        "Duo command: enabled\nDuo layout: " + ui.getDuoLayoutMode() + "\nUsage: " + CommandTuils.DUO_USAGE
+    private fun status(pack: ExecutePack, ui: UIManager): String =
+        pack.context.getString(R.string.duo_status, ui.getDuoLayoutMode(), CommandTuils.DUO_USAGE)
 
     override fun argType(): IntArray = intArrayOf(CommandAbstraction.PLAIN_TEXT)
 
@@ -88,12 +88,12 @@ class duo : CommandAbstraction {
 
     override fun onNotArgEnough(pack: ExecutePack, nArgs: Int): String {
         if (!LauncherSettings.getBoolean(Behavior.duo_mode)) {
-            return "Duo command is disabled. Enable it with: config -set duo_mode true"
+            return pack.context.getString(R.string.command_duo_duo_command_is_disabled_enable_it_with_con_7aacc)
         }
         if (pack.context is LauncherActivity) {
             val ui = (pack.context as LauncherActivity).uiManager
             if (ui != null) {
-                return status(ui)
+                return status(pack, ui)
             }
         }
         return pack.context.getString(R.string.help_duo)

@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher.managers.modules
 
+import ohi.andre.consolelauncher.R
 import android.content.Context
 import android.content.SharedPreferences
 import android.text.TextUtils
@@ -163,7 +164,7 @@ object ModuleManager {
         }
         val ids = LinkedHashSet<String?>(getScriptIds(context))
         ids.add(id)
-        val body = "No module output yet. Run module -refresh " + id
+        val body = context.getString(R.string.manager_modulemanager_no_module_output_yet_run_module_refresh_9fbc2, id)
         prefs(context).edit()
             .putStringSet(KEY_SCRIPT_IDS, ids)
             .putString(KEY_SCRIPT_PATH_PREFIX + id, normalizeModuleSource(path))
@@ -370,21 +371,29 @@ object ModuleManager {
         return id
     }
 
-    fun displayName(module: String?): String {
+    fun displayName(context: Context, module: String?): String {
         val id = normalize(module)
         if (NOTIFICATIONS == id) {
-            return "NOTIFICATIONS"
+            return context.getString(R.string.module_label_notifications)
         }
         if (EVENTS == id) {
-            return "EVENTS"
+            return context.getString(R.string.module_label_events)
         }
         if (RSS == id) {
-            return "RSS"
+            return context.getString(R.string.module_label_rss)
         }
         if (WEATHER_NATIVE == id) {
-            return "WEATHER (NATIVE)"
+            return context.getString(R.string.module_label_weather_native)
         }
-        return id.uppercase()
+        return when (id) {
+            TIMER -> context.getString(R.string.module_label_timer)
+            MUSIC -> context.getString(R.string.module_label_music)
+            CALENDAR -> context.getString(R.string.module_label_calendar)
+            REMINDER -> context.getString(R.string.module_label_reminder)
+            NOTES -> context.getString(R.string.module_label_notes)
+            WEATHER -> context.getString(R.string.module_label_weather)
+            else -> id.uppercase()
+        }
     }
 
     fun displayTitle(context: Context, module: String?): String? {
@@ -397,7 +406,7 @@ object ModuleManager {
         if (!TextUtils.isEmpty(title)) {
             return title
         }
-        return displayName(id)
+        return displayName(context, id)
     }
 
     private fun getSuggestionsForModule(
@@ -419,51 +428,51 @@ object ModuleManager {
             suggestions.add(ModuleSuggestion.Companion.command("+5m", "timer -add 5m"))
             suggestions.add(ModuleSuggestion.Companion.command("+15m", "timer -add 15m"))
             suggestions.add(ModuleSuggestion.Companion.command("25m", "timer 25m"))
-            suggestions.add(ModuleSuggestion.Companion.command("stop", "timer -stop"))
-            suggestions.add(ModuleSuggestion.Companion.command("status", "timer -status"))
-            suggestions.add(ModuleSuggestion.Companion.command("pomodoro", "pomodoro"))
+            suggestions.add(ModuleSuggestion.Companion.command(context.getString(R.string.module_action_stop), "timer -stop"))
+            suggestions.add(ModuleSuggestion.Companion.command(context.getString(R.string.module_action_status), "timer -status"))
+            suggestions.add(ModuleSuggestion.Companion.command(context.getString(R.string.module_action_pomodoro), "pomodoro"))
         } else if (MUSIC == id) {
-            suggestions.add(ModuleSuggestion.Companion.command("prev", "music -previous"))
-            suggestions.add(ModuleSuggestion.Companion.command("play", "music -play"))
-            suggestions.add(ModuleSuggestion.Companion.command("next", "music -next"))
-            suggestions.add(ModuleSuggestion.Companion.command("info", "music -info"))
-            suggestions.add(ModuleSuggestion.Companion.command("stop", "music -stop"))
+            suggestions.add(ModuleSuggestion.Companion.command(context.getString(R.string.module_action_prev), "music -previous"))
+            suggestions.add(ModuleSuggestion.Companion.command(context.getString(R.string.module_action_play), "music -play"))
+            suggestions.add(ModuleSuggestion.Companion.command(context.getString(R.string.module_action_next), "music -next"))
+            suggestions.add(ModuleSuggestion.Companion.command(context.getString(R.string.module_action_info), "music -info"))
+            suggestions.add(ModuleSuggestion.Companion.command(context.getString(R.string.module_action_stop), "music -stop"))
         } else if (NOTIFICATIONS == id) {
             if (ModulePromptManager.isActive(context)) {
                 suggestions.addAll(ModulePromptManager.getSuggestions(context))
                 return suggestions
             }
-            suggestions.add(ModuleSuggestion.Companion.command("prev", "notifications -prev"))
-            suggestions.add(ModuleSuggestion.Companion.command("next", "notifications -next"))
-            suggestions.add(ModuleSuggestion.Companion.command("reply", "notifications -reply"))
-            suggestions.add(ModuleSuggestion.Companion.command("open", "notifications -open"))
-            suggestions.add(ModuleSuggestion.Companion.command("access", "notifications -access"))
-            suggestions.add(ModuleSuggestion.Companion.command("rules", "notifications -ls"))
-            suggestions.add(ModuleSuggestion.Companion.command("filters", "notifications -file"))
+            suggestions.add(ModuleSuggestion.Companion.command(context.getString(R.string.module_action_prev), "notifications -prev"))
+            suggestions.add(ModuleSuggestion.Companion.command(context.getString(R.string.module_action_next), "notifications -next"))
+            suggestions.add(ModuleSuggestion.Companion.command(context.getString(R.string.module_action_reply), "notifications -reply"))
+            suggestions.add(ModuleSuggestion.Companion.command(context.getString(R.string.module_action_open), "notifications -open"))
+            suggestions.add(ModuleSuggestion.Companion.command(context.getString(R.string.module_action_access), "notifications -access"))
+            suggestions.add(ModuleSuggestion.Companion.command(context.getString(R.string.module_action_rules), "notifications -ls"))
+            suggestions.add(ModuleSuggestion.Companion.command(context.getString(R.string.module_action_filters), "notifications -file"))
         } else if (CALENDAR == id) {
             // Calendar is the built-in module-button example; its controls live in-panel.
         } else if (REMINDER == id) {
-            suggestions.add(ModuleSuggestion.Companion.command("open", "reminder"))
+            suggestions.add(ModuleSuggestion.Companion.command(context.getString(R.string.module_action_open), "reminder"))
         } else if (NOTES == id) {
-            suggestions.add(ModuleSuggestion.Companion.command("edit", "notes"))
-            suggestions.add(ModuleSuggestion.Companion.command("list", "notes -ls"))
-            suggestions.add(ModuleSuggestion.Companion.command("todo", "notes -add TODO: "))
-            suggestions.add(ModuleSuggestion.Companion.command("copy", "notes -cp 1"))
-            suggestions.add(ModuleSuggestion.Companion.command("clear", "notes -clear"))
+            suggestions.add(ModuleSuggestion.Companion.command(context.getString(R.string.module_action_edit), "notes"))
+            suggestions.add(ModuleSuggestion.Companion.command(context.getString(R.string.module_action_list), "notes -ls"))
+            suggestions.add(ModuleSuggestion.Companion.command(context.getString(R.string.module_action_todo), "notes -add TODO: "))
+            suggestions.add(ModuleSuggestion.Companion.command(context.getString(R.string.module_action_copy), "notes -cp 1"))
+            suggestions.add(ModuleSuggestion.Companion.command(context.getString(R.string.module_action_clear), "notes -clear"))
         } else if (RSS == id) {
             val firstFeed = firstConfiguredFeedId(context)
-            suggestions.add(ModuleSuggestion.Companion.command("list", "rss -ls"))
+            suggestions.add(ModuleSuggestion.Companion.command(context.getString(R.string.module_action_list), "rss -ls"))
             if (firstFeed != -1) {
-                suggestions.add(ModuleSuggestion.Companion.command("latest", "rss -l " + firstFeed))
+                suggestions.add(ModuleSuggestion.Companion.command(context.getString(R.string.module_action_latest), "rss -l " + firstFeed))
                 suggestions.add(
                     ModuleSuggestion.Companion.command(
-                        "refresh",
+                        context.getString(R.string.module_action_refresh),
                         "rss -frc " + firstFeed
                     )
                 )
                 suggestions.add(
                     ModuleSuggestion.Companion.command(
-                        "info",
+                        context.getString(R.string.module_action_info),
                         "rss -info " + firstFeed
                     )
                 )
@@ -474,13 +483,13 @@ object ModuleManager {
                     "rss -add 1 900 https://www.reddit.com/r/android/.rss"
                 )
             )
-            suggestions.add(ModuleSuggestion.Companion.command("file", "rss -file"))
+            suggestions.add(ModuleSuggestion.Companion.command(context.getString(R.string.module_action_file), "rss -file"))
         } else if (usesNativeWeatherControls(id)) {
-            suggestions.add(ModuleSuggestion.Companion.command("update", "tuiweather -update"))
-            suggestions.add(ModuleSuggestion.Companion.command("location", "tuiweather -set_location "))
-            suggestions.add(ModuleSuggestion.Companion.command("show status", "tuiweather -enable"))
-            suggestions.add(ModuleSuggestion.Companion.command("hide status", "tuiweather -disable"))
-            suggestions.add(ModuleSuggestion.Companion.command("setup", "tuiweather -tutorial"))
+            suggestions.add(ModuleSuggestion.Companion.command(context.getString(R.string.module_action_update), "tuiweather -update"))
+            suggestions.add(ModuleSuggestion.Companion.command(context.getString(R.string.module_action_location), "tuiweather -set_location "))
+            suggestions.add(ModuleSuggestion.Companion.command(context.getString(R.string.module_action_show_status), "tuiweather -enable"))
+            suggestions.add(ModuleSuggestion.Companion.command(context.getString(R.string.module_action_hide_status), "tuiweather -disable"))
+            suggestions.add(ModuleSuggestion.Companion.command(context.getString(R.string.module_action_setup), "tuiweather -tutorial"))
         } else {
             suggestions.addAll(getScriptSuggestions(context, id))
         }

@@ -30,7 +30,7 @@ class module : CommandAbstraction {
 
         val parts: Array<String?> =
             input.split("\\s+".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        val option = parts[0]!!.lowercase(Locale.getDefault())
+        val option = parts[0]!!.lowercase(Locale.ROOT)
 
         if ("-new" == option || "-create" == option) {
             return createLuaModule(pack, input)
@@ -45,38 +45,38 @@ class module : CommandAbstraction {
             val module = ModuleManager.normalize(parts[1])
             if (!ModuleManager.isKnown(pack.context, module)) {
                 if (LuaWidgetManager.exists(module)) {
-                    return delegateLuaCommand(pack, "-show " + module)
+                    return delegateLuaCommand(pack, "-show $module")
                 }
-                return "Unknown module: " + parts[1]
+                return pack.context.getString(R.string.command_module_unknown_module_8f2c8, parts[1])
             }
             send(pack, "show", module)
-            return "Module opened: " + module
+            return pack.context.getString(R.string.command_module_module_opened_a33ed, module)
         }
 
         if ("-close" == option) {
             send(pack, "close", null)
-            return "Module closed."
+            return pack.context.getString(R.string.command_module_module_closed_60998)
         }
 
         if ("-prompt" == option) {
             if (parts.size < 3) return pack.context.getString(R.string.help_module)
             val module = ModuleManager.normalize(parts[1])
-            val action = parts[2]!!.lowercase(Locale.getDefault())
+            val action = parts[2]!!.lowercase(Locale.ROOT)
             if (ModuleManager.REMINDER != module) {
-                return "No native prompt session for module: " + module
+                return pack.context.getString(R.string.command_module_no_native_prompt_session_for_module_afcbe, module)
             }
             send(pack, "show", ModuleManager.REMINDER)
             if ("add" == action || "-add" == action) {
                 ModulePromptManager.startReminderAdd(pack.context)
-                return "Reminder prompt started."
+                return pack.context.getString(R.string.command_module_reminder_prompt_started_c9054)
             }
             if ("edit" == action || "-edit" == action) {
                 ModulePromptManager.startReminderEdit(pack.context)
-                return "Reminder edit prompt started."
+                return pack.context.getString(R.string.command_module_reminder_edit_prompt_started_6109f)
             }
             if ("remove" == action || "rm" == action || "-rm" == action) {
                 ModulePromptManager.startReminderRemove(pack.context)
-                return "Reminder remove prompt started."
+                return pack.context.getString(R.string.command_module_reminder_remove_prompt_started_4df71)
             }
             return pack.context.getString(R.string.output_invalid_param) + " " + parts[2]
         }
@@ -85,7 +85,7 @@ class module : CommandAbstraction {
             if (parts.size < 2) return pack.context.getString(R.string.help_module)
             ModuleManager.hideFromDock(pack.context, parts[1])
             send(pack, "rebuild", null)
-            return "Module hidden from dock: " + ModuleManager.normalize(parts[1])
+            return pack.context.getString(R.string.command_module_module_hidden_from_dock_b5569, ModuleManager.normalize(parts[1]))
         }
 
         if ("-add" == option) {
@@ -105,9 +105,7 @@ class module : CommandAbstraction {
             ) {
                 send(pack, "refresh", module)
             }
-            return ("Module added: " + module
-                    + "\nSource: " + ModuleManager.getModuleSource(pack.context, module)
-                    + "\nRun module -refresh " + module + " to update it.")
+            return (pack.context.getString(R.string.command_module_module_added_source_run_module_refresh_to_829ce, module, ModuleManager.getModuleSource(pack.context, module), module))
         }
 
         if ("-refresh" == option) {
@@ -115,15 +113,15 @@ class module : CommandAbstraction {
             val module = ModuleManager.normalize(parts[1])
             if (!ModuleManager.isKnown(pack.context, module)) {
                 if (LuaWidgetManager.exists(module)) {
-                    return delegateLuaCommand(pack, "-refresh " + module)
+                    return delegateLuaCommand(pack, "-refresh $module")
                 }
-                return "Unknown module: " + parts[1]
+                return pack.context.getString(R.string.command_module_unknown_module_8f2c8, parts[1])
             }
             if (TextUtils.isEmpty(ModuleManager.getModuleSource(pack.context, module))) {
-                return "Module has no source: " + module
+                return pack.context.getString(R.string.command_module_module_has_no_source_6c6aa, module)
             }
             send(pack, "refresh", module)
-            return "Module refresh dispatched: " + module
+            return pack.context.getString(R.string.command_module_module_refresh_dispatched_393eb, module)
         }
 
         if ("-rm" == option || "-remove" == option) {
@@ -131,38 +129,37 @@ class module : CommandAbstraction {
             val module = ModuleManager.normalize(parts[1])
             if (!ModuleManager.isKnown(pack.context, module)) {
                 if (LuaWidgetManager.exists(module)) {
-                    return delegateLuaCommand(pack, "-rm " + module)
+                    return delegateLuaCommand(pack, "-rm $module")
                 }
-                return "Unknown module: " + parts[1]
+                return pack.context.getString(R.string.command_module_unknown_module_8f2c8, parts[1])
             }
             if (ModuleManager.builtIns.contains(module)) {
-                return "Built-in modules cannot be removed. Use module -hide " + module + " instead."
+                return pack.context.getString(R.string.command_module_built_in_modules_cannot_be_removed_use_mod_274e3, module)
             }
             ModuleManager.removeScriptModule(pack.context, module)
             send(pack, "rebuild", null)
-            return "Module removed from registry: " + module
+            return pack.context.getString(R.string.command_module_module_removed_from_registry_adec1, module)
         }
 
         if ("-dock" == option) {
             if (parts.size >= 2) {
-                val dockMode = parts[1]!!.lowercase(Locale.getDefault())
+                val dockMode = parts[1]!!.lowercase(Locale.ROOT)
                 if ("-toggle" == dockMode || "toggle" == dockMode) {
                     val next = !XMLPrefsManager.getBoolean(Behavior.show_module_dock)
                     LauncherSettings.set(pack.context, Behavior.show_module_dock, next.toString())
                     send(pack, "rebuild", null)
-                    return "Module dock " + (if (next) "shown." else "hidden.")
+                    return pack.context.getString(R.string.command_module_module_dock_57231, (if (next) "shown." else "hidden."))
                 }
             }
             if (parts.size < 3) return pack.context.getString(R.string.help_module)
-            val mode = parts[1]!!.lowercase(Locale.getDefault())
+            val mode = parts[1]!!.lowercase(Locale.ROOT)
             val verb: String?
             if ("add" == mode || "-add" == mode) {
                 verb = "added"
             } else if ("remove" == mode || "-remove" == mode || "rm" == mode || "-rm" == mode) {
                 verb = "removed"
             } else {
-                return (pack.context.getString(R.string.output_invalid_param) + " " + parts[1]
-                        + "\nUse module -dock -toggle, module -dock add [name], or module -dock remove [name].")
+                return (pack.context.getString(R.string.command_module_use_module_dock_toggle_module_dock_add_nam_1c820, pack.context.getString(R.string.output_invalid_param), parts[1]))
             }
 
             val modules: MutableList<String?> =
@@ -173,7 +170,7 @@ class module : CommandAbstraction {
                 ModuleManager.removeFromDock(pack.context, modules)
             }
             send(pack, "rebuild", null)
-            return "Module dock " + verb + ": " + formatDock(pack)
+            return pack.context.getString(R.string.command_module_module_dock_1a438, verb, formatDock(pack))
         }
 
         return pack.context.getString(R.string.output_invalid_param) + " " + parts[0]
@@ -187,10 +184,7 @@ class module : CommandAbstraction {
                 localLua.add(id)
             }
         }
-        return ("Modules: " + TextUtils.join(", ", modules)
-                + (if (localLua.isEmpty()) "" else "\nLocal Lua modules: " + TextUtils.join(", ", localLua))
-                + "\nDock: " + formatDock(pack)
-                + "\nUse module -new lua [name], module -edit [name], module -config [name], module -check [name], module -add [name] termux:/path/script.sh, module -refresh [name], module -show [name], events -access, module -prompt reminder add|edit|remove, module -hide [name], module -dock -toggle, module -dock add [name], module -dock remove [name], module -rm [name], module -close.")
+        return (pack.context.getString(R.string.command_module_modules_dock_use_module_new_lua_name_modul_c2582, TextUtils.join(", ", modules), (if (localLua.isEmpty()) "" else pack.context.getString(R.string.command_module_local_lua_modules_e9afe, TextUtils.join(", ", localLua))), formatDock(pack)))
     }
 
     private fun formatDock(pack: ExecutePack): String? {
@@ -206,13 +200,13 @@ class module : CommandAbstraction {
         val requestedName = TextUtils.join(" ", args.subList(2, args.size)).trim { it <= ' ' }
         val id = LuaWidgetManager.idFromName(requestedName)
         if (TextUtils.isEmpty(id)) {
-            return "Invalid Lua module id."
+            return pack.context.getString(R.string.command_module_invalid_lua_module_id_123ed)
         }
         if (!LuaWidgetManager.exists(id)) {
             LuaWidgetManager.save(id, requestedName, LuaWidgetManager.newWidgetTemplate(id))
         }
         WidgetEditorActivity.openWidget(pack.context, id)
-        return "Lua module created: " + id
+        return pack.context.getString(R.string.command_module_lua_module_created_31196, id)
     }
 
     private fun isLuaModuleCommand(option: String?): Boolean {

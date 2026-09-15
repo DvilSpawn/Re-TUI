@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher.commands.main.raw
 
+import ohi.andre.consolelauncher.R
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -79,17 +80,18 @@ class FilesCommandTest {
     @Test
     fun rejectsMissingStructuredArguments() {
         assertEquals(
-            "Usage: files -search <name> [type]",
+            R.string.files_usage_search,
             files.parseRequest("-search").error
         )
         assertEquals(
-            "Usage: files -open <file>",
+            R.string.files_usage_open,
             files.parseRequest("-open").error
         )
     }
 
     @Test
     fun rejectsRemovedLegacySearchShorthand() {
-        assertEquals("Unknown files option: note", files.parseRequest("note txt").error)
+        assertEquals(R.string.files_unknown_option, files.parseRequest("note txt").error)
+        assertEquals("note", files.parseRequest("note txt").errorArgument)
     }
 }

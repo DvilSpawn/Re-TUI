@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher.managers.xml.options
 
+import ohi.andre.consolelauncher.R
 import android.os.Build
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsElement
@@ -18,8 +19,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.BOOLEAN
         }
 
-        override fun info(): String? {
-            return "Hide/show the enter button"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_show_enter_button_description
         }
     },
     system_font {
@@ -31,8 +32,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.BOOLEAN
         }
 
-        override fun info(): String? {
-            return "If false, the default Re:T-UI font (\"Lucida Console\") will be used for all texts"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_system_font_description
         }
     },
     ram_size {
@@ -44,8 +45,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "The ram label font size"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_ram_size_description
         }
     },
     battery_size {
@@ -57,8 +58,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "The battery label font size"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_battery_size_description
         }
     },
     device_size {
@@ -70,8 +71,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "The device label font size"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_device_size_description
         }
     },
     time_size {
@@ -83,8 +84,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "The time label font size"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_time_size_description
         }
     },
     storage_size {
@@ -96,8 +97,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "The storage label font size"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_storage_size_description
         }
     },
     network_size {
@@ -109,8 +110,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "The network label font size"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_network_size_description
         }
     },
     notes_size {
@@ -122,8 +123,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "Notes size"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_notes_size_description
         }
     },
     input_output_size {
@@ -135,8 +136,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "The input/output font size"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_input_output_size_description
         }
     },
 
@@ -149,8 +150,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.BOOLEAN
         }
 
-        override fun info(): String? {
-            return "If false, the RAM label will be hidden"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_show_ram_description
         }
     },
     show_device_name {
@@ -162,8 +163,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.BOOLEAN
         }
 
-        override fun info(): String? {
-            return "If false, the device label will be hidden"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_show_device_name_description
         }
     },
     show_battery {
@@ -175,8 +176,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.BOOLEAN
         }
 
-        override fun info(): String? {
-            return "If false, the battery label will be hidden"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_show_battery_description
         }
     },
     show_network_info {
@@ -188,8 +189,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.BOOLEAN
         }
 
-        override fun info(): String? {
-            return "If false, the network info label will be hidden"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_show_network_info_description
         }
     },
     show_storage_info {
@@ -201,8 +202,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.BOOLEAN
         }
 
-        override fun info(): String? {
-            return "If false, the time label will be hidden"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_show_storage_info_description
         }
     },
     show_notes {
@@ -214,8 +215,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.BOOLEAN
         }
 
-        override fun info(): String? {
-            return "If false, the notes label will be hidden"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_show_notes_description
         }
     },
     enable_battery_status {
@@ -227,8 +228,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.BOOLEAN
         }
 
-        override fun info(): String? {
-            return "If true, battery text color will change when your battery level reaches different percentages: battery_text_high, battery_text_medium, battery_text_low. If false, only battery_text_high is used"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_enable_battery_status_description
         }
     },
     show_time {
@@ -240,8 +241,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.BOOLEAN
         }
 
-        override fun info(): String? {
-            return "If false, the time label will be hidden"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_show_time_description
         }
     },
     username {
@@ -253,8 +254,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.TEXT
         }
 
-        override fun info(): String? {
-            return "Your username"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_username_description
         }
     },
     deviceName {
@@ -266,8 +267,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.TEXT
         }
 
-        override fun info(): String? {
-            return "Your device name"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_devicename_description
         }
     },
     system_wallpaper {
@@ -279,8 +280,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.BOOLEAN
         }
 
-        override fun info(): String? {
-            return "If true, your system wallpaper will be used as background"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_system_wallpaper_description
         }
     },
     auto_color_pick {
@@ -292,8 +293,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.BOOLEAN
         }
 
-        override fun info(): String? {
-            return "Legacy migration flag; wallpaper -auto now saves a one-time color snapshot"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_auto_color_pick_description
         }
     },
     enable_crt_vignette {
@@ -305,8 +306,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.BOOLEAN
         }
 
-        override fun info(): String? {
-            return "If true, the CRT filter darkens screen edges with a radial vignette"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_enable_crt_vignette_description
         }
     },
     font_file {
@@ -318,8 +319,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.TEXT
         }
 
-        override fun info(): String? {
-            return "Selected custom font file name from the fonts folder"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_font_file_description
         }
     },
     font_size_offset {
@@ -331,8 +332,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "Adds this many points to Launcher text sizes without changing their individual size settings"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_font_size_offset_description
         }
     },
     fullscreen {
@@ -344,8 +345,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.BOOLEAN
         }
 
-        override fun info(): String? {
-            return "If true, Re:T-UI will run in fullscreen mode"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_fullscreen_description
         }
     },
     device_index {
@@ -357,8 +358,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."
+        override fun infoRes(): Int {
+            return R.string.setting_ui_device_index_description
         }
     },
     ram_index {
@@ -370,8 +371,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."
+        override fun infoRes(): Int {
+            return R.string.setting_ui_ram_index_description
         }
     },
     battery_index {
@@ -383,8 +384,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."
+        override fun infoRes(): Int {
+            return R.string.setting_ui_battery_index_description
         }
     },
     time_index {
@@ -396,8 +397,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."
+        override fun infoRes(): Int {
+            return R.string.setting_ui_time_index_description
         }
     },
     show_ascii {
@@ -409,8 +410,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.BOOLEAN
         }
 
-        override fun info(): String? {
-            return "Show the ASCII art from ascii.txt. WARNING: wide art may overflow or wrap on small screens."
+        override fun infoRes(): Int {
+            return R.string.setting_ui_show_ascii_description
         }
     },
     show_ascii_landscape {
@@ -422,8 +423,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.BOOLEAN
         }
 
-        override fun info(): String? {
-            return "Show the ASCII art while the landscape layout is active"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_show_ascii_landscape_description
         }
     },
     ascii_index {
@@ -435,8 +436,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "ASCII always uses its own status row so the dedicated viewport remains active. If that whole-number row is occupied, ASCII moves to the next free row."
+        override fun infoRes(): Int {
+            return R.string.setting_ui_ascii_index_description
         }
     },
     ascii_size {
@@ -448,8 +449,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "Legacy ASCII art text size. ASCII now auto-fits to the pane width."
+        override fun infoRes(): Int {
+            return R.string.setting_ui_ascii_size_description
         }
     },
     ascii_max_lines {
@@ -461,8 +462,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "Number of source rows shown in the ASCII viewport. Use -1 to auto-zoom wide art."
+        override fun infoRes(): Int {
+            return R.string.setting_ui_ascii_max_lines_description
         }
     },
     ascii_pane_height_rows {
@@ -474,8 +475,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "Maximum physical height of the ASCII pane, measured in text rows."
+        override fun infoRes(): Int {
+            return R.string.setting_ui_ascii_pane_height_rows_description
         }
     },
     storage_index {
@@ -487,8 +488,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."
+        override fun infoRes(): Int {
+            return R.string.setting_ui_storage_index_description
         }
     },
     network_index {
@@ -500,8 +501,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."
+        override fun infoRes(): Int {
+            return R.string.setting_ui_network_index_description
         }
     },
     notes_index {
@@ -513,8 +514,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."
+        override fun infoRes(): Int {
+            return R.string.setting_ui_notes_index_description
         }
     },
     ram_status_alignment {
@@ -526,8 +527,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "RAM status line alignment (<0 = left, =0 = center, >0 = right)"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_ram_status_alignment_description
         }
     },
     device_status_alignment {
@@ -539,8 +540,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "Device status line alignment (<0 = left, =0 = center, >0 = right)"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_device_status_alignment_description
         }
     },
     time_status_alignment {
@@ -552,8 +553,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "Time status line alignment (<0 = left, =0 = center, >0 = right)"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_time_status_alignment_description
         }
     },
     battery_status_alignment {
@@ -565,8 +566,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "Battery status line alignment (<0 = left, =0 = center, >0 = right)"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_battery_status_alignment_description
         }
     },
     storage_status_alignment {
@@ -578,8 +579,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "Storage status line alignment (<0 = left, =0 = center, >0 = right)"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_storage_status_alignment_description
         }
     },
     network_status_alignment {
@@ -591,8 +592,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "Network status line alignment (<0 = left, =0 = center, >0 = right)"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_network_status_alignment_description
         }
     },
     notes_status_alignment {
@@ -604,8 +605,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "Notes status line alignment (<0 = left, =0 = center, >0 = right)"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_notes_status_alignment_description
         }
     },
     weather_status_alignment {
@@ -617,8 +618,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "Weather status line alignment (<0 = left, =0 = center, >0 = right)"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_weather_status_alignment_description
         }
     },
     unlock_status_alignment {
@@ -630,8 +631,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "Unlock counter status line alignment (<0 = left, =0 = center, >0 = right)"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_unlock_status_alignment_description
         }
     },
     ascii_status_alignment {
@@ -643,8 +644,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "ASCII status line alignment (<0 = left, =0 = center, >0 = right)"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_ascii_status_alignment_description
         }
     },
     input_prefix {
@@ -656,8 +657,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.TEXT
         }
 
-        override fun info(): String? {
-            return "The prefix placed before every input"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_input_prefix_description
         }
     },
     input_root_prefix {
@@ -669,8 +670,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.TEXT
         }
 
-        override fun info(): String? {
-            return "The prefix placed before a root command (\"su ...\")"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_input_root_prefix_description
         }
     },
     display_margin_top_section {
@@ -682,8 +683,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.TEXT
         }
 
-        override fun info(): String? {
-            return "Complete top pane group margins in millimeters: [left],[top],[right],[bottom]"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_display_margin_top_section_description
         }
     },
     display_margin_bottom_section {
@@ -695,8 +696,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.TEXT
         }
 
-        override fun info(): String? {
-            return "Bottom terminal/input section display margin in millimeters. [left margin],[top margin],[right margin],[bottom margin]"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_display_margin_bottom_section_description
         }
     },
     display_margin_landscape_mm {
@@ -708,8 +709,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.TEXT
         }
 
-        override fun info(): String? {
-            return "Landscape display margin in millimeters. [left margin],[top margin],[right margin],[bottom margin]"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_display_margin_landscape_mm_description
         }
     },
     landscape_fold_gutter_mm {
@@ -721,8 +722,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "Landscape-only center gutter in millimeters for fold hinges or screen creases"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_landscape_fold_gutter_mm_description
         }
     },
     split_duo_launcher {
@@ -734,8 +735,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.BOOLEAN
         }
 
-        override fun info(): String? {
-            return "If true, Duo keeps the status lines and side switch button on the empty screen while output, input, toolbar, and suggestions stay on the active screen"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_split_duo_launcher_description
         }
     },
     show_app_installed {
@@ -747,8 +748,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.BOOLEAN
         }
 
-        override fun info(): String? {
-            return "If true, you will receive a message when you install an app"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_show_app_installed_description
         }
     },
     show_app_uninstalled {
@@ -760,8 +761,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.BOOLEAN
         }
 
-        override fun info(): String? {
-            return "If true, you will receive a message when you uninstall an app"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_show_app_uninstalled_description
         }
     },
     show_session_info {
@@ -773,8 +774,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.BOOLEAN
         }
 
-        override fun info(): String? {
-            return "If true, when your input field is empty there will be a short line containing some information about the current session"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_show_session_info_description
         }
     },
     notes_header {
@@ -786,8 +787,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.TEXT
         }
 
-        override fun info(): String? {
-            return "The header above your notes"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_notes_header_description
         }
     },
     notes_footer {
@@ -799,8 +800,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.TEXT
         }
 
-        override fun info(): String? {
-            return "The footer below your notes"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_notes_footer_description
         }
     },
     notes_divider {
@@ -812,8 +813,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.TEXT
         }
 
-        override fun info(): String? {
-            return "The divider between two notes"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_notes_divider_description
         }
     },
     show_restart_message {
@@ -821,8 +822,8 @@ enum class Ui : XMLPrefsSave {
             return "true"
         }
 
-        override fun info(): String? {
-            return "If false, the restart message won\'t be shown"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_show_restart_message_description
         }
 
         override fun type(): String? {
@@ -834,8 +835,8 @@ enum class Ui : XMLPrefsSave {
             return "12"
         }
 
-        override fun info(): String? {
-            return "The max number of lines of notes (-1 to disable)"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_notes_max_lines_description
         }
 
         override fun type(): String? {
@@ -847,8 +848,8 @@ enum class Ui : XMLPrefsSave {
             return "true"
         }
 
-        override fun info(): String? {
-            return "If true, you will get a message when your notes reach the value set in notes_max_lines"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_show_scroll_notes_message_description
         }
 
         override fun type(): String? {
@@ -860,8 +861,8 @@ enum class Ui : XMLPrefsSave {
             return "true"
         }
 
-        override fun info(): String? {
-            return "If true, you will see a label containing the weather in your area"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_show_weather_description
         }
 
         override fun type(): String? {
@@ -877,8 +878,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."
+        override fun infoRes(): Int {
+            return R.string.setting_ui_weather_index_description
         }
     },
     weather_size {
@@ -890,8 +891,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "Weather size"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_weather_size_description
         }
     },
     show_unlock_counter {
@@ -903,8 +904,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.BOOLEAN
         }
 
-        override fun info(): String? {
-            return "If false, the unlock counter feature will be disabled"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_show_unlock_counter_description
         }
     },
     unlock_index {
@@ -916,8 +917,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."
+        override fun infoRes(): Int {
+            return R.string.setting_ui_unlock_index_description
         }
     },
     unlock_size {
@@ -929,8 +930,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "Unlock size"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_unlock_size_description
         }
     },
     statusbar_light_icons {
@@ -942,8 +943,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.BOOLEAN
         }
 
-        override fun info(): String? {
-            return "If true, your status bar icons will be white. Dark otherwise"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_statusbar_light_icons_description
         }
     },
     shadow_params {
@@ -955,8 +956,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.TEXT
         }
 
-        override fun info(): String? {
-            return "[Shadow X offset],[Shadow Y offset],[Shadow radius]"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_shadow_params_description
         }
     },
     text_redraw_times {
@@ -968,8 +969,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "A greater value will produce a bigger outline"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_text_redraw_times_description
         }
     },
     status_lines_margins {
@@ -981,8 +982,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.TEXT
         }
 
-        override fun info(): String? {
-            return "Status-row text padding in pixels: [left],[top],[right],[bottom]"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_status_lines_margins_description
         }
     },
     output_field_margins {
@@ -994,8 +995,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.TEXT
         }
 
-        override fun info(): String? {
-            return "[horizontal_margin],[vertical_margin],[horizontal_padding],[vertical_padding]"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_output_field_margins_description
         }
     },
     output_tray_max_height {
@@ -1007,8 +1008,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "Maximum height for the expanded output tray in dp. 0 keeps the default adaptive height"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_output_tray_max_height_description
         }
     },
     input_field_margins {
@@ -1020,8 +1021,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.TEXT
         }
 
-        override fun info(): String? {
-            return "The dimension of the input field (where cmds are inserted). [horizontal_margin],[vertical_margin],[horizontal_padding],[vertical_padding]"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_input_field_margins_description
         }
     },
     input_area_margins {
@@ -1033,8 +1034,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.TEXT
         }
 
-        override fun info(): String? {
-            return "The dimension of the input area (prefix + input field + toolbar + suggestions). [horizontal_margin],[vertical_margin],[horizontal_padding],[vertical_padding]"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_input_area_margins_description
         }
     },
     toolbar_margins {
@@ -1046,8 +1047,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.TEXT
         }
 
-        override fun info(): String? {
-            return "[horizontal_margin],[vertical_margin],[horizontal_padding],[vertical_padding]"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_toolbar_margins_description
         }
     },
     android_widget_grid_columns {
@@ -1059,8 +1060,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "Base column count for the Android widget drawer. Rows and landscape columns are computed from square cells"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_android_widget_grid_columns_description
         }
     },
     android_widget_min_columns {
@@ -1072,8 +1073,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "Fallback starting width when a widget app does not provide valid Android sizing metadata"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_android_widget_min_columns_description
         }
     },
     android_widget_min_rows {
@@ -1085,8 +1086,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "Fallback starting height when a widget app does not provide valid Android sizing metadata"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_android_widget_min_rows_description
         }
     },
     suggestions_area_margin {
@@ -1098,8 +1099,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.TEXT
         }
 
-        override fun info(): String? {
-            return "Suggestion pane spacing in pixels: [outer horizontal margin],[outer vertical margin],[inner horizontal padding],[inner vertical padding]. Also applies to contextual module suggestions; it does not control spacing between chips or module-dock buttons."
+        override fun infoRes(): Int {
+            return R.string.setting_ui_suggestions_area_margin_description
         }
     },
     module_dock_spacing_dp {
@@ -1111,8 +1112,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "Space between module-dock buttons in density-independent pixels."
+        override fun infoRes(): Int {
+            return R.string.setting_ui_module_dock_spacing_dp_description
         }
     },
     enable_dashed_border {
@@ -1124,8 +1125,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.BOOLEAN
         }
 
-        override fun info(): String? {
-            return "If true, terminal windows (Music, Apps Drawer, Input/Output) will use an ASCII-style dashed border"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_enable_dashed_border_description
         }
     },
     dashed_border_dash_length {
@@ -1137,8 +1138,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "Length of the dash in the dashed border (dp)"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_dashed_border_dash_length_description
         }
     },
     dashed_border_gap_length {
@@ -1150,8 +1151,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "Length of the gap in the dashed border (dp)"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_dashed_border_gap_length_description
         }
     },
     dashed_border_stroke_width {
@@ -1163,8 +1164,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.TEXT
         }
 
-        override fun info(): String? {
-            return "Stroke width for dashed borders (dp). Decimal values are allowed"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_dashed_border_stroke_width_description
         }
     },
     dashed_border_corner_radius {
@@ -1176,8 +1177,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "Default rounded corner radius for dashed borders (dp). Specific module, output, and header corner radius settings override this when changed"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_dashed_border_corner_radius_description
         }
     },
     module_corner_radius {
@@ -1189,8 +1190,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "Rounded corner radius for module panels and module controls (dp)"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_module_corner_radius_description
         }
     },
     output_corner_radius {
@@ -1202,8 +1203,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "Rounded corner radius for the output terminal panel (dp)"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_output_corner_radius_description
         }
     },
     header_corner_radius {
@@ -1215,8 +1216,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "Rounded corner radius for module and output header boxes (dp)"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_header_corner_radius_description
         }
     },
     module_header_text_size {
@@ -1228,8 +1229,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "Text size for module header labels and close boxes (sp)"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_module_header_text_size_description
         }
     },
     module_body_text_size {
@@ -1241,8 +1242,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "Text size for built-in module body text and controls (sp)"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_module_body_text_size_description
         }
     },
     output_header_text_size {
@@ -1254,8 +1255,8 @@ enum class Ui : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "Text size for output and overlay header labels (sp)"
+        override fun infoRes(): Int {
+            return R.string.setting_ui_output_header_text_size_description
         }
     };
 

@@ -1,0 +1,596 @@
+<resources>
+    <!-- Command responses. Translate prose; preserve examples and format arguments. -->
+    <!-- bluetooth.kt: exec -->
+    <string name="command_bluetooth_false_4603a">"%1$s false"</string>
+    <!-- bluetooth.kt: exec -->
+    <string name="command_bluetooth_opening_bluetooth_settings_android_no_long_c4672" formatted="false">"Opening Bluetooth settings. Android no longer allows third-party launchers to toggle Bluetooth directly."</string>
+    <!-- bluetooth.kt: exec -->
+    <string name="command_bluetooth_true_630fa">"%1$s true"</string>
+    <!-- breach.kt: exec -->
+    <string name="command_breach_opening_breach_192de" formatted="false">"Opening breach..."</string>
+    <!-- cntcts.kt: exec -->
+    <string name="command_cntcts_contacted_53402" formatted="false">"Contacted "</string>
+    <!-- cntcts.kt: exec -->
+    <string name="command_cntcts_id_f63a6" formatted="false">"ID: "</string>
+    <!-- cntcts.kt: exec -->
+    <string name="command_cntcts_time_s_2e6ee" formatted="false">" time(s)"</string>
+    <!-- config.kt: exec -->
+    <string name="command_config_path_e8427">"Path: %1$s"</string>
+    <!-- config.kt: exec -->
+    <string name="command_config_type_default_75261">"Type:%1$s%2$s%3$sDefault:%4$s%5$s%6$s%7$s"</string>
+    <!-- debug.kt: exec -->
+    <string name="command_debug_preset_dir_cb906" formatted="false">"Preset dir: "</string>
+    <!-- debug.kt: exec -->
+    <string name="command_debug_saved_built_in_presets_69f98" formatted="false">"Saved + built-in presets"</string>
+    <!-- devutils.kt: exec -->
+    <string name="command_devutils_dev_reply_notification_posted_3cb7a" formatted="false">"Dev reply notification posted."</string>
+    <!-- devutils.kt: exec -->
+    <string name="command_devutils_dev_utils_325dc" formatted="false">"Dev Utils"</string>
+    <!-- devutils.kt: exec -->
+    <string name="command_devutils_notification_access_notification_service_r_b8c8b">"Notification access: %1$b%2$sNotification service running: %3$b"</string>
+    <!-- devutils.kt: exec -->
+    <string name="command_devutils_notification_permission_is_not_granted_2fd2a" formatted="false">"Notification permission is not granted."</string>
+    <!-- devutils.kt: exec -->
+    <string name="command_devutils_reply_6c2bb" formatted="false">"Reply"</string>
+    <!-- devutils.kt: exec -->
+    <string name="command_devutils_usage_devutils_notify_reply_title_text_97505" formatted="false">"Usage: devutils -notify_reply &lt;title&gt; &lt;text&gt;"</string>
+    <!-- duo.kt: onNotArgEnough -->
+    <string name="command_duo_duo_command_is_disabled_enable_it_with_con_7aacc" formatted="false">"Duo command is disabled. Enable it with: config -set duo_mode true"</string>
+    <!-- duo.kt: appliedMessage -->
+    <string name="command_duo_duo_layout_active_on_the_side_ff742">"Duo layout active on the %1$s side."</string>
+    <!-- duo.kt: exec -->
+    <string name="command_duo_duo_layout_is_only_available_from_the_laun_26934" formatted="false">"Duo layout is only available from the launcher screen."</string>
+    <!-- duo.kt: exec -->
+    <string name="command_duo_duo_layout_off_normal_landscape_split_rest_ab679" formatted="false">"Duo layout off. Normal landscape split restored."</string>
+    <!-- duo.kt: exec -->
+    <string name="command_duo_unknown_duo_option_usage_b3f91">"Unknown duo option: %1$s\nUsage: %2$s"</string>
+    <!-- duo.kt: appliedMessage -->
+    <string name="command_duo_use_a_wide_landscape_window_to_see_it_770de" formatted="false">" Use a wide landscape window to see it."</string>
+    <!-- events.kt: exec -->
+    <string name="command_events_calendar_access_already_granted_e615f" formatted="false">"Calendar access already granted."</string>
+    <!-- events.kt: exec -->
+    <string name="command_events_calendar_access_must_be_granted_from_andro_48275" formatted="false">"Calendar access must be granted from Android settings."</string>
+    <!-- events.kt: exec -->
+    <string name="command_events_calendar_access_requested_62085" formatted="false">"Calendar access requested."</string>
+    <!-- events.kt: exec -->
+    <string name="command_events_events_is_an_editable_termux_module_now_cr_e09d6" formatted="false">"Events is an editable Termux module now.\nCreate ~/retui/events.sh with: events -module\nThen run: module -add events termux:/data/data/com.termux/files/home/retui/events.sh"</string>
+    <!-- events.kt: exec -->
+    <string name="command_events_events_is_an_editable_termux_module_run_ev_734cb" formatted="false">"Events is an editable Termux module. Run events -module for the script, then module -add events termux:/data/data/com.termux/files/home/retui/events.sh"</string>
+    <!-- events.kt: exec -->
+    <string name="command_events_events_lookahead_days_after_today_usage_ev_98fd1">"Events lookahead: %1$d days after today.\nUsage: events -lookahead [days]"</string>
+    <!-- events.kt: exec -->
+    <string name="command_events_invalid_lookahead_7cbc8">"Invalid lookahead: %1$s"</string>
+    <!-- events.kt: exec -->
+    <string name="command_events_launcher_events_lookahead_set_today_days_8cdfd">"Launcher events lookahead set: today + %1$d days."</string>
+    <!-- events.kt: exec -->
+    <string name="command_events_launcher_events_lookahead_set_today_only_9b01c" formatted="false">"Launcher events lookahead set: today only."</string>
+    <!-- events.kt: exec -->
+    <string name="command_events_module_opened_events_4a38b" formatted="false">"Module opened: events"</string>
+    <!-- hack.kt: exec -->
+    <string name="command_hack_injecting_cinematic_nonsense_5b526" formatted="false">"Injecting cinematic nonsense..."</string>
+    <!-- help.kt: exec -->
+    <string name="command_help_priority_6d8fc">"Priority: %1$d%2$s%3$s"</string>
+    <!-- inspect.kt: inspectPackage -->
+    <string name="command_inspect_common_intents_f22d7" formatted="false">"Common intents:"</string>
+    <!-- inspect.kt: inspectPackage -->
+    <string name="command_inspect_exported_activities_b6ea7" formatted="false">"Exported activities"</string>
+    <!-- inspect.kt: inspectPackage -->
+    <string name="command_inspect_exported_providers_8cbae" formatted="false">"Exported providers"</string>
+    <!-- inspect.kt: inspectPackage -->
+    <string name="command_inspect_exported_receivers_2f5cd" formatted="false">"Exported receivers"</string>
+    <!-- inspect.kt: inspectPackage -->
+    <string name="command_inspect_exported_services_4f00c" formatted="false">"Exported services"</string>
+    <!-- inspect.kt: inspectPackage -->
+    <string name="command_inspect_package_not_found_3c09b">"Package not found: %1$s"</string>
+    <!-- install.kt: exec -->
+    <string name="command_install_install_is_deprecated_use_search_ps_53a0b">"install is deprecated. Use search -ps %1$s."</string>
+    <!-- intent.kt: exec -->
+    <string name="command_intent_broadcast_sent_6b672">"Broadcast sent: %1$s"</string>
+    <!-- intent.kt: exec -->
+    <string name="command_intent_intent_activity_needs_a_or_n_to_inspect_an_e40f0">"intent -activity needs -a or -n. To inspect an app, use inspect %1$s"</string>
+    <!-- intent.kt: exec -->
+    <string name="command_intent_intent_blocked_by_android_security_cc669">"Intent blocked by Android security: %1$s"</string>
+    <!-- intent.kt: exec -->
+    <string name="command_intent_intent_broadcast_requires_a_action_ff8fc" formatted="false">"intent -broadcast requires -a &lt;action&gt;"</string>
+    <!-- intent.kt: exec -->
+    <string name="command_intent_intent_broadcast_requires_p_or_n_add_unsaf_a14a0" formatted="false">"intent -broadcast requires -p or -n. Add --unsafe-implicit to send a broad implicit broadcast."</string>
+    <!-- intent.kt: exec -->
+    <string name="command_intent_invalid_intent_47ae3">"Invalid intent: %1$s"</string>
+    <!-- intent.kt: exec -->
+    <string name="command_intent_no_activity_found_for_intent_d8576" formatted="false">"No activity found for intent."</string>
+    <!-- location.kt: exec -->
+    <string name="command_location_lat_long_930e8">"Lat: %1$f; Long: %2$f"</string>
+    <!-- lockdown.kt: exec -->
+    <string name="command_lockdown_a_lockdown_is_already_active_68d6d" formatted="false">"A lockdown is already active."</string>
+    <!-- lockdown.kt: exec -->
+    <string name="command_lockdown_cancel_1507c" formatted="false">"CANCEL"</string>
+    <!-- lockdown.kt: exec -->
+    <string name="command_lockdown_hours_9e25a" formatted="false">"Hours"</string>
+    <!-- lockdown.kt: exec -->
+    <string name="command_lockdown_invalid_lockdown_option_716ed">"Invalid lockdown option: %1$s"</string>
+    <!-- lockdown.kt: exec -->
+    <string name="command_lockdown_minutes_092f9" formatted="false">"Minutes"</string>
+    <!-- lockdown.kt: exec -->
+    <string name="command_lockdown_new_lockdown_eb76f" formatted="false">"NEW LOCKDOWN"</string>
+    <!-- lockdown.kt: exec -->
+    <string name="command_lockdown_opening_lockdown_setup_25318" formatted="false">"Opening Lockdown setup..."</string>
+    <!-- lockdown.kt: exec -->
+    <string name="command_lockdown_reason_f219c" formatted="false">"Reason"</string>
+    <!-- lockdown.kt: exec -->
+    <string name="command_lockdown_start_7196e" formatted="false">"START"</string>
+    <!-- lockdown.kt: exec -->
+    <string name="command_lockdown_use_the_lockdown_screen_to_spend_credits_u_7424e" formatted="false">"Use the lockdown screen to spend credits, use a breach key, or run emergency breach."</string>
+    <!-- lua.kt: exec -->
+    <string name="command_lua_disabled_de50b" formatted="false">"disabled: "</string>
+    <!-- lua.kt: exec -->
+    <string name="command_lua_enabled_2d378" formatted="false">"enabled: "</string>
+    <!-- lua.kt: createLuaApp -->
+    <string name="command_lua_invalid_lua_app_id_7476c" formatted="false">"Invalid Lua app id."</string>
+    <!-- lua.kt: exec -->
+    <string name="command_lua_lua_app_76bea">"Lua app %1$s%2$s"</string>
+    <!-- lua.kt: exec -->
+    <string name="command_lua_lua_app_approved_permissions_446e4">"Lua app approved: %1$s\nPermissions: %2$s"</string>
+    <!-- lua.kt: checkApp -->
+    <string name="command_lua_lua_app_check_failed_use_lua_edit_to_updat_4ae1d">"Lua app check failed: %1$s%2$s\n%3$s\nUse lua -edit %4$s to update it."</string>
+    <!-- lua.kt: checkApp -->
+    <string name="command_lua_lua_app_check_ok_capabilities_permissions_1a3e2">"Lua app check OK: %1$s\nCapabilities: %2$s\nPermissions: %3$s\nTrust: approved\nRuntime: API %4$s\nTitle: %5$s\nActions: %6$d"</string>
+    <!-- lua.kt: createLuaApp -->
+    <string name="command_lua_lua_app_created_64c8a">"Lua app created: %1$s"</string>
+    <!-- lua.kt: copyToClipboard -->
+    <string name="command_lua_lua_app_d0263" formatted="false">"Lua app"</string>
+    <!-- lua.kt: exec -->
+    <string name="command_lua_lua_app_package_copied_to_clipboard_6c6dc">"Lua app package copied to clipboard: %1$s"</string>
+    <!-- lua.kt: exec -->
+    <string name="command_lua_lua_app_removed_f973e">"Lua app removed: %1$s"</string>
+    <!-- lua.kt: exec -->
+    <string name="command_lua_no_config_surface_92c6f">"No config surface: %1$s"</string>
+    <!-- lua.kt: exec -->
+    <string name="command_lua_opening_lua_app_config_301f2">"Opening Lua app config: %1$s"</string>
+    <!-- lua.kt: exec -->
+    <string name="command_lua_opening_lua_app_editor_d1612">"Opening Lua app editor: %1$s"</string>
+    <!-- lua.kt: checkApp -->
+    <string name="command_lua_stage_76cf8">"\nStage: %1$s"</string>
+    <!-- lua.kt: exec -->
+    <string name="command_lua_unknown_lua_app_e937e">"Unknown Lua app: %1$s"</string>
+    <!-- LuaModuleCommands.kt: exec -->
+    <string name="command_luamodulecommands_invalid_lua_module_action_index_d4245">"Invalid Lua module action index: %1$s"</string>
+    <!-- LuaModuleCommands.kt: exec -->
+    <string name="command_luamodulecommands_invalid_lua_module_dialog_index_a7b13">"Invalid Lua module dialog index: %1$s"</string>
+    <!-- LuaModuleCommands.kt: exec -->
+    <string name="command_luamodulecommands_invalid_lua_module_id_123ed" formatted="false">"Invalid Lua module id."</string>
+    <!-- LuaModuleCommands.kt: exec -->
+    <string name="command_luamodulecommands_lua_error_copied_daae5">"Lua error copied: %1$s"</string>
+    <!-- LuaModuleCommands.kt: exec -->
+    <string name="command_luamodulecommands_lua_module_approved_permissions_2f15f">"Lua module approved: %1$s\nPermissions: %2$s"</string>
+    <!-- LuaModuleCommands.kt: exec -->
+    <string name="command_luamodulecommands_lua_module_check_blocked_dfce4" formatted="false">"Lua module check blocked"</string>
+    <!-- LuaModuleCommands.kt: exec -->
+    <string name="command_luamodulecommands_lua_module_check_failed_use_module_copy_er_e3e83">"Lua module check failed: %1$s%2$s\n%3$s\nUse module -copy-error %4$s or module -edit %5$s."</string>
+    <!-- LuaModuleCommands.kt: exec -->
+    <string name="command_luamodulecommands_lua_module_check_ok_type_capabilities_perm_a9277">"Lua module check OK: %1$s\nType: %2$s\nCapabilities: %3$s\nPermissions: %4$s\nTrust: approved\nRuntime: API %5$s\nTitle: %6$s\nModule buttons: %7$d\nSuggestion chips: %8$d"</string>
+    <!-- LuaModuleCommands.kt: exec -->
+    <string name="command_luamodulecommands_lua_module_config_blocked_41b80" formatted="false">"Lua module config blocked"</string>
+    <!-- LuaModuleCommands.kt: exec -->
+    <string name="command_luamodulecommands_lua_module_created_31196">"Lua module created: %1$s"</string>
+    <!-- LuaModuleCommands.kt: exec -->
+    <string name="command_luamodulecommands_lua_module_disabled_407cc">"Lua module disabled: %1$s"</string>
+    <!-- LuaModuleCommands.kt: exec -->
+    <string name="command_luamodulecommands_lua_module_disabled_use_module_enable_3ad4f">"Lua module disabled: %1$s\nUse module -enable %2$s."</string>
+    <!-- LuaModuleCommands.kt: exec -->
+    <string name="command_luamodulecommands_lua_module_enabled_a1b01">"Lua module enabled: %1$s"</string>
+    <!-- LuaModuleCommands.kt: exec -->
+    <string name="command_luamodulecommands_lua_module_id_already_exists_7eb87">"Lua module id already exists: %1$s"</string>
+    <!-- LuaModuleCommands.kt: exec -->
+    <string name="command_luamodulecommands_lua_module_id_changed_ac703">"Lua module id changed: %1$s -&gt; %2$s"</string>
+    <!-- LuaModuleCommands.kt: exec -->
+    <string name="command_luamodulecommands_lua_module_id_unchanged_f0ada">"Lua module id unchanged: %1$s"</string>
+    <!-- LuaModuleCommands.kt: exec -->
+    <string name="command_luamodulecommands_lua_module_opened_bd9be">"Lua module opened: %1$s"</string>
+    <!-- LuaModuleCommands.kt: exec -->
+    <string name="command_luamodulecommands_lua_module_package_copied_to_clipboard_334d8">"Lua module package copied to clipboard: %1$s"</string>
+    <!-- LuaModuleCommands.kt: exec -->
+    <string name="command_luamodulecommands_lua_module_refresh_dispatched_fc516">"Lua module refresh dispatched: %1$s"</string>
+    <!-- LuaModuleCommands.kt: exec -->
+    <string name="command_luamodulecommands_lua_module_removed_5769f">"Lua module removed: %1$s"</string>
+    <!-- LuaModuleCommands.kt: exec -->
+    <string name="command_luamodulecommands_lua_module_type_capabilities_permissions_t_97c7d">"Lua module: %1$s\nType: %2$s\nCapabilities: %3$s\nPermissions: %4$s\nTrust: %5$s\nRuntime: API %6$s\nState: %7$s\nDescription: %8$s\nAuthor: %9$s\nVersion: %10$s"</string>
+    <!-- LuaModuleCommands.kt: listWidgets -->
+    <string name="command_luamodulecommands_lua_modules_use_module_new_lua_name_module_b0bc0">"Lua modules: %1$s\nUse module -new lua [name], module -edit [id], module -config [id], module -show [id], module -refresh [id], module -check [id], module -info [id], module -approve [id], module -copy-error [id], module -disable|-enable [id], module -export [id], module -expand|-collapse|-toggle [id].\nLegacy widget aliases still work."</string>
+    <!-- LuaModuleCommands.kt: exec -->
+    <string name="command_luamodulecommands_needs_approval_e0c3e" formatted="false">"needs approval"</string>
+    <!-- LuaModuleCommands.kt: exec -->
+    <string name="command_luamodulecommands_no_config_surface_92c6f">"No config surface: %1$s"</string>
+    <!-- LuaModuleCommands.kt: exec -->
+    <string name="command_luamodulecommands_no_saved_lua_error_34d62">"No saved Lua error: %1$s"</string>
+    <!-- LuaModuleCommands.kt: exec -->
+    <string name="command_luamodulecommands_opening_lua_module_config_bf40a">"Opening Lua module config: %1$s"</string>
+    <!-- LuaModuleCommands.kt: exec -->
+    <string name="command_luamodulecommands_opening_lua_module_editor_e9fb2">"Opening Lua module editor: %1$s"</string>
+    <!-- LuaModuleCommands.kt: copyToClipboard -->
+    <string name="command_luamodulecommands_re_tui_lua_module_package_c1350" formatted="false">"Re:TUI Lua module package"</string>
+    <!-- LuaModuleCommands.kt: exec -->
+    <string name="command_luamodulecommands_script_is_not_a_dock_module_a030a">"Script is not a dock module: %1$s"</string>
+    <!-- LuaModuleCommands.kt: exec -->
+    <string name="command_luamodulecommands_stage_76cf8">"\nStage: %1$s"</string>
+    <!-- LuaModuleCommands.kt: exec -->
+    <string name="command_luamodulecommands_unknown_lua_module_ef4ca">"Unknown Lua module: %1$s"</string>
+    <!-- mode.kt: exec -->
+    <string name="command_mode_classic_mode_enabled_dd49a" formatted="false">"Classic mode enabled."</string>
+    <!-- mode.kt: exec -->
+    <string name="command_mode_search_mode_enabled_ba524" formatted="false">"Search mode enabled."</string>
+    <!-- mode.kt: exec -->
+    <string name="command_mode_unknown_launcher_mode_usage_mode_search_cl_a86ba">"Unknown launcher mode: %1$s\nUsage: mode search|classic"</string>
+    <!-- module.kt: exec -->
+    <string name="command_module_built_in_modules_cannot_be_removed_use_mod_274e3">"Built-in modules cannot be removed. Use module -hide %1$s instead."</string>
+    <!-- module.kt: createLuaModule -->
+    <string name="command_module_invalid_lua_module_id_123ed" formatted="false">"Invalid Lua module id."</string>
+    <!-- module.kt: listModules -->
+    <string name="command_module_local_lua_modules_e9afe">"\nLocal Lua modules: %1$s"</string>
+    <!-- module.kt: createLuaModule -->
+    <string name="command_module_lua_module_created_31196">"Lua module created: %1$s"</string>
+    <!-- module.kt: exec -->
+    <string name="command_module_module_added_source_run_module_refresh_to_829ce">"Module added: %1$s\nSource: %2$s\nRun module -refresh %3$s to update it."</string>
+    <!-- module.kt: exec -->
+    <string name="command_module_module_closed_60998" formatted="false">"Module closed."</string>
+    <!-- module.kt: exec -->
+    <string name="command_module_module_dock_1a438">"Module dock %1$s: %2$s"</string>
+    <!-- module.kt: exec -->
+    <string name="command_module_module_dock_57231">"Module dock %1$s"</string>
+    <!-- module.kt: exec -->
+    <string name="command_module_module_has_no_source_6c6aa">"Module has no source: %1$s"</string>
+    <!-- module.kt: exec -->
+    <string name="command_module_module_hidden_from_dock_b5569">"Module hidden from dock: %1$s"</string>
+    <!-- module.kt: exec -->
+    <string name="command_module_module_opened_a33ed">"Module opened: %1$s"</string>
+    <!-- module.kt: exec -->
+    <string name="command_module_module_refresh_dispatched_393eb">"Module refresh dispatched: %1$s"</string>
+    <!-- module.kt: exec -->
+    <string name="command_module_module_removed_from_registry_adec1">"Module removed from registry: %1$s"</string>
+    <!-- module.kt: listModules -->
+    <string name="command_module_modules_dock_use_module_new_lua_name_modul_c2582">"Modules: %1$s%2$s\nDock: %3$s\nUse module -new lua [name], module -edit [name], module -config [name], module -check [name], module -add [name] termux:/path/script.sh, module -refresh [name], module -show [name], events -access, module -prompt reminder add|edit|remove, module -hide [name], module -dock -toggle, module -dock add [name], module -dock remove [name], module -rm [name], module -close."</string>
+    <!-- module.kt: exec -->
+    <string name="command_module_no_native_prompt_session_for_module_afcbe">"No native prompt session for module: %1$s"</string>
+    <!-- module.kt: exec -->
+    <!-- module.kt: exec -->
+    <string name="command_module_reminder_edit_prompt_started_6109f" formatted="false">"Reminder edit prompt started."</string>
+    <!-- module.kt: exec -->
+    <string name="command_module_reminder_prompt_started_c9054" formatted="false">"Reminder prompt started."</string>
+    <!-- module.kt: exec -->
+    <string name="command_module_reminder_remove_prompt_started_4df71" formatted="false">"Reminder remove prompt started."</string>
+    <!-- module.kt: exec -->
+    <!-- module.kt: exec -->
+    <!-- module.kt: exec -->
+    <string name="command_module_unknown_module_8f2c8">"Unknown module: %1$s"</string>
+    <!-- module.kt: exec -->
+    <string name="command_module_use_module_dock_toggle_module_dock_add_nam_1c820">"%1$s %2$s\nUse module -dock -toggle, module -dock add [name], or module -dock remove [name]."</string>
+    <!-- music.kt: exec -->
+    <string name="command_music_name_b3f69" formatted="false">"Name: "</string>
+    <!-- music.kt: exec -->
+    <string name="command_music_of_607f2" formatted="false">" of "</string>
+    <!-- music.kt: exec -->
+    <string name="command_music_path_e97fe" formatted="false">"Path: "</string>
+    <!-- notifications.kt: setNotificationTerminal -->
+    <string name="command_notifications_notification_module_added_to_dock_c05a8" formatted="false">"Notification module added to dock."</string>
+    <!-- notifications.kt: exec -->
+    <string name="command_notifications_notification_module_is_not_available_a3d66" formatted="false">"Notification module is not available."</string>
+    <!-- notifications.kt: setNotificationTerminal -->
+    <string name="command_notifications_notification_module_removed_from_dock_70376" formatted="false">"Notification module removed from dock."</string>
+    <!-- orientation.kt: apply -->
+    <string name="command_orientation_auto_orientation_preference_saved_re_t_ui_218c8" formatted="false">"Auto orientation preference saved. Re:T-UI will adapt to the current device or window orientation."</string>
+    <!-- orientation.kt: apply -->
+    <string name="command_orientation_landscape_preference_saved_re_t_ui_will_us_4c485" formatted="false">"Landscape preference saved. Re:T-UI will use the split layout only when the window is wide enough."</string>
+    <!-- orientation.kt: apply -->
+    <string name="command_orientation_portrait_preference_saved_re_t_ui_will_kee_d0e0b" formatted="false">"Portrait preference saved. Re:T-UI will keep the portrait layout even if Android reports landscape."</string>
+    <!-- orientation.kt: apply -->
+    <string name="command_orientation_unknown_orientation_usage_orientation_port_4d4ad">"Unknown orientation: %1$s\nUsage: orientation portrait|landscape|auto"</string>
+    <!-- orientation.kt: apply -->
+    <string name="command_orientation_usage_orientation_portrait_landscape_auto_fbc79">"%1$s\nUsage: orientation portrait|landscape|auto"</string>
+    <!-- pomodoro.kt: exec -->
+    <string name="command_pomodoro_a_pomodoro_session_is_already_active_abd1a" formatted="false">"A Pomodoro session is already active."</string>
+    <!-- pomodoro.kt: exec -->
+    <string name="command_pomodoro_cancel_1507c" formatted="false">"CANCEL"</string>
+    <!-- pomodoro.kt: exec -->
+    <string name="command_pomodoro_goal_9fe00" formatted="false">"Goal"</string>
+    <!-- pomodoro.kt: exec -->
+    <string name="command_pomodoro_new_pomodoro_c0b65" formatted="false">"NEW POMODORO"</string>
+    <!-- pomodoro.kt: exec -->
+    <string name="command_pomodoro_no_pomodoro_session_is_running_248bd" formatted="false">"No Pomodoro session is running."</string>
+    <!-- pomodoro.kt: exec -->
+    <string name="command_pomodoro_not_enough_credits_opening_emergency_breac_e8937" formatted="false">"Not enough credits. Opening emergency breach..."</string>
+    <!-- pomodoro.kt: exec -->
+    <string name="command_pomodoro_opening_pomodoro_setup_32cb0" formatted="false">"Opening Pomodoro setup..."</string>
+    <!-- pomodoro.kt: exec -->
+    <string name="command_pomodoro_pomodoro_session_closed_c9cf3" formatted="false">"Pomodoro session closed."</string>
+    <!-- pomodoro.kt: exec -->
+    <string name="command_pomodoro_pomodoro_session_stopped_d2e19" formatted="false">"Pomodoro session stopped."</string>
+    <!-- pomodoro.kt: exec -->
+    <string name="command_pomodoro_pomodoro_started_7a76d">"Pomodoro started: %1$s"</string>
+    <!-- pomodoro.kt: exec -->
+    <string name="command_pomodoro_pomodoro_stopped_credits_cc0e4">"Pomodoro stopped. -%1$d credits."</string>
+    <!-- pomodoro.kt: exec -->
+    <string name="command_pomodoro_start_7196e" formatted="false">"START"</string>
+    <!-- pomodoro.kt: exec -->
+    <string name="command_pomodoro_what_task_are_we_focusing_on_a99be" formatted="false">"What task are we focusing on?"</string>
+    <!-- post.kt: onResponse -->
+    <string name="command_post_empty_response_a5c48" formatted="false">"Empty Response"</string>
+    <!-- post.kt: onResponse -->
+    <string name="command_post_post_591a3">"POST [%1$d]: %2$s"</string>
+    <!-- post.kt: onFailure -->
+    <string name="command_post_post_error_91b4e">"POST Error: %1$s"</string>
+    <!-- post.kt: exec -->
+    <string name="command_post_sending_post_request_2dba0" formatted="false">"Sending POST request..."</string>
+    <!-- preset.kt: exec -->
+    <string name="command_preset_applied_preset_c132b">"Applied preset: %1$s"</string>
+    <!-- preset.kt: exec -->
+    <string name="command_preset_cancel_77dfd" formatted="false">"Cancel"</string>
+    <!-- preset.kt: exec -->
+    <string name="command_preset_duplicate_972d5" formatted="false">"Duplicate"</string>
+    <!-- preset.kt: exec -->
+    <string name="command_preset_duplicate_preset_76c16" formatted="false">"Duplicate Preset"</string>
+    <!-- preset.kt: exec -->
+    <string name="command_preset_duplicated_as_0b74a">"Duplicated \'%1$s\' as \'%2$s\'."</string>
+    <!-- preset.kt: exec -->
+    <string name="command_preset_enter_a_name_for_the_duplicate_e815f" formatted="false">"Enter a name for the duplicate."</string>
+    <!-- preset.kt: exec -->
+    <string name="command_preset_new_preset_name_0ee29" formatted="false">"New preset name"</string>
+    <!-- preset.kt: exec -->
+    <string name="command_preset_no_presets_found_a6efc" formatted="false">"No presets found."</string>
+    <!-- preset.kt: exec -->
+    <string name="command_preset_preset_applied_0611f">"Preset \'%1$s\' applied."</string>
+    <!-- preset.kt: exec -->
+    <string name="command_preset_preset_removed_0fa34">"Preset \'%1$s\' removed."</string>
+    <!-- preset.kt: exec -->
+    <string name="command_preset_preset_saved_c599d">"Preset \'%1$s\' saved."</string>
+    <!-- preset.kt: exec -->
+    <string name="command_preset_saved_preset_4a339">"Saved preset: %1$s"</string>
+    <!-- reminder.kt: remove -->
+    <string name="command_reminder_reminder_not_found_032c9">"Reminder not found.\n%1$s"</string>
+    <!-- reminder.kt: remove -->
+    <string name="command_reminder_reminder_removed_c83f7">"Reminder removed:\n%1$s"</string>
+    <!-- reminder.kt: add -->
+    <string name="command_reminder_reminder_saved_42413">"Reminder saved:\n%1$s\n%2$s"</string>
+    <!-- reminder.kt: add -->
+    <string name="command_reminder_reminder_time_must_be_in_the_future_3ea25" formatted="false">"Reminder time must be in the future."</string>
+    <!-- reminder.kt: add -->
+    <string name="command_reminder_use_reminder_add_task_name_dd_mm_yy_hh_mm_b2567" formatted="false">"Use: reminder -add &lt;task name&gt; &lt;dd/mm/yy&gt; &lt;HH:mm&gt;"</string>
+    <!-- retuitoken.kt: exec -->
+    <string name="command_retuitoken_callback_auth_disabled_f38f0" formatted="false">"Callback auth disabled."</string>
+    <!-- retuitoken.kt: exec -->
+    <string name="command_retuitoken_callback_auth_enabled_8ae51" formatted="false">"Callback auth enabled."</string>
+    <!-- retuitoken.kt: status -->
+    <string name="command_retuitoken_callback_auth_token_present_3703c">"Callback auth: %1$s%2$sToken present: %3$b"</string>
+    <!-- retuitoken.kt: exec -->
+    <string name="command_retuitoken_callback_token_rotated_7ce91" formatted="false">"Callback token rotated."</string>
+    <!-- retuitoken.kt: copyToken -->
+    <string name="command_retuitoken_re_tui_callback_token_1e777" formatted="false">"Re-TUI callback token"</string>
+    <!-- rss.kt: showAddForm -->
+    <string name="command_rss_add_f9460" formatted="false">"ADD"</string>
+    <!-- rss.kt: showFeedList -->
+    <string name="command_rss_add_feed_dbdaf" formatted="false">"add feed"</string>
+    <!-- rss.kt: showAddForm -->
+    <string name="command_rss_add_rss_feed_9d80f" formatted="false">"ADD RSS FEED"</string>
+    <!-- rss.kt: showAliasForm -->
+    <string name="command_rss_alias_04259" formatted="false">"Alias"</string>
+    <!-- rss.kt: confirmRemove -->
+    <string name="command_rss_cancel_1507c" formatted="false">"CANCEL"</string>
+    <!-- rss.kt: showFeedMenu -->
+    <string name="command_rss_edit_interval_557bc" formatted="false">"edit interval"</string>
+    <!-- rss.kt: showFeedMenu -->
+    <string name="command_rss_edit_url_e7962" formatted="false">"edit url"</string>
+    <!-- rss.kt: showFeedMenu -->
+    <string name="command_rss_hide_from_stream_38c80" formatted="false">"hide from stream"</string>
+    <!-- rss.kt: showAddForm -->
+    <string name="command_rss_id_89f89" formatted="false">"ID"</string>
+    <!-- rss.kt: showFeedList -->
+    <string name="command_rss_no_rss_feeds_saved_d7342" formatted="false">"No RSS feeds saved."</string>
+    <!-- rss.kt: showFeedMenu -->
+    <string name="command_rss_opening_rss_feed_options_2c8a2" formatted="false">"Opening RSS feed options..."</string>
+    <!-- rss.kt: showFeedList -->
+    <string name="command_rss_opening_rss_feeds_b554e" formatted="false">"Opening RSS feeds..."</string>
+    <!-- rss.kt: showAddForm -->
+    <string name="command_rss_opening_rss_setup_17e4d" formatted="false">"Opening RSS setup..."</string>
+    <!-- rss.kt: showAliasForm -->
+    <string name="command_rss_optional_display_name_d7b98" formatted="false">"Optional display name"</string>
+    <!-- rss.kt: showFeedMenu -->
+    <string name="command_rss_refresh_now_39bf9" formatted="false">"refresh now"</string>
+    <!-- rss.kt: showIntervalForm -->
+    <string name="command_rss_refresh_seconds_3114f" formatted="false">"Refresh seconds"</string>
+    <!-- rss.kt: confirmRemove -->
+    <string name="command_rss_remove_f9662" formatted="false">"REMOVE"</string>
+    <!-- rss.kt: confirmRemove -->
+    <string name="command_rss_remove_rss_2af36">"REMOVE RSS %1$d"</string>
+    <!-- rss.kt: confirmRemove -->
+    <string name="command_rss_remove_this_rss_feed_0c52b" formatted="false">"Remove this RSS feed?"</string>
+    <!-- rss.kt: showFeedMenu -->
+    <string name="command_rss_rename_alias_587f3" formatted="false">"rename alias"</string>
+    <!-- rss.kt: showAliasForm -->
+    <string name="command_rss_rss_alias_66634" formatted="false">"RSS ALIAS"</string>
+    <!-- rss.kt: showAliasForm -->
+    <string name="command_rss_rss_alias_cleared_c57e3" formatted="false">"RSS alias cleared."</string>
+    <!-- rss.kt: showAliasForm -->
+    <string name="command_rss_rss_alias_updated_73c49" formatted="false">"RSS alias updated."</string>
+    <!-- rss.kt: showFeedMenu -->
+    <string name="command_rss_rss_f543e">"RSS %1$d"</string>
+    <!-- rss.kt: showAddForm -->
+    <string name="command_rss_rss_feed_added_a32c7" formatted="false">"RSS feed added."</string>
+    <!-- rss.kt: showFeedMenu -->
+    <string name="command_rss_rss_feed_hidden_89571" formatted="false">"RSS feed hidden."</string>
+    <!-- rss.kt: confirmRemove -->
+    <string name="command_rss_rss_feed_removed_2ac75" formatted="false">"RSS feed removed."</string>
+    <!-- rss.kt: showFeedMenu -->
+    <string name="command_rss_rss_feed_shown_ee233" formatted="false">"RSS feed shown."</string>
+    <!-- rss.kt: showFeedList -->
+    <string name="command_rss_rss_feeds_1bfa2" formatted="false">"RSS FEEDS"</string>
+    <!-- rss.kt: showIntervalForm -->
+    <string name="command_rss_rss_interval_dca4f" formatted="false">"RSS INTERVAL"</string>
+    <!-- rss.kt: showIntervalForm -->
+    <string name="command_rss_rss_interval_updated_9c833" formatted="false">"RSS interval updated."</string>
+    <!-- rss.kt: showFeedMenu -->
+    <string name="command_rss_rss_refresh_requested_b09c3" formatted="false">"RSS refresh requested."</string>
+    <!-- rss.kt: showUrlForm -->
+    <string name="command_rss_rss_url_090c6" formatted="false">"RSS URL"</string>
+    <!-- rss.kt: showUrlForm -->
+    <string name="command_rss_rss_url_updated_4de4a" formatted="false">"RSS URL updated."</string>
+    <!-- rss.kt: showIntervalForm -->
+    <string name="command_rss_save_50815" formatted="false">"SAVE"</string>
+    <!-- rss.kt: showFeedMenu -->
+    <string name="command_rss_show_in_stream_ca7b2" formatted="false">"show in stream"</string>
+    <!-- rss.kt: showFeedMenu -->
+    <string name="command_rss_show_latest_b30b3" formatted="false">"show latest"</string>
+    <!-- rss.kt: showUrlForm -->
+    <string name="command_rss_url_0e2d9" formatted="false">"URL"</string>
+    <!-- search.kt: exec -->
+    <string name="command_search_search_param_is_reserved_d1d4f">"Search param %1$s is reserved."</string>
+    <!-- search.kt: exec -->
+    <string name="command_search_search_provider_not_found_7169f">"Search provider -%1$s not found."</string>
+    <!-- search.kt: exec -->
+    <string name="command_search_search_provider_removed_1f35a">"Search provider -%1$s removed."</string>
+    <!-- search.kt: exec -->
+    <string name="command_search_search_provider_saved_c4c69">"Search provider -%1$s saved."</string>
+    <!-- search.kt: exec -->
+    <string name="command_search_search_providers_reset_1120e" formatted="false">"Search providers reset."</string>
+    <!-- search.kt: exec -->
+    <string name="command_search_unable_to_reset_search_providers_8d59c" formatted="false">"Unable to reset search providers."</string>
+    <!-- search.kt: exec -->
+    <string name="command_search_usage_search_rm_param_6eab8" formatted="false">"Usage: search -rm [param]"</string>
+    <!-- space.kt: exec -->
+    <string name="command_space_created_and_switched_to_space_d546d">"Created and switched to Space: %1$s"</string>
+    <!-- space.kt: exec -->
+    <string name="command_space_removed_space_24a7b">"Removed Space: %1$s"</string>
+    <!-- space.kt: exec -->
+    <string name="command_space_renamed_active_space_4855e">"Renamed active Space: %1$s"</string>
+    <!-- space.kt: exec -->
+    <string name="command_space_saved_space_e5292">"Saved Space: %1$s"</string>
+    <!-- space.kt: exec -->
+    <string name="command_space_switched_to_c5720">"Switched to %1$s"</string>
+    <!-- space.kt: exec -->
+    <string name="command_space_switched_to_space_c4781">"Switched to Space: %1$s"</string>
+    <!-- status.kt: exec -->
+    <string name="command_status_auto_2130c" formatted="false">"(auto) "</string>
+    <!-- tbridge.kt: localStatus -->
+    <string name="command_tbridge_current_path_c14e7" formatted="false">"current path: "</string>
+    <!-- tbridge.kt: localStatus -->
+    <string name="command_tbridge_files_use_the_files_command_re_t_ui_files_4f43d" formatted="false">"files: use the files command / Re:T-UI Files app"</string>
+    <!-- tbridge.kt: ensureReady -->
+    <string name="command_tbridge_grant_re_t_ui_the_termux_run_command_permi_44e22" formatted="false">"Grant Re:T-UI the Termux RUN_COMMAND permission, then retry."</string>
+    <!-- tbridge.kt: localStatus -->
+    <string name="command_tbridge_probe_tbridge_probe_b2fb9" formatted="false">"probe: tbridge -probe"</string>
+    <!-- tbridge.kt: localStatus -->
+    <string name="command_tbridge_re_t_ui_termux_bridge_ca56e" formatted="false">"Re:T-UI Termux Bridge"</string>
+    <!-- tbridge.kt: localStatus -->
+    <string name="command_tbridge_role_scripts_modules_callbacks_automation_d1885" formatted="false">"role: scripts, modules, callbacks, automation"</string>
+    <!-- tbridge.kt: localStatus -->
+    <string name="command_tbridge_run_command_declared_3cdca" formatted="false">"RUN_COMMAND declared: "</string>
+    <!-- tbridge.kt: localStatus -->
+    <string name="command_tbridge_run_command_granted_b7cc8" formatted="false">"RUN_COMMAND granted: "</string>
+    <!-- tbridge.kt: localStatus -->
+    <string name="command_tbridge_setup_tbridge_setup_74582" formatted="false">"setup: tbridge -setup"</string>
+    <!-- tbridge.kt: exec -->
+    <string name="command_tbridge_termux_bridge_probe_dispatched_9c2fe" formatted="false">"Termux bridge probe dispatched."</string>
+    <!-- tbridge.kt: localStatus -->
+    <string name="command_tbridge_termux_f248d" formatted="false">"termux: "</string>
+    <!-- tbridge.kt: ensureReady -->
+    <string name="command_tbridge_termux_is_not_installed_3aba0" formatted="false">"Termux is not installed."</string>
+    <!-- tbridge.kt: ensureReady -->
+    <string name="command_tbridge_termux_must_also_set_allow_external_apps_t_b23b5" formatted="false">"Termux must also set allow-external-apps=true."</string>
+    <!-- tbridge.kt: ensureReady -->
+    <string name="command_tbridge_this_termux_build_does_not_expose_run_comm_b2ba8" formatted="false">"This Termux build does not expose RUN_COMMAND."</string>
+    <!-- termux.kt: dispatch -->
+    <string name="command_termux_launch_e8102" translatable="false">"launch %1$s"</string>
+    <!-- timer.kt: onRedirect -->
+    <string name="command_timer_timer_unchanged_e9bf5" formatted="false">"Timer unchanged."</string>
+    <!-- tui.kt: exec -->
+    <string name="command_tui_version_code_a8b49">"Version:%1$s%2$s (code: %3$d)%4$s%5$s%6$s%7$s"</string>
+    <!-- tuiweather.kt: exec -->
+    <string name="command_tuiweather_false_81ef6">"%1$s -&gt; false"</string>
+    <!-- tuiweather.kt: exec -->
+    <string name="command_tuiweather_true_9e9da">"%1$s -&gt; true"</string>
+    <!-- tuiweather.kt: exec -->
+    <string name="command_tuiweather_usage_tuiweather_set_location_place_or_lat_fe409" formatted="false">"Usage: tuiweather -set_location &lt;place or lat,lon&gt;"</string>
+    <!-- tuiweather.kt: exec -->
+    <string name="command_tuiweather_weather_location_set_2c0e9">"Weather location set: %1$s"</string>
+    <!-- username.kt: exec -->
+    <string name="command_username_username_and_device_updated_b68d9" formatted="false">"Username and Device updated!"</string>
+    <!-- volume.kt: exec -->
+    <string name="command_volume_can_only_be_fef3f">"%1$s can only be %2$d-%3$d."</string>
+    <!-- wallpaper.kt: enableWallpaperAuto -->
+    <string name="command_wallpaper_applied_wallpaper_colors_once_387a7" formatted="false">"Applied wallpaper colors once"</string>
+    <!-- wallpaper.kt: onRedirect -->
+    <string name="command_wallpaper_please_answer_yes_or_no_867a9" formatted="false">"Please answer Yes or No."</string>
+    <!-- wallpaper.kt: exec -->
+    <string name="command_wallpaper_please_confirm_if_you_have_saved_your_pres_87e90" formatted="false">"Please confirm if you have saved your preset (Yes/No)"</string>
+    <!-- wallpaper.kt: enableWallpaperAuto -->
+    <string name="command_wallpaper_unable_to_read_wallpaper_colors_259c7" formatted="false">"Unable to read wallpaper colors."</string>
+    <!-- wallpaper.kt: onRedirect -->
+    <string name="command_wallpaper_wallpaper_auto_cancelled_4d625" formatted="false">"Wallpaper auto cancelled."</string>
+    <!-- wallpaper.kt: enableWallpaperAuto -->
+    <string name="command_wallpaper_wallpaper_colors_applied_804d5" formatted="false">"Wallpaper colors applied."</string>
+    <!-- webhook.kt: doThings -->
+    <string name="command_webhook_configured_webhooks_843d5" formatted="false">"Configured Webhooks:"</string>
+    <!-- webhook.kt: onResponse -->
+    <string name="command_webhook_empty_response_a5c48" formatted="false">"Empty Response"</string>
+    <!-- webhook.kt: exec -->
+    <string name="command_webhook_no_webhooks_configured_b0abe" formatted="false">"No webhooks configured."</string>
+    <!-- webhook.kt: triggerWebhook -->
+    <string name="command_webhook_triggering_webhook_749c8">"Triggering webhook: %1$s"</string>
+    <!-- webhook.kt: exec -->
+    <string name="command_webhook_unable_to_save_webhook_80aaa">"Unable to save webhook %1$s."</string>
+    <!-- webhook.kt: exec -->
+    <string name="command_webhook_usage_webhook_add_name_url_body_template_849a3" formatted="false">"Usage: webhook -add [name] [url] [body_template]"</string>
+    <!-- webhook.kt: exec -->
+    <string name="command_webhook_usage_webhook_rm_name_3e38d" formatted="false">"Usage: webhook -rm [name]"</string>
+    <!-- webhook.kt: onFailure -->
+    <string name="command_webhook_webhook_error_90f01">"Webhook [%1$s] Error: %2$s"</string>
+    <!-- webhook.kt: exec -->
+    <string name="command_webhook_webhook_not_found_77db8">"Webhook %1$s not found."</string>
+    <!-- webhook.kt: doThings -->
+    <string name="command_webhook_webhook_not_found_use_webhook_ls_to_see_av_8c371">"Webhook [%1$s] not found. Use \'webhook -ls\' to see available hooks."</string>
+    <!-- webhook.kt: exec -->
+    <string name="command_webhook_webhook_removed_66aac">"Webhook %1$s removed."</string>
+    <!-- webhook.kt: onResponse -->
+    <string name="command_webhook_webhook_response_c6e97">"Webhook [%1$s] Response [%2$d]: %3$s"</string>
+    <!-- webhook.kt: exec -->
+    <string name="command_webhook_webhook_saved_a11ba">"Webhook %1$s saved."</string>
+    <!-- webhook.kt: triggerWebhook -->
+    <string name="command_webhook_webhook_template_error_2fed6">"Webhook [%1$s] template error: %2$s"</string>
+    <!-- widget.kt: exec -->
+    <!-- widget.kt: exec -->
+    <!-- widget.kt: exec -->
+    <string name="command_widget_widget_is_retired_dock_lua_scripts_use_mod_c12d8">"widget is retired.\nDock Lua scripts: use module (try: %1$s)\nAndroid AppWidgets: open the widgets pane from the toolbar."</string>
+    <!-- wifi.kt: exec -->
+    <string name="command_wifi_opening_wi_fi_settings_android_no_longer_a_15368" formatted="false">"Opening Wi-Fi settings. Android no longer allows third-party launchers to toggle Wi-Fi directly."</string>
+    <string name="validation_goal_missing">Goal is missing.</string>
+    <string name="validation_duration_missing">Duration is missing.</string>
+    <string name="validation_duration_invalid">Duration is invalid.</string>
+    <string name="validation_reason_missing">Reason is missing.</string>
+    <string name="validation_id_invalid">ID is invalid.</string>
+    <string name="validation_id_exists">ID already exists.</string>
+    <string name="validation_refresh_invalid">Refresh seconds are invalid.</string>
+    <string name="validation_url_missing">URL is missing.</string>
+    <string name="validation_url_scheme">URL must start with http:// or https://.</string>
+    <string name="files_usage_search">Usage: files -search &lt;name&gt; [type]</string>
+    <string name="files_usage_open">Usage: files -open &lt;file&gt;</string>
+    <string name="files_usage_cd">Usage: files -cd &lt;directory&gt;</string>
+    <string name="files_unknown_option">Unknown files option: %1$s</string>
+    <plurals name="rss_more_feeds">
+        <item quantity="one">... %1$d more feed</item>
+        <item quantity="other">... %1$d more feeds</item>
+    </plurals>
+    <plurals name="custom_frame_count">
+        <item quantity="one">%1$d custom frame</item>
+        <item quantity="other">%1$d custom frames</item>
+    </plurals>
+    <plurals name="contact_times">
+        <item quantity="one">Contacted %1$d time</item>
+        <item quantity="other">Contacted %1$d times</item>
+    </plurals>
+    <string name="volume_stream_voice_call">Voice call</string>
+    <string name="volume_stream_system">System</string>
+    <string name="volume_stream_ring">Ring</string>
+    <string name="volume_stream_media">Media</string>
+    <string name="volume_stream_alarm">Alarm</string>
+    <string name="volume_stream_notification">Notification</string>
+    <string name="launcher_mode_status">Launcher mode: %1$s</string>
+    <string name="duo_status">Duo command: enabled\nDuo layout: %1$s\nUsage: %2$s</string>
+    <string name="uninstalling_package">Uninstalling %1$s...</string>
+</resources>

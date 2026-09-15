@@ -49,7 +49,7 @@
         android:paddingTop="2dp"
         android:paddingEnd="12dp"
         android:paddingBottom="2dp"
-        android:text="MODULE"
+        android:text="@string/ui_module_text_panel_module"
         android:textColor="#FFFFFF"
         style="@style/Retui.Text.Body" />
 
@@ -63,7 +63,7 @@
         android:background="@drawable/apps_drawer_header_border"
         android:fontFamily="monospace"
         android:gravity="center"
-        android:text="X"
+        android:text="@string/ui_module_text_panel_x"
         android:textColor="#FFFFFF"
         style="@style/Retui.Text.Body" />
 </RelativeLayout>

@@ -31,6 +31,9 @@ import ohi.andre.consolelauncher.tuils.PublicIOReceiver
 import ohi.andre.consolelauncher.tuils.Tuils
 
 class KeeperService : android.app.Service() {
+    override fun getResources(): android.content.res.Resources =
+        ohi.andre.consolelauncher.localization.LanguagePacks.resources(super.getResources())
+
     private var title: kotlin.String? = null
     private var subtitle: kotlin.String? = null
     private var clickCmd: kotlin.String? = null

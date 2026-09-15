@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher.managers
 
+import ohi.andre.consolelauncher.R
 import android.content.Context
 import android.graphics.Color
 import android.text.SpannableStringBuilder
@@ -60,7 +61,7 @@ class TimeManager(context: Context) {
                 formats[c] = currentFormat
                 list[c] = buildEntry(color, currentFormat)
             } catch (e: Exception) {
-                Tuils.sendOutput(Color.RED, context, "Invalid time format: " + currentFormat)
+                Tuils.sendOutput(Color.RED, context, context.getString(R.string.manager_timemanager_invalid_time_format_c3076, currentFormat))
                 if (c > 0) list[c] = list[0]
                 else list[c] = buildFallbackEntry()
             }

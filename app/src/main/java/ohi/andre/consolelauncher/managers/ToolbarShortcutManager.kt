@@ -13,18 +13,18 @@ object ToolbarShortcutManager {
     const val DEFAULT_ICON = "star"
 
     private val ICONS = arrayOf(
-        IconChoice("star", "Star", R.drawable.ic_toolbar_star_24),
-        IconChoice("bell", "Bell", R.drawable.ic_toolbar_bell_24),
-        IconChoice("chat", "Chat", R.drawable.ic_toolbar_chat_24),
-        IconChoice("music", "Music", R.drawable.ic_toolbar_music_24),
-        IconChoice("timer", "Timer", R.drawable.timer_24),
-        IconChoice("note", "Note", R.drawable.ic_toolbar_note_24),
-        IconChoice("search", "Search", R.drawable.ic_toolbar_search_24),
-        IconChoice("refresh", "Refresh", R.drawable.ic_toolbar_refresh_24),
-        IconChoice("home", "Home", R.drawable.ic_toolbar_home_24),
-        IconChoice("terminal", "Terminal", R.drawable.ic_toolbar_terminal_24),
-        IconChoice("lock", "Lock", R.drawable.ic_tuixt_lock_24),
-        IconChoice("apps", "Apps", R.drawable.ic_menu)
+        IconChoice("star", R.string.toolbar_icon_star, R.drawable.ic_toolbar_star_24),
+        IconChoice("bell", R.string.toolbar_icon_bell, R.drawable.ic_toolbar_bell_24),
+        IconChoice("chat", R.string.toolbar_icon_chat, R.drawable.ic_toolbar_chat_24),
+        IconChoice("music", R.string.toolbar_icon_music, R.drawable.ic_toolbar_music_24),
+        IconChoice("timer", R.string.toolbar_icon_timer, R.drawable.timer_24),
+        IconChoice("note", R.string.toolbar_icon_note, R.drawable.ic_toolbar_note_24),
+        IconChoice("search", R.string.toolbar_icon_search, R.drawable.ic_toolbar_search_24),
+        IconChoice("refresh", R.string.toolbar_icon_refresh, R.drawable.ic_toolbar_refresh_24),
+        IconChoice("home", R.string.toolbar_icon_home, R.drawable.ic_toolbar_home_24),
+        IconChoice("terminal", R.string.toolbar_icon_terminal, R.drawable.ic_toolbar_terminal_24),
+        IconChoice("lock", R.string.toolbar_icon_lock, R.drawable.ic_tuixt_lock_24),
+        IconChoice("apps", R.string.toolbar_icon_apps, R.drawable.ic_menu)
     )
 
     @JvmStatic
@@ -66,14 +66,14 @@ object ToolbarShortcutManager {
     }
 
     @JvmStatic
-    fun iconLabel(icon: String?): String {
+    fun iconLabel(icon: String?): Int {
         val normalized = normalizeIcon(icon)
         for (choice in ICONS) {
             if (choice.key == normalized) {
-                return choice.label
+                return choice.labelRes
             }
         }
-        return "Star"
+        return R.string.toolbar_icon_star
     }
 
     @JvmStatic
@@ -109,7 +109,7 @@ object ToolbarShortcutManager {
 
     class IconChoice(
         @JvmField val key: String,
-        @JvmField val label: String,
+        @JvmField val labelRes: Int,
         @JvmField val drawableRes: Int
     )
 
@@ -119,6 +119,6 @@ object ToolbarShortcutManager {
         @JvmField val command: String,
         @JvmField val icon: String,
         @JvmField val iconRes: Int,
-        @JvmField val iconLabel: String
+        @JvmField val iconLabel: Int
     )
 }

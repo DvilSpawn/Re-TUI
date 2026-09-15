@@ -15,11 +15,12 @@ import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.managers.LauncherSoundManager
 
 class ReminderReceiver : BroadcastReceiver() {
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(rawContext: Context, intent: Intent) {
+        val context = ohi.andre.consolelauncher.localization.LanguagePacks.wrap(rawContext)
         val id = intent.getStringExtra(ReminderManager.EXTRA_ID)
         var title = intent.getStringExtra(ReminderManager.EXTRA_TITLE)
         if (title == null || title.trim().isEmpty()) {
-            title = "Reminder"
+            title = context.getString(R.string.integration_reminderreceiver_reminder_b87a1)
         }
 
         createChannel(context)
@@ -37,7 +38,7 @@ class ReminderReceiver : BroadcastReceiver() {
         LauncherSoundManager.play(context, LauncherSoundManager.Event.REMINDER)
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.mipmap.ic_launcher)
-            .setContentTitle("Re:T-UI reminder")
+            .setContentTitle(context.getString(R.string.integration_reminderreceiver_re_t_ui_reminder_825dc))
             .setContentText(title)
             .setStyle(NotificationCompat.BigTextStyle().bigText(title))
             .setContentIntent(content)
@@ -60,10 +61,10 @@ class ReminderReceiver : BroadcastReceiver() {
         }
         val channel = NotificationChannel(
             CHANNEL_ID,
-            "Re:T-UI Reminders",
+            context.getString(R.string.integration_reminderreceiver_re_t_ui_reminders_091c3),
             NotificationManager.IMPORTANCE_HIGH
         )
-        channel.description = "Reminder notifications created by Re:T-UI modules."
+        channel.description = context.getString(R.string.integration_reminderreceiver_reminder_notifications_created_by_re_t_ui_f0999)
         manager.createNotificationChannel(channel)
     }
 

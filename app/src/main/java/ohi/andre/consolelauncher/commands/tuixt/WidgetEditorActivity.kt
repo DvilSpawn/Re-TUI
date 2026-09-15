@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher.commands.tuixt
 
+import ohi.andre.consolelauncher.R
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
@@ -48,7 +49,7 @@ import java.util.Arrays
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi
 
-class WidgetEditorActivity : Activity() {
+class WidgetEditorActivity : ohi.andre.consolelauncher.localization.LocalizedActivity() {
     private var widgetMode = true
     private var widgetId: String? = null
     private var documentFile: File? = null
@@ -99,7 +100,7 @@ class WidgetEditorActivity : Activity() {
         }
 
         if (TextUtils.isEmpty(originalDocumentName)) {
-            originalDocumentName = if (widgetMode) widgetId else "Document"
+            originalDocumentName = if (widgetMode) widgetId else getString(R.string.editor_widgeteditoractivity_document_e214b)
         }
 
         if (widgetMode && TextUtils.isEmpty(originalCode)) {
@@ -144,7 +145,7 @@ class WidgetEditorActivity : Activity() {
 
         documentNameEditor = EditText(this)
         documentNameEditor!!.setSingleLine(true)
-        documentNameEditor!!.setHint(if (widgetMode) "Document name" else "File name")
+        documentNameEditor!!.setHint(if (widgetMode) getString(R.string.editor_widgeteditoractivity_document_name_2159c) else getString(R.string.editor_widgeteditoractivity_file_name_09979))
         documentNameEditor!!.setText(originalDocumentName)
         if (!widgetMode) {
             documentNameEditor!!.setFocusable(false)
@@ -210,23 +211,23 @@ class WidgetEditorActivity : Activity() {
         bottomBar.setGravity(Gravity.CENTER_VERTICAL)
         bottomBar.setPadding(0, dp(this, 10f), 0, 0)
 
-        val cancel = button("CANCEL", false)
+        val cancel = button(getString(R.string.editor_widgeteditoractivity_cancel_1507c), false)
         cancel.setOnClickListener(View.OnClickListener { v: View? -> attemptClose() })
         bottomBar.addView(cancel)
 
-        val findReplace = button("FIND/REPLACE", false)
+        val findReplace = button(getString(R.string.editor_widgeteditoractivity_find_replace_666ec), false)
         findReplace.setOnClickListener { showFindReplaceDialog() }
         bottomBar.addView(findReplace)
 
         val spacer = View(this)
         bottomBar.addView(spacer, LinearLayout.LayoutParams(0, 1, 1f))
 
-        val save = button("SAVE", false)
+        val save = button(getString(R.string.editor_widgeteditoractivity_save_50815), false)
         save.setOnClickListener(View.OnClickListener { v: View? -> save(false) })
         bottomBar.addView(save)
 
         if (widgetMode) {
-            val run = button("SAVE/RUN", true)
+            val run = button(getString(R.string.editor_widgeteditoractivity_save_run_afa8d), true)
             run.setOnClickListener(View.OnClickListener { v: View? -> save(true) })
             bottomBar.addView(run)
         }
@@ -243,7 +244,7 @@ class WidgetEditorActivity : Activity() {
         if (hasUnsavedChanges()) {
             Toast.makeText(
                 this,
-                "Save or discard the current changes before opening another document.",
+                getString(R.string.editor_widgeteditoractivity_save_or_discard_the_current_changes_before_54d4f),
                 Toast.LENGTH_LONG
             ).show()
             return
@@ -253,7 +254,7 @@ class WidgetEditorActivity : Activity() {
     }
 
     private fun showFindReplaceDialog() {
-        TuixtDialog.showCustomCompact(this, "Find/Replace", TuixtDialog.ContentFactory { dialog: Dialog? ->
+        TuixtDialog.showCustomCompact(this, getString(R.string.editor_widgeteditoractivity_find_replace_3ac99), TuixtDialog.ContentFactory { dialog: Dialog? ->
             dialog?.setCanceledOnTouchOutside(false)
             dialog?.setOnDismissListener { clearFindHighlight() }
             val content = LinearLayout(this).apply {
@@ -264,17 +265,17 @@ class WidgetEditorActivity : Activity() {
                 gravity = Gravity.END
             }
             closeRow.addView(button("X", false).apply {
-                contentDescription = "Close find and replace"
+                contentDescription = getString(R.string.editor_widgeteditoractivity_close_find_and_replace_1e4b7)
                 setOnClickListener { dialog?.dismiss() }
             })
             content.addView(closeRow)
             val find = EditText(this).apply {
-                hint = "Find"
+                hint = getString(R.string.editor_widgeteditoractivity_find_df251)
                 setSingleLine(true)
                 TuixtTheme.styleInput(this@WidgetEditorActivity, this)
             }
             val replacement = EditText(this).apply {
-                hint = "Replace with"
+                hint = getString(R.string.editor_widgeteditoractivity_replace_with_dde40)
                 setSingleLine(true)
                 TuixtTheme.styleInput(this@WidgetEditorActivity, this)
             }
@@ -292,10 +293,10 @@ class WidgetEditorActivity : Activity() {
                 setPadding(0, dp(this@WidgetEditorActivity, 12f), 0, 0)
             }
             val findActions = LinearLayout(this).apply { gravity = Gravity.CENTER }
-            findActions.addView(button("FIND PREVIOUS", false).apply {
+            findActions.addView(button(getString(R.string.editor_widgeteditoractivity_find_previous_682dd), false).apply {
                 setOnClickListener { findPrevious(find.text.toString()) }
             })
-            findActions.addView(button("FIND NEXT", false).apply {
+            findActions.addView(button(getString(R.string.editor_widgeteditoractivity_find_next_479b5), false).apply {
                 setOnClickListener { findNext(find.text.toString()) }
             })
             actions.addView(findActions)
@@ -303,12 +304,12 @@ class WidgetEditorActivity : Activity() {
                 gravity = Gravity.CENTER
                 setPadding(0, dp(this@WidgetEditorActivity, 8f), 0, 0)
             }
-            replaceActions.addView(button("REPLACE", true).apply {
+            replaceActions.addView(button(getString(R.string.editor_widgeteditoractivity_replace_c336f), true).apply {
                 setOnClickListener {
                     replaceSelection(find.text.toString(), replacement.text.toString())
                 }
             })
-            replaceActions.addView(button("REPLACE ALL", false).apply {
+            replaceActions.addView(button(getString(R.string.editor_widgeteditoractivity_replace_all_16af7), false).apply {
                 setOnClickListener {
                     replaceAll(find.text.toString(), replacement.text.toString())
                 }
@@ -327,7 +328,7 @@ class WidgetEditorActivity : Activity() {
         var match = text.indexOf(query, editor.selectionEnd.coerceAtLeast(0))
         if (match < 0) match = text.indexOf(query)
         if (match < 0) {
-            Toast.makeText(this, "Not found: $query", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.editor_widgeteditoractivity_not_found_926a3, query), Toast.LENGTH_SHORT).show()
             return false
         }
         showMatch(editor, match, query.length)
@@ -341,7 +342,7 @@ class WidgetEditorActivity : Activity() {
         var match = text.lastIndexOf(query, editor.selectionStart - 1)
         if (match < 0) match = text.lastIndexOf(query)
         if (match < 0) {
-            Toast.makeText(this, "Not found: $query", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.editor_widgeteditoractivity_not_found_926a3, query), Toast.LENGTH_SHORT).show()
             return false
         }
         showMatch(editor, match, query.length)
@@ -391,12 +392,12 @@ class WidgetEditorActivity : Activity() {
             index = text.indexOf(query, index + query.length)
         }
         if (count == 0) {
-            Toast.makeText(this, "Not found: $query", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.editor_widgeteditoractivity_not_found_926a3, query), Toast.LENGTH_SHORT).show()
             return
         }
         clearFindHighlight()
         editor.setText(text.replace(query, replacement))
-        Toast.makeText(this, "Replaced $count matches", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, getString(R.string.editor_widgeteditoractivity_replaced_matches_bc3c9, count), Toast.LENGTH_SHORT).show()
     }
 
     override fun onResume() {
@@ -440,24 +441,24 @@ class WidgetEditorActivity : Activity() {
                 refreshFromLoadedPrefs()
                 originalCode = code
                 originalDocumentName = documentFile!!.name
-                Toast.makeText(this, "Document saved: ${documentFile!!.name}", Toast.LENGTH_SHORT)
+                Toast.makeText(this, getString(R.string.editor_widgeteditoractivity_document_saved_d73e0, documentFile!!.name), Toast.LENGTH_SHORT)
                     .show()
                 LauncherActivity.preview(this)
                 return
             }
 
             val name = documentNameEditor!!.getText().toString().trim { it <= ' ' }
-            require(!TextUtils.isEmpty(name)) { "Document name is required" }
+            require(!TextUtils.isEmpty(name)) { getString(R.string.editor_widgeteditoractivity_document_name_is_required_d8c5c) }
             if (!TextUtils.equals(originalDocumentName, name)) {
                 val newId = LuaWidgetManager.idFromName(name)
-                require(!TextUtils.isEmpty(newId)) { "Document name needs letters or numbers" }
+                require(!TextUtils.isEmpty(newId)) { getString(R.string.editor_widgeteditoractivity_document_name_needs_letters_or_numbers_ccffd) }
                 if (!TextUtils.equals(widgetId, newId)) {
                     require(
                         !(ModuleManager.isKnown(
                             this,
                             newId
                         ) || LuaWidgetManager.exists(newId))
-                    ) { "Lua module id already exists: " + newId }
+                    ) { getString(R.string.editor_widgeteditoractivity_lua_module_id_already_exists_7eb87, newId) }
                     LuaWidgetManager.rename(widgetId, newId)
                     ModuleManager.renameScriptModule(
                         this,
@@ -492,17 +493,17 @@ class WidgetEditorActivity : Activity() {
                 LauncherActivity.preview(this)
                 return
             } else if (run) {
-                Toast.makeText(this, "Suggestion script saved: " + name, Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.editor_widgeteditoractivity_suggestion_script_saved_06561, name), Toast.LENGTH_SHORT).show()
             }
 
             originalDocumentName = LuaWidgetManager.getName(widgetId)
             originalCode = code
             documentNameEditor!!.setText(originalDocumentName)
             updateHeader()
-            Toast.makeText(this, "Document saved: " + originalDocumentName, Toast.LENGTH_SHORT)
+            Toast.makeText(this, getString(R.string.editor_widgeteditoractivity_document_saved_d73e0, originalDocumentName), Toast.LENGTH_SHORT)
                 .show()
         } catch (e: Exception) {
-            Toast.makeText(this, "Save failed: " + e.message, Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.editor_widgeteditoractivity_save_failed_8f75d, e.message), Toast.LENGTH_LONG).show()
         }
     }
 
@@ -515,7 +516,7 @@ class WidgetEditorActivity : Activity() {
 
     private fun updateHeader() {
         if (header != null) {
-            header!!.setText(if (widgetMode) "Lua Modules" else "Documents")
+            header!!.setText(if (widgetMode) getString(R.string.editor_widgeteditoractivity_lua_modules_4cf19) else getString(R.string.editor_widgeteditoractivity_documents_687c8))
         }
     }
 
@@ -524,7 +525,7 @@ class WidgetEditorActivity : Activity() {
             return
         }
         if (!widgetMode) {
-            capabilityView!!.setText("Document editor")
+            capabilityView!!.setText(getString(R.string.editor_widgeteditoractivity_document_editor_dd692))
             return
         }
 
@@ -538,12 +539,7 @@ class WidgetEditorActivity : Activity() {
             .trim { it <= ' ' }
         val id = LuaWidgetManager.idFromName(name)
         capabilityView!!.setText(
-            ("Type: " + type
-                    + "  |  ID: " + (if (TextUtils.isEmpty(id)) "n/a" else id)
-                    + "  |  API: " + api
-                    + "  |  Capabilities: " + capabilities
-                    + "  |  Permissions: " + permissions
-                    + capabilityWarning(meta, code))
+            (getString(R.string.editor_widgeteditoractivity_type_id_api_capabilities_permissions_8afdd, type, (if (TextUtils.isEmpty(id)) "n/a" else id), api, capabilities, permissions, capabilityWarning(meta, code)))
         )
     }
 
@@ -552,15 +548,15 @@ class WidgetEditorActivity : Activity() {
         val missing = LuaWidgetManager.missingPermissionDeclarations(code)
         val unsupported = LuaWidgetManager.unsupportedPermissions(code)
         if (!unsupported.isEmpty()) {
-            return "  |  Unsupported: " + TextUtils.join(", ", unsupported)
+            return getString(R.string.editor_widgeteditoractivity_unsupported_f4481, TextUtils.join(", ", unsupported))
         }
         if (!missing.isEmpty()) {
-            return "  |  Declare: " + TextUtils.join(", ", missing)
+            return getString(R.string.editor_widgeteditoractivity_declare_1b3b5, TextUtils.join(", ", missing))
         }
         if (TextUtils.isEmpty(declared)) {
-            return "  |  Metadata: inferred"
+            return getString(R.string.editor_widgeteditoractivity_metadata_inferred_d6932)
         }
-        return "  |  Metadata: " + declared
+        return getString(R.string.editor_widgeteditoractivity_metadata_438b7, declared)
     }
 
     private fun attemptClose() {
@@ -570,10 +566,10 @@ class WidgetEditorActivity : Activity() {
         }
         showConfirm(
             this,
-            "Discard Changes?",
-            "Unsaved document changes will be lost.",
-            "Discard",
-            "Keep Editing",
+            getString(R.string.editor_widgeteditoractivity_discard_changes_f99ee),
+            getString(R.string.editor_widgeteditoractivity_unsaved_document_changes_will_be_lost_21b59),
+            getString(R.string.editor_widgeteditoractivity_discard_36fff),
+            getString(R.string.editor_widgeteditoractivity_keep_editing_ced7d),
             ConfirmAction { this.finishAndRemoveTask() })
     }
 

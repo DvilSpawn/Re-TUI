@@ -23,15 +23,15 @@ class search : ParamCommand() {
             override fun exec(pack: ExecutePack): String? {
                 val args = pack.getList<String?>()
                 if (args.size < 2) {
-                    return usageAdd()
+                    return usageAdd(pack.context)
                 }
 
-                val name = args.get(0) ?: return usageAdd()
+                val name = args.get(0) ?: return usageAdd(pack.context)
                 if (isReserved(name)) {
-                    return "Search param " + name + " is reserved."
+                    return pack.context.getString(R.string.command_search_search_param_is_reserved_d1d4f, name)
                 }
 
-                val template = args.get(1) ?: return usageAdd()
+                val template = args.get(1) ?: return usageAdd(pack.context)
                 var fallback: String? = null
                 if (args.size > 2) {
                     var rest = args.subList(2, args.size)
@@ -43,9 +43,9 @@ class search : ParamCommand() {
 
                 val saved = SearchProviderManager.add(name, template, fallback)
                 return if (saved)
-                    "Search provider -" + stripParam(name) + " saved."
+                    pack.context.getString(R.string.command_search_search_provider_saved_c4c69, stripParam(name))
                 else
-                    usageAdd()
+                    usageAdd(pack.context)
             }
 
             override fun args(): IntArray? {
@@ -55,18 +55,18 @@ class search : ParamCommand() {
         rm {
             override fun exec(pack: ExecutePack): String? {
                 val args = pack.getList<String?>()
-                if (args.isEmpty()) return "Usage: search -rm [param]"
+                if (args.isEmpty()) return pack.context.getString(R.string.command_search_usage_search_rm_param_6eab8)
 
-                val name = args.get(0) ?: return "Usage: search -rm [param]"
+                val name = args.get(0) ?: return pack.context.getString(R.string.command_search_usage_search_rm_param_6eab8)
                 if (isReserved(name)) {
-                    return "Search param " + name + " is reserved."
+                    return pack.context.getString(R.string.command_search_search_param_is_reserved_d1d4f, name)
                 }
 
                 val removed = SearchProviderManager.remove(name)
                 return if (removed)
-                    "Search provider -" + stripParam(name) + " removed."
+                    pack.context.getString(R.string.command_search_search_provider_removed_1f35a, stripParam(name))
                 else
-                    "Search provider -" + stripParam(name) + " not found."
+                    pack.context.getString(R.string.command_search_search_provider_not_found_7169f, stripParam(name))
             }
 
             override fun args(): IntArray? {
@@ -75,7 +75,7 @@ class search : ParamCommand() {
         },
         ls {
             override fun exec(pack: ExecutePack): String {
-                return listProviders()
+                return listProviders(pack.context)
             }
 
             override fun args(): IntArray? {
@@ -96,7 +96,7 @@ class search : ParamCommand() {
         reset {
             override fun exec(pack: ExecutePack): String? {
                 val reset = SearchProviderManager.reset()
-                return if (reset) "Search providers reset." else "Unable to reset search providers."
+                return if (reset) pack.context.getString(R.string.command_search_search_providers_reset_1120e) else pack.context.getString(R.string.command_search_unable_to_reset_search_providers_8d59c)
             }
 
             override fun args(): IntArray? {
@@ -216,7 +216,7 @@ class search : ParamCommand() {
             return (pack.context.getString(R.string.help_search)
                     + Tuils.NEWLINE
                     + Tuils.NEWLINE
-                    + listProviders())
+                    + listProviders(pack.context))
         }
 
         return null
@@ -284,11 +284,11 @@ class search : ParamCommand() {
             context.startActivity(intent)
         }
 
-        private fun listProviders(): String {
+        private fun listProviders(context: android.content.Context): String {
             val providers = SearchProviderManager.load()
-            if (providers.isEmpty()) return "No search providers configured."
+            if (providers.isEmpty()) return context.getString(R.string.command_detail_search_no_search_providers_configured_f92f3)
 
-            val output = StringBuilder("Search providers:")
+            val output = StringBuilder(context.getString(R.string.command_detail_search_search_providers_a77f9))
             for (provider in providers) {
                 output.append(Tuils.NEWLINE)
                     .append(Tuils.MINUS)
@@ -303,10 +303,8 @@ class search : ParamCommand() {
             return output.toString()
         }
 
-        private fun usageAdd(): String {
-            return ("Usage: search -add [param] [url_template]"
-                    + Tuils.NEWLINE
-                    + "Example: search -add sdw https://stardewvalleywiki.com/{slug}")
+        private fun usageAdd(context: android.content.Context): String {
+            return (context.getString(R.string.command_detail_search_usage_search_add_param_url_template_exampl_59bc0, Tuils.NEWLINE))
         }
 
         private fun isReserved(param: String?): Boolean {
@@ -316,7 +314,7 @@ class search : ParamCommand() {
         private fun stripParam(param: String?): String? {
             var param = param ?: return null
 
-            param = param.trim { it <= ' ' }.lowercase(Locale.getDefault())
+            param = param.trim { it <= ' ' }.lowercase(Locale.ROOT)
             while (param.startsWith(Tuils.MINUS)) {
                 param = param.substring(1)
             }

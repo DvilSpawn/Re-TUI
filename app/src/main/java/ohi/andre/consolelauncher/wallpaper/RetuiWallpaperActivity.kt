@@ -32,7 +32,7 @@ import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.tuils.CrtOverlayDrawable
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi.applyFullscreen
 
-class RetuiWallpaperActivity : AppCompatActivity() {
+class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompatActivity() {
     private lateinit var root: FrameLayout
     private lateinit var preview: android.view.View
     private lateinit var colorSpinner: Spinner
@@ -63,31 +63,31 @@ class RetuiWallpaperActivity : AppCompatActivity() {
             setBackgroundColor(Color.argb(184, 18, 14, 24))
         }
         val selectors = row()
-        selectors.addView(label("WALLPAPER"))
+        selectors.addView(label(getString(R.string.editor_retuiwallpaperactivity_wallpaper_f00e8)))
         val scenes = listOf("csakura", "black hole", "solid")
         selectors.addView(spinner(scenes, scenes.indexOf(scene).coerceAtLeast(0), ::switchScene))
-        selectors.addView(label("COLOR"))
+        selectors.addView(label(getString(R.string.editor_retuiwallpaperactivity_color_34171)))
         colorSpinner = paletteSpinner()
         selectors.addView(colorSpinner)
         panel.addView(selectors)
 
         val tuning = row()
-        heightLabel = label(if (scene == "black hole") "TILT" else "HEIGHT")
+        heightLabel = label(if (scene == "black hole") getString(R.string.editor_retuiwallpaperactivity_tilt_aceae) else getString(R.string.editor_retuiwallpaperactivity_height_6ea6c))
         tuning.addView(heightLabel)
         tuning.addView(compactControl("−") { adjustHeight(-0.05f) })
         tuning.addView(compactControl("+") { adjustHeight(0.05f) })
-        tuning.addView(label("ZOOM"))
+        tuning.addView(label(getString(R.string.editor_retuiwallpaperactivity_zoom_c6653)))
         tuning.addView(compactControl("−") { adjustScale(-0.1f) })
         tuning.addView(compactControl("+") { adjustScale(0.1f) })
         panel.addView(tuning)
         tuningControls.add(tuning)
 
         val shape = row()
-        boundsLabel = label(if (scene == "black hole") "RADIUS" else "BOUNDS")
+        boundsLabel = label(if (scene == "black hole") getString(R.string.editor_retuiwallpaperactivity_radius_69ea4) else getString(R.string.editor_retuiwallpaperactivity_bounds_d399f))
         shape.addView(boundsLabel)
         shape.addView(compactControl("−") { adjustWidth(-0.1f) })
         shape.addView(compactControl("+") { adjustWidth(0.1f) })
-        densityLabel = label(if (scene == "black hole") "DUST" else "PETALS")
+        densityLabel = label(if (scene == "black hole") getString(R.string.editor_retuiwallpaperactivity_dust_1717e) else getString(R.string.editor_retuiwallpaperactivity_petals_5dc16))
         shape.addView(densityLabel)
         shape.addView(compactControl("−") { adjustDensity(-1) })
         shape.addView(compactControl("+") { adjustDensity(1) })
@@ -95,7 +95,7 @@ class RetuiWallpaperActivity : AppCompatActivity() {
         tuningControls.add(shape)
 
         val regrow = row()
-        regrow.addView(compactControl("REGENERATE") {
+        regrow.addView(compactControl(getString(R.string.editor_retuiwallpaperactivity_regenerate_e63ad)) {
             when (val current = preview) {
                 is CsakuraView -> current.regrow()
                 is BlackHoleView -> current.regenerate()
@@ -105,7 +105,7 @@ class RetuiWallpaperActivity : AppCompatActivity() {
         tuningControls.add(regrow)
 
         val apply = row()
-        apply.addView(compactControl("USE ON PHONE") { useOnPhone() })
+        apply.addView(compactControl(getString(R.string.editor_retuiwallpaperactivity_use_on_phone_d908b)) { useOnPhone() })
         panel.addView(apply)
         val panelParams = FrameLayout.LayoutParams(-1, dp(268), Gravity.TOP).apply {
             leftMargin = dp(8); topMargin = dp(8); rightMargin = dp(8)
@@ -169,9 +169,9 @@ class RetuiWallpaperActivity : AppCompatActivity() {
         root.removeView(preview)
         preview = createPreview(scene)
         root.addView(preview, 0, FrameLayout.LayoutParams(-1, -1))
-        densityLabel.text = if (scene == "black hole") "DUST" else "PETALS"
-        heightLabel.text = if (scene == "black hole") "TILT" else "HEIGHT"
-        boundsLabel.text = if (scene == "black hole") "RADIUS" else "BOUNDS"
+        densityLabel.text = if (scene == "black hole") getString(R.string.editor_retuiwallpaperactivity_dust_1717e) else getString(R.string.editor_retuiwallpaperactivity_petals_5dc16)
+        heightLabel.text = if (scene == "black hole") getString(R.string.editor_retuiwallpaperactivity_tilt_aceae) else getString(R.string.editor_retuiwallpaperactivity_height_6ea6c)
+        boundsLabel.text = if (scene == "black hole") getString(R.string.editor_retuiwallpaperactivity_radius_69ea4) else getString(R.string.editor_retuiwallpaperactivity_bounds_d399f)
         updateSceneControls()
         val replacement = paletteSpinner()
         (colorSpinner.parent as ViewGroup).let { parent ->
@@ -241,7 +241,7 @@ class RetuiWallpaperActivity : AppCompatActivity() {
         listOf(hue, saturation, brightness).forEach { it.setOnSeekBarChangeListener(listener) }
         listener.onProgressChanged(null, 0, false)
 
-        TuixtDialog.showContent(this, "Pick Solid Color", content, "USE", "CANCEL", ConfirmAction {
+        TuixtDialog.showContent(this, getString(R.string.editor_retuiwallpaperactivity_pick_solid_color_04728), content, getString(R.string.editor_retuiwallpaperactivity_use_7dcf4), getString(R.string.editor_retuiwallpaperactivity_cancel_1507c), ConfirmAction {
             solid.color = Color.parseColor(hexPreview.text.toString())
             val replacement = paletteSpinner()
             (colorSpinner.parent as ViewGroup).let { parent ->
@@ -269,6 +269,7 @@ class RetuiWallpaperActivity : AppCompatActivity() {
                     decorate(super.getDropDownView(position, convertView, parent) as TextView, items[position])
 
                 private fun decorate(text: TextView, value: String): TextView = text.apply {
+                    if (value == "PICK…") text.text = getString(R.string.wallpaper_pick_color)
                     val swatch = value.takeUnless { it == "PICK…" }?.let {
                         GradientDrawable().apply {
                             shape = GradientDrawable.RECTANGLE
@@ -348,7 +349,14 @@ class RetuiWallpaperActivity : AppCompatActivity() {
     }
 
     private fun spinner(items: List<String>, selected: Int, onSelected: (String) -> Unit) = Spinner(this).apply {
-        adapter = ArrayAdapter(this@RetuiWallpaperActivity, android.R.layout.simple_spinner_dropdown_item, items)
+        adapter = ArrayAdapter(this@RetuiWallpaperActivity, android.R.layout.simple_spinner_dropdown_item, items.map {
+            when (it) {
+                "csakura" -> getString(R.string.wallpaper_sakura)
+                "black hole" -> getString(R.string.wallpaper_black_hole)
+                "solid" -> getString(R.string.wallpaper_solid)
+                else -> it
+            }
+        })
         setSelection(selected)
         setBackgroundColor(Color.argb(150, 30, 22, 40))
         layoutParams = LinearLayout.LayoutParams(0, dp(46), 1.3f).apply { marginEnd = dp(4) }

@@ -1,0 +1,436 @@
+<resources>
+    <!-- Editors and dialogs. Translate prose; preserve examples and format arguments. -->
+    <!-- BreachDialog.kt: build -->
+    <string name="editor_breachdialog_breach_armed_1ca2b" formatted="false">"BREACH ARMED"</string>
+    <!-- BreachDialog.kt: finish -->
+    <string name="editor_breachdialog_breach_complete_1329a" formatted="false">"BREACH COMPLETE"</string>
+    <!-- BreachDialog.kt: showSession -->
+    <string name="editor_breachdialog_breach_f0fec" formatted="false">"BREACH"</string>
+    <!-- BreachDialog.kt: finish -->
+    <string name="editor_breachdialog_breach_failed_01b27" formatted="false">"BREACH FAILED"</string>
+    <!-- BreachDialog.kt: finish -->
+    <string name="editor_breachdialog_breach_failed_credits_credits_0ea28">"Breach failed.\n-%1$d credits\nCredits: %2$d"</string>
+    <!-- BreachDialog.kt: failRound -->
+    <string name="editor_breachdialog_breach_failed_credits_credits_759c9">"%1$s\nBREACH FAILED -%2$d CREDITS\nCREDITS: %3$d"</string>
+    <!-- BreachDialog.kt: finish -->
+    <string name="editor_breachdialog_breach_key_acquired_72f08" formatted="false">"\nBreach key acquired."</string>
+    <!-- BreachDialog.kt: finish -->
+    <string name="editor_breachdialog_breach_successful_7d15c">"Breach successful.%1$s%2$s"</string>
+    <!-- BreachDialog.kt: render -->
+    <string name="editor_breachdialog_buffer_3d5ac">"BUFFER: %1$s"</string>
+    <!-- BreachDialog.kt: exitPromptContent -->
+    <string name="editor_breachdialog_cancel_1507c" formatted="false">"CANCEL"</string>
+    <!-- BreachDialog.kt: finish -->
+    <string name="editor_breachdialog_close_dbc87" formatted="false">"CLOSE"</string>
+    <!-- BreachDialog.kt: finish -->
+    <string name="editor_breachdialog_credits_3073d">"\n+%1$d credits"</string>
+    <!-- BreachDialog.kt: showSession -->
+    <string name="editor_breachdialog_emergency_breach_ce727" formatted="false">"EMERGENCY BREACH"</string>
+    <!-- BreachDialog.kt: exitPromptContent -->
+    <string name="editor_breachdialog_exit_96110">"EXIT -%1$d"</string>
+    <!-- BreachDialog.kt: showExitPrompt -->
+    <string name="editor_breachdialog_exit_breach_7e547" formatted="false">"EXIT BREACH?"</string>
+    <!-- BreachDialog.kt: exitPromptContent -->
+    <string name="editor_breachdialog_exit_breach_cost_credit_timer_paused_d898c">"Exit breach?\nCost: -%1$d credit\nTimer paused."</string>
+    <!-- BreachDialog.kt: failRound -->
+    <string name="editor_breachdialog_new_target_loaded_0a109" formatted="false">"NEW TARGET LOADED"</string>
+    <!-- BreachDialog.kt: finish -->
+    <string name="editor_breachdialog_ok_9ce3b" formatted="false">"OK"</string>
+    <!-- BreachDialog.kt: instruction -->
+    <string name="editor_breachdialog_select_947af">"SELECT %1$s %2$d"</string>
+    <!-- BreachDialog.kt: build -->
+    <string name="editor_breachdialog_target_f7621" formatted="false">"TARGET"</string>
+    <!-- BreachDialog.kt: run -->
+    <string name="editor_breachdialog_time_expired_c763b" formatted="false">"TIME EXPIRED"</string>
+    <!-- BreachDialog.kt: timerText -->
+    <string name="editor_breachdialog_time_s_ad1e7">"TIME %1$s%2$s %3$ds"</string>
+    <!-- NotesEditorActivity.kt: onCreate -->
+    <string name="editor_noteseditoractivity_add_note_c67b2" formatted="false">"ADD NOTE"</string>
+    <!-- NotesEditorActivity.kt: onCreate -->
+    <string name="editor_noteseditoractivity_cancel_1507c" formatted="false">"CANCEL"</string>
+    <!-- NotesEditorActivity.kt: addNoteRow -->
+    <string name="editor_noteseditoractivity_delete_note_a8ed4" formatted="false">"Delete note"</string>
+    <!-- NotesEditorActivity.kt: attemptClose -->
+    <string name="editor_noteseditoractivity_discard_36fff" formatted="false">"Discard"</string>
+    <!-- NotesEditorActivity.kt: attemptClose -->
+    <string name="editor_noteseditoractivity_discard_changes_f99ee" formatted="false">"Discard Changes?"</string>
+    <!-- NotesEditorActivity.kt: attemptClose -->
+    <string name="editor_noteseditoractivity_keep_editing_ced7d" formatted="false">"Keep Editing"</string>
+    <!-- NotesEditorActivity.kt: updateLockButton -->
+    <string name="editor_noteseditoractivity_lock_note_5deb3" formatted="false">"Lock note"</string>
+    <!-- NotesEditorActivity.kt: addNoteRow -->
+    <string name="editor_noteseditoractivity_note_2c924" formatted="false">"Note"</string>
+    <!-- NotesEditorActivity.kt: onCreate -->
+    <string name="editor_noteseditoractivity_notes_70440" formatted="false">"Notes"</string>
+    <!-- NotesEditorActivity.kt: onCreate -->
+    <string name="editor_noteseditoractivity_save_50815" formatted="false">"SAVE"</string>
+    <!-- NotesEditorActivity.kt: saveAndClose -->
+    <string name="editor_noteseditoractivity_save_failed_8f75d">"Save failed: %1$s"</string>
+    <!-- NotesEditorActivity.kt: addNoteRow -->
+    <string name="editor_noteseditoractivity_toggle_lock_d15b2" formatted="false">"Toggle lock"</string>
+    <!-- NotesEditorActivity.kt: updateLockButton -->
+    <string name="editor_noteseditoractivity_unlock_note_1cdc4" formatted="false">"Unlock note"</string>
+    <!-- NotesEditorActivity.kt: deleteRow -->
+    <string name="editor_noteseditoractivity_unlock_note_before_deleting_43ce2" formatted="false">"Unlock note before deleting."</string>
+    <!-- NotesEditorActivity.kt: attemptClose -->
+    <string name="editor_noteseditoractivity_unsaved_notes_will_be_lost_4b893" formatted="false">"Unsaved notes will be lost."</string>
+    <!-- PinShortcutConfirmActivity.kt: buildContent -->
+    <string name="editor_pinshortcutconfirmactivity_cancel_1507c" formatted="false">"CANCEL"</string>
+    <!-- PinShortcutConfirmActivity.kt: buildContent -->
+    <string name="editor_pinshortcutconfirmactivity_create_alias_14186" formatted="false">"Create alias"</string>
+    <!-- PinShortcutConfirmActivity.kt: buildContent -->
+    <string name="editor_pinshortcutconfirmactivity_from_ad3b5">"From %1$s"</string>
+    <!-- PinShortcutConfirmActivity.kt: buildContent -->
+    <string name="editor_pinshortcutconfirmactivity_pin_3adad" formatted="false">"PIN"</string>
+    <!-- PinShortcutConfirmActivity.kt: buildContent -->
+    <string name="editor_pinshortcutconfirmactivity_pin_shortcut_9d9af" formatted="false">"Pin Shortcut"</string>
+    <!-- PinShortcutConfirmActivity.kt: acceptAndClose -->
+    <string name="editor_pinshortcutconfirmactivity_pinned_but_mapping_save_failed_aaab5" formatted="false">"Pinned, but mapping save failed."</string>
+    <!-- PinShortcutConfirmActivity.kt: acceptAndClose -->
+    <string name="editor_pinshortcutconfirmactivity_pinned_c1c20">"Pinned @%1$s"</string>
+    <!-- PinShortcutConfirmActivity.kt: acceptAndClose -->
+    <string name="editor_pinshortcutconfirmactivity_shortcut_pin_request_expired_d808b" formatted="false">"Shortcut pin request expired."</string>
+    <!-- PinShortcutConfirmActivity.kt: onCreate -->
+    <string name="editor_pinshortcutconfirmactivity_shortcut_pin_request_unavailable_47f86" formatted="false">"Shortcut pin request unavailable."</string>
+    <!-- PinShortcutConfirmActivity.kt: acceptAndClose -->
+    <string name="editor_pinshortcutconfirmactivity_shortcut_pin_request_was_cancelled_8d6fc" formatted="false">"Shortcut pin request was cancelled."</string>
+    <!-- ProfilePaneController.kt: addQr -->
+    <string name="editor_profilepanecontroller_add_connection_code_90e31" formatted="false">"ADD CONNECTION CODE"</string>
+    <!-- ProfilePaneController.kt: addQr -->
+    <string name="editor_profilepanecontroller_add_f9460" formatted="false">"ADD"</string>
+    <!-- ProfilePaneController.kt: onBindViewHolder -->
+    <string name="editor_profilepanecontroller_blurred_qr_preview_a61ec" formatted="false">"Blurred QR preview"</string>
+    <!-- ProfilePaneController.kt: removeCurrentQr -->
+    <string name="editor_profilepanecontroller_cancel_1507c" formatted="false">"CANCEL"</string>
+    <!-- ProfilePaneController.kt: onCreateViewHolder -->
+    <string name="editor_profilepanecontroller_connection_qr_code_428dd" formatted="false">"Connection QR code"</string>
+    <!-- ProfilePaneController.kt: qrItems -->
+    <string name="editor_profilepanecontroller_contact_740fa" formatted="false">"CONTACT"</string>
+    <!-- ProfilePaneController.kt: removeCurrentQr -->
+    <string name="editor_profilepanecontroller_delete_this_connection_code_from_the_local_d00ec" formatted="false">"Delete this connection code from the local profile?"</string>
+    <!-- ProfilePaneController.kt: editProfile -->
+    <string name="editor_profilepanecontroller_edit_profile_a6ba1" formatted="false">"EDIT PROFILE"</string>
+    <!-- ProfilePaneController.kt: addQr -->
+    <string name="editor_profilepanecontroller_github_wi_fi_contact_82dc7" formatted="false">"GitHub, Wi-Fi, Contact"</string>
+    <!-- ProfilePaneController.kt: editProfile -->
+    <string name="editor_profilepanecontroller_hidden_by_default_c1b32" formatted="false">"Hidden by default"</string>
+    <!-- ProfilePaneController.kt: addQr -->
+    <string name="editor_profilepanecontroller_label_74341" formatted="false">"Label"</string>
+    <!-- ProfilePaneController.kt: addQr -->
+    <string name="editor_profilepanecontroller_label_is_required_c9490" formatted="false">"Label is required."</string>
+    <!-- ProfilePaneController.kt: addQr -->
+    <string name="editor_profilepanecontroller_label_must_be_40_characters_or_fewer_4b1dd" formatted="false">"Label must be 40 characters or fewer."</string>
+    <!-- ProfilePaneController.kt: editProfile -->
+    <string name="editor_profilepanecontroller_name_709a2" formatted="false">"Name"</string>
+    <!-- ProfilePaneController.kt: editProfile -->
+    <string name="editor_profilepanecontroller_name_is_required_d7659" formatted="false">"Name is required."</string>
+    <!-- ProfilePaneController.kt: editProfile -->
+    <string name="editor_profilepanecontroller_name_must_be_48_characters_or_fewer_a81ab" formatted="false">"Name must be 48 characters or fewer."</string>
+    <!-- ProfilePaneController.kt: onBindViewHolder -->
+    <string name="editor_profilepanecontroller_no_connection_codes_de288" formatted="false">"NO CONNECTION CODES"</string>
+    <!-- ProfilePaneController.kt: revealPhone -->
+    <string name="editor_profilepanecontroller_not_set_ea4ed" formatted="false">"NOT SET"</string>
+    <!-- ProfilePaneController.kt: qrItems -->
+    <string name="editor_profilepanecontroller_operator_c2599" formatted="false">"OPERATOR"</string>
+    <!-- ProfilePaneController.kt: editProfile -->
+    <string name="editor_profilepanecontroller_operator_name_819cc" formatted="false">"Operator name"</string>
+    <!-- ProfilePaneController.kt: editProfile -->
+    <string name="editor_profilepanecontroller_phone_77064" formatted="false">"Phone"</string>
+    <!-- ProfilePaneController.kt: editProfile -->
+    <string name="editor_profilepanecontroller_phone_must_be_32_characters_or_fewer_7abc0" formatted="false">"Phone must be 32 characters or fewer."</string>
+    <!-- ProfilePaneController.kt: onBindViewHolder -->
+    <string name="editor_profilepanecontroller_qr_code_tap_to_hide_1bd59" formatted="false">"QR code. Tap to hide."</string>
+    <!-- ProfilePaneController.kt: addQr -->
+    <string name="editor_profilepanecontroller_qr_content_272d8" formatted="false">"QR content"</string>
+    <!-- ProfilePaneController.kt: addQr -->
+    <string name="editor_profilepanecontroller_qr_content_is_required_4353e" formatted="false">"QR content is required."</string>
+    <!-- ProfilePaneController.kt: addQr -->
+    <string name="editor_profilepanecontroller_qr_content_must_be_2048_characters_or_fewe_11e81" formatted="false">"QR content must be 2048 characters or fewer."</string>
+    <!-- ProfilePaneController.kt: removeCurrentQr -->
+    <string name="editor_profilepanecontroller_remove_a7db1">"REMOVE %1$s"</string>
+    <!-- ProfilePaneController.kt: removeCurrentQr -->
+    <string name="editor_profilepanecontroller_remove_f9662" formatted="false">"REMOVE"</string>
+    <!-- ProfilePaneController.kt: onCreateViewHolder -->
+    <string name="editor_profilepanecontroller_reveal_5a0d9" formatted="false">"[ REVEAL ]"</string>
+    <!-- ProfilePaneController.kt: onCreateViewHolder -->
+    <string name="editor_profilepanecontroller_reveal_qr_code_87b76" formatted="false">"Reveal QR code"</string>
+    <!-- ProfilePaneController.kt: editProfile -->
+    <string name="editor_profilepanecontroller_save_50815" formatted="false">"SAVE"</string>
+    <!-- ProfilePaneController.kt: qrItems -->
+    <string name="editor_profilepanecontroller_scan_to_add_9e5c8">"SCAN TO ADD %1$s"</string>
+    <!-- ProfilePaneController.kt: onBindViewHolder -->
+    <string name="editor_profilepanecontroller_tap_add_qr_to_generate_one_locally_f8074" formatted="false">"TAP ADD QR TO GENERATE ONE LOCALLY"</string>
+    <!-- ProfilePaneController.kt: addQr -->
+    <string name="editor_profilepanecontroller_url_or_text_9d2bd" formatted="false">"URL or text"</string>
+    <!-- RetuiTaskerPlugin.kt: buildContent -->
+    <string name="editor_retuitaskerplugin_choose_what_tasker_should_change_in_retui_58b55" formatted="false">"Choose what Tasker should change in RETUI."</string>
+    <!-- RetuiTaskerPlugin.kt: buildContent -->
+    <string name="editor_retuitaskerplugin_color_value_e_g_ff00ff_or_color_c5b03" formatted="false">"Color value, e.g. #FF00FF or %color"</string>
+    <!-- RetuiTaskerPlugin.kt: buildContent -->
+    <string name="editor_retuitaskerplugin_custom_name_or_tasker_variable_e_g_preset_88793" formatted="false">"Custom name or Tasker variable, e.g. %preset"</string>
+    <!-- RetuiTaskerPlugin.kt: buildContent -->
+    <string name="editor_retuitaskerplugin_custom_name_or_tasker_variable_e_g_space_56d76" formatted="false">"Custom name or Tasker variable, e.g. %space"</string>
+    <!-- RetuiTaskerPlugin.kt: buildContent -->
+    <string name="editor_retuitaskerplugin_module_id_73313" formatted="false">"Module id"</string>
+    <!-- RetuiTaskerPlugin.kt: buildContent -->
+    <string name="editor_retuitaskerplugin_preset_name_eb39e" formatted="false">"Preset name"</string>
+    <!-- RetuiTaskerPlugin.kt: onCreate -->
+    <string name="editor_retuitaskerplugin_retui_action_746d5" formatted="false">"RETUI Action"</string>
+    <!-- RetuiTaskerPlugin.kt: buildContent -->
+    <string name="editor_retuitaskerplugin_save_to_tasker_e0dd4" formatted="false">"Save to Tasker"</string>
+    <!-- RetuiTaskerPlugin.kt: buildContent -->
+    <string name="editor_retuitaskerplugin_space_6d8c9" formatted="false">"Space"</string>
+    <!-- RetuiTaskerPlugin.kt: buildContent -->
+    <string name="editor_retuitaskerplugin_text_c3328" formatted="false">"Text"</string>
+    <!-- RetuiTaskerPlugin.kt: buildContent -->
+    <string name="editor_retuitaskerplugin_theme_element_e_g_input_text_color_2b86f" formatted="false">"Theme element, e.g. input_text_color"</string>
+    <!-- RetuiWallpaperActivity.kt: switchScene -->
+    <string name="editor_retuiwallpaperactivity_bounds_d399f" formatted="false">"BOUNDS"</string>
+    <!-- RetuiWallpaperActivity.kt: showSolidColorPicker -->
+    <string name="editor_retuiwallpaperactivity_cancel_1507c" formatted="false">"CANCEL"</string>
+    <!-- RetuiWallpaperActivity.kt: onCreate -->
+    <string name="editor_retuiwallpaperactivity_color_34171" formatted="false">"COLOR"</string>
+    <!-- RetuiWallpaperActivity.kt: switchScene -->
+    <string name="editor_retuiwallpaperactivity_dust_1717e" formatted="false">"DUST"</string>
+    <!-- RetuiWallpaperActivity.kt: switchScene -->
+    <string name="editor_retuiwallpaperactivity_height_6ea6c" formatted="false">"HEIGHT"</string>
+    <!-- RetuiWallpaperActivity.kt: switchScene -->
+    <string name="editor_retuiwallpaperactivity_petals_5dc16" formatted="false">"PETALS"</string>
+    <!-- RetuiWallpaperActivity.kt: showSolidColorPicker -->
+    <string name="editor_retuiwallpaperactivity_pick_solid_color_04728" formatted="false">"Pick Solid Color"</string>
+    <!-- RetuiWallpaperActivity.kt: switchScene -->
+    <string name="editor_retuiwallpaperactivity_radius_69ea4" formatted="false">"RADIUS"</string>
+    <!-- RetuiWallpaperActivity.kt: onCreate -->
+    <string name="editor_retuiwallpaperactivity_regenerate_e63ad" formatted="false">"REGENERATE"</string>
+    <!-- RetuiWallpaperActivity.kt: switchScene -->
+    <string name="editor_retuiwallpaperactivity_tilt_aceae" formatted="false">"TILT"</string>
+    <!-- RetuiWallpaperActivity.kt: showSolidColorPicker -->
+    <string name="editor_retuiwallpaperactivity_use_7dcf4" formatted="false">"USE"</string>
+    <!-- RetuiWallpaperActivity.kt: onCreate -->
+    <string name="editor_retuiwallpaperactivity_use_on_phone_d908b" formatted="false">"USE ON PHONE"</string>
+    <!-- RetuiWallpaperActivity.kt: onCreate -->
+    <string name="editor_retuiwallpaperactivity_wallpaper_f00e8" formatted="false">"WALLPAPER"</string>
+    <!-- RetuiWallpaperActivity.kt: onCreate -->
+    <string name="editor_retuiwallpaperactivity_zoom_c6653" formatted="false">"ZOOM"</string>
+    <!-- TuixtActivity.kt: buildAsciiSettingsRows -->
+    <string name="editor_tuixtactivity_animation_62afd" formatted="false">"Animation"</string>
+    <!-- TuixtActivity.kt: launchAsciiImportPicker -->
+    <string name="editor_tuixtactivity_ascii_file_picker_is_unavailable_on_this_d_f32c0" formatted="false">"ASCII file picker is unavailable on this device."</string>
+    <!-- TuixtActivity.kt: handleAsciiImportResult -->
+    <string name="editor_tuixtactivity_ascii_import_cancelled_1ca68" formatted="false">"ASCII import cancelled."</string>
+    <!-- TuixtActivity.kt: handleAsciiImportResult -->
+    <string name="editor_tuixtactivity_ascii_import_failed_4b2e0">"ASCII import failed: %1$s"</string>
+    <!-- TuixtActivity.kt: handleAsciiImportResult -->
+    <string name="editor_tuixtactivity_ascii_import_failed_73d26" formatted="false">"ASCII import failed."</string>
+    <!-- TuixtActivity.kt: handleAsciiImportResult -->
+    <string name="editor_tuixtactivity_ascii_import_failed_empty_file_65e17" formatted="false">"ASCII import failed: empty file."</string>
+    <!-- TuixtActivity.kt: onCreate -->
+    <string name="editor_tuixtactivity_ascii_settings_4a299" formatted="false">"ASCII Settings"</string>
+    <!-- TuixtActivity.kt: buildAsciiSettingsRows -->
+    <string name="editor_tuixtactivity_ascii_txt_2739a" formatted="false">"ASCII TXT"</string>
+    <!-- TuixtActivity.kt: onActivityResult -->
+    <string name="editor_tuixtactivity_ascii_txt_saved_55025" formatted="false">"ascii.txt saved."</string>
+    <!-- TuixtActivity.kt: onCreate -->
+    <string name="editor_tuixtactivity_behavior_70e30">"Behavior/ %1$s"</string>
+    <!-- TuixtActivity.kt: onCreate -->
+    <string name="editor_tuixtactivity_cancel_1507c" formatted="false">"CANCEL"</string>
+    <!-- TuixtActivity.kt: onCreate -->
+    <string name="editor_tuixtactivity_changes_saved_previewing_launcher_8e180" formatted="false">"Changes saved. Previewing launcher..."</string>
+    <!-- TuixtActivity.kt: handleAsciiImportResult -->
+    <string name="editor_tuixtactivity_choose_a_txt_or_html_ascii_file_4714f" formatted="false">"Choose a .txt or .html ASCII file."</string>
+    <!-- TuixtActivity.kt: buildAsciiSettingsRows -->
+    <string name="editor_tuixtactivity_colors_88d5e" formatted="false">"Colors"</string>
+    <!-- TuixtActivity.kt: openAsciiTxt -->
+    <string name="editor_tuixtactivity_could_not_create_ascii_txt_62630">"Could not create ascii.txt: %1$s"</string>
+    <!-- TuixtActivity.kt: handleAsciiImportResult -->
+    <string name="editor_tuixtactivity_could_not_write_ascii_txt_5d089">"Could not write ascii.txt: %1$s"</string>
+    <!-- TuixtActivity.kt: attemptClose -->
+    <string name="editor_tuixtactivity_discard_36fff" formatted="false">"Discard"</string>
+    <!-- TuixtActivity.kt: attemptClose -->
+    <string name="editor_tuixtactivity_discard_changes_f99ee" formatted="false">"Discard Changes?"</string>
+    <!-- TuixtActivity.kt: onCreate -->
+    <string name="editor_tuixtactivity_error_saving_540ec">"Error saving: %1$s"</string>
+    <!-- TuixtActivity.kt: readUriBytes -->
+    <string name="editor_tuixtactivity_file_exceeds_kb_limit_9bba2">"file exceeds %1$d KB limit"</string>
+    <!-- TuixtActivity.kt: buildAsciiActions -->
+    <string name="editor_tuixtactivity_import_ascii_txt_9b586" formatted="false">"IMPORT ASCII TXT"</string>
+    <!-- TuixtActivity.kt: handleAsciiImportResult -->
+    <string name="editor_tuixtactivity_imported_animated_ascii_frames_d5b9c">"Imported animated ASCII: %1$d frames."</string>
+    <!-- TuixtActivity.kt: handleAsciiImportResult -->
+    <string name="editor_tuixtactivity_imported_ascii_txt_e5ed8" formatted="false">"Imported ASCII TXT."</string>
+    <!-- TuixtActivity.kt: handleAsciiImportResult -->
+    <string name="editor_tuixtactivity_imported_colored_ascii_html_9668a" formatted="false">"Imported colored ASCII HTML."</string>
+    <!-- TuixtActivity.kt: handleAsciiImportResult -->
+    <string name="editor_tuixtactivity_imported_frames_enable_animated_ascii_to_p_6960c">"Imported %1$d frames. Enable animated ASCII to play it."</string>
+    <!-- TuixtActivity.kt: attemptClose -->
+    <string name="editor_tuixtactivity_keep_editing_ced7d" formatted="false">"Keep Editing"</string>
+    <!-- TuixtActivity.kt: buildAsciiSettingsRows -->
+    <string name="editor_tuixtactivity_layout_972ad" formatted="false">"Layout"</string>
+    <!-- TuixtActivity.kt: launchAsciiImportPicker -->
+    <string name="editor_tuixtactivity_opening_ascii_file_picker_0304c" formatted="false">"Opening ASCII file picker..."</string>
+    <!-- TuixtActivity.kt: onCreate -->
+    <string name="editor_tuixtactivity_save_50815" formatted="false">"SAVE"</string>
+    <!-- TuixtActivity.kt: onCreate -->
+    <string name="editor_tuixtactivity_search_settings_d25ad" formatted="false">"Search settings..."</string>
+    <!-- TuixtActivity.kt: onCreate -->
+    <string name="editor_tuixtactivity_themer_93fef">"Themer/ %1$s"</string>
+    <!-- TuixtActivity.kt: readUriBytes -->
+    <string name="editor_tuixtactivity_unable_to_read_selected_file_8a911" formatted="false">"Unable to read selected file."</string>
+    <!-- TuixtActivity.kt: attemptClose -->
+    <string name="editor_tuixtactivity_unsaved_settings_changes_will_be_lost_697a2" formatted="false">"Unsaved settings changes will be lost."</string>
+    <!-- TuixtAdapter.kt: displayLabel -->
+    <string name="editor_tuixtadapter_animation_frame_delay_46de0" formatted="false">"Animation Frame Delay"</string>
+    <!-- TuixtAdapter.kt: displayLabel -->
+    <string name="editor_tuixtadapter_ascii_alignment_bb48f" formatted="false">"ASCII Alignment"</string>
+    <!-- TuixtAdapter.kt: displayLabel -->
+    <string name="editor_tuixtadapter_ascii_background_color_e5078" formatted="false">"ASCII Background Color"</string>
+    <!-- TuixtAdapter.kt: displayLabel -->
+    <string name="editor_tuixtadapter_ascii_pane_height_2d2b7" formatted="false">"ASCII Pane Height"</string>
+    <!-- TuixtAdapter.kt: displayLabel -->
+    <string name="editor_tuixtadapter_ascii_position_4b86a" formatted="false">"ASCII Position"</string>
+    <!-- TuixtAdapter.kt: displayLabel -->
+    <string name="editor_tuixtadapter_ascii_text_color_ee845" formatted="false">"ASCII Text Color"</string>
+    <!-- TuixtAdapter.kt: displayLabel -->
+    <string name="editor_tuixtadapter_ascii_text_shadow_color_1219b" formatted="false">"ASCII Text Shadow Color"</string>
+    <!-- TuixtAdapter.kt: displayLabel -->
+    <string name="editor_tuixtadapter_ascii_viewport_rows_30da0" formatted="false">"ASCII Viewport Rows"</string>
+    <!-- TuixtAdapter.kt: showColorPicker -->
+    <string name="editor_tuixtadapter_auto_a4b6e">"AUTO  %1$s"</string>
+    <!-- TuixtAdapter.kt: displayLabel -->
+    <string name="editor_tuixtadapter_enable_animated_ascii_5a922" formatted="false">"Enable Animated ASCII"</string>
+    <!-- TuixtAdapter.kt: displayLabel -->
+    <string name="editor_tuixtadapter_legacy_ascii_text_size_37f49" formatted="false">"Legacy ASCII Text Size"</string>
+    <!-- TuixtAdapter.kt: displayLabel -->
+    <string name="editor_tuixtadapter_max_ascii_import_file_size_7ae47" formatted="false">"Max ASCII Import File Size"</string>
+    <!-- TuixtAdapter.kt: onBindViewHolder -->
+    <string name="editor_tuixtadapter_providers_1bec3" formatted="false">"PROVIDERS"</string>
+    <!-- TuixtAdapter.kt: displayLabel -->
+    <string name="editor_tuixtadapter_show_ascii_in_landscape_587c0" formatted="false">"Show ASCII In Landscape"</string>
+    <!-- TuixtAdapter.kt: displayLabel -->
+    <string name="editor_tuixtadapter_show_ascii_txt_871d6" formatted="false">"Show ASCII TXT"</string>
+    <!-- TuixtAdapter.kt: bindToolbarIconPicker -->
+    <string name="editor_tuixtadapter_toolbar_icon_b7566" formatted="false">"Toolbar Icon"</string>
+    <!-- TuixtAdapter.kt: displayLabel -->
+    <string name="editor_tuixtadapter_unified_bottom_console_d8bbf" formatted="false">"Unified Bottom Console"</string>
+    <!-- TuixtAdapter.kt: bindSection -->
+    <string name="editor_tuixtadapter_unsectioned_7d5f9" formatted="false">"Unsectioned"</string>
+    <!-- WidgetConfigActivity.kt: onCreate -->
+    <string name="editor_widgetconfigactivity_cancel_1507c" formatted="false">"CANCEL"</string>
+    <!-- WidgetConfigActivity.kt: onCreate -->
+    <string name="editor_widgetconfigactivity_config_failed_5b277">"Config failed: %1$s"</string>
+    <!-- WidgetConfigActivity.kt: attemptClose -->
+    <string name="editor_widgetconfigactivity_discard_36fff" formatted="false">"Discard"</string>
+    <!-- WidgetConfigActivity.kt: attemptClose -->
+    <string name="editor_widgetconfigactivity_discard_changes_f99ee" formatted="false">"Discard Changes?"</string>
+    <!-- WidgetConfigActivity.kt: onCreate -->
+    <string name="editor_widgetconfigactivity_invalid_config_schema_5adb8">"Invalid config schema: %1$s"</string>
+    <!-- WidgetConfigActivity.kt: currentValues -->
+    <string name="editor_widgetconfigactivity_is_required_372e6">"%1$s is required."</string>
+    <!-- WidgetConfigActivity.kt: attemptClose -->
+    <string name="editor_widgetconfigactivity_keep_editing_ced7d" formatted="false">"Keep Editing"</string>
+    <!-- WidgetConfigActivity.kt: currentValues -->
+    <string name="editor_widgetconfigactivity_must_be_a_number_fedc6">"%1$s must be a number."</string>
+    <!-- WidgetConfigActivity.kt: currentValues -->
+    <string name="editor_widgetconfigactivity_must_be_at_least_75d4b">"%1$s must be at least %2$s."</string>
+    <!-- WidgetConfigActivity.kt: currentValues -->
+    <string name="editor_widgetconfigactivity_must_be_at_most_54268">"%1$s must be at most %2$s."</string>
+    <!-- WidgetConfigActivity.kt: onCreate -->
+    <string name="editor_widgetconfigactivity_no_config_surface_92c6f">"No config surface: %1$s"</string>
+    <!-- WidgetConfigActivity.kt: bindFields -->
+    <string name="editor_widgetconfigactivity_no_editable_fields_97e29" formatted="false">"No editable fields."</string>
+    <!-- WidgetConfigActivity.kt: options -->
+    <string name="editor_widgetconfigactivity_none_6eef6" formatted="false">"None"</string>
+    <!-- WidgetConfigActivity.kt: onCreate -->
+    <string name="editor_widgetconfigactivity_save_50815" formatted="false">"SAVE"</string>
+    <!-- WidgetConfigActivity.kt: saveAndClose -->
+    <string name="editor_widgetconfigactivity_save_failed_8f75d">"Save failed: %1$s"</string>
+    <!-- WidgetConfigActivity.kt: attemptClose -->
+    <string name="editor_widgetconfigactivity_unsaved_lua_module_settings_will_be_lost_e6012" formatted="false">"Unsaved Lua module settings will be lost."</string>
+    <!-- WidgetEditorActivity.kt: onCreate -->
+    <string name="editor_widgeteditoractivity_cancel_1507c" formatted="false">"CANCEL"</string>
+    <!-- WidgetEditorActivity.kt: showFindReplaceDialog -->
+    <string name="editor_widgeteditoractivity_close_find_and_replace_1e4b7" formatted="false">"Close find and replace"</string>
+    <!-- WidgetEditorActivity.kt: capabilityWarning -->
+    <string name="editor_widgeteditoractivity_declare_1b3b5">"  |  Declare: %1$s"</string>
+    <!-- WidgetEditorActivity.kt: attemptClose -->
+    <string name="editor_widgeteditoractivity_discard_36fff" formatted="false">"Discard"</string>
+    <!-- WidgetEditorActivity.kt: attemptClose -->
+    <string name="editor_widgeteditoractivity_discard_changes_f99ee" formatted="false">"Discard Changes?"</string>
+    <!-- WidgetEditorActivity.kt: onCreate -->
+    <string name="editor_widgeteditoractivity_document_e214b" formatted="false">"Document"</string>
+    <!-- WidgetEditorActivity.kt: updateCapabilityPreview -->
+    <string name="editor_widgeteditoractivity_document_editor_dd692" formatted="false">"Document editor"</string>
+    <!-- WidgetEditorActivity.kt: onCreate -->
+    <string name="editor_widgeteditoractivity_document_name_2159c" formatted="false">"Document name"</string>
+    <!-- WidgetEditorActivity.kt: save -->
+    <string name="editor_widgeteditoractivity_document_name_is_required_d8c5c" formatted="false">"Document name is required"</string>
+    <!-- WidgetEditorActivity.kt: save -->
+    <string name="editor_widgeteditoractivity_document_name_needs_letters_or_numbers_ccffd" formatted="false">"Document name needs letters or numbers"</string>
+    <!-- WidgetEditorActivity.kt: save -->
+    <string name="editor_widgeteditoractivity_document_saved_d73e0">"Document saved: %1$s"</string>
+    <!-- WidgetEditorActivity.kt: updateHeader -->
+    <string name="editor_widgeteditoractivity_documents_687c8" formatted="false">"Documents"</string>
+    <!-- WidgetEditorActivity.kt: onCreate -->
+    <string name="editor_widgeteditoractivity_file_name_09979" formatted="false">"File name"</string>
+    <!-- WidgetEditorActivity.kt: showFindReplaceDialog -->
+    <string name="editor_widgeteditoractivity_find_df251" formatted="false">"Find"</string>
+    <!-- WidgetEditorActivity.kt: showFindReplaceDialog -->
+    <string name="editor_widgeteditoractivity_find_next_479b5" formatted="false">"FIND NEXT"</string>
+    <!-- WidgetEditorActivity.kt: showFindReplaceDialog -->
+    <string name="editor_widgeteditoractivity_find_previous_682dd" formatted="false">"FIND PREVIOUS"</string>
+    <!-- WidgetEditorActivity.kt: showFindReplaceDialog -->
+    <string name="editor_widgeteditoractivity_find_replace_3ac99" formatted="false">"Find/Replace"</string>
+    <!-- WidgetEditorActivity.kt: onCreate -->
+    <string name="editor_widgeteditoractivity_find_replace_666ec" formatted="false">"FIND/REPLACE"</string>
+    <!-- WidgetEditorActivity.kt: attemptClose -->
+    <string name="editor_widgeteditoractivity_keep_editing_ced7d" formatted="false">"Keep Editing"</string>
+    <!-- WidgetEditorActivity.kt: save -->
+    <string name="editor_widgeteditoractivity_lua_module_id_already_exists_7eb87">"Lua module id already exists: %1$s"</string>
+    <!-- WidgetEditorActivity.kt: updateHeader -->
+    <string name="editor_widgeteditoractivity_lua_modules_4cf19" formatted="false">"Lua Modules"</string>
+    <!-- WidgetEditorActivity.kt: capabilityWarning -->
+    <string name="editor_widgeteditoractivity_metadata_438b7">"  |  Metadata: %1$s"</string>
+    <!-- WidgetEditorActivity.kt: capabilityWarning -->
+    <string name="editor_widgeteditoractivity_metadata_inferred_d6932" formatted="false">"  |  Metadata: inferred"</string>
+    <!-- WidgetEditorActivity.kt: replaceAll -->
+    <string name="editor_widgeteditoractivity_not_found_926a3">"Not found: %1$s"</string>
+    <!-- WidgetEditorActivity.kt: showFindReplaceDialog -->
+    <string name="editor_widgeteditoractivity_replace_all_16af7" formatted="false">"REPLACE ALL"</string>
+    <!-- WidgetEditorActivity.kt: showFindReplaceDialog -->
+    <string name="editor_widgeteditoractivity_replace_c336f" formatted="false">"REPLACE"</string>
+    <!-- WidgetEditorActivity.kt: showFindReplaceDialog -->
+    <string name="editor_widgeteditoractivity_replace_with_dde40" formatted="false">"Replace with"</string>
+    <!-- WidgetEditorActivity.kt: replaceAll -->
+    <string name="editor_widgeteditoractivity_replaced_matches_bc3c9">"Replaced %1$d matches"</string>
+    <!-- WidgetEditorActivity.kt: onCreate -->
+    <string name="editor_widgeteditoractivity_save_50815" formatted="false">"SAVE"</string>
+    <!-- WidgetEditorActivity.kt: save -->
+    <string name="editor_widgeteditoractivity_save_failed_8f75d">"Save failed: %1$s"</string>
+    <!-- WidgetEditorActivity.kt: onNewIntent -->
+    <string name="editor_widgeteditoractivity_save_or_discard_the_current_changes_before_54d4f" formatted="false">"Save or discard the current changes before opening another document."</string>
+    <!-- WidgetEditorActivity.kt: onCreate -->
+    <string name="editor_widgeteditoractivity_save_run_afa8d" formatted="false">"SAVE/RUN"</string>
+    <!-- WidgetEditorActivity.kt: save -->
+    <string name="editor_widgeteditoractivity_suggestion_script_saved_06561">"Suggestion script saved: %1$s"</string>
+    <!-- WidgetEditorActivity.kt: updateCapabilityPreview -->
+    <string name="editor_widgeteditoractivity_type_id_api_capabilities_permissions_8afdd">"Type: %1$s  |  ID: %2$s  |  API: %3$s  |  Capabilities: %4$s  |  Permissions: %5$s%6$s"</string>
+    <!-- WidgetEditorActivity.kt: attemptClose -->
+    <string name="editor_widgeteditoractivity_unsaved_document_changes_will_be_lost_21b59" formatted="false">"Unsaved document changes will be lost."</string>
+    <!-- WidgetEditorActivity.kt: capabilityWarning -->
+    <string name="editor_widgeteditoractivity_unsupported_f4481">"  |  Unsupported: %1$s"</string>
+    <string name="tasker_apply_preset">Apply preset</string>
+    <string name="tasker_set_theme">Set theme element</string>
+    <string name="tasker_show_module">Show module</string>
+    <string name="tasker_refresh_module">Refresh module</string>
+    <string name="tasker_update_module">Update module text</string>
+    <string name="tasker_terminal_output">Terminal output</string>
+    <string name="tasker_switch_space">Switch Space</string>
+    <string name="tasker_generic_action">RETUI action</string>
+    <string name="tasker_choose_action">Choose a RETUI action.</string>
+    <string name="tasker_choose_space">Choose a Space.</string>
+    <string name="tasker_custom_variable">Custom / Tasker variable</string>
+    <string name="wallpaper_pick_color">Pick color…</string>
+    <string name="wallpaper_sakura">Sakura</string>
+    <string name="wallpaper_black_hole">Black hole</string>
+    <string name="wallpaper_solid">Solid color</string>
+</resources>

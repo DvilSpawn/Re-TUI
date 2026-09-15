@@ -33,6 +33,9 @@ import android.net.Uri
 
 class MusicService : Service(), OnPreparedListener, MediaPlayer.OnErrorListener,
     OnCompletionListener {
+    override fun getResources(): android.content.res.Resources =
+        ohi.andre.consolelauncher.localization.LanguagePacks.resources(super.getResources())
+
     private var player: MediaPlayer? = null
     private var songs: MutableList<Song>? = null
     var songIndex: Int = 0
@@ -436,7 +439,7 @@ class MusicService : Service(), OnPreparedListener, MediaPlayer.OnErrorListener,
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 val channel = NotificationChannel(
                     channelId,
-                    "Music Playback",
+                    context.getString(R.string.manager_musicservice_music_playback_e100b),
                     NotificationManager.IMPORTANCE_LOW
                 )
                 channel.setSound(null, null)
@@ -460,22 +463,22 @@ class MusicService : Service(), OnPreparedListener, MediaPlayer.OnErrorListener,
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setTicker(songTitle)
                 .setOngoing(true)
-                .setContentTitle("Playing")
+                .setContentTitle(context.getString(R.string.manager_musicservice_playing_298c3))
                 .setContentText(songTitle)
 
             builder.addAction(
                 R.mipmap.ic_launcher,
-                "PREV",
+                context.getString(R.string.manager_musicservice_prev_b231d),
                 controlIntent(context, CONTROL_PREV_INT, 21)
             )
             builder.addAction(
                 R.mipmap.ic_launcher,
-                "PLAY/PAUSE",
+                context.getString(R.string.manager_musicservice_play_pause_884d0),
                 controlIntent(context, CONTROL_PLAY_PAUSE_INT, 22)
             )
             builder.addAction(
                 R.mipmap.ic_launcher,
-                "NEXT",
+                context.getString(R.string.manager_musicservice_next_1992d),
                 controlIntent(context, CONTROL_NEXT_INT, 23)
             )
 

@@ -1,0 +1,723 @@
+<resources>
+    <!-- Setting descriptions only. Keys, accepted values, and format tokens must not be translated. -->
+    <!-- Apps.kt: default_app_n1 -->
+    <string name="setting_apps_default_app_n1_description" formatted="false">"The first default-suggested app"</string>
+    <!-- Apps.kt: default_app_n2 -->
+    <string name="setting_apps_default_app_n2_description" formatted="false">"The second default-suggested app"</string>
+    <!-- Apps.kt: default_app_n3 -->
+    <string name="setting_apps_default_app_n3_description" formatted="false">"The third default-suggested app"</string>
+    <!-- Apps.kt: default_app_n4 -->
+    <string name="setting_apps_default_app_n4_description" formatted="false">"The fourth default-suggested app"</string>
+    <!-- Apps.kt: default_app_n5 -->
+    <string name="setting_apps_default_app_n5_description" formatted="false">"The fifth default-suggested app"</string>
+    <!-- Apps.kt: app_groups_sorting -->
+    <string name="setting_apps_app_groups_sorting_description" formatted="false">"0 = time up-&gt;down; 1 = time down-&gt;up; 2 = alphabetical up-&gt;down; 3 = alphabetical down-&gt;up; 4 = most used up-&gt;down; 5 = most used down-&gt;up"</string>
+    <!-- Behavior.kt: double_tap_lock -->
+    <string name="setting_behavior_double_tap_lock_description" formatted="false">"If true, Re:T-UI will lock the screen on double tap"</string>
+    <!-- Behavior.kt: double_tap_cmd -->
+    <string name="setting_behavior_double_tap_cmd_description" formatted="false">"The command that will run when you touch two times the screen quickly"</string>
+    <!-- Behavior.kt: random_play -->
+    <string name="setting_behavior_random_play_description" formatted="false">"If true, music player will play your tracks in random order"</string>
+    <!-- Behavior.kt: launcher_sounds -->
+    <string name="setting_behavior_launcher_sounds_description" formatted="false">"If true, Re:T-UI will play its bundled launcher sound pack"</string>
+    <!-- Behavior.kt: songs_folder -->
+    <string name="setting_behavior_songs_folder_description" formatted="false">"The folder that contains your music files"</string>
+    <!-- Behavior.kt: songs_from_mediastore -->
+    <string name="setting_behavior_songs_from_mediastore_description" formatted="false">"If true, Re:T-UI will get tracks from the system mediastore"</string>
+    <!-- Behavior.kt: tui_notification -->
+    <string name="setting_behavior_tui_notification_description" formatted="false">"If true, there will always be a notification in your status bar, telling you that Re:T-UI is running"</string>
+    <!-- Behavior.kt: auto_show_keyboard -->
+    <string name="setting_behavior_auto_show_keyboard_description" formatted="false">"If true, your keyboard will be shown everytime you go back to Re:T-UI"</string>
+    <!-- Behavior.kt: auto_scroll -->
+    <string name="setting_behavior_auto_scroll_description" formatted="false">"If true, the terminal will be automatically scrolled down when the keyboard is open"</string>
+    <!-- Behavior.kt: show_alias_content -->
+    <string name="setting_behavior_show_alias_content_description" formatted="false">"If true, when you use an alias you\'ll also be able to know what command has been executed"</string>
+    <!-- Behavior.kt: show_launch_history -->
+    <string name="setting_behavior_show_launch_history_description" formatted="false">"If false, Re:T-UI won\'t show the apps that you launch"</string>
+    <!-- Behavior.kt: show_module_dock -->
+    <string name="setting_behavior_show_module_dock_description" formatted="false">"If false, Re:T-UI will hide the module dock row while keeping modules available through commands"</string>
+    <!-- Behavior.kt: show_tmux_workspace_button -->
+    <string name="setting_behavior_show_tmux_workspace_button_description" formatted="false">"If true, Re:T-UI will show the tmux workspace button in the launcher toolbar"</string>
+    <!-- Behavior.kt: show_android_widget_drawer_button -->
+    <string name="setting_behavior_show_android_widget_drawer_button_description" formatted="false">"If true, Re:T-UI will show the Android widgets button in the launcher toolbar"</string>
+    <!-- Behavior.kt: enable_cyberdeck_mode -->
+    <string name="setting_behavior_enable_cyberdeck_mode_description" formatted="false">"If true, Re:T-UI uses angular cyberdeck drawables while keeping the active theme colors"</string>
+    <!-- Behavior.kt: enable_crt_filter -->
+    <string name="setting_behavior_enable_crt_filter_description" formatted="false">"If true, Re:T-UI draws a CRT scanline overlay over the launcher"</string>
+    <!-- Behavior.kt: ascii_animation -->
+    <string name="setting_behavior_ascii_animation_description" formatted="false">"If true, Re:T-UI will animate framed content pasted into ascii.txt"</string>
+    <!-- Behavior.kt: ascii_animation_frame_delay_ms -->
+    <string name="setting_behavior_ascii_animation_frame_delay_ms_description" formatted="false">"Default delay between animated ASCII frames in milliseconds"</string>
+    <!-- Behavior.kt: ascii_animation_max_file_kb -->
+    <string name="setting_behavior_ascii_animation_max_file_kb_description" formatted="false">"Maximum ASCII TXT import size, in KB"</string>
+    <!-- Behavior.kt: clear_after_cmds -->
+    <string name="setting_behavior_clear_after_cmds_description" formatted="false">"Auto-clear after n commands (if -1, this feature will be disabled)"</string>
+    <!-- Behavior.kt: clear_input_after_command -->
+    <string name="setting_behavior_clear_input_after_command_description" formatted="false">"Clear the launcher input and refresh suggestions after running a command"</string>
+    <!-- Behavior.kt: clear_after_seconds -->
+    <string name="setting_behavior_clear_after_seconds_description" formatted="false">"Auto-clear after n seconds (if -1, this feature will be disabled)"</string>
+    <!-- Behavior.kt: max_lines -->
+    <string name="setting_behavior_max_lines_description" formatted="false">"Set maximum number of lines that will be shown in the terminal (if -1, this feature is be disabled)"</string>
+    <!-- Behavior.kt: status_time_format -->
+    <string name="setting_behavior_status_time_format_description" formatted="false">"Define the time format for the status lines at the top. You can resize parts with [size=30]HH:mm[/size], use {clock_words} for Six Fifty Seven, and use %n for a new line"</string>
+    <!-- Behavior.kt: output_time_format -->
+    <string name="setting_behavior_output_time_format_description" formatted="false">"Define the time format for the output lines. You can resize parts with [size=30]HH:mm[/size]"</string>
+    <!-- Behavior.kt: time_format_separator -->
+    <string name="setting_behavior_time_format_separator_description" formatted="false">"This is the separator between your different time formats"</string>
+    <!-- Behavior.kt: battery_medium -->
+    <string name="setting_behavior_battery_medium_description" formatted="false">"The percentage below which the battery level will be considered \"medium\""</string>
+    <!-- Behavior.kt: battery_low -->
+    <string name="setting_behavior_battery_low_description" formatted="false">"The percentage below which the battery level will be considered \"low\""</string>
+    <!-- Behavior.kt: device_format -->
+    <string name="setting_behavior_device_format_description" formatted="false">"Define the device format"</string>
+    <!-- Behavior.kt: ram_format -->
+    <string name="setting_behavior_ram_format_description" formatted="false">"Define the RAM format"</string>
+    <!-- Behavior.kt: battery_format -->
+    <string name="setting_behavior_battery_format_description" formatted="false">"Define the battery format"</string>
+    <!-- Behavior.kt: battery_progress_bar -->
+    <string name="setting_behavior_battery_progress_bar_description" formatted="false">"If true, the battery will be shown as a progress bar"</string>
+    <!-- Behavior.kt: battery_progress_bar_symbol -->
+    <string name="setting_behavior_battery_progress_bar_symbol_description" formatted="false">"The character used to build the battery progress bar"</string>
+    <!-- Behavior.kt: battery_progress_bar_length -->
+    <string name="setting_behavior_battery_progress_bar_length_description" formatted="false">"The length of the battery progress bar"</string>
+    <!-- Behavior.kt: storage_format -->
+    <string name="setting_behavior_storage_format_description" formatted="false">"Define the storage format"</string>
+    <!-- Behavior.kt: network_info_format -->
+    <string name="setting_behavior_network_info_format_description" formatted="false">"Define the network format"</string>
+    <!-- Behavior.kt: input_format -->
+    <string name="setting_behavior_input_format_description" formatted="false">"Define the input format "</string>
+    <!-- Behavior.kt: output_format -->
+    <string name="setting_behavior_output_format_description" formatted="false">"Define the output format "</string>
+    <!-- Behavior.kt: session_info_format -->
+    <string name="setting_behavior_session_info_format_description" formatted="false">"Define the session info format"</string>
+    <!-- Behavior.kt: app_launch_format -->
+    <string name="setting_behavior_app_launch_format_description" formatted="false">"Define app launch format (%l = label, %p = package, %a = activity)"</string>
+    <!-- Behavior.kt: alias_param_marker -->
+    <string name="setting_behavior_alias_param_marker_description" formatted="false">"Define the marker that will be replaced with a provided param"</string>
+    <!-- Behavior.kt: alias_param_separator -->
+    <string name="setting_behavior_alias_param_separator_description" formatted="false">"Define the separator between a group of params"</string>
+    <!-- Behavior.kt: alias_replace_all_markers -->
+    <string name="setting_behavior_alias_replace_all_markers_description" formatted="false">"If true, if you pass a lower number of parameters to an alias, Re:T-UI will use the first one to replace the others"</string>
+    <!-- Behavior.kt: multiple_cmd_separator -->
+    <string name="setting_behavior_multiple_cmd_separator_description" formatted="false">"The separator between two or more commands in a single input"</string>
+    <!-- Behavior.kt: toggle_output_state -->
+    <string name="setting_behavior_toggle_output_state_description" formatted="false">"Legacy output tray toggle. Use output_tray_mode=toggled for manual expanded/collapsed control"</string>
+    <!-- Behavior.kt: output_tray_mode -->
+    <string name="setting_behavior_output_tray_mode_description" formatted="false">"Canonical output tray behavior: native, auto, or toggled"</string>
+    <!-- Behavior.kt: output_header_mode -->
+    <string name="setting_behavior_output_header_mode_description" formatted="false">"Output header display: normal, arrows, or none. None hides the manual tray toggle."</string>
+    <!-- Behavior.kt: auto_hide_output -->
+    <string name="setting_behavior_auto_hide_output_description" formatted="false">"Collapse output to its clickable header after a delay. Disabled when output_header_mode is none"</string>
+    <!-- Behavior.kt: output_auto_hide_seconds -->
+    <string name="setting_behavior_output_auto_hide_seconds_description" formatted="false">"Seconds before auto-hide collapses output to its header (1-3600)"</string>
+    <!-- Behavior.kt: alias_content_format -->
+    <string name="setting_behavior_alias_content_format_description" formatted="false">"Define the format used to show your alias contents "</string>
+    <!-- Behavior.kt: home_path -->
+    <string name="setting_behavior_home_path_description" formatted="false">"The path to your home directory"</string>
+    <!-- Behavior.kt: app_installed_format -->
+    <string name="setting_behavior_app_installed_format_description" formatted="false">"The format of the \"app installed\" message (%l = label, %p = package)"</string>
+    <!-- Behavior.kt: app_updated_format -->
+    <string name="setting_behavior_app_updated_format_description" formatted="false">"The format of the \"app updated\" message (%l = label, %p = package)"</string>
+    <!-- Behavior.kt: app_uninstalled_format -->
+    <string name="setting_behavior_app_uninstalled_format_description" formatted="false">"The format of the \"app uninstalled\" message (%l = label, %p = package)"</string>
+    <!-- Behavior.kt: enable_music -->
+    <string name="setting_behavior_enable_music_description" formatted="false">"If true, you will be able to use Re:T-UI as a music player. Otherwise, the music command will try to communicate with the music player that your using"</string>
+    <!-- Behavior.kt: max_optional_depth -->
+    <string name="setting_behavior_max_optional_depth_description" formatted="false">"A value which is used to tell how deep Re:T-UI can go in a nested optional value"</string>
+    <!-- Behavior.kt: tui_notification_title -->
+    <string name="setting_behavior_tui_notification_title_description" formatted="false">"The title of the Re:T-UI notification"</string>
+    <!-- Behavior.kt: tui_notification_subtitle -->
+    <string name="setting_behavior_tui_notification_subtitle_description" formatted="false">"The subtitle of the Re:T-UI notification"</string>
+    <!-- Behavior.kt: tui_notification_click_cmd -->
+    <string name="setting_behavior_tui_notification_click_cmd_description" formatted="false">"The command ran when the Re:T-UI notification is clicked"</string>
+    <!-- Behavior.kt: tui_notification_click_showhome -->
+    <string name="setting_behavior_tui_notification_click_showhome_description" formatted="false">"If false, the click on the Re:T-UI notification won\'t bring you to your phone home"</string>
+    <!-- Behavior.kt: tui_notification_lastcmds_size -->
+    <string name="setting_behavior_tui_notification_lastcmds_size_description" formatted="false">"The number of used commands that will appear inside the Re:T-UI notification (&lt;0 will disable the feature)"</string>
+    <!-- Behavior.kt: tui_notification_lastcmds_updown -->
+    <string name="setting_behavior_tui_notification_lastcmds_updown_description" formatted="false">"If true, the last used command will appear on top"</string>
+    <!-- Behavior.kt: tui_notification_priority -->
+    <string name="setting_behavior_tui_notification_priority_description" formatted="false">"The priority of the Re:T-UI notification (min: -2, max: 2)"</string>
+    <!-- Behavior.kt: long_click_vibration_duration -->
+    <string name="setting_behavior_long_click_vibration_duration_description" formatted="false">"The duration (in milliseconds) of the vibration when you long click a notification or an RSS item (&lt;0 will disable the feature)"</string>
+    <!-- Behavior.kt: long_click_duration -->
+    <string name="setting_behavior_long_click_duration_description" formatted="false">"The minimum duration of the long click on a notification or an RSS item"</string>
+    <!-- Behavior.kt: click_commands -->
+    <string name="setting_behavior_click_commands_description" formatted="false">"If true, you will be able to use a command again clicking on it"</string>
+    <!-- Behavior.kt: long_click_commands -->
+    <string name="setting_behavior_long_click_commands_description" formatted="false">"If true, you will be able to put a used command in the input field long-clicking it"</string>
+    <!-- Behavior.kt: append_quote_before_file -->
+    <string name="setting_behavior_append_quote_before_file_description" formatted="false">"If true, Re:T-UI will automatically append a quote before a file inserted clicking on a suggestion"</string>
+    <!-- Behavior.kt: optional_values_separator -->
+    <string name="setting_behavior_optional_values_separator_description" formatted="false">"The separator between two optional values (doesn\'t affect notification optional values)"</string>
+    <!-- Behavior.kt: notes_sorting -->
+    <string name="setting_behavior_notes_sorting_description" formatted="false">"0 = time up-&gt;down; 1 = time down-&gt;up; 2 = alphabetical up-&gt;down; 3 = alphabetical down-&gt;up; 4 = locked before; 5 = unlocked before"</string>
+    <!-- Behavior.kt: notes_allow_link -->
+    <string name="setting_behavior_notes_allow_link_description" formatted="false">"If false, adding links to notes will be disallowed (may slightly increase performance)"</string>
+    <!-- Behavior.kt: orientation -->
+    <string name="setting_behavior_orientation_description" formatted="false">"0 = landscape, 1 = portrait, 2 = auto-rotate"</string>
+    <!-- Behavior.kt: duo_mode -->
+    <string name="setting_behavior_duo_mode_description" formatted="false">"If true, enables the Duo command for manually switching landscape into a single portrait-style pane on the left or right screen"</string>
+    <!-- Behavior.kt: htmlextractor_default_format -->
+    <string name="setting_behavior_htmlextractor_default_format_description" formatted="false">"The default format used by htmlextract -use"</string>
+    <!-- Behavior.kt: tui_notification_time_text_color -->
+    <string name="setting_behavior_tui_notification_time_text_color_description" formatted="false">"The time color inside the Re:T-UI notification"</string>
+    <!-- Behavior.kt: tui_notification_input_text_color -->
+    <string name="setting_behavior_tui_notification_input_text_color_description" formatted="false">"The input color inside the Re:T-UI notification"</string>
+    <!-- Behavior.kt: weather_key -->
+    <string name="setting_behavior_weather_key_description" formatted="false">"Legacy OpenWeather setting. It is no longer used."</string>
+    <!-- Behavior.kt: weather_temperature_measure -->
+    <string name="setting_behavior_weather_temperature_measure_description" formatted="false">"metric = Celsius; imperial = Fahrenheit; standard = Kelvin"</string>
+    <!-- Behavior.kt: weather_location -->
+    <string name="setting_behavior_weather_location_description" formatted="false">"Place name or fixed coordinates separated by a comma (lat,lon). Weather never requests device location."</string>
+    <!-- Behavior.kt: weather_format -->
+    <string name="setting_behavior_weather_format_description" formatted="false">"The format used to show the weather"</string>
+    <!-- Behavior.kt: clear_on_lock -->
+    <string name="setting_behavior_clear_on_lock_description" formatted="false">"If true, Re:T-UI will clear the screen when you lock the phone"</string>
+    <!-- Behavior.kt: unlock_counter_format -->
+    <string name="setting_behavior_unlock_counter_format_description" formatted="false">"The format used to show the unlock counter"</string>
+    <!-- Behavior.kt: unlock_time_divider -->
+    <string name="setting_behavior_unlock_time_divider_description" formatted="false">"The divider between the last unlock times"</string>
+    <!-- Behavior.kt: unlock_time_order -->
+    <string name="setting_behavior_unlock_time_order_description" formatted="false">"1 = up-down. 2 = down-up"</string>
+    <!-- Behavior.kt: unlock_counter_cycle_start -->
+    <string name="setting_behavior_unlock_counter_cycle_start_description" formatted="false">"The starting hour of the unlock counter cycle (hh.mm)"</string>
+    <!-- Behavior.kt: not_available_text -->
+    <string name="setting_behavior_not_available_text_description" formatted="false">"The text shown when a value is not available"</string>
+    <!-- Behavior.kt: back_button_enabled -->
+    <string name="setting_behavior_back_button_enabled_description" formatted="false">"If true, the back button will put the previous command inside the input area"</string>
+    <!-- Behavior.kt: swipe_down_notifications -->
+    <string name="setting_behavior_swipe_down_notifications_description" formatted="false">"If true, swiping down will expand the notification shade"</string>
+    <!-- Behavior.kt: weather_update_time -->
+    <string name="setting_behavior_weather_update_time_description" formatted="false">"The weather update time in seconds"</string>
+    <!-- Behavior.kt: location_update_mintime -->
+    <string name="setting_behavior_location_update_mintime_description" formatted="false">"The amount of time between two location updates (in minutes, must be an integer value)"</string>
+    <!-- Behavior.kt: location_update_mindistance -->
+    <string name="setting_behavior_location_update_mindistance_description" formatted="false">"The minimum distance (in meters) to get a location update"</string>
+    <!-- Behavior.kt: show_weather_updates -->
+    <string name="setting_behavior_show_weather_updates_description" formatted="false">"If false, Re:T-UI won\'t show information about the weather in the output field"</string>
+    <!-- Behavior.kt: swipe_up_apps_drawer -->
+    <string name="setting_behavior_swipe_up_apps_drawer_description" formatted="false">"If true, swiping up will open the apps drawer"</string>
+    <!-- Behavior.kt: show_music_widget -->
+    <string name="setting_behavior_show_music_widget_description" formatted="false">"If true, the music module will be shown in the context container"</string>
+    <!-- Behavior.kt: auto_show_music_widget -->
+    <string name="setting_behavior_auto_show_music_widget_description" formatted="false">"If true, Re:T-UI will automatically show the music module when music starts playing"</string>
+    <!-- Behavior.kt: preferred_music_app -->
+    <string name="setting_behavior_preferred_music_app_description" formatted="false">"Package name of the preferred external music app. Leave empty for automatic detection."</string>
+    <!-- Behavior.kt: pomodoro_focus_minutes -->
+    <string name="setting_behavior_pomodoro_focus_minutes_description" formatted="false">"Focus period length in minutes for Pomodoro sessions"</string>
+    <!-- Behavior.kt: pomodoro_relax_minutes -->
+    <string name="setting_behavior_pomodoro_relax_minutes_description" formatted="false">"Relax/break period length in minutes for Pomodoro sessions"</string>
+    <!-- Behavior.kt: shell_requires_prefix -->
+    <string name="setting_behavior_shell_requires_prefix_description" formatted="false">"If true, embedded shell commands must be run with shell [command] instead of falling through from unknown input"</string>
+    <!-- Behavior.kt: events_lookahead_days -->
+    <string name="setting_behavior_events_lookahead_days_description" formatted="false">"Number of days after today to include in the launcher Events module. 0 shows only upcoming events today"</string>
+    <!-- Behavior.kt: sound_boot -->
+    <string name="setting_behavior_sound_boot_description" formatted="false">"Play the launcher startup sound"</string>
+    <!-- Behavior.kt: sound_click -->
+    <string name="setting_behavior_sound_click_description" formatted="false">"Play a sound when submitting launcher input"</string>
+    <!-- Behavior.kt: sound_success -->
+    <string name="setting_behavior_sound_success_description" formatted="false">"Play the successful action sound"</string>
+    <!-- Behavior.kt: sound_failure -->
+    <string name="setting_behavior_sound_failure_description" formatted="false">"Play the failed or invalid action sound"</string>
+    <!-- Behavior.kt: sound_notification -->
+    <string name="setting_behavior_sound_notification_description" formatted="false">"Play the launcher module notification sound"</string>
+    <!-- Behavior.kt: sound_reminder -->
+    <string name="setting_behavior_sound_reminder_description" formatted="false">"Play the launcher reminder sound"</string>
+    <!-- Behavior.kt: sound_timer -->
+    <string name="setting_behavior_sound_timer_description" formatted="false">"Play the timer completion sound"</string>
+    <!-- Behavior.kt: search_only_mode -->
+    <string name="setting_behavior_search_only_mode_description" formatted="false">"Use the launcher as a bottom search bar with universal results instead of the classic home surfaces"</string>
+    <!-- Cmd.kt: default_search -->
+    <string name="setting_cmd_default_search_description" formatted="false">"The param that will be used if you type \"search apples\" instead of \"search -param apples\""</string>
+    <!-- Notifications.kt: show_notifications -->
+    <string name="setting_notifications_show_notifications_description" formatted="false">"If true, Re:T-UI will show every incoming notification"</string>
+    <!-- Notifications.kt: terminal_notifications -->
+    <string name="setting_notifications_terminal_notifications_description" formatted="false">"If true, notifications will be printed in the terminal"</string>
+    <!-- Notifications.kt: app_notification_enabled_default -->
+    <string name="setting_notifications_app_notification_enabled_default_description" formatted="false">"If true, Re:T-UI will show notifications from all apps, unless they are explicitly excluded. If false, Re:T-UI won\'t show a notification from a specific app unless it was \texplicitly included"</string>
+    <!-- Notifications.kt: notification_text_color -->
+    <string name="setting_notifications_notification_text_color_description" formatted="false">"Notification text color"</string>
+    <!-- Notifications.kt: notification_format -->
+    <string name="setting_notifications_notification_format_description" formatted="false">"The default format"</string>
+    <!-- Notifications.kt: click_notification -->
+    <string name="setting_notifications_click_notification_description" formatted="false">"If true, Re:T-UI will perform the operation associated with the original notification when you click it"</string>
+    <!-- Notifications.kt: long_click_notification -->
+    <string name="setting_notifications_long_click_notification_description" formatted="false">"If true, you will be able to perform some quick operations long-clicking a notification"</string>
+    <!-- Notifications.kt: notification_popup_exclude_app -->
+    <string name="setting_notifications_notification_popup_exclude_app_description" formatted="false">"If false, the \"Exclude app\" option won\'t be shown in the long click popup menu"</string>
+    <!-- Notifications.kt: notification_popup_exclude_notification -->
+    <string name="setting_notifications_notification_popup_exclude_notification_description" formatted="false">"If false, the \"Exclude notification\" option won\'t be shown in the long click popup menu"</string>
+    <!-- Notifications.kt: notification_popup_reply -->
+    <string name="setting_notifications_notification_popup_reply_description" formatted="false">"If false, the \"Reply to the last notification\" option won\'t be shown in the long click popup menu"</string>
+    <!-- Reply.kt: reply_enabled -->
+    <string name="setting_reply_reply_enabled_description" formatted="false">"If false, notification reply will be disabled"</string>
+    <!-- Rss.kt: rss_item_text_color -->
+    <string name="setting_rss_rss_item_text_color_description" formatted="false">"RSS item text color"</string>
+    <!-- Rss.kt: rss_default_format -->
+    <string name="setting_rss_rss_default_format_description" formatted="false">"The default format"</string>
+    <!-- Rss.kt: include_rss_default -->
+    <string name="setting_rss_include_rss_default_description" formatted="false">"If true, a filter will exclude an item if it matches. If false, a filter will include an item if it matches"</string>
+    <!-- Rss.kt: rss_hidden_tags -->
+    <string name="setting_rss_rss_hidden_tags_description" formatted="false">"A list of excluded tags (separated by comma)"</string>
+    <!-- Rss.kt: rss_time_format -->
+    <string name="setting_rss_rss_time_format_description" formatted="false">"The time format used by RSS items"</string>
+    <!-- Rss.kt: show_rss_download -->
+    <string name="setting_rss_show_rss_download_description" formatted="false">"If true, you will see a message when Re:T-UI downloads a feed"</string>
+    <!-- Rss.kt: rss_download_format -->
+    <string name="setting_rss_rss_download_format_description" formatted="false">"The message shown when an RSS feed is downloaded"</string>
+    <!-- Rss.kt: rss_download_message_text_color -->
+    <string name="setting_rss_rss_download_message_text_color_description" formatted="false">"RSS download message text color"</string>
+    <!-- Rss.kt: click_rss -->
+    <string name="setting_rss_click_rss_description" formatted="false">"If true, you will be able to click on an RSS item to open the associated webpage"</string>
+    <!-- Suggestions.kt: show_suggestions -->
+    <string name="setting_suggestions_show_suggestions_description" formatted="false">"If false, suggestions won\'t be shown"</string>
+    <!-- Suggestions.kt: transparent_suggestions -->
+    <string name="setting_suggestions_transparent_suggestions_description" formatted="false">"If true, the background will be transparent"</string>
+    <!-- Suggestions.kt: default_text_color -->
+    <string name="setting_suggestions_default_text_color_description" formatted="false">"The default text color"</string>
+    <!-- Suggestions.kt: default_background_color -->
+    <string name="setting_suggestions_default_background_color_description" formatted="false">"The default background color"</string>
+    <!-- Suggestions.kt: apps_text_color -->
+    <string name="setting_suggestions_apps_text_color_description" formatted="false">"Apps suggestions text color"</string>
+    <!-- Suggestions.kt: apps_background_color -->
+    <string name="setting_suggestions_apps_background_color_description" formatted="false">"Apps suggestions background color"</string>
+    <!-- Suggestions.kt: alias_text_color -->
+    <string name="setting_suggestions_alias_text_color_description" formatted="false">"Aliases suggestions text color"</string>
+    <!-- Suggestions.kt: alias_background_color -->
+    <string name="setting_suggestions_alias_background_color_description" formatted="false">"Aliases suggestions background color"</string>
+    <!-- Suggestions.kt: cmd_text_color -->
+    <string name="setting_suggestions_cmd_text_color_description" formatted="false">"Commands suggestions text color"</string>
+    <!-- Suggestions.kt: cmd_background_color -->
+    <string name="setting_suggestions_cmd_background_color_description" formatted="false">"Commands suggestions background color"</string>
+    <!-- Suggestions.kt: song_text_color -->
+    <string name="setting_suggestions_song_text_color_description" formatted="false">"Songs suggestions text color"</string>
+    <!-- Suggestions.kt: song_background_color -->
+    <string name="setting_suggestions_song_background_color_description" formatted="false">"Songs suggestions background color"</string>
+    <!-- Suggestions.kt: contact_text_color -->
+    <string name="setting_suggestions_contact_text_color_description" formatted="false">"Contacts suggestions text color"</string>
+    <!-- Suggestions.kt: contact_background_color -->
+    <string name="setting_suggestions_contact_background_color_description" formatted="false">"Contacts suggestions background color"</string>
+    <!-- Suggestions.kt: file_text_color -->
+    <string name="setting_suggestions_file_text_color_description" formatted="false">"Files suggestions text color"</string>
+    <!-- Suggestions.kt: file_background_color -->
+    <string name="setting_suggestions_file_background_color_description" formatted="false">"Files suggestions background color"</string>
+    <!-- Suggestions.kt: suggest_alias_default -->
+    <string name="setting_suggestions_suggest_alias_default_description" formatted="false">"If true, your alias will be shown when the input field is empty"</string>
+    <!-- Suggestions.kt: suggest_appgp_default -->
+    <string name="setting_suggestions_suggest_appgp_default_description" formatted="false">"If true, your app groups will be shown when the input field is empty"</string>
+    <!-- Suggestions.kt: click_to_launch -->
+    <string name="setting_suggestions_click_to_launch_description" formatted="false">"If true, some suggestions will be executed as soon as you click them"</string>
+    <!-- Suggestions.kt: suggestions_size -->
+    <string name="setting_suggestions_suggestions_size_description" formatted="false">"The text size of the suggestions"</string>
+    <!-- Suggestions.kt: double_space_click_first_suggestion -->
+    <string name="setting_suggestions_double_space_click_first_suggestion_description" formatted="false">"If true, Re:T-UI will simulate a click on the current first suggestion if you double-click the space bar"</string>
+    <!-- Suggestions.kt: noinput_suggestions_order -->
+    <string name="setting_suggestions_noinput_suggestions_order_description" formatted="false">"The order and the number of suggestions that appears on-screen when the input field is empty. 0=apps, 1=alias, 2=cmds, 3=app groups. Put between round brackets the maximum number of suggestions of the leading type"</string>
+    <!-- Suggestions.kt: suggestions_order -->
+    <string name="setting_suggestions_suggestions_order_description" formatted="false">"The order and the number of suggestions that appears on-screen. 0=apps, 1=alias, 2=cmds, 3=app groups. Put between round brackets the maximum number of suggestions of the leading type"</string>
+    <!-- Suggestions.kt: noinput_min_command_priority -->
+    <string name="setting_suggestions_noinput_min_command_priority_description" formatted="false">"The minimum priority of a command shown when the input field is empty"</string>
+    <!-- Suggestions.kt: suggestions_per_category -->
+    <string name="setting_suggestions_suggestions_per_category_description" formatted="false">"The number of suggestions shown per category. This doesn\'t affect \"noinput_suggestions_order\" and \"suggestions_order\""</string>
+    <!-- Suggestions.kt: suggestions_deadline -->
+    <string name="setting_suggestions_suggestions_deadline_description" formatted="false">"The min/max rank that a suggestion needs to get in order to be shown. min/max depends on the comparison algorithm"</string>
+    <!-- Suggestions.kt: suggestions_algorithm -->
+    <string name="setting_suggestions_suggestions_algorithm_description" formatted="false">"The algorithm used to compare strings"</string>
+    <!-- Suggestions.kt: suggestions_quickcompare_n -->
+    <string name="setting_suggestions_suggestions_quickcompare_n_description" formatted="false">"If the input is shorter than n characters, Re:T-UI will try to show you the entries which start with those characters"</string>
+    <!-- Suggestions.kt: hide_suggestions_when_empty -->
+    <string name="setting_suggestions_hide_suggestions_when_empty_description" formatted="false">"If \"always\" the suggestion area will be hidden when there are no suggestions. If \"true\" it will be hidden only if also the input area is empty. \"false\" disables the feature"</string>
+    <!-- Suggestions.kt: suggestions_spaces -->
+    <string name="setting_suggestions_suggestions_spaces_description" formatted="false">"Suggestion chip spacing in pixels: [outer horizontal margin],[outer vertical margin],[inner horizontal padding],[inner vertical padding]."</string>
+    <!-- SurfaceBorders.kt: unified_status_border -->
+    <string name="setting_surfaceborders_unified_status_border_description" formatted="false">"Use one bottom console for output, status, modules, input, toolbar, and suggestions"</string>
+    <!-- SurfaceBorders.kt: ram_border_enabled -->
+    <string name="setting_surfaceborders_ram_border_enabled_description" formatted="false">"Show the RAM surface border"</string>
+    <!-- SurfaceBorders.kt: ram_border_color -->
+    <string name="setting_surfaceborders_ram_border_color_description" formatted="false">"RAM border color; AUTO inherits the active accent"</string>
+    <!-- SurfaceBorders.kt: device_border_enabled -->
+    <string name="setting_surfaceborders_device_border_enabled_description" formatted="false">"Show the device surface border"</string>
+    <!-- SurfaceBorders.kt: device_border_color -->
+    <string name="setting_surfaceborders_device_border_color_description" formatted="false">"Device border color; AUTO inherits the active accent"</string>
+    <!-- SurfaceBorders.kt: time_border_enabled -->
+    <string name="setting_surfaceborders_time_border_enabled_description" formatted="false">"Show the time surface border"</string>
+    <!-- SurfaceBorders.kt: time_border_color -->
+    <string name="setting_surfaceborders_time_border_color_description" formatted="false">"Time border color; AUTO inherits the active accent"</string>
+    <!-- SurfaceBorders.kt: battery_border_enabled -->
+    <string name="setting_surfaceborders_battery_border_enabled_description" formatted="false">"Show the battery surface border"</string>
+    <!-- SurfaceBorders.kt: battery_border_color -->
+    <string name="setting_surfaceborders_battery_border_color_description" formatted="false">"Battery border color; AUTO inherits the active accent"</string>
+    <!-- SurfaceBorders.kt: storage_border_enabled -->
+    <string name="setting_surfaceborders_storage_border_enabled_description" formatted="false">"Show the storage surface border"</string>
+    <!-- SurfaceBorders.kt: storage_border_color -->
+    <string name="setting_surfaceborders_storage_border_color_description" formatted="false">"Storage border color; AUTO inherits the active accent"</string>
+    <!-- SurfaceBorders.kt: network_border_enabled -->
+    <string name="setting_surfaceborders_network_border_enabled_description" formatted="false">"Show the network surface border"</string>
+    <!-- SurfaceBorders.kt: network_border_color -->
+    <string name="setting_surfaceborders_network_border_color_description" formatted="false">"Network border color; AUTO inherits the active accent"</string>
+    <!-- SurfaceBorders.kt: notes_border_enabled -->
+    <string name="setting_surfaceborders_notes_border_enabled_description" formatted="false">"Show the notes surface border"</string>
+    <!-- SurfaceBorders.kt: notes_border_color -->
+    <string name="setting_surfaceborders_notes_border_color_description" formatted="false">"Notes border color; AUTO inherits the active accent"</string>
+    <!-- SurfaceBorders.kt: weather_border_enabled -->
+    <string name="setting_surfaceborders_weather_border_enabled_description" formatted="false">"Show the weather surface border"</string>
+    <!-- SurfaceBorders.kt: weather_border_color -->
+    <string name="setting_surfaceborders_weather_border_color_description" formatted="false">"Weather border color; AUTO inherits the active accent"</string>
+    <!-- SurfaceBorders.kt: unlock_border_enabled -->
+    <string name="setting_surfaceborders_unlock_border_enabled_description" formatted="false">"Show the unlock surface border"</string>
+    <!-- SurfaceBorders.kt: unlock_border_color -->
+    <string name="setting_surfaceborders_unlock_border_color_description" formatted="false">"Unlock border color; AUTO inherits the active accent"</string>
+    <!-- SurfaceBorders.kt: ascii_border_enabled -->
+    <string name="setting_surfaceborders_ascii_border_enabled_description" formatted="false">"Show the ASCII surface border"</string>
+    <!-- SurfaceBorders.kt: ascii_border_color -->
+    <string name="setting_surfaceborders_ascii_border_color_description" formatted="false">"ASCII border color; AUTO inherits the active accent"</string>
+    <!-- SurfaceBorders.kt: input_border_enabled -->
+    <string name="setting_surfaceborders_input_border_enabled_description" formatted="false">"Show the input surface border"</string>
+    <!-- SurfaceBorders.kt: input_border_color -->
+    <string name="setting_surfaceborders_input_border_color_description" formatted="false">"Input border color; AUTO inherits the active accent"</string>
+    <!-- SurfaceBorders.kt: output_border_enabled -->
+    <string name="setting_surfaceborders_output_border_enabled_description" formatted="false">"Show the output surface border"</string>
+    <!-- SurfaceBorders.kt: output_border_color -->
+    <string name="setting_surfaceborders_output_border_color_description" formatted="false">"Output border color; AUTO inherits the active accent"</string>
+    <!-- SurfaceBorders.kt: toolbar_border_enabled -->
+    <string name="setting_surfaceborders_toolbar_border_enabled_description" formatted="false">"Show the toolbar surface border"</string>
+    <!-- SurfaceBorders.kt: toolbar_border_color -->
+    <string name="setting_surfaceborders_toolbar_border_color_description" formatted="false">"Toolbar border color; AUTO inherits the active accent"</string>
+    <!-- SurfaceBorders.kt: suggestions_border_enabled -->
+    <string name="setting_surfaceborders_suggestions_border_enabled_description" formatted="false">"Show suggestion surface borders"</string>
+    <!-- SurfaceBorders.kt: suggestions_border_color -->
+    <string name="setting_surfaceborders_suggestions_border_color_description" formatted="false">"Suggestion border color; AUTO inherits the active accent"</string>
+    <!-- Theme.kt: background_color -->
+    <string name="setting_theme_background_color_description" formatted="false">"Launcher background color when system wallpaper is disabled"</string>
+    <!-- Theme.kt: wallpaper_overlay_color -->
+    <string name="setting_theme_wallpaper_overlay_color_description" formatted="false">"Overlay color applied over the system wallpaper"</string>
+    <!-- Theme.kt: settings_wallpaper_overlay_color -->
+    <string name="setting_theme_settings_wallpaper_overlay_color_description" formatted="false">"Overlay color applied over the wallpaper behind Settings"</string>
+    <!-- Theme.kt: input_text_color -->
+    <string name="setting_theme_input_text_color_description" formatted="false">"Command input text color"</string>
+    <!-- Theme.kt: output_text_color -->
+    <string name="setting_theme_output_text_color_description" formatted="false">"Terminal output text color"</string>
+    <!-- Theme.kt: cursor_color -->
+    <string name="setting_theme_cursor_color_description" formatted="false">"Input cursor color"</string>
+    <!-- Theme.kt: enter_icon_color -->
+    <string name="setting_theme_enter_icon_color_description" formatted="false">"Enter icon color"</string>
+    <!-- Theme.kt: toolbar_icon_color -->
+    <string name="setting_theme_toolbar_icon_color_description" formatted="false">"Toolbar icon color"</string>
+    <!-- Theme.kt: toolbar_background_color -->
+    <string name="setting_theme_toolbar_background_color_description" formatted="false">"Toolbar background color"</string>
+    <!-- Theme.kt: restart_message_text_color -->
+    <string name="setting_theme_restart_message_text_color_description" formatted="false">"Restart message text color"</string>
+    <!-- Theme.kt: session_info_text_color -->
+    <string name="setting_theme_session_info_text_color_description" formatted="false">"Session info text color"</string>
+    <!-- Theme.kt: device_text_color -->
+    <string name="setting_theme_device_text_color_description" formatted="false">"Device label text color"</string>
+    <!-- Theme.kt: battery_text_high -->
+    <string name="setting_theme_battery_text_high_description" formatted="false">"Battery text color when the battery level is high"</string>
+    <!-- Theme.kt: battery_text_medium -->
+    <string name="setting_theme_battery_text_medium_description" formatted="false">"Battery text color when the battery level is medium"</string>
+    <!-- Theme.kt: battery_text_low -->
+    <string name="setting_theme_battery_text_low_description" formatted="false">"Battery text color when the battery level is low"</string>
+    <!-- Theme.kt: ascii_text_color -->
+    <string name="setting_theme_ascii_text_color_description" formatted="false">"ASCII art text color"</string>
+    <!-- Theme.kt: time_text_color -->
+    <string name="setting_theme_time_text_color_description" formatted="false">"Time label text color"</string>
+    <!-- Theme.kt: storage_text_color -->
+    <string name="setting_theme_storage_text_color_description" formatted="false">"Storage label text color"</string>
+    <!-- Theme.kt: ram_text_color -->
+    <string name="setting_theme_ram_text_color_description" formatted="false">"RAM label text color"</string>
+    <!-- Theme.kt: network_info_text_color -->
+    <string name="setting_theme_network_info_text_color_description" formatted="false">"Network info label text color"</string>
+    <!-- Theme.kt: weather_text_color -->
+    <string name="setting_theme_weather_text_color_description" formatted="false">"Weather label text color"</string>
+    <!-- Theme.kt: unlock_counter_text_color -->
+    <string name="setting_theme_unlock_counter_text_color_description" formatted="false">"Unlock counter text color"</string>
+    <!-- Theme.kt: ram_status_background_color -->
+    <string name="setting_theme_ram_status_background_color_description" formatted="false">"RAM status line background color"</string>
+    <!-- Theme.kt: device_status_background_color -->
+    <string name="setting_theme_device_status_background_color_description" formatted="false">"Device status line background color"</string>
+    <!-- Theme.kt: time_status_background_color -->
+    <string name="setting_theme_time_status_background_color_description" formatted="false">"Time status line background color"</string>
+    <!-- Theme.kt: battery_status_background_color -->
+    <string name="setting_theme_battery_status_background_color_description" formatted="false">"Battery status line background color"</string>
+    <!-- Theme.kt: storage_status_background_color -->
+    <string name="setting_theme_storage_status_background_color_description" formatted="false">"Storage status line background color"</string>
+    <!-- Theme.kt: network_status_background_color -->
+    <string name="setting_theme_network_status_background_color_description" formatted="false">"Network status line background color"</string>
+    <!-- Theme.kt: notes_status_background_color -->
+    <string name="setting_theme_notes_status_background_color_description" formatted="false">"Notes status line background color"</string>
+    <!-- Theme.kt: weather_status_background_color -->
+    <string name="setting_theme_weather_status_background_color_description" formatted="false">"Weather status line background color"</string>
+    <!-- Theme.kt: unlock_status_background_color -->
+    <string name="setting_theme_unlock_status_background_color_description" formatted="false">"Unlock counter status line background color"</string>
+    <!-- Theme.kt: ascii_status_background_color -->
+    <string name="setting_theme_ascii_status_background_color_description" formatted="false">"ASCII status line background color"</string>
+    <!-- Theme.kt: unified_status_background_color -->
+    <string name="setting_theme_unified_status_background_color_description" formatted="false">"Unified status pane background color"</string>
+    <!-- Theme.kt: ram_status_text_shadow_color -->
+    <string name="setting_theme_ram_status_text_shadow_color_description" formatted="false">"RAM status line text shadow color"</string>
+    <!-- Theme.kt: device_status_text_shadow_color -->
+    <string name="setting_theme_device_status_text_shadow_color_description" formatted="false">"Device status line text shadow color"</string>
+    <!-- Theme.kt: time_status_text_shadow_color -->
+    <string name="setting_theme_time_status_text_shadow_color_description" formatted="false">"Time status line text shadow color"</string>
+    <!-- Theme.kt: battery_status_text_shadow_color -->
+    <string name="setting_theme_battery_status_text_shadow_color_description" formatted="false">"Battery status line text shadow color"</string>
+    <!-- Theme.kt: storage_status_text_shadow_color -->
+    <string name="setting_theme_storage_status_text_shadow_color_description" formatted="false">"Storage status line text shadow color"</string>
+    <!-- Theme.kt: network_status_text_shadow_color -->
+    <string name="setting_theme_network_status_text_shadow_color_description" formatted="false">"Network status line text shadow color"</string>
+    <!-- Theme.kt: notes_status_text_shadow_color -->
+    <string name="setting_theme_notes_status_text_shadow_color_description" formatted="false">"Notes status line text shadow color"</string>
+    <!-- Theme.kt: weather_status_text_shadow_color -->
+    <string name="setting_theme_weather_status_text_shadow_color_description" formatted="false">"Weather status line text shadow color"</string>
+    <!-- Theme.kt: unlock_status_text_shadow_color -->
+    <string name="setting_theme_unlock_status_text_shadow_color_description" formatted="false">"Unlock counter status line text shadow color"</string>
+    <!-- Theme.kt: ascii_status_text_shadow_color -->
+    <string name="setting_theme_ascii_status_text_shadow_color_description" formatted="false">"ASCII status line text shadow color"</string>
+    <!-- Theme.kt: alias_content_text_color -->
+    <string name="setting_theme_alias_content_text_color_description" formatted="false">"Alias content text color"</string>
+    <!-- Theme.kt: app_installed_text_color -->
+    <string name="setting_theme_app_installed_text_color_description" formatted="false">"App installed message text color"</string>
+    <!-- Theme.kt: app_uninstalled_text_color -->
+    <string name="setting_theme_app_uninstalled_text_color_description" formatted="false">"App uninstalled message text color"</string>
+    <!-- Theme.kt: regex_match_background_color -->
+    <string name="setting_theme_regex_match_background_color_description" formatted="false">"Regex match marker background color"</string>
+    <!-- Theme.kt: notes_text_color -->
+    <string name="setting_theme_notes_text_color_description" formatted="false">"Notes text color"</string>
+    <!-- Theme.kt: locked_notes_text_color -->
+    <string name="setting_theme_locked_notes_text_color_description" formatted="false">"Locked notes text color"</string>
+    <!-- Theme.kt: link_text_color -->
+    <string name="setting_theme_link_text_color_description" formatted="false">"Link text color"</string>
+    <!-- Theme.kt: apps_drawer_text_color -->
+    <string name="setting_theme_apps_drawer_text_color_description" formatted="false">"Apps drawer text and accent color"</string>
+    <!-- Theme.kt: input_background_color -->
+    <string name="setting_theme_input_background_color_description" formatted="false">"Input field background color"</string>
+    <!-- Theme.kt: output_background_color -->
+    <string name="setting_theme_output_background_color_description" formatted="false">"Output field background color"</string>
+    <!-- Theme.kt: suggestions_background_color -->
+    <string name="setting_theme_suggestions_background_color_description" formatted="false">"Suggestions area background color"</string>
+    <!-- Theme.kt: input_text_shadow_color -->
+    <string name="setting_theme_input_text_shadow_color_description" formatted="false">"Input text shadow color"</string>
+    <!-- Theme.kt: output_text_shadow_color -->
+    <string name="setting_theme_output_text_shadow_color_description" formatted="false">"Output text shadow color"</string>
+    <!-- Theme.kt: terminal_border_color -->
+    <string name="setting_theme_terminal_border_color_description" formatted="false">"Shared border color for terminal chrome, headers, panels, and module outlines"</string>
+    <!-- Theme.kt: module_button_background_color -->
+    <string name="setting_theme_module_button_background_color_description" formatted="false">"Module button background color"</string>
+    <!-- Theme.kt: module_text_color -->
+    <string name="setting_theme_module_text_color_description" formatted="false">"Module label and control text color"</string>
+    <!-- Theme.kt: terminal_window_background_color -->
+    <string name="setting_theme_terminal_window_background_color_description" formatted="false">"Terminal window background color for modules, drawers, and panels"</string>
+    <!-- Theme.kt: terminal_header_background_color -->
+    <string name="setting_theme_terminal_header_background_color_description" formatted="false">"Terminal header tab background color"</string>
+    <!-- Theme.kt: terminal_header_border_color -->
+    <string name="setting_theme_terminal_header_border_color_description" formatted="false">"Terminal header tab border color"</string>
+    <!-- Toolbar.kt: show_toolbar -->
+    <string name="setting_toolbar_show_toolbar_description" formatted="false">"If false, the toolbar is hidden"</string>
+    <!-- Toolbar.kt: hide_toolbar_no_input -->
+    <string name="setting_toolbar_hide_toolbar_no_input_description" formatted="false">"If true, the toolbar will be hidden when the input field is empty"</string>
+    <!-- Toolbar.kt: shortcut_button_1_enabled -->
+    <string name="setting_toolbar_shortcut_button_1_enabled_description" formatted="false">"If true, the first custom toolbar button is shown"</string>
+    <!-- Toolbar.kt: shortcut_button_1_command -->
+    <string name="setting_toolbar_shortcut_button_1_command_description" formatted="false">"Command, alias, or app name executed by the first custom toolbar button"</string>
+    <!-- Toolbar.kt: shortcut_button_1_icon -->
+    <string name="setting_toolbar_shortcut_button_1_icon_description" formatted="false">"Icon key for the first custom toolbar button"</string>
+    <!-- Toolbar.kt: shortcut_button_2_enabled -->
+    <string name="setting_toolbar_shortcut_button_2_enabled_description" formatted="false">"If true, the second custom toolbar button is shown"</string>
+    <!-- Toolbar.kt: shortcut_button_2_command -->
+    <string name="setting_toolbar_shortcut_button_2_command_description" formatted="false">"Command, alias, or app name executed by the second custom toolbar button"</string>
+    <!-- Toolbar.kt: shortcut_button_2_icon -->
+    <string name="setting_toolbar_shortcut_button_2_icon_description" formatted="false">"Icon key for the second custom toolbar button"</string>
+    <!-- Ui.kt: show_enter_button -->
+    <string name="setting_ui_show_enter_button_description" formatted="false">"Hide/show the enter button"</string>
+    <!-- Ui.kt: system_font -->
+    <string name="setting_ui_system_font_description" formatted="false">"If false, the default Re:T-UI font (\"Lucida Console\") will be used for all texts"</string>
+    <!-- Ui.kt: ram_size -->
+    <string name="setting_ui_ram_size_description" formatted="false">"The ram label font size"</string>
+    <!-- Ui.kt: battery_size -->
+    <string name="setting_ui_battery_size_description" formatted="false">"The battery label font size"</string>
+    <!-- Ui.kt: device_size -->
+    <string name="setting_ui_device_size_description" formatted="false">"The device label font size"</string>
+    <!-- Ui.kt: time_size -->
+    <string name="setting_ui_time_size_description" formatted="false">"The time label font size"</string>
+    <!-- Ui.kt: storage_size -->
+    <string name="setting_ui_storage_size_description" formatted="false">"The storage label font size"</string>
+    <!-- Ui.kt: network_size -->
+    <string name="setting_ui_network_size_description" formatted="false">"The network label font size"</string>
+    <!-- Ui.kt: notes_size -->
+    <string name="setting_ui_notes_size_description" formatted="false">"Notes size"</string>
+    <!-- Ui.kt: input_output_size -->
+    <string name="setting_ui_input_output_size_description" formatted="false">"The input/output font size"</string>
+    <!-- Ui.kt: show_ram -->
+    <string name="setting_ui_show_ram_description" formatted="false">"If false, the RAM label will be hidden"</string>
+    <!-- Ui.kt: show_device_name -->
+    <string name="setting_ui_show_device_name_description" formatted="false">"If false, the device label will be hidden"</string>
+    <!-- Ui.kt: show_battery -->
+    <string name="setting_ui_show_battery_description" formatted="false">"If false, the battery label will be hidden"</string>
+    <!-- Ui.kt: show_network_info -->
+    <string name="setting_ui_show_network_info_description" formatted="false">"If false, the network info label will be hidden"</string>
+    <!-- Ui.kt: show_storage_info -->
+    <string name="setting_ui_show_storage_info_description" formatted="false">"If false, the time label will be hidden"</string>
+    <!-- Ui.kt: show_notes -->
+    <string name="setting_ui_show_notes_description" formatted="false">"If false, the notes label will be hidden"</string>
+    <!-- Ui.kt: enable_battery_status -->
+    <string name="setting_ui_enable_battery_status_description" formatted="false">"If true, battery text color will change when your battery level reaches different percentages: battery_text_high, battery_text_medium, battery_text_low. If false, only battery_text_high is used"</string>
+    <!-- Ui.kt: show_time -->
+    <string name="setting_ui_show_time_description" formatted="false">"If false, the time label will be hidden"</string>
+    <!-- Ui.kt: username -->
+    <string name="setting_ui_username_description" formatted="false">"Your username"</string>
+    <!-- Ui.kt: username -->
+    <string name="setting_ui_devicename_description" formatted="false">"Your device name"</string>
+    <!-- Ui.kt: system_wallpaper -->
+    <string name="setting_ui_system_wallpaper_description" formatted="false">"If true, your system wallpaper will be used as background"</string>
+    <!-- Ui.kt: auto_color_pick -->
+    <string name="setting_ui_auto_color_pick_description" formatted="false">"Legacy migration flag; wallpaper -auto now saves a one-time color snapshot"</string>
+    <!-- Ui.kt: enable_crt_vignette -->
+    <string name="setting_ui_enable_crt_vignette_description" formatted="false">"If true, the CRT filter darkens screen edges with a radial vignette"</string>
+    <!-- Ui.kt: font_file -->
+    <string name="setting_ui_font_file_description" formatted="false">"Selected custom font file name from the fonts folder"</string>
+    <!-- Ui.kt: font_size_offset -->
+    <string name="setting_ui_font_size_offset_description" formatted="false">"Adds this many points to Launcher text sizes without changing their individual size settings"</string>
+    <!-- Ui.kt: fullscreen -->
+    <string name="setting_ui_fullscreen_description" formatted="false">"If true, Re:T-UI will run in fullscreen mode"</string>
+    <!-- Ui.kt: device_index -->
+    <string name="setting_ui_device_index_description" formatted="false">"Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."</string>
+    <!-- Ui.kt: ram_index -->
+    <string name="setting_ui_ram_index_description" formatted="false">"Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."</string>
+    <!-- Ui.kt: battery_index -->
+    <string name="setting_ui_battery_index_description" formatted="false">"Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."</string>
+    <!-- Ui.kt: time_index -->
+    <string name="setting_ui_time_index_description" formatted="false">"Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."</string>
+    <!-- Ui.kt: show_ascii -->
+    <string name="setting_ui_show_ascii_description" formatted="false">"Show the ASCII art from ascii.txt. WARNING: wide art may overflow or wrap on small screens."</string>
+    <!-- Ui.kt: show_ascii_landscape -->
+    <string name="setting_ui_show_ascii_landscape_description" formatted="false">"Show the ASCII art while the landscape layout is active"</string>
+    <!-- Ui.kt: ascii_index -->
+    <string name="setting_ui_ascii_index_description" formatted="false">"ASCII always uses its own status row so the dedicated viewport remains active. If that whole-number row is occupied, ASCII moves to the next free row."</string>
+    <!-- Ui.kt: ascii_size -->
+    <string name="setting_ui_ascii_size_description" formatted="false">"Legacy ASCII art text size. ASCII now auto-fits to the pane width."</string>
+    <!-- Ui.kt: ascii_max_lines -->
+    <string name="setting_ui_ascii_max_lines_description" formatted="false">"Number of source rows shown in the ASCII viewport. Use -1 to auto-zoom wide art."</string>
+    <!-- Ui.kt: ascii_pane_height_rows -->
+    <string name="setting_ui_ascii_pane_height_rows_description" formatted="false">"Maximum physical height of the ASCII pane, measured in text rows."</string>
+    <!-- Ui.kt: storage_index -->
+    <string name="setting_ui_storage_index_description" formatted="false">"Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."</string>
+    <!-- Ui.kt: network_index -->
+    <string name="setting_ui_network_index_description" formatted="false">"Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."</string>
+    <!-- Ui.kt: notes_index -->
+    <string name="setting_ui_notes_index_description" formatted="false">"Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."</string>
+    <!-- Ui.kt: ram_status_alignment -->
+    <string name="setting_ui_ram_status_alignment_description" formatted="false">"RAM status line alignment (&lt;0 = left, =0 = center, &gt;0 = right)"</string>
+    <!-- Ui.kt: device_status_alignment -->
+    <string name="setting_ui_device_status_alignment_description" formatted="false">"Device status line alignment (&lt;0 = left, =0 = center, &gt;0 = right)"</string>
+    <!-- Ui.kt: time_status_alignment -->
+    <string name="setting_ui_time_status_alignment_description" formatted="false">"Time status line alignment (&lt;0 = left, =0 = center, &gt;0 = right)"</string>
+    <!-- Ui.kt: battery_status_alignment -->
+    <string name="setting_ui_battery_status_alignment_description" formatted="false">"Battery status line alignment (&lt;0 = left, =0 = center, &gt;0 = right)"</string>
+    <!-- Ui.kt: storage_status_alignment -->
+    <string name="setting_ui_storage_status_alignment_description" formatted="false">"Storage status line alignment (&lt;0 = left, =0 = center, &gt;0 = right)"</string>
+    <!-- Ui.kt: network_status_alignment -->
+    <string name="setting_ui_network_status_alignment_description" formatted="false">"Network status line alignment (&lt;0 = left, =0 = center, &gt;0 = right)"</string>
+    <!-- Ui.kt: notes_status_alignment -->
+    <string name="setting_ui_notes_status_alignment_description" formatted="false">"Notes status line alignment (&lt;0 = left, =0 = center, &gt;0 = right)"</string>
+    <!-- Ui.kt: weather_status_alignment -->
+    <string name="setting_ui_weather_status_alignment_description" formatted="false">"Weather status line alignment (&lt;0 = left, =0 = center, &gt;0 = right)"</string>
+    <!-- Ui.kt: unlock_status_alignment -->
+    <string name="setting_ui_unlock_status_alignment_description" formatted="false">"Unlock counter status line alignment (&lt;0 = left, =0 = center, &gt;0 = right)"</string>
+    <!-- Ui.kt: ascii_status_alignment -->
+    <string name="setting_ui_ascii_status_alignment_description" formatted="false">"ASCII status line alignment (&lt;0 = left, =0 = center, &gt;0 = right)"</string>
+    <!-- Ui.kt: input_prefix -->
+    <string name="setting_ui_input_prefix_description" formatted="false">"The prefix placed before every input"</string>
+    <!-- Ui.kt: input_root_prefix -->
+    <string name="setting_ui_input_root_prefix_description" formatted="false">"The prefix placed before a root command (\"su ...\")"</string>
+    <!-- Ui.kt: display_margin_top_section -->
+    <string name="setting_ui_display_margin_top_section_description" formatted="false">"Complete top pane group margins in millimeters: [left],[top],[right],[bottom]"</string>
+    <!-- Ui.kt: display_margin_bottom_section -->
+    <string name="setting_ui_display_margin_bottom_section_description" formatted="false">"Bottom terminal/input section display margin in millimeters. [left margin],[top margin],[right margin],[bottom margin]"</string>
+    <!-- Ui.kt: display_margin_landscape_mm -->
+    <string name="setting_ui_display_margin_landscape_mm_description" formatted="false">"Landscape display margin in millimeters. [left margin],[top margin],[right margin],[bottom margin]"</string>
+    <!-- Ui.kt: landscape_fold_gutter_mm -->
+    <string name="setting_ui_landscape_fold_gutter_mm_description" formatted="false">"Landscape-only center gutter in millimeters for fold hinges or screen creases"</string>
+    <!-- Ui.kt: split_duo_launcher -->
+    <string name="setting_ui_split_duo_launcher_description" formatted="false">"If true, Duo keeps the status lines and side switch button on the empty screen while output, input, toolbar, and suggestions stay on the active screen"</string>
+    <!-- Ui.kt: show_app_installed -->
+    <string name="setting_ui_show_app_installed_description" formatted="false">"If true, you will receive a message when you install an app"</string>
+    <!-- Ui.kt: show_app_uninstalled -->
+    <string name="setting_ui_show_app_uninstalled_description" formatted="false">"If true, you will receive a message when you uninstall an app"</string>
+    <!-- Ui.kt: show_session_info -->
+    <string name="setting_ui_show_session_info_description" formatted="false">"If true, when your input field is empty there will be a short line containing some information about the current session"</string>
+    <!-- Ui.kt: notes_header -->
+    <string name="setting_ui_notes_header_description" formatted="false">"The header above your notes"</string>
+    <!-- Ui.kt: notes_footer -->
+    <string name="setting_ui_notes_footer_description" formatted="false">"The footer below your notes"</string>
+    <!-- Ui.kt: notes_divider -->
+    <string name="setting_ui_notes_divider_description" formatted="false">"The divider between two notes"</string>
+    <!-- Ui.kt: show_restart_message -->
+    <string name="setting_ui_show_restart_message_description" formatted="false">"If false, the restart message won\'t be shown"</string>
+    <!-- Ui.kt: notes_max_lines -->
+    <string name="setting_ui_notes_max_lines_description" formatted="false">"The max number of lines of notes (-1 to disable)"</string>
+    <!-- Ui.kt: show_scroll_notes_message -->
+    <string name="setting_ui_show_scroll_notes_message_description" formatted="false">"If true, you will get a message when your notes reach the value set in notes_max_lines"</string>
+    <!-- Ui.kt: show_weather -->
+    <string name="setting_ui_show_weather_description" formatted="false">"If true, you will see a label containing the weather in your area"</string>
+    <!-- Ui.kt: weather_index -->
+    <string name="setting_ui_weather_index_description" formatted="false">"Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."</string>
+    <!-- Ui.kt: weather_size -->
+    <string name="setting_ui_weather_size_description" formatted="false">"Weather size"</string>
+    <!-- Ui.kt: show_unlock_counter -->
+    <string name="setting_ui_show_unlock_counter_description" formatted="false">"If false, the unlock counter feature will be disabled"</string>
+    <!-- Ui.kt: unlock_index -->
+    <string name="setting_ui_unlock_index_description" formatted="false">"Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."</string>
+    <!-- Ui.kt: unlock_size -->
+    <string name="setting_ui_unlock_size_description" formatted="false">"Unlock size"</string>
+    <!-- Ui.kt: statusbar_light_icons -->
+    <string name="setting_ui_statusbar_light_icons_description" formatted="false">"If true, your status bar icons will be white. Dark otherwise"</string>
+    <!-- Ui.kt: shadow_params -->
+    <string name="setting_ui_shadow_params_description" formatted="false">"[Shadow X offset],[Shadow Y offset],[Shadow radius]"</string>
+    <!-- Ui.kt: text_redraw_times -->
+    <string name="setting_ui_text_redraw_times_description" formatted="false">"A greater value will produce a bigger outline"</string>
+    <!-- Ui.kt: status_lines_margins -->
+    <string name="setting_ui_status_lines_margins_description" formatted="false">"Status-row text padding in pixels: [left],[top],[right],[bottom]"</string>
+    <!-- Ui.kt: output_field_margins -->
+    <string name="setting_ui_output_field_margins_description" formatted="false">"[horizontal_margin],[vertical_margin],[horizontal_padding],[vertical_padding]"</string>
+    <!-- Ui.kt: output_tray_max_height -->
+    <string name="setting_ui_output_tray_max_height_description" formatted="false">"Maximum height for the expanded output tray in dp. 0 keeps the default adaptive height"</string>
+    <!-- Ui.kt: input_field_margins -->
+    <string name="setting_ui_input_field_margins_description" formatted="false">"The dimension of the input field (where cmds are inserted). [horizontal_margin],[vertical_margin],[horizontal_padding],[vertical_padding]"</string>
+    <!-- Ui.kt: input_area_margins -->
+    <string name="setting_ui_input_area_margins_description" formatted="false">"The dimension of the input area (prefix + input field + toolbar + suggestions). [horizontal_margin],[vertical_margin],[horizontal_padding],[vertical_padding]"</string>
+    <!-- Ui.kt: toolbar_margins -->
+    <string name="setting_ui_toolbar_margins_description" formatted="false">"[horizontal_margin],[vertical_margin],[horizontal_padding],[vertical_padding]"</string>
+    <!-- Ui.kt: android_widget_grid_columns -->
+    <string name="setting_ui_android_widget_grid_columns_description" formatted="false">"Base column count for the Android widget drawer. Rows and landscape columns are computed from square cells"</string>
+    <!-- Ui.kt: android_widget_min_columns -->
+    <string name="setting_ui_android_widget_min_columns_description" formatted="false">"Fallback starting width when a widget app does not provide valid Android sizing metadata"</string>
+    <!-- Ui.kt: android_widget_min_rows -->
+    <string name="setting_ui_android_widget_min_rows_description" formatted="false">"Fallback starting height when a widget app does not provide valid Android sizing metadata"</string>
+    <!-- Ui.kt: suggestions_area_margin -->
+    <string name="setting_ui_suggestions_area_margin_description" formatted="false">"Suggestion pane spacing in pixels: [outer horizontal margin],[outer vertical margin],[inner horizontal padding],[inner vertical padding]. Also applies to contextual module suggestions; it does not control spacing between chips or module-dock buttons."</string>
+    <!-- Ui.kt: module_dock_spacing_dp -->
+    <string name="setting_ui_module_dock_spacing_dp_description" formatted="false">"Space between module-dock buttons in density-independent pixels."</string>
+    <!-- Ui.kt: enable_dashed_border -->
+    <string name="setting_ui_enable_dashed_border_description" formatted="false">"If true, terminal windows (Music, Apps Drawer, Input/Output) will use an ASCII-style dashed border"</string>
+    <!-- Ui.kt: dashed_border_dash_length -->
+    <string name="setting_ui_dashed_border_dash_length_description" formatted="false">"Length of the dash in the dashed border (dp)"</string>
+    <!-- Ui.kt: dashed_border_gap_length -->
+    <string name="setting_ui_dashed_border_gap_length_description" formatted="false">"Length of the gap in the dashed border (dp)"</string>
+    <!-- Ui.kt: dashed_border_stroke_width -->
+    <string name="setting_ui_dashed_border_stroke_width_description" formatted="false">"Stroke width for dashed borders (dp). Decimal values are allowed"</string>
+    <!-- Ui.kt: dashed_border_corner_radius -->
+    <string name="setting_ui_dashed_border_corner_radius_description" formatted="false">"Default rounded corner radius for dashed borders (dp). Specific module, output, and header corner radius settings override this when changed"</string>
+    <!-- Ui.kt: module_corner_radius -->
+    <string name="setting_ui_module_corner_radius_description" formatted="false">"Rounded corner radius for module panels and module controls (dp)"</string>
+    <!-- Ui.kt: output_corner_radius -->
+    <string name="setting_ui_output_corner_radius_description" formatted="false">"Rounded corner radius for the output terminal panel (dp)"</string>
+    <!-- Ui.kt: header_corner_radius -->
+    <string name="setting_ui_header_corner_radius_description" formatted="false">"Rounded corner radius for module and output header boxes (dp)"</string>
+    <!-- Ui.kt: module_header_text_size -->
+    <string name="setting_ui_module_header_text_size_description" formatted="false">"Text size for module header labels and close boxes (sp)"</string>
+    <!-- Ui.kt: module_body_text_size -->
+    <string name="setting_ui_module_body_text_size_description" formatted="false">"Text size for built-in module body text and controls (sp)"</string>
+    <!-- Ui.kt: output_header_text_size -->
+    <string name="setting_ui_output_header_text_size_description" formatted="false">"Text size for output and overlay header labels (sp)"</string>
+</resources>

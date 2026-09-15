@@ -1,0 +1,52 @@
+name: Language packs
+
+on:
+  pull_request:
+    paths:
+      - 'language-packs/**'
+      - 'scripts/*language*p*.py'
+      - 'scripts/*localization*.py'
+      - '**/src/main/res/values/*.xml'
+      - 'app/src/main/assets/localization/**'
+      - '.github/workflows/language-packs.yml'
+  push:
+    branches: [master]
+    paths:
+      - 'language-packs/**'
+      - 'scripts/*language*p*.py'
+      - 'scripts/*localization*.py'
+      - '**/src/main/res/values/*.xml'
+      - 'app/src/main/assets/localization/**'
+      - '.github/workflows/language-packs.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check template and validators
+        run: |
+          python3 scripts/localization_audit.py
+          python3 -m unittest discover -s scripts -p 'test_localization_audit.py'
+          python3 -m unittest discover -s scripts -p 'test_language_packs.py'
+      - name: Build every pack source
+        shell: python
+        run: |
+          import json
+          import sys
+          from pathlib import Path
+          sys.path.insert(0, 'scripts')
+          import language_packs
+          ids = set()
+          for manifest in sorted(Path('language-packs').glob('*/manifest.json')):
+              metadata = json.loads(manifest.read_text())
+              assert metadata['id'] not in ids, 'Duplicate pack ID: ' + metadata['id']
+              ids.add(metadata['id'])
+              language_packs.build(manifest.parent, Path('build/language-packs') / (manifest.parent.name + '.retui-launcher-lang'))

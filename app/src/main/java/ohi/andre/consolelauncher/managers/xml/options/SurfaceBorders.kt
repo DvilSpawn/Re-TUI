@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher.managers.xml.options
 
+import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsElement
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave
@@ -7,41 +8,41 @@ import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave
 enum class SurfaceBorderOption(
     private val default: String,
     private val kind: String,
-    private val description: String
+    private val description: Int
 ) : XMLPrefsSave {
-    unified_status_border("false", XMLPrefsSave.BOOLEAN, "Use one bottom console for output, status, modules, input, toolbar, and suggestions"),
-    ram_border_enabled("true", XMLPrefsSave.BOOLEAN, "Show the RAM surface border"),
-    ram_border_color("auto", XMLPrefsSave.AUTO_COLOR, "RAM border color; AUTO inherits the active accent"),
-    device_border_enabled("true", XMLPrefsSave.BOOLEAN, "Show the device surface border"),
-    device_border_color("auto", XMLPrefsSave.AUTO_COLOR, "Device border color; AUTO inherits the active accent"),
-    time_border_enabled("true", XMLPrefsSave.BOOLEAN, "Show the time surface border"),
-    time_border_color("auto", XMLPrefsSave.AUTO_COLOR, "Time border color; AUTO inherits the active accent"),
-    battery_border_enabled("true", XMLPrefsSave.BOOLEAN, "Show the battery surface border"),
-    battery_border_color("auto", XMLPrefsSave.AUTO_COLOR, "Battery border color; AUTO inherits the active accent"),
-    storage_border_enabled("true", XMLPrefsSave.BOOLEAN, "Show the storage surface border"),
-    storage_border_color("auto", XMLPrefsSave.AUTO_COLOR, "Storage border color; AUTO inherits the active accent"),
-    network_border_enabled("true", XMLPrefsSave.BOOLEAN, "Show the network surface border"),
-    network_border_color("auto", XMLPrefsSave.AUTO_COLOR, "Network border color; AUTO inherits the active accent"),
-    notes_border_enabled("true", XMLPrefsSave.BOOLEAN, "Show the notes surface border"),
-    notes_border_color("auto", XMLPrefsSave.AUTO_COLOR, "Notes border color; AUTO inherits the active accent"),
-    weather_border_enabled("true", XMLPrefsSave.BOOLEAN, "Show the weather surface border"),
-    weather_border_color("auto", XMLPrefsSave.AUTO_COLOR, "Weather border color; AUTO inherits the active accent"),
-    unlock_border_enabled("true", XMLPrefsSave.BOOLEAN, "Show the unlock surface border"),
-    unlock_border_color("auto", XMLPrefsSave.AUTO_COLOR, "Unlock border color; AUTO inherits the active accent"),
-    ascii_border_enabled("true", XMLPrefsSave.BOOLEAN, "Show the ASCII surface border"),
-    ascii_border_color("auto", XMLPrefsSave.AUTO_COLOR, "ASCII border color; AUTO inherits the active accent"),
-    input_border_enabled("true", XMLPrefsSave.BOOLEAN, "Show the input surface border"),
-    input_border_color("auto", XMLPrefsSave.AUTO_COLOR, "Input border color; AUTO inherits the active accent"),
-    output_border_enabled("true", XMLPrefsSave.BOOLEAN, "Show the output surface border"),
-    output_border_color("auto", XMLPrefsSave.AUTO_COLOR, "Output border color; AUTO inherits the active accent"),
-    toolbar_border_enabled("true", XMLPrefsSave.BOOLEAN, "Show the toolbar surface border"),
-    toolbar_border_color("auto", XMLPrefsSave.AUTO_COLOR, "Toolbar border color; AUTO inherits the active accent"),
-    suggestions_border_enabled("true", XMLPrefsSave.BOOLEAN, "Show suggestion surface borders"),
-    suggestions_border_color("auto", XMLPrefsSave.AUTO_COLOR, "Suggestion border color; AUTO inherits the active accent");
+    unified_status_border("false", XMLPrefsSave.BOOLEAN, R.string.setting_surfaceborders_unified_status_border_description),
+    ram_border_enabled("true", XMLPrefsSave.BOOLEAN, R.string.setting_surfaceborders_ram_border_enabled_description),
+    ram_border_color("auto", XMLPrefsSave.AUTO_COLOR, R.string.setting_surfaceborders_ram_border_color_description),
+    device_border_enabled("true", XMLPrefsSave.BOOLEAN, R.string.setting_surfaceborders_device_border_enabled_description),
+    device_border_color("auto", XMLPrefsSave.AUTO_COLOR, R.string.setting_surfaceborders_device_border_color_description),
+    time_border_enabled("true", XMLPrefsSave.BOOLEAN, R.string.setting_surfaceborders_time_border_enabled_description),
+    time_border_color("auto", XMLPrefsSave.AUTO_COLOR, R.string.setting_surfaceborders_time_border_color_description),
+    battery_border_enabled("true", XMLPrefsSave.BOOLEAN, R.string.setting_surfaceborders_battery_border_enabled_description),
+    battery_border_color("auto", XMLPrefsSave.AUTO_COLOR, R.string.setting_surfaceborders_battery_border_color_description),
+    storage_border_enabled("true", XMLPrefsSave.BOOLEAN, R.string.setting_surfaceborders_storage_border_enabled_description),
+    storage_border_color("auto", XMLPrefsSave.AUTO_COLOR, R.string.setting_surfaceborders_storage_border_color_description),
+    network_border_enabled("true", XMLPrefsSave.BOOLEAN, R.string.setting_surfaceborders_network_border_enabled_description),
+    network_border_color("auto", XMLPrefsSave.AUTO_COLOR, R.string.setting_surfaceborders_network_border_color_description),
+    notes_border_enabled("true", XMLPrefsSave.BOOLEAN, R.string.setting_surfaceborders_notes_border_enabled_description),
+    notes_border_color("auto", XMLPrefsSave.AUTO_COLOR, R.string.setting_surfaceborders_notes_border_color_description),
+    weather_border_enabled("true", XMLPrefsSave.BOOLEAN, R.string.setting_surfaceborders_weather_border_enabled_description),
+    weather_border_color("auto", XMLPrefsSave.AUTO_COLOR, R.string.setting_surfaceborders_weather_border_color_description),
+    unlock_border_enabled("true", XMLPrefsSave.BOOLEAN, R.string.setting_surfaceborders_unlock_border_enabled_description),
+    unlock_border_color("auto", XMLPrefsSave.AUTO_COLOR, R.string.setting_surfaceborders_unlock_border_color_description),
+    ascii_border_enabled("true", XMLPrefsSave.BOOLEAN, R.string.setting_surfaceborders_ascii_border_enabled_description),
+    ascii_border_color("auto", XMLPrefsSave.AUTO_COLOR, R.string.setting_surfaceborders_ascii_border_color_description),
+    input_border_enabled("true", XMLPrefsSave.BOOLEAN, R.string.setting_surfaceborders_input_border_enabled_description),
+    input_border_color("auto", XMLPrefsSave.AUTO_COLOR, R.string.setting_surfaceborders_input_border_color_description),
+    output_border_enabled("true", XMLPrefsSave.BOOLEAN, R.string.setting_surfaceborders_output_border_enabled_description),
+    output_border_color("auto", XMLPrefsSave.AUTO_COLOR, R.string.setting_surfaceborders_output_border_color_description),
+    toolbar_border_enabled("true", XMLPrefsSave.BOOLEAN, R.string.setting_surfaceborders_toolbar_border_enabled_description),
+    toolbar_border_color("auto", XMLPrefsSave.AUTO_COLOR, R.string.setting_surfaceborders_toolbar_border_color_description),
+    suggestions_border_enabled("true", XMLPrefsSave.BOOLEAN, R.string.setting_surfaceborders_suggestions_border_enabled_description),
+    suggestions_border_color("auto", XMLPrefsSave.AUTO_COLOR, R.string.setting_surfaceborders_suggestions_border_color_description);
 
     override fun defaultValue(): String = default
     override fun type(): String = kind
-    override fun info(): String = description
+    override fun infoRes(): Int = description
     override fun parent(): XMLPrefsElement = XMLPrefsManager.XMLPrefsRoot.UI
     override fun label(): String = name
     override fun invalidValues(): Array<String?>? = null

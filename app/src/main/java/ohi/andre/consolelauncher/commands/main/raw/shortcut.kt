@@ -118,7 +118,7 @@ class shortcut : ParamCommand(), APICommand {
                 if (shortcuts.isEmpty()) return "[]"
 
                 val builder = StringBuilder()
-                Param.Companion.append(builder, shortcuts, Tuils.EMPTYSTRING)
+                Param.Companion.append(pack.context, builder, shortcuts, Tuils.EMPTYSTRING)
 
                 return builder.toString()
             }
@@ -132,7 +132,7 @@ class shortcut : ParamCommand(), APICommand {
                     if (shortcuts.isEmpty()) continue
 
                     builder.append(l.publicLabel).append(Tuils.NEWLINE)
-                    Param.Companion.append(builder, shortcuts, Tuils.DOUBLE_SPACE)
+                    Param.Companion.append(pack.context, builder, shortcuts, Tuils.DOUBLE_SPACE)
                 }
 
                 Param.Companion.appendPinnedAliases(pack.context, builder)
@@ -159,7 +159,7 @@ class shortcut : ParamCommand(), APICommand {
         companion object {
             fun get(p: String): Param? {
                 var p = p
-                p = p.lowercase(Locale.getDefault())
+                p = p.lowercase(Locale.ROOT)
                 val ps = entries.toTypedArray()
                 for (p1 in ps) if (p.endsWith(p1.label()!!)) return p1
                 return null
@@ -177,24 +177,25 @@ class shortcut : ParamCommand(), APICommand {
             }
 
             private fun append(
+                context: Context,
                 builder: StringBuilder,
                 shortcuts: List<ShortcutInfo>,
                 prefix: String?
             ) {
                 for (i in shortcuts) {
-                    builder.append(prefix).append("- ").append(i.getShortLabel()).append(" (ID: ")
+                    builder.append(prefix).append("- ").append(i.getShortLabel()).append(context.getString(R.string.command_detail_shortcut_id_db527))
                         .append(i.getId()).append(")")
-                    if (i.isPinned()) builder.append(" [pinned]")
+                    if (i.isPinned()) builder.append(context.getString(R.string.command_detail_shortcut_pinned_00fe0))
                     builder.append(Tuils.NEWLINE)
                 }
             }
 
-            private fun appendPinnedAliases(context: Context?, builder: StringBuilder) {
+            private fun appendPinnedAliases(context: Context, builder: StringBuilder) {
                 val records = PinnedShortcutManager.list(context)
                 if (records.size == 0) return
 
                 if (builder.length > 0) builder.append(Tuils.NEWLINE)
-                builder.append("Pinned aliases").append(Tuils.NEWLINE)
+                builder.append(context.getString(R.string.command_detail_shortcut_pinned_aliases_6ab3b)).append(Tuils.NEWLINE)
                 for (record in records) {
                     if (record == null) continue
                     builder.append(Tuils.DOUBLE_SPACE)

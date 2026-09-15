@@ -1,5 +1,8 @@
 package ohi.andre.consolelauncher.managers
 
+import ohi.andre.consolelauncher.tuils.LocalizedArgumentException
+import ohi.andre.consolelauncher.tuils.LocalizedStateException
+import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.BuildConfig
 import android.content.Context
 import android.content.SharedPreferences
@@ -134,7 +137,7 @@ object BackupManager {
         var presetSource = false
         if (preset != null && preset.length > 0) {
             sourceRoot = PresetManager.getSavedPresetFolder(preset)
-            kotlin.require(sourceRoot.isDirectory()) { "Preset not found" }
+            kotlin.require(sourceRoot.isDirectory()) { throw LocalizedArgumentException(R.string.validation_backup_backupmanager_preset_not_found_ce086) }
             sourceType = "preset"
             presetSource = true
         }
@@ -164,7 +167,7 @@ object BackupManager {
             if (includeBehavior) roots.add(XMLPrefsManager.XMLPrefsRoot.BEHAVIOR)
             for (root in roots) {
                 val file = java.io.File(sourceRoot, root.path)
-                if (presetSource) kotlin.require(file.isFile()) { "Preset is incomplete" }
+                if (presetSource) kotlin.require(file.isFile()) { throw LocalizedArgumentException(R.string.validation_backup_backupmanager_preset_is_incomplete_85622) }
                 ohi.andre.consolelauncher.managers.BackupManager.addTextEntry(
                     zip,
                     root.path,
@@ -201,34 +204,34 @@ object BackupManager {
     }
 
     private fun writeVerified(context: Context, uri: Uri, payload: ByteArray) {
-        require(payload.isNotEmpty() && payload.size <= MAX_BACKUP_BYTES) { "Backup package is empty or too large" }
+        require(payload.isNotEmpty() && payload.size <= MAX_BACKUP_BYTES) { context.getString(R.string.manager_backupmanager_backup_package_is_empty_or_too_large_ea31d) }
         val raw = requireNotNull(context.contentResolver.openOutputStream(uri, "w")) {
-            "Unable to open backup destination"
+            context.getString(R.string.manager_backupmanager_unable_to_open_backup_destination_b73a4)
         }
         BufferedOutputStream(raw).use {
             it.write(payload)
             it.flush()
         }
         val written = requireNotNull(context.contentResolver.openInputStream(uri)) {
-            "Unable to verify backup destination"
+            context.getString(R.string.manager_backupmanager_unable_to_verify_backup_destination_dcbcd)
         }
         BufferedInputStream(written).use { verifyExport(payload, it) }
     }
 
     internal fun verifyExport(expected: ByteArray, actual: InputStream) {
-        require(expected.isNotEmpty()) { "Backup verification failed" }
+        require(expected.isNotEmpty()) { throw LocalizedArgumentException(R.string.validation_backup_backupmanager_backup_verification_failed_6772e) }
         val buffer = ByteArray(8192)
         var offset = 0
         while (true) {
             val read = actual.read(buffer)
             if (read == -1) break
-            require(offset + read <= expected.size) { "Backup verification failed" }
+            require(offset + read <= expected.size) { throw LocalizedArgumentException(R.string.validation_backup_backupmanager_backup_verification_failed_6772e) }
             for (index in 0 until read) {
-                require(buffer[index] == expected[offset + index]) { "Backup verification failed" }
+                require(buffer[index] == expected[offset + index]) { throw LocalizedArgumentException(R.string.validation_backup_backupmanager_backup_verification_failed_6772e) }
             }
             offset += read
         }
-        require(offset == expected.size) { "Backup verification failed" }
+        require(offset == expected.size) { throw LocalizedArgumentException(R.string.validation_backup_backupmanager_backup_verification_failed_6772e) }
     }
 
     @JvmOverloads
@@ -242,7 +245,7 @@ object BackupManager {
         if (tempDir.exists()) {
             Tuils.delete(tempDir)
         }
-        kotlin.check(tempDir.mkdirs()) { "Unable to create restore folder" }
+        kotlin.check(tempDir.mkdirs()) { throw LocalizedStateException(R.string.validation_backup_backupmanager_unable_to_create_restore_folder_89757) }
 
         var hasManifest = false
         var manifest: kotlin.String? = null
@@ -260,8 +263,8 @@ object BackupManager {
             while ((zip.getNextEntry().also { entry = it }) != null) {
                 val name = entry!!.getName()
                 if (entry.isDirectory()) continue
-                kotlin.require(ohi.andre.consolelauncher.managers.BackupManager.isSafeEntry(name)) { "Unsafe backup package" }
-                kotlin.require(entries.add(name)) { "Backup package contains duplicate entries" }
+                kotlin.require(ohi.andre.consolelauncher.managers.BackupManager.isSafeEntry(name)) { throw LocalizedArgumentException(R.string.validation_backup_backupmanager_unsafe_backup_package_a3cb1) }
+                kotlin.require(entries.add(name)) { throw LocalizedArgumentException(R.string.validation_backup_backupmanager_backup_package_contains_duplicate_entries_aec49) }
 
                 if (ohi.andre.consolelauncher.managers.BackupManager.MANIFEST_FILE == name) {
                     hasManifest = true
@@ -269,7 +272,7 @@ object BackupManager {
 
                 val out = java.io.File(tempDir, name)
                 val parent = out.getParentFile()
-                kotlin.check(!(parent != null && !parent.exists() && !parent.mkdirs())) { "Unable to restore backup folder" }
+                kotlin.check(!(parent != null && !parent.exists() && !parent.mkdirs())) { throw LocalizedStateException(R.string.validation_backup_backupmanager_unable_to_restore_backup_folder_184df) }
 
                 val stream = java.io.FileOutputStream(out, false)
                 try {
@@ -278,7 +281,7 @@ object BackupManager {
                         if (ohi.andre.consolelauncher.managers.BackupManager.MANIFEST_FILE == name) java.io.ByteArrayOutputStream() else null
                     while ((zip.read(buffer).also { read = it }) != -1) {
                         totalBytes += read.toLong()
-                        kotlin.require(totalBytes <= ohi.andre.consolelauncher.managers.BackupManager.MAX_BACKUP_BYTES) { "Backup package is too large" }
+                        kotlin.require(totalBytes <= ohi.andre.consolelauncher.managers.BackupManager.MAX_BACKUP_BYTES) { throw LocalizedArgumentException(R.string.validation_backup_backupmanager_backup_package_is_too_large_df84c) }
                         stream.write(buffer, 0, read)
                         if (manifestOut != null) {
                             manifestOut.write(buffer, 0, read)
@@ -295,7 +298,7 @@ object BackupManager {
             zip.close()
         }
 
-        kotlin.require(hasManifest) { "Backup package is incomplete" }
+        kotlin.require(hasManifest) { throw LocalizedArgumentException(R.string.validation_backup_backupmanager_backup_package_is_incomplete_91553) }
 
         val personal = validatePackage(manifest, entries)
         if (personal) {
@@ -326,20 +329,20 @@ object BackupManager {
 
         return when (type) {
             TYPE_BACKUP -> {
-                kotlin.require(schema == "1") { "Unsupported backup schema" }
-                kotlin.require(profile == "personal") { "Invalid personal backup profile" }
-                kotlin.require(entries.containsAll(REQUIRED_PERSONAL_ENTRIES)) { "Personal backup is incomplete" }
+                kotlin.require(schema == "1") { throw LocalizedArgumentException(R.string.validation_backup_backupmanager_unsupported_backup_schema_94afd) }
+                kotlin.require(profile == "personal") { throw LocalizedArgumentException(R.string.validation_backup_backupmanager_invalid_personal_backup_profile_e275d) }
+                kotlin.require(entries.containsAll(REQUIRED_PERSONAL_ENTRIES)) { throw LocalizedArgumentException(R.string.validation_backup_backupmanager_personal_backup_is_incomplete_838a0) }
                 true
             }
             TYPE_SHAREABLE -> {
-                kotlin.require(schema == "1" || schema == "2" || schema == "3") { "Unsupported backup schema" }
-                kotlin.require(profile == "shareable") { "Invalid shareable configuration profile" }
+                kotlin.require(schema == "1" || schema == "2" || schema == "3") { throw LocalizedArgumentException(R.string.validation_backup_backupmanager_unsupported_backup_schema_94afd) }
+                kotlin.require(profile == "shareable") { throw LocalizedArgumentException(R.string.validation_backup_backupmanager_invalid_shareable_configuration_profile_78695) }
                 val sections = manifestValue(manifest, "sections")
                 if (schema == "2" || schema == "3") {
                     kotlin.require(
                         manifestValue(manifest, "privacy") == if (schema == "2") "pi-safe" else "user-selected"
                     ) {
-                        "Shareable configuration privacy marker is missing"
+                        throw LocalizedArgumentException(R.string.validation_backup_backupmanager_shareable_configuration_privacy_marker_is_555ab)
                     }
                     if (schema == "3") behaviorFields(manifest)
                     kotlin.require(
@@ -347,12 +350,12 @@ object BackupManager {
                             sections == "theme,suggestions,behavior" ||
                             sections == "theme,ui,suggestions" ||
                             sections == "theme,ui,suggestions,behavior"
-                    ) { "Unsupported shareable configuration sections" }
+                    ) { throw LocalizedArgumentException(R.string.validation_backup_backupmanager_unsupported_shareable_configuration_sectio_c88e0) }
                     val expected = setOf(MANIFEST_FILE, XMLPrefsManager.XMLPrefsRoot.THEME.path,
                         XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS.path) +
                         (if (sections.contains(",ui,")) setOf(XMLPrefsManager.XMLPrefsRoot.UI.path) else emptySet()) +
                         (if (sections.endsWith(",behavior")) setOf(XMLPrefsManager.XMLPrefsRoot.BEHAVIOR.path) else emptySet())
-                    kotlin.require(entries == expected) { "Shareable configuration contains unsupported files" }
+                    kotlin.require(entries == expected) { throw LocalizedArgumentException(R.string.validation_backup_backupmanager_shareable_configuration_contains_unsupport_2455b) }
                     return false
                 }
                 kotlin.require(
@@ -362,27 +365,27 @@ object BackupManager {
                         sections == "theme,ui,suggestions,behavior" ||
                         sections == "theme,ui,suggestions,behavior,frames"
                 ) {
-                    "Unsupported shareable configuration sections"
+                    throw LocalizedArgumentException(R.string.validation_backup_backupmanager_unsupported_shareable_configuration_sectio_c88e0)
                 }
                 val expected = if (sections == "theme,suggestions")
                     setOf(MANIFEST_FILE, XMLPrefsManager.XMLPrefsRoot.THEME.path, XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS.path)
                 else setOf(MANIFEST_FILE, *SHAREABLE_FILES) +
                     if (sections.contains(",behavior")) setOf(XMLPrefsManager.XMLPrefsRoot.BEHAVIOR.path) else emptySet()
-                kotlin.require(entries.containsAll(expected)) { "Shareable configuration is incomplete" }
+                kotlin.require(entries.containsAll(expected)) { throw LocalizedArgumentException(R.string.validation_backup_backupmanager_shareable_configuration_is_incomplete_13f8c) }
                 val extras = entries - expected
                 if (sections.endsWith(",frames")) {
                     kotlin.require(extras.contains(FrameManager.FRAME_FOLDER + "/" + FrameManager.STATE_FILE)) {
-                        "Shareable frame settings are incomplete"
+                        throw LocalizedArgumentException(R.string.validation_backup_backupmanager_shareable_frame_settings_are_incomplete_3a160)
                     }
                     kotlin.require(extras.all(FrameManager::isPortableEntry)) {
-                        "Shareable configuration contains unsupported files"
+                        throw LocalizedArgumentException(R.string.validation_backup_backupmanager_shareable_configuration_contains_unsupport_2455b)
                     }
                 } else {
-                    kotlin.require(extras.isEmpty()) { "Shareable configuration contains unsupported files" }
+                    kotlin.require(extras.isEmpty()) { throw LocalizedArgumentException(R.string.validation_backup_backupmanager_shareable_configuration_contains_unsupport_2455b) }
                 }
                 false
             }
-            else -> throw java.lang.IllegalArgumentException("Unsupported backup package")
+            else -> throw LocalizedArgumentException(R.string.backup_error_unsupported)
         }
     }
 
@@ -392,7 +395,7 @@ object BackupManager {
         val known = ohi.andre.consolelauncher.managers.xml.options.Behavior.entries
             .mapNotNull { it.label() }
             .toSet()
-        require(fields.all { it in known }) { "Shareable configuration contains unknown behavior settings" }
+        require(fields.all { it in known }) { throw LocalizedArgumentException(R.string.validation_backup_backupmanager_shareable_configuration_contains_unknown_b_d886f) }
         return fields
     }
 
@@ -604,7 +607,7 @@ object BackupManager {
                 ohi.andre.consolelauncher.managers.BackupManager.relativeName(source, file)
             )
             if (file.isDirectory()) {
-                kotlin.check(!(!dest.exists() && !dest.mkdirs())) { "Unable to restore folder: " + dest.getName() }
+                kotlin.check(!(!dest.exists() && !dest.mkdirs())) { throw LocalizedStateException(R.string.validation_backup_backupmanager_unable_to_restore_folder_1b199, dest.getName()) }
                 ohi.andre.consolelauncher.managers.BackupManager.restoreDirectory(
                     file,
                     dest,
@@ -612,7 +615,7 @@ object BackupManager {
                 )
             } else if (file.isFile()) {
                 val parent = dest.getParentFile()
-                kotlin.check(!(parent != null && !parent.exists() && !parent.mkdirs())) { "Unable to restore folder: " + parent!!.getName() }
+                kotlin.check(!(parent != null && !parent.exists() && !parent.mkdirs())) { throw LocalizedStateException(R.string.validation_backup_backupmanager_unable_to_restore_folder_1b199, parent!!.getName()) }
                 if (!replaceExisting && dest.exists()) {
                     Tuils.insertOld(dest)
                 }
@@ -693,7 +696,7 @@ object BackupManager {
         if (!ohi.andre.consolelauncher.managers.BackupManager.startsWithMagic(bytes)) {
             return java.io.ByteArrayInputStream(bytes)
         }
-        kotlin.require(!(password == null || password.length == 0)) { "Backup password is required" }
+        kotlin.require(!(password == null || password.length == 0)) { throw LocalizedArgumentException(R.string.validation_backup_backupmanager_backup_password_is_required_9706d) }
         return java.io.ByteArrayInputStream(
             ohi.andre.consolelauncher.managers.BackupManager.decrypt(
                 bytes,
@@ -735,7 +738,7 @@ object BackupManager {
             !(encrypted.size <= headerBytes || !ohi.andre.consolelauncher.managers.BackupManager.startsWithMagic(
                 encrypted
             ))
-        ) { "Encrypted backup is incomplete" }
+        ) { throw LocalizedArgumentException(R.string.validation_backup_backupmanager_encrypted_backup_is_incomplete_777d0) }
 
         val salt = kotlin.ByteArray(ohi.andre.consolelauncher.managers.BackupManager.SALT_BYTES)
         val iv = kotlin.ByteArray(ohi.andre.consolelauncher.managers.BackupManager.IV_BYTES)
@@ -770,7 +773,7 @@ object BackupManager {
             )
             return cipher.doFinal(payload)
         } catch (e: java.lang.Exception) {
-            throw java.lang.IllegalArgumentException("Backup password is incorrect or the file was changed")
+            throw LocalizedArgumentException(R.string.backup_error_password)
         }
     }
 
@@ -804,7 +807,7 @@ object BackupManager {
     private fun readUri(context: android.content.Context, uri: android.net.Uri): kotlin.ByteArray {
         val `in`: java.io.InputStream =
             java.io.BufferedInputStream(context.getContentResolver().openInputStream(uri))
-        kotlin.requireNotNull(`in`) { "Unable to open backup package" }
+        kotlin.requireNotNull(`in`) { throw LocalizedArgumentException(R.string.validation_backup_backupmanager_unable_to_open_backup_package_bdca3) }
         val out = java.io.ByteArrayOutputStream()
         val buffer = kotlin.ByteArray(8192)
         var total: kotlin.Long = 0
@@ -812,7 +815,7 @@ object BackupManager {
             var read: Int
             while ((`in`.read(buffer).also { read = it }) != -1) {
                 total += read.toLong()
-                kotlin.require(total <= ohi.andre.consolelauncher.managers.BackupManager.MAX_BACKUP_BYTES) { "Backup package is too large" }
+                kotlin.require(total <= ohi.andre.consolelauncher.managers.BackupManager.MAX_BACKUP_BYTES) { throw LocalizedArgumentException(R.string.validation_backup_backupmanager_backup_package_is_too_large_df84c) }
                 out.write(buffer, 0, read)
             }
         } finally {

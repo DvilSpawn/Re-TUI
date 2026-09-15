@@ -1,0 +1,16 @@
+<resources>
+    <!-- Terminal glyphs and initial numeric placeholders. Actual values are set at runtime. -->
+    <string name="ui_token_d9fa58d9ac" translatable="false" formatted="false">"00/00"</string>
+    <string name="ui_token_2db3fd2887" translatable="false" formatted="false">"--:--"</string>
+    <string name="ui_token_42099b4af0" translatable="false" formatted="false">"/"</string>
+    <string name="ui_token_3bc15c8aae" translatable="false" formatted="false">"-"</string>
+    <string name="ui_token_48bb4ccc18" translatable="false" formatted="false">"$ "</string>
+    <string name="ui_token_155130c69f" translatable="false" formatted="false">"25:00"</string>
+    <string name="ui_token_5b61e9b149" translatable="false" formatted="false">"------------------------------------------------"</string>
+    <string name="ui_token_3ef9bbcc6e" translatable="false" formatted="false">"[&lt;]"</string>
+    <string name="ui_token_1ee7d42bf0" translatable="false" formatted="false">"0:00"</string>
+    <string name="ui_token_4dbd0be334" translatable="false" formatted="false">"[ -30 ]"</string>
+    <string name="ui_token_572cc15594" translatable="false" formatted="false">"[ +30 ]"</string>
+    <string name="ui_token_6a4e6e729f" translatable="false" formatted="false">"−"</string>
+    <string name="ui_token_b6589fc6ab" translatable="false" formatted="false">"0"</string>
+</resources>

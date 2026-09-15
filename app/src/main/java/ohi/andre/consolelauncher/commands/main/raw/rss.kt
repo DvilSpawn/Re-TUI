@@ -113,7 +113,7 @@ class rss : ParamCommand() {
             override fun exec(pack: ExecutePack): String? {
                 val id = pack.getInt()
                 val url = pack.getString()
-                validateUrl(url)?.let { return it }
+                validateUrl(url)?.let { return pack.context.getString(it) }
                 return (pack as MainPack).rssManager!!.setUrl(id, url)
             }
 
@@ -373,7 +373,7 @@ class rss : ParamCommand() {
 
             fun get(p: String): Param? {
                 var p = p
-                p = p.lowercase(Locale.getDefault())
+                p = p.lowercase(Locale.ROOT)
                 val ps = entries.toTypedArray()
                 for (p1 in ps) if (p.endsWith(p1.label()!!)) return p1
                 return null
@@ -394,16 +394,16 @@ class rss : ParamCommand() {
                 val manager = (pack as MainPack).rssManager!!
                 TuixtDialog.showValidatedForm(
                     pack.context,
-                    "ADD RSS FEED",
+                    pack.context.getString(R.string.command_rss_add_rss_feed_9d80f),
                     listOf(
-                        FormField(FIELD_ID, "ID", "1", InputType.TYPE_CLASS_NUMBER, manager.nextId().toString()),
-                        FormField(FIELD_SECONDS, "Refresh seconds", "900", InputType.TYPE_CLASS_NUMBER, "900"),
-                        FormField(FIELD_URL, "URL", "https://example.com/feed.xml", InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_URI),
-                        FormField(FIELD_ALIAS, "Alias", "Optional display name")
+                        FormField(FIELD_ID, pack.context.getString(R.string.command_rss_id_89f89), "1", InputType.TYPE_CLASS_NUMBER, manager.nextId().toString()),
+                        FormField(FIELD_SECONDS, pack.context.getString(R.string.command_rss_refresh_seconds_3114f), "900", InputType.TYPE_CLASS_NUMBER, "900"),
+                        FormField(FIELD_URL, pack.context.getString(R.string.command_rss_url_0e2d9), "https://example.com/feed.xml", InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_URI),
+                        FormField(FIELD_ALIAS, pack.context.getString(R.string.command_rss_alias_04259), pack.context.getString(R.string.command_rss_optional_display_name_d7b98))
                     ),
-                    "ADD",
-                    "CANCEL",
-                    { values -> validateAddForm(manager, values) }
+                    pack.context.getString(R.string.command_rss_add_f9460),
+                    pack.context.getString(R.string.command_rss_cancel_1507c),
+                    { values -> validateAddForm(manager, values)?.let(pack.context::getString) }
                 ) { values ->
                     val result = manager.add(
                         values[FIELD_ID]!!.toInt(),
@@ -411,20 +411,20 @@ class rss : ParamCommand() {
                         values[FIELD_URL].orEmpty(),
                         values[FIELD_ALIAS]
                     )
-                    Tuils.sendOutput(pack.context, result ?: "RSS feed added.")
+                    Tuils.sendOutput(pack.context, result ?: pack.context.getString(R.string.command_rss_rss_feed_added_a32c7))
                 }
-                return "Opening RSS setup..."
+                return pack.context.getString(R.string.command_rss_opening_rss_setup_17e4d)
             }
 
             private fun showFeedList(pack: ExecutePack): String {
                 val manager = (pack as MainPack).rssManager!!
                 val feeds = manager.snapshot()
                 val items = feeds.map { "[" + it.id + "] " + manager.displayLabel(it) }.toMutableList()
-                items.add("add feed")
+                items.add(pack.context.getString(R.string.command_rss_add_feed_dbdaf))
 
                 TuixtDialog.showOptions(
                     pack.context,
-                    "RSS FEEDS",
+                    pack.context.getString(R.string.command_rss_rss_feeds_1bfa2),
                     items
                 ) { index ->
                     if (index == feeds.size) {
@@ -433,22 +433,22 @@ class rss : ParamCommand() {
                         showFeedMenu(pack, feeds[index].id)?.let { Tuils.sendOutput(pack.context, it) }
                     }
                 }
-                return if (feeds.isEmpty()) "No RSS feeds saved." else "Opening RSS feeds..."
+                return if (feeds.isEmpty()) pack.context.getString(R.string.command_rss_no_rss_feeds_saved_d7342) else pack.context.getString(R.string.command_rss_opening_rss_feeds_b554e)
             }
 
             private fun showFeedMenu(pack: ExecutePack, id: Int): String? {
                 val manager = (pack as MainPack).rssManager!!
                 val feed = manager.findId(id) ?: return pack.context.getString(R.string.id_notfound)
-                val showLabel = if (feed.show) "hide from stream" else "show in stream"
+                val showLabel = if (feed.show) pack.context.getString(R.string.command_rss_hide_from_stream_38c80) else pack.context.getString(R.string.command_rss_show_in_stream_ca7b2)
                 TuixtDialog.showOptions(
                     pack.context,
-                    "RSS " + id,
-                    listOf("show latest", "refresh now", "edit url", "rename alias", "edit interval", showLabel, "remove")
+                    pack.context.getString(R.string.command_rss_rss_f543e, id),
+                    listOf(pack.context.getString(R.string.command_rss_show_latest_b30b3), pack.context.getString(R.string.command_rss_refresh_now_39bf9), pack.context.getString(R.string.command_rss_edit_url_e7962), pack.context.getString(R.string.command_rss_rename_alias_587f3), pack.context.getString(R.string.command_rss_edit_interval_557bc), showLabel, "remove")
                 ) { index ->
                     when (index) {
                         0 -> manager.l(id)?.let { Tuils.sendOutput(pack.context, it) }
                         1 -> {
-                            if (manager.updateRss(id, false, true)) Tuils.sendOutput(pack.context, "RSS refresh requested.")
+                            if (manager.updateRss(id, false, true)) Tuils.sendOutput(pack.context, pack.context.getString(R.string.command_rss_rss_refresh_requested_b09c3))
                             else Tuils.sendOutput(pack.context, pack.context.getString(R.string.id_notfound))
                         }
                         2 -> showUrlForm(pack, manager, id, feed.url.orEmpty())
@@ -457,89 +457,89 @@ class rss : ParamCommand() {
                         5 -> {
                             val nextShow = !feed.show
                             val result = manager.setShow(id, nextShow)
-                            Tuils.sendOutput(pack.context, result ?: if (nextShow) "RSS feed shown." else "RSS feed hidden.")
+                            Tuils.sendOutput(pack.context, result ?: if (nextShow) pack.context.getString(R.string.command_rss_rss_feed_shown_ee233) else pack.context.getString(R.string.command_rss_rss_feed_hidden_89571))
                         }
                         6 -> confirmRemove(pack, manager, id)
                     }
                 }
-                return "Opening RSS feed options..."
+                return pack.context.getString(R.string.command_rss_opening_rss_feed_options_2c8a2)
             }
 
             private fun showUrlForm(pack: ExecutePack, manager: RssManager, id: Int, currentUrl: String) {
                 TuixtDialog.showValidatedForm(
                     pack.context,
-                    "RSS URL",
-                    listOf(FormField(FIELD_URL, "URL", "https://example.com/feed.xml", InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_URI, currentUrl)),
-                    "SAVE",
-                    "CANCEL",
-                    { values -> validateUrl(values[FIELD_URL]) }
+                    pack.context.getString(R.string.command_rss_rss_url_090c6),
+                    listOf(FormField(FIELD_URL, pack.context.getString(R.string.command_rss_url_0e2d9), "https://example.com/feed.xml", InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_URI, currentUrl)),
+                    pack.context.getString(R.string.command_rss_save_50815),
+                    pack.context.getString(R.string.command_rss_cancel_1507c),
+                    { values -> validateUrl(values[FIELD_URL])?.let(pack.context::getString) }
                 ) { values ->
                     val result = manager.setUrl(id, values[FIELD_URL].orEmpty())
-                    Tuils.sendOutput(pack.context, result ?: "RSS URL updated.")
+                    Tuils.sendOutput(pack.context, result ?: pack.context.getString(R.string.command_rss_rss_url_updated_4de4a))
                 }
             }
 
             private fun showAliasForm(pack: ExecutePack, manager: RssManager, id: Int, currentAlias: String) {
                 TuixtDialog.showValidatedForm(
                     pack.context,
-                    "RSS ALIAS",
-                    listOf(FormField(FIELD_ALIAS, "Alias", "Optional display name", InputType.TYPE_CLASS_TEXT, currentAlias)),
-                    "SAVE",
-                    "CANCEL",
+                    pack.context.getString(R.string.command_rss_rss_alias_66634),
+                    listOf(FormField(FIELD_ALIAS, pack.context.getString(R.string.command_rss_alias_04259), pack.context.getString(R.string.command_rss_optional_display_name_d7b98), InputType.TYPE_CLASS_TEXT, currentAlias)),
+                    pack.context.getString(R.string.command_rss_save_50815),
+                    pack.context.getString(R.string.command_rss_cancel_1507c),
                     { null }
                 ) { values ->
                     val alias = values[FIELD_ALIAS]
                     val result = manager.setAlias(id, alias)
-                    Tuils.sendOutput(pack.context, result ?: if (alias.isNullOrBlank()) "RSS alias cleared." else "RSS alias updated.")
+                    Tuils.sendOutput(pack.context, result ?: if (alias.isNullOrBlank()) pack.context.getString(R.string.command_rss_rss_alias_cleared_c57e3) else pack.context.getString(R.string.command_rss_rss_alias_updated_73c49))
                 }
             }
 
             private fun showIntervalForm(pack: ExecutePack, manager: RssManager, id: Int, seconds: Long) {
                 TuixtDialog.showValidatedForm(
                     pack.context,
-                    "RSS INTERVAL",
-                    listOf(FormField(FIELD_SECONDS, "Refresh seconds", "900", InputType.TYPE_CLASS_NUMBER, seconds.toString())),
-                    "SAVE",
-                    "CANCEL",
-                    { values -> validateSeconds(values[FIELD_SECONDS]) }
+                    pack.context.getString(R.string.command_rss_rss_interval_dca4f),
+                    listOf(FormField(FIELD_SECONDS, pack.context.getString(R.string.command_rss_refresh_seconds_3114f), "900", InputType.TYPE_CLASS_NUMBER, seconds.toString())),
+                    pack.context.getString(R.string.command_rss_save_50815),
+                    pack.context.getString(R.string.command_rss_cancel_1507c),
+                    { values -> validateSeconds(values[FIELD_SECONDS])?.let(pack.context::getString) }
                 ) { values ->
                     val result = manager.setTime(id, values[FIELD_SECONDS]!!.toLong())
-                    Tuils.sendOutput(pack.context, result ?: "RSS interval updated.")
+                    Tuils.sendOutput(pack.context, result ?: pack.context.getString(R.string.command_rss_rss_interval_updated_9c833))
                 }
             }
 
             private fun confirmRemove(pack: ExecutePack, manager: RssManager, id: Int) {
                 TuixtDialog.showConfirm(
                     pack.context,
-                    "REMOVE RSS " + id,
-                    "Remove this RSS feed?",
-                    "REMOVE",
-                    "CANCEL"
+                    pack.context.getString(R.string.command_rss_remove_rss_2af36, id),
+                    pack.context.getString(R.string.command_rss_remove_this_rss_feed_0c52b),
+                    pack.context.getString(R.string.command_rss_remove_f9662),
+                    pack.context.getString(R.string.command_rss_cancel_1507c)
                 ) {
                     val result = manager.rm(id)
-                    Tuils.sendOutput(pack.context, result ?: "RSS feed removed.")
+                    Tuils.sendOutput(pack.context, result ?: pack.context.getString(R.string.command_rss_rss_feed_removed_2ac75))
                 }
             }
 
-            private fun validateAddForm(manager: RssManager, values: Map<String, String>): String? {
+            private fun validateAddForm(manager: RssManager, values: Map<String, String>): Int? {
                 val id = values[FIELD_ID]?.toIntOrNull()
-                if (id == null || id <= 0) return "ID is invalid."
-                if (manager.findId(id) != null) return "ID already exists."
+                if (id == null || id <= 0) return R.string.validation_id_invalid
+                if (manager.findId(id) != null) return R.string.validation_id_exists
                 validateSeconds(values[FIELD_SECONDS])?.let { return it }
                 validateUrl(values[FIELD_URL])?.let { return it }
                 return null
             }
 
-            private fun validateSeconds(value: String?): String? {
+            private fun validateSeconds(value: String?): Int? {
                 val seconds = value?.toLongOrNull()
-                return if (seconds == null || seconds <= 0) "Refresh seconds are invalid." else null
+                return if (seconds == null || seconds <= 0) R.string.validation_refresh_invalid else null
             }
 
-            private fun validateUrl(value: String?): String? {
+            private fun validateUrl(value: String?): Int? {
                 val url = value?.trim().orEmpty()
                 val lower = url.lowercase(Locale.US)
-                if (url.isBlank()) return "URL is missing."
-                return if (lower.startsWith("http://") || lower.startsWith("https://")) null else "URL must start with http:// or https://."
+                if (url.isBlank()) return R.string.validation_url_missing
+                return if (lower.startsWith("http://") || lower.startsWith("https://")) null else R.string.validation_url_scheme
             }
         }
     }

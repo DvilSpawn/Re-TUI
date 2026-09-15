@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "target": "retui-launcher",
+  "id": "example-en-US",
+  "languageTag": "en-US",
+  "name": "English template",
+  "nativeName": "English template",
+  "version": 1,
+  "direction": "ltr"
+}

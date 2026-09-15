@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher
 
+import ohi.andre.consolelauncher.R
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
@@ -12,6 +13,9 @@ import android.app.PendingIntent.CanceledException
 import android.app.admin.DevicePolicyManager
 import android.content.BroadcastReceiver
 import android.content.ComponentName
+import ohi.andre.consolelauncher.tuils.CalendarLabels
+import androidx.core.os.ConfigurationCompat
+import java.text.DateFormatSymbols
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -761,87 +765,87 @@ class UIManager(
     }
 
     private val hackLines: Array<String> = arrayOf(
-        "$ ./breach --target=localhost --mode=theatrical",
-        "[BOOT] attaching remote shell...",
-        "[BOOT] syncing fake intrusion assets...",
-        "[AUTH] replaying cached credentials...",
-        "[AUTH] probing token vault A1...",
-        "[AUTH] probing token vault A2...",
-        "[AUTH] probing token vault A3...",
-        "[TRACE] walking local package graph...",
-        "[TRACE] reading launcher aliases...",
-        "[TRACE] reading launcher contacts...",
-        "[TRACE] reading launcher app groups...",
-        "[MEM ] dumping volatile session tokens...",
-        "[MEM ] scanning keyboard buffer...",
-        "[MEM ] scanning clipboard buffer...",
-        "[NET ] tunneling through relay-07...",
-        "[NET ] tunneling through relay-11...",
-        "[NET ] handshaking with mirror node...",
-        "[PROC] escalating pseudo-root privileges...",
-        "[PROC] masking shell signature...",
-        "[PROC] detaching watchdog threads...",
-        "[I/O ] indexing aliases, apps, contacts...",
-        "[I/O ] reading wallpaper palette cache...",
-        "[I/O ] reading notification mirror...",
-        "[CRYP] brute forcing theme entropy...",
-        "[CRYP] brute forcing dashed border seed...",
-        "[CRYP] deriving surface accent offsets...",
-        "[SYNC] mirroring notification buffer...",
-        "[SYNC] mirroring playback metadata...",
-        "[SYNC] mirroring quick launch slots...",
-        "[WARN] firewall politely ignored",
-        "[WARN] device insists everything is fine",
-        "[MESH] propagating into nearby terminals...",
-        "[MESH] seeding ghost sessions...",
-        "[MESH] flooding loopback channel...",
-        "[DB  ] harvesting battery telemetry...",
-        "[DB  ] harvesting session hints...",
-        "[DB  ] harvesting stale command history...",
-        "[VID ] spoofing viewport overlays...",
-        "[VID ] injecting terminal rain...",
-        "[VID ] pinning cinematic contrast...",
-        "[AUX ] scrambling keyboard handshake...",
-        "[AUX ] bouncing cursor driver...",
-        "[AUX ] destabilizing glyph cache...",
-        "[FS  ] mounting /storage/emulated/0/Re-T-UI",
-        "[FS  ] enumerating ui.xml",
-        "[FS  ] enumerating theme.xml",
-        "[FS  ] enumerating suggestions.xml",
-        "[FS  ] enumerating behavior.xml",
-        "[MOD ] patching fake subsystem: notifications",
-        "[MOD ] patching fake subsystem: music",
-        "[MOD ] patching fake subsystem: wallpaper",
-        "[MOD ] patching fake subsystem: battery",
-        "[PING] 127.0.0.1 replied in 0ms",
-        "[PING] 127.0.0.1 replied in 0ms",
-        "[PING] 127.0.0.1 replied in 0ms",
-        "[SCAN] port 22 open",
-        "[SCAN] port 80 filtered",
-        "[SCAN] port 443 open",
-        "[SCAN] port 1337 aesthetically required",
-        "[SEED] generating panic checksum 8f-2c-91",
-        "[SEED] generating panic checksum 8f-2c-92",
-        "[SEED] generating panic checksum 8f-2c-93",
-        "[PIPE] rerouting stdout to dramatic overlay...",
-        "[PIPE] rerouting stderr to dramatic overlay...",
-        "[PIPE] rerouting common sense to /dev/null",
-        "[OVRD] replacing launcher calmness with urgency",
-        "[OVRD] amplifying green phosphor output",
-        "[OVRD] preserving user music module because priorities",
-        "[HOOK] intercepting idle state...",
-        "[HOOK] intercepting wallpaper refresh...",
-        "[HOOK] intercepting harmless command execution...",
-        "[TASK] assembling unauthorized vibes...",
-        "[TASK] replaying synthetic intrusion frames...",
-        "[TASK] marking sequence irreversible...",
-        "[TASK] sequence actually reversible",
-        "[LOCK] pretending to lock subsystems...",
-        "[LOCK] pretending to exfiltrate secrets...",
-        "[LOCK] pretending to know what any of this means...",
-        "[NULL] dereferencing cinematic stakes...",
-        "[NULL] recovering from fake catastrophe...",
-        "[DONE] dramatic effect complete"
+        mContext.getString(R.string.surface_breach_target_localhost_mode_theatrical_501ed),
+        mContext.getString(R.string.surface_boot_attaching_remote_shell_a4ecf),
+        mContext.getString(R.string.surface_boot_syncing_fake_intrusion_assets_c0461),
+        mContext.getString(R.string.surface_auth_replaying_cached_credentials_ff954),
+        mContext.getString(R.string.surface_auth_probing_token_vault_a1_159da),
+        mContext.getString(R.string.surface_auth_probing_token_vault_a2_f7dd0),
+        mContext.getString(R.string.surface_auth_probing_token_vault_a3_90360),
+        mContext.getString(R.string.surface_trace_walking_local_package_graph_26e0b),
+        mContext.getString(R.string.surface_trace_reading_launcher_aliases_62296),
+        mContext.getString(R.string.surface_trace_reading_launcher_contacts_8d904),
+        mContext.getString(R.string.surface_trace_reading_launcher_app_groups_97704),
+        mContext.getString(R.string.surface_mem_dumping_volatile_session_tokens_06915),
+        mContext.getString(R.string.surface_mem_scanning_keyboard_buffer_57074),
+        mContext.getString(R.string.surface_mem_scanning_clipboard_buffer_adbc9),
+        mContext.getString(R.string.surface_net_tunneling_through_relay_07_37b98),
+        mContext.getString(R.string.surface_net_tunneling_through_relay_11_c3345),
+        mContext.getString(R.string.surface_net_handshaking_with_mirror_node_b8bec),
+        mContext.getString(R.string.surface_proc_escalating_pseudo_root_privileges_c36c9),
+        mContext.getString(R.string.surface_proc_masking_shell_signature_9d67a),
+        mContext.getString(R.string.surface_proc_detaching_watchdog_threads_79bd4),
+        mContext.getString(R.string.surface_i_o_indexing_aliases_apps_contacts_f7518),
+        mContext.getString(R.string.surface_i_o_reading_wallpaper_palette_cache_b75c8),
+        mContext.getString(R.string.surface_i_o_reading_notification_mirror_bf032),
+        mContext.getString(R.string.surface_cryp_brute_forcing_theme_entropy_43e64),
+        mContext.getString(R.string.surface_cryp_brute_forcing_dashed_border_seed_72e74),
+        mContext.getString(R.string.surface_cryp_deriving_surface_accent_offsets_8557f),
+        mContext.getString(R.string.surface_sync_mirroring_notification_buffer_574fb),
+        mContext.getString(R.string.surface_sync_mirroring_playback_metadata_e919a),
+        mContext.getString(R.string.surface_sync_mirroring_quick_launch_slots_19159),
+        mContext.getString(R.string.surface_warn_firewall_politely_ignored_01d0b),
+        mContext.getString(R.string.surface_warn_device_insists_everything_is_fine_4c272),
+        mContext.getString(R.string.surface_mesh_propagating_into_nearby_terminals_f7abe),
+        mContext.getString(R.string.surface_mesh_seeding_ghost_sessions_9a742),
+        mContext.getString(R.string.surface_mesh_flooding_loopback_channel_7c336),
+        mContext.getString(R.string.surface_db_harvesting_battery_telemetry_fc93c),
+        mContext.getString(R.string.surface_db_harvesting_session_hints_636b4),
+        mContext.getString(R.string.surface_db_harvesting_stale_command_history_ffba7),
+        mContext.getString(R.string.surface_vid_spoofing_viewport_overlays_cc228),
+        mContext.getString(R.string.surface_vid_injecting_terminal_rain_12859),
+        mContext.getString(R.string.surface_vid_pinning_cinematic_contrast_f7b43),
+        mContext.getString(R.string.surface_aux_scrambling_keyboard_handshake_a188a),
+        mContext.getString(R.string.surface_aux_bouncing_cursor_driver_55683),
+        mContext.getString(R.string.surface_aux_destabilizing_glyph_cache_7fe2d),
+        mContext.getString(R.string.surface_fs_mounting_storage_emulated_0_re_t_ui_52e6f),
+        mContext.getString(R.string.surface_fs_enumerating_ui_xml_b7351),
+        mContext.getString(R.string.surface_fs_enumerating_theme_xml_67346),
+        mContext.getString(R.string.surface_fs_enumerating_suggestions_xml_b4f36),
+        mContext.getString(R.string.surface_fs_enumerating_behavior_xml_705a2),
+        mContext.getString(R.string.surface_mod_patching_fake_subsystem_notifications_b0995),
+        mContext.getString(R.string.surface_mod_patching_fake_subsystem_music_760a7),
+        mContext.getString(R.string.surface_mod_patching_fake_subsystem_wallpaper_5b40a),
+        mContext.getString(R.string.surface_mod_patching_fake_subsystem_battery_b3009),
+        mContext.getString(R.string.surface_ping_127_0_0_1_replied_in_0ms_8329b),
+        mContext.getString(R.string.surface_ping_127_0_0_1_replied_in_0ms_8329b),
+        mContext.getString(R.string.surface_ping_127_0_0_1_replied_in_0ms_8329b),
+        mContext.getString(R.string.surface_scan_port_22_open_a2126),
+        mContext.getString(R.string.surface_scan_port_80_filtered_a7a85),
+        mContext.getString(R.string.surface_scan_port_443_open_c0202),
+        mContext.getString(R.string.surface_scan_port_1337_aesthetically_required_d7959),
+        mContext.getString(R.string.surface_seed_generating_panic_checksum_8f_2c_91_79931),
+        mContext.getString(R.string.surface_seed_generating_panic_checksum_8f_2c_92_78c06),
+        mContext.getString(R.string.surface_seed_generating_panic_checksum_8f_2c_93_a69e4),
+        mContext.getString(R.string.surface_pipe_rerouting_stdout_to_dramatic_overlay_e0640),
+        mContext.getString(R.string.surface_pipe_rerouting_stderr_to_dramatic_overlay_e9649),
+        mContext.getString(R.string.surface_pipe_rerouting_common_sense_to_dev_null_0de7e),
+        mContext.getString(R.string.surface_ovrd_replacing_launcher_calmness_with_urgency_e58e2),
+        mContext.getString(R.string.surface_ovrd_amplifying_green_phosphor_output_5232f),
+        mContext.getString(R.string.surface_ovrd_preserving_user_music_module_because_priorities_ceff2),
+        mContext.getString(R.string.surface_hook_intercepting_idle_state_23263),
+        mContext.getString(R.string.surface_hook_intercepting_wallpaper_refresh_da0db),
+        mContext.getString(R.string.surface_hook_intercepting_harmless_command_execution_adcd5),
+        mContext.getString(R.string.surface_task_assembling_unauthorized_vibes_4749e),
+        mContext.getString(R.string.surface_task_replaying_synthetic_intrusion_frames_d923b),
+        mContext.getString(R.string.surface_task_marking_sequence_irreversible_2ffa6),
+        mContext.getString(R.string.surface_task_sequence_actually_reversible_d7cf9),
+        mContext.getString(R.string.surface_lock_pretending_to_lock_subsystems_b0d7d),
+        mContext.getString(R.string.surface_lock_pretending_to_exfiltrate_secrets_fdce3),
+        mContext.getString(R.string.surface_lock_pretending_to_know_what_any_of_this_means_e6784),
+        mContext.getString(R.string.surface_null_dereferencing_cinematic_stakes_7489a),
+        mContext.getString(R.string.surface_null_recovering_from_fake_catastrophe_adc60),
+        mContext.getString(R.string.surface_done_dramatic_effect_complete_3a5b9)
     )
     private val hackSequenceRunnables = ArrayList<Runnable>()
 
@@ -1098,7 +1102,7 @@ class UIManager(
             if (unifiedStatusVisible[Label.ram.ordinal] && ram.isNotEmpty()) View.VISIBLE else View.GONE
         unifiedStatusRamIcon?.visibility = unifiedStatusRam?.visibility ?: View.GONE
 
-        unifiedStatusUnlock?.text = unlockManager?.count()?.toString().orEmpty()
+        unifiedStatusUnlock?.text = unlockManager?.count()?.let { java.text.NumberFormat.getIntegerInstance().format(it) }.orEmpty()
         unifiedStatusUnlock?.visibility =
             if (unifiedStatusVisible[Label.unlock.ordinal] && unlockManager != null) View.VISIBLE else View.GONE
     }
@@ -1592,7 +1596,7 @@ class UIManager(
                 PorterDuff.Mode.SRC_IN
             )
             styleToolbarButtonChrome(button)
-            button.setContentDescription("Toolbar shortcut " + slot.index + ": " + slot.command)
+            button.setContentDescription(mContext.getString(R.string.surface_toolbar_shortcut_2e0fd, slot.index, slot.command))
             button.setOnClickListener(View.OnClickListener { v: View? -> executeToolbarShortcut(slot.command) })
             button.setOnLongClickListener(OnLongClickListener { v: View? ->
                 openToolbarShortcutSettings()
@@ -1709,7 +1713,7 @@ class UIManager(
     private fun executeToolbarShortcut(command: String?) {
         val normalized = if (command == null) Tuils.EMPTYSTRING else command.trim { it <= ' ' }
         if (normalized.length == 0) {
-            Toast.makeText(mContext, "Toolbar shortcut is empty.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(mContext, mContext.getString(R.string.surface_toolbar_shortcut_is_empty_fdada), Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -1858,7 +1862,7 @@ class UIManager(
         unifiedModulesToggle?.apply {
             visibility = if (enabled) View.VISIBLE else View.GONE
             rotation = if (unifiedModulesVisible) 180f else 0f
-            contentDescription = if (unifiedModulesVisible) "Hide modules" else "Show modules"
+            contentDescription = if (unifiedModulesVisible) mContext.getString(R.string.surface_hide_modules_ccff2) else mContext.getString(R.string.surface_show_modules_8f780)
         }
         handler?.removeCallbacks(unifiedModulesAutoHideRunnable)
         if (unifiedModulesVisible) {
@@ -2229,7 +2233,7 @@ class UIManager(
         val button = TextView(mContext)
         val textColor = terminalBorderColor()
         button.text = if (moveToLeft) "<<" else ">>"
-        button.contentDescription = "Move Re:T-UI to $targetMode screen"
+        button.contentDescription = mContext.getString(R.string.surface_move_re_t_ui_to_screen_eba98, targetMode)
         button.gravity = Gravity.CENTER
         button.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
         button.textSize = 18f
@@ -3062,7 +3066,7 @@ class UIManager(
 
         applyTermuxWorkspaceImeBottomPadding()
         styleTermuxWorkspace()
-        renderTermuxWorkspaceStatus("Tap the terminal toolbar button or run :refresh to start.")
+        renderTermuxWorkspaceStatus(mContext.getString(R.string.surface_tap_the_terminal_toolbar_button_or_run_refresh_to_start_d129f))
 
         val terminalSwipeListener = OnTouchListener { v, event ->
             val handled = handleTermuxWorkspaceOutputTouch(event)
@@ -3855,7 +3859,7 @@ class UIManager(
         } else if (isLikelyTermuxWorkspaceWindowTarget(command)) {
             selectTermuxWorkspaceWindow(command)
         } else {
-            renderTermuxWorkspaceLocalStatus("Unknown tmux command: " + command + ". Try tmux launch mc or tmux switch 2.")
+            renderTermuxWorkspaceLocalStatus(mContext.getString(R.string.surface_unknown_tmux_command_try_tmux_launch_mc_or_tmux_switch_2_b2c6d, command))
         }
     }
 
@@ -4159,7 +4163,7 @@ class UIManager(
             renderTermuxWorkspaceLocalCommandDraft()
         } else {
             termuxWorkspaceLocalCommandMode = false
-            renderTermuxWorkspaceLocalStatus("command cancelled")
+            renderTermuxWorkspaceLocalStatus(mContext.getString(R.string.surface_command_cancelled_84be2))
         }
         return true
     }
@@ -4177,10 +4181,10 @@ class UIManager(
 
     private fun renderTermuxWorkspaceLocalCommandDraft() {
         val out = StringBuilder()
-        out.append("Re:T-UI tmux workspace").append('\n')
-        out.append("session: ").append(TERMUX_WORKSPACE_SESSION).append('\n')
-        out.append("command: :").append(termuxWorkspaceLocalCommandBuffer).append('\n')
-        out.append("press Enter to run, Backspace on empty command to cancel")
+        out.append(mContext.getString(R.string.surface_re_t_ui_tmux_workspace_a062d)).append('\n')
+        out.append(mContext.getString(R.string.surface_session_5f810)).append(TERMUX_WORKSPACE_SESSION).append('\n')
+        out.append(mContext.getString(R.string.surface_command_7b150)).append(termuxWorkspaceLocalCommandBuffer).append('\n')
+        out.append(mContext.getString(R.string.surface_press_enter_to_run_backspace_on_empty_command_to_cancel_8bac4))
         updateTermuxWorkspaceLocalOutput(out.toString())
     }
 
@@ -4226,7 +4230,7 @@ class UIManager(
         if (sendTermuxWorkspaceSocketInput(command)) {
             return
         }
-        renderTermuxWorkspaceStatus(if (command.isEmpty()) "sent enter" else "sent: " + command)
+        renderTermuxWorkspaceStatus(if (command.isEmpty()) mContext.getString(R.string.surface_sent_enter_df691) else mContext.getString(R.string.surface_sent_faa06, command))
         dispatchTermuxWorkspaceScript("send", buildTermuxWorkspaceSendScript(command), true)
     }
 
@@ -4264,7 +4268,7 @@ class UIManager(
         } else if ("home" == verb || "back" == verb) {
             openHomePage()
         } else {
-            renderTermuxWorkspaceLocalStatus("Unknown workspace command: :" + command)
+            renderTermuxWorkspaceLocalStatus(mContext.getString(R.string.surface_unknown_workspace_command_cddf8, command))
         }
     }
 
@@ -4285,15 +4289,15 @@ class UIManager(
 
     private fun renderTermuxWorkspaceHelp() {
         val out = StringBuilder()
-        out.append("Re:T-UI tmux workspace").append('\n')
-        out.append("session: ").append(TERMUX_WORKSPACE_SESSION).append('\n')
-        out.append("local commands").append('\n')
-        out.append(":launch [id] - list or focus/create a launcher").append('\n')
-        out.append(":save <id> <command> - save a launcher").append('\n')
-        out.append(":rm <id> - remove a saved launcher").append('\n')
-        out.append(":switch <window> - jump to a tmux window index/name").append('\n')
-        out.append(":new [name] :prev :next :refresh :status :reconnect :home").append('\n')
-        out.append("Normal input is sent to tmux.")
+        out.append(mContext.getString(R.string.surface_re_t_ui_tmux_workspace_a062d)).append('\n')
+        out.append(mContext.getString(R.string.surface_session_5f810)).append(TERMUX_WORKSPACE_SESSION).append('\n')
+        out.append(mContext.getString(R.string.surface_local_commands_c302e)).append('\n')
+        out.append(mContext.getString(R.string.surface_launch_id_list_or_focus_create_a_launcher_213fa)).append('\n')
+        out.append(mContext.getString(R.string.surface_save_id_command_save_a_launcher_85949)).append('\n')
+        out.append(mContext.getString(R.string.surface_rm_id_remove_a_saved_launcher_ad575)).append('\n')
+        out.append(mContext.getString(R.string.surface_switch_window_jump_to_a_tmux_window_index_name_d002c)).append('\n')
+        out.append(mContext.getString(R.string.surface_new_name_prev_next_refresh_status_reconnect_home_6ee59)).append('\n')
+        out.append(mContext.getString(R.string.surface_normal_input_is_sent_to_tmux_48b12))
         updateTermuxWorkspaceLocalOutput(out.toString())
     }
 
@@ -4306,7 +4310,7 @@ class UIManager(
         }
         val launcher = TermuxWorkspaceLauncherManager.resolve(context, id)
         if (launcher == null) {
-            renderTermuxWorkspaceLocalStatus("Unknown launcher: " + rawId + ". Run :launch to list available launchers.")
+            renderTermuxWorkspaceLocalStatus(mContext.getString(R.string.surface_unknown_launcher_run_launch_to_list_available_launchers_16ab0, rawId))
             return
         }
         openTermuxWorkspaceLauncher(launcher)
@@ -4316,7 +4320,7 @@ class UIManager(
         val context = mContext ?: return
         val launchers = TermuxWorkspaceLauncherManager.list(context)
         val out = StringBuilder()
-        out.append("tmux launchers").append('\n')
+        out.append(mContext.getString(R.string.surface_tmux_launchers_f581b)).append('\n')
         for (launcher in launchers) {
             out.append(if (launcher.builtIn) "* " else "+ ")
                 .append(launcher.id)
@@ -4328,32 +4332,32 @@ class UIManager(
             out.append('\n')
         }
         out.append("----").append('\n')
-        out.append(":launch <id>").append('\n')
-        out.append(":save <id> <command>").append('\n')
-        out.append(":rm <id>")
+        out.append(mContext.getString(R.string.surface_launch_id_ab36f)).append('\n')
+        out.append(mContext.getString(R.string.surface_save_id_command_c1052)).append('\n')
+        out.append(mContext.getString(R.string.surface_rm_id_87f06))
         updateTermuxWorkspaceLocalOutput(out.toString())
     }
 
     private fun selectTermuxWorkspaceWindow(rawTarget: String) {
         val target = normalizeTermuxWorkspaceWindowTarget(rawTarget)
         if (target.isEmpty()) {
-            renderTermuxWorkspaceLocalStatus("usage: tmux switch <window> or :switch <window>")
+            renderTermuxWorkspaceLocalStatus(mContext.getString(R.string.surface_usage_tmux_switch_window_or_switch_window_82893))
             return
         }
         clearTermuxWorkspaceLocalOutputHold()
-        renderTermuxWorkspaceStatus("select tmux window: " + target)
+        renderTermuxWorkspaceStatus(mContext.getString(R.string.surface_select_tmux_window_a51c6, target))
         dispatchTermuxWorkspaceScript("select", buildTermuxWorkspaceSelectScript(target), true)
     }
 
     private fun openTermuxWorkspaceLauncher(launcher: TermuxWorkspaceLauncherManager.Launcher) {
         val name = launcher.id.trim { it <= ' ' }
         if (name.isEmpty()) {
-            renderTermuxWorkspaceLocalStatus("launcher id is empty")
+            renderTermuxWorkspaceLocalStatus(mContext.getString(R.string.surface_launcher_id_is_empty_5730e))
             return
         }
         val command = launcher.command.trim { it <= ' ' }
         clearTermuxWorkspaceLocalOutputHold()
-        renderTermuxWorkspaceStatus("open tmux launcher: " + name)
+        renderTermuxWorkspaceStatus(mContext.getString(R.string.surface_open_tmux_launcher_e4050, name))
         dispatchTermuxWorkspaceScript("launch", buildTermuxWorkspaceLauncherScript(name, command), true)
     }
 
@@ -4382,13 +4386,13 @@ class UIManager(
         val id = parsed.first
         val command = parsed.second
         if (id.isEmpty() || command.isEmpty()) {
-            renderTermuxWorkspaceLocalStatus("usage: :save <id> <command>")
+            renderTermuxWorkspaceLocalStatus(mContext.getString(R.string.surface_usage_save_id_command_21680))
             return
         }
         if (TermuxWorkspaceLauncherManager.save(context, id, command)) {
-            renderTermuxWorkspaceLocalStatus("saved launcher: " + TermuxWorkspaceLauncherManager.normalizeId(id))
+            renderTermuxWorkspaceLocalStatus(mContext.getString(R.string.surface_saved_launcher_39f4b, TermuxWorkspaceLauncherManager.normalizeId(id)))
         } else {
-            renderTermuxWorkspaceLocalStatus("Could not save launcher. Use a custom id and a non-empty command.")
+            renderTermuxWorkspaceLocalStatus(mContext.getString(R.string.surface_could_not_save_launcher_use_a_custom_id_and_a_non_empty_co_53a79))
         }
     }
 
@@ -4396,13 +4400,13 @@ class UIManager(
         val context = mContext ?: return
         val id = TermuxWorkspaceLauncherManager.normalizeId(args)
         if (id.isEmpty()) {
-            renderTermuxWorkspaceLocalStatus("usage: :rm <id>")
+            renderTermuxWorkspaceLocalStatus(mContext.getString(R.string.surface_usage_rm_id_efe42))
             return
         }
         if (TermuxWorkspaceLauncherManager.remove(context, id)) {
-            renderTermuxWorkspaceLocalStatus("removed launcher: $id")
+            renderTermuxWorkspaceLocalStatus(mContext.getString(R.string.surface_removed_launcher_4eef9, id))
         } else {
-            renderTermuxWorkspaceLocalStatus("No saved launcher removed: $id")
+            renderTermuxWorkspaceLocalStatus(mContext.getString(R.string.surface_no_saved_launcher_removed_5af97, id))
         }
     }
 
@@ -4414,17 +4418,17 @@ class UIManager(
         val launchers = TermuxWorkspaceLauncherManager.list(context)
         val savedCount = launchers.count { !it.builtIn }
         val out = StringBuilder()
-        out.append("tmux workspace diagnostics").append('\n')
-        out.append("session: ").append(TERMUX_WORKSPACE_SESSION).append('\n')
-        out.append("geometry: ").append(geometry.cols).append('x').append(geometry.rows).append('\n')
-        out.append("termux installed: ").append(status.termuxInstalled).append('\n')
-        out.append("RUN_COMMAND declared: ").append(status.runCommandDeclared).append('\n')
-        out.append("RUN_COMMAND granted: ").append(status.runCommandGranted).append('\n')
-        out.append("socket connected: ").append(client?.connected == true).append('\n')
-        out.append("socket name cached: ").append(!TextUtils.isEmpty(termuxWorkspaceSocketName)).append('\n')
-        out.append("launchers: ").append(launchers.size - savedCount).append(" built-in, ")
-            .append(savedCount).append(" saved").append('\n')
-        out.append("recovery: run :reconnect, then :refresh if the pane is stale")
+        out.append(mContext.getString(R.string.surface_tmux_workspace_diagnostics_ca59b)).append('\n')
+        out.append(mContext.getString(R.string.surface_session_5f810)).append(TERMUX_WORKSPACE_SESSION).append('\n')
+        out.append(mContext.getString(R.string.surface_geometry_297f8)).append(geometry.cols).append('x').append(geometry.rows).append('\n')
+        out.append(mContext.getString(R.string.surface_termux_installed_bd813)).append(status.termuxInstalled).append('\n')
+        out.append(mContext.getString(R.string.surface_run_command_declared_3cdca)).append(status.runCommandDeclared).append('\n')
+        out.append(mContext.getString(R.string.surface_run_command_granted_b7cc8)).append(status.runCommandGranted).append('\n')
+        out.append(mContext.getString(R.string.surface_socket_connected_d5ab4)).append(client?.connected == true).append('\n')
+        out.append(mContext.getString(R.string.surface_socket_name_cached_fcbbb)).append(!TextUtils.isEmpty(termuxWorkspaceSocketName)).append('\n')
+        out.append(mContext.getString(R.string.surface_launchers_c6320)).append(launchers.size - savedCount).append(mContext.getString(R.string.surface_built_in_c12b6))
+            .append(savedCount).append(mContext.getString(R.string.surface_saved_7718b)).append('\n')
+        out.append(mContext.getString(R.string.surface_recovery_run_reconnect_then_refresh_if_the_pane_is_stale_af976))
         updateTermuxWorkspaceLocalOutput(out.toString())
     }
 
@@ -4452,7 +4456,7 @@ class UIManager(
         if (newTermuxWorkspaceSocketWindow(clean, command)) {
             return
         }
-        val label = if (clean.isEmpty()) "new tmux window" else "new tmux window: " + clean
+        val label = if (clean.isEmpty()) mContext.getString(R.string.surface_new_tmux_window_6272b) else mContext.getString(R.string.surface_new_tmux_window_0b9e5, clean)
         renderTermuxWorkspaceStatus(if (command.isEmpty()) label else "$label -> $command")
         dispatchTermuxWorkspaceScript("new", buildTermuxWorkspaceNewWindowScript(clean, command), true)
     }
@@ -4462,7 +4466,7 @@ class UIManager(
         if (switchTermuxWorkspaceSocketWindow(direction)) {
             return
         }
-        renderTermuxWorkspaceStatus(direction + " tmux window")
+        renderTermuxWorkspaceStatus(mContext.getString(R.string.surface_tmux_window_09344, direction))
         dispatchTermuxWorkspaceScript("switch", buildTermuxWorkspaceSwitchScript(direction), true)
     }
 
@@ -4475,7 +4479,7 @@ class UIManager(
         if (sendTermuxWorkspaceSocketKey(clean)) {
             return
         }
-        renderTermuxWorkspaceStatus("key: " + clean)
+        renderTermuxWorkspaceStatus(mContext.getString(R.string.surface_key_9a5bb, clean))
         dispatchTermuxWorkspaceScript("key", buildTermuxWorkspaceKeyScript(clean), true)
     }
 
@@ -4693,9 +4697,9 @@ class UIManager(
             )
             return true
         } catch (e: SecurityException) {
-            renderTermuxWorkspaceStatus("Termux rejected the workspace command: permission denied.")
+            renderTermuxWorkspaceStatus(mContext.getString(R.string.surface_dispatch_uimanager_termux_rejected_the_workspace_command_perm_f820f))
         } catch (e: Exception) {
-            renderTermuxWorkspaceStatus("unable to dispatch workspace command: " + e.javaClass.getSimpleName())
+            renderTermuxWorkspaceStatus(mContext.getString(R.string.surface_dispatch_uimanager_unable_to_dispatch_workspace_command_f5a19, e.javaClass.getSimpleName()))
         }
         return false
     }
@@ -4703,11 +4707,11 @@ class UIManager(
     private fun ensureTermuxWorkspaceBridgeReady(echoFailure: Boolean): Boolean {
         val status = TermuxBridgeManager.status(mContext!!)
         if (!status.termuxInstalled) {
-            if (echoFailure) renderTermuxWorkspaceStatus("Termux is not installed.")
+            if (echoFailure) renderTermuxWorkspaceStatus(mContext.getString(R.string.surface_termux_is_not_installed_3aba0))
             return false
         }
         if (!status.runCommandDeclared) {
-            if (echoFailure) renderTermuxWorkspaceStatus("This Termux build does not expose RUN_COMMAND.")
+            if (echoFailure) renderTermuxWorkspaceStatus(mContext.getString(R.string.surface_this_termux_build_does_not_expose_run_command_b2ba8))
             return false
         }
         if (!status.runCommandGranted) {
@@ -4716,7 +4720,7 @@ class UIManager(
                 LauncherActivity.COMMAND_REQUEST_PERMISSION
             )
             if (echoFailure) {
-                renderTermuxWorkspaceStatus("RunCommand permission is not granted yet. Allow Re:T-UI and retry.")
+                renderTermuxWorkspaceStatus(mContext.getString(R.string.surface_runcommand_permission_is_not_granted_yet_allow_re_t_ui_and_dcbb9))
             }
             return false
         }
@@ -4908,11 +4912,7 @@ class UIManager(
     }
 
     private fun buildTermuxWorkspaceTmuxCommand(tmuxArgs: String): String {
-        return ("if [ \"\${retui_workspace_shell##*/}\" = \"bash\" ]; then\n"
-                + "  tmux " + tmuxArgs + " \"\$retui_workspace_shell\" --noprofile --norc\n"
-                + "else\n"
-                + "  tmux " + tmuxArgs + " \"\$retui_workspace_shell\"\n"
-                + "fi")
+        return (mContext.getString(R.string.surface_if_retui_workspace_shell_bash_then_tmux_retui_workspace_sh_4a152, tmuxArgs, tmuxArgs))
     }
 
     private fun buildTermuxWorkspaceFrameScript(): String {
@@ -4933,10 +4933,10 @@ class UIManager(
 
     private fun renderTermuxWorkspaceStatus(status: String?) {
         val out = StringBuilder()
-        out.append("Re:T-UI tmux workspace").append('\n')
-        out.append("session: ").append(TERMUX_WORKSPACE_SESSION).append('\n')
+        out.append(mContext.getString(R.string.surface_re_t_ui_tmux_workspace_a062d)).append('\n')
+        out.append(mContext.getString(R.string.surface_session_5f810)).append(TERMUX_WORKSPACE_SESSION).append('\n')
         if (!TextUtils.isEmpty(status)) {
-            out.append("status: ").append(status).append('\n')
+            out.append(mContext.getString(R.string.surface_status_8a876)).append(status).append('\n')
         }
         out.append("----")
         updateTermuxWorkspaceOutput(out.toString())
@@ -4944,10 +4944,10 @@ class UIManager(
 
     private fun renderTermuxWorkspaceLocalStatus(status: String?) {
         val out = StringBuilder()
-        out.append("Re:T-UI tmux workspace").append('\n')
-        out.append("session: ").append(TERMUX_WORKSPACE_SESSION).append('\n')
+        out.append(mContext.getString(R.string.surface_re_t_ui_tmux_workspace_a062d)).append('\n')
+        out.append(mContext.getString(R.string.surface_session_5f810)).append(TERMUX_WORKSPACE_SESSION).append('\n')
         if (!TextUtils.isEmpty(status)) {
-            out.append("status: ").append(status).append('\n')
+            out.append(mContext.getString(R.string.surface_status_8a876)).append(status).append('\n')
         }
         out.append("----")
         updateTermuxWorkspaceLocalOutput(out.toString())
@@ -4982,35 +4982,35 @@ class UIManager(
             return
         }
         val out = StringBuilder()
-        out.append("Re:T-UI tmux workspace").append('\n')
-        out.append("session: ").append(TERMUX_WORKSPACE_SESSION).append('\n')
+        out.append(mContext.getString(R.string.surface_re_t_ui_tmux_workspace_a062d)).append('\n')
+        out.append(mContext.getString(R.string.surface_session_5f810)).append(TERMUX_WORKSPACE_SESSION).append('\n')
         if (!TextUtils.isEmpty(parsed.bridge)) {
-            out.append("bridge: ").append(parsed.bridge)
+            out.append(mContext.getString(R.string.surface_bridge_e9cef)).append(parsed.bridge)
             if (!TextUtils.isEmpty(parsed.version)) {
                 out.append(' ').append(parsed.version)
             }
             out.append('\n')
         }
         if (!TextUtils.isEmpty(parsed.window)) {
-            out.append("window: ").append(parsed.window).append('\n')
+            out.append(mContext.getString(R.string.surface_window_8b80e)).append(parsed.window).append('\n')
         }
         if (!TextUtils.isEmpty(parsed.windows)) {
-            out.append("windows: ").append(parsed.windows).append('\n')
+            out.append(mContext.getString(R.string.surface_windows_e3c67)).append(parsed.windows).append('\n')
         }
         if (!TextUtils.isEmpty(parsed.socketProtocol)) {
-            out.append("socket: ").append(parsed.socketProtocol).append('\n')
+            out.append(mContext.getString(R.string.surface_socket_03b7c)).append(parsed.socketProtocol).append('\n')
         }
         if (exitCode != Int.MIN_VALUE && exitCode != 0) {
-            out.append("exit: ").append(exitCode).append('\n')
+            out.append(mContext.getString(R.string.surface_exit_31533)).append(exitCode).append('\n')
         }
         if (!TextUtils.isEmpty(stderr)) {
-            out.append("stderr: ").append(stderr!!.trim { it <= ' ' }).append('\n')
+            out.append(mContext.getString(R.string.surface_stderr_cc628)).append(stderr!!.trim { it <= ' ' }).append('\n')
         }
         if (!TextUtils.isEmpty(error)) {
-            out.append("error: ").append(error!!.trim { it <= ' ' }).append('\n')
+            out.append(mContext.getString(R.string.surface_error_36baa)).append(error!!.trim { it <= ' ' }).append('\n')
         }
         if (!TextUtils.isEmpty(debug)) {
-            out.append("debug: ").append(debug!!.trim { it <= ' ' }).append('\n')
+            out.append(mContext.getString(R.string.surface_debug_962c6)).append(debug!!.trim { it <= ' ' }).append('\n')
         }
         out.append("----")
         if (!TextUtils.isEmpty(parsed.frame)) {
@@ -5057,13 +5057,13 @@ class UIManager(
 
             override fun onStatus(status: String) {
                 if (!TextUtils.isEmpty(status) && !"ok".equals(status, ignoreCase = true)) {
-                    runOnUiThread(Runnable { renderTermuxWorkspaceStatus("socket: $status") })
+                    runOnUiThread(Runnable { renderTermuxWorkspaceStatus(mContext.getString(R.string.surface_socket_a559b, status)) })
                 }
             }
 
             override fun onError(message: String) {
                 runOnUiThread(Runnable {
-                    renderTermuxWorkspaceStatus("socket bridge error: $message")
+                    renderTermuxWorkspaceStatus(mContext.getString(R.string.surface_socket_bridge_error_5de4e, message))
                 })
             }
 
@@ -5196,14 +5196,14 @@ class UIManager(
     private fun updateTermuxWorkspaceChrome(frame: TermuxWorkspaceFrame) {
         if (termuxWorkspaceLabel != null) {
             termuxWorkspaceLabel!!.text = if (TextUtils.isEmpty(frame.window))
-                "TERMUX WORKSPACE"
+                mContext.getString(R.string.surface_termux_workspace_0f9f7)
             else
-                ("TMUX " + frame.window).uppercase(Locale.getDefault())
+                (mContext.getString(R.string.surface_tmux_2b42e, frame.window)).uppercase(Locale.getDefault())
         }
         if (termuxWorkspaceOutputLabel != null) {
             val windows = frame.windows
             termuxWorkspaceOutputLabel!!.text = if (TextUtils.isEmpty(windows))
-                "WINDOW"
+                mContext.getString(R.string.surface_window_201f5)
             else
                 formatTermuxWorkspaceWindowList(windows!!)
         }
@@ -5212,7 +5212,7 @@ class UIManager(
     private fun formatTermuxWorkspaceWindowList(value: String): CharSequence {
         val clean = value.trim { it <= ' ' }
         if (clean.isEmpty()) {
-            return "WINDOW"
+            return mContext.getString(R.string.surface_window_201f5)
         }
         val out = SpannableStringBuilder()
         val tokens = clean.split("\\s+".toRegex()).filter { it.isNotEmpty() }
@@ -5913,7 +5913,7 @@ class UIManager(
             }
             refreshLauncherModuleTextIfNeeded(id)
             val text = ModuleManager.getScriptText(mContext, id)
-            showTextModule(id, if (TextUtils.isEmpty(text)) "No module output yet." else text)
+            showTextModule(id, if (TextUtils.isEmpty(text)) mContext.getString(R.string.surface_no_module_output_yet_ba2f9) else text)
         }
         refreshSuggestionsForActiveModule()
         scheduleEventsRefreshIfNeeded()
@@ -5951,7 +5951,7 @@ class UIManager(
             showLuaWidgetModule(id, widgetId, result)
         } else {
             val text = ModuleManager.getScriptText(mContext, id)
-            showTextModule(id, if (TextUtils.isEmpty(text)) "No module output yet." else text)
+            showTextModule(id, if (TextUtils.isEmpty(text)) mContext.getString(R.string.surface_no_module_output_yet_ba2f9) else text)
         }
         return true
     }
@@ -6110,9 +6110,9 @@ class UIManager(
             scroll.addView(content)
 
             if (!TextUtils.isEmpty(result.error)) {
-                addLuaText(content, "Lua error: " + result.error, module)
+                addLuaText(content, mContext.getString(R.string.surface_lua_error_95ede, result.error), module)
                 if (!TextUtils.isEmpty(result.errorStage)) {
-                    addLuaText(content, "Stage: " + result.errorStage, module)
+                    addLuaText(content, mContext.getString(R.string.surface_stage_6da98, result.errorStage), module)
                 }
             } else if (!TextUtils.isEmpty(result.layoutJson)
                 && renderLuaLayout(content, module, result.layoutJson)
@@ -6121,13 +6121,13 @@ class UIManager(
             } else {
                 addLuaBodyText(
                     content,
-                    if (TextUtils.isEmpty(result.body)) "No widget output yet." else result.body,
+                    if (TextUtils.isEmpty(result.body)) mContext.getString(R.string.surface_no_widget_output_yet_c383d) else result.body,
                     module
                 )
             }
             addLuaResultActions(content, module, widgetId, result)
         } else if (body != null) {
-            body.setText(if (TextUtils.isEmpty(result.body)) "No widget output yet." else result.body)
+            body.setText(if (TextUtils.isEmpty(result.body)) mContext.getString(R.string.surface_no_widget_output_yet_c383d) else result.body)
             body.setTextColor(notificationWidgetTextColor())
             body.setTextSize(moduleBodyTextSize().toFloat())
             applyModuleBodyTypeface(body, module)
@@ -6325,7 +6325,7 @@ class UIManager(
             }
             return true
         } catch (e: Exception) {
-            addLuaText(parent, "Layout error: " + e.message, module)
+            addLuaText(parent, mContext.getString(R.string.surface_layout_error_b5bcf, e.message), module)
             return true
         }
     }
@@ -6502,7 +6502,7 @@ class UIManager(
     }
 
     private fun formatLuaLayoutProgress(obj: JSONObject): String {
-        val label = obj.optString("label", obj.optString("text", "Progress"))
+        val label = obj.optString("label", obj.optString("text", mContext.getString(R.string.surface_progress_1b902)))
         val value = obj.optDouble("value", obj.optDouble("progress", 0.0))
         val maxValue = obj.optDouble("max", 1.0)
         val pct = if (maxValue <= 0.0) 0.0 else min(1.0, max(0.0, value / maxValue))
@@ -6833,27 +6833,15 @@ class UIManager(
     }
 
     private fun buildCalendarModuleView(): View {
-        val calendar = Calendar.getInstance()
-        val today = Calendar.getInstance()
-        val months = arrayOf(
-            "JAN",
-            "FEB",
-            "MAR",
-            "APR",
-            "MAY",
-            "JUN",
-            "JUL",
-            "AUG",
-            "SEP",
-            "OCT",
-            "NOV",
-            "DEC"
-        )
-        val weekdays = arrayOf("SU", "MO", "TU", "WE", "TH", "FR", "SA")
+        val locale = ConfigurationCompat.getLocales(mContext.resources.configuration)[0] ?: Locale.getDefault()
+        val calendar = Calendar.getInstance(locale)
+        val today = Calendar.getInstance(locale)
+        val months = DateFormatSymbols(locale).shortMonths
+        val weekdays = CalendarLabels.weekdays(calendar, locale)
         val month = calendar.get(Calendar.MONTH)
         val year = calendar.get(Calendar.YEAR)
         calendar.set(Calendar.DAY_OF_MONTH, 1)
-        val firstDay = calendar.get(Calendar.DAY_OF_WEEK)
+        val firstDay = CalendarLabels.leadingCells(calendar)
         val daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
         val currentDay =
             if (today.get(Calendar.MONTH) == month && today.get(Calendar.YEAR) == year) today.get(Calendar.DAY_OF_MONTH) else -1
@@ -6883,13 +6871,13 @@ class UIManager(
         var day = 1
         for (week in 0 until 6) {
             val row = calendarRow()
-            for (dow in Calendar.SUNDAY..Calendar.SATURDAY) {
+            for (dow in 0..6) {
                 if ((week == 0 && dow < firstDay) || day > daysInMonth) {
                     row.addView(calendarCell("", false, false))
                 } else {
                     row.addView(
                         calendarCell(
-                            String.format(Locale.US, "%02d", day),
+                            String.format(locale, "%02d", day),
                             false,
                             day == currentDay
                         )
@@ -7143,10 +7131,10 @@ class UIManager(
     }
 
     private fun musicTitlePrefix(): String =
-        if (MusicService.SOURCE_PODCAST == activeMusicSource) "Episode: " else "Title: "
+        if (MusicService.SOURCE_PODCAST == activeMusicSource) mContext.getString(R.string.surface_episode_791bf) else mContext.getString(R.string.surface_title_edd45)
 
     private fun musicSubtitlePrefix(): String =
-        if (MusicService.SOURCE_PODCAST == activeMusicSource) "Show       : " else "Singer      : "
+        if (MusicService.SOURCE_PODCAST == activeMusicSource) mContext.getString(R.string.surface_show_06f63) else mContext.getString(R.string.surface_singer_e58b5)
 
     private fun buildTimerModuleText(): String {
         val out = StringBuilder()
@@ -7156,50 +7144,48 @@ class UIManager(
 
         val pomodoro = PomodoroManager.getInstance(mContext!!.getApplicationContext())
         if (pomodoro.isRunning) {
-            out.append("Pomodoro: ")
+            out.append(mContext.getString(R.string.surface_pomodoro_0fb35))
                 .append(pomodoro.currentType.name.lowercase())
                 .append(" ")
                 .append(ClockManager.formatDuration(pomodoro.remainingMillis))
                 .append('\n')
         } else {
-            out.append("Pomodoro: idle\n")
+            out.append(mContext.getString(R.string.surface_pomodoro_idle_46ab6))
         }
-        out.append("Commands: timer, stopwatch, pomodoro")
+        out.append(mContext.getString(R.string.surface_commands_timer_stopwatch_pomodoro_83ad1))
         return out.toString()
     }
 
     private fun buildReminderModuleText(): String {
-        return ReminderManager.formatPreview(mContext!!) + "\nOpen: reminder"
+        return mContext.getString(R.string.surface_open_reminder_e9efa, ReminderManager.formatPreview(mContext!!))
     }
 
     private fun buildNotesModuleText(): String {
         val records = ohi.andre.consolelauncher.managers.NotesManager.loadRecords(mContext)
         if (records.size == 0) {
-            return ("No notes."
-                    + "\nAdd: notes -add TODO: follow up"
-                    + "\nOpen editor: notes")
+            return (mContext.getString(R.string.surface_no_notes_add_notes_add_todo_follow_up_open_editor_notes_3d1ec))
         }
 
         val out = StringBuilder()
-        out.append(records.size).append(if (records.size == 1) " note" else " notes").append('\n')
+        out.append(mContext.resources.getQuantityString(R.plurals.surface_notes_count, records.size, records.size)).append('\n')
         val limit = min(records.size, 6)
         for (count in 0..<limit) {
             val record = records.get(count)
             if (record == null || TextUtils.isEmpty(record.text)) continue
             out.append(count + 1).append(". ")
-            if (record.lock) out.append("[locked] ")
+            if (record.lock) out.append(mContext.getString(R.string.surface_locked_f6608))
             out.append(shortenModuleLine(record.text, 96)).append('\n')
         }
         val remaining = records.size - limit
         if (remaining > 0) {
-            out.append("... ").append(remaining).append(" more\n")
+            out.append(mContext.resources.getQuantityString(R.plurals.surface_more_count, remaining, remaining)).append('\n')
         }
-        out.append("Commands: notes, notes -add, notes -ls")
+        out.append(mContext.getString(R.string.surface_commands_notes_notes_add_notes_ls_86691))
         return out.toString().trim { it <= ' ' }
     }
 
     private fun buildRssModuleText(): CharSequence? {
-        return mainPack.rssManager?.buildModuleText() ?: "RSS manager unavailable."
+        return mainPack.rssManager?.buildModuleText() ?: mContext.getString(R.string.surface_rss_manager_unavailable_7da59)
     }
 
     private fun buildWeatherModuleText(): String {
@@ -7208,20 +7194,20 @@ class UIManager(
             weather = labelTexts[Label.weather.ordinal]
         }
         if (TextUtils.isEmpty(weather)) {
-            return "No weather yet."
+            return mContext.getString(R.string.surface_no_weather_yet_e6067)
         }
 
         val out = StringBuilder()
         val ascii = WeatherResponseParser.ascii(lastWeatherSymbol)
         if (ascii.isNotEmpty()) out.append(ascii).append('\n')
         XMLPrefsManager.get(Behavior.weather_location)?.trim()?.takeIf { it.isNotEmpty() }?.let {
-            out.append("Location: ").append(it).append('\n')
+            out.append(mContext.getString(R.string.surface_location_c47d5)).append(it).append('\n')
         }
         out.append(weather.toString().trim { it <= ' ' })
         if (lastWeatherUpdateMillis > 0) {
             val calendar = Calendar.getInstance()
             calendar.setTimeInMillis(lastWeatherUpdateMillis)
-            out.append("\nUpdated: ")
+            out.append(mContext.getString(R.string.surface_updated_aea3f))
                 .append(
                     String.format(
                         Locale.US, "%02d.%02d",
@@ -7230,7 +7216,7 @@ class UIManager(
                     )
                 )
         }
-        out.append("\nData: MET Norway (https://api.met.no/doc/License)")
+        out.append(mContext.getString(R.string.surface_data_met_norway_https_api_met_no_doc_license_6815e))
         return out.toString()
     }
 
@@ -7242,46 +7228,26 @@ class UIManager(
     }
 
     private fun buildCalendarModuleText(): String {
-        val calendar = Calendar.getInstance()
-        val months = arrayOf<String?>(
-            "JAN",
-            "FEB",
-            "MAR",
-            "APR",
-            "MAY",
-            "JUN",
-            "JUL",
-            "AUG",
-            "SEP",
-            "OCT",
-            "NOV",
-            "DEC"
-        )
+        val locale = ConfigurationCompat.getLocales(mContext.resources.configuration)[0] ?: Locale.getDefault()
+        val calendar = Calendar.getInstance(locale)
+        val months = DateFormatSymbols(locale).shortMonths
         val month = calendar.get(Calendar.MONTH)
         val year = calendar.get(Calendar.YEAR)
         calendar.set(Calendar.DAY_OF_MONTH, 1)
-        val firstDay = calendar.get(Calendar.DAY_OF_WEEK)
+        val firstDay = CalendarLabels.leadingCells(calendar)
         val max = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
-        val today = Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
+        val today = Calendar.getInstance(locale).get(Calendar.DAY_OF_MONTH)
 
         val out = StringBuilder()
         out.append(months[month]).append(' ').append(year).append('\n')
-        out.append("SU MO TU WE TH FR SA\n")
-        for (i in Calendar.SUNDAY..<firstDay) {
-            out.append("   ")
-        }
+        val weekdays = CalendarLabels.weekdays(calendar, locale)
+        val width = max(4, weekdays.maxOf { it.length } + 1)
+        out.append(weekdays.joinToString("") { it.padEnd(width) }).append('\n')
+        repeat(firstDay) { out.append(" ".repeat(width)) }
         for (day in 1..max) {
-            if (day == today) {
-                out.append('[').append(if (day < 10) "0" else "").append(day).append(']')
-            } else {
-                if (day < 10) out.append('0')
-                out.append(day).append(' ')
-            }
-            val dow = calendar.get(Calendar.DAY_OF_WEEK)
-            if (dow == Calendar.SATURDAY) {
-                out.append('\n')
-            }
-            calendar.add(Calendar.DAY_OF_MONTH, 1)
+            val number = String.format(locale, "%02d", day)
+            out.append((if (day == today) "[$number]" else number).padEnd(width))
+            if ((firstDay + day) % 7 == 0) out.append('\n')
         }
         return out.toString()
     }
@@ -7332,7 +7298,7 @@ class UIManager(
         val id = ModuleManager.normalize(module)
         val source = ModuleManager.getModuleSource(mContext, id)
         if (TextUtils.isEmpty(source)) {
-            Tuils.sendOutput(mContext, "Module has no source: " + id)
+            Tuils.sendOutput(mContext, mContext.getString(R.string.surface_dispatch_uimanager_module_has_no_source_6c6aa, id))
             return
         }
         if (ModuleManager.isLauncherSource(source)) {
@@ -7352,7 +7318,7 @@ class UIManager(
         if (ModuleManager.EVENTS == provider) {
             payload = UpcomingEventsManager.formatModulePayload(mContext)
         } else {
-            Tuils.sendOutput(mContext, "Unknown launcher module source: " + source)
+            Tuils.sendOutput(mContext, mContext.getString(R.string.surface_unknown_launcher_module_source_3c041, source))
             return
         }
 
@@ -7363,7 +7329,7 @@ class UIManager(
         }
         updateModuleDockSelection()
         if (announce) {
-            Tuils.sendOutput(mContext, "Module refreshed: " + id)
+            Tuils.sendOutput(mContext, mContext.getString(R.string.surface_module_refreshed_97f96, id))
         }
     }
 
@@ -7377,8 +7343,7 @@ class UIManager(
         val widgetId = ModuleManager.luaWidgetId(source)
         if (TextUtils.isEmpty(widgetId) || !LuaWidgetManager.exists(widgetId)) {
             ModuleManager.setScriptText(
-                mContext, id, ("::title " + ModuleManager.displayName(id)
-                        + "\n::body Lua module source not found: " + widgetId)
+                mContext, id, (mContext.getString(R.string.surface_title_body_lua_module_source_not_found_1535c, ModuleManager.displayName(mContext, id), widgetId))
             )
             return null
         } else if (!applyLuaWidgetUnavailablePayload(id, widgetId, true, false, false)) {
@@ -7390,7 +7355,7 @@ class UIManager(
             }
             updateModuleDockSelection()
             if (announce) {
-                Tuils.sendOutput(mContext, "Lua module refreshed: " + id)
+                Tuils.sendOutput(mContext, mContext.getString(R.string.surface_lua_module_refreshed_0d7bd, id))
             }
             return result
         }
@@ -7400,7 +7365,7 @@ class UIManager(
         }
         updateModuleDockSelection()
         if (announce) {
-            Tuils.sendOutput(mContext, "Lua module refreshed: " + id)
+            Tuils.sendOutput(mContext, mContext.getString(R.string.surface_lua_module_refreshed_0d7bd, id))
         }
         return null
     }
@@ -7463,7 +7428,7 @@ class UIManager(
         val source = ModuleManager.getModuleSource(mContext, id)
         val widgetId = ModuleManager.luaWidgetId(source)
         if (TextUtils.isEmpty(widgetId) || !LuaWidgetManager.exists(widgetId)) {
-            Tuils.sendOutput(mContext, "Lua module source not found: " + id)
+            Tuils.sendOutput(mContext, mContext.getString(R.string.surface_lua_module_source_not_found_ff7f6, id))
             return
         }
         if (applyLuaWidgetUnavailablePayload(id, widgetId, false, true, true)) {
@@ -7606,7 +7571,7 @@ class UIManager(
         }
         homeModulesContainer!!.removeAllViews()
         val text = ModuleManager.getScriptText(mContext, id)
-        showTextModule(id, if (TextUtils.isEmpty(text)) "No module output yet." else text)
+        showTextModule(id, if (TextUtils.isEmpty(text)) mContext.getString(R.string.surface_no_module_output_yet_ba2f9) else text)
         refreshSuggestionsForActiveModule()
         scheduleEventsRefreshIfNeeded()
     }
@@ -8059,7 +8024,7 @@ class UIManager(
         if (clean.length == 0) {
             return
         }
-        termuxAppLastStatus = "key: " + clean
+        termuxAppLastStatus = mContext.getString(R.string.surface_key_9a5bb, clean)
         dispatchTermuxAppScript("key", buildTermuxAppControlScript(app, clean), true)
         scheduleTermuxAppRefreshBurst(app.id, TERMUX_APP_INPUT_WATCH_MS)
         scheduleTermuxConsoleFocusCapture(true)
@@ -8201,10 +8166,10 @@ class UIManager(
         val button = TextView(mContext).apply {
             text = label
             contentDescription = when (label) {
-                "⌫" -> "Backspace"
-                "√" -> "Square root"
-                "C" -> "Clear"
-                "=" -> "Equals"
+                "⌫" -> mContext.getString(R.string.surface_backspace_88d13)
+                "√" -> mContext.getString(R.string.surface_square_root_47a32)
+                "C" -> mContext.getString(R.string.surface_clear_719ea)
+                "=" -> mContext.getString(R.string.surface_equals_09b6a)
                 else -> label
             }
             gravity = Gravity.CENTER
@@ -8235,7 +8200,7 @@ class UIManager(
                 val value = try {
                     formatCalculatorValue(Tuils.eval(calculatorInput.toString()))
                 } catch (_: Exception) {
-                    calculatorResult?.text = "ERROR"
+                    calculatorResult?.text = mContext.getString(R.string.surface_error_0b99c)
                     return
                 }
                 calculatorInput.clear()
@@ -8326,8 +8291,8 @@ class UIManager(
         })
         podcastAdd?.setOnClickListener(View.OnClickListener { showPodcastAddDialog() })
         podcastRefresh?.setOnClickListener(View.OnClickListener {
-            renderPodcastSurface("Refreshing selected podcast...")
-            mainPack.podcastManager.refreshSelectedShow { message -> renderPodcastSurface(message ?: "Podcast refreshed.") }
+            renderPodcastSurface(mContext.getString(R.string.surface_refreshing_selected_podcast_7f1bc))
+            mainPack.podcastManager.refreshSelectedShow { message -> renderPodcastSurface(message ?: mContext.getString(R.string.surface_podcast_refreshed_3f4e4)) }
         })
         podcastPlayShow?.setOnClickListener(View.OnClickListener {
             podcastMode = PODCAST_MODE_RECENTS
@@ -8440,7 +8405,7 @@ class UIManager(
                 setTextColor(textColor)
                 setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
                 textSize = PODCAST_TEXT_LARGE
-                contentDescription = "Slide here to close podcasts"
+                contentDescription = mContext.getString(R.string.surface_slide_here_to_close_podcasts_bf03e)
                 background = TerminalBorderRuntime.tabDrawable(mContext, terminalHeaderTabBackground(), textColor, true)
             }
             val width = button.width.coerceAtLeast(Tuils.dpToPx(mContext, 48))
@@ -8593,7 +8558,7 @@ class UIManager(
                         val fos = FileOutputStream(file)
                         fos.write(mTerminalAdapter!!.terminalText.toByteArray())
 
-                        Tuils.sendOutput(context, "Logged to " + file.getAbsolutePath())
+                        Tuils.sendOutput(context, mContext.getString(R.string.surface_logged_to_ee37a, file.getAbsolutePath()))
                     } catch (e: Exception) {
                         Tuils.sendOutput(Color.RED, context, e.toString())
                     }
@@ -9306,6 +9271,7 @@ class UIManager(
             tuiNotesManager!!.start()
 
             notesView!!.setMovementMethod(LinkMovementMethod())
+            ohi.andre.consolelauncher.notes.NotesPaneLinks.bind(notesView)
 
             notesMaxLines = XMLPrefsManager.getInt(Ui.notes_max_lines)
             if (notesMaxLines > 0) {
@@ -9781,16 +9747,16 @@ class UIManager(
             termuxWindowLabel!!.text = if (luaId != null)
                 luaAppTitle().uppercase(Locale.getDefault())
             else
-                if (app == null) "TERMUX" else app.title.uppercase(Locale.getDefault())
+                if (app == null) mContext.getString(R.string.surface_termux_26316) else app.title.uppercase(Locale.getDefault())
         }
         if (termuxOutputLabel != null) {
-            termuxOutputLabel!!.text = if (luaId != null) "APP" else if (app == null) "OUTPUT" else "SESSION"
+            termuxOutputLabel!!.text = if (luaId != null) mContext.getString(R.string.surface_app_aa160) else if (app == null) mContext.getString(R.string.surface_output_feb35) else mContext.getString(R.string.surface_session_c1085)
         }
         if (termuxPrefix != null) {
             termuxPrefix!!.text = if (app == null && luaId == null) "\$" else ">"
         }
         if (termuxInput != null) {
-            termuxInput!!.hint = if (app == null && luaId == null) "command" else "type input or :help"
+            termuxInput!!.hint = if (app == null && luaId == null) "command" else mContext.getString(R.string.surface_type_input_or_help_4d935)
         }
         updateTermuxConsoleKeyMode()
         updateTermuxAppActions()
@@ -9839,7 +9805,7 @@ class UIManager(
         val margin = Tuils.dpToPx(mContext, 4)
         val minWidth = Tuils.dpToPx(mContext, 76)
         val button = TextView(mContext!!)
-        button.text = (if (TextUtils.isEmpty(label)) "ACTION" else label!!).uppercase(Locale.getDefault())
+        button.text = (if (TextUtils.isEmpty(label)) mContext.getString(R.string.surface_action_2b9f1) else label!!).uppercase(Locale.getDefault())
         button.gravity = Gravity.CENTER
         button.maxLines = 1
         button.ellipsize = TextUtils.TruncateAt.END
@@ -10151,11 +10117,11 @@ class UIManager(
     private fun setupPodcastPaneActions() {
         val row = podcastPaneActions ?: return
         row.removeAllViews()
-        row.addView(podcastPaneActionButton("↻", "Refresh selected podcast") {
-            renderPodcastSurface("Refreshing selected podcast...")
-            mainPack.podcastManager.refreshSelectedShow { message -> renderPodcastSurface(message ?: "Podcast refreshed.") }
+        row.addView(podcastPaneActionButton("↻", mContext.getString(R.string.surface_refresh_selected_podcast_4b302)) {
+            renderPodcastSurface(mContext.getString(R.string.surface_refreshing_selected_podcast_7f1bc))
+            mainPack.podcastManager.refreshSelectedShow { message -> renderPodcastSurface(message ?: mContext.getString(R.string.surface_podcast_refreshed_3f4e4)) }
         })
-        row.addView(podcastPaneActionButton("+", "Add podcast") { showPodcastAddDialog() })
+        row.addView(podcastPaneActionButton("+", mContext.getString(R.string.surface_add_podcast_24ba4)) { showPodcastAddDialog() })
     }
 
     private fun podcastPaneActionButton(label: String, description: String, action: Runnable): TextView {
@@ -10259,10 +10225,10 @@ class UIManager(
     private fun updatePodcastContentLabel() {
         val label = podcastContentLabel ?: return
         val next = when (podcastMode) {
-            PODCAST_MODE_RECENTS -> "RECENTS"
-            PODCAST_MODE_SHOW_DETAIL -> "EPISODES"
-            PODCAST_MODE_PLAYER -> "PLAYER"
-            else -> "SHOWS"
+            PODCAST_MODE_RECENTS -> mContext.getString(R.string.surface_recents_1a978)
+            PODCAST_MODE_SHOW_DETAIL -> mContext.getString(R.string.surface_episodes_e5e52)
+            PODCAST_MODE_PLAYER -> mContext.getString(R.string.surface_player_5055e)
+            else -> mContext.getString(R.string.surface_shows_bd50a)
         }
         val backVisibility = if (podcastMode == PODCAST_MODE_SHOW_DETAIL || podcastMode == PODCAST_MODE_PLAYER) View.VISIBLE else View.GONE
         val back = podcastContentBack
@@ -10322,9 +10288,9 @@ class UIManager(
             refreshTermuxAppSession(false)
             scheduleTermuxAppRefreshBurst(termuxAppSession?.id, TERMUX_APP_MANUAL_REFRESH_WATCH_MS)
         } else if (termuxBuffer.length == 0) {
-            appendTermuxLine("Re:T-UI Termux console")
-            appendTermuxLine("Type shell commands, help, status, open, run, clear, or exit.")
-            appendTermuxLine("Non-interactive Termux commands run from here.")
+            appendTermuxLine(mContext.getString(R.string.surface_re_t_ui_termux_console_341d4))
+            appendTermuxLine(mContext.getString(R.string.surface_type_shell_commands_help_status_open_run_clear_or_exit_a8168))
+            appendTermuxLine(mContext.getString(R.string.surface_non_interactive_termux_commands_run_from_here_80d90))
         } else {
             updateTermuxOutput()
         }
@@ -10351,11 +10317,11 @@ class UIManager(
         }
         val id = LuaWidgetManager.normalizeId(appId)
         if (TextUtils.isEmpty(id) || !LuaWidgetManager.exists(id)) {
-            Toast.makeText(mContext, "Unknown Lua app: " + id, Toast.LENGTH_SHORT).show()
+            Toast.makeText(mContext, mContext.getString(R.string.surface_unknown_lua_app_e937e, id), Toast.LENGTH_SHORT).show()
             return
         }
         if ("app" != LuaWidgetManager.getScriptType(id)) {
-            Toast.makeText(mContext, "Script is not a Lua app: " + id, Toast.LENGTH_SHORT).show()
+            Toast.makeText(mContext, mContext.getString(R.string.surface_script_is_not_a_lua_app_62b97, id), Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -10390,7 +10356,7 @@ class UIManager(
         termuxOverlay!!.setVisibility(View.VISIBLE)
         termuxOverlay!!.bringToFront()
         hideHomeSuggestionsForTermux()
-        renderLuaAppFrame(null, "opening " + luaAppTitle() + "...")
+        renderLuaAppFrame(null, mContext.getString(R.string.surface_opening_9d1be, luaAppTitle()))
 
         val result = luaAppEngine!!.open()
         renderLuaAppResult(result, "open")
@@ -11180,62 +11146,62 @@ class UIManager(
         when {
             lower == "exit" || lower == "close" -> closePodcastSurface()
             lower == "minimize" || lower == "min" -> minimizePodcastSurface()
-            lower == "help" -> renderPodcastSurface("Commands: add <https-feed-url>, refresh, play, next, prev, rewind, forward, speed <0.5-2.0>, close")
+            lower == "help" -> renderPodcastSurface(mContext.getString(R.string.surface_commands_add_https_feed_url_refresh_play_next_prev_rewind_8ce06))
             lower == "refresh" || lower == "reload" -> {
-                renderPodcastSurface("Refreshing selected podcast...")
-                mainPack.podcastManager.refreshSelectedShow { message -> renderPodcastSurface(message ?: "Podcast refreshed.") }
+                renderPodcastSurface(mContext.getString(R.string.surface_refreshing_selected_podcast_7f1bc))
+                mainPack.podcastManager.refreshSelectedShow { message -> renderPodcastSurface(message ?: mContext.getString(R.string.surface_podcast_refreshed_3f4e4)) }
             }
             lower == "play" -> renderPodcastSurface(mainPack.podcastManager.play())
             lower == "next" -> renderPodcastSurface(mainPack.podcastManager.next())
             lower == "prev" || lower == "previous" -> renderPodcastSurface(mainPack.podcastManager.previous())
-            lower == "rewind" || lower == "back" -> renderPodcastSurface("-30s: " + mainPack.podcastManager.seekBy(-30000))
-            lower == "forward" || lower == "fwd" -> renderPodcastSurface("+30s: " + mainPack.podcastManager.seekBy(30000))
+            lower == "rewind" || lower == "back" -> renderPodcastSurface(mContext.getString(R.string.surface_30s_1c6a4, mainPack.podcastManager.seekBy(-30000)))
+            lower == "forward" || lower == "fwd" -> renderPodcastSurface(mContext.getString(R.string.surface_30s_ffb4b, mainPack.podcastManager.seekBy(30000)))
             lower.startsWith("speed ") -> {
                 val speed = command.substringAfter(' ').trim().removeSuffix("x").toFloatOrNull()
                 renderPodcastSurface(
-                    if (speed == null) "Playback speed must be a number from 0.5 to 2.0."
+                    if (speed == null) mContext.getString(R.string.surface_playback_speed_must_be_a_number_from_0_5_to_2_0_eca60)
                     else mainPack.podcastManager.setPlaybackSpeed(speed)
                 )
             }
             lower.startsWith("add ") -> {
                 val url = command.substring(4).trim { it <= ' ' }
-                renderPodcastSurface("Adding podcast...")
+                renderPodcastSurface(mContext.getString(R.string.surface_adding_podcast_98f33))
                 mainPack.podcastManager.subscribe(url) { message ->
                     podcastMode = PODCAST_MODE_SHOW_DETAIL
-                    renderPodcastSurface(message ?: "Podcast added.")
+                    renderPodcastSurface(message ?: mContext.getString(R.string.surface_podcast_added_49c22))
                 }
             }
-            else -> renderPodcastSurface("Unknown podcast command. Try: add <https-feed-url>, refresh, play, next, prev, rewind, forward, speed <0.5-2.0>, close")
+            else -> renderPodcastSurface(mContext.getString(R.string.surface_unknown_podcast_command_try_add_https_feed_url_refresh_pla_74479))
         }
     }
 
     private fun showPodcastAddDialog() {
         TuixtDialog.showValidatedForm(
             mContext,
-            "ADD PODCAST",
+            mContext.getString(R.string.surface_add_podcast_24c78),
             listOf(
                 TuixtDialog.FormField(
                     "url",
-                    "Feed URL",
+                    mContext.getString(R.string.surface_feed_url_c2311),
                     "https://example.com/feed.xml",
                     InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_URI
                 )
             ),
-            "ADD",
-            "CANCEL",
+            mContext.getString(R.string.surface_add_f9460),
+            mContext.getString(R.string.surface_cancel_1507c),
             { values ->
                 val url = values["url"].orEmpty()
                 if (!PodcastManager.isSecureFeedUrl(url)) {
-                    "Podcast feed URL must be a valid https:// address."
+                    mContext.getString(R.string.surface_podcast_feed_url_must_be_a_valid_https_address_75717)
                 } else {
                     null
                 }
             }
         ) { values ->
-            renderPodcastSurface("Adding podcast...")
+            renderPodcastSurface(mContext.getString(R.string.surface_adding_podcast_98f33))
             mainPack.podcastManager.subscribe(values["url"].orEmpty()) { message ->
                 podcastMode = PODCAST_MODE_SHOW_DETAIL
-                renderPodcastSurface(message ?: "Podcast added.")
+                renderPodcastSurface(message ?: mContext.getString(R.string.surface_podcast_added_49c22))
             }
         }
     }
@@ -11281,7 +11247,7 @@ class UIManager(
                 }
             )
         )
-        podcastPlayShow?.text = "RECENTS"
+        podcastPlayShow?.text = mContext.getString(R.string.surface_recents_1a978)
 
         val content = podcastContent ?: return
         content.removeAllViews()
@@ -11306,9 +11272,9 @@ class UIManager(
             val feedCount = manager.feeds().size
             addPodcastRow(
                 if (feedCount == 0) {
-                    "No subscriptions yet.\nUse ADD or type podcast add <feed-url>."
+                    mContext.getString(R.string.surface_no_subscriptions_yet_use_add_or_type_podcast_add_feed_url_d4398)
                 } else {
-                    "Subscriptions are saved.\nTap a show to refresh it."
+                    mContext.getString(R.string.surface_subscriptions_are_saved_tap_a_show_to_refresh_it_539d1)
                 },
                 false,
                 null
@@ -11342,16 +11308,16 @@ class UIManager(
             active != null -> active.title
             current != null -> current.getTitle()
             selected != null -> selected.title
-            else -> "No podcast playing"
+            else -> mContext.getString(R.string.surface_no_podcast_playing_4555b)
         }
 
         val position = if (isPodcast) manager.currentPosition() else -1
         val saved = active?.let { manager.progress(it) } ?: 0
         val progress = if (position >= 0) position else saved
         val duration = if (isPodcast) manager.duration() else -1
-        podcastNowMeta?.text = displayShow?.title ?: "Add a feed, then play a show."
+        podcastNowMeta?.text = displayShow?.title ?: mContext.getString(R.string.surface_add_a_feed_then_play_a_show_8fab3)
         podcastNowProgress?.text = when {
-            preparing -> "buffering " + podcastPrepareGlyph()
+            preparing -> mContext.getString(R.string.surface_buffering_6f50d, podcastPrepareGlyph())
             duration > 0 -> PodcastManager.formatMillis(progress) + " / " + PodcastManager.formatMillis(duration)
             else -> PodcastManager.formatMillis(progress)
         }
@@ -11359,8 +11325,8 @@ class UIManager(
         val playText = podcastTransportLabel(
             when {
                 preparing -> "···"
-                playing -> "PAUSE"
-                else -> "PLAY"
+                playing -> mContext.getString(R.string.surface_pause_9935d)
+                else -> mContext.getString(R.string.surface_play_42c5c)
             }
         )
         podcastPlay?.text = playText
@@ -11375,8 +11341,8 @@ class UIManager(
             podcastPlayerSeek?.progress = if (duration > 0) min(progress, duration) else 0
             podcastPlayerSeek?.isEnabled = duration > 0 && !preparing
         }
-        podcastPlayerEpisodeTitle?.text = active?.title ?: current?.getTitle() ?: "No podcast loaded"
-        podcastPlayerShowName?.text = displayShow?.title ?: "Pick a show to start listening."
+        podcastPlayerEpisodeTitle?.text = active?.title ?: current?.getTitle() ?: mContext.getString(R.string.surface_no_podcast_loaded_84fab)
+        podcastPlayerShowName?.text = displayShow?.title ?: mContext.getString(R.string.surface_pick_a_show_to_start_listening_7b228)
         updatePodcastArtwork(displayShow?.imageUrl)
     }
 
@@ -11389,9 +11355,9 @@ class UIManager(
         val manager = mainPack.podcastManager
         val recents = filterPodcastRecents(manager.recents())
         addPodcastTagChips(manager.shows())
-        addPodcastSectionHeader("Recent shows", "Tap a row to resume that show's last episode.")
+        addPodcastSectionHeader(mContext.getString(R.string.surface_recent_shows_bf7cd), mContext.getString(R.string.surface_tap_a_row_to_resume_that_show_s_last_episode_abfac))
         if (recents.isEmpty()) {
-            addPodcastRow("No recent podcast episodes yet.", false, null)
+            addPodcastRow(mContext.getString(R.string.surface_no_recent_podcast_episodes_yet_b17af), false, null)
             return
         }
         addPodcastRecentGrid(recents)
@@ -11470,13 +11436,13 @@ class UIManager(
         val selected = mainPack.podcastManager.selectedShow()
         val filteredShows = filterPodcastShows(shows)
         addPodcastTagChips(shows)
-        addPodcastSectionHeader("Subscriptions", tagFilterSummary("Tap a show to refresh/open it."))
-        if (filteredShows.isEmpty()) addPodcastRow("No podcasts match this tag.", false, null)
+        addPodcastSectionHeader(mContext.getString(R.string.surface_subscriptions_5697f), tagFilterSummary(mContext.getString(R.string.surface_tap_a_show_to_refresh_open_it_6f531)))
+        if (filteredShows.isEmpty()) addPodcastRow(mContext.getString(R.string.surface_no_podcasts_match_this_tag_29076), false, null)
         else addPodcastShowGrid(filteredShows, selected)
 
         val recents = filterPodcastRecents(mainPack.podcastManager.recents())
         if (recents.isNotEmpty()) {
-            addPodcastSectionLabel("Recent")
+            addPodcastSectionLabel(mContext.getString(R.string.surface_recent_76eec))
             addPodcastRecentGrid(recents)
         }
     }
@@ -11493,7 +11459,7 @@ class UIManager(
 
     private fun tagFilterSummary(defaultText: String): String {
         val filter = podcastTagFilter
-        return if (filter.isNullOrBlank()) defaultText else "Filtered by #" + filter
+        return if (filter.isNullOrBlank()) defaultText else mContext.getString(R.string.surface_filtered_by_28f7e, filter)
     }
 
     private fun addPodcastTagChips(shows: List<PodcastShow>) {
@@ -11513,7 +11479,7 @@ class UIManager(
             ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
         ))
-        addPodcastTagChip(row, "ALL", podcastTagFilter == null) {
+        addPodcastTagChip(row, mContext.getString(R.string.surface_all_6b428), podcastTagFilter == null) {
             podcastTagFilter = null
             renderPodcastSurface(null)
         }
@@ -11567,14 +11533,14 @@ class UIManager(
                 parent,
                 show.imageUrl,
                 show.title,
-                show.episodes.size.toString() + " episodes",
+                mContext.getString(R.string.surface_episodes_223b9, show.episodes.size.toString()),
                 show.tags.joinToString("  ") { "#$it" },
                 Runnable {
                     manager.selectShow(show.id)
                     podcastEpisodeQuery = ""
                     podcastMode = PODCAST_MODE_SHOW_DETAIL
-                    renderPodcastSurface("Refreshing " + show.title + "...")
-                    manager.refreshShow(show) { message -> renderPodcastSurface(message ?: "Podcast refreshed.") }
+                    renderPodcastSurface(mContext.getString(R.string.surface_refreshing_09866, show.title))
+                    manager.refreshShow(show) { message -> renderPodcastSurface(message ?: mContext.getString(R.string.surface_podcast_refreshed_3f4e4)) }
                 },
                 Runnable { showPodcastShowMenu(show, parent) },
                 selected?.id == show.id
@@ -11585,7 +11551,7 @@ class UIManager(
     private fun addPodcastRecentGrid(recents: List<PodcastRecent>) {
         val manager = mainPack.podcastManager
         addPodcastCardRows(recents) { parent, recent ->
-            val resume = if (recent.progressMs > 0) PodcastManager.formatMillis(recent.progressMs) else "Not started"
+            val resume = if (recent.progressMs > 0) PodcastManager.formatMillis(recent.progressMs) else mContext.getString(R.string.surface_not_started_db2c4)
             addPodcastCard(
                 parent,
                 recent.show.imageUrl,
@@ -11714,10 +11680,10 @@ class UIManager(
     private fun confirmRemovePodcastShow(show: PodcastShow) {
         TuixtDialog.showConfirm(
             mContext,
-            "REMOVE PODCAST",
-            "Remove " + show.title + " from Podcasts?",
-            "REMOVE",
-            "CANCEL",
+            mContext.getString(R.string.surface_remove_podcast_5cba3),
+            mContext.getString(R.string.surface_remove_from_podcasts_e8074, show.title),
+            mContext.getString(R.string.surface_remove_f9662),
+            mContext.getString(R.string.surface_cancel_1507c),
             TuixtDialog.ConfirmAction {
                 podcastMode = PODCAST_MODE_SHOWS
                 renderPodcastSurface(mainPack.podcastManager.removeShow(show))
@@ -11728,18 +11694,18 @@ class UIManager(
     private fun showPodcastTagsDialog(show: PodcastShow) {
         TuixtDialog.showValidatedForm(
             mContext,
-            "PODCAST TAGS",
+            mContext.getString(R.string.surface_podcast_tags_cac94),
             listOf(
                 TuixtDialog.FormField(
                     "tags",
-                    "Tags",
-                    "workout, travel, calming",
+                    mContext.getString(R.string.surface_tags_848ee),
+                    mContext.getString(R.string.surface_workout_travel_calming_5a511),
                     InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_WORDS,
                     show.tags.joinToString(", ")
                 )
             ),
-            "SAVE",
-            "CANCEL",
+            mContext.getString(R.string.surface_save_50815),
+            mContext.getString(R.string.surface_cancel_1507c),
             { null }
         ) { values ->
             val message = mainPack.podcastManager.setTags(show, values["tags"].orEmpty())
@@ -11754,7 +11720,7 @@ class UIManager(
 
     private fun renderPodcastEpisodes(show: PodcastShow?, status: String?) {
         if (show == null) {
-            addPodcastRow("No show selected.", false, null)
+            addPodcastRow(mContext.getString(R.string.surface_no_show_selected_7bad6), false, null)
             return
         }
         addPodcastEpisodeHeader(show, status)
@@ -11762,8 +11728,8 @@ class UIManager(
         val episodes = mainPack.podcastManager.episodesFor(show, podcastEpisodeQuery)
         if (episodes.isEmpty()) {
             addPodcastRow(
-                if (podcastEpisodeQuery.isBlank()) "No playable episodes found in this feed."
-                else "No episodes match \"$podcastEpisodeQuery\".",
+                if (podcastEpisodeQuery.isBlank()) mContext.getString(R.string.surface_no_playable_episodes_found_in_this_feed_fc157)
+                else mContext.getString(R.string.surface_no_episodes_match_07d9b, podcastEpisodeQuery),
                 false,
                 null
             )
@@ -11778,7 +11744,7 @@ class UIManager(
                 Runnable {
                     val played = !mainPack.podcastManager.isPlayed(episode)
                     mainPack.podcastManager.markPlayed(episode, played)
-                    renderPodcastSurface(if (played) "Marked played: ${episode.title}" else "Marked unplayed: ${episode.title}")
+                    renderPodcastSurface(if (played) mContext.getString(R.string.surface_marked_played_2ba05, episode.title) else mContext.getString(R.string.surface_marked_unplayed_2cd47, episode.title))
                 }
             )
         }
@@ -11790,8 +11756,8 @@ class UIManager(
         row.gravity = Gravity.CENTER_VERTICAL
 
         val search = TextView(mContext)
-        search.text = if (podcastEpisodeQuery.isBlank()) "SEARCH EPISODES" else "SEARCH: $podcastEpisodeQuery"
-        search.contentDescription = "Search episodes in ${show.title}"
+        search.text = if (podcastEpisodeQuery.isBlank()) mContext.getString(R.string.surface_search_episodes_b4c19) else mContext.getString(R.string.surface_search_61550, podcastEpisodeQuery)
+        search.contentDescription = mContext.getString(R.string.surface_search_episodes_in_da3a8, show.title)
         search.gravity = Gravity.CENTER
         search.textSize = PODCAST_TEXT_SMALL
         styleTermuxToolButton(search, notificationWidgetTextColor())
@@ -11801,8 +11767,8 @@ class UIManager(
 
         if (podcastEpisodeQuery.isNotBlank()) {
             val clear = TextView(mContext)
-            clear.text = "CLEAR"
-            clear.contentDescription = "Clear episode search"
+            clear.text = mContext.getString(R.string.surface_clear_16ec7)
+            clear.contentDescription = mContext.getString(R.string.surface_clear_episode_search_d9091)
             clear.gravity = Gravity.CENTER
             clear.textSize = PODCAST_TEXT_SMALL
             styleTermuxToolButton(clear, notificationWidgetTextColor())
@@ -11821,18 +11787,18 @@ class UIManager(
     private fun showPodcastEpisodeSearchDialog(show: PodcastShow) {
         TuixtDialog.showValidatedForm(
             mContext,
-            "SEARCH EPISODES",
+            mContext.getString(R.string.surface_search_episodes_b4c19),
             listOf(
                 TuixtDialog.FormField(
                     "query",
-                    "Title or description",
-                    "Search ${show.title}",
+                    mContext.getString(R.string.surface_title_or_description_a127c),
+                    mContext.getString(R.string.surface_search_2c5ea, show.title),
                     InputType.TYPE_CLASS_TEXT,
                     podcastEpisodeQuery
                 )
             ),
-            "SEARCH",
-            "CANCEL",
+            mContext.getString(R.string.surface_search_a62a7),
+            mContext.getString(R.string.surface_cancel_1507c),
             { null }
         ) { values ->
             podcastEpisodeQuery = values["query"].orEmpty().trim()
@@ -11872,8 +11838,7 @@ class UIManager(
     private fun addPodcastEpisodeHeader(show: PodcastShow, status: String?) {
         val manager = mainPack.podcastManager
         val newestFirst = manager.isNewestFirst(show)
-        val detail = (status ?: if (newestFirst) "Newest first autoplay" else "Oldest first autoplay") +
-            " · Long-press an episode to mark it played"
+        val detail = mContext.getString(R.string.surface_long_press_an_episode_to_mark_it_played_6543c, (status ?: if (newestFirst) mContext.getString(R.string.surface_newest_first_autoplay_42753) else mContext.getString(R.string.surface_oldest_first_autoplay_d3909)))
         val row = LinearLayout(mContext)
         row.orientation = LinearLayout.HORIZONTAL
         row.gravity = Gravity.CENTER_VERTICAL
@@ -11896,11 +11861,11 @@ class UIManager(
         row.addView(title, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
 
         val sort = TextView(mContext)
-        sort.text = if (newestFirst) "NEWEST FIRST" else "OLDEST FIRST"
+        sort.text = if (newestFirst) mContext.getString(R.string.surface_newest_first_bca94) else mContext.getString(R.string.surface_oldest_first_da9dd)
         sort.contentDescription = if (newestFirst) {
-            "Sort newest first. Tap to switch to oldest first."
+            mContext.getString(R.string.surface_sort_newest_first_tap_to_switch_to_oldest_first_6fbb3)
         } else {
-            "Sort oldest first. Tap to switch to newest first."
+            mContext.getString(R.string.surface_sort_oldest_first_tap_to_switch_to_newest_first_d5645)
         }
         sort.gravity = Gravity.CENTER
         sort.textSize = PODCAST_TEXT_SMALL
@@ -11917,8 +11882,8 @@ class UIManager(
 
     private fun showPodcastShowMenu(show: PodcastShow, anchor: View) {
         val menu = PopupMenu(anchor.context, anchor)
-        menu.menu.add(0, 1, 0, "Edit tags")
-        menu.menu.add(0, 2, 1, "Remove")
+        menu.menu.add(0, 1, 0, mContext.getString(R.string.surface_edit_tags_d8a5f))
+        menu.menu.add(0, 2, 1, mContext.getString(R.string.surface_remove_e9639))
         menu.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 1 -> showPodcastTagsDialog(show)
@@ -11980,7 +11945,7 @@ class UIManager(
         details.gravity = Gravity.CENTER_HORIZONTAL
 
         val title = TextView(mContext)
-        title.text = active?.title ?: current?.getTitle() ?: "No podcast loaded"
+        title.text = active?.title ?: current?.getTitle() ?: mContext.getString(R.string.surface_no_podcast_loaded_84fab)
         title.setTextColor(notificationWidgetTextColor())
         title.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
         title.textSize = PODCAST_TEXT_LARGE
@@ -11991,7 +11956,7 @@ class UIManager(
         details.addView(title)
 
         val show = TextView(mContext)
-        show.text = displayShow?.title ?: "Pick a show to start listening."
+        show.text = displayShow?.title ?: mContext.getString(R.string.surface_pick_a_show_to_start_listening_7b228)
         show.setTextColor(ColorUtils.setAlphaComponent(notificationWidgetTextColor(), 210))
         show.setTypeface(Tuils.getTypeface(mContext))
         show.textSize = PODCAST_TEXT_MEDIUM
@@ -11999,8 +11964,8 @@ class UIManager(
         details.addView(show)
 
         val speed = TextView(mContext)
-        speed.text = "[ SPEED ${PodcastManager.formatSpeed(manager.playbackSpeed())} ]"
-        speed.contentDescription = "Podcast playback speed ${PodcastManager.formatSpeed(manager.playbackSpeed())}"
+        speed.text = mContext.getString(R.string.surface_speed_a23eb, PodcastManager.formatSpeed(manager.playbackSpeed()))
+        speed.contentDescription = mContext.getString(R.string.surface_podcast_playback_speed_7a955, PodcastManager.formatSpeed(manager.playbackSpeed()))
         speed.gravity = Gravity.CENTER
         speed.textSize = PODCAST_TEXT_SMALL
         styleTermuxToolButton(speed, notificationWidgetTextColor())
@@ -12099,7 +12064,7 @@ class UIManager(
             return
         }
         if ("help" == lower) {
-            renderFileConsole("Commands:\ncd [folder]\ncd ..\nls\npwd\nopen [file]\ntermux-open [file]\nshare [file]\nrefresh\nexit")
+            renderFileConsole(mContext.getString(R.string.surface_commands_cd_folder_cd_ls_pwd_open_file_termux_open_file_sh_20502))
             return
         }
         if ("refresh" == lower || "reload" == lower || "ls" == lower) {
@@ -12119,7 +12084,7 @@ class UIManager(
                 "share "
             )
         ) {
-            renderFileConsole("Dispatched: " + command)
+            renderFileConsole(mContext.getString(R.string.surface_dispatched_4daa9, command))
         } else {
             refreshFileConsole(true)
         }
@@ -12140,7 +12105,7 @@ class UIManager(
 
     private fun buildNativeFileListing(directory: File?): String {
         if (directory == null || !directory.exists()) {
-            return "Path not found."
+            return mContext.getString(R.string.surface_path_not_found_7e7ec)
         }
         if (!directory.isDirectory()) {
             return directory.getName()
@@ -12175,10 +12140,10 @@ class UIManager(
         val out = StringBuilder()
         out.append("[..]")
         if (error != null && error.trim { it <= ' ' }.length > 0) {
-            out.append('\n').append("error: ").append(error.trim { it <= ' ' })
+            out.append('\n').append(mContext.getString(R.string.surface_error_36baa)).append(error.trim { it <= ' ' })
         }
         for (dir in dirs) {
-            out.append('\n').append("[D] ").append(dir)
+            out.append('\n').append(mContext.getString(R.string.surface_d_a2c8d)).append(dir)
         }
         for (file in files) {
             out.append('\n').append("    ").append(file)
@@ -12435,7 +12400,7 @@ class UIManager(
         }
         if (termuxAppSession != null) {
             val app = termuxAppSession!!
-            termuxAppLastStatus = "sent interrupt"
+            termuxAppLastStatus = mContext.getString(R.string.surface_sent_interrupt_e9bc2)
             renderTermuxAppFrame(null, termuxAppLastStatus)
             dispatchTermuxAppScript("interrupt", buildTermuxAppControlScript(app, "C-c"), true)
             scheduleTermuxAppRefreshBurst(app.id, TERMUX_APP_INPUT_WATCH_MS)
@@ -12598,7 +12563,7 @@ class UIManager(
             return
         }
         val engine = luaAppEngine ?: return
-        luaAppLastStatus = if (command.length == 0) "sent enter" else "input: " + command
+        luaAppLastStatus = if (command.length == 0) mContext.getString(R.string.surface_sent_enter_df691) else mContext.getString(R.string.surface_input_53073, command)
         renderLuaAppResult(engine.input(command), luaAppLastStatus)
     }
 
@@ -12607,7 +12572,7 @@ class UIManager(
         if ("help" == command || command.length == 0) {
             renderLuaAppFrame(
                 luaAppLastResult,
-                ":help, :refresh, :restart, :config, :edit, :clear, :close. Other input is sent to the app."
+                mContext.getString(R.string.surface_help_refresh_restart_config_edit_clear_close_other_input_i_e0b4c)
             )
         } else if ("refresh" == command || "r" == command) {
             renderLuaAppResult(luaAppEngine!!.render(true), "refreshed")
@@ -12629,7 +12594,7 @@ class UIManager(
             if (LuaWidgetManager.hasConfig(id)) {
                 executeLuaWidgetCommand("lua -config " + id)
             } else {
-                renderLuaAppFrame(luaAppLastResult, "No config surface: " + luaAppTitle())
+                renderLuaAppFrame(luaAppLastResult, mContext.getString(R.string.surface_no_config_surface_92c6f, luaAppTitle()))
             }
         } else if ("edit" == command) {
             executeLuaWidgetCommand("lua -edit " + id)
@@ -12639,7 +12604,7 @@ class UIManager(
         } else if ("close" == command || "exit" == command || "detach" == command) {
             closeTermuxConsole()
         } else {
-            renderLuaAppFrame(luaAppLastResult, "Unknown app command: :" + command)
+            renderLuaAppFrame(luaAppLastResult, mContext.getString(R.string.surface_unknown_app_command_44753, command))
         }
     }
 
@@ -12662,26 +12627,26 @@ class UIManager(
         }
         showPlainTermuxOutput()
         val out = StringBuilder()
-        out.append("Re:T-UI Lua app: ").append(luaAppTitle()).append('\n')
-        out.append("script: ").append(id).append('\n')
-        out.append("local commands: :help :refresh :restart :config :edit :clear :close").append('\n')
+        out.append(mContext.getString(R.string.surface_re_t_ui_lua_app_2c557)).append(luaAppTitle()).append('\n')
+        out.append(mContext.getString(R.string.surface_script_39362)).append(id).append('\n')
+        out.append(mContext.getString(R.string.surface_local_commands_help_refresh_restart_config_edit_clear_clos_0f9a2)).append('\n')
         if (!TextUtils.isEmpty(status)) {
-            out.append("status: ").append(status).append('\n')
+            out.append(mContext.getString(R.string.surface_status_8a876)).append(status).append('\n')
         }
         out.append("----")
         if (result == null) {
-            out.append("\nLoading...")
+            out.append(mContext.getString(R.string.surface_loading_11b54))
         } else if (!TextUtils.isEmpty(result.error)) {
-            out.append("\nLua error: ").append(result.error)
+            out.append(mContext.getString(R.string.surface_lua_error_24e66)).append(result.error)
             if (!TextUtils.isEmpty(result.errorStage)) {
-                out.append("\nStage: ").append(result.errorStage)
+                out.append(mContext.getString(R.string.surface_stage_805fd)).append(result.errorStage)
             }
         } else if (!TextUtils.isEmpty(result.body)) {
             out.append('\n').append(result.body!!.trimEnd { it <= ' ' })
         } else if (!TextUtils.isEmpty(result.layoutJson)) {
-            out.append("\nLayout output is available in module panels; use ui:show_text for app body text.")
+            out.append(mContext.getString(R.string.surface_layout_output_is_available_in_module_panels_use_ui_show_te_5ac8c))
         } else {
-            out.append("\nNo Lua app output yet.")
+            out.append(mContext.getString(R.string.surface_no_lua_app_output_yet_334b2))
         }
         termuxBuffer.setLength(0)
         termuxBuffer.append(out.toString().trimEnd { it <= ' ' })
@@ -12700,16 +12665,16 @@ class UIManager(
             termuxOutput!!.text = Tuils.EMPTYSTRING
         }
 
-        addLuaText(container, "Re:T-UI Lua app: " + luaAppTitle(), id, MODULE_TEXT_FONT_MONO)
-        addLuaText(container, "script: " + id, id, MODULE_TEXT_FONT_MONO)
+        addLuaText(container, mContext.getString(R.string.surface_re_t_ui_lua_app_dfb07, luaAppTitle()), id, MODULE_TEXT_FONT_MONO)
+        addLuaText(container, mContext.getString(R.string.surface_script_4bf42, id), id, MODULE_TEXT_FONT_MONO)
         addLuaText(
             container,
-            "local commands: :help :refresh :restart :config :edit :clear :close",
+            mContext.getString(R.string.surface_local_commands_help_refresh_restart_config_edit_clear_clos_0f9a2),
             id,
             MODULE_TEXT_FONT_MONO
         )
         if (!TextUtils.isEmpty(status)) {
-            addLuaText(container, "status: " + status, id, MODULE_TEXT_FONT_MONO)
+            addLuaText(container, mContext.getString(R.string.surface_status_573dd, status), id, MODULE_TEXT_FONT_MONO)
         }
         addLuaText(container, "----------------", id, MODULE_TEXT_FONT_MONO)
 
@@ -12735,7 +12700,7 @@ class UIManager(
             return result.title!!
         }
         val id = luaAppId
-        return if (TextUtils.isEmpty(id)) "Lua App" else LuaWidgetManager.getName(id) ?: "Lua App"
+        return if (TextUtils.isEmpty(id)) mContext.getString(R.string.surface_lua_app_34dd8) else LuaWidgetManager.getName(id) ?: mContext.getString(R.string.surface_lua_app_34dd8)
     }
 
     private fun luaAppSurfaceActions(result: LuaWidgetEngine.RenderResult?): MutableList<LuaSurfaceAction> {
@@ -12786,19 +12751,19 @@ class UIManager(
 
     private fun clickLuaApp(index: Int) {
         val engine = luaAppEngine ?: return
-        renderLuaAppResult(engine.click(index), "button " + index)
+        renderLuaAppResult(engine.click(index), mContext.getString(R.string.surface_button_a4234, index))
         restoreLuaAppInputFocusSoon()
     }
 
     private fun actionLuaApp(value: String?) {
         val engine = luaAppEngine ?: return
-        renderLuaAppResult(engine.action(value), if (TextUtils.isEmpty(value)) "action" else "action: " + value)
+        renderLuaAppResult(engine.action(value), if (TextUtils.isEmpty(value)) "action" else mContext.getString(R.string.surface_action_a7fac, value))
         restoreLuaAppInputFocusSoon()
     }
 
     private fun dialogLuaApp(index: Int) {
         val engine = luaAppEngine ?: return
-        renderLuaAppResult(engine.dialog(index), if (index < 0) "dialog canceled" else "dialog: " + index)
+        renderLuaAppResult(engine.dialog(index), if (index < 0) mContext.getString(R.string.surface_dialog_canceled_9e0e5) else mContext.getString(R.string.surface_dialog_addd4, index))
         restoreLuaAppInputFocusSoon()
     }
 
@@ -12878,30 +12843,30 @@ class UIManager(
         appendTermuxLine("$ " + displayCommand)
         val command = normalizeTermuxConsoleCommand(displayCommand)
         if (command.length == 0) {
-            appendTermuxLine("Termux console is already open. Type help for available commands.")
+            appendTermuxLine(mContext.getString(R.string.surface_termux_console_is_already_open_type_help_for_available_com_e6bd1))
             return
         }
 
         val lower = command.lowercase()
         if ("exit" == lower || "close" == lower) {
-            appendTermuxLine("closing termux console.")
+            appendTermuxLine(mContext.getString(R.string.surface_closing_termux_console_4825d))
             closeTermuxConsole()
         } else if ("clear" == lower) {
             termuxBuffer.setLength(0)
             updateTermuxOutput()
         } else if ("help" == lower) {
             appendTermuxLine("help")
-            appendTermuxLine("pwd / ls / whoami -> run shell commands in Termux")
-            appendTermuxLine("cd [dir] -> change the Termux console working directory")
-            appendTermuxLine("status  -> check Termux bridge readiness")
-            appendTermuxLine("setup   -> show Termux bridge setup checklist")
-            appendTermuxLine("open    -> launch the Termux Android app")
-            appendTermuxLine("run <script|alias> [args...] -> dispatch a Termux script")
-            appendTermuxLine("apps / app <id> -> tmux workspace launchers (interactive TUIs)")
-            appendTermuxLine("app-add <id> <command> -> save a workspace launcher")
-            appendTermuxLine("Prefer: tmux launch mc   or alias MC")
-            appendTermuxLine("clear   -> clear this console")
-            appendTermuxLine("exit    -> close this console")
+            appendTermuxLine(mContext.getString(R.string.surface_pwd_ls_whoami_run_shell_commands_in_termux_a6ede))
+            appendTermuxLine(mContext.getString(R.string.surface_cd_dir_change_the_termux_console_working_directory_df2dc))
+            appendTermuxLine(mContext.getString(R.string.surface_status_check_termux_bridge_readiness_e5c11))
+            appendTermuxLine(mContext.getString(R.string.surface_setup_show_termux_bridge_setup_checklist_eeb78))
+            appendTermuxLine(mContext.getString(R.string.surface_open_launch_the_termux_android_app_1789b))
+            appendTermuxLine(mContext.getString(R.string.surface_run_script_alias_args_dispatch_a_termux_script_fe771))
+            appendTermuxLine(mContext.getString(R.string.surface_apps_app_id_tmux_workspace_launchers_interactive_tuis_77e6a))
+            appendTermuxLine(mContext.getString(R.string.surface_app_add_id_command_save_a_workspace_launcher_72135))
+            appendTermuxLine(mContext.getString(R.string.surface_prefer_tmux_launch_mc_or_alias_mc_577ec))
+            appendTermuxLine(mContext.getString(R.string.surface_clear_clear_this_console_9610a))
+            appendTermuxLine(mContext.getString(R.string.surface_exit_close_this_console_b8e51))
         } else if ("status" == lower) {
             appendTermuxStatus()
         } else if ("setup" == lower) {
@@ -12943,7 +12908,7 @@ class UIManager(
 
     private fun appendTermuxApps() {
         val launchers = TermuxWorkspaceLauncherManager.list(mContext!!)
-        appendTermuxLine("Workspace launchers (use: tmux launch <id> or MC)")
+        appendTermuxLine(mContext.getString(R.string.surface_workspace_launchers_use_tmux_launch_id_or_mc_7b114))
         for (launcher in launchers) {
             val cmd = if (launcher.command.isEmpty()) "(shell)" else launcher.command
             appendTermuxLine(launcher.id + " -> " + launcher.title + " [" + cmd + "]")
@@ -12953,57 +12918,57 @@ class UIManager(
     private fun appendTermuxAppActions(command: String?) {
         val parts = Tuils.splitArgs(command)
         if (parts.size < 2) {
-            appendTermuxLine("usage: app-actions <id>")
+            appendTermuxLine(mContext.getString(R.string.surface_usage_app_actions_id_fcfd2))
             return
         }
         val app = TermuxAppManager.resolve(mContext!!, parts.get(1))
         if (app == null) {
-            appendTermuxLine("Unknown Termux app: " + parts.get(1))
+            appendTermuxLine(mContext.getString(R.string.surface_unknown_termux_app_5f89c, parts.get(1)))
             return
         }
-        appendTermuxLine("Actions for " + app.id)
+        appendTermuxLine(mContext.getString(R.string.surface_actions_for_cf6f1, app.id))
         if (app.actions.isEmpty()) {
-            appendTermuxLine("No actions registered.")
+            appendTermuxLine(mContext.getString(R.string.surface_no_actions_registered_112a4))
         } else {
             for (action in app.actions) {
                 val sendLabel = if (action.send.isEmpty()) "[enter]" else action.send
                 appendTermuxLine(action.label + " -> " + sendLabel)
             }
         }
-        appendTermuxLine("Add with: app-action " + app.id + " \"label\" \"input\"")
+        appendTermuxLine(mContext.getString(R.string.surface_add_with_app_action_label_input_bcb50, app.id))
     }
 
     private fun appendTermuxAppInfo(command: String?) {
-        val app = resolveTermuxAppFromCommand(command, "app-info <id>") ?: return
-        appendTermuxLine("Termux app: " + app.id)
-        appendTermuxLine("Title: " + app.title)
-        appendTermuxLine("Command: " + app.command)
-        appendTermuxLine("Workdir: " + app.workDir)
-        appendTermuxLine("Home: " + app.homeDir)
-        appendTermuxLine("Manifest: " + app.manifestPath)
-        appendTermuxLine("State: " + app.statePath)
-        appendTermuxLine("Memory: " + app.memoryDir)
-        appendTermuxLine("Logs: " + app.logsDir)
-        appendTermuxLine("Session: " + TermuxAppManager.tmuxSessionName(app.id))
-        appendTermuxLine("Actions: " + app.actions.size)
+        val app = resolveTermuxAppFromCommand(command, mContext.getString(R.string.surface_app_info_id_1ee02)) ?: return
+        appendTermuxLine(mContext.getString(R.string.surface_termux_app_d1455, app.id))
+        appendTermuxLine(mContext.getString(R.string.surface_title_e024d, app.title))
+        appendTermuxLine(mContext.getString(R.string.surface_command_d42c7, app.command))
+        appendTermuxLine(mContext.getString(R.string.surface_workdir_a61e2, app.workDir))
+        appendTermuxLine(mContext.getString(R.string.surface_home_fb1d7, app.homeDir))
+        appendTermuxLine(mContext.getString(R.string.surface_manifest_558ac, app.manifestPath))
+        appendTermuxLine(mContext.getString(R.string.surface_state_88c10, app.statePath))
+        appendTermuxLine(mContext.getString(R.string.surface_memory_13c03, app.memoryDir))
+        appendTermuxLine(mContext.getString(R.string.surface_logs_bee4e, app.logsDir))
+        appendTermuxLine(mContext.getString(R.string.surface_session_66981, TermuxAppManager.tmuxSessionName(app.id)))
+        appendTermuxLine(mContext.getString(R.string.surface_actions_6dfd8, app.actions.size))
     }
 
     private fun syncTermuxCustomApp(command: String?) {
-        val app = resolveTermuxAppFromCommand(command, "app-sync <id>") ?: return
+        val app = resolveTermuxAppFromCommand(command, mContext.getString(R.string.surface_app_sync_id_073c6)) ?: return
         if (syncTermuxAppManifest(app, true)) {
-            appendTermuxLine("Manifest sync dispatched: " + app.manifestPath)
+            appendTermuxLine(mContext.getString(R.string.surface_manifest_sync_dispatched_3453b, app.manifestPath))
         }
     }
 
     private fun resolveTermuxAppFromCommand(command: String?, usage: String): TermuxAppManager.TermuxApp? {
         val parts = Tuils.splitArgs(command)
         if (parts.size < 2) {
-            appendTermuxLine("usage: " + usage)
+            appendTermuxLine(mContext.getString(R.string.surface_usage_84af2, usage))
             return null
         }
         val app = TermuxAppManager.resolve(mContext!!, parts.get(1))
         if (app == null) {
-            appendTermuxLine("Unknown Termux app: " + parts.get(1))
+            appendTermuxLine(mContext.getString(R.string.surface_unknown_termux_app_5f89c, parts.get(1)))
             return null
         }
         return app
@@ -13012,7 +12977,7 @@ class UIManager(
     private fun openTermuxCustomApp(command: String?) {
         val parts = Tuils.splitArgs(command)
         if (parts.size < 2) {
-            appendTermuxLine("usage: app <id>  (opens tmux workspace launcher)")
+            appendTermuxLine(mContext.getString(R.string.surface_usage_app_id_opens_tmux_workspace_launcher_018ce))
             appendTermuxApps()
             return
         }
@@ -13022,27 +12987,27 @@ class UIManager(
     private fun addTermuxCustomApp(command: String?) {
         val parts = Tuils.splitArgs(command)
         if (parts.size < 3) {
-            appendTermuxLine("usage: app-add <id> <command>")
-            appendTermuxLine("example: app-add radio bash ~/retui/radio.sh")
-            appendTermuxLine("Saved as a tmux workspace launcher: tmux launch <id>")
+            appendTermuxLine(mContext.getString(R.string.surface_usage_app_add_id_command_92855))
+            appendTermuxLine(mContext.getString(R.string.surface_example_app_add_radio_bash_retui_radio_sh_2f655))
+            appendTermuxLine(mContext.getString(R.string.surface_saved_as_a_tmux_workspace_launcher_tmux_launch_id_e5513))
             return
         }
         val id = parts[1]
         val appCommand = Tuils.toPlanString(parts.subList(2, parts.size), Tuils.SPACE)
         if (TermuxWorkspaceLauncherManager.save(mContext!!, id, appCommand)) {
             val normalized = TermuxWorkspaceLauncherManager.normalizeId(id)
-            appendTermuxLine("Workspace launcher saved: " + normalized)
-            appendTermuxLine("Open with: tmux launch " + normalized + "  (or: " + normalized + ")")
+            appendTermuxLine(mContext.getString(R.string.surface_workspace_launcher_saved_71ec1, normalized))
+            appendTermuxLine(mContext.getString(R.string.surface_open_with_tmux_launch_or_3a10f, normalized, normalized))
         } else {
-            appendTermuxLine("Unable to save launcher (built-in ids cannot be overwritten).")
+            appendTermuxLine(mContext.getString(R.string.surface_unable_to_save_launcher_built_in_ids_cannot_be_overwritten_97283))
         }
     }
 
     private fun addTermuxAppAction(command: String?) {
         val parts = Tuils.splitArgs(command)
         if (parts.size < 3) {
-            appendTermuxLine("usage: app-action <id> <label> [input]")
-            appendTermuxLine("example: app-action myapp \"show status\" 6")
+            appendTermuxLine(mContext.getString(R.string.surface_usage_app_action_id_label_input_bf286))
+            appendTermuxLine(mContext.getString(R.string.surface_example_app_action_myapp_show_status_6_37779))
             return
         }
         val id = parts.get(1)
@@ -13060,16 +13025,16 @@ class UIManager(
                     updateTermuxConsoleLabels()
                 }
             }
-            appendTermuxLine("App action registered: " + TermuxAppManager.normalizeId(id) + " / " + label)
+            appendTermuxLine(mContext.getString(R.string.surface_app_action_registered_58cf0, TermuxAppManager.normalizeId(id), label))
         } else {
-            appendTermuxLine("Unable to register app action.")
+            appendTermuxLine(mContext.getString(R.string.surface_unable_to_register_app_action_ebff7))
         }
     }
 
     private fun removeTermuxAppAction(command: String?) {
         val parts = Tuils.splitArgs(command)
         if (parts.size < 3) {
-            appendTermuxLine("usage: app-action-rm <id> <label>")
+            appendTermuxLine(mContext.getString(R.string.surface_usage_app_action_rm_id_label_5e8ec))
             return
         }
         val id = parts.get(1)
@@ -13083,25 +13048,25 @@ class UIManager(
                     updateTermuxConsoleLabels()
                 }
             }
-            appendTermuxLine("App action removed: " + TermuxAppManager.normalizeId(id) + " / " + label)
+            appendTermuxLine(mContext.getString(R.string.surface_app_action_removed_13264, TermuxAppManager.normalizeId(id), label))
         } else {
-            appendTermuxLine("App action not removed: " + label)
+            appendTermuxLine(mContext.getString(R.string.surface_app_action_not_removed_c8f3f, label))
         }
     }
 
     private fun removeTermuxCustomApp(command: String?) {
         val parts = Tuils.splitArgs(command)
         if (parts.size < 2) {
-            appendTermuxLine("usage: app-rm <id>")
-            appendTermuxLine("alias: rm-app <id>")
+            appendTermuxLine(mContext.getString(R.string.surface_usage_app_rm_id_38cb8))
+            appendTermuxLine(mContext.getString(R.string.surface_alias_rm_app_id_3df4f))
             return
         }
         val id = TermuxAppManager.normalizeId(parts.get(1))
         if (TermuxAppManager.remove(mContext!!, id)) {
             removeTermuxAppManifest(id)
-            appendTermuxLine("Termux app removed: " + id)
+            appendTermuxLine(mContext.getString(R.string.surface_termux_app_removed_4f6c4, id))
         } else {
-            appendTermuxLine("Termux app not removed: " + id)
+            appendTermuxLine(mContext.getString(R.string.surface_termux_app_not_removed_bc850, id))
         }
     }
 
@@ -13112,7 +13077,7 @@ class UIManager(
             handleTermuxAppLocalCommand(app, command.substring(1).trim { it <= ' ' }.lowercase(Locale.getDefault()))
             return
         }
-        termuxAppLastStatus = if (command.length == 0) "sent enter" else "sent: " + command
+        termuxAppLastStatus = if (command.length == 0) mContext.getString(R.string.surface_sent_enter_df691) else mContext.getString(R.string.surface_sent_faa06, command)
         renderTermuxAppFrame(null, termuxAppLastStatus)
         dispatchTermuxAppScript("send", buildTermuxAppSendScript(app, command), true)
         scheduleTermuxAppRefreshBurst(app.id, TERMUX_APP_INPUT_WATCH_MS)
@@ -13120,7 +13085,7 @@ class UIManager(
 
     private fun submitTermuxAppAction(action: TermuxAppManager.TermuxAppAction) {
         val app = termuxAppSession ?: return
-        termuxAppLastStatus = "action: " + action.label
+        termuxAppLastStatus = mContext.getString(R.string.surface_action_a7fac, action.label)
         renderTermuxAppFrame(null, termuxAppLastStatus)
         dispatchTermuxAppScript("action", buildTermuxAppSendScript(app, action.send), true)
         scheduleTermuxAppRefreshBurst(app.id, TERMUX_APP_INPUT_WATCH_MS)
@@ -13131,7 +13096,7 @@ class UIManager(
         if ("help" == command || command.length == 0) {
             renderTermuxAppFrame(
                 null,
-                ":help, :refresh, :restart, :stop, :detach, :open, :clear. Other input is sent to the app."
+                mContext.getString(R.string.surface_help_refresh_restart_stop_detach_open_clear_other_input_is_a1d16)
             )
         } else if ("refresh" == command || "r" == command) {
             refreshTermuxAppSession(true)
@@ -13154,7 +13119,7 @@ class UIManager(
             termuxBuffer.setLength(0)
             updateTermuxOutput()
         } else {
-            renderTermuxAppFrame(null, "Unknown app command: :" + command)
+            renderTermuxAppFrame(null, mContext.getString(R.string.surface_unknown_app_command_44753, command))
         }
     }
 
@@ -13211,7 +13176,7 @@ class UIManager(
         val app = termuxAppSession ?: return false
         if (!ensureTermuxBridgeReady(echoFailure)) {
             if (!echoFailure) {
-                renderTermuxAppFrame(null, "Termux bridge is not ready.")
+                renderTermuxAppFrame(null, mContext.getString(R.string.surface_dispatch_uimanager_termux_bridge_is_not_ready_86516))
             }
             return false
         }
@@ -13230,9 +13195,9 @@ class UIManager(
             )
             return true
         } catch (e: SecurityException) {
-            renderTermuxAppFrame(null, "Termux rejected the app command: permission denied.")
+            renderTermuxAppFrame(null, mContext.getString(R.string.surface_dispatch_uimanager_termux_rejected_the_app_command_permission_24c17))
         } catch (e: Exception) {
-            renderTermuxAppFrame(null, "unable to dispatch app command: " + e.javaClass.getSimpleName())
+            renderTermuxAppFrame(null, mContext.getString(R.string.surface_dispatch_uimanager_unable_to_dispatch_app_command_44ccd, e.javaClass.getSimpleName()))
         }
         return false
     }
@@ -13244,7 +13209,7 @@ class UIManager(
             if (echoToConsole) TERMUX_APP_SYNC_RESULT_PREFIX + app.id else null
         )
         if (!dispatched && echoToConsole) {
-            appendTermuxLine("Manifest sync pending: Termux bridge is not ready.")
+            appendTermuxLine(mContext.getString(R.string.surface_manifest_sync_pending_termux_bridge_is_not_ready_1d5d0))
         }
         return dispatched
     }
@@ -13533,25 +13498,25 @@ class UIManager(
     ) {
         val id = label.substring(TERMUX_APP_SYNC_RESULT_PREFIX.length)
         if (exitCode == 0 && TextUtils.isEmpty(stderr) && TextUtils.isEmpty(error)) {
-            appendTermuxLine("Manifest synced: " + id)
+            appendTermuxLine(mContext.getString(R.string.surface_manifest_synced_8a447, id))
             if (!TextUtils.isEmpty(stdout)) {
                 appendTermuxLine(stdout!!.trim { it <= ' ' })
             }
             return
         }
 
-        appendTermuxLine("Manifest sync failed: " + id)
+        appendTermuxLine(mContext.getString(R.string.surface_manifest_sync_failed_fa58b, id))
         if (exitCode != Int.Companion.MIN_VALUE) {
-            appendTermuxLine("exit: " + exitCode)
+            appendTermuxLine(mContext.getString(R.string.surface_exit_da8cd, exitCode))
         }
         if (!TextUtils.isEmpty(stderr)) {
-            appendTermuxLine("stderr: " + stderr!!.trim { it <= ' ' })
+            appendTermuxLine(mContext.getString(R.string.surface_stderr_9ffd5, stderr!!.trim { it <= ' ' }))
         }
         if (!TextUtils.isEmpty(error)) {
-            appendTermuxLine("error: " + error!!.trim { it <= ' ' })
+            appendTermuxLine(mContext.getString(R.string.surface_error_701e5, error!!.trim { it <= ' ' }))
         }
         if (!TextUtils.isEmpty(debug)) {
-            appendTermuxLine("debug: " + debug!!.trim { it <= ' ' })
+            appendTermuxLine(mContext.getString(R.string.surface_debug_cf37f, debug!!.trim { it <= ' ' }))
         }
     }
 
@@ -13577,10 +13542,10 @@ class UIManager(
         val action = termuxAppResultAction(label)
         if (isTermuxAppSessionEnded(stdout, stderr, error, exitCode)) {
             termuxAppRefreshGeneration++
-            val alreadyEnded = "session ended" == termuxAppLastStatus
-            termuxAppLastStatus = "session ended"
+            val alreadyEnded = mContext.getString(R.string.surface_session_ended_e36c4) == termuxAppLastStatus
+            termuxAppLastStatus = mContext.getString(R.string.surface_session_ended_e36c4)
             if (!(alreadyEnded && "capture" == action)) {
-                renderTermuxAppFrame("session ended. Type :restart to start it.", termuxAppLastStatus)
+                renderTermuxAppFrame(mContext.getString(R.string.surface_session_ended_type_restart_to_start_it_1bc47), termuxAppLastStatus)
             }
             return
         }
@@ -13593,13 +13558,13 @@ class UIManager(
             status = "stderr"
             frame = stderr
         } else if (!TextUtils.isEmpty(error)) {
-            status = "error: " + error!!.trim { it <= ' ' }
+            status = mContext.getString(R.string.surface_error_701e5, error!!.trim { it <= ' ' })
             frame = null
         } else if (!TextUtils.isEmpty(debug)) {
-            status = "debug: " + debug!!.trim { it <= ' ' }
+            status = mContext.getString(R.string.surface_debug_cf37f, debug!!.trim { it <= ' ' })
             frame = null
         } else if (exitCode != Int.Companion.MIN_VALUE && exitCode != 0) {
-            status = "exit: " + exitCode
+            status = mContext.getString(R.string.surface_exit_da8cd, exitCode)
             frame = null
         } else {
             status = termuxAppLastStatus
@@ -13711,10 +13676,7 @@ class UIManager(
         val raw = if (hasFrame) {
             frame!!
         } else {
-            ("Re:T-UI app: " + app.title
-                    + "\nsession: " + TermuxAppManager.tmuxSessionName(app.id)
-                    + "\nlocal commands: :help :refresh :restart :stop :detach :open"
-                    + if (TextUtils.isEmpty(status)) "\nstarting..." else "\nstatus: " + status)
+            (mContext.getString(R.string.surface_re_t_ui_app_session_local_commands_help_refresh_restart_st_d4cdf, app.title, TermuxAppManager.tmuxSessionName(app.id), if (TextUtils.isEmpty(status)) mContext.getString(R.string.surface_starting_d6fc5) else mContext.getString(R.string.surface_status_cb861, status)))
         }
         termuxBuffer.setLength(0)
         termuxBuffer.append(stripTermuxAnsi(raw)?.trimEnd { it <= ' ' } ?: Tuils.EMPTYSTRING)
@@ -13785,29 +13747,29 @@ class UIManager(
     }
 
     private fun appendTermuxSetup() {
-        appendTermuxLine("Termux bridge setup")
-        appendTermuxLine("1. Install current Termux from F-Droid/GitHub.")
-        appendTermuxLine("2. In Termux, enable external app commands:")
-        appendTermuxLine("   mkdir -p ~/.termux")
-        appendTermuxLine("   echo 'allow-external-apps = true' >> ~/.termux/termux.properties")
-        appendTermuxLine("   termux-reload-settings")
-        appendTermuxLine("3. Put scripts in a stable folder, for example:")
-        appendTermuxLine("   mkdir -p ~/retui")
-        appendTermuxLine("   nano ~/retui/test.sh")
-        appendTermuxLine("   chmod +x ~/retui/test.sh")
-        appendTermuxLine("4. Create a Re:T-UI script alias:")
-        appendTermuxLine("   alias -add -s test /data/data/com.termux/files/home/retui/test.sh")
-        appendTermuxLine("5. Run it from Re:T-UI:")
-        appendTermuxLine("   termux -run test")
-        appendTermuxLine("6. For callback modules, package-scope the broadcast:")
-        appendTermuxLine("   am broadcast -p com.dvil.tui_renewed -a com.dvil.tui_renewed.RETUI_CALLBACK ...")
-        appendTermuxLine("7. Optional helper:")
-        appendTermuxLine("   retui-token -show")
-        appendTermuxLine("   create ~/retui/retui-helper.sh with retui_module/retui_output helpers.")
-        appendTermuxLine("8. Script-backed module:")
-        appendTermuxLine("   module -add server termux:/data/data/com.termux/files/home/retui/server-health.sh")
-        appendTermuxLine("   module -refresh server")
-        appendTermuxLine("If Android asks for RUN_COMMAND permission, allow Re:T-UI and retry.")
+        appendTermuxLine(mContext.getString(R.string.surface_termux_bridge_setup_e45bb))
+        appendTermuxLine(mContext.getString(R.string.surface_1_install_current_termux_from_f_droid_github_7baec))
+        appendTermuxLine(mContext.getString(R.string.surface_2_in_termux_enable_external_app_commands_2fff2))
+        appendTermuxLine(mContext.getString(R.string.surface_mkdir_p_termux_3670c))
+        appendTermuxLine(mContext.getString(R.string.surface_echo_allow_external_apps_true_termux_termux_properties_8d906))
+        appendTermuxLine(mContext.getString(R.string.surface_termux_reload_settings_f5a10))
+        appendTermuxLine(mContext.getString(R.string.surface_3_put_scripts_in_a_stable_folder_for_example_b5179))
+        appendTermuxLine(mContext.getString(R.string.surface_mkdir_p_retui_bd4b2))
+        appendTermuxLine(mContext.getString(R.string.surface_nano_retui_test_sh_ff3a9))
+        appendTermuxLine(mContext.getString(R.string.surface_chmod_x_retui_test_sh_21c3d))
+        appendTermuxLine(mContext.getString(R.string.surface_4_create_a_re_t_ui_script_alias_5761e))
+        appendTermuxLine(mContext.getString(R.string.surface_alias_add_s_test_data_data_com_termux_files_home_retui_tes_f498e))
+        appendTermuxLine(mContext.getString(R.string.surface_5_run_it_from_re_t_ui_67a47))
+        appendTermuxLine(mContext.getString(R.string.surface_termux_run_test_b9c68))
+        appendTermuxLine(mContext.getString(R.string.surface_6_for_callback_modules_package_scope_the_broadcast_ff541))
+        appendTermuxLine(mContext.getString(R.string.surface_am_broadcast_p_com_dvil_tui_renewed_a_com_dvil_tui_renewed_c1701))
+        appendTermuxLine(mContext.getString(R.string.surface_7_optional_helper_85156))
+        appendTermuxLine(mContext.getString(R.string.surface_retui_token_show_2e437))
+        appendTermuxLine(mContext.getString(R.string.surface_create_retui_retui_helper_sh_with_retui_module_retui_outpu_1a75a))
+        appendTermuxLine(mContext.getString(R.string.surface_8_script_backed_module_f9159))
+        appendTermuxLine(mContext.getString(R.string.surface_module_add_server_termux_data_data_com_termux_files_home_r_226db))
+        appendTermuxLine(mContext.getString(R.string.surface_module_refresh_server_e8d63))
+        appendTermuxLine(mContext.getString(R.string.surface_if_android_asks_for_run_command_permission_allow_re_t_ui_a_ec158))
         appendTermuxStatus()
     }
 
@@ -13833,20 +13795,20 @@ class UIManager(
     private fun appendTermuxStatus() {
         val status = TermuxBridgeManager.status(mContext!!)
 
-        appendTermuxLine("Termux installed: " + status.termuxInstalled)
-        appendTermuxLine("RunCommand bridge: " + (if (status.runCommandDeclared) "available" else "not available"))
-        appendTermuxLine("RunCommand permission: " + (if (status.runCommandGranted) "granted" else "not granted"))
-        appendTermuxLine("Console cwd: " + termuxWorkingDirectory)
-        appendTermuxLine("Required Termux setting: allow-external-apps=true")
+        appendTermuxLine(mContext.getString(R.string.surface_termux_installed_d7938, status.termuxInstalled))
+        appendTermuxLine(mContext.getString(R.string.surface_runcommand_bridge_a8081, (if (status.runCommandDeclared) "available" else mContext.getString(R.string.surface_not_available_5f239))))
+        appendTermuxLine(mContext.getString(R.string.surface_runcommand_permission_b2628, (if (status.runCommandGranted) "granted" else mContext.getString(R.string.surface_not_granted_1604a))))
+        appendTermuxLine(mContext.getString(R.string.surface_console_cwd_be998, termuxWorkingDirectory))
+        appendTermuxLine(mContext.getString(R.string.surface_required_termux_setting_allow_external_apps_true_da61f))
         if (!status.termuxInstalled) {
-            appendTermuxLine("Install Termux before enabling script dispatch.")
+            appendTermuxLine(mContext.getString(R.string.surface_install_termux_before_enabling_script_dispatch_89dce))
         } else if (!status.runCommandDeclared) {
-            appendTermuxLine("This Termux build does not expose RUN_COMMAND.")
-            appendTermuxLine("Install the current Termux build from F-Droid/GitHub, not the old Play Store build.")
+            appendTermuxLine(mContext.getString(R.string.surface_this_termux_build_does_not_expose_run_command_b2ba8))
+            appendTermuxLine(mContext.getString(R.string.surface_install_the_current_termux_build_from_f_droid_github_not_t_ee9d3))
         } else if (!status.runCommandGranted) {
-            appendTermuxLine("Grant Re:T-UI permission to run commands in Termux when prompted by Android/Termux.")
+            appendTermuxLine(mContext.getString(R.string.surface_grant_re_t_ui_permission_to_run_commands_in_termux_when_pr_a9d96))
         } else {
-            appendTermuxLine("Bridge prerequisites look ready for the next phase.")
+            appendTermuxLine(mContext.getString(R.string.surface_bridge_prerequisites_look_ready_for_the_next_phase_66afa))
         }
     }
 
@@ -13856,8 +13818,8 @@ class UIManager(
             return
         }
         if (isInteractiveTermuxCommand(trimmed)) {
-            appendTermuxLine("interactive command: " + trimmed)
-            appendTermuxLine("opening Termux for a live terminal session.")
+            appendTermuxLine(mContext.getString(R.string.surface_interactive_command_191ac, trimmed))
+            appendTermuxLine(mContext.getString(R.string.surface_opening_termux_for_a_live_terminal_session_9bb39))
             openTermuxApp()
             return
         }
@@ -13899,21 +13861,21 @@ class UIManager(
                 arrayOf<String?>("-lc", shellCommand)
             )
             if (echoDispatch) {
-                appendTermuxLine("shell: " + shellCommand)
+                appendTermuxLine(mContext.getString(R.string.surface_shell_d4208, shellCommand))
             }
             return true
         } catch (e: SecurityException) {
-            reportTermuxDispatch("Termux rejected the command: permission denied.", true)
+            reportTermuxDispatch(mContext.getString(R.string.surface_termux_rejected_the_command_permission_denied_5c116), true)
             reportTermuxDispatch(
-                "Check allow-external-apps=true and grant RUN_COMMAND permission.",
+                mContext.getString(R.string.surface_check_allow_external_apps_true_and_grant_run_command_permi_58131),
                 true
             )
         } catch (e: Exception) {
             reportTermuxDispatch(
-                "unable to dispatch Termux command: " + e.javaClass.getSimpleName(),
+                mContext.getString(R.string.surface_unable_to_dispatch_termux_command_45f68, e.javaClass.getSimpleName()),
                 true
             )
-            reportTermuxDispatch("Open Termux once, then retry from this console.", true)
+            reportTermuxDispatch(mContext.getString(R.string.surface_open_termux_once_then_retry_from_this_console_7349c), true)
         }
         return false
     }
@@ -13941,8 +13903,8 @@ class UIManager(
     private fun runTermuxCommand(command: String?) {
         val parts = Tuils.splitArgs(command)
         if (parts.size < 2) {
-            appendTermuxLine("usage: run <script_path> [args...]")
-            appendTermuxLine("example: run /data/data/com.termux/files/home/retui/myscript.sh")
+            appendTermuxLine(mContext.getString(R.string.surface_usage_run_script_path_args_ed67b))
+            appendTermuxLine(mContext.getString(R.string.surface_example_run_data_data_com_termux_files_home_retui_myscript_5e8ca))
             return
         }
 
@@ -14001,27 +13963,27 @@ class UIManager(
                 if (dispatchArgs.isEmpty()) null else dispatchArgs.toTypedArray<String?>()
             )
             if (echoToConsole) {
-                appendTermuxLine("dispatched to Termux: " + path)
+                appendTermuxLine(mContext.getString(R.string.surface_dispatch_uimanager_dispatched_to_termux_f399f, path))
                 if (aliasName != null && aliasName != path) {
-                    appendTermuxLine("alias: " + aliasName + " -> " + path)
+                    appendTermuxLine(mContext.getString(R.string.surface_dispatch_uimanager_alias_25d3c, aliasName, path))
                 }
                 if (!args.isEmpty()) {
-                    appendTermuxLine("args: " + Tuils.toPlanString(args, Tuils.SPACE))
+                    appendTermuxLine(mContext.getString(R.string.surface_dispatch_uimanager_args_42285, Tuils.toPlanString(args, Tuils.SPACE)))
                 }
             }
             return true
         } catch (e: SecurityException) {
-            reportTermuxDispatch("Termux rejected the command: permission denied.", echoToConsole)
+            reportTermuxDispatch(mContext.getString(R.string.surface_dispatch_uimanager_termux_rejected_the_command_permission_den_5c116), echoToConsole)
             reportTermuxDispatch(
-                "Check allow-external-apps=true and grant RUN_COMMAND permission.",
+                mContext.getString(R.string.surface_dispatch_uimanager_check_allow_external_apps_true_and_grant_r_58131),
                 echoToConsole
             )
         } catch (e: Exception) {
             reportTermuxDispatch(
-                "unable to dispatch Termux command: " + e.javaClass.getSimpleName(),
+                mContext.getString(R.string.surface_dispatch_uimanager_unable_to_dispatch_termux_command_45f68, e.javaClass.getSimpleName()),
                 echoToConsole
             )
-            reportTermuxDispatch("Open Termux once, then retry from this console.", echoToConsole)
+            reportTermuxDispatch(mContext.getString(R.string.surface_dispatch_uimanager_open_termux_once_then_retry_from_this_cons_7349c), echoToConsole)
         }
         return false
     }
@@ -14029,14 +13991,14 @@ class UIManager(
     private fun ensureTermuxBridgeReady(echoToConsole: Boolean): Boolean {
         val status = TermuxBridgeManager.status(mContext!!)
         if (!status.termuxInstalled) {
-            reportTermuxDispatch("Termux is not installed.", echoToConsole)
+            reportTermuxDispatch(mContext.getString(R.string.surface_termux_is_not_installed_3aba0), echoToConsole)
             return false
         }
 
         if (!status.runCommandDeclared) {
-            reportTermuxDispatch("This Termux build does not expose RUN_COMMAND.", echoToConsole)
+            reportTermuxDispatch(mContext.getString(R.string.surface_this_termux_build_does_not_expose_run_command_b2ba8), echoToConsole)
             reportTermuxDispatch(
-                "Install/update Termux from F-Droid or GitHub, then retry.",
+                mContext.getString(R.string.surface_install_update_termux_from_f_droid_or_github_then_retry_307ff),
                 echoToConsole
             )
             return false
@@ -14047,12 +14009,12 @@ class UIManager(
                 mContext,
                 LauncherActivity.COMMAND_REQUEST_PERMISSION
             )
-            reportTermuxDispatch("RunCommand permission is not granted yet.", echoToConsole)
+            reportTermuxDispatch(mContext.getString(R.string.surface_runcommand_permission_is_not_granted_yet_29f35), echoToConsole)
             reportTermuxDispatch(
-                "If Android shows a permission prompt, allow Re:T-UI and retry.",
+                mContext.getString(R.string.surface_if_android_shows_a_permission_prompt_allow_re_t_ui_and_ret_1eb39),
                 echoToConsole
             )
-            reportTermuxDispatch("Termux must also have allow-external-apps=true.", echoToConsole)
+            reportTermuxDispatch(mContext.getString(R.string.surface_termux_must_also_have_allow_external_apps_true_bd4a5), echoToConsole)
             return false
         }
 
@@ -14213,9 +14175,9 @@ class UIManager(
             }
         }
 
-        appendTermuxLine("result: " + (if (path == null) "termux command" else path))
+        appendTermuxLine(mContext.getString(R.string.surface_result_d3272, (if (path == null) mContext.getString(R.string.surface_termux_command_b82dc) else path)))
         if (exitCode != Int.Companion.MIN_VALUE) {
-            appendTermuxLine("exit: " + exitCode)
+            appendTermuxLine(mContext.getString(R.string.surface_exit_da8cd, exitCode))
         }
         if (stdout != null && stdout.trim { it <= ' ' }.length > 0) {
             appendTermuxLine("stdout:")
@@ -14228,16 +14190,16 @@ class UIManager(
             appendTermuxLine(stderr.trim { it <= ' ' })
         }
         if (error != null && error.trim { it <= ' ' }.length > 0) {
-            appendTermuxLine("error: " + error.trim { it <= ' ' })
+            appendTermuxLine(mContext.getString(R.string.surface_error_701e5, error.trim { it <= ' ' }))
         }
         if (debug != null && debug.trim { it <= ' ' }.length > 0) {
-            appendTermuxLine("debug: " + debug.trim { it <= ' ' })
+            appendTermuxLine(mContext.getString(R.string.surface_debug_cf37f, debug.trim { it <= ' ' }))
         }
         if ((stdout == null || stdout.trim { it <= ' ' }.length == 0)
             && (stderr == null || stderr.trim { it <= ' ' }.length == 0)
             && (error == null || error.trim { it <= ' ' }.length == 0)
         ) {
-            appendTermuxLine("no output returned.")
+            appendTermuxLine(mContext.getString(R.string.surface_no_output_returned_05405))
         }
     }
 
@@ -14282,10 +14244,10 @@ class UIManager(
     ) {
         if (exitCode == 0 && stdout != null && stdout.trim { it <= ' ' }.length > 0) {
             termuxWorkingDirectory = lastNonEmptyLine(stdout.trim { it <= ' ' })
-            appendTermuxLine("cwd: " + termuxWorkingDirectory)
+            appendTermuxLine(mContext.getString(R.string.surface_cwd_2af21, termuxWorkingDirectory))
             return
         }
-        appendTermuxLine("cd failed: " + target)
+        appendTermuxLine(mContext.getString(R.string.surface_cd_failed_5abcd, target))
         appendTermuxCommandError(stdout, stderr, error, exitCode, null)
     }
 
@@ -14308,7 +14270,7 @@ class UIManager(
         }
         appendTermuxCommandError(null, null, error, exitCode, debug)
         if (!wrote && TextUtils.isEmpty(error) && TextUtils.isEmpty(debug) && exitCode == 0) {
-            appendTermuxLine("done: " + command)
+            appendTermuxLine(mContext.getString(R.string.surface_done_11556, command))
         }
     }
 
@@ -14326,13 +14288,13 @@ class UIManager(
             appendTermuxLine(stderr.trim { it <= ' ' })
         }
         if (error != null && error.trim { it <= ' ' }.length > 0) {
-            appendTermuxLine("error: " + error.trim { it <= ' ' })
+            appendTermuxLine(mContext.getString(R.string.surface_error_701e5, error.trim { it <= ' ' }))
         }
         if (debug != null && debug.trim { it <= ' ' }.length > 0) {
-            appendTermuxLine("debug: " + debug.trim { it <= ' ' })
+            appendTermuxLine(mContext.getString(R.string.surface_debug_cf37f, debug.trim { it <= ' ' }))
         }
         if (exitCode != Int.Companion.MIN_VALUE && exitCode != 0) {
-            appendTermuxLine("exit: " + exitCode)
+            appendTermuxLine(mContext.getString(R.string.surface_exit_da8cd, exitCode))
         }
     }
 
@@ -14416,21 +14378,21 @@ class UIManager(
         }
 
         val builder = StringBuilder()
-        builder.append("Termux bridge: ").append(label)
+        builder.append(mContext.getString(R.string.surface_termux_bridge_3deda)).append(label)
         if (exitCode != Int.Companion.MIN_VALUE) {
-            builder.append("\nexit: ").append(exitCode)
+            builder.append(mContext.getString(R.string.surface_exit_66ea3)).append(exitCode)
         }
         if (stdout != null && stdout.trim { it <= ' ' }.length > 0) {
             builder.append("\n").append(stdout.trim { it <= ' ' })
         }
         if (stderr != null && stderr.trim { it <= ' ' }.length > 0) {
-            builder.append("\nstderr:\n").append(stderr.trim { it <= ' ' })
+            builder.append(mContext.getString(R.string.surface_stderr_59a49)).append(stderr.trim { it <= ' ' })
         }
         if (error != null && error.trim { it <= ' ' }.length > 0) {
-            builder.append("\nerror: ").append(error.trim { it <= ' ' })
+            builder.append(mContext.getString(R.string.surface_error_efc3d)).append(error.trim { it <= ' ' })
         }
         if (debug != null && debug.trim { it <= ' ' }.length > 0) {
-            builder.append("\ndebug: ").append(debug.trim { it <= ' ' })
+            builder.append(mContext.getString(R.string.surface_debug_7052a)).append(debug.trim { it <= ' ' })
         }
         Tuils.sendOutput(mContext, builder.toString(), TerminalManager.CATEGORY_OUTPUT)
     }
@@ -14460,13 +14422,13 @@ class UIManager(
         if (!TextUtils.isEmpty(stdout) && stdout!!.trim { it <= ' ' }.length > 0) {
             text = stdout.trim { it <= ' ' }
         } else if (!TextUtils.isEmpty(stderr) && stderr!!.trim { it <= ' ' }.length > 0) {
-            text = "stderr:\n" + stderr.trim { it <= ' ' }
+            text = mContext.getString(R.string.surface_stderr_544b7, stderr.trim { it <= ' ' })
         } else if (!TextUtils.isEmpty(error) && error!!.trim { it <= ' ' }.length > 0) {
-            text = "error: " + error.trim { it <= ' ' }
+            text = mContext.getString(R.string.surface_error_701e5, error.trim { it <= ' ' })
         } else if (exitCode != Int.Companion.MIN_VALUE) {
-            text = "exit: " + exitCode + "\nNo output returned."
+            text = mContext.getString(R.string.surface_exit_no_output_returned_09cea, exitCode)
         } else {
-            text = "No output returned."
+            text = mContext.getString(R.string.surface_no_output_returned_a4db4)
         }
 
         val id = ModuleManager.normalize(module)
@@ -14475,7 +14437,7 @@ class UIManager(
             showHomeModule(id)
         }
         updateModuleDockSelection()
-        Tuils.sendOutput(mContext, "Module refreshed: " + id)
+        Tuils.sendOutput(mContext, mContext.getString(R.string.surface_module_refreshed_97f96, id))
     }
 
     private fun appendTermuxCallbackHint(stdout: String?) {
@@ -14489,8 +14451,8 @@ class UIManager(
         }
 
         if (!lower.contains("-p com.dvil.tui_renewed") && !lower.contains("pkg=com.dvil.tui_renewed")) {
-            appendTermuxLine("callback hint: if the module did not appear, add this to the script broadcast:")
-            appendTermuxLine("  -p com.dvil.tui_renewed")
+            appendTermuxLine(mContext.getString(R.string.surface_callback_hint_if_the_module_did_not_appear_add_this_to_the_eb234))
+            appendTermuxLine(mContext.getString(R.string.surface_p_com_dvil_tui_renewed_e100d))
         }
     }
 
@@ -14498,15 +14460,15 @@ class UIManager(
         val launchIntent = mContext!!.getPackageManager()
             .getLaunchIntentForPackage(TermuxBridgeManager.TERMUX_PACKAGE)
         if (launchIntent == null) {
-            appendTermuxLine("Termux is not installed.")
+            appendTermuxLine(mContext.getString(R.string.surface_termux_is_not_installed_3aba0))
             return
         }
         launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         try {
             mContext!!.startActivity(launchIntent)
-            appendTermuxLine("opened Termux.")
+            appendTermuxLine(mContext.getString(R.string.surface_opened_termux_4f527))
         } catch (e: Exception) {
-            appendTermuxLine("unable to open Termux: " + e.javaClass.getSimpleName())
+            appendTermuxLine(mContext.getString(R.string.surface_unable_to_open_termux_1f222, e.javaClass.getSimpleName()))
         }
     }
 
@@ -15141,28 +15103,28 @@ class UIManager(
         overlay.setKeepScreenOn(running && type == SessionType.FOCUS)
 
         if (type == SessionType.FINISHED) {
-            title.setText("MISSION ACCOMPLISHED")
+            title.setText(mContext.getString(R.string.surface_mission_accomplished_5f337))
             title.setTextColor(XMLPrefsManager.getColor(Theme.input_text_color))
-            taskDisplay.setText("Good job! You did great!")
+            taskDisplay.setText(mContext.getString(R.string.surface_good_job_you_did_great_c4fb2))
             countdown.setVisibility(View.GONE)
-            terminateBtn.setText("EXIT SESSION")
+            terminateBtn.setText(mContext.getString(R.string.surface_exit_session_52cc0))
         } else {
             countdown.setVisibility(View.VISIBLE)
             if (!RetuiCreditManager.isDystopiaEnabled(mContext)) {
-                terminateBtn.setText("TERMINATE SESSION")
+                terminateBtn.setText(mContext.getString(R.string.surface_terminate_session_cd886))
             } else if (RetuiCreditManager.wallet(mContext).credits >= RetuiCreditManager.ESCAPE_COST) {
-                terminateBtn.setText("SKIP POMODORO -${RetuiCreditManager.ESCAPE_COST} CREDITS")
+                terminateBtn.setText(mContext.getString(R.string.surface_skip_pomodoro_credits_b7376, RetuiCreditManager.ESCAPE_COST))
             } else {
-                terminateBtn.setText("EMERGENCY BREACH")
+                terminateBtn.setText(mContext.getString(R.string.surface_emergency_breach_ce727))
             }
             if (type == SessionType.BREAK) {
-                title.setText("TAKE A BREAK")
+                title.setText(mContext.getString(R.string.surface_take_a_break_849f9))
                 title.setTextColor(XMLPrefsManager.getColor(Theme.input_text_color))
             } else {
-                title.setText("FOCUS MODE ACTIVE")
+                title.setText(mContext.getString(R.string.surface_focus_mode_active_f4757))
                 title.setTextColor(Color.RED)
             }
-            taskDisplay.setText("Task: " + task)
+            taskDisplay.setText(mContext.getString(R.string.surface_task_c6f9a, task))
             countdown.setText(ClockManager.formatDuration(remaining))
         }
     }
@@ -15215,10 +15177,10 @@ class UIManager(
             } else {
                 TuixtDialog.showConfirm(
                     mContext,
-                    "TERMINATE",
+                    mContext.getString(R.string.surface_terminate_7acd3),
                     pomodoroStopConfirmText(),
-                    "YES",
-                    "NO",
+                    mContext.getString(R.string.surface_yes_8fff0),
+                    mContext.getString(R.string.surface_no_a0509),
                     ConfirmAction {
                         terminatePomodoroEarly(manager)
                     })
@@ -15228,12 +15190,12 @@ class UIManager(
 
     private fun pomodoroStopConfirmText(): String {
         if (!RetuiCreditManager.isDystopiaEnabled(mContext)) {
-            return "Do you really want to stop the focus session?"
+            return mContext.getString(R.string.surface_do_you_really_want_to_stop_the_focus_session_8ed84)
         }
         return if (RetuiCreditManager.wallet(mContext).credits >= RetuiCreditManager.ESCAPE_COST) {
-            "Stop this Pomodoro for ${RetuiCreditManager.ESCAPE_COST} credits?"
+            mContext.getString(R.string.surface_stop_this_pomodoro_for_credits_ad296, RetuiCreditManager.ESCAPE_COST)
         } else {
-            "Not enough credits. Try an emergency breach?"
+            mContext.getString(R.string.surface_not_enough_credits_try_an_emergency_breach_75d79)
         }
     }
 
@@ -15245,7 +15207,7 @@ class UIManager(
 
         if (RetuiCreditManager.spendCredits(mContext)) {
             manager.stopSession()
-            Tuils.sendOutput(mContext, "Pomodoro terminated. -${RetuiCreditManager.ESCAPE_COST} credits.")
+            Tuils.sendOutput(mContext, mContext.getString(R.string.surface_pomodoro_terminated_credits_d6ff8, RetuiCreditManager.ESCAPE_COST))
             return
         }
 
@@ -15303,7 +15265,7 @@ class UIManager(
         val countdown = overlay.findViewById<TextView>(R.id.lockdown_countdown)
         val reasonView = overlay.findViewById<TextView>(R.id.lockdown_reason)
         countdown.setText(ClockManager.formatDuration(remaining))
-        reasonView.setText(if (reason.isNullOrBlank()) "Focus mode" else reason)
+        reasonView.setText(if (reason.isNullOrBlank()) mContext.getString(R.string.surface_focus_mode_9a2af) else reason)
         refreshLockdownActions(overlay)
     }
 
@@ -15333,14 +15295,14 @@ class UIManager(
 
         skip.setOnClickListener {
             if (RetuiCreditManager.spendCredits(mContext)) {
-                LockdownManager.getInstance(mContext).stop("Lockdown skipped. -${RetuiCreditManager.ESCAPE_COST} credits.")
+                LockdownManager.getInstance(mContext).stop(mContext.getString(R.string.surface_lockdown_skipped_credits_29c2d, RetuiCreditManager.ESCAPE_COST))
             } else {
                 refreshLockdownActions(overlay)
             }
         }
         key.setOnClickListener {
             if (RetuiCreditManager.spendKey(mContext)) {
-                LockdownManager.getInstance(mContext).stop("Lockdown skipped with breach key.")
+                LockdownManager.getInstance(mContext).stop(mContext.getString(R.string.surface_lockdown_skipped_with_breach_key_19c9d))
             } else {
                 refreshLockdownActions(overlay)
             }
@@ -15348,7 +15310,7 @@ class UIManager(
         breach.setOnClickListener {
             BreachDialog.show(mContext, BreachManager.Mode.EMERGENCY) { won ->
                 if (won) {
-                    LockdownManager.getInstance(mContext).stop("Emergency breach accepted.")
+                    LockdownManager.getInstance(mContext).stop(mContext.getString(R.string.surface_emergency_breach_accepted_fed42))
                 } else {
                     refreshLockdownActions(overlay)
                 }
@@ -15365,9 +15327,9 @@ class UIManager(
         val key = overlay.findViewById<TextView>(R.id.lockdown_key)
         val breach = overlay.findViewById<TextView>(R.id.lockdown_breach)
 
-        wallet.setText("Credits: ${current.credits} | Keys: ${current.keys}")
+        wallet.setText(mContext.getString(R.string.surface_credits_keys_bb9c3, current.credits, current.keys))
         skip.setVisibility(if (current.credits >= RetuiCreditManager.ESCAPE_COST) View.VISIBLE else View.GONE)
-        key.setText("USE BREACH KEY (${current.keys})")
+        key.setText(mContext.getString(R.string.surface_use_breach_key_8d028, current.keys))
         key.setVisibility(if (current.keys > 0) View.VISIBLE else View.GONE)
         breach.setVisibility(
             if (current.credits < RetuiCreditManager.ESCAPE_COST && current.keys <= 0) View.VISIBLE else View.GONE
@@ -15386,7 +15348,7 @@ class UIManager(
         styleHackOverlay(mRootView)
         clearHackCallbacks()
 
-        hackText.setText(":: breach protocol engaged ::\n\n")
+        hackText.setText(mContext.getString(R.string.surface_breach_protocol_engaged_8f35d))
         overlay.setAlpha(0f)
         overlay.setVisibility(View.VISIBLE)
         overlay.animate().alpha(1f).setDuration(120).start()
@@ -15404,7 +15366,7 @@ class UIManager(
         }
 
         val exitRunnable = Runnable {
-            hackText.append(Tuils.NEWLINE + "[EXIT] connection severed")
+            hackText.append(mContext.getString(R.string.surface_exit_connection_severed_db482, Tuils.NEWLINE))
             hackScroll.post(Runnable { hackScroll.fullScroll(View.FOCUS_DOWN) })
         }
         hackSequenceRunnables.add(exitRunnable)
@@ -15505,7 +15467,7 @@ class UIManager(
             currentOverlayNotifications.size
         ) else currentOverlayNotifications.size
         if (maxRows == 0) {
-            val row = buildNotificationRow("No notifications.", widgetTextColor, widgetBorderColor)
+            val row = buildNotificationRow(mContext.getString(R.string.surface_no_notifications_273d1), widgetTextColor, widgetBorderColor)
             rows.addView(row)
             updateNotificationPagerButtons(notificationWidget)
             constrainNotificationContentScroll(scrollView)
@@ -15633,7 +15595,7 @@ class UIManager(
             .append(" / ")
             .append(currentOverlayNotifications.size)
             .append("    ")
-            .append(if (appName != null) appName else "Notification")
+            .append(if (appName != null) appName else mContext.getString(R.string.surface_notification_c18f8))
         if (!TextUtils.isEmpty(title)) {
             out.append(Tuils.NEWLINE).append(Tuils.NEWLINE).append(title)
         }
@@ -15642,10 +15604,10 @@ class UIManager(
         } else if (!TextUtils.isEmpty(fallback)) {
             out.append(Tuils.NEWLINE).append(fallback)
         } else {
-            out.append(Tuils.NEWLINE).append(Tuils.NEWLINE).append("No readable content")
+            out.append(Tuils.NEWLINE).append(Tuils.NEWLINE).append(mContext.getString(R.string.surface_no_readable_content_5d972))
         }
         if (this.isCurrentNotificationReplyable) {
-            out.append(Tuils.NEWLINE).append("reply available")
+            out.append(Tuils.NEWLINE).append(mContext.getString(R.string.surface_reply_available_0b0fd))
         }
         return out.toString()
     }
@@ -15675,7 +15637,7 @@ class UIManager(
         if (TextUtils.isEmpty(preview)) {
             preview = notification.text
         }
-        return (if (appName != null) appName else "Notification") + "  " + (if (preview != null) preview else Tuils.EMPTYSTRING)
+        return (if (appName != null) appName else mContext.getString(R.string.surface_notification_c18f8)) + "  " + (if (preview != null) preview else Tuils.EMPTYSTRING)
     }
 
     private fun setNotificationWidgetCompact(rootView: View, compact: Boolean) {
@@ -15899,13 +15861,13 @@ class UIManager(
     fun startCurrentNotificationReply() {
         val notification = currentNotification()
         if (notification == null) {
-            Tuils.sendOutput(mContext, "No notification selected.")
+            Tuils.sendOutput(mContext, mContext.getString(R.string.surface_no_notification_selected_1f0ee))
             return
         }
         if (!this.isCurrentNotificationReplyable) {
             Tuils.sendOutput(
                 mContext,
-                "Selected notification is not replyable. Bind the app with reply -bind first."
+                mContext.getString(R.string.surface_selected_notification_is_not_replyable_bind_the_app_with_r_0cf3e)
             )
             return
         }
@@ -15922,12 +15884,12 @@ class UIManager(
         if (ModulePromptManager.isNotificationReplyActive(mContext)) return
         val notification = currentNotification()
         if (notification == null) {
-            Tuils.sendOutput(mContext, "No notification selected.")
+            Tuils.sendOutput(mContext, mContext.getString(R.string.surface_no_notification_selected_1f0ee))
             return
         }
         val key = notification.key
         if (TextUtils.isEmpty(key)) {
-            Tuils.sendOutput(mContext, "Selected notification cannot be cleared.")
+            Tuils.sendOutput(mContext, mContext.getString(R.string.surface_selected_notification_cannot_be_cleared_20da0))
             return
         }
 
@@ -15940,7 +15902,7 @@ class UIManager(
     private fun showNotificationSettingsPopup(anchor: View) {
         val notification = currentNotification()
         if (notification == null) {
-            Tuils.sendOutput(mContext, "No notification selected.")
+            Tuils.sendOutput(mContext, mContext.getString(R.string.surface_no_notification_selected_1f0ee))
             return
         }
 
@@ -15955,7 +15917,7 @@ class UIManager(
 
     private fun excludeNotificationFromPanel(notification: NotificationService.Notification) {
         if (TextUtils.isEmpty(notification.text)) {
-            Tuils.sendOutput(mContext, "Selected notification cannot be excluded.")
+            Tuils.sendOutput(mContext, mContext.getString(R.string.surface_selected_notification_cannot_be_excluded_5df6b))
             return
         }
 
@@ -15964,7 +15926,7 @@ class UIManager(
         currentOverlayNotifications.remove(notification)
         clampNotificationIndex()
         refreshNotificationModuleView()
-        Tuils.sendOutput(mContext, "Notification excluded from launcher panel.")
+        Tuils.sendOutput(mContext, mContext.getString(R.string.surface_notification_excluded_from_launcher_panel_18a97))
     }
 
     private val isCurrentNotificationReplyable: Boolean
@@ -16056,6 +16018,14 @@ class UIManager(
     }
 
     fun dispose() {
+        ramManager?.stop()
+        batteryManager?.stop()
+        storageManager?.stop()
+        networkManager?.stop()
+        tuiTimeManager?.stop()
+        unlockManager?.stop()
+        tuiNotesManager?.stop()
+        weatherManager?.stop()
         captureLauncherSurfaceSession()
         cancelTerminalOutputAutoHide()
         stopTermuxWorkspaceSocketClient()
@@ -16312,6 +16282,7 @@ class UIManager(
         if (networkManager != null) networkManager!!.stop()
         if (tuiTimeManager != null) tuiTimeManager!!.stop()
         if (unlockManager != null) unlockManager!!.stop()
+        tuiNotesManager?.stop()
         pauseAsciiAnimation()
         androidWidgetDrawerManager?.stopListening()
     }
@@ -16373,6 +16344,7 @@ class UIManager(
         if (networkManager != null) networkManager!!.start()
         if (tuiTimeManager != null) tuiTimeManager!!.start()
         if (unlockManager != null) unlockManager!!.start()
+        tuiNotesManager?.start()
         resumeAsciiAnimation()
         if (androidWidgetDrawerManager?.isOpen == true) {
             androidWidgetDrawerManager?.startListening()

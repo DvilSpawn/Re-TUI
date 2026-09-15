@@ -144,6 +144,8 @@ class HTMLExtractManager(context: Context, client: OkHttpClient) {
                                 temperatureMeasure
                             ) ?: throw IllegalArgumentException(context.getString(R.string.weather_response_invalid))
 
+                            val condition = context.getString(snapshot.conditionResource)
+                            val displayValues = snapshot.values + mapOf("main" to condition, "description" to condition)
                             var o: CharSequence = Tuils.span(weatherFormat, weatherColor) ?: SpannableString(weatherFormat)
 
                             val m = weatherFormatPattern.matcher(weatherFormat)
@@ -154,7 +156,7 @@ class HTMLExtractManager(context: Context, client: OkHttpClient) {
                                 val converter = m.group(3)
 
                                 if (delay.toInt() == 1) {
-                                    var value = snapshot.values[name]
+                                    var value = displayValues[name]
                                     if (value != null) {
 
                                         if (converter != null && converter.length > 0) {
@@ -182,7 +184,7 @@ class HTMLExtractManager(context: Context, client: OkHttpClient) {
                             val i: Intent = Intent(UIManager.ACTION_WEATHER)
                             i.putExtra(XMLPrefsManager.VALUE_ATTRIBUTE, o)
                             i.putExtra(UIManager.WEATHER_SYMBOL, snapshot.symbolCode)
-                            i.putExtra(UIManager.WEATHER_CONDITION, snapshot.values["main"])
+                            i.putExtra(UIManager.WEATHER_CONDITION, condition)
                             i.putExtra(
                                 UIManager.WEATHER_DETAILS,
                                 WeatherResponseParser.compactDetails(snapshot.values, temperatureMeasure)
@@ -425,33 +427,33 @@ class HTMLExtractManager(context: Context, client: OkHttpClient) {
                         values = getListFromType(p)
 
                         for (v in values) {
-                            builder.append("- ID: ").append(v.id).append(" -> ").append(v.value)
+                            builder.append(context.getString(R.string.integration_htmlextractmanager_id_d4962)).append(v.id).append(" -> ").append(v.value)
                                 .append(Tuils.NEWLINE)
                         }
                     } catch (e: Exception) {
-                        builder.append("XPaths:").append(Tuils.NEWLINE)
+                        builder.append(context.getString(R.string.integration_htmlextractmanager_xpaths_f032b)).append(Tuils.NEWLINE)
                         if (xpaths.size == 0) builder.append("[]").append(Tuils.NEWLINE)
                         else {
                             for (v in xpaths) {
-                                builder.append(Tuils.DOUBLE_SPACE).append("- ID: ").append(v.id)
+                                builder.append(Tuils.DOUBLE_SPACE).append(context.getString(R.string.integration_htmlextractmanager_id_d4962)).append(v.id)
                                     .append(" -> ").append(v.value).append(Tuils.NEWLINE)
                             }
                         }
 
-                        builder.append("JsonPaths:").append(Tuils.NEWLINE)
+                        builder.append(context.getString(R.string.integration_htmlextractmanager_jsonpaths_a6f32)).append(Tuils.NEWLINE)
                         if (jsons.size == 0) builder.append("[]").append(Tuils.NEWLINE)
                         else {
                             for (v in jsons) {
-                                builder.append(Tuils.DOUBLE_SPACE).append("- ID: ").append(v.id)
+                                builder.append(Tuils.DOUBLE_SPACE).append(context.getString(R.string.integration_htmlextractmanager_id_d4962)).append(v.id)
                                     .append(" -> ").append(v.value).append(Tuils.NEWLINE)
                             }
                         }
 
-                        builder.append("Formats:").append(Tuils.NEWLINE)
+                        builder.append(context.getString(R.string.integration_htmlextractmanager_formats_27cf3)).append(Tuils.NEWLINE)
                         if (formats.size == 0) builder.append("[]").append(Tuils.NEWLINE)
                         else {
                             for (v in formats) {
-                                builder.append(Tuils.DOUBLE_SPACE).append("- ID: ").append(v.id)
+                                builder.append(Tuils.DOUBLE_SPACE).append(context.getString(R.string.integration_htmlextractmanager_id_d4962)).append(v.id)
                                     .append(" -> ").append(v.value).append(Tuils.NEWLINE)
                             }
                         }

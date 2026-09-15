@@ -1,0 +1,51 @@
+<resources>
+    <!-- Command responses. Translate prose; preserve examples and format arguments. -->
+    <!-- BackupManager.kt: importBackup -->
+    <string name="validation_backup_backupmanager_backup_package_contains_duplicate_entries_aec49" formatted="false">"Backup package contains duplicate entries"</string>
+    <!-- BackupManager.kt: importBackup -->
+    <string name="validation_backup_backupmanager_backup_package_is_incomplete_91553" formatted="false">"Backup package is incomplete"</string>
+    <!-- BackupManager.kt: readUri -->
+    <string name="validation_backup_backupmanager_backup_package_is_too_large_df84c" formatted="false">"Backup package is too large"</string>
+    <!-- BackupManager.kt: backupInputStream -->
+    <string name="validation_backup_backupmanager_backup_password_is_required_9706d" formatted="false">"Backup password is required"</string>
+    <!-- BackupManager.kt: verifyExport -->
+    <string name="validation_backup_backupmanager_backup_verification_failed_6772e" formatted="false">"Backup verification failed"</string>
+    <!-- BackupManager.kt: decrypt -->
+    <string name="validation_backup_backupmanager_encrypted_backup_is_incomplete_777d0" formatted="false">"Encrypted backup is incomplete"</string>
+    <!-- BackupManager.kt: validatePackage -->
+    <string name="validation_backup_backupmanager_invalid_personal_backup_profile_e275d" formatted="false">"Invalid personal backup profile"</string>
+    <!-- BackupManager.kt: validatePackage -->
+    <string name="validation_backup_backupmanager_invalid_shareable_configuration_profile_78695" formatted="false">"Invalid shareable configuration profile"</string>
+    <!-- BackupManager.kt: validatePackage -->
+    <string name="validation_backup_backupmanager_personal_backup_is_incomplete_838a0" formatted="false">"Personal backup is incomplete"</string>
+    <!-- BackupManager.kt: exportShareableConfiguration -->
+    <string name="validation_backup_backupmanager_preset_is_incomplete_85622" formatted="false">"Preset is incomplete"</string>
+    <!-- BackupManager.kt: exportShareableConfiguration -->
+    <string name="validation_backup_backupmanager_preset_not_found_ce086" formatted="false">"Preset not found"</string>
+    <!-- BackupManager.kt: behaviorFields -->
+    <string name="validation_backup_backupmanager_shareable_configuration_contains_unknown_b_d886f" formatted="false">"Shareable configuration contains unknown behavior settings"</string>
+    <!-- BackupManager.kt: validatePackage -->
+    <string name="validation_backup_backupmanager_shareable_configuration_contains_unsupport_2455b" formatted="false">"Shareable configuration contains unsupported files"</string>
+    <!-- BackupManager.kt: validatePackage -->
+    <string name="validation_backup_backupmanager_shareable_configuration_is_incomplete_13f8c" formatted="false">"Shareable configuration is incomplete"</string>
+    <!-- BackupManager.kt: validatePackage -->
+    <string name="validation_backup_backupmanager_shareable_configuration_privacy_marker_is_555ab" formatted="false">"Shareable configuration privacy marker is missing"</string>
+    <!-- BackupManager.kt: validatePackage -->
+    <string name="validation_backup_backupmanager_shareable_frame_settings_are_incomplete_3a160" formatted="false">"Shareable frame settings are incomplete"</string>
+    <!-- BackupManager.kt: importBackup -->
+    <string name="validation_backup_backupmanager_unable_to_create_restore_folder_89757" formatted="false">"Unable to create restore folder"</string>
+    <!-- BackupManager.kt: readUri -->
+    <string name="validation_backup_backupmanager_unable_to_open_backup_package_bdca3" formatted="false">"Unable to open backup package"</string>
+    <!-- BackupManager.kt: importBackup -->
+    <string name="validation_backup_backupmanager_unable_to_restore_backup_folder_184df" formatted="false">"Unable to restore backup folder"</string>
+    <!-- BackupManager.kt: restoreDirectory -->
+    <string name="validation_backup_backupmanager_unable_to_restore_folder_1b199">"Unable to restore folder: %1$s"</string>
+    <!-- BackupManager.kt: importBackup -->
+    <string name="validation_backup_backupmanager_unsafe_backup_package_a3cb1" formatted="false">"Unsafe backup package"</string>
+    <!-- BackupManager.kt: validatePackage -->
+    <string name="validation_backup_backupmanager_unsupported_backup_schema_94afd" formatted="false">"Unsupported backup schema"</string>
+    <!-- BackupManager.kt: validatePackage -->
+    <string name="validation_backup_backupmanager_unsupported_shareable_configuration_sectio_c88e0" formatted="false">"Unsupported shareable configuration sections"</string>
+    <string name="backup_error_unsupported">Unsupported backup package</string>
+    <string name="backup_error_password">Backup password is incorrect or the file was changed</string>
+</resources>

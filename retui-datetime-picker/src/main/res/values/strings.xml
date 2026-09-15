@@ -1,0 +1,6 @@
+<resources>
+    <!-- Labels above the reminder time dropdowns. AM/PM names and weekdays come from the locale. -->
+    <string name="picker_hour">HOUR</string>
+    <string name="picker_minute">MINUTE</string>
+    <string name="picker_period">AM / PM</string>
+</resources>

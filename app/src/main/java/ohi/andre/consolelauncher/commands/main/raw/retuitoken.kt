@@ -17,7 +17,7 @@ class retuitoken : CommandAbstraction {
         if (args != null && args.isNotEmpty()) {
             val arg = info.get()
             if (arg != null) {
-                command = arg.toString().trim().lowercase(Locale.getDefault())
+                command = arg.toString().trim().lowercase(Locale.ROOT)
             }
         }
 
@@ -28,43 +28,38 @@ class retuitoken : CommandAbstraction {
             val token = CallbackAuthManager.getOrCreateToken(info.context)
             CallbackAuthManager.setEnabled(info.context, true)
             copyToken(info.context, token)
-            return tokenOutput("Callback auth enabled.", token)
+            return tokenOutput(info.context, info.context.getString(R.string.command_retuitoken_callback_auth_enabled_8ae51), token)
         }
         if (command == "-rotate" || command == "rotate") {
             val token = CallbackAuthManager.rotateToken(info.context)
             copyToken(info.context, token)
-            return tokenOutput("Callback token rotated.", token)
+            return tokenOutput(info.context, info.context.getString(R.string.command_retuitoken_callback_token_rotated_7ce91), token)
         }
         if (command == "-on" || command == "on") {
             val token = CallbackAuthManager.getOrCreateToken(info.context)
             CallbackAuthManager.setEnabled(info.context, true)
             copyToken(info.context, token)
-            return tokenOutput("Callback auth enabled.", token)
+            return tokenOutput(info.context, info.context.getString(R.string.command_retuitoken_callback_auth_enabled_8ae51), token)
         }
         if (command == "-off" || command == "off") {
             CallbackAuthManager.setEnabled(info.context, false)
-            return "Callback auth disabled."
+            return info.context.getString(R.string.command_retuitoken_callback_auth_disabled_f38f0)
         }
 
         return info.context.getString(R.string.help_retuitoken)
     }
 
     private fun status(info: ExecutePack): String =
-        "Callback auth: " + (if (CallbackAuthManager.isEnabled(info.context)) "enabled" else "disabled") +
-            Tuils.NEWLINE +
-            "Token present: " + CallbackAuthManager.getToken(info.context).isNotEmpty()
+        info.context.getString(R.string.command_retuitoken_callback_auth_token_present_3703c, (if (CallbackAuthManager.isEnabled(info.context)) "enabled" else "disabled"), Tuils.NEWLINE, CallbackAuthManager.getToken(info.context).isNotEmpty())
 
     private fun copyToken(context: Context, token: String) {
         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
-        clipboard?.setPrimaryClip(ClipData.newPlainText("Re-TUI callback token", token))
+        clipboard?.setPrimaryClip(ClipData.newPlainText(context.getString(R.string.command_retuitoken_re_tui_callback_token_1e777), token))
     }
 
-    private fun tokenOutput(message: String, token: String): String =
-        message +
-            Tuils.NEWLINE +
-            "Token copied to clipboard." +
-            Tuils.NEWLINE +
-            "Token: " + token
+    private fun tokenOutput(context: android.content.Context, message: String, token: String): String =
+        context.getString(R.string.command_detail_retuitoken_token_copied_to_clipboard_token_274e3, message +
+            Tuils.NEWLINE, Tuils.NEWLINE, token)
 
     override fun argType(): IntArray = intArrayOf(CommandAbstraction.PLAIN_TEXT)
 

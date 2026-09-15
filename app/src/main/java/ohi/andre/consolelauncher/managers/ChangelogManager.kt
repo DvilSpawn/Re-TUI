@@ -60,7 +60,7 @@ object ChangelogManager {
                             return@Thread
                         }
 
-                        val header = "Changelog " + BuildConfig.VERSION_NAME
+                        val header = context.getString(R.string.manager_changelogmanager_changelog_2b4a2, BuildConfig.VERSION_NAME)
                         var log = response.body?.string() ?: Tuils.EMPTYSTRING
                         log = newlinePattern.matcher(log).replaceAll(Tuils.DOUBLE_SPACE + "-")
 
@@ -72,7 +72,7 @@ object ChangelogManager {
                         Tuils.sendOutput(context, header + Tuils.NEWLINE + log)
 
                         if (cut) {
-                            val sp = SpannableString("Click here to see the full changelog")
+                            val sp = SpannableString(context.getString(R.string.manager_changelogmanager_click_here_to_see_the_full_changelog_897bf))
                             sp.setSpan(
                                 ForegroundColorSpan(XMLPrefsManager.getColor(Theme.output_text_color)),
                                 0,

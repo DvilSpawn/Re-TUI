@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher.managers
 
+import ohi.andre.consolelauncher.R
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -26,7 +27,7 @@ class LockdownManager private constructor(private val appContext: Context) {
         override fun run() {
             if (!this@LockdownManager.isRunning) return
             if (remainingMillis <= 0L) {
-                stopInternal("Lockdown complete.")
+                stopInternal(appContext.getString(R.string.manager_lockdownmanager_lockdown_complete_b66d9))
             } else {
                 broadcastState(null)
                 handler.postDelayed(this, 1000L)
@@ -41,7 +42,7 @@ class LockdownManager private constructor(private val appContext: Context) {
     @Synchronized
     fun start(durationMs: Long, label: String?): String {
         if (durationMs <= 0L) {
-            return "Invalid duration. Use values like 30s, 5m, or 1h."
+            return appContext.getString(R.string.manager_lockdownmanager_invalid_duration_use_values_like_30s_5m_or_88438)
         }
         RetuiCreditManager.wallet(appContext)
         reason = label?.trim().orEmpty()
@@ -51,13 +52,13 @@ class LockdownManager private constructor(private val appContext: Context) {
         saveState()
         handler.removeCallbacks(ticker)
         handler.post(ticker)
-        broadcastState("Lockdown started.")
-        return "Lockdown started for " + ClockManager.formatDuration(durationMs) + "."
+        broadcastState(appContext.getString(R.string.manager_lockdownmanager_lockdown_started_176e9))
+        return appContext.getString(R.string.manager_lockdownmanager_lockdown_started_for_49b41, ClockManager.formatDuration(durationMs))
     }
 
     @Synchronized
-    fun stop(message: String = "Lockdown terminated."): String {
-        if (!isRunning) return "No lockdown is running."
+    fun stop(message: String = appContext.getString(R.string.manager_lockdownmanager_lockdown_terminated_47ad8)): String {
+        if (!isRunning) return appContext.getString(R.string.manager_lockdownmanager_no_lockdown_is_running_58118)
         stopInternal(message)
         return message
     }
@@ -70,9 +71,9 @@ class LockdownManager private constructor(private val appContext: Context) {
 
     val status: String
         @Synchronized get() {
-            if (!isRunning) return "No lockdown is running."
-            val label = if (reason.isBlank()) "" else "\nReason: $reason"
-            return "Lockdown remaining: " + ClockManager.formatDuration(remainingMillis) + "." + label
+            if (!isRunning) return appContext.getString(R.string.manager_lockdownmanager_no_lockdown_is_running_58118)
+            val label = if (reason.isBlank()) "" else appContext.getString(R.string.manager_lockdownmanager_reason_5c8d4, reason)
+            return appContext.getString(R.string.manager_lockdownmanager_lockdown_remaining_f0b10, ClockManager.formatDuration(remainingMillis), label)
         }
 
     private fun restoreState() {
@@ -93,7 +94,7 @@ class LockdownManager private constructor(private val appContext: Context) {
         if (isRunning && endElapsedRealtime > SystemClock.elapsedRealtime()) {
             handler.post(ticker)
         } else if (isRunning) {
-            stopInternal("Lockdown complete.")
+            stopInternal(appContext.getString(R.string.manager_lockdownmanager_lockdown_complete_b66d9))
         }
     }
 

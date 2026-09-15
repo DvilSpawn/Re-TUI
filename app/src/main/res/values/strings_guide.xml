@@ -1,0 +1,51 @@
+<resources>
+    <!-- Walkthrough prose. Keep command names, flags, path IDs and examples unchanged. -->
+    <string name="guide_basics" formatted="false">"Basics"</string>
+    <string name="guide_learn_the_command_surface_app_list_settings_hub_and_module_dock" formatted="false">"Learn the command surface, app list, settings hub, and module dock."</string>
+    <string name="guide_print_the_map" formatted="false">"Print the map"</string>
+    <string name="guide_help_starts_with_the_workstation_quickstart_and_then_lists_every_comma" formatted="false">"Help starts with the workstation quickstart and then lists every command."</string>
+    <string name="guide_open_the_app_list" formatted="false">"Open the app list"</string>
+    <string name="guide_use_the_app_drawer_when_you_want_to_scan_installed_apps_instead_of_typ" formatted="false">"Use the app drawer when you want to scan installed apps instead of typing a name."</string>
+    <string name="guide_inspect_modules" formatted="false">"Inspect modules"</string>
+    <string name="guide_modules_are_terminal_panels_for_status_controls_scripts_and_compact_wo" formatted="false">"Modules are terminal panels for status, controls, scripts, and compact workflows."</string>
+    <string name="guide_open_settings" formatted="false">"Open settings"</string>
+    <string name="guide_the_settings_hub_is_still_available_when_a_visual_edit_surface_is_fast" formatted="false">"The settings hub is still available when a visual edit surface is faster than XML."</string>
+    <string name="guide_customize" formatted="false">"Customize"</string>
+    <string name="guide_try_wallpaper_color_presets_appearance_settings_and_config_discovery" formatted="false">"Try wallpaper color, presets, appearance settings, and config discovery."</string>
+    <string name="guide_derive_colors" formatted="false">"Derive colors"</string>
+    <string name="guide_auto_color_reads_the_current_wallpaper_and_updates_the_terminal_palett" formatted="false">"Auto color reads the current wallpaper and updates the terminal palette."</string>
+    <string name="guide_list_presets" formatted="false">"List presets"</string>
+    <string name="guide_presets_are_saved_theme_states_plus_built_in_looks_you_can_apply_later" formatted="false">"Presets are saved theme states plus built-in looks you can apply later."</string>
+    <string name="guide_open_appearance_settings" formatted="false">"Open appearance settings"</string>
+    <string name="guide_the_settings_hub_is_the_main_route_for_precise_appearance_changes" formatted="false">"The settings hub is the main route for precise appearance changes."</string>
+    <string name="guide_browse_config" formatted="false">"Browse config"</string>
+    <string name="guide_config_listing_is_the_command_route_into_advanced_launcher_variables" formatted="false">"Config listing is the command route into advanced launcher variables."</string>
+    <string name="guide_modules" formatted="false">"Modules"</string>
+    <string name="guide_use_built_in_panels_and_the_lua_module_surface_without_leaving_the_ter" formatted="false">"Use built-in panels and the Lua module surface without leaving the terminal."</string>
+    <string name="guide_list_modules" formatted="false">"List modules"</string>
+    <string name="guide_start_by_seeing_every_built_in_and_script_backed_module_the_launcher_k" formatted="false">"Start by seeing every built-in and script-backed module the launcher knows."</string>
+    <string name="guide_show_notes" formatted="false">"Show notes"</string>
+    <string name="guide_notes_is_a_small_local_panel_and_a_good_example_of_a_module_as_workspa" formatted="false">"Notes is a small local panel and a good example of a module as workspace."</string>
+    <string name="guide_show_timer" formatted="false">"Show timer"</string>
+    <string name="guide_timer_demonstrates_a_module_with_actions_and_live_status" formatted="false">"Timer demonstrates a module with actions and live status."</string>
+    <string name="guide_read_lua_module_help" formatted="false">"Read Lua module help"</string>
+    <string name="guide_lua_modules_can_render_text_buttons_actions_app_intents_and_shortcuts" formatted="false">"Lua modules can render text, buttons, actions, app intents, and shortcuts."</string>
+    <string name="guide_guide" formatted="false">"Guide"</string>
+    <string name="guide_non_blocking_walkthroughs_that_use_commands_and_suggestion_chips" formatted="false">"Non-blocking walkthroughs that use commands and suggestion chips."</string>
+    <string name="guide_paths" formatted="false">"Paths:"</string>
+    <string name="guide_active" formatted="false">"Active: "</string>
+    <string name="guide_resume_with_guide_resume" formatted="false">"Resume with: guide -resume"</string>
+    <string name="guide_start_with_guide_start_basics" formatted="false">"Start with: guide -start basics"</string>
+    <string name="guide_guide_hidden_run_guide_start_basics_to_resume" formatted="false">"Guide hidden. Run guide -start basics to resume."</string>
+    <string name="guide_guide_reset" formatted="false">"Guide reset."</string>
+    <string name="guide_run" formatted="false">"Run: "</string>
+    <string name="guide_controls_guide_next_guide_back_guide_off" formatted="false">"Controls: guide -next, guide -back, guide -off"</string>
+    <string name="guide_start_another_path_with_guide_start_customize_or_guide_start_modules" formatted="false">"Start another path with guide -start customize or guide -start modules."</string>
+    <string name="guide_unknown_path">"Unknown guide path: %1$s"</string>
+    <string name="guide_resumed">"Resumed guide: %1$s"</string>
+    <string name="guide_started">"Started guide: %1$s"</string>
+    <string name="guide_complete">"Guide complete: %1$s"</string>
+    <string name="guide_active_progress">"Active: %1$s step %2$d/%3$d"</string>
+    <string name="guide_restart_path">"Restart with: guide -reset, then guide -start %1$s"</string>
+    <string name="guide_run_command">"Run: %1$s"</string>
+</resources>

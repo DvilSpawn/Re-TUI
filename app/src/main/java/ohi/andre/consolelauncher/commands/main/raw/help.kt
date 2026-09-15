@@ -19,7 +19,7 @@ class help : CommandAbstraction {
             return info.res.getString(R.string.output_commandnotfound)
         }
         val res = cmd?.helpRes() ?: R.string.output_commandnotfound
-        return "Priority: " + info.cmdPrefs.getPriority(cmd!!) + Tuils.NEWLINE + info.res.getString(res)
+        return pack.context.getString(R.string.command_help_priority_6d8fc, info.cmdPrefs.getPriority(cmd!!), Tuils.NEWLINE, info.res.getString(res))
     }
 
     override fun helpRes(): Int = R.string.help_help

@@ -32,7 +32,7 @@ class lua : CommandAbstraction {
             || "-ls".equals(input, ignoreCase = true)
             || "ls".equals(input, ignoreCase = true)
         ) {
-            return listApps()
+            return listApps(pack.context)
         }
 
         val args = Tuils.splitArgs(input)
@@ -46,21 +46,21 @@ class lua : CommandAbstraction {
         if ("edit" == option) {
             if (args.size < 2) return pack.context.getString(R.string.help_lua)
             val id = LuaWidgetManager.normalizeId(args.get(1))
-            if (TextUtils.isEmpty(id)) return "Invalid Lua app id."
+            if (TextUtils.isEmpty(id)) return pack.context.getString(R.string.command_lua_invalid_lua_app_id_7476c)
             if (!LuaWidgetManager.exists(id)) {
                 LuaWidgetManager.save(id, id, LuaWidgetManager.newAppTemplate(id))
             }
             openEditor(pack, id)
-            return "Opening Lua app editor: " + formatApp(id)
+            return pack.context.getString(R.string.command_lua_opening_lua_app_editor_d1612, formatApp(id))
         }
         if ("config" == option || "prefs" == option) {
             if (args.size < 2) return pack.context.getString(R.string.help_lua)
             val id = LuaWidgetManager.normalizeId(args.get(1))
-            val blocked = validateApp(id)
+            val blocked = validateApp(pack.context, id)
             if (blocked != null) return blocked
-            if (!LuaWidgetManager.hasConfig(id)) return "No config surface: " + formatApp(id)
+            if (!LuaWidgetManager.hasConfig(id)) return pack.context.getString(R.string.command_lua_no_config_surface_92c6f, formatApp(id))
             openConfig(pack, id)
-            return "Opening Lua app config: " + formatApp(id)
+            return pack.context.getString(R.string.command_lua_opening_lua_app_config_301f2, formatApp(id))
         }
         if ("check" == option) {
             if (args.size < 2) return pack.context.getString(R.string.help_lua)
@@ -68,30 +68,29 @@ class lua : CommandAbstraction {
         }
         if ("info" == option || "app-info" == option) {
             if (args.size < 2) return pack.context.getString(R.string.help_lua)
-            return appInfo(LuaWidgetManager.normalizeId(args.get(1)))
+            return appInfo(pack.context, LuaWidgetManager.normalizeId(args.get(1)))
         }
         if ("approve" == option || "trust" == option) {
             if (args.size < 2) return pack.context.getString(R.string.help_lua)
             val id = LuaWidgetManager.normalizeId(args.get(1))
-            if (!LuaWidgetManager.exists(id)) return "Unknown Lua app: " + id
+            if (!LuaWidgetManager.exists(id)) return pack.context.getString(R.string.command_lua_unknown_lua_app_e937e, id)
             LuaWidgetManager.approve(id)
-            return ("Lua app approved: " + formatApp(id)
-                    + "\nPermissions: " + LuaWidgetManager.describeRequiredPermissions(LuaWidgetManager.readScript(id)))
+            return (pack.context.getString(R.string.command_lua_lua_app_approved_permissions_446e4, formatApp(id), LuaWidgetManager.describeRequiredPermissions(LuaWidgetManager.readScript(id))))
         }
         if ("disable" == option || "enable" == option) {
             if (args.size < 2) return pack.context.getString(R.string.help_lua)
             val id = LuaWidgetManager.normalizeId(args.get(1))
-            if (!LuaWidgetManager.exists(id)) return "Unknown Lua app: " + id
+            if (!LuaWidgetManager.exists(id)) return pack.context.getString(R.string.command_lua_unknown_lua_app_e937e, id)
             val enabled = "enable" == option
             LuaWidgetManager.setEnabled(id, enabled)
-            return "Lua app " + (if (enabled) "enabled: " else "disabled: ") + formatApp(id)
+            return pack.context.getString(R.string.command_lua_lua_app_76bea, (if (enabled) pack.context.getString(R.string.command_lua_enabled_2d378) else pack.context.getString(R.string.command_lua_disabled_de50b)), formatApp(id))
         }
         if ("export" == option) {
             if (args.size < 2) return pack.context.getString(R.string.help_lua)
             val id = LuaWidgetManager.normalizeId(args.get(1))
-            if (!LuaWidgetManager.exists(id)) return "Unknown Lua app: " + id
+            if (!LuaWidgetManager.exists(id)) return pack.context.getString(R.string.command_lua_unknown_lua_app_e937e, id)
             copyToClipboard(pack.context, LuaWidgetManager.exportPackage(id))
-            return "Lua app package copied to clipboard: " + formatApp(id)
+            return pack.context.getString(R.string.command_lua_lua_app_package_copied_to_clipboard_6c6dc, formatApp(id))
         }
         if ("rm" == option || "remove" == option) {
             if (args.size < 2) return pack.context.getString(R.string.help_lua)
@@ -99,7 +98,7 @@ class lua : CommandAbstraction {
             val label = formatApp(id)
             LuaWidgetManager.delete(id)
             ModuleManager.removeScriptModule(pack.context, id)
-            return "Lua app removed: " + label
+            return pack.context.getString(R.string.command_lua_lua_app_removed_f973e, label)
         }
         return pack.context.getString(R.string.output_invalid_param) + " " + args.get(0)
     }
@@ -111,19 +110,19 @@ class lua : CommandAbstraction {
         val requestedName = TextUtils.join(" ", args.subList(2, args.size)).trim { it <= ' ' }
         val id = LuaWidgetManager.idFromName(requestedName)
         if (TextUtils.isEmpty(id)) {
-            return "Invalid Lua app id."
+            return pack.context.getString(R.string.command_lua_invalid_lua_app_id_7476c)
         }
         if (!LuaWidgetManager.exists(id)) {
             LuaWidgetManager.save(id, requestedName, LuaWidgetManager.newAppTemplate(id))
         }
         openEditor(pack, id)
-        return "Lua app created: " + formatApp(id)
+        return pack.context.getString(R.string.command_lua_lua_app_created_64c8a, formatApp(id))
     }
 
     private fun openLuaApp(pack: ExecutePack, args: MutableList<String?>): String? {
         if (args.size < 2) return pack.context.getString(R.string.help_lua)
         val id = LuaWidgetManager.normalizeId(args.get(1))
-        val blocked = validateApp(id)
+        val blocked = validateApp(pack.context, id)
         if (blocked != null) return blocked
 
         val intent = Intent(UIManager.ACTION_LUA_APP)
@@ -137,7 +136,7 @@ class lua : CommandAbstraction {
     }
 
     private fun checkApp(pack: ExecutePack, id: String?): String {
-        val blocked = validateApp(id)
+        val blocked = validateApp(pack.context, id)
         if (blocked != null) return blocked
         val engine = LuaWidgetEngine(
             pack.context,
@@ -148,57 +147,38 @@ class lua : CommandAbstraction {
         )
         val result = engine.open()
         if (!TextUtils.isEmpty(result.error)) {
-            return ("Lua app check failed: " + formatApp(id)
-                    + (if (TextUtils.isEmpty(result.errorStage)) "" else "\nStage: " + result.errorStage)
-                    + "\n" + result.error
-                    + "\nUse lua -edit " + id + " to update it.")
+            return (pack.context.getString(R.string.command_lua_lua_app_check_failed_use_lua_edit_to_updat_4ae1d, formatApp(id), (if (TextUtils.isEmpty(result.errorStage)) "" else pack.context.getString(R.string.command_lua_stage_76cf8, result.errorStage)), result.error, id))
         }
-        return ("Lua app check OK: " + formatApp(id)
-                + "\nCapabilities: " + LuaWidgetManager.describeCapabilities(LuaWidgetManager.readScript(id))
-                + "\nPermissions: " + LuaWidgetManager.describeRequiredPermissions(LuaWidgetManager.readScript(id))
-                + "\nTrust: approved"
-                + "\nRuntime: API " + LuaWidgetManager.apiVersion(id)
-                + "\nTitle: " + (if (TextUtils.isEmpty(result.title)) LuaWidgetManager.getName(id) else result.title)
-                + "\nActions: " + (result.buttons.size + result.valueActions.size + result.commands.size))
+        return (pack.context.getString(R.string.command_lua_lua_app_check_ok_capabilities_permissions_1a3e2, formatApp(id), LuaWidgetManager.describeCapabilities(LuaWidgetManager.readScript(id)), LuaWidgetManager.describeRequiredPermissions(LuaWidgetManager.readScript(id)), LuaWidgetManager.apiVersion(id), (if (TextUtils.isEmpty(result.title)) LuaWidgetManager.getName(id) else result.title), (result.buttons.size + result.valueActions.size + result.commands.size)))
     }
 
-    private fun appInfo(id: String?): String {
-        if (!LuaWidgetManager.exists(id)) return "Unknown Lua app: " + id
+    private fun appInfo(context: Context, id: String?): String {
+        if (!LuaWidgetManager.exists(id)) return context.getString(R.string.lua_detail_lua_unknown_lua_app_e937e, id)
         val trust = LuaWidgetManager.trustStatus(id)
         val meta = LuaWidgetManager.metadata(LuaWidgetManager.readScript(id))
-        return ("Lua app: " + formatApp(id)
-                + "\nType: " + LuaWidgetManager.getScriptType(id)
-                + "\nCapabilities: " + LuaWidgetManager.describeCapabilities(LuaWidgetManager.readScript(id))
-                + "\nPermissions: " + LuaWidgetManager.describeRequiredPermissions(LuaWidgetManager.readScript(id))
-                + "\nTrust: " + (if (trust.trusted) "approved" else "needs approval")
-                + "\nRuntime: API " + LuaWidgetManager.apiVersion(id)
-                + "\nState: " + (if (LuaWidgetManager.isEnabled(id)) "enabled" else "disabled")
-                + "\nDescription: " + valueOr(meta.get("description"), "none")
-                + "\nAuthor: " + valueOr(meta.get("author"), "unknown")
-                + "\nVersion: " + valueOr(meta.get("version"), "none"))
+        return (context.getString(R.string.lua_detail_lua_lua_app_type_capabilities_permissions_trus_09614, formatApp(id), LuaWidgetManager.getScriptType(id), LuaWidgetManager.describeCapabilities(LuaWidgetManager.readScript(id)), LuaWidgetManager.describeRequiredPermissions(LuaWidgetManager.readScript(id)), (if (trust.trusted) context.getString(R.string.lua_detail_lua_approved_c9560) else context.getString(R.string.lua_detail_lua_needs_approval_e0c3e)), LuaWidgetManager.apiVersion(id), (if (LuaWidgetManager.isEnabled(id)) context.getString(R.string.lua_detail_lua_enabled_3ea3f) else context.getString(R.string.lua_detail_lua_disabled_07596)), valueOr(meta.get("description"), context.getString(R.string.lua_detail_lua_none_71f8e)), valueOr(meta.get("author"), context.getString(R.string.lua_detail_lua_unknown_50d8b)), valueOr(meta.get("version"), context.getString(R.string.lua_detail_lua_none_71f8e))))
     }
 
-    private fun listApps(): String {
+    private fun listApps(context: Context): String {
         val ids = ArrayList<String?>()
         for (id in LuaWidgetManager.listIds()) {
             if ("app" == LuaWidgetManager.getScriptType(id)) {
                 ids.add(id)
             }
         }
-        return ("Lua apps: " + (if (ids.isEmpty()) "none" else formatApps(ids))
-                + "\nUse lua -new app [name], lua -app [id], lua -edit [id], lua -check [id], lua -info [id], lua -approve [id], lua -config [id], lua -export [id], lua -disable|-enable [id].")
+        return (context.getString(R.string.lua_detail_lua_lua_apps_use_lua_new_app_name_lua_app_id_l_55ff9, (if (ids.isEmpty()) context.getString(R.string.lua_detail_lua_none_71f8e) else formatApps(ids))))
     }
 
-    private fun validateApp(id: String?): String? {
-        if (TextUtils.isEmpty(id)) return "Invalid Lua app id."
-        if (!LuaWidgetManager.exists(id)) return "Unknown Lua app: " + id
+    private fun validateApp(context: Context, id: String?): String? {
+        if (TextUtils.isEmpty(id)) return context.getString(R.string.lua_detail_lua_invalid_lua_app_id_7476c)
+        if (!LuaWidgetManager.exists(id)) return context.getString(R.string.lua_detail_lua_unknown_lua_app_e937e, id)
         if ("app" != LuaWidgetManager.getScriptType(id)) {
-            return "Script is not a Lua app: " + formatApp(id) + "\nUse lua -new app [name] for the app surface."
+            return context.getString(R.string.lua_detail_lua_script_is_not_a_lua_app_use_lua_new_app_na_1623c, formatApp(id))
         }
-        if (!LuaWidgetManager.isEnabled(id)) return "Lua app disabled: " + formatApp(id) + "\nUse lua -enable " + id + "."
+        if (!LuaWidgetManager.isEnabled(id)) return context.getString(R.string.lua_detail_lua_lua_app_disabled_use_lua_enable_8bf60, formatApp(id), id)
         val trust = LuaWidgetManager.trustStatus(id)
         if (!trust.trusted) {
-            return trustSummary("Lua app blocked", id, trust)
+            return trustSummary(context, context.getString(R.string.lua_detail_lua_lua_app_blocked_c1521), id, trust)
         }
         return null
     }
@@ -221,20 +201,20 @@ class lua : CommandAbstraction {
         return if (TextUtils.isEmpty(value)) fallback else value
     }
 
-    private fun trustSummary(prefix: String, id: String?, trust: TrustStatus): String {
+    private fun trustSummary(context: Context, prefix: String, id: String?, trust: TrustStatus): String {
         val out = StringBuilder(prefix).append(": ").append(formatApp(id))
-        out.append("\nPermissions: ")
-            .append(if (trust.requiredPermissions.isEmpty()) "none" else TextUtils.join(", ", trust.requiredPermissions))
+        out.append(context.getString(R.string.lua_detail_lua_permissions_f56cd))
+            .append(if (trust.requiredPermissions.isEmpty()) context.getString(R.string.lua_detail_lua_none_71f8e) else TextUtils.join(", ", trust.requiredPermissions))
         if (!trust.missingDeclarations.isEmpty()) {
-            out.append("\nDeclare first: ").append(TextUtils.join(", ", trust.missingDeclarations))
+            out.append(context.getString(R.string.lua_detail_lua_declare_first_9cbcd)).append(TextUtils.join(", ", trust.missingDeclarations))
         }
         if (!trust.unsupportedPermissions.isEmpty()) {
-            out.append("\nUnsupported: ").append(TextUtils.join(", ", trust.unsupportedPermissions))
+            out.append(context.getString(R.string.lua_detail_lua_unsupported_50a59)).append(TextUtils.join(", ", trust.unsupportedPermissions))
         }
         if (trust.canApprove()) {
-            out.append("\nUse lua -approve ").append(LuaWidgetManager.normalizeId(id)).append(" to allow this app.")
+            out.append(context.getString(R.string.lua_approve_app_instruction, LuaWidgetManager.normalizeId(id)))
         } else {
-            out.append("\nEdit the script metadata before approval.")
+            out.append(context.getString(R.string.lua_detail_lua_edit_the_script_metadata_before_approval_bb65e))
         }
         return out.toString()
     }
@@ -251,13 +231,13 @@ class lua : CommandAbstraction {
 
     private fun copyToClipboard(context: Context, text: String?) {
         val manager = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
-        manager?.setPrimaryClip(ClipData.newPlainText("Lua app", text))
+        manager?.setPrimaryClip(ClipData.newPlainText(context.getString(R.string.command_lua_lua_app_d0263), text))
     }
 
     private fun cleanOption(value: String?): String {
         return if (value == null) "" else value.trim { it <= ' ' }
             .removePrefix("-")
-            .lowercase(Locale.getDefault())
+            .lowercase(Locale.ROOT)
     }
 
     override fun argType(): IntArray = intArrayOf(CommandAbstraction.PLAIN_TEXT)
@@ -268,5 +248,5 @@ class lua : CommandAbstraction {
 
     override fun onArgNotFound(pack: ExecutePack, indexNotFound: Int): String = pack.context.getString(R.string.help_lua)
 
-    override fun onNotArgEnough(pack: ExecutePack, nArgs: Int): String = listApps()
+    override fun onNotArgEnough(pack: ExecutePack, nArgs: Int): String = listApps(pack.context)
 }

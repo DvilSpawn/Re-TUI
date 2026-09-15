@@ -39,7 +39,7 @@ android {
         applicationId = "com.dvil.tui_renewed"
         minSdk = 23
         targetSdk = 36
-        versionCode = 417
+        versionCode = 418
         versionName = "2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -52,6 +52,7 @@ android {
 
     buildTypes {
         debug {
+            pseudoLocalesEnabled = true
             if (hasReleaseSigning) {
                 signingConfig = signingConfigs.release
             }
@@ -183,7 +184,7 @@ def addCommonSourceInputErrors = { File sourceFile, List<String> errors ->
     }
 
     def extension = fileExtension(sourceFile)
-    if (blockedExtensions.contains(extension)) {
+    if (blockedExtensions.contains(extension) && relativePath != "src/main/assets/localization/english-template.zip") {
         errors.add("${relativePath} uses blocked extension ${extension}")
     }
 }
@@ -191,6 +192,7 @@ def addCommonSourceInputErrors = { File sourceFile, List<String> errors ->
 def isAllowedAsset = { File assetsDir, File sourceFile ->
     def relativeAssetPath = assetsDir.toPath().relativize(sourceFile.toPath()).toString().replace(File.separator, "/")
     return relativeAssetPath == "lucida_console.ttf"
+            || relativeAssetPath in ["localization/catalog.json", "localization/english-template.zip"]
             || (relativeAssetPath.startsWith("first_run_terminal_green/")
             && !relativeAssetPath.substring("first_run_terminal_green/".length()).contains("/")
             && relativeAssetPath.endsWith(".xml"))
@@ -308,6 +310,8 @@ dependencies {
     implementation 'com.google.zxing:core:3.5.4'
     implementation 'com.joaomgcd:taskerpluginlibrary:0.4.10'
 
+    androidTestImplementation 'androidx.test:runner:1.6.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.2.1'
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.json:json:20250517'
 }

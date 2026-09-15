@@ -9,7 +9,7 @@
         android:id="@+id/picker_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="COLOR PICKER"
+        android:text="@string/ui_color_picker_dialog_color_picker"
         android:textColor="#00FF00"
         android:textStyle="bold"
         android:fontFamily="monospace"
@@ -28,7 +28,7 @@
         android:id="@+id/alpha_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="OPACITY (ALPHA)"
+        android:text="@string/ui_color_picker_dialog_opacity_alpha"
         android:textColor="#888888"
         android:textSize="12sp"
         android:fontFamily="monospace" />
@@ -43,7 +43,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="HUE"
+        android:text="@string/ui_color_picker_dialog_hue"
         android:textColor="#888888"
         android:textSize="12sp"
         android:fontFamily="monospace" />
@@ -57,7 +57,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="SATURATION"
+        android:text="@string/ui_color_picker_dialog_saturation"
         android:textColor="#888888"
         android:textSize="12sp"
         android:fontFamily="monospace" />
@@ -71,7 +71,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="BRIGHTNESS (VALUE)"
+        android:text="@string/ui_color_picker_dialog_brightness_value"
         android:textColor="#888888"
         android:textSize="12sp"
         android:fontFamily="monospace" />
@@ -98,7 +98,7 @@
         android:layout_marginTop="10dp"
         android:gravity="center"
         android:padding="10dp"
-        android:text="AUTO"
+        android:text="@string/ui_color_picker_dialog_auto"
         android:visibility="gone" />
 
 </LinearLayout>

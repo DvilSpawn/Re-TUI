@@ -43,7 +43,7 @@ import kotlin.math.min
 import java.util.ArrayList
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi
 
-class NotesEditorActivity : Activity() {
+class NotesEditorActivity : ohi.andre.consolelauncher.localization.LocalizedActivity() {
     private var notesContainer: LinearLayout? = null
     private var originalSnapshot = ""
 
@@ -85,7 +85,7 @@ class NotesEditorActivity : Activity() {
         panelShell.addView(root, rootParams)
 
         val header = TextView(this)
-        header.setText("Notes")
+        header.setText(getString(R.string.editor_noteseditoractivity_notes_70440))
         styleHeader(this, header)
         val headerParams = FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -122,7 +122,7 @@ class NotesEditorActivity : Activity() {
             }
         }
 
-        val add = button("ADD NOTE", false)
+        val add = button(getString(R.string.editor_noteseditoractivity_add_note_c67b2), false)
         add.setOnClickListener(View.OnClickListener { v: View? -> addNoteRow(null, true) })
         notesContainer!!.addView(add, addButtonParams())
 
@@ -131,14 +131,14 @@ class NotesEditorActivity : Activity() {
         bottomBar.setGravity(Gravity.CENTER_VERTICAL)
         bottomBar.setPadding(0, dp(this, 10f), 0, 0)
 
-        val cancel = button("CANCEL", false)
+        val cancel = button(getString(R.string.editor_noteseditoractivity_cancel_1507c), false)
         cancel.setOnClickListener(View.OnClickListener { v: View? -> attemptClose() })
         bottomBar.addView(cancel)
 
         val spacer = View(this)
         bottomBar.addView(spacer, LinearLayout.LayoutParams(0, 1, 1f))
 
-        val save = button("SAVE", true)
+        val save = button(getString(R.string.editor_noteseditoractivity_save_50815), true)
         save.setOnClickListener(View.OnClickListener { v: View? -> saveAndClose() })
         bottomBar.addView(save)
         root.addView(bottomBar)
@@ -176,7 +176,7 @@ class NotesEditorActivity : Activity() {
         val editor = EditText(this)
         editor.setGravity(Gravity.TOP or Gravity.START)
         editor.setMinLines(2)
-        editor.setHint("Note")
+        editor.setHint(getString(R.string.editor_noteseditoractivity_note_2c924))
         editor.setText(if (record == null) "" else record.text)
         styleInput(this, editor)
         val editorParams = LinearLayout.LayoutParams(
@@ -189,7 +189,7 @@ class NotesEditorActivity : Activity() {
 
         val lock = iconButton(
             if (holder.locked) R.drawable.ic_tuixt_lock_24 else R.drawable.ic_tuixt_lock_open_24,
-            "Toggle lock"
+            getString(R.string.editor_noteseditoractivity_toggle_lock_d15b2)
         )
         lock.setOnClickListener(View.OnClickListener { v: View? ->
             holder.locked = !holder.locked
@@ -198,7 +198,7 @@ class NotesEditorActivity : Activity() {
         row.addView(lock, iconParams())
         holder.lockButton = lock
 
-        val delete = iconButton(R.drawable.ic_tuixt_delete_24, "Delete note")
+        val delete = iconButton(R.drawable.ic_tuixt_delete_24, getString(R.string.editor_noteseditoractivity_delete_note_a8ed4))
         delete.setOnClickListener(View.OnClickListener { v: View? -> deleteRow(holder) })
         row.addView(delete, iconParams())
         holder.deleteButton = delete
@@ -217,7 +217,7 @@ class NotesEditorActivity : Activity() {
 
     private fun deleteRow(holder: NoteRow) {
         if (holder.locked) {
-            Toast.makeText(this, "Unlock note before deleting.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.editor_noteseditoractivity_unlock_note_before_deleting_43ce2), Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -233,7 +233,7 @@ class NotesEditorActivity : Activity() {
             if (holder.locked) accentColor() else textColor(),
             PorterDuff.Mode.SRC_IN
         )
-        holder.lockButton!!.setContentDescription(if (holder.locked) "Unlock note" else "Lock note")
+        holder.lockButton!!.setContentDescription(if (holder.locked) getString(R.string.editor_noteseditoractivity_unlock_note_1cdc4) else getString(R.string.editor_noteseditoractivity_lock_note_5deb3))
     }
 
     private fun iconButton(imageRes: Int, description: String?): ImageButton {
@@ -295,7 +295,7 @@ class NotesEditorActivity : Activity() {
             finish()
         } catch (e: Exception) {
             Tuils.log(e)
-            Toast.makeText(this, "Save failed: " + e.message, Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.editor_noteseditoractivity_save_failed_8f75d, e.message), Toast.LENGTH_LONG).show()
         }
     }
 
@@ -307,10 +307,10 @@ class NotesEditorActivity : Activity() {
 
         TuixtDialog.showConfirm(
             this,
-            "Discard Changes?",
-            "Unsaved notes will be lost.",
-            "Discard",
-            "Keep Editing",
+            getString(R.string.editor_noteseditoractivity_discard_changes_f99ee),
+            getString(R.string.editor_noteseditoractivity_unsaved_notes_will_be_lost_4b893),
+            getString(R.string.editor_noteseditoractivity_discard_36fff),
+            getString(R.string.editor_noteseditoractivity_keep_editing_ced7d),
             ConfirmAction { this.finish() })
     }
 

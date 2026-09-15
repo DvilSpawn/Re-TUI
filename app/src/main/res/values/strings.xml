@@ -1,8 +1,10 @@
 <resources>
+    <!-- Translator contract: keep command names, flags, filenames, URLs, and template tokens
+         unchanged in help text; translate the explanations. See docs/localization/README.md. -->
     <string name="retui_wallpaper_description">csakura live wallpaper for Re:T-UI</string>
 
     <!-- various text -->
-    <string name="app_name">Re:T-UI</string>
+    <string name="app_name" translatable="false">Re:T-UI</string>
     <string name="output_about">Francesco Andreuzzi (Italy)\n\t-> Programmer
         \n\nThanks to Luke Winward for his original idea</string>
     <string name="output_refresh">Refresh: apps, alias, music, contacts, rss feeds</string>
@@ -437,17 +439,18 @@
         \n-select [song] -> play the selected song
         \n-info -> get info about the current song
         \n-seekto [seconds] -> seek to the selected part of the current song</string>
-    <string name="help_notes">Open or update notes.
+    <string name="help_notes">Open or update note files.
         \n\nUsage:
         \n$ notes
         \n$ notes -add TODO: follow up
         \n$ notes -ls
+        \n$ notes -open [index or text prefix]
         \n$ notes -rm [index or text prefix]
         \n$ notes -lock [index or text prefix] [true|false]
         \n$ notes -cp [index or text prefix]
         \n$ notes -clear
         \n$ notes -file
-        \n\nThe notes module treats TODO: notes as lightweight tasks without adding a separate task store.</string>
+        \n\nEach entry opens a full note file. Notes opens in its own task in Recents. Locked notes are protected from deletion.</string>
     <string name="help_rate">Leave a feedback on the Play Store page</string>
     <string name="help_refresh">Refresh apps, alias, music, contacts</string>
     <string name="help_regex">-add [ID] [regex] -> add a new regex with the given ID
@@ -506,7 +509,7 @@
         \n\nExample:
         \n$ post https://httpbin.org/post "hello world"
     </string>
-    <string name="help_webhook">Manage and trigger webhooks.
+    <string name="help_webhook" formatted="false">Manage and trigger webhooks.
         \n\nUsage:
         \n$ webhook -add [name] [url] [body_template]
         \n$ webhook -rm [name]

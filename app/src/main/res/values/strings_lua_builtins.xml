@@ -1,0 +1,63 @@
+<resources>
+    <!-- Built-in Lua display text. Resource keys and all command arguments are stable. -->
+    <string name="lua_builtin_04e9462c0ff0" formatted="false">"Modules"</string>
+    <string name="lua_builtin_0aa811285aa0" formatted="false">"Stopwatch: idle"</string>
+    <string name="lua_builtin_0c483d574e48" formatted="false">"Write +1"</string>
+    <string name="lua_builtin_0eebb3417b5c">"Count: %1$s\nStep: %2$s\nModule: %3$s"</string>
+    <string name="lua_builtin_116ebc4830ab">"Network error: %1$s"</string>
+    <string name="lua_builtin_123a7f2fcc9a" formatted="false">"Platform"</string>
+    <string name="lua_builtin_158f91934e68" formatted="false">"Prefs Demo"</string>
+    <string name="lua_builtin_16b6ffdf1340">"-%1$s"</string>
+    <string name="lua_builtin_1b480158e1f3" formatted="false">"stop"</string>
+    <string name="lua_builtin_1df39aa58ad4" formatted="false">"Compact"</string>
+    <string name="lua_builtin_232f662d82ef" formatted="false">"Re:TUI Counter"</string>
+    <string name="lua_builtin_292b0901993f" formatted="false">"watch"</string>
+    <string name="lua_builtin_2a86ca29df01" formatted="false">"Pomodoro: finished"</string>
+    <string name="lua_builtin_2eedfba70ea0" formatted="false">"Hello from Lua"</string>
+    <string name="lua_builtin_30ee2b094f6a" formatted="false">"Re:TUI Progress"</string>
+    <string name="lua_builtin_3babbd03dec4" formatted="false">"Toast"</string>
+    <string name="lua_builtin_3d7f56ffea75" formatted="false">"Prefs"</string>
+    <string name="lua_builtin_44c57abd888a" formatted="false">"Reset"</string>
+    <string name="lua_builtin_44d6538e2c52" formatted="false">"Public IP"</string>
+    <string name="lua_builtin_48a3661d8464" formatted="false">"status"</string>
+    <string name="lua_builtin_4c7a8d14589c">"Request failed: %1$s"</string>
+    <string name="lua_builtin_539b31b6587e" formatted="false">"pomodoro"</string>
+    <string name="lua_builtin_549877f1bb31" formatted="false">"Write Log"</string>
+    <string name="lua_builtin_5586cf3db2af" formatted="false">"Ticker"</string>
+    <string name="lua_builtin_55b12130ff65">"Persistent count: %1$s"</string>
+    <string name="lua_builtin_56e3badc4e6c" formatted="false">"Refresh"</string>
+    <string name="lua_builtin_5e03c82554bb" formatted="false">"Edit behavior"</string>
+    <string name="lua_builtin_6a091eb355cc" formatted="false">"Standard mode"</string>
+    <string name="lua_builtin_719ea396ad92" formatted="false">"Clear"</string>
+    <string name="lua_builtin_792c48c79564" formatted="false">"stop pomo"</string>
+    <string name="lua_builtin_7995059422d9" formatted="false">"reset watch"</string>
+    <string name="lua_builtin_8362faf545e2" formatted="false">"Pomodoro: idle"</string>
+    <string name="lua_builtin_8c1c89354410" translatable="false" formatted="false">"25m"</string>
+    <string name="lua_builtin_95992c12d846" formatted="false">"Config list"</string>
+    <string name="lua_builtin_9869e506c38f" formatted="false">"Expand"</string>
+    <string name="lua_builtin_9c13915092a7" formatted="false">"Vibrate"</string>
+    <string name="lua_builtin_9c3d5197daac">"%1$s: idle"</string>
+    <string name="lua_builtin_9d9cec22f36f" formatted="false">"Timer"</string>
+    <string name="lua_builtin_9e253470c876" formatted="false">"Stop"</string>
+    <string name="lua_builtin_ac4735e1d1d9" formatted="false">"Open notifications"</string>
+    <string name="lua_builtin_af74f7c5362a" formatted="false">"Copy"</string>
+    <string name="lua_builtin_b04ba49f8486" formatted="false">"Loading..."</string>
+    <string name="lua_builtin_b061094464b9">"%1$s: %2$s %3$s%% %4$s"</string>
+    <string name="lua_builtin_b52af31ecd75">"Progress: %1$s%%\nBattery: %2$s%%"</string>
+    <string name="lua_builtin_bcc61965f271">"Stored in Lua module local files/count.txt\nValue: %1$s"</string>
+    <string name="lua_builtin_bd604d99e75e" formatted="false">"Debug"</string>
+    <string name="lua_builtin_c44623f31dda" formatted="false">"Copy ID"</string>
+    <string name="lua_builtin_c5c27a7c4ac7" translatable="false" formatted="false">"+5m"</string>
+    <string name="lua_builtin_c6f9a6dcc58b">"Task: %1$s"</string>
+    <string name="lua_builtin_c7f73bb54d92" formatted="false">"Settings"</string>
+    <string name="lua_builtin_df5493c10c23" formatted="false">"Module progress"</string>
+    <string name="lua_builtin_e9e0d8e560ea" formatted="false">"Expandable"</string>
+    <string name="lua_builtin_edf830938e9f" translatable="false" formatted="false">"+15m"</string>
+    <string name="lua_builtin_eee5eb604781" formatted="false">"Re:TUI Clock"</string>
+    <string name="lua_builtin_ef56d82ad7ac" formatted="false">"Files Demo"</string>
+    <string name="lua_builtin_f168b719cf9f">"+%1$s"</string>
+    <string name="lua_builtin_f624afb9f371">"Stopwatch: %1$s"</string>
+    <string name="lua_builtin_f6fdbe48dc54" formatted="false">"Delete"</string>
+    <string name="lua_builtin_pomodoro_break">Pomodoro break</string>
+    <string name="lua_builtin_pomodoro_focus">Pomodoro focus</string>
+</resources>

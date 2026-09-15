@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher.managers.tasker
 
+import ohi.andre.consolelauncher.R
 import android.content.Context
 import android.content.BroadcastReceiver
 import android.content.Intent
@@ -89,7 +90,7 @@ object TaskerIntegrationManager {
         ContextCompat.checkSelfPermission(context, TASKER_PERMISSION_RUN_TASKS) == PackageManager.PERMISSION_GRANTED
 
     fun execute(context: Context, request: Request, requireEnabled: Boolean = true): Result {
-        if (requireEnabled && !isEnabled(context)) return Result(false, "Tasker integration is disabled in RETUI.")
+        if (requireEnabled && !isEnabled(context)) return Result(false, context.getString(R.string.manager_taskerintegrationmanager_tasker_integration_is_disabled_in_retui_9165f))
         return try {
             when (request.action?.trim()?.lowercase()) {
                 ACTION_APPLY_PRESET -> applyPreset(context, request.preset)
@@ -99,38 +100,38 @@ object TaskerIntegrationManager {
                 ACTION_UPDATE_MODULE_TEXT -> updateModuleText(context, request.module, request.text)
                 ACTION_TERMINAL_OUTPUT -> terminalOutput(context, request.text)
                 ACTION_SWITCH_SPACE -> switchSpace(context, request.space)
-                else -> Result(false, "Unsupported RETUI action.")
+                else -> Result(false, context.getString(R.string.manager_taskerintegrationmanager_unsupported_retui_action_0dc00))
             }
         } catch (e: IllegalArgumentException) {
-            Result(false, e.message ?: "Invalid RETUI action input.")
+            Result(false, e.message ?: context.getString(R.string.manager_taskerintegrationmanager_invalid_retui_action_input_ea9f8))
         } catch (e: Exception) {
-            Result(false, e.message ?: "RETUI action failed.")
+            Result(false, e.message ?: context.getString(R.string.manager_taskerintegrationmanager_retui_action_failed_aa579))
         }
     }
 
     fun runTaskerTask(context: Context, taskName: String?): Result {
         val name = taskName?.trim().orEmpty()
-        if (name.isEmpty()) return Result(false, "Task name is required.")
-        if (!isTaskerInstalled(context)) return Result(false, "Tasker is not installed.")
+        if (name.isEmpty()) return Result(false, context.getString(R.string.manager_taskerintegrationmanager_task_name_is_required_e0ad1))
+        if (!isTaskerInstalled(context)) return Result(false, context.getString(R.string.manager_taskerintegrationmanager_tasker_is_not_installed_b71d9))
         if (!hasRunTasksPermission(context)) {
-            return Result(false, "Tasker run-task permission is not granted. Enable Tasker Integration in RETUI settings.")
+            return Result(false, context.getString(R.string.manager_taskerintegrationmanager_tasker_run_task_permission_is_not_granted_8de4a))
         }
         when (taskerAvailability(context)) {
-            TaskerAvailability.DISABLED -> return Result(false, "Tasker is disabled. Enable Tasker before running a task.")
+            TaskerAvailability.DISABLED -> return Result(false, context.getString(R.string.manager_taskerintegrationmanager_tasker_is_disabled_enable_tasker_before_ru_f106b))
             TaskerAvailability.EXTERNAL_ACCESS_BLOCKED -> return Result(
                 false,
-                "Tasker blocked external access. In Tasker, enable Settings > Misc > Allow External Access."
+                context.getString(R.string.manager_taskerintegrationmanager_tasker_blocked_external_access_in_tasker_e_19b98)
             )
-            TaskerAvailability.NO_RECEIVER -> return Result(false, "Tasker is not accepting external task requests.")
+            TaskerAvailability.NO_RECEIVER -> return Result(false, context.getString(R.string.manager_taskerintegrationmanager_tasker_is_not_accepting_external_task_requ_9de1e))
             TaskerAvailability.AVAILABLE -> Unit
         }
         val knownTasks = taskerTaskNames(context)
         if (knownTasks.isNotEmpty() && name !in knownTasks) {
             val caseMatch = knownTasks.firstOrNull { it.equals(name, ignoreCase = true) }
             return if (caseMatch != null) {
-                Result(false, "Task names are case-sensitive. Use: tasker \"$caseMatch\"")
+                Result(false, context.getString(R.string.manager_taskerintegrationmanager_task_names_are_case_sensitive_use_tasker_6ee7c, caseMatch))
             } else {
-                Result(false, "Tasker task not found: $name")
+                Result(false, context.getString(R.string.manager_taskerintegrationmanager_tasker_task_not_found_4a907, name))
             }
         }
         return try {
@@ -142,11 +143,11 @@ object TaskerIntegrationManager {
             val showStatuses = showTaskStatuses(context)
             if (showStatuses) listenForTaskCompletion(context.applicationContext, name)
             context.sendBroadcast(request)
-            Result(true, if (showStatuses) "Tasker task started: $name" else "")
+            Result(true, if (showStatuses) context.getString(R.string.manager_taskerintegrationmanager_tasker_task_started_b0141, name) else "")
         } catch (e: SecurityException) {
-            Result(false, "Tasker blocked the request: " + (e.message ?: "security error"))
+            Result(false, context.getString(R.string.manager_taskerintegrationmanager_tasker_blocked_the_request_3121f, (e.message ?: context.getString(R.string.manager_taskerintegrationmanager_security_error_78f9d))))
         } catch (e: Exception) {
-            Result(false, "Unable to run Tasker task: " + (e.message ?: "unknown error"))
+            Result(false, context.getString(R.string.manager_taskerintegrationmanager_unable_to_run_tasker_task_c3576, (e.message ?: context.getString(R.string.manager_taskerintegrationmanager_unknown_error_af632))))
         }
     }
 
@@ -176,7 +177,7 @@ object TaskerIntegrationManager {
                 val succeeded = intent.getBooleanExtra(TASKER_EXTRA_SUCCESS, false)
                 Tuils.sendOutput(
                     receiveContext,
-                    if (succeeded) "Tasker task completed: $taskName" else "Tasker task failed: $taskName"
+                    if (succeeded) receiveContext.getString(R.string.manager_taskerintegrationmanager_tasker_task_completed_75698, taskName) else receiveContext.getString(R.string.manager_taskerintegrationmanager_tasker_task_failed_82c6c, taskName)
                 )
             }
         }
@@ -210,60 +211,60 @@ object TaskerIntegrationManager {
     }
 
     private fun applyPreset(context: Context, preset: String?): Result {
-        val name = required(preset, "Preset name is required.")
+        val name = required(preset, context.getString(R.string.manager_taskerintegrationmanager_preset_name_is_required_4417a))
         PresetManager.apply(name)
         refreshLauncher()
-        return Result(true, "Preset applied: $name")
+        return Result(true, context.getString(R.string.manager_taskerintegrationmanager_preset_applied_71a47, name))
     }
 
     private fun setTheme(context: Context, elementName: String?, value: String?): Result {
-        val requested = required(elementName, "Theme element is required.")
-        val color = required(value, "Theme color is required.")
-        try { Color.parseColor(color) } catch (_: Exception) { return Result(false, "Invalid color. Use #RRGGBB or #AARRGGBB.") }
+        val requested = required(elementName, context.getString(R.string.manager_taskerintegrationmanager_theme_element_is_required_fbb27))
+        val color = required(value, context.getString(R.string.manager_taskerintegrationmanager_theme_color_is_required_6ee28))
+        try { Color.parseColor(color) } catch (_: Exception) { return Result(false, context.getString(R.string.manager_taskerintegrationmanager_invalid_color_use_rrggbb_or_aarrggbb_0ef3a)) }
         val element = Theme.entries.firstOrNull { it.label().equals(requested, true) }
-            ?: return Result(false, "Unknown theme element: $requested")
+            ?: return Result(false, context.getString(R.string.manager_taskerintegrationmanager_unknown_theme_element_cdc2e, requested))
         LauncherSettings.set(context, element, color)
         refreshLauncher()
-        return Result(true, "Theme updated: ${element.label()}")
+        return Result(true, context.getString(R.string.manager_taskerintegrationmanager_theme_updated_582ad, element.label()))
     }
 
     private fun showModule(context: Context, module: String?): Result {
-        val id = validModule(context, module) ?: return Result(false, "Unknown module: ${module?.trim().orEmpty()}")
+        val id = validModule(context, module) ?: return Result(false, context.getString(R.string.manager_taskerintegrationmanager_unknown_module_8f2c8, module?.trim().orEmpty()))
         ModuleManager.setActiveModule(context, id)
         sendModule(context, "show", id)
-        return Result(true, "Module opened: $id")
+        return Result(true, context.getString(R.string.manager_taskerintegrationmanager_module_opened_a33ed, id))
     }
 
     private fun refreshModule(context: Context, module: String?): Result {
-        val id = validModule(context, module) ?: return Result(false, "Unknown module: ${module?.trim().orEmpty()}")
-        if (ModuleManager.getModuleSource(context, id).isEmpty()) return Result(false, "Module has no source: $id")
+        val id = validModule(context, module) ?: return Result(false, context.getString(R.string.manager_taskerintegrationmanager_unknown_module_8f2c8, module?.trim().orEmpty()))
+        if (ModuleManager.getModuleSource(context, id).isEmpty()) return Result(false, context.getString(R.string.manager_taskerintegrationmanager_module_has_no_source_6c6aa, id))
         sendModule(context, "refresh", id)
-        return Result(true, "Module refresh dispatched: $id")
+        return Result(true, context.getString(R.string.manager_taskerintegrationmanager_module_refresh_dispatched_393eb, id))
     }
 
     private fun updateModuleText(context: Context, module: String?, text: String?): Result {
-        val id = ModuleManager.normalize(required(module, "Module name is required."))
-        if (id.isEmpty()) return Result(false, "Invalid module name.")
+        val id = ModuleManager.normalize(required(module, context.getString(R.string.manager_taskerintegrationmanager_module_name_is_required_3f25a)))
+        if (id.isEmpty()) return Result(false, context.getString(R.string.manager_taskerintegrationmanager_invalid_module_name_a370a))
         if (!ModuleManager.isKnown(context, id) || ModuleManager.getModuleSource(context, id).isEmpty()) {
-            return Result(false, "Module is not an existing script module: $id")
+            return Result(false, context.getString(R.string.manager_taskerintegrationmanager_module_is_not_an_existing_script_module_2b62a, id))
         }
         ModuleManager.setScriptText(context, id, text.orEmpty())
         sendModule(context, "update", id)
-        return Result(true, "Module text updated: $id")
+        return Result(true, context.getString(R.string.manager_taskerintegrationmanager_module_text_updated_1eb70, id))
     }
 
     private fun terminalOutput(context: Context, text: String?): Result {
-        val output = required(text, "Terminal text is required.")
+        val output = required(text, context.getString(R.string.manager_taskerintegrationmanager_terminal_text_is_required_4bba0))
         Tuils.sendOutput(context.applicationContext, output)
-        return Result(true, "Terminal output sent.")
+        return Result(true, context.getString(R.string.manager_taskerintegrationmanager_terminal_output_sent_721d1))
     }
 
     private fun switchSpace(context: Context, space: String?): Result {
         Tuils.init(context.applicationContext)
-        val target = SpaceManager.switchTo(context, required(space, "Space name is required."))
+        val target = SpaceManager.switchTo(context, required(space, context.getString(R.string.manager_taskerintegrationmanager_space_name_is_required_e3d46)))
         NotificationService.requestReload(context)
         refreshLauncher()
-        return Result(true, "Switched to Space: ${target.name}")
+        return Result(true, context.getString(R.string.manager_taskerintegrationmanager_switched_to_space_c4781, target.name))
     }
 
     private fun validModule(context: Context, raw: String?): String? {

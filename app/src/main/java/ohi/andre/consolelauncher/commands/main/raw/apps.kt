@@ -104,7 +104,7 @@ class apps : ParamCommand() {
                         i.componentName!!.packageName,
                         PackageManager.GET_PERMISSIONS or PackageManager.GET_ACTIVITIES or PackageManager.GET_SERVICES or PackageManager.GET_RECEIVERS
                     )
-                    return AppsManager.AppUtils.format(i, info)
+                    return AppsManager.AppUtils.format(pack.context, i, info)
                 } catch (e: PackageManager.NameNotFoundException) {
                     return e.toString()
                 }
@@ -334,7 +334,7 @@ class apps : ParamCommand() {
         companion object {
             fun get(p: String): Param? {
                 var p = p
-                p = p.lowercase(Locale.getDefault())
+                p = p.lowercase(Locale.ROOT)
                 if ("-gpcolor" == p) {
                     return Param.gp_bg_color
                 }

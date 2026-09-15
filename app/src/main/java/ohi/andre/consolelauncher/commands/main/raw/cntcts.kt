@@ -107,10 +107,10 @@ open class cntcts : ParamCommand() {
                         Tuils.NEWLINE + "\t\t"
                     )
                 ).append(Tuils.NEWLINE)
-                builder.append("ID: ").append(values[ContactManager.CONTACT_ID])
+                builder.append(pack.context.getString(R.string.command_cntcts_id_f63a6)).append(values[ContactManager.CONTACT_ID])
                     .append(Tuils.NEWLINE)
-                builder.append("Contacted ").append(values[ContactManager.TIME_CONTACTED])
-                    .append(" time(s)").append(Tuils.NEWLINE)
+                val contacted = values[ContactManager.TIME_CONTACTED]?.toIntOrNull() ?: 0
+                builder.append(pack.context.resources.getQuantityString(R.plurals.contact_times, contacted, contacted)).append(Tuils.NEWLINE)
 
                 return builder.toString()
             }
@@ -139,7 +139,7 @@ open class cntcts : ParamCommand() {
         companion object {
             fun get(p: String): Param? {
                 var p = p
-                p = p.lowercase(Locale.getDefault())
+                p = p.lowercase(Locale.ROOT)
                 val ps = entries.toTypedArray()
                 for (p1 in ps) if (p.endsWith(p1.label()!!)) return p1
                 return null

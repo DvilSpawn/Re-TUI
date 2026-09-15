@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher.managers.file
 
+import ohi.andre.consolelauncher.R
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -80,11 +81,11 @@ object RetuiFilesContract {
             context.startActivity(intent)
             null
         } catch (_: ActivityNotFoundException) {
-            "Re:T-UI Files is not installed."
+            context.getString(R.string.integration_retuifilescontract_re_t_ui_files_is_not_installed_fb10e)
         } catch (_: SecurityException) {
-            "Re:T-UI Files could not be opened."
+            context.getString(R.string.integration_retuifilescontract_re_t_ui_files_could_not_be_opened_6c7b3)
         } catch (_: RuntimeException) {
-            "Re:T-UI Files could not be opened."
+            context.getString(R.string.integration_retuifilescontract_re_t_ui_files_could_not_be_opened_6c7b3)
         }
     }
 

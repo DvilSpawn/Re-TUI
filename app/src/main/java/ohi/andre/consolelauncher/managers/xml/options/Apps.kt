@@ -1,28 +1,29 @@
 package ohi.andre.consolelauncher.managers.xml.options
 
+import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.managers.AppsManager
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsElement
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave
 
 enum class Apps(
     private val defaultValue: String,
-    private val info: String,
+    private val info: Int,
     private val type: String = XMLPrefsSave.APP
 ) : XMLPrefsSave {
-    default_app_n1("most_used", "The first default-suggested app"),
-    default_app_n2("most_used", "The second default-suggested app"),
-    default_app_n3("null", "The third default-suggested app"),
-    default_app_n4("null", "The fourth default-suggested app"),
-    default_app_n5("null", "The fifth default-suggested app"),
+    default_app_n1("most_used", R.string.setting_apps_default_app_n1_description),
+    default_app_n2("most_used", R.string.setting_apps_default_app_n2_description),
+    default_app_n3("null", R.string.setting_apps_default_app_n3_description),
+    default_app_n4("null", R.string.setting_apps_default_app_n4_description),
+    default_app_n5("null", R.string.setting_apps_default_app_n5_description),
     app_groups_sorting(
         "2",
-        "0 = time up->down; 1 = time down->up; 2 = alphabetical up->down; 3 = alphabetical down->up; 4 = most used up->down; 5 = most used down->up",
+        R.string.setting_apps_app_groups_sorting_description,
         XMLPrefsSave.INTEGER
     );
 
     override fun defaultValue(): String = defaultValue
 
-    override fun info(): String = info
+    override fun infoRes(): Int = info
 
     override fun type(): String = type
 

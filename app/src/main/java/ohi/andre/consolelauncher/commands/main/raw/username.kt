@@ -22,7 +22,7 @@ class username : CommandAbstraction {
         } catch (e: Exception) {
         }
 
-        return "Username and Device updated!"
+        return pack.context.getString(R.string.command_username_username_and_device_updated_b68d9)
     }
 
     override fun argType(): IntArray = intArrayOf(CommandAbstraction.NO_SPACE_STRING, CommandAbstraction.NO_SPACE_STRING)

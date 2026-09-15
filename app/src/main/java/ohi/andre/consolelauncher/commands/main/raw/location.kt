@@ -14,7 +14,7 @@ class location : CommandAbstraction {
 
         val location = TuiLocationManager.instance(context) ?: return null
         if (location.locationAvailable) {
-            return "Lat: " + location.latitude + "; Long: " + location.longitude
+            return pack.context.getString(R.string.command_location_lat_long_930e8, location.latitude, location.longitude)
         } else {
             location.add(ACTION_LOCATION_CMD_GOT)
         }

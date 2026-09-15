@@ -1,21 +1,22 @@
 package ohi.andre.consolelauncher.managers.xml.options
 
+import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.managers.notifications.reply.ReplyManager
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsElement
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave
 
 enum class Reply(
     private val defaultValue: String,
-    private val info: String,
+    private val info: Int,
     private val type: String = XMLPrefsSave.BOOLEAN
 ) : XMLPrefsSave {
-    reply_enabled("true", "If false, notification reply will be disabled");
+    reply_enabled("true", R.string.setting_reply_reply_enabled_description);
 
     override fun defaultValue(): String = defaultValue
 
     override fun type(): String = type
 
-    override fun info(): String = info
+    override fun infoRes(): Int = info
 
     override fun parent(): XMLPrefsElement? = ReplyManager.getInstance()
 

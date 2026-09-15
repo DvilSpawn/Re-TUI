@@ -85,8 +85,8 @@ object TerminalTrayToggleView {
         if (landscapeLayoutActive && !outputAutoHideEnabled && (outputTrayNativeMode || outputTrayAutoMode)) {
             toggle.foreground = null
             toggle.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null, null, null)
-            if (!TextUtils.equals(toggle.text, "OUTPUT")) {
-                toggle.text = "OUTPUT"
+            if (!TextUtils.equals(toggle.text, context.getString(R.string.integration_terminaltraytoggleview_output_feb35))) {
+                toggle.text = context.getString(R.string.integration_terminaltraytoggleview_output_feb35)
             }
             return
         }
@@ -103,10 +103,10 @@ object TerminalTrayToggleView {
         toggle.foreground = null
         toggle.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null, null, null)
         val text = when {
-            outputAutoHideEnabled -> if (terminalTrayExpanded) "OUTPUT v" else "OUTPUT ^"
-            outputTrayNativeMode -> "OUTPUT"
-            outputTrayAutoMode -> if (terminalTrayExpanded) "OUTPUT AUTO v" else "OUTPUT AUTO ^"
-            else -> if (terminalTrayExpanded) "OUTPUT v" else "OUTPUT ^"
+            outputAutoHideEnabled -> if (terminalTrayExpanded) context.getString(R.string.integration_terminaltraytoggleview_output_v_93c86) else context.getString(R.string.integration_terminaltraytoggleview_output_9dd6b)
+            outputTrayNativeMode -> context.getString(R.string.integration_terminaltraytoggleview_output_feb35)
+            outputTrayAutoMode -> if (terminalTrayExpanded) context.getString(R.string.integration_terminaltraytoggleview_output_auto_v_69560) else context.getString(R.string.integration_terminaltraytoggleview_output_auto_b2829)
+            else -> if (terminalTrayExpanded) context.getString(R.string.integration_terminaltraytoggleview_output_v_93c86) else context.getString(R.string.integration_terminaltraytoggleview_output_9dd6b)
         }
         if (!TextUtils.equals(toggle.text, text)) {
             toggle.text = text

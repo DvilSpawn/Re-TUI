@@ -92,7 +92,7 @@ class reply : ParamCommand() {
 
         companion object {
             fun get(p: String): Param? {
-                val value = p.lowercase(Locale.getDefault())
+                val value = p.lowercase(Locale.ROOT)
                 for (p1 in entries) {
                     if (value.endsWith(p1.label())) {
                         return p1

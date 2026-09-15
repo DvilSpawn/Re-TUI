@@ -1636,13 +1636,9 @@ object Tuils {
         sendOutput(
             Color.RED,
             context,
-            context.getString(R.string.output_xmlproblem1) + SPACE + PATH + context.getString(R.string.output_xmlproblem2) + NEWLINE + context.getString(
+            context.getString(R.string.integration_tuils_file_messagelinecolumn_c2233, context.getString(R.string.output_xmlproblem1) + SPACE + PATH + context.getString(R.string.output_xmlproblem2) + NEWLINE + context.getString(
                 R.string.output_errorlabel
-            ) +
-                    "File: " + e.getSystemId() + NEWLINE +
-                    "Message" + e.message + NEWLINE +
-                    "Line" + e.getLineNumber() + NEWLINE +
-                    "Column" + e.getColumnNumber()
+            ), e.getSystemId(), NEWLINE, e.message, NEWLINE, e.getLineNumber(), NEWLINE, e.getColumnNumber())
         )
     }
 

@@ -73,7 +73,7 @@ class CommandGroup(private val packageName: String) {
             }
         }
 
-        val fallback = buildCommand(normalized.lowercase(Locale.getDefault()))
+        val fallback = buildCommand(normalized.lowercase(Locale.ROOT))
         if (fallback != null && (fallback !is APICommand || fallback.willWorkOn(Build.VERSION.SDK_INT))) {
             return fallback
         }

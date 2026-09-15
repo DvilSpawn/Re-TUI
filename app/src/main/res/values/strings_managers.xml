@@ -1,0 +1,345 @@
+<resources>
+    <!-- Command responses. Translate prose; preserve examples and format arguments. -->
+    <!-- AndroidWidgetDrawerManager.kt: addEditControls -->
+    <string name="manager_androidwidgetdrawermanager_cancel_widget_edit_6d41a" formatted="false">"Cancel widget edit"</string>
+    <!-- AndroidWidgetDrawerManager.kt: showWidgetPicker -->
+    <string name="manager_androidwidgetdrawermanager_close_widget_picker_a0d0d" formatted="false">"Close widget picker"</string>
+    <!-- AndroidWidgetDrawerManager.kt: beginAddWidget -->
+    <string name="manager_androidwidgetdrawermanager_couldn_t_bind_widget_804bd" formatted="false">"Couldn\'t bind widget."</string>
+    <!-- AndroidWidgetDrawerManager.kt: configureWidget -->
+    <string name="manager_androidwidgetdrawermanager_couldn_t_configure_widget_1cc6c" formatted="false">"Couldn\'t configure widget."</string>
+    <!-- AndroidWidgetDrawerManager.kt: addEditControls -->
+    <string name="manager_androidwidgetdrawermanager_drag_to_resize_the_bottom_edge_ff1f7" formatted="false">"Drag to resize the bottom edge."</string>
+    <!-- AndroidWidgetDrawerManager.kt: addEditControls -->
+    <string name="manager_androidwidgetdrawermanager_drag_to_resize_the_left_edge_f1698" formatted="false">"Drag to resize the left edge."</string>
+    <!-- AndroidWidgetDrawerManager.kt: addEditControls -->
+    <string name="manager_androidwidgetdrawermanager_drag_to_resize_the_right_edge_9355b" formatted="false">"Drag to resize the right edge."</string>
+    <!-- AndroidWidgetDrawerManager.kt: addEditControls -->
+    <string name="manager_androidwidgetdrawermanager_drag_to_resize_the_top_edge_0998f" formatted="false">"Drag to resize the top edge."</string>
+    <!-- AndroidWidgetDrawerManager.kt: updateLabels -->
+    <string name="manager_androidwidgetdrawermanager_grid_x_ddf2d">"grid %1$d x %2$d"</string>
+    <!-- AndroidWidgetDrawerManager.kt: populateWidgetPickerAsync -->
+    <string name="manager_androidwidgetdrawermanager_loading_widgets_af1a9" formatted="false">"Loading widgets..."</string>
+    <!-- AndroidWidgetDrawerManager.kt: executeRemoveWidgetCommand -->
+    <string name="manager_androidwidgetdrawermanager_no_widget_for_w_id_0f5d6">"No widget for [W_ID:%1$s]."</string>
+    <!-- AndroidWidgetDrawerManager.kt: buildRemoveSuggestions -->
+    <string name="manager_androidwidgetdrawermanager_no_widgets_40266" formatted="false">"no widgets"</string>
+    <!-- AndroidWidgetDrawerManager.kt: populateWidgetPicker -->
+    <string name="manager_androidwidgetdrawermanager_no_widgets_found_8e343" formatted="false">"No widgets found."</string>
+    <!-- AndroidWidgetDrawerManager.kt: executeShowWidgetCommand -->
+    <string name="manager_androidwidgetdrawermanager_no_widgets_in_pane_ef590" formatted="false">"No widgets in pane."</string>
+    <!-- AndroidWidgetDrawerManager.kt: executeAddWidgetCommand -->
+    <string name="manager_androidwidgetdrawermanager_pick_a_widget_0598a" formatted="false">"Pick a widget."</string>
+    <!-- AndroidWidgetDrawerManager.kt: executeRemoveWidgetCommand -->
+    <string name="manager_androidwidgetdrawermanager_removed_80296">"%1$s removed"</string>
+    <!-- AndroidWidgetDrawerManager.kt: executeResizeWidgetCommand -->
+    <string name="manager_androidwidgetdrawermanager_resized_to_x_476c9">"%1$s resized to %2$d x %3$d"</string>
+    <!-- AndroidWidgetDrawerManager.kt: buildWidgetFailureView -->
+    <string name="manager_androidwidgetdrawermanager_tap_to_remove_19778" formatted="false">"TAP TO REMOVE"</string>
+    <!-- AndroidWidgetDrawerManager.kt: submitWidgetCommand -->
+    <string name="manager_androidwidgetdrawermanager_unknown_widget_command_155c9">"Unknown widget command: %1$s"</string>
+    <!-- AndroidWidgetDrawerManager.kt: executeRemoveWidgetCommand -->
+    <string name="manager_androidwidgetdrawermanager_usage_remove_w_id_13569" formatted="false">"Usage: remove &lt;W_ID&gt;"</string>
+    <!-- AndroidWidgetDrawerManager.kt: executeResizeWidgetCommand -->
+    <string name="manager_androidwidgetdrawermanager_usage_resize_w_id_height_width_9def5" formatted="false">"Usage: resize &lt;W_ID&gt; &lt;height&gt; &lt;width&gt;"</string>
+    <!-- AndroidWidgetDrawerManager.kt: buildWidgetFailureView -->
+    <string name="manager_androidwidgetdrawermanager_widget_failed_to_render_6bf8a" formatted="false">"WIDGET FAILED TO RENDER"</string>
+    <!-- AndroidWidgetDrawerManager.kt: buildWidgetFailureView -->
+    <string name="manager_androidwidgetdrawermanager_widget_failed_to_render_tap_to_remove_101fb">"%1$s widget failed to render. Tap to remove."</string>
+    <!-- AndroidWidgetDrawerManager.kt: showWidgetPicker -->
+    <string name="manager_androidwidgetdrawermanager_widget_picker_454a1" formatted="false">"Widget picker"</string>
+    <!-- AndroidWidgetDrawerManager.kt: updateLabels -->
+    <string name="manager_androidwidgetdrawermanager_widgets_9209f">"Widgets/ [%1$d]"</string>
+    <!-- AndroidWidgetDrawerManager.kt: widgetProviderRow -->
+    <string name="manager_androidwidgetdrawermanager_x_96067">"%1$d x %2$d"</string>
+    <!-- AndroidWidgetDrawerManager.kt: widgetCommandSummary -->
+    <string name="manager_androidwidgetdrawermanager_x_97baa">"%1$s %2$dx%3$d %4$s"</string>
+    <!-- AppDrawerPaneManager.kt: buildGroupTabs -->
+    <string name="manager_appdrawerpanemanager_all_6b428" formatted="false">"ALL"</string>
+    <!-- AppDrawerPaneManager.kt: rebuildContents -->
+    <string name="manager_appdrawerpanemanager_applications_a46d2">"Applications/ [%1$d] &lt;%2$s&gt;"</string>
+    <!-- AppDrawerPaneManager.kt: rebuildContents -->
+    <string name="manager_appdrawerpanemanager_groups_tabs_ef814">"groups %1$d | tabs %2$d"</string>
+    <!-- AppsManager.kt: format -->
+    <string name="manager_appsmanager_activities_3c20b" formatted="false">"Activities: "</string>
+    <!-- AppsManager.kt: format -->
+    <string name="manager_appsmanager_install_d406f" formatted="false">"Install: "</string>
+    <!-- AppsManager.kt: format -->
+    <string name="manager_appsmanager_launched_times_53ab9" formatted="false">"launched_times: "</string>
+    <!-- AppsManager.kt: format -->
+    <string name="manager_appsmanager_permissions_84fd6" formatted="false">"Permissions: "</string>
+    <!-- AppsManager.kt: format -->
+    <string name="manager_appsmanager_receivers_420ad" formatted="false">"Receivers: "</string>
+    <!-- AppsManager.kt: format -->
+    <string name="manager_appsmanager_services_dc973" formatted="false">"Services: "</string>
+    <!-- AppsManager.kt: format -->
+    <string name="manager_appsmanager_vrs_7256e" formatted="false">"vrs: "</string>
+    <!-- AppsManager.kt: displayLabel -->
+    <string name="manager_appsmanager_work_0b721" formatted="false">" (Work)"</string>
+    <!-- AppsManager.kt: displayLabel -->
+    <string name="manager_appsmanager_work_47b7d">"%1$s (Work)"</string>
+    <!-- BackupManager.kt: writeVerified -->
+    <string name="manager_backupmanager_backup_package_is_empty_or_too_large_ea31d" formatted="false">"Backup package is empty or too large"</string>
+    <!-- BackupManager.kt: writeVerified -->
+    <string name="manager_backupmanager_unable_to_open_backup_destination_b73a4" formatted="false">"Unable to open backup destination"</string>
+    <!-- BackupManager.kt: writeVerified -->
+    <string name="manager_backupmanager_unable_to_verify_backup_destination_dcbcd" formatted="false">"Unable to verify backup destination"</string>
+    <!-- ChangelogManager.kt: printLog -->
+    <string name="manager_changelogmanager_changelog_2b4a2">"Changelog %1$s"</string>
+    <!-- ChangelogManager.kt: printLog -->
+    <string name="manager_changelogmanager_click_here_to_see_the_full_changelog_897bf" formatted="false">"Click here to see the full changelog"</string>
+    <!-- ContactManager.kt: about -->
+    <string name="manager_contactmanager_d_h_min_sec_1f593">"d: %1$d, h: %2$d, min: %3$d, sec: %4$d"</string>
+    <!-- ContactManager.kt: about -->
+    <string name="manager_contactmanager_h_min_sec_924a2">"h: %1$d, min: %2$d, sec: %3$d"</string>
+    <!-- ContactManager.kt: about -->
+    <string name="manager_contactmanager_min_sec_cbb62">"min: %1$d, sec: %2$d"</string>
+    <!-- ContactManager.kt: about -->
+    <string name="manager_contactmanager_sec_8055d">"sec: %1$s"</string>
+    <!-- FrameManager.kt: installSproutLandsPack -->
+    <string name="manager_framemanager_bundled_frame_image_is_too_large_9e4fc" formatted="false">"Bundled frame image is too large."</string>
+    <!-- FrameManager.kt: sharedSource -->
+    <string name="manager_framemanager_frame_bundle_is_too_large_13aa8" formatted="false">"Frame bundle is too large."</string>
+    <!-- FrameManager.kt: installSproutLandsPack -->
+    <string name="manager_framemanager_invalid_bundled_frame_settings_c9224" formatted="false">"Invalid bundled frame settings."</string>
+    <!-- FrameManager.kt: copyStateTo -->
+    <string name="manager_framemanager_unable_to_create_space_frame_settings_3d6a8" formatted="false">"Unable to create Space frame settings."</string>
+    <!-- FrameManager.kt: ensureMigrated -->
+    <string name="manager_framemanager_unable_to_create_the_frame_folder_731d9" formatted="false">"Unable to create the frame folder."</string>
+    <!-- LockdownManager.kt: start -->
+    <string name="manager_lockdownmanager_invalid_duration_use_values_like_30s_5m_or_88438" formatted="false">"Invalid duration. Use values like 30s, 5m, or 1h."</string>
+    <!-- LockdownManager.kt: restoreState -->
+    <string name="manager_lockdownmanager_lockdown_complete_b66d9" formatted="false">"Lockdown complete."</string>
+    <!-- LockdownManager.kt:  -->
+    <string name="manager_lockdownmanager_lockdown_remaining_f0b10">"Lockdown remaining: %1$s.%2$s"</string>
+    <!-- LockdownManager.kt: start -->
+    <string name="manager_lockdownmanager_lockdown_started_176e9" formatted="false">"Lockdown started."</string>
+    <!-- LockdownManager.kt: start -->
+    <string name="manager_lockdownmanager_lockdown_started_for_49b41">"Lockdown started for %1$s."</string>
+    <!-- LockdownManager.kt: stop -->
+    <string name="manager_lockdownmanager_lockdown_terminated_47ad8" formatted="false">"Lockdown terminated."</string>
+    <!-- LockdownManager.kt:  -->
+    <string name="manager_lockdownmanager_no_lockdown_is_running_58118" formatted="false">"No lockdown is running."</string>
+    <!-- LockdownManager.kt:  -->
+    <string name="manager_lockdownmanager_reason_5c8d4">"\nReason: %1$s"</string>
+    <!-- MainManager.kt: onReceive -->
+    <string name="manager_mainmanager_lat_long_930e8">"Lat: %1$f; Long: %2$f"</string>
+    <!-- ModuleManager.kt: setScriptModule -->
+    <string name="manager_modulemanager_no_module_output_yet_run_module_refresh_9fbc2">"No module output yet. Run module -refresh %1$s"</string>
+    <!-- ModulePromptManager.kt: handleEdit -->
+    <string name="manager_modulepromptmanager_current_reminder_new_text_press_enter_to_k_8488b">"Current reminder: %1$s\nNew text? Press enter to keep."</string>
+    <!-- ModulePromptManager.kt: saveEditedReminder -->
+    <string name="manager_modulepromptmanager_i_could_not_parse_that_date_time_what_date_a537d" formatted="false">"I could not parse that date/time. What date?"</string>
+    <!-- ModulePromptManager.kt: handleInput -->
+    <string name="manager_modulepromptmanager_module_prompt_cancelled_96a61" formatted="false">"Module prompt cancelled."</string>
+    <!-- ModulePromptManager.kt: handleEdit -->
+    <string name="manager_modulepromptmanager_new_date_press_enter_to_keep_current_4943d">"New date? Press enter to keep.\nCurrent: %1$s"</string>
+    <!-- ModulePromptManager.kt: handleEdit -->
+    <string name="manager_modulepromptmanager_new_text_press_enter_to_keep_7d8cf" formatted="false">"New text? Press enter to keep."</string>
+    <!-- ModulePromptManager.kt: handleEdit -->
+    <string name="manager_modulepromptmanager_new_time_press_enter_to_keep_current_d67b5">"New time? Press enter to keep.\nCurrent: %1$s"</string>
+    <!-- ModulePromptManager.kt: startNotificationReply -->
+    <string name="manager_modulepromptmanager_no_notification_selected_1f0ee" formatted="false">"No notification selected."</string>
+    <!-- ModulePromptManager.kt: handleNotificationInput -->
+    <string name="manager_modulepromptmanager_notification_reply_cancelled_068bd" formatted="false">"Notification reply cancelled."</string>
+    <!-- ModulePromptManager.kt: handleRemove -->
+    <string name="manager_modulepromptmanager_reminder_not_found_enter_a_list_number_or_37b83">"Reminder not found. Enter a list number or type cancel.\n%1$s"</string>
+    <!-- ModulePromptManager.kt: handleRemove -->
+    <string name="manager_modulepromptmanager_reminder_removed_d62b9" formatted="false">"Reminder removed."</string>
+    <!-- ModulePromptManager.kt: saveNewReminder -->
+    <string name="manager_modulepromptmanager_reminder_saved_42413">"Reminder saved:\n%1$s\n%2$s"</string>
+    <!-- ModulePromptManager.kt: handleAdd -->
+    <string name="manager_modulepromptmanager_reminder_text_cannot_be_empty_what_do_you_4f23b" formatted="false">"Reminder text cannot be empty. What do you want to be reminded about?"</string>
+    <!-- ModulePromptManager.kt: confirm -->
+    <string name="manager_modulepromptmanager_reminder_type_save_edit_or_cancel_ca4fb">"Reminder:\n%1$s\n%2$s\nType save, edit, or cancel."</string>
+    <!-- ModulePromptManager.kt: saveEditedReminder -->
+    <string name="manager_modulepromptmanager_reminder_updated_523a5">"Reminder updated:\n%1$s\n%2$s"</string>
+    <!-- ModulePromptManager.kt: handleRemove -->
+    <string name="manager_modulepromptmanager_remove_this_reminder_type_save_to_remove_o_fbb0f">"Remove this reminder?\n%1$s\n%2$s\nType save to remove, or cancel."</string>
+    <!-- ModulePromptManager.kt: handleNotificationInput -->
+    <string name="manager_modulepromptmanager_reply_sent_to_57e13">"Reply sent to %1$s."</string>
+    <!-- ModulePromptManager.kt: handleNotificationInput -->
+    <string name="manager_modulepromptmanager_reply_text_cannot_be_empty_type_a_reply_or_b6dca" formatted="false">"Reply text cannot be empty. Type a reply or cancel."</string>
+    <!-- ModulePromptManager.kt: startNotificationReply -->
+    <string name="manager_modulepromptmanager_reply_to_c030d">"Reply to %1$s:"</string>
+    <!-- ModulePromptManager.kt: saveEditedReminder -->
+    <string name="manager_modulepromptmanager_that_reminder_time_is_in_the_past_what_dat_86eb2" formatted="false">"That reminder time is in the past. What date?"</string>
+    <!-- ModulePromptManager.kt: handleEdit -->
+    <string name="manager_modulepromptmanager_type_save_edit_or_cancel_4b3c2" formatted="false">"Type save, edit, or cancel."</string>
+    <!-- ModulePromptManager.kt: handleRemove -->
+    <string name="manager_modulepromptmanager_type_save_to_remove_or_cancel_098de" formatted="false">"Type save to remove, or cancel."</string>
+    <!-- ModulePromptManager.kt: handleInput -->
+    <string name="manager_modulepromptmanager_unknown_module_prompt_ef7ea" formatted="false">"Unknown module prompt."</string>
+    <!-- ModulePromptManager.kt: handleAdd -->
+    <string name="manager_modulepromptmanager_what_date_accepted_10_05_2026_or_2026_05_1_32d57" formatted="false">"What date?\nAccepted: 10/05/2026 or 2026-05-10"</string>
+    <!-- ModulePromptManager.kt: handleAdd -->
+    <string name="manager_modulepromptmanager_what_do_you_want_to_be_reminded_about_05a45" formatted="false">"What do you want to be reminded about?"</string>
+    <!-- ModulePromptManager.kt: handleAdd -->
+    <string name="manager_modulepromptmanager_what_time_accepted_11_30pm_or_23_30_e9bc8" formatted="false">"What time?\nAccepted: 11:30PM or 23:30"</string>
+    <!-- ModulePromptManager.kt: startReminderEdit -->
+    <string name="manager_modulepromptmanager_which_reminder_do_you_want_to_edit_08413">"Which reminder do you want to edit?\n%1$s"</string>
+    <!-- ModulePromptManager.kt: startReminderRemove -->
+    <string name="manager_modulepromptmanager_which_reminder_do_you_want_to_remove_a9614">"Which reminder do you want to remove?\n%1$s"</string>
+    <!-- MusicService.kt: buildNotification -->
+    <string name="manager_musicservice_music_playback_e100b" formatted="false">"Music Playback"</string>
+    <!-- MusicService.kt: buildNotification -->
+    <string name="manager_musicservice_next_1992d" formatted="false">"NEXT"</string>
+    <!-- MusicService.kt: buildNotification -->
+    <string name="manager_musicservice_play_pause_884d0" formatted="false">"PLAY/PAUSE"</string>
+    <!-- MusicService.kt: buildNotification -->
+    <string name="manager_musicservice_playing_298c3" formatted="false">"Playing"</string>
+    <!-- MusicService.kt: buildNotification -->
+    <string name="manager_musicservice_prev_b231d" formatted="false">"PREV"</string>
+    <!-- NotesManager.kt: lsNotes -->
+    <string name="manager_notesmanager_locked_4d8b4" formatted="false">" [locked]"</string>
+    <!-- PomodoroManager.kt: startFocusSession -->
+    <string name="manager_pomodoromanager_focus_session_started_3c2b6">"Focus session started: %1$s"</string>
+    <!-- PomodoroManager.kt: handleTransition -->
+    <string name="manager_pomodoromanager_good_job_you_did_great_c4fb2" formatted="false">"Good job! You did great!"</string>
+    <!-- PomodoroManager.kt: stopSession -->
+    <string name="manager_pomodoromanager_session_terminated_ce44a" formatted="false">"Session terminated."</string>
+    <!-- PomodoroManager.kt: startBreakSession -->
+    <string name="manager_pomodoromanager_take_a_break_8fbcd" formatted="false">"Take a break!"</string>
+    <!-- PresetManager.kt: importFolder -->
+    <string name="manager_presetmanager_preset_folder_is_incomplete_f679b" formatted="false">"Preset folder is incomplete"</string>
+    <!-- PresetManager.kt: exportPackage -->
+    <string name="manager_presetmanager_preset_package_not_found_7f90e" formatted="false">"Preset package not found"</string>
+    <!-- PresetManager.kt: importFolder -->
+    <string name="manager_presetmanager_unable_to_create_import_folder_c88fe" formatted="false">"Unable to create import folder"</string>
+    <!-- PresetManager.kt: copyUriToFile -->
+    <string name="manager_presetmanager_unable_to_create_preset_folder_4e6c1" formatted="false">"Unable to create preset folder"</string>
+    <!-- PresetManager.kt: exportPackage -->
+    <string name="manager_presetmanager_unable_to_open_export_destination_bd05d" formatted="false">"Unable to open export destination"</string>
+    <!-- PresetManager.kt: copyUriToFile -->
+    <string name="manager_presetmanager_unable_to_open_preset_package_e2e64" formatted="false">"Unable to open preset package"</string>
+    <!-- PresetManager.kt: folderChildren -->
+    <string name="manager_presetmanager_unable_to_read_preset_folder_a015f" formatted="false">"Unable to read preset folder"</string>
+    <!-- RetuiCreditManager.kt: status -->
+    <string name="manager_retuicreditmanager_retui_credits_are_disabled_enable_sign_up_23767" formatted="false">"Retui Credits are disabled. Enable \'Sign up for Retui Credits\' under Personalization."</string>
+    <!-- RetuiCreditManager.kt: status -->
+    <string name="manager_retuicreditmanager_retui_credits_breach_keys_de4a8">"Retui Credits: %1$d\nBreach Keys: %2$d"</string>
+    <!-- RssManager.kt: latestModuleItems -->
+    <string name="manager_rssmanager_cached_feed_could_not_be_read_run_rss_frc_74d34">"  cached feed could not be read; run rss -frc %1$d"</string>
+    <!-- RssManager.kt: buildModuleText -->
+    <string name="manager_rssmanager_checked_fc5d7" formatted="false">"checked "</string>
+    <!-- RssManager.kt: buildModuleText -->
+    <string name="manager_rssmanager_commands_rss_l_id_rss_frc_id_rss_add_41d7b" formatted="false">"Commands: rss -l [id], rss -frc [id], rss -add"</string>
+    <!-- RssManager.kt: latestModuleItems -->
+    <string name="manager_rssmanager_feed_downloaded_but_has_no_entries_e4f67" formatted="false">"  feed downloaded but has no entries"</string>
+    <!-- RssManager.kt: latestModuleItems -->
+    <string name="manager_rssmanager_feed_has_no_displayable_entries_3c7ea" formatted="false">"  feed has no displayable entries"</string>
+    <!-- RssManager.kt: buildModuleText -->
+    <string name="manager_rssmanager_feed_has_no_entries_574c5" formatted="false">"  feed has no entries"</string>
+    <!-- RssManager.kt: buildModuleText -->
+    <string name="manager_rssmanager_more_feed_edf38" formatted="false">" more feed"</string>
+    <!-- RssManager.kt: latestModuleItems -->
+    <string name="manager_rssmanager_no_cache_yet_run_rss_frc_21c21">"  no cache yet; run rss -frc %1$d"</string>
+    <!-- RssManager.kt: buildModuleText -->
+    <string name="manager_rssmanager_no_rss_feeds_add_rss_add_1_900_https_www_r_234cc" formatted="false">"No RSS feeds.\nAdd: rss -add 1 900 https://www.reddit.com/r/android/.rss\nThen: rss -frc 1"</string>
+    <!-- RssManager.kt: add -->
+    <string name="manager_rssmanager_rss_id_already_exists_51fed">"RSS ID already exists: %1$d"</string>
+    <!-- RssManager.kt: duplicateUrlMessage -->
+    <string name="manager_rssmanager_rss_url_already_exists_as_id_4d799">"RSS URL already exists as ID %1$d"</string>
+    <!-- RssManager.kt: buildModuleText -->
+    <string name="manager_rssmanager_wifi_only_1bbea" formatted="false">" (wifi only)"</string>
+    <!-- RssManager.kt: latestModuleItems -->
+    <string name="manager_rssmanager_xml_parse_error_run_rss_frc_53402">"  %1$s XML parse error; run rss -frc %2$d"</string>
+    <!-- SpaceManager.kt: remove -->
+    <string name="manager_spacemanager_cannot_remove_the_active_space_255cb" formatted="false">"Cannot remove the active Space."</string>
+    <!-- SpaceManager.kt: remove -->
+    <string name="manager_spacemanager_cannot_remove_the_only_space_69ad9" formatted="false">"Cannot remove the only Space."</string>
+    <!-- SpaceManager.kt: describeSpaces -->
+    <string name="manager_spacemanager_no_spaces_found_0f99b" formatted="false">"No Spaces found."</string>
+    <!-- SpaceManager.kt: renameActive -->
+    <string name="manager_spacemanager_space_already_exists_e5f3a" formatted="false">"Space already exists."</string>
+    <!-- SpaceManager.kt: renameActive -->
+    <string name="manager_spacemanager_space_name_is_required_e3d46" formatted="false">"Space name is required."</string>
+    <!-- SpaceManager.kt: restoreFromSpace -->
+    <string name="manager_spacemanager_space_not_found_3965e" formatted="false">"Space not found."</string>
+    <!-- SpaceManager.kt: restore -->
+    <string name="manager_spacemanager_unable_to_restore_space_preferences_11d39">"Unable to restore Space preferences: %1$s"</string>
+    <!-- TaskerIntegrationManager.kt: setTheme -->
+    <string name="manager_taskerintegrationmanager_invalid_color_use_rrggbb_or_aarrggbb_0ef3a" formatted="false">"Invalid color. Use #RRGGBB or #AARRGGBB."</string>
+    <!-- TaskerIntegrationManager.kt: updateModuleText -->
+    <string name="manager_taskerintegrationmanager_invalid_module_name_a370a" formatted="false">"Invalid module name."</string>
+    <!-- TaskerIntegrationManager.kt: execute -->
+    <string name="manager_taskerintegrationmanager_invalid_retui_action_input_ea9f8" formatted="false">"Invalid RETUI action input."</string>
+    <!-- TaskerIntegrationManager.kt: refreshModule -->
+    <string name="manager_taskerintegrationmanager_module_has_no_source_6c6aa">"Module has no source: %1$s"</string>
+    <!-- TaskerIntegrationManager.kt: updateModuleText -->
+    <string name="manager_taskerintegrationmanager_module_is_not_an_existing_script_module_2b62a">"Module is not an existing script module: %1$s"</string>
+    <!-- TaskerIntegrationManager.kt: updateModuleText -->
+    <string name="manager_taskerintegrationmanager_module_name_is_required_3f25a" formatted="false">"Module name is required."</string>
+    <!-- TaskerIntegrationManager.kt: showModule -->
+    <string name="manager_taskerintegrationmanager_module_opened_a33ed">"Module opened: %1$s"</string>
+    <!-- TaskerIntegrationManager.kt: refreshModule -->
+    <string name="manager_taskerintegrationmanager_module_refresh_dispatched_393eb">"Module refresh dispatched: %1$s"</string>
+    <!-- TaskerIntegrationManager.kt: updateModuleText -->
+    <string name="manager_taskerintegrationmanager_module_text_updated_1eb70">"Module text updated: %1$s"</string>
+    <!-- TaskerIntegrationManager.kt: applyPreset -->
+    <string name="manager_taskerintegrationmanager_preset_applied_71a47">"Preset applied: %1$s"</string>
+    <!-- TaskerIntegrationManager.kt: applyPreset -->
+    <string name="manager_taskerintegrationmanager_preset_name_is_required_4417a" formatted="false">"Preset name is required."</string>
+    <!-- TaskerIntegrationManager.kt: execute -->
+    <string name="manager_taskerintegrationmanager_retui_action_failed_aa579" formatted="false">"RETUI action failed."</string>
+    <!-- TaskerIntegrationManager.kt: runTaskerTask -->
+    <string name="manager_taskerintegrationmanager_security_error_78f9d" formatted="false">"security error"</string>
+    <!-- TaskerIntegrationManager.kt: switchSpace -->
+    <string name="manager_taskerintegrationmanager_space_name_is_required_e3d46" formatted="false">"Space name is required."</string>
+    <!-- TaskerIntegrationManager.kt: switchSpace -->
+    <string name="manager_taskerintegrationmanager_switched_to_space_c4781">"Switched to Space: %1$s"</string>
+    <!-- TaskerIntegrationManager.kt: runTaskerTask -->
+    <string name="manager_taskerintegrationmanager_task_name_is_required_e0ad1" formatted="false">"Task name is required."</string>
+    <!-- TaskerIntegrationManager.kt: runTaskerTask -->
+    <string name="manager_taskerintegrationmanager_task_names_are_case_sensitive_use_tasker_6ee7c">"Task names are case-sensitive. Use: tasker \"%1$s\""</string>
+    <!-- TaskerIntegrationManager.kt: runTaskerTask -->
+    <string name="manager_taskerintegrationmanager_tasker_blocked_external_access_in_tasker_e_19b98" formatted="false">"Tasker blocked external access. In Tasker, enable Settings &gt; Misc &gt; Allow External Access."</string>
+    <!-- TaskerIntegrationManager.kt: runTaskerTask -->
+    <string name="manager_taskerintegrationmanager_tasker_blocked_the_request_3121f">"Tasker blocked the request: %1$s"</string>
+    <!-- TaskerIntegrationManager.kt: execute -->
+    <string name="manager_taskerintegrationmanager_tasker_integration_is_disabled_in_retui_9165f" formatted="false">"Tasker integration is disabled in RETUI."</string>
+    <!-- TaskerIntegrationManager.kt: runTaskerTask -->
+    <string name="manager_taskerintegrationmanager_tasker_is_disabled_enable_tasker_before_ru_f106b" formatted="false">"Tasker is disabled. Enable Tasker before running a task."</string>
+    <!-- TaskerIntegrationManager.kt: runTaskerTask -->
+    <string name="manager_taskerintegrationmanager_tasker_is_not_accepting_external_task_requ_9de1e" formatted="false">"Tasker is not accepting external task requests."</string>
+    <!-- TaskerIntegrationManager.kt: runTaskerTask -->
+    <string name="manager_taskerintegrationmanager_tasker_is_not_installed_b71d9" formatted="false">"Tasker is not installed."</string>
+    <!-- TaskerIntegrationManager.kt: runTaskerTask -->
+    <string name="manager_taskerintegrationmanager_tasker_run_task_permission_is_not_granted_8de4a" formatted="false">"Tasker run-task permission is not granted. Enable Tasker Integration in RETUI settings."</string>
+    <!-- TaskerIntegrationManager.kt: onReceive -->
+    <string name="manager_taskerintegrationmanager_tasker_task_completed_75698">"Tasker task completed: %1$s"</string>
+    <!-- TaskerIntegrationManager.kt: onReceive -->
+    <string name="manager_taskerintegrationmanager_tasker_task_failed_82c6c">"Tasker task failed: %1$s"</string>
+    <!-- TaskerIntegrationManager.kt: runTaskerTask -->
+    <string name="manager_taskerintegrationmanager_tasker_task_not_found_4a907">"Tasker task not found: %1$s"</string>
+    <!-- TaskerIntegrationManager.kt: runTaskerTask -->
+    <string name="manager_taskerintegrationmanager_tasker_task_started_b0141">"Tasker task started: %1$s"</string>
+    <!-- TaskerIntegrationManager.kt: terminalOutput -->
+    <string name="manager_taskerintegrationmanager_terminal_output_sent_721d1" formatted="false">"Terminal output sent."</string>
+    <!-- TaskerIntegrationManager.kt: terminalOutput -->
+    <string name="manager_taskerintegrationmanager_terminal_text_is_required_4bba0" formatted="false">"Terminal text is required."</string>
+    <!-- TaskerIntegrationManager.kt: setTheme -->
+    <string name="manager_taskerintegrationmanager_theme_color_is_required_6ee28" formatted="false">"Theme color is required."</string>
+    <!-- TaskerIntegrationManager.kt: setTheme -->
+    <string name="manager_taskerintegrationmanager_theme_element_is_required_fbb27" formatted="false">"Theme element is required."</string>
+    <!-- TaskerIntegrationManager.kt: setTheme -->
+    <string name="manager_taskerintegrationmanager_theme_updated_582ad">"Theme updated: %1$s"</string>
+    <!-- TaskerIntegrationManager.kt: runTaskerTask -->
+    <string name="manager_taskerintegrationmanager_unable_to_run_tasker_task_c3576">"Unable to run Tasker task: %1$s"</string>
+    <!-- TaskerIntegrationManager.kt: runTaskerTask -->
+    <string name="manager_taskerintegrationmanager_unknown_error_af632" formatted="false">"unknown error"</string>
+    <!-- TaskerIntegrationManager.kt: refreshModule -->
+    <string name="manager_taskerintegrationmanager_unknown_module_8f2c8">"Unknown module: %1$s"</string>
+    <!-- TaskerIntegrationManager.kt: setTheme -->
+    <string name="manager_taskerintegrationmanager_unknown_theme_element_cdc2e">"Unknown theme element: %1$s"</string>
+    <!-- TaskerIntegrationManager.kt: execute -->
+    <string name="manager_taskerintegrationmanager_unsupported_retui_action_0dc00" formatted="false">"Unsupported RETUI action."</string>
+    <!-- TimeManager.kt: createList -->
+    <string name="manager_timemanager_invalid_time_format_c3076">"Invalid time format: %1$s"</string>
+    <!-- UpcomingEventsManager.kt: formatUpcoming -->
+    <string name="manager_upcomingeventsmanager_calendar_access_is_required_run_events_acc_cfe8f">"%1$s\nCalendar access is required.\nRun: events -access"</string>
+    <!-- UpcomingEventsManager.kt: formatUpcoming -->
+    <string name="manager_upcomingeventsmanager_unable_to_read_android_calendar_c129e">"%1$s\nUnable to read Android Calendar."</string>
+    <!-- UpcomingEventsManager.kt: formatUpcomingTsv -->
+    <string name="manager_upcomingeventsmanager_untitled_event_ef8d2" formatted="false">"Untitled event"</string>
+</resources>

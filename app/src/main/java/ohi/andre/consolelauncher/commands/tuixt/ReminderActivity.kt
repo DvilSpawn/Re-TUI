@@ -35,11 +35,11 @@ import ohi.andre.consolelauncher.managers.modules.ReminderManager.Reminder
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi.applyFullscreen
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi.requestNoTitleIfFullscreen
 import ohi.andre.consolelauncher.tuils.Tuils
-import java.text.SimpleDateFormat
+import android.text.format.DateFormat
+import ohi.andre.consolelauncher.R
 import java.util.Calendar
-import java.util.Locale
 
-class ReminderActivity : Activity() {
+class ReminderActivity : ohi.andre.consolelauncher.localization.LocalizedActivity() {
     private lateinit var list: LinearLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,12 +60,12 @@ class ReminderActivity : Activity() {
             stylePanel(this@ReminderActivity, this)
         }
         shell.addView(panel, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply { topMargin = dp(this@ReminderActivity, 11f) })
-        shell.addView(TextView(this).apply { text = "Reminders"; styleHeader(this@ReminderActivity, this) }, FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.TOP or Gravity.START).apply { leftMargin = dp(this@ReminderActivity, 38f) })
+        shell.addView(TextView(this).apply { text = getString(R.string.reminder_reminders); styleHeader(this@ReminderActivity, this) }, FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.TOP or Gravity.START).apply { leftMargin = dp(this@ReminderActivity, 38f) })
 
         list = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
         panel.addView(ScrollView(this).apply { addView(list) }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(this, 360f)))
-        panel.addView(button("ADD REMINDER", true).apply { setOnClickListener { edit(null) } })
-        panel.addView(button("CLOSE", false).apply { setOnClickListener { finish() } })
+        panel.addView(button(getString(R.string.reminder_add_reminder), true).apply { setOnClickListener { edit(null) } })
+        panel.addView(button(getString(R.string.reminder_close), false).apply { setOnClickListener { finish() } })
         setContentView(screen)
         render()
     }
@@ -76,21 +76,21 @@ class ReminderActivity : Activity() {
         if (!::list.isInitialized) return
         list.removeAllViews()
         val reminders = ReminderManager.list(this)
-        if (reminders.isEmpty()) list.addView(TextView(this).apply { text = "No reminders."; setTextColor(accentColor()); typeface = Tuils.getTypeface(this@ReminderActivity) })
+        if (reminders.isEmpty()) list.addView(TextView(this).apply { text = getString(R.string.reminder_no_reminders); setTextColor(accentColor()); typeface = Tuils.getTypeface(this@ReminderActivity) })
         reminders.forEachIndexed { index, reminder ->
             val row = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL }
-            row.addView(TextView(this).apply { text = "${index + 1}. ${reminder.title}\n${ReminderManager.formatWhen(reminder.atMillis)}"; setTextColor(accentColor()); typeface = Tuils.getTypeface(this@ReminderActivity) }, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
-            row.addView(button("EDIT", false).apply { setOnClickListener { edit(reminder) } })
-            row.addView(button("REMOVE", false).apply { setOnClickListener { confirmRemove(reminder) } })
+            row.addView(TextView(this).apply { text = getString(R.string.reminder_list_entry, index + 1, reminder.title, ReminderManager.formatWhen(this@ReminderActivity, reminder.atMillis)); setTextColor(accentColor()); typeface = Tuils.getTypeface(this@ReminderActivity) }, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
+            row.addView(button(getString(R.string.reminder_edit), false).apply { setOnClickListener { edit(reminder) } })
+            row.addView(button(getString(R.string.reminder_remove), false).apply { setOnClickListener { confirmRemove(reminder) } })
             list.addView(row, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply { bottomMargin = dp(this@ReminderActivity, 10f) })
         }
     }
 
     private fun edit(reminder: Reminder?) {
         val selected = Calendar.getInstance().apply { timeInMillis = reminder?.atMillis ?: System.currentTimeMillis() + 60 * 60 * 1000 }
-        TuixtDialog.showCustom(this, if (reminder == null) "Add reminder" else "Edit reminder", TuixtDialog.ContentFactory { dialog: Dialog? ->
+        TuixtDialog.showCustom(this, if (reminder == null) getString(R.string.reminder_add_title) else getString(R.string.reminder_edit_reminder), TuixtDialog.ContentFactory { dialog: Dialog? ->
             val content = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
-            val title = EditText(this).apply { hint = "Task name"; setText(reminder?.title.orEmpty()); styleInput(this@ReminderActivity, this) }
+            val title = EditText(this).apply { hint = getString(R.string.reminder_task_name); setText(reminder?.title.orEmpty()); styleInput(this@ReminderActivity, this) }
             val whenView = TextView(this).apply {
                 styleListItem(this@ReminderActivity, this, false)
                 textSize = 13f
@@ -104,17 +104,17 @@ class ReminderActivity : Activity() {
             }
             val error = TextView(this).apply { setTextColor(textColor()); typeface = Tuils.getTypeface(this@ReminderActivity); visibility = View.GONE }
             content.addView(title)
-            content.addView(TextView(this).apply { text = "DATE / TIME"; setTextColor(textColor()); typeface = Tuils.getTypeface(this@ReminderActivity) })
+            content.addView(TextView(this).apply { text = getString(R.string.reminder_date_time); setTextColor(textColor()); typeface = Tuils.getTypeface(this@ReminderActivity) })
             content.addView(whenView)
             content.addView(error)
             content.addView(LinearLayout(this).apply {
                 orientation = LinearLayout.HORIZONTAL
                 setPadding(0, dp(this@ReminderActivity, 12f), 0, 0)
-                addView(button("CANCEL", false).apply { setOnClickListener { dialog?.dismiss() } }, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
-                addView(button("SAVE", true).apply { setOnClickListener {
+                addView(button(getString(R.string.reminder_cancel), false).apply { setOnClickListener { dialog?.dismiss() } }, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
+                addView(button(getString(R.string.reminder_save), true).apply { setOnClickListener {
                     val cleanTitle = title.text.toString().trim()
                     if (cleanTitle.isEmpty() || selected.timeInMillis <= System.currentTimeMillis()) {
-                        error.text = if (cleanTitle.isEmpty()) "Task name cannot be empty." else "Reminder time must be in the future."
+                        error.text = if (cleanTitle.isEmpty()) getString(R.string.reminder_task_name_cannot_be_empty) else getString(R.string.reminder_reminder_time_must_be_in_the_future)
                         error.visibility = View.VISIBLE
                         return@setOnClickListener
                     }
@@ -146,22 +146,22 @@ class ReminderActivity : Activity() {
                 styleListItem(this@ReminderActivity, view, selected)
                 view.setTextColor(accentColor()); view.setPadding(0, 0, 0, 0); view.minHeight = 0; view.gravity = Gravity.CENTER
                 view.background = if (selected) view.background else null
-                view.alpha = if (enabled || view.text.singleOrNull()?.isLetter() == true) 1f else 0.35f
+                view.alpha = if (enabled || view.text.any { it.isLetter() }) 1f else 0.35f
             }
 
             override fun dropdownBackground() = rect(this@ReminderActivity, surfaceColor(), borderColor(), 1.25f)
         })
-        TuixtDialog.showContent(this, "Pick date / time", picker, "Use", "Cancel", TuixtDialog.ConfirmAction {
+        TuixtDialog.showContent(this, getString(R.string.reminder_pick_date_time), picker, getString(R.string.reminder_use), getString(R.string.reminder_cancel_label), TuixtDialog.ConfirmAction {
             selected.timeInMillis = picker.selectedTimeMillis()
             selected.set(Calendar.SECOND, 0); selected.set(Calendar.MILLISECOND, 0)
             done()
         })
     }
 
-    private fun formatPickerValue(value: Calendar): String = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.US).format(value.time)
+    private fun formatPickerValue(value: Calendar): String = DateFormat.getDateFormat(this).format(value.time) + " " + DateFormat.getTimeFormat(this).format(value.time)
 
     private fun confirmRemove(reminder: Reminder) {
-        TuixtDialog.showConfirm(this, "Remove reminder?", reminder.title, "Remove", "Cancel",
+        TuixtDialog.showConfirm(this, getString(R.string.reminder_remove_reminder), reminder.title, getString(R.string.reminder_remove_label), getString(R.string.reminder_cancel_label),
             TuixtDialog.ConfirmAction { ReminderManager.remove(this, reminder.id); changed() })
     }
 

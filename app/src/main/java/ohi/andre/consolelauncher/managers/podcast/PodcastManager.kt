@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher.managers.podcast
 
+import ohi.andre.consolelauncher.R
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
@@ -39,8 +40,8 @@ class PodcastManager(
         val tags = parseTags(rawTags)
         shows = shows.map { if (it.id == show.id) it.copy(tags = tags) else it }
         cacheShows()
-        return if (tags.isEmpty()) "Tags cleared: " + show.title
-        else "Tags: " + tags.joinToString(", ")
+        return if (tags.isEmpty()) appContext.getString(R.string.podcast_podcastmanager_tags_cleared_e364f, show.title)
+        else appContext.getString(R.string.podcast_podcastmanager_tags_8d749, tags.joinToString(", "))
     }
 
     fun isNewestFirst(show: PodcastShow): Boolean = prefs.getBoolean(sortNewestKey(show.id), false)
@@ -73,7 +74,7 @@ class PodcastManager(
 
     fun removeShow(show: PodcastShow): String {
         val nextFeeds = LinkedHashSet(feeds())
-        if (!nextFeeds.remove(show.feedUrl)) return "Podcast not found."
+        if (!nextFeeds.remove(show.feedUrl)) return appContext.getString(R.string.podcast_podcastmanager_podcast_not_found_7370e)
 
         shows = shows.filterNot { it.id == show.id }
         val editor = prefs.edit().putStringSet(KEY_FEEDS, nextFeeds)
@@ -93,13 +94,13 @@ class PodcastManager(
             player.stop()
         }
         cacheShows()
-        return "Removed: " + show.title
+        return appContext.getString(R.string.podcast_podcastmanager_removed_d9c0f, show.title)
     }
 
     fun subscribe(feedUrl: String, done: (String?) -> Unit) {
         val clean = feedUrl.trim()
         if (!isSecureFeedUrl(clean)) {
-            done("Podcast feed URL must be a valid https:// address.")
+            done(appContext.getString(R.string.podcast_podcastmanager_podcast_feed_url_must_be_a_valid_https_add_75717))
             return
         }
         val next = LinkedHashSet(feeds())
@@ -113,7 +114,7 @@ class PodcastManager(
         if (feedUrls.isEmpty()) {
             shows = emptyList()
             cacheShows()
-            done("No podcast feeds yet. Use podcast add <feed-url>.")
+            done(appContext.getString(R.string.podcast_podcastmanager_no_podcast_feeds_yet_use_podcast_add_feed_ac1c0))
             return
         }
 
@@ -126,7 +127,7 @@ class PodcastManager(
                     val previous = shows.firstOrNull { it.feedUrl == url || it.id == fetched.id }
                     nextShows.add(mergeRetainedEpisodes(previous, fetched))
                 } catch (e: Exception) {
-                    lastError = "Podcast refresh failed: " + (e.message ?: url)
+                    lastError = appContext.getString(R.string.podcast_podcastmanager_podcast_refresh_failed_5aa91, (e.message ?: url))
                 }
             }
             shows = nextShows
@@ -149,22 +150,22 @@ class PodcastManager(
             return
         }
         val first = feeds().firstOrNull()
-        if (first == null) done("No podcast feeds yet. Use podcast add <feed-url>.")
+        if (first == null) done(appContext.getString(R.string.podcast_podcastmanager_no_podcast_feeds_yet_use_podcast_add_feed_ac1c0))
         else refreshFeed(first, done)
     }
 
     fun play(episode: PodcastEpisode? = null): String {
-        val show = selectedShow() ?: return "No podcast selected."
+        val show = selectedShow() ?: return appContext.getString(R.string.podcast_podcastmanager_no_podcast_selected_7cc72)
         val target = episode ?: currentEpisode(show) ?: nextUnplayed(show) ?: episodesFor(show).firstOrNull()
-            ?: return "No playable episodes."
+            ?: return appContext.getString(R.string.podcast_podcastmanager_no_playable_episodes_de295)
         return play(show, target)
     }
 
     fun play(show: PodcastShow, episode: PodcastEpisode): String {
-        val manager = player ?: return "Podcast playback is unavailable."
+        val manager = player ?: return appContext.getString(R.string.podcast_podcastmanager_podcast_playback_is_unavailable_591a1)
         val episodes = episodesFor(show)
         val index = episodes.indexOfFirst { it.key == episode.key }
-        if (index == -1) return "Episode not found."
+        if (index == -1) return appContext.getString(R.string.podcast_podcastmanager_episode_not_found_c7d67)
         val songs = episodes.map {
             Song(
                 it.title,
@@ -185,48 +186,48 @@ class PodcastManager(
             .apply()
         manager.setPodcastPlaybackSpeed(playbackSpeed())
         val title = manager.playPodcast(songs, index, this)
-        return if (title == null) "Starting podcast..." else "Playing: " + title
+        return if (title == null) appContext.getString(R.string.podcast_podcastmanager_starting_podcast_5f39c) else appContext.getString(R.string.podcast_podcastmanager_playing_7dabc, title)
     }
 
     fun playbackSpeed(): Float = prefs.getFloat(KEY_PLAYBACK_SPEED, 1f)
 
     fun setPlaybackSpeed(speed: Float): String {
         if (!speed.isFinite() || speed < MIN_PLAYBACK_SPEED || speed > MAX_PLAYBACK_SPEED) {
-            return "Playback speed must be between ${formatSpeed(MIN_PLAYBACK_SPEED)} and ${formatSpeed(MAX_PLAYBACK_SPEED)}."
+            return appContext.getString(R.string.podcast_podcastmanager_playback_speed_must_be_between_and_d70f4, formatSpeed(MIN_PLAYBACK_SPEED), formatSpeed(MAX_PLAYBACK_SPEED))
         }
         val normalized = (speed * 100f).toInt() / 100f
         prefs.edit().putFloat(KEY_PLAYBACK_SPEED, normalized).apply()
         player?.setPodcastPlaybackSpeed(normalized)
-        return "Playback speed: ${formatSpeed(normalized)}"
+        return appContext.getString(R.string.podcast_podcastmanager_playback_speed_c9363, formatSpeed(normalized))
     }
 
     fun toggle(): String {
-        val manager = player ?: return "Podcast playback is unavailable."
-        if (manager.isPreparing()) return "Buffering episode..."
+        val manager = player ?: return appContext.getString(R.string.podcast_podcastmanager_podcast_playback_is_unavailable_591a1)
+        if (manager.isPreparing()) return appContext.getString(R.string.podcast_podcastmanager_buffering_episode_64f5f)
         val current = manager.currentSong()
         return if (current?.getSource() == MusicService.SOURCE_PODCAST && manager.isPlaying()) {
             saveProgress(current, manager.getCurrentPosition(), manager.getDuration())
             manager.pause()
-            "Podcast paused."
+            appContext.getString(R.string.podcast_podcastmanager_podcast_paused_a48d7)
         } else if (current?.getSource() == MusicService.SOURCE_PODCAST) {
             // Resume the loaded track — full play() re-prepares and used to race getDuration.
             manager.play()
-            "Playing: " + current.getTitle()
+            appContext.getString(R.string.podcast_podcastmanager_playing_7dabc, current.getTitle())
         } else {
             play()
         }
     }
 
     fun next(): String {
-        val manager = player ?: return "Podcast playback is unavailable."
+        val manager = player ?: return appContext.getString(R.string.podcast_podcastmanager_podcast_playback_is_unavailable_591a1)
         val current = manager.currentSong()
         if (current?.getSource() == MusicService.SOURCE_PODCAST && manager.isPlaying()) {
             saveProgress(current, manager.getCurrentPosition(), manager.getDuration())
-            return manager.playNext() ?: "Next podcast episode."
+            return manager.playNext() ?: appContext.getString(R.string.podcast_podcastmanager_next_podcast_episode_5978b)
         }
-        val show = selectedShow() ?: return "No podcast selected."
+        val show = selectedShow() ?: return appContext.getString(R.string.podcast_podcastmanager_no_podcast_selected_7cc72)
         val episodes = episodesFor(show)
-        if (episodes.isEmpty()) return "No playable episodes."
+        if (episodes.isEmpty()) return appContext.getString(R.string.podcast_podcastmanager_no_playable_episodes_de295)
         val currentKey = prefs.getString(KEY_ACTIVE_EPISODE, null)
         val index = episodes.indexOfFirst { it.key == currentKey }
         val nextIndex = if (index == -1) 0 else min(index + 1, episodes.lastIndex)
@@ -234,15 +235,15 @@ class PodcastManager(
     }
 
     fun previous(): String {
-        val manager = player ?: return "Podcast playback is unavailable."
+        val manager = player ?: return appContext.getString(R.string.podcast_podcastmanager_podcast_playback_is_unavailable_591a1)
         val current = manager.currentSong()
         if (current?.getSource() == MusicService.SOURCE_PODCAST && manager.isPlaying()) {
             saveProgress(current, manager.getCurrentPosition(), manager.getDuration())
-            return manager.playPrev() ?: "Previous podcast episode."
+            return manager.playPrev() ?: appContext.getString(R.string.podcast_podcastmanager_previous_podcast_episode_2926a)
         }
-        val show = selectedShow() ?: return "No podcast selected."
+        val show = selectedShow() ?: return appContext.getString(R.string.podcast_podcastmanager_no_podcast_selected_7cc72)
         val episodes = episodesFor(show)
-        if (episodes.isEmpty()) return "No playable episodes."
+        if (episodes.isEmpty()) return appContext.getString(R.string.podcast_podcastmanager_no_playable_episodes_de295)
         val currentKey = prefs.getString(KEY_ACTIVE_EPISODE, null)
         val index = episodes.indexOfFirst { it.key == currentKey }
         val previousIndex = if (index == -1) 0 else max(index - 1, 0)
@@ -250,9 +251,9 @@ class PodcastManager(
     }
 
     fun seekBy(deltaMs: Int): String {
-        val manager = player ?: return "Podcast playback is unavailable."
-        val current = manager.currentSong() ?: return "No podcast is loaded."
-        if (current.getSource() != MusicService.SOURCE_PODCAST) return "No podcast is loaded."
+        val manager = player ?: return appContext.getString(R.string.podcast_podcastmanager_podcast_playback_is_unavailable_591a1)
+        val current = manager.currentSong() ?: return appContext.getString(R.string.podcast_podcastmanager_no_podcast_is_loaded_b6034)
+        if (current.getSource() != MusicService.SOURCE_PODCAST) return appContext.getString(R.string.podcast_podcastmanager_no_podcast_is_loaded_b6034)
         val duration = manager.getDuration()
         val currentPos = manager.getCurrentPosition()
         val target = if (duration > 0) min(max(0, currentPos + deltaMs), duration) else max(0, currentPos + deltaMs)
@@ -260,9 +261,9 @@ class PodcastManager(
     }
 
     fun seekTo(positionMs: Int): String {
-        val manager = player ?: return "Podcast playback is unavailable."
-        val current = manager.currentSong() ?: return "No podcast is loaded."
-        if (current.getSource() != MusicService.SOURCE_PODCAST) return "No podcast is loaded."
+        val manager = player ?: return appContext.getString(R.string.podcast_podcastmanager_podcast_playback_is_unavailable_591a1)
+        val current = manager.currentSong() ?: return appContext.getString(R.string.podcast_podcastmanager_no_podcast_is_loaded_b6034)
+        if (current.getSource() != MusicService.SOURCE_PODCAST) return appContext.getString(R.string.podcast_podcastmanager_no_podcast_is_loaded_b6034)
         val duration = manager.getDuration()
         val target = if (duration > 0) min(max(0, positionMs), duration) else max(0, positionMs)
         manager.seekTo(target)
@@ -344,11 +345,11 @@ class PodcastManager(
             .build()
         client.newCall(request).execute().use { response ->
             if (!response.isSuccessful) throw IllegalStateException(response.code.toString())
-            if (!response.request.url.isHttps) throw IllegalStateException("insecure feed redirect")
-            val body = response.body ?: throw IllegalStateException("empty feed")
+            if (!response.request.url.isHttps) throw IllegalStateException(appContext.getString(R.string.podcast_podcastmanager_insecure_feed_redirect_0d13f))
+            val body = response.body ?: throw IllegalStateException(appContext.getString(R.string.podcast_podcastmanager_empty_feed_c88eb))
             val contentLength = body.contentLength()
             if (contentLength > PodcastParser.MAX_FEED_BYTES) {
-                throw IllegalStateException("feed exceeds ${PodcastParser.MAX_FEED_BYTES / (1024 * 1024)} MB")
+                throw IllegalStateException(appContext.getString(R.string.podcast_podcastmanager_feed_exceeds_mb_40110, PodcastParser.MAX_FEED_BYTES / (1024 * 1024)))
             }
             return PodcastParser.parse(body.byteStream(), feedUrl)
         }
@@ -367,7 +368,7 @@ class PodcastManager(
                 }
                 handler.post { done(null) }
             } catch (e: Exception) {
-                handler.post { done("Podcast refresh failed: " + (e.message ?: feedUrl)) }
+                handler.post { done(appContext.getString(R.string.podcast_podcastmanager_podcast_refresh_failed_5aa91, (e.message ?: feedUrl))) }
             }
         }.start()
     }

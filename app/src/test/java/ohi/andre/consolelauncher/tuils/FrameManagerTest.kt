@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher.tuils
 
+import ohi.andre.consolelauncher.R
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.nio.file.Files
@@ -138,8 +139,12 @@ class FrameManagerTest {
         val valid = FrameManager.defaultPngSpec(48, 48)
         assertNull(FrameManager.frameSpecError(valid, 48, 48))
         assertEquals(
-            "Slices must leave a center region inside the 48 x 48 PNG.",
-            FrameManager.frameSpecError(valid.copy(leftPx = 24, rightPx = 24), 48, 48)
+            R.string.frame_slices_center,
+            FrameManager.frameSpecError(valid.copy(leftPx = 24, rightPx = 24), 48, 48)?.messageResource
+        )
+        org.junit.Assert.assertArrayEquals(
+            arrayOf<Any?>(48, 48),
+            FrameManager.frameSpecError(valid.copy(leftPx = 24, rightPx = 24), 48, 48)!!.messageArguments
         )
     }
 
@@ -302,8 +307,8 @@ class FrameManagerTest {
         )
         session.createPack("Default")
 
-        assertEquals("Pack name must be 1 to 80 characters.", session.packNameError(" "))
-        assertEquals("A frame pack with that name already exists.", session.packNameError("default"))
+        assertEquals(R.string.frame_pack_name_length, session.packNameError(" ")?.messageResource)
+        assertEquals(R.string.frame_pack_name_exists, session.packNameError("default")?.messageResource)
         assertTrue(runCatching { session.createPack("DEFAULT") }.isFailure)
     }
 

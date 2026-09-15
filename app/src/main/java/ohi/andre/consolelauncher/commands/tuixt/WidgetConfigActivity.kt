@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher.commands.tuixt
 
+import ohi.andre.consolelauncher.R
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
@@ -41,7 +42,7 @@ import java.util.Locale
 import kotlin.math.max
 import kotlin.math.min
 
-class WidgetConfigActivity : Activity() {
+class WidgetConfigActivity : ohi.andre.consolelauncher.localization.LocalizedActivity() {
     private var widgetId: String? = null
     private var engine: LuaWidgetEngine? = null
     private var fieldsContainer: LinearLayout? = null
@@ -69,12 +70,12 @@ class WidgetConfigActivity : Activity() {
         )
         val result = engine!!.config()
         if (!TextUtils.isEmpty(result.error)) {
-            Toast.makeText(this, "Config failed: " + result.error, Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.editor_widgetconfigactivity_config_failed_5b277, result.error), Toast.LENGTH_LONG).show()
             finish()
             return
         }
         if (TextUtils.isEmpty(result.configJson)) {
-            Toast.makeText(this, "No config surface: " + LuaWidgetManager.getName(widgetId), Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.editor_widgetconfigactivity_no_config_surface_92c6f, LuaWidgetManager.getName(widgetId)), Toast.LENGTH_SHORT).show()
             finish()
             return
         }
@@ -82,7 +83,7 @@ class WidgetConfigActivity : Activity() {
         val spec = try {
             JSONObject(result.configJson!!)
         } catch (e: Exception) {
-            Toast.makeText(this, "Invalid config schema: " + e.message, Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.editor_widgetconfigactivity_invalid_config_schema_5adb8, e.message), Toast.LENGTH_LONG).show()
             finish()
             return
         }
@@ -157,14 +158,14 @@ class WidgetConfigActivity : Activity() {
         bottomBar.gravity = Gravity.CENTER_VERTICAL
         bottomBar.setPadding(0, dp(this, 10f), 0, 0)
 
-        val cancel = button("CANCEL", false)
+        val cancel = button(getString(R.string.editor_widgetconfigactivity_cancel_1507c), false)
         cancel.setOnClickListener { attemptClose() }
         bottomBar.addView(cancel)
 
         val spacer = View(this)
         bottomBar.addView(spacer, LinearLayout.LayoutParams(0, 1, 1f))
 
-        val save = button("SAVE", true)
+        val save = button(getString(R.string.editor_widgetconfigactivity_save_50815), true)
         save.setOnClickListener { saveAndClose() }
         bottomBar.addView(save)
         root.addView(bottomBar)
@@ -192,7 +193,7 @@ class WidgetConfigActivity : Activity() {
     private fun bindFields(fields: JSONArray?) {
         if (fields == null || fields.length() == 0) {
             val empty = TextView(this)
-            empty.text = "No editable fields."
+            empty.text = getString(R.string.editor_widgetconfigactivity_no_editable_fields_97e29)
             empty.setTextColor(textColor())
             empty.typeface = Tuils.getTypeface(this)
             empty.textSize = 14f
@@ -306,7 +307,7 @@ class WidgetConfigActivity : Activity() {
         val values = currentValues(true) ?: return
         val result = engine!!.submitConfig(saveAction, values)
         if (!TextUtils.isEmpty(result.error)) {
-            Toast.makeText(this, "Save failed: " + result.error, Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.editor_widgetconfigactivity_save_failed_8f75d, result.error), Toast.LENGTH_LONG).show()
             return
         }
         sendReload()
@@ -321,7 +322,7 @@ class WidgetConfigActivity : Activity() {
             val type = binding.type()
             val raw = binding.value()
             if (validate && binding.required() && raw.trim { it <= ' ' }.isEmpty()) {
-                Toast.makeText(this, binding.label() + " is required.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.editor_widgetconfigactivity_is_required_372e6, binding.label()), Toast.LENGTH_SHORT).show()
                 return null
             }
             if ("number" == type) {
@@ -331,16 +332,16 @@ class WidgetConfigActivity : Activity() {
                     try {
                         var number = raw.toDouble()
                         if (validate && binding.hasMin() && number < binding.min()) {
-                            Toast.makeText(this, binding.label() + " must be at least " + binding.minText() + ".", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this, getString(R.string.editor_widgetconfigactivity_must_be_at_least_75d4b, binding.label(), binding.minText()), Toast.LENGTH_SHORT).show()
                             return null
                         }
                         if (validate && binding.hasMax() && number > binding.max()) {
-                            Toast.makeText(this, binding.label() + " must be at most " + binding.maxText() + ".", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this, getString(R.string.editor_widgetconfigactivity_must_be_at_most_54268, binding.label(), binding.maxText()), Toast.LENGTH_SHORT).show()
                             return null
                         }
                         values.put(id, number)
                     } catch (e: Exception) {
-                        Toast.makeText(this, binding.label() + " must be a number.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, getString(R.string.editor_widgetconfigactivity_must_be_a_number_fedc6, binding.label()), Toast.LENGTH_SHORT).show()
                         return null
                     }
                 }
@@ -368,10 +369,10 @@ class WidgetConfigActivity : Activity() {
         }
         TuixtDialog.showConfirm(
             this,
-            "Discard Changes?",
-            "Unsaved Lua module settings will be lost.",
-            "Discard",
-            "Keep Editing",
+            getString(R.string.editor_widgetconfigactivity_discard_changes_f99ee),
+            getString(R.string.editor_widgetconfigactivity_unsaved_lua_module_settings_will_be_lost_e6012),
+            getString(R.string.editor_widgetconfigactivity_discard_36fff),
+            getString(R.string.editor_widgetconfigactivity_keep_editing_ced7d),
             ConfirmAction { this.finish() })
     }
 
@@ -429,7 +430,7 @@ class WidgetConfigActivity : Activity() {
             }
         }
         if (options.isEmpty()) {
-            options.add(SelectOption("", "None"))
+            options.add(SelectOption("", getString(R.string.editor_widgetconfigactivity_none_6eef6)))
         }
         return options
     }

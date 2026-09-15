@@ -21,7 +21,7 @@ class guide : CommandAbstraction, PermanentSuggestionCommand {
             return GuideManager.overview(pack.context)
         }
 
-        val command = parts[0]?.lowercase(Locale.getDefault()) ?: Tuils.EMPTYSTRING
+        val command = parts[0]?.lowercase(Locale.ROOT) ?: Tuils.EMPTYSTRING
         return when (command) {
             "-start", "start" -> GuideManager.start(pack.context, parts.getOrNull(1))
             "-resume", "resume" -> GuideManager.resume(pack.context)

@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Translate display text only. See docs/localization/README.md. -->
+    <!-- layout/about_device_view.xml: android:contentDescription -->
+    <string name="ui_about_device_view_show_modules" formatted="false">"Show modules"</string>
+    <!-- layout/android_widget_drawer.xml: android:text -->
+    <string name="ui_android_widget_drawer_w" formatted="false" translatable="false">"$W "</string>
+    <!-- layout/android_widget_drawer.xml: android:hint -->
+    <string name="ui_android_widget_drawer_add_show_resize_remove" formatted="false" translatable="false">"add | show | resize | remove"</string>
+    <!-- layout/android_widget_drawer.xml: android:text -->
+    <string name="ui_android_widget_drawer_run" formatted="false">"RUN"</string>
+    <!-- layout/android_widget_drawer.xml: android:text -->
+    <string name="ui_android_widget_drawer_widgets_0" formatted="false">"Widgets/ [0]"</string>
+    <!-- layout/android_widget_drawer.xml: android:text -->
+    <string name="ui_android_widget_drawer_x" formatted="false" translatable="false">"X"</string>
+    <!-- layout/android_widget_drawer.xml: android:text -->
+    <string name="ui_android_widget_drawer_grid_4" formatted="false">"grid 4"</string>
+    <!-- layout/apps_drawer.xml: android:text -->
+    <string name="ui_apps_drawer_applications_s" formatted="false">"Applications/ [s]"</string>
+    <!-- layout/apps_drawer.xml: android:text -->
+    <string name="ui_apps_drawer_total_0" formatted="false">"total 0 [~]"</string>
+    <!-- layout/base_view.xml: android:contentDescription -->
+    <string name="ui_base_view_android_widgets" formatted="false">"Android widgets"</string>
+    <!-- layout/base_view.xml: android:contentDescription -->
+    <string name="ui_base_view_termux_workspace" formatted="false">"Termux workspace"</string>
+    <!-- layout/calculator_surface.xml: android:text -->
+    <string name="ui_calculator_surface_expression" formatted="false">"EXPRESSION"</string>
+    <!-- layout/calculator_surface.xml: android:text -->
+    <string name="ui_calculator_surface_calculator" formatted="false">"CALCULATOR"</string>
+    <!-- layout/calculator_surface.xml: android:contentDescription -->
+    <string name="ui_calculator_surface_close_calculator" formatted="false">"Close calculator"</string>
+    <!-- layout/calculator_surface.xml: android:text -->
+    <string name="ui_calculator_surface_x" formatted="false" translatable="false">"X"</string>
+    <!-- layout/color_picker_dialog.xml: android:text -->
+    <string name="ui_color_picker_dialog_color_picker" formatted="false">"COLOR PICKER"</string>
+    <!-- layout/color_picker_dialog.xml: android:text -->
+    <string name="ui_color_picker_dialog_opacity_alpha" formatted="false">"OPACITY (ALPHA)"</string>
+    <!-- layout/color_picker_dialog.xml: android:text -->
+    <string name="ui_color_picker_dialog_hue" formatted="false">"HUE"</string>
+    <!-- layout/color_picker_dialog.xml: android:text -->
+    <string name="ui_color_picker_dialog_saturation" formatted="false">"SATURATION"</string>
+    <!-- layout/color_picker_dialog.xml: android:text -->
+    <string name="ui_color_picker_dialog_brightness_value" formatted="false">"BRIGHTNESS (VALUE)"</string>
+    <!-- layout/color_picker_dialog.xml: android:text -->
+    <string name="ui_color_picker_dialog_auto" formatted="false">"AUTO"</string>
+    <!-- layout/file_console.xml: android:text -->
+    <string name="ui_file_console_refresh" formatted="false">"REFRESH"</string>
+    <!-- layout/file_console.xml: android:text -->
+    <string name="ui_file_console_up" formatted="false" translatable="false">"UP"</string>
+    <!-- layout/file_console.xml: android:text -->
+    <string name="ui_file_console_open" formatted="false">"OPEN"</string>
+    <!-- layout/file_console.xml: android:text -->
+    <string name="ui_file_console_paste" formatted="false">"PASTE"</string>
+    <!-- layout/file_console.xml: android:text -->
+    <string name="ui_file_console_files" formatted="false">"FILES"</string>
+    <!-- layout/file_console.xml: android:text -->
+    <string name="ui_file_console_x" formatted="false" translatable="false">"X"</string>
+    <!-- layout/lockdown_overlay.xml: android:contentDescription -->
+    <string name="ui_lockdown_overlay_lockdown" formatted="false">"LOCKDOWN"</string>
+    <!-- layout/lockdown_overlay.xml: android:text -->
+    <string name="ui_lockdown_overlay_focus_mode" formatted="false">"Focus mode"</string>
+    <!-- layout/lockdown_overlay.xml: android:text -->
+    <string name="ui_lockdown_overlay_credits_1000_keys_0" formatted="false">"Credits: 1000 | Keys: 0"</string>
+    <!-- layout/lockdown_overlay.xml: android:text -->
+    <string name="ui_lockdown_overlay_skip_lockdown_500_credits" formatted="false">"SKIP LOCKDOWN  -500 CREDITS"</string>
+    <!-- layout/lockdown_overlay.xml: android:text -->
+    <string name="ui_lockdown_overlay_use_breach_key" formatted="false">"USE BREACH KEY"</string>
+    <!-- layout/lockdown_overlay.xml: android:text -->
+    <string name="ui_lockdown_overlay_emergency_breach" formatted="false">"EMERGENCY BREACH"</string>
+    <!-- layout/module_text_panel.xml: android:text -->
+    <string name="ui_module_text_panel_module" formatted="false">"MODULE"</string>
+    <!-- layout/module_text_panel.xml: android:text -->
+    <string name="ui_module_text_panel_x" formatted="false" translatable="false">"X"</string>
+    <!-- layout/music_module.xml: android:text -->
+    <string name="ui_music_module_title" formatted="false">"Title: -"</string>
+    <!-- layout/music_module.xml: android:text -->
+    <string name="ui_music_module_singer" formatted="false">"Singer      : -"</string>
+    <!-- layout/music_module.xml: android:text -->
+    <string name="ui_music_module_currently_playing_app" formatted="false">"Currently playing app: "</string>
+    <!-- layout/music_module.xml: android:text -->
+    <string name="ui_music_module_prev" formatted="false">"PREV"</string>
+    <!-- layout/music_module.xml: android:text -->
+    <string name="ui_music_module_play_pause" formatted="false">"PLAY/PAUSE"</string>
+    <!-- layout/music_module.xml: android:text -->
+    <string name="ui_music_module_next" formatted="false">"NEXT"</string>
+    <!-- layout/music_module.xml: android:text -->
+    <string name="ui_music_module_now_playing" formatted="false">"NOW PLAYING"</string>
+    <!-- layout/music_module.xml: android:text -->
+    <string name="ui_music_module_x" formatted="false" translatable="false">"X"</string>
+    <!-- layout/notification_module.xml: android:text -->
+    <string name="ui_notification_module_previous" formatted="false">"[previous]"</string>
+    <!-- layout/notification_module.xml: android:text -->
+    <string name="ui_notification_module_clear" formatted="false">"[clear]"</string>
+    <!-- layout/notification_module.xml: android:text -->
+    <string name="ui_notification_module_next" formatted="false">"[next]"</string>
+    <!-- layout/notification_module.xml: android:text -->
+    <string name="ui_notification_module_notifications" formatted="false">"NOTIFICATIONS"</string>
+    <!-- layout/notification_module.xml: android:text -->
+    <string name="ui_notification_module_x" formatted="false" translatable="false">"X"</string>
+    <!-- layout/podcast_surface.xml: android:text -->
+    <string name="ui_podcast_surface_shows" formatted="false">"SHOWS"</string>
+    <!-- layout/podcast_surface.xml: android:text -->
+    <string name="ui_podcast_surface_recents" formatted="false">"RECENTS"</string>
+    <!-- layout/podcast_surface.xml: android:text -->
+    <string name="ui_podcast_surface_add" formatted="false">"ADD"</string>
+    <!-- layout/podcast_surface.xml: android:text -->
+    <string name="ui_podcast_surface_refresh" formatted="false">"REFRESH"</string>
+    <!-- layout/podcast_surface.xml: android:contentDescription -->
+    <string name="ui_podcast_surface_back_to_shows" formatted="false">"Back to shows"</string>
+    <!-- layout/podcast_surface.xml: android:text -->
+    <string name="ui_podcast_surface_prev" formatted="false">"[ PREV ]"</string>
+    <!-- layout/podcast_surface.xml: android:text -->
+    <string name="ui_podcast_surface_play" formatted="false">"[ PLAY ]"</string>
+    <!-- layout/podcast_surface.xml: android:text -->
+    <string name="ui_podcast_surface_next" formatted="false">"[ NEXT ]"</string>
+    <!-- layout/podcast_surface.xml: android:contentDescription -->
+    <string name="ui_podcast_surface_podcast_artwork" formatted="false">"Podcast artwork"</string>
+    <!-- layout/podcast_surface.xml: android:text -->
+    <string name="ui_podcast_surface_add_a_feed_then_play_a_show" formatted="false">"Add a feed, then play a show."</string>
+    <!-- layout/podcast_surface.xml: android:text -->
+    <string name="ui_podcast_surface_no_podcast_playing" formatted="false">"No podcast playing"</string>
+    <!-- layout/podcast_surface.xml: android:text -->
+    <string name="ui_podcast_surface_podcasts" formatted="false">"PODCASTS"</string>
+    <!-- layout/pomodoro_overlay.xml: android:text -->
+    <string name="ui_pomodoro_overlay_focus_mode_active" formatted="false">"FOCUS MODE ACTIVE"</string>
+    <!-- layout/pomodoro_overlay.xml: android:text -->
+    <string name="ui_pomodoro_overlay_task_focus" formatted="false">"Task: Focus"</string>
+    <!-- layout/pomodoro_overlay.xml: android:text -->
+    <string name="ui_pomodoro_overlay_terminate_session" formatted="false">"TERMINATE SESSION"</string>
+    <!-- layout-land/profile_surface.xml: android:contentDescription -->
+    <string name="ui_profile_surface_temporary_profile_portrait" formatted="false">"Temporary profile portrait"</string>
+    <!-- layout-land/profile_surface.xml: android:text -->
+    <string name="ui_profile_surface_identity" formatted="false">"IDENTITY"</string>
+    <!-- layout-land/profile_surface.xml: android:text -->
+    <string name="ui_profile_surface_operator" formatted="false">"OPERATOR"</string>
+    <!-- layout-land/profile_surface.xml: android:text -->
+    <string name="ui_profile_surface_phone_tap_to_reveal_30s" formatted="false">"PHONE // TAP TO REVEAL 30S"</string>
+    <!-- layout-land/profile_surface.xml: android:contentDescription -->
+    <string name="ui_profile_surface_masked_phone_number_tap_to_reveal_for_30_seconds" formatted="false">"Masked phone number. Tap to reveal for 30 seconds."</string>
+    <!-- layout-land/profile_surface.xml: android:text -->
+    <string name="ui_profile_surface_not_set" formatted="false">"NOT SET"</string>
+    <!-- layout-land/profile_surface.xml: android:text -->
+    <string name="ui_profile_surface_edit_profile" formatted="false">"EDIT PROFILE"</string>
+    <!-- layout-land/profile_surface.xml: android:text -->
+    <string name="ui_profile_surface_add_qr" formatted="false">"ADD QR"</string>
+    <!-- layout-land/profile_surface.xml: android:text -->
+    <string name="ui_profile_surface_connection_codes" formatted="false">"CONNECTION CODES"</string>
+    <!-- layout/profile_surface.xml: android:text -->
+    <string name="ui_profile_surface_remove_current_qr" formatted="false">"REMOVE CURRENT QR"</string>
+    <!-- layout-land/profile_surface.xml: android:text -->
+    <string name="ui_profile_surface_profile_local_id" formatted="false">"PROFILE // LOCAL ID"</string>
+    <!-- layout-land/profile_surface.xml: android:text -->
+    <string name="ui_profile_surface_x" formatted="false" translatable="false">"X"</string>
+    <!-- layout/terminal_page.xml: android:text -->
+    <string name="ui_terminal_page_output" formatted="false">"OUTPUT ^"</string>
+    <!-- layout/termux_console.xml: android:text -->
+    <string name="ui_termux_console_output" formatted="false">"OUTPUT"</string>
+    <!-- layout/termux_console.xml: android:text -->
+    <string name="ui_termux_console_esc" formatted="false" translatable="false">"ESC"</string>
+    <!-- layout/termux_console.xml: android:text -->
+    <string name="ui_termux_console_home" formatted="false" translatable="false">"HOME"</string>
+    <!-- layout/termux_console.xml: android:text -->
+    <string name="ui_termux_console_up" formatted="false" translatable="false">"UP"</string>
+    <!-- layout/termux_console.xml: android:text -->
+    <string name="ui_termux_console_end" formatted="false" translatable="false">"END"</string>
+    <!-- layout/termux_console.xml: android:text -->
+    <string name="ui_termux_console_pgup" formatted="false" translatable="false">"PGUP"</string>
+    <!-- layout/termux_console.xml: android:text -->
+    <string name="ui_termux_console_cfg" formatted="false" translatable="false">"CFG"</string>
+    <!-- layout/termux_console.xml: android:text -->
+    <string name="ui_termux_console_tab" formatted="false" translatable="false">"TAB"</string>
+    <!-- layout/termux_console.xml: android:text -->
+    <string name="ui_termux_console_ctrl" formatted="false" translatable="false">"CTRL"</string>
+    <!-- layout/termux_console.xml: android:text -->
+    <string name="ui_termux_console_alt" formatted="false" translatable="false">"ALT"</string>
+    <!-- layout/termux_console.xml: android:text -->
+    <string name="ui_termux_console_left" formatted="false" translatable="false">"LEFT"</string>
+    <!-- layout/termux_console.xml: android:text -->
+    <string name="ui_termux_console_down" formatted="false" translatable="false">"DOWN"</string>
+    <!-- layout/termux_console.xml: android:text -->
+    <string name="ui_termux_console_right" formatted="false" translatable="false">"RIGHT"</string>
+    <!-- layout/termux_console.xml: android:text -->
+    <string name="ui_termux_console_pgdn" formatted="false" translatable="false">"PGDN"</string>
+    <!-- layout/termux_console.xml: android:text -->
+    <string name="ui_termux_console_ime" formatted="false">"IME"</string>
+    <!-- layout/termux_console.xml: android:text -->
+    <string name="ui_termux_console_termux" formatted="false">"TERMUX"</string>
+    <!-- layout/termux_console.xml: android:text -->
+    <string name="ui_termux_console_x" formatted="false" translatable="false">"X"</string>
+    <!-- layout/termux_workspace_page.xml: android:text -->
+    <string name="ui_termux_workspace_page_window" formatted="false">"WINDOW"</string>
+    <!-- layout/termux_workspace_page.xml: android:text -->
+    <string name="ui_termux_workspace_page_fn" formatted="false" translatable="false">"FN"</string>
+    <!-- layout/termux_workspace_page.xml: android:text -->
+    <string name="ui_termux_workspace_page_esc" formatted="false" translatable="false">"ESC"</string>
+    <!-- layout/termux_workspace_page.xml: android:text -->
+    <string name="ui_termux_workspace_page_home" formatted="false" translatable="false">"HOME"</string>
+    <!-- layout/termux_workspace_page.xml: android:text -->
+    <string name="ui_termux_workspace_page_up" formatted="false" translatable="false">"UP"</string>
+    <!-- layout/termux_workspace_page.xml: android:text -->
+    <string name="ui_termux_workspace_page_end" formatted="false" translatable="false">"END"</string>
+    <!-- layout/termux_workspace_page.xml: android:text -->
+    <string name="ui_termux_workspace_page_pgup" formatted="false" translatable="false">"PGUP"</string>
+    <!-- layout/termux_workspace_page.xml: android:text -->
+    <string name="ui_termux_workspace_page_tab" formatted="false" translatable="false">"TAB"</string>
+    <!-- layout/termux_workspace_page.xml: android:text -->
+    <string name="ui_termux_workspace_page_ctrl" formatted="false" translatable="false">"CTRL"</string>
+    <!-- layout/termux_workspace_page.xml: android:text -->
+    <string name="ui_termux_workspace_page_alt" formatted="false" translatable="false">"ALT"</string>
+    <!-- layout/termux_workspace_page.xml: android:text -->
+    <string name="ui_termux_workspace_page_shift" formatted="false" translatable="false">"SHIFT"</string>
+    <!-- layout/termux_workspace_page.xml: android:text -->
+    <string name="ui_termux_workspace_page_left" formatted="false" translatable="false">"LEFT"</string>
+    <!-- layout/termux_workspace_page.xml: android:text -->
+    <string name="ui_termux_workspace_page_down" formatted="false" translatable="false">"DOWN"</string>
+    <!-- layout/termux_workspace_page.xml: android:text -->
+    <string name="ui_termux_workspace_page_right" formatted="false" translatable="false">"RIGHT"</string>
+    <!-- layout/termux_workspace_page.xml: android:text -->
+    <string name="ui_termux_workspace_page_pgdn" formatted="false" translatable="false">"PGDN"</string>
+    <!-- layout/termux_workspace_page.xml: android:text -->
+    <string name="ui_termux_workspace_page_tmux" formatted="false" translatable="false">"tmux&gt;"</string>
+    <!-- layout/termux_workspace_page.xml: android:text -->
+    <string name="ui_termux_workspace_page_send" formatted="false">"SEND"</string>
+    <!-- layout/termux_workspace_page.xml: android:text -->
+    <string name="ui_termux_workspace_page_termux_workspace" formatted="false">"TERMUX WORKSPACE"</string>
+    <!-- layout/tuixt_row.xml: android:text -->
+    <string name="ui_tuixt_row_off" formatted="false">"OFF"</string>
+    <!-- layout-land/profile_surface.xml: android:text -->
+    <string name="ui_profile_surface_remove_qr" formatted="false">"REMOVE QR"</string>
+    <!-- Reminder editor: Reminders -->
+    <string name="reminder_reminders" formatted="false">"Reminders"</string>
+    <!-- Reminder editor: ADD REMINDER -->
+    <string name="reminder_add_reminder" formatted="false">"ADD REMINDER"</string>
+    <!-- Reminder editor: CLOSE -->
+    <string name="reminder_close" formatted="false">"CLOSE"</string>
+    <!-- Reminder editor: No reminders. -->
+    <string name="reminder_no_reminders" formatted="false">"No reminders."</string>
+    <!-- Reminder editor: EDIT -->
+    <string name="reminder_edit" formatted="false">"EDIT"</string>
+    <!-- Reminder editor: REMOVE -->
+    <string name="reminder_remove" formatted="false">"REMOVE"</string>
+    <!-- Reminder editor: Add reminder -->
+    <string name="reminder_add_title" formatted="false">"Add reminder"</string>
+    <!-- Reminder editor: Edit reminder -->
+    <string name="reminder_edit_reminder" formatted="false">"Edit reminder"</string>
+    <!-- Reminder editor: Task name -->
+    <string name="reminder_task_name" formatted="false">"Task name"</string>
+    <!-- Reminder editor: DATE / TIME -->
+    <string name="reminder_date_time" formatted="false">"DATE / TIME"</string>
+    <!-- Reminder editor: CANCEL -->
+    <string name="reminder_cancel" formatted="false">"CANCEL"</string>
+    <!-- Reminder editor: SAVE -->
+    <string name="reminder_save" formatted="false">"SAVE"</string>
+    <!-- Reminder editor: Task name cannot be empty. -->
+    <string name="reminder_task_name_cannot_be_empty" formatted="false">"Task name cannot be empty."</string>
+    <!-- Reminder editor: Reminder time must be in the future. -->
+    <string name="reminder_reminder_time_must_be_in_the_future" formatted="false">"Reminder time must be in the future."</string>
+    <!-- Reminder editor: Pick date / time -->
+    <string name="reminder_pick_date_time" formatted="false">"Pick date / time"</string>
+    <!-- Reminder editor: Use -->
+    <string name="reminder_use" formatted="false">"Use"</string>
+    <!-- Reminder editor: Cancel -->
+    <string name="reminder_cancel_label" formatted="false">"Cancel"</string>
+    <!-- Reminder editor: Remove reminder? -->
+    <string name="reminder_remove_reminder" formatted="false">"Remove reminder?"</string>
+    <!-- Reminder editor: Remove -->
+    <string name="reminder_remove_label" formatted="false">"Remove"</string>
+    <!-- First launch setup. Keep command examples unchanged. -->
+    <string name="startup_opening_startup_menu_in_dry_run_mode" formatted="false">"Opening startup menu in dry-run mode."</string>
+    <!-- First launch setup. Keep command examples unchanged. -->
+    <string name="startup_app_drawer" formatted="false">"App drawer"</string>
+    <!-- First launch setup. Keep command examples unchanged. -->
+    <string name="startup_toolbar_shortcut_for_browsing_installed_apps" formatted="false">"Toolbar shortcut for browsing installed apps."</string>
+    <!-- First launch setup. Keep command examples unchanged. -->
+    <string name="startup_module_dock" formatted="false">"Module dock"</string>
+    <!-- First launch setup. Keep command examples unchanged. -->
+    <string name="startup_quick_access_row_for_launcher_modules" formatted="false">"Quick-access row for launcher modules."</string>
+    <!-- First launch setup. Keep command examples unchanged. -->
+    <string name="startup_android_widgets" formatted="false">"Android widgets"</string>
+    <!-- First launch setup. Keep command examples unchanged. -->
+    <string name="startup_toolbar_shortcut_for_the_android_widget_drawer" formatted="false">"Toolbar shortcut for the Android widget drawer."</string>
+    <!-- First launch setup. Keep command examples unchanged. -->
+    <string name="startup_notifications_and_media" formatted="false">"Notifications and media"</string>
+    <!-- First launch setup. Keep command examples unchanged. -->
+    <string name="startup_read_notifications_and_external_media_sessions" formatted="false">"Read notifications and external media sessions."</string>
+    <!-- First launch setup. Keep command examples unchanged. -->
+    <string name="startup_status_extras" formatted="false">"Status extras"</string>
+    <!-- First launch setup. Keep command examples unchanged. -->
+    <string name="startup_weather_and_unlock_count_labels" formatted="false">"Weather and unlock-count labels."</string>
+    <!-- First launch setup. Keep command examples unchanged. -->
+    <string name="startup_double_tap_lock" formatted="false">"Double-tap lock"</string>
+    <!-- First launch setup. Keep command examples unchanged. -->
+    <string name="startup_lock_the_phone_with_a_double_tap" formatted="false">"Lock the phone with a double tap."</string>
+    <!-- First launch setup. Keep command examples unchanged. -->
+    <string name="startup_termux_and_tmux" formatted="false">"Termux and tmux"</string>
+    <!-- First launch setup. Keep command examples unchanged. -->
+    <string name="startup_termux_detected_show_the_tmux_workspace_shortcut" formatted="false">"Termux detected; show the tmux workspace shortcut."</string>
+    <!-- First launch setup. Keep command examples unchanged. -->
+    <string name="startup_termux_not_detected_keep_the_tmux_shortcut_available_for_later" formatted="false">"Termux not detected; keep the tmux shortcut available for later."</string>
+    <!-- First launch setup. Keep command examples unchanged. -->
+    <string name="startup_tasker" formatted="false">"Tasker"</string>
+    <!-- First launch setup. Keep command examples unchanged. -->
+    <string name="startup_tasker_detected_allow_re_t_ui_actions_and_tasks" formatted="false">"Tasker detected; allow Re:T-UI actions and tasks."</string>
+    <!-- First launch setup. Keep command examples unchanged. -->
+    <string name="startup_tasker_not_detected_enable_the_integration_for_later" formatted="false">"Tasker not detected; enable the integration for later."</string>
+    <!-- First launch setup. Keep command examples unchanged. -->
+    <string name="startup_launcher_sounds" formatted="false">"Launcher sounds"</string>
+    <!-- First launch setup. Keep command examples unchanged. -->
+    <string name="startup_boot_action_timer_and_reminder_sounds" formatted="false">"Boot, action, timer, and reminder sounds."</string>
+    <!-- First launch setup. Keep command examples unchanged. -->
+    <string name="startup_startup_preview_complete_no_settings_were_changed" formatted="false">"Startup preview complete. No settings were changed."</string>
+    <!-- First launch setup. Keep command examples unchanged. -->
+    <string name="startup_termux_run_tbridge_setup_then_tbridge_status" formatted="false">"Termux: run tbridge -setup, then tbridge -status."</string>
+    <!-- First launch setup. Keep command examples unchanged. -->
+    <string name="startup_tasker_allow_external_access_in_tasker_if_prompted" formatted="false">"Tasker: allow external access in Tasker if prompted."</string>
+    <!-- First launch setup. Keep command examples unchanged. -->
+    <string name="startup_startup_setup_applied" formatted="false">"Startup setup applied."</string>
+    <!-- First launch setup. Keep command examples unchanged. -->
+    <string name="startup_startup_preview_closed_no_settings_were_changed" formatted="false">"Startup preview closed. No settings were changed."</string>
+    <!-- First launch setup. Keep command examples unchanged. -->
+    <string name="startup_startup_setup_postponed_until_the_next_launch" formatted="false">"Startup setup postponed until the next launch."</string>
+    <!-- First launch setup. Keep command examples unchanged. -->
+    <string name="startup_startup_dry_run" formatted="false">"STARTUP · DRY RUN"</string>
+    <!-- First launch setup. Keep command examples unchanged. -->
+    <string name="startup_startup" formatted="false">"STARTUP"</string>
+    <!-- First launch setup. Keep command examples unchanged. -->
+    <string name="startup_set_up_your_launcher" formatted="false">"Set up your launcher"</string>
+    <!-- First launch setup. Keep command examples unchanged. -->
+    <string name="startup_preview_only_changing_switches_here_will_not_alter_your_launcher" formatted="false">"Preview only — changing switches here will not alter your launcher."</string>
+    <!-- First launch setup. Keep command examples unchanged. -->
+    <string name="startup_choose_a_setup_level_review_it_here_then_apply_once" formatted="false">"Choose a setup level, review it here, then apply once."</string>
+    <!-- First launch setup. Keep command examples unchanged. -->
+    <string name="startup_auto_theme" formatted="false">"Auto-theme"</string>
+    <!-- First launch setup. Keep command examples unchanged. -->
+    <string name="startup_derive_launcher_colors_from_the_system_wallpaper" formatted="false">"Derive launcher colors from the system wallpaper."</string>
+    <!-- First launch setup. Keep command examples unchanged. -->
+    <string name="startup_border" formatted="false">"BORDER"</string>
+    <!-- First launch setup. Keep command examples unchanged. -->
+    <string name="startup_features" formatted="false">"FEATURES"</string>
+    <!-- First launch setup. Keep command examples unchanged. -->
+    <string name="startup_visual_effects" formatted="false">"VISUAL EFFECTS"</string>
+    <!-- First launch setup. Keep command examples unchanged. -->
+    <string name="startup_basic_keeps_status_extras_and_double_tap_lock_on_optional_drawers_and" formatted="false">"Basic keeps status extras and double-tap lock on. Optional drawers and integrations stay off."</string>
+    <!-- First launch setup. Keep command examples unchanged. -->
+    <string name="startup_end_preview" formatted="false">"END PREVIEW"</string>
+    <!-- First launch setup. Keep command examples unchanged. -->
+    <string name="startup_later" formatted="false">"LATER"</string>
+    <!-- First launch setup. Keep command examples unchanged. -->
+    <string name="startup_finish_preview" formatted="false">"FINISH PREVIEW"</string>
+    <!-- First launch setup. Keep command examples unchanged. -->
+    <string name="startup_apply" formatted="false">"APPLY"</string>
+    <!-- First launch setup. Keep command examples unchanged. -->
+    <string name="startup_on" formatted="false">"On"</string>
+    <!-- First launch setup. Keep command examples unchanged. -->
+    <string name="startup_off" formatted="false">"Off"</string>
+    <!-- First launch setup. Keep command examples unchanged. -->
+    <string name="startup_classic_base" formatted="false">"Classic base"</string>
+    <!-- First launch setup. Keep command examples unchanged. -->
+    <string name="startup_the_standard_launcher_renderer_is_always_active" formatted="false">"The standard launcher renderer is always active."</string>
+    <!-- First launch setup. Keep command examples unchanged. -->
+    <string name="startup_cyberdeck" formatted="false">"Cyberdeck"</string>
+    <!-- First launch setup. Keep command examples unchanged. -->
+    <string name="startup_layer_cyberdeck_chrome_over_the_classic_base" formatted="false">"Layer cyberdeck chrome over the classic base."</string>
+    <!-- First launch setup. Keep command examples unchanged. -->
+    <string name="startup_crt" formatted="false">"CRT"</string>
+    <!-- First launch setup. Keep command examples unchanged. -->
+    <string name="startup_layer_scanline_and_crt_effects_over_the_classic_base" formatted="false">"Layer scanline and CRT effects over the classic base."</string>
+    <!-- Setup choice label; stored values do not change. -->
+    <string name="startup_basic" formatted="false">"BASIC"</string>
+    <!-- Setup choice label; stored values do not change. -->
+    <string name="startup_advanced" formatted="false">"ADVANCED"</string>
+    <!-- Setup choice label; stored values do not change. -->
+    <string name="startup_dashed" formatted="false">"DASHED"</string>
+    <!-- Setup choice label; stored values do not change. -->
+    <string name="startup_solid" formatted="false">"SOLID"</string>
+    <!-- Setup choice label; stored values do not change. -->
+    <string name="startup_none" formatted="false">"NONE"</string>
+    <!-- Empty app search results. -->
+    <string name="dialog_no_apps_found" formatted="false">"NO APPS FOUND"</string>
+    <string name="common_on">"ON"</string>
+    <string name="common_off">"OFF"</string>
+    <string name="reminder_unscheduled">"unscheduled"</string>
+    <!-- Accessibility announcement: feature name, explanation, on/off state. -->
+    <string name="startup_toggle_description">%1$s. %2$s. %3$s</string>
+    <plurals name="reminder_more">
+        <item quantity="one">+%1$d more</item>
+        <item quantity="other">+%1$d more</item>
+    </plurals>
+    <string name="reminder_list_entry">%1$d. %2$s\n%3$s</string>
+</resources>

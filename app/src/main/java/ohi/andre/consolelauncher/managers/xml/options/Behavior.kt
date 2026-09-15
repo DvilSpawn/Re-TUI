@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher.managers.xml.options
 
+import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsElement
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave
@@ -14,8 +15,8 @@ enum class Behavior : XMLPrefsSave {
             return "true"
         }
 
-        override fun info(): String? {
-            return "If true, Re:T-UI will lock the screen on double tap"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_double_tap_lock_description
         }
 
         override fun type(): String? {
@@ -27,8 +28,8 @@ enum class Behavior : XMLPrefsSave {
             return ""
         }
 
-        override fun info(): String? {
-            return "The command that will run when you touch two times the screen quickly"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_double_tap_cmd_description
         }
 
         override fun type(): String? {
@@ -40,8 +41,8 @@ enum class Behavior : XMLPrefsSave {
             return "true"
         }
 
-        override fun info(): String? {
-            return "If true, music player will play your tracks in random order"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_random_play_description
         }
 
         override fun type(): String? {
@@ -53,8 +54,8 @@ enum class Behavior : XMLPrefsSave {
             return "false"
         }
 
-        override fun info(): String? {
-            return "If true, Re:T-UI will play its bundled launcher sound pack"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_launcher_sounds_description
         }
 
         override fun type(): String? {
@@ -63,37 +64,51 @@ enum class Behavior : XMLPrefsSave {
     },
     sound_boot {
         override fun defaultValue(): String? = "true"
-        override fun info(): String? = "Play the launcher startup sound"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_sound_boot_description
+        }
         override fun type(): String? = XMLPrefsSave.BOOLEAN
     },
     sound_click {
         override fun defaultValue(): String? = "true"
-        override fun info(): String? = "Play a sound when submitting launcher input"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_sound_click_description
+        }
         override fun type(): String? = XMLPrefsSave.BOOLEAN
     },
     sound_success {
         override fun defaultValue(): String? = "true"
-        override fun info(): String? = "Play the successful action sound"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_sound_success_description
+        }
         override fun type(): String? = XMLPrefsSave.BOOLEAN
     },
     sound_failure {
         override fun defaultValue(): String? = "true"
-        override fun info(): String? = "Play the failed or invalid action sound"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_sound_failure_description
+        }
         override fun type(): String? = XMLPrefsSave.BOOLEAN
     },
     sound_notification {
         override fun defaultValue(): String? = "true"
-        override fun info(): String? = "Play the launcher module notification sound"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_sound_notification_description
+        }
         override fun type(): String? = XMLPrefsSave.BOOLEAN
     },
     sound_reminder {
         override fun defaultValue(): String? = "true"
-        override fun info(): String? = "Play the launcher reminder sound"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_sound_reminder_description
+        }
         override fun type(): String? = XMLPrefsSave.BOOLEAN
     },
     sound_timer {
         override fun defaultValue(): String? = "true"
-        override fun info(): String? = "Play the timer completion sound"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_sound_timer_description
+        }
         override fun type(): String? = XMLPrefsSave.BOOLEAN
     },
     songs_folder {
@@ -101,8 +116,8 @@ enum class Behavior : XMLPrefsSave {
             return ""
         }
 
-        override fun info(): String? {
-            return "The folder that contains your music files"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_songs_folder_description
         }
 
         override fun type(): String? {
@@ -114,8 +129,8 @@ enum class Behavior : XMLPrefsSave {
             return "true"
         }
 
-        override fun info(): String? {
-            return "If true, Re:T-UI will get tracks from the system mediastore"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_songs_from_mediastore_description
         }
 
         override fun type(): String? {
@@ -127,8 +142,8 @@ enum class Behavior : XMLPrefsSave {
             return "false"
         }
 
-        override fun info(): String? {
-            return "If true, there will always be a notification in your status bar, telling you that Re:T-UI is running"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_tui_notification_description
         }
 
         override fun type(): String? {
@@ -140,8 +155,8 @@ enum class Behavior : XMLPrefsSave {
             return "true"
         }
 
-        override fun info(): String? {
-            return "If true, your keyboard will be shown everytime you go back to Re:T-UI"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_auto_show_keyboard_description
         }
 
         override fun type(): String? {
@@ -151,8 +166,9 @@ enum class Behavior : XMLPrefsSave {
     search_only_mode {
         override fun defaultValue(): String? = "false"
 
-        override fun info(): String? =
-            "Use the launcher as a bottom search bar with universal results instead of the classic home surfaces"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_search_only_mode_description
+        }
 
         override fun type(): String? = XMLPrefsSave.BOOLEAN
     },
@@ -161,8 +177,8 @@ enum class Behavior : XMLPrefsSave {
             return "true"
         }
 
-        override fun info(): String? {
-            return "If true, the terminal will be automatically scrolled down when the keyboard is open"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_auto_scroll_description
         }
 
         override fun type(): String? {
@@ -174,8 +190,8 @@ enum class Behavior : XMLPrefsSave {
             return "false"
         }
 
-        override fun info(): String? {
-            return "If true, when you use an alias you'll also be able to know what command has been executed"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_show_alias_content_description
         }
 
         override fun type(): String? {
@@ -187,8 +203,8 @@ enum class Behavior : XMLPrefsSave {
             return "true"
         }
 
-        override fun info(): String? {
-            return "If false, Re:T-UI won't show the apps that you launch"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_show_launch_history_description
         }
 
         override fun type(): String? {
@@ -200,8 +216,8 @@ enum class Behavior : XMLPrefsSave {
             return "true"
         }
 
-        override fun info(): String? {
-            return "If false, Re:T-UI will hide the module dock row while keeping modules available through commands"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_show_module_dock_description
         }
 
         override fun type(): String? {
@@ -213,8 +229,8 @@ enum class Behavior : XMLPrefsSave {
             return "false"
         }
 
-        override fun info(): String? {
-            return "If true, Re:T-UI will show the tmux workspace button in the launcher toolbar"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_show_tmux_workspace_button_description
         }
 
         override fun type(): String? {
@@ -226,8 +242,8 @@ enum class Behavior : XMLPrefsSave {
             return "true"
         }
 
-        override fun info(): String? {
-            return "If true, Re:T-UI will show the Android widgets button in the launcher toolbar"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_show_android_widget_drawer_button_description
         }
 
         override fun type(): String? {
@@ -239,8 +255,8 @@ enum class Behavior : XMLPrefsSave {
             return "false"
         }
 
-        override fun info(): String? {
-            return "If true, Re:T-UI uses angular cyberdeck drawables while keeping the active theme colors"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_enable_cyberdeck_mode_description
         }
 
         override fun type(): String? {
@@ -252,8 +268,8 @@ enum class Behavior : XMLPrefsSave {
             return "false"
         }
 
-        override fun info(): String? {
-            return "If true, Re:T-UI draws a CRT scanline overlay over the launcher"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_enable_crt_filter_description
         }
 
         override fun type(): String? {
@@ -265,8 +281,8 @@ enum class Behavior : XMLPrefsSave {
             return "false"
         }
 
-        override fun info(): String? {
-            return "If true, Re:T-UI will animate framed content pasted into ascii.txt"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_ascii_animation_description
         }
 
         override fun type(): String? {
@@ -278,8 +294,8 @@ enum class Behavior : XMLPrefsSave {
             return "750"
         }
 
-        override fun info(): String? {
-            return "Default delay between animated ASCII frames in milliseconds"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_ascii_animation_frame_delay_ms_description
         }
 
         override fun type(): String? {
@@ -291,8 +307,8 @@ enum class Behavior : XMLPrefsSave {
             return "512"
         }
 
-        override fun info(): String? {
-            return "Maximum ASCII TXT import size, in KB"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_ascii_animation_max_file_kb_description
         }
 
         override fun type(): String? {
@@ -304,8 +320,8 @@ enum class Behavior : XMLPrefsSave {
             return "-1"
         }
 
-        override fun info(): String? {
-            return "Auto-clear after n commands (if -1, this feature will be disabled)"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_clear_after_cmds_description
         }
 
         override fun type(): String? {
@@ -317,8 +333,8 @@ enum class Behavior : XMLPrefsSave {
             return "true"
         }
 
-        override fun info(): String? {
-            return "Clear the launcher input and refresh suggestions after running a command"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_clear_input_after_command_description
         }
 
         override fun type(): String? {
@@ -330,8 +346,8 @@ enum class Behavior : XMLPrefsSave {
             return "-1"
         }
 
-        override fun info(): String? {
-            return "Auto-clear after n seconds (if -1, this feature will be disabled)"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_clear_after_seconds_description
         }
 
         override fun type(): String? {
@@ -343,8 +359,8 @@ enum class Behavior : XMLPrefsSave {
             return "-1"
         }
 
-        override fun info(): String? {
-            return "Set maximum number of lines that will be shown in the terminal (if -1, this feature is be disabled)"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_max_lines_description
         }
 
         override fun type(): String? {
@@ -356,8 +372,8 @@ enum class Behavior : XMLPrefsSave {
             return "d MMM yyyy HH:mm:ss"
         }
 
-        override fun info(): String? {
-            return "Define the time format for the status lines at the top. You can resize parts with [size=30]HH:mm[/size], use {clock_words} for Six Fifty Seven, and use %n for a new line"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_status_time_format_description
         }
 
         override fun type(): String? {
@@ -369,8 +385,8 @@ enum class Behavior : XMLPrefsSave {
             return "HH:mm:ss"
         }
 
-        override fun info(): String? {
-            return "Define the time format for the output lines. You can resize parts with [size=30]HH:mm[/size]"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_output_time_format_description
         }
 
         override fun type(): String? {
@@ -382,8 +398,8 @@ enum class Behavior : XMLPrefsSave {
             return "@"
         }
 
-        override fun info(): String? {
-            return "This is the separator between your different time formats"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_time_format_separator_description
         }
 
         override fun type(): String? {
@@ -395,8 +411,8 @@ enum class Behavior : XMLPrefsSave {
             return "50"
         }
 
-        override fun info(): String? {
-            return "The percentage below which the battery level will be considered \"medium\""
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_battery_medium_description
         }
 
         override fun type(): String? {
@@ -408,8 +424,8 @@ enum class Behavior : XMLPrefsSave {
             return "15"
         }
 
-        override fun info(): String? {
-            return "The percentage below which the battery level will be considered \"low\""
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_battery_low_description
         }
 
         override fun type(): String? {
@@ -421,8 +437,8 @@ enum class Behavior : XMLPrefsSave {
             return "%d: %u"
         }
 
-        override fun info(): String? {
-            return "Define the device format"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_device_format_description
         }
 
         override fun type(): String? {
@@ -434,8 +450,8 @@ enum class Behavior : XMLPrefsSave {
             return "Available RAM: %avgb GB of %totgb GB (%av%%)"
         }
 
-        override fun info(): String? {
-            return "Define the RAM format"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_ram_format_description
         }
 
         override fun type(): String? {
@@ -447,8 +463,8 @@ enum class Behavior : XMLPrefsSave {
             return "%(Charging: /)%v%"
         }
 
-        override fun info(): String? {
-            return "Define the battery format"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_battery_format_description
         }
 
         override fun type(): String? {
@@ -460,8 +476,8 @@ enum class Behavior : XMLPrefsSave {
             return "false"
         }
 
-        override fun info(): String? {
-            return "If true, the battery will be shown as a progress bar"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_battery_progress_bar_description
         }
 
         override fun type(): String? {
@@ -473,8 +489,8 @@ enum class Behavior : XMLPrefsSave {
             return "#"
         }
 
-        override fun info(): String? {
-            return "The character used to build the battery progress bar"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_battery_progress_bar_symbol_description
         }
 
         override fun type(): String? {
@@ -486,8 +502,8 @@ enum class Behavior : XMLPrefsSave {
             return "20"
         }
 
-        override fun info(): String? {
-            return "The length of the battery progress bar"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_battery_progress_bar_length_description
         }
 
         override fun type(): String? {
@@ -499,8 +515,8 @@ enum class Behavior : XMLPrefsSave {
             return "Internal Storage: %iavgb GB / %itotgb GB (%iav%%)"
         }
 
-        override fun info(): String? {
-            return "Define the storage format"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_storage_format_description
         }
 
         override fun type(): String? {
@@ -512,8 +528,8 @@ enum class Behavior : XMLPrefsSave {
             return "%(WiFi - %wn/%[Mobile Data: %d3/No Internet access])"
         }
 
-        override fun info(): String? {
-            return "Define the network format"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_network_info_format_description
         }
 
         override fun type(): String? {
@@ -525,8 +541,8 @@ enum class Behavior : XMLPrefsSave {
             return "[%t] %p %i"
         }
 
-        override fun info(): String? {
-            return "Define the input format "
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_input_format_description
         }
 
         override fun type(): String? {
@@ -538,8 +554,8 @@ enum class Behavior : XMLPrefsSave {
             return "%o"
         }
 
-        override fun info(): String? {
-            return "Define the output format "
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_output_format_description
         }
 
         override fun type(): String? {
@@ -551,8 +567,8 @@ enum class Behavior : XMLPrefsSave {
             return "%u@%d:%p"
         }
 
-        override fun info(): String? {
-            return "Define the session info format"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_session_info_format_description
         }
 
         override fun type(): String? {
@@ -564,8 +580,8 @@ enum class Behavior : XMLPrefsSave {
             return "--> %a"
         }
 
-        override fun info(): String? {
-            return "Define app launch format (%l = label, %p = package, %a = activity)"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_app_launch_format_description
         }
 
         override fun type(): String? {
@@ -577,8 +593,8 @@ enum class Behavior : XMLPrefsSave {
             return "%"
         }
 
-        override fun info(): String? {
-            return "Define the marker that will be replaced with a provided param"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_alias_param_marker_description
         }
 
         override fun type(): String? {
@@ -590,8 +606,8 @@ enum class Behavior : XMLPrefsSave {
             return ","
         }
 
-        override fun info(): String? {
-            return "Define the separator between a group of params"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_alias_param_separator_description
         }
 
         override fun type(): String? {
@@ -603,8 +619,8 @@ enum class Behavior : XMLPrefsSave {
             return "true"
         }
 
-        override fun info(): String? {
-            return "If true, if you pass a lower number of parameters to an alias, Re:T-UI will use the first one to replace the others"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_alias_replace_all_markers_description
         }
 
         override fun type(): String? {
@@ -616,8 +632,8 @@ enum class Behavior : XMLPrefsSave {
             return ";"
         }
 
-        override fun info(): String? {
-            return "The separator between two or more commands in a single input"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_multiple_cmd_separator_description
         }
 
         override fun type(): String? {
@@ -629,8 +645,8 @@ enum class Behavior : XMLPrefsSave {
             return "false"
         }
 
-        override fun info(): String? {
-            return "Legacy output tray toggle. Use output_tray_mode=toggled for manual expanded/collapsed control"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_toggle_output_state_description
         }
 
         override fun type(): String? {
@@ -642,8 +658,8 @@ enum class Behavior : XMLPrefsSave {
             return "native"
         }
 
-        override fun info(): String? {
-            return "Canonical output tray behavior: native, auto, or toggled"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_output_tray_mode_description
         }
 
         override fun type(): String? {
@@ -655,8 +671,8 @@ enum class Behavior : XMLPrefsSave {
             return "normal"
         }
 
-        override fun info(): String? {
-            return "Output header display: normal, arrows, or none. None hides the manual tray toggle."
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_output_header_mode_description
         }
 
         override fun type(): String? {
@@ -668,8 +684,8 @@ enum class Behavior : XMLPrefsSave {
             return "false"
         }
 
-        override fun info(): String? {
-            return "Collapse output to its clickable header after a delay. Disabled when output_header_mode is none"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_auto_hide_output_description
         }
 
         override fun type(): String? {
@@ -681,8 +697,8 @@ enum class Behavior : XMLPrefsSave {
             return "10"
         }
 
-        override fun info(): String? {
-            return "Seconds before auto-hide collapses output to its header (1-3600)"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_output_auto_hide_seconds_description
         }
 
         override fun type(): String? {
@@ -694,8 +710,8 @@ enum class Behavior : XMLPrefsSave {
             return "%a --> [%v]"
         }
 
-        override fun info(): String? {
-            return "Define the format used to show your alias contents "
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_alias_content_format_description
         }
 
         override fun type(): String? {
@@ -707,8 +723,8 @@ enum class Behavior : XMLPrefsSave {
             return Tuils.getFolder().getAbsolutePath()
         }
 
-        override fun info(): String? {
-            return "The path to your home directory"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_home_path_description
         }
 
         override fun type(): String? {
@@ -720,8 +736,8 @@ enum class Behavior : XMLPrefsSave {
             return "App installed: %p"
         }
 
-        override fun info(): String? {
-            return "The format of the \"app installed\" message (%l = label, %p = package)"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_app_installed_format_description
         }
 
         override fun type(): String? {
@@ -733,8 +749,8 @@ enum class Behavior : XMLPrefsSave {
             return "App updated: %p"
         }
 
-        override fun info(): String? {
-            return "The format of the \"app updated\" message (%l = label, %p = package)"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_app_updated_format_description
         }
 
         override fun type(): String? {
@@ -746,8 +762,8 @@ enum class Behavior : XMLPrefsSave {
             return "App uninstalled: %p"
         }
 
-        override fun info(): String? {
-            return "The format of the \"app uninstalled\" message (%l = label, %p = package)"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_app_uninstalled_format_description
         }
 
         override fun type(): String? {
@@ -759,8 +775,8 @@ enum class Behavior : XMLPrefsSave {
             return "false"
         }
 
-        override fun info(): String? {
-            return "If true, you will be able to use Re:T-UI as a music player. Otherwise, the music command will try to communicate with the music player that your using"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_enable_music_description
         }
 
         override fun type(): String? {
@@ -772,8 +788,8 @@ enum class Behavior : XMLPrefsSave {
             return "2"
         }
 
-        override fun info(): String? {
-            return "A value which is used to tell how deep Re:T-UI can go in a nested optional value"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_max_optional_depth_description
         }
 
         override fun type(): String? {
@@ -785,8 +801,8 @@ enum class Behavior : XMLPrefsSave {
             return "Re:T-UI"
         }
 
-        override fun info(): String? {
-            return "The title of the Re:T-UI notification"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_tui_notification_title_description
         }
 
         override fun type(): String? {
@@ -798,8 +814,8 @@ enum class Behavior : XMLPrefsSave {
             return "Re:T-UI is running"
         }
 
-        override fun info(): String? {
-            return "The subtitle of the Re:T-UI notification"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_tui_notification_subtitle_description
         }
 
         override fun type(): String? {
@@ -811,8 +827,8 @@ enum class Behavior : XMLPrefsSave {
             return ""
         }
 
-        override fun info(): String? {
-            return "The command ran when the Re:T-UI notification is clicked"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_tui_notification_click_cmd_description
         }
 
         override fun type(): String? {
@@ -824,8 +840,8 @@ enum class Behavior : XMLPrefsSave {
             return "true"
         }
 
-        override fun info(): String? {
-            return "If false, the click on the Re:T-UI notification won't bring you to your phone home"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_tui_notification_click_showhome_description
         }
 
         override fun type(): String? {
@@ -837,8 +853,8 @@ enum class Behavior : XMLPrefsSave {
             return "5"
         }
 
-        override fun info(): String? {
-            return "The number of used commands that will appear inside the Re:T-UI notification (<0 will disable the feature)"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_tui_notification_lastcmds_size_description
         }
 
         override fun type(): String? {
@@ -850,8 +866,8 @@ enum class Behavior : XMLPrefsSave {
             return "true"
         }
 
-        override fun info(): String? {
-            return "If true, the last used command will appear on top"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_tui_notification_lastcmds_updown_description
         }
 
         override fun type(): String? {
@@ -863,8 +879,8 @@ enum class Behavior : XMLPrefsSave {
             return "0"
         }
 
-        override fun info(): String? {
-            return "The priority of the Re:T-UI notification (min: -2, max: 2)"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_tui_notification_priority_description
         }
 
         override fun type(): String? {
@@ -876,8 +892,8 @@ enum class Behavior : XMLPrefsSave {
             return "100"
         }
 
-        override fun info(): String? {
-            return "The duration (in milliseconds) of the vibration when you long click a notification or an RSS item (<0 will disable the feature)"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_long_click_vibration_duration_description
         }
 
         override fun type(): String? {
@@ -889,8 +905,8 @@ enum class Behavior : XMLPrefsSave {
             return "700"
         }
 
-        override fun info(): String? {
-            return "The minimum duration of the long click on a notification or an RSS item"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_long_click_duration_description
         }
 
         override fun type(): String? {
@@ -902,8 +918,8 @@ enum class Behavior : XMLPrefsSave {
             return "true"
         }
 
-        override fun info(): String? {
-            return "If true, you will be able to use a command again clicking on it"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_click_commands_description
         }
 
         override fun type(): String? {
@@ -915,8 +931,8 @@ enum class Behavior : XMLPrefsSave {
             return "true"
         }
 
-        override fun info(): String? {
-            return "If true, you will be able to put a used command in the input field long-clicking it"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_long_click_commands_description
         }
 
         override fun type(): String? {
@@ -928,8 +944,8 @@ enum class Behavior : XMLPrefsSave {
             return "false"
         }
 
-        override fun info(): String? {
-            return "If true, Re:T-UI will automatically append a quote before a file inserted clicking on a suggestion"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_append_quote_before_file_description
         }
 
         override fun type(): String? {
@@ -941,8 +957,8 @@ enum class Behavior : XMLPrefsSave {
             return "/"
         }
 
-        override fun info(): String? {
-            return "The separator between two optional values (doesn\'t affect notification optional values)"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_optional_values_separator_description
         }
 
         override fun type(): String? {
@@ -954,8 +970,8 @@ enum class Behavior : XMLPrefsSave {
             return "0"
         }
 
-        override fun info(): String? {
-            return "0 = time up->down; 1 = time down->up; 2 = alphabetical up->down; 3 = alphabetical down->up; 4 = locked before; 5 = unlocked before"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_notes_sorting_description
         }
 
         override fun type(): String? {
@@ -967,8 +983,8 @@ enum class Behavior : XMLPrefsSave {
             return "true"
         }
 
-        override fun info(): String? {
-            return "If false, adding links to notes will be disallowed (may slightly increase performance)"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_notes_allow_link_description
         }
 
         override fun type(): String? {
@@ -980,8 +996,8 @@ enum class Behavior : XMLPrefsSave {
             return "2"
         }
 
-        override fun info(): String? {
-            return "0 = landscape, 1 = portrait, 2 = auto-rotate"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_orientation_description
         }
 
         override fun type(): String? {
@@ -993,8 +1009,8 @@ enum class Behavior : XMLPrefsSave {
             return "false"
         }
 
-        override fun info(): String? {
-            return "If true, enables the Duo command for manually switching landscape into a single portrait-style pane on the left or right screen"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_duo_mode_description
         }
 
         override fun type(): String? {
@@ -1006,8 +1022,8 @@ enum class Behavior : XMLPrefsSave {
             return "%t -> %v%n%a(%an = %av)(%n)"
         }
 
-        override fun info(): String? {
-            return "The default format used by htmlextract -use"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_htmlextractor_default_format_description
         }
 
         override fun type(): String? {
@@ -1019,8 +1035,8 @@ enum class Behavior : XMLPrefsSave {
             return Theme.time_text_color.defaultValue()
         }
 
-        override fun info(): String? {
-            return "The time color inside the Re:T-UI notification"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_tui_notification_time_text_color_description
         }
 
         override fun type(): String? {
@@ -1032,8 +1048,8 @@ enum class Behavior : XMLPrefsSave {
             return Theme.input_text_color.defaultValue()
         }
 
-        override fun info(): String? {
-            return "The input color inside the Re:T-UI notification"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_tui_notification_input_text_color_description
         }
 
         override fun type(): String? {
@@ -1045,8 +1061,8 @@ enum class Behavior : XMLPrefsSave {
             return "1f798f99228596c20ccfda51b9771a86"
         }
 
-        override fun info(): String? {
-            return "Legacy OpenWeather setting. It is no longer used."
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_weather_key_description
         }
 
         override fun type(): String? {
@@ -1058,8 +1074,8 @@ enum class Behavior : XMLPrefsSave {
             return "metric"
         }
 
-        override fun info(): String? {
-            return "metric = Celsius; imperial = Fahrenheit; standard = Kelvin"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_weather_temperature_measure_description
         }
 
         override fun type(): String? {
@@ -1071,8 +1087,8 @@ enum class Behavior : XMLPrefsSave {
             return "null"
         }
 
-        override fun info(): String? {
-            return "Place name or fixed coordinates separated by a comma (lat,lon). Weather never requests device location."
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_weather_location_description
         }
 
         override fun type(): String? {
@@ -1084,8 +1100,8 @@ enum class Behavior : XMLPrefsSave {
             return "Weather: %main, Temp: %temp"
         }
 
-        override fun info(): String? {
-            return "The format used to show the weather"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_weather_format_description
         }
 
         override fun type(): String? {
@@ -1097,8 +1113,8 @@ enum class Behavior : XMLPrefsSave {
             return "false"
         }
 
-        override fun info(): String? {
-            return "If true, Re:T-UI will clear the screen when you lock the phone"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_clear_on_lock_description
         }
 
         override fun type(): String? {
@@ -1110,8 +1126,8 @@ enum class Behavior : XMLPrefsSave {
             return "Unlocked %c times (%a10/)%n%t(Unlock n. %i --> %w)3"
         }
 
-        override fun info(): String? {
-            return "The format used to show the unlock counter"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_unlock_counter_format_description
         }
 
         override fun type(): String? {
@@ -1127,8 +1143,8 @@ enum class Behavior : XMLPrefsSave {
             return XMLPrefsSave.TEXT
         }
 
-        override fun info(): String? {
-            return "The divider between the last unlock times"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_unlock_time_divider_description
         }
     },
     unlock_time_order {
@@ -1136,8 +1152,8 @@ enum class Behavior : XMLPrefsSave {
             return "1"
         }
 
-        override fun info(): String? {
-            return "1 = up-down. 2 = down-up"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_unlock_time_order_description
         }
 
         override fun type(): String? {
@@ -1149,8 +1165,8 @@ enum class Behavior : XMLPrefsSave {
             return "6.00"
         }
 
-        override fun info(): String? {
-            return "The starting hour of the unlock counter cycle (hh.mm)"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_unlock_counter_cycle_start_description
         }
 
         override fun type(): String? {
@@ -1162,8 +1178,8 @@ enum class Behavior : XMLPrefsSave {
             return "n/a"
         }
 
-        override fun info(): String? {
-            return "The text shown when a value is not available"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_not_available_text_description
         }
 
         override fun type(): String? {
@@ -1175,8 +1191,8 @@ enum class Behavior : XMLPrefsSave {
             return "true"
         }
 
-        override fun info(): String? {
-            return "If true, the back button will put the previous command inside the input area"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_back_button_enabled_description
         }
 
         override fun type(): String? {
@@ -1188,8 +1204,8 @@ enum class Behavior : XMLPrefsSave {
             return "false"
         }
 
-        override fun info(): String? {
-            return "If true, swiping down will expand the notification shade"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_swipe_down_notifications_description
         }
 
         override fun type(): String? {
@@ -1201,8 +1217,8 @@ enum class Behavior : XMLPrefsSave {
             return "3600"
         }
 
-        override fun info(): String? {
-            return "The weather update time in seconds"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_weather_update_time_description
         }
 
         override fun type(): String? {
@@ -1214,8 +1230,8 @@ enum class Behavior : XMLPrefsSave {
             return "20"
         }
 
-        override fun info(): String? {
-            return "The amount of time between two location updates (in minutes, must be an integer value)"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_location_update_mintime_description
         }
 
         override fun type(): String? {
@@ -1227,8 +1243,8 @@ enum class Behavior : XMLPrefsSave {
             return "500"
         }
 
-        override fun info(): String? {
-            return "The minimum distance (in meters) to get a location update"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_location_update_mindistance_description
         }
 
         override fun type(): String? {
@@ -1240,8 +1256,8 @@ enum class Behavior : XMLPrefsSave {
             return "true"
         }
 
-        override fun info(): String? {
-            return "If false, Re:T-UI won't show information about the weather in the output field"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_show_weather_updates_description
         }
 
         override fun type(): String? {
@@ -1253,8 +1269,8 @@ enum class Behavior : XMLPrefsSave {
             return "true"
         }
 
-        override fun info(): String? {
-            return "If true, swiping up will open the apps drawer"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_swipe_up_apps_drawer_description
         }
 
         override fun type(): String? {
@@ -1266,8 +1282,8 @@ enum class Behavior : XMLPrefsSave {
             return "false"
         }
 
-        override fun info(): String? {
-            return "If true, the music module will be shown in the context container"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_show_music_widget_description
         }
 
         override fun type(): String? {
@@ -1279,8 +1295,8 @@ enum class Behavior : XMLPrefsSave {
             return "false"
         }
 
-        override fun info(): String? {
-            return "If true, Re:T-UI will automatically show the music module when music starts playing"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_auto_show_music_widget_description
         }
 
         override fun type(): String? {
@@ -1292,8 +1308,8 @@ enum class Behavior : XMLPrefsSave {
             return ""
         }
 
-        override fun info(): String? {
-            return "Package name of the preferred external music app. Leave empty for automatic detection."
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_preferred_music_app_description
         }
 
         override fun type(): String? {
@@ -1305,8 +1321,8 @@ enum class Behavior : XMLPrefsSave {
             return "25"
         }
 
-        override fun info(): String? {
-            return "Focus period length in minutes for Pomodoro sessions"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_pomodoro_focus_minutes_description
         }
 
         override fun type(): String? {
@@ -1318,8 +1334,8 @@ enum class Behavior : XMLPrefsSave {
             return "5"
         }
 
-        override fun info(): String? {
-            return "Relax/break period length in minutes for Pomodoro sessions"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_pomodoro_relax_minutes_description
         }
 
         override fun type(): String? {
@@ -1331,8 +1347,8 @@ enum class Behavior : XMLPrefsSave {
             return "true"
         }
 
-        override fun info(): String? {
-            return "If true, embedded shell commands must be run with shell [command] instead of falling through from unknown input"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_shell_requires_prefix_description
         }
 
         override fun type(): String? {
@@ -1344,8 +1360,8 @@ enum class Behavior : XMLPrefsSave {
             return "0"
         }
 
-        override fun info(): String? {
-            return "Number of days after today to include in the launcher Events module. 0 shows only upcoming events today"
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_events_lookahead_days_description
         }
 
         override fun type(): String? {

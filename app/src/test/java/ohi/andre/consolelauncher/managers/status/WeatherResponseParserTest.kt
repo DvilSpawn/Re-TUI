@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher.managers.status
 
+import ohi.andre.consolelauncher.R
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -17,7 +18,7 @@ class WeatherResponseParserTest {
     fun parsesMetForecastIntoLegacyWeatherFields() {
         val snapshot = WeatherResponseParser.parse(response, "metric")!!
 
-        assertEquals("Partly cloudy", snapshot.values["main"])
+        assertEquals(R.string.weather_condition_partlycloudy, snapshot.conditionResource)
         assertEquals("29.7", snapshot.values["temp"])
         assertEquals("79.6", snapshot.values["humidity"])
         assertEquals("partlycloudy_night", snapshot.symbolCode)

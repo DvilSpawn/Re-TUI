@@ -19,9 +19,7 @@ class widget : CommandAbstraction {
         } else {
             "module -$input"
         }
-        return "widget is retired.\n" +
-            "Dock Lua scripts: use module (try: $hint)\n" +
-            "Android AppWidgets: open the widgets pane from the toolbar."
+        return pack.context.getString(R.string.command_widget_widget_is_retired_dock_lua_scripts_use_mod_c12d8, hint)
     }
 
     override fun argType(): IntArray = intArrayOf(CommandAbstraction.PLAIN_TEXT)

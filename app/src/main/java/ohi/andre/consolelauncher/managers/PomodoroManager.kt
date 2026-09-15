@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher.managers
 
+import ohi.andre.consolelauncher.R
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Handler
@@ -104,7 +105,7 @@ class PomodoroManager private constructor(private val appContext: Context) {
         saveState()
         handler.removeCallbacks(ticker)
         handler.post(ticker)
-        broadcastState("Focus session started: " + taskName)
+        broadcastState(appContext.getString(R.string.manager_pomodoromanager_focus_session_started_3c2b6, taskName))
     }
 
     private fun startBreakSession() {
@@ -116,7 +117,7 @@ class PomodoroManager private constructor(private val appContext: Context) {
         saveState()
         handler.removeCallbacks(ticker)
         handler.post(ticker)
-        broadcastState("Take a break!")
+        broadcastState(appContext.getString(R.string.manager_pomodoromanager_take_a_break_8fbcd))
     }
 
     private fun settingMinutes(key: Behavior?, fallback: Int): Int {
@@ -139,7 +140,7 @@ class PomodoroManager private constructor(private val appContext: Context) {
                 currentType = SessionType.FINISHED
                 this.isRunning = true // Stay in finished state to show the message
                 saveState()
-                broadcastState("Good job! You did great!")
+                broadcastState(appContext.getString(R.string.manager_pomodoromanager_good_job_you_did_great_c4fb2))
             } else {
                 startBreakSession()
             }
@@ -154,7 +155,7 @@ class PomodoroManager private constructor(private val appContext: Context) {
         this.sessionEndElapsedRealtime = -1L
         handler.removeCallbacks(ticker)
         saveState()
-        broadcastState("Session terminated.")
+        broadcastState(appContext.getString(R.string.manager_pomodoromanager_session_terminated_ce44a))
     }
 
     val remainingMillis: Long

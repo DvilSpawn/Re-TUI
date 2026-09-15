@@ -19,11 +19,11 @@ import ohi.andre.consolelauncher.managers.xml.options.Behavior
 class events : CommandAbstraction {
     override fun exec(pack: ExecutePack): String {
         val arg = pack.get(Any::class.java, 0)
-        val input = arg?.toString()?.trim()?.lowercase(Locale.getDefault()) ?: ""
+        val input = arg?.toString()?.trim()?.lowercase(Locale.ROOT) ?: ""
 
         if (input == "-access" || input == "access") {
             if (UpcomingEventsManager.hasCalendarPermission(pack.context)) {
-                return "Calendar access already granted."
+                return pack.context.getString(R.string.command_events_calendar_access_already_granted_e615f)
             }
             if (pack.context is Activity) {
                 ActivityCompat.requestPermissions(
@@ -31,31 +31,30 @@ class events : CommandAbstraction {
                     arrayOf(Manifest.permission.READ_CALENDAR),
                     LauncherActivity.COMMAND_REQUEST_PERMISSION
                 )
-                return "Calendar access requested."
+                return pack.context.getString(R.string.command_events_calendar_access_requested_62085)
             }
-            return "Calendar access must be granted from Android settings."
+            return pack.context.getString(R.string.command_events_calendar_access_must_be_granted_from_andro_48275)
         }
 
         val parts = input.split("\\s+".toRegex()).toTypedArray()
         if (parts.isNotEmpty() && (parts[0] == "-lookahead" || parts[0] == "lookahead")) {
             if (parts.size < 2 || parts[1].isEmpty()) {
-                return "Events lookahead: " + UpcomingEventsManager.lookaheadDays +
-                    " days after today.\nUsage: events -lookahead [days]"
+                return pack.context.getString(R.string.command_events_events_lookahead_days_after_today_usage_ev_98fd1, UpcomingEventsManager.lookaheadDays)
             }
 
             var days: Int
             try {
                 days = parts[1].toInt()
             } catch (e: Exception) {
-                return "Invalid lookahead: " + parts[1]
+                return pack.context.getString(R.string.command_events_invalid_lookahead_7cbc8, parts[1])
             }
             days = UpcomingEventsManager.sanitizeLookaheadDays(days)
             LauncherSettings.set(pack.context, Behavior.events_lookahead_days, days.toString())
             refreshLauncherEventsIfKnown(pack)
             if (days == 0) {
-                return "Launcher events lookahead set: today only."
+                return pack.context.getString(R.string.command_events_launcher_events_lookahead_set_today_only_9b01c)
             }
-            return "Launcher events lookahead set: today + $days days."
+            return pack.context.getString(R.string.command_events_launcher_events_lookahead_set_today_days_8cdfd, days)
         }
 
         if (input == "-module" || input == "module" || input == "-print") {
@@ -63,16 +62,14 @@ class events : CommandAbstraction {
         }
 
         if (input == "-install" || input == "-add" || input == "install") {
-            return "Events is an editable Termux module now.\n" +
-                "Create ~/retui/events.sh with: events -module\n" +
-                "Then run: module -add events termux:/data/data/com.termux/files/home/retui/events.sh"
+            return pack.context.getString(R.string.command_events_events_is_an_editable_termux_module_now_cr_e09d6)
         }
 
         if (!ModuleManager.isKnown(pack.context, ModuleManager.EVENTS)) {
-            return "Events is an editable Termux module. Run events -module for the script, then module -add events termux:/data/data/com.termux/files/home/retui/events.sh"
+            return pack.context.getString(R.string.command_events_events_is_an_editable_termux_module_run_ev_734cb)
         }
         send(pack, "show")
-        return "Module opened: events"
+        return pack.context.getString(R.string.command_events_module_opened_events_4a38b)
     }
 
     private fun refreshLauncherEventsIfKnown(pack: ExecutePack) {

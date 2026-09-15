@@ -31,7 +31,7 @@ class webhook : ParamCommand() {
             override fun exec(pack: ExecutePack): String? {
                 val info = pack as MainPack
                 val split = Tuils.splitArgs(info.lastCommand)
-                if (split.size < 5) return "Usage: webhook -add [name] [url] [body_template]"
+                if (split.size < 5) return pack.context.getString(R.string.command_webhook_usage_webhook_add_name_url_body_template_849a3)
 
                 val name: String? = split.get(2)
                 val url: String? = split.get(3)
@@ -40,7 +40,7 @@ class webhook : ParamCommand() {
                 val body = Tuils.toPlanString(bodyParts, Tuils.SPACE)
 
                 val saved = info.webhookManager.add(name, url, body)
-                return if (saved) "Webhook " + name + " saved." else "Unable to save webhook " + name + "."
+                return if (saved) pack.context.getString(R.string.command_webhook_webhook_saved_a11ba, name) else pack.context.getString(R.string.command_webhook_unable_to_save_webhook_80aaa, name)
             }
 
             override fun args(): IntArray? {
@@ -50,10 +50,10 @@ class webhook : ParamCommand() {
         rm {
             override fun exec(pack: ExecutePack): String? {
                 val args = pack.getList<String?>()
-                if (args.isEmpty()) return "Usage: webhook -rm [name]"
+                if (args.isEmpty()) return pack.context.getString(R.string.command_webhook_usage_webhook_rm_name_3e38d)
                 val name = args.get(0)
                 val removed = (pack as MainPack).webhookManager.remove(name)
-                return if (removed) "Webhook " + name + " removed." else "Webhook " + name + " not found."
+                return if (removed) pack.context.getString(R.string.command_webhook_webhook_removed_66aac, name) else pack.context.getString(R.string.command_webhook_webhook_not_found_77db8, name)
             }
 
             override fun args(): IntArray? {
@@ -63,7 +63,7 @@ class webhook : ParamCommand() {
         ls {
             override fun exec(pack: ExecutePack): String? {
                 val hooks = (pack as MainPack).webhookManager.getWebhooks()
-                if (hooks.isEmpty()) return "No webhooks configured."
+                if (hooks.isEmpty()) return pack.context.getString(R.string.command_webhook_no_webhooks_configured_b0abe)
                 val sb = StringBuilder()
                 for (w in hooks) {
                     sb.append(w.name).append(" -> ").append(w.url).append(Tuils.NEWLINE)
@@ -92,7 +92,7 @@ class webhook : ParamCommand() {
             fun get(p: String?): Param? {
                 var p = p
                 if (p == null) return null
-                p = p.lowercase(Locale.getDefault())
+                p = p.lowercase(Locale.ROOT)
                 for (p1 in entries) {
                     if (p == p1.label()) return p1
                 }
@@ -197,7 +197,7 @@ class webhook : ParamCommand() {
             val sb = StringBuilder()
             sb.append(info.context.getString(helpRes())).append(Tuils.NEWLINE)
             if (!hooks.isEmpty()) {
-                sb.append(Tuils.NEWLINE).append("Configured Webhooks:").append(Tuils.NEWLINE)
+                sb.append(Tuils.NEWLINE).append(pack.context.getString(R.string.command_webhook_configured_webhooks_843d5)).append(Tuils.NEWLINE)
                 for (w in hooks) sb.append("  • ").append(w.name).append(Tuils.NEWLINE)
             }
             return sb.toString().trim { it <= ' ' }
@@ -227,7 +227,7 @@ class webhook : ParamCommand() {
             return triggerWebhook(info, w, webhookArgs)
         }
 
-        return "Webhook [" + sub + "] not found. Use 'webhook -ls' to see available hooks."
+        return pack.context.getString(R.string.command_webhook_webhook_not_found_use_webhook_ls_to_see_av_8c371, sub)
     }
 
     override fun priority(): Int {
@@ -259,7 +259,7 @@ class webhook : ParamCommand() {
             try {
                 bodyContent = w.render(webhookArgs, jsonBody) ?: Tuils.EMPTYSTRING
             } catch (e: JSONException) {
-                return "Webhook [" + w.name + "] template error: " + e.message
+                return info.context.getString(R.string.command_webhook_webhook_template_error_2fed6, w.name, e.message)
             }
 
             if (webhookArgs.size > 0) {
@@ -277,7 +277,7 @@ class webhook : ParamCommand() {
                     handler.post(Runnable {
                         Tuils.sendOutput(
                             info.context,
-                            "Webhook [" + w.name + "] Error: " + error
+                            info.context.getString(R.string.command_webhook_webhook_error_90f01, w.name, error)
                         )
                     })
                 }
@@ -285,18 +285,18 @@ class webhook : ParamCommand() {
                 @Throws(IOException::class)
                 override fun onResponse(call: Call, response: Response) {
                     response.use { r ->
-                        val resBody = if (r.body != null) r.body!!.string() else "Empty Response"
+                        val resBody = if (r.body != null) r.body!!.string() else info.context.getString(R.string.command_webhook_empty_response_a5c48)
                         val code = r.code
                         handler.post(Runnable {
                             Tuils.sendOutput(
                                 info.context,
-                                "Webhook [" + w.name + "] Response [" + code + "]: " + resBody
+                                info.context.getString(R.string.command_webhook_webhook_response_c6e97, w.name, code, resBody)
                             )
                         })
                     }
                 }
             })
-            return "Triggering webhook: " + w.name
+            return info.context.getString(R.string.command_webhook_triggering_webhook_749c8, w.name)
         }
 
         private fun formatArgsForHistory(webhookArgs: Array<String?>): String {

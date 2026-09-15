@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher.integrations.tasker
 
+import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.managers.tasker.TaskerIntegrationManager
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -27,7 +28,7 @@ class RetuiTaskerInputTest {
     @Test
     fun switchSpaceRequiresTargetBeforeSavingToTasker() {
         assertEquals(
-            "Choose a Space.",
+            R.string.tasker_choose_space,
             RetuiTaskerHelper.validationError(
                 RetuiTaskerInput(TaskerIntegrationManager.ACTION_SWITCH_SPACE, space = " ")
             )

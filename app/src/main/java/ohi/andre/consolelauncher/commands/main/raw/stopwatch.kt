@@ -11,7 +11,7 @@ class stopwatch : CommandAbstraction {
 
     override fun exec(pack: ExecutePack): String {
         val arg = pack.get(Any::class.java, 0)
-        val input = arg?.toString()?.trim()?.lowercase(Locale.getDefault())
+        val input = arg?.toString()?.trim()?.lowercase(Locale.ROOT)
 
         val clockManager = ClockManager.getInstance(pack.context)
 

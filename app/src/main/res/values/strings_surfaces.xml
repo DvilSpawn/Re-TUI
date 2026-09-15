@@ -1,0 +1,927 @@
+<resources>
+    <!-- Launcher surfaces. Translate prose; keep commands, filenames, product names and units intact. -->
+    <!-- appendTermuxSetup -->
+    <string name="surface_1_install_current_termux_from_f_droid_github_7baec" formatted="false">"1. Install current Termux from F-Droid/GitHub."</string>
+    <!-- appendTermuxSetup -->
+    <string name="surface_2_in_termux_enable_external_app_commands_2fff2" formatted="false">"2. In Termux, enable external app commands:"</string>
+    <!-- executePodcastCommand -->
+    <string name="surface_30s_1c6a4">"-30s: %1$s"</string>
+    <!-- executePodcastCommand -->
+    <string name="surface_30s_ffb4b">"+30s: %1$s"</string>
+    <!-- appendTermuxSetup -->
+    <string name="surface_3_put_scripts_in_a_stable_folder_for_example_b5179" formatted="false">"3. Put scripts in a stable folder, for example:"</string>
+    <!-- appendTermuxSetup -->
+    <string name="surface_4_create_a_re_t_ui_script_alias_5761e" formatted="false">"4. Create a Re:T-UI script alias:"</string>
+    <!-- appendTermuxSetup -->
+    <string name="surface_5_run_it_from_re_t_ui_67a47" formatted="false">"5. Run it from Re:T-UI:"</string>
+    <!-- appendTermuxSetup -->
+    <string name="surface_6_for_callback_modules_package_scope_the_broadcast_ff541" formatted="false">"6. For callback modules, package-scope the broadcast:"</string>
+    <!-- appendTermuxSetup -->
+    <string name="surface_7_optional_helper_85156" formatted="false">"7. Optional helper:"</string>
+    <!-- appendTermuxSetup -->
+    <string name="surface_8_script_backed_module_f9159" formatted="false">"8. Script-backed module:"</string>
+    <!-- overlayActionButton -->
+    <string name="surface_action_2b9f1" formatted="false">"ACTION"</string>
+    <!-- submitTermuxAppAction -->
+    <string name="surface_action_a7fac">"action: %1$s"</string>
+    <!-- appendTermuxAppInfo -->
+    <string name="surface_actions_6dfd8">"Actions: %1$d"</string>
+    <!-- appendTermuxAppActions -->
+    <string name="surface_actions_for_cf6f1">"Actions for %1$s"</string>
+    <!-- updatePodcastNowPlaying -->
+    <string name="surface_add_a_feed_then_play_a_show_8fab3" formatted="false">"Add a feed, then play a show."</string>
+    <!-- showPodcastAddDialog -->
+    <string name="surface_add_f9460" formatted="false">"ADD"</string>
+    <!-- setupPodcastPaneActions -->
+    <string name="surface_add_podcast_24ba4" formatted="false">"Add podcast"</string>
+    <!-- showPodcastAddDialog -->
+    <string name="surface_add_podcast_24c78" formatted="false">"ADD PODCAST"</string>
+    <!-- appendTermuxAppActions -->
+    <string name="surface_add_with_app_action_label_input_bcb50">"Add with: app-action %1$s \"label\" \"input\""</string>
+    <!-- showPodcastAddDialog -->
+    <string name="surface_adding_podcast_98f33" formatted="false">"Adding podcast..."</string>
+    <!-- appendTermuxSetup -->
+    <string name="surface_alias_add_s_test_data_data_com_termux_files_home_retui_tes_f498e" formatted="false">"   alias -add -s test /data/data/com.termux/files/home/retui/test.sh"</string>
+    <!-- removeTermuxCustomApp -->
+    <string name="surface_alias_rm_app_id_3df4f" formatted="false">"alias: rm-app &lt;id&gt;"</string>
+    <!-- addPodcastTagChips -->
+    <string name="surface_all_6b428" formatted="false">"ALL"</string>
+    <!-- appendTermuxSetup -->
+    <string name="surface_am_broadcast_p_com_dvil_tui_renewed_a_com_dvil_tui_renewed_c1701" formatted="false">"   am broadcast -p com.dvil.tui_renewed -a com.dvil.tui_renewed.RETUI_CALLBACK ..."</string>
+    <!-- updateTermuxConsoleLabels -->
+    <string name="surface_app_aa160" formatted="false">"APP"</string>
+    <!-- removeTermuxAppAction -->
+    <string name="surface_app_action_not_removed_c8f3f">"App action not removed: %1$s"</string>
+    <!-- addTermuxAppAction -->
+    <string name="surface_app_action_registered_58cf0">"App action registered: %1$s / %2$s"</string>
+    <!-- removeTermuxAppAction -->
+    <string name="surface_app_action_removed_13264">"App action removed: %1$s / %2$s"</string>
+    <!-- executeTermuxConsoleCommand -->
+    <string name="surface_app_add_id_command_save_a_workspace_launcher_72135" formatted="false">"app-add &lt;id&gt; &lt;command&gt; -&gt; save a workspace launcher"</string>
+    <!-- appendTermuxAppInfo -->
+    <string name="surface_app_info_id_1ee02" formatted="false">"app-info &lt;id&gt;"</string>
+    <!-- syncTermuxCustomApp -->
+    <string name="surface_app_sync_id_073c6" formatted="false">"app-sync &lt;id&gt;"</string>
+    <!-- executeTermuxConsoleCommand -->
+    <string name="surface_apps_app_id_tmux_workspace_launchers_interactive_tuis_77e6a" formatted="false">"apps / app &lt;id&gt; -&gt; tmux workspace launchers (interactive TUIs)"</string>
+    <!--  -->
+    <string name="surface_auth_probing_token_vault_a1_159da" formatted="false">"[AUTH] probing token vault A1..."</string>
+    <!--  -->
+    <string name="surface_auth_probing_token_vault_a2_f7dd0" formatted="false">"[AUTH] probing token vault A2..."</string>
+    <!--  -->
+    <string name="surface_auth_probing_token_vault_a3_90360" formatted="false">"[AUTH] probing token vault A3..."</string>
+    <!--  -->
+    <string name="surface_auth_replaying_cached_credentials_ff954" formatted="false">"[AUTH] replaying cached credentials..."</string>
+    <!--  -->
+    <string name="surface_aux_bouncing_cursor_driver_55683" formatted="false">"[AUX ] bouncing cursor driver..."</string>
+    <!--  -->
+    <string name="surface_aux_destabilizing_glyph_cache_7fe2d" formatted="false">"[AUX ] destabilizing glyph cache..."</string>
+    <!--  -->
+    <string name="surface_aux_scrambling_keyboard_handshake_a188a" formatted="false">"[AUX ] scrambling keyboard handshake..."</string>
+    <!-- addCalculatorKey -->
+    <string name="surface_backspace_88d13" formatted="false">"Backspace"</string>
+    <!--  -->
+    <string name="surface_boot_attaching_remote_shell_a4ecf" formatted="false">"[BOOT] attaching remote shell..."</string>
+    <!--  -->
+    <string name="surface_boot_syncing_fake_intrusion_assets_c0461" formatted="false">"[BOOT] syncing fake intrusion assets..."</string>
+    <!-- playHackOverlay -->
+    <string name="surface_breach_protocol_engaged_8f35d" formatted="false">":: breach protocol engaged ::\n\n"</string>
+    <!--  -->
+    <string name="surface_breach_target_localhost_mode_theatrical_501ed" formatted="false">"$ ./breach --target=localhost --mode=theatrical"</string>
+    <!-- appendTermuxWorkspaceResult -->
+    <string name="surface_bridge_e9cef" formatted="false">"bridge: "</string>
+    <!-- appendTermuxStatus -->
+    <string name="surface_bridge_prerequisites_look_ready_for_the_next_phase_66afa" formatted="false">"Bridge prerequisites look ready for the next phase."</string>
+    <!-- updatePodcastNowPlaying -->
+    <string name="surface_buffering_6f50d">"buffering %1$s"</string>
+    <!-- renderTermuxWorkspaceStatusReport -->
+    <string name="surface_built_in_c12b6" formatted="false">" built-in, "</string>
+    <!-- clickLuaApp -->
+    <string name="surface_button_a4234">"button %1$d"</string>
+    <!-- appendTermuxCallbackHint -->
+    <string name="surface_callback_hint_if_the_module_did_not_appear_add_this_to_the_eb234" formatted="false">"callback hint: if the module did not appear, add this to the script broadcast:"</string>
+    <!-- showPodcastEpisodeSearchDialog -->
+    <string name="surface_cancel_1507c" formatted="false">"CANCEL"</string>
+    <!-- executeTermuxConsoleCommand -->
+    <string name="surface_cd_dir_change_the_termux_console_working_directory_df2dc" formatted="false">"cd [dir] -&gt; change the Termux console working directory"</string>
+    <!-- appendTermuxCdResult -->
+    <string name="surface_cd_failed_5abcd">"cd failed: %1$s"</string>
+    <!-- dispatchTermuxShell -->
+    <string name="surface_check_allow_external_apps_true_and_grant_run_command_permi_58131" formatted="false">"Check allow-external-apps=true and grant RUN_COMMAND permission."</string>
+    <!-- appendTermuxSetup -->
+    <string name="surface_chmod_x_retui_test_sh_21c3d" formatted="false">"   chmod +x ~/retui/test.sh"</string>
+    <!-- addPodcastEpisodeSearch -->
+    <string name="surface_clear_16ec7" formatted="false">"CLEAR"</string>
+    <!-- addCalculatorKey -->
+    <string name="surface_clear_719ea" formatted="false">"Clear"</string>
+    <!-- executeTermuxConsoleCommand -->
+    <string name="surface_clear_clear_this_console_9610a" formatted="false">"clear   -&gt; clear this console"</string>
+    <!-- addPodcastEpisodeSearch -->
+    <string name="surface_clear_episode_search_d9091" formatted="false">"Clear episode search"</string>
+    <!-- executeTermuxConsoleCommand -->
+    <string name="surface_closing_termux_console_4825d" formatted="false">"closing termux console."</string>
+    <!-- renderTermuxWorkspaceLocalCommandDraft -->
+    <string name="surface_command_7b150" formatted="false">"command: :"</string>
+    <!-- handleTermuxWorkspaceLocalCommandBackspace -->
+    <string name="surface_command_cancelled_84be2" formatted="false">"command cancelled"</string>
+    <!-- appendTermuxAppInfo -->
+    <string name="surface_command_d42c7">"Command: %1$s"</string>
+    <!-- executePodcastCommand -->
+    <string name="surface_commands_add_https_feed_url_refresh_play_next_prev_rewind_8ce06" formatted="false">"Commands: add &lt;https-feed-url&gt;, refresh, play, next, prev, rewind, forward, speed &lt;0.5-2.0&gt;, close"</string>
+    <!-- executeFileConsoleCommand -->
+    <string name="surface_commands_cd_folder_cd_ls_pwd_open_file_termux_open_file_sh_20502" formatted="false">"Commands:\ncd [folder]\ncd ..\nls\npwd\nopen [file]\ntermux-open [file]\nshare [file]\nrefresh\nexit"</string>
+    <!-- buildNotesModuleText -->
+    <string name="surface_commands_notes_notes_add_notes_ls_86691" formatted="false">"Commands: notes, notes -add, notes -ls"</string>
+    <!-- buildTimerModuleText -->
+    <string name="surface_commands_timer_stopwatch_pomodoro_83ad1" formatted="false">"Commands: timer, stopwatch, pomodoro"</string>
+    <!-- appendTermuxStatus -->
+    <string name="surface_console_cwd_be998">"Console cwd: %1$s"</string>
+    <!-- saveTermuxWorkspaceLauncher -->
+    <string name="surface_could_not_save_launcher_use_a_custom_id_and_a_non_empty_co_53a79" formatted="false">"Could not save launcher. Use a custom id and a non-empty command."</string>
+    <!-- appendTermuxSetup -->
+    <string name="surface_create_retui_retui_helper_sh_with_retui_module_retui_outpu_1a75a" formatted="false">"   create ~/retui/retui-helper.sh with retui_module/retui_output helpers."</string>
+    <!-- refreshLockdownActions -->
+    <string name="surface_credits_keys_bb9c3">"Credits: %1$d | Keys: %2$d"</string>
+    <!--  -->
+    <string name="surface_cryp_brute_forcing_dashed_border_seed_72e74" formatted="false">"[CRYP] brute forcing dashed border seed..."</string>
+    <!--  -->
+    <string name="surface_cryp_brute_forcing_theme_entropy_43e64" formatted="false">"[CRYP] brute forcing theme entropy..."</string>
+    <!--  -->
+    <string name="surface_cryp_deriving_surface_accent_offsets_8557f" formatted="false">"[CRYP] deriving surface accent offsets..."</string>
+    <!-- appendTermuxCdResult -->
+    <string name="surface_cwd_2af21">"cwd: %1$s"</string>
+    <!-- buildFileListing -->
+    <string name="surface_d_a2c8d" formatted="false">"[D] "</string>
+    <!-- buildWeatherModuleText -->
+    <string name="surface_data_met_norway_https_api_met_no_doc_license_6815e" formatted="false">"\nData: MET Norway (https://api.met.no/doc/License)"</string>
+    <!--  -->
+    <string name="surface_db_harvesting_battery_telemetry_fc93c" formatted="false">"[DB  ] harvesting battery telemetry..."</string>
+    <!--  -->
+    <string name="surface_db_harvesting_session_hints_636b4" formatted="false">"[DB  ] harvesting session hints..."</string>
+    <!--  -->
+    <string name="surface_db_harvesting_stale_command_history_ffba7" formatted="false">"[DB  ] harvesting stale command history..."</string>
+    <!-- sendTermuxBridgeResult -->
+    <string name="surface_debug_7052a" formatted="false">"\ndebug: "</string>
+    <!-- appendTermuxWorkspaceResult -->
+    <string name="surface_debug_962c6" formatted="false">"debug: "</string>
+    <!-- appendTermuxCommandError -->
+    <string name="surface_debug_cf37f">"debug: %1$s"</string>
+    <!-- dialogLuaApp -->
+    <string name="surface_dialog_addd4">"dialog: %1$d"</string>
+    <!-- dialogLuaApp -->
+    <string name="surface_dialog_canceled_9e0e5" formatted="false">"dialog canceled"</string>
+    <!-- executeFileConsoleCommand -->
+    <string name="surface_dispatched_4daa9">"Dispatched: %1$s"</string>
+    <!-- pomodoroStopConfirmText -->
+    <string name="surface_do_you_really_want_to_stop_the_focus_session_8ed84" formatted="false">"Do you really want to stop the focus session?"</string>
+    <!-- appendTermuxShellResult -->
+    <string name="surface_done_11556">"done: %1$s"</string>
+    <!--  -->
+    <string name="surface_done_dramatic_effect_complete_3a5b9" formatted="false">"[DONE] dramatic effect complete"</string>
+    <!-- appendTermuxSetup -->
+    <string name="surface_echo_allow_external_apps_true_termux_termux_properties_8d906" formatted="false">"   echo \'allow-external-apps = true\' &gt;&gt; ~/.termux/termux.properties"</string>
+    <!-- showPodcastShowMenu -->
+    <string name="surface_edit_tags_d8a5f" formatted="false">"Edit tags"</string>
+    <!-- setupLockdownOverlay -->
+    <string name="surface_emergency_breach_accepted_fed42" formatted="false">"Emergency breach accepted."</string>
+    <!-- updatePomodoroOverlay -->
+    <string name="surface_emergency_breach_ce727" formatted="false">"EMERGENCY BREACH"</string>
+    <!-- musicTitlePrefix -->
+    <string name="surface_episode_791bf" formatted="false">"Episode: "</string>
+    <!-- addPodcastShowGrid -->
+    <string name="surface_episodes_223b9">"%1$s episodes"</string>
+    <!-- updatePodcastContentLabel -->
+    <string name="surface_episodes_e5e52" formatted="false">"EPISODES"</string>
+    <!-- addCalculatorKey -->
+    <string name="surface_equals_09b6a" formatted="false">"Equals"</string>
+    <!-- onCalculatorKey -->
+    <string name="surface_error_0b99c" formatted="false">"ERROR"</string>
+    <!-- buildFileListing -->
+    <string name="surface_error_36baa" formatted="false">"error: "</string>
+    <!-- updateModuleFromTermuxResult -->
+    <string name="surface_error_701e5">"error: %1$s"</string>
+    <!-- sendTermuxBridgeResult -->
+    <string name="surface_error_efc3d" formatted="false">"\nerror: "</string>
+    <!-- addTermuxAppAction -->
+    <string name="surface_example_app_action_myapp_show_status_6_37779" formatted="false">"example: app-action myapp \"show status\" 6"</string>
+    <!-- addTermuxCustomApp -->
+    <string name="surface_example_app_add_radio_bash_retui_radio_sh_2f655" formatted="false">"example: app-add radio bash ~/retui/radio.sh"</string>
+    <!-- runTermuxCommand -->
+    <string name="surface_example_run_data_data_com_termux_files_home_retui_myscript_5e8ca" formatted="false">"example: run /data/data/com.termux/files/home/retui/myscript.sh"</string>
+    <!-- appendTermuxWorkspaceResult -->
+    <string name="surface_exit_31533" formatted="false">"exit: "</string>
+    <!-- sendTermuxBridgeResult -->
+    <string name="surface_exit_66ea3" formatted="false">"\nexit: "</string>
+    <!-- executeTermuxConsoleCommand -->
+    <string name="surface_exit_close_this_console_b8e51" formatted="false">"exit    -&gt; close this console"</string>
+    <!-- playHackOverlay -->
+    <string name="surface_exit_connection_severed_db482">"%1$s[EXIT] connection severed"</string>
+    <!-- appendTermuxCommandError -->
+    <string name="surface_exit_da8cd">"exit: %1$d"</string>
+    <!-- updateModuleFromTermuxResult -->
+    <string name="surface_exit_no_output_returned_09cea">"exit: %1$d\nNo output returned."</string>
+    <!-- updatePomodoroOverlay -->
+    <string name="surface_exit_session_52cc0" formatted="false">"EXIT SESSION"</string>
+    <!-- showPodcastAddDialog -->
+    <string name="surface_feed_url_c2311" formatted="false">"Feed URL"</string>
+    <!-- tagFilterSummary -->
+    <string name="surface_filtered_by_28f7e">"Filtered by #%1$s"</string>
+    <!-- updateLockdownOverlay -->
+    <string name="surface_focus_mode_9a2af" formatted="false">"Focus mode"</string>
+    <!-- updatePomodoroOverlay -->
+    <string name="surface_focus_mode_active_f4757" formatted="false">"FOCUS MODE ACTIVE"</string>
+    <!--  -->
+    <string name="surface_fs_enumerating_behavior_xml_705a2" formatted="false">"[FS  ] enumerating behavior.xml"</string>
+    <!--  -->
+    <string name="surface_fs_enumerating_suggestions_xml_b4f36" formatted="false">"[FS  ] enumerating suggestions.xml"</string>
+    <!--  -->
+    <string name="surface_fs_enumerating_theme_xml_67346" formatted="false">"[FS  ] enumerating theme.xml"</string>
+    <!--  -->
+    <string name="surface_fs_enumerating_ui_xml_b7351" formatted="false">"[FS  ] enumerating ui.xml"</string>
+    <!--  -->
+    <string name="surface_fs_mounting_storage_emulated_0_re_t_ui_52e6f" formatted="false">"[FS  ] mounting /storage/emulated/0/Re-T-UI"</string>
+    <!-- renderTermuxWorkspaceStatusReport -->
+    <string name="surface_geometry_297f8" formatted="false">"geometry: "</string>
+    <!-- updatePomodoroOverlay -->
+    <string name="surface_good_job_you_did_great_c4fb2" formatted="false">"Good job! You did great!"</string>
+    <!-- appendTermuxStatus -->
+    <string name="surface_grant_re_t_ui_permission_to_run_commands_in_termux_when_pr_a9d96" formatted="false">"Grant Re:T-UI permission to run commands in Termux when prompted by Android/Termux."</string>
+    <!-- handleLuaAppLocalCommand -->
+    <string name="surface_help_refresh_restart_config_edit_clear_close_other_input_i_e0b4c" formatted="false">":help, :refresh, :restart, :config, :edit, :clear, :close. Other input is sent to the app."</string>
+    <!-- handleTermuxAppLocalCommand -->
+    <string name="surface_help_refresh_restart_stop_detach_open_clear_other_input_is_a1d16" formatted="false">":help, :refresh, :restart, :stop, :detach, :open, :clear. Other input is sent to the app."</string>
+    <!-- setUnifiedModulesVisible -->
+    <string name="surface_hide_modules_ccff2" formatted="false">"Hide modules"</string>
+    <!-- appendTermuxAppInfo -->
+    <string name="surface_home_fb1d7">"Home: %1$s"</string>
+    <!--  -->
+    <string name="surface_hook_intercepting_harmless_command_execution_adcd5" formatted="false">"[HOOK] intercepting harmless command execution..."</string>
+    <!--  -->
+    <string name="surface_hook_intercepting_idle_state_23263" formatted="false">"[HOOK] intercepting idle state..."</string>
+    <!--  -->
+    <string name="surface_hook_intercepting_wallpaper_refresh_da0db" formatted="false">"[HOOK] intercepting wallpaper refresh..."</string>
+    <!--  -->
+    <string name="surface_i_o_indexing_aliases_apps_contacts_f7518" formatted="false">"[I/O ] indexing aliases, apps, contacts..."</string>
+    <!--  -->
+    <string name="surface_i_o_reading_notification_mirror_bf032" formatted="false">"[I/O ] reading notification mirror..."</string>
+    <!--  -->
+    <string name="surface_i_o_reading_wallpaper_palette_cache_b75c8" formatted="false">"[I/O ] reading wallpaper palette cache..."</string>
+    <!-- appendTermuxSetup -->
+    <string name="surface_if_android_asks_for_run_command_permission_allow_re_t_ui_a_ec158" formatted="false">"If Android asks for RUN_COMMAND permission, allow Re:T-UI and retry."</string>
+    <!-- ensureTermuxBridgeReady -->
+    <string name="surface_if_android_shows_a_permission_prompt_allow_re_t_ui_and_ret_1eb39" formatted="false">"If Android shows a permission prompt, allow Re:T-UI and retry."</string>
+    <!-- buildTermuxWorkspaceTmuxCommand -->
+    <string name="surface_if_retui_workspace_shell_bash_then_tmux_retui_workspace_sh_4a152">"if [ \"${retui_workspace_shell##*/}\" = \"bash\" ]; then\n  tmux %1$s \"$retui_workspace_shell\" --noprofile --norc\nelse\n  tmux %2$s \"$retui_workspace_shell\"\nfi"</string>
+    <!-- submitLuaAppInput -->
+    <string name="surface_input_53073">"input: %1$s"</string>
+    <!-- appendTermuxStatus -->
+    <string name="surface_install_termux_before_enabling_script_dispatch_89dce" formatted="false">"Install Termux before enabling script dispatch."</string>
+    <!-- appendTermuxStatus -->
+    <string name="surface_install_the_current_termux_build_from_f_droid_github_not_t_ee9d3" formatted="false">"Install the current Termux build from F-Droid/GitHub, not the old Play Store build."</string>
+    <!-- ensureTermuxBridgeReady -->
+    <string name="surface_install_update_termux_from_f_droid_or_github_then_retry_307ff" formatted="false">"Install/update Termux from F-Droid or GitHub, then retry."</string>
+    <!-- runTermuxShellCommand -->
+    <string name="surface_interactive_command_191ac">"interactive command: %1$s"</string>
+    <!-- sendTermuxAppKey -->
+    <string name="surface_key_9a5bb">"key: %1$s"</string>
+    <!-- renderTermuxWorkspaceLauncherList -->
+    <string name="surface_launch_id_ab36f" formatted="false">":launch &lt;id&gt;"</string>
+    <!-- renderTermuxWorkspaceHelp -->
+    <string name="surface_launch_id_list_or_focus_create_a_launcher_213fa" formatted="false">":launch [id] - list or focus/create a launcher"</string>
+    <!-- openTermuxWorkspaceLauncher -->
+    <string name="surface_launcher_id_is_empty_5730e" formatted="false">"launcher id is empty"</string>
+    <!-- renderTermuxWorkspaceStatusReport -->
+    <string name="surface_launchers_c6320" formatted="false">"launchers: "</string>
+    <!-- renderLuaLayout -->
+    <string name="surface_layout_error_b5bcf">"Layout error: %1$s"</string>
+    <!-- renderLuaAppFrame -->
+    <string name="surface_layout_output_is_available_in_module_panels_use_ui_show_te_5ac8c" formatted="false">"\nLayout output is available in module panels; use ui:show_text for app body text."</string>
+    <!-- renderLuaAppFrame -->
+    <string name="surface_loading_11b54" formatted="false">"\nLoading..."</string>
+    <!-- renderTermuxWorkspaceHelp -->
+    <string name="surface_local_commands_c302e" formatted="false">"local commands"</string>
+    <!-- renderLuaAppRichFrame -->
+    <string name="surface_local_commands_help_refresh_restart_config_edit_clear_clos_0f9a2" formatted="false">"local commands: :help :refresh :restart :config :edit :clear :close"</string>
+    <!-- buildWeatherModuleText -->
+    <string name="surface_location_c47d5" formatted="false">"Location: "</string>
+    <!--  -->
+    <string name="surface_lock_pretending_to_exfiltrate_secrets_fdce3" formatted="false">"[LOCK] pretending to exfiltrate secrets..."</string>
+    <!--  -->
+    <string name="surface_lock_pretending_to_know_what_any_of_this_means_e6784" formatted="false">"[LOCK] pretending to know what any of this means..."</string>
+    <!--  -->
+    <string name="surface_lock_pretending_to_lock_subsystems_b0d7d" formatted="false">"[LOCK] pretending to lock subsystems..."</string>
+    <!-- setupLockdownOverlay -->
+    <string name="surface_lockdown_skipped_credits_29c2d">"Lockdown skipped. -%1$d credits."</string>
+    <!-- setupLockdownOverlay -->
+    <string name="surface_lockdown_skipped_with_breach_key_19c9d" formatted="false">"Lockdown skipped with breach key."</string>
+    <!-- buildNotesModuleText -->
+    <string name="surface_locked_f6608" formatted="false">"[locked] "</string>
+    <!-- onReceive -->
+    <string name="surface_logged_to_ee37a">"Logged to %1$s"</string>
+    <!-- appendTermuxAppInfo -->
+    <string name="surface_logs_bee4e">"Logs: %1$s"</string>
+    <!-- addPodcastEpisodeHeader -->
+    <string name="surface_long_press_an_episode_to_mark_it_played_6543c">"%1$s · Long-press an episode to mark it played"</string>
+    <!-- luaAppTitle -->
+    <string name="surface_lua_app_34dd8" formatted="false">"Lua App"</string>
+    <!-- renderLuaAppFrame -->
+    <string name="surface_lua_error_24e66" formatted="false">"\nLua error: "</string>
+    <!-- showLuaWidgetModule -->
+    <string name="surface_lua_error_95ede">"Lua error: %1$s"</string>
+    <!-- renderLuaWidgetModule -->
+    <string name="surface_lua_module_refreshed_0d7bd">"Lua module refreshed: %1$s"</string>
+    <!-- runLuaWidgetOperation -->
+    <string name="surface_lua_module_source_not_found_ff7f6">"Lua module source not found: %1$s"</string>
+    <!-- appendTermuxAppInfo -->
+    <string name="surface_manifest_558ac">"Manifest: %1$s"</string>
+    <!-- syncTermuxCustomApp -->
+    <string name="surface_manifest_sync_dispatched_3453b">"Manifest sync dispatched: %1$s"</string>
+    <!-- appendTermuxAppSyncResult -->
+    <string name="surface_manifest_sync_failed_fa58b">"Manifest sync failed: %1$s"</string>
+    <!-- syncTermuxAppManifest -->
+    <string name="surface_manifest_sync_pending_termux_bridge_is_not_ready_1d5d0" formatted="false">"Manifest sync pending: Termux bridge is not ready."</string>
+    <!-- appendTermuxAppSyncResult -->
+    <string name="surface_manifest_synced_8a447">"Manifest synced: %1$s"</string>
+    <!-- renderPodcastEpisodes -->
+    <string name="surface_marked_played_2ba05">"Marked played: %1$s"</string>
+    <!-- renderPodcastEpisodes -->
+    <string name="surface_marked_unplayed_2cd47">"Marked unplayed: %1$s"</string>
+    <!--  -->
+    <string name="surface_mem_dumping_volatile_session_tokens_06915" formatted="false">"[MEM ] dumping volatile session tokens..."</string>
+    <!--  -->
+    <string name="surface_mem_scanning_clipboard_buffer_adbc9" formatted="false">"[MEM ] scanning clipboard buffer..."</string>
+    <!--  -->
+    <string name="surface_mem_scanning_keyboard_buffer_57074" formatted="false">"[MEM ] scanning keyboard buffer..."</string>
+    <!-- appendTermuxAppInfo -->
+    <string name="surface_memory_13c03">"Memory: %1$s"</string>
+    <!--  -->
+    <string name="surface_mesh_flooding_loopback_channel_7c336" formatted="false">"[MESH] flooding loopback channel..."</string>
+    <!--  -->
+    <string name="surface_mesh_propagating_into_nearby_terminals_f7abe" formatted="false">"[MESH] propagating into nearby terminals..."</string>
+    <!--  -->
+    <string name="surface_mesh_seeding_ghost_sessions_9a742" formatted="false">"[MESH] seeding ghost sessions..."</string>
+    <!-- updatePomodoroOverlay -->
+    <string name="surface_mission_accomplished_5f337" formatted="false">"MISSION ACCOMPLISHED"</string>
+    <!-- appendTermuxSetup -->
+    <string name="surface_mkdir_p_retui_bd4b2" formatted="false">"   mkdir -p ~/retui"</string>
+    <!-- appendTermuxSetup -->
+    <string name="surface_mkdir_p_termux_3670c" formatted="false">"   mkdir -p ~/.termux"</string>
+    <!--  -->
+    <string name="surface_mod_patching_fake_subsystem_battery_b3009" formatted="false">"[MOD ] patching fake subsystem: battery"</string>
+    <!--  -->
+    <string name="surface_mod_patching_fake_subsystem_music_760a7" formatted="false">"[MOD ] patching fake subsystem: music"</string>
+    <!--  -->
+    <string name="surface_mod_patching_fake_subsystem_notifications_b0995" formatted="false">"[MOD ] patching fake subsystem: notifications"</string>
+    <!--  -->
+    <string name="surface_mod_patching_fake_subsystem_wallpaper_5b40a" formatted="false">"[MOD ] patching fake subsystem: wallpaper"</string>
+    <!-- appendTermuxSetup -->
+    <string name="surface_module_add_server_termux_data_data_com_termux_files_home_r_226db" formatted="false">"   module -add server termux:/data/data/com.termux/files/home/retui/server-health.sh"</string>
+    <!-- appendTermuxSetup -->
+    <string name="surface_module_refresh_server_e8d63" formatted="false">"   module -refresh server"</string>
+    <!-- updateModuleFromTermuxResult -->
+    <string name="surface_module_refreshed_97f96">"Module refreshed: %1$s"</string>
+    <!-- buildNotesModuleText -->
+    <string name="surface_more_82fdf" formatted="false">" more\n"</string>
+    <!-- createDuoSwitchButton -->
+    <string name="surface_move_re_t_ui_to_screen_eba98">"Move Re:T-UI to %1$s screen"</string>
+    <!-- appendTermuxSetup -->
+    <string name="surface_nano_retui_test_sh_ff3a9" formatted="false">"   nano ~/retui/test.sh"</string>
+    <!--  -->
+    <string name="surface_net_handshaking_with_mirror_node_b8bec" formatted="false">"[NET ] handshaking with mirror node..."</string>
+    <!--  -->
+    <string name="surface_net_tunneling_through_relay_07_37b98" formatted="false">"[NET ] tunneling through relay-07..."</string>
+    <!--  -->
+    <string name="surface_net_tunneling_through_relay_11_c3345" formatted="false">"[NET ] tunneling through relay-11..."</string>
+    <!-- renderTermuxWorkspaceHelp -->
+    <string name="surface_new_name_prev_next_refresh_status_reconnect_home_6ee59" formatted="false">":new [name] :prev :next :refresh :status :reconnect :home"</string>
+    <!-- newTermuxWorkspaceWindow -->
+    <string name="surface_new_tmux_window_0b9e5">"new tmux window: %1$s"</string>
+    <!-- newTermuxWorkspaceWindow -->
+    <string name="surface_new_tmux_window_6272b" formatted="false">"new tmux window"</string>
+    <!-- addPodcastEpisodeHeader -->
+    <string name="surface_newest_first_autoplay_42753" formatted="false">"Newest first autoplay"</string>
+    <!-- addPodcastEpisodeHeader -->
+    <string name="surface_newest_first_bca94" formatted="false">"NEWEST FIRST"</string>
+    <!-- setupPomodoroOverlay -->
+    <string name="surface_no_a0509" formatted="false">"NO"</string>
+    <!-- appendTermuxAppActions -->
+    <string name="surface_no_actions_registered_112a4" formatted="false">"No actions registered."</string>
+    <!-- handleLuaAppLocalCommand -->
+    <string name="surface_no_config_surface_92c6f">"No config surface: %1$s"</string>
+    <!-- renderPodcastEpisodes -->
+    <string name="surface_no_episodes_match_07d9b">"No episodes match \"%1$s\"."</string>
+    <!-- renderLuaAppFrame -->
+    <string name="surface_no_lua_app_output_yet_334b2" formatted="false">"\nNo Lua app output yet."</string>
+    <!-- repaintActiveTextModule -->
+    <string name="surface_no_module_output_yet_ba2f9" formatted="false">"No module output yet."</string>
+    <!-- buildNotesModuleText -->
+    <string name="surface_no_notes_add_notes_add_todo_follow_up_open_editor_notes_3d1ec" formatted="false">"No notes.\nAdd: notes -add TODO: follow up\nOpen editor: notes"</string>
+    <!-- showNotificationSettingsPopup -->
+    <string name="surface_no_notification_selected_1f0ee" formatted="false">"No notification selected."</string>
+    <!-- renderNotificationRows -->
+    <string name="surface_no_notifications_273d1" formatted="false">"No notifications."</string>
+    <!-- appendTermuxResult -->
+    <string name="surface_no_output_returned_05405" formatted="false">"no output returned."</string>
+    <!-- updateModuleFromTermuxResult -->
+    <string name="surface_no_output_returned_a4db4" formatted="false">"No output returned."</string>
+    <!-- renderPodcastEpisodes -->
+    <string name="surface_no_playable_episodes_found_in_this_feed_fc157" formatted="false">"No playable episodes found in this feed."</string>
+    <!-- renderPodcastPlayer -->
+    <string name="surface_no_podcast_loaded_84fab" formatted="false">"No podcast loaded"</string>
+    <!-- updatePodcastNowPlaying -->
+    <string name="surface_no_podcast_playing_4555b" formatted="false">"No podcast playing"</string>
+    <!-- renderPodcastShows -->
+    <string name="surface_no_podcasts_match_this_tag_29076" formatted="false">"No podcasts match this tag."</string>
+    <!-- buildNotificationDetail -->
+    <string name="surface_no_readable_content_5d972" formatted="false">"No readable content"</string>
+    <!-- renderPodcastRecents -->
+    <string name="surface_no_recent_podcast_episodes_yet_b17af" formatted="false">"No recent podcast episodes yet."</string>
+    <!-- removeTermuxWorkspaceLauncher -->
+    <string name="surface_no_saved_launcher_removed_5af97">"No saved launcher removed: %1$s"</string>
+    <!-- renderPodcastEpisodes -->
+    <string name="surface_no_show_selected_7bad6" formatted="false">"No show selected."</string>
+    <!-- renderPodcastSurface -->
+    <string name="surface_no_subscriptions_yet_use_add_or_type_podcast_add_feed_url_d4398" formatted="false">"No subscriptions yet.\nUse ADD or type podcast add &lt;feed-url&gt;."</string>
+    <!-- buildWeatherModuleText -->
+    <string name="surface_no_weather_yet_e6067" formatted="false">"No weather yet."</string>
+    <!-- showLuaWidgetModule -->
+    <string name="surface_no_widget_output_yet_c383d" formatted="false">"No widget output yet."</string>
+    <!-- openTermuxConsole -->
+    <string name="surface_non_interactive_termux_commands_run_from_here_80d90" formatted="false">"Non-interactive Termux commands run from here."</string>
+    <!-- renderTermuxWorkspaceHelp -->
+    <string name="surface_normal_input_is_sent_to_tmux_48b12" formatted="false">"Normal input is sent to tmux."</string>
+    <!-- appendTermuxStatus -->
+    <string name="surface_not_available_5f239" formatted="false">"not available"</string>
+    <!-- pomodoroStopConfirmText -->
+    <string name="surface_not_enough_credits_try_an_emergency_breach_75d79" formatted="false">"Not enough credits. Try an emergency breach?"</string>
+    <!-- appendTermuxStatus -->
+    <string name="surface_not_granted_1604a" formatted="false">"not granted"</string>
+    <!-- addPodcastRecentGrid -->
+    <string name="surface_not_started_db2c4" formatted="false">"Not started"</string>
+    <!-- buildNotesModuleText -->
+    <string name="surface_note_b0893" formatted="false">" note"</string>
+    <!-- buildNotesModuleText -->
+    <string name="surface_notes_90ee5" formatted="false">" notes"</string>
+    <!-- buildNotificationLine -->
+    <string name="surface_notification_c18f8" formatted="false">"Notification"</string>
+    <!-- excludeNotificationFromPanel -->
+    <string name="surface_notification_excluded_from_launcher_panel_18a97" formatted="false">"Notification excluded from launcher panel."</string>
+    <!--  -->
+    <string name="surface_null_dereferencing_cinematic_stakes_7489a" formatted="false">"[NULL] dereferencing cinematic stakes..."</string>
+    <!--  -->
+    <string name="surface_null_recovering_from_fake_catastrophe_adc60" formatted="false">"[NULL] recovering from fake catastrophe..."</string>
+    <!-- addPodcastEpisodeHeader -->
+    <string name="surface_oldest_first_autoplay_d3909" formatted="false">"Oldest first autoplay"</string>
+    <!-- addPodcastEpisodeHeader -->
+    <string name="surface_oldest_first_da9dd" formatted="false">"OLDEST FIRST"</string>
+    <!-- executeTermuxConsoleCommand -->
+    <string name="surface_open_launch_the_termux_android_app_1789b" formatted="false">"open    -&gt; launch the Termux Android app"</string>
+    <!-- buildReminderModuleText -->
+    <string name="surface_open_reminder_e9efa">"%1$s\nOpen: reminder"</string>
+    <!-- dispatchTermuxShell -->
+    <string name="surface_open_termux_once_then_retry_from_this_console_7349c" formatted="false">"Open Termux once, then retry from this console."</string>
+    <!-- openTermuxWorkspaceLauncher -->
+    <string name="surface_open_tmux_launcher_e4050">"open tmux launcher: %1$s"</string>
+    <!-- addTermuxCustomApp -->
+    <string name="surface_open_with_tmux_launch_or_3a10f">"Open with: tmux launch %1$s  (or: %2$s)"</string>
+    <!-- openTermuxApp -->
+    <string name="surface_opened_termux_4f527" formatted="false">"opened Termux."</string>
+    <!-- openLuaApp -->
+    <string name="surface_opening_9d1be">"opening %1$s..."</string>
+    <!-- runTermuxShellCommand -->
+    <string name="surface_opening_termux_for_a_live_terminal_session_9bb39" formatted="false">"opening Termux for a live terminal session."</string>
+    <!-- updateTermuxConsoleLabels -->
+    <string name="surface_output_feb35" formatted="false">"OUTPUT"</string>
+    <!--  -->
+    <string name="surface_ovrd_amplifying_green_phosphor_output_5232f" formatted="false">"[OVRD] amplifying green phosphor output"</string>
+    <!--  -->
+    <string name="surface_ovrd_preserving_user_music_module_because_priorities_ceff2" formatted="false">"[OVRD] preserving user music module because priorities"</string>
+    <!--  -->
+    <string name="surface_ovrd_replacing_launcher_calmness_with_urgency_e58e2" formatted="false">"[OVRD] replacing launcher calmness with urgency"</string>
+    <!-- appendTermuxCallbackHint -->
+    <string name="surface_p_com_dvil_tui_renewed_e100d" formatted="false">"  -p com.dvil.tui_renewed"</string>
+    <!-- buildNativeFileListing -->
+    <string name="surface_path_not_found_7e7ec" formatted="false">"Path not found."</string>
+    <!-- updatePodcastNowPlaying -->
+    <string name="surface_pause_9935d" formatted="false">"PAUSE"</string>
+    <!-- renderPodcastPlayer -->
+    <string name="surface_pick_a_show_to_start_listening_7b228" formatted="false">"Pick a show to start listening."</string>
+    <!--  -->
+    <string name="surface_ping_127_0_0_1_replied_in_0ms_8329b" formatted="false">"[PING] 127.0.0.1 replied in 0ms"</string>
+    <!--  -->
+    <string name="surface_pipe_rerouting_common_sense_to_dev_null_0de7e" formatted="false">"[PIPE] rerouting common sense to /dev/null"</string>
+    <!--  -->
+    <string name="surface_pipe_rerouting_stderr_to_dramatic_overlay_e9649" formatted="false">"[PIPE] rerouting stderr to dramatic overlay..."</string>
+    <!--  -->
+    <string name="surface_pipe_rerouting_stdout_to_dramatic_overlay_e0640" formatted="false">"[PIPE] rerouting stdout to dramatic overlay..."</string>
+    <!-- updatePodcastNowPlaying -->
+    <string name="surface_play_42c5c" formatted="false">"PLAY"</string>
+    <!-- executePodcastCommand -->
+    <string name="surface_playback_speed_must_be_a_number_from_0_5_to_2_0_eca60" formatted="false">"Playback speed must be a number from 0.5 to 2.0."</string>
+    <!-- updatePodcastContentLabel -->
+    <string name="surface_player_5055e" formatted="false">"PLAYER"</string>
+    <!-- showPodcastAddDialog -->
+    <string name="surface_podcast_added_49c22" formatted="false">"Podcast added."</string>
+    <!-- showPodcastAddDialog -->
+    <string name="surface_podcast_feed_url_must_be_a_valid_https_address_75717" formatted="false">"Podcast feed URL must be a valid https:// address."</string>
+    <!-- renderPodcastPlayer -->
+    <string name="surface_podcast_playback_speed_7a955">"Podcast playback speed %1$s"</string>
+    <!-- addPodcastShowGrid -->
+    <string name="surface_podcast_refreshed_3f4e4" formatted="false">"Podcast refreshed."</string>
+    <!-- showPodcastTagsDialog -->
+    <string name="surface_podcast_tags_cac94" formatted="false">"PODCAST TAGS"</string>
+    <!-- buildTimerModuleText -->
+    <string name="surface_pomodoro_0fb35" formatted="false">"Pomodoro: "</string>
+    <!-- buildTimerModuleText -->
+    <string name="surface_pomodoro_idle_46ab6" formatted="false">"Pomodoro: idle\n"</string>
+    <!-- terminatePomodoroEarly -->
+    <string name="surface_pomodoro_terminated_credits_d6ff8">"Pomodoro terminated. -%1$d credits."</string>
+    <!-- executeTermuxConsoleCommand -->
+    <string name="surface_prefer_tmux_launch_mc_or_alias_mc_577ec" formatted="false">"Prefer: tmux launch mc   or alias MC"</string>
+    <!-- renderTermuxWorkspaceLocalCommandDraft -->
+    <string name="surface_press_enter_to_run_backspace_on_empty_command_to_cancel_8bac4" formatted="false">"press Enter to run, Backspace on empty command to cancel"</string>
+    <!--  -->
+    <string name="surface_proc_detaching_watchdog_threads_79bd4" formatted="false">"[PROC] detaching watchdog threads..."</string>
+    <!--  -->
+    <string name="surface_proc_escalating_pseudo_root_privileges_c36c9" formatted="false">"[PROC] escalating pseudo-root privileges..."</string>
+    <!--  -->
+    <string name="surface_proc_masking_shell_signature_9d67a" formatted="false">"[PROC] masking shell signature..."</string>
+    <!-- formatLuaLayoutProgress -->
+    <string name="surface_progress_1b902" formatted="false">"Progress"</string>
+    <!-- executeTermuxConsoleCommand -->
+    <string name="surface_pwd_ls_whoami_run_shell_commands_in_termux_a6ede" formatted="false">"pwd / ls / whoami -&gt; run shell commands in Termux"</string>
+    <!-- renderTermuxAppFrame -->
+    <string name="surface_re_t_ui_app_session_local_commands_help_refresh_restart_st_d4cdf">"Re:T-UI app: %1$s\nsession: %2$s\nlocal commands: :help :refresh :restart :stop :detach :open%3$s"</string>
+    <!-- renderLuaAppFrame -->
+    <string name="surface_re_t_ui_lua_app_2c557" formatted="false">"Re:T-UI Lua app: "</string>
+    <!-- renderLuaAppRichFrame -->
+    <string name="surface_re_t_ui_lua_app_dfb07">"Re:T-UI Lua app: %1$s"</string>
+    <!-- openTermuxConsole -->
+    <string name="surface_re_t_ui_termux_console_341d4" formatted="false">"Re:T-UI Termux console"</string>
+    <!-- appendTermuxWorkspaceResult -->
+    <string name="surface_re_t_ui_tmux_workspace_a062d" formatted="false">"Re:T-UI tmux workspace"</string>
+    <!-- renderPodcastShows -->
+    <string name="surface_recent_76eec" formatted="false">"Recent"</string>
+    <!-- renderPodcastRecents -->
+    <string name="surface_recent_shows_bf7cd" formatted="false">"Recent shows"</string>
+    <!-- renderPodcastSurface -->
+    <string name="surface_recents_1a978" formatted="false">"RECENTS"</string>
+    <!-- renderTermuxWorkspaceStatusReport -->
+    <string name="surface_recovery_run_reconnect_then_refresh_if_the_pane_is_stale_af976" formatted="false">"recovery: run :reconnect, then :refresh if the pane is stale"</string>
+    <!-- setupPodcastPaneActions -->
+    <string name="surface_refresh_selected_podcast_4b302" formatted="false">"Refresh selected podcast"</string>
+    <!-- addPodcastShowGrid -->
+    <string name="surface_refreshing_09866">"Refreshing %1$s..."</string>
+    <!-- executePodcastCommand -->
+    <string name="surface_refreshing_selected_podcast_7f1bc" formatted="false">"Refreshing selected podcast..."</string>
+    <!-- showPodcastShowMenu -->
+    <string name="surface_remove_e9639" formatted="false">"Remove"</string>
+    <!-- confirmRemovePodcastShow -->
+    <string name="surface_remove_f9662" formatted="false">"REMOVE"</string>
+    <!-- confirmRemovePodcastShow -->
+    <string name="surface_remove_from_podcasts_e8074">"Remove %1$s from Podcasts?"</string>
+    <!-- confirmRemovePodcastShow -->
+    <string name="surface_remove_podcast_5cba3" formatted="false">"REMOVE PODCAST"</string>
+    <!-- removeTermuxWorkspaceLauncher -->
+    <string name="surface_removed_launcher_4eef9">"removed launcher: %1$s"</string>
+    <!-- buildNotificationDetail -->
+    <string name="surface_reply_available_0b0fd" formatted="false">"reply available"</string>
+    <!-- appendTermuxStatus -->
+    <string name="surface_required_termux_setting_allow_external_apps_true_da61f" formatted="false">"Required Termux setting: allow-external-apps=true"</string>
+    <!-- appendTermuxResult -->
+    <string name="surface_result_d3272">"result: %1$s"</string>
+    <!-- appendTermuxSetup -->
+    <string name="surface_retui_token_show_2e437" formatted="false">"   retui-token -show"</string>
+    <!-- renderTermuxWorkspaceLauncherList -->
+    <string name="surface_rm_id_87f06" formatted="false">":rm &lt;id&gt;"</string>
+    <!-- renderTermuxWorkspaceHelp -->
+    <string name="surface_rm_id_remove_a_saved_launcher_ad575" formatted="false">":rm &lt;id&gt; - remove a saved launcher"</string>
+    <!-- buildRssModuleText -->
+    <string name="surface_rss_manager_unavailable_7da59" formatted="false">"RSS manager unavailable."</string>
+    <!-- renderTermuxWorkspaceStatusReport -->
+    <string name="surface_run_command_declared_3cdca" formatted="false">"RUN_COMMAND declared: "</string>
+    <!-- renderTermuxWorkspaceStatusReport -->
+    <string name="surface_run_command_granted_b7cc8" formatted="false">"RUN_COMMAND granted: "</string>
+    <!-- executeTermuxConsoleCommand -->
+    <string name="surface_run_script_alias_args_dispatch_a_termux_script_fe771" formatted="false">"run &lt;script|alias&gt; [args...] -&gt; dispatch a Termux script"</string>
+    <!-- appendTermuxStatus -->
+    <string name="surface_runcommand_bridge_a8081">"RunCommand bridge: %1$s"</string>
+    <!-- appendTermuxStatus -->
+    <string name="surface_runcommand_permission_b2628">"RunCommand permission: %1$s"</string>
+    <!-- ensureTermuxBridgeReady -->
+    <string name="surface_runcommand_permission_is_not_granted_yet_29f35" formatted="false">"RunCommand permission is not granted yet."</string>
+    <!-- ensureTermuxWorkspaceBridgeReady -->
+    <string name="surface_runcommand_permission_is_not_granted_yet_allow_re_t_ui_and_dcbb9" formatted="false">"RunCommand permission is not granted yet. Allow Re:T-UI and retry."</string>
+    <!-- showPodcastTagsDialog -->
+    <string name="surface_save_50815" formatted="false">"SAVE"</string>
+    <!-- renderTermuxWorkspaceLauncherList -->
+    <string name="surface_save_id_command_c1052" formatted="false">":save &lt;id&gt; &lt;command&gt;"</string>
+    <!-- renderTermuxWorkspaceHelp -->
+    <string name="surface_save_id_command_save_a_launcher_85949" formatted="false">":save &lt;id&gt; &lt;command&gt; - save a launcher"</string>
+    <!-- renderTermuxWorkspaceStatusReport -->
+    <string name="surface_saved_7718b" formatted="false">" saved"</string>
+    <!-- addTermuxCustomApp -->
+    <string name="surface_saved_as_a_tmux_workspace_launcher_tmux_launch_id_e5513" formatted="false">"Saved as a tmux workspace launcher: tmux launch &lt;id&gt;"</string>
+    <!-- saveTermuxWorkspaceLauncher -->
+    <string name="surface_saved_launcher_39f4b">"saved launcher: %1$s"</string>
+    <!--  -->
+    <string name="surface_scan_port_1337_aesthetically_required_d7959" formatted="false">"[SCAN] port 1337 aesthetically required"</string>
+    <!--  -->
+    <string name="surface_scan_port_22_open_a2126" formatted="false">"[SCAN] port 22 open"</string>
+    <!--  -->
+    <string name="surface_scan_port_443_open_c0202" formatted="false">"[SCAN] port 443 open"</string>
+    <!--  -->
+    <string name="surface_scan_port_80_filtered_a7a85" formatted="false">"[SCAN] port 80 filtered"</string>
+    <!-- renderLuaAppFrame -->
+    <string name="surface_script_39362" formatted="false">"script: "</string>
+    <!-- renderLuaAppRichFrame -->
+    <string name="surface_script_4bf42">"script: %1$s"</string>
+    <!-- openLuaApp -->
+    <string name="surface_script_is_not_a_lua_app_62b97">"Script is not a Lua app: %1$s"</string>
+    <!-- showPodcastEpisodeSearchDialog -->
+    <string name="surface_search_2c5ea">"Search %1$s"</string>
+    <!-- addPodcastEpisodeSearch -->
+    <string name="surface_search_61550">"SEARCH: %1$s"</string>
+    <!-- showPodcastEpisodeSearchDialog -->
+    <string name="surface_search_a62a7" formatted="false">"SEARCH"</string>
+    <!-- showPodcastEpisodeSearchDialog -->
+    <string name="surface_search_episodes_b4c19" formatted="false">"SEARCH EPISODES"</string>
+    <!-- addPodcastEpisodeSearch -->
+    <string name="surface_search_episodes_in_da3a8">"Search episodes in %1$s"</string>
+    <!--  -->
+    <string name="surface_seed_generating_panic_checksum_8f_2c_91_79931" formatted="false">"[SEED] generating panic checksum 8f-2c-91"</string>
+    <!--  -->
+    <string name="surface_seed_generating_panic_checksum_8f_2c_92_78c06" formatted="false">"[SEED] generating panic checksum 8f-2c-92"</string>
+    <!--  -->
+    <string name="surface_seed_generating_panic_checksum_8f_2c_93_a69e4" formatted="false">"[SEED] generating panic checksum 8f-2c-93"</string>
+    <!-- selectTermuxWorkspaceWindow -->
+    <string name="surface_select_tmux_window_a51c6">"select tmux window: %1$s"</string>
+    <!-- dismissCurrentNotification -->
+    <string name="surface_selected_notification_cannot_be_cleared_20da0" formatted="false">"Selected notification cannot be cleared."</string>
+    <!-- excludeNotificationFromPanel -->
+    <string name="surface_selected_notification_cannot_be_excluded_5df6b" formatted="false">"Selected notification cannot be excluded."</string>
+    <!-- startCurrentNotificationReply -->
+    <string name="surface_selected_notification_is_not_replyable_bind_the_app_with_r_0cf3e" formatted="false">"Selected notification is not replyable. Bind the app with reply -bind first."</string>
+    <!-- submitTermuxAppInput -->
+    <string name="surface_sent_enter_df691" formatted="false">"sent enter"</string>
+    <!-- submitTermuxAppInput -->
+    <string name="surface_sent_faa06">"sent: %1$s"</string>
+    <!-- interruptTermuxInput -->
+    <string name="surface_sent_interrupt_e9bc2" formatted="false">"sent interrupt"</string>
+    <!-- appendTermuxWorkspaceResult -->
+    <string name="surface_session_5f810" formatted="false">"session: "</string>
+    <!-- appendTermuxAppInfo -->
+    <string name="surface_session_66981">"Session: %1$s"</string>
+    <!-- updateTermuxConsoleLabels -->
+    <string name="surface_session_c1085" formatted="false">"SESSION"</string>
+    <!-- appendTermuxAppResult -->
+    <string name="surface_session_ended_e36c4" formatted="false">"session ended"</string>
+    <!-- appendTermuxAppResult -->
+    <string name="surface_session_ended_type_restart_to_start_it_1bc47" formatted="false">"session ended. Type :restart to start it."</string>
+    <!-- executeTermuxConsoleCommand -->
+    <string name="surface_setup_show_termux_bridge_setup_checklist_eeb78" formatted="false">"setup   -&gt; show Termux bridge setup checklist"</string>
+    <!-- dispatchTermuxShell -->
+    <string name="surface_shell_d4208">"shell: %1$s"</string>
+    <!-- musicSubtitlePrefix -->
+    <string name="surface_show_06f63" formatted="false">"Show       : "</string>
+    <!-- setUnifiedModulesVisible -->
+    <string name="surface_show_modules_8f780" formatted="false">"Show modules"</string>
+    <!-- updatePodcastContentLabel -->
+    <string name="surface_shows_bd50a" formatted="false">"SHOWS"</string>
+    <!-- musicSubtitlePrefix -->
+    <string name="surface_singer_e58b5" formatted="false">"Singer      : "</string>
+    <!-- updatePomodoroOverlay -->
+    <string name="surface_skip_pomodoro_credits_b7376">"SKIP POMODORO -%1$d CREDITS"</string>
+    <!-- bindPodcastCloseGesture -->
+    <string name="surface_slide_here_to_close_podcasts_bf03e" formatted="false">"Slide here to close podcasts"</string>
+    <!-- appendTermuxWorkspaceResult -->
+    <string name="surface_socket_03b7c" formatted="false">"socket: "</string>
+    <!-- onStatus -->
+    <string name="surface_socket_a559b">"socket: %1$s"</string>
+    <!-- onError -->
+    <string name="surface_socket_bridge_error_5de4e">"socket bridge error: %1$s"</string>
+    <!-- renderTermuxWorkspaceStatusReport -->
+    <string name="surface_socket_connected_d5ab4" formatted="false">"socket connected: "</string>
+    <!-- renderTermuxWorkspaceStatusReport -->
+    <string name="surface_socket_name_cached_fcbbb" formatted="false">"socket name cached: "</string>
+    <!-- addPodcastEpisodeHeader -->
+    <string name="surface_sort_newest_first_tap_to_switch_to_oldest_first_6fbb3" formatted="false">"Sort newest first. Tap to switch to oldest first."</string>
+    <!-- addPodcastEpisodeHeader -->
+    <string name="surface_sort_oldest_first_tap_to_switch_to_newest_first_d5645" formatted="false">"Sort oldest first. Tap to switch to newest first."</string>
+    <!-- renderPodcastPlayer -->
+    <string name="surface_speed_a23eb">"[ SPEED %1$s ]"</string>
+    <!-- addCalculatorKey -->
+    <string name="surface_square_root_47a32" formatted="false">"Square root"</string>
+    <!-- showLuaWidgetModule -->
+    <string name="surface_stage_6da98">"Stage: %1$s"</string>
+    <!-- renderLuaAppFrame -->
+    <string name="surface_stage_805fd" formatted="false">"\nStage: "</string>
+    <!-- renderTermuxAppFrame -->
+    <string name="surface_starting_d6fc5" formatted="false">"\nstarting..."</string>
+    <!-- appendTermuxAppInfo -->
+    <string name="surface_state_88c10">"State: %1$s"</string>
+    <!-- renderLuaAppRichFrame -->
+    <string name="surface_status_573dd">"status: %1$s"</string>
+    <!-- renderLuaAppFrame -->
+    <string name="surface_status_8a876" formatted="false">"status: "</string>
+    <!-- renderTermuxAppFrame -->
+    <string name="surface_status_cb861">"\nstatus: %1$s"</string>
+    <!-- executeTermuxConsoleCommand -->
+    <string name="surface_status_check_termux_bridge_readiness_e5c11" formatted="false">"status  -&gt; check Termux bridge readiness"</string>
+    <!-- updateModuleFromTermuxResult -->
+    <string name="surface_stderr_544b7">"stderr:\n%1$s"</string>
+    <!-- sendTermuxBridgeResult -->
+    <string name="surface_stderr_59a49" formatted="false">"\nstderr:\n"</string>
+    <!-- appendTermuxAppSyncResult -->
+    <string name="surface_stderr_9ffd5">"stderr: %1$s"</string>
+    <!-- appendTermuxWorkspaceResult -->
+    <string name="surface_stderr_cc628" formatted="false">"stderr: "</string>
+    <!-- pomodoroStopConfirmText -->
+    <string name="surface_stop_this_pomodoro_for_credits_ad296">"Stop this Pomodoro for %1$d credits?"</string>
+    <!-- renderPodcastShows -->
+    <string name="surface_subscriptions_5697f" formatted="false">"Subscriptions"</string>
+    <!-- renderPodcastSurface -->
+    <string name="surface_subscriptions_are_saved_tap_a_show_to_refresh_it_539d1" formatted="false">"Subscriptions are saved.\nTap a show to refresh it."</string>
+    <!-- renderTermuxWorkspaceHelp -->
+    <string name="surface_switch_window_jump_to_a_tmux_window_index_name_d002c" formatted="false">":switch &lt;window&gt; - jump to a tmux window index/name"</string>
+    <!--  -->
+    <string name="surface_sync_mirroring_notification_buffer_574fb" formatted="false">"[SYNC] mirroring notification buffer..."</string>
+    <!--  -->
+    <string name="surface_sync_mirroring_playback_metadata_e919a" formatted="false">"[SYNC] mirroring playback metadata..."</string>
+    <!--  -->
+    <string name="surface_sync_mirroring_quick_launch_slots_19159" formatted="false">"[SYNC] mirroring quick launch slots..."</string>
+    <!-- showPodcastTagsDialog -->
+    <string name="surface_tags_848ee" formatted="false">"Tags"</string>
+    <!-- updatePomodoroOverlay -->
+    <string name="surface_take_a_break_849f9" formatted="false">"TAKE A BREAK"</string>
+    <!-- renderPodcastRecents -->
+    <string name="surface_tap_a_row_to_resume_that_show_s_last_episode_abfac" formatted="false">"Tap a row to resume that show\'s last episode."</string>
+    <!-- renderPodcastShows -->
+    <string name="surface_tap_a_show_to_refresh_open_it_6f531" formatted="false">"Tap a show to refresh/open it."</string>
+    <!-- setupTermuxWorkspacePage -->
+    <string name="surface_tap_the_terminal_toolbar_button_or_run_refresh_to_start_d129f" formatted="false">"Tap the terminal toolbar button or run :refresh to start."</string>
+    <!--  -->
+    <string name="surface_task_assembling_unauthorized_vibes_4749e" formatted="false">"[TASK] assembling unauthorized vibes..."</string>
+    <!-- updatePomodoroOverlay -->
+    <string name="surface_task_c6f9a">"Task: %1$s"</string>
+    <!--  -->
+    <string name="surface_task_marking_sequence_irreversible_2ffa6" formatted="false">"[TASK] marking sequence irreversible..."</string>
+    <!--  -->
+    <string name="surface_task_replaying_synthetic_intrusion_frames_d923b" formatted="false">"[TASK] replaying synthetic intrusion frames..."</string>
+    <!--  -->
+    <string name="surface_task_sequence_actually_reversible_d7cf9" formatted="false">"[TASK] sequence actually reversible"</string>
+    <!-- setupPomodoroOverlay -->
+    <string name="surface_terminate_7acd3" formatted="false">"TERMINATE"</string>
+    <!-- updatePomodoroOverlay -->
+    <string name="surface_terminate_session_cd886" formatted="false">"TERMINATE SESSION"</string>
+    <!-- updateTermuxConsoleLabels -->
+    <string name="surface_termux_26316" formatted="false">"TERMUX"</string>
+    <!-- appendTermuxAppInfo -->
+    <string name="surface_termux_app_d1455">"Termux app: %1$s"</string>
+    <!-- removeTermuxCustomApp -->
+    <string name="surface_termux_app_not_removed_bc850">"Termux app not removed: %1$s"</string>
+    <!-- removeTermuxCustomApp -->
+    <string name="surface_termux_app_removed_4f6c4">"Termux app removed: %1$s"</string>
+    <!-- sendTermuxBridgeResult -->
+    <string name="surface_termux_bridge_3deda" formatted="false">"Termux bridge: "</string>
+    <!-- appendTermuxSetup -->
+    <string name="surface_termux_bridge_setup_e45bb" formatted="false">"Termux bridge setup"</string>
+    <!-- appendTermuxResult -->
+    <string name="surface_termux_command_b82dc" formatted="false">"termux command"</string>
+    <!-- executeTermuxConsoleCommand -->
+    <string name="surface_termux_console_is_already_open_type_help_for_available_com_e6bd1" formatted="false">"Termux console is already open. Type help for available commands."</string>
+    <!-- renderTermuxWorkspaceStatusReport -->
+    <string name="surface_termux_installed_bd813" formatted="false">"termux installed: "</string>
+    <!-- appendTermuxStatus -->
+    <string name="surface_termux_installed_d7938">"Termux installed: %1$b"</string>
+    <!-- openTermuxApp -->
+    <string name="surface_termux_is_not_installed_3aba0" formatted="false">"Termux is not installed."</string>
+    <!-- ensureTermuxBridgeReady -->
+    <string name="surface_termux_must_also_have_allow_external_apps_true_bd4a5" formatted="false">"Termux must also have allow-external-apps=true."</string>
+    <!-- dispatchTermuxShell -->
+    <string name="surface_termux_rejected_the_command_permission_denied_5c116" formatted="false">"Termux rejected the command: permission denied."</string>
+    <!-- appendTermuxSetup -->
+    <string name="surface_termux_reload_settings_f5a10" formatted="false">"   termux-reload-settings"</string>
+    <!-- appendTermuxSetup -->
+    <string name="surface_termux_run_test_b9c68" formatted="false">"   termux -run test"</string>
+    <!-- updateTermuxWorkspaceChrome -->
+    <string name="surface_termux_workspace_0f9f7" formatted="false">"TERMUX WORKSPACE"</string>
+    <!-- ensureTermuxBridgeReady -->
+    <string name="surface_this_termux_build_does_not_expose_run_command_b2ba8" formatted="false">"This Termux build does not expose RUN_COMMAND."</string>
+    <!-- renderLuaWidgetModule -->
+    <string name="surface_title_body_lua_module_source_not_found_1535c">"::title %1$s\n::body Lua module source not found: %2$s"</string>
+    <!-- appendTermuxAppInfo -->
+    <string name="surface_title_e024d">"Title: %1$s"</string>
+    <!-- musicTitlePrefix -->
+    <string name="surface_title_edd45" formatted="false">"Title: "</string>
+    <!-- showPodcastEpisodeSearchDialog -->
+    <string name="surface_title_or_description_a127c" formatted="false">"Title or description"</string>
+    <!-- updateTermuxWorkspaceChrome -->
+    <string name="surface_tmux_2b42e">"TMUX %1$s"</string>
+    <!-- renderTermuxWorkspaceLauncherList -->
+    <string name="surface_tmux_launchers_f581b" formatted="false">"tmux launchers"</string>
+    <!-- switchTermuxWorkspaceWindow -->
+    <string name="surface_tmux_window_09344">"%1$s tmux window"</string>
+    <!-- renderTermuxWorkspaceStatusReport -->
+    <string name="surface_tmux_workspace_diagnostics_ca59b" formatted="false">"tmux workspace diagnostics"</string>
+    <!-- addToolbarShortcutButtons -->
+    <string name="surface_toolbar_shortcut_2e0fd">"Toolbar shortcut %1$d: %2$s"</string>
+    <!-- executeToolbarShortcut -->
+    <string name="surface_toolbar_shortcut_is_empty_fdada" formatted="false">"Toolbar shortcut is empty."</string>
+    <!--  -->
+    <string name="surface_trace_reading_launcher_aliases_62296" formatted="false">"[TRACE] reading launcher aliases..."</string>
+    <!--  -->
+    <string name="surface_trace_reading_launcher_app_groups_97704" formatted="false">"[TRACE] reading launcher app groups..."</string>
+    <!--  -->
+    <string name="surface_trace_reading_launcher_contacts_8d904" formatted="false">"[TRACE] reading launcher contacts..."</string>
+    <!--  -->
+    <string name="surface_trace_walking_local_package_graph_26e0b" formatted="false">"[TRACE] walking local package graph..."</string>
+    <!-- updateTermuxConsoleLabels -->
+    <string name="surface_type_input_or_help_4d935" formatted="false">"type input or :help"</string>
+    <!-- openTermuxConsole -->
+    <string name="surface_type_shell_commands_help_status_open_run_clear_or_exit_a8168" formatted="false">"Type shell commands, help, status, open, run, clear, or exit."</string>
+    <!-- dispatchTermuxShell -->
+    <string name="surface_unable_to_dispatch_termux_command_45f68">"unable to dispatch Termux command: %1$s"</string>
+    <!-- openTermuxApp -->
+    <string name="surface_unable_to_open_termux_1f222">"unable to open Termux: %1$s"</string>
+    <!-- addTermuxAppAction -->
+    <string name="surface_unable_to_register_app_action_ebff7" formatted="false">"Unable to register app action."</string>
+    <!-- addTermuxCustomApp -->
+    <string name="surface_unable_to_save_launcher_built_in_ids_cannot_be_overwritten_97283" formatted="false">"Unable to save launcher (built-in ids cannot be overwritten)."</string>
+    <!-- handleTermuxAppLocalCommand -->
+    <string name="surface_unknown_app_command_44753">"Unknown app command: :%1$s"</string>
+    <!-- refreshLauncherModule -->
+    <string name="surface_unknown_launcher_module_source_3c041">"Unknown launcher module source: %1$s"</string>
+    <!-- launchTermuxWorkspaceLauncher -->
+    <string name="surface_unknown_launcher_run_launch_to_list_available_launchers_16ab0">"Unknown launcher: %1$s. Run :launch to list available launchers."</string>
+    <!-- openLuaApp -->
+    <string name="surface_unknown_lua_app_e937e">"Unknown Lua app: %1$s"</string>
+    <!-- executePodcastCommand -->
+    <string name="surface_unknown_podcast_command_try_add_https_feed_url_refresh_pla_74479" formatted="false">"Unknown podcast command. Try: add &lt;https-feed-url&gt;, refresh, play, next, prev, rewind, forward, speed &lt;0.5-2.0&gt;, close"</string>
+    <!-- resolveTermuxAppFromCommand -->
+    <string name="surface_unknown_termux_app_5f89c">"Unknown Termux app: %1$s"</string>
+    <!-- handleTermuxWorkspaceExternalCommand -->
+    <string name="surface_unknown_tmux_command_try_tmux_launch_mc_or_tmux_switch_2_b2c6d">"Unknown tmux command: %1$s. Try tmux launch mc or tmux switch 2."</string>
+    <!-- handleTermuxWorkspaceCommand -->
+    <string name="surface_unknown_workspace_command_cddf8">"Unknown workspace command: :%1$s"</string>
+    <!-- buildWeatherModuleText -->
+    <string name="surface_updated_aea3f" formatted="false">"\nUpdated: "</string>
+    <!-- resolveTermuxAppFromCommand -->
+    <string name="surface_usage_84af2">"usage: %1$s"</string>
+    <!-- addTermuxAppAction -->
+    <string name="surface_usage_app_action_id_label_input_bf286" formatted="false">"usage: app-action &lt;id&gt; &lt;label&gt; [input]"</string>
+    <!-- removeTermuxAppAction -->
+    <string name="surface_usage_app_action_rm_id_label_5e8ec" formatted="false">"usage: app-action-rm &lt;id&gt; &lt;label&gt;"</string>
+    <!-- appendTermuxAppActions -->
+    <string name="surface_usage_app_actions_id_fcfd2" formatted="false">"usage: app-actions &lt;id&gt;"</string>
+    <!-- addTermuxCustomApp -->
+    <string name="surface_usage_app_add_id_command_92855" formatted="false">"usage: app-add &lt;id&gt; &lt;command&gt;"</string>
+    <!-- openTermuxCustomApp -->
+    <string name="surface_usage_app_id_opens_tmux_workspace_launcher_018ce" formatted="false">"usage: app &lt;id&gt;  (opens tmux workspace launcher)"</string>
+    <!-- removeTermuxCustomApp -->
+    <string name="surface_usage_app_rm_id_38cb8" formatted="false">"usage: app-rm &lt;id&gt;"</string>
+    <!-- removeTermuxWorkspaceLauncher -->
+    <string name="surface_usage_rm_id_efe42" formatted="false">"usage: :rm &lt;id&gt;"</string>
+    <!-- runTermuxCommand -->
+    <string name="surface_usage_run_script_path_args_ed67b" formatted="false">"usage: run &lt;script_path&gt; [args...]"</string>
+    <!-- saveTermuxWorkspaceLauncher -->
+    <string name="surface_usage_save_id_command_21680" formatted="false">"usage: :save &lt;id&gt; &lt;command&gt;"</string>
+    <!-- selectTermuxWorkspaceWindow -->
+    <string name="surface_usage_tmux_switch_window_or_switch_window_82893" formatted="false">"usage: tmux switch &lt;window&gt; or :switch &lt;window&gt;"</string>
+    <!-- refreshLockdownActions -->
+    <string name="surface_use_breach_key_8d028">"USE BREACH KEY (%1$d)"</string>
+    <!--  -->
+    <string name="surface_vid_injecting_terminal_rain_12859" formatted="false">"[VID ] injecting terminal rain..."</string>
+    <!--  -->
+    <string name="surface_vid_pinning_cinematic_contrast_f7b43" formatted="false">"[VID ] pinning cinematic contrast..."</string>
+    <!--  -->
+    <string name="surface_vid_spoofing_viewport_overlays_cc228" formatted="false">"[VID ] spoofing viewport overlays..."</string>
+    <!--  -->
+    <string name="surface_warn_device_insists_everything_is_fine_4c272" formatted="false">"[WARN] device insists everything is fine"</string>
+    <!--  -->
+    <string name="surface_warn_firewall_politely_ignored_01d0b" formatted="false">"[WARN] firewall politely ignored"</string>
+    <!-- formatTermuxWorkspaceWindowList -->
+    <string name="surface_window_201f5" formatted="false">"WINDOW"</string>
+    <!-- appendTermuxWorkspaceResult -->
+    <string name="surface_window_8b80e" formatted="false">"window: "</string>
+    <!-- appendTermuxWorkspaceResult -->
+    <string name="surface_windows_e3c67" formatted="false">"windows: "</string>
+    <!-- appendTermuxAppInfo -->
+    <string name="surface_workdir_a61e2">"Workdir: %1$s"</string>
+    <!-- showPodcastTagsDialog -->
+    <string name="surface_workout_travel_calming_5a511" formatted="false">"workout, travel, calming"</string>
+    <!-- addTermuxCustomApp -->
+    <string name="surface_workspace_launcher_saved_71ec1">"Workspace launcher saved: %1$s"</string>
+    <!-- appendTermuxApps -->
+    <string name="surface_workspace_launchers_use_tmux_launch_id_or_mc_7b114" formatted="false">"Workspace launchers (use: tmux launch &lt;id&gt; or MC)"</string>
+    <!-- setupPomodoroOverlay -->
+    <string name="surface_yes_8fff0" formatted="false">"YES"</string>
+    <plurals name="surface_notes_count">
+        <item quantity="one">%1$d note</item>
+        <item quantity="other">%1$d notes</item>
+    </plurals>
+    <plurals name="surface_more_count">
+        <item quantity="one">... %1$d more</item>
+        <item quantity="other">... %1$d more</item>
+    </plurals>
+</resources>

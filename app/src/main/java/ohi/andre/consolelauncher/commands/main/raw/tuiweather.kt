@@ -32,7 +32,7 @@ class tuiweather : ParamCommand() {
 
                 LauncherSettings.set(pack.context, save, "true")
                 val reloadable = pack.context as Reloadable
-                reloadable.addMessage(save.parent()!!.path(), save.label() + " -> " + "true")
+                reloadable.addMessage(save.parent()!!.path(), pack.context.getString(R.string.command_tuiweather_true_9e9da, save.label()))
                 reloadable.reload()
 
                 return null
@@ -44,7 +44,7 @@ class tuiweather : ParamCommand() {
 
                 LauncherSettings.set(pack.context, save, "false")
                 val reloadable = pack.context as Reloadable
-                reloadable.addMessage(save.parent()!!.path(), save.label() + " -> " + "false")
+                reloadable.addMessage(save.parent()!!.path(), pack.context.getString(R.string.command_tuiweather_false_81ef6, save.label()))
                 reloadable.reload()
 
                 return null
@@ -61,11 +61,11 @@ class tuiweather : ParamCommand() {
 
             override fun exec(pack: ExecutePack): String {
                 val location = pack.getString().trim()
-                if (location.isEmpty()) return "Usage: tuiweather -set_location <place or lat,lon>"
+                if (location.isEmpty()) return pack.context.getString(R.string.command_tuiweather_usage_tuiweather_set_location_place_or_lat_fe409)
                 LauncherSettings.set(pack.context, Behavior.weather_location, location)
                 LocalBroadcastManager.getInstance(pack.context.applicationContext)
                     .sendBroadcast(Intent(UIManager.ACTION_WEATHER_MANUAL_UPDATE))
-                return "Weather location set: $location"
+                return pack.context.getString(R.string.command_tuiweather_weather_location_set_2c0e9, location)
             }
         };
 
@@ -81,7 +81,7 @@ class tuiweather : ParamCommand() {
 
         companion object {
             fun get(p: String): Param? {
-                val value = p.lowercase(Locale.getDefault())
+                val value = p.lowercase(Locale.ROOT)
                 for (p1 in entries) {
                     if (value.endsWith(p1.label())) {
                         return p1

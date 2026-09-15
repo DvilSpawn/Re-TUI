@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher.managers.modules
 
+import ohi.andre.consolelauncher.R
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -61,7 +62,7 @@ object ModulePromptManager {
             .putString(KEY_FLOW, "add")
             .putString(KEY_STEP, "title")
             .apply()
-        prompt(context, "What do you want to be reminded about?")
+        prompt(context, context.getString(R.string.manager_modulepromptmanager_what_do_you_want_to_be_reminded_about_05a45))
     }
 
     fun startReminderEdit(context: Context) {
@@ -72,7 +73,7 @@ object ModulePromptManager {
             .putString(KEY_FLOW, "edit_select")
             .putString(KEY_STEP, "select")
             .apply()
-        prompt(context, "Which reminder do you want to edit?\n" + formatList(context))
+        prompt(context, context.getString(R.string.manager_modulepromptmanager_which_reminder_do_you_want_to_edit_08413, formatList(context)))
     }
 
     fun startReminderRemove(context: Context) {
@@ -83,12 +84,12 @@ object ModulePromptManager {
             .putString(KEY_FLOW, "remove")
             .putString(KEY_STEP, "select")
             .apply()
-        prompt(context, "Which reminder do you want to remove?\n" + formatList(context))
+        prompt(context, context.getString(R.string.manager_modulepromptmanager_which_reminder_do_you_want_to_remove_a9614, formatList(context)))
     }
 
     fun startNotificationReply(context: Context, pkg: String, appName: String?) {
         if (TextUtils.isEmpty(pkg)) {
-            Tuils.sendOutput(context, "No notification selected.")
+            Tuils.sendOutput(context, context.getString(R.string.manager_modulepromptmanager_no_notification_selected_1f0ee))
             return
         }
         val label: String = (if (android.text.TextUtils.isEmpty(appName)) pkg else appName)!!
@@ -102,7 +103,7 @@ object ModulePromptManager {
             .putString(KEY_PACKAGE, pkg)
             .putString(KEY_APP_NAME, label)
             .apply()
-        prompt(context, "Reply to " + label + ":")
+        prompt(context, context.getString(R.string.manager_modulepromptmanager_reply_to_c030d, label))
     }
 
     fun handleInput(context: Context, input: String?): Boolean {
@@ -116,7 +117,7 @@ object ModulePromptManager {
 
         val value = if (input == null) "" else input.trim { it <= ' ' }
         if ("cancel".equals(value, ignoreCase = true)) {
-            clear(context, "Module prompt cancelled.")
+            clear(context, context.getString(R.string.manager_modulepromptmanager_module_prompt_cancelled_96a61))
             return true
         }
 
@@ -133,7 +134,7 @@ object ModulePromptManager {
             return handleRemove(context, prefs, step, value)
         }
 
-        clear(context, "Unknown module prompt.")
+        clear(context, context.getString(R.string.manager_modulepromptmanager_unknown_module_prompt_ef7ea))
         return true
     }
 
@@ -158,11 +159,11 @@ object ModulePromptManager {
     ): Boolean {
         val value = if (input == null) "" else input.trim { it <= ' ' }
         if ("cancel".equals(value, ignoreCase = true)) {
-            clear(context, "Notification reply cancelled.")
+            clear(context, context.getString(R.string.manager_modulepromptmanager_notification_reply_cancelled_068bd))
             return true
         }
         if (TextUtils.isEmpty(value)) {
-            prompt(context, "Reply text cannot be empty. Type a reply or cancel.")
+            prompt(context, context.getString(R.string.manager_modulepromptmanager_reply_text_cannot_be_empty_type_a_reply_or_b6dca))
             return true
         }
 
@@ -177,7 +178,7 @@ object ModulePromptManager {
         LocalBroadcastManager.getInstance(context.getApplicationContext()).sendBroadcast(intent)
         clear(
             context,
-            "Reply sent to " + prefs.getString(KEY_APP_NAME, prefs.getString(KEY_PACKAGE, "")) + "."
+            context.getString(R.string.manager_modulepromptmanager_reply_sent_to_57e13, prefs.getString(KEY_APP_NAME, prefs.getString(KEY_PACKAGE, "")))
         )
         return true
     }
@@ -192,17 +193,17 @@ object ModulePromptManager {
             if (TextUtils.isEmpty(value)) {
                 prompt(
                     context,
-                    "Reminder text cannot be empty. What do you want to be reminded about?"
+                    context.getString(R.string.manager_modulepromptmanager_reminder_text_cannot_be_empty_what_do_you_4f23b)
                 )
                 return true
             }
             prefs.edit().putString(KEY_TITLE, value).putString(KEY_STEP, "date").apply()
-            prompt(context, "What date?\nAccepted: 10/05/2026 or 2026-05-10")
+            prompt(context, context.getString(R.string.manager_modulepromptmanager_what_date_accepted_10_05_2026_or_2026_05_1_32d57))
             return true
         }
         if ("date" == step) {
             prefs.edit().putString(KEY_DATE, value).putString(KEY_STEP, "time").apply()
-            prompt(context, "What time?\nAccepted: 11:30PM or 23:30")
+            prompt(context, context.getString(R.string.manager_modulepromptmanager_what_time_accepted_11_30pm_or_23_30_e9bc8))
             return true
         }
         if ("time" == step) {
@@ -213,7 +214,7 @@ object ModulePromptManager {
         if ("confirm" == step) {
             if ("edit".equals(value, ignoreCase = true)) {
                 prefs.edit().putString(KEY_STEP, "title").apply()
-                prompt(context, "What do you want to be reminded about?")
+                prompt(context, context.getString(R.string.manager_modulepromptmanager_what_do_you_want_to_be_reminded_about_05a45))
             } else if ("save".equals(value, ignoreCase = true) || "yes".equals(
                     value,
                     ignoreCase = true
@@ -221,7 +222,7 @@ object ModulePromptManager {
             ) {
                 saveNewReminder(context, prefs)
             } else {
-                prompt(context, "Type save, edit, or cancel.")
+                prompt(context, context.getString(R.string.manager_modulepromptmanager_type_save_edit_or_cancel_4b3c2))
             }
             return true
         }
@@ -240,7 +241,7 @@ object ModulePromptManager {
             if (reminder == null) {
                 prompt(
                     context,
-                    "Reminder not found. Enter a list number or type cancel.\n" + formatList(context)
+                    context.getString(R.string.manager_modulepromptmanager_reminder_not_found_enter_a_list_number_or_37b83, formatList(context))
                 )
                 return true
             }
@@ -260,7 +261,7 @@ object ModulePromptManager {
                 .apply()
             prompt(
                 context,
-                "Current reminder: " + reminder.title + "\nNew text? Press enter to keep."
+                context.getString(R.string.manager_modulepromptmanager_current_reminder_new_text_press_enter_to_k_8488b, reminder.title)
             )
             return true
         }
@@ -271,7 +272,7 @@ object ModulePromptManager {
             editor.apply()
             prompt(
                 context,
-                "New date? Press enter to keep.\nCurrent: " + prefs.getString(KEY_DATE, "")
+                context.getString(R.string.manager_modulepromptmanager_new_date_press_enter_to_keep_current_4943d, prefs.getString(KEY_DATE, ""))
             )
             return true
         }
@@ -281,7 +282,7 @@ object ModulePromptManager {
             editor.apply()
             prompt(
                 context,
-                "New time? Press enter to keep.\nCurrent: " + prefs.getString(KEY_TIME, "")
+                context.getString(R.string.manager_modulepromptmanager_new_time_press_enter_to_keep_current_d67b5, prefs.getString(KEY_TIME, ""))
             )
             return true
         }
@@ -295,7 +296,7 @@ object ModulePromptManager {
         if ("confirm" == step) {
             if ("edit".equals(value, ignoreCase = true)) {
                 prefs.edit().putString(KEY_STEP, "title").apply()
-                prompt(context, "New text? Press enter to keep.")
+                prompt(context, context.getString(R.string.manager_modulepromptmanager_new_text_press_enter_to_keep_7d8cf))
             } else if ("save".equals(value, ignoreCase = true) || "yes".equals(
                     value,
                     ignoreCase = true
@@ -303,7 +304,7 @@ object ModulePromptManager {
             ) {
                 saveEditedReminder(context, prefs)
             } else {
-                prompt(context, "Type save, edit, or cancel.")
+                prompt(context, context.getString(R.string.manager_modulepromptmanager_type_save_edit_or_cancel_4b3c2))
             }
         }
         return true
@@ -320,14 +321,14 @@ object ModulePromptManager {
             if (reminder == null) {
                 prompt(
                     context,
-                    "Reminder not found. Enter a list number or type cancel.\n" + formatList(context)
+                    context.getString(R.string.manager_modulepromptmanager_reminder_not_found_enter_a_list_number_or_37b83, formatList(context))
                 )
                 return true
             }
             prefs.edit().putString(KEY_EDIT_ID, reminder.id).putString(KEY_STEP, "confirm").apply()
             prompt(
                 context,
-                "Remove this reminder?\n" + reminder.title + "\n" + formatWhen(reminder.atMillis) + "\nType save to remove, or cancel."
+                context.getString(R.string.manager_modulepromptmanager_remove_this_reminder_type_save_to_remove_o_fbb0f, reminder.title, formatWhen(context, reminder.atMillis))
             )
             return true
         }
@@ -339,10 +340,10 @@ object ModulePromptManager {
             ) {
                 val id: String = prefs.getString(KEY_EDIT_ID, "")!!
                 remove(context, id)
-                clear(context, "Reminder removed.")
+                clear(context, context.getString(R.string.manager_modulepromptmanager_reminder_removed_d62b9))
                 refreshReminder(context)
             } else {
-                prompt(context, "Type save to remove, or cancel.")
+                prompt(context, context.getString(R.string.manager_modulepromptmanager_type_save_to_remove_or_cancel_098de))
             }
         }
         return true
@@ -352,16 +353,16 @@ object ModulePromptManager {
         val at = parseDateTime(prefs.getString(KEY_DATE, ""), prefs.getString(KEY_TIME, ""))
         if (at == null) {
             prefs.edit().putString(KEY_STEP, "date").apply()
-            prompt(context, "I could not parse that date/time. What date?")
+            prompt(context, context.getString(R.string.manager_modulepromptmanager_i_could_not_parse_that_date_time_what_date_a537d))
             return
         }
         if (at <= System.currentTimeMillis()) {
             prefs.edit().putString(KEY_STEP, "date").apply()
-            prompt(context, "That reminder time is in the past. What date?")
+            prompt(context, context.getString(R.string.manager_modulepromptmanager_that_reminder_time_is_in_the_past_what_dat_86eb2))
             return
         }
         val reminder = add(context, prefs.getString(KEY_TITLE, ""), at)
-        clear(context, "Reminder saved:\n" + reminder.title + "\n" + formatWhen(reminder.atMillis))
+        clear(context, context.getString(R.string.manager_modulepromptmanager_reminder_saved_42413, reminder.title, formatWhen(context, reminder.atMillis)))
         refreshReminder(context)
     }
 
@@ -369,12 +370,12 @@ object ModulePromptManager {
         val at = parseDateTime(prefs.getString(KEY_DATE, ""), prefs.getString(KEY_TIME, ""))
         if (at == null) {
             prefs.edit().putString(KEY_STEP, "date").apply()
-            prompt(context, "I could not parse that date/time. What date?")
+            prompt(context, context.getString(R.string.manager_modulepromptmanager_i_could_not_parse_that_date_time_what_date_a537d))
             return
         }
         if (at <= System.currentTimeMillis()) {
             prefs.edit().putString(KEY_STEP, "date").apply()
-            prompt(context, "That reminder time is in the past. What date?")
+            prompt(context, context.getString(R.string.manager_modulepromptmanager_that_reminder_time_is_in_the_past_what_dat_86eb2))
             return
         }
         val reminder = Reminder(
@@ -385,7 +386,7 @@ object ModulePromptManager {
         save(context, reminder)
         clear(
             context,
-            "Reminder updated:\n" + reminder.title + "\n" + formatWhen(reminder.atMillis)
+            context.getString(R.string.manager_modulepromptmanager_reminder_updated_523a5, reminder.title, formatWhen(context, reminder.atMillis))
         )
         refreshReminder(context)
     }
@@ -395,12 +396,9 @@ object ModulePromptManager {
         val `when` = if (at == null) prefs.getString(KEY_DATE, "") + " " + prefs.getString(
             KEY_TIME,
             ""
-        ) else formatWhen(at)
+        ) else formatWhen(context, at)
         prompt(
-            context, ("Reminder:\n"
-                    + prefs.getString(KEY_TITLE, "") + "\n"
-                    + `when` + "\n"
-                    + "Type save, edit, or cancel.")
+            context, (context.getString(R.string.manager_modulepromptmanager_reminder_type_save_edit_or_cancel_ca4fb, prefs.getString(KEY_TITLE, ""), `when`))
         )
     }
 

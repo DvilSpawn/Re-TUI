@@ -230,13 +230,13 @@
                 <ImageButton android:id="@+id/android_widget_drawer_view"
                     style="@style/ToolsBar"
                     android:background="@null"
-                    android:contentDescription="Android widgets"
+                    android:contentDescription="@string/ui_base_view_android_widgets"
                     android:src="@drawable/ic_toolbar_widgets_24"/>
 
                 <ImageButton android:id="@+id/termux_workspace_view"
                     style="@style/ToolsBar"
                     android:background="@null"
-                    android:contentDescription="Termux workspace"
+                    android:contentDescription="@string/ui_base_view_termux_workspace"
                     android:src="@drawable/ic_toolbar_terminal_24"/>
 
             </LinearLayout>

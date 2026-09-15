@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher.managers.termux
 
+import ohi.andre.consolelauncher.R
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -8,7 +9,8 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import ohi.andre.consolelauncher.UIManager
 
 class TermuxResultReceiver : BroadcastReceiver() {
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(rawContext: Context, intent: Intent) {
+        val context = ohi.andre.consolelauncher.localization.LanguagePacks.wrap(rawContext)
         forwardResult(context, intent)
     }
 
@@ -50,7 +52,7 @@ class TermuxResultReceiver : BroadcastReceiver() {
                     result.putExtra(UIManager.EXTRA_TERMUX_RESULT_ERROR, error)
                 } else {
                     copyDirectExtras(intent, result)
-                    result.putExtra(UIManager.EXTRA_TERMUX_RESULT_ERROR, "Termux returned no result bundle.")
+                    result.putExtra(UIManager.EXTRA_TERMUX_RESULT_ERROR, context.getString(R.string.integration_termuxresultreceiver_termux_returned_no_result_bundle_ea063))
                     result.putExtra(UIManager.EXTRA_TERMUX_RESULT_DEBUG, describeExtras(intent.extras))
                 }
             }

@@ -1,0 +1,193 @@
+<resources>
+    <!-- Command responses. Translate prose; preserve examples and format arguments. -->
+    <!-- FrameManager.kt: writeStateFile -->
+    <string name="validation_frame_framemanager_active_frame_pack_is_missing_548bd" formatted="false">"Active frame pack is missing."</string>
+    <!-- FrameManager.kt: writeStateFile -->
+    <string name="validation_frame_framemanager_active_frame_settings_do_not_match_their_p_423fa" formatted="false">"Active frame settings do not match their pack."</string>
+    <!-- FrameManager.kt: dp -->
+    <string name="validation_frame_framemanager_border_must_be_between_0_and_256_dp_f3f3b">"%1$s border must be between 0 and 256 dp."</string>
+    <!-- FrameManager.kt: mergeBuiltInPack -->
+    <string name="validation_frame_framemanager_built_in_frame_pack_contains_an_unknown_su_d4848" formatted="false">"Built-in frame pack contains an unknown surface."</string>
+    <!-- FrameManager.kt: deletePack -->
+    <string name="validation_frame_framemanager_built_in_frame_packs_cannot_be_deleted_7ca4e" formatted="false">"Built-in frame packs cannot be deleted."</string>
+    <!-- FrameManager.kt: replacePack -->
+    <string name="validation_frame_framemanager_built_in_frame_packs_cannot_be_replaced_3e9fd" formatted="false">"Built-in frame packs cannot be replaced."</string>
+    <!-- FrameManager.kt: centerMode -->
+    <string name="validation_frame_framemanager_center_mode_must_be_stretch_tile_or_none_650b5" formatted="false">"Center mode must be stretch, tile, or none."</string>
+    <!-- FrameManager.kt: parseSpec -->
+    <string name="validation_frame_framemanager_filtering_must_be_nearest_or_linear_43895" formatted="false">"Filtering must be nearest or linear."</string>
+    <!-- FrameManager.kt: parseBundle -->
+    <string name="validation_frame_framemanager_frame_bundle_cannot_contain_folders_fb455" formatted="false">"Frame bundle cannot contain folders."</string>
+    <!-- FrameManager.kt: parseBundle -->
+    <string name="validation_frame_framemanager_frame_bundle_contains_duplicate_files_7382c" formatted="false">"Frame bundle contains duplicate files."</string>
+    <!-- FrameManager.kt: parseBundle -->
+    <string name="validation_frame_framemanager_frame_bundle_must_contain_only_manifest_js_cb72c" formatted="false">"Frame bundle must contain only manifest.json and frame.png."</string>
+    <!-- FrameManager.kt: imageBounds -->
+    <string name="validation_frame_framemanager_frame_image_is_not_a_png_image_ff6c3" formatted="false">"Frame image is not a PNG image."</string>
+    <!-- FrameManager.kt: importFrame -->
+    <string name="validation_frame_framemanager_frame_image_is_too_large_9922d" formatted="false">"Frame image is too large."</string>
+    <!-- FrameManager.kt: parseBundle -->
+    <string name="validation_frame_framemanager_frame_image_must_be_frame_png_8b8fb" formatted="false">"Frame image must be frame.png."</string>
+    <!-- FrameManager.kt: imageBounds -->
+    <string name="validation_frame_framemanager_frame_image_must_be_no_larger_than_2048_x_a8cd5" formatted="false">"Frame image must be no larger than 2048 x 2048."</string>
+    <!-- FrameManager.kt: parseBundle -->
+    <string name="validation_frame_framemanager_frame_manifest_has_missing_or_unsupported_03b06" formatted="false">"Frame manifest has missing or unsupported fields."</string>
+    <!-- FrameManager.kt: parseSpec -->
+    <string name="validation_frame_framemanager_frame_modes_are_incomplete_5f8db" formatted="false">"Frame modes are incomplete."</string>
+    <!-- FrameManager.kt: parseBundle -->
+    <string name="validation_frame_framemanager_frame_name_must_be_1_to_80_characters_de88d" formatted="false">"Frame name must be 1 to 80 characters."</string>
+    <!-- FrameManager.kt: readState -->
+    <string name="validation_frame_framemanager_frame_pack_contains_an_unknown_surface_4d479" formatted="false">"Frame pack contains an unknown surface."</string>
+    <!-- FrameManager.kt: deletePack -->
+    <string name="validation_frame_framemanager_frame_pack_is_missing_7eff1" formatted="false">"Frame pack is missing."</string>
+    <!-- FrameManager.kt: readState -->
+    <string name="validation_frame_framemanager_frame_pack_name_must_be_1_to_80_characters_8da36" formatted="false">"Frame pack name must be 1 to 80 characters."</string>
+    <!-- FrameManager.kt: writeStateFile -->
+    <string name="validation_frame_framemanager_frame_pack_names_must_be_unique_442ae" formatted="false">"Frame pack names must be unique."</string>
+    <!-- FrameManager.kt: readState -->
+    <string name="validation_frame_framemanager_frame_settings_are_missing_or_invalid_84fe9" formatted="false">"Frame settings are missing or invalid."</string>
+    <!-- FrameManager.kt: writeStateFile -->
+    <string name="validation_frame_framemanager_frame_settings_contain_an_unknown_surface_83c5d" formatted="false">"Frame settings contain an unknown surface."</string>
+    <!-- FrameManager.kt: parseSpec -->
+    <string name="validation_frame_framemanager_frame_sides_are_incomplete_e3270" formatted="false">"Frame sides are incomplete."</string>
+    <!-- FrameManager.kt: parseBundle -->
+    <string name="validation_frame_framemanager_frame_slices_must_leave_a_center_region_f6580" formatted="false">"Frame slices must leave a center region."</string>
+    <!-- FrameManager.kt: assetMap -->
+    <string name="validation_frame_framemanager_invalid_frame_library_reference_d2d8d" formatted="false">"Invalid frame library reference."</string>
+    <!-- FrameManager.kt: readState -->
+    <string name="validation_frame_framemanager_invalid_frame_pack_reference_a2a98" formatted="false">"Invalid frame pack reference."</string>
+    <!-- FrameManager.kt: select -->
+    <string name="validation_frame_framemanager_invalid_frame_selection_8beeb" formatted="false">"Invalid frame selection."</string>
+    <!-- FrameManager.kt: parseUiPackageManifest -->
+    <string name="validation_frame_framemanager_invalid_ui_package_filename_56199">"Invalid UI package filename: %1$s"</string>
+    <!-- FrameManager.kt: edgeMode -->
+    <string name="validation_frame_framemanager_mode_must_be_stretch_or_tile_85afe">"%1$s mode must be stretch or tile."</string>
+    <!-- FrameManager.kt: updateFrameSpec -->
+    <string name="validation_frame_framemanager_no_frame_is_assigned_83185" formatted="false">"No frame is assigned."</string>
+    <!-- FrameManager.kt: defaultPngSpec -->
+    <string name="validation_frame_framemanager_png_frames_must_be_square_and_sized_24_x_2_13d51" formatted="false">"PNG frames must be square and sized 24 x 24, 48 x 48, 72 x 72, and so on."</string>
+    <!-- FrameManager.kt: positiveInt -->
+    <string name="validation_frame_framemanager_slice_must_be_a_positive_whole_number_6ebb8">"%1$s slice must be a positive whole number."</string>
+    <!-- FrameManager.kt: installImportedPack -->
+    <string name="validation_frame_framemanager_ui_package_contains_an_invalid_frame_asset_923d2" formatted="false">"UI package contains an invalid frame asset."</string>
+    <!-- FrameManager.kt: installImportedPack -->
+    <string name="validation_frame_framemanager_ui_package_contains_an_unsupported_role_78110" formatted="false">"UI package contains an unsupported role."</string>
+    <!-- FrameManager.kt: parseUiPackageManifest -->
+    <string name="validation_frame_framemanager_ui_package_contains_no_roles_dec1b" formatted="false">"UI package contains no roles."</string>
+    <!-- FrameManager.kt: parseUiPackageManifest -->
+    <string name="validation_frame_framemanager_ui_package_filtering_must_be_nearest_cbe71" formatted="false">"UI package filtering must be nearest."</string>
+    <!-- FrameManager.kt: installUiPackage -->
+    <string name="validation_frame_framemanager_ui_package_is_too_large_69ce0" formatted="false">"UI package is too large."</string>
+    <!-- FrameManager.kt: parseUiPackageManifest -->
+    <string name="validation_frame_framemanager_ui_package_manifest_has_missing_or_unsuppo_d9c9c" formatted="false">"UI package manifest has missing or unsupported fields."</string>
+    <!-- FrameManager.kt: installUiPackage -->
+    <string name="validation_frame_framemanager_ui_package_manifest_roles_must_exactly_mat_3e833" formatted="false">"UI package manifest roles must exactly match the PNGs in frames/."</string>
+    <!-- FrameManager.kt: parseUiPackageManifest -->
+    <string name="validation_frame_framemanager_ui_package_name_must_be_1_to_80_characters_62bcb" formatted="false">"UI package name must be 1 to 80 characters."</string>
+    <!-- FrameManager.kt: parseUiPackageManifest -->
+    <string name="validation_frame_framemanager_ui_package_role_has_missing_or_unsupported_b392f">"UI package role %1$s has missing or unsupported fields."</string>
+    <!-- FrameManager.kt: parseUiPackageManifest -->
+    <string name="validation_frame_framemanager_ui_package_role_must_use_5f1fd">"UI package role %1$s must use %2$s."</string>
+    <!-- FrameManager.kt: importUiPackageZip -->
+    <string name="validation_frame_framemanager_ui_package_zip_contains_duplicate_entry_4eba1">"UI package ZIP contains duplicate entry: %1$s"</string>
+    <!-- FrameManager.kt: importUiPackageZip -->
+    <string name="validation_frame_framemanager_ui_package_zip_contains_duplicate_png_42701">"UI package ZIP contains duplicate PNG: %1$s"</string>
+    <!-- FrameManager.kt: importUiPackageZip -->
+    <string name="validation_frame_framemanager_ui_package_zip_is_missing_manifest_json_c98c1" formatted="false">"UI package ZIP is missing manifest.json."</string>
+    <!-- FrameManager.kt: copyFrameFolder -->
+    <string name="validation_frame_framemanager_unable_to_create_frame_export_folder_2ba2a" formatted="false">"Unable to create frame export folder."</string>
+    <!-- FrameManager.kt: saveFile -->
+    <string name="validation_frame_framemanager_unable_to_create_the_frame_folder_731d9" formatted="false">"Unable to create the frame folder."</string>
+    <!-- FrameManager.kt: toLoadedFrame -->
+    <string name="validation_frame_framemanager_unable_to_decode_frame_png_8e3b7" formatted="false">"Unable to decode frame.png."</string>
+    <!-- FrameManager.kt: decodePreview -->
+    <string name="validation_frame_framemanager_unable_to_decode_frame_preview_59da5" formatted="false">"Unable to decode frame preview."</string>
+    <!-- FrameManager.kt: applyFrameFolder -->
+    <string name="validation_frame_framemanager_unable_to_replace_frame_settings_285ad" formatted="false">"Unable to replace frame settings."</string>
+    <!-- FrameManager.kt: saveFile -->
+    <string name="validation_frame_framemanager_unable_to_replace_the_active_frame_398ba" formatted="false">"Unable to replace the active frame."</string>
+    <!-- FrameManager.kt: writeStateFile -->
+    <string name="validation_frame_framemanager_unable_to_save_frame_settings_a4764" formatted="false">"Unable to save frame settings."</string>
+    <!-- FrameManager.kt: saveFile -->
+    <string name="validation_frame_framemanager_unable_to_save_the_frame_bundle_77f47" formatted="false">"Unable to save the frame bundle."</string>
+    <!-- FrameManager.kt: parseBundle -->
+    <string name="validation_frame_framemanager_unsupported_frame_bundle_file_ae470">"Unsupported frame bundle file: %1$s"</string>
+    <!-- FrameManager.kt: readState -->
+    <string name="validation_frame_framemanager_unsupported_frame_pack_record_fe425" formatted="false">"Unsupported frame pack record."</string>
+    <!-- FrameManager.kt: validateFrameFolder -->
+    <string name="validation_frame_framemanager_unsupported_frame_preset_file_22106">"Unsupported frame preset file: %1$s"</string>
+    <!-- FrameManager.kt: parseBundle -->
+    <string name="validation_frame_framemanager_unsupported_frame_schema_99e4d" formatted="false">"Unsupported frame schema."</string>
+    <!-- FrameManager.kt: readState -->
+    <string name="validation_frame_framemanager_unsupported_frame_settings_e926f" formatted="false">"Unsupported frame settings."</string>
+    <!-- FrameManager.kt: parseBundle -->
+    <string name="validation_frame_framemanager_unsupported_frame_type_3c72e" formatted="false">"Unsupported frame type."</string>
+    <!-- FrameManager.kt: parseUiPackageManifest -->
+    <string name="validation_frame_framemanager_unsupported_ui_package_role_67491">"Unsupported UI package role: %1$s"</string>
+    <!-- FrameManager.kt: parseUiPackageManifest -->
+    <string name="validation_frame_framemanager_unsupported_ui_package_schema_ba1a3" formatted="false">"Unsupported UI package schema."</string>
+    <!-- FrameManager.kt: parseUiPackageManifest -->
+    <string name="validation_frame_framemanager_unsupported_ui_package_type_a21d2" formatted="false">"Unsupported UI package type."</string>
+    <string name="frame_pack_name_length">Pack name must be 1 to 80 characters.</string>
+    <string name="frame_pack_name_exists">A frame pack with that name already exists.</string>
+    <string name="frame_slices_positive">Slice values must be positive whole pixels.</string>
+    <string name="frame_slices_center">Slices must leave a center region inside the %1$s x %2$s PNG.</string>
+    <string name="frame_border_range">Borders must be between 0 and 256 dp.</string>
+    <string name="frame_edge_modes">Edge modes must be stretch or tile.</string>
+    <string name="frame_center_modes">Center mode must be stretch, tile, or none.</string>
+    <string name="frame_filter_modes">Filtering must be nearest or linear.</string>
+    <string name="frame_role_error">%1$s: %2$s</string>
+    <string name="frame_target_status_group">Unified status group</string>
+    <string name="frame_target_status_ram">RAM status</string>
+    <string name="frame_target_status_device">Device status</string>
+    <string name="frame_target_status_time">Time status</string>
+    <string name="frame_target_status_battery">Battery status</string>
+    <string name="frame_target_status_storage">Storage status</string>
+    <string name="frame_target_status_network">Network status</string>
+    <string name="frame_target_status_notes">Notes status</string>
+    <string name="frame_target_status_weather">Weather status</string>
+    <string name="frame_target_status_unlock">Unlock status</string>
+    <string name="frame_target_status_ascii">ASCII status</string>
+    <string name="frame_target_output">Terminal output</string>
+    <string name="frame_target_input">Terminal input</string>
+    <string name="frame_target_toolbar">Toolbar buttons</string>
+    <string name="frame_target_suggestions">Suggestion chips</string>
+    <string name="frame_target_music">Music widget</string>
+    <string name="frame_target_notifications">Notification widget</string>
+    <string name="frame_target_modules">Modules</string>
+    <string name="frame_target_module_dock">Module dock</string>
+    <string name="frame_target_app_drawer">App drawer</string>
+    <string name="frame_target_widget_drawer">Widget drawer</string>
+    <string name="frame_target_keyboard">Re:TUI Keyboard</string>
+    <string name="frame_target_files">Re:TUI Files</string>
+    <string name="frame_target_overlays">Overlay windows</string>
+    <string name="frame_target_settings">Settings and dialogs</string>
+    <string name="frame_target_dialog">Dialogs</string>
+    <string name="frame_target_header">Headers</string>
+    <string name="frame_target_list_item">List items</string>
+    <string name="frame_target_list_item_selected">Selected list items</string>
+    <string name="frame_target_ui_input">Settings inputs</string>
+    <string name="frame_target_button">Buttons</string>
+    <string name="frame_target_button_pressed">Pressed buttons</string>
+    <string name="frame_target_button_primary">Primary buttons</string>
+    <string name="frame_target_icon_button">Icon buttons</string>
+    <string name="frame_target_toggle_off">Toggle off</string>
+    <string name="frame_target_toggle_on">Toggle on</string>
+    <string name="frame_target_slider_track">Slider track</string>
+    <string name="frame_target_slider_progress">Slider progress</string>
+    <string name="frame_target_slider_thumb">Slider thumb</string>
+    <string name="frame_target_controls">Other launcher controls</string>
+    <string name="frame_limit_b48d3b4a">Frame file is too large.</string>
+    <string name="frame_limit_13aa8bbe">Frame bundle is too large.</string>
+    <string name="frame_limit_a5384bc1">UI package manifest is too large.</string>
+    <string name="frame_limit_c5d8cc79">UI package readme is too large.</string>
+    <string name="frame_limit_4d9418fa">Frame manifest is too large.</string>
+    <string name="frame_limit_9922d64b">Frame image is too large.</string>
+    <string name="frame_limit_b897922c">%1$s is too large.</string>
+    <string name="frame_failure_50b73cfa">Unsupported UI package ZIP entry: %1$s</string>
+    <string name="frame_failure_e926f920">Unsupported frame settings.</string>
+    <string name="frame_failure_a4764402">Unable to save frame settings.</string>
+    <string name="frame_failure_70d7c2df">Unable to apply frame settings.</string>
+    <string name="frame_failure_731d91a1">Unable to create the frame folder.</string>
+    <string name="frame_failure_626ba109">Unable to activate the imported frame.</string>
+</resources>

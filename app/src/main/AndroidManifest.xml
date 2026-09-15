@@ -90,7 +90,10 @@
         android:name="${applicationId}.permission.RECEIVE_CMD"
         android:protectionLevel="signature" />
 
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
+    <uses-permission android:name="android.permission.USE_FINGERPRINT" />
     <application
+        android:name=".localization.LauncherApplication"
         android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/full_backup_content"
@@ -174,7 +177,7 @@
             android:name=".commands.tuixt.ThemerActivity"
             android:alwaysRetainTaskState="true"
             android:excludeFromRecents="false"
-            android:label="Re:T-UI Settings"
+            android:label="@string/activity_label_2b3c932bd8"
             android:taskAffinity="${applicationId}.settings"
             android:theme="@style/Custom.SystemWP"
             android:exported="false">
@@ -186,21 +189,21 @@
         <activity
             android:name=".managers.onboarding.StartupMenuActivity"
             android:excludeFromRecents="true"
-            android:label="Re:T-UI Startup"
+            android:label="@string/activity_label_ce041b1ca7"
             android:theme="@style/Custom.SystemWP"
             android:exported="false" />
 
         <activity
             android:name=".wallpaper.RetuiWallpaperActivity"
             android:excludeFromRecents="true"
-            android:label="RETUI WALLPAPER"
+            android:label="@string/activity_label_7aa338ae1a"
             android:screenOrientation="unspecified"
             android:theme="@style/Custom.Solid"
             android:exported="false" />
 
         <service
             android:name=".wallpaper.RetuiWallpaperService"
-            android:label="Re:T-UI Live Scenes"
+            android:label="@string/activity_label_211d66f964"
             android:permission="android.permission.BIND_WALLPAPER"
             android:exported="true">
             <intent-filter>
@@ -227,7 +230,7 @@
             android:name=".commands.tuixt.WidgetEditorActivity"
             android:alwaysRetainTaskState="true"
             android:excludeFromRecents="false"
-            android:label="Re:T-UI Editor"
+            android:label="@string/activity_label_2496773d94"
             android:launchMode="singleTask"
             android:taskAffinity="${applicationId}.editor"
             android:theme="@style/Custom.Popup"
@@ -241,7 +244,7 @@
         <activity
             android:name=".commands.tuixt.WidgetConfigActivity"
             android:excludeFromRecents="true"
-            android:label="Re:T-UI Widget Config"
+            android:label="@string/activity_label_846ff3e2eb"
             android:theme="@style/Custom.Popup"
             android:windowSoftInputMode="stateAlwaysVisible|adjustResize"
             android:exported="false">
@@ -251,21 +254,24 @@
         </activity>
 
         <activity
-            android:name=".commands.tuixt.NotesEditorActivity"
-            android:excludeFromRecents="true"
-            android:label="Re:T-UI Notes"
-            android:theme="@style/Custom.Popup"
-            android:windowSoftInputMode="stateAlwaysVisible|adjustResize"
-            android:exported="false">
-            <meta-data
-                android:name="androidx.core.app.PARENT_ACTIVITY"
-                android:value=".LauncherActivity" />
-        </activity>
+            android:name=".notes.RememberActivity"
+            android:alwaysRetainTaskState="true"
+            android:excludeFromRecents="false"
+            android:label="@string/activity_label_afc97f0f35"
+            android:launchMode="singleTask"
+            android:taskAffinity="${applicationId}.notes"
+            android:theme="@style/RememberTheme"
+            android:windowSoftInputMode="adjustNothing"
+            android:exported="false" />
+        <activity android:name=".notes.SettingsActivity" android:exported="false" android:theme="@style/RememberTheme" />
+        <provider android:name="androidx.core.content.FileProvider" android:authorities="${applicationId}.files" android:exported="false" android:grantUriPermissions="true">
+            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/remember_file_paths" />
+        </provider>
 
         <activity
             android:name=".commands.tuixt.ReminderActivity"
             android:excludeFromRecents="true"
-            android:label="RETUI Reminders"
+            android:label="@string/activity_label_2480708afc"
             android:theme="@style/Custom.Popup"
             android:exported="false">
             <meta-data
@@ -276,7 +282,7 @@
         <activity
             android:name=".commands.tuixt.PinShortcutConfirmActivity"
             android:excludeFromRecents="true"
-            android:label="Re:T-UI Shortcut"
+            android:label="@string/activity_label_82aae8bbc5"
             android:theme="@style/Custom.Popup"
             android:windowSoftInputMode="stateAlwaysVisible|adjustResize"
             android:exported="true"
@@ -330,7 +336,7 @@
             android:name=".integrations.tasker.RetuiTaskerConfigActivity"
             android:exported="true"
             android:icon="@mipmap/ic_launcher"
-            android:label="RETUI Action">
+            android:label="@string/activity_label_746d5da73b">
             <intent-filter>
                 <action android:name="com.twofortyfouram.locale.intent.action.EDIT_SETTING" />
             </intent-filter>
@@ -351,6 +357,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <activity android:name=".localization.LanguagePackActivity" android:exported="false" android:label="@string/language_packs_title" />
     </application>
 
 </manifest>

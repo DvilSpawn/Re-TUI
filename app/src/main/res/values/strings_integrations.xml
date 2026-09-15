@@ -1,0 +1,57 @@
+<resources>
+    <!-- Command responses. Translate prose; preserve examples and format arguments. -->
+    <!-- HTMLExtractManager.kt: onReceive -->
+    <string name="integration_htmlextractmanager_formats_27cf3" formatted="false">"Formats:"</string>
+    <!-- HTMLExtractManager.kt: onReceive -->
+    <string name="integration_htmlextractmanager_id_d4962" formatted="false">"- ID: "</string>
+    <!-- HTMLExtractManager.kt: onReceive -->
+    <string name="integration_htmlextractmanager_jsonpaths_a6f32" formatted="false">"JsonPaths:"</string>
+    <!-- HTMLExtractManager.kt: onReceive -->
+    <string name="integration_htmlextractmanager_xpaths_f032b" formatted="false">"XPaths:"</string>
+    <!-- LuaWidgetReminderReceiver.kt: onReceive -->
+    <string name="integration_luawidgetreminderreceiver_habit_reminder_5378e" formatted="false">"Habit reminder"</string>
+    <!-- LuaWidgetReminderReceiver.kt: createChannel -->
+    <string name="integration_luawidgetreminderreceiver_notifications_scheduled_by_re_t_ui_lua_mod_55ae4" formatted="false">"Notifications scheduled by Re:T-UI Lua modules."</string>
+    <!-- LuaWidgetReminderReceiver.kt: onReceive -->
+    <string name="integration_luawidgetreminderreceiver_re_t_ui_module_52869" formatted="false">"Re:T-UI module"</string>
+    <!-- LuaWidgetReminderReceiver.kt: createChannel -->
+    <string name="integration_luawidgetreminderreceiver_re_t_ui_module_notifications_424d3" formatted="false">"Re:T-UI Module Notifications"</string>
+    <!-- MusicManager2.kt: playPodcast -->
+    <string name="integration_musicmanager2_no_playable_episodes_de295" formatted="false">"No playable episodes."</string>
+    <!-- ReminderReceiver.kt: onReceive -->
+    <string name="integration_reminderreceiver_re_t_ui_reminder_825dc" formatted="false">"Re:T-UI reminder"</string>
+    <!-- ReminderReceiver.kt: createChannel -->
+    <string name="integration_reminderreceiver_re_t_ui_reminders_091c3" formatted="false">"Re:T-UI Reminders"</string>
+    <!-- ReminderReceiver.kt: onReceive -->
+    <string name="integration_reminderreceiver_reminder_b87a1" formatted="false">"Reminder"</string>
+    <!-- ReminderReceiver.kt: createChannel -->
+    <string name="integration_reminderreceiver_reminder_notifications_created_by_re_t_ui_f0999" formatted="false">"Reminder notifications created by Re:T-UI modules."</string>
+    <!-- RetuiFilesContract.kt: launch -->
+    <string name="integration_retuifilescontract_re_t_ui_files_could_not_be_opened_6c7b3" formatted="false">"Re:T-UI Files could not be opened."</string>
+    <!-- RetuiFilesContract.kt: launch -->
+    <string name="integration_retuifilescontract_re_t_ui_files_is_not_installed_fb10e" formatted="false">"Re:T-UI Files is not installed."</string>
+    <!-- RetuiThemeBridge.kt: frameBundle -->
+    <string name="integration_retuithemebridge_unable_to_create_frame_share_folder_ea7a1" formatted="false">"Unable to create frame share folder."</string>
+    <!-- RetuiThemeBridge.kt: frameBundle -->
+    <string name="integration_retuithemebridge_unable_to_publish_shared_frame_image_70d8d" formatted="false">"Unable to publish shared frame image."</string>
+    <!-- RetuiThemeBridge.kt: frameBundle -->
+    <string name="integration_retuithemebridge_unable_to_replace_shared_frame_image_c0e2d" formatted="false">"Unable to replace shared frame image."</string>
+    <!-- TerminalTrayToggleView.kt: updateText -->
+    <string name="integration_terminaltraytoggleview_output_9dd6b" formatted="false">"OUTPUT ^"</string>
+    <!-- TerminalTrayToggleView.kt: updateText -->
+    <string name="integration_terminaltraytoggleview_output_auto_b2829" formatted="false">"OUTPUT AUTO ^"</string>
+    <!-- TerminalTrayToggleView.kt: updateText -->
+    <string name="integration_terminaltraytoggleview_output_auto_v_69560" formatted="false">"OUTPUT AUTO v"</string>
+    <!-- TerminalTrayToggleView.kt: updateText -->
+    <string name="integration_terminaltraytoggleview_output_feb35" formatted="false">"OUTPUT"</string>
+    <!-- TerminalTrayToggleView.kt: updateText -->
+    <string name="integration_terminaltraytoggleview_output_v_93c86" formatted="false">"OUTPUT v"</string>
+    <!-- TermuxResultReceiver.kt: forwardResult -->
+    <string name="integration_termuxresultreceiver_termux_returned_no_result_bundle_ea063" formatted="false">"Termux returned no result bundle."</string>
+    <!-- timer.kt: execute -->
+    <string name="integration_timer_a_timer_is_already_running_use_timer_add_d_91a99" formatted="false">"A timer is already running. Use timer -add [duration], timer -status, or timer -stop."</string>
+    <!-- timer.kt: execute -->
+    <string name="integration_timer_timer_already_running_do_you_want_to_add_t_9da0b">"Timer already running. Do you want to add %1$s to it? (Yes/No)"</string>
+    <!-- Tuils.kt: sendXMLParseError -->
+    <string name="integration_tuils_file_messagelinecolumn_c2233">"%1$sFile: %2$s%3$sMessage%4$s%5$sLine%6$d%7$sColumn%8$d"</string>
+</resources>

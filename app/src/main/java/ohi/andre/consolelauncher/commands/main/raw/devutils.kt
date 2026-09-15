@@ -45,7 +45,7 @@ class devutils : ParamCommand() {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     val channel: NotificationChannel = NotificationChannel(
                         channelId,
-                        "Dev Utils",
+                        pack.context.getString(R.string.command_devutils_dev_utils_325dc),
                         NotificationManager.IMPORTANCE_DEFAULT
                     )
                     val notificationManager =
@@ -56,7 +56,7 @@ class devutils : ParamCommand() {
                 }
 
                 if (!canPostNotifications(pack.context)) {
-                    return "Notification permission is not granted."
+                    return pack.context.getString(R.string.command_devutils_notification_permission_is_not_granted_2fd2a)
                 }
 
                 NotificationManagerCompat.from(pack.context).notify(
@@ -83,7 +83,7 @@ class devutils : ParamCommand() {
 
                 val title: String?
                 var txt: String? = null
-                if (text!!.size == 0) return "Usage: devutils -notify_reply <title> <text>"
+                if (text!!.size == 0) return pack.context.getString(R.string.command_devutils_usage_devutils_notify_reply_title_text_97505)
                 else {
                     title = text.removeAt(0)
                     if (text.size > 0) txt = Tuils.toPlanString(text, Tuils.SPACE)
@@ -93,7 +93,7 @@ class devutils : ParamCommand() {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     val channel: NotificationChannel = NotificationChannel(
                         channelId,
-                        "Dev Utils",
+                        pack.context.getString(R.string.command_devutils_dev_utils_325dc),
                         NotificationManager.IMPORTANCE_DEFAULT
                     )
                     val notificationManager =
@@ -104,7 +104,7 @@ class devutils : ParamCommand() {
                 }
 
                 val remoteInput = RemoteInput.Builder(DevReplyReceiver.RESULT_KEY)
-                    .setLabel("Reply")
+                    .setLabel(pack.context.getString(R.string.command_devutils_reply_6c2bb))
                     .build()
 
                 val replyIntent: Intent = Intent(pack.context, DevReplyReceiver::class.java)
@@ -118,7 +118,7 @@ class devutils : ParamCommand() {
 
                 val replyAction: NotificationCompat.Action = NotificationCompat.Action.Builder(
                     R.mipmap.ic_launcher,
-                    "Reply",
+                    pack.context.getString(R.string.command_devutils_reply_6c2bb),
                     replyPendingIntent
                 )
                     .addRemoteInput(remoteInput)
@@ -127,7 +127,7 @@ class devutils : ParamCommand() {
                     .build()
 
                 if (!canPostNotifications(pack.context)) {
-                    return "Notification permission is not granted."
+                    return pack.context.getString(R.string.command_devutils_notification_permission_is_not_granted_2fd2a)
                 }
 
                 NotificationManagerCompat.from(pack.context).notify(
@@ -141,7 +141,7 @@ class devutils : ParamCommand() {
                         .build()
                 )
 
-                return "Dev reply notification posted."
+                return pack.context.getString(R.string.command_devutils_dev_reply_notification_posted_3cb7a)
             }
 
             override fun args(): IntArray? {
@@ -154,12 +154,12 @@ class devutils : ParamCommand() {
             }
 
             override fun exec(pack: ExecutePack): String? {
-                return "Notification access: " + NotificationManagerCompat.getEnabledListenerPackages(
+                return pack.context.getString(R.string.command_devutils_notification_access_notification_service_r_b8c8b, NotificationManagerCompat.getEnabledListenerPackages(
                     pack.context
                 )
-                    .contains(BuildConfig.APPLICATION_ID) + Tuils.NEWLINE + "Notification service running: " + Tuils.notificationServiceIsRunning(
+                    .contains(BuildConfig.APPLICATION_ID), Tuils.NEWLINE, Tuils.notificationServiceIsRunning(
                     pack.context
-                )
+                ))
             }
         };
 
@@ -178,7 +178,7 @@ class devutils : ParamCommand() {
         companion object {
             fun get(p: String): Param? {
                 var p = p
-                p = p.lowercase(Locale.getDefault())
+                p = p.lowercase(Locale.ROOT)
                 val ps = entries.toTypedArray()
                 for (p1 in ps) if (p.endsWith(p1.label()!!)) return p1
                 return null

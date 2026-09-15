@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher.managers
 
+import ohi.andre.consolelauncher.R
 import android.Manifest
 import android.content.Context
 import android.net.Uri
@@ -270,22 +271,22 @@ class ContactManager(private val context: Context) {
                     val difference = System.currentTimeMillis() - lastContacted
                     var sc = difference / 1000
                     if (sc < 60) {
-                        about[LAST_CONTACTED] = "sec: " + lastContacted.toString()
+                        about[LAST_CONTACTED] = context.getString(R.string.manager_contactmanager_sec_8055d, lastContacted.toString())
                     } else {
                         var ms = (sc / 60).toInt()
                         sc = (ms % 60).toLong()
                         if (ms < 60) {
-                            about[LAST_CONTACTED] = "min: " + ms + ", sec: " + sc
+                            about[LAST_CONTACTED] = context.getString(R.string.manager_contactmanager_min_sec_cbb62, ms, sc)
                         } else {
                             var h = ms / 60
                             ms = h % 60
                             if (h < 24) {
-                                about[LAST_CONTACTED] = "h: " + h + ", min: " + ms + ", sec: " + sc
+                                about[LAST_CONTACTED] = context.getString(R.string.manager_contactmanager_h_min_sec_924a2, h, ms, sc)
                             } else {
                                 val days = h / 24
                                 h = days % 24
                                 about[LAST_CONTACTED] =
-                                    "d: " + days + ", h: " + h + ", min: " + ms + ", sec: " + sc
+                                    context.getString(R.string.manager_contactmanager_d_h_min_sec_1f593, days, h, ms, sc)
                             }
                         }
                     }

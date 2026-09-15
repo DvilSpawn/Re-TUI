@@ -1,0 +1,11 @@
+<resources>
+    <style name="RememberTheme" parent="android:style/Theme.Material.NoActionBar">
+        <item name="android:fontFamily">monospace</item><item name="android:windowActionModeOverlay">true</item>
+        <item name="android:textCursorDrawable">@null</item>
+        <item name="android:colorAccent">#64FF9A</item><item name="android:navigationBarColor">#050A07</item>
+        <item name="android:windowLightStatusBar">false</item><item name="android:statusBarColor">#050A07</item>
+    </style>
+    <style name="RememberTheme.NoDisplay" parent="android:style/Theme.Material.NoActionBar">
+        <item name="android:windowNoDisplay">true</item>
+    </style>
+</resources>

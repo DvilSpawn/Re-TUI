@@ -27,6 +27,9 @@ internal fun shouldScheduleWallpaperFrame(
 ): Boolean = visible && (fullRedrawPending || animated)
 
 class RetuiWallpaperService : WallpaperService() {
+    override fun getResources(): android.content.res.Resources =
+        ohi.andre.consolelauncher.localization.LanguagePacks.resources(super.getResources())
+
     companion object {
         const val ACTION_REFRESH = "com.dvil.tui_renewed.action.REFRESH_WALLPAPER"
     }

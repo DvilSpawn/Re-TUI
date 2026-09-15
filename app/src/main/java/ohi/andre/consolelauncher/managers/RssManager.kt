@@ -374,7 +374,7 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
 
     fun add(id: Int, timeInSeconds: Long, url: String, alias: String?): String? {
         val cleanUrl = url.trim()
-        if (findExistingId(id) != null) return "RSS ID already exists: $id"
+        if (findExistingId(id) != null) return context.getString(R.string.manager_rssmanager_rss_id_already_exists_51fed, id)
         findExistingUrl(cleanUrl)?.let { return duplicateUrlMessage(it) }
 
         val output = XMLPrefsManager.add(
@@ -490,9 +490,7 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
         }
 
         if (snapshot.size == 0) {
-            return ("No RSS feeds."
-                    + "\nAdd: rss -add 1 900 https://www.reddit.com/r/android/.rss"
-                    + "\nThen: rss -frc 1")
+            return (context.getString(R.string.manager_rssmanager_no_rss_feeds_add_rss_add_1_900_https_www_r_234cc))
         }
 
         val out = SpannableStringBuilder()
@@ -503,14 +501,14 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
             if (out.length > 0) out.append('\n')
             out.append('[').append(feed.id.toString()).append("] ").append(feedLabel(feed)).append('\n')
             if (feed.lastCheckedClient > 0) {
-                out.append("checked ").append(formatModuleTime(feed.lastCheckedClient))
-                if (feed.wifiOnly) out.append(" (wifi only)")
+                out.append(context.getString(R.string.manager_rssmanager_checked_fc5d7)).append(formatModuleTime(feed.lastCheckedClient))
+                if (feed.wifiOnly) out.append(context.getString(R.string.manager_rssmanager_wifi_only_1bbea))
                 out.append('\n')
             }
 
             val result = latestModuleItems(feed, MODULE_MAX_ITEMS_PER_FEED)
             if (result.items.size == 0) {
-                out.append(result.message ?: "  feed has no entries").append('\n')
+                out.append(result.message ?: context.getString(R.string.manager_rssmanager_feed_has_no_entries_574c5)).append('\n')
             } else {
                 for (item in result.items) {
                     appendModuleItem(out, item)
@@ -521,11 +519,10 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
 
         val remaining = snapshot.size - shown
         if (remaining > 0) {
-            out.append("... ").append(remaining.toString()).append(" more feed")
-            if (remaining != 1) out.append('s')
+            out.append(context.resources.getQuantityString(R.plurals.rss_more_feeds, remaining, remaining))
             out.append('\n')
         }
-        out.append("Commands: rss -l [id], rss -frc [id], rss -add")
+        out.append(context.getString(R.string.manager_rssmanager_commands_rss_l_id_rss_frc_id_rss_add_41d7b))
         return out
     }
 
@@ -1325,7 +1322,7 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
         val out = ArrayList<ModuleItem>()
         val rssFile = File(root, RSS_LABEL + feed.id + ".xml")
         if (!rssFile.exists()) {
-            return ModuleItems(out, "  no cache yet; run rss -frc " + feed.id)
+            return ModuleItems(out, context.getString(R.string.manager_rssmanager_no_cache_yet_run_rss_frc_21c21, feed.id))
         }
 
         try {
@@ -1336,7 +1333,7 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
 
             val nodes = moduleEntryNodes(doc, feed)
             if (nodes.getLength() == 0) {
-                return ModuleItems(out, "  feed downloaded but has no entries")
+                return ModuleItems(out, context.getString(R.string.manager_rssmanager_feed_downloaded_but_has_no_entries_e4f67))
             }
 
             var count = 0
@@ -1374,14 +1371,14 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
             }
         } catch (e: SAXParseException) {
             Tuils.log(e)
-            return ModuleItems(out, "  " + rssFile.getName() + " XML parse error; run rss -frc " + feed.id)
+            return ModuleItems(out, context.getString(R.string.manager_rssmanager_xml_parse_error_run_rss_frc_53402, rssFile.getName(), feed.id))
         } catch (e: Exception) {
             Tuils.log(e)
-            return ModuleItems(out, "  cached feed could not be read; run rss -frc " + feed.id)
+            return ModuleItems(out, context.getString(R.string.manager_rssmanager_cached_feed_could_not_be_read_run_rss_frc_74d34, feed.id))
         }
         return ModuleItems(
             out,
-            if (out.size == 0) "  feed has no displayable entries" else null
+            if (out.size == 0) context.getString(R.string.manager_rssmanager_feed_has_no_displayable_entries_3c7ea) else null
         )
     }
 
@@ -1442,7 +1439,7 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
     }
 
     private fun duplicateUrlMessage(feed: Rss): String {
-        return "RSS URL already exists as ID " + feed.id
+        return context.getString(R.string.manager_rssmanager_rss_url_already_exists_as_id_4d799, feed.id)
     }
 
     private class ModuleItem(val text: String, val url: String?)

@@ -12,6 +12,7 @@ class NotesManager(
     private val listener: StatusUpdateListener?
 ) : StatusManager(context, delay) {
     override fun update() {
+        notesManager?.refresh()
         if (notesManager != null && notesManager.hasChanged) {
             listener?.onUpdate(UIManager.Label.notes, UIUtils.span(context, size, notesManager.getNotes()))
         }

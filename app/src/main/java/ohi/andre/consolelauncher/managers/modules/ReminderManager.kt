@@ -6,6 +6,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.text.TextUtils
+import android.text.format.DateFormat
+import ohi.andre.consolelauncher.R
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Collections
@@ -101,7 +103,7 @@ object ReminderManager {
     fun formatList(context: Context): String {
         val reminders = list(context)
         if (reminders.isEmpty()) {
-            return "No reminders."
+            return context.getString(R.string.reminder_no_reminders)
         }
         val out = StringBuilder()
         var index = 1
@@ -111,7 +113,7 @@ object ReminderManager {
                 .append(": ")
                 .append(reminder.title)
                 .append(" @ ")
-                .append(formatWhen(reminder.atMillis))
+                .append(formatWhen(context, reminder.atMillis))
         }
         return out.toString()
     }
@@ -119,16 +121,19 @@ object ReminderManager {
     @JvmStatic
     fun formatPreview(context: Context): String {
         val reminders = list(context)
-        if (reminders.isEmpty()) return "No reminders."
+        if (reminders.isEmpty()) return context.getString(R.string.reminder_no_reminders)
         val out = StringBuilder()
         val limit = minOf(reminders.size, 3)
         for (index in 0 until limit) {
             if (out.isNotEmpty()) out.append('\n')
             val reminder = reminders[index]
             out.append(index + 1).append(". ").append(reminder.title)
-                .append(" @ ").append(formatWhen(reminder.atMillis))
+                .append(" @ ").append(formatWhen(context, reminder.atMillis))
         }
-        if (reminders.size > limit) out.append("\n+").append(reminders.size - limit).append(" more")
+        if (reminders.size > limit) {
+            val remaining = reminders.size - limit
+            out.append('\n').append(context.resources.getQuantityString(R.plurals.reminder_more, remaining, remaining))
+        }
         return out.toString()
     }
 
@@ -191,9 +196,10 @@ object ReminderManager {
     }
 
     @JvmStatic
-    fun formatWhen(atMillis: kotlin.Long): String {
-        if (atMillis <= 0L) return "unscheduled"
-        return SimpleDateFormat("dd MMM yyyy, h:mm a", Locale.US).format(Date(atMillis))
+    fun formatWhen(context: Context, atMillis: kotlin.Long): String {
+        if (atMillis <= 0L) return context.getString(R.string.reminder_unscheduled)
+        val date = Date(atMillis)
+        return DateFormat.getDateFormat(context).format(date) + " " + DateFormat.getTimeFormat(context).format(date)
     }
 
     private fun schedule(context: Context, reminder: Reminder?) {
@@ -217,6 +223,7 @@ object ReminderManager {
         if (pendingIntent != null) alarm.cancel(pendingIntent)
     }
 
+    // FLAG_NO_CREATE returns null when the saved reminder has no remaining alarm token.
     private fun pendingIntent(
         context: Context?,
         id: String,

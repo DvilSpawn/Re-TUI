@@ -47,9 +47,7 @@ class tui : ParamCommand() {
         about {
             override fun exec(pack: ExecutePack): String? {
                 val info: MainPack = pack as MainPack
-                return "Version:" + Tuils.SPACE + BuildConfig.VERSION_NAME + " (code: " + BuildConfig.VERSION_CODE + ")" +
-                        (if (BuildConfig.DEBUG) Tuils.NEWLINE + BuildConfig.BUILD_TYPE else Tuils.EMPTYSTRING) +
-                        Tuils.NEWLINE + Tuils.NEWLINE + info.res.getString(R.string.output_about)
+                return pack.context.getString(R.string.command_tui_version_code_a8b49, Tuils.SPACE, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE, (if (BuildConfig.DEBUG) Tuils.NEWLINE + BuildConfig.BUILD_TYPE else Tuils.EMPTYSTRING), Tuils.NEWLINE, Tuils.NEWLINE, info.res.getString(R.string.output_about))
             }
         },
         log {
@@ -162,7 +160,7 @@ class tui : ParamCommand() {
         companion object {
             fun get(p: String): Param? {
                 var p = p
-                p = p.lowercase(Locale.getDefault())
+                p = p.lowercase(Locale.ROOT)
                 val ps = entries.toTypedArray()
                 for (p1 in ps) if (p.endsWith(p1.label()!!)) return p1
                 return null

@@ -25,6 +25,10 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import androidx.annotation.NonNull
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import ohi.andre.consolelauncher.notes.*
+import android.text.style.ClickableSpan
+import android.text.TextPaint
+import android.view.View
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.method.LinkMovementMethod
@@ -72,76 +76,22 @@ class NotesManager(var mContext: Context, noteView: TextView?) {
     var packageManager: PackageManager?
 
     private fun load(context: Context?, loadClasses: Boolean) {
-        val outputContext = context ?: mContext
-        if (loadClasses) classes.clear()
-        notes.clear()
-
-        val file: File = notesFile()
-        if (!file.exists()) {
-            XMLPrefsManager.resetFile(file, NAME)
-        }
-
-        val o: Array<Any?>?
         try {
-            o = XMLPrefsManager.buildDocument(file, NAME)
-            if (o == null) {
-                Tuils.sendXMLParseError(outputContext, PATH)
-                return
-            }
-        } catch (e: SAXParseException) {
-            Tuils.sendXMLParseError(outputContext, PATH, e)
-            return
+            val library = NoteStore(mContext).load()
+            notes.clear()
+            notes.addAll(library.notes.map { Note(it.createdAt, it.preview(), it.locked).apply { id = it.id } })
+            Collections.sort(notes)
+            observedRevision = NoteStore.revision
+            invalidateNotes()
         } catch (e: Exception) {
             Tuils.log(e)
-            return
+            Tuils.sendOutput(mContext, R.string.output_error)
         }
+    }
 
-        val root = o[1] as Element
-
-        val nodes = root.getElementsByTagName("*")
-
-        for (count in 0..<nodes.getLength()) {
-            val node = nodes.item(count)
-
-            if (node.getNodeType() == Node.ELEMENT_NODE) {
-                val e = node as Element
-                val name = e.getNodeName()
-
-                if (name == NOTE_NODE) {
-                    val time: Long = XMLPrefsManager.getLongAttribute(e, CREATION_TIME)
-                    val text: String? =
-                        XMLPrefsManager.getStringAttribute(e, XMLPrefsManager.VALUE_ATTRIBUTE)
-                    val lock: Boolean = XMLPrefsManager.getBooleanAttribute(e, LOCK)
-
-                    notes.add(NotesManager.Note(time, text!!, lock))
-                } else if (loadClasses) {
-                    val id: Int
-                    try {
-                        id = name.toInt()
-                    } catch (ex: Exception) {
-                        continue
-                    }
-
-                    val color: Int
-                    try {
-                        color = Color.parseColor(
-                            XMLPrefsManager.getStringAttribute(
-                                e,
-                                XMLPrefsManager.VALUE_ATTRIBUTE
-                            )
-                        )
-                    } catch (ex: Exception) {
-                        continue
-                    }
-
-                    classes.add(Class(id, color))
-                }
-            }
-        }
-
-        Collections.sort(notes)
-
-        invalidateNotes()
+    private var observedRevision = -1L
+    fun refresh() {
+        if (observedRevision != NoteStore.revision) load(mContext, false)
     }
 
     var colorPattern: Pattern = Pattern.compile("(\\d+|#[\\da-zA-Z]{6,8})\\(([^)]*)\\)")
@@ -186,12 +136,20 @@ class NotesManager(var mContext: Context, noteView: TextView?) {
         filter.addAction(ACTION_LS)
         filter.addAction(ACTION_LOCK)
         filter.addAction(ACTION_CP)
+        filter.addAction(ACTION_OPEN)
 
         receiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent) {
+                load(mContext, false)
                 if (intent.getIntExtra(BROADCAST_COUNT, 0) < broadcastCount) return
                 broadcastCount++
 
+                if (intent.action == ACTION_OPEN) {
+                    val index = findNote(intent.getStringExtra(TEXT).orEmpty())
+                    if (index >= 0) LauncherNotes.open(mContext, notes[index].id)
+                    else Tuils.sendOutput(mContext, R.string.note_not_found)
+                    return
+                }
                 if (intent.getAction() == ACTION_ADD) {
                     var text: String? = intent.getStringExtra(TEXT)
                     if (text == null) return
@@ -264,40 +222,14 @@ class NotesManager(var mContext: Context, noteView: TextView?) {
         for (j in notes.indices) {
             val n: Note = notes.get(j)
 
-            var t: CharSequence = n.text
-            t = lockPattern.matcher(t).replaceAll(n.lock.toString())
-            t = rowPattern.matcher(t).replaceAll((j + 1).toString())
-            t = countPattern.matcher(t).replaceAll(notes.size.toString())
-
-            t = Tuils.span(t, if (n.lock) lockedColor else this.color) ?: SpannableString(t)
-
-            t = TimeManager.instance!!.replace(t, n.creationTime)
-
-            if (allowLink) {
-                val m = uriPattern.matcher(t)
-                while (m.find()) {
-                    var g = m.group()
-
-                    //                    www.
-                    if (g.startsWith("w")) {
-                        g = "http://" + g
-                    }
-
-                    val u = Uri.parse(g)
-                    if (u == null) continue
-
-                    val sp: SpannableString = SpannableString(m.group())
-                    sp.setSpan(LongClickableSpan(u), 0, sp.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                    sp.setSpan(
-                        ForegroundColorSpan(linkColor),
-                        0,
-                        sp.length,
-                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-                    )
-
-                    t = TextUtils.replace(t, arrayOf<String>(m.group()), arrayOf<CharSequence>(sp))
+            val t = SpannableString(n.text)
+            t.setSpan(object : ClickableSpan() {
+                override fun onClick(widget: View) { LauncherNotes.open(widget.context, n.id) }
+                override fun updateDrawState(ds: TextPaint) {
+                    ds.color = if (n.lock) lockedColor else color
+                    ds.isUnderlineText = false
                 }
-            }
+            }, 0, t.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
 
             ns = TextUtils.concat(ns, t, if (j != notes.size - 1) divider else Tuils.EMPTYSTRING)
         }
@@ -320,36 +252,6 @@ class NotesManager(var mContext: Context, noteView: TextView?) {
         } else {
         }
 
-        val m = colorPattern.matcher(oldNotes)
-        while (m.find()) {
-            val match = m.group()
-            val idColor = m.group(1)
-            var t: CharSequence? = m.group(2)
-
-            var color: Int
-            if (idColor!!.startsWith("#")) {
-//                    color
-                try {
-                    color = Color.parseColor(idColor)
-                } catch (e: Exception) {
-                    color = Color.RED
-                }
-            } else {
-//                    id
-                try {
-                    val id = idColor.toInt()
-                    val c = findClass(id)
-                    color = c!!.color
-                } catch (e: Exception) {
-                    color = Color.RED
-                }
-            }
-
-            t = Tuils.span(t.toString(), color)
-            oldNotes =
-                TextUtils.replace(oldNotes, arrayOf<String>(match), arrayOf<CharSequence?>(t))
-        }
-
         hasChanged = true
     }
 
@@ -358,55 +260,34 @@ class NotesManager(var mContext: Context, noteView: TextView?) {
         return oldNotes!!
     }
 
-    private fun addNote(s: String, lock: Boolean) {
-        val t = System.currentTimeMillis()
-
-        notes.add(Note(t, s, lock))
-        Collections.sort<Note?>(notes)
-
-        val file: File = File(Tuils.getFolder(), PATH)
-        if (!file.exists()) {
-            XMLPrefsManager.resetFile(file, NAME)
+    private fun mutate(action: (NoteStore, NoteLibrary) -> Unit) {
+        try {
+            synchronized(NoteStore.lock) {
+                val store = NoteStore(mContext)
+                val library = store.load()
+                action(store, library)
+            }
+            load(mContext, false)
+        } catch (e: Exception) {
+            Tuils.log(e)
+            Tuils.sendOutput(mContext, R.string.output_error)
         }
+    }
 
-        val output: String? = XMLPrefsManager.add(
-            file,
-            NOTE_NODE,
-            arrayOf<String?>(CREATION_TIME, XMLPrefsManager.VALUE_ATTRIBUTE, LOCK),
-            arrayOf<String?>(t.toString(), s, lock.toString())
-        )
-        if (output != null) {
-            if (output.length > 0) Tuils.sendOutput(mContext, output)
-            else Tuils.sendOutput(mContext, R.string.output_error)
-        }
-
-        invalidateNotes()
+    private fun addNote(s: String, lock: Boolean) = mutate { store, library ->
+        library.notes.add(ohi.andre.consolelauncher.notes.Note(
+            title = LauncherNotes.legacyTitle(s), markdown = s, locked = lock,
+            folderId = library.ensureDefaultFolder().id
+        ))
+        store.save(library)
     }
 
     private fun rmNote(s: String) {
         val index = findNote(s)
-        if (index == -1) {
-            Tuils.sendOutput(mContext, R.string.note_not_found)
-            return
+        if (index < 0) { Tuils.sendOutput(mContext, R.string.note_not_found); return }
+        mutate { store, library ->
+            library.notes.firstOrNull { it.id == notes[index].id }?.let { store.delete(it, library) }
         }
-
-        val time: Long = notes.removeAt(index).creationTime
-
-        val file: File = File(Tuils.getFolder(), PATH)
-        if (!file.exists()) {
-            XMLPrefsManager.resetFile(file, NAME)
-        }
-
-        val output: String? = XMLPrefsManager.removeNode(
-            file,
-            arrayOf<String?>(CREATION_TIME),
-            arrayOf<String?>(time.toString())
-        )
-        if (output != null) {
-            if (output.length > 0) Tuils.sendOutput(mContext, output)
-        }
-
-        invalidateNotes()
     }
 
     private fun cpNote(s: String) {
@@ -416,7 +297,14 @@ class NotesManager(var mContext: Context, noteView: TextView?) {
             return
         }
 
-        val text: String? = notes.get(index).text
+        val text = try {
+            NoteStore(mContext).load().notes.first { it.id == notes[index].id }.let {
+                RedactionFormat.hide(it.markdown)
+            }
+        } catch (e: Exception) {
+            Tuils.sendOutput(mContext, R.string.output_error)
+            return
+        }
 
         (mContext as Activity).runOnUiThread(Runnable {
             val clipboard = mContext.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
@@ -426,26 +314,8 @@ class NotesManager(var mContext: Context, noteView: TextView?) {
         })
     }
 
-    private fun clearNotes(context: Context?) {
-        val iterator: MutableIterator<Note> = notes.iterator()
-        while (iterator.hasNext()) {
-            val n = iterator.next()
-            if (!n.lock) iterator.remove()
-        }
-
-        val file: File = File(Tuils.getFolder(), PATH)
-        if (!file.exists()) XMLPrefsManager.resetFile(file, NAME)
-
-        val output: String? = XMLPrefsManager.removeNode(
-            file,
-            arrayOf<String?>(LOCK),
-            arrayOf<String?>(false.toString()),
-            true,
-            true
-        )
-        if (output != null && output.length > 0) Tuils.sendOutput(Color.RED, context ?: mContext, output)
-
-        invalidateNotes()
+    private fun clearNotes(context: Context?) = mutate { store, library ->
+        library.notes.filter { !it.locked }.toList().forEach { store.delete(it, library) }
     }
 
     private fun lsNotes(c: Context?) {
@@ -454,7 +324,7 @@ class NotesManager(var mContext: Context, noteView: TextView?) {
         for (j in notes.indices) {
             val n: Note = notes.get(j)
             builder.append(" - ").append(j + 1)
-                .append(if (n.lock) " [locked]" else Tuils.EMPTYSTRING).append(" -> ")
+                .append(if (n.lock) mContext.getString(R.string.manager_notesmanager_locked_4d8b4) else Tuils.EMPTYSTRING).append(" -> ")
                 .append(n.text).append(Tuils.NEWLINE)
         }
 
@@ -468,94 +338,17 @@ class NotesManager(var mContext: Context, noteView: TextView?) {
             return
         }
 
-        val n: Note = notes.get(index)
-        n.lock = lock
-        Collections.sort(notes)
-
-        val time = n.creationTime
-
-        val file: File = File(Tuils.getFolder(), PATH)
-        if (!file.exists()) {
-            XMLPrefsManager.resetFile(file, NAME)
+        mutate { store, library ->
+            library.notes.firstOrNull { it.id == notes[index].id }?.locked = lock
+            store.save(library)
         }
-
-        val output: String? = XMLPrefsManager.set(
-            file,
-            NOTE_NODE,
-            arrayOf<String?>(CREATION_TIME),
-            arrayOf<String?>(time.toString()),
-            arrayOf<String?>(
-                LOCK
-            ),
-            arrayOf<String?>(lock.toString()),
-            true
-        )
-        if (output != null && output.length > 0) Tuils.sendOutput(context ?: mContext, output)
-
-        invalidateNotes()
     }
 
     private fun findNote(s: String): Int {
-        var s = s
-        try {
-            val index = s.toInt() - 1
-            if (index < 0 || index >= notes.size) return -1
-            return index
-        } catch (e: Exception) {
-        }
-
-        s = s.lowercase(Locale.getDefault()).trim { it <= ' ' }
-
-        var note: CharSequence
-        var c = 0
-        while (c < notes.size) {
-            val n: Note = notes.get(c)
-
-            var text = n.text
-
-            text = lockPattern.matcher(text).replaceAll(n.lock.toString())
-            text = rowPattern.matcher(text).replaceAll((c + 1).toString())
-            text = countPattern.matcher(text).replaceAll(notes.size.toString())
-
-            note = text
-
-            val m = colorPattern.matcher(notes.get(c).text)
-            while (m.find()) {
-                val match = m.group()
-                val idColor = m.group(1)
-                var t: CharSequence? = m.group(2)
-
-                var color: Int
-                if (idColor!!.startsWith("#")) {
-//                    color
-                    try {
-                        color = Color.parseColor(idColor)
-                    } catch (e: Exception) {
-                        color = Color.RED
-                    }
-                } else {
-//                    id
-                    try {
-                        val id = idColor.toInt()
-                        val cl = findClass(id)
-                        color = cl!!.color
-                    } catch (e: Exception) {
-                        color = Color.RED
-                    }
-                }
-
-                t = Tuils.span(t.toString(), color)
-                note = TextUtils.replace(note, arrayOf<String>(match), arrayOf<CharSequence?>(t))
-            }
-
-            if (note.toString().lowercase(Locale.getDefault()).startsWith(s)) break
-            c++
-        }
-
-        if (c == notes.size) {
-            return -1
-        }
-        return c
+        s.toIntOrNull()?.let { return (it - 1).takeIf { index -> index in notes.indices } ?: -1 }
+        val prefix = s.trim()
+        if (prefix.isEmpty()) return -1
+        return notes.indexOfFirst { it.text.startsWith(prefix, ignoreCase = true) }
     }
 
     private fun findClass(id: Int): Class? {
@@ -577,10 +370,12 @@ class NotesManager(var mContext: Context, noteView: TextView?) {
 
     class Note(var creationTime: Long, var text: String, var lock: Boolean) :
         Comparable<Note> {
+        var id: String = ""
+
         override fun compareTo(o: Note): Int {
             when (sorting) {
-                SORTING_TIME_UPDOWN -> return (creationTime - o.creationTime).toInt()
-                SORTING_TIME_DOWNUP -> return (o.creationTime - creationTime).toInt()
+                SORTING_TIME_UPDOWN -> return creationTime.compareTo(o.creationTime)
+                SORTING_TIME_DOWNUP -> return o.creationTime.compareTo(creationTime)
                 SORTING_ALPHA_UPDOWN -> return Tuils.alphabeticCompare(text, o.text)
                 SORTING_ALPHA_DOWNUP -> return Tuils.alphabeticCompare(o.text, text)
                 SORTING_LOCK_BEFORE -> if (lock) {
@@ -599,7 +394,7 @@ class NotesManager(var mContext: Context, noteView: TextView?) {
                     return 0
                 }
 
-                else -> return 1
+                else -> return 0
             }
         }
 
@@ -626,6 +421,7 @@ class NotesManager(var mContext: Context, noteView: TextView?) {
         var ACTION_CLEAR: String = BuildConfig.APPLICATION_ID + ".clear_notes"
         var ACTION_LS: String = BuildConfig.APPLICATION_ID + ".ls_notes"
         var ACTION_LOCK: String = BuildConfig.APPLICATION_ID + ".lock_notes"
+        val ACTION_OPEN = BuildConfig.APPLICATION_ID + ".open_note"
         var ACTION_CP: String = BuildConfig.APPLICATION_ID + ".cp_notes"
 
         var BROADCAST_COUNT: String = "broadcastCount"
@@ -644,41 +440,13 @@ class NotesManager(var mContext: Context, noteView: TextView?) {
         }
 
         fun loadRecords(context: Context?): MutableList<NoteRecord?> {
-            val records = ArrayList<NoteRecord?>()
-            val file: File = notesFile()
-            if (!file.exists()) {
-                XMLPrefsManager.resetFile(file, NAME)
-            }
-
-            val o: Array<Any?>?
-            try {
-                o = XMLPrefsManager.buildDocument(file, NAME)
-                if (o == null) {
-                    if (context != null) Tuils.sendXMLParseError(context, PATH)
-                    return records
-                }
-            } catch (e: SAXParseException) {
-                if (context != null) Tuils.sendXMLParseError(context, PATH, e)
-                return records
+            if (context == null) return arrayListOf()
+            return try {
+                NoteStore(context).load().notes.map { NoteRecord(it.createdAt, it.preview(), it.locked) }.toMutableList()
             } catch (e: Exception) {
                 Tuils.log(e)
-                return records
+                arrayListOf()
             }
-
-            val root = o[1] as Element
-            val nodes = root.getElementsByTagName(NOTE_NODE)
-            for (count in 0..<nodes.getLength()) {
-                val node = nodes.item(count)
-                if (node.getNodeType() != Node.ELEMENT_NODE) continue
-
-                val e = node as Element
-                val time: Long = XMLPrefsManager.getLongAttribute(e, CREATION_TIME)
-                val text: String? =
-                    XMLPrefsManager.getStringAttribute(e, XMLPrefsManager.VALUE_ATTRIBUTE)
-                val lock: Boolean = XMLPrefsManager.getBooleanAttribute(e, LOCK)
-                records.add(NoteRecord(time, text, lock))
-            }
-            return records
         }
 
         @Throws(Exception::class)

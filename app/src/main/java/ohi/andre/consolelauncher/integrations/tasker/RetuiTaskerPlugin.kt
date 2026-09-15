@@ -57,8 +57,8 @@ class RetuiTaskerRunner : TaskerPluginRunnerAction<RetuiTaskerInput, Unit>() {
     }
 }
 
-class RetuiTaskerHelper(config: TaskerPluginConfig<RetuiTaskerInput>) :
-    TaskerPluginConfigHelper<RetuiTaskerInput, Unit, RetuiTaskerRunner>(config) {
+class RetuiTaskerHelper(private val pluginConfig: TaskerPluginConfig<RetuiTaskerInput>) :
+    TaskerPluginConfigHelper<RetuiTaskerInput, Unit, RetuiTaskerRunner>(pluginConfig) {
     override val runnerClass = RetuiTaskerRunner::class.java
     override val inputClass = RetuiTaskerInput::class.java
     override val outputClass = Unit::class.java
@@ -67,7 +67,7 @@ class RetuiTaskerHelper(config: TaskerPluginConfig<RetuiTaskerInput>) :
 
     override fun isInputValid(input: TaskerInput<RetuiTaskerInput>): SimpleResult {
         val error = validationError(input.regular)
-        return if (error == null) SimpleResultSuccess() else SimpleResultError(error)
+        return if (error == null) SimpleResultSuccess() else SimpleResultError(pluginConfig.context.getString(error))
     }
 
     override fun addToStringBlurb(input: TaskerInput<RetuiTaskerInput>, blurbBuilder: StringBuilder) {
@@ -82,7 +82,7 @@ class RetuiTaskerHelper(config: TaskerPluginConfig<RetuiTaskerInput>) :
             TaskerIntegrationManager.ACTION_SWITCH_SPACE -> regular.space
             else -> null
         }
-        blurbBuilder.append(actionLabel(regular.action))
+        blurbBuilder.append(pluginConfig.context.getString(actionLabel(regular.action)))
         if (!target.isNullOrBlank()) blurbBuilder.append(": ").append(target)
     }
 
@@ -97,27 +97,27 @@ class RetuiTaskerHelper(config: TaskerPluginConfig<RetuiTaskerInput>) :
             TaskerIntegrationManager.ACTION_SWITCH_SPACE
         )
 
-        fun actionLabel(action: String?): String = when (action) {
-            TaskerIntegrationManager.ACTION_APPLY_PRESET -> "Apply preset"
-            TaskerIntegrationManager.ACTION_SET_THEME -> "Set theme element"
-            TaskerIntegrationManager.ACTION_SHOW_MODULE -> "Show module"
-            TaskerIntegrationManager.ACTION_REFRESH_MODULE -> "Refresh module"
-            TaskerIntegrationManager.ACTION_UPDATE_MODULE_TEXT -> "Update module text"
-            TaskerIntegrationManager.ACTION_TERMINAL_OUTPUT -> "Terminal output"
-            TaskerIntegrationManager.ACTION_SWITCH_SPACE -> "Switch Space"
-            else -> "RETUI action"
+        fun actionLabel(action: String?): Int = when (action) {
+            TaskerIntegrationManager.ACTION_APPLY_PRESET -> R.string.tasker_apply_preset
+            TaskerIntegrationManager.ACTION_SET_THEME -> R.string.tasker_set_theme
+            TaskerIntegrationManager.ACTION_SHOW_MODULE -> R.string.tasker_show_module
+            TaskerIntegrationManager.ACTION_REFRESH_MODULE -> R.string.tasker_refresh_module
+            TaskerIntegrationManager.ACTION_UPDATE_MODULE_TEXT -> R.string.tasker_update_module
+            TaskerIntegrationManager.ACTION_TERMINAL_OUTPUT -> R.string.tasker_terminal_output
+            TaskerIntegrationManager.ACTION_SWITCH_SPACE -> R.string.tasker_switch_space
+            else -> R.string.tasker_generic_action
         }
 
-        fun validationError(input: RetuiTaskerInput): String? = when {
-            input.action !in ACTIONS -> "Choose a RETUI action."
+        fun validationError(input: RetuiTaskerInput): Int? = when {
+            input.action !in ACTIONS -> R.string.tasker_choose_action
             input.action == TaskerIntegrationManager.ACTION_SWITCH_SPACE && input.space.isNullOrBlank() ->
-                "Choose a Space."
+                R.string.tasker_choose_space
             else -> null
         }
     }
 }
 
-class RetuiTaskerConfigActivity : Activity(), TaskerPluginConfig<RetuiTaskerInput> {
+class RetuiTaskerConfigActivity : ohi.andre.consolelauncher.localization.LocalizedActivity(), TaskerPluginConfig<RetuiTaskerInput> {
     override val context: Context get() = applicationContext
     private val helper by lazy { RetuiTaskerHelper(this) }
     private lateinit var actionSpinner: Spinner
@@ -137,7 +137,7 @@ class RetuiTaskerConfigActivity : Activity(), TaskerPluginConfig<RetuiTaskerInpu
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Tuils.init(this)
-        title = "RETUI Action"
+        title = getString(R.string.editor_retuitaskerplugin_retui_action_746d5)
         setContentView(buildContent())
         helper.onCreate()
     }
@@ -147,47 +147,47 @@ class RetuiTaskerConfigActivity : Activity(), TaskerPluginConfig<RetuiTaskerInpu
             orientation = LinearLayout.VERTICAL
             setPadding(dp(20), dp(16), dp(20), dp(16))
         }
-        root.addView(TextView(this).apply { text = "Choose what Tasker should change in RETUI."; textSize = 16f })
+        root.addView(TextView(this).apply { text = getString(R.string.editor_retuitaskerplugin_choose_what_tasker_should_change_in_retui_58b55); textSize = 16f })
         actionSpinner = Spinner(this)
         actionSpinner.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item,
-            RetuiTaskerHelper.ACTIONS.map { RetuiTaskerHelper.actionLabel(it) })
+            RetuiTaskerHelper.ACTIONS.map { getString(RetuiTaskerHelper.actionLabel(it)) })
         root.addView(actionSpinner)
-        presetOptions = PresetManager.listAllPresetNames() + CUSTOM_PRESET
+        presetOptions = PresetManager.listAllPresetNames() + getString(R.string.tasker_custom_variable)
         presetContainer = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
-        presetContainer.addView(TextView(this).apply { text = "Preset name"; textSize = 13f })
+        presetContainer.addView(TextView(this).apply { text = getString(R.string.editor_retuitaskerplugin_preset_name_eb39e); textSize = 13f })
         presetSpinner = Spinner(this).apply {
             adapter = ArrayAdapter(this@RetuiTaskerConfigActivity, android.R.layout.simple_spinner_dropdown_item, presetOptions)
             onItemSelectedListener = SimpleItemSelectedListener { updateCustomPresetVisibility() }
         }
         presetContainer.addView(presetSpinner)
         customPreset = EditText(this).apply {
-            hint = "Custom name or Tasker variable, e.g. %preset"
+            hint = getString(R.string.editor_retuitaskerplugin_custom_name_or_tasker_variable_e_g_preset_88793)
             setSingleLine(false)
         }
         presetContainer.addView(customPreset, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT))
         root.addView(presetContainer, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT))
-        spaceOptions = SpaceManager.listSpaces(this).map { it.name } + CUSTOM_SPACE
+        spaceOptions = SpaceManager.listSpaces(this).map { it.name } + getString(R.string.tasker_custom_variable)
         spaceContainer = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
-        spaceContainer.addView(TextView(this).apply { text = "Space"; textSize = 13f })
+        spaceContainer.addView(TextView(this).apply { text = getString(R.string.editor_retuitaskerplugin_space_6d8c9); textSize = 13f })
         spaceSpinner = Spinner(this).apply {
             adapter = ArrayAdapter(this@RetuiTaskerConfigActivity, android.R.layout.simple_spinner_dropdown_item, spaceOptions)
             onItemSelectedListener = SimpleItemSelectedListener { updateCustomSpaceVisibility() }
         }
         spaceContainer.addView(spaceSpinner)
         customSpace = EditText(this).apply {
-            hint = "Custom name or Tasker variable, e.g. %space"
+            hint = getString(R.string.editor_retuitaskerplugin_custom_name_or_tasker_variable_e_g_space_56d76)
             setSingleLine(false)
         }
         spaceContainer.addView(customSpace, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT))
         root.addView(spaceContainer, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT))
-        themeElement = field(root, "Theme element, e.g. input_text_color")
-        value = field(root, "Color value, e.g. #FF00FF or %color")
-        module = field(root, "Module id")
-        text = field(root, "Text")
+        themeElement = field(root, getString(R.string.editor_retuitaskerplugin_theme_element_e_g_input_text_color_2b86f))
+        value = field(root, getString(R.string.editor_retuitaskerplugin_color_value_e_g_ff00ff_or_color_c5b03))
+        module = field(root, getString(R.string.editor_retuitaskerplugin_module_id_73313))
+        text = field(root, getString(R.string.editor_retuitaskerplugin_text_c3328))
         actionSpinner.setSelection(0)
         actionSpinner.onItemSelectedListener = SimpleItemSelectedListener { updateVisibleFields() }
         root.addView(Button(this).apply {
-            text = "Save to Tasker"
+            text = getString(R.string.editor_retuitaskerplugin_save_to_tasker_e0dd4)
             setOnClickListener { finishConfiguration() }
         })
         updateVisibleFields()
@@ -284,10 +284,6 @@ class RetuiTaskerConfigActivity : Activity(), TaskerPluginConfig<RetuiTaskerInpu
 
     private fun dp(value: Int): Int = (value * resources.displayMetrics.density).toInt()
 
-    companion object {
-        private const val CUSTOM_PRESET = "Custom / Tasker variable"
-        private const val CUSTOM_SPACE = "Custom / Tasker variable"
-    }
 }
 
 private class SimpleItemSelectedListener(private val selected: () -> Unit) : android.widget.AdapterView.OnItemSelectedListener {

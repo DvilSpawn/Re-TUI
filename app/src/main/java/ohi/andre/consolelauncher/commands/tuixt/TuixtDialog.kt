@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher.commands.tuixt
 
+import ohi.andre.consolelauncher.R
 import android.app.Dialog
 import android.content.Context
 import android.graphics.Color
@@ -117,7 +118,7 @@ object TuixtDialog {
                 }
                 if (content.childCount == 0) {
                     content.addView(TextView(context).apply {
-                        text = "NO APPS FOUND"
+                        text = context.getString(R.string.dialog_no_apps_found)
                         setTextColor(textColor())
                         setTypeface(Tuils.getTypeface(context))
                         gravity = Gravity.CENTER

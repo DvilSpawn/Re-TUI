@@ -39,7 +39,7 @@ import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi
 
 @RequiresApi(Build.VERSION_CODES.O)
-class PinShortcutConfirmActivity : Activity() {
+class PinShortcutConfirmActivity : ohi.andre.consolelauncher.localization.LocalizedActivity() {
     private var request: PinItemRequest? = null
     private var shortcutInfo: ShortcutInfo? = null
     private var aliasInput: EditText? = null
@@ -52,7 +52,7 @@ class PinShortcutConfirmActivity : Activity() {
         applyFullscreen(this)
 
         if (!loadRequest()) {
-            finishWithToast("Shortcut pin request unavailable.")
+            finishWithToast(getString(R.string.editor_pinshortcutconfirmactivity_shortcut_pin_request_unavailable_47f86))
             return
         }
 
@@ -119,7 +119,7 @@ class PinShortcutConfirmActivity : Activity() {
         panelShell.addView(root, rootParams)
 
         val header = TextView(this)
-        header.setText("Pin Shortcut")
+        header.setText(getString(R.string.editor_pinshortcutconfirmactivity_pin_shortcut_9d9af))
         styleHeader(this, header)
         val headerParams = FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -133,7 +133,7 @@ class PinShortcutConfirmActivity : Activity() {
         title.setTextSize(16f)
         root.addView(title, blockParams())
 
-        val source = terminalText("From " + shortcutInfo!!.getPackage())
+        val source = terminalText(getString(R.string.editor_pinshortcutconfirmactivity_from_ad3b5, shortcutInfo!!.getPackage()))
         source.setTextColor(ColorUtils.setAlphaComponent(textColor(), 190))
         root.addView(source, blockParams())
 
@@ -149,7 +149,7 @@ class PinShortcutConfirmActivity : Activity() {
         toggleRow.setOrientation(LinearLayout.HORIZONTAL)
         toggleRow.setGravity(Gravity.CENTER_VERTICAL)
 
-        val label = terminalText("Create alias")
+        val label = terminalText(getString(R.string.editor_pinshortcutconfirmactivity_create_alias_14186))
         toggleRow.addView(label)
 
         val spacer = View(this)
@@ -169,14 +169,14 @@ class PinShortcutConfirmActivity : Activity() {
         bottomBar.setGravity(Gravity.CENTER_VERTICAL)
         bottomBar.setPadding(0, dp(this, 8f), 0, 0)
 
-        val cancel = button("CANCEL", false)
+        val cancel = button(getString(R.string.editor_pinshortcutconfirmactivity_cancel_1507c), false)
         cancel.setOnClickListener(View.OnClickListener { v: View? -> finish() })
         bottomBar.addView(cancel)
 
         val bottomSpacer = View(this)
         bottomBar.addView(bottomSpacer, LinearLayout.LayoutParams(0, 1, 1f))
 
-        val pin = button("PIN", true)
+        val pin = button(getString(R.string.editor_pinshortcutconfirmactivity_pin_3adad), true)
         pin.setOnClickListener(View.OnClickListener { v: View? -> acceptAndClose() })
         bottomBar.addView(pin)
         root.addView(bottomBar)
@@ -186,7 +186,7 @@ class PinShortcutConfirmActivity : Activity() {
 
     private fun acceptAndClose() {
         if (request == null || !request!!.isValid()) {
-            finishWithToast("Shortcut pin request expired.")
+            finishWithToast(getString(R.string.editor_pinshortcutconfirmactivity_shortcut_pin_request_expired_d808b))
             return
         }
 
@@ -204,7 +204,7 @@ class PinShortcutConfirmActivity : Activity() {
         }
 
         if (!accepted) {
-            finishWithToast("Shortcut pin request was cancelled.")
+            finishWithToast(getString(R.string.editor_pinshortcutconfirmactivity_shortcut_pin_request_was_cancelled_8d6fc))
             return
         }
 
@@ -213,11 +213,11 @@ class PinShortcutConfirmActivity : Activity() {
             if (createAlias) {
                 addAlias(handle, "shortcut -use @" + handle)
             }
-            Toast.makeText(this, "Pinned @" + handle, Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.editor_pinshortcutconfirmactivity_pinned_c1c20, handle), Toast.LENGTH_SHORT).show()
             finish()
         } catch (e: Exception) {
             Tuils.log(e)
-            finishWithToast("Pinned, but mapping save failed.")
+            finishWithToast(getString(R.string.editor_pinshortcutconfirmactivity_pinned_but_mapping_save_failed_aaab5))
         }
     }
 

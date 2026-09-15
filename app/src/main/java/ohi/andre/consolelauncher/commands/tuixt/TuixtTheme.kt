@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher.commands.tuixt
 
+import ohi.andre.consolelauncher.R
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -154,7 +155,7 @@ object TuixtTheme {
 
     @JvmStatic
     fun styleToggle(context: Context, view: TextView, checked: Boolean) {
-        view.text = if (checked) "ON" else "OFF"
+        view.setText(if (checked) R.string.common_on else R.string.common_off)
         markSelection(view, checked)
         view.setTextColor(if (checked) selectionColor() else AppearanceSettings.moduleNameTextColor())
         view.setTypeface(Tuils.getTypeface(context), Typeface.BOLD)

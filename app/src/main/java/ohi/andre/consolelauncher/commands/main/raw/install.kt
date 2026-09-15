@@ -15,7 +15,7 @@ class install : CommandAbstraction {
         }
 
         search.playstoreSearch(appName, info.context)
-        return "install is deprecated. Use search -ps $appName."
+        return pack.context.getString(R.string.command_install_install_is_deprecated_use_search_ps_53a0b, appName)
     }
 
     override fun helpRes(): Int = R.string.help_install

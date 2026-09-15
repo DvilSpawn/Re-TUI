@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import java.util.Locale
+import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.UIManager
 import ohi.andre.consolelauncher.tuils.Tuils
 
@@ -18,8 +19,8 @@ object GuideManager {
     data class Suggestion(val command: String, val execute: Boolean = true)
 
     private data class Step(
-        val title: String,
-        val body: String,
+        val title: Int,
+        val body: Int,
         val command: String,
         val matchPrefix: String = command,
         val restoreOutputOnResume: Boolean = false
@@ -27,35 +28,35 @@ object GuideManager {
 
     private data class Path(
         val id: String,
-        val title: String,
-        val summary: String,
+        val title: Int,
+        val summary: Int,
         val steps: List<Step>
     )
 
     private val paths = listOf(
         Path(
             "basics",
-            "Basics",
-            "Learn the command surface, app list, settings hub, and module dock.",
+            R.string.guide_basics,
+            R.string.guide_learn_the_command_surface_app_list_settings_hub_and_module_dock,
             listOf(
                 Step(
-                    "Print the map",
-                    "Help starts with the workstation quickstart and then lists every command.",
+                    R.string.guide_print_the_map,
+                    R.string.guide_help_starts_with_the_workstation_quickstart_and_then_lists_every_comma,
                     "help"
                 ),
                 Step(
-                    "Open the app list",
-                    "Use the app drawer when you want to scan installed apps instead of typing a name.",
+                    R.string.guide_open_the_app_list,
+                    R.string.guide_use_the_app_drawer_when_you_want_to_scan_installed_apps_instead_of_typ,
                     "apps -ls"
                 ),
                 Step(
-                    "Inspect modules",
-                    "Modules are terminal panels for status, controls, scripts, and compact workflows.",
+                    R.string.guide_inspect_modules,
+                    R.string.guide_modules_are_terminal_panels_for_status_controls_scripts_and_compact_wo,
                     "module -ls"
                 ),
                 Step(
-                    "Open settings",
-                    "The settings hub is still available when a visual edit surface is faster than XML.",
+                    R.string.guide_open_settings,
+                    R.string.guide_the_settings_hub_is_still_available_when_a_visual_edit_surface_is_fast,
                     "settings",
                     restoreOutputOnResume = true
                 )
@@ -63,55 +64,55 @@ object GuideManager {
         ),
         Path(
             "customize",
-            "Customize",
-            "Try wallpaper color, presets, appearance settings, and config discovery.",
+            R.string.guide_customize,
+            R.string.guide_try_wallpaper_color_presets_appearance_settings_and_config_discovery,
             listOf(
                 Step(
-                    "Derive colors",
-                    "Auto color reads the current wallpaper and updates the terminal palette.",
+                    R.string.guide_derive_colors,
+                    R.string.guide_auto_color_reads_the_current_wallpaper_and_updates_the_terminal_palett,
                     "wallpaper -auto"
                 ),
                 Step(
-                    "List presets",
-                    "Presets are saved theme states plus built-in looks you can apply later.",
+                    R.string.guide_list_presets,
+                    R.string.guide_presets_are_saved_theme_states_plus_built_in_looks_you_can_apply_later,
                     "preset -ls"
                 ),
                 Step(
-                    "Open appearance settings",
-                    "The settings hub is the main route for precise appearance changes.",
+                    R.string.guide_open_appearance_settings,
+                    R.string.guide_the_settings_hub_is_the_main_route_for_precise_appearance_changes,
                     "settings",
                     restoreOutputOnResume = true
                 ),
                 Step(
-                    "Browse config",
-                    "Config listing is the command route into advanced launcher variables.",
+                    R.string.guide_browse_config,
+                    R.string.guide_config_listing_is_the_command_route_into_advanced_launcher_variables,
                     "config -ls"
                 )
             )
         ),
         Path(
             "modules",
-            "Modules",
-            "Use built-in panels and the Lua module surface without leaving the terminal.",
+            R.string.guide_modules,
+            R.string.guide_use_built_in_panels_and_the_lua_module_surface_without_leaving_the_ter,
             listOf(
                 Step(
-                    "List modules",
-                    "Start by seeing every built-in and script-backed module the launcher knows.",
+                    R.string.guide_list_modules,
+                    R.string.guide_start_by_seeing_every_built_in_and_script_backed_module_the_launcher_k,
                     "module -ls"
                 ),
                 Step(
-                    "Show notes",
-                    "Notes is a small local panel and a good example of a module as workspace.",
+                    R.string.guide_show_notes,
+                    R.string.guide_notes_is_a_small_local_panel_and_a_good_example_of_a_module_as_workspa,
                     "module -show notes"
                 ),
                 Step(
-                    "Show timer",
-                    "Timer demonstrates a module with actions and live status.",
+                    R.string.guide_show_timer,
+                    R.string.guide_timer_demonstrates_a_module_with_actions_and_live_status,
                     "module -show timer"
                 ),
                 Step(
-                    "Read Lua module help",
-                    "Lua modules can render text, buttons, actions, app intents, and shortcuts.",
+                    R.string.guide_read_lua_module_help,
+                    R.string.guide_lua_modules_can_render_text_buttons_actions_app_intents_and_shortcuts,
                     "help module"
                 )
             )
@@ -121,30 +122,28 @@ object GuideManager {
     fun overview(context: Context): String {
         val active = activePath(context)
         val output = StringBuilder()
-        output.append("Guide").append(Tuils.NEWLINE)
-        output.append("Non-blocking walkthroughs that use commands and suggestion chips.").append(Tuils.NEWLINE)
+        output.append(context.getString(R.string.guide_guide)).append(Tuils.NEWLINE)
+        output.append(context.getString(R.string.guide_non_blocking_walkthroughs_that_use_commands_and_suggestion_chips)).append(Tuils.NEWLINE)
         output.append(Tuils.NEWLINE)
-        output.append("Paths:").append(Tuils.NEWLINE)
+        output.append(context.getString(R.string.guide_paths)).append(Tuils.NEWLINE)
         for (path in paths) {
             output.append("  guide -start ").append(path.id)
-                .append(" -> ").append(path.title)
-                .append(": ").append(path.summary)
+                .append(" -> ").append(context.getString(path.title))
+                .append(": ").append(context.getString(path.summary))
                 .append(Tuils.NEWLINE)
         }
         output.append(Tuils.NEWLINE)
         if (active != null) {
-            output.append("Active: ").append(active.title)
-                .append(" step ").append(stepIndex(context) + 1)
-                .append("/").append(active.steps.size)
+            output.append(context.getString(R.string.guide_active_progress, context.getString(active.title), stepIndex(context) + 1, active.steps.size))
                 .append(Tuils.NEWLINE)
             output.append(currentStepText(context, active))
         } else {
             val saved = savedPath(context)
             if (saved != null && savedStepIndex(context, saved) > 0) {
-                output.append("Resume with: guide -resume").append(Tuils.NEWLINE)
-                output.append("Restart with: guide -reset, then guide -start ").append(saved.id)
+                output.append(context.getString(R.string.guide_resume_with_guide_resume)).append(Tuils.NEWLINE)
+                output.append(context.getString(R.string.guide_restart_path, saved.id))
             } else {
-                output.append("Start with: guide -start basics")
+                output.append(context.getString(R.string.guide_start_with_guide_start_basics))
             }
         }
         return output.toString()
@@ -161,7 +160,7 @@ object GuideManager {
     private fun start(context: Context, requestedPath: String?, reset: Boolean): String {
         val path = findPath(requestedPath)
         if (path == null) {
-            return "Unknown guide path: " + (requestedPath ?: "") + Tuils.NEWLINE + overview(context)
+            return context.getString(R.string.guide_unknown_path, requestedPath.orEmpty()) + Tuils.NEWLINE + overview(context)
         }
 
         val step = if (reset) 0 else savedStepIndex(context, path)
@@ -173,8 +172,8 @@ object GuideManager {
             .apply()
         notifySuggestionsChanged(context)
 
-        val action = if (step > 0 && !reset) "Resumed guide: " else "Started guide: "
-        return action + path.title + Tuils.NEWLINE + currentStepText(context, path)
+        val message = if (step > 0 && !reset) R.string.guide_resumed else R.string.guide_started
+        return context.getString(message, context.getString(path.title)) + Tuils.NEWLINE + currentStepText(context, path)
     }
 
     fun resume(context: Context): String {
@@ -206,13 +205,13 @@ object GuideManager {
 
     fun off(context: Context): String {
         stopInternal(context)
-        return "Guide hidden. Run guide -start basics to resume."
+        return context.getString(R.string.guide_guide_hidden_run_guide_start_basics_to_resume)
     }
 
     fun reset(context: Context): String {
         prefs(context).edit().clear().apply()
         notifySuggestionsChanged(context)
-        return "Guide reset." + Tuils.NEWLINE + overview(context)
+        return context.getString(R.string.guide_guide_reset) + Tuils.NEWLINE + overview(context)
     }
 
     fun consumePendingResumeMessage(context: Context): String? {
@@ -221,7 +220,9 @@ object GuideManager {
         if (!message.isNullOrEmpty()) {
             prefs.edit().remove(KEY_PENDING_RESUME_MESSAGE).apply()
         }
-        return message
+        if (message.isNullOrEmpty()) return null
+        val path = savedPath(context) ?: return overview(context)
+        return if (isActive(context)) currentStepText(context, path) else completionText(context, path)
     }
 
     fun activeSuggestions(context: Context): List<Suggestion> {
@@ -267,13 +268,13 @@ object GuideManager {
     fun observeCommand(context: Context, rawCommand: String?): String? {
         val path = activePath(context) ?: return null
         val command = rawCommand?.trim { it <= ' ' } ?: return null
-        if (command.length == 0 || command.lowercase(Locale.getDefault()).startsWith("guide")) {
+        if (command.length == 0 || command.lowercase(Locale.ROOT).startsWith("guide")) {
             return null
         }
 
         val step = currentStep(context, path) ?: return null
-        val expected = step.matchPrefix.lowercase(Locale.getDefault())
-        val actual = command.lowercase(Locale.getDefault())
+        val expected = step.matchPrefix.lowercase(Locale.ROOT)
+        val actual = command.lowercase(Locale.ROOT)
         if (actual == expected || actual.startsWith(expected + " ")) {
             val output: String
             val next = stepIndex(context) + 1
@@ -284,7 +285,7 @@ object GuideManager {
                 output = currentStepText(context, path)
             }
             if (step.restoreOutputOnResume) {
-                savePendingResumeMessage(context, output)
+                savePendingResumeMessage(context)
                 return null
             }
             return output
@@ -299,14 +300,14 @@ object GuideManager {
         val index = stepIndex(context).coerceIn(0, path.steps.size - 1)
         val step = path.steps[index]
         val output = StringBuilder()
-        output.append(path.title).append(" ")
+        output.append(context.getString(path.title)).append(" ")
             .append(progress(index, path.steps.size))
             .append(" ").append(index + 1).append("/").append(path.steps.size)
             .append(Tuils.NEWLINE)
-        output.append(step.title).append(Tuils.NEWLINE)
-        output.append(step.body).append(Tuils.NEWLINE)
-        output.append("Run: ").append(step.command).append(Tuils.NEWLINE)
-        output.append("Controls: guide -next, guide -back, guide -off")
+        output.append(context.getString(step.title)).append(Tuils.NEWLINE)
+        output.append(context.getString(step.body)).append(Tuils.NEWLINE)
+        output.append(context.getString(R.string.guide_run_command, step.command)).append(Tuils.NEWLINE)
+        output.append(context.getString(R.string.guide_controls_guide_next_guide_back_guide_off))
         return output.toString()
     }
 
@@ -366,12 +367,16 @@ object GuideManager {
 
     private fun complete(context: Context, path: Path): String {
         stopInternal(context)
-        return "Guide complete: " + path.title + Tuils.NEWLINE +
-            "Start another path with guide -start customize or guide -start modules."
+        return completionText(context, path)
     }
 
-    private fun savePendingResumeMessage(context: Context, message: String) {
-        prefs(context).edit().putString(KEY_PENDING_RESUME_MESSAGE, message).apply()
+    private fun completionText(context: Context, path: Path): String =
+        context.getString(R.string.guide_complete, context.getString(path.title)) + Tuils.NEWLINE +
+            context.getString(R.string.guide_start_another_path_with_guide_start_customize_or_guide_start_modules)
+
+    private fun savePendingResumeMessage(context: Context) {
+        // Retain the existing preference type while regenerating display text in the current locale.
+        prefs(context).edit().putString(KEY_PENDING_RESUME_MESSAGE, "pending").apply()
     }
 
     private fun findPath(id: String?): Path? {
@@ -380,7 +385,7 @@ object GuideManager {
     }
 
     private fun normalizePathId(id: String?): String {
-        val normalized = (id ?: DEFAULT_PATH).trim { it <= ' ' }.lowercase(Locale.getDefault())
+        val normalized = (id ?: DEFAULT_PATH).trim { it <= ' ' }.lowercase(Locale.ROOT)
         return if (normalized == "basic") "basics" else normalized
     }
 

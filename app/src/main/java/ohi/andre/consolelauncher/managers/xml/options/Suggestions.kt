@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher.managers.xml.options
 
+import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsElement
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave
@@ -17,8 +18,8 @@ enum class Suggestions : XMLPrefsSave {
             return XMLPrefsSave.BOOLEAN
         }
 
-        override fun info(): String? {
-            return "If false, suggestions won't be shown"
+        override fun infoRes(): Int {
+            return R.string.setting_suggestions_show_suggestions_description
         }
     },
     transparent_suggestions {
@@ -30,8 +31,8 @@ enum class Suggestions : XMLPrefsSave {
             return XMLPrefsSave.BOOLEAN
         }
 
-        override fun info(): String? {
-            return "If true, the background will be transparent"
+        override fun infoRes(): Int {
+            return R.string.setting_suggestions_transparent_suggestions_description
         }
     },
     default_text_color {
@@ -39,8 +40,8 @@ enum class Suggestions : XMLPrefsSave {
             return "#000000"
         }
 
-        override fun info(): String? {
-            return "The default text color"
+        override fun infoRes(): Int {
+            return R.string.setting_suggestions_default_text_color_description
         }
     },
     default_background_color {
@@ -48,8 +49,8 @@ enum class Suggestions : XMLPrefsSave {
             return "#ffffff"
         }
 
-        override fun info(): String? {
-            return "The default background color"
+        override fun infoRes(): Int {
+            return R.string.setting_suggestions_default_background_color_description
         }
     },
     apps_text_color {
@@ -57,8 +58,8 @@ enum class Suggestions : XMLPrefsSave {
             return ""
         }
 
-        override fun info(): String? {
-            return "Apps suggestions text color"
+        override fun infoRes(): Int {
+            return R.string.setting_suggestions_apps_text_color_description
         }
     },
     apps_background_color {
@@ -66,8 +67,8 @@ enum class Suggestions : XMLPrefsSave {
             return "#00897B"
         }
 
-        override fun info(): String? {
-            return "Apps suggestions background color"
+        override fun infoRes(): Int {
+            return R.string.setting_suggestions_apps_background_color_description
         }
     },
     alias_text_color {
@@ -75,8 +76,8 @@ enum class Suggestions : XMLPrefsSave {
             return ""
         }
 
-        override fun info(): String? {
-            return "Aliases suggestions text color"
+        override fun infoRes(): Int {
+            return R.string.setting_suggestions_alias_text_color_description
         }
     },
     alias_background_color {
@@ -84,8 +85,8 @@ enum class Suggestions : XMLPrefsSave {
             return "#FF5722"
         }
 
-        override fun info(): String? {
-            return "Aliases suggestions background color"
+        override fun infoRes(): Int {
+            return R.string.setting_suggestions_alias_background_color_description
         }
     },
     cmd_text_color {
@@ -93,8 +94,8 @@ enum class Suggestions : XMLPrefsSave {
             return ""
         }
 
-        override fun info(): String? {
-            return "Commands suggestions text color"
+        override fun infoRes(): Int {
+            return R.string.setting_suggestions_cmd_text_color_description
         }
     },
     cmd_background_color {
@@ -102,8 +103,8 @@ enum class Suggestions : XMLPrefsSave {
             return "#76FF03"
         }
 
-        override fun info(): String? {
-            return "Commands suggestions background color"
+        override fun infoRes(): Int {
+            return R.string.setting_suggestions_cmd_background_color_description
         }
     },
     song_text_color {
@@ -111,8 +112,8 @@ enum class Suggestions : XMLPrefsSave {
             return ""
         }
 
-        override fun info(): String? {
-            return "Songs suggestions text color"
+        override fun infoRes(): Int {
+            return R.string.setting_suggestions_song_text_color_description
         }
     },
     song_background_color {
@@ -120,8 +121,8 @@ enum class Suggestions : XMLPrefsSave {
             return "#EEFF41"
         }
 
-        override fun info(): String? {
-            return "Songs suggestions background color"
+        override fun infoRes(): Int {
+            return R.string.setting_suggestions_song_background_color_description
         }
     },
     contact_text_color {
@@ -129,8 +130,8 @@ enum class Suggestions : XMLPrefsSave {
             return ""
         }
 
-        override fun info(): String? {
-            return "Contacts suggestions text color"
+        override fun infoRes(): Int {
+            return R.string.setting_suggestions_contact_text_color_description
         }
     },
     contact_background_color {
@@ -138,8 +139,8 @@ enum class Suggestions : XMLPrefsSave {
             return "#64FFDA"
         }
 
-        override fun info(): String? {
-            return "Contacts suggestions background color"
+        override fun infoRes(): Int {
+            return R.string.setting_suggestions_contact_background_color_description
         }
     },
     file_text_color {
@@ -147,8 +148,8 @@ enum class Suggestions : XMLPrefsSave {
             return ""
         }
 
-        override fun info(): String? {
-            return "Files suggestions text color"
+        override fun infoRes(): Int {
+            return R.string.setting_suggestions_file_text_color_description
         }
     },
     file_background_color {
@@ -156,8 +157,8 @@ enum class Suggestions : XMLPrefsSave {
             return "#03A9F4"
         }
 
-        override fun info(): String? {
-            return "Files suggestions background color"
+        override fun infoRes(): Int {
+            return R.string.setting_suggestions_file_background_color_description
         }
     },
     suggest_alias_default {
@@ -169,8 +170,8 @@ enum class Suggestions : XMLPrefsSave {
             return XMLPrefsSave.BOOLEAN
         }
 
-        override fun info(): String? {
-            return "If true, your alias will be shown when the input field is empty"
+        override fun infoRes(): Int {
+            return R.string.setting_suggestions_suggest_alias_default_description
         }
     },
     suggest_appgp_default {
@@ -182,8 +183,8 @@ enum class Suggestions : XMLPrefsSave {
             return XMLPrefsSave.BOOLEAN
         }
 
-        override fun info(): String? {
-            return "If true, your app groups will be shown when the input field is empty"
+        override fun infoRes(): Int {
+            return R.string.setting_suggestions_suggest_appgp_default_description
         }
     },
     click_to_launch {
@@ -195,8 +196,8 @@ enum class Suggestions : XMLPrefsSave {
             return XMLPrefsSave.BOOLEAN
         }
 
-        override fun info(): String? {
-            return "If true, some suggestions will be executed as soon as you click them"
+        override fun infoRes(): Int {
+            return R.string.setting_suggestions_click_to_launch_description
         }
     },
     suggestions_size {
@@ -208,8 +209,8 @@ enum class Suggestions : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "The text size of the suggestions"
+        override fun infoRes(): Int {
+            return R.string.setting_suggestions_suggestions_size_description
         }
     },
     double_space_click_first_suggestion {
@@ -221,8 +222,8 @@ enum class Suggestions : XMLPrefsSave {
             return XMLPrefsSave.Companion.BOOLEAN
         }
 
-        override fun info(): String? {
-            return "If true, Re:T-UI will simulate a click on the current first suggestion if you double-click the space bar"
+        override fun infoRes(): Int {
+            return R.string.setting_suggestions_double_space_click_first_suggestion_description
         }
     },
     noinput_suggestions_order {
@@ -234,8 +235,8 @@ enum class Suggestions : XMLPrefsSave {
             return XMLPrefsSave.TEXT
         }
 
-        override fun info(): String? {
-            return "The order and the number of suggestions that appears on-screen when the input field is empty. 0=apps, 1=alias, 2=cmds, 3=app groups. Put between round brackets the maximum number of suggestions of the leading type"
+        override fun infoRes(): Int {
+            return R.string.setting_suggestions_noinput_suggestions_order_description
         }
     },
     suggestions_order {
@@ -247,8 +248,8 @@ enum class Suggestions : XMLPrefsSave {
             return XMLPrefsSave.TEXT
         }
 
-        override fun info(): String? {
-            return "The order and the number of suggestions that appears on-screen. 0=apps, 1=alias, 2=cmds, 3=app groups. Put between round brackets the maximum number of suggestions of the leading type"
+        override fun infoRes(): Int {
+            return R.string.setting_suggestions_suggestions_order_description
         }
     },
     noinput_min_command_priority {
@@ -260,8 +261,8 @@ enum class Suggestions : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "The minimum priority of a command shown when the input field is empty"
+        override fun infoRes(): Int {
+            return R.string.setting_suggestions_noinput_min_command_priority_description
         }
     },
     suggestions_per_category {
@@ -273,8 +274,8 @@ enum class Suggestions : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "The number of suggestions shown per category. This doesn\'t affect \"noinput_suggestions_order\" and \"suggestions_order\""
+        override fun infoRes(): Int {
+            return R.string.setting_suggestions_suggestions_per_category_description
         }
     },
     suggestions_deadline {
@@ -286,8 +287,8 @@ enum class Suggestions : XMLPrefsSave {
             return XMLPrefsSave.TEXT
         }
 
-        override fun info(): String? {
-            return "The min/max rank that a suggestion needs to get in order to be shown. min/max depends on the comparison algorithm"
+        override fun infoRes(): Int {
+            return R.string.setting_suggestions_suggestions_deadline_description
         }
     },
     suggestions_algorithm {
@@ -299,8 +300,8 @@ enum class Suggestions : XMLPrefsSave {
             return XMLPrefsSave.INTEGER
         }
 
-        override fun info(): String? {
-            return "The algorithm used to compare strings"
+        override fun infoRes(): Int {
+            return R.string.setting_suggestions_suggestions_algorithm_description
         }
     },
     suggestions_quickcompare_n {
@@ -312,8 +313,8 @@ enum class Suggestions : XMLPrefsSave {
             return XMLPrefsSave.Companion.INTEGER
         }
 
-        override fun info(): String? {
-            return "If the input is shorter than n characters, Re:T-UI will try to show you the entries which start with those characters"
+        override fun infoRes(): Int {
+            return R.string.setting_suggestions_suggestions_quickcompare_n_description
         }
     },
     hide_suggestions_when_empty {
@@ -325,8 +326,8 @@ enum class Suggestions : XMLPrefsSave {
             return XMLPrefsSave.TEXT
         }
 
-        override fun info(): String? {
-            return "If \"always\" the suggestion area will be hidden when there are no suggestions. If \"true\" it will be hidden only if also the input area is empty. \"false\" disables the feature"
+        override fun infoRes(): Int {
+            return R.string.setting_suggestions_hide_suggestions_when_empty_description
         }
     },
     suggestions_spaces {
@@ -338,8 +339,8 @@ enum class Suggestions : XMLPrefsSave {
             return XMLPrefsSave.TEXT
         }
 
-        override fun info(): String? {
-            return "Suggestion chip spacing in pixels: [outer horizontal margin],[outer vertical margin],[inner horizontal padding],[inner vertical padding]."
+        override fun infoRes(): Int {
+            return R.string.setting_suggestions_suggestions_spaces_description
         }
     };
 

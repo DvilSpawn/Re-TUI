@@ -62,7 +62,7 @@ class regex : ParamCommand() {
 
         companion object {
             fun get(p: String): Param? {
-                val value = p.lowercase(Locale.getDefault())
+                val value = p.lowercase(Locale.ROOT)
                 val ps = entries
                 for (p1 in ps) {
                     if (value.endsWith(p1.label())) {

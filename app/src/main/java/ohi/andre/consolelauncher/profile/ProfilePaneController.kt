@@ -176,7 +176,7 @@ class ProfilePaneController(
     }
 
     private fun render() {
-        name.text = profile.name.ifBlank { "OPERATOR" }.uppercase(Locale.getDefault())
+        name.text = profile.name.ifBlank { context.getString(R.string.editor_profilepanecontroller_operator_c2599) }.uppercase(Locale.getDefault())
         maskPhone()
         photo.setImageBitmap(
             recolorMonochrome(
@@ -201,25 +201,25 @@ class ProfilePaneController(
 
     private fun revealPhone() {
         handler.removeCallbacks(maskPhoneRunnable)
-        phone.text = profile.phone.ifBlank { "NOT SET" }
+        phone.text = profile.phone.ifBlank { context.getString(R.string.editor_profilepanecontroller_not_set_ea4ed) }
         if (profile.phone.isNotBlank()) handler.postDelayed(maskPhoneRunnable, PHONE_REVEAL_MS)
     }
 
     private fun editProfile() {
         TuixtDialog.showValidatedForm(
             context,
-            "EDIT PROFILE",
+            context.getString(R.string.editor_profilepanecontroller_edit_profile_a6ba1),
             listOf(
-                TuixtDialog.FormField("name", "Name", "Operator name", value = profile.name),
-                TuixtDialog.FormField("phone", "Phone", "Hidden by default", value = profile.phone)
+                TuixtDialog.FormField("name", context.getString(R.string.editor_profilepanecontroller_name_709a2), context.getString(R.string.editor_profilepanecontroller_operator_name_819cc), value = profile.name),
+                TuixtDialog.FormField("phone", context.getString(R.string.editor_profilepanecontroller_phone_77064), context.getString(R.string.editor_profilepanecontroller_hidden_by_default_c1b32), value = profile.phone)
             ),
-            "SAVE",
-            "CANCEL",
+            context.getString(R.string.editor_profilepanecontroller_save_50815),
+            context.getString(R.string.editor_profilepanecontroller_cancel_1507c),
             TuixtDialog.FormValidator { values ->
                 when {
-                    values["name"].orEmpty().isBlank() -> "Name is required."
-                    values["name"].orEmpty().length > 48 -> "Name must be 48 characters or fewer."
-                    values["phone"].orEmpty().length > 32 -> "Phone must be 32 characters or fewer."
+                    values["name"].orEmpty().isBlank() -> context.getString(R.string.editor_profilepanecontroller_name_is_required_d7659)
+                    values["name"].orEmpty().length > 48 -> context.getString(R.string.editor_profilepanecontroller_name_must_be_48_characters_or_fewer_a81ab)
+                    values["phone"].orEmpty().length > 32 -> context.getString(R.string.editor_profilepanecontroller_phone_must_be_32_characters_or_fewer_7abc0)
                     else -> null
                 }
             },
@@ -234,19 +234,19 @@ class ProfilePaneController(
         if (profile.codes.size >= MAX_CODES) return
         TuixtDialog.showValidatedForm(
             context,
-            "ADD CONNECTION CODE",
+            context.getString(R.string.editor_profilepanecontroller_add_connection_code_90e31),
             listOf(
-                TuixtDialog.FormField("label", "Label", "GitHub, Wi-Fi, Contact"),
-                TuixtDialog.FormField("value", "QR content", "URL or text")
+                TuixtDialog.FormField("label", context.getString(R.string.editor_profilepanecontroller_label_74341), context.getString(R.string.editor_profilepanecontroller_github_wi_fi_contact_82dc7)),
+                TuixtDialog.FormField("value", context.getString(R.string.editor_profilepanecontroller_qr_content_272d8), context.getString(R.string.editor_profilepanecontroller_url_or_text_9d2bd))
             ),
-            "ADD",
-            "CANCEL",
+            context.getString(R.string.editor_profilepanecontroller_add_f9460),
+            context.getString(R.string.editor_profilepanecontroller_cancel_1507c),
             TuixtDialog.FormValidator { values ->
                 when {
-                    values["label"].orEmpty().isBlank() -> "Label is required."
-                    values["label"].orEmpty().length > 40 -> "Label must be 40 characters or fewer."
-                    values["value"].orEmpty().isBlank() -> "QR content is required."
-                    values["value"].orEmpty().length > 2048 -> "QR content must be 2048 characters or fewer."
+                    values["label"].orEmpty().isBlank() -> context.getString(R.string.editor_profilepanecontroller_label_is_required_c9490)
+                    values["label"].orEmpty().length > 40 -> context.getString(R.string.editor_profilepanecontroller_label_must_be_40_characters_or_fewer_4b1dd)
+                    values["value"].orEmpty().isBlank() -> context.getString(R.string.editor_profilepanecontroller_qr_content_is_required_4353e)
+                    values["value"].orEmpty().length > 2048 -> context.getString(R.string.editor_profilepanecontroller_qr_content_must_be_2048_characters_or_fewe_11e81)
                     else -> ProfileStore.qrValueValidationError(values["value"].orEmpty())
                 }
             },
@@ -266,10 +266,10 @@ class ProfilePaneController(
         val index = item.storedIndex
         TuixtDialog.showConfirm(
             context,
-            "REMOVE ${profile.codes[index].label}",
-            "Delete this connection code from the local profile?",
-            "REMOVE",
-            "CANCEL",
+            context.getString(R.string.editor_profilepanecontroller_remove_a7db1, profile.codes[index].label),
+            context.getString(R.string.editor_profilepanecontroller_delete_this_connection_code_from_the_local_d00ec),
+            context.getString(R.string.editor_profilepanecontroller_remove_f9662),
+            context.getString(R.string.editor_profilepanecontroller_cancel_1507c),
             TuixtDialog.ConfirmAction {
                 profile = profile.copy(codes = profile.codes.filterIndexed { itemIndex, _ -> itemIndex != index })
                 saveAndRender()
@@ -291,8 +291,8 @@ class ProfilePaneController(
 
     private fun qrItems(): List<DisplayQr> = buildList {
         if (profile.phone.isNotBlank()) {
-            val displayName = profile.name.ifBlank { "OPERATOR" }
-            add(DisplayQr("CONTACT", ProfileStore.contactVCard(displayName, profile.phone), "SCAN TO ADD $displayName", -1))
+            val displayName = profile.name.ifBlank { context.getString(R.string.editor_profilepanecontroller_operator_c2599) }
+            add(DisplayQr(context.getString(R.string.editor_profilepanecontroller_contact_740fa), ProfileStore.contactVCard(displayName, profile.phone), context.getString(R.string.editor_profilepanecontroller_scan_to_add_9e5c8, displayName), -1))
         }
         profile.codes.forEachIndexed { index, code -> add(DisplayQr(code.label, code.value, code.value, index)) }
     }
@@ -327,16 +327,16 @@ class ProfilePaneController(
             }
             val image = ImageView(context).apply {
                 scaleType = ImageView.ScaleType.FIT_CENTER
-                contentDescription = "Connection QR code"
+                contentDescription = context.getString(R.string.editor_profilepanecontroller_connection_qr_code_428dd)
             }
             val reveal = TextView(context).apply {
                 gravity = Gravity.CENTER
-                text = "[ REVEAL ]"
+                text = context.getString(R.string.editor_profilepanecontroller_reveal_5a0d9)
                 textSize = 18f
                 setTextColor(TuixtTheme.borderColor())
                 setTypeface(Tuils.getTypeface(context), Typeface.BOLD)
                 setBackgroundColor(ColorUtils.setAlphaComponent(TuixtTheme.surfaceColor(), 150))
-                contentDescription = "Reveal QR code"
+                contentDescription = context.getString(R.string.editor_profilepanecontroller_reveal_qr_code_87b76)
                 isClickable = true
                 isFocusable = true
             }
@@ -360,10 +360,10 @@ class ProfilePaneController(
         override fun onBindViewHolder(holder: QrHolder, page: Int) {
             val items = qrItems()
             if (items.isEmpty()) {
-                holder.label.text = "NO CONNECTION CODES"
+                holder.label.text = context.getString(R.string.editor_profilepanecontroller_no_connection_codes_de288)
                 holder.image.setImageDrawable(null)
                 holder.reveal.visibility = View.GONE
-                holder.value.text = "TAP ADD QR TO GENERATE ONE LOCALLY"
+                holder.value.text = context.getString(R.string.editor_profilepanecontroller_tap_add_qr_to_generate_one_locally_f8074)
                 return
             }
             val code = items[page]
@@ -376,7 +376,7 @@ class ProfilePaneController(
             ).also { qrCache.put(code.value, it) }
             holder.image.visibility = View.VISIBLE
             holder.reveal.visibility = if (revealed) View.GONE else View.VISIBLE
-            holder.image.contentDescription = if (revealed) "QR code. Tap to hide." else "Blurred QR preview"
+            holder.image.contentDescription = if (revealed) context.getString(R.string.editor_profilepanecontroller_qr_code_tap_to_hide_1bd59) else context.getString(R.string.editor_profilepanecontroller_blurred_qr_preview_a61ec)
             holder.image.setImageBitmap(if (revealed) qr else {
                 maskedQrCache.get(code.value) ?: maskQr(qr).also { maskedQrCache.put(code.value, it) }
             })

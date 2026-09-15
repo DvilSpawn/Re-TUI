@@ -1,0 +1,57 @@
+<resources>
+    <!-- Command responses. Translate prose; preserve examples and format arguments. -->
+    <!-- LuaWidgetEngine.kt: addAppButton -->
+    <string name="lua_runtime_luawidgetengine_app_not_found_ebb50">"App not found: %1$s"</string>
+    <!-- LuaWidgetEngine.kt: openUrl -->
+    <string name="lua_runtime_luawidgetengine_cannot_open_url_fce7a" formatted="false">"Cannot open URL"</string>
+    <!-- LuaWidgetEngine.kt: showChoiceDialog -->
+    <string name="lua_runtime_luawidgetengine_choose_78b7c" formatted="false">"Choose"</string>
+    <!-- LuaWidgetEngine.kt: buildUiTable -->
+    <string name="lua_runtime_luawidgetengine_invalid_config_schema_5adb8">"Invalid config schema: %1$s"</string>
+    <!-- LuaWidgetEngine.kt: buildUiTable -->
+    <string name="lua_runtime_luawidgetengine_invalid_config_schema_ce5a7" formatted="false">"Invalid config schema."</string>
+    <!-- LuaWidgetEngine.kt: addIntentButton -->
+    <string name="lua_runtime_luawidgetengine_invalid_intent_button_f9f82">"Invalid intent button: %1$s"</string>
+    <!-- LuaWidgetEngine.kt: setLayout -->
+    <string name="lua_runtime_luawidgetengine_invalid_layout_schema_02f61">"Invalid layout schema: %1$s"</string>
+    <!-- LuaWidgetEngine.kt: setLayout -->
+    <string name="lua_runtime_luawidgetengine_invalid_layout_schema_7cc62" formatted="false">"Invalid layout schema."</string>
+    <!-- LuaWidgetEngine.kt: checkTimeout -->
+    <string name="lua_runtime_luawidgetengine_lua_runtime_timeout_in_9cd2d">"Lua runtime timeout in %1$s"</string>
+    <!-- LuaWidgetEngine.kt: handleNetworkError -->
+    <string name="lua_runtime_luawidgetengine_network_error_116eb">"Network error: %1$s"</string>
+    <!-- LuaWidgetEngine.kt: handleNetworkError -->
+    <string name="lua_runtime_luawidgetengine_network_error_7eb7b" formatted="false">"network error"</string>
+    <!-- LuaWidgetEngine.kt: buildDebugTable -->
+    <string name="lua_runtime_luawidgetengine_no_debug_lines_3d01e" formatted="false">"No debug lines."</string>
+    <!-- LuaWidgetEngine.kt: prefsSummary -->
+    <string name="lua_runtime_luawidgetengine_no_editable_prefs_yet_45ad6" formatted="false">"No editable prefs yet."</string>
+    <!-- LuaWidgetEngine.kt: action -->
+    <string name="lua_runtime_luawidgetengine_no_on_action_handler_in_3b3e5">"No on_action handler in %1$s."</string>
+    <!-- LuaWidgetEngine.kt: click -->
+    <string name="lua_runtime_luawidgetengine_no_on_click_handler_in_1f666">"No on_click handler in %1$s."</string>
+    <!-- LuaWidgetEngine.kt: config -->
+    <string name="lua_runtime_luawidgetengine_no_on_config_handler_in_07f9f">"No on_config handler in %1$s."</string>
+    <!-- LuaWidgetEngine.kt: submitConfig -->
+    <string name="lua_runtime_luawidgetengine_no_on_config_submit_handler_in_7cbe2">"No on_config_submit handler in %1$s."</string>
+    <!-- LuaWidgetEngine.kt: dialog -->
+    <string name="lua_runtime_luawidgetengine_no_on_dialog_action_handler_in_f25f4">"No on_dialog_action handler in %1$s."</string>
+    <!-- LuaWidgetEngine.kt: input -->
+    <string name="lua_runtime_luawidgetengine_no_on_input_handler_in_e32dd">"No on_input handler in %1$s."</string>
+    <!-- LuaWidgetEngine.kt: open -->
+    <string name="lua_runtime_luawidgetengine_no_on_open_handler_in_3a579">"No on_open handler in %1$s."</string>
+    <!-- LuaWidgetEngine.kt: requirePermission -->
+    <string name="lua_runtime_luawidgetengine_permission_required_add_permissions_and_ru_aaa0a">"Permission required: %1$s. Add -- permissions = \"%2$s\" and run module -approve %3$s."</string>
+    <!-- LuaWidgetEngine.kt: buildUiTable -->
+    <string name="lua_runtime_luawidgetengine_progress_1b902" formatted="false">"Progress"</string>
+    <!-- LuaWidgetEngine.kt: copyToClipboard -->
+    <string name="lua_runtime_luawidgetengine_re_tui_widget_29fbe" formatted="false">"Re:TUI widget"</string>
+    <!-- LuaWidgetEngine.kt: buildUiTable -->
+    <string name="lua_runtime_luawidgetengine_toast_5bf86">"[toast] %1$s"</string>
+    <!-- LuaWidgetEngine.kt: ensureReadableFile -->
+    <string name="lua_runtime_luawidgetengine_widget_local_file_is_too_large_b3776">"Widget local file is too large: %1$s"</string>
+    <!-- LuaWidgetEngine.kt: ensureFileWriteAllowed -->
+    <string name="lua_runtime_luawidgetengine_widget_local_file_limit_exceeded_5830f">"Widget local file limit exceeded: %1$s"</string>
+    <!-- LuaWidgetEngine.kt: ensureFileWriteAllowed -->
+    <string name="lua_runtime_luawidgetengine_widget_local_storage_limit_exceeded_523f9" formatted="false">"Widget local storage limit exceeded"</string>
+</resources>

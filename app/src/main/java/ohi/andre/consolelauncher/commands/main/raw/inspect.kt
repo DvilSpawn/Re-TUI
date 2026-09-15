@@ -41,7 +41,7 @@ class inspect : CommandAbstraction {
         val packageInfo = try {
             pm.getPackageInfo(packageName, flags)
         } catch (e: PackageManager.NameNotFoundException) {
-            return "Package not found: $packageName"
+            return pack.context.getString(R.string.command_inspect_package_not_found_3c09b, packageName)
         }
 
         val out = StringBuilder()
@@ -49,13 +49,13 @@ class inspect : CommandAbstraction {
             .append(Tuils.NEWLINE).append(packageName).append(Tuils.NEWLINE)
         val common = commonHandlers(pm, packageName)
         if (common.isNotEmpty()) {
-            out.append(Tuils.NEWLINE).append("Common intents:").append(Tuils.NEWLINE)
+            out.append(Tuils.NEWLINE).append(pack.context.getString(R.string.command_inspect_common_intents_f22d7)).append(Tuils.NEWLINE)
             common.forEach { out.append("- ").append(it).append(Tuils.NEWLINE) }
         }
-        appendComponents(out, "Exported activities", packageInfo.activities, packageName)
-        appendComponents(out, "Exported receivers", packageInfo.receivers, packageName)
-        appendComponents(out, "Exported services", packageInfo.services, packageName)
-        appendComponents(out, "Exported providers", packageInfo.providers, packageName)
+        appendComponents(out, pack.context.getString(R.string.command_inspect_exported_activities_b6ea7), packageInfo.activities, packageName)
+        appendComponents(out, pack.context.getString(R.string.command_inspect_exported_receivers_2f5cd), packageInfo.receivers, packageName)
+        appendComponents(out, pack.context.getString(R.string.command_inspect_exported_services_4f00c), packageInfo.services, packageName)
+        appendComponents(out, pack.context.getString(R.string.command_inspect_exported_providers_8cbae), packageInfo.providers, packageName)
         return out.toString().trim()
     }
 

@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher.managers.suggestions
 
+import ohi.andre.consolelauncher.R
 import android.content.Context
 import android.graphics.Typeface
 import android.view.Gravity
@@ -62,7 +63,7 @@ class SearchModeResultRenderer(
     fun renderOutput(output: CharSequence) {
         clear()
         val resultCard = resultCard()
-        resultCard.addView(categoryHeader("OUTPUT", SuggestionsManager.SearchResult.TYPE_COMMAND))
+        resultCard.addView(categoryHeader(context.getString(R.string.search_category_output), SuggestionsManager.SearchResult.TYPE_COMMAND))
         val card = TextView(context)
         card.typeface = Tuils.getTypeface(context)
         card.textSize = XMLPrefsManager.getInt(Ui.input_output_size).toFloat()
@@ -135,17 +136,17 @@ class SearchModeResultRenderer(
     }
 
     private fun categoryLabel(type: Int): String = when (type) {
-        SuggestionsManager.SearchResult.TYPE_APP -> "APPS"
-        SuggestionsManager.SearchResult.TYPE_CONTACT -> "CONTACTS"
-        SuggestionsManager.SearchResult.TYPE_NOTIFICATION -> "NOTIFICATIONS"
-        SuggestionsManager.SearchResult.TYPE_ALIAS -> "ALIASES"
-        SuggestionsManager.SearchResult.TYPE_COMMAND -> "COMMANDS"
-        SuggestionsManager.SearchResult.TYPE_PARAMETER -> "PARAMS"
-        SuggestionsManager.SearchResult.TYPE_GROUP -> "APP GROUPS"
-        SuggestionsManager.SearchResult.TYPE_PROVIDER -> "WEB"
-        SuggestionsManager.SearchResult.TYPE_PERMISSION -> "ENABLE ACCESS"
-        SuggestionsManager.SearchResult.TYPE_CONTACT_ACTION -> "CONTACT ACTIONS"
-        else -> "RESULTS"
+        SuggestionsManager.SearchResult.TYPE_APP -> context.getString(R.string.search_category_apps)
+        SuggestionsManager.SearchResult.TYPE_CONTACT -> context.getString(R.string.search_category_contacts)
+        SuggestionsManager.SearchResult.TYPE_NOTIFICATION -> context.getString(R.string.search_category_notifications)
+        SuggestionsManager.SearchResult.TYPE_ALIAS -> context.getString(R.string.search_category_aliases)
+        SuggestionsManager.SearchResult.TYPE_COMMAND -> context.getString(R.string.search_category_commands)
+        SuggestionsManager.SearchResult.TYPE_PARAMETER -> context.getString(R.string.search_category_params)
+        SuggestionsManager.SearchResult.TYPE_GROUP -> context.getString(R.string.search_category_app_groups)
+        SuggestionsManager.SearchResult.TYPE_PROVIDER -> context.getString(R.string.search_category_web)
+        SuggestionsManager.SearchResult.TYPE_PERMISSION -> context.getString(R.string.search_category_enable_access)
+        SuggestionsManager.SearchResult.TYPE_CONTACT_ACTION -> context.getString(R.string.search_category_contact_actions)
+        else -> context.getString(R.string.search_category_results)
     }
 
     private fun suggestionType(type: Int): Int = when (type) {

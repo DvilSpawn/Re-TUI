@@ -24,7 +24,7 @@ class alias : ParamCommand() {
                     if (("-" + AliasManager.SCOPE_APP).equals(first, ignoreCase = true) ||
                         ("-" + AliasManager.SCOPE_SCRIPT).equals(first, ignoreCase = true)
                     ) {
-                        scope = first.substring(1).lowercase(Locale.getDefault())
+                        scope = first.substring(1).lowercase(Locale.ROOT)
                         args.removeAt(0)
                     }
                 }
@@ -78,7 +78,7 @@ class alias : ParamCommand() {
 
         companion object {
             fun get(p: String): Param? {
-                val value = p.lowercase(Locale.getDefault())
+                val value = p.lowercase(Locale.ROOT)
                 for (p1 in entries) {
                     if (value.endsWith(p1.label())) {
                         return p1

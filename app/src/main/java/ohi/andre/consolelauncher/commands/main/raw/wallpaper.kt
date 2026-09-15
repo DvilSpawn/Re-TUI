@@ -38,7 +38,7 @@ class wallpaper : ParamCommand() {
             override fun exec(pack: ExecutePack): String? {
                 if (pack is MainPack) {
                     pack.redirectator!!.prepareRedirection(WallpaperAutoConfirmation())
-                    return "Please confirm if you have saved your preset (Yes/No)"
+                    return pack.context.getString(R.string.command_wallpaper_please_confirm_if_you_have_saved_your_pres_87e90)
                 }
                 return enableWallpaperAuto(pack)
             }
@@ -57,7 +57,7 @@ class wallpaper : ParamCommand() {
                 return false
             }
 
-            val label = label()!!.lowercase(Locale.getDefault())
+            val label = label()!!.lowercase(Locale.ROOT)
             if (value == label) {
                 return true
             }
@@ -80,7 +80,7 @@ class wallpaper : ParamCommand() {
         companion object {
             fun get(p: String): Param? {
                 var p = p
-                p = p.lowercase(Locale.getDefault())
+                p = p.lowercase(Locale.ROOT)
                 for (param in entries) {
                     if (param.matches(p)) {
                         return param
@@ -133,11 +133,11 @@ class wallpaper : ParamCommand() {
             }
             if ("no".equals(answer, ignoreCase = true) || "n".equals(answer, ignoreCase = true)) {
                 mainPack.redirectator!!.cleanup()
-                return "Wallpaper auto cancelled."
+                return pack.context.getString(R.string.command_wallpaper_wallpaper_auto_cancelled_4d625)
             }
 
             afterObjects.clear()
-            return "Please answer Yes or No."
+            return pack.context.getString(R.string.command_wallpaper_please_answer_yes_or_no_867a9)
         }
 
         public override fun getHint(): Int {
@@ -202,19 +202,19 @@ class wallpaper : ParamCommand() {
 
         private fun enableWallpaperAuto(pack: ExecutePack): String {
             if (!enableWallpaperAuto(pack.context)) {
-                return "Unable to read wallpaper colors."
+                return pack.context.getString(R.string.command_wallpaper_unable_to_read_wallpaper_colors_259c7)
             }
 
             if (pack.context is Reloadable) {
                 (pack.context as Reloadable).addMessage(
                     "wallpaper",
-                    "Applied wallpaper colors once"
+                    pack.context.getString(R.string.command_wallpaper_applied_wallpaper_colors_once_387a7)
                 )
                 LauncherActivity.preview(pack.context)
                 return Tuils.EMPTYSTRING
             }
 
-            return "Wallpaper colors applied."
+            return pack.context.getString(R.string.command_wallpaper_wallpaper_colors_applied_804d5)
         }
     }
 }

@@ -1,0 +1,29 @@
+<resources>
+    <!-- Command responses. Translate prose; preserve examples and format arguments. -->
+    <!-- UIManager.kt: runTermuxScript -->
+    <string name="surface_dispatch_uimanager_alias_25d3c">"alias: %1$s -&gt; %2$s"</string>
+    <!-- UIManager.kt: runTermuxScript -->
+    <string name="surface_dispatch_uimanager_args_42285">"args: %1$s"</string>
+    <!-- UIManager.kt: runTermuxScript -->
+    <string name="surface_dispatch_uimanager_check_allow_external_apps_true_and_grant_r_58131" formatted="false">"Check allow-external-apps=true and grant RUN_COMMAND permission."</string>
+    <!-- UIManager.kt: runTermuxScript -->
+    <string name="surface_dispatch_uimanager_dispatched_to_termux_f399f">"dispatched to Termux: %1$s"</string>
+    <!-- UIManager.kt: refreshScriptModule -->
+    <string name="surface_dispatch_uimanager_module_has_no_source_6c6aa">"Module has no source: %1$s"</string>
+    <!-- UIManager.kt: runTermuxScript -->
+    <string name="surface_dispatch_uimanager_open_termux_once_then_retry_from_this_cons_7349c" formatted="false">"Open Termux once, then retry from this console."</string>
+    <!-- UIManager.kt: dispatchTermuxAppScript -->
+    <string name="surface_dispatch_uimanager_termux_bridge_is_not_ready_86516" formatted="false">"Termux bridge is not ready."</string>
+    <!-- UIManager.kt: dispatchTermuxAppScript -->
+    <string name="surface_dispatch_uimanager_termux_rejected_the_app_command_permission_24c17" formatted="false">"Termux rejected the app command: permission denied."</string>
+    <!-- UIManager.kt: runTermuxScript -->
+    <string name="surface_dispatch_uimanager_termux_rejected_the_command_permission_den_5c116" formatted="false">"Termux rejected the command: permission denied."</string>
+    <!-- UIManager.kt: dispatchTermuxWorkspaceScript -->
+    <string name="surface_dispatch_uimanager_termux_rejected_the_workspace_command_perm_f820f" formatted="false">"Termux rejected the workspace command: permission denied."</string>
+    <!-- UIManager.kt: dispatchTermuxAppScript -->
+    <string name="surface_dispatch_uimanager_unable_to_dispatch_app_command_44ccd">"unable to dispatch app command: %1$s"</string>
+    <!-- UIManager.kt: runTermuxScript -->
+    <string name="surface_dispatch_uimanager_unable_to_dispatch_termux_command_45f68">"unable to dispatch Termux command: %1$s"</string>
+    <!-- UIManager.kt: dispatchTermuxWorkspaceScript -->
+    <string name="surface_dispatch_uimanager_unable_to_dispatch_workspace_command_f5a19">"unable to dispatch workspace command: %1$s"</string>
+</resources>

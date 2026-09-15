@@ -38,14 +38,14 @@ class termux : CommandAbstraction {
         }
 
         val stripped = raw.removePrefix("-").trim { it <= ' ' }
-        val lower = stripped.lowercase(Locale.getDefault())
+        val lower = stripped.lowercase(Locale.ROOT)
         when {
             lower == "run" || lower.startsWith("run ") -> openConsole(pack, stripped)
             lower == "status" || lower == "setup" || lower == "help" -> openWorkspace(pack, lower)
             lower == "apps" || lower == "app-ls" -> openWorkspace(pack, "help")
             lower == "app" || lower.startsWith("app ") -> {
                 val id = stripped.substringAfter(' ', "").trim { it <= ' ' }
-                openWorkspace(pack, if (id.isEmpty()) "help" else "launch $id")
+                openWorkspace(pack, if (id.isEmpty()) "help" else pack.context.getString(R.string.command_termux_launch_e8102, id))
             }
             lower.startsWith("app-add") || lower.startsWith("add-app")
                 || lower.startsWith("app-rm") || lower.startsWith("rm-app")

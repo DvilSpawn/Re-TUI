@@ -16,12 +16,12 @@ class mode : CommandAbstraction {
     override fun exec(pack: ExecutePack): String {
         val requested = pack.getString()?.trim()?.lowercase(Locale.US).orEmpty()
         if (requested.isEmpty() || requested == "status" || requested == "-status") {
-            return status()
+            return status(pack)
         }
         val enabled = when (requested) {
             "search" -> true
             "classic" -> false
-            else -> return "Unknown launcher mode: $requested\nUsage: mode search|classic"
+            else -> return pack.context.getString(R.string.command_mode_unknown_launcher_mode_usage_mode_search_cl_a86ba, requested)
         }
         LauncherSettings.set(pack.context, Behavior.search_only_mode, enabled.toString())
         val launcher = pack.context as? LauncherActivity ?: LauncherActivity.instance
@@ -29,7 +29,7 @@ class mode : CommandAbstraction {
             {
                 Toast.makeText(
                     pack.context,
-                    if (enabled) "Search mode enabled." else "Classic mode enabled.",
+                    if (enabled) pack.context.getString(R.string.command_mode_search_mode_enabled_ba524) else pack.context.getString(R.string.command_mode_classic_mode_enabled_dd49a),
                     Toast.LENGTH_SHORT
                 ).show()
                 launcher?.refreshUiInPlace() ?: LauncherActivity.preview(pack.context.applicationContext)
@@ -48,8 +48,8 @@ class mode : CommandAbstraction {
     override fun onArgNotFound(pack: ExecutePack, indexNotFound: Int): String =
         pack.context.getString(R.string.help_mode)
 
-    override fun onNotArgEnough(pack: ExecutePack, nArgs: Int): String = status()
+    override fun onNotArgEnough(pack: ExecutePack, nArgs: Int): String = status(pack)
 
-    private fun status(): String =
-        "Launcher mode: " + if (LauncherSettings.getBoolean(Behavior.search_only_mode)) "search" else "classic"
+    private fun status(pack: ExecutePack): String =
+        pack.context.getString(R.string.launcher_mode_status, if (LauncherSettings.getBoolean(Behavior.search_only_mode)) "search" else "classic")
 }

@@ -58,8 +58,9 @@ class notes : CommandAbstraction {
             send(pack, NotesManager.ACTION_CP, parts[1], false)
             return null
         }
-        if (option == "-file") {
-            pack.context.startActivity(Tuils.openFile(pack.context, File(Tuils.getFolder(), NotesManager.PATH)))
+        if (option == "-file") return openEditor(pack)
+        if (option == "-open" && parts.size >= 2) {
+            send(pack, NotesManager.ACTION_OPEN, parts[1], false)
             return null
         }
 
@@ -67,13 +68,7 @@ class notes : CommandAbstraction {
     }
 
     private fun openEditor(pack: ExecutePack): String {
-        val intent = Intent(pack.context, NotesEditorActivity::class.java)
-        if (pack.context is Activity) {
-            (pack.context as Activity).startActivityForResult(intent, LauncherActivity.TUIXT_REQUEST)
-        } else {
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            pack.context.startActivity(intent)
-        }
+        ohi.andre.consolelauncher.notes.LauncherNotes.open(pack.context)
         return Tuils.EMPTYSTRING
     }
 

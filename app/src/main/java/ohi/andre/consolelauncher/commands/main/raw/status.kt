@@ -84,7 +84,7 @@ class status : CommandAbstraction {
             .append(info.res.getString(R.string.bluetooth_label)).append(Tuils.SPACE).append(bluetoothOn).append(Tuils.NEWLINE)
             .append(info.res.getString(R.string.location_label)).append(Tuils.SPACE).append(gpsEnabled || networkEnabled).append(Tuils.NEWLINE)
             .append(info.res.getString(R.string.brightness_label)).append(Tuils.SPACE)
-            .append(if (autobrightnessState == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC) "(auto) " else Tuils.EMPTYSTRING)
+            .append(if (autobrightnessState == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC) pack.context.getString(R.string.command_status_auto_2130c) else Tuils.EMPTYSTRING)
             .append(brightness).append("%")
 
         return builder.toString()

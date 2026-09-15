@@ -30,10 +30,10 @@ class reminder : CommandAbstraction {
     private fun remove(pack: ExecutePack, parts: List<String>): String {
         if (parts.size != 2) return pack.context.getString(R.string.help_reminder)
         val item = ReminderManager.get(pack.context, parts[1])
-            ?: return "Reminder not found.\n${ReminderManager.formatList(pack.context)}"
+            ?: return pack.context.getString(R.string.command_reminder_reminder_not_found_032c9, ReminderManager.formatList(pack.context))
         ReminderManager.remove(pack.context, item.id)
         refresh(pack)
-        return "Reminder removed:\n${item.title}"
+        return pack.context.getString(R.string.command_reminder_reminder_removed_c83f7, item.title)
     }
 
     private fun add(pack: ExecutePack, parts: List<String>): String {
@@ -42,11 +42,11 @@ class reminder : CommandAbstraction {
         val time = parts.last()
         val title = parts.subList(1, parts.lastIndex - 1).joinToString(" ").trim()
         val at = ReminderManager.parseCliDateTime(date, time)
-        if (title.isEmpty() || at == null) return "Use: reminder -add <task name> <dd/mm/yy> <HH:mm>"
-        if (at <= System.currentTimeMillis()) return "Reminder time must be in the future."
+        if (title.isEmpty() || at == null) return pack.context.getString(R.string.command_reminder_use_reminder_add_task_name_dd_mm_yy_hh_mm_b2567)
+        if (at <= System.currentTimeMillis()) return pack.context.getString(R.string.command_reminder_reminder_time_must_be_in_the_future_3ea25)
         val saved = ReminderManager.add(pack.context, title, at)
         refresh(pack)
-        return "Reminder saved:\n${saved.title}\n${ReminderManager.formatWhen(saved.atMillis)}"
+        return pack.context.getString(R.string.command_reminder_reminder_saved_42413, saved.title, ReminderManager.formatWhen(pack.context, saved.atMillis))
     }
 
     private fun open(pack: ExecutePack): String {

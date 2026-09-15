@@ -36,7 +36,7 @@ class uninstall : CommandAbstraction {
             return e.toString()
         }
 
-        return String.format("Uninstalling %s...", packageName)
+        return info.context.getString(R.string.uninstalling_package, packageName)
     }
 
     override fun helpRes(): Int = R.string.help_uninstall

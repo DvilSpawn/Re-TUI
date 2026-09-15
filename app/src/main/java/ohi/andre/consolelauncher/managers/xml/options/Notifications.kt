@@ -1,46 +1,47 @@
 package ohi.andre.consolelauncher.managers.xml.options
 
+import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.managers.notifications.NotificationManager
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsElement
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave
 
 enum class Notifications(
     private val defaultValue: String,
-    private val info: String,
+    private val info: Int,
     private val type: String = XMLPrefsSave.BOOLEAN
 ) : XMLPrefsSave {
-    show_notifications("false", "If true, Re:T-UI will show every incoming notification"),
-    terminal_notifications("true", "If true, notifications will be printed in the terminal"),
+    show_notifications("false", R.string.setting_notifications_show_notifications_description),
+    terminal_notifications("true", R.string.setting_notifications_terminal_notifications_description),
     app_notification_enabled_default(
         "true",
-        "If true, Re:T-UI will show notifications from all apps, unless they are explicitly excluded. If false, Re:T-UI won't show a notification from a specific app unless it was \texplicitly included"
+        R.string.setting_notifications_app_notification_enabled_default_description
     ),
-    notification_text_color("#00FF00", "Notification text color", XMLPrefsSave.COLOR),
-    notification_format("[%t] %pkg: %[100][teal]title --- %text", "The default format", XMLPrefsSave.TEXT),
+    notification_text_color("#00FF00", R.string.setting_notifications_notification_text_color_description, XMLPrefsSave.COLOR),
+    notification_format("[%t] %pkg: %[100][teal]title --- %text", R.string.setting_notifications_notification_format_description, XMLPrefsSave.TEXT),
     click_notification(
         "true",
-        "If true, Re:T-UI will perform the operation associated with the original notification when you click it"
+        R.string.setting_notifications_click_notification_description
     ),
     long_click_notification(
         "true",
-        "If true, you will be able to perform some quick operations long-clicking a notification"
+        R.string.setting_notifications_long_click_notification_description
     ),
     notification_popup_exclude_app(
         "true",
-        "If false, the \"Exclude app\" option won't be shown in the long click popup menu"
+        R.string.setting_notifications_notification_popup_exclude_app_description
     ),
     notification_popup_exclude_notification(
         "true",
-        "If false, the \"Exclude notification\" option won't be shown in the long click popup menu"
+        R.string.setting_notifications_notification_popup_exclude_notification_description
     ),
     notification_popup_reply(
         "true",
-        "If false, the \"Reply to the last notification\" option won't be shown in the long click popup menu"
+        R.string.setting_notifications_notification_popup_reply_description
     );
 
     override fun defaultValue(): String = defaultValue
 
-    override fun info(): String = info
+    override fun infoRes(): Int = info
 
     override fun parent(): XMLPrefsElement? = NotificationManager.instance
 

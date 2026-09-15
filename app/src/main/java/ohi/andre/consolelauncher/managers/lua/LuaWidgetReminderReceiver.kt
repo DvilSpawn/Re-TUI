@@ -15,7 +15,8 @@ import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.managers.LauncherSoundManager
 
 class LuaWidgetReminderReceiver : BroadcastReceiver() {
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(rawContext: Context, intent: Intent) {
+        val context = ohi.andre.consolelauncher.localization.LanguagePacks.wrap(rawContext)
         val record = LuaWidgetReminderManager.fire(
             context,
             intent.getStringExtra(LuaWidgetReminderManager.EXTRA_KEY)
@@ -32,12 +33,12 @@ class LuaWidgetReminderReceiver : BroadcastReceiver() {
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
 
-        val title = if (record.title.trim { it <= ' ' }.isEmpty()) "Habit reminder" else record.title
+        val title = if (record.title.trim { it <= ' ' }.isEmpty()) context.getString(R.string.integration_luawidgetreminderreceiver_habit_reminder_5378e) else record.title
         val soundPackEnabled = LauncherSoundManager.isEnabled()
         LauncherSoundManager.play(context, LauncherSoundManager.Event.NOTIFICATION)
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.mipmap.ic_launcher)
-            .setContentTitle("Re:T-UI module")
+            .setContentTitle(context.getString(R.string.integration_luawidgetreminderreceiver_re_t_ui_module_52869))
             .setContentText(title)
             .setStyle(NotificationCompat.BigTextStyle().bigText(title))
             .setContentIntent(content)
@@ -60,10 +61,10 @@ class LuaWidgetReminderReceiver : BroadcastReceiver() {
         }
         val channel = NotificationChannel(
             CHANNEL_ID,
-            "Re:T-UI Module Notifications",
+            context.getString(R.string.integration_luawidgetreminderreceiver_re_t_ui_module_notifications_424d3),
             NotificationManager.IMPORTANCE_HIGH
         )
-        channel.description = "Notifications scheduled by Re:T-UI Lua modules."
+        channel.description = context.getString(R.string.integration_luawidgetreminderreceiver_notifications_scheduled_by_re_t_ui_lua_mod_55ae4)
         manager.createNotificationChannel(channel)
     }
 

@@ -1,0 +1,4 @@
+<!-- Source: Tabler Icons outline/trash.svg, MIT License. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24">
+    <path android:fillColor="@android:color/transparent" android:strokeColor="#FFFFFFFF" android:strokeWidth="2" android:strokeLineCap="round" android:strokeLineJoin="round" android:pathData="M4,7h16M10,11v6M14,11v6M5,7l1,14h12l1,-14M9,7V4h6v3" />
+</vector>

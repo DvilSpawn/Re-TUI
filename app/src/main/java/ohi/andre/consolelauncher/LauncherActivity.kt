@@ -86,7 +86,7 @@ import ohi.andre.consolelauncher.managers.xml.options.Notifications
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi
 import ohi.andre.consolelauncher.commands.main.MainPack
 
-class LauncherActivity : AppCompatActivity(), Reloadable {
+class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompatActivity(), Reloadable {
     @get:JvmName("getUIManager")
     var uiManager: UIManager? = null
         private set
@@ -181,7 +181,7 @@ class LauncherActivity : AppCompatActivity(), Reloadable {
                 }
                 Toast.makeText(
                     this,
-                    "Please grant storage permissions to Re:T-UI",
+                    getString(R.string.launcher_grant_storage),
                     Toast.LENGTH_LONG
                 ).show()
                 enableEdgeToEdge()
@@ -728,7 +728,7 @@ class LauncherActivity : AppCompatActivity(), Reloadable {
                 } else {
                     Toast.makeText(
                         this,
-                        "Storage permission is required for Re:T-UI to function.",
+                        getString(R.string.launcher_storage_required),
                         Toast.LENGTH_LONG
                     ).show()
                     finish()

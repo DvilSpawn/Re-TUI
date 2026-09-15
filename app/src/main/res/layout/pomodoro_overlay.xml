@@ -19,7 +19,7 @@
         android:paddingRight="12dp"
         android:paddingTop="2dp"
         android:paddingBottom="2dp"
-        android:text="FOCUS MODE ACTIVE"
+        android:text="@string/ui_pomodoro_overlay_focus_mode_active"
         android:textColor="#FFFF0000"
         style="@style/Retui.Text.Title"
         android:textStyle="bold" />
@@ -35,7 +35,7 @@
         android:paddingRight="12dp"
         android:paddingTop="2dp"
         android:paddingBottom="2dp"
-        android:text="Task: Focus"
+        android:text="@string/ui_pomodoro_overlay_task_focus"
         android:textColor="#FFAAAAAA"
         style="@style/Retui.Text.Body" />
 
@@ -50,7 +50,7 @@
         android:paddingRight="20dp"
         android:paddingTop="4dp"
         android:paddingBottom="4dp"
-        android:text="25:00"
+        android:text="@string/ui_token_155130c69f"
         android:textColor="#FF889955"
         style="@style/Retui.Text.Display"
         android:textStyle="bold" />
@@ -59,7 +59,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="------------------------------------------------"
+        android:text="@string/ui_token_5b61e9b149"
         android:textColor="#FF889955"
         style="@style/Retui.Text.Body" />
 
@@ -80,7 +80,7 @@
         android:layout_marginTop="30dp"
         android:background="@android:color/transparent"
         android:padding="10dp"
-        android:text="TERMINATE SESSION"
+        android:text="@string/ui_pomodoro_overlay_terminate_session"
         android:textColor="#FF889955"
         style="@style/Retui.Text.Body" />
 

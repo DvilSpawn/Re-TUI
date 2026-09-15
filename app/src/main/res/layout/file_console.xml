@@ -60,7 +60,7 @@
                     android:id="@+id/file_prefix"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="$ "
+                    android:text="@string/ui_token_48bb4ccc18"
                     style="@style/Retui.Text.Body" />
 
                 <EditText
@@ -92,7 +92,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="REFRESH"
+                    android:text="@string/ui_file_console_refresh"
                     style="@style/Retui.Text.Caption" />
 
                 <TextView
@@ -101,7 +101,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="UP"
+                    android:text="@string/ui_file_console_up"
                     style="@style/Retui.Text.Caption" />
 
                 <TextView
@@ -110,7 +110,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="OPEN"
+                    android:text="@string/ui_file_console_open"
                     style="@style/Retui.Text.Caption" />
 
                 <TextView
@@ -119,7 +119,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="PASTE"
+                    android:text="@string/ui_file_console_paste"
                     style="@style/Retui.Text.Caption" />
         </LinearLayout>
     </LinearLayout>
@@ -136,7 +136,7 @@
         android:paddingTop="2dp"
         android:paddingEnd="12dp"
         android:paddingBottom="2dp"
-        android:text="FILES"
+        android:text="@string/ui_file_console_files"
         style="@style/Retui.Text.Body" />
 
     <TextView
@@ -146,7 +146,7 @@
         android:layout_gravity="top|end"
         android:layout_marginTop="8dp"
         android:gravity="center"
-        android:text="X"
+        android:text="@string/ui_file_console_x"
         style="@style/Retui.Text.Header" />
 
 </FrameLayout>

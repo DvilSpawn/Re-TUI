@@ -1,0 +1,49 @@
+<resources>
+    <!-- Command responses. Translate prose; preserve examples and format arguments. -->
+    <!-- PodcastManager.kt: toggle -->
+    <string name="podcast_podcastmanager_buffering_episode_64f5f" formatted="false">"Buffering episode..."</string>
+    <!-- PodcastManager.kt: fetch -->
+    <string name="podcast_podcastmanager_empty_feed_c88eb" formatted="false">"empty feed"</string>
+    <!-- PodcastManager.kt: play -->
+    <string name="podcast_podcastmanager_episode_not_found_c7d67" formatted="false">"Episode not found."</string>
+    <!-- PodcastManager.kt: fetch -->
+    <string name="podcast_podcastmanager_feed_exceeds_mb_40110">"feed exceeds %1$d MB"</string>
+    <!-- PodcastManager.kt: fetch -->
+    <string name="podcast_podcastmanager_insecure_feed_redirect_0d13f" formatted="false">"insecure feed redirect"</string>
+    <!-- PodcastManager.kt: next -->
+    <string name="podcast_podcastmanager_next_podcast_episode_5978b" formatted="false">"Next podcast episode."</string>
+    <!-- PodcastManager.kt: previous -->
+    <string name="podcast_podcastmanager_no_playable_episodes_de295" formatted="false">"No playable episodes."</string>
+    <!-- PodcastManager.kt: refreshSelectedShow -->
+    <string name="podcast_podcastmanager_no_podcast_feeds_yet_use_podcast_add_feed_ac1c0" formatted="false">"No podcast feeds yet. Use podcast add &lt;feed-url&gt;."</string>
+    <!-- PodcastManager.kt: seekTo -->
+    <string name="podcast_podcastmanager_no_podcast_is_loaded_b6034" formatted="false">"No podcast is loaded."</string>
+    <!-- PodcastManager.kt: previous -->
+    <string name="podcast_podcastmanager_no_podcast_selected_7cc72" formatted="false">"No podcast selected."</string>
+    <!-- PodcastManager.kt: setPlaybackSpeed -->
+    <string name="podcast_podcastmanager_playback_speed_c9363">"Playback speed: %1$s"</string>
+    <!-- PodcastManager.kt: setPlaybackSpeed -->
+    <string name="podcast_podcastmanager_playback_speed_must_be_between_and_d70f4">"Playback speed must be between %1$s and %2$s."</string>
+    <!-- PodcastManager.kt: toggle -->
+    <string name="podcast_podcastmanager_playing_7dabc">"Playing: %1$s"</string>
+    <!-- PodcastManager.kt: subscribe -->
+    <string name="podcast_podcastmanager_podcast_feed_url_must_be_a_valid_https_add_75717" formatted="false">"Podcast feed URL must be a valid https:// address."</string>
+    <!-- PodcastManager.kt: removeShow -->
+    <string name="podcast_podcastmanager_podcast_not_found_7370e" formatted="false">"Podcast not found."</string>
+    <!-- PodcastManager.kt: toggle -->
+    <string name="podcast_podcastmanager_podcast_paused_a48d7" formatted="false">"Podcast paused."</string>
+    <!-- PodcastManager.kt: seekTo -->
+    <string name="podcast_podcastmanager_podcast_playback_is_unavailable_591a1" formatted="false">"Podcast playback is unavailable."</string>
+    <!-- PodcastManager.kt: refreshFeed -->
+    <string name="podcast_podcastmanager_podcast_refresh_failed_5aa91">"Podcast refresh failed: %1$s"</string>
+    <!-- PodcastManager.kt: previous -->
+    <string name="podcast_podcastmanager_previous_podcast_episode_2926a" formatted="false">"Previous podcast episode."</string>
+    <!-- PodcastManager.kt: removeShow -->
+    <string name="podcast_podcastmanager_removed_d9c0f">"Removed: %1$s"</string>
+    <!-- PodcastManager.kt: play -->
+    <string name="podcast_podcastmanager_starting_podcast_5f39c" formatted="false">"Starting podcast..."</string>
+    <!-- PodcastManager.kt: setTags -->
+    <string name="podcast_podcastmanager_tags_8d749">"Tags: %1$s"</string>
+    <!-- PodcastManager.kt: setTags -->
+    <string name="podcast_podcastmanager_tags_cleared_e364f">"Tags cleared: %1$s"</string>
+</resources>

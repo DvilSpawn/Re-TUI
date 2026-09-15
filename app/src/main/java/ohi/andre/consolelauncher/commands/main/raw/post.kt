@@ -43,20 +43,20 @@ class post : CommandAbstraction {
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 val error = e.toString()
-                handler.post { Tuils.sendOutput(info.context, "POST Error: $error") }
+                handler.post { Tuils.sendOutput(info.context, pack.context.getString(R.string.command_post_post_error_91b4e, error)) }
             }
 
             @Throws(IOException::class)
             override fun onResponse(call: Call, response: Response) {
                 response.use { r ->
-                    val resBody = r.body?.string() ?: "Empty Response"
+                    val resBody = r.body?.string() ?: pack.context.getString(R.string.command_post_empty_response_a5c48)
                     val code = r.code
-                    handler.post { Tuils.sendOutput(info.context, "POST [$code]: $resBody") }
+                    handler.post { Tuils.sendOutput(info.context, pack.context.getString(R.string.command_post_post_591a3, code, resBody)) }
                 }
             }
         })
 
-        return "Sending POST request..."
+        return pack.context.getString(R.string.command_post_sending_post_request_2dba0)
     }
 
     override fun helpRes(): Int = R.string.help_post

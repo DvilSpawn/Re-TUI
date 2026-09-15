@@ -1,11 +1,13 @@
 package ohi.andre.consolelauncher.managers.status
 
+import ohi.andre.consolelauncher.R
 import com.jayway.jsonpath.JsonPath
 import java.util.Locale
 
 internal data class WeatherSnapshot(
     val values: Map<String, String>,
-    val symbolCode: String
+    val symbolCode: String,
+    val conditionResource: Int
 )
 
 internal object WeatherResponseParser {
@@ -18,8 +20,6 @@ internal object WeatherResponseParser {
                 ?: return null
             val temperature = readNumber(document, "$details.air_temperature") ?: return null
             val values = linkedMapOf(
-                "main" to conditionName(symbol),
-                "description" to conditionName(symbol),
                 "temp" to number(convertTemperature(temperature, temperatureMeasure)),
                 "symbol_code" to symbol
             )
@@ -31,7 +31,7 @@ internal object WeatherResponseParser {
             readNumber(document, "$details.wind_speed")?.let {
                 values["speed"] = number(if (temperatureMeasure == "imperial") it * 2.236936 else it)
             }
-            WeatherSnapshot(values, symbol)
+            WeatherSnapshot(values, symbol, conditionResource(symbol))
         } catch (_: Exception) {
             null
         }
@@ -74,24 +74,50 @@ internal object WeatherResponseParser {
         }
     }
 
-    private fun conditionName(symbolCode: String): String {
+    internal fun conditionResource(symbolCode: String): Int {
         val symbol = symbolCode.removeSuffix("_day").removeSuffix("_night").removeSuffix("_polartwilight")
-        val weight = when {
-            symbol.startsWith("light") -> "Light "
-            symbol.startsWith("heavy") -> "Heavy "
-            else -> ""
-        }
-        return weight + when {
-            "thunder" in symbol -> "thunderstorm"
-            "snow" in symbol -> if ("showers" in symbol) "snow showers" else "snow"
-            "sleet" in symbol -> if ("showers" in symbol) "sleet showers" else "sleet"
-            "rain" in symbol -> if ("showers" in symbol) "rain showers" else "rain"
-            symbol == "partlycloudy" -> "Partly cloudy"
-            symbol == "cloudy" -> "Cloudy"
-            symbol == "fog" -> "Fog"
-            symbol == "fair" -> "Fair"
-            symbol == "clearsky" -> "Clear"
-            else -> symbol.replace('_', ' ')
+        return when {
+            "thunder" in symbol -> when {
+                symbol.startsWith("light") -> R.string.weather_condition_light_thunderstorm
+                symbol.startsWith("heavy") -> R.string.weather_condition_heavy_thunderstorm
+                else -> R.string.weather_condition_thunderstorm
+            }
+            "snow" in symbol && "showers" in symbol -> when {
+                symbol.startsWith("light") -> R.string.weather_condition_light_snow_showers
+                symbol.startsWith("heavy") -> R.string.weather_condition_heavy_snow_showers
+                else -> R.string.weather_condition_snow_showers
+            }
+            "snow" in symbol -> when {
+                symbol.startsWith("light") -> R.string.weather_condition_light_snow
+                symbol.startsWith("heavy") -> R.string.weather_condition_heavy_snow
+                else -> R.string.weather_condition_snow
+            }
+            "sleet" in symbol && "showers" in symbol -> when {
+                symbol.startsWith("light") -> R.string.weather_condition_light_sleet_showers
+                symbol.startsWith("heavy") -> R.string.weather_condition_heavy_sleet_showers
+                else -> R.string.weather_condition_sleet_showers
+            }
+            "sleet" in symbol -> when {
+                symbol.startsWith("light") -> R.string.weather_condition_light_sleet
+                symbol.startsWith("heavy") -> R.string.weather_condition_heavy_sleet
+                else -> R.string.weather_condition_sleet
+            }
+            "rain" in symbol && "showers" in symbol -> when {
+                symbol.startsWith("light") -> R.string.weather_condition_light_rain_showers
+                symbol.startsWith("heavy") -> R.string.weather_condition_heavy_rain_showers
+                else -> R.string.weather_condition_rain_showers
+            }
+            "rain" in symbol -> when {
+                symbol.startsWith("light") -> R.string.weather_condition_light_rain
+                symbol.startsWith("heavy") -> R.string.weather_condition_heavy_rain
+                else -> R.string.weather_condition_rain
+            }
+            symbol == "partlycloudy" -> R.string.weather_condition_partlycloudy
+            symbol == "cloudy" -> R.string.weather_condition_cloudy
+            symbol == "fog" -> R.string.weather_condition_fog
+            symbol == "fair" -> R.string.weather_condition_fair
+            symbol == "clearsky" -> R.string.weather_condition_clearsky
+            else -> R.string.weather_condition_unknown
         }
     }
 

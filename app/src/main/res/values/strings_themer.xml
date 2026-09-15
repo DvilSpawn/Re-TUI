@@ -1,0 +1,588 @@
+<resources>
+    <!-- Settings hub. Translate prose; keep commands, filenames, product names and units intact. -->
+    <!-- bindKeyboardShortcutPanel -->
+    <string name="themer_1_app_2_apps_5e208" formatted="false">"•  1 APP     ••  2 APPS"</string>
+    <!-- framePackRow -->
+    <string name="themer_active_5b74a" formatted="false">"  •  ACTIVE"</string>
+    <!-- showFrameEditor -->
+    <string name="themer_all_surfaces_d0273" formatted="false">"All surfaces"</string>
+    <!-- showKeyboardShortcutAppPicker -->
+    <string name="themer_app_fc4a6" formatted="false">"App"</string>
+    <!-- shortcutKeyView -->
+    <string name="themer_app_shortcuts_b6cc6">"%1$s, %2$d app shortcuts"</string>
+    <!-- applyFramePack -->
+    <string name="themer_applied_56d65">"%1$s applied."</string>
+    <!-- framePackRow -->
+    <string name="themer_applied_d879d" formatted="false">"APPLIED"</string>
+    <!-- createFontScaleViewHolder -->
+    <string name="themer_apply_4433c" formatted="false">"APPLY"</string>
+    <!-- showFrameEditor -->
+    <string name="themer_apply_edits_ec4da" formatted="false">"APPLY EDITS"</string>
+    <!-- bindFramePanel -->
+    <string name="themer_apply_one_frame_to_all_surfaces_aa400" formatted="false">"Apply one frame to all surfaces"</string>
+    <!-- getHeaderText -->
+    <string name="themer_apply_preset_72454" formatted="false">"Apply Preset"</string>
+    <!-- showPreferredMusicAppPicker -->
+    <string name="themer_auto_detect_85cd1" formatted="false">"Auto detect"</string>
+    <!-- handleBackupResult -->
+    <string name="themer_backup_cancelled_8ae7e" formatted="false">"Backup cancelled."</string>
+    <!-- handleBackupResult -->
+    <string name="themer_backup_cancelled_before_export_67b17" formatted="false">"Backup cancelled before export."</string>
+    <!-- exportBackup -->
+    <string name="themer_backup_exported_and_verified_52e08" formatted="false">"Backup exported and verified."</string>
+    <!-- exportBackup -->
+    <string name="themer_backup_failed_7fd26" formatted="false">"Backup failed."</string>
+    <!-- showRestorePasswordDialog -->
+    <string name="themer_backup_password_d96a6" formatted="false">"Backup password"</string>
+    <!-- showBackupPasswordDialog -->
+    <string name="themer_backup_password_f6bc2" formatted="false">"Backup Password"</string>
+    <!-- launchBackupPicker -->
+    <string name="themer_backup_picker_is_unavailable_on_this_device_5eb44" formatted="false">"Backup picker is unavailable on this device."</string>
+    <!-- showBackupProtectionDialog -->
+    <string name="themer_backup_protection_6fea3" formatted="false">"Backup Protection"</string>
+    <!-- restoreBackup -->
+    <string name="themer_backup_restored_reloading_49aae" formatted="false">"Backup restored. Reloading..."</string>
+    <!-- showShareableBehaviorPicker -->
+    <string name="themer_behavior_sharing_441b1" formatted="false">"Behavior Sharing"</string>
+    <!-- showFrameEditor -->
+    <string name="themer_border_size_dp_42fb4" formatted="false">"BORDER SIZE (DP)"</string>
+    <!-- floatValue -->
+    <string name="themer_borders_must_be_between_0_and_256_dp_49480" formatted="false">"Borders must be between 0 and 256 dp."</string>
+    <!-- framePackRow -->
+    <string name="themer_built_in_9cfde" formatted="false">"  •  BUILT-IN"</string>
+    <!-- showFrameEditor -->
+    <string name="themer_cancel_1507c" formatted="false">"CANCEL"</string>
+    <!-- showRestorePasswordDialog -->
+    <string name="themer_cancel_77dfd" formatted="false">"Cancel"</string>
+    <!-- handleUiPackageZipImportResult -->
+    <string name="themer_choose_a_file_ending_in_retui_ui_zip_0571c" formatted="false">"Choose a file ending in .retui_ui.zip."</string>
+    <!-- handleFontImportResult -->
+    <string name="themer_choose_a_ttf_or_otf_font_file_7d188" formatted="false">"Choose a .ttf or .otf font file."</string>
+    <!-- bindKeyboardShortcutPanel -->
+    <string name="themer_choose_app_8234e" formatted="false">"CHOOSE APP"</string>
+    <!-- showShareableBehaviorPicker -->
+    <string name="themer_choose_which_behavior_values_to_include_the_existing_safe_56372" formatted="false">"Choose which behavior values to include. The existing safe set starts enabled. Optional values may contain locations, folders, API keys, notification text, or executable commands."</string>
+    <!-- showKeyboardShortcutAppPicker -->
+    <string name="themer_clear_slot_e4ba8" formatted="false">"Clear slot"</string>
+    <!-- showToolbarButtonCommandDialog -->
+    <string name="themer_command_is_required_475a6" formatted="false">"Command is required."</string>
+    <!-- showToolbarButtonCommandDialog -->
+    <string name="themer_command_or_app_name_9daa1" formatted="false">"Command or app name"</string>
+    <!-- handleShareableConfigurationResult -->
+    <string name="themer_configuration_export_cancelled_92e07" formatted="false">"Configuration export cancelled."</string>
+    <!-- handleShareableConfigurationResult -->
+    <string name="themer_configuration_export_failed_36f82" formatted="false">"Configuration export failed."</string>
+    <!-- launchShareableConfigurationPicker -->
+    <string name="themer_configuration_picker_is_unavailable_on_this_device_6c2c4" formatted="false">"Configuration picker is unavailable on this device."</string>
+    <!-- showBackupPasswordDialog -->
+    <string name="themer_confirm_password_4a7c5" formatted="false">"Confirm password"</string>
+    <!-- showShareableBehaviorPicker -->
+    <string name="themer_continue_2e026" formatted="false">"Continue"</string>
+    <!-- savePendingFontChanges -->
+    <string name="themer_could_not_apply_font_8bf6d">"Could not apply font: %1$s"</string>
+    <!-- applyFramePack -->
+    <string name="themer_could_not_apply_frame_pack_abfd3">"Could not apply frame pack: %1$s"</string>
+    <!-- showCreateFramePack -->
+    <string name="themer_could_not_create_frame_pack_f8989">"Could not create frame pack: %1$s"</string>
+    <!-- deleteFont -->
+    <string name="themer_could_not_delete_font_559bc" formatted="false">"Could not delete font."</string>
+    <!-- confirmDeleteFramePack -->
+    <string name="themer_could_not_delete_frame_pack_b1e2e">"Could not delete frame pack: %1$s"</string>
+    <!-- applyFont -->
+    <string name="themer_could_not_preview_font_c979a">"Could not preview font: %1$s"</string>
+    <!-- showReplaceFramePack -->
+    <string name="themer_could_not_replace_frame_pack_5928b">"Could not replace frame pack: %1$s"</string>
+    <!-- saveCurrentFramePack -->
+    <string name="themer_could_not_save_frame_pack_55234">"Could not save frame pack: %1$s"</string>
+    <!-- persistFrameSession -->
+    <string name="themer_could_not_save_frame_settings_a3663">"Could not save frame settings: %1$s"</string>
+    <!-- showCreateFramePack -->
+    <string name="themer_create_6e157" formatted="false">"Create"</string>
+    <!-- showCreateFramePack -->
+    <string name="themer_create_frame_pack_35416" formatted="false">"Create Frame Pack"</string>
+    <!-- saveFrameChanges -->
+    <string name="themer_create_new_pack_bc161" formatted="false">"Create new pack"</string>
+    <!-- showShareableConfigurationSourcePicker -->
+    <string name="themer_current_active_look_ffd5a" formatted="false">"Current Active Look"</string>
+    <!-- framePackRow -->
+    <string name="themer_custom_frame_72172" formatted="false">" custom frame"</string>
+    <!-- framePackRow -->
+    <string name="themer_custom_frames_43417" formatted="false">" custom frames"</string>
+    <!-- bindFramePanel -->
+    <string name="themer_custom_frames_disabled_your_active_pack_is_preserved_a8170" formatted="false">"Custom frames disabled. Your active pack is preserved."</string>
+    <!-- bindFramePanel -->
+    <string name="themer_custom_frames_enabled_4475d" formatted="false">"Custom frames enabled."</string>
+    <!-- createFontScaleViewHolder -->
+    <string name="themer_decrease_font_size_offset_18761" formatted="false">"Decrease font size offset"</string>
+    <!-- bindFontScalePanel -->
+    <string name="themer_decrease_size_469ef">"Decrease %1$s size"</string>
+    <!-- frameAssignmentRow -->
+    <string name="themer_default_border_selected_09de3" formatted="false">"Default border selected."</string>
+    <!-- confirmDeleteFramePack -->
+    <string name="themer_delete_137cd">"Delete %1$s?"</string>
+    <!-- framePackRow -->
+    <string name="themer_delete_d6f56" formatted="false">"DELETE"</string>
+    <!-- confirmDeleteFramePack -->
+    <string name="themer_delete_f6fdb" formatted="false">"Delete"</string>
+    <!-- confirmDeleteFont -->
+    <string name="themer_delete_font_bdc67" formatted="false">"Delete Font"</string>
+    <!-- confirmDeleteFramePack -->
+    <string name="themer_delete_frame_pack_7c7f4" formatted="false">"Delete Frame Pack"</string>
+    <!-- confirmDeleteFramePack -->
+    <string name="themer_deleted_b89bd">"%1$s deleted."</string>
+    <!-- showToolbarButtonSlotDialog -->
+    <string name="themer_disable_slot_8bc2b" formatted="false">"Disable slot"</string>
+    <!-- onBackPressed -->
+    <string name="themer_discard_36fff" formatted="false">"Discard"</string>
+    <!-- withCleanFrameSession -->
+    <string name="themer_discard_and_apply_bfec7" formatted="false">"Discard and Apply"</string>
+    <!-- launchUiPackagePicker -->
+    <string name="themer_discard_and_continue_6ee1b" formatted="false">"Discard and Continue"</string>
+    <!-- onBackPressed -->
+    <string name="themer_discard_changes_f99ee" formatted="false">"Discard Changes?"</string>
+    <!-- withCleanFrameSession -->
+    <string name="themer_discard_unsaved_edits_a391b" formatted="false">"Discard Unsaved Edits?"</string>
+    <!-- launchUiPackagePicker -->
+    <string name="themer_discard_unsaved_frame_edits_9bf85" formatted="false">"Discard Unsaved Frame Edits?"</string>
+    <!-- showFrameEditor -->
+    <string name="themer_drawing_4c495" formatted="false">"DRAWING"</string>
+    <!-- frameAssignmentRow -->
+    <string name="themer_edit_17865" formatted="false">"EDIT"</string>
+    <!-- showFrameEditor -->
+    <string name="themer_edit_5fa4d">"Edit %1$s"</string>
+    <!-- bindFramePanel -->
+    <string name="themer_enable_custom_frames_c7fdd" formatted="false">"Enable custom frames"</string>
+    <!-- showTaskerIntegrationDialog -->
+    <string name="themer_enable_integration_f2a7e" formatted="false">"ENABLE INTEGRATION"</string>
+    <!-- showToolbarButtonSlotDialog -->
+    <string name="themer_enable_slot_0673c" formatted="false">"Enable slot"</string>
+    <!-- showDystopiaConsentDialog -->
+    <string name="themer_enables_local_retui_credits_breach_keys_breach_puzzles_pai_408b6" formatted="false">"Enables local Retui Credits, breach keys, breach puzzles, paid Pomodoro exits, and Lockdown. Retui Credits are fictional app points only: no cash value, no purchase value, and nothing leaves this device."</string>
+    <!-- showBackupProtectionDialog -->
+    <string name="themer_encrypt_with_password_1b2c0" formatted="false">"Encrypt with Password"</string>
+    <!-- showToolbarButtonCommandDialog -->
+    <string name="themer_enter_the_same_text_you_would_type_at_the_prompt_examples_c3596" formatted="false">"Enter the same text you would type at the prompt. Examples: whatsapp, notifications -open, ytm, module -show rss."</string>
+    <!-- showBackupPasswordDialog -->
+    <string name="themer_export_f3e4f" formatted="false">"Export"</string>
+    <!-- showBackupProtectionDialog -->
+    <string name="themer_export_without_password_159da" formatted="false">"Export Without Password"</string>
+    <!-- openUiPackageZipPicker -->
+    <string name="themer_file_picker_is_unavailable_on_this_device_9a200" formatted="false">"File picker is unavailable on this device."</string>
+    <!-- deleteFont -->
+    <string name="themer_font_deleted_3f979" formatted="false">"Font deleted."</string>
+    <!-- handleFontImportResult -->
+    <string name="themer_font_import_cancelled_ae79a" formatted="false">"Font import cancelled."</string>
+    <!-- handleFontImportResult -->
+    <string name="themer_font_import_failed_2185f">"Font import failed: %1$s"</string>
+    <!-- handleFontImportResult -->
+    <string name="themer_font_import_failed_empty_file_a88dd" formatted="false">"Font import failed: empty file."</string>
+    <!-- handleFontImportResult -->
+    <string name="themer_font_imported_84bdf" formatted="false">"Font imported."</string>
+    <!-- launchFontImportPicker -->
+    <string name="themer_font_picker_is_unavailable_on_this_device_b8d21" formatted="false">"Font picker is unavailable on this device."</string>
+    <!-- createFontScaleViewHolder -->
+    <string name="themer_font_size_offset_27f1f" formatted="false">"Font size offset"</string>
+    <!-- frameAssignmentRow -->
+    <string name="themer_frame_9fec1">"FRAME: %1$s"</string>
+    <!-- showFrameEditor -->
+    <string name="themer_frame_controls_updated_b0b31" formatted="false">"Frame controls updated."</string>
+    <!-- frameAssignmentRow -->
+    <string name="themer_frame_default_border_03aae" formatted="false">"FRAME: DEFAULT BORDER"</string>
+    <!-- handleFrameImportResult -->
+    <string name="themer_frame_import_cancelled_c8e8e" formatted="false">"Frame import cancelled."</string>
+    <!-- handleFrameImportResult -->
+    <string name="themer_frame_import_failed_b43bd">"Frame import failed: %1$s"</string>
+    <!-- handleFrameImportResult -->
+    <string name="themer_frame_imported_66bc7">"Frame imported: %1$s"</string>
+    <!-- showCreateFramePack -->
+    <string name="themer_frame_pack_created_and_applied_7c5de" formatted="false">"Frame pack created and applied."</string>
+    <!-- bindFramePanel -->
+    <string name="themer_frame_packs_086f2" formatted="false">"FRAME PACKS"</string>
+    <!-- frameAssignmentRow -->
+    <string name="themer_frame_png_missing_or_corrupt_5b52d" formatted="false">"Frame PNG missing or corrupt"</string>
+    <!-- updateStatus -->
+    <string name="themer_granted_5ae8e" formatted="false">"GRANTED"</string>
+    <!-- updateStatus -->
+    <string name="themer_hidden_1ba34" formatted="false">"HIDDEN"</string>
+    <!-- bindKeyboardShortcutPanel -->
+    <string name="themer_hold_05336">"HOLD %1$s"</string>
+    <!-- showDystopiaConsentDialog -->
+    <string name="themer_hold_fingerprint_for_3_seconds_4acf7" formatted="false">"HOLD FINGERPRINT FOR 3 SECONDS"</string>
+    <!-- bindKeyboardShortcutPanel -->
+    <string name="themer_hold_or_tap_a_letter_to_choose_up_to_two_apps_hold_that_ke_10a8c" formatted="false">"Hold or tap a letter to choose up to two apps. Hold that key on Re Keyboard to launch one."</string>
+    <!-- bindKeyboardShortcutPanel -->
+    <string name="themer_hold_to_configure_289b4" formatted="false">"HOLD TO CONFIGURE"</string>
+    <!-- showDystopiaConsentDialog -->
+    <string name="themer_hold_to_sign_up_for_retui_credits_cc650" formatted="false">"Hold to sign up for Retui Credits"</string>
+    <!-- showFrameEditor -->
+    <string name="themer_image_slices_px_ff2d9" formatted="false">"IMAGE SLICES (PX)"</string>
+    <!-- bindFramePanel -->
+    <string name="themer_import_a_retui_ui_zip_package_it_is_added_to_frame_packs_w_29903" formatted="false">"Import a .retui_ui.zip package. It is added to Frame Packs without replacing the active frames until you tap Apply."</string>
+    <!-- bindFramePanel -->
+    <string name="themer_import_a_square_3_x_3_png_or_a_retui_frame_file_per_surfac_67740" formatted="false">"Import a square 3 x 3 PNG or a .retui-frame file per surface. Button states, toggle states, and slider parts can be supplied independently; missing assignments keep their defaults."</string>
+    <!-- bindFramePanel -->
+    <string name="themer_import_a_square_3_x_3_png_or_a_retui_frame_file_the_import_f8690" formatted="false">"Import a square 3 x 3 PNG or a .retui-frame file. The imported frame replaces generated borders on every supported surface."</string>
+    <!-- frameAssignmentRow -->
+    <string name="themer_import_b034f" formatted="false">"IMPORT"</string>
+    <!-- bindFramePanel -->
+    <string name="themer_import_ui_package_e6f87" formatted="false">"IMPORT UI PACKAGE"</string>
+    <!-- frameAssignmentRow -->
+    <string name="themer_imported_frame_651d9" formatted="false">"Imported frame"</string>
+    <!-- handleUiPackageZipImportResult -->
+    <string name="themer_imported_tap_apply_when_ready_6eb44">"%1$s imported. Tap Apply when ready."</string>
+    <!-- launchUiPackagePicker -->
+    <string name="themer_importing_a_ui_package_installs_a_separate_saved_pack_disc_0b86a" formatted="false">"Importing a UI package installs a separate saved pack. Discard the current element edits first?"</string>
+    <!-- createFontScaleViewHolder -->
+    <string name="themer_increase_font_size_offset_24b0b" formatted="false">"Increase font size offset"</string>
+    <!-- bindFontScalePanel -->
+    <string name="themer_increase_size_1e8c3">"Increase %1$s size"</string>
+    <!-- updateStatus -->
+    <string name="themer_installed_32554" formatted="false">"INSTALLED"</string>
+    <!-- updateStatus -->
+    <string name="themer_integration_5c0a9" formatted="false">"INTEGRATION  "</string>
+    <!-- showFrameEditor -->
+    <string name="themer_invalid_frame_settings_7301e" formatted="false">"Invalid frame settings."</string>
+    <!-- onBackPressed -->
+    <string name="themer_keep_editing_ced7d" formatted="false">"Keep Editing"</string>
+    <!-- showKeyboardShortcutAppPicker -->
+    <string name="themer_launcher_app_list_is_not_ready_return_home_and_reopen_sett_a05a4" formatted="false">"Launcher app list is not ready. Return home and reopen Settings."</string>
+    <!-- launchLiveWallpaperPicker -->
+    <string name="themer_live_wallpaper_picker_is_unavailable_on_this_device_05a68" formatted="false">"Live wallpaper picker is unavailable on this device."</string>
+    <!-- handleDystopiaOptIn -->
+    <string name="themer_lockdown_disabled_5cdbb" formatted="false">"Lockdown disabled."</string>
+    <!-- bindKeyboardShortcutPanel -->
+    <string name="themer_long_press_a_key_80497" formatted="false">"long-press a key"</string>
+    <!-- preview -->
+    <string name="themer_master_sp_d57ee">"%1$s  /  MASTER %2$sSP"</string>
+    <!-- frameAssignmentRow -->
+    <string name="themer_missing_or_corrupt_c7da0" formatted="false">"MISSING OR CORRUPT"</string>
+    <!-- showCreateFramePack -->
+    <string name="themer_my_frame_pack_a0f31" formatted="false">"My frame pack"</string>
+    <!-- openExternalUrl -->
+    <string name="themer_no_browser_app_found_e360b" formatted="false">"No browser app found."</string>
+    <!-- onBindViewHolder -->
+    <string name="themer_no_crash_log_found_79ebe" formatted="false">"No crash log found."</string>
+    <!-- openFeedbackEmail -->
+    <string name="themer_no_email_app_found_198b3" formatted="false">"No email app found."</string>
+    <!-- frameAssignmentRow -->
+    <string name="themer_no_frame_default_border_fallback_d21cf" formatted="false">"NO FRAME\nDEFAULT BORDER FALLBACK"</string>
+    <!-- frameAssignmentRow -->
+    <string name="themer_no_frame_imported_b07b6" formatted="false">"No frame imported"</string>
+    <!-- updateStatus -->
+    <string name="themer_not_granted_fe998" formatted="false">"NOT GRANTED"</string>
+    <!-- updateStatus -->
+    <string name="themer_not_installed_b81b3" formatted="false">"NOT INSTALLED"</string>
+    <!-- updateStatus -->
+    <string name="themer_off_ad504" formatted="false">"OFF"</string>
+    <!-- updateStatus -->
+    <string name="themer_on_387d7" formatted="false">"ON"</string>
+    <!-- buildSupportFooter -->
+    <string name="themer_open_discord_d6540" formatted="false">"Open Discord"</string>
+    <!-- showTaskerSetupDialog -->
+    <string name="themer_open_full_documentation_927ce" formatted="false">"OPEN FULL DOCUMENTATION"</string>
+    <!-- buildSupportFooter -->
+    <string name="themer_open_github_0b4cb" formatted="false">"Open GitHub"</string>
+    <!-- buildSupportFooter -->
+    <string name="themer_open_re_t_ui_website_3a242" formatted="false">"Open Re:T-UI website"</string>
+    <!-- buildSupportFooter -->
+    <string name="themer_open_reddit_f3fd5" formatted="false">"Open Reddit"</string>
+    <!-- frameAssignmentRow -->
+    <string name="themer_original_frame_png_preview_86c26" formatted="false">"Original frame PNG preview"</string>
+    <!-- frameAssignmentRow -->
+    <string name="themer_original_png_b57db">"%1$s\nORIGINAL PNG"</string>
+    <!-- showCreateFramePack -->
+    <string name="themer_pack_name_20f8a" formatted="false">"Pack name"</string>
+    <!-- showBackupPasswordDialog -->
+    <string name="themer_password_8be3c" formatted="false">"Password"</string>
+    <!-- showRestorePasswordDialog -->
+    <string name="themer_password_is_required_99234" formatted="false">"Password is required."</string>
+    <!-- showBackupPasswordDialog -->
+    <string name="themer_passwords_do_not_match_f7c3c" formatted="false">"Passwords do not match."</string>
+    <!-- updateStatus -->
+    <string name="themer_permission_60b6d" formatted="false">"\nPERMISSION   "</string>
+    <!-- frameAssignmentRow -->
+    <string name="themer_png_missing_or_corrupt_default_border_fallback_a1eb5" formatted="false">"PNG MISSING OR CORRUPT\nDEFAULT BORDER FALLBACK"</string>
+    <!-- showPreferredMusicAppPicker -->
+    <string name="themer_preferred_music_app_1e994" formatted="false">"Preferred Music App"</string>
+    <!-- showPreferredMusicAppPicker -->
+    <string name="themer_preferred_music_app_reset_to_automatic_detection_9a1d3" formatted="false">"Preferred music app reset to automatic detection."</string>
+    <!-- showPreferredMusicAppPicker -->
+    <string name="themer_preferred_music_app_set_to_73cf9">"Preferred music app set to %1$s."</string>
+    <!-- applyPreset -->
+    <string name="themer_preset_applied_reloading_5539d" formatted="false">"Preset applied! Reloading..."</string>
+    <!-- showShareableConfigurationSourcePicker -->
+    <string name="themer_preset_f6b28">"Preset: %1$s"</string>
+    <!-- restoreBackup -->
+    <string name="themer_preset_imported_dc305">"Preset imported: %1$s"</string>
+    <!-- showSavePresetInput -->
+    <string name="themer_preset_name_eb39e" formatted="false">"Preset name"</string>
+    <!-- confirmRemovePreset -->
+    <string name="themer_preset_removed_3a121" formatted="false">"Preset removed."</string>
+    <!-- savePreset -->
+    <string name="themer_preset_saved_bb391" formatted="false">"Preset saved."</string>
+    <!-- updateStatus -->
+    <string name="themer_presets_theme_modules_terminal_output_e4fc7" formatted="false">"\n\nPRESETS · THEME · MODULES · TERMINAL OUTPUT"</string>
+    <!-- getHeaderText -->
+    <string name="themer_re_keyboard_shortcuts_310c5" formatted="false">"Re Keyboard Shortcuts"</string>
+    <!-- getHeaderText -->
+    <string name="themer_re_t_ui_appearance_settings_f0df9" formatted="false">"Re:T-UI Appearance Settings"</string>
+    <!-- getHeaderText -->
+    <string name="themer_re_t_ui_behavior_settings_01843" formatted="false">"Re:T-UI Behavior Settings"</string>
+    <!-- getHeaderText -->
+    <string name="themer_re_t_ui_fonts_45a98" formatted="false">"Re:T-UI Fonts"</string>
+    <!-- getHeaderText -->
+    <string name="themer_re_t_ui_frames_b462d" formatted="false">"Re:T-UI Frames"</string>
+    <!-- getHeaderText -->
+    <string name="themer_re_t_ui_integrations_5c80d" formatted="false">"Re:T-UI Integrations"</string>
+    <!-- getHeaderText -->
+    <string name="themer_re_t_ui_personalization_settings_5032f" formatted="false">"Re:T-UI Personalization Settings"</string>
+    <!-- getHeaderText -->
+    <string name="themer_re_t_ui_presets_b7e7f" formatted="false">"Re:T-UI Presets"</string>
+    <!-- getHeaderText -->
+    <string name="themer_re_t_ui_settings_hub_ed322" formatted="false">"Re:T-UI Settings Hub"</string>
+    <!-- getHeaderText -->
+    <string name="themer_re_t_ui_system_support_84def" formatted="false">"Re:T-UI System &amp; Support"</string>
+    <!-- getHeaderText -->
+    <string name="themer_re_t_ui_typography_3e40f" formatted="false">"Re:T-UI Typography"</string>
+    <!-- confirmRemovePreset -->
+    <string name="themer_remove_436e1">"Remove %1$s?"</string>
+    <!-- confirmRemovePreset -->
+    <string name="themer_remove_e9639" formatted="false">"Remove"</string>
+    <!-- getHeaderText -->
+    <string name="themer_remove_preset_2d12c" formatted="false">"Remove Preset"</string>
+    <!-- showReplaceFramePack -->
+    <string name="themer_replace_a7cf7" formatted="false">"Replace"</string>
+    <!-- frameAssignmentRow -->
+    <string name="themer_replace_c336f" formatted="false">"REPLACE"</string>
+    <!-- showReplaceFramePack -->
+    <string name="themer_replace_e9bb0">"Replace %1$s?"</string>
+    <!-- saveFrameChanges -->
+    <string name="themer_replace_existing_pack_8f193" formatted="false">"Replace existing pack"</string>
+    <!-- showReplaceFramePack -->
+    <string name="themer_replace_frame_pack_f44f9" formatted="false">"Replace Frame Pack"</string>
+    <!-- showReplaceFramePack -->
+    <string name="themer_replace_this_pack_with_the_complete_current_frame_setup_576ad" formatted="false">"Replace this pack with the complete current frame setup?"</string>
+    <!-- showReplaceFramePack -->
+    <string name="themer_replaced_and_applied_997ba">"%1$s replaced and applied."</string>
+    <!-- bindFontScalePanel -->
+    <string name="themer_reset_995f2" formatted="false">"RESET"</string>
+    <!-- createFontScaleViewHolder -->
+    <string name="themer_reset_all_ca151" formatted="false">"RESET ALL"</string>
+    <!-- bindFontScalePanel -->
+    <string name="themer_reset_size_51a7d">"Reset %1$s size"</string>
+    <!-- showRestorePasswordDialog -->
+    <string name="themer_restore_3cbe6" formatted="false">"Restore"</string>
+    <!-- handleRestoreResult -->
+    <string name="themer_restore_cancelled_56adf" formatted="false">"Restore cancelled."</string>
+    <!-- restoreBackup -->
+    <string name="themer_restore_failed_0f5f0" formatted="false">"Restore failed."</string>
+    <!-- showRestorePasswordDialog -->
+    <string name="themer_restore_password_3ba9b" formatted="false">"Restore Password"</string>
+    <!-- launchRestorePicker -->
+    <string name="themer_restore_picker_is_unavailable_on_this_device_95294" formatted="false">"Restore picker is unavailable on this device."</string>
+    <!-- handleDystopiaOptIn -->
+    <string name="themer_retui_credits_disabled_e91ca" formatted="false">"Retui Credits disabled."</string>
+    <!-- showDystopiaConsentDialog -->
+    <string name="themer_retui_credits_enabled_1000_fake_credits_granted_51fe4" formatted="false">"Retui Credits enabled. 1000 fake credits granted."</string>
+    <!-- saveFrameChanges -->
+    <string name="themer_save_current_pack_72386" formatted="false">"Save current pack"</string>
+    <!-- showToolbarButtonCommandDialog -->
+    <string name="themer_save_efc00" formatted="false">"Save"</string>
+    <!-- bindFramePanel -->
+    <string name="themer_save_frame_settings_796a7" formatted="false">"SAVE FRAME SETTINGS"</string>
+    <!-- saveFrameChanges -->
+    <string name="themer_save_frame_settings_cd8c7" formatted="false">"Save Frame Settings"</string>
+    <!-- showSavePresetInput -->
+    <string name="themer_save_preset_008df" formatted="false">"Save Preset"</string>
+    <!-- saveCurrentFramePack -->
+    <string name="themer_saved_and_applied_57003">"%1$s saved and applied."</string>
+    <!-- showKeyboardShortcutAppPicker -->
+    <string name="themer_search_apps_ca3ce" formatted="false">"Search apps"</string>
+    <!-- deleteFont -->
+    <string name="themer_select_and_save_another_font_before_deleting_the_active_fo_add4a" formatted="false">"Select and save another font before deleting the active font."</string>
+    <!-- launchWallpaperPicker -->
+    <string name="themer_select_wallpaper_4842b" formatted="false">"Select wallpaper"</string>
+    <!-- savePendingFontChanges -->
+    <string name="themer_selected_font_is_no_longer_available_b914c" formatted="false">"Selected font is no longer available."</string>
+    <!-- showToolbarButtonSlotDialog -->
+    <string name="themer_set_command_c7afe">"Set command: %1$s"</string>
+    <!-- showToolbarButtonSlotDialog -->
+    <string name="themer_set_icon_96d11">"Set icon: %1$s"</string>
+    <!-- showTaskerSetupDialog -->
+    <string name="themer_setup_1_enable_tasker_integration_in_retui_2_grant_the_tas_0fc35" formatted="false">"SETUP\n1. Enable Tasker integration in RETUI.\n2. Grant the Tasker run-task permission.\n3. In Tasker, enable Allow External Access.\n4. Add an action: Plugin → RETUI Action.\n\nTASKER → RETUI\n• Apply a night preset at sunset\n• Change a theme color from a profile\n• Show or refresh a module\n• Switch Spaces; RETUI saves the current Space automatically\n• Send text to the RETUI terminal\n\nRETUI → TASKER\ntasker Work\ntasker -run \"Evening Setup\""</string>
+    <!-- showTaskerIntegrationDialog -->
+    <string name="themer_setup_examples_7ef67" formatted="false">"SETUP &amp; EXAMPLES"</string>
+    <!-- handleShareableConfigurationResult -->
+    <string name="themer_shareable_configuration_exported_and_verified_2b7f9" formatted="false">"Shareable configuration exported and verified."</string>
+    <!-- showShareableConfigurationSourcePicker -->
+    <string name="themer_shareable_source_06d7c" formatted="false">"Shareable Source"</string>
+    <!-- showTaskerIntegrationDialog -->
+    <string name="themer_show_task_statuses_fee80" formatted="false">"SHOW TASK STATUSES"</string>
+    <!-- updateStatus -->
+    <string name="themer_shown_830ab" formatted="false">"SHOWN"</string>
+    <!-- dystopiaRowLabel -->
+    <string name="themer_sign_up_for_retui_credits_852b5">"Sign up for Retui Credits: %1$s"</string>
+    <!-- showDystopiaConsentDialog -->
+    <string name="themer_sign_up_for_retui_credits_99c9d" formatted="false">"Sign up for Retui Credits"</string>
+    <!-- intValue -->
+    <string name="themer_slice_values_must_be_positive_whole_pixels_bcdc1" formatted="false">"Slice values must be positive whole pixels."</string>
+    <!-- bindKeyboardShortcutPanel -->
+    <string name="themer_slot_13d02">"SLOT %1$d   %2$s"</string>
+    <!-- toolbarSlotSummary -->
+    <string name="themer_slot_54b40">"Slot %1$d: %2$s -&gt; %3$s"</string>
+    <!-- showKeyboardShortcutAppPicker -->
+    <string name="themer_slot_aff9c">"%1$s · SLOT %2$d"</string>
+    <!-- toolbarSlotSummary -->
+    <string name="themer_slot_off_b2989">"Slot %1$d: off"</string>
+    <!-- openSoundsSettings -->
+    <string name="themer_sounds_fb1c3" formatted="false">"Sounds"</string>
+    <!-- refreshRow -->
+    <string name="themer_sp_base_7639d">"%1$dSP  ·  BASE %2$d"</string>
+    <!-- refreshRow -->
+    <string name="themer_sp_ca43c">"%1$dSP"</string>
+    <!-- createFontScaleViewHolder -->
+    <string name="themer_sp_font_preview_4055c">"%1$dsp font preview"</string>
+    <!-- pendingFontLabel -->
+    <string name="themer_system_29d43" formatted="false">"SYSTEM"</string>
+    <!-- updateStatus -->
+    <string name="themer_task_status_6002c" formatted="false">"\nTASK STATUS  "</string>
+    <!-- updateStatus -->
+    <string name="themer_tasker_551d9" formatted="false">"\nTASKER       "</string>
+    <!-- showTaskerIntegrationDialog -->
+    <string name="themer_tasker_integration_50a1b" formatted="false">"Tasker integration"</string>
+    <!-- showTaskerIntegrationDialog -->
+    <string name="themer_tasker_integration_test_ok_dbfe7" formatted="false">"Tasker integration test OK"</string>
+    <!-- showTaskerSetupDialog -->
+    <string name="themer_tasker_setup_e7f1d" formatted="false">"Tasker setup"</string>
+    <!-- showTaskerIntegrationDialog -->
+    <string name="themer_test_integration_b2a66" formatted="false">"TEST INTEGRATION"</string>
+    <!-- confirmDeleteFramePack -->
+    <string name="themer_the_active_frame_setup_will_return_to_defaults_9a38a" formatted="false">" The active frame setup will return to defaults."</string>
+    <!-- showFrameEditor -->
+    <string name="themer_this_frame_cannot_be_edited_73f23" formatted="false">"This frame cannot be edited."</string>
+    <!-- saveToolbarSlot -->
+    <string name="themer_toolbar_button_disabled_412cc" formatted="false">"Toolbar button disabled."</string>
+    <!-- saveToolbarSlot -->
+    <string name="themer_toolbar_button_saved_62678" formatted="false">"Toolbar button saved."</string>
+    <!-- showToolbarButtonsDialog -->
+    <string name="themer_toolbar_buttons_8936a" formatted="false">"Toolbar Buttons"</string>
+    <!-- showToolbarButtonCommandDialog -->
+    <string name="themer_toolbar_command_f70c1" formatted="false">"Toolbar Command"</string>
+    <!-- showToolbarButtonIconDialog -->
+    <string name="themer_toolbar_icon_b7566" formatted="false">"Toolbar Icon"</string>
+    <!-- showToolbarButtonSlotDialog -->
+    <string name="themer_toolbar_slot_b5a77">"Toolbar Slot %1$d"</string>
+    <!-- showToolbarButtonSlotDialog -->
+    <string name="themer_toolbar_slot_cleared_ce6b8" formatted="false">"Toolbar slot cleared."</string>
+    <!-- bindFramePanel -->
+    <string name="themer_turn_frames_off_to_use_generated_borders_your_active_pack_26eea" formatted="false">"Turn frames off to use generated borders. Your active pack and assignments stay saved."</string>
+    <!-- savePendingFontChanges -->
+    <string name="themer_typography_saved_applying_7cc74" formatted="false">"Typography saved. Applying..."</string>
+    <!-- handleUiPackageZipImportResult -->
+    <string name="themer_ui_package_zip_import_cancelled_1451c" formatted="false">"UI package ZIP import cancelled."</string>
+    <!-- handleUiPackageZipImportResult -->
+    <string name="themer_ui_package_zip_import_failed_f51b2">"UI package ZIP import failed: %1$s"</string>
+    <!-- showShareableBehaviorPicker -->
+    <string name="themer_unable_to_read_preset_behavior_e8a41" formatted="false">"Unable to read preset behavior."</string>
+    <!-- handleFontImportResult -->
+    <string name="themer_unable_to_read_selected_font_857be" formatted="false">"Unable to read selected font."</string>
+    <!-- handleFrameImportResult -->
+    <string name="themer_unable_to_read_the_selected_frame_c6fec" formatted="false">"Unable to read the selected frame."</string>
+    <!-- handleUiPackageZipImportResult -->
+    <string name="themer_unable_to_read_the_selected_ui_package_zip_ffc9a" formatted="false">"Unable to read the selected UI package ZIP."</string>
+    <!-- confirmDeleteFramePack -->
+    <string name="themer_unsaved_element_edits_will_be_discarded_38d5f" formatted="false">" Unsaved element edits will be discarded."</string>
+    <!-- applyFramePack -->
+    <string name="themer_unsaved_element_edits_will_be_discarded_before_applying_98e49">"Unsaved element edits will be discarded before applying %1$s."</string>
+    <!-- onBackPressed -->
+    <string name="themer_unsaved_font_and_scale_changes_will_be_lost_18b63" formatted="false">"Unsaved font and scale changes will be lost."</string>
+    <!-- onBackPressed -->
+    <string name="themer_unsaved_frame_settings_and_imports_will_be_lost_05741" formatted="false">"Unsaved frame settings and imports will be lost."</string>
+    <!-- frameAssignmentRow -->
+    <string name="themer_use_default_8e95d" formatted="false">"USE DEFAULT"</string>
+    <!-- showShareableBehaviorPicker -->
+    <string name="themer_value_a89f9" formatted="false">"VALUE: "</string>
+    <!-- launchWallpaperPicker -->
+    <string name="themer_wallpaper_picker_is_unavailable_on_this_device_a5a4d" formatted="false">"Wallpaper picker is unavailable on this device."</string>
+    <!-- showFrameEditor -->
+    <string name="themer_x_px_changes_stay_staged_until_save_frame_settings_d0a46">"%1$s  •  %2$d x %3$d px\nChanges stay staged until Save Frame Settings."</string>
+    <string name="hub_default_system_font">Default (System Font)</string>
+    <string name="hub_appearance">Appearance</string>
+    <string name="hub_behavior">Behavior</string>
+    <string name="hub_sounds">Sounds</string>
+    <string name="hub_personalization">Personalization</string>
+    <string name="hub_ascii_settings">ASCII Settings</string>
+    <string name="hub_integrations">Integrations</string>
+    <string name="hub_system_support">System &amp; Support</string>
+    <string name="hub_open_wallpaper_picker">Open Wallpaper Picker</string>
+    <string name="hub_open_live_wallpaper_picker">Open Live Wallpaper Picker</string>
+    <string name="hub_retui_wallpaper">RETUI WALLPAPER</string>
+    <string name="hub_preferred_music_app">Preferred Music App</string>
+    <string name="hub_tasker_integration">Tasker Integration</string>
+    <string name="hub_re_keyboard_shortcuts">Re Keyboard Shortcuts</string>
+    <string name="hub_fonts">Fonts</string>
+    <string name="hub_typography">Typography</string>
+    <string name="hub_presets">Presets</string>
+    <string name="hub_frames">Frames</string>
+    <string name="hub_save_current_as_preset">Save Current as Preset</string>
+    <string name="hub_apply_preset">Apply Preset</string>
+    <string name="hub_remove_preset">Remove Preset</string>
+    <string name="hub_import_font">Import Font...</string>
+    <string name="hub_toolbar_buttons">Toolbar Buttons</string>
+    <string name="hub_view_crash_log">View Crash Log</string>
+    <string name="hub_backup">Backup</string>
+    <string name="hub_create_shareable_configuration">Create Shareable Configuration</string>
+    <string name="hub_restore">Restore</string>
+    <string name="hub_rate_the_app">Rate the App</string>
+    <string name="hub_github">GitHub</string>
+    <string name="hub_discord">Discord</string>
+    <string name="hub_reddit">Reddit</string>
+    <string name="hub_send_feedback">Send Feedback</string>
+    <string name="hub_learn_more">Learn More</string>
+    <string name="hub_sign_up_for_retui_credits">Sign up for Retui Credits</string>
+    <string name="hub_music_summary">Preferred Music App: %1$s</string>
+    <string name="hub_tasker_summary">Tasker Integration: %1$s</string>
+    <string name="hub_credits_summary">Sign up for Retui Credits: %1$s</string>
+    <string name="typography_4e59487d0e" formatted="false">"┌─ RE:TUI ─┐"</string>
+    <string name="typography_1e7f242177" formatted="false">"ASCII legacy size"</string>
+    <string name="typography_8cff46ef5b" formatted="false">"UNLOCKS 4"</string>
+    <string name="typography_9d18578bbb" formatted="false">"Unlock status"</string>
+    <string name="typography_981752f693" formatted="false">"WEATHER 26°C"</string>
+    <string name="typography_5b3fc4e80d" formatted="false">"Weather status"</string>
+    <string name="typography_5dc9e5dbdd" formatted="false">"NOTES READY"</string>
+    <string name="typography_a7c8ee4433" formatted="false">"Notes status"</string>
+    <string name="typography_9d0b571792" formatted="false">"NETWORK WIFI"</string>
+    <string name="typography_c5308e6694" formatted="false">"Network status"</string>
+    <string name="typography_3ce1e0a76b" formatted="false">"STORAGE 64%"</string>
+    <string name="typography_4f02e9a678" formatted="false">"Storage status"</string>
+    <string name="typography_50a019ba96" formatted="false">"22:08"</string>
+    <string name="typography_5902d64dc5" formatted="false">"Time status"</string>
+    <string name="typography_d8b4f70ace" formatted="false">"DEVICE ONLINE"</string>
+    <string name="typography_8d2eaed52b" formatted="false">"Device status"</string>
+    <string name="typography_d859b29e9b" formatted="false">"BAT 86%"</string>
+    <string name="typography_96798b33dd" formatted="false">"Battery status"</string>
+    <string name="typography_6073f5768b" formatted="false">"RAM 42%"</string>
+    <string name="typography_6208d62be1" formatted="false">"RAM status"</string>
+    <string name="typography_cede01dc27" formatted="false">"OUTPUT  ^"</string>
+    <string name="typography_38d345e18f" formatted="false">"Output and overlay headers"</string>
+    <string name="typography_d7053f25bb" formatted="false">"Forecast: clear"</string>
+    <string name="typography_e43ff230eb" formatted="false">"Module body"</string>
+    <string name="typography_e733daecea" formatted="false">"WEATHER  [X]"</string>
+    <string name="typography_84157ec9ff" formatted="false">"Module headers"</string>
+    <string name="typography_4d1bb46cf4" formatted="false">"apps   settings   files"</string>
+    <string name="typography_861edba005" formatted="false">"Suggestions"</string>
+    <string name="typography_bacd1228fe" formatted="false">"$ help\nReady for the next command"</string>
+    <string name="typography_ac10e8e95b" formatted="false">"Input and terminal output"</string>
+    <string name="frame_left">Left</string>
+    <string name="frame_top">Top</string>
+    <string name="frame_right">Right</string>
+    <string name="frame_bottom">Bottom</string>
+    <string name="frame_center">Center</string>
+    <string name="frame_filtering">Filter</string>
+    <string name="frame_tile">Tile</string>
+    <string name="frame_stretch">Stretch</string>
+    <string name="frame_none">None</string>
+    <string name="frame_nearest">Nearest</string>
+    <string name="frame_linear">Linear</string>
+    <string name="frame_mode_label">%1$s: %2$s</string>
+</resources>

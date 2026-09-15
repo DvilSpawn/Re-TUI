@@ -1,0 +1,26 @@
+<resources>
+    <string name="language_packs_title">Language packs</string>
+    <string name="language_packs_intro">Download a Launcher language pack from GitHub, then import it here. Missing translations use English. Updating a pack does not require an app update.</string>
+    <string name="language_packs_import">Import language pack</string>
+    <string name="language_packs_browse">Browse GitHub releases</string>
+    <string name="language_packs_template">Export English template</string>
+    <string name="language_packs_system">Use system language</string>
+    <string name="language_packs_english">Use English</string>
+    <string name="language_packs_active">Active: %1$s</string>
+    <string name="language_packs_use">Use %1$s</string>
+    <string name="language_packs_remove">Remove %1$s</string>
+    <string name="language_packs_remove_confirm">Remove %1$s? If it is active, Launcher will switch to English.</string>
+    <string name="language_packs_cancel">Cancel</string>
+    <string name="language_packs_version">%1$s · version %2$d · %3$d translated entries</string>
+    <string name="language_packs_invalid">Could not import this pack. Check that it is a Launcher pack with valid translations and the same or a newer version. Your installed pack has been kept.</string>
+    <string name="language_packs_failed">Could not complete this action.</string>
+    <string name="language_packs_working">Importing…</string>
+    <string name="language_packs_exported">English template exported. Unzip it and read README.md to contribute.</string>
+    <string name="language_packs_system_name">System language</string>
+    <string name="language_packs_english_name">English</string>
+    <plurals name="language_pack_quantity" translatable="false">
+        <item quantity="zero">zero</item><item quantity="one">one</item>
+        <item quantity="two">two</item><item quantity="few">few</item>
+        <item quantity="many">many</item><item quantity="other">other</item>
+    </plurals>
+</resources>

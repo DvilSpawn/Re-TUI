@@ -38,29 +38,29 @@ class intent : CommandAbstraction {
 
             if (mode == Mode.BROADCAST) {
                 if (built.getAction() == null) {
-                    return "intent -broadcast requires -a <action>"
+                    return pack.context.getString(R.string.command_intent_intent_broadcast_requires_a_action_ff8fc)
                 }
                 if (built.getPackage() == null && built.getComponent() == null && !args.contains("--unsafe-implicit")) {
-                    return "intent -broadcast requires -p or -n. Add --unsafe-implicit to send a broad implicit broadcast."
+                    return pack.context.getString(R.string.command_intent_intent_broadcast_requires_p_or_n_add_unsaf_a14a0)
                 }
                 pack.context.sendBroadcast(built)
-                return "Broadcast sent: " + built.getAction()
+                return pack.context.getString(R.string.command_intent_broadcast_sent_6b672, built.getAction())
             }
 
             if (mode == Mode.ACTIVITY && built.getAction() == null && built.getComponent() == null && built.getData() == null && built.getType() == null) {
-                return "intent -activity needs -a or -n. To inspect an app, use inspect " + built.getPackage()
+                return pack.context.getString(R.string.command_intent_intent_activity_needs_a_or_n_to_inspect_an_e40f0, built.getPackage())
             }
 
             pack.context.startActivity(built)
             return Tuils.EMPTYSTRING
         } catch (e: ActivityNotFoundException) {
-            return "No activity found for intent."
+            return pack.context.getString(R.string.command_intent_no_activity_found_for_intent_d8576)
         } catch (e: SecurityException) {
-            return "Intent blocked by Android security: " + e.message
+            return pack.context.getString(R.string.command_intent_intent_blocked_by_android_security_cc669, e.message)
         } catch (e: IllegalArgumentException) {
-            return "Invalid intent: " + e.message
+            return pack.context.getString(R.string.command_intent_invalid_intent_47ae3, e.message)
         } catch (e: URISyntaxException) {
-            return "Invalid intent: " + e.message
+            return pack.context.getString(R.string.command_intent_invalid_intent_47ae3, e.message)
         }
     }
 

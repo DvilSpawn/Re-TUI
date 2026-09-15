@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher
 
+import ohi.andre.consolelauncher.R
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -420,10 +421,10 @@ class MainManager(private val mContext: LauncherActivity) {
                 } else if (action == location.ACTION_LOCATION_CMD_GOT) {
                     Tuils.sendOutput(
                         context,
-                        "Lat: " + intent.getDoubleExtra(
+                        context.getString(R.string.manager_mainmanager_lat_long_930e8, intent.getDoubleExtra(
                             TuiLocationManager.LATITUDE,
                             0.0
-                        ) + "; Long: " + intent.getDoubleExtra(TuiLocationManager.LONGITUDE, 0.0)
+                        ), intent.getDoubleExtra(TuiLocationManager.LONGITUDE, 0.0))
                     )
                     TuiLocationManager.instance(context)!!.rm(location.ACTION_LOCATION_CMD_GOT)
                 }

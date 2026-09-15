@@ -323,7 +323,7 @@ class AndroidWidgetDrawerManager(
             "show" -> executeShowWidgetCommand(parts.drop(1))
             "resize" -> executeResizeWidgetCommand(parts)
             "remove" -> executeRemoveWidgetCommand(parts)
-            else -> showWidgetCommandStatus("Unknown widget command: ${parts.firstOrNull().orEmpty()}")
+            else -> showWidgetCommandStatus(context.getString(R.string.manager_androidwidgetdrawermanager_unknown_widget_command_155c9, parts.firstOrNull().orEmpty()))
         }
         updateWidgetCommandSuggestions()
     }
@@ -332,13 +332,13 @@ class AndroidWidgetDrawerManager(
         commandInput?.clearFocus()
         closeKeyboard()
         showWidgetPicker()
-        showWidgetCommandStatus("Pick a widget.")
+        showWidgetCommandStatus(context.getString(R.string.manager_androidwidgetdrawermanager_pick_a_widget_0598a))
     }
 
     private fun executeShowWidgetCommand(args: List<String>) {
         val records = widgetCommandRecords()
         if (records.isEmpty()) {
-            showWidgetCommandStatus("No widgets in pane.")
+            showWidgetCommandStatus(context.getString(R.string.manager_androidwidgetdrawermanager_no_widgets_in_pane_ef590))
             return
         }
 
@@ -351,7 +351,7 @@ class AndroidWidgetDrawerManager(
 
         val record = findWidgetRecordByCode(records, requestedId)
         if (record == null) {
-            showWidgetCommandStatus("No widget for [W_ID:${requestedId.uppercase(Locale.US)}].")
+            showWidgetCommandStatus(context.getString(R.string.manager_androidwidgetdrawermanager_no_widget_for_w_id_0f5d6, requestedId.uppercase(Locale.US)))
             updateWidgetCommandSuggestions("show ")
             return
         }
@@ -361,7 +361,7 @@ class AndroidWidgetDrawerManager(
 
     private fun executeResizeWidgetCommand(parts: List<String>) {
         if (parts.size < 4) {
-            showWidgetCommandStatus("Usage: resize <W_ID> <height> <width>")
+            showWidgetCommandStatus(context.getString(R.string.manager_androidwidgetdrawermanager_usage_resize_w_id_height_width_9def5))
             updateWidgetCommandSuggestions("resize ")
             return
         }
@@ -369,7 +369,7 @@ class AndroidWidgetDrawerManager(
         val records = loadRecords().filterValid()
         val record = findWidgetRecordByCode(records, parts[1])
         if (record == null) {
-            showWidgetCommandStatus("No widget for [W_ID:${parts[1].uppercase(Locale.US)}].")
+            showWidgetCommandStatus(context.getString(R.string.manager_androidwidgetdrawermanager_no_widget_for_w_id_0f5d6, parts[1].uppercase(Locale.US)))
             updateWidgetCommandSuggestions("resize ")
             return
         }
@@ -377,7 +377,7 @@ class AndroidWidgetDrawerManager(
         val requestedRows = parts[2].toIntOrNull()
         val requestedColumns = parts[3].toIntOrNull()
         if (requestedRows == null || requestedColumns == null) {
-            showWidgetCommandStatus("Usage: resize <W_ID> <height> <width>")
+            showWidgetCommandStatus(context.getString(R.string.manager_androidwidgetdrawermanager_usage_resize_w_id_height_width_9def5))
             updateWidgetCommandSuggestions("resize ${record.wid} ")
             return
         }
@@ -392,13 +392,13 @@ class AndroidWidgetDrawerManager(
         editingWidgetId = resizedRecord.appWidgetId
         renderWidgets()
         showWidgetCommandStatus(
-            "${widgetIdBadgeText(resizedRecord)} resized to ${resizedRecord.rowSpan} x ${resizedRecord.colSpan}"
+            context.getString(R.string.manager_androidwidgetdrawermanager_resized_to_x_476c9, widgetIdBadgeText(resizedRecord), resizedRecord.rowSpan, resizedRecord.colSpan)
         )
     }
 
     private fun executeRemoveWidgetCommand(parts: List<String>) {
         if (parts.size < 2) {
-            showWidgetCommandStatus("Usage: remove <W_ID>")
+            showWidgetCommandStatus(context.getString(R.string.manager_androidwidgetdrawermanager_usage_remove_w_id_13569))
             updateWidgetCommandSuggestions("remove ")
             return
         }
@@ -406,7 +406,7 @@ class AndroidWidgetDrawerManager(
         val records = loadRecords().filterValid()
         val record = findWidgetRecordByCode(records, parts[1])
         if (record == null) {
-            showWidgetCommandStatus("No widget for [W_ID:${parts[1].uppercase(Locale.US)}].")
+            showWidgetCommandStatus(context.getString(R.string.manager_androidwidgetdrawermanager_no_widget_for_w_id_0f5d6, parts[1].uppercase(Locale.US)))
             updateWidgetCommandSuggestions("remove ")
             return
         }
@@ -414,7 +414,7 @@ class AndroidWidgetDrawerManager(
         val removedLabel = widgetIdBadgeText(record)
         editingWidgetId = INVALID_WIDGET_ID
         removeWidget(record)
-        showWidgetCommandStatus("$removedLabel removed")
+        showWidgetCommandStatus(context.getString(R.string.manager_androidwidgetdrawermanager_removed_80296, removedLabel))
     }
 
     private fun updateWidgetCommandSuggestions(rawInput: String = commandInput?.text?.toString().orEmpty()) {
@@ -451,7 +451,7 @@ class AndroidWidgetDrawerManager(
             lowerInput == "show" || lowerInput.startsWith("show ") -> {
                 val records = widgetCommandRecords()
                 if (records.isEmpty()) {
-                    suggestions.add(WidgetCommandSuggestion("no widgets", "show "))
+                    suggestions.add(WidgetCommandSuggestion(context.getString(R.string.manager_androidwidgetdrawermanager_no_widgets_40266), "show "))
                 } else {
                     records.forEach { record ->
                         suggestions.add(
@@ -491,7 +491,7 @@ class AndroidWidgetDrawerManager(
     ) {
         val records = widgetCommandRecords()
         if (records.isEmpty()) {
-            suggestions.add(WidgetCommandSuggestion("no widgets", "resize "))
+            suggestions.add(WidgetCommandSuggestion(context.getString(R.string.manager_androidwidgetdrawermanager_no_widgets_40266), "resize "))
             return
         }
 
@@ -537,7 +537,7 @@ class AndroidWidgetDrawerManager(
     private fun buildRemoveSuggestions(suggestions: MutableList<WidgetCommandSuggestion>) {
         val records = widgetCommandRecords()
         if (records.isEmpty()) {
-            suggestions.add(WidgetCommandSuggestion("no widgets", "remove "))
+            suggestions.add(WidgetCommandSuggestion(context.getString(R.string.manager_androidwidgetdrawermanager_no_widgets_40266), "remove "))
             return
         }
 
@@ -627,7 +627,7 @@ class AndroidWidgetDrawerManager(
     }
 
     private fun widgetCommandSummary(record: WidgetRecord): String {
-        return "${widgetIdBadgeText(record)} ${record.rowSpan}x${record.colSpan} ${widgetLabel(record)}"
+        return context.getString(R.string.manager_androidwidgetdrawermanager_x_97baa, widgetIdBadgeText(record), record.rowSpan, record.colSpan, widgetLabel(record))
     }
 
     private fun widgetLabel(record: WidgetRecord): String {
@@ -680,7 +680,7 @@ class AndroidWidgetDrawerManager(
         }
         headerRow.addView(
             TextView(context).apply {
-                text = "Widget picker"
+                text = context.getString(R.string.manager_androidwidgetdrawermanager_widget_picker_454a1)
                 setTextColor(pickerColor)
                 textSize = 14f
                 setTypeface(Tuils.getTypeface(context), Typeface.BOLD)
@@ -689,7 +689,7 @@ class AndroidWidgetDrawerManager(
         )
         headerRow.addView(
             pickerButton("X").apply {
-                contentDescription = "Close widget picker"
+                contentDescription = context.getString(R.string.manager_androidwidgetdrawermanager_close_widget_picker_a0d0d)
                 setOnClickListener { hideWidgetPicker() }
             },
             LinearLayout.LayoutParams(
@@ -762,7 +762,7 @@ class AndroidWidgetDrawerManager(
             return
         }
 
-        content.addView(pickerStatusText("Loading widgets..."))
+        content.addView(pickerStatusText(context.getString(R.string.manager_androidwidgetdrawermanager_loading_widgets_af1a9)))
         Thread {
             val providers = loadWidgetProviderOptions()
             cachedWidgetProviderOptions = providers
@@ -782,7 +782,7 @@ class AndroidWidgetDrawerManager(
     private fun populateWidgetPicker(content: LinearLayout, providers: List<WidgetProviderOption>) {
         if (providers.isEmpty()) {
             content.addView(
-                pickerStatusText("No widgets found."),
+                pickerStatusText(context.getString(R.string.manager_androidwidgetdrawermanager_no_widgets_found_8e343)),
                 LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT
@@ -894,7 +894,7 @@ class AndroidWidgetDrawerManager(
         )
         labels.addView(
             TextView(context).apply {
-                text = "${max(1, option.providerInfo.minWidth)} x ${max(1, option.providerInfo.minHeight)}"
+                text = context.getString(R.string.manager_androidwidgetdrawermanager_x_96067, max(1, option.providerInfo.minWidth), max(1, option.providerInfo.minHeight))
                 setTextColor(mutedTextColor)
                 textSize = 9f
                 maxLines = 1
@@ -981,7 +981,7 @@ class AndroidWidgetDrawerManager(
             }
         } catch (e: Exception) {
             deletePendingWidget(appWidgetId)
-            Toast.makeText(context, "Couldn't bind widget.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context.getString(R.string.manager_androidwidgetdrawermanager_couldn_t_bind_widget_804bd), Toast.LENGTH_SHORT).show()
             Tuils.log(e)
         }
     }
@@ -1009,7 +1009,7 @@ class AndroidWidgetDrawerManager(
             )
         } catch (e: Exception) {
             deletePendingWidget(appWidgetId)
-            Toast.makeText(context, "Couldn't configure widget.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context.getString(R.string.manager_androidwidgetdrawermanager_couldn_t_configure_widget_1cc6c), Toast.LENGTH_SHORT).show()
             Tuils.log(e)
         }
     }
@@ -1220,7 +1220,7 @@ class AndroidWidgetDrawerManager(
         if (bounds != null && bounds.maxRows > bounds.minRows) {
             frame.addView(
                 resizeControl(
-                    "Drag to resize the top edge.",
+                    context.getString(R.string.manager_androidwidgetdrawermanager_drag_to_resize_the_top_edge_0998f),
                     record,
                     ResizeEdge.TOP
                 ),
@@ -1234,7 +1234,7 @@ class AndroidWidgetDrawerManager(
             )
             frame.addView(
                 resizeControl(
-                    "Drag to resize the bottom edge.",
+                    context.getString(R.string.manager_androidwidgetdrawermanager_drag_to_resize_the_bottom_edge_ff1f7),
                     record,
                     ResizeEdge.BOTTOM
                 ),
@@ -1248,7 +1248,7 @@ class AndroidWidgetDrawerManager(
         if (bounds != null && bounds.maxColumns > bounds.minColumns) {
             frame.addView(
                 resizeControl(
-                    "Drag to resize the left edge.",
+                    context.getString(R.string.manager_androidwidgetdrawermanager_drag_to_resize_the_left_edge_f1698),
                     record,
                     ResizeEdge.LEFT
                 ),
@@ -1260,7 +1260,7 @@ class AndroidWidgetDrawerManager(
             )
             frame.addView(
                 resizeControl(
-                    "Drag to resize the right edge.",
+                    context.getString(R.string.manager_androidwidgetdrawermanager_drag_to_resize_the_right_edge_9355b),
                     record,
                     ResizeEdge.RIGHT
                 ),
@@ -1277,7 +1277,7 @@ class AndroidWidgetDrawerManager(
             gravity = Gravity.CENTER
         }
         topActions.addView(
-            editControl("X", "Cancel widget edit", {
+            editControl("X", context.getString(R.string.manager_androidwidgetdrawermanager_cancel_widget_edit_6d41a), {
                 editingWidgetId = INVALID_WIDGET_ID
                 renderWidgets()
             }),
@@ -1693,16 +1693,16 @@ class AndroidWidgetDrawerManager(
                 dashedBorders(),
                 target = FrameTarget.WIDGET_DRAWER
             )
-            contentDescription = "$label widget failed to render. Tap to remove."
+            contentDescription = context.getString(R.string.manager_androidwidgetdrawermanager_widget_failed_to_render_tap_to_remove_101fb, label)
             setOnClickListener { removeWidgetById(appWidgetId) }
             setOnLongClickListener {
                 removeWidgetById(appWidgetId)
                 true
             }
 
-            addView(errorText("WIDGET FAILED TO RENDER", textColor, 11f, true))
+            addView(errorText(context.getString(R.string.manager_androidwidgetdrawermanager_widget_failed_to_render_6bf8a), textColor, 11f, true))
             addView(errorText(label.uppercase(), mutedTextColor, 9f, false))
-            addView(errorText("TAP TO REMOVE", textColor, 9f, false))
+            addView(errorText(context.getString(R.string.manager_androidwidgetdrawermanager_tap_to_remove_19778), textColor, 9f, false))
         }
     }
 
@@ -1907,8 +1907,8 @@ class AndroidWidgetDrawerManager(
     }
 
     private fun updateLabels(recordCount: Int, displayColumns: Int, displayRows: Int) {
-        header?.text = "Widgets/ [$recordCount]"
-        footer?.text = "grid $displayColumns x ${max(1, displayRows)}"
+        header?.text = context.getString(R.string.manager_androidwidgetdrawermanager_widgets_9209f, recordCount)
+        footer?.text = context.getString(R.string.manager_androidwidgetdrawermanager_grid_x_ddf2d, displayColumns, max(1, displayRows))
     }
 
     private fun configureInputAnchor() {

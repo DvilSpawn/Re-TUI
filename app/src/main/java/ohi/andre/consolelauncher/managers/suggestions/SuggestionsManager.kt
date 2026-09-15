@@ -705,7 +705,7 @@ class SuggestionsManager(
             val label = app.publicLabel ?: continue
             val packageName = app.componentName?.packageName.orEmpty()
             candidates.add(
-                SearchResult(label, "APP · $packageName", SearchResult.TYPE_APP, app, "$label $packageName")
+                SearchResult(label, pack.context.getString(R.string.search_app , packageName), SearchResult.TYPE_APP, app, "$label $packageName")
             )
         }
 
@@ -718,7 +718,7 @@ class SuggestionsManager(
                 candidates.add(
                     SearchResult(
                         contact.string,
-                        "CONTACT · " + contact.numbers.joinToString(" · "),
+                        pack.context.getString(R.string.search_contact , contact.numbers.joinToString(" · ")),
                         SearchResult.TYPE_CONTACT,
                         contact,
                         contact.string + " " + contact.numbers.joinToString(" ")
@@ -741,7 +741,7 @@ class SuggestionsManager(
                 candidates.add(
                     SearchResult(
                         title,
-                        listOf("NOTIFICATION", app, body).filter { it.isNotBlank() }.joinToString(" · "),
+                        listOf(pack.context.getString(R.string.search_notification), app, body).filter { it.isNotBlank() }.joinToString(" · "),
                         SearchResult.TYPE_NOTIFICATION,
                         notification,
                         "$title $app $body ${notification.pkg.orEmpty()}"
@@ -760,7 +760,7 @@ class SuggestionsManager(
             candidates.add(
                 SearchResult(
                     alias.name,
-                    "ALIAS · ${alias.value}",
+                    pack.context.getString(R.string.search_alias , alias.value),
                     SearchResult.TYPE_ALIAS,
                     suggestion,
                     "${alias.name} ${alias.value}"
@@ -777,13 +777,13 @@ class SuggestionsManager(
                 searchModeCommandSuggestionExecutes(name, command.argType()),
                 Suggestion.TYPE_COMMAND
             )
-            candidates.add(SearchResult(name, "COMMAND", SearchResult.TYPE_COMMAND, suggestion, name))
+            candidates.add(SearchResult(name, pack.context.getString(R.string.search_command), SearchResult.TYPE_COMMAND, suggestion, name))
         }
         for (group in pack.appsManager.groups) {
             candidates.add(
                 SearchResult(
                     group.name(),
-                    "APP GROUP · ${group.apps.size} apps",
+                    pack.context.resources.getQuantityString(R.plurals.search_group_apps, group.apps.size, group.apps.size),
                     SearchResult.TYPE_GROUP,
                     group,
                     group.name() + " " + group.apps.joinToString(" ") { it.publicLabel.orEmpty() }
@@ -804,8 +804,8 @@ class SuggestionsManager(
         if (!contactsGranted && (permissionRelevant || CONTACT_ACCESS_WORDS.any(lower::contains))) {
             results.add(
                 SearchResult(
-                    "Enable contact search",
-                    "PERMISSION · Allow Re:T-UI to search contacts",
+                    pack.context.getString(R.string.search_enable_contacts),
+                    pack.context.getString(R.string.search_contacts_permission),
                     SearchResult.TYPE_PERMISSION,
                     PERMISSION_CONTACTS,
                     "contacts call message people"
@@ -815,8 +815,8 @@ class SuggestionsManager(
         if (!notificationsGranted && (permissionRelevant || NOTIFICATION_ACCESS_WORDS.any(lower::contains))) {
             results.add(
                 SearchResult(
-                    "Enable notification search",
-                    "ACCESS · Open Android notification access",
+                    pack.context.getString(R.string.search_enable_notifications),
+                    pack.context.getString(R.string.search_notification_access),
                     SearchResult.TYPE_PERMISSION,
                     PERMISSION_NOTIFICATIONS,
                     "notifications alerts messages"
@@ -826,8 +826,8 @@ class SuggestionsManager(
         SearchProviderManager.load().take(max(1, suggestionsPerCategory)).forEach { provider ->
             results.add(
                 SearchResult(
-                    providerTitle(provider.name),
-                    "WEB PROVIDER · -${provider.name}",
+                    if (provider.name.equals("u", true)) pack.context.getString(R.string.search_open_url) else providerTitle(provider.name),
+                    pack.context.getString(R.string.search_provider , provider.name),
                     SearchResult.TYPE_PROVIDER,
                     ProviderAction(provider, cleanQuery),
                     provider.name
@@ -847,7 +847,7 @@ class SuggestionsManager(
             val title = suggestion.text?.trim().orEmpty()
             if (title.isEmpty()) null else SearchResult(
                 title,
-                "PARAMETER",
+                pack.context.getString(R.string.search_parameter),
                 SearchResult.TYPE_PARAMETER,
                 suggestion,
                 suggestion.getText().orEmpty()
@@ -878,11 +878,11 @@ class SuggestionsManager(
         if (contact == null) return
         val actions = ArrayList<SearchResult>()
         for (number in contact.numbers.filterNotNull()) {
-            actions.add(contactAction("Call $number", "CONTACT ACTION", ContactAction(ACTION_CALL, number)))
-            actions.add(contactAction("Message $number", "CONTACT ACTION", ContactAction(ACTION_MESSAGE, number)))
+            actions.add(contactAction(pack.context.getString(R.string.search_call , number), pack.context.getString(R.string.search_contact_action), ContactAction(ACTION_CALL, number)))
+            actions.add(contactAction(pack.context.getString(R.string.search_message , number), pack.context.getString(R.string.search_contact_action), ContactAction(ACTION_MESSAGE, number)))
         }
         contact.numbers.filterNotNull().firstOrNull()?.let { number ->
-            actions.add(contactAction("View ${contact.string}", "CONTACT ACTION", ContactAction(ACTION_VIEW, number)))
+            actions.add(contactAction(pack.context.getString(R.string.search_view , contact.string), pack.context.getString(R.string.search_contact_action), ContactAction(ACTION_VIEW, number)))
         }
         searchRenderer?.render(actions)
     }
@@ -900,7 +900,7 @@ class SuggestionsManager(
         searchRenderer?.render(group.apps.map { app ->
             SearchResult(
                 app.publicLabel.orEmpty(),
-                "APP · ${app.componentName?.packageName.orEmpty()}",
+                pack.context.getString(R.string.search_app , app.componentName?.packageName.orEmpty()),
                 SearchResult.TYPE_APP,
                 app,
                 app.publicLabel.orEmpty()

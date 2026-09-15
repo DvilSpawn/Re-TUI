@@ -24,7 +24,7 @@ class orientation : CommandAbstraction {
         pack.context.getString(R.string.help_orientation)
 
     override fun onNotArgEnough(pack: ExecutePack, nArgs: Int): String =
-        currentOrientation() + "\nUsage: orientation portrait|landscape|auto"
+        pack.context.getString(R.string.command_orientation_usage_orientation_portrait_landscape_auto_fbc79, currentOrientation(pack.context))
 
     companion object {
         const val MODE_LANDSCAPE = "landscape"
@@ -39,25 +39,25 @@ class orientation : CommandAbstraction {
         fun apply(pack: ExecutePack, input: String?): String {
             val mode = input?.trim()?.lowercase(Locale.US) ?: ""
             if (mode.isEmpty() || mode == "status" || mode == "-status") {
-                return currentOrientation() + "\nUsage: orientation portrait|landscape|auto"
+                return pack.context.getString(R.string.command_orientation_usage_orientation_portrait_landscape_auto_fbc79, currentOrientation(pack.context))
             }
 
             if (mode == MODE_LANDSCAPE || mode == VALUE_LANDSCAPE) {
                 setOrientation(pack, VALUE_LANDSCAPE)
-                return "Landscape preference saved. Re:T-UI will use the split layout only when the window is wide enough."
+                return pack.context.getString(R.string.command_orientation_landscape_preference_saved_re_t_ui_will_us_4c485)
             }
 
             if (mode == MODE_PORTRAIT || mode == VALUE_PORTRAIT) {
                 setOrientation(pack, VALUE_PORTRAIT)
-                return "Portrait preference saved. Re:T-UI will keep the portrait layout even if Android reports landscape."
+                return pack.context.getString(R.string.command_orientation_portrait_preference_saved_re_t_ui_will_kee_d0e0b)
             }
 
             if (mode == MODE_AUTO || mode == VALUE_AUTO || mode == "autorotate" || mode == "auto-rotate") {
                 setOrientation(pack, VALUE_AUTO)
-                return "Auto orientation preference saved. Re:T-UI will adapt to the current device or window orientation."
+                return pack.context.getString(R.string.command_orientation_auto_orientation_preference_saved_re_t_ui_218c8)
             }
 
-            return "Unknown orientation: $input\nUsage: orientation portrait|landscape|auto"
+            return pack.context.getString(R.string.command_orientation_unknown_orientation_usage_orientation_port_4d4ad, input)
         }
 
         private fun setOrientation(pack: ExecutePack, value: String) {
@@ -68,15 +68,15 @@ class orientation : CommandAbstraction {
             }
         }
 
-        private fun currentOrientation(): String {
+        private fun currentOrientation(context: android.content.Context): String {
             val value = LauncherSettings.getInt(Behavior.orientation)
             if (value == 0) {
-                return "Orientation: landscape"
+                return context.getString(R.string.command_detail_orientation_orientation_landscape_eb4bf)
             }
             if (value == 1) {
-                return "Orientation: portrait"
+                return context.getString(R.string.command_detail_orientation_orientation_portrait_52aca)
             }
-            return if (value == 2) "Orientation: auto" else "Orientation: $value"
+            return if (value == 2) context.getString(R.string.command_detail_orientation_orientation_auto_4c066) else context.getString(R.string.command_detail_orientation_orientation_919b3, value)
         }
     }
 }

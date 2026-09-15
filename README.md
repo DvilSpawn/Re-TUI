@@ -140,3 +140,7 @@ This project uses the **OWASP Mobile Application Security Verification Standard 
 * [**HTML cleaner**](http://htmlcleaner.sourceforge.net/)
 * [**JsonPath**](https://github.com/json-path/JsonPath)
 * [**jsoup**](https://github.com/jhy/jsoup/)
+
+## Localization contributions
+
+Downloadable language packs can be imported through Settings → System & Support → Language packs. See [contributing a language pack](language-packs/README.md) for the English template, PR workflow and independent GitHub releases, and the [translator guide](docs/localization/README.md) for the bundled resource sources. The [localization audit](docs/localization/AUDIT.md) records Launcher and Notes readiness, wireless-phone pseudolocale tests, and translation acceptance limits. Human-language contributions are still needed.

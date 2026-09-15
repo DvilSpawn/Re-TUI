@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher.managers.modules
 
+import ohi.andre.consolelauncher.R
 import android.Manifest
 import android.content.ContentUris
 import android.content.Context
@@ -39,7 +40,7 @@ object UpcomingEventsManager {
         val lookaheadDays: Int = lookaheadDays
         val heading = formatHeading(lookaheadDays)
         if (!hasCalendarPermission(context)) {
-            return heading + "\nCalendar access is required.\nRun: events -access"
+            return context.getString(R.string.manager_upcomingeventsmanager_calendar_access_is_required_run_events_acc_cfe8f, heading)
         }
 
         val now = System.currentTimeMillis()
@@ -68,7 +69,7 @@ object UpcomingEventsManager {
                         val allDay = cursor.getInt(2) == 1
                         val location = cursor.getString(3)
                         val safeTitle =
-                            if (TextUtils.isEmpty(title)) "Untitled event" else title!!.trim { it <= ' ' }
+                            if (TextUtils.isEmpty(title)) context.getString(R.string.manager_upcomingeventsmanager_untitled_event_ef8d2) else title!!.trim { it <= ' ' }
                         val key = begin.toString() + "|" + allDay + "|" + safeTitle.lowercase()
                         if (!seen.add(key)) {
                             continue
@@ -86,7 +87,7 @@ object UpcomingEventsManager {
                 }
             }
         } catch (e: Exception) {
-            return heading + "\nUnable to read Android Calendar."
+            return context.getString(R.string.manager_upcomingeventsmanager_unable_to_read_android_calendar_c129e, heading)
         }
 
         if (count == 0) {
@@ -141,7 +142,7 @@ object UpcomingEventsManager {
                         val allDay = cursor.getInt(2) == 1
                         val location = cursor.getString(3)
                         val safeTitle =
-                            if (TextUtils.isEmpty(title)) "Untitled event" else title!!.trim { it <= ' ' }
+                            if (TextUtils.isEmpty(title)) context.getString(R.string.manager_upcomingeventsmanager_untitled_event_ef8d2) else title!!.trim { it <= ' ' }
                         val key = begin.toString() + "|" + allDay + "|" + safeTitle.lowercase()
                         if (!seen.add(key)) {
                             continue

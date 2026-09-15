@@ -249,7 +249,7 @@ class notifications : ParamCommand() {
                     LauncherActivity.instance!!.runOnUiThread(Runnable { LauncherActivity.instance!!.uiManager!!.nextNotificationPage() })
                     return null
                 }
-                return "Notification module is not available."
+                return pack.context.getString(R.string.command_notifications_notification_module_is_not_available_a3d66)
             }
         },
         prev {
@@ -262,7 +262,7 @@ class notifications : ParamCommand() {
                     LauncherActivity.instance!!.runOnUiThread(Runnable { LauncherActivity.instance!!.uiManager!!.previousNotificationPage() })
                     return null
                 }
-                return "Notification module is not available."
+                return pack.context.getString(R.string.command_notifications_notification_module_is_not_available_a3d66)
             }
         },
         reply {
@@ -275,7 +275,7 @@ class notifications : ParamCommand() {
                     LauncherActivity.instance!!.runOnUiThread(Runnable { LauncherActivity.instance!!.uiManager!!.startCurrentNotificationReply() })
                     return null
                 }
-                return "Notification module is not available."
+                return pack.context.getString(R.string.command_notifications_notification_module_is_not_available_a3d66)
             }
         },
         clear {
@@ -288,7 +288,7 @@ class notifications : ParamCommand() {
                     LauncherActivity.instance!!.runOnUiThread(Runnable { LauncherActivity.instance!!.uiManager!!.dismissCurrentNotification() })
                     return null
                 }
-                return "Notification module is not available."
+                return pack.context.getString(R.string.command_notifications_notification_module_is_not_available_a3d66)
             }
         },
         tutorial {
@@ -335,7 +335,7 @@ class notifications : ParamCommand() {
         companion object {
             fun get(p: String): Param? {
                 var p = p
-                p = p.lowercase(Locale.getDefault())
+                p = p.lowercase(Locale.ROOT)
                 val ps = entries.toTypedArray()
                 for (p1 in ps) if (p.endsWith(p1.label()!!)) return p1
                 return null
@@ -396,7 +396,7 @@ class notifications : ParamCommand() {
             LocalBroadcastManager.getInstance(pack.context.getApplicationContext())
                 .sendBroadcast(rebuild)
 
-            return if (enabled) "Notification module added to dock." else "Notification module removed from dock."
+            return if (enabled) pack.context.getString(R.string.command_notifications_notification_module_added_to_dock_c05a8) else pack.context.getString(R.string.command_notifications_notification_module_removed_from_dock_70376)
         }
     }
 }

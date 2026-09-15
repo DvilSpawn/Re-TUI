@@ -33,13 +33,13 @@ internal object LuaModuleCommands {
         }
 
         val args = Tuils.splitArgs(input)
-        val option = args.get(0)!!.lowercase(Locale.getDefault())
+        val option = args.get(0)!!.lowercase(Locale.ROOT)
 
         if ("-new" == option || "-add" == option) {
             if (args.size < 2) return pack.context.getString(R.string.help_module)
             val requestedName = args.get(1)
             val id = LuaWidgetManager.idFromName(requestedName)
-            if (TextUtils.isEmpty(id)) return "Invalid Lua module id."
+            if (TextUtils.isEmpty(id)) return pack.context.getString(R.string.command_luamodulecommands_invalid_lua_module_id_123ed)
             if (!LuaWidgetManager.exists(id)) {
                 LuaWidgetManager.save(
                     id,
@@ -48,69 +48,69 @@ internal object LuaModuleCommands {
                 )
             }
             openEditor(pack, id)
-            return "Lua module created: " + formatWidget(id)
+            return pack.context.getString(R.string.command_luamodulecommands_lua_module_created_31196, formatWidget(id))
         }
 
         if ("-edit" == option) {
             if (args.size < 2) return pack.context.getString(R.string.help_module)
             val id = LuaWidgetManager.normalizeId(args.get(1))
-            if (TextUtils.isEmpty(id)) return "Invalid Lua module id."
+            if (TextUtils.isEmpty(id)) return pack.context.getString(R.string.command_luamodulecommands_invalid_lua_module_id_123ed)
             if (!LuaWidgetManager.exists(id)) {
                 LuaWidgetManager.save(id, id, LuaWidgetManager.newWidgetTemplate(id))
             }
             openEditor(pack, id)
-            return "Opening Lua module editor: " + formatWidget(id)
+            return pack.context.getString(R.string.command_luamodulecommands_opening_lua_module_editor_e9fb2, formatWidget(id))
         }
 
         if ("-config" == option || "-prefs" == option) {
             if (args.size < 2) return pack.context.getString(R.string.help_module)
             val id = LuaWidgetManager.normalizeId(args.get(1))
-            if (TextUtils.isEmpty(id)) return "Invalid Lua module id."
-            if (!LuaWidgetManager.exists(id)) return "Unknown Lua module: " + id
-            if (!LuaWidgetManager.hasConfig(id)) return "No config surface: " + formatWidget(id)
-            if (!LuaWidgetManager.isEnabled(id)) return "Lua module disabled: " + formatWidget(id) + "\nUse module -enable " + id + "."
+            if (TextUtils.isEmpty(id)) return pack.context.getString(R.string.command_luamodulecommands_invalid_lua_module_id_123ed)
+            if (!LuaWidgetManager.exists(id)) return pack.context.getString(R.string.command_luamodulecommands_unknown_lua_module_ef4ca, id)
+            if (!LuaWidgetManager.hasConfig(id)) return pack.context.getString(R.string.command_luamodulecommands_no_config_surface_92c6f, formatWidget(id))
+            if (!LuaWidgetManager.isEnabled(id)) return pack.context.getString(R.string.command_luamodulecommands_lua_module_disabled_use_module_enable_3ad4f, formatWidget(id), id)
             val trust = LuaWidgetManager.trustStatus(id)
             if (!trust.trusted) {
-                return trustSummary("Lua module config blocked", id, trust)
+                return trustSummary(pack.context, pack.context.getString(R.string.command_luamodulecommands_lua_module_config_blocked_41b80), id, trust)
             }
             openConfig(pack, id)
-            return "Opening Lua module config: " + formatWidget(id)
+            return pack.context.getString(R.string.command_luamodulecommands_opening_lua_module_config_bf40a, formatWidget(id))
         }
 
         if ("-show" == option) {
             if (args.size < 2) return pack.context.getString(R.string.help_module)
             val id = LuaWidgetManager.normalizeId(args.get(1))
-            if (!LuaWidgetManager.exists(id)) return "Unknown Lua module: " + id
-            if (!LuaWidgetManager.isDockable(id)) return "Script is not a dock module: " + formatWidget(
+            if (!LuaWidgetManager.exists(id)) return pack.context.getString(R.string.command_luamodulecommands_unknown_lua_module_ef4ca, id)
+            if (!LuaWidgetManager.isDockable(id)) return pack.context.getString(R.string.command_luamodulecommands_script_is_not_a_dock_module_a030a, formatWidget(
                 id
-            )
-            if (!LuaWidgetManager.isEnabled(id)) return "Lua module disabled: " + formatWidget(id) + "\nUse module -enable " + id + "."
+            ))
+            if (!LuaWidgetManager.isEnabled(id)) return pack.context.getString(R.string.command_luamodulecommands_lua_module_disabled_use_module_enable_3ad4f, formatWidget(id), id)
             ModuleManager.setScriptModule(pack.context, id, LuaWidgetManager.SOURCE_PREFIX + id)
             ModuleManager.addToDock(pack.context, Arrays.asList<String?>(id))
             send(pack, "show", id, 0)
-            return "Lua module opened: " + formatWidget(id)
+            return pack.context.getString(R.string.command_luamodulecommands_lua_module_opened_bd9be, formatWidget(id))
         }
 
         if ("-refresh" == option) {
             if (args.size < 2) return pack.context.getString(R.string.help_module)
             val id = LuaWidgetManager.normalizeId(args.get(1))
-            if (!LuaWidgetManager.exists(id)) return "Unknown Lua module: " + id
-            if (!LuaWidgetManager.isDockable(id)) return "Script is not a dock module: " + formatWidget(
+            if (!LuaWidgetManager.exists(id)) return pack.context.getString(R.string.command_luamodulecommands_unknown_lua_module_ef4ca, id)
+            if (!LuaWidgetManager.isDockable(id)) return pack.context.getString(R.string.command_luamodulecommands_script_is_not_a_dock_module_a030a, formatWidget(
                 id
-            )
-            if (!LuaWidgetManager.isEnabled(id)) return "Lua module disabled: " + formatWidget(id) + "\nUse module -enable " + id + "."
+            ))
+            if (!LuaWidgetManager.isEnabled(id)) return pack.context.getString(R.string.command_luamodulecommands_lua_module_disabled_use_module_enable_3ad4f, formatWidget(id), id)
             ModuleManager.setScriptModule(pack.context, id, LuaWidgetManager.SOURCE_PREFIX + id)
             send(pack, "refresh", id, 0)
-            return "Lua module refresh dispatched: " + formatWidget(id)
+            return pack.context.getString(R.string.command_luamodulecommands_lua_module_refresh_dispatched_fc516, formatWidget(id))
         }
 
         if ("-check" == option) {
             if (args.size < 2) return pack.context.getString(R.string.help_module)
             val id = LuaWidgetManager.normalizeId(args.get(1))
-            if (!LuaWidgetManager.exists(id)) return "Unknown Lua module: " + id
+            if (!LuaWidgetManager.exists(id)) return pack.context.getString(R.string.command_luamodulecommands_unknown_lua_module_ef4ca, id)
             val trust = LuaWidgetManager.trustStatus(id)
             if (!trust.trusted) {
-                return trustSummary("Lua module check blocked", id, trust)
+                return trustSummary(pack.context, pack.context.getString(R.string.command_luamodulecommands_lua_module_check_blocked_dfce4), id, trust)
             }
             val engine = LuaWidgetEngine(
                 pack.context,
@@ -121,52 +121,32 @@ internal object LuaModuleCommands {
             )
             val result = engine.render(true)
             if (!TextUtils.isEmpty(result.error)) {
-                return ("Lua module check failed: " + formatWidget(id)
-                        + (if (TextUtils.isEmpty(result.errorStage)) "" else "\nStage: " + result.errorStage)
-                        + "\n" + result.error
-                        + "\nUse module -copy-error " + id + " or module -edit " + id + ".")
+                return (pack.context.getString(R.string.command_luamodulecommands_lua_module_check_failed_use_module_copy_er_e3e83, formatWidget(id), (if (TextUtils.isEmpty(result.errorStage)) "" else pack.context.getString(R.string.command_luamodulecommands_stage_76cf8, result.errorStage)), result.error, id, id))
             }
-            return ("Lua module check OK: " + formatWidget(id)
-                    + "\nType: " + LuaWidgetManager.getScriptType(id)
-                    + "\nCapabilities: " + LuaWidgetManager.describeCapabilities(
+            return (pack.context.getString(R.string.command_luamodulecommands_lua_module_check_ok_type_capabilities_perm_a9277, formatWidget(id), LuaWidgetManager.getScriptType(id), LuaWidgetManager.describeCapabilities(
                 LuaWidgetManager.readScript(
                     id
                 )
-            )
-                    + "\nPermissions: " + LuaWidgetManager.describeRequiredPermissions(
+            ), LuaWidgetManager.describeRequiredPermissions(
                 LuaWidgetManager.readScript(id)
-            )
-                    + "\nTrust: approved"
-                    + "\nRuntime: API " + LuaWidgetManager.apiVersion(id)
-                    + "\nTitle: " + (if (TextUtils.isEmpty(result.title)) LuaWidgetManager.getName(
+            ), LuaWidgetManager.apiVersion(id), (if (TextUtils.isEmpty(result.title)) LuaWidgetManager.getName(
                 id
-            ) else result.title)
-                    + "\nModule buttons: " + (result.buttons.size + result.valueActions.size + result.commands.size)
-                    + "\nSuggestion chips: " + result.suggestions.size)
+            ) else result.title), (result.buttons.size + result.valueActions.size + result.commands.size), result.suggestions.size))
         }
 
         if ("-info" == option) {
             if (args.size < 2) return pack.context.getString(R.string.help_module)
             val id = LuaWidgetManager.normalizeId(args.get(1))
-            if (!LuaWidgetManager.exists(id)) return "Unknown Lua module: " + id
+            if (!LuaWidgetManager.exists(id)) return pack.context.getString(R.string.command_luamodulecommands_unknown_lua_module_ef4ca, id)
             val meta = LuaWidgetManager.metadata(LuaWidgetManager.readScript(id))
             val trust = LuaWidgetManager.trustStatus(id)
-            return ("Lua module: " + formatWidget(id)
-                    + "\nType: " + LuaWidgetManager.getScriptType(id)
-                    + "\nCapabilities: " + LuaWidgetManager.describeCapabilities(
+            return (pack.context.getString(R.string.command_luamodulecommands_lua_module_type_capabilities_permissions_t_97c7d, formatWidget(id), LuaWidgetManager.getScriptType(id), LuaWidgetManager.describeCapabilities(
                 LuaWidgetManager.readScript(
                     id
                 )
-            )
-                    + "\nPermissions: " + LuaWidgetManager.describeRequiredPermissions(
+            ), LuaWidgetManager.describeRequiredPermissions(
                 LuaWidgetManager.readScript(id)
-            )
-                    + "\nTrust: " + (if (trust.trusted) "approved" else "needs approval")
-                    + "\nRuntime: API " + LuaWidgetManager.apiVersion(id)
-                    + "\nState: " + (if (LuaWidgetManager.isEnabled(id)) "enabled" else "disabled")
-                    + "\nDescription: " + valueOr(meta.get("description"), "none")
-                    + "\nAuthor: " + valueOr(meta.get("author"), "unknown")
-                    + "\nVersion: " + valueOr(meta.get("version"), "none"))
+            ), (if (trust.trusted) "approved" else pack.context.getString(R.string.command_luamodulecommands_needs_approval_e0c3e)), LuaWidgetManager.apiVersion(id), (if (LuaWidgetManager.isEnabled(id)) "enabled" else "disabled"), valueOr(meta.get("description"), "none"), valueOr(meta.get("author"), "unknown"), valueOr(meta.get("version"), "none")))
         }
 
         if ("-approve" == option || "-trust" == option) {
@@ -177,20 +157,19 @@ internal object LuaModuleCommands {
                 ModuleManager.setScriptModule(pack.context, id, LuaWidgetManager.SOURCE_PREFIX + id)
                 send(pack, "update", id, 0)
             }
-            return ("Lua module approved: " + formatWidget(id)
-                    + "\nPermissions: " + LuaWidgetManager.describeRequiredPermissions(
+            return (pack.context.getString(R.string.command_luamodulecommands_lua_module_approved_permissions_2f15f, formatWidget(id), LuaWidgetManager.describeRequiredPermissions(
                 LuaWidgetManager.readScript(id)
-            ))
+            )))
         }
 
         if ("-copy-error" == option) {
             if (args.size < 2) return pack.context.getString(R.string.help_module)
             val id = LuaWidgetManager.normalizeId(args.get(1))
-            if (!LuaWidgetManager.exists(id)) return "Unknown Lua module: " + id
+            if (!LuaWidgetManager.exists(id)) return pack.context.getString(R.string.command_luamodulecommands_unknown_lua_module_ef4ca, id)
             val error = LuaWidgetManager.lastError(id)
-            if (TextUtils.isEmpty(error)) return "No saved Lua error: " + formatWidget(id)
+            if (TextUtils.isEmpty(error)) return pack.context.getString(R.string.command_luamodulecommands_no_saved_lua_error_34d62, formatWidget(id))
             copyToClipboard(pack.context, error)
-            return "Lua error copied: " + formatWidget(id)
+            return pack.context.getString(R.string.command_luamodulecommands_lua_error_copied_daae5, formatWidget(id))
         }
 
         if ("-disable" == option) {
@@ -199,7 +178,7 @@ internal object LuaModuleCommands {
             LuaWidgetManager.setEnabled(id, false)
             ModuleManager.removeFromDock(pack.context, Arrays.asList<String?>(id))
             send(pack, "rebuild", null, 0)
-            return "Lua module disabled: " + formatWidget(id)
+            return pack.context.getString(R.string.command_luamodulecommands_lua_module_disabled_407cc, formatWidget(id))
         }
 
         if ("-enable" == option) {
@@ -210,7 +189,7 @@ internal object LuaModuleCommands {
                 ModuleManager.setScriptModule(pack.context, id, LuaWidgetManager.SOURCE_PREFIX + id)
             }
             send(pack, "rebuild", null, 0)
-            return "Lua module enabled: " + formatWidget(id)
+            return pack.context.getString(R.string.command_luamodulecommands_lua_module_enabled_a1b01, formatWidget(id))
         }
 
         if ("-export" == option) {
@@ -218,18 +197,18 @@ internal object LuaModuleCommands {
             val id = LuaWidgetManager.normalizeId(args.get(1))
             val exported = LuaWidgetManager.exportPackage(id)
             copyToClipboard(pack.context, exported)
-            return "Lua module package copied to clipboard: " + formatWidget(id)
+            return pack.context.getString(R.string.command_luamodulecommands_lua_module_package_copied_to_clipboard_334d8, formatWidget(id))
         }
 
         if ("-rename" == option || "-mv" == option) {
             if (args.size < 3) return pack.context.getString(R.string.help_module)
             val oldId = LuaWidgetManager.normalizeId(args.get(1))
             val newId = LuaWidgetManager.idFromName(args.get(2))
-            if (TextUtils.isEmpty(newId)) return "Invalid Lua module id."
-            if (!LuaWidgetManager.exists(oldId)) return "Unknown Lua module: " + oldId
-            if (TextUtils.equals(oldId, newId)) return "Lua module id unchanged: " + formatWidget(oldId)
+            if (TextUtils.isEmpty(newId)) return pack.context.getString(R.string.command_luamodulecommands_invalid_lua_module_id_123ed)
+            if (!LuaWidgetManager.exists(oldId)) return pack.context.getString(R.string.command_luamodulecommands_unknown_lua_module_ef4ca, oldId)
+            if (TextUtils.equals(oldId, newId)) return pack.context.getString(R.string.command_luamodulecommands_lua_module_id_unchanged_f0ada, formatWidget(oldId))
             if (ModuleManager.isKnown(pack.context, newId) || LuaWidgetManager.exists(newId)) {
-                return "Lua module id already exists: " + newId
+                return pack.context.getString(R.string.command_luamodulecommands_lua_module_id_already_exists_7eb87, newId)
             }
 
             val oldLabel = formatWidget(oldId)
@@ -250,22 +229,22 @@ internal object LuaModuleCommands {
                 ModuleManager.removeScriptModule(pack.context, newId)
             }
             send(pack, "rebuild", null, 0)
-            return "Lua module id changed: " + oldLabel + " -> " + formatWidget(newId)
+            return pack.context.getString(R.string.command_luamodulecommands_lua_module_id_changed_ac703, oldLabel, formatWidget(newId))
         }
 
         if ("-click" == option) {
             if (args.size < 3) return pack.context.getString(R.string.help_module)
             val id = LuaWidgetManager.normalizeId(args.get(1))
-            if (!LuaWidgetManager.exists(id)) return "Unknown Lua module: " + id
-            if (!LuaWidgetManager.isDockable(id)) return "Script is not a dock module: " + formatWidget(
+            if (!LuaWidgetManager.exists(id)) return pack.context.getString(R.string.command_luamodulecommands_unknown_lua_module_ef4ca, id)
+            if (!LuaWidgetManager.isDockable(id)) return pack.context.getString(R.string.command_luamodulecommands_script_is_not_a_dock_module_a030a, formatWidget(
                 id
-            )
-            if (!LuaWidgetManager.isEnabled(id)) return "Lua module disabled: " + formatWidget(id)
+            ))
+            if (!LuaWidgetManager.isEnabled(id)) return pack.context.getString(R.string.command_luamodulecommands_lua_module_disabled_407cc, formatWidget(id))
             val index: Int
             try {
                 index = args.get(2)!!.toInt()
             } catch (e: Exception) {
-                return "Invalid Lua module action index: " + args.get(2)
+                return pack.context.getString(R.string.command_luamodulecommands_invalid_lua_module_action_index_d4245, args.get(2))
             }
             send(pack, "lua_click", id, index)
             return null
@@ -274,11 +253,11 @@ internal object LuaModuleCommands {
         if ("-action" == option || "-send" == option || "-input" == option) {
             if (args.size < 3) return pack.context.getString(R.string.help_module)
             val id = LuaWidgetManager.normalizeId(args.get(1))
-            if (!LuaWidgetManager.exists(id)) return "Unknown Lua module: " + id
-            if (!LuaWidgetManager.isDockable(id)) return "Script is not a dock module: " + formatWidget(
+            if (!LuaWidgetManager.exists(id)) return pack.context.getString(R.string.command_luamodulecommands_unknown_lua_module_ef4ca, id)
+            if (!LuaWidgetManager.isDockable(id)) return pack.context.getString(R.string.command_luamodulecommands_script_is_not_a_dock_module_a030a, formatWidget(
                 id
-            )
-            if (!LuaWidgetManager.isEnabled(id)) return "Lua module disabled: " + formatWidget(id)
+            ))
+            if (!LuaWidgetManager.isEnabled(id)) return pack.context.getString(R.string.command_luamodulecommands_lua_module_disabled_407cc, formatWidget(id))
             send(pack, "lua_action", id, 0, TextUtils.join(" ", args.subList(2, args.size)))
             return null
         }
@@ -286,16 +265,16 @@ internal object LuaModuleCommands {
         if ("-dialog" == option) {
             if (args.size < 3) return pack.context.getString(R.string.help_module)
             val id = LuaWidgetManager.normalizeId(args.get(1))
-            if (!LuaWidgetManager.exists(id)) return "Unknown Lua module: " + id
-            if (!LuaWidgetManager.isDockable(id)) return "Script is not a dock module: " + formatWidget(
+            if (!LuaWidgetManager.exists(id)) return pack.context.getString(R.string.command_luamodulecommands_unknown_lua_module_ef4ca, id)
+            if (!LuaWidgetManager.isDockable(id)) return pack.context.getString(R.string.command_luamodulecommands_script_is_not_a_dock_module_a030a, formatWidget(
                 id
-            )
-            if (!LuaWidgetManager.isEnabled(id)) return "Lua module disabled: " + formatWidget(id)
+            ))
+            if (!LuaWidgetManager.isEnabled(id)) return pack.context.getString(R.string.command_luamodulecommands_lua_module_disabled_407cc, formatWidget(id))
             val index: Int
             try {
                 index = args.get(2)!!.toInt()
             } catch (e: Exception) {
-                return "Invalid Lua module dialog index: " + args.get(2)
+                return pack.context.getString(R.string.command_luamodulecommands_invalid_lua_module_dialog_index_a7b13, args.get(2))
             }
             send(pack, "lua_dialog", id, index)
             return null
@@ -304,11 +283,11 @@ internal object LuaModuleCommands {
         if ("-expand" == option || "-collapse" == option || "-toggle" == option) {
             if (args.size < 2) return pack.context.getString(R.string.help_module)
             val id = LuaWidgetManager.normalizeId(args.get(1))
-            if (!LuaWidgetManager.exists(id)) return "Unknown Lua module: " + id
-            if (!LuaWidgetManager.isDockable(id)) return "Script is not a dock module: " + formatWidget(
+            if (!LuaWidgetManager.exists(id)) return pack.context.getString(R.string.command_luamodulecommands_unknown_lua_module_ef4ca, id)
+            if (!LuaWidgetManager.isDockable(id)) return pack.context.getString(R.string.command_luamodulecommands_script_is_not_a_dock_module_a030a, formatWidget(
                 id
-            )
-            if (!LuaWidgetManager.isEnabled(id)) return "Lua module disabled: " + formatWidget(id)
+            ))
+            if (!LuaWidgetManager.isEnabled(id)) return pack.context.getString(R.string.command_luamodulecommands_lua_module_disabled_407cc, formatWidget(id))
             val command = if ("-expand" == option)
                 "lua_expand"
             else
@@ -324,7 +303,7 @@ internal object LuaModuleCommands {
             LuaWidgetManager.delete(id)
             ModuleManager.removeScriptModule(pack.context, id)
             send(pack, "rebuild", null, 0)
-            return "Lua module removed: " + label
+            return pack.context.getString(R.string.command_luamodulecommands_lua_module_removed_5769f, label)
         }
 
         return pack.context.getString(R.string.output_invalid_param) + " " + args.get(0)
@@ -332,9 +311,7 @@ internal object LuaModuleCommands {
 
     private fun listWidgets(pack: ExecutePack): String {
         val ids = LuaWidgetManager.listIds()
-        return ("Lua modules: " + (if (ids.isEmpty()) "none" else formatWidgets(ids))
-                + "\nUse module -new lua [name], module -edit [id], module -config [id], module -show [id], module -refresh [id], module -check [id], module -info [id], module -approve [id], module -copy-error [id], module -disable|-enable [id], module -export [id], module -expand|-collapse|-toggle [id]."
-                + "\nLegacy widget aliases still work.")
+        return (pack.context.getString(R.string.command_luamodulecommands_lua_modules_use_module_new_lua_name_module_b0bc0, (if (ids.isEmpty()) "none" else formatWidgets(ids))))
     }
 
     private fun formatWidgets(ids: MutableList<String?>): String {
@@ -355,26 +332,25 @@ internal object LuaModuleCommands {
         return if (TextUtils.isEmpty(value)) fallback else value
     }
 
-    private fun trustSummary(prefix: String, id: String?, trust: TrustStatus): String {
+    private fun trustSummary(context: Context, prefix: String, id: String?, trust: TrustStatus): String {
         val out = StringBuilder(prefix).append(": ").append(formatWidget(id))
-        out.append("\nPermissions: ")
+        out.append(context.getString(R.string.lua_detail_luamodulecommands_permissions_f56cd))
             .append(
-                if (trust.requiredPermissions.isEmpty()) "none" else TextUtils.join(
+                if (trust.requiredPermissions.isEmpty()) context.getString(R.string.lua_detail_luamodulecommands_none_71f8e) else TextUtils.join(
                     ", ",
                     trust.requiredPermissions
                 )
             )
         if (!trust.missingDeclarations.isEmpty()) {
-            out.append("\nDeclare first: ").append(TextUtils.join(", ", trust.missingDeclarations))
+            out.append(context.getString(R.string.lua_detail_luamodulecommands_declare_first_9cbcd)).append(TextUtils.join(", ", trust.missingDeclarations))
         }
         if (!trust.unsupportedPermissions.isEmpty()) {
-            out.append("\nUnsupported: ").append(TextUtils.join(", ", trust.unsupportedPermissions))
+            out.append(context.getString(R.string.lua_detail_luamodulecommands_unsupported_50a59)).append(TextUtils.join(", ", trust.unsupportedPermissions))
         }
         if (trust.canApprove()) {
-            out.append("\nUse module -approve ").append(LuaWidgetManager.normalizeId(id))
-                .append(" to allow this script.")
+            out.append(context.getString(R.string.lua_approve_module_instruction, LuaWidgetManager.normalizeId(id)))
         } else {
-            out.append("\nEdit the script metadata before approval.")
+            out.append(context.getString(R.string.lua_detail_luamodulecommands_edit_the_script_metadata_before_approval_bb65e))
         }
         return out.toString()
     }
@@ -416,7 +392,7 @@ internal object LuaModuleCommands {
         if (manager != null) {
             manager.setPrimaryClip(
                 ClipData.newPlainText(
-                    "Re:TUI Lua module package",
+                    context.getString(R.string.command_luamodulecommands_re_tui_lua_module_package_c1350),
                     if (text == null) "" else text
                 )
             )

@@ -8,6 +8,9 @@ import android.os.IBinder
 import ohi.andre.consolelauncher.tuils.Tuils
 
 class NotificationMonitorService : Service() {
+    override fun getResources(): android.content.res.Resources =
+        ohi.andre.consolelauncher.localization.LanguagePacks.resources(super.getResources())
+
     override fun onCreate() {
         super.onCreate()
         ensureCollectorRunning()

@@ -57,7 +57,7 @@
         android:paddingEnd="12dp"
         android:paddingTop="2dp"
         android:paddingBottom="2dp"
-        android:text="Applications/ [s]"
+        android:text="@string/ui_apps_drawer_applications_s"
         android:textColor="#A5D6A7"
         style="@style/Retui.Text.Body"
         android:fontFamily="monospace" />
@@ -115,7 +115,7 @@
         android:paddingEnd="12dp"
         android:paddingTop="2dp"
         android:paddingBottom="2dp"
-        android:text="total 0 [~]"
+        android:text="@string/ui_apps_drawer_total_0"
         android:textColor="#A5D6A7"
         style="@style/Retui.Text.Control"
         android:fontFamily="monospace" />

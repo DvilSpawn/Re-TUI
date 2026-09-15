@@ -35,14 +35,14 @@
                 android:id="@+id/profile_photo"
                 android:layout_width="136dp"
                 android:layout_height="112dp"
-                android:contentDescription="Temporary profile portrait"
+                android:contentDescription="@string/ui_profile_surface_temporary_profile_portrait"
                 android:scaleType="fitCenter" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="IDENTITY"
+                android:text="@string/ui_profile_surface_identity"
                 style="@style/Retui.Text.Micro" />
 
             <TextView
@@ -50,23 +50,23 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="OPERATOR"
+                android:text="@string/ui_profile_surface_operator"
                 android:textSize="26sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="PHONE // TAP TO REVEAL 30S"
+                android:text="@string/ui_profile_surface_phone_tap_to_reveal_30s"
                 android:textSize="9sp" />
 
             <TextView
                 android:id="@+id/profile_phone"
                 android:layout_width="match_parent"
                 android:layout_height="32dp"
-                android:contentDescription="Masked phone number. Tap to reveal for 30 seconds."
+                android:contentDescription="@string/ui_profile_surface_masked_phone_number_tap_to_reveal_for_30_seconds"
                 android:gravity="center"
-                android:text="NOT SET"
+                android:text="@string/ui_profile_surface_not_set"
                 android:textSize="21sp" />
 
             <Space
@@ -79,7 +79,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:gravity="center"
-                android:text="EDIT PROFILE" />
+                android:text="@string/ui_profile_surface_edit_profile" />
         </LinearLayout>
 
         <LinearLayout
@@ -100,14 +100,14 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="CONNECTION CODES"
+                    android:text="@string/ui_profile_surface_connection_codes"
                     style="@style/Retui.Text.Micro" />
 
                 <TextView
                     android:id="@+id/profile_qr_position"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="00/00"
+                    android:text="@string/ui_token_d9fa58d9ac"
                     style="@style/Retui.Text.Micro" />
             </LinearLayout>
 
@@ -130,7 +130,7 @@
                     android:layout_marginEnd="4dp"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="ADD QR" />
+                    android:text="@string/ui_profile_surface_add_qr" />
 
                 <TextView
                     android:id="@+id/profile_remove_qr"
@@ -139,7 +139,7 @@
                     android:layout_marginStart="4dp"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="REMOVE QR" />
+                    android:text="@string/ui_profile_surface_remove_qr" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
@@ -156,7 +156,7 @@
         android:paddingTop="2dp"
         android:paddingEnd="12dp"
         android:paddingBottom="2dp"
-        android:text="PROFILE // LOCAL ID"
+        android:text="@string/ui_profile_surface_profile_local_id"
         style="@style/Retui.Text.Body" />
 
     <TextView
@@ -166,6 +166,6 @@
         android:layout_gravity="top|end"
         android:layout_marginTop="8dp"
         android:gravity="center"
-        android:text="X"
+        android:text="@string/ui_profile_surface_x"
         style="@style/Retui.Text.Header" />
 </FrameLayout>

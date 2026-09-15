@@ -1,0 +1,57 @@
+<resources>
+    <!-- Command responses. Translate prose; preserve examples and format arguments. -->
+    <!-- lua.kt: appInfo -->
+    <string name="lua_detail_lua_approved_c9560" formatted="false">"approved"</string>
+    <!-- lua.kt: trustSummary -->
+    <string name="lua_detail_lua_declare_first_9cbcd" formatted="false">"\nDeclare first: "</string>
+    <!-- lua.kt: appInfo -->
+    <string name="lua_detail_lua_disabled_07596" formatted="false">"disabled"</string>
+    <!-- lua.kt: trustSummary -->
+    <string name="lua_detail_lua_edit_the_script_metadata_before_approval_bb65e" formatted="false">"\nEdit the script metadata before approval."</string>
+    <!-- lua.kt: appInfo -->
+    <string name="lua_detail_lua_enabled_3ea3f" formatted="false">"enabled"</string>
+    <!-- lua.kt: validateApp -->
+    <string name="lua_detail_lua_invalid_lua_app_id_7476c" formatted="false">"Invalid Lua app id."</string>
+    <!-- lua.kt: validateApp -->
+    <string name="lua_detail_lua_lua_app_blocked_c1521" formatted="false">"Lua app blocked"</string>
+    <!-- lua.kt: validateApp -->
+    <string name="lua_detail_lua_lua_app_disabled_use_lua_enable_8bf60">"Lua app disabled: %1$s\nUse lua -enable %2$s."</string>
+    <!-- lua.kt: appInfo -->
+    <string name="lua_detail_lua_lua_app_type_capabilities_permissions_trus_09614">"Lua app: %1$s\nType: %2$s\nCapabilities: %3$s\nPermissions: %4$s\nTrust: %5$s\nRuntime: API %6$s\nState: %7$s\nDescription: %8$s\nAuthor: %9$s\nVersion: %10$s"</string>
+    <!-- lua.kt: listApps -->
+    <string name="lua_detail_lua_lua_apps_use_lua_new_app_name_lua_app_id_l_55ff9">"Lua apps: %1$s\nUse lua -new app [name], lua -app [id], lua -edit [id], lua -check [id], lua -info [id], lua -approve [id], lua -config [id], lua -export [id], lua -disable|-enable [id]."</string>
+    <!-- lua.kt: appInfo -->
+    <string name="lua_detail_lua_needs_approval_e0c3e" formatted="false">"needs approval"</string>
+    <!-- lua.kt: trustSummary -->
+    <string name="lua_detail_lua_none_71f8e" formatted="false">"none"</string>
+    <!-- lua.kt: trustSummary -->
+    <string name="lua_detail_lua_permissions_f56cd" formatted="false">"\nPermissions: "</string>
+    <!-- lua.kt: validateApp -->
+    <string name="lua_detail_lua_script_is_not_a_lua_app_use_lua_new_app_na_1623c">"Script is not a Lua app: %1$s\nUse lua -new app [name] for the app surface."</string>
+    <!-- lua.kt: trustSummary -->
+    <string name="lua_detail_lua_to_allow_this_app_81fdd" formatted="false">" to allow this app."</string>
+    <!-- lua.kt: appInfo -->
+    <string name="lua_detail_lua_unknown_50d8b" formatted="false">"unknown"</string>
+    <!-- lua.kt: validateApp -->
+    <string name="lua_detail_lua_unknown_lua_app_e937e">"Unknown Lua app: %1$s"</string>
+    <!-- lua.kt: trustSummary -->
+    <string name="lua_detail_lua_unsupported_50a59" formatted="false">"\nUnsupported: "</string>
+    <!-- lua.kt: trustSummary -->
+    <string name="lua_detail_lua_use_lua_approve_4747a" formatted="false">"\nUse lua -approve "</string>
+    <!-- LuaModuleCommands.kt: trustSummary -->
+    <string name="lua_detail_luamodulecommands_declare_first_9cbcd" formatted="false">"\nDeclare first: "</string>
+    <!-- LuaModuleCommands.kt: trustSummary -->
+    <string name="lua_detail_luamodulecommands_edit_the_script_metadata_before_approval_bb65e" formatted="false">"\nEdit the script metadata before approval."</string>
+    <!-- LuaModuleCommands.kt: trustSummary -->
+    <string name="lua_detail_luamodulecommands_none_71f8e" formatted="false">"none"</string>
+    <!-- LuaModuleCommands.kt: trustSummary -->
+    <string name="lua_detail_luamodulecommands_permissions_f56cd" formatted="false">"\nPermissions: "</string>
+    <!-- LuaModuleCommands.kt: trustSummary -->
+    <string name="lua_detail_luamodulecommands_to_allow_this_script_ef43a" formatted="false">" to allow this script."</string>
+    <!-- LuaModuleCommands.kt: trustSummary -->
+    <string name="lua_detail_luamodulecommands_unsupported_50a59" formatted="false">"\nUnsupported: "</string>
+    <!-- LuaModuleCommands.kt: trustSummary -->
+    <string name="lua_detail_luamodulecommands_use_module_approve_24caa" formatted="false">"\nUse module -approve "</string>
+    <string name="lua_approve_app_instruction">"\nUse lua -approve %1$s to allow this app."</string>
+    <string name="lua_approve_module_instruction">"\nUse module -approve %1$s to allow this script."</string>
+</resources>

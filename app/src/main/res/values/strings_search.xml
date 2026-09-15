@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="search_alias">"ALIAS · %1$s"</string>
+    <string name="search_app">"APP · %1$s"</string>
+    <string name="search_call">"Call %1$s"</string>
+    <string name="search_category_aliases" formatted="false">"ALIASES"</string>
+    <string name="search_category_app_groups" formatted="false">"APP GROUPS"</string>
+    <string name="search_category_apps" formatted="false">"APPS"</string>
+    <string name="search_category_commands" formatted="false">"COMMANDS"</string>
+    <string name="search_category_contact_actions" formatted="false">"CONTACT ACTIONS"</string>
+    <string name="search_category_contacts" formatted="false">"CONTACTS"</string>
+    <string name="search_category_enable_access" formatted="false">"ENABLE ACCESS"</string>
+    <string name="search_category_notifications" formatted="false">"NOTIFICATIONS"</string>
+    <string name="search_category_output" formatted="false">"OUTPUT"</string>
+    <string name="search_category_params" formatted="false">"PARAMS"</string>
+    <string name="search_category_results" formatted="false">"RESULTS"</string>
+    <string name="search_category_web" formatted="false">"WEB"</string>
+    <string name="search_command" formatted="false">"COMMAND"</string>
+    <string name="search_contact">"CONTACT · %1$s"</string>
+    <string name="search_contact_action" formatted="false">"CONTACT ACTION"</string>
+    <string name="search_contacts_permission" formatted="false">"PERMISSION · Allow Re:T-UI to search contacts"</string>
+    <string name="search_enable_contacts" formatted="false">"Enable contact search"</string>
+    <string name="search_enable_notifications" formatted="false">"Enable notification search"</string>
+    <string name="search_message">"Message %1$s"</string>
+    <string name="search_notification" formatted="false">"NOTIFICATION"</string>
+    <string name="search_notification_access" formatted="false">"ACCESS · Open Android notification access"</string>
+    <string name="search_open_url" formatted="false">"Open URL"</string>
+    <string name="search_parameter" formatted="false">"PARAMETER"</string>
+    <string name="search_provider">"WEB PROVIDER · -%1$s"</string>
+    <string name="search_view">"View %1$s"</string>
+    <plurals name="search_group_apps">
+        <item quantity="one">APP GROUP · %1$d app</item>
+        <item quantity="other">APP GROUP · %1$d apps</item>
+    </plurals>
+    <string name="toolbar_icon_star">Star</string>
+    <string name="toolbar_icon_bell">Bell</string>
+    <string name="toolbar_icon_chat">Chat</string>
+    <string name="toolbar_icon_music">Music</string>
+    <string name="toolbar_icon_timer">Timer</string>
+    <string name="toolbar_icon_note">Note</string>
+    <string name="toolbar_icon_search">Search</string>
+    <string name="toolbar_icon_refresh">Refresh</string>
+    <string name="toolbar_icon_home">Home</string>
+    <string name="toolbar_icon_terminal">Terminal</string>
+    <string name="toolbar_icon_lock">Lock</string>
+    <string name="toolbar_icon_apps">Apps</string>
+    <string name="launcher_grant_storage">Please grant storage permissions to Re:T-UI</string>
+    <string name="launcher_storage_required">Storage permission is required for Re:T-UI to function.</string>
+    <string name="module_action_access">access</string>
+    <string name="module_action_clear">clear</string>
+    <string name="module_action_copy">copy</string>
+    <string name="module_action_edit">edit</string>
+    <string name="module_action_file">file</string>
+    <string name="module_action_filters">filters</string>
+    <string name="module_action_hide_status">hide status</string>
+    <string name="module_action_info">info</string>
+    <string name="module_action_latest">latest</string>
+    <string name="module_action_list">list</string>
+    <string name="module_action_location">location</string>
+    <string name="module_action_next">next</string>
+    <string name="module_action_open">open</string>
+    <string name="module_action_play">play</string>
+    <string name="module_action_pomodoro">pomodoro</string>
+    <string name="module_action_prev">prev</string>
+    <string name="module_action_refresh">refresh</string>
+    <string name="module_action_reply">reply</string>
+    <string name="module_action_rules">rules</string>
+    <string name="module_action_setup">setup</string>
+    <string name="module_action_show_status">show status</string>
+    <string name="module_action_status">status</string>
+    <string name="module_action_stop">stop</string>
+    <string name="module_action_todo">todo</string>
+    <string name="module_action_update">update</string>
+    <string name="module_label_calendar">CALENDAR</string>
+    <string name="module_label_events">EVENTS</string>
+    <string name="module_label_music">MUSIC</string>
+    <string name="module_label_notes">NOTES</string>
+    <string name="module_label_notifications">NOTIFICATIONS</string>
+    <string name="module_label_reminder">REMINDER</string>
+    <string name="module_label_rss">RSS</string>
+    <string name="module_label_timer">TIMER</string>
+    <string name="module_label_weather">WEATHER</string>
+    <string name="module_label_weather_native">WEATHER (NATIVE)</string>
+    <string name="app_work_profile_label">%1$s (Work)</string>
+</resources>

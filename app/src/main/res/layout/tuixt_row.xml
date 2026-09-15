@@ -44,7 +44,7 @@
             android:id="@+id/setting_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="OFF"
+            android:text="@string/ui_tuixt_row_off"
             android:fontFamily="monospace"
             android:visibility="gone" />
 

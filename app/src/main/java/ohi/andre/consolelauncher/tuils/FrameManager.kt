@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher.tuils
 
+import ohi.andre.consolelauncher.R
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -22,47 +23,47 @@ import java.util.zip.ZipOutputStream
 import ohi.andre.consolelauncher.managers.xml.options.SurfaceBorder
 import org.json.JSONObject
 
-enum class FrameTarget(val id: String, val label: String) {
-    STATUS_GROUP("status_group", "Unified status group"),
-    STATUS_RAM("status_ram", "RAM status"),
-    STATUS_DEVICE("status_device", "Device status"),
-    STATUS_TIME("status_time", "Time status"),
-    STATUS_BATTERY("status_battery", "Battery status"),
-    STATUS_STORAGE("status_storage", "Storage status"),
-    STATUS_NETWORK("status_network", "Network status"),
-    STATUS_NOTES("status_notes", "Notes status"),
-    STATUS_WEATHER("status_weather", "Weather status"),
-    STATUS_UNLOCK("status_unlock", "Unlock status"),
-    STATUS_ASCII("status_ascii", "ASCII status"),
-    OUTPUT("output", "Terminal output"),
-    INPUT("input", "Terminal input"),
-    TOOLBAR("toolbar", "Toolbar buttons"),
-    SUGGESTIONS("suggestions", "Suggestion chips"),
-    MUSIC("music", "Music widget"),
-    NOTIFICATIONS("notifications", "Notification widget"),
-    MODULES("modules", "Modules"),
-    MODULE_DOCK("module_dock", "Module dock"),
-    APP_DRAWER("app_drawer", "App drawer"),
-    WIDGET_DRAWER("widget_drawer", "Widget drawer"),
-    KEYBOARD("keyboard", "Re:TUI Keyboard"),
-    FILES("files", "Re:TUI Files"),
-    OVERLAYS("overlays", "Overlay windows"),
-    SETTINGS("settings", "Settings and dialogs"),
-    DIALOG("dialog", "Dialogs"),
-    HEADER("header", "Headers"),
-    LIST_ITEM("list_item", "List items"),
-    LIST_ITEM_SELECTED("list_item_selected", "Selected list items"),
-    UI_INPUT("ui_input", "Settings inputs"),
-    BUTTON("button", "Buttons"),
-    BUTTON_PRESSED("button_pressed", "Pressed buttons"),
-    BUTTON_PRIMARY("button_primary", "Primary buttons"),
-    ICON_BUTTON("icon_button", "Icon buttons"),
-    TOGGLE_OFF("toggle_off", "Toggle off"),
-    TOGGLE_ON("toggle_on", "Toggle on"),
-    SLIDER_TRACK("slider_track", "Slider track"),
-    SLIDER_PROGRESS("slider_progress", "Slider progress"),
-    SLIDER_THUMB("slider_thumb", "Slider thumb"),
-    CONTROLS("controls", "Other launcher controls");
+enum class FrameTarget(val id: String, val labelRes: Int) {
+    STATUS_GROUP("status_group", R.string.frame_target_status_group),
+    STATUS_RAM("status_ram", R.string.frame_target_status_ram),
+    STATUS_DEVICE("status_device", R.string.frame_target_status_device),
+    STATUS_TIME("status_time", R.string.frame_target_status_time),
+    STATUS_BATTERY("status_battery", R.string.frame_target_status_battery),
+    STATUS_STORAGE("status_storage", R.string.frame_target_status_storage),
+    STATUS_NETWORK("status_network", R.string.frame_target_status_network),
+    STATUS_NOTES("status_notes", R.string.frame_target_status_notes),
+    STATUS_WEATHER("status_weather", R.string.frame_target_status_weather),
+    STATUS_UNLOCK("status_unlock", R.string.frame_target_status_unlock),
+    STATUS_ASCII("status_ascii", R.string.frame_target_status_ascii),
+    OUTPUT("output", R.string.frame_target_output),
+    INPUT("input", R.string.frame_target_input),
+    TOOLBAR("toolbar", R.string.frame_target_toolbar),
+    SUGGESTIONS("suggestions", R.string.frame_target_suggestions),
+    MUSIC("music", R.string.frame_target_music),
+    NOTIFICATIONS("notifications", R.string.frame_target_notifications),
+    MODULES("modules", R.string.frame_target_modules),
+    MODULE_DOCK("module_dock", R.string.frame_target_module_dock),
+    APP_DRAWER("app_drawer", R.string.frame_target_app_drawer),
+    WIDGET_DRAWER("widget_drawer", R.string.frame_target_widget_drawer),
+    KEYBOARD("keyboard", R.string.frame_target_keyboard),
+    FILES("files", R.string.frame_target_files),
+    OVERLAYS("overlays", R.string.frame_target_overlays),
+    SETTINGS("settings", R.string.frame_target_settings),
+    DIALOG("dialog", R.string.frame_target_dialog),
+    HEADER("header", R.string.frame_target_header),
+    LIST_ITEM("list_item", R.string.frame_target_list_item),
+    LIST_ITEM_SELECTED("list_item_selected", R.string.frame_target_list_item_selected),
+    UI_INPUT("ui_input", R.string.frame_target_ui_input),
+    BUTTON("button", R.string.frame_target_button),
+    BUTTON_PRESSED("button_pressed", R.string.frame_target_button_pressed),
+    BUTTON_PRIMARY("button_primary", R.string.frame_target_button_primary),
+    ICON_BUTTON("icon_button", R.string.frame_target_icon_button),
+    TOGGLE_OFF("toggle_off", R.string.frame_target_toggle_off),
+    TOGGLE_ON("toggle_on", R.string.frame_target_toggle_on),
+    SLIDER_TRACK("slider_track", R.string.frame_target_slider_track),
+    SLIDER_PROGRESS("slider_progress", R.string.frame_target_slider_progress),
+    SLIDER_THUMB("slider_thumb", R.string.frame_target_slider_thumb),
+    CONTROLS("controls", R.string.frame_target_controls);
 
     companion object {
         fun fromSurface(surface: SurfaceBorder): FrameTarget = when (surface) {
@@ -245,7 +246,7 @@ object FrameManager {
             val key = assignmentKey(target)
             if (assetId == null) state.assignments.remove(key)
             else {
-                require(ASSET_ID.matches(assetId)) { "Invalid frame selection." }
+                require(ASSET_ID.matches(assetId)) { throw LocalizedArgumentException(R.string.validation_frame_framemanager_invalid_frame_selection_8beeb) }
                 state.assignments[key] = assetId
             }
             state.activePackId = null
@@ -272,18 +273,18 @@ object FrameManager {
             ?.takeIf(state.packs::containsKey)
             ?.takeUnless(::isBuiltInPack)
 
-        fun packNameError(name: String): String? {
+        fun packNameError(name: String): LocalizedArgumentException? {
             val clean = name.trim()
-            if (clean.isEmpty() || clean.length > 80) return "Pack name must be 1 to 80 characters."
+            if (clean.isEmpty() || clean.length > 80) return LocalizedArgumentException(R.string.frame_pack_name_length)
             if (state.packs.values.any { it.name.equals(clean, ignoreCase = true) }) {
-                return "A frame pack with that name already exists."
+                return LocalizedArgumentException(R.string.frame_pack_name_exists)
             }
             return null
         }
 
         fun createPack(name: String): FramePack {
             val clean = name.trim()
-            require(packNameError(clean) == null) { packNameError(clean) ?: "Invalid frame pack name." }
+            packNameError(clean)?.let { throw it }
             val id = sha256(UUID.randomUUID().toString().toByteArray(Charsets.UTF_8))
             return FramePack(id, clean, state.applyToAll, HashMap(state.assignments)).also {
                 state.packs[id] = it
@@ -293,8 +294,8 @@ object FrameManager {
         }
 
         fun replacePack(packId: String): FramePack {
-            require(!isBuiltInPack(packId)) { "Built-in frame packs cannot be replaced." }
-            val current = requireNotNull(state.packs[packId]) { "Frame pack is missing." }
+            require(!isBuiltInPack(packId)) { throw LocalizedArgumentException(R.string.validation_frame_framemanager_built_in_frame_packs_cannot_be_replaced_3e9fd) }
+            val current = requireNotNull(state.packs[packId]) { throw LocalizedArgumentException(R.string.validation_frame_framemanager_frame_pack_is_missing_7eff1) }
             return current.copy(applyToAll = state.applyToAll, assignments = HashMap(state.assignments)).also {
                 state.packs[packId] = it
                 state.activePackId = packId
@@ -303,7 +304,7 @@ object FrameManager {
         }
 
         fun applyPack(packId: String) {
-            val pack = requireNotNull(state.packs[packId]) { "Frame pack is missing." }
+            val pack = requireNotNull(state.packs[packId]) { throw LocalizedArgumentException(R.string.validation_frame_framemanager_frame_pack_is_missing_7eff1) }
             state.applyToAll = pack.applyToAll
             state.assignments.clear()
             state.assignments.putAll(pack.assignments)
@@ -312,8 +313,8 @@ object FrameManager {
         }
 
         fun deletePack(packId: String): Boolean {
-            require(!isBuiltInPack(packId)) { "Built-in frame packs cannot be deleted." }
-            requireNotNull(state.packs.remove(packId)) { "Frame pack is missing." }
+            require(!isBuiltInPack(packId)) { throw LocalizedArgumentException(R.string.validation_frame_framemanager_built_in_frame_packs_cannot_be_deleted_7ca4e) }
+            requireNotNull(state.packs.remove(packId)) { throw LocalizedArgumentException(R.string.validation_frame_framemanager_frame_pack_is_missing_7eff1) }
             if (currentPackId == packId) currentPackId = null
             val wasActive = state.activePackId == packId
             if (wasActive) {
@@ -325,12 +326,12 @@ object FrameManager {
         }
 
         fun importFrame(target: FrameTarget?, displayName: String?, input: InputStream): FrameAsset {
-            val bytes = input.readLimited(MAX_BUNDLE_BYTES, "Frame file is too large.")
+            val bytes = input.readLimited(MAX_BUNDLE_BYTES, LocalizedArgumentException(R.string.frame_limit_b48d3b4a))
             val asset = if (hasPngSignature(bytes)) {
-                require(bytes.size <= MAX_PNG_BYTES) { "Frame image is too large." }
+                require(bytes.size <= MAX_PNG_BYTES) { throw LocalizedArgumentException(R.string.validation_frame_framemanager_frame_image_is_too_large_9922d) }
                 val (width, height) = imageBounds(bytes)
                 val name = displayName.orEmpty().substringAfterLast('/').substringBeforeLast('.')
-                    .trim().take(80).ifEmpty { target?.label ?: "Imported frame" }
+                    .trim().take(80).ifEmpty { target?.id ?: "frame" }
                 registerBundle(buildBundle(name, defaultPngSpec(width, height), bytes))
             } else {
                 registerBundle(bytes)
@@ -348,37 +349,35 @@ object FrameManager {
                 while (true) {
                     val entry = zip.nextEntry ?: break
                     val name = entry.name
-                    require(seen.add(name)) { "UI package ZIP contains duplicate entry: $name" }
+                    require(seen.add(name)) { throw LocalizedArgumentException(R.string.validation_frame_framemanager_ui_package_zip_contains_duplicate_entry_4eba1, name) }
                     when {
                         name == "frames/" && entry.isDirectory -> Unit
                         name == "manifest.json" && !entry.isDirectory -> {
                             manifestBytes = zip.readLimited(
-                                MAX_MANIFEST_BYTES, "UI package manifest is too large."
+                                MAX_MANIFEST_BYTES, LocalizedArgumentException(R.string.frame_limit_a5384bc1)
                             ).also { totalBytes += it.size }
                         }
                         name == "readme.md" && !entry.isDirectory -> {
                             totalBytes += zip.readLimited(
-                                MAX_README_BYTES, "UI package readme is too large."
+                                MAX_README_BYTES, LocalizedArgumentException(R.string.frame_limit_c5d8cc79)
                             ).size
                         }
                         name.startsWith("frames/") && !entry.isDirectory &&
                             name.count { it == '/' } == 1 && PACK_FILE_NAME.matches(name.substringAfter('/')) -> {
                             val fileName = name.substringAfter('/')
-                            val png = zip.readLimited(MAX_PNG_BYTES, "$fileName is too large.")
+                            val png = zip.readLimited(MAX_PNG_BYTES, LocalizedArgumentException(R.string.frame_limit_b897922c, fileName))
                             require(pngs.put(fileName, png) == null) {
-                                "UI package ZIP contains duplicate PNG: $fileName"
+                                throw LocalizedArgumentException(R.string.validation_frame_framemanager_ui_package_zip_contains_duplicate_png_42701, fileName)
                             }
                             totalBytes += png.size
                         }
-                        else -> throw IllegalArgumentException(
-                            "Unsupported UI package ZIP entry: $name"
-                        )
+                        else -> throw LocalizedArgumentException(R.string.frame_failure_50b73cfa, name)
                     }
-                    require(totalBytes <= MAX_PACK_BYTES) { "UI package is too large." }
+                    require(totalBytes <= MAX_PACK_BYTES) { throw LocalizedArgumentException(R.string.validation_frame_framemanager_ui_package_is_too_large_69ce0) }
                     zip.closeEntry()
                 }
             }
-            val bytes = requireNotNull(manifestBytes) { "UI package ZIP is missing manifest.json." }
+            val bytes = requireNotNull(manifestBytes) { throw LocalizedArgumentException(R.string.validation_frame_framemanager_ui_package_zip_is_missing_manifest_json_c98c1) }
             return installUiPackage(parseUiPackageManifest(bytes), bytes.size, pngs)
         }
 
@@ -387,21 +386,19 @@ object FrameManager {
             manifestBytes: Int,
             pngs: Map<String, ByteArray>
         ): FramePack {
-            require(packNameError(manifest.name) == null) {
-                packNameError(manifest.name) ?: "Invalid UI package name."
-            }
+            packNameError(manifest.name)?.let { throw it }
             val referencedFiles = manifest.roles.values.mapTo(LinkedHashSet()) { it.file }
             require(pngs.keys == referencedFiles) {
-                "UI package manifest roles must exactly match the PNGs in frames/."
+                throw LocalizedArgumentException(R.string.validation_frame_framemanager_ui_package_manifest_roles_must_exactly_mat_3e833)
             }
             require(manifestBytes.toLong() + pngs.values.sumOf { it.size.toLong() } <= MAX_PACK_BYTES) {
-                "UI package is too large."
+                throw LocalizedArgumentException(R.string.validation_frame_framemanager_ui_package_is_too_large_69ce0)
             }
             for ((fileName, png) in pngs) {
                 val (width, height) = imageBounds(png)
                 manifest.roles.filterValues { it.file == fileName }.forEach { (role, definition) ->
-                    require(frameSpecError(definition.spec, width, height) == null) {
-                        "$role: ${frameSpecError(definition.spec, width, height)}"
+                    frameSpecError(definition.spec, width, height)?.let {
+                        throw LocalizedArgumentException(R.string.frame_role_error, role, it)
                     }
                 }
             }
@@ -425,11 +422,11 @@ object FrameManager {
         }
 
         internal fun installImportedPack(name: String, assignments: Map<String, String>): FramePack {
-            require(packNameError(name) == null) { packNameError(name) ?: "Invalid UI package name." }
+            packNameError(name)?.let { throw it }
             require(assignments.isNotEmpty() && assignments.keys.all { isKnownRole(it) && it != "global" }) {
-                "UI package contains an unsupported role."
+                throw LocalizedArgumentException(R.string.validation_frame_framemanager_ui_package_contains_an_unsupported_role_78110)
             }
-            require(assignments.values.all(ASSET_ID::matches)) { "UI package contains an invalid frame asset." }
+            require(assignments.values.all(ASSET_ID::matches)) { throw LocalizedArgumentException(R.string.validation_frame_framemanager_ui_package_contains_an_invalid_frame_asset_923d2) }
             val id = sha256(UUID.randomUUID().toString().toByteArray(Charsets.UTF_8))
             return FramePack(id, name.trim(), false, HashMap(assignments)).also {
                 state.packs[id] = it
@@ -438,14 +435,12 @@ object FrameManager {
         }
 
         fun updateFrameSpec(target: FrameTarget?, spec: FrameSpec) {
-            val oldId = requireNotNull(selectedAssetId(target)) { "No frame is assigned." }
+            val oldId = requireNotNull(selectedAssetId(target)) { throw LocalizedArgumentException(R.string.validation_frame_framemanager_no_frame_is_assigned_83185) }
             val parsed = parseBundle(FileInputStream(assetFile(directory, oldId)).use {
-                it.readLimited(MAX_BUNDLE_BYTES, "Frame bundle is too large.")
+                it.readLimited(MAX_BUNDLE_BYTES, LocalizedArgumentException(R.string.frame_limit_13aa8bbe))
             })
             val (width, height) = imageBounds(parsed.png)
-            require(frameSpecError(spec, width, height) == null) {
-                frameSpecError(spec, width, height) ?: "Invalid frame settings."
-            }
+            frameSpecError(spec, width, height)?.let { throw it }
             select(target, registerBundle(buildBundle(parsed.name, spec, parsed.png)).id)
         }
 
@@ -526,7 +521,7 @@ object FrameManager {
         val assetId = state.assignments[assignmentKey(resolvedTarget(state.applyToAll, target))] ?: return null
         return try {
             val parsed = parseBundle(FileInputStream(assetFile(frameDir(), assetId)).use {
-                it.readLimited(MAX_BUNDLE_BYTES, "Frame bundle is too large.")
+                it.readLimited(MAX_BUNDLE_BYTES, LocalizedArgumentException(R.string.manager_framemanager_frame_bundle_is_too_large_13aa8))
             })
             SharedFrameSource(
                 assetId,
@@ -573,7 +568,7 @@ object FrameManager {
     fun copyStateTo(context: Context, destinationRoot: File) {
         ensureMigrated(context)
         val destination = File(destinationRoot, FRAME_FOLDER)
-        check(destination.exists() || destination.mkdirs()) { "Unable to create Space frame settings." }
+        check(destination.exists() || destination.mkdirs()) { context.getString(R.string.manager_framemanager_unable_to_create_space_frame_settings_3d6a8) }
         Tuils.copy(File(frameDir(), STATE_FILE), File(destination, STATE_FILE))
     }
 
@@ -627,16 +622,16 @@ object FrameManager {
             val allowed = file.name == STATE_FILE ||
                 (schema == 1 && file.name in legacyAllowed) ||
                 (schema >= 2 && assetId(file.name) != null)
-            require(file.isFile && allowed) { "Unsupported frame preset file: ${file.name}" }
+            require(file.isFile && allowed) { throw LocalizedArgumentException(R.string.validation_frame_framemanager_unsupported_frame_preset_file_22106, file.name) }
             if (file.name.endsWith(".retui-frame")) {
-                parseBundle(FileInputStream(file).use { it.readLimited(MAX_BUNDLE_BYTES, "Frame bundle is too large.") })
+                parseBundle(FileInputStream(file).use { it.readLimited(MAX_BUNDLE_BYTES, LocalizedArgumentException(R.string.frame_limit_13aa8bbe)) })
             }
         }
         require(state.assignments.keys.all(::isKnownRole)) {
-            "Frame settings contain an unknown surface."
+            throw LocalizedArgumentException(R.string.validation_frame_framemanager_frame_settings_contain_an_unknown_surface_83c5d)
         }
         require(state.packs.values.all { pack -> pack.assignments.keys.all(::isKnownRole) }) {
-            "Frame pack contains an unknown surface."
+            throw LocalizedArgumentException(R.string.validation_frame_framemanager_frame_pack_contains_an_unknown_surface_4d479)
         }
     }
 
@@ -695,7 +690,7 @@ object FrameManager {
     @Synchronized
     private fun ensureMigrated(context: Context) {
         val dir = frameDir()
-        check(dir.exists() || dir.mkdirs()) { "Unable to create the frame folder." }
+        check(dir.exists() || dir.mkdirs()) { context.getString(R.string.manager_framemanager_unable_to_create_the_frame_folder_731d9) }
         val state = File(dir, STATE_FILE)
         val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         if (!state.isFile) {
@@ -719,12 +714,10 @@ object FrameManager {
         val assignments = LinkedHashMap<String, String>()
         for (frame in SPROUT_LANDS_FRAMES) {
             val png = context.assets.open("$SPROUT_LANDS_ASSET_FOLDER/${frame.fileName}").use {
-                it.readLimited(MAX_PNG_BYTES, "Bundled frame image is too large.")
+                it.readLimited(MAX_PNG_BYTES, LocalizedArgumentException(R.string.manager_framemanager_bundled_frame_image_is_too_large_9e4fc))
             }
             val (width, height) = imageBounds(png)
-            require(frameSpecError(frame.spec, width, height) == null) {
-                frameSpecError(frame.spec, width, height) ?: "Invalid bundled frame settings."
-            }
+            frameSpecError(frame.spec, width, height)?.let { throw it }
             val bundle = buildBundle(frame.displayName, frame.spec, png)
             val id = sha256(bundle)
             val destination = assetFile(dir, id)
@@ -755,45 +748,45 @@ object FrameManager {
 
     private fun readState(dir: File): FrameState {
         val file = File(dir, STATE_FILE)
-        require(file.isFile && file.length() <= MAX_MANIFEST_BYTES) { "Frame settings are missing or invalid." }
+        require(file.isFile && file.length() <= MAX_MANIFEST_BYTES) { throw LocalizedArgumentException(R.string.validation_frame_framemanager_frame_settings_are_missing_or_invalid_84fe9) }
         val state = JSONObject(file.readText(Charsets.UTF_8))
         return when (state.getInt("schema")) {
             1 -> {
-                require(state.stringSet() == setOf("schema", "applyToAll")) { "Unsupported frame settings." }
+                require(state.stringSet() == setOf("schema", "applyToAll")) { throw LocalizedArgumentException(R.string.validation_frame_framemanager_unsupported_frame_settings_e926f) }
                 val assignments = HashMap<String, String>()
                 for ((key, legacy) in legacyFiles(dir)) {
                     if (legacy.isFile) assignments[key] = sha256(FileInputStream(legacy).use {
-                        it.readLimited(MAX_BUNDLE_BYTES, "Frame bundle is too large.")
+                        it.readLimited(MAX_BUNDLE_BYTES, LocalizedArgumentException(R.string.frame_limit_13aa8bbe))
                     })
                 }
                 FrameState(state.getBoolean("applyToAll"), assignments)
             }
             2 -> {
-                require(state.stringSet() == setOf("schema", "applyToAll", "assignments")) { "Unsupported frame settings." }
+                require(state.stringSet() == setOf("schema", "applyToAll", "assignments")) { throw LocalizedArgumentException(R.string.validation_frame_framemanager_unsupported_frame_settings_e926f) }
                 val values = state.getJSONObject("assignments")
                 val assignments = HashMap<String, String>()
                 for (key in values.keys()) {
                     val id = values.getString(key)
-                    require(ASSET_ID.matches(id)) { "Invalid frame library reference." }
+                    require(ASSET_ID.matches(id)) { throw LocalizedArgumentException(R.string.validation_frame_framemanager_invalid_frame_library_reference_d2d8d) }
                     assignments[key] = id
                 }
                 FrameState(state.getBoolean("applyToAll"), assignments)
             }
             3 -> {
                 require(state.stringSet() == setOf("schema", "applyToAll", "assignments", "packs")) {
-                    "Unsupported frame settings."
+                    throw LocalizedArgumentException(R.string.validation_frame_framemanager_unsupported_frame_settings_e926f)
                 }
                 val assignments = state.getJSONObject("assignments").assetMap()
                 val packs = HashMap<String, FramePack>()
                 val values = state.getJSONObject("packs")
                 for (id in values.keys()) {
-                    require(ASSET_ID.matches(id)) { "Invalid frame pack reference." }
+                    require(ASSET_ID.matches(id)) { throw LocalizedArgumentException(R.string.validation_frame_framemanager_invalid_frame_pack_reference_a2a98) }
                     val value = values.getJSONObject(id)
-                    require(value.stringSet() == setOf("name", "roles")) { "Unsupported frame pack record." }
+                    require(value.stringSet() == setOf("name", "roles")) { throw LocalizedArgumentException(R.string.validation_frame_framemanager_unsupported_frame_pack_record_fe425) }
                     val name = value.getString("name").trim()
-                    require(name.isNotEmpty() && name.length <= 80) { "Frame pack name must be 1 to 80 characters." }
+                    require(name.isNotEmpty() && name.length <= 80) { throw LocalizedArgumentException(R.string.validation_frame_framemanager_frame_pack_name_must_be_1_to_80_characters_8da36) }
                     val roles = value.getJSONObject("roles").assetMap()
-                    require(roles.keys.all(::isKnownRole)) { "Frame pack contains an unknown surface." }
+                    require(roles.keys.all(::isKnownRole)) { throw LocalizedArgumentException(R.string.validation_frame_framemanager_frame_pack_contains_an_unknown_surface_4d479) }
                     packs[id] = FramePack(id, name, "global" in roles, roles)
                 }
                 val active = packs.values.firstOrNull {
@@ -803,47 +796,47 @@ object FrameManager {
             }
             4 -> {
                 require(state.stringSet() == setOf("schema", "applyToAll", "assignments", "packs", "activePackId")) {
-                    "Unsupported frame settings."
+                    throw LocalizedArgumentException(R.string.validation_frame_framemanager_unsupported_frame_settings_e926f)
                 }
                 val assignments = state.getJSONObject("assignments").assetMap()
-                require(assignments.keys.all(::isKnownRole)) { "Frame settings contain an unknown surface." }
+                require(assignments.keys.all(::isKnownRole)) { throw LocalizedArgumentException(R.string.validation_frame_framemanager_frame_settings_contain_an_unknown_surface_83c5d) }
                 val packs = HashMap<String, FramePack>()
                 val values = state.getJSONObject("packs")
                 for (id in values.keys()) {
-                    require(ASSET_ID.matches(id)) { "Invalid frame pack reference." }
+                    require(ASSET_ID.matches(id)) { throw LocalizedArgumentException(R.string.validation_frame_framemanager_invalid_frame_pack_reference_a2a98) }
                     val value = values.getJSONObject(id)
                     require(value.stringSet() == setOf("name", "applyToAll", "assignments")) {
-                        "Unsupported frame pack record."
+                        throw LocalizedArgumentException(R.string.validation_frame_framemanager_unsupported_frame_pack_record_fe425)
                     }
                     val name = value.getString("name").trim()
-                    require(name.isNotEmpty() && name.length <= 80) { "Frame pack name must be 1 to 80 characters." }
+                    require(name.isNotEmpty() && name.length <= 80) { throw LocalizedArgumentException(R.string.validation_frame_framemanager_frame_pack_name_must_be_1_to_80_characters_8da36) }
                     require(packs.values.none { it.name.equals(name, ignoreCase = true) }) {
-                        "Frame pack names must be unique."
+                        throw LocalizedArgumentException(R.string.validation_frame_framemanager_frame_pack_names_must_be_unique_442ae)
                     }
                     val packAssignments = value.getJSONObject("assignments").assetMap()
-                    require(packAssignments.keys.all(::isKnownRole)) { "Frame pack contains an unknown surface." }
+                    require(packAssignments.keys.all(::isKnownRole)) { throw LocalizedArgumentException(R.string.validation_frame_framemanager_frame_pack_contains_an_unknown_surface_4d479) }
                     packs[id] = FramePack(id, name, value.getBoolean("applyToAll"), packAssignments)
                 }
                 val active = if (state.isNull("activePackId")) null else state.getString("activePackId").also {
-                    require(it in packs) { "Active frame pack is missing." }
+                    require(it in packs) { throw LocalizedArgumentException(R.string.validation_frame_framemanager_active_frame_pack_is_missing_548bd) }
                 }
                 FrameState(state.getBoolean("applyToAll"), assignments, packs, active)
             }
-            else -> throw IllegalArgumentException("Unsupported frame settings.")
+            else -> throw LocalizedArgumentException(R.string.frame_failure_e926f920)
         }
     }
 
     private fun writeStateFile(dir: File, value: FrameState) {
         require(value.assignments.keys.all(::isKnownRole) && value.packs.values.all {
             it.assignments.keys.all(::isKnownRole)
-        }) { "Frame settings contain an unknown surface." }
+        }) { throw LocalizedArgumentException(R.string.validation_frame_framemanager_frame_settings_contain_an_unknown_surface_83c5d) }
         require(value.packs.values.map { it.name.lowercase(Locale.ROOT) }.toSet().size == value.packs.size) {
-            "Frame pack names must be unique."
+            throw LocalizedArgumentException(R.string.validation_frame_framemanager_frame_pack_names_must_be_unique_442ae)
         }
         value.activePackId?.let { activeId ->
-            val active = requireNotNull(value.packs[activeId]) { "Active frame pack is missing." }
+            val active = requireNotNull(value.packs[activeId]) { throw LocalizedArgumentException(R.string.validation_frame_framemanager_active_frame_pack_is_missing_548bd) }
             require(active.applyToAll == value.applyToAll && active.assignments == value.assignments) {
-                "Active frame settings do not match their pack."
+                throw LocalizedArgumentException(R.string.validation_frame_framemanager_active_frame_settings_do_not_match_their_p_423fa)
             }
         }
         val state = File(dir, STATE_FILE)
@@ -869,10 +862,10 @@ object FrameManager {
                 .put("activePackId", value.activePackId ?: JSONObject.NULL).toString(2),
             Charsets.UTF_8
         )
-        if (state.exists()) check(state.renameTo(backup)) { "Unable to save frame settings." }
+        if (state.exists()) check(state.renameTo(backup)) { throw LocalizedStateException(R.string.validation_frame_framemanager_unable_to_save_frame_settings_a4764) }
         if (!temp.renameTo(state)) {
             if (backup.exists()) backup.renameTo(state)
-            throw IllegalStateException("Unable to save frame settings.")
+            throw LocalizedStateException(R.string.frame_failure_a4764402)
         }
         backup.delete()
     }
@@ -897,7 +890,7 @@ object FrameManager {
         }
         for ((key, legacy) in legacyFiles(dir)) {
             if (!legacy.isFile) continue
-            val bytes = FileInputStream(legacy).use { it.readLimited(MAX_BUNDLE_BYTES, "Frame bundle is too large.") }
+            val bytes = FileInputStream(legacy).use { it.readLimited(MAX_BUNDLE_BYTES, LocalizedArgumentException(R.string.frame_limit_13aa8bbe)) }
             val id = sha256(bytes)
             val asset = assetFile(dir, id)
             if (!asset.isFile) saveFile(asset, bytes)
@@ -916,36 +909,36 @@ object FrameManager {
         copyFrameFolder(source, temp)
 
         val current = frameDir()
-        if (current.exists()) check(current.renameTo(backup)) { "Unable to replace frame settings." }
+        if (current.exists()) check(current.renameTo(backup)) { throw LocalizedStateException(R.string.validation_frame_framemanager_unable_to_replace_frame_settings_285ad) }
         if (!temp.renameTo(current)) {
             if (backup.exists()) backup.renameTo(current)
-            throw IllegalStateException("Unable to apply frame settings.")
+            throw LocalizedStateException(R.string.frame_failure_70d7c2df)
         }
         if (backup.exists()) Tuils.delete(backup)
         clearCache()
     }
 
     private fun saveFile(active: File, bytes: ByteArray) {
-        val dir = active.parentFile ?: throw IllegalStateException("Unable to create the frame folder.")
-        check(dir.exists() || dir.mkdirs()) { "Unable to create the frame folder." }
+        val dir = active.parentFile ?: throw LocalizedStateException(R.string.frame_failure_731d91a1)
+        check(dir.exists() || dir.mkdirs()) { throw LocalizedStateException(R.string.validation_frame_framemanager_unable_to_create_the_frame_folder_731d9) }
         val temp = File(dir, "${active.name}.tmp")
         val backup = File(dir, "${active.name}.old")
         temp.delete()
         backup.delete()
         FileOutputStream(temp).use { it.write(bytes) }
-        check(temp.length() == bytes.size.toLong()) { "Unable to save the frame bundle." }
+        check(temp.length() == bytes.size.toLong()) { throw LocalizedStateException(R.string.validation_frame_framemanager_unable_to_save_the_frame_bundle_77f47) }
 
-        if (active.exists()) check(active.renameTo(backup)) { "Unable to replace the active frame." }
+        if (active.exists()) check(active.renameTo(backup)) { throw LocalizedStateException(R.string.validation_frame_framemanager_unable_to_replace_the_active_frame_398ba) }
         if (!temp.renameTo(active)) {
             if (backup.exists()) backup.renameTo(active)
-            throw IllegalStateException("Unable to activate the imported frame.")
+            throw LocalizedStateException(R.string.frame_failure_626ba109)
         }
         backup.delete()
     }
 
     private fun loadFrameFile(file: File, key: String): LoadedFrame? = try {
         if (!file.isFile) null else parseBundle(FileInputStream(file).use {
-            it.readLimited(MAX_BUNDLE_BYTES, "Frame bundle is too large.")
+            it.readLimited(MAX_BUNDLE_BYTES, LocalizedArgumentException(R.string.frame_limit_13aa8bbe))
         }).toLoadedFrame()
     } catch (error: Exception) {
         Log.e("TUI-FRAME", "Unable to load $key frame", error)
@@ -954,7 +947,7 @@ object FrameManager {
 
     private fun loadFramePreview(file: File, key: String): FramePreview? = try {
         if (!file.isFile) null else parseBundle(FileInputStream(file).use {
-            it.readLimited(MAX_BUNDLE_BYTES, "Frame bundle is too large.")
+            it.readLimited(MAX_BUNDLE_BYTES, LocalizedArgumentException(R.string.frame_limit_13aa8bbe))
         }).let { parsed ->
             val (width, height) = imageBounds(parsed.png)
             FramePreview(parsed.name, parsed.spec, width, height, decodePreview(parsed.png))
@@ -971,13 +964,13 @@ object FrameManager {
         while (maxOf(bounds.outWidth, bounds.outHeight) / sample > FRAME_PREVIEW_MAX_PX) sample *= 2
         val options = BitmapFactory.Options().apply { inSampleSize = sample }
         return requireNotNull(BitmapFactory.decodeByteArray(image, 0, image.size, options)) {
-            "Unable to decode frame preview."
+            throw LocalizedArgumentException(R.string.validation_frame_framemanager_unable_to_decode_frame_preview_59da5)
         }
     }
 
     private fun copyFrameFolder(source: File, destination: File) {
         if (destination.exists()) Tuils.delete(destination)
-        check(destination.mkdirs()) { "Unable to create frame export folder." }
+        check(destination.mkdirs()) { throw LocalizedStateException(R.string.validation_frame_framemanager_unable_to_create_frame_export_folder_2ba2a) }
         for (file in source.listFiles().orEmpty()) {
             if (!file.isFile || file.name.endsWith(".tmp") || file.name.endsWith(".old")) continue
             Tuils.copy(file, File(destination, file.name))
@@ -1016,7 +1009,7 @@ object FrameManager {
     }
 
     internal fun mergeBuiltInPack(state: FrameState, assignments: Map<String, String>): Boolean {
-        require(assignments.keys.all(::isKnownRole)) { "Built-in frame pack contains an unknown surface." }
+        require(assignments.keys.all(::isKnownRole)) { throw LocalizedArgumentException(R.string.validation_frame_framemanager_built_in_frame_pack_contains_an_unknown_su_d4848) }
         val next = FramePack(SPROUT_LANDS_PACK_ID, SPROUT_LANDS_PACK_NAME, false, HashMap(assignments))
         if (state.packs[SPROUT_LANDS_PACK_ID] == next) return false
         val wasActive = state.activePackId == SPROUT_LANDS_PACK_ID
@@ -1041,27 +1034,27 @@ object FrameManager {
     internal fun parseUiPackageManifest(bytes: ByteArray): UiPackageManifest {
         val manifest = JSONObject(String(bytes, Charsets.UTF_8))
         require(manifest.stringSet() == setOf("type", "schema", "name", "filtering", "roles")) {
-            "UI package manifest has missing or unsupported fields."
+            throw LocalizedArgumentException(R.string.validation_frame_framemanager_ui_package_manifest_has_missing_or_unsuppo_d9c9c)
         }
-        require(manifest.getString("type") == "retui-frame-pack") { "Unsupported UI package type." }
-        require(manifest.getInt("schema") == 2) { "Unsupported UI package schema." }
+        require(manifest.getString("type") == "retui-frame-pack") { throw LocalizedArgumentException(R.string.validation_frame_framemanager_unsupported_ui_package_type_a21d2) }
+        require(manifest.getInt("schema") == 2) { throw LocalizedArgumentException(R.string.validation_frame_framemanager_unsupported_ui_package_schema_ba1a3) }
         val name = manifest.getString("name").trim()
-        require(name.isNotEmpty() && name.length <= 80) { "UI package name must be 1 to 80 characters." }
+        require(name.isNotEmpty() && name.length <= 80) { throw LocalizedArgumentException(R.string.validation_frame_framemanager_ui_package_name_must_be_1_to_80_characters_62bcb) }
         val filtering = manifest.getString("filtering")
-        require(filtering == "nearest") { "UI package filtering must be nearest." }
+        require(filtering == "nearest") { throw LocalizedArgumentException(R.string.validation_frame_framemanager_ui_package_filtering_must_be_nearest_cbe71) }
         val rolesJson = manifest.getJSONObject("roles")
-        require(rolesJson.length() > 0) { "UI package contains no roles." }
+        require(rolesJson.length() > 0) { throw LocalizedArgumentException(R.string.validation_frame_framemanager_ui_package_contains_no_roles_dec1b) }
         val roles = LinkedHashMap<String, UiPackageRole>()
         for (role in rolesJson.keys()) {
-            require(isKnownRole(role) && role != "global") { "Unsupported UI package role: $role" }
+            require(isKnownRole(role) && role != "global") { throw LocalizedArgumentException(R.string.validation_frame_framemanager_unsupported_ui_package_role_67491, role) }
             val value = rolesJson.getJSONObject(role)
             require(value.stringSet() == setOf("file", "slicePx", "borderDp", "modes")) {
-                "UI package role $role has missing or unsupported fields."
+                throw LocalizedArgumentException(R.string.validation_frame_framemanager_ui_package_role_has_missing_or_unsupported_b392f, role)
             }
             val file = value.getString("file")
-            require(PACK_FILE_NAME.matches(file)) { "Invalid UI package filename: $file" }
+            require(PACK_FILE_NAME.matches(file)) { throw LocalizedArgumentException(R.string.validation_frame_framemanager_invalid_ui_package_filename_56199, file) }
             val expectedFile = uiPackageFileName(role)
-            require(file == expectedFile) { "UI package role $role must use $expectedFile." }
+            require(file == expectedFile) { throw LocalizedArgumentException(R.string.validation_frame_framemanager_ui_package_role_must_use_5f1fd, role, expectedFile) }
             roles[role] = UiPackageRole(
                 file,
                 parseSpec(JSONObject(value.toString()).put("filtering", filtering))
@@ -1083,12 +1076,12 @@ object FrameManager {
 
     private fun imageBounds(image: ByteArray): Pair<Int, Int> {
         require(hasPngSignature(image)) {
-            "Frame image is not a PNG image."
+            throw LocalizedArgumentException(R.string.validation_frame_framemanager_frame_image_is_not_a_png_image_ff6c3)
         }
         val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
         BitmapFactory.decodeByteArray(image, 0, image.size, options)
         require(options.outWidth in 1..MAX_IMAGE_SIZE && options.outHeight in 1..MAX_IMAGE_SIZE) {
-            "Frame image must be no larger than 2048 x 2048."
+            throw LocalizedArgumentException(R.string.validation_frame_framemanager_frame_image_must_be_no_larger_than_2048_x_a8cd5)
         }
         return options.outWidth to options.outHeight
     }
@@ -1098,7 +1091,7 @@ object FrameManager {
 
     internal fun defaultPngSpec(width: Int, height: Int): FrameSpec {
         require(width == height && width >= 24 && width % 24 == 0) {
-            "PNG frames must be square and sized 24 x 24, 48 x 48, 72 x 72, and so on."
+            throw LocalizedArgumentException(R.string.validation_frame_framemanager_png_frames_must_be_square_and_sized_24_x_2_13d51)
         }
         val cell = width / 3
         return FrameSpec(
@@ -1136,19 +1129,19 @@ object FrameManager {
         filtering = "nearest"
     )
 
-    internal fun frameSpecError(spec: FrameSpec, width: Int, height: Int): String? = when {
+    internal fun frameSpecError(spec: FrameSpec, width: Int, height: Int): LocalizedArgumentException? = when {
         listOf(spec.leftPx, spec.topPx, spec.rightPx, spec.bottomPx).any { it <= 0 } ->
-            "Slice values must be positive whole pixels."
+            LocalizedArgumentException(R.string.frame_slices_positive)
         spec.leftPx + spec.rightPx >= width || spec.topPx + spec.bottomPx >= height ->
-            "Slices must leave a center region inside the ${width} x ${height} PNG."
+            LocalizedArgumentException(R.string.frame_slices_center, width, height)
         listOf(spec.leftDp, spec.topDp, spec.rightDp, spec.bottomDp).any { !it.isFinite() || it !in 0f..256f } ->
-            "Borders must be between 0 and 256 dp."
+            LocalizedArgumentException(R.string.frame_border_range)
         listOf(spec.leftMode, spec.topMode, spec.rightMode, spec.bottomMode).any { it != "stretch" && it != "tile" } ->
-            "Edge modes must be stretch or tile."
+            LocalizedArgumentException(R.string.frame_edge_modes)
         spec.centerMode !in setOf("stretch", "tile", "none") ->
-            "Center mode must be stretch, tile, or none."
+            LocalizedArgumentException(R.string.frame_center_modes)
         spec.filtering != "nearest" && spec.filtering != "linear" ->
-            "Filtering must be nearest or linear."
+            LocalizedArgumentException(R.string.frame_filter_modes)
         else -> null
     }
 
@@ -1187,35 +1180,35 @@ object FrameManager {
         ZipInputStream(BufferedInputStream(ByteArrayInputStream(bytes))).use { zip ->
             while (true) {
                 val entry = zip.nextEntry ?: break
-                require(!entry.isDirectory) { "Frame bundle cannot contain folders." }
+                require(!entry.isDirectory) { throw LocalizedArgumentException(R.string.validation_frame_framemanager_frame_bundle_cannot_contain_folders_fb455) }
                 val name = entry.name
-                require(name == "manifest.json" || name == "frame.png") { "Unsupported frame bundle file: $name" }
-                require(seen.add(name)) { "Frame bundle contains duplicate files." }
+                require(name == "manifest.json" || name == "frame.png") { throw LocalizedArgumentException(R.string.validation_frame_framemanager_unsupported_frame_bundle_file_ae470, name) }
+                require(seen.add(name)) { throw LocalizedArgumentException(R.string.validation_frame_framemanager_frame_bundle_contains_duplicate_files_7382c) }
                 when (name) {
-                    "manifest.json" -> manifestBytes = zip.readLimited(MAX_MANIFEST_BYTES, "Frame manifest is too large.")
-                    "frame.png" -> pngBytes = zip.readLimited(MAX_PNG_BYTES, "Frame image is too large.")
+                    "manifest.json" -> manifestBytes = zip.readLimited(MAX_MANIFEST_BYTES, LocalizedArgumentException(R.string.frame_limit_4d9418fa))
+                    "frame.png" -> pngBytes = zip.readLimited(MAX_PNG_BYTES, LocalizedArgumentException(R.string.frame_limit_9922d64b))
                 }
                 zip.closeEntry()
             }
         }
-        require(seen == setOf("manifest.json", "frame.png")) { "Frame bundle must contain only manifest.json and frame.png." }
+        require(seen == setOf("manifest.json", "frame.png")) { throw LocalizedArgumentException(R.string.validation_frame_framemanager_frame_bundle_must_contain_only_manifest_js_cb72c) }
 
         val manifest = JSONObject(String(requireNotNull(manifestBytes), Charsets.UTF_8))
         require(manifest.stringSet() == setOf("type", "schema", "name", "image", "slicePx", "borderDp", "modes", "filtering")) {
-            "Frame manifest has missing or unsupported fields."
+            throw LocalizedArgumentException(R.string.validation_frame_framemanager_frame_manifest_has_missing_or_unsupported_03b06)
         }
-        require(manifest.getString("type") == "retui-frame") { "Unsupported frame type." }
-        require(manifest.getInt("schema") == 1) { "Unsupported frame schema." }
-        require(manifest.getString("image") == "frame.png") { "Frame image must be frame.png." }
+        require(manifest.getString("type") == "retui-frame") { throw LocalizedArgumentException(R.string.validation_frame_framemanager_unsupported_frame_type_3c72e) }
+        require(manifest.getInt("schema") == 1) { throw LocalizedArgumentException(R.string.validation_frame_framemanager_unsupported_frame_schema_99e4d) }
+        require(manifest.getString("image") == "frame.png") { throw LocalizedArgumentException(R.string.validation_frame_framemanager_frame_image_must_be_frame_png_8b8fb) }
         val name = manifest.getString("name").trim()
-        require(name.isNotEmpty() && name.length <= 80) { "Frame name must be 1 to 80 characters." }
+        require(name.isNotEmpty() && name.length <= 80) { throw LocalizedArgumentException(R.string.validation_frame_framemanager_frame_name_must_be_1_to_80_characters_de88d) }
 
         val spec = parseSpec(manifest)
 
         val image = requireNotNull(pngBytes)
         val (width, height) = imageBounds(image)
         require(spec.leftPx + spec.rightPx < width && spec.topPx + spec.bottomPx < height) {
-            "Frame slices must leave a center region."
+            throw LocalizedArgumentException(R.string.validation_frame_framemanager_frame_slices_must_leave_a_center_region_f6580)
         }
         return ParsedFrame(name, spec, image)
     }
@@ -1225,8 +1218,8 @@ object FrameManager {
         val border = manifest.getJSONObject("borderDp")
         val modes = manifest.getJSONObject("modes")
         val sides = setOf("left", "top", "right", "bottom")
-        require(slice.stringSet() == sides && border.stringSet() == sides) { "Frame sides are incomplete." }
-        require(modes.stringSet() == sides + "center") { "Frame modes are incomplete." }
+        require(slice.stringSet() == sides && border.stringSet() == sides) { throw LocalizedArgumentException(R.string.validation_frame_framemanager_frame_sides_are_incomplete_e3270) }
+        require(modes.stringSet() == sides + "center") { throw LocalizedArgumentException(R.string.validation_frame_framemanager_frame_modes_are_incomplete_5f8db) }
 
         return FrameSpec(
             leftPx = slice.positiveInt("left"),
@@ -1243,17 +1236,17 @@ object FrameManager {
             leftMode = modes.edgeMode("left"),
             centerMode = modes.centerMode(),
             filtering = manifest.getString("filtering").also {
-                require(it == "nearest" || it == "linear") { "Filtering must be nearest or linear." }
+                require(it == "nearest" || it == "linear") { throw LocalizedArgumentException(R.string.validation_frame_framemanager_filtering_must_be_nearest_or_linear_43895) }
             }
         )
     }
 
     private fun ParsedFrame.toLoadedFrame(): LoadedFrame {
-        val bitmap = requireNotNull(BitmapFactory.decodeByteArray(png, 0, png.size)) { "Unable to decode frame.png." }
+        val bitmap = requireNotNull(BitmapFactory.decodeByteArray(png, 0, png.size)) { throw LocalizedArgumentException(R.string.validation_frame_framemanager_unable_to_decode_frame_png_8e3b7) }
         return LoadedFrame(name, spec, bitmap)
     }
 
-    private fun InputStream.readLimited(limit: Int, message: String): ByteArray {
+    private fun InputStream.readLimited(limit: Int, failure: IllegalArgumentException): ByteArray {
         val out = ByteArrayOutputStream(minOf(limit, 8192))
         val buffer = ByteArray(8192)
         var total = 0
@@ -1261,7 +1254,7 @@ object FrameManager {
             val read = read(buffer)
             if (read < 0) break
             total += read
-            require(total <= limit) { message }
+            if (total > limit) throw failure
             out.write(buffer, 0, read)
         }
         return out.toByteArray()
@@ -1272,7 +1265,7 @@ object FrameManager {
     private fun JSONObject.assetMap(): MutableMap<String, String> = HashMap<String, String>().also { result ->
         for (key in keys()) {
             val id = getString(key)
-            require(ASSET_ID.matches(id)) { "Invalid frame library reference." }
+            require(ASSET_ID.matches(id)) { throw LocalizedArgumentException(R.string.validation_frame_framemanager_invalid_frame_library_reference_d2d8d) }
             result[key] = id
         }
     }
@@ -1283,7 +1276,7 @@ object FrameManager {
     private fun JSONObject.positiveInt(key: String): Int {
         val value = get(key)
         require(value is Number && value.toDouble().isFinite() && value.toDouble() == value.toInt().toDouble() && value.toInt() > 0) {
-            "$key slice must be a positive whole number."
+            throw LocalizedArgumentException(R.string.validation_frame_framemanager_slice_must_be_a_positive_whole_number_6ebb8, key)
         }
         return value.toInt()
     }
@@ -1291,17 +1284,17 @@ object FrameManager {
     private fun JSONObject.dp(key: String): Float {
         val value = get(key)
         require(value is Number && value.toDouble().isFinite() && value.toDouble() in 0.0..256.0) {
-            "$key border must be between 0 and 256 dp."
+            throw LocalizedArgumentException(R.string.validation_frame_framemanager_border_must_be_between_0_and_256_dp_f3f3b, key)
         }
         return value.toFloat()
     }
 
     private fun JSONObject.edgeMode(key: String): String = getString(key).also {
-        require(it == "stretch" || it == "tile") { "$key mode must be stretch or tile." }
+        require(it == "stretch" || it == "tile") { throw LocalizedArgumentException(R.string.validation_frame_framemanager_mode_must_be_stretch_or_tile_85afe, key) }
     }
 
     private fun JSONObject.centerMode(): String = getString("center").also {
-        require(it == "stretch" || it == "tile" || it == "none") { "Center mode must be stretch, tile, or none." }
+        require(it == "stretch" || it == "tile" || it == "none") { throw LocalizedArgumentException(R.string.validation_frame_framemanager_center_mode_must_be_stretch_tile_or_none_650b5) }
     }
 
     private data class ParsedFrame(val name: String, val spec: FrameSpec, val png: ByteArray)

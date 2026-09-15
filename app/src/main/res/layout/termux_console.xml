@@ -91,7 +91,7 @@
                     android:paddingTop="1dp"
                     android:paddingEnd="10dp"
                     android:paddingBottom="1dp"
-                    android:text="OUTPUT"
+                    android:text="@string/ui_termux_console_output"
                     android:textAllCaps="true"
                     style="@style/Retui.Text.Control" />
         </FrameLayout>
@@ -113,7 +113,7 @@
                     android:id="@+id/termux_prefix"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="$ "
+                    android:text="@string/ui_token_48bb4ccc18"
                     style="@style/Retui.Text.Body" />
 
                 <EditText
@@ -170,7 +170,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="ESC"
+                        android:text="@string/ui_termux_console_esc"
                         style="@style/Retui.Text.Caption" />
 
                     <TextView
@@ -179,7 +179,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="/"
+                        android:text="@string/ui_token_42099b4af0"
                         android:textSize="13sp" />
 
                     <TextView
@@ -188,7 +188,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="-"
+                        android:text="@string/ui_token_3bc15c8aae"
                         android:textSize="13sp" />
 
                     <TextView
@@ -197,7 +197,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="HOME"
+                        android:text="@string/ui_termux_console_home"
                         style="@style/Retui.Text.Caption" />
 
                     <TextView
@@ -206,7 +206,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="UP"
+                        android:text="@string/ui_termux_console_up"
                         style="@style/Retui.Text.Caption" />
 
                     <TextView
@@ -215,7 +215,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="END"
+                        android:text="@string/ui_termux_console_end"
                         style="@style/Retui.Text.Caption" />
 
                     <TextView
@@ -224,7 +224,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="PGUP"
+                        android:text="@string/ui_termux_console_pgup"
                         style="@style/Retui.Text.Caption" />
 
                     <TextView
@@ -233,7 +233,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="CFG"
+                        android:text="@string/ui_termux_console_cfg"
                         style="@style/Retui.Text.Caption" />
                 </LinearLayout>
 
@@ -250,7 +250,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="TAB"
+                        android:text="@string/ui_termux_console_tab"
                         style="@style/Retui.Text.Caption" />
 
                     <TextView
@@ -259,7 +259,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="CTRL"
+                        android:text="@string/ui_termux_console_ctrl"
                         style="@style/Retui.Text.Caption" />
 
                     <TextView
@@ -268,7 +268,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="ALT"
+                        android:text="@string/ui_termux_console_alt"
                         style="@style/Retui.Text.Caption" />
 
                     <TextView
@@ -277,7 +277,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="LEFT"
+                        android:text="@string/ui_termux_console_left"
                         style="@style/Retui.Text.Caption" />
 
                     <TextView
@@ -286,7 +286,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="DOWN"
+                        android:text="@string/ui_termux_console_down"
                         style="@style/Retui.Text.Caption" />
 
                     <TextView
@@ -295,7 +295,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="RIGHT"
+                        android:text="@string/ui_termux_console_right"
                         style="@style/Retui.Text.Caption" />
 
                     <TextView
@@ -304,7 +304,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="PGDN"
+                        android:text="@string/ui_termux_console_pgdn"
                         style="@style/Retui.Text.Caption" />
 
                     <TextView
@@ -313,7 +313,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="IME"
+                        android:text="@string/ui_termux_console_ime"
                         style="@style/Retui.Text.Caption" />
                 </LinearLayout>
         </LinearLayout>
@@ -332,7 +332,7 @@
         android:paddingTop="2dp"
         android:paddingEnd="12dp"
         android:paddingBottom="2dp"
-        android:text="TERMUX"
+        android:text="@string/ui_termux_console_termux"
         style="@style/Retui.Text.Body" />
 
     <TextView
@@ -342,7 +342,7 @@
         android:layout_gravity="top|end"
         android:layout_marginTop="8dp"
         android:gravity="center"
-        android:text="X"
+        android:text="@string/ui_termux_console_x"
         style="@style/Retui.Text.Header" />
 
 </FrameLayout>

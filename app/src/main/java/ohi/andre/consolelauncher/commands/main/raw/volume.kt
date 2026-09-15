@@ -38,12 +38,12 @@ class volume : ParamCommand() {
                 val minIndex = streamMinVolume(manager, type)
                 val maxIndex = manager.getStreamMaxVolume(type)
                 if (volume < minIndex || volume > maxIndex) {
-                    return STREAM_LABELS[type] + " can only be " + minIndex + "-" + maxIndex + "."
+                    return pack.context.getString(R.string.command_volume_can_only_be_fef3f, pack.context.getString(STREAM_LABELS[type]), minIndex, maxIndex)
                 }
 
                 manager.setStreamVolume(type, volume, 0)
 
-                return streamInfo(manager, type)
+                return streamInfo(pack.context, manager, type)
             }
         },
         profile {
@@ -70,7 +70,7 @@ class volume : ParamCommand() {
                     ?: return pack.context.getString(R.string.help_volume)
 
                 val builder = StringBuilder()
-                builder.append(streamInfo(manager, stream))
+                builder.append(streamInfo(pack.context, manager, stream))
 
                 return builder.toString().trim()
             }
@@ -80,7 +80,7 @@ class volume : ParamCommand() {
 
                 val builder = StringBuilder()
                 for (c in STREAM_LABELS.indices) {
-                    builder.append(streamInfo(manager, c)).append(Tuils.NEWLINE)
+                    builder.append(streamInfo(pack.context, manager, c)).append(Tuils.NEWLINE)
                 }
 
                 return builder.toString().trim()
@@ -96,7 +96,7 @@ class volume : ParamCommand() {
             pack.context.getString(R.string.invalid_integer)
 
         companion object {
-            private val STREAM_LABELS = arrayOf("Voice call", "System", "Ring", "Media", "Alarm", "Notification")
+            private val STREAM_LABELS = arrayOf(R.string.volume_stream_voice_call, R.string.volume_stream_system, R.string.volume_stream_ring, R.string.volume_stream_media, R.string.volume_stream_alarm, R.string.volume_stream_notification)
 
             private fun ensureNotificationPolicyAccess(pack: ExecutePack): Boolean {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -111,7 +111,7 @@ class volume : ParamCommand() {
             }
 
             fun get(p: String): Param? {
-                val value = p.lowercase(Locale.getDefault())
+                val value = p.lowercase(Locale.ROOT)
                 for (p1 in entries) {
                     if (value.endsWith(p1.label())) return p1
                 }
@@ -130,7 +130,7 @@ class volume : ParamCommand() {
             }
 
             private fun parseStream(value: String): Int? {
-                val normalized = value.trim().lowercase(Locale.getDefault()).replace('-', ' ')
+                val normalized = value.trim().lowercase(Locale.ROOT).replace('-', ' ')
                     .replace('_', ' ')
                 val number = normalized.toIntOrNull()
                 if (number != null && number in 0..5) {
@@ -148,10 +148,10 @@ class volume : ParamCommand() {
                 }
             }
 
-            private fun streamInfo(manager: AudioManager, stream: Int): String {
+            private fun streamInfo(context: Context, manager: AudioManager, stream: Int): String {
                 val current = manager.getStreamVolume(stream)
                 val max = manager.getStreamMaxVolume(stream)
-                return STREAM_LABELS[stream] + ":" + Tuils.SPACE + current + "/" + max
+                return context.getString(STREAM_LABELS[stream]) + ":" + Tuils.SPACE + current + "/" + max
             }
 
             private fun streamMinVolume(manager: AudioManager, stream: Int): Int {

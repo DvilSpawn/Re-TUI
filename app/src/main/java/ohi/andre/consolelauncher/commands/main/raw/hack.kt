@@ -13,7 +13,7 @@ class hack : CommandAbstraction {
     override fun exec(pack: ExecutePack): String {
         LocalBroadcastManager.getInstance(pack.context.applicationContext)
             .sendBroadcast(Intent(UIManager.ACTION_HACK))
-        return "Injecting cinematic nonsense..."
+        return pack.context.getString(R.string.command_hack_injecting_cinematic_nonsense_5b526)
     }
 
     override fun argType(): IntArray = intArrayOf()

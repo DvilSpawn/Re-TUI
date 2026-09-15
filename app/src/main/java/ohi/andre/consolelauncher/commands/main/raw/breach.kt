@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher.commands.main.raw
 
+import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.commands.CommandAbstraction
 import ohi.andre.consolelauncher.commands.ExecutePack
 import ohi.andre.consolelauncher.commands.tuixt.BreachDialog
@@ -12,7 +13,7 @@ class breach : CommandAbstraction {
             return RetuiCreditManager.status(pack.context)
         }
         BreachDialog.show(pack.context, BreachManager.Mode.NORMAL)
-        return "Opening breach..."
+        return pack.context.getString(R.string.command_breach_opening_breach_192de)
     }
 
     override fun argType(): IntArray = IntArray(0)

@@ -1,6 +1,8 @@
 package com.dvil.retui.datetimepicker
 
 import android.content.Context
+import android.os.Build
+import android.text.format.DateFormat
 import android.text.Editable
 import android.text.InputType
 import android.text.TextWatcher
@@ -29,13 +31,20 @@ class RetuiDateTimePickerView(
         fun dropdownBackground(): Drawable
     }
 
-    private val value = Calendar.getInstance().apply { timeInMillis = initialTimeMillis }
-    private val minimum = Calendar.getInstance().apply {
+    private val locale: Locale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        resources.configuration.locales[0]
+    } else {
+        @Suppress("DEPRECATION")
+        resources.configuration.locale
+    }
+    private val symbols = DateFormatSymbols(locale)
+    private val value = Calendar.getInstance(locale).apply { timeInMillis = initialTimeMillis }
+    private val minimum = Calendar.getInstance(locale).apply {
         timeInMillis = minimumTimeMillis
         set(Calendar.HOUR_OF_DAY, 0); set(Calendar.MINUTE, 0); set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0)
     }
     init { keepCurrentOrFuture() }
-    private val monthNames = DateFormatSymbols(Locale.US).months.take(12)
+    private val monthNames = symbols.months.take(12)
     private val month = dropdown(validMonthNames(), monthNames[value.get(Calendar.MONTH)], false) {
         value.set(Calendar.DAY_OF_MONTH, 1)
         value.set(Calendar.MONTH, monthNames.indexOf(it))
@@ -69,21 +78,26 @@ class RetuiDateTimePickerView(
     fun selectedTimeMillis(): Long = value.timeInMillis
 
     private fun timeRow(): LinearLayout {
-        val hour = dropdown((1..12).map(Int::toString), displayHour(), false) {
-            value.set(Calendar.HOUR, (it.toInt() % 12))
+        val use24Hour = DateFormat.is24HourFormat(context)
+        val hour = dropdown(
+            (if (use24Hour) 0..23 else 1..12).map(Int::toString),
+            if (use24Hour) value.get(Calendar.HOUR_OF_DAY).toString() else displayHour(), false
+        ) {
+            value.set(if (use24Hour) Calendar.HOUR_OF_DAY else Calendar.HOUR, if (use24Hour) it.toInt() else it.toInt() % 12)
         }
         val minute = dropdown((0..59).map { it.toString().padStart(2, '0') }, value.get(Calendar.MINUTE).toString().padStart(2, '0'), false) {
             value.set(Calendar.MINUTE, it.toInt())
         }
-        val period = dropdown(listOf("AM", "PM"), if (value.get(Calendar.AM_PM) == Calendar.AM) "AM" else "PM", false) {
-            value.set(Calendar.AM_PM, if (it == "AM") Calendar.AM else Calendar.PM)
+        val periods = symbols.amPmStrings.toList()
+        val period = dropdown(periods, periods[value.get(Calendar.AM_PM)], false) {
+            value.set(Calendar.AM_PM, periods.indexOf(it))
         }
         return LinearLayout(context).apply {
             orientation = HORIZONTAL
             setPadding(0, dp(8), 0, 0)
-            addLabeled("HOUR", hour)
-            addLabeled("MINUTE", minute)
-            addLabeled("AM / PM", period)
+            addLabeled(context.getString(R.string.picker_hour), hour)
+            addLabeled(context.getString(R.string.picker_minute), minute)
+            if (!use24Hour) addLabeled(context.getString(R.string.picker_period), period)
         }
     }
 
@@ -150,8 +164,9 @@ class RetuiDateTimePickerView(
         calendarGrid.removeAllViews()
         val cursor = (value.clone() as Calendar).apply { set(Calendar.DAY_OF_MONTH, 1) }
         val cells = mutableListOf<Pair<String, Int?>>()
-        listOf("S", "M", "T", "W", "T", "F", "S").forEach { cells += it to null }
-        repeat(cursor.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY) { cells += "" to null }
+        val firstDay = cursor.firstDayOfWeek
+        repeat(7) { cells += symbols.shortWeekdays[(firstDay - 1 + it) % 7 + 1] to null }
+        repeat((cursor.get(Calendar.DAY_OF_WEEK) - firstDay + 7) % 7) { cells += "" to null }
         repeat(cursor.getActualMaximum(Calendar.DAY_OF_MONTH)) { cells += (it + 1).toString() to it + 1 }
         while (cells.size % 7 != 0) cells += "" to null
         cells.chunked(7).forEach { week ->

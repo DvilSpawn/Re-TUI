@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher.managers
 
+import ohi.andre.consolelauncher.R
 import android.content.Context
 import android.content.SharedPreferences
 import ohi.andre.consolelauncher.managers.notifications.reply.ReplyManager
@@ -127,7 +128,7 @@ object SpaceManager {
         val active = activeSpace(context)
         val spaces = listSpaces(context)
         if (spaces.isEmpty()) {
-            return "No Spaces found."
+            return context.getString(R.string.manager_spacemanager_no_spaces_found_0f99b)
         }
 
         val out = StringBuilder()
@@ -152,8 +153,8 @@ object SpaceManager {
 
     fun createFromActive(context: Context, name: String?): Space {
         val cleanName = cleanDisplayName(name)
-        require(cleanName.isNotEmpty()) { "Space name is required." }
-        require(findSpaceByName(cleanName) == null) { "Space already exists." }
+        require(cleanName.isNotEmpty()) { context.getString(R.string.manager_spacemanager_space_name_is_required_e3d46) }
+        require(findSpaceByName(cleanName) == null) { context.getString(R.string.manager_spacemanager_space_already_exists_e5f3a) }
 
         val active = saveActive(context)
         val newId = nextSpaceId(context)
@@ -171,10 +172,10 @@ object SpaceManager {
 
     fun renameActive(context: Context, name: String?): Space {
         val cleanName = cleanDisplayName(name)
-        require(cleanName.isNotEmpty()) { "Space name is required." }
+        require(cleanName.isNotEmpty()) { context.getString(R.string.manager_spacemanager_space_name_is_required_e3d46) }
         val active = activeSpace(context)
         val existing = findSpaceByName(cleanName)
-        require(existing == null || existing.id == active.id) { "Space already exists." }
+        require(existing == null || existing.id == active.id) { context.getString(R.string.manager_spacemanager_space_already_exists_e5f3a) }
 
         val renamed = Space(active.id, cleanName, System.currentTimeMillis())
         writeManifest(spaceDir(active.id), renamed)
@@ -184,9 +185,9 @@ object SpaceManager {
     fun remove(context: Context, value: String?): Space {
         val active = activeSpace(context)
         val target = resolveSpace(value)
-        requireNotNull(target) { "Space not found." }
-        require(target.id != active.id) { "Cannot remove the active Space." }
-        require(listSpacesInternal().size > 1) { "Cannot remove the only Space." }
+        requireNotNull(target) { context.getString(R.string.manager_spacemanager_space_not_found_3965e) }
+        require(target.id != active.id) { context.getString(R.string.manager_spacemanager_cannot_remove_the_active_space_255cb) }
+        require(listSpacesInternal().size > 1) { context.getString(R.string.manager_spacemanager_cannot_remove_the_only_space_69ad9) }
 
         Tuils.delete(spaceDir(target.id))
         return target
@@ -195,7 +196,7 @@ object SpaceManager {
     fun switchTo(context: Context, value: String?): Space {
         val active = activeSpace(context)
         val target = resolveSpace(value)
-        requireNotNull(target) { "Space not found." }
+        requireNotNull(target) { context.getString(R.string.manager_spacemanager_space_not_found_3965e) }
         if (target.id == active.id) {
             return target
         }
@@ -231,7 +232,7 @@ object SpaceManager {
     private fun restoreFromSpace(context: Context, id: String) {
         val root = Tuils.getFolder()
         val dir = spaceDir(id)
-        require(dir.isDirectory) { "Space not found." }
+        require(dir.isDirectory) { context.getString(R.string.manager_spacemanager_space_not_found_3965e) }
         for (provider in PROVIDERS) {
             provider.restore(context, root, dir)
         }
@@ -551,7 +552,7 @@ object SpaceManager {
                 if (file.isFile) {
                     applyPrefs(editor, readText(file))
                 }
-                check(editor.commit()) { "Unable to restore Space preferences: $name" }
+                check(editor.commit()) { context.getString(R.string.manager_spacemanager_unable_to_restore_space_preferences_11d39, name) }
             }
         }
     }

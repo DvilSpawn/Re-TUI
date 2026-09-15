@@ -56,7 +56,7 @@
         android:paddingTop="2dp"
         android:paddingEnd="12dp"
         android:paddingBottom="2dp"
-        android:text="OUTPUT ^"
+        android:text="@string/ui_terminal_page_output"
         android:textAllCaps="true"
         style="@style/Retui.Text.Body" />
 

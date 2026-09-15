@@ -32,7 +32,7 @@ class timer : CommandAbstraction {
 
         if (trimmed.startsWith("-")) {
             val split = trimmed.split("\\s+".toRegex(), limit = 2).toTypedArray()
-            val option = split[0].lowercase(Locale.getDefault())
+            val option = split[0].lowercase(Locale.ROOT)
 
             if (option == "-stop") {
                 return clockManager.stopTimer()
@@ -58,9 +58,9 @@ class timer : CommandAbstraction {
         if (clockManager.isTimerRunning) {
             if (pack is MainPack && duration > 0L) {
                 pack.redirectator!!.prepareRedirection(TimerAddConfirmation(duration))
-                return "Timer already running. Do you want to add " + ClockManager.formatDuration(duration) + " to it? (Yes/No)"
+                return pack.context.getString(R.string.integration_timer_timer_already_running_do_you_want_to_add_t_9da0b, ClockManager.formatDuration(duration))
             }
-            return "A timer is already running. Use timer -add [duration], timer -status, or timer -stop."
+            return pack.context.getString(R.string.integration_timer_a_timer_is_already_running_use_timer_add_d_91a99)
         }
         return clockManager.startTimer(duration)
     }
@@ -87,7 +87,7 @@ class timer : CommandAbstraction {
             return if ("yes".equals(answer, ignoreCase = true) || "y".equals(answer, ignoreCase = true)) {
                 ClockManager.getInstance(pack.context).addToTimer(duration)
             } else {
-                "Timer unchanged."
+                pack.context.getString(R.string.command_timer_timer_unchanged_e9bf5)
             }
         }
 

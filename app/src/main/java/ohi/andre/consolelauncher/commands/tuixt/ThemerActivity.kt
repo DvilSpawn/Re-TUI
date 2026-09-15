@@ -40,6 +40,7 @@ import androidx.core.graphics.ColorUtils
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ohi.andre.consolelauncher.R
+import ohi.andre.consolelauncher.tuils.displayMessage
 import ohi.andre.consolelauncher.LauncherActivity
 import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog.ConfirmAction
 import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog.ContentFactory
@@ -110,7 +111,7 @@ import ohi.andre.consolelauncher.wallpaper.RetuiWallpaperActivity
 import ohi.andre.consolelauncher.wallpaper.RetuiWallpaperService
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi
 
-class ThemerActivity : AppCompatActivity() {
+class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompatActivity() {
     private var screenRoot: View? = null
     private var panelRoot: LinearLayout? = null
     private var recyclerView: RecyclerView? = null
@@ -255,9 +256,9 @@ class ThemerActivity : AppCompatActivity() {
                     return
                 }
                 val itemView = holder.itemView as TextView
-                itemView.setText(fileName.uppercase(Locale.getDefault()))
+                itemView.text = hubItemLabel(fileName).uppercase(Locale.getDefault())
                 val selected = section == SECTION_FONTS &&
-                    fileName == "Default (System Font)" &&
+                    fileName == HubAction.DEFAULT_SYSTEM_FONT.name &&
                     pendingUseSystemFont == true
                 styleListItem(this@ThemerActivity, itemView, selected)
                 val params = RecyclerView.LayoutParams(
@@ -267,66 +268,76 @@ class ThemerActivity : AppCompatActivity() {
                 params.setMargins(0, 0, 0, dp(this@ThemerActivity, 8f))
                 itemView.setLayoutParams(params)
                 holder.itemView.setOnClickListener(View.OnClickListener { _: View? ->
-                    if (fileName == "Appearance") {
+                    if (section == SECTION_PRESET_APPLY) {
+                        applyPreset(fileName)
+                        return@OnClickListener
+                    }
+                    if (section == SECTION_PRESET_REMOVE) {
+                        confirmRemovePreset(fileName)
+                        return@OnClickListener
+                    }
+                    if (fileName == HubAction.APPEARANCE.name) {
                         openSection(SECTION_APPEARANCE)
-                    } else if (fileName == "Behavior") {
+                    } else if (fileName == HubAction.BEHAVIOR.name) {
                         openSection(SECTION_BEHAVIOR)
-                    } else if (fileName == "Sounds") {
+                    } else if (fileName == HubAction.SOUNDS.name) {
                         openSoundsSettings()
-                    } else if (fileName == "Personalization") {
+                    } else if (fileName == HubAction.PERSONALIZATION.name) {
                         openSection(SECTION_PERSONALIZATION)
-                    } else if (fileName == "ASCII Settings") {
+                    } else if (fileName == HubAction.ASCII_SETTINGS.name) {
                         openAsciiSettings()
-                    } else if (fileName == "Integrations") {
+                    } else if (fileName == HubAction.INTEGRATIONS.name) {
                         openSection(SECTION_INTEGRATIONS)
-                    } else if (fileName == "System & Support") {
+                    } else if (fileName == HubAction.LANGUAGE_PACKS.name) {
+                        openSettingsChild(Intent(this@ThemerActivity, ohi.andre.consolelauncher.localization.LanguagePackActivity::class.java))
+                    } else if (fileName == HubAction.SYSTEM_SUPPORT.name) {
                         openSection(SECTION_SYSTEM)
-                    } else if (fileName == "Open Wallpaper Picker") {
+                    } else if (fileName == HubAction.OPEN_WALLPAPER_PICKER.name) {
                         launchWallpaperPicker()
-                    } else if (fileName == "Open Live Wallpaper Picker") {
+                    } else if (fileName == HubAction.OPEN_LIVE_WALLPAPER_PICKER.name) {
                         launchLiveWallpaperPicker()
-                    } else if (fileName == "RETUI WALLPAPER") {
+                    } else if (fileName == HubAction.RETUI_WALLPAPER.name) {
                         openSettingsChild(Intent(this@ThemerActivity, RetuiWallpaperActivity::class.java))
-                    } else if (fileName.startsWith("Preferred Music App")) {
+                    } else if (fileName == HubAction.PREFERRED_MUSIC_APP.name) {
                         showPreferredMusicAppPicker()
-                    } else if (fileName.startsWith("Tasker Integration")) {
+                    } else if (fileName == HubAction.TASKER_INTEGRATION.name) {
                         showTaskerIntegrationDialog()
-                    } else if (fileName == "Re Keyboard Shortcuts") {
+                    } else if (fileName == HubAction.RE_KEYBOARD_SHORTCUTS.name) {
                         openSection(SECTION_KEYBOARD_SHORTCUTS)
-                    } else if (fileName == "Fonts") {
+                    } else if (fileName == HubAction.FONTS.name) {
                         openSection(SECTION_FONTS)
-                    } else if (fileName == "Typography") {
+                    } else if (fileName == HubAction.TYPOGRAPHY.name) {
                         openSection(SECTION_TYPOGRAPHY)
-                    } else if (fileName == "Presets") {
+                    } else if (fileName == HubAction.PRESETS.name) {
                         openSection(SECTION_PRESETS)
-                    } else if (fileName == "Frames") {
+                    } else if (fileName == HubAction.FRAMES.name) {
                         openSection(SECTION_FRAMES)
                     } else if (section == SECTION_FRAMES) {
                         return@OnClickListener
-                    } else if (section == SECTION_PRESETS && fileName == "Save Current as Preset") {
+                    } else if (section == SECTION_PRESETS && fileName == HubAction.SAVE_CURRENT_AS_PRESET.name) {
                         showSavePresetInput()
-                    } else if (section == SECTION_PRESETS && fileName == "Apply Preset") {
+                    } else if (section == SECTION_PRESETS && fileName == HubAction.APPLY_PRESET.name) {
                         openSection(SECTION_PRESET_APPLY)
-                    } else if (section == SECTION_PRESETS && fileName == "Remove Preset") {
+                    } else if (section == SECTION_PRESETS && fileName == HubAction.REMOVE_PRESET.name) {
                         openSection(SECTION_PRESET_REMOVE)
                     } else if (section == SECTION_PRESET_APPLY) {
                         applyPreset(fileName)
                     } else if (section == SECTION_PRESET_REMOVE) {
                         confirmRemovePreset(fileName)
-                    } else if (section == SECTION_FONTS && fileName == "Default (System Font)") {
+                    } else if (section == SECTION_FONTS && fileName == HubAction.DEFAULT_SYSTEM_FONT.name) {
                         applySystemFont()
-                    } else if (section == SECTION_FONTS && fileName == "Import Font...") {
+                    } else if (section == SECTION_FONTS && fileName == HubAction.IMPORT_FONT.name) {
                         launchFontImportPicker()
-                    } else if (fileName == "Toolbar Buttons") {
+                    } else if (fileName == HubAction.TOOLBAR_BUTTONS.name) {
                         showToolbarButtonsDialog()
                     } else if (isDystopiaRow(fileName)) {
                         handleDystopiaOptIn()
-                    } else if (fileName == "View Crash Log") {
+                    } else if (fileName == HubAction.VIEW_CRASH_LOG.name) {
                         val crashFile = File(Tuils.getFolder(), "crash.txt")
                         if (!crashFile.exists() || crashFile.length() == 0L) {
                             Toast.makeText(
                                 this@ThemerActivity,
-                                "No crash log found.",
+                                getString(R.string.themer_no_crash_log_found_79ebe),
                                 Toast.LENGTH_SHORT
                             ).show()
                         } else {
@@ -334,23 +345,23 @@ class ThemerActivity : AppCompatActivity() {
                             intent.putExtra(TuixtActivity.PATH, crashFile.getAbsolutePath())
                             openSettingsChild(intent)
                         }
-                    } else if (fileName == "Backup") {
+                    } else if (fileName == HubAction.BACKUP.name) {
                         showBackupProtectionDialog()
-                    } else if (fileName == "Create Shareable Configuration") {
+                    } else if (fileName == HubAction.CREATE_SHAREABLE_CONFIGURATION.name) {
                         showShareableConfigurationSourcePicker()
-                    } else if (fileName == "Restore") {
+                    } else if (fileName == HubAction.RESTORE.name) {
                         launchRestorePicker()
-                    } else if (fileName == "Rate the App") {
+                    } else if (fileName == HubAction.RATE_THE_APP.name) {
                         openPlayStoreListing()
-                    } else if (fileName == "GitHub") {
+                    } else if (fileName == HubAction.GITHUB.name) {
                         openExternalUrl(GITHUB_URL)
-                    } else if (fileName == "Discord") {
+                    } else if (fileName == HubAction.DISCORD.name) {
                         openExternalUrl(DISCORD_URL)
-                    } else if (fileName == "Reddit") {
+                    } else if (fileName == HubAction.REDDIT.name) {
                         openExternalUrl(REDDIT_URL)
-                    } else if (fileName == "Send Feedback") {
+                    } else if (fileName == HubAction.SEND_FEEDBACK.name) {
                         openFeedbackEmail()
-                    } else if (fileName == "Learn More") {
+                    } else if (fileName == HubAction.LEARN_MORE.name) {
                         openLearnMore()
                     } else {
                         openConfigFile(fileName)
@@ -416,7 +427,7 @@ class ThemerActivity : AppCompatActivity() {
             try {
                 startActivity(emailIntent)
             } catch (fallbackError: ActivityNotFoundException) {
-                Toast.makeText(this, "No email app found.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.themer_no_email_app_found_198b3), Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -429,17 +440,17 @@ class ThemerActivity : AppCompatActivity() {
         try {
             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
         } catch (e: ActivityNotFoundException) {
-            Toast.makeText(this, "No browser app found.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.themer_no_browser_app_found_e360b), Toast.LENGTH_SHORT).show()
         }
     }
 
     private fun showSavePresetInput() {
         TuixtDialog.showInput(
             this,
-            "Save Preset",
-            "Preset name",
-            "Save",
-            "Cancel",
+            getString(R.string.themer_save_preset_008df),
+            getString(R.string.themer_preset_name_eb39e),
+            getString(R.string.themer_save_efc00),
+            getString(R.string.themer_cancel_77dfd),
             InputAction { value ->
                 val name = value?.trim().orEmpty()
                 if (name.isNotEmpty()) savePreset(name)
@@ -450,17 +461,17 @@ class ThemerActivity : AppCompatActivity() {
     private fun confirmRemovePreset(name: String) {
         TuixtDialog.showConfirm(
             this,
-            "Remove Preset",
-            "Remove $name?",
-            "Remove",
-            "Cancel",
+            getString(R.string.themer_remove_preset_2d12c),
+            getString(R.string.themer_remove_436e1, name),
+            getString(R.string.themer_remove_e9639),
+            getString(R.string.themer_cancel_77dfd),
             ConfirmAction {
                 try {
                     PresetManager.remove(name)
-                    Toast.makeText(this, "Preset removed.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.themer_preset_removed_3a121), Toast.LENGTH_SHORT).show()
                     openSection(SECTION_PRESET_REMOVE)
                 } catch (e: Exception) {
-                    Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, e.displayMessage(this@ThemerActivity), Toast.LENGTH_SHORT).show()
                 }
             }
         )
@@ -469,10 +480,10 @@ class ThemerActivity : AppCompatActivity() {
     private fun savePreset(name: String?) {
         try {
             PresetManager.save(this, name ?: return)
-            Toast.makeText(this@ThemerActivity, "Preset saved.", Toast.LENGTH_SHORT)
+            Toast.makeText(this@ThemerActivity, getString(R.string.themer_preset_saved_bb391), Toast.LENGTH_SHORT)
                 .show()
         } catch (e: Exception) {
-            Toast.makeText(this@ThemerActivity, e.message, Toast.LENGTH_SHORT).show()
+            Toast.makeText(this@ThemerActivity, e.displayMessage(this@ThemerActivity), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -480,43 +491,92 @@ class ThemerActivity : AppCompatActivity() {
         try {
             PresetManager.apply(name ?: return)
 
-            Toast.makeText(this@ThemerActivity, "Preset applied! Reloading...", Toast.LENGTH_SHORT)
+            Toast.makeText(this@ThemerActivity, getString(R.string.themer_preset_applied_reloading_5539d), Toast.LENGTH_SHORT)
                 .show()
             recyclerView!!.postDelayed(Runnable {
                 LauncherActivity.preview(this)
             }, 500)
         } catch (e: Exception) {
-            Toast.makeText(this@ThemerActivity, e.message, Toast.LENGTH_SHORT).show()
+            Toast.makeText(this@ThemerActivity, e.displayMessage(this@ThemerActivity), Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private enum class HubAction(val labelRes: Int) {
+        LANGUAGE_PACKS(R.string.language_packs_title),
+        DEFAULT_SYSTEM_FONT(R.string.hub_default_system_font),
+        APPEARANCE(R.string.hub_appearance),
+        BEHAVIOR(R.string.hub_behavior),
+        SOUNDS(R.string.hub_sounds),
+        PERSONALIZATION(R.string.hub_personalization),
+        ASCII_SETTINGS(R.string.hub_ascii_settings),
+        INTEGRATIONS(R.string.hub_integrations),
+        SYSTEM_SUPPORT(R.string.hub_system_support),
+        OPEN_WALLPAPER_PICKER(R.string.hub_open_wallpaper_picker),
+        OPEN_LIVE_WALLPAPER_PICKER(R.string.hub_open_live_wallpaper_picker),
+        RETUI_WALLPAPER(R.string.hub_retui_wallpaper),
+        PREFERRED_MUSIC_APP(R.string.hub_preferred_music_app),
+        TASKER_INTEGRATION(R.string.hub_tasker_integration),
+        RE_KEYBOARD_SHORTCUTS(R.string.hub_re_keyboard_shortcuts),
+        FONTS(R.string.hub_fonts),
+        TYPOGRAPHY(R.string.hub_typography),
+        PRESETS(R.string.hub_presets),
+        FRAMES(R.string.hub_frames),
+        SAVE_CURRENT_AS_PRESET(R.string.hub_save_current_as_preset),
+        APPLY_PRESET(R.string.hub_apply_preset),
+        REMOVE_PRESET(R.string.hub_remove_preset),
+        IMPORT_FONT(R.string.hub_import_font),
+        TOOLBAR_BUTTONS(R.string.hub_toolbar_buttons),
+        VIEW_CRASH_LOG(R.string.hub_view_crash_log),
+        BACKUP(R.string.hub_backup),
+        CREATE_SHAREABLE_CONFIGURATION(R.string.hub_create_shareable_configuration),
+        RESTORE(R.string.hub_restore),
+        RATE_THE_APP(R.string.hub_rate_the_app),
+        GITHUB(R.string.hub_github),
+        DISCORD(R.string.hub_discord),
+        REDDIT(R.string.hub_reddit),
+        SEND_FEEDBACK(R.string.hub_send_feedback),
+        LEARN_MORE(R.string.hub_learn_more),
+        SIGN_UP_FOR_RETUI_CREDITS(R.string.hub_sign_up_for_retui_credits)
+    }
+
+    private fun hubItemLabel(id: String): String {
+        if (section == SECTION_PRESET_APPLY || section == SECTION_PRESET_REMOVE) return id
+        val action = HubAction.entries.firstOrNull { it.name == id } ?: return id
+        return when (action) {
+            HubAction.PREFERRED_MUSIC_APP -> getString(R.string.hub_music_summary, preferredMusicAppSummary)
+            HubAction.TASKER_INTEGRATION -> getString(R.string.hub_tasker_summary, getString(if (TaskerIntegrationManager.isEnabled(this)) R.string.common_on else R.string.common_off))
+            HubAction.SIGN_UP_FOR_RETUI_CREDITS -> getString(R.string.hub_credits_summary, getString(if (RetuiCreditManager.isDystopiaEnabled(this)) R.string.common_on else R.string.common_off))
+            else -> getString(action.labelRes)
         }
     }
 
     private fun getHeaderText(section: String?): String {
         if (SECTION_APPEARANCE == section) {
-            return "Re:T-UI Appearance Settings"
+            return getString(R.string.themer_re_t_ui_appearance_settings_f0df9)
         } else if (SECTION_BEHAVIOR == section) {
-            return "Re:T-UI Behavior Settings"
+            return getString(R.string.themer_re_t_ui_behavior_settings_01843)
         } else if (SECTION_PERSONALIZATION == section) {
-            return "Re:T-UI Personalization Settings"
+            return getString(R.string.themer_re_t_ui_personalization_settings_5032f)
         } else if (SECTION_INTEGRATIONS == section) {
-            return "Re:T-UI Integrations"
+            return getString(R.string.themer_re_t_ui_integrations_5c80d)
         } else if (SECTION_KEYBOARD_SHORTCUTS == section) {
-            return "Re Keyboard Shortcuts"
+            return getString(R.string.themer_re_keyboard_shortcuts_310c5)
         } else if (SECTION_SYSTEM == section) {
-            return "Re:T-UI System & Support"
+            return getString(R.string.themer_re_t_ui_system_support_84def)
         } else if (SECTION_FONTS == section) {
-            return "Re:T-UI Fonts"
+            return getString(R.string.themer_re_t_ui_fonts_45a98)
         } else if (SECTION_TYPOGRAPHY == section) {
-            return "Re:T-UI Typography"
+            return getString(R.string.themer_re_t_ui_typography_3e40f)
         } else if (SECTION_PRESETS == section) {
-            return "Re:T-UI Presets"
+            return getString(R.string.themer_re_t_ui_presets_b7e7f)
         } else if (SECTION_FRAMES == section) {
-            return "Re:T-UI Frames"
+            return getString(R.string.themer_re_t_ui_frames_b462d)
         } else if (SECTION_PRESET_APPLY == section) {
-            return "Apply Preset"
+            return getString(R.string.themer_apply_preset_72454)
         } else if (SECTION_PRESET_REMOVE == section) {
-            return "Remove Preset"
+            return getString(R.string.themer_remove_preset_2d12c)
         }
-        return "Re:T-UI Settings Hub"
+        return getString(R.string.themer_re_t_ui_settings_hub_ed322)
     }
 
     private fun getItemsForSection(section: String?): MutableList<String> {
@@ -526,15 +586,15 @@ class ThemerActivity : AppCompatActivity() {
                 "ui.xml",
                 "toolbar.xml",
                 "suggestions.xml",
-                "Fonts",
-                "Presets",
-                "Frames",
-                "Open Wallpaper Picker",
-                "Open Live Wallpaper Picker"
+                HubAction.FONTS.name,
+                HubAction.PRESETS.name,
+                HubAction.FRAMES.name,
+                HubAction.OPEN_WALLPAPER_PICKER.name,
+                HubAction.OPEN_LIVE_WALLPAPER_PICKER.name
             )
         } else if (SECTION_BEHAVIOR == section) {
             return mutableListOf(
-                "Sounds",
+                HubAction.SOUNDS.name,
                 "behavior.xml",
                 "apps.xml",
                 "notifications.xml",
@@ -542,36 +602,37 @@ class ThemerActivity : AppCompatActivity() {
             )
         } else if (SECTION_PERSONALIZATION == section) {
             return mutableListOf(
-                "RETUI WALLPAPER",
-                dystopiaRowLabel(),
+                HubAction.RETUI_WALLPAPER.name,
+                HubAction.SIGN_UP_FOR_RETUI_CREDITS.name,
                 "alias.txt",
-                "Toolbar Buttons",
-                "ASCII Settings",
+                HubAction.TOOLBAR_BUTTONS.name,
+                HubAction.ASCII_SETTINGS.name,
                 "rss.xml"
             )
         } else if (SECTION_INTEGRATIONS == section) {
             return mutableListOf(
-                "Re Keyboard Shortcuts",
-                "Preferred Music App: " + this.preferredMusicAppSummary,
-                "Tasker Integration: " + if (TaskerIntegrationManager.isEnabled(this)) "on" else "off"
+                HubAction.RE_KEYBOARD_SHORTCUTS.name,
+                HubAction.PREFERRED_MUSIC_APP.name,
+                HubAction.TASKER_INTEGRATION.name
             )
         } else if (SECTION_KEYBOARD_SHORTCUTS == section) {
             return mutableListOf(KEYBOARD_SHORTCUT_PANEL)
         } else if (SECTION_SYSTEM == section) {
             return mutableListOf(
-                "Backup",
-                "Create Shareable Configuration",
-                "Restore",
-                "Rate the App",
-                "Send Feedback",
-                "View Crash Log"
+                HubAction.LANGUAGE_PACKS.name,
+                HubAction.BACKUP.name,
+                HubAction.CREATE_SHAREABLE_CONFIGURATION.name,
+                HubAction.RESTORE.name,
+                HubAction.RATE_THE_APP.name,
+                HubAction.SEND_FEEDBACK.name,
+                HubAction.VIEW_CRASH_LOG.name
             )
         } else if (SECTION_FONTS == section) {
             ensurePendingFontChanges()
             return mutableListOf(
-                "Typography",
-                "Default (System Font)",
-                "Import Font..."
+                HubAction.TYPOGRAPHY.name,
+                HubAction.DEFAULT_SYSTEM_FONT.name,
+                HubAction.IMPORT_FONT.name
             ).apply {
                 addAll(listFontFiles(fontsDir).map { it.name })
             }
@@ -579,7 +640,7 @@ class ThemerActivity : AppCompatActivity() {
             ensurePendingFontChanges()
             return mutableListOf(FONT_SCALE_PANEL)
         } else if (SECTION_PRESETS == section) {
-            return mutableListOf("Save Current as Preset", "Apply Preset", "Remove Preset")
+            return mutableListOf(HubAction.SAVE_CURRENT_AS_PRESET.name, HubAction.APPLY_PRESET.name, HubAction.REMOVE_PRESET.name)
         } else if (SECTION_FRAMES == section) {
             return mutableListOf(FRAME_PANEL)
         } else if (SECTION_PRESET_APPLY == section) {
@@ -589,11 +650,11 @@ class ThemerActivity : AppCompatActivity() {
         }
 
         return mutableListOf(
-            "Appearance",
-            "Behavior",
-            "Personalization",
-            "Integrations",
-            "System & Support"
+            HubAction.APPEARANCE.name,
+            HubAction.BEHAVIOR.name,
+            HubAction.PERSONALIZATION.name,
+            HubAction.INTEGRATIONS.name,
+            HubAction.SYSTEM_SUPPORT.name
         )
     }
 
@@ -628,7 +689,7 @@ class ThemerActivity : AppCompatActivity() {
         val session = frameSession()
         val applyAll = session.applyToAll
         root.addView(CheckBox(this).apply {
-            text = "Enable custom frames"
+            text = getString(R.string.themer_enable_custom_frames_c7fdd)
             isChecked = FrameManager.isEnabled(this@ThemerActivity)
             setTextColor(textColor())
             setTypeface(Tuils.getTypeface(this@ThemerActivity), Typeface.BOLD)
@@ -639,7 +700,7 @@ class ThemerActivity : AppCompatActivity() {
                 FrameManager.setEnabled(this@ThemerActivity, checked)
                 Toast.makeText(
                     this@ThemerActivity,
-                    if (checked) "Custom frames enabled." else "Custom frames disabled. Your active pack is preserved.",
+                    if (checked) getString(R.string.themer_custom_frames_enabled_4475d) else getString(R.string.themer_custom_frames_disabled_your_active_pack_is_preserved_a8170),
                     Toast.LENGTH_SHORT
                 ).show()
                 sectionsAdapter?.notifyDataSetChanged()
@@ -648,7 +709,7 @@ class ThemerActivity : AppCompatActivity() {
         }, inputParams())
 
         root.addView(TextView(this).apply {
-            text = "Turn frames off to use generated borders. Your active pack and assignments stay saved."
+            text = getString(R.string.themer_turn_frames_off_to_use_generated_borders_your_active_pack_26eea)
             setTextColor(textColor())
             setTypeface(Tuils.getTypeface(this@ThemerActivity))
             textSize = 12f
@@ -656,7 +717,7 @@ class ThemerActivity : AppCompatActivity() {
         }, inputParams())
 
         val toggle = CheckBox(this).apply {
-            text = "Apply one frame to all surfaces"
+            text = getString(R.string.themer_apply_one_frame_to_all_surfaces_aa400)
             isChecked = applyAll
             setTextColor(textColor())
             setTypeface(Tuils.getTypeface(this@ThemerActivity), Typeface.BOLD)
@@ -672,9 +733,9 @@ class ThemerActivity : AppCompatActivity() {
 
         root.addView(TextView(this).apply {
             text = if (applyAll) {
-                "Import a square 3 x 3 PNG or a .retui-frame file. The imported frame replaces generated borders on every supported surface."
+                getString(R.string.themer_import_a_square_3_x_3_png_or_a_retui_frame_file_the_import_f8690)
             } else {
-                "Import a square 3 x 3 PNG or a .retui-frame file per surface. Button states, toggle states, and slider parts can be supplied independently; missing assignments keep their defaults."
+                getString(R.string.themer_import_a_square_3_x_3_png_or_a_retui_frame_file_per_surfac_67740)
             }
             setTextColor(textColor())
             setTypeface(Tuils.getTypeface(this@ThemerActivity))
@@ -683,13 +744,13 @@ class ThemerActivity : AppCompatActivity() {
         }, inputParams())
 
         root.addView(TextView(this).apply {
-            text = "IMPORT UI PACKAGE"
+            text = getString(R.string.themer_import_ui_package_e6f87)
             styleButton(this@ThemerActivity, this, false)
             setOnClickListener { launchUiPackagePicker() }
         }, inputParams())
 
         root.addView(TextView(this).apply {
-            text = "Import a .retui_ui.zip package. It is added to Frame Packs without replacing the active frames until you tap Apply."
+            text = getString(R.string.themer_import_a_retui_ui_zip_package_it_is_added_to_frame_packs_w_29903)
             setTextColor(textColor())
             setTypeface(Tuils.getTypeface(this@ThemerActivity))
             textSize = 12f
@@ -697,7 +758,7 @@ class ThemerActivity : AppCompatActivity() {
         }, inputParams())
 
         root.addView(TextView(this).apply {
-            text = "SAVE FRAME SETTINGS"
+            text = getString(R.string.themer_save_frame_settings_796a7)
             styleButton(this@ThemerActivity, this, true)
             setOnClickListener { saveFrameChanges() }
         }, inputParams())
@@ -710,7 +771,7 @@ class ThemerActivity : AppCompatActivity() {
         val packs = session.packs()
         if (packs.isNotEmpty()) {
             root.addView(TextView(this).apply {
-                text = "FRAME PACKS"
+                text = getString(R.string.themer_frame_packs_086f2)
                 setTextColor(accentColor())
                 setTypeface(Tuils.getTypeface(this@ThemerActivity), Typeface.BOLD)
                 textSize = 14f
@@ -732,7 +793,7 @@ class ThemerActivity : AppCompatActivity() {
             background = rect(this@ThemerActivity, surfaceColor(), borderColor(), 1.25f)
         }
         row.addView(TextView(this).apply {
-            text = (target?.label ?: "All surfaces").uppercase(Locale.getDefault())
+            text = (target?.let { getString(it.labelRes) } ?: getString(R.string.themer_all_surfaces_d0273)).uppercase(Locale.getDefault())
             setTextColor(textColor())
             setTypeface(Tuils.getTypeface(this@ThemerActivity), Typeface.BOLD)
             textSize = 13f
@@ -749,19 +810,19 @@ class ThemerActivity : AppCompatActivity() {
             setBackgroundColor(ColorUtils.setAlphaComponent(surfaceColor(), 190))
             if (preview != null) {
                 setImageBitmap(preview)
-                contentDescription = "Original frame PNG preview"
+                contentDescription = getString(R.string.themer_original_frame_png_preview_86c26)
             } else {
                 setImageResource(if (invalid) android.R.drawable.ic_menu_report_image else android.R.drawable.ic_menu_gallery)
                 alpha = if (invalid) 1f else 0.4f
-                contentDescription = if (invalid) "Frame PNG missing or corrupt" else "No frame imported"
+                contentDescription = if (invalid) getString(R.string.themer_frame_png_missing_or_corrupt_5b52d) else getString(R.string.themer_no_frame_imported_b07b6)
             }
         }
         previewRow.addView(image, LinearLayout.LayoutParams(dp(this, 104f), dp(this, 72f)))
         previewRow.addView(TextView(this).apply {
             text = when {
-                invalid -> "PNG MISSING OR CORRUPT\nDEFAULT BORDER FALLBACK"
-                preview != null -> "${session.assignedName(target) ?: "Imported frame"}\nORIGINAL PNG"
-                else -> "NO FRAME\nDEFAULT BORDER FALLBACK"
+                invalid -> getString(R.string.themer_png_missing_or_corrupt_default_border_fallback_a1eb5)
+                preview != null -> getString(R.string.themer_original_png_b57db, session.assignedName(target) ?: getString(R.string.themer_imported_frame_651d9))
+                else -> getString(R.string.themer_no_frame_default_border_fallback_d21cf)
             }
             setTextColor(if (invalid) Color.RED else textColor())
             setTypeface(Tuils.getTypeface(this@ThemerActivity))
@@ -772,31 +833,31 @@ class ThemerActivity : AppCompatActivity() {
 
         row.addView(TextView(this).apply {
             val selected = session.selectedAssetId(target)
-            text = if (selected == null) "FRAME: DEFAULT BORDER" else
-                "FRAME: ${session.assignedName(target) ?: "MISSING OR CORRUPT"}"
+            text = if (selected == null) getString(R.string.themer_frame_default_border_03aae) else
+                getString(R.string.themer_frame_9fec1, session.assignedName(target) ?: getString(R.string.themer_missing_or_corrupt_c7da0))
             styleButton(this@ThemerActivity, this, false)
         }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(this, 46f)))
 
         val actions = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
         actions.addView(TextView(this).apply {
-            text = if (hasBundle) "REPLACE" else "IMPORT"
+            text = if (hasBundle) getString(R.string.themer_replace_c336f) else getString(R.string.themer_import_b034f)
             styleButton(this@ThemerActivity, this, false)
             setOnClickListener { launchFrameImportPicker(target) }
         }, LinearLayout.LayoutParams(0, dp(this, 46f), 1f))
         if (hasBundle) {
             actions.addView(View(this), LinearLayout.LayoutParams(dp(this, 8f), 1))
             actions.addView(TextView(this).apply {
-                text = "EDIT"
+                text = getString(R.string.themer_edit_17865)
                 styleButton(this@ThemerActivity, this, false)
                 setOnClickListener { showFrameEditor(target) }
             }, LinearLayout.LayoutParams(0, dp(this, 46f), 1f))
             actions.addView(View(this), LinearLayout.LayoutParams(dp(this, 8f), 1))
             actions.addView(TextView(this).apply {
-                text = "USE DEFAULT"
+                text = getString(R.string.themer_use_default_8e95d)
                 styleButton(this@ThemerActivity, this, false)
                 setOnClickListener {
                     session.select(target, null)
-                    reloadForFrame("Default border selected.")
+                    reloadForFrame(getString(R.string.themer_default_border_selected_09de3))
                 }
             }, LinearLayout.LayoutParams(0, dp(this, 46f), 1f))
         }
@@ -815,9 +876,9 @@ class ThemerActivity : AppCompatActivity() {
             text = buildString {
                 append(pack.name)
                 append("\n")
-                append(pack.assignments.size).append(if (pack.assignments.size == 1) " custom frame" else " custom frames")
-                if (FrameManager.isBuiltInPack(pack.id)) append("  •  BUILT-IN")
-                if (active) append("  •  ACTIVE")
+                append(resources.getQuantityString(R.plurals.custom_frame_count, pack.assignments.size, pack.assignments.size))
+                if (FrameManager.isBuiltInPack(pack.id)) append(getString(R.string.themer_built_in_9cfde))
+                if (active) append(getString(R.string.themer_active_5b74a))
             }
             setTextColor(if (active) accentColor() else textColor())
             setTypeface(Tuils.getTypeface(this@ThemerActivity), Typeface.BOLD)
@@ -827,7 +888,7 @@ class ThemerActivity : AppCompatActivity() {
             setPadding(0, dp(this@ThemerActivity, 8f), 0, 0)
         }
         actions.addView(TextView(this).apply {
-            text = if (active) "APPLIED" else "APPLY"
+            text = if (active) getString(R.string.themer_applied_d879d) else getString(R.string.themer_apply_4433c)
             styleButton(this@ThemerActivity, this, false)
             isEnabled = !active
             alpha = if (active) 0.45f else 1f
@@ -836,7 +897,7 @@ class ThemerActivity : AppCompatActivity() {
         if (!FrameManager.isBuiltInPack(pack.id)) {
             actions.addView(View(this), LinearLayout.LayoutParams(dp(this, 8f), 1))
             actions.addView(TextView(this).apply {
-                text = "DELETE"
+                text = getString(R.string.themer_delete_d6f56)
                 styleButton(this@ThemerActivity, this, false)
                 setOnClickListener { confirmDeleteFramePack(pack) }
             }, LinearLayout.LayoutParams(0, dp(this, 46f), 1f))
@@ -878,7 +939,7 @@ class ThemerActivity : AppCompatActivity() {
                 text = "A"
                 includeFontPadding = false
                 gravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
-                contentDescription = "${baseSize.toInt()}sp font preview"
+                contentDescription = getString(R.string.themer_sp_font_preview_4055c, baseSize.toInt())
                 setPadding(dp(context, 8f), 0, dp(context, 8f), 0)
                 previewRow.addView(
                     this,
@@ -904,19 +965,19 @@ class ThemerActivity : AppCompatActivity() {
         val smaller = TextView(parent.context).apply {
             text = "A"
             gravity = Gravity.CENTER
-            contentDescription = "Decrease font size offset"
+            contentDescription = getString(R.string.themer_decrease_font_size_offset_18761)
             isClickable = true
             isFocusable = true
         }
         val slider = SeekBar(parent.context).apply {
             max = LauncherFontScale.MAX_OFFSET - LauncherFontScale.MIN_OFFSET
-            contentDescription = "Font size offset"
+            contentDescription = getString(R.string.themer_font_size_offset_27f1f)
             TuixtTheme.styleSlider(parent.context, this)
         }
         val larger = TextView(parent.context).apply {
             text = "A"
             gravity = Gravity.CENTER
-            contentDescription = "Increase font size offset"
+            contentDescription = getString(R.string.themer_increase_font_size_offset_24b0b)
             isClickable = true
             isFocusable = true
         }
@@ -938,8 +999,8 @@ class ThemerActivity : AppCompatActivity() {
             gravity = Gravity.CENTER_VERTICAL
         }
         val status = TextView(parent.context)
-        val reset = TextView(parent.context).apply { text = "RESET ALL" }
-        val save = TextView(parent.context).apply { text = "APPLY" }
+        val reset = TextView(parent.context).apply { text = getString(R.string.themer_reset_all_ca151) }
+        val save = TextView(parent.context).apply { text = getString(R.string.themer_apply_4433c) }
         footer.addView(status, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
         footer.addView(reset, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(parent.context, 48f)))
         footer.addView(View(parent.context), LinearLayout.LayoutParams(dp(parent.context, 8f), 1))
@@ -1001,13 +1062,13 @@ class ThemerActivity : AppCompatActivity() {
             }
             stylePanel(this, row)
             val title = TextView(this).apply {
-                text = spec.label.uppercase(Locale.getDefault())
+                text = getString(spec.label).uppercase(Locale.getDefault())
                 setTextColor(accentColor())
                 setTypeface(typeface, Typeface.BOLD)
                 textSize = 12f
             }
             val sample = TextView(this).apply {
-                text = spec.sample
+                text = getString(spec.sample)
                 setTextColor(textColor())
                 setTypeface(typeface)
                 setPadding(0, dp(this@ThemerActivity, 5f), 0, dp(this@ThemerActivity, 5f))
@@ -1023,13 +1084,13 @@ class ThemerActivity : AppCompatActivity() {
                 setTypeface(typeface, Typeface.BOLD)
             }
             val larger = TextView(this).apply { text = "+" }
-            val reset = TextView(this).apply { text = "RESET" }
+            val reset = TextView(this).apply { text = getString(R.string.themer_reset_995f2) }
             styleButton(this, smaller, false)
             styleButton(this, larger, false)
             styleButton(this, reset, false)
-            smaller.contentDescription = "Decrease ${spec.label} size"
-            larger.contentDescription = "Increase ${spec.label} size"
-            reset.contentDescription = "Reset ${spec.label} size"
+            smaller.contentDescription = getString(R.string.themer_decrease_size_469ef, getString(spec.label))
+            larger.contentDescription = getString(R.string.themer_increase_size_1e8c3, getString(spec.label))
+            reset.contentDescription = getString(R.string.themer_reset_size_51a7d, getString(spec.label))
             controls.addView(smaller, LinearLayout.LayoutParams(dp(this, 44f), dp(this, 44f)))
             controls.addView(value, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
             controls.addView(larger, LinearLayout.LayoutParams(dp(this, 44f), dp(this, 44f)))
@@ -1045,9 +1106,9 @@ class ThemerActivity : AppCompatActivity() {
                 val effective = LauncherFontScale.effectiveSp(base, pendingFontSizeOffset!!, spec.followsMaster)
                 sample.textSize = effective
                 value.text = if (spec.followsMaster && pendingFontSizeOffset != 0) {
-                    "${effective.toInt()}SP  ·  BASE ${base}"
+                    getString(R.string.themer_sp_base_7639d, effective.toInt(), base)
                 } else {
-                    "${effective.toInt()}SP"
+                    getString(R.string.themer_sp_ca43c, effective.toInt())
                 }
             }
 
@@ -1081,7 +1142,7 @@ class ThemerActivity : AppCompatActivity() {
             }
             rowRefreshers.forEach { it() }
             val signed = if (offset > 0) "+$offset" else offset.toString()
-            holder.status.text = "${pendingFontLabel()}  /  MASTER ${signed}SP"
+            holder.status.text = getString(R.string.themer_master_sp_d57ee, pendingFontLabel(), signed)
             refreshSaveState()
         }
 
@@ -1157,7 +1218,7 @@ class ThemerActivity : AppCompatActivity() {
     private fun pendingFontLabel(): String {
         ensurePendingFontChanges()
         return if (pendingUseSystemFont == true) {
-            "SYSTEM"
+            getString(R.string.themer_system_29d43)
         } else {
             pendingFontFileName.orEmpty().uppercase(Locale.getDefault())
         }
@@ -1193,7 +1254,7 @@ class ThemerActivity : AppCompatActivity() {
         try {
             val source = if (useSystem) null else File(fontsDir, fileName)
             if (source != null) {
-                check(source.exists() && source.isFile) { "Selected font is no longer available." }
+                check(source.exists() && source.isFile) { getString(R.string.themer_selected_font_is_no_longer_available_b914c) }
                 Typeface.createFromFile(source)
             }
             if (fontChanged) {
@@ -1213,24 +1274,21 @@ class ThemerActivity : AppCompatActivity() {
                 }
             }
             Tuils.cancelFont()
-            Toast.makeText(this, "Typography saved. Applying...", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.themer_typography_saved_applying_7cc74), Toast.LENGTH_SHORT).show()
             LauncherActivity.preview(this)
         } catch (e: Exception) {
-            Toast.makeText(this, "Could not apply font: " + e.message, Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.themer_could_not_apply_font_8bf6d, e.displayMessage(this@ThemerActivity)), Toast.LENGTH_LONG).show()
         }
     }
 
-    private fun dystopiaRowLabel(): String =
-        "Sign up for Retui Credits: " + if (RetuiCreditManager.isDystopiaEnabled(this)) "on" else "off"
-
     private fun isDystopiaRow(label: String?): Boolean =
-        label != null && label.startsWith("Sign up for Retui Credits")
+        label == HubAction.SIGN_UP_FOR_RETUI_CREDITS.name
 
     private fun handleDystopiaOptIn() {
         if (RetuiCreditManager.isDystopiaEnabled(this)) {
             RetuiCreditManager.setDystopiaEnabled(this, false)
-            LockdownManager.getInstance(this).stop("Lockdown disabled.")
-            Toast.makeText(this, "Retui Credits disabled.", Toast.LENGTH_SHORT).show()
+            LockdownManager.getInstance(this).stop(getString(R.string.themer_lockdown_disabled_5cdbb))
+            Toast.makeText(this, getString(R.string.themer_retui_credits_disabled_e91ca), Toast.LENGTH_SHORT).show()
             openSection(SECTION_PERSONALIZATION)
             return
         }
@@ -1238,13 +1296,13 @@ class ThemerActivity : AppCompatActivity() {
     }
 
     private fun showDystopiaConsentDialog() {
-        TuixtDialog.showCustom(this, "Sign up for Retui Credits", ContentFactory { dialog: Dialog? ->
+        TuixtDialog.showCustom(this, getString(R.string.themer_sign_up_for_retui_credits_99c9d), ContentFactory { dialog: Dialog? ->
             val content = LinearLayout(this)
             content.orientation = LinearLayout.VERTICAL
             content.gravity = Gravity.CENTER
 
             val description = TextView(this)
-            description.text = "Enables local Retui Credits, breach keys, breach puzzles, paid Pomodoro exits, and Lockdown. Retui Credits are fictional app points only: no cash value, no purchase value, and nothing leaves this device."
+            description.text = getString(R.string.themer_enables_local_retui_credits_breach_keys_breach_puzzles_pai_408b6)
             description.setTextColor(textColor())
             description.setTypeface(Tuils.getTypeface(this))
             description.textSize = 13f
@@ -1259,7 +1317,7 @@ class ThemerActivity : AppCompatActivity() {
             )
 
             val prompt = TextView(this)
-            prompt.text = "HOLD FINGERPRINT FOR 3 SECONDS"
+            prompt.text = getString(R.string.themer_hold_fingerprint_for_3_seconds_4acf7)
             prompt.setTextColor(accentColor())
             prompt.setTypeface(Tuils.getTypeface(this), Typeface.BOLD)
             prompt.textSize = 12f
@@ -1278,14 +1336,14 @@ class ThemerActivity : AppCompatActivity() {
             fingerprint.setColorFilter(accentColor(), PorterDuff.Mode.SRC_IN)
             styleIconButton(this, fingerprint)
             fingerprint.setPadding(dp(this, 18f), dp(this, 18f), dp(this, 18f), dp(this, 18f))
-            fingerprint.contentDescription = "Hold to sign up for Retui Credits"
+            fingerprint.contentDescription = getString(R.string.themer_hold_to_sign_up_for_retui_credits_cc650)
             fingerprint.setOnClickListener { }
 
             val handler = Handler(Looper.getMainLooper())
             val enable = Runnable {
                 RetuiCreditManager.setDystopiaEnabled(this, true)
                 dialog?.dismiss()
-                Toast.makeText(this, "Retui Credits enabled. 1000 fake credits granted.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.themer_retui_credits_enabled_1000_fake_credits_granted_51fe4), Toast.LENGTH_SHORT).show()
                 openSection(SECTION_PERSONALIZATION)
             }
             fingerprint.setOnTouchListener { view, event ->
@@ -1326,22 +1384,22 @@ class ThemerActivity : AppCompatActivity() {
         addSupportButton(
             footer,
             R.drawable.ic_tuixt_github_24,
-            "Open GitHub"
+            getString(R.string.themer_open_github_0b4cb)
         ) { openExternalUrl(GITHUB_URL) }
         addSupportButton(
             footer,
             R.drawable.ic_tuixt_discord_24,
-            "Open Discord"
+            getString(R.string.themer_open_discord_d6540)
         ) { openExternalUrl(DISCORD_URL) }
         addSupportButton(
             footer,
             R.drawable.ic_tuixt_reddit_24,
-            "Open Reddit"
+            getString(R.string.themer_open_reddit_f3fd5)
         ) { openExternalUrl(REDDIT_URL) }
         addSupportButton(
             footer,
             R.drawable.ic_tuixt_web_24,
-            "Open Re:T-UI website"
+            getString(R.string.themer_open_re_t_ui_website_3a242)
         ) { openLearnMore() }
 
         footer.visibility = View.GONE
@@ -1389,10 +1447,10 @@ class ThemerActivity : AppCompatActivity() {
         if (section == SECTION_FRAMES && frameEditSession?.hasChanges() == true) {
             TuixtDialog.showConfirm(
                 this,
-                "Discard Changes?",
-                "Unsaved frame settings and imports will be lost.",
-                "Discard",
-                "Keep Editing",
+                getString(R.string.themer_discard_changes_f99ee),
+                getString(R.string.themer_unsaved_frame_settings_and_imports_will_be_lost_05741),
+                getString(R.string.themer_discard_36fff),
+                getString(R.string.themer_keep_editing_ced7d),
                 ConfirmAction {
                     discardFrameChanges()
                     onBackPressed()
@@ -1403,10 +1461,10 @@ class ThemerActivity : AppCompatActivity() {
         if (section == SECTION_FONTS && hasPendingFontChanges()) {
             TuixtDialog.showConfirm(
                 this,
-                "Discard Changes?",
-                "Unsaved font and scale changes will be lost.",
-                "Discard",
-                "Keep Editing",
+                getString(R.string.themer_discard_changes_f99ee),
+                getString(R.string.themer_unsaved_font_and_scale_changes_will_be_lost_18b63),
+                getString(R.string.themer_discard_36fff),
+                getString(R.string.themer_keep_editing_ced7d),
                 ConfirmAction {
                     discardPendingFontChanges()
                     onBackPressed()
@@ -1429,7 +1487,7 @@ class ThemerActivity : AppCompatActivity() {
         val intent = Intent(this@ThemerActivity, TuixtActivity::class.java)
         intent.putExtra(TuixtActivity.PATH, File(Tuils.getFolder(), fileName).getAbsolutePath())
         if (fileName == "behavior.xml") {
-            intent.putExtra(TuixtActivity.EXCLUDE_SECTION, "Sounds")
+            intent.putExtra(TuixtActivity.EXCLUDE_SECTION, getString(R.string.themer_sounds_fb1c3))
         }
         openSettingsChild(intent)
     }
@@ -1437,7 +1495,7 @@ class ThemerActivity : AppCompatActivity() {
     private fun openSoundsSettings() {
         val intent = Intent(this@ThemerActivity, TuixtActivity::class.java)
         intent.putExtra(TuixtActivity.PATH, File(Tuils.getFolder(), "behavior.xml").getAbsolutePath())
-        intent.putExtra(TuixtActivity.ONLY_SECTION, "Sounds")
+        intent.putExtra(TuixtActivity.ONLY_SECTION, getString(R.string.themer_sounds_fb1c3))
         openSettingsChild(intent)
     }
 
@@ -1460,7 +1518,7 @@ class ThemerActivity : AppCompatActivity() {
 
         TuixtDialog.showOptions(
             this,
-            "Toolbar Buttons",
+            getString(R.string.themer_toolbar_buttons_8936a),
             options,
             ItemAction { which: Int -> showToolbarButtonSlotDialog(which + 1) })
     }
@@ -1468,20 +1526,20 @@ class ThemerActivity : AppCompatActivity() {
     private fun toolbarSlotSummary(slot: Int): String {
         val current = slot(slot)
         if (!current.enabled) {
-            return "Slot " + slot + ": off"
+            return getString(R.string.themer_slot_off_b2989, slot)
         }
-        return "Slot " + slot + ": " + current.iconLabel + " -> " + current.command
+        return getString(R.string.themer_slot_54b40, slot, getString(current.iconLabel), current.command)
     }
 
     private fun showToolbarButtonSlotDialog(slot: Int) {
         val current = slot(slot)
         val options: MutableList<String?> = ArrayList<String?>()
-        options.add(if (current.enabled) "Disable slot" else "Enable slot")
-        options.add("Set command: " + displayValue(current.command, "empty"))
-        options.add("Set icon: " + current.iconLabel)
-        options.add("Clear slot")
+        options.add(if (current.enabled) getString(R.string.themer_disable_slot_8bc2b) else getString(R.string.themer_enable_slot_0673c))
+        options.add(getString(R.string.themer_set_command_c7afe, displayValue(current.command, "empty")))
+        options.add(getString(R.string.themer_set_icon_96d11, getString(current.iconLabel)))
+        options.add(getString(R.string.themer_clear_slot_e4ba8))
 
-        TuixtDialog.showOptions(this, "Toolbar Slot " + slot, options, ItemAction { which: Int ->
+        TuixtDialog.showOptions(this, getString(R.string.themer_toolbar_slot_b5a77, slot), options, ItemAction { which: Int ->
             if (which == 0) {
                 if (!current.enabled && current.command.length == 0) {
                     showToolbarButtonCommandDialog(slot, true)
@@ -1495,7 +1553,7 @@ class ThemerActivity : AppCompatActivity() {
                 showToolbarButtonIconDialog(slot)
             } else {
                 clearSlot(this, slot)
-                reloadLauncherForToolbarButtons("Toolbar slot cleared.")
+                reloadLauncherForToolbarButtons(getString(R.string.themer_toolbar_slot_cleared_ce6b8))
                 recyclerView!!.postDelayed(Runnable { this.showToolbarButtonsDialog() }, 250)
             }
         })
@@ -1507,7 +1565,7 @@ class ThemerActivity : AppCompatActivity() {
         content.setOrientation(LinearLayout.VERTICAL)
 
         val help = TextView(this)
-        help.setText("Enter the same text you would type at the prompt. Examples: whatsapp, notifications -open, ytm, module -show rss.")
+        help.setText(getString(R.string.themer_enter_the_same_text_you_would_type_at_the_prompt_examples_c3596))
         help.setTextColor(textColor())
         help.setTypeface(Tuils.getTypeface(this))
         help.setTextSize(13f)
@@ -1519,15 +1577,15 @@ class ThemerActivity : AppCompatActivity() {
             )
         )
 
-        val input = commandInput("Command or app name")
+        val input = commandInput(getString(R.string.themer_command_or_app_name_9daa1))
         input.setText(current.command)
         input.setSelectAllOnFocus(true)
         content.addView(input, inputParams())
 
-        TuixtDialog.showContent(this, "Toolbar Command", content, "Save", "Cancel", ConfirmAction {
+        TuixtDialog.showContent(this, getString(R.string.themer_toolbar_command_f70c1), content, getString(R.string.themer_save_efc00), getString(R.string.themer_cancel_77dfd), ConfirmAction {
             val command = input.getText().toString().trim { it <= ' ' }
             if (command.length == 0) {
-                Toast.makeText(this, "Command is required.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.themer_command_is_required_475a6), Toast.LENGTH_SHORT).show()
                 recyclerView!!.postDelayed(Runnable {
                     showToolbarButtonCommandDialog(
                         slot,
@@ -1547,10 +1605,10 @@ class ThemerActivity : AppCompatActivity() {
         val icons: MutableList<IconChoice> = icons().toMutableList()
         val labels: MutableList<String?> = ArrayList<String?>()
         for (icon in icons) {
-            labels.add(icon.label)
+            labels.add(getString(icon.labelRes))
         }
 
-        TuixtDialog.showOptions(this, "Toolbar Icon", labels, ItemAction { which: Int ->
+        TuixtDialog.showOptions(this, getString(R.string.themer_toolbar_icon_b7566), labels, ItemAction { which: Int ->
             val icon = icons.get(which)
             saveToolbarSlot(slot, current.enabled, current.command, icon.key)
             recyclerView!!.postDelayed(Runnable { showToolbarButtonSlotDialog(slot) }, 250)
@@ -1559,7 +1617,7 @@ class ThemerActivity : AppCompatActivity() {
 
     private fun saveToolbarSlot(slot: Int, enabled: Boolean, command: String?, icon: String?) {
         saveSlot(this, slot, enabled, command, icon)
-        reloadLauncherForToolbarButtons(if (enabled) "Toolbar button saved." else "Toolbar button disabled.")
+        reloadLauncherForToolbarButtons(if (enabled) getString(R.string.themer_toolbar_button_saved_62678) else getString(R.string.themer_toolbar_button_disabled_412cc))
     }
 
     private fun reloadLauncherForToolbarButtons(message: String?) {
@@ -1583,10 +1641,10 @@ class ThemerActivity : AppCompatActivity() {
     private fun confirmDeleteFont(font: File) {
         TuixtDialog.showConfirm(
             this,
-            "Delete Font",
-            "Delete " + font.getName() + "?",
-            "Delete",
-            "Cancel",
+            getString(R.string.themer_delete_font_bdc67),
+            getString(R.string.themer_delete_137cd, font.getName()),
+            getString(R.string.themer_delete_f6fdb),
+            getString(R.string.themer_cancel_77dfd),
             ConfirmAction {
                 deleteFont(font)
             })
@@ -1597,7 +1655,7 @@ class ThemerActivity : AppCompatActivity() {
         if (!savedUseSystemFont() && savedFontFileName() == deletedName) {
             Toast.makeText(
                 this,
-                "Select and save another font before deleting the active font.",
+                getString(R.string.themer_select_and_save_another_font_before_deleting_the_active_fo_add4a),
                 Toast.LENGTH_LONG
             ).show()
             return
@@ -1610,7 +1668,7 @@ class ThemerActivity : AppCompatActivity() {
         }
 
         if (!deleted) {
-            Toast.makeText(this, "Could not delete font.", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.themer_could_not_delete_font_559bc), Toast.LENGTH_LONG).show()
             return
         }
 
@@ -1619,7 +1677,7 @@ class ThemerActivity : AppCompatActivity() {
             pendingFontFileName = savedFontFileName()
         }
 
-        Toast.makeText(this, "Font deleted.", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, getString(R.string.themer_font_deleted_3f979), Toast.LENGTH_SHORT).show()
         openSection(SECTION_FONTS, false)
     }
 
@@ -1667,7 +1725,7 @@ class ThemerActivity : AppCompatActivity() {
         try {
             startActivityForResult(intent, FONT_IMPORT_REQUEST)
         } catch (e: ActivityNotFoundException) {
-            Toast.makeText(this, "Font picker is unavailable on this device.", Toast.LENGTH_SHORT)
+            Toast.makeText(this, getString(R.string.themer_font_picker_is_unavailable_on_this_device_b8d21), Toast.LENGTH_SHORT)
                 .show()
         }
     }
@@ -1682,7 +1740,7 @@ class ThemerActivity : AppCompatActivity() {
         try {
             startActivityForResult(intent, FRAME_IMPORT_REQUEST)
         } catch (e: ActivityNotFoundException) {
-            Toast.makeText(this, "File picker is unavailable on this device.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.themer_file_picker_is_unavailable_on_this_device_9a200), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -1690,10 +1748,10 @@ class ThemerActivity : AppCompatActivity() {
         if (frameSession().hasChanges()) {
             TuixtDialog.showConfirm(
                 this,
-                "Discard Unsaved Frame Edits?",
-                "Importing a UI package installs a separate saved pack. Discard the current element edits first?",
-                "Discard and Continue",
-                "Cancel",
+                getString(R.string.themer_discard_unsaved_frame_edits_9bf85),
+                getString(R.string.themer_importing_a_ui_package_installs_a_separate_saved_pack_disc_0b86a),
+                getString(R.string.themer_discard_and_continue_6ee1b),
+                getString(R.string.themer_cancel_77dfd),
                 ConfirmAction {
                     discardFrameChanges()
                     openUiPackageZipPicker()
@@ -1713,20 +1771,20 @@ class ThemerActivity : AppCompatActivity() {
         try {
             startActivityForResult(intent, UI_PACKAGE_ZIP_IMPORT_REQUEST)
         } catch (e: ActivityNotFoundException) {
-            Toast.makeText(this, "File picker is unavailable on this device.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.themer_file_picker_is_unavailable_on_this_device_9a200), Toast.LENGTH_SHORT).show()
         }
     }
 
     private fun showFrameEditor(target: FrameTarget?) {
         val session = frameSession()
         val details = session.assignedDetails(target) ?: run {
-            Toast.makeText(this, "This frame cannot be edited.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.themer_this_frame_cannot_be_edited_73f23), Toast.LENGTH_SHORT).show()
             return
         }
-        TuixtDialog.showCustom(this, "Edit ${target?.label ?: "All surfaces"}", ContentFactory { dialog ->
+        TuixtDialog.showCustom(this, getString(R.string.themer_edit_5fa4d, target?.let { getString(it.labelRes) } ?: getString(R.string.themer_all_surfaces_d0273)), ContentFactory { dialog ->
             val content = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
             content.addView(TextView(this).apply {
-                text = "${details.name}  •  ${details.width} x ${details.height} px\nChanges stay staged until Save Frame Settings."
+                text = getString(R.string.themer_x_px_changes_stay_staged_until_save_frame_settings_d0a46, details.name, details.width, details.height)
                 setTextColor(textColor())
                 setTypeface(Tuils.getTypeface(this@ThemerActivity))
                 textSize = 12f
@@ -1743,13 +1801,13 @@ class ThemerActivity : AppCompatActivity() {
                     setPadding(0, dp(this@ThemerActivity, 8f), 0, dp(this@ThemerActivity, 4f))
                 })
                 val row = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
-                listOf("LEFT", "TOP", "RIGHT", "BOTTOM").forEachIndexed { index, side ->
+                listOf("left" to R.string.frame_left, "top" to R.string.frame_top, "right" to R.string.frame_right, "bottom" to R.string.frame_bottom).forEachIndexed { index, (side, label) ->
                     val column = LinearLayout(this).apply {
                         orientation = LinearLayout.VERTICAL
                         if (index > 0) setPadding(dp(this@ThemerActivity, 4f), 0, 0, 0)
                     }
                     column.addView(TextView(this).apply {
-                        text = side
+                        text = getString(label)
                         setTextColor(textColor())
                         setTypeface(Tuils.getTypeface(this@ThemerActivity))
                         textSize = 9f
@@ -1769,12 +1827,12 @@ class ThemerActivity : AppCompatActivity() {
             }
 
             numberGrid(
-                "BORDER SIZE (DP)", "border",
+                getString(R.string.themer_border_size_dp_42fb4), "border",
                 listOf(details.spec.leftDp, details.spec.topDp, details.spec.rightDp, details.spec.bottomDp),
                 true
             )
             numberGrid(
-                "IMAGE SLICES (PX)", "slice",
+                getString(R.string.themer_image_slices_px_ff2d9), "slice",
                 listOf(details.spec.leftPx, details.spec.topPx, details.spec.rightPx, details.spec.bottomPx),
                 false
             )
@@ -1788,15 +1846,24 @@ class ThemerActivity : AppCompatActivity() {
                 "filtering" to details.spec.filtering
             )
             content.addView(TextView(this).apply {
-                text = "DRAWING"
+                text = getString(R.string.themer_drawing_4c495)
                 setTextColor(accentColor())
                 setTypeface(Tuils.getTypeface(this@ThemerActivity), Typeface.BOLD)
                 textSize = 12f
                 setPadding(0, dp(this@ThemerActivity, 12f), 0, dp(this@ThemerActivity, 4f))
             })
             val modeRows = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
-            fun modeButton(label: String, key: String, choices: List<String>): TextView = TextView(this).apply {
-                fun refresh() { text = "$label: ${modes.getValue(key).uppercase(Locale.ROOT)}" }
+            fun modeButton(label: Int, key: String, choices: List<String>): TextView = TextView(this).apply {
+                fun refresh() {
+                    val modeLabel = when (modes.getValue(key)) {
+                        "tile" -> R.string.frame_tile
+                        "stretch" -> R.string.frame_stretch
+                        "none" -> R.string.frame_none
+                        "nearest" -> R.string.frame_nearest
+                        else -> R.string.frame_linear
+                    }
+                    text = getString(R.string.frame_mode_label, getString(label), getString(modeLabel))
+                }
                 refresh()
                 styleButton(this@ThemerActivity, this, false)
                 setOnClickListener {
@@ -1806,9 +1873,9 @@ class ThemerActivity : AppCompatActivity() {
                 }
             }
             listOf(
-                listOf("LEFT" to "left", "TOP" to "top"),
-                listOf("RIGHT" to "right", "BOTTOM" to "bottom"),
-                listOf("CENTER" to "center", "FILTER" to "filtering")
+                listOf(R.string.frame_left to "left", R.string.frame_top to "top"),
+                listOf(R.string.frame_right to "right", R.string.frame_bottom to "bottom"),
+                listOf(R.string.frame_center to "center", R.string.frame_filtering to "filtering")
             ).forEach { pair ->
                 val row = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
                 pair.forEachIndexed { index, (label, key) ->
@@ -1836,21 +1903,21 @@ class ThemerActivity : AppCompatActivity() {
                 setPadding(0, dp(this@ThemerActivity, 6f), 0, 0)
             }
             buttons.addView(TextView(this).apply {
-                text = "CANCEL"
+                text = getString(R.string.themer_cancel_1507c)
                 styleButton(this@ThemerActivity, this, false)
                 setOnClickListener { dialog?.dismiss() }
             }, LinearLayout.LayoutParams(0, dp(this, 46f), 1f))
             buttons.addView(View(this), LinearLayout.LayoutParams(dp(this, 8f), 1))
             buttons.addView(TextView(this).apply {
-                text = "APPLY EDITS"
+                text = getString(R.string.themer_apply_edits_ec4da)
                 styleButton(this@ThemerActivity, this, true)
                 setOnClickListener {
                     try {
                         fun intValue(key: String) = requireNotNull(inputs[key]?.text?.toString()?.toIntOrNull()) {
-                            "Slice values must be positive whole pixels."
+                            getString(R.string.themer_slice_values_must_be_positive_whole_pixels_bcdc1)
                         }
                         fun floatValue(key: String) = requireNotNull(inputs[key]?.text?.toString()?.toFloatOrNull()) {
-                            "Borders must be between 0 and 256 dp."
+                            getString(R.string.themer_borders_must_be_between_0_and_256_dp_49480)
                         }
                         val spec = FrameSpec(
                             intValue("slice_left"), intValue("slice_top"), intValue("slice_right"), intValue("slice_bottom"),
@@ -1858,12 +1925,12 @@ class ThemerActivity : AppCompatActivity() {
                             modes.getValue("top"), modes.getValue("right"), modes.getValue("bottom"), modes.getValue("left"),
                             modes.getValue("center"), modes.getValue("filtering")
                         )
-                        FrameManager.frameSpecError(spec, details.width, details.height)?.let { throw IllegalArgumentException(it) }
+                        FrameManager.frameSpecError(spec, details.width, details.height)?.let { throw it }
                         session.updateFrameSpec(target, spec)
                         dialog?.dismiss()
-                        reloadForFrame("Frame controls updated.")
+                        reloadForFrame(getString(R.string.themer_frame_controls_updated_b0b31))
                     } catch (e: Exception) {
-                        error.text = e.message ?: "Invalid frame settings."
+                        error.text = e.displayMessage(this@ThemerActivity) ?: getString(R.string.themer_invalid_frame_settings_7301e)
                         error.visibility = View.VISIBLE
                     }
                 }
@@ -1889,13 +1956,13 @@ class ThemerActivity : AppCompatActivity() {
     private fun saveFrameChanges() {
         val session = frameEditSession ?: return
         val choices = mutableListOf<String>()
-        if (session.currentPackId() != null) choices.add("Save current pack")
-        choices.add("Create new pack")
-        if (session.packs().any { !FrameManager.isBuiltInPack(it.id) }) choices.add("Replace existing pack")
-        TuixtDialog.showOptions(this, "Save Frame Settings", choices, ItemAction { choice ->
+        if (session.currentPackId() != null) choices.add(getString(R.string.themer_save_current_pack_72386))
+        choices.add(getString(R.string.themer_create_new_pack_bc161))
+        if (session.packs().any { !FrameManager.isBuiltInPack(it.id) }) choices.add(getString(R.string.themer_replace_existing_pack_8f193))
+        TuixtDialog.showOptions(this, getString(R.string.themer_save_frame_settings_cd8c7), choices, ItemAction { choice ->
             when (choices[choice]) {
-                "Save current pack" -> saveCurrentFramePack()
-                "Create new pack" -> showCreateFramePack()
+                getString(R.string.themer_save_current_pack_72386) -> saveCurrentFramePack()
+                getString(R.string.themer_create_new_pack_bc161) -> showCreateFramePack()
                 else -> showReplaceFramePack()
             }
         })
@@ -1907,9 +1974,9 @@ class ThemerActivity : AppCompatActivity() {
         val pack = session.packs().firstOrNull { it.id == packId } ?: return
         try {
             session.replacePack(packId)
-            persistFrameSession("${pack.name} saved and applied.")
+            persistFrameSession(getString(R.string.themer_saved_and_applied_57003, pack.name))
         } catch (e: Exception) {
-            Toast.makeText(this, "Could not save frame pack: ${e.message}", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.themer_could_not_save_frame_pack_55234, e.displayMessage(this@ThemerActivity)), Toast.LENGTH_LONG).show()
         }
     }
 
@@ -1917,17 +1984,17 @@ class ThemerActivity : AppCompatActivity() {
         val session = frameEditSession ?: return
         TuixtDialog.showValidatedForm(
             this,
-            "Create Frame Pack",
-            listOf(FormField("name", "Pack name", "My frame pack")),
-            "Create",
-            "Cancel",
-            FormValidator { values -> session.packNameError(values["name"].orEmpty()) },
+            getString(R.string.themer_create_frame_pack_35416),
+            listOf(FormField("name", getString(R.string.themer_pack_name_20f8a), getString(R.string.themer_my_frame_pack_a0f31))),
+            getString(R.string.themer_create_6e157),
+            getString(R.string.themer_cancel_77dfd),
+            FormValidator { values -> session.packNameError(values["name"].orEmpty())?.displayMessage(this@ThemerActivity) },
             FormAction { values ->
                 try {
                     session.createPack(values["name"].orEmpty())
-                    persistFrameSession("Frame pack created and applied.")
+                    persistFrameSession(getString(R.string.themer_frame_pack_created_and_applied_7c5de))
                 } catch (e: Exception) {
-                    Toast.makeText(this, "Could not create frame pack: ${e.message}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, getString(R.string.themer_could_not_create_frame_pack_f8989, e.displayMessage(this@ThemerActivity)), Toast.LENGTH_LONG).show()
                 }
             }
         )
@@ -1936,20 +2003,20 @@ class ThemerActivity : AppCompatActivity() {
     private fun showReplaceFramePack() {
         val packs = frameEditSession?.packs().orEmpty().filterNot { FrameManager.isBuiltInPack(it.id) }
         if (packs.isEmpty()) return
-        TuixtDialog.showOptions(this, "Replace Frame Pack", packs.map { it.name }, ItemAction { index ->
+        TuixtDialog.showOptions(this, getString(R.string.themer_replace_frame_pack_f44f9), packs.map { it.name }, ItemAction { index ->
             val pack = packs[index]
             TuixtDialog.showConfirm(
                 this,
-                "Replace ${pack.name}?",
-                "Replace this pack with the complete current frame setup?",
-                "Replace",
-                "Cancel",
+                getString(R.string.themer_replace_e9bb0, pack.name),
+                getString(R.string.themer_replace_this_pack_with_the_complete_current_frame_setup_576ad),
+                getString(R.string.themer_replace_a7cf7),
+                getString(R.string.themer_cancel_77dfd),
                 ConfirmAction {
                     try {
                         frameEditSession?.replacePack(pack.id) ?: return@ConfirmAction
-                        persistFrameSession("${pack.name} replaced and applied.")
+                        persistFrameSession(getString(R.string.themer_replaced_and_applied_997ba, pack.name))
                     } catch (e: Exception) {
-                        Toast.makeText(this, "Could not replace frame pack: ${e.message}", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this, getString(R.string.themer_could_not_replace_frame_pack_5928b, e.displayMessage(this@ThemerActivity)), Toast.LENGTH_LONG).show()
                     }
                 }
             )
@@ -1957,12 +2024,12 @@ class ThemerActivity : AppCompatActivity() {
     }
 
     private fun applyFramePack(pack: FrameManager.FramePack) {
-        withCleanFrameSession("Unsaved element edits will be discarded before applying ${pack.name}.") { session ->
+        withCleanFrameSession(getString(R.string.themer_unsaved_element_edits_will_be_discarded_before_applying_98e49, pack.name)) { session ->
             try {
                 session.applyPack(pack.id)
-                persistFrameSession("${pack.name} applied.")
+                persistFrameSession(getString(R.string.themer_applied_56d65, pack.name))
             } catch (e: Exception) {
-                Toast.makeText(this, "Could not apply frame pack: ${e.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, getString(R.string.themer_could_not_apply_frame_pack_abfd3, e.displayMessage(this@ThemerActivity)), Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -1970,20 +2037,20 @@ class ThemerActivity : AppCompatActivity() {
     private fun confirmDeleteFramePack(pack: FrameManager.FramePack) {
         val active = frameSession().activePackId() == pack.id
         val message = buildString {
-            append("Delete ${pack.name}?")
-            if (active) append(" The active frame setup will return to defaults.")
-            if (frameSession().hasChanges()) append(" Unsaved element edits will be discarded.")
+            append(getString(R.string.themer_delete_137cd, pack.name))
+            if (active) append(getString(R.string.themer_the_active_frame_setup_will_return_to_defaults_9a38a))
+            if (frameSession().hasChanges()) append(getString(R.string.themer_unsaved_element_edits_will_be_discarded_38d5f))
         }
-        TuixtDialog.showConfirm(this, "Delete Frame Pack", message, "Delete", "Cancel", ConfirmAction {
+        TuixtDialog.showConfirm(this, getString(R.string.themer_delete_frame_pack_7c7f4), message, getString(R.string.themer_delete_f6fdb), getString(R.string.themer_cancel_77dfd), ConfirmAction {
             val session = if (frameSession().hasChanges()) {
                 discardFrameChanges()
                 frameSession()
             } else frameSession()
             try {
                 session.deletePack(pack.id)
-                persistFrameSession("${pack.name} deleted.")
+                persistFrameSession(getString(R.string.themer_deleted_b89bd, pack.name))
             } catch (e: Exception) {
-                Toast.makeText(this, "Could not delete frame pack: ${e.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, getString(R.string.themer_could_not_delete_frame_pack_b1e2e, e.displayMessage(this@ThemerActivity)), Toast.LENGTH_LONG).show()
             }
         })
     }
@@ -1994,7 +2061,7 @@ class ThemerActivity : AppCompatActivity() {
             action(session)
             return
         }
-        TuixtDialog.showConfirm(this, "Discard Unsaved Edits?", message, "Discard and Apply", "Cancel", ConfirmAction {
+        TuixtDialog.showConfirm(this, getString(R.string.themer_discard_unsaved_edits_a391b), message, getString(R.string.themer_discard_and_apply_bfec7), getString(R.string.themer_cancel_77dfd), ConfirmAction {
             discardFrameChanges()
             action(frameSession())
         })
@@ -2009,7 +2076,7 @@ class ThemerActivity : AppCompatActivity() {
             sectionsAdapter?.notifyDataSetChanged()
             LauncherActivity.preview(this)
         } catch (e: Exception) {
-            Toast.makeText(this, "Could not save frame settings: ${e.message}", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.themer_could_not_save_frame_settings_a3663, e.displayMessage(this@ThemerActivity)), Toast.LENGTH_LONG).show()
         }
     }
 
@@ -2031,7 +2098,7 @@ class ThemerActivity : AppCompatActivity() {
             pendingFontFileName = source.name
             openSection(SECTION_TYPOGRAPHY)
         } catch (e: Exception) {
-            Toast.makeText(this, "Could not preview font: " + e.message, Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.themer_could_not_preview_font_c979a, e.displayMessage(this@ThemerActivity)), Toast.LENGTH_LONG).show()
         }
     }
 
@@ -2053,13 +2120,13 @@ class ThemerActivity : AppCompatActivity() {
             startActivity(
                 Intent.createChooser(
                     Intent(Intent.ACTION_SET_WALLPAPER),
-                    "Select wallpaper"
+                    getString(R.string.themer_select_wallpaper_4842b)
                 )
             )
         } catch (e: Exception) {
             Toast.makeText(
                 this,
-                "Wallpaper picker is unavailable on this device.",
+                getString(R.string.themer_wallpaper_picker_is_unavailable_on_this_device_a5a4d),
                 Toast.LENGTH_SHORT
             ).show()
         }
@@ -2079,7 +2146,7 @@ class ThemerActivity : AppCompatActivity() {
             try {
                 startActivity(Intent(WallpaperManager.ACTION_LIVE_WALLPAPER_CHOOSER))
             } catch (fallback: Exception) {
-                Toast.makeText(this, "Live wallpaper picker is unavailable on this device.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.themer_live_wallpaper_picker_is_unavailable_on_this_device_05a68), Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -2094,7 +2161,7 @@ class ThemerActivity : AppCompatActivity() {
         } catch (e: ActivityNotFoundException) {
             pendingBackupPassword = null
             backupExportPending = false
-            Toast.makeText(this, "Backup picker is unavailable on this device.", Toast.LENGTH_SHORT)
+            Toast.makeText(this, getString(R.string.themer_backup_picker_is_unavailable_on_this_device_5eb44), Toast.LENGTH_SHORT)
                 .show()
         }
     }
@@ -2102,8 +2169,8 @@ class ThemerActivity : AppCompatActivity() {
     private fun showBackupProtectionDialog() {
         TuixtDialog.showOptions(
             this,
-            "Backup Protection",
-            mutableListOf<String?>("Encrypt with Password", "Export Without Password"),
+            getString(R.string.themer_backup_protection_6fea3),
+            mutableListOf<String?>(getString(R.string.themer_encrypt_with_password_1b2c0), getString(R.string.themer_export_without_password_159da)),
             ItemAction { which: Int ->
                 if (which == 0) {
                     showBackupPasswordDialog()
@@ -2118,12 +2185,12 @@ class ThemerActivity : AppCompatActivity() {
     private fun showShareableConfigurationSourcePicker() {
         val presets = PresetManager.listSavedPresetFolders()
         val options: MutableList<String?> = ArrayList<String?>()
-        options.add("Current Active Look")
+        options.add(getString(R.string.themer_current_active_look_ffd5a))
         for (preset in presets) {
-            options.add("Preset: " + preset)
+            options.add(getString(R.string.themer_preset_f6b28, preset))
         }
 
-        TuixtDialog.showOptions(this, "Shareable Source", options, ItemAction { which: Int ->
+        TuixtDialog.showOptions(this, getString(R.string.themer_shareable_source_06d7c), options, ItemAction { which: Int ->
             pendingShareablePresetName = if (which == 0) null else presets.get(which - 1)
             showShareableBehaviorPicker()
         })
@@ -2135,7 +2202,7 @@ class ThemerActivity : AppCompatActivity() {
             PresetManager.shareableBehaviorValues(pendingShareablePresetName)
         } catch (error: Exception) {
             pendingShareablePresetName = null
-            Toast.makeText(this, error.message ?: "Unable to read preset behavior.", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, error.displayMessage(this@ThemerActivity) ?: getString(R.string.themer_unable_to_read_preset_behavior_e8a41), Toast.LENGTH_LONG).show()
             return
         }
         val defaults = PresetManager.defaultShareableBehaviorLabels()
@@ -2143,7 +2210,7 @@ class ThemerActivity : AppCompatActivity() {
         val content = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             addView(TextView(this@ThemerActivity).apply {
-                text = "Choose which behavior values to include. The existing safe set starts enabled. Optional values may contain locations, folders, API keys, notification text, or executable commands."
+                text = getString(R.string.themer_choose_which_behavior_values_to_include_the_existing_safe_56372)
                 setTextColor(textColor())
                 setTypeface(Tuils.getTypeface(this@ThemerActivity))
                 textSize = 12f
@@ -2157,7 +2224,7 @@ class ThemerActivity : AppCompatActivity() {
                     text = buildString {
                         append(label.replace('_', ' ').uppercase(Locale.getDefault()))
                         append("\n")
-                        append("VALUE: ")
+                        append(getString(R.string.themer_value_a89f9))
                         append(value)
                     }
                     isChecked = checked
@@ -2175,10 +2242,10 @@ class ThemerActivity : AppCompatActivity() {
         }
         TuixtDialog.showContent(
             this,
-            "Behavior Sharing",
+            getString(R.string.themer_behavior_sharing_441b1),
             content,
-            "Continue",
-            "Cancel",
+            getString(R.string.themer_continue_2e026),
+            getString(R.string.themer_cancel_77dfd),
             ConfirmAction {
                 pendingShareableBehaviorLabels = selected.toSet()
                 launchShareableConfigurationPicker()
@@ -2203,7 +2270,7 @@ class ThemerActivity : AppCompatActivity() {
             pendingShareableBehaviorLabels = null
             Toast.makeText(
                 this,
-                "Configuration picker is unavailable on this device.",
+                getString(R.string.themer_configuration_picker_is_unavailable_on_this_device_6c2c4),
                 Toast.LENGTH_SHORT
             ).show()
         }
@@ -2222,7 +2289,7 @@ class ThemerActivity : AppCompatActivity() {
         } catch (e: ActivityNotFoundException) {
             Toast.makeText(
                 this,
-                "Restore picker is unavailable on this device.",
+                getString(R.string.themer_restore_picker_is_unavailable_on_this_device_95294),
                 Toast.LENGTH_SHORT
             ).show()
         }
@@ -2232,7 +2299,7 @@ class ThemerActivity : AppCompatActivity() {
         get() {
             val packageName = preferredPackage()
             if (packageName == null || packageName.length == 0) {
-                return "Auto detect"
+                return getString(R.string.themer_auto_detect_85cd1)
             }
 
             val packageManager = getPackageManager()
@@ -2258,7 +2325,7 @@ class ThemerActivity : AppCompatActivity() {
         root.setPadding(0, dp(this, 4f), 0, dp(this, 12f))
 
         root.addView(TextView(this).apply {
-            text = "HOLD TO CONFIGURE"
+            text = getString(R.string.themer_hold_to_configure_289b4)
             setTextColor(accentColor())
             setTypeface(Tuils.getTypeface(this@ThemerActivity), Typeface.BOLD)
             textSize = 11f
@@ -2272,13 +2339,13 @@ class ThemerActivity : AppCompatActivity() {
             background = rect(this@ThemerActivity, surfaceColor(), borderColor(), 1.25f, 14)
         }
         card.addView(TextView(this).apply {
-            text = "long-press a key"
+            text = getString(R.string.themer_long_press_a_key_80497)
             setTextColor(textColor())
             setTypeface(Tuils.getTypeface(this@ThemerActivity), Typeface.BOLD)
             textSize = 16f
         }, inputParams())
         card.addView(TextView(this).apply {
-            text = "Hold or tap a letter to choose up to two apps. Hold that key on Re Keyboard to launch one."
+            text = getString(R.string.themer_hold_or_tap_a_letter_to_choose_up_to_two_apps_hold_that_ke_10a8c)
             setTextColor(textColor())
             setTypeface(Tuils.getTypeface(this@ThemerActivity))
             textSize = 12f
@@ -2297,7 +2364,7 @@ class ThemerActivity : AppCompatActivity() {
         }
 
         card.addView(TextView(this).apply {
-            text = "•  1 APP     ••  2 APPS"
+            text = getString(R.string.themer_1_app_2_apps_5e208)
             setTextColor(textColor())
             setTypeface(Tuils.getTypeface(this@ThemerActivity), Typeface.BOLD)
             textSize = 10f
@@ -2307,7 +2374,7 @@ class ThemerActivity : AppCompatActivity() {
         val selected = selectedKeyboardShortcutKey
         val mappings = KeyboardShortcutManager.mappings(this, selected)
         card.addView(TextView(this).apply {
-            text = "HOLD ${selected.uppercaseChar()}"
+            text = getString(R.string.themer_hold_05336, selected.uppercaseChar())
             setTextColor(accentColor())
             setTypeface(Tuils.getTypeface(this@ThemerActivity), Typeface.BOLD)
             textSize = 11f
@@ -2316,7 +2383,7 @@ class ThemerActivity : AppCompatActivity() {
         repeat(KeyboardShortcutManager.MAX_PER_KEY) { slot ->
             val mapping = mappings.getOrNull(slot)
             card.addView(TextView(this).apply {
-                text = "SLOT ${slot + 1}   ${mapping?.label ?: "CHOOSE APP"}"
+                text = getString(R.string.themer_slot_13d02, slot + 1, mapping?.label ?: getString(R.string.themer_choose_app_8234e))
                 styleListItem(this@ThemerActivity, this, mapping != null)
                 textSize = 12f
                 setOnClickListener { showKeyboardShortcutAppPicker(selected, slot) }
@@ -2334,7 +2401,7 @@ class ThemerActivity : AppCompatActivity() {
         return FrameLayout(this).apply {
             isClickable = true
             isFocusable = true
-            contentDescription = "${key.uppercaseChar()}, $occupied app shortcuts"
+            contentDescription = getString(R.string.themer_app_shortcuts_b6cc6, key.uppercaseChar(), occupied)
             background = GradientDrawable().apply {
                 shape = GradientDrawable.RECTANGLE
                 cornerRadius = dp(this@ThemerActivity, 5f).toFloat()
@@ -2377,17 +2444,17 @@ class ThemerActivity : AppCompatActivity() {
     private fun showKeyboardShortcutAppPicker(key: Char, slot: Int) {
         val apps = LauncherActivity.instance?.keyboardShortcutApps().orEmpty()
         if (apps.isEmpty()) {
-            Toast.makeText(this, "Launcher app list is not ready. Return home and reopen Settings.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.themer_launcher_app_list_is_not_ready_return_home_and_reopen_sett_a05a4), Toast.LENGTH_SHORT).show()
             return
         }
         val occupied = KeyboardShortcutManager.mappings(this, key).getOrNull(slot) != null
         val labels = mutableListOf<String>()
-        if (occupied) labels.add("Clear slot")
+        if (occupied) labels.add(getString(R.string.themer_clear_slot_e4ba8))
         labels.addAll(apps.map { app ->
-            val label = app.publicLabel ?: app.componentName?.packageName ?: "App"
+            val label = app.publicLabel ?: app.componentName?.packageName ?: getString(R.string.themer_app_fc4a6)
             "$label (${app.componentName?.packageName.orEmpty()})"
         })
-        TuixtDialog.showSearchableOptions(this, "${key.uppercaseChar()} · SLOT ${slot + 1}", labels, "Search apps", ItemAction { which ->
+        TuixtDialog.showSearchableOptions(this, getString(R.string.themer_slot_aff9c, key.uppercaseChar(), slot + 1), labels, getString(R.string.themer_search_apps_ca3ce), ItemAction { which ->
             if (occupied && which == 0) {
                 KeyboardShortcutManager.clear(this, key, slot)
             } else {
@@ -2399,7 +2466,7 @@ class ThemerActivity : AppCompatActivity() {
     }
 
     private fun showTaskerIntegrationDialog() {
-        TuixtDialog.showCustom(this, "Tasker integration", ContentFactory { _: Dialog? ->
+        TuixtDialog.showCustom(this, getString(R.string.themer_tasker_integration_50a1b), ContentFactory { _: Dialog? ->
             val content = LinearLayout(this).apply {
                 orientation = LinearLayout.VERTICAL
             }
@@ -2414,11 +2481,11 @@ class ThemerActivity : AppCompatActivity() {
 
             fun updateStatus() {
                 status.text = buildString {
-                    append("INTEGRATION  ").append(if (TaskerIntegrationManager.isEnabled(this@ThemerActivity)) "ON" else "OFF")
-                    append("\nTASKER       ").append(if (TaskerIntegrationManager.isTaskerInstalled(this@ThemerActivity)) "INSTALLED" else "NOT INSTALLED")
-                    append("\nPERMISSION   ").append(if (TaskerIntegrationManager.hasRunTasksPermission(this@ThemerActivity)) "GRANTED" else "NOT GRANTED")
-                    append("\nTASK STATUS  ").append(if (TaskerIntegrationManager.showTaskStatuses(this@ThemerActivity)) "SHOWN" else "HIDDEN")
-                    append("\n\nPRESETS · THEME · MODULES · TERMINAL OUTPUT")
+                    append(getString(R.string.themer_integration_5c0a9)).append(if (TaskerIntegrationManager.isEnabled(this@ThemerActivity)) getString(R.string.themer_on_387d7) else getString(R.string.themer_off_ad504))
+                    append(getString(R.string.themer_tasker_551d9)).append(if (TaskerIntegrationManager.isTaskerInstalled(this@ThemerActivity)) getString(R.string.themer_installed_32554) else getString(R.string.themer_not_installed_b81b3))
+                    append(getString(R.string.themer_permission_60b6d)).append(if (TaskerIntegrationManager.hasRunTasksPermission(this@ThemerActivity)) getString(R.string.themer_granted_5ae8e) else getString(R.string.themer_not_granted_fe998))
+                    append(getString(R.string.themer_task_status_6002c)).append(if (TaskerIntegrationManager.showTaskStatuses(this@ThemerActivity)) getString(R.string.themer_shown_830ab) else getString(R.string.themer_hidden_1ba34))
+                    append(getString(R.string.themer_presets_theme_modules_terminal_output_e4fc7))
                 }
             }
             updateStatus()
@@ -2431,7 +2498,7 @@ class ThemerActivity : AppCompatActivity() {
                 background = rect(this@ThemerActivity, surfaceColor(), borderColor(), 1.25f)
             }
             val toggleLabel = TextView(this).apply {
-                text = "ENABLE INTEGRATION"
+                text = getString(R.string.themer_enable_integration_f2a7e)
                 setTextColor(textColor())
                 setTypeface(Tuils.getTypeface(this@ThemerActivity), Typeface.BOLD)
                 textSize = 13f
@@ -2464,7 +2531,7 @@ class ThemerActivity : AppCompatActivity() {
                 background = rect(this@ThemerActivity, surfaceColor(), borderColor(), 1.25f)
             }
             val statusToggleLabel = TextView(this).apply {
-                text = "SHOW TASK STATUSES"
+                text = getString(R.string.themer_show_task_statuses_fee80)
                 setTextColor(textColor())
                 setTypeface(Tuils.getTypeface(this@ThemerActivity), Typeface.BOLD)
                 textSize = 13f
@@ -2487,37 +2554,24 @@ class ThemerActivity : AppCompatActivity() {
                 setOnClickListener { action() }
             }
 
-            content.addView(actionButton("TEST INTEGRATION") {
+            content.addView(actionButton(getString(R.string.themer_test_integration_b2a66)) {
                 val result = TaskerIntegrationManager.execute(
                     this,
-                    TaskerIntegrationManager.Request(TaskerIntegrationManager.ACTION_TERMINAL_OUTPUT, text = "Tasker integration test OK")
+                    TaskerIntegrationManager.Request(TaskerIntegrationManager.ACTION_TERMINAL_OUTPUT, text = getString(R.string.themer_tasker_integration_test_ok_dbfe7))
                 )
                 Toast.makeText(this, result.message, Toast.LENGTH_SHORT).show()
                 updateStatus()
             }, inputParams())
-            content.addView(actionButton("SETUP & EXAMPLES") { showTaskerSetupDialog() }, inputParams())
+            content.addView(actionButton(getString(R.string.themer_setup_examples_7ef67)) { showTaskerSetupDialog() }, inputParams())
             content
         })
     }
 
     private fun showTaskerSetupDialog() {
-        TuixtDialog.showCustom(this, "Tasker setup", ContentFactory { _: Dialog? ->
+        TuixtDialog.showCustom(this, getString(R.string.themer_tasker_setup_e7f1d), ContentFactory { _: Dialog? ->
             val content = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
             val instructions = TextView(this).apply {
-                text = "SETUP\n" +
-                    "1. Enable Tasker integration in RETUI.\n" +
-                    "2. Grant the Tasker run-task permission.\n" +
-                    "3. In Tasker, enable Allow External Access.\n" +
-                    "4. Add an action: Plugin → RETUI Action.\n\n" +
-                    "TASKER → RETUI\n" +
-                    "• Apply a night preset at sunset\n" +
-                    "• Change a theme color from a profile\n" +
-                    "• Show or refresh a module\n" +
-                    "• Switch Spaces; RETUI saves the current Space automatically\n" +
-                    "• Send text to the RETUI terminal\n\n" +
-                    "RETUI → TASKER\n" +
-                    "tasker Work\n" +
-                    "tasker -run \"Evening Setup\""
+                text = getString(R.string.themer_setup_1_enable_tasker_integration_in_retui_2_grant_the_tas_0fc35)
                 setTextColor(textColor())
                 setTypeface(Tuils.getTypeface(this@ThemerActivity))
                 textSize = 13f
@@ -2526,7 +2580,7 @@ class ThemerActivity : AppCompatActivity() {
             }
             content.addView(instructions, inputParams())
             val docs = TextView(this).apply {
-                text = "OPEN FULL DOCUMENTATION"
+                text = getString(R.string.themer_open_full_documentation_927ce)
                 styleListItem(this@ThemerActivity, this, false)
                 setOnClickListener { openExternalUrl(TASKER_HELP_URL) }
             }
@@ -2538,17 +2592,17 @@ class ThemerActivity : AppCompatActivity() {
     private fun showPreferredMusicAppPicker() {
         val choices = this.launchableAppChoices
         val labels: MutableList<String?> = ArrayList<String?>()
-        labels.add("Auto detect")
+        labels.add(getString(R.string.themer_auto_detect_85cd1))
         for (choice in choices) {
             labels.add(choice.label + " (" + choice.packageName + ")")
         }
 
-        TuixtDialog.showOptions(this, "Preferred Music App", labels, ItemAction { which: Int ->
+        TuixtDialog.showOptions(this, getString(R.string.themer_preferred_music_app_1e994), labels, ItemAction { which: Int ->
             if (which == 0) {
                 set(this, Behavior.preferred_music_app, Tuils.EMPTYSTRING)
                 Toast.makeText(
                     this,
-                    "Preferred music app reset to automatic detection.",
+                    getString(R.string.themer_preferred_music_app_reset_to_automatic_detection_9a1d3),
                     Toast.LENGTH_SHORT
                 ).show()
             } else {
@@ -2556,7 +2610,7 @@ class ThemerActivity : AppCompatActivity() {
                 set(this, Behavior.preferred_music_app, choice.packageName)
                 Toast.makeText(
                     this,
-                    "Preferred music app set to " + choice.label + ".",
+                    getString(R.string.themer_preferred_music_app_set_to_73cf9, choice.label),
                     Toast.LENGTH_SHORT
                 ).show()
             }
@@ -2625,23 +2679,23 @@ class ThemerActivity : AppCompatActivity() {
     private fun handleUiPackageZipImportResult(resultCode: Int, data: Intent?) {
         val uri = data?.data
         if (resultCode != RESULT_OK || uri == null) {
-            Toast.makeText(this, "UI package ZIP import cancelled.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.themer_ui_package_zip_import_cancelled_1451c), Toast.LENGTH_SHORT).show()
             return
         }
         val fileName = getDisplayName(uri) ?: uri.lastPathSegment.orEmpty()
         if (!FrameManager.isUiPackageZipName(fileName)) {
-            Toast.makeText(this, "Choose a file ending in .retui_ui.zip.", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.themer_choose_a_file_ending_in_retui_ui_zip_0571c), Toast.LENGTH_LONG).show()
             return
         }
         try {
             val pack = contentResolver.openInputStream(uri).use { input ->
                 frameSession().importUiPackageZip(
-                    requireNotNull(input) { "Unable to read the selected UI package ZIP." }
+                    requireNotNull(input) { getString(R.string.themer_unable_to_read_the_selected_ui_package_zip_ffc9a) }
                 )
             }
-            persistFrameSession("${pack.name} imported. Tap Apply when ready.")
+            persistFrameSession(getString(R.string.themer_imported_tap_apply_when_ready_6eb44, pack.name))
         } catch (e: Exception) {
-            Toast.makeText(this, "UI package ZIP import failed: ${e.message}", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.themer_ui_package_zip_import_failed_f51b2, e.displayMessage(this@ThemerActivity)), Toast.LENGTH_LONG).show()
         }
     }
 
@@ -2649,7 +2703,7 @@ class ThemerActivity : AppCompatActivity() {
         val uri = data?.data
         if (resultCode != RESULT_OK || uri == null) {
             pendingFrameTarget = null
-            Toast.makeText(this, "Frame import cancelled.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.themer_frame_import_cancelled_c8e8e), Toast.LENGTH_SHORT).show()
             return
         }
         try {
@@ -2658,20 +2712,20 @@ class ThemerActivity : AppCompatActivity() {
                 frameSession().importFrame(
                     target,
                     getDisplayName(uri) ?: uri.lastPathSegment,
-                    requireNotNull(input) { "Unable to read the selected frame." }
+                    requireNotNull(input) { getString(R.string.themer_unable_to_read_the_selected_frame_c6fec) }
                 )
             }
             pendingFrameTarget = null
-            reloadForFrame("Frame imported: ${asset.name}")
+            reloadForFrame(getString(R.string.themer_frame_imported_66bc7, asset.name))
         } catch (e: Exception) {
             pendingFrameTarget = null
-            Toast.makeText(this, "Frame import failed: ${e.message}", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.themer_frame_import_failed_b43bd, e.displayMessage(this@ThemerActivity)), Toast.LENGTH_LONG).show()
         }
     }
 
     private fun handleFontImportResult(resultCode: Int, data: Intent?) {
         if (resultCode != RESULT_OK || data == null || data.getData() == null) {
-            Toast.makeText(this, "Font import cancelled.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.themer_font_import_cancelled_ae79a), Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -2683,7 +2737,7 @@ class ThemerActivity : AppCompatActivity() {
 
         val fileName = sanitizeFontFileName(sourceName)
         if (!isFontFileName(fileName)) {
-            Toast.makeText(this, "Choose a .ttf or .otf font file.", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.themer_choose_a_ttf_or_otf_font_file_7d188), Toast.LENGTH_LONG).show()
             return
         }
 
@@ -2691,7 +2745,7 @@ class ThemerActivity : AppCompatActivity() {
         try {
             getContentResolver().openInputStream(uri).use { `in` ->
                 FileOutputStream(dest).use { out ->
-                    checkNotNull(`in`) { "Unable to read selected font." }
+                    checkNotNull(`in`) { getString(R.string.themer_unable_to_read_selected_font_857be) }
                     val buffer = ByteArray(8192)
                     var read: Int
                     while ((`in`.read(buffer).also { read = it }) != -1) {
@@ -2703,17 +2757,17 @@ class ThemerActivity : AppCompatActivity() {
             if (dest.exists()) {
                 dest.delete()
             }
-            Toast.makeText(this, "Font import failed: " + e.message, Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.themer_font_import_failed_2185f, e.displayMessage(this@ThemerActivity)), Toast.LENGTH_LONG).show()
             return
         }
 
         if (!dest.exists() || dest.length() == 0L) {
             dest.delete()
-            Toast.makeText(this, "Font import failed: empty file.", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.themer_font_import_failed_empty_file_a88dd), Toast.LENGTH_LONG).show()
             return
         }
 
-        Toast.makeText(this, "Font imported.", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, getString(R.string.themer_font_imported_84bdf), Toast.LENGTH_SHORT).show()
         applyFont(dest)
         openSection(SECTION_FONTS, false)
     }
@@ -2794,14 +2848,14 @@ class ThemerActivity : AppCompatActivity() {
         if (resultCode != RESULT_OK || data == null || data.getData() == null) {
             pendingBackupPassword = null
             backupExportPending = false
-            Toast.makeText(this, "Backup cancelled.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.themer_backup_cancelled_8ae7e), Toast.LENGTH_SHORT).show()
             return
         }
 
         val uri = data.getData() ?: return
         if (!backupExportPending) {
             deleteCreatedDocument(uri)
-            Toast.makeText(this, "Backup cancelled before export.", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.themer_backup_cancelled_before_export_67b17), Toast.LENGTH_LONG).show()
             return
         }
         exportBackup(uri, pendingBackupPassword)
@@ -2811,27 +2865,27 @@ class ThemerActivity : AppCompatActivity() {
         val content = LinearLayout(this)
         content.setOrientation(LinearLayout.VERTICAL)
 
-        val password = passwordInput("Password")
-        val confirm = passwordInput("Confirm password")
+        val password = passwordInput(getString(R.string.themer_password_8be3c))
+        val confirm = passwordInput(getString(R.string.themer_confirm_password_4a7c5))
         content.addView(password, inputParams())
         content.addView(confirm, inputParams())
 
         TuixtDialog.showContent(
             this,
-            "Backup Password",
+            getString(R.string.themer_backup_password_f6bc2),
             content,
-            "Export",
-            "Cancel",
+            getString(R.string.themer_export_f3e4f),
+            getString(R.string.themer_cancel_77dfd),
             ConfirmAction {
                 val first = password.getText().toString()
                 val second = confirm.getText().toString()
                 if (first.length == 0) {
-                    Toast.makeText(this, "Password is required.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.themer_password_is_required_99234), Toast.LENGTH_SHORT).show()
                     recyclerView!!.postDelayed(Runnable { this.showBackupPasswordDialog() }, 250)
                     return@ConfirmAction
                 }
                 if (first != second) {
-                    Toast.makeText(this, "Passwords do not match.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.themer_passwords_do_not_match_f7c3c), Toast.LENGTH_SHORT).show()
                     recyclerView!!.postDelayed(Runnable { this.showBackupPasswordDialog() }, 250)
                     return@ConfirmAction
                 }
@@ -2844,12 +2898,12 @@ class ThemerActivity : AppCompatActivity() {
     private fun exportBackup(uri: Uri, password: String?) {
         try {
             BackupManager.exportBackup(this, uri, password)
-            Toast.makeText(this, "Backup exported and verified.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.themer_backup_exported_and_verified_52e08), Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
             deleteCreatedDocument(uri)
             Toast.makeText(
                 this,
-                if (e.message == null) "Backup failed." else e.message,
+                if (e.displayMessage(this@ThemerActivity) == null) getString(R.string.themer_backup_failed_7fd26) else e.displayMessage(this@ThemerActivity),
                 Toast.LENGTH_LONG
             ).show()
         } finally {
@@ -2875,7 +2929,7 @@ class ThemerActivity : AppCompatActivity() {
         if (resultCode != RESULT_OK || data == null || data.getData() == null) {
             pendingShareablePresetName = null
             pendingShareableBehaviorLabels = null
-            Toast.makeText(this, "Configuration export cancelled.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.themer_configuration_export_cancelled_92e07), Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -2886,12 +2940,12 @@ class ThemerActivity : AppCompatActivity() {
                 pendingShareablePresetName,
                 pendingShareableBehaviorLabels ?: PresetManager.defaultShareableBehaviorLabels()
             )
-            Toast.makeText(this, "Shareable configuration exported and verified.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.themer_shareable_configuration_exported_and_verified_2b7f9), Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
             data.getData()?.let { deleteCreatedDocument(it) }
             Toast.makeText(
                 this,
-                if (e.message == null) "Configuration export failed." else e.message,
+                if (e.displayMessage(this@ThemerActivity) == null) getString(R.string.themer_configuration_export_failed_36f82) else e.displayMessage(this@ThemerActivity),
                 Toast.LENGTH_LONG
             ).show()
         } finally {
@@ -2902,7 +2956,7 @@ class ThemerActivity : AppCompatActivity() {
 
     private fun handleRestoreResult(resultCode: Int, data: Intent?) {
         if (resultCode != RESULT_OK || data == null || data.getData() == null) {
-            Toast.makeText(this, "Restore cancelled.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.themer_restore_cancelled_56adf), Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -2927,7 +2981,7 @@ class ThemerActivity : AppCompatActivity() {
         } catch (e: Exception) {
             Toast.makeText(
                 this,
-                if (e.message == null) "Restore failed." else e.message,
+                if (e.displayMessage(this@ThemerActivity) == null) getString(R.string.themer_restore_failed_0f5f0) else e.displayMessage(this@ThemerActivity),
                 Toast.LENGTH_LONG
             ).show()
         }
@@ -2937,19 +2991,19 @@ class ThemerActivity : AppCompatActivity() {
         val content = LinearLayout(this)
         content.setOrientation(LinearLayout.VERTICAL)
 
-        val password = passwordInput("Backup password")
+        val password = passwordInput(getString(R.string.themer_backup_password_d96a6))
         content.addView(password, inputParams())
 
         TuixtDialog.showContent(
             this,
-            "Restore Password",
+            getString(R.string.themer_restore_password_3ba9b),
             content,
-            "Restore",
-            "Cancel",
+            getString(R.string.themer_restore_3cbe6),
+            getString(R.string.themer_cancel_77dfd),
             ConfirmAction {
                 val value = password.getText().toString()
                 if (value.length == 0) {
-                    Toast.makeText(this, "Password is required.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.themer_password_is_required_99234), Toast.LENGTH_SHORT).show()
                     recyclerView!!.postDelayed(Runnable { this.showRestorePasswordDialog() }, 250)
                     return@ConfirmAction
                 }
@@ -2962,10 +3016,10 @@ class ThemerActivity : AppCompatActivity() {
             val importedPreset = BackupManager.importBackup(this, pendingRestoreUri ?: return, password)
             pendingRestoreUri = null
             if (importedPreset != null) {
-                Toast.makeText(this, "Preset imported: $importedPreset", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, getString(R.string.themer_preset_imported_dc305, importedPreset), Toast.LENGTH_LONG).show()
                 return
             }
-            Toast.makeText(this, "Backup restored. Reloading...", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.themer_backup_restored_reloading_49aae), Toast.LENGTH_SHORT).show()
             recyclerView!!.postDelayed(Runnable {
                 intent.putExtra(EXTRA_SECTION, SECTION_SYSTEM)
                 recreate()
@@ -2974,7 +3028,7 @@ class ThemerActivity : AppCompatActivity() {
         } catch (e: Exception) {
             Toast.makeText(
                 this,
-                if (e.message == null) "Restore failed." else e.message,
+                if (e.displayMessage(this@ThemerActivity) == null) getString(R.string.themer_restore_failed_0f5f0) else e.displayMessage(this@ThemerActivity),
                 Toast.LENGTH_LONG
             ).show()
             if (password != null && pendingRestoreUri != null) {
@@ -3022,8 +3076,8 @@ class ThemerActivity : AppCompatActivity() {
 
     private class AppChoice(val label: String, val packageName: String?)
     private data class TypographySetting(
-        val label: String,
-        val sample: String,
+        val label: Int,
+        val sample: Int,
         val setting: XMLPrefsSave,
         val followsMaster: Boolean = true
     )
@@ -3062,21 +3116,21 @@ class ThemerActivity : AppCompatActivity() {
         private val FONT_PREVIEW_SIZES = floatArrayOf(10f, 11f, 12f, 14f, 15f, 18f, 64f)
         private val FONT_SECTIONS = setOf(SECTION_FONTS, SECTION_TYPOGRAPHY)
         private val TYPOGRAPHY_SETTINGS = listOf(
-            TypographySetting("Input and terminal output", "\$ help\nReady for the next command", Ui.input_output_size),
-            TypographySetting("Suggestions", "apps   settings   files", Suggestions.suggestions_size),
-            TypographySetting("Module headers", "WEATHER  [X]", Ui.module_header_text_size),
-            TypographySetting("Module body", "Forecast: clear", Ui.module_body_text_size),
-            TypographySetting("Output and overlay headers", "OUTPUT  ^", Ui.output_header_text_size),
-            TypographySetting("RAM status", "RAM 42%", Ui.ram_size, false),
-            TypographySetting("Battery status", "BAT 86%", Ui.battery_size, false),
-            TypographySetting("Device status", "DEVICE ONLINE", Ui.device_size, false),
-            TypographySetting("Time status", "22:08", Ui.time_size, false),
-            TypographySetting("Storage status", "STORAGE 64%", Ui.storage_size, false),
-            TypographySetting("Network status", "NETWORK WIFI", Ui.network_size, false),
-            TypographySetting("Notes status", "NOTES READY", Ui.notes_size, false),
-            TypographySetting("Weather status", "WEATHER 26°C", Ui.weather_size, false),
-            TypographySetting("Unlock status", "UNLOCKS 4", Ui.unlock_size, false),
-            TypographySetting("ASCII legacy size", "┌─ RE:TUI ─┐", Ui.ascii_size, false)
+            TypographySetting(R.string.typography_ac10e8e95b, R.string.typography_bacd1228fe, Ui.input_output_size),
+            TypographySetting(R.string.typography_861edba005, R.string.typography_4d1bb46cf4, Suggestions.suggestions_size),
+            TypographySetting(R.string.typography_84157ec9ff, R.string.typography_e733daecea, Ui.module_header_text_size),
+            TypographySetting(R.string.typography_e43ff230eb, R.string.typography_d7053f25bb, Ui.module_body_text_size),
+            TypographySetting(R.string.typography_38d345e18f, R.string.typography_cede01dc27, Ui.output_header_text_size),
+            TypographySetting(R.string.typography_6208d62be1, R.string.typography_6073f5768b, Ui.ram_size, false),
+            TypographySetting(R.string.typography_96798b33dd, R.string.typography_d859b29e9b, Ui.battery_size, false),
+            TypographySetting(R.string.typography_8d2eaed52b, R.string.typography_d8b4f70ace, Ui.device_size, false),
+            TypographySetting(R.string.typography_5902d64dc5, R.string.typography_50a019ba96, Ui.time_size, false),
+            TypographySetting(R.string.typography_4f02e9a678, R.string.typography_3ce1e0a76b, Ui.storage_size, false),
+            TypographySetting(R.string.typography_c5308e6694, R.string.typography_9d0b571792, Ui.network_size, false),
+            TypographySetting(R.string.typography_a7c8ee4433, R.string.typography_5dc9e5dbdd, Ui.notes_size, false),
+            TypographySetting(R.string.typography_5b3fc4e80d, R.string.typography_981752f693, Ui.weather_size, false),
+            TypographySetting(R.string.typography_9d18578bbb, R.string.typography_8cff46ef5b, Ui.unlock_size, false),
+            TypographySetting(R.string.typography_1e7f242177, R.string.typography_4e59487d0e, Ui.ascii_size, false)
         )
         private const val BACKUP_EXPORT_REQUEST = 201
         private const val BACKUP_RESTORE_REQUEST = 202

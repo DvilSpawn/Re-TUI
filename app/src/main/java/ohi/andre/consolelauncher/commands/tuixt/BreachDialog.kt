@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher.commands.tuixt
 
+import ohi.andre.consolelauncher.R
 import android.animation.ObjectAnimator
 import android.app.Dialog
 import android.content.Context
@@ -51,7 +52,7 @@ object BreachDialog {
     ) {
         TuixtDialog.showCustomCompactDimmed(
             context,
-            if (session.mode == BreachManager.Mode.EMERGENCY) "EMERGENCY BREACH" else "BREACH",
+            if (session.mode == BreachManager.Mode.EMERGENCY) context.getString(R.string.editor_breachdialog_emergency_breach_ce727) else context.getString(R.string.editor_breachdialog_breach_f0fec),
             ContentFactory { dialog: Dialog? ->
                 BreachRound(context, dialog, session, reward, onComplete, remainingMs).build()
             }
@@ -79,10 +80,10 @@ object BreachDialog {
                 if (closing || resolvingFailure) return
                 val remaining = deadline - SystemClock.elapsedRealtime()
                 if (remaining <= 0L) {
-                    failRound("TIME EXPIRED")
+                    failRound(context.getString(R.string.editor_breachdialog_time_expired_c763b))
                     return
                 }
-                timer.text = timerText(remaining)
+                timer.text = timerText(context, remaining)
                 handler.postDelayed(this, 250L)
             }
         }
@@ -105,7 +106,7 @@ object BreachDialog {
                 FocusFrictionStyle.dp(context, 4f)
             )
 
-            addLabel("TARGET")
+            addLabel(context.getString(R.string.editor_breachdialog_target_f7621))
             styleTarget(target)
             root.addView(
                 target,
@@ -171,7 +172,7 @@ object BreachDialog {
             dialog?.setCanceledOnTouchOutside(true)
             dialog?.setOnCancelListener { requestExit() }
             dialog?.setOnDismissListener { dispose() }
-            startRound("BREACH ARMED")
+            startRound(context.getString(R.string.editor_breachdialog_breach_armed_1ca2b))
             return root
         }
 
@@ -193,8 +194,8 @@ object BreachDialog {
 
         private fun render() {
             target.text = session.targets.joinToString("   ") { it.joinToString("  ") }
-            timer.text = timerText(max(0L, deadline - SystemClock.elapsedRealtime()))
-            buffer.text = "BUFFER: " + if (session.buffer.isEmpty()) "-" else session.buffer.joinToString(" ")
+            timer.text = timerText(context, max(0L, deadline - SystemClock.elapsedRealtime()))
+            buffer.text = context.getString(R.string.editor_breachdialog_buffer_3d5ac, if (session.buffer.isEmpty()) "-" else session.buffer.joinToString(" "))
             renderKeypad()
         }
 
@@ -245,10 +246,10 @@ object BreachDialog {
             resolvingFailure = true
             handler.removeCallbacks(ticker)
             val wallet = RetuiCreditManager.recordBreachFailure(context)
-            status.text = "$reason\nBREACH FAILED -${RetuiCreditManager.BREACH_FAILURE_COST} CREDITS\nCREDITS: ${wallet.credits}"
+            status.text = context.getString(R.string.editor_breachdialog_breach_failed_credits_credits_759c9, reason, RetuiCreditManager.BREACH_FAILURE_COST, wallet.credits)
             failFeedback(context, root) {
                 if (disposed) return@failFeedback
-                resetRound("NEW TARGET LOADED")
+                resetRound(context.getString(R.string.editor_breachdialog_new_target_loaded_0a109))
             }
         }
 
@@ -271,7 +272,7 @@ object BreachDialog {
         }
 
         private fun instruction(): String =
-            "SELECT " + session.activeAxis.name.lowercase(Locale.US) + " " + (session.activeIndex + 1)
+            context.getString(R.string.editor_breachdialog_select_947af, session.activeAxis.name.lowercase(Locale.US), (session.activeIndex + 1))
 
         private fun addLabel(text: String) {
             val label = TextView(context)
@@ -357,7 +358,7 @@ object BreachDialog {
     ) {
         TuixtDialog.showCustomCompactDimmed(
             context,
-            "EXIT BREACH?",
+            context.getString(R.string.editor_breachdialog_exit_breach_7e547),
             ContentFactory { dialog: Dialog? ->
                 dialog?.setCancelable(false)
                 dialog?.setCanceledOnTouchOutside(false)
@@ -379,7 +380,7 @@ object BreachDialog {
         root.gravity = Gravity.CENTER
 
         val message = TextView(context)
-        message.text = "Exit breach?\nCost: -${RetuiCreditManager.BREACH_EXIT_COST} credit\nTimer paused."
+        message.text = context.getString(R.string.editor_breachdialog_exit_breach_cost_credit_timer_paused_d898c, RetuiCreditManager.BREACH_EXIT_COST)
         message.setTextColor(FocusFrictionStyle.bodyText())
         message.setTypeface(Tuils.getTypeface(context), Typeface.BOLD)
         message.textSize = 13f
@@ -402,7 +403,7 @@ object BreachDialog {
         row.orientation = LinearLayout.HORIZONTAL
         row.gravity = Gravity.CENTER
 
-        val cancel = exitPromptButton(context, "CANCEL", false)
+        val cancel = exitPromptButton(context, context.getString(R.string.editor_breachdialog_cancel_1507c), false)
         cancel.setOnClickListener {
             dialog?.dismiss()
             showSession(context, session, reward, onComplete, remainingMs)
@@ -412,7 +413,7 @@ object BreachDialog {
         val spacer = View(context)
         row.addView(spacer, LinearLayout.LayoutParams(FocusFrictionStyle.dp(context, 10f), 1))
 
-        val exit = exitPromptButton(context, "EXIT -${RetuiCreditManager.BREACH_EXIT_COST}", true)
+        val exit = exitPromptButton(context, context.getString(R.string.editor_breachdialog_exit_96110, RetuiCreditManager.BREACH_EXIT_COST), true)
         exit.setOnClickListener {
             RetuiCreditManager.spendCredits(context, RetuiCreditManager.BREACH_EXIT_COST)
             dialog?.dismiss()
@@ -455,29 +456,27 @@ object BreachDialog {
     ) {
         val message = if (won) {
             val result = if (reward) RetuiCreditManager.rewardBreach(context, session.mode.reward) else null
-            "Breach successful." +
-                (if (result != null) "\n+${result.credits} credits" else "") +
-                (if (result?.keyAwarded == true) "\nBreach key acquired." else "")
+            context.getString(R.string.editor_breachdialog_breach_successful_7d15c, (if (result != null) context.getString(R.string.editor_breachdialog_credits_3073d, result.credits) else ""), (if (result?.keyAwarded == true) context.getString(R.string.editor_breachdialog_breach_key_acquired_72f08) else ""))
         } else {
             val wallet = RetuiCreditManager.recordBreachFailure(context)
-            "Breach failed.\n-${RetuiCreditManager.BREACH_FAILURE_COST} credits\nCredits: ${wallet.credits}"
+            context.getString(R.string.editor_breachdialog_breach_failed_credits_credits_0ea28, RetuiCreditManager.BREACH_FAILURE_COST, wallet.credits)
         }
 
         onComplete?.invoke(won)
         TuixtDialog.showConfirm(
             context,
-            if (won) "BREACH COMPLETE" else "BREACH FAILED",
+            if (won) context.getString(R.string.editor_breachdialog_breach_complete_1329a) else context.getString(R.string.editor_breachdialog_breach_failed_01b27),
             message,
-            "OK",
-            "CLOSE",
+            context.getString(R.string.editor_breachdialog_ok_9ce3b),
+            context.getString(R.string.editor_breachdialog_close_dbc87),
             ConfirmAction { }
         )
     }
 
-    private fun timerText(remainingMs: Long): String {
+    private fun timerText(context: Context, remainingMs: Long): String {
         val totalSeconds = max(1, (ROUND_TIME_MS / 1000L).toInt())
         val seconds = min(totalSeconds, max(0, ((remainingMs + 999L) / 1000L).toInt()))
         val filled = (seconds * TIMER_BARS + totalSeconds - 1) / totalSeconds
-        return "TIME " + TIMER_FILLED.repeat(filled) + TIMER_EMPTY.repeat(TIMER_BARS - filled) + " " + seconds + "s"
+        return context.getString(R.string.editor_breachdialog_time_s_ad1e7, TIMER_FILLED.repeat(filled), TIMER_EMPTY.repeat(TIMER_BARS - filled), seconds)
     }
 }

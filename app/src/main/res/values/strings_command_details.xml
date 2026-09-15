@@ -1,0 +1,53 @@
+<resources>
+    <!-- Command responses. Translate prose; preserve examples and format arguments. -->
+    <!-- debug.kt: buildSettingsOutput -->
+    <string name="command_detail_debug_auto_color_pick_7a5c0" formatted="false">"auto_color_pick: "</string>
+    <!-- debug.kt: buildSettingsOutput -->
+    <string name="command_detail_debug_effective_colors_f4064" formatted="false">"Effective colors"</string>
+    <!-- debug.kt: buildSettingsOutput -->
+    <string name="command_detail_debug_font_file_c5936" formatted="false">"font_file: "</string>
+    <!-- debug.kt: buildSettingsOutput -->
+    <string name="command_detail_debug_music_enabled_0fb24" formatted="false">"music_enabled: "</string>
+    <!-- debug.kt: buildSettingsOutput -->
+    <string name="command_detail_debug_music_preferred_package_477d5" formatted="false">"music_preferred_package: "</string>
+    <!-- debug.kt: buildSettingsOutput -->
+    <string name="command_detail_debug_music_widget_802f6" formatted="false">"music_widget: "</string>
+    <!-- debug.kt: buildSettingsOutput -->
+    <string name="command_detail_debug_music_widget_auto_show_b8ed4" formatted="false">"music_widget_auto_show: "</string>
+    <!-- debug.kt: buildSettingsOutput -->
+    <string name="command_detail_debug_notification_output_16b6e" formatted="false">"notification_output: "</string>
+    <!-- debug.kt: buildSettingsOutput -->
+    <string name="command_detail_debug_notification_terminal_c4355" formatted="false">"notification_terminal: "</string>
+    <!-- debug.kt: buildSettingsOutput -->
+    <string name="command_detail_debug_runtime_settings_982a4" formatted="false">"Runtime settings"</string>
+    <!-- debug.kt: buildSettingsOutput -->
+    <string name="command_detail_debug_system_font_ee2d6" formatted="false">"system_font: "</string>
+    <!-- debug.kt: buildSettingsOutput -->
+    <string name="command_detail_debug_system_wallpaper_ace9c" formatted="false">"system_wallpaper: "</string>
+    <!-- orientation.kt: currentOrientation -->
+    <string name="command_detail_orientation_orientation_919b3">"Orientation: %1$d"</string>
+    <!-- orientation.kt: currentOrientation -->
+    <string name="command_detail_orientation_orientation_auto_4c066" formatted="false">"Orientation: auto"</string>
+    <!-- orientation.kt: currentOrientation -->
+    <string name="command_detail_orientation_orientation_landscape_eb4bf" formatted="false">"Orientation: landscape"</string>
+    <!-- orientation.kt: currentOrientation -->
+    <string name="command_detail_orientation_orientation_portrait_52aca" formatted="false">"Orientation: portrait"</string>
+    <!-- retuitoken.kt: tokenOutput -->
+    <string name="command_detail_retuitoken_token_copied_to_clipboard_token_274e3">"%1$sToken copied to clipboard.%2$sToken: %3$s"</string>
+    <!-- search.kt: listProviders -->
+    <string name="command_detail_search_no_search_providers_configured_f92f3" formatted="false">"No search providers configured."</string>
+    <!-- search.kt: listProviders -->
+    <string name="command_detail_search_search_providers_a77f9" formatted="false">"Search providers:"</string>
+    <!-- search.kt: usageAdd -->
+    <string name="command_detail_search_usage_search_add_param_url_template_exampl_59bc0">"Usage: search -add [param] [url_template]%1$sExample: search -add sdw https://stardewvalleywiki.com/{slug}"</string>
+    <!-- shortcut.kt: append -->
+    <string name="command_detail_shortcut_id_db527" formatted="false">" (ID: "</string>
+    <!-- shortcut.kt: append -->
+    <string name="command_detail_shortcut_pinned_00fe0" formatted="false">" [pinned]"</string>
+    <!-- shortcut.kt: appendPinnedAliases -->
+    <string name="command_detail_shortcut_pinned_aliases_6ab3b" formatted="false">"Pinned aliases"</string>
+    <!-- tbridge.kt: retiredFileListingMessage -->
+    <string name="command_detail_tbridge_tbridge_file_listing_is_retired_from_the_p_d319c" formatted="false">"TBridge file listing is retired from the public command surface.\nUse files, ls, open, or share through Re:T-UI Files.\nTBridge now focuses on Termux runtime checks, scripts, modules, callbacks, and automation."</string>
+    <!-- tbridge.kt: setupText -->
+    <string name="command_detail_tbridge_termux_bridge_setup_for_scripts_modules_an_de1dc" formatted="false">"Termux bridge setup for scripts, modules, and automation:\n1. Install Termux.\n2. In Termux run: termux-setup-storage\n3. In Termux run: mkdir -p ~/.termux &amp;&amp; echo allow-external-apps=true &gt;&gt; ~/.termux/termux.properties\n4. Restart Termux.\n5. Grant Re:T-UI the RUN_COMMAND permission from Android app settings.\n6. Run: tbridge -doctor\n\nUse files for file navigation. TBridge is now the Termux runtime for scripts and modules."</string>
+</resources>
