@@ -15,7 +15,7 @@ import android.os.Environment
 import android.provider.Settings
 import android.view.ContextMenu
 import android.view.ContextMenu.ContextMenuInfo
-import android.view.KeyEvent
+import androidx.activity.OnBackPressedCallback
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
@@ -129,7 +129,7 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
 
         fun onBack() {
             if (backButtonEnabled) {
-                onBackPressed()
+                onBackPressedDispatcher.onBackPressed()
             }
         }
     }
@@ -186,6 +186,7 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
                 ).show()
                 enableEdgeToEdge()
                 super.onCreate(savedInstanceState)
+                registerLauncherBackCallback()
                 return
             }
         }
@@ -206,6 +207,7 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
         enableEdgeToEdge()
 
         super.onCreate(savedInstanceState)
+        registerLauncherBackCallback()
 
         overridePendingTransition(0, 0)
 
@@ -620,32 +622,16 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
         super.onDestroy()
     }
 
-    @SuppressLint("GestureBackNavigation")
-    override fun onBackPressed() {
-        if (this@LauncherActivity.uiManager != null) {
-            if (uiManager!!.consumeBackPressed()) {
-                return
+    private fun registerLauncherBackCallback() {
+        // Home must consume Back even while its UI is initializing. Android 16
+        // routes system Back through this dispatcher, not the legacy overrides.
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                uiManager?.let { ui ->
+                    if (!ui.consumeBackPressed()) ui.onBackPressed()
+                }
             }
-            uiManager!!.onBackPressed()
-        } else if (main == null) {
-            super.onBackPressed()
-        }
-    }
-
-    @SuppressLint("GestureBackNavigation")
-    override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
-        if (keyCode == KeyEvent.KEYCODE_BACK && this@LauncherActivity.uiManager != null && uiManager!!.consumeBackPressed()) {
-            return true
-        }
-        return super.onKeyUp(keyCode, event)
-    }
-
-    @SuppressLint("GestureBackNavigation")
-    override fun onKeyLongPress(keyCode: Int, event: KeyEvent?): Boolean {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            return true
-        }
-        return super.onKeyLongPress(keyCode, event)
+        })
     }
 
     override fun reload() {

@@ -5,6 +5,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import ohi.andre.consolelauncher.commands.CommandAbstraction
+import ohi.andre.consolelauncher.commands.main.raw.preset
 
 class SuggestionsManagerTest {
     @Test
@@ -57,5 +58,11 @@ class SuggestionsManagerTest {
     fun multiWordContactSuggestionReplacesPartialName() {
         assertEquals("call", SuggestionsManager.Suggestion.contactCommandPrefix("call mako", "Mako Harish"))
         assertEquals("cntcts -rm", SuggestionsManager.Suggestion.contactCommandPrefix("cntcts -rm mako", "Mako Harish"))
+    }
+
+    @Test
+    fun presetSuggestsMarketplaceRoute() {
+        assertTrue(preset().params().contains("-market"))
+        assertEquals("https://re-tui.pages.dev/marketplace", preset.MARKETPLACE_URL)
     }
 }

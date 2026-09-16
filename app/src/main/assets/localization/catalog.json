@@ -4995,7 +4995,7 @@
   "help_preset": {
     "formatted": true,
     "forms": {
-      "other": "-save [name] -> save the current theme.xml and suggestions.xml colors as a preset \n-apply [name] -> apply a saved or built-in preset and disable auto_color_pick \n-duplicate [saved name] -> copy a saved preset and prompt for its new name \n-ls -> list saved and built-in presets \n-rm [name] -> remove a saved or imported preset \nTo share a look, use Settings > System & Support > Create Shareable Configuration"
+      "other": "-save [name] -> save the current theme.xml and suggestions.xml colors as a preset \n-apply [name] -> apply a saved or built-in preset and disable auto_color_pick \n-duplicate [saved name] -> copy a saved preset and prompt for its new name \n-ls -> list saved and built-in presets \n-market -> open the Re:T-UI preset marketplace \n-rm [name] -> remove a saved or imported preset \nTo share a look, use Settings > System & Support > Create Shareable Configuration"
     },
     "type": "string"
   },
@@ -12460,7 +12460,7 @@
   "setting_ui_text_redraw_times_description": {
     "formatted": false,
     "forms": {
-      "other": "A greater value will produce a bigger outline"
+      "other": "A greater value will produce a bigger outline. Limited to 1–8 drawing passes."
     },
     "type": "string"
   },

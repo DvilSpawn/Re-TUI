@@ -77,3 +77,9 @@ blocker above. An interrupted-write recovery regression was found and fixed:
 index and Markdown backup files are now read through AtomicFile recovery.
 The test simulates missing primary files with intact backups in isolated storage.
 Biometric/PIN flows still require manual acceptance.
+
+### 2026-09-16 release validation (Build 419)
+
+The existing Notes and language-pack phone regressions passed alongside the new
+Back-navigation and service reliability tests. Build 419 does not change Notes
+storage or migration behavior.

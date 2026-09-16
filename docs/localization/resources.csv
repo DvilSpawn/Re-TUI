@@ -232,6 +232,7 @@ app,app/src/main/res/values/strings.xml,help_preset,string,true,"-save [name] ->
         \n-apply [name] -> apply a saved or built-in preset and disable auto_color_pick
         \n-duplicate [saved name] -> copy a saved preset and prompt for its new name
         \n-ls -> list saved and built-in presets
+        \n-market -> open the Re:T-UI preset marketplace
         \n-rm [name] -> remove a saved or imported preset
         \nTo share a look, use Settings > System & Support > Create Shareable Configuration
     "
@@ -2345,7 +2346,7 @@ app,app/src/main/res/values/strings_settings.xml,setting_ui_unlock_index_descrip
 app,app/src/main/res/values/strings_settings.xml,setting_ui_unlock_size_description,string,true,"""Unlock size"""
 app,app/src/main/res/values/strings_settings.xml,setting_ui_statusbar_light_icons_description,string,true,"""If true, your status bar icons will be white. Dark otherwise"""
 app,app/src/main/res/values/strings_settings.xml,setting_ui_shadow_params_description,string,true,"""[Shadow X offset],[Shadow Y offset],[Shadow radius]"""
-app,app/src/main/res/values/strings_settings.xml,setting_ui_text_redraw_times_description,string,true,"""A greater value will produce a bigger outline"""
+app,app/src/main/res/values/strings_settings.xml,setting_ui_text_redraw_times_description,string,true,"""A greater value will produce a bigger outline. Limited to 1–8 drawing passes."""
 app,app/src/main/res/values/strings_settings.xml,setting_ui_status_lines_margins_description,string,true,"""Status-row text padding in pixels: [left],[top],[right],[bottom]"""
 app,app/src/main/res/values/strings_settings.xml,setting_ui_output_field_margins_description,string,true,"""[horizontal_margin],[vertical_margin],[horizontal_padding],[vertical_padding]"""
 app,app/src/main/res/values/strings_settings.xml,setting_ui_output_tray_max_height_description,string,true,"""Maximum height for the expanded output tray in dp. 0 keeps the default adaptive height"""

@@ -88,6 +88,14 @@ class preset : ParamCommand() {
 
             override fun args(): IntArray = IntArray(0)
         },
+        market {
+            override fun exec(pack: ExecutePack): String? {
+                pack.context.startActivity(Tuils.webPage(MARKETPLACE_URL))
+                return null
+            }
+
+            override fun args(): IntArray = IntArray(0)
+        },
         rm {
             override fun exec(pack: ExecutePack): String {
                 val name = pack.getString()!!
@@ -143,4 +151,8 @@ class preset : ParamCommand() {
     override fun helpRes(): Int = R.string.help_preset
 
     override fun doThings(pack: ExecutePack): String? = null
+
+    companion object {
+        internal const val MARKETPLACE_URL = "https://re-tui.pages.dev/marketplace"
+    }
 }

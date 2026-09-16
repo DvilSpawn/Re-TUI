@@ -1067,6 +1067,7 @@ $ post https://httpbin.org/post hello world</string>
 -apply [name] -&gt; apply a saved or built-in preset and disable auto_color_pick 
 -duplicate [saved name] -&gt; copy a saved preset and prompt for its new name 
 -ls -&gt; list saved and built-in presets 
+-market -&gt; open the Re:T-UI preset marketplace 
 -rm [name] -&gt; remove a saved or imported preset 
 To share a look, use Settings &gt; System &amp; Support &gt; Create Shareable Configuration</string>
     <string name="help_profile">Open your local Re:T-UI profile card.
@@ -2459,7 +2460,7 @@ Fix or delete the file to recover your options</string>
     <string name="setting_ui_suggestions_area_margin_description">Suggestion pane spacing in pixels: [outer horizontal margin],[outer vertical margin],[inner horizontal padding],[inner vertical padding]. Also applies to contextual module suggestions; it does not control spacing between chips or module-dock buttons.</string>
     <string name="setting_ui_system_font_description">If false, the default Re:T-UI font ("Lucida Console") will be used for all texts</string>
     <string name="setting_ui_system_wallpaper_description">If true, your system wallpaper will be used as background</string>
-    <string name="setting_ui_text_redraw_times_description">A greater value will produce a bigger outline</string>
+    <string name="setting_ui_text_redraw_times_description">A greater value will produce a bigger outline. Limited to 1–8 drawing passes.</string>
     <string name="setting_ui_time_index_description">Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row.</string>
     <string name="setting_ui_time_size_description">The time label font size</string>
     <string name="setting_ui_time_status_alignment_description">Time status line alignment (&lt;0 = left, =0 = center, &gt;0 = right)</string>

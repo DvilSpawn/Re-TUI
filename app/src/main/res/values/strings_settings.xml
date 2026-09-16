@@ -675,7 +675,7 @@
     <!-- Ui.kt: shadow_params -->
     <string name="setting_ui_shadow_params_description" formatted="false">"[Shadow X offset],[Shadow Y offset],[Shadow radius]"</string>
     <!-- Ui.kt: text_redraw_times -->
-    <string name="setting_ui_text_redraw_times_description" formatted="false">"A greater value will produce a bigger outline"</string>
+    <string name="setting_ui_text_redraw_times_description" formatted="false">"A greater value will produce a bigger outline. Limited to 1–8 drawing passes."</string>
     <!-- Ui.kt: status_lines_margins -->
     <string name="setting_ui_status_lines_margins_description" formatted="false">"Status-row text padding in pixels: [left],[top],[right],[bottom]"</string>
     <!-- Ui.kt: output_field_margins -->

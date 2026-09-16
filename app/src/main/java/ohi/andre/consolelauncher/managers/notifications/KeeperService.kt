@@ -34,6 +34,8 @@ class KeeperService : android.app.Service() {
     override fun getResources(): android.content.res.Resources =
         ohi.andre.consolelauncher.localization.LanguagePacks.resources(super.getResources())
 
+    private var initialized = false
+
     private var title: kotlin.String? = null
     private var subtitle: kotlin.String? = null
     private var clickCmd: kotlin.String? = null
@@ -74,8 +76,10 @@ class KeeperService : android.app.Service() {
     }
 
     @SuppressLint("MissingPermission")
-    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        if (startId == 1 || startId == 0) {
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (!initialized) {
+            XMLPrefsManager.loadCommons(this)
+            if (TimeManager.instance == null) TimeManager(applicationContext)
             title =
                 XMLPrefsManager.get(ohi.andre.consolelauncher.managers.xml.options.Behavior.tui_notification_title)
             subtitle =
@@ -126,11 +130,12 @@ class KeeperService : android.app.Service() {
             if (lastCmdSize > 0) {
                 lastCommands = kotlin.arrayOfNulls<kotlin.CharSequence>(lastCmdSize)
             }
+            initialized = true
         } else {
 //            new cmd
 //            update the list
 
-            if (lastCommands != null) updateCmds(intent.getStringExtra(KeeperService.Companion.CMD_KEY))
+            if (lastCommands != null) intent?.getStringExtra(CMD_KEY)?.let(::updateCmds)
 
             val path = resolvePath(intent)
 
@@ -145,7 +150,7 @@ class KeeperService : android.app.Service() {
             }
         }
 
-        return super.onStartCommand(intent, flags, startId)
+        return START_STICKY
     }
 
     private fun canPostNotifications(): kotlin.Boolean {

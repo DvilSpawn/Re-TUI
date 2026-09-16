@@ -9,7 +9,6 @@ import kotlin.math.max
 import kotlin.math.min
 
 class OutlineEditText : AppCompatEditText {
-    private var drawTimes = -1
     private val idleCursorPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private var idleCursorVisible = false
     private var idleCursorColor = 0xffffffff.toInt()
@@ -21,9 +20,7 @@ class OutlineEditText : AppCompatEditText {
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
     override fun draw(canvas: Canvas) {
-        if (drawTimes == -1) {
-            drawTimes = if (tag == null) 1 else OutlineTextView.redrawTimes
-        }
+        val drawTimes = OutlineTextView.drawPasses(tag)
 
         for (c in 0 until drawTimes) {
             super.draw(canvas)

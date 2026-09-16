@@ -1,28 +1,28 @@
-# Re:TUI V.2 - Build 418
+# Re:TUI V.2 - Build 419
 
-Build 418 adds downloadable Launcher language packs and a full-file Notes library.
+Build 419 is a reliability update for Android 16, notifications, media sessions,
+outlined text rendering, and the preset marketplace.
 
-## Language packs
+## Fixes
 
-- Import, update, select and remove language packs in Settings → System & Support → Language packs.
-- Missing translations fall back to English. Translation updates can be released independently of app updates.
-- Export the English translation template from the app. Contributors can submit source translations through GitHub PRs.
-- Added resource-backed text, locale-aware dates/counts, RTL support and translation validation across Launcher and Notes.
+- Back and edge-swipe gestures on Android 16 now close Launcher surfaces without
+  restarting the default Home activity.
+- Hardened the persistent notification service against Android restarting it
+  without an Intent.
+- Hardened media-session changes when playback state or controller entries
+  disappear during a callback.
+- Limited outlined text rendering to 1–8 passes, including hand-edited settings,
+  to prevent unbounded redraw work.
 
-The attached English template and example pack are reference files. No human-language pack is included in this release. Keyboard language packs use a different format.
+## Preset marketplace
 
-## Notes
-
-- Notes open as individual Markdown files, with a library, folders, rich editing and export.
-- Tapping a note opens its editor; tapping the Notes pane background opens the library.
-- Notes remain in their own Recent Apps task across Launcher reloads.
-- Existing Launcher notes migrate into the new library while retaining the original XML file.
-- Interrupted index and Markdown writes recover their atomic backup files.
+- Run `preset -market` to open `https://re-tui.pages.dev/marketplace`.
+- `-market` appears with the other options when typing `preset`.
 
 ## Downloads
 
 - Install the APK to update Launcher.
-- Translators: unzip `retui-launcher-english-template.zip` and follow its README.
-- Import `english-example-v1.retui-launcher-lang` to try the pack workflow in English.
+- Translators can use the refreshed English template and example language pack.
+- The Play Store bundle is distributed through Google Play, not this GitHub release.
 
-Version 2, version code 418. Language pack contributor instructions are in `CONTRIBUTING.md` and `language-packs/README.md`.
+Version 2, version code 419.

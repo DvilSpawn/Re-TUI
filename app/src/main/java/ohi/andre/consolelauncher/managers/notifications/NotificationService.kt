@@ -141,7 +141,7 @@ class NotificationService : NotificationListenerService() {
 
     private val sessionsChangedListener: OnActiveSessionsChangedListener =
         object : OnActiveSessionsChangedListener {
-            override fun onActiveSessionsChanged(controllers: MutableList<MediaController>?) {
+            override fun onActiveSessionsChanged(controllers: MutableList<MediaController?>?) {
                 updateActiveSessions(controllers)
             }
         }
@@ -201,27 +201,18 @@ class NotificationService : NotificationListenerService() {
         }
     }
 
-    private fun updateActiveSessions(controllers: MutableList<MediaController>?) {
+    private fun updateActiveSessions(controllers: MutableList<MediaController?>?) {
         Log.d(
             "TUI-Music",
             "updateActiveSessions: " + (if (controllers != null) controllers.size else 0) + " sessions"
         )
-        if (controllers != null) {
-            for (mc in controllers) {
-                Log.d(
-                    "TUI-Music",
-                    "Session: " + mc.getPackageName() + " State: " + (if (mc.getPlaybackState() != null) mc.getPlaybackState()!!
-                        .getState() else "null")
-                )
-            }
-        }
         synchronized(activeControllers) {
             for (controller in activeControllers) {
                 controller.unregisterCallback(mediaCallback)
             }
             activeControllers.clear()
             if (controllers != null) {
-                activeControllers.addAll(controllers)
+                activeControllers.addAll(controllers.filterNotNull())
                 for (controller in activeControllers) {
                     controller.registerCallback(mediaCallback)
                     Log.d("TUI-Music", "Registered callback for: " + controller.getPackageName())

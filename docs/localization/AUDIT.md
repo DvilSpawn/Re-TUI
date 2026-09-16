@@ -79,3 +79,10 @@ lint passed. Eleven physical-phone regression tests passed over wireless ADB.
 The release includes the template and English reference pack; language-specific
 pack publication still requires translation review. Play Console submission is
 separate from producing the signed bundle.
+
+## Build 419 release review — 2026-09-16
+
+The English template and example pack were regenerated after adding the localized
+`preset -market` help entry. The catalog remains at 2,854 translatable keys.
+Pack validation, localization audit, 174 unit tests and full-app lint passed.
+The signed release APK and Play Store bundle were built from version code 419.
