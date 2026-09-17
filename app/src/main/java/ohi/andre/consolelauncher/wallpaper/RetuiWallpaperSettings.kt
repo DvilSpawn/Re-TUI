@@ -18,6 +18,16 @@ object RetuiWallpaperSettings {
     private const val SCENE = "scene"
     private const val BLACK_HOLE_PALETTE = "black_hole_palette"
     private const val SOLID_COLOR = "solid_color"
+    private const val TOPO_OFFSET_X = "topo_offset_x"
+    private const val TOPO_OFFSET_Y = "topo_offset_y"
+    private const val TOPO_SCALE = "topo_scale"
+    private const val TOPO_RELIEF = "topo_relief"
+    private const val TOPO_DENSITY = "topo_density"
+    private const val TOPO_SEED = "topo_seed"
+    private const val TOPO_PALETTE = "topo_palette"
+    private const val TOPO_BACKGROUND = "topo_background"
+    private const val TOPO_LINE = "topo_line"
+    private const val TOPO_INDEX = "topo_index"
 
     fun offsetX(context: Context): Float = prefs(context).getFloat(OFFSET_X, 0f)
     fun offsetY(context: Context): Float = prefs(context).getFloat(OFFSET_Y, 0f)
@@ -39,6 +49,20 @@ object RetuiWallpaperSettings {
         prefs(context).getString(BLACK_HOLE_PALETTE, "amber") ?: "amber"
     fun solidColor(context: Context): String =
         prefs(context).getString(SOLID_COLOR, "#FF000000") ?: "#FF000000"
+    fun topoOffsetX(context: Context): Float = prefs(context).getFloat(TOPO_OFFSET_X, 0f)
+    fun topoOffsetY(context: Context): Float = prefs(context).getFloat(TOPO_OFFSET_Y, 0f)
+    fun topoScale(context: Context): Float = prefs(context).getFloat(TOPO_SCALE, 1f)
+    fun topoRelief(context: Context): Float = prefs(context).getFloat(TOPO_RELIEF, 0.72f)
+    fun topoDensity(context: Context): Int = prefs(context).getInt(TOPO_DENSITY, 5)
+    fun topoSeed(context: Context): Int {
+        val prefs = prefs(context)
+        if (prefs.contains(TOPO_SEED)) return prefs.getInt(TOPO_SEED, 0)
+        return Random.nextInt().also { prefs.edit().putInt(TOPO_SEED, it).apply() }
+    }
+    fun topoPalette(context: Context): String = prefs(context).getString(TOPO_PALETTE, "graphite") ?: "graphite"
+    fun topoBackground(context: Context): Int = prefs(context).getInt(TOPO_BACKGROUND, 0xFF0A0B0F.toInt())
+    fun topoLine(context: Context): Int = prefs(context).getInt(TOPO_LINE, 0xFF5C5C5C.toInt())
+    fun topoIndex(context: Context): Int = prefs(context).getInt(TOPO_INDEX, 0xFFDCDCDC.toInt())
 
     fun themeColors(): List<String> = runCatching {
         uniqueThemeColors(File(Tuils.getFolder(), "theme.xml").readText())
@@ -54,6 +78,33 @@ object RetuiWallpaperSettings {
 
     fun saveSolidColor(context: Context, color: String) {
         prefs(context).edit().putString(SOLID_COLOR, color).apply()
+    }
+
+    fun saveTopo(
+        context: Context,
+        offsetX: Float,
+        offsetY: Float,
+        scale: Float,
+        relief: Float,
+        density: Int,
+        seed: Int,
+        palette: String,
+        background: Int,
+        line: Int,
+        index: Int
+    ) {
+        prefs(context).edit()
+            .putFloat(TOPO_OFFSET_X, offsetX)
+            .putFloat(TOPO_OFFSET_Y, offsetY)
+            .putFloat(TOPO_SCALE, scale.coerceIn(0.5f, 2f))
+            .putFloat(TOPO_RELIEF, relief.coerceIn(0.45f, 1f))
+            .putInt(TOPO_DENSITY, density.coerceIn(1, 10))
+            .putInt(TOPO_SEED, seed)
+            .putString(TOPO_PALETTE, palette)
+            .putInt(TOPO_BACKGROUND, background)
+            .putInt(TOPO_LINE, line)
+            .putInt(TOPO_INDEX, index)
+            .apply()
     }
 
     fun save(context: Context, offsetX: Float, offsetY: Float, scale: Float, height: Float,

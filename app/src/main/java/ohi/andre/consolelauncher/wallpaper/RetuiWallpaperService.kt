@@ -64,7 +64,7 @@ class RetuiWallpaperService : WallpaperService() {
             override fun run() {
                 if (!visible) return
                 if (canDraw() && draw(fullSurface = fullRedrawPending)) fullRedrawPending = false
-                if (shouldScheduleWallpaperFrame(visible, fullRedrawPending, view !is SolidColorView)) {
+                if (shouldScheduleWallpaperFrame(visible, fullRedrawPending, isAnimated())) {
                     handler.postDelayed(this, frameDelayMs())
                 }
             }
@@ -95,6 +95,7 @@ class RetuiWallpaperService : WallpaperService() {
         override fun onComputeColors(): WallpaperColors = when (val current = view) {
             is BlackHoleView -> current.wallpaperColors()
             is CsakuraView -> current.wallpaperColors()
+            is TopoNoiseView -> current.wallpaperColors()
             else -> (current as SolidColorView).wallpaperColors()
         }
 
@@ -135,7 +136,7 @@ class RetuiWallpaperService : WallpaperService() {
 
         private fun scheduleIfVisible() {
             handler.removeCallbacks(drawFrame)
-            if (shouldScheduleWallpaperFrame(visible, fullRedrawPending, view !is SolidColorView)) {
+            if (shouldScheduleWallpaperFrame(visible, fullRedrawPending, isAnimated())) {
                 handler.post(drawFrame)
             }
         }
@@ -195,20 +196,25 @@ class RetuiWallpaperService : WallpaperService() {
             when (val current = view) {
                 is BlackHoleView -> current.release()
                 is CsakuraView -> current.release()
+                is TopoNoiseView -> current.release()
             }
         }
 
         private fun createView(): View = when (RetuiWallpaperSettings.scene(this@RetuiWallpaperService)) {
             "black hole" -> BlackHoleView(this@RetuiWallpaperService).apply { loadPosition() }
             "solid" -> SolidColorView(this@RetuiWallpaperService)
+            TopoNoiseView.SCENE -> TopoNoiseView(this@RetuiWallpaperService).apply { loadPosition() }
             else -> CsakuraView(this@RetuiWallpaperService).apply { loadPosition() }
         }
 
         private fun viewMatchesScene(scene: String): Boolean = when (scene) {
             "black hole" -> view is BlackHoleView
             "solid" -> view is SolidColorView
+            TopoNoiseView.SCENE -> view is TopoNoiseView
             else -> view is CsakuraView
         }
+
+        private fun isAnimated(): Boolean = view is BlackHoleView || view is CsakuraView
 
         private fun loadPosition() = when (val current = view) {
             is BlackHoleView -> current.loadPosition()

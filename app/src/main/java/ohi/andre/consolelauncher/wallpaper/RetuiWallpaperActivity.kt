@@ -39,8 +39,15 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
     private lateinit var densityLabel: TextView
     private lateinit var heightLabel: TextView
     private lateinit var boundsLabel: TextView
+    private lateinit var zoomLabel: TextView
+    private lateinit var zoomMinus: Button
+    private lateinit var zoomPlus: Button
     private val positionControls = mutableListOf<View>()
     private val tuningControls = mutableListOf<View>()
+    private val topoColorControls = mutableListOf<Button>()
+    private lateinit var topoColorRow: View
+    private lateinit var settingsPanel: View
+    private lateinit var panelParams: FrameLayout.LayoutParams
     private var scene = "csakura"
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,32 +69,57 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
             setPadding(dp(8), dp(8), dp(8), dp(8))
             setBackgroundColor(Color.argb(184, 18, 14, 24))
         }
+        settingsPanel = panel
         val selectors = row()
         selectors.addView(label(getString(R.string.editor_retuiwallpaperactivity_wallpaper_f00e8)))
-        val scenes = listOf("csakura", "black hole", "solid")
+        val scenes = listOf("csakura", "black hole", TopoNoiseView.SCENE, "solid")
         selectors.addView(spinner(scenes, scenes.indexOf(scene).coerceAtLeast(0), ::switchScene))
         selectors.addView(label(getString(R.string.editor_retuiwallpaperactivity_color_34171)))
         colorSpinner = paletteSpinner()
         selectors.addView(colorSpinner)
         panel.addView(selectors)
 
+        topoColorRow = row().apply {
+            addView(label(getString(R.string.wallpaper_topo_colors)))
+            listOf("BG", "LINES", "INDEX").forEachIndexed { index, name ->
+                topoColorControls += compactControl(name) { showTopoColorPicker(index) }
+                addView(topoColorControls.last())
+            }
+        }
+        panel.addView(topoColorRow)
+
         val tuning = row()
-        heightLabel = label(if (scene == "black hole") getString(R.string.editor_retuiwallpaperactivity_tilt_aceae) else getString(R.string.editor_retuiwallpaperactivity_height_6ea6c))
+        heightLabel = label(when (scene) {
+            "black hole" -> getString(R.string.editor_retuiwallpaperactivity_tilt_aceae)
+            TopoNoiseView.SCENE -> getString(R.string.wallpaper_topo_relief)
+            else -> getString(R.string.editor_retuiwallpaperactivity_height_6ea6c)
+        })
         tuning.addView(heightLabel)
         tuning.addView(compactControl("−") { adjustHeight(-0.05f) })
         tuning.addView(compactControl("+") { adjustHeight(0.05f) })
-        tuning.addView(label(getString(R.string.editor_retuiwallpaperactivity_zoom_c6653)))
-        tuning.addView(compactControl("−") { adjustScale(-0.1f) })
-        tuning.addView(compactControl("+") { adjustScale(0.1f) })
+        zoomLabel = label(getString(R.string.editor_retuiwallpaperactivity_zoom_c6653))
+        zoomMinus = compactControl("−") { adjustScale(-0.1f) }
+        zoomPlus = compactControl("+") { adjustScale(0.1f) }
+        tuning.addView(zoomLabel)
+        tuning.addView(zoomMinus)
+        tuning.addView(zoomPlus)
         panel.addView(tuning)
         tuningControls.add(tuning)
 
         val shape = row()
-        boundsLabel = label(if (scene == "black hole") getString(R.string.editor_retuiwallpaperactivity_radius_69ea4) else getString(R.string.editor_retuiwallpaperactivity_bounds_d399f))
+        boundsLabel = label(when (scene) {
+            "black hole" -> getString(R.string.editor_retuiwallpaperactivity_radius_69ea4)
+            TopoNoiseView.SCENE -> getString(R.string.wallpaper_topo_contours)
+            else -> getString(R.string.editor_retuiwallpaperactivity_bounds_d399f)
+        })
         shape.addView(boundsLabel)
         shape.addView(compactControl("−") { adjustWidth(-0.1f) })
         shape.addView(compactControl("+") { adjustWidth(0.1f) })
-        densityLabel = label(if (scene == "black hole") getString(R.string.editor_retuiwallpaperactivity_dust_1717e) else getString(R.string.editor_retuiwallpaperactivity_petals_5dc16))
+        densityLabel = label(when (scene) {
+            "black hole" -> getString(R.string.editor_retuiwallpaperactivity_dust_1717e)
+            TopoNoiseView.SCENE -> getString(R.string.wallpaper_topo_detail)
+            else -> getString(R.string.editor_retuiwallpaperactivity_petals_5dc16)
+        })
         shape.addView(densityLabel)
         shape.addView(compactControl("−") { adjustDensity(-1) })
         shape.addView(compactControl("+") { adjustDensity(1) })
@@ -99,6 +131,7 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
             when (val current = preview) {
                 is CsakuraView -> current.regrow()
                 is BlackHoleView -> current.regenerate()
+                is TopoNoiseView -> current.regenerate()
             }
         })
         panel.addView(regrow)
@@ -107,7 +140,7 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
         val apply = row()
         apply.addView(compactControl(getString(R.string.editor_retuiwallpaperactivity_use_on_phone_d908b)) { useOnPhone() })
         panel.addView(apply)
-        val panelParams = FrameLayout.LayoutParams(-1, dp(268), Gravity.TOP).apply {
+        panelParams = FrameLayout.LayoutParams(-1, dp(318), Gravity.TOP).apply {
             leftMargin = dp(8); topMargin = dp(8); rightMargin = dp(8)
         }
         root.addView(panel, panelParams)
@@ -127,6 +160,7 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
         when (val current = preview) {
             is CsakuraView -> { current.offsetX += dx; current.offsetY += dy }
             is BlackHoleView -> { current.offsetX += dx; current.offsetY += dy }
+            is TopoNoiseView -> { current.offsetX += dx; current.offsetY += dy }
         }
     }
 
@@ -146,6 +180,11 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
                 )
                 RetuiWallpaperSettings.saveBlackHolePalette(this, current.paletteName)
             }
+            is TopoNoiseView -> RetuiWallpaperSettings.saveTopo(
+                this, current.offsetX, current.offsetY, current.noiseScale, current.relief,
+                current.contourDensity, current.seed, current.paletteName,
+                current.color(0), current.color(1), current.color(2)
+            )
             is SolidColorView -> RetuiWallpaperSettings.saveSolidColor(this, hex(current.color))
         }
         sendBroadcast(Intent(RetuiWallpaperService.ACTION_REFRESH).setPackage(packageName))
@@ -153,6 +192,7 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
 
     private fun createPreview(name: String): android.view.View = when (name) {
         "black hole" -> BlackHoleView(this).apply { loadPosition() }
+        TopoNoiseView.SCENE -> TopoNoiseView(this).apply { loadPosition() }
         "solid" -> SolidColorView(this)
         else -> CsakuraView(this).apply { loadPosition() }
     }.also { view ->
@@ -169,9 +209,21 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
         root.removeView(preview)
         preview = createPreview(scene)
         root.addView(preview, 0, FrameLayout.LayoutParams(-1, -1))
-        densityLabel.text = if (scene == "black hole") getString(R.string.editor_retuiwallpaperactivity_dust_1717e) else getString(R.string.editor_retuiwallpaperactivity_petals_5dc16)
-        heightLabel.text = if (scene == "black hole") getString(R.string.editor_retuiwallpaperactivity_tilt_aceae) else getString(R.string.editor_retuiwallpaperactivity_height_6ea6c)
-        boundsLabel.text = if (scene == "black hole") getString(R.string.editor_retuiwallpaperactivity_radius_69ea4) else getString(R.string.editor_retuiwallpaperactivity_bounds_d399f)
+        densityLabel.text = when (scene) {
+            "black hole" -> getString(R.string.editor_retuiwallpaperactivity_dust_1717e)
+            TopoNoiseView.SCENE -> getString(R.string.wallpaper_topo_detail)
+            else -> getString(R.string.editor_retuiwallpaperactivity_petals_5dc16)
+        }
+        heightLabel.text = when (scene) {
+            "black hole" -> getString(R.string.editor_retuiwallpaperactivity_tilt_aceae)
+            TopoNoiseView.SCENE -> getString(R.string.wallpaper_topo_relief)
+            else -> getString(R.string.editor_retuiwallpaperactivity_height_6ea6c)
+        }
+        boundsLabel.text = when (scene) {
+            "black hole" -> getString(R.string.editor_retuiwallpaperactivity_radius_69ea4)
+            TopoNoiseView.SCENE -> getString(R.string.wallpaper_topo_contours)
+            else -> getString(R.string.editor_retuiwallpaperactivity_bounds_d399f)
+        }
         updateSceneControls()
         val replacement = paletteSpinner()
         (colorSpinner.parent as ViewGroup).let { parent ->
@@ -184,6 +236,9 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
 
     private fun paletteSpinner(): Spinner = when (val current = preview) {
         is BlackHoleView -> spinner(BlackHoleView.PALETTE_NAMES, BlackHoleView.PALETTE_NAMES.indexOf(current.paletteName).coerceAtLeast(0), current::setPalette)
+        is TopoNoiseView -> spinner(TopoNoiseView.PALETTE_NAMES, TopoNoiseView.PALETTE_NAMES.indexOf(current.paletteName).coerceAtLeast(0)) {
+            if (it != TopoNoiseView.CUSTOM) current.setPalette(it)
+        }
         is SolidColorView -> {
             val currentHex = hex(current.color)
             val themeColors = RetuiWallpaperSettings.themeColors()
@@ -201,6 +256,18 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
         val visibility = if (scene == "solid") View.GONE else View.VISIBLE
         positionControls.forEach { it.visibility = visibility }
         tuningControls.forEach { it.visibility = visibility }
+        topoColorRow.visibility = if (scene == TopoNoiseView.SCENE) View.VISIBLE else View.GONE
+        val zoomVisibility = if (scene == TopoNoiseView.SCENE) View.GONE else View.VISIBLE
+        zoomLabel.visibility = zoomVisibility
+        zoomMinus.visibility = zoomVisibility
+        zoomPlus.visibility = zoomVisibility
+        panelParams.height = dp(if (scene == TopoNoiseView.SCENE) 318 else 268)
+        settingsPanel.layoutParams = panelParams
+        topoColorControls.forEachIndexed { index, button ->
+            val topo = preview as? TopoNoiseView ?: return@forEachIndexed
+            button.setBackgroundColor(topo.color(index))
+            button.setTextColor(if (Color.luminance(topo.color(index)) > 0.5f) Color.BLACK else Color.WHITE)
+        }
     }
 
     private fun addPositionControl(label: String, params: FrameLayout.LayoutParams, action: () -> Unit) {
@@ -210,7 +277,34 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
         }
     }
 
-    private fun showSolidColorPicker(solid: SolidColorView) {
+    private fun showSolidColorPicker(solid: SolidColorView) = showColorPicker(
+        solid.color,
+        getString(R.string.editor_retuiwallpaperactivity_pick_solid_color_04728)
+    ) { color ->
+        solid.color = color
+        replacePaletteSpinner()
+    }
+
+    private fun showTopoColorPicker(index: Int) {
+        val topo = preview as? TopoNoiseView ?: return
+        showColorPicker(topo.color(index), getString(R.string.wallpaper_topo_pick_color)) { color ->
+            topo.setCustomColor(index, color)
+            replacePaletteSpinner()
+            updateSceneControls()
+        }
+    }
+
+    private fun replacePaletteSpinner() {
+        val replacement = paletteSpinner()
+        (colorSpinner.parent as ViewGroup).let { parent ->
+            val index = parent.indexOfChild(colorSpinner)
+            parent.removeView(colorSpinner)
+            colorSpinner = replacement
+            parent.addView(colorSpinner, index)
+        }
+    }
+
+    private fun showColorPicker(initialColor: Int, title: String, onUse: (Int) -> Unit) {
         val content = LayoutInflater.from(this).inflate(R.layout.color_picker_dialog, root, false)
         val preview = content.findViewById<View>(R.id.color_preview)
         val alpha = content.findViewById<SeekBar>(R.id.seek_alpha)
@@ -222,7 +316,7 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
         content.findViewById<View>(R.id.alpha_label).visibility = View.GONE
         alpha.visibility = View.GONE
         val hsv = FloatArray(3)
-        Color.colorToHSV(solid.color, hsv)
+        Color.colorToHSV(initialColor, hsv)
         hue.progress = hsv[0].toInt()
         saturation.progress = (hsv[1] * 100).toInt()
         brightness.progress = (hsv[2] * 100).toInt()
@@ -241,15 +335,8 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
         listOf(hue, saturation, brightness).forEach { it.setOnSeekBarChangeListener(listener) }
         listener.onProgressChanged(null, 0, false)
 
-        TuixtDialog.showContent(this, getString(R.string.editor_retuiwallpaperactivity_pick_solid_color_04728), content, getString(R.string.editor_retuiwallpaperactivity_use_7dcf4), getString(R.string.editor_retuiwallpaperactivity_cancel_1507c), ConfirmAction {
-            solid.color = Color.parseColor(hexPreview.text.toString())
-            val replacement = paletteSpinner()
-            (colorSpinner.parent as ViewGroup).let { parent ->
-                val index = parent.indexOfChild(colorSpinner)
-                parent.removeView(colorSpinner)
-                colorSpinner = replacement
-                parent.addView(colorSpinner, index)
-            }
+        TuixtDialog.showContent(this, title, content, getString(R.string.editor_retuiwallpaperactivity_use_7dcf4), getString(R.string.editor_retuiwallpaperactivity_cancel_1507c), ConfirmAction {
+            onUse(Color.parseColor(hexPreview.text.toString()))
         })
     }
 
@@ -288,21 +375,25 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
     private fun adjustHeight(delta: Float) = when (val current = preview) {
         is CsakuraView -> current.treeHeight += delta
         is BlackHoleView -> current.diskTilt += delta
+        is TopoNoiseView -> current.relief += delta
         else -> Unit
     }
     private fun adjustWidth(delta: Float) = when (val current = preview) {
         is CsakuraView -> current.treeWidth += delta
         is BlackHoleView -> current.diskWidth += delta
+        is TopoNoiseView -> current.contourDensity += if (delta < 0f) -1 else 1
         else -> Unit
     }
     private fun adjustScale(delta: Float) = when (val current = preview) {
         is CsakuraView -> current.treeScale += delta
         is BlackHoleView -> current.sceneScale += delta
+        is TopoNoiseView -> current.noiseScale += delta
         else -> Unit
     }
     private fun adjustDensity(delta: Int) = when (val current = preview) {
         is CsakuraView -> current.petalDensity += delta
         is BlackHoleView -> current.particleDensity += delta
+        is TopoNoiseView -> current.noiseScale += delta * 0.1f
         else -> Unit
     }
 
@@ -353,6 +444,7 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
             when (it) {
                 "csakura" -> getString(R.string.wallpaper_sakura)
                 "black hole" -> getString(R.string.wallpaper_black_hole)
+                TopoNoiseView.SCENE -> getString(R.string.wallpaper_topo_noise)
                 "solid" -> getString(R.string.wallpaper_solid)
                 else -> it
             }

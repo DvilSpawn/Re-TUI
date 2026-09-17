@@ -432,5 +432,11 @@
     <string name="wallpaper_pick_color">Pick color…</string>
     <string name="wallpaper_sakura">Sakura</string>
     <string name="wallpaper_black_hole">Black hole</string>
+    <string name="wallpaper_topo_noise">Topo noise</string>
+    <string name="wallpaper_topo_colors">COLORS</string>
+    <string name="wallpaper_topo_pick_color">Pick Topo Color</string>
+    <string name="wallpaper_topo_relief">RELIEF</string>
+    <string name="wallpaper_topo_contours">CONTOURS</string>
+    <string name="wallpaper_topo_detail">DETAIL</string>
     <string name="wallpaper_solid">Solid color</string>
 </resources>
