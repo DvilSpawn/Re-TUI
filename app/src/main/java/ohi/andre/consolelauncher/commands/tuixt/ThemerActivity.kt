@@ -2769,7 +2769,6 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
 
         Toast.makeText(this, getString(R.string.themer_font_imported_84bdf), Toast.LENGTH_SHORT).show()
         applyFont(dest)
-        openSection(SECTION_FONTS, false)
     }
 
     private fun getDisplayName(uri: Uri): String? {
