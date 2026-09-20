@@ -1,6 +1,7 @@
 package ohi.andre.consolelauncher.wallpaper
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 
 class RetuiWallpaperSettingsTest {
@@ -17,5 +18,12 @@ class RetuiWallpaperSettingsTest {
             listOf("#AA00FF", "#80AA00FF"),
             RetuiWallpaperSettings.uniqueThemeColors(xml)
         )
+    }
+
+    @Test
+    fun parseColorValueAcceptsArgbAndExtraHash() {
+        assertEquals(0xFF09121C.toInt(), RetuiWallpaperSettings.parseColorValue("##FF09121c"))
+        assertEquals(0x80010203.toInt(), RetuiWallpaperSettings.parseColorValue("#80010203"))
+        assertNull(RetuiWallpaperSettings.parseColorValue("#GG010203"))
     }
 }

@@ -1272,6 +1272,8 @@ class UIManager(
     private var landscapeLayoutActive = false
     private var duoLayoutActive = false
     private var splitDuoStatusActive = false
+    private var duoTopPanesSwapped = false
+    private var duoControls: View? = null
     private var duoLayoutMode: String? = DUO_LAYOUT_OFF
     private var activeDuoLayoutMode: String? = DUO_LAYOUT_OFF
     private var systemInsetLeft = 0
@@ -1628,6 +1630,7 @@ class UIManager(
         val button = mRootView?.findViewById<ImageButton?>(R.id.android_widget_drawer_view)
         configureAndroidWidgetDrawerToolbarButton(button)
         refreshToolbarWeightSum()
+        if (duoLayoutActive) attachDuoSwitchButton(activeDuoLayoutMode)
     }
 
     private fun configureAndroidWidgetDrawerToolbarButton(button: ImageButton?) {
@@ -1753,6 +1756,11 @@ class UIManager(
     private fun setupResponsiveLandscapeLayout(rootView: ViewGroup) {
         mainContainer = rootView.findViewById<View?>(R.id.main_container)
         headerContainer = rootView.findViewById<ViewGroup?>(R.id.header_container)
+        headerContainer?.addOnLayoutChangeListener { _, _, top, _, bottom, _, oldTop, _, oldBottom ->
+            if (duoTopPanesSwapped && bottom - top != oldBottom - oldTop) {
+                applyDisplayMarginsForConfiguration(currentConfiguration)
+            }
+        }
         unifiedBottomConsole = rootView.findViewById<ViewGroup?>(R.id.unified_bottom_console)
         unifiedStatusHost = rootView.findViewById<ViewGroup?>(R.id.unified_status_host)
         unifiedDockHost = rootView.findViewById<ViewGroup?>(R.id.unified_dock_host)
@@ -1928,8 +1936,10 @@ class UIManager(
         val requestedDuoLayoutMode = if (shouldUseDuoLayout) getDuoLayoutMode() else DUO_LAYOUT_OFF
         val duoSideChanged = shouldUseDuoLayout && requestedDuoLayoutMode != activeDuoLayoutMode
         val splitDuoChanged =
-            shouldUseDuoLayout && shouldUseSplitDuoLauncher() != splitDuoStatusActive
+            shouldUseDuoLayout && (shouldUseSplitDuoLauncher() != splitDuoStatusActive
+                    || getBoolean(Behavior.duo_swap_top_panes) != duoTopPanesSwapped)
         if (shouldUseLandscape == landscapeLayoutActive && shouldUseDuoLayout == duoLayoutActive && !duoSideChanged && !splitDuoChanged) {
+            if (duoLayoutActive) attachDuoSwitchButton(activeDuoLayoutMode)
             applyLandscapeStatusChrome(shouldUseLandscape)
             applyDisplayMarginsForConfiguration(configuration)
             applyTerminalTrayState(false)
@@ -1962,7 +1972,7 @@ class UIManager(
     }
 
     private fun shouldUseSplitDuoLauncher(): Boolean {
-        return getBoolean(Ui.split_duo_launcher)
+        return getBoolean(Ui.split_duo_launcher) || getBoolean(Behavior.duo_swap_top_panes)
     }
 
     fun getDuoLayoutMode(): String {
@@ -2077,7 +2087,9 @@ class UIManager(
 
         val targetPane =
             (if (ohi.andre.consolelauncher.UIManager.Companion.DUO_LAYOUT_LEFT == activeMode) landscapeLeftPane else landscapeRightPane)!!
-        targetPane.addView(
+        duoTopPanesSwapped = getBoolean(Behavior.duo_swap_top_panes)
+        val modulePane = if (duoTopPanesSwapped) getDuoEmptyPane(activeMode)!! else targetPane
+        modulePane.addView(
             mainContainer, FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
@@ -2094,6 +2106,7 @@ class UIManager(
             attachSplitDuoStatusHeader(activeMode)
         }
         attachDuoSwitchButton(activeMode)
+        attachDuoDrawers(activeMode)
 
         if (root.indexOfChild(landscapeSplitContainer) < 0) {
             root.addView(landscapeSplitContainer, 0)
@@ -2133,6 +2146,19 @@ class UIManager(
     }
 
     private fun clearLandscapePanes() {
+        // Drawer managers retain these view instances across layout changes.
+        val root = mRootView as ViewGroup
+        appDrawerPaneManager?.hide()
+        androidWidgetDrawerManager?.hide()
+        for (id in intArrayOf(R.id.apps_drawer_root, R.id.android_widget_drawer_root)) {
+            val drawer = root.findViewById<View>(id) ?: continue
+            if (drawer.parent !== root) {
+                detachFromParent(drawer)
+                root.addView(drawer, FrameLayout.LayoutParams(-1, -1))
+            }
+        }
+        duoControls = null
+        duoTopPanesSwapped = false
         if (landscapeLeftPane != null) {
             landscapeLeftPane!!.removeAllViews()
         }
@@ -2142,7 +2168,9 @@ class UIManager(
     }
 
     private fun attachSplitDuoStatusHeader(activeMode: String?) {
-        val emptyPane = getDuoEmptyPane(activeMode)
+        val emptyPane = if (duoTopPanesSwapped) {
+            if (activeMode == DUO_LAYOUT_LEFT) landscapeLeftPane else landscapeRightPane
+        } else getDuoEmptyPane(activeMode)
         if (emptyPane == null || headerContainer == null) {
             splitDuoStatusActive = false
             return
@@ -2218,15 +2246,59 @@ class UIManager(
         }
 
         val targetMode: String = if (moveToLeft) DUO_LAYOUT_LEFT else DUO_LAYOUT_RIGHT
-        val button = createDuoSwitchButton(targetMode, moveToLeft)
+        detachFromParent(duoControls)
+        val controls = LinearLayout(mContext).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+        }
+        duoControls = controls
+        controls.addView(createDuoSwitchButton(targetMode, moveToLeft),
+            LinearLayout.LayoutParams(Tuils.dpToPx(mContext, 56), Tuils.dpToPx(mContext, 48)))
+        fun addDrawerButton(icon: Int, description: Int, action: () -> Unit) {
+            val button = ImageButton(mContext).apply {
+                setImageResource(icon)
+                contentDescription = mContext.getString(description)
+                setColorFilter(terminalBorderColor())
+                background = TerminalBorderRuntime.panelDrawablePx(
+                    mContext, ColorUtils.setAlphaComponent(terminalHeaderBackground(), 224),
+                    terminalBorderColor(), 1.5f,
+                    max(genericBorderCornerRadius, Tuils.dpToPx(mContext, 6)).toFloat(), useDashed)
+                setOnClickListener { action() }
+            }
+            controls.addView(button, LinearLayout.LayoutParams(
+                Tuils.dpToPx(mContext, 48), Tuils.dpToPx(mContext, 48)
+            ).apply { marginStart = Tuils.dpToPx(mContext, 8) })
+        }
+        if (getBoolean(Behavior.swipe_up_apps_drawer)) {
+            addDrawerButton(R.drawable.ic_menu, R.string.cd_open_app_drawer) {
+                if (isAppsDrawerOpen) hideAppsDrawer() else showAppsDrawer()
+            }
+        }
+        if (getBoolean(Behavior.show_android_widget_drawer_button)) {
+            addDrawerButton(R.drawable.ic_toolbar_widgets_24, R.string.ui_base_view_android_widgets) {
+                if (isAndroidWidgetDrawerOpen) hideAndroidWidgetDrawer() else showAndroidWidgetDrawer()
+            }
+        }
         val margin = Tuils.dpToPx(mContext, 18)
         val params = FrameLayout.LayoutParams(
-            Tuils.dpToPx(mContext, 56),
+            ViewGroup.LayoutParams.WRAP_CONTENT,
             Tuils.dpToPx(mContext, 48),
             Gravity.BOTTOM or (if (moveToLeft) Gravity.START else Gravity.END)
         )
-        params.setMargins(margin, margin, margin, margin)
-        emptyPane.addView(button, params)
+        params.setMargins(margin, margin, margin, margin + imeBottomOffset)
+        emptyPane.addView(controls, params)
+    }
+
+    private fun attachDuoDrawers(activeMode: String) {
+        val pane = getDuoEmptyPane(activeMode) ?: return
+        for (id in intArrayOf(R.id.apps_drawer_root, R.id.android_widget_drawer_root)) {
+            val drawer = mRootView?.findViewById<View>(id) ?: continue
+            detachFromParent(drawer)
+            pane.addView(drawer, FrameLayout.LayoutParams(-1, -1).apply {
+                bottomMargin = Tuils.dpToPx(mContext, 84) + imeBottomOffset
+            })
+        }
+        duoControls?.bringToFront()
     }
 
     private fun createDuoSwitchButton(targetMode: String?, moveToLeft: Boolean): TextView {
@@ -2449,7 +2521,26 @@ class UIManager(
 
         mRootView.setPadding(systemInsetLeft, 0, systemInsetRight, systemInsetBottom)
         val metrics = mContext!!.getResources().getDisplayMetrics()
-        applySectionDisplayMargins(mainContainer, topMargins, metrics, 0, systemInsetTop)
+        applySectionDisplayMargins(mainContainer, topMargins, metrics,
+            if (duoTopPanesSwapped) Tuils.dpToPx(mContext, 84) + imeBottomOffset else 0, systemInsetTop)
+        if (duoLayoutActive) {
+            (duoControls?.layoutParams as? FrameLayout.LayoutParams)?.let { params ->
+                val bottom = Tuils.dpToPx(mContext, 18) + imeBottomOffset
+                if (params.bottomMargin != bottom) {
+                    params.bottomMargin = bottom
+                    duoControls?.layoutParams = params
+                }
+            }
+            for (id in intArrayOf(R.id.apps_drawer_root, R.id.android_widget_drawer_root)) {
+                val drawer = mRootView.findViewById<View>(id) ?: continue
+                val params = drawer.layoutParams as? FrameLayout.LayoutParams ?: continue
+                val bottom = Tuils.dpToPx(mContext, 84) + imeBottomOffset
+                if (params.bottomMargin != bottom) {
+                    params.bottomMargin = bottom
+                    drawer.layoutParams = params
+                }
+            }
+        }
         if (splitDuoStatusActive) {
             applySectionDisplayMargins(headerContainer, topMargins, metrics, 0, systemInsetTop)
         }
@@ -2459,6 +2550,9 @@ class UIManager(
             bottomMargins,
             metrics,
             imeBottomOffset + searchInset,
+            extraTopPx = if (duoTopPanesSwapped) {
+                systemInsetTop + Tuils.mmToPx(metrics, topMargins[1]) + (headerContainer?.height ?: 0)
+            } else 0,
             extraHorizontalPx = searchInset
         )
         applyTerminalOverlayDisplayMargins(topMargins, bottomMargins, metrics)
@@ -2535,7 +2629,7 @@ class UIManager(
             overlayDisplayMarginLeft,
             overlayDisplayMarginTop,
             overlayDisplayMarginRight,
-            overlayDisplayMarginBottom + imeBottomOffset
+            overlayDisplayMarginBottom + if (duoLayoutActive) 0 else imeBottomOffset
         )
         applyTermuxImeBottomPadding()
         OverlayLayoutManager.applyPaddingWithBase(
@@ -8902,16 +8996,16 @@ class UIManager(
             mContext!!,
             rootView,
             { if (mTerminalAdapter != null) mTerminalAdapter!!.mainPack else mainPack },
-            { closeKeyboard() },
-            { hideLauncherChromeForSurface() },
+            { if (!duoLayoutActive) closeKeyboard() },
+            { if (!duoLayoutActive) hideLauncherChromeForSurface() },
             { restoreLauncherChromeAfterSurface() }
         )
         if (mContext is Activity) {
             androidWidgetDrawerManager = AndroidWidgetDrawerManager(
                 mContext as Activity,
                 rootView,
-                { closeKeyboard() },
-                { hideLauncherChromeForSurface() },
+                { if (!duoLayoutActive) closeKeyboard() },
+                { if (!duoLayoutActive) hideLauncherChromeForSurface() },
                 { restoreLauncherChromeAfterSurface() }
             )
         }
@@ -16810,6 +16904,19 @@ class UIManager(
                 rootHeight - max(0, imeBottomOffset) - max(0, systemBottomInset)
             )
             return min(requested, max(0, availableAboveIme - max(0, persistentInputHeight)))
+        }
+
+        internal fun legacyImeBottomOffset(
+            rootBottom: Int,
+            visibleFrameBottom: Int,
+            systemBottomInset: Int,
+            visibilityThreshold: Int
+        ): Int {
+            val hiddenBottom = max(
+                0,
+                rootBottom - visibleFrameBottom - max(0, systemBottomInset)
+            )
+            return if (hiddenBottom > max(0, visibilityThreshold)) hiddenBottom else 0
         }
 
         internal fun outputAutoHideDelayMs(seconds: Int): Long =

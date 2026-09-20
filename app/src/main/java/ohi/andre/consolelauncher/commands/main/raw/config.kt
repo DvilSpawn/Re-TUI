@@ -29,6 +29,7 @@ import java.util.Locale
 import android.content.SharedPreferences
 import java.util.ArrayList
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings
+import ohi.andre.consolelauncher.managers.settings.StatusRowResolver
 
 /**
  * Created by francescoandreuzzi on 11/06/2017.
@@ -43,7 +44,11 @@ class config : ParamCommand() {
             override fun exec(pack: ExecutePack): String? {
                 val save = pack.getPrefsSave()
                 val value = pack.getString()
-                set(pack.context, save, value)
+                if (save is Ui && StatusRowResolver.isStatusIndex(save)) {
+                    LauncherSettings.setStatusIndex(pack.context, save, value)
+                } else {
+                    set(pack.context, save, value)
+                }
 
                 (pack.context as Reloadable).addMessage(
                     save.parent()!!.path(),
@@ -442,6 +447,8 @@ class config : ParamCommand() {
 
         private fun isResponsiveLandscapeSetting(save: XMLPrefsSave?): Boolean {
             return save === Ui.split_duo_launcher
+                    || save === Behavior.duo_swap_top_panes
+                    || save === Behavior.swipe_up_apps_drawer
                     || save === Ui.show_ascii_landscape
         }
 

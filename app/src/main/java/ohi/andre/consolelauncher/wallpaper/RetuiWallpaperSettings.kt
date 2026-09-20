@@ -28,6 +28,16 @@ object RetuiWallpaperSettings {
     private const val TOPO_BACKGROUND = "topo_background"
     private const val TOPO_LINE = "topo_line"
     private const val TOPO_INDEX = "topo_index"
+    private const val PIXEL_PALETTE = "pixel_palette"
+    private const val PIXEL_SEED = "pixel_seed"
+    private const val PIXEL_BACKGROUND = "pixel_background"
+    private const val PIXEL_DIM = "pixel_dim"
+    private const val PIXEL_MID = "pixel_mid"
+    private const val PIXEL_LIT = "pixel_lit"
+    private const val PIXEL_HOVER = "pixel_hover"
+    private const val PIXEL_CREST = "pixel_crest"
+    private const val LEGACY_PIXEL_ACCENT = "pixel_accent"
+    private const val LEGACY_PIXEL_HIGHLIGHT = "pixel_highlight"
 
     fun offsetX(context: Context): Float = prefs(context).getFloat(OFFSET_X, 0f)
     fun offsetY(context: Context): Float = prefs(context).getFloat(OFFSET_Y, 0f)
@@ -63,6 +73,25 @@ object RetuiWallpaperSettings {
     fun topoBackground(context: Context): Int = prefs(context).getInt(TOPO_BACKGROUND, 0xFF0A0B0F.toInt())
     fun topoLine(context: Context): Int = prefs(context).getInt(TOPO_LINE, 0xFF5C5C5C.toInt())
     fun topoIndex(context: Context): Int = prefs(context).getInt(TOPO_INDEX, 0xFFDCDCDC.toInt())
+    fun pixelDreamPalette(context: Context): String {
+        val saved = prefs(context).getString(PIXEL_PALETTE, PixelDreamThemes.DEFAULT_ID)
+        return when {
+            saved == PixelDreamView.CUSTOM -> saved
+            saved != null && PixelDreamThemes.find(saved) != null -> saved
+            else -> PixelDreamThemes.DEFAULT_ID
+        }
+    }
+    fun pixelDreamSeed(context: Context): Int {
+        val prefs = prefs(context)
+        if (prefs.contains(PIXEL_SEED)) return prefs.getInt(PIXEL_SEED, 0)
+        return Random.nextInt().also { prefs.edit().putInt(PIXEL_SEED, it).apply() }
+    }
+    fun pixelDreamBackground(context: Context): Int = prefs(context).getInt(PIXEL_BACKGROUND, defaultPixelTheme().fieldBg)
+    fun pixelDreamDim(context: Context): Int = prefs(context).getInt(PIXEL_DIM, defaultPixelTheme().fieldDim)
+    fun pixelDreamMid(context: Context): Int = prefs(context).getInt(PIXEL_MID, legacyPixelColor(context, LEGACY_PIXEL_ACCENT, defaultPixelTheme().fieldMid))
+    fun pixelDreamLit(context: Context): Int = prefs(context).getInt(PIXEL_LIT, legacyPixelColor(context, LEGACY_PIXEL_ACCENT, defaultPixelTheme().fieldLit))
+    fun pixelDreamHover(context: Context): Int = prefs(context).getInt(PIXEL_HOVER, legacyPixelColor(context, LEGACY_PIXEL_HIGHLIGHT, defaultPixelTheme().fieldHover))
+    fun pixelDreamCrest(context: Context): Int = prefs(context).getInt(PIXEL_CREST, legacyPixelColor(context, LEGACY_PIXEL_HIGHLIGHT, defaultPixelTheme().fieldCrest))
 
     fun themeColors(): List<String> = runCatching {
         uniqueThemeColors(File(Tuils.getFolder(), "theme.xml").readText())
@@ -107,6 +136,29 @@ object RetuiWallpaperSettings {
             .apply()
     }
 
+    fun savePixelDream(
+        context: Context,
+        palette: String,
+        seed: Int,
+        background: Int,
+        dim: Int,
+        mid: Int,
+        lit: Int,
+        hover: Int,
+        crest: Int
+    ) {
+        prefs(context).edit()
+            .putString(PIXEL_PALETTE, palette)
+            .putInt(PIXEL_SEED, seed)
+            .putInt(PIXEL_BACKGROUND, background)
+            .putInt(PIXEL_DIM, dim)
+            .putInt(PIXEL_MID, mid)
+            .putInt(PIXEL_LIT, lit)
+            .putInt(PIXEL_HOVER, hover)
+            .putInt(PIXEL_CREST, crest)
+            .apply()
+    }
+
     fun save(context: Context, offsetX: Float, offsetY: Float, scale: Float, height: Float,
              treeWidth: Float, petalDensity: Int, treeSeed: Int, palette: String) {
         prefs(context).edit()
@@ -124,10 +176,23 @@ object RetuiWallpaperSettings {
     private fun prefs(context: Context) =
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 
+    private fun legacyPixelColor(context: Context, key: String, fallback: Int): Int =
+        prefs(context).getInt(key, fallback)
+
+    private fun defaultPixelTheme(): PixelDreamTheme =
+        PixelDreamThemes.find(PixelDreamThemes.DEFAULT_ID)!!
+
     internal fun uniqueThemeColors(xml: String): List<String> =
         Regex("value=\"(#[0-9a-fA-F]{6}|#[0-9a-fA-F]{8})\"")
             .findAll(xml)
             .map { it.groupValues[1].uppercase() }
             .distinct()
             .toList()
+
+    internal fun parseColorValue(value: String): Int? {
+        val hex = value.trim().removePrefix("#").removePrefix("#")
+        if ((hex.length != 6 && hex.length != 8) || hex.any { it !in "0123456789abcdefABCDEF" }) return null
+        val parsed = hex.toLongOrNull(16) ?: return null
+        return if (hex.length == 6) (0xFF000000L or parsed).toInt() else parsed.toInt()
+    }
 }

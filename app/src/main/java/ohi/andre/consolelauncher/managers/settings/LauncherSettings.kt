@@ -121,6 +121,14 @@ object LauncherSettings {
         set(value, rawValue)
     }
 
+    fun setStatusIndex(context: Context?, setting: Ui, value: String?) {
+        val current = StatusRowResolver.settings.associateWith { get(it) }
+        val reordered = StatusRowResolver.reorder(current, mapOf(setting to value))
+        for ((item, position) in reordered.values) {
+            if (current[item] != position) set(context, item, position)
+        }
+    }
+
     @JvmStatic
     fun setSuggestion(value: Suggestions, rawValue: String?) {
         set(value, rawValue)

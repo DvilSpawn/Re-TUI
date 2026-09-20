@@ -156,6 +156,7 @@
     <string name="setting_behavior_notes_allow_link_description" formatted="false">"If false, adding links to notes will be disallowed (may slightly increase performance)"</string>
     <!-- Behavior.kt: orientation -->
     <string name="setting_behavior_orientation_description" formatted="false">"0 = landscape, 1 = portrait, 2 = auto-rotate"</string>
+    <string name="setting_behavior_duo_swap_top_panes_description">Swap Duo top panes: keep statuses with input/output and move the module dock and open module to the secondary screen. Only applies in Duo mode.</string>
     <!-- Behavior.kt: duo_mode -->
     <string name="setting_behavior_duo_mode_description" formatted="false">"If true, enables the Duo command for manually switching landscape into a single portrait-style pane on the left or right screen"</string>
     <!-- Behavior.kt: htmlextractor_default_format -->
@@ -581,19 +582,19 @@
     <!-- Ui.kt: fullscreen -->
     <string name="setting_ui_fullscreen_description" formatted="false">"If true, Re:T-UI will run in fullscreen mode"</string>
     <!-- Ui.kt: device_index -->
-    <string name="setting_ui_device_index_description" formatted="false">"Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."</string>
+    <string name="setting_ui_device_index_description" formatted="false">"Changing to a whole-number position inserts a row and shifts that row and later rows down when saved. Decimal positions join a row in left-to-right order: 4.1 and 4.2 share row 4. Existing decimal groups stay together when shifted. ASCII always uses its own row."</string>
     <!-- Ui.kt: ram_index -->
-    <string name="setting_ui_ram_index_description" formatted="false">"Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."</string>
+    <string name="setting_ui_ram_index_description" formatted="false">"Changing to a whole-number position inserts a row and shifts that row and later rows down when saved. Decimal positions join a row in left-to-right order: 4.1 and 4.2 share row 4. Existing decimal groups stay together when shifted. ASCII always uses its own row."</string>
     <!-- Ui.kt: battery_index -->
-    <string name="setting_ui_battery_index_description" formatted="false">"Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."</string>
+    <string name="setting_ui_battery_index_description" formatted="false">"Changing to a whole-number position inserts a row and shifts that row and later rows down when saved. Decimal positions join a row in left-to-right order: 4.1 and 4.2 share row 4. Existing decimal groups stay together when shifted. ASCII always uses its own row."</string>
     <!-- Ui.kt: time_index -->
-    <string name="setting_ui_time_index_description" formatted="false">"Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."</string>
+    <string name="setting_ui_time_index_description" formatted="false">"Changing to a whole-number position inserts a row and shifts that row and later rows down when saved. Decimal positions join a row in left-to-right order: 4.1 and 4.2 share row 4. Existing decimal groups stay together when shifted. ASCII always uses its own row."</string>
     <!-- Ui.kt: show_ascii -->
     <string name="setting_ui_show_ascii_description" formatted="false">"Show the ASCII art from ascii.txt. WARNING: wide art may overflow or wrap on small screens."</string>
     <!-- Ui.kt: show_ascii_landscape -->
     <string name="setting_ui_show_ascii_landscape_description" formatted="false">"Show the ASCII art while the landscape layout is active"</string>
     <!-- Ui.kt: ascii_index -->
-    <string name="setting_ui_ascii_index_description" formatted="false">"ASCII always uses its own status row so the dedicated viewport remains active. If that whole-number row is occupied, ASCII moves to the next free row."</string>
+    <string name="setting_ui_ascii_index_description" formatted="false">"Changing this position inserts the ASCII pane at that row and shifts that row and later rows down when saved. For example, inserting ASCII at 1 moves 1 to 2 and 1.1 to 2.1. ASCII always uses its own row."</string>
     <!-- Ui.kt: ascii_size -->
     <string name="setting_ui_ascii_size_description" formatted="false">"Legacy ASCII art text size. ASCII now auto-fits to the pane width."</string>
     <!-- Ui.kt: ascii_max_lines -->
@@ -601,11 +602,11 @@
     <!-- Ui.kt: ascii_pane_height_rows -->
     <string name="setting_ui_ascii_pane_height_rows_description" formatted="false">"Maximum physical height of the ASCII pane, measured in text rows."</string>
     <!-- Ui.kt: storage_index -->
-    <string name="setting_ui_storage_index_description" formatted="false">"Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."</string>
+    <string name="setting_ui_storage_index_description" formatted="false">"Changing to a whole-number position inserts a row and shifts that row and later rows down when saved. Decimal positions join a row in left-to-right order: 4.1 and 4.2 share row 4. Existing decimal groups stay together when shifted. ASCII always uses its own row."</string>
     <!-- Ui.kt: network_index -->
-    <string name="setting_ui_network_index_description" formatted="false">"Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."</string>
+    <string name="setting_ui_network_index_description" formatted="false">"Changing to a whole-number position inserts a row and shifts that row and later rows down when saved. Decimal positions join a row in left-to-right order: 4.1 and 4.2 share row 4. Existing decimal groups stay together when shifted. ASCII always uses its own row."</string>
     <!-- Ui.kt: notes_index -->
-    <string name="setting_ui_notes_index_description" formatted="false">"Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."</string>
+    <string name="setting_ui_notes_index_description" formatted="false">"Changing to a whole-number position inserts a row and shifts that row and later rows down when saved. Decimal positions join a row in left-to-right order: 4.1 and 4.2 share row 4. Existing decimal groups stay together when shifted. ASCII always uses its own row."</string>
     <!-- Ui.kt: ram_status_alignment -->
     <string name="setting_ui_ram_status_alignment_description" formatted="false">"RAM status line alignment (&lt;0 = left, =0 = center, &gt;0 = right)"</string>
     <!-- Ui.kt: device_status_alignment -->
@@ -661,13 +662,13 @@
     <!-- Ui.kt: show_weather -->
     <string name="setting_ui_show_weather_description" formatted="false">"If true, you will see a label containing the weather in your area"</string>
     <!-- Ui.kt: weather_index -->
-    <string name="setting_ui_weather_index_description" formatted="false">"Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."</string>
+    <string name="setting_ui_weather_index_description" formatted="false">"Changing to a whole-number position inserts a row and shifts that row and later rows down when saved. Decimal positions join a row in left-to-right order: 4.1 and 4.2 share row 4. Existing decimal groups stay together when shifted. ASCII always uses its own row."</string>
     <!-- Ui.kt: weather_size -->
     <string name="setting_ui_weather_size_description" formatted="false">"Weather size"</string>
     <!-- Ui.kt: show_unlock_counter -->
     <string name="setting_ui_show_unlock_counter_description" formatted="false">"If false, the unlock counter feature will be disabled"</string>
     <!-- Ui.kt: unlock_index -->
-    <string name="setting_ui_unlock_index_description" formatted="false">"Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."</string>
+    <string name="setting_ui_unlock_index_description" formatted="false">"Changing to a whole-number position inserts a row and shifts that row and later rows down when saved. Decimal positions join a row in left-to-right order: 4.1 and 4.2 share row 4. Existing decimal groups stay together when shifted. ASCII always uses its own row."</string>
     <!-- Ui.kt: unlock_size -->
     <string name="setting_ui_unlock_size_description" formatted="false">"Unlock size"</string>
     <!-- Ui.kt: statusbar_light_icons -->

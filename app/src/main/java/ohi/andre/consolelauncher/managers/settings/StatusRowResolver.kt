@@ -39,6 +39,32 @@ object StatusRowResolver {
 
     fun isStatusIndex(value: Any?): Boolean = value in settings
 
+    /** Explicit edits insert a row; loading a preset still preserves its existing groups. */
+    fun reorder(raw: Map<Ui, String?>, edits: Map<Ui, String?>): Result {
+        val original = normalize(raw).values
+        val resolved = original.toMutableMap()
+        for ((setting, text) in edits) {
+            if (!isStatusIndex(setting)) continue
+            val requested = text?.trim()?.toBigDecimalOrNull() ?: continue
+            if (requested < BigDecimal.ONE) continue
+            // Saving an unchanged field must not insert another row, even after a prior edit shifted it.
+            if (requested.compareTo(BigDecimal(original.getValue(setting))) == 0) continue
+            if (requested.compareTo(BigDecimal(resolved.getValue(setting))) == 0) continue
+            if (setting == Ui.ascii_index || requested.stripTrailingZeros().scale() <= 0) {
+                val row = whole(requested)
+                for (other in settings) {
+                    val value = BigDecimal(resolved.getValue(other))
+                    if (other != setting && whole(value) >= row) {
+                        resolved[other] = format(value.add(BigDecimal.ONE))
+                    }
+                }
+            }
+            resolved[setting] = format(requested)
+        }
+        val result = normalize(resolved).values
+        return Result(result, result != original)
+    }
+
     internal fun <T> groupVisible(items: List<Pair<Float, T>>): List<List<T>> {
         val rows = ArrayList<MutableList<T>>()
         var lastRow: Int? = null

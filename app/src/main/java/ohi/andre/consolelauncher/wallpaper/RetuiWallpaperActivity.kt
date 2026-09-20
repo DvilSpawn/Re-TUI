@@ -6,12 +6,15 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Button
+import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.SeekBar
@@ -45,7 +48,9 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
     private val positionControls = mutableListOf<View>()
     private val tuningControls = mutableListOf<View>()
     private val topoColorControls = mutableListOf<Button>()
+    private val pixelColorControls = mutableListOf<Button>()
     private lateinit var topoColorRow: View
+    private lateinit var pixelColorRow: View
     private lateinit var settingsPanel: View
     private lateinit var panelParams: FrameLayout.LayoutParams
     private var scene = "csakura"
@@ -72,7 +77,7 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
         settingsPanel = panel
         val selectors = row()
         selectors.addView(label(getString(R.string.editor_retuiwallpaperactivity_wallpaper_f00e8)))
-        val scenes = listOf("csakura", "black hole", TopoNoiseView.SCENE, "solid")
+        val scenes = listOf("csakura", "black hole", TopoNoiseView.SCENE, PixelDreamView.SCENE, "solid")
         selectors.addView(spinner(scenes, scenes.indexOf(scene).coerceAtLeast(0), ::switchScene))
         selectors.addView(label(getString(R.string.editor_retuiwallpaperactivity_color_34171)))
         colorSpinner = paletteSpinner()
@@ -87,6 +92,15 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
             }
         }
         panel.addView(topoColorRow)
+
+        pixelColorRow = row().apply {
+            addView(label(getString(R.string.wallpaper_pixel_colors)))
+            listOf("BG", "DIM", "MID", "LIT", "HOVER", "CREST").forEachIndexed { index, name ->
+                pixelColorControls += compactControl(name) { showPixelColorPicker(index) }
+                addView(pixelColorControls.last())
+            }
+        }
+        panel.addView(pixelColorRow)
 
         val tuning = row()
         heightLabel = label(when (scene) {
@@ -132,6 +146,7 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
                 is CsakuraView -> current.regrow()
                 is BlackHoleView -> current.regenerate()
                 is TopoNoiseView -> current.regenerate()
+                is PixelDreamView -> current.regenerate()
             }
         })
         panel.addView(regrow)
@@ -185,6 +200,11 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
                 current.contourDensity, current.seed, current.paletteName,
                 current.color(0), current.color(1), current.color(2)
             )
+            is PixelDreamView -> RetuiWallpaperSettings.savePixelDream(
+                this, current.paletteName, current.currentSeed(),
+                current.color(0), current.color(1), current.color(2), current.color(3),
+                current.color(4), current.color(5)
+            )
             is SolidColorView -> RetuiWallpaperSettings.saveSolidColor(this, hex(current.color))
         }
         sendBroadcast(Intent(RetuiWallpaperService.ACTION_REFRESH).setPackage(packageName))
@@ -193,6 +213,7 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
     private fun createPreview(name: String): android.view.View = when (name) {
         "black hole" -> BlackHoleView(this).apply { loadPosition() }
         TopoNoiseView.SCENE -> TopoNoiseView(this).apply { loadPosition() }
+        PixelDreamView.SCENE -> PixelDreamView(this).apply { loadPosition() }
         "solid" -> SolidColorView(this)
         else -> CsakuraView(this).apply { loadPosition() }
     }.also { view ->
@@ -239,6 +260,13 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
         is TopoNoiseView -> spinner(TopoNoiseView.PALETTE_NAMES, TopoNoiseView.PALETTE_NAMES.indexOf(current.paletteName).coerceAtLeast(0)) {
             if (it != TopoNoiseView.CUSTOM) current.setPalette(it)
         }
+        is PixelDreamView -> spinner(PixelDreamThemes.names, PixelDreamThemes.indexOf(current.paletteName)) {
+            val id = PixelDreamThemes.idAt(PixelDreamThemes.names.indexOf(it))
+            if (id != PixelDreamView.CUSTOM) {
+                current.setPalette(id)
+                updateSceneControls()
+            }
+        }
         is SolidColorView -> {
             val currentHex = hex(current.color)
             val themeColors = RetuiWallpaperSettings.themeColors()
@@ -253,10 +281,11 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
     }
 
     private fun updateSceneControls() {
-        val visibility = if (scene == "solid") View.GONE else View.VISIBLE
+        val visibility = if (scene == "solid" || scene == PixelDreamView.SCENE) View.GONE else View.VISIBLE
         positionControls.forEach { it.visibility = visibility }
         tuningControls.forEach { it.visibility = visibility }
         topoColorRow.visibility = if (scene == TopoNoiseView.SCENE) View.VISIBLE else View.GONE
+        pixelColorRow.visibility = if (scene == PixelDreamView.SCENE) View.VISIBLE else View.GONE
         val zoomVisibility = if (scene == TopoNoiseView.SCENE) View.GONE else View.VISIBLE
         zoomLabel.visibility = zoomVisibility
         zoomMinus.visibility = zoomVisibility
@@ -267,6 +296,11 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
             val topo = preview as? TopoNoiseView ?: return@forEachIndexed
             button.setBackgroundColor(topo.color(index))
             button.setTextColor(if (Color.luminance(topo.color(index)) > 0.5f) Color.BLACK else Color.WHITE)
+        }
+        pixelColorControls.forEachIndexed { index, button ->
+            val pixel = preview as? PixelDreamView ?: return@forEachIndexed
+            button.setBackgroundColor(pixel.color(index))
+            button.setTextColor(if (Color.luminance(pixel.color(index)) > 0.5f) Color.BLACK else Color.WHITE)
         }
     }
 
@@ -294,6 +328,15 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
         }
     }
 
+    private fun showPixelColorPicker(index: Int) {
+        val pixel = preview as? PixelDreamView ?: return
+        showColorPicker(pixel.color(index), getString(R.string.wallpaper_pixel_pick_color)) { color ->
+            pixel.setCustomColor(index, color)
+            replacePaletteSpinner()
+            updateSceneControls()
+        }
+    }
+
     private fun replacePaletteSpinner() {
         val replacement = paletteSpinner()
         (colorSpinner.parent as ViewGroup).let { parent ->
@@ -312,31 +355,55 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
         val saturation = content.findViewById<SeekBar>(R.id.seek_sat)
         val brightness = content.findViewById<SeekBar>(R.id.seek_val)
         val hexPreview = content.findViewById<TextView>(R.id.hex_preview)
+        val hexInput = content.findViewById<EditText>(R.id.hex_input)
         styleHeader(this, content.findViewById(R.id.picker_title))
-        content.findViewById<View>(R.id.alpha_label).visibility = View.GONE
-        alpha.visibility = View.GONE
+        hexInput.visibility = View.VISIBLE
+        hexInput.setText(hex(initialColor))
+        hexInput.setSelection(hexInput.length())
         val hsv = FloatArray(3)
         Color.colorToHSV(initialColor, hsv)
+        alpha.progress = Color.alpha(initialColor)
         hue.progress = hsv[0].toInt()
         saturation.progress = (hsv[1] * 100).toInt()
         brightness.progress = (hsv[2] * 100).toInt()
 
         val listener = object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                val color = Color.HSVToColor(255, floatArrayOf(
+                val color = Color.HSVToColor(alpha.progress, floatArrayOf(
                     hue.progress.toFloat(), saturation.progress / 100f, brightness.progress / 100f
                 ))
                 preview.setBackgroundColor(color)
                 hexPreview.text = hex(color)
+                if (fromUser) {
+                    hexInput.setText(hex(color))
+                    hexInput.setSelection(hexInput.length())
+                }
             }
             override fun onStartTrackingTouch(seekBar: SeekBar?) = Unit
             override fun onStopTrackingTouch(seekBar: SeekBar?) = Unit
         }
-        listOf(hue, saturation, brightness).forEach { it.setOnSeekBarChangeListener(listener) }
+        listOf(alpha, hue, saturation, brightness).forEach { it.setOnSeekBarChangeListener(listener) }
+        hexInput.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
+            override fun afterTextChanged(s: Editable?) {
+                val color = s?.toString()?.let(RetuiWallpaperSettings::parseColorValue) ?: return
+                val newHsv = FloatArray(3)
+                Color.colorToHSV(color, newHsv)
+                alpha.progress = Color.alpha(color)
+                hue.progress = newHsv[0].toInt()
+                saturation.progress = (newHsv[1] * 100).toInt()
+                brightness.progress = (newHsv[2] * 100).toInt()
+                preview.setBackgroundColor(color)
+                hexPreview.text = hex(color)
+                hexInput.error = null
+            }
+        })
         listener.onProgressChanged(null, 0, false)
 
         TuixtDialog.showContent(this, title, content, getString(R.string.editor_retuiwallpaperactivity_use_7dcf4), getString(R.string.editor_retuiwallpaperactivity_cancel_1507c), ConfirmAction {
-            onUse(Color.parseColor(hexPreview.text.toString()))
+            RetuiWallpaperSettings.parseColorValue(hexInput.text.toString())?.let(onUse)
+                ?: hexInput.setError(getString(R.string.wallpaper_hex_invalid))
         })
     }
 
@@ -445,6 +512,7 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
                 "csakura" -> getString(R.string.wallpaper_sakura)
                 "black hole" -> getString(R.string.wallpaper_black_hole)
                 TopoNoiseView.SCENE -> getString(R.string.wallpaper_topo_noise)
+                PixelDreamView.SCENE -> getString(R.string.wallpaper_pixel_dream)
                 "solid" -> getString(R.string.wallpaper_solid)
                 else -> it
             }

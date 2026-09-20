@@ -14,6 +14,13 @@ class UIManagerImeSizingTest {
     }
 
     @Test
+    fun detectsLegacyImeOnlyWhenItHidesMoreThanTheNavigationBar() {
+        assertEquals(770, UIManager.legacyImeBottomOffset(2400, 1510, 120, 64))
+        assertEquals(0, UIManager.legacyImeBottomOffset(2400, 2310, 64, 64))
+        assertEquals(0, UIManager.legacyImeBottomOffset(2400, 2500, 0, 64))
+    }
+
+    @Test
     fun clampsOutputAutoHideDuration() {
         assertEquals(1_000L, UIManager.outputAutoHideDelayMs(0))
         assertEquals(10_000L, UIManager.outputAutoHideDelayMs(10))

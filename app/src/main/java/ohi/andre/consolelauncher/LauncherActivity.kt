@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.graphics.Rect
 import android.graphics.Color
 import android.net.Uri
 import android.os.Build
@@ -59,6 +60,7 @@ import ohi.andre.consolelauncher.tuils.stuff.FakeLauncherActivity
 import ohi.andre.consolelauncher.tuils.interfaces.Inputable
 import ohi.andre.consolelauncher.tuils.interfaces.Outputable
 import ohi.andre.consolelauncher.tuils.interfaces.Reloadable
+import ohi.andre.consolelauncher.wallpaper.RetuiWallpaperService
 import java.io.File
 import kotlin.math.max
 import android.content.BroadcastReceiver
@@ -535,7 +537,12 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
                 val imeVisible = insets!!.isVisible(WindowInsetsCompat.Type.ime())
                 val imeBottom = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
                 val systemBottom = safeInsets.bottom
-                val keyboardOffset = max(0, imeBottom - systemBottom)
+                val keyboardOffset = if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
+                    legacyImeBottomOffset(mainView, systemBottom)
+                } else {
+                    max(0, imeBottom - systemBottom)
+                }
+                val effectiveImeVisible = imeVisible || keyboardOffset > 0
 
                 if (this@LauncherActivity.uiManager != null) {
                     uiManager!!.applyWindowInsets(
@@ -544,7 +551,7 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
                         safeInsets.right,
                         safeInsets.bottom,
                         keyboardOffset,
-                        imeVisible
+                        effectiveImeVisible
                     )
                 } else {
                     view!!.setPadding(
@@ -559,8 +566,25 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
         ViewCompat.requestApplyInsets(mainView)
     }
 
+    private fun legacyImeBottomOffset(mainView: View, systemBottom: Int): Int {
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.Q || mainView.height <= 0) {
+            return 0
+        }
+        val visibleFrame = Rect()
+        mainView.getWindowVisibleDisplayFrame(visibleFrame)
+        val location = IntArray(2)
+        mainView.getLocationOnScreen(location)
+        return UIManager.legacyImeBottomOffset(
+            location[1] + mainView.height,
+            visibleFrame.bottom,
+            systemBottom,
+            (64f * mainView.resources.displayMetrics.density).toInt()
+        )
+    }
+
     override fun onResume() {
         super.onResume()
+        setWallpaperInteractionEnabled(true)
         applyFullscreen(this)
         if (this@LauncherActivity.uiManager != null) {
             uiManager!!.resume()
@@ -589,6 +613,7 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
     }
 
     override fun onPause() {
+        setWallpaperInteractionEnabled(false)
         if (this@LauncherActivity.uiManager != null) {
             uiManager!!.pause()
         }
@@ -676,6 +701,7 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
+        setWallpaperInteractionEnabled(hasFocus)
         if (this@LauncherActivity.uiManager != null) {
             uiManager!!.onLauncherWindowFocusChanged(hasFocus)
         }
@@ -686,6 +712,14 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
             uiManager!!.activateTerminalInput(openKeyboardOnStart)
             uiManager!!.scheduleTypefaceRefreshes()
         }
+    }
+
+    private fun setWallpaperInteractionEnabled(enabled: Boolean) {
+        sendBroadcast(
+            Intent(RetuiWallpaperService.ACTION_INTERACTION)
+                .setPackage(packageName)
+                .putExtra(RetuiWallpaperService.EXTRA_INTERACTION_ENABLED, enabled)
+        )
     }
 
     override fun onCreateContextMenu(menu: ContextMenu?, v: View?, menuInfo: ContextMenuInfo?) {

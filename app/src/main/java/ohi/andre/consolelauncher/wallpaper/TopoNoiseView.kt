@@ -194,7 +194,7 @@ class TopoNoiseView @JvmOverloads constructor(
     ) {
         val path = Path()
         paint.color = color
-        paint.alpha = if (widthPx > 1f) 175 else 105
+        paint.alpha = Color.alpha(color) * (if (widthPx > 1f) 175 else 105) / 255
         paint.strokeWidth = widthPx
         for (y in 0 until rows - 1) {
             for (x in 0 until cols - 1) {

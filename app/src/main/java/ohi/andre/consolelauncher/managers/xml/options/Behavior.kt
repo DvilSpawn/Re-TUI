@@ -1017,6 +1017,11 @@ enum class Behavior : XMLPrefsSave {
             return XMLPrefsSave.BOOLEAN
         }
     },
+    duo_swap_top_panes {
+        override fun defaultValue(): String = "false"
+        override fun infoRes(): Int = R.string.setting_behavior_duo_swap_top_panes_description
+        override fun type(): String = XMLPrefsSave.BOOLEAN
+    },
     htmlextractor_default_format {
         override fun defaultValue(): String? {
             return "%t -> %v%n%a(%an = %av)(%n)"

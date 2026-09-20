@@ -385,6 +385,7 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
 
     override fun onResume() {
         super.onResume()
+        freezeWallpaperInteraction()
         applyFullscreen(this)
         screenRoot?.let { styleScreen(this, it) }
         panelRoot?.let { stylePanel(this, it) }
@@ -397,6 +398,14 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
                 button.setColorFilter(accentColor(), PorterDuff.Mode.SRC_IN)
             }
         }
+    }
+
+    private fun freezeWallpaperInteraction() {
+        sendBroadcast(
+            Intent(RetuiWallpaperService.ACTION_INTERACTION)
+                .setPackage(packageName)
+                .putExtra(RetuiWallpaperService.EXTRA_INTERACTION_ENABLED, false)
+        )
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {

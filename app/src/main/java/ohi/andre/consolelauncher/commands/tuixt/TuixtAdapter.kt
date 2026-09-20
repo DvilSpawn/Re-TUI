@@ -72,7 +72,7 @@ class TuixtAdapter(
     private val collapsedSections: MutableSet<String> = HashSet<String>()
     private val accordionState = SectionAccordionState(initialSection)
     private val pendingChanges: MutableMap<XMLPrefsSave?, String?> =
-        HashMap<XMLPrefsSave?, String?>()
+        LinkedHashMap<XMLPrefsSave?, String?>()
     private var expandedColorItem: XMLPrefsSave? = null
 
     init {
@@ -91,8 +91,10 @@ class TuixtAdapter(
     fun saveAll(context: Context? = null, recyclerView: RecyclerView? = null) {
         recyclerView?.let { captureVisibleInputs(it) }
         if (rows.any { StatusRowResolver.isStatusIndex(it.item) }) {
-            val rawRows = StatusRowResolver.settings.associateWith { pendingChanges[it] ?: get(it) }
-            for ((item, value) in StatusRowResolver.normalize(rawRows).values) {
+            val rawRows = StatusRowResolver.settings.associateWith { get(it) }
+            val edits = pendingChanges.entries.filter { StatusRowResolver.isStatusIndex(it.key) }
+                .associate { (item, value) -> (item as Ui) to value }
+            for ((item, value) in StatusRowResolver.reorder(rawRows, edits).values) {
                 pendingChanges[item] = value
             }
         }

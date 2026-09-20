@@ -91,6 +91,20 @@
         android:fontFamily="monospace"
         android:textSize="16sp" />
 
+    <EditText
+        android:id="@+id/hex_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:hint="@string/wallpaper_hex_hint"
+        android:inputType="textVisiblePassword"
+        android:singleLine="true"
+        android:textColor="#FFFFFF"
+        android:textColorHint="#888888"
+        android:fontFamily="monospace"
+        android:textSize="16sp"
+        android:visibility="gone" />
+
     <TextView
         android:id="@+id/auto_color"
         android:layout_width="match_parent"

@@ -117,6 +117,7 @@ object PresetManager {
         Behavior.notes_allow_link,
         Behavior.orientation,
         Behavior.duo_mode,
+        Behavior.duo_swap_top_panes,
         Behavior.tui_notification_time_text_color,
         Behavior.tui_notification_input_text_color,
         Behavior.weather_temperature_measure,
