@@ -442,7 +442,10 @@ class config : ParamCommand() {
 
     companion object {
         private fun isDisplayMarginSetting(save: XMLPrefsSave?): Boolean {
-            return save === Ui.display_margin_top_section || save === Ui.display_margin_bottom_section || save === Ui.display_margin_landscape_mm
+            return save === Ui.display_margin_top_section
+                    || save === Ui.display_margin_bottom_section
+                    || save === Ui.keyboard_visible_margin_override
+                    || save === Ui.display_margin_landscape_mm
         }
 
         private fun isResponsiveLandscapeSetting(save: XMLPrefsSave?): Boolean {

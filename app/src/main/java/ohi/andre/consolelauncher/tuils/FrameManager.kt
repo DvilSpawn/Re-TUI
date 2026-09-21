@@ -689,6 +689,7 @@ object FrameManager {
 
     @Synchronized
     private fun ensureMigrated(context: Context) {
+        Tuils.init(context.applicationContext)
         val dir = frameDir()
         check(dir.exists() || dir.mkdirs()) { context.getString(R.string.manager_framemanager_unable_to_create_the_frame_folder_731d9) }
         val state = File(dir, STATE_FILE)

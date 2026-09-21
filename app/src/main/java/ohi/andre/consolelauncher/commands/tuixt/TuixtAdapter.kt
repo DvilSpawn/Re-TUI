@@ -540,7 +540,7 @@ class TuixtAdapter(
             title.setVisibility(View.GONE)
         }
 
-        val accent = borderColor()
+        val accent = accentColor()
         val text = textColor()
         tintSeekBar(dialogView.findViewById<SeekBar?>(R.id.seek_alpha), accent)
         tintSeekBar(dialogView.findViewById<SeekBar?>(R.id.seek_hue), accent)

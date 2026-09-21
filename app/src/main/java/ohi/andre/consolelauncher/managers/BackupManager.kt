@@ -5,6 +5,7 @@ import ohi.andre.consolelauncher.tuils.LocalizedStateException
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.BuildConfig
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
 import android.util.Base64
@@ -39,6 +40,7 @@ import ohi.andre.consolelauncher.managers.lua.LuaWidgetReminderManager
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.tuils.Tuils
 import ohi.andre.consolelauncher.tuils.FrameManager
+import ohi.andre.consolelauncher.wallpaper.RetuiWallpaperService
 
 object BackupManager {
     private const val BACKUP_SUFFIX = ".retui-backup"
@@ -307,6 +309,9 @@ object BackupManager {
             ohi.andre.consolelauncher.managers.BackupManager.restoreSharedPreferences(
                 context,
                 tempDir
+            )
+            context.applicationContext.sendBroadcast(
+                Intent(RetuiWallpaperService.ACTION_REFRESH).setPackage(context.packageName)
             )
             FrameManager.onFilesRestored(context)
             SpaceManager.ensureInitialized(context)

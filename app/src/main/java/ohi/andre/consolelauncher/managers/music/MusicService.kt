@@ -191,7 +191,8 @@ class MusicService : Service(), OnPreparedListener, MediaPlayer.OnErrorListener,
     }
 
     fun playSong(): String? {
-        currentSong()?.let { playbackListener?.onProgress(it, posn, dur) }
+        val playSong = currentSong() ?: return null
+        playbackListener?.onProgress(playSong, posn, dur)
         playerPrepared = false
         playerPreparing = false
         try {
@@ -201,7 +202,6 @@ class MusicService : Service(), OnPreparedListener, MediaPlayer.OnErrorListener,
             Tuils.log(e)
         }
 
-        val playSong = songs!!.get(this.songIndex)
         songTitle = playSong.getTitle()
 
         val id = playSong.getID()

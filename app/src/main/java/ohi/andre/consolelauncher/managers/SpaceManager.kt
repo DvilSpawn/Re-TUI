@@ -10,6 +10,7 @@ import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.tuils.FrameManager
 import ohi.andre.consolelauncher.tuils.Tuils
 import java.io.File
+import java.io.IOException
 import java.util.LinkedHashSet
 import java.util.Locale
 
@@ -402,8 +403,17 @@ object SpaceManager {
         if (parent != null) {
             ensureDir(parent)
         }
-        file.writeText(text, Charsets.UTF_8)
+        try {
+            file.writeText(text, Charsets.UTF_8)
+        } catch (error: IOException) {
+            if (!hasExactText(file, text)) {
+                throw error
+            }
+        }
     }
+
+    internal fun hasExactText(file: File, text: String): Boolean =
+        runCatching { file.isFile && file.readText(Charsets.UTF_8) == text }.getOrDefault(false)
 
     private fun readText(file: File): String =
         file.readText(Charsets.UTF_8)

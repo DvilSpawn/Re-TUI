@@ -119,7 +119,7 @@ object TuixtTheme {
         view.background = framedRect(
             context,
             FrameTarget.UI_INPUT,
-            ColorUtils.setAlphaComponent(surfaceColor(), 220),
+            surface,
             borderColor(),
             1.25f
         )

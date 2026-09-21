@@ -2,6 +2,8 @@ package ohi.andre.consolelauncher
 
 import android.view.View
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class UIManagerImeSizingTest {
@@ -18,6 +20,22 @@ class UIManagerImeSizingTest {
         assertEquals(770, UIManager.legacyImeBottomOffset(2400, 1510, 120, 64))
         assertEquals(0, UIManager.legacyImeBottomOffset(2400, 2310, 64, 64))
         assertEquals(0, UIManager.legacyImeBottomOffset(2400, 2500, 0, 64))
+    }
+
+    @Test
+    fun appliesKeyboardMarginOverrideOnlyForImeOrInputFocus() {
+        assertFalse(UIManager.keyboardMarginOverrideActive(false, 0, false))
+        assertTrue(UIManager.keyboardMarginOverrideActive(true, 0, false))
+        assertTrue(UIManager.keyboardMarginOverrideActive(false, 420, false))
+        assertTrue(UIManager.keyboardMarginOverrideActive(false, 0, true))
+    }
+
+    @Test
+    fun keepsModuleSuggestionsWithTheDuoModulePane() {
+        assertTrue(UIManager.duoModulePaneIsLeft(UIManager.DUO_LAYOUT_LEFT, false))
+        assertFalse(UIManager.duoModulePaneIsLeft(UIManager.DUO_LAYOUT_RIGHT, false))
+        assertFalse(UIManager.duoModulePaneIsLeft(UIManager.DUO_LAYOUT_LEFT, true))
+        assertTrue(UIManager.duoModulePaneIsLeft(UIManager.DUO_LAYOUT_RIGHT, true))
     }
 
     @Test

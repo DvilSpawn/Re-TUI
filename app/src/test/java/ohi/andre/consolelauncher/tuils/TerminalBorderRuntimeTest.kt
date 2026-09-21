@@ -32,5 +32,6 @@ class TerminalBorderRuntimeTest {
     @Test fun customFrameSuppressesPresetPaneFill() {
         assertEquals(Color.TRANSPARENT, TerminalBorderRuntime.effectiveFillColor(true, Color.RED))
         assertEquals(Color.RED, TerminalBorderRuntime.effectiveFillColor(false, Color.RED))
+        assertEquals(Color.TRANSPARENT, TerminalBorderRuntime.effectiveFillColor(false, Color.TRANSPARENT))
     }
 }

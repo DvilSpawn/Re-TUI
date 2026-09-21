@@ -700,6 +700,19 @@ enum class Ui : XMLPrefsSave {
             return R.string.setting_ui_display_margin_bottom_section_description
         }
     },
+    keyboard_visible_margin_override {
+        override fun defaultValue(): String? {
+            return ""
+        }
+
+        override fun type(): String? {
+            return XMLPrefsSave.TEXT
+        }
+
+        override fun infoRes(): Int {
+            return R.string.setting_ui_keyboard_visible_margin_override_description
+        }
+    },
     display_margin_landscape_mm {
         override fun defaultValue(): String? {
             return "0,0,0,0"

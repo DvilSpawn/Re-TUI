@@ -573,6 +573,9 @@ class UIManager(
     private var lastModuleDockScrollX = 0
     private var moduleSuggestionsScroll: HorizontalScrollView? = null
     private var moduleSuggestionsGroup: LinearLayout? = null
+    private var moduleSuggestionsOriginalParent: ViewGroup? = null
+    private var moduleSuggestionsOriginalParams: ViewGroup.LayoutParams? = null
+    private var moduleSuggestionsOriginalIndex = -1
     private val luaWidgetEngines = HashMap<String?, LuaWidgetEngine?>()
     private var bundledLuaSamplesPruned = false
     private var activeModule: String? = ""
@@ -1362,6 +1365,9 @@ class UIManager(
         val prefixView = mRootView.findViewById<View?>(R.id.prefix_view) as TextView
         inputView.setCursorVisible(false)
         inputView.setShowSoftInputOnFocus(false)
+        inputView.setOnFocusChangeListener { _, _ ->
+            applyDisplayMarginsForConfigurationOnMainThread()
+        }
         if (inputView is OutlineEditText) {
             val outlineInput = inputView
             outlineInput.setIdleCursorColor(XMLPrefsManager.getColor(Theme.cursor_color))
@@ -2043,6 +2049,7 @@ class UIManager(
     private fun activateLandscapeLayout() {
         val root = mRootView as ViewGroup
         restoreSplitDuoStatusHeader()
+        restoreModuleSuggestionsStrip()
         detachFromParent(mainContainer)
         detachFromParent(terminalTrayContainer)
         clearLandscapePanes()
@@ -2088,7 +2095,11 @@ class UIManager(
         val targetPane =
             (if (ohi.andre.consolelauncher.UIManager.Companion.DUO_LAYOUT_LEFT == activeMode) landscapeLeftPane else landscapeRightPane)!!
         duoTopPanesSwapped = getBoolean(Behavior.duo_swap_top_panes)
-        val modulePane = if (duoTopPanesSwapped) getDuoEmptyPane(activeMode)!! else targetPane
+        val modulePane = if (duoModulePaneIsLeft(activeMode, duoTopPanesSwapped)) {
+            landscapeLeftPane!!
+        } else {
+            landscapeRightPane!!
+        }
         modulePane.addView(
             mainContainer, FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -2106,6 +2117,7 @@ class UIManager(
             attachSplitDuoStatusHeader(activeMode)
         }
         attachDuoSwitchButton(activeMode)
+        attachDuoModuleSuggestions(modulePane)
         attachDuoDrawers(activeMode)
 
         if (root.indexOfChild(landscapeSplitContainer) < 0) {
@@ -2116,6 +2128,7 @@ class UIManager(
     private fun restorePortraitLayout() {
         val root = mRootView as ViewGroup
         restoreSplitDuoStatusHeader()
+        restoreModuleSuggestionsStrip()
         detachFromParent(mainContainer)
         detachFromParent(terminalTrayContainer)
         clearLandscapePanes()
@@ -2287,6 +2300,39 @@ class UIManager(
         )
         params.setMargins(margin, margin, margin, margin + imeBottomOffset)
         emptyPane.addView(controls, params)
+    }
+
+    private fun attachDuoModuleSuggestions(modulePane: ViewGroup) {
+        val strip = moduleSuggestionsScroll ?: return
+        detachFromParent(strip)
+        val margin = Tuils.dpToPx(mContext, 18)
+        modulePane.addView(
+            strip,
+            FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                Gravity.BOTTOM
+            ).apply {
+                setMargins(margin, 0, margin, margin + Tuils.dpToPx(mContext, 56) + imeBottomOffset)
+            }
+        )
+    }
+
+    private fun restoreModuleSuggestionsStrip() {
+        val strip = moduleSuggestionsScroll ?: return
+        val originalParent = moduleSuggestionsOriginalParent ?: return
+        if (strip.parent === originalParent) return
+        detachFromParent(strip)
+        val index = if (moduleSuggestionsOriginalIndex >= 0) {
+            min(moduleSuggestionsOriginalIndex, originalParent.childCount)
+        } else {
+            originalParent.childCount
+        }
+        originalParent.addView(
+            strip,
+            index,
+            copyLayoutParams(moduleSuggestionsOriginalParams)
+        )
     }
 
     private fun attachDuoDrawers(activeMode: String) {
@@ -2518,6 +2564,14 @@ class UIManager(
             topMargins = getDisplayMargins(Ui.display_margin_landscape_mm)
             bottomMargins = topMargins
         }
+        if (keyboardMarginOverrideActive(
+                imeInsetVisible,
+                imeBottomOffset,
+                mTerminalAdapter?.inputView?.hasFocus() == true
+            ) && XMLPrefsManager.wasChanged(Ui.keyboard_visible_margin_override, false)
+        ) {
+            bottomMargins = getDisplayMargins(Ui.keyboard_visible_margin_override)
+        }
 
         mRootView.setPadding(systemInsetLeft, 0, systemInsetRight, systemInsetBottom)
         val metrics = mContext!!.getResources().getDisplayMetrics()
@@ -2529,6 +2583,13 @@ class UIManager(
                 if (params.bottomMargin != bottom) {
                     params.bottomMargin = bottom
                     duoControls?.layoutParams = params
+                }
+            }
+            (moduleSuggestionsScroll?.layoutParams as? FrameLayout.LayoutParams)?.let { params ->
+                val bottom = Tuils.dpToPx(mContext, 74) + imeBottomOffset
+                if (params.bottomMargin != bottom) {
+                    params.bottomMargin = bottom
+                    moduleSuggestionsScroll?.layoutParams = params
                 }
             }
             for (id in intArrayOf(R.id.apps_drawer_root, R.id.android_widget_drawer_root)) {
@@ -5744,6 +5805,11 @@ class UIManager(
         moduleSuggestionsGroup = mRootView?.findViewById(R.id.module_suggestions_group)
         if (moduleSuggestionsScroll == null || moduleSuggestionsGroup == null) {
             return
+        }
+        if (moduleSuggestionsOriginalParent == null && moduleSuggestionsScroll!!.parent is ViewGroup) {
+            moduleSuggestionsOriginalParent = moduleSuggestionsScroll!!.parent as ViewGroup
+            moduleSuggestionsOriginalIndex = moduleSuggestionsOriginalParent!!.indexOfChild(moduleSuggestionsScroll)
+            moduleSuggestionsOriginalParams = copyLayoutParams(moduleSuggestionsScroll!!.layoutParams)
         }
         val stripBackground = ColorUtils.blendARGB(terminalWindowBackground(), Color.BLACK, 0.12f)
         moduleSuggestionsScroll!!.setFocusable(false)
@@ -16889,6 +16955,9 @@ class UIManager(
             return DUO_LAYOUT_OFF
         }
 
+        internal fun duoModulePaneIsLeft(activeMode: String?, topPanesSwapped: Boolean): Boolean =
+            (activeMode == DUO_LAYOUT_LEFT) != topPanesSwapped
+
         internal fun constrainTerminalOutputHeight(
             requestedHeight: Int,
             rootHeight: Int,
@@ -16918,6 +16987,12 @@ class UIManager(
             )
             return if (hiddenBottom > max(0, visibilityThreshold)) hiddenBottom else 0
         }
+
+        internal fun keyboardMarginOverrideActive(
+            imeVisible: Boolean,
+            imeBottomOffset: Int,
+            inputFocused: Boolean
+        ): Boolean = imeVisible || imeBottomOffset > 0 || inputFocused
 
         internal fun outputAutoHideDelayMs(seconds: Int): Long =
             seconds.coerceIn(OUTPUT_AUTO_HIDE_MIN_SECONDS, OUTPUT_AUTO_HIDE_MAX_SECONDS) * 1000L
@@ -16991,11 +17066,7 @@ class UIManager(
                 applyMargins(v, spaces)
 
                 val color = try {
-                    var color = Color.parseColor(bgColor)
-                    if (color == Color.TRANSPARENT) {
-                        color = terminalWindowBackground()
-                    }
-                    color
+                    Color.parseColor(bgColor)
                 } catch (e: Exception) {
                     terminalWindowBackground()
                 }

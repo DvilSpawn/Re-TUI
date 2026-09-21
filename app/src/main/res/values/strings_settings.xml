@@ -635,6 +635,8 @@
     <string name="setting_ui_display_margin_top_section_description" formatted="false">"Complete top pane group margins in millimeters: [left],[top],[right],[bottom]"</string>
     <!-- Ui.kt: display_margin_bottom_section -->
     <string name="setting_ui_display_margin_bottom_section_description" formatted="false">"Bottom terminal/input section display margin in millimeters. [left margin],[top margin],[right margin],[bottom margin]"</string>
+    <!-- Ui.kt: keyboard_visible_margin_override -->
+    <string name="setting_ui_keyboard_visible_margin_override_description" formatted="false">"Bottom terminal/input section margins in millimeters used only while the keyboard is visible or the launcher input has focus. [left],[top],[right],[bottom]. Leave blank to use display_margin_bottom_section"</string>
     <!-- Ui.kt: display_margin_landscape_mm -->
     <string name="setting_ui_display_margin_landscape_mm_description" formatted="false">"Landscape display margin in millimeters. [left margin],[top margin],[right margin],[bottom margin]"</string>
     <!-- Ui.kt: landscape_fold_gutter_mm -->

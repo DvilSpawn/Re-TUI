@@ -686,6 +686,8 @@ object PresetManager {
                 Behavior.time_format_separator, Behavior.battery_progress_bar_symbol,
                 Behavior.unlock_time_divider -> value == "%n" || SAFE_PUNCTUATION.matches(value)
 
+                Ui.keyboard_visible_margin_override -> value.isEmpty() || FOUR_NUMBERS.matches(value)
+
                 Ui.display_margin_top_section, Ui.display_margin_bottom_section,
                 Ui.display_margin_landscape_mm, Ui.status_lines_margins,
                 Ui.output_field_margins, Ui.input_field_margins, Ui.input_area_margins,

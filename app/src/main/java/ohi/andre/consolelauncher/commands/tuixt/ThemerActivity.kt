@@ -137,6 +137,8 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
     override fun onCreate(savedInstanceState: Bundle?) {
         requestNoTitleIfFullscreen(this)
         super.onCreate(savedInstanceState)
+        XMLPrefsManager.loadCommons(this)
+        LauncherSettings.refreshFromLoadedPrefs()
         overridePendingTransition(0, 0)
         applyFullscreen(this)
 

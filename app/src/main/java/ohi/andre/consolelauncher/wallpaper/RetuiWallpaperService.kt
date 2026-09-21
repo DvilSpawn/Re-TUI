@@ -34,8 +34,12 @@ internal fun shouldRenderWallpaper(
     visible: Boolean,
     interactionEnabled: Boolean,
     screenInteractive: Boolean,
-    keyguardLocked: Boolean
-): Boolean = visible && screenInteractive && (interactionEnabled || keyguardLocked)
+    keyguardLocked: Boolean,
+    wallpaperPreview: Boolean = false
+): Boolean = visible && screenInteractive && (interactionEnabled || keyguardLocked || wallpaperPreview)
+
+internal fun wallpaperFrameDelay(drawSucceeded: Boolean, normalDelayMs: Long): Long =
+    if (drawSucceeded) normalDelayMs else maxOf(normalDelayMs, 1000L)
 
 class RetuiWallpaperService : WallpaperService() {
     override fun getResources(): android.content.res.Resources =
@@ -93,9 +97,10 @@ class RetuiWallpaperService : WallpaperService() {
         private val drawFrame = object : Runnable {
             override fun run() {
                 if (!shouldRender()) return
-                if (canDraw() && draw(fullSurface = fullRedrawPending)) fullRedrawPending = false
+                val drawSucceeded = canDraw() && draw(fullSurface = fullRedrawPending)
+                if (drawSucceeded) fullRedrawPending = false
                 if (shouldScheduleWallpaperFrame(shouldRender(), fullRedrawPending, isAnimated())) {
-                    handler.postDelayed(this, frameDelayMs())
+                    handler.postDelayed(this, wallpaperFrameDelay(drawSucceeded, frameDelayMs()))
                 }
             }
         }
@@ -199,10 +204,13 @@ class RetuiWallpaperService : WallpaperService() {
         }
 
         private fun shouldRender(): Boolean = shouldRenderWallpaper(
-            visible, interactionEnabled, powerManager.isInteractive, keyguardManager.isKeyguardLocked
+            visible, interactionEnabled, powerManager.isInteractive, keyguardManager.isKeyguardLocked,
+            wallpaperPreview = isPreview
         )
 
-        private fun touchAllowed(): Boolean = shouldRender()
+        private fun touchAllowed(): Boolean = shouldRenderWallpaper(
+            visible, interactionEnabled, powerManager.isInteractive, keyguardManager.isKeyguardLocked
+        )
 
         private fun updateTouchHandling() {
             val enabled = touchAllowed() && view is PixelDreamView
@@ -216,13 +224,15 @@ class RetuiWallpaperService : WallpaperService() {
         }
 
         private fun refreshView(recreate: Boolean) {
-            if (!visible) return
             val selected = RetuiWallpaperSettings.scene(this@RetuiWallpaperService)
             if (recreate || !viewMatchesScene(selected)) {
                 releaseView()
                 view = createView()
                 updateTouchHandling()
-                layoutView(surfaceHolder.surfaceFrame.width(), surfaceHolder.surfaceFrame.height())
+                val frame = surfaceHolder.surfaceFrame
+                if (frame.width() > 0 && frame.height() > 0) {
+                    layoutView(frame.width(), frame.height())
+                }
             } else {
                 loadPosition()
             }
@@ -235,15 +245,14 @@ class RetuiWallpaperService : WallpaperService() {
 
         private fun draw(fullSurface: Boolean = false): Boolean {
             val current = view
-            val canvas = try {
-                if (current is CsakuraView && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    surfaceHolder.lockHardwareCanvas()
-                } else if (!fullSurface && current is BlackHoleView) {
+            val lockSoftware = {
+                if (!fullSurface && current is BlackHoleView) {
                     surfaceHolder.lockCanvas(current.animationBounds())
                 } else {
                     surfaceHolder.lockCanvas()
                 }
-            } catch (_: Exception) { null } ?: return false
+            }
+            val canvas = try { lockSoftware() } catch (_: Exception) { null } ?: return false
             try {
                 when (current) {
                     is BlackHoleView -> current.advance()

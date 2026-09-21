@@ -22,6 +22,7 @@ import android.widget.Spinner
 import android.widget.TextView
 import android.widget.AdapterView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.ColorUtils
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import java.util.Locale
@@ -295,12 +296,12 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
         topoColorControls.forEachIndexed { index, button ->
             val topo = preview as? TopoNoiseView ?: return@forEachIndexed
             button.setBackgroundColor(topo.color(index))
-            button.setTextColor(if (Color.luminance(topo.color(index)) > 0.5f) Color.BLACK else Color.WHITE)
+            button.setTextColor(if (ColorUtils.calculateLuminance(topo.color(index)) > 0.5) Color.BLACK else Color.WHITE)
         }
         pixelColorControls.forEachIndexed { index, button ->
             val pixel = preview as? PixelDreamView ?: return@forEachIndexed
             button.setBackgroundColor(pixel.color(index))
-            button.setTextColor(if (Color.luminance(pixel.color(index)) > 0.5f) Color.BLACK else Color.WHITE)
+            button.setTextColor(if (ColorUtils.calculateLuminance(pixel.color(index)) > 0.5) Color.BLACK else Color.WHITE)
         }
     }
 
@@ -466,11 +467,16 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
 
     private fun useOnPhone() {
         save()
+        val component = ComponentName(this, RetuiWallpaperService::class.java)
+        if (WallpaperManager.getInstance(this).wallpaperInfo?.component == component) {
+            finish()
+            return
+        }
         try {
             startActivity(Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER).apply {
                 putExtra(
                     WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT,
-                    ComponentName(this@RetuiWallpaperActivity, RetuiWallpaperService::class.java)
+                    component
                 )
             })
         } catch (_: Exception) {
