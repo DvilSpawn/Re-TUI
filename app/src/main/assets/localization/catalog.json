@@ -10287,6 +10287,13 @@
     },
     "type": "string"
   },
+  "setting_behavior_duo_swap_top_panes_description": {
+    "formatted": true,
+    "forms": {
+      "other": "Swap Duo top panes: keep statuses with input/output and move the module dock and open module to the secondary screen. Only applies in Duo mode."
+    },
+    "type": "string"
+  },
   "setting_behavior_enable_crt_filter_description": {
     "formatted": false,
     "forms": {
@@ -11893,7 +11900,7 @@
   "setting_ui_ascii_index_description": {
     "formatted": false,
     "forms": {
-      "other": "ASCII always uses its own status row so the dedicated viewport remains active. If that whole-number row is occupied, ASCII moves to the next free row."
+      "other": "Changing this position inserts the ASCII pane at that row and shifts that row and later rows down when saved. For example, inserting ASCII at 1 moves 1 to 2 and 1.1 to 2.1. ASCII always uses its own row."
     },
     "type": "string"
   },
@@ -11935,7 +11942,7 @@
   "setting_ui_battery_index_description": {
     "formatted": false,
     "forms": {
-      "other": "Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."
+      "other": "Changing to a whole-number position inserts a row and shifts that row and later rows down when saved. Decimal positions join a row in left-to-right order: 4.1 and 4.2 share row 4. Existing decimal groups stay together when shifted. ASCII always uses its own row."
     },
     "type": "string"
   },
@@ -11984,7 +11991,7 @@
   "setting_ui_device_index_description": {
     "formatted": false,
     "forms": {
-      "other": "Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."
+      "other": "Changing to a whole-number position inserts a row and shifts that row and later rows down when saved. Decimal positions join a row in left-to-right order: 4.1 and 4.2 share row 4. Existing decimal groups stay together when shifted. ASCII always uses its own row."
     },
     "type": "string"
   },
@@ -12114,6 +12121,13 @@
     },
     "type": "string"
   },
+  "setting_ui_keyboard_visible_margin_override_description": {
+    "formatted": false,
+    "forms": {
+      "other": "Bottom terminal/input section margins in millimeters used only while the keyboard is visible or the launcher input has focus. [left],[top],[right],[bottom]. Leave blank to use display_margin_bottom_section"
+    },
+    "type": "string"
+  },
   "setting_ui_landscape_fold_gutter_mm_description": {
     "formatted": false,
     "forms": {
@@ -12152,7 +12166,7 @@
   "setting_ui_network_index_description": {
     "formatted": false,
     "forms": {
-      "other": "Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."
+      "other": "Changing to a whole-number position inserts a row and shifts that row and later rows down when saved. Decimal positions join a row in left-to-right order: 4.1 and 4.2 share row 4. Existing decimal groups stay together when shifted. ASCII always uses its own row."
     },
     "type": "string"
   },
@@ -12194,7 +12208,7 @@
   "setting_ui_notes_index_description": {
     "formatted": false,
     "forms": {
-      "other": "Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."
+      "other": "Changing to a whole-number position inserts a row and shifts that row and later rows down when saved. Decimal positions join a row in left-to-right order: 4.1 and 4.2 share row 4. Existing decimal groups stay together when shifted. ASCII always uses its own row."
     },
     "type": "string"
   },
@@ -12250,7 +12264,7 @@
   "setting_ui_ram_index_description": {
     "formatted": false,
     "forms": {
-      "other": "Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."
+      "other": "Changing to a whole-number position inserts a row and shifts that row and later rows down when saved. Decimal positions join a row in left-to-right order: 4.1 and 4.2 share row 4. Existing decimal groups stay together when shifted. ASCII always uses its own row."
     },
     "type": "string"
   },
@@ -12418,7 +12432,7 @@
   "setting_ui_storage_index_description": {
     "formatted": false,
     "forms": {
-      "other": "Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."
+      "other": "Changing to a whole-number position inserts a row and shifts that row and later rows down when saved. Decimal positions join a row in left-to-right order: 4.1 and 4.2 share row 4. Existing decimal groups stay together when shifted. ASCII always uses its own row."
     },
     "type": "string"
   },
@@ -12467,7 +12481,7 @@
   "setting_ui_time_index_description": {
     "formatted": false,
     "forms": {
-      "other": "Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."
+      "other": "Changing to a whole-number position inserts a row and shifts that row and later rows down when saved. Decimal positions join a row in left-to-right order: 4.1 and 4.2 share row 4. Existing decimal groups stay together when shifted. ASCII always uses its own row."
     },
     "type": "string"
   },
@@ -12495,7 +12509,7 @@
   "setting_ui_unlock_index_description": {
     "formatted": false,
     "forms": {
-      "other": "Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."
+      "other": "Changing to a whole-number position inserts a row and shifts that row and later rows down when saved. Decimal positions join a row in left-to-right order: 4.1 and 4.2 share row 4. Existing decimal groups stay together when shifted. ASCII always uses its own row."
     },
     "type": "string"
   },
@@ -12523,7 +12537,7 @@
   "setting_ui_weather_index_description": {
     "formatted": false,
     "forms": {
-      "other": "Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."
+      "other": "Changing to a whole-number position inserts a row and shifts that row and later rows down when saved. Decimal positions join a row in left-to-right order: 4.1 and 4.2 share row 4. Existing decimal groups stay together when shifted. ASCII always uses its own row."
     },
     "type": "string"
   },
@@ -19732,10 +19746,45 @@
     },
     "type": "string"
   },
+  "wallpaper_hex_hint": {
+    "formatted": true,
+    "forms": {
+      "other": "#AARRGGBB"
+    },
+    "type": "string"
+  },
+  "wallpaper_hex_invalid": {
+    "formatted": true,
+    "forms": {
+      "other": "Enter a valid #AARRGGBB or #RRGGBB value"
+    },
+    "type": "string"
+  },
   "wallpaper_pick_color": {
     "formatted": true,
     "forms": {
       "other": "Pick color…"
+    },
+    "type": "string"
+  },
+  "wallpaper_pixel_colors": {
+    "formatted": true,
+    "forms": {
+      "other": "COLORS"
+    },
+    "type": "string"
+  },
+  "wallpaper_pixel_dream": {
+    "formatted": true,
+    "forms": {
+      "other": "Pixel Dream"
+    },
+    "type": "string"
+  },
+  "wallpaper_pixel_pick_color": {
+    "formatted": true,
+    "forms": {
+      "other": "Pick Pixel Dream Color"
     },
     "type": "string"
   },
@@ -19750,6 +19799,48 @@
     "formatted": true,
     "forms": {
       "other": "Solid color"
+    },
+    "type": "string"
+  },
+  "wallpaper_topo_colors": {
+    "formatted": true,
+    "forms": {
+      "other": "COLORS"
+    },
+    "type": "string"
+  },
+  "wallpaper_topo_contours": {
+    "formatted": true,
+    "forms": {
+      "other": "CONTOURS"
+    },
+    "type": "string"
+  },
+  "wallpaper_topo_detail": {
+    "formatted": true,
+    "forms": {
+      "other": "DETAIL"
+    },
+    "type": "string"
+  },
+  "wallpaper_topo_noise": {
+    "formatted": true,
+    "forms": {
+      "other": "Topo noise"
+    },
+    "type": "string"
+  },
+  "wallpaper_topo_pick_color": {
+    "formatted": true,
+    "forms": {
+      "other": "Pick Topo Color"
+    },
+    "type": "string"
+  },
+  "wallpaper_topo_relief": {
+    "formatted": true,
+    "forms": {
+      "other": "RELIEF"
     },
     "type": "string"
   },

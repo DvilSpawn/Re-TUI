@@ -2150,6 +2150,7 @@ Fix or delete the file to recover your options</string>
     <string name="setting_behavior_double_tap_cmd_description">The command that will run when you touch two times the screen quickly</string>
     <string name="setting_behavior_double_tap_lock_description">If true, Re:T-UI will lock the screen on double tap</string>
     <string name="setting_behavior_duo_mode_description">If true, enables the Duo command for manually switching landscape into a single portrait-style pane on the left or right screen</string>
+    <string name="setting_behavior_duo_swap_top_panes_description">Swap Duo top panes: keep statuses with input/output and move the module dock and open module to the secondary screen. Only applies in Duo mode.</string>
     <string name="setting_behavior_enable_crt_filter_description">If true, Re:T-UI draws a CRT scanline overlay over the launcher</string>
     <string name="setting_behavior_enable_cyberdeck_mode_description">If true, Re:T-UI uses angular cyberdeck drawables while keeping the active theme colors</string>
     <string name="setting_behavior_enable_music_description">If true, you will be able to use Re:T-UI as a music player. Otherwise, the music command will try to communicate with the music player that your using</string>
@@ -2379,20 +2380,20 @@ Fix or delete the file to recover your options</string>
     <string name="setting_ui_android_widget_grid_columns_description">Base column count for the Android widget drawer. Rows and landscape columns are computed from square cells</string>
     <string name="setting_ui_android_widget_min_columns_description">Fallback starting width when a widget app does not provide valid Android sizing metadata</string>
     <string name="setting_ui_android_widget_min_rows_description">Fallback starting height when a widget app does not provide valid Android sizing metadata</string>
-    <string name="setting_ui_ascii_index_description">ASCII always uses its own status row so the dedicated viewport remains active. If that whole-number row is occupied, ASCII moves to the next free row.</string>
+    <string name="setting_ui_ascii_index_description">Changing this position inserts the ASCII pane at that row and shifts that row and later rows down when saved. For example, inserting ASCII at 1 moves 1 to 2 and 1.1 to 2.1. ASCII always uses its own row.</string>
     <string name="setting_ui_ascii_max_lines_description">Number of source rows shown in the ASCII viewport. Use -1 to auto-zoom wide art.</string>
     <string name="setting_ui_ascii_pane_height_rows_description">Maximum physical height of the ASCII pane, measured in text rows.</string>
     <string name="setting_ui_ascii_size_description">Legacy ASCII art text size. ASCII now auto-fits to the pane width.</string>
     <string name="setting_ui_ascii_status_alignment_description">ASCII status line alignment (&lt;0 = left, =0 = center, &gt;0 = right)</string>
     <string name="setting_ui_auto_color_pick_description">Legacy migration flag; wallpaper -auto now saves a one-time color snapshot</string>
-    <string name="setting_ui_battery_index_description">Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row.</string>
+    <string name="setting_ui_battery_index_description">Changing to a whole-number position inserts a row and shifts that row and later rows down when saved. Decimal positions join a row in left-to-right order: 4.1 and 4.2 share row 4. Existing decimal groups stay together when shifted. ASCII always uses its own row.</string>
     <string name="setting_ui_battery_size_description">The battery label font size</string>
     <string name="setting_ui_battery_status_alignment_description">Battery status line alignment (&lt;0 = left, =0 = center, &gt;0 = right)</string>
     <string name="setting_ui_dashed_border_corner_radius_description">Default rounded corner radius for dashed borders (dp). Specific module, output, and header corner radius settings override this when changed</string>
     <string name="setting_ui_dashed_border_dash_length_description">Length of the dash in the dashed border (dp)</string>
     <string name="setting_ui_dashed_border_gap_length_description">Length of the gap in the dashed border (dp)</string>
     <string name="setting_ui_dashed_border_stroke_width_description">Stroke width for dashed borders (dp). Decimal values are allowed</string>
-    <string name="setting_ui_device_index_description">Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row.</string>
+    <string name="setting_ui_device_index_description">Changing to a whole-number position inserts a row and shifts that row and later rows down when saved. Decimal positions join a row in left-to-right order: 4.1 and 4.2 share row 4. Existing decimal groups stay together when shifted. ASCII always uses its own row.</string>
     <string name="setting_ui_device_size_description">The device label font size</string>
     <string name="setting_ui_device_status_alignment_description">Device status line alignment (&lt;0 = left, =0 = center, &gt;0 = right)</string>
     <string name="setting_ui_devicename_description">Your device name</string>
@@ -2411,18 +2412,19 @@ Fix or delete the file to recover your options</string>
     <string name="setting_ui_input_output_size_description">The input/output font size</string>
     <string name="setting_ui_input_prefix_description">The prefix placed before every input</string>
     <string name="setting_ui_input_root_prefix_description">The prefix placed before a root command ("su ...")</string>
+    <string name="setting_ui_keyboard_visible_margin_override_description">Bottom terminal/input section margins in millimeters used only while the keyboard is visible or the launcher input has focus. [left],[top],[right],[bottom]. Leave blank to use display_margin_bottom_section</string>
     <string name="setting_ui_landscape_fold_gutter_mm_description">Landscape-only center gutter in millimeters for fold hinges or screen creases</string>
     <string name="setting_ui_module_body_text_size_description">Text size for built-in module body text and controls (sp)</string>
     <string name="setting_ui_module_corner_radius_description">Rounded corner radius for module panels and module controls (dp)</string>
     <string name="setting_ui_module_dock_spacing_dp_description">Space between module-dock buttons in density-independent pixels.</string>
     <string name="setting_ui_module_header_text_size_description">Text size for module header labels and close boxes (sp)</string>
-    <string name="setting_ui_network_index_description">Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row.</string>
+    <string name="setting_ui_network_index_description">Changing to a whole-number position inserts a row and shifts that row and later rows down when saved. Decimal positions join a row in left-to-right order: 4.1 and 4.2 share row 4. Existing decimal groups stay together when shifted. ASCII always uses its own row.</string>
     <string name="setting_ui_network_size_description">The network label font size</string>
     <string name="setting_ui_network_status_alignment_description">Network status line alignment (&lt;0 = left, =0 = center, &gt;0 = right)</string>
     <string name="setting_ui_notes_divider_description">The divider between two notes</string>
     <string name="setting_ui_notes_footer_description">The footer below your notes</string>
     <string name="setting_ui_notes_header_description">The header above your notes</string>
-    <string name="setting_ui_notes_index_description">Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row.</string>
+    <string name="setting_ui_notes_index_description">Changing to a whole-number position inserts a row and shifts that row and later rows down when saved. Decimal positions join a row in left-to-right order: 4.1 and 4.2 share row 4. Existing decimal groups stay together when shifted. ASCII always uses its own row.</string>
     <string name="setting_ui_notes_max_lines_description">The max number of lines of notes (-1 to disable)</string>
     <string name="setting_ui_notes_size_description">Notes size</string>
     <string name="setting_ui_notes_status_alignment_description">Notes status line alignment (&lt;0 = left, =0 = center, &gt;0 = right)</string>
@@ -2430,7 +2432,7 @@ Fix or delete the file to recover your options</string>
     <string name="setting_ui_output_field_margins_description">[horizontal_margin],[vertical_margin],[horizontal_padding],[vertical_padding]</string>
     <string name="setting_ui_output_header_text_size_description">Text size for output and overlay header labels (sp)</string>
     <string name="setting_ui_output_tray_max_height_description">Maximum height for the expanded output tray in dp. 0 keeps the default adaptive height</string>
-    <string name="setting_ui_ram_index_description">Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row.</string>
+    <string name="setting_ui_ram_index_description">Changing to a whole-number position inserts a row and shifts that row and later rows down when saved. Decimal positions join a row in left-to-right order: 4.1 and 4.2 share row 4. Existing decimal groups stay together when shifted. ASCII always uses its own row.</string>
     <string name="setting_ui_ram_size_description">The ram label font size</string>
     <string name="setting_ui_ram_status_alignment_description">RAM status line alignment (&lt;0 = left, =0 = center, &gt;0 = right)</string>
     <string name="setting_ui_shadow_params_description">[Shadow X offset],[Shadow Y offset],[Shadow radius]</string>
@@ -2454,22 +2456,22 @@ Fix or delete the file to recover your options</string>
     <string name="setting_ui_split_duo_launcher_description">If true, Duo keeps the status lines and side switch button on the empty screen while output, input, toolbar, and suggestions stay on the active screen</string>
     <string name="setting_ui_status_lines_margins_description">Status-row text padding in pixels: [left],[top],[right],[bottom]</string>
     <string name="setting_ui_statusbar_light_icons_description">If true, your status bar icons will be white. Dark otherwise</string>
-    <string name="setting_ui_storage_index_description">Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row.</string>
+    <string name="setting_ui_storage_index_description">Changing to a whole-number position inserts a row and shifts that row and later rows down when saved. Decimal positions join a row in left-to-right order: 4.1 and 4.2 share row 4. Existing decimal groups stay together when shifted. ASCII always uses its own row.</string>
     <string name="setting_ui_storage_size_description">The storage label font size</string>
     <string name="setting_ui_storage_status_alignment_description">Storage status line alignment (&lt;0 = left, =0 = center, &gt;0 = right)</string>
     <string name="setting_ui_suggestions_area_margin_description">Suggestion pane spacing in pixels: [outer horizontal margin],[outer vertical margin],[inner horizontal padding],[inner vertical padding]. Also applies to contextual module suggestions; it does not control spacing between chips or module-dock buttons.</string>
     <string name="setting_ui_system_font_description">If false, the default Re:T-UI font ("Lucida Console") will be used for all texts</string>
     <string name="setting_ui_system_wallpaper_description">If true, your system wallpaper will be used as background</string>
     <string name="setting_ui_text_redraw_times_description">A greater value will produce a bigger outline. Limited to 1–8 drawing passes.</string>
-    <string name="setting_ui_time_index_description">Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row.</string>
+    <string name="setting_ui_time_index_description">Changing to a whole-number position inserts a row and shifts that row and later rows down when saved. Decimal positions join a row in left-to-right order: 4.1 and 4.2 share row 4. Existing decimal groups stay together when shifted. ASCII always uses its own row.</string>
     <string name="setting_ui_time_size_description">The time label font size</string>
     <string name="setting_ui_time_status_alignment_description">Time status line alignment (&lt;0 = left, =0 = center, &gt;0 = right)</string>
     <string name="setting_ui_toolbar_margins_description">[horizontal_margin],[vertical_margin],[horizontal_padding],[vertical_padding]</string>
-    <string name="setting_ui_unlock_index_description">Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row.</string>
+    <string name="setting_ui_unlock_index_description">Changing to a whole-number position inserts a row and shifts that row and later rows down when saved. Decimal positions join a row in left-to-right order: 4.1 and 4.2 share row 4. Existing decimal groups stay together when shifted. ASCII always uses its own row.</string>
     <string name="setting_ui_unlock_size_description">Unlock size</string>
     <string name="setting_ui_unlock_status_alignment_description">Unlock counter status line alignment (&lt;0 = left, =0 = center, &gt;0 = right)</string>
     <string name="setting_ui_username_description">Your username</string>
-    <string name="setting_ui_weather_index_description">Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row.</string>
+    <string name="setting_ui_weather_index_description">Changing to a whole-number position inserts a row and shifts that row and later rows down when saved. Decimal positions join a row in left-to-right order: 4.1 and 4.2 share row 4. Existing decimal groups stay together when shifted. ASCII always uses its own row.</string>
     <string name="setting_ui_weather_size_description">Weather size</string>
     <string name="setting_ui_weather_status_alignment_description">Weather status line alignment (&lt;0 = left, =0 = center, &gt;0 = right)</string>
     <string name="shortcut_index_greater">The index is greater than the shortcuts count</string>
@@ -3571,9 +3573,20 @@ Ready for the next command</string>
     <string name="volume_stream_system">System</string>
     <string name="volume_stream_voice_call">Voice call</string>
     <string name="wallpaper_black_hole">Black hole</string>
+    <string name="wallpaper_hex_hint">#AARRGGBB</string>
+    <string name="wallpaper_hex_invalid">Enter a valid #AARRGGBB or #RRGGBB value</string>
     <string name="wallpaper_pick_color">Pick color…</string>
+    <string name="wallpaper_pixel_colors">COLORS</string>
+    <string name="wallpaper_pixel_dream">Pixel Dream</string>
+    <string name="wallpaper_pixel_pick_color">Pick Pixel Dream Color</string>
     <string name="wallpaper_sakura">Sakura</string>
     <string name="wallpaper_solid">Solid color</string>
+    <string name="wallpaper_topo_colors">COLORS</string>
+    <string name="wallpaper_topo_contours">CONTOURS</string>
+    <string name="wallpaper_topo_detail">DETAIL</string>
+    <string name="wallpaper_topo_noise">Topo noise</string>
+    <string name="wallpaper_topo_pick_color">Pick Topo Color</string>
+    <string name="wallpaper_topo_relief">RELIEF</string>
     <string name="weather_condition_clearsky">Clear</string>
     <string name="weather_condition_cloudy">Cloudy</string>
     <string name="weather_condition_fair">Fair</string>
