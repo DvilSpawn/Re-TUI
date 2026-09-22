@@ -1364,25 +1364,42 @@ class UIManager(
 
         val inputView = mRootView.findViewById<View?>(R.id.input_view) as EditText
         val prefixView = mRootView.findViewById<View?>(R.id.prefix_view) as TextView
+        val inputGroup = mRootView.findViewById<View>(R.id.input_group)
         inputView.setCursorVisible(false)
         inputView.setShowSoftInputOnFocus(false)
+        var inputTouchInProgress = false
+        inputView.setOnTouchListener { _, event ->
+            when (event.actionMasked) {
+                MotionEvent.ACTION_DOWN -> {
+                    inputTouchInProgress = true
+                    inputView.setShowSoftInputOnFocus(true)
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    inputTouchInProgress = false
+                    inputView.post { applyDisplayMarginsForConfigurationOnMainThread() }
+                }
+            }
+            false
+        }
         inputView.setOnFocusChangeListener { _, _ ->
-            applyDisplayMarginsForConfigurationOnMainThread()
+            if (!inputTouchInProgress) applyDisplayMarginsForConfigurationOnMainThread()
         }
         if (inputView is OutlineEditText) {
             val outlineInput = inputView
             outlineInput.setIdleCursorColor(XMLPrefsManager.getColor(Theme.cursor_color))
             outlineInput.setIdleCursorVisible(true)
         }
-        inputView.setOnClickListener {
+        val openTerminalInput = View.OnClickListener {
             activateTerminalInput(true)
             refreshStockSuggestions()
         }
+        inputView.setOnClickListener(openTerminalInput)
+        inputGroup.setOnClickListener(openTerminalInput)
         applyRetuiKeyboardTheme(inputView, "launcher")
 
         Companion.applyBgRect(
             mContext!!,
-            mRootView.findViewById<View>(R.id.input_group),
+            inputGroup,
             bgColors[INPUT_BGCOLOR_INDEX],
             margins[INPUTAREA_MARGINS_INDEX]!!,
             genericBorderCornerRadius,
@@ -2521,7 +2538,6 @@ class UIManager(
         if (mTerminalAdapter != null && mTerminalAdapter!!.inputView is EditText) {
             val terminalInput = mTerminalAdapter!!.inputView as EditText
             terminalInput.setCursorVisible(keyboardVisible)
-            terminalInput.setShowSoftInputOnFocus(keyboardVisible)
             if (terminalInput is OutlineEditText) {
                 terminalInput.setIdleCursorVisible(!keyboardVisible)
             }
@@ -4884,6 +4900,13 @@ class UIManager(
                 buildTermuxWorkspaceFrameScript()
     }
 
+    private fun buildTermuxWorkspaceLegacyCaptureScript(): String {
+        return buildTermuxWorkspacePreambleScript() + "\n" +
+                buildTermuxWorkspaceEnsureScript() + "\n" +
+                buildTermuxWorkspaceResizeScript() + "\n" +
+                buildTermuxWorkspaceFrameScript()
+    }
+
     private fun buildTermuxWorkspaceSendScript(input: String): String {
         val session = shellQuote(TERMUX_WORKSPACE_SESSION)
         val send = if (input.isEmpty()) {
@@ -5213,6 +5236,14 @@ class UIManager(
             override fun onError(message: String) {
                 runOnUiThread(Runnable {
                     renderTermuxWorkspaceStatus(mContext.getString(R.string.surface_socket_bridge_error_5de4e, message))
+                    if (termuxWorkspaceSocketClient?.connected != true) {
+                        stopTermuxWorkspaceSocketClient()
+                        dispatchTermuxWorkspaceScript(
+                            "capture-fallback",
+                            buildTermuxWorkspaceLegacyCaptureScript(),
+                            false
+                        )
+                    }
                 })
             }
 
@@ -16126,6 +16157,16 @@ class UIManager(
         appDrawerPaneManager?.hide()
         androidWidgetDrawerManager?.show()
         scheduleTypefaceRefreshes()
+    }
+
+    fun returnToLauncherHome() {
+        if (isAndroidWidgetDrawerOpen) hideAndroidWidgetDrawer()
+        if (isAppsDrawerOpen) hideAppsDrawer()
+        if (termuxWorkspaceChromeActive) {
+            hideTermuxWorkspaceKeyboard()
+            openHomePage()
+        }
+        if (isTermuxConsoleVisible) closeTermuxConsole()
     }
 
     private fun setWallpaperTouchEnabled(enabled: Boolean) {

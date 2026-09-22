@@ -200,6 +200,7 @@ class TerminalGridView @JvmOverloads constructor(
         var row = 0
         var col = 0
         var index = 0
+        var lineDrawing = false
         while (index < value.length && row < rows) {
             val ch = value[index]
             if (ch == '\u001B' && index + 1 < value.length && value[index + 1] == '[') {
@@ -213,6 +214,14 @@ class TerminalGridView @JvmOverloads constructor(
                 }
             }
             when (ch) {
+                '\u000E' -> {
+                    lineDrawing = true
+                    index++
+                }
+                '\u000F' -> {
+                    lineDrawing = false
+                    index++
+                }
                 '\r' -> {
                     index++
                 }
@@ -234,7 +243,9 @@ class TerminalGridView @JvmOverloads constructor(
                     val charLength = Character.charCount(codePoint)
                     val cellSpan = terminalCellWidth(codePoint)
                     if (cellSpan > 0 && col < cols) {
-                        writeCell(col, row, String(Character.toChars(codePoint)), style)
+                        val text = if (charLength == 1) decLineDrawingGlyph(ch, lineDrawing).toString()
+                            else String(Character.toChars(codePoint))
+                        writeCell(col, row, text, style)
                         if (cellSpan > 1 && col + 1 < cols) {
                             writeCell(col + 1, row, " ", style)
                         }
@@ -448,5 +459,37 @@ class TerminalGridView @JvmOverloads constructor(
         private const val TAB_WIDTH = 8
         private const val CELL_WIDTH_SAMPLE =
             "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+    }
+}
+
+internal fun decLineDrawingGlyph(char: Char, active: Boolean): Char {
+    if (!active) return char
+    return when (char) {
+        '`' -> '◆'
+        'a' -> '▒'
+        'f' -> '°'
+        'g' -> '±'
+        'j' -> '┘'
+        'k' -> '┐'
+        'l' -> '┌'
+        'm' -> '└'
+        'n' -> '┼'
+        'o' -> '⎺'
+        'p' -> '⎻'
+        'q' -> '─'
+        'r' -> '⎼'
+        's' -> '⎽'
+        't' -> '├'
+        'u' -> '┤'
+        'v' -> '┴'
+        'w' -> '┬'
+        'x' -> '│'
+        'y' -> '≤'
+        'z' -> '≥'
+        '{' -> 'π'
+        '|' -> '≠'
+        '}' -> '£'
+        '~' -> '·'
+        else -> char
     }
 }

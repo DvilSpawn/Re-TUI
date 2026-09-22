@@ -17,7 +17,6 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.accentColor
-import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.borderColor
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.dp
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.rect
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleButton
@@ -25,7 +24,6 @@ import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleChoice
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleColorPreview
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleInput
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleToggle
-import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.surfaceColor
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.textColor
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings.get
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings.set
@@ -74,6 +72,9 @@ class TuixtAdapter(
     private val pendingChanges: MutableMap<XMLPrefsSave?, String?> =
         LinkedHashMap<XMLPrefsSave?, String?>()
     private var expandedColorItem: XMLPrefsSave? = null
+
+    private fun rowColor(): Int = ThemeColorResolver.color(Theme.settings_row_background_color)
+    private fun rowBorderColor(): Int = ThemeColorResolver.color(Theme.settings_row_border_color)
 
     init {
         this.rows = ArrayList<SettingsRow>(rows)
@@ -144,7 +145,7 @@ class TuixtAdapter(
             title.setPadding(dp(parent.context, 14f), dp(parent.context, 10f), dp(parent.context, 14f), dp(parent.context, 10f))
             title.setTypeface(Tuils.getTypeface(parent.context), Typeface.BOLD)
             title.setTextColor(accentColor())
-            title.setBackground(rect(parent.context, surfaceColor(), borderColor(), 1.25f))
+            title.setBackground(rect(parent.context, rowColor(), rowBorderColor(), 1.25f))
             return SectionHolder(title)
         }
 
@@ -179,8 +180,8 @@ class TuixtAdapter(
         settingHolder.itemView.setBackground(
             rect(
                 settingHolder.itemView.getContext(),
-                surfaceColor(),
-                borderColor(),
+                rowColor(),
+                rowBorderColor(),
                 1.25f
             )
         )
@@ -325,7 +326,7 @@ class TuixtAdapter(
             val holder = recyclerView.getChildViewHolder(recyclerView.getChildAt(index))
             if (holder is SectionHolder) {
                 holder.title.setTextColor(accentColor())
-                holder.title.background = rect(holder.itemView.context, surfaceColor(), borderColor(), 1.25f)
+                holder.title.background = rect(holder.itemView.context, rowColor(), rowBorderColor(), 1.25f)
                 continue
             }
             if (holder !is ViewHolder) continue
@@ -333,7 +334,7 @@ class TuixtAdapter(
             if (position == RecyclerView.NO_POSITION) continue
             val item = visibleRows[position].item ?: continue
             val context = holder.itemView.context
-            holder.itemView.background = rect(context, surfaceColor(), borderColor(), 1.25f)
+            holder.itemView.background = rect(context, rowColor(), rowBorderColor(), 1.25f)
             holder.title.setTextColor(accentColor())
             holder.description.setTextColor(textColor())
             if (holder.input.visibility == View.VISIBLE) styleInput(context, holder.input)
@@ -583,7 +584,7 @@ class TuixtAdapter(
         if (hexText != null) {
             hexText.setTextColor(text)
             hexText.setTypeface(Tuils.getTypeface(context), Typeface.BOLD)
-            hexText.setBackground(rect(context, surfaceColor(), borderColor(), 1.25f))
+            hexText.setBackground(rect(context, rowColor(), rowBorderColor(), 1.25f))
             hexText.setPadding(
                 dp(context, 8f),
                 dp(context, 8f),

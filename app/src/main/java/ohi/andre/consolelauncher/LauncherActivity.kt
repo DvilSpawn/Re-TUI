@@ -88,6 +88,9 @@ import ohi.andre.consolelauncher.managers.xml.options.Notifications
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi
 import ohi.andre.consolelauncher.commands.main.MainPack
 
+internal fun shouldReturnToLauncherHome(action: String?, categories: kotlin.collections.Set<String>?): Boolean =
+    action == Intent.ACTION_MAIN && categories?.contains(Intent.CATEGORY_HOME) == true
+
 class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompatActivity(), Reloadable {
     @get:JvmName("getUIManager")
     var uiManager: UIManager? = null
@@ -777,6 +780,9 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
         super.onNewIntent(intent)
         setIntent(intent)
         if (handleKeyboardShortcutIntent(intent)) return
+        if (shouldReturnToLauncherHome(intent.action, intent.categories)) {
+            uiManager?.returnToLauncherHome()
+        }
         if (intent.hasExtra(Reloadable.MESSAGE)) {
             reload()
         }

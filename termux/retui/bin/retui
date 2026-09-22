@@ -357,7 +357,7 @@ stop_matching_bridge_daemons() {
     socket_name="$(bridge_socket_name)"
     tcp_port="$(bridge_tcp_port)"
     current_pid="$$"
-    ps -A -o PID,ARGS 2>/dev/null | while read -r pid args; do
+    ps -A -o pid,args 2>/dev/null | while read -r pid args; do
         [ "$pid" = "PID" ] && continue
         [ -n "$pid" ] || continue
         [ "$pid" = "$current_pid" ] && continue
@@ -377,6 +377,28 @@ stop_bridge_daemons() {
     stop_matching_bridge_daemons
 }
 
+bridge_listener_ready() {
+    ready_response="$(
+        printf 'HELLO %s 20 8 CAPTURE\n' "$1" |
+            socat -T 1 - TCP:127.0.0.1:"$(bridge_tcp_port)" 2>/dev/null || true
+    )"
+    printf '%s\n' "$ready_response" | grep -F -x '__RETUI_SOCKET_STATUS__ ok' >/dev/null 2>&1 &&
+        printf '%s\n' "$ready_response" | grep -F -x "__RETUI_SESSION__ $(bridge_session)" >/dev/null 2>&1
+}
+
+wait_for_bridge_listener() {
+    ready_token="$1"
+    attempts=0
+    while [ "$attempts" -lt 20 ]; do
+        if bridge_listener_ready "$ready_token"; then
+            return 0
+        fi
+        attempts=$((attempts + 1))
+        sleep 0.1
+    done
+    return 1
+}
+
 bridge_socket_start() {
     have socat || die "socat missing: pkg install socat"
     ensure_bridge_session
@@ -384,19 +406,24 @@ bridge_socket_start() {
     socket_name="$(bridge_socket_name)"
     token="$(ensure_socket_token)"
     log_file="$(bridge_runtime_dir)/bridge.log"
-    stop_bridge_daemons
-    RETUI_SESSION="$(bridge_session)" \
-    RETUI_SOCKET_NAME="$socket_name" \
-    RETUI_SOCKET_TOKEN="$token" \
-    nohup "$PREFIX/bin/retui" bridge socket-daemon >> "$log_file" 2>&1 &
-    printf '%s\n' "$!" > "$(bridge_daemon_pid_path socket)"
-    RETUI_SESSION="$(bridge_session)" \
-    RETUI_SOCKET_NAME="$socket_name" \
-    RETUI_SOCKET_TOKEN="$token" \
-    RETUI_TCP_PORT="$(bridge_tcp_port)" \
-    nohup "$PREFIX/bin/retui" bridge tcp-daemon >> "$log_file" 2>&1 &
-    printf '%s\n' "$!" > "$(bridge_daemon_pid_path tcp)"
-    sleep 0.25
+    if ! bridge_listener_ready "$token"; then
+        stop_bridge_daemons
+        RETUI_SESSION="$(bridge_session)" \
+        RETUI_SOCKET_NAME="$socket_name" \
+        RETUI_SOCKET_TOKEN="$token" \
+        nohup "$PREFIX/bin/retui" bridge socket-daemon >> "$log_file" 2>&1 &
+        printf '%s\n' "$!" > "$(bridge_daemon_pid_path socket)"
+        RETUI_SESSION="$(bridge_session)" \
+        RETUI_SOCKET_NAME="$socket_name" \
+        RETUI_SOCKET_TOKEN="$token" \
+        RETUI_TCP_PORT="$(bridge_tcp_port)" \
+        nohup "$PREFIX/bin/retui" bridge tcp-daemon >> "$log_file" 2>&1 &
+        printf '%s\n' "$!" > "$(bridge_daemon_pid_path tcp)"
+        if ! wait_for_bridge_listener "$token"; then
+            stop_bridge_daemons
+            die "socket daemon failed to start"
+        fi
+    fi
     printf '%s %s\n' "__RETUI_SOCKET__" "$RETUI_SOCKET_PROTOCOL"
     printf '%s %s\n' "__RETUI_SOCKET_NAME__" "$socket_name"
     printf '%s %s\n' "__RETUI_TCP_HOST__" "127.0.0.1"
