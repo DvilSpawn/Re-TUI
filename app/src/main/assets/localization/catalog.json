@@ -12121,13 +12121,6 @@
     },
     "type": "string"
   },
-  "setting_ui_keyboard_visible_margin_override_description": {
-    "formatted": false,
-    "forms": {
-      "other": "Bottom terminal/input section margins in millimeters used only while the keyboard is visible or the launcher input has focus. [left],[top],[right],[bottom]. Leave blank to use display_margin_bottom_section"
-    },
-    "type": "string"
-  },
   "setting_ui_landscape_fold_gutter_mm_description": {
     "formatted": false,
     "forms": {

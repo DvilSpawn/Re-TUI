@@ -2412,7 +2412,6 @@ Fix or delete the file to recover your options</string>
     <string name="setting_ui_input_output_size_description">The input/output font size</string>
     <string name="setting_ui_input_prefix_description">The prefix placed before every input</string>
     <string name="setting_ui_input_root_prefix_description">The prefix placed before a root command ("su ...")</string>
-    <string name="setting_ui_keyboard_visible_margin_override_description">Bottom terminal/input section margins in millimeters used only while the keyboard is visible or the launcher input has focus. [left],[top],[right],[bottom]. Leave blank to use display_margin_bottom_section</string>
     <string name="setting_ui_landscape_fold_gutter_mm_description">Landscape-only center gutter in millimeters for fold hinges or screen creases</string>
     <string name="setting_ui_module_body_text_size_description">Text size for built-in module body text and controls (sp)</string>
     <string name="setting_ui_module_corner_radius_description">Rounded corner radius for module panels and module controls (dp)</string>

@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1440" height="2560" viewBox="0 0 1440 2560">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0d1117"/>
+      <stop offset="1" stop-color="#1d2940"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#b7d95b"/>
+      <stop offset="1" stop-color="#8bb7d2"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="24" stdDeviation="22" flood-color="#000" flood-opacity=".42"/>
+    </filter>
+    <clipPath id="screen1"><rect x="82" y="620" width="376" height="835" rx="22"/></clipPath>
+    <clipPath id="screen2"><rect x="532" y="620" width="376" height="835" rx="22"/></clipPath>
+    <clipPath id="screen3"><rect x="982" y="620" width="376" height="835" rx="22"/></clipPath>
+    <style>
+      .ui { font-family: Arial, Helvetica, sans-serif; }
+      .mono { font-family: Menlo, Consolas, monospace; }
+    </style>
+  </defs>
+
+  <rect width="1440" height="2560" fill="url(#bg)"/>
+  <circle cx="1250" cy="360" r="260" fill="#8bb7d2" opacity=".08"/>
+  <circle cx="170" cy="2240" r="340" fill="#b7d95b" opacity=".06"/>
+
+  <text x="72" y="120" class="ui" font-size="30" letter-spacing="7" fill="#b7d95b">RE:TUI · PLAY STORE CONCEPT</text>
+  <text x="72" y="245" class="ui" font-size="84" font-weight="700" fill="#f2f4f7">Your phone, in a terminal.</text>
+  <text x="76" y="315" class="ui" font-size="34" fill="#b9c4d8">A screenshot direction built from the real launcher UI.</text>
+  <rect x="76" y="366" width="1288" height="4" fill="url(#accent)"/>
+
+  <g filter="url(#shadow)">
+    <rect x="55" y="555" width="430" height="1050" rx="44" fill="#080b10" stroke="#536079" stroke-width="4"/>
+    <rect x="505" y="555" width="430" height="1050" rx="44" fill="#080b10" stroke="#536079" stroke-width="4"/>
+    <rect x="955" y="555" width="430" height="1050" rx="44" fill="#080b10" stroke="#536079" stroke-width="4"/>
+    <rect x="82" y="620" width="376" height="835" rx="22" fill="#252a3b"/>
+    <rect x="532" y="620" width="376" height="835" rx="22" fill="#252a3b"/>
+    <rect x="982" y="620" width="376" height="835" rx="22" fill="#252a3b"/>
+    <image x="82" y="620" width="376" height="835" preserveAspectRatio="xMidYMid slice" clip-path="url(#screen1)" xlink:href="../images/getting-started/launcher-ready.png"/>
+    <image x="532" y="620" width="376" height="835" preserveAspectRatio="xMidYMid slice" clip-path="url(#screen2)" xlink:href="../images/getting-started/startup-basic.png"/>
+    <image x="982" y="620" width="376" height="835" preserveAspectRatio="xMidYMid slice" clip-path="url(#screen3)" xlink:href="../images/getting-started/startup-advanced.png"/>
+    <rect x="206" y="582" width="128" height="14" rx="7" fill="#1b202b"/>
+    <rect x="656" y="582" width="128" height="14" rx="7" fill="#1b202b"/>
+    <rect x="1106" y="582" width="128" height="14" rx="7" fill="#1b202b"/>
+    <rect x="198" y="1500" width="144" height="9" rx="4" fill="#aab3c5" opacity=".7"/>
+    <rect x="648" y="1500" width="144" height="9" rx="4" fill="#aab3c5" opacity=".7"/>
+    <rect x="1098" y="1500" width="144" height="9" rx="4" fill="#aab3c5" opacity=".7"/>
+  </g>
+
+  <g class="ui">
+    <text x="72" y="1750" font-size="28" font-weight="700" fill="#b7d95b">01</text>
+    <text x="72" y="1805" font-size="42" font-weight="700" fill="#f2f4f7">A terminal for the whole phone.</text>
+    <text x="72" y="1860" font-size="28" fill="#b9c4d8">Commands, status, output, and keyboard in one focused surface.</text>
+
+    <text x="72" y="1975" font-size="28" font-weight="700" fill="#b7d95b">02</text>
+    <text x="72" y="2030" font-size="42" font-weight="700" fill="#f2f4f7">Start simple. Tune it later.</text>
+    <text x="72" y="2085" font-size="28" fill="#b9c4d8">A clear setup path that makes the launcher feel yours quickly.</text>
+
+    <text x="72" y="2200" font-size="28" font-weight="700" fill="#b7d95b">03</text>
+    <text x="72" y="2255" font-size="42" font-weight="700" fill="#f2f4f7">Power without the clutter.</text>
+    <text x="72" y="2310" font-size="28" fill="#b9c4d8">Optional drawers and integrations stay off until you want them.</text>
+  </g>
+
+  <rect x="72" y="2440" width="1296" height="2" fill="#536079"/>
+  <text x="72" y="2495" class="mono" font-size="22" fill="#8090aa">CONCEPT MOCKUP · FINAL EXPORTS: 1080 × 1920 PORTRAIT</text>
+</svg>
