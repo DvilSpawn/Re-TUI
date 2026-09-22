@@ -48,5 +48,6 @@ wrangler.toml
 docs/store-assets/firebase-alpha-testers.*
 docs/store-assets/build_promo_screenshots.py
 docs/store-assets/promo-screenshots/
+docs/play-store/
 local-packs/
 local-skins/
