@@ -11,7 +11,16 @@ import kotlin.math.min
 class OutlineEditText : AppCompatEditText {
     private val idleCursorPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private var idleCursorVisible = false
+    private var idleCursorDrawn = true
     private var idleCursorColor = 0xffffffff.toInt()
+    private val idleCursorBlink = object : Runnable {
+        override fun run() {
+            if (!idleCursorVisible || !isAttachedToWindow) return
+            idleCursorDrawn = !idleCursorDrawn
+            invalidate()
+            postDelayed(this, IDLE_CURSOR_BLINK_MS)
+        }
+    }
 
     constructor(context: Context) : super(context)
 
@@ -33,6 +42,11 @@ class OutlineEditText : AppCompatEditText {
             return
         }
         idleCursorVisible = visible
+        idleCursorDrawn = true
+        removeCallbacks(idleCursorBlink)
+        if (visible && isAttachedToWindow) {
+            postDelayed(idleCursorBlink, IDLE_CURSOR_BLINK_MS)
+        }
         invalidate()
     }
 
@@ -45,7 +59,7 @@ class OutlineEditText : AppCompatEditText {
     }
 
     private fun drawIdleCursor(canvas: Canvas) {
-        if (!idleCursorVisible || isCursorVisible) {
+        if (!idleCursorVisible || !idleCursorDrawn || isCursorVisible) {
             return
         }
 
@@ -66,5 +80,23 @@ class OutlineEditText : AppCompatEditText {
         idleCursorPaint.color = idleCursorColor
         idleCursorPaint.style = Paint.Style.FILL
         canvas.drawRect(x, top.toFloat(), x + width, bottom.toFloat(), idleCursorPaint)
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        if (idleCursorVisible) {
+            idleCursorDrawn = true
+            removeCallbacks(idleCursorBlink)
+            postDelayed(idleCursorBlink, IDLE_CURSOR_BLINK_MS)
+        }
+    }
+
+    override fun onDetachedFromWindow() {
+        removeCallbacks(idleCursorBlink)
+        super.onDetachedFromWindow()
+    }
+
+    private companion object {
+        const val IDLE_CURSOR_BLINK_MS = 500L
     }
 }

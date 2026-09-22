@@ -8,6 +8,8 @@ import android.view.View
 import android.widget.TextView
 import androidx.core.graphics.ColorUtils
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings
+import ohi.andre.consolelauncher.managers.settings.ThemeColorResolver
+import ohi.andre.consolelauncher.managers.xml.options.Theme
 
 object TuiWidgetDecorator {
     @JvmStatic
@@ -43,8 +45,8 @@ object TuiWidgetDecorator {
         }
 
         val context = widgetRoot.context
-        val widgetBgColor = AppearanceSettings.terminalWindowBackground()
-        val labelMaskColor = AppearanceSettings.terminalHeaderTabBackground()
+        val widgetBgColor = ThemeColorResolver.color(Theme.module_panel_background_color)
+        val labelMaskColor = ThemeColorResolver.color(Theme.module_header_background_color)
         val useDashed = AppearanceSettings.dashedBorders()
 
         val borderView = widgetRoot.findViewById<View>(borderViewId)
@@ -84,9 +86,8 @@ object TuiWidgetDecorator {
         borderColor: Int,
         target: FrameTarget = FrameTarget.NOTIFICATIONS
     ): Drawable {
-        val widgetBgColor = AppearanceSettings.terminalWindowBackground()
-        val rowBackground = ColorUtils.blendARGB(widgetBgColor, Color.BLACK, 0.22f)
-        val strokeColor = ColorUtils.setAlphaComponent(borderColor, 140)
+        val rowBackground = ThemeColorResolver.color(Theme.widget_row_background_color)
+        val strokeColor = ThemeColorResolver.withMaxAlpha(borderColor, 140)
 
         return TerminalBorderRuntime.panelDrawable(
             context,

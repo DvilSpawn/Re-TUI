@@ -15,12 +15,12 @@ import android.view.ViewGroup
 import android.widget.GridLayout
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.core.graphics.ColorUtils
 import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog.ConfirmAction
 import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog.ContentFactory
 import ohi.andre.consolelauncher.managers.BreachManager
 import ohi.andre.consolelauncher.managers.FocusFrictionStyle
 import ohi.andre.consolelauncher.managers.RetuiCreditManager
+import ohi.andre.consolelauncher.managers.settings.ThemeColorResolver
 import ohi.andre.consolelauncher.tuils.TerminalBorderRuntime
 import ohi.andre.consolelauncher.tuils.FrameTarget
 import ohi.andre.consolelauncher.tuils.Tuils
@@ -136,7 +136,7 @@ object BreachDialog {
             )
             keypadPanel.background = TerminalBorderRuntime.panelDrawable(
                 context,
-                ColorUtils.setAlphaComponent(FocusFrictionStyle.buttonFill(), 45),
+                ThemeColorResolver.withMaxAlpha(FocusFrictionStyle.buttonFill(), 45),
                 FocusFrictionStyle.buttonText(),
                 1.4f,
                 0,
@@ -289,14 +289,14 @@ object BreachDialog {
 
         private fun styleCell(view: TextView, available: Boolean, used: Boolean) {
             val fill = when {
-                used -> ColorUtils.setAlphaComponent(FocusFrictionStyle.buttonFill(), 40)
+                used -> ThemeColorResolver.withMaxAlpha(FocusFrictionStyle.buttonFill(), 40)
                 available -> FocusFrictionStyle.buttonFill()
-                else -> ColorUtils.setAlphaComponent(FocusFrictionStyle.buttonFill(), 28)
+                else -> ThemeColorResolver.withMaxAlpha(FocusFrictionStyle.buttonFill(), 28)
             }
             val text = when {
-                used -> ColorUtils.setAlphaComponent(FocusFrictionStyle.bodyText(), 90)
+                used -> ThemeColorResolver.withMaxAlpha(FocusFrictionStyle.bodyText(), 90)
                 available -> FocusFrictionStyle.buttonText()
-                else -> ColorUtils.setAlphaComponent(FocusFrictionStyle.bodyText(), 150)
+                else -> ThemeColorResolver.withMaxAlpha(FocusFrictionStyle.bodyText(), 150)
             }
             view.setTextColor(text)
             view.setTypeface(Tuils.getTypeface(context), Typeface.BOLD)
@@ -326,7 +326,7 @@ object BreachDialog {
             )
             view.background = TerminalBorderRuntime.panelDrawable(
                 context,
-                ColorUtils.setAlphaComponent(FocusFrictionStyle.buttonFill(), 185),
+                ThemeColorResolver.withMaxAlpha(FocusFrictionStyle.buttonFill(), 185),
                 FocusFrictionStyle.buttonText(),
                 1.6f,
                 0,
@@ -440,7 +440,14 @@ object BreachDialog {
 
     private fun failFeedback(context: Context, root: View, after: () -> Unit) {
         FocusFrictionStyle.vibrate(context, longArrayOf(0L, 60L, 45L, 60L, 45L, 120L))
-        root.setBackgroundColor(ColorUtils.setAlphaComponent(Color.RED, 95))
+        root.setBackgroundColor(
+            ohi.andre.consolelauncher.managers.settings.ThemeColorResolver.withMaxAlpha(
+                ohi.andre.consolelauncher.managers.settings.ThemeColorResolver.color(
+                    ohi.andre.consolelauncher.managers.xml.options.Theme.error_text_color
+                ),
+                95
+            )
+        )
         ObjectAnimator.ofFloat(root, View.TRANSLATION_X, 0f, -14f, 14f, -9f, 9f, 0f)
             .setDuration(280L)
             .start()

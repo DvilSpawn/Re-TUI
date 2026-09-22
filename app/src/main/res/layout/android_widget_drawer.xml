@@ -131,7 +131,6 @@
         android:paddingEnd="12dp"
         android:paddingBottom="2dp"
         android:text="@string/ui_android_widget_drawer_widgets_0"
-        android:textColor="#A5D6A7"
         style="@style/Retui.Text.Body" />
 
     <TextView
@@ -146,7 +145,6 @@
         android:fontFamily="monospace"
         android:gravity="center"
         android:text="@string/ui_android_widget_drawer_x"
-        android:textColor="#A5D6A7"
         android:textSize="20sp" />
 
     <TextView
@@ -164,7 +162,6 @@
         android:paddingEnd="12dp"
         android:paddingBottom="2dp"
         android:text="@string/ui_android_widget_drawer_grid_4"
-        android:textColor="#A5D6A7"
         style="@style/Retui.Text.Control" />
 
 </RelativeLayout>

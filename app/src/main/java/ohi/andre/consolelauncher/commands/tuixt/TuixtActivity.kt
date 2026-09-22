@@ -6,6 +6,8 @@ import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.database.Cursor
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.net.Uri
 import android.provider.OpenableColumns
 import android.text.Editable
@@ -26,7 +28,6 @@ import ohi.andre.consolelauncher.LauncherActivity
 import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog.ConfirmAction
 import ohi.andre.consolelauncher.commands.tuixt.TuixtLayout.addFoldAwareHost
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.borderColor
-import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.clearModuleButtonBackgroundPreview
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.dp
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.rect
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleButton
@@ -49,6 +50,7 @@ import java.util.Locale
 import android.content.Intent
 import java.util.ArrayList
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings
+import ohi.andre.consolelauncher.managers.settings.ThemeColorResolver
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings.getInt
 import ohi.andre.consolelauncher.managers.SearchProviderManager
 import ohi.andre.consolelauncher.managers.status.AsciiAnimationManager
@@ -72,11 +74,13 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
     private var plainTextEditor: EditText? = null
     private var originalRawText: String? = null
     private var asciiSettingsMode = false
+    private val previewHandler = Handler(Looper.getMainLooper())
+    private val previewRunnable = Runnable { LauncherActivity.previewIfRunning() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         requestNoTitleIfFullscreen(this)
         super.onCreate(savedInstanceState)
-        clearModuleButtonBackgroundPreview()
+        ThemeColorResolver.clearPreview()
         overridePendingTransition(0, 0)
         applyFullscreen(this)
 
@@ -192,13 +196,17 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
                 }
             }
             if (saved) {
-                clearModuleButtonBackgroundPreview()
+                ThemeColorResolver.clearPreview()
                 Toast.makeText(this, getString(R.string.editor_tuixtactivity_changes_saved_previewing_launcher_8e180), Toast.LENGTH_SHORT)
                     .show()
                 LauncherActivity.preview(this)
-                if (xmlRoot == XMLPrefsRoot.THEME) {
-                    recreate()
-                }
+                styleScreen(this, screen)
+                stylePanel(this, root)
+                styleHeader(this, header)
+                styleInput(this, searchBox)
+                styleButton(this, btnCancel, false)
+                styleButton(this, btnSave, true)
+                adapter?.restyleVisibleControls(recyclerView)
             }
         })
         btnLayout.addView(btnSave)
@@ -207,9 +215,18 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
         root.addView(bottomBar)
 
         val refreshButtonTheme: () -> Unit = {
+            styleScreen(this, screen)
+            stylePanel(this, root)
+            styleHeader(this, header)
+            styleInput(this, searchBox)
+            bottomBar.setBackground(rect(this, surfaceColor(), borderColor(), 1.25f))
             styleButton(this, btnCancel, false)
             styleButton(this, btnSave, true)
             adapter?.restyleVisibleControls(recyclerView)
+            if (xmlRoot == XMLPrefsRoot.THEME) {
+                previewHandler.removeCallbacks(previewRunnable)
+                previewHandler.postDelayed(previewRunnable, THEME_PREVIEW_DELAY_MS)
+            }
         }
 
         // Load data
@@ -220,6 +237,7 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
                 break
             }
         }
+        if (xmlRoot == XMLPrefsRoot.THEME) ThemeColorResolver.clearPreview()
 
         if (asciiSettingsMode) {
             originalRows = buildAsciiSettingsRows()
@@ -258,6 +276,9 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
                 initialSection = onlySection
             )
             recyclerView!!.setAdapter(adapter)
+            if (xmlRoot == XMLPrefsRoot.THEME) {
+                root.addView(buildResetAdvancedThemeAction(), 0)
+            }
 
             searchBox.addTextChangedListener(object : TextWatcher {
                 override fun beforeTextChanged(
@@ -348,6 +369,27 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
         )
         params.setMargins(0, 0, 0, dp(this, 8f))
         container.addView(button, params)
+    }
+
+    private fun buildResetAdvancedThemeAction(): View {
+        val button = TextView(this)
+        button.text = getString(R.string.editor_tuixtactivity_reset_advanced_colors)
+        styleButton(this, button, false)
+        button.setOnClickListener {
+            TuixtDialog.showConfirm(
+                this,
+                getString(R.string.editor_tuixtactivity_reset_advanced_colors),
+                getString(R.string.editor_tuixtactivity_reset_advanced_colors_message),
+                getString(R.string.editor_tuixtactivity_reset),
+                getString(R.string.editor_tuixtactivity_keep_editing_ced7d),
+                ConfirmAction { adapter?.resetAdvancedThemeColors() }
+            )
+        }
+        button.layoutParams = LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        ).apply { bottomMargin = dp(this@TuixtActivity, 8f) }
+        return button
     }
 
     private fun buildAsciiSettingsRows(): MutableList<TuixtAdapter.SettingsRow> {
@@ -722,7 +764,7 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
 
     private fun attemptClose() {
         if (!hasUnsavedChanges()) {
-            clearModuleButtonBackgroundPreview()
+            discardThemePreview()
             setResult(BACK_PRESSED)
             finish()
             overridePendingTransition(0, 0)
@@ -736,7 +778,7 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
             getString(R.string.editor_tuixtactivity_discard_36fff),
             getString(R.string.editor_tuixtactivity_keep_editing_ced7d),
             ConfirmAction {
-                clearModuleButtonBackgroundPreview()
+                discardThemePreview()
                 setResult(BACK_PRESSED)
                 finish()
                 overridePendingTransition(0, 0)
@@ -744,8 +786,17 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
     }
 
     override fun onDestroy() {
-        clearModuleButtonBackgroundPreview()
+        previewHandler.removeCallbacks(previewRunnable)
+        val hadPreview = ThemeColorResolver.hasPreview()
+        ThemeColorResolver.clearPreview()
+        if (hadPreview) LauncherActivity.previewIfRunning()
         super.onDestroy()
+    }
+
+    private fun discardThemePreview() {
+        previewHandler.removeCallbacks(previewRunnable)
+        ThemeColorResolver.clearPreview()
+        LauncherActivity.previewIfRunning()
     }
 
     private fun hasUnsavedChanges(): Boolean {
@@ -769,5 +820,6 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
         const val SAVE_PRESSED: Int = 3
         private const val ASCII_TXT_REQUEST: Int = 11
         private const val ASCII_IMPORT_REQUEST: Int = 12
+        private const val THEME_PREVIEW_DELAY_MS = 180L
     }
 }

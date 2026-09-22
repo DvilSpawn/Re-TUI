@@ -24,7 +24,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="18dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="4dp"
+        android:layout_marginBottom="12dp"
         android:background="@drawable/apps_drawer_border"
         android:padding="2dp">
 
@@ -58,7 +58,6 @@
         android:paddingTop="2dp"
         android:paddingBottom="2dp"
         android:text="@string/ui_apps_drawer_applications_s"
-        android:textColor="#A5D6A7"
         style="@style/Retui.Text.Body"
         android:fontFamily="monospace" />
 
@@ -116,7 +115,6 @@
         android:paddingTop="2dp"
         android:paddingBottom="2dp"
         android:text="@string/ui_apps_drawer_total_0"
-        android:textColor="#A5D6A7"
         style="@style/Retui.Text.Control"
         android:fontFamily="monospace" />
 

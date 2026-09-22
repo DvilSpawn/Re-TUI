@@ -819,6 +819,15 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
             )
         }
 
+        @JvmStatic
+        fun previewIfRunning(): Boolean {
+            val launcher = instance ?: return false
+            launcher.window.decorView.post {
+                if (instance === launcher) launcher.refreshUiInPlace()
+            }
+            return true
+        }
+
         const val COMMAND_REQUEST_PERMISSION: Int = 10
         const val STARTING_PERMISSION: Int = 11
         const val COMMAND_SUGGESTION_REQUEST_PERMISSION: Int = 12

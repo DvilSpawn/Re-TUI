@@ -444,4 +444,7 @@
     <string name="wallpaper_solid">Solid color</string>
     <string name="wallpaper_hex_hint">#AARRGGBB</string>
     <string name="wallpaper_hex_invalid">Enter a valid #AARRGGBB or #RRGGBB value</string>
+    <string name="editor_tuixtactivity_reset_advanced_colors">Reset advanced colors to AUTO</string>
+    <string name="editor_tuixtactivity_reset_advanced_colors_message">All advanced color overrides will inherit from the core theme. Save to keep the reset.</string>
+    <string name="editor_tuixtactivity_reset">Reset</string>
 </resources>

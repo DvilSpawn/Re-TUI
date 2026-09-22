@@ -20,6 +20,7 @@ import ohi.andre.consolelauncher.managers.xml.options.Toolbar
 import ohi.andre.consolelauncher.managers.xml.options.Ui
 import ohi.andre.consolelauncher.managers.xml.options.SurfaceBorderOption
 import ohi.andre.consolelauncher.managers.settings.StatusRowResolver
+import ohi.andre.consolelauncher.managers.settings.ThemeColorResolver
 import ohi.andre.consolelauncher.tuils.Tuils
 import org.w3c.dom.Document
 import org.w3c.dom.Element
@@ -554,6 +555,21 @@ object XMLPrefsManager {
     }
 
     private fun themeSection(label: String): String = when {
+        Theme.entries.firstOrNull { it.label() == label }?.advanced == true -> when {
+            label.startsWith("ansi_") -> "Advanced — ANSI Palette"
+            label.startsWith("app_drawer_") -> "Advanced — App Drawer"
+            label.startsWith("module_") -> "Advanced — Modules"
+            label.startsWith("widget_") -> "Advanced — Widgets"
+            label.startsWith("workspace_") -> "Advanced — Workspaces"
+            label.startsWith("settings_") -> "Advanced — Settings"
+            label.startsWith("dialog_") || label.startsWith("overlay_") -> "Advanced — Dialogs And Overlays"
+            label.startsWith("button_") || label.startsWith("primary_button_") ||
+                label.startsWith("icon_button_") || label.startsWith("field_") ||
+                label.startsWith("list_") || label.startsWith("toggle_") ||
+                label.startsWith("slider_") || label.startsWith("chip_") ||
+                label.startsWith("tab_") -> "Advanced — Controls"
+            else -> "Advanced — Global States"
+        }
         label == "background_color" || label == "wallpaper_overlay_color" ||
             label == "settings_wallpaper_overlay_color" -> "Launcher"
         label.contains("_status_") || label.startsWith("battery_text_") ||
@@ -711,6 +727,7 @@ object XMLPrefsManager {
     }
 
     fun getColor(prefsSave: XMLPrefsSave): Int {
+        if (prefsSave is Theme) return ThemeColorResolver.color(prefsSave)
         if (prefsSave.parent() == null) return Int.Companion.MAX_VALUE
 
         var color: Int

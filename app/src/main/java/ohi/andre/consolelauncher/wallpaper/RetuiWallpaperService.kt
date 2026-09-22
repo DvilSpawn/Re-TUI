@@ -41,6 +41,15 @@ internal fun shouldRenderWallpaper(
 internal fun wallpaperFrameDelay(drawSucceeded: Boolean, normalDelayMs: Long): Long =
     if (drawSucceeded) normalDelayMs else maxOf(normalDelayMs, 1000L)
 
+internal fun shouldHandleWallpaperTouch(
+    visible: Boolean,
+    interactionEnabled: Boolean,
+    screenInteractive: Boolean,
+    keyguardLocked: Boolean,
+    touchEnabled: Boolean
+): Boolean = shouldRenderWallpaper(visible, interactionEnabled, screenInteractive, keyguardLocked) &&
+    (touchEnabled || keyguardLocked)
+
 class RetuiWallpaperService : WallpaperService() {
     override fun getResources(): android.content.res.Resources =
         ohi.andre.consolelauncher.localization.LanguagePacks.resources(super.getResources())
@@ -48,7 +57,9 @@ class RetuiWallpaperService : WallpaperService() {
     companion object {
         const val ACTION_REFRESH = "com.dvil.tui_renewed.action.REFRESH_WALLPAPER"
         const val ACTION_INTERACTION = "com.dvil.tui_renewed.action.WALLPAPER_INTERACTION"
+        const val ACTION_TOUCH_INTERACTION = "com.dvil.tui_renewed.action.WALLPAPER_TOUCH_INTERACTION"
         const val EXTRA_INTERACTION_ENABLED = "interaction_enabled"
+        const val EXTRA_TOUCH_ENABLED = "touch_enabled"
     }
 
     override fun onCreate() {
@@ -68,6 +79,7 @@ class RetuiWallpaperService : WallpaperService() {
         private var view: View = createView()
         private var visible = false
         private var interactionEnabled = false
+        private var touchEnabled = true
         private var fullRedrawPending = true
         private var receiverRegistered = false
         private var mediaReceiverRegistered = false
@@ -91,6 +103,10 @@ class RetuiWallpaperService : WallpaperService() {
                     ACTION_INTERACTION -> setInteractionEnabled(
                         intent.getBooleanExtra(EXTRA_INTERACTION_ENABLED, false)
                     )
+                    ACTION_TOUCH_INTERACTION -> {
+                        touchEnabled = intent.getBooleanExtra(EXTRA_TOUCH_ENABLED, true)
+                        updateTouchHandling()
+                    }
                 }
             }
         }
@@ -118,6 +134,7 @@ class RetuiWallpaperService : WallpaperService() {
                     addAction(Intent.ACTION_SCREEN_OFF)
                     addAction(ACTION_REFRESH)
                     addAction(ACTION_INTERACTION)
+                    addAction(ACTION_TOUCH_INTERACTION)
                 },
                 ContextCompat.RECEIVER_NOT_EXPORTED
             )
@@ -208,8 +225,12 @@ class RetuiWallpaperService : WallpaperService() {
             wallpaperPreview = isPreview
         )
 
-        private fun touchAllowed(): Boolean = shouldRenderWallpaper(
-            visible, interactionEnabled, powerManager.isInteractive, keyguardManager.isKeyguardLocked
+        private fun touchAllowed(): Boolean = shouldHandleWallpaperTouch(
+            visible,
+            interactionEnabled,
+            powerManager.isInteractive,
+            keyguardManager.isKeyguardLocked,
+            touchEnabled
         )
 
         private fun updateTouchHandling() {

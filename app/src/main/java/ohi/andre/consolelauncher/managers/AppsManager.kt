@@ -28,6 +28,7 @@ import ohi.andre.consolelauncher.MainManager
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.UIManager
 import ohi.andre.consolelauncher.commands.main.MainPack
+import ohi.andre.consolelauncher.managers.settings.AppearanceSettings
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsElement
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsList
@@ -269,7 +270,7 @@ class AppsManager(context: Context) : XMLPrefsElement {
                             val name = e.getNodeName()
                             if (name.contains(Tuils.SPACE)) {
                                 Tuils.sendOutput(
-                                    Color.RED,
+                                    AppearanceSettings.errorTextColor(),
                                     context,
                                     PATH + ": " + context.getString(R.string.output_groupspace) + ": " + name
                                 )
@@ -308,7 +309,7 @@ class AppsManager(context: Context) : XMLPrefsElement {
                                                 g.bgColor = Color.parseColor(c)
                                             } catch (e: Exception) {
                                                 Tuils.sendOutput(
-                                                    Color.RED,
+                                                    AppearanceSettings.errorTextColor(),
                                                     context,
                                                     PATH + ": " + context.getString(R.string.output_invalidcolor) + ": " + c
                                                 )
@@ -324,7 +325,7 @@ class AppsManager(context: Context) : XMLPrefsElement {
                                                     Color.parseColor(c)
                                             } catch (e: Exception) {
                                                 Tuils.sendOutput(
-                                                    Color.RED,
+                                                    AppearanceSettings.errorTextColor(),
                                                     context,
                                                     PATH + ": " + context.getString(R.string.output_invalidcolor) + ": " + c
                                                 )

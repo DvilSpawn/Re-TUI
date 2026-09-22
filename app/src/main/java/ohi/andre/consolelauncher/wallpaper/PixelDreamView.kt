@@ -8,12 +8,25 @@ import android.graphics.Paint
 import android.os.SystemClock
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewConfiguration
 import androidx.annotation.RequiresApi
 import kotlin.math.abs
-import kotlin.math.hypot
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sin
+import kotlin.math.sqrt
+
+internal fun movedBeyondTouchSlop(
+    downX: Float,
+    downY: Float,
+    x: Float,
+    y: Float,
+    touchSlop: Float
+): Boolean {
+    val dx = x - downX
+    val dy = y - downY
+    return dx * dx + dy * dy > touchSlop * touchSlop
+}
 
 /** Sparse Omarchy-style pixel field with touch-only ripples. */
 class PixelDreamView(context: Context) : View(context) {
@@ -32,6 +45,7 @@ class PixelDreamView(context: Context) : View(context) {
         private const val RIPPLE_LIFE_MS = 1200f
         private const val RIPPLE_FROM = 1.5f
         private const val RIPPLE_GROWTH = 5.5f
+        private const val MAX_RIPPLES = 2
         private val BAYER = intArrayOf(
             0, 32, 8, 40, 2, 34, 10, 42,
             48, 16, 56, 24, 50, 18, 58, 26,
@@ -45,12 +59,21 @@ class PixelDreamView(context: Context) : View(context) {
     }
 
     private data class Ripple(val x: Float, val y: Float, val born: Long, val charge: Float)
-    private data class Touch(val x: Float, val y: Float, val start: Long)
+    private data class ActiveRipple(
+        val x: Float,
+        val y: Float,
+        val radius: Float,
+        val innerSquared: Float,
+        val outerSquared: Float,
+        val strength: Float
+    )
+    private data class Touch(val downX: Float, val downY: Float, val start: Long, val dragged: Boolean = false)
 
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.FILL }
     private val noise = buildNoise(0x9ECE6A)
     private val jitter = buildJitter(0x0A1F14)
     private val ripples = ArrayDeque<Ripple>()
+    private val touchSlop = ViewConfiguration.get(context).scaledTouchSlop.toFloat()
     private val visualizerLevels = FloatArray(BANDS)
     private val visualizerTargets = FloatArray(BANDS)
     private var touch: Touch? = null
@@ -175,18 +198,24 @@ class PixelDreamView(context: Context) : View(context) {
         val now = SystemClock.uptimeMillis()
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> touch = Touch(event.x, event.y, now)
-            MotionEvent.ACTION_MOVE -> touch = touch?.copy(x = event.x, y = event.y)
+            MotionEvent.ACTION_MOVE -> touch?.let {
+                if (!it.dragged && movedBeyondTouchSlop(it.downX, it.downY, event.x, event.y, touchSlop)) {
+                    touch = it.copy(dragged = true)
+                }
+            }
             MotionEvent.ACTION_UP -> {
                 touch?.let {
-                    val held = ((now - it.start) / 1100f).coerceIn(0f, 1f)
-                    ripples.addLast(Ripple(event.x, event.y, now, held))
-                    while (ripples.size > 4) ripples.removeFirst()
+                    if (!it.dragged && !movedBeyondTouchSlop(it.downX, it.downY, event.x, event.y, touchSlop)) {
+                        val held = ((now - it.start) / 1100f).coerceIn(0f, 1f)
+                        ripples.addLast(Ripple(event.x, event.y, now, held))
+                        while (ripples.size > MAX_RIPPLES) ripples.removeFirst()
+                        invalidate()
+                    }
                 }
                 touch = null
             }
-            MotionEvent.ACTION_CANCEL -> touch = null
+            MotionEvent.ACTION_CANCEL, MotionEvent.ACTION_POINTER_DOWN -> touch = null
         }
-        invalidate()
         return true
     }
 
@@ -201,6 +230,7 @@ class PixelDreamView(context: Context) : View(context) {
         val cell = max(4f, min(0.88f * max(width - 48f, 1f), 896f) / 80f)
         val cols = (width / cell).toInt() + 1
         val rows = (height / cell).toInt() + 1
+        val activeRipples = activeRipples(now, cell)
         canvas.drawColor(backgroundColor)
 
         for (row in 0 until rows) {
@@ -229,7 +259,7 @@ class PixelDreamView(context: Context) : View(context) {
                     heat = spectrum * SPECTRUM_HEAT
                 }
 
-                val ripple = rippleAt(cx, cy, now, cell)
+                val ripple = if (activeRipples.isEmpty()) 0f else rippleAt(cx, cy, cell, activeRipples)
                 luminance += ripple
                 heat = max(heat, ripple)
 
@@ -251,17 +281,31 @@ class PixelDreamView(context: Context) : View(context) {
         if (isAttachedToWindow) postInvalidateDelayed(50L)
     }
 
-    private fun rippleAt(cx: Float, cy: Float, now: Long, cell: Float): Float {
-        var strongest = 0f
-        for (ripple in ripples) {
-            val age = ((now - ripple.born) / RIPPLE_LIFE_MS).coerceIn(0f, 1f)
-            if (age >= 1f) continue
-            val radius = cell * (RIPPLE_FROM + RIPPLE_GROWTH * ripple.charge) * (1f + age * 5f)
-            val distance = hypot(cx - ripple.x, cy - ripple.y)
-            val ring = (1f - abs(distance - radius) / (cell * 2.5f)).coerceIn(0f, 1f)
-            strongest = max(strongest, ring * (1f - age) * 0.9f)
-        }
+    private fun activeRipples(now: Long, cell: Float): List<ActiveRipple> {
         while (ripples.isNotEmpty() && (now - ripples.first().born) >= RIPPLE_LIFE_MS) ripples.removeFirst()
+        if (ripples.isEmpty()) return emptyList()
+
+        val ringWidth = cell * 2.5f
+        return ripples.mapNotNull { ripple ->
+            val age = ((now - ripple.born) / RIPPLE_LIFE_MS).coerceIn(0f, 1f)
+            if (age >= 1f) return@mapNotNull null
+            val radius = cell * (RIPPLE_FROM + RIPPLE_GROWTH * ripple.charge) * (1f + age * 5f)
+            val inner = max(0f, radius - ringWidth)
+            val outer = radius + ringWidth
+            ActiveRipple(ripple.x, ripple.y, radius, inner * inner, outer * outer, (1f - age) * 0.9f)
+        }
+    }
+
+    private fun rippleAt(cx: Float, cy: Float, cell: Float, activeRipples: List<ActiveRipple>): Float {
+        var strongest = 0f
+        for (ripple in activeRipples) {
+            val dx = cx - ripple.x
+            val dy = cy - ripple.y
+            val distanceSquared = dx * dx + dy * dy
+            if (distanceSquared < ripple.innerSquared || distanceSquared > ripple.outerSquared) continue
+            val ring = (1f - abs(sqrt(distanceSquared) - ripple.radius) / (cell * 2.5f)).coerceIn(0f, 1f)
+            strongest = max(strongest, ring * ripple.strength)
+        }
         return strongest
     }
 

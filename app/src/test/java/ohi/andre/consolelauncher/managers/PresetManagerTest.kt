@@ -218,6 +218,19 @@ class PresetManagerTest {
             .contains("<default_background_color value=\"#445566\""))
     }
 
+    @Test fun sanitizerRoundTripsAdvancedAutoAndRgbaColors() {
+        val theme = Files.createTempFile("advanced-theme", ".xml").toFile()
+        theme.writeText(
+            "<THEME><button_background_color value=\"auto\" />" +
+                "<dialog_panel_background_color value=\"#00000000\" /></THEME>"
+        )
+
+        val xml = PresetManager.sanitizeShareableXml(theme, XMLPrefsManager.XMLPrefsRoot.THEME)
+
+        assertTrue(xml.contains("<button_background_color value=\"auto\""))
+        assertTrue(xml.contains("<dialog_panel_background_color value=\"#00000000\""))
+    }
+
     @Test fun sanitizerRejectsDoctypeWithoutParserFeatureSupport() {
         val theme = Files.createTempFile("unsafe-theme", ".xml").toFile()
         theme.writeText("<!DOCTYPE THEME SYSTEM \"file:///tmp/nope\"><THEME />")

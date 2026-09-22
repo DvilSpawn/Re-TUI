@@ -9,6 +9,7 @@ import android.text.TextUtils
 import android.text.style.AbsoluteSizeSpan
 import android.text.style.ForegroundColorSpan
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
+import ohi.andre.consolelauncher.managers.settings.AppearanceSettings
 import ohi.andre.consolelauncher.managers.xml.options.Behavior
 import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.tuils.Tuils
@@ -61,7 +62,7 @@ class TimeManager(context: Context) {
                 formats[c] = currentFormat
                 list[c] = buildEntry(color, currentFormat)
             } catch (e: Exception) {
-                Tuils.sendOutput(Color.RED, context, context.getString(R.string.manager_timemanager_invalid_time_format_c3076, currentFormat))
+                Tuils.sendOutput(AppearanceSettings.errorTextColor(), context, context.getString(R.string.manager_timemanager_invalid_time_format_c3076, currentFormat))
                 if (c > 0) list[c] = list[0]
                 else list[c] = buildFallbackEntry()
             }
@@ -146,7 +147,7 @@ class TimeManager(context: Context) {
     private fun buildFallbackEntry(): FormatEntry {
         val segments: MutableList<FormatSegment?> = ArrayList<FormatSegment?>()
         segments.add(FormatSegment(SimpleDateFormat("HH:mm:ss", Locale.getDefault()), null))
-        return FormatEntry(Color.RED, segments)
+        return FormatEntry(AppearanceSettings.errorTextColor(), segments)
     }
 
     private fun get(index: Int, isStatus: Boolean): FormatEntry? {

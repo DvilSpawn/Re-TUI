@@ -15,7 +15,6 @@
         app:drawableTopCompat="@drawable/timer_24"
         android:drawablePadding="2dp"
         android:text="@string/ui_token_2db3fd2887"
-        android:textColor="#FFFFFF"
         style="@style/Retui.Text.Control"
         android:textStyle="bold"
         android:visibility="gone" />
@@ -33,7 +32,6 @@
         app:drawableTopCompat="@drawable/hourglass_24"
         android:drawablePadding="2dp"
         android:text="@string/ui_token_2db3fd2887"
-        android:textColor="#FFFFFF"
         style="@style/Retui.Text.Control"
         android:textStyle="bold"
         android:visibility="gone" />

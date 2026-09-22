@@ -14,7 +14,6 @@ import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.RelativeLayout
 import android.widget.TextView
-import androidx.core.graphics.ColorUtils
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.commands.main.MainPack
 import ohi.andre.consolelauncher.managers.AppsManager
@@ -24,6 +23,7 @@ import ohi.andre.consolelauncher.managers.settings.AppearanceSettings.moduleCorn
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings.terminalBorderColor
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings.terminalHeaderTabBackground
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings.terminalWindowBackground
+import ohi.andre.consolelauncher.managers.settings.ThemeColorResolver
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.tuils.TerminalBorderRuntime
@@ -81,14 +81,14 @@ class AppDrawerPaneManager(
         val mainPack = mainPackProvider() ?: return
         openSurface()
         val appsManager = mainPack.appsManager
-        val drawerColor = XMLPrefsManager.getColor(Theme.apps_drawer_text_color)
-        val borderColor = terminalBorderColor()
-        val backgroundColor = terminalWindowBackground()
-        val headerBackgroundColor = terminalHeaderTabBackground()
+        val drawerColor = ThemeColorResolver.color(Theme.app_drawer_panel_text_color)
+        val borderColor = ThemeColorResolver.color(Theme.app_drawer_panel_border_color)
+        val backgroundColor = ThemeColorResolver.color(Theme.app_drawer_panel_background_color)
+        val headerBackgroundColor = ThemeColorResolver.color(Theme.app_drawer_header_background_color)
 
         drawerRoot.setBackgroundColor(Color.TRANSPARENT)
-        header.setTextColor(drawerColor)
-        footer.setTextColor(drawerColor)
+        header.setTextColor(ThemeColorResolver.color(Theme.app_drawer_header_text_color))
+        footer.setTextColor(ThemeColorResolver.color(Theme.app_drawer_header_text_color))
         header.typeface = Tuils.getTypeface(context)
         header.setTypeface(header.typeface, Typeface.BOLD)
         footer.typeface = Tuils.getTypeface(context)
@@ -236,9 +236,9 @@ class AppDrawerPaneManager(
         tab.minimumWidth = 0
 
         val selected = (isAll && selectedGroup == null) || (groupName != null && groupName == selectedGroup)
-        val selectedColor = getSelectionColor(drawerColor, backgroundColor)
-        var foregroundColor = drawerColor
-        var tabBackgroundColor = backgroundColor
+        val selectedColor = ThemeColorResolver.color(Theme.app_drawer_selection_background_color)
+        var foregroundColor = ThemeColorResolver.color(Theme.app_drawer_group_text_color)
+        var tabBackgroundColor = ThemeColorResolver.color(Theme.app_drawer_group_background_color)
         if (groupName != null) {
             val group = findGroup(groupName)
             if (group != null) {
@@ -254,13 +254,17 @@ class AppDrawerPaneManager(
         tab.background = TerminalBorderRuntime.panelDrawable(
             context,
             if (selected) selectedColor else tabBackgroundColor,
-            borderColor,
+            if (selected) ThemeColorResolver.color(Theme.app_drawer_selection_border_color)
+            else ThemeColorResolver.color(Theme.app_drawer_group_border_color),
             1.5f,
             2,
             dashedBorders(),
             target = FrameTarget.APP_DRAWER
         )
-        tab.setTextColor(if (selected) backgroundColor else foregroundColor)
+        tab.setTextColor(
+            if (selected) ThemeColorResolver.color(Theme.app_drawer_selection_text_color)
+            else foregroundColor
+        )
         tab.alpha = 1f
         tab.setOnClickListener {
             selectedGroup = groupName
@@ -394,27 +398,24 @@ class AppDrawerPaneManager(
         backgroundColor: Int
     ) {
         val selected = letter != null && letter == selectedAlpha
-        tab.setTextColor(if (selected) backgroundColor else drawerColor)
-        val selectedColor = getSelectionColor(drawerColor, backgroundColor)
+        tab.setTextColor(
+            ThemeColorResolver.color(
+            if (selected) Theme.app_drawer_selection_text_color else Theme.app_drawer_group_text_color
+            )
+        )
+        val selectedColor = ThemeColorResolver.color(Theme.app_drawer_selection_background_color)
 
         tab.background = TerminalBorderRuntime.panelDrawable(
             context,
-            if (selected) selectedColor else backgroundColor,
-            borderColor,
+            if (selected) selectedColor else ThemeColorResolver.color(Theme.app_drawer_group_background_color),
+            ThemeColorResolver.color(
+                if (selected) Theme.app_drawer_selection_border_color else Theme.app_drawer_group_border_color
+            ),
             1.2f,
             2,
             dashedBorders(),
             target = FrameTarget.APP_DRAWER
         )
-    }
-
-    private fun getSelectionColor(drawerColor: Int, backgroundColor: Int): Int {
-        val hsv = FloatArray(3)
-        Color.colorToHSV(drawerColor, hsv)
-        hsv[1] = max(0f, hsv[1] * 0.55f)
-        hsv[2] = min(1f, 0.88f + (0.12f * hsv[2]))
-        val lightBase = Color.HSVToColor(hsv)
-        return ColorUtils.blendARGB(lightBase, backgroundColor, 0.18f)
     }
 
     private fun updateSelectedAlphaFromPosition(position: Int) {
@@ -437,9 +438,9 @@ class AppDrawerPaneManager(
         }
 
         selectedAlpha = letter
-        val drawerColor = XMLPrefsManager.getColor(Theme.apps_drawer_text_color)
-        val borderColor = terminalBorderColor()
-        val backgroundColor = terminalWindowBackground()
+        val drawerColor = ThemeColorResolver.color(Theme.app_drawer_panel_text_color)
+        val borderColor = ThemeColorResolver.color(Theme.app_drawer_panel_border_color)
+        val backgroundColor = ThemeColorResolver.color(Theme.app_drawer_panel_background_color)
         for (entry in alphaViews.entries) {
             val tab = entry.value ?: continue
             styleAlphaTab(tab, entry.key, drawerColor, borderColor, backgroundColor)
@@ -489,7 +490,7 @@ class AppDrawerPaneManager(
                 textView.setTextColor(color)
                 textView.textSize = 12f
                 textView.setTypeface(Tuils.getTypeface(context), Typeface.BOLD)
-                textView.setBackgroundColor(Color.TRANSPARENT)
+                textView.setBackgroundColor(ThemeColorResolver.color(Theme.app_drawer_row_background_color))
                 textView.text = "[${entry.title}]"
                 return textView
             }
@@ -501,10 +502,10 @@ class AppDrawerPaneManager(
                 Tuils.dpToPx(context, 6),
                 Tuils.dpToPx(context, 12)
             )
-            textView.setTextColor(color)
+            textView.setTextColor(ThemeColorResolver.color(Theme.app_drawer_row_text_color))
             textView.textSize = 16f
             textView.typeface = Tuils.getTypeface(context)
-            textView.setBackgroundColor(Color.TRANSPARENT)
+            textView.setBackgroundColor(ThemeColorResolver.color(Theme.app_drawer_row_background_color))
             textView.text = app.publicLabel
             return textView
         }

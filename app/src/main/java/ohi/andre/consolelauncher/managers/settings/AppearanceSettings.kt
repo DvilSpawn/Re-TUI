@@ -1,7 +1,6 @@
 package ohi.andre.consolelauncher.managers.settings
 
 import android.graphics.Color
-import androidx.core.graphics.ColorUtils
 import java.util.Locale
 import kotlin.math.min
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
@@ -31,16 +30,19 @@ object AppearanceSettings {
     fun fontFile(): String? = LauncherSettings.get(Ui.font_file)
 
     @JvmStatic
-    fun musicWidgetBorderColor(): Int = terminalBorderColor()
+    fun musicWidgetBorderColor(): Int = ThemeColorResolver.color(Theme.module_panel_border_color)
 
     @JvmStatic
-    fun musicWidgetTextColor(): Int = moduleNameTextColor()
+    fun musicWidgetTextColor(): Int = ThemeColorResolver.color(Theme.module_panel_text_color)
 
     @JvmStatic
-    fun notificationWidgetBorderColor(): Int = terminalBorderColor()
+    fun notificationWidgetBorderColor(): Int = ThemeColorResolver.color(Theme.module_panel_border_color)
 
     @JvmStatic
-    fun notificationWidgetTextColor(): Int = moduleNameTextColor()
+    fun notificationWidgetTextColor(): Int = ThemeColorResolver.color(Theme.module_panel_text_color)
+
+    @JvmStatic
+    fun errorTextColor(): Int = ThemeColorResolver.color(Theme.error_text_color)
 
     @JvmStatic
     fun terminalWindowBackground(): Int = LauncherSettings.getColor(Theme.terminal_window_background_color)
@@ -49,15 +51,15 @@ object AppearanceSettings {
     fun terminalHeaderBackground(): Int {
         val terminalBg = terminalWindowBackground()
         if (Color.alpha(terminalBg) > 0) {
-            return ColorUtils.setAlphaComponent(terminalBg, 255)
+            return terminalBg
         }
 
         val baseBg = LauncherSettings.getColor(Theme.background_color)
         if (Color.alpha(baseBg) > 0) {
-            return ColorUtils.setAlphaComponent(baseBg, 255)
+            return baseBg
         }
 
-        return Color.BLACK
+        return baseBg
     }
 
     @JvmStatic
@@ -87,13 +89,13 @@ object AppearanceSettings {
     fun unifiedStatusBorder(): Boolean = LauncherSettings.getBoolean(SurfaceBorderOption.unified_status_border)
 
     @JvmStatic
-    fun moduleButtonBackgroundColor(): Int = LauncherSettings.getColor(Theme.module_button_background_color)
+    fun moduleButtonBackgroundColor(): Int = ThemeColorResolver.color(Theme.module_action_background_color)
 
     @JvmStatic
-    fun moduleNameTextColor(): Int = LauncherSettings.getColor(Theme.module_text_color)
+    fun moduleNameTextColor(): Int = ThemeColorResolver.color(Theme.module_panel_text_color)
 
     @JvmStatic
-    fun moduleButtonBorderColor(): Int = terminalBorderColor()
+    fun moduleButtonBorderColor(): Int = ThemeColorResolver.color(Theme.module_action_border_color)
 
     @JvmStatic
     fun dashLength(): Int = LauncherSettings.getInt(Ui.dashed_border_dash_length)

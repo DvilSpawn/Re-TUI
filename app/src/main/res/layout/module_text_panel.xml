@@ -29,7 +29,6 @@
             android:layout_height="wrap_content"
             android:fontFamily="monospace"
             android:lineSpacingExtra="2dp"
-            android:textColor="#FFFFFF"
             style="@style/Retui.Text.Body" />
     </ScrollView>
 
@@ -50,7 +49,6 @@
         android:paddingEnd="12dp"
         android:paddingBottom="2dp"
         android:text="@string/ui_module_text_panel_module"
-        android:textColor="#FFFFFF"
         style="@style/Retui.Text.Body" />
 
     <TextView
@@ -64,6 +62,5 @@
         android:fontFamily="monospace"
         android:gravity="center"
         android:text="@string/ui_module_text_panel_x"
-        android:textColor="#FFFFFF"
         style="@style/Retui.Text.Body" />
 </RelativeLayout>

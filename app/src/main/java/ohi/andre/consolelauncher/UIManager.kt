@@ -87,7 +87,6 @@ import android.widget.TextView.OnEditorActionListener
 import android.widget.TextClock
 import android.widget.Toast
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.GestureDetectorCompat
 import androidx.core.widget.TextViewCompat
@@ -213,6 +212,7 @@ import ohi.andre.consolelauncher.tuils.interfaces.CommandExecuter
 import ohi.andre.consolelauncher.tuils.interfaces.OnRedirectionListener
 import ohi.andre.consolelauncher.tuils.interfaces.OnTextChanged
 import ohi.andre.consolelauncher.tuils.stuff.PolicyReceiver
+import ohi.andre.consolelauncher.wallpaper.RetuiWallpaperService
 import java.io.File
 import java.io.FileOutputStream
 import java.util.Arrays
@@ -254,6 +254,7 @@ import ohi.andre.consolelauncher.managers.settings.LauncherSettings
 import ohi.andre.consolelauncher.managers.settings.MusicSettings
 import ohi.andre.consolelauncher.managers.settings.NotificationSettings
 import ohi.andre.consolelauncher.managers.settings.StatusRowResolver
+import ohi.andre.consolelauncher.managers.settings.ThemeColorResolver
 import ohi.andre.consolelauncher.managers.termux.TermuxBridgeCache
 import ohi.andre.consolelauncher.managers.termux.TermuxAppManager
 import ohi.andre.consolelauncher.managers.xml.options.Notifications
@@ -1373,17 +1374,10 @@ class UIManager(
             outlineInput.setIdleCursorColor(XMLPrefsManager.getColor(Theme.cursor_color))
             outlineInput.setIdleCursorVisible(true)
         }
-        inputView.setOnClickListener(View.OnClickListener { v: View? ->
-            if (inputView is OutlineEditText) {
-                inputView.setIdleCursorVisible(false)
-            }
-            inputView.setCursorVisible(true)
-            inputView.setShowSoftInputOnFocus(true)
-            sendRetuiKeyboardTheme(inputView, "launcher")
-            inputView.requestFocus()
+        inputView.setOnClickListener {
+            activateTerminalInput(true)
             refreshStockSuggestions()
-            imm.showSoftInput(inputView, InputMethodManager.SHOW_IMPLICIT)
-        })
+        }
         applyRetuiKeyboardTheme(inputView, "launcher")
 
         Companion.applyBgRect(
@@ -1693,7 +1687,7 @@ class UIManager(
             button.setBackground(
                 TerminalBorderRuntime.customFrame(context, ColorDrawable(Color.TRANSPARENT), FrameTarget.TOOLBAR)
                     ?: CyberpunkIconFrameDrawable(
-                    ColorUtils.setAlphaComponent(terminalBorderColor(), 230),
+                    ThemeColorResolver.withMaxAlpha(terminalBorderColor(), 230),
                     Tuils.dpToPx(context, 1.6f),
                     Tuils.dpToPx(context, 9f),
                     Tuils.dpToPx(context, 9f)
@@ -2273,7 +2267,7 @@ class UIManager(
                 contentDescription = mContext.getString(description)
                 setColorFilter(terminalBorderColor())
                 background = TerminalBorderRuntime.panelDrawablePx(
-                    mContext, ColorUtils.setAlphaComponent(terminalHeaderBackground(), 224),
+                    mContext, ThemeColorResolver.withMaxAlpha(terminalHeaderBackground(), 224),
                     terminalBorderColor(), 1.5f,
                     max(genericBorderCornerRadius, Tuils.dpToPx(mContext, 6)).toFloat(), useDashed)
                 setOnClickListener { action() }
@@ -2358,7 +2352,7 @@ class UIManager(
         button.setTextColor(textColor)
         button.background = TerminalBorderRuntime.panelDrawablePx(
             mContext,
-            ColorUtils.setAlphaComponent(terminalHeaderBackground(), 224),
+            ThemeColorResolver.withMaxAlpha(terminalHeaderBackground(), 224),
             textColor,
             1.5f,
             max(genericBorderCornerRadius, Tuils.dpToPx(mContext, 6)).toFloat(),
@@ -3805,10 +3799,10 @@ class UIManager(
     }
 
     private fun styleTermuxWorkspace() {
-        val borderColor = terminalBorderColor()
-        val textColor = notificationWidgetTextColor()
-        val bgColor = terminalWindowBackground()
-        val labelBg = terminalHeaderTabBackground()
+        val borderColor = ThemeColorResolver.color(Theme.workspace_panel_border_color)
+        val textColor = ThemeColorResolver.color(Theme.workspace_panel_text_color)
+        val bgColor = ThemeColorResolver.color(Theme.workspace_panel_background_color)
+        val labelBg = ThemeColorResolver.color(Theme.workspace_header_background_color)
 
         termuxWorkspaceBorder?.setBackground(
             TerminalBorderRuntime.panelDrawable(
@@ -3850,8 +3844,8 @@ class UIManager(
         termuxWorkspaceOutputPanel?.setBackground(
             TerminalBorderRuntime.panelDrawable(
                 mContext!!,
-                ColorUtils.blendARGB(bgColor, Color.BLACK, 0.1f),
-                ColorUtils.setAlphaComponent(borderColor, 210),
+                ThemeColorResolver.color(Theme.workspace_output_background_color),
+                ThemeColorResolver.withMaxAlpha(borderColor, 210),
                 1.2f,
                 outputCornerRadius(),
                 dashedBorders(),
@@ -3872,8 +3866,8 @@ class UIManager(
         }
         termuxWorkspaceInput?.let { input ->
             input.setTypeface(Tuils.getTypeface(mContext))
-            input.setTextColor(textColor)
-            input.setHintTextColor(ColorUtils.setAlphaComponent(textColor, 150))
+            input.setTextColor(ThemeColorResolver.color(Theme.workspace_input_text_color))
+            input.setHintTextColor(ThemeColorResolver.withMaxAlpha(ThemeColorResolver.color(Theme.workspace_input_text_color), 150))
         }
         termuxWorkspaceSend?.let { send ->
             send.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
@@ -3882,8 +3876,8 @@ class UIManager(
         termuxWorkspaceInputGroup?.setBackground(
             TerminalBorderRuntime.panelDrawable(
                 mContext!!,
-                ColorUtils.blendARGB(bgColor, Color.BLACK, 0.16f),
-                ColorUtils.setAlphaComponent(borderColor, 180),
+                ThemeColorResolver.color(Theme.workspace_input_background_color),
+                ThemeColorResolver.withMaxAlpha(borderColor, 180),
                 1.2f,
                 outputCornerRadius(),
                 dashedBorders(),
@@ -3904,8 +3898,8 @@ class UIManager(
         button.setBackground(
             TerminalBorderRuntime.panelDrawable(
                 mContext!!,
-                Color.TRANSPARENT,
-                ColorUtils.setAlphaComponent(terminalBorderColor(), 190),
+                ThemeColorResolver.color(Theme.workspace_control_background_color),
+                ThemeColorResolver.withMaxAlpha(ThemeColorResolver.color(Theme.workspace_control_border_color), 190),
                 1f,
                 outputCornerRadius(),
                 dashedBorders(),
@@ -5382,8 +5376,8 @@ class UIManager(
             out.append(display)
             if (active) out.append('\u00A0')
             if (active) {
-                val activeBg = notificationWidgetTextColor()
-                val activeFg = if (ColorUtils.calculateLuminance(activeBg) > 0.45) Color.BLACK else Color.WHITE
+                val activeBg = ThemeColorResolver.color(Theme.selection_background_color)
+                val activeFg = ThemeColorResolver.color(Theme.selection_text_color)
                 out.setSpan(BackgroundColorSpan(activeBg), start, out.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                 out.setSpan(ForegroundColorSpan(activeFg), start, out.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                 out.setSpan(StyleSpan(Typeface.BOLD), start, out.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
@@ -5664,34 +5658,7 @@ class UIManager(
     }
 
     private fun termuxAnsiColor(index: Int, bright: Boolean, background: Boolean): Int {
-        val clean = index.coerceIn(0, 7)
-        val bg = terminalWindowBackground()
-        val fg = notificationWidgetTextColor()
-        val accent = terminalBorderColor()
-        if (background) {
-            val panel = ColorUtils.blendARGB(bg, accent, if (bright) 0.34f else 0.22f)
-            val active = ColorUtils.blendARGB(accent, fg, if (bright) 0.30f else 0.12f)
-            return when (clean) {
-                0 -> bg
-                1 -> ColorUtils.blendARGB(bg, Color.rgb(190, 62, 62), if (bright) 0.42f else 0.26f)
-                2 -> ColorUtils.blendARGB(bg, accent, if (bright) 0.42f else 0.28f)
-                3 -> ColorUtils.blendARGB(bg, fg, if (bright) 0.32f else 0.18f)
-                4 -> panel
-                5 -> ColorUtils.blendARGB(bg, accent, if (bright) 0.48f else 0.32f)
-                6 -> active
-                else -> ColorUtils.blendARGB(bg, fg, if (bright) 0.38f else 0.24f)
-            }
-        }
-        return when (clean) {
-            0 -> Color.BLACK
-            1 -> ColorUtils.blendARGB(fg, Color.rgb(255, 70, 70), if (bright) 0.55f else 0.34f)
-            2 -> ColorUtils.blendARGB(accent, fg, if (bright) 0.28f else 0.10f)
-            3 -> ColorUtils.blendARGB(fg, accent, if (bright) 0.42f else 0.24f)
-            4 -> ColorUtils.blendARGB(fg, accent, if (bright) 0.42f else 0.25f)
-            5 -> ColorUtils.blendARGB(accent, Color.rgb(220, 150, 255), if (bright) 0.36f else 0.20f)
-            6 -> ColorUtils.blendARGB(accent, fg, if (bright) 0.32f else 0.16f)
-            else -> fg
-        }
+        return ThemeColorResolver.ansi(index, bright)
     }
 
     private fun termuxAnsi256Color(code: Int, background: Boolean): Int {
@@ -5811,7 +5778,7 @@ class UIManager(
             moduleSuggestionsOriginalIndex = moduleSuggestionsOriginalParent!!.indexOfChild(moduleSuggestionsScroll)
             moduleSuggestionsOriginalParams = copyLayoutParams(moduleSuggestionsScroll!!.layoutParams)
         }
-        val stripBackground = ColorUtils.blendARGB(terminalWindowBackground(), Color.BLACK, 0.12f)
+        val stripBackground = ThemeColorResolver.color(Theme.chip_background_color)
         moduleSuggestionsScroll!!.setFocusable(false)
         Companion.applyBgRect(
             mContext!!,
@@ -5947,9 +5914,6 @@ class UIManager(
             mContext,
             button,
             selected,
-            moduleButtonBackgroundColor(),
-            moduleButtonBorderColor(),
-            moduleNameTextColor(),
             moduleCornerRadius(),
             dashedBorders()
         )
@@ -8720,7 +8684,7 @@ class UIManager(
 
                         Tuils.sendOutput(context, mContext.getString(R.string.surface_logged_to_ee37a, file.getAbsolutePath()))
                     } catch (e: Exception) {
-                        Tuils.sendOutput(Color.RED, context, e.toString())
+                        Tuils.sendOutput(ThemeColorResolver.color(Theme.error_text_color), context, e.toString())
                     }
                 } else if (action == ACTION_CLEAR) {
                     mTerminalAdapter!!.clear()
@@ -9063,16 +9027,28 @@ class UIManager(
             rootView,
             { if (mTerminalAdapter != null) mTerminalAdapter!!.mainPack else mainPack },
             { if (!duoLayoutActive) closeKeyboard() },
-            { if (!duoLayoutActive) hideLauncherChromeForSurface() },
-            { restoreLauncherChromeAfterSurface() }
+            {
+                setWallpaperTouchEnabled(false)
+                if (!duoLayoutActive) hideLauncherChromeForSurface()
+            },
+            {
+                restoreLauncherChromeAfterSurface()
+                restoreWallpaperTouchAfterDrawerClose()
+            }
         )
         if (mContext is Activity) {
             androidWidgetDrawerManager = AndroidWidgetDrawerManager(
                 mContext as Activity,
                 rootView,
                 { if (!duoLayoutActive) closeKeyboard() },
-                { if (!duoLayoutActive) hideLauncherChromeForSurface() },
-                { restoreLauncherChromeAfterSurface() }
+                {
+                    setWallpaperTouchEnabled(false)
+                    if (!duoLayoutActive) hideLauncherChromeForSurface()
+                },
+                {
+                    restoreLauncherChromeAfterSurface()
+                    restoreWallpaperTouchAfterDrawerClose()
+                }
             )
         }
 
@@ -9445,7 +9421,7 @@ class UIManager(
 
                             override fun onGlobalLayout() {
                                 if (notesView.getLineCount() > notesMaxLines && linesBefore <= notesMaxLines) {
-                                    Tuils.sendOutput(Color.RED, context, R.string.note_max_reached)
+                                    Tuils.sendOutput(ThemeColorResolver.color(Theme.error_text_color), context, R.string.note_max_reached)
                                 }
 
                                 linesBefore = notesView.getLineCount()
@@ -9773,14 +9749,14 @@ class UIManager(
         hackOverlayBasePaddingRight = overlay.getPaddingRight()
         hackOverlayBasePaddingBottom = overlay.getPaddingBottom()
 
-        val accent = moduleNameTextColor()
-        val surface = ColorUtils.setAlphaComponent(terminalWindowBackground(), 238)
-        val border = ColorUtils.setAlphaComponent(accent, 220)
+        val accent = ThemeColorResolver.color(Theme.overlay_panel_text_color)
+        val surface = ThemeColorResolver.color(Theme.overlay_panel_background_color)
+        val border = ThemeColorResolver.color(Theme.overlay_panel_border_color)
 
         overlay.setBackground(
             TerminalBorderRuntime.panelDrawable(
                 mContext!!,
-                ColorUtils.setAlphaComponent(surface, 232),
+                ThemeColorResolver.withMaxAlpha(surface, 232),
                 border,
                 1.5f,
                 0,
@@ -9800,10 +9776,10 @@ class UIManager(
             return
         }
 
-        val borderColor = terminalBorderColor()
-        val textColor = notificationWidgetTextColor()
-        val bgColor = terminalWindowBackground()
-        val labelBg = terminalHeaderTabBackground()
+        val borderColor = ThemeColorResolver.color(Theme.workspace_panel_border_color)
+        val textColor = ThemeColorResolver.color(Theme.workspace_panel_text_color)
+        val bgColor = ThemeColorResolver.color(Theme.workspace_panel_background_color)
+        val labelBg = ThemeColorResolver.color(Theme.workspace_header_background_color)
 
         if (termuxWindowBorder != null) {
             termuxWindowBorder!!.setBackground(
@@ -9850,8 +9826,8 @@ class UIManager(
             termuxOutputPanel!!.setBackground(
                 TerminalBorderRuntime.panelDrawable(
                     mContext!!,
-                    ColorUtils.blendARGB(bgColor, Color.BLACK, 0.1f),
-                    ColorUtils.setAlphaComponent(borderColor, 210),
+                    ThemeColorResolver.color(Theme.workspace_output_background_color),
+                    ThemeColorResolver.withMaxAlpha(borderColor, 210),
                     1.2f,
                     outputCornerRadius(),
                     dashedBorders(),
@@ -9875,16 +9851,16 @@ class UIManager(
 
         if (termuxInput != null) {
             termuxInput!!.setTypeface(Tuils.getTypeface(mContext))
-            termuxInput!!.setTextColor(textColor)
-            termuxInput!!.setHintTextColor(ColorUtils.setAlphaComponent(textColor, 150))
+            termuxInput!!.setTextColor(ThemeColorResolver.color(Theme.workspace_input_text_color))
+            termuxInput!!.setHintTextColor(ThemeColorResolver.withMaxAlpha(ThemeColorResolver.color(Theme.workspace_input_text_color), 150))
         }
 
         if (termuxInputGroup != null) {
             termuxInputGroup!!.setBackground(
                 TerminalBorderRuntime.panelDrawable(
                     mContext!!,
-                    ColorUtils.blendARGB(bgColor, Color.BLACK, 0.16f),
-                    ColorUtils.setAlphaComponent(borderColor, 180),
+                    ThemeColorResolver.color(Theme.workspace_input_background_color),
+                    ThemeColorResolver.withMaxAlpha(borderColor, 180),
                     1.2f,
                     outputCornerRadius(),
                     dashedBorders(),
@@ -10024,10 +10000,10 @@ class UIManager(
             return
         }
 
-        val borderColor = terminalBorderColor()
-        val textColor = notificationWidgetTextColor()
-        val bgColor = terminalWindowBackground()
-        val labelBg = terminalHeaderTabBackground()
+        val borderColor = ThemeColorResolver.color(Theme.workspace_panel_border_color)
+        val textColor = ThemeColorResolver.color(Theme.workspace_panel_text_color)
+        val bgColor = ThemeColorResolver.color(Theme.workspace_panel_background_color)
+        val labelBg = ThemeColorResolver.color(Theme.workspace_header_background_color)
 
         if (fileWindowBorder != null) {
             fileWindowBorder!!.setBackground(
@@ -10071,15 +10047,15 @@ class UIManager(
         }
         if (fileInput != null) {
             fileInput!!.setTypeface(Tuils.getTypeface(mContext))
-            fileInput!!.setTextColor(textColor)
-            fileInput!!.setHintTextColor(ColorUtils.setAlphaComponent(textColor, 150))
+            fileInput!!.setTextColor(ThemeColorResolver.color(Theme.workspace_input_text_color))
+            fileInput!!.setHintTextColor(ThemeColorResolver.withMaxAlpha(ThemeColorResolver.color(Theme.workspace_input_text_color), 150))
         }
         if (fileInputGroup != null) {
             fileInputGroup!!.setBackground(
                 TerminalBorderRuntime.panelDrawable(
                     mContext!!,
-                    ColorUtils.blendARGB(bgColor, Color.BLACK, 0.16f),
-                    ColorUtils.setAlphaComponent(borderColor, 180),
+                    ThemeColorResolver.color(Theme.workspace_input_background_color),
+                    ThemeColorResolver.withMaxAlpha(borderColor, 180),
                     1.2f,
                     outputCornerRadius(),
                     dashedBorders(),
@@ -10098,10 +10074,10 @@ class UIManager(
 
     private fun styleCalculatorSurface() {
         val overlay = calculatorOverlay ?: return
-        val borderColor = terminalBorderColor()
-        val textColor = notificationWidgetTextColor()
-        val bgColor = terminalWindowBackground()
-        val labelBg = terminalHeaderTabBackground()
+        val borderColor = ThemeColorResolver.color(Theme.workspace_panel_border_color)
+        val textColor = ThemeColorResolver.color(Theme.workspace_panel_text_color)
+        val bgColor = ThemeColorResolver.color(Theme.workspace_panel_background_color)
+        val labelBg = ThemeColorResolver.color(Theme.workspace_header_background_color)
         val typeface = Tuils.getTypeface(mContext)
 
         overlay.setBackgroundColor(Color.TRANSPARENT)
@@ -10125,8 +10101,8 @@ class UIManager(
 
         calculatorDisplayPanel?.background = TerminalBorderRuntime.panelDrawable(
             mContext,
-            ColorUtils.blendARGB(bgColor, Color.BLACK, 0.1f),
-            ColorUtils.setAlphaComponent(borderColor, 210),
+            ThemeColorResolver.color(Theme.workspace_output_background_color),
+            ThemeColorResolver.withMaxAlpha(borderColor, 210),
             1.2f,
             outputCornerRadius(),
             dashedBorders(),
@@ -10175,10 +10151,10 @@ class UIManager(
             return
         }
 
-        val borderColor = terminalBorderColor()
-        val textColor = notificationWidgetTextColor()
-        val bgColor = terminalWindowBackground()
-        val labelBg = terminalHeaderTabBackground()
+        val borderColor = ThemeColorResolver.color(Theme.workspace_panel_border_color)
+        val textColor = ThemeColorResolver.color(Theme.workspace_panel_text_color)
+        val bgColor = ThemeColorResolver.color(Theme.workspace_panel_background_color)
+        val labelBg = ThemeColorResolver.color(Theme.workspace_header_background_color)
         val typeface = Tuils.getTypeface(mContext)
 
         podcastWindowBorder?.setBackground(
@@ -10211,8 +10187,8 @@ class UIManager(
         podcastContentPanel?.setBackground(
             TerminalBorderRuntime.panelDrawable(
                 mContext,
-                ColorUtils.blendARGB(bgColor, Color.BLACK, 0.1f),
-                ColorUtils.setAlphaComponent(borderColor, 210),
+                ThemeColorResolver.color(Theme.workspace_output_background_color),
+                ThemeColorResolver.withMaxAlpha(borderColor, 210),
                 1.2f,
                 outputCornerRadius(),
                 dashedBorders(),
@@ -10230,8 +10206,8 @@ class UIManager(
         podcastNowPlaying?.setBackground(
             TerminalBorderRuntime.panelDrawable(
                 mContext,
-                ColorUtils.blendARGB(bgColor, Color.BLACK, 0.16f),
-                ColorUtils.setAlphaComponent(borderColor, 180),
+                ThemeColorResolver.color(Theme.workspace_input_background_color),
+                ThemeColorResolver.withMaxAlpha(borderColor, 180),
                 1.2f,
                 outputCornerRadius(),
                 dashedBorders(),
@@ -10243,7 +10219,7 @@ class UIManager(
             TerminalBorderRuntime.panelDrawable(
                 mContext,
                 Color.TRANSPARENT,
-                ColorUtils.setAlphaComponent(borderColor, 160),
+                ThemeColorResolver.withMaxAlpha(borderColor, 160),
                 1f,
                 moduleCornerRadius(),
                 dashedBorders(),
@@ -10267,11 +10243,11 @@ class UIManager(
         podcastSeek?.progressTintList = ColorStateList.valueOf(textColor)
         podcastSeek?.thumbTintList = ColorStateList.valueOf(textColor)
         podcastSeek?.progressBackgroundTintList =
-            ColorStateList.valueOf(ColorUtils.setAlphaComponent(borderColor, 110))
+            ColorStateList.valueOf(ThemeColorResolver.color(Theme.slider_track_color))
         podcastPlayerSeek?.progressTintList = ColorStateList.valueOf(textColor)
         podcastPlayerSeek?.thumbTintList = ColorStateList.valueOf(textColor)
         podcastPlayerSeek?.progressBackgroundTintList =
-            ColorStateList.valueOf(ColorUtils.setAlphaComponent(borderColor, 110))
+            ColorStateList.valueOf(ThemeColorResolver.color(Theme.slider_track_color))
     }
 
     private fun setupPodcastPaneActions() {
@@ -10331,7 +10307,7 @@ class UIManager(
         val landscape = podcastLandscapePresentation()
         // Landscape keeps home chrome in-place — dim so status/dock don't bleed through the sides.
         overlay.setBackgroundColor(
-            if (landscape) ColorUtils.setAlphaComponent(Color.BLACK, 210) else Color.TRANSPARENT
+            if (landscape) ThemeColorResolver.color(Theme.overlay_scrim_color) else Color.TRANSPARENT
         )
         val safeMargin = Tuils.dpToPx(mContext, if (landscape) 8 else 16)
         val maxHeight = max(1, availableHeight - safeMargin)
@@ -11670,7 +11646,7 @@ class UIManager(
             else TerminalBorderRuntime.panelDrawable(
                 mContext,
                 Color.TRANSPARENT,
-                ColorUtils.setAlphaComponent(terminalBorderColor(), 150),
+                ThemeColorResolver.withMaxAlpha(terminalBorderColor(), 150),
                 1f,
                 moduleCornerRadius(),
                 dashedBorders(),
@@ -11809,7 +11785,7 @@ class UIManager(
         if (subMeta.isNotBlank()) {
             val sub = TextView(mContext)
             sub.text = subMeta
-            sub.setTextColor(ColorUtils.setAlphaComponent(notificationWidgetTextColor(), 190))
+            sub.setTextColor(ThemeColorResolver.withMaxAlpha(notificationWidgetTextColor(), 190))
             sub.setTypeface(Tuils.getTypeface(mContext))
             sub.textSize = PODCAST_TEXT_SMALL
             sub.maxLines = 1
@@ -12117,7 +12093,7 @@ class UIManager(
 
         val show = TextView(mContext)
         show.text = displayShow?.title ?: mContext.getString(R.string.surface_pick_a_show_to_start_listening_7b228)
-        show.setTextColor(ColorUtils.setAlphaComponent(notificationWidgetTextColor(), 210))
+        show.setTextColor(ThemeColorResolver.withMaxAlpha(notificationWidgetTextColor(), 210))
         show.setTypeface(Tuils.getTypeface(mContext))
         show.textSize = PODCAST_TEXT_MEDIUM
         podcastPlayerShowName = show
@@ -15282,7 +15258,7 @@ class UIManager(
                 title.setTextColor(XMLPrefsManager.getColor(Theme.input_text_color))
             } else {
                 title.setText(mContext.getString(R.string.surface_focus_mode_active_f4757))
-                title.setTextColor(Color.RED)
+                title.setTextColor(ThemeColorResolver.color(Theme.error_text_color))
             }
             taskDisplay.setText(mContext.getString(R.string.surface_task_c6f9a, task))
             countdown.setText(ClockManager.formatDuration(remaining))
@@ -15295,14 +15271,13 @@ class UIManager(
         val taskDisplay = overlay.findViewById<TextView>(R.id.pomodoro_task_display)
         val terminateBtn = overlay.findViewById<Button>(R.id.pomodoro_terminate)
 
-        val color = XMLPrefsManager.getColor(Theme.input_text_color)
-        val bgColor: Int
-        val textBgColor = ColorUtils.setAlphaComponent(Color.BLACK, 160)
-        if (XMLPrefsManager.getBoolean(Ui.system_wallpaper)) {
-            bgColor = XMLPrefsManager.getColor(Theme.wallpaper_overlay_color)
+        val color = ThemeColorResolver.color(Theme.overlay_panel_text_color)
+        val bgColor = if (XMLPrefsManager.getBoolean(Ui.system_wallpaper)) {
+            XMLPrefsManager.getColor(Theme.wallpaper_overlay_color)
         } else {
-            bgColor = XMLPrefsManager.getColor(Theme.background_color)
+            XMLPrefsManager.getColor(Theme.background_color)
         }
+        val textBgColor = ThemeColorResolver.color(Theme.overlay_panel_background_color)
         overlay.setBackgroundColor(bgColor)
 
         title.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
@@ -15675,7 +15650,7 @@ class UIManager(
             try {
                 Tuils.sendPendingIntent(mContext, notification.pendingIntent)
             } catch (e: CanceledException) {
-                Tuils.sendOutput(Color.RED, mContext, e.toString())
+                Tuils.sendOutput(ThemeColorResolver.color(Theme.error_text_color), mContext, e.toString())
             }
         })
     }
@@ -16122,7 +16097,7 @@ class UIManager(
             expand.invoke(sbservice)
             return true
         } catch (e: Exception) {
-            Tuils.sendOutput(Color.RED, mContext, e.toString())
+            Tuils.sendOutput(ThemeColorResolver.color(Theme.error_text_color), mContext, e.toString())
             return false
         }
     }
@@ -16151,6 +16126,20 @@ class UIManager(
         appDrawerPaneManager?.hide()
         androidWidgetDrawerManager?.show()
         scheduleTypefaceRefreshes()
+    }
+
+    private fun setWallpaperTouchEnabled(enabled: Boolean) {
+        mContext.sendBroadcast(
+            Intent(RetuiWallpaperService.ACTION_TOUCH_INTERACTION)
+                .setPackage(mContext.packageName)
+                .putExtra(RetuiWallpaperService.EXTRA_TOUCH_ENABLED, enabled)
+        )
+    }
+
+    private fun restoreWallpaperTouchAfterDrawerClose() {
+        if (!isAppsDrawerOpen && !isAndroidWidgetDrawerOpen) {
+            setWallpaperTouchEnabled(true)
+        }
     }
 
     fun refreshAndroidWidgetDrawerGrid() {

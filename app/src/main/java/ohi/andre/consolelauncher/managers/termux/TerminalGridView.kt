@@ -8,7 +8,7 @@ import android.graphics.Typeface
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.View
-import androidx.core.graphics.ColorUtils
+import ohi.andre.consolelauncher.managers.settings.ThemeColorResolver
 import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.min
@@ -67,7 +67,7 @@ class TerminalGridView @JvmOverloads constructor(
         terminalForeground = foreground
         terminalBackground = background
         terminalAccent = accent
-        reverseBackground = ColorUtils.blendARGB(background, foreground, 0.36f)
+        reverseBackground = ThemeColorResolver.blendPreservingAlpha(background, foreground, 0.36f)
         clearCells()
         invalidate()
     }
@@ -364,31 +364,7 @@ class TerminalGridView @JvmOverloads constructor(
     }
 
     private fun ansiColor(index: Int, bright: Boolean, background: Boolean): Int {
-        val clean = index.coerceIn(0, 7)
-        if (background) {
-            val panel = ColorUtils.blendARGB(terminalBackground, terminalAccent, if (bright) 0.34f else 0.22f)
-            val active = ColorUtils.blendARGB(terminalAccent, terminalForeground, if (bright) 0.30f else 0.12f)
-            return when (clean) {
-                0 -> terminalBackground
-                1 -> ColorUtils.blendARGB(terminalBackground, Color.rgb(190, 62, 62), if (bright) 0.42f else 0.26f)
-                2 -> ColorUtils.blendARGB(terminalBackground, terminalAccent, if (bright) 0.42f else 0.28f)
-                3 -> ColorUtils.blendARGB(terminalBackground, terminalForeground, if (bright) 0.32f else 0.18f)
-                4 -> panel
-                5 -> ColorUtils.blendARGB(terminalBackground, terminalAccent, if (bright) 0.48f else 0.32f)
-                6 -> active
-                else -> ColorUtils.blendARGB(terminalBackground, terminalForeground, if (bright) 0.38f else 0.24f)
-            }
-        }
-        return when (clean) {
-            0 -> Color.BLACK
-            1 -> ColorUtils.blendARGB(terminalForeground, Color.rgb(255, 70, 70), if (bright) 0.55f else 0.34f)
-            2 -> ColorUtils.blendARGB(terminalAccent, terminalForeground, if (bright) 0.28f else 0.10f)
-            3 -> ColorUtils.blendARGB(terminalForeground, terminalAccent, if (bright) 0.42f else 0.24f)
-            4 -> ColorUtils.blendARGB(terminalForeground, terminalAccent, if (bright) 0.42f else 0.25f)
-            5 -> ColorUtils.blendARGB(terminalAccent, Color.rgb(220, 150, 255), if (bright) 0.36f else 0.20f)
-            6 -> ColorUtils.blendARGB(terminalAccent, terminalForeground, if (bright) 0.32f else 0.16f)
-            else -> terminalForeground
-        }
+        return ThemeColorResolver.ansi(index, bright)
     }
 
     private fun ansi256Color(code: Int, background: Boolean): Int {

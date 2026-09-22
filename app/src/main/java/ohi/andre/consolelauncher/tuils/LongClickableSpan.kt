@@ -105,7 +105,7 @@ class LongClickableSpan(
                 try {
                     v.getContext().startActivity(i)
                 } catch (e: Exception) {
-                    Tuils.sendOutput(Color.RED, v.getContext(), e.toString())
+                    Tuils.sendOutput(ohi.andre.consolelauncher.managers.settings.AppearanceSettings.errorTextColor(), v.getContext(), e.toString())
                 }
             } else if (o is NotificationService.Notification) {
                 val n = o

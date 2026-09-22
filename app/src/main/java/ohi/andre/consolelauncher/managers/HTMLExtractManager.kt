@@ -6,6 +6,7 @@ import android.net.Uri
 import android.text.TextUtils
 import ohi.andre.consolelauncher.BuildConfig
 import ohi.andre.consolelauncher.UIManager
+import ohi.andre.consolelauncher.managers.settings.AppearanceSettings
 import ohi.andre.consolelauncher.managers.xml.options.Behavior
 import ohi.andre.consolelauncher.managers.xml.options.Theme
 import okhttp3.Request
@@ -625,9 +626,9 @@ class HTMLExtractManager(context: Context, client: OkHttpClient) {
                     arrayOf<String?>(id.toString())
             )
             if (output != null) {
-                if (output.length > 0) Tuils.sendOutput(Color.RED, context, output)
+                if (output.length > 0) Tuils.sendOutput(AppearanceSettings.errorTextColor(), context, output)
                 else {
-                    Tuils.sendOutput(Color.RED, context, R.string.id_notfound)
+                    Tuils.sendOutput(AppearanceSettings.errorTextColor(), context, R.string.id_notfound)
                 }
             }
         }
@@ -648,9 +649,9 @@ class HTMLExtractManager(context: Context, client: OkHttpClient) {
                 false
             )
             if (output != null) {
-                if (output.length > 0) Tuils.sendOutput(Color.RED, context, output)
+                if (output.length > 0) Tuils.sendOutput(AppearanceSettings.errorTextColor(), context, output)
                 else {
-                    Tuils.sendOutput(Color.RED, context, R.string.id_notfound)
+                    Tuils.sendOutput(AppearanceSettings.errorTextColor(), context, R.string.id_notfound)
                 }
             } else {
                 this.value = newExpression
@@ -698,8 +699,8 @@ class HTMLExtractManager(context: Context, client: OkHttpClient) {
                     arrayOf<String?>(id.toString(), path)
                 )
                 if (output != null) {
-                    if (output.length > 0) Tuils.sendOutput(Color.RED, context, output)
-                    else Tuils.sendOutput(Color.RED, context, R.string.output_error)
+                    if (output.length > 0) Tuils.sendOutput(AppearanceSettings.errorTextColor(), context, output)
+                    else Tuils.sendOutput(AppearanceSettings.errorTextColor(), context, R.string.output_error)
                     return null
                 }
 

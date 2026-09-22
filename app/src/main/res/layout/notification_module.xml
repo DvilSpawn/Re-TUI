@@ -56,7 +56,6 @@
                     android:fontFamily="monospace"
                     android:gravity="center"
                     android:text="@string/ui_notification_module_previous"
-                    android:textColor="#FFFFFF"
                     style="@style/Retui.Text.Body" />
 
                 <TextView
@@ -70,7 +69,6 @@
                     android:fontFamily="monospace"
                     android:gravity="center"
                     android:text="@string/ui_notification_module_clear"
-                    android:textColor="#FFFFFF"
                     style="@style/Retui.Text.Body" />
 
                 <TextView
@@ -84,7 +82,6 @@
                     android:fontFamily="monospace"
                     android:gravity="center"
                     android:text="@string/ui_notification_module_next"
-                    android:textColor="#FFFFFF"
                     style="@style/Retui.Text.Body" />
         </LinearLayout>
     </LinearLayout>
@@ -106,7 +103,6 @@
         android:paddingEnd="12dp"
         android:paddingBottom="2dp"
         android:text="@string/ui_notification_module_notifications"
-        android:textColor="#FFFFFF"
         style="@style/Retui.Text.Body" />
 
     <ImageButton
@@ -134,7 +130,6 @@
         android:fontFamily="monospace"
         android:gravity="center"
         android:text="@string/ui_notification_module_x"
-        android:textColor="#FFFFFF"
         style="@style/Retui.Text.Body" />
 
 </RelativeLayout>

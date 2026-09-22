@@ -8,7 +8,7 @@ import android.graphics.Path
 import android.graphics.PixelFormat
 import android.graphics.RectF
 import android.graphics.drawable.Drawable
-import androidx.core.graphics.ColorUtils
+import ohi.andre.consolelauncher.managers.settings.ThemeColorResolver
 import kotlin.math.max
 import kotlin.math.min
 
@@ -41,7 +41,7 @@ class TerminalBorderDrawable(
     private val detailPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
         strokeWidth = max(1f, strokeWidthPx / 2f)
-        color = ColorUtils.setAlphaComponent(borderColor, 95)
+        color = ThemeColorResolver.withMaxAlpha(borderColor, 95)
     }
     private val cutoutPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL

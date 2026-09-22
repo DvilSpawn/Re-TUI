@@ -88,17 +88,17 @@ class PrivateIOReceiver(activity: Activity?, outputable: Outputable, inputable: 
                 val id: Int = intent.getIntExtra(ID, 0)
 
                 if (b == null) {
-                    Tuils.sendOutput(Color.RED, context, "The bundle is null")
+                    Tuils.sendOutput(ohi.andre.consolelauncher.managers.settings.AppearanceSettings.errorTextColor(), context, "The bundle is null")
                     return
                 }
 
                 if (ps == null || ps.size == 0) {
-                    Tuils.sendOutput(Color.RED, context, "No remote inputs")
+                    Tuils.sendOutput(ohi.andre.consolelauncher.managers.settings.AppearanceSettings.errorTextColor(), context, "No remote inputs")
                     return
                 }
 
                 if (pi == null) {
-                    Tuils.sendOutput(Color.RED, context, "The pending intent couldn\'t be found")
+                    Tuils.sendOutput(ohi.andre.consolelauncher.managers.settings.AppearanceSettings.errorTextColor(), context, "The pending intent couldn\'t be found")
                     return
                 }
 
@@ -133,7 +133,7 @@ class PrivateIOReceiver(activity: Activity?, outputable: Outputable, inputable: 
                     Log.i("RetuiReplyDebug", "pendingIntent send completed")
                 } catch (e: PendingIntent.CanceledException) {
                     Log.e("RetuiReplyDebug", "pendingIntent send failed", e)
-                    Tuils.sendOutput(Color.RED, context, e.toString())
+                    Tuils.sendOutput(ohi.andre.consolelauncher.managers.settings.AppearanceSettings.errorTextColor(), context, e.toString())
                     Tuils.log(e)
                 }
             }

@@ -6,7 +6,7 @@ import android.graphics.Paint
 import android.graphics.PixelFormat
 import android.graphics.RectF
 import android.graphics.drawable.Drawable
-import androidx.core.graphics.ColorUtils
+import ohi.andre.consolelauncher.managers.settings.ThemeColorResolver
 import kotlin.math.max
 
 class CyberpunkBackdropDrawable(
@@ -20,17 +20,17 @@ class CyberpunkBackdropDrawable(
     }
     private val gridPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
-        color = ColorUtils.setAlphaComponent(accentColor, 70)
+        color = ThemeColorResolver.withMaxAlpha(accentColor, 70)
     }
     private val railPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
         strokeWidth = 1.2f
-        color = ColorUtils.setAlphaComponent(accentColor, 115)
+        color = ThemeColorResolver.withMaxAlpha(accentColor, 115)
     }
     private val warningPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
         strokeWidth = 2.4f
-        color = ColorUtils.setAlphaComponent(warningColor, 130)
+        color = ThemeColorResolver.withMaxAlpha(warningColor, 130)
     }
 
     override fun draw(canvas: Canvas) {

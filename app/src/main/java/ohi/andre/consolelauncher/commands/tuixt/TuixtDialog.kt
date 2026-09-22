@@ -33,6 +33,8 @@ import ohi.andre.consolelauncher.tuils.LauncherSystemUi.applyFullscreen
 import ohi.andre.consolelauncher.tuils.Tuils
 import java.util.Locale
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi
+import ohi.andre.consolelauncher.managers.settings.ThemeColorResolver
+import ohi.andre.consolelauncher.managers.xml.options.Theme
 
 object TuixtDialog {
     data class FormField(
@@ -220,7 +222,7 @@ object TuixtDialog {
             }
 
             val error = TextView(context)
-            error.setTextColor(Color.RED)
+            error.setTextColor(ThemeColorResolver.color(Theme.error_text_color))
             error.setTypeface(Tuils.getTypeface(context))
             error.textSize = 12f
             error.visibility = View.GONE

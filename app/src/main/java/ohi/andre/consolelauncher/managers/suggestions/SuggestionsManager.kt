@@ -43,6 +43,7 @@ import ohi.andre.consolelauncher.commands.main.specific.ParamCommand
 import ohi.andre.consolelauncher.commands.main.specific.PermanentSuggestionCommand
 import ohi.andre.consolelauncher.managers.AliasManager
 import ohi.andre.consolelauncher.managers.AppsManager
+import ohi.andre.consolelauncher.managers.settings.AppearanceSettings
 import ohi.andre.consolelauncher.managers.AppsManager.Group.GroupLaunchInfo
 import ohi.andre.consolelauncher.managers.AppsManager.LaunchInfo
 import ohi.andre.consolelauncher.managers.ContactManager.Contact
@@ -341,7 +342,7 @@ class SuggestionsManager(
             val type = m.group(1).toInt()
 
             if (type >= indexes.size) {
-                Tuils.sendOutput(Color.RED, pack.context, "Invalid suggestion type: " + type)
+                Tuils.sendOutput(AppearanceSettings.errorTextColor(), pack.context, "Invalid suggestion type: " + type)
 
                 indexes = null
                 counts = null
@@ -369,7 +370,7 @@ class SuggestionsManager(
             val type = m.group(1).toInt()
 
             if (type >= noInputIndexes.size) {
-                Tuils.sendOutput(Color.RED, pack.context, "Invalid suggestion type: " + type)
+                Tuils.sendOutput(AppearanceSettings.errorTextColor(), pack.context, "Invalid suggestion type: " + type)
 
                 noInputIndexes = null
                 noInputCounts = null

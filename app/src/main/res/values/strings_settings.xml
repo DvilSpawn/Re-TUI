@@ -513,6 +513,7 @@
     <string name="setting_theme_terminal_header_background_color_description" formatted="false">"Terminal header tab background color"</string>
     <!-- Theme.kt: terminal_header_border_color -->
     <string name="setting_theme_terminal_header_border_color_description" formatted="false">"Terminal header tab border color"</string>
+    <string name="setting_theme_advanced_color_description" formatted="false">"Advanced semantic color. AUTO inherits from the active core theme."</string>
     <!-- Toolbar.kt: show_toolbar -->
     <string name="setting_toolbar_show_toolbar_description" formatted="false">"If false, the toolbar is hidden"</string>
     <!-- Toolbar.kt: hide_toolbar_no_input -->

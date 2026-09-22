@@ -9,6 +9,8 @@ import android.widget.TextView
 import androidx.core.widget.ImageViewCompat
 import androidx.core.widget.TextViewCompat
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings
+import ohi.andre.consolelauncher.managers.settings.ThemeColorResolver
+import ohi.andre.consolelauncher.managers.xml.options.Theme
 
 /** Shared visual contract for docked Launcher pills. */
 object LauncherPillStyle {
@@ -22,15 +24,15 @@ object LauncherPillStyle {
         }
         pill.background = TerminalBorderRuntime.panelDrawable(
             context,
-            AppearanceSettings.terminalHeaderTabBackground(),
-            AppearanceSettings.terminalHeaderTabBorderColor(),
+            ThemeColorResolver.color(Theme.icon_button_background_color),
+            ThemeColorResolver.color(Theme.icon_button_border_color),
             1.4f,
             3,
             AppearanceSettings.dashedBorders(),
             target = FrameTarget.CONTROLS
         )
 
-        val contentColor = ColorStateList.valueOf(AppearanceSettings.moduleNameTextColor())
+        val contentColor = ColorStateList.valueOf(ThemeColorResolver.color(Theme.icon_button_color))
         when (pill) {
             is TextView -> {
                 pill.setTextColor(contentColor)

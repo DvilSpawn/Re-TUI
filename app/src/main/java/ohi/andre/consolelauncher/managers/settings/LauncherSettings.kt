@@ -58,6 +58,7 @@ object LauncherSettings {
     @JvmStatic
     fun getColor(value: XMLPrefsSave?): Int {
         if (value == null) return Color.WHITE
+        if (value is Theme) return ThemeColorResolver.color(value)
         val color = try {
             Color.parseColor(getOrDefault(value))
         } catch (e: Exception) {

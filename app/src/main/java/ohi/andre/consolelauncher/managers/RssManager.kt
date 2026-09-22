@@ -13,6 +13,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import ohi.andre.consolelauncher.MainManager
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.UIManager
+import ohi.andre.consolelauncher.managers.settings.AppearanceSettings
 import ohi.andre.consolelauncher.managers.modules.ModuleManager
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager.IdValue
@@ -350,7 +351,7 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
                             rg.regex = Pattern.compile(rg.literalPattern)
                         } catch (e: Exception) {
                             Tuils.sendOutput(
-                                Color.RED,
+                                AppearanceSettings.errorTextColor(),
                                 context,
                                 context.getString(R.string.invalid_regex) + Tuils.SPACE + rg.literalPattern
                             )
@@ -881,7 +882,7 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
                 super.run()
 
                 if (!Tuils.hasInternetAccess()) {
-                    if (force) Tuils.sendOutput(Color.RED, context, R.string.no_internet)
+                    if (force) Tuils.sendOutput(AppearanceSettings.errorTextColor(), context, R.string.no_internet)
                     return
                 }
 
@@ -943,7 +944,7 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
 
                             if (bytes == 0L) {
                                 Tuils.sendOutput(
-                                    Color.RED,
+                                    AppearanceSettings.errorTextColor(),
                                     context,
                                     context.getString(R.string.rss_invalid_empty) + Tuils.SPACE + feed.id
                                 )
@@ -995,7 +996,7 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
         val list = entryNodes(doc, feed)
         if (list.getLength() == 0) {
             Tuils.sendOutput(
-                Color.RED,
+                AppearanceSettings.errorTextColor(),
                 context,
                 context.getString(R.string.rss_no_entries) + Tuils.SPACE + feed.id
             )
@@ -1019,7 +1020,7 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
                     d = parseFeedDate(feed, date)
                 } catch (e: Exception) {
                     Tuils.sendOutput(
-                        Color.RED,
+                        AppearanceSettings.errorTextColor(),
                         context,
                         rssFile.getName() + ": " + context.getString(R.string.rss_invalid_timeformat)
                     )
@@ -1042,7 +1043,7 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
 
         if (time && !foundOneDateAtLeast) {
             Tuils.sendOutput(
-                Color.RED,
+                AppearanceSettings.errorTextColor(),
                 context,
                 context.getString(R.string.rss_invalid_date) + Tuils.SPACE + Tuils.toPlanString(dateTags(feed), "/")
             )

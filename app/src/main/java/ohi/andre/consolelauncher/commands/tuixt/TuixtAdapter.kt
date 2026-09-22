@@ -20,7 +20,6 @@ import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.accentColor
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.borderColor
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.dp
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.rect
-import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.previewModuleButtonBackground
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleButton
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleChoice
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleColorPreview
@@ -45,6 +44,7 @@ import ohi.andre.consolelauncher.managers.ToolbarShortcutManager
 import ohi.andre.consolelauncher.managers.xml.options.Toolbar
 import ohi.andre.consolelauncher.managers.xml.options.Ui
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings
+import ohi.andre.consolelauncher.managers.settings.ThemeColorResolver
 import ohi.andre.consolelauncher.managers.settings.StatusRowResolver
 
 internal class SectionAccordionState(initial: String? = null) {
@@ -122,6 +122,16 @@ class TuixtAdapter(
 
     fun hasPendingChanges(): Boolean {
         return !pendingChanges.isEmpty()
+    }
+
+    fun resetAdvancedThemeColors() {
+        Theme.entries.filter { it.advanced }.forEach { role ->
+            pendingChanges[role] = "auto"
+            ThemeColorResolver.preview(role, "auto")
+        }
+        expandedColorItem = null
+        notifyDataSetChanged()
+        onButtonThemePreviewChanged()
     }
 
     override fun getItemViewType(position: Int): Int =
@@ -250,13 +260,18 @@ class TuixtAdapter(
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
                 override fun afterTextChanged(s: Editable) {
                     val `val` = s.toString()
-                    if (`val`.matches("^#[0-9A-Fa-f]{6,8}$".toRegex()) ||
-                        item.type() == XMLPrefsSave.AUTO_COLOR && `val`.equals("auto", true)
-                    ) {
+                    val valid = if (item is Theme) ThemeColorResolver.isValid(item, `val`)
+                    else `val`.matches("^#(?:[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$".toRegex())
+                    if (valid) {
                         updateColorPreview(settingHolder.colorPreview, item, `val`)
                         pendingChanges.put(item, `val`)
-                        if (item === Theme.module_button_background_color && `val`.startsWith("#")) {
-                            previewModuleButtonBackground(Color.parseColor(`val`))
+                        if (item is Theme && ThemeColorResolver.preview(item, `val`)) {
+                            onButtonThemePreviewChanged()
+                        }
+                    } else {
+                        pendingChanges.remove(item)
+                        if (item is Theme) {
+                            ThemeColorResolver.clearPreview(item)
                             onButtonThemePreviewChanged()
                         }
                     }
@@ -307,12 +322,25 @@ class TuixtAdapter(
     fun restyleVisibleControls(recyclerView: RecyclerView?) {
         if (recyclerView == null) return
         for (index in 0 until recyclerView.childCount) {
-            val holder = recyclerView.getChildViewHolder(recyclerView.getChildAt(index)) as? ViewHolder
-                ?: continue
+            val holder = recyclerView.getChildViewHolder(recyclerView.getChildAt(index))
+            if (holder is SectionHolder) {
+                holder.title.setTextColor(accentColor())
+                holder.title.background = rect(holder.itemView.context, surfaceColor(), borderColor(), 1.25f)
+                continue
+            }
+            if (holder !is ViewHolder) continue
             val position = holder.bindingAdapterPosition
             if (position == RecyclerView.NO_POSITION) continue
             val item = visibleRows[position].item ?: continue
             val context = holder.itemView.context
+            holder.itemView.background = rect(context, surfaceColor(), borderColor(), 1.25f)
+            holder.title.setTextColor(accentColor())
+            holder.description.setTextColor(textColor())
+            if (holder.input.visibility == View.VISIBLE) styleInput(context, holder.input)
+            if (holder.colorPreview.visibility == View.VISIBLE) {
+                updateColorPreview(holder.colorPreview, item, getCurrentValue(item))
+            }
+            if (holder.colorPicker.childCount > 0) styleColorPicker(holder.colorPicker.getChildAt(0))
             if (holder.toggle.visibility == View.VISIBLE) {
                 styleToggle(context, holder.toggle, getCurrentValue(item).toBoolean())
             }
@@ -443,14 +471,16 @@ class TuixtAdapter(
 
     private fun updateColorPreview(view: View, item: XMLPrefsSave, hex: String?) {
         try {
-            val color = if (hex.equals("auto", true)) inheritedColor() else Color.parseColor(hex)
+            val color = if (hex.equals("auto", true)) inheritedColor(item) else Color.parseColor(hex)
             styleColorPreview(view.getContext(), view, color)
         } catch (e: Exception) {
-            styleColorPreview(view.getContext(), view, inheritedColor())
+            styleColorPreview(view.getContext(), view, inheritedColor(item))
         }
     }
 
-    private fun inheritedColor(): Int = AppearanceSettings.terminalBorderColor()
+    private fun inheritedColor(item: XMLPrefsSave): Int =
+        if (item is Theme) ThemeColorResolver.inheritedColor(item)
+        else AppearanceSettings.terminalBorderColor()
 
     private fun getCurrentValue(item: XMLPrefsSave?): String? {
         return if (pendingChanges.containsKey(item)) pendingChanges.get(item) else get(item)
@@ -470,9 +500,9 @@ class TuixtAdapter(
 
         var initialColor: Int
         try {
-            initialColor = if (currentHex.equals("auto", true)) inheritedColor() else Color.parseColor(currentHex)
+            initialColor = if (currentHex.equals("auto", true)) inheritedColor(item) else Color.parseColor(currentHex)
         } catch (e: Exception) {
-            initialColor = Color.WHITE
+            initialColor = inheritedColor(item)
         }
 
         val hsv = FloatArray(3)
@@ -517,8 +547,9 @@ class TuixtAdapter(
             autoButton.setOnClickListener {
                 holder.input.setText("auto")
                 holder.input.setSelection(4)
-                preview.setBackgroundColor(inheritedColor())
-                hexText.text = holder.itemView.context.getString(R.string.editor_tuixtadapter_auto_a4b6e, String.format("#%08X", inheritedColor()))
+                val inherited = inheritedColor(item)
+                preview.setBackgroundColor(inherited)
+                hexText.text = holder.itemView.context.getString(R.string.editor_tuixtadapter_auto_a4b6e, String.format("#%08X", inherited))
             }
         } else {
             autoButton.visibility = View.GONE

@@ -19,7 +19,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import android.widget.Toast
-import androidx.core.graphics.ColorUtils
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import ohi.andre.consolelauncher.commands.tuixt.TuixtLayout.addFoldAwareHost
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.dp
@@ -30,6 +29,7 @@ import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.stylePanel
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.textColor
 import ohi.andre.consolelauncher.managers.AliasManager
 import ohi.andre.consolelauncher.managers.PinnedShortcutManager
+import ohi.andre.consolelauncher.managers.settings.ThemeColorResolver
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi.applyFullscreen
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi.requestNoTitleIfFullscreen
@@ -134,7 +134,7 @@ class PinShortcutConfirmActivity : ohi.andre.consolelauncher.localization.Locali
         root.addView(title, blockParams())
 
         val source = terminalText(getString(R.string.editor_pinshortcutconfirmactivity_from_ad3b5, shortcutInfo!!.getPackage()))
-        source.setTextColor(ColorUtils.setAlphaComponent(textColor(), 190))
+        source.setTextColor(ThemeColorResolver.withMaxAlpha(textColor(), 190))
         root.addView(source, blockParams())
 
         aliasInput = EditText(this)

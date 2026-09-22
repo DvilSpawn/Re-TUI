@@ -3,7 +3,6 @@ package ohi.andre.consolelauncher.commands.tuixt
 import ohi.andre.consolelauncher.R
 import android.content.Context
 import android.content.res.ColorStateList
-import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.ClipDrawable
@@ -16,9 +15,8 @@ import android.view.View
 import android.widget.EditText
 import android.widget.SeekBar
 import android.widget.TextView
-import androidx.core.graphics.ColorUtils
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings
-import ohi.andre.consolelauncher.managers.settings.LauncherSettings
+import ohi.andre.consolelauncher.managers.settings.ThemeColorResolver
 import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.tuils.CrtOverlayDrawable
 import ohi.andre.consolelauncher.tuils.FrameManager
@@ -27,22 +25,20 @@ import ohi.andre.consolelauncher.tuils.FrameTarget
 import ohi.andre.consolelauncher.tuils.Tuils
 
 object TuixtTheme {
-    private var moduleButtonBackgroundPreview: Int? = null
+    @JvmStatic
+    fun borderColor(): Int = ThemeColorResolver.color(Theme.settings_panel_border_color)
 
     @JvmStatic
-    fun borderColor(): Int = AppearanceSettings.terminalHeaderTabBorderColor()
+    fun accentColor(): Int = ThemeColorResolver.color(Theme.settings_header_text_color)
 
     @JvmStatic
-    fun accentColor(): Int = AppearanceSettings.moduleNameTextColor()
+    fun textColor(): Int = ThemeColorResolver.color(Theme.settings_panel_text_color)
 
     @JvmStatic
-    fun textColor(): Int = LauncherSettings.getColor(Theme.output_text_color)
+    fun surfaceColor(): Int = ThemeColorResolver.color(Theme.settings_panel_background_color)
 
     @JvmStatic
-    fun surfaceColor(): Int = AppearanceSettings.terminalHeaderTabBackground()
-
-    @JvmStatic
-    fun overlayColor(): Int = LauncherSettings.getColor(Theme.settings_wallpaper_overlay_color)
+    fun overlayColor(): Int = ThemeColorResolver.color(Theme.settings_screen_color)
 
     @JvmStatic
     fun styleScreen(context: Context, view: View) {
@@ -61,12 +57,18 @@ object TuixtTheme {
 
     @JvmStatic
     fun styleDialogPanel(context: Context, view: View) {
-        view.background = framedRect(context, FrameTarget.DIALOG, surfaceColor(), borderColor(), 1.5f)
+        view.background = framedRect(
+            context,
+            FrameTarget.DIALOG,
+            ThemeColorResolver.color(Theme.dialog_panel_background_color),
+            ThemeColorResolver.color(Theme.dialog_panel_border_color),
+            1.5f
+        )
     }
 
     @JvmStatic
     fun styleHeader(context: Context, view: TextView) {
-        view.setTextColor(accentColor())
+        view.setTextColor(ThemeColorResolver.color(Theme.settings_header_text_color))
         view.setTypeface(Tuils.getTypeface(context), Typeface.BOLD)
         view.textSize = 15f
         view.gravity = Gravity.CENTER
@@ -74,8 +76,8 @@ object TuixtTheme {
         view.background = framedRect(
             context,
             FrameTarget.HEADER,
-            surfaceColor(),
-            borderColor(),
+            ThemeColorResolver.color(Theme.settings_header_background_color),
+            ThemeColorResolver.color(Theme.settings_header_border_color),
             1.5f,
             AppearanceSettings.headerCornerRadius()
         )
@@ -84,7 +86,11 @@ object TuixtTheme {
     @JvmStatic
     fun styleListItem(context: Context, view: TextView, selected: Boolean) {
         markSelection(view, selected)
-        view.setTextColor(if (selected) selectionColor() else AppearanceSettings.moduleNameTextColor())
+        view.setTextColor(
+            ThemeColorResolver.color(
+                if (selected) Theme.list_selected_text_color else Theme.settings_row_text_color
+            )
+        )
         view.setTypeface(Tuils.getTypeface(context), Typeface.BOLD)
         view.textSize = 15f
         view.gravity = Gravity.CENTER_VERTICAL
@@ -93,22 +99,26 @@ object TuixtTheme {
         view.background = framedRect(
             context,
             if (selected) FrameTarget.LIST_ITEM_SELECTED else FrameTarget.LIST_ITEM,
-            moduleButtonBackgroundColor(),
-            if (selected) selectionColor() else AppearanceSettings.moduleButtonBorderColor(),
+            ThemeColorResolver.color(
+                if (selected) Theme.list_selected_background_color else Theme.settings_row_background_color
+            ),
+            ThemeColorResolver.color(
+                if (selected) Theme.list_selected_border_color else Theme.settings_row_border_color
+            ),
             if (selected) 2f else 1.25f
         )
     }
 
     @JvmStatic
     fun styleInput(context: Context, view: EditText) {
-        val surface = surfaceColor()
-        val text = if (ColorUtils.calculateLuminance(surface) > 0.45) Color.BLACK else Color.WHITE
+        val surface = ThemeColorResolver.color(Theme.settings_input_background_color)
+        val text = ThemeColorResolver.color(Theme.settings_input_text_color)
         view.setTextColor(text)
-        view.setHintTextColor(ColorUtils.setAlphaComponent(text, 150))
-        view.highlightColor = ColorUtils.setAlphaComponent(ColorUtils.blendARGB(surface, text, 0.5f), 255)
+        view.setHintTextColor(ThemeColorResolver.color(Theme.settings_input_hint_color))
+        view.highlightColor = ThemeColorResolver.color(Theme.selection_background_color)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             view.textCursorDrawable = GradientDrawable().apply {
-                setColor(Color.rgb(255 - Color.red(surface), 255 - Color.green(surface), 255 - Color.blue(surface)))
+                setColor(ThemeColorResolver.color(Theme.focus_color))
                 setSize(dp(context, 2f), dp(context, 24f))
             }
         }
@@ -120,14 +130,28 @@ object TuixtTheme {
             context,
             FrameTarget.UI_INPUT,
             surface,
-            borderColor(),
+            ThemeColorResolver.color(Theme.settings_input_border_color),
             1.25f
         )
     }
 
     @JvmStatic
     fun styleButton(context: Context, view: TextView, primary: Boolean) {
-        view.setTextColor(if (primary) selectionColor() else AppearanceSettings.moduleNameTextColor())
+        val backgroundRole = if (primary) Theme.primary_button_background_color else Theme.button_background_color
+        val textRole = if (primary) Theme.primary_button_text_color else Theme.button_text_color
+        val borderRole = if (primary) Theme.primary_button_border_color else Theme.button_border_color
+        view.setTextColor(ColorStateList(
+            arrayOf(
+                intArrayOf(-android.R.attr.state_enabled),
+                intArrayOf(android.R.attr.state_pressed),
+                intArrayOf()
+            ),
+            intArrayOf(
+                ThemeColorResolver.color(Theme.disabled_text_color),
+                ThemeColorResolver.color(Theme.pressed_text_color),
+                ThemeColorResolver.color(textRole)
+            )
+        ))
         view.setTypeface(Tuils.getTypeface(context), Typeface.BOLD)
         view.textSize = 13f
         view.gravity = Gravity.CENTER
@@ -140,11 +164,17 @@ object TuixtTheme {
         val base = framedRect(
             context,
             normal,
-            moduleButtonBackgroundColor(),
-            if (primary) selectionColor() else AppearanceSettings.moduleButtonBorderColor(),
+            ThemeColorResolver.color(backgroundRole),
+            ThemeColorResolver.color(borderRole),
             if (primary) 2f else 1.25f
         )
-        view.background = statefulFrame(context, base, FrameTarget.BUTTON_PRESSED)
+        view.background = statefulFrame(
+            context,
+            base,
+            FrameTarget.BUTTON_PRESSED,
+            ThemeColorResolver.color(Theme.pressed_background_color),
+            ThemeColorResolver.color(Theme.pressed_border_color)
+        )
     }
 
     @JvmStatic
@@ -157,7 +187,10 @@ object TuixtTheme {
     fun styleToggle(context: Context, view: TextView, checked: Boolean) {
         view.setText(if (checked) R.string.common_on else R.string.common_off)
         markSelection(view, checked)
-        view.setTextColor(if (checked) selectionColor() else AppearanceSettings.moduleNameTextColor())
+        val backgroundRole = if (checked) Theme.toggle_on_background_color else Theme.toggle_off_background_color
+        val textRole = if (checked) Theme.toggle_on_text_color else Theme.toggle_off_text_color
+        val borderRole = if (checked) Theme.toggle_on_border_color else Theme.toggle_off_border_color
+        view.setTextColor(ThemeColorResolver.color(textRole))
         view.setTypeface(Tuils.getTypeface(context), Typeface.BOLD)
         view.textSize = 13f
         view.gravity = Gravity.CENTER
@@ -167,8 +200,8 @@ object TuixtTheme {
         view.background = FrameManager.drawable(context, role) ?: framedRect(
             context,
             role,
-            moduleButtonBackgroundColor(),
-            if (checked) selectionColor() else AppearanceSettings.moduleButtonBorderColor(),
+            ThemeColorResolver.color(backgroundRole),
+            ThemeColorResolver.color(borderRole),
             if (checked) 2f else 1.25f
         )
     }
@@ -178,20 +211,10 @@ object TuixtTheme {
         view.background = framedRect(
             context,
             FrameTarget.ICON_BUTTON,
-            moduleButtonBackgroundColor(),
-            AppearanceSettings.moduleButtonBorderColor(),
+            ThemeColorResolver.color(Theme.icon_button_background_color),
+            ThemeColorResolver.color(Theme.icon_button_border_color),
             1.25f
         )
-    }
-
-    @JvmStatic
-    fun previewModuleButtonBackground(color: Int) {
-        moduleButtonBackgroundPreview = color
-    }
-
-    @JvmStatic
-    fun clearModuleButtonBackgroundPreview() {
-        moduleButtonBackgroundPreview = null
     }
 
     @JvmStatic
@@ -209,11 +232,15 @@ object TuixtTheme {
         val track = FrameManager.drawable(context, FrameTarget.SLIDER_TRACK)
         val progress = FrameManager.drawable(context, FrameTarget.SLIDER_PROGRESS)
         val thumb = FrameManager.drawable(context, FrameTarget.SLIDER_THUMB, 24f)
-        view.progressTintList = if (progress == null) ColorStateList.valueOf(fallbackColor) else null
-        view.progressBackgroundTintList = if (track == null) {
-            ColorStateList.valueOf(ColorUtils.setAlphaComponent(fallbackColor, 80))
+        view.progressTintList = if (progress == null) {
+            ColorStateList.valueOf(ThemeColorResolver.color(Theme.slider_progress_color))
         } else null
-        view.thumbTintList = if (thumb == null) ColorStateList.valueOf(fallbackColor) else null
+        view.progressBackgroundTintList = if (track == null) {
+            ColorStateList.valueOf(ThemeColorResolver.color(Theme.slider_track_color))
+        } else null
+        view.thumbTintList = if (thumb == null) {
+            ColorStateList.valueOf(ThemeColorResolver.color(Theme.slider_thumb_color))
+        } else null
         styleFrameSlider(view, track, progress, thumb)
     }
 
@@ -245,13 +272,45 @@ object TuixtTheme {
         if (track != null || progress != null || thumb != null) view.splitTrack = false
     }
 
-    private fun statefulFrame(context: Context, base: Drawable, pressed: FrameTarget): Drawable =
+    private fun statefulFrame(
+        context: Context,
+        base: Drawable,
+        pressed: FrameTarget,
+        pressedFill: Int,
+        pressedStroke: Int
+    ): Drawable =
         FrameManager.drawable(context, pressed)?.let { pressedFrame ->
             StateListDrawable().apply {
+                addState(
+                    intArrayOf(-android.R.attr.state_enabled),
+                    framedRect(
+                        context,
+                        FrameTarget.BUTTON,
+                        ThemeColorResolver.color(Theme.disabled_background_color),
+                        ThemeColorResolver.color(Theme.divider_color),
+                        1.25f
+                    )
+                )
                 addState(intArrayOf(android.R.attr.state_pressed), pressedFrame)
                 addState(intArrayOf(), base)
             }
-        } ?: base
+        } ?: StateListDrawable().apply {
+            addState(
+                intArrayOf(-android.R.attr.state_enabled),
+                framedRect(
+                    context,
+                    FrameTarget.BUTTON,
+                    ThemeColorResolver.color(Theme.disabled_background_color),
+                    ThemeColorResolver.color(Theme.divider_color),
+                    1.25f
+                )
+            )
+            addState(
+                intArrayOf(android.R.attr.state_pressed),
+                framedRect(context, pressed, pressedFill, pressedStroke, 1.25f)
+            )
+            addState(intArrayOf(), base)
+        }
 
     @JvmStatic
     fun rect(context: Context, fill: Int, stroke: Int, strokeDp: Float): Drawable =
@@ -284,12 +343,6 @@ object TuixtTheme {
 
     @JvmStatic
     fun dp(context: Context, value: Float): Int = Tuils.dpToPx(context, value).toInt()
-
-    private fun selectionColor(): Int =
-        ColorUtils.blendARGB(accentColor(), -0x1, 0.42f)
-
-    private fun moduleButtonBackgroundColor(): Int =
-        moduleButtonBackgroundPreview ?: AppearanceSettings.moduleButtonBackgroundColor()
 
     private fun markSelection(view: TextView, selected: Boolean) {
         val label = view.text.toString().removePrefix("✓ ")

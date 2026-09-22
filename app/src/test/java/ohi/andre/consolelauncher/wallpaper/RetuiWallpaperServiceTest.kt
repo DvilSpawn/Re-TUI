@@ -25,6 +25,13 @@ class RetuiWallpaperServiceTest {
         assertFalse(shouldRenderWallpaper(visible = true, interactionEnabled = false, screenInteractive = false, keyguardLocked = false, wallpaperPreview = true))
     }
 
+    @Test fun drawerCanSuppressTouchWithoutStoppingWallpaperRendering() {
+        assertTrue(shouldRenderWallpaper(true, true, true, false))
+        assertFalse(shouldHandleWallpaperTouch(true, true, true, false, touchEnabled = false))
+        assertTrue(shouldHandleWallpaperTouch(true, true, true, false, touchEnabled = true))
+        assertTrue(shouldHandleWallpaperTouch(true, false, true, true, touchEnabled = false))
+    }
+
     @Test fun failedSurfaceLocksRetryMoreSlowlyThanAnimationFrames() {
         assertEquals(50L, wallpaperFrameDelay(drawSucceeded = true, normalDelayMs = 50L))
         assertEquals(1000L, wallpaperFrameDelay(drawSucceeded = false, normalDelayMs = 50L))

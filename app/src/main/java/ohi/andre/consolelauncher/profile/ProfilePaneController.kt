@@ -32,6 +32,7 @@ import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.dp
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleButton
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleHeader
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.stylePanel
+import ohi.andre.consolelauncher.managers.settings.ThemeColorResolver
 import ohi.andre.consolelauncher.tuils.Tuils
 
 class ProfilePaneController(
@@ -145,7 +146,7 @@ class ProfilePaneController(
         photo.clearColorFilter()
         pager.background = TuixtTheme.rect(
             context,
-            ColorUtils.setAlphaComponent(TuixtTheme.surfaceColor(), 225),
+            ThemeColorResolver.withMaxAlpha(TuixtTheme.surfaceColor(), 225),
             TuixtTheme.borderColor(),
             1.25f
         )
@@ -335,7 +336,12 @@ class ProfilePaneController(
                 textSize = 18f
                 setTextColor(TuixtTheme.borderColor())
                 setTypeface(Tuils.getTypeface(context), Typeface.BOLD)
-                setBackgroundColor(ColorUtils.setAlphaComponent(TuixtTheme.surfaceColor(), 150))
+                setBackgroundColor(
+                    ohi.andre.consolelauncher.managers.settings.ThemeColorResolver.withMaxAlpha(
+                        TuixtTheme.surfaceColor(),
+                        150
+                    )
+                )
                 contentDescription = context.getString(R.string.editor_profilepanecontroller_reveal_qr_code_87b76)
                 isClickable = true
                 isFocusable = true

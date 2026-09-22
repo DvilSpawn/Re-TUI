@@ -11,7 +11,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:labelFor="@+id/setting_input"
-        android:textColor="#00FF00"
         android:textSize="14sp"
         android:fontFamily="monospace"
         android:textStyle="bold" />
@@ -21,7 +20,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
-        android:textColor="#888888"
         android:textSize="11sp"
         android:fontFamily="monospace" />
 
@@ -37,7 +35,6 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_marginEnd="8dp"
-            android:background="#FFFFFF"
             android:visibility="gone" />
 
         <TextView
@@ -53,10 +50,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="#111111"
             android:importantForAutofill="no"
             android:padding="6dp"
-            android:textColor="#FFFFFF"
             android:textSize="13sp"
             android:fontFamily="monospace" />
 
@@ -86,6 +81,5 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="12dp"
-        android:background="#222222" />
+        android:layout_marginTop="12dp" />
 </LinearLayout>

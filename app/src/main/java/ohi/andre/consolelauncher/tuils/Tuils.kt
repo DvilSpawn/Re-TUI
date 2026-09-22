@@ -1634,7 +1634,7 @@ object Tuils {
 
     fun sendXMLParseError(context: Context, PATH: String?, e: SAXParseException) {
         sendOutput(
-            Color.RED,
+            ohi.andre.consolelauncher.managers.settings.AppearanceSettings.errorTextColor(),
             context,
             context.getString(R.string.integration_tuils_file_messagelinecolumn_c2233, context.getString(R.string.output_xmlproblem1) + SPACE + PATH + context.getString(R.string.output_xmlproblem2) + NEWLINE + context.getString(
                 R.string.output_errorlabel
@@ -1644,7 +1644,7 @@ object Tuils {
 
     fun sendXMLParseError(context: Context, PATH: String?) {
         sendOutput(
-            Color.RED,
+            ohi.andre.consolelauncher.managers.settings.AppearanceSettings.errorTextColor(),
             context,
             context.getString(R.string.output_xmlproblem1) + SPACE + PATH + context.getString(R.string.output_xmlproblem2)
         )

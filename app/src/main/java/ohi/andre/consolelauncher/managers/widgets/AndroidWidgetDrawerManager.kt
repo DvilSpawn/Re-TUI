@@ -38,18 +38,15 @@ import android.widget.RelativeLayout
 import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.core.graphics.ColorUtils
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings.cyberdeckMode
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings.dashedBorders
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings.moduleCornerRadius
-import ohi.andre.consolelauncher.managers.settings.AppearanceSettings.terminalBorderColor
-import ohi.andre.consolelauncher.managers.settings.AppearanceSettings.terminalHeaderTabBackground
-import ohi.andre.consolelauncher.managers.settings.AppearanceSettings.terminalWindowBackground
 import ohi.andre.consolelauncher.managers.ui.OverlayLayoutManager
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.options.Suggestions
 import ohi.andre.consolelauncher.managers.xml.options.Theme
+import ohi.andre.consolelauncher.managers.settings.ThemeColorResolver
 import ohi.andre.consolelauncher.managers.xml.options.Ui
 import ohi.andre.consolelauncher.tuils.TerminalBorderRuntime
 import ohi.andre.consolelauncher.tuils.FrameTarget
@@ -600,7 +597,7 @@ class AndroidWidgetDrawerManager(
             return TerminalBorderRuntime.panelDrawable(
                 context,
                 backgroundColor,
-                terminalBorderColor(),
+                ThemeColorResolver.color(Theme.widget_panel_border_color),
                 1.0f,
                 0,
                 true,
@@ -648,7 +645,7 @@ class AndroidWidgetDrawerManager(
         hideWidgetPicker()
         cleanupWidgetState()
 
-        val pickerColor = XMLPrefsManager.getColor(Theme.apps_drawer_text_color)
+        val pickerColor = ThemeColorResolver.color(Theme.widget_panel_text_color)
         val overlay = FrameLayout(context).apply {
             isClickable = true
             isFocusable = true
@@ -665,8 +662,8 @@ class AndroidWidgetDrawerManager(
             )
             background = TerminalBorderRuntime.panelDrawable(
                 context,
-                terminalWindowBackground(),
-                terminalBorderColor(),
+                ThemeColorResolver.color(Theme.widget_panel_background_color),
+                ThemeColorResolver.color(Theme.widget_panel_border_color),
                 1.5f,
                 moduleCornerRadius(),
                 dashedBorders(),
@@ -804,7 +801,7 @@ class AndroidWidgetDrawerManager(
     private fun pickerStatusText(message: String): TextView {
         return TextView(context).apply {
             text = message
-            setTextColor(XMLPrefsManager.getColor(Theme.apps_drawer_text_color))
+            setTextColor(ThemeColorResolver.color(Theme.widget_panel_text_color))
             textSize = 12f
             typeface = Tuils.getTypeface(context)
             gravity = Gravity.CENTER
@@ -835,8 +832,8 @@ class AndroidWidgetDrawerManager(
     }
 
     private fun widgetProviderRow(option: WidgetProviderOption): View {
-        val textColor = XMLPrefsManager.getColor(Theme.apps_drawer_text_color)
-        val mutedTextColor = (textColor and 0x00FFFFFF) or 0x99000000.toInt()
+        val textColor = ThemeColorResolver.color(Theme.widget_row_text_color)
+        val mutedTextColor = ThemeColorResolver.withMaxAlpha(textColor, 153)
         val row = LinearLayout(context).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
@@ -851,7 +848,7 @@ class AndroidWidgetDrawerManager(
             background = TerminalBorderRuntime.panelDrawable(
                 context,
                 Color.TRANSPARENT,
-                terminalBorderColor(),
+                ThemeColorResolver.color(Theme.widget_panel_border_color),
                 1.0f,
                 moduleCornerRadius(),
                 dashedBorders(),
@@ -921,7 +918,7 @@ class AndroidWidgetDrawerManager(
     private fun sectionLabel(label: String): TextView {
         return TextView(context).apply {
             text = label.uppercase()
-            setTextColor(XMLPrefsManager.getColor(Theme.apps_drawer_text_color))
+            setTextColor(ThemeColorResolver.color(Theme.widget_header_text_color))
             textSize = 11f
             setTypeface(Tuils.getTypeface(context), Typeface.BOLD)
             setPadding(0, Tuils.dpToPx(context, 12), 0, Tuils.dpToPx(context, 4))
@@ -932,10 +929,18 @@ class AndroidWidgetDrawerManager(
         return TextView(context).apply {
             text = label
             gravity = Gravity.CENTER
-            setTextColor(XMLPrefsManager.getColor(Theme.apps_drawer_text_color))
+            setTextColor(ThemeColorResolver.color(Theme.widget_control_text_color))
             textSize = 14f
             setTypeface(Tuils.getTypeface(context), Typeface.BOLD)
-            background = TerminalBorderRuntime.tabDrawable(context, terminalHeaderTabBackground(), FrameTarget.WIDGET_DRAWER)
+            background = TerminalBorderRuntime.panelDrawable(
+                context,
+                ThemeColorResolver.color(Theme.widget_control_background_color),
+                ThemeColorResolver.color(Theme.widget_control_border_color),
+                1f,
+                moduleCornerRadius(),
+                dashedBorders(),
+                target = FrameTarget.WIDGET_DRAWER
+            )
         }
     }
 
@@ -1125,7 +1130,7 @@ class AndroidWidgetDrawerManager(
             frame.background = TerminalBorderRuntime.panelDrawable(
                 context,
                 Color.TRANSPARENT,
-                terminalBorderColor(),
+                ThemeColorResolver.color(Theme.widget_panel_border_color),
                 1.0f,
                 moduleCornerRadius(),
                 dashedBorders(),
@@ -1198,7 +1203,7 @@ class AndroidWidgetDrawerManager(
             text = widgetIdBadgeText(record)
             gravity = Gravity.CENTER
             includeFontPadding = false
-            setTextColor(XMLPrefsManager.getColor(Theme.apps_drawer_text_color))
+            setTextColor(ThemeColorResolver.color(Theme.widget_control_text_color))
             textSize = 9f
             setTypeface(Tuils.getTypeface(context), Typeface.BOLD)
             setPadding(
@@ -1207,7 +1212,15 @@ class AndroidWidgetDrawerManager(
                 Tuils.dpToPx(context, 7),
                 Tuils.dpToPx(context, 2)
             )
-            background = TerminalBorderRuntime.tabDrawable(context, terminalHeaderTabBackground(), FrameTarget.WIDGET_DRAWER)
+            background = TerminalBorderRuntime.panelDrawable(
+                context,
+                ThemeColorResolver.color(Theme.widget_control_background_color),
+                ThemeColorResolver.color(Theme.widget_control_border_color),
+                1f,
+                moduleCornerRadius(),
+                dashedBorders(),
+                target = FrameTarget.WIDGET_DRAWER
+            )
         }
     }
 
@@ -1311,7 +1324,7 @@ class AndroidWidgetDrawerManager(
             isClickable = true
             isFocusable = true
             setImageResource(R.drawable.ic_widget_resize_arrow)
-            setColorFilter(XMLPrefsManager.getColor(Theme.apps_drawer_text_color))
+            setColorFilter(ThemeColorResolver.color(Theme.widget_control_text_color))
             setPadding(
                 Tuils.dpToPx(context, 8),
                 Tuils.dpToPx(context, 8),
@@ -1324,10 +1337,14 @@ class AndroidWidgetDrawerManager(
                 ResizeEdge.BOTTOM -> 5_000
                 ResizeEdge.LEFT -> 7_500
             })
-            background = TerminalBorderRuntime.tabDrawable(
+            background = TerminalBorderRuntime.panelDrawable(
                 context,
-                terminalHeaderTabBackground(),
-                FrameTarget.WIDGET_DRAWER
+                ThemeColorResolver.color(Theme.widget_control_background_color),
+                ThemeColorResolver.color(Theme.widget_control_border_color),
+                1f,
+                moduleCornerRadius(),
+                dashedBorders(),
+                target = FrameTarget.WIDGET_DRAWER
             )
             setOnTouchListener { view, event ->
                 when (event.actionMasked) {
@@ -1395,10 +1412,18 @@ class AndroidWidgetDrawerManager(
             gravity = Gravity.CENTER
             isClickable = true
             isFocusable = true
-            setTextColor(XMLPrefsManager.getColor(Theme.apps_drawer_text_color))
+            setTextColor(ThemeColorResolver.color(Theme.widget_control_text_color))
             textSize = if (label.length > 1) 10f else 16f
             setTypeface(Tuils.getTypeface(context), Typeface.BOLD)
-            background = TerminalBorderRuntime.tabDrawable(context, terminalHeaderTabBackground(), FrameTarget.WIDGET_DRAWER)
+            background = TerminalBorderRuntime.panelDrawable(
+                context,
+                ThemeColorResolver.color(Theme.widget_control_background_color),
+                ThemeColorResolver.color(Theme.widget_control_border_color),
+                1f,
+                moduleCornerRadius(),
+                dashedBorders(),
+                target = FrameTarget.WIDGET_DRAWER
+            )
         }
     }
 
@@ -1674,8 +1699,8 @@ class AndroidWidgetDrawerManager(
     }
 
     private fun buildWidgetFailureView(appWidgetId: Int, label: String): View {
-        val textColor = XMLPrefsManager.getColor(Theme.apps_drawer_text_color)
-        val mutedTextColor = (textColor and 0x00FFFFFF) or 0x99000000.toInt()
+        val textColor = ThemeColorResolver.color(Theme.widget_panel_text_color)
+        val mutedTextColor = ThemeColorResolver.withMaxAlpha(textColor, 153)
         val padding = Tuils.dpToPx(context, 10)
 
         return LinearLayout(context).apply {
@@ -1686,8 +1711,8 @@ class AndroidWidgetDrawerManager(
             isLongClickable = true
             background = TerminalBorderRuntime.panelDrawable(
                 context,
-                terminalWindowBackground(),
-                terminalBorderColor(),
+                ThemeColorResolver.color(Theme.widget_panel_background_color),
+                ThemeColorResolver.color(Theme.widget_panel_border_color),
                 1.0f,
                 moduleCornerRadius(),
                 dashedBorders(),
@@ -1853,10 +1878,10 @@ class AndroidWidgetDrawerManager(
     }
 
     private fun styleChrome() {
-        val drawerColor = XMLPrefsManager.getColor(Theme.apps_drawer_text_color)
-        val borderColor = terminalBorderColor()
-        val backgroundColor = terminalWindowBackground()
-        val headerBackgroundColor = terminalHeaderTabBackground()
+        val drawerColor = ThemeColorResolver.color(Theme.widget_panel_text_color)
+        val borderColor = ThemeColorResolver.color(Theme.widget_panel_border_color)
+        val backgroundColor = ThemeColorResolver.color(Theme.widget_panel_background_color)
+        val headerBackgroundColor = ThemeColorResolver.color(Theme.widget_header_background_color)
 
         drawerRoot?.setBackgroundColor(Color.TRANSPARENT)
         drawerContainer?.background = TerminalBorderRuntime.panelDrawable(
@@ -1868,12 +1893,12 @@ class AndroidWidgetDrawerManager(
             dashedBorders(),
             target = FrameTarget.WIDGET_DRAWER
         )
-        header?.setTextColor(drawerColor)
-        footer?.setTextColor(drawerColor)
+        header?.setTextColor(ThemeColorResolver.color(Theme.widget_header_text_color))
+        footer?.setTextColor(ThemeColorResolver.color(Theme.widget_header_text_color))
         closeButton?.setTextColor(drawerColor)
         commandPrefix?.setTextColor(drawerColor)
-        commandInput?.setTextColor(drawerColor)
-        commandInput?.setHintTextColor(ColorUtils.setAlphaComponent(drawerColor, 150))
+        commandInput?.setTextColor(ThemeColorResolver.color(Theme.widget_command_text_color))
+        commandInput?.setHintTextColor(ThemeColorResolver.withMaxAlpha(ThemeColorResolver.color(Theme.widget_command_text_color), 150))
         commandSend?.setTextColor(drawerColor)
         header?.setTypeface(Tuils.getTypeface(context), Typeface.BOLD)
         footer?.typeface = Tuils.getTypeface(context)
@@ -1886,8 +1911,8 @@ class AndroidWidgetDrawerManager(
         closeButton?.background = TerminalBorderRuntime.tabDrawable(context, headerBackgroundColor, FrameTarget.WIDGET_DRAWER)
         commandInputGroup?.background = TerminalBorderRuntime.panelDrawable(
             context,
-            ColorUtils.blendARGB(backgroundColor, Color.BLACK, 0.16f),
-            ColorUtils.setAlphaComponent(borderColor, 180),
+            ThemeColorResolver.color(Theme.widget_command_background_color),
+            ThemeColorResolver.color(Theme.widget_command_border_color),
             1.2f,
             moduleCornerRadius(),
             dashedBorders(),
@@ -1896,7 +1921,7 @@ class AndroidWidgetDrawerManager(
         commandSend?.background = TerminalBorderRuntime.panelDrawable(
             context,
             Color.TRANSPARENT,
-            ColorUtils.setAlphaComponent(borderColor, 190),
+            ThemeColorResolver.withMaxAlpha(borderColor, 190),
             1f,
             moduleCornerRadius(),
             dashedBorders(),

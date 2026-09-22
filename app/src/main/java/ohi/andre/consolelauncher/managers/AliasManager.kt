@@ -3,6 +3,7 @@ package ohi.andre.consolelauncher.managers
 import android.content.Context
 import android.graphics.Color
 import ohi.andre.consolelauncher.BuildConfig
+import ohi.andre.consolelauncher.managers.settings.AppearanceSettings
 import ohi.andre.consolelauncher.managers.xml.options.Behavior
 import java.io.BufferedReader
 import java.io.BufferedWriter
@@ -210,14 +211,14 @@ class AliasManager(private val context: Context) {
 
                 if (name.equals(value, ignoreCase = true)) {
                     Tuils.sendOutput(
-                        Color.RED, context,
+                        AppearanceSettings.errorTextColor(), context,
                         context.getString(R.string.output_notaddingalias1) + Tuils.SPACE + name + Tuils.SPACE + context.getString(
                             R.string.output_notaddingalias2
                         )
                     )
                 } else if (value.startsWith(name + Tuils.SPACE)) {
                     Tuils.sendOutput(
-                        Color.RED, context,
+                        AppearanceSettings.errorTextColor(), context,
                         context.getString(R.string.output_notaddingalias1) + Tuils.SPACE + name + Tuils.SPACE + context.getString(
                             R.string.output_notaddingalias3
                         )

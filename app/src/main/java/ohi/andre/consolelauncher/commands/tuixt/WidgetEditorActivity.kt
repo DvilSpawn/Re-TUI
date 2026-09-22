@@ -22,7 +22,6 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
-import androidx.core.graphics.ColorUtils
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import ohi.andre.consolelauncher.LauncherActivity
 import ohi.andre.consolelauncher.UIManager
@@ -47,6 +46,8 @@ import java.io.File
 import java.io.FileInputStream
 import java.util.Arrays
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings
+import ohi.andre.consolelauncher.managers.settings.ThemeColorResolver
+import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi
 
 class WidgetEditorActivity : ohi.andre.consolelauncher.localization.LocalizedActivity() {
@@ -352,8 +353,8 @@ class WidgetEditorActivity : ohi.andre.consolelauncher.localization.LocalizedAct
     private fun showMatch(editor: EditText, match: Int, length: Int) {
         editor.setSelection(match, match + length)
         clearFindHighlight()
-        findHighlightBackground = BackgroundColorSpan(ColorUtils.setAlphaComponent(accentColor(), 220))
-        findHighlightForeground = ForegroundColorSpan(surfaceColor())
+        findHighlightBackground = BackgroundColorSpan(ThemeColorResolver.color(Theme.selection_background_color))
+        findHighlightForeground = ForegroundColorSpan(ThemeColorResolver.color(Theme.selection_text_color))
         editor.text.setSpan(findHighlightBackground, match, match + length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         editor.text.setSpan(findHighlightForeground, match, match + length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         editor.post {

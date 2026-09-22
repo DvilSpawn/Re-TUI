@@ -9,7 +9,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.core.graphics.ColorUtils
+import ohi.andre.consolelauncher.managers.settings.ThemeColorResolver
+import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.tuils.TerminalBorderRuntime
 import ohi.andre.consolelauncher.tuils.FrameTarget
 import ohi.andre.consolelauncher.tuils.Tuils
@@ -70,20 +71,21 @@ object ModuleDockButtonFactory {
         context: Context,
         button: TextView,
         selected: Boolean,
-        backgroundColor: Int,
-        borderColor: Int,
-        textColor: Int,
         cornerRadius: Int,
         dashedBorders: Boolean
     ) {
         val label = button.text.toString().removePrefix("✓ ")
         button.text = if (selected) "✓ $label" else label
         button.isSelected = selected
-        val bg = if (selected) {
-            ColorUtils.blendARGB(backgroundColor, textColor, 0.25f)
-        } else {
-            backgroundColor
-        }
+        val bg = ThemeColorResolver.color(
+            if (selected) Theme.module_active_background_color else Theme.module_dock_background_color
+        )
+        val borderColor = ThemeColorResolver.color(
+            if (selected) Theme.module_active_border_color else Theme.module_dock_border_color
+        )
+        val textColor = ThemeColorResolver.color(
+            if (selected) Theme.module_active_text_color else Theme.module_dock_text_color
+        )
 
         button.setTextColor(textColor)
         button.background = TerminalBorderRuntime.panelDrawable(

@@ -36,7 +36,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.graphics.ColorUtils
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ohi.andre.consolelauncher.R
@@ -818,7 +817,7 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
         val image = ImageView(this).apply {
             scaleType = ImageView.ScaleType.CENTER_INSIDE
             adjustViewBounds = true
-            setBackgroundColor(ColorUtils.setAlphaComponent(surfaceColor(), 190))
+            setBackgroundColor(ohi.andre.consolelauncher.managers.settings.ThemeColorResolver.withMaxAlpha(surfaceColor(), 190))
             if (preview != null) {
                 setImageBitmap(preview)
                 contentDescription = getString(R.string.themer_original_frame_png_preview_86c26)
@@ -835,7 +834,7 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
                 preview != null -> getString(R.string.themer_original_png_b57db, session.assignedName(target) ?: getString(R.string.themer_imported_frame_651d9))
                 else -> getString(R.string.themer_no_frame_default_border_fallback_d21cf)
             }
-            setTextColor(if (invalid) Color.RED else textColor())
+            setTextColor(if (invalid) ohi.andre.consolelauncher.managers.settings.ThemeColorResolver.color(ohi.andre.consolelauncher.managers.xml.options.Theme.error_text_color) else textColor())
             setTypeface(Tuils.getTypeface(this@ThemerActivity))
             textSize = 11f
             setPadding(dp(this@ThemerActivity, 12f), 0, 0, 0)
@@ -1903,7 +1902,7 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
             content.addView(modeRows)
 
             val error = TextView(this).apply {
-                setTextColor(Color.RED)
+                setTextColor(ohi.andre.consolelauncher.managers.settings.ThemeColorResolver.color(ohi.andre.consolelauncher.managers.xml.options.Theme.error_text_color))
                 setTypeface(Tuils.getTypeface(this@ThemerActivity))
                 textSize = 12f
                 visibility = View.GONE
@@ -2417,8 +2416,9 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
                 shape = GradientDrawable.RECTANGLE
                 cornerRadius = dp(this@ThemerActivity, 5f).toFloat()
                 setColor(Color.TRANSPARENT)
-                val keyOutline = ColorUtils.blendARGB(surfaceColor(), textColor(), 0.45f)
-                setStroke(dp(this@ThemerActivity, if (selected) 2f else 1f).coerceAtLeast(1), if (selected) Color.RED else keyOutline)
+                val keyOutline = ohi.andre.consolelauncher.managers.settings.ThemeColorResolver
+                    .blendPreservingAlpha(surfaceColor(), textColor(), 0.45f)
+                setStroke(dp(this@ThemerActivity, if (selected) 2f else 1f).coerceAtLeast(1), if (selected) ohi.andre.consolelauncher.managers.settings.ThemeColorResolver.color(ohi.andre.consolelauncher.managers.xml.options.Theme.error_text_color) else keyOutline)
             }
             addView(TextView(this@ThemerActivity).apply {
                 text = key.uppercaseChar().toString()
@@ -2431,7 +2431,7 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
                 addView(TextView(this@ThemerActivity).apply {
                     text = "•".repeat(occupied.coerceAtMost(2))
                     gravity = Gravity.END
-                    setTextColor(if (selected) Color.RED else accentColor())
+                    setTextColor(if (selected) ohi.andre.consolelauncher.managers.settings.ThemeColorResolver.color(ohi.andre.consolelauncher.managers.xml.options.Theme.error_text_color) else accentColor())
                     setTypeface(Tuils.getTypeface(this@ThemerActivity), Typeface.BOLD)
                     textSize = 8f
                 }, FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.TOP or Gravity.END).apply {
