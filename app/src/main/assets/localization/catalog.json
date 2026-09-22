@@ -3277,6 +3277,27 @@
     },
     "type": "string"
   },
+  "editor_tuixtactivity_reset": {
+    "formatted": true,
+    "forms": {
+      "other": "Reset"
+    },
+    "type": "string"
+  },
+  "editor_tuixtactivity_reset_advanced_colors": {
+    "formatted": true,
+    "forms": {
+      "other": "Reset advanced colors to AUTO"
+    },
+    "type": "string"
+  },
+  "editor_tuixtactivity_reset_advanced_colors_message": {
+    "formatted": true,
+    "forms": {
+      "other": "All advanced color overrides will inherit from the core theme. Save to keep the reset."
+    },
+    "type": "string"
+  },
   "editor_tuixtactivity_save_50815": {
     "formatted": false,
     "forms": {
@@ -11386,6 +11407,13 @@
     },
     "type": "string"
   },
+  "setting_theme_advanced_color_description": {
+    "formatted": false,
+    "forms": {
+      "other": "Advanced semantic color. AUTO inherits from the active core theme."
+    },
+    "type": "string"
+  },
   "setting_theme_alias_content_text_color_description": {
     "formatted": false,
     "forms": {
@@ -12118,6 +12146,13 @@
     "formatted": false,
     "forms": {
       "other": "The prefix placed before a root command (\"su ...\")"
+    },
+    "type": "string"
+  },
+  "setting_ui_keyboard_visible_margin_override_description": {
+    "formatted": false,
+    "forms": {
+      "other": "Bottom terminal/input section margins in millimeters used only while the keyboard is visible or the launcher input has focus. [left],[top],[right],[bottom]. Leave blank to use display_margin_bottom_section"
     },
     "type": "string"
   },

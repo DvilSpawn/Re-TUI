@@ -548,6 +548,9 @@ Timer paused.</string>
     <string name="editor_tuixtactivity_keep_editing_ced7d">Keep Editing</string>
     <string name="editor_tuixtactivity_layout_972ad">Layout</string>
     <string name="editor_tuixtactivity_opening_ascii_file_picker_0304c">Opening ASCII file picker...</string>
+    <string name="editor_tuixtactivity_reset">Reset</string>
+    <string name="editor_tuixtactivity_reset_advanced_colors">Reset advanced colors to AUTO</string>
+    <string name="editor_tuixtactivity_reset_advanced_colors_message">All advanced color overrides will inherit from the core theme. Save to keep the reset.</string>
     <string name="editor_tuixtactivity_save_50815">SAVE</string>
     <string name="editor_tuixtactivity_search_settings_d25ad">Search settings...</string>
     <string name="editor_tuixtactivity_themer_93fef">Themer/ %1$s</string>
@@ -2307,6 +2310,7 @@ Fix or delete the file to recover your options</string>
     <string name="setting_surfaceborders_unlock_border_enabled_description">Show the unlock surface border</string>
     <string name="setting_surfaceborders_weather_border_color_description">Weather border color; AUTO inherits the active accent</string>
     <string name="setting_surfaceborders_weather_border_enabled_description">Show the weather surface border</string>
+    <string name="setting_theme_advanced_color_description">Advanced semantic color. AUTO inherits from the active core theme.</string>
     <string name="setting_theme_alias_content_text_color_description">Alias content text color</string>
     <string name="setting_theme_app_installed_text_color_description">App installed message text color</string>
     <string name="setting_theme_app_uninstalled_text_color_description">App uninstalled message text color</string>
@@ -2412,6 +2416,7 @@ Fix or delete the file to recover your options</string>
     <string name="setting_ui_input_output_size_description">The input/output font size</string>
     <string name="setting_ui_input_prefix_description">The prefix placed before every input</string>
     <string name="setting_ui_input_root_prefix_description">The prefix placed before a root command ("su ...")</string>
+    <string name="setting_ui_keyboard_visible_margin_override_description">Bottom terminal/input section margins in millimeters used only while the keyboard is visible or the launcher input has focus. [left],[top],[right],[bottom]. Leave blank to use display_margin_bottom_section</string>
     <string name="setting_ui_landscape_fold_gutter_mm_description">Landscape-only center gutter in millimeters for fold hinges or screen creases</string>
     <string name="setting_ui_module_body_text_size_description">Text size for built-in module body text and controls (sp)</string>
     <string name="setting_ui_module_corner_radius_description">Rounded corner radius for module panels and module controls (dp)</string>
