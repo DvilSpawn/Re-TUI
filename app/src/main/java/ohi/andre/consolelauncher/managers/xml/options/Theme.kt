@@ -156,6 +156,7 @@ enum class Theme(
     module_header_background_color("auto"),
     module_header_text_color("auto"),
     module_header_border_color("auto"),
+    module_header_control_background_color("auto"),
     module_dock_background_color("auto"),
     module_dock_text_color("auto"),
     module_dock_border_color("auto"),

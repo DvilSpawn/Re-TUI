@@ -1,6 +1,5 @@
 package ohi.andre.consolelauncher.commands.tuixt
 
-import android.annotation.SuppressLint
 import android.app.Dialog
 import android.app.WallpaperManager
 import android.content.ActivityNotFoundException
@@ -35,6 +34,7 @@ import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.OnBackPressedCallback
 import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -136,6 +136,9 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
     override fun onCreate(savedInstanceState: Bundle?) {
         requestNoTitleIfFullscreen(this)
         super.onCreate(savedInstanceState)
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() = handleSettingsBack()
+        })
         XMLPrefsManager.loadCommons(this)
         LauncherSettings.refreshFromLoadedPrefs()
         overridePendingTransition(0, 0)
@@ -1452,8 +1455,7 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
         }
     }
 
-    @SuppressLint("GestureBackNavigation", "MissingSuperCall")
-    override fun onBackPressed() {
+    private fun handleSettingsBack() {
         if (section == SECTION_FRAMES && frameEditSession?.hasChanges() == true) {
             TuixtDialog.showConfirm(
                 this,
@@ -1463,7 +1465,7 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
                 getString(R.string.themer_keep_editing_ced7d),
                 ConfirmAction {
                     discardFrameChanges()
-                    onBackPressed()
+                    handleSettingsBack()
                 }
             )
             return
@@ -1477,7 +1479,7 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
                 getString(R.string.themer_keep_editing_ced7d),
                 ConfirmAction {
                     discardPendingFontChanges()
-                    onBackPressed()
+                    handleSettingsBack()
                 }
             )
             return

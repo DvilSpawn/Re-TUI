@@ -176,6 +176,7 @@ object ThemeColorResolver {
             Theme.module_header_background_color -> c(Theme.terminal_header_background_color)
             Theme.module_header_text_color -> c(Theme.module_text_color)
             Theme.module_header_border_color -> c(Theme.terminal_header_border_color)
+            Theme.module_header_control_background_color -> c(Theme.terminal_header_background_color)
             Theme.module_dock_background_color -> c(Theme.module_button_background_color)
             Theme.module_dock_text_color -> c(Theme.module_text_color)
             Theme.module_dock_border_color -> c(Theme.terminal_border_color)

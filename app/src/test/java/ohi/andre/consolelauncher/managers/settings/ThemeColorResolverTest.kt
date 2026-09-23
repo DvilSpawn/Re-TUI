@@ -49,6 +49,14 @@ class ThemeColorResolverTest {
     }
 
     @Test
+    fun moduleHeaderControlsCanOverrideTerminalHeaderWithoutChangingIt() {
+        val values = mapOf(Theme.terminal_header_background_color to "#FF112233")
+        assertEquals(0xFF112233.toInt(), ThemeColorResolver.resolve(Theme.module_header_control_background_color, values::get, emptyMap()))
+        assertEquals(0xFF445566.toInt(), ThemeColorResolver.resolve(Theme.module_header_control_background_color, values::get, mapOf(Theme.module_header_control_background_color to "#FF445566")))
+        assertEquals(0xFF112233.toInt(), ThemeColorResolver.resolve(Theme.terminal_header_background_color, values::get, emptyMap()))
+    }
+
+    @Test
     fun derivedColorsNeverIncreaseAlpha() {
         val transparent = ThemeColorResolver.blendPreservingAlpha(0x00112233, 0xFFFFFFFF.toInt(), 0.8f)
         val translucent = ThemeColorResolver.blendPreservingAlpha(0x40112233, 0xFFFFFFFF.toInt(), 0.8f)

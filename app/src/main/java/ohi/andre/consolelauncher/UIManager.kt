@@ -263,6 +263,9 @@ import ohi.andre.consolelauncher.tuils.interfaces.OnBatteryUpdate
 import org.json.JSONArray
 import org.json.JSONObject
 
+internal fun moduleSuggestionScrollTarget(module: String?, previousModule: String?, currentX: Int, pendingX: Int): Int =
+    if (module == previousModule) max(currentX, pendingX) else 0
+
 class UIManager(
     context: Context,
     rootView: ViewGroup,
@@ -574,6 +577,8 @@ class UIManager(
     private var lastModuleDockScrollX = 0
     private var moduleSuggestionsScroll: HorizontalScrollView? = null
     private var moduleSuggestionsGroup: LinearLayout? = null
+    private var moduleSuggestionsModule: String? = null
+    private var pendingModuleSuggestionsScrollX = 0
     private var moduleSuggestionsOriginalParent: ViewGroup? = null
     private var moduleSuggestionsOriginalParams: ViewGroup.LayoutParams? = null
     private var moduleSuggestionsOriginalIndex = -1
@@ -5842,6 +5847,10 @@ class UIManager(
             return
         }
         val context = mContext ?: return
+        val module = activeModule
+        val restoreX = moduleSuggestionScrollTarget(module, moduleSuggestionsModule, scroll.scrollX, pendingModuleSuggestionsScrollX)
+        moduleSuggestionsModule = module
+        pendingModuleSuggestionsScrollX = restoreX
         group.removeAllViews()
         // Music chips only while actually playing; pause/stop used to leave prev/play/next up.
         if (ModuleManager.MUSIC == activeModule && !lastMusicPlaying) {
@@ -5913,10 +5922,17 @@ class UIManager(
             group.addView(chip, params)
         }
         scroll.visibility = View.VISIBLE
-        scroll.post(Runnable { scroll.fullScroll(View.FOCUS_LEFT) })
+        scroll.post(Runnable {
+            if (moduleSuggestionsModule == module) {
+                scroll.scrollTo(restoreX, 0)
+                pendingModuleSuggestionsScrollX = 0
+            }
+        })
     }
 
     private fun hideModuleSuggestionsStrip() {
+        moduleSuggestionsModule = null
+        pendingModuleSuggestionsScrollX = 0
         moduleSuggestionsGroup?.removeAllViews()
         moduleSuggestionsScroll?.visibility = View.GONE
     }
@@ -7151,7 +7167,7 @@ class UIManager(
 
     private fun styleModuleClose(close: TextView?, target: FrameTarget = FrameTarget.MODULES) {
         if (close == null) return
-        val bgColor = terminalHeaderTabBackground()
+        val bgColor = ThemeColorResolver.color(Theme.module_header_control_background_color)
         close.setBackground(TerminalBorderRuntime.tabDrawable(mContext!!, bgColor, target))
         close.setTextSize(moduleHeaderTextSize().toFloat())
     }
@@ -15907,7 +15923,7 @@ class UIManager(
     private fun styleNotificationSettingsButton(button: ImageButton?) {
         if (button == null) return
         button.setColorFilter(moduleNameTextColor(), PorterDuff.Mode.SRC_IN)
-        button.setBackground(TerminalBorderRuntime.tabDrawable(mContext, terminalHeaderTabBackground(), FrameTarget.NOTIFICATIONS))
+        button.setBackground(TerminalBorderRuntime.tabDrawable(mContext, ThemeColorResolver.color(Theme.module_header_control_background_color), FrameTarget.NOTIFICATIONS))
     }
 
     private fun clampNotificationIndex() {
