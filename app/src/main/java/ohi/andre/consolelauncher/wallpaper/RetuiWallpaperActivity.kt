@@ -40,6 +40,7 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
     private lateinit var root: FrameLayout
     private lateinit var preview: android.view.View
     private lateinit var colorSpinner: Spinner
+    private lateinit var colorLabel: TextView
     private lateinit var densityLabel: TextView
     private lateinit var heightLabel: TextView
     private lateinit var boundsLabel: TextView
@@ -78,9 +79,10 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
         settingsPanel = panel
         val selectors = row()
         selectors.addView(label(getString(R.string.editor_retuiwallpaperactivity_wallpaper_f00e8)))
-        val scenes = listOf("csakura", "black hole", TopoNoiseView.SCENE, PixelDreamView.SCENE, "solid")
+        val scenes = listOf("csakura", "black hole", TopoNoiseView.SCENE, PixelDreamView.SCENE, CloudsView.SCENE, "solid")
         selectors.addView(spinner(scenes, scenes.indexOf(scene).coerceAtLeast(0), ::switchScene))
-        selectors.addView(label(getString(R.string.editor_retuiwallpaperactivity_color_34171)))
+        colorLabel = label(getString(R.string.editor_retuiwallpaperactivity_color_34171))
+        selectors.addView(colorLabel)
         colorSpinner = paletteSpinner()
         selectors.addView(colorSpinner)
         panel.addView(selectors)
@@ -207,6 +209,7 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
                 current.color(4), current.color(5)
             )
             is SolidColorView -> RetuiWallpaperSettings.saveSolidColor(this, hex(current.color))
+            is CloudsView -> RetuiWallpaperSettings.saveCloudScene(this, current.sceneNumber)
         }
         sendBroadcast(Intent(RetuiWallpaperService.ACTION_REFRESH).setPackage(packageName))
     }
@@ -216,6 +219,7 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
         TopoNoiseView.SCENE -> TopoNoiseView(this).apply { loadPosition() }
         PixelDreamView.SCENE -> PixelDreamView(this).apply { loadPosition() }
         "solid" -> SolidColorView(this)
+        CloudsView.SCENE -> CloudsView(this)
         else -> CsakuraView(this).apply { loadPosition() }
     }.also { view ->
         if (AppearanceSettings.crtFilter()) {
@@ -246,7 +250,6 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
             TopoNoiseView.SCENE -> getString(R.string.wallpaper_topo_contours)
             else -> getString(R.string.editor_retuiwallpaperactivity_bounds_d399f)
         }
-        updateSceneControls()
         val replacement = paletteSpinner()
         (colorSpinner.parent as ViewGroup).let { parent ->
             val index = parent.indexOfChild(colorSpinner)
@@ -254,9 +257,13 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
             colorSpinner = replacement
             parent.addView(colorSpinner, index)
         }
+        updateSceneControls()
     }
 
     private fun paletteSpinner(): Spinner = when (val current = preview) {
+        is CloudsView -> CloudsView.sceneNames(this).let { names ->
+            spinner(names, current.sceneNumber - 1) { current.setScene(names.indexOf(it) + 1) }
+        }
         is BlackHoleView -> spinner(BlackHoleView.PALETTE_NAMES, BlackHoleView.PALETTE_NAMES.indexOf(current.paletteName).coerceAtLeast(0), current::setPalette)
         is TopoNoiseView -> spinner(TopoNoiseView.PALETTE_NAMES, TopoNoiseView.PALETTE_NAMES.indexOf(current.paletteName).coerceAtLeast(0)) {
             if (it != TopoNoiseView.CUSTOM) current.setPalette(it)
@@ -282,7 +289,9 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
     }
 
     private fun updateSceneControls() {
-        val visibility = if (scene == "solid" || scene == PixelDreamView.SCENE) View.GONE else View.VISIBLE
+        val clouds = scene == CloudsView.SCENE
+        colorLabel.text = getString(if (clouds) R.string.wallpaper_clouds_scene_label else R.string.editor_retuiwallpaperactivity_color_34171)
+        val visibility = if (scene == "solid" || scene == PixelDreamView.SCENE || clouds) View.GONE else View.VISIBLE
         positionControls.forEach { it.visibility = visibility }
         tuningControls.forEach { it.visibility = visibility }
         topoColorRow.visibility = if (scene == TopoNoiseView.SCENE) View.VISIBLE else View.GONE
@@ -291,7 +300,7 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
         zoomLabel.visibility = zoomVisibility
         zoomMinus.visibility = zoomVisibility
         zoomPlus.visibility = zoomVisibility
-        panelParams.height = dp(if (scene == TopoNoiseView.SCENE) 318 else 268)
+        panelParams.height = dp(if (clouds) 116 else if (scene == TopoNoiseView.SCENE) 318 else 268)
         settingsPanel.layoutParams = panelParams
         topoColorControls.forEachIndexed { index, button ->
             val topo = preview as? TopoNoiseView ?: return@forEachIndexed
@@ -468,10 +477,8 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
     private fun useOnPhone() {
         save()
         val component = ComponentName(this, RetuiWallpaperService::class.java)
-        if (WallpaperManager.getInstance(this).wallpaperInfo?.component == component) {
-            finish()
-            return
-        }
+        // A selected component can have a stopped engine after an update or test run.
+        // Let Android bind/apply it instead of assuming wallpaperInfo means it is running.
         try {
             startActivity(Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER).apply {
                 putExtra(
@@ -519,6 +526,7 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
                 "black hole" -> getString(R.string.wallpaper_black_hole)
                 TopoNoiseView.SCENE -> getString(R.string.wallpaper_topo_noise)
                 PixelDreamView.SCENE -> getString(R.string.wallpaper_pixel_dream)
+                CloudsView.SCENE -> getString(R.string.wallpaper_clouds)
                 "solid" -> getString(R.string.wallpaper_solid)
                 else -> it
             }

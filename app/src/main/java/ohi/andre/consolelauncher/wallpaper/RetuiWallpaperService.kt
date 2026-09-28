@@ -167,11 +167,13 @@ class RetuiWallpaperService : WallpaperService() {
             is CsakuraView -> current.wallpaperColors()
             is TopoNoiseView -> current.wallpaperColors()
             is PixelDreamView -> current.wallpaperColors()
+            is CloudsView -> current.wallpaperColors()
             else -> (current as SolidColorView).wallpaperColors()
         }
 
         override fun onSurfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
             layoutView(width, height)
+            (view as? CloudsView)?.resetClock()
             fullRedrawPending = !draw(fullSurface = true)
             scheduleIfVisible()
         }
@@ -215,6 +217,7 @@ class RetuiWallpaperService : WallpaperService() {
 
         private fun scheduleIfVisible() {
             handler.removeCallbacks(drawFrame)
+            (view as? CloudsView)?.resetClock()
             if (shouldScheduleWallpaperFrame(shouldRender(), fullRedrawPending, isAnimated())) {
                 handler.post(drawFrame)
             }
@@ -273,12 +276,17 @@ class RetuiWallpaperService : WallpaperService() {
                     surfaceHolder.lockCanvas()
                 }
             }
-            val canvas = try { lockSoftware() } catch (_: Exception) { null } ?: return false
+            // Bitmap layers need the same GPU path as the picker; CPU compositing is costly.
+            val hardware = if (current is CloudsView && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                try { surfaceHolder.lockHardwareCanvas() } catch (_: Exception) { null }
+            } else null
+            val canvas = hardware ?: (try { lockSoftware() } catch (_: Exception) { null }) ?: return false
             try {
                 when (current) {
                     is BlackHoleView -> current.advance()
                     is CsakuraView -> current.advance()
                     is PixelDreamView -> current.advance()
+                    is CloudsView -> current.advance()
                 }
                 current.draw(canvas)
                 if (AppearanceSettings.crtFilter()) {
@@ -294,6 +302,7 @@ class RetuiWallpaperService : WallpaperService() {
         private fun frameDelayMs() = when (view) {
             is BlackHoleView -> BlackHoleView.FRAME_DELAY_MS
             is PixelDreamView -> 50L
+            is CloudsView -> CloudsView.FRAME_DELAY_MS
             else -> 1000L / CsakuraView.FPS
         }
 
@@ -302,12 +311,14 @@ class RetuiWallpaperService : WallpaperService() {
                 is BlackHoleView -> current.release()
                 is CsakuraView -> current.release()
                 is TopoNoiseView -> current.release()
+                is CloudsView -> current.release()
             }
         }
 
         private fun createView(): View = when (RetuiWallpaperSettings.scene(this@RetuiWallpaperService)) {
             "black hole" -> BlackHoleView(this@RetuiWallpaperService).apply { loadPosition() }
             "solid" -> SolidColorView(this@RetuiWallpaperService)
+            CloudsView.SCENE -> CloudsView(this@RetuiWallpaperService)
             TopoNoiseView.SCENE -> TopoNoiseView(this@RetuiWallpaperService).apply { loadPosition() }
             PixelDreamView.SCENE -> PixelDreamView(this@RetuiWallpaperService).apply {
                 loadPosition()
@@ -319,18 +330,20 @@ class RetuiWallpaperService : WallpaperService() {
         private fun viewMatchesScene(scene: String): Boolean = when (scene) {
             "black hole" -> view is BlackHoleView
             "solid" -> view is SolidColorView
+            CloudsView.SCENE -> view is CloudsView
             TopoNoiseView.SCENE -> view is TopoNoiseView
             PixelDreamView.SCENE -> view is PixelDreamView
             else -> view is CsakuraView
         }
 
-        private fun isAnimated(): Boolean = view is BlackHoleView || view is CsakuraView || view is PixelDreamView
+        private fun isAnimated(): Boolean = view is BlackHoleView || view is CsakuraView || view is PixelDreamView || view is CloudsView
 
         private fun loadPosition() = when (val current = view) {
             is BlackHoleView -> current.loadPosition()
             is CsakuraView -> current.loadPosition()
             is TopoNoiseView -> current.loadPosition()
             is PixelDreamView -> current.loadPosition()
+            is CloudsView -> current.setScene(RetuiWallpaperSettings.cloudScene(this@RetuiWallpaperService))
             else -> Unit
         }
     }

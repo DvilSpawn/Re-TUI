@@ -16,6 +16,7 @@ object RetuiWallpaperSettings {
     private const val TREE_SEED = "tree_seed"
     private const val PALETTE = "palette"
     private const val SCENE = "scene"
+    private const val CLOUD_SCENE = "cloud_scene"
     private const val BLACK_HOLE_PALETTE = "black_hole_palette"
     private const val SOLID_COLOR = "solid_color"
     private const val TOPO_OFFSET_X = "topo_offset_x"
@@ -53,7 +54,13 @@ object RetuiWallpaperSettings {
     fun palette(context: Context): String = prefs(context).getString(PALETTE, "sakura") ?: "sakura"
     fun scene(context: Context): String = when (val saved = prefs(context).getString(SCENE, "csakura") ?: "csakura") {
         "waterfall" -> "black hole"
+        "clouds 8" -> CloudsView.SCENE
         else -> saved
+    }
+    fun cloudScene(context: Context): Int = prefs(context).getInt(CLOUD_SCENE, 8).coerceIn(1, 8)
+
+    fun saveCloudScene(context: Context, number: Int) {
+        prefs(context).edit().putInt(CLOUD_SCENE, number.coerceIn(1, 8)).apply()
     }
     fun blackHolePalette(context: Context): String =
         prefs(context).getString(BLACK_HOLE_PALETTE, "amber") ?: "amber"

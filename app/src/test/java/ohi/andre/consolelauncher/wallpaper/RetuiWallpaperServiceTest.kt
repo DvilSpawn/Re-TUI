@@ -6,6 +6,17 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class RetuiWallpaperServiceTest {
+    @Test fun animationPausesOffScreenAndOffHomeButAllowsVisibleLockscreen() {
+        assertTrue(shouldRenderWallpaper(true, true, true, false))
+        assertFalse(shouldRenderWallpaper(true, false, true, false))
+        assertFalse(shouldRenderWallpaper(false, true, true, false))
+        assertFalse(shouldRenderWallpaper(true, true, false, false))
+        assertTrue(shouldRenderWallpaper(true, false, true, true))
+        assertFalse(shouldRenderWallpaper(true, false, false, true))
+        assertTrue(shouldRenderWallpaper(true, false, true, false, wallpaperPreview = true))
+        assertFalse(shouldRenderWallpaper(true, false, false, false, wallpaperPreview = true))
+    }
+
     @Test fun visibleAnimatedWallpaperKeepsRetryingUntilAndroidCanDraw() {
         assertTrue(shouldScheduleWallpaperFrame(visible = true, fullRedrawPending = false, animated = true))
         assertTrue(shouldScheduleWallpaperFrame(visible = true, fullRedrawPending = true, animated = false))

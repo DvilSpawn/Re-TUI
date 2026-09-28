@@ -1,5 +1,14 @@
 # Third-party notices
 
+## CraftPix sky with clouds
+
+The Clouds wallpaper uses the original PNG layers of all eight skies from CraftPix's
+Free Sky with Clouds Background Pixel Art Set, supplied by the user.
+
+License: https://craftpix.net/file-licenses/ (Freebie Products).
+The artwork is bundled for in-app rendering; it is not offered for image export.
+These images remain subject to the CraftPix license, not the repository's code license.
+
 ## csakura
 
 The Re:T-UI wallpaper renderer is an Android Canvas port of csakura by

@@ -439,6 +439,9 @@
     <string name="wallpaper_topo_contours">CONTOURS</string>
     <string name="wallpaper_topo_detail">DETAIL</string>
     <string name="wallpaper_pixel_dream">Pixel Dream</string>
+    <string name="wallpaper_clouds">Clouds</string>
+    <string name="wallpaper_clouds_scene">Clouds %1$d</string>
+    <string name="wallpaper_clouds_scene_label">Scene</string>
     <string name="wallpaper_pixel_colors">COLORS</string>
     <string name="wallpaper_pixel_pick_color">Pick Pixel Dream Color</string>
     <string name="wallpaper_solid">Solid color</string>
