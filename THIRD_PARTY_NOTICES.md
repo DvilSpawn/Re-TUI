@@ -1,5 +1,27 @@
 # Third-party notices
 
+## Qalculate Android library
+
+The optional Qalculate calculator uses `com.jherkenhoff:libqalculate:5.8.2-2`,
+Jost Herkenhoff's Android port of libqalculate 5.8.2 by Hanna Knutsson and contributors.
+The native libraries are bundled even when the calculator toggle is off.
+
+- Android wrapper and native build sources: https://github.com/jherkenhoff/libqalculate-android
+- Core sources: https://github.com/Qalculate/libqalculate/tree/v5.8.2
+- Wrapper license declared by the published artifact: GNU GPL version 2.
+  https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+- The wrapper also bundles GMP, MPFR, libiconv, libxml2 and LLVM's C++ runtime;
+  their respective licenses and build sources are referenced in the wrapper repository.
+
+The project code is now GPL-3.0-or-later; the original MIT notice is retained
+verbatim in `LICENSES/MIT-original.txt`. Neither license changes third-party terms.
+Core libqalculate grants GPL-2.0-or-later, but the Android wrapper declares only
+GPL-2.0 in its published metadata. Its license text is included in
+`LICENSES/Qalculate-wrapper-GPL-2.0.txt`; an explicit later-version grant has not
+been verified. This is a release blocker with Apache-2.0 dependencies, not a
+resolved compatibility claim. See `docs/calculator.md` for source-delivery and
+license requirements before public distribution.
+
 ## CraftPix sky with clouds
 
 The Clouds wallpaper uses the original PNG layers of all eight skies from CraftPix's

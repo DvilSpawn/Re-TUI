@@ -326,15 +326,8 @@
     <string name="help_brightness">Set the brightness of your device
         \n$ brightness [0-100]</string>
     <string name="help_clear">Clear the screen</string>
-    <string name="help_calc" formatted="false">Perform basic operations (+ - * / % ^ sqrt)
-        \nExample:
-        \n\n$ calc 4+2-5
-        \n1
-        \n\n$ calc 2 ^ (2*2)
-        \n16
-        \n\n$ calc sqrt25
-        \n5
-    </string>
+    <string name="help_calc">Open the calculator with calc, or evaluate an expression with calc 2 * (3 + 4).
+Enable qalculate in Settings → behavior.xml for units and symbolic maths, e.g. calc 5 km to miles. Expressions always use the calc command.</string>
     <string name="help_call">Call someone
         \n\nUsage:
         \n$ call [number] OR [contactName]

@@ -10,6 +10,11 @@ import ohi.andre.consolelauncher.tuils.Tuils
  * Created by francescoandreuzzi on 24/09/2017.
  */
 enum class Behavior : XMLPrefsSave {
+    qalculate {
+        override fun defaultValue(): String = "false"
+        override fun infoRes(): Int = R.string.setting_behavior_qalculate_description
+        override fun type(): String = XMLPrefsSave.BOOLEAN
+    },
     double_tap_lock {
         override fun defaultValue(): String? {
             return "true"

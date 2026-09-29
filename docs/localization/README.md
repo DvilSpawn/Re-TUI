@@ -18,6 +18,7 @@ The Android resources below remain the bundled English fallback and developer so
 | `app/src/main/res/values/strings_commands.xml`, `strings_command_details.xml` | Command responses and validation errors |
 | `app/src/main/res/values/strings_managers.xml`, `strings_integrations.xml` | Notifications, widgets, reminders, Spaces and integration messages |
 | `app/src/main/res/values/strings_podcast.xml`, `strings_lua_runtime.xml` | Podcast controls and Lua runtime messages |
+| `app/src/main/res/values/strings_calculator.xml` | Calculator options, Behaviour toggle, validation and native-engine messages |
 | `app/src/main/res/values/strings_notes.xml` | Notes library, folders, editor, dialogs, settings, storage and export errors |
 | `app/src/main/res/values/strings_search.xml`, `strings_weather.xml` | Search results, module actions, toolbar icons, work-profile badge and native weather conditions |
 | `app/src/main/res/values/strings_frame_errors.xml`, `strings_backup_errors.xml` | Frame validation and backup/restore failures |

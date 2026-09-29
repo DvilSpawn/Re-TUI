@@ -275,15 +275,8 @@ app,app/src/main/res/values/strings.xml,help_bluetooth,string,true,"Toggle Bluet
 app,app/src/main/res/values/strings.xml,help_brightness,string,true,"Set the brightness of your device
         \n$ brightness [0-100]"
 app,app/src/main/res/values/strings.xml,help_clear,string,true,Clear the screen
-app,app/src/main/res/values/strings.xml,help_calc,string,true,"Perform basic operations (+ - * / % ^ sqrt)
-        \nExample:
-        \n\n$ calc 4+2-5
-        \n1
-        \n\n$ calc 2 ^ (2*2)
-        \n16
-        \n\n$ calc sqrt25
-        \n5
-    "
+app,app/src/main/res/values/strings.xml,help_calc,string,true,"Open the calculator with calc, or evaluate an expression with calc 2 * (3 + 4).
+Enable qalculate in Settings → behavior.xml for units and symbolic maths, e.g. calc 5 km to miles. Expressions always use the calc command."
 app,app/src/main/res/values/strings.xml,help_call,string,true,"Call someone
         \n\nUsage:
         \n$ call [number] OR [contactName]
@@ -695,6 +688,16 @@ app,app/src/main/res/values/strings_backup_errors.xml,validation_backup_backupma
 app,app/src/main/res/values/strings_backup_errors.xml,validation_backup_backupmanager_unsupported_shareable_configuration_sectio_c88e0,string,true,"""Unsupported shareable configuration sections"""
 app,app/src/main/res/values/strings_backup_errors.xml,backup_error_unsupported,string,true,Unsupported backup package
 app,app/src/main/res/values/strings_backup_errors.xml,backup_error_password,string,true,Backup password is incorrect or the file was changed
+app,app/src/main/res/values/strings_calculator.xml,setting_behavior_qalculate_description,string,true,"Enable unit conversions, symbolic maths and advanced controls in the calculator and calc commands. Requires Android 7 or newer. Off by default; calculations work offline without live currency-rate updates."
+app,app/src/main/res/values/strings_calculator.xml,calculator_qalculate_hint,string,false,5 km to miles
+app,app/src/main/res/values/strings_calculator.xml,calculator_degrees,string,true,Degrees
+app,app/src/main/res/values/strings_calculator.xml,calculator_exact,string,true,Exact when possible
+app,app/src/main/res/values/strings_calculator.xml,calculator_working,string,true,Calculating…
+app,app/src/main/res/values/strings_calculator.xml,calculator_timeout,string,true,Calculation timed out. Try a simpler expression.
+app,app/src/main/res/values/strings_calculator.xml,calculator_engine_stopped,string,true,Qalculate stopped or could not start. Please try again.
+app,app/src/main/res/values/strings_calculator.xml,calculator_busy,string,true,Another calculation is running. Please try again.
+app,app/src/main/res/values/strings_calculator.xml,calculator_invalid,string,true,Invalid expression.
+app,app/src/main/res/values/strings_calculator.xml,calculator_too_long,string,true,Expressions can contain at most %1$d characters.
 app,app/src/main/res/values/strings_command_details.xml,command_detail_debug_auto_color_pick_7a5c0,string,true,"""auto_color_pick: """
 app,app/src/main/res/values/strings_command_details.xml,command_detail_debug_effective_colors_f4064,string,true,"""Effective colors"""
 app,app/src/main/res/values/strings_command_details.xml,command_detail_debug_font_file_c5936,string,true,"""font_file: """
@@ -1267,7 +1270,24 @@ app,app/src/main/res/values/strings_editors.xml,tasker_custom_variable,string,tr
 app,app/src/main/res/values/strings_editors.xml,wallpaper_pick_color,string,true,Pick color…
 app,app/src/main/res/values/strings_editors.xml,wallpaper_sakura,string,true,Sakura
 app,app/src/main/res/values/strings_editors.xml,wallpaper_black_hole,string,true,Black hole
+app,app/src/main/res/values/strings_editors.xml,wallpaper_topo_noise,string,true,Topo noise
+app,app/src/main/res/values/strings_editors.xml,wallpaper_topo_colors,string,true,COLORS
+app,app/src/main/res/values/strings_editors.xml,wallpaper_topo_pick_color,string,true,Pick Topo Color
+app,app/src/main/res/values/strings_editors.xml,wallpaper_topo_relief,string,true,RELIEF
+app,app/src/main/res/values/strings_editors.xml,wallpaper_topo_contours,string,true,CONTOURS
+app,app/src/main/res/values/strings_editors.xml,wallpaper_topo_detail,string,true,DETAIL
+app,app/src/main/res/values/strings_editors.xml,wallpaper_pixel_dream,string,true,Pixel Dream
+app,app/src/main/res/values/strings_editors.xml,wallpaper_clouds,string,true,Clouds
+app,app/src/main/res/values/strings_editors.xml,wallpaper_clouds_scene,string,true,Clouds %1$d
+app,app/src/main/res/values/strings_editors.xml,wallpaper_clouds_scene_label,string,true,Scene
+app,app/src/main/res/values/strings_editors.xml,wallpaper_pixel_colors,string,true,COLORS
+app,app/src/main/res/values/strings_editors.xml,wallpaper_pixel_pick_color,string,true,Pick Pixel Dream Color
 app,app/src/main/res/values/strings_editors.xml,wallpaper_solid,string,true,Solid color
+app,app/src/main/res/values/strings_editors.xml,wallpaper_hex_hint,string,true,#AARRGGBB
+app,app/src/main/res/values/strings_editors.xml,wallpaper_hex_invalid,string,true,Enter a valid #AARRGGBB or #RRGGBB value
+app,app/src/main/res/values/strings_editors.xml,editor_tuixtactivity_reset_advanced_colors,string,true,Reset advanced colors to AUTO
+app,app/src/main/res/values/strings_editors.xml,editor_tuixtactivity_reset_advanced_colors_message,string,true,All advanced color overrides will inherit from the core theme. Save to keep the reset.
+app,app/src/main/res/values/strings_editors.xml,editor_tuixtactivity_reset,string,true,Reset
 app,app/src/main/res/values/strings_frame_errors.xml,validation_frame_framemanager_active_frame_pack_is_missing_548bd,string,true,"""Active frame pack is missing."""
 app,app/src/main/res/values/strings_frame_errors.xml,validation_frame_framemanager_active_frame_settings_do_not_match_their_p_423fa,string,true,"""Active frame settings do not match their pack."""
 app,app/src/main/res/values/strings_frame_errors.xml,validation_frame_framemanager_border_must_be_between_0_and_256_dp_f3f3b,string,true,"""%1$s border must be between 0 and 256 dp."""
@@ -2087,6 +2107,7 @@ app,app/src/main/res/values/strings_settings.xml,setting_behavior_optional_value
 app,app/src/main/res/values/strings_settings.xml,setting_behavior_notes_sorting_description,string,true,"""0 = time up->down; 1 = time down->up; 2 = alphabetical up->down; 3 = alphabetical down->up; 4 = locked before; 5 = unlocked before"""
 app,app/src/main/res/values/strings_settings.xml,setting_behavior_notes_allow_link_description,string,true,"""If false, adding links to notes will be disallowed (may slightly increase performance)"""
 app,app/src/main/res/values/strings_settings.xml,setting_behavior_orientation_description,string,true,"""0 = landscape, 1 = portrait, 2 = auto-rotate"""
+app,app/src/main/res/values/strings_settings.xml,setting_behavior_duo_swap_top_panes_description,string,true,Swap Duo top panes: keep statuses with input/output and move the module dock and open module to the secondary screen. Only applies in Duo mode.
 app,app/src/main/res/values/strings_settings.xml,setting_behavior_duo_mode_description,string,true,"""If true, enables the Duo command for manually switching landscape into a single portrait-style pane on the left or right screen"""
 app,app/src/main/res/values/strings_settings.xml,setting_behavior_htmlextractor_default_format_description,string,true,"""The default format used by htmlextract -use"""
 app,app/src/main/res/values/strings_settings.xml,setting_behavior_tui_notification_time_text_color_description,string,true,"""The time color inside the Re:T-UI notification"""
@@ -2265,6 +2286,157 @@ app,app/src/main/res/values/strings_settings.xml,setting_theme_module_text_color
 app,app/src/main/res/values/strings_settings.xml,setting_theme_terminal_window_background_color_description,string,true,"""Terminal window background color for modules, drawers, and panels"""
 app,app/src/main/res/values/strings_settings.xml,setting_theme_terminal_header_background_color_description,string,true,"""Terminal header tab background color"""
 app,app/src/main/res/values/strings_settings.xml,setting_theme_terminal_header_border_color_description,string,true,"""Terminal header tab border color"""
+app,app/src/main/res/values/strings_settings.xml,setting_theme_advanced_color_description,string,true,Color for a specific control or panel. AUTO uses the theme default; a custom color overrides it.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_accent_color_description,string,true,Shared highlight color used by controls and panels. AUTO follows module_text_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_muted_text_color_description,string,true,Color of secondary and less prominent text. AUTO follows session_info_text_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_success_text_color_description,string,true,Text color for success messages. AUTO follows battery_text_high.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_warning_text_color_description,string,true,Text color for warnings. AUTO follows battery_text_medium.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_error_text_color_description,string,true,Text color for errors. AUTO follows battery_text_low.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_divider_color_description,string,true,Color of lines separating items. AUTO follows terminal_border_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_focus_color_description,string,true,Highlight color for the focused control. AUTO follows terminal_border_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_disabled_text_color_description,string,true,Text color for disabled controls. AUTO uses muted_text_color with reduced opacity.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_disabled_background_color_description,string,true,Background color for disabled controls. AUTO uses module_button_background_color with reduced opacity.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_selection_background_color_description,string,true,Background color for selected controls. AUTO blends module_button_background_color with accent_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_selection_text_color_description,string,true,Text color for selected controls. AUTO follows module_text_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_selection_border_color_description,string,true,Border color for selected controls. AUTO follows accent_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_pressed_background_color_description,string,true,Background color for pressed controls. AUTO blends module_button_background_color with accent_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_pressed_text_color_description,string,true,Text color for pressed controls. AUTO follows module_text_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_pressed_border_color_description,string,true,Border color for pressed controls. AUTO follows accent_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_button_background_color_description,string,true,Background color for regular buttons. AUTO follows module_button_background_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_button_text_color_description,string,true,Text color for regular buttons. AUTO follows module_text_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_button_border_color_description,string,true,Border color for regular buttons. AUTO follows terminal_border_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_primary_button_background_color_description,string,true,Background color for primary action buttons. AUTO follows selection_background_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_primary_button_text_color_description,string,true,Text color for primary action buttons. AUTO follows selection_text_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_primary_button_border_color_description,string,true,Border color for primary action buttons. AUTO follows selection_border_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_icon_button_background_color_description,string,true,Background color for icon-only buttons. AUTO follows button_background_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_icon_button_color_description,string,true,Icon color inside icon-only buttons. AUTO follows toolbar_icon_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_icon_button_border_color_description,string,true,Border color for icon-only buttons. AUTO follows button_border_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_field_background_color_description,string,true,Background color for text input fields. AUTO follows input_background_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_field_text_color_description,string,true,Text color for text input fields. AUTO follows input_text_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_field_hint_color_description,string,true,Placeholder text color for text input fields. AUTO uses field_text_color with reduced opacity.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_field_border_color_description,string,true,Border color for text input fields. AUTO follows terminal_border_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_list_row_background_color_description,string,true,Background color for list rows. AUTO follows module_button_background_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_list_row_text_color_description,string,true,Text color for list rows. AUTO follows module_text_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_list_row_border_color_description,string,true,Border color for list rows. AUTO follows terminal_border_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_list_selected_background_color_description,string,true,Background color for selected list rows. AUTO follows selection_background_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_list_selected_text_color_description,string,true,Text color for selected list rows. AUTO follows selection_text_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_list_selected_border_color_description,string,true,Border color for selected list rows. AUTO follows selection_border_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_toggle_off_background_color_description,string,true,Background color for toggles that are off. AUTO follows button_background_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_toggle_off_text_color_description,string,true,Text color for toggles that are off. AUTO follows button_text_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_toggle_off_border_color_description,string,true,Border color for toggles that are off. AUTO follows button_border_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_toggle_on_background_color_description,string,true,Background color for toggles that are on. AUTO follows selection_background_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_toggle_on_text_color_description,string,true,Text color for toggles that are on. AUTO follows selection_text_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_toggle_on_border_color_description,string,true,Border color for toggles that are on. AUTO follows selection_border_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_slider_track_color_description,string,true,Color of the unfilled slider track. AUTO uses muted_text_color with reduced opacity.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_slider_progress_color_description,string,true,Color of the filled slider track. AUTO follows accent_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_slider_thumb_color_description,string,true,Color of the draggable slider handle. AUTO follows accent_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_chip_background_color_description,string,true,Background color for small shortcut chips. AUTO follows button_background_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_chip_text_color_description,string,true,Text color for small shortcut chips. AUTO follows button_text_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_chip_border_color_description,string,true,Border color for small shortcut chips. AUTO follows button_border_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_tab_background_color_description,string,true,Background color for tabs. AUTO follows terminal_header_background_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_tab_text_color_description,string,true,Text color for tabs. AUTO follows module_text_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_tab_border_color_description,string,true,Border color for tabs. AUTO follows terminal_header_border_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_app_drawer_panel_background_color_description,string,true,Background color for the main panel in the app drawer. AUTO follows terminal_window_background_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_app_drawer_panel_text_color_description,string,true,Text color for the main panel in the app drawer. AUTO follows apps_drawer_text_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_app_drawer_panel_border_color_description,string,true,Border color for the main panel in the app drawer. AUTO follows terminal_border_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_app_drawer_header_background_color_description,string,true,Background color for the title bar in the app drawer. AUTO follows terminal_header_background_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_app_drawer_header_text_color_description,string,true,Text color for the title bar in the app drawer. AUTO follows apps_drawer_text_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_app_drawer_header_border_color_description,string,true,Border color for the title bar in the app drawer. AUTO follows terminal_header_border_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_app_drawer_row_background_color_description,string,true,Background color for rows in the app drawer. AUTO uses the built-in default.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_app_drawer_row_text_color_description,string,true,Text color for rows in the app drawer. AUTO follows apps_drawer_text_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_app_drawer_group_background_color_description,string,true,Background color for app groups in the app drawer. AUTO follows app_drawer_row_background_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_app_drawer_group_text_color_description,string,true,Text color for app groups in the app drawer. AUTO follows app_drawer_row_text_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_app_drawer_group_border_color_description,string,true,Border color for app groups in the app drawer. AUTO follows app_drawer_panel_border_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_app_drawer_selection_background_color_description,string,true,Background color for selected apps in the app drawer. AUTO blends app_drawer_panel_background_color with app_drawer_panel_text_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_app_drawer_selection_text_color_description,string,true,Text color for selected apps in the app drawer. AUTO follows app_drawer_panel_text_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_app_drawer_selection_border_color_description,string,true,Border color for selected apps in the app drawer. AUTO follows terminal_border_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_module_panel_background_color_description,string,true,Background color for the main panel in launcher modules. AUTO follows terminal_window_background_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_module_panel_text_color_description,string,true,Text color for the main panel in launcher modules. AUTO follows module_text_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_module_panel_border_color_description,string,true,Border color for the main panel in launcher modules. AUTO follows terminal_border_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_module_header_background_color_description,string,true,Background color for the title bar in launcher modules. AUTO follows terminal_header_background_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_module_header_text_color_description,string,true,Text color for the title bar in launcher modules. AUTO follows module_text_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_module_header_border_color_description,string,true,Border color for the title bar in launcher modules. AUTO follows terminal_header_border_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_module_header_control_background_color_description,string,true,Background color for title-bar controls in launcher modules. AUTO follows terminal_header_background_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_module_dock_background_color_description,string,true,Background color for dock shortcuts in launcher modules. AUTO follows module_button_background_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_module_dock_text_color_description,string,true,Text color for dock shortcuts in launcher modules. AUTO follows module_text_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_module_dock_border_color_description,string,true,Border color for dock shortcuts in launcher modules. AUTO follows terminal_border_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_module_action_background_color_description,string,true,Background color for action buttons in launcher modules. AUTO follows module_button_background_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_module_action_text_color_description,string,true,Text color for action buttons in launcher modules. AUTO follows module_text_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_module_action_border_color_description,string,true,Border color for action buttons in launcher modules. AUTO follows terminal_border_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_module_active_background_color_description,string,true,Background color for active items in launcher modules. AUTO follows selection_background_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_module_active_text_color_description,string,true,Text color for active items in launcher modules. AUTO follows selection_text_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_module_active_border_color_description,string,true,Border color for active items in launcher modules. AUTO follows selection_border_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_widget_panel_background_color_description,string,true,Background color for the main panel in launcher widgets. AUTO follows module_panel_background_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_widget_panel_text_color_description,string,true,Text color for the main panel in launcher widgets. AUTO follows module_panel_text_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_widget_panel_border_color_description,string,true,Border color for the main panel in launcher widgets. AUTO follows module_panel_border_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_widget_header_background_color_description,string,true,Background color for the title bar in launcher widgets. AUTO follows module_header_background_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_widget_header_text_color_description,string,true,Text color for the title bar in launcher widgets. AUTO follows module_header_text_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_widget_header_border_color_description,string,true,Border color for the title bar in launcher widgets. AUTO follows module_header_border_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_widget_row_background_color_description,string,true,Background color for rows in launcher widgets. AUTO blends widget_panel_background_color with ansi_black.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_widget_row_text_color_description,string,true,Text color for rows in launcher widgets. AUTO follows widget_panel_text_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_widget_command_background_color_description,string,true,Background color for command rows in launcher widgets. AUTO blends widget_panel_background_color with ansi_black.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_widget_command_text_color_description,string,true,Text color for command rows in launcher widgets. AUTO follows widget_panel_text_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_widget_command_border_color_description,string,true,Border color for command rows in launcher widgets. AUTO uses widget_panel_border_color with reduced opacity.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_widget_control_background_color_description,string,true,Background color for controls in launcher widgets. AUTO follows button_background_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_widget_control_text_color_description,string,true,Text color for controls in launcher widgets. AUTO follows button_text_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_widget_control_border_color_description,string,true,Border color for controls in launcher widgets. AUTO follows button_border_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_workspace_panel_background_color_description,string,true,"Background color for the main panel in workspace panels, including the calculator. AUTO follows terminal_window_background_color."
+app,app/src/main/res/values/strings_settings.xml,setting_theme_workspace_panel_text_color_description,string,true,"Text color for the main panel in workspace panels, including the calculator. AUTO follows output_text_color."
+app,app/src/main/res/values/strings_settings.xml,setting_theme_workspace_panel_border_color_description,string,true,"Border color for the main panel in workspace panels, including the calculator. AUTO follows terminal_border_color."
+app,app/src/main/res/values/strings_settings.xml,setting_theme_workspace_header_background_color_description,string,true,"Background color for the title bar in workspace panels, including the calculator. AUTO follows terminal_header_background_color."
+app,app/src/main/res/values/strings_settings.xml,setting_theme_workspace_header_text_color_description,string,true,"Text color for the title bar in workspace panels, including the calculator. AUTO follows module_text_color."
+app,app/src/main/res/values/strings_settings.xml,setting_theme_workspace_header_border_color_description,string,true,"Border color for the title bar in workspace panels, including the calculator. AUTO follows terminal_header_border_color."
+app,app/src/main/res/values/strings_settings.xml,setting_theme_workspace_output_background_color_description,string,true,"Background color for output area in workspace panels, including the calculator. AUTO blends workspace_panel_background_color with ansi_black."
+app,app/src/main/res/values/strings_settings.xml,setting_theme_workspace_output_text_color_description,string,true,"Text color for output area in workspace panels, including the calculator. AUTO follows output_text_color."
+app,app/src/main/res/values/strings_settings.xml,setting_theme_workspace_input_background_color_description,string,true,"Background color for input fields in workspace panels, including the calculator. AUTO blends workspace_panel_background_color with ansi_black."
+app,app/src/main/res/values/strings_settings.xml,setting_theme_workspace_input_text_color_description,string,true,"Text color for input fields in workspace panels, including the calculator. AUTO follows input_text_color."
+app,app/src/main/res/values/strings_settings.xml,setting_theme_workspace_control_background_color_description,string,true,"Background color for controls in workspace panels, including the calculator. AUTO follows module_button_background_color."
+app,app/src/main/res/values/strings_settings.xml,setting_theme_workspace_control_text_color_description,string,true,"Text color for controls in workspace panels, including the calculator. AUTO follows module_text_color."
+app,app/src/main/res/values/strings_settings.xml,setting_theme_workspace_control_border_color_description,string,true,"Border color for controls in workspace panels, including the calculator. AUTO follows terminal_border_color."
+app,app/src/main/res/values/strings_settings.xml,setting_theme_settings_screen_color_description,string,true,Color behind the settings panel. AUTO follows settings_wallpaper_overlay_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_settings_panel_background_color_description,string,true,Background color for the main panel in settings. AUTO follows terminal_header_background_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_settings_panel_text_color_description,string,true,Text color for the main panel in settings. AUTO follows output_text_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_settings_panel_border_color_description,string,true,Border color for the main panel in settings. AUTO follows terminal_header_border_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_settings_header_background_color_description,string,true,Background color for the title bar in settings. AUTO follows settings_panel_background_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_settings_header_text_color_description,string,true,Text color for the title bar in settings. AUTO follows accent_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_settings_header_border_color_description,string,true,Border color for the title bar in settings. AUTO follows settings_panel_border_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_settings_row_background_color_description,string,true,Background color for rows in settings. AUTO follows button_background_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_settings_row_text_color_description,string,true,Text color for rows in settings. AUTO follows button_text_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_settings_row_border_color_description,string,true,Border color for rows in settings. AUTO follows button_border_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_settings_input_background_color_description,string,true,Background color for input fields in settings. AUTO follows settings_panel_background_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_settings_input_text_color_description,string,true,Text color for input fields in settings. AUTO chooses readable text for settings_input_background_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_settings_input_hint_color_description,string,true,Placeholder text color for input fields in settings. AUTO uses settings_input_text_color with reduced opacity.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_settings_input_border_color_description,string,true,Border color for input fields in settings. AUTO follows settings_panel_border_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_dialog_scrim_color_description,string,true,Tint behind dialogs. AUTO follows settings_wallpaper_overlay_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_dialog_panel_background_color_description,string,true,Background color for the main panel in dialogs. AUTO follows settings_panel_background_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_dialog_panel_text_color_description,string,true,Text color for the main panel in dialogs. AUTO follows settings_panel_text_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_dialog_panel_border_color_description,string,true,Border color for the main panel in dialogs. AUTO follows settings_panel_border_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_dialog_header_background_color_description,string,true,Background color for the title bar in dialogs. AUTO follows settings_header_background_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_dialog_header_text_color_description,string,true,Text color for the title bar in dialogs. AUTO follows settings_header_text_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_dialog_header_border_color_description,string,true,Border color for the title bar in dialogs. AUTO follows settings_header_border_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_overlay_scrim_color_description,string,true,Tint behind floating panels. AUTO uses the built-in default.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_overlay_panel_background_color_description,string,true,Background color for the main panel in floating panels. AUTO follows module_panel_background_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_overlay_panel_text_color_description,string,true,Text color for the main panel in floating panels. AUTO follows module_panel_text_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_overlay_panel_border_color_description,string,true,Border color for the main panel in floating panels. AUTO follows module_panel_border_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_overlay_header_background_color_description,string,true,Background color for the title bar in floating panels. AUTO follows module_header_background_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_overlay_header_text_color_description,string,true,Text color for the title bar in floating panels. AUTO follows module_header_text_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_overlay_header_border_color_description,string,true,Border color for the title bar in floating panels. AUTO follows module_header_border_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_ansi_black_description,string,true,Terminal color for black ANSI text. AUTO uses the built-in default.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_ansi_red_description,string,true,Terminal color for red ANSI text. AUTO uses the built-in default.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_ansi_green_description,string,true,Terminal color for green ANSI text. AUTO blends terminal_window_background_color with accent_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_ansi_yellow_description,string,true,Terminal color for yellow ANSI text. AUTO follows warning_text_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_ansi_blue_description,string,true,Terminal color for blue ANSI text. AUTO blends terminal_window_background_color with output_text_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_ansi_magenta_description,string,true,Terminal color for magenta ANSI text. AUTO uses the built-in default.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_ansi_cyan_description,string,true,Terminal color for cyan ANSI text. AUTO blends accent_color with output_text_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_ansi_white_description,string,true,Terminal color for white ANSI text. AUTO follows output_text_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_ansi_bright_black_description,string,true,Terminal color for bright black ANSI text. AUTO follows muted_text_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_ansi_bright_red_description,string,true,Terminal color for bright red ANSI text. AUTO uses the built-in default.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_ansi_bright_green_description,string,true,Terminal color for bright green ANSI text. AUTO blends accent_color with output_text_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_ansi_bright_yellow_description,string,true,Terminal color for bright yellow ANSI text. AUTO blends warning_text_color with output_text_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_ansi_bright_blue_description,string,true,Terminal color for bright blue ANSI text. AUTO blends output_text_color with accent_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_ansi_bright_magenta_description,string,true,Terminal color for bright magenta ANSI text. AUTO uses the built-in default.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_ansi_bright_cyan_description,string,true,Terminal color for bright cyan ANSI text. AUTO blends accent_color with output_text_color.
+app,app/src/main/res/values/strings_settings.xml,setting_theme_ansi_bright_white_description,string,true,Terminal color for bright white ANSI text. AUTO follows output_text_color.
 app,app/src/main/res/values/strings_settings.xml,setting_toolbar_show_toolbar_description,string,true,"""If false, the toolbar is hidden"""
 app,app/src/main/res/values/strings_settings.xml,setting_toolbar_hide_toolbar_no_input_description,string,true,"""If true, the toolbar will be hidden when the input field is empty"""
 app,app/src/main/res/values/strings_settings.xml,setting_toolbar_shortcut_button_1_enabled_description,string,true,"""If true, the first custom toolbar button is shown"""
@@ -2299,19 +2471,19 @@ app,app/src/main/res/values/strings_settings.xml,setting_ui_enable_crt_vignette_
 app,app/src/main/res/values/strings_settings.xml,setting_ui_font_file_description,string,true,"""Selected custom font file name from the fonts folder"""
 app,app/src/main/res/values/strings_settings.xml,setting_ui_font_size_offset_description,string,true,"""Adds this many points to Launcher text sizes without changing their individual size settings"""
 app,app/src/main/res/values/strings_settings.xml,setting_ui_fullscreen_description,string,true,"""If true, Re:T-UI will run in fullscreen mode"""
-app,app/src/main/res/values/strings_settings.xml,setting_ui_device_index_description,string,true,"""Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."""
-app,app/src/main/res/values/strings_settings.xml,setting_ui_ram_index_description,string,true,"""Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."""
-app,app/src/main/res/values/strings_settings.xml,setting_ui_battery_index_description,string,true,"""Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."""
-app,app/src/main/res/values/strings_settings.xml,setting_ui_time_index_description,string,true,"""Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."""
+app,app/src/main/res/values/strings_settings.xml,setting_ui_device_index_description,string,true,"""Changing to a whole-number position inserts a row and shifts that row and later rows down when saved. Decimal positions join a row in left-to-right order: 4.1 and 4.2 share row 4. Existing decimal groups stay together when shifted. ASCII always uses its own row."""
+app,app/src/main/res/values/strings_settings.xml,setting_ui_ram_index_description,string,true,"""Changing to a whole-number position inserts a row and shifts that row and later rows down when saved. Decimal positions join a row in left-to-right order: 4.1 and 4.2 share row 4. Existing decimal groups stay together when shifted. ASCII always uses its own row."""
+app,app/src/main/res/values/strings_settings.xml,setting_ui_battery_index_description,string,true,"""Changing to a whole-number position inserts a row and shifts that row and later rows down when saved. Decimal positions join a row in left-to-right order: 4.1 and 4.2 share row 4. Existing decimal groups stay together when shifted. ASCII always uses its own row."""
+app,app/src/main/res/values/strings_settings.xml,setting_ui_time_index_description,string,true,"""Changing to a whole-number position inserts a row and shifts that row and later rows down when saved. Decimal positions join a row in left-to-right order: 4.1 and 4.2 share row 4. Existing decimal groups stay together when shifted. ASCII always uses its own row."""
 app,app/src/main/res/values/strings_settings.xml,setting_ui_show_ascii_description,string,true,"""Show the ASCII art from ascii.txt. WARNING: wide art may overflow or wrap on small screens."""
 app,app/src/main/res/values/strings_settings.xml,setting_ui_show_ascii_landscape_description,string,true,"""Show the ASCII art while the landscape layout is active"""
-app,app/src/main/res/values/strings_settings.xml,setting_ui_ascii_index_description,string,true,"""ASCII always uses its own status row so the dedicated viewport remains active. If that whole-number row is occupied, ASCII moves to the next free row."""
+app,app/src/main/res/values/strings_settings.xml,setting_ui_ascii_index_description,string,true,"""Changing this position inserts the ASCII pane at that row and shifts that row and later rows down when saved. For example, inserting ASCII at 1 moves 1 to 2 and 1.1 to 2.1. ASCII always uses its own row."""
 app,app/src/main/res/values/strings_settings.xml,setting_ui_ascii_size_description,string,true,"""Legacy ASCII art text size. ASCII now auto-fits to the pane width."""
 app,app/src/main/res/values/strings_settings.xml,setting_ui_ascii_max_lines_description,string,true,"""Number of source rows shown in the ASCII viewport. Use -1 to auto-zoom wide art."""
 app,app/src/main/res/values/strings_settings.xml,setting_ui_ascii_pane_height_rows_description,string,true,"""Maximum physical height of the ASCII pane, measured in text rows."""
-app,app/src/main/res/values/strings_settings.xml,setting_ui_storage_index_description,string,true,"""Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."""
-app,app/src/main/res/values/strings_settings.xml,setting_ui_network_index_description,string,true,"""Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."""
-app,app/src/main/res/values/strings_settings.xml,setting_ui_notes_index_description,string,true,"""Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."""
+app,app/src/main/res/values/strings_settings.xml,setting_ui_storage_index_description,string,true,"""Changing to a whole-number position inserts a row and shifts that row and later rows down when saved. Decimal positions join a row in left-to-right order: 4.1 and 4.2 share row 4. Existing decimal groups stay together when shifted. ASCII always uses its own row."""
+app,app/src/main/res/values/strings_settings.xml,setting_ui_network_index_description,string,true,"""Changing to a whole-number position inserts a row and shifts that row and later rows down when saved. Decimal positions join a row in left-to-right order: 4.1 and 4.2 share row 4. Existing decimal groups stay together when shifted. ASCII always uses its own row."""
+app,app/src/main/res/values/strings_settings.xml,setting_ui_notes_index_description,string,true,"""Changing to a whole-number position inserts a row and shifts that row and later rows down when saved. Decimal positions join a row in left-to-right order: 4.1 and 4.2 share row 4. Existing decimal groups stay together when shifted. ASCII always uses its own row."""
 app,app/src/main/res/values/strings_settings.xml,setting_ui_ram_status_alignment_description,string,true,"""RAM status line alignment (<0 = left, =0 = center, >0 = right)"""
 app,app/src/main/res/values/strings_settings.xml,setting_ui_device_status_alignment_description,string,true,"""Device status line alignment (<0 = left, =0 = center, >0 = right)"""
 app,app/src/main/res/values/strings_settings.xml,setting_ui_time_status_alignment_description,string,true,"""Time status line alignment (<0 = left, =0 = center, >0 = right)"""
@@ -2326,6 +2498,7 @@ app,app/src/main/res/values/strings_settings.xml,setting_ui_input_prefix_descrip
 app,app/src/main/res/values/strings_settings.xml,setting_ui_input_root_prefix_description,string,true,"""The prefix placed before a root command (\""su ...\"")"""
 app,app/src/main/res/values/strings_settings.xml,setting_ui_display_margin_top_section_description,string,true,"""Complete top pane group margins in millimeters: [left],[top],[right],[bottom]"""
 app,app/src/main/res/values/strings_settings.xml,setting_ui_display_margin_bottom_section_description,string,true,"""Bottom terminal/input section display margin in millimeters. [left margin],[top margin],[right margin],[bottom margin]"""
+app,app/src/main/res/values/strings_settings.xml,setting_ui_keyboard_visible_margin_override_description,string,true,"""Bottom terminal/input section margins in millimeters used only while the keyboard is visible or the launcher input has focus. [left],[top],[right],[bottom]. Leave blank to use display_margin_bottom_section"""
 app,app/src/main/res/values/strings_settings.xml,setting_ui_display_margin_landscape_mm_description,string,true,"""Landscape display margin in millimeters. [left margin],[top margin],[right margin],[bottom margin]"""
 app,app/src/main/res/values/strings_settings.xml,setting_ui_landscape_fold_gutter_mm_description,string,true,"""Landscape-only center gutter in millimeters for fold hinges or screen creases"""
 app,app/src/main/res/values/strings_settings.xml,setting_ui_split_duo_launcher_description,string,true,"""If true, Duo keeps the status lines and side switch button on the empty screen while output, input, toolbar, and suggestions stay on the active screen"""
@@ -2339,10 +2512,10 @@ app,app/src/main/res/values/strings_settings.xml,setting_ui_show_restart_message
 app,app/src/main/res/values/strings_settings.xml,setting_ui_notes_max_lines_description,string,true,"""The max number of lines of notes (-1 to disable)"""
 app,app/src/main/res/values/strings_settings.xml,setting_ui_show_scroll_notes_message_description,string,true,"""If true, you will get a message when your notes reach the value set in notes_max_lines"""
 app,app/src/main/res/values/strings_settings.xml,setting_ui_show_weather_description,string,true,"""If true, you will see a label containing the weather in your area"""
-app,app/src/main/res/values/strings_settings.xml,setting_ui_weather_index_description,string,true,"""Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."""
+app,app/src/main/res/values/strings_settings.xml,setting_ui_weather_index_description,string,true,"""Changing to a whole-number position inserts a row and shifts that row and later rows down when saved. Decimal positions join a row in left-to-right order: 4.1 and 4.2 share row 4. Existing decimal groups stay together when shifted. ASCII always uses its own row."""
 app,app/src/main/res/values/strings_settings.xml,setting_ui_weather_size_description,string,true,"""Weather size"""
 app,app/src/main/res/values/strings_settings.xml,setting_ui_show_unlock_counter_description,string,true,"""If false, the unlock counter feature will be disabled"""
-app,app/src/main/res/values/strings_settings.xml,setting_ui_unlock_index_description,string,true,"""Integer part selects the status row; decimal part controls left-to-right order. Values 4, 4.1, and 4.2 share one row. ASCII always uses its own row."""
+app,app/src/main/res/values/strings_settings.xml,setting_ui_unlock_index_description,string,true,"""Changing to a whole-number position inserts a row and shifts that row and later rows down when saved. Decimal positions join a row in left-to-right order: 4.1 and 4.2 share row 4. Existing decimal groups stay together when shifted. ASCII always uses its own row."""
 app,app/src/main/res/values/strings_settings.xml,setting_ui_unlock_size_description,string,true,"""Unlock size"""
 app,app/src/main/res/values/strings_settings.xml,setting_ui_statusbar_light_icons_description,string,true,"""If true, your status bar icons will be white. Dark otherwise"""
 app,app/src/main/res/values/strings_settings.xml,setting_ui_shadow_params_description,string,true,"""[Shadow X offset],[Shadow Y offset],[Shadow radius]"""

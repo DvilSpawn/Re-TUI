@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- The basic calculator remains available on API 23; native entry is guarded at API 24. -->
+    <uses-sdk tools:overrideLibrary="com.jherkenhoff.libqalculate" />
+
     <queries>
         <package android:name="com.termux" />
         <package android:name="net.dinglisch.android.taskerm" />
@@ -262,6 +265,20 @@
             android:taskAffinity="${applicationId}.notes"
             android:theme="@style/RememberTheme"
             android:windowSoftInputMode="adjustNothing"
+            android:exported="false" />
+        <activity
+            android:name=".calculator.CalculatorActivity"
+            android:alwaysRetainTaskState="true"
+            android:excludeFromRecents="false"
+            android:label="@string/ui_calculator_surface_calculator"
+            android:launchMode="singleTask"
+            android:taskAffinity="${applicationId}.calculator"
+            android:theme="@style/Custom.Popup"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden"
+            android:exported="false" />
+        <service
+            android:name=".calculator.QalculateService"
+            android:process=":qalculate"
             android:exported="false" />
         <activity android:name=".notes.SettingsActivity" android:exported="false" android:theme="@style/RememberTheme" />
         <provider android:name="androidx.core.content.FileProvider" android:authorities="${applicationId}.files" android:exported="false" android:grantUriPermissions="true">

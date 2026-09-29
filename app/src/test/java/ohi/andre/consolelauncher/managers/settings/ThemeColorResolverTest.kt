@@ -9,6 +9,8 @@ import org.junit.Test
 class ThemeColorResolverTest {
     @Test
     fun advancedRolesDefaultToAutoAndResolve() {
+        val advanced = Theme.entries.filter { it.advanced }
+        assertEquals("Every advanced color needs its own description", advanced.size, advanced.map { it.infoRes() }.toSet().size)
         Theme.entries.filter { it.advanced }.forEach { role ->
             assertEquals(XMLPrefsSave.AUTO_COLOR, role.type())
             assertEquals("auto", role.defaultValue())

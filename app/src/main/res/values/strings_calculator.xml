@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item type="id" name="calculator_equals" />
+    <item type="id" name="calculator_expression" />
+    <item type="id" name="calculator_result" />
+    <string name="setting_behavior_qalculate_description">Enable unit conversions, symbolic maths and advanced controls in the calculator and calc commands. Requires Android 7 or newer. Off by default; calculations work offline without live currency-rate updates.</string>
+    <string name="calculator_qalculate_hint" translatable="false">5 km to miles</string>
+    <string name="calculator_degrees">Degrees</string>
+    <string name="calculator_exact">Exact when possible</string>
+    <string name="calculator_working">Calculating…</string>
+    <string name="calculator_timeout">Calculation timed out. Try a simpler expression.</string>
+    <string name="calculator_engine_stopped">Qalculate stopped or could not start. Please try again.</string>
+    <string name="calculator_busy">Another calculation is running. Please try again.</string>
+    <string name="calculator_invalid">Invalid expression.</string>
+    <string name="calculator_too_long">Expressions can contain at most %1$d characters.</string>
+</resources>

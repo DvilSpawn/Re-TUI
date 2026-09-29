@@ -520,21 +520,6 @@ class UIManager(
     private val podcastImageCache = object : LruCache<String, Bitmap>(6 * 1024 * 1024) {
         override fun sizeOf(key: String, value: Bitmap): Int = value.byteCount
     }
-    private var calculatorOverlay: View? = null
-    private var calculatorOverlayBasePaddingLeft = 0
-    private var calculatorOverlayBasePaddingTop = 0
-    private var calculatorOverlayBasePaddingRight = 0
-    private var calculatorOverlayBasePaddingBottom = 0
-    private var calculatorWindowBorder: View? = null
-    private var calculatorWindowLabel: TextView? = null
-    private var calculatorClose: TextView? = null
-    private var calculatorDisplayPanel: View? = null
-    private var calculatorDisplayLabel: TextView? = null
-    private var calculatorExpression: TextView? = null
-    private var calculatorResult: TextView? = null
-    private var calculatorKeypad: GridLayout? = null
-    private val calculatorInput = StringBuilder()
-    private var calculatorWindowAnim: AnimatorSet? = null
     private var suggestionsContainer: View? = null
     private var suggestionsVisibilityBeforeTermux = View.VISIBLE
     private var termuxConsoleOpen = false
@@ -2457,7 +2442,7 @@ class UIManager(
             systemInsetBottom = max(0, bottom)
             imeInsetVisible = imeVisible
             imeBottomOffset = if (imeInsetVisible) max(0, keyboardOffset) else 0
-            if ((isPodcastSurfaceVisible || isCalculatorSurfaceVisible) && imeVisible) {
+            if (isPodcastSurfaceVisible && imeVisible) {
                 // Focus panes own the launcher viewport; the IME must not resize them.
                 closeKeyboard()
                 mTerminalAdapter?.inputView?.clearFocus()
@@ -2469,9 +2454,6 @@ class UIManager(
             applyTermuxWorkspaceImeBottomPadding()
             if (isPodcastSurfaceVisible) {
                 applyPodcastPaneGeometry()
-            }
-            if (isCalculatorSurfaceVisible) {
-                applyCalculatorPaneGeometry()
             }
             updateKeyboardLayoutState(
                 imeInsetVisible || imeBottomOffset > 0,
@@ -2731,18 +2713,6 @@ class UIManager(
             overlayDisplayMarginBottom
         )
         applyPodcastPaneGeometry()
-        OverlayLayoutManager.applyPaddingWithBase(
-            calculatorOverlay,
-            calculatorOverlayBasePaddingLeft,
-            calculatorOverlayBasePaddingTop,
-            calculatorOverlayBasePaddingRight,
-            calculatorOverlayBasePaddingBottom,
-            overlayDisplayMarginLeft,
-            overlayDisplayMarginTop,
-            overlayDisplayMarginRight,
-            overlayDisplayMarginBottom
-        )
-        applyCalculatorPaneGeometry()
         OverlayLayoutManager.applyPaddingWithBase(
             hackOverlay,
             hackOverlayBasePaddingLeft,
@@ -8283,126 +8253,6 @@ class UIManager(
         }
     }
 
-    private fun setupCalculatorSurface(rootView: ViewGroup) {
-        calculatorOverlay = rootView.findViewById(R.id.calculator_overlay)
-        val overlay = calculatorOverlay ?: return
-        calculatorOverlayBasePaddingLeft = overlay.paddingLeft
-        calculatorOverlayBasePaddingTop = overlay.paddingTop
-        calculatorOverlayBasePaddingRight = overlay.paddingRight
-        calculatorOverlayBasePaddingBottom = overlay.paddingBottom
-
-        calculatorWindowBorder = rootView.findViewById(R.id.calculator_window_border)
-        calculatorWindowLabel = rootView.findViewById(R.id.calculator_window_label)
-        calculatorClose = rootView.findViewById(R.id.calculator_close)
-        calculatorDisplayPanel = rootView.findViewById(R.id.calculator_display_panel)
-        calculatorDisplayLabel = rootView.findViewById(R.id.calculator_display_label)
-        calculatorExpression = rootView.findViewById(R.id.calculator_expression)
-        calculatorResult = rootView.findViewById(R.id.calculator_result)
-        calculatorKeypad = rootView.findViewById(R.id.calculator_keypad)
-
-        buildCalculatorKeypad()
-        styleCalculatorSurface()
-        renderCalculator()
-        calculatorClose?.setOnClickListener { closeCalculatorSurface() }
-    }
-
-    private fun buildCalculatorKeypad() {
-        val keypad = calculatorKeypad ?: return
-        keypad.removeAllViews()
-        val rows = arrayOf(
-            arrayOf("C", "(", ")", "⌫"),
-            arrayOf("√", "^", "%", "/"),
-            arrayOf("7", "8", "9", "*"),
-            arrayOf("4", "5", "6", "-"),
-            arrayOf("1", "2", "3", "+")
-        )
-        rows.forEachIndexed { row, labels ->
-            labels.forEachIndexed { column, label ->
-                addCalculatorKey(keypad, label, row, column)
-            }
-        }
-        addCalculatorKey(keypad, "", 5, 0)
-        addCalculatorKey(keypad, "0", 5, 1)
-        addCalculatorKey(keypad, ".", 5, 2)
-        addCalculatorKey(keypad, "=", 5, 3)
-    }
-
-    private fun addCalculatorKey(
-        keypad: GridLayout,
-        label: String,
-        row: Int,
-        column: Int,
-        span: Int = 1
-    ) {
-        val button = TextView(mContext).apply {
-            text = label
-            contentDescription = when (label) {
-                "⌫" -> mContext.getString(R.string.surface_backspace_88d13)
-                "√" -> mContext.getString(R.string.surface_square_root_47a32)
-                "C" -> mContext.getString(R.string.surface_clear_719ea)
-                "=" -> mContext.getString(R.string.surface_equals_09b6a)
-                else -> label
-            }
-            gravity = Gravity.CENTER
-            if (label.isEmpty()) {
-                importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
-            } else {
-                setOnClickListener { onCalculatorKey(label) }
-            }
-        }
-        styleCalculatorKey(button)
-        val margin = Tuils.dpToPx(mContext, 3)
-        val params = GridLayout.LayoutParams(
-            GridLayout.spec(row, 1, 1f),
-            GridLayout.spec(column, span, span.toFloat())
-        ).apply {
-            width = 0
-            height = 0
-            setMargins(margin, margin, margin, margin)
-        }
-        keypad.addView(button, params)
-    }
-
-    private fun onCalculatorKey(label: String) {
-        when (label) {
-            "C" -> calculatorInput.clear()
-            "⌫" -> if (calculatorInput.isNotEmpty()) calculatorInput.deleteCharAt(calculatorInput.lastIndex)
-            "=" -> {
-                val value = try {
-                    formatCalculatorValue(Tuils.eval(calculatorInput.toString()))
-                } catch (_: Exception) {
-                    calculatorResult?.text = mContext.getString(R.string.surface_error_0b99c)
-                    return
-                }
-                calculatorInput.clear()
-                calculatorInput.append(value)
-            }
-            else -> if (calculatorInput.length < CALCULATOR_MAX_EXPRESSION_LENGTH) {
-                calculatorInput.append(if (label == "√") "sqrt" else label)
-            }
-        }
-        renderCalculator()
-    }
-
-    private fun renderCalculator() {
-        val expression = calculatorInput.toString()
-        calculatorExpression?.text = expression.ifEmpty { "0" }
-        calculatorResult?.text = if (expression.isEmpty()) {
-            ""
-        } else {
-            try {
-                formatCalculatorValue(Tuils.eval(expression))
-            } catch (_: Exception) {
-                ""
-            }
-        }
-    }
-
-    private fun formatCalculatorValue(value: Double): String {
-        val whole = value.toLong()
-        return if (value.isFinite() && value == whole.toDouble()) whole.toString() else value.toString()
-    }
-
     private fun setupPodcastSurface(rootView: ViewGroup) {
         podcastOverlay = rootView.findViewById<View?>(R.id.podcast_overlay)
         if (podcastOverlay == null) {
@@ -8667,7 +8517,6 @@ class UIManager(
         filter.addAction(ACTION_LUA_APP)
         filter.addAction(ACTION_FILE_CONSOLE)
         filter.addAction(ACTION_PODCAST_SURFACE)
-        filter.addAction(ACTION_CALCULATOR_SURFACE)
         filter.addAction(ACTION_PROFILE_SURFACE)
         filter.addAction(ACTION_TERMUX_RESULT)
         filter.addAction(ACTION_MODULE_COMMAND)
@@ -8706,8 +8555,7 @@ class UIManager(
                     openFileConsole(intent.getStringExtra(EXTRA_FILE_COMMAND))
                 } else if (action == ACTION_PODCAST_SURFACE) {
                     openPodcastSurface(intent.getStringExtra(EXTRA_PODCAST_COMMAND))
-                } else if (action == ACTION_CALCULATOR_SURFACE) {
-                    openCalculatorSurface(intent.getStringExtra(EXTRA_CALCULATOR_EXPRESSION))
+
                 } else if (action == ACTION_PROFILE_SURFACE) {
                     openProfileSurface()
                 } else if (action == ACTION_TERMUX_RESULT) {
@@ -8950,7 +8798,6 @@ class UIManager(
         setupTermuxConsole(rootView)
         setupFileConsole(rootView)
         setupPodcastSurface(rootView)
-        setupCalculatorSurface(rootView)
         profilePaneController = ProfilePaneController(mContext!!, rootView) { closeProfileSurface() }
         setupResponsiveLandscapeLayout(rootView)
 
@@ -10119,80 +9966,6 @@ class UIManager(
         styleTermuxToolButton(filePaste, textColor)
     }
 
-    private fun styleCalculatorSurface() {
-        val overlay = calculatorOverlay ?: return
-        val borderColor = ThemeColorResolver.color(Theme.workspace_panel_border_color)
-        val textColor = ThemeColorResolver.color(Theme.workspace_panel_text_color)
-        val bgColor = ThemeColorResolver.color(Theme.workspace_panel_background_color)
-        val labelBg = ThemeColorResolver.color(Theme.workspace_header_background_color)
-        val typeface = Tuils.getTypeface(mContext)
-
-        overlay.setBackgroundColor(Color.TRANSPARENT)
-        calculatorWindowBorder?.background = TerminalBorderRuntime.panelDrawable(
-            mContext,
-            bgColor,
-            borderColor,
-            1.5f,
-            outputCornerRadius(),
-            dashedBorders(),
-            target = FrameTarget.OVERLAYS
-        )
-        listOf(calculatorWindowLabel, calculatorClose).forEach { label ->
-            label?.setTypeface(typeface, Typeface.BOLD)
-            label?.textSize = PODCAST_TEXT_LARGE
-            label?.setTextColor(textColor)
-        }
-        calculatorWindowLabel?.background = TerminalBorderRuntime.tabDrawable(mContext, labelBg, FrameTarget.OVERLAYS)
-        calculatorClose?.background = TerminalBorderRuntime.tabDrawable(mContext, labelBg, textColor, true, FrameTarget.OVERLAYS)
-        TerminalBorderRuntime.bind(calculatorWindowBorder, calculatorWindowLabel, calculatorClose)
-
-        calculatorDisplayPanel?.background = TerminalBorderRuntime.panelDrawable(
-            mContext,
-            ThemeColorResolver.color(Theme.workspace_output_background_color),
-            ThemeColorResolver.withMaxAlpha(borderColor, 210),
-            1.2f,
-            outputCornerRadius(),
-            dashedBorders(),
-            target = FrameTarget.OVERLAYS
-        )
-        calculatorDisplayLabel?.apply {
-            setTypeface(typeface, Typeface.BOLD)
-            setTextColor(textColor)
-            background = TerminalBorderRuntime.tabDrawable(mContext, labelBg, FrameTarget.OVERLAYS)
-        }
-        TerminalBorderRuntime.bind(calculatorDisplayPanel, calculatorDisplayLabel)
-        calculatorExpression?.apply {
-            setTypeface(typeface, Typeface.BOLD)
-            setTextColor(textColor)
-        }
-        calculatorResult?.apply {
-            setTypeface(typeface, Typeface.BOLD)
-            setTextColor(moduleNameTextColor())
-        }
-        calculatorKeypad?.let { keypad ->
-            for (index in 0 until keypad.childCount) {
-                styleCalculatorKey(keypad.getChildAt(index) as? TextView)
-            }
-        }
-    }
-
-    private fun styleCalculatorKey(button: TextView?) {
-        val target = button ?: return
-        target.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
-        target.setTextColor(moduleNameTextColor())
-        target.textSize = PODCAST_TEXT_LARGE
-        target.background = TerminalBorderRuntime.panelDrawable(
-            mContext,
-            moduleButtonBackgroundColor(),
-            moduleButtonBorderColor(),
-            1.2f,
-            moduleCornerRadius(),
-            dashedBorders(),
-            false,
-            target = FrameTarget.OVERLAYS
-        )
-    }
-
     private fun stylePodcastSurface() {
         if (podcastOverlay == null) {
             return
@@ -10334,9 +10107,6 @@ class UIManager(
     private fun applyPodcastPaneGeometry() =
         applyFocusPaneGeometry(podcastOverlay, podcastWindowBorder)
 
-    private fun applyCalculatorPaneGeometry() =
-        applyFocusPaneGeometry(calculatorOverlay, calculatorWindowBorder)
-
     private fun applyFocusPaneGeometry(overlay: View?, border: View?) {
         overlay ?: return
         border ?: return
@@ -10444,7 +10214,6 @@ class UIManager(
             return
         }
 
-        closeCalculatorSurface(false, false)
         closeFileConsole(false)
         minimizePodcastSurface()
         profilePaneController?.hide()
@@ -10508,7 +10277,6 @@ class UIManager(
             return
         }
 
-        closeCalculatorSurface(false, false)
         closeFileConsole(false)
         minimizePodcastSurface()
         profilePaneController?.hide()
@@ -10556,7 +10324,6 @@ class UIManager(
             return
         }
 
-        closeCalculatorSurface(false, false)
         closeTermuxConsole(false)
         minimizePodcastSurface()
         profilePaneController?.hide()
@@ -10605,238 +10372,6 @@ class UIManager(
         }
     }
 
-    fun openCalculatorSurface(expression: String?) {
-        if (Looper.myLooper() != Looper.getMainLooper()) {
-            runOnMainThread { openCalculatorSurface(expression) }
-            return
-        }
-        val overlay = calculatorOverlay ?: return
-
-        closeCalculatorSurface(false, false)
-        closeTermuxConsole(false)
-        closeFileConsole(false)
-        closeLuaAppSession(true)
-        minimizePodcastSurface()
-        profilePaneController?.hide()
-        closeKeyboard()
-        mTerminalAdapter?.inputView?.clearFocus()
-
-        calculatorInput.clear()
-        calculatorInput.append(expression?.trim().orEmpty().take(CALCULATOR_MAX_EXPRESSION_LENGTH))
-        renderCalculator()
-        styleCalculatorSurface()
-
-        val landscape = podcastLandscapePresentation()
-        if (landscape) {
-            snapCalculatorLandIdle()
-            overlay.alpha = 0f
-        } else {
-            snapCalculatorCrtCollapsed()
-            overlay.alpha = 1f
-        }
-        overlay.visibility = View.VISIBLE
-        overlay.bringToFront()
-        applyCalculatorPaneGeometry()
-        suggestionsContainer?.takeIf { it.visibility == View.VISIBLE }?.visibility = View.INVISIBLE
-        overlay.post {
-            if (landscape) {
-                resetPodcastFocusChromeImmediate()
-                playCalculatorLandExpand()
-            } else {
-                setPodcastFocusChrome(true)
-                playCalculatorCrtExpand()
-            }
-        }
-    }
-
-    private fun closeCalculatorSurface(restoreSuggestions: Boolean = true, animate: Boolean = true) {
-        val overlay = calculatorOverlay ?: return
-        if (overlay.visibility != View.VISIBLE) return
-
-        val finish = {
-            overlay.visibility = View.GONE
-            overlay.setBackgroundColor(Color.TRANSPARENT)
-            if (podcastLandscapePresentation()) snapCalculatorLandIdle() else snapCalculatorCrtCollapsed()
-            calculatorInput.clear()
-            renderCalculator()
-            if (restoreSuggestions && suggestionsContainer?.visibility == View.INVISIBLE) {
-                suggestionsContainer?.visibility = View.VISIBLE
-            }
-            if (restoreSuggestions) {
-                mTerminalAdapter?.focusInputEnd()
-                refreshSuggestionsSoon()
-            }
-        }
-        if (!animate) {
-            calculatorWindowAnim?.cancel()
-            calculatorWindowAnim = null
-            resetPodcastFocusChromeImmediate()
-            finish()
-        } else if (podcastLandscapePresentation()) {
-            resetPodcastFocusChromeImmediate()
-            playCalculatorLandCollapse(finish)
-        } else {
-            setPodcastFocusChrome(false)
-            playCalculatorCrtCollapse(finish)
-        }
-    }
-
-    private fun snapCalculatorCrtCollapsed() {
-        val border = calculatorWindowBorder ?: return
-        if (border.width > 0) {
-            border.pivotX = border.width / 2f
-            border.pivotY = border.height / 2f
-        }
-        border.scaleX = 0.06f
-        border.scaleY = 0.018f
-        border.alpha = 1f
-        calculatorWindowLabel?.alpha = 0f
-        calculatorClose?.alpha = 0f
-    }
-
-    private fun snapCalculatorLandIdle() {
-        calculatorWindowBorder?.apply {
-            scaleX = 1f
-            scaleY = 1f
-            alpha = 1f
-            translationY = 0f
-        }
-        calculatorWindowLabel?.alpha = 1f
-        calculatorClose?.alpha = 1f
-    }
-
-    private fun playCalculatorCrtExpand() {
-        val border = calculatorWindowBorder ?: return
-        calculatorWindowAnim?.cancel()
-        if (border.width <= 0 || border.height <= 0) {
-            border.post { playCalculatorCrtExpand() }
-            return
-        }
-        border.pivotX = border.width / 2f
-        border.pivotY = border.height / 2f
-        snapCalculatorCrtCollapsed()
-        val beam = AnimatorSet().apply {
-            duration = 90L
-            interpolator = AccelerateInterpolator()
-            playTogether(
-                ObjectAnimator.ofFloat(border, View.SCALE_X, 0.06f, 1f),
-                ObjectAnimator.ofFloat(border, View.SCALE_Y, 0.018f, 0.03f)
-            )
-        }
-        val fill = AnimatorSet().apply {
-            duration = 210L
-            interpolator = DecelerateInterpolator()
-            play(ObjectAnimator.ofFloat(border, View.SCALE_Y, 0.03f, 1f))
-        }
-        calculatorWindowAnim = AnimatorSet().apply {
-            val body = AnimatorSet().apply { playSequentially(beam, fill) }
-            val tabs = listOfNotNull(calculatorWindowLabel, calculatorClose)
-            if (tabs.isEmpty()) {
-                play(body)
-            } else {
-                val fade = AnimatorSet().apply {
-                    duration = 140L
-                    startDelay = 100L
-                    playTogether(tabs.map { ObjectAnimator.ofFloat(it, View.ALPHA, 0f, 1f) })
-                }
-                playTogether(body, fade)
-            }
-            start()
-        }
-    }
-
-    private fun playCalculatorCrtCollapse(onEnd: () -> Unit) {
-        val border = calculatorWindowBorder
-        val overlay = calculatorOverlay
-        if (border == null || overlay?.visibility != View.VISIBLE || border.width <= 0) {
-            onEnd()
-            return
-        }
-        calculatorWindowAnim?.cancel()
-        border.pivotX = border.width / 2f
-        border.pivotY = border.height / 2f
-        val beam = AnimatorSet().apply {
-            duration = 160L
-            interpolator = AccelerateInterpolator()
-            play(ObjectAnimator.ofFloat(border, View.SCALE_Y, border.scaleY.coerceAtLeast(0.03f), 0.03f))
-        }
-        val dot = AnimatorSet().apply {
-            duration = 90L
-            interpolator = AccelerateInterpolator()
-            playTogether(
-                ObjectAnimator.ofFloat(border, View.SCALE_X, border.scaleX.coerceAtLeast(0.06f), 0.06f),
-                ObjectAnimator.ofFloat(border, View.SCALE_Y, 0.03f, 0.018f)
-            )
-        }
-        val set = AnimatorSet().apply {
-            val body = AnimatorSet().apply { playSequentially(beam, dot) }
-            val tabs = listOfNotNull(calculatorWindowLabel, calculatorClose)
-            if (tabs.isEmpty()) {
-                play(body)
-            } else {
-                val fade = AnimatorSet().apply {
-                    duration = 70L
-                    playTogether(tabs.map { ObjectAnimator.ofFloat(it, View.ALPHA, it.alpha, 0f) })
-                }
-                play(fade).before(body)
-            }
-            addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator) {
-                    if (calculatorWindowAnim === animation) {
-                        calculatorWindowAnim = null
-                        onEnd()
-                    }
-                }
-            })
-        }
-        calculatorWindowAnim = set
-        set.start()
-    }
-
-    private fun playCalculatorLandExpand() {
-        val overlay = calculatorOverlay ?: return
-        val border = calculatorWindowBorder
-        calculatorWindowAnim?.cancel()
-        snapCalculatorLandIdle()
-        border?.translationY = Tuils.dpToPx(mContext, 18).toFloat()
-        overlay.alpha = 0f
-        calculatorWindowAnim = AnimatorSet().apply {
-            duration = 180L
-            interpolator = DecelerateInterpolator()
-            val parts = arrayListOf<Animator>(ObjectAnimator.ofFloat(overlay, View.ALPHA, 0f, 1f))
-            border?.let { parts.add(ObjectAnimator.ofFloat(it, View.TRANSLATION_Y, it.translationY, 0f)) }
-            playTogether(parts)
-            start()
-        }
-    }
-
-    private fun playCalculatorLandCollapse(onEnd: () -> Unit) {
-        val overlay = calculatorOverlay ?: return onEnd()
-        val border = calculatorWindowBorder
-        calculatorWindowAnim?.cancel()
-        val set = AnimatorSet().apply {
-            duration = 140L
-            interpolator = AccelerateInterpolator()
-            val parts = arrayListOf<Animator>(ObjectAnimator.ofFloat(overlay, View.ALPHA, overlay.alpha, 0f))
-            border?.let {
-                parts.add(ObjectAnimator.ofFloat(it, View.TRANSLATION_Y, it.translationY, Tuils.dpToPx(mContext, 14).toFloat()))
-            }
-            playTogether(parts)
-            addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator) {
-                    if (calculatorWindowAnim === animation) {
-                        calculatorWindowAnim = null
-                        overlay.alpha = 1f
-                        border?.translationY = 0f
-                        onEnd()
-                    }
-                }
-            })
-        }
-        calculatorWindowAnim = set
-        set.start()
-    }
-
     fun openPodcastSurface(command: String?) {
         if (Looper.myLooper() != Looper.getMainLooper()) {
             runOnMainThread { openPodcastSurface(command) }
@@ -10847,7 +10382,6 @@ class UIManager(
             return
         }
 
-        closeCalculatorSurface(false, false)
         closeTermuxConsole(false)
         closeFileConsole(false)
         closeLuaAppSession(true)
@@ -11138,7 +10672,6 @@ class UIManager(
             runOnMainThread { openProfileSurface() }
             return
         }
-        closeCalculatorSurface(false, false)
         closeTermuxConsole(false)
         closeFileConsole(false)
         closeLuaAppSession(true)
@@ -12382,8 +11915,6 @@ class UIManager(
     private val isPodcastSurfaceVisible: Boolean
         get() = podcastOverlay != null && podcastOverlay!!.getVisibility() == View.VISIBLE
 
-    private val isCalculatorSurfaceVisible: Boolean
-        get() = calculatorOverlay?.visibility == View.VISIBLE
 
     private fun takeTermuxConsoleFocus(showKeyboard: Boolean) {
         if (!this.isTermuxConsoleVisible) {
@@ -16398,10 +15929,6 @@ class UIManager(
             minimizePodcastSurface()
             return
         }
-        if (this.isCalculatorSurfaceVisible) {
-            closeCalculatorSurface()
-            return
-        }
         if (profilePaneController?.visible == true) {
             closeProfileSurface()
             return
@@ -16608,22 +16135,6 @@ class UIManager(
                     snapPodcastPresentationForCurrentOrientation()
                     applyPodcastPaneGeometry()
                     renderPodcastSurface(null)
-                }
-                if (isCalculatorSurfaceVisible) {
-                    closeKeyboard()
-                    calculatorWindowAnim?.cancel()
-                    calculatorWindowAnim = null
-                    if (podcastLandscapePresentation()) {
-                        resetPodcastFocusChromeImmediate()
-                        snapCalculatorLandIdle()
-                    } else {
-                        setPodcastFocusChrome(true)
-                        calculatorWindowBorder?.scaleX = 1f
-                        calculatorWindowBorder?.scaleY = 1f
-                        calculatorWindowLabel?.alpha = 1f
-                        calculatorClose?.alpha = 1f
-                    }
-                    applyCalculatorPaneGeometry()
                 }
                 // Docked pills keep portrait translation across layout — clamp after rotate.
                 reapplyVisibleClockTabDocks()
@@ -16875,8 +16386,6 @@ class UIManager(
         const val EXTRA_FILE_COMMAND: String = "file_command"
         val ACTION_PODCAST_SURFACE: String = BuildConfig.APPLICATION_ID + ".ui_podcast_surface"
         const val EXTRA_PODCAST_COMMAND: String = "podcast_command"
-        val ACTION_CALCULATOR_SURFACE: String = BuildConfig.APPLICATION_ID + ".ui_calculator_surface"
-        const val EXTRA_CALCULATOR_EXPRESSION: String = "calculator_expression"
         val ACTION_PROFILE_SURFACE: String = BuildConfig.APPLICATION_ID + ".ui_profile_surface"
         val ACTION_MODULE_COMMAND: String = BuildConfig.APPLICATION_ID + ".ui_module_command"
         const val EXTRA_MODULE_COMMAND: String = "module_command"
@@ -16907,7 +16416,6 @@ class UIManager(
         private const val PODCAST_PANE_LAND_SIDE_INSET_DP = 16
         private const val PODCAST_CHROME_PEEK_DP = 36
         private const val PODCAST_CHROME_PEEK_ALPHA = 0.92f
-        private const val CALCULATOR_MAX_EXPRESSION_LENGTH = 96
         private const val TERMUX_WORKSPACE_PAGE_COUNT = 2
         private const val TERMUX_WORKSPACE_SESSION = "retui_workspace"
         private const val TERMUX_WORKSPACE_RESULT_PREFIX = "retui-workspace:"

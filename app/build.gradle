@@ -1,6 +1,10 @@
 apply plugin: 'com.android.application'
 
 dependencies {
+    // Optional at runtime (Android 7+); compiled definitions and native engines stay offline.
+    implementation('com.jherkenhoff:libqalculate:5.8.2-2') {
+        exclude group: 'androidx.databinding', module: 'viewbinding'
+    }
     implementation project(':retui-datetime-picker')
     implementation project(':retui-contract')
 }

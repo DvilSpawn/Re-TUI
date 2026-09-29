@@ -144,3 +144,17 @@ This project uses the **OWASP Mobile Application Security Verification Standard 
 ## Localization contributions
 
 Downloadable language packs can be imported through Settings → System & Support → Language packs. See [contributing a language pack](language-packs/README.md) for the English template, PR workflow and independent GitHub releases, and the [translator guide](docs/localization/README.md) for the bundled resource sources. The [localization audit](docs/localization/AUDIT.md) records Launcher and Notes readiness, wireless-phone pseudolocale tests, and translation acceptance limits. Human-language contributions are still needed.
+
+## License
+
+Re:TUI project code is licensed under **GPL-3.0-or-later**; see [LICENSE](LICENSE).
+The original MIT copyright and permission notice is preserved in
+[LICENSES/MIT-original.txt](LICENSES/MIT-original.txt). Previously MIT-licensed
+code remains available under its original terms. Third-party software and artwork
+retain their own licenses; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
+Qalculate builds are currently for local testing. The Android wrapper declares
+GPL-2.0 without an explicit later-version grant, which needs clarification before
+it can be distributed with this app's Apache-2.0 dependencies. Changing this
+repository's license does not resolve that upstream issue. See
+[the Qalculate release requirements](docs/calculator.md#licensing-and-public-releases).
