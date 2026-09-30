@@ -448,8 +448,13 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
     }
 
     private fun buildRows(root: XMLPrefsRoot, source: File): MutableList<TuixtAdapter.SettingsRow> {
+        val showAnsiPalette = XMLPrefsManager.getBoolean(Behavior.show_tmux_workspace_button)
         val remaining: LinkedHashMap<String, XMLPrefsSave> = LinkedHashMap<String, XMLPrefsSave>()
         for (save in root.enums) {
+            // Only hide the editor rows; saved ANSI colors and AUTO inheritance stay active.
+            if (save is Theme && save.name.startsWith("ansi_") && !showAnsiPalette) {
+                continue
+            }
             if (save === Behavior.toggle_output_state) {
                 continue
             }

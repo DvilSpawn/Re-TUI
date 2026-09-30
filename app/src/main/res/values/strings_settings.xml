@@ -649,22 +649,22 @@
     <string name="setting_theme_overlay_header_background_color_description" formatted="false">Background color for the title bar in floating panels. AUTO follows module_header_background_color.</string>
     <string name="setting_theme_overlay_header_text_color_description" formatted="false">Text color for the title bar in floating panels. AUTO follows module_header_text_color.</string>
     <string name="setting_theme_overlay_header_border_color_description" formatted="false">Border color for the title bar in floating panels. AUTO follows module_header_border_color.</string>
-    <string name="setting_theme_ansi_black_description" formatted="false">Terminal color for black ANSI text. AUTO uses the built-in default.</string>
-    <string name="setting_theme_ansi_red_description" formatted="false">Terminal color for red ANSI text. AUTO uses the built-in default.</string>
-    <string name="setting_theme_ansi_green_description" formatted="false">Terminal color for green ANSI text. AUTO blends terminal_window_background_color with accent_color.</string>
-    <string name="setting_theme_ansi_yellow_description" formatted="false">Terminal color for yellow ANSI text. AUTO follows warning_text_color.</string>
-    <string name="setting_theme_ansi_blue_description" formatted="false">Terminal color for blue ANSI text. AUTO blends terminal_window_background_color with output_text_color.</string>
-    <string name="setting_theme_ansi_magenta_description" formatted="false">Terminal color for magenta ANSI text. AUTO uses the built-in default.</string>
-    <string name="setting_theme_ansi_cyan_description" formatted="false">Terminal color for cyan ANSI text. AUTO blends accent_color with output_text_color.</string>
-    <string name="setting_theme_ansi_white_description" formatted="false">Terminal color for white ANSI text. AUTO follows output_text_color.</string>
-    <string name="setting_theme_ansi_bright_black_description" formatted="false">Terminal color for bright black ANSI text. AUTO follows muted_text_color.</string>
-    <string name="setting_theme_ansi_bright_red_description" formatted="false">Terminal color for bright red ANSI text. AUTO uses the built-in default.</string>
-    <string name="setting_theme_ansi_bright_green_description" formatted="false">Terminal color for bright green ANSI text. AUTO blends accent_color with output_text_color.</string>
-    <string name="setting_theme_ansi_bright_yellow_description" formatted="false">Terminal color for bright yellow ANSI text. AUTO blends warning_text_color with output_text_color.</string>
-    <string name="setting_theme_ansi_bright_blue_description" formatted="false">Terminal color for bright blue ANSI text. AUTO blends output_text_color with accent_color.</string>
-    <string name="setting_theme_ansi_bright_magenta_description" formatted="false">Terminal color for bright magenta ANSI text. AUTO uses the built-in default.</string>
-    <string name="setting_theme_ansi_bright_cyan_description" formatted="false">Terminal color for bright cyan ANSI text. AUTO blends accent_color with output_text_color.</string>
-    <string name="setting_theme_ansi_bright_white_description" formatted="false">Terminal color for bright white ANSI text. AUTO follows output_text_color.</string>
+    <string name="setting_theme_ansi_black_description" formatted="false">Termux pane color for black ANSI text. AUTO uses the built-in default.</string>
+    <string name="setting_theme_ansi_red_description" formatted="false">Termux pane color for red ANSI text. AUTO uses the built-in default.</string>
+    <string name="setting_theme_ansi_green_description" formatted="false">Termux pane color for green ANSI text. AUTO blends terminal_window_background_color with accent_color.</string>
+    <string name="setting_theme_ansi_yellow_description" formatted="false">Termux pane color for yellow ANSI text. AUTO follows warning_text_color.</string>
+    <string name="setting_theme_ansi_blue_description" formatted="false">Termux pane color for blue ANSI text. AUTO blends terminal_window_background_color with output_text_color.</string>
+    <string name="setting_theme_ansi_magenta_description" formatted="false">Termux pane color for magenta ANSI text. AUTO uses the built-in default.</string>
+    <string name="setting_theme_ansi_cyan_description" formatted="false">Termux pane color for cyan ANSI text. AUTO blends accent_color with output_text_color.</string>
+    <string name="setting_theme_ansi_white_description" formatted="false">Termux pane color for white ANSI text. AUTO follows output_text_color.</string>
+    <string name="setting_theme_ansi_bright_black_description" formatted="false">Termux pane color for bright black ANSI text. AUTO follows muted_text_color.</string>
+    <string name="setting_theme_ansi_bright_red_description" formatted="false">Termux pane color for bright red ANSI text. AUTO uses the built-in default.</string>
+    <string name="setting_theme_ansi_bright_green_description" formatted="false">Termux pane color for bright green ANSI text. AUTO blends accent_color with output_text_color.</string>
+    <string name="setting_theme_ansi_bright_yellow_description" formatted="false">Termux pane color for bright yellow ANSI text. AUTO blends warning_text_color with output_text_color.</string>
+    <string name="setting_theme_ansi_bright_blue_description" formatted="false">Termux pane color for bright blue ANSI text. AUTO blends output_text_color with accent_color.</string>
+    <string name="setting_theme_ansi_bright_magenta_description" formatted="false">Termux pane color for bright magenta ANSI text. AUTO uses the built-in default.</string>
+    <string name="setting_theme_ansi_bright_cyan_description" formatted="false">Termux pane color for bright cyan ANSI text. AUTO blends accent_color with output_text_color.</string>
+    <string name="setting_theme_ansi_bright_white_description" formatted="false">Termux pane color for bright white ANSI text. AUTO follows output_text_color.</string>
     <!-- Toolbar.kt: show_toolbar -->
     <string name="setting_toolbar_show_toolbar_description" formatted="false">"If false, the toolbar is hidden"</string>
     <!-- Toolbar.kt: hide_toolbar_no_input -->
