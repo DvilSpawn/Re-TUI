@@ -115,3 +115,26 @@ Source: https://github.com/google/material-design-icons
 
 Licensed under the Apache License, Version 2.0:
 https://www.apache.org/licenses/LICENSE-2.0
+
+## Nagomi
+
+Copyright 2026 Mayank Kadam (https://github.com/msk1039).
+
+Source: https://github.com/msk1039/nagomi
+Demo: https://nagomi-blue.vercel.app/
+Revision: `01e93a410c0a317ee0a2b81e84a71e54a6db81d0`
+
+The Nagomi wallpaper adapts the original koi simulation, spine/body geometry,
+markings, palettes, small-fish schooling, lotus leaves and flowers, duckweed,
+water shader and pond-bed appearance for Android. Re:TUI adds
+notification-driven fish, local photo backgrounds and native wallpaper lifecycle
+handling. The settings page links to both the source and original experience.
+
+Upstream uses [PolyForm Noncommercial 1.0.0](LICENSES/Nagomi-PolyForm-Noncommercial.txt).
+The Re:TUI maintainer confirmed additional author permission on 2026-09-29 for
+this adaptation in the paid Google Play and free GPL-3.0-or-later distributions.
+This records that confirmation, not a verbatim grant or a change to the license
+of the upstream repository. The full upstream license and required notice are
+also included in the installed wallpaper page under Credits & license.
+
+See [adaptation details](docs/nagomi.md).

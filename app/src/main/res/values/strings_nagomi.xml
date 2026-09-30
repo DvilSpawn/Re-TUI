@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="nagomi_title">Nagomi Koi Pond</string>
+    <string name="nagomi_credit">Nagomi · by Mayank Kadam</string>
+    <string name="nagomi_choose_image">Choose image</string>
+    <string name="nagomi_reset_image">Reset background</string>
+    <string name="nagomi_github">GitHub</string>
+    <string name="nagomi_demo">Original Nagomi ↗</string>
+    <string name="nagomi_license_label">Credits &amp; license</string>
+    <string name="nagomi_description">New notifications add koi in app colors. Fish drift away over time. Choose a photo to preview its center crop beneath the water.</string>
+    <string name="nagomi_notification_access">Notification access</string>
+    <string name="nagomi_image_loading">Preparing pond background…</string>
+    <string name="nagomi_image_failed">Could not use that image. Try a JPEG or PNG under 32 MB.</string>
+    <string name="nagomi_link_failed">No browser is available to open this link.</string>
+</resources>

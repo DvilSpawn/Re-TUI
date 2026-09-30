@@ -4,6 +4,12 @@ import android.app.WallpaperManager
 import android.content.ComponentName
 import android.content.Intent
 import android.graphics.Color
+import android.net.Uri
+import android.widget.Toast
+import ohi.andre.consolelauncher.wallpaper.nagomi.NagomiView
+import ohi.andre.consolelauncher.wallpaper.nagomi.NagomiBackground
+import ohi.andre.consolelauncher.wallpaper.nagomi.NagomiWallpaperService
+import java.io.File
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.text.Editable
@@ -56,13 +62,22 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
     private lateinit var settingsPanel: View
     private lateinit var panelParams: FrameLayout.LayoutParams
     private var scene = "csakura"
+    private lateinit var nagomiControls: LinearLayout
+    private var nagomiBackground: File? = null
+    private var resumed = false
+    private var imageRevision = 0
+    private var imageLoading = false
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         applyFullscreen(this)
 
         root = FrameLayout(this)
-        scene = RetuiWallpaperSettings.scene(this)
+        scene = savedInstanceState?.getString("preview_scene") ?: RetuiWallpaperSettings.scene(this)
+        nagomiBackground = if (savedInstanceState?.containsKey("nagomi_background") == true)
+            savedInstanceState.getString("nagomi_background")?.let(::File)?.takeIf { it.isFile }
+        else NagomiBackground.saved(this).takeIf { it.isFile }
         preview = createPreview(scene)
         root.addView(preview, FrameLayout.LayoutParams(-1, -1))
 
@@ -79,7 +94,7 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
         settingsPanel = panel
         val selectors = row()
         selectors.addView(label(getString(R.string.editor_retuiwallpaperactivity_wallpaper_f00e8)))
-        val scenes = listOf("csakura", "black hole", TopoNoiseView.SCENE, PixelDreamView.SCENE, CloudsView.SCENE, "solid")
+        val scenes = listOf("csakura", "black hole", TopoNoiseView.SCENE, PixelDreamView.SCENE, CloudsView.SCENE, NagomiView.SCENE, "solid")
         selectors.addView(spinner(scenes, scenes.indexOf(scene).coerceAtLeast(0), ::switchScene))
         colorLabel = label(getString(R.string.editor_retuiwallpaperactivity_color_34171))
         selectors.addView(colorLabel)
@@ -155,6 +170,45 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
         panel.addView(regrow)
         tuningControls.add(regrow)
 
+        nagomiControls = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            addView(TextView(this@RetuiWallpaperActivity).apply {
+                text = getString(R.string.nagomi_credit)
+                setTextColor(Color.WHITE)
+                textSize = 13f
+                setPadding(dp(4), dp(6), dp(4), dp(6))
+            })
+            addView(row().apply {
+                addView(compactControl(getString(R.string.nagomi_choose_image)) {
+                    startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                        type = "image/*"
+                        addCategory(Intent.CATEGORY_OPENABLE)
+                    }, 3077)
+                })
+                addView(compactControl(getString(R.string.nagomi_reset_image)) {
+                    imageRevision++
+                    imageLoading = false
+                    nagomiBackground = null
+                    (preview as? NagomiView)?.pondBackground = null
+                })
+            })
+            addView(row().apply {
+                addView(compactControl(getString(R.string.nagomi_github)) { openNagomiLink("https://github.com/msk1039/nagomi") })
+                addView(compactControl(getString(R.string.nagomi_demo)) { openNagomiLink("https://nagomi-blue.vercel.app/") })
+                addView(compactControl(getString(R.string.nagomi_license_label)) { showNagomiLicense() })
+            })
+            addView(TextView(this@RetuiWallpaperActivity).apply {
+                text = getString(R.string.nagomi_description)
+                setTextColor(Color.WHITE)
+                textSize = 12f
+                setPadding(dp(4), dp(6), dp(4), dp(6))
+            })
+            addView(compactControl(getString(R.string.nagomi_notification_access)) {
+                startActivity(Intent(android.provider.Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
+            }.apply { layoutParams = LinearLayout.LayoutParams(-1, dp(46)) })
+        }
+        panel.addView(nagomiControls)
+
         val apply = row()
         apply.addView(compactControl(getString(R.string.editor_retuiwallpaperactivity_use_on_phone_d908b)) { useOnPhone() })
         panel.addView(apply)
@@ -174,6 +228,79 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
         updateSceneControls()
     }
 
+    override fun onResume() {
+        super.onResume()
+        resumed = true
+        (preview as? NagomiView)?.setResumed(true)
+    }
+
+    override fun onPause() {
+        resumed = false
+        (preview as? NagomiView)?.setResumed(false)
+        super.onPause()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putString("preview_scene", scene)
+        outState.putString("nagomi_background", nagomiBackground?.path)
+        super.onSaveInstanceState(outState)
+    }
+
+    @Deprecated("Legacy activity result used by this activity")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode != 3077 || resultCode != RESULT_OK) return
+        val uri = data?.data ?: return
+        val revision = ++imageRevision
+        imageLoading = true
+        Toast.makeText(this, R.string.nagomi_image_loading, Toast.LENGTH_SHORT).show()
+        Thread({
+            val result = runCatching { NagomiBackground.import(applicationContext, uri) }
+            runOnUiThread {
+                if (isDestroyed || revision != imageRevision) {
+                    result.getOrNull()?.delete()
+                    return@runOnUiThread
+                }
+                imageLoading = false
+                result.onSuccess { file ->
+                    nagomiBackground = file
+                    (preview as? NagomiView)?.pondBackground = file
+                }.onFailure {
+                    Toast.makeText(this, R.string.nagomi_image_failed, Toast.LENGTH_LONG).show()
+                }
+            }
+        }, "Nagomi image import").start()
+    }
+
+    private fun openNagomiLink(url: String) {
+        try { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) }
+        catch (_: android.content.ActivityNotFoundException) {
+            Toast.makeText(this, R.string.nagomi_link_failed, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun showNagomiLicense() {
+        val parser = resources.getXml(R.xml.nagomi_license)
+        val text = StringBuilder()
+        try {
+            while (parser.eventType != org.xmlpull.v1.XmlPullParser.END_DOCUMENT) {
+                if (parser.eventType == org.xmlpull.v1.XmlPullParser.TEXT) text.append(parser.text)
+                parser.next()
+            }
+        } finally { parser.close() }
+        val scroll = android.widget.ScrollView(this).apply {
+            addView(TextView(this@RetuiWallpaperActivity).apply {
+                this.text = text.toString().trim()
+                setTextColor(Color.WHITE)
+                textSize = 13f
+                setPadding(dp(12), dp(12), dp(12), dp(12))
+                setTextIsSelectable(true)
+            })
+        }
+        TuixtDialog.showContent(this, getString(R.string.nagomi_credit), scroll,
+            getString(android.R.string.ok), getString(android.R.string.cancel), ConfirmAction { }, heightFraction = 0.75f)
+    }
+
     private fun move(dx: Float, dy: Float) {
         when (val current = preview) {
             is CsakuraView -> { current.offsetX += dx; current.offsetY += dy }
@@ -183,6 +310,7 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
     }
 
     private fun save() {
+        if (scene == NagomiView.SCENE) NagomiBackground.apply(this, nagomiBackground)
         RetuiWallpaperSettings.saveScene(this, scene)
         when (val current = preview) {
             is CsakuraView -> RetuiWallpaperSettings.save(
@@ -220,9 +348,13 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
         PixelDreamView.SCENE -> PixelDreamView(this).apply { loadPosition() }
         "solid" -> SolidColorView(this)
         CloudsView.SCENE -> CloudsView(this)
+        NagomiView.SCENE -> NagomiView(this).apply {
+            pondBackground = nagomiBackground
+            setResumed(resumed)
+        }
         else -> CsakuraView(this).apply { loadPosition() }
     }.also { view ->
-        if (AppearanceSettings.crtFilter()) {
+        if (AppearanceSettings.crtFilter() && view !is NagomiView) {
             view.foreground = CrtOverlayDrawable(this).apply {
                 setAccentColor(LauncherSettings.getColor(Theme.output_text_color))
             }
@@ -261,6 +393,7 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
     }
 
     private fun paletteSpinner(): Spinner = when (val current = preview) {
+        is NagomiView -> spinner(listOf("Nagomi"), 0) { }
         is CloudsView -> CloudsView.sceneNames(this).let { names ->
             spinner(names, current.sceneNumber - 1) { current.setScene(names.indexOf(it) + 1) }
         }
@@ -290,8 +423,12 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
 
     private fun updateSceneControls() {
         val clouds = scene == CloudsView.SCENE
+        val nagomi = scene == NagomiView.SCENE
+        nagomiControls.visibility = if (nagomi) View.VISIBLE else View.GONE
+        colorLabel.visibility = if (nagomi) View.GONE else View.VISIBLE
+        colorSpinner.visibility = if (nagomi) View.GONE else View.VISIBLE
         colorLabel.text = getString(if (clouds) R.string.wallpaper_clouds_scene_label else R.string.editor_retuiwallpaperactivity_color_34171)
-        val visibility = if (scene == "solid" || scene == PixelDreamView.SCENE || clouds) View.GONE else View.VISIBLE
+        val visibility = if (scene == "solid" || scene == PixelDreamView.SCENE || clouds || nagomi) View.GONE else View.VISIBLE
         positionControls.forEach { it.visibility = visibility }
         tuningControls.forEach { it.visibility = visibility }
         topoColorRow.visibility = if (scene == TopoNoiseView.SCENE) View.VISIBLE else View.GONE
@@ -300,7 +437,7 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
         zoomLabel.visibility = zoomVisibility
         zoomMinus.visibility = zoomVisibility
         zoomPlus.visibility = zoomVisibility
-        panelParams.height = dp(if (clouds) 116 else if (scene == TopoNoiseView.SCENE) 318 else 268)
+        panelParams.height = if (nagomi) ViewGroup.LayoutParams.WRAP_CONTENT else dp(if (clouds) 116 else if (scene == TopoNoiseView.SCENE) 318 else 268)
         settingsPanel.layoutParams = panelParams
         topoColorControls.forEachIndexed { index, button ->
             val topo = preview as? TopoNoiseView ?: return@forEachIndexed
@@ -475,8 +612,15 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
     }
 
     private fun useOnPhone() {
-        save()
-        val component = ComponentName(this, RetuiWallpaperService::class.java)
+        if (imageLoading) {
+            Toast.makeText(this, R.string.nagomi_image_loading, Toast.LENGTH_SHORT).show()
+            return
+        }
+        try { save() } catch (_: Exception) {
+            Toast.makeText(this, R.string.nagomi_image_failed, Toast.LENGTH_LONG).show()
+            return
+        }
+        val component = ComponentName(this, if (scene == NagomiView.SCENE) NagomiWallpaperService::class.java else RetuiWallpaperService::class.java)
         // A selected component can have a stopped engine after an update or test run.
         // Let Android bind/apply it instead of assuming wallpaperInfo means it is running.
         try {
@@ -527,6 +671,7 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
                 TopoNoiseView.SCENE -> getString(R.string.wallpaper_topo_noise)
                 PixelDreamView.SCENE -> getString(R.string.wallpaper_pixel_dream)
                 CloudsView.SCENE -> getString(R.string.wallpaper_clouds)
+                NagomiView.SCENE -> getString(R.string.nagomi_title)
                 "solid" -> getString(R.string.wallpaper_solid)
                 else -> it
             }

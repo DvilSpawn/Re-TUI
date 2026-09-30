@@ -468,6 +468,12 @@ class NotificationService : NotificationListenerService() {
         } else {
             reloadNotificationConfig()
         }
+        serviceHandler.post {
+            try {
+                ohi.andre.consolelauncher.wallpaper.nagomi.NagomiNotifications.keys.seed(
+                    activeNotifications?.map { it.key } ?: emptyList())
+            } catch (_: SecurityException) { }
+        }
         setupMediaSession()
     }
 
@@ -881,6 +887,7 @@ class NotificationService : NotificationListenerService() {
     }
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
+        serviceHandler.post { ohi.andre.consolelauncher.wallpaper.nagomi.NagomiNotifications.posted(this, sbn) }
         if (!enabled) return
 
         Log.d("TUI-Music", "onNotificationPosted: " + sbn.getPackageName())
@@ -961,6 +968,7 @@ class NotificationService : NotificationListenerService() {
             return
         }
 
+        serviceHandler.post { ohi.andre.consolelauncher.wallpaper.nagomi.NagomiNotifications.keys.removed(sbn.key) }
         removeOverlayNotification(sbn.getKey(), sbn.getPackageName(), sbn.getNotification())
     }
 

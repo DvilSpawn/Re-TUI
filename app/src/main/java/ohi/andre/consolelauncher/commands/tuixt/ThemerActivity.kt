@@ -2150,7 +2150,10 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
                 Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER).apply {
                     putExtra(
                         WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT,
-                        ComponentName(this@ThemerActivity, RetuiWallpaperService::class.java)
+                        ComponentName(this@ThemerActivity,
+                            if (ohi.andre.consolelauncher.wallpaper.RetuiWallpaperSettings.scene(this@ThemerActivity) == "nagomi")
+                                ohi.andre.consolelauncher.wallpaper.nagomi.NagomiWallpaperService::class.java
+                            else RetuiWallpaperService::class.java)
                     )
                 }
             )
