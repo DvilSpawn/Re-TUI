@@ -22,6 +22,7 @@ class files : CommandAbstraction, PermanentSuggestionCommand {
 
         return RetuiFilesContract.launch(
             context = info.context,
+            path = if (shouldIncludeCurrentPath(request)) RetuiFilesContract.currentPath(info.context) else null,
             action = request.action,
             target = request.target,
             searchName = request.searchName,
@@ -50,6 +51,9 @@ class files : CommandAbstraction, PermanentSuggestionCommand {
         internal val SUGGESTIONS = arrayOf("-open", "-ls", "-share", "-search", "-cd")
         internal const val FM_PACKAGE = RetuiFilesContract.PACKAGE
         internal const val FM_ACTION = RetuiFilesContract.OPEN_CONSOLE
+
+        internal fun shouldIncludeCurrentPath(request: FilesRequest): Boolean =
+            request.action != RetuiFilesContract.ACTION_SEARCH
 
         internal fun parseRequest(input: String?): FilesRequest {
             val tokens = Tuils.splitArgs(input).filterNotNull()

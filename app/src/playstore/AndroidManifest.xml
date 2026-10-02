@@ -2,6 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Re:TUI is a launcher; runtime Play license checks can strand users offline. -->
+    <uses-permission
+        android:name="com.android.vending.CHECK_LICENSE"
+        tools:node="remove" />
+
     <application
         android:requestLegacyExternalStorage="false"
         tools:replace="android:requestLegacyExternalStorage" />

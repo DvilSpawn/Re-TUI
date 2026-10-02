@@ -25,6 +25,12 @@ class FilesCommandTest {
     }
 
     @Test
+    fun searchDoesNotScopeLaunchToCurrentFolder() {
+        assertEquals(false, files.shouldIncludeCurrentPath(files.FilesRequest(action = "search", searchName = "note")))
+        assertEquals(true, files.shouldIncludeCurrentPath(files.FilesRequest(action = "open", target = "note.txt")))
+    }
+
+    @Test
     fun parsesSearchWithType() {
         assertEquals(
             files.FilesRequest(action = "search", searchName = "note", searchType = "txt"),

@@ -61,7 +61,7 @@ object RetuiFilesContract {
 
     fun launch(
         context: Context,
-        path: String = currentPath(context),
+        path: String? = currentPath(context),
         action: String? = null,
         target: String? = null,
         searchName: String? = null,
@@ -70,7 +70,7 @@ object RetuiFilesContract {
         val intent = Intent(OPEN_CONSOLE)
             .setPackage(PACKAGE)
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            .putExtra("path", path)
+        path?.let { intent.putExtra("path", it) }
         action?.let { intent.putExtra("action", it) }
         target?.let { intent.putExtra("target", it) }
         searchName?.let { intent.putExtra("search_name", it) }
