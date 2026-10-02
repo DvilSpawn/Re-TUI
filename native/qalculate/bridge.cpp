@@ -7,6 +7,35 @@
 #include <stdexcept>
 #include <string>
 
+
+static std::string lowerAscii(std::string value) {
+    for (char& c : value) if (c >= 'A' && c <= 'Z') c = static_cast<char>(c - 'A' + 'a');
+    return value;
+}
+
+static bool asciiAlpha(char c) {
+    return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+}
+
+static bool containsUnitToken(const std::string& input, const std::string& token) {
+    size_t index = input.find(token);
+    while (index != std::string::npos) {
+        const size_t end = index + token.size();
+        const bool before = index == 0 || !asciiAlpha(input[index - 1]);
+        const bool after = end >= input.size() || !asciiAlpha(input[end]);
+        if (before && after) return true;
+        index = input.find(token, index + 1);
+    }
+    return false;
+}
+
+static bool containsImperialFootAndInch(const std::string& input) {
+    const std::string lower = lowerAscii(input);
+    const bool foot = containsUnitToken(lower, "ft") || containsUnitToken(lower, "foot") || containsUnitToken(lower, "feet");
+    const bool inch = containsUnitToken(lower, "in") || containsUnitToken(lower, "inch") || containsUnitToken(lower, "inches");
+    return foot && inch;
+}
+
 extern "C" JNIEXPORT jbyteArray JNICALL
 Java_ohi_andre_consolelauncher_calculator_NativeQalculate_evaluate(
         JNIEnv* env, jobject, jbyteArray expression, jboolean degrees, jboolean exact) {
@@ -30,7 +59,9 @@ Java_ohi_andre_consolelauncher_calculator_NativeQalculate_evaluate(
         EvaluationOptions evaluation;
         evaluation.parse_options.angle_unit = degrees ? ANGLE_UNIT_DEGREES : ANGLE_UNIT_RADIANS;
         evaluation.approximation = exact ? APPROXIMATION_TRY_EXACT : APPROXIMATION_APPROXIMATE;
-        evaluation.mixed_units_conversion = MIXED_UNITS_CONVERSION_NONE;
+        evaluation.mixed_units_conversion = containsImperialFootAndInch(input)
+                ? MIXED_UNITS_CONVERSION_DEFAULT
+                : MIXED_UNITS_CONVERSION_NONE;
         PrintOptions print;
         // Synchronous evaluation. The Android service watchdog bounds the entire request,
         // including initialization and formatting, and kills only the native worker process.

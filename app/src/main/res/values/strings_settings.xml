@@ -504,7 +504,7 @@
     <!-- Theme.kt: terminal_border_color -->
     <string name="setting_theme_terminal_border_color_description" formatted="false">"Shared border color for terminal chrome, headers, panels, and module outlines"</string>
     <!-- Theme.kt: module_button_background_color -->
-    <string name="setting_theme_module_button_background_color_description" formatted="false">"Module button background color"</string>
+    <string name="setting_theme_module_button_background_color_description" formatted="false">Base background color for launcher module buttons and controls that still inherit the regular button color in AUTO.</string>
     <!-- Theme.kt: module_text_color -->
     <string name="setting_theme_module_text_color_description" formatted="false">"Module label and control text color"</string>
     <!-- Theme.kt: terminal_window_background_color -->

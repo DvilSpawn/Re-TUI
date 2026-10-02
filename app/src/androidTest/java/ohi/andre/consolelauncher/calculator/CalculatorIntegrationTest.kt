@@ -47,6 +47,7 @@ class CalculatorIntegrationTest {
             assertEquals("6", result("2 × 3"))
             assertEquals("1", result("sin(90)"))
             assertTrue(result("5 km to miles").contains("3.106"))
+            assertEquals("2 ft + 11 in", result("2ft 6in + 5in to ft"))
             assertTrue(result("diff(x^3)").contains("3"))
             prefs.edit().putBoolean("degrees", false).commit()
             assertEquals("1", result("sin(pi/2)"))

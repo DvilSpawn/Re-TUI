@@ -12201,7 +12201,7 @@
   "setting_theme_module_button_background_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Module button background color"
+      "other": "Base background color for launcher module buttons and controls that still inherit the regular button color in AUTO."
     },
     "type": "string"
   },

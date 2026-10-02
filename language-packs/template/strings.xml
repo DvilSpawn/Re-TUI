@@ -2413,7 +2413,7 @@ Fix or delete the file to recover your options</string>
     <string name="setting_theme_module_active_background_color_description">Background color for active items in launcher modules. AUTO follows selection_background_color.</string>
     <string name="setting_theme_module_active_border_color_description">Border color for active items in launcher modules. AUTO follows selection_border_color.</string>
     <string name="setting_theme_module_active_text_color_description">Text color for active items in launcher modules. AUTO follows selection_text_color.</string>
-    <string name="setting_theme_module_button_background_color_description">Module button background color</string>
+    <string name="setting_theme_module_button_background_color_description">Base background color for launcher module buttons and controls that still inherit the regular button color in AUTO.</string>
     <string name="setting_theme_module_dock_background_color_description">Background color for dock shortcuts in launcher modules. AUTO follows module_button_background_color.</string>
     <string name="setting_theme_module_dock_border_color_description">Border color for dock shortcuts in launcher modules. AUTO follows terminal_border_color.</string>
     <string name="setting_theme_module_dock_text_color_description">Text color for dock shortcuts in launcher modules. AUTO follows module_text_color.</string>
