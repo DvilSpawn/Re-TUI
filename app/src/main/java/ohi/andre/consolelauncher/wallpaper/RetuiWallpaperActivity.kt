@@ -514,6 +514,7 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
         saturation.progress = (hsv[1] * 100).toInt()
         brightness.progress = (hsv[2] * 100).toInt()
 
+        var updatingHexFromSliders = false
         val listener = object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 val color = Color.HSVToColor(alpha.progress, floatArrayOf(
@@ -522,8 +523,14 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
                 preview.setBackgroundColor(color)
                 hexPreview.text = hex(color)
                 if (fromUser) {
-                    hexInput.setText(hex(color))
-                    hexInput.setSelection(hexInput.length())
+                    updatingHexFromSliders = true
+                    try {
+                        hexInput.setText(hex(color))
+                        hexInput.setSelection(hexInput.length())
+                        hexInput.error = null
+                    } finally {
+                        updatingHexFromSliders = false
+                    }
                 }
             }
             override fun onStartTrackingTouch(seekBar: SeekBar?) = Unit
@@ -534,6 +541,8 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
             override fun afterTextChanged(s: Editable?) {
+                // RGB rounding (and black/gray) must not overwrite the chosen HSV sliders.
+                if (updatingHexFromSliders) return
                 val color = s?.toString()?.let(RetuiWallpaperSettings::parseColorValue) ?: return
                 val newHsv = FloatArray(3)
                 Color.colorToHSV(color, newHsv)
