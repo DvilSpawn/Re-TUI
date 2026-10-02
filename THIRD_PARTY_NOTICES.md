@@ -1,26 +1,35 @@
 # Third-party notices
 
-## Qalculate Android library
+## Qalculate native engine
 
-The optional Qalculate calculator uses `com.jherkenhoff:libqalculate:5.8.2-2`,
-Jost Herkenhoff's Android port of libqalculate 5.8.2 by Hanna Knutsson and contributors.
-The native libraries are bundled even when the calculator toggle is off.
+Re:TUI uses an independently authored GPL-3.0-or-later JNI bridge and native build
+recipe. Jost Herkenhoff's Android wrapper, generated bindings and Maven artifact
+are no longer included. All native inputs are pinned in `native/qalculate/sources.json`.
 
-- Android wrapper and native build sources: https://github.com/jherkenhoff/libqalculate-android
-- Core sources: https://github.com/Qalculate/libqalculate/tree/v5.8.2
-- Wrapper license declared by the published artifact: GNU GPL version 2.
-  https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
-- The wrapper also bundles GMP, MPFR, libiconv, libxml2 and LLVM's C++ runtime;
-  their respective licenses and build sources are referenced in the wrapper repository.
+- **libqalculate 5.8.2**, Hanna Knutsson and contributors: GPL-2.0-or-later;
+  distributed here under the GPLv3 option. https://github.com/Qalculate/libqalculate
+  See `LICENSES/Qalculate-GPL-2.0.txt` and the source headers.
+- **GMP 6.3.0**, Free Software Foundation and contributors: LGPL-3.0-or-later OR
+  GPL-2.0-or-later; using the GPLv3 option. https://gmplib.org/
+  See `LICENSES/GMP-GPL-3.0.txt` and the original archive's notices.
+- **MPFR 4.2.2**, Free Software Foundation and contributors: LGPL-3.0-or-later;
+  combined under GPLv3 as permitted by LGPLv3 section 3. https://www.mpfr.org/
+  See `LICENSES/MPFR-LGPL-3.0.txt` and the project's GPLv3 text in `LICENSE`.
+- **libxml2 2.15.1**, Daniel Veillard and the Libxml2 contributors: MIT-style
+  license, with per-file notices retained in the source archive.
+  https://gitlab.gnome.org/GNOME/libxml2 See `LICENSES/libxml2-MIT.txt`.
+- **LLVM libc++ runtime**, from Android NDK 27.1.12297006: Apache-2.0 with LLVM
+  exceptions. See `LICENSES/LLVM-Apache-2.0-with-exceptions.txt` and the complete
+  pinned NDK notices in `LICENSES/Android-NDK-NOTICE.toolchain.txt` (including
+  earlier runtime notices). https://github.com/llvm/llvm-project/tree/main/libcxx
 
-The project code is now GPL-3.0-or-later; the original MIT notice is retained
-verbatim in `LICENSES/MIT-original.txt`. Neither license changes third-party terms.
-Core libqalculate grants GPL-2.0-or-later, but the Android wrapper declares only
-GPL-2.0 in its published metadata. Its license text is included in
-`LICENSES/Qalculate-wrapper-GPL-2.0.txt`; an explicit later-version grant has not
-been verified. This is a release blocker with Apache-2.0 dependencies, not a
-resolved compatibility claim. See `docs/calculator.md` for source-delivery and
-license requirements before public distribution.
+The original MIT notice for Re:TUI is retained in `LICENSES/MIT-original.txt`.
+Neither the project license nor this bridge changes third-party artwork terms.
+
+See `native/qalculate/README.md` for exact build inputs, our Android cancellation
+patch and source-bundle generation. Distribute the matching complete source and
+build materials with a public release; optional runtime activation does not
+remove source obligations for the native engine packaged in the APK.
 
 ## CraftPix sky with clouds
 

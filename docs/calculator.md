@@ -11,49 +11,45 @@ same engine for `calc` expressions, including `calc 5 km to miles`. Degrees and
 exact-result preferences apply to both entry points. Android 6 retains the basic
 calculator; native evaluation requires Android 7 or newer.
 
-The pinned Maven artifact is `com.jherkenhoff:libqalculate:5.8.2-2`. Its AAR contains
-compiled definitions and four native ABIs, so no runtime download is needed. No
-currency-rate update is performed. The wrapper's core version is 5.8.2; updating
-the wrapper and its bundled native dependencies is our responsibility.
+The engine is upstream libqalculate **5.8.2**, built through Re:TUI's independently
+authored JNI bridge. The source archives and checksums are pinned in
+`native/qalculate/sources.json`; no Jost Herkenhoff Maven wrapper or SWIG bindings
+are packaged. All four Android ABIs and compiled English definitions are included.
+No runtime download or currency-rate update is performed.
 
-Native evaluation runs in a private service process. An eight-second client bound
-and four-second process watchdog keep a stuck native calculation from blocking
-the launcher. This is necessary because the Android port's cancellation patch
-does not provide reliable pthread cancellation. Results are capped at 16 KiB and
-input at 1,024 characters. One native request is accepted at a time; concurrent
-requests get a busy message. Basic live previews use the existing Kotlin parser.
+Native evaluation runs synchronously in a private service process. An eight-second
+client bound and four-second service watchdog keep a stuck native calculation from
+blocking the launcher. Android does not support pthread cancellation: our small
+upstream patch never pretends an active thread was cancelled, and unexpected
+native cancellation terminates only the disposable service process. Normal timeouts
+return the existing timeout message before the watchdog kills that process.
 
-`CalculatorIntegrationTest` covers both command modes, the Behaviour setting, conversion,
-separate tasks, launcher reload and expression restoration. Run on a device with
-the existing AndroidJUnitRunner. See THIRD_PARTY_NOTICES.md before public distribution.
+Results are capped at 16,384 Java characters and input at 1,024 characters.
+One native request is accepted at a time; concurrent requests get a busy message.
+Basic live previews use the existing Kotlin parser. The native build disables
+external command/gnuplot execution and network currency updates.
+
+`CalculatorIntegrationTest` covers both command modes, the Behaviour setting,
+conversion, separate tasks, launcher reload, expression restoration, UTF-8 input,
+angle/exact modes, native errors and timeout recovery. Run it with the existing
+AndroidJUnitRunner. See [native build instructions](../native/qalculate/README.md).
 
 ## Licensing and public releases
 
-Project-owned code is GPL-3.0-or-later. The prior MIT notice is retained, and
-third-party source headers and artwork terms continue to apply. The libqalculate
-5.8.2 core grants GPL-2.0-or-later in its source headers, allowing GPLv3 use.
+Project-owned code and the new bridge are GPL-3.0-or-later. The prior MIT notice is
+retained. Core libqalculate grants GPL-2.0-or-later in its source headers, allowing
+the GPLv3 option. GMP, MPFR, libxml2 and the NDK C++ runtime retain their respective
+notices; see [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md).
 
-The published Android wrapper declares `GPL-2.0` and includes GPLv2 COPYING,
-without a verified explicit later-version grant. The sample notice in the GPL
-license appendix is not a grant by the wrapper author. Apache-2.0 dependencies
-in the Launcher are compatible with GPLv3 but not GPLv2-only. Before publishing
-a Qalculate-enabled binary, obtain compatible permission for the wrapper or
-replace it with a compatible Android binding/build. The separate service process
-and off-by-default toggle do not remove this issue: the native libraries are
-still shipped in the APK.
+The former Android wrapper's ambiguous GPLv2 declaration is no longer in the
+shipped dependency chain. Its permission request may remain open for other users;
+our independent implementation does not rely on a reply or relicense its code.
 
-Sources reviewed:
-- [Core license grant](https://github.com/Qalculate/libqalculate/blob/v5.8.2/libqalculate/Calculator.h)
-- [Wrapper metadata](https://repo.maven.apache.org/maven2/com/jherkenhoff/libqalculate/5.8.2-2/libqalculate-5.8.2-2.pom)
-- [Wrapper COPYING](https://github.com/jherkenhoff/libqalculate-android/blob/75b95a97b2adcd7254512f5e1c575c776ec3be64/COPYING)
-- [Apache compatibility guidance](https://www.apache.org/licenses/GPL-compatibility.html)
+Before public distribution, build and verify the final APK, then create and publish
+the matching full app/native source bundle using `scripts/qalculate_source_bundle.py`.
+The archive includes exact upstream sources, our patch, JNI code, build recipe,
+notices and a source/APK hash manifest. Provide a durable source link to recipients
+of both paid and free binaries. Signing credentials are excluded.
 
-A public binary release also needs the matching complete corresponding source,
-Android binding and patches, native dependency sources and build scripts, plus
-applicable license/attribution materials. The Maven sources JAR contains generated
-Java bindings and is not a complete native source bundle. The reviewed wrapper
-checkout is `75b95a97b2adcd7254512f5e1c575c776ec3be64`; its relationship to the
-published AAR must be verified before calling it the exact corresponding source.
-Keep this integration local until those requirements and the existing artwork
-terms have been checked for the intended distribution. A repository license
-change alone is not a completed distribution audit.
+This resolves the old wrapper dependency; it does not claim a whole-project
+licensing audit, clear unrelated artwork terms, or authorize a public release.

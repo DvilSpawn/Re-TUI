@@ -1,0 +1,28 @@
+--- a/libqalculate/util.cc
++++ b/libqalculate/util.cc
+@@ -1149,8 +1149,10 @@
+ }
+ 
+ void Thread::enableAsynchronousCancel() {
++#ifndef __ANDROID__
+ 	pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+ 	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
++#endif
+ }
+ 
+ void *Thread::doRun(void *data) {
+@@ -1173,7 +1175,14 @@
+ 
+ bool Thread::cancel() {
+ 	if(!running) return true;
++#ifdef __ANDROID__
++	// Android has no pthread_cancel. Never pretend a live thread stopped.
++	// Re:TUI evaluates synchronously in a disposable service process; its
++	// watchdog handles timeouts. Unexpected native cancellation fails closed.
++	_exit(124);
++#else
+ 	running = pthread_cancel(m_thread) != 0;
++#endif
+ 	return !running;
+ }
+ 

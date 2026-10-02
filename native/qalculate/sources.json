@@ -1,0 +1,22 @@
+[
+  {
+    "archive": "gmp-6.3.0.tar.xz",
+    "url": "https://ftp.gnu.org/gnu/gmp/gmp-6.3.0.tar.xz",
+    "sha256": "a3c2b80201b89e68616f4ad30bc66aee4927c3ce50e33929ca819d5c43538898"
+  },
+  {
+    "archive": "mpfr-4.2.2.tar.xz",
+    "url": "https://ftp.gnu.org/gnu/mpfr/mpfr-4.2.2.tar.xz",
+    "sha256": "b67ba0383ef7e8a8563734e2e889ef5ec3c3b898a01d00fa0a6869ad81c6ce01"
+  },
+  {
+    "archive": "libxml2-2.15.1.tar.xz",
+    "url": "https://download.gnome.org/sources/libxml2/2.15/libxml2-2.15.1.tar.xz",
+    "sha256": "c008bac08fd5c7b4a87f7b8a71f283fa581d80d80ff8d2efd3b26224c39bc54c"
+  },
+  {
+    "archive": "libqalculate-5.8.2.tar.gz",
+    "url": "https://github.com/Qalculate/libqalculate/releases/download/v5.8.2/libqalculate-5.8.2.tar.gz",
+    "sha256": "7136f3c929e88e7cea0fa66427bc541dcc99c7ecbe0d67cb256bfc922d2127d1"
+  }
+]

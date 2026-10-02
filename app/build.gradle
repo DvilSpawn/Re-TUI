@@ -1,10 +1,6 @@
 apply plugin: 'com.android.application'
 
 dependencies {
-    // Optional at runtime (Android 7+); compiled definitions and native engines stay offline.
-    implementation('com.jherkenhoff:libqalculate:5.8.2-2') {
-        exclude group: 'androidx.databinding', module: 'viewbinding'
-    }
     implementation project(':retui-datetime-picker')
     implementation project(':retui-contract')
 }
@@ -12,6 +8,9 @@ dependencies {
 android {
     namespace = "ohi.andre.consolelauncher"
     compileSdk = 36
+    ndkVersion = '27.1.12297006'
+    sourceSets.main.jniLibs.srcDir layout.buildDirectory.dir('qalculate/jniLibs').get().asFile
+    sourceSets.main.assets.srcDir layout.buildDirectory.dir('qalculate/notices').get().asFile
 
     def keystorePropertiesFile = rootProject.file("local.properties")
     def keystoreProperties = new Properties()
@@ -43,7 +42,7 @@ android {
         applicationId = "com.dvil.tui_renewed"
         minSdk = 23
         targetSdk = 36
-        versionCode = 424
+        versionCode = 425
         versionName = "2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -95,6 +94,31 @@ android {
     lint {
         checkReleaseBuilds = false
     }
+}
+
+def buildNativeQalculate = tasks.register('buildNativeQalculate', Exec) {
+    group = 'build'
+    description = 'Builds the offline Qalculate JNI engine from pinned upstream sources for all four ABIs.'
+    inputs.files(rootProject.fileTree('native/qalculate') { exclude '**/__pycache__/**' })
+    outputs.dir(layout.buildDirectory.dir('qalculate/jniLibs'))
+    commandLine 'python3', rootProject.file('native/qalculate/build.py'),
+            '--ndk', new File(androidComponents.sdkComponents.sdkDirectory.get().asFile, "ndk/${android.ndkVersion}")
+}
+tasks.matching { it.name.startsWith('merge') && it.name.endsWith('JniLibFolders') }.configureEach {
+    dependsOn(buildNativeQalculate)
+}
+def qalculateNotices = tasks.register('qalculateNotices', Sync) {
+    from(rootProject.projectDir) {
+        include 'LICENSE', 'THIRD_PARTY_NOTICES.md', 'LICENSES/**'
+        include 'native/qalculate/README.md', 'native/qalculate/sources.json'
+    }
+    into(layout.buildDirectory.dir('qalculate/notices/licenses'))
+}
+tasks.matching {
+    (it.name.startsWith('merge') && it.name.endsWith('Assets')) ||
+            it.name.toLowerCase(Locale.ROOT).contains('lint')
+}.configureEach {
+    dependsOn(qalculateNotices)
 }
 
 def guardedSourceSetNames = ["main", "fdroid", "playstore"]

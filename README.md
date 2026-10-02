@@ -153,8 +153,6 @@ The original MIT copyright and permission notice is preserved in
 code remains available under its original terms. Third-party software and artwork
 retain their own licenses; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
-Qalculate builds are currently for local testing. The Android wrapper declares
-GPL-2.0 without an explicit later-version grant, which needs clarification before
-it can be distributed with this app's Apache-2.0 dependencies. Changing this
-repository's license does not resolve that upstream issue. See
-[the Qalculate release requirements](docs/calculator.md#licensing-and-public-releases).
+Qalculate uses Re:TUI's own JNI bridge, built from checksum-pinned upstream sources.
+See [native build instructions](native/qalculate/README.md) and
+[calculator source-delivery requirements](docs/calculator.md#licensing-and-public-releases).
