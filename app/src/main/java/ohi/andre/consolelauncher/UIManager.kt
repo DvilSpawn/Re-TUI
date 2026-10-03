@@ -2819,8 +2819,9 @@ class UIManager(
             return
         }
 
+        val headerOnlyCollapse = this.isOutputAutoHideEnabled || this.isOutputTrayToggledMode
         terminalOutputBorder?.visibility = outputPaneVisibility(
-            this.isOutputAutoHideEnabled,
+            headerOnlyCollapse,
             terminalTrayExpanded
         )
 
@@ -2906,7 +2907,7 @@ class UIManager(
             terminalTrayExpanded = TextUtils.isEmpty(activeModule)
             requestedHeight = if (terminalTrayExpanded) expandedHeight else collapsedHeight
         } else {
-            requestedHeight = if (terminalTrayExpanded) expandedHeight else collapsedHeight
+            requestedHeight = if (terminalTrayExpanded) expandedHeight else calculateHeaderOnlyTerminalTrayHeight()
         }
         val targetHeight = constrainTerminalOutputHeight(
             requestedHeight,

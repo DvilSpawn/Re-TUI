@@ -85,6 +85,26 @@ class SearchModeTest {
     }
 
     @Test
+    fun categoryTabsKeepPreviousSelectionWhenStillAvailable() {
+        val grouped = SearchModeResultRenderer.groupResults(
+            listOf(
+                result("Reddit", SuggestionsManager.SearchResult.TYPE_APP),
+                result("Dvil", SuggestionsManager.SearchResult.TYPE_CONTACT),
+                result("Run", SuggestionsManager.SearchResult.TYPE_COMMAND)
+            )
+        )
+
+        assertEquals(
+            SuggestionsManager.SearchResult.TYPE_CONTACT,
+            SearchModeResultRenderer.selectedCategoryType(SuggestionsManager.SearchResult.TYPE_CONTACT, grouped)
+        )
+        assertEquals(
+            SuggestionsManager.SearchResult.TYPE_APP,
+            SearchModeResultRenderer.selectedCategoryType(SuggestionsManager.SearchResult.TYPE_PROVIDER, grouped)
+        )
+    }
+
+    @Test
     fun webProviderLabelsUseReadableNames() {
         assertEquals("Google", SuggestionsManager.providerTitle("gg"))
         assertEquals("YouTube", SuggestionsManager.providerTitle("yt"))

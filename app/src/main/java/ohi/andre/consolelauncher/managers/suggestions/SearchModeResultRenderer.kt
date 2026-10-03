@@ -29,34 +29,48 @@ class SearchModeResultRenderer(
     private val context = pack.context
     private val chipStyler = SuggestionChipStyler(pack)
     private var rowState = emptyMap<Int, RowState>()
+    private var latestResults = emptyList<SuggestionsManager.SearchResult>()
+    private var activeCategoryType: Int? = null
+    private var categoryStrip: HorizontalScrollView? = null
+    private var categoryScrollX: Int = 0
 
     fun clear() {
         rowState = emptyMap()
+        latestResults = emptyList()
+        activeCategoryType = null
+        categoryStrip = null
+        categoryScrollX = 0
         container.removeAllViews()
     }
 
     fun render(results: List<SuggestionsManager.SearchResult>) {
-        val previous = rowState.mapValues { (_, state) -> state.copy(scrollX = state.view.scrollX) }
-        rowState = emptyMap()
+        val previous = currentRowState()
+        categoryScrollX = categoryStrip?.scrollX ?: categoryScrollX
+        latestResults = results
+        rowState = previous
         container.removeAllViews()
-        if (results.isEmpty()) return
+        val groups = groupResults(results)
+        if (groups.isEmpty()) return
 
         val card = resultCard()
-        val nextState = LinkedHashMap<Int, RowState>()
-        for (category in groupResults(results)) {
-            val type = category.first().type
-            card.addView(categoryHeader(categoryLabel(type), type))
-            val signature = category.joinToString("\n") { "${it.title}|${it.subtitle}" }
-            val strip = resultStrip(category)
-            val prior = previous[type]
-            strip.post {
-                if (prior?.signature == signature) strip.scrollTo(prior.scrollX, 0)
-                else strip.fullScroll(View.FOCUS_LEFT)
-            }
-            nextState[type] = RowState(signature, 0, strip)
-            card.addView(strip)
+        val selectedType = selectedCategoryType(activeCategoryType, groups)
+        activeCategoryType = selectedType
+        val selectedGroup = groups.first { it.first().type == selectedType }
+
+        val signature = selectedGroup.signature()
+        val strip = resultStrip(selectedGroup)
+        val prior = previous[selectedType]
+        strip.post {
+            if (prior?.signature == signature) strip.scrollTo(prior.scrollX, 0)
+            else strip.fullScroll(View.FOCUS_LEFT)
         }
-        rowState = nextState
+        rowState = previous + (selectedType to RowState(signature, 0, strip))
+        card.addView(strip)
+
+        val tabs = categoryTabs(groups, selectedType)
+        categoryStrip = tabs
+        tabs.post { tabs.scrollTo(categoryScrollX, 0) }
+        card.addView(tabs)
         container.addView(card, cardLayoutParams())
     }
 
@@ -96,6 +110,42 @@ class SearchModeResultRenderer(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
             ))
+        }
+
+    private fun categoryTabs(
+        groups: List<List<SuggestionsManager.SearchResult>>,
+        selectedType: Int
+    ) = HorizontalScrollView(context).apply {
+        isHorizontalScrollBarEnabled = false
+        isFillViewport = false
+        val row = LinearLayout(context).apply { orientation = LinearLayout.HORIZONTAL }
+        for (group in groups) {
+            val type = group.first().type
+            row.addView(categoryChip(type, type == selectedType), LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            ).apply { setMargins(dp(3), dp(6), dp(3), 0) })
+        }
+        addView(row, ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        ))
+    }
+
+    private fun categoryChip(type: Int, selected: Boolean): TextView =
+        chipFactory(context).apply {
+            text = categoryLabel(type)
+            contentDescription = categoryLabel(type)
+            setTypeface(Tuils.getTypeface(context), if (selected) Typeface.BOLD else Typeface.NORMAL)
+            alpha = if (selected) 1f else 0.62f
+            minWidth = dp(52)
+            gravity = Gravity.CENTER
+            chipStyler.apply(this, suggestionType(type), null)
+            setOnClickListener {
+                categoryScrollX = categoryStrip?.scrollX ?: categoryScrollX
+                activeCategoryType = type
+                render(latestResults)
+            }
         }
 
     private fun resultChip(result: SuggestionsManager.SearchResult): TextView =
@@ -162,10 +212,16 @@ class SearchModeResultRenderer(
 
     private fun dp(value: Int): Int = Tuils.dpToPx(context, value)
 
+    private fun currentRowState(): Map<Int, RowState> =
+        rowState.mapValues { (_, state) -> state.copy(scrollX = state.view?.scrollX ?: state.scrollX, view = null) }
+
+    private fun List<SuggestionsManager.SearchResult>.signature(): String =
+        joinToString("\n") { "${it.title}|${it.subtitle}" }
+
     private data class RowState(
         val signature: String,
         val scrollX: Int,
-        val view: HorizontalScrollView
+        val view: HorizontalScrollView?
     )
 
     companion object {
@@ -184,5 +240,13 @@ class SearchModeResultRenderer(
 
         internal fun groupResults(results: List<SuggestionsManager.SearchResult>): List<List<SuggestionsManager.SearchResult>> =
             categoryOrder.map { type -> results.filter { it.type == type } }.filter { it.isNotEmpty() }
+
+        internal fun selectedCategoryType(
+            previous: Int?,
+            groups: List<List<SuggestionsManager.SearchResult>>
+        ): Int {
+            val available = groups.map { it.first().type }
+            return if (previous != null && available.contains(previous)) previous else available.first()
+        }
     }
 }

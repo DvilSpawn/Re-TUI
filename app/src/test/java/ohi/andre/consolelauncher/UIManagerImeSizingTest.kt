@@ -46,7 +46,7 @@ class UIManagerImeSizingTest {
     }
 
     @Test
-    fun hidesOnlyTheOutputSurfaceWhenAutoHideIsCollapsed() {
+    fun hidesOnlyTheOutputSurfaceWhenCollapsedToHeader() {
         assertEquals(View.INVISIBLE, UIManager.outputPaneVisibility(true, false))
         assertEquals(View.VISIBLE, UIManager.outputPaneVisibility(true, true))
         assertEquals(View.VISIBLE, UIManager.outputPaneVisibility(false, false))

@@ -128,7 +128,11 @@ class AppDrawerPaneManager(
                     visibleItemCount: Int,
                     totalItemCount: Int
                 ) {
-                    updateSelectedAlphaFromPosition(firstVisibleItem)
+                    if (isAtScrollableEnd(firstVisibleItem, visibleItemCount, totalItemCount)) {
+                        updateSelectedAlpha(lastAlpha())
+                    } else {
+                        updateSelectedAlphaFromPosition(firstVisibleItem)
+                    }
                 }
             })
         } else {
@@ -432,6 +436,8 @@ class AppDrawerPaneManager(
         }
     }
 
+    private fun lastAlpha(): String? = alphaPositions.keys.lastOrNull()
+
     private fun updateSelectedAlpha(letter: String?) {
         if (letter == null || letter == selectedAlpha) {
             return
@@ -509,5 +515,17 @@ class AppDrawerPaneManager(
             textView.text = app.publicLabel
             return textView
         }
+    }
+
+    companion object {
+        internal fun isAtScrollableEnd(
+            firstVisibleItem: Int,
+            visibleItemCount: Int,
+            totalItemCount: Int
+        ): Boolean =
+            firstVisibleItem > 0 &&
+                    visibleItemCount > 0 &&
+                    totalItemCount > 0 &&
+                    firstVisibleItem + visibleItemCount >= totalItemCount
     }
 }

@@ -1,6 +1,7 @@
 package ohi.andre.consolelauncher
 
 import java.io.File
+import ohi.andre.consolelauncher.managers.ui.AppDrawerPaneManager
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -53,6 +54,14 @@ class LauncherInteractionRegressionTest {
         assertTrue(handler.contains("hideAppsDrawer()"))
         assertTrue(handler.contains("openHomePage()"))
         assertTrue(handler.contains("closeTermuxConsole()"))
+    }
+
+    @Test
+    fun appDrawerDetectsScrollableEndForAlphabetHighlight() {
+        assertTrue(AppDrawerPaneManager.isAtScrollableEnd(120, 20, 140))
+        assertTrue(AppDrawerPaneManager.isAtScrollableEnd(120, 25, 140))
+        assertFalse(AppDrawerPaneManager.isAtScrollableEnd(0, 140, 140))
+        assertFalse(AppDrawerPaneManager.isAtScrollableEnd(80, 20, 140))
     }
 
     @Test
