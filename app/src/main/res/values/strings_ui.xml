@@ -332,7 +332,7 @@
     <!-- First launch setup. Keep command examples unchanged. -->
     <string name="startup_auto_theme" formatted="false">"Auto-theme"</string>
     <!-- First launch setup. Keep command examples unchanged. -->
-    <string name="startup_derive_launcher_colors_from_the_system_wallpaper" formatted="false">"Derive launcher colors from the system wallpaper."</string>
+    <string name="startup_derive_launcher_colors_from_the_system_wallpaper" formatted="false">"Apply colors once from the home wallpaper, or the system palette if unavailable. Keep explicit advanced overrides."</string>
     <!-- First launch setup. Keep command examples unchanged. -->
     <string name="startup_border" formatted="false">"BORDER"</string>
     <!-- First launch setup. Keep command examples unchanged. -->

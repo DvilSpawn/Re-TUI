@@ -8,7 +8,7 @@ import ohi.andre.consolelauncher.commands.ExecutePack
 import ohi.andre.consolelauncher.commands.main.MainPack
 import ohi.andre.consolelauncher.commands.main.specific.ParamCommand
 import ohi.andre.consolelauncher.commands.main.specific.RedirectCommand
-import ohi.andre.consolelauncher.managers.settings.LauncherSettings.enableWallpaperAuto
+import ohi.andre.consolelauncher.managers.settings.LauncherSettings.applyWallpaperAuto
 import ohi.andre.consolelauncher.tuils.Tuils
 import ohi.andre.consolelauncher.tuils.interfaces.Reloadable
 import java.util.Locale
@@ -201,20 +201,19 @@ class wallpaper : ParamCommand() {
         }
 
         private fun enableWallpaperAuto(pack: ExecutePack): String {
-            if (!enableWallpaperAuto(pack.context)) {
-                return pack.context.getString(R.string.command_wallpaper_unable_to_read_wallpaper_colors_259c7)
-            }
+            val result = applyWallpaperAuto(pack.context)
+            if (!result.succeeded) return result.message(pack.context)
 
             if (pack.context is Reloadable) {
                 (pack.context as Reloadable).addMessage(
                     "wallpaper",
-                    pack.context.getString(R.string.command_wallpaper_applied_wallpaper_colors_once_387a7)
+                    result.message(pack.context)
                 )
                 LauncherActivity.preview(pack.context)
                 return Tuils.EMPTYSTRING
             }
 
-            return pack.context.getString(R.string.command_wallpaper_wallpaper_colors_applied_804d5)
+            return result.message(pack.context)
         }
     }
 }

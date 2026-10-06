@@ -132,6 +132,20 @@
     },
     "type": "string"
   },
+  "calculator_ans": {
+    "formatted": true,
+    "forms": {
+      "other": "Insert last successful result"
+    },
+    "type": "string"
+  },
+  "calculator_arithmetic": {
+    "formatted": true,
+    "forms": {
+      "other": "Arithmetic and constants"
+    },
+    "type": "string"
+  },
   "calculator_busy": {
     "formatted": true,
     "forms": {
@@ -139,10 +153,185 @@
     },
     "type": "string"
   },
+  "calculator_cancel": {
+    "formatted": true,
+    "forms": {
+      "other": "Cancel"
+    },
+    "type": "string"
+  },
+  "calculator_cancelled": {
+    "formatted": true,
+    "forms": {
+      "other": "Calculation cancelled. Your input is unchanged."
+    },
+    "type": "string"
+  },
+  "calculator_category": {
+    "formatted": true,
+    "forms": {
+      "other": "Category"
+    },
+    "type": "string"
+  },
+  "calculator_category_area": {
+    "formatted": true,
+    "forms": {
+      "other": "Area"
+    },
+    "type": "string"
+  },
+  "calculator_category_data": {
+    "formatted": true,
+    "forms": {
+      "other": "Data size"
+    },
+    "type": "string"
+  },
+  "calculator_category_energy": {
+    "formatted": true,
+    "forms": {
+      "other": "Energy"
+    },
+    "type": "string"
+  },
+  "calculator_category_length": {
+    "formatted": true,
+    "forms": {
+      "other": "Length"
+    },
+    "type": "string"
+  },
+  "calculator_category_mass": {
+    "formatted": true,
+    "forms": {
+      "other": "Mass"
+    },
+    "type": "string"
+  },
+  "calculator_category_power": {
+    "formatted": true,
+    "forms": {
+      "other": "Power"
+    },
+    "type": "string"
+  },
+  "calculator_category_pressure": {
+    "formatted": true,
+    "forms": {
+      "other": "Pressure"
+    },
+    "type": "string"
+  },
+  "calculator_category_speed": {
+    "formatted": true,
+    "forms": {
+      "other": "Speed"
+    },
+    "type": "string"
+  },
+  "calculator_category_temperature": {
+    "formatted": true,
+    "forms": {
+      "other": "Temperature"
+    },
+    "type": "string"
+  },
+  "calculator_category_time": {
+    "formatted": true,
+    "forms": {
+      "other": "Time"
+    },
+    "type": "string"
+  },
+  "calculator_category_volume": {
+    "formatted": true,
+    "forms": {
+      "other": "Volume"
+    },
+    "type": "string"
+  },
+  "calculator_clear_entry": {
+    "formatted": true,
+    "forms": {
+      "other": "Clear current entry"
+    },
+    "type": "string"
+  },
+  "calculator_clear_history": {
+    "formatted": true,
+    "forms": {
+      "other": "Clear history"
+    },
+    "type": "string"
+  },
+  "calculator_clear_history_confirm": {
+    "formatted": true,
+    "forms": {
+      "other": "Delete all calculator history? This cannot be undone."
+    },
+    "type": "string"
+  },
+  "calculator_converter": {
+    "formatted": true,
+    "forms": {
+      "other": "Converter"
+    },
+    "type": "string"
+  },
+  "calculator_copy": {
+    "formatted": true,
+    "forms": {
+      "other": "Copy result"
+    },
+    "type": "string"
+  },
   "calculator_degrees": {
     "formatted": true,
     "forms": {
       "other": "Degrees"
+    },
+    "type": "string"
+  },
+  "calculator_delete": {
+    "formatted": true,
+    "forms": {
+      "other": "Delete"
+    },
+    "type": "string"
+  },
+  "calculator_div_zero": {
+    "formatted": true,
+    "forms": {
+      "other": "Cannot divide by zero. Edit the number and try again."
+    },
+    "type": "string"
+  },
+  "calculator_domain": {
+    "formatted": true,
+    "forms": {
+      "other": "This operation is outside the supported domain."
+    },
+    "type": "string"
+  },
+  "calculator_empty_history": {
+    "formatted": true,
+    "forms": {
+      "other": "No calculations yet."
+    },
+    "type": "string"
+  },
+  "calculator_enable": {
+    "formatted": true,
+    "forms": {
+      "other": "Enable Qalculate"
+    },
+    "type": "string"
+  },
+  "calculator_enable_help": {
+    "formatted": true,
+    "forms": {
+      "other": "Scientific and Converter use Qalculate. Enabling it also enables advanced calc commands. Calculations work offline."
     },
     "type": "string"
   },
@@ -160,10 +349,213 @@
     },
     "type": "string"
   },
+  "calculator_from": {
+    "formatted": true,
+    "forms": {
+      "other": "From"
+    },
+    "type": "string"
+  },
+  "calculator_full": {
+    "formatted": true,
+    "forms": {
+      "other": "Full result"
+    },
+    "type": "string"
+  },
+  "calculator_full_copy": {
+    "formatted": true,
+    "forms": {
+      "other": "Copy full value"
+    },
+    "type": "string"
+  },
+  "calculator_hints": {
+    "formatted": true,
+    "forms": {
+      "other": "Calculator hints"
+    },
+    "type": "string"
+  },
+  "calculator_hints_body": {
+    "formatted": true,
+    "forms": {
+      "other": "CALCULATOR HINTS\n\nEnter an expression after calc> and press Enter or ↵. The keypad stays in the calculator: 123 enters numbers and operators, ABC enters letters and units, and FUNC enters functions and constants.\n\nArithmetic\n2 + 3 * 4 → 14\n(2 + 3) * 4 → 20\nsqrt(9) → 3\n2^3 → 8\n\nConvert units\n5 ft to miles\n20 celsius to fahrenheit\nUse to for conversion. The word in means inches.\n\nChain results\n5 ft to miles\nans * 2\nans to ft → 10 ft\nErrors do not replace the last successful answer.\n\nEdit expressions\nTap the input to place the cursor, then use 123, ABC, or FUNC. √ and function keys insert parentheses with the cursor inside. Use ⌫ to delete; type clear to clear the transcript.\n\nCommands\nclear — clear the transcript, keeping ans\nhelp — show a short reminder\nexit — close the calculator\n\nCancel stops the current calculation. Tap the calculator tab to return without losing your expression."
+    },
+    "type": "string"
+  },
+  "calculator_history": {
+    "formatted": true,
+    "forms": {
+      "other": "History"
+    },
+    "type": "string"
+  },
   "calculator_invalid": {
     "formatted": true,
     "forms": {
       "other": "Invalid expression."
+    },
+    "type": "string"
+  },
+  "calculator_limit": {
+    "formatted": true,
+    "forms": {
+      "other": "This number exceeds the supported size."
+    },
+    "type": "string"
+  },
+  "calculator_memory_add": {
+    "formatted": true,
+    "forms": {
+      "other": "Add to memory"
+    },
+    "type": "string"
+  },
+  "calculator_memory_clear": {
+    "formatted": true,
+    "forms": {
+      "other": "Clear memory"
+    },
+    "type": "string"
+  },
+  "calculator_memory_indicator": {
+    "formatted": true,
+    "forms": {
+      "other": "Memory: %1$s"
+    },
+    "type": "string"
+  },
+  "calculator_memory_recall": {
+    "formatted": true,
+    "forms": {
+      "other": "Recall memory"
+    },
+    "type": "string"
+  },
+  "calculator_memory_store": {
+    "formatted": true,
+    "forms": {
+      "other": "Store in memory"
+    },
+    "type": "string"
+  },
+  "calculator_memory_subtract": {
+    "formatted": true,
+    "forms": {
+      "other": "Subtract from memory"
+    },
+    "type": "string"
+  },
+  "calculator_no_ans": {
+    "formatted": true,
+    "forms": {
+      "other": "Calculate a result before inserting Ans."
+    },
+    "type": "string"
+  },
+  "calculator_numeric": {
+    "formatted": true,
+    "forms": {
+      "other": "Enter a signed decimal number, optionally with an exponent (for example, -1.2e3)."
+    },
+    "type": "string"
+  },
+  "calculator_percent": {
+    "formatted": true,
+    "forms": {
+      "other": "Percentage"
+    },
+    "type": "string"
+  },
+  "calculator_powers": {
+    "formatted": true,
+    "forms": {
+      "other": "Logarithms and powers"
+    },
+    "type": "string"
+  },
+  "calculator_reciprocal": {
+    "formatted": true,
+    "forms": {
+      "other": "Reciprocal"
+    },
+    "type": "string"
+  },
+  "calculator_restore": {
+    "formatted": true,
+    "forms": {
+      "other": "Restore calculation"
+    },
+    "type": "string"
+  },
+  "calculator_result_description": {
+    "formatted": true,
+    "forms": {
+      "other": "Calculation result. Tap Full result to view or copy the complete value."
+    },
+    "type": "string"
+  },
+  "calculator_scientific": {
+    "formatted": true,
+    "forms": {
+      "other": "Scientific"
+    },
+    "type": "string"
+  },
+  "calculator_search_units": {
+    "formatted": true,
+    "forms": {
+      "other": "Search units"
+    },
+    "type": "string"
+  },
+  "calculator_sign": {
+    "formatted": true,
+    "forms": {
+      "other": "Change sign"
+    },
+    "type": "string"
+  },
+  "calculator_square": {
+    "formatted": true,
+    "forms": {
+      "other": "Square"
+    },
+    "type": "string"
+  },
+  "calculator_standard": {
+    "formatted": true,
+    "forms": {
+      "other": "Standard"
+    },
+    "type": "string"
+  },
+  "calculator_swap": {
+    "formatted": true,
+    "forms": {
+      "other": "Swap units"
+    },
+    "type": "string"
+  },
+  "calculator_symbolic": {
+    "formatted": true,
+    "forms": {
+      "other": "Symbolic functions"
+    },
+    "type": "string"
+  },
+  "calculator_terminal_help": {
+    "formatted": true,
+    "forms": {
+      "other": "Enter an expression, e.g. 5 ft to miles. Use ans for the last successful result. Commands: help, clear, exit."
+    },
+    "type": "string"
+  },
+  "calculator_terminal_no_answer": {
+    "formatted": true,
+    "forms": {
+      "other": "No previous result. Calculate an expression first."
     },
     "type": "string"
   },
@@ -174,10 +566,381 @@
     },
     "type": "string"
   },
+  "calculator_to": {
+    "formatted": true,
+    "forms": {
+      "other": "To"
+    },
+    "type": "string"
+  },
   "calculator_too_long": {
     "formatted": true,
     "forms": {
       "other": "Expressions can contain at most %1$d characters."
+    },
+    "type": "string"
+  },
+  "calculator_trig": {
+    "formatted": true,
+    "forms": {
+      "other": "Trigonometry"
+    },
+    "type": "string"
+  },
+  "calculator_unavailable": {
+    "formatted": true,
+    "forms": {
+      "other": "Scientific and Converter require Android 7 or newer. Standard is available on this device."
+    },
+    "type": "string"
+  },
+  "calculator_unit_acre": {
+    "formatted": true,
+    "forms": {
+      "other": "Acres"
+    },
+    "type": "string"
+  },
+  "calculator_unit_bar": {
+    "formatted": true,
+    "forms": {
+      "other": "Bar"
+    },
+    "type": "string"
+  },
+  "calculator_unit_bit": {
+    "formatted": true,
+    "forms": {
+      "other": "Bits"
+    },
+    "type": "string"
+  },
+  "calculator_unit_byte": {
+    "formatted": true,
+    "forms": {
+      "other": "Bytes"
+    },
+    "type": "string"
+  },
+  "calculator_unit_c": {
+    "formatted": true,
+    "forms": {
+      "other": "Celsius"
+    },
+    "type": "string"
+  },
+  "calculator_unit_cm": {
+    "formatted": true,
+    "forms": {
+      "other": "Centimetres"
+    },
+    "type": "string"
+  },
+  "calculator_unit_day": {
+    "formatted": true,
+    "forms": {
+      "other": "Days"
+    },
+    "type": "string"
+  },
+  "calculator_unit_f": {
+    "formatted": true,
+    "forms": {
+      "other": "Fahrenheit"
+    },
+    "type": "string"
+  },
+  "calculator_unit_ft": {
+    "formatted": true,
+    "forms": {
+      "other": "Feet"
+    },
+    "type": "string"
+  },
+  "calculator_unit_ft2": {
+    "formatted": true,
+    "forms": {
+      "other": "Square feet"
+    },
+    "type": "string"
+  },
+  "calculator_unit_g": {
+    "formatted": true,
+    "forms": {
+      "other": "Grams"
+    },
+    "type": "string"
+  },
+  "calculator_unit_gb": {
+    "formatted": true,
+    "forms": {
+      "other": "Gigabytes (decimal)"
+    },
+    "type": "string"
+  },
+  "calculator_unit_gib": {
+    "formatted": true,
+    "forms": {
+      "other": "Gibibytes (binary)"
+    },
+    "type": "string"
+  },
+  "calculator_unit_h": {
+    "formatted": true,
+    "forms": {
+      "other": "Hours"
+    },
+    "type": "string"
+  },
+  "calculator_unit_ha": {
+    "formatted": true,
+    "forms": {
+      "other": "Hectares"
+    },
+    "type": "string"
+  },
+  "calculator_unit_in": {
+    "formatted": true,
+    "forms": {
+      "other": "Inches"
+    },
+    "type": "string"
+  },
+  "calculator_unit_j": {
+    "formatted": true,
+    "forms": {
+      "other": "Joules"
+    },
+    "type": "string"
+  },
+  "calculator_unit_k": {
+    "formatted": true,
+    "forms": {
+      "other": "Kelvin"
+    },
+    "type": "string"
+  },
+  "calculator_unit_kb": {
+    "formatted": true,
+    "forms": {
+      "other": "Kilobytes (decimal, 1000 bytes)"
+    },
+    "type": "string"
+  },
+  "calculator_unit_kg": {
+    "formatted": true,
+    "forms": {
+      "other": "Kilograms"
+    },
+    "type": "string"
+  },
+  "calculator_unit_kib": {
+    "formatted": true,
+    "forms": {
+      "other": "Kibibytes (binary, 1024 bytes)"
+    },
+    "type": "string"
+  },
+  "calculator_unit_kj": {
+    "formatted": true,
+    "forms": {
+      "other": "Kilojoules"
+    },
+    "type": "string"
+  },
+  "calculator_unit_km": {
+    "formatted": true,
+    "forms": {
+      "other": "Kilometres"
+    },
+    "type": "string"
+  },
+  "calculator_unit_km2": {
+    "formatted": true,
+    "forms": {
+      "other": "Square kilometres"
+    },
+    "type": "string"
+  },
+  "calculator_unit_kmh": {
+    "formatted": true,
+    "forms": {
+      "other": "Kilometres per hour"
+    },
+    "type": "string"
+  },
+  "calculator_unit_kpa": {
+    "formatted": true,
+    "forms": {
+      "other": "Kilopascals"
+    },
+    "type": "string"
+  },
+  "calculator_unit_kw": {
+    "formatted": true,
+    "forms": {
+      "other": "Kilowatts"
+    },
+    "type": "string"
+  },
+  "calculator_unit_kwh": {
+    "formatted": true,
+    "forms": {
+      "other": "Kilowatt-hours"
+    },
+    "type": "string"
+  },
+  "calculator_unit_l": {
+    "formatted": true,
+    "forms": {
+      "other": "Litres"
+    },
+    "type": "string"
+  },
+  "calculator_unit_lb": {
+    "formatted": true,
+    "forms": {
+      "other": "Pounds"
+    },
+    "type": "string"
+  },
+  "calculator_unit_m": {
+    "formatted": true,
+    "forms": {
+      "other": "Metres"
+    },
+    "type": "string"
+  },
+  "calculator_unit_m2": {
+    "formatted": true,
+    "forms": {
+      "other": "Square metres"
+    },
+    "type": "string"
+  },
+  "calculator_unit_m3": {
+    "formatted": true,
+    "forms": {
+      "other": "Cubic metres"
+    },
+    "type": "string"
+  },
+  "calculator_unit_mb": {
+    "formatted": true,
+    "forms": {
+      "other": "Megabytes (decimal)"
+    },
+    "type": "string"
+  },
+  "calculator_unit_mi": {
+    "formatted": true,
+    "forms": {
+      "other": "Miles"
+    },
+    "type": "string"
+  },
+  "calculator_unit_mib": {
+    "formatted": true,
+    "forms": {
+      "other": "Mebibytes (binary)"
+    },
+    "type": "string"
+  },
+  "calculator_unit_min": {
+    "formatted": true,
+    "forms": {
+      "other": "Minutes"
+    },
+    "type": "string"
+  },
+  "calculator_unit_ml": {
+    "formatted": true,
+    "forms": {
+      "other": "Millilitres"
+    },
+    "type": "string"
+  },
+  "calculator_unit_mm": {
+    "formatted": true,
+    "forms": {
+      "other": "Millimetres"
+    },
+    "type": "string"
+  },
+  "calculator_unit_mph": {
+    "formatted": true,
+    "forms": {
+      "other": "Miles per hour"
+    },
+    "type": "string"
+  },
+  "calculator_unit_ms": {
+    "formatted": true,
+    "forms": {
+      "other": "Metres per second"
+    },
+    "type": "string"
+  },
+  "calculator_unit_oz": {
+    "formatted": true,
+    "forms": {
+      "other": "Ounces"
+    },
+    "type": "string"
+  },
+  "calculator_unit_pa": {
+    "formatted": true,
+    "forms": {
+      "other": "Pascals"
+    },
+    "type": "string"
+  },
+  "calculator_unit_psi": {
+    "formatted": true,
+    "forms": {
+      "other": "Pounds per square inch"
+    },
+    "type": "string"
+  },
+  "calculator_unit_s": {
+    "formatted": true,
+    "forms": {
+      "other": "Seconds"
+    },
+    "type": "string"
+  },
+  "calculator_unit_ukgal": {
+    "formatted": true,
+    "forms": {
+      "other": "Imperial gallons"
+    },
+    "type": "string"
+  },
+  "calculator_unit_usgal": {
+    "formatted": true,
+    "forms": {
+      "other": "US gallons"
+    },
+    "type": "string"
+  },
+  "calculator_unit_w": {
+    "formatted": true,
+    "forms": {
+      "other": "Watts"
+    },
+    "type": "string"
+  },
+  "calculator_unsupported": {
+    "formatted": true,
+    "forms": {
+      "other": "Unsupported operation."
+    },
+    "type": "string"
+  },
+  "calculator_value": {
+    "formatted": true,
+    "forms": {
+      "other": "Value"
     },
     "type": "string"
   },
@@ -1168,6 +1931,13 @@
     },
     "type": "string"
   },
+  "command_mode_enabled": {
+    "formatted": true,
+    "forms": {
+      "other": "%1$s mode enabled."
+    },
+    "type": "string"
+  },
   "command_mode_search_mode_enabled_ba524": {
     "formatted": false,
     "forms": {
@@ -1178,7 +1948,7 @@
   "command_mode_unknown_launcher_mode_usage_mode_search_cl_a86ba": {
     "formatted": true,
     "forms": {
-      "other": "Unknown launcher mode: %1$s\nUsage: mode search|classic"
+      "other": "Unknown launcher mode: %1$s\nUsage: mode classic|search"
     },
     "type": "string"
   },
@@ -2211,10 +2981,17 @@
     },
     "type": "string"
   },
+  "command_wallpaper_system_palette_applied": {
+    "formatted": true,
+    "forms": {
+      "other": "Applied system palette; wallpaper colors unavailable."
+    },
+    "type": "string"
+  },
   "command_wallpaper_unable_to_read_wallpaper_colors_259c7": {
     "formatted": false,
     "forms": {
-      "other": "Unable to read wallpaper colors."
+      "other": "Unable to read wallpaper colors or a system palette. Your current theme was kept."
     },
     "type": "string"
   },
@@ -4456,7 +5233,7 @@
   "guide_auto_color_reads_the_current_wallpaper_and_updates_the_terminal_palett": {
     "formatted": false,
     "forms": {
-      "other": "Auto color reads the current wallpaper and updates the terminal palette."
+      "other": "Auto color applies the home wallpaper palette once, with a system-palette fallback on Android 12 and later. Explicit advanced colors are kept."
     },
     "type": "string"
   },
@@ -5002,7 +5779,7 @@
   "help_mode": {
     "formatted": true,
     "forms": {
-      "other": "Switch launcher layout.\nUsage:\n$ mode search\n$ mode classic"
+      "other": "Switch launcher layout.\nUsage:\n$ mode classic\n$ mode search"
     },
     "type": "string"
   },
@@ -5324,7 +6101,7 @@
   "help_wallpaper": {
     "formatted": true,
     "forms": {
-      "other": "-static -> open the static wallpaper picker \n-live -> open the live wallpaper picker \n-auto -> apply wallpaper-derived theme colors once \n(no args) -> open the wallpaper picker"
+      "other": "-static -> open the static wallpaper picker \n-live -> open the live wallpaper picker \n-auto -> apply home wallpaper colors once; use the system palette if unavailable. Explicit advanced colors are preserved. \n(no args) -> open the wallpaper picker"
     },
     "type": "string"
   },
@@ -10504,6 +11281,13 @@
     },
     "type": "string"
   },
+  "setting_behavior_launcher_mode_description": {
+    "formatted": false,
+    "forms": {
+      "other": "Launcher layout mode: classic or search"
+    },
+    "type": "string"
+  },
   "setting_behavior_launcher_sounds_description": {
     "formatted": false,
     "forms": {
@@ -10686,10 +11470,17 @@
     },
     "type": "string"
   },
+  "setting_behavior_search_category_tabs_description": {
+    "formatted": true,
+    "forms": {
+      "other": "In Search mode, show one result category at a time with tabs. Turn off to show all category rows together in a single pane."
+    },
+    "type": "string"
+  },
   "setting_behavior_search_only_mode_description": {
     "formatted": false,
     "forms": {
-      "other": "Use the launcher as a bottom search bar with universal results instead of the classic home surfaces"
+      "other": "Legacy search mode toggle used only when launcher_mode is empty"
     },
     "type": "string"
   },
@@ -11557,7 +12348,7 @@
   "setting_theme_accent_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Shared highlight color used by controls and panels. AUTO follows module_text_color."
+      "other": "Shared highlight color used by controls and panels. AUTO follows terminal_border_color."
     },
     "type": "string"
   },
@@ -11687,24 +12478,87 @@
     },
     "type": "string"
   },
+  "setting_theme_app_drawer_alphabet_background_color_description": {
+    "formatted": false,
+    "forms": {
+      "other": "Background color for unselected alphabet buttons in the app drawer. AUTO follows app_drawer_panel_background_color, independently of category buttons and app-list rows."
+    },
+    "type": "string"
+  },
+  "setting_theme_app_drawer_alphabet_border_color_description": {
+    "formatted": false,
+    "forms": {
+      "other": "Border color for unselected alphabet buttons in the app drawer. AUTO follows app_drawer_panel_border_color."
+    },
+    "type": "string"
+  },
+  "setting_theme_app_drawer_alphabet_selected_background_color_description": {
+    "formatted": false,
+    "forms": {
+      "other": "Background color for the selected alphabet button in the app drawer. AUTO follows app_drawer_selection_background_color, independently of the category rail."
+    },
+    "type": "string"
+  },
+  "setting_theme_app_drawer_alphabet_selected_border_color_description": {
+    "formatted": false,
+    "forms": {
+      "other": "Border color for the selected alphabet button in the app drawer. AUTO follows app_drawer_selection_border_color, independently of the category rail."
+    },
+    "type": "string"
+  },
+  "setting_theme_app_drawer_alphabet_selected_text_color_description": {
+    "formatted": false,
+    "forms": {
+      "other": "Text color for the selected alphabet button in the app drawer. AUTO follows app_drawer_selection_text_color, independently of the category rail."
+    },
+    "type": "string"
+  },
+  "setting_theme_app_drawer_alphabet_text_color_description": {
+    "formatted": false,
+    "forms": {
+      "other": "Text color for unselected alphabet buttons in the app drawer. AUTO follows app_drawer_panel_text_color."
+    },
+    "type": "string"
+  },
   "setting_theme_app_drawer_group_background_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Background color for app groups in the app drawer. AUTO follows app_drawer_row_background_color."
+      "other": "Background color for unselected category buttons in the app drawer. AUTO follows app_drawer_panel_background_color. A saved per-group background takes priority."
     },
     "type": "string"
   },
   "setting_theme_app_drawer_group_border_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Border color for app groups in the app drawer. AUTO follows app_drawer_panel_border_color."
+      "other": "Border color for unselected category buttons in the app drawer. AUTO follows app_drawer_panel_border_color."
+    },
+    "type": "string"
+  },
+  "setting_theme_app_drawer_group_selected_background_color_description": {
+    "formatted": false,
+    "forms": {
+      "other": "Background color for the selected category button in the app drawer. AUTO follows app_drawer_selection_background_color, independently of the alphabet rail."
+    },
+    "type": "string"
+  },
+  "setting_theme_app_drawer_group_selected_border_color_description": {
+    "formatted": false,
+    "forms": {
+      "other": "Border color for the selected category button in the app drawer. AUTO follows app_drawer_selection_border_color, independently of the alphabet rail."
+    },
+    "type": "string"
+  },
+  "setting_theme_app_drawer_group_selected_text_color_description": {
+    "formatted": false,
+    "forms": {
+      "other": "Text color for the selected category button in the app drawer. AUTO follows app_drawer_selection_text_color, independently of the alphabet rail."
     },
     "type": "string"
   },
   "setting_theme_app_drawer_group_text_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Text color for app groups in the app drawer. AUTO follows app_drawer_row_text_color."
+      "other": "Text color for unselected category buttons in the app drawer. AUTO follows app_drawer_panel_text_color. A saved per-group text color takes priority."
     },
     "type": "string"
   },
@@ -11753,7 +12607,7 @@
   "setting_theme_app_drawer_row_background_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Background color for rows in the app drawer. AUTO uses the built-in default."
+      "other": "Background color for app-list rows, independently of the category and alphabet rails. AUTO is transparent."
     },
     "type": "string"
   },
@@ -11767,21 +12621,21 @@
   "setting_theme_app_drawer_selection_background_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Background color for selected apps in the app drawer. AUTO blends app_drawer_panel_background_color with app_drawer_panel_text_color."
+      "other": "Shared default highlight background for the category and alphabet rails. Each rail can override it separately. AUTO blends app_drawer_panel_background_color with app_drawer_panel_text_color."
     },
     "type": "string"
   },
   "setting_theme_app_drawer_selection_border_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Border color for selected apps in the app drawer. AUTO follows terminal_border_color."
+      "other": "Shared default highlight border for the category and alphabet rails. Each rail can override it separately. AUTO follows terminal_border_color."
     },
     "type": "string"
   },
   "setting_theme_app_drawer_selection_text_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Text color for selected apps in the app drawer. AUTO follows app_drawer_panel_text_color."
+      "other": "Shared default highlight text for the category and alphabet rails. Each rail can override it separately. AUTO follows app_drawer_panel_text_color."
     },
     "type": "string"
   },
@@ -11872,7 +12726,7 @@
   "setting_theme_button_background_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Background color for regular buttons. AUTO follows module_button_background_color."
+      "other": "Background color for regular buttons. AUTO follows terminal_window_background_color."
     },
     "type": "string"
   },
@@ -11886,7 +12740,7 @@
   "setting_theme_button_text_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Text color for regular buttons. AUTO follows module_text_color."
+      "other": "Text color for regular buttons. AUTO follows output_text_color."
     },
     "type": "string"
   },
@@ -11991,14 +12845,14 @@
   "setting_theme_disabled_background_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Background color for disabled controls. AUTO uses module_button_background_color with reduced opacity."
+      "other": "Background color for disabled controls. AUTO uses button_background_color with reduced opacity."
     },
     "type": "string"
   },
   "setting_theme_disabled_text_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Text color for disabled controls. AUTO uses muted_text_color with reduced opacity."
+      "other": "Text color for disabled controls. AUTO uses button_text_color with reduced opacity."
     },
     "type": "string"
   },
@@ -12019,7 +12873,7 @@
   "setting_theme_error_text_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Text color for errors. AUTO follows battery_text_low."
+      "other": "Text color for errors. AUTO uses the built-in orange (#FFFF5722), independently of battery colors."
     },
     "type": "string"
   },
@@ -12110,7 +12964,7 @@
   "setting_theme_list_row_background_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Background color for list rows. AUTO follows module_button_background_color."
+      "other": "Background color for list rows. AUTO follows button_background_color."
     },
     "type": "string"
   },
@@ -12124,7 +12978,7 @@
   "setting_theme_list_row_text_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Text color for list rows. AUTO follows module_text_color."
+      "other": "Text color for list rows. AUTO follows button_text_color."
     },
     "type": "string"
   },
@@ -12180,7 +13034,7 @@
   "setting_theme_module_active_background_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Background color for active items in launcher modules. AUTO follows selection_background_color."
+      "other": "Background color for active items in launcher modules. AUTO blends module_action_background_color with accent_color (25%)."
     },
     "type": "string"
   },
@@ -12194,14 +13048,14 @@
   "setting_theme_module_active_text_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Text color for active items in launcher modules. AUTO follows selection_text_color."
+      "other": "Text color for active items in launcher modules. AUTO follows module_action_text_color."
     },
     "type": "string"
   },
   "setting_theme_module_button_background_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Base background color for launcher module buttons and controls that still inherit the regular button color in AUTO."
+      "other": "Base background color for launcher module action buttons and dock shortcuts. General controls have their own button colors."
     },
     "type": "string"
   },
@@ -12282,6 +13136,13 @@
     },
     "type": "string"
   },
+  "setting_theme_module_text_shadow_color_description": {
+    "formatted": true,
+    "forms": {
+      "other": "Text shadow color for module panel text, headings and controls. Transparent disables the shadow. Offset and blur use shadow_params."
+    },
+    "type": "string"
+  },
   "setting_theme_muted_text_color_description": {
     "formatted": false,
     "forms": {
@@ -12355,42 +13216,42 @@
   "setting_theme_overlay_header_background_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Background color for the title bar in floating panels. AUTO follows module_header_background_color."
+      "other": "Background color for the title bar in floating panels. AUTO follows terminal_header_background_color."
     },
     "type": "string"
   },
   "setting_theme_overlay_header_border_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Border color for the title bar in floating panels. AUTO follows module_header_border_color."
+      "other": "Border color for the title bar in floating panels. AUTO follows terminal_header_border_color."
     },
     "type": "string"
   },
   "setting_theme_overlay_header_text_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Text color for the title bar in floating panels. AUTO follows module_header_text_color."
+      "other": "Text color for the title bar in floating panels. AUTO follows overlay_panel_text_color."
     },
     "type": "string"
   },
   "setting_theme_overlay_panel_background_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Background color for the main panel in floating panels. AUTO follows module_panel_background_color."
+      "other": "Background color for the main panel in floating panels. AUTO follows terminal_window_background_color."
     },
     "type": "string"
   },
   "setting_theme_overlay_panel_border_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Border color for the main panel in floating panels. AUTO follows module_panel_border_color."
+      "other": "Border color for the main panel in floating panels. AUTO follows terminal_border_color."
     },
     "type": "string"
   },
   "setting_theme_overlay_panel_text_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Text color for the main panel in floating panels. AUTO follows module_panel_text_color."
+      "other": "Text color for the main panel in floating panels. AUTO follows output_text_color."
     },
     "type": "string"
   },
@@ -12404,7 +13265,7 @@
   "setting_theme_pressed_background_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Background color for pressed controls. AUTO blends module_button_background_color with accent_color."
+      "other": "Background color for pressed controls. AUTO blends button_background_color with accent_color (18%)."
     },
     "type": "string"
   },
@@ -12418,7 +13279,7 @@
   "setting_theme_pressed_text_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Text color for pressed controls. AUTO follows module_text_color."
+      "other": "Text color for pressed controls. AUTO follows button_text_color."
     },
     "type": "string"
   },
@@ -12481,7 +13342,7 @@
   "setting_theme_selection_background_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Background color for selected controls. AUTO blends module_button_background_color with accent_color."
+      "other": "Background color for selected controls. AUTO blends button_background_color with accent_color (25%)."
     },
     "type": "string"
   },
@@ -12495,7 +13356,7 @@
   "setting_theme_selection_text_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Text color for selected controls. AUTO follows module_text_color."
+      "other": "Text color for selected controls. AUTO follows button_text_color."
     },
     "type": "string"
   },
@@ -12656,7 +13517,7 @@
   "setting_theme_success_text_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Text color for success messages. AUTO follows battery_text_high."
+      "other": "Text color for success messages. AUTO uses the built-in green (#FF4CAF50), independently of battery colors."
     },
     "type": "string"
   },
@@ -12664,6 +13525,13 @@
     "formatted": false,
     "forms": {
       "other": "Suggestions area background color"
+    },
+    "type": "string"
+  },
+  "setting_theme_suggestions_text_shadow_color_description": {
+    "formatted": true,
+    "forms": {
+      "other": "Text shadow color for launcher suggestions, search categories and module suggestion buttons. Transparent disables the shadow. Offset and blur use shadow_params."
     },
     "type": "string"
   },
@@ -12684,7 +13552,7 @@
   "setting_theme_tab_text_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Text color for tabs. AUTO follows module_text_color."
+      "other": "Text color for tabs. AUTO follows output_text_color."
     },
     "type": "string"
   },
@@ -12831,7 +13699,7 @@
   "setting_theme_warning_text_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Text color for warnings. AUTO follows battery_text_medium."
+      "other": "Text color for warnings. AUTO uses the built-in yellow (#FFFFEB3B), independently of battery colors."
     },
     "type": "string"
   },
@@ -12859,7 +13727,7 @@
   "setting_theme_widget_command_background_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Background color for command rows in launcher widgets. AUTO blends widget_panel_background_color with ansi_black."
+      "other": "Background color for command rows in launcher widgets. AUTO darkens widget_panel_background_color with fixed black (16%), preserving transparency."
     },
     "type": "string"
   },
@@ -12880,70 +13748,70 @@
   "setting_theme_widget_control_background_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Background color for controls in launcher widgets. AUTO follows button_background_color."
+      "other": "Background color for controls in launcher widgets. AUTO follows widget_panel_background_color."
     },
     "type": "string"
   },
   "setting_theme_widget_control_border_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Border color for controls in launcher widgets. AUTO follows button_border_color."
+      "other": "Border color for controls in launcher widgets. AUTO follows widget_panel_border_color."
     },
     "type": "string"
   },
   "setting_theme_widget_control_text_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Text color for controls in launcher widgets. AUTO follows button_text_color."
+      "other": "Text color for controls in launcher widgets. AUTO follows widget_panel_text_color."
     },
     "type": "string"
   },
   "setting_theme_widget_header_background_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Background color for the title bar in launcher widgets. AUTO follows module_header_background_color."
+      "other": "Background color for the title bar in launcher widgets. AUTO follows terminal_header_background_color."
     },
     "type": "string"
   },
   "setting_theme_widget_header_border_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Border color for the title bar in launcher widgets. AUTO follows module_header_border_color."
+      "other": "Border color for the title bar in launcher widgets. AUTO follows terminal_header_border_color."
     },
     "type": "string"
   },
   "setting_theme_widget_header_text_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Text color for the title bar in launcher widgets. AUTO follows module_header_text_color."
+      "other": "Text color for the title bar in launcher widgets. AUTO follows widget_panel_text_color."
     },
     "type": "string"
   },
   "setting_theme_widget_panel_background_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Background color for the main panel in launcher widgets. AUTO follows module_panel_background_color."
+      "other": "Background color for the main panel in launcher widgets. AUTO follows terminal_window_background_color."
     },
     "type": "string"
   },
   "setting_theme_widget_panel_border_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Border color for the main panel in launcher widgets. AUTO follows module_panel_border_color."
+      "other": "Border color for the main panel in launcher widgets. AUTO follows terminal_border_color."
     },
     "type": "string"
   },
   "setting_theme_widget_panel_text_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Text color for the main panel in launcher widgets. AUTO follows module_panel_text_color."
+      "other": "Text color for the main panel in launcher widgets. AUTO follows output_text_color."
     },
     "type": "string"
   },
   "setting_theme_widget_row_background_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Background color for rows in launcher widgets. AUTO blends widget_panel_background_color with ansi_black."
+      "other": "Background color for rows in launcher widgets. AUTO darkens widget_panel_background_color with fixed black (22%), preserving transparency."
     },
     "type": "string"
   },
@@ -12957,21 +13825,21 @@
   "setting_theme_workspace_control_background_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Background color for controls in workspace panels, including the calculator. AUTO follows module_button_background_color."
+      "other": "Background color for workspace controls, including the calculator. AUTO follows workspace_panel_background_color."
     },
     "type": "string"
   },
   "setting_theme_workspace_control_border_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Border color for controls in workspace panels, including the calculator. AUTO follows terminal_border_color."
+      "other": "Border color for workspace controls, including the calculator. AUTO follows workspace_panel_border_color."
     },
     "type": "string"
   },
   "setting_theme_workspace_control_text_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Text color for controls in workspace panels, including the calculator. AUTO follows module_text_color."
+      "other": "Text color for workspace controls, including the calculator. AUTO follows workspace_panel_text_color."
     },
     "type": "string"
   },
@@ -12992,14 +13860,14 @@
   "setting_theme_workspace_header_text_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Text color for the title bar in workspace panels, including the calculator. AUTO follows module_text_color."
+      "other": "Text color for workspace title bars, including the calculator and shared Notes theme. AUTO follows workspace_panel_text_color."
     },
     "type": "string"
   },
   "setting_theme_workspace_input_background_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Background color for input fields in workspace panels, including the calculator. AUTO blends workspace_panel_background_color with ansi_black."
+      "other": "Background color for workspace inputs, including the calculator and shared Notes theme. AUTO darkens workspace_panel_background_color with fixed black (16%), preserving transparency."
     },
     "type": "string"
   },
@@ -13013,14 +13881,14 @@
   "setting_theme_workspace_output_background_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Background color for output area in workspace panels, including the calculator. AUTO blends workspace_panel_background_color with ansi_black."
+      "other": "Background color for workspace output, including the calculator and shared Notes theme. AUTO darkens workspace_panel_background_color with fixed black (10%), preserving transparency."
     },
     "type": "string"
   },
   "setting_theme_workspace_output_text_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Text color for output area in workspace panels, including the calculator. AUTO follows output_text_color."
+      "other": "Text color for workspace output. AUTO follows workspace_panel_text_color."
     },
     "type": "string"
   },
@@ -13482,7 +14350,7 @@
   "setting_ui_output_tray_max_height_description": {
     "formatted": false,
     "forms": {
-      "other": "Maximum height for the expanded output tray in dp. 0 keeps the default adaptive height"
+      "other": "Maximum height for the expanded output tray in dp. 0 fits the current output up to the adaptive viewport limit"
     },
     "type": "string"
   },
@@ -13510,7 +14378,7 @@
   "setting_ui_shadow_params_description": {
     "formatted": false,
     "forms": {
-      "other": "[Shadow X offset],[Shadow Y offset],[Shadow radius]"
+      "other": "[Shadow X offset],[Shadow Y offset],[Shadow blur radius] in pixels. Shared by input, output, status lines, suggestions and module text; set their shadow colors in Themer."
     },
     "type": "string"
   },
@@ -13902,7 +14770,7 @@
   "startup_derive_launcher_colors_from_the_system_wallpaper": {
     "formatted": false,
     "forms": {
-      "other": "Derive launcher colors from the system wallpaper."
+      "other": "Apply colors once from the home wallpaper, or the system palette if unavailable. Keep explicit advanced overrides."
     },
     "type": "string"
   },

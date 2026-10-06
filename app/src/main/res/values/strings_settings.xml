@@ -227,8 +227,11 @@
     <string name="setting_behavior_sound_reminder_description" formatted="false">"Play the launcher reminder sound"</string>
     <!-- Behavior.kt: sound_timer -->
     <string name="setting_behavior_sound_timer_description" formatted="false">"Play the timer completion sound"</string>
+    <!-- Behavior.kt: launcher_mode -->
+    <string name="setting_behavior_launcher_mode_description" formatted="false">"Launcher layout mode: classic or search"</string>
+    <string name="setting_behavior_search_category_tabs_description">In Search mode, show one result category at a time with tabs. Turn off to show all category rows together in a single pane.</string>
     <!-- Behavior.kt: search_only_mode -->
-    <string name="setting_behavior_search_only_mode_description" formatted="false">"Use the launcher as a bottom search bar with universal results instead of the classic home surfaces"</string>
+    <string name="setting_behavior_search_only_mode_description" formatted="false">"Legacy search mode toggle used only when launcher_mode is empty"</string>
     <!-- Cmd.kt: default_search -->
     <string name="setting_cmd_default_search_description" formatted="false">"The param that will be used if you type \"search apples\" instead of \"search -param apples\""</string>
     <!-- Notifications.kt: show_notifications -->
@@ -504,7 +507,7 @@
     <!-- Theme.kt: terminal_border_color -->
     <string name="setting_theme_terminal_border_color_description" formatted="false">"Shared border color for terminal chrome, headers, panels, and module outlines"</string>
     <!-- Theme.kt: module_button_background_color -->
-    <string name="setting_theme_module_button_background_color_description" formatted="false">Base background color for launcher module buttons and controls that still inherit the regular button color in AUTO.</string>
+    <string name="setting_theme_module_button_background_color_description" formatted="false">Base background color for launcher module action buttons and dock shortcuts. General controls have their own button colors.</string>
     <!-- Theme.kt: module_text_color -->
     <string name="setting_theme_module_text_color_description" formatted="false">"Module label and control text color"</string>
     <!-- Theme.kt: terminal_window_background_color -->
@@ -515,23 +518,23 @@
     <string name="setting_theme_terminal_header_border_color_description" formatted="false">"Terminal header tab border color"</string>
     <!-- Retain the old key so previously exported language packs still import. -->
     <string name="setting_theme_advanced_color_description" formatted="false">Color for a specific control or panel. AUTO uses the theme default; a custom color overrides it.</string>
-    <string name="setting_theme_accent_color_description" formatted="false">Shared highlight color used by controls and panels. AUTO follows module_text_color.</string>
+    <string name="setting_theme_accent_color_description" formatted="false">Shared highlight color used by controls and panels. AUTO follows terminal_border_color.</string>
     <string name="setting_theme_muted_text_color_description" formatted="false">Color of secondary and less prominent text. AUTO follows session_info_text_color.</string>
-    <string name="setting_theme_success_text_color_description" formatted="false">Text color for success messages. AUTO follows battery_text_high.</string>
-    <string name="setting_theme_warning_text_color_description" formatted="false">Text color for warnings. AUTO follows battery_text_medium.</string>
-    <string name="setting_theme_error_text_color_description" formatted="false">Text color for errors. AUTO follows battery_text_low.</string>
+    <string name="setting_theme_success_text_color_description" formatted="false">Text color for success messages. AUTO uses the built-in green (#FF4CAF50), independently of battery colors.</string>
+    <string name="setting_theme_warning_text_color_description" formatted="false">Text color for warnings. AUTO uses the built-in yellow (#FFFFEB3B), independently of battery colors.</string>
+    <string name="setting_theme_error_text_color_description" formatted="false">Text color for errors. AUTO uses the built-in orange (#FFFF5722), independently of battery colors.</string>
     <string name="setting_theme_divider_color_description" formatted="false">Color of lines separating items. AUTO follows terminal_border_color.</string>
     <string name="setting_theme_focus_color_description" formatted="false">Highlight color for the focused control. AUTO follows terminal_border_color.</string>
-    <string name="setting_theme_disabled_text_color_description" formatted="false">Text color for disabled controls. AUTO uses muted_text_color with reduced opacity.</string>
-    <string name="setting_theme_disabled_background_color_description" formatted="false">Background color for disabled controls. AUTO uses module_button_background_color with reduced opacity.</string>
-    <string name="setting_theme_selection_background_color_description" formatted="false">Background color for selected controls. AUTO blends module_button_background_color with accent_color.</string>
-    <string name="setting_theme_selection_text_color_description" formatted="false">Text color for selected controls. AUTO follows module_text_color.</string>
+    <string name="setting_theme_disabled_text_color_description" formatted="false">Text color for disabled controls. AUTO uses button_text_color with reduced opacity.</string>
+    <string name="setting_theme_disabled_background_color_description" formatted="false">Background color for disabled controls. AUTO uses button_background_color with reduced opacity.</string>
+    <string name="setting_theme_selection_background_color_description" formatted="false">Background color for selected controls. AUTO blends button_background_color with accent_color (25%).</string>
+    <string name="setting_theme_selection_text_color_description" formatted="false">Text color for selected controls. AUTO follows button_text_color.</string>
     <string name="setting_theme_selection_border_color_description" formatted="false">Border color for selected controls. AUTO follows accent_color.</string>
-    <string name="setting_theme_pressed_background_color_description" formatted="false">Background color for pressed controls. AUTO blends module_button_background_color with accent_color.</string>
-    <string name="setting_theme_pressed_text_color_description" formatted="false">Text color for pressed controls. AUTO follows module_text_color.</string>
+    <string name="setting_theme_pressed_background_color_description" formatted="false">Background color for pressed controls. AUTO blends button_background_color with accent_color (18%).</string>
+    <string name="setting_theme_pressed_text_color_description" formatted="false">Text color for pressed controls. AUTO follows button_text_color.</string>
     <string name="setting_theme_pressed_border_color_description" formatted="false">Border color for pressed controls. AUTO follows accent_color.</string>
-    <string name="setting_theme_button_background_color_description" formatted="false">Background color for regular buttons. AUTO follows module_button_background_color.</string>
-    <string name="setting_theme_button_text_color_description" formatted="false">Text color for regular buttons. AUTO follows module_text_color.</string>
+    <string name="setting_theme_button_background_color_description" formatted="false">Background color for regular buttons. AUTO follows terminal_window_background_color.</string>
+    <string name="setting_theme_button_text_color_description" formatted="false">Text color for regular buttons. AUTO follows output_text_color.</string>
     <string name="setting_theme_button_border_color_description" formatted="false">Border color for regular buttons. AUTO follows terminal_border_color.</string>
     <string name="setting_theme_primary_button_background_color_description" formatted="false">Background color for primary action buttons. AUTO follows selection_background_color.</string>
     <string name="setting_theme_primary_button_text_color_description" formatted="false">Text color for primary action buttons. AUTO follows selection_text_color.</string>
@@ -543,8 +546,8 @@
     <string name="setting_theme_field_text_color_description" formatted="false">Text color for text input fields. AUTO follows input_text_color.</string>
     <string name="setting_theme_field_hint_color_description" formatted="false">Placeholder text color for text input fields. AUTO uses field_text_color with reduced opacity.</string>
     <string name="setting_theme_field_border_color_description" formatted="false">Border color for text input fields. AUTO follows terminal_border_color.</string>
-    <string name="setting_theme_list_row_background_color_description" formatted="false">Background color for list rows. AUTO follows module_button_background_color.</string>
-    <string name="setting_theme_list_row_text_color_description" formatted="false">Text color for list rows. AUTO follows module_text_color.</string>
+    <string name="setting_theme_list_row_background_color_description" formatted="false">Background color for list rows. AUTO follows button_background_color.</string>
+    <string name="setting_theme_list_row_text_color_description" formatted="false">Text color for list rows. AUTO follows button_text_color.</string>
     <string name="setting_theme_list_row_border_color_description" formatted="false">Border color for list rows. AUTO follows terminal_border_color.</string>
     <string name="setting_theme_list_selected_background_color_description" formatted="false">Background color for selected list rows. AUTO follows selection_background_color.</string>
     <string name="setting_theme_list_selected_text_color_description" formatted="false">Text color for selected list rows. AUTO follows selection_text_color.</string>
@@ -562,7 +565,7 @@
     <string name="setting_theme_chip_text_color_description" formatted="false">Text color for small shortcut chips. AUTO follows button_text_color.</string>
     <string name="setting_theme_chip_border_color_description" formatted="false">Border color for small shortcut chips. AUTO follows button_border_color.</string>
     <string name="setting_theme_tab_background_color_description" formatted="false">Background color for tabs. AUTO follows terminal_header_background_color.</string>
-    <string name="setting_theme_tab_text_color_description" formatted="false">Text color for tabs. AUTO follows module_text_color.</string>
+    <string name="setting_theme_tab_text_color_description" formatted="false">Text color for tabs. AUTO follows output_text_color.</string>
     <string name="setting_theme_tab_border_color_description" formatted="false">Border color for tabs. AUTO follows terminal_header_border_color.</string>
     <string name="setting_theme_app_drawer_panel_background_color_description" formatted="false">Background color for the main panel in the app drawer. AUTO follows terminal_window_background_color.</string>
     <string name="setting_theme_app_drawer_panel_text_color_description" formatted="false">Text color for the main panel in the app drawer. AUTO follows apps_drawer_text_color.</string>
@@ -570,14 +573,23 @@
     <string name="setting_theme_app_drawer_header_background_color_description" formatted="false">Background color for the title bar in the app drawer. AUTO follows terminal_header_background_color.</string>
     <string name="setting_theme_app_drawer_header_text_color_description" formatted="false">Text color for the title bar in the app drawer. AUTO follows apps_drawer_text_color.</string>
     <string name="setting_theme_app_drawer_header_border_color_description" formatted="false">Border color for the title bar in the app drawer. AUTO follows terminal_header_border_color.</string>
-    <string name="setting_theme_app_drawer_row_background_color_description" formatted="false">Background color for rows in the app drawer. AUTO uses the built-in default.</string>
+    <string name="setting_theme_app_drawer_row_background_color_description" formatted="false">Background color for app-list rows, independently of the category and alphabet rails. AUTO is transparent.</string>
     <string name="setting_theme_app_drawer_row_text_color_description" formatted="false">Text color for rows in the app drawer. AUTO follows apps_drawer_text_color.</string>
-    <string name="setting_theme_app_drawer_group_background_color_description" formatted="false">Background color for app groups in the app drawer. AUTO follows app_drawer_row_background_color.</string>
-    <string name="setting_theme_app_drawer_group_text_color_description" formatted="false">Text color for app groups in the app drawer. AUTO follows app_drawer_row_text_color.</string>
-    <string name="setting_theme_app_drawer_group_border_color_description" formatted="false">Border color for app groups in the app drawer. AUTO follows app_drawer_panel_border_color.</string>
-    <string name="setting_theme_app_drawer_selection_background_color_description" formatted="false">Background color for selected apps in the app drawer. AUTO blends app_drawer_panel_background_color with app_drawer_panel_text_color.</string>
-    <string name="setting_theme_app_drawer_selection_text_color_description" formatted="false">Text color for selected apps in the app drawer. AUTO follows app_drawer_panel_text_color.</string>
-    <string name="setting_theme_app_drawer_selection_border_color_description" formatted="false">Border color for selected apps in the app drawer. AUTO follows terminal_border_color.</string>
+    <string name="setting_theme_app_drawer_group_background_color_description" formatted="false">Background color for unselected category buttons in the app drawer. AUTO follows app_drawer_panel_background_color. A saved per-group background takes priority.</string>
+    <string name="setting_theme_app_drawer_group_text_color_description" formatted="false">Text color for unselected category buttons in the app drawer. AUTO follows app_drawer_panel_text_color. A saved per-group text color takes priority.</string>
+    <string name="setting_theme_app_drawer_group_border_color_description" formatted="false">Border color for unselected category buttons in the app drawer. AUTO follows app_drawer_panel_border_color.</string>
+    <string name="setting_theme_app_drawer_group_selected_background_color_description" formatted="false">Background color for the selected category button in the app drawer. AUTO follows app_drawer_selection_background_color, independently of the alphabet rail.</string>
+    <string name="setting_theme_app_drawer_group_selected_text_color_description" formatted="false">Text color for the selected category button in the app drawer. AUTO follows app_drawer_selection_text_color, independently of the alphabet rail.</string>
+    <string name="setting_theme_app_drawer_group_selected_border_color_description" formatted="false">Border color for the selected category button in the app drawer. AUTO follows app_drawer_selection_border_color, independently of the alphabet rail.</string>
+    <string name="setting_theme_app_drawer_alphabet_background_color_description" formatted="false">Background color for unselected alphabet buttons in the app drawer. AUTO follows app_drawer_panel_background_color, independently of category buttons and app-list rows.</string>
+    <string name="setting_theme_app_drawer_alphabet_text_color_description" formatted="false">Text color for unselected alphabet buttons in the app drawer. AUTO follows app_drawer_panel_text_color.</string>
+    <string name="setting_theme_app_drawer_alphabet_border_color_description" formatted="false">Border color for unselected alphabet buttons in the app drawer. AUTO follows app_drawer_panel_border_color.</string>
+    <string name="setting_theme_app_drawer_alphabet_selected_background_color_description" formatted="false">Background color for the selected alphabet button in the app drawer. AUTO follows app_drawer_selection_background_color, independently of the category rail.</string>
+    <string name="setting_theme_app_drawer_alphabet_selected_text_color_description" formatted="false">Text color for the selected alphabet button in the app drawer. AUTO follows app_drawer_selection_text_color, independently of the category rail.</string>
+    <string name="setting_theme_app_drawer_alphabet_selected_border_color_description" formatted="false">Border color for the selected alphabet button in the app drawer. AUTO follows app_drawer_selection_border_color, independently of the category rail.</string>
+    <string name="setting_theme_app_drawer_selection_background_color_description" formatted="false">Shared default highlight background for the category and alphabet rails. Each rail can override it separately. AUTO blends app_drawer_panel_background_color with app_drawer_panel_text_color.</string>
+    <string name="setting_theme_app_drawer_selection_text_color_description" formatted="false">Shared default highlight text for the category and alphabet rails. Each rail can override it separately. AUTO follows app_drawer_panel_text_color.</string>
+    <string name="setting_theme_app_drawer_selection_border_color_description" formatted="false">Shared default highlight border for the category and alphabet rails. Each rail can override it separately. AUTO follows terminal_border_color.</string>
     <string name="setting_theme_module_panel_background_color_description" formatted="false">Background color for the main panel in launcher modules. AUTO follows terminal_window_background_color.</string>
     <string name="setting_theme_module_panel_text_color_description" formatted="false">Text color for the main panel in launcher modules. AUTO follows module_text_color.</string>
     <string name="setting_theme_module_panel_border_color_description" formatted="false">Border color for the main panel in launcher modules. AUTO follows terminal_border_color.</string>
@@ -591,36 +603,36 @@
     <string name="setting_theme_module_action_background_color_description" formatted="false">Background color for action buttons in launcher modules. AUTO follows module_button_background_color.</string>
     <string name="setting_theme_module_action_text_color_description" formatted="false">Text color for action buttons in launcher modules. AUTO follows module_text_color.</string>
     <string name="setting_theme_module_action_border_color_description" formatted="false">Border color for action buttons in launcher modules. AUTO follows terminal_border_color.</string>
-    <string name="setting_theme_module_active_background_color_description" formatted="false">Background color for active items in launcher modules. AUTO follows selection_background_color.</string>
-    <string name="setting_theme_module_active_text_color_description" formatted="false">Text color for active items in launcher modules. AUTO follows selection_text_color.</string>
+    <string name="setting_theme_module_active_background_color_description" formatted="false">Background color for active items in launcher modules. AUTO blends module_action_background_color with accent_color (25%).</string>
+    <string name="setting_theme_module_active_text_color_description" formatted="false">Text color for active items in launcher modules. AUTO follows module_action_text_color.</string>
     <string name="setting_theme_module_active_border_color_description" formatted="false">Border color for active items in launcher modules. AUTO follows selection_border_color.</string>
-    <string name="setting_theme_widget_panel_background_color_description" formatted="false">Background color for the main panel in launcher widgets. AUTO follows module_panel_background_color.</string>
-    <string name="setting_theme_widget_panel_text_color_description" formatted="false">Text color for the main panel in launcher widgets. AUTO follows module_panel_text_color.</string>
-    <string name="setting_theme_widget_panel_border_color_description" formatted="false">Border color for the main panel in launcher widgets. AUTO follows module_panel_border_color.</string>
-    <string name="setting_theme_widget_header_background_color_description" formatted="false">Background color for the title bar in launcher widgets. AUTO follows module_header_background_color.</string>
-    <string name="setting_theme_widget_header_text_color_description" formatted="false">Text color for the title bar in launcher widgets. AUTO follows module_header_text_color.</string>
-    <string name="setting_theme_widget_header_border_color_description" formatted="false">Border color for the title bar in launcher widgets. AUTO follows module_header_border_color.</string>
-    <string name="setting_theme_widget_row_background_color_description" formatted="false">Background color for rows in launcher widgets. AUTO blends widget_panel_background_color with ansi_black.</string>
+    <string name="setting_theme_widget_panel_background_color_description" formatted="false">Background color for the main panel in launcher widgets. AUTO follows terminal_window_background_color.</string>
+    <string name="setting_theme_widget_panel_text_color_description" formatted="false">Text color for the main panel in launcher widgets. AUTO follows output_text_color.</string>
+    <string name="setting_theme_widget_panel_border_color_description" formatted="false">Border color for the main panel in launcher widgets. AUTO follows terminal_border_color.</string>
+    <string name="setting_theme_widget_header_background_color_description" formatted="false">Background color for the title bar in launcher widgets. AUTO follows terminal_header_background_color.</string>
+    <string name="setting_theme_widget_header_text_color_description" formatted="false">Text color for the title bar in launcher widgets. AUTO follows widget_panel_text_color.</string>
+    <string name="setting_theme_widget_header_border_color_description" formatted="false">Border color for the title bar in launcher widgets. AUTO follows terminal_header_border_color.</string>
+    <string name="setting_theme_widget_row_background_color_description" formatted="false">Background color for rows in launcher widgets. AUTO darkens widget_panel_background_color with fixed black (22%), preserving transparency.</string>
     <string name="setting_theme_widget_row_text_color_description" formatted="false">Text color for rows in launcher widgets. AUTO follows widget_panel_text_color.</string>
-    <string name="setting_theme_widget_command_background_color_description" formatted="false">Background color for command rows in launcher widgets. AUTO blends widget_panel_background_color with ansi_black.</string>
+    <string name="setting_theme_widget_command_background_color_description" formatted="false">Background color for command rows in launcher widgets. AUTO darkens widget_panel_background_color with fixed black (16%), preserving transparency.</string>
     <string name="setting_theme_widget_command_text_color_description" formatted="false">Text color for command rows in launcher widgets. AUTO follows widget_panel_text_color.</string>
     <string name="setting_theme_widget_command_border_color_description" formatted="false">Border color for command rows in launcher widgets. AUTO uses widget_panel_border_color with reduced opacity.</string>
-    <string name="setting_theme_widget_control_background_color_description" formatted="false">Background color for controls in launcher widgets. AUTO follows button_background_color.</string>
-    <string name="setting_theme_widget_control_text_color_description" formatted="false">Text color for controls in launcher widgets. AUTO follows button_text_color.</string>
-    <string name="setting_theme_widget_control_border_color_description" formatted="false">Border color for controls in launcher widgets. AUTO follows button_border_color.</string>
+    <string name="setting_theme_widget_control_background_color_description" formatted="false">Background color for controls in launcher widgets. AUTO follows widget_panel_background_color.</string>
+    <string name="setting_theme_widget_control_text_color_description" formatted="false">Text color for controls in launcher widgets. AUTO follows widget_panel_text_color.</string>
+    <string name="setting_theme_widget_control_border_color_description" formatted="false">Border color for controls in launcher widgets. AUTO follows widget_panel_border_color.</string>
     <string name="setting_theme_workspace_panel_background_color_description" formatted="false">Background color for the main panel in workspace panels, including the calculator. AUTO follows terminal_window_background_color.</string>
     <string name="setting_theme_workspace_panel_text_color_description" formatted="false">Text color for the main panel in workspace panels, including the calculator. AUTO follows output_text_color.</string>
     <string name="setting_theme_workspace_panel_border_color_description" formatted="false">Border color for the main panel in workspace panels, including the calculator. AUTO follows terminal_border_color.</string>
     <string name="setting_theme_workspace_header_background_color_description" formatted="false">Background color for the title bar in workspace panels, including the calculator. AUTO follows terminal_header_background_color.</string>
-    <string name="setting_theme_workspace_header_text_color_description" formatted="false">Text color for the title bar in workspace panels, including the calculator. AUTO follows module_text_color.</string>
+    <string name="setting_theme_workspace_header_text_color_description" formatted="false">Text color for workspace title bars, including the calculator and shared Notes theme. AUTO follows workspace_panel_text_color.</string>
     <string name="setting_theme_workspace_header_border_color_description" formatted="false">Border color for the title bar in workspace panels, including the calculator. AUTO follows terminal_header_border_color.</string>
-    <string name="setting_theme_workspace_output_background_color_description" formatted="false">Background color for output area in workspace panels, including the calculator. AUTO blends workspace_panel_background_color with ansi_black.</string>
-    <string name="setting_theme_workspace_output_text_color_description" formatted="false">Text color for output area in workspace panels, including the calculator. AUTO follows output_text_color.</string>
-    <string name="setting_theme_workspace_input_background_color_description" formatted="false">Background color for input fields in workspace panels, including the calculator. AUTO blends workspace_panel_background_color with ansi_black.</string>
+    <string name="setting_theme_workspace_output_background_color_description" formatted="false">Background color for workspace output, including the calculator and shared Notes theme. AUTO darkens workspace_panel_background_color with fixed black (10%), preserving transparency.</string>
+    <string name="setting_theme_workspace_output_text_color_description" formatted="false">Text color for workspace output. AUTO follows workspace_panel_text_color.</string>
+    <string name="setting_theme_workspace_input_background_color_description" formatted="false">Background color for workspace inputs, including the calculator and shared Notes theme. AUTO darkens workspace_panel_background_color with fixed black (16%), preserving transparency.</string>
     <string name="setting_theme_workspace_input_text_color_description" formatted="false">Text color for input fields in workspace panels, including the calculator. AUTO follows input_text_color.</string>
-    <string name="setting_theme_workspace_control_background_color_description" formatted="false">Background color for controls in workspace panels, including the calculator. AUTO follows module_button_background_color.</string>
-    <string name="setting_theme_workspace_control_text_color_description" formatted="false">Text color for controls in workspace panels, including the calculator. AUTO follows module_text_color.</string>
-    <string name="setting_theme_workspace_control_border_color_description" formatted="false">Border color for controls in workspace panels, including the calculator. AUTO follows terminal_border_color.</string>
+    <string name="setting_theme_workspace_control_background_color_description" formatted="false">Background color for workspace controls, including the calculator. AUTO follows workspace_panel_background_color.</string>
+    <string name="setting_theme_workspace_control_text_color_description" formatted="false">Text color for workspace controls, including the calculator. AUTO follows workspace_panel_text_color.</string>
+    <string name="setting_theme_workspace_control_border_color_description" formatted="false">Border color for workspace controls, including the calculator. AUTO follows workspace_panel_border_color.</string>
     <string name="setting_theme_settings_screen_color_description" formatted="false">Color behind the settings panel. AUTO follows settings_wallpaper_overlay_color.</string>
     <string name="setting_theme_settings_panel_background_color_description" formatted="false">Background color for the main panel in settings. AUTO follows terminal_header_background_color.</string>
     <string name="setting_theme_settings_panel_text_color_description" formatted="false">Text color for the main panel in settings. AUTO follows output_text_color.</string>
@@ -643,12 +655,12 @@
     <string name="setting_theme_dialog_header_text_color_description" formatted="false">Text color for the title bar in dialogs. AUTO follows settings_header_text_color.</string>
     <string name="setting_theme_dialog_header_border_color_description" formatted="false">Border color for the title bar in dialogs. AUTO follows settings_header_border_color.</string>
     <string name="setting_theme_overlay_scrim_color_description" formatted="false">Tint behind floating panels. AUTO uses the built-in default.</string>
-    <string name="setting_theme_overlay_panel_background_color_description" formatted="false">Background color for the main panel in floating panels. AUTO follows module_panel_background_color.</string>
-    <string name="setting_theme_overlay_panel_text_color_description" formatted="false">Text color for the main panel in floating panels. AUTO follows module_panel_text_color.</string>
-    <string name="setting_theme_overlay_panel_border_color_description" formatted="false">Border color for the main panel in floating panels. AUTO follows module_panel_border_color.</string>
-    <string name="setting_theme_overlay_header_background_color_description" formatted="false">Background color for the title bar in floating panels. AUTO follows module_header_background_color.</string>
-    <string name="setting_theme_overlay_header_text_color_description" formatted="false">Text color for the title bar in floating panels. AUTO follows module_header_text_color.</string>
-    <string name="setting_theme_overlay_header_border_color_description" formatted="false">Border color for the title bar in floating panels. AUTO follows module_header_border_color.</string>
+    <string name="setting_theme_overlay_panel_background_color_description" formatted="false">Background color for the main panel in floating panels. AUTO follows terminal_window_background_color.</string>
+    <string name="setting_theme_overlay_panel_text_color_description" formatted="false">Text color for the main panel in floating panels. AUTO follows output_text_color.</string>
+    <string name="setting_theme_overlay_panel_border_color_description" formatted="false">Border color for the main panel in floating panels. AUTO follows terminal_border_color.</string>
+    <string name="setting_theme_overlay_header_background_color_description" formatted="false">Background color for the title bar in floating panels. AUTO follows terminal_header_background_color.</string>
+    <string name="setting_theme_overlay_header_text_color_description" formatted="false">Text color for the title bar in floating panels. AUTO follows overlay_panel_text_color.</string>
+    <string name="setting_theme_overlay_header_border_color_description" formatted="false">Border color for the title bar in floating panels. AUTO follows terminal_header_border_color.</string>
     <string name="setting_theme_ansi_black_description" formatted="false">Termux pane color for black ANSI text. AUTO uses the built-in default.</string>
     <string name="setting_theme_ansi_red_description" formatted="false">Termux pane color for red ANSI text. AUTO uses the built-in default.</string>
     <string name="setting_theme_ansi_green_description" formatted="false">Termux pane color for green ANSI text. AUTO blends terminal_window_background_color with accent_color.</string>
@@ -828,7 +840,7 @@
     <!-- Ui.kt: statusbar_light_icons -->
     <string name="setting_ui_statusbar_light_icons_description" formatted="false">"If true, your status bar icons will be white. Dark otherwise"</string>
     <!-- Ui.kt: shadow_params -->
-    <string name="setting_ui_shadow_params_description" formatted="false">"[Shadow X offset],[Shadow Y offset],[Shadow radius]"</string>
+    <string name="setting_ui_shadow_params_description" formatted="false">"[Shadow X offset],[Shadow Y offset],[Shadow blur radius] in pixels. Shared by input, output, status lines, suggestions and module text; set their shadow colors in Themer."</string>
     <!-- Ui.kt: text_redraw_times -->
     <string name="setting_ui_text_redraw_times_description" formatted="false">"A greater value will produce a bigger outline. Limited to 1–8 drawing passes."</string>
     <!-- Ui.kt: status_lines_margins -->
@@ -836,7 +848,7 @@
     <!-- Ui.kt: output_field_margins -->
     <string name="setting_ui_output_field_margins_description" formatted="false">"[horizontal_margin],[vertical_margin],[horizontal_padding],[vertical_padding]"</string>
     <!-- Ui.kt: output_tray_max_height -->
-    <string name="setting_ui_output_tray_max_height_description" formatted="false">"Maximum height for the expanded output tray in dp. 0 keeps the default adaptive height"</string>
+    <string name="setting_ui_output_tray_max_height_description" formatted="false">"Maximum height for the expanded output tray in dp. 0 fits the current output up to the adaptive viewport limit"</string>
     <!-- Ui.kt: input_field_margins -->
     <string name="setting_ui_input_field_margins_description" formatted="false">"The dimension of the input field (where cmds are inserted). [horizontal_margin],[vertical_margin],[horizontal_padding],[vertical_padding]"</string>
     <!-- Ui.kt: input_area_margins -->
@@ -875,4 +887,6 @@
     <string name="setting_ui_module_body_text_size_description" formatted="false">"Text size for built-in module body text and controls (sp)"</string>
     <!-- Ui.kt: output_header_text_size -->
     <string name="setting_ui_output_header_text_size_description" formatted="false">"Text size for output and overlay header labels (sp)"</string>
+    <string name="setting_theme_suggestions_text_shadow_color_description">Text shadow color for launcher suggestions, search categories and module suggestion buttons. Transparent disables the shadow. Offset and blur use shadow_params.</string>
+    <string name="setting_theme_module_text_shadow_color_description">Text shadow color for module panel text, headings and controls. Transparent disables the shadow. Offset and blur use shadow_params.</string>
 </resources>

@@ -8,8 +8,7 @@ import ohi.andre.consolelauncher.LauncherActivity
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.commands.CommandAbstraction
 import ohi.andre.consolelauncher.commands.ExecutePack
-import ohi.andre.consolelauncher.managers.settings.LauncherSettings
-import ohi.andre.consolelauncher.managers.xml.options.Behavior
+import ohi.andre.consolelauncher.managers.settings.LauncherMode
 import ohi.andre.consolelauncher.tuils.Tuils
 
 class mode : CommandAbstraction {
@@ -18,18 +17,15 @@ class mode : CommandAbstraction {
         if (requested.isEmpty() || requested == "status" || requested == "-status") {
             return status(pack)
         }
-        val enabled = when (requested) {
-            "search" -> true
-            "classic" -> false
-            else -> return pack.context.getString(R.string.command_mode_unknown_launcher_mode_usage_mode_search_cl_a86ba, requested)
-        }
-        LauncherSettings.set(pack.context, Behavior.search_only_mode, enabled.toString())
+        val mode = LauncherMode.normalize(requested)
+            ?: return pack.context.getString(R.string.command_mode_unknown_launcher_mode_usage_mode_search_cl_a86ba, requested)
+        LauncherMode.set(pack.context, mode)
         val launcher = pack.context as? LauncherActivity ?: LauncherActivity.instance
         Handler(Looper.getMainLooper()).postDelayed(
             {
                 Toast.makeText(
                     pack.context,
-                    if (enabled) pack.context.getString(R.string.command_mode_search_mode_enabled_ba524) else pack.context.getString(R.string.command_mode_classic_mode_enabled_dd49a),
+                    pack.context.getString(R.string.command_mode_enabled, mode),
                     Toast.LENGTH_SHORT
                 ).show()
                 launcher?.refreshUiInPlace() ?: LauncherActivity.preview(pack.context.applicationContext)
@@ -51,5 +47,5 @@ class mode : CommandAbstraction {
     override fun onNotArgEnough(pack: ExecutePack, nArgs: Int): String = status(pack)
 
     private fun status(pack: ExecutePack): String =
-        pack.context.getString(R.string.launcher_mode_status, if (LauncherSettings.getBoolean(Behavior.search_only_mode)) "search" else "classic")
+        pack.context.getString(R.string.launcher_mode_status, LauncherMode.current())
 }

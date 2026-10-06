@@ -111,6 +111,7 @@ import ohi.andre.consolelauncher.managers.WebhookManager
 import ohi.andre.consolelauncher.managers.modules.ModuleManager
 import ohi.andre.consolelauncher.managers.termux.TermuxBridgeCache
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings
+import ohi.andre.consolelauncher.managers.settings.LauncherMode
 import ohi.andre.consolelauncher.managers.onboarding.GuideManager
 import ohi.andre.consolelauncher.commands.CommandTuils.xmlPrefsEntrys
 import ohi.andre.consolelauncher.commands.CommandTuils.xmlPrefsFiles
@@ -153,6 +154,7 @@ class SuggestionsManager(
         SearchModeResultRenderer(pack, it, ::getSuggestionView, ::openSearchResult)
     }
     @Volatile private var searchNotifications: List<NotificationService.Notification> = emptyList()
+    private var searchInputActive = false
     @Volatile private var inlineOutput: CharSequence? = null
 
     private val clickListener = View.OnClickListener { v: View? ->
@@ -258,11 +260,24 @@ class SuggestionsManager(
         }
     }
 
+    fun setSearchInputActive(active: Boolean) {
+        searchInputActive = active
+        updateSearchResultsVisibility()
+    }
+
+    private fun updateSearchResultsVisibility() {
+        if (!searchMode) return
+        searchResultsView?.visibility = if (showSearchResults(
+                searchInputActive, mTerminalAdapter.input.isNotBlank(), !inlineOutput.isNullOrBlank()
+            )) View.VISIBLE else View.INVISIBLE
+    }
+
     fun showInlineOutput(output: CharSequence?) {
         if (!searchMode || output.isNullOrBlank()) return
         inlineOutput = output
         (pack.context as Activity).runOnUiThread {
             searchRenderer?.renderOutput(output)
+            updateSearchResultsVisibility()
         }
     }
 
@@ -677,8 +692,13 @@ class SuggestionsManager(
         val requestId = suggestionRequestId.incrementAndGet()
         lastSuggestionThread?.interrupt()
         if (query.trim().isEmpty()) {
-            if (inlineOutput == null) {
-                (pack.context as Activity).runOnUiThread { searchRenderer?.clear() }
+            inlineOutput = null
+            val results = getEmptySearchModeResults()
+            (pack.context as Activity).runOnUiThread {
+                if (isLatestSuggestionRequest(requestId)) {
+                    searchRenderer?.render(results)
+                    updateSearchResultsVisibility()
+                }
             }
             return
         }
@@ -689,11 +709,63 @@ class SuggestionsManager(
                 val results = getSearchModeResults(query)
                 if (!isLatestSuggestionRequest(requestId) || interrupted()) return
                 (pack.context as Activity).runOnUiThread {
-                    if (isLatestSuggestionRequest(requestId)) searchRenderer?.render(results)
+                    if (isLatestSuggestionRequest(requestId)) {
+                        searchRenderer?.render(results)
+                        updateSearchResultsVisibility()
+                    }
                 }
             }
         }
         lastSuggestionThread!!.start()
+    }
+
+    private fun getEmptySearchModeResults(): List<SearchResult> {
+        val counts = noInputCounts ?: return emptyList()
+        val results = ArrayList<SearchResult>()
+
+        pack.appsManager.suggestedApps.filterNotNull()
+            .take(counts[Suggestion.TYPE_APP])
+            .forEach { app ->
+                val label = app.publicLabel ?: return@forEach
+                val packageName = app.componentName?.packageName.orEmpty()
+                results.add(SearchResult(label, pack.context.getString(R.string.search_app, packageName), SearchResult.TYPE_APP, app, "$label $packageName"))
+            }
+
+        if (showAliasDefault) {
+            pack.aliasManager.getAliases(true, AliasManager.SCOPE_APP).filterNotNull()
+                .take(counts[Suggestion.TYPE_ALIAS])
+                .forEach { alias ->
+                    val suggestion = Suggestion(Tuils.EMPTYSTRING, alias.name, clickToLaunch && !alias.isParametrized, Suggestion.TYPE_ALIAS)
+                    results.add(SearchResult(alias.name, pack.context.getString(R.string.search_alias, alias.value), SearchResult.TYPE_ALIAS, suggestion, "${alias.name} ${alias.value}"))
+                }
+        }
+
+        var commandsLeft = counts[Suggestion.TYPE_COMMAND]
+        for (command in pack.commandGroup.commands) {
+            if (commandsLeft == 0) break
+            val name = command.javaClass.simpleName
+            if (isHiddenCommandName(name) || HIDDEN_SUGGESTION_COMMAND.equals(name, true)) continue
+            if (pack.cmdPrefs.getPriority(command) < minCmdPriority) continue
+            val suggestion = Suggestion(null, name, commandSuggestionExecutes(name, command.argType()) && clickToLaunch, Suggestion.TYPE_COMMAND)
+            results.add(SearchResult(name, pack.context.getString(R.string.search_command), SearchResult.TYPE_COMMAND, suggestion, name))
+            commandsLeft--
+        }
+
+        if (showAppsGpDefault) {
+            pack.appsManager.groups.take(counts[Suggestion.TYPE_APPGP]).forEach { group ->
+                results.add(
+                    SearchResult(
+                        group.name(),
+                        pack.context.resources.getQuantityString(R.plurals.search_group_apps, group.apps.size, group.apps.size),
+                        SearchResult.TYPE_GROUP,
+                        group,
+                        group.name() + " " + group.apps.joinToString(" ") { it.publicLabel.orEmpty() }
+                    )
+                )
+            }
+        }
+
+        return results
     }
 
     internal fun getSearchModeResults(query: String): List<SearchResult> {
@@ -1006,12 +1078,19 @@ class SuggestionsManager(
         }
 
         val fullInput = (beforeLastSpace + Tuils.SPACE + lastWord).trim().lowercase(Locale.getDefault())
+        if (beforeLastSpace.equals("mode", true)) {
+            comparator.noInput = false
+            modeTargets(lastWord).forEach { target ->
+                suggestionList.add(Suggestion("mode", target, true, Suggestion.TYPE_COMMAND))
+            }
+            return suggestionList
+        }
         if (fullInput == "mode") {
             comparator.noInput = false
             suggestionList.add(
                 Suggestion(
                     "mode",
-                    modeTarget(LauncherSettings.getBoolean(Behavior.search_only_mode)),
+                    modeTarget(LauncherMode.current()),
                     true,
                     Suggestion.TYPE_COMMAND
                 )
@@ -4867,6 +4946,9 @@ class SuggestionsManager(
     }
 
     companion object {
+        internal fun showSearchResults(inputActive: Boolean, hasQuery: Boolean, hasOutput: Boolean): Boolean =
+            inputActive || hasQuery || hasOutput
+
         const val SINGLE_QUOTE: String = "'"
         const val DOUBLE_QUOTES: String = "\""
         private const val HIDDEN_SUGGESTION_COMMAND = "time"
@@ -4931,7 +5013,12 @@ class SuggestionsManager(
             }
         }
 
-        internal fun modeTarget(searchMode: Boolean): String = if (searchMode) "classic" else "search"
+        internal fun modeTarget(currentMode: String): String = LauncherMode.nextTarget(currentMode)
+
+        internal fun modeTargets(filter: String?): List<String> {
+            val normalized = filter?.trim()?.lowercase(Locale.ROOT).orEmpty()
+            return LauncherMode.values.filter { normalized.isEmpty() || it.startsWith(normalized) }
+        }
 
         internal fun searchModeSuggestionParts(input: String): Pair<String, String>? {
             val current = input.trimStart()

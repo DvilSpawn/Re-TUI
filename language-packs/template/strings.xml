@@ -20,13 +20,151 @@
     <string name="battery_label">Battery:</string>
     <string name="bluetooth_label">Bluetooth:</string>
     <string name="brightness_label">Brightness:</string>
+    <string name="calculator_ans">Insert last successful result</string>
+    <string name="calculator_arithmetic">Arithmetic and constants</string>
     <string name="calculator_busy">Another calculation is running. Please try again.</string>
+    <string name="calculator_cancel">Cancel</string>
+    <string name="calculator_cancelled">Calculation cancelled. Your input is unchanged.</string>
+    <string name="calculator_category">Category</string>
+    <string name="calculator_category_area">Area</string>
+    <string name="calculator_category_data">Data size</string>
+    <string name="calculator_category_energy">Energy</string>
+    <string name="calculator_category_length">Length</string>
+    <string name="calculator_category_mass">Mass</string>
+    <string name="calculator_category_power">Power</string>
+    <string name="calculator_category_pressure">Pressure</string>
+    <string name="calculator_category_speed">Speed</string>
+    <string name="calculator_category_temperature">Temperature</string>
+    <string name="calculator_category_time">Time</string>
+    <string name="calculator_category_volume">Volume</string>
+    <string name="calculator_clear_entry">Clear current entry</string>
+    <string name="calculator_clear_history">Clear history</string>
+    <string name="calculator_clear_history_confirm">Delete all calculator history? This cannot be undone.</string>
+    <string name="calculator_converter">Converter</string>
+    <string name="calculator_copy">Copy result</string>
     <string name="calculator_degrees">Degrees</string>
+    <string name="calculator_delete">Delete</string>
+    <string name="calculator_div_zero">Cannot divide by zero. Edit the number and try again.</string>
+    <string name="calculator_domain">This operation is outside the supported domain.</string>
+    <string name="calculator_empty_history">No calculations yet.</string>
+    <string name="calculator_enable">Enable Qalculate</string>
+    <string name="calculator_enable_help">Scientific and Converter use Qalculate. Enabling it also enables advanced calc commands. Calculations work offline.</string>
     <string name="calculator_engine_stopped">Qalculate stopped or could not start. Please try again.</string>
     <string name="calculator_exact">Exact when possible</string>
+    <string name="calculator_from">From</string>
+    <string name="calculator_full">Full result</string>
+    <string name="calculator_full_copy">Copy full value</string>
+    <string name="calculator_hints">Calculator hints</string>
+    <string name="calculator_hints_body">CALCULATOR HINTS
+
+Enter an expression after calc&gt; and press Enter or ↵. The keypad stays in the calculator: 123 enters numbers and operators, ABC enters letters and units, and FUNC enters functions and constants.
+
+Arithmetic
+2 + 3 * 4 → 14
+(2 + 3) * 4 → 20
+sqrt(9) → 3
+2^3 → 8
+
+Convert units
+5 ft to miles
+20 celsius to fahrenheit
+Use to for conversion. The word in means inches.
+
+Chain results
+5 ft to miles
+ans * 2
+ans to ft → 10 ft
+Errors do not replace the last successful answer.
+
+Edit expressions
+Tap the input to place the cursor, then use 123, ABC, or FUNC. √ and function keys insert parentheses with the cursor inside. Use ⌫ to delete; type clear to clear the transcript.
+
+Commands
+clear — clear the transcript, keeping ans
+help — show a short reminder
+exit — close the calculator
+
+Cancel stops the current calculation. Tap the calculator tab to return without losing your expression.</string>
+    <string name="calculator_history">History</string>
     <string name="calculator_invalid">Invalid expression.</string>
+    <string name="calculator_limit">This number exceeds the supported size.</string>
+    <string name="calculator_memory_add">Add to memory</string>
+    <string name="calculator_memory_clear">Clear memory</string>
+    <string name="calculator_memory_indicator">Memory: %1$s</string>
+    <string name="calculator_memory_recall">Recall memory</string>
+    <string name="calculator_memory_store">Store in memory</string>
+    <string name="calculator_memory_subtract">Subtract from memory</string>
+    <string name="calculator_no_ans">Calculate a result before inserting Ans.</string>
+    <string name="calculator_numeric">Enter a signed decimal number, optionally with an exponent (for example, -1.2e3).</string>
+    <string name="calculator_percent">Percentage</string>
+    <string name="calculator_powers">Logarithms and powers</string>
+    <string name="calculator_reciprocal">Reciprocal</string>
+    <string name="calculator_restore">Restore calculation</string>
+    <string name="calculator_result_description">Calculation result. Tap Full result to view or copy the complete value.</string>
+    <string name="calculator_scientific">Scientific</string>
+    <string name="calculator_search_units">Search units</string>
+    <string name="calculator_sign">Change sign</string>
+    <string name="calculator_square">Square</string>
+    <string name="calculator_standard">Standard</string>
+    <string name="calculator_swap">Swap units</string>
+    <string name="calculator_symbolic">Symbolic functions</string>
+    <string name="calculator_terminal_help">Enter an expression, e.g. 5 ft to miles. Use ans for the last successful result. Commands: help, clear, exit.</string>
+    <string name="calculator_terminal_no_answer">No previous result. Calculate an expression first.</string>
     <string name="calculator_timeout">Calculation timed out. Try a simpler expression.</string>
+    <string name="calculator_to">To</string>
     <string name="calculator_too_long">Expressions can contain at most %1$d characters.</string>
+    <string name="calculator_trig">Trigonometry</string>
+    <string name="calculator_unavailable">Scientific and Converter require Android 7 or newer. Standard is available on this device.</string>
+    <string name="calculator_unit_acre">Acres</string>
+    <string name="calculator_unit_bar">Bar</string>
+    <string name="calculator_unit_bit">Bits</string>
+    <string name="calculator_unit_byte">Bytes</string>
+    <string name="calculator_unit_c">Celsius</string>
+    <string name="calculator_unit_cm">Centimetres</string>
+    <string name="calculator_unit_day">Days</string>
+    <string name="calculator_unit_f">Fahrenheit</string>
+    <string name="calculator_unit_ft">Feet</string>
+    <string name="calculator_unit_ft2">Square feet</string>
+    <string name="calculator_unit_g">Grams</string>
+    <string name="calculator_unit_gb">Gigabytes (decimal)</string>
+    <string name="calculator_unit_gib">Gibibytes (binary)</string>
+    <string name="calculator_unit_h">Hours</string>
+    <string name="calculator_unit_ha">Hectares</string>
+    <string name="calculator_unit_in">Inches</string>
+    <string name="calculator_unit_j">Joules</string>
+    <string name="calculator_unit_k">Kelvin</string>
+    <string name="calculator_unit_kb">Kilobytes (decimal, 1000 bytes)</string>
+    <string name="calculator_unit_kg">Kilograms</string>
+    <string name="calculator_unit_kib">Kibibytes (binary, 1024 bytes)</string>
+    <string name="calculator_unit_kj">Kilojoules</string>
+    <string name="calculator_unit_km">Kilometres</string>
+    <string name="calculator_unit_km2">Square kilometres</string>
+    <string name="calculator_unit_kmh">Kilometres per hour</string>
+    <string name="calculator_unit_kpa">Kilopascals</string>
+    <string name="calculator_unit_kw">Kilowatts</string>
+    <string name="calculator_unit_kwh">Kilowatt-hours</string>
+    <string name="calculator_unit_l">Litres</string>
+    <string name="calculator_unit_lb">Pounds</string>
+    <string name="calculator_unit_m">Metres</string>
+    <string name="calculator_unit_m2">Square metres</string>
+    <string name="calculator_unit_m3">Cubic metres</string>
+    <string name="calculator_unit_mb">Megabytes (decimal)</string>
+    <string name="calculator_unit_mi">Miles</string>
+    <string name="calculator_unit_mib">Mebibytes (binary)</string>
+    <string name="calculator_unit_min">Minutes</string>
+    <string name="calculator_unit_ml">Millilitres</string>
+    <string name="calculator_unit_mm">Millimetres</string>
+    <string name="calculator_unit_mph">Miles per hour</string>
+    <string name="calculator_unit_ms">Metres per second</string>
+    <string name="calculator_unit_oz">Ounces</string>
+    <string name="calculator_unit_pa">Pascals</string>
+    <string name="calculator_unit_psi">Pounds per square inch</string>
+    <string name="calculator_unit_s">Seconds</string>
+    <string name="calculator_unit_ukgal">Imperial gallons</string>
+    <string name="calculator_unit_usgal">US gallons</string>
+    <string name="calculator_unit_w">Watts</string>
+    <string name="calculator_unsupported">Unsupported operation.</string>
+    <string name="calculator_value">Value</string>
     <string name="calculator_working">Calculating…</string>
     <string name="calling">Calling:</string>
     <string name="cd_clear_input">Clear input</string>
@@ -216,9 +354,10 @@ Legacy widget aliases still work.</string>
 Stage: %1$s</string>
     <string name="command_luamodulecommands_unknown_lua_module_ef4ca">Unknown Lua module: %1$s</string>
     <string name="command_mode_classic_mode_enabled_dd49a">Classic mode enabled.</string>
+    <string name="command_mode_enabled">%1$s mode enabled.</string>
     <string name="command_mode_search_mode_enabled_ba524">Search mode enabled.</string>
     <string name="command_mode_unknown_launcher_mode_usage_mode_search_cl_a86ba">Unknown launcher mode: %1$s
-Usage: mode search|classic</string>
+Usage: mode classic|search</string>
     <string name="command_module_built_in_modules_cannot_be_removed_use_mod_274e3">Built-in modules cannot be removed. Use module -hide %1$s instead.</string>
     <string name="command_module_invalid_lua_module_id_123ed">Invalid Lua module id.</string>
     <string name="command_module_local_lua_modules_e9afe">
@@ -378,7 +517,8 @@ Usage: orientation portrait|landscape|auto</string>
     <string name="command_wallpaper_applied_wallpaper_colors_once_387a7">Applied wallpaper colors once</string>
     <string name="command_wallpaper_please_answer_yes_or_no_867a9">Please answer Yes or No.</string>
     <string name="command_wallpaper_please_confirm_if_you_have_saved_your_pres_87e90">Please confirm if you have saved your preset (Yes/No)</string>
-    <string name="command_wallpaper_unable_to_read_wallpaper_colors_259c7">Unable to read wallpaper colors.</string>
+    <string name="command_wallpaper_system_palette_applied">Applied system palette; wallpaper colors unavailable.</string>
+    <string name="command_wallpaper_unable_to_read_wallpaper_colors_259c7">Unable to read wallpaper colors or a system palette. Your current theme was kept.</string>
     <string name="command_wallpaper_wallpaper_auto_cancelled_4d625">Wallpaper auto cancelled.</string>
     <string name="command_wallpaper_wallpaper_colors_applied_804d5">Wallpaper colors applied.</string>
     <string name="command_webhook_configured_webhooks_843d5">Configured Webhooks:</string>
@@ -716,7 +856,7 @@ Timer paused.</string>
     <string name="frame_top">Top</string>
     <string name="guide_active">Active: </string>
     <string name="guide_active_progress">Active: %1$s step %2$d/%3$d</string>
-    <string name="guide_auto_color_reads_the_current_wallpaper_and_updates_the_terminal_palett">Auto color reads the current wallpaper and updates the terminal palette.</string>
+    <string name="guide_auto_color_reads_the_current_wallpaper_and_updates_the_terminal_palett">Auto color applies the home wallpaper palette once, with a system-palette fallback on Android 12 and later. Explicit advanced colors are kept.</string>
     <string name="guide_basics">Basics</string>
     <string name="guide_browse_config">Browse config</string>
     <string name="guide_complete">Guide complete: %1$s</string>
@@ -949,8 +1089,8 @@ $ lua -enable habit
 Lua apps run inside Re:T-UI, not Termux. They use the same sandbox, prefs, files, permissions, editor, and ui:render layout objects as Lua modules, but open in a focused terminal-styled surface. Inside a Lua app, plain input is sent to on_input(text), and renderer buttons with action/value are sent to on_action(value). Local commands use a colon prefix: :help, :refresh, :restart, :config, :edit, :clear, and :close.</string>
     <string name="help_mode">Switch launcher layout.
 Usage:
-$ mode search
-$ mode classic</string>
+$ mode classic
+$ mode search</string>
     <string name="help_module">Show and manage Re:T-UI modules. 
 
 Usage: 
@@ -1318,7 +1458,7 @@ mode:
 	* normal -&gt; 2</string>
     <string name="help_wallpaper">-static -&gt; open the static wallpaper picker 
 -live -&gt; open the live wallpaper picker 
--auto -&gt; apply wallpaper-derived theme colors once 
+-auto -&gt; apply home wallpaper colors once; use the system palette if unavailable. Explicit advanced colors are preserved. 
 (no args) -&gt; open the wallpaper picker</string>
     <string name="help_weather">- update -&gt; perform a manual update (this won't work unless you set a custom weather key) 
 -enable -&gt; enable weather 
@@ -2171,6 +2311,7 @@ Fix or delete the file to recover your options</string>
     <string name="setting_behavior_home_path_description">The path to your home directory</string>
     <string name="setting_behavior_htmlextractor_default_format_description">The default format used by htmlextract -use</string>
     <string name="setting_behavior_input_format_description">Define the input format </string>
+    <string name="setting_behavior_launcher_mode_description">Launcher layout mode: classic or search</string>
     <string name="setting_behavior_launcher_sounds_description">If true, Re:T-UI will play its bundled launcher sound pack</string>
     <string name="setting_behavior_location_update_mindistance_description">The minimum distance (in meters) to get a location update</string>
     <string name="setting_behavior_location_update_mintime_description">The amount of time between two location updates (in minutes, must be an integer value)</string>
@@ -2197,7 +2338,8 @@ Fix or delete the file to recover your options</string>
     <string name="setting_behavior_qalculate_description">Enable unit conversions, symbolic maths and advanced controls in the calculator and calc commands. Requires Android 7 or newer. Off by default; calculations work offline without live currency-rate updates.</string>
     <string name="setting_behavior_ram_format_description">Define the RAM format</string>
     <string name="setting_behavior_random_play_description">If true, music player will play your tracks in random order</string>
-    <string name="setting_behavior_search_only_mode_description">Use the launcher as a bottom search bar with universal results instead of the classic home surfaces</string>
+    <string name="setting_behavior_search_category_tabs_description">In Search mode, show one result category at a time with tabs. Turn off to show all category rows together in a single pane.</string>
+    <string name="setting_behavior_search_only_mode_description">Legacy search mode toggle used only when launcher_mode is empty</string>
     <string name="setting_behavior_session_info_format_description">Define the session info format</string>
     <string name="setting_behavior_shell_requires_prefix_description">If true, embedded shell commands must be run with shell [command] instead of falling through from unknown input</string>
     <string name="setting_behavior_show_alias_content_description">If true, when you use an alias you'll also be able to know what command has been executed</string>
@@ -2321,7 +2463,7 @@ Fix or delete the file to recover your options</string>
     <string name="setting_surfaceborders_unlock_border_enabled_description">Show the unlock surface border</string>
     <string name="setting_surfaceborders_weather_border_color_description">Weather border color; AUTO inherits the active accent</string>
     <string name="setting_surfaceborders_weather_border_enabled_description">Show the weather surface border</string>
-    <string name="setting_theme_accent_color_description">Shared highlight color used by controls and panels. AUTO follows module_text_color.</string>
+    <string name="setting_theme_accent_color_description">Shared highlight color used by controls and panels. AUTO follows terminal_border_color.</string>
     <string name="setting_theme_advanced_color_description">Color for a specific control or panel. AUTO uses the theme default; a custom color overrides it.</string>
     <string name="setting_theme_alias_content_text_color_description">Alias content text color</string>
     <string name="setting_theme_ansi_black_description">Termux pane color for black ANSI text. AUTO uses the built-in default.</string>
@@ -2340,20 +2482,29 @@ Fix or delete the file to recover your options</string>
     <string name="setting_theme_ansi_red_description">Termux pane color for red ANSI text. AUTO uses the built-in default.</string>
     <string name="setting_theme_ansi_white_description">Termux pane color for white ANSI text. AUTO follows output_text_color.</string>
     <string name="setting_theme_ansi_yellow_description">Termux pane color for yellow ANSI text. AUTO follows warning_text_color.</string>
-    <string name="setting_theme_app_drawer_group_background_color_description">Background color for app groups in the app drawer. AUTO follows app_drawer_row_background_color.</string>
-    <string name="setting_theme_app_drawer_group_border_color_description">Border color for app groups in the app drawer. AUTO follows app_drawer_panel_border_color.</string>
-    <string name="setting_theme_app_drawer_group_text_color_description">Text color for app groups in the app drawer. AUTO follows app_drawer_row_text_color.</string>
+    <string name="setting_theme_app_drawer_alphabet_background_color_description">Background color for unselected alphabet buttons in the app drawer. AUTO follows app_drawer_panel_background_color, independently of category buttons and app-list rows.</string>
+    <string name="setting_theme_app_drawer_alphabet_border_color_description">Border color for unselected alphabet buttons in the app drawer. AUTO follows app_drawer_panel_border_color.</string>
+    <string name="setting_theme_app_drawer_alphabet_selected_background_color_description">Background color for the selected alphabet button in the app drawer. AUTO follows app_drawer_selection_background_color, independently of the category rail.</string>
+    <string name="setting_theme_app_drawer_alphabet_selected_border_color_description">Border color for the selected alphabet button in the app drawer. AUTO follows app_drawer_selection_border_color, independently of the category rail.</string>
+    <string name="setting_theme_app_drawer_alphabet_selected_text_color_description">Text color for the selected alphabet button in the app drawer. AUTO follows app_drawer_selection_text_color, independently of the category rail.</string>
+    <string name="setting_theme_app_drawer_alphabet_text_color_description">Text color for unselected alphabet buttons in the app drawer. AUTO follows app_drawer_panel_text_color.</string>
+    <string name="setting_theme_app_drawer_group_background_color_description">Background color for unselected category buttons in the app drawer. AUTO follows app_drawer_panel_background_color. A saved per-group background takes priority.</string>
+    <string name="setting_theme_app_drawer_group_border_color_description">Border color for unselected category buttons in the app drawer. AUTO follows app_drawer_panel_border_color.</string>
+    <string name="setting_theme_app_drawer_group_selected_background_color_description">Background color for the selected category button in the app drawer. AUTO follows app_drawer_selection_background_color, independently of the alphabet rail.</string>
+    <string name="setting_theme_app_drawer_group_selected_border_color_description">Border color for the selected category button in the app drawer. AUTO follows app_drawer_selection_border_color, independently of the alphabet rail.</string>
+    <string name="setting_theme_app_drawer_group_selected_text_color_description">Text color for the selected category button in the app drawer. AUTO follows app_drawer_selection_text_color, independently of the alphabet rail.</string>
+    <string name="setting_theme_app_drawer_group_text_color_description">Text color for unselected category buttons in the app drawer. AUTO follows app_drawer_panel_text_color. A saved per-group text color takes priority.</string>
     <string name="setting_theme_app_drawer_header_background_color_description">Background color for the title bar in the app drawer. AUTO follows terminal_header_background_color.</string>
     <string name="setting_theme_app_drawer_header_border_color_description">Border color for the title bar in the app drawer. AUTO follows terminal_header_border_color.</string>
     <string name="setting_theme_app_drawer_header_text_color_description">Text color for the title bar in the app drawer. AUTO follows apps_drawer_text_color.</string>
     <string name="setting_theme_app_drawer_panel_background_color_description">Background color for the main panel in the app drawer. AUTO follows terminal_window_background_color.</string>
     <string name="setting_theme_app_drawer_panel_border_color_description">Border color for the main panel in the app drawer. AUTO follows terminal_border_color.</string>
     <string name="setting_theme_app_drawer_panel_text_color_description">Text color for the main panel in the app drawer. AUTO follows apps_drawer_text_color.</string>
-    <string name="setting_theme_app_drawer_row_background_color_description">Background color for rows in the app drawer. AUTO uses the built-in default.</string>
+    <string name="setting_theme_app_drawer_row_background_color_description">Background color for app-list rows, independently of the category and alphabet rails. AUTO is transparent.</string>
     <string name="setting_theme_app_drawer_row_text_color_description">Text color for rows in the app drawer. AUTO follows apps_drawer_text_color.</string>
-    <string name="setting_theme_app_drawer_selection_background_color_description">Background color for selected apps in the app drawer. AUTO blends app_drawer_panel_background_color with app_drawer_panel_text_color.</string>
-    <string name="setting_theme_app_drawer_selection_border_color_description">Border color for selected apps in the app drawer. AUTO follows terminal_border_color.</string>
-    <string name="setting_theme_app_drawer_selection_text_color_description">Text color for selected apps in the app drawer. AUTO follows app_drawer_panel_text_color.</string>
+    <string name="setting_theme_app_drawer_selection_background_color_description">Shared default highlight background for the category and alphabet rails. Each rail can override it separately. AUTO blends app_drawer_panel_background_color with app_drawer_panel_text_color.</string>
+    <string name="setting_theme_app_drawer_selection_border_color_description">Shared default highlight border for the category and alphabet rails. Each rail can override it separately. AUTO follows terminal_border_color.</string>
+    <string name="setting_theme_app_drawer_selection_text_color_description">Shared default highlight text for the category and alphabet rails. Each rail can override it separately. AUTO follows app_drawer_panel_text_color.</string>
     <string name="setting_theme_app_installed_text_color_description">App installed message text color</string>
     <string name="setting_theme_app_uninstalled_text_color_description">App uninstalled message text color</string>
     <string name="setting_theme_apps_drawer_text_color_description">Apps drawer text and accent color</string>
@@ -2366,9 +2517,9 @@ Fix or delete the file to recover your options</string>
     <string name="setting_theme_battery_text_high_description">Battery text color when the battery level is high</string>
     <string name="setting_theme_battery_text_low_description">Battery text color when the battery level is low</string>
     <string name="setting_theme_battery_text_medium_description">Battery text color when the battery level is medium</string>
-    <string name="setting_theme_button_background_color_description">Background color for regular buttons. AUTO follows module_button_background_color.</string>
+    <string name="setting_theme_button_background_color_description">Background color for regular buttons. AUTO follows terminal_window_background_color.</string>
     <string name="setting_theme_button_border_color_description">Border color for regular buttons. AUTO follows terminal_border_color.</string>
-    <string name="setting_theme_button_text_color_description">Text color for regular buttons. AUTO follows module_text_color.</string>
+    <string name="setting_theme_button_text_color_description">Text color for regular buttons. AUTO follows output_text_color.</string>
     <string name="setting_theme_chip_background_color_description">Background color for small shortcut chips. AUTO follows button_background_color.</string>
     <string name="setting_theme_chip_border_color_description">Border color for small shortcut chips. AUTO follows button_border_color.</string>
     <string name="setting_theme_chip_text_color_description">Text color for small shortcut chips. AUTO follows button_text_color.</string>
@@ -2383,11 +2534,11 @@ Fix or delete the file to recover your options</string>
     <string name="setting_theme_dialog_panel_border_color_description">Border color for the main panel in dialogs. AUTO follows settings_panel_border_color.</string>
     <string name="setting_theme_dialog_panel_text_color_description">Text color for the main panel in dialogs. AUTO follows settings_panel_text_color.</string>
     <string name="setting_theme_dialog_scrim_color_description">Tint behind dialogs. AUTO follows settings_wallpaper_overlay_color.</string>
-    <string name="setting_theme_disabled_background_color_description">Background color for disabled controls. AUTO uses module_button_background_color with reduced opacity.</string>
-    <string name="setting_theme_disabled_text_color_description">Text color for disabled controls. AUTO uses muted_text_color with reduced opacity.</string>
+    <string name="setting_theme_disabled_background_color_description">Background color for disabled controls. AUTO uses button_background_color with reduced opacity.</string>
+    <string name="setting_theme_disabled_text_color_description">Text color for disabled controls. AUTO uses button_text_color with reduced opacity.</string>
     <string name="setting_theme_divider_color_description">Color of lines separating items. AUTO follows terminal_border_color.</string>
     <string name="setting_theme_enter_icon_color_description">Enter icon color</string>
-    <string name="setting_theme_error_text_color_description">Text color for errors. AUTO follows battery_text_low.</string>
+    <string name="setting_theme_error_text_color_description">Text color for errors. AUTO uses the built-in orange (#FFFF5722), independently of battery colors.</string>
     <string name="setting_theme_field_background_color_description">Background color for text input fields. AUTO follows input_background_color.</string>
     <string name="setting_theme_field_border_color_description">Border color for text input fields. AUTO follows terminal_border_color.</string>
     <string name="setting_theme_field_hint_color_description">Placeholder text color for text input fields. AUTO uses field_text_color with reduced opacity.</string>
@@ -2400,9 +2551,9 @@ Fix or delete the file to recover your options</string>
     <string name="setting_theme_input_text_color_description">Command input text color</string>
     <string name="setting_theme_input_text_shadow_color_description">Input text shadow color</string>
     <string name="setting_theme_link_text_color_description">Link text color</string>
-    <string name="setting_theme_list_row_background_color_description">Background color for list rows. AUTO follows module_button_background_color.</string>
+    <string name="setting_theme_list_row_background_color_description">Background color for list rows. AUTO follows button_background_color.</string>
     <string name="setting_theme_list_row_border_color_description">Border color for list rows. AUTO follows terminal_border_color.</string>
-    <string name="setting_theme_list_row_text_color_description">Text color for list rows. AUTO follows module_text_color.</string>
+    <string name="setting_theme_list_row_text_color_description">Text color for list rows. AUTO follows button_text_color.</string>
     <string name="setting_theme_list_selected_background_color_description">Background color for selected list rows. AUTO follows selection_background_color.</string>
     <string name="setting_theme_list_selected_border_color_description">Border color for selected list rows. AUTO follows selection_border_color.</string>
     <string name="setting_theme_list_selected_text_color_description">Text color for selected list rows. AUTO follows selection_text_color.</string>
@@ -2410,10 +2561,10 @@ Fix or delete the file to recover your options</string>
     <string name="setting_theme_module_action_background_color_description">Background color for action buttons in launcher modules. AUTO follows module_button_background_color.</string>
     <string name="setting_theme_module_action_border_color_description">Border color for action buttons in launcher modules. AUTO follows terminal_border_color.</string>
     <string name="setting_theme_module_action_text_color_description">Text color for action buttons in launcher modules. AUTO follows module_text_color.</string>
-    <string name="setting_theme_module_active_background_color_description">Background color for active items in launcher modules. AUTO follows selection_background_color.</string>
+    <string name="setting_theme_module_active_background_color_description">Background color for active items in launcher modules. AUTO blends module_action_background_color with accent_color (25%).</string>
     <string name="setting_theme_module_active_border_color_description">Border color for active items in launcher modules. AUTO follows selection_border_color.</string>
-    <string name="setting_theme_module_active_text_color_description">Text color for active items in launcher modules. AUTO follows selection_text_color.</string>
-    <string name="setting_theme_module_button_background_color_description">Base background color for launcher module buttons and controls that still inherit the regular button color in AUTO.</string>
+    <string name="setting_theme_module_active_text_color_description">Text color for active items in launcher modules. AUTO follows module_action_text_color.</string>
+    <string name="setting_theme_module_button_background_color_description">Base background color for launcher module action buttons and dock shortcuts. General controls have their own button colors.</string>
     <string name="setting_theme_module_dock_background_color_description">Background color for dock shortcuts in launcher modules. AUTO follows module_button_background_color.</string>
     <string name="setting_theme_module_dock_border_color_description">Border color for dock shortcuts in launcher modules. AUTO follows terminal_border_color.</string>
     <string name="setting_theme_module_dock_text_color_description">Text color for dock shortcuts in launcher modules. AUTO follows module_text_color.</string>
@@ -2425,6 +2576,7 @@ Fix or delete the file to recover your options</string>
     <string name="setting_theme_module_panel_border_color_description">Border color for the main panel in launcher modules. AUTO follows terminal_border_color.</string>
     <string name="setting_theme_module_panel_text_color_description">Text color for the main panel in launcher modules. AUTO follows module_text_color.</string>
     <string name="setting_theme_module_text_color_description">Module label and control text color</string>
+    <string name="setting_theme_module_text_shadow_color_description">Text shadow color for module panel text, headings and controls. Transparent disables the shadow. Offset and blur use shadow_params.</string>
     <string name="setting_theme_muted_text_color_description">Color of secondary and less prominent text. AUTO follows session_info_text_color.</string>
     <string name="setting_theme_network_info_text_color_description">Network info label text color</string>
     <string name="setting_theme_network_status_background_color_description">Network status line background color</string>
@@ -2435,16 +2587,16 @@ Fix or delete the file to recover your options</string>
     <string name="setting_theme_output_background_color_description">Output field background color</string>
     <string name="setting_theme_output_text_color_description">Terminal output text color</string>
     <string name="setting_theme_output_text_shadow_color_description">Output text shadow color</string>
-    <string name="setting_theme_overlay_header_background_color_description">Background color for the title bar in floating panels. AUTO follows module_header_background_color.</string>
-    <string name="setting_theme_overlay_header_border_color_description">Border color for the title bar in floating panels. AUTO follows module_header_border_color.</string>
-    <string name="setting_theme_overlay_header_text_color_description">Text color for the title bar in floating panels. AUTO follows module_header_text_color.</string>
-    <string name="setting_theme_overlay_panel_background_color_description">Background color for the main panel in floating panels. AUTO follows module_panel_background_color.</string>
-    <string name="setting_theme_overlay_panel_border_color_description">Border color for the main panel in floating panels. AUTO follows module_panel_border_color.</string>
-    <string name="setting_theme_overlay_panel_text_color_description">Text color for the main panel in floating panels. AUTO follows module_panel_text_color.</string>
+    <string name="setting_theme_overlay_header_background_color_description">Background color for the title bar in floating panels. AUTO follows terminal_header_background_color.</string>
+    <string name="setting_theme_overlay_header_border_color_description">Border color for the title bar in floating panels. AUTO follows terminal_header_border_color.</string>
+    <string name="setting_theme_overlay_header_text_color_description">Text color for the title bar in floating panels. AUTO follows overlay_panel_text_color.</string>
+    <string name="setting_theme_overlay_panel_background_color_description">Background color for the main panel in floating panels. AUTO follows terminal_window_background_color.</string>
+    <string name="setting_theme_overlay_panel_border_color_description">Border color for the main panel in floating panels. AUTO follows terminal_border_color.</string>
+    <string name="setting_theme_overlay_panel_text_color_description">Text color for the main panel in floating panels. AUTO follows output_text_color.</string>
     <string name="setting_theme_overlay_scrim_color_description">Tint behind floating panels. AUTO uses the built-in default.</string>
-    <string name="setting_theme_pressed_background_color_description">Background color for pressed controls. AUTO blends module_button_background_color with accent_color.</string>
+    <string name="setting_theme_pressed_background_color_description">Background color for pressed controls. AUTO blends button_background_color with accent_color (18%).</string>
     <string name="setting_theme_pressed_border_color_description">Border color for pressed controls. AUTO follows accent_color.</string>
-    <string name="setting_theme_pressed_text_color_description">Text color for pressed controls. AUTO follows module_text_color.</string>
+    <string name="setting_theme_pressed_text_color_description">Text color for pressed controls. AUTO follows button_text_color.</string>
     <string name="setting_theme_primary_button_background_color_description">Background color for primary action buttons. AUTO follows selection_background_color.</string>
     <string name="setting_theme_primary_button_border_color_description">Border color for primary action buttons. AUTO follows selection_border_color.</string>
     <string name="setting_theme_primary_button_text_color_description">Text color for primary action buttons. AUTO follows selection_text_color.</string>
@@ -2453,9 +2605,9 @@ Fix or delete the file to recover your options</string>
     <string name="setting_theme_ram_text_color_description">RAM label text color</string>
     <string name="setting_theme_regex_match_background_color_description">Regex match marker background color</string>
     <string name="setting_theme_restart_message_text_color_description">Restart message text color</string>
-    <string name="setting_theme_selection_background_color_description">Background color for selected controls. AUTO blends module_button_background_color with accent_color.</string>
+    <string name="setting_theme_selection_background_color_description">Background color for selected controls. AUTO blends button_background_color with accent_color (25%).</string>
     <string name="setting_theme_selection_border_color_description">Border color for selected controls. AUTO follows accent_color.</string>
-    <string name="setting_theme_selection_text_color_description">Text color for selected controls. AUTO follows module_text_color.</string>
+    <string name="setting_theme_selection_text_color_description">Text color for selected controls. AUTO follows button_text_color.</string>
     <string name="setting_theme_session_info_text_color_description">Session info text color</string>
     <string name="setting_theme_settings_header_background_color_description">Background color for the title bar in settings. AUTO follows settings_panel_background_color.</string>
     <string name="setting_theme_settings_header_border_color_description">Border color for the title bar in settings. AUTO follows settings_panel_border_color.</string>
@@ -2478,11 +2630,12 @@ Fix or delete the file to recover your options</string>
     <string name="setting_theme_storage_status_background_color_description">Storage status line background color</string>
     <string name="setting_theme_storage_status_text_shadow_color_description">Storage status line text shadow color</string>
     <string name="setting_theme_storage_text_color_description">Storage label text color</string>
-    <string name="setting_theme_success_text_color_description">Text color for success messages. AUTO follows battery_text_high.</string>
+    <string name="setting_theme_success_text_color_description">Text color for success messages. AUTO uses the built-in green (#FF4CAF50), independently of battery colors.</string>
     <string name="setting_theme_suggestions_background_color_description">Suggestions area background color</string>
+    <string name="setting_theme_suggestions_text_shadow_color_description">Text shadow color for launcher suggestions, search categories and module suggestion buttons. Transparent disables the shadow. Offset and blur use shadow_params.</string>
     <string name="setting_theme_tab_background_color_description">Background color for tabs. AUTO follows terminal_header_background_color.</string>
     <string name="setting_theme_tab_border_color_description">Border color for tabs. AUTO follows terminal_header_border_color.</string>
-    <string name="setting_theme_tab_text_color_description">Text color for tabs. AUTO follows module_text_color.</string>
+    <string name="setting_theme_tab_text_color_description">Text color for tabs. AUTO follows output_text_color.</string>
     <string name="setting_theme_terminal_border_color_description">Shared border color for terminal chrome, headers, panels, and module outlines</string>
     <string name="setting_theme_terminal_header_background_color_description">Terminal header tab background color</string>
     <string name="setting_theme_terminal_header_border_color_description">Terminal header tab border color</string>
@@ -2503,34 +2656,34 @@ Fix or delete the file to recover your options</string>
     <string name="setting_theme_unlock_status_background_color_description">Unlock counter status line background color</string>
     <string name="setting_theme_unlock_status_text_shadow_color_description">Unlock counter status line text shadow color</string>
     <string name="setting_theme_wallpaper_overlay_color_description">Overlay color applied over the system wallpaper</string>
-    <string name="setting_theme_warning_text_color_description">Text color for warnings. AUTO follows battery_text_medium.</string>
+    <string name="setting_theme_warning_text_color_description">Text color for warnings. AUTO uses the built-in yellow (#FFFFEB3B), independently of battery colors.</string>
     <string name="setting_theme_weather_status_background_color_description">Weather status line background color</string>
     <string name="setting_theme_weather_status_text_shadow_color_description">Weather status line text shadow color</string>
     <string name="setting_theme_weather_text_color_description">Weather label text color</string>
-    <string name="setting_theme_widget_command_background_color_description">Background color for command rows in launcher widgets. AUTO blends widget_panel_background_color with ansi_black.</string>
+    <string name="setting_theme_widget_command_background_color_description">Background color for command rows in launcher widgets. AUTO darkens widget_panel_background_color with fixed black (16%), preserving transparency.</string>
     <string name="setting_theme_widget_command_border_color_description">Border color for command rows in launcher widgets. AUTO uses widget_panel_border_color with reduced opacity.</string>
     <string name="setting_theme_widget_command_text_color_description">Text color for command rows in launcher widgets. AUTO follows widget_panel_text_color.</string>
-    <string name="setting_theme_widget_control_background_color_description">Background color for controls in launcher widgets. AUTO follows button_background_color.</string>
-    <string name="setting_theme_widget_control_border_color_description">Border color for controls in launcher widgets. AUTO follows button_border_color.</string>
-    <string name="setting_theme_widget_control_text_color_description">Text color for controls in launcher widgets. AUTO follows button_text_color.</string>
-    <string name="setting_theme_widget_header_background_color_description">Background color for the title bar in launcher widgets. AUTO follows module_header_background_color.</string>
-    <string name="setting_theme_widget_header_border_color_description">Border color for the title bar in launcher widgets. AUTO follows module_header_border_color.</string>
-    <string name="setting_theme_widget_header_text_color_description">Text color for the title bar in launcher widgets. AUTO follows module_header_text_color.</string>
-    <string name="setting_theme_widget_panel_background_color_description">Background color for the main panel in launcher widgets. AUTO follows module_panel_background_color.</string>
-    <string name="setting_theme_widget_panel_border_color_description">Border color for the main panel in launcher widgets. AUTO follows module_panel_border_color.</string>
-    <string name="setting_theme_widget_panel_text_color_description">Text color for the main panel in launcher widgets. AUTO follows module_panel_text_color.</string>
-    <string name="setting_theme_widget_row_background_color_description">Background color for rows in launcher widgets. AUTO blends widget_panel_background_color with ansi_black.</string>
+    <string name="setting_theme_widget_control_background_color_description">Background color for controls in launcher widgets. AUTO follows widget_panel_background_color.</string>
+    <string name="setting_theme_widget_control_border_color_description">Border color for controls in launcher widgets. AUTO follows widget_panel_border_color.</string>
+    <string name="setting_theme_widget_control_text_color_description">Text color for controls in launcher widgets. AUTO follows widget_panel_text_color.</string>
+    <string name="setting_theme_widget_header_background_color_description">Background color for the title bar in launcher widgets. AUTO follows terminal_header_background_color.</string>
+    <string name="setting_theme_widget_header_border_color_description">Border color for the title bar in launcher widgets. AUTO follows terminal_header_border_color.</string>
+    <string name="setting_theme_widget_header_text_color_description">Text color for the title bar in launcher widgets. AUTO follows widget_panel_text_color.</string>
+    <string name="setting_theme_widget_panel_background_color_description">Background color for the main panel in launcher widgets. AUTO follows terminal_window_background_color.</string>
+    <string name="setting_theme_widget_panel_border_color_description">Border color for the main panel in launcher widgets. AUTO follows terminal_border_color.</string>
+    <string name="setting_theme_widget_panel_text_color_description">Text color for the main panel in launcher widgets. AUTO follows output_text_color.</string>
+    <string name="setting_theme_widget_row_background_color_description">Background color for rows in launcher widgets. AUTO darkens widget_panel_background_color with fixed black (22%), preserving transparency.</string>
     <string name="setting_theme_widget_row_text_color_description">Text color for rows in launcher widgets. AUTO follows widget_panel_text_color.</string>
-    <string name="setting_theme_workspace_control_background_color_description">Background color for controls in workspace panels, including the calculator. AUTO follows module_button_background_color.</string>
-    <string name="setting_theme_workspace_control_border_color_description">Border color for controls in workspace panels, including the calculator. AUTO follows terminal_border_color.</string>
-    <string name="setting_theme_workspace_control_text_color_description">Text color for controls in workspace panels, including the calculator. AUTO follows module_text_color.</string>
+    <string name="setting_theme_workspace_control_background_color_description">Background color for workspace controls, including the calculator. AUTO follows workspace_panel_background_color.</string>
+    <string name="setting_theme_workspace_control_border_color_description">Border color for workspace controls, including the calculator. AUTO follows workspace_panel_border_color.</string>
+    <string name="setting_theme_workspace_control_text_color_description">Text color for workspace controls, including the calculator. AUTO follows workspace_panel_text_color.</string>
     <string name="setting_theme_workspace_header_background_color_description">Background color for the title bar in workspace panels, including the calculator. AUTO follows terminal_header_background_color.</string>
     <string name="setting_theme_workspace_header_border_color_description">Border color for the title bar in workspace panels, including the calculator. AUTO follows terminal_header_border_color.</string>
-    <string name="setting_theme_workspace_header_text_color_description">Text color for the title bar in workspace panels, including the calculator. AUTO follows module_text_color.</string>
-    <string name="setting_theme_workspace_input_background_color_description">Background color for input fields in workspace panels, including the calculator. AUTO blends workspace_panel_background_color with ansi_black.</string>
+    <string name="setting_theme_workspace_header_text_color_description">Text color for workspace title bars, including the calculator and shared Notes theme. AUTO follows workspace_panel_text_color.</string>
+    <string name="setting_theme_workspace_input_background_color_description">Background color for workspace inputs, including the calculator and shared Notes theme. AUTO darkens workspace_panel_background_color with fixed black (16%), preserving transparency.</string>
     <string name="setting_theme_workspace_input_text_color_description">Text color for input fields in workspace panels, including the calculator. AUTO follows input_text_color.</string>
-    <string name="setting_theme_workspace_output_background_color_description">Background color for output area in workspace panels, including the calculator. AUTO blends workspace_panel_background_color with ansi_black.</string>
-    <string name="setting_theme_workspace_output_text_color_description">Text color for output area in workspace panels, including the calculator. AUTO follows output_text_color.</string>
+    <string name="setting_theme_workspace_output_background_color_description">Background color for workspace output, including the calculator and shared Notes theme. AUTO darkens workspace_panel_background_color with fixed black (10%), preserving transparency.</string>
+    <string name="setting_theme_workspace_output_text_color_description">Text color for workspace output. AUTO follows workspace_panel_text_color.</string>
     <string name="setting_theme_workspace_panel_background_color_description">Background color for the main panel in workspace panels, including the calculator. AUTO follows terminal_window_background_color.</string>
     <string name="setting_theme_workspace_panel_border_color_description">Border color for the main panel in workspace panels, including the calculator. AUTO follows terminal_border_color.</string>
     <string name="setting_theme_workspace_panel_text_color_description">Text color for the main panel in workspace panels, including the calculator. AUTO follows output_text_color.</string>
@@ -2596,11 +2749,11 @@ Fix or delete the file to recover your options</string>
     <string name="setting_ui_output_corner_radius_description">Rounded corner radius for the output terminal panel (dp)</string>
     <string name="setting_ui_output_field_margins_description">[horizontal_margin],[vertical_margin],[horizontal_padding],[vertical_padding]</string>
     <string name="setting_ui_output_header_text_size_description">Text size for output and overlay header labels (sp)</string>
-    <string name="setting_ui_output_tray_max_height_description">Maximum height for the expanded output tray in dp. 0 keeps the default adaptive height</string>
+    <string name="setting_ui_output_tray_max_height_description">Maximum height for the expanded output tray in dp. 0 fits the current output up to the adaptive viewport limit</string>
     <string name="setting_ui_ram_index_description">Changing to a whole-number position inserts a row and shifts that row and later rows down when saved. Decimal positions join a row in left-to-right order: 4.1 and 4.2 share row 4. Existing decimal groups stay together when shifted. ASCII always uses its own row.</string>
     <string name="setting_ui_ram_size_description">The ram label font size</string>
     <string name="setting_ui_ram_status_alignment_description">RAM status line alignment (&lt;0 = left, =0 = center, &gt;0 = right)</string>
-    <string name="setting_ui_shadow_params_description">[Shadow X offset],[Shadow Y offset],[Shadow radius]</string>
+    <string name="setting_ui_shadow_params_description">[Shadow X offset],[Shadow Y offset],[Shadow blur radius] in pixels. Shared by input, output, status lines, suggestions and module text; set their shadow colors in Themer.</string>
     <string name="setting_ui_show_app_installed_description">If true, you will receive a message when you install an app</string>
     <string name="setting_ui_show_app_uninstalled_description">If true, you will receive a message when you uninstall an app</string>
     <string name="setting_ui_show_ascii_description">Show the ASCII art from ascii.txt. WARNING: wide art may overflow or wrap on small screens.</string>
@@ -2656,7 +2809,7 @@ Fix or delete the file to recover your options</string>
     <string name="startup_crt">CRT</string>
     <string name="startup_cyberdeck">Cyberdeck</string>
     <string name="startup_dashed">DASHED</string>
-    <string name="startup_derive_launcher_colors_from_the_system_wallpaper">Derive launcher colors from the system wallpaper.</string>
+    <string name="startup_derive_launcher_colors_from_the_system_wallpaper">Apply colors once from the home wallpaper, or the system palette if unavailable. Keep explicit advanced overrides.</string>
     <string name="startup_double_tap_lock">Double-tap lock</string>
     <string name="startup_end_preview">END PREVIEW</string>
     <string name="startup_features">FEATURES</string>

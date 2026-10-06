@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher.managers.suggestions
 
+import ohi.andre.consolelauncher.managers.settings.LauncherMode
 import ohi.andre.consolelauncher.managers.xml.options.Behavior
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -7,7 +8,28 @@ import org.junit.Test
 
 class SearchModeTest {
     @Test
-    fun searchModeIsOptIn() {
+    fun searchLayoutCanShowSelectedCategoryOrAllRows() {
+        val groups = SearchModeResultRenderer.groupResults(listOf(
+            result("App", SuggestionsManager.SearchResult.TYPE_APP),
+            result("Command", SuggestionsManager.SearchResult.TYPE_COMMAND)
+        ))
+        assertEquals("true", Behavior.search_category_tabs.defaultValue())
+        assertEquals(listOf(groups[1]), SearchModeResultRenderer.visibleGroups(groups, SuggestionsManager.SearchResult.TYPE_COMMAND, true))
+        assertEquals(groups, SearchModeResultRenderer.visibleGroups(groups, SuggestionsManager.SearchResult.TYPE_COMMAND, false))
+        assertEquals(emptyList<Any>(), SearchModeResultRenderer.visibleGroups(emptyList(), SuggestionsManager.SearchResult.TYPE_APP, false))
+    }
+
+    @Test
+    fun emptyDefaultsRequireActiveInputButQueriesAndOutputRemainVisible() {
+        assertEquals(false, SuggestionsManager.showSearchResults(false, false, false))
+        assertEquals(true, SuggestionsManager.showSearchResults(true, false, false))
+        assertEquals(true, SuggestionsManager.showSearchResults(false, true, false))
+        assertEquals(true, SuggestionsManager.showSearchResults(false, false, true))
+    }
+
+    @Test
+    fun launcherModeDefaultsToCompatibilityMode() {
+        assertEquals("", Behavior.launcher_mode.defaultValue())
         assertEquals("false", Behavior.search_only_mode.defaultValue())
     }
 
@@ -85,6 +107,28 @@ class SearchModeTest {
     }
 
     @Test
+    fun emptySearchDefaultsUseTabbedCategoryOrder() {
+        val grouped = SearchModeResultRenderer.groupResults(
+            listOf(
+                result("alias", SuggestionsManager.SearchResult.TYPE_ALIAS),
+                result("command", SuggestionsManager.SearchResult.TYPE_COMMAND),
+                result("group", SuggestionsManager.SearchResult.TYPE_GROUP),
+                result("app", SuggestionsManager.SearchResult.TYPE_APP)
+            )
+        )
+
+        assertEquals(
+            listOf(
+                SuggestionsManager.SearchResult.TYPE_APP,
+                SuggestionsManager.SearchResult.TYPE_ALIAS,
+                SuggestionsManager.SearchResult.TYPE_COMMAND,
+                SuggestionsManager.SearchResult.TYPE_GROUP
+            ),
+            grouped.map { it.first().type }
+        )
+    }
+
+    @Test
     fun categoryTabsKeepPreviousSelectionWhenStillAvailable() {
         val grouped = SearchModeResultRenderer.groupResults(
             listOf(
@@ -101,6 +145,19 @@ class SearchModeTest {
         assertEquals(
             SuggestionsManager.SearchResult.TYPE_APP,
             SearchModeResultRenderer.selectedCategoryType(SuggestionsManager.SearchResult.TYPE_PROVIDER, grouped)
+        )
+
+        val emptyDefaultGroups = SearchModeResultRenderer.groupResults(
+            listOf(
+                result("app", SuggestionsManager.SearchResult.TYPE_APP),
+                result("alias", SuggestionsManager.SearchResult.TYPE_ALIAS),
+                result("command", SuggestionsManager.SearchResult.TYPE_COMMAND),
+                result("group", SuggestionsManager.SearchResult.TYPE_GROUP)
+            )
+        )
+        assertEquals(
+            SuggestionsManager.SearchResult.TYPE_ALIAS,
+            SearchModeResultRenderer.selectedCategoryType(SuggestionsManager.SearchResult.TYPE_ALIAS, emptyDefaultGroups)
         )
     }
 
@@ -120,9 +177,15 @@ class SearchModeTest {
     }
 
     @Test
-    fun modeOnlyOffersTheOtherLayout() {
-        assertEquals("search", SuggestionsManager.modeTarget(false))
-        assertEquals("classic", SuggestionsManager.modeTarget(true))
+    fun modeOnlyOffersTheNextSensibleLayout() {
+        assertEquals("search", SuggestionsManager.modeTarget(LauncherMode.CLASSIC))
+        assertEquals("classic", SuggestionsManager.modeTarget(LauncherMode.SEARCH))
+    }
+
+    @Test
+    fun modeParameterSuggestionsIncludeEveryLauncherMode() {
+        assertEquals(listOf("classic", "search"), SuggestionsManager.modeTargets(""))
+        assertEquals(emptyList<String>(), SuggestionsManager.modeTargets("f"))
     }
 
     private fun result(title: String, type: Int) = SuggestionsManager.SearchResult(

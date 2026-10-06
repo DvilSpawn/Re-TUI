@@ -455,7 +455,7 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
             if (save is Theme && save.name.startsWith("ansi_") && !showAnsiPalette) {
                 continue
             }
-            if (save === Behavior.toggle_output_state) {
+            if (save === Behavior.toggle_output_state || save === Behavior.qalculate) {
                 continue
             }
             if (save === Ui.auto_color_pick) {

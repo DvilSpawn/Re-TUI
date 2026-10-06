@@ -168,6 +168,20 @@ enum class Behavior : XMLPrefsSave {
             return XMLPrefsSave.BOOLEAN
         }
     },
+    launcher_mode {
+        override fun defaultValue(): String? = ""
+
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_launcher_mode_description
+        }
+
+        override fun type(): String? = XMLPrefsSave.TEXT
+    },
+    search_category_tabs {
+        override fun defaultValue(): String = "true"
+        override fun infoRes(): Int = R.string.setting_behavior_search_category_tabs_description
+        override fun type(): String = XMLPrefsSave.BOOLEAN
+    },
     search_only_mode {
         override fun defaultValue(): String? = "false"
 

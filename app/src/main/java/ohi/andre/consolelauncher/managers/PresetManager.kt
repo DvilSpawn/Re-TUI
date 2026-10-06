@@ -30,6 +30,7 @@ import java.util.HashSet
 import java.util.HashMap
 import java.util.LinkedHashMap
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings
+import ohi.andre.consolelauncher.managers.settings.LauncherMode
 import ohi.andre.consolelauncher.managers.settings.StatusRowResolver
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager.XMLPrefsRoot
@@ -75,6 +76,7 @@ object PresetManager {
         Behavior.songs_from_mediastore,
         Behavior.tui_notification,
         Behavior.auto_show_keyboard,
+        Behavior.launcher_mode,
         Behavior.search_only_mode,
         Behavior.auto_scroll,
         Behavior.show_alias_content,
@@ -639,7 +641,7 @@ object PresetManager {
             if (!validator(setting, value)) continue
             require(parsed.put(setting, value) == null) { "Duplicate preset setting: ${setting.label()}" }
         }
-        return xml(root, values, { parsed[it] }, validator)
+        return xml(root, values, { parsed[it] }, validator, useCurrentMode = false)
     }
 
     private fun applyAllowed(
@@ -702,6 +704,7 @@ object PresetManager {
                     SUGGESTION_ORDER.matches(value)
 
                 Suggestions.hide_suggestions_when_empty -> value in setOf("always", "true", "false")
+                Behavior.launcher_mode -> value in LauncherMode.values
                 Behavior.output_tray_mode -> value in setOf("native", "auto", "toggled")
                 Behavior.output_header_mode -> value in setOf("normal", "arrows", "none")
                 Behavior.weather_temperature_measure -> value in setOf("metric", "imperial", "standard")
@@ -1060,12 +1063,13 @@ object PresetManager {
         root: XMLPrefsRoot,
         values: Array<out XMLPrefsSave>,
         valueFor: (XMLPrefsSave) -> String?,
-        validator: (XMLPrefsSave, String) -> Boolean = ::isShareableValue
+        validator: (XMLPrefsSave, String) -> Boolean = ::isShareableValue,
+        useCurrentMode: Boolean = true
     ): String {
         val xml: StringBuilder = StringBuilder(XMLPrefsManager.XML_DEFAULT)
         xml.append("<").append(root.name).append(">\n")
         for (setting in values) {
-            val value = valueFor(setting) ?: continue
+            val value = if (useCurrentMode && setting == Behavior.launcher_mode) LauncherMode.current() else valueFor(setting) ?: continue
             if (!validator(setting, value)) continue
             xml.append("\t<")
                 .append(setting.label())

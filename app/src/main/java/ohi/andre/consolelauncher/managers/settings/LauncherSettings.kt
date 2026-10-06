@@ -2,6 +2,10 @@ package ohi.andre.consolelauncher.managers.settings
 
 import android.content.Context
 import android.graphics.Color
+import android.os.Handler
+import android.os.Looper
+import androidx.annotation.WorkerThread
+import ohi.andre.consolelauncher.LauncherActivity
 import java.util.HashMap
 import java.util.Locale
 import ohi.andre.consolelauncher.managers.notifications.NotificationService
@@ -72,7 +76,6 @@ object LauncherSettings {
         synchronized(LOCK) {
             refreshFromLoadedPrefsLocked()
         }
-        AutoColorManager.invalidate()
     }
 
     @JvmStatic
@@ -81,7 +84,6 @@ object LauncherSettings {
             snapshot.clear()
             snapshotLoaded = false
         }
-        AutoColorManager.invalidate()
     }
 
     @JvmStatic
@@ -145,22 +147,31 @@ object LauncherSettings {
         setUi(Ui.auto_color_pick, enabled.toString())
     }
 
+    @WorkerThread
     @JvmStatic
-    fun enableWallpaperAuto(context: Context? = null): Boolean {
-        AutoColorManager.init(context)
-        val colors = AutoColorManager.currentWallpaperColorSnapshot()
+    fun applyWallpaperAuto(context: Context): AutoColorManager.Snapshot =
+        applyWallpaperSnapshot(context, AutoColorManager.currentWallpaperColorSnapshot(context))
+
+    internal fun applyWallpaperSnapshot(context: Context, snapshot: AutoColorManager.Snapshot): AutoColorManager.Snapshot {
+        if (!snapshot.succeeded) return snapshot
         set(context, Ui.system_wallpaper, "true")
-        colors.forEach { (setting, color) ->
-            set(context, setting, String.format(Locale.US, "#%08X", color))
+        snapshot.colors.forEach { (setting, color) ->
+            if (setting !is Theme || !setting.advanced) {
+                set(context, setting, String.format(Locale.US, "#%08X", color))
+            }
         }
         set(context, Theme.wallpaper_overlay_color, "#00000000")
         set(context, Ui.auto_color_pick, "false")
-        return colors.isNotEmpty()
+        return snapshot
     }
 
     @JvmStatic
     fun freezeLegacyWallpaperAuto(context: Context) {
-        if (getBoolean(Ui.auto_color_pick)) enableWallpaperAuto(context)
+        if (!getBoolean(Ui.auto_color_pick)) return
+        Thread({
+            val result = applyWallpaperAuto(context)
+            if (result.succeeded) Handler(Looper.getMainLooper()).post { LauncherActivity.previewIfRunning() }
+        }, "retui-auto-theme").start()
     }
 
     @JvmStatic
@@ -203,10 +214,6 @@ object LauncherSettings {
     }
 
     private fun onSettingChanged(context: Context?, value: XMLPrefsSave) {
-        if (value == Ui.auto_color_pick) {
-            AutoColorManager.invalidate()
-        }
-
         if (value == Ui.system_font || value == Ui.font_file) {
             Tuils.cancelFont()
             UIUtils.cancelFont()

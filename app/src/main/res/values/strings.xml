@@ -275,7 +275,7 @@
     </string>
     <string name="help_wallpaper">-static -> open the static wallpaper picker
         \n-live -> open the live wallpaper picker
-        \n-auto -> apply wallpaper-derived theme colors once
+        \n-auto -> apply home wallpaper colors once; use the system palette if unavailable. Explicit advanced colors are preserved.
         \n(no args) -> open the wallpaper picker
     </string>
     <string name="hint_wallpaper_auto_confirm">Yes/No</string>
@@ -706,6 +706,6 @@ Enable qalculate in Settings → behavior.xml for units and symbolic maths, e.g.
     </string>
 
     <string name="help_username">Change the username and device name: username [new_user] [new_device]</string>
-    <string name="help_mode">Switch launcher layout.\nUsage:\n$ mode search\n$ mode classic</string>
+    <string name="help_mode">Switch launcher layout.\nUsage:\n$ mode classic\n$ mode search</string>
     <string name="search_mode_hint">Search apps, contacts, notifications, or the web…</string>
 </resources>

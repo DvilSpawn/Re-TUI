@@ -89,6 +89,7 @@ class debug : ParamCommand() {
             val output = StringBuilder()
             output.append(context.getString(R.string.command_detail_debug_runtime_settings_982a4)).append(Tuils.NEWLINE)
             output.append(LauncherSettings.debugSummary()).append(Tuils.NEWLINE)
+            output.append(ohi.andre.consolelauncher.managers.xml.AutoColorManager.debugSummary()).append(Tuils.NEWLINE)
             output.append(context.getString(R.string.command_detail_debug_auto_color_pick_7a5c0)).append(AppearanceSettings.autoColorPick()).append(Tuils.NEWLINE)
             output.append(context.getString(R.string.command_detail_debug_system_wallpaper_ace9c)).append(LauncherSettings.getBoolean(Ui.system_wallpaper)).append(Tuils.NEWLINE)
             output.append(context.getString(R.string.command_detail_debug_system_font_ee2d6)).append(AppearanceSettings.useSystemFont()).append(Tuils.NEWLINE)

@@ -44,7 +44,7 @@ messages/definitions; launcher-owned messages still use Android localization.
 ## Boundary and cancellation
 
 Kotlin passes bounded standard UTF-8 bytes and two booleans (degrees and exact).
-JNI returns one status byte followed by UTF-8 text; it does not expose upstream
+JNI returns one status byte (error and approximation flags) followed by UTF-8 text; it does not expose upstream
 objects or pointers. C++ exceptions become Java exceptions; the service converts
 failures into its existing engine-stopped result. Qalculate error messages are
 returned as errors. All calls run on the service's single worker thread.
@@ -57,7 +57,7 @@ only the private calculator service process, which can be started again.
 Android lacks pthread cancellation. Our patch disables unsupported cancellation
 setup and exits the private process if upstream unexpectedly requests cancellation
 of a running thread. It never reports that a still-running thread was stopped.
-Engine globals are owned by the process and are reclaimed at process exit.
+Engine globals are owned by the process and are reclaimed at process exit. Idle definitions can remain cached between bindings; normal unbinding does not kill a new caller racing to bind. Cancellation identifies the active request before terminating the isolated process. Exact output preserves fractions, and reusable output uses ASCII signs without digit grouping.
 
 ## Source delivery and upgrades
 

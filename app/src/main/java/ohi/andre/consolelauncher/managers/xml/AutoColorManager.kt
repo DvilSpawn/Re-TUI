@@ -1,11 +1,11 @@
 package ohi.andre.consolelauncher.managers.xml
 
-import android.app.WallpaperColors
 import android.app.WallpaperManager
 import android.content.Context
 import android.graphics.Color
 import android.os.Build
-import androidx.annotation.RequiresApi
+import androidx.annotation.WorkerThread
+import ohi.andre.consolelauncher.R
 import androidx.core.graphics.ColorUtils
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave
 import ohi.andre.consolelauncher.managers.xml.options.Suggestions
@@ -17,65 +17,93 @@ object AutoColorManager {
 
     private const val NO_COLOR = Int.MAX_VALUE
     private var appContext: Context? = null
-    private var cachedPalette: Palette? = null
+    enum class Source { WALLPAPER, SYSTEM, UNAVAILABLE }
+
+    data class Snapshot(
+        val colors: Map<XMLPrefsSave, Int>,
+        val source: Source,
+        val failureReason: String? = null
+    ) {
+        val succeeded: Boolean get() = colors.isNotEmpty()
+        fun message(context: Context): String = context.getString(when (source) {
+            Source.WALLPAPER -> R.string.command_wallpaper_wallpaper_colors_applied_804d5
+            Source.SYSTEM -> R.string.command_wallpaper_system_palette_applied
+            Source.UNAVAILABLE -> R.string.command_wallpaper_unable_to_read_wallpaper_colors_259c7
+        })
+    }
+
+    internal data class SeedColors(val colors: IntArray?, val source: Source, val failureReason: String?)
+    @Volatile private var lastSource = Source.UNAVAILABLE
+    @Volatile private var lastFailure: String? = "not_requested"
 
     fun init(context: Context?) {
-        if (context != null) {
-            appContext = context.getApplicationContext()
+        if (context != null) appContext = context.applicationContext
+    }
+
+    fun debugSummary(): String = "auto_theme_source: ${lastSource.name.lowercase(java.util.Locale.ROOT)}\n" +
+        "auto_theme_failure: ${lastFailure ?: "none"}"
+
+    // Shared by production extraction and tests; failure of one source must not skip the fallback.
+    internal fun selectSeedColors(
+        sdk: Int,
+        wallpaper: () -> IntArray?,
+        system: () -> IntArray?
+    ): SeedColors {
+        var reason = if (sdk < 27) "wallpaper_api_unsupported" else "wallpaper_colors_unavailable"
+        if (sdk >= 27) try {
+            wallpaper()?.takeIf { it.size == 3 }?.let { return SeedColors(it, Source.WALLPAPER, null) }
+        } catch (e: Exception) {
+            reason = "wallpaper_${e.javaClass.simpleName}"
         }
+        if (sdk >= 31) try {
+            system()?.takeIf { it.size == 3 }?.let { return SeedColors(it, Source.SYSTEM, reason) }
+            reason += ";system_palette_unavailable"
+        } catch (e: Exception) {
+            reason += ";system_${e.javaClass.simpleName}"
+        }
+        return SeedColors(null, Source.UNAVAILABLE, reason)
     }
 
-    fun invalidate() {
-        cachedPalette = null
+    @android.annotation.SuppressLint("NewApi") // API checks are in selectSeedColors.
+    @WorkerThread
+    fun currentWallpaperColorSnapshot(context: Context? = null): Snapshot {
+        val owner = context ?: appContext
+        val seeds = selectSeedColors(Build.VERSION.SDK_INT, {
+            val manager = WallpaperManager.getInstance(requireNotNull(owner))
+            manager.getWallpaperColors(WallpaperManager.FLAG_SYSTEM)?.let {
+                intArrayOf(it.primaryColor.toArgb(),
+                    (it.secondaryColor ?: it.primaryColor).toArgb(),
+                    (it.tertiaryColor ?: it.secondaryColor ?: it.primaryColor).toArgb())
+            }
+        }, {
+            requireNotNull(owner).let { ctx ->
+                intArrayOf(ctx.getColor(android.R.color.system_accent1_500),
+                    ctx.getColor(android.R.color.system_accent2_500),
+                    ctx.getColor(android.R.color.system_neutral1_900))
+            }
+        })
+        return snapshotFromSeeds(seeds)
     }
 
-    fun currentWallpaperColorSnapshot(): Map<XMLPrefsSave, Int> {
-        invalidate()
-        val current = palette ?: return emptyMap()
-        return buildMap {
-            Theme.entries.forEach { value ->
+    internal fun snapshotFromSeeds(seeds: SeedColors): Snapshot {
+        lastSource = seeds.source
+        lastFailure = seeds.failureReason
+        val current = seeds.colors?.let { buildPalette(it[0], it[1], it[2]) }
+            ?: return Snapshot(emptyMap(), Source.UNAVAILABLE, seeds.failureReason)
+        val colors = buildMap<XMLPrefsSave, Int> {
+            Theme.entries.filterNot { it.advanced }.forEach { value ->
                 resolveThemeColor(value, current, NO_COLOR)
-                    .takeUnless { it == NO_COLOR }
-                    ?.let { put(value, it) }
+                    .takeUnless { it == NO_COLOR }?.let { put(value, it) }
             }
             Suggestions.entries.forEach { value ->
                 resolveSuggestionsColor(value, current, NO_COLOR)
-                    .takeUnless { it == NO_COLOR }
-                    ?.let { put(value, it) }
+                    .takeUnless { it == NO_COLOR }?.let { put(value, it) }
             }
         }
+        return Snapshot(colors, seeds.source, seeds.failureReason)
     }
 
-    private val palette: Palette?
-        get() {
-            if (cachedPalette == null) {
-                cachedPalette = buildPalette()
-            }
-            return cachedPalette
-        }
-
-    private fun buildPalette(): Palette? {
-        try {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O_MR1) {
-                return null
-            }
-
-            val wallpaperManager = WallpaperManager.getInstance(appContext)
-            val colors = wallpaperManager.getWallpaperColors(WallpaperManager.FLAG_SYSTEM)
-            return colors?.let { buildFromWallpaperColors(it) }
-        } catch (ignored: Exception) {
-            return null
-        }
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.O_MR1)
-    private fun buildFromWallpaperColors(colors: WallpaperColors): Palette {
-        val primary = colors.getPrimaryColor().toArgb()
-        val secondary = if (colors.getSecondaryColor() != null) colors.getSecondaryColor()!!
-            .toArgb() else primary
-        val tertiary = if (colors.getTertiaryColor() != null) colors.getTertiaryColor()!!
-            .toArgb() else secondary
-
+    private fun buildPalette(primary: Int, secondary: Int, tertiary: Int): Palette {
         val base = darkestOf(primary, secondary, tertiary)
         val accentSeed = mostSaturatedOf(primary, secondary, tertiary)
         val background = clampLuminance(base, 0.14f)
@@ -128,7 +156,8 @@ object AutoColorManager {
             Theme.battery_status_text_shadow_color, Theme.storage_status_text_shadow_color,
             Theme.network_status_text_shadow_color, Theme.notes_status_text_shadow_color,
             Theme.weather_status_text_shadow_color, Theme.unlock_status_text_shadow_color,
-            Theme.ascii_status_text_shadow_color, Theme.input_text_shadow_color, Theme.output_text_shadow_color -> return fallbackColor
+            Theme.ascii_status_text_shadow_color, Theme.input_text_shadow_color, Theme.output_text_shadow_color,
+            Theme.suggestions_text_shadow_color, Theme.module_text_shadow_color -> return fallbackColor
             else -> return fallbackColor
         }
     }

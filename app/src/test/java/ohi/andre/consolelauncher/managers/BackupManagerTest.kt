@@ -42,6 +42,11 @@ class BackupManagerTest {
     }
 
     @Test
+    fun personalBackupIncludesFramePreferenceState() {
+        assertTrue(BackupManager.personalSharedPreferenceNames().contains("retui_frames"))
+    }
+
+    @Test
     fun acceptsExactWrittenBackup() {
         BackupManager.verifyExport(byteArrayOf(1, 2, 3), ByteArrayInputStream(byteArrayOf(1, 2, 3)))
     }

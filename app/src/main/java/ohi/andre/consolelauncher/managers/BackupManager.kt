@@ -87,6 +87,7 @@ object BackupManager {
         "retui_termux_apps",
         "retui_module_prompt",
         "retui_callback_auth",
+        "retui_frames",
         "pomodoro_state",
         RetuiCreditManager.PREFS,
         SpaceManager.PREFS,
@@ -98,6 +99,8 @@ object BackupManager {
         TermuxWorkspaceLauncherManager.PREFS,
         "changelogPrefs"
     )
+
+    internal fun personalSharedPreferenceNames(): List<kotlin.String> = PERSONAL_PREFS.filterNotNull()
 
     fun defaultBackupName(): kotlin.String {
         val stamp = java.text.SimpleDateFormat("yyyyMMdd-HHmmss", java.util.Locale.US)

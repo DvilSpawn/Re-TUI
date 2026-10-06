@@ -219,7 +219,8 @@
     <!-- mode.kt: exec -->
     <string name="command_mode_search_mode_enabled_ba524" formatted="false">"Search mode enabled."</string>
     <!-- mode.kt: exec -->
-    <string name="command_mode_unknown_launcher_mode_usage_mode_search_cl_a86ba">"Unknown launcher mode: %1$s\nUsage: mode search|classic"</string>
+    <string name="command_mode_unknown_launcher_mode_usage_mode_search_cl_a86ba">"Unknown launcher mode: %1$s\nUsage: mode classic|search"</string>
+    <string name="command_mode_enabled">"%1$s mode enabled."</string>
     <!-- module.kt: exec -->
     <string name="command_module_built_in_modules_cannot_be_removed_use_mod_274e3">"Built-in modules cannot be removed. Use module -hide %1$s instead."</string>
     <!-- module.kt: createLuaModule -->
@@ -520,7 +521,7 @@
     <!-- wallpaper.kt: exec -->
     <string name="command_wallpaper_please_confirm_if_you_have_saved_your_pres_87e90" formatted="false">"Please confirm if you have saved your preset (Yes/No)"</string>
     <!-- wallpaper.kt: enableWallpaperAuto -->
-    <string name="command_wallpaper_unable_to_read_wallpaper_colors_259c7" formatted="false">"Unable to read wallpaper colors."</string>
+    <string name="command_wallpaper_unable_to_read_wallpaper_colors_259c7" formatted="false">"Unable to read wallpaper colors or a system palette. Your current theme was kept."</string>
     <!-- wallpaper.kt: onRedirect -->
     <string name="command_wallpaper_wallpaper_auto_cancelled_4d625" formatted="false">"Wallpaper auto cancelled."</string>
     <!-- wallpaper.kt: enableWallpaperAuto -->
@@ -593,4 +594,5 @@
     <string name="launcher_mode_status">Launcher mode: %1$s</string>
     <string name="duo_status">Duo command: enabled\nDuo layout: %1$s\nUsage: %2$s</string>
     <string name="uninstalling_package">Uninstalling %1$s...</string>
+    <string name="command_wallpaper_system_palette_applied">Applied system palette; wallpaper colors unavailable.</string>
 </resources>

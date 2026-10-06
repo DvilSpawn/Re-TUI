@@ -32,6 +32,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import ohi.andre.consolelauncher.commands.tuixt.TuixtActivity
+import ohi.andre.consolelauncher.calculator.CalculatorEngine
 import ohi.andre.consolelauncher.managers.RegexManager
 import ohi.andre.consolelauncher.managers.SpaceManager
 import ohi.andre.consolelauncher.managers.TerminalManager
@@ -545,6 +546,7 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
                 } else {
                     max(0, imeBottom - systemBottom)
                 }
+                CalculatorEngine.rememberImeBottomOffset(this@LauncherActivity, keyboardOffset)
                 val effectiveImeVisible = imeVisible || keyboardOffset > 0
 
                 if (this@LauncherActivity.uiManager != null) {

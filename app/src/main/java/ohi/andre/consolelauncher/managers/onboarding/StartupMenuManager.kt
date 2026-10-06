@@ -3,6 +3,9 @@ package ohi.andre.consolelauncher.managers.onboarding
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
+import ohi.andre.consolelauncher.managers.xml.AutoColorManager
 import android.content.Intent
 import android.graphics.Typeface
 import android.os.Bundle
@@ -166,13 +169,13 @@ object StartupMenuManager {
         prefs(context).edit().putBoolean(KEY_CRT, !crt(context)).apply()
     }
 
-    fun finish(context: Context): ActionResult {
+    fun finish(context: Context, palette: AutoColorManager.Snapshot? = null): ActionResult {
         if (isDryRun(context)) {
             prefs(context).edit().putBoolean(KEY_ACTIVE, false).apply()
             return ActionResult(context.getString(R.string.startup_startup_preview_complete_no_settings_were_changed))
         }
 
-        applyChoices(context)
+        val themeResult = applyChoices(context, palette)
         prefs(context).edit().putBoolean(KEY_ACTIVE, false).putBoolean(KEY_COMPLETE, true).apply()
         val followUp = mutableListOf<String>()
         if (level(context) == ADVANCED && enabled(context, TERMUX)) followUp.add(context.getString(R.string.startup_termux_run_tbridge_setup_then_tbridge_status))
@@ -180,6 +183,7 @@ object StartupMenuManager {
         return ActionResult(
             buildString {
                 append(context.getString(R.string.startup_startup_setup_applied))
+                themeResult?.let { append("\n").append(it.message(context)) }
                 if (followUp.isNotEmpty()) append("\n").append(followUp.joinToString("\n"))
             },
             reload = true
@@ -235,7 +239,7 @@ object StartupMenuManager {
         })
     }
 
-    private fun applyChoices(context: Context) {
+    private fun applyChoices(context: Context, palette: AutoColorManager.Snapshot?): AutoColorManager.Snapshot? {
         fun selected(id: String): Boolean = selectedFeature(level(context), id, enabled(context, id))
 
         LauncherSettings.set(context, Behavior.swipe_up_apps_drawer, selected(APP_DRAWER).toString())
@@ -259,11 +263,13 @@ object StartupMenuManager {
         LauncherSettings.set(context, Ui.enable_dashed_border, border.first.toString())
         LauncherSettings.set(context, Ui.dashed_border_gap_length, border.second.toString())
         if (autoTheme(context)) {
-            LauncherSettings.enableWallpaperAuto(context)
+            return LauncherSettings.applyWallpaperSnapshot(context,
+                palette ?: AutoColorManager.currentWallpaperColorSnapshot(context))
         } else {
             LauncherSettings.set(context, Ui.auto_color_pick, "false")
             LauncherSettings.set(context, Theme.wallpaper_overlay_color, "#00000000")
         }
+        return null
     }
 
     private fun toggle(context: Context, id: String, label: String, description: String): Toggle =
@@ -376,7 +382,21 @@ class StartupMenuActivity : ohi.andre.consolelauncher.localization.LocalizedActi
         controls.addView(later, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
         controls.addView(View(this), LinearLayout.LayoutParams(dp(this, 10f), 1))
         val apply = button(if (StartupMenuManager.isDryRun(this)) getString(R.string.startup_finish_preview) else getString(R.string.startup_apply), true)
-        apply.setOnClickListener { close(StartupMenuManager.finish(this)) }
+        apply.setOnClickListener {
+            fun disable(view: View) {
+                view.isEnabled = false
+                if (view is ViewGroup) for (i in 0 until view.childCount) disable(view.getChildAt(i))
+            }
+            disable(screen)
+            Thread({
+                val palette = if (!StartupMenuManager.isDryRun(this) && StartupMenuManager.autoTheme(this)) {
+                    AutoColorManager.currentWallpaperColorSnapshot(this)
+                } else null
+                Handler(Looper.getMainLooper()).post {
+                    if (!isFinishing && !isDestroyed) close(StartupMenuManager.finish(this, palette))
+                }
+            }, "retui-startup-theme").start()
+        }
         controls.addView(apply, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
         panel.addView(controls)
         return screen

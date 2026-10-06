@@ -12,6 +12,7 @@ import android.widget.TextView
 import ohi.andre.consolelauncher.commands.main.MainPack
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
+import ohi.andre.consolelauncher.managers.xml.options.Behavior
 import ohi.andre.consolelauncher.managers.xml.options.SurfaceBorder
 import ohi.andre.consolelauncher.managers.xml.options.Suggestions
 import ohi.andre.consolelauncher.managers.xml.options.Theme
@@ -55,22 +56,30 @@ class SearchModeResultRenderer(
         val card = resultCard()
         val selectedType = selectedCategoryType(activeCategoryType, groups)
         activeCategoryType = selectedType
-        val selectedGroup = groups.first { it.first().type == selectedType }
-
-        val signature = selectedGroup.signature()
-        val strip = resultStrip(selectedGroup)
-        val prior = previous[selectedType]
-        strip.post {
-            if (prior?.signature == signature) strip.scrollTo(prior.scrollX, 0)
-            else strip.fullScroll(View.FOCUS_LEFT)
+        val tabbed = XMLPrefsManager.getBoolean(Behavior.search_category_tabs)
+        val visibleGroups = visibleGroups(groups, selectedType, tabbed)
+        val nextState = previous.toMutableMap()
+        for (group in visibleGroups) {
+            val type = group.first().type
+            if (!tabbed) card.addView(categoryHeader(categoryLabel(type), type))
+            val signature = group.signature()
+            val strip = resultStrip(group)
+            val prior = previous[type]
+            strip.post {
+                if (prior?.signature == signature) strip.scrollTo(prior.scrollX, 0)
+                else strip.fullScroll(View.FOCUS_LEFT)
+            }
+            nextState[type] = RowState(signature, 0, strip)
+            card.addView(strip)
         }
-        rowState = previous + (selectedType to RowState(signature, 0, strip))
-        card.addView(strip)
-
-        val tabs = categoryTabs(groups, selectedType)
-        categoryStrip = tabs
-        tabs.post { tabs.scrollTo(categoryScrollX, 0) }
-        card.addView(tabs)
+        rowState = nextState
+        categoryStrip = null
+        if (tabbed) {
+            val tabs = categoryTabs(groups, selectedType)
+            categoryStrip = tabs
+            tabs.post { tabs.scrollTo(categoryScrollX, 0) }
+            card.addView(tabs)
+        }
         container.addView(card, cardLayoutParams())
     }
 
@@ -178,6 +187,7 @@ class SearchModeResultRenderer(
     ).apply { setMargins(dp(8), dp(8), dp(8), dp(8)) }
 
     private fun categoryHeader(label: String, type: Int) = TextView(context).apply {
+        ohi.andre.consolelauncher.managers.settings.TextShadows.apply(this, Theme.suggestions_text_shadow_color)
         text = label
         setTypeface(Tuils.getTypeface(context), Typeface.BOLD)
         textSize = (XMLPrefsManager.getInt(Suggestions.suggestions_size) * 0.72f).coerceAtLeast(9f)
@@ -240,6 +250,13 @@ class SearchModeResultRenderer(
 
         internal fun groupResults(results: List<SuggestionsManager.SearchResult>): List<List<SuggestionsManager.SearchResult>> =
             categoryOrder.map { type -> results.filter { it.type == type } }.filter { it.isNotEmpty() }
+
+        internal fun visibleGroups(
+            groups: List<List<SuggestionsManager.SearchResult>>,
+            selectedType: Int,
+            tabbed: Boolean
+        ): List<List<SuggestionsManager.SearchResult>> =
+            if (tabbed) groups.filter { it.first().type == selectedType } else groups
 
         internal fun selectedCategoryType(
             previous: Int?,

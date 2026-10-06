@@ -240,7 +240,7 @@ class AppDrawerPaneManager(
         tab.minimumWidth = 0
 
         val selected = (isAll && selectedGroup == null) || (groupName != null && groupName == selectedGroup)
-        val selectedColor = ThemeColorResolver.color(Theme.app_drawer_selection_background_color)
+        val selectedColor = ThemeColorResolver.color(Theme.app_drawer_group_selected_background_color)
         var foregroundColor = ThemeColorResolver.color(Theme.app_drawer_group_text_color)
         var tabBackgroundColor = ThemeColorResolver.color(Theme.app_drawer_group_background_color)
         if (groupName != null) {
@@ -258,7 +258,7 @@ class AppDrawerPaneManager(
         tab.background = TerminalBorderRuntime.panelDrawable(
             context,
             if (selected) selectedColor else tabBackgroundColor,
-            if (selected) ThemeColorResolver.color(Theme.app_drawer_selection_border_color)
+            if (selected) ThemeColorResolver.color(Theme.app_drawer_group_selected_border_color)
             else ThemeColorResolver.color(Theme.app_drawer_group_border_color),
             1.5f,
             2,
@@ -266,7 +266,7 @@ class AppDrawerPaneManager(
             target = FrameTarget.APP_DRAWER
         )
         tab.setTextColor(
-            if (selected) ThemeColorResolver.color(Theme.app_drawer_selection_text_color)
+            if (selected) ThemeColorResolver.color(Theme.app_drawer_group_selected_text_color)
             else foregroundColor
         )
         tab.alpha = 1f
@@ -404,16 +404,16 @@ class AppDrawerPaneManager(
         val selected = letter != null && letter == selectedAlpha
         tab.setTextColor(
             ThemeColorResolver.color(
-            if (selected) Theme.app_drawer_selection_text_color else Theme.app_drawer_group_text_color
+            if (selected) Theme.app_drawer_alphabet_selected_text_color else Theme.app_drawer_alphabet_text_color
             )
         )
-        val selectedColor = ThemeColorResolver.color(Theme.app_drawer_selection_background_color)
+        val selectedColor = ThemeColorResolver.color(Theme.app_drawer_alphabet_selected_background_color)
 
         tab.background = TerminalBorderRuntime.panelDrawable(
             context,
-            if (selected) selectedColor else ThemeColorResolver.color(Theme.app_drawer_group_background_color),
+            if (selected) selectedColor else ThemeColorResolver.color(Theme.app_drawer_alphabet_background_color),
             ThemeColorResolver.color(
-                if (selected) Theme.app_drawer_selection_border_color else Theme.app_drawer_group_border_color
+                if (selected) Theme.app_drawer_alphabet_selected_border_color else Theme.app_drawer_alphabet_border_color
             ),
             1.2f,
             2,

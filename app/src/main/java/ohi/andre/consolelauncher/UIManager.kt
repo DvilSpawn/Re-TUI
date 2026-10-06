@@ -132,6 +132,7 @@ import ohi.andre.consolelauncher.managers.settings.AppearanceSettings.moduleButt
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings.moduleButtonBorderColor
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings.moduleCornerRadius
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings.moduleHeaderTextSize
+import ohi.andre.consolelauncher.managers.settings.TextShadows
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings.moduleNameTextColor
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings.musicWidgetBorderColor
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings.musicWidgetTextColor
@@ -147,6 +148,7 @@ import ohi.andre.consolelauncher.managers.settings.AppearanceSettings.terminalWi
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings.getBoolean
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings.getColor
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings.getInt
+import ohi.andre.consolelauncher.managers.settings.LauncherMode
 import ohi.andre.consolelauncher.managers.settings.MusicSettings.autoShowWidget
 import ohi.andre.consolelauncher.managers.settings.MusicSettings.preferredPackage
 import ohi.andre.consolelauncher.managers.settings.MusicSettings.showWidget
@@ -226,7 +228,6 @@ import kotlin.math.hypot
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
-import android.app.ActivityManager
 import android.app.KeyguardManager
 import android.app.PendingIntent
 import android.bluetooth.BluetoothAdapter
@@ -985,11 +986,11 @@ class UIManager(
         styleUnifiedMetric(unifiedStatusUnlock, R.drawable.ic_status_lock_open_40, Theme.unlock_counter_text_color, compactSize)
 
         unifiedModulesToggle?.apply {
-            imageTintList = ColorStateList.valueOf(getColor(Theme.time_text_color))
+            imageTintList = ColorStateList.valueOf(getColor(Theme.icon_button_color))
             background = TerminalBorderRuntime.panelDrawable(
                 mContext,
-                moduleButtonBackgroundColor(),
-                moduleButtonBorderColor(),
+                getColor(Theme.icon_button_background_color),
+                getColor(Theme.icon_button_border_color),
                 1.25f,
                 moduleCornerRadius(),
                 dashedBorders(),
@@ -1230,7 +1231,7 @@ class UIManager(
 
     private var suggestionsManager: SuggestionsManager? = null
     private val searchOnlyMode: Boolean
-        get() = getBoolean(Behavior.search_only_mode)
+        get() = LauncherMode.isSearch()
 
     private var terminalView: TextView? = null
 
@@ -1371,7 +1372,9 @@ class UIManager(
             }
             false
         }
-        inputView.setOnFocusChangeListener { _, _ ->
+        inputView.setOnFocusChangeListener { _, hasFocus ->
+            suggestionsManager?.setSearchInputActive(keyboardVisible)
+            if (searchOnlyMode && hasFocus) refreshStockSuggestions()
             if (!inputTouchInProgress) applyDisplayMarginsForConfigurationOnMainThread()
         }
         if (inputView is OutlineEditText) {
@@ -2532,6 +2535,7 @@ class UIManager(
                 terminalInput.clearFocus()
             }
         }
+        suggestionsManager?.setSearchInputActive(keyboardVisible)
         setNotificationWidgetCompact(mRootView!!, keyboardVisible)
         updateUnifiedBottomModuleBounds()
         applyTerminalTrayState(false)
@@ -2733,7 +2737,7 @@ class UIManager(
             terminalOutputBorder,
             this.isOutputHeaderNone,
             this.isOutputHeaderArrowsOnly,
-            moduleNameTextColor(),
+            getColor(Theme.tab_text_color),
             outputHeaderTextSize(),
             terminalHeaderTabBackground(),
             onClick = {
@@ -2972,15 +2976,17 @@ class UIManager(
     }
 
     private fun calculateExpandedTerminalTrayHeight(rootHeight: Int, collapsedHeight: Int): Int {
-        val expandedHeight: Int
+        val adaptiveMaximum: Int
         if (rootHeight <= 0) {
-            expandedHeight =
+            adaptiveMaximum =
                 max(collapsedHeight, UIUtils.dpToPx(mContext!!, if (keyboardVisible) 220 else 320))
         } else {
             val trayPercent = if (keyboardVisible) 0.34f else 0.48f
-            expandedHeight = max(collapsedHeight, Math.round(rootHeight * trayPercent))
+            adaptiveMaximum = max(collapsedHeight, Math.round(rootHeight * trayPercent))
         }
-        return applyTerminalTrayMaxHeight(expandedHeight, collapsedHeight)
+        return calculateNativeTerminalTrayHeight(
+            applyTerminalTrayMaxHeight(adaptiveMaximum, collapsedHeight)
+        )
     }
 
     private fun applyTerminalTrayMaxHeight(expandedHeight: Int, collapsedHeight: Int): Int {
@@ -3003,7 +3009,7 @@ class UIManager(
             this.isOutputTrayNativeMode,
             this.isOutputTrayAutoMode,
             this.isOutputAutoHideEnabled,
-            moduleNameTextColor()
+            getColor(Theme.tab_text_color)
         )
     }
 
@@ -3415,7 +3421,7 @@ class UIManager(
         termuxWorkspaceCtrlKey = null
         termuxWorkspaceAltKey = null
         termuxWorkspaceShiftKey = null
-        val normalColor = notificationWidgetTextColor()
+        val normalColor = ThemeColorResolver.color(Theme.workspace_control_text_color)
         for (i in termuxWorkspaceKeySlots.indices) {
             val key = termuxWorkspaceKeySlots[i]
             if (i >= specs.size) {
@@ -3749,7 +3755,7 @@ class UIManager(
     }
 
     private fun updateTermuxWorkspaceModifierButtons() {
-        val normalColor = notificationWidgetTextColor()
+        val normalColor = ThemeColorResolver.color(Theme.workspace_control_text_color)
         val activeColor = terminalBorderColor()
         termuxWorkspaceCtrlKey?.let { key ->
             updateTermuxWorkspaceModifierButton(key, "CTRL", termuxWorkspaceCtrlPending, normalColor, activeColor)
@@ -3777,7 +3783,7 @@ class UIManager(
                 TerminalBorderRuntime.panelDrawable(
                     mContext!!,
                     activeColor,
-                    notificationWidgetTextColor(),
+                    ThemeColorResolver.color(Theme.workspace_control_text_color),
                     1f,
                     outputCornerRadius(),
                     dashedBorders(),
@@ -3886,7 +3892,7 @@ class UIManager(
 
     private fun styleTermuxWorkspaceButton(button: TextView) {
         button.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
-        button.setTextColor(notificationWidgetTextColor())
+        button.setTextColor(ThemeColorResolver.color(Theme.workspace_control_text_color))
         button.setBackground(
             TerminalBorderRuntime.panelDrawable(
                 mContext!!,
@@ -3912,7 +3918,7 @@ class UIManager(
             return
         }
         button.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
-        button.setTextColor(notificationWidgetTextColor())
+        button.setTextColor(ThemeColorResolver.color(Theme.workspace_control_text_color))
         button.includeFontPadding = false
         button.setPadding(
             Tuils.dpToPx(mContext, 3),
@@ -3930,7 +3936,7 @@ class UIManager(
         }
         val icon = ContextCompat.getDrawable(mContext, drawableId) ?: return
         val wrapped = DrawableCompat.wrap(icon).mutate()
-        DrawableCompat.setTint(wrapped, notificationWidgetTextColor())
+        DrawableCompat.setTint(wrapped, ThemeColorResolver.color(Theme.workspace_control_text_color))
         val size = Tuils.dpToPx(mContext, 12)
         wrapped.setBounds(0, 0, size, size)
         button.text = Tuils.EMPTYSTRING
@@ -5060,7 +5066,14 @@ class UIManager(
     }
 
     private fun buildTermuxWorkspaceTmuxCommand(tmuxArgs: String): String {
-        return (mContext.getString(R.string.surface_if_retui_workspace_shell_bash_then_tmux_retui_workspace_sh_4a152, tmuxArgs, tmuxArgs))
+        // Executable shell syntax must never come from a language pack.
+        return """
+            if [ "${'$'}{retui_workspace_shell##*/}" = "bash" ]; then
+              tmux $tmuxArgs "${'$'}retui_workspace_shell" --noprofile --norc
+            else
+              tmux $tmuxArgs "${'$'}retui_workspace_shell"
+            fi
+        """.trimIndent()
     }
 
     private fun buildTermuxWorkspaceFrameScript(): String {
@@ -5488,7 +5501,7 @@ class UIManager(
         if (TextUtils.isEmpty(value)) {
             return out
         }
-        val baseForeground = notificationWidgetTextColor()
+        val baseForeground = ThemeColorResolver.color(Theme.workspace_output_text_color)
         val baseBackground = terminalWindowBackground()
         val style = TermuxAnsiStyle()
         var spanStart = 0
@@ -5533,7 +5546,7 @@ class UIManager(
                     Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
                 )
                 out.setSpan(
-                    BackgroundColorSpan(notificationWidgetTextColor()),
+                    BackgroundColorSpan(ThemeColorResolver.color(Theme.workspace_output_text_color)),
                     index,
                     index + 1,
                     Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
@@ -5852,6 +5865,7 @@ class UIManager(
         val textSize = XMLPrefsManager.getInt(Suggestions.suggestions_size).toFloat()
         for (suggestion in suggestions) {
             val chip = TextView(context)
+            TextShadows.apply(chip, Theme.suggestions_text_shadow_color)
             chip.text = suggestion.label
             chip.gravity = Gravity.CENTER
             chip.setLines(1)
@@ -6955,6 +6969,7 @@ class UIManager(
         if (body == null) {
             return
         }
+        TextShadows.apply(body, Theme.module_text_shadow_color)
         val useThemeTypeface = if (MODULE_TEXT_FONT_MONO == fontMode) {
             false
         } else if (MODULE_TEXT_FONT_THEME == fontMode) {
@@ -7163,6 +7178,7 @@ class UIManager(
     }
 
     private fun refreshSuggestionsForActiveModule() {
+        TextShadows.applyModule(homeModulesContainer)
         refreshModuleSuggestionsStrip()
         // Always rebuild stock chips for current input. Empty-only skipped cases where
         // setText("") didn't fire the watcher (already empty) after module/music actions.
@@ -7875,7 +7891,7 @@ class UIManager(
             Runnable { scrollTermuxOutput(1) },
             Runnable { this.toggleTermuxKeyboard() }
         )
-        val color = notificationWidgetTextColor()
+        val color = ThemeColorResolver.color(Theme.workspace_control_text_color)
         for (i in termuxKeySlots.indices) {
             val key = termuxKeySlots[i]
             val label = labels.getOrNull(i) ?: ""
@@ -7907,7 +7923,7 @@ class UIManager(
         termuxAltKey = null
         termuxShiftKey = null
         val specs = activeTermuxAppKeySpecs()
-        val normalColor = notificationWidgetTextColor()
+        val normalColor = ThemeColorResolver.color(Theme.workspace_control_text_color)
         for (i in termuxKeySlots.indices) {
             val key = termuxKeySlots[i]
             val spec = specs.getOrNull(i)
@@ -8147,7 +8163,7 @@ class UIManager(
     }
 
     private fun updateTermuxAppModifierButtons() {
-        val normalColor = notificationWidgetTextColor()
+        val normalColor = ThemeColorResolver.color(Theme.workspace_control_text_color)
         val activeColor = terminalBorderColor()
         termuxCtrlKey?.let { key ->
             updateTermuxWorkspaceModifierButton(key, "CTRL", termuxCtrlPending, normalColor, activeColor)
@@ -8420,7 +8436,7 @@ class UIManager(
 
         val showTarget = Runnable {
             longPressed = true
-            val textColor = notificationWidgetTextColor()
+            val textColor = ThemeColorResolver.color(Theme.workspace_control_text_color)
             val closeTarget = TextView(mContext).apply {
                 text = "X"
                 gravity = Gravity.CENTER
@@ -9831,7 +9847,7 @@ class UIManager(
     }
 
     private fun overlayActionButton(label: String?, action: Runnable): TextView {
-        val textColor = notificationWidgetTextColor()
+        val textColor = ThemeColorResolver.color(Theme.workspace_control_text_color)
         val labelBg = terminalHeaderTabBackground()
         val margin = Tuils.dpToPx(mContext, 4)
         val minWidth = Tuils.dpToPx(mContext, 76)
@@ -10101,7 +10117,7 @@ class UIManager(
         val target = button ?: return
         target.textSize = PODCAST_TEXT_MEDIUM
         target.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
-        target.setTextColor(notificationWidgetTextColor())
+        target.setTextColor(ThemeColorResolver.color(Theme.workspace_control_text_color))
         target.setBackground(TerminalBorderRuntime.tabDrawable(mContext, terminalHeaderTabBackground(), FrameTarget.OVERLAYS))
     }
 
@@ -10163,7 +10179,7 @@ class UIManager(
         shouldUseResponsiveLandscape(currentConfiguration)
 
     private fun updatePodcastTabStyle() {
-        val textColor = notificationWidgetTextColor()
+        val textColor = ThemeColorResolver.color(Theme.workspace_control_text_color)
         val labelBg = terminalHeaderTabBackground()
         val tabs = arrayOf(podcastTabShows to PODCAST_MODE_SHOWS, podcastPlayShow to PODCAST_MODE_RECENTS)
         for ((tabView, mode) in tabs) {
@@ -11215,7 +11231,7 @@ class UIManager(
         chip.gravity = Gravity.CENTER
         chip.textSize = PODCAST_TEXT_SMALL
         chip.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
-        chip.setTextColor(notificationWidgetTextColor())
+        chip.setTextColor(ThemeColorResolver.color(Theme.workspace_control_text_color))
         chip.setPadding(
             Tuils.dpToPx(mContext, 12),
             Tuils.dpToPx(mContext, 6),
@@ -11336,7 +11352,7 @@ class UIManager(
         titleRow.gravity = Gravity.CENTER_VERTICAL
         val titleView = TextView(mContext)
         titleView.text = title
-        titleView.setTextColor(notificationWidgetTextColor())
+        titleView.setTextColor(ThemeColorResolver.color(Theme.workspace_panel_text_color))
         titleView.setTypeface(Tuils.getTypeface(mContext), if (selected) Typeface.BOLD else Typeface.NORMAL)
         titleView.textSize = PODCAST_TEXT_LARGE
         titleView.maxLines = 3
@@ -11348,7 +11364,7 @@ class UIManager(
             menu.gravity = Gravity.CENTER
             menu.textSize = PODCAST_TEXT_LARGE
             menu.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
-            menu.setTextColor(notificationWidgetTextColor())
+            menu.setTextColor(ThemeColorResolver.color(Theme.workspace_panel_text_color))
             menu.setOnClickListener { menuAction.run() }
             titleRow.addView(menu, LinearLayout.LayoutParams(Tuils.dpToPx(mContext, 28), Tuils.dpToPx(mContext, 28)))
         }
@@ -11356,7 +11372,7 @@ class UIManager(
 
         val metaView = TextView(mContext)
         metaView.text = meta
-        metaView.setTextColor(notificationWidgetTextColor())
+        metaView.setTextColor(ThemeColorResolver.color(Theme.workspace_panel_text_color))
         metaView.setTypeface(Tuils.getTypeface(mContext))
         metaView.textSize = PODCAST_TEXT_MEDIUM
         metaView.maxLines = 2
@@ -11366,7 +11382,7 @@ class UIManager(
         if (subMeta.isNotBlank()) {
             val sub = TextView(mContext)
             sub.text = subMeta
-            sub.setTextColor(ThemeColorResolver.withMaxAlpha(notificationWidgetTextColor(), 190))
+            sub.setTextColor(ThemeColorResolver.withMaxAlpha(ThemeColorResolver.color(Theme.workspace_panel_text_color), 190))
             sub.setTypeface(Tuils.getTypeface(mContext))
             sub.textSize = PODCAST_TEXT_SMALL
             sub.maxLines = 1
@@ -11382,7 +11398,7 @@ class UIManager(
     private fun addPodcastSectionLabel(title: String) {
         val label = TextView(mContext)
         label.text = title.uppercase(Locale.getDefault())
-        label.setTextColor(notificationWidgetTextColor())
+        label.setTextColor(ThemeColorResolver.color(Theme.workspace_panel_text_color))
         label.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
         label.textSize = PODCAST_TEXT_MEDIUM
         label.setPadding(
@@ -11477,7 +11493,7 @@ class UIManager(
         search.contentDescription = mContext.getString(R.string.surface_search_episodes_in_da3a8, show.title)
         search.gravity = Gravity.CENTER
         search.textSize = PODCAST_TEXT_SMALL
-        styleTermuxToolButton(search, notificationWidgetTextColor())
+        styleTermuxToolButton(search, ThemeColorResolver.color(Theme.workspace_control_text_color))
         search.setBackground(TerminalBorderRuntime.tabDrawable(mContext, terminalHeaderTabBackground(), FrameTarget.OVERLAYS))
         search.setOnClickListener { showPodcastEpisodeSearchDialog(show) }
         row.addView(search, LinearLayout.LayoutParams(0, Tuils.dpToPx(mContext, 34), 1f))
@@ -11488,7 +11504,7 @@ class UIManager(
             clear.contentDescription = mContext.getString(R.string.surface_clear_episode_search_d9091)
             clear.gravity = Gravity.CENTER
             clear.textSize = PODCAST_TEXT_SMALL
-            styleTermuxToolButton(clear, notificationWidgetTextColor())
+            styleTermuxToolButton(clear, ThemeColorResolver.color(Theme.workspace_control_text_color))
             clear.setBackground(TerminalBorderRuntime.tabDrawable(mContext, terminalHeaderTabBackground(), FrameTarget.OVERLAYS))
             clear.setOnClickListener {
                 podcastEpisodeQuery = ""
@@ -11570,7 +11586,7 @@ class UIManager(
         val text = SpannableStringBuilder(show.title).append('\n').append(detail)
         text.setSpan(StyleSpan(Typeface.BOLD), 0, show.title.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         title.text = text
-        title.setTextColor(notificationWidgetTextColor())
+        title.setTextColor(ThemeColorResolver.color(Theme.workspace_panel_text_color))
         title.setTypeface(Tuils.getTypeface(mContext))
         title.textSize = PODCAST_TEXT_SMALL
         title.maxLines = 3
@@ -11587,7 +11603,7 @@ class UIManager(
         sort.gravity = Gravity.CENTER
         sort.textSize = PODCAST_TEXT_SMALL
         sort.minWidth = Tuils.dpToPx(mContext, 104)
-        styleTermuxToolButton(sort, notificationWidgetTextColor())
+        styleTermuxToolButton(sort, ThemeColorResolver.color(Theme.workspace_panel_text_color))
         sort.setBackground(TerminalBorderRuntime.tabDrawable(mContext, terminalHeaderTabBackground(), FrameTarget.OVERLAYS))
         sort.setOnClickListener {
             manager.toggleNewestFirst(show)
@@ -11663,7 +11679,7 @@ class UIManager(
 
         val title = TextView(mContext)
         title.text = active?.title ?: current?.getTitle() ?: mContext.getString(R.string.surface_no_podcast_loaded_84fab)
-        title.setTextColor(notificationWidgetTextColor())
+        title.setTextColor(ThemeColorResolver.color(Theme.workspace_panel_text_color))
         title.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
         title.textSize = PODCAST_TEXT_LARGE
         title.maxLines = 3
@@ -11674,7 +11690,7 @@ class UIManager(
 
         val show = TextView(mContext)
         show.text = displayShow?.title ?: mContext.getString(R.string.surface_pick_a_show_to_start_listening_7b228)
-        show.setTextColor(ThemeColorResolver.withMaxAlpha(notificationWidgetTextColor(), 210))
+        show.setTextColor(ThemeColorResolver.withMaxAlpha(ThemeColorResolver.color(Theme.workspace_panel_text_color), 210))
         show.setTypeface(Tuils.getTypeface(mContext))
         show.textSize = PODCAST_TEXT_MEDIUM
         podcastPlayerShowName = show
@@ -11685,7 +11701,7 @@ class UIManager(
         speed.contentDescription = mContext.getString(R.string.surface_podcast_playback_speed_7a955, PodcastManager.formatSpeed(manager.playbackSpeed()))
         speed.gravity = Gravity.CENTER
         speed.textSize = PODCAST_TEXT_SMALL
-        styleTermuxToolButton(speed, notificationWidgetTextColor())
+        styleTermuxToolButton(speed, ThemeColorResolver.color(Theme.workspace_panel_text_color))
         speed.setBackground(TerminalBorderRuntime.tabDrawable(mContext, terminalHeaderTabBackground(), FrameTarget.OVERLAYS))
         speed.setOnClickListener { showPodcastSpeedMenu(speed) }
         val speedParams = LinearLayout.LayoutParams(
@@ -11731,7 +11747,7 @@ class UIManager(
         val content = podcastContent ?: return
         val row = TextView(mContext)
         row.text = text
-        row.setTextColor(notificationWidgetTextColor())
+        row.setTextColor(ThemeColorResolver.color(Theme.workspace_panel_text_color))
         row.setTypeface(Tuils.getTypeface(mContext), if (bold) Typeface.BOLD else Typeface.NORMAL)
         row.textSize = PODCAST_TEXT_MEDIUM
         row.maxLines = 5
@@ -15240,6 +15256,7 @@ class UIManager(
         widgetBorderColor: Int
     ): TextView {
         val row = TextView(mContext)
+        TextShadows.apply(row, Theme.module_text_shadow_color)
         val lp = LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
@@ -15270,6 +15287,7 @@ class UIManager(
         widgetBorderColor: Int
     ): TextView {
         val row = TextView(mContext)
+        TextShadows.apply(row, Theme.module_text_shadow_color)
         val lp = LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
@@ -16199,6 +16217,7 @@ class UIManager(
         if (typeface != null) {
             applyTypefaceRecursively(mRootView, typeface)
         }
+        TextShadows.applyModule(homeModulesContainer)
         LauncherFontScale.applyRecursively(mRootView)
 
         if (mTerminalAdapter != null) {

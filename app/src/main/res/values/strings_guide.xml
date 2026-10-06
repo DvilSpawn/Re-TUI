@@ -13,7 +13,7 @@
     <string name="guide_customize" formatted="false">"Customize"</string>
     <string name="guide_try_wallpaper_color_presets_appearance_settings_and_config_discovery" formatted="false">"Try wallpaper color, presets, appearance settings, and config discovery."</string>
     <string name="guide_derive_colors" formatted="false">"Derive colors"</string>
-    <string name="guide_auto_color_reads_the_current_wallpaper_and_updates_the_terminal_palett" formatted="false">"Auto color reads the current wallpaper and updates the terminal palette."</string>
+    <string name="guide_auto_color_reads_the_current_wallpaper_and_updates_the_terminal_palett" formatted="false">"Auto color applies the home wallpaper palette once, with a system-palette fallback on Android 12 and later. Explicit advanced colors are kept."</string>
     <string name="guide_list_presets" formatted="false">"List presets"</string>
     <string name="guide_presets_are_saved_theme_states_plus_built_in_looks_you_can_apply_later" formatted="false">"Presets are saved theme states plus built-in looks you can apply later."</string>
     <string name="guide_open_appearance_settings" formatted="false">"Open appearance settings"</string>

@@ -190,7 +190,7 @@ class MarkdownEditText(context: Context) : EditText(context) {
     }
 
     private fun styleImages(value: Editable) {
-        Regex("!\\[([^]]*)]\\((images/[^)]+)\\)").findAll(value).forEach { match ->
+        Regex("!\\[([^]]*)]\\(((?:images/|notes-library/\\.assets/)[^)]+)\\)").findAll(value).forEach { match ->
             val maxWidth = (width.takeIf { it > 0 } ?: resources.displayMetrics.widthPixels) - totalPaddingLeft - totalPaddingRight
             val path = match.groups[2]!!.value
             val drawable = imageCache[path] ?: loadImage(path, maxWidth)?.also { imageCache[path] = it } ?: return@forEach

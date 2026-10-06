@@ -36,6 +36,12 @@ static bool containsImperialFootAndInch(const std::string& input) {
     return foot && inch;
 }
 
+static bool hasZeroDenominator(const MathStructure& value) {
+    if (value.isPower() && value.size() == 2 && value[0].isZero() && value[1].representsNegative()) return true;
+    for (size_t i = 0; i < value.size(); ++i) if (hasZeroDenominator(value[i])) return true;
+    return false;
+}
+
 extern "C" JNIEXPORT jbyteArray JNICALL
 Java_ohi_andre_consolelauncher_calculator_NativeQalculate_evaluate(
         JNIEnv* env, jobject, jbyteArray expression, jboolean degrees, jboolean exact) {
@@ -54,6 +60,7 @@ Java_ohi_andre_consolelauncher_calculator_NativeQalculate_evaluate(
             if (!instance->loadGlobalDefinitions()) throw std::runtime_error("Cannot load definitions");
             instance->useDecimalPoint();
             calculator = instance.release();
+            calculator->setPrecision(34);
         }
         calculator->clearMessages();
         EvaluationOptions evaluation;
@@ -63,13 +70,22 @@ Java_ohi_andre_consolelauncher_calculator_NativeQalculate_evaluate(
                 ? MIXED_UNITS_CONVERSION_DEFAULT
                 : MIXED_UNITS_CONVERSION_NONE;
         PrintOptions print;
+        bool approximate = false;
+        print.is_approximate = &approximate;
+        print.preserve_precision = false;
+        print.number_fraction_format = exact ? FRACTION_FRACTIONAL : FRACTION_DECIMAL;
+        print.use_unicode_signs = false;
+        print.digit_grouping = DIGIT_GROUPING_NONE;
         // Synchronous evaluation. The Android service watchdog bounds the entire request,
         // including initialization and formatting, and kills only the native worker process.
         std::string text = calculator->calculateAndPrint(input, 0, evaluation, print);
         bool error = false;
         std::string errors;
         for (auto* message = calculator->message(); message; message = calculator->nextMessage()) {
-            if (message->type() == MESSAGE_ERROR) {
+            // Qalculate can return a number after ignoring a misplaced operator.
+            // Treat that correction as invalid input instead of presenting a misleading success.
+            const std::string detail = message->message();
+            if (message->type() == MESSAGE_ERROR || detail.find("Misplaced operator") != std::string::npos) {
                 error = true;
                 if (errors.size() < 16384) {
                     if (!errors.empty()) errors += '\n';
@@ -77,13 +93,20 @@ Java_ohi_andre_consolelauncher_calculator_NativeQalculate_evaluate(
                 }
             }
         }
+        if (!error) {
+            // Exact evaluation can preserve an undefined quotient as "1 / 0"
+            // without an error message. Inspect the evaluated output structure.
+            MathStructure rendered;
+            calculator->parse(&rendered, text, evaluation.parse_options);
+            if (hasZeroDenominator(rendered)) { error = true; errors = "Division by zero."; }
+        }
         if (error) text = errors;
         if (text.size() > 65536) {
             error = true;
             text = "Calculation result is too long";
         }
         // Standard UTF-8 bytes avoid JNI's modified-UTF-8 restrictions (e.g. emoji).
-        const jbyte status = error ? 1 : 0;
+        const jbyte status = error ? 1 : (approximate ? 2 : 0);
         auto result = env->NewByteArray(static_cast<jsize>(text.size() + 1));
         if (!result) return nullptr;
         env->SetByteArrayRegion(result, 0, 1, &status);

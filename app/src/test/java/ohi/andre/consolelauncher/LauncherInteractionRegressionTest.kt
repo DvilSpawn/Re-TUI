@@ -11,6 +11,17 @@ class LauncherInteractionRegressionTest {
         .first { File(it, "app/src/main").isDirectory }
 
     @Test
+    fun workspaceRenderersDoNotReadModuleTextColors() {
+        val ui = File(root, "app/src/main/java/ohi/andre/consolelauncher/UIManager.kt").readText()
+        for (name in listOf("styleTermuxWorkspaceButton", "styleTermuxWorkspaceChromeIcon",
+            "renderTermuxWorkspaceAnsi", "updateTermuxAppKeyMode", "addPodcastCard", "renderPodcastPlayer")) {
+            val method = ui.substringAfter("private fun $name(").substringBefore("\n    private fun ")
+            assertFalse("Module colors leaked into $name", method.contains("notificationWidgetTextColor()"))
+            assertTrue("Missing workspace color in $name", method.contains("Theme.workspace_"))
+        }
+    }
+
+    @Test
     fun terminalTapDefersImeAndDrawerFooterHasClearance() {
         val ui = File(root, "app/src/main/java/ohi/andre/consolelauncher/UIManager.kt").readText()
         val click = ui.substringAfter("val openTerminalInput = View.OnClickListener").substringBefore("inputView.setOnClickListener")
@@ -54,6 +65,17 @@ class LauncherInteractionRegressionTest {
         assertTrue(handler.contains("hideAppsDrawer()"))
         assertTrue(handler.contains("openHomePage()"))
         assertTrue(handler.contains("closeTermuxConsole()"))
+    }
+
+    @Test
+    fun modeCommandWritesChoiceSettingAndKeepsLegacyBooleanReadOnly() {
+        val mode = File(root, "app/src/main/java/ohi/andre/consolelauncher/commands/main/raw/mode.kt").readText()
+        assertTrue(mode.contains("LauncherMode.set(pack.context, mode)"))
+        assertFalse(mode.contains("Behavior.search_only_mode"))
+        assertTrue(mode.contains("LauncherMode.current()"))
+
+        val commands = File(root, "app/src/main/res/values/strings_commands.xml").readText()
+        assertTrue(commands.contains("mode classic|search"))
     }
 
     @Test

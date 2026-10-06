@@ -2,9 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- The basic calculator remains available on API 23; native entry is guarded at API 24. -->
-    <uses-sdk tools:overrideLibrary="com.jherkenhoff.libqalculate" />
-
     <queries>
         <package android:name="com.termux" />
         <package android:name="net.dinglisch.android.taskerm" />

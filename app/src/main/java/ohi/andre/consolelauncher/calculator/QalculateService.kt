@@ -13,17 +13,24 @@ class QalculateService : Service() {
     private val main = Handler(Looper.getMainLooper())
     private val worker = Executors.newSingleThreadExecutor()
     private var busy = false
+    private var activeId: String? = null
+    private var activeTarget: Messenger? = null
     private val messenger = Messenger(Handler(Looper.getMainLooper()) { request ->
         if (request.what == 1 && request.replyTo != null) calculate(request)
+        if (request.what == 2 && busy && request.data.getString("id") == activeId) {
+            activeTarget?.let { reply(it, getString(R.string.calculator_cancelled), true, failure = "cancelled") }
+            android.os.Process.killProcess(android.os.Process.myPid())
+        }
         true
     })
 
     override fun onBind(intent: Intent): IBinder = messenger.binder
 
-    private fun reply(target: Messenger, text: String, error: Boolean) {
+    private fun reply(target: Messenger, text: String, error: Boolean, approximate: Boolean = false, reusable: String? = null, failure: String? = null) {
         try {
             target.send(Message.obtain(null, 1).apply {
-                data = Bundle().apply { putString("text", text.take(16384)); putBoolean("error", error) }
+                data = Bundle().apply { putString("text", text); putBoolean("error", error)
+                    putBoolean("approximate", approximate); putString("reusable", reusable); putString("failure", failure) }
             })
         } catch (_: RemoteException) { /* The requesting activity or launcher has gone away. */ }
     }
@@ -36,11 +43,12 @@ class QalculateService : Service() {
             reply(target, getString(R.string.calculator_invalid), true); return
         }
         busy = true
+        activeId = request.data.getString("id"); activeTarget = target
         val degrees = request.data.getBoolean("degrees")
         val exact = request.data.getBoolean("exact")
         // Android has no pthread cancellation. The deadline kills only this service process.
         val watchdog = Runnable {
-            reply(target, getString(R.string.calculator_timeout), true)
+            reply(target, getString(R.string.calculator_timeout), true, failure = "timeout")
             android.os.Process.killProcess(android.os.Process.myPid())
         }
         main.postDelayed(watchdog, 4000)
@@ -57,7 +65,15 @@ class QalculateService : Service() {
             main.post {
                 main.removeCallbacks(watchdog)
                 busy = false
-                reply(target, result.text, result.error)
+                activeId = null; activeTarget = null
+                val message = when(result.failure) {
+                    "division_by_zero" -> getString(R.string.calculator_div_zero)
+                    "domain" -> getString(R.string.calculator_domain)
+                    "unsupported" -> getString(R.string.calculator_unsupported)
+                    "syntax" -> getString(R.string.calculator_invalid) + "\n" + result.text
+                    else -> result.text
+                }
+                reply(target, message, result.error, result.approximate, result.reusable, result.failure)
             }
         }
     }
@@ -66,7 +82,9 @@ class QalculateService : Service() {
         main.removeCallbacksAndMessages(null)
         worker.shutdownNow()
         super.onDestroy()
-        // The engine owns native globals and threads; discard them between bound sessions.
-        android.os.Process.killProcess(android.os.Process.myPid())
+        // Do not kill an idle bound-service process: an immediate new bind can race
+        // teardown and Android then throttles restarts. Unfinished native work
+        // still must be discarded; idle definitions may remain process-cached.
+        if (busy) android.os.Process.killProcess(android.os.Process.myPid())
     }
 }

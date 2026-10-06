@@ -195,6 +195,7 @@ internal class SuggestionChipStyler(private val pack: MainPack) {
     private val suggDefaultText = XMLPrefsManager.getColor(Suggestions.default_text_color)
 
     fun apply(view: TextView, type: Int, payload: Any?) {
+        ohi.andre.consolelauncher.managers.settings.TextShadows.apply(view, ohi.andre.consolelauncher.managers.xml.options.Theme.suggestions_text_shadow_color)
         var bgColor = Int.MAX_VALUE
         var textColor = Int.MAX_VALUE
         var styledPayload = payload

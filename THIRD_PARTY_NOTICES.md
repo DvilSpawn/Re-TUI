@@ -117,7 +117,7 @@ from exported frame packs, presets, shareable configurations, and backups.
 
 ## Material Symbols Rounded
 
-The compact unified-status controls include a subset of Material Symbols
+The compact unified-status controls and calculator tabs include a subset of Material Symbols
 Rounded by Google LLC.
 
 Source: https://github.com/google/material-design-icons
