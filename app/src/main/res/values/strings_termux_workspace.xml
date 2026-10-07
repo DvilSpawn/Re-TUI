@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="workspace_bridge_connecting">Connecting</string>
+    <string name="workspace_bridge_ready">Ready</string>
+    <string name="workspace_bridge_disconnected">Disconnected · refresh to reconnect</string>
+    <string name="workspace_bridge_input_not_sent">Input not sent · wait for Ready or reconnect</string>
+    <string name="workspace_bridge_label">%2$s · %1$s</string>
+    <string name="workspace_bridge_snapshot">Snapshot · refresh for updates</string>
+</resources>

@@ -19,6 +19,7 @@ class CalculatorSessionIntegrationTest {
         val keys = listOf("terminal_ans", "terminal_transcript", "terminal_draft")
         val saved = keys.associateWith { prefs.getString(it, null) }
         val cursor = prefs.getInt("terminal_cursor", 0)
+        val selectionEnd = prefs.getInt("terminal_selection_end", cursor)
         var activity: CalculatorActivity? = null
         try {
             prefs.edit().remove("terminal_ans").remove("terminal_transcript").remove("terminal_draft").commit()
@@ -34,7 +35,7 @@ class CalculatorSessionIntegrationTest {
                 assertEquals("12×34", field.text.toString()); assertEquals(3, field.selectionStart)
                 field.setText(""); key("√").performClick()
                 assertEquals("sqrt()", field.text.toString()); assertEquals(5, field.selectionStart)
-                field.setText("44")
+                field.setText("44"); field.setSelection(2)
                 activity!!.findViewById<View>(R.id.calculator_letters_tab).performClick()
                 val letters = activity!!.findViewById<android.view.ViewGroup>(R.id.calculator_symbols)
                 (0 until letters.childCount).map { letters.getChildAt(it) as TextView }.first { it.text.toString() == "F" }.performClick()
@@ -42,18 +43,20 @@ class CalculatorSessionIntegrationTest {
                 activity!!.findViewById<View>(R.id.calculator_functions_tab).performClick()
                 (0 until letters.childCount).map { letters.getChildAt(it) as TextView }.first { it.text.toString() == "sqrt" }.performClick()
                 assertEquals("44fsqrt()", field.text.toString())
+                assertTrue("Percent remains available on the function layer", (0 until letters.childCount).any { (letters.getChildAt(it) as TextView).text.toString() == "%" })
                 activity!!.findViewById<View>(R.id.calculator_numbers_tab).performClick()
                 assertEquals(View.VISIBLE, activity!!.findViewById<View>(R.id.calculator_main_pane).visibility)
                 assertEquals(96, activity!!.findViewById<ImageButton>(R.id.calculator_help_tab).imageAlpha)
                 assertEquals(255, activity!!.findViewById<ImageButton>(R.id.calculator_main_tab).imageAlpha)
                 activity!!.findViewById<View>(R.id.calculator_help_tab).performClick()
-                assertEquals(View.GONE, activity!!.findViewById<View>(R.id.calculator_main_pane).visibility)
-                assertEquals(View.VISIBLE, activity!!.findViewById<View>(R.id.calculator_help_pane).visibility)
+                assertEquals("Help uses the same terminal and keypad", View.VISIBLE, activity!!.findViewById<View>(R.id.calculator_main_pane).visibility)
+                assertEquals("", field.text.toString())
+                assertTrue(activity!!.findViewById<TextView>(R.id.calculator_result).text.contains("1"))
                 assertEquals(255, activity!!.findViewById<ImageButton>(R.id.calculator_help_tab).imageAlpha)
                 assertEquals(96, activity!!.findViewById<ImageButton>(R.id.calculator_main_tab).imageAlpha)
                 activity!!.findViewById<View>(R.id.calculator_main_tab).performClick()
                 assertEquals(View.VISIBLE, activity!!.findViewById<View>(R.id.calculator_main_pane).visibility)
-                assertEquals("44", field.text.toString())
+                assertEquals("44fsqrt()", field.text.toString())
             }
             fun execute(expression: String): String {
                 instrumentation.runOnMainSync {
@@ -68,6 +71,13 @@ class CalculatorSessionIntegrationTest {
                 }
                 assertTrue("Calculation timed out: $expression", complete)
                 return prefs.getString("terminal_ans", "").orEmpty()
+            }
+            assertEquals("7", execute("7")) // Digits in calculator mode are arithmetic, not help choices.
+            execute("2+")
+            assertEquals("7", prefs.getString("terminal_ans", null))
+            instrumentation.runOnMainSync {
+                assertEquals("2+", activity!!.findViewById<EditText>(R.id.calculator_expression).text.toString())
+                assertTrue(activity!!.findViewById<TextView>(R.id.calculator_result).text.contains("calc> 2+"))
             }
             val first = execute("5 ft to miles")
             assertTrue(first, first.contains("0.000946969696")); assertTrue(first, first.contains("mi"))
@@ -93,7 +103,7 @@ class CalculatorSessionIntegrationTest {
             instrumentation.runOnMainSync { activity?.finishAndRemoveTask() }
             val editor = prefs.edit()
             saved.forEach { (key,value) -> editor.putString(key,value) }
-            editor.putInt("terminal_cursor",cursor).commit()
+            editor.putInt("terminal_cursor",cursor).putInt("terminal_selection_end", selectionEnd).commit()
         }
     }
 }

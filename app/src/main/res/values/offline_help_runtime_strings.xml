@@ -1,0 +1,4 @@
+<resources>
+    <string name="offline_help_no_reference">No command reference is available for this command in this build.</string>
+    <string name="offline_help_invalid_choice">Choose one of the numbers shown on this page.</string>
+</resources>

@@ -259,6 +259,7 @@ object PresetManager {
         return importExtractedFolder(name, source, null)
     }
 
+    @Synchronized
     internal fun importExtractedFolder(
         name: kotlin.String,
         source: File,
@@ -268,15 +269,21 @@ object PresetManager {
         val base = cleanPresetPackageName(name)
         var cleanName = base
         var suffix = 2
-        while (File(presetsDir, cleanName).exists() || packageFile(cleanName).exists()) {
+        val existing = listAllPresetNames()
+        while (containsIgnoreCase(existing, cleanName) || File(presetsDir, cleanName).exists() || packageFile(cleanName).exists()) {
             cleanName = "$base ($suffix)"
             suffix++
         }
         val presetFolder = File(presetsDir, cleanName)
         check(presetFolder.mkdirs()) { "Unable to create preset folder" }
-        copySanitizedXmlFiles(source, presetFolder, behaviorLabels)
-        FrameManager.copyPortableState(source, presetFolder)
-        return cleanName
+        try {
+            copySanitizedXmlFiles(source, presetFolder, behaviorLabels)
+            FrameManager.copyPortableState(source, presetFolder)
+            return cleanName
+        } catch (error: Exception) {
+            presetFolder.deleteRecursively()
+            throw error
+        }
     }
 
     @Throws(Exception::class)
@@ -972,7 +979,7 @@ object PresetManager {
     }
 
     @Throws(Exception::class)
-    private fun validatePresetFolder(folder: File?) {
+    internal fun validatePresetFolder(folder: File?) {
         validateXmlRoot(
             File(folder, XMLPrefsManager.XMLPrefsRoot.THEME.path),
             XMLPrefsManager.XMLPrefsRoot.THEME.name

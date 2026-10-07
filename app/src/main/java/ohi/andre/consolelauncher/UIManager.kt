@@ -417,6 +417,8 @@ class UIManager(
     private var termuxWorkspaceSocketClient: TermuxWorkspaceSocketClient? = null
     private var termuxWorkspaceSocketName: String? = null
     private var termuxWorkspaceSocketToken: String? = null
+    private var termuxWorkspaceCurrentWindow: String? = null
+    private var termuxWorkspaceConnectionStatus: String? = null
     private var termuxWorkspaceLastCols = 80
     private var termuxWorkspaceLastRows = 24
     private var termuxWorkspaceLastRenderedFrameKey: String? = null
@@ -3193,6 +3195,7 @@ class UIManager(
         termuxWorkspaceInputGroup = workspacePage.findViewById<View?>(R.id.termux_workspace_input_group)
         termuxWorkspaceOutputPanel = workspacePage.findViewById<View?>(R.id.termux_workspace_output_panel)
         termuxWorkspaceOutputLabel = workspacePage.findViewById<TextView?>(R.id.termux_workspace_output_label)
+        termuxWorkspaceOutputLabel?.movementMethod = LinkMovementMethod.getInstance()
         termuxWorkspaceOutputLabel?.addOnLayoutChangeListener { view, _, _, _, _, _, _, _, _ ->
             view.translationY = -(view.top + view.height / 2f)
         }
@@ -4021,6 +4024,7 @@ class UIManager(
     }
 
     private fun setTermuxWorkspaceChromeActive(active: Boolean) {
+        if (!active) stopTermuxWorkspaceSocketClient()
         if (termuxWorkspaceChromeActive == active) {
             return
         }
@@ -4398,6 +4402,8 @@ class UIManager(
             newTermuxWorkspaceWindow(rest)
         } else if ("launch" == verb || "run" == verb) {
             launchTermuxWorkspaceLauncher(rest)
+        } else if ("switch" == verb || "select" == verb || "window" == verb || "tab" == verb || "focus" == verb) {
+            selectTermuxWorkspaceWindow(rest)
         } else if ("save" == verb) {
             saveTermuxWorkspaceLauncher(rest)
         } else if ("rm" == verb || "remove" == verb) {
@@ -4492,6 +4498,7 @@ class UIManager(
             return
         }
         clearTermuxWorkspaceLocalOutputHold()
+        if (dispatchTermuxWorkspaceSocketMutation { client, geometry -> client.selectWindow(target, geometry.cols, geometry.rows) }) return
         renderTermuxWorkspaceStatus(mContext.getString(R.string.surface_select_tmux_window_a51c6, target))
         dispatchTermuxWorkspaceScript("select", buildTermuxWorkspaceSelectScript(target), true)
     }
@@ -4509,17 +4516,10 @@ class UIManager(
     }
 
     private fun normalizeTermuxWorkspaceWindowTarget(rawTarget: String): String {
-        val token = rawTarget.trim { it <= ' ' }
-            .split("\\s+".toRegex())
-            .firstOrNull()
-            ?.trim('[', ']')
-            ?.removeSuffix("*")
-            ?: Tuils.EMPTYSTRING
-        if (token.isEmpty()) {
-            return Tuils.EMPTYSTRING
-        }
-        val separator = token.indexOf(':')
-        return if (separator > 0) token.substring(0, separator) else token
+        val target = rawTarget.trim { it <= ' ' }
+        val displayToken = target.trim('[', ']')
+        val index = displayToken.substringBefore(':')
+        return if (displayToken.contains(':') && index.isNotEmpty() && index.all { it.isDigit() }) index else target
     }
 
     private fun isLikelyTermuxWorkspaceWindowTarget(value: String): Boolean {
@@ -4581,15 +4581,19 @@ class UIManager(
 
     private fun reconnectTermuxWorkspace() {
         stopTermuxWorkspaceSocketClient()
+        setTermuxWorkspaceConnectionStatus(R.string.workspace_bridge_connecting)
         renderTermuxWorkspaceStatus("reconnecting")
         refreshTermuxWorkspace(true)
     }
 
     private fun refreshTermuxWorkspace(announce: Boolean) {
+        if (!termuxWorkspaceChromeActive || !launcherWindowFocused) return
+        if (termuxWorkspaceSocketClient != null && termuxWorkspaceSocketClient?.connected != true) return
         clearTermuxWorkspaceLocalOutputHold()
         if (captureTermuxWorkspaceSocket()) {
             return
         }
+        setTermuxWorkspaceConnectionStatus(R.string.workspace_bridge_connecting)
         if (announce) {
             renderTermuxWorkspaceStatus("refreshing")
         }
@@ -4651,49 +4655,28 @@ class UIManager(
         return client.capture(geometry.cols, geometry.rows)
     }
 
-    private fun sendTermuxWorkspaceSocketInput(input: String): Boolean {
-        val client = termuxWorkspaceSocketClient ?: return false
-        if (!client.connected) {
-            return false
-        }
-        val geometry = calculateTermuxWorkspaceGeometry()
-        return client.sendInput(input, geometry.cols, geometry.rows)
-    }
+    private fun sendTermuxWorkspaceSocketInput(input: String): Boolean =
+        dispatchTermuxWorkspaceSocketMutation { client, geometry -> client.sendInput(input, geometry.cols, geometry.rows) }
 
-    private fun sendTermuxWorkspaceSocketText(text: String): Boolean {
-        val client = termuxWorkspaceSocketClient ?: return false
-        if (!client.connected) {
-            return false
-        }
-        val geometry = calculateTermuxWorkspaceGeometry()
-        return client.typeInput(text, geometry.cols, geometry.rows)
-    }
+    private fun sendTermuxWorkspaceSocketText(text: String): Boolean =
+        dispatchTermuxWorkspaceSocketMutation { client, geometry -> client.typeInput(text, geometry.cols, geometry.rows) }
 
-    private fun sendTermuxWorkspaceSocketKey(key: String): Boolean {
-        val client = termuxWorkspaceSocketClient ?: return false
-        if (!client.connected) {
-            return false
-        }
-        val geometry = calculateTermuxWorkspaceGeometry()
-        return client.key(key, geometry.cols, geometry.rows)
-    }
+    private fun sendTermuxWorkspaceSocketKey(key: String): Boolean =
+        dispatchTermuxWorkspaceSocketMutation { client, geometry -> client.key(key, geometry.cols, geometry.rows) }
 
-    private fun newTermuxWorkspaceSocketWindow(name: String, initialCommand: String): Boolean {
-        val client = termuxWorkspaceSocketClient ?: return false
-        if (!client.connected) {
-            return false
-        }
-        val geometry = calculateTermuxWorkspaceGeometry()
-        return client.newWindow(name, initialCommand, geometry.cols, geometry.rows)
-    }
+    private fun newTermuxWorkspaceSocketWindow(name: String, initialCommand: String): Boolean =
+        dispatchTermuxWorkspaceSocketMutation { client, geometry -> client.newWindow(name, initialCommand, geometry.cols, geometry.rows) }
 
-    private fun switchTermuxWorkspaceSocketWindow(direction: String): Boolean {
+    private fun switchTermuxWorkspaceSocketWindow(direction: String): Boolean =
+        dispatchTermuxWorkspaceSocketMutation { client, geometry -> client.switchWindow(direction, geometry.cols, geometry.rows) }
+
+    private fun dispatchTermuxWorkspaceSocketMutation(send: (TermuxWorkspaceSocketClient, TermuxWorkspaceGeometry) -> Boolean): Boolean {
         val client = termuxWorkspaceSocketClient ?: return false
-        if (!client.connected) {
-            return false
+        if (!client.connected || !send(client, calculateTermuxWorkspaceGeometry())) {
+            setTermuxWorkspaceConnectionStatus(R.string.workspace_bridge_input_not_sent)
         }
-        val geometry = calculateTermuxWorkspaceGeometry()
-        return client.switchWindow(direction, geometry.cols, geometry.rows)
+        // A selected transport never falls through to a second mutation path.
+        return true
     }
 
     private fun refreshTermuxWorkspaceSocketGeometry(forceCapture: Boolean) {
@@ -4853,6 +4836,9 @@ class UIManager(
 
     private fun ensureTermuxWorkspaceBridgeReady(echoFailure: Boolean): Boolean {
         val status = TermuxBridgeManager.status(mContext!!)
+        if (!status.termuxInstalled || !status.runCommandDeclared || !status.runCommandGranted) {
+            setTermuxWorkspaceConnectionStatus(R.string.workspace_bridge_disconnected)
+        }
         if (!status.termuxInstalled) {
             if (echoFailure) renderTermuxWorkspaceStatus(mContext.getString(R.string.surface_termux_is_not_installed_3aba0))
             return false
@@ -5036,10 +5022,9 @@ class UIManager(
             }
         }
         env.append("RETUI_TCP_PORT=").append(shellQuote(TERMUX_WORKSPACE_TCP_PORT.toString())).append(' ')
-        return ("if command -v retui >/dev/null 2>&1; then\n"
+        return ("if command -v retui >/dev/null 2>&1 && retui bridge capabilities 2>/dev/null | grep -F -x -- " + shellQuote(action) + " >/dev/null; then\n"
                 + "  RETUI_SESSION=" + shellQuote(TERMUX_WORKSPACE_SESSION) + " " + env + "retui bridge " + action + "\n"
-                + "  retui_status=\$?\n"
-                + "  if [ \"\$retui_status\" -eq 0 ]; then exit 0; fi\n"
+                + "  exit \$?\n"
                 + "fi")
     }
 
@@ -5081,18 +5066,23 @@ class UIManager(
         return ("printf '%s ' '__RETUI_WINDOW__'\n"
                 + "tmux display-message -p -t " + session + " '#I:#W'\n"
                 + "printf '%s ' '__RETUI_WINDOWS__'\n"
-                + "tmux list-windows -t " + session + " -F '#I:#W#{?window_active,*,}' | tr '\\n' ' '\n"
+                + "tmux list-windows -t " + session + " -F '#I:#W#{?window_active,*,}' | tr '\\n' '\\t'\n"
                 + "printf '\\n'\n"
                 + "printf '%s %s\\n' '__RETUI_COLS__' '" + calculateTermuxWorkspaceGeometry().cols + "'\n"
                 + "printf '%s %s\\n' '__RETUI_ROWS__' '" + calculateTermuxWorkspaceGeometry().rows + "'\n"
                 + "printf '%s ' '__RETUI_CURSOR__'\n"
                 + "tmux display-message -p -t " + session + " '#{cursor_x}:#{cursor_y}' 2>/dev/null || printf '%s\\n' '0:0'\n"
-                + "printf '%s\\n' '__RETUI_FRAME_BEGIN__'\n"
-                + "tmux capture-pane -t " + session + " -p -e -N\n"
+                + "printf '%s ' '__RETUI_FRAME_BASE64__'\n"
+                + "tmux capture-pane -t " + session + " -p -e -N | base64 | tr -d '\\n'\n"
+                + "printf '\\n'\n"
                 + "printf '%s\\n' '__RETUI_FRAME_END__'")
     }
 
     private fun renderTermuxWorkspaceStatus(status: String?) {
+        if (termuxWorkspaceCurrentWindow != null && termuxWorkspaceBuffer.isNotEmpty()) {
+            termuxWorkspaceLabel?.contentDescription = status
+            return
+        }
         val out = StringBuilder()
         out.append(mContext.getString(R.string.surface_re_t_ui_tmux_workspace_a062d)).append('\n')
         out.append(mContext.getString(R.string.surface_session_5f810)).append(TERMUX_WORKSPACE_SESSION).append('\n')
@@ -5122,6 +5112,7 @@ class UIManager(
         exitCode: Int,
         debug: String?
     ) {
+        if (!termuxWorkspaceChromeActive || !launcherWindowFocused) return
         val sequence = termuxWorkspaceResultSequence(label)
         if (sequence > 0 && sequence < termuxWorkspaceAcceptedSequence) {
             return
@@ -5138,6 +5129,13 @@ class UIManager(
                 || !TextUtils.isEmpty(stderr)
                 || !TextUtils.isEmpty(error)
                 || !TextUtils.isEmpty(debug)
+        if (termuxWorkspaceSocketClient == null) {
+            setTermuxWorkspaceConnectionStatus(if (hasDiagnostics) R.string.workspace_bridge_disconnected else R.string.workspace_bridge_snapshot)
+        }
+        if (termuxWorkspaceLocalCommandMode) {
+            renderTermuxWorkspaceLocalCommandDraft()
+            return
+        }
         if (!hasDiagnostics && parsed.frame != null) {
             updateTermuxWorkspaceOutput(parsed.frame, parsed.cursorX, parsed.cursorY, parsed.cols, parsed.rows)
             return
@@ -5181,14 +5179,16 @@ class UIManager(
     }
 
     private fun startTermuxWorkspaceSocketClient(frame: TermuxWorkspaceFrame) {
+        if (!termuxWorkspaceChromeActive || !launcherWindowFocused) return
         val socketName = frame.socketName ?: return
         val token = frame.socketToken ?: return
+        if (socketName != TERMUX_WORKSPACE_SOCKET_NAME || frame.socketProtocol != "retui-bridge-socket-v3"
+            || !token.matches(Regex("[A-Za-z0-9_-]{1,128}"))
+            || (frame.tcpHost != null && frame.tcpHost != "127.0.0.1")
+            || (frame.tcpPort != null && frame.tcpPort !in 1..65535)) return
         val current = termuxWorkspaceSocketClient
-        if (current != null && current.connected
-            && socketName == termuxWorkspaceSocketName
-            && token == termuxWorkspaceSocketToken
-        ) {
-            refreshTermuxWorkspaceSocketGeometry(true)
+        if (current != null && socketName == termuxWorkspaceSocketName && token == termuxWorkspaceSocketToken) {
+            if (current.connected) refreshTermuxWorkspaceSocketGeometry(true)
             return
         }
 
@@ -5198,53 +5198,44 @@ class UIManager(
         val geometry = calculateTermuxWorkspaceGeometry()
         termuxWorkspaceLastCols = geometry.cols
         termuxWorkspaceLastRows = geometry.rows
-        val client = TermuxWorkspaceSocketClient(object : TermuxWorkspaceSocketClient.Listener {
+        lateinit var client: TermuxWorkspaceSocketClient
+        client = TermuxWorkspaceSocketClient(object : TermuxWorkspaceSocketClient.Listener {
             override fun onFrame(frame: String) {
                 runOnUiThread(Runnable {
-                    if (System.currentTimeMillis() < termuxWorkspaceLocalOutputHoldUntilMs) {
-                        return@Runnable
-                    }
+                    if (termuxWorkspaceSocketClient !== client || !termuxWorkspaceChromeActive || !launcherWindowFocused
+                        || termuxWorkspaceLocalCommandMode || System.currentTimeMillis() < termuxWorkspaceLocalOutputHoldUntilMs) return@Runnable
                     val parsed = parseTermuxWorkspaceFrame(frame)
                     updateTermuxWorkspaceChrome(parsed)
-                    updateTermuxWorkspaceOutput(
-                        parsed.frame ?: Tuils.EMPTYSTRING,
-                        parsed.cursorX,
-                        parsed.cursorY,
-                        parsed.cols,
-                        parsed.rows
-                    )
+                    updateTermuxWorkspaceOutput(parsed.frame ?: Tuils.EMPTYSTRING, parsed.cursorX, parsed.cursorY, parsed.cols, parsed.rows)
                 })
             }
 
             override fun onStatus(status: String) {
-                if (!TextUtils.isEmpty(status) && !"ok".equals(status, ignoreCase = true)) {
-                    runOnUiThread(Runnable { renderTermuxWorkspaceStatus(mContext.getString(R.string.surface_socket_a559b, status)) })
-                }
+                runOnUiThread(Runnable {
+                    if (termuxWorkspaceSocketClient !== client) return@Runnable
+                    if (status == "ok") setTermuxWorkspaceConnectionStatus(R.string.workspace_bridge_ready)
+                })
             }
 
             override fun onError(message: String) {
                 runOnUiThread(Runnable {
-                    renderTermuxWorkspaceStatus(mContext.getString(R.string.surface_socket_bridge_error_5de4e, message))
-                    if (termuxWorkspaceSocketClient?.connected != true) {
-                        stopTermuxWorkspaceSocketClient()
-                        dispatchTermuxWorkspaceScript(
-                            "capture-fallback",
-                            buildTermuxWorkspaceLegacyCaptureScript(),
-                            false
-                        )
-                    }
+                    if (termuxWorkspaceSocketClient !== client) return@Runnable
+                    stopTermuxWorkspaceSocketClient()
+                    setTermuxWorkspaceConnectionStatus(R.string.workspace_bridge_disconnected)
+                    termuxWorkspaceLabel?.contentDescription = message
                 })
             }
 
             override fun onClosed() {
                 runOnUiThread(Runnable {
-                    if (socketName == termuxWorkspaceSocketName && token == termuxWorkspaceSocketToken) {
-                        termuxWorkspaceSocketClient = null
-                    }
+                    if (termuxWorkspaceSocketClient !== client) return@Runnable
+                    stopTermuxWorkspaceSocketClient()
+                    setTermuxWorkspaceConnectionStatus(R.string.workspace_bridge_disconnected)
                 })
             }
         })
         termuxWorkspaceSocketClient = client
+        setTermuxWorkspaceConnectionStatus(R.string.workspace_bridge_connecting)
         client.connect(socketName, token, geometry.cols, geometry.rows, frame.tcpHost, frame.tcpPort, true)
     }
 
@@ -5273,7 +5264,7 @@ class UIManager(
     }
 
     private fun parseTermuxWorkspaceFrame(stdout: String?): TermuxWorkspaceFrame {
-        if (TextUtils.isEmpty(stdout)) {
+        if (TextUtils.isEmpty(stdout) || (stdout?.length ?: 0) > 262144) {
             return TermuxWorkspaceFrame(null, null, null, null, null, null, null, null, null, null, null, null, null, null)
         }
         val frame = StringBuilder()
@@ -5292,8 +5283,15 @@ class UIManager(
         var cursorY: Int? = null
         var hasFrameMarkers = false
         val lines = stdout!!.split("\n".toRegex()).dropLastWhile { it.isEmpty() }
-        for (line in lines) {
-            if (line.startsWith("__RETUI_WINDOW__")) {
+        for ((index, line) in lines.withIndex()) {
+            // Once the body begins, terminal text is never protocol metadata.
+            if (hasFrameMarkers) {
+                if (line == "__RETUI_FRAME_END__" && index == lines.lastIndex) break
+                if (frame.isNotEmpty()) frame.append('\n')
+                frame.append(line)
+                continue
+            }
+            if (line.startsWith("__RETUI_WINDOW__ ")) {
                 window = line.substring("__RETUI_WINDOW__".length).trim { it <= ' ' }
             } else if (line.startsWith("__RETUI_WINDOWS__")) {
                 windows = line.substring("__RETUI_WINDOWS__".length).trim { it <= ' ' }
@@ -5321,7 +5319,16 @@ class UIManager(
                 )
                 cursorX = cursor?.first
                 cursorY = cursor?.second
-            } else if (line.startsWith("__RETUI_FRAME_BEGIN__")) {
+            } else if (line.startsWith("__RETUI_FRAME_BASE64__ ")) {
+                val encoded = line.substringAfter(' ')
+                if (encoded.length > 262144) break
+                try {
+                    frame.append(String(android.util.Base64.decode(encoded, android.util.Base64.DEFAULT), Charsets.UTF_8))
+                } catch (e: IllegalArgumentException) {
+                    frame.setLength(0)
+                }
+                break
+            } else if (line == "__RETUI_FRAME_BEGIN__") {
                 hasFrameMarkers = true
             } else if (line.startsWith("__RETUI_FRAME_END__")) {
                 break
@@ -5345,10 +5352,10 @@ class UIManager(
             socketToken,
             tcpHost,
             tcpPort,
-            cols,
-            rows,
-            cursorX,
-            cursorY
+            cols?.coerceIn(20, 240),
+            rows?.coerceIn(8, 120),
+            cursorX?.coerceIn(0, (cols?.coerceIn(20, 240) ?: 80) - 1),
+            cursorY?.coerceIn(0, (rows?.coerceIn(8, 120) ?: 24) - 1)
         )
     }
 
@@ -5362,13 +5369,22 @@ class UIManager(
         return Pair(max(0, x), max(0, y))
     }
 
+    private fun setTermuxWorkspaceConnectionStatus(resource: Int) {
+        termuxWorkspaceConnectionStatus = mContext.getString(resource)
+        updateTermuxWorkspaceConnectionLabel()
+    }
+
+    private fun updateTermuxWorkspaceConnectionLabel() {
+        val title = termuxWorkspaceCurrentWindow?.let { mContext.getString(R.string.surface_tmux_2b42e, it) }
+            ?: mContext.getString(R.string.surface_termux_workspace_0f9f7)
+        termuxWorkspaceLabel?.text = termuxWorkspaceConnectionStatus?.let {
+            mContext.getString(R.string.workspace_bridge_label, title, it)
+        } ?: title
+    }
+
     private fun updateTermuxWorkspaceChrome(frame: TermuxWorkspaceFrame) {
-        if (termuxWorkspaceLabel != null) {
-            termuxWorkspaceLabel!!.text = if (TextUtils.isEmpty(frame.window))
-                mContext.getString(R.string.surface_termux_workspace_0f9f7)
-            else
-                (mContext.getString(R.string.surface_tmux_2b42e, frame.window)).uppercase(Locale.getDefault())
-        }
+        if (!frame.window.isNullOrEmpty()) termuxWorkspaceCurrentWindow = frame.window
+        updateTermuxWorkspaceConnectionLabel()
         if (termuxWorkspaceOutputLabel != null) {
             val windows = frame.windows
             termuxWorkspaceOutputLabel!!.text = if (TextUtils.isEmpty(windows))
@@ -5384,7 +5400,7 @@ class UIManager(
             return mContext.getString(R.string.surface_window_201f5)
         }
         val out = SpannableStringBuilder()
-        val tokens = clean.split("\\s+".toRegex()).filter { it.isNotEmpty() }
+        val tokens = (if (clean.contains('\t')) clean.split('\t') else clean.split("\\s+".toRegex())).filter { it.isNotEmpty() }
         for (token in tokens) {
             if (out.isNotEmpty()) {
                 out.append(' ')
@@ -5395,6 +5411,13 @@ class UIManager(
             if (active) out.append('\u00A0')
             out.append(display)
             if (active) out.append('\u00A0')
+            val index = token.substringBefore(':').toIntOrNull()
+            if (index != null) {
+                out.setSpan(object : android.text.style.ClickableSpan() {
+                    override fun onClick(widget: View) { selectTermuxWorkspaceWindow(index.toString()) }
+                    override fun updateDrawState(ds: android.text.TextPaint) { ds.isUnderlineText = false }
+                }, start, out.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
             if (active) {
                 val activeBg = ThemeColorResolver.color(Theme.selection_background_color)
                 val activeFg = ThemeColorResolver.color(Theme.selection_text_color)
@@ -5402,10 +5425,6 @@ class UIManager(
                 out.setSpan(ForegroundColorSpan(activeFg), start, out.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                 out.setSpan(StyleSpan(Typeface.BOLD), start, out.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
             }
-        }
-        if (out.length > 42) {
-            out.delete(39, out.length)
-            out.append("...")
         }
         return out
     }
@@ -15774,6 +15793,7 @@ class UIManager(
     }
 
     fun dispose() {
+        launcherWindowFocused = false
         ramManager?.stop()
         batteryManager?.stop()
         storageManager?.stop()
@@ -16011,6 +16031,7 @@ class UIManager(
 
     fun pause() {
         launcherWindowFocused = false
+        stopTermuxWorkspaceSocketClient()
         if (mTerminalAdapter != null) {
             closeKeyboard()
         }
@@ -16080,6 +16101,7 @@ class UIManager(
             return
         }
         launcherWindowFocused = true
+        if (termuxWorkspaceChromeActive) refreshTermuxWorkspace(false)
         refreshSuggestionsNow()
         if (restoreLauncherChromeOnResume) {
             restoreLauncherChromeOnResume = false
@@ -16450,7 +16472,7 @@ class UIManager(
         private const val TERMUX_WORKSPACE_IME_VISIBLE_THRESHOLD_DP = 80
         private const val TERMUX_WORKSPACE_IME_RESIZE_REFRESH_DELAY_MS = 180L
         private const val TERMUX_WORKSPACE_LOCAL_OUTPUT_HOLD_MS = 7000L
-        private const val TERMUX_WORKSPACE_MAX_OUTPUT_CHARS = 24000
+        private const val TERMUX_WORKSPACE_MAX_OUTPUT_CHARS = 262144
         private const val TERMUX_WORKSPACE_LINE_HEIGHT_SAMPLE = "M\n\u2502\n\u2500\n\u2514\n\u2588"
         private const val TERMUX_WORKSPACE_LINE_HEIGHT_FALLBACK_MULTIPLIER = 1.36f
         private const val TERMUX_WORKSPACE_LINE_HEIGHT_MAX_SAMPLE_LINES = 16

@@ -743,7 +743,7 @@
     <!-- renderPodcastSurface -->
     <string name="surface_subscriptions_are_saved_tap_a_show_to_refresh_it_539d1" formatted="false">"Subscriptions are saved.\nTap a show to refresh it."</string>
     <!-- renderTermuxWorkspaceHelp -->
-    <string name="surface_switch_window_jump_to_a_tmux_window_index_name_d002c" formatted="false">":switch &lt;window&gt; - jump to a tmux window index/name"</string>
+    <string name="surface_switch_window_jump_to_a_tmux_window_index_name_d002c" formatted="false">":switch &lt;window&gt; - select an index/name; tmux switch &lt;window&gt; does the same from Launcher Home. Tap a window label or use :prev/:next for adjacent windows"</string>
     <!--  -->
     <string name="surface_sync_mirroring_notification_buffer_574fb" formatted="false">"[SYNC] mirroring notification buffer..."</string>
     <!--  -->
@@ -887,7 +887,7 @@
     <!-- saveTermuxWorkspaceLauncher -->
     <string name="surface_usage_save_id_command_21680" formatted="false">"usage: :save &lt;id&gt; &lt;command&gt;"</string>
     <!-- selectTermuxWorkspaceWindow -->
-    <string name="surface_usage_tmux_switch_window_or_switch_window_82893" formatted="false">"usage: tmux switch &lt;window&gt; or :switch &lt;window&gt;"</string>
+    <string name="surface_usage_tmux_switch_window_or_switch_window_82893" formatted="false">"usage: :switch &lt;window&gt; in the workspace or tmux switch &lt;window&gt; from Launcher Home; :prev/:next select adjacent windows"</string>
     <!-- refreshLockdownActions -->
     <string name="surface_use_breach_key_8d028">"USE BREACH KEY (%1$d)"</string>
     <!--  -->

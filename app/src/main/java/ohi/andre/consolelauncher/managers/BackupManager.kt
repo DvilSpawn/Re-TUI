@@ -109,12 +109,14 @@ object BackupManager {
     }
 
     @JvmOverloads
-    @Suppress("UNUSED_PARAMETER")
     fun defaultShareableConfigurationName(sourceName: kotlin.String? = null): kotlin.String {
-        val stamp = java.text.SimpleDateFormat("yyyyMMdd-HHmmss", java.util.Locale.US)
-            .format(java.util.Date())
-        return "retui-config-" + stamp + ohi.andre.consolelauncher.managers.BackupManager.BACKUP_SUFFIX
+        val name = sourceName?.replace(Regex("[^A-Za-z0-9_-]+"), "_")?.trim('_')?.take(80)
+        if (!name.isNullOrEmpty()) return "$name.retui"
+        val stamp = SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US).format(Date())
+        return "retui-config-$stamp.retui"
     }
+
+    const val PRESET_MIME = "application/vnd.retui+zip"
 
     @JvmOverloads
     @Throws(java.lang.Exception::class)
@@ -135,7 +137,7 @@ object BackupManager {
         uri: android.net.Uri,
         presetName: kotlin.String? = null,
         behaviorLabels: Set<String> = PresetManager.defaultShareableBehaviorLabels()
-    ) {
+    ): Uri {
         val preset = if (presetName == null) null else presetName.trim { it <= ' ' }
         var sourceRoot: java.io.File = Tuils.getFolder()
         var sourceType = "current"
@@ -186,7 +188,24 @@ object BackupManager {
         } finally {
             zip.close()
         }
-        writeVerified(context, uri, out.toByteArray())
+        val payload = out.toByteArray()
+        writeVerified(context, uri, payload)
+        val shares = File(context.cacheDir, "preset-share")
+        check(shares.isDirectory || shares.mkdirs()) { "Unable to create preset share cache" }
+        val now = System.currentTimeMillis()
+        shares.listFiles()?.filter { now - it.lastModified() > 24L * 60 * 60 * 1000 }?.forEach { it.deleteRecursively() }
+        val folder = File(shares, java.util.UUID.randomUUID().toString())
+        check(folder.mkdir()) { "Unable to cache preset for sharing" }
+        try {
+            val cached = File(folder, defaultShareableConfigurationName(presetName))
+            cached.writeBytes(payload)
+            cached.inputStream().use { verifyExport(payload, it) }
+            return androidx.core.content.FileProvider.getUriForFile(context,
+                ohi.andre.consolelauncher.tuils.GenericFileProvider.PROVIDER_NAME, cached)
+        } catch (error: Exception) {
+            folder.deleteRecursively()
+            throw error
+        }
     }
 
     internal fun shareableManifest(
@@ -328,6 +347,107 @@ object BackupManager {
         )
         Tuils.delete(tempDir)
         return importedName
+    }
+
+    class StagedPreset internal constructor(
+        private val staging: File,
+        val folder: File,
+        val manifest: String
+    ) : AutoCloseable {
+        val name: String get() = manifestValue(manifest, "presetName").ifBlank { "Imported preset" }
+        val sections: String get() = manifestValue(manifest, "sections")
+        val producerVersion: String get() = manifestValue(manifest, "appVersion")
+        val schema: String get() = manifestValue(manifest, "schema")
+        val behaviorLabels: Set<String>? get() = if (schema == "3") behaviorFields(manifest) else null
+
+        fun save(): String {
+            // Re-extract and validate the private snapshot, never the original provider URI.
+            File(staging, "package.retui").inputStream().use { input ->
+                inspectPreset(input, staging.parentFile!!).use { checked ->
+                    return PresetManager.importExtractedFolder(checked.name, checked.folder, checked.behaviorLabels)
+                }
+            }
+        }
+
+        override fun close() { staging.deleteRecursively() }
+    }
+
+    fun inspectPreset(input: InputStream, privateRoot: File): StagedPreset {
+        check(privateRoot.isDirectory || privateRoot.mkdirs()) { "Unable to create private preset staging" }
+        val staging = File.createTempFile("preset-", ".staging", privateRoot)
+        check(staging.delete() && staging.mkdir()) { "Unable to create private preset staging" }
+        try {
+            val archive = File(staging, "package.retui")
+            input.use { source -> archive.outputStream().use { target -> copyBounded(source, target, MAX_BACKUP_BYTES) } }
+            val folder = File(staging, "contents")
+            check(folder.mkdir()) { "Unable to stage preset contents" }
+            val entries = HashSet<String>()
+            var total = 0L
+            java.util.zip.ZipFile(archive).use { zip ->
+                val all = zip.entries()
+                var count = 0
+                while (all.hasMoreElements()) {
+                    val entry = all.nextElement()
+                    require(++count <= 256) { "Preset contains too many archive entries" }
+                    val name = entry.name
+                    require(isSafeEntry(name) && !name.contains('\u0000') && name.length <= 240) { "Unsafe preset path" }
+                    require(entries.add(name)) { "Preset contains duplicate archive entries" }
+                    require(!entry.isDirectory) { "Unexpected preset directory entry" }
+                    require(name == MANIFEST_FILE || name in SHAREABLE_FILES ||
+                        name == XMLPrefsManager.XMLPrefsRoot.BEHAVIOR.path || FrameManager.isPortableEntry(name)) {
+                        "Unexpected preset file: $name"
+                    }
+                    val target = File(folder, name)
+                    check(target.parentFile!!.isDirectory || target.parentFile!!.mkdirs()) { "Unable to stage preset" }
+                    val limit = when {
+                        name == MANIFEST_FILE -> 16L * 1024
+                        name.endsWith(".xml") -> 256L * 1024
+                        else -> MAX_BACKUP_BYTES
+                    }
+                    zip.getInputStream(entry).use { source ->
+                        target.outputStream().use { output -> total += copyBounded(source, output, minOf(limit, MAX_BACKUP_BYTES - total)) }
+                    }
+                    val crc = java.util.zip.CRC32()
+                    target.inputStream().use { source ->
+                        val buffer = ByteArray(8192)
+                        while (true) { val n = source.read(buffer); if (n < 0) break; crc.update(buffer, 0, n) }
+                    }
+                    require(crc.value == entry.crc && target.length() == entry.size) { "Corrupt preset archive entry" }
+                }
+            }
+            val manifest = File(folder, MANIFEST_FILE).takeIf { it.isFile }?.readText(Charsets.UTF_8)
+                ?: throw IllegalArgumentException("Preset manifest is missing")
+            val keys = manifest.lineSequence().filter { it.isNotBlank() }.map { it.substringBefore('=') }.toList()
+            require(keys.size == keys.toSet().size) { "Duplicate preset manifest fields" }
+            require(manifestValue(manifest, "type") == TYPE_SHAREABLE) { "Personal backups cannot be imported as presets. Use Restore Backup instead." }
+            require(!validatePackage(manifest, entries)) { "Only shareable presets are supported" }
+            PresetManager.validatePresetFolder(folder)
+            for (root in arrayOf(XMLPrefsManager.XMLPrefsRoot.THEME, XMLPrefsManager.XMLPrefsRoot.UI,
+                XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS, XMLPrefsManager.XMLPrefsRoot.BEHAVIOR)) {
+                val file = File(folder, root.path)
+                if (!file.isFile) continue
+                if (root == XMLPrefsManager.XMLPrefsRoot.BEHAVIOR && manifestValue(manifest, "schema") == "3")
+                    PresetManager.sanitizeSelectedBehaviorXml(file, behaviorFields(manifest))
+                else PresetManager.sanitizeShareableXml(file, root)
+            }
+            return StagedPreset(staging, folder, manifest)
+        } catch (error: Exception) {
+            staging.deleteRecursively()
+            throw error
+        }
+    }
+
+    internal fun copyBounded(input: InputStream, output: OutputStream, limit: Long): Long {
+        val buffer = ByteArray(8192)
+        var total = 0L
+        while (true) {
+            val count = input.read(buffer)
+            if (count < 0) break
+            total += count
+            require(total <= limit) { "Preset package is too large" }
+            output.write(buffer, 0, count)
+        }
+        return total
     }
 
     internal fun validatePackage(manifest: kotlin.String?, entries: kotlin.collections.Set<kotlin.String>): kotlin.Boolean {

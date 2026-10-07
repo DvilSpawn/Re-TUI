@@ -911,10 +911,12 @@ class SuggestionsManager(
     }
 
     private fun searchModeCommandResults(input: String): List<SearchResult>? {
-        val (beforeLastSpace, lastWord) = searchModeSuggestionParts(input)
-            ?: if (input.trim().equals("mode", true)) "mode" to Tuils.EMPTYSTRING else return null
+        val helpInput = normalizedHelpInput(input)
+        val (beforeLastSpace, lastWord) = if (helpInput != null) helpInput to Tuils.EMPTYSTRING else
+            searchModeSuggestionParts(input)
+                ?: if (input.trim().equals("mode", true)) input.trim() to Tuils.EMPTYSTRING else return null
         val commandName = beforeLastSpace.trim().substringBefore(Tuils.SPACE)
-        if (pack.commandGroup.getCommandByName(commandName) == null) return null
+        if (helpInput == null && pack.commandGroup.getCommandByName(commandName) == null) return null
 
         return getSuggestions(beforeLastSpace, lastWord).filterNotNull().mapNotNull { suggestion ->
             val title = suggestion.text?.trim().orEmpty()
@@ -1054,6 +1056,22 @@ class SuggestionsManager(
         beforeLastSpace = beforeLastSpace.trim { it <= ' ' }
         lastWord = lastWord.trim { it <= ' ' }
 
+        val helpInput = normalizedHelpInput(beforeLastSpace + Tuils.SPACE + lastWord)
+        if (helpInput != null) {
+            comparator.noInput = false
+            suggestionList.addAll(helpTopicSuggestions(pack.context, helpInput))
+            val filter = helpInput.substringAfter(' ', "")
+            if (filter.isNotEmpty() && filter != "-topic" && !filter.startsWith("-topic ")) {
+                pack.commandGroup.commands.filter {
+                    !isHiddenCommandName(it.javaClass.simpleName) && it.javaClass.simpleName.startsWith(filter, true)
+                }.sortedBy { it.javaClass.simpleName }.forEach {
+                    val command = "help ${it.javaClass.simpleName}"
+                    suggestionList.add(Suggestion(null, command, true, Suggestion.TYPE_PERMANENT, command))
+                }
+            }
+            return suggestionList
+        }
+
         if (GuideManager.isActive(pack.context)) {
             comparator.noInput = beforeLastSpace.length == 0 && lastWord.length == 0
             if (!suggestActiveGuide(suggestionList)) {
@@ -1174,12 +1192,6 @@ class SuggestionsManager(
                 )
             } else {
                 comparator.noInput = false
-
-                if (isHelpQuickstart(beforeLastSpace)) {
-                    suggestHelpQuickstartActions(suggestionList)
-                    Collections.sort<Suggestion?>(suggestionList, comparator)
-                    return suggestionList
-                }
 
                 if (isGuideCommand(beforeLastSpace)) {
                     suggestGuideSubcommands(suggestionList)
@@ -1342,12 +1354,6 @@ class SuggestionsManager(
 
                 //                lastword > 0 && beforeLastSpace  = 0
             } else {
-                if (isHelpQuickstart(lastWord)) {
-                    suggestHelpQuickstartActions(suggestionList)
-                    Collections.sort<Suggestion?>(suggestionList, comparator)
-                    return suggestionList
-                }
-
                 if (isGuideCommand(lastWord)) {
                     suggestGuideRootActions(suggestionList)
                     Collections.sort<Suggestion?>(suggestionList, comparator)
@@ -1450,35 +1456,8 @@ class SuggestionsManager(
         return engine
     }
 
-    private fun isHelpQuickstart(value: String?): Boolean {
-        return value != null && "help".equals(value.trim { it <= ' ' }, ignoreCase = true)
-    }
-
     private fun isGuideCommand(value: String?): Boolean {
         return value != null && "guide".equals(value.trim { it <= ' ' }, ignoreCase = true)
-    }
-
-    private fun suggestHelpQuickstartActions(suggestions: MutableList<Suggestion?>) {
-        suggestions.add(Suggestion(null, "apps -ls", true, Suggestion.Companion.TYPE_PERMANENT))
-        suggestions.add(Suggestion(null, "alias -add", false, Suggestion.Companion.TYPE_PERMANENT))
-        suggestions.add(Suggestion(null, "apps -hide", false, Suggestion.Companion.TYPE_PERMANENT))
-        suggestions.add(
-            Suggestion(
-                null,
-                "wallpaper -auto",
-                true,
-                Suggestion.Companion.TYPE_PERMANENT
-            )
-        )
-        suggestions.add(
-            Suggestion(
-                null,
-                "preset -save",
-                false,
-                Suggestion.Companion.TYPE_PERMANENT
-            )
-        )
-        suggestions.add(Suggestion(null, "module -ls", true, Suggestion.Companion.TYPE_PERMANENT))
     }
 
     private fun suggestFilesActions(suggestions: MutableList<Suggestion?>) {
@@ -4846,7 +4825,7 @@ class SuggestionsManager(
 
                 return contactCommandPrefix(textBefore, c.string) + Tuils.SPACE + c.numbers.get(c.selectedNumber)
             } else if (type == TYPE_PERMANENT || type == TYPE_FILE_ACTION) {
-                return text
+                return `object` as? String ?: text
             } else if (type == TYPE_MODULE) {
                 return if (`object` is String) `object` as String else text
             } else if (type == TYPE_FILE) {
@@ -5000,6 +4979,44 @@ class SuggestionsManager(
             return normalizedOption.startsWith(filter) ||
                 normalizedOption.removePrefix("-").startsWith(filter.removePrefix("-"))
         }
+
+        internal fun normalizedHelpInput(input: String): String? {
+            val normalized = input.trim().lowercase(Locale.ROOT).replace(Regex("\\s+"), " ")
+            return normalized.takeIf { it == "help" || it.startsWith("help ") }
+        }
+
+        internal fun helpTopics(
+            input: String,
+            resourceText: (Int) -> String = { "" }
+        ): List<ohi.andre.consolelauncher.help.HelpTopic> {
+            val normalized = normalizedHelpInput(input) ?: return emptyList()
+            val query = normalized.substringAfter(' ', "").let {
+                if (it == "-topic") "" else it.removePrefix("-topic ")
+            }
+            val topics = ohi.andre.consolelauncher.help.OfflineHelpCatalog.topics
+            if (query.isEmpty()) return topics.filter { it.category == null }
+            val terms = query.split(' ')
+            fun matches(value: String): Boolean {
+                val text = value.lowercase(Locale.ROOT).replace(Regex("\\s+"), " ")
+                return terms.all(text::contains)
+            }
+            return topics.mapNotNull { topic ->
+                val direct = topic.id + " " + topic.id.replace('-', ' ') + " " + resourceText(topic.title)
+                when {
+                    matches(direct) -> topic to 0
+                    matches(direct + " " + resourceText(topic.body)) -> topic to 1
+                    else -> null
+                }
+            }.sortedBy { it.second }.map { it.first }
+        }
+
+        internal fun helpTopicSuggestions(context: Context, input: String): List<Suggestion> =
+            helpTopicSuggestions(input) { context.getString(it) }
+
+        internal fun helpTopicSuggestions(input: String, resourceText: (Int) -> String): List<Suggestion> =
+            helpTopics(input, resourceText).map { topic ->
+                Suggestion(null, resourceText(topic.title), true, Suggestion.TYPE_PERMANENT, "help -topic ${topic.id}")
+            }
 
         internal fun commandSuggestionExecutes(commandName: String?, argTypes: IntArray?): Boolean {
             return argTypes == null || argTypes.isEmpty() || "podcast".equals(commandName, ignoreCase = true)

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="portable_preset_import">Import RetUI Preset</string>
+    <string name="portable_preset_inspecting">Reading and validating preset…</string>
+    <string name="portable_preset_confirm">Import</string>
+    <string name="portable_preset_cancel">Cancel</string>
+    <string name="portable_preset_saved">Saved preset: %1$s\nApply it later through preset -apply. Active settings have not changed.</string>
+    <string name="portable_preset_error">Unable to import preset: %1$s\nChoose a readable shared configuration using Import RetUI Preset. Personal backups belong in Restore Backup.</string>
+    <string name="portable_preset_preview">Preset: %1$s\nSections: %2$s\nProducer version: %3$s\nCompatibility: supported shareable schema %4$s; manifest, XML and included frame contents validated. Unsupported or private setting values are omitted by the existing sanitizer.\n\nImport only saves a preset; it does not apply it. Behavior settings may include commands and other user-provided values. Inspection never runs them.\n\nIncluded behavior fields and values:\n%5$s</string>
+    <string name="portable_preset_unknown_version">Not provided</string>
+    <string name="portable_preset_no_behavior">None</string>
+    <string name="portable_preset_share">Share</string>
+    <string name="portable_preset_exported">Preset exported and verified. Share a cached copy?</string>
+    <string name="portable_preset_done">Done</string>
+</resources>

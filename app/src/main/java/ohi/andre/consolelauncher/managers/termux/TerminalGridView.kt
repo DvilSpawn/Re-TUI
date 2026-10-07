@@ -81,8 +81,8 @@ class TerminalGridView @JvmOverloads constructor(
     }
 
     fun setFrame(value: String?, frameCols: Int, frameRows: Int, cursorCol: Int?, cursorRow: Int?) {
-        val cleanCols = max(1, frameCols)
-        val cleanRows = max(1, frameRows)
+        val cleanCols = frameCols.coerceIn(1, 240)
+        val cleanRows = frameRows.coerceIn(1, 120)
         val sizeChanged = cleanCols != cols || cleanRows != rows
         if (sizeChanged) {
             cols = cleanCols

@@ -87,7 +87,7 @@ class LauncherInteractionRegressionTest {
     }
 
     @Test
-    fun termuxSocketStartupWaitsForProtocolAndFallsBackOnce() {
+    fun termuxSocketStartupWaitsForProtocolAndDoesNotReplayAfterFailure() {
         val bridge = File(root, "termux/retui/bin/retui").readText()
         val readiness = bridge.substringAfter("bridge_listener_ready()").substringBefore("bridge_socket_start()")
         assertTrue(readiness.contains("HELLO %s 20 8 CAPTURE"))
@@ -99,7 +99,10 @@ class LauncherInteractionRegressionTest {
 
         val ui = File(root, "app/src/main/java/ohi/andre/consolelauncher/UIManager.kt").readText()
         val socketError = ui.substringAfter("override fun onError(message: String)").substringBefore("override fun onClosed()")
-        assertTrue(socketError.contains("termuxWorkspaceSocketClient?.connected != true"))
-        assertTrue(socketError.contains("buildTermuxWorkspaceLegacyCaptureScript()"))
+        assertTrue(socketError.contains("termuxWorkspaceSocketClient !== client"))
+        assertTrue(socketError.contains("stopTermuxWorkspaceSocketClient()"))
+        assertTrue(socketError.contains("workspace_bridge_disconnected"))
+        assertFalse(socketError.contains("dispatchTermuxWorkspaceScript"))
+        assertFalse(socketError.contains("buildTermuxWorkspaceLegacyCaptureScript()"))
     }
 }

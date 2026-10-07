@@ -1,9 +1,9 @@
 #!/data/data/com.termux/files/usr/bin/sh
 set -eu
 
-RETUI_VERSION="0.3.3"
+RETUI_VERSION="0.3.4"
 RETUI_BRIDGE_PROTOCOL="retui-bridge-v1"
-RETUI_SOCKET_PROTOCOL="retui-bridge-socket-v2"
+RETUI_SOCKET_PROTOCOL="retui-bridge-socket-v3"
 TERMUX_PREFIX_DEFAULT="/data/data/com.termux/files/usr"
 TERMUX_HOME_DEFAULT="/data/data/com.termux/files/home"
 
@@ -19,10 +19,11 @@ die() {
 
 usage() {
     cat <<'EOF'
-retui 0.3.3
+retui 0.3.4
 
 Usage:
   retui version
+  retui bridge capabilities
   retui bridge status
   retui bridge capture
   retui bridge socket-start
@@ -30,8 +31,11 @@ Usage:
   retui bridge socket-client
   retui bridge tcp-daemon
   retui bridge send
+  retui bridge type
   retui bridge new
+  retui bridge launch
   retui bridge switch
+  retui bridge select
   retui bridge key
   retui bridge kill
 
@@ -139,6 +143,12 @@ resize_bridge() {
     session="$(bridge_session)"
     cols="${1:-}"
     rows="${2:-}"
+    [ -z "$cols" ] && [ -z "$rows" ] && return 0
+    if ! valid_dimension "$cols" || ! valid_dimension "$rows" ||
+        [ "${#cols}" -gt 3 ] || [ "${#rows}" -gt 3 ] ||
+        [ "$cols" -gt 240 ] || [ "$rows" -gt 120 ]; then
+        die "invalid bridge geometry (maximum 240x120)"
+    fi
     if valid_dimension "$cols" && valid_dimension "$rows"; then
         tmux resize-window -t "$session" -x "$cols" -y "$rows" 2>/dev/null || true
         tmux resize-pane -t "$session" -x "$cols" -y "$rows" 2>/dev/null || true
@@ -151,21 +161,23 @@ resize_bridge_from_env() {
 
 capture_frame() {
     session="$(bridge_session)"
+    pane="$(tmux capture-pane -t "$session" -p -e -N)" || return
     printf '%s %s\n' "__RETUI_BRIDGE__" "$RETUI_BRIDGE_PROTOCOL"
     printf '%s %s\n' "__RETUI_VERSION__" "$RETUI_VERSION"
     printf '%s %s\n' "__RETUI_SESSION__" "$session"
     printf '%s ' "__RETUI_WINDOW__"
     tmux display-message -p -t "$session" '#I:#W'
     printf '%s ' "__RETUI_WINDOWS__"
-    tmux list-windows -t "$session" -F '#I:#W#{?window_active,*,}' | tr '\n' ' '
+    tmux list-windows -t "$session" -F '#I:#W#{?window_active,*,}' | tr '\n' '\t'
     printf '\n%s ' "__RETUI_COLS__"
     tmux display-message -p -t "$session" '#{window_width}'
     printf '%s ' "__RETUI_ROWS__"
     tmux display-message -p -t "$session" '#{window_height}'
     printf '\n%s ' "__RETUI_CURSOR__"
     tmux display-message -p -t "$session" '#{cursor_x}:#{cursor_y}' 2>/dev/null || printf '%s\n' "0:0"
-    printf '\n%s\n' "__RETUI_FRAME_BEGIN__"
-    tmux capture-pane -t "$session" -p -e -N
+    printf '\n%s ' "__RETUI_FRAME_BASE64__"
+    printf '%s\n' "$pane" | base64 | tr -d '\n'
+    printf '\n'
     printf '%s\n' "__RETUI_FRAME_END__"
 }
 
@@ -383,6 +395,7 @@ bridge_listener_ready() {
             socat -T 1 - TCP:127.0.0.1:"$(bridge_tcp_port)" 2>/dev/null || true
     )"
     printf '%s\n' "$ready_response" | grep -F -x '__RETUI_SOCKET_STATUS__ ok' >/dev/null 2>&1 &&
+        printf '%s\n' "$ready_response" | grep -F -x "__RETUI_SOCKET__ $RETUI_SOCKET_PROTOCOL" >/dev/null 2>&1 &&
         printf '%s\n' "$ready_response" | grep -F -x "__RETUI_SESSION__ $(bridge_session)" >/dev/null 2>&1
 }
 
@@ -449,6 +462,7 @@ bridge_tcp_daemon() {
 }
 
 bridge_socket_client() {
+    set -f
     ensure_bridge_session
     expected_token="${RETUI_SOCKET_TOKEN:-$(ensure_socket_token)}"
     authed=0
@@ -473,6 +487,7 @@ bridge_socket_client() {
     }
     trap cleanup_socket_client EXIT HUP INT TERM
     while IFS= read -r line; do
+        [ "${#line}" -le 65536 ] || { socket_error "command too large"; exit 1; }
         set -- $line
         command_name="${1:-}"
         case "$command_name" in
@@ -514,7 +529,7 @@ bridge_socket_client() {
             SEND)
                 [ "$authed" -eq 1 ] || { socket_error "auth required"; exit 1; }
                 resize_bridge "${2:-}" "${3:-}"
-                input="$(decode_payload "${4:-}" || true)"
+                input="$(decode_payload "${4:-}")" || { socket_error "invalid payload"; exit 1; }
                 if [ -n "$input" ]; then
                     tmux send-keys -t "$(bridge_session)" -l -- "$input"
                 fi
@@ -527,7 +542,7 @@ bridge_socket_client() {
             TYPE)
                 [ "$authed" -eq 1 ] || { socket_error "auth required"; exit 1; }
                 resize_bridge "${2:-}" "${3:-}"
-                input="$(decode_payload "${4:-}" || true)"
+                input="$(decode_payload "${4:-}")" || { socket_error "invalid payload"; exit 1; }
                 if [ -n "$input" ]; then
                     tmux send-keys -t "$(bridge_session)" -l -- "$input"
                 fi
@@ -541,8 +556,8 @@ bridge_socket_client() {
                 resize_bridge "${2:-}" "${3:-}"
                 payload="${4:-}"
                 [ -n "$payload" ] || payload="-"
-                name="$(decode_payload "$payload" || true)"
-                command="$(decode_payload "${5:--}" || true)"
+                name="$(decode_payload "$payload")" || { socket_error "invalid payload"; exit 1; }
+                command="$(decode_payload "${5:--}")" || { socket_error "invalid payload"; exit 1; }
                 if [ -n "$name" ]; then
                     tmux_new_with_shell new-window -t "$(bridge_session)" -n "$name" -c "$HOME"
                 else
@@ -568,6 +583,14 @@ bridge_socket_client() {
                     sleep 0.1
                     capture_frame
                 fi
+                ;;
+            SELECT)
+                [ "$authed" -eq 1 ] || { socket_error "auth required"; exit 1; }
+                resize_bridge "${2:-}" "${3:-}"
+                target="$(decode_payload "${4:-}")" || { socket_error "invalid payload"; exit 1; }
+                [ -n "$target" ] || { socket_error "target required"; exit 1; }
+                tmux select-window -t "$(bridge_session):$target"
+                maybe_capture_frame
                 ;;
             KEY)
                 [ "$authed" -eq 1 ] || { socket_error "auth required"; exit 1; }
@@ -600,6 +623,7 @@ bridge_socket_client() {
 bridge_main() {
     action="${1:-capture}"
     case "$action" in
+        capabilities) printf '%s\n' capture socket-start send type new launch switch select key ;;
         status) bridge_status ;;
         capture) bridge_capture ;;
         socket-start) bridge_socket_start ;;

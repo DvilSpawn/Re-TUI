@@ -122,4 +122,15 @@
     <string name="calculator_terminal_no_answer">No previous result. Calculate an expression first.</string>
     <string name="calculator_hints">Calculator hints</string>
     <string name="calculator_hints_body">CALCULATOR HINTS\n\nEnter an expression after calc&gt; and press Enter or ↵. The keypad stays in the calculator: 123 enters numbers and operators, ABC enters letters and units, and FUNC enters functions and constants.\n\nArithmetic\n2 + 3 * 4 → 14\n(2 + 3) * 4 → 20\nsqrt(9) → 3\n2^3 → 8\n\nConvert units\n5 ft to miles\n20 celsius to fahrenheit\nUse to for conversion. The word in means inches.\n\nChain results\n5 ft to miles\nans * 2\nans to ft → 10 ft\nErrors do not replace the last successful answer.\n\nEdit expressions\nTap the input to place the cursor, then use 123, ABC, or FUNC. √ and function keys insert parentheses with the cursor inside. Use ⌫ to delete; type clear to clear the transcript.\n\nCommands\nclear — clear the transcript, keeping ans\nhelp — show a short reminder\nexit — close the calculator\n\nCancel stops the current calculation. Tap the calculator tab to return without losing your expression.</string>
+    <string name="calculator_help_menu">CALCULATOR HELP\n\n1 Expressions / operators\n2 Functions / constants\n3 Conversions\n4 ans\n5 Keypad / editing\n\n0 Calculator</string>
+    <string name="calculator_help_expressions">EXPRESSIONS / OPERATORS\n\n2 + 3 * 4 → 14\n(2 + 3) * 4 → 20\n2^3 → 8\nUse +, −, ×, ÷, parentheses, ^ and %.</string>
+    <string name="calculator_help_functions">FUNCTIONS / CONSTANTS\n\nsqrt(9) → 3\nsin(90) → 1 in degrees mode\nFUNC inserts sqrt, sin, cos, tan, log, ln and abs with parentheses. Constants: pi and e.</string>
+    <string name="calculator_help_conversions">CONVERSIONS\n\n5 ft to miles\n20 celsius to fahrenheit\nUse to for conversion. The word in means inches. ABC enters letters and units.</string>
+    <string name="calculator_help_ans">ANS\n\n5 ft to miles\nans * 2\nans to ft → 10 ft\nUse ans for the last successful result. Errors do not replace it. Clear keeps ans.</string>
+    <string name="calculator_help_editing">KEYPAD / EDITING\n\n123: numbers and operators\nABC: letters and units\nFUNC: functions and constants\n\nTap the prompt to place the cursor or select text. √ and function keys insert parentheses with the cursor inside. ⌫ deletes the selection or previous character. ↵ evaluates.\n\nclear — clear the transcript, keeping ans\nhelp — open this browser\nexit — close the calculator\nCancel stops a calculation without changing your input.</string>
+    <string name="calculator_help_menu_choice">1 Menu</string>
+    <string name="calculator_help_previous">2 Previous</string>
+    <string name="calculator_help_next">3 Next</string>
+    <string name="calculator_help_calculator">0 Calculator</string>
+    <string name="calculator_expression_description">Calculator terminal input</string>
 </resources>

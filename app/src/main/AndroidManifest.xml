@@ -114,6 +114,9 @@
                 android:resource="@xml/provider_paths"/>
         </provider>
 
+        <activity android:name=".help.OfflineHelpActivity" android:exported="false"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
+
         <activity
             android:name=".LauncherActivity"
             android:clearTaskOnLaunch="true"
@@ -172,6 +175,24 @@
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="mediaPlayback" />
+
+        <activity
+            android:name=".commands.tuixt.PresetImportActivity"
+            android:label="@string/portable_preset_import"
+            android:configChanges="orientation|screenSize"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="content" android:mimeType="application/vnd.retui+zip" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="application/vnd.retui+zip" />
+            </intent-filter>
+        </activity>
 
         <activity
             android:name=".commands.tuixt.ThemerActivity"

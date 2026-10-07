@@ -2,8 +2,8 @@
     <!-- Walkthrough prose. Keep command names, flags, path IDs and examples unchanged. -->
     <string name="guide_basics" formatted="false">"Basics"</string>
     <string name="guide_learn_the_command_surface_app_list_settings_hub_and_module_dock" formatted="false">"Learn the command surface, app list, settings hub, and module dock."</string>
-    <string name="guide_print_the_map" formatted="false">"Print the map"</string>
-    <string name="guide_help_starts_with_the_workstation_quickstart_and_then_lists_every_comma" formatted="false">"Help starts with the workstation quickstart and then lists every command."</string>
+    <string name="guide_print_the_map" formatted="false">"Open the offline manual"</string>
+    <string name="guide_help_starts_with_the_workstation_quickstart_and_then_lists_every_comma" formatted="false">"Help opens the offline manual. Browse numbered topics, then use 0 or Back to return to the launcher."</string>
     <string name="guide_open_the_app_list" formatted="false">"Open the app list"</string>
     <string name="guide_use_the_app_drawer_when_you_want_to_scan_installed_apps_instead_of_typ" formatted="false">"Use the app drawer when you want to scan installed apps instead of typing a name."</string>
     <string name="guide_inspect_modules" formatted="false">"Inspect modules"</string>

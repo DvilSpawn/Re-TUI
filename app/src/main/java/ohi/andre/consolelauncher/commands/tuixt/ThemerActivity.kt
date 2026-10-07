@@ -353,6 +353,8 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
                         showBackupProtectionDialog()
                     } else if (fileName == HubAction.CREATE_SHAREABLE_CONFIGURATION.name) {
                         showShareableConfigurationSourcePicker()
+                    } else if (fileName == HubAction.IMPORT_RETUI_PRESET.name) {
+                        openSettingsChild(Intent(this@ThemerActivity, PresetImportActivity::class.java).setAction(Intent.ACTION_MAIN))
                     } else if (fileName == HubAction.RESTORE.name) {
                         launchRestorePicker()
                     } else if (fileName == HubAction.RATE_THE_APP.name) {
@@ -542,6 +544,7 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
         VIEW_CRASH_LOG(R.string.hub_view_crash_log),
         BACKUP(R.string.hub_backup),
         CREATE_SHAREABLE_CONFIGURATION(R.string.hub_create_shareable_configuration),
+        IMPORT_RETUI_PRESET(R.string.portable_preset_import),
         RESTORE(R.string.hub_restore),
         RATE_THE_APP(R.string.hub_rate_the_app),
         GITHUB(R.string.hub_github),
@@ -635,6 +638,7 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
                 HubAction.LANGUAGE_PACKS.name,
                 HubAction.BACKUP.name,
                 HubAction.CREATE_SHAREABLE_CONFIGURATION.name,
+                HubAction.IMPORT_RETUI_PRESET.name,
                 HubAction.RESTORE.name,
                 HubAction.RATE_THE_APP.name,
                 HubAction.SEND_FEEDBACK.name,
@@ -2273,7 +2277,7 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
     private fun launchShareableConfigurationPicker() {
         val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
         intent.addCategory(Intent.CATEGORY_OPENABLE)
-        intent.setType("application/zip")
+        intent.setType(BackupManager.PRESET_MIME)
         intent.putExtra(
             Intent.EXTRA_TITLE,
             BackupManager.defaultShareableConfigurationName(pendingShareablePresetName)
@@ -2948,24 +2952,40 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
             return
         }
 
-        try {
-            BackupManager.exportShareableConfiguration(
-                this,
-                data.getData() ?: return,
-                pendingShareablePresetName,
-                pendingShareableBehaviorLabels ?: PresetManager.defaultShareableBehaviorLabels()
-            )
-            Toast.makeText(this, getString(R.string.themer_shareable_configuration_exported_and_verified_2b7f9), Toast.LENGTH_SHORT).show()
-        } catch (e: Exception) {
-            data.getData()?.let { deleteCreatedDocument(it) }
-            Toast.makeText(
-                this,
-                if (e.displayMessage(this@ThemerActivity) == null) getString(R.string.themer_configuration_export_failed_36f82) else e.displayMessage(this@ThemerActivity),
-                Toast.LENGTH_LONG
-            ).show()
-        } finally {
-            pendingShareablePresetName = null
-            pendingShareableBehaviorLabels = null
+        val uri = data.data ?: return
+        val preset = pendingShareablePresetName
+        val labels = pendingShareableBehaviorLabels ?: PresetManager.defaultShareableBehaviorLabels()
+        pendingShareablePresetName = null
+        pendingShareableBehaviorLabels = null
+        Thread {
+            try {
+                val cachedUri = BackupManager.exportShareableConfiguration(this, uri, preset, labels)
+                runOnUiThread {
+                    if (!isFinishing && !isDestroyed) TuixtDialog.showConfirm(this,
+                        getString(R.string.portable_preset_share), getString(R.string.portable_preset_exported),
+                        getString(R.string.portable_preset_share), getString(R.string.portable_preset_done),
+                        ConfirmAction { sharePreset(cachedUri) })
+                }
+            } catch (error: Exception) {
+                deleteCreatedDocument(uri)
+                runOnUiThread {
+                    if (!isFinishing && !isDestroyed) Toast.makeText(this,
+                        error.displayMessage(this) ?: getString(R.string.themer_configuration_export_failed_36f82), Toast.LENGTH_LONG).show()
+                }
+            }
+        }.start()
+    }
+
+    private fun sharePreset(uri: Uri) {
+        val send = Intent(Intent.ACTION_SEND).apply {
+            type = BackupManager.PRESET_MIME
+            putExtra(Intent.EXTRA_STREAM, uri)
+            clipData = android.content.ClipData.newRawUri("RetUI preset", uri)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        try { startActivity(Intent.createChooser(send, getString(R.string.portable_preset_share))) }
+        catch (error: ActivityNotFoundException) {
+            Toast.makeText(this, error.displayMessage(this), Toast.LENGTH_LONG).show()
         }
     }
 

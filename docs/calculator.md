@@ -1,9 +1,9 @@
 # Calculator
 
-`calc` opens a floating, text-based calculator pane. Enter an expression after
-`calc>` and press Enter or the submit button. Results appear in the scrollable,
-selectable transcript. `calc <expression>` still prints a one-shot result in the
-launcher terminal.
+`calc` opens a terminal with an attached keypad dock. Enter an expression after
+`calc>` and press Enter or ↵. The live prompt, expressions and results share one
+scrollable monospace terminal; there is no input frame or separate result display.
+`calc <expression>` still prints a one-shot result in the launcher terminal.
 
 ```
 calc> 5 ft to miles
@@ -20,15 +20,28 @@ cancelled requests do not replace it. The pane displays approximate decimal
 results and retains the existing angle preference. Opening it enables the
 Qalculate engine on Android 7+. Android 6 retains basic arithmetic support.
 
-- `help`: show usage.
+- `help` or the header question mark: open the terminal help browser.
 - `clear`: clear the transcript, retaining `ans`.
 - `exit`: close the pane and return to the launcher.
 - Cancel stops only this pane's active calculation; late responses are ignored.
 
+Help uses a separate `help>` session, not calculation history. At its menu,
+choose 1–5 for expressions/operators, functions/constants, conversions, `ans`,
+or keypad/editing; 0 returns to the calculator. Within a topic, 1 opens the menu,
+2 goes to the previous topic, 3 goes to the next, and 0 returns to the calculator.
+Unavailable directions are omitted. Choices are also tappable plain text.
+Back returns from topic to menu to calculator without closing it. Entering help
+preserves the calculation draft and selection; typed `help` is consumed as a
+command. Help navigation never changes `ans` or calculation history.
+
+The separate dock provides 123, ABC and FUNC layers with one ↵ key in every
+layer. FUNC includes percentages, functions, constants and conversion words.
 The input scrolls horizontally and supports cursor editing and selection.
-Transcript, answer and draft persist across reopening. Earlier calculator
+Transcript, answer, draft and selection persist across reopening. Help page and
+its own draft also survive activity recreation. Earlier calculator
 history and mode drafts are retained in storage without destructive migration.
-The pane uses the launcher font, theme and floating frame.
+The pane uses the launcher theme and floating frame; controls retain the launcher
+font while the transcript and prompt stay monospace.
 
 Calculations use the existing isolated Qalculate service and watchdog. The native
 bridge is independently authored; see `native/qalculate/README.md` and

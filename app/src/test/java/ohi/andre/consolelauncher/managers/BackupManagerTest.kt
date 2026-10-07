@@ -9,6 +9,13 @@ import org.junit.Test
 
 class BackupManagerTest {
     @Test
+    fun portableExportUsesPresetNameAndDistinctExtension() {
+        assertEquals("Black_Dawn.retui", BackupManager.defaultShareableConfigurationName("../Black Dawn"))
+        assertTrue(BackupManager.defaultShareableConfigurationName().endsWith(".retui"))
+        assertTrue(BackupManager.defaultBackupName().endsWith(".retui-backup"))
+    }
+
+    @Test
     fun shareablePresetManifestPreservesItsName() {
         val manifest = BackupManager.shareableManifest(
             "preset",

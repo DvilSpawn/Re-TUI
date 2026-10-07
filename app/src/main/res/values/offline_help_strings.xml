@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="offline_help_title">Offline manual</string>
+    <string name="offline_help_topics">Topics</string>
+    <string name="offline_help_previous">Previous topic</string>
+    <string name="offline_help_next">Next topic</string>
+    <string name="offline_help_previous_page">Previous page</string>
+    <string name="offline_help_next_page">Next page</string>
+    <string name="offline_help_close">Return to launcher</string>
+    <string name="offline_help_root">Categories</string>
+    <string name="offline_help_choice">Numbered choice</string>
+    <string name="offline_help_enter">Enter</string>
+    <string name="offline_help_backspace">Backspace</string>
+    <string name="offline_help_description">help → open the offline manual\nhelp &lt;command&gt; → print command help and priority\nhelp -topic &lt;id&gt; → open a manual category or article</string>
+    <string name="offline_help_tutorial_description">tutorial → open offline Getting started</string>
+    <string name="offline_help_getting_started_title">Getting started</string>
+    <string name="offline_help_getting_started_body">Choose a numbered topic. Use 0 to return to the launcher.</string>
+    <string name="offline_help_apps_title">Apps</string>
+    <string name="offline_help_apps_body">Choose a numbered topic. Use 0 to return to the launcher.</string>
+    <string name="offline_help_commands_title">Commands</string>
+    <string name="offline_help_commands_body">Choose a numbered topic. Use 0 to return to the launcher.</string>
+    <string name="offline_help_appearance_title">Appearance</string>
+    <string name="offline_help_appearance_body">Choose a numbered topic. Use 0 to return to the launcher.</string>
+    <string name="offline_help_presets_title">Presets</string>
+    <string name="offline_help_presets_body">Choose a numbered topic. Use 0 to return to the launcher.</string>
+    <string name="offline_help_tools_title">Tools</string>
+    <string name="offline_help_tools_body">Choose a numbered topic. Use 0 to return to the launcher.</string>
+    <string name="offline_help_automation_title">Automation</string>
+    <string name="offline_help_automation_body">Choose a numbered topic. Use 0 to return to the launcher.</string>
+    <string name="offline_help_troubleshooting_title">Troubleshooting</string>
+    <string name="offline_help_troubleshooting_body">Choose a numbered topic. Use 0 to return to the launcher.</string>
+    <string name="offline_help_reference_title">Command reference</string>
+    <string name="offline_help_reference_body">Choose a numbered topic. Use 0 to return to the launcher.</string>
+</resources>

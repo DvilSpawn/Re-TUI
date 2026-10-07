@@ -3,14 +3,11 @@ package ohi.andre.consolelauncher.commands.main.raw
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.commands.CommandAbstraction
 import ohi.andre.consolelauncher.commands.ExecutePack
-import ohi.andre.consolelauncher.tuils.Tuils
+import ohi.andre.consolelauncher.help.OfflineHelpActivity
 
 class tutorial : CommandAbstraction {
-    private val url = "https://github.com/DvilSpawn/Re-TUI/wiki"
-
     override fun exec(pack: ExecutePack): String? {
-        val intent = Tuils.webPage(url)
-        pack.context.startActivity(intent)
+        OfflineHelpActivity.open(pack.context, "getting-started")
         return null
     }
 
@@ -18,7 +15,7 @@ class tutorial : CommandAbstraction {
 
     override fun priority(): Int = 4
 
-    override fun helpRes(): Int = R.string.help_tutorial
+    override fun helpRes(): Int = R.string.offline_help_tutorial_description
 
     override fun onArgNotFound(pack: ExecutePack, indexNotFound: Int): String? = null
 

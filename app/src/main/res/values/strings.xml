@@ -140,7 +140,17 @@
     <string name="output_invalid_param">Invalid option:</string>
 
     <!-- flash -->
-    <string name="help_termux">Termux surface (workspace-first).\n\nUsage:\ntermux\ntermux -status\ntermux -setup\ntermux -open\ntermux -run &lt;script_path&gt; [args...]\ntermux -apps\ntermux -app &lt;id&gt;\ntermux -app-add &lt;id&gt; &lt;command&gt;\n\nInteractive TUIs (mc, htop, …) open the tmux workspace.\nPrefer: tmux launch mc   or alias MC\nOne-shot scripts: termux -run &lt;path&gt;\nDock modules: module -add name termux:/path/script.sh</string>
+    <string name="help_termux">Open the optional interactive Termux tmux workspace. Termux and the selected programs must be installed.
+        \n\nUsage:
+        \ntermux -> open the workspace
+        \ntermux -open -> open the workspace
+        \ntermux -status -> show workspace diagnostics
+        \ntermux -app &lt;id&gt; -> launch a workspace launcher
+        \ntermux -apps -> show workspace help, not an app registry
+        \ntermux -run &lt;script_path&gt; [args...] -> run a one-shot script in the console overlay
+        \n\nUse tmux launch &lt;id&gt; for interactive programs and tmux save &lt;id&gt; &lt;command&gt; for custom launchers. Legacy app-management options only show help.
+        \nUse tbridge -setup for bridge setup instructions.
+        \nScripts and saved launcher commands execute code; inspect them before running. Dock scripts use module -add &lt;name&gt; termux:/path/script.sh.</string>
     <string name="help_files">Open Re:T-UI Files.
         \nUsage:
         \n$ files
@@ -171,10 +181,9 @@
         \ntbridge -doctor
         \ntbridge -setup
         \ntbridge -probe
-        \n\nFor file navigation, use:
-        \nfiles
-        \n\nFor bridge-backed quick file actions, use ls/open/share with file_backend=termux.
-        \n\nThis bridge requires Termux, RUN_COMMAND permission, allow-external-apps=true, and termux-setup-storage.
+        \n\n-status/-doctor inspect local readiness; -setup prints instructions. -probe executes a diagnostic shell script after readiness checks and may request permission.
+        \n\nFile browsing and ls/open/share require the separate Re:T-UI Files app (com.dvil.retui.fm). Legacy bridge file-listing options are retired; changing the file backend does not restore them.
+        \n\nThe bridge needs Termux, RUN_COMMAND permission, and allow-external-apps=true in Termux. Shared-storage scripts may also need termux-setup-storage. Run only scripts you trust.
     </string>
     <string name="help_tmux">Open and control the optional Termux tmux workspace.
         \nUsage:
@@ -192,13 +201,15 @@
         \nalias -add LOGS tmux launch logs
         \nalias -add BASH2 tmux switch 2
     </string>
-    <string name="help_retuitoken">Manage the Re:T-UI callback token for Termux, Tasker, and future modules.
+    <string name="help_retuitoken">Manage the private Re:T-UI callback credential for Termux, Tasker, and modules.
         \n\nUsage:
         \n$ retui-token -status
         \n$ retui-token -show
         \n$ retui-token -rotate
         \n$ retui-token -on
         \n$ retui-token -off
+        \n\n-status reports state without revealing the token. -show and -on enable callback authentication and print/copy the token to the clipboard. -rotate creates a new token, enables authentication, and prints/copies it; update existing integrations. -off disables authenticated callbacks.
+        \nWarning: keep this credential out of shared terminal output, screenshots, history, and clipboard contents. Never put a real token in an example or shared script.
         \n\nCallback action:
         \ncom.dvil.tui_renewed.RETUI_CALLBACK
         \n\nExtras:
@@ -279,13 +290,14 @@
         \n(no args) -> open the wallpaper picker
     </string>
     <string name="hint_wallpaper_auto_confirm">Yes/No</string>
-    <string name="help_preset">-save [name] -> save the current theme.xml and suggestions.xml colors as a preset
-        \n-apply [name] -> apply a saved or built-in preset and disable auto_color_pick
+    <string name="help_preset">-save [name] -> save theme.xml and suggestions.xml colors, shareable ui.xml values, local behavior.xml settings, and frame state as a local preset
+        \n-apply [name] -> apply a saved or built-in preset; saved presets can restore UI, selected behavior settings, and frames as well as colors; disable auto_color_pick
         \n-duplicate [saved name] -> copy a saved preset and prompt for its new name
         \n-ls -> list saved and built-in presets
-        \n-market -> open the Re:T-UI preset marketplace
+        \n-market -> open the external Re:T-UI preset marketplace (network)
         \n-rm [name] -> remove a saved or imported preset
-        \nTo share a look, use Settings > System &amp; Support > Create Shareable Configuration
+        \nLocal saved presets are not sanitized portable exports or personal backups. Save your current setup before applying a different preset.
+        \nTo share a look, use Settings > System &amp; Support > Create Shareable Configuration.
     </string>
     <string name="help_space">-ls -> list Spaces
         \n-current -> show the active Space
@@ -301,6 +313,8 @@
         \n-rm [aliasName] -> remove an existing alias
         \n-ls -> list your aliases
         \n-file -> open alias.txt
+        \n-tutorial -> open the external GitHub wiki in a browser (network)
+        \nHome aliases expand before built-in commands; avoid conflicting names. Script aliases execute code through Termux; inspect the script first.
     </string>
     <string name="help_apps">-ls -> open the app drawer, or list visible apps when the drawer is unavailable
         \n-lsh -> list your hidden apps
@@ -333,23 +347,25 @@ Enable qalculate in Settings → behavior.xml for units and symbolic maths, e.g.
         \n$ call [number] OR [contactName]
     </string>
     <string name="help_changelog">Show the changelog of the current version</string>
-    <string name="help_config">-set [option] [value] -> set the value of an option
-        \n-append [option] [value] -> append the given string to the value of the selected option
-        \n-file [file] -> edit a config file in the document editor (behavior.xml, ui.xml, theme.xml, ...)
-        \n-erase [option] -> set the value of an option to \"\"
-        \n-setr [option] [value] -> same to \"-set\", but restarts Re:T-UI automatically
-        \n-get [option] -> get the value of an option
-        \n-fontsize [value] -> change the global font size
-        \n-reset [option] -> reset the value of an option
-        \n-info [option] -> request info about the given option
-        \n-apply [file] -> move a file to the Re:T-UI directory
-        \n-tutorial -> open the tutorial page
+    <string name="help_config">-ls [optional: config file] -> list known files/options; with a file, read its values
+        \n-info [option] -> read the type, default, and description
+        \n-get [option] -> read the current value
+        \n-set [option] [value] -> change a value; some options refresh live, others need restart
+        \n-append [option] [value] -> concatenate text directly onto the current value, without a separator
+        \n-file [known config file] -> edit a supported file such as behavior.xml, ui.xml, or theme.xml; saving changes configuration
+        \n-erase [option] -> empty a value
+        \n-reset [option] -> restore its default value
+        \n-fontsize [integer] -> change ten legacy UI size fields, not all typography; use Settings for suggestions, module, and header sizes
+        \n-apply [file] -> move an existing file into the configuration folder and rotate existing XML or font assets
+        \n-tutorial -> open the external tutorial page (network)
+        \n\nWarning: keep a personal backup before broad edits. -apply is a move, not a copy or portable preset import; it may replace existing assets and its reported path does not verify a successful move. Use the Settings shareable-configuration import for portable presets.
+        \nKnown issue: -ls rss.xml currently returns notification values, not RSS values; do not use it to inspect feed configuration.
     </string>
     <string name="help_devutils">Dev utilities.
         \n$ devutils -notify title body
         \n$ devutils -notify_reply title body
         \n$ devutils -check_notifications</string>
-    <string name="help_donate">Offer a coffee to the developer (PayPal only)</string>
+    <string name="help_donate">Open the Re:T-UI GitHub repository in a browser (network). This command does not open a payment page.</string>
     <string name="help_duo">Manually switch the Surface Duo landscape companion layout.
         \nRequires behavior.xml duo_mode=true.
         \n$ duo status
@@ -448,6 +464,7 @@ Enable qalculate in Settings → behavior.xml for units and symbolic maths, e.g.
     <string name="help_rate">Leave a feedback on the Play Store page</string>
     <string name="help_refresh">Refresh apps, alias, music, contacts</string>
     <string name="help_regex">-add [ID] [regex] -> add a new regex with the given ID
+        \n-get [ID] -> read the stored pattern
         \n-rm [ID] -> remove the regex with the given ID
         \n-test [ID] [string] -> test the corresponding regex over the given string</string>
     <string name="help_reply">-to [ID or packageName] [what] -> reply to the last notification from the application bound with the given ID
@@ -469,25 +486,29 @@ Enable qalculate in Settings → behavior.xml for units and symbolic maths, e.g.
     </string>
     <string name="help_share">$ share [pathToFile]
     </string>
-    <string name="help_shortcut">-ls [appName] -> show the shortcuts of this app
-        \n-use [shortcutID OR shortcut index] [optional: appName] -> use the specified shortcut
-        \n-use @alias -> use a pinned shortcut accepted by Re:T-UI
-        \n-cp [index] [appName] -> copy to clipboard the nth shortcut of the selected app (first: 0)</string>
+    <string name="help_shortcut">Requires Android API 25 or later.
+        \n-ls [optional: appName] -> list shortcuts; without an app, also list accepted pinned handles
+        \n-use [shortcutID] [optional: appName] -> launch the matching shortcut
+        \n-use [zero-based shortcut index] [appName] -> launch an indexed app shortcut
+        \n-use @handle -> launch a pinned shortcut already accepted by Re:T-UI
+        \nCheck -ls before -use: shortcuts may perform app-specific actions.</string>
     <string name="help_status">Get info about battery charge, wifi status and mobile data</string>
-    <string name="help_time">Print the current time with the given format
+    <string name="help_time">Print the current time using a configured output format.
         \n\nUsage:
-        \n$ time [index] (index means the index of the desired time_format</string>
-    <string name="help_tuixt">Open the Re:T-UI document editor.
+        \n$ time [index]
+        \n\nWithout an index, use format zero. The zero-based index selects output_time_format entries separated by time_format_separator. Out-of-range indices fall back to zero.</string>
+    <string name="help_tuixt">Open a known launcher configuration file in the document editor, not an arbitrary text path.
         \n\nUsage:
-        \n$ tuixt [textFile]
+        \n$ tuixt [known config file]
+        \nPrefer config -file behavior.xml for supported configuration editing. Saving changes configuration; keep a backup before broad edits.
     </string>
     <string name="help_tui">-rm -> uninstall Re:T-UI
         \n-about -> show info about the developer and the current version
-        \n-reset -> removes the Re:T-UI folder and resets default settings (restart required)
-        \n-log [fileName] -> log the text on screen to the file
+        \n-reset -> immediately deletes configuration-folder contents and reloads, without command-level confirmation; keep a personal backup first
+        \n-log [fileName] -> write terminal text to a file; output may contain private data
         \n-priority [command] [int] -> set the priority of the selected command
         \n-sourcecode -> open the GitHub page
-        \n-folder -> print the path of the Re:T-UI folder</string>
+        \n-folder -> open the actual configuration folder when a handler exists, otherwise print its path</string>
     <string name="help_tutorial">Open the Re:T-UI wiki</string>
     <string name="help_uninstall">Uninstall an application
         \n\nUsage:
@@ -536,11 +557,13 @@ Enable qalculate in Settings → behavior.xml for units and symbolic maths, e.g.
         \n\t* silent -> 0
         \n\t* vibrate -> 1
         \n\t* normal -> 2</string>
-    <string name="help_weather">- update -> perform a manual update (this won\'t work unless you set a custom weather key)
-        \n-enable -> enable weather
-        \n-disable -> disable weather
-        \n-tutorial -> open the weather tutorial webpage
-        \n-set_key [key] -> set a custom weather key
+    <string name="help_weather">Use tuiweather with these options; no API key is needed.
+        \n-set_location [place or latitude,longitude] -> save weather_location and request an update
+        \n-update -> request a manual weather update
+        \n-enable -> enable show_weather and reload the launcher
+        \n-disable -> disable show_weather and reload the launcher
+        \n-tutorial -> open the external weather tutorial webpage (network)
+        \n\nWeather requires network access to met.no. Place names use Android Geocoder and may fail to resolve. Coordinates are sent to the weather service; choose their precision deliberately.
         \n\nModule:
         \n$ module -show weather
         \n$ module -dock add weather</string>
@@ -562,8 +585,7 @@ Enable qalculate in Settings → behavior.xml for units and symbolic maths, e.g.
         \n$ reminder -add &lt;task name&gt; &lt;dd/mm/yy&gt; &lt;HH:mm&gt;
         \n$ reminder -ls
         \n$ reminder -rm &lt;ID&gt;
-        \n\nExample:
-        \n$ reminder -add Buy milk 31/08/26 21:30</string>
+        \n\nChoose a future date/time in dd/mm/yy HH:mm format; the final two tokens are date and time, and earlier tokens form the title. Past or current times are rejected. Open reminder to select a date in the editor instead of copying an expiring example. -rm deletes the selected reminder immediately.</string>
     <string name="help_stopwatch">Start or manage a stopwatch.
         \n\nUsage:
         \n$ stopwatch
@@ -572,10 +594,11 @@ Enable qalculate in Settings → behavior.xml for units and symbolic maths, e.g.
         \n$ stopwatch -status</string>
     <string name="help_notifications">-inc [appName] -> include an application
         \n-exc [appName] -> exclude an application
-        \n-open -> open the Android notification shade
+        \n-open -> open the launcher notification shade; try the system shade only when the launcher UI is unavailable
         \n-next -> show the next notification in the module
         \n-prev -> show the previous notification in the module
         \n-reply -> reply to the selected module notification
+        \n-clear -> dismiss the selected module notification, not clear terminal output
         \n-on -> add the notifications module to the dock
         \n-off -> remove the notifications module from the dock
         \n-color [color] [appName] -> set the color to be used for the application
@@ -587,7 +610,8 @@ Enable qalculate in Settings → behavior.xml for units and symbolic maths, e.g.
         \n-ls -> list included/excluded apps and content filters
         \n-access -> show the system settings page dedicated to the Notification Access
         \n-file -> open notifications.xml
-        \n-tutorial -> show the tutorial page</string>
+        \n-tutorial -> open the external tutorial page (network)
+        \nNotification access exposes private message content to the launcher. -on/-off only change dock membership, not Android listener access. Replies can send real messages; dismissal removes the selected notification.</string>
     <string name="help_location">Show your current location</string>
     <string name="help_cntcts">-ls -> list your contacts
         \n-l [contactName] -> show details about a contact
@@ -599,16 +623,18 @@ Enable qalculate in Settings → behavior.xml for units and symbolic maths, e.g.
         \n-add [ID] [update_time_in_seconds] [url] -> add a new RSS feed. Re:T-UI will try to get new contents every [update_time_in_seconds] seconds
         \n-rm [ID] -> remove this RSS feed
         \n-ls -> open your RSS feed list; tap a feed to edit it
-        \n-l [ID] -> show the whole content of the corresponding RSS feed
+        \n-menu [ID] -> open options for a saved feed
+        \n-l [ID] -> show the latest content of the corresponding RSS feed
         \n-show [ID] [boolean] -> toggle the [show] property of the given saved RSS feed
         \n-update_time [ID] [update_time_in_seconds] -> set the update time of the corresponding RSS feed
         \n-url [ID] [url] -> update the URL of the corresponding RSS feed
         \n-alias [ID] [alias] -> rename the corresponding RSS feed in lists and modules
+        \n-time_format [ID] [format] -> set the SimpleDateFormat pattern used to parse publication dates in this feed
         \n-format [ID] [format] -> set the format of the corresponding RSS feed ([format] can be both a string or the ID of an existing format)
         \n-color [ID] [color] -> set the base color of the corresponding RSS feed
         \n-wifi_only [ID] [boolean] -> if [boolean] is true, the corresponding feed will be updated only if your device is connected to a WiFi network
         \n-last_check [ID] -> show the last time Re:T-UI checked this RSS feed
-        \n-entry_tag [ID] -> set the base tag for every single entry (default: \"item\")
+        \n-entry_tag [ID] [tag] -> set the base tag for every single entry (default: \"item\")
         \n-date_tag [ID] [tag] -> set the tag which holds info about the publication date (default: \"pubDate\")
         \n-add_command [ID] [IDs (comma separated)] [regex] [cmd] -> create a new regex command that will be applied on the RSS feeds corresponding to IDs
         \n-rm_command [ID] -> rm the corresponding regex command
@@ -617,8 +643,9 @@ Enable qalculate in Settings → behavior.xml for units and symbolic maths, e.g.
         \n-include_if_matches [ID] [regex] -> if the given regex matches on an RSS feed item, it will be shown ([regex] can be both a string or the ID of a regex saved inside regex.xml)
         \n-exclude_if_matches [ID] [regex] -> if the given regex matches on an RSS feed item, it won\'t be shown ([regex] can be both a string or the ID of a regex saved inside regex.xml)
         \n-add_format [ID] [format] -> create a new format that you will be able to use for more than one RSS feed
-        \n-rm_format [ID] [format] -> remove an existing format
+        \n-rm_format [ID] -> remove an existing format
         \n-file -> open the file rss.xml
+        \n\nWarning: feed refresh uses the network and contacts the chosen URL. -rm deletes feed configuration. Saved regex commands can execute launcher commands triggered by feed content; use only trusted rules. Booleans are true/false.
         \n\nReddit/module example:
         \n$ rss -add 1 900 https://www.reddit.com/r/android/.rss
         \n$ rss -frc 1
@@ -632,11 +659,11 @@ Enable qalculate in Settings → behavior.xml for units and symbolic maths, e.g.
         \n$ cd ..
         \n$ cd /sdcard/Download
     </string>
-    <string name="help_ls">List files and folders in the current path or selected folder.
+    <string name="help_ls">Request a listing at the remembered file path using Re:T-UI Files (com.dvil.retui.fm), which must be installed.
         \nUsage:
         \n$ ls
-        \n$ ls [folder]
-        \n\nFor full browsing, use:
+        \n\nExtra folder arguments are ignored. Use cd [folder] then ls to change the listing path; cd requires the companion provider. This is not shell ls and has no sorting/filter flags.
+        \nFor full browsing, use:
         \n$ files
     </string>
     <string name="help_pwd">Print Re:T-UI\'s current file path.</string>

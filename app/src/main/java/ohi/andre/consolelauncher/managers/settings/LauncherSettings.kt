@@ -16,6 +16,7 @@ import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave
 import ohi.andre.consolelauncher.managers.xml.options.Behavior
 import ohi.andre.consolelauncher.managers.xml.options.Notifications
 import ohi.andre.consolelauncher.managers.xml.options.Suggestions
+import ohi.andre.consolelauncher.managers.xml.options.SurfaceBorderOption
 import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.managers.xml.options.Ui
 import ohi.andre.consolelauncher.tuils.Tuils
@@ -221,6 +222,14 @@ object LauncherSettings {
 
         if (context == null) {
             return
+        }
+
+        if (value is SurfaceBorderOption || value == Ui.enable_dashed_border ||
+            value == Ui.dashed_border_dash_length || value == Ui.dashed_border_gap_length ||
+            value == Ui.dashed_border_stroke_width || value == Ui.dashed_border_corner_radius ||
+            value == Theme.terminal_border_color || value == Theme.terminal_header_border_color
+        ) {
+            LauncherActivity.previewIfRunning()
         }
 
         if (value is Notifications || value == Behavior.preferred_music_app) {
