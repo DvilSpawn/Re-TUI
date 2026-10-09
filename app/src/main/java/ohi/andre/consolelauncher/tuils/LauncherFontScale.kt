@@ -20,6 +20,8 @@ object LauncherFontScale {
     @JvmStatic
     fun scaledSp(baseSp: Float): Float = scaledSp(baseSp, offsetSp())
 
+    fun terminalTextSizeSp(): Float = scaledSp(12f)
+
     internal fun scaledSp(baseSp: Float, offsetSp: Int): Float =
         (baseSp + offsetSp.coerceIn(MIN_OFFSET, MAX_OFFSET)).coerceAtLeast(1f)
 

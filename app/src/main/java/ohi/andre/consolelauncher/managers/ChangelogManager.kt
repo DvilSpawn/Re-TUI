@@ -74,13 +74,13 @@ object ChangelogManager {
                         if (cut) {
                             val sp = SpannableString(context.getString(R.string.manager_changelogmanager_click_here_to_see_the_full_changelog_897bf))
                             sp.setSpan(
-                                ForegroundColorSpan(XMLPrefsManager.getColor(Theme.output_text_color)),
+                                ohi.andre.consolelauncher.tuils.ThemeColorSpan(Theme.output_text_color),
                                 0,
                                 sp.length,
                                 Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
                             )
                             sp.setSpan(
-                                ForegroundColorSpan(XMLPrefsManager.getColor(Theme.link_text_color)),
+                                ohi.andre.consolelauncher.tuils.ThemeColorSpan(Theme.link_text_color),
                                 6,
                                 10,
                                 Spanned.SPAN_EXCLUSIVE_EXCLUSIVE

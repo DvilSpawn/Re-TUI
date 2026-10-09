@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="workspace_home">Home</string>
+    <string name="workspace_new">New window</string>
+    <string name="workspace_ime">Keyboard</string>
+    <string name="workspace_layout">Workspace layout</string>
+    <string name="workspace_layout_single">Single</string>
+    <string name="workspace_layout_top_bottom">Top-bottom</string>
+    <string name="workspace_layout_left_right">Left-right</string>
+    <string name="workspace_choose_window">Choose window</string>
+    <string name="workspace_new_shell">New shell</string>
+    <string name="workspace_focused_tile">Tile %1$d, focused</string>
+    <string name="workspace_unfocused_tile">Tile %1$d, tap to focus</string>
+    <string name="workspace_helper_update_required">Update the Termux retui helper to 0.4.1 for workspace pages and shell exit detection. Existing windows are unchanged.</string>
+    <string name="workspace_place_shell">Place new shell window</string>
+    <string name="workspace_replace_focused">Replace focused tile (keep previous shell)</string>
+    <string name="workspace_split_top_bottom">Split top-bottom</string>
+    <string name="workspace_split_left_right">Split left-right</string>
+    <string name="workspace_replace_top">Replace top tile (keep previous shell)</string>
+    <string name="workspace_replace_bottom">Replace bottom tile (keep previous shell)</string>
+    <string name="workspace_replace_left">Replace left tile (keep previous shell)</string>
+    <string name="workspace_replace_right">Replace right tile (keep previous shell)</string>
+    <string name="workspace_new_page">New single page (keep this page)</string>
+    <string name="workspace_page_position">Page %1$d / %2$d · swipe here</string>
+    <string name="workspace_page_previous">Previous workspace page</string>
+    <string name="workspace_page_next">Next workspace page</string>
+    <string name="workspace_shell_exited">Shell window exited</string>
+    <string name="workspace_empty">No shell windows · add a new shell</string>
+</resources>

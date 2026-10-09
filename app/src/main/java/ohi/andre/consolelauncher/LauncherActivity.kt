@@ -67,7 +67,6 @@ import kotlin.math.max
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.graphics.PorterDuff
-import android.graphics.drawable.Drawable
 import android.os.Handler
 import android.os.Looper
 import android.widget.EditText
@@ -105,6 +104,8 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
     private val pendingReloadMessages = StringBuilder()
     private var canApplyTheme = false
     private var backButtonEnabled = false
+    private var breathOutRoot: BreathOutLayout? = null
+    private var launcherResumed = false
 
     private var categories: MutableSet<ReloadMessageCategory?>? = null
 
@@ -419,8 +420,13 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
         playBootSound: Boolean
     ) {
         applyWallpaperWindowMode()
+        // The renderer must support clearing pixels before its first surface is created.
+        // UIManager paints the normal background inside the shared fade boundary.
+        window.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(Color.TRANSPARENT))
+        window.setFormat(android.graphics.PixelFormat.TRANSLUCENT)
 
-        val mainView = FrameLayout(this)
+        val mainView = BreathOutLayout(this)
+        breathOutRoot = mainView
         mainView.id = R.id.mainview
         mainView.layoutParams = ViewGroup.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
@@ -448,19 +454,28 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
         main!!.setRedirectionListener(uiManager!!.buildRedirectionListener())
         uiManager!!.pack = main!!.mainPack
         uiManager!!.restoreTerminalState(terminalState)
+        refreshBreathOutSettings()
         if (playBootSound) LauncherSoundManager.playBoot(this)
 
         if (terminalState == null) `in`.`in`(Tuils.EMPTYSTRING)
         if (!openStartupMenu || !StartupMenuManager.maybeOpen(this)) {
             if (terminalState == null || hasWindowFocus()) {
-                uiManager!!.activateTerminalInput(openKeyboardOnStart)
+                uiManager!!.activateTerminalInput(openKeyboardOnStart, preserveSelection = terminalState != null)
             }
             restoreGuideSessionAfterReload()
         }
     }
 
+    fun refreshBreathOutSettings() {
+        val root = breathOutRoot ?: return
+        val enabled = LauncherSettings.getBoolean(Behavior.breath_out)
+        applyWallpaperWindowMode()
+        root.configure(enabled, LauncherSettings.getInt(Behavior.breath_out_seconds))
+        root.setActive(launcherResumed && hasWindowFocus())
+    }
+
     private fun applyWallpaperWindowMode() {
-        if (LauncherSettings.getBoolean(Ui.system_wallpaper)) {
+        if (LauncherSettings.getBoolean(Ui.system_wallpaper) || LauncherSettings.getBoolean(Behavior.breath_out)) {
             window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER)
         } else {
             window.clearFlags(WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER)
@@ -469,6 +484,7 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
 
     fun refreshUiInPlace() {
         runOnUiThread {
+            if (isFinishing || isDestroyed || uiManager == null) return@runOnUiThread
             val oldManager = uiManager
             val terminalState = oldManager?.snapshotTerminalState()
             oldManager?.preserveSurfaceSessionForReload()
@@ -589,6 +605,8 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
 
     override fun onResume() {
         super.onResume()
+        launcherResumed = true
+        breathOutRoot?.setActive(hasWindowFocus())
         setWallpaperInteractionEnabled(true)
         applyFullscreen(this)
         if (this@LauncherActivity.uiManager != null) {
@@ -618,6 +636,8 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
     }
 
     override fun onPause() {
+        launcherResumed = false
+        breathOutRoot?.setActive(false)
         setWallpaperInteractionEnabled(false)
         if (this@LauncherActivity.uiManager != null) {
             uiManager!!.pause()
@@ -657,6 +677,7 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
         // routes system Back through this dispatcher, not the legacy overrides.
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
+                if (breathOutRoot?.wake() == true) return
                 uiManager?.let { ui ->
                     if (!ui.consumeBackPressed()) ui.onBackPressed()
                 }
@@ -706,6 +727,7 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
+        breathOutRoot?.setActive(launcherResumed && hasFocus)
         setWallpaperInteractionEnabled(hasFocus)
         if (this@LauncherActivity.uiManager != null) {
             uiManager!!.onLauncherWindowFocusChanged(hasFocus)
@@ -780,6 +802,7 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        breathOutRoot?.wake()
         setIntent(intent)
         if (handleKeyboardShortcutIntent(intent)) return
         if (shouldReturnToLauncherHome(intent.action, intent.categories)) {

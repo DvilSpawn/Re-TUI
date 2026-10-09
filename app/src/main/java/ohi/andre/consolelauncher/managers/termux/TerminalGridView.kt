@@ -38,6 +38,7 @@ class TerminalGridView @JvmOverloads constructor(
     private var cellHeightPx = 1
     private var baselineOffsetPx = 1f
     private var cells = Array(cols * rows) { Cell() }
+    private var frame: String? = null
     private val normalGlyphWidths = HashMap<String, Float>()
     private val boldGlyphWidths = HashMap<String, Float>()
 
@@ -69,6 +70,7 @@ class TerminalGridView @JvmOverloads constructor(
         terminalAccent = accent
         reverseBackground = ThemeColorResolver.blendPreservingAlpha(background, foreground, 0.36f)
         clearCells()
+        parseIntoGrid(frame)
         invalidate()
     }
 
@@ -81,6 +83,7 @@ class TerminalGridView @JvmOverloads constructor(
     }
 
     fun setFrame(value: String?, frameCols: Int, frameRows: Int, cursorCol: Int?, cursorRow: Int?) {
+        frame = value
         val cleanCols = frameCols.coerceIn(1, 240)
         val cleanRows = frameRows.coerceIn(1, 120)
         val sizeChanged = cleanCols != cols || cleanRows != rows

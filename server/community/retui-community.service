@@ -1,0 +1,36 @@
+[Unit]
+Description=Re-TUI community PocketBase pilot
+After=network.target
+
+[Service]
+Type=simple
+User=retui-community
+Group=retui-community
+WorkingDirectory=/opt/retui-community
+ExecStart=/opt/retui-community/pocketbase serve --http=127.0.0.1:8095 --dir=/var/lib/retui-community/data --hooksDir=/opt/retui-community/pb_hooks --migrationsDir=/opt/retui-community/pb_migrations --automigrate=false
+Restart=on-failure
+RestartSec=5
+UMask=0077
+Environment=GOMEMLIMIT=192MiB
+MemoryMax=256M
+CPUQuota=50%
+TasksMax=128
+LimitNOFILE=4096
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+CapabilityBoundingSet=
+ReadWritePaths=/var/lib/retui-community
+StandardOutput=null
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

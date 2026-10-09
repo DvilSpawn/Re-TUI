@@ -20,7 +20,7 @@ class CalculatorHelpIntegrationTest {
         try {
             prefs.edit().putString("terminal_transcript", "calc> 2+2\n4\n")
                 .putString("terminal_ans", "4").putString("terminal_draft", "ans + 7")
-                .putInt("terminal_cursor", 3).commit()
+                .putInt("terminal_cursor", 3).putInt("terminal_selection_end", 3).commit()
             activity = instrumentation.startActivitySync(Intent(context, CalculatorActivity::class.java)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) as CalculatorActivity
             instrumentation.waitForIdleSync()
@@ -84,6 +84,8 @@ class CalculatorHelpIntegrationTest {
             expectedDockHeight = activity.findViewById<View>(R.id.calculator_keypad_dock).height
             expectedTerminalHeight = activity.findViewById<View>(R.id.calculator_transcript_scroll).height
             assertTrue("Numeric keypad is laid out", expectedGridHeight > 0)
+            assertEquals("Five numeric rows use their exact pixel budget",
+                ohi.andre.consolelauncher.tuils.Tuils.dpToPx(activity, 48) * 5, expectedGridHeight)
         }
         listOf(R.id.calculator_letters_tab, R.id.calculator_functions_tab, R.id.calculator_numbers_tab).forEach { tab ->
             instrumentation.runOnMainSync { activity.findViewById<View>(tab).performClick() }
@@ -100,6 +102,32 @@ class CalculatorHelpIntegrationTest {
         }
     }
 
+    @Test fun firstMeasureAndSettledLayoutKeepExactDockBudget() = withCalculator { activity ->
+        val panel = activity.findViewById<View>(R.id.calculator_overlay)
+        val width = panel.width
+        val height = minOf(panel.height, ohi.andre.consolelauncher.tuils.Tuils.dpToPx(activity, 360))
+        val viewport = activity.findViewById<View>(R.id.calculator_keypad_scroll)
+        val ids = listOf(R.id.calculator_symbols, R.id.calculator_keypad_dock,
+            R.id.calculator_transcript_scroll, R.id.calculator_keypad_scroll)
+        fun measure(): List<Int> {
+            panel.forceLayout()
+            panel.measure(View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(height, View.MeasureSpec.EXACTLY))
+            return ids.map { activity.findViewById<View>(it).measuredHeight }
+        }
+        viewport.layoutParams.height = android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+        val first = measure()
+        assertEquals("Numeric grid has its full pixel budget", ohi.andre.consolelauncher.tuils.Tuils.dpToPx(activity, 48) * 5, first[0])
+        repeat(3) {
+            panel.layout(panel.left, panel.top, panel.left + width, panel.top + height)
+            assertEquals("First allocation must already equal the settled allocation", first, measure())
+        }
+        listOf(R.id.calculator_letters_tab, R.id.calculator_functions_tab, R.id.calculator_numbers_tab).forEach { tab ->
+            activity.findViewById<View>(tab).performClick()
+            assertEquals("Mode switches retain the first measure budget", first, measure())
+        }
+    }
+
     @Test fun landscapeRestorationKeepsLivePromptVisible() = withCalculator(onMain = false) { activity ->
         val monitor = instrumentation.addMonitor(CalculatorActivity::class.java.name, null, false)
         var landscape: CalculatorActivity? = null
@@ -109,6 +137,14 @@ class CalculatorHelpIntegrationTest {
             assertNotNull("Landscape calculator recreation", landscape)
             instrumentation.waitForIdleSync()
             android.os.SystemClock.sleep(400)
+            val stableHeights = listOf(R.id.calculator_symbols, R.id.calculator_keypad_dock,
+                R.id.calculator_transcript_scroll, R.id.calculator_keypad_scroll)
+            var expectedHeights = emptyList<Int>()
+            instrumentation.runOnMainSync {
+                expectedHeights = stableHeights.map { landscape!!.findViewById<View>(it).height }
+                assertEquals("Landscape numeric rows use the same exact pixel budget",
+                    ohi.andre.consolelauncher.tuils.Tuils.dpToPx(landscape!!, 48) * 5, expectedHeights.first())
+            }
             instrumentation.runOnMainSync {
                 val field = landscape!!.findViewById<EditText>(R.id.calculator_expression)
                 val visible = android.graphics.Rect()
@@ -117,127 +153,170 @@ class CalculatorHelpIntegrationTest {
                 assertEquals("ans + 7", field.text.toString())
                 assertEquals(3, field.selectionStart)
             }
+            listOf(R.id.calculator_letters_tab, R.id.calculator_functions_tab, R.id.calculator_numbers_tab).forEach { tab ->
+                instrumentation.runOnMainSync { landscape!!.findViewById<View>(tab).performClick() }
+                instrumentation.waitForIdleSync()
+                android.os.SystemClock.sleep(150)
+                instrumentation.runOnMainSync {
+                    assertEquals("Landscape grid, dock, terminal and viewport heights stay exact",
+                        expectedHeights, stableHeights.map { landscape!!.findViewById<View>(it).height })
+                    val field = landscape!!.findViewById<EditText>(R.id.calculator_expression)
+                    val visible = android.graphics.Rect()
+                    assertTrue("Live prompt remains visible in every landscape mode", field.getGlobalVisibleRect(visible))
+                    assertEquals(field.height, visible.height())
+                    assertEquals("ans + 7", field.text.toString())
+                    assertEquals(3, field.selectionStart)
+                    val dockScroll = landscape!!.findViewById<android.widget.ScrollView>(R.id.calculator_keypad_scroll)
+                    assertTrue("Short landscape retains a usable keypad viewport", dockScroll.height >= ohi.andre.consolelauncher.tuils.Tuils.dpToPx(landscape!!, 48))
+                    dockScroll.fullScroll(View.FOCUS_DOWN)
+                }
+                instrumentation.waitForIdleSync()
+                android.os.SystemClock.sleep(350)
+                instrumentation.runOnMainSync {
+                    val evaluate = landscape!!.findViewById<View>(R.id.calculator_equals)
+                    val visible = android.graphics.Rect()
+                    assertTrue("Evaluate can be reached by scrolling the dock", evaluate.getGlobalVisibleRect(visible))
+                    assertEquals(evaluate.height, visible.height())
+                    landscape!!.findViewById<android.widget.ScrollView>(R.id.calculator_keypad_scroll).fullScroll(View.FOCUS_UP)
+                }
+                instrumentation.waitForIdleSync()
+                android.os.SystemClock.sleep(350)
+                val mode = when (tab) {
+                    R.id.calculator_letters_tab -> "qwerty"
+                    R.id.calculator_functions_tab -> "functions"
+                    else -> "numeric"
+                }
+                java.io.File(context.cacheDir, "calculator-landscape-$mode.png").outputStream().use {
+                    instrumentation.uiAutomation.takeScreenshot().compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it)
+                }
+            }
         } finally {
             instrumentation.removeMonitor(monitor)
             instrumentation.runOnMainSync { landscape?.finishAndRemoveTask() }
         }
     }
 
-    @Test fun deviceBackReturnsTopicThenMenuThenCalculator() = withCalculator(onMain = false) { activity ->
+    @Test fun shortViewportWithLargeTextKeepsHistoryScrollableAndDraftVisible() = withCalculator(onMain = false) { activity ->
         instrumentation.runOnMainSync {
-            activity.findViewById<View>(R.id.calculator_help_tab).performClick()
-            activity.findViewById<EditText>(R.id.calculator_expression).setText("1")
-            activity.findViewById<View>(R.id.calculator_equals).performClick()
+            val root = activity.findViewById<View>(R.id.calculator_overlay)
+            root.layoutParams = root.layoutParams.apply { height = minOf(root.height, ohi.andre.consolelauncher.tuils.Tuils.dpToPx(activity, 360)) }
+            val field = activity.findViewById<EditText>(R.id.calculator_expression)
+            field.textSize = 48f
+            activity.findViewById<TextView>(R.id.calculator_prompt).textSize = 48f
+            activity.findViewById<TextView>(R.id.calculator_result).apply {
+                textSize = 48f
+                text = (1..60).joinToString("\n") { "calc> $it\n$it" }
+            }
+            val screen = activity.findViewById<android.view.ViewGroup>(android.R.id.content).getChildAt(0)
+            androidx.core.view.ViewCompat.dispatchApplyWindowInsets(screen,
+                androidx.core.view.WindowInsetsCompat.Builder().setInsets(
+                    androidx.core.view.WindowInsetsCompat.Type.systemBars(),
+                    androidx.core.graphics.Insets.of(16, 24, 16, 48)).build())
         }
         instrumentation.waitForIdleSync()
-        android.os.SystemClock.sleep(300)
-        java.io.File(context.cacheDir, "calculator-help-topic.png").outputStream().use {
-            instrumentation.uiAutomation.takeScreenshot().compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it)
-        }
-        instrumentation.sendKeyDownUpSync(android.view.KeyEvent.KEYCODE_BACK)
-        instrumentation.waitForIdleSync()
-        android.os.SystemClock.sleep(300)
-        java.io.File(context.cacheDir, "calculator-help-menu.png").outputStream().use {
-            instrumentation.uiAutomation.takeScreenshot().compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it)
-        }
-        instrumentation.runOnMainSync {
-            assertFalse(activity.isFinishing)
-            assertTrue(activity.findViewById<TextView>(R.id.calculator_result).text.contains("5 Keypad"))
-        }
-        instrumentation.sendKeyDownUpSync(android.view.KeyEvent.KEYCODE_BACK)
-        instrumentation.waitForIdleSync()
-        instrumentation.runOnMainSync {
-            assertFalse(activity.isFinishing)
-            assertEquals("ans + 7", activity.findViewById<EditText>(R.id.calculator_expression).text.toString())
+        android.os.SystemClock.sleep(400)
+        listOf(R.id.calculator_numbers_tab, R.id.calculator_letters_tab, R.id.calculator_functions_tab).forEach { tab ->
+            instrumentation.runOnMainSync { activity.findViewById<View>(tab).performClick() }
+            instrumentation.waitForIdleSync()
+            android.os.SystemClock.sleep(150)
+            instrumentation.runOnMainSync {
+                val field = activity.findViewById<EditText>(R.id.calculator_expression)
+                val visible = android.graphics.Rect()
+                assertTrue("Large draft remains visible with insets and long history", field.getGlobalVisibleRect(visible))
+                assertEquals("Large draft is not vertically clipped", field.height, visible.height())
+                assertEquals("ans + 7", field.text.toString())
+                assertEquals(3, field.selectionStart)
+                val terminal = activity.findViewById<android.widget.ScrollView>(R.id.calculator_transcript_scroll)
+                assertTrue("History can scroll independently of the controls", terminal.scrollY > 0)
+                terminal.scrollTo(0, 0)
+                assertEquals("Earlier output remains reachable", 0, terminal.scrollY)
+                terminal.scrollTo(0, terminal.getChildAt(0).height)
+            }
         }
     }
 
-    @Test fun recreationPreservesHelpPageAndBothDrafts() = withCalculator(onMain = false) { activity ->
-        val monitor = instrumentation.addMonitor(CalculatorActivity::class.java.name, null, false)
-        var recreated: CalculatorActivity? = null
+    @Test fun helpOpensDedicatedReaderWithoutChangingCalculatorDraft() = withCalculator(onMain = false) { activity ->
+        val monitor = instrumentation.addMonitor(ohi.andre.consolelauncher.help.OfflineHelpActivity::class.java.name, null, false)
+        var reader: ohi.andre.consolelauncher.help.OfflineHelpActivity? = null
         try {
             instrumentation.runOnMainSync {
                 val field = activity.findViewById<EditText>(R.id.calculator_expression)
                 field.setSelection(2, 5)
                 activity.findViewById<View>(R.id.calculator_help_tab).performClick()
-                field.setText("3")
-                activity.findViewById<View>(R.id.calculator_equals).performClick()
-                field.setText("9")
-                activity.recreate()
+                assertEquals("ans + 7", field.text.toString())
+                assertEquals("calc> 2+2\n4", activity.findViewById<TextView>(R.id.calculator_result).text.toString())
             }
-            recreated = instrumentation.waitForMonitorWithTimeout(monitor, 10000) as? CalculatorActivity
-            assertNotNull("Recreated calculator", recreated)
+            reader = instrumentation.waitForMonitorWithTimeout(monitor, 5000) as? ohi.andre.consolelauncher.help.OfflineHelpActivity
+            assertNotNull("Help tab opens dedicated reader", reader)
             instrumentation.waitForIdleSync()
             instrumentation.runOnMainSync {
-                val current = recreated!!
-                val field = current.findViewById<EditText>(R.id.calculator_expression)
-                val output = current.findViewById<TextView>(R.id.calculator_result)
-                assertEquals("help> ", current.findViewById<TextView>(R.id.calculator_prompt).text.toString())
-                assertTrue(output.text.contains("CONVERSIONS"))
-                assertEquals("9", field.text.toString())
-                current.onBackPressed()
-                current.onBackPressed()
+                assertTrue(reader!!.findViewById<TextView>(R.id.offline_help_output).text.contains(context.getString(R.string.offline_help_article_calculator_help_title)))
+                reader!!.findViewById<EditText>(R.id.offline_help_input).setText("9")
+                reader!!.finish()
+                val field = activity.findViewById<EditText>(R.id.calculator_expression)
                 assertEquals("ans + 7", field.text.toString())
-                assertEquals(2, field.selectionStart)
-                assertEquals(5, field.selectionEnd)
-                assertEquals("calc> 2+2\n4\n", output.text.toString())
-                assertEquals("4", CalculatorEngine.prefs(context).getString("terminal_ans", null))
+                assertEquals(2, field.selectionStart); assertEquals(5, field.selectionEnd)
             }
-        } finally {
-            instrumentation.removeMonitor(monitor)
-            instrumentation.runOnMainSync { recreated?.finishAndRemoveTask() }
-        }
+        } finally { instrumentation.removeMonitor(monitor); instrumentation.runOnMainSync { reader?.finish() } }
     }
 
-    @Test fun plainTextChoicesNavigateWithoutChangingDraft() = withCalculator { activity ->
-        val field = activity.findViewById<EditText>(R.id.calculator_expression)
-        val output = activity.findViewById<TextView>(R.id.calculator_result)
-        activity.findViewById<View>(R.id.calculator_help_tab).performClick()
-        val text = output.text
-        assertTrue("Help choices are tappable", text is android.text.Spanned)
-        val spans = (text as android.text.Spanned).getSpans(0, text.length, android.text.style.ClickableSpan::class.java)
-        assertEquals(6, spans.size)
-        spans[2].onClick(output)
-        assertTrue(output.text.contains("5 ft to miles"))
-        assertEquals("help> ", activity.findViewById<TextView>(R.id.calculator_prompt).text.toString())
-        val topic = output.text as android.text.Spanned
-        assertEquals("Only navigation choices are links, never examples", 4, topic.getSpans(0, topic.length, android.text.style.ClickableSpan::class.java).size)
-        topic.getSpans(0, topic.length, android.text.style.ClickableSpan::class.java).last().onClick(output)
-        assertEquals("ans + 7", field.text.toString())
-        assertEquals("calc> ", activity.findViewById<TextView>(R.id.calculator_prompt).text.toString())
+    @Test fun pendingCalculationDoesNotConsumeReaderDraftOrOverwriteNewCalculatorDraft() = withCalculator(onMain = false) { activity ->
+        val monitor = instrumentation.addMonitor(ohi.andre.consolelauncher.help.OfflineHelpActivity::class.java.name, null, false)
+        var reader: ohi.andre.consolelauncher.help.OfflineHelpActivity? = null
+        try {
+            instrumentation.runOnMainSync {
+                val field = activity.findViewById<EditText>(R.id.calculator_expression)
+                field.setText("2+2")
+                activity.findViewById<View>(R.id.calculator_equals).performClick()
+                assertFalse("Calculation is pending", activity.findViewById<View>(R.id.calculator_equals).isEnabled)
+                field.setText("ans + 7"); field.setSelection(3)
+                activity.findViewById<View>(R.id.calculator_help_tab).performClick()
+            }
+            reader = instrumentation.waitForMonitorWithTimeout(monitor, 5000) as? ohi.andre.consolelauncher.help.OfflineHelpActivity
+            assertNotNull(reader)
+            instrumentation.waitForIdleSync()
+            instrumentation.runOnMainSync { reader!!.findViewById<EditText>(R.id.offline_help_input).setText("9") }
+            val deadline = android.os.SystemClock.uptimeMillis() + 15000
+            var completed = false
+            while (!completed && android.os.SystemClock.uptimeMillis() < deadline) {
+                instrumentation.runOnMainSync { completed = activity.findViewById<View>(R.id.calculator_equals).isEnabled }
+                android.os.SystemClock.sleep(50)
+            }
+            assertTrue("Calculation finishes while reader is open", completed)
+            instrumentation.runOnMainSync {
+                assertEquals("9", reader!!.findViewById<EditText>(R.id.offline_help_input).text.toString())
+                assertEquals("ans + 7", activity.findViewById<EditText>(R.id.calculator_expression).text.toString())
+                val history = activity.findViewById<TextView>(R.id.calculator_result).text.toString()
+                assertEquals("Pending result appends the exact continuous displayed transcript",
+                    "calc> 2+2\n4\ncalc> 2+2\n4", history)
+                assertEquals("New calculator cursor is retained", 3,
+                    activity.findViewById<EditText>(R.id.calculator_expression).selectionStart)
+            }
+        } finally { instrumentation.removeMonitor(monitor); instrumentation.runOnMainSync { reader?.finish() } }
     }
 
-    @Test fun clearStaysClearedAcrossHelpAndKeepsAnswer() = withCalculator { activity ->
-        val field = activity.findViewById<EditText>(R.id.calculator_expression)
-        field.setText("clear")
-        activity.findViewById<View>(R.id.calculator_equals).performClick()
-        activity.findViewById<View>(R.id.calculator_help_tab).performClick()
-        activity.onBackPressed()
-        assertEquals("", activity.findViewById<TextView>(R.id.calculator_result).text.toString())
-        assertEquals("", CalculatorEngine.prefs(context).getString("terminal_transcript", null))
-        assertEquals("4", CalculatorEngine.prefs(context).getString("terminal_ans", null))
-    }
-
-    @Test fun typedHelpIsACommandNotCalculationHistory() = withCalculator { activity ->
-        val field = activity.findViewById<EditText>(R.id.calculator_expression)
-        val output = activity.findViewById<TextView>(R.id.calculator_result)
-        val original = output.text.toString()
-        field.setText("help")
-        activity.findViewById<View>(R.id.calculator_equals).performClick()
-        assertTrue(output.text.toString(), output.text.contains("5 Keypad"))
-        assertEquals("", field.text.toString())
-        field.setText("0")
-        activity.findViewById<View>(R.id.calculator_equals).performClick()
-        assertEquals(original, output.text.toString())
-        assertEquals("", field.text.toString())
-        assertEquals("4", CalculatorEngine.prefs(context).getString("terminal_ans", null))
+    @Test fun typedHelpOpensReaderWithoutCalculationHistory() = withCalculator(onMain = false) { activity ->
+        val monitor = instrumentation.addMonitor(ohi.andre.consolelauncher.help.OfflineHelpActivity::class.java.name, null, false)
+        var reader: android.app.Activity? = null
+        try {
+            instrumentation.runOnMainSync {
+                activity.findViewById<EditText>(R.id.calculator_expression).setText("help")
+                activity.findViewById<View>(R.id.calculator_equals).performClick()
+            }
+            reader = instrumentation.waitForMonitorWithTimeout(monitor, 5000)
+            assertNotNull(reader)
+            instrumentation.runOnMainSync {
+                assertEquals("", activity.findViewById<EditText>(R.id.calculator_expression).text.toString())
+                assertEquals("calc> 2+2\n4", activity.findViewById<TextView>(R.id.calculator_result).text.toString())
+            }
+        } finally { instrumentation.removeMonitor(monitor); instrumentation.runOnMainSync { reader?.finish() } }
     }
 
     @Test fun terminalPromptIsUnframedAboveSeparateDock() = withCalculator { activity ->
         val field = activity.findViewById<EditText>(R.id.calculator_expression)
         val scroll = activity.findViewById<android.widget.ScrollView>(R.id.calculator_transcript_scroll)
         val output = activity.findViewById<TextView>(R.id.calculator_result)
-        assertEquals("Terminal is monospace even when controls use a proportional theme font", android.graphics.Typeface.MONOSPACE, field.typeface)
+        assertEquals("Terminal uses the embedded pane font", ohi.andre.consolelauncher.tuils.Tuils.getTypeface(activity), field.typeface)
         assertNull("Live prompt has no input border or underline", field.background)
         assertSame("Prompt and history share one scrollable terminal", scroll.getChildAt(0), field.parent.parent)
         assertSame(output.parent, field.parent.parent)
@@ -250,39 +329,4 @@ class CalculatorHelpIntegrationTest {
         assertEquals("Only one evaluate key", 1, countEvaluate(activity.findViewById(R.id.calculator_overlay)))
     }
 
-    @Test fun numberedTopicsHaveBoundariesAndBackRestoresCalculator() = withCalculator { activity ->
-        val field = activity.findViewById<EditText>(R.id.calculator_expression)
-        val output = activity.findViewById<TextView>(R.id.calculator_result)
-        val original = output.text.toString()
-        fun command(value: String) {
-            field.setText(value)
-            activity.findViewById<View>(R.id.calculator_equals).performClick()
-        }
-        activity.findViewById<View>(R.id.calculator_help_tab).performClick()
-        command("1")
-        assertTrue(output.text.toString(), output.text.contains("2 + 3 * 4"))
-        assertFalse(output.text.contains("2 Previous"))
-        assertTrue(output.text.contains("3 Next"))
-        command("2") // No previous topic: stay here, never wrap.
-        assertTrue(output.text.contains("2 + 3 * 4"))
-        command("3")
-        assertTrue(output.text.contains("sin"))
-        command("1")
-        assertTrue(output.text.contains("5 Keypad"))
-        command("5")
-        assertTrue(output.text.contains("⌫"))
-        assertTrue(output.text.contains("2 Previous"))
-        assertFalse(output.text.contains("3 Next"))
-        command("3")
-        assertTrue(output.text.contains("⌫"))
-        activity.onBackPressed()
-        assertTrue(output.text.contains("5 Keypad"))
-        assertFalse(activity.isFinishing)
-        activity.onBackPressed()
-        assertFalse(activity.isFinishing)
-        assertEquals(original, output.text.toString())
-        assertEquals("ans + 7", field.text.toString())
-        assertEquals(3, field.selectionStart)
-        assertEquals("4", CalculatorEngine.prefs(context).getString("terminal_ans", null))
-    }
 }

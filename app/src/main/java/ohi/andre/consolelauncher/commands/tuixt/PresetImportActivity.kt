@@ -8,7 +8,7 @@ import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
 import ohi.andre.consolelauncher.R
-import ohi.andre.consolelauncher.localization.LocalizedActivity
+import ohi.andre.consolelauncher.localization.LocalizedComponentActivity
 import ohi.andre.consolelauncher.managers.BackupManager
 import ohi.andre.consolelauncher.managers.PresetManager
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager.XMLPrefsRoot
@@ -17,7 +17,7 @@ import java.io.File
 import java.util.concurrent.Executors
 
 /** The exported boundary can only inspect and save shareable presets, never restore backups. */
-class PresetImportActivity : LocalizedActivity() {
+class PresetImportActivity : LocalizedComponentActivity() {
     private val worker = Executors.newSingleThreadExecutor()
     private var staged: BackupManager.StagedPreset? = null
     @Volatile private var leaving = false
@@ -27,6 +27,9 @@ class PresetImportActivity : LocalizedActivity() {
 
     override fun onCreate(state: Bundle?) {
         super.onCreate(state)
+        onBackPressedDispatcher.addCallback(this, object : androidx.activity.OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() { if (!saving) finish() }
+        })
         val layout = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(24, 24, 24, 24)
@@ -127,9 +130,6 @@ class PresetImportActivity : LocalizedActivity() {
         confirm.isEnabled = false
         preview.text = getString(R.string.portable_preset_error, error.displayMessage(this) ?: error.javaClass.simpleName)
     }
-
-    @Deprecated("Deprecated in Java")
-    override fun onBackPressed() { if (!saving) super.onBackPressed() }
 
     override fun onDestroy() {
         leaving = true

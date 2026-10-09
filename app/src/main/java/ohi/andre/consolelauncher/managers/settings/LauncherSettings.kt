@@ -9,6 +9,7 @@ import ohi.andre.consolelauncher.LauncherActivity
 import java.util.HashMap
 import java.util.Locale
 import ohi.andre.consolelauncher.managers.notifications.NotificationService
+import ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceActivity
 import ohi.andre.consolelauncher.managers.xml.AutoColorManager
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsElement
@@ -214,11 +215,25 @@ object LauncherSettings {
         return parentPath + ":" + value.label()
     }
 
+    private val themeRefreshHandler by lazy { Handler(Looper.getMainLooper()) }
+    private val themeRefresh = Runnable { LauncherActivity.previewIfRunning() }
+
     private fun onSettingChanged(context: Context?, value: XMLPrefsSave) {
+        if (value.type() == XMLPrefsSave.COLOR && value != Theme.terminal_border_color && value != Theme.terminal_header_border_color) {
+            themeRefreshHandler.removeCallbacks(themeRefresh)
+            themeRefreshHandler.postDelayed(themeRefresh, 100)
+        }
+        if (value == Behavior.breath_out || value == Behavior.breath_out_seconds) {
+            val launcher = LauncherActivity.instance
+            if (launcher != null) launcher.window.decorView.post {
+                if (LauncherActivity.instance === launcher) launcher.refreshBreathOutSettings()
+            }
+        }
         if (value == Ui.system_font || value == Ui.font_file) {
             Tuils.cancelFont()
             UIUtils.cancelFont()
         }
+        TermuxWorkspaceActivity.refreshIfRunning()
 
         if (context == null) {
             return

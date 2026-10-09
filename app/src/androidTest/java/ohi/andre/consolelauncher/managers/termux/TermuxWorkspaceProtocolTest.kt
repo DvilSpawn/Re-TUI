@@ -2,7 +2,6 @@ package ohi.andre.consolelauncher.managers.termux
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import ohi.andre.consolelauncher.UIManager
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -12,17 +11,16 @@ import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
 class TermuxWorkspaceProtocolTest {
-    private fun parse(text: String): Any {
-        // Parser has no UI dependencies; allocate without constructing launcher services.
-        val type = Class.forName("sun.misc.Unsafe")
-        val field = type.getDeclaredField("theUnsafe").apply { isAccessible = true }
-        val instance = type.getMethod("allocateInstance", Class::class.java).invoke(field.get(null), UIManager::class.java)
-        return UIManager::class.java.getDeclaredMethod("parseTermuxWorkspaceFrame", String::class.java)
-            .apply { isAccessible = true }.invoke(instance, text)!!
-    }
+    private fun parse(text: String) = TermuxWorkspaceFrame.parse(text)
 
-    private fun value(frame: Any, name: String): Any? = frame.javaClass.getDeclaredField(name)
-        .apply { isAccessible = true }.get(frame)
+    private fun value(frame: TermuxWorkspaceFrame, name: String): Any? = when (name) {
+        "frame" -> frame.body
+        "socketToken" -> frame.token
+        "tcpHost" -> frame.host
+        "cols" -> frame.cols
+        "rows" -> frame.rows
+        else -> error(name)
+    }
 
     @Test fun displayContentCannotChangeSocketMetadata() {
         val frame = parse("__RETUI_COLS__ 80\n__RETUI_ROWS__ 24\n__RETUI_FRAME_BEGIN__\n__RETUI_TOKEN__ attacker\n__RETUI_TCP_HOST__ 192.0.2.1\n__RETUI_COLS__ 2147483647\n__RETUI_FRAME_END__\n")
@@ -38,69 +36,12 @@ class TermuxWorkspaceProtocolTest {
         assertTrue((value(frame, "rows") as Int?) == null || (value(frame, "rows") as Int) <= 120)
     }
 
-    @Test fun failedHelperMutationIsNeverReplayed() {
-        val instrumentation = InstrumentationRegistry.getInstrumentation()
-        val type = Class.forName("sun.misc.Unsafe")
-        val field = type.getDeclaredField("theUnsafe").apply { isAccessible = true }
-        val manager = type.getMethod("allocateInstance", Class::class.java).invoke(field.get(null), UIManager::class.java)
-        instrumentation.runOnMainSync {
-            UIManager::class.java.getDeclaredField("termuxWorkspaceOutput").apply { isAccessible = true }
-                .set(manager, android.widget.TextView(instrumentation.targetContext))
-        }
-        val script = UIManager::class.java.getDeclaredMethod("buildTermuxWorkspaceBridgeScript", String::class.java)
-            .apply { isAccessible = true }.invoke(manager, "send").toString()
-        val fixture = "retui() { if [ \"\$2\" = capabilities ]; then printf '%s\\n' send; return 0; fi; printf '%s\\n' mutation; return 9; };\n" +
-            script + "\nprintf '%s\\n' replay\n"
-        val process = ProcessBuilder("/system/bin/sh", "-c", fixture).redirectErrorStream(true).start()
-        val output = process.inputStream.bufferedReader().readText()
-        assertEquals("mutation\n", output)
-        assertEquals(9, process.waitFor())
-    }
-
     @Test fun encodedBodyPreservesEveryProtocolLookingLine() {
         val body = "__RETUI_FRAME_END__\n__RETUI_TOKEN__ attacker\n__RETUI_SOCKET_ERROR__ fake\n"
         val encoded = android.util.Base64.encodeToString(body.toByteArray(), android.util.Base64.NO_WRAP)
         val frame = parse("__RETUI_COLS__ 80\n__RETUI_ROWS__ 24\n__RETUI_FRAME_BASE64__ $encoded\n__RETUI_FRAME_END__\n")
         assertEquals(body, value(frame, "frame"))
         assertNull(value(frame, "socketToken"))
-    }
-
-    @Test fun pauseClosesOnlyTheClientAndKeepsLocalDraft() {
-        val type = Class.forName("sun.misc.Unsafe")
-        val unsafe = type.getDeclaredField("theUnsafe").apply { isAccessible = true }.get(null)
-        val manager = type.getMethod("allocateInstance", Class::class.java).invoke(unsafe, UIManager::class.java)
-        val client = TermuxWorkspaceSocketClient(object : TermuxWorkspaceSocketClient.Listener {
-            override fun onFrame(frame: String) {}
-            override fun onStatus(status: String) {}
-            override fun onError(message: String) {}
-            override fun onClosed() {}
-        })
-        fun set(name: String, value: Any) = UIManager::class.java.getDeclaredField(name).apply { isAccessible = true }.set(manager, value)
-        val draft = StringBuilder("switch 2")
-        set("termuxWorkspaceSocketClient", client)
-        set("termuxWorkspaceLocalCommandBuffer", draft)
-        set("termuxWorkspaceLocalCommandMode", true)
-        InstrumentationRegistry.getInstrumentation().runOnMainSync { (manager as UIManager).pause() }
-        assertNull(UIManager::class.java.getDeclaredField("termuxWorkspaceSocketClient").apply { isAccessible = true }.get(manager))
-        assertEquals("switch 2", draft.toString())
-        assertEquals(true, UIManager::class.java.getDeclaredField("termuxWorkspaceLocalCommandMode").apply { isAccessible = true }.get(manager))
-        client.close()
-    }
-
-    @Test fun transientStatusDoesNotReplaceRunningTerminalContent() {
-        val instrumentation = InstrumentationRegistry.getInstrumentation()
-        val type = Class.forName("sun.misc.Unsafe")
-        val unsafe = type.getDeclaredField("theUnsafe").apply { isAccessible = true }.get(null)
-        val manager = type.getMethod("allocateInstance", Class::class.java).invoke(unsafe, UIManager::class.java)
-        val buffer = StringBuilder("running editor content")
-        instrumentation.runOnMainSync {
-            UIManager::class.java.getDeclaredField("mContext").apply { isAccessible = true }.set(manager, instrumentation.targetContext)
-            UIManager::class.java.getDeclaredField("termuxWorkspaceBuffer").apply { isAccessible = true }.set(manager, buffer)
-            UIManager::class.java.getDeclaredField("termuxWorkspaceCurrentWindow").apply { isAccessible = true }.set(manager, "0:editor")
-            UIManager::class.java.getDeclaredField("termuxWorkspaceOutput").apply { isAccessible = true }.set(manager, android.widget.TextView(instrumentation.targetContext))
-            UIManager::class.java.getDeclaredMethod("renderTermuxWorkspaceStatus", String::class.java).apply { isAccessible = true }.invoke(manager, "typing")
-        }
-        assertEquals("running editor content", buffer.toString())
     }
 
     @Test fun gridAllocationHasAnIndependentGeometryLimit() {
@@ -113,18 +54,6 @@ class TermuxWorkspaceProtocolTest {
             assertEquals(240, cols)
             assertEquals(120, rows)
         }
-    }
-
-    @Test fun windowHeaderOffersSelectionForEachIndex() {
-        val instrumentation = InstrumentationRegistry.getInstrumentation()
-        val type = Class.forName("sun.misc.Unsafe")
-        val unsafe = type.getDeclaredField("theUnsafe").apply { isAccessible = true }.get(null)
-        val manager = type.getMethod("allocateInstance", Class::class.java).invoke(unsafe, UIManager::class.java)
-        UIManager::class.java.getDeclaredField("mContext").apply { isAccessible = true }.set(manager, instrumentation.targetContext)
-        val rendered = UIManager::class.java.getDeclaredMethod("formatTermuxWorkspaceWindowList", String::class.java)
-            .apply { isAccessible = true }.invoke(manager, "0:shell*\t1:editor with spaces\t2:logs\t") as android.text.Spanned
-        assertEquals(3, rendered.getSpans(0, rendered.length, android.text.style.ClickableSpan::class.java).size)
-        assertTrue(rendered.toString().contains("editor with spaces"))
     }
 
     @Test fun authenticatedLoopbackDeliversFramesInputAndClosesHonestly() {
@@ -202,34 +131,6 @@ class TermuxWorkspaceProtocolTest {
             assertTrue(client.sendInput("printf '%s\\n' RETUI_LOOPBACK_OK", 80, 24))
             assertTrue("Real tmux must capture the round trip", observed.await(8, TimeUnit.SECONDS))
         } finally { client.close() }
-    }
-
-    @Test fun completeBoundedFrameIsNotCroppedFromItsBeginning() {
-        val instrumentation = InstrumentationRegistry.getInstrumentation()
-        val type = Class.forName("sun.misc.Unsafe")
-        val unsafe = type.getDeclaredField("theUnsafe").apply { isAccessible = true }.get(null)
-        val manager = type.getMethod("allocateInstance", Class::class.java).invoke(unsafe, UIManager::class.java)
-        val body = List(120) { "x".repeat(240) }.joinToString("\n").replaceRange(0, 1, "A")
-        val buffer = StringBuilder()
-        instrumentation.runOnMainSync {
-            fun set(name: String, value: Any) = UIManager::class.java.getDeclaredField(name).apply { isAccessible = true }.set(manager, value)
-            set("mContext", instrumentation.targetContext)
-            set("termuxWorkspaceBuffer", buffer)
-            set("termuxWorkspaceGrid", TerminalGridView(instrumentation.targetContext))
-            UIManager::class.java.declaredMethods.single { it.name == "updateTermuxWorkspaceOutput" }.apply { isAccessible = true }
-                .invoke(manager, body, null, null, 240, 120)
-        }
-        assertEquals(body, buffer.toString())
-    }
-
-    @Test fun explicitWindowNamesKeepSpacesAndLiteralSuffixes() {
-        val type = Class.forName("sun.misc.Unsafe")
-        val unsafe = type.getDeclaredField("theUnsafe").apply { isAccessible = true }.get(null)
-        val manager = type.getMethod("allocateInstance", Class::class.java).invoke(unsafe, UIManager::class.java)
-        val method = UIManager::class.java.getDeclaredMethod("normalizeTermuxWorkspaceWindowTarget", String::class.java).apply { isAccessible = true }
-        assertEquals("editor with spaces", method.invoke(manager, "editor with spaces"))
-        assertEquals("literal*", method.invoke(manager, "literal*"))
-        assertEquals("2", method.invoke(manager, "2:editor with spaces*"))
     }
 
     @Test fun transportIsNotReadyBeforeAuthenticatedHelloResponse() {

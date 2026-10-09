@@ -23,6 +23,11 @@ class OfflineHelpIntegrationTest {
         try { instrumentation.runOnMainSync { check(activity) } }
         finally { instrumentation.runOnMainSync { activity.finish() } }
     }
+    private fun renderedBody(body: String): String {
+        val text = android.text.SpannableStringBuilder()
+        HelpText.body(text, body, 0, 12)
+        return text.toString().trimEnd()
+    }
     private fun fixturePack(): ohi.andre.consolelauncher.commands.main.MainPack {
         // Avoid constructing account/contact/app managers for read-only command tests.
         val type = Class.forName("sun.misc.Unsafe")
@@ -76,7 +81,7 @@ class OfflineHelpIntegrationTest {
             assertNull(execute("help -topic terminal-basics"))
             val article = instrumentation.waitForMonitorWithTimeout(monitor, 5000) as OfflineHelpActivity
             instrumentation.waitForIdleSync()
-            instrumentation.runOnMainSync { assertTrue(article.findViewById<TextView>(R.id.offline_help_output).text.contains(context.getString(OfflineHelpCatalog.find("terminal-basics")!!.body))) }
+            instrumentation.runOnMainSync { assertTrue(article.findViewById<TextView>(R.id.offline_help_output).text.contains(renderedBody(context.getString(OfflineHelpCatalog.find("terminal-basics")!!.body)))) }
             pack.context = article
             instrumentation.addMonitor(monitor)
             pack.clear()
@@ -134,7 +139,7 @@ class OfflineHelpIntegrationTest {
             val prefsBefore = guide.all.toMap()
             activity.findViewById<EditText>(R.id.offline_help_input).setText("1")
             activity.findViewById<View>(R.id.offline_help_enter).performClick()
-            activity.onBackPressed()
+            activity.onBackPressedDispatcher.onBackPressed()
             assertEquals(saved.input, terminal.input)
             assertEquals(saved.output.toString(), terminal.terminalText)
             assertEquals(saved.commands, terminal.snapshotState().commands)
@@ -195,11 +200,11 @@ class OfflineHelpIntegrationTest {
             articles.forEachIndexed { index, topic ->
                 if (index > 0 && index % 7 == 0) enter(9)
                 enter(index % 7 + 1)
-                assertTrue("Missing ${topic.id}", output.text.contains(activity.getString(topic.body)))
-                activity.onBackPressed()
+                assertTrue("Missing ${topic.id}", output.text.contains(renderedBody(activity.getString(topic.body))))
+                activity.onBackPressedDispatcher.onBackPressed()
                 assertTrue(output.text.contains(activity.getString(topic.title)))
             }
-            activity.onBackPressed()
+            activity.onBackPressedDispatcher.onBackPressed()
             repeat(rootIndex / 7) { enter(8) }
         }
         assertEquals(before, configSnapshot())
@@ -216,7 +221,7 @@ class OfflineHelpIntegrationTest {
                 val output = activity.findViewById<TextView>(R.id.offline_help_output)
                 assertTrue(output.text.contains(activity.getString(fixture.title)))
                 input.setText("1"); activity.findViewById<View>(R.id.offline_help_enter).performClick()
-                assertTrue(output.text.contains(activity.getString(fixture.body)))
+                assertTrue(output.text.contains(renderedBody(activity.getString(fixture.body))))
                 input.setText("3"); activity.findViewById<View>(R.id.offline_help_enter).performClick()
                 assertTrue(output.text.contains(OfflineHelpReference.text(activity, OfflineHelpReference.commands(activity).first())))
             }
@@ -264,12 +269,12 @@ class OfflineHelpIntegrationTest {
         input.setText("1")
         input.dispatchKeyEvent(android.view.KeyEvent(android.view.KeyEvent.ACTION_DOWN, android.view.KeyEvent.KEYCODE_ENTER))
         input.dispatchKeyEvent(android.view.KeyEvent(android.view.KeyEvent.ACTION_UP, android.view.KeyEvent.KEYCODE_ENTER))
-        assertTrue(output.text.contains(context.getString(OfflineHelpCatalog.find("terminal-basics")!!.body)))
-        activity.onBackPressed()
+        assertTrue(output.text.contains(renderedBody(context.getString(OfflineHelpCatalog.find("terminal-basics")!!.body))))
+        activity.onBackPressedDispatcher.onBackPressed()
         assertTrue(output.text.contains("Terminal basics"))
-        activity.onBackPressed()
+        activity.onBackPressedDispatcher.onBackPressed()
         assertTrue(output.text.contains("Getting started"))
-        activity.onBackPressed()
+        activity.onBackPressedDispatcher.onBackPressed()
         assertTrue(activity.isFinishing)
     }
     @Test fun recreationKeepsTopicDraftSelectionAndLandscapePromptVisible() {
@@ -291,20 +296,27 @@ class OfflineHelpIntegrationTest {
                 val current = recreated!!
                 val field = current.findViewById<EditText>(R.id.offline_help_input)
                 assertEquals("19", field.text.toString()); assertEquals(0, field.selectionStart); assertEquals(1, field.selectionEnd)
-                assertTrue(current.findViewById<TextView>(R.id.offline_help_output).text.contains(context.getString(OfflineHelpCatalog.find("terminal-basics")!!.body)))
+                assertTrue(current.findViewById<TextView>(R.id.offline_help_output).text.contains(renderedBody(context.getString(OfflineHelpCatalog.find("terminal-basics")!!.body))))
                 val visible = android.graphics.Rect()
                 assertTrue(field.getGlobalVisibleRect(visible)); assertEquals(field.height, visible.height())
             }
             java.io.File(context.cacheDir, "offline-help-landscape.png").outputStream().use {
                 instrumentation.uiAutomation.takeScreenshot().compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it)
             }
-            instrumentation.sendKeyDownUpSync(android.view.KeyEvent.KEYCODE_BACK)
-            instrumentation.waitForIdleSync()
-            instrumentation.runOnMainSync { assertTrue(recreated!!.findViewById<TextView>(R.id.offline_help_output).text.contains("Terminal basics")) }
+            instrumentation.runOnMainSync {
+                recreated!!.findViewById<EditText>(R.id.offline_help_input).apply { setSelection(length()); clearFocus() }
+            }
             instrumentation.sendKeyDownUpSync(android.view.KeyEvent.KEYCODE_BACK)
             instrumentation.waitForIdleSync()
             instrumentation.runOnMainSync {
-                assertTrue(recreated!!.findViewById<TextView>(R.id.offline_help_output).text.contains("Getting started"))
+                val title = recreated!!.findViewById<TextView>(R.id.offline_help_output).text.lineSequence().first().toString()
+                assertEquals("Back reaches the category, not a matching phrase in the article", "Getting started", title)
+            }
+            instrumentation.sendKeyDownUpSync(android.view.KeyEvent.KEYCODE_BACK)
+            instrumentation.waitForIdleSync()
+            instrumentation.runOnMainSync {
+                val title = recreated!!.findViewById<TextView>(R.id.offline_help_output).text.lineSequence().first().toString()
+                assertEquals("Back reaches root navigation without a duplicate title", "1 Getting started", title)
                 recreated!!.findViewById<EditText>(R.id.offline_help_input).setText("9")
                 recreated!!.findViewById<View>(R.id.offline_help_enter).performClick()
                 recreated!!.findViewById<EditText>(R.id.offline_help_input).apply { setText("78"); setSelection(1) }
@@ -317,7 +329,8 @@ class OfflineHelpIntegrationTest {
             instrumentation.runOnMainSync {
                 val current = recreated!!
                 val field = current.findViewById<EditText>(R.id.offline_help_input)
-                assertTrue(current.findViewById<TextView>(R.id.offline_help_output).text.contains("8 Previous page"))
+                val pageText = current.findViewById<TextView>(R.id.offline_help_output).text.toString()
+                assertTrue("Recreated second root page: $pageText", pageText.contains("8 Previous page"))
                 assertFalse(current.findViewById<TextView>(R.id.offline_help_output).text.contains("Getting started"))
                 assertEquals("78", field.text.toString()); assertEquals(1, field.selectionStart)
             }
@@ -364,6 +377,6 @@ class OfflineHelpIntegrationTest {
         assertTrue(output.text.contains("8 Previous page"))
         input.setText("1"); activity.findViewById<View>(R.id.offline_help_enter).performClick()
         assertTrue(output.text.contains(let { val authored = OfflineHelpCatalog.topics.filter { it.category == "reference" };
-            if (authored.size > 7) context.getString(authored[7].body) else OfflineHelpReference.text(context, reference[7 - authored.size]) }))
+            if (authored.size > 7) renderedBody(context.getString(authored[7].body)) else renderedBody(OfflineHelpReference.text(context, reference[7 - authored.size])) }))
     }
 }

@@ -79,6 +79,39 @@ class PortablePresetIntegrationTest {
     }
 
     @Test
+    fun dispatcherBackWaitsForSaveAndCancelsStagedInspection() {
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        val before = PresetManager.listPresets().toSet()
+        val uri = Uri.parse("content://${instrumentation.context.packageName}.portable-fixtures/legacy.retui-backup")
+        val activity = instrumentation.startActivitySync(Intent(context,
+            ohi.andre.consolelauncher.commands.tuixt.PresetImportActivity::class.java)
+            .setAction(Intent.ACTION_VIEW).setDataAndType(uri, BackupManager.PRESET_MIME)
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        try {
+            await(activity, "Preset: Portable fixture")
+            assertTrue("Import must support gesture back dispatch", activity is androidx.activity.ComponentActivity)
+            val saving = activity.javaClass.getDeclaredField("saving").apply { isAccessible = true }
+            val staged = activity.javaClass.getDeclaredField("staged").apply { isAccessible = true }
+            var folder: File? = null
+            instrumentation.runOnMainSync {
+                folder = (staged.get(activity) as BackupManager.StagedPreset).folder
+                saving.setBoolean(activity, true)
+                val component = activity as androidx.activity.ComponentActivity
+                component.onBackPressedDispatcher.onBackPressed()
+                assertFalse("Back must not interrupt an in-flight save", activity.isFinishing)
+                saving.setBoolean(activity, false)
+                component.onBackPressedDispatcher.onBackPressed()
+                assertTrue("Back cancels inspection without confirmation", activity.isFinishing)
+            }
+            instrumentation.waitForIdleSync()
+            val deadline = android.os.SystemClock.uptimeMillis() + 10000
+            while (folder!!.exists() && android.os.SystemClock.uptimeMillis() < deadline) Thread.sleep(50)
+            assertFalse("Cancellation removes the captured staging folder", folder!!.exists())
+            assertEquals(before, PresetManager.listPresets().toSet())
+        } finally { instrumentation.runOnMainSync { activity.finish() } }
+    }
+
+    @Test
     fun invalidExternalUrisAndActionsCannotEnableImport() {
         val instrumentation = InstrumentationRegistry.getInstrumentation()
         val before = PresetManager.listPresets().toSet()

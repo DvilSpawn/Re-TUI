@@ -1,6 +1,6 @@
 # Re:T-UI Termux Bridge
 
-`retui` 0.3.4 is the Termux-side helper for the launcher's tmux workspace.
+`retui` 0.4.1 is the Termux-side helper for the launcher's tmux workspace.
 Termux owns the shell, tmux session and persistent jobs. Re:T-UI displays
 captured cells and forwards input; this is not a second terminal runtime or a
 claim of complete terminal-emulator fidelity.
@@ -25,8 +25,21 @@ only `127.0.0.1` TCP fallback when cross-app abstract sockets are blocked.
 
 ## Workspace controls
 
-- Tap a window label to select its index. The active window is highlighted.
+- The launcher toolbar Termux icon, `tmux`, and `termux` open a dedicated Activity.
+- The layout tab always offers Single, Top-bottom, and Left-right (maximum two tiles).
+  Choose an existing window or a new shell for the second tile. Single expands the
+  focused tile without terminating either shell. Layout, focus and window IDs persist.
+- Tap a tile to focus it; its highlighted label identifies the input/IME target.
+  Tap a window label to choose a window. Swipes affect only the focused tile.
 - Swipe the terminal horizontally, or use `:prev` / `:next`, for adjacent windows.
+- Add always asks where to place the new shell window: replace a tile (keeping
+  its shell running), split a single page top-bottom/left-right, or open a new
+  single page. Cancelling creates nothing. Pages remember their own pair and focus.
+- Swipe the labelled page strip or tap its arrows to change pages; `:page next`
+  and `:page prev` do the same. Terminal swipes still change only the focused tile.
+- Exiting a shell removes its window from pages, collapses a surviving split and
+  closes empty pages. The final exit leaves an empty workspace; resume/reconnect
+  never silently recreates it. Add explicitly starts a new shell.
 - `:switch <window>` selects an index/name inside the pane. `tmux switch <window>`
   does the same from Launcher Home. `:new [name]` creates a window.
 - `:launch <id>` focuses/creates a saved launcher window; `:save <id> <command>`
@@ -35,7 +48,7 @@ only `127.0.0.1` TCP fallback when cross-app abstract sockets are blocked.
   Use the existing `termuxopen` command when the full Termux application is needed.
 - Connecting/Ready/Disconnected belongs to the header, not the running TUI.
   Typing/key progress does not replace a captured editor or other application.
-- Leaving the pane or backgrounding closes its stream, not tmux jobs. Returning
+- Leaving the Activity or backgrounding closes its stream, not tmux jobs. Returning
   reconnects to the same session. A local colon-command draft is retained.
 
 Ready requires the helper's successful HELLO response and a complete valid
@@ -66,9 +79,10 @@ retui bridge kill
 
 `capabilities` is read-only and lists supported operation names. The launcher
 chooses helper or direct tmux **before** mutation; it exits with the selected
-helper's result rather than replaying failed input. Older helpers without the
-capability query use direct tmux snapshots. For continuous streaming and frame
-isolation, update to 0.3.4. The v3 encoded socket protocol is not compatible with
+helper's result rather than replaying failed input. The dedicated Activity requires 0.4.1; it never silently falls back to a
+session-global input/capture path. Updating the APK alone does not update a
+Termux helper. Upgrade the helper separately; existing sessions/jobs are retained.
+For continuous streaming and independent tile geometry, update to 0.4.1. The v4 targeted socket protocol is not compatible with
 older launcher frame readers; update both sides rather than claiming transparent
 backward compatibility.
 
@@ -98,10 +112,11 @@ allowing spaces in names. Example (the payload here encodes `hello` plus newline
 
 ```text
 __RETUI_BRIDGE__ retui-bridge-v1
-__RETUI_VERSION__ 0.3.4
+__RETUI_VERSION__ 0.4.1
 __RETUI_SESSION__ retui_workspace
+__RETUI_TARGET__ @0
 __RETUI_WINDOW__ 0:1
-__RETUI_WINDOWS__ 0:1*
+__RETUI_WINDOWS__ @0:0:1
 __RETUI_COLS__ 80
 __RETUI_ROWS__ 24
 __RETUI_CURSOR__ 0:0
@@ -109,13 +124,28 @@ __RETUI_FRAME_BASE64__ aGVsbG8K
 __RETUI_FRAME_END__
 ```
 
-`socket-start` also returns `__RETUI_SOCKET__ retui-bridge-socket-v3`, the socket
+`socket-start` also returns `__RETUI_SOCKET__ retui-bridge-socket-v4`, the socket
 name, loopback host/port and private token in its bootstrap result. The launcher
-sends `HELLO <token> <cols> <rows> STREAM`. The helper returns protocol and
+opens one connection per visible tile and sends
+`HELLO <token> <cols> <rows> STREAM <base64-window-id-or-dash> NO_CREATE`.
+Each connection owns its target; capture, resize, text and keys address that
+window, not tmux's session-global active window. SELECT and SWITCH change only
+the connection target; NEW creates a detached window and targets it. Window
+list entries are `@id:index:name`. Missing restored windows require reselection.
+Displaying one window in both tiles is avoided because tmux sizes a window,
+not individual viewers. The helper returns protocol and
 `__RETUI_SOCKET_STATUS__ ok`, followed by changed frames. Omitting STREAM uses
 request/response captures with the **same encoded** frame format. Messages
 include CAPTURE, ENTER, SEND, TYPE, NEW, SWITCH, SELECT, KEY, PING and BYE; text/name/initial
 command arguments use base64. Invalid payloads fail before sending Enter.
+
+The 0.4.1 extension emits `__RETUI_TARGET_GONE__ @id` when a targeted window
+disappears or its retained pane has exited (`pane_dead`), and `-` for an empty
+session. It is a control event, not terminal output. `NO_CREATE` prevents HELLO
+from bootstrapping an exited session; only explicit NEW may create it. The
+Activity also uses `RETUI_NO_CREATE=1` on socket-start. Listener readiness uses
+authenticated PROBE (no capture, resize or shell creation), not an artificial
+20×8 attachment. Legacy non-Activity helper commands retain their bootstrap semantics.
 
 Closing the client ends its capture loop. The listener and tmux session remain
 available for reconnect; backgrounded launchers do not continue frame polling.
@@ -125,6 +155,8 @@ available for reconnect; backgrounded launchers do not continue frame polling.
 ```sh
 python3 scripts/test_termux_workspace.py
 python3 scripts/test_termux_helper.py
+python3 scripts/test_termux_tiles.py
+python3 scripts/test_termux_activity.py
 sh -n termux/retui/bin/retui
 sh -n termux/retui/install.sh
 ```

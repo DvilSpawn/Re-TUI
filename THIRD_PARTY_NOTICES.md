@@ -1,5 +1,15 @@
 # Third-party notices
 
+## Google Material Symbols
+
+The `open_in_full_24` and `pip_24` window-action vectors adapt Google's outlined
+Material Symbols `open_in_full` and `picture_in_picture` SVG paths. The SVG
+coordinate origin is translated into an Android vector viewport; the paths are
+otherwise unchanged.
+
+Source: https://github.com/google/material-design-icons/tree/master/symbols/web
+License: Apache-2.0; see `LICENSES/Material-Symbols-Apache-2.0.txt`.
+
 ## Qalculate native engine
 
 Re:TUI uses an independently authored GPL-3.0-or-later JNI bridge and native build

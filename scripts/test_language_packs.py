@@ -9,6 +9,12 @@ class LanguagePacksTest(unittest.TestCase):
     def test_template_is_current(self):
         packs.export(check=True)
 
+    def test_community_help_discloses_current_retention(self):
+        text = packs.catalog()['community_help']['forms']['other']
+        self.assertNotIn('30 days', text)
+        self.assertIn('24 hours', text)
+        self.assertIn('six calendar months', text)
+
     def test_plain_xml_preserves_android_escapes_and_quoted_spaces(self):
         self.assertEqual(' hi\nthere "yes" ', packs.android_text('" hi\\nthere \\"yes\\" "'))
         self.assertEqual("Don't", packs.android_text("Don\\'t"))

@@ -1,4 +1,8 @@
 <resources>
+    <string name="setting_behavior_breath_out_label">Breath out</string>
+    <string name="setting_behavior_breath_out_seconds_label">Breath out timeout (seconds)</string>
+    <string name="setting_behavior_breath_out_description">Fade the launcher away after inactivity, leaving only your wallpaper. Tap anywhere to restore it. Works in every launcher mode; off by default.</string>
+    <string name="setting_behavior_breath_out_seconds_description">Idle timeout in seconds before the launcher fades away when Breath out is enabled. Default: 900 seconds. Use a positive number.</string>
     <!-- Setting descriptions only. Keys, accepted values, and format tokens must not be translated. -->
     <!-- Apps.kt: default_app_n1 -->
     <string name="setting_apps_default_app_n1_description" formatted="false">"The first default-suggested app"</string>
@@ -621,17 +625,17 @@
     <string name="setting_theme_widget_control_text_color_description" formatted="false">Text color for controls in launcher widgets. AUTO follows widget_panel_text_color.</string>
     <string name="setting_theme_widget_control_border_color_description" formatted="false">Border color for controls in launcher widgets. AUTO follows widget_panel_border_color.</string>
     <string name="setting_theme_workspace_panel_background_color_description" formatted="false">Background color for the main panel in workspace panels, including the calculator. AUTO follows terminal_window_background_color.</string>
-    <string name="setting_theme_workspace_panel_text_color_description" formatted="false">Text color for the main panel in workspace panels, including the calculator. AUTO follows output_text_color.</string>
+    <string name="setting_theme_workspace_panel_text_color_description" formatted="false">Shared text color for calculator and offline help bodies, prompts and title bars, and default embedded Termux grid text and panel labels. Explicit ANSI colors are retained. AUTO follows output_text_color.</string>
     <string name="setting_theme_workspace_panel_border_color_description" formatted="false">Border color for the main panel in workspace panels, including the calculator. AUTO follows terminal_border_color.</string>
     <string name="setting_theme_workspace_header_background_color_description" formatted="false">Background color for the title bar in workspace panels, including the calculator. AUTO follows terminal_header_background_color.</string>
-    <string name="setting_theme_workspace_header_text_color_description" formatted="false">Text color for workspace title bars, including the calculator and shared Notes theme. AUTO follows workspace_panel_text_color.</string>
+    <string name="setting_theme_workspace_header_text_color_description" formatted="false">Header text color exported to the shared Notes theme. Calculator, offline help and embedded Termux title labels use workspace_panel_text_color. AUTO follows workspace_panel_text_color.</string>
     <string name="setting_theme_workspace_header_border_color_description" formatted="false">Border color for the title bar in workspace panels, including the calculator. AUTO follows terminal_header_border_color.</string>
     <string name="setting_theme_workspace_output_background_color_description" formatted="false">Background color for workspace output, including the calculator and shared Notes theme. AUTO darkens workspace_panel_background_color with fixed black (10%), preserving transparency.</string>
-    <string name="setting_theme_workspace_output_text_color_description" formatted="false">Text color for workspace output. AUTO follows workspace_panel_text_color.</string>
+    <string name="setting_theme_workspace_output_text_color_description" formatted="false">Base color for the alternate Termux ANSI span and cursor renderer and output text exported to the shared Notes theme. The embedded Termux grid, calculator and offline help use workspace_panel_text_color. Explicit ANSI colors are retained. AUTO follows workspace_panel_text_color.</string>
     <string name="setting_theme_workspace_input_background_color_description" formatted="false">Background color for workspace inputs, including the calculator and shared Notes theme. AUTO darkens workspace_panel_background_color with fixed black (16%), preserving transparency.</string>
-    <string name="setting_theme_workspace_input_text_color_description" formatted="false">Text color for input fields in workspace panels, including the calculator. AUTO follows input_text_color.</string>
+    <string name="setting_theme_workspace_input_text_color_description" formatted="false">Text color for embedded Termux input and input text exported to the shared Notes theme. Calculator and offline help prompts use workspace_panel_text_color. AUTO follows input_text_color.</string>
     <string name="setting_theme_workspace_control_background_color_description" formatted="false">Background color for workspace controls, including the calculator. AUTO follows workspace_panel_background_color.</string>
-    <string name="setting_theme_workspace_control_text_color_description" formatted="false">Text color for workspace controls, including the calculator. AUTO follows workspace_panel_text_color.</string>
+    <string name="setting_theme_workspace_control_text_color_description" formatted="false">Shared text color for calculator keys and mode tabs, offline help keys and window handles, and embedded Termux controls. AUTO follows workspace_panel_text_color.</string>
     <string name="setting_theme_workspace_control_border_color_description" formatted="false">Border color for workspace controls, including the calculator. AUTO follows workspace_panel_border_color.</string>
     <string name="setting_theme_settings_screen_color_description" formatted="false">Color behind the settings panel. AUTO follows settings_wallpaper_overlay_color.</string>
     <string name="setting_theme_settings_panel_background_color_description" formatted="false">Background color for the main panel in settings. AUTO follows terminal_header_background_color.</string>
@@ -661,22 +665,22 @@
     <string name="setting_theme_overlay_header_background_color_description" formatted="false">Background color for the title bar in floating panels. AUTO follows terminal_header_background_color.</string>
     <string name="setting_theme_overlay_header_text_color_description" formatted="false">Text color for the title bar in floating panels. AUTO follows overlay_panel_text_color.</string>
     <string name="setting_theme_overlay_header_border_color_description" formatted="false">Border color for the title bar in floating panels. AUTO follows terminal_header_border_color.</string>
-    <string name="setting_theme_ansi_black_description" formatted="false">Termux pane color for black ANSI text. AUTO uses the built-in default.</string>
-    <string name="setting_theme_ansi_red_description" formatted="false">Termux pane color for red ANSI text. AUTO uses the built-in default.</string>
-    <string name="setting_theme_ansi_green_description" formatted="false">Termux pane color for green ANSI text. AUTO blends terminal_window_background_color with accent_color.</string>
-    <string name="setting_theme_ansi_yellow_description" formatted="false">Termux pane color for yellow ANSI text. AUTO follows warning_text_color.</string>
-    <string name="setting_theme_ansi_blue_description" formatted="false">Termux pane color for blue ANSI text. AUTO blends terminal_window_background_color with output_text_color.</string>
-    <string name="setting_theme_ansi_magenta_description" formatted="false">Termux pane color for magenta ANSI text. AUTO uses the built-in default.</string>
-    <string name="setting_theme_ansi_cyan_description" formatted="false">Termux pane color for cyan ANSI text. AUTO blends accent_color with output_text_color.</string>
-    <string name="setting_theme_ansi_white_description" formatted="false">Termux pane color for white ANSI text. AUTO follows output_text_color.</string>
-    <string name="setting_theme_ansi_bright_black_description" formatted="false">Termux pane color for bright black ANSI text. AUTO follows muted_text_color.</string>
-    <string name="setting_theme_ansi_bright_red_description" formatted="false">Termux pane color for bright red ANSI text. AUTO uses the built-in default.</string>
-    <string name="setting_theme_ansi_bright_green_description" formatted="false">Termux pane color for bright green ANSI text. AUTO blends accent_color with output_text_color.</string>
-    <string name="setting_theme_ansi_bright_yellow_description" formatted="false">Termux pane color for bright yellow ANSI text. AUTO blends warning_text_color with output_text_color.</string>
-    <string name="setting_theme_ansi_bright_blue_description" formatted="false">Termux pane color for bright blue ANSI text. AUTO blends output_text_color with accent_color.</string>
-    <string name="setting_theme_ansi_bright_magenta_description" formatted="false">Termux pane color for bright magenta ANSI text. AUTO uses the built-in default.</string>
-    <string name="setting_theme_ansi_bright_cyan_description" formatted="false">Termux pane color for bright cyan ANSI text. AUTO blends accent_color with output_text_color.</string>
-    <string name="setting_theme_ansi_bright_white_description" formatted="false">Termux pane color for bright white ANSI text. AUTO follows output_text_color.</string>
+    <string name="setting_theme_ansi_black_description" formatted="false">Termux pane color for black ANSI text and backgrounds. Explicit truecolor is retained. AUTO uses the built-in default.</string>
+    <string name="setting_theme_ansi_red_description" formatted="false">Termux pane color for red ANSI text and backgrounds. Explicit truecolor is retained. AUTO uses the built-in default.</string>
+    <string name="setting_theme_ansi_green_description" formatted="false">Termux pane color for green ANSI text and backgrounds. Explicit truecolor is retained. AUTO blends terminal_window_background_color with accent_color.</string>
+    <string name="setting_theme_ansi_yellow_description" formatted="false">Termux pane color for yellow ANSI text and backgrounds. Explicit truecolor is retained. AUTO follows warning_text_color.</string>
+    <string name="setting_theme_ansi_blue_description" formatted="false">Termux pane color for blue ANSI text and backgrounds. Explicit truecolor is retained. AUTO blends terminal_window_background_color with output_text_color.</string>
+    <string name="setting_theme_ansi_magenta_description" formatted="false">Termux pane color for magenta ANSI text and backgrounds. Explicit truecolor is retained. AUTO uses the built-in default.</string>
+    <string name="setting_theme_ansi_cyan_description" formatted="false">Termux pane color for cyan ANSI text and backgrounds. Explicit truecolor is retained. AUTO blends accent_color with output_text_color.</string>
+    <string name="setting_theme_ansi_white_description" formatted="false">Termux pane color for white ANSI text and backgrounds. Explicit truecolor is retained. AUTO follows output_text_color.</string>
+    <string name="setting_theme_ansi_bright_black_description" formatted="false">Termux pane color for bright black ANSI text and backgrounds. Explicit truecolor is retained. AUTO follows muted_text_color.</string>
+    <string name="setting_theme_ansi_bright_red_description" formatted="false">Termux pane color for bright red ANSI text and backgrounds. Explicit truecolor is retained. AUTO uses the built-in default.</string>
+    <string name="setting_theme_ansi_bright_green_description" formatted="false">Termux pane color for bright green ANSI text and backgrounds. Explicit truecolor is retained. AUTO blends accent_color with output_text_color.</string>
+    <string name="setting_theme_ansi_bright_yellow_description" formatted="false">Termux pane color for bright yellow ANSI text and backgrounds. Explicit truecolor is retained. AUTO blends warning_text_color with output_text_color.</string>
+    <string name="setting_theme_ansi_bright_blue_description" formatted="false">Termux pane color for bright blue ANSI text and backgrounds. Explicit truecolor is retained. AUTO blends output_text_color with accent_color.</string>
+    <string name="setting_theme_ansi_bright_magenta_description" formatted="false">Termux pane color for bright magenta ANSI text and backgrounds. Explicit truecolor is retained. AUTO uses the built-in default.</string>
+    <string name="setting_theme_ansi_bright_cyan_description" formatted="false">Termux pane color for bright cyan ANSI text and backgrounds. Explicit truecolor is retained. AUTO blends accent_color with output_text_color.</string>
+    <string name="setting_theme_ansi_bright_white_description" formatted="false">Termux pane color for bright white ANSI text and backgrounds. Explicit truecolor is retained. AUTO follows output_text_color.</string>
     <!-- Toolbar.kt: show_toolbar -->
     <string name="setting_toolbar_show_toolbar_description" formatted="false">"If false, the toolbar is hidden"</string>
     <!-- Toolbar.kt: hide_toolbar_no_input -->

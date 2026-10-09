@@ -41,7 +41,11 @@ Transcript, answer, draft and selection persist across reopening. Help page and
 its own draft also survive activity recreation. Earlier calculator
 history and mode drafts are retained in storage without destructive migration.
 The pane uses the launcher theme and floating frame; controls retain the launcher
-font while the transcript and prompt stay monospace.
+font while the transcript and prompt stay monospace. Calculator and help start in
+floating mode. Drag the title to move a window, or one of its four corner targets
+to resize it. The header provides maximize/float and reset controls; floating
+restores the retained rectangle, and reset returns to the default safe-host bounds.
+Calculator and help keep independent window geometry across recreation.
 
 Calculations use the existing isolated Qalculate service and watchdog. The native
 bridge is independently authored; see `native/qalculate/README.md` and

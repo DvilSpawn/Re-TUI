@@ -54,7 +54,7 @@ class TermuxWorkspaceInputEditText : AppCompatEditText {
                 }
                 if (event != null && event.action == KeyEvent.ACTION_DOWN) {
                     val unicodeChar = event.unicodeChar
-                    if (unicodeChar > 0) {
+                    if (unicodeChar > 0 && !Character.isISOControl(unicodeChar) && !event.isCtrlPressed && !event.isAltPressed) {
                         textListener?.invoke(String(Character.toChars(unicodeChar)))
                         return true
                     }

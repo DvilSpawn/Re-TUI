@@ -360,6 +360,8 @@ class TuixtAdapter(
 
     private fun displayLabel(context: Context, item: XMLPrefsSave): String {
         return when (item.label()) {
+            "breath_out" -> context.getString(R.string.setting_behavior_breath_out_label)
+            "breath_out_seconds" -> context.getString(R.string.setting_behavior_breath_out_seconds_label)
             "unified_status_border" -> context.getString(R.string.editor_tuixtadapter_unified_bottom_console_d8bbf)
             "show_ascii" -> context.getString(R.string.editor_tuixtadapter_show_ascii_txt_871d6)
             "show_ascii_landscape" -> context.getString(R.string.editor_tuixtadapter_show_ascii_in_landscape_587c0)

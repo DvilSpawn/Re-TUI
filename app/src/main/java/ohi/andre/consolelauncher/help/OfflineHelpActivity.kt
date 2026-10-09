@@ -15,7 +15,7 @@ import android.view.ViewGroup
 import android.widget.*
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.commands.tuixt.TuixtLayout
-import ohi.andre.consolelauncher.localization.LocalizedActivity
+import ohi.andre.consolelauncher.localization.LocalizedComponentActivity
 import ohi.andre.consolelauncher.managers.settings.ThemeColorResolver
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.options.Theme
@@ -23,7 +23,7 @@ import ohi.andre.consolelauncher.tuils.LauncherSystemUi
 import ohi.andre.consolelauncher.tuils.TerminalBorderRuntime
 import ohi.andre.consolelauncher.tuils.Tuils
 
-class OfflineHelpActivity : LocalizedActivity() {
+class OfflineHelpActivity : LocalizedComponentActivity() {
     companion object {
         fun open(context: Context, topicId: String? = null) {
             val intent = Intent(context, OfflineHelpActivity::class.java).putExtra("topic", topicId)
@@ -35,9 +35,11 @@ class OfflineHelpActivity : LocalizedActivity() {
     private var article: String? = null
     private var page = 0
     private var rootPage = 0
+    private lateinit var windowPanel: HelpWindowPanel
     private lateinit var input: EditText
     private lateinit var output: TextView
     private lateinit var scroll: ScrollView
+    private lateinit var root: View
     private val reference by lazy { OfflineHelpReference.commands(this) }
     private val actions = mutableMapOf<String, () -> Unit>()
 
@@ -46,24 +48,30 @@ class OfflineHelpActivity : LocalizedActivity() {
         super.onCreate(state)
         Tuils.init(this); XMLPrefsManager.loadCommons(this); LauncherSystemUi.applyFullscreen(this)
         androidx.core.view.WindowCompat.setDecorFitsSystemWindows(window, false)
-        val screen = FrameLayout(this)
+        val screen = FrameLayout(this).apply { isClickable = true }
         val host = TuixtLayout.addFoldAwareHost(this, screen, ViewGroup.LayoutParams.MATCH_PARENT)
-        val root = layoutInflater.inflate(R.layout.offline_help_surface, host, false)
-        host.addView(root)
+        root = layoutInflater.inflate(R.layout.offline_help_surface, host, false)
+        val viewport = FrameLayout(this)
+        host.addView(viewport, ViewGroup.LayoutParams(-1, -1))
+        windowPanel = HelpWindowPanel(viewport, root, state)
         input = root.findViewById(R.id.offline_help_input)
         output = root.findViewById(R.id.offline_help_output)
         scroll = root.findViewById(R.id.offline_help_scroll)
         val textColor = ThemeColorResolver.color(Theme.workspace_panel_text_color)
-        root.setBackgroundColor(ThemeColorResolver.color(Theme.workspace_panel_background_color))
+        root.setBackgroundColor(android.graphics.Color.TRANSPARENT)
         listOf(output, input, root.findViewById<TextView>(R.id.offline_help_prompt), root.findViewById<TextView>(R.id.offline_help_header)).forEach {
-            it.typeface = Typeface.MONOSPACE; it.setTextColor(textColor)
+            it.typeface = Tuils.getTypeface(this); it.setTextColor(textColor)
+            it.textSize = ohi.andre.consolelauncher.tuils.LauncherFontScale.terminalTextSizeSp()
         }
+        output.textSize = ohi.andre.consolelauncher.tuils.LauncherFontScale.terminalTextSizeSp()
+        output.setLineSpacing(Tuils.dpToPx(this, 3).toFloat(), 1f)
+        input.typeface = Tuils.getTypeface(this)
         output.setLinkTextColor(textColor)
         root.findViewById<View>(R.id.offline_help_panel).background = TerminalBorderRuntime.panelDrawable(this,
             ThemeColorResolver.color(Theme.workspace_panel_background_color), ThemeColorResolver.color(Theme.workspace_panel_border_color),
             1.5f, ohi.andre.consolelauncher.managers.settings.AppearanceSettings.outputCornerRadius(),
             ohi.andre.consolelauncher.managers.settings.AppearanceSettings.dashedBorders(), target = ohi.andre.consolelauncher.tuils.FrameTarget.OVERLAYS)
-        TerminalBorderRuntime.bind(root.findViewById(R.id.offline_help_panel))
+        TerminalBorderRuntime.bind(root.findViewById(R.id.offline_help_panel), root.findViewById(R.id.offline_help_header))
         input.showSoftInputOnFocus = false
         input.setOnKeyListener { _, key, event ->
             if (key == KeyEvent.KEYCODE_ENTER) {
@@ -76,7 +84,9 @@ class OfflineHelpActivity : LocalizedActivity() {
             keys.addView(Button(this).apply {
                 text = label; minWidth = 0; minimumWidth = 0; minHeight = 0; minimumHeight = 0
                 setPadding(0, 0, 0, 0); setTextColor(textColor)
-                background = TerminalBorderRuntime.tabDrawable(this@OfflineHelpActivity, ThemeColorResolver.color(Theme.workspace_header_background_color))
+                typeface = Tuils.getTypeface(this@OfflineHelpActivity)
+                textSize = ohi.andre.consolelauncher.tuils.LauncherFontScale.terminalTextSizeSp()
+                background = null
                 if (label == "↵") { id = R.id.offline_help_enter; contentDescription = getString(R.string.offline_help_enter) }
                 if (label == "⌫") contentDescription = getString(R.string.offline_help_backspace)
                 setOnClickListener {
@@ -103,6 +113,9 @@ class OfflineHelpActivity : LocalizedActivity() {
             category = topic?.category ?: topic?.id
             article = topic?.takeIf { it.category != null }?.id
         }
+        onBackPressedDispatcher.addCallback(this, object : androidx.activity.OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() = back()
+        })
         render()
         if (state != null) {
             input.setText(state.getString("draft", ""))
@@ -114,7 +127,48 @@ class OfflineHelpActivity : LocalizedActivity() {
         }
         setContentView(screen)
         input.requestFocus()
+        if (state != null) scroll.post { scroll.scrollTo(0, state.getInt("scroll_y")) }
     }
+    override fun onResume() {
+        super.onResume()
+        if (!::output.isInitialized) return
+        val textColor = ThemeColorResolver.color(Theme.workspace_panel_text_color)
+        root.setBackgroundColor(android.graphics.Color.TRANSPARENT)
+        listOf(output, input, root.findViewById<TextView>(R.id.offline_help_prompt), root.findViewById<TextView>(R.id.offline_help_header)).forEach {
+            it.typeface = Tuils.getTypeface(this); it.setTextColor(textColor)
+            it.textSize = ohi.andre.consolelauncher.tuils.LauncherFontScale.terminalTextSizeSp()
+        }
+        input.typeface = Tuils.getTypeface(this)
+        output.textSize = ohi.andre.consolelauncher.tuils.LauncherFontScale.terminalTextSizeSp()
+        output.setLinkTextColor(textColor)
+        root.findViewById<View>(R.id.offline_help_panel).background = TerminalBorderRuntime.panelDrawable(this,
+            ThemeColorResolver.color(Theme.workspace_panel_background_color), ThemeColorResolver.color(Theme.workspace_panel_border_color),
+            1.5f, ohi.andre.consolelauncher.managers.settings.AppearanceSettings.outputCornerRadius(),
+            ohi.andre.consolelauncher.managers.settings.AppearanceSettings.dashedBorders(), target = ohi.andre.consolelauncher.tuils.FrameTarget.OVERLAYS)
+        val keys = root.findViewById<GridLayout>(R.id.offline_help_keys)
+        for (index in 0 until keys.childCount) (keys.getChildAt(index) as Button).apply {
+            setTextColor(ThemeColorResolver.color(Theme.workspace_control_text_color))
+            typeface = Tuils.getTypeface(this@OfflineHelpActivity)
+            textSize = ohi.andre.consolelauncher.tuils.LauncherFontScale.terminalTextSizeSp()
+            background = null
+        }
+        root.findViewById<TextView>(R.id.offline_help_header).apply {
+            includeFontPadding = false
+            setTypeface(Tuils.getTypeface(this@OfflineHelpActivity), Typeface.BOLD)
+            textSize = ohi.andre.consolelauncher.managers.settings.AppearanceSettings.outputHeaderTextSize().toFloat()
+            background = TerminalBorderRuntime.tabDrawable(this@OfflineHelpActivity,
+                ThemeColorResolver.color(Theme.workspace_header_background_color), ohi.andre.consolelauncher.tuils.FrameTarget.OVERLAYS)
+        }
+        TerminalBorderRuntime.bind(root.findViewById(R.id.offline_help_panel), root.findViewById(R.id.offline_help_header))
+        root.findViewById<View>(R.id.offline_help_main_pane).background = TerminalBorderRuntime.panelDrawable(this,
+            ThemeColorResolver.color(Theme.workspace_output_background_color),
+            ThemeColorResolver.withMaxAlpha(ThemeColorResolver.color(Theme.workspace_panel_border_color), 210),
+            1.2f, ohi.andre.consolelauncher.managers.settings.AppearanceSettings.outputCornerRadius(),
+            ohi.andre.consolelauncher.managers.settings.AppearanceSettings.dashedBorders(), target = ohi.andre.consolelauncher.tuils.FrameTarget.OVERLAYS)
+        windowPanel.refreshTheme()
+        render(preserveScroll = true)
+    }
+
     private fun ids(): List<String> = when (category) {
         null -> OfflineHelpCatalog.topics.filter { it.category == null }.map { it.id }
         "reference" -> OfflineHelpCatalog.topics.filter { it.category == category }.map { it.id } +
@@ -127,7 +181,8 @@ class OfflineHelpActivity : LocalizedActivity() {
         if (action == null) input.error = getString(R.string.offline_help_invalid_choice)
         else { input.error = null; action() }
     }
-    private fun render() {
+    private fun render(preserveScroll: Boolean = false) {
+        val scrollY = if (preserveScroll) scroll.scrollY else 0
         actions.clear()
         val text = SpannableStringBuilder()
         fun choice(number: Int, label: String, action: () -> Unit) {
@@ -143,7 +198,7 @@ class OfflineHelpActivity : LocalizedActivity() {
         val entries = ids()
         val current = article
         if (current == null) {
-            text.append(category?.let { title(it) } ?: getString(R.string.offline_help_title)).append("\n\n")
+            if (category != null) HelpText.title(text, title(category!!))
             val nav = HelpNavigation(entries, page); page = nav.page
             nav.visible().forEachIndexed { index, id -> choice(index + 1, title(id)) {
                 if (category == null) { rootPage = page; category = id; page = 0 }
@@ -156,7 +211,11 @@ class OfflineHelpActivity : LocalizedActivity() {
             val body = if (current.startsWith("command:")) reference.firstOrNull { "command:${it.javaClass.simpleName}" == current }
                 ?.let { OfflineHelpReference.text(this, it) } ?: getString(R.string.offline_help_no_reference)
                 else OfflineHelpCatalog.find(current)?.body?.let { getString(it) }.orEmpty()
-            text.append(title(current)).append("\n\n").append(body).append("\n\n")
+            HelpText.title(text, title(current))
+            val panelColor = ThemeColorResolver.color(Theme.workspace_panel_background_color)
+            val blockColor = androidx.core.graphics.ColorUtils.compositeColors(
+                androidx.core.graphics.ColorUtils.setAlphaComponent(output.currentTextColor, 24), panelColor)
+            HelpText.body(text, body, blockColor, Tuils.dpToPx(this, 12))
             val index = entries.indexOf(current)
             choice(1, getString(R.string.offline_help_topics)) { article = null; page = index.coerceAtLeast(0) / 7 }
             if (index > 0) choice(2, getString(R.string.offline_help_previous)) { article = entries[index - 1] }
@@ -165,10 +224,9 @@ class OfflineHelpActivity : LocalizedActivity() {
         }
         output.text = text
         output.movementMethod = LinkMovementMethod.getInstance()
-        scroll.post { scroll.scrollTo(0, 0) }
+        scroll.post { scroll.scrollTo(0, scrollY) }
     }
-    @Deprecated("Manual hierarchy")
-    override fun onBackPressed() {
+    private fun back() {
         when {
             article != null -> { val index = ids().indexOf(article); article = null; page = index.coerceAtLeast(0) / 7 }
             category != null -> { category = null; page = rootPage }
@@ -176,10 +234,12 @@ class OfflineHelpActivity : LocalizedActivity() {
         }
         input.setText(""); render()
     }
-    override fun onSaveInstanceState(state: Bundle) {
-        state.putString("category", category); state.putString("article", article)
-        state.putInt("page", page); state.putInt("root_page", rootPage)
-        state.putString("draft", input.text.toString()); state.putInt("start", input.selectionStart); state.putInt("end", input.selectionEnd)
-        super.onSaveInstanceState(state)
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putString("category", category); outState.putString("article", article)
+        outState.putInt("page", page); outState.putInt("root_page", rootPage)
+        outState.putString("draft", input.text.toString()); outState.putInt("start", input.selectionStart); outState.putInt("end", input.selectionEnd)
+        windowPanel.save(outState)
+        outState.putInt("scroll_y", scroll.scrollY)
+        super.onSaveInstanceState(outState)
     }
 }

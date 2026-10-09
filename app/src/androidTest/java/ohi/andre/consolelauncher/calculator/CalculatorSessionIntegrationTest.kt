@@ -3,7 +3,6 @@ package ohi.andre.consolelauncher.calculator
 import android.content.Intent
 import android.os.SystemClock
 import android.widget.EditText
-import android.widget.ImageButton
 import android.widget.TextView
 import android.view.View
 import androidx.test.platform.app.InstrumentationRegistry
@@ -27,7 +26,7 @@ class CalculatorSessionIntegrationTest {
             instrumentation.runOnMainSync {
                 val field = activity!!.findViewById<EditText>(R.id.calculator_expression)
                 assertFalse(field.showSoftInputOnFocus)
-                val size = ohi.andre.consolelauncher.managers.xml.XMLPrefsManager.getInt(ohi.andre.consolelauncher.managers.xml.options.Suggestions.suggestions_size)
+                val size = ohi.andre.consolelauncher.tuils.LauncherFontScale.terminalTextSizeSp()
                 assertEquals(android.util.TypedValue.applyDimension(android.util.TypedValue.COMPLEX_UNIT_SP, size.toFloat(), context.resources.displayMetrics), field.textSize, 0.1f)
                 val symbols = activity!!.findViewById<android.view.ViewGroup>(R.id.calculator_symbols)
                 fun key(label: String) = (0 until symbols.childCount).map { symbols.getChildAt(it) as TextView }.first { it.text.toString() == label }
@@ -46,16 +45,8 @@ class CalculatorSessionIntegrationTest {
                 assertTrue("Percent remains available on the function layer", (0 until letters.childCount).any { (letters.getChildAt(it) as TextView).text.toString() == "%" })
                 activity!!.findViewById<View>(R.id.calculator_numbers_tab).performClick()
                 assertEquals(View.VISIBLE, activity!!.findViewById<View>(R.id.calculator_main_pane).visibility)
-                assertEquals(96, activity!!.findViewById<ImageButton>(R.id.calculator_help_tab).imageAlpha)
-                assertEquals(255, activity!!.findViewById<ImageButton>(R.id.calculator_main_tab).imageAlpha)
-                activity!!.findViewById<View>(R.id.calculator_help_tab).performClick()
-                assertEquals("Help uses the same terminal and keypad", View.VISIBLE, activity!!.findViewById<View>(R.id.calculator_main_pane).visibility)
-                assertEquals("", field.text.toString())
-                assertTrue(activity!!.findViewById<TextView>(R.id.calculator_result).text.contains("1"))
-                assertEquals(255, activity!!.findViewById<ImageButton>(R.id.calculator_help_tab).imageAlpha)
-                assertEquals(96, activity!!.findViewById<ImageButton>(R.id.calculator_main_tab).imageAlpha)
-                activity!!.findViewById<View>(R.id.calculator_main_tab).performClick()
-                assertEquals(View.VISIBLE, activity!!.findViewById<View>(R.id.calculator_main_pane).visibility)
+                assertFalse(activity!!.findViewById<TextView>(R.id.calculator_help_tab).isSelected)
+                assertTrue(activity!!.findViewById<TextView>(R.id.calculator_main_tab).isSelected)
                 assertEquals("44fsqrt()", field.text.toString())
             }
             fun execute(expression: String): String {

@@ -10,6 +10,16 @@ import ohi.andre.consolelauncher.tuils.Tuils
  * Created by francescoandreuzzi on 24/09/2017.
  */
 enum class Behavior : XMLPrefsSave {
+    breath_out {
+        override fun defaultValue(): String = "false"
+        override fun infoRes(): Int = R.string.setting_behavior_breath_out_description
+        override fun type(): String = XMLPrefsSave.BOOLEAN
+    },
+    breath_out_seconds {
+        override fun defaultValue(): String = "900"
+        override fun infoRes(): Int = R.string.setting_behavior_breath_out_seconds_description
+        override fun type(): String = XMLPrefsSave.INTEGER
+    },
     qalculate {
         override fun defaultValue(): String = "false"
         override fun infoRes(): Int = R.string.setting_behavior_qalculate_description

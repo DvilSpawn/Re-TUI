@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="help_community">community — open the experimental opt-in Re-TUI community feed. Inside: plain text posts; /help lists local commands. Username/password only. No launcher commands run in this surface.</string>
+    <string name="community_title">Re-TUI community · experimental</string>
+    <string name="community_signed_out">Signed out · offline · /login or /register</string>
+    <string name="community_invalid">Input rejected; use /help. Slash commands take no password arguments. Messages: 500 Unicode characters / 2000 UTF-8 bytes maximum.</string>
+    <string name="community_submit">Send</string>
+    <string name="community_help">One room: Re-TUI community. Plain text posts on Send. exit posts; /exit leaves. //text posts /text. Unknown slash commands stay here.\n/help · /refresh · /older · /login · /register · /logout · /exit\n/report &lt;full message ID&gt; · /block &lt;username&gt; (local only; repeat to unblock)\nUsername/password only. Public registration, authenticated reading/posting. No forgotten-password recovery: register a new username; it is a separate identity, not a reclaim or history/ownership transfer.\nServer-readable; no end-to-end encryption. General messages expire after 24 hours; private report evidence is retained for six calendar months. Local cache: at most 200 messages, pruned on opening and while visible, including offline. Paused encrypted cache bytes may remain until reopening; no secure-erasure guarantee. Cached messages are rechecked for moderation when connected.\nPocketBase is pre-1.0; this optional pilot may change. No push, background service, attachments, private messages, automatic links or launcher execution.</string>
+    <string name="community_username">Username</string>
+    <string name="community_password">Password</string>
+    <string name="community_confirm_password">Confirm password</string>
+    <string name="community_login">Login</string>
+    <string name="community_register">Register</string>
+    <string name="community_cancel">Cancel</string>
+    <string name="community_account_policy">Username: 3–24 ASCII letters, digits, - or _. Password: at least 8 characters. No forgotten-password recovery: use a new username, a separate identity. Old usernames cannot be reclaimed; no automatic ownership or history migration.</string>
+    <string name="community_login_required">Sign in or register first. Draft kept; nothing was sent.</string>
+    <string name="community_stale">%1$s · stale/offline</string>
+    <string name="community_current">%1$s · current · refreshed while visible</string>
+    <string name="community_loading">%1$s · requesting…</string>
+    <string name="community_network_error">Network/TLS request failed. Cached history may be stale; draft kept. Nothing will post automatically.</string>
+    <string name="community_session_error">Session expired, revoked or account unavailable. Signed out; private cache and draft cleared.</string>
+    <string name="community_registration_error">Registration rejected. Check username uniqueness, password length and matching confirmation. If creation succeeded but login failed, try Login; account creation alone is not sign-in.</string>
+    <string name="community_duplicate_username">Username is already taken.</string>
+    <string name="community_rate_error">Rate limited; wait %1$d seconds before retrying.</string>
+    <string name="community_request_error">Request failed (%1$d). No success was confirmed.</string>
+    <string name="community_uncertain">Delivery uncertain. Pending draft kept with the same request ID. Send the same draft again to reconcile/retry; do not send a second copy. No automatic retry.</string>
+    <string name="community_pending">Posting… not delivered yet.</string>
+    <string name="community_pending_locked">Previous attempt is unresolved. Restore its draft with /refresh and submit it unchanged to reconcile/retry, or /logout to clear local state (this does not retract any server post).</string>
+    <string name="community_posted">Posted — server acknowledgement verified.</string>
+    <string name="community_reported">Report accepted by server.</string>
+    <string name="community_blocked">Local block toggled for %1$s.</string>
+    <string name="community_logout">Signed out. Account cache, blocks, draft and token cleared.</string>
+    <string name="community_leave_title">Unsent or uncertain draft</string>
+    <string name="community_leave_body">Keep the draft privately for next time, or discard it. Nothing is uploaded. Discarding an uncertain draft does not retract a possible server post.</string>
+    <string name="community_keep">Keep and leave</string>
+    <string name="community_discard">Discard and leave</string>
+    <string name="community_new_messages">New/unread messages: %1$d · scroll to read</string>
+    <string name="community_unread_divider">— first unread —</string>
+    <string name="community_empty">No cached messages. Sign in and /refresh to fetch the room.</string>
+    <string name="community_storage_error">Private encrypted storage is unavailable. No post was started; draft is only in this window.</string>
+    <string name="community_busy">A request is in progress; wait before submitting again.</string>
+</resources>

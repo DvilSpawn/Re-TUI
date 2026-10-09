@@ -21,12 +21,14 @@ class TermuxWorkspaceSocketClient(private val listener: Listener) {
         fun onStatus(status: String)
         fun onError(message: String)
         fun onClosed()
+        fun onTargetGone(target: String?) {}
     }
 
     @Volatile var connected: Boolean = false
         private set
     @Volatile private var running = false
     private var started = false
+    private var targeted = false
     private val writeLock = Any()
     private var localSocket: LocalSocket? = null
     private var tcpSocket: Socket? = null
@@ -35,9 +37,12 @@ class TermuxWorkspaceSocketClient(private val listener: Listener) {
         ArrayBlockingQueue<Runnable>(16), { task -> Thread(task, "retui-workspace-writer").apply { isDaemon = true } })
 
     fun connect(socketName: String, token: String, cols: Int, rows: Int,
-                tcpHost: String?, tcpPort: Int?, stream: Boolean) {
+                tcpHost: String?, tcpPort: Int?, stream: Boolean,
+                target: String? = null, targeted: Boolean = false) {
         check(!started) { "Create a new client to reconnect" }
         started = true
+        this.targeted = targeted
+        require(target == null || target.matches(Regex("@[0-9]+"))) { "Invalid window target" }
         require(socketName == SOCKET_NAME) { "Unexpected bridge socket" }
         require(token.matches(Regex("[A-Za-z0-9_-]{1,128}"))) { "Invalid bridge token" }
         require(tcpHost == null || tcpHost == "127.0.0.1") { "Bridge must be loopback" }
@@ -55,7 +60,7 @@ class TermuxWorkspaceSocketClient(private val listener: Listener) {
                     if (!running) return@Thread
                     writer = out
                 }
-                out.write("HELLO $token ${cleanCols(cols)} ${cleanRows(rows)} ${if (stream) "STREAM" else "CAPTURE"}\n")
+                out.write("HELLO $token ${cleanCols(cols)} ${cleanRows(rows)} ${if (stream) "STREAM" else "CAPTURE"} ${target?.let { encode(it) } ?: "-"}${if (targeted) " NO_CREATE" else ""}\n")
                 out.flush()
                 readFrames(BufferedReader(InputStreamReader(input, StandardCharsets.UTF_8)))
             } catch (e: Exception) {
@@ -140,10 +145,23 @@ class TermuxWorkspaceSocketClient(private val listener: Listener) {
             val line = readBoundedLine(reader) ?: break
             if (!inBody) {
                 when {
-                    line.startsWith("__RETUI_SOCKET__ ") -> protocol = line.substringAfter(' ') == "retui-bridge-socket-v3"
+                    line.startsWith("__RETUI_SOCKET__ ") -> protocol = line.substringAfter(' ') == "retui-bridge-socket-v4" ||
+                        (!targeted && line.substringAfter(' ') == "retui-bridge-socket-v3")
                     line == "__RETUI_SOCKET_STATUS__ ok" -> authenticated = true
                     line == "__RETUI_SESSION__ retui_workspace" -> session = true
                     line.startsWith("__RETUI_SOCKET_ERROR__ ") -> error(line.substringAfter(' '))
+                    line.startsWith("__RETUI_TARGET_GONE__ ") -> {
+                        check(protocol && authenticated && session) { "Invalid bridge handshake" }
+                        val target = line.substringAfter(' ')
+                        check(target == "-" || target.matches(Regex("@[0-9]+"))) { "Invalid missing target" }
+                        if (!connected) {
+                            connected = true
+                            localSocket?.soTimeout = 0; tcpSocket?.soTimeout = 0
+                        }
+                        listener.onTargetGone(target.takeIf { it != "-" })
+                        frame.setLength(0)
+                        continue
+                    }
                     line.startsWith("__RETUI_FRAME_BASE64__ ") -> {
                         check(protocol && authenticated && session) { "Invalid bridge handshake" }
                         Base64.decode(line.substringAfter(' '), Base64.DEFAULT)

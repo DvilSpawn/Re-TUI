@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="calculator_windowed">Windowed calculator</string>
+    <string name="calculator_maximize">Maximize calculator</string>
+    <string name="offline_help_windowed">Windowed help</string>
+    <string name="offline_help_maximize">Maximize help</string>
+    <string name="offline_help_reset_window">Reset window geometry</string>
+    <string name="offline_help_resize_width">Resize width: drag, tap to grow, long press to shrink</string>
+    <string name="offline_help_resize_height">Resize height: drag, tap to grow, long press to shrink</string>
+    <string name="offline_help_resize_corner">Resize width and height: drag, tap to grow, long press to shrink</string>
+</resources>

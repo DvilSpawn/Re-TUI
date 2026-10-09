@@ -89,8 +89,8 @@ class AppsManager(context: Context) : XMLPrefsElement {
     private var appInstalledFormat: String?
     private val appUpdatedFormat: String?
     private var appUninstalledFormat: String?
-    var appInstalledColor: Int = 0
-    var appUninstalledColor: Int = 0
+    val appInstalledColor: Int get() = XMLPrefsManager.getColor(Theme.app_installed_text_color)
+    val appUninstalledColor: Int get() = XMLPrefsManager.getColor(Theme.app_uninstalled_text_color)
 
     private var lastInstalledPackage: String? = null
     private var lastInstallTime: Long = 0
@@ -155,8 +155,7 @@ class AppsManager(context: Context) : XMLPrefsElement {
             pp = Pattern.compile("%p", Pattern.CASE_INSENSITIVE)
             pl = Pattern.compile("%l", Pattern.CASE_INSENSITIVE)
 
-            appInstalledColor = XMLPrefsManager.getColor(Theme.app_installed_text_color)
-            appUninstalledColor = XMLPrefsManager.getColor(Theme.app_uninstalled_text_color)
+
         } else {
             pp = null
             pl = null
@@ -553,6 +552,10 @@ class AppsManager(context: Context) : XMLPrefsElement {
         return Tuils.patternNewline.matcher(cp).replaceAll(Tuils.NEWLINE)
     }
 
+    private fun sendPackageEvent(role: Theme, text: CharSequence) {
+        Tuils.sendOutput(context!!, ohi.andre.consolelauncher.tuils.ThemeColorSpan.text(text, role), TerminalManager.CATEGORY_NO_COLOR)
+    }
+
     private fun appInstalled(packageName: String, replacing: Boolean) {
         try {
             val manager = context!!.getPackageManager()
@@ -566,9 +569,8 @@ class AppsManager(context: Context) : XMLPrefsElement {
                         lastUpdateTime
                     )
                 ) {
-                    Tuils.sendOutput(
-                        appInstalledColor,
-                        context,
+                    sendPackageEvent(
+                        Theme.app_installed_text_color,
                         formatPackageEvent(
                             appUpdatedFormat,
                             packageName,
@@ -586,9 +588,8 @@ class AppsManager(context: Context) : XMLPrefsElement {
                     lastInstallTime
                 )
             ) {
-                Tuils.sendOutput(
-                    appInstalledColor,
-                    context,
+                sendPackageEvent(
+                    Theme.app_installed_text_color,
                     formatPackageEvent(
                         appInstalledFormat!!,
                         packageName,
@@ -643,9 +644,8 @@ class AppsManager(context: Context) : XMLPrefsElement {
         )
 
         if (appUninstalledFormat != null) {
-            Tuils.sendOutput(
-                appUninstalledColor,
-                context,
+            sendPackageEvent(
+                Theme.app_uninstalled_text_color,
                 formatPackageEvent(
                     appUninstalledFormat!!,
                     packageName,

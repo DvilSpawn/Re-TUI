@@ -63,6 +63,8 @@ object PresetManager {
         it == Ui.username || it == Ui.deviceName || it == Ui.font_file || it == Ui.auto_color_pick
     }.toTypedArray()
     private val SHAREABLE_BEHAVIOR = arrayOf(
+        Behavior.breath_out,
+        Behavior.breath_out_seconds,
         Behavior.double_tap_lock,
         Behavior.random_play,
         Behavior.launcher_sounds,

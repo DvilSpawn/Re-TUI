@@ -57,7 +57,7 @@ class HTMLExtractManager(context: Context, client: OkHttpClient) {
 
     var defaultFormat: String = Tuils.EMPTYSTRING
     var weatherFormat: String = Tuils.EMPTYSTRING
-    var weatherColor: Int = Color.WHITE
+    val weatherColor: Int get() = XMLPrefsManager.getColor(Theme.weather_text_color)
 
     private fun getListFromType(t: StoreableValue.Type?): MutableList<StoreableValue> {
         if (t == StoreableValue.Type.xpath) return xpaths
@@ -147,7 +147,7 @@ class HTMLExtractManager(context: Context, client: OkHttpClient) {
 
                             val condition = context.getString(snapshot.conditionResource)
                             val displayValues = snapshot.values + mapOf("main" to condition, "description" to condition)
-                            var o: CharSequence = Tuils.span(weatherFormat, weatherColor) ?: SpannableString(weatherFormat)
+                            var o: CharSequence = ohi.andre.consolelauncher.tuils.ThemeColorSpan.text(weatherFormat, Theme.weather_text_color) ?: SpannableString(weatherFormat)
 
                             val m = weatherFormatPattern.matcher(weatherFormat)
                             while (m.find()) {
@@ -208,7 +208,7 @@ class HTMLExtractManager(context: Context, client: OkHttpClient) {
                                 node = nodes[c] as TagNode
 
                                 val f = format ?: defaultFormat
-                                var copy: CharSequence = Tuils.span(f, outputColor) ?: SpannableString(f)
+                                var copy: CharSequence = ohi.andre.consolelauncher.tuils.ThemeColorSpan.text(f, Theme.output_text_color) ?: SpannableString(f)
 
                                 copy =
                                     replaceAllAttributesString(copy, node.getAttributes().entries)
@@ -235,7 +235,7 @@ class HTMLExtractManager(context: Context, client: OkHttpClient) {
 //                            this should be a single JSON object
 
                                 val f = format ?: defaultFormat
-                                var copy: CharSequence = Tuils.span(f, outputColor) ?: SpannableString(f)
+                                var copy: CharSequence = ohi.andre.consolelauncher.tuils.ThemeColorSpan.text(f, Theme.output_text_color) ?: SpannableString(f)
 
                                 copy = Companion.replaceAllAttributesObject(copy, o.entries)
                                 copy = replaceTagNameObject(copy, null, o)
@@ -257,7 +257,7 @@ class HTMLExtractManager(context: Context, client: OkHttpClient) {
 
                                 for (c in a.indices) {
                                     val f = format ?: defaultFormat
-                                    var copy: CharSequence = Tuils.span(f, outputColor) ?: SpannableString(f)
+                                    var copy: CharSequence = ohi.andre.consolelauncher.tuils.ThemeColorSpan.text(f, Theme.output_text_color) ?: SpannableString(f)
 
                                     val m = a.get(c) as LinkedHashMap<String?, Any?>
 
@@ -282,7 +282,7 @@ class HTMLExtractManager(context: Context, client: OkHttpClient) {
                                     TerminalManager.CATEGORY_NO_COLOR
                                 )
                             } else if (o is String) {
-                                output = Tuils.span(o.toString(), outputColor)
+                                output = ohi.andre.consolelauncher.tuils.ThemeColorSpan.text(o.toString(), Theme.output_text_color)
                                 output(
                                     output,
                                     context,
@@ -290,7 +290,7 @@ class HTMLExtractManager(context: Context, client: OkHttpClient) {
                                     TerminalManager.CATEGORY_NO_COLOR
                                 )
                             } else {
-                                Tuils.sendOutput(outputColor, context, o.toString())
+                                Tuils.sendOutput(context, o.toString())
                             }
                         }
                     }
@@ -540,9 +540,8 @@ class HTMLExtractManager(context: Context, client: OkHttpClient) {
 
         this.client = client
 
-        linkColor = XMLPrefsManager.getColor(Theme.link_text_color)
-        outputColor = XMLPrefsManager.getColor(Theme.output_text_color)
-        weatherColor = XMLPrefsManager.getColor(Theme.weather_text_color)
+
+
         defaultFormat = XMLPrefsManager.get(Behavior.htmlextractor_default_format) ?: Tuils.EMPTYSTRING
         optionalValueSeparator = XMLPrefsManager.get(Behavior.optional_values_separator) ?: "|"
         weatherFormat = XMLPrefsManager.get(Behavior.weather_format) ?: Tuils.EMPTYSTRING
@@ -763,8 +762,8 @@ class HTMLExtractManager(context: Context, client: OkHttpClient) {
         var attributeName: Pattern = Pattern.compile("%an", Pattern.CASE_INSENSITIVE)
         var attributeValue: Pattern = Pattern.compile("%av", Pattern.CASE_INSENSITIVE)
 
-        var linkColor: Int = Color.WHITE
-        var outputColor: Int = Color.WHITE
+        val linkColor: Int get() = XMLPrefsManager.getColor(Theme.link_text_color)
+        val outputColor: Int get() = XMLPrefsManager.getColor(Theme.output_text_color)
 
         fun removeDelimiter(original: CharSequence): CharSequence {
             var original = original
@@ -997,7 +996,7 @@ class HTMLExtractManager(context: Context, client: OkHttpClient) {
                     Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
                 )
                 sp.setSpan(
-                    ForegroundColorSpan(linkColor),
+                    ohi.andre.consolelauncher.tuils.ThemeColorSpan(Theme.link_text_color),
                     0,
                     sp.length,
                     Spanned.SPAN_EXCLUSIVE_EXCLUSIVE

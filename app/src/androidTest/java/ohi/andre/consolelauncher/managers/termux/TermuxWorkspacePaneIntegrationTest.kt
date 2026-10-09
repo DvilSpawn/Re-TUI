@@ -2,154 +2,289 @@ package ohi.andre.consolelauncher.managers.termux
 
 import android.content.Context
 import android.content.Intent
-import android.content.pm.ActivityInfo
+import android.view.View
 import android.view.inputmethod.EditorInfo
+import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import ohi.andre.consolelauncher.LauncherActivity
+import androidx.lifecycle.Lifecycle
 import ohi.andre.consolelauncher.R
-import ohi.andre.consolelauncher.UIManager
-import ohi.andre.consolelauncher.managers.TerminalManager
-import ohi.andre.consolelauncher.managers.settings.LauncherSettings
-import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
-import ohi.andre.consolelauncher.managers.xml.options.Ui
-import ohi.andre.consolelauncher.managers.xml.options.Behavior
-import ohi.andre.consolelauncher.tuils.Tuils
 import org.junit.Assert.*
 import org.junit.Assume.assumeTrue
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.io.File
 
-/** Requires the explicit private host-helper fixture; never impersonates an installed Termux package. */
+/** Opt-in disposable-emulator fixture; never replaces a phone's Termux helper. */
 @RunWith(AndroidJUnit4::class)
 class TermuxWorkspacePaneIntegrationTest {
     private val instrumentation get() = InstrumentationRegistry.getInstrumentation()
-    private fun field(manager: UIManager, name: String): Any? = UIManager::class.java.getDeclaredField(name).apply { isAccessible = true }.get(manager)
-    private fun call(manager: UIManager, name: String, vararg args: Any): Any? = UIManager::class.java.declaredMethods
-        .single { it.name == name && it.parameterTypes.size == args.size }.apply { isAccessible = true }.invoke(manager, *args)
-    private fun await(message: String, condition: () -> Boolean) {
+    private fun field(activity: TermuxWorkspaceActivity, name: String): Any? =
+        TermuxWorkspaceActivity::class.java.getDeclaredField(name).apply { isAccessible = true }.get(activity)
+    private fun call(activity: TermuxWorkspaceActivity, name: String, vararg args: Any?) =
+        TermuxWorkspaceActivity::class.java.declaredMethods.single { it.name == name && it.parameterTypes.size == args.size }
+            .apply { isAccessible = true }.invoke(activity, *args)
+    private fun await(scenario: ActivityScenario<TermuxWorkspaceActivity>, message: String, condition: (TermuxWorkspaceActivity) -> Boolean) {
         val deadline = android.os.SystemClock.uptimeMillis() + 10000
         while (android.os.SystemClock.uptimeMillis() < deadline) {
             var passed = false
-            instrumentation.runOnMainSync { passed = condition() }
+            scenario.onActivity { passed = condition(it) }
             if (passed) return
             Thread.sleep(50)
         }
         fail(message)
     }
+    private fun attach(activity: TermuxWorkspaceActivity, port: Int) {
+        val bootstrap = TermuxWorkspaceFrame.parse("__RETUI_SOCKET__ retui-bridge-socket-v4\n__RETUI_SOCKET_NAME__ retui_bridge_com_dvil_tui_renewed_v2\n__RETUI_TOKEN__ fixture-token\n__RETUI_TCP_HOST__ 127.0.0.1\n__RETUI_TCP_PORT__ $port\n")
+        TermuxWorkspaceActivity::class.java.getDeclaredField("bootstrap").apply { isAccessible = true }.set(activity, bootstrap)
+        val state = field(activity, "selection") as TermuxWorkspaceState
+        state.visibleTiles.forEach { call(activity, "connectTile", it) }
+    }
 
-    private fun screenshot(name: String) {
-        instrumentation.waitForIdleSync()
-        Thread.sleep(1500) // Wait for rotation animation and the existing delayed geometry recovery.
-        val file = File(instrumentation.targetContext.cacheDir, "termux-pane-fixture-$name.png")
-        instrumentation.uiAutomation.takeScreenshot().let { bitmap ->
-            file.outputStream().use { bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it) }
-            bitmap.recycle()
+    @Test fun liveAppearanceAndFadeRetainBothTilesDraftAndInputSelection() {
+        assumeTrue("Disposable emulator fixture only", android.os.Build.FINGERPRINT.contains("generic") || android.os.Build.HARDWARE in listOf("goldfish", "ranchu"))
+        val context = instrumentation.targetContext
+        assumeTrue("Appearance fixture must not bootstrap a shared Termux runtime", !TermuxBridgeManager.status(context).termuxInstalled)
+        if (android.os.Build.VERSION.SDK_INT >= 30 && ohi.andre.consolelauncher.BuildConfig.FLAVOR == "fdroid")
+            assumeTrue(android.os.Environment.isExternalStorageManager())
+        val prefs = context.getSharedPreferences("retui_workspace_surface", Context.MODE_PRIVATE)
+        val original = prefs.all.toMap()
+        val size = ohi.andre.consolelauncher.managers.xml.options.Ui.font_size_offset
+        val foreground = ohi.andre.consolelauncher.managers.xml.options.Theme.workspace_output_text_color
+        val control = ohi.andre.consolelauncher.managers.xml.options.Theme.workspace_control_text_color
+        val settings = ohi.andre.consolelauncher.managers.settings.LauncherSettings
+        ohi.andre.consolelauncher.managers.xml.XMLPrefsManager.loadCommons(context)
+        settings.refreshFromLoadedPrefs()
+        val originals = listOf(size, foreground, control,
+            ohi.andre.consolelauncher.managers.xml.options.Ui.system_font,
+            ohi.andre.consolelauncher.managers.xml.options.Behavior.breath_out,
+            ohi.andre.consolelauncher.managers.xml.options.Behavior.breath_out_seconds).associateWith { settings.get(it) }
+        try {
+            settings.set(ohi.andre.consolelauncher.managers.xml.options.Behavior.breath_out, "false")
+            settings.set(size, "0")
+            settings.set(ohi.andre.consolelauncher.managers.xml.options.Ui.system_font, "true")
+            ActivityScenario.launch<TermuxWorkspaceActivity>(Intent(context, TermuxWorkspaceActivity::class.java)).use { scenario ->
+                await(scenario, "Workspace must own a rendered window") { it.hasWindowFocus() }
+                scenario.onActivity { activity ->
+                    val state = field(activity, "selection") as TermuxWorkspaceState
+                    state.select(0, "@1"); state.select(1, "@2"); state.focus(1)
+                    state.layout = TermuxWorkspaceState.Layout.LEFT_RIGHT
+                    call(activity, "applyLayout")
+                    call(activity, "directText", ":retained 😀 draft")
+                    val input = activity.findViewById<TermuxWorkspaceInputEditText>(R.id.termux_workspace_input)
+                    input.setText("editor draft"); input.setSelection(2, 5)
+                    val grids = field(activity, "grids") as Array<*>
+                    grids.forEach { (it as TerminalGridView).setFrame("retained frame", 80, 24, 2, 3) }
+                }
+                instrumentation.waitForIdleSync()
+                await(scenario, "Both workspace grids must be laid out before comparing geometry") {
+                    (field(it, "grids") as Array<*>).all { grid -> (grid as TerminalGridView).width > 0 && grid.height > 0 }
+                }
+                var beforeGeometry = emptyList<Any?>()
+                scenario.onActivity { activity ->
+                    val state = field(activity, "selection") as TermuxWorkspaceState
+                    val input = activity.findViewById<TermuxWorkspaceInputEditText>(R.id.termux_workspace_input)
+                    val grids = (field(activity, "grids") as Array<*>).map { it as TerminalGridView }
+                    val beforeMetrics = grids.map { it.characterWidth() to it.lineHeight() }
+                    val beforePixels = grids.map { it.width to it.height }
+                    beforeGeometry = grids.indices.map { call(activity, "geometry", it) }
+                    assertEquals(android.util.TypedValue.applyDimension(android.util.TypedValue.COMPLEX_UNIT_SP,
+                        12f, activity.resources.displayMetrics), input.textSize, 0.01f)
+                    val selected = state.encode()
+                    val clients = (field(activity, "clients") as Array<*>).toList()
+                    settings.set(size, "7"); settings.set(size, "7")
+                    settings.set(foreground, "#FF123456"); settings.set(control, "#FF654321")
+                    assertEquals(android.util.TypedValue.applyDimension(android.util.TypedValue.COMPLEX_UNIT_SP,
+                        19f, activity.resources.displayMetrics), input.textSize, 0.01f)
+                    assertEquals("Metric-only changes must not need a pixel-bounds event", beforePixels, grids.map { it.width to it.height })
+                    grids.forEachIndexed { tile, grid ->
+                        assertNotEquals("Grid $tile character width did not change through settings hook", beforeMetrics[tile].first, grid.characterWidth())
+                        assertNotEquals("Grid $tile line height did not change through settings hook", beforeMetrics[tile].second, grid.lineHeight())
+                        assertNotEquals("Grid $tile effective geometry stayed stale", beforeGeometry[tile], call(activity, "geometry", tile))
+                    }
+                    assertEquals(selected, state.encode())
+                    assertEquals("retained 😀 draft", field(activity, "localDraft"))
+                    assertEquals("editor draft", input.text.toString())
+                    assertEquals(2, input.selectionStart); assertEquals(5, input.selectionEnd)
+                    assertEquals(clients, (field(activity, "clients") as Array<*>).toList())
+                    for (grid in grids) {
+                        val type = TerminalGridView::class.java
+                        assertEquals("retained frame", type.getDeclaredField("frame").apply { isAccessible = true }.get(grid))
+                        assertEquals(0xff123456.toInt(), type.getDeclaredField("terminalForeground").apply { isAccessible = true }.getInt(grid))
+                        val paint = type.getDeclaredField("textPaint").apply { isAccessible = true }.get(grid) as android.graphics.Paint
+                        assertEquals(android.util.TypedValue.applyDimension(android.util.TypedValue.COMPLEX_UNIT_SP,
+                            ohi.andre.consolelauncher.tuils.LauncherFontScale.terminalTextSizeSp(), activity.resources.displayMetrics), paint.textSize, 0.01f)
+                        assertEquals(ohi.andre.consolelauncher.tuils.Tuils.getTypeface(activity), paint.typeface)
+                    }
+                    val row = activity.findViewById<android.widget.LinearLayout>(R.id.termux_workspace_keys_row_one)
+                    assertEquals(0xff654321.toInt(), (row.getChildAt(0) as android.widget.TextView).currentTextColor)
+                    assertTrue(input.privateImeOptions.contains("123456", ignoreCase = true))
+                }
+                instrumentation.waitForIdleSync()
+                scenario.onActivity { activity ->
+                    for (tile in 0..1) assertNotEquals("Grid $tile settled geometry must change", beforeGeometry[tile], call(activity, "geometry", tile))
+                }
+                scenario.onActivity {
+                    assertEquals(android.graphics.PixelFormat.TRANSLUCENT, it.window.attributes.format)
+                    assertEquals(android.graphics.Color.TRANSPARENT, (it.window.decorView.background as android.graphics.drawable.ColorDrawable).color)
+                    settings.set(ohi.andre.consolelauncher.managers.xml.options.Behavior.breath_out_seconds, "1")
+                    settings.set(ohi.andre.consolelauncher.managers.xml.options.Behavior.breath_out, "true")
+                    it.refreshBreathOutSettings()
+                }
+                await(scenario, "Entire workspace must fade") { (field(it, "screen") as View).alpha == 0f }
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                    val copied = java.util.concurrent.CountDownLatch(1)
+                    lateinit var bitmap: android.graphics.Bitmap
+                    var result = -1
+                    scenario.onActivity {
+                        val screen = field(it, "screen") as View
+                        bitmap = android.graphics.Bitmap.createBitmap(screen.width, screen.height, android.graphics.Bitmap.Config.ARGB_8888)
+                        android.view.PixelCopy.request(it.window, bitmap, { value -> result = value; copied.countDown() }, android.os.Handler(android.os.Looper.getMainLooper()))
+                    }
+                    try {
+                        assertTrue(copied.await(5, java.util.concurrent.TimeUnit.SECONDS))
+                        assertEquals(android.view.PixelCopy.SUCCESS, result)
+                        assertEquals("Hidden renderer must submit transparent workspace pixels", 0,
+                            android.graphics.Color.alpha(bitmap.getPixel(bitmap.width / 2, bitmap.height / 2)))
+                    } finally { bitmap.recycle() }
+                }
+                scenario.onActivity {
+                    assertTrue(it.window.attributes.flags and android.view.WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER != 0)
+                    val screen = field(it, "screen") as ohi.andre.consolelauncher.BreathOutLayout
+                    screen.setActive(true)
+                    assertEquals("Duplicate focus must not wake workspace", 0f, screen.alpha, 0.001f)
+                    val bitmap = android.graphics.Bitmap.createBitmap(screen.width, screen.height, android.graphics.Bitmap.Config.ARGB_8888)
+                    it.findViewById<View>(android.R.id.content).draw(android.graphics.Canvas(bitmap))
+                    val pixels = IntArray(bitmap.width * bitmap.height)
+                    bitmap.getPixels(pixels, 0, bitmap.width, 0, 0, bitmap.width, bitmap.height)
+                    bitmap.recycle()
+                    assertEquals("Hidden workspace must draw no pixels", 0, pixels.count { pixel -> android.graphics.Color.alpha(pixel) != 0 })
+                    call(it, "directText", "wake must not edit")
+                    assertEquals("retained 😀 draft", field(it, "localDraft"))
+                }
+                await(scenario, "IME wake must restore workspace") { (field(it, "screen") as View).alpha == 1f }
+                scenario.onActivity {
+                    settings.set(ohi.andre.consolelauncher.managers.xml.options.Behavior.breath_out, "false")
+                    it.refreshBreathOutSettings()
+                    assertEquals(1f, (field(it, "screen") as View).alpha, 0.001f)
+                    val input = it.findViewById<TermuxWorkspaceInputEditText>(R.id.termux_workspace_input)
+                    assertEquals("editor draft", input.text.toString())
+                    assertEquals(2, input.selectionStart); assertEquals(5, input.selectionEnd)
+                }
+            }
+        } finally {
+            originals.forEach { (key, value) -> settings.set(key, value) }
+            val edit = prefs.edit().clear()
+            original.forEach { (key, value) -> when (value) {
+                is String -> edit.putString(key, value)
+                is Boolean -> edit.putBoolean(key, value)
+                is Int -> edit.putInt(key, value)
+                is Long -> edit.putLong(key, value)
+                is Float -> edit.putFloat(key, value)
+                is Set<*> -> edit.putStringSet(key, value.filterIsInstance<String>().toSet())
+            } }
+            edit.commit()
+            assertEquals(original, prefs.all)
         }
     }
 
-    @Test fun paneNavigationImeRotationAndPausePreserveDraftAndHomeState() {
+    @Test fun twoTilesRestoreFocusInputAndKeepFramesDuringTypingAndPause() {
         val port = InstrumentationRegistry.getArguments().getString("hostFixturePort")?.toIntOrNull()
         assumeTrue("Explicit private real-helper fixture is required", port != null)
+        assumeTrue("Fixture must not run on a data-bearing phone", android.os.Build.FINGERPRINT.contains("generic") || android.os.Build.HARDWARE in listOf("goldfish", "ranchu"))
         val context = instrumentation.targetContext
-        if (android.os.Build.VERSION.SDK_INT >= 30 && ohi.andre.consolelauncher.BuildConfig.FLAVOR == "fdroid") {
-            android.os.ParcelFileDescriptor.AutoCloseInputStream(instrumentation.uiAutomation.executeShellCommand(
-                "appops set ${context.packageName} MANAGE_EXTERNAL_STORAGE allow")).use { it.readBytes() }
-        }
-        XMLPrefsManager.loadCommons(context)
-        ohi.andre.consolelauncher.managers.notifications.NotificationManager.create(context)
-        LauncherSettings.refreshFromLoadedPrefs()
-        val config = Tuils.getFolder()
-        val originalFiles = config.listFiles()?.filter { it.isFile && it.extension == "xml" }?.associate { it.name to it.readBytes() } ?: emptyMap()
-        val startup = context.getSharedPreferences("retui_startup", Context.MODE_PRIVATE)
-        val startupOriginal = startup.all.toMap()
-        val activeModule = ohi.andre.consolelauncher.managers.modules.ModuleManager.getActiveModule(context)
-        val fixtureSettings = listOf(Ui.show_weather to "false", Behavior.tui_notification to "false")
-        val originalSettings = fixtureSettings.associate { it.first to LauncherSettings.get(it.first) }
-        fixtureSettings.forEach { (key, value) -> LauncherSettings.set(key, value) }
-        startup.edit().putBoolean("complete", true).putBoolean("active", false).commit()
-        ohi.andre.consolelauncher.managers.modules.ModuleManager.setActiveModule(context, "")
-        val monitor = object : android.app.Instrumentation.ActivityMonitor() {
-            override fun onStartActivity(intent: Intent): android.app.Instrumentation.ActivityResult? =
-                if (intent.action == "android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS") android.app.Instrumentation.ActivityResult(0, null) else null
-        }
-        instrumentation.addMonitor(monitor)
-        var activity: LauncherActivity? = null
+        if (android.os.Build.VERSION.SDK_INT >= 30 && ohi.andre.consolelauncher.BuildConfig.FLAVOR == "fdroid")
+            assumeTrue("Grant storage access to the disposable fixture before running", android.os.Environment.isExternalStorageManager())
+        val prefs = context.getSharedPreferences("retui_workspace_surface", Context.MODE_PRIVATE)
+        val original = prefs.all.toMap()
+        prefs.edit().clear().commit()
         try {
-            activity = instrumentation.startActivitySync(Intent(context, LauncherActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) as LauncherActivity
-            val launcher = activity
-            await("Launcher must initialize") { launcher.uiManager != null && launcher.findViewById<android.view.View>(R.id.view_pager).width > 0 }
-            val manager = launcher.uiManager!!
-            val orientation = launcher.requestedOrientation
-            fun connectFixture() {
-                val bootstrap = "__RETUI_SOCKET__ retui-bridge-socket-v3\n__RETUI_SOCKET_NAME__ retui_bridge_com_dvil_tui_renewed_v2\n__RETUI_TOKEN__ fixture-token\n__RETUI_TCP_HOST__ 127.0.0.1\n__RETUI_TCP_PORT__ $port\n"
-                val frame = call(manager, "parseTermuxWorkspaceFrame", bootstrap)!!
-                call(manager, "startTermuxWorkspaceSocketClient", frame)
-            }
-            instrumentation.runOnMainSync {
-                manager.restoreTerminalState(TerminalManager.State("home draft", "home history", listOf("pwd"), 0, false))
-                call(manager, "openTermuxWorkspacePage", false)
-                connectFixture()
-            }
-            await("Pane must receive authenticated real-helper stream") { (field(manager, "termuxWorkspaceSocketClient") as? TermuxWorkspaceSocketClient)?.connected == true }
-            instrumentation.runOnMainSync { call(manager, "newTermuxWorkspaceWindow", "fixture-nav", "") }
-            await("NEW must select the real tmux window") { field(manager, "termuxWorkspaceCurrentWindow").toString().contains("fixture-nav") }
-            instrumentation.runOnMainSync { call(manager, "handleTermuxWorkspaceCommand", "switch 0") }
-            await("Local :switch must use the shared live selector") { field(manager, "termuxWorkspaceCurrentWindow").toString().startsWith("0:") }
-            instrumentation.runOnMainSync {
-                val input = launcher.findViewById<TermuxWorkspaceInputEditText>(R.id.termux_workspace_input)
-                val connection = input.onCreateInputConnection(EditorInfo())!!
-                assertTrue(connection.commitText(":switch 0x", 1))
-                assertTrue(connection.deleteSurroundingText(1, 0))
-                assertEquals("switch 0", field(manager, "termuxWorkspaceLocalCommandBuffer").toString())
-                launcher.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-            }
-            instrumentation.uiAutomation.setRotation(android.app.UiAutomation.ROTATION_FREEZE_90)
-            await("Landscape must render") { launcher.window.decorView.width > launcher.window.decorView.height }
-            screenshot("landscape")
-            instrumentation.runOnMainSync {
-                assertSame(manager, launcher.uiManager)
-                assertEquals("switch 0", field(manager, "termuxWorkspaceLocalCommandBuffer").toString())
-                assertEquals("home draft", manager.snapshotTerminalState()!!.input)
-                assertEquals("home history", manager.snapshotTerminalState()!!.output.toString())
-                manager.pause()
-                assertNull(field(manager, "termuxWorkspaceSocketClient"))
-                assertEquals("switch 0", field(manager, "termuxWorkspaceLocalCommandBuffer").toString())
-                manager.resume()
-                connectFixture()
-            }
-            await("Returning to pane must reconnect") { (field(manager, "termuxWorkspaceSocketClient") as? TermuxWorkspaceSocketClient)?.connected == true }
-            instrumentation.runOnMainSync {
-                assertEquals("switch 0", field(manager, "termuxWorkspaceLocalCommandBuffer").toString())
-                launcher.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-            }
-            instrumentation.uiAutomation.setRotation(android.app.UiAutomation.ROTATION_FREEZE_0)
-            await("Portrait must render") { launcher.window.decorView.height > launcher.window.decorView.width }
-            screenshot("portrait")
-            instrumentation.runOnMainSync {
-                assertEquals("switch 0", field(manager, "termuxWorkspaceLocalCommandBuffer").toString())
-                call(manager, "openHomePage")
-                assertNull(field(manager, "termuxWorkspaceSocketClient"))
-                assertEquals("home draft", manager.snapshotTerminalState()!!.input)
-                launcher.requestedOrientation = orientation
+            ActivityScenario.launch<TermuxWorkspaceActivity>(Intent(context, TermuxWorkspaceActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)).use { scenario ->
+                scenario.onActivity { attach(it, port!!) }
+                await(scenario, "First tile must receive a real helper frame") { (field(it, "selection") as TermuxWorkspaceState).targets[0] != null }
+                scenario.onActivity {
+                    val state = field(it, "selection") as TermuxWorkspaceState
+                    state.layout = TermuxWorkspaceState.Layout.TOP_BOTTOM
+                    call(it, "newShell", 1, null, null)
+                }
+                await(scenario, "Second tile must own a distinct real tmux window") {
+                    val state = field(it, "selection") as TermuxWorkspaceState
+                    state.targets[1] != null && state.targets[1] != state.targets[0]
+                }
+                var selection = ""
+                scenario.onActivity {
+                    call(it, "focusTile", 1)
+                    val input = it.findViewById<TermuxWorkspaceInputEditText>(R.id.termux_workspace_input)
+                    val connection = input.onCreateInputConnection(EditorInfo())!!
+                    assertTrue(connection.commitText("printf 'SECOND_TILE_INPUT'", 1))
+                    call(it, "enter")
+                    val state = field(it, "selection") as TermuxWorkspaceState
+                    selection = state.encode()
+                    assertEquals(1, state.focused)
+                    assertTrue((field(it, "labels") as Array<*>)[1].let { label -> (label as android.widget.TextView).text.startsWith("▶") })
+                }
+                await(scenario, "Focused tile must render its own input") {
+                    val frames = field(it, "frames") as Array<*>
+                    (frames[1] as? TermuxWorkspaceFrame)?.body?.contains("SECOND_TILE_INPUT") == true &&
+                        (frames[0] as? TermuxWorkspaceFrame)?.body?.contains("SECOND_TILE_INPUT") != true
+                }
+                scenario.onActivity {
+                    val input = it.findViewById<TermuxWorkspaceInputEditText>(R.id.termux_workspace_input)
+                    val connection = input.onCreateInputConnection(EditorInfo())!!
+                    assertTrue(connection.commitText("printf '%s' '", 1))
+                    @Suppress("UNCHECKED_CAST")
+                    val modifiers = field(it, "modifiers") as MutableSet<String>
+                    for ((modifier, text) in listOf("C" to "é", "M" to "😀", "S" to "e\u0301")) {
+                        modifiers.add(modifier)
+                        assertTrue(connection.commitText(text, 1))
+                        assertTrue("Literal Unicode must consume unsupported modifier latch", modifiers.isEmpty())
+                    }
+                    assertTrue(connection.commitText("'", 1)); call(it, "enter")
+                }
+                await(scenario, "Modified Unicode must reach the focused real tmux window literally") {
+                    ((field(it, "frames") as Array<*>)[1] as? TermuxWorkspaceFrame)?.body?.contains("é😀e\u0301") == true
+                }
+                scenario.onActivity {
+                    call(it, "directText", ":switch 0😀")
+                    call(it, "inputBackspace")
+                    assertEquals("switch 0", field(it, "localDraft"))
+                    assertNotNull((field(it, "frames") as Array<*>)[1])
+                }
+                scenario.moveToState(Lifecycle.State.CREATED)
+                scenario.onActivity { assertTrue((field(it, "clients") as Array<*>).all { client -> client == null }) }
+                scenario.moveToState(Lifecycle.State.RESUMED)
+                scenario.onActivity { attach(it, port!!) }
+                await(scenario, "Resume must reconnect both selected windows") { (field(it, "clients") as Array<*>).all { client -> (client as? TermuxWorkspaceSocketClient)?.connected == true } }
+                scenario.recreate()
+                scenario.onActivity {
+                    assertEquals(selection, (field(it, "selection") as TermuxWorkspaceState).encode())
+                    assertEquals("switch 0", field(it, "localDraft"))
+                    attach(it, port!!)
+                }
+                await(scenario, "Recreation must fetch fresh independent frames") { (field(it, "frames") as Array<*>).all { frame -> (frame as? TermuxWorkspaceFrame)?.body != null } }
+                scenario.onActivity {
+                    val state = field(it, "selection") as TermuxWorkspaceState
+                    state.layout = TermuxWorkspaceState.Layout.SINGLE
+                    call(it, "applyLayout")
+                    assertEquals(listOf(1), state.visibleTiles)
+                    assertEquals(2, state.targets.filterNotNull().distinct().size)
+                    val panels = field(it, "panels") as Array<*>
+                    assertEquals(View.GONE, (panels[0] as View).visibility)
+                    assertEquals(View.VISIBLE, (panels[1] as View).visibility)
+                }
             }
         } finally {
-            instrumentation.uiAutomation.setRotation(android.app.UiAutomation.ROTATION_UNFREEZE)
-            instrumentation.removeMonitor(monitor)
-            instrumentation.runOnMainSync { activity?.finish() }
             instrumentation.waitForIdleSync()
-            originalSettings.forEach { (key, value) -> LauncherSettings.set(key, value) }
-            originalFiles.forEach { (name, bytes) -> File(config, name).writeBytes(bytes) }
-            XMLPrefsManager.loadCommons(context)
-            LauncherSettings.refreshFromLoadedPrefs()
-            val edit = startup.edit()
-            for (key in listOf("complete", "active")) {
-                if (startupOriginal.containsKey(key)) edit.putBoolean(key, startupOriginal[key] as Boolean) else edit.remove(key)
-            }
+            val edit = prefs.edit().clear()
+            original.forEach { (key, value) -> when (value) {
+                is String -> edit.putString(key, value)
+                is Boolean -> edit.putBoolean(key, value)
+                is Int -> edit.putInt(key, value)
+                is Long -> edit.putLong(key, value)
+                is Float -> edit.putFloat(key, value)
+                is Set<*> -> edit.putStringSet(key, value.filterIsInstance<String>().toSet())
+            } }
             edit.commit()
-            ohi.andre.consolelauncher.managers.modules.ModuleManager.setActiveModule(context, activeModule)
-            for ((name, bytes) in originalFiles) assertArrayEquals("Configuration bytes changed: $name", bytes, File(config, name).readBytes())
+            assertEquals(original, prefs.all)
         }
     }
 }

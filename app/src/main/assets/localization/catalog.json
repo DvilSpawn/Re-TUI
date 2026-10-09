@@ -482,6 +482,13 @@
     },
     "type": "string"
   },
+  "calculator_maximize": {
+    "formatted": true,
+    "forms": {
+      "other": "Maximize calculator"
+    },
+    "type": "string"
+  },
   "calculator_memory_add": {
     "formatted": true,
     "forms": {
@@ -1018,6 +1025,13 @@
     "formatted": true,
     "forms": {
       "other": "Value"
+    },
+    "type": "string"
+  },
+  "calculator_windowed": {
+    "formatted": true,
+    "forms": {
+      "other": "Windowed calculator"
     },
     "type": "string"
   },
@@ -3209,6 +3223,272 @@
     "formatted": true,
     "forms": {
       "other": "ON"
+    },
+    "type": "string"
+  },
+  "community_account_policy": {
+    "formatted": true,
+    "forms": {
+      "other": "Username: 3–24 ASCII letters, digits, - or _. Password: at least 8 characters. No forgotten-password recovery: use a new username, a separate identity. Old usernames cannot be reclaimed; no automatic ownership or history migration."
+    },
+    "type": "string"
+  },
+  "community_blocked": {
+    "formatted": true,
+    "forms": {
+      "other": "Local block toggled for %1$s."
+    },
+    "type": "string"
+  },
+  "community_busy": {
+    "formatted": true,
+    "forms": {
+      "other": "A request is in progress; wait before submitting again."
+    },
+    "type": "string"
+  },
+  "community_cancel": {
+    "formatted": true,
+    "forms": {
+      "other": "Cancel"
+    },
+    "type": "string"
+  },
+  "community_confirm_password": {
+    "formatted": true,
+    "forms": {
+      "other": "Confirm password"
+    },
+    "type": "string"
+  },
+  "community_current": {
+    "formatted": true,
+    "forms": {
+      "other": "%1$s · current · refreshed while visible"
+    },
+    "type": "string"
+  },
+  "community_discard": {
+    "formatted": true,
+    "forms": {
+      "other": "Discard and leave"
+    },
+    "type": "string"
+  },
+  "community_duplicate_username": {
+    "formatted": true,
+    "forms": {
+      "other": "Username is already taken."
+    },
+    "type": "string"
+  },
+  "community_empty": {
+    "formatted": true,
+    "forms": {
+      "other": "No cached messages. Sign in and /refresh to fetch the room."
+    },
+    "type": "string"
+  },
+  "community_help": {
+    "formatted": true,
+    "forms": {
+      "other": "One room: Re-TUI community. Plain text posts on Send. exit posts; /exit leaves. //text posts /text. Unknown slash commands stay here.\n/help · /refresh · /older · /login · /register · /logout · /exit\n/report <full message ID> · /block <username> (local only; repeat to unblock)\nUsername/password only. Public registration, authenticated reading/posting. No forgotten-password recovery: register a new username; it is a separate identity, not a reclaim or history/ownership transfer.\nServer-readable; no end-to-end encryption. General messages expire after 24 hours; private report evidence is retained for six calendar months. Local cache: at most 200 messages, pruned on opening and while visible, including offline. Paused encrypted cache bytes may remain until reopening; no secure-erasure guarantee. Cached messages are rechecked for moderation when connected.\nPocketBase is pre-1.0; this optional pilot may change. No push, background service, attachments, private messages, automatic links or launcher execution."
+    },
+    "type": "string"
+  },
+  "community_invalid": {
+    "formatted": true,
+    "forms": {
+      "other": "Input rejected; use /help. Slash commands take no password arguments. Messages: 500 Unicode characters / 2000 UTF-8 bytes maximum."
+    },
+    "type": "string"
+  },
+  "community_keep": {
+    "formatted": true,
+    "forms": {
+      "other": "Keep and leave"
+    },
+    "type": "string"
+  },
+  "community_leave_body": {
+    "formatted": true,
+    "forms": {
+      "other": "Keep the draft privately for next time, or discard it. Nothing is uploaded. Discarding an uncertain draft does not retract a possible server post."
+    },
+    "type": "string"
+  },
+  "community_leave_title": {
+    "formatted": true,
+    "forms": {
+      "other": "Unsent or uncertain draft"
+    },
+    "type": "string"
+  },
+  "community_loading": {
+    "formatted": true,
+    "forms": {
+      "other": "%1$s · requesting…"
+    },
+    "type": "string"
+  },
+  "community_login": {
+    "formatted": true,
+    "forms": {
+      "other": "Login"
+    },
+    "type": "string"
+  },
+  "community_login_required": {
+    "formatted": true,
+    "forms": {
+      "other": "Sign in or register first. Draft kept; nothing was sent."
+    },
+    "type": "string"
+  },
+  "community_logout": {
+    "formatted": true,
+    "forms": {
+      "other": "Signed out. Account cache, blocks, draft and token cleared."
+    },
+    "type": "string"
+  },
+  "community_network_error": {
+    "formatted": true,
+    "forms": {
+      "other": "Network/TLS request failed. Cached history may be stale; draft kept. Nothing will post automatically."
+    },
+    "type": "string"
+  },
+  "community_new_messages": {
+    "formatted": true,
+    "forms": {
+      "other": "New/unread messages: %1$d · scroll to read"
+    },
+    "type": "string"
+  },
+  "community_password": {
+    "formatted": true,
+    "forms": {
+      "other": "Password"
+    },
+    "type": "string"
+  },
+  "community_pending": {
+    "formatted": true,
+    "forms": {
+      "other": "Posting… not delivered yet."
+    },
+    "type": "string"
+  },
+  "community_pending_locked": {
+    "formatted": true,
+    "forms": {
+      "other": "Previous attempt is unresolved. Restore its draft with /refresh and submit it unchanged to reconcile/retry, or /logout to clear local state (this does not retract any server post)."
+    },
+    "type": "string"
+  },
+  "community_posted": {
+    "formatted": true,
+    "forms": {
+      "other": "Posted — server acknowledgement verified."
+    },
+    "type": "string"
+  },
+  "community_rate_error": {
+    "formatted": true,
+    "forms": {
+      "other": "Rate limited; wait %1$d seconds before retrying."
+    },
+    "type": "string"
+  },
+  "community_register": {
+    "formatted": true,
+    "forms": {
+      "other": "Register"
+    },
+    "type": "string"
+  },
+  "community_registration_error": {
+    "formatted": true,
+    "forms": {
+      "other": "Registration rejected. Check username uniqueness, password length and matching confirmation. If creation succeeded but login failed, try Login; account creation alone is not sign-in."
+    },
+    "type": "string"
+  },
+  "community_reported": {
+    "formatted": true,
+    "forms": {
+      "other": "Report accepted by server."
+    },
+    "type": "string"
+  },
+  "community_request_error": {
+    "formatted": true,
+    "forms": {
+      "other": "Request failed (%1$d). No success was confirmed."
+    },
+    "type": "string"
+  },
+  "community_session_error": {
+    "formatted": true,
+    "forms": {
+      "other": "Session expired, revoked or account unavailable. Signed out; private cache and draft cleared."
+    },
+    "type": "string"
+  },
+  "community_signed_out": {
+    "formatted": true,
+    "forms": {
+      "other": "Signed out · offline · /login or /register"
+    },
+    "type": "string"
+  },
+  "community_stale": {
+    "formatted": true,
+    "forms": {
+      "other": "%1$s · stale/offline"
+    },
+    "type": "string"
+  },
+  "community_storage_error": {
+    "formatted": true,
+    "forms": {
+      "other": "Private encrypted storage is unavailable. No post was started; draft is only in this window."
+    },
+    "type": "string"
+  },
+  "community_submit": {
+    "formatted": true,
+    "forms": {
+      "other": "Send"
+    },
+    "type": "string"
+  },
+  "community_title": {
+    "formatted": true,
+    "forms": {
+      "other": "Re-TUI community · experimental"
+    },
+    "type": "string"
+  },
+  "community_uncertain": {
+    "formatted": true,
+    "forms": {
+      "other": "Delivery uncertain. Pending draft kept with the same request ID. Send the same draft again to reconcile/retry; do not send a second copy. No automatic retry."
+    },
+    "type": "string"
+  },
+  "community_unread_divider": {
+    "formatted": true,
+    "forms": {
+      "other": "— first unread —"
+    },
+    "type": "string"
+  },
+  "community_username": {
+    "formatted": true,
+    "forms": {
+      "other": "Username"
     },
     "type": "string"
   },
@@ -5703,6 +5983,13 @@
     "formatted": true,
     "forms": {
       "other": "-ls -> list your contacts \n-l [contactName] -> show details about a contact \n-add -> create a new contact \n-edit [contactName] -> edit an existing contact \n-rm [contactName] -> remove a contact"
+    },
+    "type": "string"
+  },
+  "help_community": {
+    "formatted": true,
+    "forms": {
+      "other": "community — open the experimental opt-in Re-TUI community feed. Inside: plain text posts; /help lists local commands. Username/password only. No launcher commands run in this surface."
     },
     "type": "string"
   },
@@ -10182,7 +10469,7 @@
   "offline_help_article_alias_workflow_body": {
     "formatted": false,
     "forms": {
-      "other": "Home/app aliases and Termux-script aliases are separate scopes in alias.txt. alias -add saves a name and command, defaulting to home scope; place -a after -add for explicit home scope, or -s for a Termux script. Parameter expansion uses configurable marker/separator rules, not necessarily POSIX shell-function parsing. Use alias -ls to inspect mappings and alias -file to edit the file. Removal deletes only the chosen mapping.\n\nHome aliases take precedence over built-in commands, so avoid conflicting names. Storing an alias changes configuration; invoking it executes its content. Save only code you trust. Script aliases require Termux, whose environment differs from the home prompt. Use termux -run or a module termux: source for Termux scripts.\n\nshell explicitly dispatches the launcher's Android shell input with launcher access, not Termux's private environment. Bare unknown input reaches it only when shell_requires_prefix is false. A known launcher command that fails parsing is not silently run as shell.\n\nExamples:\nalias -add ll apps -ls\nCreate ll as an app-drawer shortcut.\n\nalias -ls\nInspect stored aliases.\n\nalias -rm ll\nRemove the example mapping.\n\nshell pwd\nExplicitly request launcher shell working directory, not Termux home."
+      "other": "Home/app aliases and Termux-script aliases are separate scopes in alias.txt. alias -add saves a name and command, defaulting to home scope; place -a after -add for explicit home scope, or -s for a Termux script. Parameter expansion uses configurable marker/separator rules, not necessarily POSIX shell-function parsing. Use alias -ls to inspect mappings and alias -file to edit the file. Removal deletes only the chosen mapping.\n\nHome aliases take precedence over built-in commands, so avoid conflicting names. Storing an alias changes configuration; invoking it executes its content. Save only code you trust. Script aliases require Termux, whose environment differs from the home prompt. Use termux -run or a module termux: source for Termux scripts.\n\nshell explicitly dispatches the launcher's Android shell input with launcher access, not Termux's private environment. Bare unknown input reaches it only when shell_requires_prefix is false. A known launcher command that fails parsing is not silently run as shell.\n\n## Examples\n\n```\nalias -add ll apps -ls\n```\n\nCreate ll as an app-drawer shortcut.\n\n```\nalias -ls\n```\n\nInspect stored aliases.\n\n```\nalias -rm ll\n```\n\nRemove the example mapping.\n\n```\nshell pwd\n```\n\nExplicitly request launcher shell working directory, not Termux home."
     },
     "type": "string"
   },
@@ -10196,7 +10483,7 @@
   "offline_help_article_android_shortcuts_body": {
     "formatted": false,
     "forms": {
-      "other": "Pinned shortcut handles begin with @ and retain package, shortcut ID and user-profile identity. They launch through Android LauncherApps, so the source app must still expose the shortcut. A label is not sufficient to restore a removed or disabled shortcut.\nUse shortcut -ls to discover published/pinned shortcuts and shortcut -use with a chosen handle/ID using completion. The Settings keyboard-shortcut panel is separate: it maps letters a-z to at most two app shortcuts each for the Re:TUI keyboard companion. Those mappings are token-authorized and pass icon content URIs to that package; installing the launcher alone does not install the keyboard.\nNeither shortcut feature is a shell alias. Use aliases for launcher command shortcuts, pinned handles for Android shortcuts, and keyboard mappings for companion-keyboard app launches.\n\nApp shortcuts require Android API 25 or later. shortcut -ls lists shortcuts and accepted pinned aliases; adding an app name narrows the list. shortcut -use accepts an ID, an index with an app name, or an @handle already accepted by the launcher. Check the list before running a shortcut: a shortcut may perform an app-specific action. The old -cp option is not implemented.\n\nExamples:\nshortcut -ls\nInspect available shortcuts and pinned aliases.\n\nsettings\nOpen keyboard-shortcut configuration from the Hub."
+      "other": "Pinned shortcut handles begin with @ and retain package, shortcut ID and user-profile identity. They launch through Android LauncherApps, so the source app must still expose the shortcut. A label is not sufficient to restore a removed or disabled shortcut.\nUse shortcut -ls to discover published/pinned shortcuts and shortcut -use with a chosen handle/ID using completion. The Settings keyboard-shortcut panel is separate: it maps letters a-z to at most two app shortcuts each for the Re:TUI keyboard companion. Those mappings are token-authorized and pass icon content URIs to that package; installing the launcher alone does not install the keyboard.\nNeither shortcut feature is a shell alias. Use aliases for launcher command shortcuts, pinned handles for Android shortcuts, and keyboard mappings for companion-keyboard app launches.\n\nApp shortcuts require Android API 25 or later. shortcut -ls lists shortcuts and accepted pinned aliases; adding an app name narrows the list. shortcut -use accepts an ID, an index with an app name, or an @handle already accepted by the launcher. Check the list before running a shortcut: a shortcut may perform an app-specific action. The old -cp option is not implemented.\n\n## Examples\n\n```\nshortcut -ls\n```\n\nInspect available shortcuts and pinned aliases.\n\n```\nsettings\n```\n\nOpen keyboard-shortcut configuration from the Hub."
     },
     "type": "string"
   },
@@ -10210,7 +10497,7 @@
   "offline_help_article_android_widgets_body": {
     "formatted": false,
     "forms": {
-      "other": "Open the Android widgets pane from the toolbar. Its local input accepts add, show, resize and remove. add opens provider picker, then Android binding/configuration when required. show lists the assigned w_id codes; use those displayed codes, not Android’s raw AppWidget ID. resize takes height then width in grid cells, subject to provider minima/resizability and launcher grid bounds. Remove deletes the hosted widget, not its source app.\nLong-press/edit exposes drag movement and edge-resize controls; outside touch cancels edit mode. Adding needs an installed widget provider and may open that app’s configuration screen. Widget content can depend on the provider app, Android access and network.\nThese pane commands are not home launcher commands. The old widget command is retired and prints migration guidance for Lua modules. Use the native widgets pane for AppWidgets, module for dock Lua, and lua for app-like scripts. widget -add does not create an Android widget.\n\nExamples:\nadd\nWidgets-pane input only: choose a native Android widget.\n\nshow\nWidgets-pane input only: list hosted w_id codes."
+      "other": "Open the Android widgets pane from the toolbar. Its local input accepts add, show, resize and remove. add opens provider picker, then Android binding/configuration when required. show lists the assigned w_id codes; use those displayed codes, not Android’s raw AppWidget ID. resize takes height then width in grid cells, subject to provider minima/resizability and launcher grid bounds. Remove deletes the hosted widget, not its source app.\nLong-press/edit exposes drag movement and edge-resize controls; outside touch cancels edit mode. Adding needs an installed widget provider and may open that app’s configuration screen. Widget content can depend on the provider app, Android access and network.\nThese pane commands are not home launcher commands. The old widget command is retired and prints migration guidance for Lua modules. Use the native widgets pane for AppWidgets, module for dock Lua, and lua for app-like scripts. widget -add does not create an Android widget.\n\n## Examples\n\n```\nadd\n```\n\nWidgets-pane input only: choose a native Android widget.\n\n```\nshow\n```\n\nWidgets-pane input only: list hosted w_id codes."
     },
     "type": "string"
   },
@@ -10224,7 +10511,7 @@
   "offline_help_article_app_defaults_body": {
     "formatted": false,
     "forms": {
-      "other": "Default app slots use apps -default_app followed by an integer slot and a shown app, most_used, or null marker. The slot is validated against actual Apps settings; invalid indices report an error. The command refreshes default suggestions. apps -reset clears the selected visible app’s launched_times counter; it does not clear that app’s data.\n\nExamples:\napps -default_app 1 most_used\nChange slot 1 to the most-used marker."
+      "other": "Default app slots use apps -default_app followed by an integer slot and a shown app, most_used, or null marker. The slot is validated against actual Apps settings; invalid indices report an error. The command refreshes default suggestions. apps -reset clears the selected visible app’s launched_times counter; it does not clear that app’s data.\n\n## Examples\n\n```\napps -default_app 1 most_used\n```\n\nChange slot 1 to the most-used marker."
     },
     "type": "string"
   },
@@ -10238,7 +10525,7 @@
   "offline_help_article_app_discovery_body": {
     "formatted": false,
     "forms": {
-      "other": "Use apps -ls to browse visible launchable apps in the drawer. Without an active launcher interface it can print a visible-app list; an unavailable drawer does not always trigger that fallback. apps -lsh prints hidden entries and accepts a filter. Choose installed apps through completion: identities can include an activity and Android user profile. apps -frc resolves visible or hidden apps for an explicit launch. App details, Android app settings and store pages are separate actions.\n\nHiding removes an activity from normal launcher choices, not its installation, running state or Android access. apps -show restores a hidden entry. Hidden apps can still open through intents, settings or other launchers. If an app is missing, check hidden entries, profile availability and whether it exposes a launcher activity. Package events refresh the app manager; apps -ls is not a list of every background package.\n\nApp groups and drawer tabs organize entries. Opening the app drawer hides the widgets drawer and vice versa. Back closes the active drawer after higher-priority surfaces; Android Home returns to Launcher Home from the Termux workspace/console. Work-profile launches depend on Android profile access.\n\nExamples:\napps -ls\nOpen the app drawer.\n\napps -lsh\nInspect hidden apps.\n\nhelp apps\nSee app hide/show syntax; choose actual app arguments from completion.\n\napps -frc <appName>\nExplicit app launch when a name conflicts; replace the placeholder."
+      "other": "Use apps -ls to browse visible launchable apps in the drawer. Without an active launcher interface it can print a visible-app list; an unavailable drawer does not always trigger that fallback. apps -lsh prints hidden entries and accepts a filter. Choose installed apps through completion: identities can include an activity and Android user profile. apps -frc resolves visible or hidden apps for an explicit launch. App details, Android app settings and store pages are separate actions.\n\nHiding removes an activity from normal launcher choices, not its installation, running state or Android access. apps -show restores a hidden entry. Hidden apps can still open through intents, settings or other launchers. If an app is missing, check hidden entries, profile availability and whether it exposes a launcher activity. Package events refresh the app manager; apps -ls is not a list of every background package.\n\nApp groups and drawer tabs organize entries. Opening the app drawer hides the widgets drawer and vice versa. Back closes the active drawer after higher-priority surfaces; Android Home returns to Launcher Home from the Termux workspace/console. Work-profile launches depend on Android profile access.\n\n## Examples\n\n```\napps -ls\n```\n\nOpen the app drawer.\n\n```\napps -lsh\n```\n\nInspect hidden apps.\n\n```\nhelp apps\n```\n\nSee app hide/show syntax; choose actual app arguments from completion.\n\n```\napps -frc <appName>\n```\n\nExplicit app launch when a name conflicts; replace the placeholder."
     },
     "type": "string"
   },
@@ -10252,7 +10539,7 @@
   "offline_help_article_app_groups_body": {
     "formatted": false,
     "forms": {
-      "other": "A group is a local launcher collection, not an Android folder or permission boundary. Create a short single-word name, add installed apps with apps -addtogp <group> <app>, then list its members. Choose actual app labels/profile matches through completion. Quoted names with spaces can be saved, but typing them at the home prompt does not select the group correctly.\n\nTyping a group name alone lists its apps; text after it selects an app in that group. Group tabs appear in the app drawer, and Search can show group results. Removing membership or a group does not uninstall apps. Sorting and colors are independent options: background and text colors are separate, and the older -gpcolor changes the background.\n\nExamples:\napps -mkgp work\nCreate group work.\n\napps -lsgp work\nList work group membership.\n\napps -gp_bg_color work #243040\nChange work group background.\n\napps -lsgp\nList all groups."
+      "other": "A group is a local launcher collection, not an Android folder or permission boundary. Create a short single-word name, add installed apps with apps -addtogp <group> <app>, then list its members. Choose actual app labels/profile matches through completion. Quoted names with spaces can be saved, but typing them at the home prompt does not select the group correctly.\n\nTyping a group name alone lists its apps; text after it selects an app in that group. Group tabs appear in the app drawer, and Search can show group results. Removing membership or a group does not uninstall apps. Sorting and colors are independent options: background and text colors are separate, and the older -gpcolor changes the background.\n\n## Examples\n\n```\napps -mkgp work\n```\n\nCreate group work.\n\n```\napps -lsgp work\n```\n\nList work group membership.\n\n```\napps -gp_bg_color work #243040\n```\n\nChange work group background.\n\n```\napps -lsgp\n```\n\nList all groups."
     },
     "type": "string"
   },
@@ -10266,7 +10553,7 @@
   "offline_help_article_app_inspection_intents_body": {
     "formatted": false,
     "forms": {
-      "other": "Inspect accepts a launcher app label or package name and prints exported components plus common handlers. Output is capped at 12 components per section. Intent supports view, activity, broadcast, and Android intent-URI modes. Activity/broadcast options include -a/-d/-t/-p/-n and string/integer/boolean extras. Broadcasts need an action and an explicit package/component unless --unsafe-implicit is used. Sending an intent may open an app or cause external actions; do not copy unknown intent URIs. In -view and -uri modes, only the first URI token is used; extra arguments do not constrain the action.\n\nExamples:\nintent -view https://example.com\nOpen an example page in a registered handler; network use depends on the handler."
+      "other": "Inspect accepts a launcher app label or package name and prints exported components plus common handlers. Output is capped at 12 components per section. Intent supports view, activity, broadcast, and Android intent-URI modes. Activity/broadcast options include -a/-d/-t/-p/-n and string/integer/boolean extras. Broadcasts need an action and an explicit package/component unless --unsafe-implicit is used. Sending an intent may open an app or cause external actions; do not copy unknown intent URIs. In -view and -uri modes, only the first URI token is used; extra arguments do not constrain the action.\n\n## Examples\n\n```\nintent -view https://example.com\n```\n\nOpen an example page in a registered handler; network use depends on the handler."
     },
     "type": "string"
   },
@@ -10294,7 +10581,7 @@
   "offline_help_article_appearance_borders_body": {
     "formatted": false,
     "forms": {
-      "other": "Generated borders use the master enable_dashed_border switch plus per-surface enable/color overrides. Per-surface auto inherits the terminal border color; advanced AUTO colors inherit their role parents and are not explicit transparent colors. Zero dash gap makes a continuous enabled stroke; a positive gap makes dashed segments. Stroke/radius accessors clamp raw values, so extreme saved geometry is not an exact screen dimension. Unified-status border is separate.\n\nContext-aware settings/config border writes refresh the running launcher in place. config -set persists changes; config -get reads stored values. If a change seems ineffective, check the surface override and custom frame before restarting.\n\nCustom image frames take precedence over generated artwork; with a frame, generated fallback fill is transparent. Without a frame, fallback borders depend on border-enabled, Cyberdeck and dashed settings. Color options change fills/text, not custom-frame pixels. Disabling a surface/master dashed border does not delete its frame or disable every Cyberdeck border.\n\nExamples:\nconfig -set dashed_border_gap_length 0\nPersist solid generated borders and live-refresh running launcher.\n\nconfig -set dashed_border_gap_length 4\nPersist a dashed gap; changes appearance.\n\nconfig -get unified_status_border\nRead unified status-border option.\n\nsettings\nInspect appearance settings; opening settings alone is not a border change."
+      "other": "Generated borders use the master enable_dashed_border switch plus per-surface enable/color overrides. Per-surface auto inherits the terminal border color; advanced AUTO colors inherit their role parents and are not explicit transparent colors. Zero dash gap makes a continuous enabled stroke; a positive gap makes dashed segments. Stroke/radius accessors clamp raw values, so extreme saved geometry is not an exact screen dimension. Unified-status border is separate.\n\nContext-aware settings/config border writes refresh the running launcher in place. config -set persists changes; config -get reads stored values. If a change seems ineffective, check the surface override and custom frame before restarting.\n\nCustom image frames take precedence over generated artwork; with a frame, generated fallback fill is transparent. Without a frame, fallback borders depend on border-enabled, Cyberdeck and dashed settings. Color options change fills/text, not custom-frame pixels. Disabling a surface/master dashed border does not delete its frame or disable every Cyberdeck border.\n\n## Examples\n\n```\nconfig -set dashed_border_gap_length 0\n```\n\nPersist solid generated borders and live-refresh running launcher.\n\n```\nconfig -set dashed_border_gap_length 4\n```\n\nPersist a dashed gap; changes appearance.\n\n```\nconfig -get unified_status_border\n```\n\nRead unified status-border option.\n\n```\nsettings\n```\n\nInspect appearance settings; opening settings alone is not a border change."
     },
     "type": "string"
   },
@@ -10308,7 +10595,7 @@
   "offline_help_article_argument_shapes_body": {
     "formatted": false,
     "forms": {
-      "other": "Arguments vary by command. Text arguments may consume the rest of the input; single-name arguments support quoted names and backslash escapes. Integer arguments do not accept decimals. For boolean arguments, use true or false: other nonempty words, including yes, can be treated as false. App names are resolved through the launcher’s app list. Use the canonical dashed options shown here. Extra arguments are not always rejected: commands with no arguments can ignore trailing text, and text arguments can absorb it. Do not rely on extra words to prevent an action.\n\nExamples:\nusername \"Work User\" \"Desk Phone\"\nChange displayed prompt labels; quotes keep each label together."
+      "other": "Arguments vary by command. Text arguments may consume the rest of the input; single-name arguments support quoted names and backslash escapes. Integer arguments do not accept decimals. For boolean arguments, use true or false: other nonempty words, including yes, can be treated as false. App names are resolved through the launcher’s app list. Use the canonical dashed options shown here. Extra arguments are not always rejected: commands with no arguments can ignore trailing text, and text arguments can absorb it. Do not rely on extra words to prevent an action.\n\n## Examples\n\n```\nusername \"Work User\" \"Desk Phone\"\n```\n\nChange displayed prompt labels; quotes keep each label together."
     },
     "type": "string"
   },
@@ -10322,7 +10609,7 @@
   "offline_help_article_calculator_editing_limits_body": {
     "formatted": false,
     "forms": {
-      "other": "Tap the calculator input to position the cursor or select text. Function and square-root keys wrap selected text, or insert parentheses with the cursor inside. Backspace deletes the selection or previous character. ABC uses staggered QWERTY rows within the same keypad-height budget as 123, and long input scrolls horizontally. Expressions are limited to 1024 characters. The native worker has a four-second watchdog; the client waits up to eight seconds for completion. Cancel targets the active calculation and late results are ignored. A fixed keypad height does not guarantee a visible input row on every short landscape screen.\n\nExamples:\nclear\nAt calc>, clear displayed transcript but retain the previous answer."
+      "other": "Tap the calculator input to position the cursor or select text. Function and square-root keys wrap selected text, or insert parentheses with the cursor inside. Backspace deletes the selection or previous character. ABC uses staggered QWERTY rows within the same keypad-height budget as 123, and long input scrolls horizontally. Expressions are limited to 1024 characters. The native worker has a four-second watchdog; the client waits up to eight seconds for completion. Cancel targets the active calculation and late results are ignored. A fixed keypad height does not guarantee a visible input row on every short landscape screen.\n\n## Examples\n\n```\nclear\n```\n\nAt calc>, clear displayed transcript but retain the previous answer."
     },
     "type": "string"
   },
@@ -10336,7 +10623,7 @@
   "offline_help_article_calculator_help_body": {
     "formatted": false,
     "forms": {
-      "other": "In the calculator, type help or tap its question-mark tab. At help>, choose 1–5 for expressions, functions, conversions, ans or editing; 0 returns to calc>. Within a topic, 1 returns to the menu, 2 goes back, 3 goes forward, and 0 returns to the calculator; unavailable directions are omitted. Back moves from topic to menu to calculator rather than closing the pane immediately. Header-tab entry preserves the calculation draft and selection; typed help is consumed as a local command. Help choices do not evaluate expressions or enter the calculation transcript. Calculator-specific help is distinct from the launcher manual.\n\nExamples:\nhelp\nAt calc>, open calculator help; not a launcher command.\n\n0\nAt help>, return to the calculator."
+      "other": "## Read without calculating\n\nTap the calculator question-mark tab, or type `help` at `calc>` and submit it, to open this dedicated offline reader. Header-tab entry keeps the calculator draft, selection and transcript. Typed help is consumed as a local command. The reader has its own numbered input; choices and examples never evaluate expressions or enter the calculation transcript. A pending calculation can finish without consuming the reader draft.\n\nAt `help>`, choose a displayed number or tap its line. Within an article, 1 returns to its topic list and 2/3 move between articles when shown. Android Back moves up the manual hierarchy; 0 closes the reader and returns to the calculator. Use the header window control to switch between maximized and windowed reading; drag the header to move and the visible edge/corner handles to resize. Text reflows rather than scaling.\n\n## Expressions and operators\n\n```\n2 + 3 * 4 → 14\n(2 + 3) * 4 → 20\n2^3 → 8\n```\n\nUse +, −, ×, ÷, parentheses, ^ and %.\n\n## Functions and constants\n\n```\nsqrt(9) → 3\nsin(90) → 1 in degrees mode\n```\n\nFUNC inserts sqrt, sin, cos, tan, log, ln and abs with parentheses. Constants: `pi` and `e`.\n\n## Conversions and ans\n\n```\n5 ft to miles\n20 celsius to fahrenheit\n```\n\nUse `to` for conversion. The word `in` means inches. ABC enters letters and units. `ans` holds the last successful result, including units; errors and cancellation do not replace it.\n\n```\n5 ft to miles\nans * 2\nans to ft → 10 ft\n```\n\n## Keypad and editing\n\n- 123: numbers and operators\n- ABC: letters and units\n- FUNC: functions and constants\n\nTap the prompt to place the cursor or select text. √ and function keys wrap selected text or insert parentheses with the cursor inside. ⌫ deletes the selection or previous character. ↵ evaluates.\n\n- `clear` clears the transcript, keeping ans.\n- `help` opens this reader.\n- `exit` closes the calculator.\n- Cancel stops a calculation without changing your input.\n\n>! Examples are read-only here. Entering them at calc> evaluates them."
     },
     "type": "string"
   },
@@ -10364,7 +10651,7 @@
   "offline_help_article_calculator_workflow_body": {
     "formatted": false,
     "forms": {
-      "other": "calc opens the calculator; calc <expression> evaluates one launcher result. At the home prompt or in an alias, use the calc prefix: bare numbers/expressions are not automatically calculations. Inside the pane, type after calc> and press Enter or ↵. 123 provides numbers, ABC provides QWERTY letters/units and FUNC provides functions/constants. Use to for conversion; in is an inch unit.\n\nans holds the last successful pane result with grouping/units; errors or cancellation do not replace it. clear clears the transcript but keeps ans, and exit closes the pane. The help tab explains expressions and editing.\n\nOn Android 7+, opening the pane enables bundled Qalculate; the one-shot launcher command follows the saved Qalculate/engine settings. Enable qalculate in Settings → behavior.xml for units and symbolic maths from the prompt. Suggestions reflect that setting. Android 6 uses the basic evaluator. Pane calculations use approximate mode; one-shot calculations follow stored engine options.\n\nExamples:\ncalc\nOpen the calculator.\n\ncalc 2 * (3 + 4)\nEvaluate the supplied expression text.\n\ncalc 5 ft to miles\nRun a conversion from the launcher when Qalculate is enabled."
+      "other": "calc opens the calculator; calc <expression> evaluates one launcher result. At the home prompt or in an alias, use the calc prefix: bare numbers/expressions are not automatically calculations. Inside the pane, type after calc> and press Enter or ↵. 123 provides numbers, ABC provides QWERTY letters/units and FUNC provides functions/constants. Use to for conversion; in is an inch unit.\n\nans holds the last successful pane result with grouping/units; errors or cancellation do not replace it. clear clears the transcript but keeps ans, and exit closes the pane. The help tab explains expressions and editing.\n\nOn Android 7+, opening the pane enables bundled Qalculate; the one-shot launcher command follows the saved Qalculate/engine settings. Enable qalculate in Settings → behavior.xml for units and symbolic maths from the prompt. Suggestions reflect that setting. Android 6 uses the basic evaluator. Pane calculations use approximate mode; one-shot calculations follow stored engine options.\n\n## Examples\n\n```\ncalc\n```\n\nOpen the calculator.\n\n```\ncalc 2 * (3 + 4)\n```\n\nEvaluate the supplied expression text.\n\n```\ncalc 5 ft to miles\n```\n\nRun a conversion from the launcher when Qalculate is enabled."
     },
     "type": "string"
   },
@@ -10378,7 +10665,7 @@
   "offline_help_article_calendar_events_body": {
     "formatted": false,
     "forms": {
-      "other": "Events -access requests READ_CALENDAR. -lookahead reads/changes the configured number of days after today. -module prints a Termux script example using exported calendar data; it does not install or run that script. Old -install/-add options only print migration guidance. Register an events module source before expecting events to open it. Calendar titles, dates, and locations passed to scripts are personal data; inspect scripts before using them.\n\nExamples:\nevents -access\nRequest calendar-read permission.\n\nevents -module\nPrint the script template without executing it.\n\nevents -lookahead\nInspect the lookahead setting."
+      "other": "Events -access requests READ_CALENDAR. -lookahead reads/changes the configured number of days after today. -module prints a Termux script example using exported calendar data; it does not install or run that script. Old -install/-add options only print migration guidance. Register an events module source before expecting events to open it. Calendar titles, dates, and locations passed to scripts are personal data; inspect scripts before using them.\n\n## Examples\n\n```\nevents -access\n```\n\nRequest calendar-read permission.\n\n```\nevents -module\n```\n\nPrint the script template without executing it.\n\n```\nevents -lookahead\n```\n\nInspect the lookahead setting."
     },
     "type": "string"
   },
@@ -10392,7 +10679,7 @@
   "offline_help_article_calendar_reminders_body": {
     "formatted": false,
     "forms": {
-      "other": "Calendar/events reads Android’s calendar provider only after READ_CALENDAR. events -access requests it from an Activity; use Android settings if not available. Upcoming events are limited to 20, and lookahead is today plus a sanitized 0-366 days; zero means today only. Native calendar UI and editable script events modules are different surfaces.\nThe events command currently does not install a ready Termux script automatically: -install/-add return migration guidance. -module prints an example; configure an actual module source before opening scripted events. Materialized %RETUI_CALENDAR_UPCOMING_MONTH TSV is generated by launcher provider and substituted into module runtime; despite the token name, current lookahead can be customized.\nLocal reminders are not synced calendar events. module -prompt reminder add/edit/remove walks through a local confirmation flow, storing records and scheduling Android alarms. CLI reminder date syntax differs from native prompt syntax. Alarms are setAndAllowWhileIdle, not exact-to-the-second alarms; Android notification permissions/settings can suppress display. Do not rely on these alarms as exact-time or guaranteed reboot-surviving reminders.\n\nExamples:\nevents -access\nExplicitly request calendar-read access.\n\nevents -lookahead 7\nPersist seven days after today; state-changing.\n\nevents -module\nPrint sample script text without installing or executing it.\n\nmodule -prompt reminder add\nStart interactive local-reminder setup; confirmation saves record."
+      "other": "Calendar/events reads Android’s calendar provider only after READ_CALENDAR. events -access requests it from an Activity; use Android settings if not available. Upcoming events are limited to 20, and lookahead is today plus a sanitized 0-366 days; zero means today only. Native calendar UI and editable script events modules are different surfaces.\nThe events command currently does not install a ready Termux script automatically: -install/-add return migration guidance. -module prints an example; configure an actual module source before opening scripted events. Materialized %RETUI_CALENDAR_UPCOMING_MONTH TSV is generated by launcher provider and substituted into module runtime; despite the token name, current lookahead can be customized.\nLocal reminders are not synced calendar events. module -prompt reminder add/edit/remove walks through a local confirmation flow, storing records and scheduling Android alarms. CLI reminder date syntax differs from native prompt syntax. Alarms are setAndAllowWhileIdle, not exact-to-the-second alarms; Android notification permissions/settings can suppress display. Do not rely on these alarms as exact-time or guaranteed reboot-surviving reminders.\n\n## Examples\n\n```\nevents -access\n```\n\nExplicitly request calendar-read access.\n\n```\nevents -lookahead 7\n```\n\nPersist seven days after today; state-changing.\n\n```\nevents -module\n```\n\nPrint sample script text without installing or executing it.\n\n```\nmodule -prompt reminder add\n```\n\nStart interactive local-reminder setup; confirmation saves record."
     },
     "type": "string"
   },
@@ -10406,7 +10693,7 @@
   "offline_help_article_clock_tools_body": {
     "formatted": false,
     "forms": {
-      "other": "Time without arguments prints output format zero; time <index> selects from output_time_format, and out-of-range indices fall back to zero. The separator comes from time_format_separator. Timer duration units are s/m/h and can be combined. When a timer is running, a new plain duration asks whether to add time; -add adds directly. -status checks progress and -stop stops the timer. Stopwatch starts without arguments, with -stop/-reset/-status controls. Stopping/resetting changes the running session.\n\nExamples:\ntime 0\nPrint the first configured output time format.\n\ntimer 5m\nStart a five-minute timer or confirm addition to an existing one.\n\ntimer -status\nInspect the timer.\n\nstopwatch -status\nInspect the stopwatch without starting it."
+      "other": "Time without arguments prints output format zero; time <index> selects from output_time_format, and out-of-range indices fall back to zero. The separator comes from time_format_separator. Timer duration units are s/m/h and can be combined. When a timer is running, a new plain duration asks whether to add time; -add adds directly. -status checks progress and -stop stops the timer. Stopwatch starts without arguments, with -stop/-reset/-status controls. Stopping/resetting changes the running session.\n\n## Examples\n\n```\ntime 0\n```\n\nPrint the first configured output time format.\n\n```\ntimer 5m\n```\n\nStart a five-minute timer or confirm addition to an existing one.\n\n```\ntimer -status\n```\n\nInspect the timer.\n\n```\nstopwatch -status\n```\n\nInspect the stopwatch without starting it."
     },
     "type": "string"
   },
@@ -10420,7 +10707,7 @@
   "offline_help_article_colors_type_and_status_body": {
     "formatted": false,
     "forms": {
-      "other": "Base colors and advanced semantic roles are defined in Theme; advanced auto roles inherit resolved parent colors rather than using one global fixed color. Settings can preview a color before saving. Wallpaper Auto-theme stores a palette snapshot, uses system-color fallback when necessary and disables legacy auto_color_pick after the snapshot. It can replace many colors; save a local preset first if you want to retain the current look.\nStatus indices are positive decimal values: labels sharing the same integer part share a row. Whole-row edits insert/shift rows; ASCII is kept on a separate row. Multiple labels can share a row. Typography includes base text sizes and global font-size offset; custom font paths are excluded from shared presets.\nASCII reads ascii.txt, supports static/colored HTML and framed animation; enable animation only for a suitable bounded file. Launcher sound has a master switch plus per-event toggles. Cyberdeck and CRT are independent effects, not extra launcher modes.\n\nExamples:\nconfig -get font_size_offset\nInspect global type-size offset.\n\nconfig -info ram_index\nRead status row-placement setting.\n\nwallpaper -auto\nInteractive palette-change flow; can write colors after confirmation."
+      "other": "Base colors and advanced semantic roles are defined in Theme; advanced auto roles inherit resolved parent colors rather than using one global fixed color. Settings can preview a color before saving. Wallpaper Auto-theme stores a palette snapshot, uses system-color fallback when necessary and disables legacy auto_color_pick after the snapshot. It can replace many colors; save a local preset first if you want to retain the current look.\nStatus indices are positive decimal values: labels sharing the same integer part share a row. Whole-row edits insert/shift rows; ASCII is kept on a separate row. Multiple labels can share a row. Typography includes base text sizes and global font-size offset; custom font paths are excluded from shared presets.\nASCII reads ascii.txt, supports static/colored HTML and framed animation; enable animation only for a suitable bounded file. Launcher sound has a master switch plus per-event toggles. Cyberdeck and CRT are independent effects, not extra launcher modes.\n\n## Examples\n\n```\nconfig -get font_size_offset\n```\n\nInspect global type-size offset.\n\n```\nconfig -info ram_index\n```\n\nRead status row-placement setting.\n\n```\nwallpaper -auto\n```\n\nInteractive palette-change flow; can write colors after confirmation."
     },
     "type": "string"
   },
@@ -10434,7 +10721,7 @@
   "offline_help_article_command_basics_body": {
     "formatted": false,
     "forms": {
-      "other": "Without active input redirection, typed home input is checked in this order: module prompt, app group, alias, built-in command, saved Termux workspace launcher, installed app, then embedded-shell fallback. Earlier matches win: a group or alias can claim a built-in name, and a built-in can take precedence over an app. Use apps -frc <appName> for an explicit app launch when a label conflicts. An app launch suggestion can bypass this typed-input sequence.\n\nUse shell explicitly for Android shell tooling. Unknown input is not sent to the shell when shell_requires_prefix is enabled. Use calc <expression> for a launcher calculation, or enter an expression after calc> in the dedicated calculator. Submitting commands outside this manual can open apps, alter settings or send data.\n\nExamples:\nhelp apps\nRead the actual Apps quick reference.\n\nshell pwd\nPrint the embedded shell directory.\n\ncalc 2 * (3 + 4)\nEvaluate explicitly from the launcher.\n\nhelp calc\nRead the calculator command reference."
+      "other": "## Dispatch order\n\nWithout active input redirection, typed home input is checked in this order: module prompt, app group, alias, built-in command, saved Termux workspace launcher, installed app, then embedded-shell fallback. Earlier matches win: a group or alias can claim a built-in name, and a built-in can take precedence over an app. Use apps -frc <appName> for an explicit app launch when a label conflicts. An app launch suggestion can bypass this typed-input sequence.\n\n## Choose the correct prompt\n\nUse shell explicitly for Android shell tooling. Unknown input is not sent to the shell when shell_requires_prefix is enabled. Use calc <expression> for a launcher calculation, or enter an expression after calc> in the dedicated calculator. Submitting commands outside this manual can open apps, alter settings or send data.\n\n## Examples\n\n```\nhelp apps\n```\n\nRead the actual Apps quick reference.\n\n```\nshell pwd\n```\n\nPrint the embedded shell directory.\n\n```\ncalc 2 * (3 + 4)\n```\n\nEvaluate explicitly from the launcher.\n\n```\nhelp calc\n```\n\nRead the calculator command reference."
     },
     "type": "string"
   },
@@ -10448,7 +10735,7 @@
   "offline_help_article_command_reference_body": {
     "formatted": false,
     "forms": {
-      "other": "At the launcher prompt, enter help for this offline manual, tutorial for Getting started, or help <command> for bundled syntax and configured priority without running that command. help -topic <id> opens a known category/article. Topic suggestions match IDs, titles and body text and open the selected topic directly. Hidden compatibility names are omitted from the ordinary command list; commands without reference text show a fallback, not invented syntax.\n\nLists show up to seven choices with 8/9 for previous/next pages when available. Tap an entry or enter its number and press ↵. Within an article, 1 returns to its list and 2/3 move between topics when shown. Android Back moves up a level; 0 closes the manual. Examples are text, not executable buttons. Calculator help is separate inside calc>. Online tutorial options and companion/network services do not become offline because this manual is bundled.\n\nExamples:\nhelp\nOpen the bundled offline manual.\n\nhelp search\nShow the provider-management quick reference.\n\ntutorial\nOpen offline Getting started.\n\nhelp -topic getting-started\nOpen the Getting started category."
+      "other": "At the launcher prompt, enter help for this offline manual, tutorial for Getting started, or help <command> for bundled syntax and configured priority without running that command. help -topic <id> opens a known category/article. Topic suggestions match IDs, titles and body text and open the selected topic directly. Hidden compatibility names are omitted from the ordinary command list; commands without reference text show a fallback, not invented syntax.\n\nLists show up to seven choices with 8/9 for previous/next pages when available. Tap an entry or enter its number and press ↵. Within an article, 1 returns to its list and 2/3 move between topics when shown. Android Back moves up a level; 0 closes the manual. Examples are text, not executable buttons. The calculator help tab opens the dedicated offline reader. Online tutorial options and companion/network services do not become offline because this manual is bundled.\n\n## Examples\n\n```\nhelp\n```\n\nOpen the bundled offline manual.\n\n```\nhelp search\n```\n\nShow the provider-management quick reference.\n\n```\ntutorial\n```\n\nOpen offline Getting started.\n\n```\nhelp -topic getting-started\n```\n\nOpen the Getting started category."
     },
     "type": "string"
   },
@@ -10462,7 +10749,7 @@
   "offline_help_article_configuration_editor_body": {
     "formatted": false,
     "forms": {
-      "other": "config -file opens a known launcher configuration file in the document editor. The older tuixt command also accepts only known configuration filenames, not arbitrary text-file paths. Use the editor’s displayed Save action; do not use old terminal-editor save or exit instructions in the home prompt. config -apply moves a source file into the configuration folder and can replace XML or font assets. It is not a copy operation or a portable-preset import. Back up first; use the shareable-configuration workflow for portable looks.\n\nExamples:\nconfig -file behavior.xml\nOpen known behavior options for editing; saving alters configuration."
+      "other": "config -file opens a known launcher configuration file in the document editor. The older tuixt command also accepts only known configuration filenames, not arbitrary text-file paths. Use the editor’s displayed Save action; do not use old terminal-editor save or exit instructions in the home prompt. config -apply moves a source file into the configuration folder and can replace XML or font assets. It is not a copy operation or a portable-preset import. Back up first; use the shareable-configuration workflow for portable looks.\n\n## Examples\n\n```\nconfig -file behavior.xml\n```\n\nOpen known behavior options for editing; saving alters configuration."
     },
     "type": "string"
   },
@@ -10476,7 +10763,7 @@
   "offline_help_article_configuration_workflow_body": {
     "formatted": false,
     "forms": {
-      "other": "Use settings for the visual Hub, config -ls for file/option discovery, config -info for an option's type/default/description and config -get for its stored value. -set persists, -erase empties a value, -reset restores its default and -append concatenates text without a list separator. There is no -setr operation. Back up before broad edits. config -ls rss.xml currently returns notification values; use RSS commands or its editor for feed settings.\n\nThe LauncherSettings snapshot keeps runtime reads consistent, but refresh routes vary. Context-aware border writes (master/per-surface, geometry and terminal border/header colors) rebuild in place. Some command settings refresh toolbars, margins, widgets or orientation directly. Cyberdeck/CRT/vignette command changes reload the activity; notification settings and preferred music app request listener reload. Other construction-time values may need restart after saving or external XML edits.\n\nLauncherActivity.preview preserves terminal UI state during an in-place rebuild; it does not undo saved settings. Transient color previews and staged startup/frame/font editors are different mechanisms. Follow each editor's Save/Apply and Cancel controls rather than assuming all previews are unsaved trials.\n\nExamples:\nconfig -info show_module_dock\nInspect this option before changing it.\n\nconfig -get show_module_dock\nRead the current dock setting.\n\nconfig -set show_module_dock false\nHide the dock and rebuild it live.\n\nconfig -ls\nDiscover configuration options.\n\nconfig -get enable_dashed_border\nRead master generated-border switch.\n\nconfig -info enable_dashed_border\nRead option description.\n\nrestart\nReload launcher activity when needed; not a phone reboot."
+      "other": "## Inspect before editing\n\nUse settings for the visual Hub, config -ls for file/option discovery, config -info for an option's type/default/description and config -get for its stored value. -set persists, -erase empties a value, -reset restores its default and -append concatenates text without a list separator. There is no -setr operation. Back up before broad edits. config -ls rss.xml currently returns notification values; use RSS commands or its editor for feed settings.\n\n## Refresh and restart\n\nThe LauncherSettings snapshot keeps runtime reads consistent, but refresh routes vary. Context-aware border writes (master/per-surface, geometry and terminal border/header colors) rebuild in place. Some command settings refresh toolbars, margins, widgets or orientation directly. Cyberdeck/CRT/vignette command changes reload the activity; notification settings and preferred music app request listener reload. Other construction-time values may need restart after saving or external XML edits.\n\n## Preview versus apply\n\nLauncherActivity.preview preserves terminal UI state during an in-place rebuild; it does not undo saved settings. Transient color previews and staged startup/frame/font editors are different mechanisms. Follow each editor's Save/Apply and Cancel controls rather than assuming all previews are unsaved trials.\n\n## Examples\n\n```\nconfig -info show_module_dock\n```\n\nInspect this option before changing it.\n\n```\nconfig -get show_module_dock\n```\n\nRead the current dock setting.\n\n```\nconfig -set show_module_dock false\n```\n\nHide the dock and rebuild it live.\n\n```\nconfig -ls\n```\n\nDiscover configuration options.\n\n```\nconfig -get enable_dashed_border\n```\n\nRead master generated-border switch.\n\n```\nconfig -info enable_dashed_border\n```\n\nRead option description.\n\n```\nrestart\n```\n\nReload launcher activity when needed; not a phone reboot."
     },
     "type": "string"
   },
@@ -10490,7 +10777,7 @@
   "offline_help_article_contacts_and_calls_body": {
     "formatted": false,
     "forms": {
-      "other": "contacts is the public name for cntcts. Listing/searching needs Android READ_CONTACTS; a permission request can be declined. contacts -ls prints loaded names/numbers, -l displays details, and Search uses the same authorized data. This output is private.\n\n-add and -edit delegate to Android contact activities. -rm requests WRITE_CONTACTS and deletes the resolved provider contact directly, without a confirmation dialog in that branch. Select real identifiers through completion and do not test removal on a real contact. call resolves a number/contact and needs contact-reading and phone-call access; it places a real call, not merely a dialer preview.\n\nContacts are Android provider records, not launcher notes or portable-preset backup content. Reading this manual does not enumerate contacts or request access.\n\nExamples:\ncontacts -ls\nInspect contact names/numbers; output is private."
+      "other": "contacts is the public name for cntcts. Listing/searching needs Android READ_CONTACTS; a permission request can be declined. contacts -ls prints loaded names/numbers, -l displays details, and Search uses the same authorized data. This output is private.\n\n-add and -edit delegate to Android contact activities. -rm requests WRITE_CONTACTS and deletes the resolved provider contact directly, without a confirmation dialog in that branch. Select real identifiers through completion and do not test removal on a real contact. call resolves a number/contact and needs contact-reading and phone-call access; it places a real call, not merely a dialer preview.\n\nContacts are Android provider records, not launcher notes or portable-preset backup content. Reading this manual does not enumerate contacts or request access.\n\n## Examples\n\n```\ncontacts -ls\n```\n\nInspect contact names/numbers; output is private."
     },
     "type": "string"
   },
@@ -10504,7 +10791,7 @@
   "offline_help_article_device_controls_body": {
     "formatted": false,
     "forms": {
-      "other": "Wi-Fi opens system settings on Android 10+; older versions toggle directly. Bluetooth opens settings on Android 13+; Android 12 direct toggles require BLUETOOTH_CONNECT. Brightness takes an integer percentage, clamps it, requests write-settings access, and can disable automatic brightness. Volume -get reads stream steps/max; -set uses device-specific steps and -profile uses numeric ringer modes 0/1/2. Changes may request notification-policy access. Flash requests CAMERA then toggles the torch. Beep/vibrate produce sound/haptics. These are device actions, not launcher-only appearance settings. Location prints latitude/longitude when available or requests an asynchronous location update. Treat coordinates as private.\n\nExamples:\nvolume -get media\nInspect current/max media steps before setting volume."
+      "other": "Wi-Fi opens system settings on Android 10+; older versions toggle directly. Bluetooth opens settings on Android 13+; Android 12 direct toggles require BLUETOOTH_CONNECT. Brightness takes an integer percentage, clamps it, requests write-settings access, and can disable automatic brightness. Volume -get reads stream steps/max; -set uses device-specific steps and -profile uses numeric ringer modes 0/1/2. Changes may request notification-policy access. Flash requests CAMERA then toggles the torch. Beep/vibrate produce sound/haptics. These are device actions, not launcher-only appearance settings. Location prints latitude/longitude when available or requests an asynchronous location update. Treat coordinates as private.\n\n## Examples\n\n```\nvolume -get media\n```\n\nInspect current/max media steps before setting volume."
     },
     "type": "string"
   },
@@ -10518,7 +10805,7 @@
   "offline_help_article_diagnostics_and_reload_body": {
     "formatted": false,
     "forms": {
-      "other": "Identify your surface first: home prompt, Search, widgets-pane input, Lua app, one-shot Termux console or interactive tmux workspace. Their parsers differ. Home widget -add or tbridge -ls does not revive retired features. Check config -get/-info, apps -lsh, module -ls and explicit permission-access actions before changing state. For Termux, tbridge -doctor precedes a real -probe; retuitoken -status checks callbacks without disclosing a token. Configure a weather place rather than an obsolete API key.\n\nrefresh reloads apps, aliases, local music, contacts and RSS, not webhook/history managers or every setting. It can request contact access or fetch feeds. restart recreates the launcher activity; live border changes already rebuild in place. Neither is a phone reboot. Debug -settings/-theme prints effective settings/colors, notification/music and font state; -presets prints directory/names. status may lack unavailable system data.\n\nLogs and debug output can expose private settings/input. tui -log requests a terminal log file. tui -reset immediately deletes configuration-root contents and reloads; do not use it, clear-data, uninstall, personal restore or Space deletion as routine troubleshooting. Hidden devutils -check_notifications reports listener readiness; -notify/-notify_reply post test notifications when permitted, not real incoming messages.\n\nExamples:\ndebug -settings\nInspect current runtime settings before changing them.\n\nrefresh\nReload indexed apps/aliases/music/contacts/RSS.\n\nconfig -get show_module_dock\nCheck why dock is hidden before changing configuration.\n\napps -lsh\nCheck hidden apps.\n\ntbridge -doctor\nCheck local bridge prerequisites.\n\nretuitoken -status\nInspect callback authorization without token disclosure."
+      "other": "Identify your surface first: home prompt, Search, widgets-pane input, Lua app, one-shot Termux console or interactive tmux workspace. Their parsers differ. Home widget -add or tbridge -ls does not revive retired features. Check config -get/-info, apps -lsh, module -ls and explicit permission-access actions before changing state. For Termux, tbridge -doctor precedes a real -probe; retuitoken -status checks callbacks without disclosing a token. Configure a weather place rather than an obsolete API key.\n\nrefresh reloads apps, aliases, local music, contacts and RSS, not webhook/history managers or every setting. It can request contact access or fetch feeds. restart recreates the launcher activity; live border changes already rebuild in place. Neither is a phone reboot. Debug -settings/-theme prints effective settings/colors, notification/music and font state; -presets prints directory/names. status may lack unavailable system data.\n\nLogs and debug output can expose private settings/input. tui -log requests a terminal log file. tui -reset immediately deletes configuration-root contents and reloads; do not use it, clear-data, uninstall, personal restore or Space deletion as routine troubleshooting. Hidden devutils -check_notifications reports listener readiness; -notify/-notify_reply post test notifications when permitted, not real incoming messages.\n\n## Examples\n\n```\ndebug -settings\n```\n\nInspect current runtime settings before changing them.\n\n```\nrefresh\n```\n\nReload indexed apps/aliases/music/contacts/RSS.\n\n```\nconfig -get show_module_dock\n```\n\nCheck why dock is hidden before changing configuration.\n\n```\napps -lsh\n```\n\nCheck hidden apps.\n\n```\ntbridge -doctor\n```\n\nCheck local bridge prerequisites.\n\n```\nretuitoken -status\n```\n\nInspect callback authorization without token disclosure."
     },
     "type": "string"
   },
@@ -10532,7 +10819,7 @@
   "offline_help_article_duo_layout_not_display_launch_body": {
     "formatted": false,
     "forms": {
-      "other": "duo controls a companion layout within a sufficiently wide landscape launcher window. It requires duo_mode to be enabled and offers on/off/left/right/toggle plus status. It does not select a physical external display for an app launch. A connected display alone does not guarantee a split launcher layout: window width, orientation and the saved layout mode matter.\n\nExamples:\nduo status\nInspect the in-launcher companion layout; requires duo_mode."
+      "other": "duo controls a companion layout within a sufficiently wide landscape launcher window. It requires duo_mode to be enabled and offers on/off/left/right/toggle plus status. It does not select a physical external display for an app launch. A connected display alone does not guarantee a split launcher layout: window width, orientation and the saved layout mode matter.\n\n## Examples\n\n```\nduo status\n```\n\nInspect the in-launcher companion layout; requires duo_mode."
     },
     "type": "string"
   },
@@ -10546,7 +10833,7 @@
   "offline_help_article_embedded_shell_body": {
     "formatted": false,
     "forms": {
-      "other": "Shell explicitly runs an Android embedded-shell command. The command text is passed to the shell, so shell quoting, redirects, and destructive operations are real—not launcher options. It is not a full Termux Linux environment. shell cd changes the launcher’s shell-directory display, but does not update the remembered Files path; use launcher cd when both paths should stay in sync. Hidden ctrlc kills and rebuilds the embedded shell, resets its launcher directory, and clears the root-shell indicator. Do not use rm or su just to test the prompt.\n\nExamples:\nshell pwd\nInspect the shell’s current directory without modifying files."
+      "other": "Shell explicitly runs an Android embedded-shell command. The command text is passed to the shell, so shell quoting, redirects, and destructive operations are real—not launcher options. It is not a full Termux Linux environment. shell cd changes the launcher’s shell-directory display, but does not update the remembered Files path; use launcher cd when both paths should stay in sync. Hidden ctrlc kills and rebuilds the embedded shell, resets its launcher directory, and clears the root-shell indicator. Do not use rm or su just to test the prompt.\n\n## Examples\n\n```\nshell pwd\n```\n\nInspect the shell’s current directory without modifying files."
     },
     "type": "string"
   },
@@ -10560,7 +10847,7 @@
   "offline_help_article_feed_and_text_automation_body": {
     "formatted": false,
     "forms": {
-      "other": "regex supports -add, -get, -test and -rm with integer rule IDs. -get reads a saved pattern. htmlextract -query takes a filter ID, optional format ID and URL; -add takes a store type, integer ID and expression. Editing/removal changes saved expressions, and queries fetch remote URLs.\n\nRSS command rules take a rule ID, feed-selector token, regex token and remaining command text. Matches can trigger launcher commands. Do not register rules from untrusted sources or use them without understanding their side effects.\n\nExamples:\nregex -get 1\nInspect existing regex 1 before testing or using it.\n\nhtmlextract -ls\nList stored extraction expressions."
+      "other": "regex supports -add, -get, -test and -rm with integer rule IDs. -get reads a saved pattern. htmlextract -query takes a filter ID, optional format ID and URL; -add takes a store type, integer ID and expression. Editing/removal changes saved expressions, and queries fetch remote URLs.\n\nRSS command rules take a rule ID, feed-selector token, regex token and remaining command text. Matches can trigger launcher commands. Do not register rules from untrusted sources or use them without understanding their side effects.\n\n## Examples\n\n```\nregex -get 1\n```\n\nInspect existing regex 1 before testing or using it.\n\n```\nhtmlextract -ls\n```\n\nList stored extraction expressions."
     },
     "type": "string"
   },
@@ -10574,7 +10861,7 @@
   "offline_help_article_file_workflow_body": {
     "formatted": false,
     "forms": {
-      "other": "files, ls, open and share use the Re:T-UI Files companion (com.dvil.retui.fm). Missing companion access reports an error rather than browsing locally. cd resolves a directory through its provider, remembers it and synchronizes the embedded shell. Relative file actions use that path. ls ignores a supplied folder argument: use cd then ls. files -search sends a name and optional type without restricting search to the current path.\n\nshare opens the companion share action; review recipients because the file leaves the launcher boundary. termuxopen is an older hidden name for open with the same Files dependency.\n\nExamples:\npwd\nPrint the launcher’s current directory.\n\ncd /sdcard/Download\nChange the remembered file directory if the companion can resolve it.\n\nls\nRequest companion listing at the remembered path.\n\nfiles -search invoice pdf\nRequest companion search; supported type interpretation belongs to the companion."
+      "other": "files, ls, open and share use the Re:T-UI Files companion (com.dvil.retui.fm). Missing companion access reports an error rather than browsing locally. cd resolves a directory through its provider, remembers it and synchronizes the embedded shell. Relative file actions use that path. ls ignores a supplied folder argument: use cd then ls. files -search sends a name and optional type without restricting search to the current path.\n\nshare opens the companion share action; review recipients because the file leaves the launcher boundary. termuxopen is an older hidden name for open with the same Files dependency.\n\n## Examples\n\n```\npwd\n```\n\nPrint the launcher’s current directory.\n\n```\ncd /sdcard/Download\n```\n\nChange the remembered file directory if the companion can resolve it.\n\n```\nls\n```\n\nRequest companion listing at the remembered path.\n\n```\nfiles -search invoice pdf\n```\n\nRequest companion search; supported type interpretation belongs to the companion."
     },
     "type": "string"
   },
@@ -10588,7 +10875,7 @@
   "offline_help_article_files_and_location_body": {
     "formatted": false,
     "forms": {
-      "other": "files opens the Re:TUI Files companion, not a bundled Termux-private file browser. It can open/list/search/share a remembered or supplied path through the installed companion/provider. If the companion is absent, install/configure it explicitly; the explorer is a separate installation. Launcher FileManager also provides local helper paths, but that does not create arbitrary Android document access.\nlocation is separate from weather setup. It asks the launcher location subsystem for coordinates, may request coarse/fine Android permission, registers provider updates and can time out. A current weather place can be explicit coordinates and does not require granting live device-location access. Location requests expose a privacy-sensitive result; avoid copying it into screenshots or shared preset behavior.\nConfiguration folder location varies by build/storage availability: F-Droid/debug can use shared Re-T-UI while Play uses app-owned storage, with fallback paths. Use the path reported by your installation and respect Android storage access; launcher access does not unlock another app’s private files.\n\nExamples:\nfiles\nOpen installed Re:TUI Files companion; external dependency.\n\nlocation\nRequest device coordinates; may prompt permission and can time out."
+      "other": "files opens the Re:TUI Files companion, not a bundled Termux-private file browser. It can open/list/search/share a remembered or supplied path through the installed companion/provider. If the companion is absent, install/configure it explicitly; the explorer is a separate installation. Launcher FileManager also provides local helper paths, but that does not create arbitrary Android document access.\nlocation is separate from weather setup. It asks the launcher location subsystem for coordinates, may request coarse/fine Android permission, registers provider updates and can time out. A current weather place can be explicit coordinates and does not require granting live device-location access. Location requests expose a privacy-sensitive result; avoid copying it into screenshots or shared preset behavior.\nConfiguration folder location varies by build/storage availability: F-Droid/debug can use shared Re-T-UI while Play uses app-owned storage, with fallback paths. Use the path reported by your installation and respect Android storage access; launcher access does not unlock another app’s private files.\n\n## Examples\n\n```\nfiles\n```\n\nOpen installed Re:TUI Files companion; external dependency.\n\n```\nlocation\n```\n\nRequest device coordinates; may prompt permission and can time out."
     },
     "type": "string"
   },
@@ -10616,7 +10903,7 @@
   "offline_help_article_guided_walkthrough_body": {
     "formatted": false,
     "forms": {
-      "other": "Guide is an interactive walkthrough separate from this read-only manual, with basics, customize and modules paths. Start a path, use next/back to move between steps, off to hide it and resume to continue. Restart returns a path to its first step; reset clears saved guide progress, not the whole launcher configuration. Progress can advance when a matching command is observed even if its action fails.\n\nGuide task chips can execute commands. The customize path includes wallpaper -auto, whose confirmation flow can save colors. Use guide -off if guided input or suggestions get in your way. guide -startup-test rehearses the startup menu rather than starting a lesson. Use help when you only want to read.\n\nExamples:\nguide -start basics\nStart the basics path.\n\nguide -status\nInspect guide progress.\n\nguide -off\nStop the guided session.\n\nguide -resume\nResume stored path progress."
+      "other": "Guide is an interactive walkthrough separate from this read-only manual, with basics, customize and modules paths. Start a path, use next/back to move between steps, off to hide it and resume to continue. Restart returns a path to its first step; reset clears saved guide progress, not the whole launcher configuration. Progress can advance when a matching command is observed even if its action fails.\n\nGuide task chips can execute commands. The customize path includes wallpaper -auto, whose confirmation flow can save colors. Use guide -off if guided input or suggestions get in your way. guide -startup-test rehearses the startup menu rather than starting a lesson. Use help when you only want to read.\n\n## Examples\n\n```\nguide -start basics\n```\n\nStart the basics path.\n\n```\nguide -status\n```\n\nInspect guide progress.\n\n```\nguide -off\n```\n\nStop the guided session.\n\n```\nguide -resume\n```\n\nResume stored path progress."
     },
     "type": "string"
   },
@@ -10644,7 +10931,7 @@
   "offline_help_article_http_actions_body": {
     "formatted": false,
     "forms": {
-      "other": "Post takes a URL token and the remaining body text. A body beginning with { or [ uses JSON media type; otherwise it is text/plain. It sends a real HTTP POST and prints status/response asynchronously. Webhook -add stores a name, URL, and template; a configured name triggers its POST with arguments. -ls prints names/URLs, and -rm removes a saved hook. Webhook arguments can be recorded in history. Avoid putting credentials or private message bodies in examples, URLs, terminal screenshots, or history; remote endpoints may retain what you send.\n\nExamples:\nwebhook -ls\nInspect configured names/URLs; this may reveal private endpoint URLs."
+      "other": "Post takes a URL token and the remaining body text. A body beginning with { or [ uses JSON media type; otherwise it is text/plain. It sends a real HTTP POST and prints status/response asynchronously. Webhook -add stores a name, URL, and template; a configured name triggers its POST with arguments. -ls prints names/URLs, and -rm removes a saved hook. Webhook arguments can be recorded in history. Avoid putting credentials or private message bodies in examples, URLs, terminal screenshots, or history; remote endpoints may retain what you send.\n\n## Examples\n\n```\nwebhook -ls\n```\n\nInspect configured names/URLs; this may reveal private endpoint URLs."
     },
     "type": "string"
   },
@@ -10658,7 +10945,7 @@
   "offline_help_article_image_frame_packs_body": {
     "formatted": false,
     "forms": {
-      "other": "Settings Frames stages frame selections/assignments in an edit session. Choose an element or apply-to-all, import an asset/package, inspect original PNG preview and choose a frame pack. Saving current, creating new or replacing an existing user pack persists the complete staged setup and applies it. Built-in packs cannot be replaced or deleted. Switching/deleting with unsaved edits has a discard-confirmation flow.\nFrame bundles use .retui-frame; UI packages are .retui_ui.zip, distinct from shareable .retui and personal .retui-backup. Frame import validates names/manifest/PNG and size bounds. The editor’s PNG preview is not a full screenshot simulation of the launcher. Custom frames can change how generated-border settings appear.\nLocal preset save includes current frame state, while current .retui share export does not actually emit frame files. Use supported frame-specific controls rather than promising all frame assets travel with every shared theme.\n\nExamples:\nsettings\nOpen Frames in the Hub; use its staged save/apply controls."
+      "other": "Settings Frames stages frame selections/assignments in an edit session. Choose an element or apply-to-all, import an asset/package, inspect original PNG preview and choose a frame pack. Saving current, creating new or replacing an existing user pack persists the complete staged setup and applies it. Built-in packs cannot be replaced or deleted. Switching/deleting with unsaved edits has a discard-confirmation flow.\nFrame bundles use .retui-frame; UI packages are .retui_ui.zip, distinct from shareable .retui and personal .retui-backup. Frame import validates names/manifest/PNG and size bounds. The editor’s PNG preview is not a full screenshot simulation of the launcher. Custom frames can change how generated-border settings appear.\nLocal preset save includes current frame state, while current .retui share export does not actually emit frame files. Use supported frame-specific controls rather than promising all frame assets travel with every shared theme.\n\n## Examples\n\n```\nsettings\n```\n\nOpen Frames in the Hub; use its staged save/apply controls."
     },
     "type": "string"
   },
@@ -10672,7 +10959,7 @@
   "offline_help_article_import_retui_body": {
     "formatted": false,
     "forms": {
-      "other": "Open/share a correctly typed .retui to Re:TUI, or use Import RetUI Preset in Settings. The public importer accepts readable content URIs, not arbitrary filesystem paths or private app providers. Manual document selection accepts the custom MIME plus ZIP/binary types when the sender lost metadata.\nThe file is copied to bounded private staging before inspection. You see name, sections, producer version, supported schema and included behavior XML. This is textual inspection, not a rendered screenshot or proof that commands are harmless. Import revalidates the private captured archive, saves a uniquely named preset, and tells you the saved name. Cancel leaves active settings and saved presets unchanged. Import does not run included commands, apply a theme or restore personal data.\nUse preset -ls afterward; apply the displayed saved name only when you intend to change settings. Type is determined by validated manifest, not extension. Personal backups renamed .retui remain rejected; supported old shared packages with a .retui-backup filename can still be shareable by their manifest.\n\nExamples:\nsettings\nOpen explicit preset-import picker from the Hub.\n\npreset -ls\nFind uniquely saved imported name before choosing apply."
+      "other": "Open/share a correctly typed .retui to Re:TUI, or use Import RetUI Preset in Settings. The public importer accepts readable content URIs, not arbitrary filesystem paths or private app providers. Manual document selection accepts the custom MIME plus ZIP/binary types when the sender lost metadata.\nThe file is copied to bounded private staging before inspection. You see name, sections, producer version, supported schema and included behavior XML. This is textual inspection, not a rendered screenshot or proof that commands are harmless. Import revalidates the private captured archive, saves a uniquely named preset, and tells you the saved name. Cancel leaves active settings and saved presets unchanged. Import does not run included commands, apply a theme or restore personal data.\nUse preset -ls afterward; apply the displayed saved name only when you intend to change settings. Type is determined by validated manifest, not extension. Personal backups renamed .retui remain rejected; supported old shared packages with a .retui-backup filename can still be shareable by their manifest.\n\n## Examples\n\n```\nsettings\n```\n\nOpen explicit preset-import picker from the Hub.\n\n```\npreset -ls\n```\n\nFind uniquely saved imported name before choosing apply."
     },
     "type": "string"
   },
@@ -10700,7 +10987,7 @@
   "offline_help_article_launcher_modes_body": {
     "formatted": false,
     "forms": {
-      "other": "Classic shows the command terminal; Search presents categorized results and inline output around the search field. Search is a different layout, not a sandbox or an assurance that text cannot execute commands: both layouts keep the launcher command path. Use mode to inspect the current mode, mode search to switch, or mode classic to return. A mode change refreshes the existing launcher UI. An active command guide can control the normal suggestion row, so use guide -off when you want normal suggestions again.\n\nExamples:\nmode\nShow the selected launcher mode.\n\nmode classic\nChange layout to Classic.\n\nmode search\nChange layout to Search."
+      "other": "Classic shows the command terminal; Search presents categorized results and inline output around the search field. Search is a different layout, not a sandbox or an assurance that text cannot execute commands: both layouts keep the launcher command path. Use mode to inspect the current mode, mode search to switch, or mode classic to return. A mode change refreshes the existing launcher UI. An active command guide can control the normal suggestion row, so use guide -off when you want normal suggestions again.\n\n## Examples\n\n```\nmode\n```\n\nShow the selected launcher mode.\n\n```\nmode classic\n```\n\nChange layout to Classic.\n\n```\nmode search\n```\n\nChange layout to Search."
     },
     "type": "string"
   },
@@ -10714,7 +11001,7 @@
   "offline_help_article_local_profile_body": {
     "formatted": false,
     "forms": {
-      "other": "The profile card stores your name, phone, photo reference and QR entries locally in the app’s private storage. A masked phone shows only its last two characters; masking is a display feature, not encryption or authentication. A contact QR contains a generated vCard, so review the information before displaying or sharing it. QR links reject YouTube destinations and known shortened-link hosts, but that is not a guarantee that every accepted link is safe. The local profile is not a verified online identity or a synchronized account.\n\nExamples:\nprofile\nOpen the local profile card."
+      "other": "The profile card stores your name, phone, photo reference and QR entries locally in the app’s private storage. A masked phone shows only its last two characters; masking is a display feature, not encryption or authentication. A contact QR contains a generated vCard, so review the information before displaying or sharing it. QR links reject YouTube destinations and known shortened-link hosts, but that is not a guarantee that every accepted link is safe. The local profile is not a verified online identity or a synchronized account.\n\n## Examples\n\n```\nprofile\n```\n\nOpen the local profile card."
     },
     "type": "string"
   },
@@ -10728,7 +11015,7 @@
   "offline_help_article_lua_apps_and_modules_body": {
     "formatted": false,
     "forms": {
-      "other": "Lua apps and Lua dock modules are different script types. lua -new app <name> creates an app template; module -new lua <name> creates a dock-module template. Editing an unknown ID may create a template, so use list or info first when you only want to inspect. Opening an app checks its type, enabled state and approval. Approval grants its declared permissions; read the metadata and script before trusting it. Check runs app code rather than only checking syntax. Export copies a package to the clipboard, which may expose script content; removal deletes the script. Suggestion-only scripts cannot be opened as dock panels.\n\nExamples:\nlua -apps\nList scripts of type app.\n\nlua -new app habit\nCreate/open a local app template; writes a script.\n\nmodule -new lua counter\nCreate/open a Lua dock-module template; writes a script.\n\nlua -info habit\nRead metadata and trust status before approving."
+      "other": "Lua apps and Lua dock modules are different script types. lua -new app <name> creates an app template; module -new lua <name> creates a dock-module template. Editing an unknown ID may create a template, so use list or info first when you only want to inspect. Opening an app checks its type, enabled state and approval. Approval grants its declared permissions; read the metadata and script before trusting it. Check runs app code rather than only checking syntax. Export copies a package to the clipboard, which may expose script content; removal deletes the script. Suggestion-only scripts cannot be opened as dock panels.\n\n## Examples\n\n```\nlua -apps\n```\n\nList scripts of type app.\n\n```\nlua -new app habit\n```\n\nCreate/open a local app template; writes a script.\n\n```\nmodule -new lua counter\n```\n\nCreate/open a Lua dock-module template; writes a script.\n\n```\nlua -info habit\n```\n\nRead metadata and trust status before approving."
     },
     "type": "string"
   },
@@ -10742,7 +11029,7 @@
   "offline_help_article_lua_apps_modules_consent_body": {
     "formatted": false,
     "forms": {
-      "other": "Use lua -new app Name for a launcher-native app-like Lua script, or module -new lua name for a dock script. The retired widget command is not the creation route. Script files and manifests live in widgets/<id>/main.lua; type metadata decides app/module/suggest eligibility. A full-screen Lua app is not automatically dockable.\nEdit, inspect info/check output, then approve only the capabilities you intend: network, clipboard, vibrate, local-files, active-tick, notifications, apps, intents and shortcuts. Capabilities must be declared; unsupported/missing declarations block approval. Sensitive approval is tied to script hash, so changed code may require reapproval. Enable state is separate from trust. check executes guarded script lifecycle/render code, so it is not a no-effects syntax-only validator.\nLua exposes explicit ui/prefs/files/http/system/launcher/apps/intents/shortcuts/reminders/date/format helpers, not unrestricted Java/IO/shell. Local-file storage/HTTP responses are bounded and execution has an instruction-checked timeout. The sandbox is not a proof that a script’s approved network or command-button behavior is harmless. Export copies a textual package to clipboard; it does not create an APK.\n\nExamples:\nlua -new app Daily Counter\nCreate/edit an app-like script; not a dock module.\n\nmodule -new lua counter\nCreate/edit a dock Lua script named counter.\n\nmodule -info counter\nInspect existing counter metadata/permissions; does not approve.\n\nmodule -check counter\nRun guarded script check/render after trust requirements; not syntax-only."
+      "other": "Use lua -new app Name for a launcher-native app-like Lua script, or module -new lua name for a dock script. The retired widget command is not the creation route. Script files and manifests live in widgets/<id>/main.lua; type metadata decides app/module/suggest eligibility. A full-screen Lua app is not automatically dockable.\nEdit, inspect info/check output, then approve only the capabilities you intend: network, clipboard, vibrate, local-files, active-tick, notifications, apps, intents and shortcuts. Capabilities must be declared; unsupported/missing declarations block approval. Sensitive approval is tied to script hash, so changed code may require reapproval. Enable state is separate from trust. check executes guarded script lifecycle/render code, so it is not a no-effects syntax-only validator.\nLua exposes explicit ui/prefs/files/http/system/launcher/apps/intents/shortcuts/reminders/date/format helpers, not unrestricted Java/IO/shell. Local-file storage/HTTP responses are bounded and execution has an instruction-checked timeout. The sandbox is not a proof that a script’s approved network or command-button behavior is harmless. Export copies a textual package to clipboard; it does not create an APK.\n\n## Examples\n\n```\nlua -new app Daily Counter\n```\n\nCreate/edit an app-like script; not a dock module.\n\n```\nmodule -new lua counter\n```\n\nCreate/edit a dock Lua script named counter.\n\n```\nmodule -info counter\n```\n\nInspect existing counter metadata/permissions; does not approve.\n\n```\nmodule -check counter\n```\n\nRun guarded script check/render after trust requirements; not syntax-only."
     },
     "type": "string"
   },
@@ -10756,7 +11043,7 @@
   "offline_help_article_lua_module_maintenance_body": {
     "formatted": false,
     "forms": {
-      "other": "module -info shows a Lua module’s metadata, permissions, API version, enabled state and approval. -check renders approved code and can run its logic. -copy-error copies the saved error, which may contain private data, to the clipboard. -disable removes the module from the dock; -enable makes it available again. -rename and -mv change its ID. -click, -action, -send, -input and -dialog run script actions; -expand, -collapse and -toggle control the panel. They are not inspection-only commands. Removal routes can remove a registered module without deleting its underlying Lua script; check the script list afterward before assuming it is gone.\n\nExamples:\nmodule -info counter\nInspect a saved Lua module without executing its render function."
+      "other": "module -info shows a Lua module’s metadata, permissions, API version, enabled state and approval. -check renders approved code and can run its logic. -copy-error copies the saved error, which may contain private data, to the clipboard. -disable removes the module from the dock; -enable makes it available again. -rename and -mv change its ID. -click, -action, -send, -input and -dialog run script actions; -expand, -collapse and -toggle control the panel. They are not inspection-only commands. Removal routes can remove a registered module without deleting its underlying Lua script; check the script list afterward before assuming it is gone.\n\n## Examples\n\n```\nmodule -info counter\n```\n\nInspect a saved Lua module without executing its render function."
     },
     "type": "string"
   },
@@ -10770,7 +11057,7 @@
   "offline_help_article_manual_security_contract_body": {
     "formatted": false,
     "forms": {
-      "other": "The bundled manual contains topic text and command reference. Choose a numbered entry or topic link to read it; examples do not execute from the article. Reading instructions is different from typing an example into the launcher prompt, where permission requests, settings changes, sending data or running scripts may occur.\nUse help followed by a command name for its current command reference. Some commands also have a tutorial option that opens an external web page, requiring network; use bundled topics when offline. If a feature depends on Termux, Tasker, Re:TUI Files, the keyboard companion or an Android permission, reading its instructions does not install the companion or grant access.\nGuide is interactive and its task chips can run commands. Home suggestions and module buttons can also take action on a tap. For private operations, review the destination and requested access before leaving the manual. Avoid copying callback tokens, message content, contact lists or private configuration into public screenshots.\n\nExamples:\nhelp config\nRead config reference, not config reset."
+      "other": "## Read-only help\n\nThe bundled manual contains topic text and command reference. Choose a numbered entry or topic link to read it; examples do not execute from the article. Reading instructions is different from typing an example into the launcher prompt, where permission requests, settings changes, sending data or running scripts may occur.\nUse help followed by a command name for its current command reference. Some commands also have a tutorial option that opens an external web page, requiring network; use bundled topics when offline. If a feature depends on Termux, Tasker, Re:TUI Files, the keyboard companion or an Android permission, reading its instructions does not install the companion or grant access.\nGuide is interactive and its task chips can run commands. Home suggestions and module buttons can also take action on a tap. For private operations, review the destination and requested access before leaving the manual. Avoid copying callback tokens, message content, contact lists or private configuration into public screenshots.\n\n## Examples\n\n```\nhelp config\n```\n\nRead config reference, not config reset."
     },
     "type": "string"
   },
@@ -10784,7 +11071,7 @@
   "offline_help_article_module_workflow_body": {
     "formatted": false,
     "forms": {
-      "other": "Module -ls lists registered modules, local Lua scripts, and dock membership. -show opens a known module; -close closes the panel. -dock add/remove changes dock membership and -dock -toggle changes dock visibility live. -hide removes a module from the dock; built-ins cannot be removed using -rm. A script module is registered by name and source, then refreshed with -refresh. Running a shell/Termux source executes code: inspect it before registering or refreshing. Widget is retired and prints module migration guidance; Android AppWidgets use the widgets pane, not widget commands.\n\nExamples:\nmodule -ls\nInspect modules and dock contents.\n\nmodule -show notes\nOpen the built-in notes panel.\n\nmodule -dock -toggle\nToggle dock visibility without removing modules."
+      "other": "Module -ls lists registered modules, local Lua scripts, and dock membership. -show opens a known module; -close closes the panel. -dock add/remove changes dock membership and -dock -toggle changes dock visibility live. -hide removes a module from the dock; built-ins cannot be removed using -rm. A script module is registered by name and source, then refreshed with -refresh. Running a shell/Termux source executes code: inspect it before registering or refreshing. Widget is retired and prints module migration guidance; Android AppWidgets use the widgets pane, not widget commands.\n\n## Examples\n\n```\nmodule -ls\n```\n\nInspect modules and dock contents.\n\n```\nmodule -show notes\n```\n\nOpen the built-in notes panel.\n\n```\nmodule -dock -toggle\n```\n\nToggle dock visibility without removing modules."
     },
     "type": "string"
   },
@@ -10798,7 +11085,7 @@
   "offline_help_article_music_and_podcasts_body": {
     "formatted": false,
     "forms": {
-      "other": "Local music needs enable_music and readable MediaStore tracks or configured folders, potentially with Android media/storage access. music -ls lists known tracks. Without a local player, next/previous/play/stop fall back to Android media key events, but listing/selection/info/seek require the local player. Notification Access provides external media sessions; preferred_music_app can filter their package. Local music enablement does not grant that access.\n\npodcast opens a separate home surface with a minimized edge pill and the shared internal player. It stores subscriptions, tags/filter/order, recent episodes, played flags and resumable progress locally. add requires an HTTPS feed; parser limits feed size/episode count and rejects DOCTYPE. refresh updates the selected show; play/next/prev control playback, rewind/forward move 30 seconds and speed accepts 0.5–2x.\n\nCached metadata is not downloaded audio. Refresh and streaming contact external servers and can use mobile data. External media controls act on another app's session, not the local track list. Closing the surface does not imply deletion of subscriptions.\n\nExamples:\nmusic -ls\nList local tracks if the local player is enabled.\n\npodcast\nOpen/expand the podcast surface.\n\npodcast speed 1.25\nChange podcast playback speed."
+      "other": "Local music needs enable_music and readable MediaStore tracks or configured folders, potentially with Android media/storage access. music -ls lists known tracks. Without a local player, next/previous/play/stop fall back to Android media key events, but listing/selection/info/seek require the local player. Notification Access provides external media sessions; preferred_music_app can filter their package. Local music enablement does not grant that access.\n\npodcast opens a separate home surface with a minimized edge pill and the shared internal player. It stores subscriptions, tags/filter/order, recent episodes, played flags and resumable progress locally. add requires an HTTPS feed; parser limits feed size/episode count and rejects DOCTYPE. refresh updates the selected show; play/next/prev control playback, rewind/forward move 30 seconds and speed accepts 0.5–2x.\n\nCached metadata is not downloaded audio. Refresh and streaming contact external servers and can use mobile data. External media controls act on another app's session, not the local track list. Closing the surface does not imply deletion of subscriptions.\n\n## Examples\n\n```\nmusic -ls\n```\n\nList local tracks if the local player is enabled.\n\n```\npodcast\n```\n\nOpen/expand the podcast surface.\n\n```\npodcast speed 1.25\n```\n\nChange podcast playback speed."
     },
     "type": "string"
   },
@@ -10812,7 +11099,7 @@
   "offline_help_article_notes_workflow_body": {
     "formatted": false,
     "forms": {
-      "other": "notes opens the integrated Remember library/editor in its own task, not a separate app. Current storage is a private remember-notes.xml index plus Markdown/assets in notes-library; legacy notes.xml is retained as an import recovery copy, not the primary live database. NotesManager adapts the library for status/module display.\n\nnotes -add saves remaining text; an initial true/false followed by text is a lock flag. -ls prints previews. -open, -rm, -cp and -lock select a one-based index or first matching text prefix; quote prefixes containing spaces. -lock takes true/false and protects against deletion, not disclosure or encryption. -rm deletes the selected unlocked note; -clear deletes unlocked notes and leaves locked ones. Check identifiers first. -cp exposes text to clipboard and terminal; module/status previews can also show private content.\n\nRedaction is separate authenticated encryption for protected passages using a device-bound Android Keystore key. Titles and allowed ordinary words are not necessarily encrypted. Revealed text is read-only and hidden on pause; copying files does not transfer a usable key.\n\nPersonal backup and Spaces cover the configuration root/legacy notes, not this private library. Use the library's share/export for separate copies: confirmation/authentication for protected passages produces unredacted Markdown and attached images in a ZIP. Treat that export as unprotected private content; launcher backup alone does not protect the library.\n\nExamples:\nnotes -add TODO: follow up\nCreate a note from the remaining text.\n\nnotes -ls\nList notes before choosing an entry.\n\nnotes -open \"TODO:\"\nOpen a matching prefix; quotes make it one selector.\n\nnotes\nOpen Remember library editor."
+      "other": "## Library storage\n\nnotes opens the integrated Remember library/editor in its own task, not a separate app. Current storage is a private remember-notes.xml index plus Markdown/assets in notes-library; legacy notes.xml is retained as an import recovery copy, not the primary live database. NotesManager adapts the library for status/module display.\n\n## Commands and deletion\n\nnotes -add saves remaining text; an initial true/false followed by text is a lock flag. -ls prints previews. -open, -rm, -cp and -lock select a one-based index or first matching text prefix; quote prefixes containing spaces. -lock takes true/false and protects against deletion, not disclosure or encryption. -rm deletes the selected unlocked note; -clear deletes unlocked notes and leaves locked ones. Check identifiers first. -cp exposes text to clipboard and terminal; module/status previews can also show private content.\n\n## Protected passages\n\nRedaction is separate authenticated encryption for protected passages using a device-bound Android Keystore key. Titles and allowed ordinary words are not necessarily encrypted. Revealed text is read-only and hidden on pause; copying files does not transfer a usable key.\n\n## Backup and export\n\nPersonal backup and Spaces cover the configuration root/legacy notes, not this private library. Use the library's share/export for separate copies: confirmation/authentication for protected passages produces unredacted Markdown and attached images in a ZIP. Treat that export as unprotected private content; launcher backup alone does not protect the library.\n\n## Examples\n\n```\nnotes -add TODO: follow up\n```\n\nCreate a note from the remaining text.\n\n```\nnotes -ls\n```\n\nList notes before choosing an entry.\n\n```\nnotes -open \"TODO:\"\n```\n\nOpen a matching prefix; quotes make it one selector.\n\n```\nnotes\n```\n\nOpen Remember library editor."
     },
     "type": "string"
   },
@@ -10826,7 +11113,7 @@
   "offline_help_article_notification_replies_body": {
     "formatted": false,
     "forms": {
-      "other": "Replies need Android Notification Access, reply_enabled, an app binding in reply.xml and a current notification exposing RemoteInput plus PendingIntent. Binding an app does not create an account or guarantee that all its notifications support replies. It is per app, not a reliable conversation selector.\n\nreply -bind resolves a visible app package and updates services. -ls lists bindings; -check with a binding ID/package shows the most recent captured notification. Inspect that private content before using -to with the target and remaining message text, or the module's reply prompt. These send real messages through the captured action, not arbitrary SMS/email or a preview. Actions can expire/fail; asynchronous dispatch is not proof of receipt.\n\nThe reply prompt temporarily captures input, with cancel/confirm behavior different from normal commands. -unbind removes a mapping; revoking listener access and disabling reply_enabled are separate controls. Listing bindings sends nothing.\n\nExamples:\nreply -ls\nInspect reply bindings; do not send a message.\n\nhelp reply\nRead reply bind/check/to parameter types; sending is an explicit user action."
+      "other": "Replies need Android Notification Access, reply_enabled, an app binding in reply.xml and a current notification exposing RemoteInput plus PendingIntent. Binding an app does not create an account or guarantee that all its notifications support replies. It is per app, not a reliable conversation selector.\n\nreply -bind resolves a visible app package and updates services. -ls lists bindings; -check with a binding ID/package shows the most recent captured notification. Inspect that private content before using -to with the target and remaining message text, or the module's reply prompt. These send real messages through the captured action, not arbitrary SMS/email or a preview. Actions can expire/fail; asynchronous dispatch is not proof of receipt.\n\nThe reply prompt temporarily captures input, with cancel/confirm behavior different from normal commands. -unbind removes a mapping; revoking listener access and disabling reply_enabled are separate controls. Listing bindings sends nothing.\n\n## Examples\n\n```\nreply -ls\n```\n\nInspect reply bindings; do not send a message.\n\n```\nhelp reply\n```\n\nRead reply bind/check/to parameter types; sending is an explicit user action."
     },
     "type": "string"
   },
@@ -10840,7 +11127,7 @@
   "offline_help_article_notifications_workflow_body": {
     "formatted": false,
     "forms": {
-      "other": "notifications -access opens Android Notification Access settings. You decide whether Re:TUI may read other apps' notifications and media sessions. This differs from POST_NOTIFICATIONS, which lets Re:TUI post its own notifications. Hiding terminal output does not revoke listener access; revoke it in Android settings.\n\nRules and settings control per-app exclusions, display, click behavior, formats, colors and filters; -ls describes rules, and a quoted format selector is one token. -on/-off add/remove the dock module only, not listener authorization or collection. -open uses the launcher shade when available; the overlay holds at most 12 current notifications, not an unlimited archive. -next/-prev select module entries, -reply begins a reply workflow and -clear dismisses the current notification.\n\nReplies need a captured reply action, and media controls need usable sessions. Long-press actions can exclude an app, add a literal content filter or prepare a reply command. The exclusion path logs notification text, so inspect diagnostics before sharing. Keep private message text out of screenshots, terminal output and logs. Launcher rules do not control what the original app sends to Android.\n\nExamples:\nnotifications -access\nOpen the listener-access permission screen.\n\nnotifications -ls\nInspect rules without changing them.\n\nnotifications -on\nAdd the notifications module to the dock.\n\nnotifications -off\nRemove the notification module from the dock; leaves Android listener access and collection settings unchanged."
+      "other": "notifications -access opens Android Notification Access settings. You decide whether Re:TUI may read other apps' notifications and media sessions. This differs from POST_NOTIFICATIONS, which lets Re:TUI post its own notifications. Hiding terminal output does not revoke listener access; revoke it in Android settings.\n\nRules and settings control per-app exclusions, display, click behavior, formats, colors and filters; -ls describes rules, and a quoted format selector is one token. -on/-off add/remove the dock module only, not listener authorization or collection. -open uses the launcher shade when available; the overlay holds at most 12 current notifications, not an unlimited archive. -next/-prev select module entries, -reply begins a reply workflow and -clear dismisses the current notification.\n\nReplies need a captured reply action, and media controls need usable sessions. Long-press actions can exclude an app, add a literal content filter or prepare a reply command. The exclusion path logs notification text, so inspect diagnostics before sharing. Keep private message text out of screenshots, terminal output and logs. Launcher rules do not control what the original app sends to Android.\n\n## Examples\n\n```\nnotifications -access\n```\n\nOpen the listener-access permission screen.\n\n```\nnotifications -ls\n```\n\nInspect rules without changing them.\n\n```\nnotifications -on\n```\n\nAdd the notifications module to the dock.\n\n```\nnotifications -off\n```\n\nRemove the notification module from the dock; leaves Android listener access and collection settings unchanged."
     },
     "type": "string"
   },
@@ -10854,7 +11141,7 @@
   "offline_help_article_orientation_and_layout_body": {
     "formatted": false,
     "forms": {
-      "other": "orientation portrait/landscape/auto saves the launcher orientation preference; portrait and landscape are convenience commands. A landscape preference is not a guarantee of split layout in a narrow window. mode classic/search changes launcher mode and refreshes the UI. Duo companion layout is gated by duo_mode; its side/toggle options only operate from the launcher UI, and need a wide landscape window to show the layout. Disable Duo mode before expecting ordinary split behavior.\n\nExamples:\norientation auto\nLet the launcher follow automatic orientation.\n\nmode classic\nSwitch to classic launcher layout."
+      "other": "orientation portrait/landscape/auto saves the launcher orientation preference; portrait and landscape are convenience commands. A landscape preference is not a guarantee of split layout in a narrow window. mode classic/search changes launcher mode and refreshes the UI. Duo companion layout is gated by duo_mode; its side/toggle options only operate from the launcher UI, and need a wide landscape window to show the layout. Disable Duo mode before expecting ordinary split behavior.\n\n## Examples\n\n```\norientation auto\n```\n\nLet the launcher follow automatic orientation.\n\n```\nmode classic\n```\n\nSwitch to classic launcher layout."
     },
     "type": "string"
   },
@@ -10882,7 +11169,7 @@
   "offline_help_article_personal_backup_body": {
     "formatted": false,
     "forms": {
-      "other": "Settings Export Backup creates a .retui-backup personal archive. Choose encryption with a password if the archive may leave trusted storage; export without password is still available. Password protection uses authenticated AES-GCM with a derived key. Forgotten passwords are not recoverable by the importer. Keep the password outside the archive.\nPersonal backup includes launcher configuration folder contents and an explicit preferences allowlist, including bindings, callback auth and Space state. It can contain secrets, commands, local data and personal identifiers: do not publish it like a theme. Restore Backup validates the archive and, for a personal manifest, deletes/replaces current launcher-root files and restores included preferences. This is a destructive local restore, unlike preset-only import.\nThe label full/personal does not mean every app-private asset or device setting. The current Remember note database and Markdown/assets are stored outside the archived configuration folder. Android-widget drawer and companion-keyboard shortcut preferences are also omitted. These are not protected by this backup. Termux files/apps and other Android apps are not a device-wide backup.\n\nExamples:\nsettings\nUse Export Backup/Restore Backup actions; verify file kind before restoring."
+      "other": "## Protect the archive\n\nSettings Export Backup creates a .retui-backup personal archive. Choose encryption with a password if the archive may leave trusted storage; export without password is still available. Password protection uses authenticated AES-GCM with a derived key. Forgotten passwords are not recoverable by the importer. Keep the password outside the archive.\nPersonal backup includes launcher configuration folder contents and an explicit preferences allowlist, including bindings, callback auth and Space state. It can contain secrets, commands, local data and personal identifiers: do not publish it like a theme. Restore Backup validates the archive and, for a personal manifest, deletes/replaces current launcher-root files and restores included preferences. This is a destructive local restore, unlike preset-only import.\nThe label full/personal does not mean every app-private asset or device setting. The current Remember note database and Markdown/assets are stored outside the archived configuration folder. Android-widget drawer and companion-keyboard shortcut preferences are also omitted. These are not protected by this backup. Termux files/apps and other Android apps are not a device-wide backup.\n\n## Restore is destructive\n\n## Examples\n\n## Coverage limits\n\n```\nsettings\n```\n\nUse Export Backup/Restore Backup actions; verify file kind before restoring."
     },
     "type": "string"
   },
@@ -10896,7 +11183,7 @@
   "offline_help_article_portable_preset_import_body": {
     "formatted": false,
     "forms": {
-      "other": "A shared .retui package is a launcher preset; .retui-backup is the personal-backup extension. Package contents and manifest type, not the filename, decide what may be imported. Open/share a correctly typed preset, or use Import RetUI Preset in Settings when another app lost the MIME type. Public import accepts readable content:// input, stages and validates it privately, then asks for confirmation. Import adds a uniquely named saved preset; it does not apply active settings or restore personal data. Confirmation revalidates the private snapshot rather than reopening the external URI. Apply the saved name later with preset -apply. Imported behavior fields may contain commands; inspection does not run them.\n\nExamples:\npreset -apply <saved-name>\nApply later; this changes the active configuration. Replace the placeholder."
+      "other": "## Save first, apply later\n\nA shared .retui package is a launcher preset; .retui-backup is the personal-backup extension. Package contents and manifest type, not the filename, decide what may be imported. Open/share a correctly typed preset, or use Import RetUI Preset in Settings when another app lost the MIME type. Public import accepts readable content:// input, stages and validates it privately, then asks for confirmation. Import adds a uniquely named saved preset; it does not apply active settings or restore personal data. Confirmation revalidates the private snapshot rather than reopening the external URI. Apply the saved name later with preset -apply. Imported behavior fields may contain commands; inspection does not run them.\n\n## Examples\n\n```\npreset -apply <saved-name>\n```\n\nApply later; this changes the active configuration. Replace the placeholder."
     },
     "type": "string"
   },
@@ -10910,7 +11197,7 @@
   "offline_help_article_prompt_and_chips_body": {
     "formatted": false,
     "forms": {
-      "other": "Home-prompt suggestions do not all behave alike. Some insert incomplete text for you to finish; others run immediately on one tap. App launches, module controls, Guide tasks and complete commands can take action. App launches also update local usage counts used by ranking.\nClassic is terminal-centric. Search groups matching apps, contacts, notifications, groups, aliases, commands and search providers. Contacts and notifications depend on their respective Android access; a permission-related result does not grant access by itself.\nType help to see manual categories. Continue typing to match topic IDs, titles or article text. Tapping a help topic opens that page directly, without running its examples. mode -status shows your current launcher mode; mode search and mode classic save a mode change and refresh the interface. Cyberdeck and CRT effects are separate from these modes.\n\nExamples:\nmode search\nSwitch to Search mode and refresh UI; this changes saved launcher mode.\n\nmode classic\nReturn to terminal-centric Classic mode; effects are separate.\n\nmode -status\nInspect active launcher mode."
+      "other": "Home-prompt suggestions do not all behave alike. Some insert incomplete text for you to finish; others run immediately on one tap. App launches, module controls, Guide tasks and complete commands can take action. App launches also update local usage counts used by ranking.\nClassic is terminal-centric. Search groups matching apps, contacts, notifications, groups, aliases, commands and search providers. Contacts and notifications depend on their respective Android access; a permission-related result does not grant access by itself.\nType help to see manual categories. Continue typing to match topic IDs, titles or article text. Tapping a help topic opens that page directly, without running its examples. mode -status shows your current launcher mode; mode search and mode classic save a mode change and refresh the interface. Cyberdeck and CRT effects are separate from these modes.\n\n## Examples\n\n```\nmode search\n```\n\nSwitch to Search mode and refresh UI; this changes saved launcher mode.\n\n```\nmode classic\n```\n\nReturn to terminal-centric Classic mode; effects are separate.\n\n```\nmode -status\n```\n\nInspect active launcher mode."
     },
     "type": "string"
   },
@@ -10924,7 +11211,7 @@
   "offline_help_article_reminder_workflow_body": {
     "formatted": false,
     "forms": {
-      "other": "reminder opens the editor; enter a nonempty title and choose a future date/time before saving. The picker uses locale month/weekday labels and system 12/24-hour preference. Earlier days cannot be selected, but today's time may still be past; saving validates the complete instant. Times round to whole minutes. The year dropdown is limited, while valid manually entered years may extend beyond it.\n\n-ls prints reminders. CLI -add takes a title followed by dd/mm/yy and HH:mm: the final two tokens are date/time and earlier tokens form the title. Past/current times are rejected. -rm/-remove immediately deletes the selected reminder. Prefer the editor to copied dated examples. module -prompt reminder add/edit/remove offers native prompt workflows; their syntax differs from CLI dates.\n\nExamples:\nreminder\nOpen the reminder editor to choose a future date.\n\nreminder -ls\nRead reminder identifiers before editing/removing.\n\nmodule -prompt reminder add\nStart a native reminder-add prompt."
+      "other": "reminder opens the editor; enter a nonempty title and choose a future date/time before saving. The picker uses locale month/weekday labels and system 12/24-hour preference. Earlier days cannot be selected, but today's time may still be past; saving validates the complete instant. Times round to whole minutes. The year dropdown is limited, while valid manually entered years may extend beyond it.\n\n-ls prints reminders. CLI -add takes a title followed by dd/mm/yy and HH:mm: the final two tokens are date/time and earlier tokens form the title. Past/current times are rejected. -rm/-remove immediately deletes the selected reminder. Prefer the editor to copied dated examples. module -prompt reminder add/edit/remove offers native prompt workflows; their syntax differs from CLI dates.\n\n## Examples\n\n```\nreminder\n```\n\nOpen the reminder editor to choose a future date.\n\n```\nreminder -ls\n```\n\nRead reminder identifiers before editing/removing.\n\n```\nmodule -prompt reminder add\n```\n\nStart a native reminder-add prompt."
     },
     "type": "string"
   },
@@ -10938,7 +11225,7 @@
   "offline_help_article_rss_workflow_body": {
     "formatted": false,
     "forms": {
-      "other": "rss -add without enough arguments opens a setup form; full syntax takes an integer feed ID, interval in seconds and URL. -ls opens the feed list, -menu opens a feed's options and -l ID prints cached entries. -rm deletes configuration. -show and -wifi_only take true/false; -alias changes the display label. The RSS module summarizes configured feeds with clickable links.\n\nFormats/colors, entry/date tags and include/exclude regex rules are configurable. -entry_tag takes ID then tag; -rm_format takes only ID. -time_format configures publication-date parsing, not display formatting; dates/links depend on RSS/Atom contents. With include_rss_default false, a matching include_if_matches regex currently suppresses the entry rather than including it: do not treat it as an allowlist.\n\nRegular Wi-Fi-only feeds skip updates off Wi-Fi, but -frc explicitly bypasses that restriction. Refresh sends requests to the chosen server. Cached entries are not complete offline articles. add_command regex automation can substitute captured groups from new/background items and execute launcher commands; manual listing skips that loop. Do not trust remote feed text to trigger local actions without reviewing the rules.\n\nExamples:\nrss -add\nOpen the feed setup form.\n\nrss -ls\nChoose a saved feed and inspect options.\n\nrss -frc 1\nRefresh an existing feed 1; requires that ID to exist.\n\nrss -add 1 900 https://www.reddit.com/r/android/.rss\nAdd feed ID 1 at 900-second interval if ID/URL are not already configured; network endpoint availability not tested.\n\nrss -wifi_only 1 true\nRestrict regular updates of feed 1 to Wi-Fi.\n\nrss -l 1\nPrint cached feed 1 items without regex-command automation."
+      "other": "rss -add without enough arguments opens a setup form; full syntax takes an integer feed ID, interval in seconds and URL. -ls opens the feed list, -menu opens a feed's options and -l ID prints cached entries. -rm deletes configuration. -show and -wifi_only take true/false; -alias changes the display label. The RSS module summarizes configured feeds with clickable links.\n\nFormats/colors, entry/date tags and include/exclude regex rules are configurable. -entry_tag takes ID then tag; -rm_format takes only ID. -time_format configures publication-date parsing, not display formatting; dates/links depend on RSS/Atom contents. With include_rss_default false, a matching include_if_matches regex currently suppresses the entry rather than including it: do not treat it as an allowlist.\n\nRegular Wi-Fi-only feeds skip updates off Wi-Fi, but -frc explicitly bypasses that restriction. Refresh sends requests to the chosen server. Cached entries are not complete offline articles. add_command regex automation can substitute captured groups from new/background items and execute launcher commands; manual listing skips that loop. Do not trust remote feed text to trigger local actions without reviewing the rules.\n\n## Examples\n\n```\nrss -add\n```\n\nOpen the feed setup form.\n\n```\nrss -ls\n```\n\nChoose a saved feed and inspect options.\n\n```\nrss -frc 1\n```\n\nRefresh an existing feed 1; requires that ID to exist.\n\n```\nrss -add 1 900 https://www.reddit.com/r/android/.rss\n```\n\nAdd feed ID 1 at 900-second interval if ID/URL are not already configured; network endpoint availability not tested.\n\n```\nrss -wifi_only 1 true\n```\n\nRestrict regular updates of feed 1 to Wi-Fi.\n\n```\nrss -l 1\n```\n\nPrint cached feed 1 items without regex-command automation."
     },
     "type": "string"
   },
@@ -10952,7 +11239,7 @@
   "offline_help_article_script_module_sources_body": {
     "formatted": false,
     "forms": {
-      "other": "module -ls shows known modules and dock. -show opens a panel; -hide only removes a dock shortcut; -dock add/remove/toggle changes dock layout, while -rm removes a script registry entry and refuses built-ins. -close closes the active module. Do not equate hidden with deleted.\nScript modules use launcher: providers, termux: script paths, or lua: script IDs. module -add registers a named source and adds it to dock. Launcher providers can refresh immediately; Termux sources need the bridge and an existing script. Refresh runs the source, not an offline explanatory preview.\nTermux output supports ::title, ::body, preformatted blocks and ::suggest label | mode | payload; modes include command, termux-run and callback. Suggestions can become real executable controls. Declared %RETUI_* variables can make launcher-provided JSON, TSV and timestamps available to a script. Review which personal data the script reads and where it sends it before granting access or refreshing.\nRSS, notes, reminder, weather_native, calendar and timer are useful starting panels; current events/weather can be editable script-backed entries. Use module -ls to see what is available on your installation.\n\nExamples:\nmodule -ls\nList actual modules, sources and dock.\n\nmodule -show notes\nOpen local notes panel.\n\nmodule -dock add notes\nAdd notes dock shortcut; changes layout.\n\nmodule -close\nClose active module without deleting it."
+      "other": "module -ls shows known modules and dock. -show opens a panel; -hide only removes a dock shortcut; -dock add/remove/toggle changes dock layout, while -rm removes a script registry entry and refuses built-ins. -close closes the active module. Do not equate hidden with deleted.\nScript modules use launcher: providers, termux: script paths, or lua: script IDs. module -add registers a named source and adds it to dock. Launcher providers can refresh immediately; Termux sources need the bridge and an existing script. Refresh runs the source, not an offline explanatory preview.\nTermux output supports ::title, ::body, preformatted blocks and ::suggest label | mode | payload; modes include command, termux-run and callback. Suggestions can become real executable controls. Declared %RETUI_* variables can make launcher-provided JSON, TSV and timestamps available to a script. Review which personal data the script reads and where it sends it before granting access or refreshing.\nRSS, notes, reminder, weather_native, calendar and timer are useful starting panels; current events/weather can be editable script-backed entries. Use module -ls to see what is available on your installation.\n\n## Examples\n\n```\nmodule -ls\n```\n\nList actual modules, sources and dock.\n\n```\nmodule -show notes\n```\n\nOpen local notes panel.\n\n```\nmodule -dock add notes\n```\n\nAdd notes dock shortcut; changes layout.\n\n```\nmodule -close\n```\n\nClose active module without deleting it."
     },
     "type": "string"
   },
@@ -10966,7 +11253,7 @@
   "offline_help_article_search_providers_body": {
     "formatted": false,
     "forms": {
-      "other": "search.txt defines reusable providers. Built-in names are gg (Google), ps (Play Store with web fallback), yt (YouTube), dd (DuckDuckGo) and u (URL). Use search -ls to see your current names/templates; they can be changed or removed. The default is configured by default_search. Management names are reserved; reset replaces providers with defaults, so preserve custom entries first.\n\nAdd a named URL template containing a recognized token: {query} URL-encodes spaces, {query+} uses plus signs, {slug} changes spaces to underscores, {raw} inserts raw text, and {url} supplies https:// when missing. An optional fallback follows => and is used if the primary link cannot be opened, not when a website finds no results.\n\nA search opens a browser or another registered handler and can send your query to that destination. It is not offline cached-web search. Review custom templates, especially raw substitution, before sending private input.\n\nExamples:\nsearch -ls\nInspect the current provider names and templates.\n\nsearch -add example https://example.com/?q={query}\nSave a demonstration provider; changes search configuration.\n\nsearch -example offline manuals\nOpen that provider with a query; sends the query to the handler.\n\nsearch -dd android launcher\nOpen a DuckDuckGo query if the default dd provider exists."
+      "other": "search.txt defines reusable providers. Built-in names are gg (Google), ps (Play Store with web fallback), yt (YouTube), dd (DuckDuckGo) and u (URL). Use search -ls to see your current names/templates; they can be changed or removed. The default is configured by default_search. Management names are reserved; reset replaces providers with defaults, so preserve custom entries first.\n\nAdd a named URL template containing a recognized token: {query} URL-encodes spaces, {query+} uses plus signs, {slug} changes spaces to underscores, {raw} inserts raw text, and {url} supplies https:// when missing. An optional fallback follows => and is used if the primary link cannot be opened, not when a website finds no results.\n\nA search opens a browser or another registered handler and can send your query to that destination. It is not offline cached-web search. Review custom templates, especially raw substitution, before sending private input.\n\n## Examples\n\n```\nsearch -ls\n```\n\nInspect the current provider names and templates.\n\n```\nsearch -add example https://example.com/?q={query}\n```\n\nSave a demonstration provider; changes search configuration.\n\n```\nsearch -example offline manuals\n```\n\nOpen that provider with a query; sends the query to the handler.\n\n```\nsearch -dd android launcher\n```\n\nOpen a DuckDuckGo query if the default dd provider exists."
     },
     "type": "string"
   },
@@ -10980,7 +11267,7 @@
   "offline_help_article_share_retui_body": {
     "formatted": false,
     "forms": {
-      "other": "In Settings choose Create Shareable Configuration, then current active look or a saved local preset. Review selected behavior fields before exporting. The default behavior field set is restricted, but schema 3 explicitly permits user-selected behavior values, including text/commands. Do not call every export anonymous or safe to publish. UI excludes username, deviceName, font_file and legacy auto_color_pick; aliases, notes, notification/reply bindings and callback tokens are not sections of a shareable package.\nSave-document export writes and verifies a ZIP with manifest.txt and sanitized XML, naming it .retui with MIME application/vnd.retui+zip. Sharing afterward uses a privately cached content URI with temporary read permission. Third-party apps may drop the MIME; use the manual import picker if tap-to-open fails.\nCurrent export code emits theme, optional UI, suggestions and selected behavior; it does not add frame entries, although supported schema-1 imports can include frames. Custom frame packs are not included in this export route. Use this Settings action to export; preset -export is not supported.\n\nExamples:\nsettings\nOpen Settings, then System & Support > Create Shareable Configuration."
+      "other": "In Settings choose Create Shareable Configuration, then current active look or a saved local preset. Review selected behavior fields before exporting. The default behavior field set is restricted, but schema 3 explicitly permits user-selected behavior values, including text/commands. Do not call every export anonymous or safe to publish. UI excludes username, deviceName, font_file and legacy auto_color_pick; aliases, notes, notification/reply bindings and callback tokens are not sections of a shareable package.\nSave-document export writes and verifies a ZIP with manifest.txt and sanitized XML, naming it .retui with MIME application/vnd.retui+zip. Sharing afterward uses a privately cached content URI with temporary read permission. Third-party apps may drop the MIME; use the manual import picker if tap-to-open fails.\nCurrent export code emits theme, optional UI, suggestions and selected behavior; it does not add frame entries, although supported schema-1 imports can include frames. Custom frame packs are not included in this export route. Use this Settings action to export; preset -export is not supported.\n\n## Examples\n\n```\nsettings\n```\n\nOpen Settings, then System & Support > Create Shareable Configuration."
     },
     "type": "string"
   },
@@ -10994,7 +11281,7 @@
   "offline_help_article_space_workflow_body": {
     "formatted": false,
     "forms": {
-      "other": "A Space is a local configuration snapshot, not an Android user account, security sandbox or tmux session. -current/-ls identify the active Space; -save snapshots it. -new duplicates selected active settings into a new Space and activates it. -rename renames the active Space. -switch first snapshots the old Space, then restores selected target files/preferences/frame state and reloads launcher/notification rules.\n\nCoverage includes listed XML roots, alias/legacy notes/search/reply/ASCII/webhook/extractor files, selected UI/app/widget/focus/module/reminder/workspace-launcher preferences and frames—not every private database/namespace. Remember notes are in private NoteStore; legacy notes.xml is not a snapshot of that library.\n\nCreation/save/switch write configuration, and switching replaces selected active state. -rm permanently deletes an inactive Space; the active or only Space cannot be removed. Spaces differ from portable .retui themes and personal .retui-backup archives. Keep a personal backup for important setups, noting its own coverage limits.\n\nExamples:\nspace -current\nInspect the active Space.\n\nspace -save\nSnapshot the current active Space.\n\nspace -new work\nDuplicate active settings and switch to work.\n\nspace -ls\nList local Spaces."
+      "other": "A Space is a local configuration snapshot, not an Android user account, security sandbox or tmux session. -current/-ls identify the active Space; -save snapshots it. -new duplicates selected active settings into a new Space and activates it. -rename renames the active Space. -switch first snapshots the old Space, then restores selected target files/preferences/frame state and reloads launcher/notification rules.\n\nCoverage includes listed XML roots, alias/legacy notes/search/reply/ASCII/webhook/extractor files, selected UI/app/widget/focus/module/reminder/workspace-launcher preferences and frames—not every private database/namespace. Remember notes are in private NoteStore; legacy notes.xml is not a snapshot of that library.\n\nCreation/save/switch write configuration, and switching replaces selected active state. -rm permanently deletes an inactive Space; the active or only Space cannot be removed. Spaces differ from portable .retui themes and personal .retui-backup archives. Keep a personal backup for important setups, noting its own coverage limits.\n\n## Examples\n\n```\nspace -current\n```\n\nInspect the active Space.\n\n```\nspace -save\n```\n\nSnapshot the current active Space.\n\n```\nspace -new work\n```\n\nDuplicate active settings and switch to work.\n\n```\nspace -ls\n```\n\nList local Spaces."
     },
     "type": "string"
   },
@@ -11008,7 +11295,7 @@
   "offline_help_article_startup_setup_body": {
     "formatted": false,
     "forms": {
-      "other": "On a new install, choose Basic or Advanced, review Auto-theme and border choices, then press Apply. Switching choices only stages them. Later closes setup without changing launcher settings and leaves setup pending. Basic enables status extras and double-tap lock, but keeps optional drawers, module dock, integrations, notification display and sounds off. Advanced lets you choose those switches separately. Enabling Termux or Tasker does not install it or grant Android access. Double-tap lock depends on Android device-admin configuration.\n\nAuto-theme takes a wallpaper-derived color snapshot with system fallback, not a permanent link to future wallpapers. Dashed uses a gap, Solid sets the gap to zero, and None disables generated borders. Classic remains the renderer under independent Cyberdeck/CRT effects. Basic and Advanced are startup defaults, not Classic versus Search launcher mode.\n\nFor a no-apply rehearsal use guide -startup-test. End Preview and Finish Preview leave launcher settings unchanged, unlike normal Settings editors that can persist changes.\n\nExamples:\nguide -startup-test\nOpen the staged startup dry run; neither finish nor cancel applies launcher choices.\n\nsettings\nOpen the Settings Hub for later changes."
+      "other": "## Stage the setup\n\nOn a new install, choose Basic or Advanced, review Auto-theme and border choices, then press Apply. Switching choices only stages them. Later closes setup without changing launcher settings and leaves setup pending. Basic enables status extras and double-tap lock, but keeps optional drawers, module dock, integrations, notification display and sounds off. Advanced lets you choose those switches separately. Enabling Termux or Tasker does not install it or grant Android access. Double-tap lock depends on Android device-admin configuration.\n\n## Appearance defaults\n\nAuto-theme takes a wallpaper-derived color snapshot with system fallback, not a permanent link to future wallpapers. Dashed uses a gap, Solid sets the gap to zero, and None disables generated borders. Classic remains the renderer under independent Cyberdeck/CRT effects. Basic and Advanced are startup defaults, not Classic versus Search launcher mode.\n\n## Rehearse without applying\n\nFor a no-apply rehearsal use guide -startup-test. End Preview and Finish Preview leave launcher settings unchanged, unlike normal Settings editors that can persist changes.\n\n## Examples\n\n```\nguide -startup-test\n```\n\nOpen the staged startup dry run; neither finish nor cancel applies launcher choices.\n\n```\nsettings\n```\n\nOpen the Settings Hub for later changes."
     },
     "type": "string"
   },
@@ -11022,7 +11309,7 @@
   "offline_help_article_status_reference_body": {
     "formatted": false,
     "forms": {
-      "other": "Battery, RAM, storage, network, time, unlock count and notes are launcher status labels with configurable visibility/format/row indices. RAM is an ActivityManager readout, not a RAM-cleaning optimizer. Storage can omit unavailable removable volumes. Network labels can have redacted/unavailable Wi-Fi SSID. Unlock count reflects launcher observations and saved cycle state, not an authoritative device security log.\nUse time for configured clock output; timer and stopwatch are different commands. flash toggles the available camera torch, requests camera permission if needed and can fail on hardware/access constraints. This is not an emergency-light service with delivery guarantees.\nBreach is a local grid puzzle with alternating row/column picks and targets; it does not hack a network. Optional Dystopia uses local virtual credits and escape friction, disabled by default. Those credits are local virtual balances, not money or server accounts, and focus restrictions are not system-wide package blocking. Use config -info with an option name to read its type, default and description.\n\nExamples:\ntime\nPrint time using default configured clock format.\n\nflash\nToggle camera torch; hardware/privacy access may prevent it."
+      "other": "Battery, RAM, storage, network, time, unlock count and notes are launcher status labels with configurable visibility/format/row indices. RAM is an ActivityManager readout, not a RAM-cleaning optimizer. Storage can omit unavailable removable volumes. Network labels can have redacted/unavailable Wi-Fi SSID. Unlock count reflects launcher observations and saved cycle state, not an authoritative device security log.\nUse time for configured clock output; timer and stopwatch are different commands. flash toggles the available camera torch, requests camera permission if needed and can fail on hardware/access constraints. This is not an emergency-light service with delivery guarantees.\nBreach is a local grid puzzle with alternating row/column picks and targets; it does not hack a network. Optional Dystopia uses local virtual credits and escape friction, disabled by default. Those credits are local virtual balances, not money or server accounts, and focus restrictions are not system-wide package blocking. Use config -info with an option name to read its type, default and description.\n\n## Examples\n\n```\ntime\n```\n\nPrint time using default configured clock format.\n\n```\nflash\n```\n\nToggle camera torch; hardware/privacy access may prevent it."
     },
     "type": "string"
   },
@@ -11036,7 +11323,7 @@
   "offline_help_article_storage_and_backup_boundary_body": {
     "formatted": false,
     "forms": {
-      "other": "Do not assume /sdcard/Re-T-UI on every build. Play uses app-owned external storage with an internal-files fallback. F-Droid tries the shared Re-T-UI folder and falls back to app-owned storage if needed. Legacy Re:T-UI/T-UI folders are not automatically migrated. tui -folder opens the actual configuration directory or prints its path if no compatible folder app resolves. This differs from the remembered Files-companion directory; respect Android storage access.\n\nAndroid automatic app backup is disabled. Use explicit Settings Export Backup/Restore Backup for personal coverage, or Create Shareable Configuration for a portable look. Portable import saves a preset without applying it; apply its saved name later. config -apply is not an import substitute. Personal archives/configuration may contain private data, and neither configuration backup nor Spaces includes the private Remember library. Keystore keys are not portable note backups.\n\nExamples:\ntui -folder\nOpen/print the actual configuration directory."
+      "other": "Do not assume /sdcard/Re-T-UI on every build. Play uses app-owned external storage with an internal-files fallback. F-Droid tries the shared Re-T-UI folder and falls back to app-owned storage if needed. Legacy Re:T-UI/T-UI folders are not automatically migrated. tui -folder opens the actual configuration directory or prints its path if no compatible folder app resolves. This differs from the remembered Files-companion directory; respect Android storage access.\n\nAndroid automatic app backup is disabled. Use explicit Settings Export Backup/Restore Backup for personal coverage, or Create Shareable Configuration for a portable look. Portable import saves a preset without applying it; apply its saved name later. config -apply is not an import substitute. Personal archives/configuration may contain private data, and neither configuration backup nor Spaces includes the private Remember library. Keystore keys are not portable note backups.\n\n## Examples\n\n```\ntui -folder\n```\n\nOpen/print the actual configuration directory."
     },
     "type": "string"
   },
@@ -11050,7 +11337,7 @@
   "offline_help_article_support_and_compatibility_body": {
     "formatted": false,
     "forms": {
-      "other": "settings opens launcher settings; themer is an older hidden name for the same surface. tutorial opens the bundled getting-started article. Some command-specific -tutorial options still open external websites. The deprecated install command opens a Play Store search; it does not install an APK. rate opens the store listing, with a web fallback. donate currently opens the project repository, not PayPal. changelog fetches release notes from Pastebin and needs network access. profile opens the local profile screen. hack shows a simulated overlay animation, not a hacking tool. clear clears the terminal display. Hidden compatibility commands can still be called; being hidden is not a security restriction.\n\nExamples:\ntui -about\nRead launcher build/about information."
+      "other": "settings opens launcher settings; themer is an older hidden name for the same surface. tutorial opens the bundled getting-started article. Some command-specific -tutorial options still open external websites. The deprecated install command opens a Play Store search; it does not install an APK. rate opens the store listing, with a web fallback. donate currently opens the project repository, not PayPal. changelog fetches release notes from Pastebin and needs network access. profile opens the local profile screen. hack shows a simulated overlay animation, not a hacking tool. clear clears the terminal display. Hidden compatibility commands can still be called; being hidden is not a security restriction.\n\n## Examples\n\n```\ntui -about\n```\n\nRead launcher build/about information."
     },
     "type": "string"
   },
@@ -11064,7 +11351,7 @@
   "offline_help_article_tasker_and_callbacks_body": {
     "formatted": false,
     "forms": {
-      "other": "tasker runs a named Tasker task. It checks installed package, RUN_TASKS permission, Tasker enabled state and Allow External Access; task names are case-sensitive. A started message means broadcast dispatched, not necessarily task completed. Optional completion status waits at most 30 seconds. Incoming Tasker-plugin actions are separately controlled by Re:TUI integration enablement and support preset apply, theme color, module show/refresh/text, terminal output and Space switch.\nTermux/script callbacks use exported com.dvil.tui_renewed.RETUI_CALLBACK with a locally generated token. retuitoken -status reports enabled/token-present without printing the token. -show and -on enable callbacks and display/copy the token; -rotate creates and displays/copies a replacement. -off disables callback authorization. Keep tokens out of screenshots, shared behavior text and public docs. Rotate invalidates old callbacks; personal backup includes callback auth preferences.\nCallbacks only support output, notify (terminal output, not Android push) and module_set/module text. They do not implement arbitrary authenticated exec. The Re:TUI Tasker-integration switch gates incoming plugin actions, not the outbound tasker command. Running a task can change device state or send data according to that task; inspect it in Tasker first.\n\nTask names may be quoted, optionally after -run; permanent Tasker suggestions execute when tapped. retui-token is a public alias for retuitoken. Update integrations after token rotation.\n\nThe Re:T-UI Tasker plug-in offers apply preset, set theme, show/refresh/update module, terminal output and switch Space. It shows fields for the selected action, including a custom preset/Space name or Tasker variable where supported. These actions can change live launcher state. The plug-in reports a failed action rather than treating it as successful. Back in plug-in configuration attempts to save; it is not an unconditional discard action. Tasker must already be installed with the required permissions and setup.\n\nExamples:\nretuitoken -status\nReport callback state without revealing secret token.\n\nretuitoken -off\nDisable inbound callback authorization; existing token remains stored.\n\nhelp tasker\nRead task invocation help before selecting a real task name."
+      "other": "tasker runs a named Tasker task. It checks installed package, RUN_TASKS permission, Tasker enabled state and Allow External Access; task names are case-sensitive. A started message means broadcast dispatched, not necessarily task completed. Optional completion status waits at most 30 seconds. Incoming Tasker-plugin actions are separately controlled by Re:TUI integration enablement and support preset apply, theme color, module show/refresh/text, terminal output and Space switch.\nTermux/script callbacks use exported com.dvil.tui_renewed.RETUI_CALLBACK with a locally generated token. retuitoken -status reports enabled/token-present without printing the token. -show and -on enable callbacks and display/copy the token; -rotate creates and displays/copies a replacement. -off disables callback authorization. Keep tokens out of screenshots, shared behavior text and public docs. Rotate invalidates old callbacks; personal backup includes callback auth preferences.\nCallbacks only support output, notify (terminal output, not Android push) and module_set/module text. They do not implement arbitrary authenticated exec. The Re:TUI Tasker-integration switch gates incoming plugin actions, not the outbound tasker command. Running a task can change device state or send data according to that task; inspect it in Tasker first.\n\nTask names may be quoted, optionally after -run; permanent Tasker suggestions execute when tapped. retui-token is a public alias for retuitoken. Update integrations after token rotation.\n\nThe Re:T-UI Tasker plug-in offers apply preset, set theme, show/refresh/update module, terminal output and switch Space. It shows fields for the selected action, including a custom preset/Space name or Tasker variable where supported. These actions can change live launcher state. The plug-in reports a failed action rather than treating it as successful. Back in plug-in configuration attempts to save; it is not an unconditional discard action. Tasker must already be installed with the required permissions and setup.\n\n## Examples\n\n```\nretuitoken -status\n```\n\nReport callback state without revealing secret token.\n\n```\nretuitoken -off\n```\n\nDisable inbound callback authorization; existing token remains stored.\n\n```\nhelp tasker\n```\n\nRead task invocation help before selecting a real task name."
     },
     "type": "string"
   },
@@ -11078,7 +11365,7 @@
   "offline_help_article_terminal_basics_body": {
     "formatted": false,
     "forms": {
-      "other": "Type a command at the launcher prompt and press Enter. Typing help by itself does not open this manual until you submit it. Suggestions can take you directly to a topic. help apps prints a short command reference; tutorial opens Getting started.\n\nNothing on this page executes: examples are text, not command buttons. In the manual, type a displayed number and press Enter, or tap its numbered line. Android Back moves up one level; 0 returns to the launcher. The compact number keys belong only to the manual, not the launcher command prompt."
+      "other": "## Enter a command\n\nType a command at the launcher prompt and press Enter. Typing help by itself does not open this manual until you submit it. Suggestions can take you directly to a topic. help apps prints a short command reference; tutorial opens Getting started.\n\n## Navigate the manual\n\n>! Nothing on this page executes: examples are text, not command buttons. In the manual, type a displayed number and press Enter, or tap its numbered line. Android Back moves up one level; 0 returns to the launcher. The compact number keys belong only to the manual, not the launcher command prompt."
     },
     "type": "string"
   },
@@ -11092,7 +11379,7 @@
   "offline_help_article_termux_bridge_setup_body": {
     "formatted": false,
     "forms": {
-      "other": "Tbridge -status/-doctor report whether Termux is installed and RUN_COMMAND is declared/granted. -setup prints setup instructions. -probe dispatches a diagnostic shell script only after readiness checks. The bridge requires allow-external-apps=true in Termux in addition to launcher permission; shared-storage scripts may need termux-setup-storage. Legacy -dirs/-files/-ls only print a retirement message. File browsing is delegated to Re:T-UI Files, not restored by changing file_backend. Grant only the access needed by scripts you trust.\n\nExamples:\ntbridge -doctor\nRead local bridge readiness status.\n\ntbridge -setup\nPrint bridge setup instructions without running a script."
+      "other": "Tbridge -status/-doctor report whether Termux is installed and RUN_COMMAND is declared/granted. -setup prints setup instructions. -probe dispatches a diagnostic shell script only after readiness checks. The bridge requires allow-external-apps=true in Termux in addition to launcher permission; shared-storage scripts may need termux-setup-storage. Legacy -dirs/-files/-ls only print a retirement message. File browsing is delegated to Re:T-UI Files, not restored by changing file_backend. Grant only the access needed by scripts you trust.\n\n## Examples\n\n```\ntbridge -doctor\n```\n\nRead local bridge readiness status.\n\n```\ntbridge -setup\n```\n\nPrint bridge setup instructions without running a script."
     },
     "type": "string"
   },
@@ -11106,7 +11393,7 @@
   "offline_help_article_termux_workspace_body": {
     "formatted": false,
     "forms": {
-      "other": "Termux must be installed with its RUN_COMMAND service exposed, allow-external-apps enabled, and launcher RUN_COMMAND permission granted through Android. tbridge -setup prints instructions; -doctor/-status checks local installation/declaration/permission, not remote execution. -probe dispatches a diagnostic with asynchronous results. Shared-storage scripts may need Termux storage setup.\n\nBare termux or tmux opens the interactive workspace. tmux launch <id> focuses/creates a launcher window; built-ins include shell, htop, mc, nano, vim, python, node and logs. Their executables must already be installed in Termux. tmux switch selects an index/visible window token, new creates a window, save persists a custom launcher command and rm removes that saved launcher, not its package. Scripts run with Termux access: review them first.\n\nInside the workspace, a colon starts local control mode; ordinary input goes to tmux using a socket when possible and a script fallback otherwise. :status reports installation, permission, socket and geometry. :new, :switch, :prev, :next, :reconnect and :home are local controls. Tap a window label, use :switch <window> locally, or tmux switch <window> at Launcher Home to select an index/name; :prev/:next and a horizontal terminal swipe switch adjacent windows. The active window is highlighted. Connecting/Ready/Disconnected appears in the header without replacing a running terminal with typing/key status. Ready confirms the authenticated bridge handshake, not execution of each queued key. Input that cannot be queued is not automatically replayed. Returning Home or backgrounding closes only the launcher stream; Termux tmux jobs and shell drafts continue. Returning to the pane reconnects without killing the session. Install helper 0.3.4 with this launcher for encoded frame isolation and live streaming; older helpers use direct tmux snapshots selected before mutation.\n\ntermux -run opens the one-shot console, not an interactive full-screen Linux app. Registered termux: sources can update modules with script stdout. Legacy -app-add/-apps only show workspace help; use tmux save for custom launchers. termux -setup is unhandled; use tbridge -setup. Retired tbridge -dirs/-files/-ls do not browse files; use the Re:TUI Files companion.\n\nExamples:\ntmux launch mc\nOpen/focus Midnight Commander when installed in Termux.\n\ntmux switch 2\nSelect workspace window 2 if present.\n\ntmux status\nInspect workspace status.\n\ntbridge -setup\nPrint bridge setup instructions only.\n\ntbridge -doctor\nInspect local bridge access; no external command dispatch.\n\ntmux help\nOpen workspace local help, not execute a shell command.\n\n:status\nInside the workspace, inspect diagnostics without sending a shell command.\n\n:home\nInside the workspace, return to Launcher Home."
+      "other": "Termux must be installed with its RUN_COMMAND service exposed, allow-external-apps enabled, and launcher RUN_COMMAND permission granted through Android. tbridge -setup prints instructions; -doctor/-status checks local installation/declaration/permission, not remote execution. -probe dispatches a diagnostic with asynchronous results. Shared-storage scripts may need Termux storage setup.\n\nBare termux or tmux opens the interactive workspace. tmux launch <id> focuses/creates a launcher window; built-ins include shell, htop, mc, nano, vim, python, node and logs. Their executables must already be installed in Termux. tmux switch selects an index/visible window token, new creates a window, save persists a custom launcher command and rm removes that saved launcher, not its package. Scripts run with Termux access: review them first.\n\nInside the workspace, a colon starts local control mode; ordinary input goes to tmux using a socket when possible and a script fallback otherwise. :status reports installation, permission, socket and geometry. :new, :switch, :prev, :next, :reconnect and :home are local controls. Tap a window label, use :switch <window> locally, or tmux switch <window> at Launcher Home to select an index/name; :prev/:next and a horizontal terminal swipe switch adjacent windows. The active window is highlighted. Connecting/Ready/Disconnected appears in the header without replacing a running terminal with typing/key status. Ready confirms the authenticated bridge handshake, not execution of each queued key. Input that cannot be queued is not automatically replayed. Returning Home or backgrounding closes only the launcher stream; Termux tmux jobs and shell drafts continue. Returning to the pane reconnects without killing the session. Install helper 0.3.4 with this launcher for encoded frame isolation and live streaming; older helpers use direct tmux snapshots selected before mutation.\n\ntermux -run opens the one-shot console, not an interactive full-screen Linux app. Registered termux: sources can update modules with script stdout. Legacy -app-add/-apps only show workspace help; use tmux save for custom launchers. termux -setup is unhandled; use tbridge -setup. Retired tbridge -dirs/-files/-ls do not browse files; use the Re:TUI Files companion.\n\n## Examples\n\n```\ntmux launch mc\n```\n\nOpen/focus Midnight Commander when installed in Termux.\n\n```\ntmux switch 2\n```\n\nSelect workspace window 2 if present.\n\n```\ntmux status\n```\n\nInspect workspace status.\n\n```\ntbridge -setup\n```\n\nPrint bridge setup instructions only.\n\n```\ntbridge -doctor\n```\n\nInspect local bridge access; no external command dispatch.\n\n```\ntmux help\n```\n\nOpen workspace local help, not execute a shell command.\n\n```\n:status\n```\n\nInside the workspace, inspect diagnostics without sending a shell command.\n\n```\n:home\n```\n\nInside the workspace, return to Launcher Home."
     },
     "type": "string"
   },
@@ -11120,7 +11407,7 @@
   "offline_help_article_theme_and_preset_body": {
     "formatted": false,
     "forms": {
-      "other": "preset -save captures theme/suggestion colors, permitted UI fields, local behavior and current frames in a saved preset. Behavior can contain commands, locations or personal text, so local presets are not automatically public-safe. Saving an existing name may overwrite it; use a new name to retain both snapshots.\n\n-ls lists saved presets and built-ins blue, red, green, pink, bw and cyberpunk. -apply directly changes active colors, permitted UI/behavior and frame state, disables auto_color_pick and refreshes the launcher. Save the current setup first; there is no save-before-apply confirmation. Review imported behavior before applying it.\n\n-duplicate accepts only saved presets and prompts for a new name. -rm permanently deletes a saved/imported copy, not active state or a personal backup. Portable import adds a unique saved name without applying it. -market opens a network marketplace, not bundled content. wallpaper -auto asks for confirmation before replacing colors; -static/-live open Android wallpaper pickers.\n\nExamples:\npreset -save mylook\nSave your current look before experimenting.\n\npreset -ls\nInspect available preset names.\n\nwallpaper -auto\nBegin a confirmation workflow for wallpaper-derived colors.\n\npreset -apply mylook\nApply the saved mylook snapshot; active settings change."
+      "other": "preset -save captures theme/suggestion colors, permitted UI fields, local behavior and current frames in a saved preset. Behavior can contain commands, locations or personal text, so local presets are not automatically public-safe. Saving an existing name may overwrite it; use a new name to retain both snapshots.\n\n-ls lists saved presets and built-ins blue, red, green, pink, bw and cyberpunk. -apply directly changes active colors, permitted UI/behavior and frame state, disables auto_color_pick and refreshes the launcher. Save the current setup first; there is no save-before-apply confirmation. Review imported behavior before applying it.\n\n-duplicate accepts only saved presets and prompts for a new name. -rm permanently deletes a saved/imported copy, not active state or a personal backup. Portable import adds a unique saved name without applying it. -market opens a network marketplace, not bundled content. wallpaper -auto asks for confirmation before replacing colors; -static/-live open Android wallpaper pickers.\n\n## Examples\n\n```\npreset -save mylook\n```\n\nSave your current look before experimenting.\n\n```\npreset -ls\n```\n\nInspect available preset names.\n\n```\nwallpaper -auto\n```\n\nBegin a confirmation workflow for wallpaper-derived colors.\n\n```\npreset -apply mylook\n```\n\nApply the saved mylook snapshot; active settings change."
     },
     "type": "string"
   },
@@ -11134,7 +11421,7 @@
   "offline_help_article_timer_stopwatch_focus_body": {
     "formatted": false,
     "forms": {
-      "other": "timer accepts s/m/h unit segments such as 5m or 1h30m. Only one timer runs; starting a second prompts whether to add time, while -add explicitly extends it (or starts a new timer if none is active). -status is read-only and -stop cancels. Bare timer shows help, not a duration picker. Stopwatch starts on bare command, stops/continues and resets through its own options; it is separate from countdown.\nPomodoro uses configured focus/break durations (defaults 25/5 minutes) over four cycles and persists phase/deadline. A supplied goal starts; bare command opens setup. Dystopia is optional and off by default. When enabled, early stop can spend virtual credits or require emergency Breach. Lockdown is its related launcher focus overlay and does not hard-block other Android apps or act as device policy.\nTimer and stopwatch state is held in memory and can be lost when the launcher process ends. Pomodoro and Lockdown save their state, but saved state is not an alarm-delivery guarantee. Starting, extending, stopping or resetting a timer or focus session changes state; -status only reports it.\n\nExamples:\ntimer 5m\nStart a five-minute countdown or prompt to add if already active.\n\ntimer -status\nRead countdown status.\n\nstopwatch -status\nRead stopwatch status without starting it.\n\npomodoro Read manual\nStart focus session for this goal; optional Dystopia can restrict early exit."
+      "other": "timer accepts s/m/h unit segments such as 5m or 1h30m. Only one timer runs; starting a second prompts whether to add time, while -add explicitly extends it (or starts a new timer if none is active). -status is read-only and -stop cancels. Bare timer shows help, not a duration picker. Stopwatch starts on bare command, stops/continues and resets through its own options; it is separate from countdown.\nPomodoro uses configured focus/break durations (defaults 25/5 minutes) over four cycles and persists phase/deadline. A supplied goal starts; bare command opens setup. Dystopia is optional and off by default. When enabled, early stop can spend virtual credits or require emergency Breach. Lockdown is its related launcher focus overlay and does not hard-block other Android apps or act as device policy.\nTimer and stopwatch state is held in memory and can be lost when the launcher process ends. Pomodoro and Lockdown save their state, but saved state is not an alarm-delivery guarantee. Starting, extending, stopping or resetting a timer or focus session changes state; -status only reports it.\n\n## Examples\n\n```\ntimer 5m\n```\n\nStart a five-minute countdown or prompt to add if already active.\n\n```\ntimer -status\n```\n\nRead countdown status.\n\n```\nstopwatch -status\n```\n\nRead stopwatch status without starting it.\n\n```\npomodoro Read manual\n```\n\nStart focus session for this goal; optional Dystopia can restrict early exit."
     },
     "type": "string"
   },
@@ -11148,7 +11435,7 @@
   "offline_help_article_weather_setup_body": {
     "formatted": false,
     "forms": {
-      "other": "Use tuiweather -set_location with a place name or latitude,longitude. Coordinates are used directly; Android Geocoder resolves place names and caches a match. Ambiguous names may resolve unexpectedly; empty or failed matches require correction. Setting a location requests a refresh; -update requests another. Forecasts use MET Norway/met.no, not OpenWeather. No API key is needed: weather_key is unused and -set_key is unsupported.\n\n-enable/-disable changes weather visibility and reloads the launcher. weather_native offers built-in controls; weather can be a scripted module depending on the registry. Forecasts require network and send configured coordinates to the service; choose precision deliberately. Geocoding may also need network. This path does not request live device GPS access; location uses a separate subsystem.\n\nThe weather-specific tutorial option opens an online page, unlike the launcher's offline tutorial.\n\nExamples:\ntuiweather -set_location London\nSave a place name and request weather; may contact a geocoder/weather service.\n\ntuiweather -update\nRequest a manual weather refresh.\n\ntuiweather -enable\nShow weather; changes setting and reloads launcher."
+      "other": "Use tuiweather -set_location with a place name or latitude,longitude. Coordinates are used directly; Android Geocoder resolves place names and caches a match. Ambiguous names may resolve unexpectedly; empty or failed matches require correction. Setting a location requests a refresh; -update requests another. Forecasts use MET Norway/met.no, not OpenWeather. No API key is needed: weather_key is unused and -set_key is unsupported.\n\n-enable/-disable changes weather visibility and reloads the launcher. weather_native offers built-in controls; weather can be a scripted module depending on the registry. Forecasts require network and send configured coordinates to the service; choose precision deliberately. Geocoding may also need network. This path does not request live device GPS access; location uses a separate subsystem.\n\nThe weather-specific tutorial option opens an online page, unlike the launcher's offline tutorial.\n\n## Examples\n\n```\ntuiweather -set_location London\n```\n\nSave a place name and request weather; may contact a geocoder/weather service.\n\n```\ntuiweather -update\n```\n\nRequest a manual weather refresh.\n\n```\ntuiweather -enable\n```\n\nShow weather; changes setting and reloads launcher."
     },
     "type": "string"
   },
@@ -11162,7 +11449,7 @@
   "offline_help_article_webhooks_privacy_body": {
     "formatted": false,
     "forms": {
-      "other": "webhook -add saves a name, destination URL and body template in webhooks.xml. Invoking a named webhook renders its arguments and dispatches an asynchronous HTTP POST. Nonempty arguments are saved to recent history before dispatch, including when the request later fails; up to five entries per webhook feed suggestions. JSON templates substitute within parsed values to preserve escaping; plain-text templates use simpler substitution.\nInspect the endpoint and template before invoking one. Requests can disclose arguments or trigger remote actions. A dispatched request or HTTP response does not prove the remote service performed the action you intended. Personal backups can include webhook definitions and history; treat those archives as private.\nwebhook -ls sends no request, but prints both names and URLs. A URL may contain a secret token: do not share its terminal output or screenshots without checking. Outbound webhooks are separate from inbound token-authorized callbacks.\n\nExamples:\nwebhook -ls\nPrint configured webhook names and destination URLs without sending; URLs can contain secrets."
+      "other": "webhook -add saves a name, destination URL and body template in webhooks.xml. Invoking a named webhook renders its arguments and dispatches an asynchronous HTTP POST. Nonempty arguments are saved to recent history before dispatch, including when the request later fails; up to five entries per webhook feed suggestions. JSON templates substitute within parsed values to preserve escaping; plain-text templates use simpler substitution.\nInspect the endpoint and template before invoking one. Requests can disclose arguments or trigger remote actions. A dispatched request or HTTP response does not prove the remote service performed the action you intended. Personal backups can include webhook definitions and history; treat those archives as private.\nwebhook -ls sends no request, but prints both names and URLs. A URL may contain a secret token: do not share its terminal output or screenshots without checking. Outbound webhooks are separate from inbound token-authorized callbacks.\n\n## Examples\n\n```\nwebhook -ls\n```\n\nPrint configured webhook names and destination URLs without sending; URLs can contain secrets."
     },
     "type": "string"
   },
@@ -11257,6 +11544,13 @@
     },
     "type": "string"
   },
+  "offline_help_maximize": {
+    "formatted": true,
+    "forms": {
+      "other": "Maximize help"
+    },
+    "type": "string"
+  },
   "offline_help_next": {
     "formatted": true,
     "forms": {
@@ -11320,6 +11614,34 @@
     },
     "type": "string"
   },
+  "offline_help_reset_window": {
+    "formatted": true,
+    "forms": {
+      "other": "Reset window geometry"
+    },
+    "type": "string"
+  },
+  "offline_help_resize_corner": {
+    "formatted": true,
+    "forms": {
+      "other": "Resize width and height: drag, tap to grow, long press to shrink"
+    },
+    "type": "string"
+  },
+  "offline_help_resize_height": {
+    "formatted": true,
+    "forms": {
+      "other": "Resize height: drag, tap to grow, long press to shrink"
+    },
+    "type": "string"
+  },
+  "offline_help_resize_width": {
+    "formatted": true,
+    "forms": {
+      "other": "Resize width: drag, tap to grow, long press to shrink"
+    },
+    "type": "string"
+  },
   "offline_help_root": {
     "formatted": true,
     "forms": {
@@ -11373,6 +11695,13 @@
     "formatted": true,
     "forms": {
       "other": "tutorial → open offline Getting started"
+    },
+    "type": "string"
+  },
+  "offline_help_windowed": {
+    "formatted": true,
+    "forms": {
+      "other": "Windowed help"
     },
     "type": "string"
   },
@@ -12545,6 +12874,34 @@
     "formatted": false,
     "forms": {
       "other": "The character used to build the battery progress bar"
+    },
+    "type": "string"
+  },
+  "setting_behavior_breath_out_description": {
+    "formatted": true,
+    "forms": {
+      "other": "Fade the launcher away after inactivity, leaving only your wallpaper. Tap anywhere to restore it. Works in every launcher mode; off by default."
+    },
+    "type": "string"
+  },
+  "setting_behavior_breath_out_label": {
+    "formatted": true,
+    "forms": {
+      "other": "Breath out"
+    },
+    "type": "string"
+  },
+  "setting_behavior_breath_out_seconds_description": {
+    "formatted": true,
+    "forms": {
+      "other": "Idle timeout in seconds before the launcher fades away when Breath out is enabled. Default: 900 seconds. Use a positive number."
+    },
+    "type": "string"
+  },
+  "setting_behavior_breath_out_seconds_label": {
+    "formatted": true,
+    "forms": {
+      "other": "Breath out timeout (seconds)"
     },
     "type": "string"
   },
@@ -13755,112 +14112,112 @@
   "setting_theme_ansi_black_description": {
     "formatted": false,
     "forms": {
-      "other": "Termux pane color for black ANSI text. AUTO uses the built-in default."
+      "other": "Termux pane color for black ANSI text and backgrounds. Explicit truecolor is retained. AUTO uses the built-in default."
     },
     "type": "string"
   },
   "setting_theme_ansi_blue_description": {
     "formatted": false,
     "forms": {
-      "other": "Termux pane color for blue ANSI text. AUTO blends terminal_window_background_color with output_text_color."
+      "other": "Termux pane color for blue ANSI text and backgrounds. Explicit truecolor is retained. AUTO blends terminal_window_background_color with output_text_color."
     },
     "type": "string"
   },
   "setting_theme_ansi_bright_black_description": {
     "formatted": false,
     "forms": {
-      "other": "Termux pane color for bright black ANSI text. AUTO follows muted_text_color."
+      "other": "Termux pane color for bright black ANSI text and backgrounds. Explicit truecolor is retained. AUTO follows muted_text_color."
     },
     "type": "string"
   },
   "setting_theme_ansi_bright_blue_description": {
     "formatted": false,
     "forms": {
-      "other": "Termux pane color for bright blue ANSI text. AUTO blends output_text_color with accent_color."
+      "other": "Termux pane color for bright blue ANSI text and backgrounds. Explicit truecolor is retained. AUTO blends output_text_color with accent_color."
     },
     "type": "string"
   },
   "setting_theme_ansi_bright_cyan_description": {
     "formatted": false,
     "forms": {
-      "other": "Termux pane color for bright cyan ANSI text. AUTO blends accent_color with output_text_color."
+      "other": "Termux pane color for bright cyan ANSI text and backgrounds. Explicit truecolor is retained. AUTO blends accent_color with output_text_color."
     },
     "type": "string"
   },
   "setting_theme_ansi_bright_green_description": {
     "formatted": false,
     "forms": {
-      "other": "Termux pane color for bright green ANSI text. AUTO blends accent_color with output_text_color."
+      "other": "Termux pane color for bright green ANSI text and backgrounds. Explicit truecolor is retained. AUTO blends accent_color with output_text_color."
     },
     "type": "string"
   },
   "setting_theme_ansi_bright_magenta_description": {
     "formatted": false,
     "forms": {
-      "other": "Termux pane color for bright magenta ANSI text. AUTO uses the built-in default."
+      "other": "Termux pane color for bright magenta ANSI text and backgrounds. Explicit truecolor is retained. AUTO uses the built-in default."
     },
     "type": "string"
   },
   "setting_theme_ansi_bright_red_description": {
     "formatted": false,
     "forms": {
-      "other": "Termux pane color for bright red ANSI text. AUTO uses the built-in default."
+      "other": "Termux pane color for bright red ANSI text and backgrounds. Explicit truecolor is retained. AUTO uses the built-in default."
     },
     "type": "string"
   },
   "setting_theme_ansi_bright_white_description": {
     "formatted": false,
     "forms": {
-      "other": "Termux pane color for bright white ANSI text. AUTO follows output_text_color."
+      "other": "Termux pane color for bright white ANSI text and backgrounds. Explicit truecolor is retained. AUTO follows output_text_color."
     },
     "type": "string"
   },
   "setting_theme_ansi_bright_yellow_description": {
     "formatted": false,
     "forms": {
-      "other": "Termux pane color for bright yellow ANSI text. AUTO blends warning_text_color with output_text_color."
+      "other": "Termux pane color for bright yellow ANSI text and backgrounds. Explicit truecolor is retained. AUTO blends warning_text_color with output_text_color."
     },
     "type": "string"
   },
   "setting_theme_ansi_cyan_description": {
     "formatted": false,
     "forms": {
-      "other": "Termux pane color for cyan ANSI text. AUTO blends accent_color with output_text_color."
+      "other": "Termux pane color for cyan ANSI text and backgrounds. Explicit truecolor is retained. AUTO blends accent_color with output_text_color."
     },
     "type": "string"
   },
   "setting_theme_ansi_green_description": {
     "formatted": false,
     "forms": {
-      "other": "Termux pane color for green ANSI text. AUTO blends terminal_window_background_color with accent_color."
+      "other": "Termux pane color for green ANSI text and backgrounds. Explicit truecolor is retained. AUTO blends terminal_window_background_color with accent_color."
     },
     "type": "string"
   },
   "setting_theme_ansi_magenta_description": {
     "formatted": false,
     "forms": {
-      "other": "Termux pane color for magenta ANSI text. AUTO uses the built-in default."
+      "other": "Termux pane color for magenta ANSI text and backgrounds. Explicit truecolor is retained. AUTO uses the built-in default."
     },
     "type": "string"
   },
   "setting_theme_ansi_red_description": {
     "formatted": false,
     "forms": {
-      "other": "Termux pane color for red ANSI text. AUTO uses the built-in default."
+      "other": "Termux pane color for red ANSI text and backgrounds. Explicit truecolor is retained. AUTO uses the built-in default."
     },
     "type": "string"
   },
   "setting_theme_ansi_white_description": {
     "formatted": false,
     "forms": {
-      "other": "Termux pane color for white ANSI text. AUTO follows output_text_color."
+      "other": "Termux pane color for white ANSI text and backgrounds. Explicit truecolor is retained. AUTO follows output_text_color."
     },
     "type": "string"
   },
   "setting_theme_ansi_yellow_description": {
     "formatted": false,
     "forms": {
-      "other": "Termux pane color for yellow ANSI text. AUTO follows warning_text_color."
+      "other": "Termux pane color for yellow ANSI text and backgrounds. Explicit truecolor is retained. AUTO follows warning_text_color."
     },
     "type": "string"
   },
@@ -15225,7 +15582,7 @@
   "setting_theme_workspace_control_text_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Text color for workspace controls, including the calculator. AUTO follows workspace_panel_text_color."
+      "other": "Shared text color for calculator keys and mode tabs, offline help keys and window handles, and embedded Termux controls. AUTO follows workspace_panel_text_color."
     },
     "type": "string"
   },
@@ -15246,7 +15603,7 @@
   "setting_theme_workspace_header_text_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Text color for workspace title bars, including the calculator and shared Notes theme. AUTO follows workspace_panel_text_color."
+      "other": "Header text color exported to the shared Notes theme. Calculator, offline help and embedded Termux title labels use workspace_panel_text_color. AUTO follows workspace_panel_text_color."
     },
     "type": "string"
   },
@@ -15260,7 +15617,7 @@
   "setting_theme_workspace_input_text_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Text color for input fields in workspace panels, including the calculator. AUTO follows input_text_color."
+      "other": "Text color for embedded Termux input and input text exported to the shared Notes theme. Calculator and offline help prompts use workspace_panel_text_color. AUTO follows input_text_color."
     },
     "type": "string"
   },
@@ -15274,7 +15631,7 @@
   "setting_theme_workspace_output_text_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Text color for workspace output. AUTO follows workspace_panel_text_color."
+      "other": "Base color for the alternate Termux ANSI span and cursor renderer and output text exported to the shared Notes theme. The embedded Termux grid, calculator and offline help use workspace_panel_text_color. Explicit ANSI colors are retained. AUTO follows workspace_panel_text_color."
     },
     "type": "string"
   },
@@ -15295,7 +15652,7 @@
   "setting_theme_workspace_panel_text_color_description": {
     "formatted": false,
     "forms": {
-      "other": "Text color for the main panel in workspace panels, including the calculator. AUTO follows output_text_color."
+      "other": "Shared text color for calculator and offline help bodies, prompts and title bars, and default embedded Termux grid text and panel labels. Explicit ANSI colors are retained. AUTO follows output_text_color."
     },
     "type": "string"
   },
@@ -23614,6 +23971,188 @@
     "formatted": true,
     "forms": {
       "other": "Snapshot · refresh for updates"
+    },
+    "type": "string"
+  },
+  "workspace_choose_window": {
+    "formatted": true,
+    "forms": {
+      "other": "Choose window"
+    },
+    "type": "string"
+  },
+  "workspace_empty": {
+    "formatted": true,
+    "forms": {
+      "other": "No shell windows · add a new shell"
+    },
+    "type": "string"
+  },
+  "workspace_focused_tile": {
+    "formatted": true,
+    "forms": {
+      "other": "Tile %1$d, focused"
+    },
+    "type": "string"
+  },
+  "workspace_helper_update_required": {
+    "formatted": true,
+    "forms": {
+      "other": "Update the Termux retui helper to 0.4.1 for workspace pages and shell exit detection. Existing windows are unchanged."
+    },
+    "type": "string"
+  },
+  "workspace_home": {
+    "formatted": true,
+    "forms": {
+      "other": "Home"
+    },
+    "type": "string"
+  },
+  "workspace_ime": {
+    "formatted": true,
+    "forms": {
+      "other": "Keyboard"
+    },
+    "type": "string"
+  },
+  "workspace_layout": {
+    "formatted": true,
+    "forms": {
+      "other": "Workspace layout"
+    },
+    "type": "string"
+  },
+  "workspace_layout_left_right": {
+    "formatted": true,
+    "forms": {
+      "other": "Left-right"
+    },
+    "type": "string"
+  },
+  "workspace_layout_single": {
+    "formatted": true,
+    "forms": {
+      "other": "Single"
+    },
+    "type": "string"
+  },
+  "workspace_layout_top_bottom": {
+    "formatted": true,
+    "forms": {
+      "other": "Top-bottom"
+    },
+    "type": "string"
+  },
+  "workspace_new": {
+    "formatted": true,
+    "forms": {
+      "other": "New window"
+    },
+    "type": "string"
+  },
+  "workspace_new_page": {
+    "formatted": true,
+    "forms": {
+      "other": "New single page (keep this page)"
+    },
+    "type": "string"
+  },
+  "workspace_new_shell": {
+    "formatted": true,
+    "forms": {
+      "other": "New shell"
+    },
+    "type": "string"
+  },
+  "workspace_page_next": {
+    "formatted": true,
+    "forms": {
+      "other": "Next workspace page"
+    },
+    "type": "string"
+  },
+  "workspace_page_position": {
+    "formatted": true,
+    "forms": {
+      "other": "Page %1$d / %2$d · swipe here"
+    },
+    "type": "string"
+  },
+  "workspace_page_previous": {
+    "formatted": true,
+    "forms": {
+      "other": "Previous workspace page"
+    },
+    "type": "string"
+  },
+  "workspace_place_shell": {
+    "formatted": true,
+    "forms": {
+      "other": "Place new shell window"
+    },
+    "type": "string"
+  },
+  "workspace_replace_bottom": {
+    "formatted": true,
+    "forms": {
+      "other": "Replace bottom tile (keep previous shell)"
+    },
+    "type": "string"
+  },
+  "workspace_replace_focused": {
+    "formatted": true,
+    "forms": {
+      "other": "Replace focused tile (keep previous shell)"
+    },
+    "type": "string"
+  },
+  "workspace_replace_left": {
+    "formatted": true,
+    "forms": {
+      "other": "Replace left tile (keep previous shell)"
+    },
+    "type": "string"
+  },
+  "workspace_replace_right": {
+    "formatted": true,
+    "forms": {
+      "other": "Replace right tile (keep previous shell)"
+    },
+    "type": "string"
+  },
+  "workspace_replace_top": {
+    "formatted": true,
+    "forms": {
+      "other": "Replace top tile (keep previous shell)"
+    },
+    "type": "string"
+  },
+  "workspace_shell_exited": {
+    "formatted": true,
+    "forms": {
+      "other": "Shell window exited"
+    },
+    "type": "string"
+  },
+  "workspace_split_left_right": {
+    "formatted": true,
+    "forms": {
+      "other": "Split left-right"
+    },
+    "type": "string"
+  },
+  "workspace_split_top_bottom": {
+    "formatted": true,
+    "forms": {
+      "other": "Split top-bottom"
+    },
+    "type": "string"
+  },
+  "workspace_unfocused_tile": {
+    "formatted": true,
+    "forms": {
+      "other": "Tile %1$d, tap to focus"
     },
     "type": "string"
   }

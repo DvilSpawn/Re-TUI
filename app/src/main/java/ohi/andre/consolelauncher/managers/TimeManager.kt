@@ -13,6 +13,7 @@ import ohi.andre.consolelauncher.managers.settings.AppearanceSettings
 import ohi.andre.consolelauncher.managers.xml.options.Behavior
 import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.tuils.Tuils
+import ohi.andre.consolelauncher.tuils.ThemeColorSpan
 import java.text.SimpleDateFormat
 import java.util.ArrayList
 import java.util.Calendar
@@ -52,7 +53,7 @@ class TimeManager(context: Context) {
             try {
                 currentFormat = Tuils.patternNewline.matcher(currentFormat).replaceAll(Tuils.NEWLINE)
 
-                var color = XMLPrefsManager.getColor(Theme.time_text_color)
+                var color: Int? = null
                 val m: Matcher = COLOR_PATTERN.matcher(currentFormat)
                 if (m.find()) {
                     color = Color.parseColor(m.group())
@@ -70,7 +71,7 @@ class TimeManager(context: Context) {
         return list
     }
 
-    private fun buildEntry(color: Int, rawFormat: String): FormatEntry {
+    private fun buildEntry(color: Int?, rawFormat: String): FormatEntry {
         val segments: MutableList<FormatSegment?> = ArrayList<FormatSegment?>()
         val matcher: Matcher = SIZE_PATTERN.matcher(rawFormat)
         var cursor = 0
@@ -322,9 +323,9 @@ class TimeManager(context: Context) {
             return Tuils.EMPTYSTRING
         }
 
-        val clr = if (color != TerminalManager.NO_COLOR) color else entry.color
+        val clr = if (color != TerminalManager.NO_COLOR) color else entry.color ?: XMLPrefsManager.getColor(Theme.time_text_color)
         builder.setSpan(
-            ForegroundColorSpan(clr),
+            if (color == TerminalManager.NO_COLOR && entry.color == null) ThemeColorSpan(Theme.time_text_color) else ForegroundColorSpan(clr),
             0,
             builder.length,
             Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
@@ -339,7 +340,7 @@ class TimeManager(context: Context) {
         instance = null
     }
 
-    private class FormatEntry(val color: Int, val segments: MutableList<FormatSegment?>)
+    private class FormatEntry(val color: Int?, val segments: MutableList<FormatSegment?>)
 
     private class FormatSegment(
         val formatter: SimpleDateFormat?,

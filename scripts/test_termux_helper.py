@@ -26,7 +26,7 @@ class HelperTransportTest(unittest.TestCase):
         assert tmux_binary is not None
         tmux.write_text('#!/bin/sh\nexec ' + tmux_binary + ' -L ' + self.server + ' "$@"\n')
         tmux.chmod(0o755)
-        self.env = dict(os.environ, PREFIX=str(self.home), HOME=str(self.home), RETUI_SESSION='retui_fixture', RETUI_SOCKET_TOKEN='fixture-token', RETUI_COLS='80', RETUI_ROWS='24')
+        self.env = dict(os.environ, PREFIX=str(self.home), HOME=str(self.home), HISTFILE='/dev/null', RETUI_SESSION='retui_fixture', RETUI_SOCKET_TOKEN='fixture-token', RETUI_COLS='80', RETUI_ROWS='24')
 
     def tearDown(self):
         subprocess.run([str(self.bin / 'tmux'), 'kill-server'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
@@ -34,6 +34,22 @@ class HelperTransportTest(unittest.TestCase):
 
     def helper(self, action, **kwargs):
         return subprocess.run(['sh', str(HELPER), 'bridge', action], env=self.env, capture_output=True, text=True, timeout=10, **kwargs)
+
+    def test_missing_target_emits_gone_without_recreating_last_session(self):
+        self.assertEqual(self.helper('capture').returncode, 0)
+        target = subprocess.check_output([str(self.bin / 'tmux'), 'display-message', '-p', '-t', 'retui_fixture', '#{window_id}'], text=True).strip()
+        subprocess.run([str(self.bin / 'tmux'), 'kill-session', '-t', 'retui_fixture'], check=True)
+        encoded = base64.b64encode(target.encode()).decode()
+        result = self.helper('socket-client', input=f'HELLO fixture-token 80 24 CAPTURE {encoded} NO_CREATE\nBYE\n')
+        self.assertIn('__RETUI_TARGET_GONE__ ' + target, result.stdout)
+        self.assertNotEqual(subprocess.run([str(self.bin / 'tmux'), 'has-session', '-t', 'retui_fixture'], capture_output=True).returncode, 0)
+
+    def test_explicit_new_after_empty_hello_creates_exactly_one_window(self):
+        result = self.helper('socket-client', input='HELLO fixture-token 80 24 STREAM - NO_CREATE\nNEW 80 24 b25l -\nBYE\n')
+        self.assertEqual(0, result.returncode, result.stderr)
+        self.assertIn('__RETUI_TARGET_GONE__ -', result.stdout)
+        windows = subprocess.check_output([str(self.bin / 'tmux'), 'list-windows', '-t', 'retui_fixture', '-F', '#W'], text=True).splitlines()
+        self.assertEqual(['one'], windows)
 
     def test_capabilities_are_read_only(self):
         result = self.helper('capabilities')
@@ -75,9 +91,10 @@ class HelperTransportTest(unittest.TestCase):
         payload = base64.b64encode(name.encode()).decode()
         accepted = self.helper('socket-client', input=f'HELLO fixture-token 80 24 CAPTURE\nNEW 80 24 {payload} -\nNEW 80 24 b3RoZXI= -\nSELECT 80 24 {payload}\nBYE\n')
         self.assertEqual(accepted.returncode, 0, accepted.stderr)
-        selected = subprocess.check_output([str(self.bin / 'tmux'), 'display-message', '-p', '-t', 'retui_fixture', '#W'], text=True).strip()
-        self.assertEqual(selected, name)
-        self.assertIn('\t1:editor with spaces*\t', accepted.stdout)
+        self.assertIn('__RETUI_WINDOW__ 1:editor with spaces\n', accepted.stdout)
+        self.assertIn(':1:editor with spaces\t', accepted.stdout)
+        selected = subprocess.check_output([str(self.bin / 'tmux'), 'display-message', '-p', '-t', 'retui_fixture', '#I'], text=True).strip()
+        self.assertEqual(selected, '0', 'Client selection must not change session-global selection')
 
     def test_socket_auth_and_session_survive_disconnect(self):
         rejected = self.helper('socket-client', input='HELLO wrong 80 24 CAPTURE\n')

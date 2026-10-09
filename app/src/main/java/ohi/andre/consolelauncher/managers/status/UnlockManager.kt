@@ -46,6 +46,7 @@ class UnlockManager(
     private val whenPattern = "%w"
 
     private var lockReceiver: BroadcastReceiver? = null
+    private var unlockTransition: UnlockTransition? = null
 
     private fun init() {
         unlockTimes = preferences.getInt(UNLOCK_KEY, 0)
@@ -92,8 +93,12 @@ class UnlockManager(
     public override fun stop() {
         if (!running) return
         running = false
-        unregisterLockReceiver()
         handler.removeCallbacks(unlockTimeRunnable)
+    }
+
+    fun dispose() {
+        stop()
+        unregisterLockReceiver()
     }
 
     override fun update() {
@@ -104,6 +109,9 @@ class UnlockManager(
 
     private fun registerLockReceiver() {
         if (lockReceiver != null) return
+        val keyguard = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+        val power = context.getSystemService(Context.POWER_SERVICE) as android.os.PowerManager
+        unlockTransition = UnlockTransition(keyguard.isKeyguardLocked || !power.isInteractive)
         val theFilter = IntentFilter()
         theFilter.addAction(Intent.ACTION_SCREEN_ON)
         theFilter.addAction(Intent.ACTION_SCREEN_OFF)
@@ -111,14 +119,12 @@ class UnlockManager(
 
         lockReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
-                val strAction = intent.getAction()
-                val myKM = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
-                if (Intent.ACTION_USER_PRESENT == strAction || Intent.ACTION_SCREEN_OFF == strAction || Intent.ACTION_SCREEN_ON == strAction) {
-                    if (myKM.inKeyguardRestrictedInputMode()) {
-                        // onLock handled by UIManager if needed for clearing terminal
-                    } else {
-                        onUnlock()
-                    }
+                val action = intent.action
+                if (action != Intent.ACTION_SCREEN_OFF && action != Intent.ACTION_SCREEN_ON &&
+                    action != Intent.ACTION_USER_PRESENT) return
+                val keyguard = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+                if (unlockTransition!!.onScreenEvent(action == Intent.ACTION_SCREEN_OFF, keyguard.isKeyguardLocked)) {
+                    onUnlock()
                 }
             }
         }
@@ -126,7 +132,8 @@ class UnlockManager(
             context.getApplicationContext(),
             lockReceiver,
             theFilter,
-            ContextCompat.RECEIVER_NOT_EXPORTED
+            // All three actions are protected system broadcasts; accept privileged SystemUI senders.
+            ContextCompat.RECEIVER_EXPORTED
         )
     }
 
@@ -138,50 +145,49 @@ class UnlockManager(
     }
 
     private fun onUnlock() {
-        if (System.currentTimeMillis() - lastUnlockTime < 1000 || lastUnlocks == null) return
+        resetCycleIfNeeded()
         lastUnlockTime = System.currentTimeMillis()
 
         unlockTimes++
-        System.arraycopy(lastUnlocks, 0, lastUnlocks, 1, lastUnlocks!!.size - 1)
-        lastUnlocks!![0] = lastUnlockTime
+        lastUnlocks?.takeIf { it.isNotEmpty() }?.let {
+            System.arraycopy(it, 0, it, 1, it.size - 1)
+            it[0] = lastUnlockTime
+        }
 
         preferences.edit().putInt(UNLOCK_KEY, unlockTimes).apply()
-        invalidateUnlockText()
+        if (running) invalidateUnlockText()
     }
 
     private val unlockTimeRunnable: Runnable = object : Runnable {
         override fun run() {
-            var delay = nextUnlockCycleRestart - System.currentTimeMillis()
-            if (delay <= 0) {
-                unlockTimes = 0
-                if (lastUnlocks != null) {
-                    for (c in lastUnlocks!!.indices) lastUnlocks!![c] = -1
-                }
-
-                val now = Calendar.getInstance()
-                val hour = now.get(Calendar.HOUR_OF_DAY)
-                val minute = now.get(Calendar.MINUTE)
-                if (unlockHour < hour || (unlockHour == hour && unlockMinute <= minute)) {
-                    now.add(Calendar.DAY_OF_YEAR, 1)
-                }
-                now.set(Calendar.HOUR_OF_DAY, unlockHour)
-                now.set(Calendar.MINUTE, unlockMinute)
-                now.set(Calendar.SECOND, 0)
-
-                nextUnlockCycleRestart = now.getTimeInMillis()
-                preferences.edit()
-                    .putLong(NEXT_UNLOCK_CYCLE_RESTART, nextUnlockCycleRestart)
-                    .putInt(UNLOCK_KEY, 0)
-                    .apply()
-
-                delay = nextUnlockCycleRestart - System.currentTimeMillis()
-                if (delay < 0) delay = 0
-            }
-
+            resetCycleIfNeeded()
+            val delay = nextUnlockCycleRestart - System.currentTimeMillis()
             invalidateUnlockText()
-            delay = min(delay, (cycleDuration / 24).toLong())
-            handler.postDelayed(this, delay)
+            handler.postDelayed(this, min(delay.coerceAtLeast(0), (cycleDuration / 24).toLong()))
         }
+    }
+
+    private fun resetCycleIfNeeded() {
+        if (nextUnlockCycleRestart > System.currentTimeMillis()) return
+        unlockTimes = 0
+        lastUnlocks?.fill(-1)
+
+        val now = Calendar.getInstance()
+        val hour = now.get(Calendar.HOUR_OF_DAY)
+        val minute = now.get(Calendar.MINUTE)
+        if (unlockHour < hour || (unlockHour == hour && unlockMinute <= minute)) {
+            now.add(Calendar.DAY_OF_YEAR, 1)
+        }
+        now.set(Calendar.HOUR_OF_DAY, unlockHour)
+        now.set(Calendar.MINUTE, unlockMinute)
+        now.set(Calendar.SECOND, 0)
+        now.set(Calendar.MILLISECOND, 0)
+
+        nextUnlockCycleRestart = now.timeInMillis
+        preferences.edit()
+            .putLong(NEXT_UNLOCK_CYCLE_RESTART, nextUnlockCycleRestart)
+            .putInt(UNLOCK_KEY, 0)
+            .apply()
     }
 
     init {

@@ -31,6 +31,8 @@ abstract class ParamCommand : CommandAbstraction {
         return param.exec(pack)
     }
 
+    open fun emptyParam(pack: MainPack): Param? = null
+
     open fun getParam(pack: MainPack, param: String): SimpleEntry<Boolean, Param?> {
         val p = paramForString(pack, param)
         if (p == null && defaultParamReference() != null) {

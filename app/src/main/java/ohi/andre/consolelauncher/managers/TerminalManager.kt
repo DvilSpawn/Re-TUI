@@ -41,6 +41,7 @@ import ohi.andre.consolelauncher.tuils.LongClickMovementMethod
 import ohi.andre.consolelauncher.UIManager
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import android.content.Intent
+import ohi.andre.consolelauncher.tuils.ThemeColorSpan
 
 /*Copyright Francesco Andreuzzi
 
@@ -73,7 +74,10 @@ class TerminalManager(
         val output: CharSequence,
         val commands: List<String>,
         val historyPosition: Int,
-        val root: Boolean
+        val root: Boolean,
+        val selectionStart: Int = input.length,
+        val selectionEnd: Int = selectionStart,
+        val scrollY: Int = 0
     )
 
     private val SCROLL_DELAY = 200
@@ -125,8 +129,7 @@ class TerminalManager(
 
     private val inputFormat: String?
     private val outputFormat: String?
-    private val inputColor: Int
-    private val outputColor: Int
+
 
     private val clickCommands: Boolean
     private val longClickCommands: Boolean
@@ -225,15 +228,11 @@ class TerminalManager(
     }
 
     fun setOutput(color: Int, output: CharSequence?) {
-        var color = color
         if (output == null || output.length == 0) return
-
-        if (color == NO_COLOR) {
-            color = XMLPrefsManager.getColor(Theme.output_text_color)
+        val si = if (color == NO_COLOR) ThemeColorSpan.text(output, Theme.output_text_color)
+        else SpannableString(output).apply {
+            setSpan(ForegroundColorSpan(color), 0, output.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
-
-        val si = SpannableString(output)
-        si.setSpan(ForegroundColorSpan(color), 0, output.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
 
         val s = TextUtils.concat(Tuils.NEWLINE, si)
         writeToView(s)
@@ -287,8 +286,7 @@ class TerminalManager(
         inputFormat = XMLPrefsManager.get(Behavior.input_format)
         outputFormat = XMLPrefsManager.get(Behavior.output_format)
 
-        inputColor = XMLPrefsManager.getColor(Theme.input_text_color)
-        outputColor = XMLPrefsManager.getColor(Theme.output_text_color)
+
 
         prefix = XMLPrefsManager.get(Ui.input_prefix)
         suPrefix = XMLPrefsManager.get(Ui.input_root_prefix)
@@ -448,7 +446,7 @@ class TerminalManager(
 
                 val su = t.toString().startsWith("su ") || suMode
 
-                val si = Tuils.span(inputFormat, inputColor) ?: SpannableString(inputFormat)
+                val si = ThemeColorSpan.text(inputFormat, Theme.input_text_color)
                 if (clickCommands || longClickCommands) si.setSpan(
                     LongClickableSpan(
                         if (clickCommands) t.toString() else null,
@@ -480,9 +478,7 @@ class TerminalManager(
             }
 
             CATEGORY_OUTPUT -> {
-                t = t.toString()
-
-                val so = Tuils.span(outputFormat, outputColor)
+                val so = ThemeColorSpan.text(outputFormat, Theme.output_text_color)
 
                 s = TextUtils.replace(
                     so,
@@ -600,17 +596,22 @@ class TerminalManager(
         SpannableString(mTerminalView?.text ?: Tuils.EMPTYSTRING),
         cmdList.toList(),
         howBack,
-        suMode
+        suMode,
+        mInputView?.selectionStart ?: input.length,
+        mInputView?.selectionEnd ?: input.length,
+        mScrollView.scrollY
     )
 
     fun restoreState(state: State) {
-        mTerminalView?.text = state.output
+        mTerminalView?.text = ThemeColorSpan.refresh(state.output)
         input = state.input
+        mInputView?.setSelection(state.selectionStart.coerceIn(0, state.input.length), state.selectionEnd.coerceIn(0, state.input.length))
         cmdList.clear()
         cmdList.addAll(state.commands)
         howBack = state.historyPosition.coerceIn(-1, cmdList.size)
         if (state.root) onRoot() else onStandard()
-        scrollToEnd()
+        mScrollView.removeCallbacks(mScrollRunnable)
+        mScrollView.post { mScrollView.scrollTo(0, state.scrollY) }
     }
 
     fun onRoot() {

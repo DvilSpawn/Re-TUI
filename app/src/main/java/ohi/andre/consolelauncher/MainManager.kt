@@ -469,7 +469,7 @@ class MainManager(private val mContext: LauncherActivity) {
 
             val text = SpannableString(a)
             text.setSpan(
-                ForegroundColorSpan(outputColor),
+                ohi.andre.consolelauncher.tuils.ThemeColorSpan(Theme.output_text_color),
                 0,
                 text.length,
                 Spanned.SPAN_EXCLUSIVE_EXCLUSIVE

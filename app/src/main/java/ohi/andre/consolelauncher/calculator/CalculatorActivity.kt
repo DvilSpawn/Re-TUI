@@ -2,8 +2,6 @@ package ohi.andre.consolelauncher.calculator
 
 import android.content.Context
 import android.content.Intent
-import android.content.res.ColorStateList
-import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -20,7 +18,6 @@ import ohi.andre.consolelauncher.managers.settings.LauncherSettings
 import ohi.andre.consolelauncher.managers.settings.ThemeColorResolver
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.options.Behavior
-import ohi.andre.consolelauncher.managers.xml.options.Suggestions
 import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.managers.xml.options.Ui
 import ohi.andre.consolelauncher.tuils.*
@@ -41,91 +38,36 @@ class CalculatorActivity : LocalizedActivity() {
     private var request: CalculatorEngine.Request? = null
     private var answer: String? = null
     private var history = ""
-    private var helpTopic = -1
-    private var calculatorDraft = ""
-    private var calculatorCursor = 0
-    private var calculatorSelectionEnd = 0
-    private lateinit var helpTab: ImageButton
-    private lateinit var mainTab: ImageButton
+    private lateinit var helpTab: TextView
+    private lateinit var mainTab: TextView
     private lateinit var root: View
+    private lateinit var windowPanel: ohi.andre.consolelauncher.help.HelpWindowPanel
 
     private fun selectHelp(help: Boolean) {
-        if (help && helpTopic < 0) {
-            calculatorDraft = input.text.toString()
-            calculatorCursor = input.selectionStart
-            calculatorSelectionEnd = input.selectionEnd
-            helpTopic = 0
-            input.setText("")
-        } else if (!help && helpTopic >= 0) {
-            helpTopic = -1
-            input.setText(calculatorDraft)
-            input.setSelection(calculatorCursor.coerceIn(0, input.length()), calculatorSelectionEnd.coerceIn(0, input.length()))
+        if (help) {
+            ohi.andre.consolelauncher.help.OfflineHelpActivity.open(this, "calculator-help")
+            return
         }
         renderTerminal()
         val textColor = ThemeColorResolver.color(Theme.workspace_panel_text_color)
         listOf(helpTab to help, mainTab to !help).forEach { (tab, selected) ->
             tab.isSelected = selected
-            tab.imageTintList = ColorStateList.valueOf(textColor)
-            tab.imageAlpha = if (selected) 255 else 96
-            tab.background = GradientDrawable().apply {
-                setColor(ThemeColorResolver.color(if (selected) Theme.workspace_panel_background_color else Theme.workspace_header_background_color))
+            tab.setTextColor(textColor)
+            tab.background = TerminalBorderRuntime.tabDrawable(this,
+                ThemeColorResolver.color(Theme.workspace_header_background_color), FrameTarget.OVERLAYS).let {
+                if (tab === helpTab) android.graphics.drawable.InsetDrawable(it, 0, 0, 0, Tuils.dpToPx(this, 28)) else it
             }
+            tab.setPadding(Tuils.dpToPx(this, 10), 0, Tuils.dpToPx(this, 10), 0)
         }
         TerminalBorderRuntime.bind(root.findViewById(R.id.calculator_window_border), if (help) helpTab else mainTab)
+        TerminalPaneIcon.apply(helpTab, R.drawable.ic_material_help_24)
     }
 
     private fun renderTerminal() {
-        transcript.text = when (helpTopic) {
-            -1 -> history
-            0 -> getString(R.string.calculator_help_menu)
-            else -> {
-                val topics = listOf(R.string.calculator_help_expressions, R.string.calculator_help_functions,
-                    R.string.calculator_help_conversions, R.string.calculator_help_ans, R.string.calculator_help_editing)
-                getString(topics[helpTopic - 1]) + "\n\n" + getString(R.string.calculator_help_menu_choice) +
-                    (if (helpTopic > 1) "\n" + getString(R.string.calculator_help_previous) else "") +
-                    (if (helpTopic < topics.size) "\n" + getString(R.string.calculator_help_next) else "") +
-                    "\n" + getString(R.string.calculator_help_calculator)
-            }
-        }
-        root.findViewById<TextView>(R.id.calculator_prompt).text = if (helpTopic >= 0) "help> " else "calc> "
-        if (helpTopic >= 0) {
-            val text = android.text.SpannableString(transcript.text)
-            val navigation = listOf(R.string.calculator_help_menu_choice, R.string.calculator_help_previous,
-                R.string.calculator_help_next, R.string.calculator_help_calculator).map { getString(it) }
-            Regex("(?m)^[0-5] [^\\n]+").findAll(text)
-                .filter { helpTopic == 0 || it.value in navigation }.forEach { match ->
-                val choice = match.value.take(1)
-                text.setSpan(object : android.text.style.ClickableSpan() {
-                    override fun onClick(widget: View) = navigateHelp(choice)
-                    override fun updateDrawState(ds: android.text.TextPaint) { ds.isUnderlineText = false }
-                }, match.range.first, match.range.last + 1, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-            }
-            transcript.text = text
-            transcript.movementMethod = android.text.method.LinkMovementMethod.getInstance()
-        } else transcript.movementMethod = android.text.method.ArrowKeyMovementMethod.getInstance()
-        scroll.post {
-            if (helpTopic < 0) scroll.fullScroll(View.FOCUS_DOWN) else scroll.scrollTo(0, 0)
-        }
-    }
-
-    private fun navigateHelp(choice: String) {
-        when {
-            choice == "0" -> { selectHelp(false); return }
-            helpTopic == 0 && choice.toIntOrNull() in 1..5 -> helpTopic = choice.toInt()
-            helpTopic > 0 && choice == "1" -> helpTopic = 0
-            helpTopic > 1 && choice == "2" -> helpTopic--
-            helpTopic in 1..4 && choice == "3" -> helpTopic++
-        }
-        input.setText("")
-        renderTerminal()
-        scroll.post { scroll.scrollTo(0, 0) }
-    }
-
-    @Deprecated("Uses the terminal help hierarchy")
-    override fun onBackPressed() {
-        if (helpTopic > 0) navigateHelp("1")
-        else if (helpTopic == 0) selectHelp(false)
-        else super.onBackPressed()
+        transcript.text = history.trimEnd()
+        transcript.movementMethod = android.text.method.ArrowKeyMovementMethod.getInstance()
+        root.findViewById<TextView>(R.id.calculator_prompt).text = "calc> "
+        scroll.post { scroll.scrollTo(0, scroll.getChildAt(0).height) }
     }
 
     override fun onCreate(state: Bundle?) {
@@ -134,17 +76,26 @@ class CalculatorActivity : LocalizedActivity() {
         Tuils.init(this); XMLPrefsManager.loadCommons(this); LauncherSystemUi.applyFullscreen(this)
         if (CalculatorEngine.supported()) LauncherSettings.set(this, Behavior.qalculate, "true")
         androidx.core.view.WindowCompat.setDecorFitsSystemWindows(window, false)
-        val screen = FrameLayout(this)
-        val host = TuixtLayout.addFoldAwareHost(this, screen, ViewGroup.LayoutParams.MATCH_PARENT)
+        val screen = FrameLayout(this).apply { isClickable = true }
+        val safeHost = TuixtLayout.addFoldAwareHost(this, screen, ViewGroup.LayoutParams.MATCH_PARENT)
+        val host = FrameLayout(this)
+        safeHost.addView(host, ViewGroup.LayoutParams(-1, -1))
         root = layoutInflater.inflate(R.layout.calculator_surface, host, false)
-        host.addView(root)
+        windowPanel = ohi.andre.consolelauncher.help.HelpWindowPanel(host, root, state,
+            statePrefix = "calculator", header = root.findViewById(R.id.calculator_main_tab),
+            row = root.findViewById(R.id.calculator_header),
+            maximizeLabel = R.string.calculator_maximize, windowedLabel = R.string.calculator_windowed)
+        root.setBackgroundColor(android.graphics.Color.TRANSPARENT)
         input = root.findViewById(R.id.calculator_expression)
         transcript = root.findViewById(R.id.calculator_result)
         scroll = root.findViewById(R.id.calculator_transcript_scroll)
         submit = root.findViewById(R.id.calculator_equals)
         cancelButton = root.findViewById(R.id.calculator_cancel_request)
+        scroll.addOnLayoutChangeListener { _, _, top, _, bottom, _, oldTop, _, oldBottom ->
+            if (bottom - top != oldBottom - oldTop) scroll.post { scroll.scrollTo(0, scroll.getChildAt(0).height) }
+        }
         val symbols = root.findViewById<GridLayout>(R.id.calculator_symbols)
-        val suggestionSize = XMLPrefsManager.getInt(Suggestions.suggestions_size).toFloat()
+        val suggestionSize = LauncherFontScale.terminalTextSizeSp()
         val modes = mapOf(
             "123" to listOf("7", "8", "9", "÷", "4", "5", "6", "×", "1", "2", "3", "−", ".", "0", "⌫", "+", "(", ")", "√"),
             "ABC" to "QWERTYUIOPASDFGHJKLZXCVBNM".map(Char::toString) + listOf("_", "SPACE", "⌫"),
@@ -187,6 +138,8 @@ class CalculatorActivity : LocalizedActivity() {
                 if (!letters) return GridLayout.LayoutParams().apply {
                     width = 0
                     height = keyHeight
+                    // Text baselines must not enlarge the fixed-height key rows.
+                    rowSpec = GridLayout.spec(GridLayout.UNDEFINED, GridLayout.CENTER)
                     columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
                 }
                 val (row, column, span) = when {
@@ -201,7 +154,7 @@ class CalculatorActivity : LocalizedActivity() {
                 return GridLayout.LayoutParams().apply {
                     width = 0
                     height = keyHeight * 5 * (row + 1) / 4 - keyHeight * 5 * row / 4
-                    rowSpec = GridLayout.spec(row)
+                    rowSpec = GridLayout.spec(row, GridLayout.CENTER)
                     columnSpec = GridLayout.spec(column, span, GridLayout.FILL, span.toFloat())
                 }
             }
@@ -212,12 +165,13 @@ class CalculatorActivity : LocalizedActivity() {
                     isFocusable = false
                     minWidth = Tuils.dpToPx(this@CalculatorActivity, 48)
                     minHeight = Tuils.dpToPx(this@CalculatorActivity, 48)
-                    setPadding(8, 4, 8, 4)
+                    setPadding(0, 0, 0, 0)
+                    includeFontPadding = false
                     typeface = Tuils.getTypeface(this@CalculatorActivity)
-                    textSize = suggestionSize + 2
+                    textSize = suggestionSize
                     setTextColor(ThemeColorResolver.color(Theme.workspace_control_text_color))
-                    background = TerminalBorderRuntime.tabDrawable(this@CalculatorActivity,
-                        ThemeColorResolver.color(Theme.workspace_control_background_color), FrameTarget.OVERLAYS)
+                    background = null
+                    setTypeface(Tuils.getTypeface(this@CalculatorActivity), android.graphics.Typeface.BOLD)
                     if (label == "√") contentDescription = getString(R.string.surface_square_root_47a32)
                     if (label == "⌫") contentDescription = getString(R.string.surface_backspace_88d13)
                     setOnClickListener { insertKey(label) }
@@ -232,7 +186,7 @@ class CalculatorActivity : LocalizedActivity() {
                     }, GridLayout.LayoutParams().apply {
                         width = 0
                         height = 0
-                        rowSpec = GridLayout.spec(row)
+                        rowSpec = GridLayout.spec(row, GridLayout.CENTER)
                         columnSpec = GridLayout.spec(column, span, GridLayout.FILL, span.toFloat())
                     })
                 }
@@ -241,8 +195,7 @@ class CalculatorActivity : LocalizedActivity() {
             tabs.forEach { (tab, selected) ->
                 tab.isSelected = selected == mode
                 tab.setTextColor(if (tab.isSelected) textColor else ThemeColorResolver.withMaxAlpha(textColor, 150))
-                tab.background = TerminalBorderRuntime.tabDrawable(this,
-                    ThemeColorResolver.color(if (selected == mode) Theme.workspace_panel_background_color else Theme.workspace_header_background_color), FrameTarget.OVERLAYS)
+                tab.background = null
             }
             input.requestFocus()
         }
@@ -252,29 +205,31 @@ class CalculatorActivity : LocalizedActivity() {
                 view.typeface = Tuils.getTypeface(this)
                 view.textSize = suggestionSize
                 view.setTextColor(ThemeColorResolver.color(if (view is Button) Theme.workspace_control_text_color else Theme.workspace_panel_text_color))
-                if (view is Button) view.background = TerminalBorderRuntime.tabDrawable(this,
-                    ThemeColorResolver.color(Theme.workspace_control_background_color), FrameTarget.OVERLAYS)
+                if (view is Button) {
+                    view.background = null
+                    view.setTypeface(Tuils.getTypeface(this), android.graphics.Typeface.BOLD)
+                }
             }
             if (view is ViewGroup) for (i in 0 until view.childCount) style(view.getChildAt(i))
         }
         style(root)
         input.background = null
-        root.findViewById<View>(R.id.calculator_header).setBackgroundColor(ThemeColorResolver.color(Theme.workspace_header_background_color))
-        root.findViewById<View>(R.id.calculator_keypad_dock).setBackgroundColor(ThemeColorResolver.color(Theme.workspace_header_background_color))
-        (submit as TextView).textSize = suggestionSize + 2
+        root.findViewById<View>(R.id.calculator_header).setBackgroundColor(android.graphics.Color.TRANSPARENT)
+        root.findViewById<View>(R.id.calculator_keypad_dock).setBackgroundColor(android.graphics.Color.TRANSPARENT)
+        (submit as TextView).textSize = suggestionSize
         root.findViewById<View>(R.id.calculator_window_border).background = TerminalBorderRuntime.panelDrawable(this,
             ThemeColorResolver.color(Theme.workspace_panel_background_color), ThemeColorResolver.color(Theme.workspace_panel_border_color),
             1.5f, AppearanceSettings.outputCornerRadius(), AppearanceSettings.dashedBorders(), target = FrameTarget.OVERLAYS)
         answer = prefs.getString("terminal_ans", null)
         history = prefs.getString("terminal_transcript", null) ?: getString(R.string.calculator_terminal_help)
-        transcript.text = history
+        transcript.text = history.trimEnd()
         input.setText(prefs.getString("terminal_draft", ""))
         input.setSingleLine(true); input.setHorizontallyScrolling(true); input.ellipsize = null
         input.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
         input.showSoftInputOnFocus = false
-        input.typeface = android.graphics.Typeface.MONOSPACE
-        transcript.typeface = android.graphics.Typeface.MONOSPACE
-        root.findViewById<TextView>(R.id.calculator_prompt).typeface = android.graphics.Typeface.MONOSPACE
+        input.typeface = Tuils.getTypeface(this)
+        transcript.typeface = Tuils.getTypeface(this)
+        root.findViewById<TextView>(R.id.calculator_prompt).typeface = Tuils.getTypeface(this)
         showMode("123")
         input.imeOptions = EditorInfo.IME_ACTION_DONE or EditorInfo.IME_FLAG_NO_EXTRACT_UI
         input.setSelection(prefs.getInt("terminal_cursor", input.length()).coerceIn(0, input.length()),
@@ -289,19 +244,9 @@ class CalculatorActivity : LocalizedActivity() {
         helpTab = root.findViewById(R.id.calculator_help_tab)
         mainTab = root.findViewById(R.id.calculator_main_tab)
         helpTab.setOnClickListener { selectHelp(true) }
+        TerminalPaneIcon.apply(helpTab, R.drawable.ic_material_help_24)
         mainTab.setOnClickListener { selectHelp(false) }
         selectHelp(false)
-        if (state != null && state.getInt("help_topic", -1) >= 0) {
-            input.setText(state.getString("calculator_draft", ""))
-            input.setSelection(state.getInt("calculator_cursor", 0).coerceIn(0, input.length()),
-                state.getInt("calculator_selection_end", 0).coerceIn(0, input.length()))
-            selectHelp(true)
-            helpTopic = state.getInt("help_topic").coerceIn(0, 5)
-            input.setText(state.getString("help_draft", ""))
-            input.setSelection(state.getInt("help_cursor", 0).coerceIn(0, input.length()),
-                state.getInt("help_selection_end", 0).coerceIn(0, input.length()))
-            renderTerminal()
-        }
         androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(screen) { view, insets ->
             val bars = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars() or androidx.core.view.WindowInsetsCompat.Type.displayCutout())
             val ime = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.ime())
@@ -321,7 +266,6 @@ class CalculatorActivity : LocalizedActivity() {
         if (request != null) return
         val expression = input.text.toString().trim()
         if (expression.isEmpty()) return
-        if (helpTopic >= 0) { navigateHelp(expression); return }
         when (expression.lowercase()) {
             "exit" -> { input.setText(""); finish(); return }
             "clear" -> { history = ""; renderTerminal(); input.setText(""); persist(); return }
@@ -352,8 +296,8 @@ class CalculatorActivity : LocalizedActivity() {
     }
     private fun append(text: String) {
         history = (history.trimEnd() + "\n" + text + "\n").trimStart().takeLast(65536)
-        if (helpTopic < 0) transcript.text = history
-        scroll.post { scroll.fullScroll(View.FOCUS_DOWN) }
+        transcript.text = history.trimEnd()
+        scroll.post { scroll.scrollTo(0, scroll.getChildAt(0).height) }
     }
     private fun cancel() {
         request?.cancel(); request = null
@@ -362,23 +306,60 @@ class CalculatorActivity : LocalizedActivity() {
     }
     private fun persist() {
         prefs.edit().putString("terminal_ans", answer).putString("terminal_transcript", history)
-            .putString("terminal_draft", if (helpTopic >= 0) calculatorDraft else input.text.toString())
-            .putInt("terminal_cursor", if (helpTopic >= 0) calculatorCursor else input.selectionStart)
-            .putInt("terminal_selection_end", if (helpTopic >= 0) calculatorSelectionEnd else input.selectionEnd).apply()
+            .putString("terminal_draft", input.text.toString())
+            .putInt("terminal_cursor", input.selectionStart)
+            .putInt("terminal_selection_end", input.selectionEnd).apply()
     }
     override fun onSaveInstanceState(state: Bundle) {
-        state.putInt("help_topic", helpTopic)
-        state.putString("calculator_draft", if (helpTopic >= 0) calculatorDraft else input.text.toString())
-        state.putInt("calculator_cursor", if (helpTopic >= 0) calculatorCursor else input.selectionStart)
-        state.putInt("calculator_selection_end", if (helpTopic >= 0) calculatorSelectionEnd else input.selectionEnd)
-        if (helpTopic >= 0) {
-            state.putString("help_draft", input.text.toString())
-            state.putInt("help_cursor", input.selectionStart)
-            state.putInt("help_selection_end", input.selectionEnd)
-        }
         persist()
+        windowPanel.save(state)
         super.onSaveInstanceState(state)
     }
     override fun onPause() { persist(); super.onPause() }
+    override fun onResume() {
+        super.onResume()
+        if (!::root.isInitialized) return
+        fun refresh(view: View) {
+            if (view is TextView) {
+                view.typeface = Tuils.getTypeface(this)
+                view.textSize = LauncherFontScale.terminalTextSizeSp()
+                val role = if (view is Button) Theme.workspace_control_text_color else Theme.workspace_panel_text_color
+                val color = ThemeColorResolver.color(role)
+                view.setTextColor(if (view is Button && !view.isSelected && view.id in listOf(R.id.calculator_numbers_tab, R.id.calculator_letters_tab, R.id.calculator_functions_tab))
+                    ThemeColorResolver.withMaxAlpha(color, 150) else color)
+                if (view is Button) {
+                    view.background = null
+                    view.setTypeface(Tuils.getTypeface(this), android.graphics.Typeface.BOLD)
+                }
+            }
+            if (view is ViewGroup) for (index in 0 until view.childCount) refresh(view.getChildAt(index))
+        }
+        refresh(root)
+        root.setBackgroundColor(android.graphics.Color.TRANSPARENT)
+        listOf(R.id.calculator_header, R.id.calculator_keypad_dock).forEach {
+            root.findViewById<View>(it).setBackgroundColor(android.graphics.Color.TRANSPARENT)
+        }
+        listOf(mainTab, helpTab).forEach {
+            it.setTextColor(ThemeColorResolver.color(Theme.workspace_panel_text_color))
+            it.includeFontPadding = false
+            it.setTypeface(Tuils.getTypeface(this), android.graphics.Typeface.BOLD)
+            it.textSize = AppearanceSettings.outputHeaderTextSize().toFloat()
+            it.background = TerminalBorderRuntime.tabDrawable(this,
+                ThemeColorResolver.color(Theme.workspace_header_background_color), FrameTarget.OVERLAYS).let { drawable ->
+                if (it === helpTab) android.graphics.drawable.InsetDrawable(drawable, 0, 0, 0, Tuils.dpToPx(this, 28)) else drawable
+            }
+            it.setPadding(Tuils.dpToPx(this, 10), 0, Tuils.dpToPx(this, 10), 0)
+        }
+        TerminalPaneIcon.apply(helpTab, R.drawable.ic_material_help_24)
+        root.findViewById<View>(R.id.calculator_window_border).background = TerminalBorderRuntime.panelDrawable(this,
+            ThemeColorResolver.color(Theme.workspace_panel_background_color), ThemeColorResolver.color(Theme.workspace_panel_border_color),
+            1.5f, AppearanceSettings.outputCornerRadius(), AppearanceSettings.dashedBorders(), target = FrameTarget.OVERLAYS)
+        TerminalBorderRuntime.bind(root.findViewById(R.id.calculator_window_border), mainTab)
+        windowPanel.refreshTheme()
+        root.findViewById<View>(R.id.calculator_main_pane).background = TerminalBorderRuntime.panelDrawable(this,
+            ThemeColorResolver.color(Theme.workspace_output_background_color),
+            ThemeColorResolver.withMaxAlpha(ThemeColorResolver.color(Theme.workspace_panel_border_color), 210),
+            1.2f, AppearanceSettings.outputCornerRadius(), AppearanceSettings.dashedBorders(), target = FrameTarget.OVERLAYS)
+    }
     override fun onDestroy() { request?.cancel(); request = null; worker.shutdownNow(); super.onDestroy() }
 }

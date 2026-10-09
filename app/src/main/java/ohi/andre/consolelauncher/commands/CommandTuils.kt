@@ -491,7 +491,9 @@ object CommandTuils {
     }
 
     private fun param(pack: MainPack, cmd: ParamCommand, input: String?): ArgInfo? {
-        if (input == null || input.trim { it <= ' ' }.length == 0) return null
+        if (input == null || input.trim { it <= ' ' }.isEmpty()) {
+            return cmd.emptyParam(pack)?.let { ArgInfo(it, "", true, 1) }
+        }
 
         var indexOfFirstSpace = input.indexOf(Tuils.SPACE)
         if (indexOfFirstSpace == -1) {

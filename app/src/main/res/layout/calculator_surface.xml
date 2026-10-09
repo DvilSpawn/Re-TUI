@@ -1,32 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/calculator_overlay" android:layout_width="match_parent" android:layout_height="match_parent" android:padding="12dp" android:orientation="vertical" android:focusableInTouchMode="true">
-    <LinearLayout android:id="@+id/calculator_header" android:layout_width="match_parent" android:layout_height="48dp" android:gravity="center_vertical" android:orientation="horizontal">
-        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:paddingStart="12dp" android:text="@string/ui_calculator_surface_calculator" />
-        <ImageButton android:id="@+id/calculator_main_tab" android:layout_width="48dp" android:layout_height="48dp" android:padding="12dp" android:src="@drawable/ic_material_calculate_24" android:contentDescription="@string/ui_calculator_surface_calculator" />
-        <ImageButton android:id="@+id/calculator_help_tab" android:layout_width="48dp" android:layout_height="48dp" android:padding="12dp" android:src="@drawable/ic_material_help_24" android:contentDescription="@string/calculator_hints" />
-    </LinearLayout>
-    <FrameLayout android:id="@+id/calculator_window_border" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:padding="12dp">
-        <LinearLayout android:id="@+id/calculator_main_pane" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical">
-            <ScrollView android:id="@+id/calculator_transcript_scroll" android:layout_width="match_parent" android:layout_height="match_parent" android:fillViewport="false">
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/calculator_overlay" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@android:color/transparent" android:paddingStart="8dp" android:paddingEnd="8dp"
+    android:paddingBottom="4dp" android:clipChildren="false" android:clipToPadding="false" android:focusableInTouchMode="true">
+    <LinearLayout android:id="@+id/calculator_window_border" android:layout_width="match_parent" android:layout_height="match_parent"
+        android:layout_marginTop="18dp" android:layout_marginBottom="2dp" android:orientation="vertical"
+        android:paddingStart="6dp" android:paddingEnd="6dp" android:paddingTop="28dp" android:paddingBottom="10dp">
+        <LinearLayout android:id="@+id/calculator_main_pane" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:orientation="vertical" android:paddingStart="0dp" android:paddingEnd="0dp" android:paddingTop="8dp" android:paddingBottom="0dp">
+            <ScrollView android:id="@+id/calculator_transcript_scroll" android:layout_width="match_parent" android:layout_height="match_parent" android:fillViewport="false" android:scrollbars="none">
                 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
-                    <TextView android:id="@id/calculator_result" android:layout_width="match_parent" android:layout_height="wrap_content" android:textIsSelectable="true" android:paddingBottom="8dp" />
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical">
-                        <TextView android:id="@+id/calculator_prompt" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="calc&gt; " />
-                        <EditText android:id="@id/calculator_expression" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:minHeight="48dp" android:padding="0dp" android:background="@null" android:singleLine="true" android:scrollHorizontally="true" android:contentDescription="@string/calculator_expression_description" />
+                    <TextView android:id="@id/calculator_result" android:layout_width="match_parent" android:layout_height="wrap_content" android:textIsSelectable="true" android:includeFontPadding="false" android:paddingBottom="0dp" />
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="top">
+                        <TextView android:id="@+id/calculator_prompt" android:layout_width="wrap_content" android:layout_height="wrap_content" android:includeFontPadding="false" android:text="calc&gt; " />
+                        <EditText android:id="@id/calculator_expression" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:minHeight="48dp" android:gravity="top" android:includeFontPadding="false" android:padding="0dp" android:background="@null" android:singleLine="true" android:scrollHorizontally="true" android:contentDescription="@string/calculator_expression_description" />
                     </LinearLayout>
                 </LinearLayout>
             </ScrollView>
         </LinearLayout>
-    </FrameLayout>
-    <LinearLayout android:id="@+id/calculator_keypad_dock" android:layout_width="match_parent" android:layout_height="wrap_content" android:padding="8dp" android:orientation="vertical">
-        <LinearLayout android:id="@+id/calculator_keypad_tabs" android:layout_width="match_parent" android:layout_height="48dp" android:orientation="horizontal">
-            <Button android:id="@+id/calculator_numbers_tab" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:minHeight="0dp" android:text="123" />
-            <Button android:id="@+id/calculator_letters_tab" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:minHeight="0dp" android:text="ABC" />
-            <Button android:id="@+id/calculator_functions_tab" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:minHeight="0dp" android:text="FUNC" />
-        </LinearLayout>
-        <GridLayout android:id="@+id/calculator_symbols" android:layout_width="match_parent" android:layout_height="wrap_content" android:columnCount="4" />
-        <Button android:id="@+id/calculator_equals" android:layout_width="48dp" android:layout_height="48dp" android:text="↵" android:contentDescription="@string/surface_equals_09b6a" />
-        <Button android:id="@+id/calculator_cancel_request" android:layout_width="wrap_content" android:layout_height="48dp" android:text="@string/calculator_cancel" android:visibility="gone" />
+        <ohi.andre.consolelauncher.calculator.CalculatorKeypadScrollView android:id="@+id/calculator_keypad_scroll" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:fillViewport="false" android:scrollbars="none">
+            <LinearLayout android:id="@+id/calculator_keypad_dock" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
+                <LinearLayout android:id="@+id/calculator_keypad_tabs" android:layout_width="match_parent" android:layout_height="48dp" android:orientation="horizontal">
+                    <Button android:id="@+id/calculator_numbers_tab" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:minHeight="0dp" android:text="123" />
+                    <Button android:id="@+id/calculator_letters_tab" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:minHeight="0dp" android:text="ABC" />
+                    <Button android:id="@+id/calculator_functions_tab" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:minHeight="0dp" android:text="FUNC" />
+                </LinearLayout>
+                <GridLayout android:id="@+id/calculator_symbols" android:layout_width="match_parent" android:layout_height="wrap_content" android:columnCount="4" />
+                <Button android:id="@+id/calculator_equals" android:layout_width="48dp" android:layout_height="48dp" android:text="↵" android:contentDescription="@string/surface_equals_09b6a" />
+                <Button android:id="@+id/calculator_cancel_request" android:layout_width="wrap_content" android:layout_height="48dp" android:text="@string/calculator_cancel" android:visibility="gone" />
+            </LinearLayout>
+        </ohi.andre.consolelauncher.calculator.CalculatorKeypadScrollView>
     </LinearLayout>
-</LinearLayout>
+    <FrameLayout android:id="@+id/calculator_header" android:layout_width="match_parent" android:layout_height="48dp"
+        android:layout_marginStart="48dp" android:layout_marginEnd="48dp" android:layout_marginTop="8dp" android:orientation="horizontal">
+        <FrameLayout android:layout_width="match_parent" android:layout_height="20dp">
+            <TextView android:id="@+id/calculator_main_tab" android:layout_width="wrap_content" android:layout_height="20dp" android:paddingStart="10dp" android:paddingEnd="10dp" android:gravity="start|center_vertical" android:singleLine="true" android:ellipsize="end" android:text="@string/ui_calculator_surface_calculator" />
+        </FrameLayout>
+        <TextView android:id="@+id/calculator_help_tab" android:layout_width="48dp" android:layout_height="48dp" android:gravity="top|center_horizontal" android:contentDescription="@string/calculator_hints" />
+    </FrameLayout>
+</FrameLayout>

@@ -21,6 +21,12 @@ For plurals keep other and add your language's zero/one/two/few/many forms.
 You may delete untranslated entries: they fall back to English.
 Keep executable commands, flags, URLs, filenames and configuration tokens unchanged.
 
+Offline help bodies support explicit portable markup: ## headings, blank-line
+paragraphs, **bold**, *emphasis*, `inline code`, - bullets, numbered lists,
+triple-backtick fenced command examples and >! warning paragraphs. Translate
+prose around the markers; keep command text intact. Plain older/partial packs
+remain readable and missing articles still fall back to bundled English.
+
 Do not include this README in the finished pack. Build it from the repository:
 python3 scripts/language_packs.py build language-packs/YOUR-LOCALE --output YOUR-PACK.retui-launcher-lang
 

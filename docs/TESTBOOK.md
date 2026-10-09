@@ -10,9 +10,12 @@ runtime screenshots, XML dumps, traces, or temporary test notes under
 Run these before release-candidate work:
 
 ```sh
-./gradlew :app:assemblePlaystoreDebug
-./gradlew :app:assembleFdroidDebug
-./gradlew :app:lintPlaystoreDebug
+./gradlew :app:validateSourceInputs
+./gradlew :app:testFdroidDebugUnitTest :app:testPlaystoreDebugUnitTest --tests '*'
+./gradlew :app:assembleFdroidDebug :app:assemblePlaystoreDebug
+./gradlew :app:assembleFdroidDebugAndroidTest :app:assemblePlaystoreDebugAndroidTest
+./gradlew :app:lintFdroidDebug :app:lintPlaystoreDebug --no-daemon --max-workers=1
+./gradlew :app:assembleFdroidRelease :app:assemblePlaystoreRelease
 ```
 
 ## Source Guardrail Check
@@ -54,7 +57,7 @@ settings
 In `System & Support`, verify:
 
 - `GitHub` resolves to `https://github.com/DvilSpawn/Re-TUI.git`
-- `Discord` resolves to `https://discord.gg/n6zsVYuV`
+- `Discord` resolves to `https://discord.gg/dF2QXWB3ee`
 - `Reddit` resolves to `https://www.reddit.com/r/RE_TUI_launcher/`
 - `Send Feedback` opens email to `DvilSpawn@gmail.com`
 - `Backup`, `Create Shareable Configuration`, `Restore`, `Rate the App`,
@@ -138,3 +141,48 @@ Open the tmux workspace from the toolbar and verify:
 - `:reconnect` restarts the socket bootstrap and refreshes the pane.
 - Existing `:new [name]`, `:prev`, `:next`, `:refresh`, `:home`, key tray,
   and horizontal window swipe behavior still work.
+
+## Combined Release Acceptance
+
+Builds and unit tests do not close the following device gates. Record an observed
+outcome for each row, retaining failed runs and any untested hardware separately.
+Use one device owner and one installer at a time. Preserve configuration, presets,
+private preferences and existing Termux sessions before testing; never clear data
+or uninstall a data-bearing target to resolve a deployment problem.
+
+- **Workspace lifecycle:** enter through toolbar and terminal command; test single,
+  top/bottom and left/right layouts, focused-tile input, swipe, Home/reopen and
+  recreation without killing shells. An initial launch command must execute once,
+  including after recreation and reopening. Verify input again after reopening.
+- **Workspace appearance:** change colors and font/size, return to the existing
+  workspace, and inspect terminal, key tray, input and chrome together. Preserve
+  drafts, cursor/selection, chosen windows and running jobs.
+- **Workspace input:** ordinary Unicode, latched modifiers with non-ASCII input,
+  Enter/backspace, local colon commands and both key-tray modes. Report real
+  physical-keyboard checks separately from IME or injected-key tests.
+- **Breath out:** verify wallpaper-only rendered pixels after timeout, consumed
+  wake touch/key/Back, foreground/focus handling, and live enable/timeout updates
+  in the launcher and detached workspace. Refresh with an already populated
+  launcher draft and verify its text and selection survive. Calculator, help and
+  community are separate Activities, not additional idle-fade targets.
+- **Calculator/help:** untouched initial floating layout in portrait and landscape;
+  drag the title and all four corners, maximize/float/reset, then recreate. Check
+  independent geometry, every keypad layer, prompt visibility, editing, `ans`,
+  help/Back navigation, live appearance and retained draft/history/selection.
+- **Portable presets:** export and inspect a `.retui` file, cancel and confirm
+  import, verify unique preset saving without applying settings, reject personal
+  backups even when renamed, and check recipient access before/after grant
+  revocation. Do not infer messaging-provider coverage from a fixture provider.
+- **Unlock counter:** observe a real lock/wake/authentication cycle and verify one
+  increment; repeat across launcher pause/refresh. Do not count ordinary resume
+  or waking an already unlocked device as an unlock test.
+- **Community:** use controlled accounts to verify login/logout, literal message
+  input, pagination/unread behavior, failed/ambiguous delivery and draft retention.
+  Test restored/offline cache at the 24-hour boundary, moderation removal and
+  account isolation. Live production fixtures require separate authorization and
+  exact recorded cleanup; loopback tests do not prove production availability.
+
+Before publishing, verify release APK package/version/signature and required native
+libraries, review privacy/retention disclosures, and compare the installed candidate
+with the intended artifact. Restore test-modified state and compare complete file
+sets and bytes. An outstanding device gate is a release blocker, not a passing row.

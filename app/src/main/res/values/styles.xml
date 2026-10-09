@@ -20,6 +20,12 @@
         <item name="android:windowFullscreen">false</item>
     </style>
 
+    <style name="Custom.Floating" parent="Custom.Popup">
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:backgroundDimAmount">0.18</item>
+        <item name="android:windowCloseOnTouchOutside">false</item>
+    </style>
+
     <style name="ToolsBar">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">match_parent</item>

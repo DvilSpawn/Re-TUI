@@ -3181,7 +3181,7 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
         private const val PLAY_STORE_WEB_URL =
             "https://play.google.com/store/apps/details?id=$PLAY_STORE_PACKAGE_ID"
         private const val GITHUB_URL = "https://github.com/DvilSpawn/Re-TUI.git"
-        private const val DISCORD_URL = "https://discord.gg/n6zsVYuV"
+        private const val DISCORD_URL = "https://discord.gg/dF2QXWB3ee"
         private const val REDDIT_URL = "https://www.reddit.com/r/RE_TUI_launcher/"
         private const val FEEDBACK_EMAIL = "DvilSpawn@gmail.com"
         private const val FEEDBACK_MAILTO_URI = "mailto:$FEEDBACK_EMAIL"
