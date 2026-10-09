@@ -143,13 +143,12 @@ class CommunityIntegrationTest {
         try {
             instrumentation.runOnMainSync {
                 activity.window.decorView.findViewWithTag<EditText>("community_input").setText("/register"); activity.window.decorView.findViewWithTag<android.view.View>("community_submit").performClick()
-                val root=(activity.javaClass.getDeclaredField("authDialog").apply { isAccessible=true }.get(activity) as android.app.Dialog).window!!.decorView
-                root.findViewWithTag<EditText>("community_username").setText("alice"); root.findViewWithTag<EditText>("community_password").setText("fixture-password"); root.findViewWithTag<EditText>("community_confirmation").setText("fixture-password")
-                root.findViewWithTag<android.view.View>("community_auth_submit").performClick()
+                val input = activity.findViewById<EditText>(ohi.andre.consolelauncher.R.id.community_input)
+                val send = activity.findViewById<android.view.View>(ohi.andre.consolelauncher.R.id.community_send)
+                for (value in listOf("alice", "fixture-password", "fixture-password")) { input.setText(value); send.performClick() }
             }
             await {
-                val root=(activity.javaClass.getDeclaredField("authDialog").apply { isAccessible=true }.get(activity) as android.app.Dialog).window!!.decorView
-                root.findViewWithTag<TextView>("community_auth_error").text.isNotEmpty()
+                activity.findViewById<TextView>(ohi.andre.consolelauncher.R.id.community_auth_guidance).text.contains("Rate limited")
             }
             assertFalse(CommunityState(store.load()).toJson().has("account"))
             assertFalse(fixture.requests.any { it.path.endsWith("auth-with-password") })
@@ -626,27 +625,24 @@ class CommunityIntegrationTest {
         instrumentation.waitForIdleSync()
         try {
             instrumentation.runOnMainSync {
-                activity.window.decorView.findViewWithTag<EditText>("community_input").setText("/login")
-                activity.window.decorView.findViewWithTag<android.view.View>("community_submit").performClick()
-                val dialog = activity.javaClass.getDeclaredField("authDialog").apply { isAccessible = true }.get(activity) as android.app.Dialog
-                val register = dialog.window!!.decorView.findViewWithTag<android.view.View>("community_register")
-                assertNotNull("Login panel needs a Register action", register); register.performClick()
-                val registration = activity.javaClass.getDeclaredField("authDialog").apply { isAccessible = true }.get(activity) as android.app.Dialog
-                val root = registration.window!!.decorView
-                val confirm = root.findViewWithTag<EditText>("community_confirmation")
-                assertNotNull(confirm); assertTrue(confirm.transformationMethod is android.text.method.PasswordTransformationMethod)
-                assertFalse(confirm.isSaveEnabled)
-                root.findViewWithTag<EditText>("community_username").setText("alice")
-                root.findViewWithTag<EditText>("community_password").setText("fixture-password"); confirm.setText("different")
-                root.findViewWithTag<android.view.View>("community_auth_submit").performClick()
+                val input = activity.findViewById<EditText>(ohi.andre.consolelauncher.R.id.community_input)
+                val send = activity.findViewById<android.view.View>(ohi.andre.consolelauncher.R.id.community_send)
+                input.setText("/register"); send.performClick()
+                input.setText("alice"); send.performClick()
+                assertTrue(input.transformationMethod is android.text.method.PasswordTransformationMethod)
+                assertFalse(input.isSaveEnabled)
+                input.setText("fixture-password"); send.performClick()
+                assertTrue(input.transformationMethod is android.text.method.PasswordTransformationMethod)
+                input.setText("different"); send.performClick()
+                assertTrue(activity.findViewById<TextView>(ohi.andre.consolelauncher.R.id.community_auth_guidance).text.contains("Passwords differ"))
+                assertTrue(input.text.isEmpty()); assertNull(input.transformationMethod)
+                assertFalse(CommunityStore(context).load().toString().contains("fixture-password"))
             }
             assertEquals(0, fixture.requests.size)
             instrumentation.runOnMainSync {
-                val dialog = activity.javaClass.getDeclaredField("authDialog").apply { isAccessible = true }.get(activity) as android.app.Dialog
-                val root = dialog.window!!.decorView
-                root.findViewWithTag<EditText>("community_password").setText("fixture-password")
-                root.findViewWithTag<EditText>("community_confirmation").setText("fixture-password")
-                root.findViewWithTag<android.view.View>("community_auth_submit").performClick()
+                val input = activity.findViewById<EditText>(ohi.andre.consolelauncher.R.id.community_input)
+                val send = activity.findViewById<android.view.View>(ohi.andre.consolelauncher.R.id.community_send)
+                for (value in listOf("alice", "fixture-password", "fixture-password")) { input.setText(value); send.performClick() }
             }
             await { fixture.requests.any { it.path.endsWith("messages/records") } }
             assertEquals(listOf("/api/collections/members/records", "/api/collections/members/auth-with-password"), fixture.requests.take(2).map { it.path })
@@ -673,14 +669,13 @@ class CommunityIntegrationTest {
                 submit("/login")
                 instrumentation.waitForIdleSync()
                 instrumentation.runOnMainSync {
-                    val dialog = activity.javaClass.getDeclaredField("authDialog").apply { isAccessible = true }.get(activity) as android.app.Dialog
-                    val username = dialog.window!!.decorView.findViewWithTag<EditText>("community_username")
-                    val password = dialog.window!!.decorView.findViewWithTag<EditText>("community_password")
-                    assertEquals("Username", username.hint.toString())
-                    assertTrue(password.transformationMethod is android.text.method.PasswordTransformationMethod)
-                    assertFalse(password.isSaveEnabled)
-                    username.setText("alice"); password.setText("fixture-password")
-                    dialog.window!!.decorView.findViewWithTag<android.view.View>("community_auth_submit").performClick()
+                    val input = activity.window.decorView.findViewWithTag<EditText>("community_input")
+                    assertTrue(activity.window.decorView.findViewWithTag<TextView>("community_auth_error").text.contains("Username"))
+                    val send = activity.window.decorView.findViewWithTag<android.view.View>("community_submit")
+                    input.setText("alice"); send.performClick()
+                    assertTrue(input.transformationMethod is android.text.method.PasswordTransformationMethod)
+                    assertFalse(input.isSaveEnabled)
+                    input.setText("fixture-password"); send.performClick()
                 }
                 await { fixture.requests.any { it.path.endsWith("messages/records") } }
                 await { activity.window.decorView.findViewWithTag<TextView>("community_status").text.contains("alice") }

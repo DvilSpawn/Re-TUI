@@ -10,7 +10,7 @@ import ohi.andre.consolelauncher.commands.main.Param
 import ohi.andre.consolelauncher.commands.main.specific.ParamCommand
 
 /** Only this entry belongs to the launcher; feed input never reaches its dispatcher. */
-class community : ParamCommand() {
+open class community : ParamCommand() {
     private val open = object : Param {
         override fun label(): String = ""
         override fun args(): IntArray = intArrayOf()

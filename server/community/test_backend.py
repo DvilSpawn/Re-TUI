@@ -481,6 +481,7 @@ def main():
     parser.add_argument('--data-dir')
     parser.add_argument('--admin-file')
     parser.add_argument('--admin-base', default='http://127.0.0.1:8095')
+    parser.add_argument('--tests', default='*', help='Comma-separated unittest method globs')
     args = parser.parse_args()
     Contract.binary = args.binary or args.restore_binary
     log = None
@@ -514,7 +515,11 @@ def main():
         try:
             s, r = Contract().call('POST', '/api/collections/_superusers/auth-with-password', auth, admin=True)
             if s == 200: Contract.admin = r['token']
-            suite = unittest.defaultTestLoader.loadTestsFromTestCase(Contract)
+            import fnmatch
+            names=unittest.defaultTestLoader.getTestCaseNames(Contract)
+            selected=[name for name in names if any(fnmatch.fnmatchcase(name,pattern) for pattern in args.tests.split(','))]
+            if not selected: raise ValueError('No tests matched')
+            suite = unittest.TestSuite(Contract(name) for name in selected)
             result = unittest.TextTestRunner(verbosity=2).run(suite)
             if not result.wasSuccessful() and process:
                 log.flush(); log.seek(0)

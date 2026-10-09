@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@android:color/transparent" android:paddingStart="8dp" android:paddingEnd="8dp" android:paddingBottom="4dp" android:clipChildren="false" android:clipToPadding="false">
+    <LinearLayout android:id="@+id/community_panel" android:layout_width="match_parent" android:layout_height="match_parent" android:layout_marginTop="18dp" android:layout_marginBottom="2dp" android:orientation="vertical" android:paddingStart="6dp" android:paddingEnd="6dp" android:paddingTop="30dp" android:paddingBottom="48dp">
+        <LinearLayout android:id="@+id/community_body" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:orientation="horizontal">
+            <ScrollView android:id="@+id/community_rail" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="0.2" android:scrollbars="none">
+                <LinearLayout android:id="@+id/community_channel_rows" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" />
+            </ScrollView>
+            <View android:id="@+id/community_divider" android:layout_width="1dp" android:layout_height="match_parent" />
+            <LinearLayout android:id="@+id/community_main_pane" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="0.8" android:orientation="vertical" android:paddingStart="6dp">
+                <TextView android:id="@+id/community_status" android:tag="community_status" android:layout_width="match_parent" android:layout_height="wrap_content" android:maxLines="2" android:ellipsize="end" />
+                <TextView android:id="@+id/community_unread" android:tag="community_unread" android:layout_width="match_parent" android:layout_height="wrap_content" />
+                <ScrollView android:id="@+id/community_scroll" android:tag="community_scroll" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:scrollbars="none">
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
+                        <TextView android:id="@+id/community_output" android:tag="community_output" android:layout_width="match_parent" android:layout_height="wrap_content" android:textIsSelectable="true" />
+                        <LinearLayout android:id="@+id/community_records" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" />
+                    </LinearLayout>
+                </ScrollView>
+            </LinearLayout>
+        </LinearLayout>
+        <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content" android:scrollbars="none"><LinearLayout android:id="@+id/community_actions" android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" /></HorizontalScrollView>
+        <LinearLayout android:id="@+id/community_guidance_row" android:layout_width="match_parent" android:layout_height="48dp" android:orientation="horizontal" android:gravity="center_vertical">
+            <FrameLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent">
+                <EditText android:id="@+id/community_thread_title" android:layout_width="match_parent" android:layout_height="match_parent" android:singleLine="true" android:hint="@string/community_thread_title" android:background="@null" android:visibility="invisible" />
+                <TextView android:id="@+id/community_auth_guidance" android:tag="community_auth_error" android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center_vertical" android:maxLines="2" android:ellipsize="end" android:accessibilityLiveRegion="polite" android:visibility="invisible" />
+            </FrameLayout>
+            <Button android:id="@+id/community_auth_cancel" android:layout_width="wrap_content" android:layout_height="match_parent" android:minWidth="48dp" android:background="@null" android:text="@string/community_cancel" android:visibility="invisible" />
+        </LinearLayout>
+        <LinearLayout android:id="@+id/community_prompt_row" android:layout_width="match_parent" android:layout_height="64dp" android:minHeight="48dp" android:orientation="horizontal" android:gravity="center_vertical">
+            <TextView android:id="@+id/community_prompt" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="&gt; " />
+            <ohi.andre.consolelauncher.community.CommunityEditText android:id="@+id/community_input" android:tag="community_input" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:minHeight="48dp" android:background="@null" android:padding="0dp" android:maxLines="3" android:inputType="textMultiLine|textCapSentences" android:imeOptions="actionSend|flagNoExtractUi" />
+            <Button android:id="@+id/community_send" android:tag="community_submit" android:layout_width="wrap_content" android:layout_height="wrap_content" android:minWidth="48dp" android:minHeight="48dp" android:text="@string/community_submit" />
+        </LinearLayout>
+        <HorizontalScrollView android:id="@+id/community_completion_scroll" android:layout_width="match_parent" android:layout_height="48dp" android:scrollbars="none" android:visibility="invisible"><LinearLayout android:id="@+id/community_completions" android:layout_width="wrap_content" android:layout_height="match_parent" android:gravity="center_vertical" android:orientation="horizontal" /></HorizontalScrollView>
+    </LinearLayout>
+    <FrameLayout android:id="@+id/community_header_row" android:layout_width="match_parent" android:layout_height="48dp" android:layout_marginStart="48dp" android:layout_marginEnd="48dp" android:layout_marginTop="8dp">
+        <FrameLayout android:layout_width="match_parent" android:layout_height="20dp">
+            <TextView android:id="@+id/community_header" android:tag="community_header" android:layout_width="wrap_content" android:layout_height="20dp" android:paddingStart="10dp" android:paddingEnd="10dp" android:gravity="start|center_vertical" android:singleLine="true" android:ellipsize="end" android:text="@string/community_title" />
+        </FrameLayout>
+    </FrameLayout>
+</FrameLayout>

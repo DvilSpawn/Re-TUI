@@ -3,6 +3,8 @@ package ohi.andre.consolelauncher.community
 import org.json.JSONObject
 
 class CommunityState @JvmOverloads constructor(saved: JSONObject = JSONObject(), private val clock: () -> Long = System::currentTimeMillis) {
+    var pane = CommunityPaneState(saved.optJSONObject("pane") ?: JSONObject())
+    var mentions = CommunityMentionState(saved.optJSONObject("mentions") ?: JSONObject())
     var draft = saved.optString("draft")
     var pendingId: String? = saved.optString("pending_id").takeIf { it.isNotEmpty() }
         private set
@@ -31,10 +33,10 @@ class CommunityState @JvmOverloads constructor(saved: JSONObject = JSONObject(),
         if (account?.id != next.id) clear()
         account = next
     }
-    fun clear() { account = null; draft = ""; pendingId = null; pendingBody = ""; messages = emptyList(); readingHistory = false; newestObserved = null; arrivals = emptyList(); blocked.clear(); seen.clear() }
+    fun clear() { pane = CommunityPaneState(JSONObject()); mentions = CommunityMentionState(JSONObject()); account = null; draft = ""; pendingId = null; pendingBody = ""; messages = emptyList(); readingHistory = false; newestObserved = null; arrivals = emptyList(); blocked.clear(); seen.clear() }
     fun toJson(): JSONObject {
         expire()
-        return JSONObject().put("draft", draft).put("pending_id", pendingId ?: "").put("pending_body", pendingBody)
+        return JSONObject().put("pane", pane.toJson()).put("mentions", mentions.toJson()).put("draft", draft).put("pending_id", pendingId ?: "").put("pending_body", pendingBody)
         .put("account", account?.let { JSONObject().put("id", it.id).put("handle", it.handle).put("token", it.token) })
         .put("blocked", org.json.JSONArray(blocked.toList())).put("seen", org.json.JSONArray(seen.toList()))
         .put("messages", org.json.JSONArray(messages)).put("reading_history", readingHistory)
@@ -97,6 +99,10 @@ class CommunityState @JvmOverloads constructor(saved: JSONObject = JSONObject(),
             if (newestObserved == null || order.compare(record, newestObserved!!) > 0)
                 newestObserved = JSONObject().put("id", record.getString("id")).put("created", record.getString("created"))
         }
+    }
+    fun focusMessage(record: JSONObject) {
+        expire(); messages = listOf(record).filter { fresh(it, clock()) }; readingHistory = true
+        seen.retainAll(messages.map { it.getString("id") }.toSet())
     }
     @JvmOverloads fun merge(incoming: List<JSONObject>, checkedIds: Set<String>, returnLatest: Boolean = false) {
         expire()

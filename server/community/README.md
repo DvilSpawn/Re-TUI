@@ -1,4 +1,4 @@
-# Re-TUI community backend — API contract v2 (pilot)
+# Re-TUI community backend — API contract v3 (pilot)
 
 PocketBase **0.40.4**, before 1.0: not a production-critical stability guarantee.
 No IRC bridge. This independently isolated service does not use launcher/device inventory,
@@ -79,14 +79,14 @@ with `active=false`. Only disposable test fixtures are deleted by automated test
 ## Fixed-channel threads and private queue (v2)
 
 The fixed registry is static: `general` uses the existing messages API; `bugs`, `features`
-and `presets` use persistent threads/replies. No channels collection, public mods channel
+and `presets` use persistent threads/replies (`help` is added in v3). No channels collection, public mods channel
 or standalone chat posting into persistent channels exists.
 
 ### Persistent thread API
 
 - `POST /api/collections/threads/records`, ONLY
   `{"author":"CURRENT_ID","channel":"bugs","title":"Title","body":"Root text","client_id":"UUID"}`.
-  Channel enum: exactly `bugs`, `features`, `presets`. Native **200** record fields:
+  Channel enum: exactly `bugs`, `features`, `presets`, `help` (v3). Native **200** record fields:
   `id,author,author_handle,channel,title,body,client_id,created,updated` plus collection metadata.
   Title nonblank, max 120 Unicode code points / 480 UTF-8 bytes; body same 500/2000 limit
   as messages. Unknown fields, timestamps and handle spoofing are rejected.
@@ -146,6 +146,89 @@ no member management, queue mutation, reply or resolve workflow is implemented i
   future-dated rows; per-ID GET is **404**, even before purge. Rules plus pre-query
   middleware and view hooks enforce this for ordinary and superuser APIs, including
   collection-ID aliases. Private expired content is similarly hidden immediately.
+
+## Foreground community additions (v3)
+
+The fixed registry adds persistent `help` threads/replies. `features` remains its wire
+name; clients display **Suggestions**. Existing strict posting payloads, UUID duplicate
+**400** reconciliation and six-calendar-month private queues are unchanged. No public
+mods channel, IRC protocol or sleeping-phone push is implemented.
+
+### Safe member directory
+
+`GET /api/community/users?q=<fragment>&page=1&perPage=20` returns only
+`{page,perPage,hasMore,items:[{id,handle,online}]}`. Authentication must be a current
+active member, including stored bans on old tokens; anonymous/invalid tokens **401**,
+inactive members **403**. Moderator status, roles, email, tokens, IP/device and last-seen
+fields never appear. The native members list/view stays closed.
+
+Case-insensitive ranking: exact, prefix, substring, then ordered subsequence (fuzzy),
+with online preferred within equal rank, followed by canonical handle and ID. An empty
+query sorts online first, then handle/ID. `q` is at most 24 ASCII handle characters;
+underscore/hyphen are literal, not SQL wildcards. Queries are bound SQL parameters.
+Exact/prefix candidates use the existing NOCASE handle index; substring/subsequence
+candidates scan SQLite, not a downloaded member table. This pilot deliberately refuses
+the directory with **503** above 10,000 identities; install a search index before growing
+past that ceiling. Results are bounded in SQL to perPage+1; no general collection opening.
+Maximum perPage **20**, page **1000**. Invalid/unknown/repeated parameters are **400**.
+Search is not an account-recovery or handle-transfer mechanism; banned/deleted members
+are absent. Debounce client input rather than download every member per keystroke.
+
+### Foreground presence lease
+
+`POST /api/community/presence` accepts only `{"active":true}` or `{"active":false}`.
+Owner is inferred from the authenticated current member, never a client ID. True renews
+a server-timed **90-second** lease and returns `{online:true,expires_at:"UTC timestamp"}`;
+false deletes it and returns `{online:false,expires_at:""}`. Heartbeat about every 30
+seconds only while the community surface is foreground; release on leave/sign-out.
+Directory presence hides expired, future-issued and implausibly future-dated leases
+immediately. The minute retention job removes expired leases, and account deletion
+cascades them. There is no persistent last-seen history or device/IP tracking.
+
+Presence has an independent native/nginx POST budget **120/min/IP** (nginx burst 30),
+not the shared messages/threads/replies **20/min** budget. Directory and mentions use
+the existing shared GET ingress budget **240/min/IP**. Shared NAT remains bounded.
+
+### Validated mention metadata
+
+The server extracts mentions from message/thread/reply **body** during transactional
+creation, without changing accepted payload fields. Tokens are `@[-_a-z0-9]{3,24}`,
+case-insensitive, with ASCII handle-token boundaries (not embedded in a handle/email,
+and not a prefix of a longer handle). Canonical exact currently-active identities are
+resolved once; repeated targets collapse, self-mentions and unknown/banned names are
+ignored. More than **10 unique active non-author recipients** rejects the whole post
+with **400**, never silently truncates or stores a partial post. UUID duplicates do not
+create extra metadata. Mention targets are stable record IDs, never re-resolved when a
+handle is deleted/recreated. Do not delete/reassign real accounts.
+
+`GET /api/community/mentions?page=1&perPage=50` returns
+`{page,perPage,hasMore,items:[{id,kind,source_id,thread_id,channel,author_handle,created,expires_at}]}`.
+`kind` is exactly `message`, `thread`, or `thread_reply`; `source_id` is the exact source
+record ID. General messages have `channel="general"`, `thread_id=""`, and expiry at
+source creation +24 hours. Persistent roots/replies use the root channel and root ID,
+with `expires_at=""`. `created` and `author_handle` come from the immutable server-owned
+source snapshot. Items sort descending mention `(created,id)`; max perPage **50**, page
+**1000**. No bodies are copied into the mention collection or returned by this endpoint;
+read the original source through its own API. Only the authenticated active recipient
+can read metadata and only while source/root view rules currently allow access. Expired
+or future-created chat is immediately hidden before paging; source/parent/account deletion
+cascades metadata physically. The ordinary native mentions/presence APIs remain closed,
+and global relation-expansion rejection is unchanged. No moderation/private queue content
+is mentioned or discoverable. This is a foreground poll, not a notification delivery promise.
+
+Each request checks at most **1,000 recipient metadata rows** against the current source/root
+rules, plus one metadata-only exhaustion probe. Page offsets count accessible items, not
+raw rows. **200** with `hasMore=false` means the raw list was actually exhausted; a full
+page with an accessible extra item returns `hasMore=true`. If more raw rows remain before
+that answer can be established, the endpoint returns **503**
+`{"status":503,"message":"Mention scan limit exceeded.","data":{}}`, never a partial
+successful page or a fabricated end. This work ceiling also applies to valid deep pages;
+page **1000** is a parameter limit, not a promise that every page can be served.
+Treat this as a failed GET: retain only otherwise-valid stale cache, do not mark missing
+mentions read, and do not advance the page. Back off before retrying the same request;
+do not repeatedly walk pages or immediately retry to evade the scan budget. A later retry
+can succeed after source access/metadata changes; persistent failures require operator
+review or a permission-preserving indexed query, not client cursor/contract changes.
 
 ## Isolation and operations
 
@@ -229,6 +312,15 @@ then reload nginx (not restart). Migrations have no destructive down path; do no
 newly accepted records. Never restart IRC, databases, containers, games or other services.
 
 ## Reproducibility / verification
+
+New v3 real suite: `python3 server/community/test_v3.py --binary /path/to/pocketbase`
+(**22 tests**, including all 14 prior regressions). `--tests 'test_1[4-9]*,test_20*'` selects the
+seven additive v3 tests for bounded live batches. The additional `test_21*` is local-only:
+1,000 permission-denied metadata rows before an accessible source must produce explicit
+503, with exact-boundary exhaustion, deep-page failure and ordinary lookahead success
+checked against real PocketBase. Its bulk SQLite fixture and temporary source view rule
+are never run against an existing remote service. Disposable fixture accounts are the only
+accounts ever deleted/recreated; permission-lock testing is local-only, not live schema mutation.
 
 Additional real fixtures: `python3 server/community/test_migration.py --binary /path/to/pocketbase`
 (1 preexisting-data upgrade test), and `test_nginx.py` (1 isolated nginx quota/allowlist test).

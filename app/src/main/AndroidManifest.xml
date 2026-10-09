@@ -120,7 +120,7 @@
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
 
         <activity android:name=".community.CommunityActivity" android:exported="false"
-            android:label="@string/community_title" android:theme="@style/Custom.Solid"
+            android:label="@string/community_title" android:theme="@style/Custom.Floating"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
 
         <activity android:name=".help.OfflineHelpActivity" android:exported="false"

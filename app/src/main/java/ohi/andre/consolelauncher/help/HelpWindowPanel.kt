@@ -74,7 +74,7 @@ internal class HelpWindowPanel(private val host: FrameLayout, private val conten
             Triple("top-left", "◤", R.string.offline_help_resize_corner),
             Triple("top-right", "◥", R.string.offline_help_resize_corner),
             Triple("bottom-left", "◣", R.string.offline_help_resize_corner)).forEach { (kind, glyph, label) ->
-            val handle = control(glyph, label).apply {
+            val handle = control(glyph, label, resizeCorner = true).apply {
                 tag = "$statePrefix-resize-$kind"
                 setOnClickListener {
                     // A tap grows the selected axes; long press shrinks them for keyboard/TalkBack users.
@@ -115,7 +115,27 @@ internal class HelpWindowPanel(private val host: FrameLayout, private val conten
                 if (index == 0) toggleIcon() else R.drawable.ic_toolbar_refresh_24)
         }
     }
-    private fun control(glyph: String, label: Int) = Button(context).apply {
+    private fun contentHit(view: View, x: Int, y: Int): Boolean {
+        if (!view.isShown || !view.isEnabled) return false
+        val bounds = android.graphics.Rect()
+        if (!view.getGlobalVisibleRect(bounds)) return false
+        val origin = IntArray(2)
+        view.rootView.getLocationOnScreen(origin)
+        bounds.offset(origin[0], origin[1])
+        if (!bounds.contains(x, y)) return false
+        if (view.isClickable || view.isLongClickable || view is android.widget.EditText) return true
+        return view is android.view.ViewGroup && (0 until view.childCount).any {
+            contentHit(view.getChildAt(it), x, y)
+        }
+    }
+    private fun control(glyph: String, label: Int, resizeCorner: Boolean = false) = object : Button(context) {
+        override fun dispatchTouchEvent(event: MotionEvent): Boolean {
+            // Content owns its complete measured target, even when a corner is drawn above it.
+            if (resizeCorner && event.actionMasked == MotionEvent.ACTION_DOWN &&
+                contentHit(content, event.rawX.toInt(), event.rawY.toInt())) return false
+            return super.dispatchTouchEvent(event)
+        }
+    }.apply {
         text = glyph; contentDescription = context.getString(label); isFocusable = true
         androidx.appcompat.widget.TooltipCompat.setTooltipText(this, contentDescription)
         isAllCaps = false

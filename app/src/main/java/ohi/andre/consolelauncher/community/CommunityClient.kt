@@ -55,23 +55,39 @@ class CommunityClient @JvmOverloads constructor(private val base: String = PRODU
         "author = ${quote(account.id)} && client_id = ${quote(clientId)}").firstOrNull {
         it.optString("author") == account.id && it.optString("client_id") == clientId
     }
-    @JvmOverloads fun post(account: Account, body: String, clientId: String, uncertainAttempt: Boolean = false): JSONObject = operation {
+    @JvmOverloads fun post(account: Account, body: String, clientId: String, uncertainAttempt: Boolean = false): JSONObject =
+        deliver(account, "messages", JSONObject().put("author", account.id).put("body", body).put("client_id", clientId), uncertainAttempt)
+    fun postThread(account: Account, channel: String, title: String, body: String, clientId: String, uncertainAttempt: Boolean): JSONObject {
+        require(channel in setOf("bugs", "help", "features", "presets"))
+        require(title.isNotBlank() && title.codePointCount(0, title.length) <= 120 && title.toByteArray(Charsets.UTF_8).size <= 480)
+        return deliver(account, "threads", JSONObject().put("author", account.id).put("channel", channel)
+            .put("title", title).put("body", body).put("client_id", clientId), uncertainAttempt)
+    }
+    fun postReply(account: Account, thread: String, body: String, clientId: String, uncertainAttempt: Boolean): JSONObject {
+        require(thread.matches(Regex("[a-zA-Z0-9]{15}")))
+        return deliver(account, "thread_replies", JSONObject().put("author", account.id).put("thread", thread)
+            .put("body", body).put("client_id", clientId), uncertainAttempt)
+    }
+    private fun deliver(account: Account, collection: String, payload: JSONObject, uncertainAttempt: Boolean): JSONObject = operation {
+        val body = payload.getString("body"); val clientId = payload.getString("client_id")
         require(CommunityInput.message(body) is CommunityInput.Message)
         require(java.util.UUID.fromString(clientId).toString() == clientId)
+        fun matches(record: JSONObject) = record.optString("id").matches(Regex("[a-zA-Z0-9]{15}")) && payload.keys().asSequence().all { record.optString(it) == payload.getString(it) }
         fun reconcile(): JSONObject? {
-            val match = try { find(account, clientId) } catch (lookup: Exception) {
+            val match = try { records(account, "author = ${quote(account.id)} && client_id = ${quote(clientId)}", collection = collection).firstOrNull {
+                it.optString("author") == account.id && it.optString("client_id") == clientId
+            } } catch (lookup: Exception) {
                 if (lookup is Failure && lookup.status in setOf(401, 403)) throw lookup
                 throw Uncertain()
             }
-            if (match != null && match.optString("body") != body) throw Uncertain()
+            if (match != null && !matches(match)) throw Uncertain()
             return match
         }
         // A retained attempt may have committed, including after lifecycle cancellation.
         if (uncertainAttempt) reconcile()?.let { return@operation it }
         try {
-            val record = request("messages/records", account.token, JSONObject().put("author", account.id)
-                .put("body", body).put("client_id", clientId))
-            if (record.optString("author") != account.id || record.optString("client_id") != clientId || record.optString("body") != body)
+            val record = request("$collection/records", account.token, payload)
+            if (!matches(record))
                 throw Uncertain()
             record
         } catch (error: Exception) {
@@ -83,13 +99,74 @@ class CommunityClient @JvmOverloads constructor(private val base: String = PRODU
             throw Uncertain()
         }
     }
+    fun threads(account: Account, channel: String, older: JSONObject?): List<JSONObject> {
+        require(channel in setOf("bugs", "help", "features", "presets"))
+        val filter = "channel = ${quote(channel)}" + (older?.let { " && (${cursor(it, "<")})" } ?: "")
+        return records(account, filter, "threads")
+    }
+    @JvmOverloads fun replies(account: Account, thread: String, after: JSONObject?, latest: Boolean = false): List<JSONObject> {
+        require(thread.matches(Regex("[a-zA-Z0-9]{15}")))
+        val filter = "thread = ${quote(thread)}" + (after?.takeUnless { latest }?.let { " && (${cursor(it, ">")})" } ?: "")
+        return records(account, filter, "thread_replies", if (latest) "-created,-id" else "created,id")
+            .sortedWith(compareBy({ it.getString("created") }, { it.getString("id") }))
+    }
+    private fun cursor(record: JSONObject, direction: String): String {
+        val created = quote(record.getString("created")); val id = quote(record.getString("id"))
+        return "created $direction $created || (created = $created && id $direction $id)"
+    }
+    fun source(account: Account, collection: String, id: String): JSONObject {
+        require(collection in setOf("messages", "threads", "thread_replies"))
+        require(id.matches(Regex("[a-zA-Z0-9]{15}")))
+        return request("$collection/records/$id", account.token)
+    }
+    fun moderate(account: Account, body: String) {
+        require(CommunityInput.message(body) is CommunityInput.Message)
+        request("moderator_requests/records", account.token, JSONObject().put("reporter", account.id).put("kind", "moderate").put("body", body))
+    }
+    fun users(account: Account, fragment: String, page: Int): JSONObject {
+        require(fragment.length <= 24 && fragment.matches(Regex("[-_a-zA-Z0-9]*")) && page > 0)
+        val url = "$base/api/community/users".toHttpUrl().newBuilder().addQueryParameter("q", fragment)
+            .addQueryParameter("page", page.toString()).addQueryParameter("perPage", "20").build()
+        return request("users", account.token, url = url.toString())
+    }
+    fun presence(account: Account, active: Boolean): JSONObject =
+        request("presence", account.token, JSONObject().put("active", active), "$base/api/community/presence")
+    fun mentions(account: Account, page: Int): JSONObject {
+        require(page > 0)
+        return request("mentions", account.token, url = "$base/api/community/mentions?page=$page&perPage=50")
+    }
+    fun mentionWindow(account: Account, cached: List<JSONObject>): JSONObject = operation {
+        val items = mutableListOf<JSONObject>()
+        var page = 0
+        var more: Boolean
+        do {
+            val response = mentions(account, ++page)
+            val rows = response.getJSONArray("items")
+            items.addAll((0 until rows.length()).map { rows.getJSONObject(it) })
+            more = response.getBoolean("hasMore")
+        } while (more && page < 4)
+        // A bounded page is not an authoritative absence. Validate retained sources
+        // outside the window without storing another copy of their bodies.
+        if (more) {
+            val received = items.map { it.getString("id") }.toSet()
+            val missing = cached.take(200).filter { it.optString("id") !in received }
+            for ((kind, collection) in listOf("message" to "messages", "thread" to "threads", "thread_reply" to "thread_replies")) {
+                val candidates = missing.filter { it.optString("kind") == kind }
+                val valid = checked(account, candidates.map { it.getString("source_id") }, collection).map { it.getString("id") }.toSet()
+                items.addAll(candidates.filter { it.optString("source_id") in valid })
+            }
+        }
+        JSONObject().put("items", org.json.JSONArray(items.distinctBy { it.getString("id") }))
+            .put("page", page).put("hasMore", more)
+    }
     fun report(account: Account, messageId: String) {
         require(messageId.matches(Regex("[a-zA-Z0-9]{15}")))
         request("reports/records", account.token, JSONObject().put("reporter", account.id)
             .put("message", messageId).put("reason", "Reported from Re-TUI"))
     }
-    fun checked(account: Account, ids: List<String>): List<JSONObject> = operation {
-        ids.take(200).chunked(50).flatMap { batch -> records(account, batch.joinToString(" || ") { "id = ${quote(it)}" }) }
+    @JvmOverloads fun checked(account: Account, ids: List<String>, collection: String = "messages"): List<JSONObject> = operation {
+        require(collection in setOf("messages", "threads", "thread_replies"))
+        ids.take(200).chunked(50).flatMap { batch -> records(account, batch.joinToString(" || ") { "id = ${quote(it)}" }, collection) }
     }
     private fun quote(value: String) = "'" + value.replace("\\", "\\\\").replace("'", "\\'") + "'"
     fun history(account: Account, older: JSONObject?): List<JSONObject> {
@@ -99,11 +176,11 @@ class CommunityClient @JvmOverloads constructor(private val base: String = PRODU
         }
         return records(account, filter).sortedWith(compareBy({ it.getString("created") }, { it.getString("id") }))
     }
-    private fun records(account: Account, filter: String?): List<JSONObject> {
-        val query = ("$base/api/collections/messages/records").toHttpUrl().newBuilder()
-            .addQueryParameter("sort", "-created,-id").addQueryParameter("perPage", "50").addQueryParameter("page", "1")
+    private fun records(account: Account, filter: String?, collection: String = "messages", sort: String = "-created,-id"): List<JSONObject> {
+        val query = ("$base/api/collections/$collection/records").toHttpUrl().newBuilder()
+            .addQueryParameter("sort", sort).addQueryParameter("perPage", "50").addQueryParameter("page", "1")
         if (filter != null) query.addQueryParameter("filter", filter)
-        val items = request("messages/records", account.token, url = query.build().toString()).getJSONArray("items")
+        val items = request("$collection/records", account.token, url = query.build().toString()).getJSONArray("items")
         return (0 until items.length()).map { items.getJSONObject(it) }
     }
     private fun request(path: String, token: String, payload: JSONObject? = null, url: String = "$base/api/collections/$path"): JSONObject {

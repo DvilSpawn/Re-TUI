@@ -7,7 +7,7 @@ cronAdd("community_retention", "* * * * *", () => {
         for (const record of records) $app.delete(record);
     }
     const now = new Date().toISOString().replace("T", " ");
-    for (const collection of ["reports","moderator_requests"]) {
+    for (const collection of ["reports","moderator_requests","presence"]) {
         while (true) {
             const records = $app.findRecordsByFilter(collection,"expires_at <= {:now}","expires_at",100,0,{now:now});
             if (!records.length) break;

@@ -16,7 +16,9 @@ internal class CommunityHttpFixture : AutoCloseable {
         }.format(java.util.Date(time))
     }
     data class Request(val path: String, val method: String, val query: String)
+    /** Native collection traffic used by existing delivery/cursor assertions. */
     val requests = CopyOnWriteArrayList<Request>()
+    val auxiliaryRequests = CopyOnWriteArrayList<Request>()
     val posts = CopyOnWriteArrayList<JSONObject>()
     private val socket = ServerSocket(0, 10, java.net.InetAddress.getByName("127.0.0.1"))
     val url = "http://127.0.0.1:${socket.localPort}"
@@ -52,12 +54,17 @@ internal class CommunityHttpFixture : AutoCloseable {
         val bytes = ByteArray(length); var offset = 0
         while (offset < length) { val read = input.read(bytes, offset, length-offset); if (read < 0) break; offset += read }
         val body = if (length > 0) JSONObject(String(bytes, Charsets.UTF_8)) else JSONObject()
-        val path = start[1].substringBefore("?"); requests.add(Request(path, start[0], java.net.URLDecoder.decode(start[1], "UTF-8")))
-        if (start[0] == "GET" && getCount.incrementAndGet() == gateGetNumber)
+        val path = start[1].substringBefore("?")
+        val auxiliary = path.startsWith("/api/community/")
+        (if (auxiliary) auxiliaryRequests else requests).add(Request(path, start[0], java.net.URLDecoder.decode(start[1], "UTF-8")))
+        if (!auxiliary && start[0] == "GET" && getCount.incrementAndGet() == gateGetNumber)
             getResponseGate?.await(10, java.util.concurrent.TimeUnit.SECONDS)
         var code = if (start[0] == "GET" && status == 200) lookupStatus else status
         val result = when {
             code != 200 -> JSONObject().put("message", "Fixture rejection")
+            path.endsWith("/presence") -> JSONObject().put("online", body.optBoolean("active")).put("expires_at", created(System.currentTimeMillis() + 90000))
+            path.endsWith("/users") || path.endsWith("/mentions") -> JSONObject().put("page", 1).put("perPage", 50).put("hasMore", false).put("items", JSONArray())
+            path.endsWith("moderator_requests/records") -> JSONObject().put("id", "private00000001")
             path.endsWith("auth-with-password") -> JSONObject().put("token", "fixture-token").put("record", JSONObject().put("id", "member000000001").put("handle", body.getString("identity")))
             path.endsWith("members/records") -> JSONObject().put("id", "member000000001").put("handle", body.getString("handle"))
             path.endsWith("reports/records") -> JSONObject().put("id", "report000000001")

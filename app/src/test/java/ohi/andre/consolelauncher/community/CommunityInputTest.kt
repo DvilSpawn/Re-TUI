@@ -9,6 +9,12 @@ class CommunityInputTest {
             .getMethod("parse", String::class.java).invoke(null, text)
     } catch (_: ClassNotFoundException) { null }
 
+    @Test fun moderateIsPrivateLocalCommandWithValidatedBody() {
+        assertEquals(CommunityInput.Command("moderate", "private; text"), CommunityInput.parse("/moderate private; text"))
+        assertTrue(CommunityInput.parse("/moderate") is CommunityInput.Rejected)
+        assertTrue(CommunityInput.parse("/moderate " + "x".repeat(501)) is CommunityInput.Rejected)
+        assertEquals(CommunityInput.Message("/moderate literal"), CommunityInput.parse("//moderate literal"))
+    }
     @Test fun slashInputNeverFallsThroughToPosting() {
         assertEquals("Command(name=exit, argument=)", parse("/exit").toString())
         assertEquals("Message(body=exit)", parse("exit").toString())

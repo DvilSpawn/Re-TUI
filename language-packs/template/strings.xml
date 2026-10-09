@@ -591,7 +591,7 @@ Android AppWidgets: open the widgets pane from the toolbar.</string>
     <string name="command_wifi_opening_wi_fi_settings_android_no_longer_a_15368">Opening Wi-Fi settings. Android no longer allows third-party launchers to toggle Wi-Fi directly.</string>
     <string name="common_off">OFF</string>
     <string name="common_on">ON</string>
-    <string name="community_account_policy">Username: 3–24 ASCII letters, digits, - or _. Password: at least 8 characters. No forgotten-password recovery: use a new username, a separate identity. Old usernames cannot be reclaimed; no automatic ownership or history migration.</string>
+    <string name="community_account_policy">Username: 3–24 ASCII letters, digits, - or _. Password: 8–71 characters. No forgotten-password recovery: use a new username, a separate identity. Old usernames cannot be reclaimed; no automatic ownership or history migration.</string>
     <string name="community_blocked">Local block toggled for %1$s.</string>
     <string name="community_busy">A request is in progress; wait before submitting again.</string>
     <string name="community_cancel">Cancel</string>
@@ -5685,4 +5685,9 @@ Ready for the next command</string>
     <string name="workspace_split_left_right">Split left-right</string>
     <string name="workspace_split_top_bottom">Split top-bottom</string>
     <string name="workspace_unfocused_tile">Tile %1$d, tap to focus</string>
+    <string name="community_auth_username_error">Use 3–24 ASCII letters, digits, - or _.</string>
+    <string name="community_auth_username_guidance">3–24 ASCII letters, digits, - or _. No email or password recovery.</string>
+    <string name="community_auth_password_guidance">8–71 characters. No email or password recovery.</string>
+    <string name="community_auth_password_error">Use 8–71 characters. Enter username again.</string>
+    <string name="community_auth_confirmation_error">Passwords differ. Enter username again.</string>
 </resources>

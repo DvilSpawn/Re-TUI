@@ -47,14 +47,7 @@ class CommunityLiveIntegrationTest {
             submit("/register")
             val deadline = android.os.SystemClock.uptimeMillis() + 180000
             while (true) {
-                instrumentation.runOnMainSync {
-                    val dialog = activity.javaClass.getDeclaredField("authDialog").apply { isAccessible = true }.get(activity) as android.app.Dialog
-                    val root = dialog.window!!.decorView
-                    root.findViewWithTag<EditText>("community_username").setText(names[index])
-                    root.findViewWithTag<EditText>("community_password").setText(passwords[index])
-                    root.findViewWithTag<EditText>("community_confirmation").setText(passwords[index])
-                    root.findViewWithTag<android.view.View>("community_auth_submit").performClick()
-                }
+                for (value in listOf(names[index], passwords[index], passwords[index])) submit(value)
                 idle()
                 val account = CommunityState(store.load()).account
                 if (account != null) { emit(names[index], account.id); return account.id }

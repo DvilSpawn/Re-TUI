@@ -14,6 +14,7 @@ import javax.crypto.spec.GCMParameterSpec
 
 /** All community state is private, encrypted and excluded from Android and launcher backups. */
 class CommunityStore(context: Context) {
+    companion object { const val MAX_STATE_BYTES = 4_000_000L }
     private val file = AtomicFile(File(context.noBackupFilesDir, "community/state.bin"))
     private val alias = "retui-community-v1"
     private fun key(): SecretKey {
@@ -26,7 +27,7 @@ class CommunityStore(context: Context) {
     }
     @Synchronized fun load(): JSONObject {
         if (!file.baseFile.exists() && !File(file.baseFile.path + ".bak").exists()) return JSONObject()
-        require(file.baseFile.length() <= 1_000_000)
+        require(file.baseFile.length() <= MAX_STATE_BYTES && File(file.baseFile.path + ".bak").length() <= MAX_STATE_BYTES)
         val bytes = file.readFully()
         require(bytes.size > 28)
         val cipher = Cipher.getInstance("AES/GCM/NoPadding").apply { init(Cipher.DECRYPT_MODE, key(), GCMParameterSpec(128, bytes, 0, 12)) }
@@ -36,6 +37,7 @@ class CommunityStore(context: Context) {
         file.baseFile.parentFile!!.mkdirs()
         val cipher = Cipher.getInstance("AES/GCM/NoPadding").apply { init(Cipher.ENCRYPT_MODE, key()) }
         val bytes = cipher.iv + cipher.doFinal(state.toString().toByteArray(Charsets.UTF_8))
+        require(bytes.size.toLong() <= MAX_STATE_BYTES)
         val stream = file.startWrite()
         try { stream.write(bytes); file.finishWrite(stream) }
         catch (error: Exception) { file.failWrite(stream); throw error }

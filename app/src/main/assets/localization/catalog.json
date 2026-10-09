@@ -3229,7 +3229,14 @@
   "community_account_policy": {
     "formatted": true,
     "forms": {
-      "other": "Username: 3–24 ASCII letters, digits, - or _. Password: at least 8 characters. No forgotten-password recovery: use a new username, a separate identity. Old usernames cannot be reclaimed; no automatic ownership or history migration."
+      "other": "Username: 3–24 ASCII letters, digits, - or _. Password: 8–71 characters. No forgotten-password recovery: use a new username, a separate identity. Old usernames cannot be reclaimed; no automatic ownership or history migration."
+    },
+    "type": "string"
+  },
+  "community_back": {
+    "formatted": true,
+    "forms": {
+      "other": "Back to threads"
     },
     "type": "string"
   },
@@ -3237,6 +3244,13 @@
     "formatted": true,
     "forms": {
       "other": "Local block toggled for %1$s."
+    },
+    "type": "string"
+  },
+  "community_bugs": {
+    "formatted": true,
+    "forms": {
+      "other": "bugs"
     },
     "type": "string"
   },
@@ -3251,6 +3265,13 @@
     "formatted": true,
     "forms": {
       "other": "Cancel"
+    },
+    "type": "string"
+  },
+  "community_channels": {
+    "formatted": true,
+    "forms": {
+      "other": "Channels"
     },
     "type": "string"
   },
@@ -3289,10 +3310,24 @@
     },
     "type": "string"
   },
+  "community_general": {
+    "formatted": true,
+    "forms": {
+      "other": "general"
+    },
+    "type": "string"
+  },
   "community_help": {
     "formatted": true,
     "forms": {
-      "other": "One room: Re-TUI community. Plain text posts on Send. exit posts; /exit leaves. //text posts /text. Unknown slash commands stay here.\n/help · /refresh · /older · /login · /register · /logout · /exit\n/report <full message ID> · /block <username> (local only; repeat to unblock)\nUsername/password only. Public registration, authenticated reading/posting. No forgotten-password recovery: register a new username; it is a separate identity, not a reclaim or history/ownership transfer.\nServer-readable; no end-to-end encryption. General messages expire after 24 hours; private report evidence is retained for six calendar months. Local cache: at most 200 messages, pruned on opening and while visible, including offline. Paused encrypted cache bytes may remain until reopening; no secure-erasure guarantee. Cached messages are rechecked for moderation when connected.\nPocketBase is pre-1.0; this optional pilot may change. No push, background service, attachments, private messages, automatic links or launcher execution."
+      "other": "Channels: general, bugs, help, suggestions and presets. Suggestions uses the features API key. Tap Channels, New thread, Mentions or Menu; no slash command is required. Plain text posts on Send; exit posts, /exit leaves, //text posts /text.\n/help · /refresh · /older · /login · /register · /logout · /exit\n/report <full message ID> · /block <username> · /moderate <private text>\nGeneral messages expire individually after 24 hours. Forum threads and replies persist. Reports and private moderator requests last six calendar months; /moderate never posts publicly and has no automatic retry.\nTap a suggested @handle to insert it at the caret. Only active foreground sessions renew 90-second presence leases; badges and mentions are in-app only. No push, private messages, attachments, external IRC or launcher execution.\nUsername/password only; public registration and no password recovery. Server-readable, not end-to-end encrypted. Private encrypted account storage; 200 bodies per window and bounded routing/read metadata. Paused cache bytes are pruned on access; no secure-erasure guarantee. Nothing posts automatically on restoration. PocketBase is pre-1.0; this optional pilot may change."
+    },
+    "type": "string"
+  },
+  "community_help_channel": {
+    "formatted": true,
+    "forms": {
+      "other": "help"
     },
     "type": "string"
   },
@@ -3352,6 +3387,41 @@
     },
     "type": "string"
   },
+  "community_mentions": {
+    "formatted": true,
+    "forms": {
+      "other": "Mentions"
+    },
+    "type": "string"
+  },
+  "community_mentions_empty": {
+    "formatted": true,
+    "forms": {
+      "other": "No unexpired mentions."
+    },
+    "type": "string"
+  },
+  "community_menu": {
+    "formatted": true,
+    "forms": {
+      "other": "Menu"
+    },
+    "type": "string"
+  },
+  "community_moderate": {
+    "formatted": true,
+    "forms": {
+      "other": "Private moderator request"
+    },
+    "type": "string"
+  },
+  "community_more": {
+    "formatted": true,
+    "forms": {
+      "other": "More"
+    },
+    "type": "string"
+  },
   "community_network_error": {
     "formatted": true,
     "forms": {
@@ -3363,6 +3433,34 @@
     "formatted": true,
     "forms": {
       "other": "New/unread messages: %1$d · scroll to read"
+    },
+    "type": "string"
+  },
+  "community_new_thread": {
+    "formatted": true,
+    "forms": {
+      "other": "New thread"
+    },
+    "type": "string"
+  },
+  "community_offline": {
+    "formatted": true,
+    "forms": {
+      "other": "@%1$s · offline"
+    },
+    "type": "string"
+  },
+  "community_older": {
+    "formatted": true,
+    "forms": {
+      "other": "Older"
+    },
+    "type": "string"
+  },
+  "community_online": {
+    "formatted": true,
+    "forms": {
+      "other": "@%1$s · online"
     },
     "type": "string"
   },
@@ -3394,10 +3492,38 @@
     },
     "type": "string"
   },
+  "community_presets": {
+    "formatted": true,
+    "forms": {
+      "other": "presets"
+    },
+    "type": "string"
+  },
+  "community_private_sent": {
+    "formatted": true,
+    "forms": {
+      "other": "Private moderator request accepted."
+    },
+    "type": "string"
+  },
+  "community_private_uncertain": {
+    "formatted": true,
+    "forms": {
+      "other": "Private delivery was not confirmed. It may have reached the server. Do not send another copy blindly."
+    },
+    "type": "string"
+  },
   "community_rate_error": {
     "formatted": true,
     "forms": {
       "other": "Rate limited; wait %1$d seconds before retrying."
+    },
+    "type": "string"
+  },
+  "community_refresh": {
+    "formatted": true,
+    "forms": {
+      "other": "Latest"
     },
     "type": "string"
   },
@@ -3415,6 +3541,13 @@
     },
     "type": "string"
   },
+  "community_report": {
+    "formatted": true,
+    "forms": {
+      "other": "Report a general message"
+    },
+    "type": "string"
+  },
   "community_reported": {
     "formatted": true,
     "forms": {
@@ -3429,6 +3562,48 @@
     },
     "type": "string"
   },
+  "community_auth_username_error": {
+    "formatted": true,
+    "forms": {
+      "other": "Use 3–24 ASCII letters, digits, - or _."
+    },
+    "type": "string"
+  },
+  "community_auth_username_guidance": {
+    "formatted": true,
+    "forms": {
+      "other": "3–24 ASCII letters, digits, - or _. No email or password recovery."
+    },
+    "type": "string"
+  },
+  "community_auth_password_guidance": {
+    "formatted": true,
+    "forms": {
+      "other": "8–71 characters. No email or password recovery."
+    },
+    "type": "string"
+  },
+  "community_auth_password_error": {
+    "formatted": true,
+    "forms": {
+      "other": "Use 8–71 characters. Enter username again."
+    },
+    "type": "string"
+  },
+  "community_auth_confirmation_error": {
+    "formatted": true,
+    "forms": {
+      "other": "Passwords differ. Enter username again."
+    },
+    "type": "string"
+  },
+  "community_retry": {
+    "formatted": true,
+    "forms": {
+      "other": "Reconcile pending post"
+    },
+    "type": "string"
+  },
   "community_session_error": {
     "formatted": true,
     "forms": {
@@ -3440,6 +3615,13 @@
     "formatted": true,
     "forms": {
       "other": "Signed out · offline · /login or /register"
+    },
+    "type": "string"
+  },
+  "community_source_gone": {
+    "formatted": true,
+    "forms": {
+      "other": "This source is unavailable or has expired."
     },
     "type": "string"
   },
@@ -3461,6 +3643,27 @@
     "formatted": true,
     "forms": {
       "other": "Send"
+    },
+    "type": "string"
+  },
+  "community_suggestions": {
+    "formatted": true,
+    "forms": {
+      "other": "suggestions"
+    },
+    "type": "string"
+  },
+  "community_thread_title": {
+    "formatted": true,
+    "forms": {
+      "other": "Thread title"
+    },
+    "type": "string"
+  },
+  "community_threads_empty": {
+    "formatted": true,
+    "forms": {
+      "other": "No threads in this channel. Tap New thread to start one."
     },
     "type": "string"
   },

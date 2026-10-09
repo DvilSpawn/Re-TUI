@@ -84,6 +84,13 @@ class Quotas(unittest.TestCase):
 
                 # Two NAT clients at five reads/15 seconds cost 40 reads/minute.
                 self.assertEqual([request('GET') for _ in range(40)], [401] * 40)
+                self.assertEqual([request('POST','/community/api/community/presence') for _ in range(22)],[401]*22,'presence must have its own posting quota')
+                self.assertEqual(request('GET','/community/api/community/users'),401)
+                self.assertEqual(request('GET','/community/api/community/mentions'),401)
+                self.assertEqual(request('GET','/community/api/community/presence'),404)
+                self.assertEqual(request('POST','/community/api/community/users'),404)
+                self.assertEqual(request('POST','/community/api/community/mentions'),404)
+                self.assertEqual(request('GET','/community/api/collections/mentions/records'),404)
                 self.assertEqual([request('POST') for _ in range(6)], [401] * 6)
                 self.assertEqual(request('POST'), 429, 'posting quota must still be enforced')
                 self.assertEqual(request('GET'), 401, 'posts must not consume read quota')

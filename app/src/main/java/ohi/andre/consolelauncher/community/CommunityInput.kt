@@ -1,6 +1,13 @@
 package ohi.andre.consolelauncher.community
 
 object CommunityInput {
+    fun suggestions(text: String, signedIn: Boolean): List<String> {
+        val commands = if (signedIn) listOf("/help", "/refresh", "/older", "/report", "/moderate", "/block", "/logout", "/exit")
+            else listOf("/register", "/login")
+        if (text.isEmpty()) return if (signedIn) emptyList() else commands
+        if (!text.startsWith("/") || text.startsWith("//") || text.any { it.isWhitespace() }) return emptyList()
+        return commands.filter { it.startsWith(text) }
+    }
     sealed class Result
     data class Message(val body: String) : Result()
     data class Command(val name: String, val argument: String = "") : Result()
@@ -26,10 +33,11 @@ object CommunityInput {
         val parts = text.substring(1).split(" ", limit = 2)
         val name = parts[0]
         val argument = parts.getOrElse(1) { "" }.trim()
-        if (name !in setOf("help", "refresh", "older", "report", "block", "login", "register", "logout", "exit"))
+        if (name !in setOf("help", "refresh", "older", "report", "moderate", "block", "login", "register", "logout", "exit"))
             return Rejected("Unknown slash command; use /help.")
-        if ((name in setOf("report", "block")) != argument.isNotEmpty())
+        if ((name in setOf("report", "moderate", "block")) != argument.isNotEmpty())
             return Rejected("Invalid command arguments; use /help.")
+        if (name == "moderate" && message(argument) !is Message) return Rejected("Invalid private request body.")
         return Command(name, argument)
     }
 }
