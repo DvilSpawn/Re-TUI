@@ -114,6 +114,9 @@ import ohi.andre.consolelauncher.tuils.stuff.FakeLauncherActivity
 object Tuils {
     private const val TAG = "TUI"
 
+    const val BUNDLED_FONT_ASSET = "JetBrainsMonoNerdFont-Regular.ttf"
+    const val BUNDLED_FONT_NAME = "JetBrains Mono Nerd Font Regular"
+
     const val SPACE: String = " "
     const val DOUBLE_SPACE: String = "  "
     const val NEWLINE: String = "\n"
@@ -198,11 +201,11 @@ object Tuils {
             if (globalTypeface == null) {
                 try {
                     globalTypeface =
-                        Typeface.createFromAsset(context.getAssets(), "lucida_console.ttf")
-                    fontPath = "asset://lucida_console.ttf"
+                        Typeface.createFromAsset(context.getAssets(), BUNDLED_FONT_ASSET)
+                    fontPath = "asset://$BUNDLED_FONT_ASSET"
                     Log.e("TUI-FONT", "Falling back to bundled font")
                 } catch (e: Exception) {
-                    globalTypeface = Typeface.DEFAULT
+                    globalTypeface = Typeface.MONOSPACE
                     fontPath = null
                     Log.e("TUI-FONT", "Falling back to system default font")
                 }

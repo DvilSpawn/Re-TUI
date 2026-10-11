@@ -119,6 +119,10 @@
             android:theme="@style/Custom.SystemWP"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
 
+        <activity android:name=".irc.IrcActivity" android:exported="false"
+            android:label="@string/irc_title" android:theme="@style/Custom.Floating"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
+
         <activity android:name=".community.CommunityActivity" android:exported="false"
             android:label="@string/community_title" android:theme="@style/Custom.Floating"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />

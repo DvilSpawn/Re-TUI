@@ -122,9 +122,50 @@ def qalculateNotices = tasks.register('qalculateNotices', Sync) {
     from(rootProject.projectDir) {
         include 'LICENSE', 'THIRD_PARTY_NOTICES.md', 'LICENSES/**'
         include 'native/qalculate/README.md', 'native/qalculate/sources.json'
+        include 'third_party/*.json', 'third_party/*.md', 'third_party/*.patch'
     }
     into(layout.buildDirectory.dir('qalculate/notices/licenses'))
 }
+
+def validateRuntimeNotices = tasks.register('validateRuntimeNotices') {
+    group = 'verification'
+    description = 'Requires reviewed notice records for the resolved release runtime libraries.'
+    inputs.file(rootProject.file('third_party/runtime-libraries.json'))
+    inputs.file(rootProject.file('third_party/sources.json'))
+    inputs.dir(rootProject.file('LICENSES'))
+    doLast {
+        def entries = new groovy.json.JsonSlurper().parse(rootProject.file('third_party/runtime-libraries.json'))
+        def recorded = entries.collect { it.coordinate }.toSet()
+        if (recorded.size() != entries.size()) throw new GradleException('Duplicate runtime notice coordinates')
+        ['playstoreReleaseRuntimeClasspath', 'fdroidReleaseRuntimeClasspath'].each { name ->
+            def resolved = configurations.getByName(name).incoming.resolutionResult.allComponents
+                    .findAll { it.id instanceof org.gradle.api.artifacts.component.ModuleComponentIdentifier }
+                    .collect { it.id.displayName }.toSet()
+            if (resolved != recorded) {
+                throw new GradleException("Review third_party/runtime-libraries.json for ${name}: missing ${resolved - recorded}; stale ${recorded - resolved}")
+            }
+        }
+        entries.each { entry ->
+            if (!entry.license_files) throw new GradleException("No notice texts for ${entry.coordinate}")
+            entry.license_files.each { name ->
+                if (!rootProject.file("LICENSES/${name}").isFile()) {
+                    throw new GradleException("Missing notice ${name} for ${entry.coordinate}")
+                }
+            }
+        }
+        def sourceInputs = new groovy.json.JsonSlurper().parse(rootProject.file('third_party/sources.json'))
+        if (sourceInputs.collect { it.coordinate }.toSet() != entries.findAll {
+            it.license_files.contains('Tasker-GPL-3.0.txt')
+        }.collect { it.coordinate }.toSet()) {
+            throw new GradleException('Tasker runtime version and corresponding-source pins must match')
+        }
+        sourceInputs.each { source ->
+            if (!recorded.contains(source.coordinate)) throw new GradleException("Stale source input: ${source.coordinate}")
+        }
+        println("Verified notice records for ${recorded.size()} external runtime components")
+    }
+}
+tasks.named('preBuild').configure { dependsOn(validateRuntimeNotices) }
 tasks.matching {
     (it.name.startsWith('merge') && it.name.endsWith('Assets')) ||
             it.name.toLowerCase(Locale.ROOT).contains('lint')
@@ -230,7 +271,7 @@ def addCommonSourceInputErrors = { File sourceFile, List<String> errors ->
 
 def isAllowedAsset = { File assetsDir, File sourceFile ->
     def relativeAssetPath = assetsDir.toPath().relativize(sourceFile.toPath()).toString().replace(File.separator, "/")
-    return relativeAssetPath == "lucida_console.ttf"
+    return relativeAssetPath == "JetBrainsMonoNerdFont-Regular.ttf"
             || relativeAssetPath in ["localization/catalog.json", "localization/english-template.zip"]
             || (relativeAssetPath.startsWith("first_run_terminal_green/")
             && !relativeAssetPath.substring("first_run_terminal_green/".length()).contains("/")

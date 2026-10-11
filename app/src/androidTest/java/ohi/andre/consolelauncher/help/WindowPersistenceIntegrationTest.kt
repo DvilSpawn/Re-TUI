@@ -9,6 +9,7 @@ import android.view.View
 import androidx.test.platform.app.InstrumentationRegistry
 import ohi.andre.consolelauncher.calculator.CalculatorActivity
 import ohi.andre.consolelauncher.community.CommunityActivity
+import ohi.andre.consolelauncher.irc.IrcActivity
 import org.junit.Assert.*
 import org.junit.Test
 
@@ -60,7 +61,7 @@ class WindowPersistenceIntegrationTest {
             instrumentation.runOnMainSync { target("window-toggle").performClick() }
             idle()
             assertEquals("Expanding never loses the floating rectangle", floating, bounds(panel()))
-            if (prefix != "community") {
+            if (prefix != "community" && prefix != "irc") {
                 activity = rotate(activity!!, ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
                 assertEquals(View.GONE, target("resize-corner").visibility)
                 close(activity!!); activity = null
@@ -74,5 +75,6 @@ class WindowPersistenceIntegrationTest {
     }
     @Test fun calculatorRemembersModeAndRectangleAfterClosing() = check(CalculatorActivity::class.java, "calculator", OfflineHelpActivity::class.java, "help")
     @Test fun helpRemembersModeAndRectangleAfterClosing() = check(OfflineHelpActivity::class.java, "help", CommunityActivity::class.java, "community")
-    @Test fun ircRemembersModeAndRectangleAfterClosing() = check(CommunityActivity::class.java, "community", CalculatorActivity::class.java, "calculator")
+    @Test fun communityRemembersModeAndRectangleAfterClosing() = check(CommunityActivity::class.java, "community", CalculatorActivity::class.java, "calculator")
+    @Test fun ircRemembersModeAndRectangleAfterClosing() = check(IrcActivity::class.java, "irc", CalculatorActivity::class.java, "calculator")
 }

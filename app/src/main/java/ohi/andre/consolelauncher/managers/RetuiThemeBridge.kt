@@ -275,8 +275,8 @@ object RetuiThemeBridge {
             return LauncherFontExtras(path = cached.absolutePath, file = cached.name)
         }
 
-        return if (cachedFontPath == "asset://lucida_console.ttf") {
-            LauncherFontExtras(name = "lucida_console")
+        return if (cachedFontPath == "asset://${Tuils.BUNDLED_FONT_ASSET}") {
+            LauncherFontExtras(name = Tuils.BUNDLED_FONT_NAME)
         } else {
             LauncherFontExtras()
         }

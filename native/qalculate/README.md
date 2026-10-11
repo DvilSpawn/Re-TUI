@@ -86,7 +86,9 @@ For a Play Store release, use the release APK and also pass
 to record both binary hashes against the same source tree.
 
 The bundle includes app source, our bridge/build recipe/patch, the original native
-archives, notices, and a manifest with source hashes and the APK hash. It excludes
+archives, matching Tasker Plugin Library source/build archives, notices, and a
+manifest with source hashes and the APK hash. See `third_party/README.md` for its
+source-match verification and metadata-only build patch. It excludes
 ignored signing keys, local settings and build products. Bundled upstream archives
 are reused by the build script, so native source downloads are unnecessary when
 rebuilding the bundle. Android SDK/NDK and Gradle dependencies remain build

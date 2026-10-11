@@ -700,7 +700,7 @@
     <!-- Ui.kt: show_enter_button -->
     <string name="setting_ui_show_enter_button_description" formatted="false">"Hide/show the enter button"</string>
     <!-- Ui.kt: system_font -->
-    <string name="setting_ui_system_font_description" formatted="false">"If false, the default Re:T-UI font (\"Lucida Console\") will be used for all texts"</string>
+    <string name="setting_ui_system_font_description" formatted="false">Use the Android system font instead of a custom font or the bundled JetBrains Mono Nerd Font Regular.</string>
     <!-- Ui.kt: ram_size -->
     <string name="setting_ui_ram_size_description" formatted="false">"The ram label font size"</string>
     <!-- Ui.kt: battery_size -->

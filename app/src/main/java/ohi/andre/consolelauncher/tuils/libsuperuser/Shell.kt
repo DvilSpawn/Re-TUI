@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2012-2015 Jorrit "Chainfire" Jongma
+ * Modified by Re:TUI: Kotlin port and Launcher integration.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

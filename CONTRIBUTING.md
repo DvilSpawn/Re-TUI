@@ -21,6 +21,11 @@ checks do not replace a native speaker's review or phone import testing.
 
 ## Other changes
 
+Before redistributing artwork or adding assets, read the
+[asset provenance and permission boundaries](docs/asset-provenance.md) and
+[third-party notices](THIRD_PARTY_NOTICES.md). Record source, author, license and
+modifications for new assets; do not assume the code's GPL covers third-party art.
+
 Describe the problem, the resulting behavior, and how you tested the change.
 For changes to app strings, follow the [localization maintenance guide](docs/localization/README.md)
 and refresh the English pack template with `python3 scripts/language_packs.py export`.

@@ -25,7 +25,7 @@ enum class Ui : XMLPrefsSave {
     },
     system_font {
         override fun defaultValue(): String? {
-            return "true"
+            return "false"
         }
 
         override fun type(): String? {

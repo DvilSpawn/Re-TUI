@@ -1,0 +1,11 @@
+--- a/taskerpluginlibrary/build.gradle
++++ b/taskerpluginlibrary/build.gradle
+@@ -40,7 +40,7 @@
+ }
+ ext {
+     PUBLISH_GROUP_ID = 'com.joaomgcd'
+-    PUBLISH_VERSION = '0.4.9'
++    PUBLISH_VERSION = '0.4.10'
+     PUBLISH_ARTIFACT_ID = 'taskerpluginlibrary'
+ }
+ apply from: "${rootProject.projectDir}/scripts/publish-mavencentral.gradle"

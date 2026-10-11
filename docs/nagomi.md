@@ -13,7 +13,13 @@ instructed implementation. The upstream PolyForm license is retained in
 `LICENSES/Nagomi-PolyForm-Noncommercial.txt` and the installed credits dialog.
 This record describes the maintainer's confirmation; it does not fabricate a
 verbatim grant or claim upstream changed its public license. Retain the full
-author correspondence with the project's permission records.
+author correspondence with the project's permission records, if available.
+
+On 2026-10-11 the maintainer confirmed the permission was explicitly verbal
+and also covers other people modifying and redistributing the Re:TUI adaptation,
+including commercial GPL forks. This scope includes the adapted code and
+pond artwork described below, not a relicensing of the separate upstream project.
+This is a dated maintainer attestation, not a fabricated written author grant.
 
 GitHub and demo links appear on the Nagomi wallpaper page. Any future author
 app link should be added once supplied/verified; no speculative redirect exists.

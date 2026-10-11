@@ -1,0 +1,269 @@
+package ohi.andre.consolelauncher.irc
+
+import android.content.Intent
+import android.graphics.Bitmap
+import android.text.InputType
+import android.view.View
+import android.view.ViewGroup
+import android.widget.EditText
+import android.widget.TextView
+import android.widget.ScrollView
+import androidx.test.platform.app.InstrumentationRegistry
+import ohi.andre.consolelauncher.R
+import ohi.andre.consolelauncher.help.WindowPreferencesRule
+import ohi.andre.consolelauncher.managers.settings.LauncherSettings
+import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
+import ohi.andre.consolelauncher.managers.xml.options.Ui
+import ohi.andre.consolelauncher.tuils.Tuils
+import ohi.andre.consolelauncher.tuils.LauncherFontScale
+import org.junit.Assert.*
+import org.junit.Rule
+import org.junit.Test
+import java.net.ServerSocket
+import java.net.Socket
+import java.io.File
+import java.util.concurrent.CopyOnWriteArrayList
+import kotlin.concurrent.thread
+
+/** Loopback-only transport. No production messages or account mutations. */
+class IrcGuidedDeviceTest {
+    @get:Rule val windows = WindowPreferencesRule()
+    private val instrumentation = InstrumentationRegistry.getInstrumentation()
+    private class Peer : AutoCloseable {
+        val server = ServerSocket(0)
+        val frames = CopyOnWriteArrayList<IrcMessage>()
+        val mechanisms = CopyOnWriteArrayList<String>()
+        private var socket: Socket? = null
+        private val worker = thread {
+            runCatching {
+                server.accept().use { connection ->
+                    socket = connection; val reader = connection.getInputStream().bufferedReader(); val writer = connection.getOutputStream().bufferedWriter()
+                    var nick = "fixture"
+                    fun reply(text: String) { writer.write(text + "\r\n"); writer.flush() }
+                    while (true) {
+                        val raw = reader.readLine() ?: break; val m = IrcMessage.parse(raw)
+                        // Never retain authentication payloads, even fixture passwords.
+                        if (m.command != "AUTHENTICATE") frames.add(m)
+                        when (m.command) {
+                            "NICK" -> nick = m.params[0]
+                            "CAP" -> if ("LS" in m.params) reply(":s CAP $nick LS :sasl=PLAIN,EXTERNAL echo-message") else if ("REQ" in m.params) reply(":s CAP $nick ACK :sasl echo-message") else if ("END" in m.params) reply(":s 001 $nick :Welcome")
+                            "AUTHENTICATE" -> if (m.params[0] in listOf("PLAIN", "EXTERNAL")) { mechanisms.add(m.params[0]); reply("AUTHENTICATE +") } else reply(":s 903 $nick :Success")
+                            "JOIN" -> { val channel = m.params[0]; reply(":$nick!u@fixture JOIN $channel"); reply(":s 353 $nick = $channel :$nick alice"); reply(":s 366 $nick $channel :End") }
+                            "NAMES" -> { reply(":s 353 $nick = ${m.params[0]} :$nick alice"); reply(":s 366 $nick ${m.params[0]} :End") }
+                            "LIST" -> { reply(":s 321 $nick :Start"); reply(":s 322 $nick #fixture 2 :A test channel"); reply(":s 323 $nick :End") }
+                            "PRIVMSG" -> if (m.params[0] == "NickServ" && m.params[1].startsWith("CERT ADD ")) reply(":NickServ!service@fixture NOTICE $nick :Certificate fingerprint successfully added")
+                                else if (m.params[0] == "NickServ" && m.params[1].startsWith("CERT DEL ")) reply(":NickServ!service@fixture NOTICE $nick :Certificate fingerprint successfully removed")
+                                else reply(":$nick!u@fixture PRIVMSG ${m.params[0]} :${m.params[1]}")
+                        }
+                    }
+                }
+            }
+        }
+        override fun close() { socket?.close(); server.close(); worker.join(5000) }
+    }
+    private fun start(): IrcActivity {
+        val a = instrumentation.startActivitySync(Intent(instrumentation.targetContext, IrcActivity::class.java).putExtra("irc_offline_fixture", true).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) as IrcActivity
+        waitFor { var resumed = false; main { resumed = a.lifecycle.currentState == androidx.lifecycle.Lifecycle.State.RESUMED && a.onBackPressedDispatcher.hasEnabledCallbacks() }; resumed }
+        return a
+    }
+    private fun main(block: () -> Unit) = instrumentation.runOnMainSync(block)
+    private fun waitFor(condition: () -> Boolean) {
+        val deadline = System.nanoTime() + 5_000_000_000
+        while (System.nanoTime() < deadline) { instrumentation.waitForIdleSync(); if (condition()) return; android.os.SystemClock.sleep(25) }
+        assertTrue("Fixture state arrived", condition())
+    }
+    private fun input(a: IrcActivity) = a.findViewById<EditText>(R.id.irc_input)
+    private fun capture(a: IrcActivity, name: String) {
+        instrumentation.waitForIdleSync()
+        android.os.SystemClock.sleep(200)
+        instrumentation.waitForIdleSync()
+        val shot = instrumentation.uiAutomation.takeScreenshot()
+        try { File(a.getExternalFilesDir(null), "irc-guided-$name.png").outputStream().use { assertTrue(shot.compress(Bitmap.CompressFormat.PNG, 100, it)) } }
+        finally { shot.recycle() }
+    }
+    private fun submit(a: IrcActivity, text: String) { input(a).setText(text); a.findViewById<View>(R.id.irc_send).performClick() }
+    private fun find(view: View, text: String): View? {
+        if (view is TextView && view.text.toString().removePrefix("> ") == text) return view
+        if (view is ViewGroup) for (i in 0 until view.childCount) find(view.getChildAt(i), text)?.let { return it }
+        return null
+    }
+    private fun click(a: IrcActivity, text: String) {
+        var target = find(a.window.decorView, text); assertNotNull("Action $text", target)
+        while (target != null && !target.isClickable) target = target.parent as? View
+        assertNotNull("Clickable action $text", target); target!!.performClick()
+    }
+    @Test fun guidedLoginChannelsPeopleAndLocalHelpUseOneComposer() {
+        val a = start()
+        Peer().use { peer ->
+            try {
+                main {
+                    a.session.connector = { _, _ -> Socket("127.0.0.1", peer.server.localPort) }
+                    input(a).setText("preserved draft"); click(a, "Sign in"); submit(a, "fixture")
+                    assertEquals(InputType.TYPE_TEXT_VARIATION_PASSWORD, input(a).inputType and InputType.TYPE_MASK_VARIATION)
+                    submit(a, "fixture-only-password")
+                }
+                waitFor { a.session.state.active.joined }
+                capture(a, "chat")
+                main {
+                    assertEquals("#retui", a.session.state.active.name); assertEquals("preserved draft", a.session.state.buffers.first().draft)
+                    input(a).setText("my channel draft"); click(a, "Help")
+                    assertEquals(IrcNavigation.Page.HELP, a.session.navigation.page)
+                    submit(a, "a local search, not a message")
+                    a.onBackPressedDispatcher.onBackPressed(); assertEquals("my channel draft", input(a).text.toString())
+                    submit(a, "/help"); assertEquals("#retui", a.session.state.active.name)
+                    a.onBackPressedDispatcher.onBackPressed()
+                    click(a, "Channels"); submit(a, "#help"); click(a, "#help")
+                }
+                waitFor { a.session.state.active.name == "#help" && a.session.state.active.joined }
+                main { click(a, "People") }
+                waitFor { a.session.state.active.names.contains("alice") && !a.session.state.active.namesLoading }
+                capture(a, "people")
+                main { click(a, "alice"); assertEquals("alice", a.session.state.active.name); assertTrue(a.findViewById<TextView>(R.id.irc_context).text.contains("Private conversation")) }
+                assertFalse(peer.frames.any { it.command == "PRIVMSG" })
+                assertFalse(a.session.state.buffers.any { b -> b.lines.any { it.text.contains("fixture-only-password") || it.text.contains("one TLS network") } })
+            } finally { main { a.finish() }; instrumentation.waitForIdleSync() }
+        }
+    }
+    @Test fun navigationSurvivesRecreationAndPasswordStageCancels() {
+        var a = start()
+        try {
+            main {
+                val state = a.session.state; state.nickname = "fixture"; state.receive(IrcMessage.parse(":fixture!u@host JOIN #retui")); a.session.changed?.invoke()
+                input(a).setText("keep this draft"); submit(a, "/help"); click(a, "All commands"); input(a).setText("join")
+            }
+            fun recreate() {
+                val monitor = instrumentation.addMonitor(IrcActivity::class.java.name, null, false)
+                try { main { a.recreate() }; a = instrumentation.waitForMonitorWithTimeout(monitor, 5000) as IrcActivity; instrumentation.waitForIdleSync() }
+                finally { instrumentation.removeMonitor(monitor) }
+            }
+            recreate()
+            main {
+                assertEquals(IrcNavigation.Page.COMMANDS, a.session.navigation.page); assertEquals("join", input(a).text.toString())
+                a.onBackPressedDispatcher.onBackPressed(); assertEquals("keep this draft", input(a).text.toString())
+                submit(a, "/login fixture"); input(a).setText("rotation-secret")
+            }
+            recreate()
+            main { assertEquals("keep this draft", input(a).text.toString()); assertEquals(InputType.TYPE_TEXT_FLAG_MULTI_LINE, input(a).inputType and InputType.TYPE_TEXT_FLAG_MULTI_LINE); assertNull(a.session.client) }
+            assertFalse(a.session.state.buffers.any { b -> b.lines.any { it.text.contains("rotation-secret") } })
+        } finally { main { a.finish() }; instrumentation.waitForIdleSync() }
+    }
+    @Test fun browseDoesNotSendSearchAndEchoDeduplicatesImmediateLocalMessage() {
+        val a = start()
+        Peer().use { peer ->
+            try {
+                main { a.session.connector = { _, _ -> Socket("127.0.0.1", peer.server.localPort) }; a.session.account = "fixture"; a.session.state.nickname = "fixture"; a.session.connect("fixture-password".toCharArray()) }
+                waitFor { a.session.state.active.joined }
+                main { click(a, "Channels"); click(a, "Browse network"); input(a).setText("fixture") }
+                waitFor { a.session.state.directory.size == 1 && !a.session.state.directoryLoading }
+                capture(a, "channels")
+                main { a.onBackPressedDispatcher.onBackPressed(); submit(a, "hello fixture"); assertTrue(a.session.state.active.lines.any { it.body == "hello fixture" }) }
+                waitFor { a.session.state.active.lines.any { it.body == "hello fixture" && !it.pending } }
+                assertEquals(1, a.session.state.active.lines.count { it.body == "hello fixture" })
+                assertEquals(1, peer.frames.count { it.command == "PRIVMSG" }); assertFalse(peer.frames.any { it.command == "PRIVMSG" && it.params.last() == "fixture" })
+            } finally { main { a.finish() }; instrumentation.waitForIdleSync() }
+        }
+    }
+    @Test fun temporaryHelpPreservesReadingPositionAndHiddenUnreadAndCommandHints() {
+        val a = start()
+        try {
+            main {
+                val s = a.session.state; s.nickname = "fixture"; s.receive(IrcMessage.parse(":fixture!u@host JOIN #retui"))
+                repeat(80) { s.receive(IrcMessage.parse(":alice!u@host PRIVMSG #retui :fixture line $it")) }
+                a.session.changed?.invoke(); input(a).setText("unfinished reply")
+            }
+            instrumentation.waitForIdleSync()
+            main { a.findViewById<ScrollView>(R.id.irc_scroll).scrollTo(0, 120) }
+            instrumentation.waitForIdleSync()
+            val position = a.session.state.active.scroll
+            main {
+                submit(a, "/help")
+                a.session.state.receive(IrcMessage.parse(":alice!u@host PRIVMSG #retui :hello fixture")); a.session.changed?.invoke()
+                assertEquals(1, a.session.state.active.unread)
+            }
+            capture(a, "help")
+            main { a.onBackPressedDispatcher.onBackPressed(); assertEquals("unfinished reply", input(a).text.toString()); assertEquals(0, a.session.state.active.unread) }
+            instrumentation.waitForIdleSync()
+            main {
+                assertEquals(position, a.findViewById<ScrollView>(R.id.irc_scroll).scrollY)
+                input(a).setText("/join")
+                assertEquals(View.VISIBLE, a.findViewById<View>(R.id.irc_guidance).visibility)
+                assertTrue(a.findViewById<TextView>(R.id.irc_guidance).text.contains("#channel"))
+            }
+            capture(a, "command")
+        } finally { main { a.finish() }; instrumentation.waitForIdleSync() }
+    }
+    @Test fun deviceEnrollmentAutomaticReconnectAndRevocationUseFixtureOnly() {
+        val context = instrumentation.targetContext; val record = File(context.noBackupFilesDir, "irc-device.json")
+        val original = record.takeIf { it.exists() }?.readBytes()
+        val identity = IrcDeviceKey.Identity("irc.kokodoko.cloud", 6697, "fixture" + System.nanoTime().toString().takeLast(8))
+        val devices = IrcDeviceKey(context)
+        var a = start()
+        try {
+            devices.ensure(identity)
+            Peer().use { first ->
+                main {
+                    a.session.connector = { _, _ -> Socket("127.0.0.1", first.server.localPort) }
+                    a.session.rememberDevice = true; a.session.account = identity.account; a.session.state.nickname = identity.account
+                    a.session.connect("fixture-only-password".toCharArray())
+                }
+                waitFor { devices.remembered() == identity }
+                assertEquals(listOf("PLAIN"), first.mechanisms)
+                main { a.finish() }; instrumentation.waitForIdleSync()
+            }
+            a = start()
+            Peer().use { second ->
+                main {
+                    a.session.connector = { _, _ -> Socket("127.0.0.1", second.server.localPort) }
+                    a.session.initialized = false; a.session.restoreDevice()
+                }
+                waitFor { a.session.state.active.joined }
+                assertEquals(listOf("EXTERNAL"), second.mechanisms)
+                assertFalse(second.frames.any { it.command == "PRIVMSG" })
+                main { a.session.forgetDevice() }
+                waitFor { devices.remembered() == null && a.session.client == null }
+                assertTrue(second.frames.any { it.command == "PRIVMSG" && it.params.last().startsWith("CERT DEL ") })
+                assertEquals(context.getString(R.string.irc_device_revoked), a.session.deviceStatus)
+            }
+        } finally {
+            main { a.finish() }; instrumentation.waitForIdleSync()
+            devices.forget(identity)
+            if (original != null) record.writeBytes(original) else record.delete()
+        }
+    }
+    @Test fun largestLauncherFontInNarrowFloatingPaneKeepsAccessibleActionsAndComposer() {
+        val context = instrumentation.targetContext
+        XMLPrefsManager.loadCommons(context); LauncherSettings.refreshFromLoadedPrefs()
+        val original = LauncherSettings.get(Ui.font_size_offset)
+        var a: IrcActivity? = null
+        try {
+            LauncherSettings.set(context, Ui.font_size_offset, "8")
+            val activity = start(); a = activity
+            main {
+                val root = activity.window.decorView
+                root.findViewWithTag<View>("irc-window-toggle").performClick()
+                repeat(30) { root.findViewWithTag<View>("irc-resize-corner").performLongClick() }
+                submit(activity, "/login fixture"); activity.onBackPressedDispatcher.onBackPressed()
+                assertEquals(Tuils.getTypeface(activity), input(activity).typeface)
+                assertEquals(LauncherFontScale.terminalTextSizeSp() * activity.resources.displayMetrics.scaledDensity, input(activity).textSize, .1f)
+            }
+            instrumentation.waitForIdleSync()
+            main {
+                val minimum = Tuils.dpToPx(activity, 48)
+                assertTrue(input(activity).height >= minimum)
+                assertTrue(activity.findViewById<View>(R.id.irc_send).height >= minimum)
+                assertTrue(activity.findViewById<View>(R.id.irc_scroll).height > 0)
+                submit(activity, "/help")
+            }
+            instrumentation.waitForIdleSync()
+            main {
+                val minimum = Tuils.dpToPx(activity, 48)
+                val all = find(activity.window.decorView, "All commands")!!
+                assertTrue(all.height >= minimum); assertTrue(all.isFocusable); assertTrue(all.contentDescription.isNotBlank())
+                assertFalse(input(activity).isEnabled)
+                assertEquals(View.GONE, activity.findViewById<View>(R.id.irc_prompt_row).visibility)
+                assertTrue(activity.findViewById<View>(R.id.irc_scroll).height > 0)
+            }
+            capture(activity, "narrow-large-font")
+        } finally { main { a?.finish(); LauncherSettings.set(context, Ui.font_size_offset, original) }; instrumentation.waitForIdleSync() }
+    }
+}

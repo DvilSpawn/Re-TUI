@@ -1277,6 +1277,7 @@ Examples:
 $ intent -view geo:0,0?q=home 
 $ intent -activity -a android.intent.action.SEND -t text/plain --es android.intent.extra.TEXT standup notes 
 $ intent -broadcast -a net.dinglisch.android.tasker.ACTION_TASK -p net.dinglisch.android.taskerm --es task_name Work</string>
+    <string name="help_irc">irc — open the native TLS IRC terminal. /server, /connect, /login, /register, /join, /window, /query, /msg and /help. This is not the HTTP community feed.</string>
     <string name="help_landscape">Save the Re:T-UI landscape preference and enable adaptive split layout when the window is wide enough. 
 
 Usage: 
@@ -1753,7 +1754,7 @@ Wiki:
     <string name="hub_behavior">Behavior</string>
     <string name="hub_create_shareable_configuration">Create Shareable Configuration</string>
     <string name="hub_credits_summary">Sign up for Retui Credits: %1$s</string>
-    <string name="hub_default_system_font">Default (System Font)</string>
+    <string name="hub_default_system_font">Android System Font</string>
     <string name="hub_discord">Discord</string>
     <string name="hub_fonts">Fonts</string>
     <string name="hub_frames">Frames</string>
@@ -1818,6 +1819,22 @@ Wiki:
     <string name="invalid_name">Invalid name</string>
     <string name="invalid_number">Invalid number</string>
     <string name="invalid_regex">Invalid regex:</string>
+    <string name="irc_help">Native IRC terminal — one TLS network at a time.
+/server [host] [TLS port] · default irc.kokodoko.cloud 6697
+/nick nickname · /connect · /login account (masked SASL password)
+/register (connected nickname; masked NickServ password)
+/join #channel · /j #channel · /part [#channel]
+/window [number|name|next|prev|close] · /buffer is an alias
+/query nick · /msg nick text · /me action · /names · /list
+/topic [text] · /whois nick · /mode target modes · /kick nick [reason]
+/oper name (masked password) · /disconnect · /quit · /clear · /help
+Plain text goes only to the active joined channel or query. //text sends /text literally. Unknown commands never become messages or launcher commands.
+Window markers: * unread · ! mention/private message. Passwords are never transcript/history entries. TLS is verified; no plaintext fallback.
+IRC accounts are separate from old community accounts. Register once, then /login before joining registered-only channels. Server-readable, not end-to-end encrypted. This first slice has no offline replay, push or background service; leaving disconnects. Unconfirmed messages are never retried automatically.</string>
+    <string name="irc_input_hint">message or /command</string>
+    <string name="irc_secret_hint">Password · masked, session only · Back cancels</string>
+    <string name="irc_send">Send IRC input</string>
+    <string name="irc_title">IRC</string>
     <string name="language_packs_active">Active: %1$s</string>
     <string name="language_packs_browse">Browse GitHub releases</string>
     <string name="language_packs_cancel">Cancel</string>
@@ -4634,7 +4651,7 @@ Apply it later through preset -apply. Active settings have not changed.</string>
     <string name="setting_ui_storage_size_description">The storage label font size</string>
     <string name="setting_ui_storage_status_alignment_description">Storage status line alignment (&lt;0 = left, =0 = center, &gt;0 = right)</string>
     <string name="setting_ui_suggestions_area_margin_description">Suggestion pane spacing in pixels: [outer horizontal margin],[outer vertical margin],[inner horizontal padding],[inner vertical padding]. Also applies to contextual module suggestions; it does not control spacing between chips or module-dock buttons.</string>
-    <string name="setting_ui_system_font_description">If false, the default Re:T-UI font ("Lucida Console") will be used for all texts</string>
+    <string name="setting_ui_system_font_description">Use the Android system font instead of a custom font or the bundled JetBrains Mono Nerd Font Regular.</string>
     <string name="setting_ui_system_wallpaper_description">If true, your system wallpaper will be used as background</string>
     <string name="setting_ui_text_redraw_times_description">A greater value will produce a bigger outline. Limited to 1–8 drawing passes.</string>
     <string name="setting_ui_time_index_description">Changing to a whole-number position inserts a row and shifts that row and later rows down when saved. Decimal positions join a row in left-to-right order: 4.1 and 4.2 share row 4. Existing decimal groups stay together when shifted. ASCII always uses its own row.</string>

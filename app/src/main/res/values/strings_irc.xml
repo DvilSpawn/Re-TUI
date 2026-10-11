@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="help_irc">irc — open the native TLS IRC terminal. /server, /connect, /login, /register, /join, /window, /query, /msg and /help. This is not the HTTP community feed.</string>
+    <string name="irc_title">IRC</string>
+    <string name="irc_input_hint">message or /command</string>
+    <string name="irc_send">Send IRC input</string>
+    <string name="irc_secret_hint">Password · masked, session only · Back cancels</string>
+    <string name="irc_channels">Channels</string>
+    <string name="irc_people">People</string>
+    <string name="irc_help_title">Help</string>
+    <string name="irc_more">More</string>
+    <string name="irc_sign_in">Sign in</string>
+    <string name="irc_network">Network</string>
+    <string name="irc_cancel">Cancel</string>
+    <string name="irc_back">Back to conversation</string>
+    <string name="irc_continue">Continue</string>
+    <string name="irc_private">Private conversation</string>
+    <string name="irc_password_context">%1$s · masked password · Back cancels</string>
+    <string name="irc_joining">Joining %1$s…</string>
+    <string name="irc_account_hint">IRC account name</string>
+    <string name="irc_account_invalid">Use an IRC nickname: up to 30 characters, without spaces. Advanced account names can use /login.</string>
+    <string name="irc_account_explanation">Enter your IRC account name, then your password. This name will also be your nickname.</string>
+    <string name="irc_network_hint">hostname [TLS port]</string>
+    <string name="irc_network_explanation">Choose a TLS network. Account names belong to that network. Default port: 6697.</string>
+    <string name="irc_join_hint">Enter a channel such as #retui, then Continue.</string>
+    <string name="irc_search_hint">Search this view</string>
+    <string name="irc_welcome">IRC, at your fingertips.\nSign in, choose a channel, and talk.</string>
+    <string name="irc_pilot">Re:TUI is a closed-account pilot. New registration is not open. IRC accounts are separate from old community accounts.</string>
+    <string name="irc_other_network">Use an existing account on this network. Nickname-only connections and registration are available through commands where supported.</string>
+    <string name="irc_browse">Browse network</string>
+    <string name="irc_directory">Network channels</string>
+    <string name="irc_join_name">Join by channel name</string>
+    <string name="irc_loading">Loading…</string>
+    <string name="irc_no_matches">No matches yet.</string>
+    <string name="irc_refresh">Refresh</string>
+    <string name="irc_show_more">Show next 50</string>
+    <string name="irc_directory_limit">Showing the first 1,000 channels. You can still join a channel by name.</string>
+    <string name="irc_people_requires_channel">Join a channel to see its people.</string>
+    <string name="irc_all_commands">All commands</string>
+    <string name="irc_quick_help">1. Type a message and press ↵ to send.\n2. Tap a conversation chip to switch chats.\n3. Open Channels to find or join a channel.</string>
+    <string name="irc_connection_details">Connection details</string>
+    <string name="irc_security_details">TLS protects the connection, not against server operators. Private conversations are not end-to-end encrypted.\nLeaving this pane disconnects. Passwords are not saved. Unconfirmed messages are never retried automatically.</string>
+    <string name="irc_diagnostics">Server diagnostics</string>
+    <string name="irc_leave">Leave %1$s</string>
+    <string name="irc_leave_question">Leave %1$s? Your in-session draft will be kept.</string>
+    <string name="irc_leave_confirm">Leave channel</string>
+    <string name="irc_close_conversation">Close conversation</string>
+    <string name="irc_disconnect">Disconnect</string>
+    <string name="irc_disconnect_first">Disconnect before changing networks.</string>
+    <string name="irc_action_failed">Could not complete this action.</string>
+    <string name="irc_command_guidance">Choose a command for its syntax. Nothing is sent until you press ↵.</string>
+    <string name="irc_reconnect">Reconnect</string>
+    <string name="irc_remember_device">Remember this device</string>
+    <string name="irc_device_explanation">Optional: use a protected device key to reconnect automatically when IRC opens. Your password is not saved. Anyone using your unlocked Launcher can access this IRC account. Reinstalling requires password sign-in again.</string>
+    <string name="irc_device_pending">Registering this device key…</string>
+    <string name="irc_device_saved">Device remembered. IRC reconnects automatically when opened.</string>
+    <string name="irc_device_failed">Device login could not be confirmed. Sign in with your password to retry.</string>
+    <string name="irc_forget_device">Forget this device</string>
+    <string name="irc_forget_explanation">Remove the login key from this phone and disconnect? Server revocation will also be requested if this account is connected. If offline, remove its old certificate through NickServ on a trusted client.</string>
+    <string name="irc_device_forgotten">Local device key removed. Password sign-in is required. Check NickServ certificate authorization if server revocation could not complete.</string>
+    <string name="irc_device_removing">Removing device authorization…</string>
+    <string name="irc_device_revoked">Device authorization revoked and local key removed.</string>
+    <string-array name="irc_commands">
+        <item>Connection</item>
+        <item>/server hostname [TLS-port] — choose a network while disconnected</item>
+        <item>/nick nickname — choose your display name</item>
+        <item>/connect — connect; account login asks for a masked password</item>
+        <item>/reconnect — reconnect without resending messages</item>
+        <item>/login account — enter a masked account password</item>
+        <item>/register — masked registration on networks that permit it</item>
+        <item>/disconnect — close the connection</item>
+        <item>/quit — disconnect</item>
+        <item>Conversations</item>
+        <item>/join #channel — join a channel</item>
+        <item>/j #channel — join a channel</item>
+        <item>/part [#channel] — leave a channel</item>
+        <item>/query nickname — open a private conversation</item>
+        <item>/msg nickname text — send a private message</item>
+        <item>/me action — send an action</item>
+        <item>/names — see people in this channel</item>
+        <item>/list — browse network channels</item>
+        <item>/window number|name|next|prev|close — switch or close a buffer</item>
+        <item>/buffer number|name|next|prev|close — alias for /window</item>
+        <item>Channel tools</item>
+        <item>/topic [text] — view or change the channel topic</item>
+        <item>/whois nickname — ask the server about a nickname</item>
+        <item>/mode target modes — change modes where permitted</item>
+        <item>/kick nickname [reason] — remove a member where permitted</item>
+        <item>/oper name — enter a masked operator password</item>
+        <item>Local tools</item>
+        <item>/clear — clear this buffer locally</item>
+        <item>/help — open short, local help</item>
+        <item>//text — send /text literally</item>
+    </string-array>
+    <string name="irc_help">Native IRC terminal — one TLS network at a time.\n/server [host] [TLS port] · default irc.kokodoko.cloud 6697\n/nick nickname · /connect · /login account (masked SASL password)\n/register (connected nickname; masked NickServ password)\n/join #channel · /j #channel · /part [#channel]\n/window [number|name|next|prev|close] · /buffer is an alias\n/query nick · /msg nick text · /me action · /names · /list\n/topic [text] · /whois nick · /mode target modes · /kick nick [reason]\n/oper name (masked password) · /disconnect · /quit · /clear · /help\nPlain text goes only to the active joined channel or query. //text sends /text literally. Unknown commands never become messages or launcher commands.\nWindow markers: * unread · ! mention/private message. Passwords are never transcript/history entries. TLS is verified; no plaintext fallback.\nIRC accounts are separate from old community accounts. Register once, then /login before joining registered-only channels. Server-readable, not end-to-end encrypted. This first slice has no offline replay, push or background service; leaving disconnects. Unconfirmed messages are never retried automatically.</string>
+</resources>

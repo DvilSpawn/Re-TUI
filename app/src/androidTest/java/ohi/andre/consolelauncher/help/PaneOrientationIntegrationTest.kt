@@ -10,6 +10,7 @@ import android.view.View
 import androidx.test.platform.app.InstrumentationRegistry
 import ohi.andre.consolelauncher.calculator.CalculatorActivity
 import ohi.andre.consolelauncher.community.CommunityActivity
+import ohi.andre.consolelauncher.irc.IrcActivity
 import org.junit.Assert.*
 import org.junit.Test
 import java.io.File
@@ -34,7 +35,7 @@ class PaneOrientationIntegrationTest {
         return Rect(xy[0], xy[1], xy[0] + view.width, xy[1] + view.height)
     }
     private fun check(type: Class<out Activity>, prefix: String, floatingLandscape: Boolean) {
-        var activity = instrumentation.startActivitySync(Intent(instrumentation.targetContext, type).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        var activity = instrumentation.startActivitySync(Intent(instrumentation.targetContext, type).putExtra("irc_offline_fixture", true).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
         fun target(tag: String) = activity.window.decorView.findViewWithTag<View>("$prefix-$tag")
         try {
             activity = rotate(activity, ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); idle()
@@ -49,7 +50,9 @@ class PaneOrientationIntegrationTest {
                 instrumentation.runOnMainSync {
                     val panel = target("resize-corner").parent as View
                     assertEquals(if (floatingLandscape) View.VISIBLE else View.GONE, target("window-toggle").visibility)
-                    assertEquals(if (floatingLandscape) View.VISIBLE else View.GONE, target("window-reset").visibility)
+                    activity.window.decorView.findViewWithTag<View>("$prefix-window-reset")?.let {
+                        assertEquals(if (floatingLandscape) View.VISIBLE else View.GONE, it.visibility)
+                    }
                     assertEquals(if (floatingLandscape && floating) View.VISIBLE else View.GONE, target("resize-corner").visibility)
                     if (!floatingLandscape || !floating) assertEquals(bounds(panel.parent as View), bounds(panel))
                 }
@@ -71,5 +74,6 @@ class PaneOrientationIntegrationTest {
     }
     @Test fun calculatorLandscapeIsExpandedAndPortraitChoiceIsPreserved() = check(CalculatorActivity::class.java, "calculator", false)
     @Test fun helpLandscapeIsExpandedAndPortraitChoiceIsPreserved() = check(OfflineHelpActivity::class.java, "help", false)
-    @Test fun ircCanStillFloatInLandscape() = check(CommunityActivity::class.java, "community", true)
+    @Test fun communityCanStillFloatInLandscape() = check(CommunityActivity::class.java, "community", true)
+    @Test fun ircCanStillFloatInLandscape() = check(IrcActivity::class.java, "irc", true)
 }

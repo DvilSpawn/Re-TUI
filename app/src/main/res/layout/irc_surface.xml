@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:paddingStart="8dp" android:paddingEnd="8dp" android:paddingBottom="4dp" android:clipChildren="false" android:clipToPadding="false">
+    <LinearLayout android:id="@+id/irc_panel" android:layout_width="match_parent" android:layout_height="match_parent"
+        android:layout_marginTop="18dp" android:layout_marginBottom="2dp" android:orientation="vertical" android:paddingTop="28dp" android:paddingStart="6dp" android:paddingEnd="6dp">
+        <LinearLayout android:id="@+id/irc_main_pane" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:orientation="vertical" android:paddingTop="8dp">
+            <TextView android:id="@+id/irc_context" android:layout_width="match_parent" android:layout_height="wrap_content" android:maxLines="2" android:ellipsize="end" android:accessibilityHeading="true" />
+            <TextView android:id="@+id/irc_status" android:layout_width="match_parent" android:layout_height="wrap_content" android:maxLines="2" android:ellipsize="end" android:accessibilityLiveRegion="polite" />
+            <ScrollView android:id="@+id/irc_scroll" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+                <FrameLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+                    <TextView android:id="@+id/irc_output" android:layout_width="match_parent" android:layout_height="wrap_content" android:textIsSelectable="true" android:padding="6dp" />
+                    <LinearLayout android:id="@+id/irc_navigation" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="6dp" android:visibility="gone" />
+                </FrameLayout>
+            </ScrollView>
+            <HorizontalScrollView android:id="@+id/irc_window_scroll" android:layout_width="match_parent" android:layout_height="48dp" android:fillViewport="true" android:scrollbars="none">
+                <LinearLayout android:id="@+id/irc_windows" android:layout_width="wrap_content" android:layout_height="match_parent" android:orientation="horizontal" />
+            </HorizontalScrollView>
+            <LinearLayout android:id="@+id/irc_prompt_row" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
+                <TextView android:id="@+id/irc_prompt" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="&gt; " />
+                <EditText android:id="@+id/irc_input" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                    android:minHeight="48dp" android:maxLines="3" android:inputType="textMultiLine|textNoSuggestions" android:imeOptions="actionSend|flagNoExtractUi"
+                    android:hint="@string/irc_input_hint" android:saveEnabled="false" android:importantForAutofill="noExcludeDescendants" />
+                <Button android:id="@+id/irc_send" android:layout_width="48dp" android:layout_height="48dp" android:minWidth="48dp" android:minHeight="48dp" android:text="↵" android:contentDescription="@string/irc_send" android:background="@null" />
+            </LinearLayout>
+            <TextView android:id="@+id/irc_guidance" android:layout_width="match_parent" android:layout_height="wrap_content" android:maxLines="2" android:ellipsize="end" android:visibility="gone" android:accessibilityLiveRegion="polite" />
+        </LinearLayout>
+        <HorizontalScrollView android:id="@+id/irc_suggestion_scroll" android:layout_width="match_parent" android:layout_height="48dp" android:layout_marginTop="2dp" android:scrollbars="none">
+            <LinearLayout android:id="@+id/irc_suggestions" android:layout_width="wrap_content" android:layout_height="match_parent" android:orientation="horizontal" />
+        </HorizontalScrollView>
+    </LinearLayout>
+    <FrameLayout android:id="@+id/irc_header_row" android:layout_width="match_parent" android:layout_height="48dp" android:layout_marginStart="48dp" android:layout_marginEnd="48dp" android:layout_marginTop="8dp">
+        <FrameLayout android:layout_width="match_parent" android:layout_height="20dp">
+            <TextView android:id="@+id/irc_header" android:layout_width="wrap_content" android:layout_height="20dp" android:maxWidth="180dp" android:paddingStart="10dp" android:paddingEnd="10dp" android:gravity="start|center_vertical" android:singleLine="true" android:ellipsize="end" android:text="@string/irc_title" />
+        </FrameLayout>
+    </FrameLayout>
+</FrameLayout>

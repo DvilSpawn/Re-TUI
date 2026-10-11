@@ -6777,6 +6777,13 @@
     },
     "type": "string"
   },
+  "help_irc": {
+    "formatted": true,
+    "forms": {
+      "other": "irc — open the native TLS IRC terminal. /server, /connect, /login, /register, /join, /window, /query, /msg and /help. This is not the HTTP community feed."
+    },
+    "type": "string"
+  },
   "help_landscape": {
     "formatted": true,
     "forms": {
@@ -7242,7 +7249,7 @@
   "hub_default_system_font": {
     "formatted": true,
     "forms": {
-      "other": "Default (System Font)"
+      "other": "Android System Font"
     },
     "type": "string"
   },
@@ -7691,6 +7698,41 @@
     "formatted": true,
     "forms": {
       "other": "Invalid regex:"
+    },
+    "type": "string"
+  },
+  "irc_help": {
+    "formatted": true,
+    "forms": {
+      "other": "Native IRC terminal — one TLS network at a time.\n/server [host] [TLS port] · default irc.kokodoko.cloud 6697\n/nick nickname · /connect · /login account (masked SASL password)\n/register (connected nickname; masked NickServ password)\n/join #channel · /j #channel · /part [#channel]\n/window [number|name|next|prev|close] · /buffer is an alias\n/query nick · /msg nick text · /me action · /names · /list\n/topic [text] · /whois nick · /mode target modes · /kick nick [reason]\n/oper name (masked password) · /disconnect · /quit · /clear · /help\nPlain text goes only to the active joined channel or query. //text sends /text literally. Unknown commands never become messages or launcher commands.\nWindow markers: * unread · ! mention/private message. Passwords are never transcript/history entries. TLS is verified; no plaintext fallback.\nIRC accounts are separate from old community accounts. Register once, then /login before joining registered-only channels. Server-readable, not end-to-end encrypted. This first slice has no offline replay, push or background service; leaving disconnects. Unconfirmed messages are never retried automatically."
+    },
+    "type": "string"
+  },
+  "irc_input_hint": {
+    "formatted": true,
+    "forms": {
+      "other": "message or /command"
+    },
+    "type": "string"
+  },
+  "irc_secret_hint": {
+    "formatted": true,
+    "forms": {
+      "other": "Password · masked, session only · Back cancels"
+    },
+    "type": "string"
+  },
+  "irc_send": {
+    "formatted": true,
+    "forms": {
+      "other": "Send IRC input"
+    },
+    "type": "string"
+  },
+  "irc_title": {
+    "formatted": true,
+    "forms": {
+      "other": "IRC"
     },
     "type": "string"
   },
@@ -16961,7 +17003,7 @@
   "setting_ui_system_font_description": {
     "formatted": false,
     "forms": {
-      "other": "If false, the default Re:T-UI font (\"Lucida Console\") will be used for all texts"
+      "other": "Use the Android system font instead of a custom font or the bundled JetBrains Mono Nerd Font Regular."
     },
     "type": "string"
   },

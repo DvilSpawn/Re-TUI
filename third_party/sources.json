@@ -1,0 +1,14 @@
+[
+  {
+    "coordinate": "com.joaomgcd:taskerpluginlibrary:0.4.10",
+    "revision": "ba80eb174cfef264ad9e77d7481dd040ebd74f8c",
+    "archive": "taskerpluginlibrary-0.4.10-source.tar.gz",
+    "url": "https://codeload.github.com/joaomgcd/TaskerPluginSample/tar.gz/ba80eb174cfef264ad9e77d7481dd040ebd74f8c",
+    "sha256": "b908993eda5db677ae3dffc1fe0b673e71d58cbbd82caa32fd36d0475be68250",
+    "published_sources": {
+      "archive": "taskerpluginlibrary-0.4.10-sources.jar",
+      "url": "https://repo.maven.apache.org/maven2/com/joaomgcd/taskerpluginlibrary/0.4.10/taskerpluginlibrary-0.4.10-sources.jar",
+      "sha256": "e413bd2b968c6bffd809e6d46c2fa329acf399cdc5a150a2d34a96f33d500db1"
+    }
+  }
+]

@@ -506,7 +506,7 @@
     <string name="themer_wallpaper_picker_is_unavailable_on_this_device_a5a4d" formatted="false">"Wallpaper picker is unavailable on this device."</string>
     <!-- showFrameEditor -->
     <string name="themer_x_px_changes_stay_staged_until_save_frame_settings_d0a46">"%1$s  •  %2$d x %3$d px\nChanges stay staged until Save Frame Settings."</string>
-    <string name="hub_default_system_font">Default (System Font)</string>
+    <string name="hub_default_system_font">Android System Font</string>
     <string name="hub_appearance">Appearance</string>
     <string name="hub_behavior">Behavior</string>
     <string name="hub_sounds">Sounds</string>

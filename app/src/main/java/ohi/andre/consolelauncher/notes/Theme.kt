@@ -1,6 +1,7 @@
 package ohi.andre.consolelauncher.notes
 
 import ohi.andre.consolelauncher.R
+import ohi.andre.consolelauncher.tuils.Tuils
 
 import android.app.Activity
 import android.content.Context
@@ -65,6 +66,13 @@ data class RetuiTheme(
     val fontPath: String? = null,
     val frame: LauncherFrameAsset? = null
 ) {
+    fun typeface(context: Context): Typeface =
+        fontPath?.let { runCatching { Typeface.createFromFile(it) }.getOrNull() }
+            ?: if (fontName == Tuils.BUNDLED_FONT_NAME) {
+                runCatching { Typeface.createFromAsset(context.assets, Tuils.BUNDLED_FONT_ASSET) }
+                    .getOrDefault(Typeface.MONOSPACE)
+            } else Typeface.create(fontName, Typeface.NORMAL)
+
     companion object {
         private const val PREFS = "remember-theme"
         private const val USE_LAUNCHER = "useLauncherAppearance"
@@ -377,8 +385,7 @@ private fun styleTree(
             view is EditText -> theme.inputSize.toFloat()
             else -> theme.size.toFloat()
         }
-        val baseTypeface = theme.fontPath?.let { runCatching { Typeface.createFromFile(it) }.getOrNull() }
-            ?: Typeface.create(theme.fontName, Typeface.NORMAL)
+        val baseTypeface = theme.typeface(context)
         typeface = Typeface.create(baseTypeface, if (tag == "retui_bold") Typeface.BOLD else Typeface.NORMAL)
         if (h1 || h2) background = chrome(theme.header, theme.panelBorder, theme.headerRadius)
     }

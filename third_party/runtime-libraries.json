@@ -1,0 +1,580 @@
+[
+  {
+    "coordinate": "androidx.activity:activity:1.13.0",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://developer.android.com/jetpack/androidx/releases/activity#1.13.0",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "androidx.annotation:annotation-experimental:1.4.1",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://developer.android.com/jetpack/androidx/releases/annotation#1.4.1",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "androidx.annotation:annotation-jvm:1.9.1",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://developer.android.com/jetpack/androidx/releases/annotation#1.9.1",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "androidx.annotation:annotation:1.9.1",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://developer.android.com/jetpack/androidx/releases/annotation#1.9.1",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "androidx.appcompat:appcompat-resources:1.7.1",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://developer.android.com/jetpack/androidx/releases/appcompat#1.7.1",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "androidx.appcompat:appcompat:1.7.1",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://developer.android.com/jetpack/androidx/releases/appcompat#1.7.1",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "androidx.arch.core:core-common:2.2.0",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://developer.android.com/jetpack/androidx/releases/arch-core#2.2.0",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "androidx.arch.core:core-runtime:2.2.0",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://developer.android.com/jetpack/androidx/releases/arch-core#2.2.0",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "androidx.collection:collection-jvm:1.4.2",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://developer.android.com/jetpack/androidx/releases/collection#1.4.2",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "androidx.collection:collection:1.4.2",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://developer.android.com/jetpack/androidx/releases/collection#1.4.2",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "androidx.compose.runtime:runtime-annotation-android:1.9.0",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.9.0",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "androidx.compose.runtime:runtime-annotation:1.9.0",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.9.0",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "androidx.concurrent:concurrent-futures:1.1.0",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://developer.android.com/topic/libraries/architecture/index.html",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "androidx.core:core-ktx:1.18.0",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://developer.android.com/jetpack/androidx/releases/core#1.18.0",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "androidx.core:core-viewtree:1.0.0",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://developer.android.com/jetpack/androidx/releases/core#1.0.0",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "androidx.core:core:1.18.0",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://developer.android.com/jetpack/androidx/releases/core#1.18.0",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "androidx.cursoradapter:cursoradapter:1.0.0",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "http://developer.android.com/tools/extras/support-library.html",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "androidx.customview:customview-poolingcontainer:1.0.0",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://developer.android.com/jetpack/androidx/releases/customview#1.0.0",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "androidx.customview:customview:1.0.0",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "http://developer.android.com/tools/extras/support-library.html",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "androidx.drawerlayout:drawerlayout:1.0.0",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "http://developer.android.com/tools/extras/support-library.html",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "androidx.emoji2:emoji2-views-helper:1.3.0",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://developer.android.com/jetpack/androidx/releases/emoji2#1.3.0",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "androidx.emoji2:emoji2:1.3.0",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://developer.android.com/jetpack/androidx/releases/emoji2#1.3.0",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "androidx.fragment:fragment:1.5.4",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://developer.android.com/jetpack/androidx/releases/fragment#1.5.4",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "androidx.interpolator:interpolator:1.0.0",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "http://developer.android.com/tools/extras/support-library.html",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "androidx.lifecycle:lifecycle-common:2.6.2",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://developer.android.com/jetpack/androidx/releases/lifecycle#2.6.2",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "androidx.lifecycle:lifecycle-livedata-core:2.6.2",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://developer.android.com/jetpack/androidx/releases/lifecycle#2.6.2",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "androidx.lifecycle:lifecycle-livedata:2.6.2",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://developer.android.com/jetpack/androidx/releases/lifecycle#2.6.2",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "androidx.lifecycle:lifecycle-process:2.6.2",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://developer.android.com/jetpack/androidx/releases/lifecycle#2.6.2",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "androidx.lifecycle:lifecycle-runtime:2.6.2",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://developer.android.com/jetpack/androidx/releases/lifecycle#2.6.2",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "androidx.lifecycle:lifecycle-viewmodel-savedstate:2.6.2",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://developer.android.com/jetpack/androidx/releases/lifecycle#2.6.2",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "androidx.lifecycle:lifecycle-viewmodel:2.6.2",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://developer.android.com/jetpack/androidx/releases/lifecycle#2.6.2",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "androidx.loader:loader:1.0.0",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "http://developer.android.com/tools/extras/support-library.html",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "androidx.localbroadcastmanager:localbroadcastmanager:1.1.0",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://developer.android.com/jetpack/androidx/releases/localbroadcastmanager#1.1.0",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "androidx.navigationevent:navigationevent-android:1.0.0",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://developer.android.com/jetpack/androidx/releases/navigationevent#1.0.0",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "androidx.navigationevent:navigationevent:1.0.0",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://developer.android.com/jetpack/androidx/releases/navigationevent#1.0.0",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "androidx.profileinstaller:profileinstaller:1.4.0",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://developer.android.com/jetpack/androidx/releases/profileinstaller#1.4.0",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "androidx.recyclerview:recyclerview:1.4.0",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://developer.android.com/jetpack/androidx/releases/recyclerview#1.4.0",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "androidx.resourceinspection:resourceinspection-annotation:1.0.1",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://developer.android.com/jetpack/androidx/releases/resourceinspection#1.0.1",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "androidx.savedstate:savedstate:1.2.1",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://developer.android.com/jetpack/androidx/releases/savedstate#1.2.1",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "androidx.startup:startup-runtime:1.1.1",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://developer.android.com/jetpack/androidx/releases/startup#1.1.1",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "androidx.tracing:tracing:1.2.0",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://developer.android.com/jetpack/androidx/releases/tracing#1.2.0",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "androidx.vectordrawable:vectordrawable-animated:1.1.0",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://developer.android.com/jetpack/androidx",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "androidx.vectordrawable:vectordrawable:1.1.0",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://developer.android.com/jetpack/androidx",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "androidx.versionedparcelable:versionedparcelable:1.1.1",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "http://developer.android.com/tools/extras/support-library.html",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "androidx.viewpager:viewpager:1.0.0",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "http://developer.android.com/tools/extras/support-library.html",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "androidx.viewpager2:viewpager2:1.1.0",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://developer.android.com/jetpack/androidx/releases/viewpager2#1.1.0",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "com.google.guava:listenablefuture:1.0",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://repo.maven.apache.org/maven2/com/google/guava/listenablefuture/1.0/listenablefuture-1.0.pom",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "com.google.zxing:core:3.5.4",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://repo.maven.apache.org/maven2/com/google/zxing/core/3.5.4/core-3.5.4.pom",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "com.jayway.jsonpath:json-path:3.0.0",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://github.com/jayway/JsonPath",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "com.joaomgcd:taskerpluginlibrary:0.4.10",
+    "license_files": [
+      "Tasker-GPL-3.0.txt"
+    ],
+    "project_url": "https://github.com/joaomgcd/TaskerPluginSample",
+    "license_metadata": "Tasker Plugin Sample License"
+  },
+  {
+    "coordinate": "com.squareup.okhttp3:okhttp:4.12.0",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt",
+      "Public-Suffix-MPL-2.0.txt",
+      "Public-Suffix-NOTICE.txt"
+    ],
+    "project_url": "https://square.github.io/okhttp/",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "com.squareup.okio:okio-jvm:3.6.0",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://github.com/square/okio/",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "com.squareup.okio:okio:3.6.0",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://github.com/square/okio/",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "it.andreuzzi:CompareString2:1.0.9",
+    "license_files": [
+      "CompareString2-MIT.txt"
+    ],
+    "project_url": "https://github.com/fAndreuzzi/CompareString2",
+    "license_metadata": "MIT License"
+  },
+  {
+    "coordinate": "net.minidev:accessors-smart:2.6.0",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://urielch.github.io/",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "net.minidev:json-smart:2.6.0",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://urielch.github.io/",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "net.sourceforge.htmlcleaner:htmlcleaner:2.29",
+    "license_files": [
+      "HtmlCleaner-BSD.txt"
+    ],
+    "project_url": "http://htmlcleaner.sourceforge.net/",
+    "license_metadata": "BSD License"
+  },
+  {
+    "coordinate": "org.jdom:jdom2:2.0.6.1",
+    "license_files": [
+      "JDOM-License.txt"
+    ],
+    "project_url": "http://www.jdom.org",
+    "license_metadata": "Similar to Apache License but with the acknowledgment clause removed"
+  },
+  {
+    "coordinate": "org.jetbrains:annotations:23.0.0",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://github.com/JetBrains/java-annotations",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "org.jetbrains.kotlin:kotlin-stdlib-common:2.2.10",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://kotlinlang.org/",
+    "license_metadata": "The Apache License, Version 2.0"
+  },
+  {
+    "coordinate": "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.10",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://kotlinlang.org/",
+    "license_metadata": "The Apache License, Version 2.0"
+  },
+  {
+    "coordinate": "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.10",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://kotlinlang.org/",
+    "license_metadata": "The Apache License, Version 2.0"
+  },
+  {
+    "coordinate": "org.jetbrains.kotlin:kotlin-stdlib:2.2.10",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://kotlinlang.org/",
+    "license_metadata": "The Apache License, Version 2.0"
+  },
+  {
+    "coordinate": "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://github.com/Kotlin/kotlinx.coroutines",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.9.0",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://github.com/Kotlin/kotlinx.coroutines",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.9.0",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://github.com/Kotlin/kotlinx.coroutines",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://github.com/Kotlin/kotlinx.coroutines",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "org.jsoup:jsoup:1.22.1",
+    "license_files": [
+      "jsoup-MIT.txt"
+    ],
+    "project_url": "https://jsoup.org/",
+    "license_metadata": "The MIT License"
+  },
+  {
+    "coordinate": "org.jspecify:jspecify:1.0.0",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "http://jspecify.org/",
+    "license_metadata": "The Apache License, Version 2.0"
+  },
+  {
+    "coordinate": "org.luaj:luaj-jse:3.0.1",
+    "license_files": [
+      "LuaJ-MIT.txt"
+    ],
+    "project_url": "http://sourceforge.net/projects/luaj/",
+    "license_metadata": "MIT License"
+  },
+  {
+    "coordinate": "org.ow2.asm:asm:9.7.1",
+    "license_files": [
+      "ASM-BSD.txt"
+    ],
+    "project_url": "http://asm.ow2.io/",
+    "license_metadata": "BSD-3-Clause"
+  },
+  {
+    "coordinate": "org.slf4j:slf4j-api:2.0.17",
+    "license_files": [
+      "SLF4J-MIT.txt"
+    ],
+    "project_url": "http://www.slf4j.org",
+    "license_metadata": "MIT License"
+  }
+]

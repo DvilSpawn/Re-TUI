@@ -6,8 +6,25 @@ import java.nio.file.Files
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import ohi.andre.consolelauncher.tuils.Tuils
+import ohi.andre.consolelauncher.managers.xml.options.Ui
 
 class RetuiThemeBridgeTest {
+    @Test
+    fun newInstallsDefaultToBundledJetBrainsAndShareItsNameWithoutAnUnreadablePath() {
+        assertEquals("false", Ui.system_font.defaultValue())
+        assertEquals("", Ui.font_file.defaultValue())
+        val extras = RetuiThemeBridge.resolveLauncherFontExtras(
+            useSystemFont = false,
+            configuredFont = "",
+            launcherRoot = File("."),
+            cachedFontPath = "asset://${Tuils.BUNDLED_FONT_ASSET}"
+        )
+        assertEquals(Tuils.BUNDLED_FONT_NAME, extras.name)
+        assertNull(extras.path)
+        assertNull(extras.file)
+    }
+
     @Test
     fun keyboardFrameTargetsMatchTheSharedContract() {
         assertEquals(

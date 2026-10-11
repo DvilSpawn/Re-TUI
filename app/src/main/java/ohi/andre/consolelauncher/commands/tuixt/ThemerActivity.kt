@@ -1223,6 +1223,9 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
     private fun pendingFontTypeface(): Typeface {
         ensurePendingFontChanges()
         if (pendingUseSystemFont == true) return Typeface.DEFAULT
+        if (pendingFontFileName.isNullOrBlank()) {
+            return Typeface.createFromAsset(assets, Tuils.BUNDLED_FONT_ASSET)
+        }
 
         val file = File(fontsDir, pendingFontFileName.orEmpty())
         return try {
@@ -1237,7 +1240,7 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
         return if (pendingUseSystemFont == true) {
             getString(R.string.themer_system_29d43)
         } else {
-            pendingFontFileName.orEmpty().uppercase(Locale.getDefault())
+            pendingFontFileName.orEmpty().ifBlank { Tuils.BUNDLED_FONT_NAME }.uppercase(Locale.getDefault())
         }
     }
 
@@ -1269,7 +1272,7 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
         val fileName = if (useSystem) "" else pendingFontFileName.orEmpty()
         val fontChanged = useSystem != savedUseSystemFont() || fileName != savedFontFileName()
         try {
-            val source = if (useSystem) null else File(fontsDir, fileName)
+            val source = if (useSystem || fileName.isBlank()) null else File(fontsDir, fileName)
             if (source != null) {
                 check(source.exists() && source.isFile) { getString(R.string.themer_selected_font_is_no_longer_available_b914c) }
                 Typeface.createFromFile(source)

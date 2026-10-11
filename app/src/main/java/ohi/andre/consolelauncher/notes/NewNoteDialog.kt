@@ -5,7 +5,6 @@ import ohi.andre.consolelauncher.R
 import android.app.Activity
 import android.app.AlertDialog
 import android.graphics.Color
-import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
 import android.view.Gravity
 import android.view.View
@@ -28,8 +27,7 @@ fun Activity.showNewNotePrompt(
     val folders = availableFolders.sortedBy { it.name.lowercase() }
     val folderIds = listOf<String?>(null) + folders.map { it.id }
     val folderNames = listOf(this@showNewNotePrompt.getString(R.string.notes_newnotedialog_unfiled_c1aca)) + folders.map { it.name }
-    val font = theme.fontPath?.let { runCatching { Typeface.createFromFile(it) }.getOrNull() }
-        ?: Typeface.create(theme.fontName, Typeface.NORMAL)
+    val font = theme.typeface(this)
     val title = EditText(this).apply {
         hint = this@showNewNotePrompt.getString(R.string.notes_newnotedialog_note_name_11bdf)
         isSingleLine = true

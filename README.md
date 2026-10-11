@@ -152,6 +152,9 @@ The original MIT copyright and permission notice is preserved in
 [LICENSES/MIT-original.txt](LICENSES/MIT-original.txt). Previously MIT-licensed
 code remains available under its original terms. Third-party software and artwork
 retain their own licenses; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+See [asset provenance and permission boundaries](docs/asset-provenance.md) before
+redistributing the artwork, and [runtime source delivery](third_party/README.md)
+for Tasker and the dependency notice inventory.
 
 Qalculate uses Re:TUI's own JNI bridge, built from checksum-pinned upstream sources.
 See [native build instructions](native/qalculate/README.md) and
