@@ -37,6 +37,7 @@ import ohi.andre.consolelauncher.managers.xml.options.Behavior
 import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.managers.xml.options.Ui
 import ohi.andre.consolelauncher.tuils.StoppableThread
+import ohi.andre.consolelauncher.tuils.FrameTarget
 import ohi.andre.consolelauncher.tuils.Tuils
 import org.w3c.dom.Document
 import org.w3c.dom.Element
@@ -725,6 +726,14 @@ class AppsManager(context: Context) : XMLPrefsElement {
         val intent = getIntent(info)
         if (intent == null) {
             return false
+        }
+        if (info.componentName?.packageName == REMEMBER_PACKAGE) {
+            RetuiThemeBridge.putLauncherThemeExtras(
+                intent,
+                launchContext,
+                FrameTarget.REMEMBER,
+                REMEMBER_PACKAGE
+            )
         }
         return startActivitySafely { launchContext.startActivity(intent) }
     }
@@ -1820,6 +1829,7 @@ class AppsManager(context: Context) : XMLPrefsElement {
     companion object {
         internal const val APP_LAUNCH_ACTION = Intent.ACTION_MAIN
         internal const val APP_LAUNCH_CATEGORY = Intent.CATEGORY_LAUNCHER
+        private const val REMEMBER_PACKAGE = "com.dvil.retui.remember"
 
         internal fun startActivitySafely(startActivity: () -> Unit): Boolean = try {
             startActivity()

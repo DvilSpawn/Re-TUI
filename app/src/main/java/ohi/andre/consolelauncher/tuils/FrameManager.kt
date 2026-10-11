@@ -41,6 +41,7 @@ enum class FrameTarget(val id: String, val label: String) {
     WIDGET_DRAWER("widget_drawer", "Widget drawer"),
     KEYBOARD("keyboard", "Re:TUI Keyboard"),
     FILES("files", "Re:TUI Files"),
+    REMEMBER("remember", "Re:Member"),
     OVERLAYS("overlays", "Overlay windows"),
     SETTINGS("settings", "Settings and dialogs"),
     CONTROLS("controls", "Other launcher controls");

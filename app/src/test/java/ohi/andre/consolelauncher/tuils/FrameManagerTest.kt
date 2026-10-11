@@ -17,6 +17,7 @@ class FrameManagerTest {
     @Test fun surfaceTargetsAndPortablePathsStayStable() {
         assertEquals(FrameTarget.STATUS_NOTES, FrameTarget.fromSurface(SurfaceBorder.NOTES))
         assertEquals("files", FrameTarget.FILES.id)
+        assertEquals("remember", FrameTarget.REMEMBER.id)
         assertTrue(FrameManager.isPortableEntry("frames/status_notes.retui-frame"))
         assertTrue(FrameManager.isPortableEntry("frames/library-${"a".repeat(64)}.retui-frame"))
         assertFalse(FrameManager.isPortableEntry("frames/library-short.retui-frame"))

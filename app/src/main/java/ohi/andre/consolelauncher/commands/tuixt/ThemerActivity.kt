@@ -121,6 +121,7 @@ class ThemerActivity : AppCompatActivity() {
     private var pendingFontFileName: String? = null
     private var pendingFrameTarget: FrameTarget? = null
     private var frameEditSession: FrameManager.EditSession? = null
+    private var expandedFrameSelector: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         requestNoTitleIfFullscreen(this)
@@ -572,6 +573,7 @@ class ThemerActivity : AppCompatActivity() {
             pendingUseSystemFont = null
             pendingFontFileName = null
         }
+        if (targetSection != SECTION_FRAMES) expandedFrameSelector = null
         section = targetSection
         header!!.setText(getHeaderText(section))
         sectionItems.clear()
@@ -601,6 +603,7 @@ class ThemerActivity : AppCompatActivity() {
             buttonTintList = ColorStateList.valueOf(accentColor())
             setOnCheckedChangeListener { _, checked ->
                 session.applyToAll = checked
+                expandedFrameSelector = null
                 sectionsAdapter?.notifyDataSetChanged()
             }
         }
@@ -694,13 +697,43 @@ class ThemerActivity : AppCompatActivity() {
         }, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
         row.addView(previewRow)
 
+        val selectorKey = target?.name ?: FRAME_SELECTOR_ALL
         row.addView(TextView(this).apply {
             val selected = session.selectedAssetId(target)
             text = if (selected == null) "FRAME: DEFAULT BORDER" else
                 "FRAME: ${session.assignedName(target) ?: "MISSING OR CORRUPT"}"
             styleButton(this@ThemerActivity, this, false)
-            setOnClickListener { showFrameSelector(target) }
+            setOnClickListener {
+                expandedFrameSelector = if (expandedFrameSelector == selectorKey) null else selectorKey
+                sectionsAdapter?.notifyDataSetChanged()
+            }
         }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(this, 46f)))
+
+        if (expandedFrameSelector == selectorKey) {
+            val selectedId = session.selectedAssetId(target)
+            val options = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                setPadding(0, dp(this@ThemerActivity, 6f), 0, dp(this@ThemerActivity, 8f))
+            }
+            listOf<FrameManager.FrameAsset?>(null).plus(session.assets()).forEach { asset ->
+                options.addView(TextView(this).apply {
+                    text = when {
+                        asset == null -> "DEFAULT BORDER"
+                        asset.valid -> asset.name.uppercase(Locale.getDefault())
+                        else -> "⚠ ${asset.name.uppercase(Locale.getDefault())}"
+                    }
+                    styleListItem(this@ThemerActivity, this, asset?.id == selectedId)
+                    setOnClickListener {
+                        session.select(target, asset?.id)
+                        expandedFrameSelector = null
+                        reloadForFrame("Frame selection updated.")
+                    }
+                }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+                    bottomMargin = dp(this@ThemerActivity, 4f)
+                })
+            }
+            row.addView(options)
+        }
 
         val actions = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
         actions.addView(TextView(this).apply {
@@ -742,20 +775,6 @@ class ThemerActivity : AppCompatActivity() {
             setOnClickListener { confirmDeleteFrameAsset(asset, session.references(asset.id)) }
         }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(this, 44f)))
         return row
-    }
-
-    private fun showFrameSelector(target: FrameTarget?) {
-        val session = frameSession()
-        val assets = session.assets()
-        val labels = mutableListOf("Default border")
-        labels.addAll(assets.map { if (it.valid) it.name else "⚠ ${it.name}" })
-        val selectedId = session.selectedAssetId(target)
-        val selectedIndex = if (selectedId == null) 0 else
-            assets.indexOfFirst { it.id == selectedId }.takeIf { it >= 0 }?.plus(1) ?: -1
-        TuixtDialog.showOptions(this, "Select Frame", labels, selectedIndex, TuixtDialog.ItemAction { index ->
-            session.select(target, if (index == 0) null else assets[index - 1].id)
-            reloadForFrame("Frame selection updated.")
-        })
     }
 
     private fun confirmDeleteFrameAsset(asset: FrameManager.FrameAsset, references: List<String>) {
@@ -2311,6 +2330,7 @@ class ThemerActivity : AppCompatActivity() {
         private const val VIEW_TYPE_FRAME_PANEL = 3
         private const val FONT_SCALE_PANEL = "__font_scale_panel__"
         private const val FRAME_PANEL = "__frame_panel__"
+        private const val FRAME_SELECTOR_ALL = "__all_surfaces__"
         private val FONT_PREVIEW_SIZES = floatArrayOf(10f, 11f, 12f, 14f, 15f, 18f, 64f)
         private const val BACKUP_EXPORT_REQUEST = 201
         private const val BACKUP_RESTORE_REQUEST = 202
