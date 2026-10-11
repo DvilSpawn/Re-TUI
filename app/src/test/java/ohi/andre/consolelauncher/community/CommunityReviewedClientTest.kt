@@ -35,6 +35,24 @@ class CommunityReviewedClientTest {
             assertEquals(listOf("r00000000000251"), client.replies(account, "thread000000001", latest.last()).map { it.getString("id") })
         }
     }
+    @Test fun olderRepliesPageBackwardsWithoutLosingTheForwardOrLatestPath() {
+        val rows = (1..250).map { n -> JSONObject().put("id", "r" + n.toString().padStart(14, '0'))
+            .put("created", "2026-10-09 00:00:00.000Z").put("thread", "thread000000001") }
+        serve({ _, query ->
+            assertTrue(query.contains("thread = 'thread000000001'"))
+            val before = Regex("id < '([^']+)'").find(query)?.groupValues?.get(1)
+            val after = Regex("id > '([^']+)'").find(query)?.groupValues?.get(1)
+            val ordered = if (query.contains("sort=-created,-id")) rows.reversed() else rows
+            200 to JSONObject().put("items", JSONArray(ordered.filter {
+                (before == null || it.getString("id") < before) && (after == null || it.getString("id") > after)
+            }.take(50)))
+        }) { client ->
+            val tail = client.replies(account, "thread000000001", null, latest = true)
+            val older = client.replies(account, "thread000000001", tail.first(), older = true)
+            assertEquals(rows.subList(150, 200).map { it.getString("id") }, older.map { it.getString("id") })
+            assertEquals(tail.map { it.getString("id") }, client.replies(account, "thread000000001", older.last()).map { it.getString("id") })
+        }
+    }
     @Test fun mentionWindowKeepsOlderUnreadPagesAndRejectsPartialErrorResults() {
         val rows = (1..100).map { mention(it) }
         var failing = false

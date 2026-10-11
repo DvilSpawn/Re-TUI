@@ -1,6 +1,7 @@
 package ohi.andre.consolelauncher.managers.suggestions
 
 import android.app.Activity
+import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
@@ -177,7 +178,21 @@ class SuggestionRunnable(
 
 }
 
-internal class SuggestionChipStyler(private val pack: MainPack) {
+internal class SuggestionChipStyler(private val context: Context, private val appsManager: AppsManager? = null) {
+    constructor(pack: MainPack) : this(pack.context, pack.appsManager)
+
+    companion object {
+        fun spacing(): IntArray = XMLPrefsManager.getListOfIntValues(XMLPrefsManager.get(Suggestions.suggestions_spaces), 4, 0)
+
+        fun createView(context: Context, spaces: IntArray = spacing()): TextView = TextView(context).apply {
+            typeface = Tuils.getTypeface(context)
+            textSize = XMLPrefsManager.getInt(Suggestions.suggestions_size).toFloat()
+            setPadding(spaces[2], spaces[3], spaces[2], spaces[3])
+            setLines(1)
+            maxLines = 1
+        }
+    }
+
     private val transparentSuggestions = XMLPrefsManager.getBoolean(Suggestions.transparent_suggestions)
     private val suggAppBg = XMLPrefsManager.getColor(Suggestions.apps_background_color)
     private val suggAliasBg = XMLPrefsManager.getColor(Suggestions.alias_background_color)
@@ -201,7 +216,7 @@ internal class SuggestionChipStyler(private val pack: MainPack) {
         var styledPayload = payload
         if (type == SuggestionsManager.Suggestion.TYPE_APP || type == SuggestionsManager.Suggestion.TYPE_APPGP) {
             if (styledPayload is LaunchInfo) {
-                styledPayload = pack.appsManager.groups.firstOrNull { it.contains(styledPayload) } ?: styledPayload
+                styledPayload = appsManager?.groups?.firstOrNull { it.contains(styledPayload) } ?: styledPayload
             }
             if (styledPayload is AppsManager.Group) {
                 bgColor = styledPayload.bgColor
@@ -232,7 +247,6 @@ internal class SuggestionChipStyler(private val pack: MainPack) {
     }
 
     private fun suggestionColorBg(color: Int): Drawable {
-        val context = pack.context
         if (AppearanceSettings.cyberdeckMode() || TerminalBorderRuntime.customFrameActive(context, FrameTarget.SUGGESTIONS)) {
             return TerminalBorderRuntime.panelDrawable(
                 context,

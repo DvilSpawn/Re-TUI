@@ -19,6 +19,7 @@ import org.junit.Test
 
 /** Synthetic overlapping controls in a disposable scene; never opens or clears community storage. */
 class ResizeCornerDispatchIntegrationTest {
+    @get:org.junit.Rule val readerPreferences = ohi.andre.consolelauncher.help.HelpReaderPreferencesRule()
     private val instrumentation = InstrumentationRegistry.getInstrumentation()
     private fun bounds(view: View): Rect {
         val xy = IntArray(2); view.getLocationOnScreen(xy)

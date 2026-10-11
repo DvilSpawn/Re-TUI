@@ -17,6 +17,21 @@ class TerminalPaneLayoutTest {
             .first { it.getAttribute("android:id").substringAfter('/') == id }
     }
 
+    @Test fun previewLivesBelowPromptWithoutChangingDockRows() {
+        val preview = element("calculator_surface", "calculator_preview")
+        val input = element("calculator_surface", "calculator_expression")
+        assertEquals("@+id/calculator_transcript_scroll", (preview.parentNode.parentNode as Element).getAttribute("android:id"))
+        assertEquals("@+id/calculator_transcript_scroll", (input.parentNode.parentNode.parentNode as Element).getAttribute("android:id"))
+        assertEquals("2", preview.getAttribute("android:lines"))
+        assertEquals("polite", preview.getAttribute("android:accessibilityLiveRegion"))
+        val dock = source("java/ohi/andre/consolelauncher/calculator/CalculatorKeypadScrollView.kt")
+        assertTrue(dock.contains("prompt.measuredHeight + preview.measuredHeight"))
+        val activity = source("java/ohi/andre/consolelauncher/calculator/CalculatorActivity.kt")
+        assertTrue(activity.contains("main.postDelayed(it, 300)"))
+        assertTrue(activity.contains("generation != previewGeneration"))
+        assertFalse("Discarding a preview must not kill the variable-owning native process", activity.contains("previewRequest?.cancel()"))
+    }
+
     @Test fun outputAndPromptShareTightContinuousPane() {
         val pane = element("calculator_surface", "calculator_main_pane")
         assertEquals("0dp", pane.getAttribute("android:paddingStart"))
@@ -96,14 +111,15 @@ class TerminalPaneLayoutTest {
         assertTrue(panel.contains("FrameLayout.LayoutParams(dp(48), dp(48)"))
     }
 
-    @Test fun calculatorStartsFloatingInsideSafeHost() {
+    @Test fun calculatorStartsExpandedWithSafeFloatingGeometryAvailable() {
         val activity = source("java/ohi/andre/consolelauncher/calculator/CalculatorActivity.kt")
         assertTrue("Calculator reuses help's safe-host geometry", activity.contains("HelpWindowPanel(host, root, state,"))
         val panel = source("java/ohi/andre/consolelauncher/help/HelpWindowPanel.kt")
-        assertTrue(panel.contains("getFloat(\"${'$'}{statePrefix}_width\", .9f)"))
-        assertTrue(panel.contains("getFloat(\"${'$'}{statePrefix}_height\", .9f)"))
-        assertTrue(panel.contains("getFloat(\"${'$'}{statePrefix}_left\", .05f)"))
-        assertTrue(panel.contains("getFloat(\"${'$'}{statePrefix}_top\", .05f)"))
+        assertTrue(panel.contains("initiallyMaximized: Boolean = true"))
+        assertTrue(panel.contains("restoredFraction(state, \"width\", .9f)"))
+        assertTrue(panel.contains("restoredFraction(state, \"height\", .9f)"))
+        assertTrue(panel.contains("restoredFraction(state, \"left\", .05f)"))
+        assertTrue(panel.contains("restoredFraction(state, \"top\", .05f)"))
         val workspace = element("termux_workspace_page", "termux_workspace_root")
         val calculator = element("calculator_surface", "calculator_overlay")
         for (attribute in listOf("paddingStart", "paddingEnd", "paddingBottom")) {

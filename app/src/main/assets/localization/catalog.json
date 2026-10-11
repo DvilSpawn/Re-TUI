@@ -380,7 +380,7 @@
   "calculator_help_ans": {
     "formatted": true,
     "forms": {
-      "other": "ANS\n\n5 ft to miles\nans * 2\nans to ft → 10 ft\nUse ans for the last successful result. Errors do not replace it. Clear keeps ans."
+      "other": "CONTINUE A RESULT\n\n5 + 5 → 10\n+5 → 15\n*2 → 30\n\nStart with an operator to use the last successful result automatically. A complete expression starts fresh; (-5) enters a standalone negative value after a result.\n\nans is optional for explicit references such as sqrt(ans), 100 / ans or ans to ft. ans = 5 sets it. Errors and cancellation keep the last result. Clear keeps it too."
     },
     "type": "string"
   },
@@ -401,7 +401,7 @@
   "calculator_help_editing": {
     "formatted": true,
     "forms": {
-      "other": "KEYPAD / EDITING\n\n123: numbers and operators\nABC: letters and units\nFUNC: functions and constants\n\nTap the prompt to place the cursor or select text. √ and function keys insert parentheses with the cursor inside. ⌫ deletes the selection or previous character. ↵ evaluates.\n\nclear — clear the transcript, keeping ans\nhelp — open this browser\nexit — close the calculator\nCancel stops a calculation without changing your input."
+      "other": "KEYPAD / EDITING\n\n123: numbers, operators and =\nABC: letters and units\nFUNC: functions, constants and =\n\nTap the prompt to place the cursor or select text. Function keys, including sqrt, insert parentheses with the cursor inside. ⌫ deletes the selection or previous character. ↵ evaluates.\n\nclear — clear the transcript, keeping ans\nhelp — open this browser\nexit — close the calculator\nCancel stops a calculation without changing your input."
     },
     "type": "string"
   },
@@ -457,7 +457,7 @@
   "calculator_hints_body": {
     "formatted": true,
     "forms": {
-      "other": "CALCULATOR HINTS\n\nEnter an expression after calc> and press Enter or ↵. The keypad stays in the calculator: 123 enters numbers and operators, ABC enters letters and units, and FUNC enters functions and constants.\n\nArithmetic\n2 + 3 * 4 → 14\n(2 + 3) * 4 → 20\nsqrt(9) → 3\n2^3 → 8\n\nConvert units\n5 ft to miles\n20 celsius to fahrenheit\nUse to for conversion. The word in means inches.\n\nChain results\n5 ft to miles\nans * 2\nans to ft → 10 ft\nErrors do not replace the last successful answer.\n\nEdit expressions\nTap the input to place the cursor, then use 123, ABC, or FUNC. √ and function keys insert parentheses with the cursor inside. Use ⌫ to delete; type clear to clear the transcript.\n\nCommands\nclear — clear the transcript, keeping ans\nhelp — show a short reminder\nexit — close the calculator\n\nCancel stops the current calculation. Tap the calculator tab to return without losing your expression."
+      "other": "CALCULATOR\n\nEnter an expression after calc> and press Enter or ↵.\n\nContinue a result\n5 + 5 → 10\n+5 → 15\n*2 → 30\nA leading +, −, ×, ÷ or ^ continues the last successful result. A complete expression starts fresh. Use (-5) for a standalone negative value after a result. Errors and cancellation keep the last result.\n\nArithmetic\n2 + 3 * 4 → 14\n(2 + 3) * 4 → 20\nsqrt(144) → 12\n2^3 → 8\n\nConvert units\n5 ft to cm → 152.4 cm\n*2 → 304.8 cm\nans to ft → 10 ft\nUse to for conversion. The word in means inches.\n\nExplicit answers and variables\nans is optional: sqrt(ans), 100 / ans and ans to ft refer to the last result. ans = 5 sets it. Named assignments such as tax = 18% go to Qalculate; these variables last only while the engine process remains alive.\n\nKeypad and editing\n123: numbers, operators and =\nABC: letters, units and variable names\nFUNC: functions, constants and =\nTap the input to place the cursor or select text. Function keys insert parentheses with the cursor inside. ⌫ deletes. = inserts an assignment; ↵ evaluates.\n\nCommands\nclear — clear the transcript, keeping the last result\nhelp — open the calculator guide\nexit — close the calculator\n\nCancel stops the current calculation. Back closes Help and retains your reading position."
     },
     "type": "string"
   },
@@ -559,6 +559,55 @@
     },
     "type": "string"
   },
+  "calculator_preview_clear": {
+    "formatted": true,
+    "forms": {
+      "other": "Clear history · keep the last result"
+    },
+    "type": "string"
+  },
+  "calculator_preview_enter_only": {
+    "formatted": true,
+    "forms": {
+      "other": "Assignment or comparison · evaluated only on ↵"
+    },
+    "type": "string"
+  },
+  "calculator_preview_exit": {
+    "formatted": true,
+    "forms": {
+      "other": "Close the calculator"
+    },
+    "type": "string"
+  },
+  "calculator_preview_format": {
+    "formatted": true,
+    "forms": {
+      "other": "↳ %1$s → %2$s"
+    },
+    "type": "string"
+  },
+  "calculator_preview_help": {
+    "formatted": true,
+    "forms": {
+      "other": "Open calculator help"
+    },
+    "type": "string"
+  },
+  "calculator_preview_incomplete": {
+    "formatted": true,
+    "forms": {
+      "other": "Complete or check the expression"
+    },
+    "type": "string"
+  },
+  "calculator_preview_unavailable": {
+    "formatted": true,
+    "forms": {
+      "other": "Preview unavailable · press ↵ to evaluate"
+    },
+    "type": "string"
+  },
   "calculator_reciprocal": {
     "formatted": true,
     "forms": {
@@ -632,7 +681,7 @@
   "calculator_terminal_help": {
     "formatted": true,
     "forms": {
-      "other": "Enter an expression, e.g. 5 ft to miles. Use ans for the last successful result. Commands: help, clear, exit."
+      "other": "Enter an expression and press ↵. After a result, +5 or *2 continues it. Use ans only for an explicit reference. Commands: help, clear, exit."
     },
     "type": "string"
   },
@@ -3226,6 +3275,20 @@
     },
     "type": "string"
   },
+  "community_accept_rules": {
+    "formatted": true,
+    "forms": {
+      "other": "Accept rules"
+    },
+    "type": "string"
+  },
+  "community_account_deleted": {
+    "formatted": true,
+    "forms": {
+      "other": "Community account deleted. Local account data cleared."
+    },
+    "type": "string"
+  },
   "community_account_policy": {
     "formatted": true,
     "forms": {
@@ -3233,10 +3296,59 @@
     },
     "type": "string"
   },
+  "community_auth_confirmation_error": {
+    "formatted": true,
+    "forms": {
+      "other": "Passwords differ. Enter username again."
+    },
+    "type": "string"
+  },
+  "community_auth_password_error": {
+    "formatted": true,
+    "forms": {
+      "other": "Use 8–71 characters. Enter username again."
+    },
+    "type": "string"
+  },
+  "community_auth_password_guidance": {
+    "formatted": true,
+    "forms": {
+      "other": "8–71 characters. No email or password recovery."
+    },
+    "type": "string"
+  },
+  "community_auth_username_error": {
+    "formatted": true,
+    "forms": {
+      "other": "Use 3–24 ASCII letters, digits, - or _."
+    },
+    "type": "string"
+  },
+  "community_auth_username_guidance": {
+    "formatted": true,
+    "forms": {
+      "other": "3–24 ASCII letters, digits, - or _. No email or password recovery."
+    },
+    "type": "string"
+  },
   "community_back": {
     "formatted": true,
     "forms": {
       "other": "Back to threads"
+    },
+    "type": "string"
+  },
+  "community_ban_author": {
+    "formatted": true,
+    "forms": {
+      "other": "Ban reported author"
+    },
+    "type": "string"
+  },
+  "community_block_author": {
+    "formatted": true,
+    "forms": {
+      "other": "Block / unblock author locally"
     },
     "type": "string"
   },
@@ -3275,10 +3387,73 @@
     },
     "type": "string"
   },
+  "community_checking_delivery": {
+    "formatted": true,
+    "forms": {
+      "other": "checking delivery…"
+    },
+    "type": "string"
+  },
+  "community_confirm_action": {
+    "formatted": true,
+    "forms": {
+      "other": "Confirm"
+    },
+    "type": "string"
+  },
   "community_confirm_password": {
     "formatted": true,
     "forms": {
       "other": "Confirm password"
+    },
+    "type": "string"
+  },
+  "community_connection_live": {
+    "formatted": true,
+    "forms": {
+      "other": "● Live · @%1$s"
+    },
+    "type": "string"
+  },
+  "community_connection_offline": {
+    "formatted": true,
+    "forms": {
+      "other": "○ Offline · @%1$s"
+    },
+    "type": "string"
+  },
+  "community_connection_ready": {
+    "formatted": true,
+    "forms": {
+      "other": "● Connected · @%1$s"
+    },
+    "type": "string"
+  },
+  "community_connection_signed_out": {
+    "formatted": true,
+    "forms": {
+      "other": "○ Signed out"
+    },
+    "type": "string"
+  },
+  "community_connection_syncing": {
+    "formatted": true,
+    "forms": {
+      "other": "↻ Syncing · @%1$s"
+    },
+    "type": "string"
+  },
+  "community_copy_message": {
+    "formatted": true,
+    "forms": {
+      "other": "Copy message"
+    },
+    "type": "string"
+  },
+  "community_create_account": {
+    "formatted": true,
+    "forms": {
+      "other": "Join"
     },
     "type": "string"
   },
@@ -3289,10 +3464,38 @@
     },
     "type": "string"
   },
+  "community_delete_account": {
+    "formatted": true,
+    "forms": {
+      "other": "Delete community account"
+    },
+    "type": "string"
+  },
+  "community_delete_explanation": {
+    "formatted": true,
+    "forms": {
+      "other": "Delete @%1$s and its authored messages, discussions and replies? Replies by others on your discussions are also removed. This cannot be undone. Enter your current password to confirm.\n\nModeration evidence remains for six calendar months. Private recovery copies rotate after seven days and are removed on the next hourly run. Launcher settings are not affected. No forgotten-password recovery. A web deletion path is available at irc.kokodoko.cloud/community/account-deletion."
+    },
+    "type": "string"
+  },
+  "community_deletion_failed": {
+    "formatted": true,
+    "forms": {
+      "other": "Deletion was not confirmed. Check the web deletion page before retrying."
+    },
+    "type": "string"
+  },
   "community_discard": {
     "formatted": true,
     "forms": {
       "other": "Discard and leave"
+    },
+    "type": "string"
+  },
+  "community_discussion_hint": {
+    "formatted": true,
+    "forms": {
+      "other": "Opening message"
     },
     "type": "string"
   },
@@ -3303,10 +3506,31 @@
     },
     "type": "string"
   },
+  "community_edit_title": {
+    "formatted": true,
+    "forms": {
+      "other": "Back · Edit title"
+    },
+    "type": "string"
+  },
+  "community_edit_title_summary": {
+    "formatted": true,
+    "forms": {
+      "other": "Edit discussion title: %1$s"
+    },
+    "type": "string"
+  },
   "community_empty": {
     "formatted": true,
     "forms": {
-      "other": "No cached messages. Sign in and /refresh to fetch the room."
+      "other": "No messages yet. Start the conversation."
+    },
+    "type": "string"
+  },
+  "community_forum_context": {
+    "formatted": true,
+    "forms": {
+      "other": "#%1$s · discussions stay"
     },
     "type": "string"
   },
@@ -3317,10 +3541,24 @@
     },
     "type": "string"
   },
+  "community_general_context": {
+    "formatted": true,
+    "forms": {
+      "other": "#general · 24-hour chat"
+    },
+    "type": "string"
+  },
   "community_help": {
     "formatted": true,
     "forms": {
       "other": "Channels: general, bugs, help, suggestions and presets. Suggestions uses the features API key. Tap Channels, New thread, Mentions or Menu; no slash command is required. Plain text posts on Send; exit posts, /exit leaves, //text posts /text.\n/help · /refresh · /older · /login · /register · /logout · /exit\n/report <full message ID> · /block <username> · /moderate <private text>\nGeneral messages expire individually after 24 hours. Forum threads and replies persist. Reports and private moderator requests last six calendar months; /moderate never posts publicly and has no automatic retry.\nTap a suggested @handle to insert it at the caret. Only active foreground sessions renew 90-second presence leases; badges and mentions are in-app only. No push, private messages, attachments, external IRC or launcher execution.\nUsername/password only; public registration and no password recovery. Server-readable, not end-to-end encrypted. Private encrypted account storage; 200 bodies per window and bounded routing/read metadata. Paused cache bytes are pruned on access; no secure-erasure guarantee. Nothing posts automatically on restoration. PocketBase is pre-1.0; this optional pilot may change."
+    },
+    "type": "string"
+  },
+  "community_help_action": {
+    "formatted": true,
+    "forms": {
+      "other": "Help"
     },
     "type": "string"
   },
@@ -3335,6 +3573,13 @@
     "formatted": true,
     "forms": {
       "other": "Input rejected; use /help. Slash commands take no password arguments. Messages: 500 Unicode characters / 2000 UTF-8 bytes maximum."
+    },
+    "type": "string"
+  },
+  "community_join": {
+    "formatted": true,
+    "forms": {
+      "other": "Join community"
     },
     "type": "string"
   },
@@ -3356,6 +3601,13 @@
     "formatted": true,
     "forms": {
       "other": "Unsent or uncertain draft"
+    },
+    "type": "string"
+  },
+  "community_live": {
+    "formatted": true,
+    "forms": {
+      "other": "%1$s · live"
     },
     "type": "string"
   },
@@ -3387,6 +3639,13 @@
     },
     "type": "string"
   },
+  "community_mention_author": {
+    "formatted": true,
+    "forms": {
+      "other": "Mention author"
+    },
+    "type": "string"
+  },
   "community_mentions": {
     "formatted": true,
     "forms": {
@@ -3408,10 +3667,45 @@
     },
     "type": "string"
   },
+  "community_message_actions": {
+    "formatted": true,
+    "forms": {
+      "other": "Message actions"
+    },
+    "type": "string"
+  },
+  "community_message_hint": {
+    "formatted": true,
+    "forms": {
+      "other": "Message #general"
+    },
+    "type": "string"
+  },
+  "community_messages_below": {
+    "formatted": true,
+    "forms": {
+      "other": "%1$d messages below · Latest ↓"
+    },
+    "type": "string"
+  },
   "community_moderate": {
     "formatted": true,
     "forms": {
       "other": "Private moderator request"
+    },
+    "type": "string"
+  },
+  "community_moderation_actions": {
+    "formatted": true,
+    "forms": {
+      "other": "Choose action"
+    },
+    "type": "string"
+  },
+  "community_moderation_confirm": {
+    "formatted": true,
+    "forms": {
+      "other": "Confirm this moderator action. Removing a discussion also removes its replies. Evidence keeps its original six-month expiry."
     },
     "type": "string"
   },
@@ -3432,14 +3726,28 @@
   "community_new_messages": {
     "formatted": true,
     "forms": {
-      "other": "New/unread messages: %1$d · scroll to read"
+      "other": "%1$d unread · Latest ↓"
     },
     "type": "string"
   },
   "community_new_thread": {
     "formatted": true,
     "forms": {
-      "other": "New thread"
+      "other": "New discussion"
+    },
+    "type": "string"
+  },
+  "community_next": {
+    "formatted": true,
+    "forms": {
+      "other": "Next"
+    },
+    "type": "string"
+  },
+  "community_not_confirmed": {
+    "formatted": true,
+    "forms": {
+      "other": "delivery not confirmed"
     },
     "type": "string"
   },
@@ -3464,6 +3772,13 @@
     },
     "type": "string"
   },
+  "community_operations_warning": {
+    "formatted": true,
+    "forms": {
+      "other": "Operator attention needed: %1$s"
+    },
+    "type": "string"
+  },
   "community_password": {
     "formatted": true,
     "forms": {
@@ -3482,6 +3797,13 @@
     "formatted": true,
     "forms": {
       "other": "Previous attempt is unresolved. Restore its draft with /refresh and submit it unchanged to reconcile/retry, or /logout to clear local state (this does not retract any server post)."
+    },
+    "type": "string"
+  },
+  "community_post_discussion": {
+    "formatted": true,
+    "forms": {
+      "other": "Post discussion"
     },
     "type": "string"
   },
@@ -3513,6 +3835,34 @@
     },
     "type": "string"
   },
+  "community_queue_next": {
+    "formatted": true,
+    "forms": {
+      "other": "Next"
+    },
+    "type": "string"
+  },
+  "community_queue_page": {
+    "formatted": true,
+    "forms": {
+      "other": "%1$s · page %2$d"
+    },
+    "type": "string"
+  },
+  "community_queue_previous": {
+    "formatted": true,
+    "forms": {
+      "other": "Previous"
+    },
+    "type": "string"
+  },
+  "community_queue_switch": {
+    "formatted": true,
+    "forms": {
+      "other": "Switch report / request queue"
+    },
+    "type": "string"
+  },
   "community_rate_error": {
     "formatted": true,
     "forms": {
@@ -3524,6 +3874,13 @@
     "formatted": true,
     "forms": {
       "other": "Latest"
+    },
+    "type": "string"
+  },
+  "community_refresh_action": {
+    "formatted": true,
+    "forms": {
+      "other": "Refresh"
     },
     "type": "string"
   },
@@ -3541,10 +3898,38 @@
     },
     "type": "string"
   },
+  "community_remove_content": {
+    "formatted": true,
+    "forms": {
+      "other": "Remove reported content"
+    },
+    "type": "string"
+  },
+  "community_reply_hint": {
+    "formatted": true,
+    "forms": {
+      "other": "Reply to this discussion"
+    },
+    "type": "string"
+  },
   "community_report": {
     "formatted": true,
     "forms": {
-      "other": "Report a general message"
+      "other": "Report content / author"
+    },
+    "type": "string"
+  },
+  "community_report_default": {
+    "formatted": true,
+    "forms": {
+      "other": "Reported content or author from Re:TUI"
+    },
+    "type": "string"
+  },
+  "community_report_reason": {
+    "formatted": true,
+    "forms": {
+      "other": "Reason (optional)"
     },
     "type": "string"
   },
@@ -3562,45 +3947,73 @@
     },
     "type": "string"
   },
-  "community_auth_username_error": {
+  "community_request_resolved": {
     "formatted": true,
     "forms": {
-      "other": "Use 3–24 ASCII letters, digits, - or _."
+      "other": "Moderator action saved; request resolved."
     },
     "type": "string"
   },
-  "community_auth_username_guidance": {
+  "community_reset_window": {
     "formatted": true,
     "forms": {
-      "other": "3–24 ASCII letters, digits, - or _. No email or password recovery."
+      "other": "Reset floating window"
     },
     "type": "string"
   },
-  "community_auth_password_guidance": {
+  "community_resolve_request": {
     "formatted": true,
     "forms": {
-      "other": "8–71 characters. No email or password recovery."
-    },
-    "type": "string"
-  },
-  "community_auth_password_error": {
-    "formatted": true,
-    "forms": {
-      "other": "Use 8–71 characters. Enter username again."
-    },
-    "type": "string"
-  },
-  "community_auth_confirmation_error": {
-    "formatted": true,
-    "forms": {
-      "other": "Passwords differ. Enter username again."
+      "other": "Resolve / dismiss request"
     },
     "type": "string"
   },
   "community_retry": {
     "formatted": true,
     "forms": {
-      "other": "Reconcile pending post"
+      "other": "Check delivery"
+    },
+    "type": "string"
+  },
+  "community_review_queue": {
+    "formatted": true,
+    "forms": {
+      "other": "Moderator review"
+    },
+    "type": "string"
+  },
+  "community_rules_accepted": {
+    "formatted": true,
+    "forms": {
+      "other": "Rules accepted. Your draft is unchanged; tap Send when ready."
+    },
+    "type": "string"
+  },
+  "community_rules_body": {
+    "formatted": true,
+    "forms": {
+      "other": "Re:TUI community · Rules version 2026-10-10\n\nBe respectful. No harassment, threats, hate, sexual exploitation, illegal content, impersonation, spam or sharing private information. Do not post secrets or passwords.\n\nReport content or its author from Message actions. Block an author locally to hide their posts and mention badges; /block username toggles the block. Private moderation requests are not public posts. dvil is the only moderator and can remove content or ban accounts.\n\nMessages are server-readable, not end-to-end encrypted. General expires after 24 hours. Forum discussions and accounts persist until deletion. Reports and moderation evidence last six calendar months, including after account deletion. Private recovery snapshots use a seven-day rotation; expired copies are removed on the next hourly run. There is currently no off-site recovery.\n\nAccept these rules before contributing. Acceptance does not submit your draft."
+    },
+    "type": "string"
+  },
+  "community_rules_required": {
+    "formatted": true,
+    "forms": {
+      "other": "Accept the current community rules before posting."
+    },
+    "type": "string"
+  },
+  "community_rules_title": {
+    "formatted": true,
+    "forms": {
+      "other": "Community rules"
+    },
+    "type": "string"
+  },
+  "community_sending": {
+    "formatted": true,
+    "forms": {
+      "other": "sending…"
     },
     "type": "string"
   },
@@ -3611,10 +4024,24 @@
     },
     "type": "string"
   },
+  "community_sign_in": {
+    "formatted": true,
+    "forms": {
+      "other": "Sign in"
+    },
+    "type": "string"
+  },
   "community_signed_out": {
     "formatted": true,
     "forms": {
       "other": "Signed out · offline · /login or /register"
+    },
+    "type": "string"
+  },
+  "community_signed_out_hint": {
+    "formatted": true,
+    "forms": {
+      "other": "Sign in, join, or type /help"
     },
     "type": "string"
   },
@@ -3653,10 +4080,17 @@
     },
     "type": "string"
   },
+  "community_thread_context": {
+    "formatted": true,
+    "forms": {
+      "other": "#%1$s › %2$s"
+    },
+    "type": "string"
+  },
   "community_thread_title": {
     "formatted": true,
     "forms": {
-      "other": "Thread title"
+      "other": "Discussion title"
     },
     "type": "string"
   },
@@ -3674,10 +4108,24 @@
     },
     "type": "string"
   },
+  "community_title_error": {
+    "formatted": true,
+    "forms": {
+      "other": "Enter a single-line title, up to 120 Unicode characters / 480 UTF-8 bytes."
+    },
+    "type": "string"
+  },
+  "community_title_guidance": {
+    "formatted": true,
+    "forms": {
+      "other": "1 · Title, then Next. Your opening message is kept."
+    },
+    "type": "string"
+  },
   "community_uncertain": {
     "formatted": true,
     "forms": {
-      "other": "Delivery uncertain. Pending draft kept with the same request ID. Send the same draft again to reconcile/retry; do not send a second copy. No automatic retry."
+      "other": "Delivery uncertain. Tap Check delivery to verify the original message before retrying. Your newer draft is kept; nothing retries automatically."
     },
     "type": "string"
   },
@@ -3692,6 +4140,20 @@
     "formatted": true,
     "forms": {
       "other": "Username"
+    },
+    "type": "string"
+  },
+  "community_welcome": {
+    "formatted": true,
+    "forms": {
+      "other": "Welcome to Re-TUI community.\n\nTalk with other Re-TUI users in General, or start a lasting discussion in Help, Bugs, Suggestions or Presets.\n\nGeneral messages expire after 24 hours; discussions stay.\n\nSign in or join below. Public posts are server-readable, not end-to-end encrypted. Accounts have no password recovery."
+    },
+    "type": "string"
+  },
+  "community_window_title": {
+    "formatted": true,
+    "forms": {
+      "other": "Re-TUI community"
     },
     "type": "string"
   },
@@ -10826,14 +11288,14 @@
   "offline_help_article_calculator_help_body": {
     "formatted": false,
     "forms": {
-      "other": "## Read without calculating\n\nTap the calculator question-mark tab, or type `help` at `calc>` and submit it, to open this dedicated offline reader. Header-tab entry keeps the calculator draft, selection and transcript. Typed help is consumed as a local command. The reader has its own numbered input; choices and examples never evaluate expressions or enter the calculation transcript. A pending calculation can finish without consuming the reader draft.\n\nAt `help>`, choose a displayed number or tap its line. Within an article, 1 returns to its topic list and 2/3 move between articles when shown. Android Back moves up the manual hierarchy; 0 closes the reader and returns to the calculator. Use the header window control to switch between maximized and windowed reading; drag the header to move and the visible edge/corner handles to resize. Text reflows rather than scaling.\n\n## Expressions and operators\n\n```\n2 + 3 * 4 → 14\n(2 + 3) * 4 → 20\n2^3 → 8\n```\n\nUse +, −, ×, ÷, parentheses, ^ and %.\n\n## Functions and constants\n\n```\nsqrt(9) → 3\nsin(90) → 1 in degrees mode\n```\n\nFUNC inserts sqrt, sin, cos, tan, log, ln and abs with parentheses. Constants: `pi` and `e`.\n\n## Conversions and ans\n\n```\n5 ft to miles\n20 celsius to fahrenheit\n```\n\nUse `to` for conversion. The word `in` means inches. ABC enters letters and units. `ans` holds the last successful result, including units; errors and cancellation do not replace it.\n\n```\n5 ft to miles\nans * 2\nans to ft → 10 ft\n```\n\n## Keypad and editing\n\n- 123: numbers and operators\n- ABC: letters and units\n- FUNC: functions and constants\n\nTap the prompt to place the cursor or select text. √ and function keys wrap selected text or insert parentheses with the cursor inside. ⌫ deletes the selection or previous character. ↵ evaluates.\n\n- `clear` clears the transcript, keeping ans.\n- `help` opens this reader.\n- `exit` closes the calculator.\n- Cancel stops a calculation without changing your input.\n\n>! Examples are read-only here. Entering them at calc> evaluates them."
+      "other": "Enter an expression at `calc>` and press ↵. Use the keypad to enter numbers, letters, units and functions. Qalculate evaluates the expression.\n\n## Continue a result\n\n```\n5 + 5 → 10\n+5 → 15\n*2 → 30\n```\n\nStart with +, −, ×, ÷ or ^ to continue from the last successful result. You do not need to type `ans`. ASCII `-`, `*` and `/` work too. A complete expression such as `5 + 5` starts a new calculation. With a previous result, `-5` subtracts 5; use `(-5)` for a standalone negative value. Without a previous result, `-5` is just negative 5. Errors and cancellation keep the last successful result.\n\n## Expressions and operators\n\n```\n2 + 3 * 4 → 14\n(2 + 3) * 4 → 20\n2^3 → 8\n```\n\nUse +, −, ×, ÷, parentheses, ^ and %.\n\n## Convert units\n\n```\n5 ft to cm → 152.4 cm\n*2 → 304.8 cm\nans to ft → 10 ft\n20 celsius to fahrenheit\n```\n\nUse `to` for conversion. The word `in` means inches. Results retain their units when continued.\n\n## Functions and constants\n\n```\nsqrt(144) → 12\nsin(90) → 1 in degrees mode\n```\n\nFUNC inserts sqrt, sin, cos, tan, log, ln and abs with parentheses. Constants: `pi` and `e`.\n\n## Variables and explicit answers\n\n```\ntax = 18%\n4200 * tax → 756\n```\n\n= inserts an assignment; ↵ evaluates. Native named variables last only while the engine process remains alive.\n\n`ans` is optional: use it to refer to the last result inside an expression, for example `sqrt(ans)`, `100 / ans` or `ans to ft`. `ans = 5` sets the stored answer. The last successful answer survives reopening the calculator.\n\n## Keypad and editing\n\n- 123: numbers, operators and =\n- ABC: letters, units and variable names\n- FUNC: functions, constants and =\n\nTap the prompt to place the cursor or select text. Function keys wrap selected text or insert parentheses with the cursor inside. ⌫ deletes the selection or previous character. ↵ evaluates.\n\n- `clear` clears the transcript, keeping the last result.\n- `help` opens this reader.\n- `exit` closes the calculator.\n- Cancel stops a calculation without changing your input.\n\n## Using this help\n\nThe question-mark tab opens this calculator guide without changing your expression. Typing `help` opens it too, consuming only that command. Examples here are read-only; enter them at `calc>` to calculate.\n\nAt `help>`, choose a displayed number or tap its line. 1 opens Topics; 2/3 move between articles when shown. In a topic list, 10 opens Categories. Android Back or 0 closes Help immediately. Reopening resumes your reading position.\n\nThe header window control switches between expanded and floating reading. Drag the header to move a floating window or its corners to resize it. Text reflows rather than scaling."
     },
     "type": "string"
   },
   "offline_help_article_calculator_help_title": {
     "formatted": false,
     "forms": {
-      "other": "Browse calculator help without calculating"
+      "other": "Calculator"
     },
     "type": "string"
   },
@@ -10938,7 +11400,7 @@
   "offline_help_article_command_reference_body": {
     "formatted": false,
     "forms": {
-      "other": "At the launcher prompt, enter help for this offline manual, tutorial for Getting started, or help <command> for bundled syntax and configured priority without running that command. help -topic <id> opens a known category/article. Topic suggestions match IDs, titles and body text and open the selected topic directly. Hidden compatibility names are omitted from the ordinary command list; commands without reference text show a fallback, not invented syntax.\n\nLists show up to seven choices with 8/9 for previous/next pages when available. Tap an entry or enter its number and press ↵. Within an article, 1 returns to its list and 2/3 move between topics when shown. Android Back moves up a level; 0 closes the manual. Examples are text, not executable buttons. The calculator help tab opens the dedicated offline reader. Online tutorial options and companion/network services do not become offline because this manual is bundled.\n\n## Examples\n\n```\nhelp\n```\n\nOpen the bundled offline manual.\n\n```\nhelp search\n```\n\nShow the provider-management quick reference.\n\n```\ntutorial\n```\n\nOpen offline Getting started.\n\n```\nhelp -topic getting-started\n```\n\nOpen the Getting started category."
+      "other": "At the launcher prompt, enter help for this offline manual, tutorial for Getting started, or help <command> for bundled syntax and configured priority without running that command. help -topic <id> opens a known category/article. Topic suggestions match IDs, titles and body text and open the selected topic directly. Hidden compatibility names are omitted from the ordinary command list; commands without reference text show a fallback, not invented syntax.\n\nLists show up to seven choices with 8/9 for previous/next pages when available. Tap an entry or enter its number and press ↵. Within an article, 1 returns to its list and 2/3 move between topics when shown. Android Back or 0 closes the manual. Bare help restores the previous article/page and reading position; explicit topic links open the requested topic. Use 1 for Topics within an article and 10 for Categories within a list. Examples are text, not executable buttons. The calculator help tab opens the dedicated offline reader. Online tutorial options and companion/network services do not become offline because this manual is bundled.\n\n## Examples\n\n```\nhelp\n```\n\nOpen the bundled offline manual.\n\n```\nhelp search\n```\n\nShow the provider-management quick reference.\n\n```\ntutorial\n```\n\nOpen offline Getting started.\n\n```\nhelp -topic getting-started\n```\n\nOpen the Getting started category."
     },
     "type": "string"
   },
@@ -11498,7 +11960,7 @@
   "offline_help_article_startup_setup_body": {
     "formatted": false,
     "forms": {
-      "other": "## Stage the setup\n\nOn a new install, choose Basic or Advanced, review Auto-theme and border choices, then press Apply. Switching choices only stages them. Later closes setup without changing launcher settings and leaves setup pending. Basic enables status extras and double-tap lock, but keeps optional drawers, module dock, integrations, notification display and sounds off. Advanced lets you choose those switches separately. Enabling Termux or Tasker does not install it or grant Android access. Double-tap lock depends on Android device-admin configuration.\n\n## Appearance defaults\n\nAuto-theme takes a wallpaper-derived color snapshot with system fallback, not a permanent link to future wallpapers. Dashed uses a gap, Solid sets the gap to zero, and None disables generated borders. Classic remains the renderer under independent Cyberdeck/CRT effects. Basic and Advanced are startup defaults, not Classic versus Search launcher mode.\n\n## Rehearse without applying\n\nFor a no-apply rehearsal use guide -startup-test. End Preview and Finish Preview leave launcher settings unchanged, unlike normal Settings editors that can persist changes.\n\n## Examples\n\n```\nguide -startup-test\n```\n\nOpen the staged startup dry run; neither finish nor cancel applies launcher choices.\n\n```\nsettings\n```\n\nOpen the Settings Hub for later changes."
+      "other": "## A required first-launch introduction\n\nNew installs start with three pages: a quick guide to apps, suggestion chips and commands; Basic or Advanced configuration; then a thank-you page for this independent project. Complete startup before using the launcher. Back revisits earlier pages, but there is no Later or Skip. Closing or restarting preserves your page and choices. Existing completed installations are not asked to configure again.\n\n## Stage, review, build\n\nConfiguration choices stay staged until Build my launcher on the final page. Display-only pseudo-code prints your chosen configuration line by line as a visible progress bar advances. The sequence prepares the theme, applies your selections and reveals the launcher. Basic enables weather/unlock-count labels and double-tap lock; optional drawers, module dock, integrations, notification display, sounds and effects stay off. Advanced exposes those switches separately. Double-tap lock requests Android device-admin access on first use. Integration switches do not install Termux/Tasker or grant permissions. All choices can be changed later in Settings.\n\n## Appearance defaults\n\nAuto-theme applies the current wallpaper palette once, with system fallback, not a permanent link to future wallpapers. The startup pane itself previews the selected border. Dashed exposes live stroke-width and gap sliders; these stay staged until Build. Solid sets the gap to zero, and None disables generated borders. Classic remains the renderer beneath independent Cyberdeck/CRT effects. Basic and Advanced are startup defaults, not Classic versus Search launcher mode.\n\n## Rehearse without applying\n\nUse guide -startup-test to preview all three pages and the build animation. Preview uses a separate draft and does not change real onboarding progress or launcher settings. End Preview on the first page closes it; Finish Preview rehearses the final sequence.\n\n## Examples\n\n```\nguide -startup-test\n```\n\nRehearse the required startup without applying choices.\n\n```\nsettings\n```\n\nOpen the Settings Hub for later changes."
     },
     "type": "string"
   },
@@ -11568,7 +12030,7 @@
   "offline_help_article_terminal_basics_body": {
     "formatted": false,
     "forms": {
-      "other": "## Enter a command\n\nType a command at the launcher prompt and press Enter. Typing help by itself does not open this manual until you submit it. Suggestions can take you directly to a topic. help apps prints a short command reference; tutorial opens Getting started.\n\n## Navigate the manual\n\n>! Nothing on this page executes: examples are text, not command buttons. In the manual, type a displayed number and press Enter, or tap its numbered line. Android Back moves up one level; 0 returns to the launcher. The compact number keys belong only to the manual, not the launcher command prompt."
+      "other": "## Enter a command\n\nType a command at the launcher prompt and press Enter. Typing help by itself does not open this manual until you submit it. Suggestions can take you directly to a topic. help apps prints a short command reference; tutorial opens Getting started.\n\n## Navigate the manual\n\n>! Nothing on this page executes: examples are text, not command buttons. In the manual, type a displayed number and press Enter, or tap its numbered line. Android Back or 0 closes Help immediately. Bare help restores your previous page and reading position. Use 1 for Topics within an article and 10 for Categories within a topic list. The compact number keys belong only to the manual, not the launcher command prompt."
     },
     "type": "string"
   },
@@ -11694,7 +12156,7 @@
   "offline_help_close": {
     "formatted": true,
     "forms": {
-      "other": "Return to launcher"
+      "other": "Close help"
     },
     "type": "string"
   },
@@ -16615,6 +17077,13 @@
     },
     "type": "string"
   },
+  "startup_access_note": {
+    "formatted": false,
+    "forms": {
+      "other": "These switches choose features, not permissions. Notifications need Android access; Termux and Tasker need their own setup. You can grant access when you use them."
+    },
+    "type": "string"
+  },
   "startup_advanced": {
     "formatted": false,
     "forms": {
@@ -16650,10 +17119,24 @@
     },
     "type": "string"
   },
+  "startup_back": {
+    "formatted": false,
+    "forms": {
+      "other": "Back"
+    },
+    "type": "string"
+  },
   "startup_basic": {
     "formatted": false,
     "forms": {
       "other": "BASIC"
+    },
+    "type": "string"
+  },
+  "startup_basic_description": {
+    "formatted": false,
+    "forms": {
+      "other": "Basic keeps weather, unlock count, and double-tap lock on. Locking needs Android device-admin access on first use. Optional drawers, integrations, notifications, sounds, and visual effects stay off."
     },
     "type": "string"
   },
@@ -16678,6 +17161,90 @@
     },
     "type": "string"
   },
+  "startup_border_gap": {
+    "formatted": true,
+    "forms": {
+      "other": "Gap between dashes: %1$s dp"
+    },
+    "type": "string"
+  },
+  "startup_border_preview": {
+    "formatted": false,
+    "forms": {
+      "other": "This pane previews your border. Choose Dashed to adjust its width and gap."
+    },
+    "type": "string"
+  },
+  "startup_border_stroke": {
+    "formatted": true,
+    "forms": {
+      "other": "Stroke width: %1$s dp"
+    },
+    "type": "string"
+  },
+  "startup_border_summary": {
+    "formatted": true,
+    "forms": {
+      "other": " (stroke %1$s dp, gap %2$d dp)"
+    },
+    "type": "string"
+  },
+  "startup_build_apply": {
+    "formatted": false,
+    "forms": {
+      "other": "> Applying your choices"
+    },
+    "type": "string"
+  },
+  "startup_build_button": {
+    "formatted": false,
+    "forms": {
+      "other": "Build my launcher"
+    },
+    "type": "string"
+  },
+  "startup_build_description": {
+    "formatted": false,
+    "forms": {
+      "other": "Your choices, written out as we prepare your home screen. This is a configuration illustration, not executable code."
+    },
+    "type": "string"
+  },
+  "startup_build_failed": {
+    "formatted": false,
+    "forms": {
+      "other": "Setup could not finish. Your choices are saved. Please try again."
+    },
+    "type": "string"
+  },
+  "startup_build_preview": {
+    "formatted": false,
+    "forms": {
+      "other": "> Rehearsing setup — no launcher settings changed"
+    },
+    "type": "string"
+  },
+  "startup_build_ready": {
+    "formatted": false,
+    "forms": {
+      "other": "> Ready. Make yourself at home."
+    },
+    "type": "string"
+  },
+  "startup_build_title": {
+    "formatted": false,
+    "forms": {
+      "other": "Building your launcher"
+    },
+    "type": "string"
+  },
+  "startup_choices_reversible": {
+    "formatted": false,
+    "forms": {
+      "other": "Every choice can be changed later in Settings. Go back now if you want to adjust anything."
+    },
+    "type": "string"
+  },
   "startup_choose_a_setup_level_review_it_here_then_apply_once": {
     "formatted": false,
     "forms": {
@@ -16689,6 +17256,20 @@
     "formatted": false,
     "forms": {
       "other": "Classic base"
+    },
+    "type": "string"
+  },
+  "startup_configuration_description": {
+    "formatted": false,
+    "forms": {
+      "other": "Start with Basic, or choose Advanced for individual feature controls. Nothing changes until you build your launcher on the final page."
+    },
+    "type": "string"
+  },
+  "startup_continue": {
+    "formatted": false,
+    "forms": {
+      "other": "Continue"
     },
     "type": "string"
   },
@@ -16748,6 +17329,55 @@
     },
     "type": "string"
   },
+  "startup_intro_chips_body": {
+    "formatted": false,
+    "forms": {
+      "other": "The chips above the input help you find apps, commands, and their options. Tap a chip to select it instead of typing every character."
+    },
+    "type": "string"
+  },
+  "startup_intro_chips_title": {
+    "formatted": false,
+    "forms": {
+      "other": "02 / Let suggestions help"
+    },
+    "type": "string"
+  },
+  "startup_intro_launch_body": {
+    "formatted": false,
+    "forms": {
+      "other": "Tap the input line and start typing an app name. Choose the matching app from the suggestions to open it."
+    },
+    "type": "string"
+  },
+  "startup_intro_launch_title": {
+    "formatted": false,
+    "forms": {
+      "other": "01 / Type to launch"
+    },
+    "type": "string"
+  },
+  "startup_intro_next": {
+    "formatted": false,
+    "forms": {
+      "other": "Next, choose your setup. Your choices are saved as you go and applied only at the end."
+    },
+    "type": "string"
+  },
+  "startup_intro_tools_body": {
+    "formatted": false,
+    "forms": {
+      "other": "Type a command, then press Enter:\n\ncalc → open the calculator\nhelp → read the offline manual\nsettings → customize your launcher\n\nYou can learn more as you go. These three are a good start."
+    },
+    "type": "string"
+  },
+  "startup_intro_tools_title": {
+    "formatted": false,
+    "forms": {
+      "other": "03 / More than an app launcher"
+    },
+    "type": "string"
+  },
   "startup_later": {
     "formatted": false,
     "forms": {
@@ -16773,6 +17403,13 @@
     "formatted": false,
     "forms": {
       "other": "Layer scanline and CRT effects over the classic base."
+    },
+    "type": "string"
+  },
+  "startup_lock_requires_access": {
+    "formatted": false,
+    "forms": {
+      "other": "Lock with a double tap. Android device-admin access is requested on first use."
     },
     "type": "string"
   },
@@ -16825,6 +17462,13 @@
     },
     "type": "string"
   },
+  "startup_page_progress": {
+    "formatted": true,
+    "forms": {
+      "other": "SETUP %1$d / 3"
+    },
+    "type": "string"
+  },
   "startup_preview_only_changing_switches_here_will_not_alter_your_launcher": {
     "formatted": false,
     "forms": {
@@ -16843,6 +17487,20 @@
     "formatted": false,
     "forms": {
       "other": "Read notifications and external media sessions."
+    },
+    "type": "string"
+  },
+  "startup_required": {
+    "formatted": false,
+    "forms": {
+      "other": "Complete this quick setup to start using Re:TUI. Your progress is saved."
+    },
+    "type": "string"
+  },
+  "startup_selection_summary": {
+    "formatted": true,
+    "forms": {
+      "other": "Setup: %1$s\nWallpaper colors: %2$s\nBorders: %3$s\nFeatures: %4$s\nEffects: %5$s"
     },
     "type": "string"
   },
@@ -16965,10 +17623,38 @@
     },
     "type": "string"
   },
+  "startup_thanks_body": {
+    "formatted": false,
+    "forms": {
+      "other": "Re:TUI is an independent project, built with care and a love for doing things differently. Thank you for giving this little terminal a place on your phone."
+    },
+    "type": "string"
+  },
+  "startup_thanks_feedback": {
+    "formatted": false,
+    "forms": {
+      "other": "Your feedback, bug reports, ideas, and support help shape what comes next. Welcome aboard. Let’s build your launcher."
+    },
+    "type": "string"
+  },
+  "startup_thanks_title": {
+    "formatted": false,
+    "forms": {
+      "other": "Thanks for trying Re:TUI"
+    },
+    "type": "string"
+  },
   "startup_the_standard_launcher_renderer_is_always_active": {
     "formatted": false,
     "forms": {
       "other": "The standard launcher renderer is always active."
+    },
+    "type": "string"
+  },
+  "startup_theme_snapshot_description": {
+    "formatted": false,
+    "forms": {
+      "other": "Use colors from your current wallpaper. This applies the palette once; future wallpaper changes do not automatically replace it."
     },
     "type": "string"
   },
@@ -17004,6 +17690,27 @@
     "formatted": false,
     "forms": {
       "other": "Weather and unlock-count labels."
+    },
+    "type": "string"
+  },
+  "startup_welcome_body": {
+    "formatted": false,
+    "forms": {
+      "other": "Your home screen, reimagined as a terminal. Launch apps, use everyday tools, and make a workspace that feels like yours. No terminal experience needed."
+    },
+    "type": "string"
+  },
+  "startup_welcome_title": {
+    "formatted": false,
+    "forms": {
+      "other": "Welcome to Re:TUI"
+    },
+    "type": "string"
+  },
+  "startup_your_setup": {
+    "formatted": false,
+    "forms": {
+      "other": "Your setup, your way"
     },
     "type": "string"
   },

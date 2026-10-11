@@ -198,7 +198,8 @@ object LauncherSettings {
         for (root in XMLPrefsManager.XMLPrefsRoot.values()) {
             for (save in root.enums) {
                 try {
-                    val value: String? = root.getValues()!!.get(save)?.value
+                    // Some settings (notifications/apps) are owned by a live manager, not the XML root cache.
+                    val value: String? = (save.parent() ?: root).getValues()?.get(save)?.value
                     if (value != null) {
                         snapshot[key(save)] = value
                     }

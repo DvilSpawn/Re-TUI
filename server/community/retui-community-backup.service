@@ -1,0 +1,12 @@
+[Unit]
+Description=Re:TUI selective community recovery snapshot
+After=retui-community.service
+[Service]
+Type=oneshot
+UMask=0077
+ExecStart=/usr/bin/python3 /opt/retui-community/operations.py backup
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/var/lib/retui-community/recovery

@@ -19,9 +19,13 @@ class CommunityIntegrationTest {
         var activity=instrumentation.startActivitySync(Intent(context,CommunityActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) as CommunityActivity
         instrumentation.waitForIdleSync()
         try {
-            val monitor=instrumentation.addMonitor(CommunityActivity::class.java.name,null,false)
-            instrumentation.runOnMainSync { activity.requestedOrientation=android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE }
-            activity=instrumentation.waitForMonitorWithTimeout(monitor,5000) as CommunityActivity
+            if (activity.resources.configuration.orientation != android.content.res.Configuration.ORIENTATION_LANDSCAPE) {
+                val monitor=instrumentation.addMonitor(CommunityActivity::class.java.name,null,false)
+                try {
+                    instrumentation.runOnMainSync { activity.requestedOrientation=android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE }
+                    activity=instrumentation.waitForMonitorWithTimeout(monitor,5000) as CommunityActivity
+                } finally { instrumentation.removeMonitor(monitor) }
+            }
             instrumentation.waitForIdleSync()
             instrumentation.runOnMainSync {
                 val input=activity.window.decorView.findViewWithTag<EditText>("community_input"); input.requestFocus(); input.setText("/exit")
@@ -30,7 +34,7 @@ class CommunityIntegrationTest {
             Thread.sleep(1000); instrumentation.waitForIdleSync()
             instrumentation.runOnMainSync {
                 val input=activity.window.decorView.findViewWithTag<EditText>("community_input")
-                val rect=android.graphics.Rect(); assertTrue(input.getGlobalVisibleRect(rect)); assertEquals(input.height,rect.height()); assertNull(input.background)
+                val rect=android.graphics.Rect(); assertTrue(input.getGlobalVisibleRect(rect)); assertEquals(input.height,rect.height()); assertNotNull(input.background)
                 assertTrue("Landscape IME must not replace or obscure the inline prompt", input.imeOptions and android.view.inputmethod.EditorInfo.IME_FLAG_NO_EXTRACT_UI != 0)
                 assertTrue(activity.window.decorView.width>activity.window.decorView.height)
             }
@@ -45,7 +49,7 @@ class CommunityIntegrationTest {
         emulatorOnly(); val fixture = CommunityHttpFixture(); fixture.status = 503; CommunityActivity.debugBackend = fixture.url
         val store = CommunityStore(context); store.clear()
         val state = CommunityState().apply {
-            signIn(CommunityClient.Account("member000000001", "alice", "fixture-token"))
+            signIn(CommunityClient.Account("member000000001", "alice", "fixture-token", policyVersion = CommunityClient.POLICY_VERSION))
             draft = "original uncertain"; beginPost(draft); draft = "new independent draft"
             merge(listOf(org.json.JSONObject().put("id", "m00000000000001")
                 .put("created", CommunityHttpFixture.created(System.currentTimeMillis() - 86_400_000L + 8000L))
@@ -85,7 +89,7 @@ class CommunityIntegrationTest {
         val records = (1..200).map { org.json.JSONObject().put("id", "m" + it.toString().padStart(14, '0'))
             .put("created", CommunityHttpFixture.created()).put("author", "member000000002").put("author_handle", "bob").put("body", "pause item $it") }
         fixture.posts.addAll(records)
-        store.save(CommunityState().apply { signIn(CommunityClient.Account("member000000001", "alice", "fixture-token")); merge(records, emptySet()); draft = "kept during pause" }.toJson())
+        store.save(CommunityState().apply { signIn(CommunityClient.Account("member000000001", "alice", "fixture-token", policyVersion = CommunityClient.POLICY_VERSION)); merge(records, emptySet()); draft = "kept during pause" }.toJson())
         val activity = instrumentation.startActivitySync(Intent(context, CommunityActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) as CommunityActivity
         instrumentation.waitForIdleSync()
         try {
@@ -110,7 +114,7 @@ class CommunityIntegrationTest {
         emulatorOnly(); val fixture = CommunityHttpFixture(); CommunityActivity.debugBackend = fixture.url
         val gate = java.util.concurrent.CountDownLatch(1)
         val store = CommunityStore(context); store.clear()
-        store.save(CommunityState().apply { signIn(CommunityClient.Account("member000000001", "alice", "fixture-token")) }.toJson())
+        store.save(CommunityState().apply { signIn(CommunityClient.Account("member000000001", "alice", "fixture-token", policyVersion = CommunityClient.POLICY_VERSION)) }.toJson())
         val activity = instrumentation.startActivitySync(Intent(context, CommunityActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) as CommunityActivity
         instrumentation.waitForIdleSync()
         try {
@@ -125,8 +129,10 @@ class CommunityIntegrationTest {
             instrumentation.runOnMainSync { activity.window.decorView.findViewWithTag<EditText>("community_input").setText("new independent draft") }
             gate.countDown()
             await { activity.window.decorView.findViewWithTag<TextView>("community_status").text.contains("Posted") }
+            instrumentation.runOnMainSync { (activity.javaClass.getDeclaredField("poll").apply { isAccessible = true }.get(activity) as Runnable).run() }
+            await { activity.window.decorView.findViewWithTag<TextView>("community_status").text.contains("Request failed") }
             instrumentation.runOnMainSync {
-                assertTrue(activity.window.decorView.findViewWithTag<TextView>("community_status").text.contains("stale"))
+                assertTrue(activity.window.decorView.findViewWithTag<TextView>("community_status").text.contains("Request failed"))
                 assertTrue(activity.window.decorView.findViewWithTag<TextView>("community_output").text.contains("canonical delivered"))
             }
             val saved = CommunityState(store.load())
@@ -159,7 +165,7 @@ class CommunityIntegrationTest {
         emulatorOnly(); val fixture = CommunityHttpFixture(); CommunityActivity.debugBackend = fixture.url
         val gate = java.util.concurrent.CountDownLatch(1)
         val store = CommunityStore(context); store.clear()
-        store.save(CommunityState().apply { signIn(CommunityClient.Account("member000000001", "alice", "fixture-token")) }.toJson())
+        store.save(CommunityState().apply { signIn(CommunityClient.Account("member000000001", "alice", "fixture-token", policyVersion = CommunityClient.POLICY_VERSION)) }.toJson())
         var activity = instrumentation.startActivitySync(Intent(context, CommunityActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) as CommunityActivity
         instrumentation.waitForIdleSync()
         try {
@@ -188,7 +194,7 @@ class CommunityIntegrationTest {
         emulatorOnly(); val fixture = CommunityHttpFixture(); CommunityActivity.debugBackend = fixture.url
         val gate = java.util.concurrent.CountDownLatch(1)
         val store = CommunityStore(context); store.clear()
-        store.save(CommunityState().apply { signIn(CommunityClient.Account("member000000001", "alice", "fixture-token")) }.toJson())
+        store.save(CommunityState().apply { signIn(CommunityClient.Account("member000000001", "alice", "fixture-token", policyVersion = CommunityClient.POLICY_VERSION)) }.toJson())
         var activity = instrumentation.startActivitySync(Intent(context, CommunityActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) as CommunityActivity
         instrumentation.waitForIdleSync()
         try {
@@ -222,7 +228,7 @@ class CommunityIntegrationTest {
     @Test fun uncertainOriginalReconcilesWithoutPostingNewDraftAfterRecreation() {
         emulatorOnly(); val fixture = CommunityHttpFixture(); CommunityActivity.debugBackend = fixture.url
         val store = CommunityStore(context); store.clear()
-        store.save(CommunityState().apply { signIn(CommunityClient.Account("member000000001", "alice", "fixture-token")) }.toJson())
+        store.save(CommunityState().apply { signIn(CommunityClient.Account("member000000001", "alice", "fixture-token", policyVersion = CommunityClient.POLICY_VERSION)) }.toJson())
         var activity = instrumentation.startActivitySync(Intent(context, CommunityActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) as CommunityActivity
         instrumentation.waitForIdleSync()
         try {
@@ -259,7 +265,7 @@ class CommunityIntegrationTest {
     @Test fun committedGatewayResponsesRecoverOrPersistOriginalIdentityThroughReload() {
         emulatorOnly(); val fixture = CommunityHttpFixture(); CommunityActivity.debugBackend = fixture.url
         val store = CommunityStore(context); store.clear()
-        store.save(CommunityState().apply { signIn(CommunityClient.Account("member000000001", "alice", "fixture-token")) }.toJson())
+        store.save(CommunityState().apply { signIn(CommunityClient.Account("member000000001", "alice", "fixture-token", policyVersion = CommunityClient.POLICY_VERSION)) }.toJson())
         var activity = instrumentation.startActivitySync(Intent(context, CommunityActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) as CommunityActivity
         instrumentation.waitForIdleSync()
         fun submit(text: String) = instrumentation.runOnMainSync {
@@ -296,7 +302,7 @@ class CommunityIntegrationTest {
     @Test fun definitivePostRejectionClearsAttemptButKeepsEditableDraft() {
         emulatorOnly(); val fixture = CommunityHttpFixture(); CommunityActivity.debugBackend = fixture.url
         val store = CommunityStore(context); store.clear()
-        store.save(CommunityState().apply { signIn(CommunityClient.Account("member000000001", "alice", "fixture-token")) }.toJson())
+        store.save(CommunityState().apply { signIn(CommunityClient.Account("member000000001", "alice", "fixture-token", policyVersion = CommunityClient.POLICY_VERSION)) }.toJson())
         val activity = instrumentation.startActivitySync(Intent(context, CommunityActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) as CommunityActivity
         instrumentation.waitForIdleSync()
         try {
@@ -326,7 +332,7 @@ class CommunityIntegrationTest {
         fixture.posts.add(org.json.JSONObject().put("id", "m00000000000001").put("created", CommunityHttpFixture.created())
             .put("author", "member000000002").put("author_handle", "billy").put("body", "block fixture body"))
         val store = CommunityStore(context); store.clear()
-        store.save(CommunityState().apply { signIn(CommunityClient.Account("member000000001", "alice", "fixture-token")) }.toJson())
+        store.save(CommunityState().apply { signIn(CommunityClient.Account("member000000001", "alice", "fixture-token", policyVersion = CommunityClient.POLICY_VERSION)) }.toJson())
         val activity = instrumentation.startActivitySync(Intent(context, CommunityActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) as CommunityActivity
         instrumentation.waitForIdleSync()
         try {
@@ -351,7 +357,7 @@ class CommunityIntegrationTest {
             .put("created", CommunityHttpFixture.created()).put("author", "member000000002").put("author_handle", "bob").put("body", "history item $n")
         fixture.posts.addAll((1..400).map(::message))
         val store = CommunityStore(context); store.clear()
-        store.save(CommunityState().apply { signIn(CommunityClient.Account("member000000001", "alice", "fixture-token")); merge((201..400).map(::message), emptySet()) }.toJson())
+        store.save(CommunityState().apply { signIn(CommunityClient.Account("member000000001", "alice", "fixture-token", policyVersion = CommunityClient.POLICY_VERSION)); merge((201..400).map(::message), emptySet()) }.toJson())
         var activity = instrumentation.startActivitySync(Intent(context, CommunityActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) as CommunityActivity
         instrumentation.waitForIdleSync()
         fun submit(text: String) = instrumentation.runOnMainSync {
@@ -364,11 +370,12 @@ class CommunityIntegrationTest {
             await { activity.window.decorView.findViewWithTag<TextView>("community_output").text.contains("history item 151\n") }
             assertFalse(CommunityState(store.load()).messages.any { it.getString("id") == message(400).getString("id") })
             submit("own latest post")
-            await { activity.window.decorView.findViewWithTag<TextView>("community_status").text.contains("Posted") }
+            await { activity.window.decorView.findViewWithTag<TextView>("community_output").text.contains("own latest post") }
+            await { activity.window.decorView.findViewWithTag<TextView>("community_output").text.contains("history item 400\n") }
             instrumentation.runOnMainSync {
                 val text = activity.window.decorView.findViewWithTag<TextView>("community_output").text
                 assertTrue("Successful post must not disappear in an old bounded window", text.contains("own latest post"))
-                assertTrue("Posting from history must fetch evicted latest peer bodies immediately", text.contains("history item 400\n"))
+                assertTrue("Posting from history must resync evicted latest peer bodies", text.contains("history item 400\n"))
             }
             val posted = fixture.posts.last().getString("id")
             assertTrue(CommunityState(store.load()).seen.contains(posted))
@@ -395,7 +402,7 @@ class CommunityIntegrationTest {
             .put("created", CommunityHttpFixture.created()).put("author", "member000000002").put("author_handle", "bob").put("body", "history item $n")
         fixture.posts.addAll((1..400).map(::message))
         val store = CommunityStore(context); store.clear()
-        store.save(CommunityState().apply { signIn(CommunityClient.Account("member000000001", "alice", "fixture-token")); merge((201..400).map(::message), emptySet()) }.toJson())
+        store.save(CommunityState().apply { signIn(CommunityClient.Account("member000000001", "alice", "fixture-token", policyVersion = CommunityClient.POLICY_VERSION)); merge((201..400).map(::message), emptySet()) }.toJson())
         var activity = instrumentation.startActivitySync(Intent(context, CommunityActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) as CommunityActivity
         instrumentation.waitForIdleSync()
         fun submit(command: String) = instrumentation.runOnMainSync {
@@ -456,7 +463,7 @@ class CommunityIntegrationTest {
 
     @Test fun lostPostResponseRemainsRecoverableAndRetryUsesSameUuidWithoutDuplicate() {
         emulatorOnly(); val fixture = CommunityHttpFixture(); CommunityActivity.debugBackend = fixture.url
-        val store = CommunityStore(context); store.clear(); store.save(CommunityState().apply { signIn(CommunityClient.Account("member000000001","alice","fixture-token")) }.toJson())
+        val store = CommunityStore(context); store.clear(); store.save(CommunityState().apply { signIn(CommunityClient.Account("member000000001", "alice", "fixture-token", policyVersion = CommunityClient.POLICY_VERSION)) }.toJson())
         var activity = instrumentation.startActivitySync(Intent(context,CommunityActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) as CommunityActivity
         instrumentation.waitForIdleSync()
         try {
@@ -483,7 +490,7 @@ class CommunityIntegrationTest {
         fun message(n: Int) = org.json.JSONObject().put("id","m"+n.toString().padStart(14,'0')).put("created",CommunityHttpFixture.created())
             .put("author","member000000002").put("author_handle","bob").put("body","message $n\nsecond line\nthird line")
         (1..30).forEach { fixture.posts.add(message(it)) }
-        val store = CommunityStore(context); store.clear(); store.save(CommunityState().apply { signIn(CommunityClient.Account("member000000001","alice","fixture-token")) }.toJson())
+        val store = CommunityStore(context); store.clear(); store.save(CommunityState().apply { signIn(CommunityClient.Account("member000000001", "alice", "fixture-token", policyVersion = CommunityClient.POLICY_VERSION)) }.toJson())
         val activity = instrumentation.startActivitySync(Intent(context, CommunityActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) as CommunityActivity
         instrumentation.waitForIdleSync()
         try {
@@ -503,7 +510,7 @@ class CommunityIntegrationTest {
     @Test fun revokedSessionClearsPrivateCacheDraftAndToken() {
         emulatorOnly(); val fixture = CommunityHttpFixture(); fixture.status = 403; CommunityActivity.debugBackend = fixture.url
         val store = CommunityStore(context); store.clear()
-        store.save(CommunityState().apply { signIn(CommunityClient.Account("member000000001","alice","fixture-token")); draft = "private pending draft"; blocked.add("bob") }.toJson())
+        store.save(CommunityState().apply { signIn(CommunityClient.Account("member000000001", "alice", "fixture-token", policyVersion = CommunityClient.POLICY_VERSION)); draft = "private pending draft"; blocked.add("bob") }.toJson())
         val activity = instrumentation.startActivitySync(Intent(context, CommunityActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) as CommunityActivity
         instrumentation.waitForIdleSync()
         try {
@@ -568,7 +575,7 @@ class CommunityIntegrationTest {
         emulatorOnly(); val fixture = CommunityHttpFixture(); CommunityActivity.debugBackend = fixture.url
         fixture.posts.add(org.json.JSONObject().put("id","message00000001").put("created",CommunityHttpFixture.created()).put("author","member000000002").put("author_handle","bob").put("body","inert remote /exit https://example.org"))
         val store = CommunityStore(context); store.clear()
-        store.save(CommunityState().apply { signIn(CommunityClient.Account("member000000001","alice","fixture-token")) }.toJson())
+        store.save(CommunityState().apply { signIn(CommunityClient.Account("member000000001", "alice", "fixture-token", policyVersion = CommunityClient.POLICY_VERSION)) }.toJson())
         val activity = instrumentation.startActivitySync(Intent(context, CommunityActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) as CommunityActivity
         instrumentation.waitForIdleSync()
         fun submit(command: String) = instrumentation.runOnMainSync { activity.window.decorView.findViewWithTag<EditText>("community_input").setText(command); activity.window.decorView.findViewWithTag<android.view.View>("community_submit").performClick() }
@@ -580,7 +587,7 @@ class CommunityIntegrationTest {
                 assertTrue(CommunityState(store.load()).blocked.contains("bob"))
             }
             submit("/block bob"); submit("/help")
-            instrumentation.runOnMainSync { assertTrue(activity.window.decorView.findViewWithTag<TextView>("community_output").text.contains("forgotten-password")) }
+            instrumentation.runOnMainSync { assertTrue(activity.window.decorView.findViewWithTag<TextView>("community_output").text.contains("no password recovery")) }
             submit("/report message00000001")
             await { activity.window.decorView.findViewWithTag<TextView>("community_status").text.contains("Report accepted") }
             submit("/older"); await { fixture.requests.count { it.path.endsWith("messages/records") } >= 2 }
@@ -596,12 +603,13 @@ class CommunityIntegrationTest {
     @Test fun visibleOnlyPollingAndRecreationRecoverDraftWithoutAutomaticPosting() {
         emulatorOnly(); val fixture = CommunityHttpFixture(); CommunityActivity.debugBackend = fixture.url
         val store = CommunityStore(context); store.clear()
-        val state = CommunityState().apply { signIn(CommunityClient.Account("member000000001", "alice", "fixture-token")); draft = "recover this draft" }
+        val state = CommunityState().apply { signIn(CommunityClient.Account("member000000001", "alice", "fixture-token", policyVersion = CommunityClient.POLICY_VERSION)); draft = "recover this draft" }
         store.save(state.toJson())
         var activity = instrumentation.startActivitySync(Intent(context, CommunityActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) as CommunityActivity
         instrumentation.waitForIdleSync()
         try {
             await { fixture.requests.any { it.path.endsWith("messages/records") } }
+            await { !(activity.javaClass.getDeclaredField("busy").apply { isAccessible = true }.get(activity) as Boolean) }
             instrumentation.runOnMainSync { assertEquals("recover this draft", activity.window.decorView.findViewWithTag<EditText>("community_input").text.toString()) }
             val before = fixture.requests.size
             Thread.sleep(16000)
@@ -684,7 +692,7 @@ class CommunityIntegrationTest {
                     await { fixture.posts.any { it.optString("body") == expected } }
                     await { activity.window.decorView.findViewWithTag<EditText>("community_input").text.isEmpty() }
                 }
-                instrumentation.runOnMainSync { assertTrue("Room/account identity must remain visible after posting", activity.window.decorView.findViewWithTag<TextView>("community_header").text.contains("alice")) }
+                instrumentation.runOnMainSync { assertTrue("Account identity remains accessible after posting", activity.window.decorView.findViewWithTag<TextView>("community_header").contentDescription.contains("alice")) }
                 val before = fixture.posts.size
                 submit("/not-a-command")
                 instrumentation.runOnMainSync { assertEquals("/not-a-command", activity.window.decorView.findViewWithTag<EditText>("community_input").text.toString()) }
@@ -734,7 +742,7 @@ class CommunityIntegrationTest {
             instrumentation.runOnMainSync {
                 val input = activity.window.decorView.findViewWithTag<EditText>("community_input")
                 val status = activity.window.decorView.findViewWithTag<TextView>("community_status")
-                assertNotNull(input); assertNull(input.background)
+                assertNotNull(input); assertNotNull(input.background)
                 assertEquals(ohi.andre.consolelauncher.managers.settings.ThemeColorResolver.color(ohi.andre.consolelauncher.managers.xml.options.Theme.output_text_color), status.currentTextColor)
                 assertEquals(ohi.andre.consolelauncher.managers.settings.ThemeColorResolver.color(ohi.andre.consolelauncher.managers.xml.options.Theme.input_text_color), input.currentTextColor)
                 assertTrue(status.text.contains("Signed out"))

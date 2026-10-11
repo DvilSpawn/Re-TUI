@@ -6,6 +6,7 @@ import android.graphics.drawable.ColorDrawable
 import android.view.View
 import android.widget.TextView
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.core.view.descendants
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.tuils.LauncherFontScale
 import ohi.andre.consolelauncher.tuils.Tuils
@@ -13,6 +14,8 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class TerminalPaneStyleIntegrationTest {
+    @get:org.junit.Rule val readerPreferences = ohi.andre.consolelauncher.help.HelpReaderPreferencesRule()
+    @get:org.junit.Rule val windowPreferences = ohi.andre.consolelauncher.help.WindowPreferencesRule()
     private val instrumentation = InstrumentationRegistry.getInstrumentation()
     @Test fun calculatorControlsUsePlainTextInsteadOfFramedCards() {
         val activity = instrumentation.startActivitySync(Intent(instrumentation.targetContext, CalculatorActivity::class.java)
@@ -21,8 +24,7 @@ class TerminalPaneStyleIntegrationTest {
             instrumentation.waitForIdleSync()
             instrumentation.runOnMainSync {
                 val keys = activity.findViewById<android.view.ViewGroup>(R.id.calculator_symbols)
-                for (index in 0 until keys.childCount) {
-                    val key = keys.getChildAt(index)
+                for (key in keys.descendants.filterIsInstance<android.widget.Button>()) {
                     assertTrue("Keys share Termux's transparent text controls", key.background == null || (key.background as? ColorDrawable)?.color == Color.TRANSPARENT)
                 }
                 val help = activity.findViewById<View>(R.id.calculator_help_tab)
@@ -35,6 +37,11 @@ class TerminalPaneStyleIntegrationTest {
         val activity = instrumentation.startActivitySync(Intent(instrumentation.targetContext, ohi.andre.consolelauncher.help.OfflineHelpActivity::class.java)
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) as ohi.andre.consolelauncher.help.OfflineHelpActivity
         try {
+            instrumentation.waitForIdleSync()
+            instrumentation.runOnMainSync {
+                val toggle = activity.window.decorView.findViewWithTag<View>("help-window-toggle")
+                if (toggle.visibility == View.VISIBLE) toggle.performClick()
+            }
             instrumentation.waitForIdleSync()
             instrumentation.runOnMainSync {
                 val title = activity.findViewById<TextView>(R.id.offline_help_header)
@@ -56,15 +63,17 @@ class TerminalPaneStyleIntegrationTest {
                 assertFalse("Root does not repeat the chrome title", activity.findViewById<TextView>(R.id.offline_help_output).text.startsWith(activity.getString(R.string.offline_help_title)))
                 val toggle = activity.window.decorView.findViewWithTag<View>("help-window-toggle")
                 assertTrue(toggle.background is android.graphics.drawable.InsetDrawable)
-                for (index in 0 until keys.childCount) {
-                    val key = keys.getChildAt(index)
+                for (key in keys.descendants.filterIsInstance<android.widget.Button>()) {
                     assertTrue("Help uses the pane's transparent text controls", key.background == null || (key.background as? ColorDrawable)?.color == Color.TRANSPARENT)
                 }
                 listOf("top-left", "top-right", "bottom-left", "corner").forEach {
                     val handle = activity.window.decorView.findViewWithTag<View>("help-resize-$it")
-                    assertEquals(View.VISIBLE, handle.visibility)
-                    assertTrue("Accessible corner width", handle.width >= Tuils.dpToPx(activity, 48))
-                    assertTrue("Accessible corner height", handle.height >= Tuils.dpToPx(activity, 48))
+                    val landscape = activity.resources.configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
+                    assertEquals(if (landscape) View.GONE else View.VISIBLE, handle.visibility)
+                    if (!landscape) {
+                        assertTrue("Accessible corner width", handle.width >= Tuils.dpToPx(activity, 48))
+                        assertTrue("Accessible corner height", handle.height >= Tuils.dpToPx(activity, 48))
+                    }
                 }
             }
         } finally { instrumentation.runOnMainSync { activity.finishAndRemoveTask() } }

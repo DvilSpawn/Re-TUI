@@ -55,12 +55,15 @@
     <string name="calculator_from">From</string>
     <string name="calculator_full">Full result</string>
     <string name="calculator_full_copy">Copy full value</string>
-    <string name="calculator_help_ans">ANS
+    <string name="calculator_help_ans">CONTINUE A RESULT
 
-5 ft to miles
-ans * 2
-ans to ft → 10 ft
-Use ans for the last successful result. Errors do not replace it. Clear keeps ans.</string>
+5 + 5 → 10
++5 → 15
+*2 → 30
+
+Start with an operator to use the last successful result automatically. A complete expression starts fresh; (-5) enters a standalone negative value after a result.
+
+ans is optional for explicit references such as sqrt(ans), 100 / ans or ans to ft. ans = 5 sets it. Errors and cancellation keep the last result. Clear keeps it too.</string>
     <string name="calculator_help_calculator">0 Calculator</string>
     <string name="calculator_help_conversions">CONVERSIONS
 
@@ -69,11 +72,11 @@ Use ans for the last successful result. Errors do not replace it. Clear keeps an
 Use to for conversion. The word in means inches. ABC enters letters and units.</string>
     <string name="calculator_help_editing">KEYPAD / EDITING
 
-123: numbers and operators
+123: numbers, operators and =
 ABC: letters and units
-FUNC: functions and constants
+FUNC: functions, constants and =
 
-Tap the prompt to place the cursor or select text. √ and function keys insert parentheses with the cursor inside. ⌫ deletes the selection or previous character. ↵ evaluates.
+Tap the prompt to place the cursor or select text. Function keys, including sqrt, insert parentheses with the cursor inside. ⌫ deletes the selection or previous character. ↵ evaluates.
 
 clear — clear the transcript, keeping ans
 help — open this browser
@@ -103,36 +106,43 @@ FUNC inserts sqrt, sin, cos, tan, log, ln and abs with parentheses. Constants: p
     <string name="calculator_help_next">3 Next</string>
     <string name="calculator_help_previous">2 Previous</string>
     <string name="calculator_hints">Calculator hints</string>
-    <string name="calculator_hints_body">CALCULATOR HINTS
+    <string name="calculator_hints_body">CALCULATOR
 
-Enter an expression after calc&gt; and press Enter or ↵. The keypad stays in the calculator: 123 enters numbers and operators, ABC enters letters and units, and FUNC enters functions and constants.
+Enter an expression after calc&gt; and press Enter or ↵.
+
+Continue a result
+5 + 5 → 10
++5 → 15
+*2 → 30
+A leading +, −, ×, ÷ or ^ continues the last successful result. A complete expression starts fresh. Use (-5) for a standalone negative value after a result. Errors and cancellation keep the last result.
 
 Arithmetic
 2 + 3 * 4 → 14
 (2 + 3) * 4 → 20
-sqrt(9) → 3
+sqrt(144) → 12
 2^3 → 8
 
 Convert units
-5 ft to miles
-20 celsius to fahrenheit
+5 ft to cm → 152.4 cm
+*2 → 304.8 cm
+ans to ft → 10 ft
 Use to for conversion. The word in means inches.
 
-Chain results
-5 ft to miles
-ans * 2
-ans to ft → 10 ft
-Errors do not replace the last successful answer.
+Explicit answers and variables
+ans is optional: sqrt(ans), 100 / ans and ans to ft refer to the last result. ans = 5 sets it. Named assignments such as tax = 18% go to Qalculate; these variables last only while the engine process remains alive.
 
-Edit expressions
-Tap the input to place the cursor, then use 123, ABC, or FUNC. √ and function keys insert parentheses with the cursor inside. Use ⌫ to delete; type clear to clear the transcript.
+Keypad and editing
+123: numbers, operators and =
+ABC: letters, units and variable names
+FUNC: functions, constants and =
+Tap the input to place the cursor or select text. Function keys insert parentheses with the cursor inside. ⌫ deletes. = inserts an assignment; ↵ evaluates.
 
 Commands
-clear — clear the transcript, keeping ans
-help — show a short reminder
+clear — clear the transcript, keeping the last result
+help — open the calculator guide
 exit — close the calculator
 
-Cancel stops the current calculation. Tap the calculator tab to return without losing your expression.</string>
+Cancel stops the current calculation. Back closes Help and retains your reading position.</string>
     <string name="calculator_history">History</string>
     <string name="calculator_invalid">Invalid expression.</string>
     <string name="calculator_limit">This number exceeds the supported size.</string>
@@ -147,6 +157,13 @@ Cancel stops the current calculation. Tap the calculator tab to return without l
     <string name="calculator_numeric">Enter a signed decimal number, optionally with an exponent (for example, -1.2e3).</string>
     <string name="calculator_percent">Percentage</string>
     <string name="calculator_powers">Logarithms and powers</string>
+    <string name="calculator_preview_clear">Clear history · keep the last result</string>
+    <string name="calculator_preview_enter_only">Assignment or comparison · evaluated only on ↵</string>
+    <string name="calculator_preview_exit">Close the calculator</string>
+    <string name="calculator_preview_format">↳ %1$s → %2$s</string>
+    <string name="calculator_preview_help">Open calculator help</string>
+    <string name="calculator_preview_incomplete">Complete or check the expression</string>
+    <string name="calculator_preview_unavailable">Preview unavailable · press ↵ to evaluate</string>
     <string name="calculator_reciprocal">Reciprocal</string>
     <string name="calculator_restore">Restore calculation</string>
     <string name="calculator_result_description">Calculation result. Tap Full result to view or copy the complete value.</string>
@@ -157,7 +174,7 @@ Cancel stops the current calculation. Tap the calculator tab to return without l
     <string name="calculator_standard">Standard</string>
     <string name="calculator_swap">Swap units</string>
     <string name="calculator_symbolic">Symbolic functions</string>
-    <string name="calculator_terminal_help">Enter an expression, e.g. 5 ft to miles. Use ans for the last successful result. Commands: help, clear, exit.</string>
+    <string name="calculator_terminal_help">Enter an expression and press ↵. After a result, +5 or *2 continues it. Use ans only for an explicit reference. Commands: help, clear, exit.</string>
     <string name="calculator_terminal_no_answer">No previous result. Calculate an expression first.</string>
     <string name="calculator_timeout">Calculation timed out. Try a simpler expression.</string>
     <string name="calculator_to">To</string>
@@ -591,49 +608,153 @@ Android AppWidgets: open the widgets pane from the toolbar.</string>
     <string name="command_wifi_opening_wi_fi_settings_android_no_longer_a_15368">Opening Wi-Fi settings. Android no longer allows third-party launchers to toggle Wi-Fi directly.</string>
     <string name="common_off">OFF</string>
     <string name="common_on">ON</string>
+    <string name="community_accept_rules">Accept rules</string>
+    <string name="community_account_deleted">Community account deleted. Local account data cleared.</string>
     <string name="community_account_policy">Username: 3–24 ASCII letters, digits, - or _. Password: 8–71 characters. No forgotten-password recovery: use a new username, a separate identity. Old usernames cannot be reclaimed; no automatic ownership or history migration.</string>
+    <string name="community_auth_confirmation_error">Passwords differ. Enter username again.</string>
+    <string name="community_auth_password_error">Use 8–71 characters. Enter username again.</string>
+    <string name="community_auth_password_guidance">8–71 characters. No email or password recovery.</string>
+    <string name="community_auth_username_error">Use 3–24 ASCII letters, digits, - or _.</string>
+    <string name="community_auth_username_guidance">3–24 ASCII letters, digits, - or _. No email or password recovery.</string>
+    <string name="community_back">Back to threads</string>
+    <string name="community_ban_author">Ban reported author</string>
+    <string name="community_block_author">Block / unblock author locally</string>
     <string name="community_blocked">Local block toggled for %1$s.</string>
+    <string name="community_bugs">bugs</string>
     <string name="community_busy">A request is in progress; wait before submitting again.</string>
     <string name="community_cancel">Cancel</string>
+    <string name="community_channels">Channels</string>
+    <string name="community_checking_delivery">checking delivery…</string>
+    <string name="community_confirm_action">Confirm</string>
     <string name="community_confirm_password">Confirm password</string>
+    <string name="community_connection_live">● Live · @%1$s</string>
+    <string name="community_connection_offline">○ Offline · @%1$s</string>
+    <string name="community_connection_ready">● Connected · @%1$s</string>
+    <string name="community_connection_signed_out">○ Signed out</string>
+    <string name="community_connection_syncing">↻ Syncing · @%1$s</string>
+    <string name="community_copy_message">Copy message</string>
+    <string name="community_create_account">Join</string>
     <string name="community_current">%1$s · current · refreshed while visible</string>
+    <string name="community_delete_account">Delete community account</string>
+    <string name="community_delete_explanation">Delete @%1$s and its authored messages, discussions and replies? Replies by others on your discussions are also removed. This cannot be undone. Enter your current password to confirm.
+
+Moderation evidence remains for six calendar months. Private recovery copies rotate after seven days and are removed on the next hourly run. Launcher settings are not affected. No forgotten-password recovery. A web deletion path is available at irc.kokodoko.cloud/community/account-deletion.</string>
+    <string name="community_deletion_failed">Deletion was not confirmed. Check the web deletion page before retrying.</string>
     <string name="community_discard">Discard and leave</string>
+    <string name="community_discussion_hint">Opening message</string>
     <string name="community_duplicate_username">Username is already taken.</string>
-    <string name="community_empty">No cached messages. Sign in and /refresh to fetch the room.</string>
-    <string name="community_help">One room: Re-TUI community. Plain text posts on Send. exit posts; /exit leaves. //text posts /text. Unknown slash commands stay here.
+    <string name="community_edit_title">Back · Edit title</string>
+    <string name="community_edit_title_summary">Edit discussion title: %1$s</string>
+    <string name="community_empty">No messages yet. Start the conversation.</string>
+    <string name="community_forum_context">#%1$s · discussions stay</string>
+    <string name="community_general">general</string>
+    <string name="community_general_context">#general · 24-hour chat</string>
+    <string name="community_help">Channels: general, bugs, help, suggestions and presets. Suggestions uses the features API key. Tap Channels, New thread, Mentions or Menu; no slash command is required. Plain text posts on Send; exit posts, /exit leaves, //text posts /text.
 /help · /refresh · /older · /login · /register · /logout · /exit
-/report &lt;full message ID&gt; · /block &lt;username&gt; (local only; repeat to unblock)
-Username/password only. Public registration, authenticated reading/posting. No forgotten-password recovery: register a new username; it is a separate identity, not a reclaim or history/ownership transfer.
-Server-readable; no end-to-end encryption. General messages expire after 24 hours; private report evidence is retained for six calendar months. Local cache: at most 200 messages, pruned on opening and while visible, including offline. Paused encrypted cache bytes may remain until reopening; no secure-erasure guarantee. Cached messages are rechecked for moderation when connected.
-PocketBase is pre-1.0; this optional pilot may change. No push, background service, attachments, private messages, automatic links or launcher execution.</string>
+/report &lt;full message ID&gt; · /block &lt;username&gt; · /moderate &lt;private text&gt;
+General messages expire individually after 24 hours. Forum threads and replies persist. Reports and private moderator requests last six calendar months; /moderate never posts publicly and has no automatic retry.
+Tap a suggested @handle to insert it at the caret. Only active foreground sessions renew 90-second presence leases; badges and mentions are in-app only. No push, private messages, attachments, external IRC or launcher execution.
+Username/password only; public registration and no password recovery. Server-readable, not end-to-end encrypted. Private encrypted account storage; 200 bodies per window and bounded routing/read metadata. Paused cache bytes are pruned on access; no secure-erasure guarantee. Nothing posts automatically on restoration. PocketBase is pre-1.0; this optional pilot may change.</string>
+    <string name="community_help_action">Help</string>
+    <string name="community_help_channel">help</string>
     <string name="community_invalid">Input rejected; use /help. Slash commands take no password arguments. Messages: 500 Unicode characters / 2000 UTF-8 bytes maximum.</string>
+    <string name="community_join">Join community</string>
     <string name="community_keep">Keep and leave</string>
     <string name="community_leave_body">Keep the draft privately for next time, or discard it. Nothing is uploaded. Discarding an uncertain draft does not retract a possible server post.</string>
     <string name="community_leave_title">Unsent or uncertain draft</string>
+    <string name="community_live">%1$s · live</string>
     <string name="community_loading">%1$s · requesting…</string>
     <string name="community_login">Login</string>
     <string name="community_login_required">Sign in or register first. Draft kept; nothing was sent.</string>
     <string name="community_logout">Signed out. Account cache, blocks, draft and token cleared.</string>
+    <string name="community_mention_author">Mention author</string>
+    <string name="community_mentions">Mentions</string>
+    <string name="community_mentions_empty">No unexpired mentions.</string>
+    <string name="community_menu">Menu</string>
+    <string name="community_message_actions">Message actions</string>
+    <string name="community_message_hint">Message #general</string>
+    <string name="community_messages_below">%1$d messages below · Latest ↓</string>
+    <string name="community_moderate">Private moderator request</string>
+    <string name="community_moderation_actions">Choose action</string>
+    <string name="community_moderation_confirm">Confirm this moderator action. Removing a discussion also removes its replies. Evidence keeps its original six-month expiry.</string>
+    <string name="community_more">More</string>
     <string name="community_network_error">Network/TLS request failed. Cached history may be stale; draft kept. Nothing will post automatically.</string>
-    <string name="community_new_messages">New/unread messages: %1$d · scroll to read</string>
+    <string name="community_new_messages">%1$d unread · Latest ↓</string>
+    <string name="community_new_thread">New discussion</string>
+    <string name="community_next">Next</string>
+    <string name="community_not_confirmed">delivery not confirmed</string>
+    <string name="community_offline">@%1$s · offline</string>
+    <string name="community_older">Older</string>
+    <string name="community_online">@%1$s · online</string>
+    <string name="community_operations_warning">Operator attention needed: %1$s</string>
     <string name="community_password">Password</string>
     <string name="community_pending">Posting… not delivered yet.</string>
     <string name="community_pending_locked">Previous attempt is unresolved. Restore its draft with /refresh and submit it unchanged to reconcile/retry, or /logout to clear local state (this does not retract any server post).</string>
+    <string name="community_post_discussion">Post discussion</string>
     <string name="community_posted">Posted — server acknowledgement verified.</string>
+    <string name="community_presets">presets</string>
+    <string name="community_private_sent">Private moderator request accepted.</string>
+    <string name="community_private_uncertain">Private delivery was not confirmed. It may have reached the server. Do not send another copy blindly.</string>
+    <string name="community_queue_next">Next</string>
+    <string name="community_queue_page">%1$s · page %2$d</string>
+    <string name="community_queue_previous">Previous</string>
+    <string name="community_queue_switch">Switch report / request queue</string>
     <string name="community_rate_error">Rate limited; wait %1$d seconds before retrying.</string>
+    <string name="community_refresh">Latest</string>
+    <string name="community_refresh_action">Refresh</string>
     <string name="community_register">Register</string>
     <string name="community_registration_error">Registration rejected. Check username uniqueness, password length and matching confirmation. If creation succeeded but login failed, try Login; account creation alone is not sign-in.</string>
+    <string name="community_remove_content">Remove reported content</string>
+    <string name="community_reply_hint">Reply to this discussion</string>
+    <string name="community_report">Report content / author</string>
+    <string name="community_report_default">Reported content or author from Re:TUI</string>
+    <string name="community_report_reason">Reason (optional)</string>
     <string name="community_reported">Report accepted by server.</string>
     <string name="community_request_error">Request failed (%1$d). No success was confirmed.</string>
+    <string name="community_request_resolved">Moderator action saved; request resolved.</string>
+    <string name="community_reset_window">Reset floating window</string>
+    <string name="community_resolve_request">Resolve / dismiss request</string>
+    <string name="community_retry">Check delivery</string>
+    <string name="community_review_queue">Moderator review</string>
+    <string name="community_rules_accepted">Rules accepted. Your draft is unchanged; tap Send when ready.</string>
+    <string name="community_rules_body">Re:TUI community · Rules version 2026-10-10
+
+Be respectful. No harassment, threats, hate, sexual exploitation, illegal content, impersonation, spam or sharing private information. Do not post secrets or passwords.
+
+Report content or its author from Message actions. Block an author locally to hide their posts and mention badges; /block username toggles the block. Private moderation requests are not public posts. dvil is the only moderator and can remove content or ban accounts.
+
+Messages are server-readable, not end-to-end encrypted. General expires after 24 hours. Forum discussions and accounts persist until deletion. Reports and moderation evidence last six calendar months, including after account deletion. Private recovery snapshots use a seven-day rotation; expired copies are removed on the next hourly run. There is currently no off-site recovery.
+
+Accept these rules before contributing. Acceptance does not submit your draft.</string>
+    <string name="community_rules_required">Accept the current community rules before posting.</string>
+    <string name="community_rules_title">Community rules</string>
+    <string name="community_sending">sending…</string>
     <string name="community_session_error">Session expired, revoked or account unavailable. Signed out; private cache and draft cleared.</string>
+    <string name="community_sign_in">Sign in</string>
     <string name="community_signed_out">Signed out · offline · /login or /register</string>
+    <string name="community_signed_out_hint">Sign in, join, or type /help</string>
+    <string name="community_source_gone">This source is unavailable or has expired.</string>
     <string name="community_stale">%1$s · stale/offline</string>
     <string name="community_storage_error">Private encrypted storage is unavailable. No post was started; draft is only in this window.</string>
     <string name="community_submit">Send</string>
+    <string name="community_suggestions">suggestions</string>
+    <string name="community_thread_context">#%1$s › %2$s</string>
+    <string name="community_thread_title">Discussion title</string>
+    <string name="community_threads_empty">No threads in this channel. Tap New thread to start one.</string>
     <string name="community_title">Re-TUI community · experimental</string>
-    <string name="community_uncertain">Delivery uncertain. Pending draft kept with the same request ID. Send the same draft again to reconcile/retry; do not send a second copy. No automatic retry.</string>
+    <string name="community_title_error">Enter a single-line title, up to 120 Unicode characters / 480 UTF-8 bytes.</string>
+    <string name="community_title_guidance">1 · Title, then Next. Your opening message is kept.</string>
+    <string name="community_uncertain">Delivery uncertain. Tap Check delivery to verify the original message before retrying. Your newer draft is kept; nothing retries automatically.</string>
     <string name="community_unread_divider">— first unread —</string>
     <string name="community_username">Username</string>
+    <string name="community_welcome">Welcome to Re-TUI community.
+
+Talk with other Re-TUI users in General, or start a lasting discussion in Help, Bugs, Suggestions or Presets.
+
+General messages expire after 24 hours; discussions stay.
+
+Sign in or join below. Public posts are server-readable, not end-to-end encrypted. Accounts have no password recovery.</string>
+    <string name="community_window_title">Re-TUI community</string>
     <plurals name="contact_times">
         <item quantity="one">Contacted %1$d time</item>
         <item quantity="other">Contacted %1$d times</item>
@@ -2447,11 +2568,17 @@ clear
 
 At calc&gt;, clear displayed transcript but retain the previous answer.</string>
     <string name="offline_help_article_calculator_editing_limits_title">Edit expressions and recognize calculator limits</string>
-    <string name="offline_help_article_calculator_help_body">## Read without calculating
+    <string name="offline_help_article_calculator_help_body">Enter an expression at `calc&gt;` and press ↵. Use the keypad to enter numbers, letters, units and functions. Qalculate evaluates the expression.
 
-Tap the calculator question-mark tab, or type `help` at `calc&gt;` and submit it, to open this dedicated offline reader. Header-tab entry keeps the calculator draft, selection and transcript. Typed help is consumed as a local command. The reader has its own numbered input; choices and examples never evaluate expressions or enter the calculation transcript. A pending calculation can finish without consuming the reader draft.
+## Continue a result
 
-At `help&gt;`, choose a displayed number or tap its line. Within an article, 1 returns to its topic list and 2/3 move between articles when shown. Android Back moves up the manual hierarchy; 0 closes the reader and returns to the calculator. Use the header window control to switch between maximized and windowed reading; drag the header to move and the visible edge/corner handles to resize. Text reflows rather than scaling.
+```
+5 + 5 → 10
++5 → 15
+*2 → 30
+```
+
+Start with +, −, ×, ÷ or ^ to continue from the last successful result. You do not need to type `ans`. ASCII `-`, `*` and `/` work too. A complete expression such as `5 + 5` starts a new calculation. With a previous result, `-5` subtracts 5; use `(-5)` for a standalone negative value. Without a previous result, `-5` is just negative 5. Errors and cancellation keep the last successful result.
 
 ## Expressions and operators
 
@@ -2463,45 +2590,58 @@ At `help&gt;`, choose a displayed number or tap its line. Within an article, 1 r
 
 Use +, −, ×, ÷, parentheses, ^ and %.
 
+## Convert units
+
+```
+5 ft to cm → 152.4 cm
+*2 → 304.8 cm
+ans to ft → 10 ft
+20 celsius to fahrenheit
+```
+
+Use `to` for conversion. The word `in` means inches. Results retain their units when continued.
+
 ## Functions and constants
 
 ```
-sqrt(9) → 3
+sqrt(144) → 12
 sin(90) → 1 in degrees mode
 ```
 
 FUNC inserts sqrt, sin, cos, tan, log, ln and abs with parentheses. Constants: `pi` and `e`.
 
-## Conversions and ans
+## Variables and explicit answers
 
 ```
-5 ft to miles
-20 celsius to fahrenheit
+tax = 18%
+4200 * tax → 756
 ```
 
-Use `to` for conversion. The word `in` means inches. ABC enters letters and units. `ans` holds the last successful result, including units; errors and cancellation do not replace it.
+= inserts an assignment; ↵ evaluates. Native named variables last only while the engine process remains alive.
 
-```
-5 ft to miles
-ans * 2
-ans to ft → 10 ft
-```
+`ans` is optional: use it to refer to the last result inside an expression, for example `sqrt(ans)`, `100 / ans` or `ans to ft`. `ans = 5` sets the stored answer. The last successful answer survives reopening the calculator.
 
 ## Keypad and editing
 
-- 123: numbers and operators
-- ABC: letters and units
-- FUNC: functions and constants
+- 123: numbers, operators and =
+- ABC: letters, units and variable names
+- FUNC: functions, constants and =
 
-Tap the prompt to place the cursor or select text. √ and function keys wrap selected text or insert parentheses with the cursor inside. ⌫ deletes the selection or previous character. ↵ evaluates.
+Tap the prompt to place the cursor or select text. Function keys wrap selected text or insert parentheses with the cursor inside. ⌫ deletes the selection or previous character. ↵ evaluates.
 
-- `clear` clears the transcript, keeping ans.
+- `clear` clears the transcript, keeping the last result.
 - `help` opens this reader.
 - `exit` closes the calculator.
 - Cancel stops a calculation without changing your input.
 
-&gt;! Examples are read-only here. Entering them at calc&gt; evaluates them.</string>
-    <string name="offline_help_article_calculator_help_title">Browse calculator help without calculating</string>
+## Using this help
+
+The question-mark tab opens this calculator guide without changing your expression. Typing `help` opens it too, consuming only that command. Examples here are read-only; enter them at `calc&gt;` to calculate.
+
+At `help&gt;`, choose a displayed number or tap its line. 1 opens Topics; 2/3 move between articles when shown. In a topic list, 10 opens Categories. Android Back or 0 closes Help immediately. Reopening resumes your reading position.
+
+The header window control switches between expanded and floating reading. Drag the header to move a floating window or its corners to resize it. Text reflows rather than scaling.</string>
+    <string name="offline_help_article_calculator_help_title">Calculator</string>
     <string name="offline_help_article_calculator_offline_engine_body">The advanced calculator is bundled with the app and its definitions; it does not download an engine when you calculate. It is available on Android 7 and later. It does not fetch current online currency rates or provide arbitrary external command execution. Native definitions and engine messages are English; launcher-owned messages can use a selected language pack. The advanced engine runs in a separate private worker process, which can be stopped if a calculation exceeds its deadline.</string>
     <string name="offline_help_article_calculator_offline_engine_title">Offline calculator capabilities</string>
     <string name="offline_help_article_calculator_workflow_body">calc opens the calculator; calc &lt;expression&gt; evaluates one launcher result. At the home prompt or in an alias, use the calc prefix: bare numbers/expressions are not automatically calculations. Inside the pane, type after calc&gt; and press Enter or ↵. 123 provides numbers, ABC provides QWERTY letters/units and FUNC provides functions/constants. Use to for conversion; in is an inch unit.
@@ -2670,7 +2810,7 @@ Read the calculator command reference.</string>
     <string name="offline_help_article_command_basics_title">Choose a launcher command, alias, or shell</string>
     <string name="offline_help_article_command_reference_body">At the launcher prompt, enter help for this offline manual, tutorial for Getting started, or help &lt;command&gt; for bundled syntax and configured priority without running that command. help -topic &lt;id&gt; opens a known category/article. Topic suggestions match IDs, titles and body text and open the selected topic directly. Hidden compatibility names are omitted from the ordinary command list; commands without reference text show a fallback, not invented syntax.
 
-Lists show up to seven choices with 8/9 for previous/next pages when available. Tap an entry or enter its number and press ↵. Within an article, 1 returns to its list and 2/3 move between topics when shown. Android Back moves up a level; 0 closes the manual. Examples are text, not executable buttons. The calculator help tab opens the dedicated offline reader. Online tutorial options and companion/network services do not become offline because this manual is bundled.
+Lists show up to seven choices with 8/9 for previous/next pages when available. Tap an entry or enter its number and press ↵. Within an article, 1 returns to its list and 2/3 move between topics when shown. Android Back or 0 closes the manual. Bare help restores the previous article/page and reading position; explicit topic links open the requested topic. Use 1 for Topics within an article and 10 for Categories within a list. Examples are text, not executable buttons. The calculator help tab opens the dedicated offline reader. Online tutorial options and companion/network services do not become offline because this manual is bundled.
 
 ## Examples
 
@@ -3497,17 +3637,21 @@ space -ls
 
 List local Spaces.</string>
     <string name="offline_help_article_space_workflow_title">Separate personal setups with Spaces</string>
-    <string name="offline_help_article_startup_setup_body">## Stage the setup
+    <string name="offline_help_article_startup_setup_body">## A required first-launch introduction
 
-On a new install, choose Basic or Advanced, review Auto-theme and border choices, then press Apply. Switching choices only stages them. Later closes setup without changing launcher settings and leaves setup pending. Basic enables status extras and double-tap lock, but keeps optional drawers, module dock, integrations, notification display and sounds off. Advanced lets you choose those switches separately. Enabling Termux or Tasker does not install it or grant Android access. Double-tap lock depends on Android device-admin configuration.
+New installs start with three pages: a quick guide to apps, suggestion chips and commands; Basic or Advanced configuration; then a thank-you page for this independent project. Complete startup before using the launcher. Back revisits earlier pages, but there is no Later or Skip. Closing or restarting preserves your page and choices. Existing completed installations are not asked to configure again.
+
+## Stage, review, build
+
+Configuration choices stay staged until Build my launcher on the final page. Display-only pseudo-code prints your chosen configuration line by line as a visible progress bar advances. The sequence prepares the theme, applies your selections and reveals the launcher. Basic enables weather/unlock-count labels and double-tap lock; optional drawers, module dock, integrations, notification display, sounds and effects stay off. Advanced exposes those switches separately. Double-tap lock requests Android device-admin access on first use. Integration switches do not install Termux/Tasker or grant permissions. All choices can be changed later in Settings.
 
 ## Appearance defaults
 
-Auto-theme takes a wallpaper-derived color snapshot with system fallback, not a permanent link to future wallpapers. Dashed uses a gap, Solid sets the gap to zero, and None disables generated borders. Classic remains the renderer under independent Cyberdeck/CRT effects. Basic and Advanced are startup defaults, not Classic versus Search launcher mode.
+Auto-theme applies the current wallpaper palette once, with system fallback, not a permanent link to future wallpapers. The startup pane itself previews the selected border. Dashed exposes live stroke-width and gap sliders; these stay staged until Build. Solid sets the gap to zero, and None disables generated borders. Classic remains the renderer beneath independent Cyberdeck/CRT effects. Basic and Advanced are startup defaults, not Classic versus Search launcher mode.
 
 ## Rehearse without applying
 
-For a no-apply rehearsal use guide -startup-test. End Preview and Finish Preview leave launcher settings unchanged, unlike normal Settings editors that can persist changes.
+Use guide -startup-test to preview all three pages and the build animation. Preview uses a separate draft and does not change real onboarding progress or launcher settings. End Preview on the first page closes it; Finish Preview rehearses the final sequence.
 
 ## Examples
 
@@ -3515,7 +3659,7 @@ For a no-apply rehearsal use guide -startup-test. End Preview and Finish Preview
 guide -startup-test
 ```
 
-Open the staged startup dry run; neither finish nor cancel applies launcher choices.
+Rehearse the required startup without applying choices.
 
 ```
 settings
@@ -3597,7 +3741,7 @@ Type a command at the launcher prompt and press Enter. Typing help by itself doe
 
 ## Navigate the manual
 
-&gt;! Nothing on this page executes: examples are text, not command buttons. In the manual, type a displayed number and press Enter, or tap its numbered line. Android Back moves up one level; 0 returns to the launcher. The compact number keys belong only to the manual, not the launcher command prompt.</string>
+&gt;! Nothing on this page executes: examples are text, not command buttons. In the manual, type a displayed number and press Enter, or tap its numbered line. Android Back or 0 closes Help immediately. Bare help restores your previous page and reading position. Use 1 for Topics within an article and 10 for Categories within a topic list. The compact number keys belong only to the manual, not the launcher command prompt.</string>
     <string name="offline_help_article_terminal_basics_title">Terminal basics</string>
     <string name="offline_help_article_termux_bridge_setup_body">Tbridge -status/-doctor report whether Termux is installed and RUN_COMMAND is declared/granted. -setup prints setup instructions. -probe dispatches a diagnostic shell script only after readiness checks. The bridge requires allow-external-apps=true in Termux in addition to launcher permission; shared-storage scripts may need termux-setup-storage. Legacy -dirs/-files/-ls only print a retirement message. File browsing is delegated to Re:T-UI Files, not restored by changing file_backend. Grant only the access needed by scripts you trust.
 
@@ -3777,7 +3921,7 @@ Print configured webhook names and destination URLs without sending; URLs can co
     <string name="offline_help_automation_title">Automation</string>
     <string name="offline_help_backspace">Backspace</string>
     <string name="offline_help_choice">Numbered choice</string>
-    <string name="offline_help_close">Return to launcher</string>
+    <string name="offline_help_close">Close help</string>
     <string name="offline_help_commands_body">Choose a numbered topic. Use 0 to return to the launcher.</string>
     <string name="offline_help_commands_title">Commands</string>
     <string name="offline_help_description">help → open the offline manual
@@ -4507,17 +4651,34 @@ Apply it later through preset -apply. Active settings have not changed.</string>
     <string name="shortcut_index_greater">The index is greater than the shortcuts count</string>
     <string name="sms_hint">Enter SMS message</string>
     <string name="start_notification">Re:T-UI started</string>
+    <string name="startup_access_note">These switches choose features, not permissions. Notifications need Android access; Termux and Tasker need their own setup. You can grant access when you use them.</string>
     <string name="startup_advanced">ADVANCED</string>
     <string name="startup_android_widgets">Android widgets</string>
     <string name="startup_app_drawer">App drawer</string>
     <string name="startup_apply">APPLY</string>
     <string name="startup_auto_theme">Auto-theme</string>
+    <string name="startup_back">Back</string>
     <string name="startup_basic">BASIC</string>
+    <string name="startup_basic_description">Basic keeps weather, unlock count, and double-tap lock on. Locking needs Android device-admin access on first use. Optional drawers, integrations, notifications, sounds, and visual effects stay off.</string>
     <string name="startup_basic_keeps_status_extras_and_double_tap_lock_on_optional_drawers_and">Basic keeps status extras and double-tap lock on. Optional drawers and integrations stay off.</string>
     <string name="startup_boot_action_timer_and_reminder_sounds">Boot, action, timer, and reminder sounds.</string>
     <string name="startup_border">BORDER</string>
+    <string name="startup_border_gap">Gap between dashes: %1$s dp</string>
+    <string name="startup_border_preview">This pane previews your border. Choose Dashed to adjust its width and gap.</string>
+    <string name="startup_border_stroke">Stroke width: %1$s dp</string>
+    <string name="startup_border_summary"> (stroke %1$s dp, gap %2$d dp)</string>
+    <string name="startup_build_apply">&gt; Applying your choices</string>
+    <string name="startup_build_button">Build my launcher</string>
+    <string name="startup_build_description">Your choices, written out as we prepare your home screen. This is a configuration illustration, not executable code.</string>
+    <string name="startup_build_failed">Setup could not finish. Your choices are saved. Please try again.</string>
+    <string name="startup_build_preview">&gt; Rehearsing setup — no launcher settings changed</string>
+    <string name="startup_build_ready">&gt; Ready. Make yourself at home.</string>
+    <string name="startup_build_title">Building your launcher</string>
+    <string name="startup_choices_reversible">Every choice can be changed later in Settings. Go back now if you want to adjust anything.</string>
     <string name="startup_choose_a_setup_level_review_it_here_then_apply_once">Choose a setup level, review it here, then apply once.</string>
     <string name="startup_classic_base">Classic base</string>
+    <string name="startup_configuration_description">Start with Basic, or choose Advanced for individual feature controls. Nothing changes until you build your launcher on the final page.</string>
+    <string name="startup_continue">Continue</string>
     <string name="startup_crt">CRT</string>
     <string name="startup_cyberdeck">Cyberdeck</string>
     <string name="startup_dashed">DASHED</string>
@@ -4526,10 +4687,24 @@ Apply it later through preset -apply. Active settings have not changed.</string>
     <string name="startup_end_preview">END PREVIEW</string>
     <string name="startup_features">FEATURES</string>
     <string name="startup_finish_preview">FINISH PREVIEW</string>
+    <string name="startup_intro_chips_body">The chips above the input help you find apps, commands, and their options. Tap a chip to select it instead of typing every character.</string>
+    <string name="startup_intro_chips_title">02 / Let suggestions help</string>
+    <string name="startup_intro_launch_body">Tap the input line and start typing an app name. Choose the matching app from the suggestions to open it.</string>
+    <string name="startup_intro_launch_title">01 / Type to launch</string>
+    <string name="startup_intro_next">Next, choose your setup. Your choices are saved as you go and applied only at the end.</string>
+    <string name="startup_intro_tools_body">Type a command, then press Enter:
+
+calc → open the calculator
+help → read the offline manual
+settings → customize your launcher
+
+You can learn more as you go. These three are a good start.</string>
+    <string name="startup_intro_tools_title">03 / More than an app launcher</string>
     <string name="startup_later">LATER</string>
     <string name="startup_launcher_sounds">Launcher sounds</string>
     <string name="startup_layer_cyberdeck_chrome_over_the_classic_base">Layer cyberdeck chrome over the classic base.</string>
     <string name="startup_layer_scanline_and_crt_effects_over_the_classic_base">Layer scanline and CRT effects over the classic base.</string>
+    <string name="startup_lock_requires_access">Lock with a double tap. Android device-admin access is requested on first use.</string>
     <string name="startup_lock_the_phone_with_a_double_tap">Lock the phone with a double tap.</string>
     <string name="startup_module_dock">Module dock</string>
     <string name="startup_none">NONE</string>
@@ -4537,9 +4712,16 @@ Apply it later through preset -apply. Active settings have not changed.</string>
     <string name="startup_off">Off</string>
     <string name="startup_on">On</string>
     <string name="startup_opening_startup_menu_in_dry_run_mode">Opening startup menu in dry-run mode.</string>
+    <string name="startup_page_progress">SETUP %1$d / 3</string>
     <string name="startup_preview_only_changing_switches_here_will_not_alter_your_launcher">Preview only — changing switches here will not alter your launcher.</string>
     <string name="startup_quick_access_row_for_launcher_modules">Quick-access row for launcher modules.</string>
     <string name="startup_read_notifications_and_external_media_sessions">Read notifications and external media sessions.</string>
+    <string name="startup_required">Complete this quick setup to start using Re:TUI. Your progress is saved.</string>
+    <string name="startup_selection_summary">Setup: %1$s
+Wallpaper colors: %2$s
+Borders: %3$s
+Features: %4$s
+Effects: %5$s</string>
     <string name="startup_set_up_your_launcher">Set up your launcher</string>
     <string name="startup_solid">SOLID</string>
     <string name="startup_startup">STARTUP</string>
@@ -4557,12 +4739,19 @@ Apply it later through preset -apply. Active settings have not changed.</string>
     <string name="startup_termux_detected_show_the_tmux_workspace_shortcut">Termux detected; show the tmux workspace shortcut.</string>
     <string name="startup_termux_not_detected_keep_the_tmux_shortcut_available_for_later">Termux not detected; keep the tmux shortcut available for later.</string>
     <string name="startup_termux_run_tbridge_setup_then_tbridge_status">Termux: run tbridge -setup, then tbridge -status.</string>
+    <string name="startup_thanks_body">Re:TUI is an independent project, built with care and a love for doing things differently. Thank you for giving this little terminal a place on your phone.</string>
+    <string name="startup_thanks_feedback">Your feedback, bug reports, ideas, and support help shape what comes next. Welcome aboard. Let’s build your launcher.</string>
+    <string name="startup_thanks_title">Thanks for trying Re:TUI</string>
     <string name="startup_the_standard_launcher_renderer_is_always_active">The standard launcher renderer is always active.</string>
+    <string name="startup_theme_snapshot_description">Use colors from your current wallpaper. This applies the palette once; future wallpaper changes do not automatically replace it.</string>
     <string name="startup_toggle_description">%1$s. %2$s. %3$s</string>
     <string name="startup_toolbar_shortcut_for_browsing_installed_apps">Toolbar shortcut for browsing installed apps.</string>
     <string name="startup_toolbar_shortcut_for_the_android_widget_drawer">Toolbar shortcut for the Android widget drawer.</string>
     <string name="startup_visual_effects">VISUAL EFFECTS</string>
     <string name="startup_weather_and_unlock_count_labels">Weather and unlock-count labels.</string>
+    <string name="startup_welcome_body">Your home screen, reimagined as a terminal. Launch apps, use everyday tools, and make a workspace that feels like yours. No terminal experience needed.</string>
+    <string name="startup_welcome_title">Welcome to Re:TUI</string>
+    <string name="startup_your_setup">Your setup, your way</string>
     <string name="surface_1_install_current_termux_from_f_droid_github_7baec">1. Install current Termux from F-Droid/GitHub.</string>
     <string name="surface_2_in_termux_enable_external_app_commands_2fff2">2. In Termux, enable external app commands:</string>
     <string name="surface_30s_1c6a4">-30s: %1$s</string>
@@ -5685,9 +5874,4 @@ Ready for the next command</string>
     <string name="workspace_split_left_right">Split left-right</string>
     <string name="workspace_split_top_bottom">Split top-bottom</string>
     <string name="workspace_unfocused_tile">Tile %1$d, tap to focus</string>
-    <string name="community_auth_username_error">Use 3–24 ASCII letters, digits, - or _.</string>
-    <string name="community_auth_username_guidance">3–24 ASCII letters, digits, - or _. No email or password recovery.</string>
-    <string name="community_auth_password_guidance">8–71 characters. No email or password recovery.</string>
-    <string name="community_auth_password_error">Use 8–71 characters. Enter username again.</string>
-    <string name="community_auth_confirmation_error">Passwords differ. Enter username again.</string>
 </resources>

@@ -17,8 +17,8 @@ DATA = Path('/var/lib/retui-community')
 CONFIG = Path('/etc/retui-community')
 UNIT = Path('/etc/systemd/system/retui-community.service')
 SITE = Path('/etc/nginx/sites-available/irc.kokodoko.cloud')
-SHA256 = '9042ec818570e79c3628dadcd0a756c1496d9e1173918ec409d133c02f82e5fa'
-VERSION = '0.40.4'
+SHA256 = '1dbea1b01eb3dfe64953513859d01e759c96650c4e3264fa4eecd54b769382e4'
+VERSION = '0.40.5'
 
 if __name__ == '__main__':
     assert os.geteuid() == 0 and Path.cwd() == ROOT

@@ -6,6 +6,13 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class CommunityMentionStateTest {
+    @Test fun blockedAuthorsDoNotCreateUnreadMentionBadges() {
+        val state = CommunityMentionState(JSONObject())
+        state.replace(listOf(JSONObject().put("id", "forum").put("channel", "bugs").put("author_handle", "alice")))
+        assertEquals(1, state.unread("bugs"))
+        assertEquals(0, state.unread("bugs", setOf("alice")))
+        assertEquals(1, state.unread("bugs", emptySet()))
+    }
     @Test fun earliestMentionDeadlineBoundsForegroundExpiryEvenWhenNetworkIsBusy() {
         val type = CommunityMentionState::class.java
         val method = type.methods.firstOrNull { it.name == "expiryDelay" }

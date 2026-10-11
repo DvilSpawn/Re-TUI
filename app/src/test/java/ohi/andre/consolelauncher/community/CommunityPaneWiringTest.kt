@@ -23,8 +23,9 @@ class CommunityPaneWiringTest {
     }
     @Test fun touchReportsCaptureSourceIdentityBeforeDialogPollingCanReorderHistory() {
         val source = File(root, "app/src/main/java/ohi/andre/consolelauncher/community/CommunityActivity.kt").readText()
-        assertTrue("Report source must be immutable while choosing", source.contains("val reportMessages = state.messages.toList()"))
-        assertTrue(source.contains("reportMessages.getOrNull(index)"))
+        assertTrue("Message source must be captured before choosing an action", source.contains("val id = record.optString(\"id\"); val context = pane.context; val accountId = state.account?.id"))
+        assertTrue("An account switch must not reuse a captured source", source.contains("state.account?.id != accountId || pane.context != context"))
+        assertTrue(source.contains("client.reportSource(account, collection, id, text)"))
     }
     @Test fun historicalForumBodiesAreRecheckedBeforeBeingCalledCurrent() {
         val source = File(root, "app/src/main/java/ohi/andre/consolelauncher/community/CommunityActivity.kt").readText()

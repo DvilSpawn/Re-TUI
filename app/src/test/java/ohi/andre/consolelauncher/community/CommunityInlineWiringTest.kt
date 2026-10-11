@@ -24,11 +24,27 @@ class CommunityInlineWiringTest {
     @Test fun paneThemeRefreshDoesNotOverwriteSuggestionPaletteOrFont() {
         assertTrue(source.substringAfter("private fun stylePane()").substringBefore("private fun adaptRail()").contains("if (view.id == R.id.community_completions) return"))
     }
-    @Test fun suggestionRowUsesItsOwnConfiguredFontBudget() {
+    @Test fun startsExpandedAndOnlyShowsGuidanceWhenItIsNeeded() {
+        assertTrue(source.contains("initiallyMaximized = true"))
+        val window = File(root, "app/src/main/java/ohi/andre/consolelauncher/help/HelpWindowPanel.kt").readText()
+        assertTrue("All panes default to expanded", window.contains("initiallyMaximized: Boolean = true"))
+        val xml = File(root, "app/src/main/res/layout/community_surface.xml").readText()
+        val prompt = xml.substringAfter("android:id=\"@+id/community_prompt_row\"").substringBefore('>')
+        assertTrue(prompt.contains("android:layout_height=\"wrap_content\""))
+        assertTrue(source.contains("if (auth.active || (!mentionsView && pane.composing)) View.VISIBLE else View.GONE"))
+        assertFalse(xml.contains("<EditText android:id=\"@+id/community_thread_title\""))
+        assertTrue(xml.contains("community_thread_summary"))
+    }
+    @Test fun suggestionRowUsesHomeScreenChipGeometryAndReservesItsTouchTarget() {
         val style = source.substringAfter("private fun stylePane()").substringBefore("private fun adaptRail()")
-        assertTrue("Suggestion typography must not inherit composer font budget", style.contains("Suggestions.suggestions_size"))
-        assertTrue("Include font padding to avoid clipping", style.contains("suggestionMetrics.bottom - suggestionMetrics.top"))
-        assertTrue(style.contains("reserve(root.findViewById(R.id.community_completion_scroll), maxOf(dp(48), suggestionMetrics.bottom - suggestionMetrics.top + dp(12)))"))
+        val home = File(root, "app/src/main/java/ohi/andre/consolelauncher/managers/suggestions/SuggestionsManager.kt").readText()
+        assertTrue(home.contains("SuggestionChipStyler.createView(context, spaces)"))
+        assertTrue(style.contains("SuggestionChipStyler.createView(this, spaces)"))
+        assertTrue(style.contains("maxOf(dp(48), suggestionChip.measuredHeight) + spaces[1] * 2"))
+        val chip = source.substringAfter("private fun suggestion(").substringBefore("private fun dp(")
+        assertTrue(chip.contains("SuggestionChipStyler(this).apply(chip"))
+        assertTrue(chip.contains("minimumHeight = dp(48)"))
+        assertTrue(chip.contains("contentDescription = label"))
     }
     @Test fun draftRestoreAndNewThreadCannotMixCredentialsWithConversationDraft() {
         assertTrue(source.substringAfter("private fun restoreDraft()").substringBefore("private fun cancelPageRequest()").contains("if (auth.active) return"))

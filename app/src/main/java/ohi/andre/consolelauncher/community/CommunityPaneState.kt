@@ -18,6 +18,10 @@ class CommunityPaneState(saved: JSONObject) {
         get() = if (thread.isEmpty()) threadCursor else replyCursor
         set(value) { if (thread.isEmpty()) threadCursor = value else replyCursor = value }
     var history = saved.optBoolean("history")
+    var replyHistory = saved.optBoolean("reply_history")
+    var replyFollowing = saved.optBoolean("reply_following", !replyHistory)
+    var replyAnchor = saved.optString("reply_anchor")
+    var replyOffset = saved.optInt("reply_offset").coerceIn(-10000, 10000)
     fun focusReply(record: JSONObject) {
         thread = record.getString("thread"); composing = false; root = null; replies = listOf(record); cursor = record
     }
@@ -37,9 +41,17 @@ class CommunityPaneState(saved: JSONObject) {
         private set
     val context: String get() = if (thread.isEmpty()) channel else "reply:$thread"
     fun draft(context: String) = drafts.optJSONObject(context) ?: JSONObject()
+    var editingTitle: Boolean
+        get() = draft(context).optBoolean("editing_title", draft(context).optString("title").isBlank())
+        set(value) { draft(context).takeIf { it.length() > 0 }?.put("editing_title", value) }
     fun saveDraft(context: String, title: String, body: String) {
         if (title.isEmpty() && body.isEmpty()) drafts.remove(context)
-        else drafts.put(context, JSONObject().put("title", title).put("body", body))
+        else {
+            val editing = draft(context).opt("editing_title")
+            drafts.put(context, JSONObject().put("title", title).put("body", body).apply {
+                if (editing != null) put("editing_title", editing)
+            })
+        }
     }
     fun begin(context: String, payload: JSONObject): String {
         check(pendingId == null || (pendingContext == context && pending.toString() == payload.toString()))
@@ -58,5 +70,6 @@ class CommunityPaneState(saved: JSONObject) {
     fun toJson() = JSONObject().put("channel", channel).put("thread", thread).put("composing", composing)
         .put("threads", org.json.JSONArray(threads)).put("replies", org.json.JSONArray(replies)).put("root", root).put("cursor", cursor).put("thread_cursor", threadCursor).put("reply_cursor", replyCursor).put("history", history)
         .put("drafts", drafts).put("pending_id", pendingId ?: "").put("pending_context", pendingContext).put("pending", pending)
+        .put("reply_history", replyHistory).put("reply_following", replyFollowing).put("reply_anchor", replyAnchor).put("reply_offset", replyOffset)
     companion object { val CHANNELS = listOf("general", "bugs", "help", "features", "presets") }
 }

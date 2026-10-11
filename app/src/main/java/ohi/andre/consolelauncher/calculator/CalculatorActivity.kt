@@ -6,6 +6,8 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.InputType
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
@@ -29,6 +31,10 @@ class CalculatorActivity : LocalizedActivity() {
     }
     private lateinit var input: EditText
     private lateinit var transcript: TextView
+    private lateinit var previewHint: TextView
+    @Volatile private var previewGeneration = 0
+    private var pendingPreview: Runnable? = null
+    private var resumed = false
     private lateinit var scroll: ScrollView
     private lateinit var submit: View
     private lateinit var cancelButton: View
@@ -42,6 +48,48 @@ class CalculatorActivity : LocalizedActivity() {
     private lateinit var mainTab: TextView
     private lateinit var root: View
     private lateinit var windowPanel: ohi.andre.consolelauncher.help.HelpWindowPanel
+
+    private fun clearPreview() {
+        previewGeneration++
+        pendingPreview?.let { main.removeCallbacks(it) }; pendingPreview = null
+        if (::previewHint.isInitialized) previewHint.text = ""
+    }
+    private fun schedulePreview() {
+        clearPreview()
+        if (request != null || !resumed) return
+        val expression = input.text.toString().trim()
+        if (expression.isEmpty()) return
+        val action = when (expression.lowercase()) {
+            "clear" -> R.string.calculator_preview_clear
+            "help" -> R.string.calculator_preview_help
+            "exit" -> R.string.calculator_preview_exit
+            else -> null
+        }
+        if (action != null) { previewHint.setText(action); return }
+        if ('=' in expression || ':' in expression) { previewHint.setText(R.string.calculator_preview_enter_only); return }
+        val expanded = CalculatorSession.expand(expression, answer)
+        if (expanded == null) { previewHint.setText(R.string.calculator_terminal_no_answer); return }
+        if (Regex("[+\\-−*/×÷^]$|\\($").containsMatchIn(expanded)) { previewHint.setText(R.string.calculator_preview_incomplete); return }
+        val generation = previewGeneration
+        val options = CalculatorEngine.options(this).copy(exact = false)
+        pendingPreview = Runnable {
+            pendingPreview = null
+            worker.execute {
+                if (generation != previewGeneration) return@execute
+                val result = CalculatorEngine.evaluate(this, expanded, options, preview = true)
+                main.post {
+                    if (generation != previewGeneration || isDestroyed || request != null) return@post
+                    previewHint.text = when {
+                        result.failure in listOf("preview_unavailable", "timeout", "cancelled") || result.parsed == null && !result.error -> getString(R.string.calculator_preview_unavailable)
+                        result.error -> if (result.failure == "syntax") getString(R.string.calculator_preview_incomplete) else result.text.lineSequence().first()
+                        else -> getString(R.string.calculator_preview_format, result.parsed,
+                            (if (result.approximate) "≈ " else "") + CalculatorSession.display(result.text))
+                    }
+                    scroll.post { scroll.scrollTo(0, scroll.getChildAt(0).height) }
+                }
+            }
+        }.also { main.postDelayed(it, 300) }
+    }
 
     private fun selectHelp(help: Boolean) {
         if (help) {
@@ -84,10 +132,12 @@ class CalculatorActivity : LocalizedActivity() {
         windowPanel = ohi.andre.consolelauncher.help.HelpWindowPanel(host, root, state,
             statePrefix = "calculator", header = root.findViewById(R.id.calculator_main_tab),
             row = root.findViewById(R.id.calculator_header),
-            maximizeLabel = R.string.calculator_maximize, windowedLabel = R.string.calculator_windowed)
+            maximizeLabel = R.string.calculator_maximize, windowedLabel = R.string.calculator_windowed,
+            floatingInLandscape = false)
         root.setBackgroundColor(android.graphics.Color.TRANSPARENT)
         input = root.findViewById(R.id.calculator_expression)
         transcript = root.findViewById(R.id.calculator_result)
+        previewHint = root.findViewById(R.id.calculator_preview)
         scroll = root.findViewById(R.id.calculator_transcript_scroll)
         submit = root.findViewById(R.id.calculator_equals)
         cancelButton = root.findViewById(R.id.calculator_cancel_request)
@@ -97,9 +147,9 @@ class CalculatorActivity : LocalizedActivity() {
         val symbols = root.findViewById<GridLayout>(R.id.calculator_symbols)
         val suggestionSize = LauncherFontScale.terminalTextSizeSp()
         val modes = mapOf(
-            "123" to listOf("7", "8", "9", "÷", "4", "5", "6", "×", "1", "2", "3", "−", ".", "0", "⌫", "+", "(", ")", "√"),
-            "ABC" to "QWERTYUIOPASDFGHJKLZXCVBNM".map(Char::toString) + listOf("_", "SPACE", "⌫"),
-            "FUNC" to listOf("sqrt", "sin", "cos", "tan", "log", "ln", "abs", "pi", "e", "ans", "to", "of", "(", ")", "^", "!", "%", "⌫")
+            "123" to listOf("7", "8", "9", "÷", "4", "5", "6", "×", "1", "2", "3", "−", ".", "0", "⌫", "+", "(", ")", "="),
+            "ABC" to "QWERTYUIOPASDFGHJKLZXCVBNM".map(Char::toString) + listOf("⌫", "_", "SPACE"),
+            "FUNC" to listOf("sqrt", "sin", "cos", "tan", "log", "ln", "abs", "pi", "e", "ans", "to", "of", "(", ")", "^", "!", "%", "⌫", "=")
         )
         val tabs = listOf(
             root.findViewById<Button>(R.id.calculator_numbers_tab) to "123",
@@ -130,9 +180,12 @@ class CalculatorActivity : LocalizedActivity() {
         }
         fun showMode(mode: String) {
             (submit.parent as? ViewGroup)?.removeView(submit)
+            (cancelButton.parent as? ViewGroup)?.removeView(cancelButton)
             symbols.removeAllViews()
             val letters = mode == "ABC"
             symbols.columnCount = if (letters) 20 else 4
+            val lastRowStart = if (letters) 27 else modes.getValue(mode).size / 4 * 4
+            val bottomRow = ohi.andre.consolelauncher.help.BottomCornerRow(this)
             fun keyLayout(index: Int): GridLayout.LayoutParams {
                 val keyHeight = Tuils.dpToPx(this@CalculatorActivity, 48)
                 if (!letters) return GridLayout.LayoutParams().apply {
@@ -145,11 +198,8 @@ class CalculatorActivity : LocalizedActivity() {
                 val (row, column, span) = when {
                     index < 10 -> Triple(0, index * 2, 2)
                     index < 19 -> Triple(1, 1 + (index - 10) * 2, 2)
-                    index < 26 -> Triple(2, 3 + (index - 19) * 2, 2)
-                    index == 26 -> Triple(3, 0, 3)
-                    index == 27 -> Triple(3, 3, 11)
-                    index == 28 -> Triple(3, 14, 3)
-                    else -> Triple(3, 17, 3)
+                    index == 26 -> Triple(2, 17, 3)
+                    else -> Triple(2, 3 + (index - 19) * 2, 2)
                 }
                 return GridLayout.LayoutParams().apply {
                     width = 0
@@ -159,7 +209,7 @@ class CalculatorActivity : LocalizedActivity() {
                 }
             }
             modes.getValue(mode).forEachIndexed { index, label ->
-                symbols.addView(Button(this).apply {
+                val key = Button(this).apply {
                     text = label
                     isAllCaps = false
                     isFocusable = false
@@ -175,9 +225,35 @@ class CalculatorActivity : LocalizedActivity() {
                     if (label == "√") contentDescription = getString(R.string.surface_square_root_47a32)
                     if (label == "⌫") contentDescription = getString(R.string.surface_backspace_88d13)
                     setOnClickListener { insertKey(label) }
-                }, keyLayout(index))
+                }
+                if (index >= lastRowStart) bottomRow.addKey(key, if (letters && label == "SPACE") 14f else if (letters) 3f else 1f)
+                else symbols.addView(key, keyLayout(index))
             }
-            symbols.addView(submit, keyLayout(modes.getValue(mode).size))
+            bottomRow.addKey(submit, if (letters) 3f else 1f)
+            bottomRow.addKey(cancelButton)
+            symbols.addView(bottomRow, GridLayout.LayoutParams().apply {
+                width = 0
+                val keyHeight = Tuils.dpToPx(this@CalculatorActivity, 48)
+                height = if (letters) keyHeight * 5 - keyHeight * 5 * 3 / 4 else keyHeight
+                rowSpec = GridLayout.spec(if (letters) 3 else lastRowStart / 4, GridLayout.CENTER)
+                columnSpec = GridLayout.spec(0, symbols.columnCount, 1f)
+            })
+            windowPanel.reserveBottomCorners(bottomRow)
+            val border = root.findViewById<View>(R.id.calculator_window_border)
+            val borderMargins = border.layoutParams as ViewGroup.MarginLayoutParams
+            val keypadMargins = root.findViewById<View>(R.id.calculator_keypad_scroll).layoutParams as ViewGroup.MarginLayoutParams
+            val pane = root.findViewById<View>(R.id.calculator_main_pane)
+            val prompt = input.parent as View
+            prompt.measure(View.MeasureSpec.makeMeasureSpec(Tuils.dpToPx(this, 336), View.MeasureSpec.AT_MOST),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED))
+            previewHint.measure(View.MeasureSpec.makeMeasureSpec(Tuils.dpToPx(this, 336), View.MeasureSpec.AT_MOST),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED))
+            val minimumHeight = root.paddingTop + root.paddingBottom + borderMargins.topMargin + borderMargins.bottomMargin +
+                border.paddingTop + border.paddingBottom + pane.paddingTop + pane.paddingBottom +
+                maxOf(Tuils.dpToPx(this, 120), prompt.measuredHeight + previewHint.measuredHeight) + keypadMargins.topMargin + keypadMargins.bottomMargin +
+                Tuils.dpToPx(this, 48) * 6
+            // Five bottom actions (including Cancel) and both 48dp corners must fit without horizontal scrolling.
+            windowPanel.setMinimumSize(Tuils.dpToPx(this, 336), minimumHeight)
             if (letters) {
                 // Empty edge cells keep the staggered rows centered.
                 listOf(Triple(1, 0, 1), Triple(1, 19, 1), Triple(2, 0, 3), Triple(2, 17, 3)).forEach { (row, column, span) ->
@@ -205,6 +281,7 @@ class CalculatorActivity : LocalizedActivity() {
                 view.typeface = Tuils.getTypeface(this)
                 view.textSize = suggestionSize
                 view.setTextColor(ThemeColorResolver.color(if (view is Button) Theme.workspace_control_text_color else Theme.workspace_panel_text_color))
+                if (view === previewHint) { view.textSize = suggestionSize * 0.85f; view.setTextColor(ThemeColorResolver.withMaxAlpha(ThemeColorResolver.color(Theme.workspace_panel_text_color), 170)) }
                 if (view is Button) {
                     view.background = null
                     view.setTypeface(Tuils.getTypeface(this), android.graphics.Typeface.BOLD)
@@ -239,6 +316,11 @@ class CalculatorActivity : LocalizedActivity() {
                 execute(); true
             } else false
         }
+        input.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) = schedulePreview()
+        })
         submit.setOnClickListener { execute() }
         cancelButton.setOnClickListener { cancel() }
         helpTab = root.findViewById(R.id.calculator_help_tab)
@@ -266,6 +348,7 @@ class CalculatorActivity : LocalizedActivity() {
         if (request != null) return
         val expression = input.text.toString().trim()
         if (expression.isEmpty()) return
+        clearPreview()
         when (expression.lowercase()) {
             "exit" -> { input.setText(""); finish(); return }
             "clear" -> { history = ""; renderTerminal(); input.setText(""); persist(); return }
@@ -273,6 +356,7 @@ class CalculatorActivity : LocalizedActivity() {
         }
         val expanded = CalculatorSession.expand(expression, answer)
         if (expanded == null) { append("calc> $expression\n${getString(R.string.calculator_terminal_no_answer)}"); return }
+        if (expanded.isBlank()) { append("calc> $expression\n${getString(R.string.calculator_invalid)}"); return }
         append("calc> $expression")
         val active = CalculatorEngine.Request()
         val options = CalculatorEngine.options(this).copy(exact = false)
@@ -291,6 +375,7 @@ class CalculatorActivity : LocalizedActivity() {
                     if (input.text.toString().trim() == expression) input.setText("")
                 }
                 persist()
+                schedulePreview()
             }
         }
     }
@@ -303,6 +388,7 @@ class CalculatorActivity : LocalizedActivity() {
         request?.cancel(); request = null
         submit.isEnabled = true; cancelButton.visibility = View.GONE
         append(getString(R.string.calculator_cancelled)); persist()
+        schedulePreview()
     }
     private fun persist() {
         prefs.edit().putString("terminal_ans", answer).putString("terminal_transcript", history)
@@ -315,9 +401,10 @@ class CalculatorActivity : LocalizedActivity() {
         windowPanel.save(state)
         super.onSaveInstanceState(state)
     }
-    override fun onPause() { persist(); super.onPause() }
+    override fun onPause() { resumed = false; clearPreview(); windowPanel.persist(); persist(); super.onPause() }
     override fun onResume() {
         super.onResume()
+        resumed = true
         if (!::root.isInitialized) return
         fun refresh(view: View) {
             if (view is TextView) {
@@ -327,6 +414,7 @@ class CalculatorActivity : LocalizedActivity() {
                 val color = ThemeColorResolver.color(role)
                 view.setTextColor(if (view is Button && !view.isSelected && view.id in listOf(R.id.calculator_numbers_tab, R.id.calculator_letters_tab, R.id.calculator_functions_tab))
                     ThemeColorResolver.withMaxAlpha(color, 150) else color)
+                if (view === previewHint) { view.textSize = LauncherFontScale.terminalTextSizeSp() * 0.85f; view.setTextColor(ThemeColorResolver.withMaxAlpha(color, 170)) }
                 if (view is Button) {
                     view.background = null
                     view.setTypeface(Tuils.getTypeface(this), android.graphics.Typeface.BOLD)
@@ -360,6 +448,7 @@ class CalculatorActivity : LocalizedActivity() {
             ThemeColorResolver.color(Theme.workspace_output_background_color),
             ThemeColorResolver.withMaxAlpha(ThemeColorResolver.color(Theme.workspace_panel_border_color), 210),
             1.2f, AppearanceSettings.outputCornerRadius(), AppearanceSettings.dashedBorders(), target = FrameTarget.OVERLAYS)
+        schedulePreview()
     }
-    override fun onDestroy() { request?.cancel(); request = null; worker.shutdownNow(); super.onDestroy() }
+    override fun onDestroy() { clearPreview(); request?.cancel(); request = null; worker.shutdownNow(); super.onDestroy() }
 }

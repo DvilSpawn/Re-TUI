@@ -58,8 +58,8 @@ class Contract(unittest.TestCase):
         except urllib.error.HTTPError as e:
             return e.code, json.loads(e.read() or b'{}')
 
-    def signup(self):
-        handle = 't_' + secrets.token_hex(6)
+    def signup(self, handle=None):
+        handle = handle or 't_' + secrets.token_hex(6)
         password = secrets.token_urlsafe(30)
         s, r = self.call('POST', '/api/collections/members/records',
                          {'handle': handle, 'password': password, 'passwordConfirm': password})
@@ -79,6 +79,7 @@ class Contract(unittest.TestCase):
     def login(self, h, p):
         s, a = self.call('POST', '/api/collections/members/auth-with-password', {'identity': h, 'password': p})
         self.assertEqual(s, 200)
+        self.assertEqual(self.call('POST','/api/community/policy',{'version':'2026-10-10'},a['token'])[0],200)
         return a['token']
 
     def test_02_plain_post_ownership_and_idempotency(self):
@@ -279,7 +280,7 @@ class Contract(unittest.TestCase):
         self.assertIn(self.call('POST',path,dict(payload,client_id=str(uuid.uuid4())),t)[0],(400,401,403))
 
     def test_09_private_moderator_queue(self):
-        h,p,a=self.signup(); h2,p2,b=self.signup()
+        h,p,a=self.signup(); h2,p2,b=self.signup('dvil')
         t=self.login(h,p); t2=self.login(h2,p2)
         path='/api/collections/moderator_requests/records'
         payload={'reporter':a['id'],'kind':'moderate','body':'private request'}
@@ -493,7 +494,7 @@ def main():
             env = dict(os.environ, RETUI_BOOTSTRAP_PASSWORD=password)
             log = open(Path(tmp) / 'server.log', 'w+')
             process = subprocess.Popen([args.binary, 'serve', '--http=127.0.0.1:18095', '--dir=' + tmp + '/data',
-                '--hooksDir=' + str(ROOT/'pb_hooks'), '--migrationsDir=' + str(ROOT/'pb_migrations'), '--automigrate=false'],
+                '--hooksDir=' + str(ROOT/'pb_hooks'), '--migrationsDir=' + str(ROOT/'pb_migrations'), '--automigrate=false', '--hooksWatch=false'],
                 env=env, stdout=log, stderr=log)
             Contract.data_dir = tmp + '/data'
             Contract.base = Contract.admin_base = 'http://127.0.0.1:18095'
@@ -522,9 +523,10 @@ def main():
             suite = unittest.TestSuite(Contract(name) for name in selected)
             result = unittest.TextTestRunner(verbosity=2).run(suite)
             if not result.wasSuccessful() and process:
+                print('Fixture backend process exit:', process.poll())
                 log.flush(); log.seek(0)
                 for line in log:
-                    if 'ERR' in line or 'error' in line.lower():
+                    if 'ERR' in line or 'error' in line.lower() or 'panic:' in line or 'runtime.' in line or 'github.com/pocketbase/' in line:
                         print(line.rstrip().replace(password, '[redacted]'))
         finally:
             if process:

@@ -1,8 +1,137 @@
 # Re-TUI community backend — API contract v3 (pilot)
 
-PocketBase **0.40.4**, before 1.0: not a production-critical stability guarantee.
+## Live-delivery upgrade
+
+The authenticated `GET /api/realtime` connection and `POST /api/realtime` subscription
+allow only the exact custom `community` topic (or an empty unsubscribe list). Native
+collection subscriptions, topic options, anonymous streams and cross-account connection
+reuse are rejected. Tokens are revalidated against current accounts before each notice;
+expired/revoked tokens, password rotation and inactive accounts cannot keep receiving it.
+
+Create/update notices are `{action,collection,id}` and respect source view permissions.
+General expiry is checked before publication. Deletes emit only `{action:"invalidate"}`:
+no retained/expired message body or deleted-record metadata is serialized. REST reads
+remain authoritative. Streams close after 60 seconds idle and reconnect with history
+reconciliation; nginx has buffering disabled and a 90-second stream-specific timeout.
+The public ingress still blocks dashboard, settings and private/native collections.
+
+The generic PocketBase API fallback is 240 requests/minute, matching the proxy read
+budget. Existing authentication, signup, posting and moderation quotas remain intact.
+Stream requests have their own bucket and a 10-concurrent-stream/IP ceiling. Nginx
+429 responses now advise 15 seconds rather than a blanket minute. Native limits may
+still require a longer wait; shared-IP allowances are bounded, not unlimited.
+
+`/var/log/nginx/retui-community-timing.log` records operation category, method, status,
+request duration and upstream duration only. It does NOT contain IPs, handles, record
+IDs, paths/queries, authorization, cookies or bodies. The existing nginx log rotation
+retains 14 daily files; PocketBase request logging remains disabled. Long SSE durations
+measure connection lifetime, not message latency.
+
+`upgrade_live.py` is an existing-service-only, hash-checked upgrade. It prepares a
+root-private persistent recovery snapshot, stops/restarts only `retui-community`, applies
+the additive migration, preserves ACME configuration and account/forum IDs, validates
+nginx and reloads it. Hook hot-reloading is disabled to prevent partial deploys. Failure
+restores code/config without replacing the live database or rolling back accepted writes.
+The separate Ergo IRC service is not changed.
+
+`selective_backup.py --source /var/lib/retui-community/data/data.db --destination <new-private-file>`
+creates a fresh 0600 SQLite database in a required 0700 directory, from a consistent
+read-only transaction. All schemas/indexes are retained; only system configuration,
+migration metadata, superusers, members, persistent threads and replies are copied.
+General messages, reports/private requests, mentions and presence are EMPTY. Integrity
+and reference checks run, and existing destination files cannot be overwritten. Snapshots
+contain password hashes/auth secrets: keep root-only and encrypt before off-site transfer.
+Hourly selective recovery and seven-day rotation are managed by the operations timer.
+No off-site transfer is enabled. Restore only to a separate protected instance, never over
+live data. Authorized legacy-data cleanup follows verification of a fresh recovery snapshot.
+
+Regression tests: `test_realtime.py --binary <pinned-pocketbase>` includes live notices,
+subscription restrictions, revocation, password rotation, denied-source metadata and
+an actual reopened selective recovery snapshot. `test_selective_backup.py` verifies
+transient body exclusion, private permissions and overwrite prevention.
+
+PocketBase **0.40.5**, before 1.0: not a production-critical stability guarantee.
 No IRC bridge. This independently isolated service does not use launcher/device inventory,
 Google, OAuth, email, push, analytics, or any external identity service.
+
+## Public-release gates (2026-10-10)
+
+The additive `1791401000_release_gates.js` migration grants the existing `dvil` account
+the sole moderator role and removes other moderator flags. All moderation reads/actions
+require a current active member, stored moderator status and the canonical handle `dvil`.
+Registration cannot grant roles. Role revocation/bans apply to existing tokens.
+
+`POST /api/community/policy` accepts only `{version:"2026-10-10"}`. The server stores
+the accepted version/time. Posting messages, discussions, replies, reports or private
+requests without current acceptance fails **428**. Native member updates remain closed;
+clients cannot forge the stored acceptance fields. The Android confirmation does not
+automatically send a retained draft. Rules are public at `/community/rules`.
+
+`POST /api/community/report` accepts `{collection,id,reason}` for messages, threads or
+thread_replies. It creates private immutable evidence in moderator_requests, including
+the source collection and original author ID. General expiry still applies. Evidence
+retains its original six-calendar-month expiry even after removal/account deletion.
+
+`GET /api/community/moderation?collection=reports|moderator_requests&page=1&perPage=50`
+returns bounded unresolved private requests with source previews. Only dvil can use it.
+The response includes privacy-safe operations health, never credentials or log bodies.
+`POST /api/community/moderation/action` accepts `{queue,id,action}` with action
+`dismiss`, `remove` or `ban`. It rechecks the role within its transaction and stores
+resolution identity/time. Repeating an already resolved action does not act twice.
+Ban uses the immutable original author ID, never a potentially reclaimed username;
+self-ban is rejected. Native `/report` requests also retain the original author ID,
+so action remains possible after their source chat is deleted or expires.
+Removing a discussion also removes its replies. All other native
+member/content writes stay inaccessible. Android exposes these actions with confirmation.
+
+`POST /api/community/account-delete` accepts only `{confirm:"canonical_handle",password}`.
+It checks the current password and deletes that account plus authored content in a
+transaction; when a token is supplied, it must belong to the same account. It also works
+without a session token, including for banned accounts, with the same strict rate limits.
+Unknown accounts/wrong passwords return a generic **400**. Logout is not deletion.
+The public `/community/account-deletion` page works without Launcher; credentials/tokens
+are never placed in URLs, local storage or logs. Retained moderation evidence remains
+until its original expiry. Forgotten passwords still require private operator verification.
+
+`operations.py backup` creates hourly root-private selective snapshots with seven-day
+rotation. Its named snapshots are reconciled against live account/thread/reply deletions;
+the filename creation time controls expiry, not VACUUM/mtime. Backups exclude transient
+chat, reports, requests, presence and mentions. Restore into an isolated instance first;
+never replace live account data with an old snapshot. `operations.py monitor` checks local
+and public HTTPS health, overdue retention, dvil-only moderation, >24-hour unresolved
+requests, fresh recovery and disk space every five minutes. Failures are recorded in
+the system journal and a role-protected in-app operator status. These are VPS-local checks,
+not an independent external availability alarm. No off-site destination is configured.
+
+`verify_recovery.py` verifies the newest snapshot against live persistent identities,
+checks integrity and empty transient tables, then reopens a temporary protected loopback
+copy with the deployed backend. It never overwrites live data and removes its test copy.
+On 2026-10-10, the operator-approved two October 8 whole-database archives (and metadata)
+and the v2 rollback `data.db`/`auxiliary.db` were removed after this verification. Code/config
+rollback files and selective recovery snapshots were retained. This does not establish
+forensic erasure of provider snapshots or storage free pages.
+
+Operator routine: sign in as dvil, open Menu → Moderator review, inspect both queues and
+resolve reports promptly (within 24 hours as a working target, not a guaranteed SLA).
+For deletion support, privately verify ownership; never delete or transfer an identity
+based on a public username alone. Update Play Console Data safety/content-rating/reviewer
+access declarations and the published privacy policy before store submission.
+
+Verified 2026-10-10: deployed PocketBase 0.40.5 and source hashes; original dvil ID
+and the one account/discussion/reply preserved; only dvil has a moderator flag.
+Both operations timers are enabled and active, with healthy repeated monitor results.
+Six external HTTPS ingress checks pass, including public page MIME/CSP headers and
+unauthenticated gate denial. The fresh production selective snapshot passes integrity,
+identity and zero-transient-row checks and reopens in an isolated instance.
+Local suites pass 22 backend contract, 20 realtime/recovery, three release-gate,
+two selective-backup and one operations checks, plus the isolated nginx regression.
+Android passes 90 Community host tests and a combined 16-test emulator regression run,
+including the new rules/deletion/moderation flows. Normal Play debug assembles, and F-Droid debug/Play release Kotlin
+compile. A matching-signer in-place update is installed on physical I2220 device
+`10BE1C0FB40006A`; the app identity, first-install time and encrypted community-state
+fingerprint are unchanged. All three gate flows pass there in the isolated fixture package,
+without production posts or account deletion. No store publication is claimed.
+Off-site recovery and independent alert delivery remain unset.
 
 ## General/identity API contract (v1-compatible)
 
@@ -52,8 +181,9 @@ The UI label is **Username**; its API field is `handle`.
   `{ "reporter": "current_member_id", "message": "message_id", "reason": "plain text" }`.
   Reason nonblank, maximum 500 code points / 2000 UTF-8 bytes.
   Native **200** response. Unique reporter/source-message identity; duplicates return **400**.
-  Active moderator members may list/view reports; ordinary member access is forbidden.
-  Mutations and member list/view/update/delete remain loopback-superuser-only.
+  Only the active dvil moderator may list/view reports; ordinary member access is forbidden.
+  Native mutations and member list/view/update/delete remain loopback-superuser-only;
+  the release-gate custom routes provide confirmed moderation and self-deletion.
 - Member-authenticated active accounts can read feed; no anonymous reading/posting.
   Missing, invalid, expired or revoked auth on message listing returns **401**;
   banned account listing returns **403**. Single inaccessible message may return **404**.
@@ -106,13 +236,15 @@ or standalone chat posting into persistent channels exists.
   is enforced separately per collection. Reconcile uncertain delivery using signed-in
   author, UUID and body on the matching collection. Never release an uncertain UUID early.
 - All reads/creates require an active member. No creator/moderator edit/delete in v2;
-  only loopback superusers can moderate content. Threads and replies have no timed expiry.
+  only loopback superusers can moderate content in the original v2 API. Release gates
+  add dvil-only custom moderation routes. Threads and replies have no timed expiry.
   Deleting a parent deletes its replies; administrative account deletion cascades authored
-  messages/threads/replies. Real identities should instead be banned and retained.
+  messages/threads/replies. Moderation bans retain identities; password-confirmed
+  owner-requested account deletion is supported by the release-gate custom route.
 
 ### Private moderator delivery
 
-Only active members can send; only active members with stored `moderator=true` (or
+Only active members with accepted current rules can send; only the active dvil member with stored `moderator=true` (or
 loopback superusers) can list/view. Roles are assigned only through loopback admin APIs;
 registration cannot self-grant a role. Current stored roles/bans apply to existing tokens.
 Moderators use their own member login, never the administrator secret. They are read-only:
@@ -257,7 +389,7 @@ remain per IP, not per account: other clients/reads behind that NAT also spend t
 read allowance, and posts behind it still share 20/min. This is not unlimited NAT support.
 Backend native operation quotas remain unchanged; direct loopback administration is
 excluded, and nginx **overwrites** X-Real-IP/X-Forwarded-For.
-Access logging disabled for this HTTPS host and PocketBase request logs disabled.
+Privacy-safe timing logging is enabled for this HTTPS host; PocketBase request logs remain disabled.
 
 Root-only generated administrator config: `/etc/retui-community/admin.json` (0600).
 Never copy it to the app, print it, pass its password on command lines, or commit it.
@@ -271,8 +403,9 @@ ssh -i ~/.ssh/retui_hostinger_ed25519 -o IdentitiesOnly=yes -o StrictHostKeyChec
 ```
 
 Then `http://127.0.0.1:18095/_/`. Admin dashboard must never be opened from Android.
-Moderators use their own member login and the native private queue list/view API.
-Only loopback superusers can delete abusive content, change moderator roles or ban members.
+The sole moderator dvil uses their member login and the custom review/action routes.
+Only loopback superusers can change roles; the custom action route lets dvil remove
+abusive content or ban its original author after confirmation.
 Set active=false without deleting the account. Report snapshots do NOT cascade away with
 message/account deletion. Administrator handles must not be used to reassign identities.
 
@@ -289,11 +422,12 @@ loopback superuser list/view APIs. Client filters cannot bypass the server cutof
 
 **Scheduled whole-database backups are disabled** by a versioned migration: archives
 would preserve expired message/request bodies. Tests no longer create production archives.
-No selective backup or offsite transfer is configured; persistent accounts/threads therefore
-have single-VPS loss risk. Existing legacy archives are NOT automatically deleted.
+Selective local recovery snapshots run hourly with seven-day rotation and deletion
+reconciliation; no offsite transfer is configured, so persistent accounts/threads still
+have single-VPS loss risk. Legacy archives are NOT automatically deleted.
 Inventory exact paths, sizes, permissions, timestamps and hashes; request explicit operator
-approval before removing them. Legacy copies and the protected local pre-upgrade rollback
-snapshot are retention-policy exceptions. Do not claim full historical compliance until
+approval before removing them. Legacy full-data copies are retention-policy exceptions;
+new rollback directories contain code/config only. Do not claim full historical compliance until
 those copies are resolved. Provider snapshots are outside application control.
 
 Deletion means SQLite row removal, **not forensic secure erasure**: WAL/free pages and
@@ -367,7 +501,66 @@ quota still returns 429, and disallowed methods/paths stay blocked. It touches n
 configuration or production data. Authenticated public fixture tests require operator
 permission; do not rerun them after approval expires or an approval request times out.
 
-Remaining pilot release gates: Android integration/device testing, assign active
-moderation owner, uptime/retention monitoring, resolve legacy copies, and decide on
-policy-compatible disaster recovery. No offsite backup is configured. No claim of production-critical readiness. Native APIs and deployment
+Remaining public-release work: choose off-site recovery and external alert delivery,
+complete final release-device and longer network/soak checks, address the bounded-load
+findings below, and update store declarations/published policy.
+VPS-local monitoring does not detect total VPS loss independently. No claim of production-critical readiness. Native APIs and deployment
 reference: https://pocketbase.io/docs/ and https://pocketbase.io/docs/going-to-production/.
+
+## Bounded VPS load/stress verification (2026-10-11 IST)
+
+`load_test.py` requires Linux systemd, root, nginx and the pinned PocketBase 0.40.5
+binary. It cannot accept an existing database, live API base or account credentials:
+every run uses a fresh private loopback fixture with synthetic accounts/history.
+Use a private copy of the deployed hooks, migrations, public pages, nginx route/proxy
+files and `selective_backup.py` alongside the harness. Do not run it against public
+ingress. The trusted synthetic-IP header exists only in its private nginx instance.
+
+Example with a new output filename and unused transient unit name:
+
+```sh
+sudo systemd-run --quiet --collect --wait --pipe --service-type=exec \
+  --unit=retui-load-check -p CPUQuota=100% -p MemoryMax=768M \
+  -p TasksMax=512 -p RuntimeMaxSec=600 -p Nice=10 -p IOWeight=10 \
+  -p LimitNOFILE=4096 python3 /path/to/private-fixture/load_test.py \
+  --binary /opt/retui-community/pocketbase --nginx /usr/sbin/nginx \
+  --duration 20 --guard-production --output /path/to/private-fixture/new-report.json
+```
+
+Backend subprocesses use production-equivalent CPUQuota=50%, MemoryMax=256M,
+GOMEMLIMIT=192MiB, TasksMax=128 and LimitNOFILE=4096. `--backend-cpu 100` changes
+only the synthetic backend for a one-core comparison. Production service/configuration
+is never changed. The guard sends a lightweight production health GET every two seconds
+and stops further load on failure or a >1-second health response. Generated databases,
+credentials and private server logs are removed; reports contain aggregate metrics.
+
+Two completed VPS runs measured 4,559 and 4,818 HTTP requests respectively, plus
+setup/SSE/probe calls, over 10/25/50/100-client 20-second stages. Synthetic history:
+100 accounts, 2,000 messages, 200 discussions, 1,000 replies. The workload intentionally
+uses two-second rotating reads and whole-feed live refreshes; it is more aggressive
+than the launcher's periodic polling and is not an exact Android traffic simulation.
+All 25 deployed hook/migration hashes matched the local checkout.
+
+At production-equivalent limits, 100-client p95 read/message-post/live-notice latency
+was 1.61/3.13/3.22 seconds. In the fixture-only one-core run it was 0.87/0.91/0.72 seconds.
+Ten concurrent posts with retries and 100 listeners had successful-post p95
+4.47 seconds versus 2.08 seconds. CPU quota throttling was observed. Peak cgroup memory
+was 240.34/230.37 MiB out of 256 MiB; extra memory headroom has not yet been tested.
+Ordinary stage post percentiles have only seven successful message samples per stage.
+These are observed short-run results, not a capacity/SLA guarantee.
+
+All 13 aggregate correctness checks pass for both completed reports: no ordinary
+request failures, no missed live create notices, no duplicate same-UUID posts, successful
+login/read bursts, clean 429 abuse rejection, the ten-stream/IP ceiling and quota isolation,
+forced-process-crash recovery with retained message counts and SQLite integrity, and an
+actually reopened selective snapshot with persistent identities/forums but no transient rows.
+Production stayed healthy in all 71/56 guard samples; six fresh public ingress tests pass.
+Production remains half-core/256M, dvil-only moderation is unchanged and no synthetic
+production accounts or test services remain. No deployment, commit or release was made.
+
+An exploratory five-second-deadline run recorded 59 transport timeouts in the 100-client
+join stage; the completed runs use the launcher's actual 15-second read deadline and
+recorded none. An earlier recovery-controller error was corrected and is not counted
+as a completed recovery pass. Seven harness metric/isolation self-tests pass:
+`python3 server/community/test_load_test.py`. The harness exits unsuccessfully for
+incomplete or failed correctness checks; latency remains a measured result for review.

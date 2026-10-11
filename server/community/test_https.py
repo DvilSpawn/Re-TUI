@@ -18,6 +18,7 @@ class Ingress(unittest.TestCase):
         s,h,b=self.request('/community/api/health')
         self.assertEqual(s,200); self.assertIn(b'healthy',b)
         self.assertEqual(h['Cache-Control'],'no-store')
+        self.assertEqual(self.request('/community/api/realtime')[0],401)
 
     def test_admin_and_encoded_paths_denied(self):
         for path in ('/_/','/community/_/','/community/%5f/','/community/%255f/',
@@ -47,5 +48,16 @@ class Ingress(unittest.TestCase):
         with socket.socket() as s:
             s.settimeout(3)
             self.assertNotEqual(s.connect_ex(('72.61.124.153',8095)),0)
+
+    def test_public_release_pages_and_protected_routes(self):
+        for page, mime in (('rules','text/html'),('account-deletion','text/html'),('account-deletion.js','application/javascript'),('community.css','text/css')):
+            s,h,b=self.request('/community/'+page)
+            self.assertEqual(s,200);self.assertIn(mime,h['Content-Type']);self.assertEqual(h['Cache-Control'],'no-store')
+            if page in ('rules','account-deletion'):
+                self.assertIn("frame-ancestors 'none'",h['Content-Security-Policy'])
+        self.assertEqual(self.request('/community/api/community/moderation')[0],401)
+        for route in ('policy','report','moderation/action'):
+            self.assertEqual(self.request('/community/api/community/'+route,b'{}','POST')[0],401)
+        self.assertEqual(self.request('/community/api/community/account-delete',b'{}','POST')[0],400)
 
 if __name__=='__main__': unittest.main(verbosity=2)

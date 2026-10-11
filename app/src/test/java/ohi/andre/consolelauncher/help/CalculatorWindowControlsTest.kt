@@ -26,7 +26,7 @@ class CalculatorWindowControlsTest {
 
     @Test fun maximizeAndFloatUseRequestedMaterialAssets() {
         val panel = source("java/ohi/andre/consolelauncher/help/HelpWindowPanel.kt")
-        assertTrue("Float uses pip and maximize uses open-in-full", panel.contains("if (maximized) R.drawable.pip_24 else R.drawable.open_in_full_24"))
+        assertTrue("Float uses pip and maximize uses open-in-full", panel.contains("if (expanded) R.drawable.pip_24 else R.drawable.open_in_full_24"))
         for (name in listOf("pip_24", "open_in_full_24")) {
             assertTrue(File(root, "app/src/main/res/drawable/$name.xml").isFile)
         }

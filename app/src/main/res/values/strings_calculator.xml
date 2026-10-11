@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="calculator_preview_format">↳ %1$s → %2$s</string>
+    <string name="calculator_preview_incomplete">Complete or check the expression</string>
+    <string name="calculator_preview_unavailable">Preview unavailable · press ↵ to evaluate</string>
+    <string name="calculator_preview_enter_only">Assignment or comparison · evaluated only on ↵</string>
+    <string name="calculator_preview_clear">Clear history · keep the last result</string>
+    <string name="calculator_preview_help">Open calculator help</string>
+    <string name="calculator_preview_exit">Close the calculator</string>
     <item type="id" name="calculator_equals" />
     <item type="id" name="calculator_expression" />
     <item type="id" name="calculator_result" />
@@ -118,16 +125,16 @@
     <string name="calculator_unit_kib">Kibibytes (binary, 1024 bytes)</string>
     <string name="calculator_unit_mib">Mebibytes (binary)</string>
     <string name="calculator_unit_gib">Gibibytes (binary)</string>
-    <string name="calculator_terminal_help">Enter an expression, e.g. 5 ft to miles. Use ans for the last successful result. Commands: help, clear, exit.</string>
+    <string name="calculator_terminal_help">Enter an expression and press ↵. After a result, +5 or *2 continues it. Use ans only for an explicit reference. Commands: help, clear, exit.</string>
     <string name="calculator_terminal_no_answer">No previous result. Calculate an expression first.</string>
     <string name="calculator_hints">Calculator hints</string>
-    <string name="calculator_hints_body">CALCULATOR HINTS\n\nEnter an expression after calc&gt; and press Enter or ↵. The keypad stays in the calculator: 123 enters numbers and operators, ABC enters letters and units, and FUNC enters functions and constants.\n\nArithmetic\n2 + 3 * 4 → 14\n(2 + 3) * 4 → 20\nsqrt(9) → 3\n2^3 → 8\n\nConvert units\n5 ft to miles\n20 celsius to fahrenheit\nUse to for conversion. The word in means inches.\n\nChain results\n5 ft to miles\nans * 2\nans to ft → 10 ft\nErrors do not replace the last successful answer.\n\nEdit expressions\nTap the input to place the cursor, then use 123, ABC, or FUNC. √ and function keys insert parentheses with the cursor inside. Use ⌫ to delete; type clear to clear the transcript.\n\nCommands\nclear — clear the transcript, keeping ans\nhelp — show a short reminder\nexit — close the calculator\n\nCancel stops the current calculation. Tap the calculator tab to return without losing your expression.</string>
+    <string name="calculator_hints_body">CALCULATOR\n\nEnter an expression after calc&gt; and press Enter or ↵.\n\nContinue a result\n5 + 5 → 10\n+5 → 15\n*2 → 30\nA leading +, −, ×, ÷ or ^ continues the last successful result. A complete expression starts fresh. Use (-5) for a standalone negative value after a result. Errors and cancellation keep the last result.\n\nArithmetic\n2 + 3 * 4 → 14\n(2 + 3) * 4 → 20\nsqrt(144) → 12\n2^3 → 8\n\nConvert units\n5 ft to cm → 152.4 cm\n*2 → 304.8 cm\nans to ft → 10 ft\nUse to for conversion. The word in means inches.\n\nExplicit answers and variables\nans is optional: sqrt(ans), 100 / ans and ans to ft refer to the last result. ans = 5 sets it. Named assignments such as tax = 18% go to Qalculate; these variables last only while the engine process remains alive.\n\nKeypad and editing\n123: numbers, operators and =\nABC: letters, units and variable names\nFUNC: functions, constants and =\nTap the input to place the cursor or select text. Function keys insert parentheses with the cursor inside. ⌫ deletes. = inserts an assignment; ↵ evaluates.\n\nCommands\nclear — clear the transcript, keeping the last result\nhelp — open the calculator guide\nexit — close the calculator\n\nCancel stops the current calculation. Back closes Help and retains your reading position.</string>
     <string name="calculator_help_menu">CALCULATOR HELP\n\n1 Expressions / operators\n2 Functions / constants\n3 Conversions\n4 ans\n5 Keypad / editing\n\n0 Calculator</string>
     <string name="calculator_help_expressions">EXPRESSIONS / OPERATORS\n\n2 + 3 * 4 → 14\n(2 + 3) * 4 → 20\n2^3 → 8\nUse +, −, ×, ÷, parentheses, ^ and %.</string>
     <string name="calculator_help_functions">FUNCTIONS / CONSTANTS\n\nsqrt(9) → 3\nsin(90) → 1 in degrees mode\nFUNC inserts sqrt, sin, cos, tan, log, ln and abs with parentheses. Constants: pi and e.</string>
     <string name="calculator_help_conversions">CONVERSIONS\n\n5 ft to miles\n20 celsius to fahrenheit\nUse to for conversion. The word in means inches. ABC enters letters and units.</string>
-    <string name="calculator_help_ans">ANS\n\n5 ft to miles\nans * 2\nans to ft → 10 ft\nUse ans for the last successful result. Errors do not replace it. Clear keeps ans.</string>
-    <string name="calculator_help_editing">KEYPAD / EDITING\n\n123: numbers and operators\nABC: letters and units\nFUNC: functions and constants\n\nTap the prompt to place the cursor or select text. √ and function keys insert parentheses with the cursor inside. ⌫ deletes the selection or previous character. ↵ evaluates.\n\nclear — clear the transcript, keeping ans\nhelp — open this browser\nexit — close the calculator\nCancel stops a calculation without changing your input.</string>
+    <string name="calculator_help_ans">CONTINUE A RESULT\n\n5 + 5 → 10\n+5 → 15\n*2 → 30\n\nStart with an operator to use the last successful result automatically. A complete expression starts fresh; (-5) enters a standalone negative value after a result.\n\nans is optional for explicit references such as sqrt(ans), 100 / ans or ans to ft. ans = 5 sets it. Errors and cancellation keep the last result. Clear keeps it too.</string>
+    <string name="calculator_help_editing">KEYPAD / EDITING\n\n123: numbers, operators and =\nABC: letters and units\nFUNC: functions, constants and =\n\nTap the prompt to place the cursor or select text. Function keys, including sqrt, insert parentheses with the cursor inside. ⌫ deletes the selection or previous character. ↵ evaluates.\n\nclear — clear the transcript, keeping ans\nhelp — open this browser\nexit — close the calculator\nCancel stops a calculation without changing your input.</string>
     <string name="calculator_help_menu_choice">1 Menu</string>
     <string name="calculator_help_previous">2 Previous</string>
     <string name="calculator_help_next">3 Next</string>

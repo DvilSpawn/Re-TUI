@@ -404,6 +404,7 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
 
     private fun handleKeyboardShortcutIntent(request: Intent?): Boolean {
         if (request?.action != KeyboardShortcutManager.ACTION_RUN) return false
+        if (StartupMenuManager.isFirstInstallPending(this)) return true
         val mapping = KeyboardShortcutManager.resolve(
             this,
             request.getStringExtra(KeyboardShortcutManager.EXTRA_TOKEN),
@@ -458,7 +459,9 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
         if (playBootSound) LauncherSoundManager.playBoot(this)
 
         if (terminalState == null) `in`.`in`(Tuils.EMPTYSTRING)
-        if (!openStartupMenu || !StartupMenuManager.maybeOpen(this)) {
+        startupMenuRequested = (openStartupMenu || StartupMenuManager.isFirstInstallPending(this)) &&
+            StartupMenuManager.maybeOpen(this)
+        if (!startupMenuRequested) {
             if (terminalState == null || hasWindowFocus()) {
                 uiManager!!.activateTerminalInput(openKeyboardOnStart, preserveSelection = terminalState != null)
             }
@@ -603,6 +606,8 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
         )
     }
 
+    private var startupMenuRequested = false
+
     override fun onResume() {
         super.onResume()
         launcherResumed = true
@@ -610,6 +615,10 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
         setWallpaperInteractionEnabled(true)
         applyFullscreen(this)
         if (this@LauncherActivity.uiManager != null) {
+            if (StartupMenuManager.isFirstInstallPending(this)) {
+                if (!startupMenuRequested) startupMenuRequested = StartupMenuManager.maybeOpen(this)
+                return
+            }
             uiManager!!.resume()
             uiManager!!.activateTerminalInput(openKeyboardOnStart)
             val guideMessage = GuideManager.consumePendingResumeMessage(this)
@@ -636,6 +645,7 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
     }
 
     override fun onPause() {
+        startupMenuRequested = false
         launcherResumed = false
         breathOutRoot?.setActive(false)
         setWallpaperInteractionEnabled(false)
@@ -735,7 +745,7 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
         if (hasFocus) {
             applyFullscreen(this)
         }
-        if (hasFocus && this@LauncherActivity.uiManager != null) {
+        if (hasFocus && this@LauncherActivity.uiManager != null && !StartupMenuManager.isFirstInstallPending(this)) {
             uiManager!!.activateTerminalInput(openKeyboardOnStart)
             uiManager!!.scheduleTypefaceRefreshes()
         }

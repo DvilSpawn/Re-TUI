@@ -43,13 +43,24 @@ messages/definitions; launcher-owned messages still use Android localization.
 
 ## Boundary and cancellation
 
-Kotlin passes bounded standard UTF-8 bytes and two booleans (degrees and exact).
+Kotlin passes bounded standard UTF-8 bytes and booleans (degrees, exact and preview).
 JNI returns one status byte (error and approximation flags) followed by UTF-8 text; it does not expose upstream
 objects or pointers. C++ exceptions become Java exceptions; the service converts
 failures into its existing engine-stopped result. Qalculate error messages are
 returned as errors. All calls run on the service's single worker thread.
 
-`calculateAndPrint` runs synchronously without an internal threaded timeout.
+Preview packets append a NUL-delimited parsed-expression string; status 3 means
+the preview is deferred until Enter. Their reusable answer is always null.
+Preview input is limited to 256 UTF-8 bytes. Assignments/quoted expressions are
+deferred before evaluation; an AST whitelist admits only pure built-in math and
+already-evaluated variable values, excluding user functions, deferred variable
+expressions and save/load/export/random/loop functions. Preview powers must have
+a literal exponent within ±1000. Native parsing/evaluation uses a cooperative
+200ms control budget, not threaded cancellation. Ordinary evaluation keeps the
+original result format, function support and watchdog. Android messages are
+snapshotted before worker dispatch so recycled messages cannot lose preview mode.
+
+Committed `calculateAndPrint` calls run synchronously without an internal threaded timeout.
 The existing four-second Android watchdog bounds loading, evaluation and
 formatting; the client has its own eight-second bound. The watchdog terminates
 only the private calculator service process, which can be started again.

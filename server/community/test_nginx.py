@@ -46,19 +46,23 @@ class Quotas(unittest.TestCase):
                 probe.bind(('127.0.0.1', 0))
                 port = probe.getsockname()[1]
             source = (ROOT / 'nginx-community.conf').read_text()
+            shutil.copytree(ROOT / 'public', root / 'public')
             # Only substitute transport/filesystem paths; keep actual ingress policy.
             config = source.replace('listen 443 ssl;', f'listen 127.0.0.1:{port};')
+            config = config.replace('/var/log/nginx/retui-community-timing.log',str(root/'timing.log'))
             config = re.sub(r'^\s*ssl_.*;\n', '', config, flags=re.MULTILINE)
             config = config.replace('/etc/nginx/snippets/retui-community-proxy.conf', str(root / 'proxy.conf'))
+            config = config.replace('/opt/retui-community/public', str(root / 'public'))
             snippet = (ROOT / 'nginx-proxy.conf').read_text().replace('127.0.0.1:8095', f'127.0.0.1:{upstream.server_port}')
             (root / 'proxy.conf').write_text(snippet)
             (root / 'nginx.conf').write_text(
                 f'pid {root}/nginx.pid;\nerror_log {root}/error.log;\n'
-                f'events {{}}\nhttp {{ client_body_temp_path {root}/body;\n{config}\n}}\n')
+                f'events {{}}\nhttp {{ types {{ text/css css; application/javascript js; }} client_body_temp_path {root}/body;\n{config}\n}}\n')
             args = [nginx, '-p', str(root) + '/', '-c', str(root / 'nginx.conf')]
             process = None
             try:
-                subprocess.run(args + ['-t'], check=True, capture_output=True)
+                checked = subprocess.run(args + ['-t'], capture_output=True)
+                self.assertEqual(checked.returncode,0,checked.stderr.decode())
                 process = subprocess.Popen(args + ['-g', 'daemon off;'], stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
                 for _ in range(100):
                     try:
@@ -86,11 +90,23 @@ class Quotas(unittest.TestCase):
                 self.assertEqual([request('GET') for _ in range(40)], [401] * 40)
                 self.assertEqual([request('POST','/community/api/community/presence') for _ in range(22)],[401]*22,'presence must have its own posting quota')
                 self.assertEqual(request('GET','/community/api/community/users'),401)
+                for path in ('policy','report','account-delete','moderation/action'):
+                    self.assertEqual(request('POST','/community/api/community/'+path),401)
+                    self.assertEqual(request('GET','/community/api/community/'+path),404)
+                self.assertEqual(request('GET','/community/api/community/moderation'),401)
+                self.assertEqual(request('POST','/community/api/community/moderation'),404)
+                for page in ('rules','account-deletion','account-deletion.js','community.css'):
+                    self.assertEqual(request('GET','/community/'+page),200)
+                    self.assertEqual(request('POST','/community/'+page),404)
+                self.assertEqual(request('GET','/community/../pb_hooks/release-gates.pb.js'),404)
                 self.assertEqual(request('GET','/community/api/community/mentions'),401)
                 self.assertEqual(request('GET','/community/api/community/presence'),404)
                 self.assertEqual(request('POST','/community/api/community/users'),404)
                 self.assertEqual(request('POST','/community/api/community/mentions'),404)
                 self.assertEqual(request('GET','/community/api/collections/mentions/records'),404)
+                self.assertEqual(request('GET','/community/api/realtime'),401)
+                self.assertEqual(request('POST','/community/api/realtime'),401)
+                self.assertEqual(request('DELETE','/community/api/realtime'),404)
                 self.assertEqual([request('POST') for _ in range(6)], [401] * 6)
                 self.assertEqual(request('POST'), 429, 'posting quota must still be enforced')
                 self.assertEqual(request('GET'), 401, 'posts must not consume read quota')
@@ -103,6 +119,11 @@ class Quotas(unittest.TestCase):
                 self.assertEqual(request('GET', '/community/api/settings'), 404)
                 self.assertIn('zone=retui_reads:1m rate=240r/m;', source)
                 self.assertIn('zone=retui_posts:1m rate=20r/m;', source)
+                timing = (root/'timing.log').read_text()
+                self.assertIn('operation=messages method=GET',timing)
+                self.assertIn('operation=realtime',timing)
+                for private in ('127.0.0.1','/community/','123456789012345'):
+                    self.assertNotIn(private,timing)
             finally:
                 if process is not None:
                     process.terminate()

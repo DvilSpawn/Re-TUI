@@ -6,6 +6,7 @@ import android.text.style.ClickableSpan
 import android.view.View
 import android.widget.*
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.core.view.descendants
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.commands.CommandGroup
 import ohi.andre.consolelauncher.commands.CommandTuils
@@ -13,6 +14,7 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class OfflineHelpIntegrationTest {
+    @get:org.junit.Rule val readerPreferences = HelpReaderPreferencesRule()
     private val instrumentation = InstrumentationRegistry.getInstrumentation()
     private val context = instrumentation.targetContext
     private fun withHelp(id: String? = null, check: (OfflineHelpActivity) -> Unit) {
@@ -201,10 +203,10 @@ class OfflineHelpIntegrationTest {
                 if (index > 0 && index % 7 == 0) enter(9)
                 enter(index % 7 + 1)
                 assertTrue("Missing ${topic.id}", output.text.contains(renderedBody(activity.getString(topic.body))))
-                activity.onBackPressedDispatcher.onBackPressed()
+                enter(1)
                 assertTrue(output.text.contains(activity.getString(topic.title)))
             }
-            activity.onBackPressedDispatcher.onBackPressed()
+            enter(10)
             repeat(rootIndex / 7) { enter(8) }
         }
         assertEquals(before, configSnapshot())
@@ -254,10 +256,11 @@ class OfflineHelpIntegrationTest {
         val output = activity.findViewById<TextView>(R.id.offline_help_output)
         val input = activity.findViewById<EditText>(R.id.offline_help_input)
         val dock = activity.findViewById<GridLayout>(R.id.offline_help_keys)
-        assertEquals(12, dock.childCount)
+        val keys = dock.descendants.filterIsInstance<Button>().toList()
+        assertEquals(12, keys.size)
         assertEquals(listOf("1", "2", "3", "4", "5", "⌫", "6", "7", "8", "9", "0", "↵"),
-            (0 until dock.childCount).map { (dock.getChildAt(it) as TextView).text.toString() })
-        for (index in 0 until dock.childCount) assertEquals(ohi.andre.consolelauncher.tuils.Tuils.dpToPx(activity, 48), dock.getChildAt(index).height)
+            keys.map { it.text.toString() })
+        keys.forEach { assertEquals(ohi.andre.consolelauncher.tuils.Tuils.dpToPx(activity, 48), it.height) }
         dock.getChildAt(0).performClick(); assertEquals("1", input.text.toString())
         dock.getChildAt(5).performClick(); assertEquals("", input.text.toString())
         assertNull(input.background)
@@ -270,9 +273,9 @@ class OfflineHelpIntegrationTest {
         input.dispatchKeyEvent(android.view.KeyEvent(android.view.KeyEvent.ACTION_DOWN, android.view.KeyEvent.KEYCODE_ENTER))
         input.dispatchKeyEvent(android.view.KeyEvent(android.view.KeyEvent.ACTION_UP, android.view.KeyEvent.KEYCODE_ENTER))
         assertTrue(output.text.contains(renderedBody(context.getString(OfflineHelpCatalog.find("terminal-basics")!!.body))))
-        activity.onBackPressedDispatcher.onBackPressed()
+        input.setText("1"); activity.findViewById<View>(R.id.offline_help_enter).performClick()
         assertTrue(output.text.contains("Terminal basics"))
-        activity.onBackPressedDispatcher.onBackPressed()
+        input.setText("10"); activity.findViewById<View>(R.id.offline_help_enter).performClick()
         assertTrue(output.text.contains("Getting started"))
         activity.onBackPressedDispatcher.onBackPressed()
         assertTrue(activity.isFinishing)
@@ -286,7 +289,8 @@ class OfflineHelpIntegrationTest {
         try {
             instrumentation.runOnMainSync {
                 activity.findViewById<EditText>(R.id.offline_help_input).apply { setText("19"); setSelection(0, 1) }
-                activity.requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                if (activity.resources.configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE) activity.recreate()
+                else activity.requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
             }
             recreated = instrumentation.waitForMonitorWithTimeout(monitor, 10000) as? OfflineHelpActivity
             assertNotNull(recreated)
@@ -304,19 +308,20 @@ class OfflineHelpIntegrationTest {
                 instrumentation.uiAutomation.takeScreenshot().compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it)
             }
             instrumentation.runOnMainSync {
-                recreated!!.findViewById<EditText>(R.id.offline_help_input).apply { setSelection(length()); clearFocus() }
+                recreated!!.findViewById<EditText>(R.id.offline_help_input).setText("1")
+                recreated!!.findViewById<View>(R.id.offline_help_enter).performClick()
             }
-            instrumentation.sendKeyDownUpSync(android.view.KeyEvent.KEYCODE_BACK)
             instrumentation.waitForIdleSync()
             instrumentation.runOnMainSync {
                 val title = recreated!!.findViewById<TextView>(R.id.offline_help_output).text.lineSequence().first().toString()
-                assertEquals("Back reaches the category, not a matching phrase in the article", "Getting started", title)
+                assertEquals("Topics reaches the category, not a matching phrase in the article", "Getting started", title)
+                recreated!!.findViewById<EditText>(R.id.offline_help_input).setText("10")
+                recreated!!.findViewById<View>(R.id.offline_help_enter).performClick()
             }
-            instrumentation.sendKeyDownUpSync(android.view.KeyEvent.KEYCODE_BACK)
             instrumentation.waitForIdleSync()
             instrumentation.runOnMainSync {
                 val title = recreated!!.findViewById<TextView>(R.id.offline_help_output).text.lineSequence().first().toString()
-                assertEquals("Back reaches root navigation without a duplicate title", "1 Getting started", title)
+                assertEquals("Categories reaches root navigation without a duplicate title", "1 Getting started", title)
                 recreated!!.findViewById<EditText>(R.id.offline_help_input).setText("9")
                 recreated!!.findViewById<View>(R.id.offline_help_enter).performClick()
                 recreated!!.findViewById<EditText>(R.id.offline_help_input).apply { setText("78"); setSelection(1) }

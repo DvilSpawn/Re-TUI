@@ -11,6 +11,7 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class LiveThemeIntegrationTest {
+    @get:org.junit.Rule val readerPreferences = ohi.andre.consolelauncher.help.HelpReaderPreferencesRule()
     private val instrumentation = InstrumentationRegistry.getInstrumentation()
     @Test fun htmlFormatterColorsFollowTheCurrentTheme() {
         val context = instrumentation.targetContext

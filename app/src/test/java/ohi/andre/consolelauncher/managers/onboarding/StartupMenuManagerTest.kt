@@ -11,6 +11,11 @@ class StartupMenuManagerTest {
         assertEquals(true to 4, StartupMenuManager.borderValues(StartupMenuManager.BORDER_DASHED))
         assertEquals(true to 0, StartupMenuManager.borderValues(StartupMenuManager.BORDER_SOLID))
         assertEquals(false to 4, StartupMenuManager.borderValues(StartupMenuManager.BORDER_NONE))
+        assertEquals(true to 9, StartupMenuManager.borderValues(StartupMenuManager.BORDER_DASHED, 9))
+        assertEquals(true to 0, StartupMenuManager.borderValues(StartupMenuManager.BORDER_SOLID, 9))
+        assertEquals(false to 9, StartupMenuManager.borderValues(StartupMenuManager.BORDER_NONE, 9))
+        assertEquals(true to 1, StartupMenuManager.borderValues(StartupMenuManager.BORDER_DASHED, 0))
+        assertEquals(true to 24, StartupMenuManager.borderValues(StartupMenuManager.BORDER_DASHED, 99))
     }
 
     @Test

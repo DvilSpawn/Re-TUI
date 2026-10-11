@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- First-install walkthrough. Keep executable words and command examples unchanged. -->
+    <string name="startup_page_progress">"SETUP %1$d / 3"</string>
+    <string name="startup_welcome_title" formatted="false">"Welcome to Re:TUI"</string>
+    <string name="startup_welcome_body" formatted="false">"Your home screen, reimagined as a terminal. Launch apps, use everyday tools, and make a workspace that feels like yours. No terminal experience needed."</string>
+    <string name="startup_intro_launch_title" formatted="false">"01 / Type to launch"</string>
+    <string name="startup_intro_launch_body" formatted="false">"Tap the input line and start typing an app name. Choose the matching app from the suggestions to open it."</string>
+    <string name="startup_intro_chips_title" formatted="false">"02 / Let suggestions help"</string>
+    <string name="startup_intro_chips_body" formatted="false">"The chips above the input help you find apps, commands, and their options. Tap a chip to select it instead of typing every character."</string>
+    <string name="startup_intro_tools_title" formatted="false">"03 / More than an app launcher"</string>
+    <string name="startup_intro_tools_body" formatted="false">"Type a command, then press Enter:\n\ncalc → open the calculator\nhelp → read the offline manual\nsettings → customize your launcher\n\nYou can learn more as you go. These three are a good start."</string>
+    <string name="startup_intro_next" formatted="false">"Next, choose your setup. Your choices are saved as you go and applied only at the end."</string>
+    <string name="startup_configuration_description" formatted="false">"Start with Basic, or choose Advanced for individual feature controls. Nothing changes until you build your launcher on the final page."</string>
+    <string name="startup_border_preview" formatted="false">"This pane previews your border. Choose Dashed to adjust its width and gap."</string>
+    <string name="startup_border_stroke">"Stroke width: %1$s dp"</string>
+    <string name="startup_border_gap">"Gap between dashes: %1$s dp"</string>
+    <string name="startup_border_summary">" (stroke %1$s dp, gap %2$d dp)"</string>
+    <string name="startup_theme_snapshot_description" formatted="false">"Use colors from your current wallpaper. This applies the palette once; future wallpaper changes do not automatically replace it."</string>
+    <string name="startup_basic_description" formatted="false">"Basic keeps weather, unlock count, and double-tap lock on. Locking needs Android device-admin access on first use. Optional drawers, integrations, notifications, sounds, and visual effects stay off."</string>
+    <string name="startup_lock_requires_access" formatted="false">"Lock with a double tap. Android device-admin access is requested on first use."</string>
+    <string name="startup_access_note" formatted="false">"These switches choose features, not permissions. Notifications need Android access; Termux and Tasker need their own setup. You can grant access when you use them."</string>
+    <string name="startup_thanks_title" formatted="false">"Thanks for trying Re:TUI"</string>
+    <string name="startup_thanks_body" formatted="false">"Re:TUI is an independent project, built with care and a love for doing things differently. Thank you for giving this little terminal a place on your phone."</string>
+    <string name="startup_thanks_feedback" formatted="false">"Your feedback, bug reports, ideas, and support help shape what comes next. Welcome aboard. Let’s build your launcher."</string>
+    <string name="startup_your_setup" formatted="false">"Your setup, your way"</string>
+    <string name="startup_choices_reversible" formatted="false">"Every choice can be changed later in Settings. Go back now if you want to adjust anything."</string>
+    <string name="startup_selection_summary">"Setup: %1$s\nWallpaper colors: %2$s\nBorders: %3$s\nFeatures: %4$s\nEffects: %5$s"</string>
+    <string name="startup_continue" formatted="false">"Continue"</string>
+    <string name="startup_back" formatted="false">"Back"</string>
+    <string name="startup_required" formatted="false">"Complete this quick setup to start using Re:TUI. Your progress is saved."</string>
+    <string name="startup_build_button" formatted="false">"Build my launcher"</string>
+    <string name="startup_build_title" formatted="false">"Building your launcher"</string>
+    <string name="startup_build_description" formatted="false">"Your choices, written out as we prepare your home screen. This is a configuration illustration, not executable code."</string>
+    <string name="startup_build_apply" formatted="false">"> Applying your choices"</string>
+    <string name="startup_build_preview" formatted="false">"> Rehearsing setup — no launcher settings changed"</string>
+    <string name="startup_build_ready" formatted="false">"> Ready. Make yourself at home."</string>
+    <string name="startup_build_failed" formatted="false">"Setup could not finish. Your choices are saved. Please try again."</string>
+</resources>

@@ -13,6 +13,7 @@ import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.core.view.descendants
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.commands.tuixt.TuixtLayout
 import ohi.andre.consolelauncher.localization.LocalizedComponentActivity
@@ -42,6 +43,25 @@ class OfflineHelpActivity : LocalizedComponentActivity() {
     private lateinit var root: View
     private val reference by lazy { OfflineHelpReference.commands(this) }
     private val actions = mutableMapOf<String, () -> Unit>()
+    private val readerPrefs by lazy { getSharedPreferences("offline_help_reader", Context.MODE_PRIVATE) }
+    private var pendingScroll: Int? = null
+    private var renderGeneration = 0
+
+    private fun savedReader(): Bundle? = if (!readerPrefs.contains("page")) null else Bundle().apply {
+        putString("category", readerPrefs.getString("category", null)); putString("article", readerPrefs.getString("article", null))
+        for (key in listOf("page", "root_page", "start", "end", "scroll_y")) putInt(key, readerPrefs.getInt(key, 0))
+        putString("draft", readerPrefs.getString("draft", ""))
+    }
+    private fun persistReader() {
+        readerPrefs.edit().putString("category", category).putString("article", article)
+            .putInt("page", page).putInt("root_page", rootPage).putString("draft", input.text.toString())
+            .putInt("start", input.selectionStart).putInt("end", input.selectionEnd)
+            .putInt("scroll_y", pendingScroll ?: scroll.scrollY).apply()
+    }
+    private fun closeHelp(consumeChoice: Boolean = false) {
+        if (consumeChoice) input.setText("")
+        persistReader(); finish()
+    }
 
     override fun onCreate(state: Bundle?) {
         LauncherSystemUi.requestNoTitleIfFullscreen(this)
@@ -53,7 +73,7 @@ class OfflineHelpActivity : LocalizedComponentActivity() {
         root = layoutInflater.inflate(R.layout.offline_help_surface, host, false)
         val viewport = FrameLayout(this)
         host.addView(viewport, ViewGroup.LayoutParams(-1, -1))
-        windowPanel = HelpWindowPanel(viewport, root, state)
+        windowPanel = HelpWindowPanel(viewport, root, state, floatingInLandscape = false)
         input = root.findViewById(R.id.offline_help_input)
         output = root.findViewById(R.id.offline_help_output)
         scroll = root.findViewById(R.id.offline_help_scroll)
@@ -80,8 +100,9 @@ class OfflineHelpActivity : LocalizedComponentActivity() {
             } else false
         }
         val keys = root.findViewById<GridLayout>(R.id.offline_help_keys)
+        val bottomRow = BottomCornerRow(this)
         listOf("1", "2", "3", "4", "5", "⌫", "6", "7", "8", "9", "0", "↵").forEachIndexed { index, label ->
-            keys.addView(Button(this).apply {
+            val key = Button(this).apply {
                 text = label; minWidth = 0; minimumWidth = 0; minHeight = 0; minimumHeight = 0
                 setPadding(0, 0, 0, 0); setTextColor(textColor)
                 typeface = Tuils.getTypeface(this@OfflineHelpActivity)
@@ -99,27 +120,40 @@ class OfflineHelpActivity : LocalizedComponentActivity() {
                     }
                     input.requestFocus()
                 }
-            }, GridLayout.LayoutParams().apply {
+            }
+            if (index >= 6) bottomRow.addKey(key) else keys.addView(key, GridLayout.LayoutParams().apply {
                 width = 0; height = Tuils.dpToPx(this@OfflineHelpActivity, 48)
                 rowSpec = GridLayout.spec(index / 6)
                 columnSpec = GridLayout.spec(index % 6, 1f)
             })
         }
-        if (state != null) {
-            category = state.getString("category"); article = state.getString("article")
-            page = state.getInt("page"); rootPage = state.getInt("root_page")
+        keys.addView(bottomRow, GridLayout.LayoutParams().apply {
+            width = 0; height = Tuils.dpToPx(this@OfflineHelpActivity, 48)
+            rowSpec = GridLayout.spec(1)
+            columnSpec = GridLayout.spec(0, 6, 1f)
+        })
+        windowPanel.reserveBottomCorners(bottomRow)
+        val requestedTopic = intent.getStringExtra("topic")
+        val bookmark = savedReader()
+        val bookmarkedTopic = bookmark?.getString("article") ?: bookmark?.getString("category")
+        val readerState = state ?: if (requestedTopic.isNullOrEmpty() || requestedTopic == bookmarkedTopic) bookmark else null
+        if (readerState != null) {
+            category = readerState.getString("category")?.takeIf { id -> OfflineHelpCatalog.find(id)?.let { it.category == null } == true }
+            article = readerState.getString("article")?.takeIf { category != null && it in ids() }
+            page = readerState.getInt("page"); rootPage = readerState.getInt("root_page")
+            pendingScroll = readerState.getInt("scroll_y").coerceAtLeast(0)
         } else {
             val topic = OfflineHelpCatalog.find(intent.getStringExtra("topic").orEmpty())
             category = topic?.category ?: topic?.id
             article = topic?.takeIf { it.category != null }?.id
         }
         onBackPressedDispatcher.addCallback(this, object : androidx.activity.OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() = back()
+            override fun handleOnBackPressed() = closeHelp()
         })
-        render()
-        if (state != null) {
-            input.setText(state.getString("draft", ""))
-            input.setSelection(state.getInt("start").coerceIn(0, input.length()), state.getInt("end").coerceIn(0, input.length()))
+        render(preserveScroll = true)
+        if (readerState != null) {
+            input.setText(readerState.getString("draft", ""))
+            input.setSelection(readerState.getInt("start").coerceIn(0, input.length()), readerState.getInt("end").coerceIn(0, input.length()))
         }
         androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(screen) { view, insets ->
             val bars = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars() or androidx.core.view.WindowInsetsCompat.Type.displayCutout())
@@ -127,7 +161,6 @@ class OfflineHelpActivity : LocalizedComponentActivity() {
         }
         setContentView(screen)
         input.requestFocus()
-        if (state != null) scroll.post { scroll.scrollTo(0, state.getInt("scroll_y")) }
     }
     override fun onResume() {
         super.onResume()
@@ -146,11 +179,11 @@ class OfflineHelpActivity : LocalizedComponentActivity() {
             1.5f, ohi.andre.consolelauncher.managers.settings.AppearanceSettings.outputCornerRadius(),
             ohi.andre.consolelauncher.managers.settings.AppearanceSettings.dashedBorders(), target = ohi.andre.consolelauncher.tuils.FrameTarget.OVERLAYS)
         val keys = root.findViewById<GridLayout>(R.id.offline_help_keys)
-        for (index in 0 until keys.childCount) (keys.getChildAt(index) as Button).apply {
-            setTextColor(ThemeColorResolver.color(Theme.workspace_control_text_color))
-            typeface = Tuils.getTypeface(this@OfflineHelpActivity)
-            textSize = ohi.andre.consolelauncher.tuils.LauncherFontScale.terminalTextSizeSp()
-            background = null
+        keys.descendants.filterIsInstance<Button>().forEach { key ->
+            key.setTextColor(ThemeColorResolver.color(Theme.workspace_control_text_color))
+            key.typeface = Tuils.getTypeface(this@OfflineHelpActivity)
+            key.textSize = ohi.andre.consolelauncher.tuils.LauncherFontScale.terminalTextSizeSp()
+            key.background = null
         }
         root.findViewById<TextView>(R.id.offline_help_header).apply {
             includeFontPadding = false
@@ -182,14 +215,16 @@ class OfflineHelpActivity : LocalizedComponentActivity() {
         else { input.error = null; action() }
     }
     private fun render(preserveScroll: Boolean = false) {
-        val scrollY = if (preserveScroll) scroll.scrollY else 0
+        if (!preserveScroll) pendingScroll = null
+        val scrollY = if (preserveScroll) pendingScroll ?: scroll.scrollY else 0
+        val epoch = ++renderGeneration
         actions.clear()
         val text = SpannableStringBuilder()
         fun choice(number: Int, label: String, action: () -> Unit) {
             if (text.isNotEmpty()) text.append("\n")
             val start = text.length
             text.append("$number $label")
-            actions[number.toString()] = { action(); input.setText(""); render() }
+            actions[number.toString()] = { action(); if (!isFinishing) { input.setText(""); render() } }
             text.setSpan(object : ClickableSpan() {
                 override fun onClick(widget: View) { actions[number.toString()]?.invoke() }
                 override fun updateDrawState(ds: TextPaint) { ds.color = output.currentTextColor; ds.isUnderlineText = false }
@@ -206,7 +241,8 @@ class OfflineHelpActivity : LocalizedComponentActivity() {
             } }
             if (nav.previous) choice(8, getString(R.string.offline_help_previous_page)) { page-- }
             if (nav.next) choice(9, getString(R.string.offline_help_next_page)) { page++ }
-            choice(0, getString(R.string.offline_help_close)) { finish() }
+            if (category != null) choice(10, getString(R.string.offline_help_root)) { category = null; page = rootPage }
+            choice(0, getString(R.string.offline_help_close)) { closeHelp(consumeChoice = true) }
         } else {
             val body = if (current.startsWith("command:")) reference.firstOrNull { "command:${it.javaClass.simpleName}" == current }
                 ?.let { OfflineHelpReference.text(this, it) } ?: getString(R.string.offline_help_no_reference)
@@ -220,26 +256,21 @@ class OfflineHelpActivity : LocalizedComponentActivity() {
             choice(1, getString(R.string.offline_help_topics)) { article = null; page = index.coerceAtLeast(0) / 7 }
             if (index > 0) choice(2, getString(R.string.offline_help_previous)) { article = entries[index - 1] }
             if (index >= 0 && index < entries.lastIndex) choice(3, getString(R.string.offline_help_next)) { article = entries[index + 1] }
-            choice(0, getString(R.string.offline_help_close)) { finish() }
+            choice(0, getString(R.string.offline_help_close)) { closeHelp(consumeChoice = true) }
         }
         output.text = text
         output.movementMethod = LinkMovementMethod.getInstance()
-        scroll.post { scroll.scrollTo(0, scrollY) }
-    }
-    private fun back() {
-        when {
-            article != null -> { val index = ids().indexOf(article); article = null; page = index.coerceAtLeast(0) / 7 }
-            category != null -> { category = null; page = rootPage }
-            else -> { finish(); return }
+        androidx.core.view.OneShotPreDrawListener.add(output) {
+            if (epoch == renderGeneration) { scroll.scrollTo(0, scrollY); pendingScroll = null }
         }
-        input.setText(""); render()
     }
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putString("category", category); outState.putString("article", article)
         outState.putInt("page", page); outState.putInt("root_page", rootPage)
         outState.putString("draft", input.text.toString()); outState.putInt("start", input.selectionStart); outState.putInt("end", input.selectionEnd)
         windowPanel.save(outState)
-        outState.putInt("scroll_y", scroll.scrollY)
+        outState.putInt("scroll_y", pendingScroll ?: scroll.scrollY)
         super.onSaveInstanceState(outState)
     }
+    override fun onPause() { persistReader(); windowPanel.persist(); super.onPause() }
 }

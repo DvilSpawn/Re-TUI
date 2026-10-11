@@ -2,7 +2,7 @@ onRecordUpdateRequest((e) => {
     // Administrator edits cannot extend retention from the immutable request creation date.
     const original = e.record.original();
     e.record.setRaw("created", original.getRaw("created"));
-    for (const key of ["source_message_id","snapshot_body","snapshot_author_handle","source_reporter_id"]) e.record.set(key,original.get(key));
+    for (const key of ["source_message_id","snapshot_body","snapshot_author_handle","source_reporter_id","source_collection","source_author_id"]) e.record.set(key,original.get(key));
     e.record.set("expires_at", require(`${__hooks}/retention.js`).sixMonths(original.getString("created")));
     e.next();
 }, "reports", "moderator_requests");
@@ -34,7 +34,7 @@ onRecordValidate((e) => {
 onRecordsListRequest((e) => {
     if (!e.hasSuperuserAuth()) {
         if (!e.auth) throw new UnauthorizedError("Sign in required");
-        if (e.auth.collection().name !== "members" || !e.auth.getBool("active") || !e.auth.getBool("moderator")) throw new ForbiddenError("Moderator required");
+        require(`${__hooks}/release-gates.js`).moderator(e);
     }
     if (Number(e.requestInfo().query["perPage"]) > 50) throw new BadRequestError("perPage must be at most 50");
     e.next();

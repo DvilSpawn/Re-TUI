@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Re:TUI — delete community account</title><link rel="stylesheet" href="/community/community.css">
+<main><h1>Delete your Re:TUI community account</h1>
+<p>This works without installing Launcher. Enter your community username and current password. Credentials are sent over HTTPS only to this community service, not stored in this page.</p>
+<p>Deletion removes your account, authored General messages, discussions and replies. Replies by other people on your discussions are also removed. It cannot be undone. Launcher settings are unaffected.</p>
+<p>Private reports and moderation evidence retain their original six-calendar-month expiry. Private recovery snapshots use a seven-day rotation; expired copies are removed on the next hourly run. Restoring a snapshot must apply account deletions. No off-site recovery is configured.</p>
+<form id="deletion"><label>Community username<input name="username" required minlength="3" maxlength="24" pattern="[-_a-zA-Z0-9]{3,24}" autocomplete="username"></label>
+<label>Current password<input name="password" type="password" required maxlength="71" autocomplete="off"></label>
+<label><input name="confirm" type="checkbox" required> I understand this permanently deletes the account and its authored content.</label>
+<button type="submit">Delete community account</button></form>
+<p id="status" role="status" aria-live="polite"></p>
+<p>If you no longer have the password, request deletion verification through <a href="https://github.com/DvilSpawn/Re-TUI/issues">Re:TUI support</a>. Do not publish passwords or personal information in an issue. The operator will arrange private verification; a username alone is not proof of ownership. There is no automatic password recovery.</p>
+<p><a href="/community/rules">Community rules and retention</a></p></main>
+<script src="/community/account-deletion.js" defer></script></html>

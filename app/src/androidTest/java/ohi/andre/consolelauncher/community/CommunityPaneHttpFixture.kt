@@ -18,9 +18,11 @@ internal class CommunityPaneHttpFixture : AutoCloseable {
     val threads = CopyOnWriteArrayList<JSONObject>()
     val replies = CopyOnWriteArrayList<JSONObject>()
     val mentions = CopyOnWriteArrayList<JSONObject>()
+    val moderationRows = CopyOnWriteArrayList<JSONObject>()
     val failures = java.util.concurrent.ConcurrentHashMap<String, Int>()
     @Volatile var postGate: CountDownLatch? = null
     @Volatile var lookupGate: CountDownLatch? = null
+    @Volatile var readGate: CountDownLatch? = null
     private val socket = ServerSocket(0, 20, java.net.InetAddress.getByName("127.0.0.1"))
     private val clients = CopyOnWriteArrayList<Socket>()
     private val pool = Executors.newCachedThreadPool()
@@ -48,10 +50,22 @@ internal class CommunityPaneHttpFixture : AutoCloseable {
         val body = if (bytes.isEmpty()) JSONObject() else JSONObject(String(bytes, Charsets.UTF_8))
         val path = first[1].substringBefore('?'); val query = java.net.URLDecoder.decode(first[1], "UTF-8")
         requests.add(Request(path, first[0], query, body))
+        if (first[0] == "GET" && path.endsWith("messages/records")) readGate?.await(5, TimeUnit.SECONDS)
         val collection = when { path.contains("thread_replies") -> replies; path.contains("/threads/") -> threads; else -> messages }
         var code = failures[path] ?: 200
         val result = when {
             code != 200 -> JSONObject()
+            path.endsWith("/policy") -> JSONObject().put("version", CommunityClient.POLICY_VERSION)
+            path.endsWith("/account-delete") -> {
+                if (body.optString("password") != "fixture-secret") { code = 400; JSONObject() }
+                else JSONObject().put("deleted", true)
+            }
+            path.endsWith("/moderation/action") -> {
+                moderationRows.removeAll { it.optString("id") == body.optString("id") }
+                JSONObject().put("resolved", true).put("action", body.optString("action"))
+            }
+            path.endsWith("/moderation") -> JSONObject().put("page", 1).put("hasMore", false).put("items", JSONArray(moderationRows))
+            path.endsWith("/report") -> JSONObject().put("id", "report000000001")
             path.endsWith("/presence") -> JSONObject().put("online", body.optBoolean("active")).put("expires_at", CommunityHttpFixture.created(System.currentTimeMillis() + 90000))
             path.endsWith("/users") -> {
                 lookupGate?.await(5, TimeUnit.SECONDS)

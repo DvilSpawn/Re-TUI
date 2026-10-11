@@ -1,0 +1,12 @@
+[Unit]
+Description=Re:TUI uptime retention moderation and recovery checks
+After=network-online.target retui-community.service
+[Service]
+Type=oneshot
+UMask=0077
+ExecStart=/usr/bin/python3 /opt/retui-community/operations.py monitor
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/var/lib/retui-community

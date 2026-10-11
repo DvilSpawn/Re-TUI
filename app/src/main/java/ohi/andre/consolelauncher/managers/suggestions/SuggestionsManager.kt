@@ -209,20 +209,12 @@ class SuggestionsManager(
     }
 
     fun getSuggestionView(context: Context): TextView {
-        val textView = TextView(context)
+        val textView = SuggestionChipStyler.createView(context, spaces)
         textView.setOnClickListener(clickListener)
 
         textView.setFocusable(false)
         textView.setLongClickable(false)
         textView.setClickable(true)
-
-        textView.setTypeface(Tuils.getTypeface(context))
-        textView.setTextSize(XMLPrefsManager.getInt(Suggestions.suggestions_size).toFloat())
-
-        textView.setPadding(spaces[2], spaces[3], spaces[2], spaces[3])
-
-        textView.setLines(1)
-        textView.setMaxLines(1)
 
         return textView
     }

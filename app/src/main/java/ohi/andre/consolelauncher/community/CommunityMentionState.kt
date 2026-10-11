@@ -58,6 +58,6 @@ class CommunityMentionState(saved: JSONObject) {
         seen.retainAll(seenMetadata.map { it.optString("id") }.toSet())
         return true
     }
-    fun unread(channel: String): Int { expire(); return items.count { it.optString("channel") == channel && it.optString("id") !in seen } }
+    @JvmOverloads fun unread(channel: String, blocked: Set<String> = emptySet()): Int { expire(); return items.count { it.optString("channel") == channel && it.optString("id") !in seen && it.optString("author_handle") !in blocked } }
     fun toJson(): JSONObject { expire(); return JSONObject().put("items", JSONArray(items)).put("seen_metadata", JSONArray(seenMetadata)).put("seen", JSONArray(seen.toList())) }
 }

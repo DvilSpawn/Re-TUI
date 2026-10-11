@@ -12,7 +12,24 @@ import org.junit.Test
 import kotlin.math.roundToInt
 
 class FloatingWindowIntegrationTest {
+    @get:org.junit.Rule val readerPreferences = ohi.andre.consolelauncher.help.HelpReaderPreferencesRule()
+    @get:org.junit.Rule val windowPreferences = WindowPreferencesRule()
     private val instrumentation = InstrumentationRegistry.getInstrumentation()
+    private fun floatingActivity(type: Class<out android.app.Activity>): android.app.Activity {
+        var activity = instrumentation.startActivitySync(Intent(instrumentation.targetContext, type).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        if (activity.resources.configuration.orientation != android.content.res.Configuration.ORIENTATION_PORTRAIT) {
+            val monitor = instrumentation.addMonitor(type.name, null, false)
+            try {
+                instrumentation.runOnMainSync { activity.requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT }
+                activity = instrumentation.waitForMonitorWithTimeout(monitor, 5000) as android.app.Activity
+            } finally { instrumentation.removeMonitor(monitor) }
+        }
+        instrumentation.waitForIdleSync()
+        val prefix = if (type == CalculatorActivity::class.java) "calculator" else "help"
+        instrumentation.runOnMainSync { activity.window.decorView.findViewWithTag<View>("$prefix-window-toggle").performClick() }
+        instrumentation.waitForIdleSync()
+        return activity
+    }
     private fun drag(view: View, dx: Float, dy: Float) {
         val now = android.os.SystemClock.uptimeMillis()
         listOf(MotionEvent.obtain(now, now, MotionEvent.ACTION_DOWN, 10f, 10f, 0),
@@ -48,6 +65,14 @@ class FloatingWindowIntegrationTest {
             android.os.SystemClock.sleep(400)
             assertEquals("Rendered orientation", orientation == android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE,
                 activity.window.decorView.width > activity.window.decorView.height)
+            if (orientation == android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
+                assertEquals(View.GONE, activity.window.decorView.findViewWithTag<View>("help-window-toggle").visibility)
+                assertEquals(View.GONE, activity.window.decorView.findViewWithTag<View>("help-window-reset").visibility)
+                assertEquals(View.GONE, activity.window.decorView.findViewWithTag<View>("help-resize-corner").visibility)
+                return
+            }
+            instrumentation.runOnMainSync { activity.window.decorView.findViewWithTag<View>("help-window-toggle").performClick() }
+            instrumentation.waitForIdleSync()
             val title = activity.findViewById<View>(R.id.offline_help_header)
             val reset = activity.window.decorView.findViewWithTag<View>("help-window-reset")
             val toggle = activity.window.decorView.findViewWithTag<View>("help-window-toggle")
@@ -127,8 +152,7 @@ class FloatingWindowIntegrationTest {
         }
     }
     @Test fun eachCornerResizesBothAxesAndKeepsOppositeCornerAnchored() {
-        val activity = instrumentation.startActivitySync(Intent(instrumentation.targetContext, OfflineHelpActivity::class.java)
-            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) as OfflineHelpActivity
+        val activity = floatingActivity(OfflineHelpActivity::class.java)
         try {
             instrumentation.waitForIdleSync()
             listOf("top-left", "top-right", "bottom-left", "corner").forEach { corner ->
@@ -160,8 +184,7 @@ class FloatingWindowIntegrationTest {
         } finally { instrumentation.runOnMainSync { activity.finish() } }
     }
     @Test fun calculatorHasSymmetricOuterInsetAndModalTranslucentBackdrop() {
-        val activity = instrumentation.startActivitySync(Intent(instrumentation.targetContext, CalculatorActivity::class.java)
-            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) as CalculatorActivity
+        val activity = floatingActivity(CalculatorActivity::class.java)
         try {
             instrumentation.waitForIdleSync()
             instrumentation.runOnMainSync {

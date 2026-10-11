@@ -54,6 +54,12 @@ class BackupManagerTest {
     }
 
     @Test
+    fun personalBackupKeepsStartupCompletionButNotPreviewDrafts() {
+        assertTrue(BackupManager.personalSharedPreferenceNames().contains("retui_startup"))
+        assertFalse(BackupManager.personalSharedPreferenceNames().contains("retui_startup_preview"))
+    }
+
+    @Test
     fun acceptsExactWrittenBackup() {
         BackupManager.verifyExport(byteArrayOf(1, 2, 3), ByteArrayInputStream(byteArrayOf(1, 2, 3)))
     }

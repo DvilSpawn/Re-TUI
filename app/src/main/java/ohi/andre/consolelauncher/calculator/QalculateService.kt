@@ -26,11 +26,11 @@ class QalculateService : Service() {
 
     override fun onBind(intent: Intent): IBinder = messenger.binder
 
-    private fun reply(target: Messenger, text: String, error: Boolean, approximate: Boolean = false, reusable: String? = null, failure: String? = null) {
+    private fun reply(target: Messenger, text: String, error: Boolean, approximate: Boolean = false, reusable: String? = null, failure: String? = null, parsed: String? = null) {
         try {
             target.send(Message.obtain(null, 1).apply {
                 data = Bundle().apply { putString("text", text); putBoolean("error", error)
-                    putBoolean("approximate", approximate); putString("reusable", reusable); putString("failure", failure) }
+                    putBoolean("approximate", approximate); putString("reusable", reusable); putString("failure", failure); putString("parsed", parsed) }
             })
         } catch (_: RemoteException) { /* The requesting activity or launcher has gone away. */ }
     }
@@ -46,6 +46,7 @@ class QalculateService : Service() {
         activeId = request.data.getString("id"); activeTarget = target
         val degrees = request.data.getBoolean("degrees")
         val exact = request.data.getBoolean("exact")
+        val preview = request.data.getBoolean("preview") // Messages are recycled after the handler returns.
         // Android has no pthread cancellation. The deadline kills only this service process.
         val watchdog = Runnable {
             reply(target, getString(R.string.calculator_timeout), true, failure = "timeout")
@@ -56,7 +57,7 @@ class QalculateService : Service() {
             val result = try {
                 val privateHome = File(filesDir, "qalculate").apply { mkdirs() }
                 Os.setenv("HOME", privateHome.absolutePath, true)
-                NativeQalculate.calculate(input, degrees, exact)
+                NativeQalculate.calculate(input, degrees, exact, preview)
             } catch (_: Exception) {
                 CalculatorEngine.Result(getString(R.string.calculator_engine_stopped), true)
             } catch (_: LinkageError) {
@@ -73,7 +74,7 @@ class QalculateService : Service() {
                     "syntax" -> getString(R.string.calculator_invalid) + "\n" + result.text
                     else -> result.text
                 }
-                reply(target, message, result.error, result.approximate, result.reusable, result.failure)
+                reply(target, message, result.error, result.approximate, result.reusable, result.failure, result.parsed)
             }
         }
     }

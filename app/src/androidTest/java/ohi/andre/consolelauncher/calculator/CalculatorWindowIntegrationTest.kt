@@ -21,6 +21,8 @@ import kotlin.math.roundToInt
 
 /** Screen-coordinate acceptance; compile before deployment, run only on an authorized target. */
 class CalculatorWindowIntegrationTest {
+    @get:org.junit.Rule val readerPreferences = ohi.andre.consolelauncher.help.HelpReaderPreferencesRule()
+    @get:org.junit.Rule val windowPreferences = ohi.andre.consolelauncher.help.WindowPreferencesRule()
     private val instrumentation = InstrumentationRegistry.getInstrumentation()
     private val corners = listOf("top-left", "top-right", "bottom-left", "corner")
     private fun idle() { instrumentation.waitForIdleSync(); SystemClock.sleep(200) }
@@ -50,7 +52,7 @@ class CalculatorWindowIntegrationTest {
         val title = activity.findViewById<View>(if (prefix == "calculator") R.id.calculator_main_tab else R.id.offline_help_header)
         val reset = target(activity, "$prefix-window-reset")
         val toggle = target(activity, "$prefix-window-toggle")
-        val actions = if (prefix == "calculator") listOf(activity.findViewById<View>(R.id.calculator_help_tab), toggle, reset) else listOf(toggle, reset)
+        val actions = (if (prefix == "calculator") listOf(activity.findViewById<View>(R.id.calculator_help_tab), toggle, reset) else listOf(toggle, reset)).filter { it.visibility == View.VISIBLE }
         val row = (title.parent as View).parent as View
         val group = reset.parent as View
         assertEquals("Dedicated action group", "$prefix-header-actions", group.tag)
@@ -102,7 +104,22 @@ class CalculatorWindowIntegrationTest {
                 idle()
             }
             checkHeader(activity, prefix, "initial-${if (narrow) "narrow" else "full"}")
-            val initial = geometry(panel)
+            var initial = geometry(panel)
+            if (orientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
+                assertEquals(listOf(0, 0, host.width, host.height), initial)
+                assertEquals(View.GONE, toggle.visibility)
+                assertEquals(View.GONE, reset.visibility)
+                corners.forEach { assertEquals(View.GONE, target(activity, "$prefix-resize-$it").visibility) }
+                monitor = instrumentation.addMonitor(className.name, null, false)
+                instrumentation.runOnMainSync { activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT }
+                activity = instrumentation.waitForMonitorWithTimeout(monitor, 5000) as Activity
+                idle()
+                assertEquals("First launch remains expanded in portrait", View.GONE, target(activity, "$prefix-resize-corner").visibility)
+                assertEquals(View.VISIBLE, target(activity, "$prefix-window-toggle").visibility)
+                return
+            }
+            gesture(toggle)
+            initial = geometry(panel)
             assertEquals(listOf((host.width * .05f).roundToInt(), (host.height * .05f).roundToInt(),
                 (host.width * .9f).roundToInt(), (host.height * .9f).roundToInt()), initial)
             val actions = listOf(toggle, reset) + if (prefix == "calculator") listOf(activity.findViewById<View>(R.id.calculator_help_tab)) else emptyList()
@@ -186,6 +203,7 @@ class CalculatorWindowIntegrationTest {
         val monitor = instrumentation.addMonitor(OfflineHelpActivity::class.java.name, null, false)
         try {
             idle()
+            gesture(target(calculator, "calculator-window-toggle"))
             gesture(target(calculator, "calculator-resize-corner"), 10f, 10f)
             val retained = geometry(target(calculator, "calculator-resize-corner").parent as View)
             val input = calculator.findViewById<EditText>(R.id.calculator_expression)
@@ -195,6 +213,7 @@ class CalculatorWindowIntegrationTest {
             val reader = instrumentation.waitForMonitorWithTimeout(monitor, 5000) as Activity
             help = reader
             idle()
+            gesture(target(reader, "help-window-toggle"))
             val initialHelp = geometry(target(reader, "help-resize-corner").parent as View)
             gesture(target(reader, "help-window-toggle"))
             gesture(target(reader, "help-window-reset"))
@@ -216,4 +235,38 @@ class CalculatorWindowIntegrationTest {
     @Test fun helpLandscapeScreenTargetsAndGeometry() = check(OfflineHelpActivity::class.java, "help", ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
     @Test fun narrowCalculatorLandscapeKeepsActionsOutsideCorners() = check(CalculatorActivity::class.java, "calculator", ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE, narrow = true)
     @Test fun narrowHelpLandscapeKeepsActionsOutsideCorners() = check(OfflineHelpActivity::class.java, "help", ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE, narrow = true)
+
+    @Test fun shrinkingCalculatorStopsBeforeKeypadNeedsScrolling() {
+        var activity = instrumentation.startActivitySync(Intent(instrumentation.targetContext, CalculatorActivity::class.java)
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) as CalculatorActivity
+        val monitor = instrumentation.addMonitor(CalculatorActivity::class.java.name, null, false)
+        try {
+            if (activity.resources.configuration.orientation != android.content.res.Configuration.ORIENTATION_PORTRAIT) {
+                instrumentation.runOnMainSync { activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT }
+                activity = instrumentation.waitForMonitorWithTimeout(monitor, 5000) as CalculatorActivity
+            }
+            idle()
+            gesture(target(activity, "calculator-window-toggle"))
+            instrumentation.runOnMainSync {
+                val controller = activity.javaClass.getDeclaredField("windowPanel").apply { isAccessible = true }.get(activity)
+                controller.javaClass.getDeclaredMethod("resize", String::class.java, Int::class.javaPrimitiveType, Int::class.javaPrimitiveType)
+                    .apply { isAccessible = true }.invoke(controller, "corner", -10000, -10000)
+            }
+            idle()
+            for (tab in listOf(R.id.calculator_numbers_tab, R.id.calculator_letters_tab, R.id.calculator_functions_tab)) {
+                instrumentation.runOnMainSync { activity.findViewById<View>(tab).performClick() }
+                idle()
+                instrumentation.runOnMainSync {
+                    val scroll = activity.findViewById<android.widget.ScrollView>(R.id.calculator_keypad_scroll)
+                    assertTrue("Minimum height fits all keypad rows", scroll.height >= scroll.getChildAt(0).height)
+                    val bottom = target(activity, "calculator-bottom-dock") as android.widget.HorizontalScrollView
+                    assertTrue("Minimum width fits the bottom keys", bottom.width >= bottom.getChildAt(0).width)
+                    assertTrue("Input retains useful room", activity.findViewById<View>(R.id.calculator_main_pane).height >= Tuils.dpToPx(activity, 120))
+                }
+            }
+        } finally {
+            instrumentation.removeMonitor(monitor)
+            instrumentation.runOnMainSync { activity.finish() }
+        }
+    }
 }

@@ -17,8 +17,11 @@ class CalculatorKeypadScrollView(context: Context, attrs: AttributeSet?) : Scrol
         val prompt = input.parent as View
         prompt.measure(MeasureSpec.makeMeasureSpec((measuredWidth - pane.paddingLeft - pane.paddingRight).coerceAtLeast(0),
             MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED))
+        val preview = pane.findViewById<View>(R.id.calculator_preview)
+        preview.measure(MeasureSpec.makeMeasureSpec((measuredWidth - pane.paddingLeft - pane.paddingRight).coerceAtLeast(0),
+            MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED))
         val available = MeasureSpec.getSize(heightMeasureSpec)
-        val promptHeight = prompt.measuredHeight + pane.paddingTop + pane.paddingBottom
+        val promptHeight = prompt.measuredHeight + preview.measuredHeight + pane.paddingTop + pane.paddingBottom
         val tallestKey = (Tuils.dpToPx(context, 48) * 5 + 3) / 4
         val terminalHeight = minOf(maxOf(Tuils.dpToPx(context, 120) + pane.paddingTop + pane.paddingBottom, promptHeight),
             maxOf(promptHeight, available - tallestKey))

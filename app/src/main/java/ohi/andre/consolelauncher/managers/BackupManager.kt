@@ -92,6 +92,7 @@ object BackupManager {
         RetuiCreditManager.PREFS,
         SpaceManager.PREFS,
         GuideManager.PREFS,
+        ohi.andre.consolelauncher.managers.onboarding.StartupMenuManager.PREFS,
         PodcastManager.PREFS,
         "tasker_integration",
         "retui_wallpaper",

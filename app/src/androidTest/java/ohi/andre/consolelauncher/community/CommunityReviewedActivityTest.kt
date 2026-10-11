@@ -15,6 +15,7 @@ import ohi.andre.consolelauncher.R
 
 /** Destructive private-store fixture: disposable emulator only. */
 class CommunityReviewedActivityTest {
+    @get:org.junit.Rule val windowPreferences = ohi.andre.consolelauncher.help.WindowPreferencesRule()
     private val instrumentation = InstrumentationRegistry.getInstrumentation()
     private val context = instrumentation.targetContext
     private fun state(activity: CommunityActivity) = activity.javaClass.getDeclaredField("state").apply { isAccessible = true }.get(activity) as CommunityState
@@ -28,7 +29,7 @@ class CommunityReviewedActivityTest {
         while (System.nanoTime() < deadline) { instrumentation.waitForIdleSync(); if (condition()) return; Thread.sleep(40) }
         fail("Community review fixture did not settle")
     }
-    private fun signedIn() = CommunityState().apply { signIn(CommunityClient.Account("member000000001", "alice", "fixture-token")) }
+    private fun signedIn() = CommunityState().apply { signIn(CommunityClient.Account("member000000001", "alice", "fixture-token", policyVersion = CommunityClient.POLICY_VERSION)) }
     private fun root(channel: String = "help") = JSONObject().put("id", "thread000000001").put("channel", channel)
         .put("title", "fixture root").put("body", "root body").put("author_handle", "bob").put("created", CommunityHttpFixture.created())
     private fun run(fixture: CommunityPaneHttpFixture, seed: CommunityState, test: (CommunityActivity) -> Unit) {
@@ -50,12 +51,14 @@ class CommunityReviewedActivityTest {
                 val panel = root.parent as android.view.ViewGroup
                 val host = panel.parent as android.widget.FrameLayout
                 fun px(dp: Int) = ohi.andre.consolelauncher.tuils.Tuils.dpToPx(activity, dp)
-                fun bounds(view: View) = android.graphics.Rect(0, 0, view.width, view.height).also {
-                    panel.offsetDescendantRectToMyCoords(view, it)
+                fun bounds(view: View) = android.graphics.Rect().also {
+                    // Scrolled-out channel buttons cannot steal a visible corner's touch target.
+                    if (view.getLocalVisibleRect(it)) panel.offsetDescendantRectToMyCoords(view, it) else it.setEmpty()
                 }
                 fun descendants(view: View): List<View> = listOf(view) + if (view is android.view.ViewGroup)
                     (0 until view.childCount).flatMap { descendants(view.getChildAt(it)) } else emptyList()
                 val toggle = panel.findViewWithTag<View>("community-window-toggle")
+                toggle.performClick()
                 for (maximized in listOf(false, true)) {
                     if (maximized) toggle.performClick()
                     for ((width, height) in listOf(360 to 640, 640 to 360, 320 to 360)) {
@@ -124,14 +127,17 @@ class CommunityReviewedActivityTest {
         val uuid = seed.pane.pendingId
         run(fixture, seed) { activity ->
             instrumentation.runOnMainSync { call(activity, "retryForum") }
-            await { !busy(activity) && state(activity).pane.thread == "thread000000001" }
+            await { !busy(activity) && state(activity).pane.thread == "thread000000001" && state(activity).pane.pendingId == null }
             instrumentation.runOnMainSync {
                 val s = state(activity)
                 assertEquals("help", s.pane.channel); assertEquals("reply:thread000000001", s.pane.context)
-                assertEquals(uuid, s.pane.pendingId); assertEquals("immutable body", s.pane.pending.getString("body"))
+                assertNull(s.pane.pendingId)
                 assertEquals("newer reply draft", activity.findViewById<EditText>(R.id.community_input).text.toString()); assertEquals("general draft", s.draft)
             }
             assertFalse(fixture.requests.any { it.method == "POST" && it.path.endsWith("messages/records") })
+            assertEquals(1, fixture.replies.size)
+            assertEquals(uuid, fixture.replies.single().getString("client_id"))
+            assertEquals("immutable body", fixture.replies.single().getString("body"))
         }
     }
     @Test fun latestBeyondFiftyRepliesReplacesOldViewAndFollowingPollDoesNotJump() {
@@ -144,6 +150,7 @@ class CommunityReviewedActivityTest {
             instrumentation.runOnMainSync { call(activity, "refreshForum", false, true) }
             await { !busy(activity) && state(activity).pane.replies.lastOrNull()?.getString("id") == "r00000000000250" }
             assertEquals("r00000000000201", state(activity).pane.replies.first().getString("id"))
+            await { activity.javaClass.getDeclaredField("restoringViewport").apply { isAccessible = true }.get(activity) == false }
             val next = JSONObject(fixture.replies.last().toString()).put("id", "r00000000000251").put("body", "reply 251"); fixture.replies.add(next)
             var y = 0
             instrumentation.runOnMainSync { val scroll = activity.findViewById<ScrollView>(R.id.community_scroll); scroll.scrollTo(0, 40); y = scroll.scrollY; call(activity, "refreshForum", false, false) }
@@ -168,7 +175,7 @@ class CommunityReviewedActivityTest {
             assertEquals(50, state(activity).mentions.unread("help")); assertEquals(100, state(activity).mentions.items.size)
         }
     }
-    @Test fun failedParentAndOffscreenReplyRemainUnreadUntilViewportDisplaysTheSource() {
+    @Test fun failedParentKeepsMentionUnreadAndOpeningSourceDisplaysIt() {
         assumeTrue(Build.MODEL.startsWith("sdk_gphone"))
         val fixture = CommunityPaneHttpFixture(); val thread = root().put("body", (1..60).joinToString("\n") { "root line $it" }); fixture.threads.add(thread)
         val reply = JSONObject().put("id", "reply0000000001").put("thread", thread.getString("id")).put("body", "peer @alice")
@@ -183,8 +190,33 @@ class CommunityReviewedActivityTest {
             fixture.failures.clear()
             instrumentation.runOnMainSync { call(activity, "openMention", mention) }
             await { !busy(activity) && activity.findViewById<TextView>(R.id.community_output).text.contains("peer @alice") }
+            await { state(activity).mentions.unread("help") == 0 }
+        }
+    }
+    @Test fun offscreenReplyMentionStaysUnreadUntilItsBodyIsVisible() {
+        val fixture = CommunityPaneHttpFixture()
+        val thread = root().put("body", (1..100).joinToString("\n") { "root line $it" }); fixture.threads.add(thread)
+        val reply = JSONObject().put("id", "reply0000000001").put("thread", thread.getString("id")).put("body", "peer @alice")
+            .put("author_handle", "bob").put("created", thread.getString("created")); fixture.replies.add(reply)
+        val mention = JSONObject().put("id", "mention00000001").put("kind", "thread_reply").put("source_id", reply.getString("id")).put("channel", "help")
+        fixture.mentions.add(mention)
+        run(fixture, signedIn().apply {
+            mentions.replace(listOf(mention)); pane.channel = "help"; pane.thread = thread.getString("id")
+            pane.replyHistory = true; pane.replyFollowing = false; pane.replyAnchor = thread.getString("id")
+        }) { activity ->
+            await { !busy(activity) && activity.findViewById<TextView>(R.id.community_output).text.contains("peer @alice") }
             instrumentation.runOnMainSync { call(activity, "markDisplayed") }
             assertEquals(1, state(activity).mentions.unread("help"))
+            instrumentation.runOnMainSync {
+                val output = activity.findViewById<TextView>(R.id.community_output)
+                val scroll = activity.findViewById<ScrollView>(R.id.community_scroll)
+                @Suppress("UNCHECKED_CAST")
+                val range = (activity.javaClass.getDeclaredField("displayed").apply { isAccessible = true }.get(activity) as Map<String, IntRange>).getValue(reply.getString("id"))
+                val bottom = output.top + output.layout.getLineBottom(output.layout.getLineForOffset(range.last))
+                scroll.scrollTo(0, bottom - scroll.height - ohi.andre.consolelauncher.tuils.Tuils.dpToPx(activity, 8))
+                call(activity, "markDisplayed")
+                assertEquals("A reply partially below the viewport must stay unread", 1, state(activity).mentions.unread("help"))
+            }
             instrumentation.runOnMainSync { activity.findViewById<ScrollView>(R.id.community_scroll).fullScroll(View.FOCUS_DOWN) }
             await { state(activity).mentions.unread("help") == 0 }
         }

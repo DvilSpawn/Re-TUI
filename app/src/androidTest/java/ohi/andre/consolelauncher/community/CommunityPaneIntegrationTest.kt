@@ -24,7 +24,7 @@ class CommunityPaneIntegrationTest {
         CommunityActivity.debugBackend = fixture.url
         CommunityStore(context).clear()
         CommunityStore(context).save(CommunityState().apply {
-            signIn(CommunityClient.Account("member000000001", "alice", "fixture-token")); pane.channel = "bugs"
+            signIn(CommunityClient.Account("member000000001", "alice", "fixture-token", policyVersion = CommunityClient.POLICY_VERSION)); pane.channel = "bugs"
         }.toJson())
         return instrumentation.startActivitySync(Intent(context, CommunityActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) as CommunityActivity
     }
@@ -40,7 +40,8 @@ class CommunityPaneIntegrationTest {
             await { !busy(activity) }
             instrumentation.runOnMainSync { view(activity, "community_new_thread").performClick() }
             instrumentation.runOnMainSync {
-                activity.findViewById<EditText>(ohi.andre.consolelauncher.R.id.community_thread_title).setText("literal title")
+                (view(activity, "community_input") as EditText).setText("literal title")
+                view(activity, "community_submit").performClick()
                 (view(activity, "community_input") as EditText).setText("exit; settings")
                 view(activity, "community_submit").performClick()
             }
@@ -65,13 +66,16 @@ class CommunityPaneIntegrationTest {
             await { !busy(activity) }
             instrumentation.runOnMainSync {
                 view(activity, "community_new_thread").performClick()
-                activity.findViewById<EditText>(ohi.andre.consolelauncher.R.id.community_thread_title).setText("original title")
+                (view(activity, "community_input") as EditText).setText("original title")
+                view(activity, "community_submit").performClick()
                 (view(activity, "community_input") as EditText).setText("original body")
                 view(activity, "community_submit").performClick()
             }
             await { fixture.threads.size == 1 }
             instrumentation.runOnMainSync {
-                activity.findViewById<EditText>(ohi.andre.consolelauncher.R.id.community_thread_title).setText("new title")
+                view(activity, "community_back").performClick()
+                (view(activity, "community_input") as EditText).setText("new title")
+                view(activity, "community_submit").performClick()
                 (view(activity, "community_input") as EditText).setText("new body")
             }
             val uuid = CommunityPaneState(CommunityStore(context).load().getJSONObject("pane")).pendingId
@@ -96,6 +100,7 @@ class CommunityPaneIntegrationTest {
             instrumentation.runOnMainSync {
                 view(activity, "community_new_thread").performClick()
                 val input = view(activity, "community_input") as EditText
+                input.setText("title"); view(activity, "community_submit").performClick()
                 input.setText("hi @al rest"); input.setSelection(6)
             }
             await { view(activity, "community_complete_alice") != null }
@@ -103,7 +108,6 @@ class CommunityPaneIntegrationTest {
                 view(activity, "community_complete_alice").performClick()
                 val input = view(activity, "community_input") as EditText
                 assertEquals("hi @alice rest", input.text.toString()); assertEquals(9, input.selectionStart)
-                activity.findViewById<EditText>(ohi.andre.consolelauncher.R.id.community_thread_title).setText("title")
                 fixture.postGate = gate; view(activity, "community_submit").performClick()
             }
             await { busy(activity) && fixture.threads.size == 1 }

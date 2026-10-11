@@ -21,7 +21,7 @@ class CommunityState @JvmOverloads constructor(saved: JSONObject = JSONObject(),
         return pendingId!!
     }
     var account: CommunityClient.Account? = saved.optJSONObject("account")?.let {
-        CommunityClient.Account(it.getString("id"), it.getString("handle"), it.getString("token"))
+        CommunityClient.Account(it.getString("id"), it.getString("handle"), it.getString("token"), it.optBoolean("moderator"), it.optString("policy_version"))
     }
         private set
     val blocked = strings(saved, "blocked").toMutableSet()
@@ -33,14 +33,15 @@ class CommunityState @JvmOverloads constructor(saved: JSONObject = JSONObject(),
         if (account?.id != next.id) clear()
         account = next
     }
-    fun clear() { pane = CommunityPaneState(JSONObject()); mentions = CommunityMentionState(JSONObject()); account = null; draft = ""; pendingId = null; pendingBody = ""; messages = emptyList(); readingHistory = false; newestObserved = null; arrivals = emptyList(); blocked.clear(); seen.clear() }
+    fun clear() { pane = CommunityPaneState(JSONObject()); mentions = CommunityMentionState(JSONObject()); account = null; draft = ""; pendingId = null; pendingBody = ""; messages = emptyList(); readingHistory = false; following = true; viewAnchor = ""; viewOffset = 0; newestObserved = null; arrivals = emptyList(); blocked.clear(); seen.clear() }
     fun toJson(): JSONObject {
         expire()
         return JSONObject().put("pane", pane.toJson()).put("mentions", mentions.toJson()).put("draft", draft).put("pending_id", pendingId ?: "").put("pending_body", pendingBody)
-        .put("account", account?.let { JSONObject().put("id", it.id).put("handle", it.handle).put("token", it.token) })
+        .put("account", account?.let { JSONObject().put("id", it.id).put("handle", it.handle).put("token", it.token).put("moderator", it.moderator).put("policy_version", it.policyVersion) })
         .put("blocked", org.json.JSONArray(blocked.toList())).put("seen", org.json.JSONArray(seen.toList()))
         .put("messages", org.json.JSONArray(messages)).put("reading_history", readingHistory)
         .put("newest_observed", newestObserved).put("arrivals", org.json.JSONArray(arrivals))
+        .put("following", following).put("view_anchor", viewAnchor).put("view_offset", viewOffset)
     }
 
     var messages: List<JSONObject> = saved.optJSONArray("messages")?.let { array ->
@@ -48,6 +49,10 @@ class CommunityState @JvmOverloads constructor(saved: JSONObject = JSONObject(),
     } ?: emptyList()
         private set
     private var readingHistory = saved.optBoolean("reading_history")
+    val readingOlder: Boolean get() = readingHistory
+    var following = saved.optBoolean("following", !readingHistory)
+    var viewAnchor = saved.optString("view_anchor")
+    var viewOffset = saved.optInt("view_offset").coerceIn(-10000, 10000)
     private var newestObserved = saved.optJSONObject("newest_observed") ?: messages.lastOrNull()?.let {
         JSONObject().put("id", it.optString("id")).put("created", it.optString("created"))
     }
@@ -72,6 +77,7 @@ class CommunityState @JvmOverloads constructor(saved: JSONObject = JSONObject(),
         val changed = retained.size != messages.size || retainedArrivals.size != arrivals.size || cursor !== newestObserved
         seen.removeAll(messages.filterNot { it in retained }.map { it.getString("id") }.toSet())
         messages = retained; arrivals = retainedArrivals; newestObserved = cursor
+        if (messages.none { it.optString("id") == viewAnchor }) { viewAnchor = ""; viewOffset = 0 }
         return changed
     }
     fun expiryDelay(): Long {
@@ -100,8 +106,12 @@ class CommunityState @JvmOverloads constructor(saved: JSONObject = JSONObject(),
                 newestObserved = JSONObject().put("id", record.getString("id")).put("created", record.getString("created"))
         }
     }
+    fun observeRealtime(record: JSONObject) {
+        // Historical windows may not contain the latest arrivals; keep their read metadata.
+        observeLatest(messages + arrivals + record)
+    }
     fun focusMessage(record: JSONObject) {
-        expire(); messages = listOf(record).filter { fresh(it, clock()) }; readingHistory = true
+        expire(); messages = listOf(record).filter { fresh(it, clock()) }; readingHistory = true; following = false; viewAnchor = ""; viewOffset = 0
         seen.retainAll(messages.map { it.getString("id") }.toSet())
     }
     @JvmOverloads fun merge(incoming: List<JSONObject>, checkedIds: Set<String>, returnLatest: Boolean = false) {
@@ -111,6 +121,7 @@ class CommunityState @JvmOverloads constructor(saved: JSONObject = JSONObject(),
         val order = compareBy<JSONObject>({ it.getString("created") }, { it.getString("id") })
         if (returnLatest) readingHistory = false
         else messages.firstOrNull()?.let { first -> if (freshIncoming.any { order.compare(it, first) < 0 }) readingHistory = true }
+        if (returnLatest) following = true else if (readingHistory) following = false
         val records = messages.filterNot { it.getString("id") in checkedIds }.associateBy { it.getString("id") }.toMutableMap()
         freshIncoming.forEach { records[it.getString("id")] = it }
         val sorted = records.values.sortedWith(order)

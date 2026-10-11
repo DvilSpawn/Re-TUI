@@ -5,6 +5,37 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class CommunityPaneStateTest {
+    @Test fun discussionStepIsPrivatePerDraftAndSurvivesRecreationWithoutChangingPendingPayload() {
+        val pane = CommunityPaneState(JSONObject()).apply { channel = "help"; composing = true }
+        assertTrue(pane.editingTitle)
+        pane.saveDraft("help", "first title", "body kept"); pane.editingTitle = true
+        val restored = CommunityPaneState(pane.toJson())
+        assertTrue(restored.editingTitle)
+        restored.saveDraft("help", "edited title", "body kept")
+        assertTrue(restored.editingTitle)
+        restored.editingTitle = false
+        val id = restored.begin("help", JSONObject().put("title", "edited title").put("body", "body kept").put("channel", "help"))
+        restored.editingTitle = true
+        restored.saveDraft("help", "newer title", "body kept")
+        restored.channel = "bugs"
+        assertTrue(restored.editingTitle)
+        restored.channel = "help"
+        assertTrue(restored.editingTitle)
+        assertEquals(id, restored.pendingId)
+        assertEquals("edited title", restored.pending.getString("title"))
+        restored.complete()
+        assertEquals("newer title", restored.draft("help").getString("title"))
+        assertEquals("body kept", restored.draft("help").getString("body"))
+        assertTrue(restored.editingTitle)
+    }
+
+    @Test fun legacyDiscussionDraftWithTitleResumesAtBodyAndBlankDraftStartsWithTitle() {
+        val pane = CommunityPaneState(JSONObject()).apply { channel = "bugs" }
+        pane.saveDraft("bugs", "existing title", "existing body")
+        assertFalse(CommunityPaneState(pane.toJson()).editingTitle)
+        pane.saveDraft("bugs", "", "")
+        assertTrue(pane.editingTitle)
+    }
     @Test fun replyMentionFocusKeepsItsSourceVisibleBeyondTheFirstPage() {
         val pane = CommunityPaneState(JSONObject())
         pane.saveDraft("bugs", "title", "keep")

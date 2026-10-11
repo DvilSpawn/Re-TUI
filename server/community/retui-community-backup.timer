@@ -1,0 +1,8 @@
+[Unit]
+Description=Hourly Re:TUI selective recovery with seven-day rotation
+[Timer]
+OnCalendar=hourly
+Persistent=true
+RandomizedDelaySec=60
+[Install]
+WantedBy=timers.target

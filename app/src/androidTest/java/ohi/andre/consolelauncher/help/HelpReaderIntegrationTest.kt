@@ -12,7 +12,25 @@ import org.junit.Test
 import ohi.andre.consolelauncher.R
 
 class HelpReaderIntegrationTest {
+    @get:org.junit.Rule val readerPreferences = HelpReaderPreferencesRule()
+    @get:org.junit.Rule val windowPreferences = WindowPreferencesRule()
     private val instrumentation = InstrumentationRegistry.getInstrumentation()
+    private fun floatingHelp(topic: String? = null): OfflineHelpActivity {
+        val intent = Intent(instrumentation.targetContext, OfflineHelpActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        if (topic != null) intent.putExtra("topic", topic)
+        var activity = instrumentation.startActivitySync(intent) as OfflineHelpActivity
+        if (activity.resources.configuration.orientation != android.content.res.Configuration.ORIENTATION_PORTRAIT) {
+            val monitor = instrumentation.addMonitor(OfflineHelpActivity::class.java.name, null, false)
+            try {
+                instrumentation.runOnMainSync { activity.requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT }
+                activity = instrumentation.waitForMonitorWithTimeout(monitor, 5000) as OfflineHelpActivity
+            } finally { instrumentation.removeMonitor(monitor) }
+        }
+        instrumentation.waitForIdleSync()
+        instrumentation.runOnMainSync { activity.window.decorView.findViewWithTag<View>("help-window-toggle").performClick() }
+        instrumentation.waitForIdleSync()
+        return activity
+    }
     @Test fun explicitFormattingUsesNativeStylesAndNonExecutableBlocks() {
         instrumentation.runOnMainSync {
             val text = android.text.SpannableStringBuilder()
@@ -41,8 +59,7 @@ class HelpReaderIntegrationTest {
         } finally { instrumentation.runOnMainSync { activity.finish() } }
     }
     @Test fun windowControlsAndAccessibleResizeHandlesSurviveRecreation() {
-        var activity = instrumentation.startActivitySync(Intent(instrumentation.targetContext, OfflineHelpActivity::class.java)
-            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) as OfflineHelpActivity
+        var activity = floatingHelp()
         val monitor = instrumentation.addMonitor(OfflineHelpActivity::class.java.name, null, false)
         try {
             instrumentation.waitForIdleSync()
@@ -51,7 +68,7 @@ class HelpReaderIntegrationTest {
                 assertNotNull("Window toggle is available", control)
                 val panel = activity.window.decorView.findViewWithTag<View>("help-resize-corner").parent as View
                 val host = panel.parent as View
-                assertEquals("Corners exposed on first launch", View.VISIBLE,
+                assertEquals("Corners exposed in floating mode", View.VISIBLE,
                     activity.window.decorView.findViewWithTag<View>("help-resize-corner").visibility)
                 assertTrue("Symmetric outer horizontal inset", panel.left > 0 && kotlin.math.abs(panel.left - (host.width - panel.right)) <= 1)
                 assertTrue("Symmetric outer vertical inset", panel.top > 0 && kotlin.math.abs(panel.top - (host.height - panel.bottom)) <= 1)
@@ -79,8 +96,7 @@ class HelpReaderIntegrationTest {
         } finally { instrumentation.removeMonitor(monitor); instrumentation.runOnMainSync { activity.finish() } }
     }
     @Test fun touchLongPressOnCornerShrinksBothAxes() {
-        val activity = instrumentation.startActivitySync(Intent(instrumentation.targetContext, OfflineHelpActivity::class.java)
-            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) as OfflineHelpActivity
+        val activity = floatingHelp()
         try {
             instrumentation.waitForIdleSync()
             instrumentation.waitForIdleSync()
@@ -100,8 +116,7 @@ class HelpReaderIntegrationTest {
         } finally { instrumentation.runOnMainSync { activity.finish() } }
     }
     @Test fun dragResizeAndRotationStayInSafeViewportAndReflowText() {
-        var activity = instrumentation.startActivitySync(Intent(instrumentation.targetContext, OfflineHelpActivity::class.java)
-            .putExtra("topic", "calculator-help").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) as OfflineHelpActivity
+        var activity = floatingHelp("calculator-help")
         val monitor = instrumentation.addMonitor(OfflineHelpActivity::class.java.name, null, false)
         fun screenshot(name: String) {
             instrumentation.waitForIdleSync(); android.os.SystemClock.sleep(300)

@@ -5,15 +5,20 @@ import android.view.View
 import android.widget.EditText
 import android.widget.TextView
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.core.view.descendants
 import ohi.andre.consolelauncher.R
 import org.junit.Assert.*
 import org.junit.Test
 
 class CalculatorHelpIntegrationTest {
+    @get:org.junit.Rule val readerPreferences = ohi.andre.consolelauncher.help.HelpReaderPreferencesRule()
+    @get:org.junit.Rule val windowPreferences = ohi.andre.consolelauncher.help.WindowPreferencesRule(fresh = false)
     private val instrumentation = InstrumentationRegistry.getInstrumentation()
     private val context = instrumentation.targetContext
 
     private fun withCalculator(onMain: Boolean = true, check: (CalculatorActivity) -> Unit) {
+        ohi.andre.consolelauncher.managers.xml.XMLPrefsManager.loadCommons(context)
+        val savedEngine = ohi.andre.consolelauncher.managers.settings.LauncherSettings.get(ohi.andre.consolelauncher.managers.xml.options.Behavior.qalculate)
         val prefs = CalculatorEngine.prefs(context)
         val saved = prefs.all
         var activity: CalculatorActivity? = null
@@ -24,9 +29,18 @@ class CalculatorHelpIntegrationTest {
             activity = instrumentation.startActivitySync(Intent(context, CalculatorActivity::class.java)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) as CalculatorActivity
             instrumentation.waitForIdleSync()
+            if (activity.resources.configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE) {
+                val monitor = instrumentation.addMonitor(CalculatorActivity::class.java.name, null, false)
+                try {
+                    instrumentation.runOnMainSync { activity!!.requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT }
+                    activity = instrumentation.waitForMonitorWithTimeout(monitor, 5000) as CalculatorActivity
+                    instrumentation.waitForIdleSync()
+                } finally { instrumentation.removeMonitor(monitor) }
+            }
             if (onMain) instrumentation.runOnMainSync { check(activity!!) } else check(activity!!)
         } finally {
             instrumentation.runOnMainSync { activity?.finishAndRemoveTask() }
+            instrumentation.waitForIdleSync()
             val editor = prefs.edit().clear()
             saved.forEach { (key, value) -> when (value) {
                 is String -> editor.putString(key, value)
@@ -36,6 +50,7 @@ class CalculatorHelpIntegrationTest {
                 is Float -> editor.putFloat(key, value)
             } }
             editor.commit()
+            ohi.andre.consolelauncher.managers.settings.LauncherSettings.set(context, ohi.andre.consolelauncher.managers.xml.options.Behavior.qalculate, savedEngine)
         }
     }
 
@@ -43,15 +58,20 @@ class CalculatorHelpIntegrationTest {
         instrumentation.runOnMainSync { activity.findViewById<View>(R.id.calculator_letters_tab).performClick() }
         instrumentation.waitForIdleSync()
         android.os.SystemClock.sleep(150)
+        java.io.File(context.cacheDir, "calculator-qwerty.png").outputStream().use {
+            instrumentation.uiAutomation.takeScreenshot().compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it)
+        }
         instrumentation.runOnMainSync {
             val grid = activity.findViewById<android.view.ViewGroup>(R.id.calculator_symbols)
-            val keys = (0 until grid.childCount).map { grid.getChildAt(it) as TextView }.filter { it.text.isNotEmpty() }
-            val rows = keys.groupBy { it.top }.toSortedMap().values.map { row -> row.sortedBy { it.left } }
+            val keys = grid.descendants.filterIsInstance<TextView>().filter { it.text.isNotEmpty() && it.visibility == View.VISIBLE }.toList()
+            fun position(key: View) = IntArray(2).also { key.getLocationOnScreen(it) }
+            val rows = keys.groupBy { position(it)[1] }.toSortedMap().values.map { row -> row.sortedBy { position(it)[0] } }
             assertEquals("Three letter rows and one editing row", 4, rows.size)
             assertEquals("QWERTYUIOP", rows[0].joinToString("") { it.text.toString() })
             assertEquals("ASDFGHJKL", rows[1].joinToString("") { it.text.toString() })
-            assertEquals("ZXCVBNM", rows[2].joinToString("") { it.text.toString() })
-            assertEquals(listOf("_", "SPACE", "⌫", "↵"), rows[3].map { it.text.toString() })
+            assertEquals("ZXCVBNM⌫", rows[2].joinToString("") { it.text.toString() })
+            assertEquals(listOf("_", "SPACE", "↵"), rows[3].map { it.text.toString() })
+            assertEquals("Delete immediately follows M", rows[2][6].right, rows[2][7].left)
             assertTrue("Home row is staggered", rows[1].first().left > rows[0].first().left)
             assertTrue("Bottom letter row is staggered", rows[2].first().left > rows[1].first().left)
             assertTrue("Space key is wider than a letter", rows[3][1].width > rows[0][0].width)
@@ -59,7 +79,7 @@ class CalculatorHelpIntegrationTest {
                 val visible = android.graphics.Rect()
                 assertTrue("Every QWERTY key is visible", key.getGlobalVisibleRect(visible))
                 assertEquals("No QWERTY key is clipped horizontally", key.width, visible.width())
-                assertEquals("No QWERTY key is clipped vertically", key.height, visible.height())
+                assertEquals("No QWERTY key ${key.text} is clipped vertically", key.height, visible.height())
             }
             val input = activity.findViewById<EditText>(R.id.calculator_expression)
             input.setText("")
@@ -69,9 +89,6 @@ class CalculatorHelpIntegrationTest {
             assertEquals("qwerty ", input.text.toString())
             keys.first { it.text == "⌫" }.performClick()
             assertEquals("qwerty", input.text.toString())
-        }
-        java.io.File(context.cacheDir, "calculator-qwerty.png").outputStream().use {
-            instrumentation.uiAutomation.takeScreenshot().compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it)
         }
     }
 
@@ -250,7 +267,19 @@ class CalculatorHelpIntegrationTest {
             assertNotNull("Help tab opens dedicated reader", reader)
             instrumentation.waitForIdleSync()
             instrumentation.runOnMainSync {
-                assertTrue(reader!!.findViewById<TextView>(R.id.offline_help_output).text.contains(context.getString(R.string.offline_help_article_calculator_help_title)))
+                val text = reader!!.findViewById<TextView>(R.id.offline_help_output).text.toString()
+                assertTrue("Calculator Help starts with using the calculator, not reader mechanics",
+                    text.startsWith(context.getString(R.string.offline_help_article_calculator_help_title) + "\n\nEnter an expression"))
+                assertTrue(text.indexOf("5 + 5 → 10") < text.indexOf("Using this help"))
+                assertEquals("A new calculator article opens at its beginning", 0,
+                    reader!!.findViewById<android.widget.ScrollView>(R.id.offline_help_scroll).scrollY)
+            }
+            // Idle can precede the activity transition's final composited frame.
+            android.os.SystemClock.sleep(500)
+            java.io.File(context.cacheDir, "calculator-help-start.png").outputStream().use {
+                instrumentation.uiAutomation.takeScreenshot().compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it)
+            }
+            instrumentation.runOnMainSync {
                 reader!!.findViewById<EditText>(R.id.offline_help_input).setText("9")
                 reader!!.finish()
                 val field = activity.findViewById<EditText>(R.id.calculator_expression)
@@ -322,9 +351,10 @@ class CalculatorHelpIntegrationTest {
         assertSame(output.parent, field.parent.parent)
         assertTrue("Terminal retains useful space", scroll.height >= ohi.andre.consolelauncher.tuils.Tuils.dpToPx(activity, 120))
         val symbols = activity.findViewById<android.view.ViewGroup>(R.id.calculator_symbols)
-        assertEquals(20, symbols.childCount)
-        assertTrue((0 until symbols.childCount).all { symbols.getChildAt(it).height >= ohi.andre.consolelauncher.tuils.Tuils.dpToPx(activity, 48) })
-        fun countEvaluate(view: View): Int = (if (view.id == R.id.calculator_equals || (view is TextView && view.text == "=")) 1 else 0) +
+        val keys = symbols.descendants.filterIsInstance<android.widget.Button>().filter { it.visibility == View.VISIBLE }.toList()
+        assertEquals(20, keys.size)
+        assertTrue(keys.all { it.height >= ohi.andre.consolelauncher.tuils.Tuils.dpToPx(activity, 48) })
+        fun countEvaluate(view: View): Int = (if (view.id == R.id.calculator_equals) 1 else 0) +
             (if (view is android.view.ViewGroup) (0 until view.childCount).sumOf { countEvaluate(view.getChildAt(it)) } else 0)
         assertEquals("Only one evaluate key", 1, countEvaluate(activity.findViewById(R.id.calculator_overlay)))
     }

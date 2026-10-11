@@ -1,5 +1,113 @@
 # Experimental community pane
 
+## Public-release controls
+
+PocketBase is pinned to 0.40.5. The existing account **dvil** is the sole moderator;
+server-side current-role checks protect both private queue reads and all actions.
+Menu → Moderator review provides paged report/request queues, evidence previews,
+confirmed removal/ban and resolution. Evidence stays private with its original six-month
+expiry and is never written to the Android conversation cache. Contextual reporting and
+local author blocking are available for General, discussion roots and replies.
+
+Before contributing, every account accepts the versioned Community rules. The backend
+also enforces acceptance; older clients cannot bypass it. Acceptance never sends a draft.
+Rules cover prohibited behavior, moderation and separate retention for General/forums.
+
+Menu → Delete community account requires the current password, clears local account state
+only after confirmation, and leaves Launcher settings intact. The same deletion path works
+without installing Launcher at https://irc.kokodoko.cloud/community/account-deletion.
+Deletion removes the account and authored content, including replies on authored discussions;
+retained moderation evidence expires at its original six-calendar-month deadline.
+There is no password recovery; support deletion requests require private ownership verification.
+
+Hourly selective recovery snapshots rotate after seven days and exclude transient chat,
+reports/requests, presence and mentions. Older snapshots are reconciled with live deletions.
+Five-minute VPS-local health checks cover HTTPS, overdue retention, moderator ownership,
+unresolved requests, recovery freshness and disk space. Operator warnings appear in the
+moderator review flow and system journal. An off-site backup destination and independent
+external availability alerts remain unset; total VPS loss is not covered by local checks.
+See the current release-gates contract in [server/community/README.md](../server/community/README.md).
+
+## Messaging interface
+
+The terminal-styled pane identifies the current room and discussion separately from
+connection state and post errors. General is labelled as 24-hour chat; the other
+channels are persistent discussions. Signed-out users see a welcome and direct
+**Join community** / **Sign in** actions; slash commands remain available. Composer
+hints and authentication action labels follow the current context.
+
+New discussions use that same composer in two steps: **Discussion title → Next →
+Opening message → Post discussion**. The title is a read-only, tappable summary
+during the message step, not another input field. **Back · Edit title**, the system
+Back action, or tapping the summary returns to the title without losing the opening
+message. Each channel's encrypted draft remembers its editing step; legacy drafts
+with an existing title resume at the message step. Titles must be a nonblank single
+line of at most 120 Unicode characters / 480 UTF-8 bytes. Next saves locally and
+never posts; delivery checks still reconcile the original immutable payload.
+
+General and discussion replies open at the latest messages unless an intentional
+reading position was saved. Live updates follow the bottom, but scrolling up stops
+following. A tappable unread/Latest indicator (messages-below count for discussions)
+returns to the newest window. The first visible message and its pixel offset are
+encrypted with account state so refresh, pagination and reopening can restore the
+reading anchor while it remains in the bounded, unexpired cache.
+Expiry or eviction can remove that anchor; it is not an unlimited history bookmark.
+Consecutive General messages from one author within five minutes share their visual
+author header, repeated at least every four messages so long runs remain identifiable,
+with local-day separators and smaller timestamps. Bodies remain selectable. Discussion
+reply history pages backwards from the oldest retained reply without losing the
+latest/forward refresh path; its 200-body history window remains bounded.
+
+History controls sit inside the transcript, not in the fixed action strip. Wide panes
+use the rail; narrow panes expose Channels instead. The window header keeps only the
+expand/float action; **Menu → Reset floating window** explicitly resets geometry.
+Help and Calculator retain their own existing header controls.
+
+Select text from one message and choose **Message actions**, or use the Menu picker,
+to copy the full message, insert its author's mention, or confirm a General-message
+report. Pickers show handles and text previews, not transport IDs. Discussion rows
+show a title, author/time and bounded body preview. **Check delivery** reconciles the
+persisted original attempt before a possible same-identity retry; a newer editable
+draft is kept, and nothing is retried automatically. Sending, checking delivery and
+unconfirmed delivery are distinct transcript states; a background history read does
+not label an uncertain post as sending. Read markers include the transcript's history
+control offset and require the entire displayed message range to be in the viewport.
+
+Validation for this UI pass (2026-10-10): 109 focused Community/window JVM checks,
+33 emulator regression checks and 12 final messaging/review scenarios passed. The
+physical phone passed six final fixture-based messaging/delivery checks plus the
+main-app chip/layout check; portrait and landscape screenshots were inspected.
+The fixture checks restore encrypted account state and window settings without
+clearing keys, and send no production community posts. Play Store debug assembly
+and F-Droid debug compilation passed. The main phone package was updated in place
+at Build 426, version 2, without changing its first-install time. No release, commit,
+backend deployment or new external network integration is part of this UI pass.
+
+The single-composer discussion follow-up passed 111 focused JVM checks and 12
+emulator scenarios, including preserved newer drafts during delivery reconciliation
+and credential isolation. On the physical phone, a local-fixture creation check
+verified title validation, both steps across recreation, summary editing, no post on
+Next, and exactly one post on final confirmation; the main-app layout check also
+passed. The main Build 426 package was updated in place with its matching signer and
+original first-install time preserved. No production discussion, commit or release
+was created for this verification.
+
+## Live delivery
+
+While this pane is visible and signed in, an authenticated SSE connection subscribes
+only to the `community` topic. Notices contain collection/record pointers, never message
+bodies, account identities or IPs. The app fetches changed records through the existing
+view/expiry-controlled REST endpoints. Body-free invalidation notices handle deletion;
+resume/reconnect reconciles history, and a 60-second safety refresh still checks cached
+content. Disconnected clients use the existing 15-second polling/backoff fallback.
+Pause/logout cancels the stream and pending reads; there is still no background delivery.
+
+Sending preempts a slow history refresh. A pending line appears immediately and becomes
+canonical on the POST acknowledgement, without waiting for another history request.
+Uncertain attempts retain their immutable request ID and are never retried automatically.
+General posts and forum replies show the chosen `@handle` and a compact local date/time;
+internal message IDs remain available to reporting but are not conversation headers.
+
 Run `community` or its `irc` alias to open the opt-in Re-TUI community Activity. This is the integrated HTTPS launcher community, not an arbitrary-network IRC client. Nothing connects on launcher startup. Both F-Droid and Play Store use the same native username/password authentication at `https://irc.kokodoko.cloud/community`; no email, Google sign-in, social provider, Firebase, push, analytics or CAPTCHA dependency is added.
 
 Use `/register` for public registration, or `/login` for an existing username. Authentication runs above and inside the **same composer**, not a modal: username → masked password → masked confirmation for registration, or username → masked password for login. Send/Enter advances each stage. Usernames use 3–24 ASCII letters, digits, `-` or `_`; passwords use 8–71 Unicode characters, matching the pinned backend's native password field limit. Validation and request errors appear in a bounded two-line guidance row. Invalid usernames stay at the username stage; password/confirmation or server failures clear secrets and restart at username. Touch **Cancel** or Back restores the conversation draft and forum title in the original context. `/cancel` also cancels at the username stage only; slash text in a password is always literal. Pause/recreation cancels authentication rather than retaining a password. Credential mode bypasses draft persistence and suggestions, disables view-state saving, autofill, prediction and personalized IME learning, and sets `FLAG_SECURE` on the Activity window until cancellation/completion, restoring any prior secure flag. Credentials remain short-lived in-memory request inputs, never commands, history, transcript or serialized conversation state. Registration is not sign-in: the app authenticates and validates a returned token before saving a session. A session token is saved encrypted; raw passwords are not saved. There is **no forgotten-password recovery**. Register a new username to continue: it is a separate identity; the old username is not reclaimed and ownership/history do not migrate automatically.
@@ -50,10 +158,18 @@ At a full 200-record cache, a General or thread-list refresh costs one page plus
 
 The Android surface now includes General, persistent forums, foreground presence and recipient-only in-app mention indicators. It does not include private messages, attachments, recipient read receipts, push delivery, an external IRC connection or a background service. Messages are server-readable, **not end-to-end encrypted**. The backend v2 contract expires each general message individually at age **>=24 hours** from immutable server creation in UTC (not midnight or last edit); API reads hide expired/future-dated messages immediately, with physical purge normally every minute. Accounts persist. Accepted reports retain private snapshots of reported text/author and reasons for **six calendar months** after report creation in UTC, with end-of-month clamping, not 180 days; deleting the source message/account does not remove that evidence. Active assigned moderators and loopback administrators can read it.
 
-The v3 endpoints and Help migration are required for directory/presence/mentions and the `help` forum. Android browsing, thread/reply composition and private `/moderate` requests are implemented; moderator queue reading/resolution is not. `/report` succeeds only on server acceptance and cannot report an expired source. Private reports and moderator requests retain server-readable evidence for six calendar months, not public posts.
+The v3 endpoints and Help migration are required for directory/presence/mentions and the `help` forum. Android browsing, thread/reply composition and private `/moderate` requests are implemented. Release gates add versioned rules acceptance, reporting for General and forums, and a confirmed moderator review/remove/ban/resolve workflow restricted to the active dvil account. `/report` succeeds only on server acceptance and cannot report an expired source. Private reports and moderator requests retain server-readable evidence for six calendar months, not public posts.
 
-Local expiry relies on the device wall clock and runs when state is restored, merged, saved or rendered, and while the Activity is visible. An unopened/paused app cannot rewrite its encrypted on-disk cache at the cutoff; it prunes on next access/save. Drafts and immutable uncertain-delivery bodies are separate user-controlled state, not timed chat history. This is not forensic secure erasure of storage, memory, WAL/free pages or provider snapshots. Scheduled whole-database server archives are disabled because they would preserve expired text, but unresolved legacy archives/rollback copies remain retention exceptions; no offsite backup is configured and persistent identities/threads have single-VPS loss risk. See [the backend contract](../server/community/README.md) for policy and operational limits. PocketBase is pre-1.0: this optional experimental feature and its storage/API may change.
+Local expiry uses the trusted HTTPS response time plus monotonic elapsed time while connected, falling back to the device wall clock before a response or after process restart. The HTTP date's second-precision upper bound prevents slight clock skew from hiding fresh messages and errs toward early expiry, not longer retention. Expiry runs when state is restored, merged, saved or rendered, and while the Activity is visible. An unopened/paused app cannot rewrite its encrypted on-disk cache at the cutoff; it prunes on next access/save. Drafts and immutable uncertain-delivery bodies are separate user-controlled state, not timed chat history. This is not forensic secure erasure of storage, memory, WAL/free pages or provider snapshots. Scheduled whole-database server archives are disabled because they would preserve expired text; hourly selective local recovery snapshots exclude transient collections, reconcile deletions and rotate after seven days. Legacy full archives/rollback copies require exact-target approval and verified selective recovery before removal. No offsite backup is configured, so single-VPS loss risk remains. See [the backend contract](../server/community/README.md) for policy and operational limits. PocketBase is pre-1.0: this optional experimental feature and its storage/API may change.
 
 Release gates include deployed public-registration rules/rate limits, validated TLS and collection authorization, authenticated two-user live integration, and final release-flavor/device regression checks. Host unit tests use production state/input/client code with real loopback HTTP fixtures. Source-wiring guards are not rendered-UI evidence. The new `CommunityPaneIntegrationTest` and concurrent socket fixture are disposable-emulator-only: they clear fixture account storage, launch/recreate/background the Activity and must never run on a data-bearing phone. They are compiled but not executed for this change; neither those fixtures nor host tests establish production availability, rendered visual parity or physical-device compatibility.
 
 `CommunityLiveIntegrationTest` is skipped unless instrumentation receives `-e liveCommunity true`, and is restricted to disposable emulators. It uses the fixed production HTTPS endpoint with ordinary certificate validation and generates credentials only in memory. It emits only its unique temporary usernames/member IDs for operator cleanup; after any run, remove only those exact fixtures and verify their related messages/reports are gone. It respects rate-limit delays with bounded foreground waits.
+
+`CommunityDeliveryDeviceTest` is an opt-in, test-package-only physical-device check.
+It preserves and restores the existing encrypted account state and window settings,
+checks pending/acknowledged delivery against blocked history, and tests two synthetic
+accounts over production TLS. Exact synthetic usernames/IDs are emitted for server
+cleanup; credentials are never emitted. The live check passed on the connected phone
+with 219 ms peer delivery; the controlled post acknowledgement took 32 ms. These are
+individual test measurements, not an SLA. A rendered screenshot was inspected.

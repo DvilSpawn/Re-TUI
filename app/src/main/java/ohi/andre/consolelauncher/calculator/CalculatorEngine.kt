@@ -32,7 +32,7 @@ object CalculatorEngine {
 
     data class Result(val text: String, val error: Boolean = false,
         val approximate: Boolean = false, val reusable: String? = if (error) null else text,
-        val failure: String? = null)
+        val failure: String? = null, val parsed: String? = null)
     data class Options(val degrees: Boolean, val exact: Boolean)
     fun options(context: Context) = Options(prefs(context).getBoolean("degrees", true), prefs(context).getBoolean("exact", true))
     class Request {
@@ -54,10 +54,11 @@ object CalculatorEngine {
     }
 
     // Call on a worker thread. The same path serves the activity and `calc <expression>`.
-    fun evaluate(context: Context, expression: String, options: Options = options(context), request: Request = Request()): Result {
+    fun evaluate(context: Context, expression: String, options: Options = options(context), request: Request = Request(), preview: Boolean = false): Result {
         val input = expression.trim()
         if (input.isEmpty()) return Result("")
         if (input.length > MAX_INPUT) return Result(context.getString(R.string.calculator_too_long, MAX_INPUT), true)
+        if (preview && !enabled(context)) return Result("", true, failure = "preview_unavailable")
         if (!enabled(context)) return try {
             val value = Tuils.eval(input)
             if (!value.isFinite()) Result(context.getString(R.string.calculator_invalid), true)
@@ -69,7 +70,7 @@ object CalculatorEngine {
         var result = Result(context.getString(R.string.calculator_engine_stopped), true)
         val reply = Messenger(Handler(Looper.getMainLooper()) { message ->
             result = Result(message.data.getString("text").orEmpty(), message.data.getBoolean("error"),
-                message.data.getBoolean("approximate"), message.data.getString("reusable"), message.data.getString("failure"))
+                message.data.getBoolean("approximate"), message.data.getString("reusable"), message.data.getString("failure"), message.data.getString("parsed"))
             completed.countDown()
             true
         })
@@ -84,6 +85,7 @@ object CalculatorEngine {
                             putString("expression", input)
                             putBoolean("degrees", options.degrees)
                             putBoolean("exact", options.exact)
+                            putBoolean("preview", preview)
                         }
                     })
                     if (!submitted) completed.countDown()

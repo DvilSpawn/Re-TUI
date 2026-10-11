@@ -5,6 +5,7 @@ import android.graphics.Color
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.managers.AppsManager
 import ohi.andre.consolelauncher.managers.FirstRunPresetManager
+import ohi.andre.consolelauncher.managers.onboarding.StartupMenuManager
 import ohi.andre.consolelauncher.managers.xml.AutoColorManager.init
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsElement
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsList
@@ -80,6 +81,7 @@ object XMLPrefsManager {
         commonsLoaded = true
 
         val folder = Tuils.getFolder()
+        StartupMenuManager.initialize(context, XMLPrefsRoot.entries.any { File(folder, it.path).isFile })
         FirstRunPresetManager.seedIfNeeded(context, folder)
 
         for (element in XMLPrefsRoot.entries) {
