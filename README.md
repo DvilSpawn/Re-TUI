@@ -82,6 +82,25 @@ This keeps the launcher lean for Play Store builds while preserving power-user L
 *   **Gradle & AGP:** Updated to Gradle 9.4.1 and Android Gradle Plugin 9.2.0.
 *   **Build JDK:** Gradle builds run on **JDK 17+**; app bytecode remains compatible with Java 8.
 
+### Build from source
+
+Install the Android SDK/NDK versions declared in `app/build.gradle`, Python 3 and
+the native prerequisites in [native/qalculate/README.md](native/qalculate/README.md).
+Configure your own SDK path using `ANDROID_HOME` or an ignored `local.properties`.
+Then build and run the reusable unit tests:
+
+```sh
+./gradlew :app:assembleFdroidDebug :app:testFdroidDebugUnitTest
+```
+
+The current source declares version **3**, build **500**. `assemblePlaystoreRelease`
+and `bundlePlaystoreRelease` produce the release APK and Play Store bundle.
+Official signing keys are private and are not needed to compile your own debug
+APK. Never add signing files, credentials, release reports or personal device
+configuration to Git. The repository includes reusable tests, build documentation,
+required license notices and runtime Help/changelog content, not maintainer-local
+release notes or VPS operating records.
+
 ---
 
 ## 📦 Release Channels and Support
@@ -143,7 +162,7 @@ This project uses the **OWASP Mobile Application Security Verification Standard 
 
 ## Localization contributions
 
-Downloadable language packs can be imported through Settings → System & Support → Language packs. See [contributing a language pack](language-packs/README.md) for the English template, PR workflow and independent GitHub releases, and the [translator guide](docs/localization/README.md) for the bundled resource sources. The [localization audit](docs/localization/AUDIT.md) records Launcher and Notes readiness, wireless-phone pseudolocale tests, and translation acceptance limits. Human-language contributions are still needed.
+Downloadable language packs can be imported through Settings → System & Support → Language packs. See [contributing a language pack](language-packs/README.md) for the English template, PR workflow and independent GitHub releases, and the [translator guide](docs/localization/README.md) for the bundled resource sources. Human-language contributions are still needed; automated checks do not replace native-speaker review.
 
 ## License
 

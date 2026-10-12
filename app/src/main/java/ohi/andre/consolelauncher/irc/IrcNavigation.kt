@@ -2,7 +2,7 @@ package ohi.andre.consolelauncher.irc
 
 /** Local presentation only. Search/account text never enters conversation drafts. */
 class IrcNavigation(private val state: IrcState) {
-    enum class Page { CHAT, CHANNELS, DIRECTORY, PEOPLE, HELP, COMMANDS, MORE, NETWORK, ACCOUNT, JOIN, LEAVE, DETAILS, DIAGNOSTICS, FORGET_DEVICE }
+    enum class Page { CHAT, CHANNELS, DIRECTORY, PEOPLE, HELP, COMMANDS, MORE, NETWORK, ACCOUNT, REGISTER, JOIN, LEAVE, DETAILS, DIAGNOSTICS, FORGET_DEVICE }
     var page = Page.CHAT; private set
     var text = ""
     var scroll = 0

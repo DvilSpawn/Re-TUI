@@ -1,0 +1,18 @@
+{
+  "license": "GPL-3.0-or-later",
+  "origin": "Independently authored Re:TUI geometric paths; no font outlines or third-party logos",
+  "files": [
+    {
+      "path": "app/src/main/res/drawable/lockdown_wordmark.xml",
+      "sha256": "f682e7e92ee9382f2f6f6940af1e0c0120dc1221ab50d4096ed53ea7d5e9c71a"
+    },
+    {
+      "path": "app/src/main/res/drawable/remember_ic_tree_branch.xml",
+      "sha256": "7dd8ee8499064b33b414c453cb87f65db95f488c7076f5bf469473f52f8c580f"
+    },
+    {
+      "path": "app/src/main/res/drawable/remember_ic_tree_branch_last.xml",
+      "sha256": "4af69699eefed4cccb25f1574edab832f84ca6e2193f29d0d2171573314038da"
+    }
+  ]
+}

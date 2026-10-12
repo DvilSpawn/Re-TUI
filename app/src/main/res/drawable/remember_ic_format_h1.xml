@@ -1,0 +1,8 @@
+<!-- Google Material Symbols, Apache-2.0. Converted viewport; paths unchanged.
+Source: https://raw.githubusercontent.com/google/material-design-icons/49d4db35df873165d6bd6ba09b063c7dafbac2f4/symbols/web/format_h1/materialsymbolsoutlined/format_h1_24px.svg
+License: LICENSES/Material-Symbols-Apache-2.0.txt -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="24dp" android:height="24dp" android:viewportWidth="960" android:viewportHeight="960">
+    <group android:translateX="-0.0" android:translateY="960.0">
+        <path android:fillColor="#FFFFFFFF" android:pathData="M200-280v-400h80v160h160v-160h80v400h-80v-160H280v160h-80Zm480 0v-320h-80v-80h160v400h-80Z" />
+    </group>
+</vector>

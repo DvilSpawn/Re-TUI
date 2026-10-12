@@ -35,9 +35,10 @@ PolyForm Noncommercial license; this record does not change that license.
 
 ## Separate unresolved or conditional boundaries
 
-- CraftPix app use is supported, but raw public-Git inclusion still needs
-  clarification or an approved replacement/exclusion. See the
-  [two-listing license review](clouds-licensing.md).
+- CraftPix clouds follow-up: completed at the maintainer's direction on
+  2026-10-12; assets remain bundled and creator coordination is maintainer-owned.
+  See the [review and dated closure](clouds-licensing.md). This attestation does
+  not invent independently verified correspondence or GPL asset sublicensing.
 - Sprout's paid purchase is maintainer-confirmed. Both the supplied Sprites premium
   readme and the exact downloaded Premium UI Pack readme explicitly permit
   open-source projects with credit and terms. The UI readme is preserved in
@@ -54,13 +55,25 @@ PolyForm Noncommercial license; this record does not change that license.
   `LICENSES/MIT-original.txt`. This establishes their repository/license trail,
   not independent proof that upstream created every pixel or had no third-party
   obligations. They are not established infringements requiring automatic deletion.
-- The 13 `remember_ic_format_*.png` Notes formatting icons entered with the
-  separate Re:Member import in `f449804`, not the original T-UI repository.
-  Re:Member's MIT notice is preserved in `docs/notes/REMEMBER-LICENSE`, but the
-  original graphic source still needs confirmation. Unattributed vectors/social
-  logos also retain their provenance/trademark questions.
+- Current icon provenance is resolved by replacement on 2026-10-12. The 13
+  unverified Notes formatting PNGs are removed; their resource names now use
+  documented Apache-2.0 Google Material Symbols vectors. All 66 current Material
+  vectors have exact source URLs/SVG checksums at revision
+  `49d4db35df873165d6bd6ba09b063c7dafbac2f4` in
+  `third_party/material-icons.json`, including Android output checksums.
+  Existing resource names, intrinsic dimensions and the resize-arrow rotation
+  wrapper are retained. GitHub/Discord/Reddit support actions use neutral code/
+  chat/forum symbols, not unverified brand logos; destinations and accessible
+  descriptions are unchanged.
+- The wordmark and two simple tree connectors are independently authored geometric
+  paths under GPL-3.0-or-later, with no font outlines. Their exact output hashes are
+  in `third_party/project-vector-icons.json`. Together with the 11 MIT Tabler
+  vectors, every current vector is classified and checksum-checked. This resolves
+  current assets, not the origin/rights of replaced files in old revisions.
 - Lucida Console is absent from current builds but remains in earlier Git
-  revisions/releases. No history rewrite or old-release deletion is implied.
+  revisions/releases. On 2026-10-12 the maintainer chose to keep its handling as a
+  separate historical follow-up. No history rewrite, old-release deletion or
+  retroactive font grant is implied.
 
 Contributors should retain per-component notices and record the origin, license
 and modifications of new assets. The code's GPL does not grant rights to every

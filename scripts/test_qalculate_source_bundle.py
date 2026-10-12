@@ -12,6 +12,14 @@ import qalculate_source_bundle as bundle
 
 
 class SourceBundleTest(unittest.TestCase):
+    def test_local_release_context_is_never_public_source(self):
+        for name in bundle.LOCAL_ONLY_FILES | {'server/irc/operations.py', 'server/private-report.json'}:
+            self.assertFalse(bundle.public_source_path(name), name)
+        for name in ['app/src/main/AndroidManifest.xml', 'app/build.gradle',
+                     'LICENSES/MIT-original.txt', 'scripts/language_packs.py',
+                     'app/src/test/java/example/Test.kt', 'native/qalculate/build.py']:
+            self.assertTrue(bundle.public_source_path(name), name)
+
     def test_pinned_source_reuses_bundle_and_rejects_changed_cache(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)

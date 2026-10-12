@@ -123,11 +123,11 @@
             android:label="@string/irc_title" android:theme="@style/Custom.Floating"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
 
-        <activity android:name=".community.CommunityActivity" android:exported="false"
-            android:label="@string/community_title" android:theme="@style/Custom.Floating"
-            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
-
         <activity android:name=".help.OfflineHelpActivity" android:exported="false"
+            android:theme="@style/Custom.Floating"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
+
+        <activity android:name=".help.ChangelogActivity" android:exported="false"
             android:theme="@style/Custom.Floating"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
 

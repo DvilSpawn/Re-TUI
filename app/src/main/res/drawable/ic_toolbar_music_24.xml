@@ -1,9 +1,8 @@
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="24dp"
-    android:height="24dp"
-    android:viewportWidth="24"
-    android:viewportHeight="24">
-    <path
-        android:fillColor="#FFFFFFFF"
-        android:pathData="M19,3V15.5C19,17.4 17.4,19 15.5,19C13.6,19 12,17.4 12,15.5C12,13.6 13.6,12 15.5,12C16.1,12 16.6,12.1 17,12.4V7H9V17.5C9,19.4 7.4,21 5.5,21C3.6,21 2,19.4 2,17.5C2,15.6 3.6,14 5.5,14C6.1,14 6.6,14.1 7,14.4V3H19Z" />
+<!-- Google Material Symbols, Apache-2.0. Converted viewport; paths unchanged.
+Source: https://raw.githubusercontent.com/google/material-design-icons/49d4db35df873165d6bd6ba09b063c7dafbac2f4/symbols/web/music_note/materialsymbolsoutlined/music_note_24px.svg
+License: LICENSES/Material-Symbols-Apache-2.0.txt -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="24dp" android:height="24dp" android:viewportWidth="960" android:viewportHeight="960">
+    <group android:translateX="-0.0" android:translateY="960.0">
+        <path android:fillColor="#FFFFFFFF" android:pathData="M400-120q-66 0-113-47t-47-113q0-66 47-113t113-47q23 0 42.5 5.5T480-418v-422h240v160H560v400q0 66-47 113t-113 47Z" />
+    </group>
 </vector>

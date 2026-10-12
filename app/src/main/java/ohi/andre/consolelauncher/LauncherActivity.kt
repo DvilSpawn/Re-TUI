@@ -467,6 +467,9 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
             }
             restoreGuideSessionAfterReload()
         }
+        rootView.post {
+            if (launcherResumed && hasWindowFocus()) maybeShowChangelog()
+        }
     }
 
     fun refreshBreathOutSettings() {
@@ -607,6 +610,16 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
     }
 
     private var startupMenuRequested = false
+    private var changelogRequested = false
+
+    private fun maybeShowChangelog(): Boolean {
+        if (StartupMenuManager.isFirstInstallPending(this)) {
+            return false
+        }
+        if (startupMenuRequested || StartupMenuManager.isActive(this)) return false
+        if (!changelogRequested) changelogRequested = ohi.andre.consolelauncher.managers.ChangelogManager.maybeOpen(this)
+        return changelogRequested
+    }
 
     override fun onResume() {
         super.onResume()
@@ -619,6 +632,7 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
                 if (!startupMenuRequested) startupMenuRequested = StartupMenuManager.maybeOpen(this)
                 return
             }
+            if (maybeShowChangelog()) return
             uiManager!!.resume()
             uiManager!!.activateTerminalInput(openKeyboardOnStart)
             val guideMessage = GuideManager.consumePendingResumeMessage(this)
@@ -646,6 +660,7 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
 
     override fun onPause() {
         startupMenuRequested = false
+        changelogRequested = false
         launcherResumed = false
         breathOutRoot?.setActive(false)
         setWallpaperInteractionEnabled(false)
@@ -746,6 +761,7 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
             applyFullscreen(this)
         }
         if (hasFocus && this@LauncherActivity.uiManager != null && !StartupMenuManager.isFirstInstallPending(this)) {
+            if (maybeShowChangelog()) return
             uiManager!!.activateTerminalInput(openKeyboardOnStart)
             uiManager!!.scheduleTypefaceRefreshes()
         }

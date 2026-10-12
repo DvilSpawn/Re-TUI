@@ -26,6 +26,7 @@ class WindowPreferencesRule(private val fresh: Boolean = true) : ExternalResourc
                 is Set<*> -> editor.putStringSet(key, value.filterIsInstance<String>().toSet())
             }
         }
-        editor.commit()
+        check(editor.commit()) { "Window preferences could not be restored" }
+        check(saved == preferences.all) { "Window preference values changed during the fixture" }
     }
 }

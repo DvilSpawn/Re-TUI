@@ -22,6 +22,7 @@ class IrcStateTest {
         val s = IrcState(); s.nickname = "dvil"
         s.event(":dvil!ident@cloak JOIN :#retui")
         assertEquals(2, s.current); assertTrue(s.active.joined); assertEquals("#retui", s.active.name)
+        s.beginJoin("#help")
         s.event(":dvil!ident@cloak JOIN #help")
         assertEquals(3, s.current); s.switch("2"); assertEquals("#retui", s.active.name); s.switch("next"); assertEquals("#help", s.active.name)
     }

@@ -18,6 +18,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.ScrollView
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.OneShotPreDrawListener
@@ -62,6 +63,12 @@ class TermuxWorkspaceActivity : LocalizedActivity() {
     private lateinit var title: TextView
     private lateinit var input: TermuxWorkspaceInputEditText
     private lateinit var tiles: LinearLayout
+    private lateinit var helperPanel: ScrollView
+    private lateinit var helperBody: TextView
+    private lateinit var helperActions: LinearLayout
+    private var helperUpdating = false
+    private var helperDeferred = false
+    private var helperBusyChecks = 0
     private val panels = arrayOfNulls<LinearLayout>(2)
     private val labels = arrayOfNulls<TextView>(2)
     private val grids = arrayOfNulls<TerminalGridView>(2)
@@ -91,9 +98,39 @@ class TermuxWorkspaceActivity : LocalizedActivity() {
             if (!visible || intent == null || resultLabel == null || intent.getStringExtra(UIManager.EXTRA_TERMUX_RESULT_PATH) != resultLabel) return
             resultLabel = null
             val raw = intent.getStringExtra(UIManager.EXTRA_TERMUX_RESULT_STDOUT).orEmpty()
+            val exitCode = intent.getIntExtra(UIManager.EXTRA_TERMUX_RESULT_EXIT_CODE, Int.MIN_VALUE)
+            if (helperUpdating) {
+                helperUpdating = false
+                if (TermuxHelperUpdate.succeeded(raw, exitCode)) {
+                    helperBusyChecks = 0; helperDeferred = false
+                    helperPanel.visibility = View.GONE; tiles.visibility = View.VISIBLE
+                    startBridge()
+                } else {
+                    val dependencyFailure = raw.lineSequence().any { it == "__RETUI_UPDATE_ERROR__ dependencies" }
+                    showHelperPrompt(getString(if (dependencyFailure) R.string.workspace_helper_dependencies else R.string.workspace_helper_update_failed), !dependencyFailure)
+                }
+                return
+            }
+            if (raw.trim() == "__RETUI_UPDATE_BUSY__") {
+                status(getString(R.string.workspace_helper_updating))
+                if (++helperBusyChecks <= 15) main.postDelayed({ if (visible) startBridge() }, 1000)
+                else showHelperPrompt(getString(R.string.workspace_helper_update_busy), false)
+                return
+            }
+            helperBusyChecks = 0
+            if (raw.trim() == "__RETUI_UPDATE_REQUIRED__") {
+                status(getString(R.string.workspace_helper_update_required))
+                if (!helperDeferred) showHelperPrompt(getString(R.string.workspace_helper_update_prompt, TermuxHelperUpdate.VERSION), true)
+                return
+            }
+            if (exitCode != 0 || !intent.getStringExtra(UIManager.EXTRA_TERMUX_RESULT_ERROR).isNullOrBlank()) {
+                showHelperPrompt(getString(R.string.workspace_helper_setup), false); return
+            }
             val frame = try { TermuxWorkspaceFrame.parse(raw) } catch (e: Exception) { status(e.message.orEmpty()); return }
-            if (frame.protocol != "retui-bridge-socket-v4" || frame.helperVersion != "0.4.1") {
-                status(getString(R.string.workspace_helper_update_required)); return
+            if (frame.protocol != TermuxHelperUpdate.PROTOCOL || frame.helperVersion != TermuxHelperUpdate.VERSION) {
+                status(getString(R.string.workspace_helper_update_required))
+                if (!helperDeferred) showHelperPrompt(getString(R.string.workspace_helper_update_prompt, TermuxHelperUpdate.VERSION), true)
+                return
             }
             if (frame.socket != TermuxWorkspaceSocketClient.SOCKET_NAME ||
                 frame.token?.matches(Regex("[A-Za-z0-9_-]{1,128}")) != true ||
@@ -101,6 +138,7 @@ class TermuxWorkspaceActivity : LocalizedActivity() {
                 status(getString(R.string.workspace_bridge_disconnected)); return
             }
             bootstrap = frame
+            helperPanel.visibility = View.GONE; tiles.visibility = View.VISIBLE
             windows = frame.windows
             val previousTargets = selection.targets.toList()
             selection.reconcile(windows.map { it.first }.toSet())
@@ -118,6 +156,7 @@ class TermuxWorkspaceActivity : LocalizedActivity() {
     override fun onCreate(state: Bundle?) {
         LauncherSystemUi.requestNoTitleIfFullscreen(this)
         super.onCreate(state)
+        helperDeferred = state?.getBoolean("helperDeferred") ?: false
         Tuils.init(this); XMLPrefsManager.loadCommons(this); LauncherSystemUi.applyFullscreen(this)
         androidx.core.view.WindowCompat.setDecorFitsSystemWindows(window, false)
         selection = TermuxWorkspaceState.restore(state?.getString("selection") ?: prefs.getString("selection", null))
@@ -157,6 +196,14 @@ class TermuxWorkspaceActivity : LocalizedActivity() {
             override fun onViewDetachedFromWindow(v: View) { cancelGeometryCapture() }
         })
         output.addView(tiles, FrameLayout.LayoutParams(-1, -1))
+        helperPanel = ScrollView(this).apply { visibility = View.GONE }
+        val helperContent = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(dp(12), dp(12), dp(12), dp(12)) }
+        helperBody = TextView(this).apply { setTextIsSelectable(true) }
+        helperActions = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+        helperContent.addView(helperBody, LinearLayout.LayoutParams(-1, -2))
+        helperContent.addView(helperActions, LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(12) })
+        helperPanel.addView(helperContent)
+        output.addView(helperPanel, FrameLayout.LayoutParams(-1, -1))
         for (tile in 0..1) {
             val panel = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(0, dp(6), 0, 0) }
             val label = TextView(this).apply {
@@ -244,6 +291,7 @@ class TermuxWorkspaceActivity : LocalizedActivity() {
         screen.setActive(false)
         if (foreground?.get() === this) foreground = null
         visible = false; generation++; resultLabel = null; bootstrap = null
+        helperUpdating = false
         cancelGeometryCapture()
         main.removeCallbacksAndMessages(null)
         clients.indices.forEach { closeTile(it); creating[it] = false }
@@ -265,6 +313,7 @@ class TermuxWorkspaceActivity : LocalizedActivity() {
         screen.setActive(visible && hasWindowFocus())
     }
     override fun onSaveInstanceState(out: Bundle) {
+        out.putBoolean("helperDeferred", helperDeferred)
         out.putString("selection", selection.encode()); out.putString("draft", localDraft); out.putString("pending", pendingCommand)
         persist(); super.onSaveInstanceState(out)
     }
@@ -274,20 +323,94 @@ class TermuxWorkspaceActivity : LocalizedActivity() {
     private fun startBridge() {
         if (!visible || resultLabel != null) return
         val ready = TermuxBridgeManager.status(this)
-        if (!ready.termuxInstalled || !ready.runCommandDeclared) { status(getString(R.string.workspace_bridge_disconnected)); return }
+        if (!ready.termuxInstalled || !ready.runCommandDeclared) { showHelperPrompt(getString(R.string.workspace_helper_setup), false); return }
         if (!ready.runCommandGranted) {
-            TermuxBridgeManager.requestRunCommandPermissionIfPossible(this)
-            status(getString(R.string.surface_runcommand_permission_is_not_granted_yet_allow_re_t_ui_and_dcbb9)); return
+            showHelperPrompt(getString(R.string.workspace_helper_setup), false); return
         }
         status(getString(R.string.workspace_bridge_connecting))
         val label = "workspace-activity:$instance:$generation"
         resultLabel = label
-        val script = "export HOME='${TermuxBridgeManager.TERMUX_HOME}'; export PATH='/data/data/com.termux/files/usr/bin':\$PATH; " +
-            "if command -v retui >/dev/null 2>&1 && [ \"\$(retui version)\" = 0.4.1 ]; then RETUI_NO_CREATE=1 retui bridge socket-start; else printf '%s\\n' 'retui helper update required'; fi"
+        val script = TermuxHelperUpdate.probeScript
         try {
             TermuxBridgeManager.startRunCommand(this, TermuxBridgeManager.TERMUX_SH, TermuxBridgeManager.TERMUX_HOME,
                 TermuxBridgeManager.createResultPendingIntent(this, label, null), arrayOf("-c", script, "retui-workspace"))
-        } catch (e: Exception) { resultLabel = null; status(e.message.orEmpty()) }
+            awaitHelperResult(label)
+        } catch (e: Exception) { resultLabel = null; showHelperPrompt(getString(R.string.workspace_helper_setup), false) }
+    }
+    private fun awaitHelperResult(label: String) {
+        main.postDelayed({
+            if (visible && resultLabel == label) {
+                resultLabel = null; helperUpdating = false
+                showHelperPrompt(getString(R.string.workspace_helper_no_reply), false)
+            }
+        }, 30000)
+    }
+    private fun updateHelper() {
+        if (!visible || helperUpdating || resultLabel != null) return
+        val ready = TermuxBridgeManager.status(this)
+        if (!ready.termuxInstalled || !ready.runCommandGranted) { showHelperPrompt(getString(R.string.workspace_helper_setup), false); return }
+        try {
+            val bytes = assets.open("termux-helper/retui").use { it.readBytes() }
+            val checksum = TermuxHelperUpdate.checksum(bytes)
+            val script = assets.open("termux-helper/update.sh").bufferedReader().use { it.readText() }
+            clients.indices.forEach { closeTile(it) }; bootstrap = null
+            val label = "workspace-update:$instance:$generation"
+            resultLabel = label; helperUpdating = true
+            helperBody.text = getString(R.string.workspace_helper_updating)
+            status(getString(R.string.workspace_helper_updating))
+            helperActions.removeAllViews()
+            helperAction(R.string.workspace_helper_hide) { dismissHelperPrompt() }
+            TermuxBridgeManager.startRunCommand(this, TermuxBridgeManager.TERMUX_SH, TermuxBridgeManager.TERMUX_HOME,
+                TermuxBridgeManager.createResultPendingIntent(this, label, null),
+                arrayOf("-c", script, "retui-update", TermuxHelperUpdate.VERSION, checksum), TermuxHelperUpdate.payload(bytes))
+            awaitHelperResult(label)
+        } catch (e: Exception) {
+            resultLabel = null; helperUpdating = false
+            showHelperPrompt(getString(R.string.workspace_helper_update_failed), true)
+        }
+    }
+    private fun helperAction(label: Int, action: () -> Unit) {
+        helperActions.addView(TextView(this).apply {
+            setText(label); minimumHeight = dp(48); gravity = Gravity.CENTER_VERTICAL
+            setPadding(dp(10), dp(8), dp(10), dp(8)); isFocusable = true
+            setOnClickListener { action() }
+        }, LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(6) })
+        styleHelperPrompt()
+    }
+    private fun showHelperPrompt(message: String, canUpdate: Boolean) {
+        status(message.lineSequence().first())
+        if (helperDeferred) return
+        helperPanel.visibility = View.VISIBLE; tiles.visibility = View.GONE
+        helperBody.text = message; helperActions.removeAllViews()
+        if (canUpdate) helperAction(R.string.workspace_helper_update_now) { updateHelper() }
+        else {
+            helperAction(R.string.workspace_helper_retry) { startBridge() }
+            helperAction(R.string.workspace_helper_permissions) {
+                startActivity(Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                    android.net.Uri.parse("package:$packageName")))
+            }
+            if (TermuxBridgeManager.isTermuxInstalled(this)) helperAction(R.string.workspace_helper_open_termux) {
+                packageManager.getLaunchIntentForPackage(TermuxBridgeManager.TERMUX_PACKAGE)?.let { startActivity(it) }
+            }
+        }
+        helperAction(R.string.workspace_helper_guide) { ohi.andre.consolelauncher.help.OfflineHelpActivity.open(this, "termux-workspace") }
+        helperAction(R.string.workspace_helper_later) { dismissHelperPrompt() }
+        styleHelperPrompt()
+    }
+    private fun dismissHelperPrompt() {
+        helperDeferred = true; helperPanel.visibility = View.GONE; tiles.visibility = View.VISIBLE
+        if (visible && !helperUpdating && resultLabel == null && bootstrap == null) startBridge()
+    }
+    private fun styleHelperPrompt() {
+        if (!::helperPanel.isInitialized) return
+        helperPanel.background = panelDrawable(Theme.workspace_output_background_color)
+        helperBody.typeface = Tuils.getTypeface(this); helperBody.textSize = LauncherFontScale.terminalTextSizeSp()
+        helperBody.setTextColor(color(Theme.workspace_output_text_color))
+        for (index in 0 until helperActions.childCount) (helperActions.getChildAt(index) as TextView).apply {
+            typeface = Tuils.getTypeface(this@TermuxWorkspaceActivity); textSize = LauncherFontScale.terminalTextSizeSp()
+            setTextColor(color(Theme.workspace_control_text_color))
+            background = panelDrawable(Theme.workspace_control_background_color)
+        }
     }
     override fun onRequestPermissionsResult(code: Int, permissions: Array<out String>, results: IntArray) {
         super.onRequestPermissionsResult(code, permissions, results)
@@ -541,6 +664,15 @@ class TermuxWorkspaceActivity : LocalizedActivity() {
             "page" -> movePage(if (rest == "prev") -1 else 1)
             "refresh", "r" -> { selection.visibleTiles.forEach { capture(it) }; if (clients[selection.focused] == null) startBridge() }
             "reconnect" -> { clients.indices.forEach { closeTile(it) }; bootstrap = null; startBridge() }
+            "update" -> {
+                helperDeferred = false
+                if (helperUpdating) helperPanel.visibility = View.VISIBLE
+                else {
+                    // A pending probe must not dismiss an explicitly opened update prompt.
+                    resultLabel = null
+                    showHelperPrompt(getString(R.string.workspace_helper_update_prompt, TermuxHelperUpdate.VERSION), true)
+                }
+            }
             "status", "diagnostics" -> diagnostics()
             "launch", "run", "app" -> launch(rest)
             "save" -> { val id = rest.substringBefore(' '); val cmd = rest.substringAfter(' ', ""); status(if (TermuxWorkspaceLauncherManager.save(this, id, cmd)) getString(R.string.surface_saved_launcher_39f4b, id) else getString(R.string.surface_usage_save_id_command_21680)) }
@@ -617,6 +749,7 @@ class TermuxWorkspaceActivity : LocalizedActivity() {
         }
     }
     private fun style() {
+        styleHelperPrompt()
         refreshBreathOutSettings()
         val typeface = Tuils.getTypeface(this)
         grids.forEach { grid -> grid?.apply {

@@ -39,6 +39,36 @@ class TermuxWorkspacePaneIntegrationTest {
         val state = field(activity, "selection") as TermuxWorkspaceState
         state.visibleTiles.forEach { call(activity, "connectTile", it) }
     }
+    private fun choosePlacement(label: String) {
+        val deadline = android.os.SystemClock.uptimeMillis() + 5000
+        while (android.os.SystemClock.uptimeMillis() < deadline) {
+            val node = instrumentation.uiAutomation.rootInActiveWindow
+                ?.findAccessibilityNodeInfosByText(label)?.firstOrNull { it.text?.toString() == label }
+            if (node != null) {
+                if (node.performAction(android.view.accessibility.AccessibilityNodeInfo.ACTION_CLICK)) return
+                val bounds = android.graphics.Rect()
+                node.getBoundsInScreen(bounds)
+                if (!bounds.isEmpty) {
+                    val now = android.os.SystemClock.uptimeMillis()
+                    for (action in listOf(android.view.MotionEvent.ACTION_DOWN, android.view.MotionEvent.ACTION_UP)) {
+                        android.view.MotionEvent.obtain(now, now, action, bounds.exactCenterX(), bounds.exactCenterY(), 0).useEvent {
+                            instrumentation.uiAutomation.injectInputEvent(it, true)
+                        }
+                    }
+                    return
+                }
+            }
+            Thread.sleep(25)
+        }
+        val root = instrumentation.uiAutomation.rootInActiveWindow
+        fun texts(node: android.view.accessibility.AccessibilityNodeInfo?): List<String> =
+            if (node == null) emptyList() else listOfNotNull(node.text?.toString()) +
+                (0 until node.childCount).flatMap { texts(node.getChild(it)) }
+        fail("Shell placement choice was not visible: $label; fixture UI: ${texts(root)}")
+    }
+    private inline fun android.view.MotionEvent.useEvent(block: (android.view.MotionEvent) -> Unit) {
+        try { block(this) } finally { recycle() }
+    }
 
     @Test fun liveAppearanceAndFadeRetainBothTilesDraftAndInputSelection() {
         assumeTrue("Disposable emulator fixture only", android.os.Build.FINGERPRINT.contains("generic") || android.os.Build.HARDWARE in listOf("goldfish", "ranchu"))
@@ -65,6 +95,7 @@ class TermuxWorkspacePaneIntegrationTest {
             ActivityScenario.launch<TermuxWorkspaceActivity>(Intent(context, TermuxWorkspaceActivity::class.java)).use { scenario ->
                 await(scenario, "Workspace must own a rendered window") { it.hasWindowFocus() }
                 scenario.onActivity { activity ->
+                    call(activity, "dismissHelperPrompt")
                     val state = field(activity, "selection") as TermuxWorkspaceState
                     state.select(0, "@1"); state.select(1, "@2"); state.focus(1)
                     state.layout = TermuxWorkspaceState.Layout.LEFT_RIGHT
@@ -199,13 +230,19 @@ class TermuxWorkspacePaneIntegrationTest {
         prefs.edit().clear().commit()
         try {
             ActivityScenario.launch<TermuxWorkspaceActivity>(Intent(context, TermuxWorkspaceActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)).use { scenario ->
-                scenario.onActivity { attach(it, port!!) }
-                await(scenario, "First tile must receive a real helper frame") { (field(it, "selection") as TermuxWorkspaceState).targets[0] != null }
                 scenario.onActivity {
-                    val state = field(it, "selection") as TermuxWorkspaceState
-                    state.layout = TermuxWorkspaceState.Layout.TOP_BOTTOM
+                    // The private helper owns @0; an empty pane must not auto-select/create a shell.
+                    call(it, "dismissHelperPrompt")
+                    (field(it, "selection") as TermuxWorkspaceState).select(0, "@0")
+                    attach(it, port!!)
+                }
+                await(scenario, "First tile must receive a real helper frame") {
+                    ((field(it, "frames") as Array<*>)[0] as? TermuxWorkspaceFrame)?.target == "@0"
+                }
+                scenario.onActivity {
                     call(it, "newShell", 1, null, null)
                 }
+                choosePlacement(context.getString(R.string.workspace_split_top_bottom))
                 await(scenario, "Second tile must own a distinct real tmux window") {
                     val state = field(it, "selection") as TermuxWorkspaceState
                     state.targets[1] != null && state.targets[1] != state.targets[0]

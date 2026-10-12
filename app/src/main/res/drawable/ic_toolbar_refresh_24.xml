@@ -1,9 +1,8 @@
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="24dp"
-    android:height="24dp"
-    android:viewportWidth="24"
-    android:viewportHeight="24">
-    <path
-        android:fillColor="#FFFFFFFF"
-        android:pathData="M17.7,6.3C16.2,4.9 14.2,4 12,4C7.9,4 4.5,7.1 4.1,11H2L5,14.5L8,11H6.1C6.5,8.2 9,6 12,6C13.6,6 15.1,6.6 16.2,7.8L17.7,6.3ZM18.9,13C18.5,15.8 16,18 13,18C11.4,18 9.9,17.4 8.8,16.2L7.3,17.7C8.8,19.1 10.8,20 13,20C17.1,20 20.5,16.9 20.9,13H23L20,9.5L17,13H18.9Z" />
+<!-- Google Material Symbols, Apache-2.0. Converted viewport; paths unchanged.
+Source: https://raw.githubusercontent.com/google/material-design-icons/49d4db35df873165d6bd6ba09b063c7dafbac2f4/symbols/web/refresh/materialsymbolsoutlined/refresh_24px.svg
+License: LICENSES/Material-Symbols-Apache-2.0.txt -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="24dp" android:height="24dp" android:viewportWidth="960" android:viewportHeight="960">
+    <group android:translateX="-0.0" android:translateY="960.0">
+        <path android:fillColor="#FFFFFFFF" android:pathData="M480-160q-134 0-227-93t-93-227q0-134 93-227t227-93q69 0 132 28.5T720-690v-110h80v280H520v-80h168q-32-56-87.5-88T480-720q-100 0-170 70t-70 170q0 100 70 170t170 70q77 0 139-44t87-116h84q-28 106-114 173t-196 67Z" />
+    </group>
 </vector>

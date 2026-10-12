@@ -51,3 +51,19 @@ docs/store-assets/promo-screenshots/
 docs/play-store/
 local-packs/
 local-skins/
+
+# Maintainer-local release context, reports and VPS operations (keep on disk)
+/RELEASE_NOTES.md
+/release-notes.md
+/TODO.md
+/IDEA.md
+/.local-context/
+/server/
+/docs/TESTBOOK.md
+/docs/FOCUS_FRICTION_V1.md
+/docs/irc-release-readiness.md
+/docs/privacy.html
+/docs/localization/AUDIT.md
+/docs/localization/INVENTORY.md
+/docs/localization/resources.csv
+/docs/localization/source-review.csv

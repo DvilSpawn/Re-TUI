@@ -82,10 +82,20 @@ and does not grant trademark rights.
 
 ## Google Material Symbols
 
-The `open_in_full_24` and `pip_24` window-action vectors adapt Google's outlined
-Material Symbols `open_in_full` and `picture_in_picture` SVG paths. The SVG
-coordinate origin is translated into an Android vector viewport; the paths are
-otherwise unchanged.
+The 66 Material vectors, including Notes formatting, toolbar/window controls and
+neutral support-link symbols, adapt Google's outlined/rounded Material Symbols.
+The SVG coordinate origin is translated into an Android vector viewport; paths
+are unchanged. Existing resource dimensions and the resize-arrow rotation wrapper
+are retained. Per-file source URLs/SVG hashes and modified-output hashes are in
+`third_party/material-icons.json`, pinned to revision
+`49d4db35df873165d6bd6ba09b063c7dafbac2f4`.
+
+The former unverified Notes formatting PNGs and support brand-logo vectors are
+not included in current builds. Neutral code/chat/forum symbols link to the same
+destinations without asserting brand-logo rights. The block-letter wordmark and
+two tree connectors are independently authored Re:TUI geometric paths under the
+project GPL-3.0-or-later license, not extracted font outlines; exact hashes are in
+`third_party/project-vector-icons.json`.
 
 Source: https://github.com/google/material-design-icons/tree/master/symbols/web
 License: Apache-2.0; see `LICENSES/Material-Symbols-Apache-2.0.txt`.
@@ -130,9 +140,10 @@ License: https://craftpix.net/file-licenses/ (Freebie Products).
 The artwork is bundled for in-app rendering; it is not offered for image export.
 These images remain subject to the CraftPix license, not the repository's code license.
 Source: https://craftpix.net/freebies/free-sky-with-clouds-background-pixel-art-set/.
-The 2026-10-11 review in `docs/clouds-licensing.md` supports app use but leaves
-raw public-Git redistribution unresolved; the separate four-background itch.io
-listing does not establish additional permissions for this eight-sky set.
+The maintainer closed the clouds follow-up on 2026-10-12 and directed that these
+assets remain bundled, with creator coordination maintainer-owned. The evidence
+and closure record are in `docs/clouds-licensing.md`; this does not relicense the
+artwork under GPL or establish rights from the separate four-background listing.
 
 ## csakura
 

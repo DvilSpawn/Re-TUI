@@ -24,6 +24,7 @@ object TermuxBridgeManager {
     const val TERMUX_RUN_COMMAND_WORKDIR: String = "com.termux.RUN_COMMAND_WORKDIR"
     const val TERMUX_RUN_COMMAND_BACKGROUND: String = "com.termux.RUN_COMMAND_BACKGROUND"
     const val TERMUX_RUN_COMMAND_PENDING_INTENT: String = "com.termux.RUN_COMMAND_PENDING_INTENT"
+    const val TERMUX_RUN_COMMAND_STDIN: String = "com.termux.RUN_COMMAND_STDIN"
 
     const val TERMUX_HOME: String = "/data/data/com.termux/files/home"
     const val TERMUX_SH: String = "/data/data/com.termux/files/usr/bin/sh"
@@ -119,12 +120,14 @@ object TermuxBridgeManager {
     }
 
     @JvmStatic
+    @JvmOverloads
     fun startRunCommand(
         context: Context,
         path: String?,
         workDir: String?,
         resultPendingIntent: PendingIntent?,
-        args: Array<String?>?
+        args: Array<String?>?,
+        stdin: String? = null
     ) {
         val intent = Intent(TERMUX_RUN_COMMAND_ACTION)
         intent.setClassName(TERMUX_PACKAGE, TERMUX_RUN_COMMAND_SERVICE)
@@ -132,6 +135,7 @@ object TermuxBridgeManager {
         intent.putExtra(TERMUX_RUN_COMMAND_WORKDIR, if (workDir == null) TERMUX_HOME else workDir)
         intent.putExtra(TERMUX_RUN_COMMAND_BACKGROUND, true)
         intent.putExtra(TERMUX_RUN_COMMAND_PENDING_INTENT, resultPendingIntent)
+        if (stdin != null) intent.putExtra(TERMUX_RUN_COMMAND_STDIN, stdin)
         if (args != null && args.size > 0) {
             intent.putExtra(TERMUX_RUN_COMMAND_ARGUMENTS, args)
         }

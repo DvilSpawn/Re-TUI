@@ -1,11 +1,8 @@
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="40dp"
-    android:height="40dp"
-    android:viewportWidth="960"
-    android:viewportHeight="960">
-    <group android:translateY="960">
-        <path
-            android:fillColor="#FF000000"
-            android:pathData="M130,-160q-20.83,0 -35.42,-14.62Q80,-189.24 80,-210.12 80,-231 94.58,-245.5 109.17,-260 130,-260h30v-473.33q0,-27.5 19.58,-47.09Q199.17,-800 226.67,-800h580q14.16,0 23.75,9.62 9.58,9.61 9.58,23.83 0,14.22 -9.58,23.72 -9.59,9.5 -23.75,9.5h-580V-260h190q20.83,0 35.41,14.62 14.59,14.62 14.59,35.5 0,20.88 -14.59,35.38Q437.5,-160 416.67,-160H130Zm436.67,0q-14.17,0 -23.75,-9.58 -9.59,-9.59 -9.59,-23.75v-440q0,-14.17 9.59,-23.75 9.58,-9.59 23.75,-9.59h280q14.16,0 23.75,9.59 9.58,9.58 9.58,23.75v440q0,14.16 -9.58,23.75 -9.59,9.58 -23.75,9.58h-280ZM600,-260h213.33v-340H600v340Z" />
+<!-- Google Material Symbols, Apache-2.0. Converted viewport; paths unchanged.
+Source: https://raw.githubusercontent.com/google/material-design-icons/49d4db35df873165d6bd6ba09b063c7dafbac2f4/symbols/web/devices/materialsymbolsrounded/devices_24px.svg
+License: LICENSES/Material-Symbols-Apache-2.0.txt -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="40dp" android:height="40dp" android:viewportWidth="960" android:viewportHeight="960">
+    <group android:translateX="-0.0" android:translateY="960.0">
+        <path android:fillColor="#FFFFFFFF" android:pathData="M140-160q-25 0-42.5-17.5T80-220q0-25 17.5-42.5T140-280h20v-440q0-33 23.5-56.5T240-800h560q17 0 28.5 11.5T840-760q0 17-11.5 28.5T800-720H240v440h180q25 0 42.5 17.5T480-220q0 25-17.5 42.5T420-160H140Zm460 0q-17 0-28.5-11.5T560-200v-400q0-17 11.5-28.5T600-640h240q17 0 28.5 11.5T880-600v400q0 17-11.5 28.5T840-160H600Zm40-120h160v-280H640v280Zm0 0h160-160Z" />
     </group>
 </vector>

@@ -11,7 +11,21 @@
     <string name="workspace_new_shell">New shell</string>
     <string name="workspace_focused_tile">Tile %1$d, focused</string>
     <string name="workspace_unfocused_tile">Tile %1$d, tap to focus</string>
-    <string name="workspace_helper_update_required">Update the Termux retui helper to 0.4.1 for workspace pages and shell exit detection. Existing windows are unchanged.</string>
+    <string name="workspace_helper_update_required">Update the Termux retui helper to 0.4.2 for workspace pages and shell exit detection. Existing windows are unchanged.</string>
+    <string name="workspace_helper_update_prompt">Termux helper update required\n\nThis Launcher needs helper %1$s. Update now installs the matching helper bundled with this app and reconnects the bridge. Existing shells and jobs are kept. A previous helper copy is retained for recovery. Any custom helper at this path will be replaced.</string>
+    <string name="workspace_helper_update_now">Update now</string>
+    <string name="workspace_helper_later">Later</string>
+    <string name="workspace_helper_hide">Hide progress</string>
+    <string name="workspace_helper_retry">Retry connection</string>
+    <string name="workspace_helper_guide">Setup guide</string>
+    <string name="workspace_helper_permissions">Launcher permissions</string>
+    <string name="workspace_helper_open_termux">Open Termux</string>
+    <string name="workspace_helper_updating">Updating helper · existing shells and jobs are kept</string>
+    <string name="workspace_helper_setup">Termux setup required\n\nInstall Termux, grant Launcher permission to run Termux commands, and enable allow-external-apps=true in Termux settings. The setup guide has instructions. No security settings are changed automatically.</string>
+    <string name="workspace_helper_dependencies">Termux packages required\n\nInstall tmux and socat in Termux with: pkg install tmux socat\nThen retry. Your existing helper has not been changed.</string>
+    <string name="workspace_helper_update_failed">Helper update failed\n\nThe update was not confirmed. Installation failures attempt to restore the previous helper; it is also retained under $PREFIX/share/retui/retui.previous. Retry or open the setup guide. Existing shells and jobs are not stopped.</string>
+    <string name="workspace_helper_update_busy">Another helper update is running or was interrupted\n\nRetry shortly. If this persists, open the setup guide. Launcher will not delete an unknown update lock or start another installation.</string>
+    <string name="workspace_helper_no_reply">No reply from Termux\n\nCheck command permission and allow-external-apps, then retry. A dispatched update may still finish inside Termux; no installation is automatically retried.</string>
     <string name="workspace_place_shell">Place new shell window</string>
     <string name="workspace_replace_focused">Replace focused tile (keep previous shell)</string>
     <string name="workspace_split_top_bottom">Split top-bottom</string>

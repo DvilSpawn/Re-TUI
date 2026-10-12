@@ -455,7 +455,7 @@
     "type": "string"
   },
   "calculator_hints_body": {
-    "formatted": true,
+    "formatted": false,
     "forms": {
       "other": "CALCULATOR\n\nEnter an expression after calc> and press Enter or ↵.\n\nContinue a result\n5 + 5 → 10\n+5 → 15\n*2 → 30\nA leading +, −, ×, ÷ or ^ continues the last successful result. A complete expression starts fresh. Use (-5) for a standalone negative value after a result. Errors and cancellation keep the last result.\n\nArithmetic\n2 + 3 * 4 → 14\n(2 + 3) * 4 → 20\nsqrt(144) → 12\n2^3 → 8\n\nConvert units\n5 ft to cm → 152.4 cm\n*2 → 304.8 cm\nans to ft → 10 ft\nUse to for conversion. The word in means inches.\n\nExplicit answers and variables\nans is optional: sqrt(ans), 100 / ans and ans to ft refer to the last result. ans = 5 sets it. Named assignments such as tax = 18% go to Qalculate; these variables last only while the engine process remains alive.\n\nKeypad and editing\n123: numbers, operators and =\nABC: letters, units and variable names\nFUNC: functions, constants and =\nTap the input to place the cursor or select text. Function keys insert parentheses with the cursor inside. ⌫ deletes. = inserts an assignment; ↵ evaluates.\n\nCommands\nclear — clear the transcript, keeping the last result\nhelp — open the calculator guide\nexit — close the calculator\n\nCancel stops the current calculation. Back closes Help and retains your reading position."
     },
@@ -1137,6 +1137,34 @@
     "formatted": true,
     "forms": {
       "other": "Submit command"
+    },
+    "type": "string"
+  },
+  "changelog_continue": {
+    "formatted": true,
+    "forms": {
+      "other": "Continue to Launcher"
+    },
+    "type": "string"
+  },
+  "changelog_pane_title": {
+    "formatted": true,
+    "forms": {
+      "other": "CHANGELOG"
+    },
+    "type": "string"
+  },
+  "changelog_release_heading": {
+    "formatted": true,
+    "forms": {
+      "other": "Re:TUI %1$s · Build %2$d"
+    },
+    "type": "string"
+  },
+  "changelog_release_highlights": {
+    "formatted": false,
+    "forms": {
+      "other": "What is new in this update\n\n## Native IRC\n- Talk through standard IRC with channel and private-conversation chips, Channels, People and concise Help. Slash commands remain available.\n- Sign in through one prompt; optional device-key authentication reconnects without saving your password.\n- Messages appear immediately. Pending or uncertain sends are labelled; duplicate server echoes and automatic retries are avoided.\n\n## Calculator\n- Terminal input with 123, ABC and FUNC key layers for numbers, units, variables and functions.\n- Live hints preview how Qalculate interprets your expression and its possible result.\n- Continue from the last answer: 5+5 gives 10, then +5 gives 15. Assignment and conversion controls are easier to reach.\n\n## Floating tools and Help\n- Calculator, Help and IRC share raised headers, inner panes, theme-controlled borders and remembered window sizes.\n- Calculator and Help stay expanded in landscape. Help closes with Back and remembers your place; calculator help leaves your calculation intact.\n\n## Termux workspace\n- A separate workspace with two independent terminal tiles, split layouts and multiple pages. Existing shells and jobs keep running when you leave.\n- The workspace checks its helper and offers Update now / Later. Updates use the matching helper bundled with Launcher, with checksum verification and installation-failure recovery.\n- Improved Unicode input, resizing and reconnect restoration.\n\n## Launcher\n- Guided first-run setup with live border previews and a terminal-style build animation.\n- Classic/Search controls, optional search-category tabs and independent app-drawer rail appearance controls.\n- Portable preset sharing/import, an optional idle fade, improved unlock tracking and the JetBrains Mono Nerd Font Regular default.\n\n## Before you start\n- Termux still needs its command permission, external-app access, tmux and socat. The update prompt offers setup guidance when needed.\n- IRC uses TLS, not end-to-end encryption. Server operators can read messages; closing the IRC pane disconnects.\n\nYou can reopen these notes with the changelog command. These highlights are bundled with the installed app and work offline."
     },
     "type": "string"
   },
@@ -3272,888 +3300,6 @@
     "formatted": true,
     "forms": {
       "other": "ON"
-    },
-    "type": "string"
-  },
-  "community_accept_rules": {
-    "formatted": true,
-    "forms": {
-      "other": "Accept rules"
-    },
-    "type": "string"
-  },
-  "community_account_deleted": {
-    "formatted": true,
-    "forms": {
-      "other": "Community account deleted. Local account data cleared."
-    },
-    "type": "string"
-  },
-  "community_account_policy": {
-    "formatted": true,
-    "forms": {
-      "other": "Username: 3–24 ASCII letters, digits, - or _. Password: 8–71 characters. No forgotten-password recovery: use a new username, a separate identity. Old usernames cannot be reclaimed; no automatic ownership or history migration."
-    },
-    "type": "string"
-  },
-  "community_auth_confirmation_error": {
-    "formatted": true,
-    "forms": {
-      "other": "Passwords differ. Enter username again."
-    },
-    "type": "string"
-  },
-  "community_auth_password_error": {
-    "formatted": true,
-    "forms": {
-      "other": "Use 8–71 characters. Enter username again."
-    },
-    "type": "string"
-  },
-  "community_auth_password_guidance": {
-    "formatted": true,
-    "forms": {
-      "other": "8–71 characters. No email or password recovery."
-    },
-    "type": "string"
-  },
-  "community_auth_username_error": {
-    "formatted": true,
-    "forms": {
-      "other": "Use 3–24 ASCII letters, digits, - or _."
-    },
-    "type": "string"
-  },
-  "community_auth_username_guidance": {
-    "formatted": true,
-    "forms": {
-      "other": "3–24 ASCII letters, digits, - or _. No email or password recovery."
-    },
-    "type": "string"
-  },
-  "community_back": {
-    "formatted": true,
-    "forms": {
-      "other": "Back to threads"
-    },
-    "type": "string"
-  },
-  "community_ban_author": {
-    "formatted": true,
-    "forms": {
-      "other": "Ban reported author"
-    },
-    "type": "string"
-  },
-  "community_block_author": {
-    "formatted": true,
-    "forms": {
-      "other": "Block / unblock author locally"
-    },
-    "type": "string"
-  },
-  "community_blocked": {
-    "formatted": true,
-    "forms": {
-      "other": "Local block toggled for %1$s."
-    },
-    "type": "string"
-  },
-  "community_bugs": {
-    "formatted": true,
-    "forms": {
-      "other": "bugs"
-    },
-    "type": "string"
-  },
-  "community_busy": {
-    "formatted": true,
-    "forms": {
-      "other": "A request is in progress; wait before submitting again."
-    },
-    "type": "string"
-  },
-  "community_cancel": {
-    "formatted": true,
-    "forms": {
-      "other": "Cancel"
-    },
-    "type": "string"
-  },
-  "community_channels": {
-    "formatted": true,
-    "forms": {
-      "other": "Channels"
-    },
-    "type": "string"
-  },
-  "community_checking_delivery": {
-    "formatted": true,
-    "forms": {
-      "other": "checking delivery…"
-    },
-    "type": "string"
-  },
-  "community_confirm_action": {
-    "formatted": true,
-    "forms": {
-      "other": "Confirm"
-    },
-    "type": "string"
-  },
-  "community_confirm_password": {
-    "formatted": true,
-    "forms": {
-      "other": "Confirm password"
-    },
-    "type": "string"
-  },
-  "community_connection_live": {
-    "formatted": true,
-    "forms": {
-      "other": "● Live · @%1$s"
-    },
-    "type": "string"
-  },
-  "community_connection_offline": {
-    "formatted": true,
-    "forms": {
-      "other": "○ Offline · @%1$s"
-    },
-    "type": "string"
-  },
-  "community_connection_ready": {
-    "formatted": true,
-    "forms": {
-      "other": "● Connected · @%1$s"
-    },
-    "type": "string"
-  },
-  "community_connection_signed_out": {
-    "formatted": true,
-    "forms": {
-      "other": "○ Signed out"
-    },
-    "type": "string"
-  },
-  "community_connection_syncing": {
-    "formatted": true,
-    "forms": {
-      "other": "↻ Syncing · @%1$s"
-    },
-    "type": "string"
-  },
-  "community_copy_message": {
-    "formatted": true,
-    "forms": {
-      "other": "Copy message"
-    },
-    "type": "string"
-  },
-  "community_create_account": {
-    "formatted": true,
-    "forms": {
-      "other": "Join"
-    },
-    "type": "string"
-  },
-  "community_current": {
-    "formatted": true,
-    "forms": {
-      "other": "%1$s · current · refreshed while visible"
-    },
-    "type": "string"
-  },
-  "community_delete_account": {
-    "formatted": true,
-    "forms": {
-      "other": "Delete community account"
-    },
-    "type": "string"
-  },
-  "community_delete_explanation": {
-    "formatted": true,
-    "forms": {
-      "other": "Delete @%1$s and its authored messages, discussions and replies? Replies by others on your discussions are also removed. This cannot be undone. Enter your current password to confirm.\n\nModeration evidence remains for six calendar months. Private recovery copies rotate after seven days and are removed on the next hourly run. Launcher settings are not affected. No forgotten-password recovery. A web deletion path is available at irc.kokodoko.cloud/community/account-deletion."
-    },
-    "type": "string"
-  },
-  "community_deletion_failed": {
-    "formatted": true,
-    "forms": {
-      "other": "Deletion was not confirmed. Check the web deletion page before retrying."
-    },
-    "type": "string"
-  },
-  "community_discard": {
-    "formatted": true,
-    "forms": {
-      "other": "Discard and leave"
-    },
-    "type": "string"
-  },
-  "community_discussion_hint": {
-    "formatted": true,
-    "forms": {
-      "other": "Opening message"
-    },
-    "type": "string"
-  },
-  "community_duplicate_username": {
-    "formatted": true,
-    "forms": {
-      "other": "Username is already taken."
-    },
-    "type": "string"
-  },
-  "community_edit_title": {
-    "formatted": true,
-    "forms": {
-      "other": "Back · Edit title"
-    },
-    "type": "string"
-  },
-  "community_edit_title_summary": {
-    "formatted": true,
-    "forms": {
-      "other": "Edit discussion title: %1$s"
-    },
-    "type": "string"
-  },
-  "community_empty": {
-    "formatted": true,
-    "forms": {
-      "other": "No messages yet. Start the conversation."
-    },
-    "type": "string"
-  },
-  "community_forum_context": {
-    "formatted": true,
-    "forms": {
-      "other": "#%1$s · discussions stay"
-    },
-    "type": "string"
-  },
-  "community_general": {
-    "formatted": true,
-    "forms": {
-      "other": "general"
-    },
-    "type": "string"
-  },
-  "community_general_context": {
-    "formatted": true,
-    "forms": {
-      "other": "#general · 24-hour chat"
-    },
-    "type": "string"
-  },
-  "community_help": {
-    "formatted": true,
-    "forms": {
-      "other": "Channels: general, bugs, help, suggestions and presets. Suggestions uses the features API key. Tap Channels, New thread, Mentions or Menu; no slash command is required. Plain text posts on Send; exit posts, /exit leaves, //text posts /text.\n/help · /refresh · /older · /login · /register · /logout · /exit\n/report <full message ID> · /block <username> · /moderate <private text>\nGeneral messages expire individually after 24 hours. Forum threads and replies persist. Reports and private moderator requests last six calendar months; /moderate never posts publicly and has no automatic retry.\nTap a suggested @handle to insert it at the caret. Only active foreground sessions renew 90-second presence leases; badges and mentions are in-app only. No push, private messages, attachments, external IRC or launcher execution.\nUsername/password only; public registration and no password recovery. Server-readable, not end-to-end encrypted. Private encrypted account storage; 200 bodies per window and bounded routing/read metadata. Paused cache bytes are pruned on access; no secure-erasure guarantee. Nothing posts automatically on restoration. PocketBase is pre-1.0; this optional pilot may change."
-    },
-    "type": "string"
-  },
-  "community_help_action": {
-    "formatted": true,
-    "forms": {
-      "other": "Help"
-    },
-    "type": "string"
-  },
-  "community_help_channel": {
-    "formatted": true,
-    "forms": {
-      "other": "help"
-    },
-    "type": "string"
-  },
-  "community_invalid": {
-    "formatted": true,
-    "forms": {
-      "other": "Input rejected; use /help. Slash commands take no password arguments. Messages: 500 Unicode characters / 2000 UTF-8 bytes maximum."
-    },
-    "type": "string"
-  },
-  "community_join": {
-    "formatted": true,
-    "forms": {
-      "other": "Join community"
-    },
-    "type": "string"
-  },
-  "community_keep": {
-    "formatted": true,
-    "forms": {
-      "other": "Keep and leave"
-    },
-    "type": "string"
-  },
-  "community_leave_body": {
-    "formatted": true,
-    "forms": {
-      "other": "Keep the draft privately for next time, or discard it. Nothing is uploaded. Discarding an uncertain draft does not retract a possible server post."
-    },
-    "type": "string"
-  },
-  "community_leave_title": {
-    "formatted": true,
-    "forms": {
-      "other": "Unsent or uncertain draft"
-    },
-    "type": "string"
-  },
-  "community_live": {
-    "formatted": true,
-    "forms": {
-      "other": "%1$s · live"
-    },
-    "type": "string"
-  },
-  "community_loading": {
-    "formatted": true,
-    "forms": {
-      "other": "%1$s · requesting…"
-    },
-    "type": "string"
-  },
-  "community_login": {
-    "formatted": true,
-    "forms": {
-      "other": "Login"
-    },
-    "type": "string"
-  },
-  "community_login_required": {
-    "formatted": true,
-    "forms": {
-      "other": "Sign in or register first. Draft kept; nothing was sent."
-    },
-    "type": "string"
-  },
-  "community_logout": {
-    "formatted": true,
-    "forms": {
-      "other": "Signed out. Account cache, blocks, draft and token cleared."
-    },
-    "type": "string"
-  },
-  "community_mention_author": {
-    "formatted": true,
-    "forms": {
-      "other": "Mention author"
-    },
-    "type": "string"
-  },
-  "community_mentions": {
-    "formatted": true,
-    "forms": {
-      "other": "Mentions"
-    },
-    "type": "string"
-  },
-  "community_mentions_empty": {
-    "formatted": true,
-    "forms": {
-      "other": "No unexpired mentions."
-    },
-    "type": "string"
-  },
-  "community_menu": {
-    "formatted": true,
-    "forms": {
-      "other": "Menu"
-    },
-    "type": "string"
-  },
-  "community_message_actions": {
-    "formatted": true,
-    "forms": {
-      "other": "Message actions"
-    },
-    "type": "string"
-  },
-  "community_message_hint": {
-    "formatted": true,
-    "forms": {
-      "other": "Message #general"
-    },
-    "type": "string"
-  },
-  "community_messages_below": {
-    "formatted": true,
-    "forms": {
-      "other": "%1$d messages below · Latest ↓"
-    },
-    "type": "string"
-  },
-  "community_moderate": {
-    "formatted": true,
-    "forms": {
-      "other": "Private moderator request"
-    },
-    "type": "string"
-  },
-  "community_moderation_actions": {
-    "formatted": true,
-    "forms": {
-      "other": "Choose action"
-    },
-    "type": "string"
-  },
-  "community_moderation_confirm": {
-    "formatted": true,
-    "forms": {
-      "other": "Confirm this moderator action. Removing a discussion also removes its replies. Evidence keeps its original six-month expiry."
-    },
-    "type": "string"
-  },
-  "community_more": {
-    "formatted": true,
-    "forms": {
-      "other": "More"
-    },
-    "type": "string"
-  },
-  "community_network_error": {
-    "formatted": true,
-    "forms": {
-      "other": "Network/TLS request failed. Cached history may be stale; draft kept. Nothing will post automatically."
-    },
-    "type": "string"
-  },
-  "community_new_messages": {
-    "formatted": true,
-    "forms": {
-      "other": "%1$d unread · Latest ↓"
-    },
-    "type": "string"
-  },
-  "community_new_thread": {
-    "formatted": true,
-    "forms": {
-      "other": "New discussion"
-    },
-    "type": "string"
-  },
-  "community_next": {
-    "formatted": true,
-    "forms": {
-      "other": "Next"
-    },
-    "type": "string"
-  },
-  "community_not_confirmed": {
-    "formatted": true,
-    "forms": {
-      "other": "delivery not confirmed"
-    },
-    "type": "string"
-  },
-  "community_offline": {
-    "formatted": true,
-    "forms": {
-      "other": "@%1$s · offline"
-    },
-    "type": "string"
-  },
-  "community_older": {
-    "formatted": true,
-    "forms": {
-      "other": "Older"
-    },
-    "type": "string"
-  },
-  "community_online": {
-    "formatted": true,
-    "forms": {
-      "other": "@%1$s · online"
-    },
-    "type": "string"
-  },
-  "community_operations_warning": {
-    "formatted": true,
-    "forms": {
-      "other": "Operator attention needed: %1$s"
-    },
-    "type": "string"
-  },
-  "community_password": {
-    "formatted": true,
-    "forms": {
-      "other": "Password"
-    },
-    "type": "string"
-  },
-  "community_pending": {
-    "formatted": true,
-    "forms": {
-      "other": "Posting… not delivered yet."
-    },
-    "type": "string"
-  },
-  "community_pending_locked": {
-    "formatted": true,
-    "forms": {
-      "other": "Previous attempt is unresolved. Restore its draft with /refresh and submit it unchanged to reconcile/retry, or /logout to clear local state (this does not retract any server post)."
-    },
-    "type": "string"
-  },
-  "community_post_discussion": {
-    "formatted": true,
-    "forms": {
-      "other": "Post discussion"
-    },
-    "type": "string"
-  },
-  "community_posted": {
-    "formatted": true,
-    "forms": {
-      "other": "Posted — server acknowledgement verified."
-    },
-    "type": "string"
-  },
-  "community_presets": {
-    "formatted": true,
-    "forms": {
-      "other": "presets"
-    },
-    "type": "string"
-  },
-  "community_private_sent": {
-    "formatted": true,
-    "forms": {
-      "other": "Private moderator request accepted."
-    },
-    "type": "string"
-  },
-  "community_private_uncertain": {
-    "formatted": true,
-    "forms": {
-      "other": "Private delivery was not confirmed. It may have reached the server. Do not send another copy blindly."
-    },
-    "type": "string"
-  },
-  "community_queue_next": {
-    "formatted": true,
-    "forms": {
-      "other": "Next"
-    },
-    "type": "string"
-  },
-  "community_queue_page": {
-    "formatted": true,
-    "forms": {
-      "other": "%1$s · page %2$d"
-    },
-    "type": "string"
-  },
-  "community_queue_previous": {
-    "formatted": true,
-    "forms": {
-      "other": "Previous"
-    },
-    "type": "string"
-  },
-  "community_queue_switch": {
-    "formatted": true,
-    "forms": {
-      "other": "Switch report / request queue"
-    },
-    "type": "string"
-  },
-  "community_rate_error": {
-    "formatted": true,
-    "forms": {
-      "other": "Rate limited; wait %1$d seconds before retrying."
-    },
-    "type": "string"
-  },
-  "community_refresh": {
-    "formatted": true,
-    "forms": {
-      "other": "Latest"
-    },
-    "type": "string"
-  },
-  "community_refresh_action": {
-    "formatted": true,
-    "forms": {
-      "other": "Refresh"
-    },
-    "type": "string"
-  },
-  "community_register": {
-    "formatted": true,
-    "forms": {
-      "other": "Register"
-    },
-    "type": "string"
-  },
-  "community_registration_error": {
-    "formatted": true,
-    "forms": {
-      "other": "Registration rejected. Check username uniqueness, password length and matching confirmation. If creation succeeded but login failed, try Login; account creation alone is not sign-in."
-    },
-    "type": "string"
-  },
-  "community_remove_content": {
-    "formatted": true,
-    "forms": {
-      "other": "Remove reported content"
-    },
-    "type": "string"
-  },
-  "community_reply_hint": {
-    "formatted": true,
-    "forms": {
-      "other": "Reply to this discussion"
-    },
-    "type": "string"
-  },
-  "community_report": {
-    "formatted": true,
-    "forms": {
-      "other": "Report content / author"
-    },
-    "type": "string"
-  },
-  "community_report_default": {
-    "formatted": true,
-    "forms": {
-      "other": "Reported content or author from Re:TUI"
-    },
-    "type": "string"
-  },
-  "community_report_reason": {
-    "formatted": true,
-    "forms": {
-      "other": "Reason (optional)"
-    },
-    "type": "string"
-  },
-  "community_reported": {
-    "formatted": true,
-    "forms": {
-      "other": "Report accepted by server."
-    },
-    "type": "string"
-  },
-  "community_request_error": {
-    "formatted": true,
-    "forms": {
-      "other": "Request failed (%1$d). No success was confirmed."
-    },
-    "type": "string"
-  },
-  "community_request_resolved": {
-    "formatted": true,
-    "forms": {
-      "other": "Moderator action saved; request resolved."
-    },
-    "type": "string"
-  },
-  "community_reset_window": {
-    "formatted": true,
-    "forms": {
-      "other": "Reset floating window"
-    },
-    "type": "string"
-  },
-  "community_resolve_request": {
-    "formatted": true,
-    "forms": {
-      "other": "Resolve / dismiss request"
-    },
-    "type": "string"
-  },
-  "community_retry": {
-    "formatted": true,
-    "forms": {
-      "other": "Check delivery"
-    },
-    "type": "string"
-  },
-  "community_review_queue": {
-    "formatted": true,
-    "forms": {
-      "other": "Moderator review"
-    },
-    "type": "string"
-  },
-  "community_rules_accepted": {
-    "formatted": true,
-    "forms": {
-      "other": "Rules accepted. Your draft is unchanged; tap Send when ready."
-    },
-    "type": "string"
-  },
-  "community_rules_body": {
-    "formatted": true,
-    "forms": {
-      "other": "Re:TUI community · Rules version 2026-10-10\n\nBe respectful. No harassment, threats, hate, sexual exploitation, illegal content, impersonation, spam or sharing private information. Do not post secrets or passwords.\n\nReport content or its author from Message actions. Block an author locally to hide their posts and mention badges; /block username toggles the block. Private moderation requests are not public posts. dvil is the only moderator and can remove content or ban accounts.\n\nMessages are server-readable, not end-to-end encrypted. General expires after 24 hours. Forum discussions and accounts persist until deletion. Reports and moderation evidence last six calendar months, including after account deletion. Private recovery snapshots use a seven-day rotation; expired copies are removed on the next hourly run. There is currently no off-site recovery.\n\nAccept these rules before contributing. Acceptance does not submit your draft."
-    },
-    "type": "string"
-  },
-  "community_rules_required": {
-    "formatted": true,
-    "forms": {
-      "other": "Accept the current community rules before posting."
-    },
-    "type": "string"
-  },
-  "community_rules_title": {
-    "formatted": true,
-    "forms": {
-      "other": "Community rules"
-    },
-    "type": "string"
-  },
-  "community_sending": {
-    "formatted": true,
-    "forms": {
-      "other": "sending…"
-    },
-    "type": "string"
-  },
-  "community_session_error": {
-    "formatted": true,
-    "forms": {
-      "other": "Session expired, revoked or account unavailable. Signed out; private cache and draft cleared."
-    },
-    "type": "string"
-  },
-  "community_sign_in": {
-    "formatted": true,
-    "forms": {
-      "other": "Sign in"
-    },
-    "type": "string"
-  },
-  "community_signed_out": {
-    "formatted": true,
-    "forms": {
-      "other": "Signed out · offline · /login or /register"
-    },
-    "type": "string"
-  },
-  "community_signed_out_hint": {
-    "formatted": true,
-    "forms": {
-      "other": "Sign in, join, or type /help"
-    },
-    "type": "string"
-  },
-  "community_source_gone": {
-    "formatted": true,
-    "forms": {
-      "other": "This source is unavailable or has expired."
-    },
-    "type": "string"
-  },
-  "community_stale": {
-    "formatted": true,
-    "forms": {
-      "other": "%1$s · stale/offline"
-    },
-    "type": "string"
-  },
-  "community_storage_error": {
-    "formatted": true,
-    "forms": {
-      "other": "Private encrypted storage is unavailable. No post was started; draft is only in this window."
-    },
-    "type": "string"
-  },
-  "community_submit": {
-    "formatted": true,
-    "forms": {
-      "other": "Send"
-    },
-    "type": "string"
-  },
-  "community_suggestions": {
-    "formatted": true,
-    "forms": {
-      "other": "suggestions"
-    },
-    "type": "string"
-  },
-  "community_thread_context": {
-    "formatted": true,
-    "forms": {
-      "other": "#%1$s › %2$s"
-    },
-    "type": "string"
-  },
-  "community_thread_title": {
-    "formatted": true,
-    "forms": {
-      "other": "Discussion title"
-    },
-    "type": "string"
-  },
-  "community_threads_empty": {
-    "formatted": true,
-    "forms": {
-      "other": "No threads in this channel. Tap New thread to start one."
-    },
-    "type": "string"
-  },
-  "community_title": {
-    "formatted": true,
-    "forms": {
-      "other": "Re-TUI community · experimental"
-    },
-    "type": "string"
-  },
-  "community_title_error": {
-    "formatted": true,
-    "forms": {
-      "other": "Enter a single-line title, up to 120 Unicode characters / 480 UTF-8 bytes."
-    },
-    "type": "string"
-  },
-  "community_title_guidance": {
-    "formatted": true,
-    "forms": {
-      "other": "1 · Title, then Next. Your opening message is kept."
-    },
-    "type": "string"
-  },
-  "community_uncertain": {
-    "formatted": true,
-    "forms": {
-      "other": "Delivery uncertain. Tap Check delivery to verify the original message before retrying. Your newer draft is kept; nothing retries automatically."
-    },
-    "type": "string"
-  },
-  "community_unread_divider": {
-    "formatted": true,
-    "forms": {
-      "other": "— first unread —"
-    },
-    "type": "string"
-  },
-  "community_username": {
-    "formatted": true,
-    "forms": {
-      "other": "Username"
-    },
-    "type": "string"
-  },
-  "community_welcome": {
-    "formatted": true,
-    "forms": {
-      "other": "Welcome to Re-TUI community.\n\nTalk with other Re-TUI users in General, or start a lasting discussion in Help, Bugs, Suggestions or Presets.\n\nGeneral messages expire after 24 hours; discussions stay.\n\nSign in or join below. Public posts are server-readable, not end-to-end encrypted. Accounts have no password recovery."
-    },
-    "type": "string"
-  },
-  "community_window_title": {
-    "formatted": true,
-    "forms": {
-      "other": "Re-TUI community"
     },
     "type": "string"
   },
@@ -6651,13 +5797,6 @@
     },
     "type": "string"
   },
-  "help_community": {
-    "formatted": true,
-    "forms": {
-      "other": "community — open the experimental opt-in Re-TUI community feed. Inside: plain text posts; /help lists local commands. Username/password only. No launcher commands run in this surface."
-    },
-    "type": "string"
-  },
   "help_config": {
     "formatted": true,
     "forms": {
@@ -6780,7 +5919,7 @@
   "help_irc": {
     "formatted": true,
     "forms": {
-      "other": "irc — open the native TLS IRC terminal. /server, /connect, /login, /register, /join, /window, /query, /msg and /help. This is not the HTTP community feed."
+      "other": "irc — open the native TLS IRC terminal. /server, /connect, /login, /register, /join, /window, /query, /msg and /help."
     },
     "type": "string"
   },
@@ -7701,10 +6840,213 @@
     },
     "type": "string"
   },
+  "irc_account_explanation": {
+    "formatted": true,
+    "forms": {
+      "other": "Enter your IRC account name, then your password. This name will also be your nickname."
+    },
+    "type": "string"
+  },
+  "irc_account_hint": {
+    "formatted": true,
+    "forms": {
+      "other": "IRC account name"
+    },
+    "type": "string"
+  },
+  "irc_account_invalid": {
+    "formatted": true,
+    "forms": {
+      "other": "Use an IRC nickname: up to 30 characters, without spaces. Advanced account names can use /login."
+    },
+    "type": "string"
+  },
+  "irc_action_failed": {
+    "formatted": true,
+    "forms": {
+      "other": "Could not complete this action."
+    },
+    "type": "string"
+  },
+  "irc_all_commands": {
+    "formatted": true,
+    "forms": {
+      "other": "All commands"
+    },
+    "type": "string"
+  },
+  "irc_back": {
+    "formatted": true,
+    "forms": {
+      "other": "Back to conversation"
+    },
+    "type": "string"
+  },
+  "irc_browse": {
+    "formatted": true,
+    "forms": {
+      "other": "Browse network"
+    },
+    "type": "string"
+  },
+  "irc_cancel": {
+    "formatted": true,
+    "forms": {
+      "other": "Cancel"
+    },
+    "type": "string"
+  },
+  "irc_channels": {
+    "formatted": true,
+    "forms": {
+      "other": "Channels"
+    },
+    "type": "string"
+  },
+  "irc_close_conversation": {
+    "formatted": true,
+    "forms": {
+      "other": "Close conversation"
+    },
+    "type": "string"
+  },
+  "irc_command_guidance": {
+    "formatted": true,
+    "forms": {
+      "other": "Choose a command for its syntax. Nothing is sent until you press ↵."
+    },
+    "type": "string"
+  },
+  "irc_connection_details": {
+    "formatted": true,
+    "forms": {
+      "other": "Connection details"
+    },
+    "type": "string"
+  },
+  "irc_continue": {
+    "formatted": true,
+    "forms": {
+      "other": "Continue"
+    },
+    "type": "string"
+  },
+  "irc_create_account": {
+    "formatted": true,
+    "forms": {
+      "other": "Create account"
+    },
+    "type": "string"
+  },
+  "irc_device_explanation": {
+    "formatted": true,
+    "forms": {
+      "other": "Reconnect automatically with a protected device key; no saved password. Anyone using your unlocked Launcher can access this account. A new phone or reinstall needs password sign-in."
+    },
+    "type": "string"
+  },
+  "irc_device_failed": {
+    "formatted": true,
+    "forms": {
+      "other": "Device login could not be confirmed. Sign in with your password to retry."
+    },
+    "type": "string"
+  },
+  "irc_device_forgotten": {
+    "formatted": true,
+    "forms": {
+      "other": "Local device key removed. Password sign-in is required. Check NickServ certificate authorization if server revocation could not complete."
+    },
+    "type": "string"
+  },
+  "irc_device_pending": {
+    "formatted": true,
+    "forms": {
+      "other": "Registering this device key…"
+    },
+    "type": "string"
+  },
+  "irc_device_removing": {
+    "formatted": true,
+    "forms": {
+      "other": "Removing device authorization…"
+    },
+    "type": "string"
+  },
+  "irc_device_revoked": {
+    "formatted": true,
+    "forms": {
+      "other": "Device authorization revoked and local key removed."
+    },
+    "type": "string"
+  },
+  "irc_device_saved": {
+    "formatted": true,
+    "forms": {
+      "other": "Device remembered. IRC reconnects automatically when opened."
+    },
+    "type": "string"
+  },
+  "irc_diagnostics": {
+    "formatted": true,
+    "forms": {
+      "other": "Server diagnostics"
+    },
+    "type": "string"
+  },
+  "irc_directory": {
+    "formatted": true,
+    "forms": {
+      "other": "Network channels"
+    },
+    "type": "string"
+  },
+  "irc_directory_limit": {
+    "formatted": true,
+    "forms": {
+      "other": "Showing the first 1,000 channels. You can still join a channel by name."
+    },
+    "type": "string"
+  },
+  "irc_disconnect": {
+    "formatted": true,
+    "forms": {
+      "other": "Disconnect"
+    },
+    "type": "string"
+  },
+  "irc_disconnect_first": {
+    "formatted": true,
+    "forms": {
+      "other": "Disconnect before changing networks."
+    },
+    "type": "string"
+  },
+  "irc_forget_device": {
+    "formatted": true,
+    "forms": {
+      "other": "Forget this device"
+    },
+    "type": "string"
+  },
+  "irc_forget_explanation": {
+    "formatted": true,
+    "forms": {
+      "other": "Remove the login key from this phone and disconnect? Server revocation will also be requested if this account is connected. If offline, remove its old certificate through NickServ on a trusted client."
+    },
+    "type": "string"
+  },
   "irc_help": {
     "formatted": true,
     "forms": {
-      "other": "Native IRC terminal — one TLS network at a time.\n/server [host] [TLS port] · default irc.kokodoko.cloud 6697\n/nick nickname · /connect · /login account (masked SASL password)\n/register (connected nickname; masked NickServ password)\n/join #channel · /j #channel · /part [#channel]\n/window [number|name|next|prev|close] · /buffer is an alias\n/query nick · /msg nick text · /me action · /names · /list\n/topic [text] · /whois nick · /mode target modes · /kick nick [reason]\n/oper name (masked password) · /disconnect · /quit · /clear · /help\nPlain text goes only to the active joined channel or query. //text sends /text literally. Unknown commands never become messages or launcher commands.\nWindow markers: * unread · ! mention/private message. Passwords are never transcript/history entries. TLS is verified; no plaintext fallback.\nIRC accounts are separate from old community accounts. Register once, then /login before joining registered-only channels. Server-readable, not end-to-end encrypted. This first slice has no offline replay, push or background service; leaving disconnects. Unconfirmed messages are never retried automatically."
+      "other": "Native IRC terminal — one TLS network at a time.\n/server [host] [TLS port] · default irc.kokodoko.cloud 6697\n/nick nickname · /connect · /login account (masked SASL password)\n/register (guided signup offline; masked NickServ password when connected)\n/join #channel · /j #channel · /part [#channel]\n/window [number|name|next|prev|close] · /buffer is an alias\n/query nick · /msg nick text · /me action · /names · /list\n/topic [text] · /whois nick · /mode target modes · /kick nick [reason]\n/oper name (masked password) · /disconnect · /quit · /clear · /help\nPlain text goes only to the active joined channel or query. //text sends /text literally. Unknown commands never become messages or launcher commands.\nWindow markers: * unread · ! mention/private message. Passwords are never transcript/history entries. TLS is verified; no plaintext fallback.\nRegister once, then sign in or reconnect before joining registered-only channels. Server-readable, not end-to-end encrypted. This first slice has no offline replay, push or background service; leaving disconnects. Unconfirmed messages are never retried automatically."
+    },
+    "type": "string"
+  },
+  "irc_help_title": {
+    "formatted": true,
+    "forms": {
+      "other": "Help"
     },
     "type": "string"
   },
@@ -7715,10 +7057,178 @@
     },
     "type": "string"
   },
+  "irc_join_hint": {
+    "formatted": true,
+    "forms": {
+      "other": "Enter a channel such as #retui, then Continue."
+    },
+    "type": "string"
+  },
+  "irc_join_name": {
+    "formatted": true,
+    "forms": {
+      "other": "Join by channel name"
+    },
+    "type": "string"
+  },
+  "irc_joining": {
+    "formatted": true,
+    "forms": {
+      "other": "Joining %1$s…"
+    },
+    "type": "string"
+  },
+  "irc_leave": {
+    "formatted": true,
+    "forms": {
+      "other": "Leave %1$s"
+    },
+    "type": "string"
+  },
+  "irc_leave_confirm": {
+    "formatted": true,
+    "forms": {
+      "other": "Leave channel"
+    },
+    "type": "string"
+  },
+  "irc_leave_question": {
+    "formatted": true,
+    "forms": {
+      "other": "Leave %1$s? Your in-session draft will be kept."
+    },
+    "type": "string"
+  },
+  "irc_loading": {
+    "formatted": true,
+    "forms": {
+      "other": "Loading…"
+    },
+    "type": "string"
+  },
+  "irc_more": {
+    "formatted": true,
+    "forms": {
+      "other": "More"
+    },
+    "type": "string"
+  },
+  "irc_network": {
+    "formatted": true,
+    "forms": {
+      "other": "Network"
+    },
+    "type": "string"
+  },
+  "irc_network_explanation": {
+    "formatted": true,
+    "forms": {
+      "other": "Choose a TLS network. Account names belong to that network. Default port: 6697."
+    },
+    "type": "string"
+  },
+  "irc_network_hint": {
+    "formatted": true,
+    "forms": {
+      "other": "hostname [TLS port]"
+    },
+    "type": "string"
+  },
+  "irc_no_matches": {
+    "formatted": true,
+    "forms": {
+      "other": "No matches yet."
+    },
+    "type": "string"
+  },
+  "irc_other_network": {
+    "formatted": true,
+    "forms": {
+      "other": "Use an existing account on this network. Nickname-only connections and registration are available through commands where supported."
+    },
+    "type": "string"
+  },
+  "irc_password_context": {
+    "formatted": true,
+    "forms": {
+      "other": "%1$s · masked password · Back cancels"
+    },
+    "type": "string"
+  },
+  "irc_people": {
+    "formatted": true,
+    "forms": {
+      "other": "People"
+    },
+    "type": "string"
+  },
+  "irc_people_requires_channel": {
+    "formatted": true,
+    "forms": {
+      "other": "Join a channel to see its people."
+    },
+    "type": "string"
+  },
+  "irc_private": {
+    "formatted": true,
+    "forms": {
+      "other": "Private conversation"
+    },
+    "type": "string"
+  },
+  "irc_quick_help": {
+    "formatted": true,
+    "forms": {
+      "other": "1. Type a message and press ↵ to send.\n2. Tap a conversation chip to switch chats.\n3. Open Channels to find or join a channel."
+    },
+    "type": "string"
+  },
+  "irc_reconnect": {
+    "formatted": true,
+    "forms": {
+      "other": "Reconnect"
+    },
+    "type": "string"
+  },
+  "irc_refresh": {
+    "formatted": true,
+    "forms": {
+      "other": "Refresh"
+    },
+    "type": "string"
+  },
+  "irc_register_explanation": {
+    "formatted": true,
+    "forms": {
+      "other": "Choose a username, then a masked password. We join only after your account is confirmed. Re:TUI remembers this device by default; you can turn that off below."
+    },
+    "type": "string"
+  },
+  "irc_remember_device": {
+    "formatted": true,
+    "forms": {
+      "other": "Remember this device"
+    },
+    "type": "string"
+  },
+  "irc_search_hint": {
+    "formatted": true,
+    "forms": {
+      "other": "Search this view"
+    },
+    "type": "string"
+  },
   "irc_secret_hint": {
     "formatted": true,
     "forms": {
       "other": "Password · masked, session only · Back cancels"
+    },
+    "type": "string"
+  },
+  "irc_security_details": {
+    "formatted": true,
+    "forms": {
+      "other": "TLS protects the connection, not against server operators. Private conversations are not end-to-end encrypted.\nLeaving this pane disconnects. Passwords are not saved. Unconfirmed messages are never retried automatically."
     },
     "type": "string"
   },
@@ -7729,10 +7239,38 @@
     },
     "type": "string"
   },
+  "irc_show_more": {
+    "formatted": true,
+    "forms": {
+      "other": "Show next 50"
+    },
+    "type": "string"
+  },
+  "irc_sign_in": {
+    "formatted": true,
+    "forms": {
+      "other": "Sign in"
+    },
+    "type": "string"
+  },
+  "irc_signup_info": {
+    "formatted": true,
+    "forms": {
+      "other": "Create an IRC account with a username and password. No email is required. Registration is subject to server limits."
+    },
+    "type": "string"
+  },
   "irc_title": {
     "formatted": true,
     "forms": {
       "other": "IRC"
+    },
+    "type": "string"
+  },
+  "irc_welcome": {
+    "formatted": true,
+    "forms": {
+      "other": "IRC, at your fingertips.\nSign in, choose a channel, and talk."
     },
     "type": "string"
   },
@@ -11148,7 +10686,7 @@
   "offline_help_appearance_body": {
     "formatted": true,
     "forms": {
-      "other": "Choose a numbered topic. Use 0 to return to the launcher."
+      "other": "Fonts, colors, floating tools and optional idle fade. Choose a numbered topic. Use 0 to return to the launcher."
     },
     "type": "string"
   },
@@ -11316,7 +10854,7 @@
   "offline_help_article_calculator_editing_limits_body": {
     "formatted": false,
     "forms": {
-      "other": "Tap the calculator input to position the cursor or select text. Function and square-root keys wrap selected text, or insert parentheses with the cursor inside. Backspace deletes the selection or previous character. ABC uses staggered QWERTY rows within the same keypad-height budget as 123, and long input scrolls horizontally. Expressions are limited to 1024 characters. The native worker has a four-second watchdog; the client waits up to eight seconds for completion. Cancel targets the active calculation and late results are ignored. A fixed keypad height does not guarantee a visible input row on every short landscape screen.\n\n## Examples\n\n```\nclear\n```\n\nAt calc>, clear displayed transcript but retain the previous answer."
+      "other": "Tap the calculator input to position the cursor or select text. Function and square-root keys wrap selected text, or insert parentheses with the cursor inside. Backspace deletes the selection or previous character. ABC uses staggered QWERTY rows within the same keypad-height budget as 123, and long input scrolls horizontally. Expressions are limited to 1024 characters. The native worker has a four-second watchdog; the client waits up to eight seconds for completion. Cancel targets the active calculation and late results are ignored. The floating pane enforces minimum sizing for the input, hint and keypad; Calculator stays expanded in landscape. Larger fonts and a smaller screen can reduce the available floating resize range.\n\n## Examples\n\n```\nclear\n```\n\nAt calc>, clear displayed transcript but retain the previous answer."
     },
     "type": "string"
   },
@@ -11330,7 +10868,7 @@
   "offline_help_article_calculator_help_body": {
     "formatted": false,
     "forms": {
-      "other": "Enter an expression at `calc>` and press ↵. Use the keypad to enter numbers, letters, units and functions. Qalculate evaluates the expression.\n\n## Continue a result\n\n```\n5 + 5 → 10\n+5 → 15\n*2 → 30\n```\n\nStart with +, −, ×, ÷ or ^ to continue from the last successful result. You do not need to type `ans`. ASCII `-`, `*` and `/` work too. A complete expression such as `5 + 5` starts a new calculation. With a previous result, `-5` subtracts 5; use `(-5)` for a standalone negative value. Without a previous result, `-5` is just negative 5. Errors and cancellation keep the last successful result.\n\n## Expressions and operators\n\n```\n2 + 3 * 4 → 14\n(2 + 3) * 4 → 20\n2^3 → 8\n```\n\nUse +, −, ×, ÷, parentheses, ^ and %.\n\n## Convert units\n\n```\n5 ft to cm → 152.4 cm\n*2 → 304.8 cm\nans to ft → 10 ft\n20 celsius to fahrenheit\n```\n\nUse `to` for conversion. The word `in` means inches. Results retain their units when continued.\n\n## Functions and constants\n\n```\nsqrt(144) → 12\nsin(90) → 1 in degrees mode\n```\n\nFUNC inserts sqrt, sin, cos, tan, log, ln and abs with parentheses. Constants: `pi` and `e`.\n\n## Variables and explicit answers\n\n```\ntax = 18%\n4200 * tax → 756\n```\n\n= inserts an assignment; ↵ evaluates. Native named variables last only while the engine process remains alive.\n\n`ans` is optional: use it to refer to the last result inside an expression, for example `sqrt(ans)`, `100 / ans` or `ans to ft`. `ans = 5` sets the stored answer. The last successful answer survives reopening the calculator.\n\n## Keypad and editing\n\n- 123: numbers, operators and =\n- ABC: letters, units and variable names\n- FUNC: functions, constants and =\n\nTap the prompt to place the cursor or select text. Function keys wrap selected text or insert parentheses with the cursor inside. ⌫ deletes the selection or previous character. ↵ evaluates.\n\n- `clear` clears the transcript, keeping the last result.\n- `help` opens this reader.\n- `exit` closes the calculator.\n- Cancel stops a calculation without changing your input.\n\n## Using this help\n\nThe question-mark tab opens this calculator guide without changing your expression. Typing `help` opens it too, consuming only that command. Examples here are read-only; enter them at `calc>` to calculate.\n\nAt `help>`, choose a displayed number or tap its line. 1 opens Topics; 2/3 move between articles when shown. In a topic list, 10 opens Categories. Android Back or 0 closes Help immediately. Reopening resumes your reading position.\n\nThe header window control switches between expanded and floating reading. Drag the header to move a floating window or its corners to resize it. Text reflows rather than scaling."
+      "other": "Enter an expression at `calc>` and press ↵. Use the keypad to enter numbers, letters, units and functions. Qalculate evaluates the expression.\n\n## Check the live hint\n\nThe hint below the input shows the interpreted expression and a possible result before you submit. Check it when units or unfamiliar words might be read differently than intended. Preview does not add history or replace your saved answer. Assignments/comparisons wait for ↵, and unavailable or incomplete previews are labelled. Use clear, not cls, to clear the transcript; an unfamiliar token can be interpreted as units rather than a terminal command.\n\n## Continue a result\n\n```\n5 + 5 → 10\n+5 → 15\n*2 → 30\n```\n\nStart with +, −, ×, ÷ or ^ to continue from the last successful result. You do not need to type `ans`. ASCII `-`, `*` and `/` work too. A complete expression such as `5 + 5` starts a new calculation. With a previous result, `-5` subtracts 5; use `(-5)` for a standalone negative value. Without a previous result, `-5` is just negative 5. Errors and cancellation keep the last successful result.\n\n## Expressions and operators\n\n```\n2 + 3 * 4 → 14\n(2 + 3) * 4 → 20\n2^3 → 8\n```\n\nUse +, −, ×, ÷, parentheses, ^ and %.\n\n## Convert units\n\n```\n5 ft to cm → 152.4 cm\n*2 → 304.8 cm\nans to ft → 10 ft\n61 d to min\n20 celsius to fahrenheit\n```\n\nUse `to` followed by your desired output unit: `61 d to min` requests minutes rather than accepting an automatic seconds result. The word `in` means inches. Results retain their units when continued.\n\n## Functions and constants\n\n```\nsqrt(144) → 12\nsin(90) → 1 in degrees mode\n```\n\nFUNC inserts sqrt, sin, cos, tan, log, ln and abs with parentheses. Constants: `pi` and `e`.\n\n## Variables and explicit answers\n\n```\ntax = 18%\n4200 * tax → 756\n```\n\n= inserts an assignment; ↵ evaluates. Native named variables last only while the engine process remains alive.\n\n`ans` is optional: use it to refer to the last result inside an expression, for example `sqrt(ans)`, `100 / ans` or `ans to ft`. `ans = 5` sets the stored answer. The last successful answer survives reopening the calculator.\n\n## Keypad and editing\n\n- 123: numbers, operators and =\n- ABC: letters, units and variable names\n- FUNC: functions, constants and =\n\nTap the prompt to place the cursor or select text. Function keys wrap selected text or insert parentheses with the cursor inside. ⌫ deletes the selection or previous character. ↵ evaluates.\n\n- `clear` clears the transcript, keeping the last result.\n- `help` opens this reader.\n- `exit` closes the calculator.\n- Cancel stops a calculation without changing your input.\n\n## Using this help\n\nThe question-mark tab opens this calculator guide without changing your expression. Typing `help` opens it too, consuming only that command. Examples here are read-only; enter them at `calc>` to calculate.\n\nAt `help>`, choose a displayed number or tap its line. 1 opens Topics; 2/3 move between articles when shown. In a topic list, 10 opens Categories. Android Back or 0 closes Help immediately. Reopening resumes your reading position.\n\nThe header window control switches between expanded and floating reading. Drag the header to move a floating window or its corners to resize it. Text reflows rather than scaling."
     },
     "type": "string"
   },
@@ -11358,7 +10896,7 @@
   "offline_help_article_calculator_workflow_body": {
     "formatted": false,
     "forms": {
-      "other": "calc opens the calculator; calc <expression> evaluates one launcher result. At the home prompt or in an alias, use the calc prefix: bare numbers/expressions are not automatically calculations. Inside the pane, type after calc> and press Enter or ↵. 123 provides numbers, ABC provides QWERTY letters/units and FUNC provides functions/constants. Use to for conversion; in is an inch unit.\n\nans holds the last successful pane result with grouping/units; errors or cancellation do not replace it. clear clears the transcript but keeps ans, and exit closes the pane. The help tab explains expressions and editing.\n\nOn Android 7+, opening the pane enables bundled Qalculate; the one-shot launcher command follows the saved Qalculate/engine settings. Enable qalculate in Settings → behavior.xml for units and symbolic maths from the prompt. Suggestions reflect that setting. Android 6 uses the basic evaluator. Pane calculations use approximate mode; one-shot calculations follow stored engine options.\n\n## Examples\n\n```\ncalc\n```\n\nOpen the calculator.\n\n```\ncalc 2 * (3 + 4)\n```\n\nEvaluate the supplied expression text.\n\n```\ncalc 5 ft to miles\n```\n\nRun a conversion from the launcher when Qalculate is enabled."
+      "other": "calc opens the calculator; calc <expression> evaluates one launcher result. At the home prompt or in an alias, use the calc prefix: bare numbers/expressions are not automatically calculations. Inside the pane, type after calc> and press Enter or ↵. 123 provides numbers, ABC provides QWERTY letters/units and FUNC provides functions/constants. Use to for conversion; in is an inch unit.\n\nThe hint below the input previews how the engine reads the expression and its possible result; it does not submit or change history. Start with +, -, *, / or ^ to continue the previous successful answer without typing ans. ans is still available inside larger expressions and conversions. Errors or cancellation do not replace the last result. clear clears the transcript but keeps ans, and exit closes the pane. The help tab explains expressions and editing.\n\nOn Android 7+, opening the pane enables bundled Qalculate; the one-shot launcher command follows the saved Qalculate/engine settings. Enable qalculate in Settings → behavior.xml for units and symbolic maths from the prompt. Suggestions reflect that setting. Android 6 uses the basic evaluator. Pane calculations use approximate mode; one-shot calculations follow stored engine options.\n\n## Examples\n\n```\ncalc\n```\n\nOpen the calculator.\n\n```\ncalc 2 * (3 + 4)\n```\n\nEvaluate the supplied expression text.\n\n```\ncalc 5 ft to miles\n```\n\nRun a conversion from the launcher when Qalculate is enabled."
     },
     "type": "string"
   },
@@ -11414,7 +10952,7 @@
   "offline_help_article_colors_type_and_status_body": {
     "formatted": false,
     "forms": {
-      "other": "Base colors and advanced semantic roles are defined in Theme; advanced auto roles inherit resolved parent colors rather than using one global fixed color. Settings can preview a color before saving. Wallpaper Auto-theme stores a palette snapshot, uses system-color fallback when necessary and disables legacy auto_color_pick after the snapshot. It can replace many colors; save a local preset first if you want to retain the current look.\nStatus indices are positive decimal values: labels sharing the same integer part share a row. Whole-row edits insert/shift rows; ASCII is kept on a separate row. Multiple labels can share a row. Typography includes base text sizes and global font-size offset; custom font paths are excluded from shared presets.\nASCII reads ascii.txt, supports static/colored HTML and framed animation; enable animation only for a suitable bounded file. Launcher sound has a master switch plus per-event toggles. Cyberdeck and CRT are independent effects, not extra launcher modes.\n\n## Examples\n\n```\nconfig -get font_size_offset\n```\n\nInspect global type-size offset.\n\n```\nconfig -info ram_index\n```\n\nRead status row-placement setting.\n\n```\nwallpaper -auto\n```\n\nInteractive palette-change flow; can write colors after confirmation."
+      "other": "Base colors and advanced semantic roles are defined in Theme; advanced auto roles inherit resolved parent colors rather than using one global fixed color. Settings can preview a color before saving. Wallpaper Auto-theme stores a palette snapshot, uses system-color fallback when necessary and disables legacy auto_color_pick after the snapshot. It can replace many colors; save a local preset first if you want to retain the current look.\nStatus indices are positive decimal values: labels sharing the same integer part share a row. Whole-row edits insert/shift rows; ASCII is kept on a separate row. Multiple labels can share a row. Typography includes base text sizes and global font-size offset. JetBrains Mono Nerd Font Regular is the default; system/custom font choices remain available. Custom font paths and font files are not included in shared presets.\nApp-drawer category/group and alphabet rails each have independent background, text and border colors, including selected states. They are not app-row colors. Advanced AUTO values inherit their role parents; explicit rail values override that inheritance. Wallpaper Auto-theme is a one-time palette choice, not automatic retheming on every wallpaper change.\nASCII reads ascii.txt, supports static/colored HTML and framed animation; enable animation only for a suitable bounded file. Launcher sound has a master switch plus per-event toggles. Cyberdeck and CRT are independent effects, not extra launcher modes.\n\n## Examples\n\n```\nconfig -get font_size_offset\n```\n\nInspect global type-size offset.\n\n```\nconfig -info ram_index\n```\n\nRead status row-placement setting.\n\n```\nwallpaper -auto\n```\n\nInteractive palette-change flow; can write colors after confirmation."
     },
     "type": "string"
   },
@@ -11593,6 +11131,20 @@
     },
     "type": "string"
   },
+  "offline_help_article_floating_tools_body": {
+    "formatted": false,
+    "forms": {
+      "other": "Calculator, Help and IRC start expanded. The header window control switches between expanded and floating. Drag a floating header to move the pane, or its corners to resize it within the safe screen area. Expanding preserves the floating rectangle for later. Each tool remembers its own mode and floating bounds when closed and reopened.\n\nCalculator and Help stay expanded in landscape; IRC can still float. Calculator has a minimum size to keep its input, hint and keypad usable rather than shrinking the pad into a scrolling keyboard. Larger fonts or a smaller screen can require a larger minimum pane.\n\nThe tools follow Launcher fonts, colors and generated-border settings. Header controls and bottom-corner clearance keep resize targets distinct from editing keys. Changing border appearance does not change calculation or network behavior.\n\nHelp is a separate reader. Opening it from Calculator keeps the expression, answer and transcript intact. Android Back or 0 closes Help immediately; reopening resumes its saved article and reading position. Numbered Topics/Categories choices navigate inside Help instead of requiring repeated Back presses.\n\nThese are Launcher-owned tool windows, not Android split-screen controls. Floating does not create a background service or keep IRC connected after its pane closes."
+    },
+    "type": "string"
+  },
+  "offline_help_article_floating_tools_title": {
+    "formatted": false,
+    "forms": {
+      "other": "Move, resize and reopen tool panes"
+    },
+    "type": "string"
+  },
   "offline_help_article_focus_and_credits_body": {
     "formatted": false,
     "forms": {
@@ -11624,7 +11176,7 @@
   "offline_help_article_home_back_retention_body": {
     "formatted": false,
     "forms": {
-      "other": "Back is contextual: it handles a workspace or Termux console before podcast/profile surfaces, drawers and the output tray. In the Termux console, Back hides the keyboard before closing the console. Android Home is a separate action. In-place launcher refresh preserves terminal state. Podcast filters, search and scroll, and Termux console buffer/drafts are retained only while the launcher process survives. Calculator history, answer and editing position use separate saved preferences. Launcher UI retention does not guarantee that a remote tmux job or session is still running."
+      "other": "Back is contextual: it handles a workspace or Termux console before podcast/profile surfaces, drawers and the output tray. In the Termux console, Back hides the keyboard before closing the console. Android Home is a separate action. In-place launcher refresh preserves terminal state. Podcast filters, search and scroll, and Termux console buffer/drafts are retained only while the launcher process survives. Calculator history, answer and editing position use separate saved preferences. Help Back closes the reader immediately and keeps its article/reading position for reopening. Calculator, Help and IRC retain independent expanded/floating choice and bounds; Calculator and Help remain expanded in landscape. IRC Back first leaves Channels/People/Help navigation; Back from its conversation closes the pane and disconnects. Remembered device authentication can reconnect next time, but it is not chat transcript or process-death draft persistence. Launcher UI retention does not guarantee that a remote tmux job or session is still running."
     },
     "type": "string"
   },
@@ -11646,6 +11198,20 @@
     "formatted": false,
     "forms": {
       "other": "Know when POST and webhooks send data"
+    },
+    "type": "string"
+  },
+  "offline_help_article_idle_fade_body": {
+    "formatted": false,
+    "forms": {
+      "other": "Idle fade is off by default. Enable breath_out in Settings and choose breath_out_seconds; its default timeout is 900 seconds (15 minutes). It fades Launcher Home and the dedicated Termux workspace to the wallpaper after inactivity. Calculator, Help and IRC are not additional fade targets.\n\nThe first touch, key or Back wakes a faded surface without performing the underlying action. Interact again to use that control. Typing restarts the timer. Backgrounding or loss of focus pauses active timing, and touch exploration prevents the fade. Disabling the feature restores the surface immediately.\n\nThis is visual fading, not screen locking, a security boundary, a phone-sleep command or a way to stop tmux jobs.\n\n## Check the setting\n\n```\nconfig -get breath_out\nconfig -get breath_out_seconds\n```\n\nThese commands at Launcher Home only inspect the current values. To change them, use Settings or an explicit config -set. The two settings can be included in shareable presets."
+    },
+    "type": "string"
+  },
+  "offline_help_article_idle_fade_title": {
+    "formatted": false,
+    "forms": {
+      "other": "Optional idle fade to your wallpaper"
     },
     "type": "string"
   },
@@ -11674,6 +11240,34 @@
     "formatted": false,
     "forms": {
       "other": "Inspect a shared preset without applying it"
+    },
+    "type": "string"
+  },
+  "offline_help_article_irc_accounts_privacy_body": {
+    "formatted": false,
+    "forms": {
+      "other": "## Remember this device\n\nOn the default Re:TUI network, Remember this device authorizes a protected Android Keystore key after successful account authentication. Create account enables this choice by default and explains it before password entry; you can turn it off. Passwords are not saved. After enrollment is confirmed, opening IRC automatically reconnects and requests #retui.\n\nThis is a device reconnect key, not a portable restore code. A new phone, reinstall, deleted app data or a missing key needs password sign-in again. Anyone using your unlocked Launcher can use the remembered account. Keep your account password recoverable independently.\n\n## If reconnect fails\n\nCheck your network and the chosen server, then use Reconnect or password Sign in. A rejected key or TLS failure does not silently downgrade authentication. Account names belong to a network; an account on another IRC server or an old experimental community login is not automatically a Re:TUI IRC account. Use Network while disconnected to choose a compatible TLS server.\n\n## Forget this device\n\nConnection details offers Forget this device. While connected to the bound account it requests server revocation, waits for confirmation, then removes the local key and disconnects. If offline or revocation fails, local removal can still happen; follow the warning and remove the old certificate authorization through NickServ on a trusted client. Local deletion is not proof of server revocation.\n\n## Privacy and retention\n\nTLS verifies and encrypts the connection, but messages are not end-to-end encrypted. Server operators can read channel and private messages. The server receives your connection address; nickname display and IP cloaking are not anonymity from the operator. Never share passwords or private recovery information in a channel.\n\nThe default network uses a one-week server-history policy with cleanup in batches, not instantaneous deletion. External networks have their own policies. Launcher has no persistent local transcript, background IRC service, push or offline replay in this version. Rotation retains conversations, but password entry cancels; leaving the pane disconnects. Process death does not preserve an unsent chat draft.\n\nFor default-network moderation, privacy or account-deletion requests, contact the developer privately. dvil is the configured moderator. Forget this device does not delete the server account or its history."
+    },
+    "type": "string"
+  },
+  "offline_help_article_irc_accounts_privacy_title": {
+    "formatted": false,
+    "forms": {
+      "other": "IRC accounts, reconnect and privacy"
+    },
+    "type": "string"
+  },
+  "offline_help_article_irc_community_body": {
+    "formatted": false,
+    "forms": {
+      "other": "## Open and sign in\n\nEnter `irc` at Launcher Home. Tap Sign in, enter your IRC account name, then the masked password in the same composer. On the Re:TUI network the account name is also your nickname. Wait for Connected and confirmed membership of #retui before sending. Joining means the server has not confirmed membership yet.\n\nCreate account uses the same username/password flow when the network permits registration. If registration is closed or rejected, use an existing account or wait for signup to open; Launcher does not fall back to a guest account.\n\n## Everyday navigation\n\n1. Type a message in the active conversation and press ↵ to send.\n2. Tap a named conversation chip to switch channels or private conversations. Unread counts and mention markers identify activity elsewhere.\n3. Open Channels to switch to an open channel, browse the network, or join by name. Search text in navigation views is never posted as a message.\n\nPeople lists nicknames in the active channel. Tap a nickname to open a private conversation; that alone sends nothing. Help begins with three short instructions; All commands opens the grouped reference. Channels, People and Help temporarily replace the conversation view without discarding its draft or reading position.\n\nBack first leaves a temporary view. From the conversation it closes the pane and disconnects. More offers connection details, diagnostics, leave/close and disconnect; leaving a channel asks for confirmation.\n\n## Optional slash commands\n\n```\n/join #help\n/window #retui\n/query nickname\n/help\n```\n\nUse these inside IRC, not at Launcher Home. /join requests membership; /window switches an open conversation; /query opens a private conversation without sending. Replace nickname with the intended person. Typing / offers syntax hints. Unknown slash commands are rejected, never sent as messages. `//text` sends a literal leading slash.\n\n## Sending safely\n\nMessages appear immediately with their confirmation state. Server echo confirms server acceptance, not recipient delivery or a read receipt. Disconnect can leave a send uncertain; it is never automatically retried. Check the conversation before manually resending. Opening this offline article does not sign in, join or send anything."
+    },
+    "type": "string"
+  },
+  "offline_help_article_irc_community_title": {
+    "formatted": false,
+    "forms": {
+      "other": "IRC: sign in, join and talk"
     },
     "type": "string"
   },
@@ -11800,6 +11394,20 @@
     "formatted": false,
     "forms": {
       "other": "Separate local music, external media and podcasts"
+    },
+    "type": "string"
+  },
+  "offline_help_article_new_features_body": {
+    "formatted": false,
+    "forms": {
+      "other": "## Start here\n\nThis manual is bundled with Launcher and can be read offline. IRC and network services still need a connection. Read examples here; entering them at a live prompt can perform their described actions.\n\n- IRC: open `irc`, sign in, wait for #retui, then talk. Find IRC guides in Tools.\n- Calculator: use 123, ABC and FUNC, check the interpretation/result hint, and use `to` for conversions. Read Calculator help in Tools.\n- Floating tools: Calculator, Help and IRC start expanded, remember their window choice and retain their floating size. Find Floating tools in Appearance.\n- Termux: the separate workspace has pages and up to two independent tiles. It offers a prompted update for the APK-bundled helper. Read Termux workspace and Helper updates in Automation.\n- Presets: a shared .retui package is inspected and saved first, not immediately applied. Personal .retui-backup archives are separate. Read Portable preset import in Presets.\n- Startup: new installs complete the introduction, configuration and build animation before entering Launcher. Existing completed setups are kept. Read Startup setup in Getting started.\n- Appearance: app-drawer category/alphabet rails have independent normal and selected colors. The default font is JetBrains Mono Nerd Font Regular; custom/system font controls remain available.\n- Idle fade: optionally fade Home and the Termux workspace to the wallpaper. It is off by default. Read Idle fade in Appearance.\n\n## Find an article directly\n\n```\nhelp -topic irc-community\n```\n\nAt Launcher Home, open the offline IRC guide. `help irc` prints the shorter command reference instead. Use numbered choices or tap a topic in this reader; Android Back closes Help and keeps your place."
+    },
+    "type": "string"
+  },
+  "offline_help_article_new_features_title": {
+    "formatted": false,
+    "forms": {
+      "other": "Explore the new terminal tools"
     },
     "type": "string"
   },
@@ -12044,7 +11652,7 @@
   "offline_help_article_support_and_compatibility_body": {
     "formatted": false,
     "forms": {
-      "other": "settings opens launcher settings; themer is an older hidden name for the same surface. tutorial opens the bundled getting-started article. Some command-specific -tutorial options still open external websites. The deprecated install command opens a Play Store search; it does not install an APK. rate opens the store listing, with a web fallback. donate currently opens the project repository, not PayPal. changelog fetches release notes from Pastebin and needs network access. profile opens the local profile screen. hack shows a simulated overlay animation, not a hacking tool. clear clears the terminal display. Hidden compatibility commands can still be called; being hidden is not a security restriction.\n\n## Examples\n\n```\ntui -about\n```\n\nRead launcher build/about information."
+      "other": "settings opens launcher settings; themer is an older hidden name for the same surface. tutorial opens the bundled getting-started article. Some command-specific -tutorial options still open external websites. The deprecated install command opens a Play Store search; it does not install an APK. rate opens the store listing, with a web fallback. donate currently opens the project repository, not PayPal. changelog opens bundled release highlights in a separate terminal pane and works offline. After an app update, the pane opens once for the newer build after first-run setup; Back or Continue closes it. profile opens the local profile screen. hack shows a simulated overlay animation, not a hacking tool. clear clears the terminal display. Hidden compatibility commands can still be called; being hidden is not a security restriction.\n\n## Examples\n\n```\ntui -about\n```\n\nRead launcher build/about information."
     },
     "type": "string"
   },
@@ -12097,10 +11705,24 @@
     },
     "type": "string"
   },
+  "offline_help_article_termux_helper_updates_body": {
+    "formatted": false,
+    "forms": {
+      "other": "## Approve the matching helper\n\nOpening the Termux workspace checks compatibility with the helper bundled in this APK. Update now installs that matching helper through Termux and reconnects the bridge. Later installs nothing. Inside the workspace, :update reopens the prompt. There is no silent update or background download from a changing Git branch.\n\nThe update replaces the normal helper path, including a custom helper there, only after approval. It verifies decoded bytes with SHA-256 and atomically replaces the file. Installation failures attempt rollback; the previous helper is retained at $PREFIX/share/retui/retui.previous. Existing shells, running jobs and workspace layout are kept. Only bridge connections restart.\n\n## Setup is separate\n\nTermux must already be installed, Launcher must have command permission, and allow-external-apps must be enabled in Termux by the user. If tmux or socat is missing, install them in Termux with pkg install tmux socat. The prompt offers permission, Termux and setup-guide actions; it does not silently grant access or install dependencies.\n\n## If an update fails\n\nCheck the displayed error and prerequisites before retrying. A command with no reply may still finish inside Termux; Launcher does not automatically replay the installation. Leaving Launcher does not cancel a command already dispatched to Termux.\n\nA lock prevents concurrent replacements. After an interrupted update, retry may report a running or interrupted lock. Launcher never deletes unknown locks automatically. Open the setup guide, inspect $PREFIX/share/retui/.update-lock only after checking that no updater is running, and retain the previous helper if recovery is needed. Never kill the tmux server as a routine update fix.\n\n## Open the guide\n\n```\nhelp -topic termux-helper-updates\n```\n\nAt Launcher Home, read this offline guide without changing the helper. :update belongs to the workspace local-control prompt, not the Home command parser."
+    },
+    "type": "string"
+  },
+  "offline_help_article_termux_helper_updates_title": {
+    "formatted": false,
+    "forms": {
+      "other": "Update the Termux helper from the workspace"
+    },
+    "type": "string"
+  },
   "offline_help_article_termux_workspace_body": {
     "formatted": false,
     "forms": {
-      "other": "Termux must be installed with its RUN_COMMAND service exposed, allow-external-apps enabled, and launcher RUN_COMMAND permission granted through Android. tbridge -setup prints instructions; -doctor/-status checks local installation/declaration/permission, not remote execution. -probe dispatches a diagnostic with asynchronous results. Shared-storage scripts may need Termux storage setup.\n\nBare termux or tmux opens the interactive workspace. tmux launch <id> focuses/creates a launcher window; built-ins include shell, htop, mc, nano, vim, python, node and logs. Their executables must already be installed in Termux. tmux switch selects an index/visible window token, new creates a window, save persists a custom launcher command and rm removes that saved launcher, not its package. Scripts run with Termux access: review them first.\n\nInside the workspace, a colon starts local control mode; ordinary input goes to tmux using a socket when possible and a script fallback otherwise. :status reports installation, permission, socket and geometry. :new, :switch, :prev, :next, :reconnect and :home are local controls. Tap a window label, use :switch <window> locally, or tmux switch <window> at Launcher Home to select an index/name; :prev/:next and a horizontal terminal swipe switch adjacent windows. The active window is highlighted. Connecting/Ready/Disconnected appears in the header without replacing a running terminal with typing/key status. Ready confirms the authenticated bridge handshake, not execution of each queued key. Input that cannot be queued is not automatically replayed. Returning Home or backgrounding closes only the launcher stream; Termux tmux jobs and shell drafts continue. Returning to the pane reconnects without killing the session. Install helper 0.3.4 with this launcher for encoded frame isolation and live streaming; older helpers use direct tmux snapshots selected before mutation.\n\ntermux -run opens the one-shot console, not an interactive full-screen Linux app. Registered termux: sources can update modules with script stdout. Legacy -app-add/-apps only show workspace help; use tmux save for custom launchers. termux -setup is unhandled; use tbridge -setup. Retired tbridge -dirs/-files/-ls do not browse files; use the Re:TUI Files companion.\n\n## Examples\n\n```\ntmux launch mc\n```\n\nOpen/focus Midnight Commander when installed in Termux.\n\n```\ntmux switch 2\n```\n\nSelect workspace window 2 if present.\n\n```\ntmux status\n```\n\nInspect workspace status.\n\n```\ntbridge -setup\n```\n\nPrint bridge setup instructions only.\n\n```\ntbridge -doctor\n```\n\nInspect local bridge access; no external command dispatch.\n\n```\ntmux help\n```\n\nOpen workspace local help, not execute a shell command.\n\n```\n:status\n```\n\nInside the workspace, inspect diagnostics without sending a shell command.\n\n```\n:home\n```\n\nInside the workspace, return to Launcher Home."
+      "other": "Termux must be installed with its RUN_COMMAND service exposed, allow-external-apps enabled, and launcher RUN_COMMAND permission granted through Android. tbridge -setup prints instructions; -doctor/-status checks local installation/declaration/permission, not remote execution. -probe dispatches a diagnostic with asynchronous results. Shared-storage scripts may need Termux storage setup.\n\nBare termux or tmux opens the interactive workspace. tmux launch <id> focuses/creates a launcher window; built-ins include shell, htop, mc, nano, vim, python, node and logs. Their executables must already be installed in Termux. tmux switch selects an index/visible window token, new creates a window, save persists a custom launcher command and rm removes that saved launcher, not its package. Scripts run with Termux access: review them first.\n\nInside the workspace, a colon starts local control mode; ordinary input goes to its selected tmux window using an authenticated targeted socket. There is no silent fallback to session-global input. :status reports installation, permission, socket and geometry. :update reopens the helper update prompt; it never sends a chat or shell message. :new, :switch, :prev, :next, :reconnect and :home are local controls. Tap a window label, use :switch <window> locally, or tmux switch <window> at Launcher Home to select an index/name; :prev/:next and a horizontal terminal swipe switch adjacent windows. The active window is highlighted. Connecting/Ready/Disconnected appears in the header without replacing a running terminal with typing/key status. Ready confirms the authenticated bridge handshake, not execution of each queued key. Input that cannot be queued is not automatically replayed. Returning Home or backgrounding closes only the launcher stream; Termux tmux jobs and shell drafts continue. Returning to the pane reconnects without killing the session. This Launcher needs helper 0.4.2. Opening the workspace checks compatibility and offers Update now / Later. Update now installs the checksum-verified helper bundled with the APK through Termux and reconnects without stopping shells/jobs. The previous helper is kept at $PREFIX/share/retui/retui.previous, and installation failures attempt rollback. Custom helpers at the normal path are replaced only with your approval. Termux must already be installed with command permission and allow-external-apps enabled; missing tmux/socat packages require pkg install tmux socat in Termux. Setup is never silently changed. No helper is downloaded from a changing Git branch. A timed-out command may still finish in Termux; Launcher does not automatically retry installation. If an interrupted update lock persists, check that no updater is running before inspecting $PREFIX/share/retui/.update-lock. Launcher will not remove unknown locks.\n\ntermux -run opens the one-shot console, not an interactive full-screen Linux app. Registered termux: sources can update modules with script stdout. Legacy -app-add/-apps only show workspace help; use tmux save for custom launchers. termux -setup is unhandled; use tbridge -setup. Retired tbridge -dirs/-files/-ls do not browse files; use the Re:TUI Files companion.\n\n## Workspace pages and tiles\n\nSingle, Top-bottom and Left-right choose the visible layout, with at most two tiles targeting independent tmux windows. Tap a tile to choose where keyboard input goes. Add asks whether to replace a tile, split the page or create a new page; replacing a view does not kill its old shell.\n\nThe page strip, arrows and :page next / :page prev switch pages. A terminal swipe or :prev / :next changes only the focused tile window. Single expands the focused tile without ending the other shell. Exited shells are removed from remembered pages; the last exit leaves an empty workspace until Add explicitly creates a shell. Read Helper updates in Automation for the shorter update/recovery guide.\n\n## Examples\n\n```\ntmux launch mc\n```\n\nOpen/focus Midnight Commander when installed in Termux.\n\n```\ntmux switch 2\n```\n\nSelect workspace window 2 if present.\n\n```\ntmux status\n```\n\nInspect workspace status.\n\n```\ntbridge -setup\n```\n\nPrint bridge setup instructions only.\n\n```\ntbridge -doctor\n```\n\nInspect local bridge access; no external command dispatch.\n\n```\ntmux help\n```\n\nOpen workspace local help, not execute a shell command.\n\n```\n:status\n```\n\nInside the workspace, inspect diagnostics without sending a shell command.\n\n```\n:home\n```\n\nInside the workspace, return to Launcher Home."
     },
     "type": "string"
   },
@@ -12170,7 +11792,7 @@
   "offline_help_automation_body": {
     "formatted": true,
     "forms": {
-      "other": "Choose a numbered topic. Use 0 to return to the launcher."
+      "other": "Termux workspace, prompted helper updates and scripting. Choose a numbered topic. Use 0 to return to the launcher."
     },
     "type": "string"
   },
@@ -12366,7 +11988,7 @@
   "offline_help_tools_body": {
     "formatted": true,
     "forms": {
-      "other": "Choose a numbered topic. Use 0 to return to the launcher."
+      "other": "IRC, Calculator, notes and other built-in tools. Choose a numbered topic. Use 0 to return to the launcher."
     },
     "type": "string"
   },
@@ -19230,7 +18852,7 @@
   "surface_new_name_prev_next_refresh_status_reconnect_home_6ee59": {
     "formatted": false,
     "forms": {
-      "other": ":new [name] :prev :next :refresh :status :reconnect :home"
+      "other": ":new [name] :prev :next :refresh :status :reconnect :update :home"
     },
     "type": "string"
   },
@@ -24947,10 +24569,108 @@
     },
     "type": "string"
   },
+  "workspace_helper_dependencies": {
+    "formatted": true,
+    "forms": {
+      "other": "Termux packages required\n\nInstall tmux and socat in Termux with: pkg install tmux socat\nThen retry. Your existing helper has not been changed."
+    },
+    "type": "string"
+  },
+  "workspace_helper_guide": {
+    "formatted": true,
+    "forms": {
+      "other": "Setup guide"
+    },
+    "type": "string"
+  },
+  "workspace_helper_hide": {
+    "formatted": true,
+    "forms": {
+      "other": "Hide progress"
+    },
+    "type": "string"
+  },
+  "workspace_helper_later": {
+    "formatted": true,
+    "forms": {
+      "other": "Later"
+    },
+    "type": "string"
+  },
+  "workspace_helper_no_reply": {
+    "formatted": true,
+    "forms": {
+      "other": "No reply from Termux\n\nCheck command permission and allow-external-apps, then retry. A dispatched update may still finish inside Termux; no installation is automatically retried."
+    },
+    "type": "string"
+  },
+  "workspace_helper_open_termux": {
+    "formatted": true,
+    "forms": {
+      "other": "Open Termux"
+    },
+    "type": "string"
+  },
+  "workspace_helper_permissions": {
+    "formatted": true,
+    "forms": {
+      "other": "Launcher permissions"
+    },
+    "type": "string"
+  },
+  "workspace_helper_retry": {
+    "formatted": true,
+    "forms": {
+      "other": "Retry connection"
+    },
+    "type": "string"
+  },
+  "workspace_helper_setup": {
+    "formatted": true,
+    "forms": {
+      "other": "Termux setup required\n\nInstall Termux, grant Launcher permission to run Termux commands, and enable allow-external-apps=true in Termux settings. The setup guide has instructions. No security settings are changed automatically."
+    },
+    "type": "string"
+  },
+  "workspace_helper_update_busy": {
+    "formatted": true,
+    "forms": {
+      "other": "Another helper update is running or was interrupted\n\nRetry shortly. If this persists, open the setup guide. Launcher will not delete an unknown update lock or start another installation."
+    },
+    "type": "string"
+  },
+  "workspace_helper_update_failed": {
+    "formatted": true,
+    "forms": {
+      "other": "Helper update failed\n\nThe update was not confirmed. Installation failures attempt to restore the previous helper; it is also retained under $PREFIX/share/retui/retui.previous. Retry or open the setup guide. Existing shells and jobs are not stopped."
+    },
+    "type": "string"
+  },
+  "workspace_helper_update_now": {
+    "formatted": true,
+    "forms": {
+      "other": "Update now"
+    },
+    "type": "string"
+  },
+  "workspace_helper_update_prompt": {
+    "formatted": true,
+    "forms": {
+      "other": "Termux helper update required\n\nThis Launcher needs helper %1$s. Update now installs the matching helper bundled with this app and reconnects the bridge. Existing shells and jobs are kept. A previous helper copy is retained for recovery. Any custom helper at this path will be replaced."
+    },
+    "type": "string"
+  },
   "workspace_helper_update_required": {
     "formatted": true,
     "forms": {
-      "other": "Update the Termux retui helper to 0.4.1 for workspace pages and shell exit detection. Existing windows are unchanged."
+      "other": "Update the Termux retui helper to 0.4.2 for workspace pages and shell exit detection. Existing windows are unchanged."
+    },
+    "type": "string"
+  },
+  "workspace_helper_updating": {
+    "formatted": true,
+    "forms": {
+      "other": "Updating helper · existing shells and jobs are kept"
     },
     "type": "string"
   },

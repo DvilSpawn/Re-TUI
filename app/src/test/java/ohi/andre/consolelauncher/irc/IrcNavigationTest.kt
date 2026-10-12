@@ -52,4 +52,21 @@ class IrcNavigationTest {
         s.local("#retui", "old message", true); s.disconnected(); a.authenticated(true)
         assertEquals(listOf("JOIN #retui\r\n"), frames); assertFalse(s.buffer("#retui").lines.single().pending)
     }
+    @Test fun restoredMembershipDoesNotStealRequestedConversationOrReadHiddenMessages() {
+        for (channels in listOf(listOf("#retui", "#help"), listOf("#help", "#retui"))) {
+            val s = IrcState(); s.nickname = "me"
+            val a = IrcActions(s) { _, _, _ -> }
+            a.authenticated(true)
+            channels.forEach { s.receive(IrcMessage.parse(":me!u@host JOIN $it")) }
+            assertEquals("#retui", s.active.name)
+            assertTrue(s.buffer("#help").joined)
+            s.receive(IrcMessage.parse(":alice!u@host PRIVMSG #help :hello"))
+            s.receive(IrcMessage.parse(":me!u@host JOIN #help"))
+            assertEquals("#retui", s.active.name)
+            assertEquals(1, s.buffer("#help").unread)
+            a.join("#help")
+            assertEquals("#help", s.active.name)
+            assertEquals(0, s.active.unread)
+        }
+    }
 }

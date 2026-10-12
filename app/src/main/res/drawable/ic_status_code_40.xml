@@ -1,11 +1,8 @@
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="40dp"
-    android:height="40dp"
-    android:viewportWidth="960"
-    android:viewportHeight="960">
-    <group android:translateY="960">
-        <path
-            android:fillColor="#FF000000"
-            android:pathData="m175,-481 169,169q9.67,9.67 9.33,23.33 -0.33,13.67 -10,23.34 -9.66,9.66 -23.66,9.66T296,-265.33L103.33,-458q-5.33,-5.33 -7.5,-11 -2.16,-5.67 -2.16,-12.33 0,-6.67 2.16,-12.34 2.17,-5.66 7.5,-11L298,-699.33q10,-10 23.83,-10 13.84,0 23.84,10t10,23.83q0,13.83 -10,23.83L175,-481Zm610,-0.67 -169,-169q-9.67,-9.66 -9.33,-23.33 0.33,-13.67 10,-23.33 9.66,-9.67 23.66,-9.67t23.67,9.67l192.67,192.66q5.33,5.34 7.5,11 2.16,5.67 2.16,12.34 0,6.66 -2.16,12.33 -2.17,5.67 -7.5,11L662,-263.33q-10,10 -23.33,9.5 -13.34,-0.5 -23.34,-10.5t-10,-23.84q0,-13.83 10,-23.83L785,-481.67Z" />
+<!-- Google Material Symbols, Apache-2.0. Converted viewport; paths unchanged.
+Source: https://raw.githubusercontent.com/google/material-design-icons/49d4db35df873165d6bd6ba09b063c7dafbac2f4/symbols/web/code/materialsymbolsrounded/code_24px.svg
+License: LICENSES/Material-Symbols-Apache-2.0.txt -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="40dp" android:height="40dp" android:viewportWidth="960" android:viewportHeight="960">
+    <group android:translateX="-0.0" android:translateY="960.0">
+        <path android:fillColor="#FFFFFFFF" android:pathData="m193-479 155 155q11 11 11 28t-11 28q-11 11-28 11t-28-11L108-452q-6-6-8.5-13T97-480q0-8 2.5-15t8.5-13l184-184q12-12 28.5-12t28.5 12q12 12 12 28.5T349-635L193-479Zm574-2L612-636q-11-11-11-28t11-28q11-11 28-11t28 11l184 184q6 6 8.5 13t2.5 15q0 8-2.5 15t-8.5 13L668-268q-12 12-28 11.5T612-269q-12-12-12-28.5t12-28.5l155-155Z" />
     </group>
 </vector>

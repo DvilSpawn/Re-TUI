@@ -17,8 +17,9 @@ class IrcLiveTest {
         return JSONObject(File(path).readText())
     }
     @Test fun certificateHostnameMismatchIsRejectedBeforeAuthentication() {
-        credentials()
-        assertThrows(SSLPeerUnverifiedException::class.java) { IrcClient.tlsSocket("72.61.124.153", 6697).close() }
+        val c = credentials()
+        val address = java.net.InetAddress.getByName(c.getString("server")).hostAddress!!
+        assertThrows(SSLPeerUnverifiedException::class.java) { IrcClient.tlsSocket(address, 6697).close() }
     }
     @Test fun nativeClientAuthenticatesAndJoinsBothOfficialChannels() {
         val c = credentials(); val ready = CountDownLatch(1); val retui = CountDownLatch(1); val help = CountDownLatch(1)
@@ -31,14 +32,15 @@ class IrcLiveTest {
             assertTrue(retui.await(10, TimeUnit.SECONDS)); assertTrue(help.await(10, TimeUnit.SECONDS))
         } finally { client.close() }
     }
-    @Test fun guestCannotJoinRegisteredOnlyChannel() {
-        val c = credentials(); val ready = CountDownLatch(1); val rejected = CountDownLatch(1)
+    @Test fun guestCannotConnectOrJoinRegisteredOnlyChannel() {
+        val c = credentials(); val ready = java.util.concurrent.atomic.AtomicBoolean(false); val rejected = CountDownLatch(1)
         val client = IrcClient(c.getString("server"), 6697, "check" + System.nanoTime().toString().takeLast(8),
             receive = { if (it.command == "477" && "#retui" in it.params) rejected.countDown() },
-            connection = { connected, _ -> if (connected) ready.countDown() })
+            connection = { connected, text -> if (connected) ready.set(true) else if (text.startsWith("Disconnected")) rejected.countDown() })
         try {
-            client.start(); assertTrue(ready.await(15, TimeUnit.SECONDS)); client.send("JOIN", listOf("#retui"))
-            assertTrue("Unregistered JOIN rejected", rejected.await(10, TimeUnit.SECONDS))
+            client.start(); assertTrue("Guest connection is rejected", rejected.await(15, TimeUnit.SECONDS))
+            assertFalse("No authenticated welcome for guest", ready.get())
+            assertFalse(client.ready)
         } finally { client.close() }
     }
     @Test fun privateTestChannelDeliversToTwoNativeSessionsWithoutPolling() {

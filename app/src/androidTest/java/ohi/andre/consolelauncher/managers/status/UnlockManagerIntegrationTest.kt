@@ -200,6 +200,31 @@ class UnlockManagerIntegrationTest {
         }
     }
 
+    @Test fun optedInPhysicalUnlockIsObservedWhileTimerPaused() {
+        org.junit.Assume.assumeTrue("Requires an explicit human lock/unlock cycle",
+            InstrumentationRegistry.getArguments().getString("physicalUnlock") == "true")
+        org.junit.Assume.assumeFalse(android.os.Build.HARDWARE.startsWith("ranchu") ||
+            android.os.Build.HARDWARE.startsWith("goldfish"))
+        // Keep the tested package foreground; OEMs can freeze an activity-less
+        // instrumented package while the user's separate Launcher owns Home.
+        androidx.test.core.app.ActivityScenario.launch<ohi.andre.consolelauncher.LauncherActivity>(
+            android.content.Intent(instrumentation.targetContext, ohi.andre.consolelauncher.LauncherActivity::class.java)
+        ).use {
+            withManager(onMain = false) { manager, prefs ->
+                instrumentation.runOnMainSync { manager.start(); manager.stop() }
+                instrumentation.sendStatus(2, android.os.Bundle().apply { putString("stream", "Physical unlock observer ready\n") })
+                val deadline = android.os.SystemClock.elapsedRealtime() + 180000
+                var count = 0
+                do {
+                    android.os.SystemClock.sleep(100)
+                    instrumentation.runOnMainSync { count = manager.count() }
+                } while (count == 0 && android.os.SystemClock.elapsedRealtime() < deadline)
+                assertEquals("One real protected-system unlock must be counted", 1, count)
+                assertEquals(1, prefs.getInt(UnlockManager.UNLOCK_KEY, -1))
+            }
+        }
+    }
+
     @Test fun screenOffNeverCounts() = withManager { manager, _ ->
         manager.start()
         val receiver = UnlockManager::class.java.getDeclaredField("lockReceiver")

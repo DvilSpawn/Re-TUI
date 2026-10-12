@@ -393,7 +393,7 @@
     <!--  -->
     <string name="surface_net_tunneling_through_relay_11_c3345" formatted="false">"[NET ] tunneling through relay-11..."</string>
     <!-- renderTermuxWorkspaceHelp -->
-    <string name="surface_new_name_prev_next_refresh_status_reconnect_home_6ee59" formatted="false">":new [name] :prev :next :refresh :status :reconnect :home"</string>
+    <string name="surface_new_name_prev_next_refresh_status_reconnect_home_6ee59" formatted="false">":new [name] :prev :next :refresh :status :reconnect :update :home"</string>
     <!-- newTermuxWorkspaceWindow -->
     <string name="surface_new_tmux_window_0b9e5">"new tmux window: %1$s"</string>
     <!-- newTermuxWorkspaceWindow -->

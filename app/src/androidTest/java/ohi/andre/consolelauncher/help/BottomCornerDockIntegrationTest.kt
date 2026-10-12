@@ -13,7 +13,7 @@ import androidx.core.view.descendants
 import androidx.test.platform.app.InstrumentationRegistry
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.calculator.CalculatorActivity
-import ohi.andre.consolelauncher.community.CommunityActivity
+import ohi.andre.consolelauncher.irc.IrcActivity
 import ohi.andre.consolelauncher.tuils.Tuils
 import org.junit.Assert.*
 import org.junit.Test
@@ -30,7 +30,7 @@ class BottomCornerDockIntegrationTest {
         return Rect(xy[0], xy[1], xy[0] + view.width, xy[1] + view.height)
     }
     private fun check(type: Class<out Activity>, prefix: String, borderId: Int) {
-        val activity = instrumentation.startActivitySync(Intent(instrumentation.targetContext, type)
+        val activity = instrumentation.startActivitySync(Intent(instrumentation.targetContext, type).putExtra("irc_offline_fixture", true)
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
         try {
             idle()
@@ -89,5 +89,5 @@ class BottomCornerDockIntegrationTest {
     }
     @Test fun calculatorOnlyReservesLowestRowCorners() = check(CalculatorActivity::class.java, "calculator", R.id.calculator_window_border)
     @Test fun helpOnlyReservesLowestRowCorners() = check(OfflineHelpActivity::class.java, "help", R.id.offline_help_panel)
-    @Test fun communityOnlyReservesChipRowCorners() = check(CommunityActivity::class.java, "community", R.id.community_panel)
+    @Test fun ircOnlyReservesChipRowCorners() = check(IrcActivity::class.java, "irc", R.id.irc_panel)
 }

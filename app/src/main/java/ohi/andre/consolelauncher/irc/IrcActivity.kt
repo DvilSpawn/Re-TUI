@@ -106,7 +106,7 @@ class IrcTerminalSession(application: Application) : AndroidViewModel(applicatio
         if (incoming.isNotEmpty()) scheduleDrain()
         if (updated) changed?.invoke()
     }
-    fun connect(password: CharArray = charArrayOf(), external: Boolean = false) {
+    fun connect(password: CharArray = charArrayOf(), external: Boolean = false, register: Boolean = false) {
         val identity = IrcDeviceKey.Identity(host.lowercase(java.util.Locale.ROOT), port, account)
         val enroll = rememberDevice && !external && host.equals("irc.kokodoko.cloud", true) && account.isNotBlank()
         if (external) check(devices.remembered() == identity) { "Device key unavailable. Sign in with a password." }
@@ -118,9 +118,10 @@ class IrcTerminalSession(application: Application) : AndroidViewModel(applicatio
             // A busy server must not create an unbounded Android main-thread callback backlog.
             receive = { message -> check(incoming.offer(generation to message)) { "IRC UI backlog full" }; scheduleDrain() },
             connection = { connected, text -> ui.post { if (generation == epoch) {
-                connectionText = if (connected) "Connected · $host" else if (text.startsWith("Disconnected")) "Disconnected · Sign in to retry" else "Connecting…"
+                connectionText = if (connected) "Connected · $host" else if (register) text else if (text.startsWith("Disconnected")) "Disconnected · Sign in to retry" else "Connecting…"
                 if (!connected && text.startsWith("Disconnected")) { state.disconnected(); pendingDevice = null; if (external) deviceStatus = getApplication<Application>().getString(R.string.irc_device_failed) }
                 if (connected && enroll) runCatching {
+                    if (register) devices.ensure(identity)
                     send("PRIVMSG", listOf("NickServ"), "CERT ADD ${devices.fingerprint(identity)}")
                     pendingDevice = identity; deviceStatus = getApplication<Application>().getString(R.string.irc_device_pending)
                     ui.postDelayed({ if (generation == epoch && pendingDevice == identity) { pendingDevice = null; deviceStatus = getApplication<Application>().getString(R.string.irc_device_failed); changed?.invoke() } }, 10_000)
@@ -128,9 +129,9 @@ class IrcTerminalSession(application: Application) : AndroidViewModel(applicatio
                 if (connected && account.isNotEmpty()) runCatching { actions.authenticated(host.equals("irc.kokodoko.cloud", true)) }.onFailure { state.status(it.message ?: "Could not join channel") }
                 changed?.invoke()
             } } }, connector = connector ?: { h, p ->
-                if (enroll) devices.ensure(identity)
-                IrcClient.tlsSocket(h, p, if (external || enroll) devices.factory(identity) else javax.net.ssl.SSLSocketFactory.getDefault() as javax.net.ssl.SSLSocketFactory)
-            }, external = external)
+                if (enroll && !register) devices.ensure(identity)
+                IrcClient.tlsSocket(h, p, if (external || enroll && !register) devices.factory(identity) else javax.net.ssl.SSLSocketFactory.getDefault() as javax.net.ssl.SSLSocketFactory)
+            }, external = external, register = register)
         client!!.start(); changed?.invoke()
     }
     fun disconnect() {
@@ -229,10 +230,10 @@ class IrcActivity : LocalizedComponentActivity() {
         if (BuildConfig.DEBUG && intent.getBooleanExtra("irc_offline_fixture", false)) session.initialized = true
         action { session.restoreDevice() }; render()
     }
+    override fun onPause() { windowPanel.persist(); super.onPause() }
     override fun onStop() {
         cancelSecret(); session.changed = null
-        if (navigation.page == IrcNavigation.Page.ACCOUNT) navigation.close()
-        windowPanel.persist()
+        if (!isChangingConfigurations && navigation.page in listOf(IrcNavigation.Page.ACCOUNT, IrcNavigation.Page.REGISTER)) navigation.close()
         if (!isChangingConfigurations) { session.disconnect(); session.initialized = false }
         super.onStop()
     }
@@ -282,7 +283,7 @@ class IrcActivity : LocalizedComponentActivity() {
             guidance.visibility = View.VISIBLE
         } else if (navigation.page != IrcNavigation.Page.CHAT) {
             rows.addView(chip(getString(R.string.irc_back)) { closeNavigation() })
-            if (navigation.page == IrcNavigation.Page.ACCOUNT || navigation.page == IrcNavigation.Page.JOIN || navigation.page == IrcNavigation.Page.NETWORK)
+            if (navigation.page in listOf(IrcNavigation.Page.ACCOUNT, IrcNavigation.Page.REGISTER, IrcNavigation.Page.JOIN, IrcNavigation.Page.NETWORK))
                 rows.addView(chip(getString(R.string.irc_continue)) { submit() })
         } else if (session.client?.ready == true) {
             rows.addView(chip(getString(R.string.irc_channels)) { openNavigation(IrcNavigation.Page.CHANNELS) })
@@ -299,6 +300,9 @@ class IrcActivity : LocalizedComponentActivity() {
     private fun restoreDraft() { switching = true; input.setText(if (navigation.page == IrcNavigation.Page.CHAT) session.state.active.draft else navigation.text); input.setSelection(input.length()); switching = false; suggestions() }
     private fun openNavigation(page: IrcNavigation.Page) {
         if (secretCommand.isNotEmpty()) return
+        if (page == IrcNavigation.Page.REGISTER) {
+            session.rememberDevice = session.host.equals("irc.kokodoko.cloud", true)
+        }
         if (navigation.page == IrcNavigation.Page.CHAT) session.state.active.scroll = scroll.scrollY
         navigation.open(page); input.error = null; restoreDraft(); render(); scroll.post { scroll.scrollTo(0, 0) }
     }
@@ -332,20 +336,20 @@ class IrcActivity : LocalizedComponentActivity() {
             else -> "${state.nickname} · ${session.connectionText}" + session.deviceStatus.takeIf { it.isNotEmpty() }?.let { "\n$it" }.orEmpty()
         }
         val searchable = navigation.page in listOf(IrcNavigation.Page.CHANNELS, IrcNavigation.Page.DIRECTORY, IrcNavigation.Page.PEOPLE, IrcNavigation.Page.COMMANDS)
-        val editable = secretCommand.isNotEmpty() || searchable || navigation.page in listOf(IrcNavigation.Page.CHAT, IrcNavigation.Page.ACCOUNT, IrcNavigation.Page.NETWORK, IrcNavigation.Page.JOIN)
+        val editable = secretCommand.isNotEmpty() || searchable || navigation.page in listOf(IrcNavigation.Page.CHAT, IrcNavigation.Page.ACCOUNT, IrcNavigation.Page.REGISTER, IrcNavigation.Page.NETWORK, IrcNavigation.Page.JOIN)
         input.isEnabled = editable
         root.findViewById<View>(R.id.irc_prompt_row).visibility = if (editable) View.VISIBLE else View.GONE
         root.findViewById<View>(R.id.irc_send).isEnabled = editable && !searchable
         root.findViewById<TextView>(R.id.irc_prompt).text = when {
             secretCommand.isNotEmpty() -> "password> "
             navigation.page == IrcNavigation.Page.CHAT -> "> "
-            navigation.page == IrcNavigation.Page.ACCOUNT -> "account> "
+            navigation.page in listOf(IrcNavigation.Page.ACCOUNT, IrcNavigation.Page.REGISTER) -> "account> "
             navigation.page == IrcNavigation.Page.NETWORK -> "server> "
             navigation.page == IrcNavigation.Page.JOIN -> "join> "
             else -> if (searchable) "find> " else "nav> "
         }
         if (secretCommand.isEmpty()) input.hint = getString(when (navigation.page) {
-            IrcNavigation.Page.ACCOUNT -> R.string.irc_account_hint
+            IrcNavigation.Page.ACCOUNT, IrcNavigation.Page.REGISTER -> R.string.irc_account_hint
             IrcNavigation.Page.NETWORK -> R.string.irc_network_hint
             IrcNavigation.Page.JOIN -> R.string.irc_join_hint
             IrcNavigation.Page.CHAT -> R.string.irc_input_hint
@@ -403,9 +407,13 @@ class IrcActivity : LocalizedComponentActivity() {
         when (navigation.page) {
             IrcNavigation.Page.CHAT -> {
                 line(label(R.string.irc_welcome))
-                line(label(if (session.host.equals("irc.kokodoko.cloud", true)) R.string.irc_pilot else R.string.irc_other_network))
+                line(label(if (session.host.equals("irc.kokodoko.cloud", true)) R.string.irc_signup_info else R.string.irc_other_network))
+                if (session.connectionText.startsWith("Disconnected")) line(session.connectionText)
                 if (session.client?.ready == true) line(label(R.string.irc_channels)) { openNavigation(IrcNavigation.Page.CHANNELS) }
-                else line(label(R.string.irc_sign_in)) { openNavigation(IrcNavigation.Page.ACCOUNT) }
+                else {
+                    line(label(R.string.irc_sign_in)) { openNavigation(IrcNavigation.Page.ACCOUNT) }
+                    line(label(R.string.irc_create_account)) { openNavigation(IrcNavigation.Page.REGISTER) }
+                }
                 line(label(R.string.irc_help_title)) { openNavigation(IrcNavigation.Page.HELP) }
             }
             IrcNavigation.Page.CHANNELS -> {
@@ -471,11 +479,21 @@ class IrcActivity : LocalizedComponentActivity() {
             }
             IrcNavigation.Page.ACCOUNT -> {
                 line(label(R.string.irc_sign_in)); line(label(R.string.irc_account_explanation))
+                line(label(R.string.irc_create_account)) { openNavigation(IrcNavigation.Page.REGISTER) }
                 if (session.host.equals("irc.kokodoko.cloud", true)) {
-                    line(label(R.string.irc_pilot))
+                    line(label(R.string.irc_signup_info))
                     line((if (session.rememberDevice) "[✓] " else "[ ] ") + label(R.string.irc_remember_device)) { session.rememberDevice = !session.rememberDevice }
                     line(label(R.string.irc_device_explanation))
                 }
+            }
+            IrcNavigation.Page.REGISTER -> {
+                line(label(R.string.irc_create_account)); line(label(R.string.irc_register_explanation))
+                if (session.host.equals("irc.kokodoko.cloud", true)) {
+                    line(label(R.string.irc_signup_info))
+                    line((if (session.rememberDevice) "[✓] " else "[ ] ") + label(R.string.irc_remember_device)) { session.rememberDevice = !session.rememberDevice }
+                    line(label(R.string.irc_device_explanation))
+                }
+                line(label(R.string.irc_sign_in)) { openNavigation(IrcNavigation.Page.ACCOUNT) }
             }
             IrcNavigation.Page.JOIN -> { line(label(R.string.irc_join_name)); line(label(R.string.irc_join_hint)) }
             IrcNavigation.Page.LEAVE -> {
@@ -531,6 +549,7 @@ class IrcActivity : LocalizedComponentActivity() {
                 require(secret.isNotEmpty() && secret.size <= 256 && secret.none { it == '\u0000' || it == '\r' || it == '\n' }) { "Password must be 1–256 characters with no line breaks." }
                 when (command) {
                     "SASL login" -> { session.account = name; session.connect(secret) }
+                    "Create account" -> { session.account = name; session.state.nickname = name; session.connect(secret, register = true) }
                     "NickServ register" -> { require(secret.none { it.isWhitespace() }) { "NickServ passwords cannot contain spaces." }; session.send("PRIVMSG", listOf("NickServ"), "REGISTER ${String(secret)}"); session.state.status("Registration submitted privately to NickServ; check its response in status.") }
                     "Operator login" -> { session.send("OPER", listOf(name, String(secret))); session.state.status("Operator authentication submitted; check the server response.") }
                 }
@@ -543,10 +562,11 @@ class IrcActivity : LocalizedComponentActivity() {
         try {
             if (navigation.page != IrcNavigation.Page.CHAT) {
                 when (navigation.page) {
-                    IrcNavigation.Page.ACCOUNT -> {
+                    IrcNavigation.Page.ACCOUNT, IrcNavigation.Page.REGISTER -> {
                         val name = original.trim()
                         require(IrcProtocol.nick(name)) { getString(R.string.irc_account_invalid) }
-                        session.state.nickname = name; requestSecret("SASL login", name)
+                        val registering = navigation.page == IrcNavigation.Page.REGISTER
+                        session.state.nickname = name; requestSecret(if (registering) "Create account" else "SASL login", name)
                     }
                     IrcNavigation.Page.JOIN -> joinChannel(original.trim())
                     IrcNavigation.Page.NETWORK -> {
@@ -581,7 +601,11 @@ class IrcActivity : LocalizedComponentActivity() {
                         else { requestSecret("SASL login", session.account); return }
                     }
                     "login" -> { requestSecret("SASL login", rest.ifEmpty { session.state.nickname }); return }
-                    "register" -> { require(rest.isEmpty() && session.client?.ready == true) { "Connect first, then /register with no password argument." }; requestSecret("NickServ register", session.state.nickname); return }
+                    "register" -> {
+                        require(rest.isEmpty()) { "Use /register with no password argument." }
+                        if (session.client?.ready == true) requestSecret("NickServ register", session.state.nickname) else openNavigation(IrcNavigation.Page.REGISTER)
+                        return
+                    }
                     "oper" -> { require(session.client?.ready == true); requestSecret("Operator login", rest); return }
                     "join", "j" -> session.actions.join(channel())
                     "part", "leave" -> session.send("PART", listOf(channel()))

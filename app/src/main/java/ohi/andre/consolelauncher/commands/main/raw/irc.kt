@@ -9,7 +9,7 @@ import ohi.andre.consolelauncher.commands.main.MainPack
 import ohi.andre.consolelauncher.commands.main.Param
 import ohi.andre.consolelauncher.commands.main.specific.ParamCommand
 
-/** Native IRC entry, deliberately separate from the preserved HTTP community service. */
+/** Launcher entry for the native IRC terminal; conversation input stays inside IRC. */
 class irc : ParamCommand() {
     private val open = object : Param {
         override fun label(): String = ""

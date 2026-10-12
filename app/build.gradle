@@ -11,6 +11,7 @@ android {
     ndkVersion = '27.1.12297006'
     sourceSets.main.jniLibs.srcDir layout.buildDirectory.dir('qalculate/jniLibs').get().asFile
     sourceSets.main.assets.srcDir layout.buildDirectory.dir('qalculate/notices').get().asFile
+    sourceSets.main.assets.srcDir layout.buildDirectory.dir('termux-helper-assets').get().asFile
 
     def keystorePropertiesFile = rootProject.file("local.properties")
     def keystoreProperties = new Properties()
@@ -42,10 +43,12 @@ android {
         applicationId = "com.dvil.tui_renewed"
         minSdk = 23
         targetSdk = 36
-        versionCode = 426
-        versionName = "2"
+        versionCode = 500
+        versionName = "3"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = providers.gradleProperty('ircReleaseSmokeRunner').map { it.toBoolean() }
+                .getOrElse(false) ? "ohi.andre.consolelauncher.irc.IrcReleaseSmokeInstrumentation"
+                : "androidx.test.runner.AndroidJUnitRunner"
         manifestPlaceholders.applicationLabel = '@string/app_name'
     }
 
@@ -126,6 +129,11 @@ def qalculateNotices = tasks.register('qalculateNotices', Sync) {
     }
     into(layout.buildDirectory.dir('qalculate/notices/licenses'))
 }
+def termuxHelperAssets = tasks.register('termuxHelperAssets', Sync) {
+    from(rootProject.file('termux/retui/bin/retui'))
+    from(rootProject.file('termux/retui/update.sh'))
+    into(layout.buildDirectory.dir('termux-helper-assets/termux-helper'))
+}
 
 def validateRuntimeNotices = tasks.register('validateRuntimeNotices') {
     group = 'verification'
@@ -170,7 +178,7 @@ tasks.matching {
     (it.name.startsWith('merge') && it.name.endsWith('Assets')) ||
             it.name.toLowerCase(Locale.ROOT).contains('lint')
 }.configureEach {
-    dependsOn(qalculateNotices)
+    dependsOn(qalculateNotices, termuxHelperAssets)
 }
 
 def guardedSourceSetNames = ["main", "fdroid", "playstore"]
@@ -338,7 +346,7 @@ tasks.register("validateSourceInputs") {
 
         if (!errors.isEmpty()) {
             throw new GradleException(
-                    "Unexpected app source input files were found. Move durable test notes to docs/TESTBOOK.md and keep runtime captures under ignored output folders.\n - "
+                    "Unexpected app source input files were found. Keep test notes and runtime captures in local ignored output folders.\n - "
                             + errors.unique().sort().join("\n - ")
             )
         }

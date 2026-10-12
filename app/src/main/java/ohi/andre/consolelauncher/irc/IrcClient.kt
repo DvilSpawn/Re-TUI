@@ -18,7 +18,7 @@ class IrcClient(private val host: String, private val port: Int, private val nic
     private val account: String = "", password: CharArray = charArrayOf(),
     private val receive: (IrcMessage) -> Unit, private val connection: (Boolean, String) -> Unit,
     private val connector: (String, Int) -> Socket = { h, p -> tlsSocket(h, p) },
-    private val external: Boolean = false) : AutoCloseable {
+    private val external: Boolean = false, private val register: Boolean = false) : AutoCloseable {
     companion object {
         private val hostnameVerifier = OkHttpClient().hostnameVerifier
         fun tlsSocket(host: String, port: Int, factory: SSLSocketFactory = SSLSocketFactory.getDefault() as SSLSocketFactory): Socket {
@@ -45,13 +45,18 @@ class IrcClient(private val host: String, private val port: Int, private val nic
     @Volatile var echoMessages = false; private set
     private var worker: Thread? = null
     private var writer: Thread? = null
+    private class RegistrationFailure(val explanation: String) : java.io.IOException()
     fun start() {
         require(host.isNotBlank() && port in 1..65535 && IrcProtocol.nick(nickname))
         require(account.isEmpty() || account.length <= 64 && account.none { it <= ' ' })
+        require(!register || !external && account == nickname && secret.isNotEmpty() && secret.none { it == '\u0000' || it == '\r' || it == '\n' })
+        if (register) IrcProtocol.line("REGISTER", listOf(account, "*"), String(secret))
         check(started.compareAndSet(false, true))
         check(!closed.get())
         worker = thread(name = "retui-irc-reader") {
             var negotiated = false; var authenticating = false; var authenticated = false
+            var welcomed = false; var registrationSent = false; var registerBeforeConnect = false
+            val registrationCapability = "draft/account-registration"
             var disconnectedText = "Disconnected · /connect to reconnect; unsent drafts stay local."
             val offered = linkedSetOf<String>()
             val mechanism = if (external) "EXTERNAL" else "PLAIN"
@@ -60,6 +65,7 @@ class IrcClient(private val host: String, private val port: Int, private val nic
                 val connected = connector(host, port)
                 socket = connected
                 if (closed.get()) { connected.close(); return@thread }
+                if (register) connected.soTimeout = 30_000
                 val output = BufferedOutputStream(connected.getOutputStream())
                 writer = thread(name = "retui-irc-writer") {
                     try {
@@ -74,6 +80,19 @@ class IrcClient(private val host: String, private val port: Int, private val nic
                 queue(IrcProtocol.line("USER", listOf(nickname, "0", "*"), "Re:TUI IRC"))
                 val input = connected.getInputStream()
                 fun endCapabilities() { if (!negotiated) { negotiated = true; queue(IrcProtocol.line("CAP", listOf("END"))) } }
+                fun submitRegistration() {
+                    check(!registrationSent)
+                    registrationSent = true
+                    queue(IrcProtocol.line("REGISTER", listOf(account, "*"), String(secret)))
+                    secret.fill('\u0000')
+                    connection(false, "Creating account…")
+                }
+                fun finishRegistration() {
+                    if (welcomed && authenticated && !ready) {
+                        connected.soTimeout = 180_000
+                        ready = true; connection(true, "Connected · $host:$port · account registered")
+                    }
+                }
                 while (!closed.get()) {
                     val bytes = ByteArrayOutputStream()
                     while (true) {
@@ -92,23 +111,31 @@ class IrcClient(private val host: String, private val port: Int, private val nic
                             when (sub) {
                                 "LS" -> {
                                     capabilities.firstOrNull { it.startsWith("sasl=") }?.substringAfter('=')?.let { mechanisms ->
-                                        check(account.isEmpty() || mechanism in mechanisms.split(',')) { "Required SASL mechanism unavailable" }
+                                        check(register || account.isEmpty() || mechanism in mechanisms.split(',')) { "Required SASL mechanism unavailable" }
+                                    }
+                                    if (register) capabilities.firstOrNull { it.substringBefore('=') == registrationCapability }?.substringAfter('=', "")?.split(',')?.map { it.substringBefore('=') }?.let { options ->
+                                        if ("email-required" in options) throw RegistrationFailure("This network requires email registration. Use its registration instructions, then Sign in.")
+                                        registerBeforeConnect = "before-connect" in options
                                     }
                                     offered.addAll(capabilities.map { it.substringBefore('=') })
                                     if (message.params.getOrNull(2) != "*") {
-                                        check(account.isEmpty() || "sasl" in offered) { "Server does not offer SASL" }
+                                        if (register && registrationCapability !in offered) throw RegistrationFailure("Registration is closed or guided signup is unsupported on this network. Use an existing account to Sign in.")
+                                        check(register || account.isEmpty() || "sasl" in offered) { "Server does not offer SASL" }
                                         val wanted = listOf("server-time", "echo-message", "multi-prefix") .filter { it in offered }.toMutableList()
-                                        if (account.isNotEmpty()) wanted.add("sasl")
+                                        if (register) wanted.add(registrationCapability) else if (account.isNotEmpty()) wanted.add("sasl")
                                         if (wanted.isEmpty()) endCapabilities() else queue(IrcProtocol.line("CAP", listOf("REQ"), wanted.joinToString(" ")))
                                     }
                                 }
                                 "ACK" -> {
                                     echoMessages = "echo-message" in capabilities
-                                    if (account.isNotEmpty() && "sasl" in capabilities) {
+                                    if (register) {
+                                        if (registrationCapability !in capabilities) throw RegistrationFailure("Guided registration was rejected by this network. Nothing was joined.")
+                                        if (registerBeforeConnect) submitRegistration() else endCapabilities()
+                                    } else if (account.isNotEmpty() && "sasl" in capabilities) {
                                         authenticating = true; queue(IrcProtocol.line("AUTHENTICATE", listOf(mechanism)))
                                     } else { check(account.isEmpty()) { "SASL rejected" }; endCapabilities() }
                                 }
-                                "NAK" -> { check(account.isEmpty()) { "SASL rejected" }; endCapabilities() }
+                                "NAK" -> { if (register) throw RegistrationFailure("Guided registration was rejected by this network. Nothing was joined."); check(account.isEmpty()) { "SASL rejected" }; endCapabilities() }
                             }
                         }
                         "AUTHENTICATE" -> if (authenticating && message.params.firstOrNull() == "+") {
@@ -118,16 +145,39 @@ class IrcClient(private val host: String, private val port: Int, private val nic
                             if (encoded.length % 400 == 0) queue(IrcProtocol.line("AUTHENTICATE", listOf("+")))
                             authenticating = false
                         }
-                        "903" -> { authenticated = true; secret.fill('\u0000'); endCapabilities() }
+                        "903" -> if (!register) { authenticated = true; secret.fill('\u0000'); endCapabilities() }
                         "902", "904", "905", "906", "907" -> throw java.io.IOException("SASL authentication failed")
-                        "001" -> { check(account.isEmpty() || authenticated && negotiated) { "Unauthenticated welcome rejected" }; ready = true; connection(true, "Connected · $host:$port · ${if (account.isEmpty()) "nickname only" else "SASL authenticated"}") }
+                        "001" -> if (register) {
+                            check(negotiated && IrcProtocol.fold(message.params.firstOrNull().orEmpty(), "rfc1459") == IrcProtocol.fold(nickname, "rfc1459")) { "Unexpected registration welcome" }
+                            welcomed = true
+                            if (!registrationSent) submitRegistration()
+                            finishRegistration()
+                        } else { check(account.isEmpty() || authenticated && negotiated) { "Unauthenticated welcome rejected" }; ready = true; connection(true, "Connected · $host:$port · ${if (account.isEmpty()) "nickname only" else "SASL authenticated"}") }
+                        "REGISTER" -> if (register && registrationSent && !authenticated) {
+                            if (message.prefix.isEmpty() || message.prefix.contains('!') || message.prefix.contains('@')) continue
+                            when (message.params.firstOrNull()) {
+                                "SUCCESS" -> {
+                                    check(message.params.getOrNull(1)?.equals(account, true) == true) { "Unexpected registration account" }
+                                    authenticated = true; endCapabilities(); finishRegistration()
+                                }
+                                "VERIFICATION_REQUIRED" -> throw RegistrationFailure("Account needs verification on this network. Complete its verification instructions, then Sign in; no device key was saved.")
+                            }
+                        }
+                        "FAIL" -> if (register && !authenticated && message.params.firstOrNull() in listOf("REGISTER", "*")) throw RegistrationFailure(when (message.params.getOrNull(1)) {
+                            "ACCOUNT_EXISTS", "ALREADY_REGISTERED", "ALREADY_AUTHENTICATED" -> "That account name is unavailable. Sign in if it is yours, or choose another name."
+                            "DISALLOWED" -> "New account registration is closed on this network. Use an existing account to Sign in."
+                            "INVALID_PASSWORD", "WEAK_PASSWORD", "UNACCEPTABLE_PASSWORD" -> "The server rejected this password. Choose a stronger password and try again."
+                            "INVALID_USERNAME", "BAD_ACCOUNT_NAME", "ACCOUNT_NAME_MUST_BE_NICK" -> "The server rejected this account name. Choose another name and try again."
+                            "INVALID_EMAIL", "UNACCEPTABLE_EMAIL" -> "This network requires email registration. Use its registration instructions, then Sign in."
+                            else -> "Account creation was not confirmed. Sign in if it succeeded; signup is never retried automatically."
+                        })
                         "ERROR" -> throw java.io.IOException("IRC server closed the session")
                     }
                     // Authentication frames are never exposed to transcript/logging callbacks.
-                    if (message.command !in setOf("AUTHENTICATE", "CAP", "900", "902", "903", "904", "905", "906", "907", "PING", "PONG")) receive(message)
+                    if (message.command !in setOf("AUTHENTICATE", "CAP", "REGISTER", "900", "902", "903", "904", "905", "906", "907", "PING", "PONG") && !(register && message.command == "FAIL")) receive(message)
                 }
-            } catch (_: Exception) {
-                if (!closed.get()) disconnectedText = "Disconnected · TLS, authentication or network failed. /connect to try again; nothing is resent."
+            } catch (error: Exception) {
+                if (!closed.get()) disconnectedText = "Disconnected · " + if (error is RegistrationFailure) error.explanation else if (register && !authenticated) "Account creation was not confirmed. Sign in if it succeeded; signup is never retried automatically." else "TLS, authentication or network failed. /connect to try again; nothing is resent."
             } finally {
                 close(); connection(false, disconnectedText)
             }
@@ -141,7 +191,11 @@ class IrcClient(private val host: String, private val port: Int, private val nic
     override fun close() {
         ready = false; secret.fill('\u0000')
         if (closed.compareAndSet(false, true)) {
-            socket?.close(); outgoing.clear(); writer?.interrupt()
+            outgoing.clear(); writer?.interrupt()
+            val connected = socket
+            // TLS close_notify can write to the network. Back/Forget must never do
+            // that on Android's main thread; logical disconnect is immediate.
+            if (connected != null) thread(name = "retui-irc-close", isDaemon = true) { runCatching { connected.close() } }
         }
     }
 }

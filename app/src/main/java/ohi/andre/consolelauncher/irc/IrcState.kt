@@ -95,7 +95,16 @@ class IrcState {
                 else append(b, Line(text, body, nick), incoming = !own)
             }
             "JOIN" -> p.firstOrNull()?.let { channel ->
-                val b = buffer(channel); if (same(message.nick, nickname)) { b.joined = true; if (joining.isEmpty() || same(joining, channel)) { joining = ""; switch(channel) } }; if (b.names.size < 1000) b.names.add(message.nick)
+                val b = buffer(channel)
+                if (same(message.nick, nickname)) {
+                    b.joined = true
+                    // Bouncers may restore several channels after login. Only
+                    // the requested JOIN (or first channel from status) takes focus.
+                    if (same(joining, channel) || (joining.isEmpty() && current == 1)) {
+                        joining = ""; switch(channel)
+                    }
+                }
+                if (b.names.size < 1000) b.names.add(message.nick)
                 event(channel, "$nick joined $channel")
             }
             "PART" -> p.firstOrNull()?.let { channel ->

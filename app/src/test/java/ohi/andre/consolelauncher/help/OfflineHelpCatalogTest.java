@@ -32,9 +32,11 @@ public class OfflineHelpCatalogTest {
         Set<String> ids = new HashSet<>();
         List<String> roots = new ArrayList<>();
         Map<String, String> articleCategories = new HashMap<>();
+        Map<String, String> bodies = new HashMap<>();
         while (entries.find()) {
             String id = entries.group(1);
             assertTrue("Duplicate topic " + id, ids.add(id));
+            bodies.put(id, resources.get(entries.group(3)));
             for (int part = 2; part <= 3; part++) {
                 String text = resources.get(entries.group(part));
                 assertNotNull("Missing resource for " + id, text);
@@ -49,7 +51,26 @@ public class OfflineHelpCatalogTest {
         assertEquals("automation", articleCategories.get("termux-workspace"));
         assertEquals("presets", articleCategories.get("personal-backup"));
         assertEquals("tools", articleCategories.get("notes-workflow"));
+        assertEquals("getting-started", articleCategories.get("new-features"));
+        assertEquals("tools", articleCategories.get("irc-community"));
+        assertEquals("tools", articleCategories.get("irc-accounts-privacy"));
+        assertEquals("appearance", articleCategories.get("floating-tools"));
+        assertEquals("appearance", articleCategories.get("idle-fade"));
+        assertEquals("automation", articleCategories.get("termux-helper-updates"));
         assertEquals("reference", articleCategories.get("command-reference"));
         assertEquals(new HashSet<>(roots), new HashSet<>(articleCategories.values()));
+        assertTrue(bodies.get("irc-community").contains("Search text in navigation views is never posted"));
+        assertTrue(bodies.get("irc-community").contains("when the network permits registration"));
+        assertTrue(bodies.get("irc-community").contains("not recipient delivery or a read receipt"));
+        assertTrue(bodies.get("irc-accounts-privacy").contains("not a portable restore code"));
+        assertTrue(bodies.get("irc-accounts-privacy").contains("not end-to-end encrypted"));
+        assertTrue(bodies.get("irc-accounts-privacy").contains("Local deletion is not proof of server revocation"));
+        assertTrue(bodies.get("floating-tools").contains("Calculator and Help stay expanded in landscape"));
+        assertTrue(bodies.get("idle-fade").contains("breath_out_seconds"));
+        assertTrue(bodies.get("termux-helper-updates").contains(":update"));
+        assertTrue(bodies.get("termux-helper-updates").contains("SHA-256"));
+        assertTrue(bodies.get("calculator-help").contains("Check the live hint"));
+        assertTrue(bodies.get("calculator-help").contains("61 d to min"));
+        assertTrue(bodies.get("colors-type-and-status").contains("alphabet rails"));
     }
 }

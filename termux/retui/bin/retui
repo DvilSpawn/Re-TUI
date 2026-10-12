@@ -1,7 +1,7 @@
 #!/data/data/com.termux/files/usr/bin/sh
 set -eu
 
-RETUI_VERSION="0.4.1"
+RETUI_VERSION="0.4.2"
 RETUI_BRIDGE_PROTOCOL="retui-bridge-v1"
 RETUI_SOCKET_PROTOCOL="retui-bridge-socket-v4"
 TERMUX_PREFIX_DEFAULT="/data/data/com.termux/files/usr"
@@ -19,7 +19,7 @@ die() {
 
 usage() {
     cat <<'EOF'
-retui 0.4.1
+retui 0.4.2
 
 Usage:
   retui version
@@ -387,17 +387,6 @@ socket_error() {
     printf '%s %s\n' "__RETUI_SOCKET_ERROR__" "$*"
 }
 
-stop_pid_file_process() {
-    pid_path="$1"
-    pid="$(sed -n '1p' "$pid_path" 2>/dev/null || true)"
-    if [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null; then
-        kill "$pid" 2>/dev/null || true
-        sleep 0.05
-        kill -0 "$pid" 2>/dev/null && kill -9 "$pid" 2>/dev/null || true
-    fi
-    rm -f "$pid_path" 2>/dev/null || true
-}
-
 stop_matching_bridge_daemons() {
     socket_name="$(bridge_socket_name)"
     tcp_port="$(bridge_tcp_port)"
@@ -417,9 +406,9 @@ stop_matching_bridge_daemons() {
 }
 
 stop_bridge_daemons() {
-    stop_pid_file_process "$(bridge_daemon_pid_path socket)"
-    stop_pid_file_process "$(bridge_daemon_pid_path tcp)"
+    # A recycled PID from an old file can now belong to a shell or tmux job.
     stop_matching_bridge_daemons
+    rm -f "$(bridge_daemon_pid_path socket)" "$(bridge_daemon_pid_path tcp)"
 }
 
 bridge_listener_ready() {
@@ -430,7 +419,7 @@ bridge_listener_ready() {
     printf '%s\n' "$ready_response" | grep -F -x '__RETUI_SOCKET_STATUS__ ok' >/dev/null 2>&1 &&
         printf '%s\n' "$ready_response" | grep -F -x "__RETUI_SOCKET__ $RETUI_SOCKET_PROTOCOL" >/dev/null 2>&1 &&
         printf '%s\n' "$ready_response" | grep -F -x "__RETUI_SESSION__ $(bridge_session)" >/dev/null 2>&1 &&
-        printf '%s\n' "$ready_response" | grep -F -x '__RETUI_VERSION__ 0.4.1' >/dev/null 2>&1
+        printf '%s\n' "$ready_response" | grep -F -x '__RETUI_VERSION__ 0.4.2' >/dev/null 2>&1
 }
 
 wait_for_bridge_listener() {

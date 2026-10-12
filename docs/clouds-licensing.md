@@ -21,6 +21,10 @@ GPL asset sublicensing. Neither listing closes that source-distribution question
 This is an evidence-based risk assessment, not a legal adjudication or an assertion
 that project-source inclusion is explicitly forbidden in all circumstances.
 
-For public Git, obtain creator confirmation covering these exact layers in Re:TUI
-and downstream forks, or approve replacement/exclusion. No permission request has
-been sent, no artwork changed, and no broader grant has been invented.
+## Maintainer closure — October 12, 2026
+
+**Completed at the maintainer's explicit direction.** The maintainer instructed
+that the bundled artwork remain and this follow-up be marked completed; creator
+coordination is maintainer-owned. No artwork replacement/exclusion is pending.
+This is a recorded maintainer closure, not independently verified creator
+correspondence or a new GPL grant. Retain the CraftPix attribution and asset terms.

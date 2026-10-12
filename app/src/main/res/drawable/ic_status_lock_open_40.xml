@@ -1,11 +1,8 @@
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="40dp"
-    android:height="40dp"
-    android:viewportWidth="960"
-    android:viewportHeight="960">
-    <group android:translateY="960">
-        <path
-            android:fillColor="#FF000000"
-            android:pathData="M226.67,-80q-27.5,0 -47.09,-19.58Q160,-119.17 160,-146.67v-422.66q0,-27.5 19.58,-47.09Q199.17,-636 226.67,-636h380v-90.67q0,-52.77 -36.95,-89.72 -36.94,-36.94 -89.72,-36.94 -45.73,0 -80.03,28.5 -34.3,28.5 -43.97,71.16 -2.67,12 -12.83,19.5 -10.17,7.5 -22.98,7.5 -14.52,0 -23.69,-10.33 -9.17,-10.33 -6.83,-24 12,-67.67 65.33,-113.33Q408.33,-920 480,-920q80.23,0 136.78,56.55t56.55,136.78V-636h60q27.5,0 47.09,19.58Q800,-596.83 800,-569.33v422.66q0,27.5 -19.58,47.09Q760.83,-80 733.33,-80H226.67Zm0,-66.67h506.66v-422.66H226.67v422.66ZM480.11,-280q32.22,0 55.06,-22.52Q558,-325.04 558,-356.67q0,-31 -22.95,-55.16Q512.11,-436 479.89,-436t-55.06,24.17Q402,-387.67 402,-356.33q0,31.33 22.95,53.83 22.94,22.5 55.16,22.5Z" />
+<!-- Google Material Symbols, Apache-2.0. Converted viewport; paths unchanged.
+Source: https://raw.githubusercontent.com/google/material-design-icons/49d4db35df873165d6bd6ba09b063c7dafbac2f4/symbols/web/lock_open/materialsymbolsrounded/lock_open_24px.svg
+License: LICENSES/Material-Symbols-Apache-2.0.txt -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="40dp" android:height="40dp" android:viewportWidth="960" android:viewportHeight="960">
+    <group android:translateX="-0.0" android:translateY="960.0">
+        <path android:fillColor="#FFFFFFFF" android:pathData="M240-80q-33 0-56.5-23.5T160-160v-400q0-33 23.5-56.5T240-640h360v-80q0-50-35-85t-85-35q-42 0-73.5 25.5T364-751q-4 14-16.5 22.5T320-720q-17 0-28.5-11t-8.5-26q14-69 69-116t128-47q83 0 141.5 58.5T680-720v80h40q33 0 56.5 23.5T800-560v400q0 33-23.5 56.5T720-80H240Zm0-80h480v-400H240v400Zm240-120q33 0 56.5-23.5T560-360q0-33-23.5-56.5T480-440q-33 0-56.5 23.5T400-360q0 33 23.5 56.5T480-280ZM240-160v-400 400Z" />
     </group>
 </vector>

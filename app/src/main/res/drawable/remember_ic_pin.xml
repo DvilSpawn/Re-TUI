@@ -1,3 +1,8 @@
+<!-- Google Material Symbols, Apache-2.0. Converted viewport; paths unchanged.
+Source: https://raw.githubusercontent.com/google/material-design-icons/49d4db35df873165d6bd6ba09b063c7dafbac2f4/symbols/web/push_pin/materialsymbolsoutlined/push_pin_24px.svg
+License: LICENSES/Material-Symbols-Apache-2.0.txt -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24">
-    <path android:fillColor="#E3E3E3" android:pathData="M12,2 L14.9,8.6 L22,9.3 L16.8,14.1 L18.2,21.2 L12,17.8 L5.8,21.2 L7.2,14.1 L2,9.3 L9.1,8.6 Z"/>
+    <group android:translateX="-0.0" android:translateY="-0.0">
+        <path android:fillColor="#FFFFFFFF" android:pathData="m16 12 2 2v2h-5v6l-1 1-1-1v-6H6v-2l2-2V5H7V3h10v2h-1Zm-7.15 2h6.3L14 12.85V5h-4v7.85ZM12 14Z" />
+    </group>
 </vector>

@@ -194,7 +194,7 @@ internal class HelpWindowPanel(private val host: FrameLayout, private val conten
             contentHit(view.getChildAt(it), x, y)
         }
     }
-    private fun control(glyph: String, label: Int, resizeCorner: Boolean = false) = object : Button(context) {
+    private fun control(glyph: String, label: Int, resizeCorner: Boolean = false) = object : androidx.appcompat.widget.AppCompatButton(context) {
         override fun dispatchTouchEvent(event: MotionEvent): Boolean {
             // Content owns its complete measured target, even when a corner is drawn above it.
             if (resizeCorner && event.actionMasked == MotionEvent.ACTION_DOWN &&

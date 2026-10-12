@@ -13,6 +13,18 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parent.parent
 
+LOCAL_ONLY_FILES = {
+    'RELEASE_NOTES.md', 'release-notes.md', 'TODO.md', 'IDEA.md',
+    'docs/TESTBOOK.md', 'docs/FOCUS_FRICTION_V1.md', 'docs/irc-release-readiness.md',
+    'docs/privacy.html', 'docs/localization/AUDIT.md', 'docs/localization/INVENTORY.md',
+    'docs/localization/resources.csv', 'docs/localization/source-review.csv',
+}
+
+
+def public_source_path(name):
+    return name not in LOCAL_ONLY_FILES and not name.startswith((
+        'server/', 'native/qalculate/upstream/', 'third_party/upstream/'))
+
 
 def sha256(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
@@ -85,12 +97,11 @@ def main():
         third_party_archives.extend([archive, published_archive])
     names = subprocess.check_output(['git', 'ls-files', '-z', '--cached', '--others', '--exclude-standard'], cwd=ROOT).decode().split('\0')
     paths = [ROOT / name for name in names if name and (ROOT / name).is_file()
-             and not name.startswith(('native/qalculate/upstream/', 'third_party/upstream/'))]
+             and public_source_path(name)]
     # No ignored signing credentials, caches, APKs, or generated object files are included.
     manifest = {
         'apk': args.apk.name, 'apk_sha256': sha256(args.apk),
         'base_commit': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
-        'working_tree': subprocess.check_output(['git', 'status', '--short'], cwd=ROOT, text=True),
         'files': {str(p.relative_to(ROOT)): sha256(p) for p in paths},
         'native_sources': sources,
         'third_party_sources': third_party,

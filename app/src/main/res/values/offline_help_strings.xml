@@ -20,13 +20,13 @@
     <string name="offline_help_commands_title">Commands</string>
     <string name="offline_help_commands_body">Choose a numbered topic. Use 0 to return to the launcher.</string>
     <string name="offline_help_appearance_title">Appearance</string>
-    <string name="offline_help_appearance_body">Choose a numbered topic. Use 0 to return to the launcher.</string>
+    <string name="offline_help_appearance_body">Fonts, colors, floating tools and optional idle fade. Choose a numbered topic. Use 0 to return to the launcher.</string>
     <string name="offline_help_presets_title">Presets</string>
     <string name="offline_help_presets_body">Choose a numbered topic. Use 0 to return to the launcher.</string>
     <string name="offline_help_tools_title">Tools</string>
-    <string name="offline_help_tools_body">Choose a numbered topic. Use 0 to return to the launcher.</string>
+    <string name="offline_help_tools_body">IRC, Calculator, notes and other built-in tools. Choose a numbered topic. Use 0 to return to the launcher.</string>
     <string name="offline_help_automation_title">Automation</string>
-    <string name="offline_help_automation_body">Choose a numbered topic. Use 0 to return to the launcher.</string>
+    <string name="offline_help_automation_body">Termux workspace, prompted helper updates and scripting. Choose a numbered topic. Use 0 to return to the launcher.</string>
     <string name="offline_help_troubleshooting_title">Troubleshooting</string>
     <string name="offline_help_troubleshooting_body">Choose a numbered topic. Use 0 to return to the launcher.</string>
     <string name="offline_help_reference_title">Command reference</string>

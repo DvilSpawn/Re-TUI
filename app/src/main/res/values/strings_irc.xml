@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="help_irc">irc — open the native TLS IRC terminal. /server, /connect, /login, /register, /join, /window, /query, /msg and /help. This is not the HTTP community feed.</string>
+    <string name="help_irc">irc — open the native TLS IRC terminal. /server, /connect, /login, /register, /join, /window, /query, /msg and /help.</string>
     <string name="irc_title">IRC</string>
     <string name="irc_input_hint">message or /command</string>
     <string name="irc_send">Send IRC input</string>
@@ -10,6 +10,8 @@
     <string name="irc_help_title">Help</string>
     <string name="irc_more">More</string>
     <string name="irc_sign_in">Sign in</string>
+    <string name="irc_create_account">Create account</string>
+    <string name="irc_register_explanation">Choose a username, then a masked password. We join only after your account is confirmed. Re:TUI remembers this device by default; you can turn that off below.</string>
     <string name="irc_network">Network</string>
     <string name="irc_cancel">Cancel</string>
     <string name="irc_back">Back to conversation</string>
@@ -25,7 +27,7 @@
     <string name="irc_join_hint">Enter a channel such as #retui, then Continue.</string>
     <string name="irc_search_hint">Search this view</string>
     <string name="irc_welcome">IRC, at your fingertips.\nSign in, choose a channel, and talk.</string>
-    <string name="irc_pilot">Re:TUI is a closed-account pilot. New registration is not open. IRC accounts are separate from old community accounts.</string>
+    <string name="irc_signup_info">Create an IRC account with a username and password. No email is required. Registration is subject to server limits.</string>
     <string name="irc_other_network">Use an existing account on this network. Nickname-only connections and registration are available through commands where supported.</string>
     <string name="irc_browse">Browse network</string>
     <string name="irc_directory">Network channels</string>
@@ -51,7 +53,7 @@
     <string name="irc_command_guidance">Choose a command for its syntax. Nothing is sent until you press ↵.</string>
     <string name="irc_reconnect">Reconnect</string>
     <string name="irc_remember_device">Remember this device</string>
-    <string name="irc_device_explanation">Optional: use a protected device key to reconnect automatically when IRC opens. Your password is not saved. Anyone using your unlocked Launcher can access this IRC account. Reinstalling requires password sign-in again.</string>
+    <string name="irc_device_explanation">Reconnect automatically with a protected device key; no saved password. Anyone using your unlocked Launcher can access this account. A new phone or reinstall needs password sign-in.</string>
     <string name="irc_device_pending">Registering this device key…</string>
     <string name="irc_device_saved">Device remembered. IRC reconnects automatically when opened.</string>
     <string name="irc_device_failed">Device login could not be confirmed. Sign in with your password to retry.</string>
@@ -67,7 +69,7 @@
         <item>/connect — connect; account login asks for a masked password</item>
         <item>/reconnect — reconnect without resending messages</item>
         <item>/login account — enter a masked account password</item>
-        <item>/register — masked registration on networks that permit it</item>
+        <item>/register — guided username/password signup; connected clients use NickServ</item>
         <item>/disconnect — close the connection</item>
         <item>/quit — disconnect</item>
         <item>Conversations</item>
@@ -92,5 +94,5 @@
         <item>/help — open short, local help</item>
         <item>//text — send /text literally</item>
     </string-array>
-    <string name="irc_help">Native IRC terminal — one TLS network at a time.\n/server [host] [TLS port] · default irc.kokodoko.cloud 6697\n/nick nickname · /connect · /login account (masked SASL password)\n/register (connected nickname; masked NickServ password)\n/join #channel · /j #channel · /part [#channel]\n/window [number|name|next|prev|close] · /buffer is an alias\n/query nick · /msg nick text · /me action · /names · /list\n/topic [text] · /whois nick · /mode target modes · /kick nick [reason]\n/oper name (masked password) · /disconnect · /quit · /clear · /help\nPlain text goes only to the active joined channel or query. //text sends /text literally. Unknown commands never become messages or launcher commands.\nWindow markers: * unread · ! mention/private message. Passwords are never transcript/history entries. TLS is verified; no plaintext fallback.\nIRC accounts are separate from old community accounts. Register once, then /login before joining registered-only channels. Server-readable, not end-to-end encrypted. This first slice has no offline replay, push or background service; leaving disconnects. Unconfirmed messages are never retried automatically.</string>
+    <string name="irc_help">Native IRC terminal — one TLS network at a time.\n/server [host] [TLS port] · default irc.kokodoko.cloud 6697\n/nick nickname · /connect · /login account (masked SASL password)\n/register (guided signup offline; masked NickServ password when connected)\n/join #channel · /j #channel · /part [#channel]\n/window [number|name|next|prev|close] · /buffer is an alias\n/query nick · /msg nick text · /me action · /names · /list\n/topic [text] · /whois nick · /mode target modes · /kick nick [reason]\n/oper name (masked password) · /disconnect · /quit · /clear · /help\nPlain text goes only to the active joined channel or query. //text sends /text literally. Unknown commands never become messages or launcher commands.\nWindow markers: * unread · ! mention/private message. Passwords are never transcript/history entries. TLS is verified; no plaintext fallback.\nRegister once, then sign in or reconnect before joining registered-only channels. Server-readable, not end-to-end encrypted. This first slice has no offline replay, push or background service; leaving disconnects. Unconfirmed messages are never retried automatically.</string>
 </resources>

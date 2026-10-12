@@ -9,7 +9,6 @@ import android.graphics.Rect
 import android.view.View
 import androidx.test.platform.app.InstrumentationRegistry
 import ohi.andre.consolelauncher.calculator.CalculatorActivity
-import ohi.andre.consolelauncher.community.CommunityActivity
 import ohi.andre.consolelauncher.irc.IrcActivity
 import org.junit.Assert.*
 import org.junit.Test
@@ -74,6 +73,5 @@ class PaneOrientationIntegrationTest {
     }
     @Test fun calculatorLandscapeIsExpandedAndPortraitChoiceIsPreserved() = check(CalculatorActivity::class.java, "calculator", false)
     @Test fun helpLandscapeIsExpandedAndPortraitChoiceIsPreserved() = check(OfflineHelpActivity::class.java, "help", false)
-    @Test fun communityCanStillFloatInLandscape() = check(CommunityActivity::class.java, "community", true)
     @Test fun ircCanStillFloatInLandscape() = check(IrcActivity::class.java, "irc", true)
 }

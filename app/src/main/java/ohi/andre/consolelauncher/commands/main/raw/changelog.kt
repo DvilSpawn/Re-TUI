@@ -3,12 +3,11 @@ package ohi.andre.consolelauncher.commands.main.raw
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.commands.CommandAbstraction
 import ohi.andre.consolelauncher.commands.ExecutePack
-import ohi.andre.consolelauncher.commands.main.MainPack
 import ohi.andre.consolelauncher.managers.ChangelogManager
 
 class changelog : CommandAbstraction {
     override fun exec(pack: ExecutePack): String? {
-        ChangelogManager.printLog(pack.context, (pack as MainPack).client, true)
+        ChangelogManager.open(pack.context)
         return null
     }
 

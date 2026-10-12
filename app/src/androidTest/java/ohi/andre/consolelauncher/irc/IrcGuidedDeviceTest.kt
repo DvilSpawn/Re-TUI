@@ -29,7 +29,7 @@ import kotlin.concurrent.thread
 class IrcGuidedDeviceTest {
     @get:Rule val windows = WindowPreferencesRule()
     private val instrumentation = InstrumentationRegistry.getInstrumentation()
-    private class Peer : AutoCloseable {
+    private class Peer(private val registrationReply: String? = null) : AutoCloseable {
         val server = ServerSocket(0)
         val frames = CopyOnWriteArrayList<IrcMessage>()
         val mechanisms = CopyOnWriteArrayList<String>()
@@ -43,10 +43,11 @@ class IrcGuidedDeviceTest {
                     while (true) {
                         val raw = reader.readLine() ?: break; val m = IrcMessage.parse(raw)
                         // Never retain authentication payloads, even fixture passwords.
-                        if (m.command != "AUTHENTICATE") frames.add(m)
+                        if (m.command != "AUTHENTICATE") frames.add(if (m.command == "REGISTER") m.copy(params = m.params.take(2)) else m)
                         when (m.command) {
                             "NICK" -> nick = m.params[0]
-                            "CAP" -> if ("LS" in m.params) reply(":s CAP $nick LS :sasl=PLAIN,EXTERNAL echo-message") else if ("REQ" in m.params) reply(":s CAP $nick ACK :sasl echo-message") else if ("END" in m.params) reply(":s 001 $nick :Welcome")
+                            "CAP" -> if ("LS" in m.params) reply(":s CAP $nick LS :sasl=PLAIN,EXTERNAL echo-message${if (registrationReply != null) " draft/account-registration" else ""}") else if ("REQ" in m.params) reply(":s CAP $nick ACK :${m.params.last()}") else if ("END" in m.params) reply(":s 001 $nick :Welcome")
+                            "REGISTER" -> reply(":s $registrationReply".replace("<account>", nick))
                             "AUTHENTICATE" -> if (m.params[0] in listOf("PLAIN", "EXTERNAL")) { mechanisms.add(m.params[0]); reply("AUTHENTICATE +") } else reply(":s 903 $nick :Success")
                             "JOIN" -> { val channel = m.params[0]; reply(":$nick!u@fixture JOIN $channel"); reply(":s 353 $nick = $channel :$nick alice"); reply(":s 366 $nick $channel :End") }
                             "NAMES" -> { reply(":s 353 $nick = ${m.params[0]} :$nick alice"); reply(":s 366 $nick ${m.params[0]} :End") }
@@ -145,6 +146,15 @@ class IrcGuidedDeviceTest {
             recreate()
             main { assertEquals("keep this draft", input(a).text.toString()); assertEquals(InputType.TYPE_TEXT_FLAG_MULTI_LINE, input(a).inputType and InputType.TYPE_TEXT_FLAG_MULTI_LINE); assertNull(a.session.client) }
             assertFalse(a.session.state.buffers.any { b -> b.lines.any { it.text.contains("rotation-secret") } })
+            main { submit(a, "/register"); input(a).setText("fixture") }
+            recreate()
+            main {
+                assertEquals(IrcNavigation.Page.REGISTER, a.session.navigation.page); assertEquals("fixture", input(a).text.toString())
+                submit(a, "fixture"); input(a).setText("signup-rotation-secret")
+            }
+            recreate()
+            main { assertEquals("keep this draft", input(a).text.toString()); assertNull(a.session.client); assertEquals(InputType.TYPE_TEXT_FLAG_MULTI_LINE, input(a).inputType and InputType.TYPE_TEXT_FLAG_MULTI_LINE) }
+            assertFalse(a.session.state.buffers.any { b -> b.lines.any { it.text.contains("signup-rotation-secret") } })
         } finally { main { a.finish() }; instrumentation.waitForIdleSync() }
     }
     @Test fun browseDoesNotSendSearchAndEchoDeduplicatesImmediateLocalMessage() {
@@ -229,6 +239,77 @@ class IrcGuidedDeviceTest {
             devices.forget(identity)
             if (original != null) record.writeBytes(original) else record.delete()
         }
+    }
+    @Test fun usernamePasswordSignupEnrollsAndReconnectsWithoutPassword() {
+        val context = instrumentation.targetContext; val record = File(context.noBackupFilesDir, "irc-device.json")
+        val original = record.takeIf { it.exists() }?.readBytes()
+        val identity = IrcDeviceKey.Identity("irc.kokodoko.cloud", 6697, "signup" + System.nanoTime().toString().takeLast(8))
+        val devices = IrcDeviceKey(context)
+        var a = start()
+        try {
+            Peer("REGISTER SUCCESS <account> :Account successfully registered").use { peer ->
+                main {
+                    a.session.connector = { _, _ -> Socket("127.0.0.1", peer.server.localPort) }
+                    input(a).setText("keep signup draft"); click(a, "Sign in"); click(a, "Create account")
+                    assertTrue(a.session.rememberDevice)
+                }
+                capture(a, "signup")
+                main {
+                    submit(a, identity.account)
+                    assertEquals(InputType.TYPE_TEXT_VARIATION_PASSWORD, input(a).inputType and InputType.TYPE_MASK_VARIATION)
+                    assertTrue(a.window.attributes.flags and android.view.WindowManager.LayoutParams.FLAG_SECURE != 0)
+                    submit(a, "signup fixture password")
+                }
+                waitFor { devices.remembered() == identity && a.session.state.active.joined }
+                assertEquals(1, peer.frames.count { it.command == "REGISTER" }); assertTrue(peer.mechanisms.isEmpty())
+                assertEquals(1, peer.frames.count { it.command == "JOIN" })
+                assertTrue(peer.frames.any { it.command == "PRIVMSG" && it.params.last().startsWith("CERT ADD ") })
+                assertFalse(a.session.state.buffers.any { b -> b.lines.any { it.text.contains("signup fixture password") } })
+                assertEquals("keep signup draft", a.session.state.buffers.first().draft)
+                capture(a, "signup-complete")
+                main { a.finish() }; instrumentation.waitForIdleSync()
+            }
+            a = start()
+            Peer().use { peer ->
+                main { a.session.connector = { _, _ -> Socket("127.0.0.1", peer.server.localPort) }; a.session.initialized = false; a.session.restoreDevice() }
+                waitFor { a.session.state.active.joined }
+                assertEquals(listOf("EXTERNAL"), peer.mechanisms)
+                assertFalse(peer.frames.any { it.command == "REGISTER" || it.command == "PRIVMSG" })
+            }
+        } finally {
+            main { a.finish() }; instrumentation.waitForIdleSync(); devices.forget(identity)
+            if (original != null) record.writeBytes(original) else record.delete()
+        }
+    }
+    @Test fun closedSignupReportsFailureWithoutJoiningOrSavingDevice() {
+        val a = start(); val remembered = a.session.devices.remembered()
+        Peer().use { peer ->
+            try {
+                main {
+                    a.session.connector = { _, _ -> Socket("127.0.0.1", peer.server.localPort) }
+                    submit(a, "/register"); assertEquals(IrcNavigation.Page.REGISTER, a.session.navigation.page)
+                    submit(a, "closedfixture"); submit(a, "never-sent-fixture-password")
+                }
+                waitFor { a.session.connectionText.startsWith("Disconnected") }
+                assertTrue(a.session.connectionText.contains("Registration is closed"))
+                assertEquals(remembered, a.session.devices.remembered())
+                assertFalse(peer.frames.any { it.command in listOf("REGISTER", "JOIN", "PRIVMSG") })
+                assertFalse(a.session.state.buffers.any { b -> b.lines.any { it.text.contains("never-sent-fixture-password") } })
+                capture(a, "signup-closed")
+            } finally { main { a.finish() }; instrumentation.waitForIdleSync() }
+        }
+    }
+    @Test fun signupPasswordCancellationDoesNotCreateConnectionOrReplaceDraft() {
+        val a = start(); val remembered = a.session.devices.remembered()
+        try {
+            main {
+                input(a).setText("signup cancel draft"); submit(a, "/register"); submit(a, "fixture")
+                input(a).setText("cancel-signup-secret"); a.onBackPressedDispatcher.onBackPressed()
+                assertEquals("signup cancel draft", input(a).text.toString()); assertNull(a.session.client)
+                assertEquals(remembered, a.session.devices.remembered())
+                assertEquals(0, a.window.attributes.flags and android.view.WindowManager.LayoutParams.FLAG_SECURE)
+            }
+        } finally { main { a.finish() }; instrumentation.waitForIdleSync() }
     }
     @Test fun largestLauncherFontInNarrowFloatingPaneKeepsAccessibleActionsAndComposer() {
         val context = instrumentation.targetContext

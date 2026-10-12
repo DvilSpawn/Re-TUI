@@ -240,6 +240,40 @@ Cancel stops the current calculation. Back closes Help and retains your reading 
     <string name="cd_open_app_drawer">Open app drawer</string>
     <string name="cd_paste_clipboard">Paste from clipboard</string>
     <string name="cd_submit_command">Submit command</string>
+    <string name="changelog_continue">Continue to Launcher</string>
+    <string name="changelog_pane_title">CHANGELOG</string>
+    <string name="changelog_release_heading">Re:TUI %1$s · Build %2$d</string>
+    <string name="changelog_release_highlights">What is new in this update
+
+## Native IRC
+- Talk through standard IRC with channel and private-conversation chips, Channels, People and concise Help. Slash commands remain available.
+- Sign in through one prompt; optional device-key authentication reconnects without saving your password.
+- Messages appear immediately. Pending or uncertain sends are labelled; duplicate server echoes and automatic retries are avoided.
+
+## Calculator
+- Terminal input with 123, ABC and FUNC key layers for numbers, units, variables and functions.
+- Live hints preview how Qalculate interprets your expression and its possible result.
+- Continue from the last answer: 5+5 gives 10, then +5 gives 15. Assignment and conversion controls are easier to reach.
+
+## Floating tools and Help
+- Calculator, Help and IRC share raised headers, inner panes, theme-controlled borders and remembered window sizes.
+- Calculator and Help stay expanded in landscape. Help closes with Back and remembers your place; calculator help leaves your calculation intact.
+
+## Termux workspace
+- A separate workspace with two independent terminal tiles, split layouts and multiple pages. Existing shells and jobs keep running when you leave.
+- The workspace checks its helper and offers Update now / Later. Updates use the matching helper bundled with Launcher, with checksum verification and installation-failure recovery.
+- Improved Unicode input, resizing and reconnect restoration.
+
+## Launcher
+- Guided first-run setup with live border previews and a terminal-style build animation.
+- Classic/Search controls, optional search-category tabs and independent app-drawer rail appearance controls.
+- Portable preset sharing/import, an optional idle fade, improved unlock tracking and the JetBrains Mono Nerd Font Regular default.
+
+## Before you start
+- Termux still needs its command permission, external-app access, tmux and socat. The update prompt offers setup guidance when needed.
+- IRC uses TLS, not end-to-end encryption. Server operators can read messages; closing the IRC pane disconnects.
+
+You can reopen these notes with the changelog command. These highlights are bundled with the installed app and work offline.</string>
     <string name="command_bluetooth_false_4603a">%1$s false</string>
     <string name="command_bluetooth_opening_bluetooth_settings_android_no_long_c4672">Opening Bluetooth settings. Android no longer allows third-party launchers to toggle Bluetooth directly.</string>
     <string name="command_bluetooth_true_630fa">%1$s true</string>
@@ -608,153 +642,6 @@ Android AppWidgets: open the widgets pane from the toolbar.</string>
     <string name="command_wifi_opening_wi_fi_settings_android_no_longer_a_15368">Opening Wi-Fi settings. Android no longer allows third-party launchers to toggle Wi-Fi directly.</string>
     <string name="common_off">OFF</string>
     <string name="common_on">ON</string>
-    <string name="community_accept_rules">Accept rules</string>
-    <string name="community_account_deleted">Community account deleted. Local account data cleared.</string>
-    <string name="community_account_policy">Username: 3–24 ASCII letters, digits, - or _. Password: 8–71 characters. No forgotten-password recovery: use a new username, a separate identity. Old usernames cannot be reclaimed; no automatic ownership or history migration.</string>
-    <string name="community_auth_confirmation_error">Passwords differ. Enter username again.</string>
-    <string name="community_auth_password_error">Use 8–71 characters. Enter username again.</string>
-    <string name="community_auth_password_guidance">8–71 characters. No email or password recovery.</string>
-    <string name="community_auth_username_error">Use 3–24 ASCII letters, digits, - or _.</string>
-    <string name="community_auth_username_guidance">3–24 ASCII letters, digits, - or _. No email or password recovery.</string>
-    <string name="community_back">Back to threads</string>
-    <string name="community_ban_author">Ban reported author</string>
-    <string name="community_block_author">Block / unblock author locally</string>
-    <string name="community_blocked">Local block toggled for %1$s.</string>
-    <string name="community_bugs">bugs</string>
-    <string name="community_busy">A request is in progress; wait before submitting again.</string>
-    <string name="community_cancel">Cancel</string>
-    <string name="community_channels">Channels</string>
-    <string name="community_checking_delivery">checking delivery…</string>
-    <string name="community_confirm_action">Confirm</string>
-    <string name="community_confirm_password">Confirm password</string>
-    <string name="community_connection_live">● Live · @%1$s</string>
-    <string name="community_connection_offline">○ Offline · @%1$s</string>
-    <string name="community_connection_ready">● Connected · @%1$s</string>
-    <string name="community_connection_signed_out">○ Signed out</string>
-    <string name="community_connection_syncing">↻ Syncing · @%1$s</string>
-    <string name="community_copy_message">Copy message</string>
-    <string name="community_create_account">Join</string>
-    <string name="community_current">%1$s · current · refreshed while visible</string>
-    <string name="community_delete_account">Delete community account</string>
-    <string name="community_delete_explanation">Delete @%1$s and its authored messages, discussions and replies? Replies by others on your discussions are also removed. This cannot be undone. Enter your current password to confirm.
-
-Moderation evidence remains for six calendar months. Private recovery copies rotate after seven days and are removed on the next hourly run. Launcher settings are not affected. No forgotten-password recovery. A web deletion path is available at irc.kokodoko.cloud/community/account-deletion.</string>
-    <string name="community_deletion_failed">Deletion was not confirmed. Check the web deletion page before retrying.</string>
-    <string name="community_discard">Discard and leave</string>
-    <string name="community_discussion_hint">Opening message</string>
-    <string name="community_duplicate_username">Username is already taken.</string>
-    <string name="community_edit_title">Back · Edit title</string>
-    <string name="community_edit_title_summary">Edit discussion title: %1$s</string>
-    <string name="community_empty">No messages yet. Start the conversation.</string>
-    <string name="community_forum_context">#%1$s · discussions stay</string>
-    <string name="community_general">general</string>
-    <string name="community_general_context">#general · 24-hour chat</string>
-    <string name="community_help">Channels: general, bugs, help, suggestions and presets. Suggestions uses the features API key. Tap Channels, New thread, Mentions or Menu; no slash command is required. Plain text posts on Send; exit posts, /exit leaves, //text posts /text.
-/help · /refresh · /older · /login · /register · /logout · /exit
-/report &lt;full message ID&gt; · /block &lt;username&gt; · /moderate &lt;private text&gt;
-General messages expire individually after 24 hours. Forum threads and replies persist. Reports and private moderator requests last six calendar months; /moderate never posts publicly and has no automatic retry.
-Tap a suggested @handle to insert it at the caret. Only active foreground sessions renew 90-second presence leases; badges and mentions are in-app only. No push, private messages, attachments, external IRC or launcher execution.
-Username/password only; public registration and no password recovery. Server-readable, not end-to-end encrypted. Private encrypted account storage; 200 bodies per window and bounded routing/read metadata. Paused cache bytes are pruned on access; no secure-erasure guarantee. Nothing posts automatically on restoration. PocketBase is pre-1.0; this optional pilot may change.</string>
-    <string name="community_help_action">Help</string>
-    <string name="community_help_channel">help</string>
-    <string name="community_invalid">Input rejected; use /help. Slash commands take no password arguments. Messages: 500 Unicode characters / 2000 UTF-8 bytes maximum.</string>
-    <string name="community_join">Join community</string>
-    <string name="community_keep">Keep and leave</string>
-    <string name="community_leave_body">Keep the draft privately for next time, or discard it. Nothing is uploaded. Discarding an uncertain draft does not retract a possible server post.</string>
-    <string name="community_leave_title">Unsent or uncertain draft</string>
-    <string name="community_live">%1$s · live</string>
-    <string name="community_loading">%1$s · requesting…</string>
-    <string name="community_login">Login</string>
-    <string name="community_login_required">Sign in or register first. Draft kept; nothing was sent.</string>
-    <string name="community_logout">Signed out. Account cache, blocks, draft and token cleared.</string>
-    <string name="community_mention_author">Mention author</string>
-    <string name="community_mentions">Mentions</string>
-    <string name="community_mentions_empty">No unexpired mentions.</string>
-    <string name="community_menu">Menu</string>
-    <string name="community_message_actions">Message actions</string>
-    <string name="community_message_hint">Message #general</string>
-    <string name="community_messages_below">%1$d messages below · Latest ↓</string>
-    <string name="community_moderate">Private moderator request</string>
-    <string name="community_moderation_actions">Choose action</string>
-    <string name="community_moderation_confirm">Confirm this moderator action. Removing a discussion also removes its replies. Evidence keeps its original six-month expiry.</string>
-    <string name="community_more">More</string>
-    <string name="community_network_error">Network/TLS request failed. Cached history may be stale; draft kept. Nothing will post automatically.</string>
-    <string name="community_new_messages">%1$d unread · Latest ↓</string>
-    <string name="community_new_thread">New discussion</string>
-    <string name="community_next">Next</string>
-    <string name="community_not_confirmed">delivery not confirmed</string>
-    <string name="community_offline">@%1$s · offline</string>
-    <string name="community_older">Older</string>
-    <string name="community_online">@%1$s · online</string>
-    <string name="community_operations_warning">Operator attention needed: %1$s</string>
-    <string name="community_password">Password</string>
-    <string name="community_pending">Posting… not delivered yet.</string>
-    <string name="community_pending_locked">Previous attempt is unresolved. Restore its draft with /refresh and submit it unchanged to reconcile/retry, or /logout to clear local state (this does not retract any server post).</string>
-    <string name="community_post_discussion">Post discussion</string>
-    <string name="community_posted">Posted — server acknowledgement verified.</string>
-    <string name="community_presets">presets</string>
-    <string name="community_private_sent">Private moderator request accepted.</string>
-    <string name="community_private_uncertain">Private delivery was not confirmed. It may have reached the server. Do not send another copy blindly.</string>
-    <string name="community_queue_next">Next</string>
-    <string name="community_queue_page">%1$s · page %2$d</string>
-    <string name="community_queue_previous">Previous</string>
-    <string name="community_queue_switch">Switch report / request queue</string>
-    <string name="community_rate_error">Rate limited; wait %1$d seconds before retrying.</string>
-    <string name="community_refresh">Latest</string>
-    <string name="community_refresh_action">Refresh</string>
-    <string name="community_register">Register</string>
-    <string name="community_registration_error">Registration rejected. Check username uniqueness, password length and matching confirmation. If creation succeeded but login failed, try Login; account creation alone is not sign-in.</string>
-    <string name="community_remove_content">Remove reported content</string>
-    <string name="community_reply_hint">Reply to this discussion</string>
-    <string name="community_report">Report content / author</string>
-    <string name="community_report_default">Reported content or author from Re:TUI</string>
-    <string name="community_report_reason">Reason (optional)</string>
-    <string name="community_reported">Report accepted by server.</string>
-    <string name="community_request_error">Request failed (%1$d). No success was confirmed.</string>
-    <string name="community_request_resolved">Moderator action saved; request resolved.</string>
-    <string name="community_reset_window">Reset floating window</string>
-    <string name="community_resolve_request">Resolve / dismiss request</string>
-    <string name="community_retry">Check delivery</string>
-    <string name="community_review_queue">Moderator review</string>
-    <string name="community_rules_accepted">Rules accepted. Your draft is unchanged; tap Send when ready.</string>
-    <string name="community_rules_body">Re:TUI community · Rules version 2026-10-10
-
-Be respectful. No harassment, threats, hate, sexual exploitation, illegal content, impersonation, spam or sharing private information. Do not post secrets or passwords.
-
-Report content or its author from Message actions. Block an author locally to hide their posts and mention badges; /block username toggles the block. Private moderation requests are not public posts. dvil is the only moderator and can remove content or ban accounts.
-
-Messages are server-readable, not end-to-end encrypted. General expires after 24 hours. Forum discussions and accounts persist until deletion. Reports and moderation evidence last six calendar months, including after account deletion. Private recovery snapshots use a seven-day rotation; expired copies are removed on the next hourly run. There is currently no off-site recovery.
-
-Accept these rules before contributing. Acceptance does not submit your draft.</string>
-    <string name="community_rules_required">Accept the current community rules before posting.</string>
-    <string name="community_rules_title">Community rules</string>
-    <string name="community_sending">sending…</string>
-    <string name="community_session_error">Session expired, revoked or account unavailable. Signed out; private cache and draft cleared.</string>
-    <string name="community_sign_in">Sign in</string>
-    <string name="community_signed_out">Signed out · offline · /login or /register</string>
-    <string name="community_signed_out_hint">Sign in, join, or type /help</string>
-    <string name="community_source_gone">This source is unavailable or has expired.</string>
-    <string name="community_stale">%1$s · stale/offline</string>
-    <string name="community_storage_error">Private encrypted storage is unavailable. No post was started; draft is only in this window.</string>
-    <string name="community_submit">Send</string>
-    <string name="community_suggestions">suggestions</string>
-    <string name="community_thread_context">#%1$s › %2$s</string>
-    <string name="community_thread_title">Discussion title</string>
-    <string name="community_threads_empty">No threads in this channel. Tap New thread to start one.</string>
-    <string name="community_title">Re-TUI community · experimental</string>
-    <string name="community_title_error">Enter a single-line title, up to 120 Unicode characters / 480 UTF-8 bytes.</string>
-    <string name="community_title_guidance">1 · Title, then Next. Your opening message is kept.</string>
-    <string name="community_uncertain">Delivery uncertain. Tap Check delivery to verify the original message before retrying. Your newer draft is kept; nothing retries automatically.</string>
-    <string name="community_unread_divider">— first unread —</string>
-    <string name="community_username">Username</string>
-    <string name="community_welcome">Welcome to Re-TUI community.
-
-Talk with other Re-TUI users in General, or start a lasting discussion in Help, Bugs, Suggestions or Presets.
-
-General messages expire after 24 hours; discussions stay.
-
-Sign in or join below. Public posts are server-readable, not end-to-end encrypted. Accounts have no password recovery.</string>
-    <string name="community_window_title">Re-TUI community</string>
     <plurals name="contact_times">
         <item quantity="one">Contacted %1$d time</item>
         <item quantity="other">Contacted %1$d times</item>
@@ -1167,7 +1054,6 @@ $ cd /sdcard/Download</string>
 -add -&gt; create a new contact 
 -edit [contactName] -&gt; edit an existing contact 
 -rm [contactName] -&gt; remove a contact</string>
-    <string name="help_community">community — open the experimental opt-in Re-TUI community feed. Inside: plain text posts; /help lists local commands. Username/password only. No launcher commands run in this surface.</string>
     <string name="help_config">-ls [optional: config file] -&gt; list known files/options; with a file, read its values 
 -info [option] -&gt; read the type, default, and description 
 -get [option] -&gt; read the current value 
@@ -1277,7 +1163,7 @@ Examples:
 $ intent -view geo:0,0?q=home 
 $ intent -activity -a android.intent.action.SEND -t text/plain --es android.intent.extra.TEXT standup notes 
 $ intent -broadcast -a net.dinglisch.android.tasker.ACTION_TASK -p net.dinglisch.android.taskerm --es task_name Work</string>
-    <string name="help_irc">irc — open the native TLS IRC terminal. /server, /connect, /login, /register, /join, /window, /query, /msg and /help. This is not the HTTP community feed.</string>
+    <string name="help_irc">irc — open the native TLS IRC terminal. /server, /connect, /login, /register, /join, /window, /query, /msg and /help.</string>
     <string name="help_landscape">Save the Re:T-UI landscape preference and enable adaptive split layout when the window is wide enough. 
 
 Usage: 
@@ -1819,10 +1705,38 @@ Wiki:
     <string name="invalid_name">Invalid name</string>
     <string name="invalid_number">Invalid number</string>
     <string name="invalid_regex">Invalid regex:</string>
+    <string name="irc_account_explanation">Enter your IRC account name, then your password. This name will also be your nickname.</string>
+    <string name="irc_account_hint">IRC account name</string>
+    <string name="irc_account_invalid">Use an IRC nickname: up to 30 characters, without spaces. Advanced account names can use /login.</string>
+    <string name="irc_action_failed">Could not complete this action.</string>
+    <string name="irc_all_commands">All commands</string>
+    <string name="irc_back">Back to conversation</string>
+    <string name="irc_browse">Browse network</string>
+    <string name="irc_cancel">Cancel</string>
+    <string name="irc_channels">Channels</string>
+    <string name="irc_close_conversation">Close conversation</string>
+    <string name="irc_command_guidance">Choose a command for its syntax. Nothing is sent until you press ↵.</string>
+    <string name="irc_connection_details">Connection details</string>
+    <string name="irc_continue">Continue</string>
+    <string name="irc_create_account">Create account</string>
+    <string name="irc_device_explanation">Reconnect automatically with a protected device key; no saved password. Anyone using your unlocked Launcher can access this account. A new phone or reinstall needs password sign-in.</string>
+    <string name="irc_device_failed">Device login could not be confirmed. Sign in with your password to retry.</string>
+    <string name="irc_device_forgotten">Local device key removed. Password sign-in is required. Check NickServ certificate authorization if server revocation could not complete.</string>
+    <string name="irc_device_pending">Registering this device key…</string>
+    <string name="irc_device_removing">Removing device authorization…</string>
+    <string name="irc_device_revoked">Device authorization revoked and local key removed.</string>
+    <string name="irc_device_saved">Device remembered. IRC reconnects automatically when opened.</string>
+    <string name="irc_diagnostics">Server diagnostics</string>
+    <string name="irc_directory">Network channels</string>
+    <string name="irc_directory_limit">Showing the first 1,000 channels. You can still join a channel by name.</string>
+    <string name="irc_disconnect">Disconnect</string>
+    <string name="irc_disconnect_first">Disconnect before changing networks.</string>
+    <string name="irc_forget_device">Forget this device</string>
+    <string name="irc_forget_explanation">Remove the login key from this phone and disconnect? Server revocation will also be requested if this account is connected. If offline, remove its old certificate through NickServ on a trusted client.</string>
     <string name="irc_help">Native IRC terminal — one TLS network at a time.
 /server [host] [TLS port] · default irc.kokodoko.cloud 6697
 /nick nickname · /connect · /login account (masked SASL password)
-/register (connected nickname; masked NickServ password)
+/register (guided signup offline; masked NickServ password when connected)
 /join #channel · /j #channel · /part [#channel]
 /window [number|name|next|prev|close] · /buffer is an alias
 /query nick · /msg nick text · /me action · /names · /list
@@ -1830,11 +1744,44 @@ Wiki:
 /oper name (masked password) · /disconnect · /quit · /clear · /help
 Plain text goes only to the active joined channel or query. //text sends /text literally. Unknown commands never become messages or launcher commands.
 Window markers: * unread · ! mention/private message. Passwords are never transcript/history entries. TLS is verified; no plaintext fallback.
-IRC accounts are separate from old community accounts. Register once, then /login before joining registered-only channels. Server-readable, not end-to-end encrypted. This first slice has no offline replay, push or background service; leaving disconnects. Unconfirmed messages are never retried automatically.</string>
+Register once, then sign in or reconnect before joining registered-only channels. Server-readable, not end-to-end encrypted. This first slice has no offline replay, push or background service; leaving disconnects. Unconfirmed messages are never retried automatically.</string>
+    <string name="irc_help_title">Help</string>
     <string name="irc_input_hint">message or /command</string>
+    <string name="irc_join_hint">Enter a channel such as #retui, then Continue.</string>
+    <string name="irc_join_name">Join by channel name</string>
+    <string name="irc_joining">Joining %1$s…</string>
+    <string name="irc_leave">Leave %1$s</string>
+    <string name="irc_leave_confirm">Leave channel</string>
+    <string name="irc_leave_question">Leave %1$s? Your in-session draft will be kept.</string>
+    <string name="irc_loading">Loading…</string>
+    <string name="irc_more">More</string>
+    <string name="irc_network">Network</string>
+    <string name="irc_network_explanation">Choose a TLS network. Account names belong to that network. Default port: 6697.</string>
+    <string name="irc_network_hint">hostname [TLS port]</string>
+    <string name="irc_no_matches">No matches yet.</string>
+    <string name="irc_other_network">Use an existing account on this network. Nickname-only connections and registration are available through commands where supported.</string>
+    <string name="irc_password_context">%1$s · masked password · Back cancels</string>
+    <string name="irc_people">People</string>
+    <string name="irc_people_requires_channel">Join a channel to see its people.</string>
+    <string name="irc_private">Private conversation</string>
+    <string name="irc_quick_help">1. Type a message and press ↵ to send.
+2. Tap a conversation chip to switch chats.
+3. Open Channels to find or join a channel.</string>
+    <string name="irc_reconnect">Reconnect</string>
+    <string name="irc_refresh">Refresh</string>
+    <string name="irc_register_explanation">Choose a username, then a masked password. We join only after your account is confirmed. Re:TUI remembers this device by default; you can turn that off below.</string>
+    <string name="irc_remember_device">Remember this device</string>
+    <string name="irc_search_hint">Search this view</string>
     <string name="irc_secret_hint">Password · masked, session only · Back cancels</string>
+    <string name="irc_security_details">TLS protects the connection, not against server operators. Private conversations are not end-to-end encrypted.
+Leaving this pane disconnects. Passwords are not saved. Unconfirmed messages are never retried automatically.</string>
     <string name="irc_send">Send IRC input</string>
+    <string name="irc_show_more">Show next 50</string>
+    <string name="irc_sign_in">Sign in</string>
+    <string name="irc_signup_info">Create an IRC account with a username and password. No email is required. Registration is subject to server limits.</string>
     <string name="irc_title">IRC</string>
+    <string name="irc_welcome">IRC, at your fingertips.
+Sign in, choose a channel, and talk.</string>
     <string name="language_packs_active">Active: %1$s</string>
     <string name="language_packs_browse">Browse GitHub releases</string>
     <string name="language_packs_cancel">Cancel</string>
@@ -2375,7 +2322,7 @@ Unable to read Android Calendar.</string>
     <string name="notes_storage_error_4">Missing note file</string>
     <string name="notification_reader">Re:T-UI notification reader</string>
     <string name="notification_settings">Notification settings</string>
-    <string name="offline_help_appearance_body">Choose a numbered topic. Use 0 to return to the launcher.</string>
+    <string name="offline_help_appearance_body">Fonts, colors, floating tools and optional idle fade. Choose a numbered topic. Use 0 to return to the launcher.</string>
     <string name="offline_help_appearance_title">Appearance</string>
     <string name="offline_help_apps_body">Choose a numbered topic. Use 0 to return to the launcher.</string>
     <string name="offline_help_apps_title">Apps</string>
@@ -2575,7 +2522,7 @@ username "Work User" "Desk Phone"
 
 Change displayed prompt labels; quotes keep each label together.</string>
     <string name="offline_help_article_argument_shapes_title">Enter names, text, colors, and booleans</string>
-    <string name="offline_help_article_calculator_editing_limits_body">Tap the calculator input to position the cursor or select text. Function and square-root keys wrap selected text, or insert parentheses with the cursor inside. Backspace deletes the selection or previous character. ABC uses staggered QWERTY rows within the same keypad-height budget as 123, and long input scrolls horizontally. Expressions are limited to 1024 characters. The native worker has a four-second watchdog; the client waits up to eight seconds for completion. Cancel targets the active calculation and late results are ignored. A fixed keypad height does not guarantee a visible input row on every short landscape screen.
+    <string name="offline_help_article_calculator_editing_limits_body">Tap the calculator input to position the cursor or select text. Function and square-root keys wrap selected text, or insert parentheses with the cursor inside. Backspace deletes the selection or previous character. ABC uses staggered QWERTY rows within the same keypad-height budget as 123, and long input scrolls horizontally. Expressions are limited to 1024 characters. The native worker has a four-second watchdog; the client waits up to eight seconds for completion. Cancel targets the active calculation and late results are ignored. The floating pane enforces minimum sizing for the input, hint and keypad; Calculator stays expanded in landscape. Larger fonts and a smaller screen can reduce the available floating resize range.
 
 ## Examples
 
@@ -2586,6 +2533,10 @@ clear
 At calc&gt;, clear displayed transcript but retain the previous answer.</string>
     <string name="offline_help_article_calculator_editing_limits_title">Edit expressions and recognize calculator limits</string>
     <string name="offline_help_article_calculator_help_body">Enter an expression at `calc&gt;` and press ↵. Use the keypad to enter numbers, letters, units and functions. Qalculate evaluates the expression.
+
+## Check the live hint
+
+The hint below the input shows the interpreted expression and a possible result before you submit. Check it when units or unfamiliar words might be read differently than intended. Preview does not add history or replace your saved answer. Assignments/comparisons wait for ↵, and unavailable or incomplete previews are labelled. Use clear, not cls, to clear the transcript; an unfamiliar token can be interpreted as units rather than a terminal command.
 
 ## Continue a result
 
@@ -2613,10 +2564,11 @@ Use +, −, ×, ÷, parentheses, ^ and %.
 5 ft to cm → 152.4 cm
 *2 → 304.8 cm
 ans to ft → 10 ft
+61 d to min
 20 celsius to fahrenheit
 ```
 
-Use `to` for conversion. The word `in` means inches. Results retain their units when continued.
+Use `to` followed by your desired output unit: `61 d to min` requests minutes rather than accepting an automatic seconds result. The word `in` means inches. Results retain their units when continued.
 
 ## Functions and constants
 
@@ -2663,7 +2615,7 @@ The header window control switches between expanded and floating reading. Drag t
     <string name="offline_help_article_calculator_offline_engine_title">Offline calculator capabilities</string>
     <string name="offline_help_article_calculator_workflow_body">calc opens the calculator; calc &lt;expression&gt; evaluates one launcher result. At the home prompt or in an alias, use the calc prefix: bare numbers/expressions are not automatically calculations. Inside the pane, type after calc&gt; and press Enter or ↵. 123 provides numbers, ABC provides QWERTY letters/units and FUNC provides functions/constants. Use to for conversion; in is an inch unit.
 
-ans holds the last successful pane result with grouping/units; errors or cancellation do not replace it. clear clears the transcript but keeps ans, and exit closes the pane. The help tab explains expressions and editing.
+The hint below the input previews how the engine reads the expression and its possible result; it does not submit or change history. Start with +, -, *, / or ^ to continue the previous successful answer without typing ans. ans is still available inside larger expressions and conversions. Errors or cancellation do not replace the last result. clear clears the transcript but keeps ans, and exit closes the pane. The help tab explains expressions and editing.
 
 On Android 7+, opening the pane enables bundled Qalculate; the one-shot launcher command follows the saved Qalculate/engine settings. Enable qalculate in Settings → behavior.xml for units and symbolic maths from the prompt. Suggestions reflect that setting. Android 6 uses the basic evaluator. Pane calculations use approximate mode; one-shot calculations follow stored engine options.
 
@@ -2768,7 +2720,8 @@ stopwatch -status
 Inspect the stopwatch without starting it.</string>
     <string name="offline_help_article_clock_tools_title">Use a timer, stopwatch, and configured time format</string>
     <string name="offline_help_article_colors_type_and_status_body">Base colors and advanced semantic roles are defined in Theme; advanced auto roles inherit resolved parent colors rather than using one global fixed color. Settings can preview a color before saving. Wallpaper Auto-theme stores a palette snapshot, uses system-color fallback when necessary and disables legacy auto_color_pick after the snapshot. It can replace many colors; save a local preset first if you want to retain the current look.
-Status indices are positive decimal values: labels sharing the same integer part share a row. Whole-row edits insert/shift rows; ASCII is kept on a separate row. Multiple labels can share a row. Typography includes base text sizes and global font-size offset; custom font paths are excluded from shared presets.
+Status indices are positive decimal values: labels sharing the same integer part share a row. Whole-row edits insert/shift rows; ASCII is kept on a separate row. Multiple labels can share a row. Typography includes base text sizes and global font-size offset. JetBrains Mono Nerd Font Regular is the default; system/custom font choices remain available. Custom font paths and font files are not included in shared presets.
+App-drawer category/group and alphabet rails each have independent background, text and border colors, including selected states. They are not app-row colors. Advanced AUTO values inherit their role parents; explicit rail values override that inheritance. Wallpaper Auto-theme is a one-time palette choice, not automatic retheming on every wallpaper change.
 ASCII reads ascii.txt, supports static/colored HTML and framed animation; enable animation only for a suitable bounded file. Launcher sound has a master switch plus per-event toggles. Cyberdeck and CRT are independent effects, not extra launcher modes.
 
 ## Examples
@@ -3075,6 +3028,16 @@ location
 
 Request device coordinates; may prompt permission and can time out.</string>
     <string name="offline_help_article_files_and_location_title">Use file companion and device location only when needed</string>
+    <string name="offline_help_article_floating_tools_body">Calculator, Help and IRC start expanded. The header window control switches between expanded and floating. Drag a floating header to move the pane, or its corners to resize it within the safe screen area. Expanding preserves the floating rectangle for later. Each tool remembers its own mode and floating bounds when closed and reopened.
+
+Calculator and Help stay expanded in landscape; IRC can still float. Calculator has a minimum size to keep its input, hint and keypad usable rather than shrinking the pad into a scrolling keyboard. Larger fonts or a smaller screen can require a larger minimum pane.
+
+The tools follow Launcher fonts, colors and generated-border settings. Header controls and bottom-corner clearance keep resize targets distinct from editing keys. Changing border appearance does not change calculation or network behavior.
+
+Help is a separate reader. Opening it from Calculator keeps the expression, answer and transcript intact. Android Back or 0 closes Help immediately; reopening resumes its saved article and reading position. Numbered Topics/Categories choices navigate inside Help instead of requiring repeated Back presses.
+
+These are Launcher-owned tool windows, not Android split-screen controls. Floating does not create a background service or keep IRC connected after its pane closes.</string>
+    <string name="offline_help_article_floating_tools_title">Move, resize and reopen tool panes</string>
     <string name="offline_help_article_focus_and_credits_body">pomodoro starts a goal immediately when followed by text, or opens a goal form without text. -stop closes a finished session; in Dystopia mode it may spend credits or start an emergency breach challenge rather than stopping freely. credits and wallet show the same credit balance. breach and lockdown require Dystopia to be enabled. lockdown takes a positive duration and a reason; -stop directs you to the lockdown screen rather than ending the lock. Do not start a locking or focus session merely to try the syntax. Use the task guidance here when a command has no specific quick reference.</string>
     <string name="offline_help_article_focus_and_credits_title">Understand focus sessions before starting one</string>
     <string name="offline_help_article_guided_walkthrough_body">Guide is an interactive walkthrough separate from this read-only manual, with basics, customize and modules paths. Start a path, use next/back to move between steps, off to hide it and resume to continue. Restart returns a path to its first step; reset clears saved guide progress, not the whole launcher configuration. Progress can advance when a matching command is observed even if its action fails.
@@ -3107,7 +3070,7 @@ guide -resume
 
 Resume stored path progress.</string>
     <string name="offline_help_article_guided_walkthrough_title">Read help or follow a guided task</string>
-    <string name="offline_help_article_home_back_retention_body">Back is contextual: it handles a workspace or Termux console before podcast/profile surfaces, drawers and the output tray. In the Termux console, Back hides the keyboard before closing the console. Android Home is a separate action. In-place launcher refresh preserves terminal state. Podcast filters, search and scroll, and Termux console buffer/drafts are retained only while the launcher process survives. Calculator history, answer and editing position use separate saved preferences. Launcher UI retention does not guarantee that a remote tmux job or session is still running.</string>
+    <string name="offline_help_article_home_back_retention_body">Back is contextual: it handles a workspace or Termux console before podcast/profile surfaces, drawers and the output tray. In the Termux console, Back hides the keyboard before closing the console. Android Home is a separate action. In-place launcher refresh preserves terminal state. Podcast filters, search and scroll, and Termux console buffer/drafts are retained only while the launcher process survives. Calculator history, answer and editing position use separate saved preferences. Help Back closes the reader immediately and keeps its article/reading position for reopening. Calculator, Help and IRC retain independent expanded/floating choice and bounds; Calculator and Help remain expanded in landscape. IRC Back first leaves Channels/People/Help navigation; Back from its conversation closes the pane and disconnects. Remembered device authentication can reconnect next time, but it is not chat transcript or process-death draft persistence. Launcher UI retention does not guarantee that a remote tmux job or session is still running.</string>
     <string name="offline_help_article_home_back_retention_title">Home, Back and retained sessions</string>
     <string name="offline_help_article_http_actions_body">Post takes a URL token and the remaining body text. A body beginning with { or [ uses JSON media type; otherwise it is text/plain. It sends a real HTTP POST and prints status/response asynchronously. Webhook -add stores a name, URL, and template; a configured name triggers its POST with arguments. -ls prints names/URLs, and -rm removes a saved hook. Webhook arguments can be recorded in history. Avoid putting credentials or private message bodies in examples, URLs, terminal screenshots, or history; remote endpoints may retain what you send.
 
@@ -3119,6 +3082,21 @@ webhook -ls
 
 Inspect configured names/URLs; this may reveal private endpoint URLs.</string>
     <string name="offline_help_article_http_actions_title">Know when POST and webhooks send data</string>
+    <string name="offline_help_article_idle_fade_body">Idle fade is off by default. Enable breath_out in Settings and choose breath_out_seconds; its default timeout is 900 seconds (15 minutes). It fades Launcher Home and the dedicated Termux workspace to the wallpaper after inactivity. Calculator, Help and IRC are not additional fade targets.
+
+The first touch, key or Back wakes a faded surface without performing the underlying action. Interact again to use that control. Typing restarts the timer. Backgrounding or loss of focus pauses active timing, and touch exploration prevents the fade. Disabling the feature restores the surface immediately.
+
+This is visual fading, not screen locking, a security boundary, a phone-sleep command or a way to stop tmux jobs.
+
+## Check the setting
+
+```
+config -get breath_out
+config -get breath_out_seconds
+```
+
+These commands at Launcher Home only inspect the current values. To change them, use Settings or an explicit config -set. The two settings can be included in shareable presets.</string>
+    <string name="offline_help_article_idle_fade_title">Optional idle fade to your wallpaper</string>
     <string name="offline_help_article_image_frame_packs_body">Settings Frames stages frame selections/assignments in an edit session. Choose an element or apply-to-all, import an asset/package, inspect original PNG preview and choose a frame pack. Saving current, creating new or replacing an existing user pack persists the complete staged setup and applies it. Built-in packs cannot be replaced or deleted. Switching/deleting with unsaved edits has a discard-confirmation flow.
 Frame bundles use .retui-frame; UI packages are .retui_ui.zip, distinct from shareable .retui and personal .retui-backup. Frame import validates names/manifest/PNG and size bounds. The editor’s PNG preview is not a full screenshot simulation of the launcher. Custom frames can change how generated-border settings appear.
 Local preset save includes current frame state, while current .retui share export does not actually emit frame files. Use supported frame-specific controls rather than promising all frame assets travel with every shared theme.
@@ -3149,6 +3127,59 @@ preset -ls
 
 Find uniquely saved imported name before choosing apply.</string>
     <string name="offline_help_article_import_retui_title">Inspect a shared preset without applying it</string>
+    <string name="offline_help_article_irc_accounts_privacy_body">## Remember this device
+
+On the default Re:TUI network, Remember this device authorizes a protected Android Keystore key after successful account authentication. Create account enables this choice by default and explains it before password entry; you can turn it off. Passwords are not saved. After enrollment is confirmed, opening IRC automatically reconnects and requests #retui.
+
+This is a device reconnect key, not a portable restore code. A new phone, reinstall, deleted app data or a missing key needs password sign-in again. Anyone using your unlocked Launcher can use the remembered account. Keep your account password recoverable independently.
+
+## If reconnect fails
+
+Check your network and the chosen server, then use Reconnect or password Sign in. A rejected key or TLS failure does not silently downgrade authentication. Account names belong to a network; an account on another IRC server or an old experimental community login is not automatically a Re:TUI IRC account. Use Network while disconnected to choose a compatible TLS server.
+
+## Forget this device
+
+Connection details offers Forget this device. While connected to the bound account it requests server revocation, waits for confirmation, then removes the local key and disconnects. If offline or revocation fails, local removal can still happen; follow the warning and remove the old certificate authorization through NickServ on a trusted client. Local deletion is not proof of server revocation.
+
+## Privacy and retention
+
+TLS verifies and encrypts the connection, but messages are not end-to-end encrypted. Server operators can read channel and private messages. The server receives your connection address; nickname display and IP cloaking are not anonymity from the operator. Never share passwords or private recovery information in a channel.
+
+The default network uses a one-week server-history policy with cleanup in batches, not instantaneous deletion. External networks have their own policies. Launcher has no persistent local transcript, background IRC service, push or offline replay in this version. Rotation retains conversations, but password entry cancels; leaving the pane disconnects. Process death does not preserve an unsent chat draft.
+
+For default-network moderation, privacy or account-deletion requests, contact the developer privately. dvil is the configured moderator. Forget this device does not delete the server account or its history.</string>
+    <string name="offline_help_article_irc_accounts_privacy_title">IRC accounts, reconnect and privacy</string>
+    <string name="offline_help_article_irc_community_body">## Open and sign in
+
+Enter `irc` at Launcher Home. Tap Sign in, enter your IRC account name, then the masked password in the same composer. On the Re:TUI network the account name is also your nickname. Wait for Connected and confirmed membership of #retui before sending. Joining means the server has not confirmed membership yet.
+
+Create account uses the same username/password flow when the network permits registration. If registration is closed or rejected, use an existing account or wait for signup to open; Launcher does not fall back to a guest account.
+
+## Everyday navigation
+
+1. Type a message in the active conversation and press ↵ to send.
+2. Tap a named conversation chip to switch channels or private conversations. Unread counts and mention markers identify activity elsewhere.
+3. Open Channels to switch to an open channel, browse the network, or join by name. Search text in navigation views is never posted as a message.
+
+People lists nicknames in the active channel. Tap a nickname to open a private conversation; that alone sends nothing. Help begins with three short instructions; All commands opens the grouped reference. Channels, People and Help temporarily replace the conversation view without discarding its draft or reading position.
+
+Back first leaves a temporary view. From the conversation it closes the pane and disconnects. More offers connection details, diagnostics, leave/close and disconnect; leaving a channel asks for confirmation.
+
+## Optional slash commands
+
+```
+/join #help
+/window #retui
+/query nickname
+/help
+```
+
+Use these inside IRC, not at Launcher Home. /join requests membership; /window switches an open conversation; /query opens a private conversation without sending. Replace nickname with the intended person. Typing / offers syntax hints. Unknown slash commands are rejected, never sent as messages. `//text` sends a literal leading slash.
+
+## Sending safely
+
+Messages appear immediately with their confirmation state. Server echo confirms server acceptance, not recipient delivery or a read receipt. Disconnect can leave a send uncertain; it is never automatically retried. Check the conversation before manually resending. Opening this offline article does not sign in, join or send anything.</string>
+    <string name="offline_help_article_irc_community_title">IRC: sign in, join and talk</string>
     <string name="offline_help_article_language_packs_body">Language packs supply text, not scripts. Import validates the pack archive, resource keys and formatting arguments. Missing translations fall back to bundled English. Installed packs and the selected language stay local to Launcher; an older pack version cannot replace a newer installed version. Selecting a pack changes launcher text and layout direction, not command names or flags. External app labels, feed titles, your documents, and native calculator definitions/messages are not automatically translated. Acceptance of a partial pack does not establish translation quality.</string>
     <string name="offline_help_article_language_packs_title">Use language packs with English fallback</string>
     <string name="offline_help_article_launcher_modes_body">Classic shows the command terminal; Search presents categorized results and inline output around the search field. Search is a different layout, not a sandbox or an assurance that text cannot execute commands: both layouts keep the launcher command path. Use mode to inspect the current mode, mode search to switch, or mode classic to return. A mode change refreshes the existing launcher UI. An active command guide can control the normal suggestion row, so use guide -off when you want normal suggestions again.
@@ -3313,6 +3344,27 @@ podcast speed 1.25
 
 Change podcast playback speed.</string>
     <string name="offline_help_article_music_and_podcasts_title">Separate local music, external media and podcasts</string>
+    <string name="offline_help_article_new_features_body">## Start here
+
+This manual is bundled with Launcher and can be read offline. IRC and network services still need a connection. Read examples here; entering them at a live prompt can perform their described actions.
+
+- IRC: open `irc`, sign in, wait for #retui, then talk. Find IRC guides in Tools.
+- Calculator: use 123, ABC and FUNC, check the interpretation/result hint, and use `to` for conversions. Read Calculator help in Tools.
+- Floating tools: Calculator, Help and IRC start expanded, remember their window choice and retain their floating size. Find Floating tools in Appearance.
+- Termux: the separate workspace has pages and up to two independent tiles. It offers a prompted update for the APK-bundled helper. Read Termux workspace and Helper updates in Automation.
+- Presets: a shared .retui package is inspected and saved first, not immediately applied. Personal .retui-backup archives are separate. Read Portable preset import in Presets.
+- Startup: new installs complete the introduction, configuration and build animation before entering Launcher. Existing completed setups are kept. Read Startup setup in Getting started.
+- Appearance: app-drawer category/alphabet rails have independent normal and selected colors. The default font is JetBrains Mono Nerd Font Regular; custom/system font controls remain available.
+- Idle fade: optionally fade Home and the Termux workspace to the wallpaper. It is off by default. Read Idle fade in Appearance.
+
+## Find an article directly
+
+```
+help -topic irc-community
+```
+
+At Launcher Home, open the offline IRC guide. `help irc` prints the shorter command reference instead. Use numbered choices or tap a topic in this reader; Android Back closes Help and keeps your place.</string>
+    <string name="offline_help_article_new_features_title">Explore the new terminal tools</string>
     <string name="offline_help_article_notes_workflow_body">## Library storage
 
 notes opens the integrated Remember library/editor in its own task, not a separate app. Current storage is a private remember-notes.xml index plus Markdown/assets in notes-library; legacy notes.xml is retained as an import recovery copy, not the primary live database. NotesManager adapts the library for status/module display.
@@ -3714,7 +3766,7 @@ tui -folder
 
 Open/print the actual configuration directory.</string>
     <string name="offline_help_article_storage_and_backup_boundary_title">Find configuration storage for your build</string>
-    <string name="offline_help_article_support_and_compatibility_body">settings opens launcher settings; themer is an older hidden name for the same surface. tutorial opens the bundled getting-started article. Some command-specific -tutorial options still open external websites. The deprecated install command opens a Play Store search; it does not install an APK. rate opens the store listing, with a web fallback. donate currently opens the project repository, not PayPal. changelog fetches release notes from Pastebin and needs network access. profile opens the local profile screen. hack shows a simulated overlay animation, not a hacking tool. clear clears the terminal display. Hidden compatibility commands can still be called; being hidden is not a security restriction.
+    <string name="offline_help_article_support_and_compatibility_body">settings opens launcher settings; themer is an older hidden name for the same surface. tutorial opens the bundled getting-started article. Some command-specific -tutorial options still open external websites. The deprecated install command opens a Play Store search; it does not install an APK. rate opens the store listing, with a web fallback. donate currently opens the project repository, not PayPal. changelog opens bundled release highlights in a separate terminal pane and works offline. After an app update, the pane opens once for the newer build after first-run setup; Back or Continue closes it. profile opens the local profile screen. hack shows a simulated overlay animation, not a hacking tool. clear clears the terminal display. Hidden compatibility commands can still be called; being hidden is not a security restriction.
 
 ## Examples
 
@@ -3776,13 +3828,43 @@ tbridge -setup
 
 Print bridge setup instructions without running a script.</string>
     <string name="offline_help_article_termux_bridge_setup_title">Check bridge prerequisites before running scripts</string>
+    <string name="offline_help_article_termux_helper_updates_body">## Approve the matching helper
+
+Opening the Termux workspace checks compatibility with the helper bundled in this APK. Update now installs that matching helper through Termux and reconnects the bridge. Later installs nothing. Inside the workspace, :update reopens the prompt. There is no silent update or background download from a changing Git branch.
+
+The update replaces the normal helper path, including a custom helper there, only after approval. It verifies decoded bytes with SHA-256 and atomically replaces the file. Installation failures attempt rollback; the previous helper is retained at $PREFIX/share/retui/retui.previous. Existing shells, running jobs and workspace layout are kept. Only bridge connections restart.
+
+## Setup is separate
+
+Termux must already be installed, Launcher must have command permission, and allow-external-apps must be enabled in Termux by the user. If tmux or socat is missing, install them in Termux with pkg install tmux socat. The prompt offers permission, Termux and setup-guide actions; it does not silently grant access or install dependencies.
+
+## If an update fails
+
+Check the displayed error and prerequisites before retrying. A command with no reply may still finish inside Termux; Launcher does not automatically replay the installation. Leaving Launcher does not cancel a command already dispatched to Termux.
+
+A lock prevents concurrent replacements. After an interrupted update, retry may report a running or interrupted lock. Launcher never deletes unknown locks automatically. Open the setup guide, inspect $PREFIX/share/retui/.update-lock only after checking that no updater is running, and retain the previous helper if recovery is needed. Never kill the tmux server as a routine update fix.
+
+## Open the guide
+
+```
+help -topic termux-helper-updates
+```
+
+At Launcher Home, read this offline guide without changing the helper. :update belongs to the workspace local-control prompt, not the Home command parser.</string>
+    <string name="offline_help_article_termux_helper_updates_title">Update the Termux helper from the workspace</string>
     <string name="offline_help_article_termux_workspace_body">Termux must be installed with its RUN_COMMAND service exposed, allow-external-apps enabled, and launcher RUN_COMMAND permission granted through Android. tbridge -setup prints instructions; -doctor/-status checks local installation/declaration/permission, not remote execution. -probe dispatches a diagnostic with asynchronous results. Shared-storage scripts may need Termux storage setup.
 
 Bare termux or tmux opens the interactive workspace. tmux launch &lt;id&gt; focuses/creates a launcher window; built-ins include shell, htop, mc, nano, vim, python, node and logs. Their executables must already be installed in Termux. tmux switch selects an index/visible window token, new creates a window, save persists a custom launcher command and rm removes that saved launcher, not its package. Scripts run with Termux access: review them first.
 
-Inside the workspace, a colon starts local control mode; ordinary input goes to tmux using a socket when possible and a script fallback otherwise. :status reports installation, permission, socket and geometry. :new, :switch, :prev, :next, :reconnect and :home are local controls. Tap a window label, use :switch &lt;window&gt; locally, or tmux switch &lt;window&gt; at Launcher Home to select an index/name; :prev/:next and a horizontal terminal swipe switch adjacent windows. The active window is highlighted. Connecting/Ready/Disconnected appears in the header without replacing a running terminal with typing/key status. Ready confirms the authenticated bridge handshake, not execution of each queued key. Input that cannot be queued is not automatically replayed. Returning Home or backgrounding closes only the launcher stream; Termux tmux jobs and shell drafts continue. Returning to the pane reconnects without killing the session. Install helper 0.3.4 with this launcher for encoded frame isolation and live streaming; older helpers use direct tmux snapshots selected before mutation.
+Inside the workspace, a colon starts local control mode; ordinary input goes to its selected tmux window using an authenticated targeted socket. There is no silent fallback to session-global input. :status reports installation, permission, socket and geometry. :update reopens the helper update prompt; it never sends a chat or shell message. :new, :switch, :prev, :next, :reconnect and :home are local controls. Tap a window label, use :switch &lt;window&gt; locally, or tmux switch &lt;window&gt; at Launcher Home to select an index/name; :prev/:next and a horizontal terminal swipe switch adjacent windows. The active window is highlighted. Connecting/Ready/Disconnected appears in the header without replacing a running terminal with typing/key status. Ready confirms the authenticated bridge handshake, not execution of each queued key. Input that cannot be queued is not automatically replayed. Returning Home or backgrounding closes only the launcher stream; Termux tmux jobs and shell drafts continue. Returning to the pane reconnects without killing the session. This Launcher needs helper 0.4.2. Opening the workspace checks compatibility and offers Update now / Later. Update now installs the checksum-verified helper bundled with the APK through Termux and reconnects without stopping shells/jobs. The previous helper is kept at $PREFIX/share/retui/retui.previous, and installation failures attempt rollback. Custom helpers at the normal path are replaced only with your approval. Termux must already be installed with command permission and allow-external-apps enabled; missing tmux/socat packages require pkg install tmux socat in Termux. Setup is never silently changed. No helper is downloaded from a changing Git branch. A timed-out command may still finish in Termux; Launcher does not automatically retry installation. If an interrupted update lock persists, check that no updater is running before inspecting $PREFIX/share/retui/.update-lock. Launcher will not remove unknown locks.
 
 termux -run opens the one-shot console, not an interactive full-screen Linux app. Registered termux: sources can update modules with script stdout. Legacy -app-add/-apps only show workspace help; use tmux save for custom launchers. termux -setup is unhandled; use tbridge -setup. Retired tbridge -dirs/-files/-ls do not browse files; use the Re:TUI Files companion.
+
+## Workspace pages and tiles
+
+Single, Top-bottom and Left-right choose the visible layout, with at most two tiles targeting independent tmux windows. Tap a tile to choose where keyboard input goes. Add asks whether to replace a tile, split the page or create a new page; replacing a view does not kill its old shell.
+
+The page strip, arrows and :page next / :page prev switch pages. A terminal swipe or :prev / :next changes only the focused tile window. Single expands the focused tile without ending the other shell. Exited shells are removed from remembered pages; the last exit leaves an empty workspace until Add explicitly creates a shell. Read Helper updates in Automation for the shorter update/recovery guide.
 
 ## Examples
 
@@ -3934,7 +4016,7 @@ webhook -ls
 
 Print configured webhook names and destination URLs without sending; URLs can contain secrets.</string>
     <string name="offline_help_article_webhooks_privacy_title">Review webhook destinations and saved argument history</string>
-    <string name="offline_help_automation_body">Choose a numbered topic. Use 0 to return to the launcher.</string>
+    <string name="offline_help_automation_body">Termux workspace, prompted helper updates and scripting. Choose a numbered topic. Use 0 to return to the launcher.</string>
     <string name="offline_help_automation_title">Automation</string>
     <string name="offline_help_backspace">Backspace</string>
     <string name="offline_help_choice">Numbered choice</string>
@@ -3964,7 +4046,7 @@ help -topic &lt;id&gt; → open a manual category or article</string>
     <string name="offline_help_resize_width">Resize width: drag, tap to grow, long press to shrink</string>
     <string name="offline_help_root">Categories</string>
     <string name="offline_help_title">Offline manual</string>
-    <string name="offline_help_tools_body">Choose a numbered topic. Use 0 to return to the launcher.</string>
+    <string name="offline_help_tools_body">IRC, Calculator, notes and other built-in tools. Choose a numbered topic. Use 0 to return to the launcher.</string>
     <string name="offline_help_tools_title">Tools</string>
     <string name="offline_help_topics">Topics</string>
     <string name="offline_help_troubleshooting_body">Choose a numbered topic. Use 0 to return to the launcher.</string>
@@ -5006,7 +5088,7 @@ Lua error: </string>
     <string name="surface_net_handshaking_with_mirror_node_b8bec">[NET ] handshaking with mirror node...</string>
     <string name="surface_net_tunneling_through_relay_07_37b98">[NET ] tunneling through relay-07...</string>
     <string name="surface_net_tunneling_through_relay_11_c3345">[NET ] tunneling through relay-11...</string>
-    <string name="surface_new_name_prev_next_refresh_status_reconnect_home_6ee59">:new [name] :prev :next :refresh :status :reconnect :home</string>
+    <string name="surface_new_name_prev_next_refresh_status_reconnect_home_6ee59">:new [name] :prev :next :refresh :status :reconnect :update :home</string>
     <string name="surface_new_tmux_window_0b9e5">new tmux window: %1$s</string>
     <string name="surface_new_tmux_window_6272b">new tmux window</string>
     <string name="surface_newest_first_autoplay_42753">Newest first autoplay</string>
@@ -5868,7 +5950,34 @@ Ready for the next command</string>
     <string name="workspace_choose_window">Choose window</string>
     <string name="workspace_empty">No shell windows · add a new shell</string>
     <string name="workspace_focused_tile">Tile %1$d, focused</string>
-    <string name="workspace_helper_update_required">Update the Termux retui helper to 0.4.1 for workspace pages and shell exit detection. Existing windows are unchanged.</string>
+    <string name="workspace_helper_dependencies">Termux packages required
+
+Install tmux and socat in Termux with: pkg install tmux socat
+Then retry. Your existing helper has not been changed.</string>
+    <string name="workspace_helper_guide">Setup guide</string>
+    <string name="workspace_helper_hide">Hide progress</string>
+    <string name="workspace_helper_later">Later</string>
+    <string name="workspace_helper_no_reply">No reply from Termux
+
+Check command permission and allow-external-apps, then retry. A dispatched update may still finish inside Termux; no installation is automatically retried.</string>
+    <string name="workspace_helper_open_termux">Open Termux</string>
+    <string name="workspace_helper_permissions">Launcher permissions</string>
+    <string name="workspace_helper_retry">Retry connection</string>
+    <string name="workspace_helper_setup">Termux setup required
+
+Install Termux, grant Launcher permission to run Termux commands, and enable allow-external-apps=true in Termux settings. The setup guide has instructions. No security settings are changed automatically.</string>
+    <string name="workspace_helper_update_busy">Another helper update is running or was interrupted
+
+Retry shortly. If this persists, open the setup guide. Launcher will not delete an unknown update lock or start another installation.</string>
+    <string name="workspace_helper_update_failed">Helper update failed
+
+The update was not confirmed. Installation failures attempt to restore the previous helper; it is also retained under $PREFIX/share/retui/retui.previous. Retry or open the setup guide. Existing shells and jobs are not stopped.</string>
+    <string name="workspace_helper_update_now">Update now</string>
+    <string name="workspace_helper_update_prompt">Termux helper update required
+
+This Launcher needs helper %1$s. Update now installs the matching helper bundled with this app and reconnects the bridge. Existing shells and jobs are kept. A previous helper copy is retained for recovery. Any custom helper at this path will be replaced.</string>
+    <string name="workspace_helper_update_required">Update the Termux retui helper to 0.4.2 for workspace pages and shell exit detection. Existing windows are unchanged.</string>
+    <string name="workspace_helper_updating">Updating helper · existing shells and jobs are kept</string>
     <string name="workspace_home">Home</string>
     <string name="workspace_ime">Keyboard</string>
     <string name="workspace_layout">Workspace layout</string>

@@ -8,7 +8,6 @@ import android.graphics.Rect
 import android.view.View
 import androidx.test.platform.app.InstrumentationRegistry
 import ohi.andre.consolelauncher.calculator.CalculatorActivity
-import ohi.andre.consolelauncher.community.CommunityActivity
 import ohi.andre.consolelauncher.irc.IrcActivity
 import org.junit.Assert.*
 import org.junit.Test
@@ -29,8 +28,15 @@ class WindowPersistenceIntegrationTest {
         } finally { instrumentation.removeMonitor(monitor) }
     }
     private fun open(type: Class<out Activity>, orientation: Int = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) =
-        rotate(instrumentation.startActivitySync(Intent(instrumentation.targetContext, type).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)), orientation).also { idle() }
-    private fun close(activity: Activity) { instrumentation.runOnMainSync { activity.finish() }; idle() }
+        rotate(instrumentation.startActivitySync(Intent(instrumentation.targetContext, type).putExtra("irc_offline_fixture", true).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)), orientation).also { idle() }
+    private fun close(activity: Activity) {
+        instrumentation.runOnMainSync { activity.finish() }
+        val deadline = android.os.SystemClock.uptimeMillis() + 5000
+        while (!activity.isDestroyed && android.os.SystemClock.uptimeMillis() < deadline) {
+            idle()
+        }
+        assertTrue("Closed activity completes its lifecycle before the next fixture", activity.isDestroyed)
+    }
     private fun bounds(view: View): Rect {
         val xy = IntArray(2); view.getLocationOnScreen(xy)
         return Rect(xy[0], xy[1], xy[0] + view.width, xy[1] + view.height)
@@ -61,7 +67,7 @@ class WindowPersistenceIntegrationTest {
             instrumentation.runOnMainSync { target("window-toggle").performClick() }
             idle()
             assertEquals("Expanding never loses the floating rectangle", floating, bounds(panel()))
-            if (prefix != "community" && prefix != "irc") {
+            if (prefix != "irc") {
                 activity = rotate(activity!!, ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
                 assertEquals(View.GONE, target("resize-corner").visibility)
                 close(activity!!); activity = null
@@ -74,7 +80,26 @@ class WindowPersistenceIntegrationTest {
         } finally { activity?.let { close(it) } }
     }
     @Test fun calculatorRemembersModeAndRectangleAfterClosing() = check(CalculatorActivity::class.java, "calculator", OfflineHelpActivity::class.java, "help")
-    @Test fun helpRemembersModeAndRectangleAfterClosing() = check(OfflineHelpActivity::class.java, "help", CommunityActivity::class.java, "community")
-    @Test fun communityRemembersModeAndRectangleAfterClosing() = check(CommunityActivity::class.java, "community", CalculatorActivity::class.java, "calculator")
+    @Test fun helpRemembersModeAndRectangleAfterClosing() = check(OfflineHelpActivity::class.java, "help", IrcActivity::class.java, "irc")
     @Test fun ircRemembersModeAndRectangleAfterClosing() = check(IrcActivity::class.java, "irc", CalculatorActivity::class.java, "calculator")
+
+    @Test fun ircRapidReopenReadsMostRecentModeBeforeOldStop() {
+        var activity: Activity? = null
+        try {
+            activity = open(IrcActivity::class.java)
+            repeat(6) { index ->
+                val expanded = index % 2 != 0
+                instrumentation.runOnMainSync {
+                    activity!!.window.decorView.findViewWithTag<View>("irc-window-toggle").performClick()
+                    assertEquals(if (expanded) View.GONE else View.VISIBLE,
+                        activity!!.window.decorView.findViewWithTag<View>("irc-resize-corner").visibility)
+                    activity!!.finish()
+                }
+                // Intentionally no destruction/idle delay before asking Android to reopen.
+                activity = open(IrcActivity::class.java)
+                assertEquals("Rapid reopen keeps the latest choice", if (expanded) View.GONE else View.VISIBLE,
+                    activity!!.window.decorView.findViewWithTag<View>("irc-resize-corner").visibility)
+            }
+        } finally { activity?.let { close(it) } }
+    }
 }

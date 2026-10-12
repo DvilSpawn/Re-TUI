@@ -1,13 +1,32 @@
 # Re:T-UI Termux Bridge
 
-`retui` 0.4.1 is the Termux-side helper for the launcher's tmux workspace.
+`retui` 0.4.2 is the Termux-side helper for the launcher's tmux workspace.
 Termux owns the shell, tmux session and persistent jobs. Re:T-UI displays
 captured cells and forwards input; this is not a second terminal runtime or a
 claim of complete terminal-emulator fidelity.
 
 ## Install
 
-Install this helper together with the matching launcher:
+Launcher now bundles the matching helper and checks it when opening the workspace.
+Choose **Update now** to install/update it inside Termux and reconnect; **Later**
+does not install anything. `:update` reopens the prompt. This is a user-approved
+APK-matched update, not a background download of the GitHub branch.
+
+Termux must already be installed with command permission and `allow-external-apps`
+enabled by the user. If required tools are missing, the pane offers setup guidance;
+install `tmux` and `socat` in Termux first. Existing shells/jobs are retained, and
+only bridge listeners reconnect. Helper replacement uses bounded Base64 transport,
+SHA-256 verification, an atomic rename and installation-failure rollback. The last
+helper is retained at `$PREFIX/share/retui/retui.previous`; custom helpers at the
+normal path are replaced only after confirmation. No credentials are included.
+
+The short-lived update lock serializes installs. If Termux is forcibly killed
+during installation, retry may report an interrupted lock; Launcher never removes
+unknown locks automatically. Inspect `$PREFIX/share/retui/.update-lock` in Termux
+only after verifying no updater is running. The pane times out without replaying
+an installation; closing Launcher does not cancel a command already sent to Termux.
+
+For manual installation:
 
 ```sh
 pkg install curl tmux socat -y
@@ -44,7 +63,7 @@ only `127.0.0.1` TCP fallback when cross-app abstract sockets are blocked.
   does the same from Launcher Home. `:new [name]` creates a window.
 - `:launch <id>` focuses/creates a saved launcher window; `:save <id> <command>`
   saves a custom launcher and `:rm <id>` removes that saved entry.
-- `:status`, `:refresh`, `:reconnect`, `:help` and `:home` remain local controls.
+- `:status`, `:refresh`, `:reconnect`, `:update`, `:help` and `:home` remain local controls.
   Use the existing `termuxopen` command when the full Termux application is needed.
 - Connecting/Ready/Disconnected belongs to the header, not the running TUI.
   Typing/key progress does not replace a captured editor or other application.
@@ -79,10 +98,10 @@ retui bridge kill
 
 `capabilities` is read-only and lists supported operation names. The launcher
 chooses helper or direct tmux **before** mutation; it exits with the selected
-helper's result rather than replaying failed input. The dedicated Activity requires 0.4.1; it never silently falls back to a
+helper's result rather than replaying failed input. The dedicated Activity requires 0.4.2; it never silently falls back to a
 session-global input/capture path. Updating the APK alone does not update a
 Termux helper. Upgrade the helper separately; existing sessions/jobs are retained.
-For continuous streaming and independent tile geometry, update to 0.4.1. The v4 targeted socket protocol is not compatible with
+For continuous streaming and independent tile geometry, update to 0.4.2. The v4 targeted socket protocol is not compatible with
 older launcher frame readers; update both sides rather than claiming transparent
 backward compatibility.
 
@@ -112,7 +131,7 @@ allowing spaces in names. Example (the payload here encodes `hello` plus newline
 
 ```text
 __RETUI_BRIDGE__ retui-bridge-v1
-__RETUI_VERSION__ 0.4.1
+__RETUI_VERSION__ 0.4.2
 __RETUI_SESSION__ retui_workspace
 __RETUI_TARGET__ @0
 __RETUI_WINDOW__ 0:1
@@ -139,7 +158,7 @@ request/response captures with the **same encoded** frame format. Messages
 include CAPTURE, ENTER, SEND, TYPE, NEW, SWITCH, SELECT, KEY, PING and BYE; text/name/initial
 command arguments use base64. Invalid payloads fail before sending Enter.
 
-The 0.4.1 extension emits `__RETUI_TARGET_GONE__ @id` when a targeted window
+The 0.4.2 extension emits `__RETUI_TARGET_GONE__ @id` when a targeted window
 disappears or its retained pane has exited (`pane_dead`), and `-` for an empty
 session. It is a control event, not terminal output. `NO_CREATE` prevents HELLO
 from bootstrapping an exited session; only explicit NEW may create it. The

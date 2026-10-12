@@ -10,6 +10,103 @@ import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
 class IrcClientTest {
+    @Test fun closeReturnsImmediatelyEvenWhenTlsCloseBlocksOrThrows() {
+        val connected = CountDownLatch(1); val closing = CountDownLatch(1); val release = CountDownLatch(1)
+        val ended = CountDownLatch(1)
+        val fixture = object : Socket() {
+            override fun getInputStream() = object : java.io.InputStream() {
+                override fun read(): Int { release.await(5, TimeUnit.SECONDS); return -1 }
+            }
+            override fun getOutputStream(): java.io.OutputStream { connected.countDown(); return java.io.ByteArrayOutputStream() }
+            override fun close() {
+                closing.countDown(); release.await(5, TimeUnit.SECONDS); ended.countDown()
+                throw java.io.IOException("Fixture TLS close failure")
+            }
+        }
+        val client = IrcClient("localhost", 6697, "test", receive = {}, connection = { _, _ -> }, connector = { _, _ -> fixture })
+        try {
+            client.start(); assertTrue(connected.await(5, TimeUnit.SECONDS))
+            val returned = CountDownLatch(1)
+            thread { client.close(); returned.countDown() }
+            assertTrue("Close must not wait for TLS close_notify", returned.await(1, TimeUnit.SECONDS))
+            assertFalse(client.ready); assertTrue(closing.await(5, TimeUnit.SECONDS))
+            client.close()
+        } finally { release.countDown(); client.close() }
+        assertTrue(ended.await(5, TimeUnit.SECONDS))
+    }
+    private fun registration(capability: String, response: String?, beforeConnect: Boolean = false, rejectCapability: Boolean = false): Pair<List<String>, String> {
+        ServerSocket(0).use { server ->
+            val frames = CopyOnWriteArrayList<String>(); val incoming = CopyOnWriteArrayList<IrcMessage>()
+            val done = CountDownLatch(1); var result = ""; val ready = java.util.concurrent.atomic.AtomicBoolean(false)
+            val workerFailure = java.util.concurrent.atomic.AtomicReference<Throwable>()
+            val fixture = thread {
+                try { server.accept().use { peer ->
+                    peer.soTimeout = 5000; val reader = peer.getInputStream().bufferedReader(); val writer = peer.getOutputStream().bufferedWriter()
+                    fun reply(line: String) { writer.write(line + "\r\n"); writer.flush() }
+                    var registrationSent = false
+                    while (true) {
+                        val line = reader.readLine() ?: break; frames.add(line)
+                        val m = IrcMessage.parse(line)
+                        when (m.command) {
+                            "CAP" -> when (m.params[0]) {
+                                "LS" -> reply(":s CAP test LS :$capability")
+                                "REQ" -> reply(":s CAP test ${if (rejectCapability) "NAK" else "ACK"} :${m.params.last()}")
+                                "END" -> reply(":s 001 test :Welcome")
+                            }
+                            "REGISTER" -> {
+                                registrationSent = true
+                                assertFalse("Signup must not become a guest session", ready.get())
+                                assertEquals("test", m.params[0]); assertEquals("*", m.params[1]); assertEquals("fixture password", m.params[2])
+                                assertEquals(beforeConnect, frames.none { it == "CAP END" })
+                                // Human text and user-origin success frames cannot authenticate signup.
+                                reply(":NickServ!service@fixture NOTICE test :Account created")
+                                reply(":alice!u@fixture REGISTER SUCCESS test :Not a server response")
+                                reply("PING :confirmation-barrier")
+                            }
+                            "PONG" -> if (registrationSent) {
+                                assertFalse(ready.get())
+                                if (response == null) return@use else reply(response)
+                            }
+                            "JOIN" -> { done.countDown(); while (reader.readLine() != null) { }; return@use }
+                        }
+                    }
+                } } catch (error: Throwable) { workerFailure.set(error); done.countDown() }
+            }
+            lateinit var c: IrcClient
+            c = IrcClient("localhost", server.localPort, "test", "test", "fixture password".toCharArray(), incoming::add,
+                { ok, text -> if (ok) { ready.set(true); result = "ready"; c.send("JOIN", listOf("#retui")) } else if (text.startsWith("Disconnected") && !ready.get()) { result = text; done.countDown() } },
+                { _, port -> Socket("127.0.0.1", port) }, register = true)
+            try {
+                c.start(); assertTrue(done.await(5, TimeUnit.SECONDS))
+                assertTrue(incoming.none { it.command == "REGISTER" || it.params.any { value -> value.contains("fixture password") } })
+            } finally { c.close(); fixture.join(5000) }
+            workerFailure.get()?.let { throw AssertionError("Registration peer", it) }
+            assertFalse(fixture.isAlive)
+            return frames.toList() to result
+        }
+    }
+    @Test fun guidedRegistrationRequiresServerConfirmationBeforeJoining() {
+        listOf(false, true).forEach { early ->
+            val (frames, result) = registration("draft/account-registration${if (early) "=before-connect" else ""} echo-message", ":s REGISTER SUCCESS test :Created", early)
+            assertEquals("ready", result); assertEquals(1, frames.count { it.startsWith("REGISTER ") }); assertEquals(1, frames.count { it.startsWith("JOIN ") })
+            assertFalse(frames.any { it.startsWith("AUTHENTICATE") })
+        }
+    }
+    @Test fun closedOrEmailOnlyRegistrationNeverReceivesPasswordOrJoins() {
+        listOf("sasl=PLAIN echo-message", "draft/account-registration=email-required echo-message").forEach { capability ->
+            val (frames, result) = registration(capability, null)
+            assertTrue(result.startsWith("Disconnected")); assertFalse(frames.any { it.startsWith("REGISTER") || it.startsWith("AUTHENTICATE") || it.startsWith("JOIN") || it.contains("fixture password") })
+        }
+        val (frames, result) = registration("draft/account-registration", null, rejectCapability = true)
+        assertTrue(result.contains("rejected")); assertFalse(frames.any { it.startsWith("REGISTER") || it == "CAP END" || it.startsWith("JOIN") })
+    }
+    @Test fun rejectedUnverifiedOrUncertainSignupNeverFallsBackOrRetries() {
+        listOf(":s FAIL REGISTER ACCOUNT_EXISTS test :fixture password", ":s REGISTER VERIFICATION_REQUIRED test :Verify first", ":s REGISTER SUCCESS somebodyelse :Wrong account", null).forEach { response ->
+            val (frames, result) = registration("draft/account-registration", response)
+            assertTrue(result.startsWith("Disconnected")); assertFalse(result.contains("fixture password"))
+            assertEquals(1, frames.count { it.startsWith("REGISTER ") }); assertFalse(frames.any { it.startsWith("JOIN") || it.startsWith("AUTHENTICATE") })
+        }
+    }
     @Test fun externalAuthenticatesWithAccountOnlyAndNoPasswordFallback() {
         ServerSocket(0).use { server ->
             val frames = CopyOnWriteArrayList<String>(); val ready = CountDownLatch(1)

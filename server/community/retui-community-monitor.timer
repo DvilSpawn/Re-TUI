@@ -1,7 +1,0 @@
-[Unit]
-Description=Check Re:TUI community health every five minutes
-[Timer]
-OnBootSec=2min
-OnUnitActiveSec=5min
-[Install]
-WantedBy=timers.target

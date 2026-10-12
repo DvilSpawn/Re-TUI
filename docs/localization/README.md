@@ -28,7 +28,10 @@ The Android resources below remain the bundled English fallback and developer so
 
 Create the same files under a language directory beside `values`, for example `values-pt` for Portuguese, or `values-pt-rBR` for Brazilian Portuguese. Pick the contributor's actual language and region before starting. Keep the English files as the defaults. Translate only the entries you have reviewed; missing entries fall back to English. Do not copy entries marked `translatable="false"`. Android Studio's Translations Editor or a plain XML editor works. [Android resource localization](https://developer.android.com/guide/topics/resources/localization).
 
-`resources.csv` is a reference catalog, not an import format. `source-review.csv` is a developer work queue, not a translation assignment: it includes technical strings and other false positives. Translating that CSV does not change the app.
+Running the inventory script generates local `resources.csv` and `source-review.csv`
+files. These are ignored developer work queues, not import formats or translation
+assignments; they include technical strings and other false positives. Editing
+those CSVs does not change the app.
 
 ## Translation contract
 
