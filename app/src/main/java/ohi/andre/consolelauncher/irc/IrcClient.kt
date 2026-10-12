@@ -43,6 +43,7 @@ class IrcClient(private val host: String, private val port: Int, private val nic
     @Volatile private var socket: Socket? = null
     @Volatile var ready = false; private set
     @Volatile var echoMessages = false; private set
+    @Volatile var supportsChatHistory = false; private set
     private var worker: Thread? = null
     private var writer: Thread? = null
     private class RegistrationFailure(val explanation: String) : java.io.IOException()
@@ -121,13 +122,15 @@ class IrcClient(private val host: String, private val port: Int, private val nic
                                     if (message.params.getOrNull(2) != "*") {
                                         if (register && registrationCapability !in offered) throw RegistrationFailure("Registration is closed or guided signup is unsupported on this network. Use an existing account to Sign in.")
                                         check(register || account.isEmpty() || "sasl" in offered) { "Server does not offer SASL" }
-                                        val wanted = listOf("server-time", "echo-message", "multi-prefix") .filter { it in offered }.toMutableList()
+                                        val wanted = listOf("batch", "message-tags", "server-time", "echo-message", "multi-prefix", "draft/chathistory")
+                                            .filter { it in offered }.toMutableList()
                                         if (register) wanted.add(registrationCapability) else if (account.isNotEmpty()) wanted.add("sasl")
                                         if (wanted.isEmpty()) endCapabilities() else queue(IrcProtocol.line("CAP", listOf("REQ"), wanted.joinToString(" ")))
                                     }
                                 }
                                 "ACK" -> {
                                     echoMessages = "echo-message" in capabilities
+                                    supportsChatHistory = capabilities.any { it == "draft/chathistory" || it == "chathistory" }
                                     if (register) {
                                         if (registrationCapability !in capabilities) throw RegistrationFailure("Guided registration was rejected by this network. Nothing was joined.")
                                         if (registerBeforeConnect) submitRegistration() else endCapabilities()

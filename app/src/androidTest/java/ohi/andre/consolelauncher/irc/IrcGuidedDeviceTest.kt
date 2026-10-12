@@ -46,11 +46,12 @@ class IrcGuidedDeviceTest {
                         if (m.command != "AUTHENTICATE") frames.add(if (m.command == "REGISTER") m.copy(params = m.params.take(2)) else m)
                         when (m.command) {
                             "NICK" -> nick = m.params[0]
-                            "CAP" -> if ("LS" in m.params) reply(":s CAP $nick LS :sasl=PLAIN,EXTERNAL echo-message${if (registrationReply != null) " draft/account-registration" else ""}") else if ("REQ" in m.params) reply(":s CAP $nick ACK :${m.params.last()}") else if ("END" in m.params) reply(":s 001 $nick :Welcome")
+                            "CAP" -> if ("LS" in m.params) reply(":s CAP $nick LS :sasl=PLAIN,EXTERNAL echo-message batch message-tags server-time draft/chathistory${if (registrationReply != null) " draft/account-registration" else ""}") else if ("REQ" in m.params) reply(":s CAP $nick ACK :${m.params.last()}") else if ("END" in m.params) reply(":s 001 $nick :Welcome")
                             "REGISTER" -> reply(":s $registrationReply".replace("<account>", nick))
                             "AUTHENTICATE" -> if (m.params[0] in listOf("PLAIN", "EXTERNAL")) { mechanisms.add(m.params[0]); reply("AUTHENTICATE +") } else reply(":s 903 $nick :Success")
                             "JOIN" -> { val channel = m.params[0]; reply(":$nick!u@fixture JOIN $channel"); reply(":s 353 $nick = $channel :$nick alice"); reply(":s 366 $nick $channel :End") }
                             "NAMES" -> { reply(":s 353 $nick = ${m.params[0]} :$nick alice"); reply(":s 366 $nick ${m.params[0]} :End") }
+                            "CHATHISTORY" -> { reply(":s BATCH +h chathistory ${m.params[1]}"); reply("@batch=h;msgid=fixture-history-1;time=2026-10-12T10:00:00Z :alice!u@fixture PRIVMSG ${m.params[1]} :replayed fixture message"); reply(":s BATCH -h") }
                             "LIST" -> { reply(":s 321 $nick :Start"); reply(":s 322 $nick #fixture 2 :A test channel"); reply(":s 323 $nick :End") }
                             "PRIVMSG" -> if (m.params[0] == "NickServ" && m.params[1].startsWith("CERT ADD ")) reply(":NickServ!service@fixture NOTICE $nick :Certificate fingerprint successfully added")
                                 else if (m.params[0] == "NickServ" && m.params[1].startsWith("CERT DEL ")) reply(":NickServ!service@fixture NOTICE $nick :Certificate fingerprint successfully removed")
@@ -122,6 +123,36 @@ class IrcGuidedDeviceTest {
                 main { click(a, "alice"); assertEquals("alice", a.session.state.active.name); assertTrue(a.findViewById<TextView>(R.id.irc_context).text.contains("Private conversation")) }
                 assertFalse(peer.frames.any { it.command == "PRIVMSG" })
                 assertFalse(a.session.state.buffers.any { b -> b.lines.any { it.text.contains("fixture-only-password") || it.text.contains("one TLS network") } })
+            } finally { main { a.finish() }; instrumentation.waitForIdleSync() }
+        }
+    }
+    @Test fun historyReplayAndMentionSuggestionsWorkOnDevice() {
+        val a = start()
+        Peer().use { peer ->
+            try {
+                main {
+                    a.session.connector = { _, _ -> Socket("127.0.0.1", peer.server.localPort) }
+                    a.session.account = "fixture"; a.session.state.nickname = "fixture"
+                    a.session.connect("fixture-password".toCharArray())
+                }
+                waitFor { a.session.state.active.joined }
+                assertTrue("CHATHISTORY was not requested: ${peer.frames}", peer.frames.any { it.command == "CHATHISTORY" })
+                waitFor { a.session.state.active.historyLoaded }
+                main {
+                    assertTrue(a.session.state.active.lines.any { it.body == "replayed fixture message" })
+                    assertTrue(peer.frames.any { it.command == "CHATHISTORY" && it.params[1] == "#retui" })
+                    assertTrue(peer.frames.any { it.command == "NAMES" && it.params[0] == "#retui" })
+                    a.session.state.receive(IrcMessage.parse(":s 353 fixture = #retui :fixture alice"))
+                    input(a).setText("@al")
+                    input(a).setSelection(input(a).length())
+                    a.session.changed?.invoke()
+                }
+                val mentionDeadline = System.nanoTime() + 5_000_000_000
+                while (System.nanoTime() < mentionDeadline && find(a.window.decorView, "@alice") == null) { instrumentation.waitForIdleSync(); android.os.SystemClock.sleep(25) }
+                val chipRow = a.findViewById<android.widget.LinearLayout>(R.id.irc_suggestions)
+                val chipLabels = (0 until chipRow.childCount).mapNotNull { (chipRow.getChildAt(it) as? android.view.ViewGroup)?.let { group -> (0 until group.childCount).mapNotNull { group.getChildAt(it) as? TextView }.firstOrNull()?.text?.toString() } }
+                assertNotNull("Mention chip missing: names=${a.session.state.active.names} ready=${a.session.client?.ready} input=${input(a).text} selection=${input(a).selectionStart} chips=$chipLabels", find(a.window.decorView, "@alice"))
+                assertFalse(peer.frames.any { it.command == "PRIVMSG" && it.params.last() == "@al" })
             } finally { main { a.finish() }; instrumentation.waitForIdleSync() }
         }
     }
