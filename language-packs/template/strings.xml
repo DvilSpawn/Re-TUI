@@ -245,6 +245,11 @@ Cancel stops the current calculation. Back closes Help and retains your reading 
     <string name="changelog_release_heading">Re:TUI %1$s · Build %2$d</string>
     <string name="changelog_release_highlights">What is new in this update
 
+## IRC reconnect and mentions
+- Reconnecting to a channel now requests the server's recent retained history when IRCv3 CHATHISTORY is available.
+- Channel members refresh after reconnect, and typing @ offers the current channel's nicknames for quick mentions.
+- Replayed messages are deduplicated and do not create false unread counts.
+
 ## Native IRC
 - Talk through standard IRC with channel and private-conversation chips, Channels, People and concise Help. Slash commands remain available.
 - Sign in through one prompt; optional device-key authentication reconnects without saving your password.
@@ -1744,7 +1749,7 @@ Wiki:
 /oper name (masked password) · /disconnect · /quit · /clear · /help
 Plain text goes only to the active joined channel or query. //text sends /text literally. Unknown commands never become messages or launcher commands.
 Window markers: * unread · ! mention/private message. Passwords are never transcript/history entries. TLS is verified; no plaintext fallback.
-Register once, then sign in or reconnect before joining registered-only channels. Server-readable, not end-to-end encrypted. This first slice has no offline replay, push or background service; leaving disconnects. Unconfirmed messages are never retried automatically.</string>
+Register once, then sign in or reconnect before joining registered-only channels. Server-readable, not end-to-end encrypted. Reconnect replays up to 50 retained channel messages when the server supports IRCv3 CHATHISTORY; leaving disconnects. Unconfirmed messages are never retried automatically.</string>
     <string name="irc_help_title">Help</string>
     <string name="irc_input_hint">message or /command</string>
     <string name="irc_join_hint">Enter a channel such as #retui, then Continue.</string>

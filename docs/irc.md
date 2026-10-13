@@ -49,9 +49,11 @@ TLS is not end-to-end encryption: server operators can read messages and see
 connection addresses. dvil is the default network's configured moderator.
 
 Back first leaves temporary navigation, then closes the pane and disconnects.
-There is no background IRC service, push, persistent local transcript or offline
-replay. Rotation preserves navigation/drafts but cancels password entry. Default
-server history expires after one week in cleanup batches. Current public privacy
+There is no background IRC service, push or persistent local transcript. When the
+server advertises IRCv3 `CHATHISTORY`, reconnect replays up to 50 retained messages
+for each channel after membership is confirmed; server retention still applies.
+Rotation preserves navigation/drafts but cancels password entry. Default server
+history expires after one week in cleanup batches. Current public privacy
 details are at https://re-tui.pages.dev/privacy.html.
 
 ## Implementation and testing
