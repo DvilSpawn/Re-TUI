@@ -245,6 +245,12 @@ Cancel stops the current calculation. Back closes Help and retains your reading 
     <string name="changelog_release_heading">Re:TUI %1$s · Build %2$d</string>
     <string name="changelog_release_highlights">What is new in this update
 
+## Faster Termux pane updates
+- The existing Termux workspace now refreshes from terminal output instead of repeatedly polling for screen changes.
+- Termux still runs your shells and jobs. The same terminal tiles, input controls, layouts, fonts and themes remain available.
+- Improved Unicode paste, terminal colors and cursor restoration after resizing or reconnecting.
+- Helper updates preserve existing shells and jobs. Use Update now when prompted to install the matching bundled helper.
+
 ## IRC reconnect and mentions
 - Reconnecting to a channel now requests the server's recent retained history when IRCv3 CHATHISTORY is available.
 - Channel members refresh after reconnect, and typing @ offers the current channel's nicknames for quick mentions.
@@ -275,7 +281,7 @@ Cancel stops the current calculation. Back closes Help and retains your reading 
 - Portable preset sharing/import, an optional idle fade, improved unlock tracking and the JetBrains Mono Nerd Font Regular default.
 
 ## Before you start
-- Termux still needs its command permission, external-app access, tmux and socat. The update prompt offers setup guidance when needed.
+- Termux still needs its command permission, external-app access, tmux, socat and gawk. The update prompt offers setup guidance when needed.
 - IRC uses TLS, not end-to-end encryption. Server operators can read messages; closing the IRC pane disconnects.
 
 You can reopen these notes with the changelog command. These highlights are bundled with the installed app and work offline.</string>
@@ -5957,7 +5963,7 @@ Ready for the next command</string>
     <string name="workspace_focused_tile">Tile %1$d, focused</string>
     <string name="workspace_helper_dependencies">Termux packages required
 
-Install tmux and socat in Termux with: pkg install tmux socat
+Install tmux, socat and gawk in Termux with: pkg install tmux socat gawk
 Then retry. Your existing helper has not been changed.</string>
     <string name="workspace_helper_guide">Setup guide</string>
     <string name="workspace_helper_hide">Hide progress</string>

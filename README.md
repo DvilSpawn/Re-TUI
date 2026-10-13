@@ -93,7 +93,7 @@ Then build and run the reusable unit tests:
 ./gradlew :app:assembleFdroidDebug :app:testFdroidDebugUnitTest
 ```
 
-The current source declares version **3**, build **500**. `assemblePlaystoreRelease`
+The current source declares version **3**, build **502**. `assemblePlaystoreRelease`
 and `bundlePlaystoreRelease` produce the release APK and Play Store bundle.
 Official signing keys are private and are not needed to compile your own debug
 APK. Never add signing files, credentials, release reports or personal device
@@ -177,4 +177,4 @@ for Tasker and the dependency notice inventory.
 
 Qalculate uses Re:TUI's own JNI bridge, built from checksum-pinned upstream sources.
 See [native build instructions](native/qalculate/README.md) and
-[calculator source-delivery requirements](docs/calculator.md#licensing-and-public-releases).
+[calculator source-delivery requirements](native/qalculate/README.md#source-delivery-and-upgrades).
