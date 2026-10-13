@@ -43,7 +43,7 @@ def main():
     bodies += '\n fun installAttachListener() { ' + attach + ' }'
     frame_start = source.index('override fun onFrame(raw: String)')
     frame_callback = block(source, source.index('main.post {', frame_start))
-    bodies += '\n fun acceptFrame(tile:Int, client:TermuxWorkspaceSocketClient, raw:String) { ' + frame_callback + ' }'
+    bodies += '\n fun acceptFrame(tile:Int, client:TermuxWorkspaceSocketClient, raw:String) { ' + 'val pendingBytes=java.util.concurrent.atomic.AtomicInteger(raw.length * 2); ' + frame_callback + ' }'
     code = r'''
 import ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceSocketClient
 import ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceFrame
@@ -79,10 +79,13 @@ object TerminalBorderRuntime { fun tabDrawable(c:Any,v:Int,t:Int)=v; fun bind(v:
 object R { object id { const val termux_workspace_border=1; const val termux_workspace_home=2; const val termux_workspace_new=3; const val termux_workspace_ime=4; const val termux_workspace_layout=5; const val termux_workspace_page_previous=6; const val termux_workspace_page_position=7; const val termux_workspace_page_next=8 }; object drawable { const val ic_toolbar_home_24=1; const val ic_workspace_add_24=2; const val ic_workspace_keyboard_24=3; const val ic_workspace_layout_24=4 }; object string { const val workspace_home=1; const val workspace_new=2; const val workspace_ime=3; const val workspace_layout=4; const val workspace_bridge_input_not_sent=5; const val workspace_bridge_ready=6 } }
 enum class Theme { workspace_panel_background_color,workspace_panel_text_color,workspace_header_background_color,workspace_output_background_color,workspace_output_text_color,workspace_panel_border_color,workspace_input_text_color,workspace_control_text_color }
 object RetuiThemeBridge { fun sendToKeyboard(c:Any,i:Input,label:String,mode:String){} }
+class TermuxWorkspaceTerminal(frame:TermuxWorkspaceFrame,grid:Grid)
 class Selection { val focused=1; val focusedTarget get()=targets[focused]; val targets=mutableListOf<String?>("@1","@2"); var visibleTiles=listOf(0,1); fun select(tile:Int,target:String?){targets[tile]=target} }
 class Harness(val clients:Array<TermuxWorkspaceSocketClient?>) : Activity() {
  var geometryCaptureListener:OneShotPreDrawListener?=null
  val screen=Screen(); var foreground:WeakReference<Harness>?=null;var generation=0;var resultLabel:String?=null;var bootstrap:Any?=null;val main=Main();val receiver=Any();var isFinishing=false
+ val terminals=arrayOfNulls<TermuxWorkspaceTerminal>(2);var helperUpdating=false
+ fun renderTerminal(tile:Int,client:TermuxWorkspaceSocketClient){};fun styleHelperPrompt(){}
  val frames=arrayOfNulls<TermuxWorkspaceFrame>(2);var windows=emptyList<Pair<String,String>>();var pendingRuns=0
  fun closeTile(tile:Int){clients[tile]?.close();clients[tile]=null;lastGeometry[tile]=null};fun persist(){};fun runPendingCommand(){pendingRuns++};fun startBridge(){};fun reconcileWindows(){}
  val root=Root(); val title=TextView(); val input=Input(); val tiles=Tiles(); val panels=arrayOf(View(),View()); val grids=arrayOf(Grid(),Grid()); val labels=arrayOf(TextView(),TextView()); val selection=Selection()
@@ -208,7 +211,7 @@ object Base64 { const val NO_WRAP=2; const val DEFAULT=0; fun encodeToString(v:B
             files.append(str(path))
         client = ROOT / 'app/src/main/java/ohi/andre/consolelauncher/managers/termux/TermuxWorkspaceSocketClient.kt'
         frame = SOURCE.with_name('TermuxWorkspaceFrame.kt')
-        subprocess.run([java, '-cp', cp, 'org.jetbrains.kotlin.cli.jvm.K2JVMCompiler', '-no-stdlib', '-no-reflect', '-nowarn', '-classpath', cp, '-d', str(out / 'classes'), *files, str(client), str(frame)], check=True)
+        subprocess.run([java, '-cp', cp, 'org.jetbrains.kotlin.cli.jvm.K2JVMCompiler', '-no-stdlib', '-no-reflect', '-nowarn', '-classpath', cp, '-d', str(out / 'classes'), *files, str(client), str(frame), str(SOURCE.with_name('TermuxWorkspaceOutput.kt'))], check=True)
         subprocess.run([java, '-cp', str(out / 'classes') + os.pathsep + cp, 'GeometrySliceKt'], check=True)
 
 

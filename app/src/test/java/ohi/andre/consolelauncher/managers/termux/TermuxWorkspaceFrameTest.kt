@@ -23,4 +23,12 @@ class TermuxWorkspaceFrameTest {
         assertEquals(67, second.cols)
         assertEquals(19, second.rows)
     }
+    @Test fun seedPreservesIndependentWindowTabsAndUnusedCursorSentinel() {
+        val frame = TermuxWorkspaceFrame.parse("__RETUI_TERMINAL_STATE__ 80|24|0|0|0|4294967295|4294967295|1|1|0|0|23|0\n" +
+            "__RETUI_WINDOWS__ @0:0:first\t@1:1:second\t\n__RETUI_NORMAL_BASE64__ \n__RETUI_FRAME_BASE64__ eA==\n")
+        assertEquals(listOf("@0" to "0:first", "@1" to "1:second"), frame.windows)
+        assertEquals(0, frame.terminalState!![5])
+        assertEquals(0, frame.terminalState[6])
+    }
+
 }

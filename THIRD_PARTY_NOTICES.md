@@ -260,3 +260,14 @@ of the upstream repository. The full upstream license and required notice are
 also included in the installed wallpaper page under Credits & license.
 
 See [adaptation details](docs/nagomi.md).
+
+## Termux terminal engine
+
+The existing Termux workspace pane uses the terminal-emulator Java sources from
+Termux 0.118.3, pinned at `5b657c6adf4304e5198951ce815fe0205dcac29c`.
+The source archive SHA-256 is
+`a79a8ae388caab56d4d6df8f80aa213c21090e3a1f605c28d7f93fb466d6e7ca`.
+Sources and their copyright headers are retained under `third_party/termux/`.
+The engine's license text is in `LICENSES/Termux-Terminal-Emulator.txt`.
+Only the emulator is used; execution remains in the installed Termux app, and
+the launcher retains its own TerminalGridView renderer.

@@ -86,12 +86,12 @@ class TermuxHelperUpdateIntegrationTest {
                     val receiver = field(it, "receiver").get(it) as BroadcastReceiver
                     receiver.onReceive(it, Intent(UIManager.ACTION_TERMUX_RESULT)
                         .putExtra(UIManager.EXTRA_TERMUX_RESULT_PATH, "stale-fixture")
-                        .putExtra(UIManager.EXTRA_TERMUX_RESULT_STDOUT, "__RETUI_UPDATE_OK__ 0.4.2")
+                        .putExtra(UIManager.EXTRA_TERMUX_RESULT_STDOUT, "__RETUI_UPDATE_OK__ 0.4.4")
                         .putExtra(UIManager.EXTRA_TERMUX_RESULT_EXIT_CODE, 0))
                     assertTrue(field(it, "helperUpdating").getBoolean(it))
                     receiver.onReceive(it, Intent(UIManager.ACTION_TERMUX_RESULT)
                         .putExtra(UIManager.EXTRA_TERMUX_RESULT_PATH, "helper-fixture")
-                        .putExtra(UIManager.EXTRA_TERMUX_RESULT_STDOUT, "__RETUI_UPDATE_OK__ 0.4.2")
+                        .putExtra(UIManager.EXTRA_TERMUX_RESULT_STDOUT, "__RETUI_UPDATE_OK__ 0.4.4")
                         .putExtra(UIManager.EXTRA_TERMUX_RESULT_EXIT_CODE, 1))
                     assertFalse(field(it, "helperUpdating").getBoolean(it))
                     assertEquals(it.getString(R.string.workspace_helper_update_failed), (field(it, "helperBody").get(it) as TextView).text.toString())
@@ -173,7 +173,7 @@ class TermuxHelperUpdateIntegrationTest {
                 arrayOf("-c", script, "helper-test", update), TermuxHelperUpdate.payload(helper))
             assertTrue("Termux fixture did not return", done.await(30, TimeUnit.SECONDS))
             assertEquals("Private Termux fixture failed: ${output.take(512)} $diagnostic", 0, exitCode)
-            assertEquals("__RETUI_FIXTURE_STAGE__ update\n__RETUI_UPDATE_OK__ 0.4.2\n__RETUI_FIXTURE_STAGE__ private-jobs\n__RETUI_FIXTURE_STAGE__ original-helper\n__RETUI_FIXTURE_STAGE__ original-jobs\n__RETUI_DEVICE_UPDATE_FIXTURE_OK__", output.trim())
+            assertEquals("__RETUI_FIXTURE_STAGE__ update\n__RETUI_UPDATE_OK__ 0.4.4\n__RETUI_FIXTURE_STAGE__ private-jobs\n__RETUI_FIXTURE_STAGE__ original-helper\n__RETUI_FIXTURE_STAGE__ original-jobs\n__RETUI_DEVICE_UPDATE_FIXTURE_OK__", output.trim())
         } finally { manager.unregisterReceiver(receiver) }
     }
 }

@@ -22,7 +22,7 @@
     <string name="workspace_helper_open_termux">Open Termux</string>
     <string name="workspace_helper_updating">Updating helper · existing shells and jobs are kept</string>
     <string name="workspace_helper_setup">Termux setup required\n\nInstall Termux, grant Launcher permission to run Termux commands, and enable allow-external-apps=true in Termux settings. The setup guide has instructions. No security settings are changed automatically.</string>
-    <string name="workspace_helper_dependencies">Termux packages required\n\nInstall tmux and socat in Termux with: pkg install tmux socat\nThen retry. Your existing helper has not been changed.</string>
+    <string name="workspace_helper_dependencies">Termux packages required\n\nInstall tmux, socat and gawk in Termux with: pkg install tmux socat gawk\nThen retry. Your existing helper has not been changed.</string>
     <string name="workspace_helper_update_failed">Helper update failed\n\nThe update was not confirmed. Installation failures attempt to restore the previous helper; it is also retained under $PREFIX/share/retui/retui.previous. Retry or open the setup guide. Existing shells and jobs are not stopped.</string>
     <string name="workspace_helper_update_busy">Another helper update is running or was interrupted\n\nRetry shortly. If this persists, open the setup guide. Launcher will not delete an unknown update lock or start another installation.</string>
     <string name="workspace_helper_no_reply">No reply from Termux\n\nCheck command permission and allow-external-apps, then retry. A dispatched update may still finish inside Termux; no installation is automatically retried.</string>

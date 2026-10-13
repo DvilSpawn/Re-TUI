@@ -73,6 +73,8 @@ class TermuxWorkspaceActivity : LocalizedActivity() {
     private val labels = arrayOfNulls<TextView>(2)
     private val grids = arrayOfNulls<TerminalGridView>(2)
     private val clients = arrayOfNulls<TermuxWorkspaceSocketClient>(2)
+    private val terminals = arrayOfNulls<TermuxWorkspaceTerminal>(2)
+    private val renderPending = BooleanArray(2)
     private val lastGeometry = arrayOfNulls<Pair<Int, Int>>(2)
     private var geometryCapturePending = false
     private var geometryCaptureListener: OneShotPreDrawListener? = null
@@ -422,26 +424,45 @@ class TermuxWorkspaceActivity : LocalizedActivity() {
         if (selection.targets[tile] == null && !creating[tile]) return
         val ownTarget = if (creating[tile]) creationSeeds[tile] else selection.targets[tile]
         val geometry = if (creating[tile]) geometry(1 - tile) else geometry(tile)
+        val pendingBytes = java.util.concurrent.atomic.AtomicInteger()
         lateinit var client: TermuxWorkspaceSocketClient
         client = TermuxWorkspaceSocketClient(object : TermuxWorkspaceSocketClient.Listener {
-            override fun onFrame(raw: String) { main.post {
+            override fun onFrame(raw: String) {
+                if (pendingBytes.addAndGet(raw.length * 2) > 1048576) {
+                    client.close(); onError("Terminal output backlog; reconnect"); return
+                }
+                main.post {
+                    pendingBytes.addAndGet(-raw.length * 2)
+                    if (!visible || clients[tile] !== client) return@post
+                    val frame = try { TermuxWorkspaceFrame.parse(raw) } catch (e: Exception) { status(e.message.orEmpty()); return@post }
+                    val target = frame.target ?: return@post
+                    if (creating[tile] && target == creationSeeds[tile]) return@post
+                    if (selection.targets[1 - tile] == target) return@post
+                    val selectionChanged = creating[tile] || selection.targets[tile] != target || windows != frame.windows
+                    val creationCompleted = creating[tile]
+                    creating[tile] = false
+                    selection.select(tile, target); frames[tile] = frame.copy(window = frame.window ?: frame.windows.firstOrNull { it.first == target }?.second); windows = frame.windows
+                    reconcileWindows()
+                    val grid = grids[tile]!!
+                    terminals[tile] = frame.terminalState?.let { TermuxWorkspaceTerminal(frame, grid) }
+                    if (terminals[tile] != null) renderTerminal(tile, client)
+                    else grids[tile]?.setFrame(frame.body, frame.cols, frame.rows, frame.cursorX, frame.cursorY)
+                    status(getString(R.string.workspace_bridge_ready)); if (selectionChanged) { updateLabels(); persist() }; runPendingCommand()
+                    if (creationCompleted) scheduleGeometryCapture()
+                }
+            }
+            override fun onWindows(updated: List<Pair<String, String>>) { main.post {
                 if (!visible || clients[tile] !== client) return@post
-                val frame = try { TermuxWorkspaceFrame.parse(raw) } catch (e: Exception) { status(e.message.orEmpty()); return@post }
-                val target = frame.target ?: return@post
-                if (creating[tile] && target == creationSeeds[tile]) return@post
-                if (selection.targets[1 - tile] == target) return@post
-                val creationCompleted = creating[tile]
-                creating[tile] = false
-                selection.select(tile, target); frames[tile] = frame; windows = frame.windows
-                reconcileWindows()
-                grids[tile]?.setFrame(frame.body, frame.cols, frame.rows, frame.cursorX, frame.cursorY)
-                status(getString(R.string.workspace_bridge_ready)); updateLabels(); persist(); runPendingCommand()
-                if (creationCompleted) scheduleGeometryCapture()
+                windows = updated
+                frames.indices.forEach { index ->
+                    frames[index] = frames[index]?.copy(windows = updated, window = updated.firstOrNull { it.first == frames[index]?.target }?.second)
+                }
+                reconcileWindows(); updateLabels(); persist()
             } }
             override fun onStatus(status: String) { main.post {
                 if (!visible || clients[tile] !== client) return@post
                 if (creating[tile]) mutation(tile) { c, size -> c.newWindow(creationNames[tile], creationCommands[tile], size.first, size.second) }
-                else capture(tile)
+                else capture(tile, onlyIfChanged = true)
             } }
             override fun onTargetGone(target: String?) { main.post {
                 if (!visible || clients[tile] !== client) return@post
@@ -458,10 +479,25 @@ class TermuxWorkspaceActivity : LocalizedActivity() {
             } }
         })
         clients[tile] = client
+        lastGeometry[tile] = geometry
         client.connect(boot.socket!!, boot.token!!, geometry.first, geometry.second, boot.host, boot.port, true,
-            ownTarget, targeted = true)
+            ownTarget, targeted = true, outputDriven = true)
     }
-    private fun closeTile(tile: Int) { clients[tile]?.close(); clients[tile] = null; lastGeometry[tile] = null }
+    private fun renderTerminal(tile: Int, client: TermuxWorkspaceSocketClient) {
+        if (renderPending[tile]) return
+        renderPending[tile] = true
+        grids[tile]?.postOnAnimation {
+            renderPending[tile] = false
+            if (!visible || clients[tile] !== client) return@postOnAnimation
+            val terminal = terminals[tile] ?: return@postOnAnimation
+            grids[tile]?.setEmulatorFrame(terminal.emulator)
+            frames[tile] = frames[tile]?.copy(body = terminal.text())
+        }
+    }
+    private fun closeTile(tile: Int) {
+        clients[tile]?.close(); clients[tile] = null; lastGeometry[tile] = null
+        terminals[tile] = null; renderPending[tile] = false
+    }
     private fun clearTiles() {
         for (tile in 0..1) {
             closeTile(tile); frames[tile] = null; creating[tile] = false
@@ -520,7 +556,10 @@ class TermuxWorkspaceActivity : LocalizedActivity() {
     private fun directText(text: String) {
         if (text.isEmpty() || screen.wake()) return
         if (localDraft != null) { localDraft += text; updateLabels(); persist(); return }
-        if (text.startsWith(":")) { localDraft = text.drop(1); updateLabels(); persist(); return }
+        // Full-screen editors own colon commands; keep workspace commands at the shell.
+        if (text.startsWith(":") && terminals[selection.focused]?.emulator?.isAlternateBufferActive != true) {
+            localDraft = text.drop(1); updateLabels(); persist(); return
+        }
         if (modifiers.isNotEmpty()) {
             if (text.length == 1 && text[0].code in 32..126) { key(if (text == " ") "Space" else text); return }
             // KEY accepts ASCII tokens only. Unicode/composed text and paste are literal

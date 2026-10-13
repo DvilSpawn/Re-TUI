@@ -12,7 +12,7 @@ import uuid
 ROOT = Path(__file__).resolve().parents[1]
 UPDATER = ROOT / 'termux/retui/update.sh'
 HELPER = (ROOT / 'termux/retui/bin/retui').read_bytes()
-VERSION = '0.4.2'
+VERSION = '0.4.4'
 
 
 class HelperUpdateTest(unittest.TestCase):
@@ -51,10 +51,10 @@ class HelperUpdateTest(unittest.TestCase):
     def test_success_installs_exact_bytes_keeps_previous_and_releases_lock(self):
         result = self.update()
         self.assertEqual(0, result.returncode, result.stderr)
-        self.assertEqual(b'__RETUI_UPDATE_OK__ 0.4.2\n', result.stdout)
+        self.assertEqual(b'__RETUI_UPDATE_OK__ 0.4.4\n', result.stdout)
         self.assertEqual(HELPER, self.target.read_bytes())
         self.assertEqual(self.old, (self.share / 'retui.previous').read_bytes())
-        self.assertEqual('0.4.2\n', (self.share / 'version').read_text())
+        self.assertEqual('0.4.4\n', (self.share / 'version').read_text())
         self.assertFalse((self.share / '.update-lock').exists())
         self.assertEqual([], list(self.bin.glob('.retui-*')))
 

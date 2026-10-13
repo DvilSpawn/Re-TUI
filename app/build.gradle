@@ -9,6 +9,7 @@ android {
     namespace = "ohi.andre.consolelauncher"
     compileSdk = 36
     ndkVersion = '27.1.12297006'
+    sourceSets.main.java.srcDir rootProject.file('third_party/termux/terminal-emulator')
     sourceSets.main.jniLibs.srcDir layout.buildDirectory.dir('qalculate/jniLibs').get().asFile
     sourceSets.main.assets.srcDir layout.buildDirectory.dir('qalculate/notices').get().asFile
     sourceSets.main.assets.srcDir layout.buildDirectory.dir('termux-helper-assets').get().asFile

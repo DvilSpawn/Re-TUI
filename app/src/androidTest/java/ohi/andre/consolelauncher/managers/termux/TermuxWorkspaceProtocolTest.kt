@@ -162,4 +162,42 @@ class TermuxWorkspaceProtocolTest {
             }
         }
     }
+    @Test fun tmuxOutputPreservesUtf8AcrossNotificationsAndMetadataIsStillUtf8() {
+        ServerSocket(0, 1, java.net.InetAddress.getByName("127.0.0.1")).use { server ->
+            val received = java.io.ByteArrayOutputStream()
+            val observed = CountDownLatch(1)
+            val frame = java.util.concurrent.atomic.AtomicReference<TermuxWorkspaceFrame>()
+            val worker = Thread {
+                server.accept().use { socket ->
+                    socket.getInputStream().bufferedReader().readLine()
+                    socket.getOutputStream().write(("__RETUI_SOCKET__ retui-bridge-socket-v4\n__RETUI_SOCKET_STATUS__ ok\n" +
+                        "__RETUI_SESSION__ retui_workspace\n__RETUI_WINDOW__ 0:界\n__RETUI_FRAME_BASE64__ eA==\n__RETUI_FRAME_END__\n").toByteArray())
+                    for (byte in byteArrayOf(0xce.toByte(), 0xbb.toByte())) {
+                        socket.getOutputStream().write("__RETUI_OUTPUT_OCTAL__ @1 ".toByteArray())
+                        socket.getOutputStream().write(byte.toInt() and 255)
+                        socket.getOutputStream().write('\n'.code)
+                    }
+                    socket.getOutputStream().flush()
+                    observed.await(5, TimeUnit.SECONDS)
+                }
+            }.apply { start() }
+            val client = TermuxWorkspaceSocketClient(object : TermuxWorkspaceSocketClient.Listener {
+                override fun onFrame(value: String) { frame.set(parse(value)) }
+                override fun onOutput(target: String, bytes: ByteArray) {
+                    assertEquals("@1", target); received.write(bytes)
+                    if (received.size() == 2) observed.countDown()
+                }
+                override fun onStatus(status: String) {}
+                override fun onError(message: String) {}
+                override fun onClosed() {}
+            })
+            try {
+                client.connect(TermuxWorkspaceSocketClient.SOCKET_NAME, "fixture-token", 80, 24, "127.0.0.1", server.localPort, true)
+                assertTrue(observed.await(8, TimeUnit.SECONDS))
+                assertEquals("λ", received.toByteArray().toString(Charsets.UTF_8))
+                assertEquals("0:界", frame.get().window)
+            } finally { client.close(); worker.join(2000) }
+        }
+    }
+
 }
