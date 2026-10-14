@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_file_operation_working">Working on your files…</string>
+    <string name="settings_font_too_large">Font files must be 8 MiB or smaller.</string>
+</resources>

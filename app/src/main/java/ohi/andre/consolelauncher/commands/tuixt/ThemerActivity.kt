@@ -1,6 +1,7 @@
 package ohi.andre.consolelauncher.commands.tuixt
 
 import android.app.Dialog
+import android.app.ProgressDialog
 import android.app.WallpaperManager
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -35,10 +36,13 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.OnBackPressedCallback
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ohi.andre.consolelauncher.R
+import ohi.andre.consolelauncher.localization.LanguagePacks
 import ohi.andre.consolelauncher.tuils.displayMessage
 import ohi.andre.consolelauncher.LauncherActivity
 import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog.ConfirmAction
@@ -84,11 +88,13 @@ import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi.applyFullscreen
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi.requestNoTitleIfFullscreen
 import ohi.andre.consolelauncher.tuils.LauncherFontScale
+import ohi.andre.consolelauncher.tuils.LocalizedArgumentException
 import ohi.andre.consolelauncher.tuils.FrameManager
 import ohi.andre.consolelauncher.tuils.FrameSpec
 import ohi.andre.consolelauncher.tuils.FrameTarget
 import ohi.andre.consolelauncher.tuils.Tuils
 import java.io.File
+import java.lang.ref.WeakReference
 import java.io.FileOutputStream
 import java.io.FilenameFilter
 import java.util.Arrays
@@ -120,7 +126,9 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
     private val sectionItems: MutableList<String> = ArrayList<String>()
     private val sectionBackStack = ArrayDeque<String>()
     private var section: String? = null
-    private var pendingBackupPassword: String? = null
+    private var pendingBackupPassword: String?
+        get() = hubState.pendingBackupPassword
+        set(value) { hubState.pendingBackupPassword = value }
     private var backupExportPending = false
     private var pendingRestoreUri: Uri? = null
     private var pendingShareablePresetName: String? = null
@@ -130,12 +138,30 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
     private var pendingFontFileName: String? = null
     private var pendingTypographySizes: MutableMap<XMLPrefsSave, Int>? = null
     private var pendingFrameTarget: FrameTarget? = null
-    private var frameEditSession: FrameManager.EditSession? = null
+    class HubState : ViewModel() {
+        var frameEditSession: FrameManager.EditSession? = null
+        @Volatile var fileOperationRunning = false
+        var activity: WeakReference<ThemerActivity>? = null
+        var completedOperation: (ThemerActivity.() -> Unit)? = null
+        var pendingBackupPassword: String? = null
+        override fun onCleared() {
+            frameEditSession?.discard()
+        }
+    }
+    private lateinit var hubState: HubState
+    private var frameEditSession: FrameManager.EditSession?
+        get() = hubState.frameEditSession
+        set(value) { hubState.frameEditSession = value }
+    private var fileOperationRunning: Boolean
+        get() = hubState.fileOperationRunning
+        set(value) { hubState.fileOperationRunning = value }
+    private var fileProgress: ProgressDialog? = null
     private var selectedKeyboardShortcutKey: Char = 'a'
 
     override fun onCreate(savedInstanceState: Bundle?) {
         requestNoTitleIfFullscreen(this)
         super.onCreate(savedInstanceState)
+        hubState = ViewModelProvider(this)[HubState::class.java]
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() = handleSettingsBack()
         })
@@ -144,7 +170,22 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
         overridePendingTransition(0, 0)
         applyFullscreen(this)
 
-        section = if (getIntent() != null) getIntent().getStringExtra(EXTRA_SECTION) else null
+        section = savedInstanceState?.getString("hub_section") ?: intent?.getStringExtra(EXTRA_SECTION)
+        savedInstanceState?.let { state ->
+            sectionBackStack.addAll(state.getStringArrayList("hub_history").orEmpty())
+            if (state.containsKey("hub_font_offset")) pendingFontSizeOffset = state.getInt("hub_font_offset")
+            if (state.containsKey("hub_system_font")) pendingUseSystemFont = state.getBoolean("hub_system_font")
+            pendingFontFileName = state.getString("hub_font_file")
+            state.getBundle("hub_typography")?.let { sizes ->
+                pendingTypographySizes = TYPOGRAPHY_SETTINGS.associateTo(LinkedHashMap()) {
+                    it.setting to sizes.getInt(it.setting.label(), LauncherSettings.getInt(it.setting))
+                }
+            }
+            pendingFrameTarget = state.getString("hub_frame_target")?.let { id -> FrameTarget.entries.firstOrNull { it.id == id } }
+            pendingRestoreUri = state.getString("hub_restore_uri")?.let(Uri::parse)
+            backupExportPending = state.getBoolean("hub_export_pending") &&
+                (!state.getBoolean("hub_export_encrypted") || pendingBackupPassword != null)
+        }
         if (section == null || section!!.length == 0) {
             section = SECTION_HOME
         }
@@ -391,6 +432,9 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
 
     override fun onResume() {
         super.onResume()
+        hubState.activity = WeakReference(this)
+        if (fileOperationRunning) showFileProgress()
+        deliverCompletedOperation()
         freezeWallpaperInteraction()
         applyFullscreen(this)
         screenRoot?.let { styleScreen(this, it) }
@@ -673,6 +717,64 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
             HubAction.INTEGRATIONS.name,
             HubAction.SYSTEM_SUPPORT.name
         )
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putString("hub_section", section)
+        outState.putStringArrayList("hub_history", ArrayList(sectionBackStack))
+        pendingFontSizeOffset?.let { outState.putInt("hub_font_offset", it) }
+        pendingUseSystemFont?.let { outState.putBoolean("hub_system_font", it) }
+        outState.putString("hub_font_file", pendingFontFileName)
+        pendingTypographySizes?.let { sizes ->
+            outState.putBundle("hub_typography", Bundle().apply {
+                sizes.forEach { (setting, value) -> putInt(setting.label(), value) }
+            })
+        }
+        outState.putString("hub_frame_target", pendingFrameTarget?.id)
+        outState.putString("hub_restore_uri", pendingRestoreUri?.toString())
+        outState.putBoolean("hub_export_pending", backupExportPending)
+        outState.putBoolean("hub_export_encrypted", pendingBackupPassword != null)
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onDestroy() {
+        if (hubState.activity?.get() === this) hubState.activity = null
+        fileProgress?.dismiss()
+        fileProgress = null
+        super.onDestroy()
+    }
+
+    private fun showFileProgress() {
+        if (fileProgress?.isShowing == true) return
+        fileProgress = ProgressDialog(this).apply {
+            setMessage(getString(R.string.settings_file_operation_working))
+            setIndeterminate(true)
+            // Do not cancel a restore while its file transaction is committing.
+            setCancelable(false)
+            show()
+        }
+    }
+
+    private fun deliverCompletedOperation() {
+        val completed = hubState.completedOperation ?: return
+        hubState.completedOperation = null
+        fileProgress?.dismiss()
+        fileProgress = null
+        completed(this)
+    }
+
+    private fun <T> runFileOperation(work: () -> T, completed: ThemerActivity.(Result<T>) -> Unit) {
+        if (fileOperationRunning) return
+        fileOperationRunning = true
+        showFileProgress()
+        Thread {
+            val result = runCatching(work)
+            Handler(Looper.getMainLooper()).post {
+                fileOperationRunning = false
+                hubState.completedOperation = { completed(result) }
+                hubState.activity?.get()?.takeIf { !it.isFinishing && !it.isDestroyed }?.deliverCompletedOperation()
+            }
+        }.start()
     }
 
     private fun openSection(targetSection: String?, addToHistory: Boolean = true) {
@@ -2747,51 +2849,35 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
     }
 
     private fun handleFontImportResult(resultCode: Int, data: Intent?) {
-        if (resultCode != RESULT_OK || data == null || data.getData() == null) {
+        val uri = data?.data
+        if (resultCode != RESULT_OK || uri == null) {
             Toast.makeText(this, getString(R.string.themer_font_import_cancelled_ae79a), Toast.LENGTH_SHORT).show()
             return
         }
-
-        val uri = data.getData()
-        var sourceName = getDisplayName(uri!!)
-        if (sourceName == null || sourceName.trim { it <= ' ' }.length == 0) {
-            sourceName = uri.getLastPathSegment()
-        }
-
-        val fileName = sanitizeFontFileName(sourceName)
-        if (!isFontFileName(fileName)) {
-            Toast.makeText(this, getString(R.string.themer_choose_a_ttf_or_otf_font_file_7d188), Toast.LENGTH_LONG).show()
-            return
-        }
-
-        val dest = uniqueFontFile(this.fontsDir, fileName)
-        try {
-            getContentResolver().openInputStream(uri).use { `in` ->
-                FileOutputStream(dest).use { out ->
-                    checkNotNull(`in`) { getString(R.string.themer_unable_to_read_selected_font_857be) }
-                    val buffer = ByteArray(8192)
-                    var read: Int
-                    while ((`in`.read(buffer).also { read = it }) != -1) {
-                        out.write(buffer, 0, read)
-                    }
+        runFileOperation({
+            val fileName = sanitizeFontFileName(getDisplayName(uri) ?: uri.lastPathSegment)
+            require(isFontFileName(fileName)) { getString(R.string.themer_choose_a_ttf_or_otf_font_file_7d188) }
+            val dest = uniqueFontFile(fontsDir, fileName)
+            try {
+                contentResolver.openInputStream(uri).use { input ->
+                    checkNotNull(input) { getString(R.string.themer_unable_to_read_selected_font_857be) }
+                    FileOutputStream(dest).use { output -> copyFontStream(input, output) }
                 }
-            }
-        } catch (e: Exception) {
-            if (dest.exists()) {
+                check(dest.length() > 0L) { getString(R.string.themer_font_import_failed_empty_file_a88dd) }
+                Typeface.createFromFile(dest)
+                dest
+            } catch (error: Exception) {
                 dest.delete()
+                throw error
             }
-            Toast.makeText(this, getString(R.string.themer_font_import_failed_2185f, e.displayMessage(this@ThemerActivity)), Toast.LENGTH_LONG).show()
-            return
+        }) { result ->
+            result.fold(onSuccess = { font ->
+                Toast.makeText(this, getString(R.string.themer_font_imported_84bdf), Toast.LENGTH_SHORT).show()
+                applyFont(font)
+            }, onFailure = { error ->
+                Toast.makeText(this, getString(R.string.themer_font_import_failed_2185f, error.displayMessage(this)), Toast.LENGTH_LONG).show()
+            })
         }
-
-        if (!dest.exists() || dest.length() == 0L) {
-            dest.delete()
-            Toast.makeText(this, getString(R.string.themer_font_import_failed_empty_file_a88dd), Toast.LENGTH_LONG).show()
-            return
-        }
-
-        Toast.makeText(this, getString(R.string.themer_font_imported_84bdf), Toast.LENGTH_SHORT).show()
-        applyFont(dest)
     }
 
     private fun getDisplayName(uri: Uri): String? {
@@ -2918,19 +3004,20 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
     }
 
     private fun exportBackup(uri: Uri, password: String?) {
-        try {
-            BackupManager.exportBackup(this, uri, password)
-            Toast.makeText(this, getString(R.string.themer_backup_exported_and_verified_52e08), Toast.LENGTH_SHORT).show()
-        } catch (e: Exception) {
-            deleteCreatedDocument(uri)
-            Toast.makeText(
-                this,
-                if (e.displayMessage(this@ThemerActivity) == null) getString(R.string.themer_backup_failed_7fd26) else e.displayMessage(this@ThemerActivity),
-                Toast.LENGTH_LONG
-            ).show()
-        } finally {
-            pendingBackupPassword = null
-            backupExportPending = false
+        pendingBackupPassword = null
+        backupExportPending = false
+        runFileOperation({
+            try {
+                BackupManager.exportBackup(this, uri, password)
+            } catch (error: Exception) {
+                deleteCreatedDocument(uri)
+                throw error
+            }
+        }) { result ->
+            Toast.makeText(this,
+                result.fold(onSuccess = { getString(R.string.themer_backup_exported_and_verified_52e08) },
+                    onFailure = { it.displayMessage(this) ?: getString(R.string.themer_backup_failed_7fd26) }),
+                Toast.LENGTH_LONG).show()
         }
     }
 
@@ -3010,18 +3097,12 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
         }
 
         pendingRestoreUri = uri
-        try {
-            if (BackupManager.isEncryptedBackup(this, uri)) {
-                showRestorePasswordDialog()
-            } else {
-                restoreBackup(null)
-            }
-        } catch (e: Exception) {
-            Toast.makeText(
-                this,
-                if (e.displayMessage(this@ThemerActivity) == null) getString(R.string.themer_restore_failed_0f5f0) else e.displayMessage(this@ThemerActivity),
-                Toast.LENGTH_LONG
-            ).show()
+        runFileOperation({ BackupManager.isEncryptedBackup(this, uri) }) { result ->
+            result.fold(onSuccess = { encrypted ->
+                if (encrypted) showRestorePasswordDialog() else restoreBackup(null)
+            }, onFailure = { error ->
+                Toast.makeText(this, error.displayMessage(this) ?: getString(R.string.themer_restore_failed_0f5f0), Toast.LENGTH_LONG).show()
+            })
         }
     }
 
@@ -3050,28 +3131,34 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
     }
 
     private fun restoreBackup(password: String?) {
-        try {
-            val importedPreset = BackupManager.importBackup(this, pendingRestoreUri ?: return, password)
-            pendingRestoreUri = null
-            if (importedPreset != null) {
-                Toast.makeText(this, getString(R.string.themer_preset_imported_dc305, importedPreset), Toast.LENGTH_LONG).show()
-                return
+        val uri = pendingRestoreUri ?: return
+        runFileOperation({
+            val importedPreset = BackupManager.importBackup(this, uri, password)
+            if (importedPreset == null) {
+                LanguagePacks.initialize(applicationContext)
+                val selected = getSharedPreferences("launcher-language", Context.MODE_PRIVATE).getString("active", "").orEmpty()
+                val available = selected in setOf("", "en") || LanguagePacks.installed().any { it.id == selected }
+                LanguagePacks.select(if (available) selected else "en")
             }
-            Toast.makeText(this, getString(R.string.themer_backup_restored_reloading_49aae), Toast.LENGTH_SHORT).show()
-            recyclerView!!.postDelayed(Runnable {
-                intent.putExtra(EXTRA_SECTION, SECTION_SYSTEM)
-                recreate()
-                LauncherActivity.preview(this)
-            }, 500)
-        } catch (e: Exception) {
-            Toast.makeText(
-                this,
-                if (e.displayMessage(this@ThemerActivity) == null) getString(R.string.themer_restore_failed_0f5f0) else e.displayMessage(this@ThemerActivity),
-                Toast.LENGTH_LONG
-            ).show()
-            if (password != null && pendingRestoreUri != null) {
-                recyclerView!!.postDelayed(Runnable { this.showRestorePasswordDialog() }, 500)
-            }
+            importedPreset
+        }) { result ->
+            result.fold(onSuccess = { importedPreset ->
+                pendingRestoreUri = null
+                if (importedPreset != null) {
+                    Toast.makeText(this, getString(R.string.themer_preset_imported_dc305, importedPreset), Toast.LENGTH_LONG).show()
+                } else {
+                    Toast.makeText(this, getString(R.string.themer_backup_restored_reloading_49aae), Toast.LENGTH_SHORT).show()
+                    XMLPrefsManager.dispose()
+                    XMLPrefsManager.loadCommons(this)
+                    LauncherSettings.refreshFromLoadedPrefs()
+                    openSection(SECTION_SYSTEM, false)
+                    recreate()
+                    LauncherActivity.preview(this)
+                }
+            }, onFailure = { error ->
+                Toast.makeText(this, error.displayMessage(this) ?: getString(R.string.themer_restore_failed_0f5f0), Toast.LENGTH_LONG).show()
+                if (password != null && pendingRestoreUri != null) showRestorePasswordDialog()
+            })
         }
     }
 
@@ -3120,6 +3207,20 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
         val followsMaster: Boolean = true
     )
     companion object {
+        private const val MAX_FONT_BYTES = 8L * 1024 * 1024
+
+        internal fun copyFontStream(input: InputStream, output: OutputStream, maxBytes: Long = MAX_FONT_BYTES) {
+            val buffer = ByteArray(8192)
+            var total = 0L
+            while (true) {
+                val read = input.read(buffer)
+                if (read < 0) break
+                total += read
+                if (total > maxBytes) throw LocalizedArgumentException(R.string.settings_font_too_large)
+                output.write(buffer, 0, read)
+            }
+        }
+
         @JvmStatic
         fun launchIntent(context: Context, section: String?): Intent =
             Intent(context, ThemerActivity::class.java).apply {

@@ -1203,6 +1203,8 @@ $ mode search</string>
 
 Usage: 
 $ module -ls 
+$ module -library 
+$ module -library todo 
 $ module -show music 
 $ module -show notifications 
 $ module -show timer 
@@ -1217,7 +1219,8 @@ $ module -prompt reminder remove
 $ module -new lua counter 
 $ module -edit counter 
 $ module -config counter 
-$ module -check counter 
+$ module -check counter
+$ module -preview counter 
 $ module -approve counter 
 $ module -export counter 
 $ module -add server termux:/data/data/com.termux/files/home/retui/server-health.sh 
@@ -2193,6 +2196,14 @@ Unable to read Android Calendar.</string>
     <string name="module_label_timer">TIMER</string>
     <string name="module_label_weather">WEATHER</string>
     <string name="module_label_weather_native">WEATHER (NATIVE)</string>
+    <string name="module_library_cached">Offline · showing the saved module list.</string>
+    <string name="module_library_failed">Could not install module: %1$s</string>
+    <string name="module_library_installed">Installed · open</string>
+    <string name="module_library_loading">Loading module library…</string>
+    <string name="module_library_not_installed">Not installed · download</string>
+    <string name="module_library_title">Module library</string>
+    <string name="module_library_unavailable">Could not load the module library: %1$s</string>
+    <string name="module_library_unknown">Unknown library module. Use module -library.</string>
     <string name="nagomi_choose_image">Choose image</string>
     <string name="nagomi_credit">Nagomi · by Mayank Kadam</string>
     <string name="nagomi_demo">Original Nagomi ↗</string>
@@ -4771,6 +4782,28 @@ Apply it later through preset -apply. Active settings have not changed.</string>
     <string name="setting_ui_weather_index_description">Changing to a whole-number position inserts a row and shifts that row and later rows down when saved. Decimal positions join a row in left-to-right order: 4.1 and 4.2 share row 4. Existing decimal groups stay together when shifted. ASCII always uses its own row.</string>
     <string name="setting_ui_weather_size_description">Weather size</string>
     <string name="setting_ui_weather_status_alignment_description">Weather status line alignment (&lt;0 = left, =0 = center, &gt;0 = right)</string>
+    <string name="settings_editor_fix_field">Correct %1$s before saving. %2$s</string>
+    <string name="settings_editor_invalid_auto_color">Enter auto, #RRGGBB, or #AARRGGBB.</string>
+    <string name="settings_editor_invalid_color">Enter a color as #RRGGBB or #AARRGGBB.</string>
+    <string name="settings_editor_invalid_font_offset">Enter a font offset from -8 to 8.</string>
+    <string name="settings_editor_invalid_font_size">Enter a font size of at least 1.</string>
+    <string name="settings_editor_invalid_integer">Enter a whole number between -2147483648 and 2147483647.</string>
+    <string name="settings_editor_invalid_status_index">Enter a row position between 1 and 2147483637. Decimals can share a row.</string>
+    <string name="settings_editor_invalid_time">Enter a time as hh.mm, from 0.00 to 23.59.</string>
+    <string name="settings_editor_invalid_value">This value is not allowed.</string>
+    <string name="settings_file_operation_working">Working on your files…</string>
+    <string name="settings_font_too_large">Font files must be 8 MiB or smaller.</string>
+    <string name="settings_preview_ansi">ANSI</string>
+    <string name="settings_preview_disabled">Disabled</string>
+    <string name="settings_preview_draft">LIVE PREVIEW · Sample content · Apply with Save</string>
+    <string name="settings_preview_modules">Modules</string>
+    <string name="settings_preview_normal">Normal</string>
+    <string name="settings_preview_page">%1$s · %2$d / %3$d · Swipe to explore</string>
+    <string name="settings_preview_palette">ANSI palette · Normal 30–37 / Bright 90–97</string>
+    <string name="settings_preview_selected">Selected</string>
+    <string name="settings_preview_status">Status</string>
+    <string name="settings_preview_status_hidden">Status lines are hidden. Enable one below to preview it.</string>
+    <string name="settings_preview_terminal">Terminal</string>
     <string name="shortcut_index_greater">The index is greater than the shortcuts count</string>
     <string name="sms_hint">Enter SMS message</string>
     <string name="start_notification">Re:T-UI started</string>
@@ -4805,6 +4838,9 @@ Apply it later through preset -apply. Active settings have not changed.</string>
     <string name="startup_crt">CRT</string>
     <string name="startup_cyberdeck">Cyberdeck</string>
     <string name="startup_dashed">DASHED</string>
+    <string name="startup_default_launcher">Set Re:TUI as my default launcher</string>
+    <string name="startup_default_launcher_description">Open Re:TUI when you press Home. Android will ask you to confirm after setup. You can skip this and decide later.</string>
+    <string name="startup_default_launcher_unavailable">Open Android Settings → Default apps → Home app to choose Re:TUI.</string>
     <string name="startup_derive_launcher_colors_from_the_system_wallpaper">Apply colors once from the home wallpaper, or the system palette if unavailable. Keep explicit advanced overrides.</string>
     <string name="startup_double_tap_lock">Double-tap lock</string>
     <string name="startup_end_preview">END PREVIEW</string>

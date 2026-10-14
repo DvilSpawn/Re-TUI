@@ -46,6 +46,11 @@ object BackupManager {
     private const val BACKUP_SUFFIX = ".retui-backup"
     private const val MANIFEST_FILE = "manifest.txt"
     private const val SHARED_PREFS_DIR = "shared_prefs/"
+    private const val PRIVATE_FILES_DIR = "app_files/"
+    internal val personalPrivateFileNames = listOf(
+        "remember-notes.xml", "remember-notes.xml.bak", "notes-library", "images",
+        "launcher-language-packs", "launcher_frames", "fonts"
+    )
     private val MAX_BACKUP_BYTES = 32L * 1024L * 1024L
     private val ENCRYPTED_MAGIC = kotlin.byteArrayOf(
         'R'.code.toByte(),
@@ -98,7 +103,9 @@ object BackupManager {
         "retui_wallpaper",
         "retui_profile",
         TermuxWorkspaceLauncherManager.PREFS,
-        "changelogPrefs"
+        "changelogPrefs",
+        "launcher-language",
+        "remember-theme"
     )
 
     internal fun personalSharedPreferenceNames(): List<kotlin.String> = PERSONAL_PREFS.filterNotNull()
@@ -327,12 +334,9 @@ object BackupManager {
 
         val personal = validatePackage(manifest, entries)
         if (personal) {
-            ohi.andre.consolelauncher.managers.BackupManager.clearForPersonalRestore(Tuils.getFolder())
-            ohi.andre.consolelauncher.managers.BackupManager.restoreDirectory(tempDir, Tuils.getFolder(), true)
-            ohi.andre.consolelauncher.managers.BackupManager.restoreSharedPreferences(
-                context,
-                tempDir
-            )
+            synchronized(ohi.andre.consolelauncher.notes.NoteStore.lock) {
+                restorePersonalBackup(context, tempDir, manifestValue(manifest, "schema") == "2")
+            }
             context.applicationContext.sendBroadcast(
                 Intent(RetuiWallpaperService.ACTION_REFRESH).setPackage(context.packageName)
             )
@@ -458,9 +462,14 @@ object BackupManager {
 
         return when (type) {
             TYPE_BACKUP -> {
-                kotlin.require(schema == "1") { throw LocalizedArgumentException(R.string.validation_backup_backupmanager_unsupported_backup_schema_94afd) }
+                kotlin.require(schema == "1" || schema == "2") { throw LocalizedArgumentException(R.string.validation_backup_backupmanager_unsupported_backup_schema_94afd) }
                 kotlin.require(profile == "personal") { throw LocalizedArgumentException(R.string.validation_backup_backupmanager_invalid_personal_backup_profile_e275d) }
                 kotlin.require(entries.containsAll(REQUIRED_PERSONAL_ENTRIES)) { throw LocalizedArgumentException(R.string.validation_backup_backupmanager_personal_backup_is_incomplete_838a0) }
+                require(entries.filter { it.startsWith(PRIVATE_FILES_DIR) }.all { entry ->
+                    schema == "2" && personalPrivateFileNames.any { name ->
+                        entry == PRIVATE_FILES_DIR + name || entry.startsWith(PRIVATE_FILES_DIR + name + "/")
+                    }
+                }) { "Unsupported private backup file" }
                 true
             }
             TYPE_SHAREABLE -> {
@@ -558,7 +567,7 @@ object BackupManager {
             ohi.andre.consolelauncher.managers.BackupManager.addTextEntry(
                 zip, ohi.andre.consolelauncher.managers.BackupManager.MANIFEST_FILE,
                 ("type=" + ohi.andre.consolelauncher.managers.BackupManager.TYPE_BACKUP + "\n"
-                        + "schema=1\n"
+                        + "schema=2\n"
                         + "profile=personal\n"
                         + "appVersion=" + BuildConfig.VERSION_NAME + "\n")
             )
@@ -569,6 +578,12 @@ object BackupManager {
                 root,
                 FrameManager.bundledAssetFileNames(root)
             )
+            synchronized(ohi.andre.consolelauncher.notes.NoteStore.lock) {
+                for (name in personalPrivateFileNames) {
+                    val file = File(context.filesDir, name)
+                    if (file.exists()) addPrivateFiles(zip, context.filesDir, file)
+                }
+            }
             ohi.andre.consolelauncher.managers.BackupManager.addSharedPreferences(zip, context)
         } finally {
             zip.close()
@@ -607,7 +622,8 @@ object BackupManager {
         if (name == null || name.length == 0) return false
         if (name.startsWith(ohi.andre.consolelauncher.managers.BackupManager.SHARED_PREFS_DIR)) return false
         if (name.startsWith("spaces/.")) return false
-        if (name.startsWith(".restore-importing") || name.endsWith(ohi.andre.consolelauncher.managers.BackupManager.BACKUP_SUFFIX)) return false
+        if (name.startsWith(".restore-") || name.startsWith(PRIVATE_FILES_DIR) ||
+            name.endsWith(ohi.andre.consolelauncher.managers.BackupManager.BACKUP_SUFFIX)) return false
         if (name.startsWith("crash.txt")) return false
         return file.isDirectory() || file.isFile()
     }
@@ -717,101 +733,84 @@ object BackupManager {
         zip.closeEntry()
     }
 
-    @Throws(java.lang.Exception::class)
-    private fun restoreDirectory(
-        source: java.io.File,
-        target: java.io.File?,
-        replaceExisting: kotlin.Boolean
-    ) {
-        val files = source.listFiles()
-        if (files == null) return
+    internal fun addPrivateFiles(zip: ZipOutputStream, root: File, file: File) {
+        if (file.isDirectory) {
+            val children = requireNotNull(file.listFiles()) { "Unable to read private backup folder" }
+            children.forEach { addPrivateFiles(zip, root, it) }
+        } else if (file.isFile) {
+            addFileEntry(zip, PRIVATE_FILES_DIR + relativeName(root, file), file)
+        }
+    }
 
-        for (file in files) {
-            if (ohi.andre.consolelauncher.managers.BackupManager.MANIFEST_FILE == file.getName()) continue
-            val relative =
-                ohi.andre.consolelauncher.managers.BackupManager.relativeName(source, file)
-            if (relative.startsWith(ohi.andre.consolelauncher.managers.BackupManager.SHARED_PREFS_DIR)) continue
-            val dest = java.io.File(
-                target,
-                ohi.andre.consolelauncher.managers.BackupManager.relativeName(source, file)
-            )
-            if (file.isDirectory()) {
-                kotlin.check(!(!dest.exists() && !dest.mkdirs())) { throw LocalizedStateException(R.string.validation_backup_backupmanager_unable_to_restore_folder_1b199, dest.getName()) }
-                ohi.andre.consolelauncher.managers.BackupManager.restoreDirectory(
-                    file,
-                    dest,
-                    replaceExisting
-                )
-            } else if (file.isFile()) {
-                val parent = dest.getParentFile()
-                kotlin.check(!(parent != null && !parent.exists() && !parent.mkdirs())) { throw LocalizedStateException(R.string.validation_backup_backupmanager_unable_to_restore_folder_1b199, parent!!.getName()) }
-                if (!replaceExisting && dest.exists()) {
-                    Tuils.insertOld(dest)
-                }
-                ohi.andre.consolelauncher.managers.BackupManager.copyFile(file, dest)
+    private fun restorePersonalBackup(context: Context, staging: File, includesPrivateFiles: Boolean) {
+        val root = Tuils.getFolder()
+        val replacements = linkedMapOf<File, File?>()
+        val incoming = requireNotNull(staging.listFiles()).filter {
+            it.name != MANIFEST_FILE && it.name != SHARED_PREFS_DIR.trimEnd('/') &&
+                it.name != PRIVATE_FILES_DIR.trimEnd('/')
+        }
+        incoming.forEach { require(!it.name.startsWith(".restore-") && !it.name.endsWith(BACKUP_SUFFIX)) }
+        requireNotNull(root.listFiles()).filter {
+            !it.name.startsWith(".restore-") && !it.name.endsWith(BACKUP_SUFFIX)
+        }.forEach { replacements[it] = null }
+        incoming.forEach { replacements[File(root, it.name)] = it }
+        if (includesPrivateFiles) {
+            personalPrivateFileNames.forEach { name ->
+                replacements[File(context.filesDir, name)] = File(staging, PRIVATE_FILES_DIR + name).takeIf { it.exists() }
             }
         }
-    }
-
-    @Throws(java.lang.Exception::class)
-    private fun restoreSharedPreferences(context: android.content.Context, tempDir: java.io.File?) {
-        val prefsDir =
-            java.io.File(tempDir, ohi.andre.consolelauncher.managers.BackupManager.SHARED_PREFS_DIR)
-        if (!prefsDir.isDirectory()) return
-        for (name in ohi.andre.consolelauncher.managers.BackupManager.PERSONAL_PREFS) {
-            val file = java.io.File(prefsDir, name + ".properties")
-            if (!file.isFile()) continue
-            val editor: SharedPreferences.Editor = context.getApplicationContext()
-                .getSharedPreferences(name, android.content.Context.MODE_PRIVATE)
-                .edit()
-                .clear()
-            ohi.andre.consolelauncher.managers.BackupManager.applyPrefs(
-                editor,
-                ohi.andre.consolelauncher.managers.BackupManager.readText(file)
-            )
-            editor.apply()
+        val prefsDir = File(staging, SHARED_PREFS_DIR)
+        val preferences = personalSharedPreferenceNames().mapNotNull { name ->
+            File(prefsDir, "$name.properties").takeIf { it.isFile }?.let { file ->
+                val prefs = context.applicationContext.getSharedPreferences(name, Context.MODE_PRIVATE)
+                val editor = prefs.edit().clear()
+                // Decode every value before any live file is moved or preference is committed.
+                applyPrefs(editor, readText(file))
+                Triple(prefs, editor, HashMap(prefs.all))
+            }
         }
+        BackupRestoreTransaction.replace(replacements, commit = {
+            preferences.forEach { (_, editor, _) ->
+                check(editor.commit()) { "Unable to save restored preferences" }
+            }
+        }, rollback = {
+            preferences.forEach { (prefs, _, original) ->
+                val editor = prefs.edit().clear()
+                original.forEach { (key, value) ->
+                    when (value) {
+                        is Boolean -> editor.putBoolean(key, value)
+                        is Int -> editor.putInt(key, value)
+                        is Long -> editor.putLong(key, value)
+                        is Float -> editor.putFloat(key, value)
+                        is String -> editor.putString(key, value)
+                        is Set<*> -> editor.putStringSet(key, value.filterIsInstance<String>().toSet())
+                    }
+                }
+                check(editor.commit()) { "Unable to roll back restored preferences" }
+            }
+        })
     }
 
-    private fun applyPrefs(editor: SharedPreferences.Editor, text: kotlin.String) {
-        val lines = text.split("\\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        for (line in lines) {
-            if (line.length == 0) continue
-            val parts: kotlin.Array<kotlin.String?> =
-                line.split("\\|".toRegex(), limit = 3).toTypedArray()
-            if (parts.size != 3) continue
-            val type = parts[0]
-            val key = ohi.andre.consolelauncher.managers.BackupManager.decode(parts[1])
-            val value = ohi.andre.consolelauncher.managers.BackupManager.decode(parts[2])
-            try {
-                if ("boolean" == type) {
+    private fun applyPrefs(editor: SharedPreferences.Editor, text: String) {
+        for (line in text.lineSequence()) {
+            if (line.isEmpty()) continue
+            val parts = line.split('|', limit = 3)
+            require(parts.size == 3) { "Invalid backup preference" }
+            val key = String(Base64.decode(parts[1], Base64.NO_WRAP), Charsets.UTF_8)
+            val value = String(Base64.decode(parts[2], Base64.NO_WRAP), Charsets.UTF_8)
+            require(key.isNotEmpty()) { "Invalid backup preference key" }
+            when (parts[0]) {
+                "boolean" -> {
+                    require(value == "true" || value == "false") { "Invalid backup boolean" }
                     editor.putBoolean(key, value.toBoolean())
-                } else if ("int" == type) {
-                    editor.putInt(key, value.toInt())
-                } else if ("long" == type) {
-                    editor.putLong(key, value.toLong())
-                } else if ("float" == type) {
-                    editor.putFloat(key, value.toFloat())
-                } else if ("set" == type) {
-                    editor.putStringSet(
-                        key,
-                        ohi.andre.consolelauncher.managers.BackupManager.splitSet(value)
-                    )
-                } else {
-                    editor.putString(key, value)
                 }
-            } catch (ignored: java.lang.Exception) {
+                "int" -> editor.putInt(key, value.toInt())
+                "long" -> editor.putLong(key, value.toLong())
+                "float" -> editor.putFloat(key, value.toFloat().also { require(it.isFinite()) })
+                "set" -> editor.putStringSet(key, splitSet(value))
+                "string" -> editor.putString(key, value)
+                else -> throw IllegalArgumentException("Invalid backup preference type")
             }
-        }
-    }
-
-    private fun clearForPersonalRestore(root: java.io.File) {
-        val files = root.listFiles()
-        if (files == null) return
-        for (file in files) {
-            val name = file.getName()
-            if (name.startsWith(".restore-importing") || name.endsWith(ohi.andre.consolelauncher.managers.BackupManager.BACKUP_SUFFIX)) continue
-            Tuils.delete(file)
         }
     }
 
@@ -1017,36 +1016,6 @@ object BackupManager {
         var value = value
         if (value == null) value = ""
         return android.util.Base64.encodeToString(value.toByteArray(), android.util.Base64.NO_WRAP)
-    }
-
-    private fun decode(value: kotlin.String?): kotlin.String {
-        try {
-            return kotlin.text.String(
-                android.util.Base64.decode(
-                    value,
-                    android.util.Base64.NO_WRAP
-                )
-            )
-        } catch (e: java.lang.Exception) {
-            return ""
-        }
-    }
-
-    @Throws(java.lang.Exception::class)
-    private fun copyFile(source: java.io.File?, dest: java.io.File?) {
-        val `in`: java.io.InputStream = java.io.BufferedInputStream(java.io.FileInputStream(source))
-        val out: java.io.OutputStream =
-            java.io.BufferedOutputStream(java.io.FileOutputStream(dest, false))
-        val buffer = kotlin.ByteArray(8192)
-        try {
-            var read: Int
-            while ((`in`.read(buffer).also { read = it }) != -1) {
-                out.write(buffer, 0, read)
-            }
-        } finally {
-            `in`.close()
-            out.close()
-        }
     }
 
     private fun relativeName(root: java.io.File, file: java.io.File): kotlin.String {

@@ -107,7 +107,7 @@ object LauncherSettings {
             return
         }
 
-        val parent: XMLPrefsElement = value.parent() ?: return
+        val parent: XMLPrefsElement = value.parent() ?: throw IllegalStateException("Settings manager is not available: ${value.label()}")
 
         parent.write(value, rawValue ?: Tuils.EMPTYSTRING)
         synchronized(LOCK) {

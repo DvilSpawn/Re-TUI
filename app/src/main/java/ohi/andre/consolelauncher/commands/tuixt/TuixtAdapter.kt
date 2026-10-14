@@ -5,10 +5,13 @@ import android.graphics.Color
 import android.graphics.Typeface
 import android.text.Editable
 import android.text.TextWatcher
+import android.text.InputType
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.accessibility.AccessibilityNodeInfo
+import android.view.accessibility.AccessibilityEvent
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.SeekBar
@@ -91,6 +94,16 @@ class TuixtAdapter(
     @JvmOverloads
     fun saveAll(context: Context? = null, recyclerView: RecyclerView? = null) {
         recyclerView?.let { captureVisibleInputs(it) }
+        val invalid = pendingChanges.entries.firstOrNull { (item, value) ->
+            item != null && SettingsInputValidation.error(item, value) != null
+        }
+        if (invalid != null) {
+            val item = invalid.key!!
+            val error = SettingsInputValidation.error(item, invalid.value)!!
+            notifyDataSetChanged()
+            throw IllegalArgumentException(context?.getString(R.string.settings_editor_fix_field,
+                displayLabel(context, item), context.getString(error)) ?: item.label())
+        }
         if (pendingChanges.keys.any { StatusRowResolver.isStatusIndex(it) }) {
             val rawRows = StatusRowResolver.settings.associateWith { get(it) }
             val edits = pendingChanges.entries.filter { StatusRowResolver.isStatusIndex(it.key) }
@@ -116,7 +129,6 @@ class TuixtAdapter(
             val position = holder.bindingAdapterPosition
             if (position == RecyclerView.NO_POSITION) continue
             val item = visibleRows[position].item ?: continue
-            if (item.type() == XMLPrefsSave.COLOR || item.type() == XMLPrefsSave.AUTO_COLOR) continue
             val value = holder.input.text.toString()
             pendingChanges[item] = value
         }
@@ -192,6 +204,14 @@ class TuixtAdapter(
         val currentValue = getCurrentValue(item)
 
         settingHolder.input.removeTextChangedListener(settingHolder.textWatcher)
+        settingHolder.input.inputType = when {
+            StatusRowResolver.isStatusIndex(item) || item === Behavior.unlock_counter_cycle_start ->
+                InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
+            item.type() == XMLPrefsSave.INTEGER -> InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_SIGNED
+            else -> InputType.TYPE_CLASS_TEXT
+        }
+        settingHolder.input.error = null
+        settingHolder.title.labelFor = settingHolder.input.id
         settingHolder.toggle.setOnClickListener(null)
         settingHolder.action.setOnClickListener(null)
         settingHolder.action.visibility = View.GONE
@@ -250,17 +270,29 @@ class TuixtAdapter(
             settingHolder.colorPreview.setVisibility(View.GONE)
             settingHolder.input.setVisibility(View.GONE)
             val checked = currentValue.toBoolean()
+            settingHolder.title.labelFor = settingHolder.toggle.id
+            settingHolder.toggle.contentDescription = displayLabel(settingHolder.itemView.context, item)
+            settingHolder.toggle.accessibilityDelegate = object : View.AccessibilityDelegate() {
+                override fun onInitializeAccessibilityNodeInfo(host: View, info: AccessibilityNodeInfo) {
+                    super.onInitializeAccessibilityNodeInfo(host, info)
+                    info.className = "android.widget.Switch"
+                    info.isCheckable = true
+                    info.isChecked = getCurrentValue(item).toBoolean()
+                }
+            }
             styleToggle(settingHolder.itemView.getContext(), settingHolder.toggle, checked)
             settingHolder.toggle.setOnClickListener(View.OnClickListener { v: View? ->
                 val next = !getCurrentValue(item).toBoolean()
                 changeDraft(item, next.toString())
                 styleToggle(settingHolder.itemView.getContext(), settingHolder.toggle, next)
+                settingHolder.toggle.sendAccessibilityEvent(AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED)
             })
         } else if (XMLPrefsSave.COLOR == item.type() || XMLPrefsSave.AUTO_COLOR == item.type()) {
             settingHolder.toggle.setVisibility(View.GONE)
             settingHolder.colorPreview.setVisibility(View.VISIBLE)
             settingHolder.input.setVisibility(View.VISIBLE)
             settingHolder.input.setText(currentValue)
+            showInputError(settingHolder, item, currentValue)
             updateColorPreview(settingHolder.colorPreview, item, currentValue)
 
             settingHolder.colorPreview.setOnClickListener(View.OnClickListener { v: View? ->
@@ -284,16 +316,11 @@ class TuixtAdapter(
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
                 override fun afterTextChanged(s: Editable) {
                     val `val` = s.toString()
-                    val valid = if (item is Theme) ThemeColorResolver.isValid(item, `val`)
-                    else (item.type() == XMLPrefsSave.AUTO_COLOR && `val`.equals("auto", true)) ||
-                        `val`.matches("^#(?:[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$".toRegex())
-                    if (valid) {
+                    if (SettingsInputValidation.error(item, `val`) == null) {
                         updateColorPreview(settingHolder.colorPreview, item, `val`)
-                        changeDraft(item, `val`)
-                    } else {
-                        pendingChanges.remove(item)
-                        onDraftChanged()
                     }
+                    showInputError(settingHolder, item, `val`)
+                    changeDraft(item, `val`)
                 }
             }
             settingHolder.input.addTextChangedListener(settingHolder.textWatcher)
@@ -302,6 +329,7 @@ class TuixtAdapter(
             settingHolder.colorPreview.setVisibility(View.GONE)
             settingHolder.input.setVisibility(View.VISIBLE)
             settingHolder.input.setText(currentValue)
+            showInputError(settingHolder, item, currentValue)
             settingHolder.textWatcher = object : TextWatcher {
                 override fun beforeTextChanged(
                     s: CharSequence?,
@@ -313,11 +341,16 @@ class TuixtAdapter(
 
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
                 override fun afterTextChanged(s: Editable) {
+                    showInputError(settingHolder, item, s.toString())
                     changeDraft(item, s.toString())
                 }
             }
             settingHolder.input.addTextChangedListener(settingHolder.textWatcher)
         }
+    }
+
+    private fun showInputError(holder: ViewHolder, item: XMLPrefsSave, value: String?) {
+        holder.input.error = SettingsInputValidation.error(item, value)?.let { holder.itemView.context.getString(it) }
     }
 
     private fun bindSection(holder: SectionHolder, row: SettingsRow) {

@@ -29,6 +29,7 @@ import ohi.andre.consolelauncher.tuils.FramedDrawable
 import ohi.andre.consolelauncher.tuils.TerminalBorderDrawable
 import ohi.andre.consolelauncher.tuils.TerminalBorderRuntime
 import ohi.andre.consolelauncher.tuils.Tuils
+import ohi.andre.consolelauncher.tuils.LauncherFontScale
 
 /** Owns sample views only; draft values never enter the launcher's settings or color cache. */
 internal class SettingsAppearancePreview(
@@ -166,7 +167,10 @@ internal class SettingsAppearancePreview(
     private fun sample(text: String, textRole: Theme, size: Ui? = null) = TextView(context).apply {
         this.text = text
         typeface = font()
-        textSize = ((size?.let { number(it, 8f, 32f) } ?: 13f) + number(Ui.font_size_offset, -6f, 12f)).coerceAtLeast(8f)
+        textSize = LauncherFontScale.scaledSp(
+            size?.let { raw(it)?.toFloatOrNull()?.takeIf(Float::isFinite) } ?: 13f,
+            number(Ui.font_size_offset, LauncherFontScale.MIN_OFFSET.toFloat(), LauncherFontScale.MAX_OFFSET.toFloat()).toInt()
+        )
         setTextColor(color(textRole))
         setPadding(dp(10), dp(7), dp(10), dp(7))
         importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_YES

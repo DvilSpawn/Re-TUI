@@ -119,12 +119,7 @@ class AppsManager(context: Context) : XMLPrefsElement {
     }
 
     override fun write(save: XMLPrefsSave, value: String) {
-        XMLPrefsManager.set(
-            File(Tuils.getFolder(), PATH),
-            save.label(),
-            arrayOf<String>(XMLPrefsManager.VALUE_ATTRIBUTE),
-            arrayOf<String?>(value)
-        )
+        XMLPrefsManager.writeSetting(File(Tuils.getFolder(), PATH), save, value)
         prefsList!!.add(save.label()!!, value)
     }
 

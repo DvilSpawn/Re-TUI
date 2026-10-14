@@ -8298,7 +8298,8 @@
       "showMode"
     ],
     "commands/tuixt/TuixtAdapter.kt": [
-      "showColorPicker"
+      "showColorPicker",
+      "showInputError"
     ],
     "commands/tuixt/ThemerActivity.kt": [
       "openAsciiSettings",
@@ -8315,6 +8316,7 @@
       "showBackupProtectionDialog",
       "showCreateFramePack",
       "showDystopiaConsentDialog",
+      "showFileProgress",
       "showFrameEditor",
       "showKeyboardShortcutAppPicker",
       "showPreferredMusicAppPicker",

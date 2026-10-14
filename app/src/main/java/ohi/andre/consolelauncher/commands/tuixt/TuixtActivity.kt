@@ -193,8 +193,12 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
         btnSave.setOnClickListener(View.OnClickListener { v: View? ->
             var saved = false
             if (adapter != null) {
-                adapter!!.saveAll(this, recyclerView)
-                saved = true
+                try {
+                    adapter!!.saveAll(this, recyclerView)
+                    saved = true
+                } catch (e: Exception) {
+                    Toast.makeText(this, getString(R.string.editor_tuixtactivity_error_saving_540ec, e.message), Toast.LENGTH_LONG).show()
+                }
             } else if (plainTextEditor != null) {
                 try {
                     val currentText = plainTextEditor!!.getText().toString()
@@ -241,6 +245,7 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
             originalRows = buildAsciiSettingsRows()
             adapter = TuixtAdapter(originalRows!!.toMutableList(), null)
             recyclerView!!.setAdapter(adapter)
+            adapter?.restoreDraftState(savedInstanceState?.getBundle("appearance_draft"))
 
             searchBox.addTextChangedListener(object : TextWatcher {
                 override fun beforeTextChanged(
@@ -327,6 +332,9 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
             }
 
             root.addView(plainTextEditor, 2)
+            if (savedInstanceState?.containsKey("plain_text_draft") == true) {
+                plainTextEditor?.setText(savedInstanceState.getString("plain_text_draft"))
+            }
         }
 
         setContentView(screen)
@@ -799,6 +807,7 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putBundle("appearance_draft", adapter?.saveDraftState())
         outState.putInt("appearance_page", appearancePreview?.selectedPage() ?: 0)
+        plainTextEditor?.let { outState.putString("plain_text_draft", it.text.toString()) }
         super.onSaveInstanceState(outState)
     }
 

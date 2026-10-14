@@ -130,7 +130,10 @@ class SettingsPreviewIntegrationTest {
             assertEquals(original, LauncherSettings.get(Theme.terminal_border_color))
             assertFalse(ThemeColorResolver.hasPreview())
             holder.itemView.findViewById<EditText>(R.id.setting_input).setText("#bad-color")
-            assertEquals(original, adapter.draftValue(Theme.terminal_border_color))
+            assertEquals("#bad-color", adapter.draftValue(Theme.terminal_border_color))
+            org.junit.Assert.assertNotNull(holder.itemView.findViewById<EditText>(R.id.setting_input).error)
+            assertEquals(original, LauncherSettings.get(Theme.terminal_border_color))
+            assertFalse(ThemeColorResolver.hasPreview())
         }
     }
 }

@@ -1,6 +1,10 @@
 package ohi.andre.consolelauncher.managers
 
 import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.util.zip.ZipInputStream
+import java.util.zip.ZipOutputStream
 import java.nio.file.Files
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertEquals
@@ -57,6 +61,69 @@ class BackupManagerTest {
     fun personalBackupKeepsStartupCompletionButNotPreviewDrafts() {
         assertTrue(BackupManager.personalSharedPreferenceNames().contains("retui_startup"))
         assertFalse(BackupManager.personalSharedPreferenceNames().contains("retui_startup_preview"))
+    }
+
+    @Test
+    fun personalBackupIncludesPrivateNotesImagesLanguageAndThemeState() {
+        assertTrue(BackupManager.personalPrivateFileNames.containsAll(listOf(
+            "remember-notes.xml", "notes-library", "images", "launcher-language-packs"
+        )))
+        assertTrue(BackupManager.personalSharedPreferenceNames().containsAll(listOf("launcher-language", "remember-theme")))
+    }
+
+    @Test
+    fun privateNotesAndLanguageFilesSurviveArchiveRoundTrip() {
+        val root = Files.createTempDirectory("private-backup-roundtrip").toFile()
+        try {
+            val original = File(root, "original").apply { mkdir() }
+            val contents = mapOf(
+                "remember-notes.xml" to "<notes version=\"4\"/>",
+                "notes-library/note.md" to "My note",
+                "notes-library/.assets/note/image.png" to "image bytes",
+                "images/legacy/photo.png" to "legacy image",
+                "launcher-language-packs/ta.retui-launcher-lang" to "language pack"
+            )
+            contents.forEach { (path, text) ->
+                File(original, path).apply { parentFile!!.mkdirs(); writeText(text) }
+            }
+            val bytes = ByteArrayOutputStream()
+            ZipOutputStream(bytes).use { zip ->
+                BackupManager.personalPrivateFileNames.forEach { name ->
+                    File(original, name).takeIf { it.exists() }?.let { BackupManager.addPrivateFiles(zip, original, it) }
+                }
+            }
+            val extracted = File(root, "extracted").apply { mkdir() }
+            ZipInputStream(ByteArrayInputStream(bytes.toByteArray())).use { zip ->
+                while (true) {
+                    val entry = zip.nextEntry ?: break
+                    assertTrue(entry.name.startsWith("app_files/"))
+                    File(extracted, entry.name).apply { parentFile!!.mkdirs(); outputStream().use { zip.copyTo(it) } }
+                }
+            }
+            val restored = File(root, "restored").apply { mkdir() }
+            val replacement = BackupManager.personalPrivateFileNames.associate { name ->
+                File(restored, name) to File(extracted, "app_files/$name").takeIf { it.exists() }
+            }
+            BackupRestoreTransaction.replace(replacement, {}, { throw AssertionError("unexpected rollback") })
+            contents.forEach { (path, text) -> assertEquals(text, File(restored, path).readText()) }
+        } finally { root.deleteRecursively() }
+    }
+
+    @Test
+    fun acceptsVersionTwoPersonalBackupWithNestedPrivateAssets() {
+        assertTrue(BackupManager.validatePackage(
+            "type=retui-backup\nschema=2\nprofile=personal\n",
+            setOf("manifest.txt", "theme.xml", "ui.xml", "suggestions.xml", "shared_prefs/ui.properties",
+                "app_files/notes-library/.assets/123/photo.png", "app_files/launcher-language-packs/ta.retui-launcher-lang")
+        ))
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun rejectsUnknownPrivateFileStore() {
+        BackupManager.validatePackage(
+            "type=retui-backup\nschema=2\nprofile=personal\n",
+            setOf("manifest.txt", "theme.xml", "ui.xml", "suggestions.xml", "shared_prefs/ui.properties", "app_files/unknown/secrets")
+        )
     }
 
     @Test

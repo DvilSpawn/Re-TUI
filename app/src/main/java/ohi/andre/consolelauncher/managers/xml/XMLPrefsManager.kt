@@ -2,6 +2,7 @@ package ohi.andre.consolelauncher.managers.xml
 
 import android.content.Context
 import android.graphics.Color
+import android.util.AtomicFile
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.managers.AppsManager
 import ohi.andre.consolelauncher.managers.FirstRunPresetManager
@@ -30,6 +31,7 @@ import org.xml.sax.SAXParseException
 import java.io.File
 import java.io.FileOutputStream
 import java.io.StringWriter
+import java.io.IOException
 import java.util.Arrays
 import java.util.Locale
 import java.util.regex.Pattern
@@ -857,6 +859,7 @@ object XMLPrefsManager {
     //    [0] = document
     //    [1] = root
     @Throws(Exception::class)
+    @Synchronized
     fun buildDocument(file: File?, rootName: String?): Array<Any?>? {
         if (file == null) {
             return null
@@ -867,7 +870,7 @@ object XMLPrefsManager {
 
         var d: Document
         try {
-            d = builder!!.parse(file)
+            d = AtomicFile(file).openRead().use { builder!!.parse(it) }
         } catch (e: Exception) {
             Tuils.log(e)
 
@@ -882,26 +885,29 @@ object XMLPrefsManager {
         return arrayOf<Any?>(d, r)
     }
 
+    @Synchronized
+    @Throws(Exception::class)
     fun writeTo(d: Document?, f: File?) {
+        val transformer = TransformerFactory.newInstance().newTransformer()
+        val writer = StringWriter()
+        transformer.transform(DOMSource(checkNotNull(d)), StreamResult(writer))
+        val bytes = fixNewlines(writer.toString()).toByteArray(Charsets.UTF_8)
+        val atomic = AtomicFile(checkNotNull(f))
+        var stream: FileOutputStream? = null
         try {
-            val transformerFactory = TransformerFactory.newInstance()
-            val transformer = transformerFactory.newTransformer()
-
-            val source = DOMSource(d)
-            val writer = StringWriter()
-            val result = StreamResult(writer)
-            transformer.transform(source, result)
-
-            val s = fixNewlines(writer.toString())
-
-            val stream = FileOutputStream(f)
-            stream.write(s.toByteArray())
-
-            stream.flush()
-            stream.close()
-        } catch (e: Exception) {
-            Tuils.log(e)
+            stream = atomic.startWrite()
+            stream.write(bytes)
+            atomic.finishWrite(stream)
+        } catch (error: Exception) {
+            atomic.failWrite(stream)
+            throw error
         }
+    }
+
+    @Throws(IOException::class)
+    fun writeSetting(file: File, save: XMLPrefsSave, value: String) {
+        val error = set(file, save.label(), arrayOf(VALUE_ATTRIBUTE), arrayOf(value))
+        if (!error.isNullOrEmpty()) throw IOException(error)
     }
 
     //    this will only add, it won't check if there's already one
@@ -972,6 +978,7 @@ object XMLPrefsManager {
         )
     }
 
+    @Synchronized
     fun setMany(
         file: File?,
         elementNames: Array<String?>?,
@@ -981,6 +988,7 @@ object XMLPrefsManager {
         return setMany(file, elementNames, null, null, attributeNames, attributeValues, true)
     }
 
+    @Synchronized
     fun setMany(
         file: File?,
         elementNames: Array<String?>?,
@@ -994,7 +1002,7 @@ object XMLPrefsManager {
             val o: Array<Any?>?
             try {
                 o = buildDocument(file, null)
-                if (o == null) return Tuils.EMPTYSTRING
+                if (o == null) return IOException("Unable to read ${file?.name}").toString()
             } catch (e: Exception) {
                 Tuils.log(e)
                 return e.toString()
@@ -1004,7 +1012,7 @@ object XMLPrefsManager {
             val root = o[1] as Element?
 
             if (d == null || root == null) {
-                return Tuils.EMPTYSTRING
+                return IOException("Unable to read ${file?.name}").toString()
             }
 
             var nFound = 0
@@ -1479,17 +1487,13 @@ object XMLPrefsManager {
             this.path = this.name.lowercase(Locale.getDefault()) + ".xml"
         }
 
+        @Synchronized
         override fun write(save: XMLPrefsSave, value: String) {
             if (prefsValues == null) {
                 prefsValues = XMLPrefsList()
             }
             val f = File(Tuils.getFolder(), path)
-            XMLPrefsManager.set(
-                f,
-                save.label(),
-                arrayOf<String>(VALUE_ATTRIBUTE),
-                arrayOf<String?>(value)
-            )
+            XMLPrefsManager.writeSetting(f, save, value)
             prefsValues!!.add(save.label()!!, value)
         }
 

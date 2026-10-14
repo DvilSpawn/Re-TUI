@@ -24,11 +24,11 @@ import android.widget.TextView
 import ohi.andre.consolelauncher.commands.tuixt.TuixtLayout.addFoldAwareHost
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.dp
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleButton
-import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleHeader
+import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleDialogHeader
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleInput
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleListItem
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleDialogPanel
-import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.textColor
+import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.dialogTextColor
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi.applyFullscreen
 import ohi.andre.consolelauncher.tuils.Tuils
 import java.util.Locale
@@ -121,7 +121,7 @@ object TuixtDialog {
                 if (content.childCount == 0) {
                     content.addView(TextView(context).apply {
                         text = context.getString(R.string.dialog_no_apps_found)
-                        setTextColor(textColor())
+                        setTextColor(dialogTextColor())
                         setTypeface(Tuils.getTypeface(context))
                         gravity = Gravity.CENTER
                         setPadding(0, dp(context, 18f), 0, dp(context, 18f))
@@ -200,7 +200,7 @@ object TuixtDialog {
             fields.forEach { field ->
                 val label = TextView(context)
                 label.text = field.label.uppercase(Locale.getDefault())
-                label.setTextColor(textColor())
+                label.setTextColor(dialogTextColor())
                 label.setTypeface(Tuils.getTypeface(context))
                 label.textSize = 12f
                 label.setPadding(0, dp(context, 6f), 0, dp(context, 4f))
@@ -222,7 +222,7 @@ object TuixtDialog {
             }
 
             val error = TextView(context)
-            error.setTextColor(ThemeColorResolver.color(Theme.error_text_color))
+            error.setTextColor(TuixtTheme.dialogErrorColor())
             error.setTypeface(Tuils.getTypeface(context))
             error.textSize = 12f
             error.visibility = View.GONE
@@ -273,7 +273,7 @@ object TuixtDialog {
 
             val messageView = TextView(context)
             messageView.setText(message)
-            messageView.setTextColor(textColor())
+            messageView.setTextColor(dialogTextColor())
             messageView.setTypeface(Tuils.getTypeface(context))
             messageView.setTextSize(14f)
             messageView.setPadding(
@@ -421,7 +421,7 @@ object TuixtDialog {
 
         val header = TextView(context)
         header.setText(title.uppercase(Locale.getDefault()))
-        styleHeader(context, header)
+        styleDialogHeader(context, header)
         val headerParams = FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT

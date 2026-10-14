@@ -43,6 +43,12 @@ object TuixtTheme {
     fun textColor(): Int = color(Theme.settings_panel_text_color)
 
     @JvmStatic
+    fun dialogTextColor(): Int = color(Theme.dialog_panel_text_color)
+
+    @JvmStatic
+    fun dialogErrorColor(): Int = SettingsColorSafety.readable(ThemeColorResolver.color(Theme.error_text_color), color(Theme.dialog_panel_background_color))
+
+    @JvmStatic
     fun surfaceColor(): Int = color(Theme.settings_panel_background_color)
 
     @JvmStatic
@@ -75,8 +81,13 @@ object TuixtTheme {
     }
 
     @JvmStatic
-    fun styleHeader(context: Context, view: TextView) {
-        view.setTextColor(color(Theme.settings_header_text_color))
+    fun styleHeader(context: Context, view: TextView) = styleHeader(context, view, false)
+
+    @JvmStatic
+    fun styleDialogHeader(context: Context, view: TextView) = styleHeader(context, view, true)
+
+    private fun styleHeader(context: Context, view: TextView, dialog: Boolean) {
+        view.setTextColor(color(if (dialog) Theme.dialog_header_text_color else Theme.settings_header_text_color))
         view.setTypeface(Tuils.getTypeface(context), Typeface.BOLD)
         view.textSize = 15f
         view.gravity = Gravity.CENTER
@@ -84,8 +95,8 @@ object TuixtTheme {
         view.background = framedRect(
             context,
             FrameTarget.HEADER,
-            color(Theme.settings_header_background_color),
-            color(Theme.settings_header_border_color),
+            color(if (dialog) Theme.dialog_header_background_color else Theme.settings_header_background_color),
+            color(if (dialog) Theme.dialog_header_border_color else Theme.settings_header_border_color),
             1.5f,
             AppearanceSettings.headerCornerRadius()
         )

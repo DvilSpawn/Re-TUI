@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_editor_invalid_integer">Enter a whole number between -2147483648 and 2147483647.</string>
+    <string name="settings_editor_invalid_status_index">Enter a row position between 1 and 2147483637. Decimals can share a row.</string>
+    <string name="settings_editor_invalid_time">Enter a time as hh.mm, from 0.00 to 23.59.</string>
+    <string name="settings_editor_invalid_font_offset">Enter a font offset from -8 to 8.</string>
+    <string name="settings_editor_invalid_font_size">Enter a font size of at least 1.</string>
+    <string name="settings_editor_invalid_color">Enter a color as #RRGGBB or #AARRGGBB.</string>
+    <string name="settings_editor_invalid_auto_color">Enter auto, #RRGGBB, or #AARRGGBB.</string>
+    <string name="settings_editor_invalid_value">This value is not allowed.</string>
+    <string name="settings_editor_fix_field">Correct %1$s before saving. %2$s</string>
+</resources>

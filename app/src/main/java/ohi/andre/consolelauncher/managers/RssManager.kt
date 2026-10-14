@@ -86,12 +86,7 @@ class RssManager(context: Context, client: OkHttpClient) : XMLPrefsElement {
     }
 
     override fun write(save: XMLPrefsSave, value: String) {
-        XMLPrefsManager.set(
-            File(Tuils.getFolder(), PATH),
-            save.label(),
-            arrayOf<String>(XMLPrefsManager.VALUE_ATTRIBUTE),
-            arrayOf<String?>(value)
-        )
+        XMLPrefsManager.writeSetting(File(Tuils.getFolder(), PATH), save, value)
         values.add(save.label()!!, value)
     }
 

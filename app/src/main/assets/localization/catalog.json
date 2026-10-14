@@ -5968,7 +5968,7 @@
   "help_module": {
     "formatted": true,
     "forms": {
-      "other": "Show and manage Re:T-UI modules. \n\nUsage: \n$ module -ls \n$ module -show music \n$ module -show notifications \n$ module -show timer \n$ module -show calendar \n$ module -show reminder \n$ module -show notes \n$ module -show rss \n$ module -show weather \n$ module -prompt reminder add \n$ module -prompt reminder edit \n$ module -prompt reminder remove \n$ module -new lua counter \n$ module -edit counter \n$ module -config counter \n$ module -check counter \n$ module -approve counter \n$ module -export counter \n$ module -add server termux:/data/data/com.termux/files/home/retui/server-health.sh \n$ module -add events termux:/data/data/com.termux/files/home/retui/events.sh \n$ module -refresh server \n$ module -rm server \n$ module -hide music \n$ module -dock -toggle \n$ module -dock add server \n$ module -dock remove music \n$ module -close \n\nModules are the single dock/panel category in Re:T-UI. A module can be native, Termux/shell-backed, launcher-backed, or Lua-backed. Built-in modules include music, notifications, timer, calendar, reminder, notes, rss, and weather. Lua modules are edited locally in Re:T-UI, can render native buttons/layouts, and use module -new lua, module -edit, module -config, module -check, and module -approve. Termux modules execute shell scripts and render ::title, ::body, and ::suggest metadata. Suggestion-only Lua scripts remain helpers because they do not render a dock panel. \n\nAn empty dock stays empty. To hide or show the dock row live, run module -dock -toggle. You can also turn off show_module_dock in Behavior settings or run config -set show_module_dock false."
+      "other": "Show and manage Re:T-UI modules. \n\nUsage: \n$ module -ls \n$ module -library \n$ module -library todo \n$ module -show music \n$ module -show notifications \n$ module -show timer \n$ module -show calendar \n$ module -show reminder \n$ module -show notes \n$ module -show rss \n$ module -show weather \n$ module -prompt reminder add \n$ module -prompt reminder edit \n$ module -prompt reminder remove \n$ module -new lua counter \n$ module -edit counter \n$ module -config counter \n$ module -check counter\n$ module -preview counter \n$ module -approve counter \n$ module -export counter \n$ module -add server termux:/data/data/com.termux/files/home/retui/server-health.sh \n$ module -add events termux:/data/data/com.termux/files/home/retui/events.sh \n$ module -refresh server \n$ module -rm server \n$ module -hide music \n$ module -dock -toggle \n$ module -dock add server \n$ module -dock remove music \n$ module -close \n\nModules are the single dock/panel category in Re:T-UI. A module can be native, Termux/shell-backed, launcher-backed, or Lua-backed. Built-in modules include music, notifications, timer, calendar, reminder, notes, rss, and weather. Lua modules are edited locally in Re:T-UI, can render native buttons/layouts, and use module -new lua, module -edit, module -config, module -check, and module -approve. Termux modules execute shell scripts and render ::title, ::body, and ::suggest metadata. Suggestion-only Lua scripts remain helpers because they do not render a dock panel. \n\nAn empty dock stays empty. To hide or show the dock row live, run module -dock -toggle. You can also turn off show_module_dock in Behavior settings or run config -set show_module_dock false."
     },
     "type": "string"
   },
@@ -9749,6 +9749,62 @@
     "formatted": true,
     "forms": {
       "other": "WEATHER (NATIVE)"
+    },
+    "type": "string"
+  },
+  "module_library_cached": {
+    "formatted": true,
+    "forms": {
+      "other": "Offline · showing the saved module list."
+    },
+    "type": "string"
+  },
+  "module_library_failed": {
+    "formatted": true,
+    "forms": {
+      "other": "Could not install module: %1$s"
+    },
+    "type": "string"
+  },
+  "module_library_installed": {
+    "formatted": true,
+    "forms": {
+      "other": "Installed · open"
+    },
+    "type": "string"
+  },
+  "module_library_loading": {
+    "formatted": true,
+    "forms": {
+      "other": "Loading module library…"
+    },
+    "type": "string"
+  },
+  "module_library_not_installed": {
+    "formatted": true,
+    "forms": {
+      "other": "Not installed · download"
+    },
+    "type": "string"
+  },
+  "module_library_title": {
+    "formatted": true,
+    "forms": {
+      "other": "Module library"
+    },
+    "type": "string"
+  },
+  "module_library_unavailable": {
+    "formatted": true,
+    "forms": {
+      "other": "Could not load the module library: %1$s"
+    },
+    "type": "string"
+  },
+  "module_library_unknown": {
+    "formatted": true,
+    "forms": {
+      "other": "Unknown library module. Use module -library."
     },
     "type": "string"
   },
@@ -16860,6 +16916,160 @@
     },
     "type": "string"
   },
+  "settings_editor_fix_field": {
+    "formatted": true,
+    "forms": {
+      "other": "Correct %1$s before saving. %2$s"
+    },
+    "type": "string"
+  },
+  "settings_editor_invalid_auto_color": {
+    "formatted": true,
+    "forms": {
+      "other": "Enter auto, #RRGGBB, or #AARRGGBB."
+    },
+    "type": "string"
+  },
+  "settings_editor_invalid_color": {
+    "formatted": true,
+    "forms": {
+      "other": "Enter a color as #RRGGBB or #AARRGGBB."
+    },
+    "type": "string"
+  },
+  "settings_editor_invalid_font_offset": {
+    "formatted": true,
+    "forms": {
+      "other": "Enter a font offset from -8 to 8."
+    },
+    "type": "string"
+  },
+  "settings_editor_invalid_font_size": {
+    "formatted": true,
+    "forms": {
+      "other": "Enter a font size of at least 1."
+    },
+    "type": "string"
+  },
+  "settings_editor_invalid_integer": {
+    "formatted": true,
+    "forms": {
+      "other": "Enter a whole number between -2147483648 and 2147483647."
+    },
+    "type": "string"
+  },
+  "settings_editor_invalid_status_index": {
+    "formatted": true,
+    "forms": {
+      "other": "Enter a row position between 1 and 2147483637. Decimals can share a row."
+    },
+    "type": "string"
+  },
+  "settings_editor_invalid_time": {
+    "formatted": true,
+    "forms": {
+      "other": "Enter a time as hh.mm, from 0.00 to 23.59."
+    },
+    "type": "string"
+  },
+  "settings_editor_invalid_value": {
+    "formatted": true,
+    "forms": {
+      "other": "This value is not allowed."
+    },
+    "type": "string"
+  },
+  "settings_file_operation_working": {
+    "formatted": true,
+    "forms": {
+      "other": "Working on your files…"
+    },
+    "type": "string"
+  },
+  "settings_font_too_large": {
+    "formatted": true,
+    "forms": {
+      "other": "Font files must be 8 MiB or smaller."
+    },
+    "type": "string"
+  },
+  "settings_preview_ansi": {
+    "formatted": true,
+    "forms": {
+      "other": "ANSI"
+    },
+    "type": "string"
+  },
+  "settings_preview_disabled": {
+    "formatted": true,
+    "forms": {
+      "other": "Disabled"
+    },
+    "type": "string"
+  },
+  "settings_preview_draft": {
+    "formatted": true,
+    "forms": {
+      "other": "LIVE PREVIEW · Sample content · Apply with Save"
+    },
+    "type": "string"
+  },
+  "settings_preview_modules": {
+    "formatted": true,
+    "forms": {
+      "other": "Modules"
+    },
+    "type": "string"
+  },
+  "settings_preview_normal": {
+    "formatted": true,
+    "forms": {
+      "other": "Normal"
+    },
+    "type": "string"
+  },
+  "settings_preview_page": {
+    "formatted": true,
+    "forms": {
+      "other": "%1$s · %2$d / %3$d · Swipe to explore"
+    },
+    "type": "string"
+  },
+  "settings_preview_palette": {
+    "formatted": true,
+    "forms": {
+      "other": "ANSI palette · Normal 30–37 / Bright 90–97"
+    },
+    "type": "string"
+  },
+  "settings_preview_selected": {
+    "formatted": true,
+    "forms": {
+      "other": "Selected"
+    },
+    "type": "string"
+  },
+  "settings_preview_status": {
+    "formatted": true,
+    "forms": {
+      "other": "Status"
+    },
+    "type": "string"
+  },
+  "settings_preview_status_hidden": {
+    "formatted": true,
+    "forms": {
+      "other": "Status lines are hidden. Enable one below to preview it."
+    },
+    "type": "string"
+  },
+  "settings_preview_terminal": {
+    "formatted": true,
+    "forms": {
+      "other": "Terminal"
+    },
+    "type": "string"
+  },
   "shortcut_index_greater": {
     "formatted": true,
     "forms": {
@@ -17095,6 +17305,27 @@
     "formatted": false,
     "forms": {
       "other": "DASHED"
+    },
+    "type": "string"
+  },
+  "startup_default_launcher": {
+    "formatted": true,
+    "forms": {
+      "other": "Set Re:TUI as my default launcher"
+    },
+    "type": "string"
+  },
+  "startup_default_launcher_description": {
+    "formatted": true,
+    "forms": {
+      "other": "Open Re:TUI when you press Home. Android will ask you to confirm after setup. You can skip this and decide later."
+    },
+    "type": "string"
+  },
+  "startup_default_launcher_unavailable": {
+    "formatted": true,
+    "forms": {
+      "other": "Open Android Settings → Default apps → Home app to choose Re:TUI."
     },
     "type": "string"
   },
