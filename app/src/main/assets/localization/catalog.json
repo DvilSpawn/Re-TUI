@@ -6938,6 +6938,48 @@
     },
     "type": "string"
   },
+  "irc_delete_confirm": {
+    "formatted": true,
+    "forms": {
+      "other": "Delete from IRC"
+    },
+    "type": "string"
+  },
+  "irc_delete_explanation": {
+    "formatted": true,
+    "forms": {
+      "other": "Choose a message. You can request deletion of your own messages; channel moderators can delete other messages. The server checks permission."
+    },
+    "type": "string"
+  },
+  "irc_delete_message": {
+    "formatted": true,
+    "forms": {
+      "other": "Delete a message"
+    },
+    "type": "string"
+  },
+  "irc_delete_missing": {
+    "formatted": true,
+    "forms": {
+      "other": "This message is no longer available for deletion."
+    },
+    "type": "string"
+  },
+  "irc_delete_question": {
+    "formatted": true,
+    "forms": {
+      "other": "Delete this message from IRC history and supported clients? Copies on Discord or other clients may remain."
+    },
+    "type": "string"
+  },
+  "irc_delete_unavailable": {
+    "formatted": true,
+    "forms": {
+      "other": "Message deletion is unavailable on this connection."
+    },
+    "type": "string"
+  },
   "irc_device_explanation": {
     "formatted": true,
     "forms": {
@@ -7039,7 +7081,7 @@
   "irc_help": {
     "formatted": true,
     "forms": {
-      "other": "Native IRC terminal — one TLS network at a time.\n/server [host] [TLS port] · default irc.kokodoko.cloud 6697\n/nick nickname · /connect · /login account (masked SASL password)\n/register (guided signup offline; masked NickServ password when connected)\n/join #channel · /j #channel · /part [#channel]\n/window [number|name|next|prev|close] · /buffer is an alias\n/query nick · /msg nick text · /me action · /names · /list\n/topic [text] · /whois nick · /mode target modes · /kick nick [reason]\n/oper name (masked password) · /disconnect · /quit · /clear · /help\nPlain text goes only to the active joined channel or query. //text sends /text literally. Unknown commands never become messages or launcher commands.\nWindow markers: * unread · ! mention/private message. Passwords are never transcript/history entries. TLS is verified; no plaintext fallback.\nRegister once, then sign in or reconnect before joining registered-only channels. Server-readable, not end-to-end encrypted. Reconnect replays up to 50 retained channel messages when the server supports IRCv3 CHATHISTORY; leaving disconnects. Unconfirmed messages are never retried automatically."
+      "other": "Native IRC terminal — one TLS network at a time.\n/server [host] [TLS port] · default irc.kokodoko.cloud 6697\n/nick nickname · /connect · /login account (masked SASL password)\n/register (guided signup offline; masked NickServ password when connected)\n/join #channel · /j #channel · /part [#channel]\n/window [number|name|next|prev|close] · /buffer is an alias\n/query nick · /msg nick text · /me action · /names · /list\n/topic [text] · /whois nick · /mode target modes · /kick nick [reason]\n/oper name (masked password) · /disconnect · /quit · /clear · /help\nPlain text goes only to the active joined channel or query. //text sends /text literally. Unknown commands never become messages or launcher commands.\nWindow markers: * unread · ! mention/private message. Passwords are never transcript/history entries. TLS is verified; no plaintext fallback.\nRegister once, then sign in or reconnect before joining registered-only channels. Server-readable, not end-to-end encrypted. On supported networks, rejoining loads up to 100 recent channel messages. Server-confirmed deletions replace messages with a deletion marker. There is no push or background service; leaving disconnects. Unconfirmed messages are never retried automatically."
     },
     "type": "string"
   },

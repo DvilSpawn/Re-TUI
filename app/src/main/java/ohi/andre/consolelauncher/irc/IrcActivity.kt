@@ -105,9 +105,6 @@ class IrcTerminalSession(application: Application) : AndroidViewModel(applicatio
                         IrcProtocol.fold(message.nick, state.mapping) == IrcProtocol.fold(state.nickname, state.mapping) &&
                         client?.ready == true) {
                         runCatching { actions.names(channel) }
-                        if (client?.supportsChatHistory == true && state.beginHistory(channel)) {
-                            runCatching { send("CHATHISTORY", listOf("LATEST", channel, "*", "50")) }
-                        }
                     }
                 }
                 updated = true
@@ -352,6 +349,10 @@ class IrcActivity : LocalizedComponentActivity() {
         session.actions.join(name); if (session.state.active.name == name && session.state.active.joined) closeNavigation()
     }
     private fun openPeople() = action { openNavigation(IrcNavigation.Page.PEOPLE); session.actions.names() }
+    private fun openDeleteMessages() = action {
+        check(session.client?.ready == true && session.client?.messageRedaction == true && session.state.active.joined) { getString(R.string.irc_delete_unavailable) }
+        openNavigation(IrcNavigation.Page.DELETE_MESSAGES)
+    }
     private fun switchWindow(value: String) {
         if (secretCommand.isNotEmpty()) return
         action { if (navigation.page == IrcNavigation.Page.CHAT) session.state.active.scroll = scroll.scrollY; restoringScroll = true; navigation.close(); session.state.switch(value); restoreDraft(); render(); scroll.post { scroll.scrollTo(0, session.state.active.scroll); restoringScroll = false } }
@@ -371,7 +372,7 @@ class IrcActivity : LocalizedComponentActivity() {
             state.joinError.isNotEmpty() -> state.joinError
             else -> "${state.nickname} · ${session.connectionText}" + session.deviceStatus.takeIf { it.isNotEmpty() }?.let { "\n$it" }.orEmpty()
         }
-        val searchable = navigation.page in listOf(IrcNavigation.Page.CHANNELS, IrcNavigation.Page.DIRECTORY, IrcNavigation.Page.PEOPLE, IrcNavigation.Page.COMMANDS)
+        val searchable = navigation.page in listOf(IrcNavigation.Page.CHANNELS, IrcNavigation.Page.DIRECTORY, IrcNavigation.Page.PEOPLE, IrcNavigation.Page.COMMANDS, IrcNavigation.Page.DELETE_MESSAGES)
         val editable = secretCommand.isNotEmpty() || searchable || navigation.page in listOf(IrcNavigation.Page.CHAT, IrcNavigation.Page.ACCOUNT, IrcNavigation.Page.REGISTER, IrcNavigation.Page.NETWORK, IrcNavigation.Page.JOIN)
         input.isEnabled = editable
         root.findViewById<View>(R.id.irc_prompt_row).visibility = if (editable) View.VISIBLE else View.GONE
@@ -505,9 +506,35 @@ class IrcActivity : LocalizedComponentActivity() {
             IrcNavigation.Page.MORE -> {
                 line(label(R.string.irc_more))
                 line(label(R.string.irc_connection_details)) { openNavigation(IrcNavigation.Page.DETAILS) }
+                if (state.active.joined && session.client?.ready == true && session.client?.messageRedaction == true) line(label(R.string.irc_delete_message)) { openDeleteMessages() }
                 if (state.active.joined) line(getString(R.string.irc_leave, state.active.name)) { openNavigation(IrcNavigation.Page.LEAVE) }
                 else if (state.active.number != 1) line(label(R.string.irc_close_conversation)) { state.closeActive(); closeNavigation() }
                 line(label(R.string.irc_disconnect)) { session.disconnect(); session.account = ""; closeNavigation() }
+            }
+            IrcNavigation.Page.DELETE_MESSAGES -> {
+                line(label(R.string.irc_delete_message)); line(label(R.string.irc_delete_explanation))
+                val messages = state.active.lines.asReversed().filter { it.messageId.isNotEmpty() && it.command in setOf("PRIVMSG", "NOTICE") && !it.pending && navigation.matches(it.text) }
+                messages.take(navigation.limit).forEach { message -> line(message.text) {
+                    navigation.deleteTarget = state.active.name; navigation.deleteMessageId = message.messageId
+                    openNavigation(IrcNavigation.Page.DELETE_CONFIRM)
+                } }
+                if (messages.isEmpty()) line(label(R.string.irc_no_matches))
+                more(messages.size)
+            }
+            IrcNavigation.Page.DELETE_CONFIRM -> {
+                line(label(R.string.irc_delete_message))
+                val target = navigation.deleteTarget; val id = navigation.deleteMessageId
+                val buffer = state.buffers.firstOrNull { it.name == target }
+                val message = buffer?.lines?.firstOrNull { it.messageId == id && it.command in setOf("PRIVMSG", "NOTICE") }
+                if (message == null) line(label(R.string.irc_delete_missing))
+                else if (buffer?.joined != true || session.client?.ready != true || session.client?.messageRedaction != true) line(label(R.string.irc_delete_unavailable))
+                else {
+                    line(message.text); line(label(R.string.irc_delete_question))
+                    line(label(R.string.irc_delete_confirm)) {
+                        check(session.client?.messageRedaction == true) { getString(R.string.irc_delete_unavailable) }
+                        session.actions.deleteMessage(target, id); closeNavigation()
+                    }
+                }
             }
             IrcNavigation.Page.NETWORK -> {
                 line(label(R.string.irc_network)); line("${session.host}:${session.port}")
@@ -655,6 +682,7 @@ class IrcActivity : LocalizedComponentActivity() {
                     "whois" -> { require(IrcProtocol.nick(rest)); session.send("WHOIS", listOf(rest)); openNavigation(IrcNavigation.Page.DIAGNOSTICS); return }
                     "mode" -> { val p = rest.split(' '); require(p.size in 1..5 && IrcProtocol.target(p[0])); session.send("MODE", p) }
                     "kick" -> { require(session.state.active.joined); val nick = rest.substringBefore(' '); require(IrcProtocol.nick(nick)); session.send("KICK", listOf(session.state.active.name, nick), rest.substringAfter(' ', "").takeIf { it.isNotEmpty() }) }
+                    "delete" -> { require(rest.isEmpty()); openDeleteMessages(); return }
                     "clear" -> { require(rest.isEmpty()); session.state.active.lines.clear() }
                     "disconnect", "quit" -> { require(rest.isEmpty()); session.disconnect(); session.account = "" }
                     else -> throw IllegalArgumentException("Unknown IRC command. /help lists supported commands; nothing was sent.")

@@ -1730,6 +1730,12 @@ Wiki:
     <string name="irc_connection_details">Connection details</string>
     <string name="irc_continue">Continue</string>
     <string name="irc_create_account">Create account</string>
+    <string name="irc_delete_confirm">Delete from IRC</string>
+    <string name="irc_delete_explanation">Choose a message. You can request deletion of your own messages; channel moderators can delete other messages. The server checks permission.</string>
+    <string name="irc_delete_message">Delete a message</string>
+    <string name="irc_delete_missing">This message is no longer available for deletion.</string>
+    <string name="irc_delete_question">Delete this message from IRC history and supported clients? Copies on Discord or other clients may remain.</string>
+    <string name="irc_delete_unavailable">Message deletion is unavailable on this connection.</string>
     <string name="irc_device_explanation">Reconnect automatically with a protected device key; no saved password. Anyone using your unlocked Launcher can access this account. A new phone or reinstall needs password sign-in.</string>
     <string name="irc_device_failed">Device login could not be confirmed. Sign in with your password to retry.</string>
     <string name="irc_device_forgotten">Local device key removed. Password sign-in is required. Check NickServ certificate authorization if server revocation could not complete.</string>
@@ -1755,7 +1761,7 @@ Wiki:
 /oper name (masked password) · /disconnect · /quit · /clear · /help
 Plain text goes only to the active joined channel or query. //text sends /text literally. Unknown commands never become messages or launcher commands.
 Window markers: * unread · ! mention/private message. Passwords are never transcript/history entries. TLS is verified; no plaintext fallback.
-Register once, then sign in or reconnect before joining registered-only channels. Server-readable, not end-to-end encrypted. Reconnect replays up to 50 retained channel messages when the server supports IRCv3 CHATHISTORY; leaving disconnects. Unconfirmed messages are never retried automatically.</string>
+Register once, then sign in or reconnect before joining registered-only channels. Server-readable, not end-to-end encrypted. On supported networks, rejoining loads up to 100 recent channel messages. Server-confirmed deletions replace messages with a deletion marker. There is no push or background service; leaving disconnects. Unconfirmed messages are never retried automatically.</string>
     <string name="irc_help_title">Help</string>
     <string name="irc_input_hint">message or /command</string>
     <string name="irc_join_hint">Enter a channel such as #retui, then Continue.</string>

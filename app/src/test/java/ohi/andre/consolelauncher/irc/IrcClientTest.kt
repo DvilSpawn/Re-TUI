@@ -10,6 +10,62 @@ import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
 class IrcClientTest {
+    @Test fun historyIsRequestedAfterConfirmedJoinAndOnlyWithAllCapabilities() {
+        listOf("batch server-time message-tags draft/chathistory draft/message-redaction", "batch server-time draft/chathistory", "server-time").forEach { offered ->
+            ServerSocket(0).use { server ->
+                val frames = CopyOnWriteArrayList<String>(); val incoming = CopyOnWriteArrayList<IrcMessage>()
+                val done = CountDownLatch(1); val failure = java.util.concurrent.atomic.AtomicReference<Throwable>()
+                val history = offered.contains("message-tags")
+                val fixture = thread {
+                    try { server.accept().use { peer ->
+                        peer.soTimeout = 5000
+                        val reader = peer.getInputStream().bufferedReader(); val writer = peer.getOutputStream().bufferedWriter()
+                        fun reply(line: String) { writer.write(line + "\r\n"); writer.flush() }
+                        while (true) {
+                            val line = reader.readLine() ?: break; frames.add(line)
+                            val message = IrcMessage.parse(line)
+                            when (message.command) {
+                                "CAP" -> when (message.params[0]) {
+                                    "LS" -> reply(":s CAP test LS :$offered")
+                                    "REQ" -> reply(":s CAP test ACK :${message.params.last()}")
+                                    "END" -> {
+                                        reply(":s 001 canonical :Welcome")
+                                        reply(":s 005 canonical CHATHISTORY=25 :Supported")
+                                        reply(":alice!u@host JOIN #other")
+                                        reply("PING :before-join")
+                                    }
+                                }
+                                "PONG" -> when (message.params.last()) {
+                                    "before-join" -> {
+                                        assertFalse(frames.any { it.startsWith("CHATHISTORY") })
+                                        reply(":canonical!u@host JOIN #retui")
+                                        if (!history) reply("PING :finished")
+                                    }
+                                    "finished" -> { done.countDown(); while (reader.readLine() != null) { }; return@use }
+                                }
+                                "CHATHISTORY" -> {
+                                    assertTrue(history); assertEquals(listOf("LATEST", "#retui", "*", "25"), message.params)
+                                    reply(":s BATCH +h chathistory #retui")
+                                    reply("@batch=h;msgid=one;time=2026-10-13T15:01:00Z :komi/discord!u@host PRIVMSG #retui :🤤🤤🤤")
+                                    reply(":s BATCH -h"); reply("PING :finished")
+                                }
+                            }
+                        }
+                    } } catch (error: Throwable) { failure.set(error); done.countDown() }
+                }
+                val c = IrcClient("localhost", server.localPort, "test", receive = incoming::add, connection = { _, _ -> }, connector = { _, port -> Socket("127.0.0.1", port) })
+                try {
+                    c.start(); assertTrue(done.await(5, TimeUnit.SECONDS))
+                    failure.get()?.let { throw AssertionError("History fixture", it) }
+                    assertEquals(if (history) 1 else 0, frames.count { it.startsWith("CHATHISTORY") })
+                    if (history) assertTrue(incoming.any { it.command == "PRIVMSG" && it.params.last() == "🤤🤤🤤" })
+                    if (history) assertTrue(frames.any { it.startsWith("CAP REQ") && "draft/message-redaction" in it })
+                    else assertFalse(frames.any { it.contains("draft/chathistory") && it.startsWith("CAP REQ") })
+                } finally { c.close(); fixture.join(5000) }
+                assertFalse(fixture.isAlive)
+            }
+        }
+    }
     @Test fun closeReturnsImmediatelyEvenWhenTlsCloseBlocksOrThrows() {
         val connected = CountDownLatch(1); val closing = CountDownLatch(1); val release = CountDownLatch(1)
         val ended = CountDownLatch(1)

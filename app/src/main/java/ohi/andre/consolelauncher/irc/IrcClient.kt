@@ -43,7 +43,7 @@ class IrcClient(private val host: String, private val port: Int, private val nic
     @Volatile private var socket: Socket? = null
     @Volatile var ready = false; private set
     @Volatile var echoMessages = false; private set
-    @Volatile var supportsChatHistory = false; private set
+    @Volatile var messageRedaction = false; private set
     private var worker: Thread? = null
     private var writer: Thread? = null
     private class RegistrationFailure(val explanation: String) : java.io.IOException()
@@ -57,6 +57,8 @@ class IrcClient(private val host: String, private val port: Int, private val nic
         worker = thread(name = "retui-irc-reader") {
             var negotiated = false; var authenticating = false; var authenticated = false
             var welcomed = false; var registrationSent = false; var registerBeforeConnect = false
+            var currentNickname = nickname; var historyEnabled = false; var historyLimit = 100
+            val historyCapabilities = listOf("batch", "server-time", "message-tags", "draft/chathistory")
             val registrationCapability = "draft/account-registration"
             var disconnectedText = "Disconnected · /connect to reconnect; unsent drafts stay local."
             val offered = linkedSetOf<String>()
@@ -122,15 +124,19 @@ class IrcClient(private val host: String, private val port: Int, private val nic
                                     if (message.params.getOrNull(2) != "*") {
                                         if (register && registrationCapability !in offered) throw RegistrationFailure("Registration is closed or guided signup is unsupported on this network. Use an existing account to Sign in.")
                                         check(register || account.isEmpty() || "sasl" in offered) { "Server does not offer SASL" }
-                                        val wanted = listOf("batch", "message-tags", "server-time", "echo-message", "multi-prefix", "draft/chathistory")
-                                            .filter { it in offered }.toMutableList()
+                                        val wanted = listOf("server-time", "echo-message", "multi-prefix") .filter { it in offered }.toMutableList()
+                                        if (offered.containsAll(historyCapabilities)) wanted.addAll(historyCapabilities.filter { it !in wanted })
+                                        if ("draft/message-redaction" in offered && "message-tags" in offered) {
+                                            wanted.addAll(listOf("message-tags", "draft/message-redaction").filter { it !in wanted })
+                                        }
                                         if (register) wanted.add(registrationCapability) else if (account.isNotEmpty()) wanted.add("sasl")
                                         if (wanted.isEmpty()) endCapabilities() else queue(IrcProtocol.line("CAP", listOf("REQ"), wanted.joinToString(" ")))
                                     }
                                 }
                                 "ACK" -> {
                                     echoMessages = "echo-message" in capabilities
-                                    supportsChatHistory = capabilities.any { it == "draft/chathistory" || it == "chathistory" }
+                                    historyEnabled = capabilities.containsAll(historyCapabilities)
+                                    messageRedaction = "draft/message-redaction" in capabilities && "message-tags" in capabilities
                                     if (register) {
                                         if (registrationCapability !in capabilities) throw RegistrationFailure("Guided registration was rejected by this network. Nothing was joined.")
                                         if (registerBeforeConnect) submitRegistration() else endCapabilities()
@@ -150,12 +156,19 @@ class IrcClient(private val host: String, private val port: Int, private val nic
                         }
                         "903" -> if (!register) { authenticated = true; secret.fill('\u0000'); endCapabilities() }
                         "902", "904", "905", "906", "907" -> throw java.io.IOException("SASL authentication failed")
-                        "001" -> if (register) {
+                        "001" -> { currentNickname = message.params.firstOrNull() ?: nickname; if (register) {
                             check(negotiated && IrcProtocol.fold(message.params.firstOrNull().orEmpty(), "rfc1459") == IrcProtocol.fold(nickname, "rfc1459")) { "Unexpected registration welcome" }
                             welcomed = true
                             if (!registrationSent) submitRegistration()
                             finishRegistration()
-                        } else { check(account.isEmpty() || authenticated && negotiated) { "Unauthenticated welcome rejected" }; ready = true; connection(true, "Connected · $host:$port · ${if (account.isEmpty()) "nickname only" else "SASL authenticated"}") }
+                        } else { check(account.isEmpty() || authenticated && negotiated) { "Unauthenticated welcome rejected" }; ready = true; connection(true, "Connected · $host:$port · ${if (account.isEmpty()) "nickname only" else "SASL authenticated"}") } }
+                        "005" -> message.params.firstOrNull { it.startsWith("CHATHISTORY=") }?.substringAfter('=')?.toIntOrNull()?.takeIf { it > 0 }?.let { historyLimit = it.coerceAtMost(100) }
+                        "JOIN" -> if (ready && historyEnabled && IrcProtocol.fold(message.nick) == IrcProtocol.fold(currentNickname)) {
+                            message.params.firstOrNull()?.takeIf { IrcProtocol.target(it) && it.first() in "#&" }?.let {
+                                queue(IrcProtocol.line("CHATHISTORY", listOf("LATEST", it, "*", historyLimit.toString())))
+                            }
+                        }
+                        "NICK" -> if (IrcProtocol.fold(message.nick) == IrcProtocol.fold(currentNickname)) currentNickname = message.params.firstOrNull() ?: currentNickname
                         "REGISTER" -> if (register && registrationSent && !authenticated) {
                             if (message.prefix.isEmpty() || message.prefix.contains('!') || message.prefix.contains('@')) continue
                             when (message.params.firstOrNull()) {

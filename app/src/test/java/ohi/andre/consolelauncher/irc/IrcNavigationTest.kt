@@ -4,6 +4,18 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class IrcNavigationTest {
+    @Test fun messageDeletionUsesServerIdWithoutOptimisticallyRemovingContent() {
+        val s = IrcState(); s.nickname = "me"; s.receive(IrcMessage.parse(":me!u@host JOIN #retui"))
+        s.receive(IrcMessage.parse("@msgid=message-1 :alice!u@host PRIVMSG #retui :original"))
+        val frames = mutableListOf<String>(); val a = IrcActions(s) { c, p, t -> frames.add(IrcProtocol.line(c, p, t)) }
+        a.deleteMessage("#retui", "message-1")
+        assertEquals(listOf("REDACT #retui message-1\r\n"), frames)
+        assertTrue(s.active.lines.any { it.body == "original" })
+        s.receive(IrcMessage.parse(":s FAIL REDACT REDACT_FORBIDDEN #retui message-1 :Permission denied"))
+        assertTrue(s.active.lines.any { it.body == "original" }); assertTrue(s.active.lines.last().text.contains("Permission denied"))
+        assertThrows(IllegalStateException::class.java) { a.deleteMessage("#retui", "missing") }
+        assertThrows(IllegalArgumentException::class.java) { a.deleteMessage("#retui", "bad id") }
+    }
     @Test fun localViewsPreserveDraftPositionAndTrackHiddenMessages() {
         val s = IrcState(); s.nickname = "me"; val b = s.buffer("#retui"); s.switch("#retui")
         b.draft = "unfinished"; b.scroll = 144
