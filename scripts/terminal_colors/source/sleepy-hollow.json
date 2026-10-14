@@ -1,0 +1,32 @@
+{
+  "id": "sleepy-hollow",
+  "sourceUrl": "https://term.const.net/en/themes/sleepy-hollow/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "634a91c1c9fec769a10f705001c7e01684704ddbc23d9617944bf4d49f6f3734",
+  "paletteSha256": "8e01a428c05b57e0a2c699dd2187f416e0d14265d5a65fe1411889926cdc4873",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Sleepy Hollow.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Sleepy Hollow",
+    "background": "#121214",
+    "foreground": "#af9a91",
+    "cursorColor": "#af9a91",
+    "selectionBackground": "#575256",
+    "black": "#572100",
+    "red": "#ba3934",
+    "green": "#91773f",
+    "yellow": "#b55600",
+    "blue": "#5f63b4",
+    "purple": "#a17c7b",
+    "cyan": "#8faea9",
+    "white": "#af9a91",
+    "brightBlack": "#4e4b61",
+    "brightRed": "#d9443f",
+    "brightGreen": "#d6b04e",
+    "brightYellow": "#f66813",
+    "brightBlue": "#8086ef",
+    "brightPurple": "#e2c2bb",
+    "brightCyan": "#a4dce7",
+    "brightWhite": "#d2c7a9"
+  }
+}

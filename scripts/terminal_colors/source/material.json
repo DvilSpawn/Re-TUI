@@ -1,0 +1,32 @@
+{
+  "id": "material",
+  "sourceUrl": "https://term.const.net/en/themes/material/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "0d4a6125c4a246e4f90b44b75cdd86baaa96bc50c19f03363455bba792ed48ba",
+  "paletteSha256": "431104604cadf45297a0e286f2cb56284a13b4bb70a621b85c9bb962a313662f",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Material.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Material",
+    "background": "#eaeaea",
+    "foreground": "#232322",
+    "cursorColor": "#16afca",
+    "selectionBackground": "#c2c2c2",
+    "black": "#212121",
+    "red": "#b7141f",
+    "green": "#457b24",
+    "yellow": "#f6981e",
+    "blue": "#134eb2",
+    "purple": "#560088",
+    "cyan": "#0e717c",
+    "white": "#afafaf",
+    "brightBlack": "#424242",
+    "brightRed": "#e83b3f",
+    "brightGreen": "#7aba3a",
+    "brightYellow": "#bfaa00",
+    "brightBlue": "#54a4f3",
+    "brightPurple": "#aa4dbc",
+    "brightCyan": "#26bbd1",
+    "brightWhite": "#d9d9d9"
+  }
+}

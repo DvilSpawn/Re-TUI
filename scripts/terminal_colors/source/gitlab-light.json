@@ -1,0 +1,32 @@
+{
+  "id": "gitlab-light",
+  "sourceUrl": "https://term.const.net/en/themes/gitlab-light/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "ba3f22baf86d18ae93434eb2beceaa64e74daac44cebc368d2bf44848115f943",
+  "paletteSha256": "751f4d46b0ed40cd13857cdf977b085f89e9a7beabc58d6a8482c572dc9d0d4d",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/GitLab Light.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "GitLab Light",
+    "background": "#fafaff",
+    "foreground": "#303030",
+    "cursorColor": "#303030",
+    "selectionBackground": "#ad95e9",
+    "black": "#303030",
+    "red": "#a31700",
+    "green": "#0a7f3d",
+    "yellow": "#af551d",
+    "blue": "#006cd8",
+    "purple": "#583cac",
+    "cyan": "#00798a",
+    "white": "#303030",
+    "brightBlack": "#303030",
+    "brightRed": "#a31700",
+    "brightGreen": "#0a7f3d",
+    "brightYellow": "#af551d",
+    "brightBlue": "#006cd8",
+    "brightPurple": "#583cac",
+    "brightCyan": "#00798a",
+    "brightWhite": "#303030"
+  }
+}

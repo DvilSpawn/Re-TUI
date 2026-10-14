@@ -1,0 +1,32 @@
+{
+  "id": "urban",
+  "sourceUrl": "https://term.const.net/en/themes/urban/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "84e17ad453740fad9bb935ace5fb80ac65d1ca041f7873498115e0893daa10e6",
+  "paletteSha256": "5a0c866b6ee400a8511874d1ae4df0f8a8fdde67a7847beb4ac56b2458a2e6d1",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/urban.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "urban",
+    "background": "#312e39",
+    "foreground": "#c0a79a",
+    "cursorColor": "#c0a79a",
+    "selectionBackground": "#c0a79a",
+    "black": "#33303b",
+    "red": "#87404f",
+    "green": "#74934e",
+    "yellow": "#ae835a",
+    "blue": "#615772",
+    "purple": "#854b64",
+    "cyan": "#625464",
+    "white": "#c0a79a",
+    "brightBlack": "#5c5865",
+    "brightRed": "#87404f",
+    "brightGreen": "#74934e",
+    "brightYellow": "#ae835a",
+    "brightBlue": "#615772",
+    "brightPurple": "#854b64",
+    "brightCyan": "#625464",
+    "brightWhite": "#c0a79a"
+  }
+}

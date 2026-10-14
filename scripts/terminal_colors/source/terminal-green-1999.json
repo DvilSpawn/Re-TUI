@@ -1,0 +1,32 @@
+{
+  "id": "terminal-green-1999",
+  "sourceUrl": "https://term.const.net/en/themes/terminal-green-1999/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "d587a9d425700494c87e5703b05f166eb7a0edcf96139b643e91bb685eef5eb9",
+  "paletteSha256": "6c380630d41f2a52082ae4de8aa6f8ca768f11f2c82813b050b9d9806efa950d",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Terminal Green 1999.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Terminal Green 1999",
+    "background": "#03120a",
+    "foreground": "#d8ffe6",
+    "cursorColor": "#d8ffe6",
+    "selectionBackground": "#d8ffe6",
+    "black": "#32463a",
+    "red": "#ff5c7a",
+    "green": "#22c55e",
+    "yellow": "#00d26a",
+    "blue": "#7dd3fc",
+    "purple": "#9dff57",
+    "cyan": "#39ff88",
+    "white": "#8fd6a9",
+    "brightBlack": "#274335",
+    "brightRed": "#ff7d95",
+    "brightGreen": "#4ed17e",
+    "brightYellow": "#2eda85",
+    "brightBlue": "#97dcfd",
+    "brightPurple": "#b1ff79",
+    "brightCyan": "#61ffa0",
+    "brightWhite": "#d8ffe6"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "neobones-light",
+  "sourceUrl": "https://term.const.net/en/themes/neobones-light/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "0899fcc94e4c30d59e389c83dfdd625568478bbb1345e68835e3a37a30f8e2c8",
+  "paletteSha256": "c758583b2430c6da57693ff94d3c4712e90f2001f0adfa68d02f4feea4c107d0",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Neobones Light.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Neobones Light",
+    "background": "#e5ede6",
+    "foreground": "#202e18",
+    "cursorColor": "#202e18",
+    "selectionBackground": "#ade48c",
+    "black": "#e5ede6",
+    "red": "#a8334c",
+    "green": "#567a30",
+    "yellow": "#944927",
+    "blue": "#286486",
+    "purple": "#88507d",
+    "cyan": "#3b8992",
+    "white": "#202e18",
+    "brightBlack": "#99ac9c",
+    "brightRed": "#94253e",
+    "brightGreen": "#3f5a22",
+    "brightYellow": "#803d1c",
+    "brightBlue": "#1d5573",
+    "brightPurple": "#7b3b70",
+    "brightCyan": "#2b747c",
+    "brightWhite": "#415934"
+  }
+}

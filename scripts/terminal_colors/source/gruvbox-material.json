@@ -1,0 +1,32 @@
+{
+  "id": "gruvbox-material",
+  "sourceUrl": "https://term.const.net/en/themes/gruvbox-material/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "81398040bb1bf5ef65c20e090025870124ac59cb0bcff2c94efcbedcac443872",
+  "paletteSha256": "51a7234c10675646487ab033e9169035c31a6822f5a487397d6d07f062e3d536",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Gruvbox Material.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Gruvbox Material",
+    "background": "#1d2021",
+    "foreground": "#d4be98",
+    "cursorColor": "#ffffff",
+    "selectionBackground": "#2b2c3f",
+    "black": "#141617",
+    "red": "#ea6926",
+    "green": "#c1d041",
+    "yellow": "#eecf75",
+    "blue": "#6da3ec",
+    "purple": "#fd9bc1",
+    "cyan": "#fe9d6e",
+    "white": "#ffffff",
+    "brightBlack": "#4c4c4c",
+    "brightRed": "#d3573b",
+    "brightGreen": "#c1d041",
+    "brightYellow": "#eecf75",
+    "brightBlue": "#2c86ff",
+    "brightPurple": "#fd9bc1",
+    "brightCyan": "#92a5df",
+    "brightWhite": "#ffffff"
+  }
+}

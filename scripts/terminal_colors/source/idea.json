@@ -1,0 +1,32 @@
+{
+  "id": "idea",
+  "sourceUrl": "https://term.const.net/en/themes/idea/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "de676cf2da8b75f183c6a45a9ffde479b2f04d2ada5d4be624298fd4be604986",
+  "paletteSha256": "5ee03884646ab9e107d2d0d14f440073b300d29ff9046b9e2f627ec0354a35d9",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Idea.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Idea",
+    "background": "#202020",
+    "foreground": "#adadad",
+    "cursorColor": "#bbbbbb",
+    "selectionBackground": "#44475a",
+    "black": "#adadad",
+    "red": "#fc5256",
+    "green": "#98b61c",
+    "yellow": "#ccb444",
+    "blue": "#437ee7",
+    "purple": "#9d74b0",
+    "cyan": "#248887",
+    "white": "#4b4b4b",
+    "brightBlack": "#ffffff",
+    "brightRed": "#fc7072",
+    "brightGreen": "#98b61c",
+    "brightYellow": "#ffff0b",
+    "brightBlue": "#6c9ced",
+    "brightPurple": "#fc7eff",
+    "brightCyan": "#248887",
+    "brightWhite": "#181818"
+  }
+}

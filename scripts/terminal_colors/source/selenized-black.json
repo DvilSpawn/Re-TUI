@@ -1,0 +1,32 @@
+{
+  "id": "selenized-black",
+  "sourceUrl": "https://term.const.net/en/themes/selenized-black/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "572feeb4d1bc555298d2326e8c820373be208d460240e861d0ccd1f648286e3a",
+  "paletteSha256": "706da27f4bfe193cdda54d715be120a53507831f43847faacada408f466bc326",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Selenized Black.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Selenized Black",
+    "background": "#181818",
+    "foreground": "#b9b9b9",
+    "cursorColor": "#777777",
+    "selectionBackground": "#3b3b3b",
+    "black": "#252525",
+    "red": "#ed4a46",
+    "green": "#70b433",
+    "yellow": "#dbb32d",
+    "blue": "#368aeb",
+    "purple": "#eb6eb7",
+    "cyan": "#3fc5b7",
+    "white": "#b9b9b9",
+    "brightBlack": "#777777",
+    "brightRed": "#ff5e56",
+    "brightGreen": "#83c746",
+    "brightYellow": "#efc541",
+    "brightBlue": "#4f9cfe",
+    "brightPurple": "#ff81ca",
+    "brightCyan": "#56d8c9",
+    "brightWhite": "#dedede"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "cutie-pro",
+  "sourceUrl": "https://term.const.net/en/themes/cutie-pro/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "e1945fc861b9be33fb9604c84926c4bc94a46913b6fc34850648570fc592bc88",
+  "paletteSha256": "a2b4283b00862dd5818d38f4ae7ba525d0e420b815bdd4a7ee9acae01eebb4c5",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Cutie Pro.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Cutie Pro",
+    "background": "#181818",
+    "foreground": "#d5d0c9",
+    "cursorColor": "#efc4cd",
+    "selectionBackground": "#363636",
+    "black": "#000000",
+    "red": "#f56e7f",
+    "green": "#bec975",
+    "yellow": "#f58669",
+    "blue": "#42d9c5",
+    "purple": "#d286b7",
+    "cyan": "#37cb8a",
+    "white": "#d5c3c3",
+    "brightBlack": "#88847f",
+    "brightRed": "#e5a1a3",
+    "brightGreen": "#e8d6a7",
+    "brightYellow": "#f1bb79",
+    "brightBlue": "#80c5de",
+    "brightPurple": "#b294bb",
+    "brightCyan": "#9dccbb",
+    "brightWhite": "#ffffff"
+  }
+}

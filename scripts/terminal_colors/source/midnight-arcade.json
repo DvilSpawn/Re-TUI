@@ -1,0 +1,32 @@
+{
+  "id": "midnight-arcade",
+  "sourceUrl": "https://term.const.net/en/themes/midnight-arcade/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "98ec2534987baf3494c6465bb5a7d3559cfbbf291378df2f012ea18caa7faa5d",
+  "paletteSha256": "9b2ac561cdd55b6928a40d930b88081ac8e22b9b72462d6a59abf42083d82ad8",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Midnight Arcade.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Midnight Arcade",
+    "background": "#0b1220",
+    "foreground": "#f8fafc",
+    "cursorColor": "#f8fafc",
+    "selectionBackground": "#f8fafc",
+    "black": "#3f4550",
+    "red": "#fb7185",
+    "green": "#22c55e",
+    "yellow": "#fbbf24",
+    "blue": "#60a5fa",
+    "purple": "#e879f9",
+    "cyan": "#22d3ee",
+    "white": "#b6c2d5",
+    "brightBlack": "#3d4452",
+    "brightRed": "#fc8d9d",
+    "brightGreen": "#4ed17e",
+    "brightYellow": "#fccb4b",
+    "brightBlue": "#80b7fb",
+    "brightPurple": "#ed94fa",
+    "brightCyan": "#4edcf1",
+    "brightWhite": "#f8fafc"
+  }
+}

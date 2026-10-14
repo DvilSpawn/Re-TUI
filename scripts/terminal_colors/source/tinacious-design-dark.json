@@ -1,0 +1,32 @@
+{
+  "id": "tinacious-design-dark",
+  "sourceUrl": "https://term.const.net/en/themes/tinacious-design-dark/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "d6008467787bde5b3cd392e508b2c883e90fac9eb15f01dc1dd22042b13026d0",
+  "paletteSha256": "03393cbc106ad710fda0ed134f559f4859aa4331c2425049eb3636b6ff974c76",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Tinacious Design Dark.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Tinacious Design Dark",
+    "background": "#1d1d26",
+    "foreground": "#cbcbf0",
+    "cursorColor": "#cbcbf0",
+    "selectionBackground": "#ff3399",
+    "black": "#1d1d26",
+    "red": "#ff3399",
+    "green": "#00d364",
+    "yellow": "#ffcc66",
+    "blue": "#00cbff",
+    "purple": "#cc66ff",
+    "cyan": "#00ceca",
+    "white": "#cbcbf0",
+    "brightBlack": "#636667",
+    "brightRed": "#ff2f92",
+    "brightGreen": "#00d364",
+    "brightYellow": "#ffd479",
+    "brightBlue": "#00cbff",
+    "brightPurple": "#d783ff",
+    "brightCyan": "#00d5d4",
+    "brightWhite": "#d5d6f3"
+  }
+}

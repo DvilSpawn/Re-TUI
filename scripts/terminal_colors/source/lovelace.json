@@ -1,0 +1,32 @@
+{
+  "id": "lovelace",
+  "sourceUrl": "https://term.const.net/en/themes/lovelace/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "efb0d862ddc511503313d8fdc9902b90515be0ce0b8e5c7df14aaac792edb769",
+  "paletteSha256": "ed9cbf8d0809998a146182a1271d58d0ecbfaf72a6b0c17421391a4185fa035e",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Lovelace.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Lovelace",
+    "background": "#1d1f28",
+    "foreground": "#fdfdfd",
+    "cursorColor": "#c574dd",
+    "selectionBackground": "#c1deff",
+    "black": "#282a36",
+    "red": "#f37f97",
+    "green": "#5adecd",
+    "yellow": "#f2a272",
+    "blue": "#8897f4",
+    "purple": "#c574dd",
+    "cyan": "#79e6f3",
+    "white": "#fdfdfd",
+    "brightBlack": "#4e5165",
+    "brightRed": "#ff4971",
+    "brightGreen": "#18e3c8",
+    "brightYellow": "#ff8037",
+    "brightBlue": "#556fff",
+    "brightPurple": "#b043d1",
+    "brightCyan": "#3fdcee",
+    "brightWhite": "#bebec1"
+  }
+}

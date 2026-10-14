@@ -1,0 +1,32 @@
+{
+  "id": "one-half-dark",
+  "sourceUrl": "https://term.const.net/en/themes/one-half-dark/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "f38a9bb5efd97dc0c9c1a403d9292bcc5a4abe329ec6b6efe93e094bd57599b4",
+  "paletteSha256": "33548cb5fa56c8701d48e2f2dd31395eb5dad681fa1183238839b112630865a8",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/One Half Dark.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "One Half Dark",
+    "background": "#282c34",
+    "foreground": "#dcdfe4",
+    "cursorColor": "#a3b3cc",
+    "selectionBackground": "#474e5d",
+    "black": "#282c34",
+    "red": "#e06c75",
+    "green": "#98c379",
+    "yellow": "#e5c07b",
+    "blue": "#61afef",
+    "purple": "#c678dd",
+    "cyan": "#56b6c2",
+    "white": "#dcdfe4",
+    "brightBlack": "#5d677a",
+    "brightRed": "#e06c75",
+    "brightGreen": "#98c379",
+    "brightYellow": "#e5c07b",
+    "brightBlue": "#61afef",
+    "brightPurple": "#c678dd",
+    "brightCyan": "#56b6c2",
+    "brightWhite": "#dcdfe4"
+  }
+}

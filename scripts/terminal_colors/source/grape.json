@@ -1,0 +1,32 @@
+{
+  "id": "grape",
+  "sourceUrl": "https://term.const.net/en/themes/grape/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "97d374a2224a6d015a7d46aea6a393c47713c6e64cff97d86fef215f8614a23b",
+  "paletteSha256": "0a3e4c14c7062b3ddea7739180d6c543ae8c3afbbd4f3bbf0650733a0f895665",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Grape.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Grape",
+    "background": "#171423",
+    "foreground": "#9f9fa1",
+    "cursorColor": "#a288f7",
+    "selectionBackground": "#493d70",
+    "black": "#2d283f",
+    "red": "#ed2261",
+    "green": "#1fa91b",
+    "yellow": "#8ddc20",
+    "blue": "#487df4",
+    "purple": "#8d35c9",
+    "cyan": "#3bdeed",
+    "white": "#9e9ea0",
+    "brightBlack": "#59516a",
+    "brightRed": "#f0729a",
+    "brightGreen": "#53aa5e",
+    "brightYellow": "#b2dc87",
+    "brightBlue": "#a9bcec",
+    "brightPurple": "#ad81c2",
+    "brightCyan": "#9de3eb",
+    "brightWhite": "#a288f7"
+  }
+}

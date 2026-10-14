@@ -1,0 +1,32 @@
+{
+  "id": "token-dark",
+  "sourceUrl": "https://term.const.net/en/themes/token-dark/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "5449a9e5d46500968f2a9cf9b33c547418affc28b8018e736bc94997b5023099",
+  "paletteSha256": "a95680ea19439ce9f10b6397991f60d3423859bf599008a139b7c919864cf937",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Token Dark.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Token Dark",
+    "background": "#262624",
+    "foreground": "#e8e4dc",
+    "cursorColor": "#e8e4dc",
+    "selectionBackground": "#3a3a37",
+    "black": "#1d1d1c",
+    "red": "#c67777",
+    "green": "#7da47a",
+    "yellow": "#c4a855",
+    "blue": "#7b9ebd",
+    "purple": "#a68bbf",
+    "cyan": "#6ba8a8",
+    "white": "#d4cfc6",
+    "brightBlack": "#5a5955",
+    "brightRed": "#d97757",
+    "brightGreen": "#98bf95",
+    "brightYellow": "#c4956a",
+    "brightBlue": "#96b8d3",
+    "brightPurple": "#bea5d4",
+    "brightCyan": "#88c0c0",
+    "brightWhite": "#e8e4dc"
+  }
+}

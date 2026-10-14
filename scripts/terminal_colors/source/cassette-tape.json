@@ -1,0 +1,32 @@
+{
+  "id": "cassette-tape",
+  "sourceUrl": "https://term.const.net/en/themes/cassette-tape/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "7630727d42b184c9611032335c742efbdb591b57aec117ce593a81cd6344de0f",
+  "paletteSha256": "c4092eb0e9698b93595c8f7f152d03d5b1ebb457e9094f35fa07cb0c203e0585",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Cassette Tape.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Cassette Tape",
+    "background": "#fff7ed",
+    "foreground": "#2b1b12",
+    "cursorColor": "#2b1b12",
+    "selectionBackground": "#2b1b12",
+    "black": "#514339",
+    "red": "#b91c1c",
+    "green": "#3f6212",
+    "yellow": "#be123c",
+    "blue": "#7c2d12",
+    "purple": "#0f766e",
+    "cyan": "#b45309",
+    "white": "#6b4f3f",
+    "brightBlack": "#c4b39a",
+    "brightRed": "#941616",
+    "brightGreen": "#324e0e",
+    "brightYellow": "#9c0f31",
+    "brightBlue": "#63240e",
+    "brightPurple": "#0c5e58",
+    "brightCyan": "#904207",
+    "brightWhite": "#2b1b12"
+  }
+}

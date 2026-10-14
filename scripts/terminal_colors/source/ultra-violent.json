@@ -1,0 +1,32 @@
+{
+  "id": "ultra-violent",
+  "sourceUrl": "https://term.const.net/en/themes/ultra-violent/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "349aa4490f518723d03c9c9008d51b0443d223714da13c87ba8c7462c2dee331",
+  "paletteSha256": "5da4221963dede6c49cde66b93bb4c348883bc7879f1a8df33be74451e6d7bc4",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Ultra Violent.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Ultra Violent",
+    "background": "#242728",
+    "foreground": "#c1c1c1",
+    "cursorColor": "#c1c1c1",
+    "selectionBackground": "#574c49",
+    "black": "#242728",
+    "red": "#ff0090",
+    "green": "#b6ff00",
+    "yellow": "#fff727",
+    "blue": "#47e0fb",
+    "purple": "#d731ff",
+    "cyan": "#0effbb",
+    "white": "#e1e1e1",
+    "brightBlack": "#636667",
+    "brightRed": "#fb58b4",
+    "brightGreen": "#deff8c",
+    "brightYellow": "#ebe087",
+    "brightBlue": "#7fecff",
+    "brightPurple": "#e681ff",
+    "brightCyan": "#69fcd3",
+    "brightWhite": "#f9f9f5"
+  }
+}

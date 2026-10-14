@@ -1,0 +1,32 @@
+{
+  "id": "cobalt2",
+  "sourceUrl": "https://term.const.net/en/themes/cobalt2/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "1e9bae72d9124f4356a33291126071f023cd196d1d64c6e6105dc179f52bb721",
+  "paletteSha256": "2fe1db0aafbae0205a49b0f7d1212a4c6a1c8fe32edfe8678e1f5580845f5072",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Cobalt2.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Cobalt2",
+    "background": "#132738",
+    "foreground": "#ffffff",
+    "cursorColor": "#f0cc09",
+    "selectionBackground": "#18354f",
+    "black": "#000000",
+    "red": "#ff0000",
+    "green": "#38de21",
+    "yellow": "#ffe50a",
+    "blue": "#1460d2",
+    "purple": "#ff005d",
+    "cyan": "#00bbbb",
+    "white": "#bbbbbb",
+    "brightBlack": "#555555",
+    "brightRed": "#f40e17",
+    "brightGreen": "#3bd01d",
+    "brightYellow": "#edc809",
+    "brightBlue": "#5555ff",
+    "brightPurple": "#ff55ff",
+    "brightCyan": "#6ae3fa",
+    "brightWhite": "#ffffff"
+  }
+}

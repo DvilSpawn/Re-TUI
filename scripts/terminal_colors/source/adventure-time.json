@@ -1,0 +1,32 @@
+{
+  "id": "adventure-time",
+  "sourceUrl": "https://term.const.net/en/themes/adventure-time/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "db752111878c87429242676c109415a410eac5fd0b25808fad308b4322d64b37",
+  "paletteSha256": "ef1f616d95d91f1f669b026ec9805b6101c8aee9749c288848c431afcfa29856",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Adventure Time.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Adventure Time",
+    "background": "#1f1d45",
+    "foreground": "#f8dcc0",
+    "cursorColor": "#efbf38",
+    "selectionBackground": "#706b4e",
+    "black": "#050404",
+    "red": "#bd0013",
+    "green": "#4ab118",
+    "yellow": "#e7741e",
+    "blue": "#0f4ac6",
+    "purple": "#665993",
+    "cyan": "#70a598",
+    "white": "#f8dcc0",
+    "brightBlack": "#4e7cbf",
+    "brightRed": "#fc5f5a",
+    "brightGreen": "#9eff6e",
+    "brightYellow": "#efc11a",
+    "brightBlue": "#1997c6",
+    "brightPurple": "#9b5953",
+    "brightCyan": "#c8faf4",
+    "brightWhite": "#f6f5fb"
+  }
+}

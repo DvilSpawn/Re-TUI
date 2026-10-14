@@ -1,0 +1,32 @@
+{
+  "id": "fun-forrest",
+  "sourceUrl": "https://term.const.net/en/themes/fun-forrest/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "43215fb9843ab2fcb46dbeee4c507f466ad6f0094c233c27e815948941c7b85b",
+  "paletteSha256": "750593fac70c0ac9ffbcd7663b0a86a8f91ecd7020078e1eb04963a6f22f41a6",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Fun Forrest.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Fun Forrest",
+    "background": "#251200",
+    "foreground": "#dec165",
+    "cursorColor": "#e5591c",
+    "selectionBackground": "#e5591c",
+    "black": "#000000",
+    "red": "#d6262b",
+    "green": "#919c00",
+    "yellow": "#be8a13",
+    "blue": "#4699a3",
+    "purple": "#8d4331",
+    "cyan": "#da8213",
+    "white": "#ddc265",
+    "brightBlack": "#7f6a55",
+    "brightRed": "#e55a1c",
+    "brightGreen": "#bfc65a",
+    "brightYellow": "#ffcb1b",
+    "brightBlue": "#7cc9cf",
+    "brightPurple": "#d26349",
+    "brightCyan": "#e6a96b",
+    "brightWhite": "#ffeaa3"
+  }
+}

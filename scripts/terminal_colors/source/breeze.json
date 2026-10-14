@@ -1,0 +1,32 @@
+{
+  "id": "breeze",
+  "sourceUrl": "https://term.const.net/en/themes/breeze/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "f1d635e2dad35c5b4033bd3cc26adf1f9bb26cf03d039633d8a944a2f472828f",
+  "paletteSha256": "10177b8800f759d376b262d531338d98bf083956286c5a30df9db19a388eb849",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Breeze.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Breeze",
+    "background": "#31363b",
+    "foreground": "#eff0f1",
+    "cursorColor": "#eff0f1",
+    "selectionBackground": "#eff0f1",
+    "black": "#31363b",
+    "red": "#ed1515",
+    "green": "#11d116",
+    "yellow": "#f67400",
+    "blue": "#1d99f3",
+    "purple": "#9b59b6",
+    "cyan": "#1abc9c",
+    "white": "#eff0f1",
+    "brightBlack": "#7f8c8d",
+    "brightRed": "#c0392b",
+    "brightGreen": "#1cdc9a",
+    "brightYellow": "#fdbc4b",
+    "brightBlue": "#3daee9",
+    "brightPurple": "#8e44ad",
+    "brightCyan": "#16a085",
+    "brightWhite": "#fcfcfc"
+  }
+}

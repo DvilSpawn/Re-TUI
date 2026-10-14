@@ -1,0 +1,32 @@
+{
+  "id": "poimandres-white",
+  "sourceUrl": "https://term.const.net/en/themes/poimandres-white/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "ef268dd5039283a09c3ee9a61d1209ed1bff8680b6884b7377af5e426970b05b",
+  "paletteSha256": "a720e8d3215aa7b2bea7d30e0a2fc3bb7940c704b53195a214639d38d18b2bad",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Poimandres White.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Poimandres White",
+    "background": "#fefeff",
+    "foreground": "#969cbd",
+    "cursorColor": "#969cbd",
+    "selectionBackground": "#969cbd",
+    "black": "#fefeff",
+    "red": "#ff2090",
+    "green": "#01dab2",
+    "yellow": "#e5ba4e",
+    "blue": "#8abacd",
+    "purple": "#eb8394",
+    "cyan": "#8abacd",
+    "white": "#000000",
+    "brightBlack": "#969cbd",
+    "brightRed": "#ff2090",
+    "brightGreen": "#01dab2",
+    "brightYellow": "#e5ba4e",
+    "brightBlue": "#0ebfff",
+    "brightPurple": "#eb8394",
+    "brightCyan": "#0ebfff",
+    "brightWhite": "#000000"
+  }
+}

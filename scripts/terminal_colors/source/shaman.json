@@ -1,0 +1,32 @@
+{
+  "id": "shaman",
+  "sourceUrl": "https://term.const.net/en/themes/shaman/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "86ca165b6e626b8154d47c42130a6de5e0c9724414f89903fa95e721e03dccca",
+  "paletteSha256": "00f6f4b61e544849acfe8db364c8d4fc27158976a3ad6ecca11d0f634578d40e",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Shaman.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Shaman",
+    "background": "#001015",
+    "foreground": "#405555",
+    "cursorColor": "#4afcd6",
+    "selectionBackground": "#415555",
+    "black": "#012026",
+    "red": "#b2302d",
+    "green": "#00a941",
+    "yellow": "#5e8baa",
+    "blue": "#449a86",
+    "purple": "#00599d",
+    "cyan": "#5d7e19",
+    "white": "#405555",
+    "brightBlack": "#384451",
+    "brightRed": "#ff4242",
+    "brightGreen": "#2aea5e",
+    "brightYellow": "#8ed4fd",
+    "brightBlue": "#61d5ba",
+    "brightPurple": "#1298ff",
+    "brightCyan": "#98d028",
+    "brightWhite": "#58fbd6"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "modus-vivendi",
+  "sourceUrl": "https://term.const.net/en/themes/modus-vivendi/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "2c254e7d8149c2fc5536ced12866955a944a4e7a00c5d84ebfabac4b510d8aa8",
+  "paletteSha256": "81cadb20031cd48880e70502b28969d0a0125bb5ad388eaf1c0ea0cbbc558449",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Modus Vivendi.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Modus Vivendi",
+    "background": "#000000",
+    "foreground": "#ffffff",
+    "cursorColor": "#ffffff",
+    "selectionBackground": "#5a5a5a",
+    "black": "#000000",
+    "red": "#ff5f59",
+    "green": "#44bc44",
+    "yellow": "#d0bc00",
+    "blue": "#2fafff",
+    "purple": "#feacd0",
+    "cyan": "#00d3d0",
+    "white": "#a6a6a6",
+    "brightBlack": "#595959",
+    "brightRed": "#ff7f9f",
+    "brightGreen": "#00c06f",
+    "brightYellow": "#fec43f",
+    "brightBlue": "#79a8ff",
+    "brightPurple": "#b6a0ff",
+    "brightCyan": "#6ae4b9",
+    "brightWhite": "#ffffff"
+  }
+}

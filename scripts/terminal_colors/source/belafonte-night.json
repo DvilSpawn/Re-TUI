@@ -1,0 +1,32 @@
+{
+  "id": "belafonte-night",
+  "sourceUrl": "https://term.const.net/en/themes/belafonte-night/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "5731d466f8639f108facc1547de4465844b8f7c53423ecd2d10b807ebbb1bbb6",
+  "paletteSha256": "b8bfc70f2e6284c5a8c0c7012c8a2a7d985ed6c5038ec665ef67beb6b7440cc9",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Belafonte Night.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Belafonte Night",
+    "background": "#20111b",
+    "foreground": "#968c83",
+    "cursorColor": "#968c83",
+    "selectionBackground": "#45373c",
+    "black": "#20111b",
+    "red": "#be100e",
+    "green": "#858162",
+    "yellow": "#eaa549",
+    "blue": "#426a79",
+    "purple": "#97522c",
+    "cyan": "#989a9c",
+    "white": "#968c83",
+    "brightBlack": "#5e5252",
+    "brightRed": "#be100e",
+    "brightGreen": "#858162",
+    "brightYellow": "#eaa549",
+    "brightBlue": "#426a79",
+    "brightPurple": "#97522c",
+    "brightCyan": "#989a9c",
+    "brightWhite": "#d5ccba"
+  }
+}

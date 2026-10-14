@@ -1,0 +1,32 @@
+{
+  "id": "pale-night-hc",
+  "sourceUrl": "https://term.const.net/en/themes/pale-night-hc/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "c763aea3f89541d1848f98953e94cdbf5d435709efb2a2a12db31187abd87542",
+  "paletteSha256": "9d40835f441cc4825ac8eb10f05139ae607b6fabf47cc1415af358535be4710e",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Pale Night Hc.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Pale Night Hc",
+    "background": "#3e4251",
+    "foreground": "#cccccc",
+    "cursorColor": "#ffcb6b",
+    "selectionBackground": "#717cb4",
+    "black": "#000000",
+    "red": "#f07178",
+    "green": "#c3e88d",
+    "yellow": "#ffcb6b",
+    "blue": "#82aaff",
+    "purple": "#c792ea",
+    "cyan": "#89ddff",
+    "white": "#ffffff",
+    "brightBlack": "#737373",
+    "brightRed": "#f6a9ae",
+    "brightGreen": "#dbf1ba",
+    "brightYellow": "#ffdfa6",
+    "brightBlue": "#b4ccff",
+    "brightPurple": "#ddbdf2",
+    "brightCyan": "#b8eaff",
+    "brightWhite": "#999999"
+  }
+}

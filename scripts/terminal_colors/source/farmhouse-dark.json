@@ -1,0 +1,32 @@
+{
+  "id": "farmhouse-dark",
+  "sourceUrl": "https://term.const.net/en/themes/farmhouse-dark/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "de6d4002f726d8c1eaa03aa14ea08dc8a0d31caa3ad919035437abc0dc9ae59d",
+  "paletteSha256": "c785ba82d75dc5a00c60d34920c5bed54bdbf88a5290995373338b7cffa71411",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Farmhouse Dark.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Farmhouse Dark",
+    "background": "#1d2027",
+    "foreground": "#e8e4e1",
+    "cursorColor": "#006efe",
+    "selectionBackground": "#4d5658",
+    "black": "#1d2027",
+    "red": "#ba0004",
+    "green": "#549d00",
+    "yellow": "#c87300",
+    "blue": "#0049e6",
+    "purple": "#9f1b61",
+    "cyan": "#1fb65c",
+    "white": "#e8e4e1",
+    "brightBlack": "#464d54",
+    "brightRed": "#eb0009",
+    "brightGreen": "#7ac100",
+    "brightYellow": "#ea9a00",
+    "brightBlue": "#006efe",
+    "brightPurple": "#bf3b7f",
+    "brightCyan": "#19e062",
+    "brightWhite": "#f4eef0"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "peppermint",
+  "sourceUrl": "https://term.const.net/en/themes/peppermint/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "dffa02018127813a023aa598079488470a4a39cd6eaa70980d93d922ab6d2fa1",
+  "paletteSha256": "2dd16126b504af3ab42c29047fe184977a2311b8ed83e6b4c910df6c77f74b98",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Peppermint.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Peppermint",
+    "background": "#000000",
+    "foreground": "#c8c8c8",
+    "cursorColor": "#bbbbbb",
+    "selectionBackground": "#e6e6e6",
+    "black": "#353535",
+    "red": "#e74669",
+    "green": "#89d287",
+    "yellow": "#dab853",
+    "blue": "#449fd0",
+    "purple": "#da62dc",
+    "cyan": "#65aaaf",
+    "white": "#b4b4b4",
+    "brightBlack": "#535353",
+    "brightRed": "#e4859b",
+    "brightGreen": "#a3cca2",
+    "brightYellow": "#e1e487",
+    "brightBlue": "#6fbce2",
+    "brightPurple": "#e586e7",
+    "brightCyan": "#96dcdb",
+    "brightWhite": "#dfdfdf"
+  }
+}

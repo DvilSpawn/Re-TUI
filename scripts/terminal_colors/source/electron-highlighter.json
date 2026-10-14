@@ -1,0 +1,32 @@
+{
+  "id": "electron-highlighter",
+  "sourceUrl": "https://term.const.net/en/themes/electron-highlighter/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "4b891e09f9eeb057e1c9b5f0917665323bfe9970daa88c19a77d10b024013fb4",
+  "paletteSha256": "0cc28c2824ba34e65403339067ec73a71fcb6dc4be6cfff3d64adf11a1343485",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Electron Highlighter.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Electron Highlighter",
+    "background": "#23283d",
+    "foreground": "#a5b6d4",
+    "cursorColor": "#a5b6d4",
+    "selectionBackground": "#293257",
+    "black": "#15161f",
+    "red": "#ff6c8d",
+    "green": "#00ffc3",
+    "yellow": "#ffebb1",
+    "blue": "#77abff",
+    "purple": "#daa4f4",
+    "cyan": "#00e5ff",
+    "white": "#7187b7",
+    "brightBlack": "#4b5b8c",
+    "brightRed": "#ff6c8d",
+    "brightGreen": "#00ffc3",
+    "brightYellow": "#ffebb1",
+    "brightBlue": "#77abff",
+    "brightPurple": "#daa4f4",
+    "brightCyan": "#00e5ff",
+    "brightWhite": "#c3cde2"
+  }
+}

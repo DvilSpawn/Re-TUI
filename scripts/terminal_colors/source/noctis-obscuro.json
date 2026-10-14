@@ -1,0 +1,32 @@
+{
+  "id": "noctis-obscuro",
+  "sourceUrl": "https://term.const.net/en/themes/noctis-obscuro/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "ed7d4810e7df7aade83550783aaebc7d040542c05ec7450e060006febec41791",
+  "paletteSha256": "6f1a54a0785db498fc953b6c04bf2f8cfc3368aad90dc4096187d78bd139cd59",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Noctis Obscuro.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Noctis Obscuro",
+    "background": "#031417",
+    "foreground": "#b2cacd",
+    "cursorColor": "#b2cacd",
+    "selectionBackground": "#0d2a2f",
+    "black": "#324a4d",
+    "red": "#e66533",
+    "green": "#49e9a6",
+    "yellow": "#e4b781",
+    "blue": "#49ace9",
+    "purple": "#df769b",
+    "cyan": "#49d6e9",
+    "white": "#b2cacd",
+    "brightBlack": "#47686c",
+    "brightRed": "#e97749",
+    "brightGreen": "#60ebb1",
+    "brightYellow": "#e69533",
+    "brightBlue": "#60b6eb",
+    "brightPurple": "#e798b3",
+    "brightCyan": "#60dbeb",
+    "brightWhite": "#c1d4d7"
+  }
+}

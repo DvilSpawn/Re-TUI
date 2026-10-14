@@ -1,0 +1,32 @@
+{
+  "id": "synthwave-everything",
+  "sourceUrl": "https://term.const.net/en/themes/synthwave-everything/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "502b4b10e050c28737077cf056801cf0db4898e9833c48ce1fa6976d3a2bb6a5",
+  "paletteSha256": "f540d451b828def1d1d7267728998fdeb9bcfd7d0f96123a8cd7f80808247169",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Synthwave Everything.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Synthwave Everything",
+    "background": "#2a2139",
+    "foreground": "#f0eff1",
+    "cursorColor": "#72f1b8",
+    "selectionBackground": "#181521",
+    "black": "#fefefe",
+    "red": "#f97e72",
+    "green": "#72f1b8",
+    "yellow": "#fede5d",
+    "blue": "#6d77b3",
+    "purple": "#c792ea",
+    "cyan": "#f772e0",
+    "white": "#fefefe",
+    "brightBlack": "#fefefe",
+    "brightRed": "#f88414",
+    "brightGreen": "#72f1b8",
+    "brightYellow": "#fff951",
+    "brightBlue": "#36f9f6",
+    "brightPurple": "#e1acff",
+    "brightCyan": "#f92aad",
+    "brightWhite": "#fefefe"
+  }
+}

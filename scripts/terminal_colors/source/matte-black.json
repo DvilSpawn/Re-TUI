@@ -1,0 +1,32 @@
+{
+  "id": "matte-black",
+  "sourceUrl": "https://term.const.net/en/themes/matte-black/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "59920584c919b11c01b9f4581907ceae51b54ad55e3277d24c608212aa16026d",
+  "paletteSha256": "45204c3db5ce486de8b5293c018ae2268253e8e307cc5d5a0a81c73ea5967fa9",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Matte Black.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Matte Black",
+    "background": "#121212",
+    "foreground": "#bebebe",
+    "cursorColor": "#eaeaea",
+    "selectionBackground": "#333333",
+    "black": "#333333",
+    "red": "#d35f5f",
+    "green": "#ffc107",
+    "yellow": "#b91c1c",
+    "blue": "#e68e0d",
+    "purple": "#d35f5f",
+    "cyan": "#bebebe",
+    "white": "#bebebe",
+    "brightBlack": "#8a8a8d",
+    "brightRed": "#891c1c",
+    "brightGreen": "#ffc107",
+    "brightYellow": "#b90a0a",
+    "brightBlue": "#f59e0b",
+    "brightPurple": "#b91c1c",
+    "brightCyan": "#eaeaea",
+    "brightWhite": "#ffffff"
+  }
+}

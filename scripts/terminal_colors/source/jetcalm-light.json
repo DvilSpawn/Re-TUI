@@ -1,0 +1,32 @@
+{
+  "id": "jetcalm-light",
+  "sourceUrl": "https://term.const.net/en/themes/jetcalm-light/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "33ab63a2cb37e94f7e393d68eb43b8b1270df82c52d8f27d4b4558c00d2c8bb7",
+  "paletteSha256": "febcb94cad06c004f30765cd0bae98cccb08068b776dfd1c7a6f89ec0e188504",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/JetCalm Light.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "JetCalm Light",
+    "background": "#ededed",
+    "foreground": "#1c2410",
+    "cursorColor": "#082108",
+    "selectionBackground": "#3c444d",
+    "black": "#383a42",
+    "red": "#a52a2a",
+    "green": "#556b2f",
+    "yellow": "#5c3e00",
+    "blue": "#4682b4",
+    "purple": "#a626a4",
+    "cyan": "#0997b3",
+    "white": "#6b8e23",
+    "brightBlack": "#4f525d",
+    "brightRed": "#df6c75",
+    "brightGreen": "#2e8b57",
+    "brightYellow": "#808000",
+    "brightBlue": "#008080",
+    "brightPurple": "#c577dd",
+    "brightCyan": "#008080",
+    "brightWhite": "#7b8d9e"
+  }
+}

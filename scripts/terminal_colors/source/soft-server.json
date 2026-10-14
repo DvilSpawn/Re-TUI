@@ -1,0 +1,32 @@
+{
+  "id": "soft-server",
+  "sourceUrl": "https://term.const.net/en/themes/soft-server/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "11e96dbbcb369ab3e4c8b0e493e37371b4543dbdacd7b09aced34119d2bc378b",
+  "paletteSha256": "15979b8cc72c42e776a970d4450bf56f564850c08e612ba383537b5df57e75ba",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Soft Server.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Soft Server",
+    "background": "#242626",
+    "foreground": "#99a3a2",
+    "cursorColor": "#d2e0de",
+    "selectionBackground": "#7f8786",
+    "black": "#000000",
+    "red": "#a2686a",
+    "green": "#9aa56a",
+    "yellow": "#a3906a",
+    "blue": "#6b8fa3",
+    "purple": "#6a71a3",
+    "cyan": "#6ba58f",
+    "white": "#99a3a2",
+    "brightBlack": "#666c6c",
+    "brightRed": "#dd5c60",
+    "brightGreen": "#bfdf55",
+    "brightYellow": "#deb360",
+    "brightBlue": "#62b1df",
+    "brightPurple": "#606edf",
+    "brightCyan": "#64e39c",
+    "brightWhite": "#d2e0de"
+  }
+}

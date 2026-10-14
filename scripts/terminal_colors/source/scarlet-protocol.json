@@ -1,0 +1,32 @@
+{
+  "id": "scarlet-protocol",
+  "sourceUrl": "https://term.const.net/en/themes/scarlet-protocol/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "985f12884c6deba5c8d1b8f401b68442625cdc8b6c0e5713f7828d22814e5e2e",
+  "paletteSha256": "0e80515677f763f472438a7d64bec9e91215068ac1015a5baf81292a1d022c23",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Scarlet Protocol.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Scarlet Protocol",
+    "background": "#1c153d",
+    "foreground": "#e41951",
+    "cursorColor": "#76ff9f",
+    "selectionBackground": "#c1deff",
+    "black": "#101116",
+    "red": "#ff0051",
+    "green": "#00dc84",
+    "yellow": "#faf945",
+    "blue": "#0271b6",
+    "purple": "#ca30c7",
+    "cyan": "#00c5c7",
+    "white": "#c7c7c7",
+    "brightBlack": "#686868",
+    "brightRed": "#ff6e67",
+    "brightGreen": "#5ffa68",
+    "brightYellow": "#fffc67",
+    "brightBlue": "#6871ff",
+    "brightPurple": "#bd35ec",
+    "brightCyan": "#60fdff",
+    "brightWhite": "#ffffff"
+  }
+}

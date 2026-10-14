@@ -1,0 +1,32 @@
+{
+  "id": "monokai-remastered",
+  "sourceUrl": "https://term.const.net/en/themes/monokai-remastered/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "8082e099e30e8969a6d932c76201ee442ee2b6fb86446ccd5a25af92717ede67",
+  "paletteSha256": "1ef4c68f998159f0697ce891ef2bbbd4ef06a0a1a573283f77657d8f4aaf83fe",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Monokai Remastered.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Monokai Remastered",
+    "background": "#0c0c0c",
+    "foreground": "#d9d9d9",
+    "cursorColor": "#fc971f",
+    "selectionBackground": "#343434",
+    "black": "#1a1a1a",
+    "red": "#f4005f",
+    "green": "#98e024",
+    "yellow": "#fd971f",
+    "blue": "#9d65ff",
+    "purple": "#f4005f",
+    "cyan": "#58d1eb",
+    "white": "#c4c5b5",
+    "brightBlack": "#625e4c",
+    "brightRed": "#f4005f",
+    "brightGreen": "#98e024",
+    "brightYellow": "#e0d561",
+    "brightBlue": "#9d65ff",
+    "brightPurple": "#f4005f",
+    "brightCyan": "#58d1eb",
+    "brightWhite": "#f6f6ef"
+  }
+}

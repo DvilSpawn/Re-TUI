@@ -1,0 +1,32 @@
+{
+  "id": "monokai-pro-light-sun",
+  "sourceUrl": "https://term.const.net/en/themes/monokai-pro-light-sun/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "cd34ef7a5f7bf80d59e4aa0f6034789f79a603b5ad3e60d79a54cc5d733d7f3c",
+  "paletteSha256": "3c087edefe7a8598bdfd2310c1d95f2cca5e370b4c3f763e14ec2de243abbd6d",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Monokai Pro Light Sun.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Monokai Pro Light Sun",
+    "background": "#f8efe7",
+    "foreground": "#2c232e",
+    "cursorColor": "#72696d",
+    "selectionBackground": "#beb5b3",
+    "black": "#f8efe7",
+    "red": "#ce4770",
+    "green": "#218871",
+    "yellow": "#b16803",
+    "blue": "#d4572b",
+    "purple": "#6851a2",
+    "cyan": "#2473b6",
+    "white": "#2c232e",
+    "brightBlack": "#a59c9c",
+    "brightRed": "#ce4770",
+    "brightGreen": "#218871",
+    "brightYellow": "#b16803",
+    "brightBlue": "#d4572b",
+    "brightPurple": "#6851a2",
+    "brightCyan": "#2473b6",
+    "brightWhite": "#2c232e"
+  }
+}

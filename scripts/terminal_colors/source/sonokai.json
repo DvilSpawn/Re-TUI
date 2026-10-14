@@ -1,0 +1,32 @@
+{
+  "id": "sonokai",
+  "sourceUrl": "https://term.const.net/en/themes/sonokai/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "a7711e98e9b9375fdeaf9f28f01cd0fa9a0fbcf594e72db951c0c4abcaba1a45",
+  "paletteSha256": "def28b0d296391e80db205cfb5dc4c6db3d60f8d6b262b2488760f39c6b35728",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Sonokai.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Sonokai",
+    "background": "#2c2e34",
+    "foreground": "#e2e2e3",
+    "cursorColor": "#e2e2e3",
+    "selectionBackground": "#414550",
+    "black": "#181819",
+    "red": "#fc5d7c",
+    "green": "#9ed072",
+    "yellow": "#e7c664",
+    "blue": "#76cce0",
+    "purple": "#b39df3",
+    "cyan": "#f39660",
+    "white": "#e2e2e3",
+    "brightBlack": "#7f8490",
+    "brightRed": "#fc5d7c",
+    "brightGreen": "#9ed072",
+    "brightYellow": "#e7c664",
+    "brightBlue": "#76cce0",
+    "brightPurple": "#b39df3",
+    "brightCyan": "#f39660",
+    "brightWhite": "#e2e2e3"
+  }
+}

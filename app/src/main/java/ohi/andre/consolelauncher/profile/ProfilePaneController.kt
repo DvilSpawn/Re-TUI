@@ -146,7 +146,7 @@ class ProfilePaneController(
         photo.clearColorFilter()
         pager.background = TuixtTheme.rect(
             context,
-            ThemeColorResolver.withMaxAlpha(TuixtTheme.surfaceColor(), 225),
+            TuixtTheme.surfaceColor(),
             TuixtTheme.borderColor(),
             1.25f
         )

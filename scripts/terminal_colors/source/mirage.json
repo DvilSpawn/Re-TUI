@@ -1,0 +1,32 @@
+{
+  "id": "mirage",
+  "sourceUrl": "https://term.const.net/en/themes/mirage/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "15cb04016c787148f1b8e56bf42cdefa9577c1adbb793154170c3f9cadbd5f4d",
+  "paletteSha256": "dec80a942de2994c8756e54eda2f48788e317d8b5b13bed2f173e4a7c7a774e8",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Mirage.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Mirage",
+    "background": "#1b2738",
+    "foreground": "#a6b2c0",
+    "cursorColor": "#ddb3ff",
+    "selectionBackground": "#273951",
+    "black": "#011627",
+    "red": "#ff9999",
+    "green": "#85cc95",
+    "yellow": "#ffd700",
+    "blue": "#7fb5ff",
+    "purple": "#ddb3ff",
+    "cyan": "#21c7a8",
+    "white": "#ffffff",
+    "brightBlack": "#575656",
+    "brightRed": "#ff9999",
+    "brightGreen": "#85cc95",
+    "brightYellow": "#ffd700",
+    "brightBlue": "#7fb5ff",
+    "brightPurple": "#ddb3ff",
+    "brightCyan": "#85cc95",
+    "brightWhite": "#ffffff"
+  }
+}

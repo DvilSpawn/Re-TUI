@@ -1,0 +1,32 @@
+{
+  "id": "symfonic",
+  "sourceUrl": "https://term.const.net/en/themes/symfonic/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "38642cbdddb23ac90fc4d77f60095313c66b6ac8fc484371784e858927ec6c14",
+  "paletteSha256": "6f1fff3e08b639e812a4a9dd91f697c2f29b4b5c4f42a05d54cb966e842d70c5",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Symfonic.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Symfonic",
+    "background": "#000000",
+    "foreground": "#ffffff",
+    "cursorColor": "#dc322f",
+    "selectionBackground": "#073642",
+    "black": "#000000",
+    "red": "#dc322f",
+    "green": "#56db3a",
+    "yellow": "#ff8400",
+    "blue": "#0084d4",
+    "purple": "#b729d9",
+    "cyan": "#ccccff",
+    "white": "#ffffff",
+    "brightBlack": "#414347",
+    "brightRed": "#dc322f",
+    "brightGreen": "#56db3a",
+    "brightYellow": "#ff8400",
+    "brightBlue": "#0084d4",
+    "brightPurple": "#b729d9",
+    "brightCyan": "#ccccff",
+    "brightWhite": "#ffffff"
+  }
+}

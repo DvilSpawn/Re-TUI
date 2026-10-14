@@ -1,0 +1,32 @@
+{
+  "id": "nightfox",
+  "sourceUrl": "https://term.const.net/en/themes/nightfox/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "d5281e448916c669706ea673b605c01c3262d9f85691e874a71df563ead89e94",
+  "paletteSha256": "25996be4f65d21a97925be70a0a1e813cd2b6a147382ccb5d41d93ebf3367ca8",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Nightfox.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Nightfox",
+    "background": "#192330",
+    "foreground": "#cdcecf",
+    "cursorColor": "#cdcecf",
+    "selectionBackground": "#2b3b51",
+    "black": "#393b44",
+    "red": "#c94f6d",
+    "green": "#81b29a",
+    "yellow": "#dbc074",
+    "blue": "#719cd6",
+    "purple": "#9d79d6",
+    "cyan": "#63cdcf",
+    "white": "#dfdfe0",
+    "brightBlack": "#575860",
+    "brightRed": "#d16983",
+    "brightGreen": "#8ebaa4",
+    "brightYellow": "#e0c989",
+    "brightBlue": "#86abdc",
+    "brightPurple": "#baa1e2",
+    "brightCyan": "#7ad5d6",
+    "brightWhite": "#e4e4e5"
+  }
+}

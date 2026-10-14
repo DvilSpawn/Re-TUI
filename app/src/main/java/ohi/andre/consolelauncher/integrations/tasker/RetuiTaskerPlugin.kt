@@ -138,7 +138,18 @@ class RetuiTaskerConfigActivity : ohi.andre.consolelauncher.localization.Localiz
         super.onCreate(savedInstanceState)
         Tuils.init(this)
         title = getString(R.string.editor_retuitaskerplugin_retui_action_746d5)
-        setContentView(buildContent())
+        val content = buildContent()
+        ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleScreen(this, content)
+        fun style(view: View) {
+            when (view) {
+                is EditText -> ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleInput(this, view)
+                is Button -> ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleButton(this, view, true)
+                is TextView -> view.setTextColor(ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.textColor())
+            }
+            if (view is android.view.ViewGroup) for (index in 0 until view.childCount) style(view.getChildAt(index))
+        }
+        style(content)
+        setContentView(content)
         helper.onCreate()
     }
 
@@ -149,14 +160,13 @@ class RetuiTaskerConfigActivity : ohi.andre.consolelauncher.localization.Localiz
         }
         root.addView(TextView(this).apply { text = getString(R.string.editor_retuitaskerplugin_choose_what_tasker_should_change_in_retui_58b55); textSize = 16f })
         actionSpinner = Spinner(this)
-        actionSpinner.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item,
-            RetuiTaskerHelper.ACTIONS.map { getString(RetuiTaskerHelper.actionLabel(it)) })
+        actionSpinner.adapter = themedOptions(RetuiTaskerHelper.ACTIONS.map { getString(RetuiTaskerHelper.actionLabel(it)) })
         root.addView(actionSpinner)
         presetOptions = PresetManager.listAllPresetNames() + getString(R.string.tasker_custom_variable)
         presetContainer = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
         presetContainer.addView(TextView(this).apply { text = getString(R.string.editor_retuitaskerplugin_preset_name_eb39e); textSize = 13f })
         presetSpinner = Spinner(this).apply {
-            adapter = ArrayAdapter(this@RetuiTaskerConfigActivity, android.R.layout.simple_spinner_dropdown_item, presetOptions)
+            adapter = themedOptions(presetOptions)
             onItemSelectedListener = SimpleItemSelectedListener { updateCustomPresetVisibility() }
         }
         presetContainer.addView(presetSpinner)
@@ -170,7 +180,7 @@ class RetuiTaskerConfigActivity : ohi.andre.consolelauncher.localization.Localiz
         spaceContainer = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
         spaceContainer.addView(TextView(this).apply { text = getString(R.string.editor_retuitaskerplugin_space_6d8c9); textSize = 13f })
         spaceSpinner = Spinner(this).apply {
-            adapter = ArrayAdapter(this@RetuiTaskerConfigActivity, android.R.layout.simple_spinner_dropdown_item, spaceOptions)
+            adapter = themedOptions(spaceOptions)
             onItemSelectedListener = SimpleItemSelectedListener { updateCustomSpaceVisibility() }
         }
         spaceContainer.addView(spaceSpinner)
@@ -192,6 +202,14 @@ class RetuiTaskerConfigActivity : ohi.andre.consolelauncher.localization.Localiz
         })
         updateVisibleFields()
         return root
+    }
+
+    private fun themedOptions(options: List<String>) = object : ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, options) {
+        private fun themed(view: View): View = view.also {
+            if (it is TextView) ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleListItem(this@RetuiTaskerConfigActivity, it, false)
+        }
+        override fun getView(position: Int, convertView: View?, parent: android.view.ViewGroup): View = themed(super.getView(position, convertView, parent))
+        override fun getDropDownView(position: Int, convertView: View?, parent: android.view.ViewGroup): View = themed(super.getDropDownView(position, convertView, parent))
     }
 
     private fun field(root: LinearLayout, hintText: String): EditText = EditText(this).also {

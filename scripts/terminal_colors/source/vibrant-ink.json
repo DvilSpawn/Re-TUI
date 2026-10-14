@@ -1,0 +1,32 @@
+{
+  "id": "vibrant-ink",
+  "sourceUrl": "https://term.const.net/en/themes/vibrant-ink/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "6b15064d378eec017768d74de2c8ca75447be1a06c4f864c6152379c25a7ba00",
+  "paletteSha256": "2740ab8854f70fca0a7f79f2edf5392b59ffbf216701a3523e4737320ce75851",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Vibrant Ink.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Vibrant Ink",
+    "background": "#000000",
+    "foreground": "#ffffff",
+    "cursorColor": "#ffffff",
+    "selectionBackground": "#b5d5ff",
+    "black": "#878787",
+    "red": "#ff6600",
+    "green": "#ccff04",
+    "yellow": "#ffcc00",
+    "blue": "#44b4cc",
+    "purple": "#9933cc",
+    "cyan": "#44b4cc",
+    "white": "#f5f5f5",
+    "brightBlack": "#555555",
+    "brightRed": "#ff0000",
+    "brightGreen": "#00ff00",
+    "brightYellow": "#ffff00",
+    "brightBlue": "#0000ff",
+    "brightPurple": "#ff00ff",
+    "brightCyan": "#00ffff",
+    "brightWhite": "#e5e5e5"
+  }
+}

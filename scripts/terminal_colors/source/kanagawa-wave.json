@@ -1,0 +1,32 @@
+{
+  "id": "kanagawa-wave",
+  "sourceUrl": "https://term.const.net/en/themes/kanagawa-wave/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "cae169ce8ae749db767288f496729eedf14737b70104ffd4e604e877941306db",
+  "paletteSha256": "be180e789104dc17af3ec38bdcc2db3f62d7c11cefa1be53bac65a4053ecdfb6",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Kanagawa Wave.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Kanagawa Wave",
+    "background": "#1f1f28",
+    "foreground": "#dcd7ba",
+    "cursorColor": "#dcd7ba",
+    "selectionBackground": "#dcd7ba",
+    "black": "#090618",
+    "red": "#c34043",
+    "green": "#76946a",
+    "yellow": "#c0a36e",
+    "blue": "#7e9cd8",
+    "purple": "#957fb8",
+    "cyan": "#6a9589",
+    "white": "#c8c093",
+    "brightBlack": "#727169",
+    "brightRed": "#e82424",
+    "brightGreen": "#98bb6c",
+    "brightYellow": "#e6c384",
+    "brightBlue": "#7fb4ca",
+    "brightPurple": "#938aa9",
+    "brightCyan": "#7aa89f",
+    "brightWhite": "#dcd7ba"
+  }
+}

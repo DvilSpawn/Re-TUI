@@ -1,0 +1,32 @@
+{
+  "id": "silkcircuit-dawn",
+  "sourceUrl": "https://term.const.net/en/themes/silkcircuit-dawn/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "5ccb74d6f52f98f88c6155d43fd526ff6754cdf07e4ea5be1227552aec5320a9",
+  "paletteSha256": "cb443a4fdf8dc865d3111d14acbb8a873c6b32a1e380a265b29ef118229db519",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/SilkCircuit Dawn.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "SilkCircuit Dawn",
+    "background": "#faf8ff",
+    "foreground": "#2b2540",
+    "cursorColor": "#006e72",
+    "selectionBackground": "#d4c8f0",
+    "black": "#2b2540",
+    "red": "#c1272d",
+    "green": "#1d6e46",
+    "yellow": "#796100",
+    "blue": "#1454dc",
+    "purple": "#b40077",
+    "cyan": "#006e72",
+    "white": "#bab8bf",
+    "brightBlack": "#5a4d6e",
+    "brightRed": "#dc2626",
+    "brightGreen": "#288855",
+    "brightYellow": "#7f5f00",
+    "brightBlue": "#2572ef",
+    "brightPurple": "#d92a99",
+    "brightCyan": "#048397",
+    "brightWhite": "#ffffff"
+  }
+}

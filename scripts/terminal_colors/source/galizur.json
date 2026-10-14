@@ -1,0 +1,32 @@
+{
+  "id": "galizur",
+  "sourceUrl": "https://term.const.net/en/themes/galizur/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "cec63358efbfdb05fcfed104b25b3d379c21b5abc112412f93dafa611006fa94",
+  "paletteSha256": "fe4f46bce97dc8865276a24a82a84e6143674fb81581dfffebc578af1e4af073",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Galizur.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Galizur",
+    "background": "#071317",
+    "foreground": "#ddeeff",
+    "cursorColor": "#ddeeff",
+    "selectionBackground": "#071317",
+    "black": "#223344",
+    "red": "#aa1122",
+    "green": "#33aa11",
+    "yellow": "#ccaa22",
+    "blue": "#2255cc",
+    "purple": "#7755aa",
+    "cyan": "#22bbdd",
+    "white": "#8899aa",
+    "brightBlack": "#556677",
+    "brightRed": "#ff1133",
+    "brightGreen": "#33ff11",
+    "brightYellow": "#ffdd33",
+    "brightBlue": "#3377ff",
+    "brightPurple": "#aa77ff",
+    "brightCyan": "#33ddff",
+    "brightWhite": "#bbccdd"
+  }
+}

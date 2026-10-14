@@ -1,0 +1,32 @@
+{
+  "id": "toy-chest",
+  "sourceUrl": "https://term.const.net/en/themes/toy-chest/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "9ba8d765c4189d6bbbe6545405d67c986d7a74d1f83efa4adce10807687f34b5",
+  "paletteSha256": "5ce2b89a33357f1682b4d758ec3958e9d85a920231f33ab074b2f8959d792a4d",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Toy Chest.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Toy Chest",
+    "background": "#24364b",
+    "foreground": "#31d07b",
+    "cursorColor": "#d5d5d5",
+    "selectionBackground": "#5f217a",
+    "black": "#2c3f58",
+    "red": "#be2d26",
+    "green": "#1a9172",
+    "yellow": "#db8e27",
+    "blue": "#325d96",
+    "purple": "#8a5edc",
+    "cyan": "#35a08f",
+    "white": "#23d183",
+    "brightBlack": "#336889",
+    "brightRed": "#dd5944",
+    "brightGreen": "#31d07b",
+    "brightYellow": "#e7d84b",
+    "brightBlue": "#34a6da",
+    "brightPurple": "#ae6bdc",
+    "brightCyan": "#42c3ae",
+    "brightWhite": "#d5d5d5"
+  }
+}

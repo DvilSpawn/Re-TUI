@@ -1,0 +1,32 @@
+{
+  "id": "batman",
+  "sourceUrl": "https://term.const.net/en/themes/batman/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "35b3caac0ff0478e856b9abcb9a7318e0caa817af9b8bf43130e38d421dcf41a",
+  "paletteSha256": "feb1963ba70f32d0fd502918b1ba17eb4ef04937eefea0ec25ea723d41c9594f",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Batman.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Batman",
+    "background": "#1b1d1e",
+    "foreground": "#6f6f6f",
+    "cursorColor": "#fcef0c",
+    "selectionBackground": "#4d504c",
+    "black": "#1b1d1e",
+    "red": "#e6dc44",
+    "green": "#c8be46",
+    "yellow": "#f4fd22",
+    "blue": "#737174",
+    "purple": "#747271",
+    "cyan": "#62605f",
+    "white": "#c6c5bf",
+    "brightBlack": "#505354",
+    "brightRed": "#fff78e",
+    "brightGreen": "#fff27d",
+    "brightYellow": "#feed6c",
+    "brightBlue": "#919495",
+    "brightPurple": "#9a9a9d",
+    "brightCyan": "#a3a3a6",
+    "brightWhite": "#dadbd6"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "konsolas",
+  "sourceUrl": "https://term.const.net/en/themes/konsolas/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "642f61a2e4aef8dbe29de5230a56430b0318b06cc52134da33010c2759cbb6cd",
+  "paletteSha256": "1209b82c2e05b7eaf640349e813348f5b71e80f0a47f6dfda2d6087a9d834805",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Konsolas.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Konsolas",
+    "background": "#060606",
+    "foreground": "#c8c1c1",
+    "cursorColor": "#c8c1c1",
+    "selectionBackground": "#060606",
+    "black": "#000000",
+    "red": "#aa1717",
+    "green": "#18b218",
+    "yellow": "#ebae1f",
+    "blue": "#2323a5",
+    "purple": "#ad1edc",
+    "cyan": "#42b0c8",
+    "white": "#c8c1c1",
+    "brightBlack": "#7b716e",
+    "brightRed": "#ff4141",
+    "brightGreen": "#5fff5f",
+    "brightYellow": "#ffff55",
+    "brightBlue": "#4b4bff",
+    "brightPurple": "#ff54ff",
+    "brightCyan": "#69ffff",
+    "brightWhite": "#ffffff"
+  }
+}

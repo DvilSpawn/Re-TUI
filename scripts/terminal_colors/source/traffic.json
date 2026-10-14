@@ -1,0 +1,32 @@
+{
+  "id": "traffic",
+  "sourceUrl": "https://term.const.net/en/themes/traffic/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "163bc6bfd4e0d2963b82fc62796b6b533aabbdd19e2b30a05f856802e53d37a2",
+  "paletteSha256": "9daa7026e5fa17faf8c14624cc717896134740cd39f3a994b7897fc911c99bf7",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/traffic.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "traffic",
+    "background": "#272c30",
+    "foreground": "#cfb9a8",
+    "cursorColor": "#cfb9a8",
+    "selectionBackground": "#cfb9a8",
+    "black": "#282d31",
+    "red": "#934e46",
+    "green": "#637268",
+    "yellow": "#c79e84",
+    "blue": "#515e67",
+    "purple": "#715f5e",
+    "cyan": "#5c6f7d",
+    "white": "#cfb9a8",
+    "brightBlack": "#4e575e",
+    "brightRed": "#934e46",
+    "brightGreen": "#637270",
+    "brightYellow": "#c79e84",
+    "brightBlue": "#515e67",
+    "brightPurple": "#715f5e",
+    "brightCyan": "#5c6f7d",
+    "brightWhite": "#ddcec2"
+  }
+}

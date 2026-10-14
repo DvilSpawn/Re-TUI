@@ -1,0 +1,32 @@
+{
+  "id": "terminal-basic",
+  "sourceUrl": "https://term.const.net/en/themes/terminal-basic/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "49c93c0a45755b213414df74acac3cb575357bdae1592c14c0cb82fe2c39ec52",
+  "paletteSha256": "9fc5ff699f97f80ad5d3436fda805d56042547f6e399b39a9fb362ef92fb5a33",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Terminal Basic.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Terminal Basic",
+    "background": "#ffffff",
+    "foreground": "#000000",
+    "cursorColor": "#7f7f7f",
+    "selectionBackground": "#a4c9ff",
+    "black": "#000000",
+    "red": "#990000",
+    "green": "#00a600",
+    "yellow": "#999900",
+    "blue": "#0000b2",
+    "purple": "#b200b2",
+    "cyan": "#00a6b2",
+    "white": "#bfbfbf",
+    "brightBlack": "#666666",
+    "brightRed": "#e50000",
+    "brightGreen": "#00d900",
+    "brightYellow": "#bfbf00",
+    "brightBlue": "#0000ff",
+    "brightPurple": "#e500e5",
+    "brightCyan": "#00d8d8",
+    "brightWhite": "#e5e5e5"
+  }
+}

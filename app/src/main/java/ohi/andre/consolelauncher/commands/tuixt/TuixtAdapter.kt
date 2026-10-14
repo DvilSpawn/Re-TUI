@@ -16,7 +16,6 @@ import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import ohi.andre.consolelauncher.R
-import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.accentColor
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.dp
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.rect
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleButton
@@ -24,7 +23,8 @@ import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleChoice
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleColorPreview
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleInput
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleToggle
-import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.textColor
+import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.rowTextColor
+import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.rowAccentColor
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings.get
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings.set
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave
@@ -59,10 +59,10 @@ internal class SectionAccordionState(initial: String? = null) {
 class TuixtAdapter(
     rows: MutableList<SettingsRow>,
     private val file: File?,
-    private val onButtonThemePreviewChanged: () -> Unit = {},
     private val onOpenSearchProviders: () -> Unit = {},
     private val accordionSections: Boolean = false,
-    initialSection: String? = null
+    initialSection: String? = null,
+    private val onDraftChanged: () -> Unit = {}
 ) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private var rows: MutableList<SettingsRow>
@@ -73,8 +73,8 @@ class TuixtAdapter(
         LinkedHashMap<XMLPrefsSave?, String?>()
     private var expandedColorItem: XMLPrefsSave? = null
 
-    private fun rowColor(): Int = ThemeColorResolver.color(Theme.settings_row_background_color)
-    private fun rowBorderColor(): Int = ThemeColorResolver.color(Theme.settings_row_border_color)
+    private fun rowColor(): Int = SettingsColorSafety.color(Theme.settings_row_background_color, ThemeColorResolver::color)
+    private fun rowBorderColor(): Int = SettingsColorSafety.color(Theme.settings_row_border_color, ThemeColorResolver::color)
 
     init {
         this.rows = ArrayList<SettingsRow>(rows)
@@ -91,7 +91,7 @@ class TuixtAdapter(
     @JvmOverloads
     fun saveAll(context: Context? = null, recyclerView: RecyclerView? = null) {
         recyclerView?.let { captureVisibleInputs(it) }
-        if (rows.any { StatusRowResolver.isStatusIndex(it.item) }) {
+        if (pendingChanges.keys.any { StatusRowResolver.isStatusIndex(it) }) {
             val rawRows = StatusRowResolver.settings.associateWith { get(it) }
             val edits = pendingChanges.entries.filter { StatusRowResolver.isStatusIndex(it.key) }
                 .associate { (item, value) -> (item as Ui) to value }
@@ -105,6 +105,7 @@ class TuixtAdapter(
             set(context, item, value)
         }
         pendingChanges.clear()
+        onDraftChanged()
     }
 
     private fun captureVisibleInputs(recyclerView: RecyclerView) {
@@ -128,11 +129,33 @@ class TuixtAdapter(
     fun resetAdvancedThemeColors() {
         Theme.entries.filter { it.advanced }.forEach { role ->
             pendingChanges[role] = "auto"
-            ThemeColorResolver.preview(role, "auto")
         }
         expandedColorItem = null
         notifyDataSetChanged()
-        onButtonThemePreviewChanged()
+        onDraftChanged()
+    }
+
+    fun draftValue(item: XMLPrefsSave): String? = getCurrentValue(item)
+
+    fun hasDraft(item: XMLPrefsSave): Boolean = pendingChanges.containsKey(item)
+
+    private fun changeDraft(item: XMLPrefsSave, value: String) {
+        pendingChanges[item] = value
+        onDraftChanged()
+    }
+
+    fun saveDraftState(): android.os.Bundle = android.os.Bundle().apply {
+        pendingChanges.forEach { (item, value) -> if (item != null) putString("${item.parent()?.path()}:${item.label()}", value) }
+    }
+
+    fun restoreDraftState(state: android.os.Bundle?) {
+        if (state == null) return
+        ohi.andre.consolelauncher.managers.xml.XMLPrefsManager.XMLPrefsRoot.entries.flatMap { it.enums.toList() }.forEach { item ->
+            val key = "${item.parent()?.path()}:${item.label()}"
+            if (state.containsKey(key)) pendingChanges[item] = state.getString(key)
+        }
+        notifyDataSetChanged()
+        onDraftChanged()
     }
 
     override fun getItemViewType(position: Int): Int =
@@ -144,7 +167,7 @@ class TuixtAdapter(
             title.setGravity(Gravity.CENTER_VERTICAL)
             title.setPadding(dp(parent.context, 14f), dp(parent.context, 10f), dp(parent.context, 14f), dp(parent.context, 10f))
             title.setTypeface(Tuils.getTypeface(parent.context), Typeface.BOLD)
-            title.setTextColor(accentColor())
+            title.setTextColor(rowAccentColor())
             title.setBackground(rect(parent.context, rowColor(), rowBorderColor(), 1.25f))
             return SectionHolder(title)
         }
@@ -185,8 +208,8 @@ class TuixtAdapter(
                 1.25f
             )
         )
-        settingHolder.title.setTextColor(accentColor())
-        settingHolder.description.setTextColor(textColor())
+        settingHolder.title.setTextColor(rowAccentColor())
+        settingHolder.description.setTextColor(rowTextColor())
         styleInput(settingHolder.itemView.getContext(), settingHolder.input)
 
         if (item === Cmd.default_search) {
@@ -201,7 +224,7 @@ class TuixtAdapter(
             settingHolder.textWatcher = object : TextWatcher {
                 override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-                override fun afterTextChanged(s: Editable) { pendingChanges[item] = s.toString() }
+                override fun afterTextChanged(s: Editable) { changeDraft(item, s.toString()) }
             }
             settingHolder.input.addTextChangedListener(settingHolder.textWatcher)
         } else if (item === Behavior.output_tray_mode) {
@@ -230,7 +253,7 @@ class TuixtAdapter(
             styleToggle(settingHolder.itemView.getContext(), settingHolder.toggle, checked)
             settingHolder.toggle.setOnClickListener(View.OnClickListener { v: View? ->
                 val next = !getCurrentValue(item).toBoolean()
-                pendingChanges.put(item, next.toString())
+                changeDraft(item, next.toString())
                 styleToggle(settingHolder.itemView.getContext(), settingHolder.toggle, next)
             })
         } else if (XMLPrefsSave.COLOR == item.type() || XMLPrefsSave.AUTO_COLOR == item.type()) {
@@ -262,19 +285,14 @@ class TuixtAdapter(
                 override fun afterTextChanged(s: Editable) {
                     val `val` = s.toString()
                     val valid = if (item is Theme) ThemeColorResolver.isValid(item, `val`)
-                    else `val`.matches("^#(?:[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$".toRegex())
+                    else (item.type() == XMLPrefsSave.AUTO_COLOR && `val`.equals("auto", true)) ||
+                        `val`.matches("^#(?:[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$".toRegex())
                     if (valid) {
                         updateColorPreview(settingHolder.colorPreview, item, `val`)
-                        pendingChanges.put(item, `val`)
-                        if (item is Theme && ThemeColorResolver.preview(item, `val`)) {
-                            onButtonThemePreviewChanged()
-                        }
+                        changeDraft(item, `val`)
                     } else {
                         pendingChanges.remove(item)
-                        if (item is Theme) {
-                            ThemeColorResolver.clearPreview(item)
-                            onButtonThemePreviewChanged()
-                        }
+                        onDraftChanged()
                     }
                 }
             }
@@ -295,7 +313,7 @@ class TuixtAdapter(
 
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
                 override fun afterTextChanged(s: Editable) {
-                    pendingChanges.put(item, s.toString())
+                    changeDraft(item, s.toString())
                 }
             }
             settingHolder.input.addTextChangedListener(settingHolder.textWatcher)
@@ -306,7 +324,7 @@ class TuixtAdapter(
         val title = row.section ?: holder.itemView.context.getString(R.string.editor_tuixtadapter_unsectioned_7d5f9)
         val collapsed = if (accordionSections) accordionState.collapsed(title) else collapsedSections.contains(title)
         holder.title.text = (if (collapsed) "[+] " else "[-] ") + title.uppercase()
-        holder.title.setTextColor(accentColor())
+        holder.title.setTextColor(rowAccentColor())
         holder.title.setOnClickListener {
             if (accordionSections) {
                 accordionState.toggle(title)
@@ -325,7 +343,7 @@ class TuixtAdapter(
         for (index in 0 until recyclerView.childCount) {
             val holder = recyclerView.getChildViewHolder(recyclerView.getChildAt(index))
             if (holder is SectionHolder) {
-                holder.title.setTextColor(accentColor())
+                holder.title.setTextColor(rowAccentColor())
                 holder.title.background = rect(holder.itemView.context, rowColor(), rowBorderColor(), 1.25f)
                 continue
             }
@@ -335,8 +353,8 @@ class TuixtAdapter(
             val item = visibleRows[position].item ?: continue
             val context = holder.itemView.context
             holder.itemView.background = rect(context, rowColor(), rowBorderColor(), 1.25f)
-            holder.title.setTextColor(accentColor())
-            holder.description.setTextColor(textColor())
+            holder.title.setTextColor(rowAccentColor())
+            holder.description.setTextColor(rowTextColor())
             if (holder.input.visibility == View.VISIBLE) styleInput(context, holder.input)
             if (holder.colorPreview.visibility == View.VISIBLE) {
                 updateColorPreview(holder.colorPreview, item, getCurrentValue(item))
@@ -420,7 +438,7 @@ class TuixtAdapter(
             )
             styleChoice(holder.itemView.getContext(), button, option == current)
             button.setOnClickListener(View.OnClickListener { v: View? ->
-                pendingChanges.put(item, option)
+                changeDraft(item, option)
                 notifyDataSetChanged()
             })
             holder.options.addView(button)
@@ -455,7 +473,7 @@ class TuixtAdapter(
                     params.bottomMargin = dp(context, 8f)
                     content.addView(row, params)
                     row.setOnClickListener {
-                        pendingChanges[item] = icon.key
+                        changeDraft(item, icon.key)
                         dialog?.dismiss()
                         notifyDataSetChanged()
                     }
@@ -574,8 +592,8 @@ class TuixtAdapter(
             title.setVisibility(View.GONE)
         }
 
-        val accent = accentColor()
-        val text = textColor()
+        val accent = rowAccentColor()
+        val text = rowTextColor()
         tintSeekBar(dialogView.findViewById<SeekBar?>(R.id.seek_alpha), accent)
         tintSeekBar(dialogView.findViewById<SeekBar?>(R.id.seek_hue), accent)
         tintSeekBar(dialogView.findViewById<SeekBar?>(R.id.seek_sat), accent)

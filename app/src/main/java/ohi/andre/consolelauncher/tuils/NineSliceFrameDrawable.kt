@@ -17,6 +17,7 @@ class NineSliceFrameDrawable(
     private val density: Float,
     private val intrinsicDp: Float? = null
 ) : Drawable() {
+    var drawCenter: Boolean = true
     private val spec = frame.spec
     private val filter = spec.filtering == "linear"
     private val source = frame.bitmap
@@ -49,7 +50,7 @@ class NineSliceFrameDrawable(
         drawEdge(canvas, 2, 1, dx[2], dy[1], dx[3], dy[2], spec.rightMode, false)
         drawEdge(canvas, 1, 2, dx[1], dy[2], dx[2], dy[3], spec.bottomMode, true)
         drawEdge(canvas, 0, 1, dx[0], dy[1], dx[1], dy[2], spec.leftMode, false)
-        if (spec.centerMode != "none") {
+        if (drawCenter && spec.centerMode != "none") {
             drawRegion(canvas, 1, 1, RectF(dx[1], dy[1], dx[2], dy[2]), spec.centerMode, null, scale)
         }
     }
@@ -171,6 +172,7 @@ class FramedDrawable(
     private val fallback: Drawable,
     frame: NineSliceFrameDrawable
 ) : LayerDrawable(arrayOf(fallback, frame)) {
+    init { frame.drawCenter = false }
     fun setCutouts(top: List<RectF>, bottom: List<RectF>) {
         (fallback as? TerminalBorderDrawable)?.setCutouts(top, bottom)
     }

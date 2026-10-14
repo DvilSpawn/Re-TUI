@@ -1,0 +1,32 @@
+{
+  "id": "atelier-sulphurpool",
+  "sourceUrl": "https://term.const.net/en/themes/atelier-sulphurpool/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "9346890d8f6605376a9a795c32a40899aebb9963fa10b73b79823c72bad2c04e",
+  "paletteSha256": "c9c24df30d19d408de150b434a50cb31676f147c031dab47353ca543f57f7ad7",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Atelier Sulphurpool.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Atelier Sulphurpool",
+    "background": "#202746",
+    "foreground": "#979db4",
+    "cursorColor": "#979db4",
+    "selectionBackground": "#5e6687",
+    "black": "#202746",
+    "red": "#c94922",
+    "green": "#ac9739",
+    "yellow": "#c08b30",
+    "blue": "#3d8fd1",
+    "purple": "#6679cc",
+    "cyan": "#22a2c9",
+    "white": "#979db4",
+    "brightBlack": "#6b7394",
+    "brightRed": "#c76b29",
+    "brightGreen": "#4f587c",
+    "brightYellow": "#5e6687",
+    "brightBlue": "#898ea4",
+    "brightPurple": "#dfe2f1",
+    "brightCyan": "#9c637a",
+    "brightWhite": "#f5f7ff"
+  }
+}

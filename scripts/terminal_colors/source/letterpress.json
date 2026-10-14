@@ -1,0 +1,32 @@
+{
+  "id": "letterpress",
+  "sourceUrl": "https://term.const.net/en/themes/letterpress/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "3bf6db39835c65068a8abc70be7898c89f94ec1b8653e09540b5d30620daf73a",
+  "paletteSha256": "935f66a5c226a2597708541b001a884a84e75e9d116c11ae5363376a2edb6cff",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Letterpress.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Letterpress",
+    "background": "#f3ecdf",
+    "foreground": "#3a352c",
+    "cursorColor": "#2a5c8a",
+    "selectionBackground": "#e3d8c4",
+    "black": "#3a352c",
+    "red": "#b0202a",
+    "green": "#506b24",
+    "yellow": "#8a5e0a",
+    "blue": "#2a5c8a",
+    "purple": "#6e4b2e",
+    "cyan": "#176b5f",
+    "white": "#aeaba4",
+    "brightBlack": "#8e886f",
+    "brightRed": "#b0202a",
+    "brightGreen": "#506b24",
+    "brightYellow": "#8a4fa0",
+    "brightBlue": "#2a5c8a",
+    "brightPurple": "#176b5f",
+    "brightCyan": "#176b5f",
+    "brightWhite": "#3a352c"
+  }
+}

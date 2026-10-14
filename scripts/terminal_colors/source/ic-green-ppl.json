@@ -1,0 +1,32 @@
+{
+  "id": "ic-green-ppl",
+  "sourceUrl": "https://term.const.net/en/themes/ic-green-ppl/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "d4002d52cb698be14162723ecc00699e306311ffb2a4d6773ab7ef318f8c01dd",
+  "paletteSha256": "b44492880ce35432bbf9ca03c543adcccc50f6bbe8bfbb9e0423236049ad4a87",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/IC Green PPL.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "IC Green PPL",
+    "background": "#2c2c2c",
+    "foreground": "#e0f1dc",
+    "cursorColor": "#47fa6b",
+    "selectionBackground": "#116b41",
+    "black": "#014401",
+    "red": "#ff2736",
+    "green": "#41a638",
+    "yellow": "#76a831",
+    "blue": "#2ec3b9",
+    "purple": "#50a096",
+    "cyan": "#3ca078",
+    "white": "#e6fef2",
+    "brightBlack": "#106910",
+    "brightRed": "#b4fa5c",
+    "brightGreen": "#aefb86",
+    "brightYellow": "#dafa87",
+    "brightBlue": "#2efaeb",
+    "brightPurple": "#50fafa",
+    "brightCyan": "#3cfac8",
+    "brightWhite": "#e0f1dc"
+  }
+}

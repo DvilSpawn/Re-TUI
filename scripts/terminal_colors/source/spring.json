@@ -1,0 +1,32 @@
+{
+  "id": "spring",
+  "sourceUrl": "https://term.const.net/en/themes/spring/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "89a04983cf1c61c8608343a18f9ec5eaa515335353171951fa74a1440fb55230",
+  "paletteSha256": "217d536a223e4315dc5a63bc5ce9f001622fef7c14f4aea251e18cd024268c32",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Spring.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Spring",
+    "background": "#ffffff",
+    "foreground": "#4d4d4c",
+    "cursorColor": "#4d4d4c",
+    "selectionBackground": "#d6d6d6",
+    "black": "#000000",
+    "red": "#ff4d83",
+    "green": "#1f8c3b",
+    "yellow": "#1fc95b",
+    "blue": "#1dd3ee",
+    "purple": "#8959a8",
+    "cyan": "#3e999f",
+    "white": "#bfbfbf",
+    "brightBlack": "#000000",
+    "brightRed": "#ff0021",
+    "brightGreen": "#1fc231",
+    "brightYellow": "#d5b807",
+    "brightBlue": "#15a9fd",
+    "brightPurple": "#8959a8",
+    "brightCyan": "#3e999f",
+    "brightWhite": "#ffffff"
+  }
+}

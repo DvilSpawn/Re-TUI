@@ -1,0 +1,32 @@
+{
+  "id": "frostbyte",
+  "sourceUrl": "https://term.const.net/en/themes/frostbyte/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "de93a1b52776e16ac106505d6771f3499435b9b6582f78f90778c9f9beb6f548",
+  "paletteSha256": "caa33213c9203bd828bc069c2d7d724e702e2c5b4b4dbb38e47d4c009e63c873",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Frostbyte.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Frostbyte",
+    "background": "#eef5fc",
+    "foreground": "#283645",
+    "cursorColor": "#1f73cc",
+    "selectionBackground": "#d2e4f4",
+    "black": "#283645",
+    "red": "#c2384f",
+    "green": "#2e7a56",
+    "yellow": "#876010",
+    "blue": "#1a66be",
+    "purple": "#5552cc",
+    "cyan": "#1a7e9e",
+    "white": "#586878",
+    "brightBlack": "#93a4b6",
+    "brightRed": "#c2384f",
+    "brightGreen": "#2e7a56",
+    "brightYellow": "#9a5220",
+    "brightBlue": "#1a66be",
+    "brightPurple": "#5552cc",
+    "brightCyan": "#1a7e9e",
+    "brightWhite": "#283645"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "tearout",
+  "sourceUrl": "https://term.const.net/en/themes/tearout/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "719eea50079903d0b2b88496afadeb928e5678c007946b8f83369851826a9e12",
+  "paletteSha256": "3b49260b41b1f66864243aeab245022fb3696a9d129a6bf4991c2e8dad76a4ac",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Tearout.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Tearout",
+    "background": "#34392d",
+    "foreground": "#f4d2ae",
+    "cursorColor": "#d7c483",
+    "selectionBackground": "#e4c47a",
+    "black": "#685742",
+    "red": "#cc967b",
+    "green": "#97976d",
+    "yellow": "#6c9861",
+    "blue": "#b5955e",
+    "purple": "#c9a554",
+    "cyan": "#d7c483",
+    "white": "#b5955e",
+    "brightBlack": "#75644f",
+    "brightRed": "#cc967b",
+    "brightGreen": "#97976d",
+    "brightYellow": "#6c9861",
+    "brightBlue": "#b5955e",
+    "brightPurple": "#c9a554",
+    "brightCyan": "#d7c483",
+    "brightWhite": "#b5955e"
+  }
+}

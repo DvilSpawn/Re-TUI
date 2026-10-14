@@ -1,0 +1,32 @@
+{
+  "id": "mesila-one",
+  "sourceUrl": "https://term.const.net/en/themes/mesila-one/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "687376e74ca036cf1ebded600fcb155a60b2e9d41e91343478987841090a7db3",
+  "paletteSha256": "0ff48ed5f5dd044a33d560697248f95fa10e9e768534ed6e64bda0052ba67ea4",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Mesila One.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Mesila One",
+    "background": "#1b1f23",
+    "foreground": "#e9fae3",
+    "cursorColor": "#5cc8ff",
+    "selectionBackground": "#334155",
+    "black": "#101418",
+    "red": "#93867f",
+    "green": "#5cc8ff",
+    "yellow": "#ebb3a9",
+    "blue": "#dec1ff",
+    "purple": "#7d70ba",
+    "cyan": "#5cc8ff",
+    "white": "#e9fae3",
+    "brightBlack": "#7d70ba",
+    "brightRed": "#93867f",
+    "brightGreen": "#5cc8ff",
+    "brightYellow": "#ebb3a9",
+    "brightBlue": "#dec1ff",
+    "brightPurple": "#7d70ba",
+    "brightCyan": "#5cc8ff",
+    "brightWhite": "#e9fae3"
+  }
+}

@@ -79,7 +79,9 @@ class LuaWidgetEngine(
     id: String?,
     script: String?,
     private val version: Long,
-    private val updateListener: UpdateListener?
+    private val updateListener: UpdateListener?,
+    private val preview: Boolean = false,
+    private val emptyPreviewData: Boolean = false
 ) {
     private val id: String
     private val script: String
@@ -96,6 +98,7 @@ class LuaWidgetEngine(
     private var executionDeadlineMs: Long = 0
     private var executionInstructions = 0
     private var executionStage: String? = ""
+    private var failedStage: String? = null
     @Volatile private var disposed = false
     private var lastResult = RenderResult()
     private val httpHeaders: MutableMap<String?, String?> = LinkedHashMap<String?, String?>()
@@ -374,6 +377,7 @@ class LuaWidgetEngine(
             return
         }
 
+        LuaWidgetManager.requireCompatible(script)
         val globals = safeGlobals()
         this.globals = globals
         val prefsTable = loadPrefs()
@@ -485,6 +489,9 @@ class LuaWidgetEngine(
         executionInstructions = 0
         try {
             runnable.run()
+        } catch (error: Throwable) {
+            failedStage = executionStage
+            throw error
         } finally {
             executionDeadlineMs = previousDeadline
             executionStage = previousStage
@@ -1160,15 +1167,15 @@ class LuaWidgetEngine(
     private fun buildIntentsTable(): LuaTable {
         val intents = LuaTable()
         intents.set("view", ValueFunction(ValueAction { args: Varargs ->
-            requirePermission("intents")
+            requirePermission("intents", previewReadOnly = true)
             LuaValue.valueOf("intent -view " + quoteCommandArg(stringArg(args)))
         }))
         intents.set("activity", ValueFunction(ValueAction { args: Varargs ->
-            requirePermission("intents")
+            requirePermission("intents", previewReadOnly = true)
             LuaValue.valueOf("intent -activity -n " + quoteCommandArg(stringArg(args)))
         }))
         intents.set("command", ValueFunction(ValueAction { args: Varargs ->
-            requirePermission("intents")
+            requirePermission("intents", previewReadOnly = true)
             LuaValue.valueOf(commandFromIntentSpec(args.arg(rawIndex(args, 1))) ?: "")
         }))
         intents.set("button", UiFunction(UiAction { args: Varargs -> this.addIntentButton(args) }))
@@ -1178,7 +1185,7 @@ class LuaWidgetEngine(
     private fun buildShortcutsTable(): LuaTable {
         val shortcuts = LuaTable()
         shortcuts.set("use_command", ValueFunction(ValueAction { args: Varargs ->
-            requirePermission("shortcuts")
+            requirePermission("shortcuts", previewReadOnly = true)
             val shortcutId = stringAt(args, 1, "")
             val app = stringAt(args, 2, "")
             val command = StringBuilder("shortcut -use ")
@@ -1800,7 +1807,10 @@ class LuaWidgetEngine(
         }
     }
 
-    private fun requirePermission(permission: String?) {
+    private fun requirePermission(permission: String?, previewReadOnly: Boolean = false) {
+        if (preview && !previewReadOnly && permission != "active-tick") {
+            throw LuaError("Preview blocked $permission access. Open the approved module to use this capability.")
+        }
         val normalized = if (permission == null) "" else permission.trim { it <= ' ' }.lowercase()
         if (!approvedPermissions.contains(normalized)) {
             throw LuaError(
@@ -2135,13 +2145,17 @@ class LuaWidgetEngine(
 
     private fun errorResult(e: Throwable): RenderResult {
         val message: String? = errorMessage(e)
-        val stage = if (TextUtils.isEmpty(executionStage)) "script" else executionStage
-        val result: RenderResult = RenderResult.Companion.error(message, stage)
-        LuaWidgetManager.saveLastError(id, stage, message)
+        val stage = if (LuaWidgetManager.compatibilityError(script) != null) "compatibility"
+            else failedStage ?: executionStage?.takeIf { it.isNotEmpty() } ?: "script"
+        failedStage = null
+        val result = if (preview) lastResult.copy().apply { error = message; errorStage = stage }
+            else RenderResult.error(message, stage)
+        if (!preview) LuaWidgetManager.saveLastError(id, stage, message)
         return result
     }
 
     private fun loadPrefs(): LuaTable {
+        if (preview && emptyPreviewData) return LuaTable()
         val file = prefsFile()
         if (!file.isFile()) {
             return LuaTable()
@@ -2157,6 +2171,7 @@ class LuaWidgetEngine(
     }
 
     private fun persistPrefs() {
+        if (preview) return
         if (prefsTable == null) {
             return
         }
@@ -2314,6 +2329,7 @@ class LuaWidgetEngine(
     }
 
     private fun showToast(text: String?) {
+        if (preview) { debugLines.add("Preview toast: " + text); return }
         if (context == null || TextUtils.isEmpty(text)) {
             return
         }
@@ -2321,6 +2337,7 @@ class LuaWidgetEngine(
     }
 
     private fun openUrl(url: String?) {
+        requirePermission("intents")
         if (context == null || TextUtils.isEmpty(url)) {
             return
         }

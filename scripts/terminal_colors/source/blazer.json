@@ -1,0 +1,32 @@
+{
+  "id": "blazer",
+  "sourceUrl": "https://term.const.net/en/themes/blazer/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "fe8930fc5bfef7dcaee03294f51d98b5e2f907d60a391514167860ccd97c6cb7",
+  "paletteSha256": "5eb10925dc5d7bb5590366be85e8cbb3502e521b7336e208428173c462085b40",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Blazer.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Blazer",
+    "background": "#0d1926",
+    "foreground": "#d9e6f2",
+    "cursorColor": "#d9e6f2",
+    "selectionBackground": "#c1ddff",
+    "black": "#000000",
+    "red": "#b87a7a",
+    "green": "#7ab87a",
+    "yellow": "#b8b87a",
+    "blue": "#7a7ab8",
+    "purple": "#b87ab8",
+    "cyan": "#7ab8b8",
+    "white": "#d9d9d9",
+    "brightBlack": "#4c4c4c",
+    "brightRed": "#dbbdbd",
+    "brightGreen": "#bddbbd",
+    "brightYellow": "#dbdbbd",
+    "brightBlue": "#bdbddb",
+    "brightPurple": "#dbbddb",
+    "brightCyan": "#bddbdb",
+    "brightWhite": "#ffffff"
+  }
+}

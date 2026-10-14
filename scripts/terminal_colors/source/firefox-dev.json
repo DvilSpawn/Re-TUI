@@ -1,0 +1,32 @@
+{
+  "id": "firefox-dev",
+  "sourceUrl": "https://term.const.net/en/themes/firefox-dev/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "3e306cee4c709a78734629d156fe73fdb56e0bd3ac306988b068f4e61fce4177",
+  "paletteSha256": "6626905c4574c8e91d62eb6b1f27cf0433cb86b8a8ddf296c20672ff2ddbfbf9",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Firefox Dev.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Firefox Dev",
+    "background": "#0e1011",
+    "foreground": "#7c8fa4",
+    "cursorColor": "#708284",
+    "selectionBackground": "#163c61",
+    "black": "#002831",
+    "red": "#e63853",
+    "green": "#5eb83c",
+    "yellow": "#a57706",
+    "blue": "#359ddf",
+    "purple": "#d75cff",
+    "cyan": "#4b73a2",
+    "white": "#dcdcdc",
+    "brightBlack": "#26444d",
+    "brightRed": "#e1003f",
+    "brightGreen": "#1d9000",
+    "brightYellow": "#cd9409",
+    "brightBlue": "#006fc0",
+    "brightPurple": "#a200da",
+    "brightCyan": "#005794",
+    "brightWhite": "#e2e2e2"
+  }
+}

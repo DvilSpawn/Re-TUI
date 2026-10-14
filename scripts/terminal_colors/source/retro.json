@@ -1,0 +1,32 @@
+{
+  "id": "retro",
+  "sourceUrl": "https://term.const.net/en/themes/retro/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "dd649e0f8a2a77718ad3b2c198f8447cc017eb35a6721c48df30f6560f56bcf1",
+  "paletteSha256": "e1a1fa2e942fb7e6274785e33bf37ac35ece3ee43632e76bb3c3592961d02364",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Retro.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Retro",
+    "background": "#000000",
+    "foreground": "#13a10e",
+    "cursorColor": "#13a10e",
+    "selectionBackground": "#ffffff",
+    "black": "#13a10e",
+    "red": "#13a10e",
+    "green": "#13a10e",
+    "yellow": "#13a10e",
+    "blue": "#13a10e",
+    "purple": "#13a10e",
+    "cyan": "#13a10e",
+    "white": "#13a10e",
+    "brightBlack": "#16ba10",
+    "brightRed": "#16ba10",
+    "brightGreen": "#16ba10",
+    "brightYellow": "#16ba10",
+    "brightBlue": "#16ba10",
+    "brightPurple": "#16ba10",
+    "brightCyan": "#16ba10",
+    "brightWhite": "#16ba10"
+  }
+}

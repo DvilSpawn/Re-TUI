@@ -1,0 +1,32 @@
+{
+  "id": "flexoki-dark",
+  "sourceUrl": "https://term.const.net/en/themes/flexoki-dark/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "cb4a0f186990b7555ee1b862927a06daf896de1541f60ce8ea5cb021d7b7e1e2",
+  "paletteSha256": "589640f985fc6683e7fd5dd71c10badcd87ce0432115c9e7a38e0f466ba2cbcc",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Flexoki Dark.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Flexoki Dark",
+    "background": "#100f0f",
+    "foreground": "#cecdc3",
+    "cursorColor": "#cecdc3",
+    "selectionBackground": "#403e3c",
+    "black": "#100f0f",
+    "red": "#d14d41",
+    "green": "#879a39",
+    "yellow": "#d0a215",
+    "blue": "#4385be",
+    "purple": "#ce5d97",
+    "cyan": "#3aa99f",
+    "white": "#878580",
+    "brightBlack": "#575653",
+    "brightRed": "#af3029",
+    "brightGreen": "#66800b",
+    "brightYellow": "#ad8301",
+    "brightBlue": "#205ea6",
+    "brightPurple": "#a02f6f",
+    "brightCyan": "#24837b",
+    "brightWhite": "#cecdc3"
+  }
+}

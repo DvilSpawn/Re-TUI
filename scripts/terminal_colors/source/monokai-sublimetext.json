@@ -1,0 +1,32 @@
+{
+  "id": "monokai-sublimetext",
+  "sourceUrl": "https://term.const.net/en/themes/monokai-sublimetext/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "5c0eb61cc621f211026f453650d57837aa658dcf9b8b7672ddbd26d7a6455c24",
+  "paletteSha256": "d09052e3e972aaf2e657e36594b96fd9c0c9bf9f23a65be99d82a2b42df3a1d6",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Monokai SublimeText.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Monokai SublimeText",
+    "background": "#272822",
+    "foreground": "#f8f8f2",
+    "cursorColor": "#f8f8f0",
+    "selectionBackground": "#49483e",
+    "black": "#333333",
+    "red": "#c4265e",
+    "green": "#86b42b",
+    "yellow": "#b3b42b",
+    "blue": "#6a7ec8",
+    "purple": "#8c6bc8",
+    "cyan": "#56adbc",
+    "white": "#e3e3dd",
+    "brightBlack": "#666666",
+    "brightRed": "#f92672",
+    "brightGreen": "#a6e22e",
+    "brightYellow": "#e2e22e",
+    "brightBlue": "#819aff",
+    "brightPurple": "#ae81ff",
+    "brightCyan": "#66d9ef",
+    "brightWhite": "#f8f8f2"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "seedflip-ember",
+  "sourceUrl": "https://term.const.net/en/themes/seedflip-ember/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "c1319201013fccb26ea2031ea179e3850f5b954dac916fb2ded8dd866b3640d2",
+  "paletteSha256": "f8299181da24abfb4623268443e5a374f979c80046d5847228d363b53858b2c8",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/SeedFlip Ember.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "SeedFlip Ember",
+    "background": "#0a0a0a",
+    "foreground": "#ededed",
+    "cursorColor": "#ff6b3d",
+    "selectionBackground": "#141414",
+    "black": "#050505",
+    "red": "#f04242",
+    "green": "#42f07c",
+    "yellow": "#f0d342",
+    "blue": "#428bf0",
+    "purple": "#f042f0",
+    "cyan": "#42f0f0",
+    "white": "#fafafa",
+    "brightBlack": "#3d3d3d",
+    "brightRed": "#f58989",
+    "brightGreen": "#89f5ad",
+    "brightYellow": "#f5e389",
+    "brightBlue": "#89b6f5",
+    "brightPurple": "#f589f5",
+    "brightCyan": "#89f5f5",
+    "brightWhite": "#ffffff"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "citruszest",
+  "sourceUrl": "https://term.const.net/en/themes/citruszest/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "c6865310fd9ad225ec66c3c73e52682c810116e9ad973a83c774e238229ee04f",
+  "paletteSha256": "21f470c5fe13772fa4bed2625643ce2dd49293bbac1ead995168c73bba64256b",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Citruszest.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Citruszest",
+    "background": "#121212",
+    "foreground": "#bfbfbf",
+    "cursorColor": "#666666",
+    "selectionBackground": "#ff8c00",
+    "black": "#404040",
+    "red": "#ff5454",
+    "green": "#00cc7a",
+    "yellow": "#ffd400",
+    "blue": "#00bfff",
+    "purple": "#ff90fe",
+    "cyan": "#48d1cc",
+    "white": "#bfbfbf",
+    "brightBlack": "#808080",
+    "brightRed": "#ff1a75",
+    "brightGreen": "#1affa3",
+    "brightYellow": "#ffff00",
+    "brightBlue": "#33cfff",
+    "brightPurple": "#ffb2fe",
+    "brightCyan": "#00fff2",
+    "brightWhite": "#f9f9f9"
+  }
+}

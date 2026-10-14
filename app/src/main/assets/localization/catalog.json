@@ -83,6 +83,13 @@
     },
     "type": "string"
   },
+  "app_other_profile_label": {
+    "formatted": true,
+    "forms": {
+      "other": "%1$s (Profile)"
+    },
+    "type": "string"
+  },
   "app_shortcut_not_found": {
     "formatted": true,
     "forms": {
@@ -6028,6 +6035,13 @@
     },
     "type": "string"
   },
+  "help_private": {
+    "formatted": true,
+    "forms": {
+      "other": "-ls -> list Private Space apps \n-lock -> lock Private Space \n-unlock -> unlock Private Space \n-settings -> open Private Space settings when Android exposes them \n-show / -hide -> show or hide the Private Space drawer entrypoint"
+    },
+    "type": "string"
+  },
   "help_profile": {
     "formatted": true,
     "forms": {
@@ -6938,6 +6952,48 @@
     },
     "type": "string"
   },
+  "irc_delete_confirm": {
+    "formatted": true,
+    "forms": {
+      "other": "Delete from IRC"
+    },
+    "type": "string"
+  },
+  "irc_delete_explanation": {
+    "formatted": true,
+    "forms": {
+      "other": "Choose a message. You can request deletion of your own messages; channel moderators can delete other messages. The server checks permission."
+    },
+    "type": "string"
+  },
+  "irc_delete_message": {
+    "formatted": true,
+    "forms": {
+      "other": "Delete a message"
+    },
+    "type": "string"
+  },
+  "irc_delete_missing": {
+    "formatted": true,
+    "forms": {
+      "other": "This message is no longer available for deletion."
+    },
+    "type": "string"
+  },
+  "irc_delete_question": {
+    "formatted": true,
+    "forms": {
+      "other": "Delete this message from IRC history and supported clients? Copies on Discord or other clients may remain."
+    },
+    "type": "string"
+  },
+  "irc_delete_unavailable": {
+    "formatted": true,
+    "forms": {
+      "other": "Message deletion is unavailable on this connection."
+    },
+    "type": "string"
+  },
   "irc_device_explanation": {
     "formatted": true,
     "forms": {
@@ -7039,7 +7095,7 @@
   "irc_help": {
     "formatted": true,
     "forms": {
-      "other": "Native IRC terminal — one TLS network at a time.\n/server [host] [TLS port] · default irc.kokodoko.cloud 6697\n/nick nickname · /connect · /login account (masked SASL password)\n/register (guided signup offline; masked NickServ password when connected)\n/join #channel · /j #channel · /part [#channel]\n/window [number|name|next|prev|close] · /buffer is an alias\n/query nick · /msg nick text · /me action · /names · /list\n/topic [text] · /whois nick · /mode target modes · /kick nick [reason]\n/oper name (masked password) · /disconnect · /quit · /clear · /help\nPlain text goes only to the active joined channel or query. //text sends /text literally. Unknown commands never become messages or launcher commands.\nWindow markers: * unread · ! mention/private message. Passwords are never transcript/history entries. TLS is verified; no plaintext fallback.\nRegister once, then sign in or reconnect before joining registered-only channels. Server-readable, not end-to-end encrypted. This first slice has no offline replay, push or background service; leaving disconnects. Unconfirmed messages are never retried automatically."
+      "other": "Native IRC terminal — one TLS network at a time.\n/server [host] [TLS port] · default irc.kokodoko.cloud 6697\n/nick nickname · /connect · /login account (masked SASL password)\n/register (guided signup offline; masked NickServ password when connected)\n/join #channel · /j #channel · /part [#channel]\n/window [number|name|next|prev|close] · /buffer is an alias\n/query nick · /msg nick text · /me action · /names · /list\n/topic [text] · /whois nick · /mode target modes · /kick nick [reason]\n/oper name (masked password) · /disconnect · /quit · /clear · /help\nPlain text goes only to the active joined channel or query. //text sends /text literally. Unknown commands never become messages or launcher commands.\nWindow markers: * unread · ! mention/private message. Passwords are never transcript/history entries. TLS is verified; no plaintext fallback.\nRegister once, then sign in or reconnect before joining registered-only channels. Server-readable, not end-to-end encrypted. On supported networks, rejoining loads up to 100 recent channel messages. Server-confirmed deletions replace messages with a deletion marker. There is no push or background service; leaving disconnects. Unconfirmed messages are never retried automatically."
     },
     "type": "string"
   },
@@ -8426,6 +8482,34 @@
     "formatted": true,
     "forms": {
       "other": "groups %1$d | tabs %2$d"
+    },
+    "type": "string"
+  },
+  "manager_appdrawerpanemanager_private_7d5e1": {
+    "formatted": false,
+    "forms": {
+      "other": "PRI"
+    },
+    "type": "string"
+  },
+  "manager_appdrawerpanemanager_private_hide_4d1c2": {
+    "formatted": false,
+    "forms": {
+      "other": "[ HIDE PRIVATE SPACE ]"
+    },
+    "type": "string"
+  },
+  "manager_appdrawerpanemanager_private_lock_6b0f1": {
+    "formatted": false,
+    "forms": {
+      "other": "[ LOCK PRIVATE SPACE ]"
+    },
+    "type": "string"
+  },
+  "manager_appdrawerpanemanager_private_space_9f6b2": {
+    "formatted": false,
+    "forms": {
+      "other": "PRIVATE SPACE · %1$d"
     },
     "type": "string"
   },
@@ -12199,6 +12283,62 @@
     "formatted": true,
     "forms": {
       "other": "Playing:"
+    },
+    "type": "string"
+  },
+  "output_private_space_action_failed": {
+    "formatted": true,
+    "forms": {
+      "other": "Private Space action failed."
+    },
+    "type": "string"
+  },
+  "output_private_space_hidden": {
+    "formatted": true,
+    "forms": {
+      "other": "Private Space entrypoint hidden."
+    },
+    "type": "string"
+  },
+  "output_private_space_locked": {
+    "formatted": true,
+    "forms": {
+      "other": "Private Space is locked."
+    },
+    "type": "string"
+  },
+  "output_private_space_locked_now": {
+    "formatted": true,
+    "forms": {
+      "other": "Private Space lock requested."
+    },
+    "type": "string"
+  },
+  "output_private_space_settings_android": {
+    "formatted": true,
+    "forms": {
+      "other": "Open Android Settings to manage Private Space on this Android version."
+    },
+    "type": "string"
+  },
+  "output_private_space_shown": {
+    "formatted": true,
+    "forms": {
+      "other": "Private Space entrypoint shown."
+    },
+    "type": "string"
+  },
+  "output_private_space_unavailable": {
+    "formatted": true,
+    "forms": {
+      "other": "Private Space is unavailable."
+    },
+    "type": "string"
+  },
+  "output_private_space_unlock_requested": {
+    "formatted": true,
+    "forms": {
+      "other": "Private Space unlock requested."
     },
     "type": "string"
   },

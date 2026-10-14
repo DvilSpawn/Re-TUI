@@ -1,0 +1,32 @@
+{
+  "id": "seafoam-pastel",
+  "sourceUrl": "https://term.const.net/en/themes/seafoam-pastel/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "7105235d3595e873ef7c32abf03db396bf1af915e0a68605c9b34758408414ae",
+  "paletteSha256": "62575ca1f8a79d583a84c62ec27d7352276b8e4b682c728d30de5fd76d032d5b",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Seafoam Pastel.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Seafoam Pastel",
+    "background": "#243435",
+    "foreground": "#d4e7d4",
+    "cursorColor": "#57647a",
+    "selectionBackground": "#ffffff",
+    "black": "#757575",
+    "red": "#825d4d",
+    "green": "#728c62",
+    "yellow": "#ada16d",
+    "blue": "#4d7b82",
+    "purple": "#8a7267",
+    "cyan": "#729494",
+    "white": "#e0e0e0",
+    "brightBlack": "#8a8a8a",
+    "brightRed": "#cf937a",
+    "brightGreen": "#98d9aa",
+    "brightYellow": "#fae79d",
+    "brightBlue": "#7ac3cf",
+    "brightPurple": "#d6b2a1",
+    "brightCyan": "#ade0e0",
+    "brightWhite": "#e0e0e0"
+  }
+}

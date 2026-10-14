@@ -1,0 +1,32 @@
+{
+  "id": "kanso-zen",
+  "sourceUrl": "https://term.const.net/en/themes/kanso-zen/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "5ec473e3bb833d496fb9c322eebe69d3896ba1282b7c234eb2caba20685d6b99",
+  "paletteSha256": "78c10950103d50b40160c5843c11201cb918b449680fb53c145c2e627f59464a",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Kanso Zen.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Kanso Zen",
+    "background": "#090e13",
+    "foreground": "#c5c9c7",
+    "cursorColor": "#c5c9c7",
+    "selectionBackground": "#393b44",
+    "black": "#0d0c0c",
+    "red": "#c4746e",
+    "green": "#8a9a7b",
+    "yellow": "#c4b28a",
+    "blue": "#8ba4b0",
+    "purple": "#a292a3",
+    "cyan": "#8ea4a2",
+    "white": "#c8c093",
+    "brightBlack": "#a4a7a4",
+    "brightRed": "#e46876",
+    "brightGreen": "#87a987",
+    "brightYellow": "#e6c384",
+    "brightBlue": "#7fb4ca",
+    "brightPurple": "#938aa9",
+    "brightCyan": "#7aa89f",
+    "brightWhite": "#c5c9c7"
+  }
+}

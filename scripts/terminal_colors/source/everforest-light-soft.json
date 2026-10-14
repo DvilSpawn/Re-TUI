@@ -1,0 +1,32 @@
+{
+  "id": "everforest-light-soft",
+  "sourceUrl": "https://term.const.net/en/themes/everforest-light-soft/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "dce107454ee8c45c18a5df7dee7ad32237af77cb8ff91b5b38ec32a781c8ffef",
+  "paletteSha256": "90b1f2592011ace3052fa3aa00f382e076805e40a1f3a1f531ff278e5fee5378",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Everforest Light Soft.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Everforest Light Soft",
+    "background": "#e5dfc5",
+    "foreground": "#5c6a72",
+    "cursorColor": "#f57d26",
+    "selectionBackground": "#e1e4bd",
+    "black": "#7a8478",
+    "red": "#e67e80",
+    "green": "#8da666",
+    "yellow": "#c1a266",
+    "blue": "#72aea6",
+    "purple": "#c98ca9",
+    "cyan": "#76b385",
+    "white": "#a5a292",
+    "brightBlack": "#99a393",
+    "brightRed": "#f85552",
+    "brightGreen": "#8da101",
+    "brightYellow": "#d29300",
+    "brightBlue": "#3a94c5",
+    "brightPurple": "#df69ba",
+    "brightCyan": "#35a77c",
+    "brightWhite": "#fffbef"
+  }
+}

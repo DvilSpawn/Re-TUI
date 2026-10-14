@@ -1,0 +1,32 @@
+{
+  "id": "catppuccin-mocha",
+  "sourceUrl": "https://term.const.net/en/themes/catppuccin-mocha/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "4b7313317e4bf765ba6e9c338f70dc50f942d6a38bdfb6b2f8a8cef91f16c01f",
+  "paletteSha256": "9a94e59c19522222406b00b259522582a7dfffbd4198a26e169e082303a3c7fb",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Catppuccin Mocha.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Catppuccin Mocha",
+    "background": "#1e1e2e",
+    "foreground": "#cdd6f4",
+    "cursorColor": "#f5e0dc",
+    "selectionBackground": "#f5e0dc",
+    "black": "#45475a",
+    "red": "#f38ba8",
+    "green": "#a6e3a1",
+    "yellow": "#f9e2af",
+    "blue": "#89b4fa",
+    "purple": "#f5c2e7",
+    "cyan": "#94e2d5",
+    "white": "#bac2de",
+    "brightBlack": "#585b70",
+    "brightRed": "#f7aec2",
+    "brightGreen": "#c2ecbf",
+    "brightYellow": "#fcd682",
+    "brightBlue": "#aeccfc",
+    "brightPurple": "#f398da",
+    "brightCyan": "#b1eae1",
+    "brightWhite": "#a6adc8"
+  }
+}

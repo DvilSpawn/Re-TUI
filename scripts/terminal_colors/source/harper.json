@@ -1,0 +1,32 @@
+{
+  "id": "harper",
+  "sourceUrl": "https://term.const.net/en/themes/harper/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "e87c8f587d2150781b414b0333fce071d206e511a05eeb1193282e4b91403234",
+  "paletteSha256": "88047e955ffc9a071483b6ba06136d3498febe18c86b452f22054e4f64fabe57",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Harper.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Harper",
+    "background": "#010101",
+    "foreground": "#a8a49d",
+    "cursorColor": "#a8a49d",
+    "selectionBackground": "#5a5753",
+    "black": "#010101",
+    "red": "#f8b63f",
+    "green": "#7fb5e1",
+    "yellow": "#d6da25",
+    "blue": "#489e48",
+    "purple": "#b296c6",
+    "cyan": "#f5bfd7",
+    "white": "#a8a49d",
+    "brightBlack": "#726e6a",
+    "brightRed": "#f8b63f",
+    "brightGreen": "#7fb5e1",
+    "brightYellow": "#d6da25",
+    "brightBlue": "#489e48",
+    "brightPurple": "#b296c6",
+    "brightCyan": "#f5bfd7",
+    "brightWhite": "#fefbea"
+  }
+}

@@ -201,6 +201,19 @@ object LuaWidgetManager {
         return (if (android.text.TextUtils.isEmpty(version)) "1" else version)!!
     }
 
+    const val SUPPORTED_API_VERSION = "1"
+
+    fun compatibilityError(script: kotlin.String?): kotlin.String? {
+        val api = apiVersionFromScript(script)
+        return if (api == SUPPORTED_API_VERSION) null else
+            "This module requires Re:TUI widget API $api. This launcher supports API $SUPPORTED_API_VERSION. Update Re:TUI or use an API-$SUPPORTED_API_VERSION module."
+    }
+
+    fun requireCompatible(script: kotlin.String?) {
+        val error = compatibilityError(script)
+        require(error == null) { error ?: "Unsupported widget API" }
+    }
+
     fun isDockableScript(script: kotlin.String?): Boolean {
         val type = getScriptTypeFromScript(script)
         return "suggest" != type && "command" != type && "app" != type
@@ -251,6 +264,7 @@ object LuaWidgetManager {
         val normalized = normalizeId(id)
         require(!TextUtils.isEmpty(normalized)) { "Lua module id is required" }
         val code = if (script == null) "" else script
+        requireCompatible(code)
         val meta = metadata(code)
         val scriptName = meta.get("name")
         var effectiveName: kotlin.String? = if (name == null) "" else name.trim { it <= ' ' }
@@ -319,14 +333,8 @@ object LuaWidgetManager {
     ) {
         val normalized = normalizeId(id)
         val manifest = readManifest(normalized)
-        if (exists(normalized) && (manifest == null || !manifest.optBoolean(
-                "systemManaged",
-                false
-            ))
-        ) {
-            return
-        }
-        saveSystem(normalized, name, script)
+        val baseline = manifest?.takeIf { it.optBoolean("systemManaged", false) }?.optString("scriptHash")
+        LuaDefaultUpdater.update(normalized, script.orEmpty(), baseline) { saveSystem(normalized, name, it) }
     }
 
     @Throws(Exception::class)
@@ -360,6 +368,7 @@ object LuaWidgetManager {
     }
 
     fun delete(id: kotlin.String?) {
+        LuaDefaultUpdater.deleted(normalizeId(id))
         val dir = widgetDir(id)
         if (dir.exists()) {
             Tuils.delete(dir)
@@ -396,6 +405,7 @@ object LuaWidgetManager {
         require(!newDir.exists()) { "Lua module id already exists: " + newNormalized }
 
         check(oldDir.renameTo(newDir)) { "Unable to rename Lua module folder" }
+        LuaDefaultUpdater.deleted(oldNormalized)
 
         val name = getName(newNormalized)
         val script = readScript(newNormalized)
@@ -491,7 +501,7 @@ object LuaWidgetManager {
         for (entry in samples().entries) {
             val id = entry.key
             val sample: Sample = entry.value!!
-            save(id, sample.name, sample.script)
+            LuaDefaultUpdater.update(id!!, sample.script.orEmpty()) { save(id, sample.name, it) }
             ids.add(id)
         }
         return ids
@@ -540,6 +550,7 @@ object LuaWidgetManager {
         appendDirective(out, "body", "Lua module disabled.")
         appendSuggest(out, "enable", "module -enable " + normalized)
         appendSuggest(out, "check", "module -check " + normalized)
+        appendSuggest(out, "preview", "module -preview " + normalized)
         return out.toString().trim { it <= ' ' }
     }
 
@@ -578,6 +589,7 @@ object LuaWidgetManager {
             appendSuggest(out, "approve", "module -approve " + normalized)
         }
         appendSuggest(out, "check", "module -check " + normalized)
+        appendSuggest(out, "preview", "module -preview " + normalized)
         return out.toString().trim { it <= ' ' }
     }
 
@@ -638,6 +650,7 @@ object LuaWidgetManager {
     fun approve(id: kotlin.String?) {
         val normalized = normalizeId(id)
         require(exists(normalized)) { "Unknown Lua module: " + normalized }
+        requireCompatible(readScript(normalized))
         val status = trustStatus(normalized)
         require(status.unsupportedPermissions.isEmpty()) {
             "Unsupported permissions: " + TextUtils.join(
@@ -975,12 +988,14 @@ object LuaWidgetManager {
     private fun write(file: File, text: kotlin.String?) {
         val parent = file.getParentFile()
         check(!(parent != null && !parent.exists() && !parent.mkdirs())) { "Unable to create Lua module folder" }
-        FileOutputStream(file, false).use { out ->
-            out.write(
-                (if (text == null) "" else text).toByteArray(
-                    StandardCharsets.UTF_8
-                )
-            )
+        val atomic = android.util.AtomicFile(file)
+        val out = atomic.startWrite()
+        try {
+            out.write(text.orEmpty().toByteArray(StandardCharsets.UTF_8))
+            atomic.finishWrite(out)
+        } catch (error: Throwable) {
+            atomic.failWrite(out)
+            throw error
         }
     }
 

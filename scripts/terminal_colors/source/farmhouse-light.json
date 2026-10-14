@@ -1,0 +1,32 @@
+{
+  "id": "farmhouse-light",
+  "sourceUrl": "https://term.const.net/en/themes/farmhouse-light/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "0136eb90fe45e0dbdf1eb1812ce65ac6a12cf905dd9c5a70e70ec4fd4e5f617b",
+  "paletteSha256": "aa71655ecf3b2838de3f50facc2e20647cd6cafe31c48a7d641f64addad1f981",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Farmhouse Light.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Farmhouse Light",
+    "background": "#e8e4e1",
+    "foreground": "#1d2027",
+    "cursorColor": "#006efe",
+    "selectionBackground": "#b3b1aa",
+    "black": "#1d2027",
+    "red": "#8d0003",
+    "green": "#3a7d00",
+    "yellow": "#a95600",
+    "blue": "#092ccd",
+    "purple": "#820046",
+    "cyan": "#229256",
+    "white": "#a8a4a1",
+    "brightBlack": "#394047",
+    "brightRed": "#eb0009",
+    "brightGreen": "#7ac100",
+    "brightYellow": "#ea9a00",
+    "brightBlue": "#006efe",
+    "brightPurple": "#bf3b7f",
+    "brightCyan": "#00c649",
+    "brightWhite": "#f4eef0"
+  }
+}

@@ -1898,7 +1898,8 @@ class AndroidWidgetDrawerManager(
         closeButton?.setTextColor(drawerColor)
         commandPrefix?.setTextColor(drawerColor)
         commandInput?.setTextColor(ThemeColorResolver.color(Theme.widget_command_text_color))
-        commandInput?.setHintTextColor(ThemeColorResolver.withMaxAlpha(ThemeColorResolver.color(Theme.widget_command_text_color), 150))
+        commandInput?.setHintTextColor(ThemeColorResolver.color(Theme.field_hint_color))
+        commandInput?.let { Tuils.setCursorDrawableColor(it, ThemeColorResolver.color(Theme.cursor_color)) }
         commandSend?.setTextColor(drawerColor)
         header?.setTypeface(Tuils.getTypeface(context), Typeface.BOLD)
         footer?.typeface = Tuils.getTypeface(context)

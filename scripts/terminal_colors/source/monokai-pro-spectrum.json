@@ -1,0 +1,32 @@
+{
+  "id": "monokai-pro-spectrum",
+  "sourceUrl": "https://term.const.net/en/themes/monokai-pro-spectrum/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "2e4cdcd240ec7b875f9acb3a664f375f4e6adfdf7dab119a21a3bdf2eb433c82",
+  "paletteSha256": "50c00b022eb5490c3e444bb1a6d9f3acb799b644c69d236129e727ff7527ed4e",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Monokai Pro Spectrum.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Monokai Pro Spectrum",
+    "background": "#222222",
+    "foreground": "#f7f1ff",
+    "cursorColor": "#bab6c0",
+    "selectionBackground": "#525053",
+    "black": "#222222",
+    "red": "#fc618d",
+    "green": "#7bd88f",
+    "yellow": "#fce566",
+    "blue": "#fd9353",
+    "purple": "#948ae3",
+    "cyan": "#5ad4e6",
+    "white": "#f7f1ff",
+    "brightBlack": "#69676c",
+    "brightRed": "#fc618d",
+    "brightGreen": "#7bd88f",
+    "brightYellow": "#fce566",
+    "brightBlue": "#fd9353",
+    "brightPurple": "#948ae3",
+    "brightCyan": "#5ad4e6",
+    "brightWhite": "#f7f1ff"
+  }
+}

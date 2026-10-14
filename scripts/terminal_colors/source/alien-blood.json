@@ -1,0 +1,32 @@
+{
+  "id": "alien-blood",
+  "sourceUrl": "https://term.const.net/en/themes/alien-blood/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "8063876d1653c0c527a23e5da386cc1e42c70f3a9b16fce4d300968c4bacf484",
+  "paletteSha256": "1cd0f470df7f68ee3ed1d29e24f19f7d9f3bca809faf222b120ec384a4323e4f",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Alien Blood.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Alien Blood",
+    "background": "#0f1610",
+    "foreground": "#637d75",
+    "cursorColor": "#73fa91",
+    "selectionBackground": "#1d4125",
+    "black": "#112616",
+    "red": "#7f2b27",
+    "green": "#2f7e25",
+    "yellow": "#717f24",
+    "blue": "#2f6a7f",
+    "purple": "#47587f",
+    "cyan": "#327f77",
+    "white": "#647d75",
+    "brightBlack": "#3c4812",
+    "brightRed": "#e08009",
+    "brightGreen": "#18e000",
+    "brightYellow": "#bde000",
+    "brightBlue": "#00aae0",
+    "brightPurple": "#0058e0",
+    "brightCyan": "#00e0c4",
+    "brightWhite": "#73fa91"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "builtin-tango-light",
+  "sourceUrl": "https://term.const.net/en/themes/builtin-tango-light/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "0762c948db46bc293c1e39b4fdf6842232620809bc4ad4ac9717a187fa70bea3",
+  "paletteSha256": "7f8f567f34796763e171a4970260203541c55e3d6d9bcd7ebe49331e51c97d4d",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Builtin Tango Light.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Builtin Tango Light",
+    "background": "#ffffff",
+    "foreground": "#000000",
+    "cursorColor": "#000000",
+    "selectionBackground": "#b5d5ff",
+    "black": "#000000",
+    "red": "#cc0000",
+    "green": "#4e9a06",
+    "yellow": "#c4a000",
+    "blue": "#3465a4",
+    "purple": "#75507b",
+    "cyan": "#06989a",
+    "white": "#b9bdb5",
+    "brightBlack": "#555753",
+    "brightRed": "#ef2929",
+    "brightGreen": "#7dd527",
+    "brightYellow": "#d6c329",
+    "brightBlue": "#729fcf",
+    "brightPurple": "#ad7fa8",
+    "brightCyan": "#27d5d5",
+    "brightWhite": "#eeeeec"
+  }
+}

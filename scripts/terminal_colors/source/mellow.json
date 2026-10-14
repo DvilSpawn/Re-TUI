@@ -1,0 +1,32 @@
+{
+  "id": "mellow",
+  "sourceUrl": "https://term.const.net/en/themes/mellow/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "d95e01c67d522dcabea6cbaf5ec700325b02a7be4636cd7a79d3cb56f8cd3301",
+  "paletteSha256": "93cf51c4e008d8f9f485749a9eb195898389999f713c185f6ebd85ee5ad3b121",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Mellow.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Mellow",
+    "background": "#161617",
+    "foreground": "#c9c7cd",
+    "cursorColor": "#cac9dd",
+    "selectionBackground": "#2a2a2d",
+    "black": "#27272a",
+    "red": "#f5a191",
+    "green": "#90b99f",
+    "yellow": "#e6b99d",
+    "blue": "#aca1cf",
+    "purple": "#e29eca",
+    "cyan": "#ea83a5",
+    "white": "#c1c0d4",
+    "brightBlack": "#424246",
+    "brightRed": "#ffae9f",
+    "brightGreen": "#9dc6ac",
+    "brightYellow": "#f0c5a9",
+    "brightBlue": "#b9aeda",
+    "brightPurple": "#ecaad6",
+    "brightCyan": "#f591b2",
+    "brightWhite": "#cac9dd"
+  }
+}

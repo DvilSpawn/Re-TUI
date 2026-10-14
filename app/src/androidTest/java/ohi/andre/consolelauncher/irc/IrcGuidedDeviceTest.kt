@@ -29,7 +29,9 @@ import kotlin.concurrent.thread
 class IrcGuidedDeviceTest {
     @get:Rule val windows = WindowPreferencesRule()
     private val instrumentation = InstrumentationRegistry.getInstrumentation()
-    private class Peer(private val registrationReply: String? = null) : AutoCloseable {
+    private class Peer(private val registrationReply: String? = null, private val historyBodies: List<String>? = null,
+        private val redactionId: String? = null, private val manualRedaction: Boolean = false,
+        private val rejectRedaction: Boolean = false) : AutoCloseable {
         val server = ServerSocket(0)
         val frames = CopyOnWriteArrayList<IrcMessage>()
         val mechanisms = CopyOnWriteArrayList<String>()
@@ -46,11 +48,22 @@ class IrcGuidedDeviceTest {
                         if (m.command != "AUTHENTICATE") frames.add(if (m.command == "REGISTER") m.copy(params = m.params.take(2)) else m)
                         when (m.command) {
                             "NICK" -> nick = m.params[0]
-                            "CAP" -> if ("LS" in m.params) reply(":s CAP $nick LS :sasl=PLAIN,EXTERNAL echo-message${if (registrationReply != null) " draft/account-registration" else ""}") else if ("REQ" in m.params) reply(":s CAP $nick ACK :${m.params.last()}") else if ("END" in m.params) reply(":s 001 $nick :Welcome")
+                            "CAP" -> if ("LS" in m.params) reply(":s CAP $nick LS :sasl=PLAIN,EXTERNAL echo-message${if (registrationReply != null) " draft/account-registration" else ""}${if (historyBodies != null) " batch server-time message-tags draft/chathistory" else ""}${if (redactionId != null || manualRedaction) " draft/message-redaction" else ""}") else if ("REQ" in m.params) reply(":s CAP $nick ACK :${m.params.last()}") else if ("END" in m.params) reply(":s 001 $nick :Welcome")
                             "REGISTER" -> reply(":s $registrationReply".replace("<account>", nick))
                             "AUTHENTICATE" -> if (m.params[0] in listOf("PLAIN", "EXTERNAL")) { mechanisms.add(m.params[0]); reply("AUTHENTICATE +") } else reply(":s 903 $nick :Success")
                             "JOIN" -> { val channel = m.params[0]; reply(":$nick!u@fixture JOIN $channel"); reply(":s 353 $nick = $channel :$nick alice"); reply(":s 366 $nick $channel :End") }
+                            "CHATHISTORY" -> {
+                                val channel = m.params[1]
+                                reply(":s BATCH +history chathistory $channel")
+                                historyBodies.orEmpty().forEachIndexed { index, body ->
+                                    reply("@batch=history;msgid=fixture-$index;time=2026-10-13T15:01:${index.toString().padStart(2, '0')}Z :alice/discord!u@fixture PRIVMSG $channel :$body")
+                                }
+                                reply(":s BATCH -history")
+                                if (redactionId != null) reply(":mod!u@fixture REDACT $channel $redactionId")
+                            }
                             "NAMES" -> { reply(":s 353 $nick = ${m.params[0]} :$nick alice"); reply(":s 366 $nick ${m.params[0]} :End") }
+                            "REDACT" -> if (rejectRedaction) reply(":s FAIL REDACT REDACT_FORBIDDEN ${m.params[0]} ${m.params[1]} :Fixture permission denied")
+                                else reply(":mod!u@fixture REDACT ${m.params[0]} ${m.params[1]}")
                             "LIST" -> { reply(":s 321 $nick :Start"); reply(":s 322 $nick #fixture 2 :A test channel"); reply(":s 323 $nick :End") }
                             "PRIVMSG" -> if (m.params[0] == "NickServ" && m.params[1].startsWith("CERT ADD ")) reply(":NickServ!service@fixture NOTICE $nick :Certificate fingerprint successfully added")
                                 else if (m.params[0] == "NickServ" && m.params[1].startsWith("CERT DEL ")) reply(":NickServ!service@fixture NOTICE $nick :Certificate fingerprint successfully removed")
@@ -92,6 +105,84 @@ class IrcGuidedDeviceTest {
         var target = find(a.window.decorView, text); assertNotNull("Action $text", target)
         while (target != null && !target.isClickable) target = target.parent as? View
         assertNotNull("Clickable action $text", target); target!!.performClick()
+    }
+    @Test fun reopeningPaneLoadsMessagesSentWhileClosedWithRelayedNamesAndEmoji() {
+        val bodies = listOf("Earlier conversation", "Hello @fixture", "Missed while closed 🤤🤤🤤")
+        for (count in listOf(2, 3)) {
+            val a = start()
+            Peer(historyBodies = bodies.take(count)).use { peer ->
+                try {
+                    main {
+                        a.session.connector = { _, _ -> Socket("127.0.0.1", peer.server.localPort) }
+                        a.session.account = "fixture"; a.session.state.nickname = "fixture"
+                        a.session.connect("fixture-only-password".toCharArray())
+                    }
+                    waitFor { a.session.state.active.lines.count { it.body in bodies } == count }
+                    main {
+                        val transcript = a.findViewById<TextView>(R.id.irc_output).text.toString()
+                        assertTrue(transcript.contains("<alice/discord> ${bodies[count - 1]}"))
+                        assertEquals(count, a.session.state.active.lines.count { it.body in bodies })
+                        assertFalse(a.session.state.active.highlight)
+                    }
+                    if (count == 3) capture(a, "history-reopen")
+                    main { a.onBackPressedDispatcher.onBackPressed() }
+                    assertNull(a.session.client)
+                    assertEquals(1, peer.frames.count { it.command == "CHATHISTORY" })
+                    assertFalse(peer.frames.any { it.command == "PRIVMSG" })
+                } finally { main { a.finish() }; instrumentation.waitForIdleSync() }
+            }
+        }
+    }
+    @Test fun moderatorDeletionUpdatesVisibleTranscriptWithoutReconnecting() {
+        val a = start()
+        Peer(historyBodies = listOf("keep this message", "fixture-secret"), redactionId = "fixture-1").use { peer ->
+            try {
+                main {
+                    a.session.connector = { _, _ -> Socket("127.0.0.1", peer.server.localPort) }
+                    a.session.account = "fixture"; a.session.state.nickname = "fixture"
+                    a.session.connect("fixture-only-password".toCharArray())
+                }
+                waitFor { a.findViewById<TextView>(R.id.irc_output).text.contains("Message deleted") }
+                main {
+                    val transcript = a.findViewById<TextView>(R.id.irc_output).text.toString()
+                    assertTrue(transcript.contains("keep this message")); assertFalse(transcript.contains("fixture-secret"))
+                    assertTrue(a.session.client?.ready == true)
+                }
+                capture(a, "message-deleted")
+            } finally { main { a.finish() }; instrumentation.waitForIdleSync() }
+        }
+    }
+    @Test fun deleteMessageActionRequiresConfirmationAndWaitsForServerPermission() {
+        for (rejected in listOf(false, true)) {
+            val a = start()
+            Peer(historyBodies = listOf("delete fixture", "keep fixture"), manualRedaction = true, rejectRedaction = rejected).use { peer ->
+                try {
+                    main {
+                        a.session.connector = { _, _ -> Socket("127.0.0.1", peer.server.localPort) }
+                        a.session.account = "fixture"; a.session.state.nickname = "fixture"
+                        a.session.connect("fixture-only-password".toCharArray())
+                    }
+                    waitFor { a.session.state.active.lines.any { it.body == "delete fixture" } }
+                    main {
+                        input(a).setText("preserved draft"); click(a, "More"); click(a, "Delete a message")
+                        click(a, "<alice/discord> delete fixture")
+                        assertEquals(IrcNavigation.Page.DELETE_CONFIRM, a.session.navigation.page)
+                        assertFalse(peer.frames.any { it.command == "REDACT" })
+                        a.onBackPressedDispatcher.onBackPressed(); assertEquals("preserved draft", input(a).text.toString())
+                        click(a, "More"); click(a, "Delete a message"); click(a, "<alice/discord> delete fixture")
+                        click(a, "Delete from IRC")
+                    }
+                    waitFor { a.findViewById<TextView>(R.id.irc_output).text.contains(if (rejected) "Fixture permission denied" else "Message deleted") }
+                    main {
+                        val transcript = a.findViewById<TextView>(R.id.irc_output).text.toString()
+                        assertEquals(rejected, transcript.contains("delete fixture")); assertTrue(transcript.contains("keep fixture"))
+                        assertEquals("preserved draft", input(a).text.toString())
+                    }
+                    assertEquals(listOf("#retui", "fixture-0"), peer.frames.single { it.command == "REDACT" }.params)
+                    if (!rejected) capture(a, "delete-action")
+                } finally { main { a.finish() }; instrumentation.waitForIdleSync() }
+            }
+        }
     }
     @Test fun guidedLoginChannelsPeopleAndLocalHelpUseOneComposer() {
         val a = start()

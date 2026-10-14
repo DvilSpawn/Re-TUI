@@ -1,0 +1,32 @@
+{
+  "id": "spacegray-bright",
+  "sourceUrl": "https://term.const.net/en/themes/spacegray-bright/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "6abf8bbdffc97ed520029ca2df326c9229439f174b18db7c3452e94e6aac1b7a",
+  "paletteSha256": "68b28f8696dabaded8553a1d63d94a2b3927758d0526afbd88c6ec8a7fc9f914",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Spacegray Bright.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Spacegray Bright",
+    "background": "#2a2e3a",
+    "foreground": "#f3f3f3",
+    "cursorColor": "#c6c6c6",
+    "selectionBackground": "#cacaca",
+    "black": "#080808",
+    "red": "#bc5553",
+    "green": "#a0b56c",
+    "yellow": "#f6c987",
+    "blue": "#7baec1",
+    "purple": "#b98aae",
+    "cyan": "#85c9b8",
+    "white": "#d8d8d8",
+    "brightBlack": "#626262",
+    "brightRed": "#bc5553",
+    "brightGreen": "#a0b56c",
+    "brightYellow": "#f6c987",
+    "brightBlue": "#7baec1",
+    "brightPurple": "#b98aae",
+    "brightCyan": "#85c9b8",
+    "brightWhite": "#f7f7f7"
+  }
+}

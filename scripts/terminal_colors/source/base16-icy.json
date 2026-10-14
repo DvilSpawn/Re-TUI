@@ -1,0 +1,32 @@
+{
+  "id": "base16-icy",
+  "sourceUrl": "https://term.const.net/en/themes/base16-icy/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "f0cc676120a0dfde4a53a92e7711fdaa0897e9ecb45533287749c2b0f7818a52",
+  "paletteSha256": "e38735f7457084042f323283ee836589451ccc682e98a3913d115ca9db10e73a",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/base16-icy.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "base16-icy",
+    "background": "#021012",
+    "foreground": "#095b67",
+    "cursorColor": "#16c2d9",
+    "selectionBackground": "#041f23",
+    "black": "#021012",
+    "red": "#16c2d9",
+    "green": "#4dd0e1",
+    "yellow": "#80deea",
+    "blue": "#00bcd4",
+    "purple": "#00adc1",
+    "cyan": "#26c6d6",
+    "white": "#095b67",
+    "brightBlack": "#1e484e",
+    "brightRed": "#b3ebf2",
+    "brightGreen": "#4dd0e1",
+    "brightYellow": "#80deea",
+    "brightBlue": "#00bcd4",
+    "brightPurple": "#00adc1",
+    "brightCyan": "#26c6d6",
+    "brightWhite": "#0c7c7c"
+  }
+}

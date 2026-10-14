@@ -1,0 +1,32 @@
+{
+  "id": "horizon",
+  "sourceUrl": "https://term.const.net/en/themes/horizon/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "3f3bfbd56754f4ae809772c00d4a1ef53d73f9fc46b278523853f49c563be110",
+  "paletteSha256": "de38bb74aa4e4f7bb9cdb8c3854564d13f50533b9fd693ba55e9b77a5b28bc85",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Horizon.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Horizon",
+    "background": "#1c1e26",
+    "foreground": "#d5d8da",
+    "cursorColor": "#6c6f93",
+    "selectionBackground": "#6c6f93",
+    "black": "#000000",
+    "red": "#e95678",
+    "green": "#29d398",
+    "yellow": "#fab795",
+    "blue": "#26bbd9",
+    "purple": "#ee64ac",
+    "cyan": "#59e1e3",
+    "white": "#e5e5e5",
+    "brightBlack": "#666666",
+    "brightRed": "#ec6a88",
+    "brightGreen": "#3fdaa4",
+    "brightYellow": "#fbc3a7",
+    "brightBlue": "#3fc4de",
+    "brightPurple": "#f075b5",
+    "brightCyan": "#6be4e6",
+    "brightWhite": "#e5e5e5"
+  }
+}

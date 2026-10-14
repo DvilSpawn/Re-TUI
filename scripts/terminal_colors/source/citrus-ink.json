@@ -1,0 +1,32 @@
+{
+  "id": "citrus-ink",
+  "sourceUrl": "https://term.const.net/en/themes/citrus-ink/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "469a2fc52ef95fd358cf41e6672b7f53b797d5c32638802a1ee4d20c21918d4a",
+  "paletteSha256": "3377606f27f0ea4ddef8ad221bb9bd9e8330c3c3f726ee6599071e61a0b7d689",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Citrus Ink.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Citrus Ink",
+    "background": "#0b1413",
+    "foreground": "#eaf0e2",
+    "cursorColor": "#b8e62e",
+    "selectionBackground": "#1f302d",
+    "black": "#14201e",
+    "red": "#ff6b5b",
+    "green": "#5fd3a0",
+    "yellow": "#e6c84a",
+    "blue": "#c2ef45",
+    "purple": "#f2b441",
+    "cyan": "#cfe89a",
+    "white": "#eaf0e2",
+    "brightBlack": "#4f6b5e",
+    "brightRed": "#ff8174",
+    "brightGreen": "#72d8ab",
+    "brightYellow": "#f2a23e",
+    "brightBlue": "#b8e62e",
+    "brightPurple": "#b8e62e",
+    "brightCyan": "#d5eba6",
+    "brightWhite": "#ffffff"
+  }
+}

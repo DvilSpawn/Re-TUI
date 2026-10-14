@@ -1,0 +1,32 @@
+{
+  "id": "klein-void",
+  "sourceUrl": "https://term.const.net/en/themes/klein-void/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "7b6b82f7f601aacc6ae37a11f99815db9da2ab09edea060bc9ebda7d70a281c4",
+  "paletteSha256": "ab70ca60a6f4d9f1117c5dd8b8129eeb827cd61c16e2a9cbd35133187c1b46bc",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Klein Void.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Klein Void",
+    "background": "#0b0d14",
+    "foreground": "#ede6d3",
+    "cursorColor": "#ede6d3",
+    "selectionBackground": "#002fa7",
+    "black": "#1a1c24",
+    "red": "#f09890",
+    "green": "#a6c080",
+    "yellow": "#e8bc75",
+    "blue": "#002fa7",
+    "purple": "#d49bb5",
+    "cyan": "#9fc0e5",
+    "white": "#cdc7b8",
+    "brightBlack": "#92907a",
+    "brightRed": "#d97757",
+    "brightGreen": "#bcc89c",
+    "brightYellow": "#f0c880",
+    "brightBlue": "#a8bef0",
+    "brightPurple": "#c8b4d4",
+    "brightCyan": "#b0d0ed",
+    "brightWhite": "#f5efde"
+  }
+}

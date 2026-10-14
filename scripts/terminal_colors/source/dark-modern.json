@@ -1,0 +1,32 @@
+{
+  "id": "dark-modern",
+  "sourceUrl": "https://term.const.net/en/themes/dark-modern/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "e1908e1cca2c21a80380f2971b63255e7ef8b59fb5f4a622f99be05c05c1099b",
+  "paletteSha256": "615b6925d91b761cc70d050a6b155bc74c1d13c62dbf5190bbd4c9fee22d8a2f",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Dark Modern.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Dark Modern",
+    "background": "#1f1f1f",
+    "foreground": "#cccccc",
+    "cursorColor": "#ffffff",
+    "selectionBackground": "#3a3d41",
+    "black": "#272727",
+    "red": "#f74949",
+    "green": "#2ea043",
+    "yellow": "#9e6a03",
+    "blue": "#0078d4",
+    "purple": "#d01273",
+    "cyan": "#1db4d6",
+    "white": "#cccccc",
+    "brightBlack": "#5d5d5d",
+    "brightRed": "#dc5452",
+    "brightGreen": "#23d18b",
+    "brightYellow": "#f5f543",
+    "brightBlue": "#3b8eea",
+    "brightPurple": "#d670d6",
+    "brightCyan": "#29b8db",
+    "brightWhite": "#e5e5e5"
+  }
+}

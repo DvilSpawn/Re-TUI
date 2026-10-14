@@ -1,0 +1,32 @@
+{
+  "id": "elemental",
+  "sourceUrl": "https://term.const.net/en/themes/elemental/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "323ab960ee9f4da3d224470efde5b82958f7ea73b27a72dc524cc8c6b0d018c4",
+  "paletteSha256": "916bc4e53567c7f428b4ead9213d653598d3e095920b9f5c9ee76e0e7fd7feed",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Elemental.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Elemental",
+    "background": "#22211d",
+    "foreground": "#807a74",
+    "cursorColor": "#facb80",
+    "selectionBackground": "#413829",
+    "black": "#3c3c30",
+    "red": "#98290f",
+    "green": "#479a43",
+    "yellow": "#7f7111",
+    "blue": "#497f7d",
+    "purple": "#7f4e2f",
+    "cyan": "#387f58",
+    "white": "#807974",
+    "brightBlack": "#555445",
+    "brightRed": "#e0502a",
+    "brightGreen": "#61e070",
+    "brightYellow": "#d69927",
+    "brightBlue": "#79d9d9",
+    "brightPurple": "#cd7c54",
+    "brightCyan": "#59d599",
+    "brightWhite": "#fff1e9"
+  }
+}

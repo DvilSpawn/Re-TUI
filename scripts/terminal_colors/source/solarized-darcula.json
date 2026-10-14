@@ -1,0 +1,32 @@
+{
+  "id": "solarized-darcula",
+  "sourceUrl": "https://term.const.net/en/themes/solarized-darcula/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "7d72c5b602272fa19abbb871002f5dac8f3dbc58aa8ac4dff6e8a06e34072ac6",
+  "paletteSha256": "2981258ee89acc599afa679411f2f7a1efc128c12f9bdaabb2c35925e07aecc3",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Solarized Darcula.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Solarized Darcula",
+    "background": "#3d3f41",
+    "foreground": "#d2d8d9",
+    "cursorColor": "#708284",
+    "selectionBackground": "#214283",
+    "black": "#25292a",
+    "red": "#f24840",
+    "green": "#629655",
+    "yellow": "#b68800",
+    "blue": "#2075c7",
+    "purple": "#797fd4",
+    "cyan": "#15968d",
+    "white": "#d2d8d9",
+    "brightBlack": "#65696a",
+    "brightRed": "#f24840",
+    "brightGreen": "#629655",
+    "brightYellow": "#b68800",
+    "brightBlue": "#2075c7",
+    "brightPurple": "#797fd4",
+    "brightCyan": "#15968d",
+    "brightWhite": "#d2d8d9"
+  }
+}

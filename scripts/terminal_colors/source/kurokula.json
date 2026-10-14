@@ -1,0 +1,32 @@
+{
+  "id": "kurokula",
+  "sourceUrl": "https://term.const.net/en/themes/kurokula/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "e9c3d8fde1ba8f65dbf7561b76f730af81913f9094892c116fa55d5dfa83d750",
+  "paletteSha256": "96f4e8b535635c0628e362ffe732d9ad5102caa182b1fdadc6f36ed5c769aeb3",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Kurokula.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Kurokula",
+    "background": "#141515",
+    "foreground": "#e0cfc2",
+    "cursorColor": "#7a1c1c",
+    "selectionBackground": "#515151",
+    "black": "#333333",
+    "red": "#c35a52",
+    "green": "#78b3a9",
+    "yellow": "#e1b917",
+    "blue": "#5c91dd",
+    "purple": "#8b79a6",
+    "cyan": "#867268",
+    "white": "#e0cfc2",
+    "brightBlack": "#515151",
+    "brightRed": "#ffc34c",
+    "brightGreen": "#afffa5",
+    "brightYellow": "#fff700",
+    "brightBlue": "#90dbff",
+    "brightPurple": "#ad93ff",
+    "brightCyan": "#ffcdb6",
+    "brightWhite": "#ffffff"
+  }
+}

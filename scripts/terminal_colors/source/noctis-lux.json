@@ -1,0 +1,32 @@
+{
+  "id": "noctis-lux",
+  "sourceUrl": "https://term.const.net/en/themes/noctis-lux/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "63b04cad135348ecab78f6847952458b3325ea4d81fff1d95346f11186411241",
+  "paletteSha256": "659376f52c0a8780961ef4fd02203342b113f6aaeaaf525ef50ce2fe3c29a380",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Noctis Lux.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Noctis Lux",
+    "background": "#fef8ec",
+    "foreground": "#005661",
+    "cursorColor": "#005661",
+    "selectionBackground": "#f4e2b8",
+    "black": "#003b42",
+    "red": "#e34e1c",
+    "green": "#00b368",
+    "yellow": "#f49725",
+    "blue": "#0094f0",
+    "purple": "#ff5792",
+    "cyan": "#00bdd6",
+    "white": "#8ca6a6",
+    "brightBlack": "#004d57",
+    "brightRed": "#ff4000",
+    "brightGreen": "#00d17a",
+    "brightYellow": "#ff8c00",
+    "brightBlue": "#0fa3ff",
+    "brightPurple": "#ff6b9f",
+    "brightCyan": "#00cbe6",
+    "brightWhite": "#bbc3c4"
+  }
+}

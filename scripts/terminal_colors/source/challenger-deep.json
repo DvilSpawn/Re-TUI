@@ -1,0 +1,32 @@
+{
+  "id": "challenger-deep",
+  "sourceUrl": "https://term.const.net/en/themes/challenger-deep/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "d79ab477e5be1aa31e80401ed1e71c9c00a7da148db92f08e91abbaa77685991",
+  "paletteSha256": "611f8afde685f69bb5350bd8799571e593108a965983093aad3b5cc50a3da6b0",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Challenger Deep.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Challenger Deep",
+    "background": "#1e1c31",
+    "foreground": "#cbe1e7",
+    "cursorColor": "#fbfcfc",
+    "selectionBackground": "#cbe1e7",
+    "black": "#141228",
+    "red": "#ff5458",
+    "green": "#62d196",
+    "yellow": "#ffb378",
+    "blue": "#65b2ff",
+    "purple": "#906cff",
+    "cyan": "#63f2f1",
+    "white": "#a6b3cc",
+    "brightBlack": "#565575",
+    "brightRed": "#ff8080",
+    "brightGreen": "#95ffa4",
+    "brightYellow": "#ffe9aa",
+    "brightBlue": "#91ddff",
+    "brightPurple": "#c991e1",
+    "brightCyan": "#aaffe4",
+    "brightWhite": "#cbe3e7"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "github-light-colorblind",
+  "sourceUrl": "https://term.const.net/en/themes/github-light-colorblind/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "41551840d6431869b254fc61eb8b8c7a2b7dabd88ebc6cf14de7d74282f2d5f9",
+  "paletteSha256": "2b1183571007be8616c3fdc508d9978a5117616c88b6d700063830c1528c79b1",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/GitHub Light Colorblind.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "GitHub Light Colorblind",
+    "background": "#ffffff",
+    "foreground": "#24292f",
+    "cursorColor": "#0969da",
+    "selectionBackground": "#24292f",
+    "black": "#24292f",
+    "red": "#b35900",
+    "green": "#0550ae",
+    "yellow": "#4d2d00",
+    "blue": "#0969da",
+    "purple": "#8250df",
+    "cyan": "#1b7c83",
+    "white": "#6e7781",
+    "brightBlack": "#57606a",
+    "brightRed": "#8a4600",
+    "brightGreen": "#0969da",
+    "brightYellow": "#633c01",
+    "brightBlue": "#218bff",
+    "brightPurple": "#a475f9",
+    "brightCyan": "#3192aa",
+    "brightWhite": "#8c959f"
+  }
+}

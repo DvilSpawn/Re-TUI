@@ -1,0 +1,32 @@
+{
+  "id": "blue-berry-pie",
+  "sourceUrl": "https://term.const.net/en/themes/blue-berry-pie/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "74b2c9b50f58004270d18c0ab1d0783837c215b95e4db65710aa071cf4ba1502",
+  "paletteSha256": "e221eaef6ca432d22150a0d9234426508761886c37fcbf051be013eafc34ffb4",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Blue Berry Pie.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Blue Berry Pie",
+    "background": "#1c0c28",
+    "foreground": "#babab9",
+    "cursorColor": "#fcfad6",
+    "selectionBackground": "#606060",
+    "black": "#0a4c62",
+    "red": "#99246e",
+    "green": "#5cb1b3",
+    "yellow": "#eab9a8",
+    "blue": "#90a5bd",
+    "purple": "#9d54a7",
+    "cyan": "#7e83cc",
+    "white": "#f0e8d6",
+    "brightBlack": "#463c5d",
+    "brightRed": "#c87272",
+    "brightGreen": "#0a6c7e",
+    "brightYellow": "#7a3188",
+    "brightBlue": "#5f3d63",
+    "brightPurple": "#bc94b7",
+    "brightCyan": "#5e6071",
+    "brightWhite": "#0a6c7e"
+  }
+}

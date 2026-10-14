@@ -1,0 +1,32 @@
+{
+  "id": "liquid-carbon-transparent",
+  "sourceUrl": "https://term.const.net/en/themes/liquid-carbon-transparent/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "4c0e68caed11e9c98dd765aeb1df837be41274b04d28a8d6e525dbb5b3283257",
+  "paletteSha256": "ea9027891667972af62817caecf0a15cc7d9217773330a191817eeeb89bbd4ba",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Liquid Carbon Transparent.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Liquid Carbon Transparent",
+    "background": "#000000",
+    "foreground": "#afc2c2",
+    "cursorColor": "#ffffff",
+    "selectionBackground": "#7dbeff",
+    "black": "#000000",
+    "red": "#ff3030",
+    "green": "#559a70",
+    "yellow": "#ccac00",
+    "blue": "#0099cc",
+    "purple": "#cc69c8",
+    "cyan": "#7ac4cc",
+    "white": "#bccccc",
+    "brightBlack": "#404040",
+    "brightRed": "#ff3030",
+    "brightGreen": "#559a70",
+    "brightYellow": "#ccac00",
+    "brightBlue": "#0099cc",
+    "brightPurple": "#cc69c8",
+    "brightCyan": "#7ac4cc",
+    "brightWhite": "#bccccc"
+  }
+}

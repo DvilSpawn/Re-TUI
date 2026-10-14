@@ -1,0 +1,32 @@
+{
+  "id": "under-the-sea",
+  "sourceUrl": "https://term.const.net/en/themes/under-the-sea/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "aa6c3f11a9ae1d07765c2085f38f4a69eebef451d867fcd921eec6a87c566670",
+  "paletteSha256": "c871417dc2f328874a770d7ead1f6da47c4a4dc736a504d18d5c3a23513bf13c",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Under The Sea.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Under The Sea",
+    "background": "#011116",
+    "foreground": "#ffffff",
+    "cursorColor": "#4afcd6",
+    "selectionBackground": "#415555",
+    "black": "#022026",
+    "red": "#b2302d",
+    "green": "#00a941",
+    "yellow": "#59819c",
+    "blue": "#459a86",
+    "purple": "#00599d",
+    "cyan": "#5d7e19",
+    "white": "#405555",
+    "brightBlack": "#384451",
+    "brightRed": "#ff4242",
+    "brightGreen": "#2aea5e",
+    "brightYellow": "#8ed4fd",
+    "brightBlue": "#61d5ba",
+    "brightPurple": "#1298ff",
+    "brightCyan": "#98d028",
+    "brightWhite": "#58fbd6"
+  }
+}

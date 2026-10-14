@@ -1,5 +1,7 @@
 package ohi.andre.consolelauncher.managers
 
+import android.app.Activity
+import android.app.role.RoleManager
 import android.content.BroadcastReceiver
 import android.content.ActivityNotFoundException
 import android.content.ComponentName
@@ -75,10 +77,23 @@ class AppsManager(context: Context) : XMLPrefsElement {
 
     private var appsHolder: AppsHolder? = null
     private var hiddenApps: MutableList<LaunchInfo>? = null
+    private var privateShownApps: MutableList<LaunchInfo> = ArrayList()
+    private var privateHiddenApps: MutableList<LaunchInfo> = ArrayList()
+    private var privateProfile: UserHandle? = null
+    private var privateSpaceLocked = true
 
     private val PREFS = "apps"
+    private val PRIVATE_ENTRYPOINT_VISIBLE = "private_space_entrypoint_visible"
     private val preferences: SharedPreferences
     private val editor: SharedPreferences.Editor
+
+    private val profileBroadcast: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            val action = intent?.action ?: return
+            if (action != Intent.ACTION_PROFILE_AVAILABLE && action != Intent.ACTION_PROFILE_UNAVAILABLE) return
+            refreshProfiles()
+        }
+    }
 
     private var prefsList: XMLPrefsList? = null
 
@@ -169,6 +184,7 @@ class AppsManager(context: Context) : XMLPrefsElement {
         this.groups = ArrayList<Group>()
 
         initAppListener(context)
+        initProfileListener(context)
 
         object : StoppableThread() {
             override fun run() {
@@ -198,9 +214,32 @@ class AppsManager(context: Context) : XMLPrefsElement {
         )
     }
 
+    private fun initProfileListener(c: Context) {
+        val filter = IntentFilter().apply {
+            addAction(Intent.ACTION_PROFILE_AVAILABLE)
+            addAction(Intent.ACTION_PROFILE_UNAVAILABLE)
+        }
+        ContextCompat.registerReceiver(
+            c,
+            profileBroadcast,
+            filter,
+            ContextCompat.RECEIVER_EXPORTED
+        )
+    }
+
+    private fun refreshProfiles() {
+        refreshPrivateSpaceState()
+        fill()
+        LocalBroadcastManager.getInstance(context.applicationContext).sendBroadcast(
+            Intent(UIManager.ACTION_UPDATE_APPS)
+        )
+    }
+
     fun fill() {
         val allApps = createAppMap(context!!.getPackageManager())
         hiddenApps = ArrayList<LaunchInfo>()
+        privateShownApps = ArrayList(allApps.filter { it.isPrivateProfile })
+        privateHiddenApps = ArrayList()
 
         groups.clear()
 
@@ -288,7 +327,7 @@ class AppsManager(context: Context) : XMLPrefsElement {
                                             .dropLastWhile { it.isEmpty() }.toTypedArray()
 
                                     val `as`: MutableList<LaunchInfo?> =
-                                        ArrayList<LaunchInfo?>(allApps)
+                                        ArrayList<LaunchInfo?>(allApps.filter { !it.isPrivateProfile })
 
                                     External@ for (s in split) {
                                         for (c in `as`.indices) {
@@ -381,7 +420,9 @@ class AppsManager(context: Context) : XMLPrefsElement {
             Tuils.toFile(e1)
         }
 
-        appsHolder = AppsHolder(allApps, prefsList!!)
+        privateShownApps = ArrayList(allApps.filter { it.isPrivateProfile })
+        privateHiddenApps = ArrayList(hiddenApps?.filter { it.isPrivateProfile } ?: emptyList())
+        appsHolder = AppsHolder(allApps.filter { !it.isPrivateProfile }.toMutableList(), prefsList!!)
         AppUtils.checkEquality(hiddenApps!!)
 
         Group.Companion.sorting = XMLPrefsManager.getInt(Apps.app_groups_sorting)
@@ -402,23 +443,39 @@ class AppsManager(context: Context) : XMLPrefsElement {
         val userManager = context!!.getSystemService(Context.USER_SERVICE) as UserManager?
         val currentProfile = Process.myUserHandle()
         val currentSerial = profileSerial(userManager, currentProfile)
+        privateProfile = null
+        privateSpaceLocked = true
         var canReadShortcuts = false
 
         try {
             launcherApps =
                 context.getSystemService(Context.LAUNCHER_APPS_SERVICE) as LauncherApps?
+            val isDefaultLauncher = isDefaultLauncher()
             canReadShortcuts =
-                launcherApps != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1 && Tuils.isMyLauncherDefault(
-                    context.getPackageManager()
-                )
+                launcherApps != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1 && isDefaultLauncher
+            val canAccessPrivateProfiles =
+                launcherApps != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM &&
+                    isDefaultLauncher
 
-            var profiles = if (userManager != null) userManager.getUserProfiles() else null
+            var profiles = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && launcherApps != null) {
+                runCatching { launcherApps.getProfiles() }.getOrNull()
+            } else {
+                null
+            }
+            if (profiles == null && userManager != null) {
+                profiles = userManager.getUserProfiles()
+            }
             if (profiles == null || profiles.size == 0) {
                 profiles = ArrayList<UserHandle>()
                 profiles.add(currentProfile!!)
             }
 
             for (profile in profiles) {
+                val current = profile == currentProfile
+                val privateProfileType = isPrivateProfile(launcherApps, profile, current)
+                if (privateProfileType && !canAccessPrivateProfiles) {
+                    continue
+                }
                 val activities = if (launcherApps != null)
                     launcherApps.getActivityList(null, profile)
                 else
@@ -427,8 +484,12 @@ class AppsManager(context: Context) : XMLPrefsElement {
                     continue
                 }
 
-                val current = profile == currentProfile
                 val serial = profileSerial(userManager, profile)
+                val profileType = profileType(launcherApps, profile, current, canAccessPrivateProfiles)
+                if (profileType == LaunchInfo.ProfileType.PRIVATE) {
+                    privateProfile = profile
+                    privateSpaceLocked = isQuietModeEnabled(profile)
+                }
                 for (activity in activities) {
                     val component = activity.getComponentName()
                     val label = if (activity.getLabel() != null) activity.getLabel()
@@ -436,10 +497,11 @@ class AppsManager(context: Context) : XMLPrefsElement {
                     val li = LaunchInfo(
                         component.getPackageName(),
                         component.getClassName(),
-                        if (current) label else context.getString(R.string.app_work_profile_label, label),
+                        profileLabel(profileType, label),
                         profile,
                         serial,
-                        current
+                        current,
+                        profileType
                     )
                     maybeLoadShortcuts(launcherApps, li, canReadShortcuts)
                     deduped.put(li.write(), li)
@@ -466,7 +528,8 @@ class AppsManager(context: Context) : XMLPrefsElement {
                 ri.loadLabel(mgr).toString(),
                 currentProfile,
                 currentSerial,
-                true
+                true,
+                LaunchInfo.ProfileType.CURRENT
             )
             if (launcherApps != null) {
                 maybeLoadShortcuts(launcherApps, li, canReadShortcuts)
@@ -477,6 +540,62 @@ class AppsManager(context: Context) : XMLPrefsElement {
         Log.i("TUI-APPS", "Loaded " + deduped.size + " launchable activities")
 
         return ArrayList<LaunchInfo>(deduped.values)
+    }
+
+    private fun profileType(
+        launcherApps: LauncherApps?,
+        profile: UserHandle,
+        current: Boolean,
+        canAccessPrivateProfiles: Boolean
+    ): LaunchInfo.ProfileType {
+        if (current) return LaunchInfo.ProfileType.CURRENT
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM && launcherApps != null) {
+            val userType = runCatching {
+                launcherApps.getLauncherUserInfo(profile)?.userType
+            }.getOrNull()
+            return profileTypeForUserType(userType, current, canAccessPrivateProfiles)
+        }
+        return LaunchInfo.ProfileType.MANAGED
+    }
+
+    private fun isPrivateProfile(
+        launcherApps: LauncherApps?,
+        profile: UserHandle,
+        current: Boolean
+    ): Boolean {
+        if (current || launcherApps == null || Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+            return false
+        }
+        return runCatching {
+            launcherApps.getLauncherUserInfo(profile)?.userType == "android.os.usertype.profile.PRIVATE"
+        }.getOrDefault(false)
+    }
+
+    private fun profileLabel(type: LaunchInfo.ProfileType, label: String): String {
+        return when (type) {
+            LaunchInfo.ProfileType.CURRENT,
+            LaunchInfo.ProfileType.PRIVATE -> label
+            LaunchInfo.ProfileType.MANAGED -> context.getString(R.string.app_work_profile_label, label)
+            LaunchInfo.ProfileType.OTHER -> context.getString(R.string.app_other_profile_label, label)
+        }
+    }
+
+    private fun isQuietModeEnabled(profile: UserHandle): Boolean {
+        val manager = context.getSystemService(Context.USER_SERVICE) as? UserManager ?: return true
+        return runCatching { manager.isQuietModeEnabled(profile) }.getOrDefault(true)
+    }
+
+    private fun refreshPrivateSpaceState() {
+        val profile = privateProfile ?: return
+        privateSpaceLocked = isQuietModeEnabled(profile)
+    }
+
+    private fun isDefaultLauncher(): Boolean {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val roles = context.getSystemService(RoleManager::class.java)
+            if (roles != null) return roles.isRoleHeld(RoleManager.ROLE_HOME)
+        }
+        return Tuils.isMyLauncherDefault(context.packageManager)
     }
 
     private fun profileSerial(userManager: UserManager?, profile: UserHandle?): Long {
@@ -663,14 +782,12 @@ class AppsManager(context: Context) : XMLPrefsElement {
         if (label == null) return null
         if (appsHolder == null) return null
 
-        val appList: MutableList<LaunchInfo>?
+        val appList: MutableList<LaunchInfo>
         if (type == SHOWN_APPS) {
             appList = appsHolder!!.apps
         } else {
-            appList = hiddenApps
+            appList = hiddenApps()
         }
-
-        if (appList == null) return null
 
         val i: LaunchInfo? = AppUtils.findLaunchInfoWithLabel(appList, label)
         if (i != null) {
@@ -719,7 +836,7 @@ class AppsManager(context: Context) : XMLPrefsElement {
             override fun run() {
                 super.run()
 
-                if (appsHolder != null) appsHolder!!.requestSuggestionUpdate(info)
+                if (!info.isPrivateProfile && appsHolder != null) appsHolder!!.requestSuggestionUpdate(info)
                 writeLaunchTimes(info)
             }
         }.start()
@@ -829,7 +946,7 @@ class AppsManager(context: Context) : XMLPrefsElement {
     }
 
     fun addAppToGroup(group: String?, app: LaunchInfo?): String? {
-        if (app == null) return null
+        if (app == null || app.isPrivateProfile) return null
         val o: Array<Any?>?
         try {
             o = XMLPrefsManager.buildDocument(file, null)
@@ -941,7 +1058,7 @@ class AppsManager(context: Context) : XMLPrefsElement {
             val identity = LaunchInfo.Companion.identityInfo(s)
             var info: LaunchInfo? = AppUtils.findLaunchInfoWithIdentity(appsHolder!!.apps, identity)
             if (info == null) {
-                info = AppUtils.findLaunchInfoWithIdentity(hiddenApps!!, identity)
+                info = AppUtils.findLaunchInfoWithIdentity(hiddenApps(), identity)
             }
             if (info == null) continue
 
@@ -988,13 +1105,83 @@ class AppsManager(context: Context) : XMLPrefsElement {
     }
 
     fun hiddenApps(): MutableList<LaunchInfo> {
-        return hiddenApps!!
+        return ArrayList(hiddenApps?.filter { !it.isPrivateProfile } ?: emptyList())
+    }
+
+    fun hasPrivateSpace(): Boolean = privateProfile != null && privateSpaceAccessAllowed()
+
+    private fun privateSpaceAccessAllowed(): Boolean =
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM && isDefaultLauncher()
+
+    fun isPrivateSpaceLocked(): Boolean {
+        refreshPrivateSpaceState()
+        return privateProfile == null || privateSpaceLocked
+    }
+
+    fun isPrivateSpaceTabVisible(): Boolean {
+        return hasPrivateSpace() && !isPrivateSpaceLocked() &&
+            preferences.getBoolean(PRIVATE_ENTRYPOINT_VISIBLE, true)
+    }
+
+    fun privateApps(): MutableList<LaunchInfo> {
+        if (!isPrivateSpaceTabVisible()) return ArrayList()
+        return ArrayList(privateShownApps)
+    }
+
+    fun listPrivateApps(): String {
+        if (!hasPrivateSpace()) return context.getString(R.string.output_private_space_unavailable)
+        if (isPrivateSpaceLocked()) return context.getString(R.string.output_private_space_locked)
+        val apps = ArrayList<LaunchInfo>(privateShownApps)
+        apps.addAll(privateHiddenApps)
+        return AppUtils.printApps(AppUtils.labelList(apps, true))
+    }
+
+    fun setPrivateSpaceEntrypointVisible(visible: Boolean): String {
+        if (!hasPrivateSpace()) return context.getString(R.string.output_private_space_unavailable)
+        preferences.edit().putBoolean(PRIVATE_ENTRYPOINT_VISIBLE, visible).apply()
+        notifyPrivateSpaceUi()
+        return context.getString(if (visible) R.string.output_private_space_shown else R.string.output_private_space_hidden)
+    }
+
+    fun requestPrivateSpaceQuietMode(quietMode: Boolean): String {
+        if (!hasPrivateSpace()) return context.getString(R.string.output_private_space_unavailable)
+        val profile = privateProfile ?: return context.getString(R.string.output_private_space_unavailable)
+        val manager = context.getSystemService(Context.USER_SERVICE) as? UserManager
+            ?: return context.getString(R.string.output_private_space_unavailable)
+        val requested = runCatching { manager.requestQuietModeEnabled(quietMode, profile) }.getOrDefault(false)
+        if (!requested) return context.getString(R.string.output_private_space_action_failed)
+        privateSpaceLocked = quietMode
+        notifyPrivateSpaceUi()
+        return context.getString(if (quietMode) R.string.output_private_space_locked_now else R.string.output_private_space_unlock_requested)
+    }
+
+    fun openPrivateSpaceSettings(): String? {
+        if (!hasPrivateSpace()) return context.getString(R.string.output_private_space_unavailable)
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.BAKLAVA) {
+            return context.getString(R.string.output_private_space_settings_android)
+        }
+        val launcherApps = context.getSystemService(Context.LAUNCHER_APPS_SERVICE) as? LauncherApps
+            ?: return context.getString(R.string.output_private_space_unavailable)
+        val sender = runCatching { launcherApps.getPrivateSpaceSettingsIntent() }.getOrNull()
+            ?: return context.getString(R.string.output_private_space_unavailable)
+        val activity = context as? Activity
+            ?: return context.getString(R.string.output_private_space_unavailable)
+        return runCatching {
+            activity.startIntentSender(sender, null, 0, 0, 0)
+            null
+        }.getOrElse { context.getString(R.string.output_private_space_unavailable) }
+    }
+
+    private fun notifyPrivateSpaceUi() {
+        LocalBroadcastManager.getInstance(context.applicationContext).sendBroadcast(
+            Intent(UIManager.ACTION_UPDATE_APPS)
+        )
     }
 
     fun findLaunchInfo(identity: String?): LaunchInfo? {
         val parsed = LaunchInfo.identityInfo(identity) ?: return null
         AppUtils.findLaunchInfoWithIdentity(shownApps(), parsed)?.let { return it }
-        return hiddenApps?.let { AppUtils.findLaunchInfoWithIdentity(it, parsed) }
+        return AppUtils.findLaunchInfoWithIdentity(hiddenApps(), parsed)
     }
 
     val suggestedApps: Array<LaunchInfo?>
@@ -1032,7 +1219,7 @@ class AppsManager(context: Context) : XMLPrefsElement {
     private fun printNApps(type: Int, n: Int): String? {
         try {
             val labels: MutableList<String> = AppUtils.labelList(
-                (if (type == AppsManager.Companion.SHOWN_APPS) appsHolder!!.apps else hiddenApps)!!,
+                if (type == AppsManager.Companion.SHOWN_APPS) shownApps() else hiddenApps(),
                 true
             )
 
@@ -1055,7 +1242,7 @@ class AppsManager(context: Context) : XMLPrefsElement {
         var with = with
         try {
             val labels: MutableList<String> = AppUtils.labelList(
-                (if (type == AppsManager.Companion.SHOWN_APPS) appsHolder!!.apps else hiddenApps)!!,
+                if (type == AppsManager.Companion.SHOWN_APPS) shownApps() else hiddenApps(),
                 true
             )
 
@@ -1080,6 +1267,7 @@ class AppsManager(context: Context) : XMLPrefsElement {
 
     fun onDestroy() {
         unregisterReceiver(context!!)
+        context.unregisterReceiver(profileBroadcast)
     }
 
     class Group(var name: String) : MainManager.Group, StringableObject {
@@ -1231,12 +1419,14 @@ class AppsManager(context: Context) : XMLPrefsElement {
             label: String?,
             userHandle: UserHandle? = Process.myUserHandle(),
             profileSerial: Long = 0L,
-            currentProfile: Boolean = true
+            currentProfile: Boolean = true,
+            profileType: ProfileType = if (currentProfile) ProfileType.CURRENT else ProfileType.OTHER
         ) {
             this.componentName = ComponentName(packageName, activityName)
             this.userHandle = if (userHandle != null) userHandle else Process.myUserHandle()
             this.profileSerial = profileSerial
             this.currentProfile = currentProfile
+            this.profileType = profileType
             setLabel(label.orEmpty())
         }
 
@@ -1246,7 +1436,8 @@ class AppsManager(context: Context) : XMLPrefsElement {
             info.publicLabel,
             info.userHandle,
             info.profileSerial,
-            info.currentProfile
+            info.currentProfile,
+            info.profileType
         ) {
             launchedTimes = info.launchedTimes
             unspacedLowercaseLabel = info.unspacedLowercaseLabel
@@ -1262,7 +1453,17 @@ class AppsManager(context: Context) : XMLPrefsElement {
             currentProfile = `in`.readByte().toInt() != 0
             setLabel(`in`.readString()!!)
             launchedTimes = `in`.readInt()
+            profileType = if (`in`.dataAvail() > 0) {
+                ProfileType.values().getOrElse(`in`.readInt()) { if (currentProfile) ProfileType.CURRENT else ProfileType.OTHER }
+            } else {
+                if (currentProfile) ProfileType.CURRENT else ProfileType.OTHER
+            }
         }
+
+        var profileType: ProfileType = ProfileType.OTHER
+
+        val isPrivateProfile: Boolean
+            get() = profileType == ProfileType.PRIVATE
 
         fun setLabel(s: String) {
             this.publicLabel = s
@@ -1333,6 +1534,7 @@ class AppsManager(context: Context) : XMLPrefsElement {
             dest.writeByte((if (currentProfile) 1 else 0).toByte())
             dest.writeString(publicLabel)
             dest.writeInt(launchedTimes)
+            dest.writeInt(profileType.ordinal)
         }
 
         fun setShortcuts(s: MutableList<ShortcutInfo?>?) {
@@ -1347,6 +1549,13 @@ class AppsManager(context: Context) : XMLPrefsElement {
             val profileSerial: Long,
             val componentName: ComponentName?
         )
+
+        enum class ProfileType {
+            CURRENT,
+            MANAGED,
+            PRIVATE,
+            OTHER
+        }
 
         companion object {
             private const val COMPONENT_SEPARATOR = "-"
@@ -1843,5 +2052,36 @@ class AppsManager(context: Context) : XMLPrefsElement {
 
         private const val PROFILE_PREFIX = "profile"
         var instance: XMLPrefsElement? = null
+
+        internal fun profileTypeForUserType(
+            userType: String?,
+            current: Boolean,
+            canAccessPrivateProfiles: Boolean
+        ): LaunchInfo.ProfileType {
+            if (current) return LaunchInfo.ProfileType.CURRENT
+            return when (userType) {
+                "android.os.usertype.profile.PRIVATE" ->
+                    if (canAccessPrivateProfiles) LaunchInfo.ProfileType.PRIVATE else LaunchInfo.ProfileType.OTHER
+                "android.os.usertype.profile.MANAGED" -> LaunchInfo.ProfileType.MANAGED
+                else -> LaunchInfo.ProfileType.OTHER
+            }
+        }
+
+        internal fun normalSurfaceApps(infos: Collection<LaunchInfo>): MutableList<LaunchInfo> =
+            infos.filterTo(ArrayList()) { isNormalSurfaceProfile(it.profileType) }
+
+        internal fun privateSurfaceApps(
+            infos: Collection<LaunchInfo>,
+            unlocked: Boolean
+        ): MutableList<LaunchInfo> =
+            infos.filterTo(ArrayList()) { isPrivateSurfaceProfile(it.profileType, unlocked) }
+
+        internal fun isNormalSurfaceProfile(type: LaunchInfo.ProfileType): Boolean =
+            type != LaunchInfo.ProfileType.PRIVATE
+
+        internal fun isPrivateSurfaceProfile(
+            type: LaunchInfo.ProfileType,
+            unlocked: Boolean
+        ): Boolean = unlocked && type == LaunchInfo.ProfileType.PRIVATE
     }
 }

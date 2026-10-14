@@ -1,0 +1,32 @@
+{
+  "id": "everblush",
+  "sourceUrl": "https://term.const.net/en/themes/everblush/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "42f3e8432b33f448d9ccdd158585e7bec72d2d716513a9a02babbc42e27c74a3",
+  "paletteSha256": "e6d7882d485b837a3e87dee259f3d8ebf2b0dfd266e48f4989a049fc9dd78928",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Everblush.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Everblush",
+    "background": "#141b1e",
+    "foreground": "#dadada",
+    "cursorColor": "#dadada",
+    "selectionBackground": "#141b1e",
+    "black": "#232a2d",
+    "red": "#e57474",
+    "green": "#8ccf7e",
+    "yellow": "#e5c76b",
+    "blue": "#67b0e8",
+    "purple": "#c47fd5",
+    "cyan": "#6cbfbf",
+    "white": "#b3b9b8",
+    "brightBlack": "#464e50",
+    "brightRed": "#ef7e7e",
+    "brightGreen": "#96d988",
+    "brightYellow": "#f4d67a",
+    "brightBlue": "#71baf2",
+    "brightPurple": "#ce89df",
+    "brightCyan": "#67cbe7",
+    "brightWhite": "#bdc3c2"
+  }
+}

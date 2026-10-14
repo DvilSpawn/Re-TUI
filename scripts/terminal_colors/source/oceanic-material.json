@@ -1,0 +1,32 @@
+{
+  "id": "oceanic-material",
+  "sourceUrl": "https://term.const.net/en/themes/oceanic-material/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "3c25096bcc77ac6c6aca8b37ff1b538b555f0b64d894b6fb3976fa842b1b98e0",
+  "paletteSha256": "546e9a04b146d0244cf98fa04c7ae6234146b2ae8c6238e7f20c721cbfafae64",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Oceanic Material.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Oceanic Material",
+    "background": "#1c262b",
+    "foreground": "#c2c8d7",
+    "cursorColor": "#b3b8c3",
+    "selectionBackground": "#6dc2b8",
+    "black": "#000000",
+    "red": "#ee2b2a",
+    "green": "#40a33f",
+    "yellow": "#ffea2e",
+    "blue": "#1e80f0",
+    "purple": "#8800a0",
+    "cyan": "#16afca",
+    "white": "#a4a4a4",
+    "brightBlack": "#777777",
+    "brightRed": "#dc5c60",
+    "brightGreen": "#70be71",
+    "brightYellow": "#fff163",
+    "brightBlue": "#54a4f3",
+    "brightPurple": "#aa4dbc",
+    "brightCyan": "#42c7da",
+    "brightWhite": "#ffffff"
+  }
+}

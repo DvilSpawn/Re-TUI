@@ -1,0 +1,32 @@
+{
+  "id": "hopscotch-256",
+  "sourceUrl": "https://term.const.net/en/themes/hopscotch-256/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "3743620bd3362a18d024801ab2dcf6364fda8d6cd8370cd92b0e4f47649c9454",
+  "paletteSha256": "9384a1c731f2ada73eaa12aab73973a61fa1ae42f280f4bdc93e43f3e72127ba",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Hopscotch.256.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Hopscotch.256",
+    "background": "#322931",
+    "foreground": "#b9b5b8",
+    "cursorColor": "#b9b5b8",
+    "selectionBackground": "#5c545b",
+    "black": "#322931",
+    "red": "#dd464c",
+    "green": "#8fc13e",
+    "yellow": "#fdcc59",
+    "blue": "#1290bf",
+    "purple": "#c85e7c",
+    "cyan": "#149b93",
+    "white": "#b9b5b8",
+    "brightBlack": "#797379",
+    "brightRed": "#dd464c",
+    "brightGreen": "#8fc13e",
+    "brightYellow": "#fdcc59",
+    "brightBlue": "#1290bf",
+    "brightPurple": "#c85e7c",
+    "brightCyan": "#149b93",
+    "brightWhite": "#ffffff"
+  }
+}

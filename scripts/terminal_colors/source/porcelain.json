@@ -1,0 +1,32 @@
+{
+  "id": "porcelain",
+  "sourceUrl": "https://term.const.net/en/themes/porcelain/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "8b4d26990d9c2325b11e664ebea8e02367390dfe4a5a6120fa463e3fb6c160fd",
+  "paletteSha256": "e4a2575e70f577e3c575eea48eb40c866003038d2a44d69fdcd6bbf3cf1746a7",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Porcelain.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Porcelain",
+    "background": "#fbfbfd",
+    "foreground": "#2a2e37",
+    "cursorColor": "#0054d1",
+    "selectionBackground": "#dce6f7",
+    "black": "#2a2e37",
+    "red": "#c60018",
+    "green": "#157424",
+    "yellow": "#855700",
+    "blue": "#004cc8",
+    "purple": "#761bc3",
+    "cyan": "#006873",
+    "white": "#5a6170",
+    "brightBlack": "#828896",
+    "brightRed": "#d60027",
+    "brightGreen": "#1b842d",
+    "brightYellow": "#af2700",
+    "brightBlue": "#005bdb",
+    "brightPurple": "#862ad2",
+    "brightCyan": "#007f8f",
+    "brightWhite": "#1b1e25"
+  }
+}

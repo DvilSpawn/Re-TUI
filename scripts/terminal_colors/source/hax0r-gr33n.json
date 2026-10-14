@@ -1,0 +1,32 @@
+{
+  "id": "hax0r-gr33n",
+  "sourceUrl": "https://term.const.net/en/themes/hax0r-gr33n/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "28e8233b28111e683d573f55d2f8514a8f2a7076c4ee44a1df926630342f4a2a",
+  "paletteSha256": "645b90eac4dd0076369cef92d37de2a3c39a0ec27de2f3abc73df93ce0cdea51",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/HaX0R Gr33N.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "HaX0R Gr33N",
+    "background": "#020f01",
+    "foreground": "#16b10e",
+    "cursorColor": "#15d00d",
+    "selectionBackground": "#d4ffc1",
+    "black": "#001f0b",
+    "red": "#15d00d",
+    "green": "#15d00d",
+    "yellow": "#15d00d",
+    "blue": "#15d00d",
+    "purple": "#15d00d",
+    "cyan": "#15d00d",
+    "white": "#fafafa",
+    "brightBlack": "#334843",
+    "brightRed": "#19e20e",
+    "brightGreen": "#19e20e",
+    "brightYellow": "#19e20e",
+    "brightBlue": "#19e20e",
+    "brightPurple": "#19e20e",
+    "brightCyan": "#19e20e",
+    "brightWhite": "#fefefe"
+  }
+}

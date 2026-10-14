@@ -1,0 +1,32 @@
+{
+  "id": "black-metal-burzum",
+  "sourceUrl": "https://term.const.net/en/themes/black-metal-burzum/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "e72d35f6ef9772becb4fd8cec57d82c5933dc0ca2420e6dfe8e4ea42935bceb7",
+  "paletteSha256": "f6e13638ff1b028471bef1419af4bf877b344ddaeeedd4d7cfedc7002107861f",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Black Metal (Burzum).json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Black Metal (Burzum)",
+    "background": "#000000",
+    "foreground": "#c1c1c1",
+    "cursorColor": "#c1c1c1",
+    "selectionBackground": "#c1c1c1",
+    "black": "#000000",
+    "red": "#5f8787",
+    "green": "#ddeecc",
+    "yellow": "#99bbaa",
+    "blue": "#888888",
+    "purple": "#999999",
+    "cyan": "#aaaaaa",
+    "white": "#c1c1c1",
+    "brightBlack": "#404040",
+    "brightRed": "#5f8787",
+    "brightGreen": "#ddeecc",
+    "brightYellow": "#99bbaa",
+    "brightBlue": "#888888",
+    "brightPurple": "#999999",
+    "brightCyan": "#aaaaaa",
+    "brightWhite": "#c1c1c1"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "sublette",
+  "sourceUrl": "https://term.const.net/en/themes/sublette/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "bab1e0a19360cf4cde362ba0ca9c4c25f15614f403a3afbc55143f49433f58d2",
+  "paletteSha256": "134f18dd88ee32ca11598099f2e50718adeaad34ada6ccfa3c7d7cd224558147",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Sublette.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Sublette",
+    "background": "#202535",
+    "foreground": "#ccced0",
+    "cursorColor": "#ccced0",
+    "selectionBackground": "#ccced0",
+    "black": "#253045",
+    "red": "#ee5577",
+    "green": "#55ee77",
+    "yellow": "#ffdd88",
+    "blue": "#5588ff",
+    "purple": "#ff77cc",
+    "cyan": "#44eeee",
+    "white": "#f5f5da",
+    "brightBlack": "#405570",
+    "brightRed": "#ee6655",
+    "brightGreen": "#99ee77",
+    "brightYellow": "#ffff77",
+    "brightBlue": "#77bbff",
+    "brightPurple": "#aa88ff",
+    "brightCyan": "#55ffbb",
+    "brightWhite": "#ffffee"
+  }
+}

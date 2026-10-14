@@ -1,0 +1,32 @@
+{
+  "id": "london-soho-night",
+  "sourceUrl": "https://term.const.net/en/themes/london-soho-night/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "e30e273d8301a82eb0d661a4885cf805e941ed71dd310a8b4d4355155ddd91f9",
+  "paletteSha256": "e794b5939dbaea3eecfb5acc24632ad187364aba8aac9542ce93f7c26a2a7c7d",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/London Soho Night.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "London Soho Night",
+    "background": "#1a1612",
+    "foreground": "#ebe0c8",
+    "cursorColor": "#ff5db1",
+    "selectionBackground": "#3a2f24",
+    "black": "#2a221a",
+    "red": "#d4574a",
+    "green": "#8fae5e",
+    "yellow": "#e8b04a",
+    "blue": "#6a8fb5",
+    "purple": "#d96aa5",
+    "cyan": "#9ab8a8",
+    "white": "#ebe0c8",
+    "brightBlack": "#6b5a48",
+    "brightRed": "#e87765",
+    "brightGreen": "#aac874",
+    "brightYellow": "#f4c560",
+    "brightBlue": "#88a8c8",
+    "brightPurple": "#ed85b8",
+    "brightCyan": "#b8cebd",
+    "brightWhite": "#f8eed2"
+  }
+}

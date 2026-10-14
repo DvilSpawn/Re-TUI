@@ -1,0 +1,32 @@
+{
+  "id": "iceberg-light",
+  "sourceUrl": "https://term.const.net/en/themes/iceberg-light/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "6f728019c2a0b0fe29356c05a654b38a7000c02a8ac5d20d021c249c0aa0bfcf",
+  "paletteSha256": "22057e7622df33b71b1005f83929ec0274eb5b683fc4387b984c29be2d6d94e4",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Iceberg Light.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Iceberg Light",
+    "background": "#e8e9ec",
+    "foreground": "#33374c",
+    "cursorColor": "#33374c",
+    "selectionBackground": "#33374c",
+    "black": "#dcdfe7",
+    "red": "#cc517a",
+    "green": "#668e3d",
+    "yellow": "#c57339",
+    "blue": "#2d539e",
+    "purple": "#7759b4",
+    "cyan": "#3f83a6",
+    "white": "#33374c",
+    "brightBlack": "#8389a3",
+    "brightRed": "#cc3768",
+    "brightGreen": "#598030",
+    "brightYellow": "#b6662d",
+    "brightBlue": "#22478e",
+    "brightPurple": "#6845ad",
+    "brightCyan": "#327698",
+    "brightWhite": "#262a3f"
+  }
+}

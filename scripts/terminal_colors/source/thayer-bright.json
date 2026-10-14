@@ -1,0 +1,32 @@
+{
+  "id": "thayer-bright",
+  "sourceUrl": "https://term.const.net/en/themes/thayer-bright/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "4c6dd728845f74fc829425eaab15ac0c0a3ac2550887ece8159116db9e3723d2",
+  "paletteSha256": "edafc26e79cbf91456c6e5c597337ef8de0cbfe2083bc8a0eb2e41cef289fe5a",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Thayer Bright.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Thayer Bright",
+    "background": "#1b1d1e",
+    "foreground": "#f8f8f8",
+    "cursorColor": "#fc971f",
+    "selectionBackground": "#4d4d4d",
+    "black": "#1b1d1e",
+    "red": "#f92672",
+    "green": "#4df840",
+    "yellow": "#f4fd22",
+    "blue": "#2757d6",
+    "purple": "#8c54fe",
+    "cyan": "#38c8b5",
+    "white": "#ccccc6",
+    "brightBlack": "#505354",
+    "brightRed": "#ff5995",
+    "brightGreen": "#b6e354",
+    "brightYellow": "#feed6c",
+    "brightBlue": "#3f78ff",
+    "brightPurple": "#9e6ffe",
+    "brightCyan": "#23cfd5",
+    "brightWhite": "#f8f8f2"
+  }
+}

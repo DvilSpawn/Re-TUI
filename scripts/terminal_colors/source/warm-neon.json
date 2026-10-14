@@ -1,0 +1,32 @@
+{
+  "id": "warm-neon",
+  "sourceUrl": "https://term.const.net/en/themes/warm-neon/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "f81d539c5f3cdf9a2f0c4bad2a78543b0dc6ab0eca1c30aeeda6edbc4168f970",
+  "paletteSha256": "4cd646a821f54cd9100bcbe7d26437729237ec68e9ab477d0294598c99ba42e3",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Warm Neon.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Warm Neon",
+    "background": "#404040",
+    "foreground": "#afdab6",
+    "cursorColor": "#30ff24",
+    "selectionBackground": "#b0ad21",
+    "black": "#000000",
+    "red": "#e24346",
+    "green": "#39b13a",
+    "yellow": "#dae145",
+    "blue": "#4261c5",
+    "purple": "#f920fb",
+    "cyan": "#2abbd4",
+    "white": "#d0b8a3",
+    "brightBlack": "#fefcfc",
+    "brightRed": "#e97071",
+    "brightGreen": "#9cc090",
+    "brightYellow": "#ddda7a",
+    "brightBlue": "#7b91d6",
+    "brightPurple": "#f674ba",
+    "brightCyan": "#5ed1e5",
+    "brightWhite": "#d8c8bb"
+  }
+}

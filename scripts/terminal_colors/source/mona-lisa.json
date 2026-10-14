@@ -1,0 +1,32 @@
+{
+  "id": "mona-lisa",
+  "sourceUrl": "https://term.const.net/en/themes/mona-lisa/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "170a067347caf16b0f8733cfc4a45ed4f40c4c3fcb24c36bd60d96f85c734b93",
+  "paletteSha256": "263397f139f6d2c0610ceedc90b1c43cda0a7df000e45437378201ec6d961d51",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Mona Lisa.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Mona Lisa",
+    "background": "#120b0d",
+    "foreground": "#f7d66a",
+    "cursorColor": "#c46c32",
+    "selectionBackground": "#f7d66a",
+    "black": "#351b0e",
+    "red": "#9b291c",
+    "green": "#636232",
+    "yellow": "#c36e28",
+    "blue": "#515c5d",
+    "purple": "#9b1d29",
+    "cyan": "#588056",
+    "white": "#f7d75c",
+    "brightBlack": "#874228",
+    "brightRed": "#ff4331",
+    "brightGreen": "#b4b264",
+    "brightYellow": "#ff9566",
+    "brightBlue": "#9eb2b4",
+    "brightPurple": "#ff5b6a",
+    "brightCyan": "#8acd8f",
+    "brightWhite": "#ffe598"
+  }
+}

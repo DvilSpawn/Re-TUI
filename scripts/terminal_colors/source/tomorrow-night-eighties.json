@@ -1,0 +1,32 @@
+{
+  "id": "tomorrow-night-eighties",
+  "sourceUrl": "https://term.const.net/en/themes/tomorrow-night-eighties/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "ac339456ed0bd8af50edb7bae0fc10d0f8154537c6f06013f1439ab9c8f97b83",
+  "paletteSha256": "f4d14192304404a11cf00213d9e528d6c95b72d540fa3195aa4b2ce6c4faed7e",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Tomorrow Night Eighties.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Tomorrow Night Eighties",
+    "background": "#2d2d2d",
+    "foreground": "#cccccc",
+    "cursorColor": "#cccccc",
+    "selectionBackground": "#515151",
+    "black": "#000000",
+    "red": "#f2777a",
+    "green": "#99cc99",
+    "yellow": "#ffcc66",
+    "blue": "#6699cc",
+    "purple": "#cc99cc",
+    "cyan": "#66cccc",
+    "white": "#ffffff",
+    "brightBlack": "#595959",
+    "brightRed": "#f2777a",
+    "brightGreen": "#99cc99",
+    "brightYellow": "#ffcc66",
+    "brightBlue": "#6699cc",
+    "brightPurple": "#cc99cc",
+    "brightCyan": "#66cccc",
+    "brightWhite": "#ffffff"
+  }
+}

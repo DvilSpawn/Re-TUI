@@ -1,0 +1,32 @@
+{
+  "id": "gitlab-dark-grey",
+  "sourceUrl": "https://term.const.net/en/themes/gitlab-dark-grey/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "6663ca2451b2645608b81824301acd888e5109e2d7fd9ab38c87ccc497002570",
+  "paletteSha256": "9c7c7ce65d20dcbd1314489dc44da4da73266d9252e0bdb8564c7184e849aa87",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/GitLab Dark Grey.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "GitLab Dark Grey",
+    "background": "#222222",
+    "foreground": "#ffffff",
+    "cursorColor": "#ffffff",
+    "selectionBackground": "#ad95e9",
+    "black": "#000000",
+    "red": "#f57f6c",
+    "green": "#52b87a",
+    "yellow": "#d99530",
+    "blue": "#7fb6ed",
+    "purple": "#f88aaf",
+    "cyan": "#32c5d2",
+    "white": "#ffffff",
+    "brightBlack": "#666666",
+    "brightRed": "#fcb5aa",
+    "brightGreen": "#91d4a8",
+    "brightYellow": "#e9be74",
+    "brightBlue": "#498dd1",
+    "brightPurple": "#fcacc5",
+    "brightCyan": "#5edee3",
+    "brightWhite": "#ffffff"
+  }
+}

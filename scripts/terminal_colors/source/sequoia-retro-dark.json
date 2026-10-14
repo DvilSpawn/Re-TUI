@@ -1,0 +1,32 @@
+{
+  "id": "sequoia-retro-dark",
+  "sourceUrl": "https://term.const.net/en/themes/sequoia-retro-dark/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "425973aa43462f2359a93cbedd7a6e9b7c1330e35f7c9c89dd7dd117daf9b84e",
+  "paletteSha256": "12b0eee3519f666e97d2e43a140b00f2a5e6a44b4685e0ef4b8729a705affb77",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Sequoia Retro Dark.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Sequoia Retro Dark",
+    "background": "#0f1014",
+    "foreground": "#868690",
+    "cursorColor": "#43444d",
+    "selectionBackground": "#817c9c",
+    "black": "#131317",
+    "red": "#829fa7",
+    "green": "#648f68",
+    "yellow": "#da674b",
+    "blue": "#5c87a4",
+    "purple": "#e8b246",
+    "cyan": "#a27e57",
+    "white": "#868690",
+    "brightBlack": "#575861",
+    "brightRed": "#e8b246",
+    "brightGreen": "#648f68",
+    "brightYellow": "#da674b",
+    "brightBlue": "#5c87a4",
+    "brightPurple": "#829fa7",
+    "brightCyan": "#a27e57",
+    "brightWhite": "#868690"
+  }
+}

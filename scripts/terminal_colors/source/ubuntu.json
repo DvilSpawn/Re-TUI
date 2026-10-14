@@ -1,0 +1,32 @@
+{
+  "id": "ubuntu",
+  "sourceUrl": "https://term.const.net/en/themes/ubuntu/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "2e81f60ef8f6bcd729023e871762fe017b6473d0a4052bacb5a5828f1bcf4d77",
+  "paletteSha256": "2f83a2b3352e8b553e8775c7007fbba7e0624556df471fc31c96ec60bf4ebebf",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Ubuntu.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Ubuntu",
+    "background": "#300a24",
+    "foreground": "#eeeeec",
+    "cursorColor": "#bbbbbb",
+    "selectionBackground": "#b5d5ff",
+    "black": "#2e3436",
+    "red": "#cc0000",
+    "green": "#4e9a06",
+    "yellow": "#c4a000",
+    "blue": "#3465a4",
+    "purple": "#75507b",
+    "cyan": "#06989a",
+    "white": "#d3d7cf",
+    "brightBlack": "#555753",
+    "brightRed": "#ef2929",
+    "brightGreen": "#8ae234",
+    "brightYellow": "#fce94f",
+    "brightBlue": "#729fcf",
+    "brightPurple": "#ad7fa8",
+    "brightCyan": "#34e2e2",
+    "brightWhite": "#eeeeec"
+  }
+}

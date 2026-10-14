@@ -1,0 +1,32 @@
+{
+  "id": "deep",
+  "sourceUrl": "https://term.const.net/en/themes/deep/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "a54cdcc22b56675c0a5092fcd5d5be4067f318a1e0ae4860fd0ce043aaef04f7",
+  "paletteSha256": "5a0333f9b011562060875f39668b5b815de126abe4166adfd0d9aece2d8f2d88",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Deep.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Deep",
+    "background": "#090909",
+    "foreground": "#cdcdcd",
+    "cursorColor": "#d0d0d0",
+    "selectionBackground": "#780002",
+    "black": "#000000",
+    "red": "#d70005",
+    "green": "#1cd915",
+    "yellow": "#d9bd26",
+    "blue": "#5665ff",
+    "purple": "#b052da",
+    "cyan": "#50d2da",
+    "white": "#e0e0e0",
+    "brightBlack": "#535353",
+    "brightRed": "#fb0007",
+    "brightGreen": "#22ff18",
+    "brightYellow": "#fedc2b",
+    "brightBlue": "#9fa9ff",
+    "brightPurple": "#e09aff",
+    "brightCyan": "#8df9ff",
+    "brightWhite": "#ffffff"
+  }
+}

@@ -10,4 +10,5 @@
     <item name="startup_dash_controls" type="id" />
     <item name="startup_border_stroke" type="id" />
     <item name="startup_border_gap" type="id" />
+    <item name="startup_default_launcher" type="id" />
 </resources>

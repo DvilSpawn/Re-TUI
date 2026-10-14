@@ -1,0 +1,32 @@
+{
+  "id": "matcha-zen",
+  "sourceUrl": "https://term.const.net/en/themes/matcha-zen/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "a315956e4ddaf0cce9d8278aa5fabdef4e14d205d79d4b5c6d5479656b56f2b3",
+  "paletteSha256": "ad62fe014786fca5fb2e1b33ddb8b2923fd8137d8ed0b2755f3044498a6dec11",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Matcha Zen.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Matcha Zen",
+    "background": "#f5f7ea",
+    "foreground": "#354029",
+    "cursorColor": "#4e8c2e",
+    "selectionBackground": "#dde7cc",
+    "black": "#354029",
+    "red": "#c2452a",
+    "green": "#4e8c2e",
+    "yellow": "#927000",
+    "blue": "#2e7c78",
+    "purple": "#7e5ba6",
+    "cyan": "#2a8585",
+    "white": "#56664a",
+    "brightBlack": "#97a887",
+    "brightRed": "#c2452a",
+    "brightGreen": "#4e8c2e",
+    "brightYellow": "#b05a1e",
+    "brightBlue": "#2e7c78",
+    "brightPurple": "#7e5ba6",
+    "brightCyan": "#2a8585",
+    "brightWhite": "#354029"
+  }
+}

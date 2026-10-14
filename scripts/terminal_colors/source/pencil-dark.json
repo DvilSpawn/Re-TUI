@@ -1,0 +1,32 @@
+{
+  "id": "pencil-dark",
+  "sourceUrl": "https://term.const.net/en/themes/pencil-dark/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "71f2a5408b0ca63e5d819e62df14734f433d17be2ec61592514c1b75917a8bb6",
+  "paletteSha256": "ac4bc3730fa460b19eb97a5815fa6b29a07f09290e430a11c3444ebff146455d",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Pencil Dark.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Pencil Dark",
+    "background": "#212121",
+    "foreground": "#f1f1f1",
+    "cursorColor": "#20bbfc",
+    "selectionBackground": "#b6d6fd",
+    "black": "#212121",
+    "red": "#c30771",
+    "green": "#10a778",
+    "yellow": "#a89c14",
+    "blue": "#008ec4",
+    "purple": "#5f4986",
+    "cyan": "#20a5ba",
+    "white": "#d9d9d9",
+    "brightBlack": "#4f4f4f",
+    "brightRed": "#fb007a",
+    "brightGreen": "#5fd7af",
+    "brightYellow": "#f3e430",
+    "brightBlue": "#20bbfc",
+    "brightPurple": "#6855de",
+    "brightCyan": "#4fb8cc",
+    "brightWhite": "#f1f1f1"
+  }
+}

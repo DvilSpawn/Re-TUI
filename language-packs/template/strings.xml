@@ -13,6 +13,7 @@
     <string name="activity_label_ce041b1ca7">Re:T-UI Startup</string>
     <string name="activity_not_found">Activity not found</string>
     <string name="admin_permission">Lock the screen on double tap</string>
+    <string name="app_other_profile_label">%1$s (Profile)</string>
     <string name="app_shortcut_not_found">Shortcut not found</string>
     <string name="app_work_profile_label">%1$s (Work)</string>
     <string name="backup_error_password">Backup password is incorrect or the file was changed</string>
@@ -1321,6 +1322,11 @@ $ post https://httpbin.org/post hello world</string>
 -rm [name] -&gt; remove a saved or imported preset 
 Local saved presets are not sanitized portable exports or personal backups. Save your current setup before applying a different preset. 
 To share a look, use Settings &gt; System &amp; Support &gt; Create Shareable Configuration.</string>
+    <string name="help_private">-ls -&gt; list Private Space apps 
+-lock -&gt; lock Private Space 
+-unlock -&gt; unlock Private Space 
+-settings -&gt; open Private Space settings when Android exposes them 
+-show / -hide -&gt; show or hide the Private Space drawer entrypoint</string>
     <string name="help_profile">Open your local Re:T-UI profile card.
 Usage:
 profile</string>
@@ -1719,6 +1725,12 @@ Wiki:
     <string name="irc_connection_details">Connection details</string>
     <string name="irc_continue">Continue</string>
     <string name="irc_create_account">Create account</string>
+    <string name="irc_delete_confirm">Delete from IRC</string>
+    <string name="irc_delete_explanation">Choose a message. You can request deletion of your own messages; channel moderators can delete other messages. The server checks permission.</string>
+    <string name="irc_delete_message">Delete a message</string>
+    <string name="irc_delete_missing">This message is no longer available for deletion.</string>
+    <string name="irc_delete_question">Delete this message from IRC history and supported clients? Copies on Discord or other clients may remain.</string>
+    <string name="irc_delete_unavailable">Message deletion is unavailable on this connection.</string>
     <string name="irc_device_explanation">Reconnect automatically with a protected device key; no saved password. Anyone using your unlocked Launcher can access this account. A new phone or reinstall needs password sign-in.</string>
     <string name="irc_device_failed">Device login could not be confirmed. Sign in with your password to retry.</string>
     <string name="irc_device_forgotten">Local device key removed. Password sign-in is required. Check NickServ certificate authorization if server revocation could not complete.</string>
@@ -1744,7 +1756,7 @@ Wiki:
 /oper name (masked password) · /disconnect · /quit · /clear · /help
 Plain text goes only to the active joined channel or query. //text sends /text literally. Unknown commands never become messages or launcher commands.
 Window markers: * unread · ! mention/private message. Passwords are never transcript/history entries. TLS is verified; no plaintext fallback.
-Register once, then sign in or reconnect before joining registered-only channels. Server-readable, not end-to-end encrypted. This first slice has no offline replay, push or background service; leaving disconnects. Unconfirmed messages are never retried automatically.</string>
+Register once, then sign in or reconnect before joining registered-only channels. Server-readable, not end-to-end encrypted. On supported networks, rejoining loads up to 100 recent channel messages. Server-confirmed deletions replace messages with a deletion marker. There is no push or background service; leaving disconnects. Unconfirmed messages are never retried automatically.</string>
     <string name="irc_help_title">Help</string>
     <string name="irc_input_hint">message or /command</string>
     <string name="irc_join_hint">Enter a channel such as #retui, then Continue.</string>
@@ -1975,6 +1987,10 @@ Use module -approve </string>
     <string name="manager_appdrawerpanemanager_all_6b428">ALL</string>
     <string name="manager_appdrawerpanemanager_applications_a46d2">Applications/ [%1$d] &lt;%2$s&gt;</string>
     <string name="manager_appdrawerpanemanager_groups_tabs_ef814">groups %1$d | tabs %2$d</string>
+    <string name="manager_appdrawerpanemanager_private_7d5e1">PRI</string>
+    <string name="manager_appdrawerpanemanager_private_hide_4d1c2">[ HIDE PRIVATE SPACE ]</string>
+    <string name="manager_appdrawerpanemanager_private_lock_6b0f1">[ LOCK PRIVATE SPACE ]</string>
+    <string name="manager_appdrawerpanemanager_private_space_9f6b2">PRIVATE SPACE · %1$d</string>
     <string name="manager_appsmanager_activities_3c20b">Activities: </string>
     <string name="manager_appsmanager_install_d406f">Install: </string>
     <string name="manager_appsmanager_launched_times_53ab9">launched_times: </string>
@@ -4081,6 +4097,14 @@ Try to use "$ help" or "$ tutorial"</string>
     <string name="output_notification_error">The notification service couldn't be started:</string>
     <string name="output_numbernotfound">Contact not found</string>
     <string name="output_playing">Playing:</string>
+    <string name="output_private_space_action_failed">Private Space action failed.</string>
+    <string name="output_private_space_hidden">Private Space entrypoint hidden.</string>
+    <string name="output_private_space_locked">Private Space is locked.</string>
+    <string name="output_private_space_locked_now">Private Space lock requested.</string>
+    <string name="output_private_space_settings_android">Open Android Settings to manage Private Space on this Android version.</string>
+    <string name="output_private_space_shown">Private Space entrypoint shown.</string>
+    <string name="output_private_space_unavailable">Private Space is unavailable.</string>
+    <string name="output_private_space_unlock_requested">Private Space unlock requested.</string>
     <string name="output_rate">Thank you!</string>
     <string name="output_refresh">Refresh: apps, alias, music, contacts, rss feeds</string>
     <string name="output_smsnotsent">SMS not sent: the message was empty.</string>

@@ -1,0 +1,32 @@
+{
+  "id": "mathias",
+  "sourceUrl": "https://term.const.net/en/themes/mathias/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "3cc97483e2c9fecab908513dd6754c5b3b598352b2674bce94396e418d5ce88e",
+  "paletteSha256": "2b93861f255981aa3609296bd8b8cf0bd02a36ae42c72748fc51298dd8891bd1",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Mathias.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Mathias",
+    "background": "#000000",
+    "foreground": "#bbbbbb",
+    "cursorColor": "#bbbbbb",
+    "selectionBackground": "#555555",
+    "black": "#000000",
+    "red": "#e52222",
+    "green": "#a6e32d",
+    "yellow": "#fc951e",
+    "blue": "#c48dff",
+    "purple": "#fa2573",
+    "cyan": "#67d9f0",
+    "white": "#f2f2f2",
+    "brightBlack": "#555555",
+    "brightRed": "#ff5555",
+    "brightGreen": "#55ff55",
+    "brightYellow": "#ffff55",
+    "brightBlue": "#5555ff",
+    "brightPurple": "#ff55ff",
+    "brightCyan": "#55ffff",
+    "brightWhite": "#ffffff"
+  }
+}

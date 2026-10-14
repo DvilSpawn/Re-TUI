@@ -1,0 +1,32 @@
+{
+  "id": "espresso-libre",
+  "sourceUrl": "https://term.const.net/en/themes/espresso-libre/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "15b531cc8b96d41fd8e2138cc5271950e9a882d4f46c6d46b8ab69383c3c502e",
+  "paletteSha256": "b81f3acfa097aa5d265f84e7281aafe18e91f21a59111805642a6e4b22946d09",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Espresso Libre.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Espresso Libre",
+    "background": "#2a211c",
+    "foreground": "#b8a898",
+    "cursorColor": "#ffffff",
+    "selectionBackground": "#c3dcff",
+    "black": "#000000",
+    "red": "#cc0000",
+    "green": "#1a921c",
+    "yellow": "#f0e53a",
+    "blue": "#0066ff",
+    "purple": "#c5656b",
+    "cyan": "#06989a",
+    "white": "#d3d7cf",
+    "brightBlack": "#555753",
+    "brightRed": "#ef2929",
+    "brightGreen": "#9aff87",
+    "brightYellow": "#fffb5c",
+    "brightBlue": "#43a8ed",
+    "brightPurple": "#ff818a",
+    "brightCyan": "#34e2e2",
+    "brightWhite": "#eeeeec"
+  }
+}

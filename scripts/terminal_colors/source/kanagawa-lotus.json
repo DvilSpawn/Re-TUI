@@ -1,0 +1,32 @@
+{
+  "id": "kanagawa-lotus",
+  "sourceUrl": "https://term.const.net/en/themes/kanagawa-lotus/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "6d813ca21780a329b9e013e7eafc0b1bff15c5434e0e7bb2028c35ffcd08e3c7",
+  "paletteSha256": "051ad8104d88056fdd2c4d5c233676f3677de50b185cd3af74ca31e2050c7c43",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Kanagawa Lotus.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Kanagawa Lotus",
+    "background": "#f2ecbc",
+    "foreground": "#545464",
+    "cursorColor": "#43436c",
+    "selectionBackground": "#545464",
+    "black": "#1f1f28",
+    "red": "#c84053",
+    "green": "#6f894e",
+    "yellow": "#77713f",
+    "blue": "#4d699b",
+    "purple": "#b35b79",
+    "cyan": "#597b75",
+    "white": "#545464",
+    "brightBlack": "#8a8980",
+    "brightRed": "#d7474b",
+    "brightGreen": "#6e915f",
+    "brightYellow": "#836f4a",
+    "brightBlue": "#6693bf",
+    "brightPurple": "#624c83",
+    "brightCyan": "#5e857a",
+    "brightWhite": "#43436c"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "nocturnal-winter",
+  "sourceUrl": "https://term.const.net/en/themes/nocturnal-winter/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "6da9606848d97230fabf76666a603eef763349746f7c4c1cf37ea5f27a60f66c",
+  "paletteSha256": "f6ec28effd5a0fd4583726a67f94a14362cb78db20856efbfb9e82bf92a46364",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Nocturnal Winter.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Nocturnal Winter",
+    "background": "#0d0d17",
+    "foreground": "#e6e5e5",
+    "cursorColor": "#e6e5e5",
+    "selectionBackground": "#adbdd0",
+    "black": "#4d4d4d",
+    "red": "#f12d52",
+    "green": "#09cd7e",
+    "yellow": "#f5f17a",
+    "blue": "#3182e0",
+    "purple": "#ff2b6d",
+    "cyan": "#09c87a",
+    "white": "#fcfcfc",
+    "brightBlack": "#808080",
+    "brightRed": "#f16d86",
+    "brightGreen": "#0ae78d",
+    "brightYellow": "#fffc67",
+    "brightBlue": "#6096ff",
+    "brightPurple": "#ff78a2",
+    "brightCyan": "#0ae78d",
+    "brightWhite": "#ffffff"
+  }
+}

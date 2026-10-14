@@ -1,0 +1,32 @@
+{
+  "id": "tango-adapted",
+  "sourceUrl": "https://term.const.net/en/themes/tango-adapted/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "b9495b6349f1cff68a8dbd05e774d9c93b9d29d9cca24a52069d8f087be74c62",
+  "paletteSha256": "116dffc15575ef9fe88f18c5aaaec791218f75c8386974ace04054448792b49e",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Tango Adapted.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Tango Adapted",
+    "background": "#ffffff",
+    "foreground": "#000000",
+    "cursorColor": "#000000",
+    "selectionBackground": "#c1deff",
+    "black": "#000000",
+    "red": "#ff0000",
+    "green": "#59d600",
+    "yellow": "#e3be00",
+    "blue": "#00a2ff",
+    "purple": "#c17ecc",
+    "cyan": "#00d0d6",
+    "white": "#c0c5bb",
+    "brightBlack": "#8f928b",
+    "brightRed": "#ff0013",
+    "brightGreen": "#6dd900",
+    "brightYellow": "#ccbe00",
+    "brightBlue": "#88c9ff",
+    "brightPurple": "#e9a7e1",
+    "brightCyan": "#00d8d9",
+    "brightWhite": "#f6f6f4"
+  }
+}

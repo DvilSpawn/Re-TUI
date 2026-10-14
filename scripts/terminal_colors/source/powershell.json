@@ -1,0 +1,32 @@
+{
+  "id": "powershell",
+  "sourceUrl": "https://term.const.net/en/themes/powershell/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "84a5f81a821bfb078f5588507be9411e5069d1c589e8400c5cd415b941294ddf",
+  "paletteSha256": "d726e6f60628e801ff35b1a095da2681755ad482c8a3f875890047317c9c08aa",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Powershell.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Powershell",
+    "background": "#052454",
+    "foreground": "#f6f6f7",
+    "cursorColor": "#f6f6f7",
+    "selectionBackground": "#f6f6f7",
+    "black": "#000000",
+    "red": "#981a22",
+    "green": "#098003",
+    "yellow": "#c4a000",
+    "blue": "#4140c3",
+    "purple": "#d33682",
+    "cyan": "#0e807f",
+    "white": "#7f7c7f",
+    "brightBlack": "#808080",
+    "brightRed": "#ef2929",
+    "brightGreen": "#1cfe3c",
+    "brightYellow": "#fefe45",
+    "brightBlue": "#268ad2",
+    "brightPurple": "#fe13fa",
+    "brightCyan": "#29fffe",
+    "brightWhite": "#c2c1c3"
+  }
+}

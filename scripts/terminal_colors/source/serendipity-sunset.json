@@ -1,0 +1,32 @@
+{
+  "id": "serendipity-sunset",
+  "sourceUrl": "https://term.const.net/en/themes/serendipity-sunset/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "78294674b65e654dfa63fe3a92e61e08f783268b53faf5e5c2f6c52610161740",
+  "paletteSha256": "66163241f3bfbc29062cf0de079fdc85a90bce1643dddaa159e6f9e6cbe314eb",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Serendipity Sunset.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Serendipity Sunset",
+    "background": "#202231",
+    "foreground": "#dee0ef",
+    "cursorColor": "#8d8f9e",
+    "selectionBackground": "#6b6d7c",
+    "black": "#363847",
+    "red": "#d1918f",
+    "green": "#709bbd",
+    "yellow": "#a392dc",
+    "blue": "#a0b6e8",
+    "purple": "#aac9d4",
+    "cyan": "#d6b4b4",
+    "white": "#dee0ef",
+    "brightBlack": "#6b6d7c",
+    "brightRed": "#d1918f",
+    "brightGreen": "#709bbd",
+    "brightYellow": "#a392dc",
+    "brightBlue": "#a0b6e8",
+    "brightPurple": "#aac9d4",
+    "brightCyan": "#d6b4b4",
+    "brightWhite": "#dee0ef"
+  }
+}

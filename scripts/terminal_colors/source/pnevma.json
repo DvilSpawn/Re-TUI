@@ -1,0 +1,32 @@
+{
+  "id": "pnevma",
+  "sourceUrl": "https://term.const.net/en/themes/pnevma/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "5654ce0babb52aa8fa67ecea3e37b8be761087f784c47e359a79da7d553ec5cd",
+  "paletteSha256": "fed85cdc7b128ba0105e116e33afb22e14467bec82deac5df90891d7d5ee3f06",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Pnevma.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Pnevma",
+    "background": "#1c1c1c",
+    "foreground": "#d0d0d0",
+    "cursorColor": "#e4c9af",
+    "selectionBackground": "#4d4d4d",
+    "black": "#2f2e2d",
+    "red": "#a36666",
+    "green": "#90a57d",
+    "yellow": "#d7af87",
+    "blue": "#7fa5bd",
+    "purple": "#c79ec4",
+    "cyan": "#8adbb4",
+    "white": "#d0d0d0",
+    "brightBlack": "#4a4845",
+    "brightRed": "#d78787",
+    "brightGreen": "#afbea2",
+    "brightYellow": "#e4c9af",
+    "brightBlue": "#a1bdce",
+    "brightPurple": "#d7beda",
+    "brightCyan": "#b1e7dd",
+    "brightWhite": "#efefef"
+  }
+}

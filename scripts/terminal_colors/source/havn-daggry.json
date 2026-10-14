@@ -1,0 +1,32 @@
+{
+  "id": "havn-daggry",
+  "sourceUrl": "https://term.const.net/en/themes/havn-daggry/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "60ca1b681ee8d982d268029b2ba605a66a8428e114ccc4d63480ab91b71208b7",
+  "paletteSha256": "fb840529d084c2371de88dafee1ca8bdf68a308b2a81c892e6852487aad0010d",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Havn Daggry.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Havn Daggry",
+    "background": "#f8f9fb",
+    "foreground": "#3b4a7a",
+    "cursorColor": "#226c4f",
+    "selectionBackground": "#cfe9dd",
+    "black": "#1f2842",
+    "red": "#985248",
+    "green": "#577159",
+    "yellow": "#be6b00",
+    "blue": "#3a577d",
+    "purple": "#7c5c97",
+    "cyan": "#925780",
+    "white": "#b0b5c5",
+    "brightBlack": "#1f2842",
+    "brightRed": "#cc4a35",
+    "brightGreen": "#719679",
+    "brightYellow": "#f1a527",
+    "brightBlue": "#6089c0",
+    "brightPurple": "#7d7396",
+    "brightCyan": "#aa869d",
+    "brightWhite": "#d6dbeb"
+  }
+}

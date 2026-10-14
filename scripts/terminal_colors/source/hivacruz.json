@@ -1,0 +1,32 @@
+{
+  "id": "hivacruz",
+  "sourceUrl": "https://term.const.net/en/themes/hivacruz/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "10a76f0bbc9396032b1ccc5b25ad71f106f0836f3e70340b6127b154d301eb85",
+  "paletteSha256": "31ea93fb5fe2ab410d860a7b425f911fbd362a982c3f95fa21e4069b8397d2bf",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Hivacruz.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Hivacruz",
+    "background": "#132638",
+    "foreground": "#ede4e4",
+    "cursorColor": "#979db4",
+    "selectionBackground": "#5e6687",
+    "black": "#202746",
+    "red": "#c94922",
+    "green": "#ac9739",
+    "yellow": "#c08b30",
+    "blue": "#3d8fd1",
+    "purple": "#6679cc",
+    "cyan": "#22a2c9",
+    "white": "#979db4",
+    "brightBlack": "#6b7394",
+    "brightRed": "#c76b29",
+    "brightGreen": "#73ad43",
+    "brightYellow": "#5e6687",
+    "brightBlue": "#898ea4",
+    "brightPurple": "#dfe2f1",
+    "brightCyan": "#9c637a",
+    "brightWhite": "#f5f7ff"
+  }
+}

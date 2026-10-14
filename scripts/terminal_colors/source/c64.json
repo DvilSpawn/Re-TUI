@@ -1,0 +1,32 @@
+{
+  "id": "c64",
+  "sourceUrl": "https://term.const.net/en/themes/c64/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "855302a263a40eacf99f469764a2ba1ea85a0572cfc3e5fdbdd248154defcf93",
+  "paletteSha256": "e99d7b63223686e217d07189baa3c7df3f7b70f67844e8f61cae778849353b84",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/C64.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "C64",
+    "background": "#40318d",
+    "foreground": "#7869c4",
+    "cursorColor": "#7869c4",
+    "selectionBackground": "#7869c4",
+    "black": "#090300",
+    "red": "#a2524c",
+    "green": "#55a049",
+    "yellow": "#bfce72",
+    "blue": "#6657b3",
+    "purple": "#984ca3",
+    "cyan": "#67b6bd",
+    "white": "#ffffff",
+    "brightBlack": "#000000",
+    "brightRed": "#a2524c",
+    "brightGreen": "#55a049",
+    "brightYellow": "#bfce72",
+    "brightBlue": "#6657b3",
+    "brightPurple": "#984ca3",
+    "brightCyan": "#67b6bd",
+    "brightWhite": "#f7f7f7"
+  }
+}

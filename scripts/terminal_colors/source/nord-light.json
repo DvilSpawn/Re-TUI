@@ -1,0 +1,32 @@
+{
+  "id": "nord-light",
+  "sourceUrl": "https://term.const.net/en/themes/nord-light/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "9edfdad854a87c31f97b2cafd155c205e0e28d56ffa091796c33889babadfed3",
+  "paletteSha256": "9ffc0cd19f41d08fdc036f95b983342222814c4b9130b6c96b794638b067f963",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Nord Light.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Nord Light",
+    "background": "#e5e9f0",
+    "foreground": "#414858",
+    "cursorColor": "#7bb3c3",
+    "selectionBackground": "#d8dee9",
+    "black": "#3b4252",
+    "red": "#bf616a",
+    "green": "#96b17f",
+    "yellow": "#c5a565",
+    "blue": "#81a1c1",
+    "purple": "#b48ead",
+    "cyan": "#7bb3c3",
+    "white": "#a5abb6",
+    "brightBlack": "#4c566a",
+    "brightRed": "#bf616a",
+    "brightGreen": "#96b17f",
+    "brightYellow": "#c5a565",
+    "brightBlue": "#81a1c1",
+    "brightPurple": "#b48ead",
+    "brightCyan": "#82afae",
+    "brightWhite": "#eceff4"
+  }
+}

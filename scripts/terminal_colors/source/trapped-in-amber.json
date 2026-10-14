@@ -1,0 +1,32 @@
+{
+  "id": "trapped-in-amber",
+  "sourceUrl": "https://term.const.net/en/themes/trapped-in-amber/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "3741d184e56b4112d92a16c2f73465850cfc8ac88d7b128e11af9cfd9dbb5dab",
+  "paletteSha256": "aa0e54e1e1de94e877c59bf76a1d5039b1319a14cce9d884326b805baab4bf4a",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Trapped in Amber.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Trapped in Amber",
+    "background": "#0a1017",
+    "foreground": "#f0a020",
+    "cursorColor": "#ffc940",
+    "selectionBackground": "#4a3416",
+    "black": "#4a3220",
+    "red": "#e05c1c",
+    "green": "#7a9c4a",
+    "yellow": "#f0a020",
+    "blue": "#4a7ec9",
+    "purple": "#c95a8c",
+    "cyan": "#7a9ea8",
+    "white": "#ffd9a0",
+    "brightBlack": "#5a4a3a",
+    "brightRed": "#ff7832",
+    "brightGreen": "#a8c46b",
+    "brightYellow": "#ffd700",
+    "brightBlue": "#6b9fff",
+    "brightPurple": "#ff7fa8",
+    "brightCyan": "#a5c2cc",
+    "brightWhite": "#fff5e0"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "pencil-light",
+  "sourceUrl": "https://term.const.net/en/themes/pencil-light/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "a0bae3a0dadd46f180485187a2bdb50ba99601ed220797851995e701ae15debb",
+  "paletteSha256": "82d18270c91530fb0a71d9d4daf829cef9d6120a0f081515c103ca79b2ca13c4",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Pencil Light.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Pencil Light",
+    "background": "#f1f1f1",
+    "foreground": "#424242",
+    "cursorColor": "#20bbfc",
+    "selectionBackground": "#b6d6fd",
+    "black": "#212121",
+    "red": "#c30771",
+    "green": "#10a778",
+    "yellow": "#a89c14",
+    "blue": "#008ec4",
+    "purple": "#523c79",
+    "cyan": "#20a5ba",
+    "white": "#b3b3b3",
+    "brightBlack": "#424242",
+    "brightRed": "#fb007a",
+    "brightGreen": "#52caa2",
+    "brightYellow": "#c0b100",
+    "brightBlue": "#20bbfc",
+    "brightPurple": "#6855de",
+    "brightCyan": "#4fb8cc",
+    "brightWhite": "#f1f1f1"
+  }
+}

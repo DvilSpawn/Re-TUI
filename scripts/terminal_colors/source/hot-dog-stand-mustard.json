@@ -1,0 +1,32 @@
+{
+  "id": "hot-dog-stand-mustard",
+  "sourceUrl": "https://term.const.net/en/themes/hot-dog-stand-mustard/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "4d7625f9f91a58aa6949f7be2bdd27397057dfbe726821097056158c072fe688",
+  "paletteSha256": "e8181f05362bbda840b3d8bbe886bd017bc5198132d19412ae3f454e8a623f8e",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Hot Dog Stand (Mustard).json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Hot Dog Stand (Mustard)",
+    "background": "#ffff54",
+    "foreground": "#000000",
+    "cursorColor": "#ea3323",
+    "selectionBackground": "#ea3323",
+    "black": "#000000",
+    "red": "#ea3323",
+    "green": "#ea3323",
+    "yellow": "#ea3323",
+    "blue": "#000000",
+    "purple": "#ea3323",
+    "cyan": "#000000",
+    "white": "#b9b9b9",
+    "brightBlack": "#000000",
+    "brightRed": "#ea3323",
+    "brightGreen": "#ea3323",
+    "brightYellow": "#ea3323",
+    "brightBlue": "#000000",
+    "brightPurple": "#ea3323",
+    "brightCyan": "#000000",
+    "brightWhite": "#c6c6c6"
+  }
+}

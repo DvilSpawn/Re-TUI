@@ -1,0 +1,32 @@
+{
+  "id": "black-metal-venom",
+  "sourceUrl": "https://term.const.net/en/themes/black-metal-venom/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "6d06e651b3b4fdbe7d292c4d5b8221b1f742fb806911515b9412d1521eb58af7",
+  "paletteSha256": "da31053e3b44b16fb59f1f1b6236e77cc96e6d71e454ed540a1c70008408eb44",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Black Metal (Venom).json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Black Metal (Venom)",
+    "background": "#000000",
+    "foreground": "#c1c1c1",
+    "cursorColor": "#c1c1c1",
+    "selectionBackground": "#c1c1c1",
+    "black": "#000000",
+    "red": "#5f8787",
+    "green": "#f8f7f2",
+    "yellow": "#79241f",
+    "blue": "#888888",
+    "purple": "#999999",
+    "cyan": "#aaaaaa",
+    "white": "#c1c1c1",
+    "brightBlack": "#404040",
+    "brightRed": "#5f8787",
+    "brightGreen": "#f8f7f2",
+    "brightYellow": "#79241f",
+    "brightBlue": "#888888",
+    "brightPurple": "#999999",
+    "brightCyan": "#aaaaaa",
+    "brightWhite": "#c1c1c1"
+  }
+}

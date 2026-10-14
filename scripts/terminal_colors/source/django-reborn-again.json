@@ -1,0 +1,32 @@
+{
+  "id": "django-reborn-again",
+  "sourceUrl": "https://term.const.net/en/themes/django-reborn-again/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "c6675dd270f61bb09fac4010acabe0462e34143fdde2e8d14dc04e7e3c3566d4",
+  "paletteSha256": "7acbad74c4ecfa2d3d5dc1b7d5eb06b1cc2a373333b8fd04d994019f5e46c2e7",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Django Reborn Again.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Django Reborn Again",
+    "background": "#051f14",
+    "foreground": "#dadedc",
+    "cursorColor": "#ffcc00",
+    "selectionBackground": "#203727",
+    "black": "#000000",
+    "red": "#fd6209",
+    "green": "#41a83e",
+    "yellow": "#ffe862",
+    "blue": "#245032",
+    "purple": "#f8f8f8",
+    "cyan": "#9df39f",
+    "white": "#ffffff",
+    "brightBlack": "#4c4c4c",
+    "brightRed": "#ff943b",
+    "brightGreen": "#73da70",
+    "brightYellow": "#ffff94",
+    "brightBlue": "#568264",
+    "brightPurple": "#ffffff",
+    "brightCyan": "#cfffd1",
+    "brightWhite": "#ffffff"
+  }
+}

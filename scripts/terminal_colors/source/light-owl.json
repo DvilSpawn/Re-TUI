@@ -1,0 +1,32 @@
+{
+  "id": "light-owl",
+  "sourceUrl": "https://term.const.net/en/themes/light-owl/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "202d3d71856004db77f5ce8e3dd199fa65b4a91df9aee2540080e86fad010af5",
+  "paletteSha256": "1d9cfededc4db148550d1b96990ba77ff095996a9f669f528087c7d6e1eed521",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Light Owl.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Light Owl",
+    "background": "#fbfbfb",
+    "foreground": "#403f53",
+    "cursorColor": "#403f53",
+    "selectionBackground": "#e0e0e0",
+    "black": "#403f53",
+    "red": "#de3d3b",
+    "green": "#08916a",
+    "yellow": "#e0af02",
+    "blue": "#288ed7",
+    "purple": "#d6438a",
+    "cyan": "#2aa298",
+    "white": "#bdbdbd",
+    "brightBlack": "#989fb1",
+    "brightRed": "#de3d3b",
+    "brightGreen": "#08916a",
+    "brightYellow": "#daaa01",
+    "brightBlue": "#288ed7",
+    "brightPurple": "#d6438a",
+    "brightCyan": "#2aa298",
+    "brightWhite": "#f0f0f0"
+  }
+}

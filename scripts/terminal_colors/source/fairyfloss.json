@@ -1,0 +1,32 @@
+{
+  "id": "fairyfloss",
+  "sourceUrl": "https://term.const.net/en/themes/fairyfloss/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "019af89ea7629ad3c1f68c6580a2cad50f26cc56b8e64730d0c2869e1d4ba402",
+  "paletteSha256": "72962ee4a3733e392ae14b7413d8d85e11e406eb3282fad0802f56038f045354",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Fairyfloss.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Fairyfloss",
+    "background": "#5a5475",
+    "foreground": "#f8f8f2",
+    "cursorColor": "#f8f8f0",
+    "selectionBackground": "#8077a8",
+    "black": "#040303",
+    "red": "#f92672",
+    "green": "#c2ffdf",
+    "yellow": "#e6c000",
+    "blue": "#c2ffdf",
+    "purple": "#ffb8d1",
+    "cyan": "#c5a3ff",
+    "white": "#f8f8f0",
+    "brightBlack": "#6090cb",
+    "brightRed": "#ff857f",
+    "brightGreen": "#c2ffdf",
+    "brightYellow": "#ffea00",
+    "brightBlue": "#c2ffdf",
+    "brightPurple": "#ffb8d1",
+    "brightCyan": "#c5a3ff",
+    "brightWhite": "#f8f8f0"
+  }
+}

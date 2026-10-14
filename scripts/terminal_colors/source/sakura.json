@@ -1,0 +1,32 @@
+{
+  "id": "sakura",
+  "sourceUrl": "https://term.const.net/en/themes/sakura/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "cd245a01c0d3cde608b6abc56608845c2357a719a9b03cc40a9496348e9d8afa",
+  "paletteSha256": "6072d514f440e4ca2d95f30b218af220cd3de78911d48bdc00f4d835f670364f",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Sakura.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Sakura",
+    "background": "#18131e",
+    "foreground": "#dd7bdc",
+    "cursorColor": "#ff65fd",
+    "selectionBackground": "#c05cbf",
+    "black": "#000000",
+    "red": "#d52370",
+    "green": "#41af1a",
+    "yellow": "#bc7053",
+    "blue": "#6964ab",
+    "purple": "#c71fbf",
+    "cyan": "#939393",
+    "white": "#998eac",
+    "brightBlack": "#786d69",
+    "brightRed": "#f41d99",
+    "brightGreen": "#22e529",
+    "brightYellow": "#f59574",
+    "brightBlue": "#9892f1",
+    "brightPurple": "#e90cdd",
+    "brightCyan": "#eeeeee",
+    "brightWhite": "#cbb6ff"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "seedflip-phosphor",
+  "sourceUrl": "https://term.const.net/en/themes/seedflip-phosphor/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "e206291da12bc6f8f1d736b32649de0662f89b45350bc4d8bb67a13f735c746c",
+  "paletteSha256": "685df92c37516a24d6a084d06156500bc745c24df70eb2c9ca2486a92f6f27f4",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/SeedFlip Phosphor.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "SeedFlip Phosphor",
+    "background": "#0c0c0c",
+    "foreground": "#b3ffb3",
+    "cursorColor": "#00ff88",
+    "selectionBackground": "#141414",
+    "black": "#070707",
+    "red": "#f04242",
+    "green": "#42f07c",
+    "yellow": "#f0d342",
+    "blue": "#428bf0",
+    "purple": "#f042f0",
+    "cyan": "#42f0f0",
+    "white": "#cdffcd",
+    "brightBlack": "#3f3f3f",
+    "brightRed": "#f58989",
+    "brightGreen": "#89f5ad",
+    "brightYellow": "#f5e389",
+    "brightBlue": "#89b6f5",
+    "brightPurple": "#f589f5",
+    "brightCyan": "#89f5f5",
+    "brightWhite": "#ffffff"
+  }
+}

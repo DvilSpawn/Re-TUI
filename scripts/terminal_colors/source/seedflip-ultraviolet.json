@@ -1,0 +1,32 @@
+{
+  "id": "seedflip-ultraviolet",
+  "sourceUrl": "https://term.const.net/en/themes/seedflip-ultraviolet/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "0eda7201f2d3de2d1760518acb6b3d1d465123c9ac040cf83471d107c1258642",
+  "paletteSha256": "7c8aeeb1de2952c98590bdad9c5859faf551f642dc7e238aef0e1c9df30dd045",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/SeedFlip Ultraviolet.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "SeedFlip Ultraviolet",
+    "background": "#0b0014",
+    "foreground": "#e8e0f5",
+    "cursorColor": "#c77dff",
+    "selectionBackground": "#13082a",
+    "black": "#05000a",
+    "red": "#f04242",
+    "green": "#42f07c",
+    "yellow": "#f0d342",
+    "blue": "#428bf0",
+    "purple": "#f042f0",
+    "cyan": "#42f0f0",
+    "white": "#f6f3fb",
+    "brightBlack": "#5b2687",
+    "brightRed": "#f58989",
+    "brightGreen": "#89f5ad",
+    "brightYellow": "#f5e389",
+    "brightBlue": "#89b6f5",
+    "brightPurple": "#f589f5",
+    "brightCyan": "#89f5f5",
+    "brightWhite": "#ffffff"
+  }
+}

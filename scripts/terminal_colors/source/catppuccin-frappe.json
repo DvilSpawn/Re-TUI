@@ -1,0 +1,32 @@
+{
+  "id": "catppuccin-frappe",
+  "sourceUrl": "https://term.const.net/en/themes/catppuccin-frappe/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "2cf186e49f95f54f4234a497a55b592573453c16d651621be18a1cdd6af5f426",
+  "paletteSha256": "ade13f11ef6bd96ff05529358eddd930ab7629eeb181746cf93084f33cf42e62",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Catppuccin Frappe.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Catppuccin Frappe",
+    "background": "#303446",
+    "foreground": "#c6d0f5",
+    "cursorColor": "#f2d5cf",
+    "selectionBackground": "#f2d5cf",
+    "black": "#51576d",
+    "red": "#e78284",
+    "green": "#a6d189",
+    "yellow": "#e5c890",
+    "blue": "#8caaee",
+    "purple": "#f4b8e4",
+    "cyan": "#81c8be",
+    "white": "#b5bfe2",
+    "brightBlack": "#626880",
+    "brightRed": "#eda0a2",
+    "brightGreen": "#b9dba2",
+    "brightYellow": "#ecd7ae",
+    "brightBlue": "#adc2f3",
+    "brightPurple": "#f38ed8",
+    "brightCyan": "#98d2ca",
+    "brightWhite": "#a5adce"
+  }
+}

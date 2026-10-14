@@ -1,0 +1,32 @@
+{
+  "id": "seedflip-ivory",
+  "sourceUrl": "https://term.const.net/en/themes/seedflip-ivory/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "c5802859fce728a7ea8de1028e1207639eb5ee1408c6430bc20eb05d65c97b6c",
+  "paletteSha256": "a1d801ca4ea2a1c3aca6e7faa246be20bd9b03a114c41f2fbbf9a9ce3e760960",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/SeedFlip Ivory.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "SeedFlip Ivory",
+    "background": "#ffffff",
+    "foreground": "#0a2540",
+    "cursorColor": "#635bff",
+    "selectionBackground": "#f6f9fc",
+    "black": "#d9d9d9",
+    "red": "#bd0f0f",
+    "green": "#0fbd49",
+    "yellow": "#bda00f",
+    "blue": "#0f58bd",
+    "purple": "#bd0fbd",
+    "cyan": "#0fbdbd",
+    "white": "#07182a",
+    "brightBlack": "#b3b3b3",
+    "brightRed": "#ee2b2b",
+    "brightGreen": "#12d452",
+    "brightYellow": "#e1c01e",
+    "brightBlue": "#2b7cee",
+    "brightPurple": "#ee2bee",
+    "brightCyan": "#12d4d4",
+    "brightWhite": "#0a2540"
+  }
+}

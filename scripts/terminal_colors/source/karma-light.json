@@ -1,0 +1,32 @@
+{
+  "id": "karma-light",
+  "sourceUrl": "https://term.const.net/en/themes/karma-light/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "0876d882fe6356d31ed033540fac7ac92e371a14410d33b2c0a959f5e879c492",
+  "paletteSha256": "d7f10d7016c92ba7bf701d6daff39b3d368e3a17be8552bce7c35cae061dcc95",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Karma Light.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Karma Light",
+    "background": "#ffffff",
+    "foreground": "#0a0e14",
+    "cursorColor": "#a86efd",
+    "selectionBackground": "#e5e3ea",
+    "black": "#0a0e14",
+    "red": "#fc618d",
+    "green": "#2d972f",
+    "yellow": "#eeae11",
+    "blue": "#5688c7",
+    "purple": "#6f42c1",
+    "cyan": "#5688c7",
+    "white": "#525053",
+    "brightBlack": "#999999",
+    "brightRed": "#fc618d",
+    "brightGreen": "#2d972f",
+    "brightYellow": "#ffaa33",
+    "brightBlue": "#5688c7",
+    "brightPurple": "#a86efd",
+    "brightCyan": "#5688c7",
+    "brightWhite": "#0a0e14"
+  }
+}

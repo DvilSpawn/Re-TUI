@@ -1,0 +1,32 @@
+{
+  "id": "squintless",
+  "sourceUrl": "https://term.const.net/en/themes/squintless/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "36587b16cfa4cccdf282adde1ad6799472f9edc240392d0cc6f6797a10fa905a",
+  "paletteSha256": "23c8e8ea5f559a29810a563203af64d0123efd76fdcb45d7840959d3b6540b7d",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Squintless.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Squintless",
+    "background": "#f2e5bc",
+    "foreground": "#3c3836",
+    "cursorColor": "#282828",
+    "selectionBackground": "#d5c4a1",
+    "black": "#f2e5bc",
+    "red": "#9d0006",
+    "green": "#79740e",
+    "yellow": "#b57614",
+    "blue": "#076678",
+    "purple": "#8f3f71",
+    "cyan": "#427b58",
+    "white": "#7c6f64",
+    "brightBlack": "#928374",
+    "brightRed": "#9d0006",
+    "brightGreen": "#79740e",
+    "brightYellow": "#b57614",
+    "brightBlue": "#076678",
+    "brightPurple": "#8f3f71",
+    "brightCyan": "#427b58",
+    "brightWhite": "#3c3836"
+  }
+}

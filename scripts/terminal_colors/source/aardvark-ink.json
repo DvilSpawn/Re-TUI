@@ -1,0 +1,32 @@
+{
+  "id": "aardvark-ink",
+  "sourceUrl": "https://term.const.net/en/themes/aardvark-ink/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "893853bf53295b38580dffc45918abee4f56103fc26c3ed04661537eb9269988",
+  "paletteSha256": "69218c70d70c858a1b307cfcd3327dbc14aa66e75d6d9a996d8215a0156263a8",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Aardvark Ink.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Aardvark Ink",
+    "background": "#0f141f",
+    "foreground": "#b4bcca",
+    "cursorColor": "#b4bcca",
+    "selectionBackground": "#2a3645",
+    "black": "#222734",
+    "red": "#c26265",
+    "green": "#52aa60",
+    "yellow": "#ad9b49",
+    "blue": "#487fd4",
+    "purple": "#af5bd1",
+    "cyan": "#269d9a",
+    "white": "#5a6377",
+    "brightBlack": "#3a4152",
+    "brightRed": "#e48383",
+    "brightGreen": "#75cf84",
+    "brightYellow": "#c7b461",
+    "brightBlue": "#76a8f2",
+    "brightPurple": "#d58bf0",
+    "brightCyan": "#52c4c0",
+    "brightWhite": "#dfe5ee"
+  }
+}

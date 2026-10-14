@@ -1,0 +1,32 @@
+{
+  "id": "detuned",
+  "sourceUrl": "https://term.const.net/en/themes/detuned/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "f3bf38494aee93968a951d2e583c37dcf6ee3e00459a7ca24c52993865ef3cd5",
+  "paletteSha256": "70aabe0acb862ec97932e55641b7d8f2e22607f8fc2749916e4efe89991a0b70",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Detuned.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Detuned",
+    "background": "#000000",
+    "foreground": "#c7c7c7",
+    "cursorColor": "#c7c7c7",
+    "selectionBackground": "#c1deff",
+    "black": "#171717",
+    "red": "#fe4386",
+    "green": "#a6e32d",
+    "yellow": "#e6da73",
+    "blue": "#0094d9",
+    "purple": "#9b37ff",
+    "cyan": "#50b7d9",
+    "white": "#c7c7c7",
+    "brightBlack": "#686868",
+    "brightRed": "#fa80ac",
+    "brightGreen": "#bde371",
+    "brightYellow": "#fff27f",
+    "brightBlue": "#00beff",
+    "brightPurple": "#be9eff",
+    "brightCyan": "#5ed7ff",
+    "brightWhite": "#ffffff"
+  }
+}

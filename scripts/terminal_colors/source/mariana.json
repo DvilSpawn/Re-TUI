@@ -1,0 +1,32 @@
+{
+  "id": "mariana",
+  "sourceUrl": "https://term.const.net/en/themes/mariana/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "d1209d29fdfad9c591ed3e74f7b15020dc26f1161f844656d840c8d9e2e7298d",
+  "paletteSha256": "9105f034dd7eefe84bbb5af62e74f8dad0306807e2a11471e2db90c105d0a0d3",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Mariana.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Mariana",
+    "background": "#343d46",
+    "foreground": "#d8dee9",
+    "cursorColor": "#fcbb6a",
+    "selectionBackground": "#4e5a65",
+    "black": "#000000",
+    "red": "#ec5f66",
+    "green": "#99c794",
+    "yellow": "#f9ae58",
+    "blue": "#6699cc",
+    "purple": "#c695c6",
+    "cyan": "#5fb4b4",
+    "white": "#f7f7f7",
+    "brightBlack": "#666666",
+    "brightRed": "#f97b58",
+    "brightGreen": "#acd1a8",
+    "brightYellow": "#fac761",
+    "brightBlue": "#85add6",
+    "brightPurple": "#d8b6d8",
+    "brightCyan": "#82c4c4",
+    "brightWhite": "#ffffff"
+  }
+}

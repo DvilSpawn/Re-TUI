@@ -1,0 +1,32 @@
+{
+  "id": "tomorrow",
+  "sourceUrl": "https://term.const.net/en/themes/tomorrow/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "c71ca07da81c36a12710c13326115799deba3dedfaa83bd978daef38a5c9a301",
+  "paletteSha256": "ea3e76d7728055157fea1999d940ab9df5bc0265d27c4617bcb8503b900bbcee",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Tomorrow.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Tomorrow",
+    "background": "#ffffff",
+    "foreground": "#4d4d4c",
+    "cursorColor": "#4d4d4c",
+    "selectionBackground": "#d6d6d6",
+    "black": "#000000",
+    "red": "#c82829",
+    "green": "#718c00",
+    "yellow": "#eab700",
+    "blue": "#4271ae",
+    "purple": "#8959a8",
+    "cyan": "#3e999f",
+    "white": "#bfbfbf",
+    "brightBlack": "#000000",
+    "brightRed": "#c82829",
+    "brightGreen": "#718c00",
+    "brightYellow": "#eab700",
+    "brightBlue": "#4271ae",
+    "brightPurple": "#8959a8",
+    "brightCyan": "#3e999f",
+    "brightWhite": "#ffffff"
+  }
+}

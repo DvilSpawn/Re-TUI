@@ -1,0 +1,32 @@
+{
+  "id": "espresso",
+  "sourceUrl": "https://term.const.net/en/themes/espresso/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "c0f364292af1b4f6037e9e7a16347ff2aac596485c6be1ead2106aa01ad58168",
+  "paletteSha256": "53bccdf3956e38de0709fca828e4c2d79ead29c72f3f7dab68a13add1943241b",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Espresso.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Espresso",
+    "background": "#323232",
+    "foreground": "#ffffff",
+    "cursorColor": "#d6d6d6",
+    "selectionBackground": "#5b5b5b",
+    "black": "#353535",
+    "red": "#d25252",
+    "green": "#a5c261",
+    "yellow": "#ffc66d",
+    "blue": "#6c99bb",
+    "purple": "#d197d9",
+    "cyan": "#bed6ff",
+    "white": "#eeeeec",
+    "brightBlack": "#606060",
+    "brightRed": "#f00c0c",
+    "brightGreen": "#c2e075",
+    "brightYellow": "#e1e48b",
+    "brightBlue": "#8ab7d9",
+    "brightPurple": "#efb5f7",
+    "brightCyan": "#dcf4ff",
+    "brightWhite": "#ffffff"
+  }
+}

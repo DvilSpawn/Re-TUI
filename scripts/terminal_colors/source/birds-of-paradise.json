@@ -1,0 +1,32 @@
+{
+  "id": "birds-of-paradise",
+  "sourceUrl": "https://term.const.net/en/themes/birds-of-paradise/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "23821e8d2c858e11b9d5c614514be6a7904dfc5044a1ee6ace3c9fd7e89c3ab9",
+  "paletteSha256": "ba38f5aa1dc35e420938b43b6788278d2450361e985b81d943b0065960e38d68",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Birds Of Paradise.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Birds Of Paradise",
+    "background": "#2a1f1d",
+    "foreground": "#e0dbb7",
+    "cursorColor": "#644a33",
+    "selectionBackground": "#563c27",
+    "black": "#573d26",
+    "red": "#be2d26",
+    "green": "#6ba18a",
+    "yellow": "#e99d2a",
+    "blue": "#5a86ad",
+    "purple": "#ac80a6",
+    "cyan": "#74a6ad",
+    "white": "#e0dbb7",
+    "brightBlack": "#9b6c4a",
+    "brightRed": "#e84627",
+    "brightGreen": "#95d8ba",
+    "brightYellow": "#d0d150",
+    "brightBlue": "#b8d3ed",
+    "brightPurple": "#d19ecb",
+    "brightCyan": "#93cfd7",
+    "brightWhite": "#fff9d5"
+  }
+}

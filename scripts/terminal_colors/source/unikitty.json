@@ -1,0 +1,32 @@
+{
+  "id": "unikitty",
+  "sourceUrl": "https://term.const.net/en/themes/unikitty/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "5ae13fa4ef150c30f311fb294b0aa9fb22b5ec341271be77a4df3c0b04927058",
+  "paletteSha256": "b1a6ddddb9fcac37ddb7b0b2ed996e99595080586c0fea61f647a2fee7508bd2",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Unikitty.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Unikitty",
+    "background": "#ff8cd9",
+    "foreground": "#0b0b0b",
+    "cursorColor": "#c7ff98",
+    "selectionBackground": "#3ea9fe",
+    "black": "#0c0c0c",
+    "red": "#a80f20",
+    "green": "#c7ff98",
+    "yellow": "#fff964",
+    "blue": "#145fcd",
+    "purple": "#ffe9ff",
+    "cyan": "#9effef",
+    "white": "#fcf1fb",
+    "brightBlack": "#434343",
+    "brightRed": "#d91329",
+    "brightGreen": "#d3ffaf",
+    "brightYellow": "#ffef50",
+    "brightBlue": "#0075ea",
+    "brightPurple": "#ffefff",
+    "brightCyan": "#93ffef",
+    "brightWhite": "#fff3fe"
+  }
+}

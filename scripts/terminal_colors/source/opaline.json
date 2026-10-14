@@ -1,0 +1,32 @@
+{
+  "id": "opaline",
+  "sourceUrl": "https://term.const.net/en/themes/opaline/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "e62fd59ce403f126449e5cbfd3a5f01093e3fd58a8a7cc19473018c341349502",
+  "paletteSha256": "fcbfed6ab0fb29fb31d7457a2a09b6a06e4c32638db3027ac99e2c4a7c9d1b49",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Opaline.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Opaline",
+    "background": "#131121",
+    "foreground": "#ece9f7",
+    "cursorColor": "#ffb3d6",
+    "selectionBackground": "#2c2748",
+    "black": "#201b33",
+    "red": "#ff6b92",
+    "green": "#86e6b4",
+    "yellow": "#ffc2ae",
+    "blue": "#8fb4ff",
+    "purple": "#be9bff",
+    "cyan": "#5fe3d8",
+    "white": "#ece9f7",
+    "brightBlack": "#6b678f",
+    "brightRed": "#ff81a2",
+    "brightGreen": "#95e9bd",
+    "brightYellow": "#f4d27e",
+    "brightBlue": "#b79bff",
+    "brightPurple": "#ff9ed2",
+    "brightCyan": "#72e6dd",
+    "brightWhite": "#ffffff"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "hot-dog-stand",
+  "sourceUrl": "https://term.const.net/en/themes/hot-dog-stand/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "ad0a9f80812c6c7fcdd5c49be4967a532ccb82d04b80b3457f19c07b81f88494",
+  "paletteSha256": "5dc7e9039073f70627bef96657c96e2cfbd58493cf75f63233210d0a7e1b02e8",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Hot Dog Stand.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Hot Dog Stand",
+    "background": "#ea3323",
+    "foreground": "#ffffff",
+    "cursorColor": "#ffff54",
+    "selectionBackground": "#ffff54",
+    "black": "#000000",
+    "red": "#ffff54",
+    "green": "#ffff54",
+    "yellow": "#ffff54",
+    "blue": "#000000",
+    "purple": "#ffff54",
+    "cyan": "#ffffff",
+    "white": "#c6c6c6",
+    "brightBlack": "#000000",
+    "brightRed": "#ffff54",
+    "brightGreen": "#ffff54",
+    "brightYellow": "#ffff54",
+    "brightBlue": "#000000",
+    "brightPurple": "#ffff54",
+    "brightCyan": "#ffffff",
+    "brightWhite": "#c6c6c6"
+  }
+}

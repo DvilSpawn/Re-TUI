@@ -1,0 +1,32 @@
+{
+  "id": "kanagawabones",
+  "sourceUrl": "https://term.const.net/en/themes/kanagawabones/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "4548f8700ce2b4625dcf6ced549e0097ba026e1f8d2708669a5d4691246d10ea",
+  "paletteSha256": "6dc49848ef4fe314ade4853376e7b782e15bb3a3451e3a2dd3731b0d929aaf59",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Kanagawabones.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Kanagawabones",
+    "background": "#1f1f28",
+    "foreground": "#ddd8bb",
+    "cursorColor": "#e6e0c2",
+    "selectionBackground": "#49473e",
+    "black": "#1f1f28",
+    "red": "#e46a78",
+    "green": "#98bc6d",
+    "yellow": "#e5c283",
+    "blue": "#7eb3c9",
+    "purple": "#957fb8",
+    "cyan": "#7eb3c9",
+    "white": "#ddd8bb",
+    "brightBlack": "#49495e",
+    "brightRed": "#ec818c",
+    "brightGreen": "#9ec967",
+    "brightYellow": "#f1c982",
+    "brightBlue": "#7bc2df",
+    "brightPurple": "#a98fd2",
+    "brightCyan": "#7bc2df",
+    "brightWhite": "#a8a48d"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "later-this-evening",
+  "sourceUrl": "https://term.const.net/en/themes/later-this-evening/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "224017001637947e1b3f0a6c5d8d00130830a7c374d2797df6d235ac9a8c76ef",
+  "paletteSha256": "5b8f9406e689ea62bc9dbfbb03896ea038e0d250e3f6cc1cdff580e84a7f6416",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Later This Evening.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Later This Evening",
+    "background": "#222222",
+    "foreground": "#959595",
+    "cursorColor": "#4f4f4f",
+    "selectionBackground": "#424242",
+    "black": "#2b2b2b",
+    "red": "#d45a60",
+    "green": "#afba67",
+    "yellow": "#e5d289",
+    "blue": "#a0bad6",
+    "purple": "#c092d6",
+    "cyan": "#91bfb7",
+    "white": "#494a4a",
+    "brightBlack": "#525454",
+    "brightRed": "#d3232f",
+    "brightGreen": "#aabb39",
+    "brightYellow": "#e5be39",
+    "brightBlue": "#6699d6",
+    "brightPurple": "#ab53d6",
+    "brightCyan": "#5fc0ae",
+    "brightWhite": "#c1c2c2"
+  }
+}

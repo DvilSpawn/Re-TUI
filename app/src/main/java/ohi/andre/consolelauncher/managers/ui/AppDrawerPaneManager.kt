@@ -55,6 +55,7 @@ class AppDrawerPaneManager(
     private val alphaPositions = LinkedHashMap<String?, Int?>()
     private val alphaViews = LinkedHashMap<String?, TextView?>()
     private var selectedGroup: String? = null
+    private var selectedPrivate = false
     private var selectedAlpha: String? = null
     private var surfaceOpen = false
 
@@ -116,6 +117,12 @@ class AppDrawerPaneManager(
                     if (entry is AppEntry) {
                         appsManager.launch(context, entry.app)
                         hide()
+                    } else if (entry is PrivateActionEntry) {
+                        when (entry.action) {
+                            PrivateAction.LOCK -> appsManager.requestPrivateSpaceQuietMode(true)
+                            PrivateAction.HIDE -> appsManager.setPrivateSpaceEntrypointVisible(false)
+                        }
+                        show()
                     }
                 }
             appsList.setOnScrollListener(object : AbsListView.OnScrollListener {
@@ -193,6 +200,10 @@ class AppDrawerPaneManager(
         }
 
         groupTabs.removeAllViews()
+        if (selectedPrivate && !appsManager.isPrivateSpaceTabVisible()) {
+            selectedPrivate = false
+            selectedGroup = null
+        }
         addGroupTab(context.getString(R.string.manager_appdrawerpanemanager_all_6b428), null, drawerColor, borderColor, backgroundColor, true)
 
         val groups: MutableList<AppsManager.Group> = ArrayList(appsManager.groups)
@@ -211,6 +222,62 @@ class AppDrawerPaneManager(
             }
             addGroupTab(tabLabel, groupName, drawerColor, borderColor, backgroundColor, false)
         }
+        if (appsManager.isPrivateSpaceTabVisible()) {
+            addPrivateTab(drawerColor, borderColor, backgroundColor)
+        }
+    }
+
+    private fun addPrivateTab(drawerColor: Int, borderColor: Int, backgroundColor: Int) {
+        val tabs = groupTabs ?: return
+        val tab = TextView(context)
+        val params = LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            Tuils.dpToPx(context, 34)
+        )
+        params.bottomMargin = Tuils.dpToPx(context, 4)
+        tab.layoutParams = params
+        tab.gravity = Gravity.CENTER
+        tab.setPadding(Tuils.dpToPx(context, 2), 0, Tuils.dpToPx(context, 2), 0)
+        tab.text = context.getString(R.string.manager_appdrawerpanemanager_private_7d5e1)
+        tab.maxLines = 1
+        tab.ellipsize = TextUtils.TruncateAt.END
+        tab.textSize = 9.5f
+        tab.setTypeface(Tuils.getTypeface(context), Typeface.BOLD)
+        tab.minWidth = 0
+        tab.minimumWidth = 0
+        val selected = selectedPrivate
+        tab.background = TerminalBorderRuntime.panelDrawable(
+            context,
+            if (selected) ThemeColorResolver.color(Theme.app_drawer_group_selected_background_color)
+            else ThemeColorResolver.color(Theme.app_drawer_group_background_color),
+            if (selected) ThemeColorResolver.color(Theme.app_drawer_group_selected_border_color)
+            else ThemeColorResolver.color(Theme.app_drawer_group_border_color),
+            1.5f,
+            2,
+            dashedBorders(),
+            target = FrameTarget.APP_DRAWER
+        )
+        tab.setTextColor(
+            if (selected) ThemeColorResolver.color(Theme.app_drawer_group_selected_text_color)
+            else drawerColor
+        )
+        tab.setOnClickListener {
+            selectedPrivate = true
+            selectedGroup = null
+            buildGroupTabs(
+                mainPackProvider()?.appsManager ?: return@setOnClickListener,
+                drawerColor,
+                borderColor,
+                backgroundColor
+            )
+            rebuildContents(
+                mainPackProvider()?.appsManager ?: return@setOnClickListener,
+                drawerColor,
+                borderColor,
+                backgroundColor
+            )
+        }
+        tabs.addView(tab)
     }
 
     private fun addGroupTab(
@@ -239,7 +306,8 @@ class AppDrawerPaneManager(
         tab.minWidth = 0
         tab.minimumWidth = 0
 
-        val selected = (isAll && selectedGroup == null) || (groupName != null && groupName == selectedGroup)
+        val selected = (isAll && selectedGroup == null && !selectedPrivate) ||
+                (groupName != null && groupName == selectedGroup && !selectedPrivate)
         val selectedColor = ThemeColorResolver.color(Theme.app_drawer_group_selected_background_color)
         var foregroundColor = ThemeColorResolver.color(Theme.app_drawer_group_text_color)
         var tabBackgroundColor = ThemeColorResolver.color(Theme.app_drawer_group_background_color)
@@ -271,6 +339,7 @@ class AppDrawerPaneManager(
         )
         tab.alpha = 1f
         tab.setOnClickListener {
+            selectedPrivate = false
             selectedGroup = groupName
             val appsManager = mainPackProvider()?.appsManager ?: return@setOnClickListener
             buildGroupTabs(appsManager, drawerColor, borderColor, backgroundColor)
@@ -296,10 +365,15 @@ class AppDrawerPaneManager(
         borderColor: Int,
         backgroundColor: Int
     ) {
-        val visibleApps = getAppsForDrawer(appsManager)
+        val visibleApps = if (selectedPrivate) appsManager.privateApps() else getAppsForDrawer(appsManager)
         entries.clear()
         alphaPositions.clear()
         selectedAlpha = null
+
+        if (selectedPrivate) {
+            entries.add(PrivateActionEntry(PrivateAction.LOCK))
+            entries.add(PrivateActionEntry(PrivateAction.HIDE))
+        }
 
         var currentSection: String? = null
         for (app in visibleApps) {
@@ -316,7 +390,11 @@ class AppDrawerPaneManager(
         buildAlphabetTabs(drawerColor, borderColor, backgroundColor)
 
         val scope = if (selectedGroup == null) "all" else selectedGroup
-        header?.text = context.getString(R.string.manager_appdrawerpanemanager_applications_a46d2, visibleApps.size, scope)
+        header?.text = if (selectedPrivate) {
+            context.getString(R.string.manager_appdrawerpanemanager_private_space_9f6b2, visibleApps.size)
+        } else {
+            context.getString(R.string.manager_appdrawerpanemanager_applications_a46d2, visibleApps.size, scope)
+        }
         footer?.text = context.getString(R.string.manager_appdrawerpanemanager_groups_tabs_ef814, appsManager.groups.size, alphaPositions.size)
         appsList?.setSelection(0)
         updateSelectedAlphaFromPosition(0)
@@ -324,7 +402,7 @@ class AppDrawerPaneManager(
 
     private fun getAppsForDrawer(appsManager: AppsManager): MutableList<LaunchInfo> {
         val apps: MutableList<LaunchInfo> = ArrayList()
-        val shownApps: List<LaunchInfo> = appsManager.shownApps() ?: emptyList()
+        val shownApps: List<LaunchInfo> = appsManager.shownApps()
 
         if (selectedGroup == null) {
             apps.addAll(shownApps)
@@ -465,6 +543,15 @@ class AppDrawerPaneManager(
         override val viewType: Int = 1
     }
 
+    private enum class PrivateAction {
+        LOCK,
+        HIDE
+    }
+
+    private class PrivateActionEntry(val action: PrivateAction) : AppDrawerEntry() {
+        override val viewType: Int = 2
+    }
+
     private inner class AppsDrawerAdapter(
         private val context: Context,
         private var color: Int,
@@ -481,11 +568,11 @@ class AppDrawerPaneManager(
 
         override fun getItemId(position: Int): Long = position.toLong()
 
-        override fun getViewTypeCount(): Int = 2
+        override fun getViewTypeCount(): Int = 3
 
         override fun getItemViewType(position: Int): Int = entries[position].viewType
 
-        override fun isEnabled(position: Int): Boolean = getItemViewType(position) == 1
+        override fun isEnabled(position: Int): Boolean = getItemViewType(position) != 0
 
         override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
             val entry = entries[position]
@@ -498,6 +585,24 @@ class AppDrawerPaneManager(
                 textView.setTypeface(Tuils.getTypeface(context), Typeface.BOLD)
                 textView.setBackgroundColor(ThemeColorResolver.color(Theme.app_drawer_row_background_color))
                 textView.text = "[${entry.title}]"
+                return textView
+            }
+
+            if (entry is PrivateActionEntry) {
+                textView.setPadding(
+                    Tuils.dpToPx(context, 6),
+                    Tuils.dpToPx(context, 10),
+                    Tuils.dpToPx(context, 6),
+                    Tuils.dpToPx(context, 10)
+                )
+                textView.setTextColor(ThemeColorResolver.color(Theme.app_drawer_group_selected_text_color))
+                textView.textSize = 13f
+                textView.typeface = Tuils.getTypeface(context)
+                textView.setBackgroundColor(ThemeColorResolver.color(Theme.app_drawer_group_selected_background_color))
+                textView.text = when (entry.action) {
+                    PrivateAction.LOCK -> context.getString(R.string.manager_appdrawerpanemanager_private_lock_6b0f1)
+                    PrivateAction.HIDE -> context.getString(R.string.manager_appdrawerpanemanager_private_hide_4d1c2)
+                }
                 return textView
             }
 

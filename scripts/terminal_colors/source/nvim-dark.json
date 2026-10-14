@@ -1,0 +1,32 @@
+{
+  "id": "nvim-dark",
+  "sourceUrl": "https://term.const.net/en/themes/nvim-dark/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "b98b85ab1f5fbd455e9a25cfd130b77f25153208983a144de56aabeff1e2c29c",
+  "paletteSha256": "1779fe029c235b57d247b7abeeac1577153acc82a7eb332760eb595c7c911d8f",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Nvim Dark.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Nvim Dark",
+    "background": "#14161b",
+    "foreground": "#e0e2ea",
+    "cursorColor": "#9b9ea4",
+    "selectionBackground": "#4f5258",
+    "black": "#07080d",
+    "red": "#ffc0b9",
+    "green": "#b3f6c0",
+    "yellow": "#fce094",
+    "blue": "#a6dbff",
+    "purple": "#ffcaff",
+    "cyan": "#8cf8f7",
+    "white": "#eef1f8",
+    "brightBlack": "#4f5258",
+    "brightRed": "#ffc0b9",
+    "brightGreen": "#b3f6c0",
+    "brightYellow": "#fce094",
+    "brightBlue": "#a6dbff",
+    "brightPurple": "#ffcaff",
+    "brightCyan": "#8cf8f7",
+    "brightWhite": "#eef1f8"
+  }
+}

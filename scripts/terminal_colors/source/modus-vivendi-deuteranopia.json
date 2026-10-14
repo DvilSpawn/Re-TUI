@@ -1,0 +1,32 @@
+{
+  "id": "modus-vivendi-deuteranopia",
+  "sourceUrl": "https://term.const.net/en/themes/modus-vivendi-deuteranopia/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "498749fdf5c155fef1f2fe8246bc6d82339a9908b0522727e19918867dcd7f9d",
+  "paletteSha256": "88067bd196a861adbea8905c1acf4aad7077b445c977d5847bbe2f26aac87197",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Modus Vivendi Deuteranopia.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Modus Vivendi Deuteranopia",
+    "background": "#000000",
+    "foreground": "#ffffff",
+    "cursorColor": "#ffffff",
+    "selectionBackground": "#5a5a5a",
+    "black": "#000000",
+    "red": "#ff5f59",
+    "green": "#44bc44",
+    "yellow": "#cabf00",
+    "blue": "#2fafff",
+    "purple": "#feacd0",
+    "cyan": "#00d3d0",
+    "white": "#a6a6a6",
+    "brightBlack": "#595959",
+    "brightRed": "#ff7f9f",
+    "brightGreen": "#00c06f",
+    "brightYellow": "#ffa00f",
+    "brightBlue": "#79a8ff",
+    "brightPurple": "#b6a0ff",
+    "brightCyan": "#6ae4b9",
+    "brightWhite": "#ffffff"
+  }
+}

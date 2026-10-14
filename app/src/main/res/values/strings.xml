@@ -221,6 +221,8 @@
     <string name="help_module">Show and manage Re:T-UI modules.
         \n\nUsage:
         \n$ module -ls
+        \n$ module -library
+        \n$ module -library todo
         \n$ module -show music
         \n$ module -show notifications
         \n$ module -show timer
@@ -235,7 +237,7 @@
         \n$ module -new lua counter
         \n$ module -edit counter
         \n$ module -config counter
-        \n$ module -check counter
+        \n$ module -check counter\n$ module -preview counter
         \n$ module -approve counter
         \n$ module -export counter
         \n$ module -add server termux:/data/data/com.termux/files/home/retui/server-health.sh
@@ -336,6 +338,19 @@
         \n-lsgp [OPTIONAL: groupName] -> list your groups, or list the content of the given group
         \n-tutorial -> open the Apps command guide
     </string>
+    <string name="help_private">-ls -> list Private Space apps
+        \n-lock -> lock Private Space
+        \n-unlock -> unlock Private Space
+        \n-settings -> open Private Space settings when Android exposes them
+        \n-show / -hide -> show or hide the Private Space drawer entrypoint</string>
+    <string name="output_private_space_unavailable">Private Space is unavailable.</string>
+    <string name="output_private_space_locked">Private Space is locked.</string>
+    <string name="output_private_space_action_failed">Private Space action failed.</string>
+    <string name="output_private_space_locked_now">Private Space lock requested.</string>
+    <string name="output_private_space_unlock_requested">Private Space unlock requested.</string>
+    <string name="output_private_space_settings_android">Open Android Settings to manage Private Space on this Android version.</string>
+    <string name="output_private_space_shown">Private Space entrypoint shown.</string>
+    <string name="output_private_space_hidden">Private Space entrypoint hidden.</string>
     <string name="help_bluetooth">Toggle Bluetooth on older Android versions, or open Bluetooth settings on modern Android versions where direct toggles are restricted.</string>
     <string name="help_brightness">Set the brightness of your device
         \n$ brightness [0-100]</string>

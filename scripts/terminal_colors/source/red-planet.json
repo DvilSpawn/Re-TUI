@@ -1,0 +1,32 @@
+{
+  "id": "red-planet",
+  "sourceUrl": "https://term.const.net/en/themes/red-planet/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "38b909d323ab311480fc67d95f359c1392ff7353c880353325f4cdd3f456a4cc",
+  "paletteSha256": "b330cc5c98a487250428a0b3a66b8776d9204a07b5f88cf345d545efd77c2223",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Red Planet.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Red Planet",
+    "background": "#222222",
+    "foreground": "#c2b790",
+    "cursorColor": "#c2b790",
+    "selectionBackground": "#1b324a",
+    "black": "#202020",
+    "red": "#8c3432",
+    "green": "#728271",
+    "yellow": "#e8bf6a",
+    "blue": "#69819e",
+    "purple": "#896492",
+    "cyan": "#5b8390",
+    "white": "#b9aa99",
+    "brightBlack": "#676767",
+    "brightRed": "#b55242",
+    "brightGreen": "#869985",
+    "brightYellow": "#ebeb91",
+    "brightBlue": "#60827e",
+    "brightPurple": "#de4974",
+    "brightCyan": "#38add8",
+    "brightWhite": "#d6bfb8"
+  }
+}

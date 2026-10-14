@@ -1,0 +1,32 @@
+{
+  "id": "cool-night",
+  "sourceUrl": "https://term.const.net/en/themes/cool-night/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "36c4d48bad56675a161aee4d1c3893570e7e5b918e7ecdda33a68e625bfa263b",
+  "paletteSha256": "b5f1cf3bd0afa34490155ff8a0498978b8f650bb9cc28f797a92991f7c7e325e",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Cool Night.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Cool Night",
+    "background": "#010c18",
+    "foreground": "#ecdef4",
+    "cursorColor": "#38ff9d",
+    "selectionBackground": "#38ff9c",
+    "black": "#0b3b61",
+    "red": "#ff3a3a",
+    "green": "#52ffd0",
+    "yellow": "#fff383",
+    "blue": "#1376f9",
+    "purple": "#c792ea",
+    "cyan": "#ff5ed4",
+    "white": "#16fda2",
+    "brightBlack": "#63686d",
+    "brightRed": "#ff54b0",
+    "brightGreen": "#74ffd8",
+    "brightYellow": "#fcf5ae",
+    "brightBlue": "#388eff",
+    "brightPurple": "#ae81ff",
+    "brightCyan": "#ff6ad7",
+    "brightWhite": "#60fbbf"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "forge-ember",
+  "sourceUrl": "https://term.const.net/en/themes/forge-ember/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "28c3eb2ad34af9bfb7a888cce9d5f4f6fb196072ad97ae50435c373cbb3d82e7",
+  "paletteSha256": "e7fccdff3a5393c264748cd1f3a4e40d9df6c5d3dc4c995a3613ab9b59e29e9b",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Forge Ember.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Forge Ember",
+    "background": "#140c07",
+    "foreground": "#f4e2c8",
+    "cursorColor": "#ff6a1f",
+    "selectionBackground": "#33220f",
+    "black": "#241810",
+    "red": "#ff4733",
+    "green": "#c4c24a",
+    "yellow": "#ffb347",
+    "blue": "#f0a24f",
+    "purple": "#ff6a4d",
+    "cyan": "#ffd27a",
+    "white": "#e6d2b6",
+    "brightBlack": "#7a6248",
+    "brightRed": "#ff4733",
+    "brightGreen": "#c4c24a",
+    "brightYellow": "#ff7a2d",
+    "brightBlue": "#f0a24f",
+    "brightPurple": "#ff6a4d",
+    "brightCyan": "#ffd27a",
+    "brightWhite": "#f4e2c8"
+  }
+}

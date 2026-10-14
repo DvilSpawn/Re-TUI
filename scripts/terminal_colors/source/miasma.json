@@ -1,0 +1,32 @@
+{
+  "id": "miasma",
+  "sourceUrl": "https://term.const.net/en/themes/miasma/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "9012c800158150afd9845df30a9c42ff64926a48fc00a57c8f8825ebf945c4c1",
+  "paletteSha256": "cd3d617d993b12f701fae709ab9fbf7688e1fe9432c0a2e5d4c12cf90de2f37b",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Miasma.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Miasma",
+    "background": "#222222",
+    "foreground": "#c2c2b0",
+    "cursorColor": "#c7c7c7",
+    "selectionBackground": "#e5c47b",
+    "black": "#000000",
+    "red": "#685742",
+    "green": "#5f875f",
+    "yellow": "#b36d43",
+    "blue": "#78824b",
+    "purple": "#bb7744",
+    "cyan": "#c9a554",
+    "white": "#d7c483",
+    "brightBlack": "#666666",
+    "brightRed": "#685742",
+    "brightGreen": "#5f875f",
+    "brightYellow": "#b36d43",
+    "brightBlue": "#78824b",
+    "brightPurple": "#bb7744",
+    "brightCyan": "#c9a554",
+    "brightWhite": "#d7c483"
+  }
+}

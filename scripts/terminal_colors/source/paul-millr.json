@@ -1,0 +1,32 @@
+{
+  "id": "paul-millr",
+  "sourceUrl": "https://term.const.net/en/themes/paul-millr/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "de8eced2b2e3224e1c05eea0048cd453d6df3b3ae8ea1875cc711616210154be",
+  "paletteSha256": "f8c70979085a98807e19dbd1fc45106128a02b7cbe3888d3ed28b9ae290876b6",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Paul Millr.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Paul Millr",
+    "background": "#000000",
+    "foreground": "#f2f2f2",
+    "cursorColor": "#4d4d4d",
+    "selectionBackground": "#414141",
+    "black": "#2a2a2a",
+    "red": "#ff0000",
+    "green": "#79ff0f",
+    "yellow": "#e7bf00",
+    "blue": "#396bd7",
+    "purple": "#b449be",
+    "cyan": "#66ccff",
+    "white": "#bbbbbb",
+    "brightBlack": "#666666",
+    "brightRed": "#ff0080",
+    "brightGreen": "#66ff66",
+    "brightYellow": "#f3d64e",
+    "brightBlue": "#709aed",
+    "brightPurple": "#db67e6",
+    "brightCyan": "#7adff2",
+    "brightWhite": "#ffffff"
+  }
+}

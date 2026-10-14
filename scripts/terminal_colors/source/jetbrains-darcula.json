@@ -1,0 +1,32 @@
+{
+  "id": "jetbrains-darcula",
+  "sourceUrl": "https://term.const.net/en/themes/jetbrains-darcula/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "e899141fd2dd7196864297e416d3987a541798d34c460c827e71904216f45a0f",
+  "paletteSha256": "25629c14cb2df7e1242bc495a3aac709620158ca0e86e65704b3fee7320924e1",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/JetBrains Darcula.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "JetBrains Darcula",
+    "background": "#202020",
+    "foreground": "#adadad",
+    "cursorColor": "#ffffff",
+    "selectionBackground": "#1a3272",
+    "black": "#000000",
+    "red": "#fa5355",
+    "green": "#126e00",
+    "yellow": "#c2c300",
+    "blue": "#4581eb",
+    "purple": "#fa54ff",
+    "cyan": "#33c2c1",
+    "white": "#adadad",
+    "brightBlack": "#555555",
+    "brightRed": "#fb7172",
+    "brightGreen": "#67ff4f",
+    "brightYellow": "#ffff00",
+    "brightBlue": "#6d9df1",
+    "brightPurple": "#fb82ff",
+    "brightCyan": "#60d3d1",
+    "brightWhite": "#eeeeee"
+  }
+}

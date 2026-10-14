@@ -1,0 +1,32 @@
+{
+  "id": "datum-light",
+  "sourceUrl": "https://term.const.net/en/themes/datum-light/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "c3bdb9bcece6efd96a73f2fbe6f48ad3abfe206833ff9fb46f5bab89d7d22599",
+  "paletteSha256": "e777ec12a413ca72c90e0b1972b09c75393a3509a51faac08b82c5bba969fe95",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/datum (light).json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "datum (light)",
+    "background": "#f1f6fd",
+    "foreground": "#292e35",
+    "cursorColor": "#973070",
+    "selectionBackground": "#ced3d9",
+    "black": "#292e35",
+    "red": "#a24500",
+    "green": "#007553",
+    "yellow": "#656023",
+    "blue": "#0176b8",
+    "purple": "#973070",
+    "cyan": "#0d7a7f",
+    "white": "#b4b9bf",
+    "brightBlack": "#616a76",
+    "brightRed": "#976700",
+    "brightGreen": "#007553",
+    "brightYellow": "#4d3919",
+    "brightBlue": "#2f516c",
+    "brightPurple": "#633750",
+    "brightCyan": "#154b4e",
+    "brightWhite": "#e7ecf2"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "fahrenheit",
+  "sourceUrl": "https://term.const.net/en/themes/fahrenheit/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "3278334e519d82b1f78ef029cbea378cd70bef6a235c7bae6786fbc425a1d371",
+  "paletteSha256": "437730c7b1be98c32307481683c7cbd855856eba81fb0f24e089fce4f534505d",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Fahrenheit.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Fahrenheit",
+    "background": "#000000",
+    "foreground": "#ffffce",
+    "cursorColor": "#bbbbbb",
+    "selectionBackground": "#4e739f",
+    "black": "#1d1d1d",
+    "red": "#cda074",
+    "green": "#9e744d",
+    "yellow": "#fecf75",
+    "blue": "#7f0e0f",
+    "purple": "#734c4d",
+    "cyan": "#979797",
+    "white": "#ffffce",
+    "brightBlack": "#404040",
+    "brightRed": "#fecea0",
+    "brightGreen": "#cc734d",
+    "brightYellow": "#fd9f4d",
+    "brightBlue": "#cb4a05",
+    "brightPurple": "#4e739f",
+    "brightCyan": "#fed04d",
+    "brightWhite": "#ffffff"
+  }
+}

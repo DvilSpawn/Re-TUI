@@ -1,0 +1,32 @@
+{
+  "id": "noctis-bordo",
+  "sourceUrl": "https://term.const.net/en/themes/noctis-bordo/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "a53fe3d8bcc49cceb4244e10c947e37fa7b4dcd0dd3395d4b0255c3315998258",
+  "paletteSha256": "4c74083771bd3a9dfc1d2f537d65b9bb27cf7222e9f342b30ae712f146069271",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Noctis Bordo.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Noctis Bordo",
+    "background": "#322a2d",
+    "foreground": "#cbbec2",
+    "cursorColor": "#cbbec2",
+    "selectionBackground": "#4a3339",
+    "black": "#47393e",
+    "red": "#e66533",
+    "green": "#49e9a6",
+    "yellow": "#e4b781",
+    "blue": "#49ace9",
+    "purple": "#df769b",
+    "cyan": "#49d6e9",
+    "white": "#b9acb0",
+    "brightBlack": "#69545b",
+    "brightRed": "#e97749",
+    "brightGreen": "#60ebb1",
+    "brightYellow": "#e69533",
+    "brightBlue": "#60b6eb",
+    "brightPurple": "#e798b3",
+    "brightCyan": "#60dbeb",
+    "brightWhite": "#cbbec2"
+  }
+}

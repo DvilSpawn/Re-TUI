@@ -1,0 +1,32 @@
+{
+  "id": "clear-dark",
+  "sourceUrl": "https://term.const.net/en/themes/clear-dark/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "4517078f7850d56d3442a5a6315fca3fd20056beeb335a913dca2cfcc94cd4e2",
+  "paletteSha256": "d81806466b457fbd02bde434feec8d69ca7df4c065679e992c9eb90984005ce9",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Clear Dark.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Clear Dark",
+    "background": "#212734",
+    "foreground": "#e6e6e6",
+    "cursorColor": "#9d9d9d",
+    "selectionBackground": "#334e5e",
+    "black": "#35424c",
+    "red": "#b45648",
+    "green": "#6caa71",
+    "yellow": "#c4ac62",
+    "blue": "#6d96b4",
+    "purple": "#bd7bcd",
+    "cyan": "#7ccbcd",
+    "white": "#dee5eb",
+    "brightBlack": "#465c6d",
+    "brightRed": "#df6c5a",
+    "brightGreen": "#79be7e",
+    "brightYellow": "#e5c872",
+    "brightBlue": "#67b5ed",
+    "brightPurple": "#d389e5",
+    "brightCyan": "#84dde0",
+    "brightWhite": "#e5eff5"
+  }
+}

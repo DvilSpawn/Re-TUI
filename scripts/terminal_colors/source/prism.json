@@ -1,0 +1,32 @@
+{
+  "id": "prism",
+  "sourceUrl": "https://term.const.net/en/themes/prism/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "d774de7626b5612ce4edffcfa113f4eb4353ce111cd35ffe207371ad76f15af1",
+  "paletteSha256": "5fd541548a84d616b3ac920a4b99b977dd1a582680ae6fd1e045755e3c4a27f1",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Prism.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Prism",
+    "background": "#0b1326",
+    "foreground": "#d7e3f4",
+    "cursorColor": "#56d5ff",
+    "selectionBackground": "#1e2c49",
+    "black": "#060c18",
+    "red": "#ff7192",
+    "green": "#71e0b0",
+    "yellow": "#fad77c",
+    "blue": "#47b3ff",
+    "purple": "#9da9ff",
+    "cyan": "#31dcf2",
+    "white": "#b6c4dc",
+    "brightBlack": "#5e6f90",
+    "brightRed": "#ff96ad",
+    "brightGreen": "#93ecc7",
+    "brightYellow": "#fca76d",
+    "brightBlue": "#77caff",
+    "brightPurple": "#b8c1ff",
+    "brightCyan": "#6ceafb",
+    "brightWhite": "#eaf1fb"
+  }
+}

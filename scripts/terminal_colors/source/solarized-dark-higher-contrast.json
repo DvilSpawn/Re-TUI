@@ -1,0 +1,32 @@
+{
+  "id": "solarized-dark-higher-contrast",
+  "sourceUrl": "https://term.const.net/en/themes/solarized-dark-higher-contrast/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "70179da5fbdac9ed27fe148c65da0ae7ae623b727ab98375cd4aafc0fae2674c",
+  "paletteSha256": "7f25bf38ebd4bcda7fd0ce4d84f274cc35cb46b0695cc55dd797d65e5430abfa",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Solarized Dark Higher Contrast.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Solarized Dark Higher Contrast",
+    "background": "#001e27",
+    "foreground": "#9cc2c3",
+    "cursorColor": "#f34b00",
+    "selectionBackground": "#003748",
+    "black": "#002831",
+    "red": "#d11c24",
+    "green": "#6cbe6c",
+    "yellow": "#a57706",
+    "blue": "#2176c7",
+    "purple": "#c61c6f",
+    "cyan": "#259286",
+    "white": "#eae3cb",
+    "brightBlack": "#006488",
+    "brightRed": "#f5163b",
+    "brightGreen": "#51ef84",
+    "brightYellow": "#b27e28",
+    "brightBlue": "#178ec8",
+    "brightPurple": "#e24d8e",
+    "brightCyan": "#00b39e",
+    "brightWhite": "#fcf4dc"
+  }
+}

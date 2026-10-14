@@ -1,0 +1,32 @@
+{
+  "id": "terafox",
+  "sourceUrl": "https://term.const.net/en/themes/terafox/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "3a407aa18c889e3a3f09b16cc8d5dd947b83f42d823aa826e9709575e1165f4f",
+  "paletteSha256": "008787380f14c201ea04687b4713592f87aa237b1907562193b2afd42de4e678",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Terafox.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Terafox",
+    "background": "#152528",
+    "foreground": "#e6eaea",
+    "cursorColor": "#e6eaea",
+    "selectionBackground": "#293e40",
+    "black": "#2f3239",
+    "red": "#e85c51",
+    "green": "#7aa4a1",
+    "yellow": "#fda47f",
+    "blue": "#5a93aa",
+    "purple": "#ad5c7c",
+    "cyan": "#a1cdd8",
+    "white": "#ebebeb",
+    "brightBlack": "#4e5157",
+    "brightRed": "#eb746b",
+    "brightGreen": "#8eb2af",
+    "brightYellow": "#fdb292",
+    "brightBlue": "#73a3b7",
+    "brightPurple": "#b97490",
+    "brightCyan": "#afd4de",
+    "brightWhite": "#eeeeee"
+  }
+}

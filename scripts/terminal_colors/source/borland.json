@@ -1,0 +1,32 @@
+{
+  "id": "borland",
+  "sourceUrl": "https://term.const.net/en/themes/borland/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "24ad00204adb67d7d5ead58f81dc7b9b089ca6e233826870b4a710bc43c569d6",
+  "paletteSha256": "1284cfe1446b1e93bf6ebd6eead241bdf95b4d129bfc342fe55e925b30d21608",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Borland.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Borland",
+    "background": "#0000a4",
+    "foreground": "#ffff4e",
+    "cursorColor": "#ffa560",
+    "selectionBackground": "#a4a4a4",
+    "black": "#4f4f4f",
+    "red": "#ff6c60",
+    "green": "#a8ff60",
+    "yellow": "#ffffb6",
+    "blue": "#96cbfe",
+    "purple": "#ff73fd",
+    "cyan": "#c6c5fe",
+    "white": "#eeeeee",
+    "brightBlack": "#7c7c7c",
+    "brightRed": "#ffb6b0",
+    "brightGreen": "#ceffac",
+    "brightYellow": "#ffffcc",
+    "brightBlue": "#b5dcff",
+    "brightPurple": "#ff9cfe",
+    "brightCyan": "#dfdffe",
+    "brightWhite": "#ffffff"
+  }
+}

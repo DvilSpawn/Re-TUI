@@ -1,0 +1,32 @@
+{
+  "id": "brogrammer",
+  "sourceUrl": "https://term.const.net/en/themes/brogrammer/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "d2d5be0bd3424bdce743570d27b50a2e4fec5bba4f7016fd9ca3504364b4650b",
+  "paletteSha256": "4282f578c8cf1f045aaeac279e0726767ebcfd828c41a42a5844b191dbfd9e8d",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Brogrammer.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Brogrammer",
+    "background": "#131313",
+    "foreground": "#d6dbe5",
+    "cursorColor": "#b9b9b9",
+    "selectionBackground": "#1f1f1f",
+    "black": "#1f1f1f",
+    "red": "#f81118",
+    "green": "#2dc55e",
+    "yellow": "#ecba0f",
+    "blue": "#2a84d2",
+    "purple": "#4e5ab7",
+    "cyan": "#1081d6",
+    "white": "#d6dbe5",
+    "brightBlack": "#d6dbe5",
+    "brightRed": "#de352e",
+    "brightGreen": "#1dd361",
+    "brightYellow": "#f3bd09",
+    "brightBlue": "#1081d6",
+    "brightPurple": "#5350b9",
+    "brightCyan": "#0f7ddb",
+    "brightWhite": "#ffffff"
+  }
+}

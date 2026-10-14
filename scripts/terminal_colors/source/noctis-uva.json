@@ -1,0 +1,32 @@
+{
+  "id": "noctis-uva",
+  "sourceUrl": "https://term.const.net/en/themes/noctis-uva/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "b6872d037d9a9bcd32d163ee4aed56a277819f58df57f18cbb8410d437c8e2d7",
+  "paletteSha256": "2c82966f9dd9c767f37cc0b3599a038e0a8033fcf278339bccc3269b7a14e5a0",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Noctis Uva.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Noctis Uva",
+    "background": "#292640",
+    "foreground": "#c5c2d6",
+    "cursorColor": "#c5c2d6",
+    "selectionBackground": "#35325a",
+    "black": "#302f3d",
+    "red": "#e66533",
+    "green": "#49e9a6",
+    "yellow": "#e4b781",
+    "blue": "#49ace9",
+    "purple": "#df769b",
+    "cyan": "#49d6e9",
+    "white": "#b6b3cc",
+    "brightBlack": "#504e65",
+    "brightRed": "#e97749",
+    "brightGreen": "#60ebb1",
+    "brightYellow": "#e69533",
+    "brightBlue": "#60b6eb",
+    "brightPurple": "#e798b3",
+    "brightCyan": "#60dbeb",
+    "brightWhite": "#c5c2d6"
+  }
+}

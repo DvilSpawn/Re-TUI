@@ -1,0 +1,32 @@
+{
+  "id": "keys-ocean-sunset",
+  "sourceUrl": "https://term.const.net/en/themes/keys-ocean-sunset/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "cb8a644432746e6f7b6b45547118a464824cf5ac324d1239cd5bb76a7fea99e5",
+  "paletteSha256": "6f56b8133d4ca882b291d09f78ef9f5bec11fb97576ac63091e0591d3251cc21",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Keys Ocean Sunset.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Keys Ocean Sunset",
+    "background": "#0a1018",
+    "foreground": "#b8c8dc",
+    "cursorColor": "#fc9077",
+    "selectionBackground": "#1a2430",
+    "black": "#101927",
+    "red": "#e85a52",
+    "green": "#4a9a72",
+    "yellow": "#e89a2e",
+    "blue": "#5288b8",
+    "purple": "#bc5090",
+    "cyan": "#5ec8c8",
+    "white": "#a5b5d5",
+    "brightBlack": "#344658",
+    "brightRed": "#fc9077",
+    "brightGreen": "#62c48e",
+    "brightYellow": "#ffcb9a",
+    "brightBlue": "#5a8fd4",
+    "brightPurple": "#fdbfde",
+    "brightCyan": "#7ed4e0",
+    "brightWhite": "#fff5be"
+  }
+}

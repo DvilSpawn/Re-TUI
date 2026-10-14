@@ -1,0 +1,32 @@
+{
+  "id": "xcode-light-hc",
+  "sourceUrl": "https://term.const.net/en/themes/xcode-light-hc/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "8b87404b7d7918c7b5313a1b9264d7e2bc6ae92ce13be32950f21a5c45eec9ec",
+  "paletteSha256": "5c9468c2f9391d29ef30fbe14a572f37d3046506c0aba50484578a17cefd9be5",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Xcode Light hc.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Xcode Light hc",
+    "background": "#ffffff",
+    "foreground": "#000000",
+    "cursorColor": "#000000",
+    "selectionBackground": "#b4d8fd",
+    "black": "#b4d8fd",
+    "red": "#ad1805",
+    "green": "#355d61",
+    "yellow": "#78492a",
+    "blue": "#0058a1",
+    "purple": "#9c2191",
+    "cyan": "#703daa",
+    "white": "#000000",
+    "brightBlack": "#8a99a6",
+    "brightRed": "#ad1805",
+    "brightGreen": "#174145",
+    "brightYellow": "#78492a",
+    "brightBlue": "#003f73",
+    "brightPurple": "#9c2191",
+    "brightCyan": "#441ea1",
+    "brightWhite": "#000000"
+  }
+}

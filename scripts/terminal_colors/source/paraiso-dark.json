@@ -1,0 +1,32 @@
+{
+  "id": "paraiso-dark",
+  "sourceUrl": "https://term.const.net/en/themes/paraiso-dark/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "c47079edb23da7cc5ff892a93918c407f295679e01473cb20e0f96ce7e64b0b2",
+  "paletteSha256": "caf5f7f82d48ab2d7ff1e2ee5a0ad9c230ae3e210df9837751880f90e20a6f89",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Paraiso Dark.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Paraiso Dark",
+    "background": "#2f1e2e",
+    "foreground": "#a39e9b",
+    "cursorColor": "#a39e9b",
+    "selectionBackground": "#4f424c",
+    "black": "#2f1e2e",
+    "red": "#ef6155",
+    "green": "#48b685",
+    "yellow": "#fec418",
+    "blue": "#06b6ef",
+    "purple": "#815ba4",
+    "cyan": "#5bc4bf",
+    "white": "#a39e9b",
+    "brightBlack": "#776e71",
+    "brightRed": "#ef6155",
+    "brightGreen": "#48b685",
+    "brightYellow": "#fec418",
+    "brightBlue": "#06b6ef",
+    "brightPurple": "#815ba4",
+    "brightCyan": "#5bc4bf",
+    "brightWhite": "#e7e9db"
+  }
+}

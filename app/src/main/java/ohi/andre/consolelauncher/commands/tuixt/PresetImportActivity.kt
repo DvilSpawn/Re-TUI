@@ -34,16 +34,20 @@ class PresetImportActivity : LocalizedComponentActivity() {
             orientation = LinearLayout.VERTICAL
             setPadding(24, 24, 24, 24)
         }
+        TuixtTheme.styleScreen(this, layout)
         preview = TextView(this).apply { setText(R.string.portable_preset_inspecting); setTextIsSelectable(true) }
+        preview.setTextColor(TuixtTheme.textColor())
         layout.addView(ScrollView(this).apply { addView(preview) }, LinearLayout.LayoutParams(-1, 0, 1f))
         confirm = Button(this).apply {
             setText(R.string.portable_preset_confirm)
             isEnabled = false
+            TuixtTheme.styleButton(this@PresetImportActivity, this, true)
             setOnClickListener { savePreset() }
         }
         layout.addView(confirm)
         layout.addView(Button(this).apply {
             setText(R.string.portable_preset_cancel)
+            TuixtTheme.styleButton(this@PresetImportActivity, this, false)
             setOnClickListener { if (!saving) finish() }
         })
         setContentView(layout)

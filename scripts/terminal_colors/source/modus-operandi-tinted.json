@@ -1,0 +1,32 @@
+{
+  "id": "modus-operandi-tinted",
+  "sourceUrl": "https://term.const.net/en/themes/modus-operandi-tinted/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "596b1e24c5d40e37b0ecef28a30c2bd11a819fe0e096b220913c558694798411",
+  "paletteSha256": "67fb4f091a6d1a0a21bae5c6ef71fa8f6f654a224e50a52b2ab5bf78d80bb4b4",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Modus Operandi Tinted.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Modus Operandi Tinted",
+    "background": "#fbf7f0",
+    "foreground": "#000000",
+    "cursorColor": "#d00000",
+    "selectionBackground": "#c2bcb5",
+    "black": "#000000",
+    "red": "#a60000",
+    "green": "#006800",
+    "yellow": "#6f5500",
+    "blue": "#0031a9",
+    "purple": "#721045",
+    "cyan": "#005e8b",
+    "white": "#a6a6a6",
+    "brightBlack": "#595959",
+    "brightRed": "#972500",
+    "brightGreen": "#00663f",
+    "brightYellow": "#884900",
+    "brightBlue": "#3548cf",
+    "brightPurple": "#531ab6",
+    "brightCyan": "#005f5f",
+    "brightWhite": "#595959"
+  }
+}

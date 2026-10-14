@@ -1,0 +1,32 @@
+{
+  "id": "spacedust",
+  "sourceUrl": "https://term.const.net/en/themes/spacedust/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "b078bb292748db952d8f6b22293b9b417dcffb90e72433ee4c91d7c9ec4e3202",
+  "paletteSha256": "039f3be3ed11a3054e15d480283dcb68188991458f387e18c69e9fbb9d4ad62c",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Spacedust.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Spacedust",
+    "background": "#0a1e24",
+    "foreground": "#ecf0c1",
+    "cursorColor": "#708284",
+    "selectionBackground": "#0a385c",
+    "black": "#6e5346",
+    "red": "#e35b00",
+    "green": "#5cab96",
+    "yellow": "#e3cd7b",
+    "blue": "#0f548b",
+    "purple": "#e35b00",
+    "cyan": "#06afc7",
+    "white": "#f0f1ce",
+    "brightBlack": "#684c31",
+    "brightRed": "#ff8a3a",
+    "brightGreen": "#aecab8",
+    "brightYellow": "#ffc878",
+    "brightBlue": "#67a0ce",
+    "brightPurple": "#ff8a3a",
+    "brightCyan": "#83a7b4",
+    "brightWhite": "#fefff1"
+  }
+}

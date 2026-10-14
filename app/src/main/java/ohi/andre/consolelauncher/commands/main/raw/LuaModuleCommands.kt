@@ -104,6 +104,14 @@ internal object LuaModuleCommands {
             return pack.context.getString(R.string.command_luamodulecommands_lua_module_refresh_dispatched_fc516, formatWidget(id))
         }
 
+        if ("-preview" == option) {
+            if (args.size < 2) return pack.context.getString(R.string.help_module)
+            val id = LuaWidgetManager.normalizeId(args[1])
+            if (!LuaWidgetManager.exists(id)) return "Unknown Lua module: $id"
+            ohi.andre.consolelauncher.managers.lua.LuaWidgetPreview.show(pack.context, id, LuaWidgetManager.readScript(id).orEmpty())
+            return null
+        }
+
         if ("-check" == option) {
             if (args.size < 2) return pack.context.getString(R.string.help_module)
             val id = LuaWidgetManager.normalizeId(args.get(1))
@@ -119,7 +127,7 @@ internal object LuaModuleCommands {
                 LuaWidgetManager.version(id),
                 null
             )
-            val result = engine.render(true)
+            val result = try { engine.render(true) } finally { engine.dispose() }
             if (!TextUtils.isEmpty(result.error)) {
                 return (pack.context.getString(R.string.command_luamodulecommands_lua_module_check_failed_use_module_copy_er_e3e83, formatWidget(id), (if (TextUtils.isEmpty(result.errorStage)) "" else pack.context.getString(R.string.command_luamodulecommands_stage_76cf8, result.errorStage)), result.error, id, id))
             }

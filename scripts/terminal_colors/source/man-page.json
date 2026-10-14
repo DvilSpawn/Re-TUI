@@ -1,0 +1,32 @@
+{
+  "id": "man-page",
+  "sourceUrl": "https://term.const.net/en/themes/man-page/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "b8fa7bde5aabfba2ac9b4ed439ab65029e23f569d23d24c1715f7e06801cd33b",
+  "paletteSha256": "2d7c087d987c4d6176eae1f9b9101cec768b5e281b7a41aaf39ac0972d354911",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Man Page.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Man Page",
+    "background": "#fef49c",
+    "foreground": "#000000",
+    "cursorColor": "#7f7f7f",
+    "selectionBackground": "#a4c9cd",
+    "black": "#000000",
+    "red": "#cc0000",
+    "green": "#00a600",
+    "yellow": "#999900",
+    "blue": "#0000b2",
+    "purple": "#b200b2",
+    "cyan": "#00a6b2",
+    "white": "#b2b2b2",
+    "brightBlack": "#666666",
+    "brightRed": "#e50000",
+    "brightGreen": "#00cc00",
+    "brightYellow": "#bfbf00",
+    "brightBlue": "#0000ff",
+    "brightPurple": "#e500e5",
+    "brightCyan": "#00cbcb",
+    "brightWhite": "#e5e5e5"
+  }
+}

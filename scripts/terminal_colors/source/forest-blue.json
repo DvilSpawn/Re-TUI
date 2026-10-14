@@ -1,0 +1,32 @@
+{
+  "id": "forest-blue",
+  "sourceUrl": "https://term.const.net/en/themes/forest-blue/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "2686b5a5a2ad2b6c6d7846edf3aea08b66a963207dc992089493c4960c95d421",
+  "paletteSha256": "9fd23c33648f1851a0c5a4290b25cbc8b4a76c0f6faa33c304a9c0e27fd85a18",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Forest Blue.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Forest Blue",
+    "background": "#051519",
+    "foreground": "#e2d8cd",
+    "cursorColor": "#9e9ecb",
+    "selectionBackground": "#4d4d4d",
+    "black": "#333333",
+    "red": "#f8818e",
+    "green": "#92d3a2",
+    "yellow": "#1a8e63",
+    "blue": "#8ed0ce",
+    "purple": "#5e468c",
+    "cyan": "#31658c",
+    "white": "#e2d8cd",
+    "brightBlack": "#4a4a4a",
+    "brightRed": "#fb3d66",
+    "brightGreen": "#6bb48d",
+    "brightYellow": "#30c85a",
+    "brightBlue": "#39a7a2",
+    "brightPurple": "#7e62b3",
+    "brightCyan": "#6096bf",
+    "brightWhite": "#e2d8cd"
+  }
+}

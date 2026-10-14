@@ -1,0 +1,32 @@
+{
+  "id": "noctis-sereno",
+  "sourceUrl": "https://term.const.net/en/themes/noctis-sereno/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "8af56f919602b0063cb09efa181acdc92d8f76818b7f21af140eec652e43bcd2",
+  "paletteSha256": "1e6f3c36c8aa2232051556164bab8348bd423fc773fbc398dff42a4695e093fd",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Noctis Sereno.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Noctis Sereno",
+    "background": "#062e32",
+    "foreground": "#b2cacd",
+    "cursorColor": "#b2cacd",
+    "selectionBackground": "#0f4045",
+    "black": "#324a4d",
+    "red": "#e66533",
+    "green": "#49e9a6",
+    "yellow": "#e4b781",
+    "blue": "#49ace9",
+    "purple": "#df769b",
+    "cyan": "#49d6e9",
+    "white": "#b2cacd",
+    "brightBlack": "#47686c",
+    "brightRed": "#e97749",
+    "brightGreen": "#60ebb1",
+    "brightYellow": "#e69533",
+    "brightBlue": "#60b6eb",
+    "brightPurple": "#e798b3",
+    "brightCyan": "#60dbeb",
+    "brightWhite": "#c1d4d7"
+  }
+}

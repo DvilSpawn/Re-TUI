@@ -1,0 +1,32 @@
+{
+  "id": "gruvbox-dark-hard",
+  "sourceUrl": "https://term.const.net/en/themes/gruvbox-dark-hard/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "e11120686c6b5be8957b3eb7e61a8d3184e7495858081740ac1363fb2c5c066a",
+  "paletteSha256": "f1fe6556d1ba3fb8016e67a4ebfae955eb155ebdff4772781167e44f0a14a535",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Gruvbox Dark Hard.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Gruvbox Dark Hard",
+    "background": "#1d2021",
+    "foreground": "#ebdbb2",
+    "cursorColor": "#ebdbb2",
+    "selectionBackground": "#665c54",
+    "black": "#1d2021",
+    "red": "#cc241d",
+    "green": "#98971a",
+    "yellow": "#d79921",
+    "blue": "#458588",
+    "purple": "#b16286",
+    "cyan": "#689d6a",
+    "white": "#a89984",
+    "brightBlack": "#928374",
+    "brightRed": "#fb4934",
+    "brightGreen": "#b8bb26",
+    "brightYellow": "#fabd2f",
+    "brightBlue": "#83a598",
+    "brightPurple": "#d3869b",
+    "brightCyan": "#8ec07c",
+    "brightWhite": "#ebdbb2"
+  }
+}

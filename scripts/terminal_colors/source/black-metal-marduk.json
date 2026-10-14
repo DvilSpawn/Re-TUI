@@ -1,0 +1,32 @@
+{
+  "id": "black-metal-marduk",
+  "sourceUrl": "https://term.const.net/en/themes/black-metal-marduk/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "ca031f196e05f8fba9411735ad74288b1587a443383e5ee7cffcca979ab96c01",
+  "paletteSha256": "5c0fcaf81841c3e6aea3682a672610575c1c3e64c91928ad9cf1bae357ef4894",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Black Metal (Marduk).json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Black Metal (Marduk)",
+    "background": "#000000",
+    "foreground": "#c1c1c1",
+    "cursorColor": "#c1c1c1",
+    "selectionBackground": "#c1c1c1",
+    "black": "#000000",
+    "red": "#5f8787",
+    "green": "#a5aaa7",
+    "yellow": "#626b67",
+    "blue": "#888888",
+    "purple": "#999999",
+    "cyan": "#aaaaaa",
+    "white": "#c1c1c1",
+    "brightBlack": "#404040",
+    "brightRed": "#5f8787",
+    "brightGreen": "#a5aaa7",
+    "brightYellow": "#626b67",
+    "brightBlue": "#888888",
+    "brightPurple": "#999999",
+    "brightCyan": "#aaaaaa",
+    "brightWhite": "#c1c1c1"
+  }
+}

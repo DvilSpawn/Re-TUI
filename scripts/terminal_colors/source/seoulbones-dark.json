@@ -1,0 +1,32 @@
+{
+  "id": "seoulbones-dark",
+  "sourceUrl": "https://term.const.net/en/themes/seoulbones-dark/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "abe625dbf767fe3936ae16e728243c066679ac61691ea26a0cc94fee69dba011",
+  "paletteSha256": "c2f856672fbf682369a739922d90696b63274fcd383f59f9a152408390d385a1",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Seoulbones Dark.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Seoulbones Dark",
+    "background": "#4b4b4b",
+    "foreground": "#dddddd",
+    "cursorColor": "#e2e2e2",
+    "selectionBackground": "#777777",
+    "black": "#4b4b4b",
+    "red": "#e388a3",
+    "green": "#98bd99",
+    "yellow": "#ffdf9b",
+    "blue": "#97bdde",
+    "purple": "#a5a6c5",
+    "cyan": "#6fbdbe",
+    "white": "#dddddd",
+    "brightBlack": "#797172",
+    "brightRed": "#eb99b1",
+    "brightGreen": "#8fcd92",
+    "brightYellow": "#ffe5b3",
+    "brightBlue": "#a2c8e9",
+    "brightPurple": "#b2b3da",
+    "brightCyan": "#6bcacb",
+    "brightWhite": "#a8a8a8"
+  }
+}

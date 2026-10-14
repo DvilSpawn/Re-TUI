@@ -49,8 +49,26 @@ TLS is not end-to-end encryption: server operators can read messages and see
 connection addresses. dvil is the default network's configured moderator.
 
 Back first leaves temporary navigation, then closes the pane and disconnects.
-There is no background IRC service, push, persistent local transcript or offline
-replay. Rotation preserves navigation/drafts but cancels password entry. Default
+There is no background IRC service, push or persistent local transcript. On servers
+offering IRCv3 chat history, each confirmed channel join loads up to 100 recent
+messages (or the server's smaller limit). This includes messages sent while the
+pane was closed. Overlapping history is deduplicated by message ID or server time;
+older messages are inserted before newer ones and do not trigger unread alerts.
+Completed history refreshes remove previously cached messages absent from the
+server's latest window, while preserving new messages arriving during the refresh.
+On servers supporting IRCv3 message redaction, server-confirmed deletions replace
+the displayed content with a deletion marker immediately. A deleted message ID
+cannot reappear from overlapping history. Clearing the local pane only clears that
+phone's display; deletion on IRC does not remove already-relayed Discord copies.
+On a supported connection, **More → Delete a message** (or `/delete`) lists
+server-confirmed channel messages. Selection previews the message; confirmation
+sends native IRC `REDACT`. The server decides whether the account may delete it
+(own messages, or other messages with channel moderator permission). A refused
+request leaves the message visible. No optimistic removal or proprietary chat API
+is used; older IRC clients may retain their displayed copy.
+History is limited by server retention and the 200-line window; it is not a complete
+offline archive. Networks without the required history capabilities keep live chat.
+Rotation preserves navigation/drafts but cancels password entry. Default
 server history expires after one week in cleanup batches. Current public privacy
 details are at https://re-tui.pages.dev/privacy.html.
 

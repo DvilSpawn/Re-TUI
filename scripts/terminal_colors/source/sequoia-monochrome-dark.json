@@ -1,0 +1,32 @@
+{
+  "id": "sequoia-monochrome-dark",
+  "sourceUrl": "https://term.const.net/en/themes/sequoia-monochrome-dark/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "e6d7cc89586053187e3559c1de2e06b7058a4df6a5cbaa06e6a7c165e0739ca0",
+  "paletteSha256": "63ba108dd80718b27e7161a512fb27c2b1f021497472bc008a89d423b2163d68",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Sequoia Monochrome Dark.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Sequoia Monochrome Dark",
+    "background": "#0f1014",
+    "foreground": "#868690",
+    "cursorColor": "#43444d",
+    "selectionBackground": "#817c9c",
+    "black": "#131317",
+    "red": "#999eb2",
+    "green": "#626983",
+    "yellow": "#d3d5de",
+    "blue": "#7c829d",
+    "purple": "#e2e4ed",
+    "cyan": "#b6bac8",
+    "white": "#868690",
+    "brightBlack": "#575861",
+    "brightRed": "#999eb2",
+    "brightGreen": "#626983",
+    "brightYellow": "#d3d5de",
+    "brightBlue": "#7c829d",
+    "brightPurple": "#e2e4ed",
+    "brightCyan": "#b6bac8",
+    "brightWhite": "#868690"
+  }
+}

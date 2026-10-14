@@ -1,0 +1,32 @@
+{
+  "id": "firewatch",
+  "sourceUrl": "https://term.const.net/en/themes/firewatch/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "a644d7953bb76da5ed6231990268113967926c8e909643501bfdb0fab240f5e2",
+  "paletteSha256": "e7c1609741dd56600dd5e939b98312a36d81a4ff6d903611c744a5bdaba1685d",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Firewatch.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Firewatch",
+    "background": "#1e2027",
+    "foreground": "#9ba2b2",
+    "cursorColor": "#f6f7ec",
+    "selectionBackground": "#2f363e",
+    "black": "#585f6d",
+    "red": "#d95360",
+    "green": "#5ab977",
+    "yellow": "#dfb563",
+    "blue": "#4d89c4",
+    "purple": "#d55119",
+    "cyan": "#44a8b6",
+    "white": "#e6e5ff",
+    "brightBlack": "#585f6d",
+    "brightRed": "#d95360",
+    "brightGreen": "#5ab977",
+    "brightYellow": "#dfb563",
+    "brightBlue": "#4c89c5",
+    "brightPurple": "#d55119",
+    "brightCyan": "#44a8b6",
+    "brightWhite": "#e6e5ff"
+  }
+}

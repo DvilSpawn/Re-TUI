@@ -1,0 +1,598 @@
+{
+  "schema": 1,
+  "retrievedDate": "2026-10-14",
+  "galleryUrl": "https://term.const.net/en/themes/",
+  "selection": "featured",
+  "sourceSnapshotCount": 614,
+  "description": "Re:TUI readability adaptations of the 21 featured Term gallery palettes.",
+  "themes": [
+    {
+      "id": "catppuccin-frappe",
+      "name": "Catppuccin Frappe",
+      "mode": "dark",
+      "download": "downloads/catppuccin-frappe.retui",
+      "bytes": 2005,
+      "sha256": "f8ce84e64357b4a9c85c1412f2f63b77f72e28df3ee26de05cf58d62d5a65f0d",
+      "background": "#303446",
+      "foreground": "#c6d0f5",
+      "swatches": [
+        "#e78284",
+        "#a6d189",
+        "#e5c890",
+        "#8caaee",
+        "#f4b8e4",
+        "#81c8be"
+      ],
+      "sourceUrl": "https://term.const.net/en/themes/catppuccin-frappe/",
+      "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Catppuccin Frappe.json",
+      "attribution": {
+        "text": "The Catppuccin themes were created by the [Catppuccin](https://github.com/orgs/catppuccin/people) team",
+        "basis": "theme family",
+        "source": "CREDITS.md"
+      },
+      "adjustmentCount": 12,
+      "screenshot": null,
+      "verification": "untested"
+    },
+    {
+      "id": "catppuccin-latte",
+      "name": "Catppuccin Latte",
+      "mode": "light",
+      "download": "downloads/catppuccin-latte.retui",
+      "bytes": 2020,
+      "sha256": "5c91fa8ff9e476905ec6a2be598bc42cc7adbae5c0859da75834a6ed7ae0a2d7",
+      "background": "#eff1f5",
+      "foreground": "#4c4f69",
+      "swatches": [
+        "#d20f39",
+        "#327d22",
+        "#996214",
+        "#1d64ef",
+        "#a2528c",
+        "#137a80"
+      ],
+      "sourceUrl": "https://term.const.net/en/themes/catppuccin-latte/",
+      "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Catppuccin Latte.json",
+      "attribution": {
+        "text": "The Catppuccin themes were created by the [Catppuccin](https://github.com/orgs/catppuccin/people) team",
+        "basis": "theme family",
+        "source": "CREDITS.md"
+      },
+      "adjustmentCount": 51,
+      "screenshot": null,
+      "verification": "untested"
+    },
+    {
+      "id": "catppuccin-macchiato",
+      "name": "Catppuccin Macchiato",
+      "mode": "dark",
+      "download": "downloads/catppuccin-macchiato.retui",
+      "bytes": 2023,
+      "sha256": "de7ddd7f222ae76e6d8af91619b2b1f0f864551cdb736b98679cfe826f2bb6c1",
+      "background": "#24273a",
+      "foreground": "#cad3f5",
+      "swatches": [
+        "#ed8796",
+        "#a6da95",
+        "#eed49f",
+        "#8aadf4",
+        "#f5bde6",
+        "#8bd5ca"
+      ],
+      "sourceUrl": "https://term.const.net/en/themes/catppuccin-macchiato/",
+      "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Catppuccin Macchiato.json",
+      "attribution": {
+        "text": "The Catppuccin themes were created by the [Catppuccin](https://github.com/orgs/catppuccin/people) team",
+        "basis": "theme family",
+        "source": "CREDITS.md"
+      },
+      "adjustmentCount": 21,
+      "screenshot": null,
+      "verification": "untested"
+    },
+    {
+      "id": "catppuccin-mocha",
+      "name": "Catppuccin Mocha",
+      "mode": "dark",
+      "download": "downloads/catppuccin-mocha.retui",
+      "bytes": 2001,
+      "sha256": "5ff7b49fc536842158aea528743e0ddcb4e9f5470cb2afe4583f4927093ac17f",
+      "background": "#1e1e2e",
+      "foreground": "#cdd6f4",
+      "swatches": [
+        "#f38ba8",
+        "#a6e3a1",
+        "#f9e2af",
+        "#89b4fa",
+        "#f5c2e7",
+        "#94e2d5"
+      ],
+      "sourceUrl": "https://term.const.net/en/themes/catppuccin-mocha/",
+      "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Catppuccin Mocha.json",
+      "attribution": {
+        "text": "The Catppuccin themes were created by the [Catppuccin](https://github.com/orgs/catppuccin/people) team",
+        "basis": "theme family",
+        "source": "CREDITS.md"
+      },
+      "adjustmentCount": 12,
+      "screenshot": null,
+      "verification": "untested"
+    },
+    {
+      "id": "claude-dark",
+      "name": "Claude Dark",
+      "mode": "dark",
+      "download": "downloads/claude-dark.retui",
+      "bytes": 2004,
+      "sha256": "bce955b56a7a9a18799f7157c7e7870495ba4d3f36139ee0b8267b64721a792d",
+      "background": "#262624",
+      "foreground": "#e5e4e1",
+      "swatches": [
+        "#d47563",
+        "#9aca86",
+        "#e8c96b",
+        "#6a9bcc",
+        "#9b87f5",
+        "#3cbe8c"
+      ],
+      "sourceUrl": "https://term.const.net/en/themes/claude-dark/",
+      "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Claude Dark.json",
+      "attribution": {
+        "text": "The Claude theme was created by [techfitmaster](https://github.com/techfitmaster/ghostty-claude-theme), inspired by the [Claude](https://claude.ai) AI interface color palette",
+        "basis": "theme family",
+        "source": "CREDITS.md"
+      },
+      "adjustmentCount": 1,
+      "screenshot": null,
+      "verification": "untested"
+    },
+    {
+      "id": "claude-light",
+      "name": "Claude Light",
+      "mode": "light",
+      "download": "downloads/claude-light.retui",
+      "bytes": 2006,
+      "sha256": "32f23811b6cda25d00201231b3a723a0ff244f5c0eac3a7d12db9c47731e8546",
+      "background": "#faf9f5",
+      "foreground": "#141413",
+      "swatches": [
+        "#a84b3a",
+        "#2e7c4c",
+        "#8a6220",
+        "#184e95",
+        "#882b4d",
+        "#066049"
+      ],
+      "sourceUrl": "https://term.const.net/en/themes/claude-light/",
+      "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Claude Light.json",
+      "attribution": {
+        "text": "The Claude theme was created by [techfitmaster](https://github.com/techfitmaster/ghostty-claude-theme), inspired by the [Claude](https://claude.ai) AI interface color palette",
+        "basis": "theme family",
+        "source": "CREDITS.md"
+      },
+      "adjustmentCount": 9,
+      "screenshot": null,
+      "verification": "untested"
+    },
+    {
+      "id": "cobalt2",
+      "name": "Cobalt2",
+      "mode": "dark",
+      "download": "downloads/cobalt2.retui",
+      "bytes": 2003,
+      "sha256": "71dc26c337dc7056511066154f0bff9393c3bc6f30d23583c13f58dbebc4b9c8",
+      "background": "#132738",
+      "foreground": "#ffffff",
+      "swatches": [
+        "#ff4545",
+        "#38de21",
+        "#ffe50a",
+        "#558cde",
+        "#ff3b82",
+        "#00bbbb"
+      ],
+      "sourceUrl": "https://term.const.net/en/themes/cobalt2/",
+      "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Cobalt2.json",
+      "attribution": {
+        "text": "The Cobalt2 theme was created by [wesbos](https://github.com/wesbos/Cobalt2-iterm)",
+        "basis": "exact theme",
+        "source": "CREDITS.md"
+      },
+      "adjustmentCount": 66,
+      "screenshot": null,
+      "verification": "untested"
+    },
+    {
+      "id": "dracula",
+      "name": "Dracula",
+      "mode": "dark",
+      "download": "downloads/dracula.retui",
+      "bytes": 1979,
+      "sha256": "d878459b5f2b6ed095a5f9673ddde9bcc2876efd2725a23bfda65a15d6150e9c",
+      "background": "#282a36",
+      "foreground": "#f8f8f2",
+      "swatches": [
+        "#ff5555",
+        "#50fa7b",
+        "#f1fa8c",
+        "#bd93f9",
+        "#ff79c6",
+        "#8be9fd"
+      ],
+      "sourceUrl": "https://term.const.net/en/themes/dracula/",
+      "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Dracula.json",
+      "attribution": {
+        "text": "The Dracula theme was created by [zenorocha](https://github.com/zenorocha/dracula-theme)",
+        "basis": "exact theme",
+        "source": "CREDITS.md"
+      },
+      "adjustmentCount": 2,
+      "screenshot": null,
+      "verification": "untested"
+    },
+    {
+      "id": "dracula-plus",
+      "name": "Dracula+",
+      "mode": "dark",
+      "download": "downloads/dracula-plus.retui",
+      "bytes": 1988,
+      "sha256": "aa72b88698f0c9b885550d44dfa3c83bd1e7ee3d61e713bafabdc64880943af4",
+      "background": "#212121",
+      "foreground": "#f8f8f2",
+      "swatches": [
+        "#ff5555",
+        "#50fa7b",
+        "#ffcb6b",
+        "#82aaff",
+        "#c792ea",
+        "#8be9fd"
+      ],
+      "sourceUrl": "https://term.const.net/en/themes/dracula-plus/",
+      "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Dracula+.json",
+      "attribution": {
+        "text": "The Dracula theme was created by [zenorocha](https://github.com/zenorocha/dracula-theme)",
+        "basis": "exact theme",
+        "source": "CREDITS.md"
+      },
+      "adjustmentCount": 21,
+      "screenshot": null,
+      "verification": "untested"
+    },
+    {
+      "id": "github-dark",
+      "name": "GitHub Dark",
+      "mode": "dark",
+      "download": "downloads/github-dark.retui",
+      "bytes": 1968,
+      "sha256": "bbcd1f14ddd0db37a748751d36f87a18fa722c39e231bcac212e14b677c1df8e",
+      "background": "#101216",
+      "foreground": "#8b949e",
+      "swatches": [
+        "#f78166",
+        "#56d364",
+        "#e3b341",
+        "#6ca4f8",
+        "#db61a2",
+        "#448597"
+      ],
+      "sourceUrl": "https://term.const.net/en/themes/github-dark/",
+      "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/GitHub Dark.json",
+      "attribution": {
+        "text": "The GitHub Dark Default, GitHub Dark Dimmed, GitHub Dark Colorblind, GitHub Dark High Contrast, GitHub Light Default, GitHub Light Colorblind, and GitHub Light High Contrast themes were added by [Antonio Camargo](https://github.com/apcamargo). These themes were converted from the [official GitHub theme](https://github.com/primer/github-vscode-theme) using the [ditto](https://github.com/campvanilla/ditto) tool.",
+        "basis": "exact theme",
+        "source": "CREDITS.md"
+      },
+      "adjustmentCount": 17,
+      "screenshot": null,
+      "verification": "untested"
+    },
+    {
+      "id": "gruvbox-dark",
+      "name": "Gruvbox Dark",
+      "mode": "dark",
+      "download": "downloads/gruvbox-dark.retui",
+      "bytes": 2023,
+      "sha256": "c1fa58f5b0e8b275afcaccf70dee985749f074150f6c161d2b9ff46676f1cb19",
+      "background": "#282828",
+      "foreground": "#ebdbb2",
+      "swatches": [
+        "#dd6c67",
+        "#98971a",
+        "#d79921",
+        "#61989a",
+        "#bd7b99",
+        "#689d6a"
+      ],
+      "sourceUrl": "https://term.const.net/en/themes/gruvbox-dark/",
+      "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Gruvbox Dark.json",
+      "attribution": {
+        "text": "The Gruvbox Dark theme was created by [morhetz](https://github.com/morhetz) and added by [saccarosium](https://github.com/mcchrish)",
+        "basis": "exact theme",
+        "source": "CREDITS.md"
+      },
+      "adjustmentCount": 25,
+      "screenshot": null,
+      "verification": "untested"
+    },
+    {
+      "id": "gruvbox-light",
+      "name": "Gruvbox Light",
+      "mode": "light",
+      "download": "downloads/gruvbox-light.retui",
+      "bytes": 2026,
+      "sha256": "4ea26907c6c360f0fa34cec5dd2f0b1c6a01c22617b9e4f2994c1d542dad75b3",
+      "background": "#fbf1c7",
+      "foreground": "#3c3836",
+      "swatches": [
+        "#cc241d",
+        "#727114",
+        "#906616",
+        "#3d7679",
+        "#9e5778",
+        "#4f7751"
+      ],
+      "sourceUrl": "https://term.const.net/en/themes/gruvbox-light/",
+      "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Gruvbox Light.json",
+      "attribution": {
+        "text": "The Gruvbox Light theme was created by [morhetz](https://github.com/morhetz) and added by [reynn](https://github.com/reynn)",
+        "basis": "exact theme",
+        "source": "CREDITS.md"
+      },
+      "adjustmentCount": 47,
+      "screenshot": null,
+      "verification": "untested"
+    },
+    {
+      "id": "material-dark",
+      "name": "Material Dark",
+      "mode": "dark",
+      "download": "downloads/material-dark.retui",
+      "bytes": 2020,
+      "sha256": "32e99a823d88dae6382221a233aa1702ae2a738390f12e4f5be5b199204983a7",
+      "background": "#232322",
+      "foreground": "#e5e5e5",
+      "swatches": [
+        "#d16a71",
+        "#69954e",
+        "#f6981e",
+        "#628acc",
+        "#a974c7",
+        "#4a949d"
+      ],
+      "sourceUrl": "https://term.const.net/en/themes/material-dark/",
+      "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Material Dark.json",
+      "attribution": {
+        "text": "The Material and MaterialDark themes were created by [stoeffel](https://github.com/stoeffel/material-iterm)",
+        "basis": "exact theme",
+        "source": "CREDITS.md"
+      },
+      "adjustmentCount": 85,
+      "screenshot": null,
+      "verification": "untested"
+    },
+    {
+      "id": "night-owl",
+      "name": "Night Owl",
+      "mode": "dark",
+      "download": "downloads/night-owl.retui",
+      "bytes": 1995,
+      "sha256": "e307111469ff3e230f66c5c6dca775f0d47733bf2a424a6b9f52d6250f75533a",
+      "background": "#011627",
+      "foreground": "#d6deeb",
+      "swatches": [
+        "#ef5350",
+        "#22da6e",
+        "#addb67",
+        "#82aaff",
+        "#c792ea",
+        "#21c7a8"
+      ],
+      "sourceUrl": "https://term.const.net/en/themes/night-owl/",
+      "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Night Owl.json",
+      "attribution": {
+        "text": "The NightOwl theme was created by [zasdaym](https://github.com/zasdaym)",
+        "basis": "exact theme",
+        "source": "CREDITS.md"
+      },
+      "adjustmentCount": 21,
+      "screenshot": null,
+      "verification": "untested"
+    },
+    {
+      "id": "nord",
+      "name": "Nord",
+      "mode": "dark",
+      "download": "downloads/nord.retui",
+      "bytes": 1987,
+      "sha256": "2dd3c5bbc3e97b2515394d9108598947bcf14f27a7fa6415eadc7aa516f70653",
+      "background": "#2e3440",
+      "foreground": "#d8dee9",
+      "swatches": [
+        "#cf888f",
+        "#a3be8c",
+        "#ebcb8b",
+        "#81a1c1",
+        "#b590af",
+        "#88c0d0"
+      ],
+      "sourceUrl": "https://term.const.net/en/themes/nord/",
+      "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Nord.json",
+      "attribution": {
+        "text": "Nord theme was created by [Arctic Ice Studio](https://www.nordtheme.com/) and added by [Teraskull](https://github.com/Teraskull)",
+        "basis": "exact theme",
+        "source": "CREDITS.md"
+      },
+      "adjustmentCount": 32,
+      "screenshot": null,
+      "verification": "untested"
+    },
+    {
+      "id": "rose-pine",
+      "name": "Rose Pine",
+      "mode": "dark",
+      "download": "downloads/rose-pine.retui",
+      "bytes": 1958,
+      "sha256": "3d9e65a27520e35df63e04900e19b78121eb7e03b3f549ced5e3b451b7b5e8e7",
+      "background": "#191724",
+      "foreground": "#e0def4",
+      "swatches": [
+        "#eb6f92",
+        "#4f889f",
+        "#f6c177",
+        "#9ccfd8",
+        "#c4a7e7",
+        "#ebbcba"
+      ],
+      "sourceUrl": "https://term.const.net/en/themes/rose-pine/",
+      "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Rose Pine.json",
+      "attribution": {
+        "text": "iTerm2-Color-Schemes contributors. The pinned credits do not identify the author of this exact variant.",
+        "basis": "unresolved individual author",
+        "source": "CREDITS.md"
+      },
+      "adjustmentCount": 8,
+      "screenshot": null,
+      "verification": "untested"
+    },
+    {
+      "id": "rose-pine-dawn",
+      "name": "Rose Pine Dawn",
+      "mode": "light",
+      "download": "downloads/rose-pine-dawn.retui",
+      "bytes": 1995,
+      "sha256": "5167429c8abda68dafa89d930aadc8a64bfc638f29c48898580a199a766912eb",
+      "background": "#faf4ed",
+      "foreground": "#575279",
+      "swatches": [
+        "#a45a6f",
+        "#286983",
+        "#986622",
+        "#467881",
+        "#7b6991",
+        "#9e5f5d"
+      ],
+      "sourceUrl": "https://term.const.net/en/themes/rose-pine-dawn/",
+      "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Rose Pine Dawn.json",
+      "attribution": {
+        "text": "iTerm2-Color-Schemes contributors. The pinned credits do not identify the author of this exact variant.",
+        "basis": "unresolved individual author",
+        "source": "CREDITS.md"
+      },
+      "adjustmentCount": 37,
+      "screenshot": null,
+      "verification": "untested"
+    },
+    {
+      "id": "tokyonight",
+      "name": "TokyoNight",
+      "mode": "dark",
+      "download": "downloads/tokyonight.retui",
+      "bytes": 1963,
+      "sha256": "c536fbab903e9a342ff3a114d158cff8c42dbde0037956a4a283c5598777355a",
+      "background": "#1a1b26",
+      "foreground": "#c0caf5",
+      "swatches": [
+        "#f7768e",
+        "#9ece6a",
+        "#e0af68",
+        "#7aa2f7",
+        "#bb9af7",
+        "#7dcfff"
+      ],
+      "sourceUrl": "https://term.const.net/en/themes/tokyonight/",
+      "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/TokyoNight.json",
+      "attribution": {
+        "text": "The Tokyo Night themes were created by [folke](https://github.com/folke/tokyonight.nvim)",
+        "basis": "exact theme",
+        "source": "CREDITS.md"
+      },
+      "adjustmentCount": 2,
+      "screenshot": null,
+      "verification": "untested"
+    },
+    {
+      "id": "tokyonight-day",
+      "name": "TokyoNight Day",
+      "mode": "light",
+      "download": "downloads/tokyonight-day.retui",
+      "bytes": 1980,
+      "sha256": "bbfd6ad618c527c74512d1a93e7262ba6b32579e8ec1143f1cf795225d4dc890",
+      "background": "#e1e2e7",
+      "foreground": "#3760bf",
+      "swatches": [
+        "#c12150",
+        "#526d35",
+        "#7d6037",
+        "#2564b9",
+        "#7e46c9",
+        "#006d92"
+      ],
+      "sourceUrl": "https://term.const.net/en/themes/tokyonight-day/",
+      "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/TokyoNight Day.json",
+      "attribution": {
+        "text": "The Tokyo Night themes were created by [folke](https://github.com/folke/tokyonight.nvim)",
+        "basis": "theme family",
+        "source": "CREDITS.md"
+      },
+      "adjustmentCount": 45,
+      "screenshot": null,
+      "verification": "untested"
+    },
+    {
+      "id": "tokyonight-storm",
+      "name": "TokyoNight Storm",
+      "mode": "dark",
+      "download": "downloads/tokyonight-storm.retui",
+      "bytes": 1974,
+      "sha256": "f6c14e17e293879452a00ec0bfb84bf25a50d14b8f6b40d47fbed8ba76a5a8e3",
+      "background": "#24283b",
+      "foreground": "#c0caf5",
+      "swatches": [
+        "#f7768e",
+        "#9ece6a",
+        "#e0af68",
+        "#7aa2f7",
+        "#bb9af7",
+        "#7dcfff"
+      ],
+      "sourceUrl": "https://term.const.net/en/themes/tokyonight-storm/",
+      "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/TokyoNight Storm.json",
+      "attribution": {
+        "text": "The Tokyo Night themes were created by [folke](https://github.com/folke/tokyonight.nvim)",
+        "basis": "theme family",
+        "source": "CREDITS.md"
+      },
+      "adjustmentCount": 2,
+      "screenshot": null,
+      "verification": "untested"
+    },
+    {
+      "id": "tomorrow",
+      "name": "Tomorrow",
+      "mode": "light",
+      "download": "downloads/tomorrow.retui",
+      "bytes": 1946,
+      "sha256": "bc250b13232b045c810815b8fc9f34a94232592c9b796d8dae90592942e105a1",
+      "background": "#ffffff",
+      "foreground": "#4d4d4c",
+      "swatches": [
+        "#c82829",
+        "#678000",
+        "#927200",
+        "#4271ae",
+        "#8959a8",
+        "#348187"
+      ],
+      "sourceUrl": "https://term.const.net/en/themes/tomorrow/",
+      "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Tomorrow.json",
+      "attribution": {
+        "text": "The Tomorrow themes were created by [chriskempson](https://github.com/chriskempson/tomorrow-theme/tree/master/iTerm2)",
+        "basis": "exact theme",
+        "source": "CREDITS.md"
+      },
+      "adjustmentCount": 18,
+      "screenshot": null,
+      "verification": "untested"
+    }
+  ]
+}

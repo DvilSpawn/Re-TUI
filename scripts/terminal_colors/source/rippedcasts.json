@@ -1,0 +1,32 @@
+{
+  "id": "rippedcasts",
+  "sourceUrl": "https://term.const.net/en/themes/rippedcasts/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "b5e854700700ce576738caeacb2bed52d0159bd9c73dfe1b8e1e7366a5155d1a",
+  "paletteSha256": "63f2f9a9fc26305918d194bd248551b1b0f0a639222997fd8ea7cbe06ea5509e",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Rippedcasts.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Rippedcasts",
+    "background": "#2b2b2b",
+    "foreground": "#ffffff",
+    "cursorColor": "#7f7f7f",
+    "selectionBackground": "#5a647e",
+    "black": "#000000",
+    "red": "#cdaf95",
+    "green": "#a8ff60",
+    "yellow": "#bfbb1f",
+    "blue": "#75a5b0",
+    "purple": "#ff73fd",
+    "cyan": "#5a647e",
+    "white": "#bfbfbf",
+    "brightBlack": "#666666",
+    "brightRed": "#eecbad",
+    "brightGreen": "#bcee68",
+    "brightYellow": "#e5e500",
+    "brightBlue": "#86bdc9",
+    "brightPurple": "#e500e5",
+    "brightCyan": "#8c9bc4",
+    "brightWhite": "#e5e5e5"
+  }
+}

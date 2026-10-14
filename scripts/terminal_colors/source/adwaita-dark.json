@@ -1,0 +1,32 @@
+{
+  "id": "adwaita-dark",
+  "sourceUrl": "https://term.const.net/en/themes/adwaita-dark/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "55c380e539c3f36b12ff330a0d5ddeebc3656a06eb2d5d521c1e28ea5939fcd7",
+  "paletteSha256": "3b563bc7577f4a0d2effd1e803e43d542eceec264175c412659788e74d9cf08f",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Adwaita Dark.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Adwaita Dark",
+    "background": "#1c1c1f",
+    "foreground": "#ffffff",
+    "cursorColor": "#ffffff",
+    "selectionBackground": "#ffffff",
+    "black": "#241f31",
+    "red": "#c01c28",
+    "green": "#2ec27e",
+    "yellow": "#f5c211",
+    "blue": "#1e78e4",
+    "purple": "#9841bb",
+    "cyan": "#0ab9dc",
+    "white": "#c0bfbc",
+    "brightBlack": "#5e5c64",
+    "brightRed": "#ed333b",
+    "brightGreen": "#57e389",
+    "brightYellow": "#f8e45c",
+    "brightBlue": "#51a1ff",
+    "brightPurple": "#c061cb",
+    "brightCyan": "#4fd2fd",
+    "brightWhite": "#f6f5f4"
+  }
+}

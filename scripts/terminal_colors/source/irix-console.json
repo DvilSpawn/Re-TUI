@@ -1,0 +1,32 @@
+{
+  "id": "irix-console",
+  "sourceUrl": "https://term.const.net/en/themes/irix-console/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "5195c8782355a471ae74bd3d2d768211d6439154f3625ddaa323b90744947183",
+  "paletteSha256": "65f1978d27af57dbb4b2c59fa056ea6b7a552659b174444c0eb70347959eeb58",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/IRIX Console.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "IRIX Console",
+    "background": "#0c0c0c",
+    "foreground": "#f2f2f2",
+    "cursorColor": "#c7c7c7",
+    "selectionBackground": "#c2deff",
+    "black": "#1a1919",
+    "red": "#d42426",
+    "green": "#37a327",
+    "yellow": "#c29d28",
+    "blue": "#0739e2",
+    "purple": "#911f9c",
+    "cyan": "#4497df",
+    "white": "#cccccc",
+    "brightBlack": "#767676",
+    "brightRed": "#f34f59",
+    "brightGreen": "#45c731",
+    "brightYellow": "#f9f2a7",
+    "brightBlue": "#4079ff",
+    "brightPurple": "#c31ba2",
+    "brightCyan": "#6ed7d7",
+    "brightWhite": "#f2f2f2"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "cyberdyne",
+  "sourceUrl": "https://term.const.net/en/themes/cyberdyne/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "e69f5a9226cb3007070540a8354450ff30e65fed24af794d8f49f164176d23cf",
+  "paletteSha256": "e1023cbebc79ff55fdf0444af94bf8a309e25f2f6e23922b6868e8a7359dbaf1",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Cyberdyne.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Cyberdyne",
+    "background": "#151144",
+    "foreground": "#00ff92",
+    "cursorColor": "#00ff9c",
+    "selectionBackground": "#454d96",
+    "black": "#080808",
+    "red": "#ff8373",
+    "green": "#00c172",
+    "yellow": "#d2a700",
+    "blue": "#0071cf",
+    "purple": "#ff90fe",
+    "cyan": "#6bffdd",
+    "white": "#f1f1f1",
+    "brightBlack": "#484848",
+    "brightRed": "#ffc4be",
+    "brightGreen": "#d6fcba",
+    "brightYellow": "#fffed5",
+    "brightBlue": "#c2e3ff",
+    "brightPurple": "#ffb2fe",
+    "brightCyan": "#e6e7fe",
+    "brightWhite": "#ffffff"
+  }
+}

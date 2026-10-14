@@ -1,0 +1,32 @@
+{
+  "id": "one-dark-two",
+  "sourceUrl": "https://term.const.net/en/themes/one-dark-two/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "dea7271e399dd8154d22b57755a93b7c4217dc4379294bee77597428159c7c58",
+  "paletteSha256": "d1a2490c48e2914f55ab2300d52e75748955cc6369bfbf26288d14676b82bc35",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/One Dark Two.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "One Dark Two",
+    "background": "#21252b",
+    "foreground": "#e6e6e6",
+    "cursorColor": "#e6e6e6",
+    "selectionBackground": "#393e47",
+    "black": "#1d1f23",
+    "red": "#e27881",
+    "green": "#98c379",
+    "yellow": "#eac786",
+    "blue": "#71b9f4",
+    "purple": "#c88bda",
+    "cyan": "#62bac6",
+    "white": "#c9ccd3",
+    "brightBlack": "#4a505a",
+    "brightRed": "#e68991",
+    "brightGreen": "#a8cc8e",
+    "brightYellow": "#edcf97",
+    "brightBlue": "#8dc7f6",
+    "brightPurple": "#d3a2e2",
+    "brightCyan": "#78c4ce",
+    "brightWhite": "#e6e6e6"
+  }
+}

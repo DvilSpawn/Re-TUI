@@ -1,0 +1,32 @@
+{
+  "id": "black-metal-immortal",
+  "sourceUrl": "https://term.const.net/en/themes/black-metal-immortal/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "dd674b0bb5e538f91a4b76e0cfe64e6ea203283b2821d960edf41a2741a3b279",
+  "paletteSha256": "e671ceba317219d7f2154690639ff06a85a0b25cfb7fae9ee90207610d0a88e9",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Black Metal (Immortal).json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Black Metal (Immortal)",
+    "background": "#000000",
+    "foreground": "#c1c1c1",
+    "cursorColor": "#c1c1c1",
+    "selectionBackground": "#c1c1c1",
+    "black": "#000000",
+    "red": "#5f8787",
+    "green": "#7799bb",
+    "yellow": "#556677",
+    "blue": "#888888",
+    "purple": "#999999",
+    "cyan": "#aaaaaa",
+    "white": "#c1c1c1",
+    "brightBlack": "#404040",
+    "brightRed": "#5f8787",
+    "brightGreen": "#7799bb",
+    "brightYellow": "#556677",
+    "brightBlue": "#888888",
+    "brightPurple": "#999999",
+    "brightCyan": "#aaaaaa",
+    "brightWhite": "#c1c1c1"
+  }
+}

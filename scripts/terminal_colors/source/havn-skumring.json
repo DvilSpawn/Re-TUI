@@ -1,0 +1,32 @@
+{
+  "id": "havn-skumring",
+  "sourceUrl": "https://term.const.net/en/themes/havn-skumring/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "0ef3be3851bf3b3ef6f3515a2333e71a369eed56f3dc92de6936c0b39d468c0f",
+  "paletteSha256": "7f5dbf2cf19fcbd32910eef40564ad7f354a0336a19f3ecca3691cc753a59777",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Havn Skumring.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Havn Skumring",
+    "background": "#111522",
+    "foreground": "#d6dbeb",
+    "cursorColor": "#277a6f",
+    "selectionBackground": "#2b514b",
+    "black": "#252c47",
+    "red": "#ea563e",
+    "green": "#6ead7b",
+    "yellow": "#f8b330",
+    "blue": "#596cf7",
+    "purple": "#7c719e",
+    "cyan": "#d588c1",
+    "white": "#dce0ee",
+    "brightBlack": "#38425c",
+    "brightRed": "#d17264",
+    "brightGreen": "#8c9e8f",
+    "brightYellow": "#eac58c",
+    "brightBlue": "#5186cb",
+    "brightPurple": "#9b7cee",
+    "brightCyan": "#d17ab6",
+    "brightWhite": "#fff6e1"
+  }
+}

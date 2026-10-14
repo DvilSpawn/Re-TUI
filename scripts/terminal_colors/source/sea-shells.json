@@ -1,0 +1,32 @@
+{
+  "id": "sea-shells",
+  "sourceUrl": "https://term.const.net/en/themes/sea-shells/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "69492801d7aa469921703d8c57716cf3d77659c334e6160c606e3808c5ce5e8b",
+  "paletteSha256": "b3d11dbd084f4105791fd5ea6af1983571dc5128d885ce6736da12d1069fc2b2",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Sea Shells.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Sea Shells",
+    "background": "#09141b",
+    "foreground": "#deb88d",
+    "cursorColor": "#fca02f",
+    "selectionBackground": "#1e4962",
+    "black": "#17384c",
+    "red": "#d15123",
+    "green": "#027c9b",
+    "yellow": "#fca02f",
+    "blue": "#1e4950",
+    "purple": "#68d4f1",
+    "cyan": "#50a3b5",
+    "white": "#deb88d",
+    "brightBlack": "#434b53",
+    "brightRed": "#d48678",
+    "brightGreen": "#628d98",
+    "brightYellow": "#fdd39f",
+    "brightBlue": "#1bbcdd",
+    "brightPurple": "#bbe3ee",
+    "brightCyan": "#87acb4",
+    "brightWhite": "#fee4ce"
+  }
+}

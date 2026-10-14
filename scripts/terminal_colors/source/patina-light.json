@@ -1,0 +1,32 @@
+{
+  "id": "patina-light",
+  "sourceUrl": "https://term.const.net/en/themes/patina-light/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "316884086f6b04fd060f93f38518e686577dcae2aa56ba62dcae0d239017b693",
+  "paletteSha256": "b0d75d880d088ca9b4e2d50565c9d468f78db0afde179705baad45ee5ee68ffd",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Patina Light.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Patina Light",
+    "background": "#ddd7c4",
+    "foreground": "#2e2a24",
+    "cursorColor": "#2e2a24",
+    "selectionBackground": "#bfb8a3",
+    "black": "#2e2a24",
+    "red": "#9b3b3b",
+    "green": "#34644c",
+    "yellow": "#6e5817",
+    "blue": "#2f626f",
+    "purple": "#7a4f47",
+    "cyan": "#2e6260",
+    "white": "#5a5248",
+    "brightBlack": "#625a51",
+    "brightRed": "#833333",
+    "brightGreen": "#2d5839",
+    "brightYellow": "#634e14",
+    "brightBlue": "#2c5660",
+    "brightPurple": "#6d463e",
+    "brightCyan": "#285654",
+    "brightWhite": "#393a34"
+  }
+}

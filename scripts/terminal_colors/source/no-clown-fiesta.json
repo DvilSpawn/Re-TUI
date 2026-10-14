@@ -1,0 +1,32 @@
+{
+  "id": "no-clown-fiesta",
+  "sourceUrl": "https://term.const.net/en/themes/no-clown-fiesta/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "f9489dabd98c14aa11742d049ad3246aa784f03882f0eb8cd5a1b72e5a33cd54",
+  "paletteSha256": "47fed76d626043442a94706dce6df792a2f2e5640ba8b8332ca5d2c846e4c6c0",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/No Clown Fiesta.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "No Clown Fiesta",
+    "background": "#101010",
+    "foreground": "#e0e1e4",
+    "cursorColor": "#e0e1e4",
+    "selectionBackground": "#696d79",
+    "black": "#151515",
+    "red": "#b46958",
+    "green": "#90a959",
+    "yellow": "#f4bf75",
+    "blue": "#bad7ff",
+    "purple": "#aa759f",
+    "cyan": "#88afa2",
+    "white": "#e1e1e1",
+    "brightBlack": "#727272",
+    "brightRed": "#7e97ab",
+    "brightGreen": "#90a959",
+    "brightYellow": "#f4bf75",
+    "brightBlue": "#bad7ff",
+    "brightPurple": "#aa759f",
+    "brightCyan": "#88afa2",
+    "brightWhite": "#afafaf"
+  }
+}

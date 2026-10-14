@@ -1,0 +1,32 @@
+{
+  "id": "silkcircuit-glow",
+  "sourceUrl": "https://term.const.net/en/themes/silkcircuit-glow/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "dcdff32643722db47d27ecf38c7c1378b8e0f746521d9d4183daa1ebc9009520",
+  "paletteSha256": "4fdc56a87dbd34b18efe2e01951ab13f085b442e003b8764a57013260c67e2a2",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/SilkCircuit Glow.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "SilkCircuit Glow",
+    "background": "#0a0816",
+    "foreground": "#ffffff",
+    "cursorColor": "#00ffff",
+    "selectionBackground": "#4b0654",
+    "black": "#000000",
+    "red": "#ff2244",
+    "green": "#00ff00",
+    "yellow": "#ffff00",
+    "blue": "#0099ff",
+    "purple": "#ff00ff",
+    "cyan": "#00ffff",
+    "white": "#ffffff",
+    "brightBlack": "#818181",
+    "brightRed": "#ff6666",
+    "brightGreen": "#66ff66",
+    "brightYellow": "#ffff66",
+    "brightBlue": "#66ccff",
+    "brightPurple": "#ff66ff",
+    "brightCyan": "#66ffff",
+    "brightWhite": "#ffffff"
+  }
+}

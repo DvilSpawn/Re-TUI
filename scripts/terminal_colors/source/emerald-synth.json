@@ -1,0 +1,32 @@
+{
+  "id": "emerald-synth",
+  "sourceUrl": "https://term.const.net/en/themes/emerald-synth/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "664c519cb6f7c1720c692ce1b51757c8beec386458ae3045323fe18ddd1ac59d",
+  "paletteSha256": "af2bb2c87197fb743b5b3b72c1aa99fde09d9f1fbb2e546a581f78077b7dbdc2",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Emerald Synth.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Emerald Synth",
+    "background": "#0d0221",
+    "foreground": "#00ffcc",
+    "cursorColor": "#ff79c6",
+    "selectionBackground": "#2e6b5f",
+    "black": "#0a0118",
+    "red": "#ff2a6d",
+    "green": "#00e67e",
+    "yellow": "#ffcc66",
+    "blue": "#8b9cf7",
+    "purple": "#ff79c6",
+    "cyan": "#4dd0e1",
+    "white": "#f0e6ff",
+    "brightBlack": "#6a5585",
+    "brightRed": "#ff5c8a",
+    "brightGreen": "#40ffdd",
+    "brightYellow": "#ffe099",
+    "brightBlue": "#b0b8fc",
+    "brightPurple": "#ff9ed0",
+    "brightCyan": "#7ee0ec",
+    "brightWhite": "#ffffff"
+  }
+}

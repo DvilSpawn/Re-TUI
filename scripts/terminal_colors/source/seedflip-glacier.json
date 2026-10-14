@@ -1,0 +1,32 @@
+{
+  "id": "seedflip-glacier",
+  "sourceUrl": "https://term.const.net/en/themes/seedflip-glacier/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "6c41a49a20a42390894420eadd7ba704a7a1192bac6097fc1ac07677b5b77685",
+  "paletteSha256": "bbc4773629db08abe8b68396627f13386692b52b3893ad14db63bc81d9149ae5",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/SeedFlip Glacier.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "SeedFlip Glacier",
+    "background": "#f8fafc",
+    "foreground": "#0f172a",
+    "cursorColor": "#0ea5e9",
+    "selectionBackground": "#ffffff",
+    "black": "#c2d4e5",
+    "red": "#bd0f0f",
+    "green": "#0fbd49",
+    "yellow": "#bda00f",
+    "blue": "#0f58bd",
+    "purple": "#bd0fbd",
+    "cyan": "#0fbdbd",
+    "white": "#080d17",
+    "brightBlack": "#8dadce",
+    "brightRed": "#ee2b2b",
+    "brightGreen": "#12d452",
+    "brightYellow": "#d4b312",
+    "brightBlue": "#2b7cee",
+    "brightPurple": "#ee2bee",
+    "brightCyan": "#12d4d4",
+    "brightWhite": "#0f172a"
+  }
+}

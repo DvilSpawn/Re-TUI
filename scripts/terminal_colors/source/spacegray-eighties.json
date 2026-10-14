@@ -1,0 +1,32 @@
+{
+  "id": "spacegray-eighties",
+  "sourceUrl": "https://term.const.net/en/themes/spacegray-eighties/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "c796edec6a67604255f9f18245f0ceba24574354d18b57d4dde6eeb9fb0f165a",
+  "paletteSha256": "6f1b3560ceb65f92b24e8101b3e806e10074967f8ab0ff46938b96e95aa568fe",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Spacegray Eighties.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Spacegray Eighties",
+    "background": "#222222",
+    "foreground": "#bdbaae",
+    "cursorColor": "#bbbbbb",
+    "selectionBackground": "#272e35",
+    "black": "#15171c",
+    "red": "#ec5f67",
+    "green": "#81a764",
+    "yellow": "#fec254",
+    "blue": "#5486c0",
+    "purple": "#bf83c1",
+    "cyan": "#57c2c1",
+    "white": "#efece7",
+    "brightBlack": "#555555",
+    "brightRed": "#ff6973",
+    "brightGreen": "#93d493",
+    "brightYellow": "#ffd256",
+    "brightBlue": "#4d84d1",
+    "brightPurple": "#ff55ff",
+    "brightCyan": "#83e9e4",
+    "brightWhite": "#ffffff"
+  }
+}

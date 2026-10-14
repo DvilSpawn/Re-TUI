@@ -124,7 +124,7 @@ data class RetuiTheme(
             context.getSharedPreferences(PREFS, 0).edit().remove(IMPORTED_FONT_LABEL).apply()
         }
 
-        private fun launcherInstalled(context: Context): Boolean = runCatching {
+        private fun launcherInstalled(context: Context): Boolean = context.packageName == ohi.andre.consolelauncher.BuildConfig.APPLICATION_ID || runCatching {
             context.packageManager.getApplicationInfo(PreviewContract.LAUNCHER_PACKAGE, 0)
         }.isSuccess
 
@@ -371,7 +371,9 @@ private fun styleTree(
             view is EditText -> theme.inputText
             else -> theme.panelText
         })
-        if (view is EditText) setHintTextColor(Color.argb(150, Color.red(theme.inputText), Color.green(theme.inputText), Color.blue(theme.inputText)))
+        if (view is EditText) setHintTextColor(if (RetuiTheme.launcherAppearanceEnabled(context))
+            ohi.andre.consolelauncher.managers.settings.ThemeColorResolver.color(ohi.andre.consolelauncher.managers.xml.options.Theme.field_hint_color)
+            else Color.argb(150, Color.red(theme.inputText), Color.green(theme.inputText), Color.blue(theme.inputText)))
         if (view is EditText && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             textCursorDrawable = GradientDrawable().apply {
                 setColor(if (Color.luminance(if (document) theme.panel else theme.inputBg) > 0.5) Color.BLACK else Color.WHITE)

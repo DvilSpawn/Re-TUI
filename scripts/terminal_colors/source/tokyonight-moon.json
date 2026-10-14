@@ -1,0 +1,32 @@
+{
+  "id": "tokyonight-moon",
+  "sourceUrl": "https://term.const.net/en/themes/tokyonight-moon/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "677e332f61dfa9b07b1bb63885a31a85692e6d909237956a5d7a1b1ba1c2aea5",
+  "paletteSha256": "0726ed8070a2a56ddc2852cba3f9f0a375c4c5a391661d92a5e11d7d59a888ba",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/TokyoNight Moon.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "TokyoNight Moon",
+    "background": "#222436",
+    "foreground": "#c8d3f5",
+    "cursorColor": "#c8d3f5",
+    "selectionBackground": "#2d3f76",
+    "black": "#1b1d2b",
+    "red": "#ff757f",
+    "green": "#c3e88d",
+    "yellow": "#ffc777",
+    "blue": "#82aaff",
+    "purple": "#c099ff",
+    "cyan": "#86e1fc",
+    "white": "#828bb8",
+    "brightBlack": "#444a73",
+    "brightRed": "#ff757f",
+    "brightGreen": "#c3e88d",
+    "brightYellow": "#ffc777",
+    "brightBlue": "#82aaff",
+    "brightPurple": "#c099ff",
+    "brightCyan": "#86e1fc",
+    "brightWhite": "#c8d3f5"
+  }
+}

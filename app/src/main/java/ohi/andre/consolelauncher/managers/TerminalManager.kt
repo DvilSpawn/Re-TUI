@@ -384,6 +384,7 @@ class TerminalManager(
         this.mInputView = inputView
         this.mInputView!!.setTextSize(ioSize.toFloat())
         this.mInputView!!.setTextColor(XMLPrefsManager.getColor(Theme.input_text_color))
+        this.mInputView!!.setHintTextColor(XMLPrefsManager.getColor(Theme.field_hint_color))
         this.mInputView!!.setTypeface(Tuils.getTypeface(context))
         this.mInputView!!.setHint(Tuils.getHint(mainPack.currentDirectory.getAbsolutePath()))
         this.mInputView!!.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS)

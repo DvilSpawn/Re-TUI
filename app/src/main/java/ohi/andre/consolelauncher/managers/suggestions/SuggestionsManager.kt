@@ -2657,6 +2657,7 @@ class SuggestionsManager(
             || "module -config" == normalized
             || "module -prefs" == normalized
             || "module -check" == normalized
+            || "module -preview" == normalized
             || "module -info" == normalized
             || "module -approve" == normalized
             || "module -trust" == normalized
@@ -4949,11 +4950,13 @@ class SuggestionsManager(
         )
         private val MODULE_ROOT_OPTIONS = arrayOf(
             "-ls" to true,
+            "-library" to true,
             "-add" to false,
             "-new" to false,
             "-edit" to false,
             "-config" to false,
             "-check" to false,
+            "-preview" to false,
             "-approve" to false,
             "-refresh" to false,
             "-rm" to false,

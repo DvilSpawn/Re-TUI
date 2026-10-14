@@ -1,0 +1,32 @@
+{
+  "id": "nachtschicht",
+  "sourceUrl": "https://term.const.net/en/themes/nachtschicht/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "4ae4c61cebec832cad92b47b8702797f55616ef4e02e40d88b570df91097fa7e",
+  "paletteSha256": "9851c965e0308aa33832fbe6b257280194c738c7e10927d793d12c7d21600549",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Nachtschicht.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Nachtschicht",
+    "background": "#17191d",
+    "foreground": "#e8eaed",
+    "cursorColor": "#e3b341",
+    "selectionBackground": "#36393c",
+    "black": "#0e1012",
+    "red": "#e5484d",
+    "green": "#33d17a",
+    "yellow": "#e3b341",
+    "blue": "#4d7cfe",
+    "purple": "#c86ad8",
+    "cyan": "#3fc8b0",
+    "white": "#c9cfd6",
+    "brightBlack": "#9da4af",
+    "brightRed": "#ef8f92",
+    "brightGreen": "#76e0a5",
+    "brightYellow": "#edcf88",
+    "brightBlue": "#9eb8fe",
+    "brightPurple": "#e0abe9",
+    "brightCyan": "#7edaca",
+    "brightWhite": "#e8eaed"
+  }
+}

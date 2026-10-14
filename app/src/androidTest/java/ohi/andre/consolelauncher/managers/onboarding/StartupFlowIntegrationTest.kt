@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.ScrollView
 import android.widget.SeekBar
 import android.widget.TextView
+import android.widget.CheckBox
 import androidx.test.core.app.ActivityScenario
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry
@@ -220,6 +221,76 @@ class StartupFlowIntegrationTest {
             scenario.onActivity { it.requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT }
             idle()
             scenario.onActivity { assertEquals(2, StartupMenuManager.page(it)) }
+        }
+    }
+
+    @Test fun defaultLauncherCheckboxPersistsInPreviewWithoutRequestingHomeRole() {
+        open(dryRun = true).use { scenario ->
+            next(scenario)
+            scenario.onActivity {
+                val checkbox = it.findViewById<CheckBox>(R.id.startup_default_launcher)
+                assertFalse(checkbox.isChecked)
+                checkbox.performClick()
+                assertTrue(StartupMenuManager.defaultLauncher(it))
+                assertNull("Preview never changes the default Home app", StartupMenuManager.defaultLauncherRequest(it))
+                assertFalse("Preview choice stays separate from real setup", StartupMenuManager.defaultLauncher(context))
+            }
+            scenario.recreate(); idle()
+            scenario.onActivity {
+                val checkbox = it.findViewById<CheckBox>(R.id.startup_default_launcher)
+                assertTrue(checkbox.isChecked)
+                val scroll = it.findViewById<ScrollView>(R.id.startup_scroll)
+                scroll.scrollTo(0, 0)
+            }
+            idle()
+            screenshot("startup-default-launcher-checkbox.png")
+        }
+    }
+
+    @Test fun defaultLauncherOptOutNeverRequestsHomeRole() {
+        assertNull(StartupMenuManager.defaultLauncherRequest(context))
+        StartupMenuManager.setDefaultLauncher(context, true)
+        val roles = if (android.os.Build.VERSION.SDK_INT >= 29) context.getSystemService(android.app.role.RoleManager::class.java) else null
+        if (roles != null && roles.isRoleAvailable(android.app.role.RoleManager.ROLE_HOME)) {
+            if (roles.isRoleHeld(android.app.role.RoleManager.ROLE_HOME)) {
+                assertNull(StartupMenuManager.defaultLauncherRequest(context))
+            } else {
+                val request = StartupMenuManager.defaultLauncherRequest(context)
+                assertEquals("android.app.role.action.REQUEST_ROLE", request?.action)
+                assertEquals(android.app.role.RoleManager.ROLE_HOME, request?.getStringExtra("android.intent.extra.ROLE_NAME"))
+            }
+        }
+        StartupMenuManager.setDefaultLauncher(context, false)
+        assertNull(StartupMenuManager.defaultLauncherRequest(context))
+    }
+
+    @Test fun cancellingDefaultLauncherChooserStillFinishesSetup() {
+        org.junit.Assume.assumeTrue(android.os.Build.VERSION.SDK_INT >= 29)
+        val roles = context.getSystemService(android.app.role.RoleManager::class.java)
+        org.junit.Assume.assumeTrue(roles.isRoleAvailable(android.app.role.RoleManager.ROLE_HOME))
+        org.junit.Assume.assumeFalse(roles.isRoleHeld(android.app.role.RoleManager.ROLE_HOME))
+        val requests = java.util.concurrent.atomic.AtomicInteger()
+        val monitor = object : android.app.Instrumentation.ActivityMonitor() {
+            override fun onStartActivity(intent: Intent): android.app.Instrumentation.ActivityResult? {
+                if (intent.action != "android.app.role.action.REQUEST_ROLE") return null
+                requests.incrementAndGet()
+                return android.app.Instrumentation.ActivityResult(android.app.Activity.RESULT_CANCELED, null)
+            }
+        }
+        instrumentation.addMonitor(monitor)
+        try {
+            open().use { scenario ->
+                StartupMenuManager.setDefaultLauncher(context, true)
+                StartupMenuManager.toggleAutoTheme(context)
+                next(scenario)
+                next(scenario)
+                next(scenario)
+                await("Setup completes after declining the Home role") { !StartupMenuManager.isFirstInstallPending(context) && requests.get() == 1 }
+                await("Setup closes after the chooser returns") { scenario.state == androidx.lifecycle.Lifecycle.State.DESTROYED }
+                assertFalse(roles.isRoleHeld(android.app.role.RoleManager.ROLE_HOME))
+            }
+        } finally {
+            instrumentation.removeMonitor(monitor)
         }
     }
 

@@ -1,0 +1,32 @@
+{
+  "id": "red-sands",
+  "sourceUrl": "https://term.const.net/en/themes/red-sands/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "e91a0dfa1d8e0ba00ab62be168007eacb11ea6ad44bc93e65a6586aec99f933b",
+  "paletteSha256": "b3cbf4bdc35258b76dc681df8e98b5e04fe11f564498131daba5fb9476758618",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Red Sands.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Red Sands",
+    "background": "#7a251e",
+    "foreground": "#d7c9a7",
+    "cursorColor": "#ffffff",
+    "selectionBackground": "#a4a390",
+    "black": "#000000",
+    "red": "#ff3f00",
+    "green": "#00bb00",
+    "yellow": "#e7b000",
+    "blue": "#0072ff",
+    "purple": "#bb00bb",
+    "cyan": "#00bbbb",
+    "white": "#bbbbbb",
+    "brightBlack": "#6e6e6e",
+    "brightRed": "#d41a1a",
+    "brightGreen": "#00bb00",
+    "brightYellow": "#e7b000",
+    "brightBlue": "#0072ae",
+    "brightPurple": "#ff55ff",
+    "brightCyan": "#55ffff",
+    "brightWhite": "#ffffff"
+  }
+}

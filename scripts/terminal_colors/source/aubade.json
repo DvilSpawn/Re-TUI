@@ -1,0 +1,32 @@
+{
+  "id": "aubade",
+  "sourceUrl": "https://term.const.net/en/themes/aubade/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "4469a20cd6dc0b71c451847a3822b4a68166cfded7d7c4296746619c1c36eb54",
+  "paletteSha256": "3d85aea8f2a6dfe52be03174b580810dbecf8e398570da4d091444a760245d63",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Aubade.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Aubade",
+    "background": "#fbf6fb",
+    "foreground": "#3a3340",
+    "cursorColor": "#ae3f84",
+    "selectionBackground": "#ebe2ee",
+    "black": "#33293f",
+    "red": "#c0303a",
+    "green": "#2e7d6e",
+    "yellow": "#8c610c",
+    "blue": "#4a3cc0",
+    "purple": "#8a4bc0",
+    "cyan": "#ae3f84",
+    "white": "#b2b2b2",
+    "brightBlack": "#9a8fa8",
+    "brightRed": "#c0303a",
+    "brightGreen": "#2e7d6e",
+    "brightYellow": "#ae3f84",
+    "brightBlue": "#4a3cc0",
+    "brightPurple": "#d8b670",
+    "brightCyan": "#ae3f84",
+    "brightWhite": "#3a3340"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "bluloco-light",
+  "sourceUrl": "https://term.const.net/en/themes/bluloco-light/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "11592caec5772befb305e36f61166b723f38f4cc7d66b0b0d23658d9be4df341",
+  "paletteSha256": "c772318713f0a0d7157615072969e4ff1d6f99c97f81f9a2d51048efb50c4ff9",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Bluloco Light.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Bluloco Light",
+    "background": "#f9f9f9",
+    "foreground": "#373a41",
+    "cursorColor": "#f32759",
+    "selectionBackground": "#daf0ff",
+    "black": "#373a41",
+    "red": "#d52753",
+    "green": "#23974a",
+    "yellow": "#df631c",
+    "blue": "#275fe4",
+    "purple": "#823ff1",
+    "cyan": "#27618d",
+    "white": "#babbc2",
+    "brightBlack": "#676a77",
+    "brightRed": "#ff6480",
+    "brightGreen": "#3cbc66",
+    "brightYellow": "#c5a332",
+    "brightBlue": "#0099e1",
+    "brightPurple": "#ce33c0",
+    "brightCyan": "#6d93bb",
+    "brightWhite": "#d3d3d3"
+  }
+}

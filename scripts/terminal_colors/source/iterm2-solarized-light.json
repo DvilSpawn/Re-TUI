@@ -1,0 +1,32 @@
+{
+  "id": "iterm2-solarized-light",
+  "sourceUrl": "https://term.const.net/en/themes/iterm2-solarized-light/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "38cc3937c7e3a33994748b68c7c9198579d08407f60241b34e59788f5f8897aa",
+  "paletteSha256": "0940b060a597da90aefeb271fc1eee62cadd65d2d56884381568086b60cfd453",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/iTerm2 Solarized Light.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "iTerm2 Solarized Light",
+    "background": "#fdf6e3",
+    "foreground": "#657b83",
+    "cursorColor": "#657b83",
+    "selectionBackground": "#eee8d5",
+    "black": "#073642",
+    "red": "#dc322f",
+    "green": "#859900",
+    "yellow": "#b58900",
+    "blue": "#268bd2",
+    "purple": "#d33682",
+    "cyan": "#2aa198",
+    "white": "#bbb5a2",
+    "brightBlack": "#002b36",
+    "brightRed": "#cb4b16",
+    "brightGreen": "#586e75",
+    "brightYellow": "#657b83",
+    "brightBlue": "#839496",
+    "brightPurple": "#6c71c4",
+    "brightCyan": "#93a1a1",
+    "brightWhite": "#fdf6e3"
+  }
+}

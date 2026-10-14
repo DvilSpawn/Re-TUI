@@ -1,0 +1,32 @@
+{
+  "id": "molokai",
+  "sourceUrl": "https://term.const.net/en/themes/molokai/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "5821209cf6997340f39c7e627d41efc4c7388c1a1fd44017ce08d84528d96d26",
+  "paletteSha256": "1b710568c2432ab78b2a9d51c6bfbe04550730c1b3a028530841e6bdcc4c2fdb",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Molokai.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Molokai",
+    "background": "#121212",
+    "foreground": "#bbbbbb",
+    "cursorColor": "#bbbbbb",
+    "selectionBackground": "#b5d5ff",
+    "black": "#121212",
+    "red": "#fa2573",
+    "green": "#98e123",
+    "yellow": "#dfd460",
+    "blue": "#1080d0",
+    "purple": "#8700ff",
+    "cyan": "#43a8d0",
+    "white": "#bbbbbb",
+    "brightBlack": "#555555",
+    "brightRed": "#f6669d",
+    "brightGreen": "#b1e05f",
+    "brightYellow": "#fff26d",
+    "brightBlue": "#00afff",
+    "brightPurple": "#af87ff",
+    "brightCyan": "#51ceff",
+    "brightWhite": "#ffffff"
+  }
+}

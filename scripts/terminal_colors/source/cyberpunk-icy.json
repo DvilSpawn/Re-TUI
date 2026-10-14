@@ -1,0 +1,32 @@
+{
+  "id": "cyberpunk-icy",
+  "sourceUrl": "https://term.const.net/en/themes/cyberpunk-icy/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "c6df47b1e20422a9a6840670b2bf383affa4e86d2cbce7741a8e6fb0d9337563",
+  "paletteSha256": "16768d84b749c7c730646aa5b1213c47c7c20328f2d73eeafe5559df53065d49",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/cyberpunk-icy.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "cyberpunk-icy",
+    "background": "#0a0a0f",
+    "foreground": "#d4b3f7",
+    "cursorColor": "#00ffff",
+    "selectionBackground": "#004d4d",
+    "black": "#1a1a2e",
+    "red": "#ff0055",
+    "green": "#00ff9f",
+    "yellow": "#fffc00",
+    "blue": "#7b2fff",
+    "purple": "#ff00ff",
+    "cyan": "#00ffff",
+    "white": "#d4b3f7",
+    "brightBlack": "#444468",
+    "brightRed": "#ff3377",
+    "brightGreen": "#33ffb2",
+    "brightYellow": "#fffe33",
+    "brightBlue": "#9955ff",
+    "brightPurple": "#ff55ff",
+    "brightCyan": "#55ffff",
+    "brightWhite": "#ffffff"
+  }
+}

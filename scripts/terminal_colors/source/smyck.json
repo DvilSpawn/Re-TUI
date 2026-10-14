@@ -1,0 +1,32 @@
+{
+  "id": "smyck",
+  "sourceUrl": "https://term.const.net/en/themes/smyck/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "9858a3bd46fc4ededa303f690d18d5bc1325173fa4b3722bf46c7ad3a1661b63",
+  "paletteSha256": "e90d977b348026a05ef5b959c75165313626d56dcef557489dca4d52f9960e37",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Smyck.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Smyck",
+    "background": "#1b1b1b",
+    "foreground": "#f7f7f7",
+    "cursorColor": "#bbbbbb",
+    "selectionBackground": "#207483",
+    "black": "#000000",
+    "red": "#b84131",
+    "green": "#7da900",
+    "yellow": "#c4a500",
+    "blue": "#62a3c4",
+    "purple": "#ba8acc",
+    "cyan": "#207383",
+    "white": "#a1a1a1",
+    "brightBlack": "#7a7a7a",
+    "brightRed": "#d6837c",
+    "brightGreen": "#c4f137",
+    "brightYellow": "#fee14d",
+    "brightBlue": "#8dcff0",
+    "brightPurple": "#f79aff",
+    "brightCyan": "#6ad9cf",
+    "brightWhite": "#f7f7f7"
+  }
+}

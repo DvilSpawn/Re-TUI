@@ -1,0 +1,32 @@
+{
+  "id": "mellifluous",
+  "sourceUrl": "https://term.const.net/en/themes/mellifluous/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "306656acb90d15c00076a7d261fdd7f0bdbf73f78745355f5c6710b8e15c4a6c",
+  "paletteSha256": "731e0f2a404b9333b7161a525b7706f9b2742bb76e268c24aaacc4e3d120ed61",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Mellifluous.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Mellifluous",
+    "background": "#1a1a1a",
+    "foreground": "#dadada",
+    "cursorColor": "#bfad9e",
+    "selectionBackground": "#2d2d2d",
+    "black": "#1a1a1a",
+    "red": "#d29393",
+    "green": "#b3b393",
+    "yellow": "#cbaa89",
+    "blue": "#a8a1be",
+    "purple": "#b39fb0",
+    "cyan": "#c0af8c",
+    "white": "#dadada",
+    "brightBlack": "#5b5b5b",
+    "brightRed": "#c95954",
+    "brightGreen": "#828040",
+    "brightYellow": "#a6794c",
+    "brightBlue": "#5a6599",
+    "brightPurple": "#9c6995",
+    "brightCyan": "#74a39e",
+    "brightWhite": "#ffffff"
+  }
+}

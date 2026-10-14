@@ -1,0 +1,32 @@
+{
+  "id": "iterm2-light-background",
+  "sourceUrl": "https://term.const.net/en/themes/iterm2-light-background/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "af900419e761721e2fc5cd982edae348eabdbf43a09d0bb5cc122cfb8de94a56",
+  "paletteSha256": "c8d46b3c0d26de4f330cc73b5c00ccee8b639a02f6ccd3a7558e1d7c9552876d",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/iTerm2 Light Background.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "iTerm2 Light Background",
+    "background": "#ffffff",
+    "foreground": "#000000",
+    "cursorColor": "#000000",
+    "selectionBackground": "#c1deff",
+    "black": "#000000",
+    "red": "#c91b00",
+    "green": "#00c200",
+    "yellow": "#c7c400",
+    "blue": "#0225c7",
+    "purple": "#ca30c7",
+    "cyan": "#00c5c7",
+    "white": "#bababa",
+    "brightBlack": "#686868",
+    "brightRed": "#ff6e67",
+    "brightGreen": "#39d442",
+    "brightYellow": "#ccc934",
+    "brightBlue": "#6871ff",
+    "brightPurple": "#ff77ff",
+    "brightCyan": "#3ad7d9",
+    "brightWhite": "#ffffff"
+  }
+}

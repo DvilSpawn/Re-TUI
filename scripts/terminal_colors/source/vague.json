@@ -1,0 +1,32 @@
+{
+  "id": "vague",
+  "sourceUrl": "https://term.const.net/en/themes/vague/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "a3a627c3bf873efbb230cedb8d7bddb3ba5d3610edf1a5887611dce9fbf1efac",
+  "paletteSha256": "50947bb669e3e2e3eaf663564776f135ba29f8c0a250e43774c3564391750735",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Vague.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Vague",
+    "background": "#141415",
+    "foreground": "#cdcdcd",
+    "cursorColor": "#cdcdcd",
+    "selectionBackground": "#252530",
+    "black": "#252530",
+    "red": "#d8647e",
+    "green": "#7fa563",
+    "yellow": "#f3be7c",
+    "blue": "#6e94b2",
+    "purple": "#bb9dbd",
+    "cyan": "#aeaed1",
+    "white": "#cdcdcd",
+    "brightBlack": "#606079",
+    "brightRed": "#e08398",
+    "brightGreen": "#99b782",
+    "brightYellow": "#f5cb96",
+    "brightBlue": "#8ba9c1",
+    "brightPurple": "#c9b1ca",
+    "brightCyan": "#bebeda",
+    "brightWhite": "#d7d7d7"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "catthode",
+  "sourceUrl": "https://term.const.net/en/themes/catthode/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "13852b7345fad13e84c95a2f20f1f41816472baf5247542400180ff9e60e5f61",
+  "paletteSha256": "180cb09b52896ff8f0527ae9f1b48655aef63ee610c4007d1bb5eaa01efe63bb",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Catthode.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Catthode",
+    "background": "#000000",
+    "foreground": "#ffffff",
+    "cursorColor": "#ff9e3b",
+    "selectionBackground": "#2d2d2d",
+    "black": "#141414",
+    "red": "#ff6b6b",
+    "green": "#b9d665",
+    "yellow": "#ffb86c",
+    "blue": "#9cd9e6",
+    "purple": "#eba4be",
+    "cyan": "#aee6d6",
+    "white": "#b3b3b3",
+    "brightBlack": "#636363",
+    "brightRed": "#ff6b6b",
+    "brightGreen": "#b9d665",
+    "brightYellow": "#fae2c8",
+    "brightBlue": "#9cd9e6",
+    "brightPurple": "#eba4be",
+    "brightCyan": "#aee6d6",
+    "brightWhite": "#ffffff"
+  }
+}

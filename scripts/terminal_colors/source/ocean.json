@@ -1,0 +1,32 @@
+{
+  "id": "ocean",
+  "sourceUrl": "https://term.const.net/en/themes/ocean/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "cc0c597f9ee6e0250853de41cb3f6b6295ab502eb3ad4bd387f382dd90a43a95",
+  "paletteSha256": "ff313cad58796c4614afd542cd24b80419a7df0e8e970d37af2aaed6e1a7ad77",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Ocean.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Ocean",
+    "background": "#224fbc",
+    "foreground": "#ffffff",
+    "cursorColor": "#7f7f7f",
+    "selectionBackground": "#216dff",
+    "black": "#000000",
+    "red": "#e64c4c",
+    "green": "#00a600",
+    "yellow": "#999900",
+    "blue": "#0000b2",
+    "purple": "#d826d8",
+    "cyan": "#00a6b2",
+    "white": "#bfbfbf",
+    "brightBlack": "#808080",
+    "brightRed": "#ff1a1a",
+    "brightGreen": "#00d900",
+    "brightYellow": "#e5e500",
+    "brightBlue": "#7373ff",
+    "brightPurple": "#e500e5",
+    "brightCyan": "#00e5e5",
+    "brightWhite": "#e5e5e5"
+  }
+}

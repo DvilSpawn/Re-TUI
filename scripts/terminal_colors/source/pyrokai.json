@@ -1,0 +1,32 @@
+{
+  "id": "pyrokai",
+  "sourceUrl": "https://term.const.net/en/themes/pyrokai/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "fce62a41f4ea26015a92bd322ff9053f9b68774c83bb5a967d51bce41b96320d",
+  "paletteSha256": "7f9d0608383d89677061dfa0b43e09c337a3f4ff950d211d343b50da506bd071",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Pyrokai.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Pyrokai",
+    "background": "#151312",
+    "foreground": "#faf6f5",
+    "cursorColor": "#ea7332",
+    "selectionBackground": "#312d2b",
+    "black": "#242120",
+    "red": "#ec6785",
+    "green": "#75ad2f",
+    "yellow": "#bb9500",
+    "blue": "#2aa0f9",
+    "purple": "#e76899",
+    "cyan": "#00aebd",
+    "white": "#b4afad",
+    "brightBlack": "#807c7a",
+    "brightRed": "#fa8099",
+    "brightGreen": "#8bbf53",
+    "brightYellow": "#d0a70e",
+    "brightBlue": "#5bb3ff",
+    "brightPurple": "#f681ac",
+    "brightCyan": "#00c3d3",
+    "brightWhite": "#faf6f5"
+  }
+}

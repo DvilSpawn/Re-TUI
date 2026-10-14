@@ -1,0 +1,32 @@
+{
+  "id": "wild-cherry",
+  "sourceUrl": "https://term.const.net/en/themes/wild-cherry/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "047678a5cd0d35935704339114cf01cd98aefe4544d41f9c6c032b9095ca5f93",
+  "paletteSha256": "426ae7b71e18b4b7389a891765b476648397cb851b5dbead1e1736d7152f1961",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Wild Cherry.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Wild Cherry",
+    "background": "#1f1726",
+    "foreground": "#dafaff",
+    "cursorColor": "#dd00ff",
+    "selectionBackground": "#002831",
+    "black": "#000507",
+    "red": "#d94085",
+    "green": "#2ab250",
+    "yellow": "#ffd16f",
+    "blue": "#883cdc",
+    "purple": "#ececec",
+    "cyan": "#c1b8b7",
+    "white": "#fff8de",
+    "brightBlack": "#009cc9",
+    "brightRed": "#da6bac",
+    "brightGreen": "#f4dca5",
+    "brightYellow": "#eac066",
+    "brightBlue": "#308cba",
+    "brightPurple": "#ae636b",
+    "brightCyan": "#ff919d",
+    "brightWhite": "#e4838d"
+  }
+}

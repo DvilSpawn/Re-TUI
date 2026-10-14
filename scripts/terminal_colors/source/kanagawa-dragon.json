@@ -1,0 +1,32 @@
+{
+  "id": "kanagawa-dragon",
+  "sourceUrl": "https://term.const.net/en/themes/kanagawa-dragon/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "607a8989324ba3ea4744bf73bd829da1616fe456e7447e5ed4c68016619209ba",
+  "paletteSha256": "cdb3f930efc86fc0e0e247d9b6fb61c1d60cfd10eeede068b6497af006e3b926",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Kanagawa Dragon.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Kanagawa Dragon",
+    "background": "#181616",
+    "foreground": "#c5c9c5",
+    "cursorColor": "#c8c093",
+    "selectionBackground": "#c5c9c5",
+    "black": "#0d0c0c",
+    "red": "#c4746e",
+    "green": "#8a9a7b",
+    "yellow": "#c4b28a",
+    "blue": "#8ba4b0",
+    "purple": "#a292a3",
+    "cyan": "#8ea4a2",
+    "white": "#c8c093",
+    "brightBlack": "#a6a69c",
+    "brightRed": "#e46876",
+    "brightGreen": "#87a987",
+    "brightYellow": "#e6c384",
+    "brightBlue": "#7fb4ca",
+    "brightPurple": "#938aa9",
+    "brightCyan": "#7aa89f",
+    "brightWhite": "#c5c9c5"
+  }
+}

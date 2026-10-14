@@ -1,0 +1,32 @@
+{
+  "id": "monospace-light",
+  "sourceUrl": "https://term.const.net/en/themes/monospace-light/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "0a3360d03a747db48fbd2af7a8050fc632a8f0c230347a8ae9c510dc1860f46a",
+  "paletteSha256": "b45d37b7592e0c9fe6c7c42b4ae62d7f3b441b61d917fd9424d2a0376eb6cd55",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Monospace Light.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Monospace Light",
+    "background": "#f4f7fd",
+    "foreground": "#475365",
+    "cursorColor": "#6f4cde",
+    "selectionBackground": "#c7d3ff",
+    "black": "#333e4f",
+    "red": "#d03941",
+    "green": "#007b49",
+    "yellow": "#a65921",
+    "blue": "#3c60dd",
+    "purple": "#6f4cde",
+    "cyan": "#0075a2",
+    "white": "#5d6a7d",
+    "brightBlack": "#000000",
+    "brightRed": "#a52430",
+    "brightGreen": "#00522f",
+    "brightYellow": "#904b1a",
+    "brightBlue": "#002487",
+    "brightPurple": "#4d21bb",
+    "brightCyan": "#00607e",
+    "brightWhite": "#475365"
+  }
+}

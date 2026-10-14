@@ -1,0 +1,32 @@
+{
+  "id": "oxblood",
+  "sourceUrl": "https://term.const.net/en/themes/oxblood/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "4feafb2826d1cdfcf6f2066cb06f0f6830c1dd45e51874a2d326790e4b8582ff",
+  "paletteSha256": "0316f8b5605db4aa90678ed701e69eb6ab62d706ff145c792233e513eba41505",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Oxblood.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Oxblood",
+    "background": "#140b0d",
+    "foreground": "#e8d2d4",
+    "cursorColor": "#e0483a",
+    "selectionBackground": "#3a2227",
+    "black": "#231417",
+    "red": "#ff4d54",
+    "green": "#c9a24a",
+    "yellow": "#e0b24a",
+    "blue": "#d9743f",
+    "purple": "#e0556b",
+    "cyan": "#e0a36a",
+    "white": "#e8d2d4",
+    "brightBlack": "#7a5458",
+    "brightRed": "#ff686e",
+    "brightGreen": "#cfad60",
+    "brightYellow": "#d9743f",
+    "brightBlue": "#e86b72",
+    "brightPurple": "#c8324b",
+    "brightCyan": "#e4ae7c",
+    "brightWhite": "#ffffff"
+  }
+}

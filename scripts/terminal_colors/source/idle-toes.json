@@ -1,0 +1,32 @@
+{
+  "id": "idle-toes",
+  "sourceUrl": "https://term.const.net/en/themes/idle-toes/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "f649e918942e9f57e0963f76ae21389cc965284ddcdbbd76ad8b8c9c2aa93d3f",
+  "paletteSha256": "75b094d1b61d23ea0eb9e6603632a2ad8a09c4d5a7aa77e1c5b0a3d046d414d6",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Idle Toes.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Idle Toes",
+    "background": "#323232",
+    "foreground": "#ffffff",
+    "cursorColor": "#d6d6d6",
+    "selectionBackground": "#5b5b5b",
+    "black": "#323232",
+    "red": "#d25252",
+    "green": "#7fe173",
+    "yellow": "#ffc66d",
+    "blue": "#4099ff",
+    "purple": "#f680ff",
+    "cyan": "#bed6ff",
+    "white": "#eeeeec",
+    "brightBlack": "#606060",
+    "brightRed": "#f07070",
+    "brightGreen": "#9dff91",
+    "brightYellow": "#ffe48b",
+    "brightBlue": "#5eb7f7",
+    "brightPurple": "#ff9dff",
+    "brightCyan": "#dcf4ff",
+    "brightWhite": "#ffffff"
+  }
+}

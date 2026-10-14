@@ -1,0 +1,32 @@
+{
+  "id": "dracula-plus",
+  "sourceUrl": "https://term.const.net/en/themes/dracula-plus/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "e9566f27cf2538e87cc2aa060488e07bca4a7e4ae2397b8f1440f01f5e1ea87e",
+  "paletteSha256": "b7ef4e282d4748d11b606dcc57c5938edc073a9472e4e3366bb403daa24489cf",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Dracula+.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Dracula+",
+    "background": "#212121",
+    "foreground": "#f8f8f2",
+    "cursorColor": "#eceff4",
+    "selectionBackground": "#f8f8f2",
+    "black": "#21222c",
+    "red": "#ff5555",
+    "green": "#50fa7b",
+    "yellow": "#ffcb6b",
+    "blue": "#82aaff",
+    "purple": "#c792ea",
+    "cyan": "#8be9fd",
+    "white": "#f8f8f2",
+    "brightBlack": "#545454",
+    "brightRed": "#ff6e6e",
+    "brightGreen": "#69ff94",
+    "brightYellow": "#ffcb6b",
+    "brightBlue": "#d6acff",
+    "brightPurple": "#ff92df",
+    "brightCyan": "#a4ffff",
+    "brightWhite": "#f8f8f2"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "rose-pine-dawn",
+  "sourceUrl": "https://term.const.net/en/themes/rose-pine-dawn/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "630345a24c8dc04b661f45e48eb77e47a3c93373dd261c7f221bc8faa46016d7",
+  "paletteSha256": "bee394421dbe46b4ed22ffb7f7dcd1a99aad2840e5a2c05b2e0f5d3d8c927214",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Rose Pine Dawn.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Rose Pine Dawn",
+    "background": "#faf4ed",
+    "foreground": "#575279",
+    "cursorColor": "#575279",
+    "selectionBackground": "#dfdad9",
+    "black": "#f2e9e1",
+    "red": "#b4637a",
+    "green": "#286983",
+    "yellow": "#ea9d34",
+    "blue": "#56949f",
+    "purple": "#907aa9",
+    "cyan": "#d7827e",
+    "white": "#575279",
+    "brightBlack": "#9893a5",
+    "brightRed": "#b4637a",
+    "brightGreen": "#286983",
+    "brightYellow": "#ea9d34",
+    "brightBlue": "#56949f",
+    "brightPurple": "#907aa9",
+    "brightCyan": "#d7827e",
+    "brightWhite": "#575279"
+  }
+}

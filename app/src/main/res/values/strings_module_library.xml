@@ -1,0 +1,10 @@
+<resources>
+    <string name="module_library_title">Module library</string>
+    <string name="module_library_installed">Installed · open</string>
+    <string name="module_library_not_installed">Not installed · download</string>
+    <string name="module_library_loading">Loading module library…</string>
+    <string name="module_library_cached">Offline · showing the saved module list.</string>
+    <string name="module_library_unavailable">Could not load the module library: %1$s</string>
+    <string name="module_library_unknown">Unknown library module. Use module -library.</string>
+    <string name="module_library_failed">Could not install module: %1$s</string>
+</resources>

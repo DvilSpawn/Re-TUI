@@ -29,7 +29,6 @@ class TerminalGridView @JvmOverloads constructor(
     private var terminalForeground = Color.WHITE
     private var terminalBackground = Color.BLACK
     private var terminalAccent = Color.WHITE
-    private var reverseBackground = Color.DKGRAY
     private var cols = 80
     private var rows = 24
     private var cursorX: Int? = null
@@ -68,7 +67,6 @@ class TerminalGridView @JvmOverloads constructor(
         terminalForeground = foreground
         terminalBackground = background
         terminalAccent = accent
-        reverseBackground = ThemeColorResolver.blendPreservingAlpha(background, foreground, 0.36f)
         clearCells()
         parseIntoGrid(frame)
         invalidate()
@@ -281,8 +279,8 @@ class TerminalGridView @JvmOverloads constructor(
                 foreground = style.background!!
                 background = originalForeground
             } else {
+                background = foreground
                 foreground = terminalBackground
-                background = reverseBackground
             }
         }
         return ResolvedStyle(foreground, background)

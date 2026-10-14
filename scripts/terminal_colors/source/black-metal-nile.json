@@ -1,0 +1,32 @@
+{
+  "id": "black-metal-nile",
+  "sourceUrl": "https://term.const.net/en/themes/black-metal-nile/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "ca5b5eda247d0e6cdda70f6e9a63d3711f9ca9a2a61f90917687f2827ec13be0",
+  "paletteSha256": "01b2411f4a218b4af8296b50c701003d1f90828435fb08d61379a9ebf7ff3355",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Black Metal (Nile).json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Black Metal (Nile)",
+    "background": "#000000",
+    "foreground": "#c1c1c1",
+    "cursorColor": "#c1c1c1",
+    "selectionBackground": "#c1c1c1",
+    "black": "#000000",
+    "red": "#5f8787",
+    "green": "#aa9988",
+    "yellow": "#777755",
+    "blue": "#888888",
+    "purple": "#999999",
+    "cyan": "#aaaaaa",
+    "white": "#c1c1c1",
+    "brightBlack": "#404040",
+    "brightRed": "#5f8787",
+    "brightGreen": "#aa9988",
+    "brightYellow": "#777755",
+    "brightBlue": "#888888",
+    "brightPurple": "#999999",
+    "brightCyan": "#aaaaaa",
+    "brightWhite": "#c1c1c1"
+  }
+}

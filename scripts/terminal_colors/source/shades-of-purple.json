@@ -1,0 +1,32 @@
+{
+  "id": "shades-of-purple",
+  "sourceUrl": "https://term.const.net/en/themes/shades-of-purple/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "46b357bde7bbd6d4c41e99523f4c5a165c1c4603733f69fe85c8c71200c1e13e",
+  "paletteSha256": "bbe5e168269c66a13efe15daf50a15d6b676adef9be7f47ec9ee2df822f9a3f7",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Shades Of Purple.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Shades Of Purple",
+    "background": "#1e1d40",
+    "foreground": "#ffffff",
+    "cursorColor": "#fad000",
+    "selectionBackground": "#b362ff",
+    "black": "#000000",
+    "red": "#d90429",
+    "green": "#3ad900",
+    "yellow": "#ffe700",
+    "blue": "#6943ff",
+    "purple": "#ff2c70",
+    "cyan": "#00c5c7",
+    "white": "#c7c7c7",
+    "brightBlack": "#686868",
+    "brightRed": "#f92a1c",
+    "brightGreen": "#43d426",
+    "brightYellow": "#f1d000",
+    "brightBlue": "#6871ff",
+    "brightPurple": "#ff77ff",
+    "brightCyan": "#79e8fb",
+    "brightWhite": "#ffffff"
+  }
+}

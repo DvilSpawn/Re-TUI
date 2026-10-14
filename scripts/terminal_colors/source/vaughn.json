@@ -1,0 +1,32 @@
+{
+  "id": "vaughn",
+  "sourceUrl": "https://term.const.net/en/themes/vaughn/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "7e0283093096826eaacb8fbcbf7cd7256b4ca9481860c80c4014c1b322c48a1c",
+  "paletteSha256": "8d86cafe0d6a5a09ba243ebb12845595bf041383ffcf75679f6bdfa323a32101",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Vaughn.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Vaughn",
+    "background": "#25234f",
+    "foreground": "#dcdccc",
+    "cursorColor": "#ff5555",
+    "selectionBackground": "#b5d5ff",
+    "black": "#25234f",
+    "red": "#705050",
+    "green": "#60b48a",
+    "yellow": "#dfaf8f",
+    "blue": "#5555ff",
+    "purple": "#f08cc3",
+    "cyan": "#8cd0d3",
+    "white": "#709080",
+    "brightBlack": "#709080",
+    "brightRed": "#dca3a3",
+    "brightGreen": "#60b48a",
+    "brightYellow": "#f0dfaf",
+    "brightBlue": "#5555ff",
+    "brightPurple": "#ec93d3",
+    "brightCyan": "#93e0e3",
+    "brightWhite": "#ffffff"
+  }
+}

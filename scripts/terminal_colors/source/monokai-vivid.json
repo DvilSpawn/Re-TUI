@@ -1,0 +1,32 @@
+{
+  "id": "monokai-vivid",
+  "sourceUrl": "https://term.const.net/en/themes/monokai-vivid/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "fa309fd0ae699e118be70c1683bbf6acd48872c4c2d08f36b9596e00b552435c",
+  "paletteSha256": "2c6730a48f7fcb62077965b9369e85f55cc67d8e0bdab3e754153370815c5fb9",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Monokai Vivid.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Monokai Vivid",
+    "background": "#121212",
+    "foreground": "#f9f9f9",
+    "cursorColor": "#fb0007",
+    "selectionBackground": "#ffffff",
+    "black": "#121212",
+    "red": "#fa2934",
+    "green": "#98e123",
+    "yellow": "#fff30a",
+    "blue": "#0443ff",
+    "purple": "#f800f8",
+    "cyan": "#01b6ed",
+    "white": "#ffffff",
+    "brightBlack": "#838383",
+    "brightRed": "#f6669d",
+    "brightGreen": "#b1e05f",
+    "brightYellow": "#fff26d",
+    "brightBlue": "#0443ff",
+    "brightPurple": "#f200f6",
+    "brightCyan": "#51ceff",
+    "brightWhite": "#ffffff"
+  }
+}

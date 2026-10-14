@@ -1,0 +1,32 @@
+{
+  "id": "guezwhoz",
+  "sourceUrl": "https://term.const.net/en/themes/guezwhoz/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "593451cf73b2e3328aeef9b55a8f7ece5bfea092014fae7289fbbe0b0daaec1a",
+  "paletteSha256": "f65a4a062e345d78b0c37df144331c8754a3d78079ce413acbea4b5902bc31f4",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Guezwhoz.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Guezwhoz",
+    "background": "#1d1d1d",
+    "foreground": "#d9d9d9",
+    "cursorColor": "#99d4b1",
+    "selectionBackground": "#245354",
+    "black": "#333333",
+    "red": "#e85181",
+    "green": "#7ad694",
+    "yellow": "#b7d074",
+    "blue": "#5aa0d6",
+    "purple": "#9a90e0",
+    "cyan": "#58d6ce",
+    "white": "#d9d9d9",
+    "brightBlack": "#808080",
+    "brightRed": "#e85181",
+    "brightGreen": "#afd7af",
+    "brightYellow": "#d1ed85",
+    "brightBlue": "#64b2ed",
+    "brightPurple": "#a398ed",
+    "brightCyan": "#61ede4",
+    "brightWhite": "#ededed"
+  }
+}

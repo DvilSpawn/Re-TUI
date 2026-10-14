@@ -20,7 +20,7 @@ object TerminalBorderRuntime {
         frameAvailable && frameEnabled
 
     internal fun effectiveFillColor(frameActive: Boolean, fillColor: Int): Int =
-        if (frameActive) Color.TRANSPARENT else fillColor
+        fillColor
 
     internal fun drawsTabBorder(frameActive: Boolean, alwaysBorder: Boolean, cyberdeck: Boolean, dashed: Boolean, alpha: Int): Boolean =
         !frameActive && alpha > 0 && (alwaysBorder || cyberdeck || dashed)

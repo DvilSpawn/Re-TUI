@@ -1,6 +1,7 @@
 package ohi.andre.consolelauncher.managers.onboarding
 
 import android.app.Activity
+import android.app.role.RoleManager
 import android.content.Context
 import android.content.SharedPreferences
 import android.animation.ValueAnimator
@@ -9,20 +10,25 @@ import android.os.Looper
 import android.os.SystemClock
 import ohi.andre.consolelauncher.managers.xml.AutoColorManager
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.graphics.Typeface
 import android.graphics.drawable.StateListDrawable
 import android.os.Bundle
+import android.os.Build
+import android.provider.Settings
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.FrameLayout
+import android.widget.CheckBox
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.LauncherActivity
 import ohi.andre.consolelauncher.commands.tuixt.TuixtLayout.addFoldAwareHost
@@ -68,6 +74,7 @@ object StartupMenuManager {
     private const val KEY_GAP = "border_gap"
     private const val KEY_CYBERDECK = "cyberdeck"
     private const val KEY_CRT = "crt"
+    private const val KEY_DEFAULT_LAUNCHER = "default_launcher"
     private const val CHOICE_PREFIX = "choice_"
     private const val MENU_VERSION = 4
 
@@ -151,6 +158,22 @@ object StartupMenuManager {
     private fun validStroke(value: Float): Float = if (value.isFinite()) value.coerceIn(0.5f, 8f) else 1.5f
     fun cyberdeck(context: Context): Boolean = prefs(context).getBoolean(KEY_CYBERDECK, false)
     fun crt(context: Context): Boolean = prefs(context).getBoolean(KEY_CRT, false)
+    fun defaultLauncher(context: Context): Boolean = prefs(context).getBoolean(KEY_DEFAULT_LAUNCHER, false)
+    fun setDefaultLauncher(context: Context, selected: Boolean) {
+        prefs(context).edit().putBoolean(KEY_DEFAULT_LAUNCHER, selected).apply()
+    }
+
+    internal fun defaultLauncherRequest(context: Context): Intent? {
+        if (isDryRun(context) || !defaultLauncher(context)) return null
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val roles = context.getSystemService(RoleManager::class.java)
+            if (roles != null && roles.isRoleAvailable(RoleManager.ROLE_HOME)) {
+                return if (roles.isRoleHeld(RoleManager.ROLE_HOME)) null
+                    else roles.createRequestRoleIntent(RoleManager.ROLE_HOME)
+            }
+        }
+        return if (Tuils.isMyLauncherDefault(context.packageManager)) null else Intent(Settings.ACTION_HOME_SETTINGS)
+    }
 
     fun isFirstInstallPending(context: Context): Boolean {
         return !context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(KEY_COMPLETE, false)
@@ -328,6 +351,11 @@ class StartupMenuActivity : ohi.andre.consolelauncher.localization.LocalizedComp
     private var palette: AutoColorManager.Snapshot? = null
     private var paletteReady = false
     private var buildResult: StartupMenuManager.ActionResult? = null
+    private var choosingDefaultLauncher = false
+    private val defaultLauncherResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        choosingDefaultLauncher = false
+        buildResult?.let { close(it) }
+    }
     private val buildTick = Runnable { advanceBuild() }
     private var previewPanel: View? = null
     private var previewHeader: View? = null
@@ -338,9 +366,13 @@ class StartupMenuActivity : ohi.andre.consolelauncher.localization.LocalizedComp
     override fun onCreate(savedInstanceState: Bundle?) {
         requestNoTitleIfFullscreen(this)
         super.onCreate(savedInstanceState)
+        savedInstanceState?.getString("default_launcher_result")?.let {
+            buildResult = StartupMenuManager.ActionResult(it, reload = true)
+            choosingDefaultLauncher = true
+        }
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
         applyFullscreen(this)
-        if (!StartupMenuManager.isActive(this)) {
+        if (!StartupMenuManager.isActive(this) && !choosingDefaultLauncher) {
             if (!StartupMenuManager.isDryRun(this) && !StartupMenuManager.isFirstInstallPending(this)) LauncherActivity.preview(this)
             finish()
             return
@@ -358,6 +390,11 @@ class StartupMenuActivity : ohi.andre.consolelauncher.localization.LocalizedComp
         })
         render()
         if (StartupMenuManager.isBuilding(this)) prepareBuild()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        if (choosingDefaultLauncher) outState.putString("default_launcher_result", buildResult?.message)
+        super.onSaveInstanceState(outState)
     }
 
     override fun onResume() {
@@ -553,6 +590,18 @@ class StartupMenuActivity : ohi.andre.consolelauncher.localization.LocalizedComp
             visibility = if (StartupMenuManager.border(this@StartupMenuActivity) == StartupMenuManager.BORDER_DASHED) View.VISIBLE else View.GONE
         }
         list.addView(dashControls, blockParams(8f))
+        list.addView(CheckBox(this).apply {
+            id = R.id.startup_default_launcher
+            text = getString(R.string.startup_default_launcher)
+            typeface = Tuils.getTypeface(this@StartupMenuActivity)
+            textSize = 14f
+            setTextColor(textColor())
+            buttonTintList = ColorStateList.valueOf(textColor())
+            minHeight = dp(this@StartupMenuActivity, 48f)
+            isChecked = StartupMenuManager.defaultLauncher(this@StartupMenuActivity)
+            setOnCheckedChangeListener { _, checked -> StartupMenuManager.setDefaultLauncher(this@StartupMenuActivity, checked) }
+        }, blockParams(4f))
+        list.addView(terminalText(getString(R.string.startup_default_launcher_description), 12f), blockParams(12f))
         if (StartupMenuManager.level(this) == StartupMenuManager.ADVANCED) {
             list.addView(terminalText(getString(R.string.startup_features), 13f), blockParams(6f))
             StartupMenuManager.toggles(this).forEach { list.addView(toggleRow(it), blockParams(8f)) }
@@ -695,6 +744,19 @@ class StartupMenuActivity : ohi.andre.consolelauncher.localization.LocalizedComp
                 }
             }
         } else if (elapsed >= if (duration == 0L) 0L else 350L) {
+            buildStarted = 0L
+            try {
+                val request = StartupMenuManager.defaultLauncherRequest(this)
+                if (request != null) {
+                    choosingDefaultLauncher = true
+                    defaultLauncherResult.launch(request)
+                    return
+                }
+            } catch (error: Exception) {
+                choosingDefaultLauncher = false
+                Tuils.log(error)
+                Toast.makeText(this, R.string.startup_default_launcher_unavailable, Toast.LENGTH_LONG).show()
+            }
             close(checkNotNull(buildResult))
             return
         }

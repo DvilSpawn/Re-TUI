@@ -1,0 +1,32 @@
+{
+  "id": "acid-lime",
+  "sourceUrl": "https://term.const.net/en/themes/acid-lime/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "df0196ea6836f893d3461562cef795a76955ee3d1b9a651937df151ce538cb4c",
+  "paletteSha256": "2f463da390fab79f43ea3e8d26efd749bdba28cd2f61be248349074b21b4cb40",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Acid Lime.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Acid Lime",
+    "background": "#080c05",
+    "foreground": "#d4efbc",
+    "cursorColor": "#c2ff33",
+    "selectionBackground": "#1b2a10",
+    "black": "#131d0c",
+    "red": "#ff3344",
+    "green": "#97e63c",
+    "yellow": "#eeff5c",
+    "blue": "#4deca0",
+    "purple": "#a6ff6b",
+    "cyan": "#50ffb4",
+    "white": "#bfe0a4",
+    "brightBlack": "#4a6b36",
+    "brightRed": "#ff3344",
+    "brightGreen": "#97e63c",
+    "brightYellow": "#dbff45",
+    "brightBlue": "#4deca0",
+    "brightPurple": "#a6ff6b",
+    "brightCyan": "#50ffb4",
+    "brightWhite": "#d4efbc"
+  }
+}

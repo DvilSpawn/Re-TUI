@@ -1588,11 +1588,12 @@ object Tuils {
     @SuppressLint("SoonBlockedPrivateApi")
     fun setCursorDrawableColor(editText: EditText, color: Int) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            editText.setTextCursorDrawable(editText.getTextCursorDrawable())
-            val cursorDrawable = editText.getTextCursorDrawable()
-            if (cursorDrawable != null) {
-                cursorDrawable.setColorFilter(color, PorterDuff.Mode.SRC_IN)
+            // Install before the first draw, then retain the object cached by Android's Editor.
+            if (editText.textCursorDrawable !is PaletteCursorDrawable) {
+                editText.textCursorDrawable = PaletteCursorDrawable(dpToPx(editText.context, 2f).toInt().coerceAtLeast(1))
             }
+            (editText.textCursorDrawable as PaletteCursorDrawable).role = ohi.andre.consolelauncher.managers.xml.options.Theme.cursor_color
+            editText.textCursorDrawable?.invalidateSelf()
         }
     }
 

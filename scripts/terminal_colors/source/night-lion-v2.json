@@ -1,0 +1,32 @@
+{
+  "id": "night-lion-v2",
+  "sourceUrl": "https://term.const.net/en/themes/night-lion-v2/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "cc4f3e50f1a92369bc9c13bc991fb07cb274e707ca51c2f5b6e1cf75c3f9c296",
+  "paletteSha256": "4aed538e0dacdd3e2af64464f22b526b69b8c68e4cc07b937747caed093abfa9",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Night Lion V2.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Night Lion V2",
+    "background": "#171717",
+    "foreground": "#bbbbbb",
+    "cursorColor": "#bbbbbb",
+    "selectionBackground": "#b5d5ff",
+    "black": "#4c4c4c",
+    "red": "#bb0000",
+    "green": "#04f623",
+    "yellow": "#f3f167",
+    "blue": "#64d0f0",
+    "purple": "#ce6fdb",
+    "cyan": "#00dadf",
+    "white": "#bbbbbb",
+    "brightBlack": "#555555",
+    "brightRed": "#ff5555",
+    "brightGreen": "#7df71d",
+    "brightYellow": "#ffff55",
+    "brightBlue": "#62cbe8",
+    "brightPurple": "#ff9bf5",
+    "brightCyan": "#00ccd8",
+    "brightWhite": "#ffffff"
+  }
+}

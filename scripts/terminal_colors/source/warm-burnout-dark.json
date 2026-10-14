@@ -1,0 +1,32 @@
+{
+  "id": "warm-burnout-dark",
+  "sourceUrl": "https://term.const.net/en/themes/warm-burnout-dark/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "ee07adbbf82fa46581af309ba4bf1ea79a6c0f034eaccb407dcf3dca56bcc8d5",
+  "paletteSha256": "e4f6128322238a0268c4f579fbab148998a6867624d105477b3ae079a3339a38",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Warm Burnout Dark.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Warm Burnout Dark",
+    "background": "#1a1510",
+    "foreground": "#bfbdb6",
+    "cursorColor": "#f5c56e",
+    "selectionBackground": "#33393a",
+    "black": "#23211b",
+    "red": "#f06b73",
+    "green": "#70bf56",
+    "yellow": "#fdb04c",
+    "blue": "#4fbfff",
+    "purple": "#d0a1ff",
+    "cyan": "#93e2c8",
+    "white": "#c7c7c7",
+    "brightBlack": "#686868",
+    "brightRed": "#f07178",
+    "brightGreen": "#aad94c",
+    "brightYellow": "#ffb454",
+    "brightBlue": "#59c2ff",
+    "brightPurple": "#d2a6ff",
+    "brightCyan": "#95e6cb",
+    "brightWhite": "#ffffff"
+  }
+}

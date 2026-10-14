@@ -1,0 +1,32 @@
+{
+  "id": "breadog",
+  "sourceUrl": "https://term.const.net/en/themes/breadog/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "6171fae94e4372faa8fdb9393b413890584c4595b176424e0b3befd4b8c5709f",
+  "paletteSha256": "5570be1fdba154accb30dd1cf69fff669b3d434ae0dffa55c19d1ff42fb88776",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Breadog.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Breadog",
+    "background": "#f1ebe6",
+    "foreground": "#362c24",
+    "cursorColor": "#362c24",
+    "selectionBackground": "#362c24",
+    "black": "#362c24",
+    "red": "#b10b00",
+    "green": "#007232",
+    "yellow": "#8b4c00",
+    "blue": "#005cb4",
+    "purple": "#9b0097",
+    "cyan": "#006a78",
+    "white": "#baa99d",
+    "brightBlack": "#514337",
+    "brightRed": "#de1100",
+    "brightGreen": "#008f40",
+    "brightYellow": "#ae6000",
+    "brightBlue": "#0074e1",
+    "brightPurple": "#c300bd",
+    "brightCyan": "#008697",
+    "brightWhite": "#eae1da"
+  }
+}

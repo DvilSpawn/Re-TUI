@@ -1,0 +1,32 @@
+{
+  "id": "velvet-court",
+  "sourceUrl": "https://term.const.net/en/themes/velvet-court/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "aae57669a73aed9cb287b292674fc1c47ec928e933b636bfd98e39e3205e7fab",
+  "paletteSha256": "78a8b73c6969a189f72ddbd7ab7681c5af0fac3abac84b7c189095374fd8f3e7",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Velvet Court.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Velvet Court",
+    "background": "#1f0e1c",
+    "foreground": "#f2dcea",
+    "cursorColor": "#f0c44e",
+    "selectionBackground": "#3e2138",
+    "black": "#2f1629",
+    "red": "#ee5c82",
+    "green": "#9ad08a",
+    "yellow": "#f0c44e",
+    "blue": "#b392e8",
+    "purple": "#d087e0",
+    "cyan": "#6fd0c8",
+    "white": "#e2c8d8",
+    "brightBlack": "#836075",
+    "brightRed": "#ee5c82",
+    "brightGreen": "#9ad08a",
+    "brightYellow": "#e8964f",
+    "brightBlue": "#b392e8",
+    "brightPurple": "#d087e0",
+    "brightCyan": "#6fd0c8",
+    "brightWhite": "#f2dcea"
+  }
+}

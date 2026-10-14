@@ -1,0 +1,32 @@
+{
+  "id": "teerb",
+  "sourceUrl": "https://term.const.net/en/themes/teerb/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "a6a1555095348b27d23ccb25c578924f02f1c1223084d8dd554d954f56cf7fd2",
+  "paletteSha256": "184f138a3ce9dcb181204057ac460125d4545b90861690c68b3a6520aa13feb8",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Teerb.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Teerb",
+    "background": "#262626",
+    "foreground": "#d0d0d0",
+    "cursorColor": "#e4c9af",
+    "selectionBackground": "#4d4d4d",
+    "black": "#1c1c1c",
+    "red": "#d68686",
+    "green": "#aed686",
+    "yellow": "#d7af87",
+    "blue": "#86aed6",
+    "purple": "#d6aed6",
+    "cyan": "#8adbb4",
+    "white": "#d0d0d0",
+    "brightBlack": "#4f4f4f",
+    "brightRed": "#d68686",
+    "brightGreen": "#aed686",
+    "brightYellow": "#e4c9af",
+    "brightBlue": "#86aed6",
+    "brightPurple": "#d6aed6",
+    "brightCyan": "#b1e7dd",
+    "brightWhite": "#efefef"
+  }
+}

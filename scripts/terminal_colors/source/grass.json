@@ -1,0 +1,32 @@
+{
+  "id": "grass",
+  "sourceUrl": "https://term.const.net/en/themes/grass/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "9b1e0e5ef2b927bffdced93e674bc3f17714d48aa1b719370c8df78f1e35df74",
+  "paletteSha256": "08e49f4054d34b86812a7d78ab9eef75da1208faf193aa1c2e9c674e0410a21a",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Grass.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Grass",
+    "background": "#13773d",
+    "foreground": "#fff0a5",
+    "cursorColor": "#d9744c",
+    "selectionBackground": "#b64926",
+    "black": "#000000",
+    "red": "#ff5959",
+    "green": "#00bb00",
+    "yellow": "#e7b000",
+    "blue": "#0000a3",
+    "purple": "#ee59bb",
+    "cyan": "#00bbbb",
+    "white": "#bbbbbb",
+    "brightBlack": "#959595",
+    "brightRed": "#ff5959",
+    "brightGreen": "#00bb00",
+    "brightYellow": "#e7b000",
+    "brightBlue": "#0000bb",
+    "brightPurple": "#ff55ff",
+    "brightCyan": "#55ffff",
+    "brightWhite": "#ffffff"
+  }
+}

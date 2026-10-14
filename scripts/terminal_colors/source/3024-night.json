@@ -1,0 +1,32 @@
+{
+  "id": "3024-night",
+  "sourceUrl": "https://term.const.net/en/themes/3024-night/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "84f29920eafe1609b4a90f26d0a690c8baaf0f27af605eb37b03c50e0eb65fbb",
+  "paletteSha256": "cfa19be55b0279c6ea60dc93466ae6bdcc077879801059c4f7d3b01b2b8262a7",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/3024 Night.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "3024 Night",
+    "background": "#090300",
+    "foreground": "#a5a2a2",
+    "cursorColor": "#a5a2a2",
+    "selectionBackground": "#4a4543",
+    "black": "#090300",
+    "red": "#db2d20",
+    "green": "#01a252",
+    "yellow": "#fded02",
+    "blue": "#01a0e4",
+    "purple": "#a16a94",
+    "cyan": "#b5e4f4",
+    "white": "#a5a2a2",
+    "brightBlack": "#5c5855",
+    "brightRed": "#e8bbd0",
+    "brightGreen": "#47413f",
+    "brightYellow": "#4a4543",
+    "brightBlue": "#807d7c",
+    "brightPurple": "#d6d5d4",
+    "brightCyan": "#cdab53",
+    "brightWhite": "#f7f7f7"
+  }
+}

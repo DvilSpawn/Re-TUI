@@ -1,0 +1,32 @@
+{
+  "id": "novel",
+  "sourceUrl": "https://term.const.net/en/themes/novel/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "b91a99c58a8f1143c9a6c2c6bb364f3145a7c3cbb54274234e377cab1b649038",
+  "paletteSha256": "740e89cb0f74d678d0af9f83100f1971719a54b8c2c683b59a1bddd73c48d200",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Novel.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Novel",
+    "background": "#dfdbc3",
+    "foreground": "#3b2322",
+    "cursorColor": "#73635a",
+    "selectionBackground": "#a4a390",
+    "black": "#000000",
+    "red": "#cc0000",
+    "green": "#009600",
+    "yellow": "#d06b00",
+    "blue": "#0000cc",
+    "purple": "#cc00cc",
+    "cyan": "#0087cc",
+    "white": "#a6a6a6",
+    "brightBlack": "#808080",
+    "brightRed": "#cc0000",
+    "brightGreen": "#009600",
+    "brightYellow": "#d06b00",
+    "brightBlue": "#0000cc",
+    "brightPurple": "#cc00cc",
+    "brightCyan": "#0087cc",
+    "brightWhite": "#ffffff"
+  }
+}

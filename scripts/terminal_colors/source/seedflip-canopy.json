@@ -1,0 +1,32 @@
+{
+  "id": "seedflip-canopy",
+  "sourceUrl": "https://term.const.net/en/themes/seedflip-canopy/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "6cc12466856f73de88849c98a8e19cd87b542b97306ffad2032b5589f796955e",
+  "paletteSha256": "a1f6ed6ed4feb8852940c938d8971b1a74b9db7665dc7dc0f950bfe8d94379e7",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/SeedFlip Canopy.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "SeedFlip Canopy",
+    "background": "#0f1714",
+    "foreground": "#ededed",
+    "cursorColor": "#3ecf8e",
+    "selectionBackground": "#171f1b",
+    "black": "#0b110f",
+    "red": "#d65c5c",
+    "green": "#5cd685",
+    "yellow": "#d6c25c",
+    "blue": "#5c8fd6",
+    "purple": "#d65cd6",
+    "cyan": "#5cd6d6",
+    "white": "#fafafa",
+    "brightBlack": "#2d453c",
+    "brightRed": "#e69999",
+    "brightGreen": "#99e6b2",
+    "brightYellow": "#e6d999",
+    "brightBlue": "#99b9e6",
+    "brightPurple": "#e699e6",
+    "brightCyan": "#99e6e6",
+    "brightWhite": "#ffffff"
+  }
+}

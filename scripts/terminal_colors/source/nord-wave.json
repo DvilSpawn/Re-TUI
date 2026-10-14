@@ -1,0 +1,32 @@
+{
+  "id": "nord-wave",
+  "sourceUrl": "https://term.const.net/en/themes/nord-wave/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "3b42a16996c8e7c66fce9066bf76531e01b9af95be0102163ce053f849f1c323",
+  "paletteSha256": "d44635b6e5a031f0f56252b3d51e46fd480dec0958c7aeb607edf2782bbaabe8",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Nord Wave.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Nord Wave",
+    "background": "#212121",
+    "foreground": "#d8dee9",
+    "cursorColor": "#ebcb8b",
+    "selectionBackground": "#d8dee9",
+    "black": "#3b4252",
+    "red": "#bf616a",
+    "green": "#a3be8c",
+    "yellow": "#ebcb8b",
+    "blue": "#81a1c1",
+    "purple": "#b48ead",
+    "cyan": "#88c0d0",
+    "white": "#e5e9f0",
+    "brightBlack": "#4c566a",
+    "brightRed": "#bf616a",
+    "brightGreen": "#a3be8c",
+    "brightYellow": "#ebcb8b",
+    "brightBlue": "#81a1c1",
+    "brightPurple": "#b48ead",
+    "brightCyan": "#8fbcbb",
+    "brightWhite": "#eceff4"
+  }
+}

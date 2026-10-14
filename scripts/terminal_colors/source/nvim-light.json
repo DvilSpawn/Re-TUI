@@ -1,0 +1,32 @@
+{
+  "id": "nvim-light",
+  "sourceUrl": "https://term.const.net/en/themes/nvim-light/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "c9700048d25af8ed4bc885a773bba4001f066542d9dc7c1d11d4b5f230be75bb",
+  "paletteSha256": "2a00930a0a07fc4fbba56c470017c176a0b845f075b8e4c4997b771c0264e009",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Nvim Light.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Nvim Light",
+    "background": "#e0e2ea",
+    "foreground": "#14161b",
+    "cursorColor": "#9b9ea4",
+    "selectionBackground": "#9b9ea4",
+    "black": "#07080d",
+    "red": "#590008",
+    "green": "#005523",
+    "yellow": "#6b5300",
+    "blue": "#004c73",
+    "purple": "#470045",
+    "cyan": "#007373",
+    "white": "#a1a4ab",
+    "brightBlack": "#4f5258",
+    "brightRed": "#590008",
+    "brightGreen": "#005523",
+    "brightYellow": "#6b5300",
+    "brightBlue": "#004c73",
+    "brightPurple": "#470045",
+    "brightCyan": "#007373",
+    "brightWhite": "#eef1f8"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "dark-plus",
+  "sourceUrl": "https://term.const.net/en/themes/dark-plus/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "1f1282447e0b427a108e0be3ca2c511a93f835270580e7492ead89ba7d746493",
+  "paletteSha256": "d366449bcccc8fb9538540d80a7507effb5709053857756dade43d5bc09028c4",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Dark+.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Dark+",
+    "background": "#1e1e1e",
+    "foreground": "#cccccc",
+    "cursorColor": "#ffffff",
+    "selectionBackground": "#3a3d41",
+    "black": "#000000",
+    "red": "#cd3131",
+    "green": "#0dbc79",
+    "yellow": "#e5e510",
+    "blue": "#2472c8",
+    "purple": "#bc3fbc",
+    "cyan": "#11a8cd",
+    "white": "#e5e5e5",
+    "brightBlack": "#666666",
+    "brightRed": "#f14c4c",
+    "brightGreen": "#23d18b",
+    "brightYellow": "#f5f543",
+    "brightBlue": "#3b8eea",
+    "brightPurple": "#d670d6",
+    "brightCyan": "#29b8db",
+    "brightWhite": "#e5e5e5"
+  }
+}

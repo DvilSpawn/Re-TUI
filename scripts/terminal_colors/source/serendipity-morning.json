@@ -1,0 +1,32 @@
+{
+  "id": "serendipity-morning",
+  "sourceUrl": "https://term.const.net/en/themes/serendipity-morning/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "8085eeb3045f70b9fbe6d223b20781a9e4cdcbd6a46169b30cd49c1c23f7a737",
+  "paletteSha256": "66d365a3b8e6eb442641ee5a1d258a0b9341386fa16e8b598759bf46b775c853",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Serendipity Morning.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Serendipity Morning",
+    "background": "#f6f7fb",
+    "foreground": "#3f4363",
+    "cursorColor": "#6d7296",
+    "selectionBackground": "#5a5670",
+    "black": "#ccd0dc",
+    "red": "#c25a4d",
+    "green": "#2f7aab",
+    "yellow": "#785fd0",
+    "blue": "#6288d8",
+    "purple": "#629aa5",
+    "cyan": "#e58678",
+    "white": "#3f4363",
+    "brightBlack": "#505575",
+    "brightRed": "#c25a4d",
+    "brightGreen": "#2f7aab",
+    "brightYellow": "#785fd0",
+    "brightBlue": "#6288d8",
+    "brightPurple": "#629aa5",
+    "brightCyan": "#e58678",
+    "brightWhite": "#3f4363"
+  }
+}

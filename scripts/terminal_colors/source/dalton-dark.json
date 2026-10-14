@@ -1,0 +1,32 @@
+{
+  "id": "dalton-dark",
+  "sourceUrl": "https://term.const.net/en/themes/dalton-dark/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "0ac7cb22e882d3429385c5ace25cc5a1fcdd533828f78deec2e14ba039d70fe2",
+  "paletteSha256": "c410c3e07ed1806575819307610497068db3cc890cf452a255845d7317ceeca5",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Dalton Dark.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Dalton Dark",
+    "background": "#1b1b1b",
+    "foreground": "#c8c9cc",
+    "cursorColor": "#9a9a9a",
+    "selectionBackground": "#c8c9cc",
+    "black": "#282828",
+    "red": "#d85050",
+    "green": "#5b914e",
+    "yellow": "#c4c40c",
+    "blue": "#7aa2f7",
+    "purple": "#a050d0",
+    "cyan": "#56717f",
+    "white": "#b8b8b8",
+    "brightBlack": "#494949",
+    "brightRed": "#f07068",
+    "brightGreen": "#88b97d",
+    "brightYellow": "#eded02",
+    "brightBlue": "#97b1f1",
+    "brightPurple": "#c070f0",
+    "brightCyan": "#6691a7",
+    "brightWhite": "#d8d8d8"
+  }
+}

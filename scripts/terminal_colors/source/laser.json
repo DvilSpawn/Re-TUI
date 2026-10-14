@@ -1,0 +1,32 @@
+{
+  "id": "laser",
+  "sourceUrl": "https://term.const.net/en/themes/laser/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "aa5506982c505af886ca74d4f830345c7035acde1474950d1d9ee4845b557033",
+  "paletteSha256": "d687aceccc036e7e29cc44f6d5a8f8c2b08e38825dc2d5b1db3f930e17baed50",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Laser.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Laser",
+    "background": "#030d18",
+    "foreground": "#f106e3",
+    "cursorColor": "#00ff9c",
+    "selectionBackground": "#2e206a",
+    "black": "#626262",
+    "red": "#ff8373",
+    "green": "#b4fb73",
+    "yellow": "#09b4bd",
+    "blue": "#fed300",
+    "purple": "#ff90fe",
+    "cyan": "#d1d1fe",
+    "white": "#f1f1f1",
+    "brightBlack": "#8f8f8f",
+    "brightRed": "#ffc4be",
+    "brightGreen": "#d6fcba",
+    "brightYellow": "#fffed5",
+    "brightBlue": "#f92883",
+    "brightPurple": "#ffb2fe",
+    "brightCyan": "#e6e7fe",
+    "brightWhite": "#ffffff"
+  }
+}

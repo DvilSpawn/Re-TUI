@@ -1,0 +1,32 @@
+{
+  "id": "onenord-light",
+  "sourceUrl": "https://term.const.net/en/themes/onenord-light/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "2b69aa5d29d8d2b5b367f325bfd72a141f88cd6f1531c964de3f266b80bf8b1d",
+  "paletteSha256": "7884f7265622b19fee6ae80b6328d64cdaa4ef30f8c990bd66f2c03dc63d336f",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Onenord Light.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Onenord Light",
+    "background": "#f7f8fa",
+    "foreground": "#2e3440",
+    "cursorColor": "#3879c5",
+    "selectionBackground": "#eaebed",
+    "black": "#2e3440",
+    "red": "#cb4f53",
+    "green": "#48a53d",
+    "yellow": "#ee5e25",
+    "blue": "#3879c5",
+    "purple": "#9f4aca",
+    "cyan": "#3ea1ad",
+    "white": "#b2b6bd",
+    "brightBlack": "#646a76",
+    "brightRed": "#d16366",
+    "brightGreen": "#5f9e9d",
+    "brightYellow": "#ba793e",
+    "brightBlue": "#1b40a6",
+    "brightPurple": "#9665af",
+    "brightCyan": "#8fbcbb",
+    "brightWhite": "#eceff4"
+  }
+}

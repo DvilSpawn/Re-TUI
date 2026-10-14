@@ -1,0 +1,32 @@
+{
+  "id": "oxocarbon",
+  "sourceUrl": "https://term.const.net/en/themes/oxocarbon/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "385fb10538f7eeb9f7f64f90702260098d1b92dd01a434799f1f88646e258c60",
+  "paletteSha256": "40fe8a485253407c9255e2944010311193571cbdc8f2538311879676891d6a03",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Oxocarbon.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Oxocarbon",
+    "background": "#161616",
+    "foreground": "#f2f4f8",
+    "cursorColor": "#ffffff",
+    "selectionBackground": "#393939",
+    "black": "#161616",
+    "red": "#00dfdb",
+    "green": "#00b4ff",
+    "yellow": "#ff4297",
+    "blue": "#00c15a",
+    "purple": "#c693ff",
+    "cyan": "#ff74b8",
+    "white": "#f2f4f8",
+    "brightBlack": "#585858",
+    "brightRed": "#00dfdb",
+    "brightGreen": "#00b4ff",
+    "brightYellow": "#ff4297",
+    "brightBlue": "#00c15a",
+    "brightPurple": "#c693ff",
+    "brightCyan": "#ff74b8",
+    "brightWhite": "#f2f4f8"
+  }
+}

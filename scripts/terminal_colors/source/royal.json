@@ -1,0 +1,32 @@
+{
+  "id": "royal",
+  "sourceUrl": "https://term.const.net/en/themes/royal/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "697fa145c0395e592096d2f9f2b447934c2a8615845e51fc0aba662167f7417f",
+  "paletteSha256": "a2b148a4ee0086e333fed58fdfe887507c35968022ff9bc78976b88bb0de48d3",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Royal.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Royal",
+    "background": "#100815",
+    "foreground": "#514968",
+    "cursorColor": "#524966",
+    "selectionBackground": "#1f1d2b",
+    "black": "#241f2b",
+    "red": "#91284c",
+    "green": "#23801c",
+    "yellow": "#b49d27",
+    "blue": "#6580b0",
+    "purple": "#674d96",
+    "cyan": "#8aaabe",
+    "white": "#524966",
+    "brightBlack": "#3e3a4a",
+    "brightRed": "#d5356c",
+    "brightGreen": "#2cd946",
+    "brightYellow": "#fde83b",
+    "brightBlue": "#90baf9",
+    "brightPurple": "#a479e3",
+    "brightCyan": "#acd4eb",
+    "brightWhite": "#9e8cbd"
+  }
+}

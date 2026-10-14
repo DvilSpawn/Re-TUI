@@ -1,0 +1,32 @@
+{
+  "id": "noctis-hibernus",
+  "sourceUrl": "https://term.const.net/en/themes/noctis-hibernus/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "22df5edaa6cce5e6076c44832005882b552758fe93bfca078f2e1b9fce3aa766",
+  "paletteSha256": "2fb661724397c4a6b61c0c85847fecbae441d171575e4bd46e8490663d3d30fe",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Noctis Hibernus.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Noctis Hibernus",
+    "background": "#f4f6f6",
+    "foreground": "#005661",
+    "cursorColor": "#005661",
+    "selectionBackground": "#d9e0e0",
+    "black": "#003b42",
+    "red": "#e34e1c",
+    "green": "#00b368",
+    "yellow": "#f49725",
+    "blue": "#0094f0",
+    "purple": "#ff5792",
+    "cyan": "#00bdd6",
+    "white": "#8ca6a6",
+    "brightBlack": "#004d57",
+    "brightRed": "#ff4000",
+    "brightGreen": "#00d17a",
+    "brightYellow": "#ff8c00",
+    "brightBlue": "#0fa3ff",
+    "brightPurple": "#ff6b9f",
+    "brightCyan": "#00cbe6",
+    "brightWhite": "#bbc3c4"
+  }
+}

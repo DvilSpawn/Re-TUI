@@ -1,0 +1,32 @@
+{
+  "id": "silkcircuit-soft",
+  "sourceUrl": "https://term.const.net/en/themes/silkcircuit-soft/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "90b9ae909783d7ca040ec081c8508b55eb24acd16f68b97293a5426ca35c8109",
+  "paletteSha256": "bef2fe2eb1eb911bd928d6833d0f74534294d68ba01470ef83fb63724c9a9854",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/SilkCircuit Soft.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "SilkCircuit Soft",
+    "background": "#1a1626",
+    "foreground": "#f8f8f2",
+    "cursorColor": "#99ffee",
+    "selectionBackground": "#44475a",
+    "black": "#141220",
+    "red": "#ff6677",
+    "green": "#66ff99",
+    "yellow": "#ffe699",
+    "blue": "#92aaff",
+    "purple": "#ff99ff",
+    "cyan": "#99ffee",
+    "white": "#f8f8f2",
+    "brightBlack": "#6272a4",
+    "brightRed": "#ff7788",
+    "brightGreen": "#80ffb3",
+    "brightYellow": "#ffffa5",
+    "brightBlue": "#a2bbff",
+    "brightPurple": "#ffb3ff",
+    "brightCyan": "#b3ffea",
+    "brightWhite": "#ffffff"
+  }
+}

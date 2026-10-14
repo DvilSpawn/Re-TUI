@@ -1,0 +1,32 @@
+{
+  "id": "fish-tank",
+  "sourceUrl": "https://term.const.net/en/themes/fish-tank/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "fda0dca22d64e1a099dd0031a704b532d0e0e702130e21d65663f0e1b9a0444b",
+  "paletteSha256": "5d4c17947865ba2e826ae77f80cb0808ca395a9665f32eafd5c8ef6893a3a7f1",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Fish Tank.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Fish Tank",
+    "background": "#232537",
+    "foreground": "#ecf0fe",
+    "cursorColor": "#fecd5e",
+    "selectionBackground": "#fcf7e9",
+    "black": "#03073c",
+    "red": "#c6004a",
+    "green": "#acf157",
+    "yellow": "#fecd5e",
+    "blue": "#525fb8",
+    "purple": "#986f82",
+    "cyan": "#968763",
+    "white": "#ecf0fc",
+    "brightBlack": "#6c5b30",
+    "brightRed": "#da4b8a",
+    "brightGreen": "#dbffa9",
+    "brightYellow": "#fee6a9",
+    "brightBlue": "#b2befa",
+    "brightPurple": "#fda5cd",
+    "brightCyan": "#a5bd86",
+    "brightWhite": "#f6ffec"
+  }
+}

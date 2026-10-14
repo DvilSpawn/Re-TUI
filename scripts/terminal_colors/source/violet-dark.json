@@ -1,0 +1,32 @@
+{
+  "id": "violet-dark",
+  "sourceUrl": "https://term.const.net/en/themes/violet-dark/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "0f233613dbb8d29504681920736a3b1965c783b6373e2e826cf4d15e8cf258d6",
+  "paletteSha256": "8cc29423b48c030ace324911cc4e8051ef04a4a343d86f3a669f72ce58240471",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Violet Dark.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Violet Dark",
+    "background": "#1c1d1f",
+    "foreground": "#708284",
+    "cursorColor": "#708284",
+    "selectionBackground": "#595ab7",
+    "black": "#56595c",
+    "red": "#c94c22",
+    "green": "#85981c",
+    "yellow": "#b4881d",
+    "blue": "#2e8bce",
+    "purple": "#d13a82",
+    "cyan": "#32a198",
+    "white": "#c9c6bd",
+    "brightBlack": "#45484b",
+    "brightRed": "#bd3613",
+    "brightGreen": "#738a04",
+    "brightYellow": "#a57705",
+    "brightBlue": "#2176c7",
+    "brightPurple": "#c61c6f",
+    "brightCyan": "#259286",
+    "brightWhite": "#c9c6bd"
+  }
+}

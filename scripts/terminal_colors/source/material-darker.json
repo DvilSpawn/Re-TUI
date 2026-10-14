@@ -1,0 +1,32 @@
+{
+  "id": "material-darker",
+  "sourceUrl": "https://term.const.net/en/themes/material-darker/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "161cbed42d9215324060e433af476e9d21cb5a5fdf35c8332ecc6e5db353dfa5",
+  "paletteSha256": "32087960e8538b33f82ff739c6ee03a9248fb36b93c5ca532b67d50d0c2fd41a",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Material Darker.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Material Darker",
+    "background": "#212121",
+    "foreground": "#eeffff",
+    "cursorColor": "#ffffff",
+    "selectionBackground": "#eeffff",
+    "black": "#000000",
+    "red": "#ff5370",
+    "green": "#c3e88d",
+    "yellow": "#ffcb6b",
+    "blue": "#82aaff",
+    "purple": "#c792ea",
+    "cyan": "#89ddff",
+    "white": "#ffffff",
+    "brightBlack": "#545454",
+    "brightRed": "#ff5370",
+    "brightGreen": "#c3e88d",
+    "brightYellow": "#ffcb6b",
+    "brightBlue": "#82aaff",
+    "brightPurple": "#c792ea",
+    "brightCyan": "#89ddff",
+    "brightWhite": "#ffffff"
+  }
+}

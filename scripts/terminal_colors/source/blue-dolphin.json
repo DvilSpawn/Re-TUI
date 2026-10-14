@@ -1,0 +1,32 @@
+{
+  "id": "blue-dolphin",
+  "sourceUrl": "https://term.const.net/en/themes/blue-dolphin/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "72ac5dd191a0710be28baa43312ae26b99926be679b8d40e5a801d1af94fd123",
+  "paletteSha256": "cff765059c5c47037569f1efd659f4b9452f5334d1af752c08ffbdbedfa18c01",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Blue Dolphin.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Blue Dolphin",
+    "background": "#006984",
+    "foreground": "#c5f2ff",
+    "cursorColor": "#ffcc00",
+    "selectionBackground": "#2baeca",
+    "black": "#292d3e",
+    "red": "#ff8288",
+    "green": "#b4e88d",
+    "yellow": "#f4d69f",
+    "blue": "#82aaff",
+    "purple": "#e9c1ff",
+    "cyan": "#89ebff",
+    "white": "#d0d0d0",
+    "brightBlack": "#9094a4",
+    "brightRed": "#ff8b92",
+    "brightGreen": "#ddffa7",
+    "brightYellow": "#ffe585",
+    "brightBlue": "#9cc4ff",
+    "brightPurple": "#ddb0f6",
+    "brightCyan": "#a3f7ff",
+    "brightWhite": "#ffffff"
+  }
+}

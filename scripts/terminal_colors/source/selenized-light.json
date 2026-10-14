@@ -1,0 +1,32 @@
+{
+  "id": "selenized-light",
+  "sourceUrl": "https://term.const.net/en/themes/selenized-light/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "7a8744ddc4dee13f25d372cfac51ef10d1c87e288284911c1a5433b2148533ea",
+  "paletteSha256": "e2d0d7ee776dcb68ea6be3750d3f3a48a4ef5528e6d3f29988ce0a428d965058",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Selenized Light.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Selenized Light",
+    "background": "#fbf3db",
+    "foreground": "#53676d",
+    "cursorColor": "#53676d",
+    "selectionBackground": "#ece3cc",
+    "black": "#ece3cc",
+    "red": "#d2212d",
+    "green": "#489100",
+    "yellow": "#ad8900",
+    "blue": "#0072d4",
+    "purple": "#ca4898",
+    "cyan": "#009c8f",
+    "white": "#53676d",
+    "brightBlack": "#909995",
+    "brightRed": "#cc1729",
+    "brightGreen": "#428b00",
+    "brightYellow": "#a78300",
+    "brightBlue": "#006dce",
+    "brightPurple": "#c44392",
+    "brightCyan": "#00978a",
+    "brightWhite": "#3a4d53"
+  }
+}

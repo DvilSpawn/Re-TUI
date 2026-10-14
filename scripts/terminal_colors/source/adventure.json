@@ -1,0 +1,32 @@
+{
+  "id": "adventure",
+  "sourceUrl": "https://term.const.net/en/themes/adventure/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "bdbb99057b7d17c3ac5f1b3215c681a317e79e9aeff28f6c3534ac3bef3ac3b0",
+  "paletteSha256": "47559b06a5f4dba27f8ab2f89f8a5d8d3c2db8e2435ef5605ad05677d403a193",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Adventure.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Adventure",
+    "background": "#040404",
+    "foreground": "#feffff",
+    "cursorColor": "#feffff",
+    "selectionBackground": "#606060",
+    "black": "#040404",
+    "red": "#d84a33",
+    "green": "#5da602",
+    "yellow": "#eebb6e",
+    "blue": "#417ab3",
+    "purple": "#e5c499",
+    "cyan": "#bdcfe5",
+    "white": "#dbded8",
+    "brightBlack": "#685656",
+    "brightRed": "#d76b42",
+    "brightGreen": "#99b52c",
+    "brightYellow": "#ffb670",
+    "brightBlue": "#97d7ef",
+    "brightPurple": "#aa7900",
+    "brightCyan": "#bdcfe5",
+    "brightWhite": "#e4d5c7"
+  }
+}

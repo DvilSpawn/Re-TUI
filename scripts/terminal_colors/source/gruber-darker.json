@@ -1,0 +1,32 @@
+{
+  "id": "gruber-darker",
+  "sourceUrl": "https://term.const.net/en/themes/gruber-darker/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "4394e6af9e496b6dad34710e42870f115b6084eef280fd2ea9ee6d153b39f1ea",
+  "paletteSha256": "ea60bbf3c5392c6132e7033a9a2555220c265f2ef79ca5411af84f395658687e",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Gruber Darker.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Gruber Darker",
+    "background": "#181818",
+    "foreground": "#e4e4e4",
+    "cursorColor": "#ffdb00",
+    "selectionBackground": "#ffffff",
+    "black": "#181818",
+    "red": "#ff0a36",
+    "green": "#42dc00",
+    "yellow": "#ffdb00",
+    "blue": "#92a7cb",
+    "purple": "#a095cb",
+    "cyan": "#90aa9e",
+    "white": "#e4e4e4",
+    "brightBlack": "#54494e",
+    "brightRed": "#ff3851",
+    "brightGreen": "#42dc00",
+    "brightYellow": "#ffdb00",
+    "brightBlue": "#92a7cb",
+    "brightPurple": "#afafda",
+    "brightCyan": "#90aa9e",
+    "brightWhite": "#f5f5f5"
+  }
+}

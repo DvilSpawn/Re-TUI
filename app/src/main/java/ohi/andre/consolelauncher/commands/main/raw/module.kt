@@ -9,6 +9,9 @@ import ohi.andre.consolelauncher.UIManager
 import ohi.andre.consolelauncher.commands.CommandAbstraction
 import ohi.andre.consolelauncher.commands.ExecutePack
 import ohi.andre.consolelauncher.commands.tuixt.WidgetEditorActivity
+import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog
+import ohi.andre.consolelauncher.managers.modules.ModuleLibraryPane
+import ohi.andre.consolelauncher.managers.modules.ModuleLibrary
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings
 import ohi.andre.consolelauncher.managers.modules.ModuleManager
 import ohi.andre.consolelauncher.managers.modules.ModulePromptManager
@@ -31,6 +34,37 @@ class module : CommandAbstraction {
         val parts: Array<String?> =
             input.split("\\s+".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
         val option = parts[0]!!.lowercase(Locale.ROOT)
+
+        if ("-library" == option) {
+            fun install(entry: ModuleLibrary.Entry) {
+                ModuleLibrary.installAsync(pack.context, entry) { result ->
+                    val activity = pack.context as? Activity
+                    if (activity?.isFinishing == true || activity?.isDestroyed == true) return@installAsync
+                    result.onSuccess { id -> send(pack, "rebuild", null); send(pack, "show", id) }
+                        .onFailure { error -> Tuils.sendOutput(pack.context, pack.context.getString(R.string.module_library_failed, error.message)) }
+                }
+            }
+            ModuleLibrary.refresh(pack.context) { result ->
+                val activity = pack.context as? Activity
+                if (activity?.isFinishing == true || activity?.isDestroyed == true) return@refresh
+                result.onSuccess { catalogue ->
+                    if (catalogue.cached) Tuils.sendOutput(pack.context, pack.context.getString(R.string.module_library_cached))
+                    if (parts.size > 1) {
+                        val entry = catalogue.entries.firstOrNull { it.key.equals(parts[1], true) || it.id.equals(parts[1], true) }
+                        if (entry == null) Tuils.sendOutput(pack.context, pack.context.getString(R.string.module_library_unknown))
+                        else if (LuaWidgetManager.exists(entry.id)) install(entry)
+                        else ModuleLibraryPane.show(pack.context, entry) { command, id -> send(pack, command, id) }
+                    } else {
+                        TuixtDialog.showOptions(pack.context, pack.context.getString(R.string.module_library_title),
+                            catalogue.entries.map { it.title + " · " + ModuleLibrary.status(pack.context, it) + "\n" + it.description },
+                            TuixtDialog.ItemAction { index -> ModuleLibraryPane.show(pack.context, catalogue.entries[index]) { command, id -> send(pack, command, id) } })
+                    }
+                }.onFailure { error ->
+                    Tuils.sendOutput(pack.context, pack.context.getString(R.string.module_library_unavailable, error.message))
+                }
+            }
+            return pack.context.getString(R.string.module_library_loading)
+        }
 
         if ("-new" == option || "-create" == option) {
             return createLuaModule(pack, input)
@@ -214,6 +248,7 @@ class module : CommandAbstraction {
                 || "-config" == option
                 || "-prefs" == option
                 || "-check" == option
+                || "-preview" == option
                 || "-info" == option
                 || "-approve" == option
                 || "-trust" == option

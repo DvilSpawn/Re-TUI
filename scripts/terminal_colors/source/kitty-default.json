@@ -1,0 +1,32 @@
+{
+  "id": "kitty-default",
+  "sourceUrl": "https://term.const.net/en/themes/kitty-default/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "e5b2d77c2e203942b4dfc607c5c726464f7a5bbbdd7c3f6856d1034addc9ee91",
+  "paletteSha256": "59bee1679f5168a9f925d509b17879f5aa8ff8771500c5f51d6480cee34ae543",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Kitty Default.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Kitty Default",
+    "background": "#000000",
+    "foreground": "#dddddd",
+    "cursorColor": "#cccccc",
+    "selectionBackground": "#fffacd",
+    "black": "#000000",
+    "red": "#cc0403",
+    "green": "#19cb00",
+    "yellow": "#cecb00",
+    "blue": "#0d73cc",
+    "purple": "#cb1ed1",
+    "cyan": "#0dcdcd",
+    "white": "#dddddd",
+    "brightBlack": "#767676",
+    "brightRed": "#f2201f",
+    "brightGreen": "#23fd00",
+    "brightYellow": "#fffd00",
+    "brightBlue": "#1a8fff",
+    "brightPurple": "#fd28ff",
+    "brightCyan": "#14ffff",
+    "brightWhite": "#ffffff"
+  }
+}

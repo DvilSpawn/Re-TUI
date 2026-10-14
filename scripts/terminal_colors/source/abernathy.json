@@ -1,0 +1,32 @@
+{
+  "id": "abernathy",
+  "sourceUrl": "https://term.const.net/en/themes/abernathy/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "c177a6d6245b1dcb488eb70e483a71f9b572f5330bcb54ae2230473461b80be7",
+  "paletteSha256": "a92a89ae474391e7e782e22e690b45fac550c17719138e2972ba79b36d7b1638",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Abernathy.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Abernathy",
+    "background": "#111416",
+    "foreground": "#eeeeec",
+    "cursorColor": "#bbbbbb",
+    "selectionBackground": "#eeeeec",
+    "black": "#000000",
+    "red": "#cd0000",
+    "green": "#00cd00",
+    "yellow": "#cdcd00",
+    "blue": "#1093f5",
+    "purple": "#cd00cd",
+    "cyan": "#00cdcd",
+    "white": "#faebd7",
+    "brightBlack": "#404040",
+    "brightRed": "#ff0000",
+    "brightGreen": "#00ff00",
+    "brightYellow": "#ffff00",
+    "brightBlue": "#11b5f6",
+    "brightPurple": "#ff00ff",
+    "brightCyan": "#00ffff",
+    "brightWhite": "#ffffff"
+  }
+}

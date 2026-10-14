@@ -1,0 +1,32 @@
+{
+  "id": "sugarplum",
+  "sourceUrl": "https://term.const.net/en/themes/sugarplum/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "5b58db289b8667bdc76d49c6707544df5a0343f8c4765dc0c721c52366c3f567",
+  "paletteSha256": "11770a8b90eee6c76e6ccf371c1c20a3a87e5e7d0044a315d71b78075ec04c3c",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Sugarplum.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Sugarplum",
+    "background": "#111147",
+    "foreground": "#db7ddd",
+    "cursorColor": "#53b397",
+    "selectionBackground": "#5ca8dc",
+    "black": "#111147",
+    "red": "#5ca8dc",
+    "green": "#53b397",
+    "yellow": "#249a84",
+    "blue": "#db7ddd",
+    "purple": "#d0beee",
+    "cyan": "#f9f3f9",
+    "white": "#a175d4",
+    "brightBlack": "#44447a",
+    "brightRed": "#5cb5dc",
+    "brightGreen": "#52deb5",
+    "brightYellow": "#01f5c7",
+    "brightBlue": "#fa5dfd",
+    "brightPurple": "#c6a5fd",
+    "brightCyan": "#ffffff",
+    "brightWhite": "#b577fd"
+  }
+}

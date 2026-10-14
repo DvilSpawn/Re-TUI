@@ -1,0 +1,32 @@
+{
+  "id": "embers-dark",
+  "sourceUrl": "https://term.const.net/en/themes/embers-dark/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "b4ba84a5ec12720f193aafc80746ba90bf53302a71c16dee03e437c2d7bff052",
+  "paletteSha256": "a2df2fb8661977123575c2a34b216db22fff6b30d18234bfc8c89764db64f0a9",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Embers Dark.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Embers Dark",
+    "background": "#16130f",
+    "foreground": "#a39a90",
+    "cursorColor": "#a39a90",
+    "selectionBackground": "#433b32",
+    "black": "#16130f",
+    "red": "#826d57",
+    "green": "#57826d",
+    "yellow": "#6d8257",
+    "blue": "#6d5782",
+    "purple": "#82576d",
+    "cyan": "#576d82",
+    "white": "#a39a90",
+    "brightBlack": "#5a5047",
+    "brightRed": "#828257",
+    "brightGreen": "#464039",
+    "brightYellow": "#50483f",
+    "brightBlue": "#8a8075",
+    "brightPurple": "#beb6ae",
+    "brightCyan": "#825757",
+    "brightWhite": "#dbd6d1"
+  }
+}

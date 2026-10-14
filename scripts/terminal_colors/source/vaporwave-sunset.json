@@ -1,0 +1,32 @@
+{
+  "id": "vaporwave-sunset",
+  "sourceUrl": "https://term.const.net/en/themes/vaporwave-sunset/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "4f524c8df278e001bea424fb33f5b3a1b9bb1240553487f6869246ef7907f068",
+  "paletteSha256": "bd81bba66a2251b4207101af07249cfd28d56fd43e6b78301a050ca136e694ac",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Vaporwave Sunset.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Vaporwave Sunset",
+    "background": "#180827",
+    "foreground": "#fff7ed",
+    "cursorColor": "#fff7ed",
+    "selectionBackground": "#fff7ed",
+    "black": "#4b3d53",
+    "red": "#fb7185",
+    "green": "#2dd4bf",
+    "yellow": "#fb923c",
+    "blue": "#a78bfa",
+    "purple": "#22d3ee",
+    "cyan": "#ff4fd8",
+    "white": "#f0abfc",
+    "brightBlack": "#563f6e",
+    "brightRed": "#fc8d9d",
+    "brightGreen": "#57ddcc",
+    "brightYellow": "#fca65f",
+    "brightBlue": "#b9a2fb",
+    "brightPurple": "#4edcf1",
+    "brightCyan": "#ff72e0",
+    "brightWhite": "#fff7ed"
+  }
+}

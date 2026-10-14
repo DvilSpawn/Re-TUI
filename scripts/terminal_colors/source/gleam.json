@@ -1,0 +1,32 @@
+{
+  "id": "gleam",
+  "sourceUrl": "https://term.const.net/en/themes/gleam/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "1d6f1312ca4a355924c334da5633e367e260ae17f2d433e559c0bece197bd8a9",
+  "paletteSha256": "ab0cca538a293e66374b71d277a65d68620132ee05a0a05198a4a832febe4401",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Gleam.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Gleam",
+    "background": "#292d3e",
+    "foreground": "#ffffff",
+    "cursorColor": "#ffffff",
+    "selectionBackground": "#393f57",
+    "black": "#000000",
+    "red": "#f44747",
+    "green": "#aadd8b",
+    "yellow": "#ffd596",
+    "blue": "#6796e6",
+    "purple": "#fe7ab2",
+    "cyan": "#b181ec",
+    "white": "#f7f7f7",
+    "brightBlack": "#808080",
+    "brightRed": "#ff4a4a",
+    "brightGreen": "#c8ffa7",
+    "brightYellow": "#fdffab",
+    "brightBlue": "#9ce7ff",
+    "brightPurple": "#ffaff3",
+    "brightCyan": "#d9baff",
+    "brightWhite": "#ffffff"
+  }
+}

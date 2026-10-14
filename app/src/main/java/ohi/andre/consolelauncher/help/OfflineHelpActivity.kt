@@ -86,6 +86,9 @@ class OfflineHelpActivity : LocalizedComponentActivity() {
         output.textSize = ohi.andre.consolelauncher.tuils.LauncherFontScale.terminalTextSizeSp()
         output.setLineSpacing(Tuils.dpToPx(this, 3).toFloat(), 1f)
         input.typeface = Tuils.getTypeface(this)
+        input.setTextColor(ThemeColorResolver.color(Theme.workspace_input_text_color))
+        input.setHintTextColor(ThemeColorResolver.color(Theme.field_hint_color))
+        Tuils.setCursorDrawableColor(input, ThemeColorResolver.color(Theme.cursor_color))
         output.setLinkTextColor(textColor)
         root.findViewById<View>(R.id.offline_help_panel).background = TerminalBorderRuntime.panelDrawable(this,
             ThemeColorResolver.color(Theme.workspace_panel_background_color), ThemeColorResolver.color(Theme.workspace_panel_border_color),
@@ -172,6 +175,9 @@ class OfflineHelpActivity : LocalizedComponentActivity() {
             it.textSize = ohi.andre.consolelauncher.tuils.LauncherFontScale.terminalTextSizeSp()
         }
         input.typeface = Tuils.getTypeface(this)
+        input.setTextColor(ThemeColorResolver.color(Theme.workspace_input_text_color))
+        input.setHintTextColor(ThemeColorResolver.color(Theme.field_hint_color))
+        Tuils.setCursorDrawableColor(input, ThemeColorResolver.color(Theme.cursor_color))
         output.textSize = ohi.andre.consolelauncher.tuils.LauncherFontScale.terminalTextSizeSp()
         output.setLinkTextColor(textColor)
         root.findViewById<View>(R.id.offline_help_panel).background = TerminalBorderRuntime.panelDrawable(this,
@@ -248,9 +254,7 @@ class OfflineHelpActivity : LocalizedComponentActivity() {
                 ?.let { OfflineHelpReference.text(this, it) } ?: getString(R.string.offline_help_no_reference)
                 else OfflineHelpCatalog.find(current)?.body?.let { getString(it) }.orEmpty()
             HelpText.title(text, title(current))
-            val panelColor = ThemeColorResolver.color(Theme.workspace_panel_background_color)
-            val blockColor = androidx.core.graphics.ColorUtils.compositeColors(
-                androidx.core.graphics.ColorUtils.setAlphaComponent(output.currentTextColor, 24), panelColor)
+            val blockColor = ThemeColorResolver.color(Theme.workspace_output_background_color)
             HelpText.body(text, body, blockColor, Tuils.dpToPx(this, 12))
             val index = entries.indexOf(current)
             choice(1, getString(R.string.offline_help_topics)) { article = null; page = index.coerceAtLeast(0) / 7 }

@@ -1,0 +1,32 @@
+{
+  "id": "noctis-minimus",
+  "sourceUrl": "https://term.const.net/en/themes/noctis-minimus/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "ad54949c637bee02ae48e3e99da332e67589cb37fc36f17073a75e37d500b36a",
+  "paletteSha256": "58c10a19550cb0bad7ff64520ce589c76db45e8eca833f1d393e1609d3c9b2c5",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Noctis Minimus.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Noctis Minimus",
+    "background": "#1b2932",
+    "foreground": "#c5cdd3",
+    "cursorColor": "#c5cdd3",
+    "selectionBackground": "#263c4a",
+    "black": "#182a35",
+    "red": "#c08872",
+    "green": "#72c09f",
+    "yellow": "#c8a984",
+    "blue": "#6196b8",
+    "purple": "#c28097",
+    "cyan": "#72b7c0",
+    "white": "#c5cdd3",
+    "brightBlack": "#425866",
+    "brightRed": "#ca8468",
+    "brightGreen": "#84c8ab",
+    "brightYellow": "#d1aa7b",
+    "brightBlue": "#68a4ca",
+    "brightPurple": "#c88da2",
+    "brightCyan": "#84c0c8",
+    "brightWhite": "#c5d1d3"
+  }
+}

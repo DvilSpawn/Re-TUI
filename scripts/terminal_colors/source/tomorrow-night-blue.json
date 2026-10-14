@@ -1,0 +1,32 @@
+{
+  "id": "tomorrow-night-blue",
+  "sourceUrl": "https://term.const.net/en/themes/tomorrow-night-blue/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "c2386ee249d0d39a6bcfa1ea3012265361fc2d8f8c211f3cb5a0ed7799689502",
+  "paletteSha256": "603775f1bf7704515412ea46eb069bf22db99c795074256b30a931f57962e9be",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Tomorrow Night Blue.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Tomorrow Night Blue",
+    "background": "#002451",
+    "foreground": "#ffffff",
+    "cursorColor": "#ffffff",
+    "selectionBackground": "#003f8e",
+    "black": "#000000",
+    "red": "#ff9da4",
+    "green": "#d1f1a9",
+    "yellow": "#ffeead",
+    "blue": "#bbdaff",
+    "purple": "#ebbbff",
+    "cyan": "#99ffff",
+    "white": "#ffffff",
+    "brightBlack": "#4c4c4c",
+    "brightRed": "#ff9da4",
+    "brightGreen": "#d1f1a9",
+    "brightYellow": "#ffeead",
+    "brightBlue": "#bbdaff",
+    "brightPurple": "#ebbbff",
+    "brightCyan": "#99ffff",
+    "brightWhite": "#ffffff"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "medallion",
+  "sourceUrl": "https://term.const.net/en/themes/medallion/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "2608c5e0c9213202938f8c665199b1864a1a4aa3fda31f9bc0c1dd79cdcc7712",
+  "paletteSha256": "6fed39594a8b340c239f1581c01887e29a7c00e342df4a125fa6072e7ef2cf30",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Medallion.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Medallion",
+    "background": "#1d1908",
+    "foreground": "#cac296",
+    "cursorColor": "#d3ba30",
+    "selectionBackground": "#626dac",
+    "black": "#000000",
+    "red": "#b64c00",
+    "green": "#7c8b16",
+    "yellow": "#d3bd26",
+    "blue": "#616bb0",
+    "purple": "#8c5a90",
+    "cyan": "#916c25",
+    "white": "#cac29a",
+    "brightBlack": "#5e5219",
+    "brightRed": "#ff9149",
+    "brightGreen": "#b2ca3b",
+    "brightYellow": "#ffe54a",
+    "brightBlue": "#acb8ff",
+    "brightPurple": "#ffa0ff",
+    "brightCyan": "#ffbc51",
+    "brightWhite": "#fed698"
+  }
+}

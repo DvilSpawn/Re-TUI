@@ -1,0 +1,32 @@
+{
+  "id": "dayfox",
+  "sourceUrl": "https://term.const.net/en/themes/dayfox/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "20ccf5f2584d520dcaf0f14b30a55cdf3cd811622374149d727baee7b9813eac",
+  "paletteSha256": "86e1f8d8b29a77c3b8a9a754f9339b62325fa800884a590dbd55ce1c024e510b",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Dayfox.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Dayfox",
+    "background": "#f6f2ee",
+    "foreground": "#3d2b5a",
+    "cursorColor": "#3d2b5a",
+    "selectionBackground": "#e7d2be",
+    "black": "#352c24",
+    "red": "#a5222f",
+    "green": "#396847",
+    "yellow": "#ac5402",
+    "blue": "#2848a9",
+    "purple": "#6e33ce",
+    "cyan": "#287980",
+    "white": "#bfb6ae",
+    "brightBlack": "#534c45",
+    "brightRed": "#b3434e",
+    "brightGreen": "#577f63",
+    "brightYellow": "#b86e28",
+    "brightBlue": "#4863b6",
+    "brightPurple": "#8452d5",
+    "brightCyan": "#488d93",
+    "brightWhite": "#f4ece6"
+  }
+}

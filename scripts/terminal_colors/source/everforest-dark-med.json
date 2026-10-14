@@ -1,0 +1,32 @@
+{
+  "id": "everforest-dark-med",
+  "sourceUrl": "https://term.const.net/en/themes/everforest-dark-med/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "7a430a93106031afed8e5f38e9d3e82faec380c8f09527c21eab9c097160618f",
+  "paletteSha256": "662205a27f09ae5c8a3980196b51c8c4527eb312d82d4d9f50fbd618db7da7ec",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Everforest Dark Med.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Everforest Dark Med",
+    "background": "#232a2e",
+    "foreground": "#d3c6aa",
+    "cursorColor": "#e69875",
+    "selectionBackground": "#543a48",
+    "black": "#7a8478",
+    "red": "#e67e80",
+    "green": "#a7c080",
+    "yellow": "#dbbc7f",
+    "blue": "#7fbbb3",
+    "purple": "#d699b6",
+    "cyan": "#83c092",
+    "white": "#f2efdf",
+    "brightBlack": "#a6b0a0",
+    "brightRed": "#f85552",
+    "brightGreen": "#8da101",
+    "brightYellow": "#dfa000",
+    "brightBlue": "#3a94c5",
+    "brightPurple": "#df69ba",
+    "brightCyan": "#35a77c",
+    "brightWhite": "#fffbef"
+  }
+}

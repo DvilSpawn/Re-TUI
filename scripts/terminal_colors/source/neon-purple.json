@@ -1,0 +1,32 @@
+{
+  "id": "neon-purple",
+  "sourceUrl": "https://term.const.net/en/themes/neon-purple/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "833a450a208264df9549dce13a891d8720b1cd5bd8075c87d0ba10682e00fc5c",
+  "paletteSha256": "1641af2f794663f53e9563259afb233325493d37c275867aca83d92d23c6b425",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Neon Purple.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Neon Purple",
+    "background": "#291b47",
+    "foreground": "#e5e5e5",
+    "cursorColor": "#21f6bc",
+    "selectionBackground": "#c1deff",
+    "black": "#000000",
+    "red": "#cd0d76",
+    "green": "#03eba5",
+    "yellow": "#fffa6a",
+    "blue": "#00bfff",
+    "purple": "#ff00e0",
+    "cyan": "#9aa5ed",
+    "white": "#ffffff",
+    "brightBlack": "#a8fcff",
+    "brightRed": "#ff0da5",
+    "brightGreen": "#00ffb6",
+    "brightYellow": "#fff787",
+    "brightBlue": "#1bccfd",
+    "brightPurple": "#ff00f8",
+    "brightCyan": "#a6b6ff",
+    "brightWhite": "#ffffff"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "grey-green",
+  "sourceUrl": "https://term.const.net/en/themes/grey-green/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "b2e5e1dac22d855848836beb694e09ddc40d82164c08e06a1a93d0849dccb800",
+  "paletteSha256": "97cfc2734f513736642bd59a0f8b5091f5775b646167d72431768aba1d96d9be",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Grey Green.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Grey Green",
+    "background": "#002a1a",
+    "foreground": "#ffffff",
+    "cursorColor": "#fff400",
+    "selectionBackground": "#517e50",
+    "black": "#000000",
+    "red": "#fe1414",
+    "green": "#74ff00",
+    "yellow": "#f1ff01",
+    "blue": "#00deff",
+    "purple": "#ff00f0",
+    "cyan": "#00ffbc",
+    "white": "#ffffff",
+    "brightBlack": "#666666",
+    "brightRed": "#ff3939",
+    "brightGreen": "#00ff44",
+    "brightYellow": "#ffd100",
+    "brightBlue": "#00afff",
+    "brightPurple": "#ff008a",
+    "brightCyan": "#00ffd3",
+    "brightWhite": "#f5ecec"
+  }
+}

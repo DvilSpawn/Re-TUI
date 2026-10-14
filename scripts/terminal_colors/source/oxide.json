@@ -1,0 +1,32 @@
+{
+  "id": "oxide",
+  "sourceUrl": "https://term.const.net/en/themes/oxide/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "63f63cd42372202778d908a40f8025580f8aa13babb3e9994a7762d763c51274",
+  "paletteSha256": "d3d5efd442c17b029375a3cbb1897efcebf415b79c3904994bc48d292b7ac29f",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Oxide.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Oxide",
+    "background": "#161616",
+    "foreground": "#cecece",
+    "cursorColor": "#cecece",
+    "selectionBackground": "#262626",
+    "black": "#262626",
+    "red": "#ed756e",
+    "green": "#5bb661",
+    "yellow": "#c39900",
+    "blue": "#3ba6f5",
+    "purple": "#968ff7",
+    "cyan": "#00baaa",
+    "white": "#cecece",
+    "brightBlack": "#8f8f8f",
+    "brightRed": "#ff9890",
+    "brightGreen": "#7bd77f",
+    "brightYellow": "#e3b831",
+    "brightBlue": "#6fc6ff",
+    "brightPurple": "#b5b2ff",
+    "brightCyan": "#00dcca",
+    "brightWhite": "#dedede"
+  }
+}

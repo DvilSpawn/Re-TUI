@@ -1,0 +1,32 @@
+{
+  "id": "fideloper",
+  "sourceUrl": "https://term.const.net/en/themes/fideloper/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "b1edce9bf1eb6701b4722d70d0d7651302609b70ee4eba7484a7a3950f874bfc",
+  "paletteSha256": "b6ab296f74c67f5bfd7493e7da1f890b99972dec866b9e66c9ad10348b767647",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Fideloper.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Fideloper",
+    "background": "#292f33",
+    "foreground": "#dbdae0",
+    "cursorColor": "#d4605a",
+    "selectionBackground": "#efb8ac",
+    "black": "#292f33",
+    "red": "#cb1e2d",
+    "green": "#edb8ac",
+    "yellow": "#b7ab9b",
+    "blue": "#2e78c2",
+    "purple": "#c0236f",
+    "cyan": "#309186",
+    "white": "#eae3ce",
+    "brightBlack": "#496068",
+    "brightRed": "#d4605a",
+    "brightGreen": "#d4605a",
+    "brightYellow": "#a86671",
+    "brightBlue": "#7c85c4",
+    "brightPurple": "#5c5db2",
+    "brightCyan": "#819090",
+    "brightWhite": "#fcf4df"
+  }
+}

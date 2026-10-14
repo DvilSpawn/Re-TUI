@@ -1,0 +1,32 @@
+{
+  "id": "patina-lichen",
+  "sourceUrl": "https://term.const.net/en/themes/patina-lichen/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "54f8c8cfe1e1158014392544c61d5c7a3497ceb791bfc20a15e48e566c2ef3f8",
+  "paletteSha256": "b0cece8d3cda83b5cee984b4f7939f6a06409c241fad11526b18f58cae3a8c1c",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Patina Lichen.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Patina Lichen",
+    "background": "#cdd1c6",
+    "foreground": "#393a34",
+    "cursorColor": "#393a34",
+    "selectionBackground": "#aab0a3",
+    "black": "#393a34",
+    "red": "#8b4646",
+    "green": "#33644d",
+    "yellow": "#7f5031",
+    "blue": "#35616d",
+    "purple": "#854b3f",
+    "cyan": "#2a6361",
+    "white": "#5a5248",
+    "brightBlack": "#5b5b54",
+    "brightRed": "#8b4646",
+    "brightGreen": "#426338",
+    "brightYellow": "#7f5031",
+    "brightBlue": "#35616d",
+    "brightPurple": "#854b3f",
+    "brightCyan": "#2a6361",
+    "brightWhite": "#393a34"
+  }
+}

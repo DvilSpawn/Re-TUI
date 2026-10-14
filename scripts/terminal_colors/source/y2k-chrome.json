@@ -1,0 +1,32 @@
+{
+  "id": "y2k-chrome",
+  "sourceUrl": "https://term.const.net/en/themes/y2k-chrome/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "23963ca5d0870522ce9d06e5c047c408d9b059aaf1d8e4ef669673a29e839eec",
+  "paletteSha256": "68a2cdb72ac1f2212a8d958946ce73decb8ed396778b558e1b1ed4771852c892",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Y2K Chrome.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Y2K Chrome",
+    "background": "#f1f5f9",
+    "foreground": "#0f172a",
+    "cursorColor": "#0f172a",
+    "selectionBackground": "#0f172a",
+    "black": "#383f4f",
+    "red": "#dc2626",
+    "green": "#15803d",
+    "yellow": "#0891b2",
+    "blue": "#f97316",
+    "purple": "#7c3aed",
+    "cyan": "#2563eb",
+    "white": "#475569",
+    "brightBlack": "#a3b1c4",
+    "brightRed": "#b01e1e",
+    "brightGreen": "#116631",
+    "brightYellow": "#077792",
+    "brightBlue": "#c75c12",
+    "brightPurple": "#632ebe",
+    "brightCyan": "#1e4fbc",
+    "brightWhite": "#0f172a"
+  }
+}

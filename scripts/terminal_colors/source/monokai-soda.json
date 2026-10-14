@@ -1,0 +1,32 @@
+{
+  "id": "monokai-soda",
+  "sourceUrl": "https://term.const.net/en/themes/monokai-soda/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "3a0350341408e081ab12092f8279bc17eecf2037967766a4b5122ebd36a6b9e7",
+  "paletteSha256": "dfe1d6913ace06940a1c97f98788f4bb5d327e5c5cab46b556aebe6e11d1ee44",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Monokai Soda.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Monokai Soda",
+    "background": "#1a1a1a",
+    "foreground": "#c4c5b5",
+    "cursorColor": "#f6f7ec",
+    "selectionBackground": "#343434",
+    "black": "#1a1a1a",
+    "red": "#f4005f",
+    "green": "#98e024",
+    "yellow": "#fa8419",
+    "blue": "#9d65ff",
+    "purple": "#f4005f",
+    "cyan": "#58d1eb",
+    "white": "#c4c5b5",
+    "brightBlack": "#625e4c",
+    "brightRed": "#f4005f",
+    "brightGreen": "#98e024",
+    "brightYellow": "#e0d561",
+    "brightBlue": "#9d65ff",
+    "brightPurple": "#f4005f",
+    "brightCyan": "#58d1eb",
+    "brightWhite": "#f6f6ef"
+  }
+}

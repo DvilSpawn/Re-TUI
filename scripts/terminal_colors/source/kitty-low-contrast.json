@@ -1,0 +1,32 @@
+{
+  "id": "kitty-low-contrast",
+  "sourceUrl": "https://term.const.net/en/themes/kitty-low-contrast/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "12034c0fc1e9f26a4d205b55375a6df02eb00e39b9215dc0b266799b18f93d78",
+  "paletteSha256": "17b24a085bcb353a00b1e35b2f518f5a65eaa361a66ca6175f4a5211d61348fb",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Kitty Low Contrast.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Kitty Low Contrast",
+    "background": "#333333",
+    "foreground": "#ffffff",
+    "cursorColor": "#cccccc",
+    "selectionBackground": "#fffacd",
+    "black": "#000000",
+    "red": "#cc0403",
+    "green": "#19cb00",
+    "yellow": "#cecb00",
+    "blue": "#0d73cc",
+    "purple": "#cb1ed1",
+    "cyan": "#0dcdcd",
+    "white": "#dddddd",
+    "brightBlack": "#767676",
+    "brightRed": "#f2201f",
+    "brightGreen": "#23fd00",
+    "brightYellow": "#fffd00",
+    "brightBlue": "#1a8fff",
+    "brightPurple": "#fd28ff",
+    "brightCyan": "#14ffff",
+    "brightWhite": "#ffffff"
+  }
+}

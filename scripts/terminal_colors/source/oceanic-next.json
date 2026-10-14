@@ -1,0 +1,32 @@
+{
+  "id": "oceanic-next",
+  "sourceUrl": "https://term.const.net/en/themes/oceanic-next/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "83c982989646ad3111af82988faee869bcbecb31b562a8b946cf6a849048bc8f",
+  "paletteSha256": "11e9c94591664fffb5c5a2a68056f9d21dc7feff3d9155fbfc5930594d769be5",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Oceanic Next.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Oceanic Next",
+    "background": "#162c35",
+    "foreground": "#c0c5ce",
+    "cursorColor": "#c0c5ce",
+    "selectionBackground": "#4f5b66",
+    "black": "#162c35",
+    "red": "#ec5f67",
+    "green": "#99c794",
+    "yellow": "#fac863",
+    "blue": "#6699cc",
+    "purple": "#c594c5",
+    "cyan": "#5fb3b3",
+    "white": "#ffffff",
+    "brightBlack": "#65737e",
+    "brightRed": "#ec5f67",
+    "brightGreen": "#99c794",
+    "brightYellow": "#fac863",
+    "brightBlue": "#6699cc",
+    "brightPurple": "#c594c5",
+    "brightCyan": "#5fb3b3",
+    "brightWhite": "#ffffff"
+  }
+}

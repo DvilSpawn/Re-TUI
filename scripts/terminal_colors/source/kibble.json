@@ -1,0 +1,32 @@
+{
+  "id": "kibble",
+  "sourceUrl": "https://term.const.net/en/themes/kibble/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "8aff91d055626942aed6a2b358c8cd9f4f6cca115fa5aa04bb3e2886aef4026f",
+  "paletteSha256": "2cbca3f079760599447d477f5b76428a14e0b2f3db31d3c1aaf95ccb88360827",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Kibble.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Kibble",
+    "background": "#0e100a",
+    "foreground": "#f7f7f7",
+    "cursorColor": "#9fda9c",
+    "selectionBackground": "#9ba787",
+    "black": "#4d4d4d",
+    "red": "#c70031",
+    "green": "#29cf13",
+    "yellow": "#d8e30e",
+    "blue": "#3449d1",
+    "purple": "#8400ff",
+    "cyan": "#0798ab",
+    "white": "#e2d1e3",
+    "brightBlack": "#5a5a5a",
+    "brightRed": "#f01578",
+    "brightGreen": "#6ce05c",
+    "brightYellow": "#f3f79e",
+    "brightBlue": "#97a4f7",
+    "brightPurple": "#c495f0",
+    "brightCyan": "#68f2e0",
+    "brightWhite": "#ffffff"
+  }
+}

@@ -1,7 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application>
+        <provider android:name="ohi.andre.consolelauncher.managers.settings.PaletteFixtureProvider"
+            android:authorities="${applicationId}.palette-fixtures"
+            android:exported="true" android:grantUriPermissions="true" />
         <provider android:name="ohi.andre.consolelauncher.managers.PresetFixtureProvider"
             android:authorities="${applicationId}.portable-fixtures"
+            android:process=":preset_recipient"
             android:exported="true" android:grantUriPermissions="true" />
     </application>
 </manifest>

@@ -260,3 +260,12 @@ of the upstream repository. The full upstream license and required notice are
 also included in the installed wallpaper page under Credits & license.
 
 See [adaptation details](docs/nagomi.md).
+
+## Module catalogue references
+
+The Todo, Daily Habits, Focus Timer, Bookmarks and Year Progress Lua modules
+were implemented for Re:TUI using the SimonSchubert/omarchy-widgets catalogue
+as a feature reference. The upstream catalogue is MIT-licensed, copyright
+(c) 2026 Simon Schubert and contributors. Reference links are recorded in
+`docs/MODULE_LIBRARY.md` and the module metadata; the upstream MIT notice is
+retained alongside the hosted catalogue at `modules/LICENSE`.

@@ -1,0 +1,32 @@
+{
+  "id": "cyberpunk-scarlet-protocol",
+  "sourceUrl": "https://term.const.net/en/themes/cyberpunk-scarlet-protocol/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "802b4c7e127213095f2d9ed1f4b90eebe10dec84a1591d606227c7ae9310f329",
+  "paletteSha256": "42f4f823b2238499148fb8e44d6d57dab11c3cb93ac3613846d72630f7fcaf4e",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Cyberpunk Scarlet Protocol.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Cyberpunk Scarlet Protocol",
+    "background": "#101116",
+    "foreground": "#e41951",
+    "cursorColor": "#76ff9f",
+    "selectionBackground": "#c1deff",
+    "black": "#101116",
+    "red": "#ff0051",
+    "green": "#01dc84",
+    "yellow": "#faf945",
+    "blue": "#0271b6",
+    "purple": "#c930c7",
+    "cyan": "#00c5c7",
+    "white": "#c7c7c7",
+    "brightBlack": "#686868",
+    "brightRed": "#ff6e67",
+    "brightGreen": "#60fa68",
+    "brightYellow": "#fffc67",
+    "brightBlue": "#6871ff",
+    "brightPurple": "#bd35ec",
+    "brightCyan": "#60fdff",
+    "brightWhite": "#ffffff"
+  }
+}

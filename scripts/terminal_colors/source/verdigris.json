@@ -1,0 +1,32 @@
+{
+  "id": "verdigris",
+  "sourceUrl": "https://term.const.net/en/themes/verdigris/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "485b0d308d75a7dfa99ec2d8b79254732676b7af393fdb0b74a9a7a708f4cbf7",
+  "paletteSha256": "f4e443449d45769f6ae5e1dcd0f95a069aaacae77f5e72f287325fbda51a996b",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Verdigris.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Verdigris",
+    "background": "#14110b",
+    "foreground": "#e8dcc6",
+    "cursorColor": "#ce8b45",
+    "selectionBackground": "#2a2417",
+    "black": "#221c12",
+    "red": "#d9604f",
+    "green": "#a8b86a",
+    "yellow": "#d9a441",
+    "blue": "#5fbfb0",
+    "purple": "#b98fb0",
+    "cyan": "#8fd6b0",
+    "white": "#bfb29a",
+    "brightBlack": "#6e6450",
+    "brightRed": "#d9604f",
+    "brightGreen": "#a8b86a",
+    "brightYellow": "#c97a45",
+    "brightBlue": "#5fbfb0",
+    "brightPurple": "#b98fb0",
+    "brightCyan": "#8fd6b0",
+    "brightWhite": "#e8dcc6"
+  }
+}

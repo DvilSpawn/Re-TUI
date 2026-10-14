@@ -165,8 +165,8 @@ class WidgetEditorActivity : ohi.andre.consolelauncher.localization.LocalizedAct
         capabilityView!!.setSingleLine(false)
         capabilityView!!.setTextSize(11f)
         capabilityView!!.setTypeface(Tuils.getTypeface(this))
-        capabilityView!!.setTextColor(textColor())
-        capabilityView!!.setAlpha(if (widgetMode) 0.82f else 0.55f)
+        capabilityView!!.setTextColor(ohi.andre.consolelauncher.managers.settings.ThemeColorResolver.color(
+            ohi.andre.consolelauncher.managers.xml.options.Theme.muted_text_color))
         val capabilityParams = LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
@@ -233,6 +233,13 @@ class WidgetEditorActivity : ohi.andre.consolelauncher.localization.LocalizedAct
             bottomBar.addView(run)
         }
 
+        if (widgetMode) {
+            val previewButton = button("Preview draft", false)
+            previewButton.setOnClickListener {
+                ohi.andre.consolelauncher.managers.lua.LuaWidgetPreview.show(this, widgetId ?: "draft", codeEditor!!.text.toString())
+            }
+            root.addView(previewButton)
+        }
         root.addView(bottomBar)
         setContentView(screen)
     }
@@ -448,6 +455,7 @@ class WidgetEditorActivity : ohi.andre.consolelauncher.localization.LocalizedAct
                 return
             }
 
+            LuaWidgetManager.requireCompatible(code)
             val name = documentNameEditor!!.getText().toString().trim { it <= ' ' }
             require(!TextUtils.isEmpty(name)) { getString(R.string.editor_widgeteditoractivity_document_name_is_required_d8c5c) }
             if (!TextUtils.equals(originalDocumentName, name)) {

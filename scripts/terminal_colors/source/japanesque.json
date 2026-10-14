@@ -1,0 +1,32 @@
+{
+  "id": "japanesque",
+  "sourceUrl": "https://term.const.net/en/themes/japanesque/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "1526c7dd73ddb944b022d460eeaf30a740e051b3d2491c822d9a4321fa349ee2",
+  "paletteSha256": "f90a2e88f290fdb300a4ca4c3f117eab35bc1c42708c5435e8049fe285081a21",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Japanesque.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Japanesque",
+    "background": "#1e1e1e",
+    "foreground": "#f7f6ec",
+    "cursorColor": "#edcf4f",
+    "selectionBackground": "#175877",
+    "black": "#343935",
+    "red": "#cf3f61",
+    "green": "#7bb75b",
+    "yellow": "#e9b32a",
+    "blue": "#4c9ad4",
+    "purple": "#a57fc4",
+    "cyan": "#389aad",
+    "white": "#fafaf6",
+    "brightBlack": "#595b59",
+    "brightRed": "#d18fa6",
+    "brightGreen": "#767f2c",
+    "brightYellow": "#78592f",
+    "brightBlue": "#135979",
+    "brightPurple": "#604291",
+    "brightCyan": "#76bbca",
+    "brightWhite": "#b2b5ae"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "slate",
+  "sourceUrl": "https://term.const.net/en/themes/slate/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "4b5d720420afa6dfac39ae6df0c7b366ea3dffe784761aade24bd623ddd6ed01",
+  "paletteSha256": "37525b56417ae19b9f974d86515eca105329a096816760b229a8026cc846cc13",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Slate.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Slate",
+    "background": "#222222",
+    "foreground": "#35b1d2",
+    "cursorColor": "#87d3c4",
+    "selectionBackground": "#0f3754",
+    "black": "#222222",
+    "red": "#e2a8bf",
+    "green": "#81d778",
+    "yellow": "#c4c9c0",
+    "blue": "#335856",
+    "purple": "#a481d3",
+    "cyan": "#15ab9c",
+    "white": "#02c5e0",
+    "brightBlack": "#ffffff",
+    "brightRed": "#ffcdd9",
+    "brightGreen": "#beffa8",
+    "brightYellow": "#d0ccca",
+    "brightBlue": "#7ab0d2",
+    "brightPurple": "#c5a7d9",
+    "brightCyan": "#8cdfe0",
+    "brightWhite": "#e0e0e0"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "argonaut",
+  "sourceUrl": "https://term.const.net/en/themes/argonaut/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "b7d8c99ce6e6812487cefb696d502cb5e3a09f21314ede333fefe6d9e5149ef8",
+  "paletteSha256": "5bf35b87720bfabdf9b286e8ca58afae0934c6817ae2d034daaebaa308fa8dfb",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Argonaut.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Argonaut",
+    "background": "#0e1019",
+    "foreground": "#fffaf4",
+    "cursorColor": "#ff0018",
+    "selectionBackground": "#002a3b",
+    "black": "#232323",
+    "red": "#ff000f",
+    "green": "#8ce10b",
+    "yellow": "#ffb900",
+    "blue": "#008df8",
+    "purple": "#6d43a6",
+    "cyan": "#00d8eb",
+    "white": "#ffffff",
+    "brightBlack": "#444444",
+    "brightRed": "#ff2740",
+    "brightGreen": "#abe15b",
+    "brightYellow": "#ffd242",
+    "brightBlue": "#0092ff",
+    "brightPurple": "#9a5feb",
+    "brightCyan": "#67fff0",
+    "brightWhite": "#ffffff"
+  }
+}

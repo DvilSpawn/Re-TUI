@@ -1,0 +1,32 @@
+{
+  "id": "srcery",
+  "sourceUrl": "https://term.const.net/en/themes/srcery/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "286b7eba2e6768b0d7167c5f171bc7dd684e056e3eed92187b61d4922677a052",
+  "paletteSha256": "2b78334d1722c051bfc47e2f0de22c0b1fa7edaeb54d6650b28809df8157ff3e",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Srcery.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Srcery",
+    "background": "#1c1b19",
+    "foreground": "#fce8c3",
+    "cursorColor": "#fbb829",
+    "selectionBackground": "#fce8c3",
+    "black": "#1c1b19",
+    "red": "#ef2f27",
+    "green": "#519f50",
+    "yellow": "#fbb829",
+    "blue": "#2c78bf",
+    "purple": "#e02c6d",
+    "cyan": "#0aaeb3",
+    "white": "#baa67f",
+    "brightBlack": "#918175",
+    "brightRed": "#f75341",
+    "brightGreen": "#98bc37",
+    "brightYellow": "#fed06e",
+    "brightBlue": "#68a8e4",
+    "brightPurple": "#ff5c8f",
+    "brightCyan": "#2be4d0",
+    "brightWhite": "#fce8c3"
+  }
+}

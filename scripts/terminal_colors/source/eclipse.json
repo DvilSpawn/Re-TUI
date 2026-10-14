@@ -1,0 +1,32 @@
+{
+  "id": "eclipse",
+  "sourceUrl": "https://term.const.net/en/themes/eclipse/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "c59e9e6fcedb4f914b0689977500edd630cd7956a4a2594a08c2ecbcd59f5351",
+  "paletteSha256": "7f5ad73ae0d97ccc1d95fe22747cc873f1dd87c5b1e8ddf989b3767d39754a01",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Eclipse.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Eclipse",
+    "background": "#0e1116",
+    "foreground": "#dce3ed",
+    "cursorColor": "#f6c45f",
+    "selectionBackground": "#25324a",
+    "black": "#0a0d12",
+    "red": "#ff6366",
+    "green": "#85df5e",
+    "yellow": "#f1c655",
+    "blue": "#5fb9ff",
+    "purple": "#cea5ff",
+    "cyan": "#3addc4",
+    "white": "#b7c0ce",
+    "brightBlack": "#5c6675",
+    "brightRed": "#ff8688",
+    "brightGreen": "#a0ec7e",
+    "brightYellow": "#fad77c",
+    "brightBlue": "#84ccff",
+    "brightPurple": "#ddbfff",
+    "brightCyan": "#68ead3",
+    "brightWhite": "#f4f8fd"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "ic-orange-ppl",
+  "sourceUrl": "https://term.const.net/en/themes/ic-orange-ppl/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "0b41950faac0be11034f4236fc2dc9605dc7c589d795572eb5f1c078b5ce3b8b",
+  "paletteSha256": "243f34c23a1261df7083d00df2fbf3288ff5aaac4c01b731f5dd4b9afdd2372b",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/IC Orange PPL.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "IC Orange PPL",
+    "background": "#262626",
+    "foreground": "#ffcb83",
+    "cursorColor": "#fc531d",
+    "selectionBackground": "#c14020",
+    "black": "#000000",
+    "red": "#c13900",
+    "green": "#a4a900",
+    "yellow": "#caaf00",
+    "blue": "#bd6d00",
+    "purple": "#fc5e00",
+    "cyan": "#f79500",
+    "white": "#ffc88a",
+    "brightBlack": "#6a4f2a",
+    "brightRed": "#ff8c68",
+    "brightGreen": "#f6ff40",
+    "brightYellow": "#ffe36e",
+    "brightBlue": "#ffbe55",
+    "brightPurple": "#fc874f",
+    "brightCyan": "#c69752",
+    "brightWhite": "#fafaff"
+  }
+}

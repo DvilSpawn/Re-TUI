@@ -1,0 +1,32 @@
+{
+  "id": "cga",
+  "sourceUrl": "https://term.const.net/en/themes/cga/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "95275b499d54dce2bcf847d767e07b0c126e4f40f701b3744e8bd2ab99f39084",
+  "paletteSha256": "de13f6b35f9f571025aeb5dad5740419d0c5b026c73ee44cc97e0db3aef97dfc",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/CGA.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "CGA",
+    "background": "#000000",
+    "foreground": "#aaaaaa",
+    "cursorColor": "#b8b8b8",
+    "selectionBackground": "#c1deff",
+    "black": "#000000",
+    "red": "#aa0000",
+    "green": "#00aa00",
+    "yellow": "#aa5500",
+    "blue": "#0d0db7",
+    "purple": "#aa00aa",
+    "cyan": "#00aaaa",
+    "white": "#aaaaaa",
+    "brightBlack": "#555555",
+    "brightRed": "#ff5555",
+    "brightGreen": "#55ff55",
+    "brightYellow": "#ffff55",
+    "brightBlue": "#5555ff",
+    "brightPurple": "#ff55ff",
+    "brightCyan": "#55ffff",
+    "brightWhite": "#ffffff"
+  }
+}

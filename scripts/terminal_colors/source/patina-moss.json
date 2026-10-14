@@ -1,0 +1,32 @@
+{
+  "id": "patina-moss",
+  "sourceUrl": "https://term.const.net/en/themes/patina-moss/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "51b9b587488f46239967d6007ba177d44898de594178a2a5c3cdfdf6a86d70f4",
+  "paletteSha256": "baaff6b96d6eda1c5345ecad1ef01f14988d3fd0449c5db344e357b2378ae0f0",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Patina Moss.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Patina Moss",
+    "background": "#20231f",
+    "foreground": "#dbd7ca",
+    "cursorColor": "#dbd7ca",
+    "selectionBackground": "#383b31",
+    "black": "#33362e",
+    "red": "#c07878",
+    "green": "#5ba886",
+    "yellow": "#d4bf6e",
+    "blue": "#65a8b5",
+    "purple": "#c08a7d",
+    "cyan": "#63a8a6",
+    "white": "#dbd7ca",
+    "brightBlack": "#585b51",
+    "brightRed": "#c07878",
+    "brightGreen": "#5ba886",
+    "brightYellow": "#d4bf6e",
+    "brightBlue": "#65a8b5",
+    "brightPurple": "#c08a7d",
+    "brightCyan": "#63a8a6",
+    "brightWhite": "#dbd7ca"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "sequoia-moonlight-light",
+  "sourceUrl": "https://term.const.net/en/themes/sequoia-moonlight-light/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "293fed7af2cfb4377d1844bfb2784b385d5937f7728a4313d40fc26d4c50b488",
+  "paletteSha256": "1e321177504a8833cf911711dcae5fe5ef20ee31b808eea0daa5daa6a50011bb",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Sequoia Moonlight Light.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Sequoia Moonlight Light",
+    "background": "#edeef2",
+    "foreground": "#282930",
+    "cursorColor": "#565760",
+    "selectionBackground": "#817c9c",
+    "black": "#d4d5dc",
+    "red": "#c94da8",
+    "green": "#4a85d4",
+    "yellow": "#6a6a78",
+    "blue": "#9a5fd9",
+    "purple": "#282930",
+    "cyan": "#d9884a",
+    "white": "#282930",
+    "brightBlack": "#42434e",
+    "brightRed": "#c94da8",
+    "brightGreen": "#4a85d4",
+    "brightYellow": "#6a6a78",
+    "brightBlue": "#9a5fd9",
+    "brightPurple": "#282930",
+    "brightCyan": "#d9884a",
+    "brightWhite": "#282930"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "github",
+  "sourceUrl": "https://term.const.net/en/themes/github/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "ceb977b6d1d0848407ea71fd4a578ee882d90d13fc7b9b3573e7144a57bf730b",
+  "paletteSha256": "19eef9c1181cd0e24b4120605aaa961cbdd22c7c55d11dc0258f615a87940b16",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/GitHub.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "GitHub",
+    "background": "#f4f4f4",
+    "foreground": "#3e3e3e",
+    "cursorColor": "#3f3f3f",
+    "selectionBackground": "#a9c1e2",
+    "black": "#3e3e3e",
+    "red": "#970b16",
+    "green": "#07962a",
+    "yellow": "#c5bb94",
+    "blue": "#003e8a",
+    "purple": "#e94691",
+    "cyan": "#7cc4df",
+    "white": "#b2b2b2",
+    "brightBlack": "#666666",
+    "brightRed": "#de0000",
+    "brightGreen": "#7ac895",
+    "brightYellow": "#d7b600",
+    "brightBlue": "#2e6cba",
+    "brightPurple": "#f29592",
+    "brightCyan": "#00c7cb",
+    "brightWhite": "#ffffff"
+  }
+}

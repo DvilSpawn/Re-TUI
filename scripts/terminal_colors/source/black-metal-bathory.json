@@ -1,0 +1,32 @@
+{
+  "id": "black-metal-bathory",
+  "sourceUrl": "https://term.const.net/en/themes/black-metal-bathory/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "c5bb7c7324d8cefbb41c1d3b278910cbcd98acb7645ace39544129eecbb7cd78",
+  "paletteSha256": "81111c9bd6d807a1f2f8e7b5cb63053df5d2c20ebf034d422f4dd3dd1ab38170",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Black Metal (Bathory).json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Black Metal (Bathory)",
+    "background": "#000000",
+    "foreground": "#c1c1c1",
+    "cursorColor": "#c1c1c1",
+    "selectionBackground": "#c1c1c1",
+    "black": "#000000",
+    "red": "#5f8787",
+    "green": "#fbcb97",
+    "yellow": "#e78a53",
+    "blue": "#888888",
+    "purple": "#999999",
+    "cyan": "#aaaaaa",
+    "white": "#c1c1c1",
+    "brightBlack": "#404040",
+    "brightRed": "#5f8787",
+    "brightGreen": "#fbcb97",
+    "brightYellow": "#e78a53",
+    "brightBlue": "#888888",
+    "brightPurple": "#999999",
+    "brightCyan": "#aaaaaa",
+    "brightWhite": "#c1c1c1"
+  }
+}

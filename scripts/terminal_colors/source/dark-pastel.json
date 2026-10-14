@@ -1,0 +1,32 @@
+{
+  "id": "dark-pastel",
+  "sourceUrl": "https://term.const.net/en/themes/dark-pastel/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "202a99c94c048d45a2b6e269e747121624d59891f2a3348557e6aadf00a288f1",
+  "paletteSha256": "79be1c0c3be51e552284807ffee128acc8283f7e155e34edfdee7365553a8f64",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Dark Pastel.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Dark Pastel",
+    "background": "#000000",
+    "foreground": "#ffffff",
+    "cursorColor": "#bbbbbb",
+    "selectionBackground": "#b5d5ff",
+    "black": "#000000",
+    "red": "#ff5555",
+    "green": "#55ff55",
+    "yellow": "#ffff55",
+    "blue": "#5555ff",
+    "purple": "#ff55ff",
+    "cyan": "#55ffff",
+    "white": "#bbbbbb",
+    "brightBlack": "#555555",
+    "brightRed": "#ff5555",
+    "brightGreen": "#55ff55",
+    "brightYellow": "#ffff55",
+    "brightBlue": "#5555ff",
+    "brightPurple": "#ff55ff",
+    "brightCyan": "#55ffff",
+    "brightWhite": "#ffffff"
+  }
+}

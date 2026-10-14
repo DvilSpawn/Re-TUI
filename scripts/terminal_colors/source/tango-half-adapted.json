@@ -1,0 +1,32 @@
+{
+  "id": "tango-half-adapted",
+  "sourceUrl": "https://term.const.net/en/themes/tango-half-adapted/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "723a3bd5e3a70ddaec3cef091c6478402ac241c48c1a73ab7f921b64e069dacd",
+  "paletteSha256": "99be1b37d1034081221af81b4bb5b1442a772ce78e85dbd8a5962e25f0aef976",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Tango Half Adapted.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Tango Half Adapted",
+    "background": "#ffffff",
+    "foreground": "#000000",
+    "cursorColor": "#000000",
+    "selectionBackground": "#c1deff",
+    "black": "#000000",
+    "red": "#ff0000",
+    "green": "#4cc300",
+    "yellow": "#e2c000",
+    "blue": "#008ef6",
+    "purple": "#a96cb3",
+    "cyan": "#00bdc3",
+    "white": "#babfb5",
+    "brightBlack": "#797d76",
+    "brightRed": "#ff0013",
+    "brightGreen": "#70dc00",
+    "brightYellow": "#d9c600",
+    "brightBlue": "#76bfff",
+    "brightPurple": "#d898d1",
+    "brightCyan": "#00d0d4",
+    "brightWhite": "#f4f4f2"
+  }
+}

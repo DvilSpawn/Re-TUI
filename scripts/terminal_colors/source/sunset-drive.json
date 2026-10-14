@@ -1,0 +1,32 @@
+{
+  "id": "sunset-drive",
+  "sourceUrl": "https://term.const.net/en/themes/sunset-drive/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "91100323d3943017607247ce02884e8feac5f27058e3cc2980f608c218d3a8c7",
+  "paletteSha256": "b32d304a55ad25eaa81145424995503a682c2311e88d10a4614b3f848a45f958",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Sunset Drive.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Sunset Drive",
+    "background": "#0f0f1a",
+    "foreground": "#ededfe",
+    "cursorColor": "#ededfe",
+    "selectionBackground": "#202036",
+    "black": "#0a0a13",
+    "red": "#ff0063",
+    "green": "#00f992",
+    "yellow": "#ffe900",
+    "blue": "#00a4ff",
+    "purple": "#ff57fd",
+    "cyan": "#00ffed",
+    "white": "#ededff",
+    "brightBlack": "#3e3e4b",
+    "brightRed": "#ff948b",
+    "brightGreen": "#00fcb9",
+    "brightYellow": "#ffff68",
+    "brightBlue": "#3ea0ff",
+    "brightPurple": "#ff93ff",
+    "brightCyan": "#38ffff",
+    "brightWhite": "#f8f8ff"
+  }
+}

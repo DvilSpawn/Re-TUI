@@ -1,0 +1,32 @@
+{
+  "id": "sandstone-classic",
+  "sourceUrl": "https://term.const.net/en/themes/sandstone-classic/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "9a65a1854408845f60bea3333fa67c8dd35ed57e0d6d714c5f058bc165de3cc6",
+  "paletteSha256": "5536fa38fd2072135ac08982628f6750401ab3a325412e81cf5b868383842123",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Sandstone Classic.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Sandstone Classic",
+    "background": "#fdf6e3",
+    "foreground": "#3d5259",
+    "cursorColor": "#3d5259",
+    "selectionBackground": "#e4dcc8",
+    "black": "#073642",
+    "red": "#cf2522",
+    "green": "#5d7b00",
+    "yellow": "#865e00",
+    "blue": "#0d6eb2",
+    "purple": "#c42a78",
+    "cyan": "#037a71",
+    "white": "#6e6855",
+    "brightBlack": "#3d5259",
+    "brightRed": "#c04010",
+    "brightGreen": "#5e7171",
+    "brightYellow": "#5b7070",
+    "brightBlue": "#5c6f6f",
+    "brightPurple": "#5f64b7",
+    "brightCyan": "#5f6e6e",
+    "brightWhite": "#fdf6e3"
+  }
+}

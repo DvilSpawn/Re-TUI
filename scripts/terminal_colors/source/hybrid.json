@@ -1,0 +1,32 @@
+{
+  "id": "hybrid",
+  "sourceUrl": "https://term.const.net/en/themes/hybrid/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "15b8dfa5ea781ca263b0466e4698011e85cdd7d9d0090475764b1a614ba0d775",
+  "paletteSha256": "020cff1b914f46c7338b16fad4c00d44a9cb7254012da8644aa99b096209a5a9",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Hybrid.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Hybrid",
+    "background": "#161719",
+    "foreground": "#b7bcba",
+    "cursorColor": "#b7bcba",
+    "selectionBackground": "#1e1f22",
+    "black": "#2a2e33",
+    "red": "#b84d51",
+    "green": "#b3bf5a",
+    "yellow": "#e4b55e",
+    "blue": "#6e90b0",
+    "purple": "#a17eac",
+    "cyan": "#7fbfb4",
+    "white": "#b5b9b6",
+    "brightBlack": "#434548",
+    "brightRed": "#8d2e32",
+    "brightGreen": "#798431",
+    "brightYellow": "#e58a50",
+    "brightBlue": "#4b6b88",
+    "brightPurple": "#6e5079",
+    "brightCyan": "#4d7b74",
+    "brightWhite": "#5a626a"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "twilight",
+  "sourceUrl": "https://term.const.net/en/themes/twilight/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "2287c8dfb1df1586031377d04a075ee1a1f139b02146f4fa2e20740a63d696bf",
+  "paletteSha256": "e67f9e9b134e72805564828f7a2767bc1812f5ad0ffdbbc65f2a740669d64be5",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Twilight.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Twilight",
+    "background": "#141414",
+    "foreground": "#ffffd4",
+    "cursorColor": "#ffffff",
+    "selectionBackground": "#313131",
+    "black": "#141414",
+    "red": "#c06d44",
+    "green": "#afb97a",
+    "yellow": "#c2a86c",
+    "blue": "#44474a",
+    "purple": "#b4be7c",
+    "cyan": "#778385",
+    "white": "#ffffd4",
+    "brightBlack": "#404040",
+    "brightRed": "#de7c4c",
+    "brightGreen": "#ccd88c",
+    "brightYellow": "#e2c47e",
+    "brightBlue": "#5a5e62",
+    "brightPurple": "#d0dc8e",
+    "brightCyan": "#8a989b",
+    "brightWhite": "#ffffd4"
+  }
+}

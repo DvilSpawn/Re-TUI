@@ -1,0 +1,32 @@
+{
+  "id": "snazzy-soft",
+  "sourceUrl": "https://term.const.net/en/themes/snazzy-soft/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "37466a75c5080a288dc79edaa929666411d39ef501cf7fc56e7687eea678d8bf",
+  "paletteSha256": "7f82e2d4eb041e2e928721fd4007bee7c388b127a230343f37d010cc71ab1f59",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Snazzy Soft.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Snazzy Soft",
+    "background": "#282a36",
+    "foreground": "#eff0eb",
+    "cursorColor": "#eaeaea",
+    "selectionBackground": "#92bcd0",
+    "black": "#000000",
+    "red": "#ff5c57",
+    "green": "#5af78e",
+    "yellow": "#f3f99d",
+    "blue": "#57c7ff",
+    "purple": "#ff6ac1",
+    "cyan": "#9aedfe",
+    "white": "#f1f1f0",
+    "brightBlack": "#686868",
+    "brightRed": "#ff5c57",
+    "brightGreen": "#5af78e",
+    "brightYellow": "#f3f99d",
+    "brightBlue": "#57c7ff",
+    "brightPurple": "#ff6ac1",
+    "brightCyan": "#9aedfe",
+    "brightWhite": "#f1f1f0"
+  }
+}

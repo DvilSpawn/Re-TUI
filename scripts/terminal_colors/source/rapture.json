@@ -1,0 +1,32 @@
+{
+  "id": "rapture",
+  "sourceUrl": "https://term.const.net/en/themes/rapture/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "b6138d0caf6769cbe02ea89f25c3372d15d5e1118b9f729bcffc60fc8abbc59e",
+  "paletteSha256": "a2d0017da0eeec0b409b6e0b1cac1b48de581bc291dad3abe32847e321e3597e",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Rapture.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Rapture",
+    "background": "#111e2a",
+    "foreground": "#c0c9e5",
+    "cursorColor": "#ffffff",
+    "selectionBackground": "#304b66",
+    "black": "#000000",
+    "red": "#fc644d",
+    "green": "#7afde1",
+    "yellow": "#fff09b",
+    "blue": "#6c9bf5",
+    "purple": "#ff4fa1",
+    "cyan": "#64e0ff",
+    "white": "#c0c9e5",
+    "brightBlack": "#304b66",
+    "brightRed": "#fc644d",
+    "brightGreen": "#7afde1",
+    "brightYellow": "#fff09b",
+    "brightBlue": "#6c9bf5",
+    "brightPurple": "#ff4fa1",
+    "brightCyan": "#64e0ff",
+    "brightWhite": "#ffffff"
+  }
+}

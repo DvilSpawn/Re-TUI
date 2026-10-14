@@ -1,0 +1,32 @@
+{
+  "id": "squirrelsong-dark",
+  "sourceUrl": "https://term.const.net/en/themes/squirrelsong-dark/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "60ba65b37264a067d9ab2d199806e964cd39e84b4a43a43a65ff7cdc33bac6a7",
+  "paletteSha256": "38893a1e54f7cbfa30fa87e150b4af1e24cb4198509aeb0eeb230c283e3b7c1e",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Squirrelsong Dark.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Squirrelsong Dark",
+    "background": "#372920",
+    "foreground": "#b19b89",
+    "cursorColor": "#b19b89",
+    "selectionBackground": "#5b402e",
+    "black": "#372920",
+    "red": "#ba4138",
+    "green": "#468336",
+    "yellow": "#d4b139",
+    "blue": "#4395c6",
+    "purple": "#855fb8",
+    "cyan": "#2f9794",
+    "white": "#d3b9a2",
+    "brightBlack": "#704f39",
+    "brightRed": "#df4d43",
+    "brightGreen": "#659a4c",
+    "brightYellow": "#e8c23f",
+    "brightBlue": "#4ca4db",
+    "brightPurple": "#9d70da",
+    "brightCyan": "#60aca9",
+    "brightWhite": "#f2d4bb"
+  }
+}

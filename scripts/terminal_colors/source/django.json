@@ -1,0 +1,32 @@
+{
+  "id": "django",
+  "sourceUrl": "https://term.const.net/en/themes/django/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "cf065ce95e0df27a718c433e4ab4053e32125a1d9aa53dd5e4db3634964ab21a",
+  "paletteSha256": "c6e61e04f2296279440f941c4798bdaced233a344ee7682abd2741f425c175e7",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Django.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Django",
+    "background": "#0b2f20",
+    "foreground": "#f8f8f8",
+    "cursorColor": "#336442",
+    "selectionBackground": "#245032",
+    "black": "#000000",
+    "red": "#fd6209",
+    "green": "#41a83e",
+    "yellow": "#ffe862",
+    "blue": "#315d3f",
+    "purple": "#f8f8f8",
+    "cyan": "#9df39f",
+    "white": "#ffffff",
+    "brightBlack": "#585858",
+    "brightRed": "#ff943b",
+    "brightGreen": "#73da70",
+    "brightYellow": "#ffff94",
+    "brightBlue": "#568264",
+    "brightPurple": "#ffffff",
+    "brightCyan": "#cfffd1",
+    "brightWhite": "#ffffff"
+  }
+}

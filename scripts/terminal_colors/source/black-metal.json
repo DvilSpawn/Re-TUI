@@ -1,0 +1,32 @@
+{
+  "id": "black-metal",
+  "sourceUrl": "https://term.const.net/en/themes/black-metal/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "c4f3e15c9faf4779605685f54b5910acb220251c7369f46af42320ac4c974d55",
+  "paletteSha256": "0af940d65ae840137969afb714ae0f2268ffa3b86b09e48db31257506c8c038f",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Black Metal.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Black Metal",
+    "background": "#000000",
+    "foreground": "#c1c1c1",
+    "cursorColor": "#c1c1c1",
+    "selectionBackground": "#c1c1c1",
+    "black": "#000000",
+    "red": "#486e6f",
+    "green": "#dd9999",
+    "yellow": "#a06666",
+    "blue": "#888888",
+    "purple": "#999999",
+    "cyan": "#aaaaaa",
+    "white": "#c1c1c1",
+    "brightBlack": "#404040",
+    "brightRed": "#486e6f",
+    "brightGreen": "#dd9999",
+    "brightYellow": "#a06666",
+    "brightBlue": "#888888",
+    "brightPurple": "#999999",
+    "brightCyan": "#aaaaaa",
+    "brightWhite": "#c1c1c1"
+  }
+}

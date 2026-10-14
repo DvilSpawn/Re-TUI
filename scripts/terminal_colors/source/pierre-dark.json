@@ -1,0 +1,32 @@
+{
+  "id": "pierre-dark",
+  "sourceUrl": "https://term.const.net/en/themes/pierre-dark/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "447439f8553a095c4ec171bfe3f82f8a46e808bf45eb4735e04389cdf4931877",
+  "paletteSha256": "c258a22845f19820651ef0d71fbdfbb09772145e7eef60bd9d92745da55654d8",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Pierre Dark.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Pierre Dark",
+    "background": "#070707",
+    "foreground": "#fbfbfb",
+    "cursorColor": "#009fff",
+    "selectionBackground": "#19283c",
+    "black": "#141415",
+    "red": "#ff2e3f",
+    "green": "#0dbe4e",
+    "yellow": "#ffca00",
+    "blue": "#009fff",
+    "purple": "#c635e4",
+    "cyan": "#08c0ef",
+    "white": "#c6c6c8",
+    "brightBlack": "#6c6c71",
+    "brightRed": "#ff6762",
+    "brightGreen": "#5ecc71",
+    "brightYellow": "#ffd452",
+    "brightBlue": "#69b1ff",
+    "brightPurple": "#d568ea",
+    "brightCyan": "#68cdf2",
+    "brightWhite": "#fbfbfb"
+  }
+}

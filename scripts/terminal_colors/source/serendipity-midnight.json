@@ -1,0 +1,32 @@
+{
+  "id": "serendipity-midnight",
+  "sourceUrl": "https://term.const.net/en/themes/serendipity-midnight/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "80930e76d015453c795c2522c2b5a70558c6e51eac66023f0b0fa5a5ecdfb8b8",
+  "paletteSha256": "e4a0bcdca47259fd981d2d0a4219b75734ec5f44be1148e1875d2213d1d733bc",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Serendipity Midnight.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Serendipity Midnight",
+    "background": "#151726",
+    "foreground": "#dee0ef",
+    "cursorColor": "#6b6d7c",
+    "selectionBackground": "#6b6d7c",
+    "black": "#232534",
+    "red": "#ee8679",
+    "green": "#5ba2d0",
+    "yellow": "#a78bfa",
+    "blue": "#94b8ff",
+    "purple": "#9ccfd8",
+    "cyan": "#f8d2c9",
+    "white": "#dee0ef",
+    "brightBlack": "#8d8f9e",
+    "brightRed": "#ee8679",
+    "brightGreen": "#5ba2d0",
+    "brightYellow": "#a78bfa",
+    "brightBlue": "#94b8ff",
+    "brightPurple": "#9ccfd8",
+    "brightCyan": "#f8d2c9",
+    "brightWhite": "#dee0ef"
+  }
+}

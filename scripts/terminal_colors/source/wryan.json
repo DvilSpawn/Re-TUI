@@ -1,0 +1,32 @@
+{
+  "id": "wryan",
+  "sourceUrl": "https://term.const.net/en/themes/wryan/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "c96d1cbe406cafd06f555fafac310beb352388247479fe8d96e3e06a452b125b",
+  "paletteSha256": "b4d360514ff554e1575c1471af3e0be31463d2c6dd296aaab1d2d1c4cd9e650b",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Wryan.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Wryan",
+    "background": "#101010",
+    "foreground": "#999993",
+    "cursorColor": "#9e9ecb",
+    "selectionBackground": "#4d4d4d",
+    "black": "#333333",
+    "red": "#8c4665",
+    "green": "#287373",
+    "yellow": "#7c7c99",
+    "blue": "#395573",
+    "purple": "#5e468c",
+    "cyan": "#31658c",
+    "white": "#899ca1",
+    "brightBlack": "#3d3d3d",
+    "brightRed": "#bf4d80",
+    "brightGreen": "#53a6a6",
+    "brightYellow": "#9e9ecb",
+    "brightBlue": "#477ab3",
+    "brightPurple": "#7e62b3",
+    "brightCyan": "#6096bf",
+    "brightWhite": "#c0c0c0"
+  }
+}

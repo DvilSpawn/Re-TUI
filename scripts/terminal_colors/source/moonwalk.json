@@ -1,0 +1,32 @@
+{
+  "id": "moonwalk",
+  "sourceUrl": "https://term.const.net/en/themes/moonwalk/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "66c29d95848200b53d673426cf2446f66b5b57dd65a00174e4e8a0572f94d172",
+  "paletteSha256": "729d0f1d095e519d0206c1275de7d12cf2762e02a39105f06f06d61b6e38a8c0",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Moonwalk.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Moonwalk",
+    "background": "#e4e2e0",
+    "foreground": "#061f4a",
+    "cursorColor": "#061f4a",
+    "selectionBackground": "#b8d2e5",
+    "black": "#080808",
+    "red": "#7a0047",
+    "green": "#145b0e",
+    "yellow": "#733a11",
+    "blue": "#002fa7",
+    "purple": "#5400a8",
+    "cyan": "#00566b",
+    "white": "#9c958d",
+    "brightBlack": "#494440",
+    "brightRed": "#af1608",
+    "brightGreen": "#4c6129",
+    "brightYellow": "#7a5000",
+    "brightBlue": "#0d50c5",
+    "brightPurple": "#952197",
+    "brightCyan": "#006092",
+    "brightWhite": "#ffffff"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "chalkboard",
+  "sourceUrl": "https://term.const.net/en/themes/chalkboard/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "66e0e6db0792ca360c655332de95a80be8c3d4b27a39b2637d837d3c03381734",
+  "paletteSha256": "6fd3581629d4efccf173d21f267a01ca8ac9613b1f99bdccccfcd937880c678d",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Chalkboard.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Chalkboard",
+    "background": "#29262f",
+    "foreground": "#d9e6f2",
+    "cursorColor": "#d9e6f2",
+    "selectionBackground": "#073642",
+    "black": "#000000",
+    "red": "#c37372",
+    "green": "#72c373",
+    "yellow": "#c2c372",
+    "blue": "#7372c3",
+    "purple": "#c372c2",
+    "cyan": "#72c2c3",
+    "white": "#d9d9d9",
+    "brightBlack": "#585858",
+    "brightRed": "#dbaaaa",
+    "brightGreen": "#aadbaa",
+    "brightYellow": "#dadbaa",
+    "brightBlue": "#aaaadb",
+    "brightPurple": "#dbaada",
+    "brightCyan": "#aadadb",
+    "brightWhite": "#ffffff"
+  }
+}

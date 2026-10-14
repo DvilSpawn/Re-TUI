@@ -1,0 +1,32 @@
+{
+  "id": "relaxed",
+  "sourceUrl": "https://term.const.net/en/themes/relaxed/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "0f0087109293b67a85a83d4718ee5bee984b2fd800bedb091a62a0d66fba56ea",
+  "paletteSha256": "5837f3595d41e274820f70e57b3fa4ab598eb46ceb64c3db8307ce7621e8ca3d",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Relaxed.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Relaxed",
+    "background": "#353a44",
+    "foreground": "#d9d9d9",
+    "cursorColor": "#d9d9d9",
+    "selectionBackground": "#6a7985",
+    "black": "#151515",
+    "red": "#bc5653",
+    "green": "#909d63",
+    "yellow": "#ebc17a",
+    "blue": "#6a8799",
+    "purple": "#b06698",
+    "cyan": "#c9dfff",
+    "white": "#d9d9d9",
+    "brightBlack": "#636363",
+    "brightRed": "#bc5653",
+    "brightGreen": "#a0ac77",
+    "brightYellow": "#ebc17a",
+    "brightBlue": "#7eaac7",
+    "brightPurple": "#b06698",
+    "brightCyan": "#acbbd0",
+    "brightWhite": "#f7f7f7"
+  }
+}

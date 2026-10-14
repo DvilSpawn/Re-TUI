@@ -1,0 +1,32 @@
+{
+  "id": "rebecca",
+  "sourceUrl": "https://term.const.net/en/themes/rebecca/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "4fb1e0d2ab6e614384af8718d156ca6f1e2b1c5a3b060d67f6119725e64a4c56",
+  "paletteSha256": "b24d9e786293e9d2eeb0fc4ef1579d88b1a44eb596fd864911249193bc5b2fb3",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Rebecca.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Rebecca",
+    "background": "#292a44",
+    "foreground": "#e8e6ed",
+    "cursorColor": "#b89bf9",
+    "selectionBackground": "#663399",
+    "black": "#12131e",
+    "red": "#dd7755",
+    "green": "#04dbb5",
+    "yellow": "#f2e7b7",
+    "blue": "#7aa5ff",
+    "purple": "#bf9cf9",
+    "cyan": "#56d3c2",
+    "white": "#e4e3e9",
+    "brightBlack": "#666699",
+    "brightRed": "#ff92cd",
+    "brightGreen": "#01eac0",
+    "brightYellow": "#fffca8",
+    "brightBlue": "#69c0fa",
+    "brightPurple": "#c17ff8",
+    "brightCyan": "#8bfde1",
+    "brightWhite": "#f4f2f9"
+  }
+}

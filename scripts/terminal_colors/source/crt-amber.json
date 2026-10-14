@@ -1,0 +1,32 @@
+{
+  "id": "crt-amber",
+  "sourceUrl": "https://term.const.net/en/themes/crt-amber/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "26bb317023fc282d457e10c15f9c163e1410eaa58d19688487f2badaf1409013",
+  "paletteSha256": "66c1b247c434882f8c2cf3a9ced414d574fd36fc67e88c3bb15cc38e07cac9b1",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/CRT Amber.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "CRT Amber",
+    "background": "#1a1005",
+    "foreground": "#fff3c4",
+    "cursorColor": "#fff3c4",
+    "selectionBackground": "#fff3c4",
+    "black": "#4c422f",
+    "red": "#ef4444",
+    "green": "#84cc16",
+    "yellow": "#fde68a",
+    "blue": "#c084fc",
+    "purple": "#f97316",
+    "cyan": "#f59e0b",
+    "white": "#d8a657",
+    "brightBlack": "#544435",
+    "brightRed": "#f26969",
+    "brightGreen": "#9dd645",
+    "brightYellow": "#fdeb9f",
+    "brightBlue": "#cd9dfd",
+    "brightPurple": "#fa8f45",
+    "brightCyan": "#f7b13c",
+    "brightWhite": "#fff3c4"
+  }
+}

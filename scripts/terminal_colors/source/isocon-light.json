@@ -1,0 +1,32 @@
+{
+  "id": "isocon-light",
+  "sourceUrl": "https://term.const.net/en/themes/isocon-light/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "ba7ef9dfc3795788da9af72574c63e68c61e28215a589f17713da9e1fcae313e",
+  "paletteSha256": "842a063fa523c617a5aee60067d9055ede9b76bc7490946f4b1b7c182fe9c9d7",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Isocon Light.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Isocon Light",
+    "background": "#eef3ea",
+    "foreground": "#6e6e6e",
+    "cursorColor": "#6e6e6e",
+    "selectionBackground": "#6e6e6e",
+    "black": "#eef3ea",
+    "red": "#c33f3d",
+    "green": "#347b47",
+    "yellow": "#856b31",
+    "blue": "#2f6bcf",
+    "purple": "#9242d6",
+    "cyan": "#306f72",
+    "white": "#6e6e6e",
+    "brightBlack": "#8c8c8c",
+    "brightRed": "#d0272f",
+    "brightGreen": "#1f7d3f",
+    "brightYellow": "#896a1c",
+    "brightBlue": "#1a67e1",
+    "brightPurple": "#982ae9",
+    "brightCyan": "#1c7175",
+    "brightWhite": "#6e6e6e"
+  }
+}

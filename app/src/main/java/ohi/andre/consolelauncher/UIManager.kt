@@ -3962,6 +3962,29 @@ class UIManager(
         refreshSuggestionsForActiveModule()
     }
 
+    /** Uses the module renderer while making every generated action inert. */
+    fun buildLuaPreview(module: String, result: LuaWidgetEngine.RenderResult): View {
+        val panel = LinearLayout(mContext).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(Tuils.dpToPx(mContext, 12), Tuils.dpToPx(mContext, 12), Tuils.dpToPx(mContext, 12), Tuils.dpToPx(mContext, 12))
+            ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.stylePanel(mContext, this)
+        }
+        addLuaText(panel, result.title?.takeIf { it.isNotBlank() } ?: LuaWidgetManager.getName(module), module)
+        if (TextUtils.isEmpty(result.layoutJson) || !renderLuaLayout(panel, module, result.layoutJson)) {
+            addLuaBodyText(panel, result.body?.takeIf { it.isNotEmpty() } ?: "No module output", module)
+        }
+        addLuaResultActions(panel, module, module, result)
+        for (suggestion in result.suggestions) addLuaText(panel, suggestion?.label, module)
+        fun makeInert(view: View) {
+            view.setOnClickListener(null)
+            view.isClickable = false
+            view.isLongClickable = false
+            if (view is ViewGroup) for (index in 0 until view.childCount) makeInert(view.getChildAt(index))
+        }
+        makeInert(panel)
+        return panel
+    }
+
     private fun showLuaWidgetModule(
         module: String?,
         widgetId: String?,
@@ -5187,6 +5210,13 @@ class UIManager(
             setLuaWidgetExpanded(module, false)
         } else if ("lua_toggle" == command) {
             toggleLuaWidgetExpanded(module)
+        } else if ("library_remove" == command) {
+            val id = ModuleManager.normalize(module)
+            luaWidgetEngines.remove(id)?.dispose()
+            if (activeModule == id) closeHomeModule()
+            runCatching { ohi.andre.consolelauncher.managers.modules.ModuleLibrary.remove(mContext, id) }
+                .onFailure { Tuils.sendOutput(mContext, "Could not remove module: " + it.message) }
+            rebuildModuleDock()
         } else if ("lua_reload_widget" == command) {
             reloadLuaWidget(module)
         }
@@ -5638,7 +5668,7 @@ class UIManager(
             val action = actions.getOrNull(i)
             key.text = label
             key.textSize = if (label.length >= 5) 10f else 11f
-            key.alpha = 0.82f
+            key.alpha = 1f
             styleTermuxToolButton(key, color)
             key.setOnClickListener(View.OnClickListener { v: View? ->
                 if (action != null) {
@@ -5675,7 +5705,7 @@ class UIManager(
             key.visibility = View.VISIBLE
             key.text = spec.label
             key.textSize = if (spec.label.length >= 5) 10f else 11f
-            key.alpha = 0.82f
+            key.alpha = 1f
             styleTermuxToolButton(key, normalColor)
             when (spec.modifier) {
                 TermuxWorkspaceModifier.CTRL -> termuxCtrlKey = key
@@ -6254,6 +6284,7 @@ class UIManager(
 
         val filter = IntentFilter()
         filter.addAction(ACTION_UPDATE_SUGGESTIONS)
+        filter.addAction(ACTION_UPDATE_APPS)
         filter.addAction(ACTION_UPDATE_HINT)
         filter.addAction(ACTION_ROOT)
         filter.addAction(ACTION_NOROOT)
@@ -6285,6 +6316,10 @@ class UIManager(
                 if (action == ACTION_UPDATE_SUGGESTIONS) {
                     refreshSuggestionsNow()
                     refreshModuleSuggestionsStrip()
+                } else if (action == ACTION_UPDATE_APPS) {
+                    refreshSuggestionsNow()
+                    refreshModuleSuggestionsStrip()
+                    if (isAppsDrawerOpen) showAppsDrawer()
                 } else if (action == ACTION_UPDATE_HINT) {
                     mTerminalAdapter!!.setDefaultHint()
                     refreshFileConsole(false)
@@ -7493,7 +7528,8 @@ class UIManager(
         if (termuxInput != null) {
             termuxInput!!.setTypeface(Tuils.getTypeface(mContext))
             termuxInput!!.setTextColor(ThemeColorResolver.color(Theme.workspace_input_text_color))
-            termuxInput!!.setHintTextColor(ThemeColorResolver.withMaxAlpha(ThemeColorResolver.color(Theme.workspace_input_text_color), 150))
+            termuxInput!!.setHintTextColor(ThemeColorResolver.color(Theme.field_hint_color))
+            Tuils.setCursorDrawableColor(termuxInput!!, ThemeColorResolver.color(Theme.cursor_color))
         }
 
         if (termuxInputGroup != null) {
@@ -7689,7 +7725,8 @@ class UIManager(
         if (fileInput != null) {
             fileInput!!.setTypeface(Tuils.getTypeface(mContext))
             fileInput!!.setTextColor(ThemeColorResolver.color(Theme.workspace_input_text_color))
-            fileInput!!.setHintTextColor(ThemeColorResolver.withMaxAlpha(ThemeColorResolver.color(Theme.workspace_input_text_color), 150))
+            fileInput!!.setHintTextColor(ThemeColorResolver.color(Theme.field_hint_color))
+            Tuils.setCursorDrawableColor(fileInput!!, ThemeColorResolver.color(Theme.cursor_color))
         }
         if (fileInputGroup != null) {
             fileInputGroup!!.setBackground(
@@ -14086,6 +14123,8 @@ class UIManager(
         private const val RSS_MODULE_VISIBLE_LINES = 14
         val ACTION_UPDATE_SUGGESTIONS: String =
             BuildConfig.APPLICATION_ID + ".ui_update_suggestions"
+        val ACTION_UPDATE_APPS: String =
+            BuildConfig.APPLICATION_ID + ".ui_update_apps"
         val ACTION_UPDATE_HINT: String = BuildConfig.APPLICATION_ID + ".ui_update_hint"
         var ACTION_ROOT: String = BuildConfig.APPLICATION_ID + ".ui_root"
         var ACTION_NOROOT: String = BuildConfig.APPLICATION_ID + ".ui_noroot"

@@ -1,0 +1,32 @@
+{
+  "id": "kolorit",
+  "sourceUrl": "https://term.const.net/en/themes/kolorit/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "d3f3e53cfefe7d25ddbcdeba3a86ea714c6687329a3d4b9710d41ddaf72a5bac",
+  "paletteSha256": "da213cd905c06b38d17d297bd4f8c94c5db5b10f70927a968b9630dac62ea6ab",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Kolorit.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Kolorit",
+    "background": "#1d1a1e",
+    "foreground": "#efecec",
+    "cursorColor": "#c7c7c7",
+    "selectionBackground": "#e1925c",
+    "black": "#1d1a1e",
+    "red": "#ff5b82",
+    "green": "#47d7a1",
+    "yellow": "#e8e562",
+    "blue": "#5db4ee",
+    "purple": "#da6cda",
+    "cyan": "#57e9eb",
+    "white": "#ededed",
+    "brightBlack": "#504d51",
+    "brightRed": "#ff5b82",
+    "brightGreen": "#47d7a1",
+    "brightYellow": "#e8e562",
+    "brightBlue": "#5db4ee",
+    "brightPurple": "#da6cda",
+    "brightCyan": "#57e9eb",
+    "brightWhite": "#ededed"
+  }
+}

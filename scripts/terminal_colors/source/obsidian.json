@@ -1,0 +1,32 @@
+{
+  "id": "obsidian",
+  "sourceUrl": "https://term.const.net/en/themes/obsidian/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "b80ac755cb801575bedf02d3946aeb3ce09c92ae4950dd766dc83b572d806914",
+  "paletteSha256": "7c6e65d68017a0b739386af9c7582f1e658819e00c9a6710ae099a17d13c8e99",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Obsidian.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Obsidian",
+    "background": "#283033",
+    "foreground": "#cdcdcd",
+    "cursorColor": "#c0cad0",
+    "selectionBackground": "#3e4c4f",
+    "black": "#000000",
+    "red": "#b30d0e",
+    "green": "#00bb00",
+    "yellow": "#fecd22",
+    "blue": "#3a9bdb",
+    "purple": "#bb00bb",
+    "cyan": "#00bbbb",
+    "white": "#bbbbbb",
+    "brightBlack": "#555555",
+    "brightRed": "#ff0003",
+    "brightGreen": "#93c863",
+    "brightYellow": "#fef874",
+    "brightBlue": "#a1d7ff",
+    "brightPurple": "#ff55ff",
+    "brightCyan": "#55ffff",
+    "brightWhite": "#ffffff"
+  }
+}

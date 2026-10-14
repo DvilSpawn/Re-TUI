@@ -1,0 +1,32 @@
+{
+  "id": "monokai-classic",
+  "sourceUrl": "https://term.const.net/en/themes/monokai-classic/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "60a038c48ed77477ce9f84ece8fd3246bdaca3b3c9ff057c4a11f6508169458b",
+  "paletteSha256": "bad805999b2852bf4c5e34390e03074b33d2e05dc4d4cc89ab429853cfbafd28",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Monokai Classic.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Monokai Classic",
+    "background": "#272822",
+    "foreground": "#fdfff1",
+    "cursorColor": "#c0c1b5",
+    "selectionBackground": "#57584f",
+    "black": "#272822",
+    "red": "#f92672",
+    "green": "#a6e22e",
+    "yellow": "#e6db74",
+    "blue": "#fd971f",
+    "purple": "#ae81ff",
+    "cyan": "#66d9ef",
+    "white": "#fdfff1",
+    "brightBlack": "#6e7066",
+    "brightRed": "#f92672",
+    "brightGreen": "#a6e22e",
+    "brightYellow": "#e6db74",
+    "brightBlue": "#fd971f",
+    "brightPurple": "#ae81ff",
+    "brightCyan": "#66d9ef",
+    "brightWhite": "#fdfff1"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "amber-crt-retro",
+  "sourceUrl": "https://term.const.net/en/themes/amber-crt-retro/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "a68ab4bb47f579132fdaa928732955c5934eec0b47459992cbebec8945ee1edf",
+  "paletteSha256": "6069d51203135e80cb7251659513a234793f883d0859bfa50c1f2088ba6faee1",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Amber CRT Retro.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Amber CRT Retro",
+    "background": "#1a1200",
+    "foreground": "#ffb000",
+    "cursorColor": "#ffb000",
+    "selectionBackground": "#3a2a00",
+    "black": "#2a1e00",
+    "red": "#ff6a00",
+    "green": "#ffb000",
+    "yellow": "#ffc742",
+    "blue": "#ff8c00",
+    "purple": "#ffa033",
+    "cyan": "#ffd27f",
+    "white": "#ffd9a0",
+    "brightBlack": "#6a4e00",
+    "brightRed": "#ff8a1e",
+    "brightGreen": "#ffc742",
+    "brightYellow": "#ffe08a",
+    "brightBlue": "#ffab3d",
+    "brightPurple": "#ffc266",
+    "brightCyan": "#ffe3b0",
+    "brightWhite": "#fff0d6"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "overnight-slumber",
+  "sourceUrl": "https://term.const.net/en/themes/overnight-slumber/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "ea43260aa9c76741a12d54ffef954106be7ae8c251a4c58f920bd4da994c6da9",
+  "paletteSha256": "9ae70bd824151743ea7841aac5c1f489c2e3915dd51022bbaf2cb2a7a363c876",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Overnight Slumber.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Overnight Slumber",
+    "background": "#0e1729",
+    "foreground": "#ced2d6",
+    "cursorColor": "#ffa7c4",
+    "selectionBackground": "#1f2b41",
+    "black": "#0a1222",
+    "red": "#ffa7c4",
+    "green": "#85cc95",
+    "yellow": "#ffcb8b",
+    "blue": "#8dabe1",
+    "purple": "#c792eb",
+    "cyan": "#78ccf0",
+    "white": "#ffffff",
+    "brightBlack": "#575656",
+    "brightRed": "#ffa7c4",
+    "brightGreen": "#85cc95",
+    "brightYellow": "#ffcb8b",
+    "brightBlue": "#8dabe1",
+    "brightPurple": "#c792eb",
+    "brightCyan": "#ffa7c4",
+    "brightWhite": "#ffffff"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "whimsy",
+  "sourceUrl": "https://term.const.net/en/themes/whimsy/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "6eeb79fc3be3e1bb9141f9d2e9b3360ef8eecca9c806085781b4fc6a02669240",
+  "paletteSha256": "78caa524179548a69aa954783fc01643502d166a9728250bea53c48aae4b6590",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Whimsy.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Whimsy",
+    "background": "#29283b",
+    "foreground": "#b3b0d6",
+    "cursorColor": "#b3b0d6",
+    "selectionBackground": "#3d3c58",
+    "black": "#535178",
+    "red": "#ef6487",
+    "green": "#5eca89",
+    "yellow": "#fdd877",
+    "blue": "#65aef7",
+    "purple": "#aa7ff0",
+    "cyan": "#43c1be",
+    "white": "#ffffff",
+    "brightBlack": "#535178",
+    "brightRed": "#ef6487",
+    "brightGreen": "#5eca89",
+    "brightYellow": "#fdd877",
+    "brightBlue": "#65aef7",
+    "brightPurple": "#aa7ff0",
+    "brightCyan": "#43c1be",
+    "brightWhite": "#ffffff"
+  }
+}

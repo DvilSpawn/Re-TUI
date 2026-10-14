@@ -1,0 +1,32 @@
+{
+  "id": "branch",
+  "sourceUrl": "https://term.const.net/en/themes/branch/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "ca63462f639ab91a209db6fca2006ae670f38a253901a7730bdf0a6f90794036",
+  "paletteSha256": "ad5991dfb9953b17ce0107d2819de87d0a3b929b7b8cb5b8034e1daa17d1ad91",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/branch.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "branch",
+    "background": "#32221a",
+    "foreground": "#cfc1a9",
+    "cursorColor": "#cfc1a9",
+    "selectionBackground": "#cfc1a9",
+    "black": "#35241c",
+    "red": "#c2562d",
+    "green": "#96a65e",
+    "yellow": "#d29b5a",
+    "blue": "#3b8e8c",
+    "purple": "#c47e5b",
+    "cyan": "#639a90",
+    "white": "#cfc1a9",
+    "brightBlack": "#564a45",
+    "brightRed": "#c2562d",
+    "brightGreen": "#96a65e",
+    "brightYellow": "#d29b5a",
+    "brightBlue": "#3b8e8c",
+    "brightPurple": "#c47e5b",
+    "brightCyan": "#639a90",
+    "brightWhite": "#cfc1a9"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "pandora",
+  "sourceUrl": "https://term.const.net/en/themes/pandora/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "a4bde5e629c4ed40676bbd62a1c10977f4b766b653aa73db8f2b5385acbf0598",
+  "paletteSha256": "1a8c87a0c0be5867712f73378d1a9e3d81318529b499113c97e909b688d1bbde",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Pandora.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Pandora",
+    "background": "#141e43",
+    "foreground": "#e1e1e1",
+    "cursorColor": "#43d58e",
+    "selectionBackground": "#2d37ff",
+    "black": "#000000",
+    "red": "#ff4242",
+    "green": "#74af68",
+    "yellow": "#ffad29",
+    "blue": "#338f86",
+    "purple": "#9414e6",
+    "cyan": "#23d7d7",
+    "white": "#e2e2e2",
+    "brightBlack": "#3f5648",
+    "brightRed": "#ff3242",
+    "brightGreen": "#74cd68",
+    "brightYellow": "#ffb929",
+    "brightBlue": "#23d7d7",
+    "brightPurple": "#ff37ff",
+    "brightCyan": "#00ede1",
+    "brightWhite": "#ffffff"
+  }
+}

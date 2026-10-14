@@ -1,0 +1,32 @@
+{
+  "id": "zenwritten-dark",
+  "sourceUrl": "https://term.const.net/en/themes/zenwritten-dark/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "a203abdcd2ecede442ffd77ed4877f63a7b2c6cffb04109a79b0a7f6f5fec770",
+  "paletteSha256": "b6d2dfc14e6ed01118ddc0f644c4bc12df3dfb30b67ff6f51dc7a4bcf4b6f2f7",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Zenwritten Dark.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Zenwritten Dark",
+    "background": "#191919",
+    "foreground": "#bbbbbb",
+    "cursorColor": "#c9c9c9",
+    "selectionBackground": "#404040",
+    "black": "#191919",
+    "red": "#de6e7c",
+    "green": "#819b69",
+    "yellow": "#b77e64",
+    "blue": "#6099c0",
+    "purple": "#b279a7",
+    "cyan": "#66a5ad",
+    "white": "#bbbbbb",
+    "brightBlack": "#4a4546",
+    "brightRed": "#e8838f",
+    "brightGreen": "#8bae68",
+    "brightYellow": "#d68c67",
+    "brightBlue": "#61abda",
+    "brightPurple": "#cf86c1",
+    "brightCyan": "#65b8c1",
+    "brightWhite": "#8e8e8e"
+  }
+}

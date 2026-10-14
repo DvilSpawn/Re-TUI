@@ -13,6 +13,9 @@
     <string name="startup_intro_next" formatted="false">"Next, choose your setup. Your choices are saved as you go and applied only at the end."</string>
     <string name="startup_configuration_description" formatted="false">"Start with Basic, or choose Advanced for individual feature controls. Nothing changes until you build your launcher on the final page."</string>
     <string name="startup_border_preview" formatted="false">"This pane previews your border. Choose Dashed to adjust its width and gap."</string>
+    <string name="startup_default_launcher">Set Re:TUI as my default launcher</string>
+    <string name="startup_default_launcher_description">Open Re:TUI when you press Home. Android will ask you to confirm after setup. You can skip this and decide later.</string>
+    <string name="startup_default_launcher_unavailable">Open Android Settings → Default apps → Home app to choose Re:TUI.</string>
     <string name="startup_border_stroke">"Stroke width: %1$s dp"</string>
     <string name="startup_border_gap">"Gap between dashes: %1$s dp"</string>
     <string name="startup_border_summary">" (stroke %1$s dp, gap %2$d dp)"</string>

@@ -1,0 +1,32 @@
+{
+  "id": "atom",
+  "sourceUrl": "https://term.const.net/en/themes/atom/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "7070cb7cdfa2ae1a09c745d7fbf4e9d0148647d78390ff70b430dceb0655637b",
+  "paletteSha256": "7450ccb9e2cfe831fb918ff81a9dd487c3aa5fe46e826cfd0c5a99c4cebebbb7",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Atom.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Atom",
+    "background": "#161719",
+    "foreground": "#c5c8c6",
+    "cursorColor": "#d0d0d0",
+    "selectionBackground": "#444444",
+    "black": "#000000",
+    "red": "#fd5ff1",
+    "green": "#87c38a",
+    "yellow": "#ffd7b1",
+    "blue": "#85befd",
+    "purple": "#b9b6fc",
+    "cyan": "#85befd",
+    "white": "#e0e0e0",
+    "brightBlack": "#4c4c4c",
+    "brightRed": "#fd5ff1",
+    "brightGreen": "#94fa36",
+    "brightYellow": "#f5ffa8",
+    "brightBlue": "#96cbfe",
+    "brightPurple": "#b9b6fc",
+    "brightCyan": "#85befd",
+    "brightWhite": "#e0e0e0"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "andromeda",
+  "sourceUrl": "https://term.const.net/en/themes/andromeda/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "1f864b25464ce269864b0aed89aeb7ab9c3fb3c62270a281d21fece361b00464",
+  "paletteSha256": "0830fa3d3137d209d985c6fcf96e5f4ad2493feb989b513b046879edbb3230c4",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Andromeda.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Andromeda",
+    "background": "#262a33",
+    "foreground": "#e5e5e5",
+    "cursorColor": "#f8f8f0",
+    "selectionBackground": "#5a5c62",
+    "black": "#000000",
+    "red": "#cd3131",
+    "green": "#05bc79",
+    "yellow": "#e5e512",
+    "blue": "#2472c8",
+    "purple": "#bc3fbc",
+    "cyan": "#0fa8cd",
+    "white": "#e5e5e5",
+    "brightBlack": "#666666",
+    "brightRed": "#cd3131",
+    "brightGreen": "#05bc79",
+    "brightYellow": "#e5e512",
+    "brightBlue": "#2472c8",
+    "brightPurple": "#bc3fbc",
+    "brightCyan": "#0fa8cd",
+    "brightWhite": "#e5e5e5"
+  }
+}

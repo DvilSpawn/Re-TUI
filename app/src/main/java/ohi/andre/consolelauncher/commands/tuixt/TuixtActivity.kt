@@ -6,8 +6,6 @@ import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.database.Cursor
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.net.Uri
 import android.provider.OpenableColumns
 import android.text.Editable
@@ -22,6 +20,8 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ohi.andre.consolelauncher.LauncherActivity
@@ -74,8 +74,8 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
     private var plainTextEditor: EditText? = null
     private var originalRawText: String? = null
     private var asciiSettingsMode = false
-    private val previewHandler = Handler(Looper.getMainLooper())
-    private val previewRunnable = Runnable { LauncherActivity.previewIfRunning() }
+    private var appearancePreview: SettingsAppearancePreview? = null
+    private var previewKeyboardVisible = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         requestNoTitleIfFullscreen(this)
@@ -97,13 +97,26 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
 
         val screen = FrameLayout(this)
         styleScreen(this, screen)
-        screen.setFitsSystemWindows(true)
+        screen.setFitsSystemWindows(false)
+        ViewCompat.setOnApplyWindowInsetsListener(screen) { view, insets ->
+            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val keyboard = insets.getInsets(WindowInsetsCompat.Type.ime())
+            previewKeyboardVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
+            view.setPadding(bars.left, bars.top, bars.right, maxOf(bars.bottom, keyboard.bottom))
+            appearancePreview?.setAvailableHeight(view.height, previewKeyboardVisible)
+            insets
+        }
         val contentHost = addFoldAwareHost(this, screen, ViewGroup.LayoutParams.MATCH_PARENT)
 
         val root = LinearLayout(this)
         root.setOrientation(LinearLayout.VERTICAL)
         root.setPadding(dp(this, 14f), dp(this, 50f), dp(this, 14f), dp(this, 14f))
         stylePanel(this, root)
+        root.addOnLayoutChangeListener { _, _, top, _, bottom, _, _, _, _ ->
+            appearancePreview?.setAvailableHeight(bottom - top, previewKeyboardVisible)
+        }
+        window.setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN or
+            android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
 
         val panelLeft = dp(this, 28f)
         val panelTop = dp(this, 34f)
@@ -199,7 +212,7 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
                 ThemeColorResolver.clearPreview()
                 Toast.makeText(this, getString(R.string.editor_tuixtactivity_changes_saved_previewing_launcher_8e180), Toast.LENGTH_SHORT)
                     .show()
-                LauncherActivity.preview(this)
+                LauncherActivity.previewIfRunning()
                 styleScreen(this, screen)
                 stylePanel(this, root)
                 styleHeader(this, header)
@@ -214,21 +227,6 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
         bottomBar.addView(btnLayout)
         root.addView(bottomBar)
 
-        val refreshButtonTheme: () -> Unit = {
-            styleScreen(this, screen)
-            stylePanel(this, root)
-            styleHeader(this, header)
-            styleInput(this, searchBox)
-            bottomBar.setBackground(rect(this, surfaceColor(), borderColor(), 1.25f))
-            styleButton(this, btnCancel, false)
-            styleButton(this, btnSave, true)
-            adapter?.restyleVisibleControls(recyclerView)
-            if (xmlRoot == XMLPrefsRoot.THEME) {
-                previewHandler.removeCallbacks(previewRunnable)
-                previewHandler.postDelayed(previewRunnable, THEME_PREVIEW_DELAY_MS)
-            }
-        }
-
         // Load data
         val fileName = file!!.getName().lowercase(Locale.ROOT)
         for (rootEnum in XMLPrefsRoot.entries.toTypedArray()) {
@@ -241,7 +239,7 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
 
         if (asciiSettingsMode) {
             originalRows = buildAsciiSettingsRows()
-            adapter = TuixtAdapter(originalRows!!.toMutableList(), null, refreshButtonTheme)
+            adapter = TuixtAdapter(originalRows!!.toMutableList(), null)
             recyclerView!!.setAdapter(adapter)
 
             searchBox.addTextChangedListener(object : TextWatcher {
@@ -270,14 +268,22 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
             adapter = TuixtAdapter(
                 originalRows!!.toMutableList(),
                 file,
-                refreshButtonTheme,
                 ::openSearchProviders,
                 accordionSections = true,
-                initialSection = onlySection
+                initialSection = onlySection,
+                onDraftChanged = { appearancePreview?.refresh() }
             )
             recyclerView!!.setAdapter(adapter)
+            adapter?.restoreDraftState(savedInstanceState?.getBundle("appearance_draft"))
+            if (xmlRoot == XMLPrefsRoot.UI || xmlRoot == XMLPrefsRoot.THEME || xmlRoot == XMLPrefsRoot.BEHAVIOR) {
+                appearancePreview = SettingsAppearancePreview(this, { item -> adapter?.draftValue(item) }, { item -> adapter?.hasDraft(item) == true }).also {
+                    root.addView(it, 0, LinearLayout.LayoutParams(-1, -2))
+                    it.restorePage(savedInstanceState?.getInt("appearance_page", 0) ?: 0)
+                    it.refresh()
+                }
+            }
             if (xmlRoot == XMLPrefsRoot.THEME) {
-                root.addView(buildResetAdvancedThemeAction(), 0)
+                root.addView(buildResetAdvancedThemeAction(), 1)
             }
 
             searchBox.addTextChangedListener(object : TextWatcher {
@@ -790,18 +796,14 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
             })
     }
 
-    override fun onDestroy() {
-        previewHandler.removeCallbacks(previewRunnable)
-        val hadPreview = ThemeColorResolver.hasPreview()
-        ThemeColorResolver.clearPreview()
-        if (hadPreview) LauncherActivity.previewIfRunning()
-        super.onDestroy()
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putBundle("appearance_draft", adapter?.saveDraftState())
+        outState.putInt("appearance_page", appearancePreview?.selectedPage() ?: 0)
+        super.onSaveInstanceState(outState)
     }
 
     private fun discardThemePreview() {
-        previewHandler.removeCallbacks(previewRunnable)
         ThemeColorResolver.clearPreview()
-        LauncherActivity.previewIfRunning()
     }
 
     private fun hasUnsavedChanges(): Boolean {
@@ -825,6 +827,5 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
         const val SAVE_PRESSED: Int = 3
         private const val ASCII_TXT_REQUEST: Int = 11
         private const val ASCII_IMPORT_REQUEST: Int = 12
-        private const val THEME_PREVIEW_DELAY_MS = 180L
     }
 }

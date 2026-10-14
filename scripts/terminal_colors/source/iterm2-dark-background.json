@@ -1,0 +1,32 @@
+{
+  "id": "iterm2-dark-background",
+  "sourceUrl": "https://term.const.net/en/themes/iterm2-dark-background/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "61a79271d6e3a476607dd379da3178fe7ff48012289930c3ce115eff3a9a132d",
+  "paletteSha256": "f944f86e6b7a85b14028b0986e432d4a61eec6a246fad1a74badde93b59c073a",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/iTerm2 Dark Background.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "iTerm2 Dark Background",
+    "background": "#000000",
+    "foreground": "#c7c7c7",
+    "cursorColor": "#c7c7c7",
+    "selectionBackground": "#c1deff",
+    "black": "#000000",
+    "red": "#c91b00",
+    "green": "#00c200",
+    "yellow": "#c7c400",
+    "blue": "#0225c7",
+    "purple": "#ca30c7",
+    "cyan": "#00c5c7",
+    "white": "#c7c7c7",
+    "brightBlack": "#686868",
+    "brightRed": "#ff6e67",
+    "brightGreen": "#5ffa68",
+    "brightYellow": "#fffc67",
+    "brightBlue": "#6871ff",
+    "brightPurple": "#ff77ff",
+    "brightCyan": "#60fdff",
+    "brightWhite": "#ffffff"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "clrs",
+  "sourceUrl": "https://term.const.net/en/themes/clrs/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "696b457e576b389f2e05ac3e6a757434782936ba17f01b8f6620f26f904d580d",
+  "paletteSha256": "14cd4dffbdd37c011b5b2e20dc0265c4bc77d68019e5f5a20ebd8e9a8ee39339",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/CLRS.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "CLRS",
+    "background": "#ffffff",
+    "foreground": "#262626",
+    "cursorColor": "#62c6ef",
+    "selectionBackground": "#6fd3fc",
+    "black": "#000000",
+    "red": "#f8282a",
+    "green": "#328a5d",
+    "yellow": "#fa701d",
+    "blue": "#135cd0",
+    "purple": "#9f00bd",
+    "cyan": "#33c3c1",
+    "white": "#b3b3b3",
+    "brightBlack": "#555753",
+    "brightRed": "#fb0416",
+    "brightGreen": "#2cc631",
+    "brightYellow": "#e3bd0e",
+    "brightBlue": "#1670ff",
+    "brightPurple": "#e900b0",
+    "brightCyan": "#3ad5ce",
+    "brightWhite": "#eeeeec"
+  }
+}

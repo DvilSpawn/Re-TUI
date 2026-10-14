@@ -1,0 +1,32 @@
+{
+  "id": "spacegray-eighties-dull",
+  "sourceUrl": "https://term.const.net/en/themes/spacegray-eighties-dull/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "4d3208a111a89384fff3fdfdee2c625a7820b950b8bdc37093c019f274ac8073",
+  "paletteSha256": "e4b6d6df7dcb702f119ee6fb02c498e29fd61c12d68a71313a396a24c41eae9b",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Spacegray Eighties Dull.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Spacegray Eighties Dull",
+    "background": "#222222",
+    "foreground": "#c9c6bc",
+    "cursorColor": "#bbbbbb",
+    "selectionBackground": "#272e36",
+    "black": "#15171c",
+    "red": "#b24a56",
+    "green": "#92b477",
+    "yellow": "#c6735a",
+    "blue": "#7c8fa5",
+    "purple": "#a5789e",
+    "cyan": "#80cdcb",
+    "white": "#b3b8c3",
+    "brightBlack": "#555555",
+    "brightRed": "#ec5f67",
+    "brightGreen": "#89e986",
+    "brightYellow": "#fec254",
+    "brightBlue": "#5486c0",
+    "brightPurple": "#bf83c1",
+    "brightCyan": "#58c2c1",
+    "brightWhite": "#ffffff"
+  }
+}

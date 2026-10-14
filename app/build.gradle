@@ -61,8 +61,9 @@ android {
         debug {
             pseudoLocalesEnabled = true
             if (providers.gradleProperty('fetchDebug').map { it.toBoolean() }.getOrElse(false)) {
-                applicationIdSuffix = '.fetchdebug'
-                manifestPlaceholders.applicationLabel = 'Re:T-UI Debug'
+                def paletteDebug = providers.gradleProperty('paletteDebug').map { it.toBoolean() }.getOrElse(false)
+                applicationIdSuffix = paletteDebug ? '.palettedebug' : '.fetchdebug'
+                manifestPlaceholders.applicationLabel = paletteDebug ? 'Re:TUI Palette Test' : 'Re:T-UI Debug'
             }
             if (hasReleaseSigning) {
                 signingConfig = signingConfigs.release
@@ -281,6 +282,9 @@ def isAllowedAsset = { File assetsDir, File sourceFile ->
     def relativeAssetPath = assetsDir.toPath().relativize(sourceFile.toPath()).toString().replace(File.separator, "/")
     return relativeAssetPath == "JetBrainsMonoNerdFont-Regular.ttf"
             || relativeAssetPath in ["localization/catalog.json", "localization/english-template.zip"]
+            || relativeAssetPath in ["module-library/index.json", "module-library/todo.lua",
+                "module-library/habits.lua", "module-library/focus.lua",
+                "module-library/bookmarks.lua", "module-library/year_progress.lua"]
             || (relativeAssetPath.startsWith("first_run_terminal_green/")
             && !relativeAssetPath.substring("first_run_terminal_green/".length()).contains("/")
             && relativeAssetPath.endsWith(".xml"))

@@ -1,0 +1,32 @@
+{
+  "id": "rose-pine-moon",
+  "sourceUrl": "https://term.const.net/en/themes/rose-pine-moon/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "ab16a7a34ca3beec081037b1633aaa97f9a9b79b9d538b09f45f66e31d13bbab",
+  "paletteSha256": "3636d0679abbe3c829c7bcc8daa8986b0046f81354e055ea42a272d79256208f",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Rose Pine Moon.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Rose Pine Moon",
+    "background": "#232136",
+    "foreground": "#e0def4",
+    "cursorColor": "#e0def4",
+    "selectionBackground": "#44415a",
+    "black": "#393552",
+    "red": "#eb6f92",
+    "green": "#3e8fb0",
+    "yellow": "#f6c177",
+    "blue": "#9ccfd8",
+    "purple": "#c4a7e7",
+    "cyan": "#ea9a97",
+    "white": "#e0def4",
+    "brightBlack": "#6e6a86",
+    "brightRed": "#eb6f92",
+    "brightGreen": "#3e8fb0",
+    "brightYellow": "#f6c177",
+    "brightBlue": "#9ccfd8",
+    "brightPurple": "#c4a7e7",
+    "brightCyan": "#ea9a97",
+    "brightWhite": "#e0def4"
+  }
+}

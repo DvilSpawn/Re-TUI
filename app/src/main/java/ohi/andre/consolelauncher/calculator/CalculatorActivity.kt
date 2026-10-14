@@ -270,7 +270,7 @@ class CalculatorActivity : LocalizedActivity() {
             val textColor = ThemeColorResolver.color(Theme.workspace_control_text_color)
             tabs.forEach { (tab, selected) ->
                 tab.isSelected = selected == mode
-                tab.setTextColor(if (tab.isSelected) textColor else ThemeColorResolver.withMaxAlpha(textColor, 150))
+                tab.setTextColor(if (tab.isSelected) textColor else ThemeColorResolver.color(Theme.muted_text_color))
                 tab.background = null
             }
             input.requestFocus()
@@ -281,7 +281,7 @@ class CalculatorActivity : LocalizedActivity() {
                 view.typeface = Tuils.getTypeface(this)
                 view.textSize = suggestionSize
                 view.setTextColor(ThemeColorResolver.color(if (view is Button) Theme.workspace_control_text_color else Theme.workspace_panel_text_color))
-                if (view === previewHint) { view.textSize = suggestionSize * 0.85f; view.setTextColor(ThemeColorResolver.withMaxAlpha(ThemeColorResolver.color(Theme.workspace_panel_text_color), 170)) }
+                if (view === previewHint) { view.textSize = suggestionSize * 0.85f; view.setTextColor(ThemeColorResolver.color(Theme.muted_text_color)) }
                 if (view is Button) {
                     view.background = null
                     view.setTypeface(Tuils.getTypeface(this), android.graphics.Typeface.BOLD)
@@ -413,8 +413,8 @@ class CalculatorActivity : LocalizedActivity() {
                 val role = if (view is Button) Theme.workspace_control_text_color else Theme.workspace_panel_text_color
                 val color = ThemeColorResolver.color(role)
                 view.setTextColor(if (view is Button && !view.isSelected && view.id in listOf(R.id.calculator_numbers_tab, R.id.calculator_letters_tab, R.id.calculator_functions_tab))
-                    ThemeColorResolver.withMaxAlpha(color, 150) else color)
-                if (view === previewHint) { view.textSize = LauncherFontScale.terminalTextSizeSp() * 0.85f; view.setTextColor(ThemeColorResolver.withMaxAlpha(color, 170)) }
+                    ThemeColorResolver.color(Theme.muted_text_color) else color)
+                if (view === previewHint) { view.textSize = LauncherFontScale.terminalTextSizeSp() * 0.85f; view.setTextColor(ThemeColorResolver.color(Theme.muted_text_color)) }
                 if (view is Button) {
                     view.background = null
                     view.setTypeface(Tuils.getTypeface(this), android.graphics.Typeface.BOLD)
@@ -423,6 +423,9 @@ class CalculatorActivity : LocalizedActivity() {
             if (view is ViewGroup) for (index in 0 until view.childCount) refresh(view.getChildAt(index))
         }
         refresh(root)
+        input.setTextColor(ThemeColorResolver.color(Theme.workspace_input_text_color))
+        input.setHintTextColor(ThemeColorResolver.color(Theme.field_hint_color))
+        Tuils.setCursorDrawableColor(input, ThemeColorResolver.color(Theme.cursor_color))
         root.setBackgroundColor(android.graphics.Color.TRANSPARENT)
         listOf(R.id.calculator_header, R.id.calculator_keypad_dock).forEach {
             root.findViewById<View>(it).setBackgroundColor(android.graphics.Color.TRANSPARENT)

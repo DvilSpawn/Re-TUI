@@ -1,0 +1,32 @@
+{
+  "id": "sumi-phosphor",
+  "sourceUrl": "https://term.const.net/en/themes/sumi-phosphor/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "3c923853e25ef4d03b38fbc8d9c26d203d033ba281c050299ff0845860991271",
+  "paletteSha256": "310ae1ee04973c9a07440e79a1aeb65c2e971587fba9e07b4027a6173be3f774",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Sumi Phosphor.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Sumi Phosphor",
+    "background": "#12100e",
+    "foreground": "#bab4a8",
+    "cursorColor": "#2ec4b6",
+    "selectionBackground": "#3a3834",
+    "black": "#1e1a16",
+    "red": "#d45848",
+    "green": "#5ca868",
+    "yellow": "#d4a03c",
+    "blue": "#5a82b8",
+    "purple": "#9870b0",
+    "cyan": "#2ec4b6",
+    "white": "#8a8478",
+    "brightBlack": "#474139",
+    "brightRed": "#e87060",
+    "brightGreen": "#72c078",
+    "brightYellow": "#e8b84c",
+    "brightBlue": "#70a0d8",
+    "brightPurple": "#b088c8",
+    "brightCyan": "#48d8c8",
+    "brightWhite": "#e0dcd4"
+  }
+}

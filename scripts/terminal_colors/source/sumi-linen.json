@@ -1,0 +1,32 @@
+{
+  "id": "sumi-linen",
+  "sourceUrl": "https://term.const.net/en/themes/sumi-linen/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "4efc835f10b66941cd7669d2d86952a2ea11a78884ce373309f7ff2347a33163",
+  "paletteSha256": "de57314bc23a979d965e29db5660f5ccc675267e7a224f3c566762a3403a1a3a",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Sumi Linen.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Sumi Linen",
+    "background": "#e6dfd0",
+    "foreground": "#1c1814",
+    "cursorColor": "#18786c",
+    "selectionBackground": "#9ec4ba",
+    "black": "#3a342c",
+    "red": "#b83830",
+    "green": "#2e8050",
+    "yellow": "#a87820",
+    "blue": "#3060a0",
+    "purple": "#704890",
+    "cyan": "#18786c",
+    "white": "#5a5448",
+    "brightBlack": "#6a6458",
+    "brightRed": "#c84840",
+    "brightGreen": "#3a9868",
+    "brightYellow": "#c09030",
+    "brightBlue": "#4080c0",
+    "brightPurple": "#8858a8",
+    "brightCyan": "#28a090",
+    "brightWhite": "#14100c"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "aizen-dark",
+  "sourceUrl": "https://term.const.net/en/themes/aizen-dark/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "629f06d5dc7b219f289064cac00dfb8570f078735a422c795b0be8318be30b02",
+  "paletteSha256": "525122e61769d2d65e5784c0f7d5312dc74325604247ff2af35195ecebb2624f",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Aizen Dark.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Aizen Dark",
+    "background": "#1a1a1a",
+    "foreground": "#d0d6f0",
+    "cursorColor": "#f8b080",
+    "selectionBackground": "#333333",
+    "black": "#1a1a1a",
+    "red": "#f08898",
+    "green": "#a4e09c",
+    "yellow": "#f5dea4",
+    "blue": "#84b4f8",
+    "purple": "#c8a2f4",
+    "cyan": "#90dcd0",
+    "white": "#d0d6f0",
+    "brightBlack": "#444444",
+    "brightRed": "#f08898",
+    "brightGreen": "#a4e09c",
+    "brightYellow": "#f5dea4",
+    "brightBlue": "#84b4f8",
+    "brightPurple": "#c8a2f4",
+    "brightCyan": "#90dcd0",
+    "brightWhite": "#ffffff"
+  }
+}

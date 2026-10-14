@@ -1,0 +1,32 @@
+{
+  "id": "carbonfox",
+  "sourceUrl": "https://term.const.net/en/themes/carbonfox/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "cdead7c566974e56f9985702a6cd705b5167e91daac313c288cb8835a907cb9b",
+  "paletteSha256": "f90756551524bf8c1a4f7d0c370e6c0d3b2576940c8e7d1b619534291a209343",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Carbonfox.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Carbonfox",
+    "background": "#161616",
+    "foreground": "#f2f4f8",
+    "cursorColor": "#f2f4f8",
+    "selectionBackground": "#2a2a2a",
+    "black": "#282828",
+    "red": "#ee5396",
+    "green": "#25be6a",
+    "yellow": "#08bdba",
+    "blue": "#78a9ff",
+    "purple": "#be95ff",
+    "cyan": "#33b1ff",
+    "white": "#dfdfe0",
+    "brightBlack": "#484848",
+    "brightRed": "#f16da6",
+    "brightGreen": "#46c880",
+    "brightYellow": "#2dc7c4",
+    "brightBlue": "#8cb6ff",
+    "brightPurple": "#c8a5ff",
+    "brightCyan": "#52bdff",
+    "brightWhite": "#e4e4e5"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "karasu-snow",
+  "sourceUrl": "https://term.const.net/en/themes/karasu-snow/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "dc8c085b18033510fcf3d1ccf460eae11b7284cb34de6394292c2a5dd082e349",
+  "paletteSha256": "a22ec0afb6ea821c782ab9803a3cf170660ee216254f84614fe81af9d66c8273",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Karasu Snow.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Karasu Snow",
+    "background": "#fafafa",
+    "foreground": "#292524",
+    "cursorColor": "#0a0a0a",
+    "selectionBackground": "#e5e5e5",
+    "black": "#0a0a0a",
+    "red": "#b84755",
+    "green": "#3f7e4a",
+    "yellow": "#8a6a1f",
+    "blue": "#2e5e9b",
+    "purple": "#6c4bb8",
+    "cyan": "#2d7e7a",
+    "white": "#b5b5b5",
+    "brightBlack": "#404040",
+    "brightRed": "#d93c3c",
+    "brightGreen": "#2f9150",
+    "brightYellow": "#9a7a1d",
+    "brightBlue": "#2b72c7",
+    "brightPurple": "#7b59d6",
+    "brightCyan": "#1f968f",
+    "brightWhite": "#ffffff"
+  }
+}

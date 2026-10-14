@@ -1,0 +1,32 @@
+{
+  "id": "front-end-delight",
+  "sourceUrl": "https://term.const.net/en/themes/front-end-delight/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "5fcbb9b1488621bf5d1714b6c4e05e78bcb532443e0a04dd5dcf335fe77837ad",
+  "paletteSha256": "a26323db14d7d2f29ff76556cbcaed97bad973485d4d5b24bc4bbd64a4179ef5",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Front End Delight.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Front End Delight",
+    "background": "#1b1c1d",
+    "foreground": "#adadad",
+    "cursorColor": "#cdcdcd",
+    "selectionBackground": "#ea6154",
+    "black": "#242526",
+    "red": "#f8511b",
+    "green": "#565747",
+    "yellow": "#fa771d",
+    "blue": "#2c70b7",
+    "purple": "#f02e4f",
+    "cyan": "#3ca1a6",
+    "white": "#adadad",
+    "brightBlack": "#5fac6d",
+    "brightRed": "#f74319",
+    "brightGreen": "#74ec4c",
+    "brightYellow": "#fdc325",
+    "brightBlue": "#3393ca",
+    "brightPurple": "#e75e4f",
+    "brightCyan": "#4fbce6",
+    "brightWhite": "#8c735b"
+  }
+}

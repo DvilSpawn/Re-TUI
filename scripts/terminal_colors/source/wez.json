@@ -1,0 +1,32 @@
+{
+  "id": "wez",
+  "sourceUrl": "https://term.const.net/en/themes/wez/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "2bb4d8181592fc88d8cf405ec37a89b03d5986ecc397844cf6a6e893ceaa6601",
+  "paletteSha256": "c86456d9114dfb3576e2b73855cd7b53ddb141ee4e8c98a5686b0f02c4dfff6b",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Wez.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Wez",
+    "background": "#000000",
+    "foreground": "#b3b3b3",
+    "cursorColor": "#53ae71",
+    "selectionBackground": "#4d52f8",
+    "black": "#000000",
+    "red": "#cc5555",
+    "green": "#55cc55",
+    "yellow": "#cdcd55",
+    "blue": "#5555cc",
+    "purple": "#cc55cc",
+    "cyan": "#7acaca",
+    "white": "#cccccc",
+    "brightBlack": "#555555",
+    "brightRed": "#ff5555",
+    "brightGreen": "#55ff55",
+    "brightYellow": "#ffff55",
+    "brightBlue": "#5555ff",
+    "brightPurple": "#ff55ff",
+    "brightCyan": "#55ffff",
+    "brightWhite": "#ffffff"
+  }
+}

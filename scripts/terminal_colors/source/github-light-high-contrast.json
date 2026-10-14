@@ -1,0 +1,32 @@
+{
+  "id": "github-light-high-contrast",
+  "sourceUrl": "https://term.const.net/en/themes/github-light-high-contrast/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "f3d2febad498f7d6c284875772c3f5e607b9745d507d767c038a81d23ec05024",
+  "paletteSha256": "677e82fc162721ff6db54e458670566a877e20c7648224fcc1c6be6f517d6f71",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/GitHub Light High Contrast.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "GitHub Light High Contrast",
+    "background": "#ffffff",
+    "foreground": "#0e1116",
+    "cursorColor": "#0349b4",
+    "selectionBackground": "#0e1116",
+    "black": "#0e1116",
+    "red": "#a0111f",
+    "green": "#024c1a",
+    "yellow": "#3f2200",
+    "blue": "#0349b4",
+    "purple": "#622cbc",
+    "cyan": "#1b7c83",
+    "white": "#66707b",
+    "brightBlack": "#4b535d",
+    "brightRed": "#86061d",
+    "brightGreen": "#055d20",
+    "brightYellow": "#4e2c00",
+    "brightBlue": "#1168e3",
+    "brightPurple": "#844ae7",
+    "brightCyan": "#3192aa",
+    "brightWhite": "#88929d"
+  }
+}

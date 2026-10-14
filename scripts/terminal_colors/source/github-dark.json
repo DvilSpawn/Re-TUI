@@ -1,0 +1,32 @@
+{
+  "id": "github-dark",
+  "sourceUrl": "https://term.const.net/en/themes/github-dark/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "2471a818abac92bfbe8e97b9ebebed43aa7f66f2607440bf0a3e8e4246599fae",
+  "paletteSha256": "5fe4847ce60874e04f69f85032845d4ae3d862e445595590acb3d6bd2c7bfa67",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/GitHub Dark.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "GitHub Dark",
+    "background": "#101216",
+    "foreground": "#8b949e",
+    "cursorColor": "#c9d1d9",
+    "selectionBackground": "#3b5070",
+    "black": "#000000",
+    "red": "#f78166",
+    "green": "#56d364",
+    "yellow": "#e3b341",
+    "blue": "#6ca4f8",
+    "purple": "#db61a2",
+    "cyan": "#2b7489",
+    "white": "#ffffff",
+    "brightBlack": "#4d4d4d",
+    "brightRed": "#f78166",
+    "brightGreen": "#56d364",
+    "brightYellow": "#e3b341",
+    "brightBlue": "#6ca4f8",
+    "brightPurple": "#db61a2",
+    "brightCyan": "#2b7489",
+    "brightWhite": "#ffffff"
+  }
+}

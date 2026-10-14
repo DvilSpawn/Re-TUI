@@ -1,0 +1,32 @@
+{
+  "id": "arcoiris",
+  "sourceUrl": "https://term.const.net/en/themes/arcoiris/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "dabec3e23a8add9759b6da6b38c947b33d98481d55127908fb7468f3362f8bde",
+  "paletteSha256": "5aeda79bb1967e9868f8ae56f020ff60423e9869cb8fe0d484a00c19997a443d",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Arcoiris.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Arcoiris",
+    "background": "#201f1e",
+    "foreground": "#eee4d9",
+    "cursorColor": "#872929",
+    "selectionBackground": "#25524a",
+    "black": "#333333",
+    "red": "#da2700",
+    "green": "#12c258",
+    "yellow": "#ffc656",
+    "blue": "#518bfc",
+    "purple": "#e37bd9",
+    "cyan": "#63fad5",
+    "white": "#bab2b2",
+    "brightBlack": "#777777",
+    "brightRed": "#ffb9b9",
+    "brightGreen": "#e3f6aa",
+    "brightYellow": "#ffddaa",
+    "brightBlue": "#b3e8f3",
+    "brightPurple": "#cbbaf9",
+    "brightCyan": "#bcffc7",
+    "brightWhite": "#efefef"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "elegant",
+  "sourceUrl": "https://term.const.net/en/themes/elegant/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "bcb81ac80ed8a0403dd0455681a11a30478d5ea1cfc642e14684c7440bf25c4a",
+  "paletteSha256": "e8844682f3060dc3ba5b3719856615b68138301528417d13656602fcc1edb62f",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Elegant.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Elegant",
+    "background": "#292b31",
+    "foreground": "#ced2d6",
+    "cursorColor": "#00beff",
+    "selectionBackground": "#d5d5d5",
+    "black": "#0a1222",
+    "red": "#ff0257",
+    "green": "#85cc95",
+    "yellow": "#ffcb8b",
+    "blue": "#8dabe1",
+    "purple": "#c792eb",
+    "cyan": "#78ccf0",
+    "white": "#ffffff",
+    "brightBlack": "#575656",
+    "brightRed": "#ff0057",
+    "brightGreen": "#85cc95",
+    "brightYellow": "#ffcb8b",
+    "brightBlue": "#8dabe1",
+    "brightPurple": "#c792eb",
+    "brightCyan": "#3facef",
+    "brightWhite": "#ffffff"
+  }
+}

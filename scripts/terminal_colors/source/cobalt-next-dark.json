@@ -1,0 +1,32 @@
+{
+  "id": "cobalt-next-dark",
+  "sourceUrl": "https://term.const.net/en/themes/cobalt-next-dark/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "6826ea0948a21ad4f338201e1b81f7a0cfae4881e17d0d024066de0d22ce6ed8",
+  "paletteSha256": "5217e96fa1f3351a45d6910ec1532780f746dcad25f58bd70920966a7dfca7d6",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Cobalt Next Dark.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Cobalt Next Dark",
+    "background": "#0b1c24",
+    "foreground": "#d7deea",
+    "cursorColor": "#ffc64c",
+    "selectionBackground": "#37b5b4",
+    "black": "#262f37",
+    "red": "#f94967",
+    "green": "#8cc98f",
+    "yellow": "#ffc64c",
+    "blue": "#409dd4",
+    "purple": "#cba3c7",
+    "cyan": "#37b5b4",
+    "white": "#d7deea",
+    "brightBlack": "#62747f",
+    "brightRed": "#e47e8b",
+    "brightGreen": "#baddbb",
+    "brightYellow": "#ffdc91",
+    "brightBlue": "#7ac0eb",
+    "brightPurple": "#f3ccef",
+    "brightCyan": "#84e4e3",
+    "brightWhite": "#ffffff"
+  }
+}

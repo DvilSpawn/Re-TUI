@@ -1,0 +1,32 @@
+{
+  "id": "encom",
+  "sourceUrl": "https://term.const.net/en/themes/encom/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "a3422b895703c5841af365a491b2cf8a728b3873aab73f8655929c7986c61dd5",
+  "paletteSha256": "cdcd2d02aa7adc851150fc4115515a56c7176b48217ddf40282a8b82ae361120",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/ENCOM.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "ENCOM",
+    "background": "#000000",
+    "foreground": "#00a595",
+    "cursorColor": "#bbbbbb",
+    "selectionBackground": "#00a48c",
+    "black": "#000000",
+    "red": "#9f0000",
+    "green": "#008b00",
+    "yellow": "#ffd000",
+    "blue": "#0081ff",
+    "purple": "#bc00ca",
+    "cyan": "#008b8b",
+    "white": "#bbbbbb",
+    "brightBlack": "#555555",
+    "brightRed": "#ff0000",
+    "brightGreen": "#00ee00",
+    "brightYellow": "#ffff00",
+    "brightBlue": "#0000ff",
+    "brightPurple": "#ff00ff",
+    "brightCyan": "#00cdcd",
+    "brightWhite": "#ffffff"
+  }
+}

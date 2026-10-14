@@ -1,0 +1,32 @@
+{
+  "id": "modus-operandi-tritanopia",
+  "sourceUrl": "https://term.const.net/en/themes/modus-operandi-tritanopia/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "466b4ce22c18ce5b28e3be9fcf9978c085831957f4b388e6294b659fa770cefa",
+  "paletteSha256": "6b013ba26d0cd1daa3dd5d9ecdc2d81bd1dd073e4573e62f30ca96310c8f2a04",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Modus Operandi Tritanopia.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Modus Operandi Tritanopia",
+    "background": "#ffffff",
+    "foreground": "#000000",
+    "cursorColor": "#000000",
+    "selectionBackground": "#bdbdbd",
+    "black": "#000000",
+    "red": "#a60000",
+    "green": "#006800",
+    "yellow": "#695500",
+    "blue": "#0031a9",
+    "purple": "#721045",
+    "cyan": "#005e8b",
+    "white": "#a6a6a6",
+    "brightBlack": "#595959",
+    "brightRed": "#b21100",
+    "brightGreen": "#00663f",
+    "brightYellow": "#973300",
+    "brightBlue": "#3548cf",
+    "brightPurple": "#531ab6",
+    "brightCyan": "#005f5f",
+    "brightWhite": "#595959"
+  }
+}

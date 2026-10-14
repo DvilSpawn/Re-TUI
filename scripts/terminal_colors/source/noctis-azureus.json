@@ -1,0 +1,32 @@
+{
+  "id": "noctis-azureus",
+  "sourceUrl": "https://term.const.net/en/themes/noctis-azureus/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "b9043b5c681cf7d10d05ace35559794ba3de47164d4c53804d107cea21fb6621",
+  "paletteSha256": "6ec59ba90363775d564bf8a28edfb3abc552b75a2e84b14058494ce9b56f9871",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Noctis Azureus.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Noctis Azureus",
+    "background": "#07273b",
+    "foreground": "#becfda",
+    "cursorColor": "#becfda",
+    "selectionBackground": "#103850",
+    "black": "#28353e",
+    "red": "#e66533",
+    "green": "#49e9a6",
+    "yellow": "#e4b781",
+    "blue": "#49ace9",
+    "purple": "#df769b",
+    "cyan": "#49d6e9",
+    "white": "#aec3d0",
+    "brightBlack": "#475e6c",
+    "brightRed": "#e97749",
+    "brightGreen": "#60ebb1",
+    "brightYellow": "#e69533",
+    "brightBlue": "#60b6eb",
+    "brightPurple": "#e798b3",
+    "brightCyan": "#60dbeb",
+    "brightWhite": "#becfda"
+  }
+}

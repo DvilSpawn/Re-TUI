@@ -1,0 +1,32 @@
+{
+  "id": "hacktober",
+  "sourceUrl": "https://term.const.net/en/themes/hacktober/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "6c58b1c7c7dd99080703559bde5f453396daccc90e3c13a4e97576da3bc80971",
+  "paletteSha256": "1b922049d370d7d3e85081c6e81f5d5c42c10f122e4bf4c1f4344c7d8df98f45",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Hacktober.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Hacktober",
+    "background": "#141414",
+    "foreground": "#c9c9c9",
+    "cursorColor": "#c9c9c9",
+    "selectionBackground": "#141414",
+    "black": "#191918",
+    "red": "#b34538",
+    "green": "#587744",
+    "yellow": "#d08949",
+    "blue": "#206ec5",
+    "purple": "#864651",
+    "cyan": "#ac9166",
+    "white": "#f1eee7",
+    "brightBlack": "#464444",
+    "brightRed": "#b33323",
+    "brightGreen": "#42824a",
+    "brightYellow": "#c75a22",
+    "brightBlue": "#5389c5",
+    "brightPurple": "#e795a5",
+    "brightCyan": "#ebc587",
+    "brightWhite": "#ffffff"
+  }
+}

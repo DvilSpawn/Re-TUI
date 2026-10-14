@@ -1,0 +1,32 @@
+{
+  "id": "treehouse",
+  "sourceUrl": "https://term.const.net/en/themes/treehouse/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "72a3902d37b47a69ac8f1b0995b3058fe0b6fc1f380a091ba74dbde558173c7f",
+  "paletteSha256": "1a4ce36c59d1982edba025b52b6ec708745ec3195cfea1e1f9507c3aaa36da75",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Treehouse.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Treehouse",
+    "background": "#191919",
+    "foreground": "#786b53",
+    "cursorColor": "#fac814",
+    "selectionBackground": "#786b53",
+    "black": "#321300",
+    "red": "#b2270e",
+    "green": "#44a900",
+    "yellow": "#aa820c",
+    "blue": "#58859a",
+    "purple": "#97363d",
+    "cyan": "#b25a1e",
+    "white": "#786b53",
+    "brightBlack": "#504333",
+    "brightRed": "#ed5d20",
+    "brightGreen": "#55f238",
+    "brightYellow": "#f2b732",
+    "brightBlue": "#85cfed",
+    "brightPurple": "#e14c5a",
+    "brightCyan": "#f07d14",
+    "brightWhite": "#ffc800"
+  }
+}

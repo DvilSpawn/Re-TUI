@@ -1,0 +1,32 @@
+{
+  "id": "night-owl",
+  "sourceUrl": "https://term.const.net/en/themes/night-owl/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "0a1670010fbe5b3e16c0d7c8ca9aaeef05d01a121d0774867642fc4c9d81dbbc",
+  "paletteSha256": "41fdc4efa3a811c4d902448ebc2e95c69b2ea6ac3dbfd8b923c29e185091fef6",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Night Owl.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Night Owl",
+    "background": "#011627",
+    "foreground": "#d6deeb",
+    "cursorColor": "#7e57c2",
+    "selectionBackground": "#5f7e97",
+    "black": "#011627",
+    "red": "#ef5350",
+    "green": "#22da6e",
+    "yellow": "#addb67",
+    "blue": "#82aaff",
+    "purple": "#c792ea",
+    "cyan": "#21c7a8",
+    "white": "#ffffff",
+    "brightBlack": "#575656",
+    "brightRed": "#ef5350",
+    "brightGreen": "#22da6e",
+    "brightYellow": "#ffeb95",
+    "brightBlue": "#82aaff",
+    "brightPurple": "#c792ea",
+    "brightCyan": "#7fdbca",
+    "brightWhite": "#ffffff"
+  }
+}

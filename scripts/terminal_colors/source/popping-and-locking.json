@@ -1,0 +1,32 @@
+{
+  "id": "popping-and-locking",
+  "sourceUrl": "https://term.const.net/en/themes/popping-and-locking/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "015a356fa8fb4fdc1049f64aa8303029e77894b9f7b540e0c7891426252838a8",
+  "paletteSha256": "d6486382c9e03206e3b28466dc9eef6b1b02c40c16c3fb65d30c66d1323e74fc",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Popping And Locking.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Popping And Locking",
+    "background": "#181921",
+    "foreground": "#ebdbb2",
+    "cursorColor": "#c7c7c7",
+    "selectionBackground": "#ebdbb2",
+    "black": "#1d2021",
+    "red": "#cc241d",
+    "green": "#98971a",
+    "yellow": "#d79921",
+    "blue": "#458588",
+    "purple": "#b16286",
+    "cyan": "#689d6a",
+    "white": "#a89984",
+    "brightBlack": "#928374",
+    "brightRed": "#f42c3e",
+    "brightGreen": "#b8bb26",
+    "brightYellow": "#fabd2f",
+    "brightBlue": "#99c6ca",
+    "brightPurple": "#d3869b",
+    "brightCyan": "#7ec16e",
+    "brightWhite": "#ebdbb2"
+  }
+}

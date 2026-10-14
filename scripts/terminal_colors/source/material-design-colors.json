@@ -1,0 +1,32 @@
+{
+  "id": "material-design-colors",
+  "sourceUrl": "https://term.const.net/en/themes/material-design-colors/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "02542691d9fef91d1166dd92ebe338d61f99b7236b4ccf0e07e572ebb75eb46a",
+  "paletteSha256": "c18d7320564c1693a0f8cf03effa4c80d5fc875c6aab269cb818efffb6e2d109",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Material Design Colors.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Material Design Colors",
+    "background": "#1d262a",
+    "foreground": "#e7ebed",
+    "cursorColor": "#eaeaea",
+    "selectionBackground": "#4e6a78",
+    "black": "#435b67",
+    "red": "#fc3841",
+    "green": "#5cf19e",
+    "yellow": "#fed032",
+    "blue": "#37b6ff",
+    "purple": "#fc226e",
+    "cyan": "#59ffd1",
+    "white": "#ffffff",
+    "brightBlack": "#a1b0b8",
+    "brightRed": "#fc746d",
+    "brightGreen": "#adf7be",
+    "brightYellow": "#fee16c",
+    "brightBlue": "#70cfff",
+    "brightPurple": "#fc669b",
+    "brightCyan": "#9affe6",
+    "brightWhite": "#ffffff"
+  }
+}

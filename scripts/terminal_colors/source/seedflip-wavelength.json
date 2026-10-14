@@ -1,0 +1,32 @@
+{
+  "id": "seedflip-wavelength",
+  "sourceUrl": "https://term.const.net/en/themes/seedflip-wavelength/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "76dc5c15ffe23ccae57f9c0e6fee7a84e909418a47ab27330817ae9954905f1e",
+  "paletteSha256": "a5811157f980b61d44e198436c4852b04ed63bb39dac801957a0406da8a4ac24",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/SeedFlip Wavelength.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "SeedFlip Wavelength",
+    "background": "#0d1117",
+    "foreground": "#e6edf3",
+    "cursorColor": "#238636",
+    "selectionBackground": "#161b22",
+    "black": "#090c10",
+    "red": "#d55d5d",
+    "green": "#5dd585",
+    "yellow": "#d5c15d",
+    "blue": "#5d8fd5",
+    "purple": "#d55dd5",
+    "cyan": "#5dd5d5",
+    "white": "#f7f9fb",
+    "brightBlack": "#364255",
+    "brightRed": "#e59a9a",
+    "brightGreen": "#9ae5b3",
+    "brightYellow": "#e5d89a",
+    "brightBlue": "#9ab9e5",
+    "brightPurple": "#e59ae5",
+    "brightCyan": "#9ae5e5",
+    "brightWhite": "#ffffff"
+  }
+}

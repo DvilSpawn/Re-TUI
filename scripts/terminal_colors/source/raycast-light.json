@@ -1,0 +1,32 @@
+{
+  "id": "raycast-light",
+  "sourceUrl": "https://term.const.net/en/themes/raycast-light/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "eef908b14c4f404145d7138b6cd83d92a8335ee13559b16414f7cc075cb28841",
+  "paletteSha256": "b515edcf3b0304ff20f941ace66850955068859d03dff63f7fadde4b70a47b76",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Raycast Light.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Raycast Light",
+    "background": "#ffffff",
+    "foreground": "#000000",
+    "cursorColor": "#000000",
+    "selectionBackground": "#e5e5e5",
+    "black": "#000000",
+    "red": "#b12424",
+    "green": "#006b4f",
+    "yellow": "#f8a300",
+    "blue": "#138af2",
+    "purple": "#9a1b6e",
+    "cyan": "#3eb8bf",
+    "white": "#bfbfbf",
+    "brightBlack": "#000000",
+    "brightRed": "#b12424",
+    "brightGreen": "#006b4f",
+    "brightYellow": "#f8a300",
+    "brightBlue": "#138af2",
+    "brightPurple": "#9a1b6e",
+    "brightCyan": "#3eb8bf",
+    "brightWhite": "#ffffff"
+  }
+}

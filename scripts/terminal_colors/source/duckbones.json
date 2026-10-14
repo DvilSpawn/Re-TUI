@@ -1,0 +1,32 @@
+{
+  "id": "duckbones",
+  "sourceUrl": "https://term.const.net/en/themes/duckbones/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "6cb4565c88fb4ac723ece0127312173f40e05b482badcccef995f70ad08ad646",
+  "paletteSha256": "d7a844fe008db59c1b6725abd4624b837a59ef0f26c675a8ea514b5c86b2b277",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Duckbones.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Duckbones",
+    "background": "#0e101a",
+    "foreground": "#ebefc0",
+    "cursorColor": "#edf2c2",
+    "selectionBackground": "#37382d",
+    "black": "#0e101a",
+    "red": "#e03600",
+    "green": "#5dcd97",
+    "yellow": "#e39500",
+    "blue": "#00a3cb",
+    "purple": "#795ccc",
+    "cyan": "#00a3cb",
+    "white": "#ebefc0",
+    "brightBlack": "#444860",
+    "brightRed": "#ff4821",
+    "brightGreen": "#58db9e",
+    "brightYellow": "#f6a100",
+    "brightBlue": "#00b4e0",
+    "brightPurple": "#b3a1e6",
+    "brightCyan": "#00b4e0",
+    "brightWhite": "#b3b692"
+  }
+}

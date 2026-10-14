@@ -1,0 +1,32 @@
+{
+  "id": "belafonte-day",
+  "sourceUrl": "https://term.const.net/en/themes/belafonte-day/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "0e9f4e138c7190a9008f8ef8faaff41941de3ad93e997e55099903ed19eef0e0",
+  "paletteSha256": "0932cf8a3785da6cefe4a2f73c4b2899dd66c0c660de2e554b7413045e603dcc",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Belafonte Day.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Belafonte Day",
+    "background": "#d5ccba",
+    "foreground": "#45373c",
+    "cursorColor": "#45373c",
+    "selectionBackground": "#968c83",
+    "black": "#20111b",
+    "red": "#be100e",
+    "green": "#858162",
+    "yellow": "#d08b30",
+    "blue": "#426a79",
+    "purple": "#97522c",
+    "cyan": "#989a9c",
+    "white": "#968c83",
+    "brightBlack": "#5e5252",
+    "brightRed": "#be100e",
+    "brightGreen": "#858162",
+    "brightYellow": "#d08b30",
+    "brightBlue": "#426a79",
+    "brightPurple": "#97522c",
+    "brightCyan": "#989a9c",
+    "brightWhite": "#d5ccba"
+  }
+}

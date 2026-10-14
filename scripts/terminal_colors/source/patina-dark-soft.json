@@ -1,0 +1,32 @@
+{
+  "id": "patina-dark-soft",
+  "sourceUrl": "https://term.const.net/en/themes/patina-dark-soft/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "a8670b7a8c3b3b72d255f9d2c29bf8739bb1d64767cb0fc6481cc87d9a9032e9",
+  "paletteSha256": "ed9a1ab7578d1968ac9f5cf2b8e674cc5f6b786c158b3743149a6d3943d14b3a",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Patina Dark Soft.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Patina Dark Soft",
+    "background": "#1a1a1a",
+    "foreground": "#dbd7ca",
+    "cursorColor": "#dbd7ca",
+    "selectionBackground": "#3a3835",
+    "black": "#2e2e2e",
+    "red": "#cb7676",
+    "green": "#549c7d",
+    "yellow": "#e6cc77",
+    "blue": "#6db3c2",
+    "purple": "#c98a7d",
+    "cyan": "#5da9a7",
+    "white": "#dbd7ca",
+    "brightBlack": "#585858",
+    "brightRed": "#cb7676",
+    "brightGreen": "#549c7d",
+    "brightYellow": "#e6cc77",
+    "brightBlue": "#6db3c2",
+    "brightPurple": "#c98a7d",
+    "brightCyan": "#5da9a7",
+    "brightWhite": "#dbd7ca"
+  }
+}

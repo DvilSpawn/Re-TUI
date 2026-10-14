@@ -1,0 +1,32 @@
+{
+  "id": "catppuccin-macchiato",
+  "sourceUrl": "https://term.const.net/en/themes/catppuccin-macchiato/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "39e80fab66a5f505d14be372a67afcd1d95bbb63d3013d892014b83fce5217e0",
+  "paletteSha256": "5ee3fc073c3d19fd974e27323c023a50c849a438ca9cac0062a8fa320737a121",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Catppuccin Macchiato.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Catppuccin Macchiato",
+    "background": "#24273a",
+    "foreground": "#cad3f5",
+    "cursorColor": "#f4dbd6",
+    "selectionBackground": "#f4dbd6",
+    "black": "#494d64",
+    "red": "#ed8796",
+    "green": "#a6da95",
+    "yellow": "#eed49f",
+    "blue": "#8aadf4",
+    "purple": "#f5bde6",
+    "cyan": "#8bd5ca",
+    "white": "#b8c0e0",
+    "brightBlack": "#5b6078",
+    "brightRed": "#f2a7b2",
+    "brightGreen": "#bde3b0",
+    "brightYellow": "#f4e3c1",
+    "brightBlue": "#adc5f7",
+    "brightPurple": "#f493da",
+    "brightCyan": "#a5ded6",
+    "brightWhite": "#a5adcb"
+  }
+}

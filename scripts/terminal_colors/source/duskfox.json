@@ -1,0 +1,32 @@
+{
+  "id": "duskfox",
+  "sourceUrl": "https://term.const.net/en/themes/duskfox/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "e0947e9569dbb5322123f14d901339410bc6070fa4d1576f1d8fbb4db61f0917",
+  "paletteSha256": "d1735a8bd3f66c579fc93869d43b601345ee6d1f7011c4cabc08a90df7919861",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Duskfox.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Duskfox",
+    "background": "#232136",
+    "foreground": "#e0def4",
+    "cursorColor": "#e0def4",
+    "selectionBackground": "#433c59",
+    "black": "#393552",
+    "red": "#eb6f92",
+    "green": "#a3be8c",
+    "yellow": "#f6c177",
+    "blue": "#569fba",
+    "purple": "#c4a7e7",
+    "cyan": "#9ccfd8",
+    "white": "#e0def4",
+    "brightBlack": "#544d8a",
+    "brightRed": "#f083a2",
+    "brightGreen": "#b1d196",
+    "brightYellow": "#f9cb8c",
+    "brightBlue": "#65b1cd",
+    "brightPurple": "#ccb1ed",
+    "brightCyan": "#a6dae3",
+    "brightWhite": "#e2e0f7"
+  }
+}

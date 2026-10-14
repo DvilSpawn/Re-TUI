@@ -1,0 +1,32 @@
+{
+  "id": "tokyonight-storm",
+  "sourceUrl": "https://term.const.net/en/themes/tokyonight-storm/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "5574cd67873635e179cf18dacbd2bbe585f3b466a52c5e5956ff3b49d3014f4d",
+  "paletteSha256": "e46be255eda3e2f581843fda99a9db96e3aa5791b6c2d231853357daea9ccf4f",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/TokyoNight Storm.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "TokyoNight Storm",
+    "background": "#24283b",
+    "foreground": "#c0caf5",
+    "cursorColor": "#c0caf5",
+    "selectionBackground": "#364a82",
+    "black": "#1d202f",
+    "red": "#f7768e",
+    "green": "#9ece6a",
+    "yellow": "#e0af68",
+    "blue": "#7aa2f7",
+    "purple": "#bb9af7",
+    "cyan": "#7dcfff",
+    "white": "#a9b1d6",
+    "brightBlack": "#4e5575",
+    "brightRed": "#f7768e",
+    "brightGreen": "#9ece6a",
+    "brightYellow": "#e0af68",
+    "brightBlue": "#7aa2f7",
+    "brightPurple": "#bb9af7",
+    "brightCyan": "#7dcfff",
+    "brightWhite": "#c0caf5"
+  }
+}

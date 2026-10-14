@@ -1,0 +1,32 @@
+{
+  "id": "melange-light",
+  "sourceUrl": "https://term.const.net/en/themes/melange-light/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "7d332bcf76fd854d45e6a872aae45cdf71d4209856a567650f06cfc7b0724da3",
+  "paletteSha256": "08f05233ad28f51819a22ebb14a703f876dda0ddde9d468fdfef54d5da384767",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Melange Light.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Melange Light",
+    "background": "#f1f1f1",
+    "foreground": "#54433a",
+    "cursorColor": "#54433a",
+    "selectionBackground": "#54433a",
+    "black": "#e9e1db",
+    "red": "#c77b8b",
+    "green": "#6e9b72",
+    "yellow": "#bc5c00",
+    "blue": "#7892bd",
+    "purple": "#be79bb",
+    "cyan": "#739797",
+    "white": "#7d6658",
+    "brightBlack": "#a98a78",
+    "brightRed": "#bf0021",
+    "brightGreen": "#3a684a",
+    "brightYellow": "#a06d00",
+    "brightBlue": "#465aa4",
+    "brightPurple": "#904180",
+    "brightCyan": "#3d6568",
+    "brightWhite": "#54433a"
+  }
+}

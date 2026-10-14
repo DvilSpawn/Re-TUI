@@ -1,0 +1,32 @@
+{
+  "id": "builtin-light",
+  "sourceUrl": "https://term.const.net/en/themes/builtin-light/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "414c70075c6c71d1681c005e810be4b96f2b11627eac3b3a892cf8c4b097d5c4",
+  "paletteSha256": "158339f61df47022efa2cf0cda8de7d96a63d0cce6cc6789e00d42258f9174ce",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Builtin Light.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Builtin Light",
+    "background": "#ffffff",
+    "foreground": "#000000",
+    "cursorColor": "#000000",
+    "selectionBackground": "#b5d5ff",
+    "black": "#000000",
+    "red": "#bb0000",
+    "green": "#00bb00",
+    "yellow": "#bbbb00",
+    "blue": "#0000bb",
+    "purple": "#bb00bb",
+    "cyan": "#00bbbb",
+    "white": "#bbbbbb",
+    "brightBlack": "#555555",
+    "brightRed": "#ff5555",
+    "brightGreen": "#2fd92f",
+    "brightYellow": "#bfbf15",
+    "brightBlue": "#5555ff",
+    "brightPurple": "#ff55ff",
+    "brightCyan": "#22cccc",
+    "brightWhite": "#ffffff"
+  }
+}

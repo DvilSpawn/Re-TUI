@@ -1,0 +1,32 @@
+{
+  "id": "flat",
+  "sourceUrl": "https://term.const.net/en/themes/flat/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "2ea742a23ffd071f41dade829c3e133d64d81fb7b5c775751f7da5cc2d5af2de",
+  "paletteSha256": "190612f0a121c0d05dfee32da6efe0bae2cb6f732a4dc43134a0040a471c306d",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Flat.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Flat",
+    "background": "#002240",
+    "foreground": "#2cc55d",
+    "cursorColor": "#e5be0c",
+    "selectionBackground": "#792b9c",
+    "black": "#222d3f",
+    "red": "#a82320",
+    "green": "#32a548",
+    "yellow": "#e58d11",
+    "blue": "#3167ac",
+    "purple": "#781aa0",
+    "cyan": "#2c9370",
+    "white": "#b0b6ba",
+    "brightBlack": "#475262",
+    "brightRed": "#d4312e",
+    "brightGreen": "#2d9440",
+    "brightYellow": "#e5be0c",
+    "brightBlue": "#3c7dd2",
+    "brightPurple": "#8230a7",
+    "brightCyan": "#35b387",
+    "brightWhite": "#e7eced"
+  }
+}

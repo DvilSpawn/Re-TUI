@@ -1,0 +1,32 @@
+{
+  "id": "purplepeter",
+  "sourceUrl": "https://term.const.net/en/themes/purplepeter/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "4a076f9e39a057df46cc04d0c164d30051c7f3b21739e0989c2ee5069ba0b5c4",
+  "paletteSha256": "ec6a5e7d1bdba9b6501208960fc4ef9c6b8612e67ca04f5f6630b77862e43e2f",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Purplepeter.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Purplepeter",
+    "background": "#2a1a4a",
+    "foreground": "#ece7fa",
+    "cursorColor": "#c7c7c7",
+    "selectionBackground": "#8689c2",
+    "black": "#0a0520",
+    "red": "#ff796d",
+    "green": "#99b481",
+    "yellow": "#efdfac",
+    "blue": "#66d9ef",
+    "purple": "#e78fcd",
+    "cyan": "#ba8cff",
+    "white": "#ffba81",
+    "brightBlack": "#504b63",
+    "brightRed": "#f99f92",
+    "brightGreen": "#b4be8f",
+    "brightYellow": "#f2e9bf",
+    "brightBlue": "#79daed",
+    "brightPurple": "#ba91d4",
+    "brightCyan": "#a0a0d6",
+    "brightWhite": "#b9aed3"
+  }
+}

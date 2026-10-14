@@ -1,0 +1,32 @@
+{
+  "id": "cursor-dark",
+  "sourceUrl": "https://term.const.net/en/themes/cursor-dark/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "7eec3d36f06a4972ace49104e604b20f9e6880dadb212b0c48e77c2379c30f97",
+  "paletteSha256": "bf4bbd24dc3d5029062a0073223879e43415d2fdce5f1835477db6d4e58ff303",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Cursor Dark.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Cursor Dark",
+    "background": "#141414",
+    "foreground": "#d4d4d4",
+    "cursorColor": "#d4d4d4",
+    "selectionBackground": "#2c2c2c",
+    "black": "#242424",
+    "red": "#fc6b83",
+    "green": "#3fa266",
+    "yellow": "#d2943e",
+    "blue": "#81a1c1",
+    "purple": "#b48ead",
+    "cyan": "#88c0d0",
+    "white": "#e4e4e4",
+    "brightBlack": "#4a4a4a",
+    "brightRed": "#fc6b83",
+    "brightGreen": "#70b489",
+    "brightYellow": "#f1b467",
+    "brightBlue": "#87a6c4",
+    "brightPurple": "#b48ead",
+    "brightCyan": "#88c0d0",
+    "brightWhite": "#e4e4e4"
+  }
+}

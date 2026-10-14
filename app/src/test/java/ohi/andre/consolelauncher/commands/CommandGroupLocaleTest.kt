@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher.commands
 
+import ohi.andre.consolelauncher.commands.main.specific.ParamCommand
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.util.Locale
@@ -15,5 +16,16 @@ class CommandGroupLocaleTest {
         } finally {
             Locale.setDefault(original)
         }
+    }
+
+    @Test
+    fun privateCommandExposesAllPrivateSpaceActions() {
+        val command = CommandGroup("ohi.andre.consolelauncher.commands.main.raw")
+            .getCommandByName("private")
+
+        assertEquals(
+            setOf("-ls", "-lock", "-unlock", "-settings", "-show", "-hide"),
+            (command as? ParamCommand)?.params()?.toSet()
+        )
     }
 }

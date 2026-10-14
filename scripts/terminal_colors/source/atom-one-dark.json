@@ -1,0 +1,32 @@
+{
+  "id": "atom-one-dark",
+  "sourceUrl": "https://term.const.net/en/themes/atom-one-dark/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "bd20ef84fead9eae9ba6041080a36b4069dc7cce32079c2b743ec51cddb6b291",
+  "paletteSha256": "e49bf5bc8591b03ceeefa0f43541c48a93c6d1d6b1df508c3d28a788486d0ebd",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Atom One Dark.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Atom One Dark",
+    "background": "#21252b",
+    "foreground": "#abb2bf",
+    "cursorColor": "#abb2bf",
+    "selectionBackground": "#323844",
+    "black": "#21252b",
+    "red": "#e06c75",
+    "green": "#98c379",
+    "yellow": "#e5c07b",
+    "blue": "#61afef",
+    "purple": "#c678dd",
+    "cyan": "#56b6c2",
+    "white": "#abb2bf",
+    "brightBlack": "#767676",
+    "brightRed": "#e06c75",
+    "brightGreen": "#98c379",
+    "brightYellow": "#e5c07b",
+    "brightBlue": "#61afef",
+    "brightPurple": "#c678dd",
+    "brightCyan": "#56b6c2",
+    "brightWhite": "#abb2bf"
+  }
+}

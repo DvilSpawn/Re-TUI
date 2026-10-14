@@ -1,0 +1,32 @@
+{
+  "id": "aurora",
+  "sourceUrl": "https://term.const.net/en/themes/aurora/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "e97bd046a3476f4fbbc4f78592c42d9f0d3e8871bd95e807a68a92238b573632",
+  "paletteSha256": "8e049f825571aa708e0885b95718e0efd55eb2143cbbd8612a60f68f17edfb0a",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Aurora.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Aurora",
+    "background": "#23262e",
+    "foreground": "#ffca28",
+    "cursorColor": "#ee5d43",
+    "selectionBackground": "#292e38",
+    "black": "#23262e",
+    "red": "#f0266f",
+    "green": "#8fd46d",
+    "yellow": "#ffe66d",
+    "blue": "#102ee4",
+    "purple": "#ee5d43",
+    "cyan": "#03d6b8",
+    "white": "#c74ded",
+    "brightBlack": "#4f545e",
+    "brightRed": "#f92672",
+    "brightGreen": "#8fd46d",
+    "brightYellow": "#ffe66d",
+    "brightBlue": "#03d6b8",
+    "brightPurple": "#ee5d43",
+    "brightCyan": "#03d6b8",
+    "brightWhite": "#c74ded"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "ollie",
+  "sourceUrl": "https://term.const.net/en/themes/ollie/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "ea1940a43eee3f7d8351c2e6c3996f0700125bab4cead577314c41d56d39c992",
+  "paletteSha256": "23dafb7cd6f798fabe3861b587465be37c8a7c1af03347c9ee5d37b37db3756c",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Ollie.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Ollie",
+    "background": "#222125",
+    "foreground": "#8a8dae",
+    "cursorColor": "#5b6ea7",
+    "selectionBackground": "#1e3a66",
+    "black": "#000000",
+    "red": "#ac2e31",
+    "green": "#31ac61",
+    "yellow": "#ac4300",
+    "blue": "#2d57ac",
+    "purple": "#b08528",
+    "cyan": "#1fa6ac",
+    "white": "#8a8eac",
+    "brightBlack": "#684432",
+    "brightRed": "#ff3d48",
+    "brightGreen": "#3bff99",
+    "brightYellow": "#ff5e1e",
+    "brightBlue": "#4488ff",
+    "brightPurple": "#ffc21d",
+    "brightCyan": "#1ffaff",
+    "brightWhite": "#5b6ea7"
+  }
+}

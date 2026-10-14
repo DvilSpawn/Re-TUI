@@ -1,0 +1,32 @@
+{
+  "id": "neopolitan",
+  "sourceUrl": "https://term.const.net/en/themes/neopolitan/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "05301827e8412f592f27b945e953efd312e53146c2ca74a00570375042578405",
+  "paletteSha256": "9ce3dd1627a4c08e4532a735ded6f8136d6a6493e1c7ff74f165d69242ba0639",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Neopolitan.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Neopolitan",
+    "background": "#271f19",
+    "foreground": "#ffffff",
+    "cursorColor": "#ffffff",
+    "selectionBackground": "#253b76",
+    "black": "#000000",
+    "red": "#9a1a1a",
+    "green": "#61ce3c",
+    "yellow": "#fbde2d",
+    "blue": "#324883",
+    "purple": "#ff0080",
+    "cyan": "#8da6ce",
+    "white": "#f8f8f8",
+    "brightBlack": "#4c4c4c",
+    "brightRed": "#9a1a1a",
+    "brightGreen": "#61ce3c",
+    "brightYellow": "#fbde2d",
+    "brightBlue": "#324883",
+    "brightPurple": "#ff0080",
+    "brightCyan": "#8da6ce",
+    "brightWhite": "#f8f8f8"
+  }
+}

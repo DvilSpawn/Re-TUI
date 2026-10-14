@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_preview_draft">LIVE PREVIEW · Sample content · Apply with Save</string>
+    <string name="settings_preview_status">Status</string>
+    <string name="settings_preview_terminal">Terminal</string>
+    <string name="settings_preview_modules">Modules</string>
+    <string name="settings_preview_status_hidden">Status lines are hidden. Enable one below to preview it.</string>
+    <string name="settings_preview_ansi">ANSI</string>
+    <string name="settings_preview_page">%1$s · %2$d / %3$d · Swipe to explore</string>
+    <string name="settings_preview_palette">ANSI palette · Normal 30–37 / Bright 90–97</string>
+    <string name="settings_preview_normal">Normal</string>
+    <string name="settings_preview_selected">Selected</string>
+    <string name="settings_preview_disabled">Disabled</string>
+</resources>

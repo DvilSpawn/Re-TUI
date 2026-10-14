@@ -1,0 +1,32 @@
+{
+  "id": "ryuuko",
+  "sourceUrl": "https://term.const.net/en/themes/ryuuko/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "5059934a838a15b47b793881aa4eb73f748dfd43727d5e4142c41b78eaf48ab1",
+  "paletteSha256": "da055a266ef7c278915665456c8c036ec58aaf73619b30b1301e80f49cbd251a",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Ryuuko.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Ryuuko",
+    "background": "#2c3941",
+    "foreground": "#ececec",
+    "cursorColor": "#ececec",
+    "selectionBackground": "#002831",
+    "black": "#2c3941",
+    "red": "#865f5b",
+    "green": "#66907d",
+    "yellow": "#b1a990",
+    "blue": "#6a8e95",
+    "purple": "#b18a73",
+    "cyan": "#88b2ac",
+    "white": "#ececec",
+    "brightBlack": "#5d7079",
+    "brightRed": "#865f5b",
+    "brightGreen": "#66907d",
+    "brightYellow": "#b1a990",
+    "brightBlue": "#6a8e95",
+    "brightPurple": "#b18a73",
+    "brightCyan": "#88b2ac",
+    "brightWhite": "#ececec"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "galaxy",
+  "sourceUrl": "https://term.const.net/en/themes/galaxy/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "4ce40d3168990275cbdeafd930b31031434ecb97bf6f40e344934487c4d11bf9",
+  "paletteSha256": "501507a942f0ded31db1a5e6b590c42be71b41be18ee2e26dc0c10df9cae5f0b",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Galaxy.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Galaxy",
+    "background": "#1d2837",
+    "foreground": "#ffffff",
+    "cursorColor": "#bbbbbb",
+    "selectionBackground": "#b5d5ff",
+    "black": "#000000",
+    "red": "#f9555f",
+    "green": "#21b089",
+    "yellow": "#fef02a",
+    "blue": "#589df6",
+    "purple": "#944d95",
+    "cyan": "#1f9ee7",
+    "white": "#bbbbbb",
+    "brightBlack": "#555555",
+    "brightRed": "#fa8c8f",
+    "brightGreen": "#35bb9a",
+    "brightYellow": "#ffff55",
+    "brightBlue": "#589df6",
+    "brightPurple": "#e75699",
+    "brightCyan": "#3979bc",
+    "brightWhite": "#ffffff"
+  }
+}

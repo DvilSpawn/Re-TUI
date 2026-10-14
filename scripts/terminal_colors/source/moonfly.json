@@ -1,0 +1,32 @@
+{
+  "id": "moonfly",
+  "sourceUrl": "https://term.const.net/en/themes/moonfly/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "7b1066d9cfe114b7b146f1d6668758454f259f2d5cb94f09da8558f27bd0dd8d",
+  "paletteSha256": "5c625c5a6c73b8569ca390bbb713540fd73ef0f787c97cede2543921c9415b0a",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Moonfly.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Moonfly",
+    "background": "#080808",
+    "foreground": "#bdbdbd",
+    "cursorColor": "#9e9e9e",
+    "selectionBackground": "#b2ceee",
+    "black": "#323437",
+    "red": "#ff5454",
+    "green": "#8cc85f",
+    "yellow": "#e3c78a",
+    "blue": "#80a0ff",
+    "purple": "#cf87e8",
+    "cyan": "#79dac8",
+    "white": "#c6c6c6",
+    "brightBlack": "#949494",
+    "brightRed": "#ff5189",
+    "brightGreen": "#36c692",
+    "brightYellow": "#c6c684",
+    "brightBlue": "#74b2ff",
+    "brightPurple": "#ae81ff",
+    "brightCyan": "#85dc85",
+    "brightWhite": "#e4e4e4"
+  }
+}

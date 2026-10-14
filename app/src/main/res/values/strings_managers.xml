@@ -56,6 +56,10 @@
     <string name="manager_androidwidgetdrawermanager_x_97baa">"%1$s %2$dx%3$d %4$s"</string>
     <!-- AppDrawerPaneManager.kt: buildGroupTabs -->
     <string name="manager_appdrawerpanemanager_all_6b428" formatted="false">"ALL"</string>
+    <string name="manager_appdrawerpanemanager_private_7d5e1" formatted="false">"PRI"</string>
+    <string name="manager_appdrawerpanemanager_private_space_9f6b2" formatted="false">"PRIVATE SPACE · %1$d"</string>
+    <string name="manager_appdrawerpanemanager_private_lock_6b0f1" formatted="false">"[ LOCK PRIVATE SPACE ]"</string>
+    <string name="manager_appdrawerpanemanager_private_hide_4d1c2" formatted="false">"[ HIDE PRIVATE SPACE ]"</string>
     <!-- AppDrawerPaneManager.kt: rebuildContents -->
     <string name="manager_appdrawerpanemanager_applications_a46d2">"Applications/ [%1$d] &lt;%2$s&gt;"</string>
     <!-- AppDrawerPaneManager.kt: rebuildContents -->

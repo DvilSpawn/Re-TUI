@@ -1,0 +1,32 @@
+{
+  "id": "subliminal",
+  "sourceUrl": "https://term.const.net/en/themes/subliminal/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "28d86312804d36c1d7a6b48500293b93fbb73912b3eb61405a75252197caba3f",
+  "paletteSha256": "3a8953d2bf51f1ce9eb6fee7df36d1b0d0e28eb938484d495b003fc7e4a382e6",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Subliminal.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Subliminal",
+    "background": "#282c35",
+    "foreground": "#d4d4d4",
+    "cursorColor": "#c7c7c7",
+    "selectionBackground": "#484e5b",
+    "black": "#7f7f7f",
+    "red": "#e15a60",
+    "green": "#a9cfa4",
+    "yellow": "#ffe2a9",
+    "blue": "#6699cc",
+    "purple": "#f1a5ab",
+    "cyan": "#5fb3b3",
+    "white": "#d4d4d4",
+    "brightBlack": "#7f7f7f",
+    "brightRed": "#e15a60",
+    "brightGreen": "#a9cfa4",
+    "brightYellow": "#ffe2a9",
+    "brightBlue": "#6699cc",
+    "brightPurple": "#f1a5ab",
+    "brightCyan": "#5fb3b3",
+    "brightWhite": "#d4d4d4"
+  }
+}

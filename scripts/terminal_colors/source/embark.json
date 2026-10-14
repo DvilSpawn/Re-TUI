@@ -1,0 +1,32 @@
+{
+  "id": "embark",
+  "sourceUrl": "https://term.const.net/en/themes/embark/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "9728b69f9e550c8ae9f4071a5bc1a2e7f8f5176c70eb0ac9da4fc4ecc1b4cafa",
+  "paletteSha256": "fbca4eeb232b98b6cbbcdaa387fff699d57d675efb04f1fcd5cdbf646d2461e0",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Embark.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Embark",
+    "background": "#1e1c31",
+    "foreground": "#eeffff",
+    "cursorColor": "#a1efd3",
+    "selectionBackground": "#fbfcfc",
+    "black": "#1e1c31",
+    "red": "#f0719b",
+    "green": "#a1efd3",
+    "yellow": "#ffe9aa",
+    "blue": "#57c7ff",
+    "purple": "#c792ea",
+    "cyan": "#87dfeb",
+    "white": "#f8f8f2",
+    "brightBlack": "#585273",
+    "brightRed": "#f02e6e",
+    "brightGreen": "#2ce592",
+    "brightYellow": "#ffb378",
+    "brightBlue": "#1da0e2",
+    "brightPurple": "#a742ea",
+    "brightCyan": "#63f2f1",
+    "brightWhite": "#a6b3cc"
+  }
+}

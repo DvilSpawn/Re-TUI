@@ -1,0 +1,32 @@
+{
+  "id": "piatto-light",
+  "sourceUrl": "https://term.const.net/en/themes/piatto-light/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "3856aad7be9028234a3b77a3fe5885415bfb3020b93d19ace034fbfe4d880940",
+  "paletteSha256": "789709897032a57b2267411267e7e22a29775ca4eba85ea5666eaa36d60b87f5",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Piatto Light.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Piatto Light",
+    "background": "#ffffff",
+    "foreground": "#414141",
+    "cursorColor": "#5e77c8",
+    "selectionBackground": "#706b4e",
+    "black": "#414141",
+    "red": "#b23771",
+    "green": "#66781e",
+    "yellow": "#cd6f34",
+    "blue": "#3c5ea8",
+    "purple": "#a454b2",
+    "cyan": "#66781e",
+    "white": "#bfbfbf",
+    "brightBlack": "#3f3f3f",
+    "brightRed": "#db3365",
+    "brightGreen": "#829429",
+    "brightYellow": "#cd6f34",
+    "brightBlue": "#3c5ea8",
+    "brightPurple": "#a454b2",
+    "brightCyan": "#829429",
+    "brightWhite": "#f2f2f2"
+  }
+}

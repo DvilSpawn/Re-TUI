@@ -1,0 +1,32 @@
+{
+  "id": "darkermatrix",
+  "sourceUrl": "https://term.const.net/en/themes/darkermatrix/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "db596b09806a6b46c097faa9bb40b7cf22e2df89ca212a2ea5949199a843eb81",
+  "paletteSha256": "b4a4ec9b56cee76865f59740fb79847ab335448096127ad24cd60a4f646c0a1d",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Darkermatrix.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Darkermatrix",
+    "background": "#070c0e",
+    "foreground": "#35451a",
+    "cursorColor": "#444733",
+    "selectionBackground": "#0f191c",
+    "black": "#091013",
+    "red": "#1a4831",
+    "green": "#6fa64c",
+    "yellow": "#595900",
+    "blue": "#00cb6b",
+    "purple": "#4e375a",
+    "cyan": "#125459",
+    "white": "#1a4833",
+    "brightBlack": "#404040",
+    "brightRed": "#0d452a",
+    "brightGreen": "#90d762",
+    "brightYellow": "#e2e500",
+    "brightBlue": "#00ff87",
+    "brightPurple": "#4e375a",
+    "brightCyan": "#176c73",
+    "brightWhite": "#00381e"
+  }
+}

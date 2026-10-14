@@ -1,0 +1,32 @@
+{
+  "id": "chalk",
+  "sourceUrl": "https://term.const.net/en/themes/chalk/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "77c8395a44ebf0d2804e49b62f3f993e06c31be5f32fdc58a09ee89365f360e2",
+  "paletteSha256": "266b22d4a46e0a164f6edbffb96024c00ead04fadb4eaf23ef4db2f70a7a362e",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Chalk.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Chalk",
+    "background": "#2b2d2e",
+    "foreground": "#d2d8d9",
+    "cursorColor": "#708284",
+    "selectionBackground": "#e4e8ed",
+    "black": "#7d8b8f",
+    "red": "#b23a52",
+    "green": "#789b6a",
+    "yellow": "#b9ac4a",
+    "blue": "#2a7fac",
+    "purple": "#bd4f5a",
+    "cyan": "#44a799",
+    "white": "#d2d8d9",
+    "brightBlack": "#888888",
+    "brightRed": "#f24840",
+    "brightGreen": "#80c470",
+    "brightYellow": "#ffeb62",
+    "brightBlue": "#4196ff",
+    "brightPurple": "#fc5275",
+    "brightCyan": "#53cdbd",
+    "brightWhite": "#d2d8d9"
+  }
+}

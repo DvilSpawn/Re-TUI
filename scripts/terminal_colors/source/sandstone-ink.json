@@ -1,0 +1,32 @@
+{
+  "id": "sandstone-ink",
+  "sourceUrl": "https://term.const.net/en/themes/sandstone-ink/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "bd16d87e9c239fe3049ad4d88a3770abad549e4281dfd7ef372afd65fac03948",
+  "paletteSha256": "9955f1dbd771e5fcd02ef9e9d0e515b81d3be4ee2a5a63c296171c655f2d39d4",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Sandstone Ink.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Sandstone Ink",
+    "background": "#fdf6e3",
+    "foreground": "#2b3d45",
+    "cursorColor": "#2b3d45",
+    "selectionBackground": "#ddd8c0",
+    "black": "#002b36",
+    "red": "#cf2522",
+    "green": "#4b7000",
+    "yellow": "#906800",
+    "blue": "#0d6fa8",
+    "purple": "#b5006e",
+    "cyan": "#00756d",
+    "white": "#6e6855",
+    "brightBlack": "#2b3d45",
+    "brightRed": "#b33000",
+    "brightGreen": "#536868",
+    "brightYellow": "#566c6c",
+    "brightBlue": "#5c6f6f",
+    "brightPurple": "#5f64b7",
+    "brightCyan": "#5f6e6e",
+    "brightWhite": "#fdf6e3"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "purple-portal",
+  "sourceUrl": "https://term.const.net/en/themes/purple-portal/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "c51d07313de020161c941e518e5ac2e9a2be4b1986e85c40349b01381c68c2c3",
+  "paletteSha256": "6acd1245688582a8a7d29757fdaffd0d8e6c772a2bc9315d2b357ffd4bb5a231",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Purple Portal.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Purple Portal",
+    "background": "#160528",
+    "foreground": "#faf5ff",
+    "cursorColor": "#faf5ff",
+    "selectionBackground": "#faf5ff",
+    "black": "#483a57",
+    "red": "#fb7185",
+    "green": "#34d399",
+    "yellow": "#f472b6",
+    "blue": "#facc15",
+    "purple": "#38bdf8",
+    "cyan": "#580ff0",
+    "white": "#d8b4fe",
+    "brightBlack": "#503872",
+    "brightRed": "#fc8d9d",
+    "brightGreen": "#5ddcad",
+    "brightYellow": "#f68bc3",
+    "brightBlue": "#fbd644",
+    "brightPurple": "#60caf9",
+    "brightCyan": "#793ff3",
+    "brightWhite": "#faf5ff"
+  }
+}

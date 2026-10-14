@@ -1,0 +1,32 @@
+{
+  "id": "zenbones",
+  "sourceUrl": "https://term.const.net/en/themes/zenbones/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "a064bfa78474672d47e458ff01cae81797ecc8d9bc1ffb52379c73d881435280",
+  "paletteSha256": "e4e64fe8b764f49f56f24959dd5966ba8d236960d7519572372f7cfec93fc5d5",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Zenbones.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Zenbones",
+    "background": "#f0edec",
+    "foreground": "#2c363c",
+    "cursorColor": "#2c363c",
+    "selectionBackground": "#cbd9e3",
+    "black": "#f0edec",
+    "red": "#a8334c",
+    "green": "#4f6c31",
+    "yellow": "#944927",
+    "blue": "#286486",
+    "purple": "#88507d",
+    "cyan": "#3b8992",
+    "white": "#2c363c",
+    "brightBlack": "#b5a7a0",
+    "brightRed": "#94253e",
+    "brightGreen": "#3f5a22",
+    "brightYellow": "#803d1c",
+    "brightBlue": "#1d5573",
+    "brightPurple": "#7b3b70",
+    "brightCyan": "#2b747c",
+    "brightWhite": "#4f5e68"
+  }
+}

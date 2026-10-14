@@ -333,6 +333,7 @@ class PortablePresetIntegrationTest {
             context.grantUriPermission(recipient, shareUri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
             try {
                 val read = context.contentResolver.call(recipientProvider, "read-share", shareUri.toString(), null)!!
+                assertNotEquals("Recipient proof requires a different app UID", android.os.Process.myUid(), read.getInt("uid"))
                 assertNull(read.getString("error"))
                 assertEquals(BackupManager.PRESET_MIME, read.getString("mime"))
                 assertArrayEquals(destination.readBytes(), read.getByteArray("bytes"))

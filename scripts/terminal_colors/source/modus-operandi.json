@@ -1,0 +1,32 @@
+{
+  "id": "modus-operandi",
+  "sourceUrl": "https://term.const.net/en/themes/modus-operandi/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "45e361b645f4430962c081f78c5f35a95a4ebfff758cefee77af8f5606e17dd8",
+  "paletteSha256": "8dc6d4645dbb25531d8533c15393da7d1cc7952de5648833f9f96d2c276d7342",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Modus Operandi.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Modus Operandi",
+    "background": "#ffffff",
+    "foreground": "#000000",
+    "cursorColor": "#000000",
+    "selectionBackground": "#bdbdbd",
+    "black": "#000000",
+    "red": "#a60000",
+    "green": "#006800",
+    "yellow": "#6f5500",
+    "blue": "#0031a9",
+    "purple": "#721045",
+    "cyan": "#005e8b",
+    "white": "#a6a6a6",
+    "brightBlack": "#595959",
+    "brightRed": "#972500",
+    "brightGreen": "#00663f",
+    "brightYellow": "#884900",
+    "brightBlue": "#3548cf",
+    "brightPurple": "#531ab6",
+    "brightCyan": "#005f5f",
+    "brightWhite": "#595959"
+  }
+}

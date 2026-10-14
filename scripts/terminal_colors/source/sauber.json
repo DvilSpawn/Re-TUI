@@ -1,0 +1,32 @@
+{
+  "id": "sauber",
+  "sourceUrl": "https://term.const.net/en/themes/sauber/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "51a42c4e1a9eba307ba8906a7fb3debbde6e3ba1baf62e920ebbf0558fa6a240",
+  "paletteSha256": "9c057a07cd1be41bbefe8ea211a06fba9c38f98c260925bcb9a838fd47a219d8",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Sauber.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Sauber",
+    "background": "#ecffe5",
+    "foreground": "#1345f6",
+    "cursorColor": "#000000",
+    "selectionBackground": "#b3d7ff",
+    "black": "#14191e",
+    "red": "#b43c2a",
+    "green": "#00c200",
+    "yellow": "#c7c400",
+    "blue": "#2744c7",
+    "purple": "#c040be",
+    "cyan": "#00c5c7",
+    "white": "#bababa",
+    "brightBlack": "#686868",
+    "brightRed": "#dd7975",
+    "brightGreen": "#3fcd76",
+    "brightYellow": "#c6bb00",
+    "brightBlue": "#a7abf2",
+    "brightPurple": "#e17ee1",
+    "brightCyan": "#048b8f",
+    "brightWhite": "#a4801c"
+  }
+}

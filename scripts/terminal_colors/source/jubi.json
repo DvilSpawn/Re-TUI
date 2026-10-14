@@ -1,0 +1,32 @@
+{
+  "id": "jubi",
+  "sourceUrl": "https://term.const.net/en/themes/jubi/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "88d061bd0622b88132f4b484008aaa8cecd7edec65d0bd4c4dbd277f12d67f72",
+  "paletteSha256": "b9bf9195eb5c76d46d8c57a89a50d5e0f134952fda67667019998388c7b5858a",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Jubi.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Jubi",
+    "background": "#262b33",
+    "foreground": "#c3d3de",
+    "cursorColor": "#c3d3de",
+    "selectionBackground": "#5b5184",
+    "black": "#3b3750",
+    "red": "#cf7b98",
+    "green": "#90a94b",
+    "yellow": "#6ebfc0",
+    "blue": "#576ea6",
+    "purple": "#bc4f68",
+    "cyan": "#75a7d2",
+    "white": "#c3d3de",
+    "brightBlack": "#a874ce",
+    "brightRed": "#de90ab",
+    "brightGreen": "#bcdd61",
+    "brightYellow": "#87e9ea",
+    "brightBlue": "#8c9fcd",
+    "brightPurple": "#e16c87",
+    "brightCyan": "#b7c9ef",
+    "brightWhite": "#d5e5f1"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "tokyonight-day",
+  "sourceUrl": "https://term.const.net/en/themes/tokyonight-day/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "d8db60eccce4af2fa140c13c6c2b2d54553a189d9290cbff3f875b9318ced8e5",
+  "paletteSha256": "dc5b3a21c5ca4faa2f4112476eacbcf734360d46806abe584aea7d494747f97b",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/TokyoNight Day.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "TokyoNight Day",
+    "background": "#e1e2e7",
+    "foreground": "#3760bf",
+    "cursorColor": "#3760bf",
+    "selectionBackground": "#99a7df",
+    "black": "#e9e9ed",
+    "red": "#f52a65",
+    "green": "#587539",
+    "yellow": "#8c6c3e",
+    "blue": "#2e7de9",
+    "purple": "#9854f1",
+    "cyan": "#007197",
+    "white": "#6172b0",
+    "brightBlack": "#a1a6c5",
+    "brightRed": "#f52a65",
+    "brightGreen": "#587539",
+    "brightYellow": "#8c6c3e",
+    "brightBlue": "#2e7de9",
+    "brightPurple": "#9854f1",
+    "brightCyan": "#007197",
+    "brightWhite": "#3760bf"
+  }
+}

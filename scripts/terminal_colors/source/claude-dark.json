@@ -1,0 +1,32 @@
+{
+  "id": "claude-dark",
+  "sourceUrl": "https://term.const.net/en/themes/claude-dark/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "3bd1eddeb0e6d88fb8caaebfa931bf678002fcfc6362ebdef396c43d0c8715b0",
+  "paletteSha256": "b8124e570910773ece1a446f39bad2c1a3346e50f5171bef61edbe3fce7fe89c",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Claude Dark.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Claude Dark",
+    "background": "#262624",
+    "foreground": "#e5e4e1",
+    "cursorColor": "#d97757",
+    "selectionBackground": "#363634",
+    "black": "#888681",
+    "red": "#d47563",
+    "green": "#9aca86",
+    "yellow": "#e8c96b",
+    "blue": "#6a9bcc",
+    "purple": "#9b87f5",
+    "cyan": "#3cbe8c",
+    "white": "#e2e1da",
+    "brightBlack": "#a6a59b",
+    "brightRed": "#f4a9a9",
+    "brightGreen": "#a8d166",
+    "brightYellow": "#fab319",
+    "brightBlue": "#9fc5f4",
+    "brightPurple": "#f3aac5",
+    "brightCyan": "#79d7b3",
+    "brightWhite": "#efeeeb"
+  }
+}

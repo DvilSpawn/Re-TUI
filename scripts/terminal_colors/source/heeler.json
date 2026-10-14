@@ -1,0 +1,32 @@
+{
+  "id": "heeler",
+  "sourceUrl": "https://term.const.net/en/themes/heeler/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "29dfb14e0435f2b9735aaa04ef2f04f4a6595ae8a6e4a23fd15a54d35dade9f4",
+  "paletteSha256": "c6aa8216ddeba07e7df644fdd773ce64210ca219003b5f657f4d2eb5c31dc64a",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Heeler.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Heeler",
+    "background": "#211f46",
+    "foreground": "#fdfdfd",
+    "cursorColor": "#ffffff",
+    "selectionBackground": "#2b2c41",
+    "black": "#000000",
+    "red": "#e44c2e",
+    "green": "#bdd100",
+    "yellow": "#f4ce65",
+    "blue": "#5ba5f2",
+    "purple": "#ff95c2",
+    "cyan": "#ff9763",
+    "white": "#ffffff",
+    "brightBlack": "#4c4c4c",
+    "brightRed": "#e44c2e",
+    "brightGreen": "#bdd100",
+    "brightYellow": "#f4ce65",
+    "brightBlue": "#0088ff",
+    "brightPurple": "#ff95c2",
+    "brightCyan": "#8da6e4",
+    "brightWhite": "#ffffff"
+  }
+}

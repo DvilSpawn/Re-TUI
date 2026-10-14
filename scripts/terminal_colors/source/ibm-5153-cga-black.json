@@ -1,0 +1,32 @@
+{
+  "id": "ibm-5153-cga-black",
+  "sourceUrl": "https://term.const.net/en/themes/ibm-5153-cga-black/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "4b290482b66d86b736a6e2741ad745f57554c0dba37b73bbcd88929ad8896c74",
+  "paletteSha256": "a70b1a84be012b438a5f68aa3b93514634618df3fd95be246f43235f6efa1f4e",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/IBM 5153 CGA (Black).json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "IBM 5153 CGA (Black)",
+    "background": "#000000",
+    "foreground": "#c4c4c4",
+    "cursorColor": "#c4c4c4",
+    "selectionBackground": "#c4c4c4",
+    "black": "#000000",
+    "red": "#c40000",
+    "green": "#00c400",
+    "yellow": "#c47e00",
+    "blue": "#0000c4",
+    "purple": "#c400c4",
+    "cyan": "#00c4c4",
+    "white": "#c4c4c4",
+    "brightBlack": "#4e4e4e",
+    "brightRed": "#dc4e4e",
+    "brightGreen": "#4edc4e",
+    "brightYellow": "#f3f34e",
+    "brightBlue": "#4e4edc",
+    "brightPurple": "#f34ef3",
+    "brightCyan": "#4ef3f3",
+    "brightWhite": "#ffffff"
+  }
+}

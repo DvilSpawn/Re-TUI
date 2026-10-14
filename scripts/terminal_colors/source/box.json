@@ -1,0 +1,32 @@
+{
+  "id": "box",
+  "sourceUrl": "https://term.const.net/en/themes/box/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "9c167f4518295010f81ae9a6951b5f8ee7e3e020f27f3069c473c64b60aa28a2",
+  "paletteSha256": "ff4b3c48b7bd40c720576495dfe4482624dc80c0265e659ccd8ea10dc04d489f",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Box.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Box",
+    "background": "#141d2b",
+    "foreground": "#9fef00",
+    "cursorColor": "#9fef00",
+    "selectionBackground": "#a4b1cd",
+    "black": "#000000",
+    "red": "#cc0403",
+    "green": "#19cb00",
+    "yellow": "#cecb00",
+    "blue": "#0d73cc",
+    "purple": "#cb1ed1",
+    "cyan": "#0dcdcd",
+    "white": "#dddddd",
+    "brightBlack": "#767676",
+    "brightRed": "#f2201f",
+    "brightGreen": "#23fd00",
+    "brightYellow": "#fffd00",
+    "brightBlue": "#1a8fff",
+    "brightPurple": "#fd28ff",
+    "brightCyan": "#14ffff",
+    "brightWhite": "#ffffff"
+  }
+}

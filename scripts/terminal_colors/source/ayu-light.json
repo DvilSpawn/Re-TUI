@@ -1,0 +1,32 @@
+{
+  "id": "ayu-light",
+  "sourceUrl": "https://term.const.net/en/themes/ayu-light/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "a64bcd25b52be1eb3619f40509d2b7d997df3fefa1c2075ae06fab7b22ba77f2",
+  "paletteSha256": "14d3dcf28276d58ea68a88e976abfd991e8e9e2c0a0fc8bcafe2dbc526c06986",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Ayu Light.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Ayu Light",
+    "background": "#f8f9fa",
+    "foreground": "#5c6166",
+    "cursorColor": "#ffaa33",
+    "selectionBackground": "#035bd6",
+    "black": "#000000",
+    "red": "#ea6c6d",
+    "green": "#6cbf43",
+    "yellow": "#eca944",
+    "blue": "#3199e1",
+    "purple": "#9e75c7",
+    "cyan": "#46ba94",
+    "white": "#bababa",
+    "brightBlack": "#686868",
+    "brightRed": "#f07171",
+    "brightGreen": "#86b300",
+    "brightYellow": "#f2ae49",
+    "brightBlue": "#399ee6",
+    "brightPurple": "#a37acc",
+    "brightCyan": "#4cbf99",
+    "brightWhite": "#d1d1d1"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "lab-fox",
+  "sourceUrl": "https://term.const.net/en/themes/lab-fox/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "2279b61d40981ee62b79a56c74d715899d43c5407d91bd9ec91a496f1b12d7bd",
+  "paletteSha256": "6761fdc0893cbf781671c55da5ec6b62da78c9e48fcdf3ac76c1bea42482ad5a",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Lab Fox.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Lab Fox",
+    "background": "#2e2e2e",
+    "foreground": "#ffffff",
+    "cursorColor": "#7f7f7f",
+    "selectionBackground": "#cb392e",
+    "black": "#2e2e2e",
+    "red": "#fc6d26",
+    "green": "#3eb383",
+    "yellow": "#fca121",
+    "blue": "#db3b21",
+    "purple": "#6b40a8",
+    "cyan": "#6e49cb",
+    "white": "#ffffff",
+    "brightBlack": "#535353",
+    "brightRed": "#ff6517",
+    "brightGreen": "#53eaa8",
+    "brightYellow": "#fca013",
+    "brightBlue": "#db501f",
+    "brightPurple": "#6a36b6",
+    "brightCyan": "#7d53e7",
+    "brightWhite": "#ffffff"
+  }
+}

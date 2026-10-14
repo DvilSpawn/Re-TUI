@@ -1,0 +1,32 @@
+{
+  "id": "poimandres-storm",
+  "sourceUrl": "https://term.const.net/en/themes/poimandres-storm/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "8e973ae05e9a4d0d6fd17f86b1b04e6ff749fa5f8808ff00b054972151b398c0",
+  "paletteSha256": "e4fee7282b7e08bde082b9b44592322e7a64a4ed31a9c0b18742c34e45ed21ab",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Poimandres Storm.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Poimandres Storm",
+    "background": "#252b37",
+    "foreground": "#a6accd",
+    "cursorColor": "#ffffff",
+    "selectionBackground": "#a6accd",
+    "black": "#252b37",
+    "red": "#d0679d",
+    "green": "#5de4c7",
+    "yellow": "#fffac2",
+    "blue": "#89ddff",
+    "purple": "#f087bd",
+    "cyan": "#89ddff",
+    "white": "#ffffff",
+    "brightBlack": "#a6accd",
+    "brightRed": "#d0679d",
+    "brightGreen": "#5de4c7",
+    "brightYellow": "#fffac2",
+    "brightBlue": "#add7ff",
+    "brightPurple": "#f087bd",
+    "brightCyan": "#add7ff",
+    "brightWhite": "#ffffff"
+  }
+}

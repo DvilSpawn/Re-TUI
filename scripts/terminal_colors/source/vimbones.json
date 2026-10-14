@@ -1,0 +1,32 @@
+{
+  "id": "vimbones",
+  "sourceUrl": "https://term.const.net/en/themes/vimbones/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "5f6d3e8911882b65936cf7b26fad1926a62227392b56e0791faa3a0238f586ba",
+  "paletteSha256": "2ed1014a3a91145d1005f9630a5c8df970e79726dcedbb04b9a7590b511ad278",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Vimbones.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Vimbones",
+    "background": "#f0f0ca",
+    "foreground": "#353535",
+    "cursorColor": "#353535",
+    "selectionBackground": "#d7d7d7",
+    "black": "#f0f0ca",
+    "red": "#a8334c",
+    "green": "#4f6c31",
+    "yellow": "#944927",
+    "blue": "#286486",
+    "purple": "#88507d",
+    "cyan": "#3b8992",
+    "white": "#353535",
+    "brightBlack": "#acac89",
+    "brightRed": "#94253e",
+    "brightGreen": "#3f5a22",
+    "brightYellow": "#803d1c",
+    "brightBlue": "#1d5573",
+    "brightPurple": "#7b3b70",
+    "brightCyan": "#2b747c",
+    "brightWhite": "#5c5c5c"
+  }
+}

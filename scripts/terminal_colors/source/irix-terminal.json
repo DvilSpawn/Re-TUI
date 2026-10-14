@@ -1,0 +1,32 @@
+{
+  "id": "irix-terminal",
+  "sourceUrl": "https://term.const.net/en/themes/irix-terminal/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "f5dd09c5df46caadec98fc80930c84cce03aeef856002ef96ee5c7578df75b32",
+  "paletteSha256": "ead49f3903feeb3a15365864921e8fdd5414ae7230bd21170ed59eee4bc8b1ad",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/IRIX Terminal.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "IRIX Terminal",
+    "background": "#000043",
+    "foreground": "#f2f2f2",
+    "cursorColor": "#c7c7c7",
+    "selectionBackground": "#c2deff",
+    "black": "#1a1919",
+    "red": "#ff2b1e",
+    "green": "#57ff3d",
+    "yellow": "#ffff44",
+    "blue": "#0004ff",
+    "purple": "#ff2cff",
+    "cyan": "#56ffff",
+    "white": "#ffffff",
+    "brightBlack": "#ffff44",
+    "brightRed": "#ffff44",
+    "brightGreen": "#ffff44",
+    "brightYellow": "#fffc72",
+    "brightBlue": "#ffff44",
+    "brightPurple": "#ffff44",
+    "brightCyan": "#ffff44",
+    "brightWhite": "#ffff44"
+  }
+}

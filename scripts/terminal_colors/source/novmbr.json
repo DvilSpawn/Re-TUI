@@ -1,0 +1,32 @@
+{
+  "id": "novmbr",
+  "sourceUrl": "https://term.const.net/en/themes/novmbr/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "642d7512e9eba954b36e144960baf65673dfe48549b5adec5384a6946fbc6e5e",
+  "paletteSha256": "c5262e3abc8a7f6d1f6e6e44c142a71b4f42d7d280c38517686c2e8fba69e78e",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/novmbr.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "novmbr",
+    "background": "#241d1a",
+    "foreground": "#c7b8ac",
+    "cursorColor": "#c7b8ac",
+    "selectionBackground": "#c7b8ac",
+    "black": "#282a2e",
+    "red": "#9f6434",
+    "green": "#9dac5f",
+    "yellow": "#cca75f",
+    "blue": "#2f7d7c",
+    "purple": "#b5896e",
+    "cyan": "#52877f",
+    "white": "#c7b8ac",
+    "brightBlack": "#5d4e47",
+    "brightRed": "#9f6434",
+    "brightGreen": "#9dac5f",
+    "brightYellow": "#cca75f",
+    "brightBlue": "#2f7d7c",
+    "brightPurple": "#b5896e",
+    "brightCyan": "#52877f",
+    "brightWhite": "#c7b8ac"
+  }
+}

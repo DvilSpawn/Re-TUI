@@ -1,0 +1,32 @@
+{
+  "id": "dogxi-misty",
+  "sourceUrl": "https://term.const.net/en/themes/dogxi-misty/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "6bd6d480c42977f4fcab5fdd4d33acb92fb209cc53ac226cb34389c64c7eac54",
+  "paletteSha256": "ca413c861c7c7146c0d368bcefbeed29b63e99ca67f737bb79bb3df70df234cd",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Dogxi Misty.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Dogxi Misty",
+    "background": "#282a36",
+    "foreground": "#eff0eb",
+    "cursorColor": "#eaeaea",
+    "selectionBackground": "#92bcd0",
+    "black": "#000000",
+    "red": "#ff5c57",
+    "green": "#94e362",
+    "yellow": "#eebd70",
+    "blue": "#99ecfe",
+    "purple": "#ff6ac1",
+    "cyan": "#5fdeed",
+    "white": "#f1f1f0",
+    "brightBlack": "#686868",
+    "brightRed": "#ff5c57",
+    "brightGreen": "#94e362",
+    "brightYellow": "#efc781",
+    "brightBlue": "#99ecfe",
+    "brightPurple": "#ff6ac1",
+    "brightCyan": "#87e0f0",
+    "brightWhite": "#f1f1f0"
+  }
+}

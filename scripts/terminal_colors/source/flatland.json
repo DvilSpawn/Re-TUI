@@ -1,0 +1,32 @@
+{
+  "id": "flatland",
+  "sourceUrl": "https://term.const.net/en/themes/flatland/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "df1b59b38478f5249f952b2478f98aaae7a23d03f48d73b98af72f7b082260e7",
+  "paletteSha256": "82490993de05f1e555d2b8e8197fc51763a9b44d50be4a6cc306d28b56a28040",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Flatland.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Flatland",
+    "background": "#1d1f21",
+    "foreground": "#b8dbef",
+    "cursorColor": "#708284",
+    "selectionBackground": "#2b2a24",
+    "black": "#1d1d19",
+    "red": "#f18339",
+    "green": "#9fd364",
+    "yellow": "#f4ef6d",
+    "blue": "#5096be",
+    "purple": "#695abc",
+    "cyan": "#d63865",
+    "white": "#ffffff",
+    "brightBlack": "#50504c",
+    "brightRed": "#d22a24",
+    "brightGreen": "#a7d42c",
+    "brightYellow": "#ff8949",
+    "brightBlue": "#61b9d0",
+    "brightPurple": "#695abc",
+    "brightCyan": "#d63865",
+    "brightWhite": "#ffffff"
+  }
+}

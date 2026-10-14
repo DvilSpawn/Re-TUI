@@ -1,0 +1,32 @@
+{
+  "id": "glacier",
+  "sourceUrl": "https://term.const.net/en/themes/glacier/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "bdf792f6229941e69c287bd8cca63163db72039f4a63ef4664aff2220346192c",
+  "paletteSha256": "199dad2f778e2ac14568c7a07f172261c973d72b8df7bd0c40d33b98c0c2066d",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Glacier.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Glacier",
+    "background": "#0c1115",
+    "foreground": "#ffffff",
+    "cursorColor": "#6c6c6c",
+    "selectionBackground": "#bd2523",
+    "black": "#2e343c",
+    "red": "#bd0f2f",
+    "green": "#35a770",
+    "yellow": "#fb9435",
+    "blue": "#1f5872",
+    "purple": "#bd2523",
+    "cyan": "#778397",
+    "white": "#ffffff",
+    "brightBlack": "#404a55",
+    "brightRed": "#bd0f2f",
+    "brightGreen": "#49e998",
+    "brightYellow": "#fddf6e",
+    "brightBlue": "#2a8bc1",
+    "brightPurple": "#ea4727",
+    "brightCyan": "#a0b6d3",
+    "brightWhite": "#ffffff"
+  }
+}

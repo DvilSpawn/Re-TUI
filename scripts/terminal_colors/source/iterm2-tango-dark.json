@@ -1,0 +1,32 @@
+{
+  "id": "iterm2-tango-dark",
+  "sourceUrl": "https://term.const.net/en/themes/iterm2-tango-dark/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "1ba35d9d650b0bc52d4d7b8ec9074c5167ec42bb7d64c57de56e51feeffdae09",
+  "paletteSha256": "2091683e5be349759e1eccea1879b872687a7b26551a5862aac7b7a5d1a7a6df",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/iTerm2 Tango Dark.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "iTerm2 Tango Dark",
+    "background": "#000000",
+    "foreground": "#ffffff",
+    "cursorColor": "#ffffff",
+    "selectionBackground": "#c1deff",
+    "black": "#000000",
+    "red": "#d81e00",
+    "green": "#5ea702",
+    "yellow": "#cfae00",
+    "blue": "#427ab3",
+    "purple": "#89658e",
+    "cyan": "#00a7aa",
+    "white": "#dbded8",
+    "brightBlack": "#686a66",
+    "brightRed": "#f54235",
+    "brightGreen": "#99e343",
+    "brightYellow": "#fdeb61",
+    "brightBlue": "#84b0d8",
+    "brightPurple": "#bc94b7",
+    "brightCyan": "#37e6e8",
+    "brightWhite": "#f1f1f0"
+  }
+}

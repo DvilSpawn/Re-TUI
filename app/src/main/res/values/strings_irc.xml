@@ -50,6 +50,12 @@
     <string name="irc_disconnect">Disconnect</string>
     <string name="irc_disconnect_first">Disconnect before changing networks.</string>
     <string name="irc_action_failed">Could not complete this action.</string>
+    <string name="irc_delete_message">Delete a message</string>
+    <string name="irc_delete_explanation">Choose a message. You can request deletion of your own messages; channel moderators can delete other messages. The server checks permission.</string>
+    <string name="irc_delete_question">Delete this message from IRC history and supported clients? Copies on Discord or other clients may remain.</string>
+    <string name="irc_delete_confirm">Delete from IRC</string>
+    <string name="irc_delete_unavailable">Message deletion is unavailable on this connection.</string>
+    <string name="irc_delete_missing">This message is no longer available for deletion.</string>
     <string name="irc_command_guidance">Choose a command for its syntax. Nothing is sent until you press ↵.</string>
     <string name="irc_reconnect">Reconnect</string>
     <string name="irc_remember_device">Remember this device</string>
@@ -88,11 +94,12 @@
         <item>/whois nickname — ask the server about a nickname</item>
         <item>/mode target modes — change modes where permitted</item>
         <item>/kick nickname [reason] — remove a member where permitted</item>
+        <item>/delete — choose a channel message and confirm deletion</item>
         <item>/oper name — enter a masked operator password</item>
         <item>Local tools</item>
         <item>/clear — clear this buffer locally</item>
         <item>/help — open short, local help</item>
         <item>//text — send /text literally</item>
     </string-array>
-    <string name="irc_help">Native IRC terminal — one TLS network at a time.\n/server [host] [TLS port] · default irc.kokodoko.cloud 6697\n/nick nickname · /connect · /login account (masked SASL password)\n/register (guided signup offline; masked NickServ password when connected)\n/join #channel · /j #channel · /part [#channel]\n/window [number|name|next|prev|close] · /buffer is an alias\n/query nick · /msg nick text · /me action · /names · /list\n/topic [text] · /whois nick · /mode target modes · /kick nick [reason]\n/oper name (masked password) · /disconnect · /quit · /clear · /help\nPlain text goes only to the active joined channel or query. //text sends /text literally. Unknown commands never become messages or launcher commands.\nWindow markers: * unread · ! mention/private message. Passwords are never transcript/history entries. TLS is verified; no plaintext fallback.\nRegister once, then sign in or reconnect before joining registered-only channels. Server-readable, not end-to-end encrypted. This first slice has no offline replay, push or background service; leaving disconnects. Unconfirmed messages are never retried automatically.</string>
+    <string name="irc_help">Native IRC terminal — one TLS network at a time.\n/server [host] [TLS port] · default irc.kokodoko.cloud 6697\n/nick nickname · /connect · /login account (masked SASL password)\n/register (guided signup offline; masked NickServ password when connected)\n/join #channel · /j #channel · /part [#channel]\n/window [number|name|next|prev|close] · /buffer is an alias\n/query nick · /msg nick text · /me action · /names · /list\n/topic [text] · /whois nick · /mode target modes · /kick nick [reason]\n/oper name (masked password) · /disconnect · /quit · /clear · /help\nPlain text goes only to the active joined channel or query. //text sends /text literally. Unknown commands never become messages or launcher commands.\nWindow markers: * unread · ! mention/private message. Passwords are never transcript/history entries. TLS is verified; no plaintext fallback.\nRegister once, then sign in or reconnect before joining registered-only channels. Server-readable, not end-to-end encrypted. On supported networks, rejoining loads up to 100 recent channel messages. Server-confirmed deletions replace messages with a deletion marker. There is no push or background service; leaving disconnects. Unconfirmed messages are never retried automatically.</string>
 </resources>

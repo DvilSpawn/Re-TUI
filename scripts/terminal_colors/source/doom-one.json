@@ -1,0 +1,32 @@
+{
+  "id": "doom-one",
+  "sourceUrl": "https://term.const.net/en/themes/doom-one/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "db483dea6b658e4773368aeb8e94fddc3d95a7384609ff6a1ea4e36d07ae9e4f",
+  "paletteSha256": "b2adb7d51980c0298fad011c5f4c2240d524d1dd6192c2c5b3d7522b17faed0f",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Doom One.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Doom One",
+    "background": "#282c34",
+    "foreground": "#bbc2cf",
+    "cursorColor": "#51afef",
+    "selectionBackground": "#42444b",
+    "black": "#000000",
+    "red": "#ff6c6b",
+    "green": "#98be65",
+    "yellow": "#ecbe7b",
+    "blue": "#a9a1e1",
+    "purple": "#c678dd",
+    "cyan": "#51afef",
+    "white": "#bbc2cf",
+    "brightBlack": "#595959",
+    "brightRed": "#ff6655",
+    "brightGreen": "#99bb66",
+    "brightYellow": "#ecbe7b",
+    "brightBlue": "#a9a1e1",
+    "brightPurple": "#c678dd",
+    "brightCyan": "#51afef",
+    "brightWhite": "#bfbfbf"
+  }
+}

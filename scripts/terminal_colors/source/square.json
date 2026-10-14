@@ -1,0 +1,32 @@
+{
+  "id": "square",
+  "sourceUrl": "https://term.const.net/en/themes/square/",
+  "retrievedDate": "2026-10-14",
+  "pageSha256": "bab15a00891746f6327596bc6fa21f0988e30d064068646c3253abbcf3ae3e3b",
+  "paletteSha256": "ee696861dfc0e20da2ab1ec27c2fa730153868e8fb0463f80925018058e99918",
+  "upstreamUrl": "https://github.com/mbadolato/iTerm2-Color-Schemes/blob/1a3e1d298b0a102d53333f1a03cb5234e7f9dae8/windowsterminal/Square.json",
+  "attribution": "iTerm2-Color-Schemes contributors; individual theme authors listed in CREDITS.md",
+  "palette": {
+    "name": "Square",
+    "background": "#1a1a1a",
+    "foreground": "#acacab",
+    "cursorColor": "#fcfbcc",
+    "selectionBackground": "#4d4d4d",
+    "black": "#050505",
+    "red": "#e9897c",
+    "green": "#b6377d",
+    "yellow": "#ecebbe",
+    "blue": "#a9cdeb",
+    "purple": "#75507b",
+    "cyan": "#c9caec",
+    "white": "#f2f2f2",
+    "brightBlack": "#474747",
+    "brightRed": "#f99286",
+    "brightGreen": "#c3f786",
+    "brightYellow": "#fcfbcc",
+    "brightBlue": "#b6defb",
+    "brightPurple": "#ad7fa8",
+    "brightCyan": "#d7d9fc",
+    "brightWhite": "#e2e2e2"
+  }
+}
