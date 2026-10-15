@@ -2,4 +2,7 @@
 <resources>
     <string name="settings_file_operation_working">Working on your files…</string>
     <string name="settings_font_too_large">Font files must be 8 MiB or smaller.</string>
+    <string name="settings_file_operation_cancelling">Cancelling…</string>
+    <string name="settings_file_operation_cancelled">File operation cancelled.</string>
+    <string name="settings_file_operation_finishing">Finishing restore…</string>
 </resources>

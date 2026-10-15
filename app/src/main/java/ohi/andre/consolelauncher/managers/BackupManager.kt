@@ -24,7 +24,6 @@ import java.util.Collections
 import java.util.Date
 import java.util.HashSet
 import java.util.Locale
-import java.util.Map
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
@@ -133,8 +132,11 @@ object BackupManager {
         uri: android.net.Uri,
         password: kotlin.String? = null
     ) {
+        FileOperationCancellation.check()
         val backup = ohi.andre.consolelauncher.managers.BackupManager.createPersonalBackup(context)
+        FileOperationCancellation.check()
         val payload = if (!password.isNullOrEmpty()) encrypt(backup, password) else backup
+        FileOperationCancellation.check()
         writeVerified(context, uri, payload)
     }
 
@@ -197,6 +199,7 @@ object BackupManager {
             zip.close()
         }
         val payload = out.toByteArray()
+        FileOperationCancellation.check()
         writeVerified(context, uri, payload)
         val shares = File(context.cacheDir, "preset-share")
         check(shares.isDirectory || shares.mkdirs()) { "Unable to create preset share cache" }
@@ -240,14 +243,16 @@ object BackupManager {
         val raw = requireNotNull(context.contentResolver.openOutputStream(uri, "w")) {
             context.getString(R.string.manager_backupmanager_unable_to_open_backup_destination_b73a4)
         }
-        BufferedOutputStream(raw).use {
-            it.write(payload)
-            it.flush()
+        BufferedOutputStream(raw).use { output ->
+            FileOperationCancellation.copy(ByteArrayInputStream(payload), output, MAX_BACKUP_BYTES)
+            output.flush()
         }
         val written = requireNotNull(context.contentResolver.openInputStream(uri)) {
             context.getString(R.string.manager_backupmanager_unable_to_verify_backup_destination_dcbcd)
         }
-        BufferedInputStream(written).use { verifyExport(payload, it) }
+        BufferedInputStream(written).use { input ->
+            FileOperationCancellation.track(input) { verifyExport(payload, it) }
+        }
     }
 
     internal fun verifyExport(expected: ByteArray, actual: InputStream) {
@@ -255,6 +260,7 @@ object BackupManager {
         val buffer = ByteArray(8192)
         var offset = 0
         while (true) {
+            FileOperationCancellation.check()
             val read = actual.read(buffer)
             if (read == -1) break
             require(offset + read <= expected.size) { throw LocalizedArgumentException(R.string.validation_backup_backupmanager_backup_verification_failed_6772e) }
@@ -273,85 +279,92 @@ object BackupManager {
         uri: android.net.Uri,
         password: kotlin.String? = null
     ): kotlin.String? {
+        FileOperationCancellation.check()
+        recoverInterruptedRestore(context)
         val tempDir: java.io.File = java.io.File(Tuils.getFolder(), ".restore-importing")
         if (tempDir.exists()) {
             Tuils.delete(tempDir)
         }
         kotlin.check(tempDir.mkdirs()) { throw LocalizedStateException(R.string.validation_backup_backupmanager_unable_to_create_restore_folder_89757) }
 
-        var hasManifest = false
-        var manifest: kotlin.String? = null
-        var totalBytes: kotlin.Long = 0
-        val entries = java.util.HashSet<kotlin.String>()
-        val packageStream = ohi.andre.consolelauncher.managers.BackupManager.backupInputStream(
-            context,
-            uri,
-            password
-        )
-        val zip = java.util.zip.ZipInputStream(java.io.BufferedInputStream(packageStream))
-        val buffer = kotlin.ByteArray(8192)
         try {
-            var entry: java.util.zip.ZipEntry?
-            while ((zip.getNextEntry().also { entry = it }) != null) {
-                val name = entry!!.getName()
-                if (entry.isDirectory()) continue
-                kotlin.require(ohi.andre.consolelauncher.managers.BackupManager.isSafeEntry(name)) { throw LocalizedArgumentException(R.string.validation_backup_backupmanager_unsafe_backup_package_a3cb1) }
-                kotlin.require(entries.add(name)) { throw LocalizedArgumentException(R.string.validation_backup_backupmanager_backup_package_contains_duplicate_entries_aec49) }
-
-                if (ohi.andre.consolelauncher.managers.BackupManager.MANIFEST_FILE == name) {
-                    hasManifest = true
-                }
-
-                val out = java.io.File(tempDir, name)
-                val parent = out.getParentFile()
-                kotlin.check(!(parent != null && !parent.exists() && !parent.mkdirs())) { throw LocalizedStateException(R.string.validation_backup_backupmanager_unable_to_restore_backup_folder_184df) }
-
-                val stream = java.io.FileOutputStream(out, false)
-                try {
-                    var read: Int
-                    val manifestOut =
-                        if (ohi.andre.consolelauncher.managers.BackupManager.MANIFEST_FILE == name) java.io.ByteArrayOutputStream() else null
-                    while ((zip.read(buffer).also { read = it }) != -1) {
-                        totalBytes += read.toLong()
-                        kotlin.require(totalBytes <= ohi.andre.consolelauncher.managers.BackupManager.MAX_BACKUP_BYTES) { throw LocalizedArgumentException(R.string.validation_backup_backupmanager_backup_package_is_too_large_df84c) }
-                        stream.write(buffer, 0, read)
-                        if (manifestOut != null) {
-                            manifestOut.write(buffer, 0, read)
-                        }
-                    }
-                    if (manifestOut != null) {
-                        manifest = manifestOut.toString("UTF-8")
-                    }
-                } finally {
-                    stream.close()
-                }
-            }
-        } finally {
-            zip.close()
-        }
-
-        kotlin.require(hasManifest) { throw LocalizedArgumentException(R.string.validation_backup_backupmanager_backup_package_is_incomplete_91553) }
-
-        val personal = validatePackage(manifest, entries)
-        if (personal) {
-            synchronized(ohi.andre.consolelauncher.notes.NoteStore.lock) {
-                restorePersonalBackup(context, tempDir, manifestValue(manifest, "schema") == "2")
-            }
-            context.applicationContext.sendBroadcast(
-                Intent(RetuiWallpaperService.ACTION_REFRESH).setPackage(context.packageName)
+            var hasManifest = false
+            var manifest: kotlin.String? = null
+            var totalBytes: kotlin.Long = 0
+            val entries = java.util.HashSet<kotlin.String>()
+            val packageStream = ohi.andre.consolelauncher.managers.BackupManager.backupInputStream(
+                context,
+                uri,
+                password
             )
-            FrameManager.onFilesRestored(context)
-            SpaceManager.ensureInitialized(context)
-            Tuils.delete(tempDir)
-            return null
+            val zip = java.util.zip.ZipInputStream(java.io.BufferedInputStream(packageStream))
+            val buffer = kotlin.ByteArray(8192)
+            try {
+                var entry: java.util.zip.ZipEntry?
+                while ((zip.getNextEntry().also { entry = it }) != null) {
+                    FileOperationCancellation.check()
+                    val name = entry!!.getName()
+                    if (entry.isDirectory()) continue
+                    kotlin.require(ohi.andre.consolelauncher.managers.BackupManager.isSafeEntry(name)) { throw LocalizedArgumentException(R.string.validation_backup_backupmanager_unsafe_backup_package_a3cb1) }
+                    kotlin.require(entries.add(name)) { throw LocalizedArgumentException(R.string.validation_backup_backupmanager_backup_package_contains_duplicate_entries_aec49) }
+
+                    if (ohi.andre.consolelauncher.managers.BackupManager.MANIFEST_FILE == name) {
+                        hasManifest = true
+                    }
+
+                    val out = java.io.File(tempDir, name)
+                    val parent = out.getParentFile()
+                    kotlin.check(!(parent != null && !parent.exists() && !parent.mkdirs())) { throw LocalizedStateException(R.string.validation_backup_backupmanager_unable_to_restore_backup_folder_184df) }
+
+                    val stream = java.io.FileOutputStream(out, false)
+                    try {
+                        var read: Int
+                        val manifestOut =
+                            if (ohi.andre.consolelauncher.managers.BackupManager.MANIFEST_FILE == name) java.io.ByteArrayOutputStream() else null
+                        while ((zip.read(buffer).also { read = it }) != -1) {
+                            FileOperationCancellation.check()
+                            totalBytes += read.toLong()
+                            kotlin.require(totalBytes <= ohi.andre.consolelauncher.managers.BackupManager.MAX_BACKUP_BYTES) { throw LocalizedArgumentException(R.string.validation_backup_backupmanager_backup_package_is_too_large_df84c) }
+                            stream.write(buffer, 0, read)
+                            if (manifestOut != null) {
+                                manifestOut.write(buffer, 0, read)
+                            }
+                        }
+                        if (manifestOut != null) {
+                            manifest = manifestOut.toString("UTF-8")
+                        }
+                    } finally {
+                        stream.close()
+                    }
+                }
+            } finally {
+                zip.close()
+            }
+
+            kotlin.require(hasManifest) { throw LocalizedArgumentException(R.string.validation_backup_backupmanager_backup_package_is_incomplete_91553) }
+
+            val personal = validatePackage(manifest, entries)
+            if (personal) {
+                synchronized(ohi.andre.consolelauncher.notes.NoteStore.lock) {
+                    restorePersonalBackup(context, tempDir, manifestValue(manifest, "schema") == "2")
+                }
+                context.applicationContext.sendBroadcast(
+                    Intent(RetuiWallpaperService.ACTION_REFRESH).setPackage(context.packageName)
+                )
+                FrameManager.onFilesRestored(context)
+                SpaceManager.ensureInitialized(context)
+                return null
+            }
+            FileOperationCancellation.beginCommit()
+            val importedName = PresetManager.importExtractedFolder(
+                manifestValue(manifest, "presetName")?.takeIf { it.isNotBlank() } ?: "Imported preset",
+                tempDir,
+                if (manifestValue(manifest, "schema") == "3") behaviorFields(manifest) else null
+            )
+            return importedName
+        } finally {
+            tempDir.deleteRecursively()
         }
-        val importedName = PresetManager.importExtractedFolder(
-            manifestValue(manifest, "presetName")?.takeIf { it.isNotBlank() } ?: "Imported preset",
-            tempDir,
-            if (manifestValue(manifest, "schema") == "3") behaviorFields(manifest) else null
-        )
-        Tuils.delete(tempDir)
-        return importedName
     }
 
     class StagedPreset internal constructor(
@@ -369,6 +382,7 @@ object BackupManager {
             // Re-extract and validate the private snapshot, never the original provider URI.
             File(staging, "package.retui").inputStream().use { input ->
                 inspectPreset(input, staging.parentFile!!).use { checked ->
+                    FileOperationCancellation.beginCommit()
                     return PresetManager.importExtractedFolder(checked.name, checked.folder, checked.behaviorLabels)
                 }
             }
@@ -392,6 +406,7 @@ object BackupManager {
                 val all = zip.entries()
                 var count = 0
                 while (all.hasMoreElements()) {
+                    FileOperationCancellation.check()
                     val entry = all.nextElement()
                     require(++count <= 256) { "Preset contains too many archive entries" }
                     val name = entry.name
@@ -415,7 +430,7 @@ object BackupManager {
                     val crc = java.util.zip.CRC32()
                     target.inputStream().use { source ->
                         val buffer = ByteArray(8192)
-                        while (true) { val n = source.read(buffer); if (n < 0) break; crc.update(buffer, 0, n) }
+                        while (true) { FileOperationCancellation.check(); val n = source.read(buffer); if (n < 0) break; crc.update(buffer, 0, n) }
                     }
                     require(crc.value == entry.crc && target.length() == entry.size) { "Corrupt preset archive entry" }
                 }
@@ -442,18 +457,20 @@ object BackupManager {
         }
     }
 
-    internal fun copyBounded(input: InputStream, output: OutputStream, limit: Long): Long {
-        val buffer = ByteArray(8192)
-        var total = 0L
-        while (true) {
-            val count = input.read(buffer)
-            if (count < 0) break
-            total += count
-            require(total <= limit) { "Preset package is too large" }
-            output.write(buffer, 0, count)
-        }
-        return total
-    }
+    internal fun copyBounded(input: InputStream, output: OutputStream, limit: Long): Long =
+        FileOperationCancellation.track(input) { source -> FileOperationCancellation.track(output) { target ->
+            val buffer = ByteArray(8192)
+            var total = 0L
+            while (true) {
+                FileOperationCancellation.check()
+                val count = source.read(buffer)
+                if (count < 0) break
+                total += count
+                require(total <= limit) { "Preset package is too large" }
+                target.write(buffer, 0, count)
+            }
+            total
+        } }
 
     internal fun validatePackage(manifest: kotlin.String?, entries: kotlin.collections.Set<kotlin.String>): kotlin.Boolean {
         val type = manifestValue(manifest, "type")
@@ -538,22 +555,22 @@ object BackupManager {
     }
 
     @Throws(java.lang.Exception::class)
-    fun isEncryptedBackup(
-        context: android.content.Context?,
-        uri: android.net.Uri?
-    ): kotlin.Boolean {
+    fun isEncryptedBackup(context: Context?, uri: Uri?): Boolean {
         if (context == null || uri == null) return false
-        val source = context.getContentResolver().openInputStream(uri) ?: return false
-        val `in`: java.io.InputStream = java.io.BufferedInputStream(source)
-        try {
-            val header =
-                kotlin.ByteArray(ohi.andre.consolelauncher.managers.BackupManager.ENCRYPTED_MAGIC.size)
-            val read = `in`.read(header)
-            return read == ohi.andre.consolelauncher.managers.BackupManager.ENCRYPTED_MAGIC.size && ohi.andre.consolelauncher.managers.BackupManager.matchesMagic(
-                header
-            )
-        } finally {
-            `in`.close()
+        FileOperationCancellation.check()
+        val source = context.contentResolver.openInputStream(uri) ?: return false
+        return BufferedInputStream(source).use { input ->
+            FileOperationCancellation.track(input) { tracked ->
+                val header = ByteArray(ENCRYPTED_MAGIC.size)
+                var offset = 0
+                while (offset < header.size) {
+                    FileOperationCancellation.check()
+                    val count = tracked.read(header, offset, header.size - offset)
+                    if (count < 0) break
+                    offset += count
+                }
+                offset == header.size && matchesMagic(header)
+            }
         }
     }
 
@@ -602,6 +619,7 @@ object BackupManager {
         if (files == null) return
 
         for (file in files) {
+            FileOperationCancellation.check()
             val name = ohi.andre.consolelauncher.managers.BackupManager.relativeName(root, file)
             if (!ohi.andre.consolelauncher.managers.BackupManager.isBackupCandidate(
                     file,
@@ -634,6 +652,7 @@ object BackupManager {
         context: android.content.Context
     ) {
         for (name in ohi.andre.consolelauncher.managers.BackupManager.PERSONAL_PREFS) {
+            FileOperationCancellation.check()
             val prefs: SharedPreferences = context.getApplicationContext()
                 .getSharedPreferences(name, android.content.Context.MODE_PRIVATE)
             val values: kotlin.collections.MutableMap<kotlin.String?, *> = prefs.getAll()
@@ -649,6 +668,7 @@ object BackupManager {
         val out = java.lang.StringBuilder()
         val keys = values.keys.filterNotNull().sorted()
         for (key in keys) {
+            FileOperationCancellation.check()
             val value: Any? = values.get(key)
             if (value == null) continue
             if (value is kotlin.collections.MutableSet<*>) {
@@ -720,20 +740,14 @@ object BackupManager {
     ) {
         val entry = java.util.zip.ZipEntry(name)
         zip.putNextEntry(entry)
-        val `in` = java.io.FileInputStream(file)
-        val buffer = kotlin.ByteArray(8192)
-        try {
-            var read: Int
-            while ((`in`.read(buffer).also { read = it }) != -1) {
-                zip.write(buffer, 0, read)
-            }
-        } finally {
-            `in`.close()
+        java.io.FileInputStream(file).use { input ->
+            FileOperationCancellation.copy(input, zip, MAX_BACKUP_BYTES)
         }
         zip.closeEntry()
     }
 
     internal fun addPrivateFiles(zip: ZipOutputStream, root: File, file: File) {
+        FileOperationCancellation.check()
         if (file.isDirectory) {
             val children = requireNotNull(file.listFiles()) { "Unable to read private backup folder" }
             children.forEach { addPrivateFiles(zip, root, it) }
@@ -760,35 +774,67 @@ object BackupManager {
             }
         }
         val prefsDir = File(staging, SHARED_PREFS_DIR)
+        val preferenceSnapshots = linkedMapOf<String, String>()
         val preferences = personalSharedPreferenceNames().mapNotNull { name ->
             File(prefsDir, "$name.properties").takeIf { it.isFile }?.let { file ->
                 val prefs = context.applicationContext.getSharedPreferences(name, Context.MODE_PRIVATE)
                 val editor = prefs.edit().clear()
                 // Decode every value before any live file is moved or preference is committed.
                 applyPrefs(editor, readText(file))
-                Triple(prefs, editor, HashMap(prefs.all))
+                preferenceSnapshots[name] = serializePrefs(prefs.all)
+                editor
             }
         }
-        BackupRestoreTransaction.replace(replacements, commit = {
-            preferences.forEach { (_, editor, _) ->
-                check(editor.commit()) { "Unable to save restored preferences" }
-            }
-        }, rollback = {
-            preferences.forEach { (prefs, _, original) ->
-                val editor = prefs.edit().clear()
-                original.forEach { (key, value) ->
-                    when (value) {
-                        is Boolean -> editor.putBoolean(key, value)
-                        is Int -> editor.putInt(key, value)
-                        is Long -> editor.putLong(key, value)
-                        is Float -> editor.putFloat(key, value)
-                        is String -> editor.putString(key, value)
-                        is Set<*> -> editor.putStringSet(key, value.filterIsInstance<String>().toSet())
-                    }
+        val journal = restoreJournalFile(context)
+        check(journal.parentFile!!.isDirectory || journal.parentFile!!.mkdirs()) { "Unable to create restore journal folder" }
+        syncRestoreDirectory(context.noBackupFilesDir)
+        BackupRestoreTransaction.replace(replacements, journal, preferenceSnapshots,
+            { restoreRecoveryTargetAllowed(context, it) },
+            { restorePreferenceSnapshots(context, it) }, ::syncRestoreDirectory,
+            commit = {
+                preferences.forEach { editor ->
+                    check(editor.commit()) { "Unable to save restored preferences" }
                 }
-                check(editor.commit()) { "Unable to roll back restored preferences" }
+            })
+    }
+
+    internal fun restoreJournalFile(context: Context) = File(context.noBackupFilesDir, "restore-transaction/journal")
+
+    /** Call after Tuils.init and before loading settings, language packs, Notes, or launcher state. */
+    fun recoverInterruptedRestore(context: Context) {
+        val journal = restoreJournalFile(context)
+        if (!journal.exists()) return
+        synchronized(ohi.andre.consolelauncher.notes.NoteStore.lock) {
+            BackupRestoreTransaction.recover(journal,
+                { restoreRecoveryTargetAllowed(context, it) },
+                { restorePreferenceSnapshots(context, it) }, ::syncRestoreDirectory)
+        }
+    }
+
+    internal fun restoreRecoveryTargetAllowed(context: Context, file: File): Boolean {
+        val target = file.absoluteFile
+        val launcherRoot = Tuils.getFolder().canonicalFile
+        val privateRoot = context.filesDir.canonicalFile
+        return (target.parentFile == launcherRoot && !target.name.startsWith(".restore-") &&
+            !target.name.endsWith(BACKUP_SUFFIX)) ||
+            (target.parentFile == privateRoot && target.name in personalPrivateFileNames)
+    }
+
+    internal fun restorePreferenceSnapshots(context: Context, snapshots: Map<String, String>) {
+        require(snapshots.keys.all { it in personalSharedPreferenceNames() }) { "Unsafe restore preference snapshot" }
+        // Parse all snapshots before committing any, so a corrupt journal cannot partially reset preferences.
+        val editors = snapshots.map { (name, text) ->
+            context.getSharedPreferences(name, Context.MODE_PRIVATE).edit().clear().also {
+                applyPrefs(it, text)
             }
-        })
+        }
+        editors.forEach { check(it.commit()) { "Unable to recover original preferences" } }
+    }
+
+    internal fun syncRestoreDirectory(directory: File) {
+        check(directory.isDirectory) { "Restore sync path is not a directory" }
+        val descriptor = android.system.Os.open(directory.path, android.system.OsConstants.O_RDONLY, 0)
+        try { android.system.Os.fsync(descriptor) } finally { android.system.Os.close(descriptor) }
     }
 
     private fun applyPrefs(editor: SharedPreferences.Editor, text: String) {
@@ -932,23 +978,12 @@ object BackupManager {
     }
 
     @Throws(java.lang.Exception::class)
-    private fun readUri(context: android.content.Context, uri: android.net.Uri): kotlin.ByteArray {
-        val `in`: java.io.InputStream =
-            java.io.BufferedInputStream(context.getContentResolver().openInputStream(uri))
-        kotlin.requireNotNull(`in`) { throw LocalizedArgumentException(R.string.validation_backup_backupmanager_unable_to_open_backup_package_bdca3) }
-        val out = java.io.ByteArrayOutputStream()
-        val buffer = kotlin.ByteArray(8192)
-        var total: kotlin.Long = 0
-        try {
-            var read: Int
-            while ((`in`.read(buffer).also { read = it }) != -1) {
-                total += read.toLong()
-                kotlin.require(total <= ohi.andre.consolelauncher.managers.BackupManager.MAX_BACKUP_BYTES) { throw LocalizedArgumentException(R.string.validation_backup_backupmanager_backup_package_is_too_large_df84c) }
-                out.write(buffer, 0, read)
-            }
-        } finally {
-            `in`.close()
+    private fun readUri(context: Context, uri: Uri): ByteArray {
+        val raw = requireNotNull(context.contentResolver.openInputStream(uri)) {
+            throw LocalizedArgumentException(R.string.validation_backup_backupmanager_unable_to_open_backup_package_bdca3)
         }
+        val out = ByteArrayOutputStream()
+        BufferedInputStream(raw).use { input -> FileOperationCancellation.copy(input, out, MAX_BACKUP_BYTES) }
         return out.toByteArray()
     }
 
@@ -979,18 +1014,9 @@ object BackupManager {
     }
 
     @Throws(java.lang.Exception::class)
-    private fun readText(file: java.io.File?): kotlin.String {
-        val out = java.io.ByteArrayOutputStream()
-        val `in`: java.io.InputStream = java.io.BufferedInputStream(java.io.FileInputStream(file))
-        val buffer = kotlin.ByteArray(4096)
-        try {
-            var read: Int
-            while ((`in`.read(buffer).also { read = it }) != -1) {
-                out.write(buffer, 0, read)
-            }
-        } finally {
-            `in`.close()
-        }
+    private fun readText(file: File?): String {
+        val out = ByteArrayOutputStream()
+        FileInputStream(file).use { input -> FileOperationCancellation.copy(input, out, MAX_BACKUP_BYTES) }
         return out.toString("UTF-8")
     }
 

@@ -16,6 +16,8 @@ import ohi.andre.consolelauncher.tuils.interfaces.Reloadable
 class LauncherApplication : Application() {
     override fun attachBaseContext(base: Context) {
         super.attachBaseContext(base)
+        ohi.andre.consolelauncher.tuils.Tuils.init(base)
+        ohi.andre.consolelauncher.managers.BackupManager.recoverInterruptedRestore(base)
         LanguagePacks.initialize(base)
     }
     override fun getResources(): Resources = LanguagePacks.resources(super.getResources())

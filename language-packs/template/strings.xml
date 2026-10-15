@@ -886,6 +886,9 @@ Timer paused.</string>
     <string name="frame_bottom">Bottom</string>
     <string name="frame_center">Center</string>
     <string name="frame_center_modes">Center mode must be stretch, tile, or none.</string>
+    <string name="frame_draft_discard">Discard draft and use current frames</string>
+    <string name="frame_draft_stale">Your active frames changed since these edits began. Your draft is preserved. Discard these edits before starting from the current frames.</string>
+    <string name="frame_draft_unreadable">Saved frame edits could not be reopened. The original draft has been retained for recovery.</string>
     <string name="frame_edge_modes">Edge modes must be stretch or tile.</string>
     <string name="frame_failure_50b73cfa">Unsupported UI package ZIP entry: %1$s</string>
     <string name="frame_failure_626ba109">Unable to activate the imported frame.</string>
@@ -4791,6 +4794,9 @@ Apply it later through preset -apply. Active settings have not changed.</string>
     <string name="settings_editor_invalid_status_index">Enter a row position between 1 and 2147483637. Decimals can share a row.</string>
     <string name="settings_editor_invalid_time">Enter a time as hh.mm, from 0.00 to 23.59.</string>
     <string name="settings_editor_invalid_value">This value is not allowed.</string>
+    <string name="settings_file_operation_cancelled">File operation cancelled.</string>
+    <string name="settings_file_operation_cancelling">Cancelling…</string>
+    <string name="settings_file_operation_finishing">Finishing restore…</string>
     <string name="settings_file_operation_working">Working on your files…</string>
     <string name="settings_font_too_large">Font files must be 8 MiB or smaller.</string>
     <string name="settings_preview_ansi">ANSI</string>

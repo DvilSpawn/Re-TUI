@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="frame_draft_stale">Your active frames changed since these edits began. Your draft is preserved. Discard these edits before starting from the current frames.</string>
+    <string name="frame_draft_unreadable">Saved frame edits could not be reopened. The original draft has been retained for recovery.</string>
+    <string name="frame_draft_discard">Discard draft and use current frames</string>
+</resources>

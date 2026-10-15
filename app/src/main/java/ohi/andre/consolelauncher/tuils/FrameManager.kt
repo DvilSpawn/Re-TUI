@@ -5,6 +5,8 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
+import android.util.AtomicFile
+import android.widget.Toast
 import android.util.LruCache
 import android.util.Log
 import java.io.BufferedInputStream
@@ -219,19 +221,25 @@ object FrameManager {
 
     class EditSession internal constructor(
         private val directory: File,
-        private val original: FrameState
+        private val original: FrameState,
+        val draftToken: String? = null,
+        private val configurationPath: String? = null,
+        restoredState: FrameState? = null,
+        restoredLibraryChanged: Boolean = false,
+        restoredPackId: String? = null
     ) {
-        private val state = original.copyState()
+        private val state = restoredState ?: original.copyState()
         var applyToAll: Boolean
             get() = state.applyToAll
             set(value) {
                 if (state.applyToAll != value) {
                     state.applyToAll = value
                     state.activePackId = null
+                    checkpoint()
                 }
             }
-        private var libraryChanged = false
-        private var currentPackId = state.activePackId
+        private var libraryChanged = restoredLibraryChanged
+        private var currentPackId = restoredPackId ?: state.activePackId
         private val previews = HashMap<String, FramePreview?>()
 
         fun hasChanges(): Boolean = libraryChanged || state != original
@@ -250,6 +258,7 @@ object FrameManager {
                 state.assignments[key] = assetId
             }
             state.activePackId = null
+            checkpoint()
         }
 
         fun hasAssignedFrame(target: FrameTarget?): Boolean = selectedAssetId(target) != null
@@ -290,6 +299,7 @@ object FrameManager {
                 state.packs[id] = it
                 state.activePackId = id
                 currentPackId = id
+                checkpoint()
             }
         }
 
@@ -300,6 +310,7 @@ object FrameManager {
                 state.packs[packId] = it
                 state.activePackId = packId
                 currentPackId = packId
+                checkpoint()
             }
         }
 
@@ -310,6 +321,7 @@ object FrameManager {
             state.assignments.putAll(pack.assignments)
             state.activePackId = packId
             currentPackId = packId
+            checkpoint()
         }
 
         fun deletePack(packId: String): Boolean {
@@ -322,6 +334,7 @@ object FrameManager {
                 state.assignments.clear()
                 state.activePackId = null
             }
+            checkpoint()
             return wasActive
         }
 
@@ -431,6 +444,7 @@ object FrameManager {
             return FramePack(id, name.trim(), false, HashMap(assignments)).also {
                 state.packs[id] = it
                 libraryChanged = true
+                checkpoint()
             }
         }
 
@@ -444,12 +458,31 @@ object FrameManager {
             select(target, registerBundle(buildBundle(parsed.name, spec, parsed.png)).id)
         }
 
+        fun checkpoint() {
+            val token = draftToken ?: return
+            require(UUID.fromString(token).toString() == token)
+            val manifest = JSONObject().put("schema", 1).put("token", token)
+                .put("configuration", configurationPath)
+                .put("original", stateJson(original)).put("draft", stateJson(state))
+                .put("libraryChanged", libraryChanged).put("currentPackId", currentPackId ?: JSONObject.NULL)
+            writeDraftManifest(directory, manifest)
+        }
+
         fun save() {
-            writeStateFile(directory, state)
-            removeUnreferencedAssets(directory)
-            validateFrameFolder(directory)
-            applyFrameFolder(directory)
-            discard()
+            if (draftToken != null && original != readStateOrDefault(configurationPath?.let(::File) ?: frameDir())) {
+                throw LocalizedStateException(R.string.frame_draft_stale)
+            }
+            val publish = File(directory.parentFile, "${directory.name}-publish")
+            try {
+                copyFrameFolder(directory, publish)
+                writeStateFile(publish, state)
+                removeUnreferencedAssets(publish)
+                validateFrameFolder(publish)
+                applyFrameFolder(publish)
+                discard()
+            } finally {
+                if (publish.exists()) Tuils.delete(publish)
+            }
         }
 
         fun discard() {
@@ -470,18 +503,72 @@ object FrameManager {
             val file = assetFile(directory, id)
             if (!file.isFile) {
                 saveFile(file, bytes)
+                if (draftToken != null) FileOutputStream(file, true).use { it.fd.sync() }
                 libraryChanged = true
             }
             previews.remove(id)
+            checkpoint()
             return FrameAsset(id, parsed.name)
         }
     }
 
+    internal const val DRAFT_FOLDER = "frame-settings-draft"
+    private const val DRAFT_MANIFEST = "checkpoint.json"
+    private const val DRAFT_TOKEN = "session-token"
+    private const val MAX_DRAFT_BYTES = 4 * MAX_MANIFEST_BYTES
+
     fun beginEdit(context: Context): EditSession {
         ensureMigrated(context)
-        val directory = File(context.cacheDir, "frame-settings-editing")
-        copyFrameFolder(frameDir(), directory)
-        return EditSession(directory, readStateOrDefault(directory))
+        val rootKey = sha256(frameDir().canonicalPath.toByteArray(Charsets.UTF_8)).take(16)
+        val directory = File(context.filesDir, "$DRAFT_FOLDER-$rootKey")
+        if (directory.exists()) {
+            try {
+                return reopenDraft(directory, frameDir().canonicalPath)
+            } catch (_: Exception) {
+                val retained = File(context.filesDir, "${directory.name}-unreadable-${UUID.randomUUID()}")
+                check(directory.renameTo(retained)) { throw LocalizedStateException(R.string.frame_draft_unreadable) }
+                Toast.makeText(context, R.string.frame_draft_unreadable, Toast.LENGTH_LONG).show()
+            }
+        }
+        return createDraft(directory, frameDir())
+    }
+
+    internal fun createDraft(directory: File, activeDirectory: File): EditSession {
+        check(!directory.exists()) { throw LocalizedStateException(R.string.frame_draft_unreadable) }
+        copyFrameFolder(activeDirectory, directory)
+        val token = UUID.randomUUID().toString()
+        File(directory, DRAFT_TOKEN).writeText(token)
+        return EditSession(directory, readStateOrDefault(activeDirectory), token, activeDirectory.canonicalPath).also { it.checkpoint() }
+    }
+
+    internal fun reopenDraft(directory: File, activePath: String): EditSession {
+        val bytes = AtomicFile(File(directory, DRAFT_MANIFEST)).openRead().use {
+            it.readLimited(MAX_DRAFT_BYTES, LocalizedArgumentException(R.string.frame_draft_unreadable))
+        }
+        val manifest = JSONObject(String(bytes, Charsets.UTF_8))
+        require(manifest.getInt("schema") == 1)
+        val token = manifest.getString("token")
+        require(UUID.fromString(token).toString() == token && File(directory, DRAFT_TOKEN).readText() == token)
+        require(manifest.getString("configuration") == activePath)
+        val original = readState(directory, manifest.getJSONObject("original"))
+        val draft = readState(directory, manifest.getJSONObject("draft"))
+        val currentPack = if (manifest.isNull("currentPackId")) null else manifest.getString("currentPackId")
+        require(currentPack == null || currentPack in draft.packs)
+        return EditSession(directory, original, token, activePath, draft, manifest.getBoolean("libraryChanged"), currentPack)
+    }
+
+    private fun writeDraftManifest(directory: File, manifest: JSONObject) {
+        val bytes = manifest.toString().toByteArray(Charsets.UTF_8)
+        require(bytes.size <= MAX_DRAFT_BYTES) { throw LocalizedArgumentException(R.string.frame_draft_unreadable) }
+        val file = AtomicFile(File(directory, DRAFT_MANIFEST))
+        val output = file.startWrite()
+        try {
+            output.write(bytes)
+            file.finishWrite(output)
+        } catch (error: Exception) {
+            file.failWrite(output)
+            throw error
+        }
     }
 
     fun applyToAll(context: Context): Boolean {
@@ -747,10 +834,12 @@ object FrameManager {
         FrameState(true, HashMap())
     }
 
-    private fun readState(dir: File): FrameState {
-        val file = File(dir, STATE_FILE)
-        require(file.isFile && file.length() <= MAX_MANIFEST_BYTES) { throw LocalizedArgumentException(R.string.validation_frame_framemanager_frame_settings_are_missing_or_invalid_84fe9) }
-        val state = JSONObject(file.readText(Charsets.UTF_8))
+    private fun readState(dir: File, savedState: JSONObject? = null): FrameState {
+        val state = savedState ?: run {
+            val file = File(dir, STATE_FILE)
+            require(file.isFile && file.length() <= MAX_MANIFEST_BYTES) { throw LocalizedArgumentException(R.string.validation_frame_framemanager_frame_settings_are_missing_or_invalid_84fe9) }
+            JSONObject(file.readText(Charsets.UTF_8))
+        }
         return when (state.getInt("schema")) {
             1 -> {
                 require(state.stringSet() == setOf("schema", "applyToAll")) { throw LocalizedArgumentException(R.string.validation_frame_framemanager_unsupported_frame_settings_e926f) }
@@ -827,7 +916,7 @@ object FrameManager {
         }
     }
 
-    private fun writeStateFile(dir: File, value: FrameState) {
+    private fun stateJson(value: FrameState): JSONObject {
         require(value.assignments.keys.all(::isKnownRole) && value.packs.values.all {
             it.assignments.keys.all(::isKnownRole)
         }) { throw LocalizedArgumentException(R.string.validation_frame_framemanager_frame_settings_contain_an_unknown_surface_83c5d) }
@@ -840,11 +929,6 @@ object FrameManager {
                 throw LocalizedArgumentException(R.string.validation_frame_framemanager_active_frame_settings_do_not_match_their_p_423fa)
             }
         }
-        val state = File(dir, STATE_FILE)
-        val temp = File(dir, "$STATE_FILE.tmp")
-        val backup = File(dir, "$STATE_FILE.old")
-        temp.delete()
-        backup.delete()
         val assignments = JSONObject()
         for ((key, assetId) in value.assignments.toSortedMap()) assignments.put(key, assetId)
         val packs = JSONObject()
@@ -857,12 +941,18 @@ object FrameManager {
                     .put("assignments", packAssignments)
             )
         }
-        temp.writeText(
-            JSONObject().put("schema", 4).put("applyToAll", value.applyToAll)
-                .put("assignments", assignments).put("packs", packs)
-                .put("activePackId", value.activePackId ?: JSONObject.NULL).toString(2),
-            Charsets.UTF_8
-        )
+        return JSONObject().put("schema", 4).put("applyToAll", value.applyToAll)
+            .put("assignments", assignments).put("packs", packs)
+            .put("activePackId", value.activePackId ?: JSONObject.NULL)
+    }
+
+    private fun writeStateFile(dir: File, value: FrameState) {
+        val state = File(dir, STATE_FILE)
+        val temp = File(dir, "$STATE_FILE.tmp")
+        val backup = File(dir, "$STATE_FILE.old")
+        temp.delete()
+        backup.delete()
+        temp.writeText(stateJson(value).toString(2), Charsets.UTF_8)
         if (state.exists()) check(state.renameTo(backup)) { throw LocalizedStateException(R.string.validation_frame_framemanager_unable_to_save_frame_settings_a4764) }
         if (!temp.renameTo(state)) {
             if (backup.exists()) backup.renameTo(state)
@@ -973,7 +1063,8 @@ object FrameManager {
         if (destination.exists()) Tuils.delete(destination)
         check(destination.mkdirs()) { throw LocalizedStateException(R.string.validation_frame_framemanager_unable_to_create_frame_export_folder_2ba2a) }
         for (file in source.listFiles().orEmpty()) {
-            if (!file.isFile || file.name.endsWith(".tmp") || file.name.endsWith(".old")) continue
+            if (!file.isFile || file.name.endsWith(".tmp") || file.name.endsWith(".old") ||
+                file.name in setOf(DRAFT_MANIFEST, DRAFT_TOKEN, "$DRAFT_MANIFEST.bak", "$DRAFT_MANIFEST.new")) continue
             Tuils.copy(file, File(destination, file.name))
         }
     }

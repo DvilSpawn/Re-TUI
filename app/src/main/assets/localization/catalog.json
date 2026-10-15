@@ -4901,6 +4901,27 @@
     },
     "type": "string"
   },
+  "frame_draft_discard": {
+    "formatted": true,
+    "forms": {
+      "other": "Discard draft and use current frames"
+    },
+    "type": "string"
+  },
+  "frame_draft_stale": {
+    "formatted": true,
+    "forms": {
+      "other": "Your active frames changed since these edits began. Your draft is preserved. Discard these edits before starting from the current frames."
+    },
+    "type": "string"
+  },
+  "frame_draft_unreadable": {
+    "formatted": true,
+    "forms": {
+      "other": "Saved frame edits could not be reopened. The original draft has been retained for recovery."
+    },
+    "type": "string"
+  },
   "frame_edge_modes": {
     "formatted": true,
     "forms": {
@@ -16976,6 +16997,27 @@
     "formatted": true,
     "forms": {
       "other": "This value is not allowed."
+    },
+    "type": "string"
+  },
+  "settings_file_operation_cancelled": {
+    "formatted": true,
+    "forms": {
+      "other": "File operation cancelled."
+    },
+    "type": "string"
+  },
+  "settings_file_operation_cancelling": {
+    "formatted": true,
+    "forms": {
+      "other": "Cancelling…"
+    },
+    "type": "string"
+  },
+  "settings_file_operation_finishing": {
+    "formatted": true,
+    "forms": {
+      "other": "Finishing restore…"
     },
     "type": "string"
   },

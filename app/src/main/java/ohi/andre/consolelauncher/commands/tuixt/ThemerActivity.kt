@@ -95,6 +95,8 @@ import ohi.andre.consolelauncher.tuils.FrameTarget
 import ohi.andre.consolelauncher.tuils.Tuils
 import java.io.File
 import java.lang.ref.WeakReference
+import java.util.concurrent.CancellationException
+import ohi.andre.consolelauncher.managers.FileOperationCancellation
 import java.io.FileOutputStream
 import java.io.FilenameFilter
 import java.util.Arrays
@@ -141,11 +143,14 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
     class HubState : ViewModel() {
         var frameEditSession: FrameManager.EditSession? = null
         @Volatile var fileOperationRunning = false
+        var fileOperationToken: FileOperationCancellation.Token? = null
         var activity: WeakReference<ThemerActivity>? = null
         var completedOperation: (ThemerActivity.() -> Unit)? = null
         var pendingBackupPassword: String? = null
         override fun onCleared() {
-            frameEditSession?.discard()
+            frameEditSession?.let { session ->
+                if (!session.hasChanges()) session.discard()
+            }
         }
     }
     private lateinit var hubState: HubState
@@ -749,9 +754,24 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
         fileProgress = ProgressDialog(this).apply {
             setMessage(getString(R.string.settings_file_operation_working))
             setIndeterminate(true)
-            // Do not cancel a restore while its file transaction is committing.
             setCancelable(false)
+            setButton(android.content.DialogInterface.BUTTON_NEGATIVE, getString(R.string.editor_tuixtactivity_cancel_1507c)) { _, _ -> }
             show()
+            getButton(android.content.DialogInterface.BUTTON_NEGATIVE).setOnClickListener {
+                val token = hubState.fileOperationToken ?: return@setOnClickListener
+                if (token.requestCancellation()) {
+                    setMessage(getString(R.string.settings_file_operation_cancelling))
+                    getButton(android.content.DialogInterface.BUTTON_NEGATIVE).isEnabled = false
+                } else updateFileCommitProgress()
+            }
+        }
+        updateFileCommitProgress()
+    }
+
+    private fun updateFileCommitProgress() {
+        if (hubState.fileOperationToken?.isCommitting() == true) {
+            fileProgress?.setMessage(getString(R.string.settings_file_operation_finishing))
+            fileProgress?.getButton(android.content.DialogInterface.BUTTON_NEGATIVE)?.visibility = View.GONE
         }
     }
 
@@ -766,13 +786,23 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
     private fun <T> runFileOperation(work: () -> T, completed: ThemerActivity.(Result<T>) -> Unit) {
         if (fileOperationRunning) return
         fileOperationRunning = true
+        val retained = hubState
+        val token = FileOperationCancellation.Token {
+            Handler(Looper.getMainLooper()).post { retained.activity?.get()?.updateFileCommitProgress() }
+        }
+        retained.fileOperationToken = token
         showFileProgress()
         Thread {
-            val result = runCatching(work)
+            val result = runCatching { FileOperationCancellation.run(token) { work().also { token.markCompleted() } } }
             Handler(Looper.getMainLooper()).post {
-                fileOperationRunning = false
-                hubState.completedOperation = { completed(result) }
-                hubState.activity?.get()?.takeIf { !it.isFinishing && !it.isDestroyed }?.deliverCompletedOperation()
+                retained.fileOperationRunning = false
+                retained.fileOperationToken = null
+                retained.completedOperation = {
+                    if (result.exceptionOrNull() is CancellationException) {
+                        Toast.makeText(this, getString(R.string.settings_file_operation_cancelled), Toast.LENGTH_SHORT).show()
+                    } else completed(result)
+                }
+                retained.activity?.get()?.takeIf { !it.isFinishing && !it.isDestroyed }?.deliverCompletedOperation()
             }
         }.start()
     }
@@ -807,6 +837,23 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
 
         val session = frameSession()
         val applyAll = session.applyToAll
+        if (session.isStale()) {
+            root.addView(TextView(this).apply {
+                text = getString(R.string.frame_draft_stale)
+                setTextColor(textColor())
+                setTypeface(Tuils.getTypeface(this@ThemerActivity))
+            }, inputParams())
+            root.addView(TextView(this).apply {
+                text = getString(R.string.frame_draft_discard)
+                styleButton(this@ThemerActivity, this, false)
+                setOnClickListener {
+                    TuixtDialog.showConfirm(this@ThemerActivity, getString(R.string.frame_draft_discard),
+                        getString(R.string.themer_unsaved_element_edits_will_be_discarded_38d5f),
+                        getString(R.string.themer_discard_and_apply_bfec7), getString(R.string.themer_cancel_77dfd),
+                        ConfirmAction { discardFrameChanges(); sectionsAdapter?.notifyDataSetChanged() })
+                }
+            }, inputParams())
+        }
         root.addView(CheckBox(this).apply {
             text = getString(R.string.themer_enable_custom_frames_c7fdd)
             isChecked = FrameManager.isEnabled(this@ThemerActivity)
@@ -844,8 +891,12 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
             background = rect(this@ThemerActivity, surfaceColor(), borderColor(), 1.25f)
             buttonTintList = ColorStateList.valueOf(accentColor())
             setOnCheckedChangeListener { _, checked ->
-                session.applyToAll = checked
-                sectionsAdapter?.notifyDataSetChanged()
+                try {
+                    session.applyToAll = checked
+                    sectionsAdapter?.notifyDataSetChanged()
+                } catch (error: Exception) {
+                    Toast.makeText(this@ThemerActivity, error.displayMessage(this@ThemerActivity), Toast.LENGTH_LONG).show()
+                }
             }
         }
         root.addView(toggle, inputParams())
@@ -975,8 +1026,12 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
                 text = getString(R.string.themer_use_default_8e95d)
                 styleButton(this@ThemerActivity, this, false)
                 setOnClickListener {
-                    session.select(target, null)
-                    reloadForFrame(getString(R.string.themer_default_border_selected_09de3))
+                    try {
+                        session.select(target, null)
+                        reloadForFrame(getString(R.string.themer_default_border_selected_09de3))
+                    } catch (error: Exception) {
+                        Toast.makeText(this@ThemerActivity, error.displayMessage(this@ThemerActivity), Toast.LENGTH_LONG).show()
+                    }
                 }
             }, LinearLayout.LayoutParams(0, dp(this, 46f), 1f))
         }
@@ -2067,11 +2122,10 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
     }
 
     private fun frameSession(): FrameManager.EditSession {
-        if (frameEditSession?.isStale() == true) {
-            frameEditSession?.discard()
-            frameEditSession = null
+        return frameEditSession ?: FrameManager.beginEdit(this).also {
+            frameEditSession = it
+            if (it.isStale()) Toast.makeText(this, R.string.frame_draft_stale, Toast.LENGTH_LONG).show()
         }
-        return frameEditSession ?: FrameManager.beginEdit(this).also { frameEditSession = it }
     }
 
     private fun saveFrameChanges() {
@@ -2865,6 +2919,7 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
                 }
                 check(dest.length() > 0L) { getString(R.string.themer_font_import_failed_empty_file_a88dd) }
                 Typeface.createFromFile(dest)
+                FileOperationCancellation.check()
                 dest
             } catch (error: Exception) {
                 dest.delete()
@@ -3047,23 +3102,19 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
         val labels = pendingShareableBehaviorLabels ?: PresetManager.defaultShareableBehaviorLabels()
         pendingShareablePresetName = null
         pendingShareableBehaviorLabels = null
-        Thread {
-            try {
-                val cachedUri = BackupManager.exportShareableConfiguration(this, uri, preset, labels)
-                runOnUiThread {
-                    if (!isFinishing && !isDestroyed) TuixtDialog.showConfirm(this,
-                        getString(R.string.portable_preset_share), getString(R.string.portable_preset_exported),
-                        getString(R.string.portable_preset_share), getString(R.string.portable_preset_done),
-                        ConfirmAction { sharePreset(cachedUri) })
-                }
-            } catch (error: Exception) {
-                deleteCreatedDocument(uri)
-                runOnUiThread {
-                    if (!isFinishing && !isDestroyed) Toast.makeText(this,
-                        error.displayMessage(this) ?: getString(R.string.themer_configuration_export_failed_36f82), Toast.LENGTH_LONG).show()
-                }
-            }
-        }.start()
+        runFileOperation({
+            try { BackupManager.exportShareableConfiguration(this, uri, preset, labels) }
+            catch (error: Exception) { deleteCreatedDocument(uri); throw error }
+        }) { result ->
+            result.fold(onSuccess = { cachedUri ->
+                TuixtDialog.showConfirm(this,
+                    getString(R.string.portable_preset_share), getString(R.string.portable_preset_exported),
+                    getString(R.string.portable_preset_share), getString(R.string.portable_preset_done),
+                    ConfirmAction { sharePreset(cachedUri) })
+            }, onFailure = { error ->
+                Toast.makeText(this, error.displayMessage(this) ?: getString(R.string.themer_configuration_export_failed_36f82), Toast.LENGTH_LONG).show()
+            })
+        }
     }
 
     private fun sharePreset(uri: Uri) {
@@ -3210,14 +3261,10 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
         private const val MAX_FONT_BYTES = 8L * 1024 * 1024
 
         internal fun copyFontStream(input: InputStream, output: OutputStream, maxBytes: Long = MAX_FONT_BYTES) {
-            val buffer = ByteArray(8192)
-            var total = 0L
-            while (true) {
-                val read = input.read(buffer)
-                if (read < 0) break
-                total += read
-                if (total > maxBytes) throw LocalizedArgumentException(R.string.settings_font_too_large)
-                output.write(buffer, 0, read)
+            try { FileOperationCancellation.copy(input, output, maxBytes) }
+            catch (error: java.io.IOException) {
+                if (error.message?.startsWith("File exceeds ") == true) throw LocalizedArgumentException(R.string.settings_font_too_large)
+                throw error
             }
         }
 

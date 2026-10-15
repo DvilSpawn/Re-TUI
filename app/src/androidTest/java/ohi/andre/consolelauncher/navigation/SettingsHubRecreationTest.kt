@@ -27,7 +27,7 @@ class SettingsHubRecreationTest {
         Tuils.init(context)
         reload()
         val original = Tuils.getFolder()
-        val temporary = File(context.filesDir, "settings-hub-recreation-fixture").apply { deleteRecursively(); mkdirs() }
+        val temporary = File(context.filesDir, "settings-hub-recreation-fixture-${java.util.UUID.randomUUID()}").apply { deleteRecursively(); mkdirs() }
         original.listFiles().orEmpty().filter { it.isFile && it.extension == "xml" }
             .forEach { it.copyTo(File(temporary, it.name)) }
         val folder = Tuils::class.java.getDeclaredField("folder").apply { isAccessible = true }
@@ -98,6 +98,12 @@ class SettingsHubRecreationTest {
                 assertSame(session, restored)
                 assertTrue(restored.hasChanges())
             }
-        } finally { main { activity.finish() }; instrumentation.waitForIdleSync() }
+        } finally {
+            main {
+                ThemerActivity::class.java.getDeclaredMethod("discardFrameChanges").apply { isAccessible = true }.invoke(activity)
+                activity.finish()
+            }
+            instrumentation.waitForIdleSync()
+        }
     }
 }

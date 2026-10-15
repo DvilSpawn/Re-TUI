@@ -77,6 +77,7 @@ object XMLPrefsManager {
             return
         }
         Tuils.init(context)
+        ohi.andre.consolelauncher.managers.BackupManager.recoverInterruptedRestore(context)
         init(context)
 
         if (commonsLoaded) return
