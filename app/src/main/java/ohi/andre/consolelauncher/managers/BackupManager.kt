@@ -86,6 +86,7 @@ object BackupManager {
         "apps",
         PinnedShortcutManager.PREFS,
         "retui_modules",
+        "retui_module_library_installs",
         "retui_reminders",
         LuaWidgetReminderManager.PREFS,
         "retui_termux_apps",
@@ -605,7 +606,29 @@ object BackupManager {
         } finally {
             zip.close()
         }
-        return out.toByteArray()
+        return out.toByteArray().also { validateExpandedBackupSize(it) }
+    }
+
+    /** Use the restore limit before exporting, so a verified archive is also small enough to restore. */
+    internal fun validateExpandedBackupSize(archive: ByteArray, limit: Long = MAX_BACKUP_BYTES): Long {
+        require(limit >= 0)
+        var total = 0L
+        val buffer = ByteArray(8192)
+        ZipInputStream(ByteArrayInputStream(archive)).use { zip ->
+            while (zip.nextEntry != null) {
+                FileOperationCancellation.check()
+                while (true) {
+                    FileOperationCancellation.check()
+                    val count = zip.read(buffer)
+                    if (count < 0) break
+                    require(count.toLong() <= limit - total) {
+                        throw LocalizedArgumentException(R.string.validation_backup_backupmanager_backup_package_is_too_large_df84c)
+                    }
+                    total += count
+                }
+            }
+        }
+        return total
     }
 
     @Throws(java.lang.Exception::class)

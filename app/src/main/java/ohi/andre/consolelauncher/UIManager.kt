@@ -512,7 +512,6 @@ class UIManager(
     private var moduleSuggestionsOriginalParams: ViewGroup.LayoutParams? = null
     private var moduleSuggestionsOriginalIndex = -1
     private val luaWidgetEngines = HashMap<String?, LuaWidgetEngine?>()
-    private var bundledLuaSamplesPruned = false
     private var activeModule: String? = ""
     private var lastClockStateIntent: Intent? = null
     private var lastPomodoroStateIntent: Intent? = null
@@ -3057,7 +3056,6 @@ class UIManager(
         if (homeModulesContainer == null) return
 
         ensureSystemLuaModules()
-        pruneBundledLuaSamples()
         activeModule = ""
         ModuleManager.setActiveModule(mContext, "")
         homeModulesContainer!!.removeAllViews()
@@ -3491,24 +3489,7 @@ class UIManager(
         val refreshes: Boolean
     )
 
-    private fun pruneBundledLuaSamples() {
-        if (bundledLuaSamplesPruned) return
-        bundledLuaSamplesPruned = true
-        val ids = ArrayList<String?>(LuaWidgetManager.bundledSampleIds())
-        for (id in LuaWidgetManager.listIds()) {
-            if (LuaWidgetManager.isBundledSample(id) && !ids.contains(id)) {
-                ids.add(id)
-            }
-        }
-        for (id in ids) {
-            LuaWidgetManager.delete(id)
-            ModuleManager.removeScriptModule(mContext, id)
-            luaWidgetEngines.remove(id)?.dispose()
-        }
-    }
-
     private fun rebuildModuleDock() {
-        pruneBundledLuaSamples()
         val showDock = getBoolean(Behavior.show_module_dock)
         if (moduleDockScroll != null) {
             moduleDockScroll!!.setVisibility(if (showDock) View.VISIBLE else View.GONE)

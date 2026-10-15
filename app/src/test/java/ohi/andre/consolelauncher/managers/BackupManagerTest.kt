@@ -3,6 +3,7 @@ package ohi.andre.consolelauncher.managers
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
 import java.nio.file.Files
@@ -69,6 +70,38 @@ class BackupManagerTest {
             "remember-notes.xml", "notes-library", "images", "launcher-language-packs"
         )))
         assertTrue(BackupManager.personalSharedPreferenceNames().containsAll(listOf("launcher-language", "remember-theme")))
+    }
+
+    @Test
+    fun personalBackupIncludesModuleLibraryInstallProvenance() {
+        assertTrue(BackupManager.personalSharedPreferenceNames().contains("retui_module_library_installs"))
+    }
+
+    @Test
+    fun acceptsCompressedBackupWithinCumulativeExpandedLimit() {
+        val archive = compressibleArchive(2, 400)
+        assertTrue(archive.size < 1024)
+        assertEquals(800L, BackupManager.validateExpandedBackupSize(archive, 1024))
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun rejectsSmallCompressedBackupThatRestoreCannotExpandWithinLimit() {
+        // Every source file fits, and the compressed archive fits; only the expanded total is too big.
+        val archive = compressibleArchive(3, 400)
+        assertTrue(archive.size < 1024)
+        BackupManager.validateExpandedBackupSize(archive, 1024)
+    }
+
+    private fun compressibleArchive(entries: Int, bytesPerEntry: Int): ByteArray {
+        val bytes = ByteArrayOutputStream()
+        ZipOutputStream(bytes).use { zip ->
+            repeat(entries) { index ->
+                zip.putNextEntry(ZipEntry("file-$index.txt"))
+                zip.write(ByteArray(bytesPerEntry) { 'x'.code.toByte() })
+                zip.closeEntry()
+            }
+        }
+        return bytes.toByteArray()
     }
 
     @Test
