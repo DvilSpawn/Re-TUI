@@ -1,0 +1,12 @@
+{
+  "official_release": "https://github.com/DvilSpawn/Re-TUI/releases/tag/v3-20261013-build502",
+  "release_asset": "app-playstore-release.apk",
+  "flavor": "playstoreRelease",
+  "package": "com.dvil.tui_renewed",
+  "apk_sha256": "bb26a7dbacbf52eb3a1ac2653c2e9d8a346634fef12d7beb4d67678b04fc3031",
+  "release_certificate_sha256": "f1f50b573286bfbd59b8bfbb39d202ea3adf173f12077d98110bb9ed981b93f2",
+  "configured_original_keystore_certificate_matches": true,
+  "existing_local_playstore_release_certificate_matches": true,
+  "installed_on_phone": false,
+  "purpose": "Certificate/flavor reference only; new candidate must be built from current worktree, not install this old published APK."
+}

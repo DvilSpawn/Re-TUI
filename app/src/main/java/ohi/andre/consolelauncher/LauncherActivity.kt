@@ -106,6 +106,35 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
     private var backButtonEnabled = false
     private var breathOutRoot: BreathOutLayout? = null
     private var launcherResumed = false
+    private var startupHomeFramePending = false
+    private val startupHomeResult = registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()) { }
+
+    private fun requestStartupHomeAfterDraw() {
+        if (startupHomeFramePending || !launcherResumed || uiManager == null || StartupMenuManager.isFirstInstallPending(this) || !StartupMenuManager.hasPendingDefaultLauncher(this)) return
+        startupHomeFramePending = true
+        val root = window.decorView
+        root.postOnAnimation {
+            startupHomeFramePending = false
+            if (!launcherResumed || root !== window.decorView || !root.hasWindowFocus()) return@postOnAnimation
+            if (!StartupMenuManager.preparationWindowDismissed()) { requestStartupHomeAfterDraw(); return@postOnAnimation }
+            startupHomeFramePending = true
+            val launch = Runnable {
+                startupHomeFramePending = false
+                if (launcherResumed && root === window.decorView && root.hasWindowFocus()) {
+                    try { StartupMenuManager.consumeDefaultLauncherRequest(this)?.let { startupHomeResult.launch(it) } }
+                    catch (error: Exception) {
+                        Tuils.log(error)
+                        android.widget.Toast.makeText(this, R.string.startup_default_launcher_unavailable, android.widget.Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+            if (Build.VERSION.SDK_INT >= 29 && root.isHardwareAccelerated) {
+                root.viewTreeObserver.registerFrameCommitCallback { root.post(launch) }
+                root.invalidate()
+            } else root.postOnAnimation { root.post(launch) }
+        }
+    }
+
 
     private var categories: MutableSet<ReloadMessageCategory?>? = null
 
@@ -459,6 +488,7 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
         if (playBootSound) LauncherSoundManager.playBoot(this)
 
         if (terminalState == null) `in`.`in`(Tuils.EMPTYSTRING)
+        requestStartupHomeAfterDraw()
         startupMenuRequested = (openStartupMenu || StartupMenuManager.isFirstInstallPending(this)) &&
             StartupMenuManager.maybeOpen(this)
         if (!startupMenuRequested) {
@@ -613,7 +643,7 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
     private var changelogRequested = false
 
     private fun maybeShowChangelog(): Boolean {
-        if (StartupMenuManager.isFirstInstallPending(this)) {
+        if (StartupMenuManager.isFirstInstallPending(this) || StartupMenuManager.hasPendingDefaultLauncher(this)) {
             return false
         }
         if (startupMenuRequested || StartupMenuManager.isActive(this)) return false
@@ -634,6 +664,7 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
             }
             if (maybeShowChangelog()) return
             uiManager!!.resume()
+            requestStartupHomeAfterDraw()
             uiManager!!.activateTerminalInput(openKeyboardOnStart)
             val guideMessage = GuideManager.consumePendingResumeMessage(this)
             if (!guideMessage.isNullOrEmpty()) {
@@ -662,6 +693,7 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
         startupMenuRequested = false
         changelogRequested = false
         launcherResumed = false
+        startupHomeFramePending = false
         breathOutRoot?.setActive(false)
         setWallpaperInteractionEnabled(false)
         if (this@LauncherActivity.uiManager != null) {
@@ -760,6 +792,7 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
         if (hasFocus) {
             applyFullscreen(this)
         }
+        if (hasFocus) requestStartupHomeAfterDraw()
         if (hasFocus && this@LauncherActivity.uiManager != null && !StartupMenuManager.isFirstInstallPending(this)) {
             if (maybeShowChangelog()) return
             uiManager!!.activateTerminalInput(openKeyboardOnStart)

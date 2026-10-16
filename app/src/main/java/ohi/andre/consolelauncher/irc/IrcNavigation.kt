@@ -29,7 +29,11 @@ class IrcActions(private val state: IrcState, private val send: (String, List<St
         state.buffer(name); state.switch(name)
     }
     fun directory() { if (!state.directoryLoading) { send("LIST", emptyList(), null); state.beginDirectory() } }
-    fun names() { require(state.active.joined) { "Join a channel to see its people." }; if (!state.active.namesLoading) { send("NAMES", listOf(state.active.name), null); state.beginNames() } }
+    fun names(channel: String = state.active.name) {
+        val buffer = state.buffer(channel)
+        require(buffer.joined) { "Join a channel to see its people." }
+        if (!buffer.namesLoading) { send("NAMES", listOf(buffer.name), null); state.beginNames(buffer.name) }
+    }
     fun part() { require(state.active.joined); send("PART", listOf(state.active.name), null) }
     fun deleteMessage(target: String, id: String) {
         require(IrcProtocol.target(target) && target.first() in "#&" && id.length in 1..512 && id.none { it <= ' ' || it == '\u007f' })

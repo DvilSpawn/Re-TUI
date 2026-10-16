@@ -1,0 +1,10 @@
+{
+  "target": "@213",
+  "panePid": "15257",
+  "marker": "PROCESS_SURVIVAL_9e3b2bd673174184b9ef7cfe53fb5bcc",
+  "stage": "READY_FOR_KILL",
+  "app_pid_before": "15170",
+  "app_pid_after": "15522",
+  "seed_intentionally_force_stopped": true,
+  "verify_passed": true
+}

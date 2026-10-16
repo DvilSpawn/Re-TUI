@@ -1,0 +1,18 @@
+{
+  "apk": {
+    "path": "/Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/build/validated-production-blockers/app-playstore-release.apk",
+    "sha256": "c9d10725c4d0ef70adba39b59b0b5c7765a9238488c6bfd1620e72b894d10402",
+    "bytes": 7659815,
+    "jar_signer_entries": []
+  },
+  "aab": {
+    "path": "/Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/build/validated-production-blockers/app-playstore-release.aab",
+    "sha256": "3fb02c54da32ad3f37864767870f8703fee95d8439599de739c97867eb546859",
+    "bytes": 8191077,
+    "jar_signer_entries": []
+  },
+  "default_release_ssh_disabled": {
+    "jsch_mapping_classes": 0,
+    "ssh_implementation_mapping_classes": 0
+  }
+}

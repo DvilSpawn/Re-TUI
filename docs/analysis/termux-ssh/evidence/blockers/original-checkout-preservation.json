@@ -1,0 +1,144 @@
+{
+  "original_checkout_unchanged_against_snapshot": true,
+  "original_index_empty": true,
+  "checked_paths": 34,
+  "files": [
+    {
+      "path": "app/build.gradle",
+      "unchanged": true
+    },
+    {
+      "path": "app/proguard-rules.pro",
+      "unchanged": true
+    },
+    {
+      "path": "app/src/androidTest/java/ohi/andre/consolelauncher/calculator/CalculatorInlineEnhancementTest.kt",
+      "unchanged": true
+    },
+    {
+      "path": "app/src/androidTest/java/ohi/andre/consolelauncher/calculator/PortableCalculatorDeviceTest.kt",
+      "unchanged": true
+    },
+    {
+      "path": "app/src/main/AndroidManifest.xml",
+      "unchanged": true
+    },
+    {
+      "path": "app/src/main/assets/calculator-runtime/bootstrap.js",
+      "unchanged": true
+    },
+    {
+      "path": "app/src/main/assets/calculator-runtime/index.html",
+      "unchanged": true
+    },
+    {
+      "path": "app/src/main/assets/calculator-runtime/worker.js",
+      "unchanged": true
+    },
+    {
+      "path": "app/src/main/assets/localization/catalog.json",
+      "unchanged": true
+    },
+    {
+      "path": "app/src/main/assets/localization/english-template.zip",
+      "unchanged": true
+    },
+    {
+      "path": "app/src/main/java/ohi/andre/consolelauncher/calculator/CalculatorActivity.kt",
+      "unchanged": true
+    },
+    {
+      "path": "app/src/main/java/ohi/andre/consolelauncher/calculator/CalculatorEngine.kt",
+      "unchanged": true
+    },
+    {
+      "path": "app/src/main/java/ohi/andre/consolelauncher/calculator/CalculatorPackActivity.kt",
+      "unchanged": true
+    },
+    {
+      "path": "app/src/main/java/ohi/andre/consolelauncher/calculator/CalculatorPackPanel.kt",
+      "unchanged": true
+    },
+    {
+      "path": "app/src/main/java/ohi/andre/consolelauncher/calculator/CalculatorPackStore.kt",
+      "unchanged": true
+    },
+    {
+      "path": "app/src/main/java/ohi/andre/consolelauncher/calculator/NativeQalculate.kt",
+      "unchanged": true
+    },
+    {
+      "path": "app/src/main/java/ohi/andre/consolelauncher/calculator/OptionalCalculatorEngine.kt",
+      "unchanged": true
+    },
+    {
+      "path": "app/src/main/java/ohi/andre/consolelauncher/calculator/QalculateService.kt",
+      "unchanged": true
+    },
+    {
+      "path": "app/src/main/java/ohi/andre/consolelauncher/calculator/WasmCalculatorRuntime.kt",
+      "unchanged": true
+    },
+    {
+      "path": "app/src/main/java/ohi/andre/consolelauncher/managers/BackupManager.kt",
+      "unchanged": true
+    },
+    {
+      "path": "app/src/main/java/ohi/andre/consolelauncher/managers/onboarding/StartupMenuManager.kt",
+      "unchanged": true
+    },
+    {
+      "path": "app/src/main/res/values/strings_optional_calculator.xml",
+      "unchanged": true
+    },
+    {
+      "path": "app/src/test/java/ohi/andre/consolelauncher/calculator/CalculatorPackStoreTest.kt",
+      "unchanged": true
+    },
+    {
+      "path": "app/src/test/java/ohi/andre/consolelauncher/managers/BackupManagerTest.kt",
+      "unchanged": true
+    },
+    {
+      "path": "docs/calculator.md",
+      "unchanged": true
+    },
+    {
+      "path": "docs/optional-calculator-engine.md",
+      "unchanged": true
+    },
+    {
+      "path": "language-packs/template/strings.xml",
+      "unchanged": true
+    },
+    {
+      "path": "native/qalculate/README.md",
+      "unchanged": true
+    },
+    {
+      "path": "native/qalculate/build_wasm.py",
+      "unchanged": true
+    },
+    {
+      "path": "native/qalculate/package_wasm.py",
+      "unchanged": true
+    },
+    {
+      "path": "native/qalculate/test_runtime_bootstrap.mjs",
+      "unchanged": true
+    },
+    {
+      "path": "native/qalculate/test_wasm.cjs",
+      "unchanged": true
+    },
+    {
+      "path": "native/qalculate/wasm_bridge.cpp",
+      "unchanged": true
+    },
+    {
+      "path": "scripts/qalculate_source_bundle.py",
+      "unchanged": true
+    }
+  ],
+  "worktree_branch": "dvil/termux-ssh-analysis"
+}

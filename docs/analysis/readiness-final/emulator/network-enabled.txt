@@ -1,0 +1,6 @@
+Current network status:
+  download speed:          0 bits/s (0.0 KB/s)
+  upload speed:            0 bits/s (0.0 KB/s)
+  minimum latency:  0 ms
+  maximum latency:  0 ms
+OK

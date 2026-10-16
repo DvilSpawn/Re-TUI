@@ -49,6 +49,7 @@ enum class FrameTarget(val id: String, val labelRes: Int) {
     WIDGET_DRAWER("widget_drawer", R.string.frame_target_widget_drawer),
     KEYBOARD("keyboard", R.string.frame_target_keyboard),
     FILES("files", R.string.frame_target_files),
+    REMEMBER("remember", R.string.frame_target_remember),
     OVERLAYS("overlays", R.string.frame_target_overlays),
     SETTINGS("settings", R.string.frame_target_settings),
     DIALOG("dialog", R.string.frame_target_dialog),
@@ -154,7 +155,7 @@ object FrameManager {
                 FrameTarget.STATUS_UNLOCK, FrameTarget.STATUS_ASCII, FrameTarget.OUTPUT,
                 FrameTarget.INPUT, FrameTarget.SUGGESTIONS, FrameTarget.MUSIC,
                 FrameTarget.NOTIFICATIONS, FrameTarget.MODULES, FrameTarget.MODULE_DOCK,
-                FrameTarget.APP_DRAWER, FrameTarget.WIDGET_DRAWER, FrameTarget.FILES,
+                FrameTarget.APP_DRAWER, FrameTarget.WIDGET_DRAWER, FrameTarget.FILES, FrameTarget.REMEMBER,
                 FrameTarget.OVERLAYS, FrameTarget.SETTINGS, FrameTarget.DIALOG,
                 FrameTarget.HEADER, FrameTarget.LIST_ITEM, FrameTarget.UI_INPUT,
                 FrameTarget.BUTTON, FrameTarget.BUTTON_PRIMARY

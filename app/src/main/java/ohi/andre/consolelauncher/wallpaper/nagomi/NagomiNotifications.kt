@@ -33,6 +33,7 @@ internal object NagomiNotifications {
 
     fun posted(context: Context, sbn: StatusBarNotification) {
         if (!keys.posted(sbn.key)) return
+        if (!ohi.andre.consolelauncher.wallpaper.WallpaperLibrary.available(context, NagomiView.SCENE)) return
         val n = sbn.notification
         if (n.flags and (Notification.FLAG_GROUP_SUMMARY or Notification.FLAG_ONGOING_EVENT) != 0) return
         if (previews == 0 && engines == 0 && RetuiWallpaperSettings.scene(context) != NagomiView.SCENE) return

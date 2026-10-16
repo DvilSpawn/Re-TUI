@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="ohi.andre.consolelauncher.managers.PresetManagerTest" tests="18" skipped="0" failures="0" errors="0" timestamp="2026-10-16T03:33:20.571Z" hostname="Makos-MacBook-Air-6.local" time="0.106">
+  <properties/>
+  <testcase name="sanitizerRoundTripsAdvancedAutoAndRgbaColors" classname="ohi.andre.consolelauncher.managers.PresetManagerTest" time="0.048"/>
+  <testcase name="selectedBehaviorSanitizerKeepsOnlyExplicitKnownValues" classname="ohi.andre.consolelauncher.managers.PresetManagerTest" time="0.005"/>
+  <testcase name="shareableUiExcludesPersonalAndNonportableSettings" classname="ohi.andre.consolelauncher.managers.PresetManagerTest" time="0.014"/>
+  <testcase name="unifiedStatusPaneHasItsOwnTransparentThemeColor" classname="ohi.andre.consolelauncher.managers.PresetManagerTest" time="0.0"/>
+  <testcase name="duplicatePresetRefusesToOverwriteExistingFolder" classname="ohi.andre.consolelauncher.managers.PresetManagerTest" time="0.001"/>
+  <testcase name="crtVignetteDefaultsOn" classname="ohi.andre.consolelauncher.managers.PresetManagerTest" time="0.001"/>
+  <testcase name="sanitizerRemovesPersonalTextUnknownFieldsAndInvalidValues" classname="ohi.andre.consolelauncher.managers.PresetManagerTest" time="0.003"/>
+  <testcase name="localPresetCopiesBehaviorWithoutSanitizing" classname="ohi.andre.consolelauncher.managers.PresetManagerTest" time="0.002"/>
+  <testcase name="sanitizerKeepsDecimalStatusIndexes" classname="ohi.andre.consolelauncher.managers.PresetManagerTest" time="0.002"/>
+  <testcase name="duplicatePresetCopiesRawBehaviorAndFramesWithoutSanitizing" classname="ohi.andre.consolelauncher.managers.PresetManagerTest" time="0.012"/>
+  <testcase name="unifiedStatusBorderPreservesIndividualFramesByDefault" classname="ohi.andre.consolelauncher.managers.PresetManagerTest" time="0.0"/>
+  <testcase name="sanitizerMigratesLegacyPresetColors" classname="ohi.andre.consolelauncher.managers.PresetManagerTest" time="0.004"/>
+  <testcase name="sanitizerRejectsDoctypeWithoutParserFeatureSupport" classname="ohi.andre.consolelauncher.managers.PresetManagerTest" time="0.001"/>
+  <testcase name="shareableBehaviorKeepsTypedConfigurationWithoutFreeformPersonalData" classname="ohi.andre.consolelauncher.managers.PresetManagerTest" time="0.002"/>
+  <testcase name="sanitizerKeepsTerminalPromptPrefixes" classname="ohi.andre.consolelauncher.managers.PresetManagerTest" time="0.003"/>
+  <testcase name="defaultBehaviorConsentRemainsPiSafe" classname="ohi.andre.consolelauncher.managers.PresetManagerTest" time="0.0"/>
+  <testcase name="sanitizerKeepsConstrainedLayoutAndSuggestionValuesOnly" classname="ohi.andre.consolelauncher.managers.PresetManagerTest" time="0.004"/>
+  <testcase name="wallpaperDefaultsToSystemWithNoOverlay" classname="ohi.andre.consolelauncher.managers.PresetManagerTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

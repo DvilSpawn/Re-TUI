@@ -1,0 +1,4 @@
+ln_exit=1
+total 8
+377634 -rw-rw-rw-. 1 u0_a215 u0_a215 4 Oct 16 14:36 source
+ln: failed to create hard link '/data/data/com.termux/files/home/.retui/lnprobe/destination' => '/data/data/com.termux/files/home/.retui/lnprobe/source': Permission denied

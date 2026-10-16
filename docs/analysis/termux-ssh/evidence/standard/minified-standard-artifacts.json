@@ -1,0 +1,20 @@
+{
+  "application": {
+    "path": "/Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/build/validated-ssh-standard/app-playstore-standard-ssh-check.apk",
+    "sha256": "c101fe38a864845cc3d92661a3fe17cfe13bfd28c75443881bf1b8c4766bcf43",
+    "bytes": 7800927
+  },
+  "installed_apk_sha256": "c101fe38a864845cc3d92661a3fe17cfe13bfd28c75443881bf1b8c4766bcf43",
+  "installed_matches_candidate": true,
+  "physical_minified_checks": 4,
+  "serial": "adb-10BE1C0FB40006A-RwuKbp._adb-tls-connect._tcp",
+  "ordinary_and_check_ssh_flag_inherited_from_default": true,
+  "release_check_transport_enable_override_present": false,
+  "source_app_build_gradle_sha256": "11d1010d4eb7de6bd75ec1ebe993c8a2d2a6c2f481a38ca38f4e8293d248644a",
+  "source_ssh_r8_rules_sha256": "0fed099afe0fc9ed8e0661b34b023f24a95c9340e057b9b83d3fa2723500f222",
+  "source_apps_manager_sha256": "49442bd9a547634026c06dbc14b45bd281d47cb43349427717d8f012cf207dc6",
+  "production_package_installed_over": false,
+  "api23_rerun": false,
+  "debug_pairing_restored": true,
+  "owned_release_check_packages_removed": true
+}

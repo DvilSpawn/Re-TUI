@@ -1,0 +1,56 @@
+{
+  "device": "adb-10BE1C0FB40006A-RwuKbp._adb-tls-connect._tcp",
+  "artifacts": [
+    {
+      "package": "com.dvil.tui_renewed.termuxsshdebug",
+      "apk": "app/build/outputs/apk/playstore/debug/app-playstore-debug.apk",
+      "sha256": "93bd31435ce6c2e0133633ce12397bbd6f6fb512408dd0851bfa2b8a744f2d46",
+      "installedMatches": true
+    },
+    {
+      "package": "com.dvil.tui_renewed.termuxsshdebug.test",
+      "apk": "app/build/outputs/apk/androidTest/playstore/debug/app-playstore-debug-androidTest.apk",
+      "sha256": "e7e99d0f28f47aba555201a601fd540b0f6953fa16fd7763363639ee44789360",
+      "installedMatches": true
+    }
+  ],
+  "themes": [
+    "catppuccin-latte",
+    "catppuccin-mocha"
+  ],
+  "surfaces": [
+    "calculator-enhancement",
+    "calculator-pack"
+  ],
+  "registrySha256": "ff5bad1887c5545bb4c0c36d3c547a8efb66001cbc46e847033f6e8fb395e231",
+  "captureGuard": "Actual help backdrop for floating calculator; focused launcher/dialog root framecommit +500ms compositor transition wait + same focused root recheck.",
+  "instrumentationArgs": [
+    "shell",
+    "am",
+    "instrument",
+    "-w",
+    "-r",
+    "-e",
+    "readabilityEnabled",
+    "true",
+    "-e",
+    "readabilityPhone",
+    "true",
+    "-e",
+    "themes",
+    "catppuccin-latte,catppuccin-mocha",
+    "-e",
+    "surfaces",
+    "calculator-enhancement,calculator-pack",
+    "-e",
+    "configuration",
+    "baseline",
+    "-e",
+    "buildSha256",
+    "93bd31435ce6c2e0133633ce12397bbd6f6fb512408dd0851bfa2b8a744f2d46:e7e99d0f28f47aba555201a601fd540b0f6953fa16fd7763363639ee44789360",
+    "-e",
+    "class",
+    "ohi.andre.consolelauncher.managers.settings.PaletteReadabilityTest#renderPaletteBatch",
+    "com.dvil.tui_renewed.termuxsshdebug.test/androidx.test.runner.AndroidJUnitRunner"
+  ]
+}

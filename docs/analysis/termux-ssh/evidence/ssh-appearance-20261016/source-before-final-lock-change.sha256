@@ -1,0 +1,3 @@
+f324a87665b70f1fc405fa49e0463829cee5c7a7eaea835b75c34d9205dfcb60  app/src/main/assets/termux-ssh/setup.sh
+319d9ae01787f2670b7db3a806bf26d19362025fd25fc9ed23ad05037527a984  app/src/androidTest/java/ohi/andre/consolelauncher/managers/termux/TermuxWorkspaceSshAppearanceTest.kt
+df6873bde69a151d87c4735c6a5effafa83a9fc5c9eb27b072f4b9dad3b1f4c1  scripts/test_termux_ssh_setup.py

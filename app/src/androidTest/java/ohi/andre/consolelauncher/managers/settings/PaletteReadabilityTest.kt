@@ -62,6 +62,7 @@ class PaletteReadabilityTest {
     private val emulator get() = android.os.Build.HARDWARE in listOf("goldfish", "ranchu")
     private val widget = "readability_fixture"
     private var rolesAtColor: Map<Int, List<String>> = emptyMap()
+    private var calculatorBackdrop: Activity? = null
     private fun main(block: () -> Unit) = instrumentation.runOnMainSync(block)
     private fun settle() {
         val frames = java.util.concurrent.CountDownLatch(1)
@@ -176,6 +177,15 @@ class PaletteReadabilityTest {
             ActivityLifecycleMonitorRegistry.getInstance().getActivitiesInStage(Stage.RESUMED)
                 .filter { it.javaClass == cls }.forEach { it.finish() }
         }
+        if (surface.getString("id") == "calculator-enhancement") {
+            calculatorBackdrop = instrumentation.startActivitySync(Intent(context, ohi.andre.consolelauncher.help.OfflineHelpActivity::class.java)
+                .putExtra("topic", "calculator-help").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            main {
+                calculatorBackdrop!!.window.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                calculatorBackdrop!!.window.decorView.setBackgroundColor(ThemeColorResolver.color(Theme.background_color))
+            }
+            settle()
+        }
         val intent = Intent(context, cls).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         val variant = surface.getString("variant")
         if (variant == "settings") intent.putExtra(TuixtActivity.PATH,
@@ -258,6 +268,11 @@ class PaletteReadabilityTest {
                     "functions" -> activity.findViewById<View>(R.id.calculator_functions_tab).performClick()
                     "help" -> activity.findViewById<View>(R.id.calculator_help_tab).performClick()
                     "interpretation" -> Unit
+                    "enhancement" -> {
+                        check(ohi.andre.consolelauncher.calculator.CalculatorPackStore.installedVersion(activity) == null) { "Inline enhancement capture requires an uninstalled optional calculator pack" }
+                        check(ohi.andre.consolelauncher.calculator.CalculatorEngine.supported()) { "Inline enhancement capture requires supported WebView" }
+                        invoke(activity, "showEnhancement")
+                    }
                     else -> activity.findViewById<View>(R.id.calculator_equals).performClick()
                 }
             }
@@ -282,6 +297,50 @@ class PaletteReadabilityTest {
             }
         }
         settle()
+        if (surface.getString("id") == "wallpaper-gallery") {
+            val deadline = android.os.SystemClock.uptimeMillis() + 15000
+            var loaded = false
+            do {
+                main { loaded = all(activity).any { it.tag?.toString()?.startsWith("wallpaper-download-") == true || it.tag?.toString()?.startsWith("wallpaper-use-") == true } }
+                if (!loaded) Thread.sleep(30)
+            } while (!loaded && android.os.SystemClock.uptimeMillis() < deadline)
+            check(loaded) { "Wallpaper gallery catalogue did not render native cards; loading/error alone is not coverage" }
+            main {
+                val actions = all(activity).filterIsInstance<TextView>().filter { it.tag?.toString()?.startsWith("wallpaper-download-") == true || it.tag?.toString()?.startsWith("wallpaper-use-") == true }
+                assertTrue("Native gallery actions rendered", actions.isNotEmpty())
+                actions.forEach { action ->
+                    assertTrue("Accessible gallery action height", action.height >= (48 * context.resources.displayMetrics.density).toInt())
+                    for ((state, role) in listOf(intArrayOf() to Theme.button_text_color, intArrayOf(android.R.attr.state_pressed) to Theme.pressed_text_color, intArrayOf(-android.R.attr.state_enabled) to Theme.disabled_text_color)) {
+                        assertEquals("Gallery action state follows $role", SettingsColorSafety.color(role, ThemeColorResolver::color), action.textColors.getColorForState(state, 0))
+                    }
+                }
+            }
+            settle()
+        }
+        if (surface.getString("id") in listOf("calculator-enhancement", "calculator-pack")) main {
+            val inline = surface.getString("id") == "calculator-enhancement"
+            val panel = field(activity, if (inline) "enginePanel" else "panel")!!
+            val panelView = field(panel, "view") as View
+            check(panelView.isShown) { "The real calculator enhancement panel must be visible" }
+            val expectedText = if (inline) ThemeColorResolver.color(Theme.workspace_panel_text_color)
+                else ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.textColor()
+            for (name in listOf("title", "status")) {
+                val text = field(panel, name) as TextView
+                assertTrue("Calculator $name needs readable content", text.text.isNotBlank())
+                assertEquals("Calculator $name follows the active palette", expectedText, text.currentTextColor)
+            }
+            val actions = all(activity).filterIsInstance<TextView>().filter { it.isShown && it.tag?.toString()?.startsWith("calculator-enhancement-action-") == true }
+            assertTrue("Capture real pack actions", actions.isNotEmpty())
+            for (action in actions) {
+                val normal = if (action.tag == "calculator-enhancement-action-${R.string.optional_calculator_download}") Theme.primary_button_text_color else Theme.button_text_color
+                for ((state, role) in listOf(intArrayOf(android.R.attr.state_enabled) to normal,
+                    intArrayOf(android.R.attr.state_enabled, android.R.attr.state_pressed) to Theme.pressed_text_color,
+                    intArrayOf(-android.R.attr.state_enabled) to Theme.disabled_text_color)) {
+                    assertEquals("Pack action state follows $role", SettingsColorSafety.color(role, ThemeColorResolver::color), action.textColors.getColorForState(state, 0))
+                }
+                assertNotNull("Pack action has its themed drawable", action.background)
+            }
+        }
         if (activity is ohi.andre.consolelauncher.calculator.CalculatorActivity && variant in listOf("normal", "error", "interpretation")) {
             val deadline = android.os.SystemClock.uptimeMillis() + 10000
             var rendered = false
@@ -366,6 +425,9 @@ class PaletteReadabilityTest {
         val result = JSONArray()
         for (view in (only ?: all(activity)).distinct().filter(::visible)) {
             val bg = background(view)
+            if (view is android.webkit.WebView && activity is ohi.andre.consolelauncher.wallpaper.WallpaperGalleryActivity) {
+                result.put(JSONObject().put("id", view.contentDescription).put("kind", "animated-wallpaper-preview").put("status", "manual review required").put("reason", "Remote GIF artwork is content-authored; inspect the actual preview in the screenshot"))
+            }
             if (view is TextView) {
                 if (view.text.isNotEmpty()) {
                     val text = view.text
@@ -448,7 +510,23 @@ class PaletteReadabilityTest {
             root.getLocationOnScreen(origin)
             bitmap = Bitmap.createBitmap(root.width, root.height, Bitmap.Config.ARGB_8888)
             root.draw(Canvas(bitmap!!))
-        } else bitmap = checkNotNull(instrumentation.uiAutomation.takeScreenshot())
+        } else {
+            val committed = java.util.concurrent.CountDownLatch(1)
+            var committedRoot: View? = null
+            main {
+                val decor = roots(activity).last()
+                committedRoot = decor
+                if (android.os.Build.VERSION.SDK_INT >= 29 && decor.isHardwareAccelerated) {
+                    decor.viewTreeObserver.registerFrameCommitCallback { committed.countDown() }
+                    decor.invalidate()
+                } else decor.postOnAnimation { committed.countDown() }
+            }
+            check(committed.await(3, java.util.concurrent.TimeUnit.SECONDS)) { "Target window did not submit a frame" }
+            // Choreographer callbacks precede Surface visibility/Activity transitions on some OEMs.
+            android.os.SystemClock.sleep(500)
+            main { check(committedRoot?.hasWindowFocus() == true) { "Target window lost focus before screenshot" } }
+            bitmap = checkNotNull(instrumentation.uiAutomation.takeScreenshot())
+        }
         file.outputStream().use { assertTrue(bitmap!!.compress(Bitmap.CompressFormat.PNG, 100, it)) }; bitmap!!.recycle()
         val status = if (measured.length() == 0) "blocked" else if ((0 until measured.length()).any { measured.getJSONObject(it).optString("status") == "fail" }) "fail" else "manual review required"
         return JSONObject().put("theme", theme.getString("id")).put("surface", surface.getString("id")).put("state", suffix)
@@ -584,6 +662,7 @@ class PaletteReadabilityTest {
                             .put("status", "blocked").put("reason", error.stackTraceToString().take(5000)))
                     } finally {
                         activity?.let { a -> main { a.finish() } }; activity = null
+                        calculatorBackdrop?.let { a -> main { a.finish() } }; calculatorBackdrop = null
                         val scene = JSONArray()
                         for (index in firstResult until results.length()) scene.put(results.getJSONObject(index))
                         File(output, "${theme.getString("id")}/${surface.getString("id")}/evidence.json")

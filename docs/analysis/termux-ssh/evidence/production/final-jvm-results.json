@@ -1,0 +1,26 @@
+{
+  "counts": {
+    "tests": 438,
+    "failures": 2,
+    "errors": 0,
+    "skipped": 5
+  },
+  "termux_counts": {
+    "tests": 27,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "failures": [
+    {
+      "suite": "ohi.andre.consolelauncher.managers.settings.PaletteCoverageRegistryTest",
+      "test": "everyRoleBelongsToRegisteredRenderingChecks",
+      "message": "java.lang.AssertionError: calculator/CalculatorActivity.kt expected:<[showMode]> but was:<[showMode, showEnhancement]>"
+    },
+    {
+      "suite": "ohi.andre.consolelauncher.managers.settings.PaletteCoverageRegistryTest",
+      "test": "everyActivityHasACaptureOrDocumentedException",
+      "message": "java.lang.AssertionError: Register new readable surfaces before the suite can pass expected:<[.managers.termux.TermuxWorkspaceActivity, .irc.IrcActivity, .help.OfflineHelpActivity, .help.ChangelogActivity, .LauncherActivity, .commands.tuixt.PresetImportActivity, .commands.tuixt.ThemerActivity, .managers.onboarding.StartupMenuActivity, .wallpaper.RetuiWallpaperActivity, .commands.tuixt.TuixtActivity, .commands.tuixt.WidgetEditorActivity, .commands.tuixt.WidgetConfigActivity, .notes.RememberActivity, .calculator.CalculatorPackActivity, .calculator.CalculatorActivity, .notes.SettingsActivity, .commands.tuixt.ReminderActivity, .commands.tuixt.PinShortcutConfirmActivity, .integrations.tasker.RetuiTaskerConfigActivity, .tuils.stuff.FakeLauncherActivity, .localization.LanguagePackActivity]> but was:<[.LauncherActivity, .commands.tuixt.ThemerActivity, .commands.tuixt.TuixtActivity, .calculator.CalculatorActivity, .help.OfflineHelpActivity, .help.ChangelogActivity, .irc.IrcActivity, .managers.termux.TermuxWorkspaceActivity, .notes.RememberActivity, .notes.SettingsActivity, .commands.tuixt.ReminderActivity, .localization.LanguagePackActivity, .wallpaper.RetuiWallpaperActivity, .managers.onboarding.StartupMenuActivity, .commands.tuixt.WidgetEditorActivity, .commands.tuixt.WidgetConfigActivity, .commands.tuixt.PresetImportActivity, .integrations.tasker.RetuiTaskerConfigActivity, .commands.tuixt.PinShortcutConfirmActivity, .tuils.stuff.FakeLauncherActivity]>"
+    }
+  ]
+}

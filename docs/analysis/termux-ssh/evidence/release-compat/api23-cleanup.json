@@ -1,0 +1,11 @@
+{
+  "owned_avd": "retui_ssh_api23",
+  "emulator_serial": "emulator-5562",
+  "emulator_stopped": true,
+  "removed_owned_paths": [
+    "/Users/mako/.android/avd/retui_ssh_api23.avd",
+    "/Users/mako/.android/avd/retui_ssh_api23.ini",
+    "/Users/mako/Library/Android/sdk/system-images/android-23/default/arm64-v8a"
+  ],
+  "other_emulators_and_images_modified": false
+}

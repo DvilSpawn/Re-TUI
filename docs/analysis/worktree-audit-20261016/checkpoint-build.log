@@ -1,0 +1,235 @@
+
+> Task :app:validateRuntimeNotices
+Verified notice records for 73 external runtime components
+
+> Task :app:validateSourceInputs
+> Task :app:preBuild
+> Task :app:prePlaystoreDebugBuild
+> Task :app:generatePlaystoreDebugBuildConfig UP-TO-DATE
+> Task :app:generatePlaystoreDebugResValues UP-TO-DATE
+> Task :app:generatePlaystoreDebugResources UP-TO-DATE
+> Task :app:packagePlaystoreDebugResources UP-TO-DATE
+> Task :retui-contract:preBuild UP-TO-DATE
+> Task :retui-contract:preDebugBuild UP-TO-DATE
+> Task :retui-contract:processDebugNavigationResources UP-TO-DATE
+> Task :retui-datetime-picker:preBuild UP-TO-DATE
+> Task :retui-datetime-picker:preDebugBuild UP-TO-DATE
+> Task :retui-datetime-picker:processDebugNavigationResources UP-TO-DATE
+> Task :app:processPlaystoreDebugNavigationResources UP-TO-DATE
+> Task :app:parsePlaystoreDebugLocalResources UP-TO-DATE
+> Task :app:generatePlaystoreDebugRFile UP-TO-DATE
+> Task :retui-contract:generateDebugResources UP-TO-DATE
+> Task :retui-contract:packageDebugResources UP-TO-DATE
+> Task :retui-contract:parseDebugLocalResources UP-TO-DATE
+> Task :retui-contract:generateDebugRFile UP-TO-DATE
+> Task :retui-contract:compileDebugKotlin UP-TO-DATE
+> Task :retui-contract:javaPreCompileDebug UP-TO-DATE
+> Task :retui-contract:compileDebugJavaWithJavac NO-SOURCE
+> Task :retui-contract:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :retui-datetime-picker:generateDebugResources UP-TO-DATE
+> Task :retui-datetime-picker:packageDebugResources UP-TO-DATE
+> Task :retui-datetime-picker:parseDebugLocalResources UP-TO-DATE
+> Task :retui-datetime-picker:generateDebugRFile UP-TO-DATE
+> Task :retui-datetime-picker:compileDebugKotlin UP-TO-DATE
+> Task :retui-datetime-picker:javaPreCompileDebug UP-TO-DATE
+> Task :retui-datetime-picker:compileDebugJavaWithJavac NO-SOURCE
+> Task :retui-datetime-picker:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :app:javaPreCompilePlaystoreDebug UP-TO-DATE
+> Task :retui-contract:writeDebugAarMetadata UP-TO-DATE
+> Task :retui-datetime-picker:writeDebugAarMetadata UP-TO-DATE
+> Task :app:checkPlaystoreDebugAarMetadata UP-TO-DATE
+> Task :app:mapPlaystoreDebugSourceSetPaths UP-TO-DATE
+> Task :app:compilePlaystoreDebugNavigationResources UP-TO-DATE
+> Task :app:mergePlaystoreDebugResources UP-TO-DATE
+> Task :app:createPlaystoreDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksPlaystoreDebug UP-TO-DATE
+> Task :retui-contract:extractDeepLinksDebug UP-TO-DATE
+> Task :retui-contract:processDebugManifest UP-TO-DATE
+> Task :retui-datetime-picker:extractDeepLinksDebug UP-TO-DATE
+> Task :retui-datetime-picker:processDebugManifest UP-TO-DATE
+> Task :app:processPlaystoreDebugMainManifest UP-TO-DATE
+> Task :app:processPlaystoreDebugManifest UP-TO-DATE
+> Task :app:processPlaystoreDebugManifestForPackage UP-TO-DATE
+> Task :retui-contract:mapDebugSourceSetPaths UP-TO-DATE
+> Task :retui-contract:compileDebugLibraryResources UP-TO-DATE
+> Task :retui-datetime-picker:mapDebugSourceSetPaths UP-TO-DATE
+> Task :retui-datetime-picker:compileDebugLibraryResources UP-TO-DATE
+> Task :app:processPlaystoreDebugResources UP-TO-DATE
+> Task :app:prePlaystoreDebugUnitTestBuild
+> Task :app:javaPreCompilePlaystoreDebugUnitTest UP-TO-DATE
+> Task :retui-contract:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :retui-contract:processDebugJavaRes UP-TO-DATE
+> Task :retui-datetime-picker:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :retui-datetime-picker:processDebugJavaRes UP-TO-DATE
+> Task :app:prePlaystoreReleaseBuild
+> Task :app:generatePlaystoreReleaseBuildConfig UP-TO-DATE
+> Task :app:generatePlaystoreReleaseResValues UP-TO-DATE
+> Task :app:generatePlaystoreReleaseResources UP-TO-DATE
+> Task :app:packagePlaystoreReleaseResources UP-TO-DATE
+> Task :retui-contract:preReleaseBuild UP-TO-DATE
+> Task :retui-contract:processReleaseNavigationResources UP-TO-DATE
+> Task :retui-datetime-picker:preReleaseBuild UP-TO-DATE
+> Task :retui-datetime-picker:processReleaseNavigationResources UP-TO-DATE
+> Task :app:processPlaystoreReleaseNavigationResources UP-TO-DATE
+> Task :app:parsePlaystoreReleaseLocalResources UP-TO-DATE
+> Task :app:generatePlaystoreReleaseRFile UP-TO-DATE
+> Task :retui-contract:generateReleaseResources UP-TO-DATE
+> Task :retui-contract:packageReleaseResources UP-TO-DATE
+> Task :retui-contract:parseReleaseLocalResources UP-TO-DATE
+> Task :retui-contract:generateReleaseRFile UP-TO-DATE
+> Task :retui-contract:compileReleaseKotlin UP-TO-DATE
+> Task :retui-contract:javaPreCompileRelease UP-TO-DATE
+> Task :retui-contract:compileReleaseJavaWithJavac NO-SOURCE
+> Task :retui-contract:bundleLibCompileToJarRelease UP-TO-DATE
+> Task :retui-datetime-picker:generateReleaseResources UP-TO-DATE
+> Task :retui-datetime-picker:packageReleaseResources UP-TO-DATE
+> Task :retui-datetime-picker:parseReleaseLocalResources UP-TO-DATE
+> Task :retui-datetime-picker:generateReleaseRFile UP-TO-DATE
+> Task :retui-datetime-picker:compileReleaseKotlin UP-TO-DATE
+> Task :retui-datetime-picker:javaPreCompileRelease UP-TO-DATE
+> Task :retui-datetime-picker:compileReleaseJavaWithJavac NO-SOURCE
+> Task :retui-datetime-picker:bundleLibCompileToJarRelease UP-TO-DATE
+> Task :app:javaPreCompilePlaystoreRelease UP-TO-DATE
+> Task :app:extractProguardFiles UP-TO-DATE
+> Task :app:extractDeepLinksPlaystoreRelease UP-TO-DATE
+> Task :retui-contract:extractDeepLinksRelease UP-TO-DATE
+> Task :retui-contract:processReleaseManifest UP-TO-DATE
+> Task :retui-datetime-picker:extractDeepLinksRelease UP-TO-DATE
+> Task :retui-datetime-picker:processReleaseManifest UP-TO-DATE
+> Task :app:processPlaystoreReleaseMainManifest UP-TO-DATE
+> Task :app:runtimeNotices UP-TO-DATE
+> Task :app:termuxHelperAssets UP-TO-DATE
+> Task :retui-contract:bundleLibRuntimeToJarRelease UP-TO-DATE
+> Task :retui-contract:processReleaseJavaRes UP-TO-DATE
+> Task :retui-contract:createFullJarRelease UP-TO-DATE
+> Task :retui-contract:extractProguardFiles UP-TO-DATE
+> Task :retui-contract:generateReleaseLintModel UP-TO-DATE
+> Task :retui-contract:prepareLintJarForPublish UP-TO-DATE
+> Task :retui-datetime-picker:bundleLibRuntimeToJarRelease UP-TO-DATE
+> Task :retui-datetime-picker:processReleaseJavaRes UP-TO-DATE
+> Task :retui-datetime-picker:createFullJarRelease UP-TO-DATE
+> Task :retui-datetime-picker:extractProguardFiles UP-TO-DATE
+> Task :retui-datetime-picker:generateReleaseLintModel UP-TO-DATE
+> Task :retui-datetime-picker:prepareLintJarForPublish UP-TO-DATE
+> Task :retui-datetime-picker:checkReleaseAarMetadata UP-TO-DATE
+> Task :retui-datetime-picker:mergeReleaseJniLibFolders UP-TO-DATE
+> Task :retui-datetime-picker:mergeReleaseNativeLibs NO-SOURCE
+> Task :retui-datetime-picker:stripReleaseDebugSymbols NO-SOURCE
+> Task :retui-datetime-picker:copyReleaseJniLibsProjectAndLocalJars UP-TO-DATE
+> Task :retui-datetime-picker:extractDeepLinksForAarRelease UP-TO-DATE
+> Task :retui-datetime-picker:extractReleaseAnnotations UP-TO-DATE
+> Task :retui-datetime-picker:generateReleaseAssets UP-TO-DATE
+> Task :retui-datetime-picker:mergeReleaseAssets UP-TO-DATE
+> Task :retui-datetime-picker:mergeReleaseGeneratedProguardFiles UP-TO-DATE
+> Task :retui-datetime-picker:mergeReleaseConsumerProguardFiles UP-TO-DATE
+> Task :retui-datetime-picker:prepareReleaseArtProfile UP-TO-DATE
+> Task :retui-datetime-picker:mergeReleaseJavaResource UP-TO-DATE
+> Task :retui-datetime-picker:syncReleaseLibJars UP-TO-DATE
+> Task :retui-datetime-picker:writeReleaseAarMetadata UP-TO-DATE
+> Task :retui-datetime-picker:bundleReleaseLocalLintAar UP-TO-DATE
+> Task :retui-contract:checkReleaseAarMetadata UP-TO-DATE
+> Task :retui-contract:mergeReleaseJniLibFolders UP-TO-DATE
+> Task :retui-contract:mergeReleaseNativeLibs NO-SOURCE
+> Task :retui-contract:stripReleaseDebugSymbols NO-SOURCE
+> Task :retui-contract:copyReleaseJniLibsProjectAndLocalJars UP-TO-DATE
+> Task :retui-contract:extractDeepLinksForAarRelease UP-TO-DATE
+> Task :retui-contract:extractReleaseAnnotations UP-TO-DATE
+> Task :retui-contract:generateReleaseAssets UP-TO-DATE
+> Task :retui-contract:mergeReleaseAssets UP-TO-DATE
+> Task :retui-contract:mergeReleaseGeneratedProguardFiles UP-TO-DATE
+> Task :retui-contract:mergeReleaseConsumerProguardFiles UP-TO-DATE
+> Task :retui-contract:prepareReleaseArtProfile UP-TO-DATE
+> Task :retui-contract:mergeReleaseJavaResource UP-TO-DATE
+> Task :retui-contract:syncReleaseLibJars UP-TO-DATE
+> Task :retui-contract:writeReleaseAarMetadata UP-TO-DATE
+> Task :retui-contract:bundleReleaseLocalLintAar UP-TO-DATE
+> Task :retui-contract:lintAnalyzeRelease UP-TO-DATE
+> Task :retui-contract:writeReleaseLintModelMetadata UP-TO-DATE
+> Task :retui-datetime-picker:lintAnalyzeRelease UP-TO-DATE
+> Task :retui-datetime-picker:writeReleaseLintModelMetadata UP-TO-DATE
+> Task :app:mergePlaystoreDebugNativeDebugMetadata NO-SOURCE
+> Task :app:generatePlaystoreDebugAssets UP-TO-DATE
+> Task :retui-contract:generateDebugAssets UP-TO-DATE
+> Task :retui-contract:mergeDebugAssets UP-TO-DATE
+> Task :retui-datetime-picker:generateDebugAssets UP-TO-DATE
+> Task :retui-datetime-picker:mergeDebugAssets UP-TO-DATE
+> Task :app:mergePlaystoreDebugAssets UP-TO-DATE
+> Task :app:compressPlaystoreDebugAssets UP-TO-DATE
+> Task :app:generatePlaystoreDebugGlobalSynthetics UP-TO-DATE
+> Task :app:l8DexDesugarLibPlaystoreDebug UP-TO-DATE
+> Task :app:checkPlaystoreDebugDuplicateClasses UP-TO-DATE
+> Task :app:desugarPlaystoreDebugFileDependencies UP-TO-DATE
+> Task :app:mergeExtDexPlaystoreDebug UP-TO-DATE
+> Task :app:mergeLibDexPlaystoreDebug UP-TO-DATE
+> Task :app:mergePlaystoreDebugJniLibFolders UP-TO-DATE
+> Task :retui-contract:mergeDebugJniLibFolders UP-TO-DATE
+> Task :retui-contract:mergeDebugNativeLibs NO-SOURCE
+> Task :retui-contract:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :retui-datetime-picker:mergeDebugJniLibFolders UP-TO-DATE
+> Task :retui-datetime-picker:mergeDebugNativeLibs NO-SOURCE
+> Task :retui-datetime-picker:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :app:mergePlaystoreDebugNativeLibs NO-SOURCE
+> Task :app:stripPlaystoreDebugDebugSymbols NO-SOURCE
+> Task :app:validateSigningPlaystoreDebug UP-TO-DATE
+> Task :app:writePlaystoreDebugAppMetadata UP-TO-DATE
+> Task :app:writePlaystoreDebugSigningConfigVersions UP-TO-DATE
+> Task :app:prePlaystoreDebugAndroidTestBuild SKIPPED
+> Task :app:processPlaystoreDebugAndroidTestManifest UP-TO-DATE
+> Task :app:generatePlaystoreDebugAndroidTestBuildConfig UP-TO-DATE
+> Task :app:generatePlaystoreDebugAndroidTestResValues UP-TO-DATE
+> Task :app:generatePlaystoreDebugAndroidTestResources UP-TO-DATE
+> Task :app:packagePlaystoreDebugAndroidTestResources UP-TO-DATE
+> Task :app:processPlaystoreDebugAndroidTestNavigationResources UP-TO-DATE
+> Task :app:parsePlaystoreDebugAndroidTestLocalResources UP-TO-DATE
+> Task :app:generatePlaystoreDebugAndroidTestRFile UP-TO-DATE
+> Task :app:javaPreCompilePlaystoreDebugAndroidTest UP-TO-DATE
+> Task :app:generatePlaystoreDebugAndroidTestAssets UP-TO-DATE
+> Task :app:mergePlaystoreDebugAndroidTestAssets UP-TO-DATE
+> Task :app:compressPlaystoreDebugAndroidTestAssets UP-TO-DATE
+> Task :app:generatePlaystoreDebugAndroidTestGlobalSynthetics UP-TO-DATE
+> Task :app:checkPlaystoreDebugAndroidTestDuplicateClasses UP-TO-DATE
+> Task :app:desugarPlaystoreDebugAndroidTestFileDependencies UP-TO-DATE
+> Task :app:mergeExtDexPlaystoreDebugAndroidTest UP-TO-DATE
+> Task :app:mergeLibDexPlaystoreDebugAndroidTest UP-TO-DATE
+> Task :app:checkPlaystoreDebugAndroidTestAarMetadata UP-TO-DATE
+> Task :app:mapPlaystoreDebugAndroidTestSourceSetPaths UP-TO-DATE
+> Task :app:compilePlaystoreDebugAndroidTestNavigationResources UP-TO-DATE
+> Task :app:mergePlaystoreDebugAndroidTestResources UP-TO-DATE
+> Task :app:processPlaystoreDebugAndroidTestResources UP-TO-DATE
+> Task :app:mergePlaystoreDebugAndroidTestJniLibFolders UP-TO-DATE
+> Task :app:mergePlaystoreDebugAndroidTestNativeLibs NO-SOURCE
+> Task :app:stripPlaystoreDebugAndroidTestDebugSymbols NO-SOURCE
+> Task :app:validateSigningPlaystoreDebugAndroidTest UP-TO-DATE
+> Task :app:writePlaystoreDebugAndroidTestSigningConfigVersions UP-TO-DATE
+> Task :app:compilePlaystoreDebugKotlin
+> Task :app:compilePlaystoreReleaseKotlin
+> Task :app:compilePlaystoreDebugJavaWithJavac UP-TO-DATE
+> Task :app:processPlaystoreDebugJavaRes UP-TO-DATE
+> Task :app:compilePlaystoreReleaseJavaWithJavac UP-TO-DATE
+> Task :app:generatePlaystoreReleaseLintReportModel
+> Task :app:mergePlaystoreDebugJavaResource UP-TO-DATE
+> Task :app:bundlePlaystoreDebugClassesToRuntimeJar
+> Task :app:bundlePlaystoreDebugClassesToCompileJar
+> Task :app:dexBuilderPlaystoreDebug
+> Task :app:compilePlaystoreDebugUnitTestKotlin UP-TO-DATE
+> Task :app:compilePlaystoreDebugUnitTestJavaWithJavac UP-TO-DATE
+> Task :app:processPlaystoreDebugUnitTestJavaRes UP-TO-DATE
+> Task :app:lintAnalyzePlaystoreRelease
+> Task :app:testPlaystoreDebugUnitTest
+> Task :app:compilePlaystoreDebugAndroidTestKotlin UP-TO-DATE
+> Task :app:mergeProjectDexPlaystoreDebug
+
+> Task :app:compilePlaystoreDebugAndroidTestJavaWithJavac
+Note: /Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/androidTest/java/ohi/andre/consolelauncher/managers/termux/TermuxWorkspaceSshReleaseInstrumentation.java uses or overrides a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+
+> Task :app:processPlaystoreDebugAndroidTestJavaRes UP-TO-DATE
+> Task :app:mergePlaystoreDebugAndroidTestJavaResource UP-TO-DATE
+> Task :app:dexBuilderPlaystoreDebugAndroidTest
+> Task :app:packagePlaystoreDebug
+> Task :app:createPlaystoreDebugApkListingFileRedirect UP-TO-DATE
+> Task :app:assemblePlaystoreDebug
+> Task :app:mergeProjectDexPlaystoreDebugAndroidTest
+> Task :app:packagePlaystoreDebugAndroidTest
+> Task :app:createPlaystoreDebugAndroidTestApkListingFileRedirect UP-TO-DATE
+> Task :app:assemblePlaystoreDebugAndroidTest

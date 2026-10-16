@@ -1,0 +1,7 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="dev.retui.test.presetrecipient" android:versionCode="1" android:versionName="1">
+    <uses-sdk android:minSdkVersion="23" android:targetSdkVersion="36" />
+    <queries><provider android:authorities="dev.retui.test.presetsender.FILE_PROVIDER" /></queries>
+    <application android:label="Re:TUI preset permission probe" android:allowBackup="false" android:debuggable="true">
+        <provider android:name=".ReadProvider" android:authorities="dev.retui.test.presetrecipient.read" android:exported="true" />
+    </application>
+</manifest>

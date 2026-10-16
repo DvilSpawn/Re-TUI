@@ -6,7 +6,7 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 
 /** Only the helper shipped with this APK is offered, never a remote "latest". */
 object TermuxHelperUpdate {
-    const val VERSION = "0.4.2"
+    const val VERSION = "0.4.4"
     const val PROTOCOL = "retui-bridge-socket-v4"
     const val MAX_BYTES = 131072
     val probeScript = "export PATH='/data/data/com.termux/files/usr/bin':\$PATH; " +

@@ -936,6 +936,7 @@ Timer paused.</string>
     <string name="frame_target_notifications">Notification widget</string>
     <string name="frame_target_output">Terminal output</string>
     <string name="frame_target_overlays">Overlay windows</string>
+    <string name="frame_target_remember">Re:Member</string>
     <string name="frame_target_settings">Settings and dialogs</string>
     <string name="frame_target_slider_progress">Slider progress</string>
     <string name="frame_target_slider_thumb">Slider thumb</string>
@@ -4083,6 +4084,39 @@ help -topic &lt;id&gt; → open a manual category or article</string>
     <string name="offline_help_troubleshooting_title">Troubleshooting</string>
     <string name="offline_help_tutorial_description">tutorial → open offline Getting started</string>
     <string name="offline_help_windowed">Windowed help</string>
+    <string name="optional_calculator_cancel">Cancel</string>
+    <string name="optional_calculator_close">Close</string>
+    <string name="optional_calculator_complete">Calculator engine updated.</string>
+    <string name="optional_calculator_download">Download Qalculate</string>
+    <string name="optional_calculator_enable">Enable Qalculate</string>
+    <string name="optional_calculator_failed">Engine operation failed: %1$s</string>
+    <string name="optional_calculator_header_basic">Calculator · Basic</string>
+    <string name="optional_calculator_header_enhanced">Calculator · Qalculate</string>
+    <string name="optional_calculator_help_title">Calculator help</string>
+    <string name="optional_calculator_import">Import engine file</string>
+    <string name="optional_calculator_import_description">Install this calculator engine file? Only continue if you trust its source. Re:TUI checks pack compatibility and file integrity before replacing the current engine. No second app is installed.</string>
+    <string name="optional_calculator_inline_description">Add units, conversions and advanced maths. Works offline after download.</string>
+    <string name="optional_calculator_inline_title">Qalculate · optional</string>
+    <string name="optional_calculator_install">Install pack</string>
+    <string name="optional_calculator_invalid_file">Choose a readable calculator engine file from a document provider.</string>
+    <string name="optional_calculator_missing_description">Basic calculations work now. Download or import the optional Qalculate pack for units, exact results and advanced expressions. It runs inside Re:TUI and works offline after installation.</string>
+    <string name="optional_calculator_not_now">Hide calculator enhancement</string>
+    <string name="optional_calculator_pack_installed">Qalculate %1$s installed. Works offline inside this launcher.</string>
+    <string name="optional_calculator_picker_unavailable">No document picker is available.</string>
+    <string name="optional_calculator_protocol_error">The calculator pack is incompatible. Import a compatible pack and try again.</string>
+    <string name="optional_calculator_remove">Remove engine</string>
+    <string name="optional_calculator_remove_description">Remove the downloaded Qalculate engine? Your history and calculator settings will be kept.</string>
+    <string name="optional_calculator_removed">Qalculate removed. Your history and settings are kept.</string>
+    <string name="optional_calculator_status_basic">Basic calculator · Download Qalculate</string>
+    <string name="optional_calculator_status_enhanced">Qalculate active · Manage</string>
+    <string name="optional_calculator_status_installed">Basic calculator · Qalculate installed</string>
+    <string name="optional_calculator_status_unsupported">Basic calculator · Enhancement unavailable</string>
+    <string name="optional_calculator_title">Calculator enhancement</string>
+    <string name="optional_calculator_unpublished_description">The download catalogue has not been published for this build. You can import a .retui.calc.engine file now. Basic calculations remain available.</string>
+    <string name="optional_calculator_unsupported_description">The portable calculator requires Android 7 or newer and a WebView with WebAssembly support. Basic calculations and your history remain available.</string>
+    <string name="optional_calculator_update">Check for update</string>
+    <string name="optional_calculator_use_basic">Use basic calculator</string>
+    <string name="optional_calculator_working">Preparing calculator engine…</string>
     <string name="output_about">Francesco Andreuzzi (Italy)
 	-&gt; Programmer 
 
@@ -4158,6 +4192,7 @@ Fix or delete the file to recover your options</string>
     <string name="podcast_podcastmanager_tags_8d749">Tags: %1$s</string>
     <string name="podcast_podcastmanager_tags_cleared_e364f">Tags cleared: %1$s</string>
     <string name="portable_preset_cancel">Cancel</string>
+    <string name="portable_preset_choose_file">Choose preset file</string>
     <string name="portable_preset_confirm">Import</string>
     <string name="portable_preset_done">Done</string>
     <string name="portable_preset_error">Unable to import preset: %1$s
@@ -4179,6 +4214,20 @@ Included behavior fields and values:
 Apply it later through preset -apply. Active settings have not changed.</string>
     <string name="portable_preset_share">Share</string>
     <string name="portable_preset_unknown_version">Not provided</string>
+    <string name="preset_market_cancelled">Download cancelled. Your active preset has not changed.</string>
+    <string name="preset_market_copy">Copy apply command</string>
+    <string name="preset_market_download">Download &amp; import</string>
+    <string name="preset_market_error">Could not complete this request: %1$s</string>
+    <string name="preset_market_intro">Preview a palette, then download and import it. Apply it later with preset -apply. Your current look stays as it is.</string>
+    <string name="preset_market_loading">Loading…</string>
+    <string name="preset_market_progress">Downloading %1$d / %2$d bytes…</string>
+    <string name="preset_market_retry">Retry</string>
+    <string name="preset_market_sample">Re:TUI
+$ hello world
+Your terminal, your colors.</string>
+    <string name="preset_market_saved">Imported: %1$s
+To apply later: preset -apply %1$s</string>
+    <string name="preset_market_title">Preset marketplace</string>
     <string name="reminder_add_reminder">ADD REMINDER</string>
     <string name="reminder_add_title">Add reminder</string>
     <string name="reminder_cancel">CANCEL</string>
@@ -5957,15 +6006,36 @@ Ready for the next command</string>
     <string name="volume_stream_system">System</string>
     <string name="volume_stream_voice_call">Voice call</string>
     <string name="wallpaper_black_hole">Black hole</string>
+    <string name="wallpaper_browse_downloads">Get more wallpapers</string>
     <string name="wallpaper_clouds">Clouds</string>
     <string name="wallpaper_clouds_scene">Clouds %1$d</string>
     <string name="wallpaper_clouds_scene_label">Scene</string>
     <string name="wallpaper_hex_hint">#AARRGGBB</string>
     <string name="wallpaper_hex_invalid">Enter a valid #AARRGGBB or #RRGGBB value</string>
+    <string name="wallpaper_library_back">Back</string>
+    <string name="wallpaper_library_cancel">Cancel</string>
+    <string name="wallpaper_library_cancelled">Download cancelled. Your wallpaper hasn’t changed.</string>
+    <string name="wallpaper_library_cancelling">Cancelling…</string>
+    <string name="wallpaper_library_confirm">Download and install this wallpaper? Your current wallpaper stays in place until you apply the new one.</string>
+    <string name="wallpaper_library_download">Download</string>
+    <string name="wallpaper_library_downloading">Downloading and installing…</string>
+    <string name="wallpaper_library_empty">No wallpapers are available yet.</string>
+    <string name="wallpaper_library_failed">Couldn’t install this wallpaper. Check your connection and try again.</string>
+    <string name="wallpaper_library_installed">Installed. Preview and customize it before applying.</string>
+    <string name="wallpaper_library_intro">Browse animated previews here. Download a wallpaper to customize it, then choose when to use it.</string>
+    <string name="wallpaper_library_loading">Loading wallpapers…</string>
+    <string name="wallpaper_library_preview_description">Animated preview of %1$s</string>
+    <string name="wallpaper_library_preview_use">Preview / Use</string>
+    <string name="wallpaper_library_ready">Available to download</string>
+    <string name="wallpaper_library_retry">Try again</string>
+    <string name="wallpaper_library_title">Wallpaper gallery</string>
+    <string name="wallpaper_library_unavailable">Couldn’t load the gallery. Check your connection and try again.</string>
+    <string name="wallpaper_optional_restore_description">This wallpaper is now a separate download. Install it to restore the preview. Your saved wallpaper settings are kept.</string>
     <string name="wallpaper_pick_color">Pick color…</string>
     <string name="wallpaper_pixel_colors">COLORS</string>
     <string name="wallpaper_pixel_dream">Pixel Dream</string>
     <string name="wallpaper_pixel_pick_color">Pick Pixel Dream Color</string>
+    <string name="wallpaper_restore_download">Preview and download</string>
     <string name="wallpaper_sakura">Sakura</string>
     <string name="wallpaper_solid">Solid color</string>
     <string name="wallpaper_topo_colors">COLORS</string>
@@ -6065,5 +6135,10 @@ This Launcher needs helper %1$s. Update now installs the matching helper bundled
     <string name="workspace_shell_exited">Shell window exited</string>
     <string name="workspace_split_left_right">Split left-right</string>
     <string name="workspace_split_top_bottom">Split top-bottom</string>
+    <string name="workspace_ssh_enable">Enable Termux pane</string>
+    <string name="workspace_ssh_enable_body">Connect the existing pane directly to Termux. Setup installs missing tmux and OpenSSH packages and pairs this app locally. Re:TUI keeps your split layout; Termux keeps your shells running.</string>
+    <string name="workspace_ssh_repair">Repair connection</string>
+    <string name="workspace_ssh_setting_up">Preparing Termux connection…</string>
+    <string name="workspace_ssh_setup_failed">Termux connection setup failed. Retry or open Termux to check setup.</string>
     <string name="workspace_unfocused_tile">Tile %1$d, tap to focus</string>
 </resources>

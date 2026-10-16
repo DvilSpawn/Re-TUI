@@ -4,12 +4,11 @@
 -keep public class ohi.andre.consolelauncher.tuils.GenericFileProvider { *; }
 -keep public class ohi.andre.consolelauncher.tuils.PrivateIOReceiver { *; }
 -keep public class ohi.andre.consolelauncher.tuils.PublicIOReceiver { *; }
--keep class ohi.andre.consolelauncher.managers.** { *; }
+-keep class !ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceSsh**,!ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceActivity**,ohi.andre.consolelauncher.managers.** { *; }
 -keep class ohi.andre.consolelauncher.tuils.libsuperuser.**
 -keep class ohi.andre.consolelauncher.managers.suggestions.HideSuggestionViewValues
 -keep public class it.andreuzzi.comparestring2.**
 -keep class org.luaj.** { *; }
--keep class ohi.andre.consolelauncher.calculator.NativeQalculate { *; }
 -keep class ohi.andre.consolelauncher.integrations.tasker.** { *; }
 
 -dontwarn ohi.andre.consolelauncher.commands.main.raw.**

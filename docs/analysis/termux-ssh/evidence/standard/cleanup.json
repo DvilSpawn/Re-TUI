@@ -1,0 +1,13 @@
+{
+  "debug_pairing_restored": "OK (1 test), 1.808 seconds",
+  "removed_only_owned_release_test_packages": [
+    "com.dvil.tui_renewed.termuxsshreleasecheck",
+    "com.dvil.tui_renewed.termuxsshreleasecheck.test"
+  ],
+  "retained_packages": [
+    "com.dvil.tui_renewed.termuxsshdebug",
+    "com.dvil.tui_renewed.termuxsshdebug.test",
+    "com.dvil.tui_renewed"
+  ],
+  "production_launcher_replaced": false
+}

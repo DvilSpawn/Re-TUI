@@ -31,10 +31,16 @@ class NagomiWallpaperService : WallpaperService() {
         private var interaction = false
         private var hasSurface = false
         private var registered = false
+        private var available = ohi.andre.consolelauncher.wallpaper.WallpaperLibrary.available(this@NagomiWallpaperService, "nagomi")
         private val frame = object : Runnable {
             override fun run() {
                 if (!hasSurface || !visible || !power.isInteractive) return
                 val rect = surfaceHolder.surfaceFrame
+                if (!available) {
+                    val canvas = try { surfaceHolder.lockCanvas() } catch (_: Exception) { null }
+                    if (canvas != null) try { canvas.drawColor(0xff345e52.toInt()) } finally { surfaceHolder.unlockCanvasAndPost(canvas) }
+                    return
+                }
                 val started = SystemClock.uptimeMillis()
                 val success = renderer.draw(surfaceHolder.surface, rect.width(), rect.height())
                 if (renderAllowed()) handler.postDelayed(this, nagomiFrameDelay(success, SystemClock.uptimeMillis() - started))
@@ -46,6 +52,7 @@ class NagomiWallpaperService : WallpaperService() {
                     Intent.ACTION_SCREEN_OFF -> interaction = false
                     RetuiWallpaperService.ACTION_INTERACTION -> interaction = intent.getBooleanExtra(RetuiWallpaperService.EXTRA_INTERACTION_ENABLED, false)
                     RetuiWallpaperService.ACTION_REFRESH -> {
+                        available = ohi.andre.consolelauncher.wallpaper.WallpaperLibrary.available(this@NagomiWallpaperService, "nagomi")
                         renderer.background = NagomiBackground.saved(this@NagomiWallpaperService).takeIf { it.isFile }
                         // The saved image can change in-place while its path stays the same.
                         renderer.releaseSurface()

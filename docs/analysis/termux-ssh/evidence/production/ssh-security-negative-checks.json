@@ -1,0 +1,51 @@
+{
+  "timestamp_utc": "2026-10-15T16:32:26.575385+00:00",
+  "serial": "10BE1C0FB40006A",
+  "endpoint": "Termux dedicated loopback SSH 8928 through a temporary USB forward",
+  "app": "com.dvil.tui_renewed.termuxsshdebug",
+  "bounds": "Authenticated and rejected requests only; no workspace windows, endpoint files, personal SSH configuration, or existing jobs changed.",
+  "checks": {
+    "authorized_list": {
+      "passed": true,
+      "returncode": 0,
+      "window_count": 3,
+      "stderr": ""
+    },
+    "arbitrary_command_rejected": {
+      "passed": true,
+      "attempts": [
+        {
+          "passed": true,
+          "returncode": 1,
+          "stderr": "Unsupported Re:TUI SSH command"
+        },
+        {
+          "passed": true,
+          "returncode": 1,
+          "stderr": "Unsupported Re:TUI SSH command"
+        }
+      ],
+      "probe_file_absent": true
+    },
+    "unrestricted_shell_rejected": {
+      "passed": true,
+      "returncode": 1,
+      "stderr": "Unsupported Re:TUI SSH command"
+    },
+    "unrelated_key_rejected": {
+      "passed": true,
+      "returncode": 255,
+      "stderr": "u0_a1000@127.0.0.1: Permission denied (publickey)."
+    },
+    "remote_port_forwarding_rejected": {
+      "passed": true,
+      "returncode": 255,
+      "stderr": "Error: remote port forwarding failed for listen port 0",
+      "timed_out": false
+    }
+  },
+  "temporary_forward_removed": true,
+  "temporary_probe_cleanup": true,
+  "temporary_identity_directory_removed": true,
+  "passed": true
+}

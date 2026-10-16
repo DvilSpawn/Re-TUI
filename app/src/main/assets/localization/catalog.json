@@ -5251,6 +5251,13 @@
     },
     "type": "string"
   },
+  "frame_target_remember": {
+    "formatted": true,
+    "forms": {
+      "other": "Re:Member"
+    },
+    "type": "string"
+  },
   "frame_target_settings": {
     "formatted": true,
     "forms": {
@@ -12195,6 +12202,237 @@
     },
     "type": "string"
   },
+  "optional_calculator_cancel": {
+    "formatted": true,
+    "forms": {
+      "other": "Cancel"
+    },
+    "type": "string"
+  },
+  "optional_calculator_close": {
+    "formatted": true,
+    "forms": {
+      "other": "Close"
+    },
+    "type": "string"
+  },
+  "optional_calculator_complete": {
+    "formatted": true,
+    "forms": {
+      "other": "Calculator engine updated."
+    },
+    "type": "string"
+  },
+  "optional_calculator_download": {
+    "formatted": true,
+    "forms": {
+      "other": "Download Qalculate"
+    },
+    "type": "string"
+  },
+  "optional_calculator_enable": {
+    "formatted": true,
+    "forms": {
+      "other": "Enable Qalculate"
+    },
+    "type": "string"
+  },
+  "optional_calculator_failed": {
+    "formatted": true,
+    "forms": {
+      "other": "Engine operation failed: %1$s"
+    },
+    "type": "string"
+  },
+  "optional_calculator_header_basic": {
+    "formatted": true,
+    "forms": {
+      "other": "Calculator · Basic"
+    },
+    "type": "string"
+  },
+  "optional_calculator_header_enhanced": {
+    "formatted": true,
+    "forms": {
+      "other": "Calculator · Qalculate"
+    },
+    "type": "string"
+  },
+  "optional_calculator_help_title": {
+    "formatted": true,
+    "forms": {
+      "other": "Calculator help"
+    },
+    "type": "string"
+  },
+  "optional_calculator_import": {
+    "formatted": true,
+    "forms": {
+      "other": "Import engine file"
+    },
+    "type": "string"
+  },
+  "optional_calculator_import_description": {
+    "formatted": true,
+    "forms": {
+      "other": "Install this calculator engine file? Only continue if you trust its source. Re:TUI checks pack compatibility and file integrity before replacing the current engine. No second app is installed."
+    },
+    "type": "string"
+  },
+  "optional_calculator_inline_description": {
+    "formatted": true,
+    "forms": {
+      "other": "Add units, conversions and advanced maths. Works offline after download."
+    },
+    "type": "string"
+  },
+  "optional_calculator_inline_title": {
+    "formatted": true,
+    "forms": {
+      "other": "Qalculate · optional"
+    },
+    "type": "string"
+  },
+  "optional_calculator_install": {
+    "formatted": true,
+    "forms": {
+      "other": "Install pack"
+    },
+    "type": "string"
+  },
+  "optional_calculator_invalid_file": {
+    "formatted": true,
+    "forms": {
+      "other": "Choose a readable calculator engine file from a document provider."
+    },
+    "type": "string"
+  },
+  "optional_calculator_missing_description": {
+    "formatted": true,
+    "forms": {
+      "other": "Basic calculations work now. Download or import the optional Qalculate pack for units, exact results and advanced expressions. It runs inside Re:TUI and works offline after installation."
+    },
+    "type": "string"
+  },
+  "optional_calculator_not_now": {
+    "formatted": true,
+    "forms": {
+      "other": "Hide calculator enhancement"
+    },
+    "type": "string"
+  },
+  "optional_calculator_pack_installed": {
+    "formatted": true,
+    "forms": {
+      "other": "Qalculate %1$s installed. Works offline inside this launcher."
+    },
+    "type": "string"
+  },
+  "optional_calculator_picker_unavailable": {
+    "formatted": true,
+    "forms": {
+      "other": "No document picker is available."
+    },
+    "type": "string"
+  },
+  "optional_calculator_protocol_error": {
+    "formatted": true,
+    "forms": {
+      "other": "The calculator pack is incompatible. Import a compatible pack and try again."
+    },
+    "type": "string"
+  },
+  "optional_calculator_remove": {
+    "formatted": true,
+    "forms": {
+      "other": "Remove engine"
+    },
+    "type": "string"
+  },
+  "optional_calculator_remove_description": {
+    "formatted": true,
+    "forms": {
+      "other": "Remove the downloaded Qalculate engine? Your history and calculator settings will be kept."
+    },
+    "type": "string"
+  },
+  "optional_calculator_removed": {
+    "formatted": true,
+    "forms": {
+      "other": "Qalculate removed. Your history and settings are kept."
+    },
+    "type": "string"
+  },
+  "optional_calculator_status_basic": {
+    "formatted": true,
+    "forms": {
+      "other": "Basic calculator · Download Qalculate"
+    },
+    "type": "string"
+  },
+  "optional_calculator_status_enhanced": {
+    "formatted": true,
+    "forms": {
+      "other": "Qalculate active · Manage"
+    },
+    "type": "string"
+  },
+  "optional_calculator_status_installed": {
+    "formatted": true,
+    "forms": {
+      "other": "Basic calculator · Qalculate installed"
+    },
+    "type": "string"
+  },
+  "optional_calculator_status_unsupported": {
+    "formatted": true,
+    "forms": {
+      "other": "Basic calculator · Enhancement unavailable"
+    },
+    "type": "string"
+  },
+  "optional_calculator_title": {
+    "formatted": true,
+    "forms": {
+      "other": "Calculator enhancement"
+    },
+    "type": "string"
+  },
+  "optional_calculator_unpublished_description": {
+    "formatted": true,
+    "forms": {
+      "other": "The download catalogue has not been published for this build. You can import a .retui.calc.engine file now. Basic calculations remain available."
+    },
+    "type": "string"
+  },
+  "optional_calculator_unsupported_description": {
+    "formatted": true,
+    "forms": {
+      "other": "The portable calculator requires Android 7 or newer and a WebView with WebAssembly support. Basic calculations and your history remain available."
+    },
+    "type": "string"
+  },
+  "optional_calculator_update": {
+    "formatted": true,
+    "forms": {
+      "other": "Check for update"
+    },
+    "type": "string"
+  },
+  "optional_calculator_use_basic": {
+    "formatted": true,
+    "forms": {
+      "other": "Use basic calculator"
+    },
+    "type": "string"
+  },
+  "optional_calculator_working": {
+    "formatted": true,
+    "forms": {
+      "other": "Preparing calculator engine…"
+    },
+    "type": "string"
+  },
   "output_about": {
     "formatted": true,
     "forms": {
@@ -12685,6 +12923,13 @@
     },
     "type": "string"
   },
+  "portable_preset_choose_file": {
+    "formatted": true,
+    "forms": {
+      "other": "Choose preset file"
+    },
+    "type": "string"
+  },
   "portable_preset_confirm": {
     "formatted": true,
     "forms": {
@@ -12759,6 +13004,83 @@
     "formatted": true,
     "forms": {
       "other": "Not provided"
+    },
+    "type": "string"
+  },
+  "preset_market_cancelled": {
+    "formatted": true,
+    "forms": {
+      "other": "Download cancelled. Your active preset has not changed."
+    },
+    "type": "string"
+  },
+  "preset_market_copy": {
+    "formatted": true,
+    "forms": {
+      "other": "Copy apply command"
+    },
+    "type": "string"
+  },
+  "preset_market_download": {
+    "formatted": true,
+    "forms": {
+      "other": "Download & import"
+    },
+    "type": "string"
+  },
+  "preset_market_error": {
+    "formatted": true,
+    "forms": {
+      "other": "Could not complete this request: %1$s"
+    },
+    "type": "string"
+  },
+  "preset_market_intro": {
+    "formatted": true,
+    "forms": {
+      "other": "Preview a palette, then download and import it. Apply it later with preset -apply. Your current look stays as it is."
+    },
+    "type": "string"
+  },
+  "preset_market_loading": {
+    "formatted": true,
+    "forms": {
+      "other": "Loading…"
+    },
+    "type": "string"
+  },
+  "preset_market_progress": {
+    "formatted": true,
+    "forms": {
+      "other": "Downloading %1$d / %2$d bytes…"
+    },
+    "type": "string"
+  },
+  "preset_market_retry": {
+    "formatted": true,
+    "forms": {
+      "other": "Retry"
+    },
+    "type": "string"
+  },
+  "preset_market_sample": {
+    "formatted": true,
+    "forms": {
+      "other": "Re:TUI\n$ hello world\nYour terminal, your colors."
+    },
+    "type": "string"
+  },
+  "preset_market_saved": {
+    "formatted": true,
+    "forms": {
+      "other": "Imported: %1$s\nTo apply later: preset -apply %1$s"
+    },
+    "type": "string"
+  },
+  "preset_market_title": {
+    "formatted": true,
+    "forms": {
+      "other": "Preset marketplace"
     },
     "type": "string"
   },
@@ -24569,6 +24891,13 @@
     },
     "type": "string"
   },
+  "wallpaper_browse_downloads": {
+    "formatted": true,
+    "forms": {
+      "other": "Get more wallpapers"
+    },
+    "type": "string"
+  },
   "wallpaper_clouds": {
     "formatted": true,
     "forms": {
@@ -24604,6 +24933,139 @@
     },
     "type": "string"
   },
+  "wallpaper_library_back": {
+    "formatted": true,
+    "forms": {
+      "other": "Back"
+    },
+    "type": "string"
+  },
+  "wallpaper_library_cancel": {
+    "formatted": true,
+    "forms": {
+      "other": "Cancel"
+    },
+    "type": "string"
+  },
+  "wallpaper_library_cancelled": {
+    "formatted": true,
+    "forms": {
+      "other": "Download cancelled. Your wallpaper hasn’t changed."
+    },
+    "type": "string"
+  },
+  "wallpaper_library_cancelling": {
+    "formatted": true,
+    "forms": {
+      "other": "Cancelling…"
+    },
+    "type": "string"
+  },
+  "wallpaper_library_confirm": {
+    "formatted": true,
+    "forms": {
+      "other": "Download and install this wallpaper? Your current wallpaper stays in place until you apply the new one."
+    },
+    "type": "string"
+  },
+  "wallpaper_library_download": {
+    "formatted": true,
+    "forms": {
+      "other": "Download"
+    },
+    "type": "string"
+  },
+  "wallpaper_library_downloading": {
+    "formatted": true,
+    "forms": {
+      "other": "Downloading and installing…"
+    },
+    "type": "string"
+  },
+  "wallpaper_library_empty": {
+    "formatted": true,
+    "forms": {
+      "other": "No wallpapers are available yet."
+    },
+    "type": "string"
+  },
+  "wallpaper_library_failed": {
+    "formatted": true,
+    "forms": {
+      "other": "Couldn’t install this wallpaper. Check your connection and try again."
+    },
+    "type": "string"
+  },
+  "wallpaper_library_installed": {
+    "formatted": true,
+    "forms": {
+      "other": "Installed. Preview and customize it before applying."
+    },
+    "type": "string"
+  },
+  "wallpaper_library_intro": {
+    "formatted": true,
+    "forms": {
+      "other": "Browse animated previews here. Download a wallpaper to customize it, then choose when to use it."
+    },
+    "type": "string"
+  },
+  "wallpaper_library_loading": {
+    "formatted": true,
+    "forms": {
+      "other": "Loading wallpapers…"
+    },
+    "type": "string"
+  },
+  "wallpaper_library_preview_description": {
+    "formatted": true,
+    "forms": {
+      "other": "Animated preview of %1$s"
+    },
+    "type": "string"
+  },
+  "wallpaper_library_preview_use": {
+    "formatted": true,
+    "forms": {
+      "other": "Preview / Use"
+    },
+    "type": "string"
+  },
+  "wallpaper_library_ready": {
+    "formatted": true,
+    "forms": {
+      "other": "Available to download"
+    },
+    "type": "string"
+  },
+  "wallpaper_library_retry": {
+    "formatted": true,
+    "forms": {
+      "other": "Try again"
+    },
+    "type": "string"
+  },
+  "wallpaper_library_title": {
+    "formatted": true,
+    "forms": {
+      "other": "Wallpaper gallery"
+    },
+    "type": "string"
+  },
+  "wallpaper_library_unavailable": {
+    "formatted": true,
+    "forms": {
+      "other": "Couldn’t load the gallery. Check your connection and try again."
+    },
+    "type": "string"
+  },
+  "wallpaper_optional_restore_description": {
+    "formatted": true,
+    "forms": {
+      "other": "This wallpaper is now a separate download. Install it to restore the preview. Your saved wallpaper settings are kept."
+    },
+    "type": "string"
+  },
   "wallpaper_pick_color": {
     "formatted": true,
     "forms": {
@@ -24629,6 +25091,13 @@
     "formatted": true,
     "forms": {
       "other": "Pick Pixel Dream Color"
+    },
+    "type": "string"
+  },
+  "wallpaper_restore_download": {
+    "formatted": true,
+    "forms": {
+      "other": "Preview and download"
     },
     "type": "string"
   },
@@ -25231,6 +25700,41 @@
     "formatted": true,
     "forms": {
       "other": "Split top-bottom"
+    },
+    "type": "string"
+  },
+  "workspace_ssh_enable": {
+    "formatted": true,
+    "forms": {
+      "other": "Enable Termux pane"
+    },
+    "type": "string"
+  },
+  "workspace_ssh_enable_body": {
+    "formatted": true,
+    "forms": {
+      "other": "Connect the existing pane directly to Termux. Setup installs missing tmux and OpenSSH packages and pairs this app locally. Re:TUI keeps your split layout; Termux keeps your shells running."
+    },
+    "type": "string"
+  },
+  "workspace_ssh_repair": {
+    "formatted": true,
+    "forms": {
+      "other": "Repair connection"
+    },
+    "type": "string"
+  },
+  "workspace_ssh_setting_up": {
+    "formatted": true,
+    "forms": {
+      "other": "Preparing Termux connection…"
+    },
+    "type": "string"
+  },
+  "workspace_ssh_setup_failed": {
+    "formatted": true,
+    "forms": {
+      "other": "Termux connection setup failed. Retry or open Termux to check setup."
     },
     "type": "string"
   },

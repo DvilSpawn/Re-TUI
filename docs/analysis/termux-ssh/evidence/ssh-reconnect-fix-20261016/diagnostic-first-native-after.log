@@ -1,0 +1,50 @@
+DAEMON LOG
+debug1: sshd version OpenSSH_10.3, OpenSSL 3.6.3 9 Jun 2026
+debug3: Running on Linux 6.1.145-android14-11-g0f62335d867d-ab16017550 #1 SMP PREEMPT Tue Aug  4 16:44:43 UTC 2026 aarch64
+debug3: Started with: /data/data/com.termux/files/usr/bin/sshd -D -E /data/data/com.termux/files/home/.retui/sshappearance-4ead35ec-sshd.log -o LogLevel=DEBUG3 -f /data/data/com.termux/files/home/.retui/ssh/sshd_config
+debug2: load_server_config: filename /data/data/com.termux/files/home/.retui/ssh/sshd_config
+debug2: load_server_config: done config len = 630
+debug2: parse_server_config_depth: config /data/data/com.termux/files/home/.retui/ssh/sshd_config len 630
+debug3: /data/data/com.termux/files/home/.retui/ssh/sshd_config:1 setting Port 8928
+debug3: /data/data/com.termux/files/home/.retui/ssh/sshd_config:2 setting ListenAddress 127.0.0.1
+debug3: /data/data/com.termux/files/home/.retui/ssh/sshd_config:3 setting AddressFamily inet
+debug3: /data/data/com.termux/files/home/.retui/ssh/sshd_config:4 setting HostKey "/data/data/com.termux/files/home/.retui/ssh/host_ecdsa"
+debug3: /data/data/com.termux/files/home/.retui/ssh/sshd_config:5 setting PidFile "/data/data/com.termux/files/home/.retui/ssh/sshd.pid"
+debug3: /data/data/com.termux/files/home/.retui/ssh/sshd_config:6 setting AuthorizedKeysFile "/data/data/com.termux/files/home/.retui/ssh/authorized_keys"
+debug3: /data/data/com.termux/files/home/.retui/ssh/sshd_config:7 setting AllowUsers u0_a1000
+debug3: /data/data/com.termux/files/home/.retui/ssh/sshd_config:8 setting AuthenticationMethods publickey
+debug3: /data/data/com.termux/files/home/.retui/ssh/sshd_config:9 setting PubkeyAuthentication yes
+debug3: /data/data/com.termux/files/home/.retui/ssh/sshd_config:10 setting PasswordAuthentication no
+debug3: /data/data/com.termux/files/home/.retui/ssh/sshd_config:11 setting KbdInteractiveAuthentication no
+debug3: /data/data/com.termux/files/home/.retui/ssh/sshd_config:12 setting PermitEmptyPasswords no
+debug3: /data/data/com.termux/files/home/.retui/ssh/sshd_config:13 setting PermitRootLogin no
+debug3: /data/data/com.termux/files/home/.retui/ssh/sshd_config:14 setting StrictModes yes
+debug3: /data/data/com.termux/files/home/.retui/ssh/sshd_config:15 setting DisableForwarding yes
+debug3: /data/data/com.termux/files/home/.retui/ssh/sshd_config:16 setting PermitUserRC no
+debug3: /data/data/com.termux/files/home/.retui/ssh/sshd_config:17 setting PermitUserEnvironment no
+debug3: /data/data/com.termux/files/home/.retui/ssh/sshd_config:18 setting PermitTTY yes
+debug3: /data/data/com.termux/files/home/.retui/ssh/sshd_config:19 setting UseDNS no
+debug3: /data/data/com.termux/files/home/.retui/ssh/sshd_config:20 setting LogLevel ERROR
+debug3: /data/data/com.termux/files/home/.retui/ssh/sshd_config:21 setting ForceCommand "/data/data/com.termux/files/home/.retui/ssh/dispatch.sh"
+debug1: private host key #0: ecdsa-sha2-nistp256 SHA256:kU2/3T69nMo6UBPpbAzTTPExuPws7vEONSbhYwD16hY
+debug3: pack_config: d config len 630
+debug3: pack_config: done
+debug1: rexec_argv[1]='-D'
+debug1: rexec_argv[2]='-E'
+debug1: rexec_argv[3]='/data/data/com.termux/files/home/.retui/sshappearance-4ead35ec-sshd.log'
+debug1: rexec_argv[4]='-o'
+debug1: rexec_argv[5]='LogLevel=DEBUG3'
+debug1: rexec_argv[6]='-f'
+debug1: rexec_argv[7]='/data/data/com.termux/files/home/.retui/ssh/sshd_config'
+debug3: using /data/data/com.termux/files/usr/libexec/sshd-session for re-exec
+debug2: fd 7 setting O_NONBLOCK
+debug1: Bind to port 8928 on 127.0.0.1.
+Bind to port 8928 on 127.0.0.1 failed: Address already in use.
+Cannot bind any address.
+
+PROCESS
+13843 19229 /data/data/com.termux/files/usr/bin/sh -c set -eu export PATH="$PREFIX/bin:$PATH" printf 'DAEMON LOG\n'; tail -n 1600 "$1" || true printf '\nPROCESS\n'; ps -A -o pid,ppid,args | grep '[s]shd' || true printf '\nPIDFILE\n'; cat "$HOME/.retui/ssh/sshd.pid" || true retui-appearance /data/data/com.termux/files/home/.retui/sshappearance-4ead35ec-sshd.log
+19322 19229 /data/data/com.termux/files/usr/bin/sshd -D -e -f /data/data/com.termux/files/home/.retui/ssh/sshd_config
+
+PIDFILE
+30154

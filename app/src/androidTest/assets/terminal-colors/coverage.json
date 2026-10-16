@@ -8242,6 +8242,139 @@
         "drawable-states",
         "screenshots"
       ]
+    },
+    {
+      "id": "calculator-enhancement",
+      "activity": ".calculator.CalculatorActivity",
+      "variant": "enhancement",
+      "roles": [
+        "workspace_panel_text_color",
+        "workspace_panel_background_color",
+        "workspace_panel_border_color",
+        "button_background_color",
+        "button_border_color",
+        "button_text_color",
+        "primary_button_background_color",
+        "primary_button_border_color",
+        "primary_button_text_color",
+        "disabled_text_color",
+        "pressed_background_color",
+        "pressed_border_color",
+        "pressed_text_color"
+      ],
+      "states": [
+        "normal",
+        "focused",
+        "pressed",
+        "disabled"
+      ],
+      "required": true,
+      "renderingChecks": [
+        "text-spans",
+        "composited-backgrounds",
+        "drawable-states",
+        "screenshots"
+      ]
+    },
+    {
+      "id": "calculator-pack",
+      "activity": ".calculator.CalculatorPackActivity",
+      "variant": "management",
+      "roles": [
+        "settings_screen_color",
+        "settings_panel_text_color",
+        "button_background_color",
+        "button_border_color",
+        "button_text_color",
+        "primary_button_background_color",
+        "primary_button_border_color",
+        "primary_button_text_color",
+        "disabled_text_color",
+        "pressed_background_color",
+        "pressed_border_color",
+        "pressed_text_color"
+      ],
+      "states": [
+        "normal",
+        "focused",
+        "pressed",
+        "disabled"
+      ],
+      "required": true,
+      "renderingChecks": [
+        "text-spans",
+        "composited-backgrounds",
+        "drawable-states",
+        "screenshots"
+      ]
+    },
+    {
+      "id": "wallpaper-gallery",
+      "activity": ".wallpaper.WallpaperGalleryActivity",
+      "variant": "gallery",
+      "roles": [
+        "settings_screen_color",
+        "settings_panel_background_color",
+        "settings_panel_border_color",
+        "settings_panel_text_color",
+        "settings_header_text_color",
+        "settings_header_background_color",
+        "settings_header_border_color",
+        "button_background_color",
+        "button_border_color",
+        "button_text_color",
+        "disabled_text_color",
+        "pressed_background_color",
+        "pressed_border_color",
+        "pressed_text_color"
+      ],
+      "states": [
+        "normal",
+        "focused",
+        "pressed",
+        "disabled"
+      ],
+      "required": true,
+      "renderingChecks": [
+        "text-spans",
+        "composited-backgrounds",
+        "drawable-states",
+        "screenshots"
+      ]
+    },
+    {
+      "id": "preset-marketplace",
+      "activity": ".commands.tuixt.PresetMarketplaceActivity",
+      "variant": "gallery",
+      "roles": [
+        "settings_screen_color",
+        "settings_panel_background_color",
+        "settings_panel_border_color",
+        "settings_panel_text_color",
+        "settings_header_text_color",
+        "settings_header_background_color",
+        "settings_header_border_color",
+        "button_background_color",
+        "button_border_color",
+        "button_text_color",
+        "disabled_text_color",
+        "pressed_background_color",
+        "pressed_border_color",
+        "pressed_text_color"
+      ],
+      "states": [
+        "normal",
+        "focused",
+        "pressed",
+        "disabled"
+      ],
+      "required": true,
+      "renderingChecks": [
+        "text-spans",
+        "composited-backgrounds",
+        "drawable-states",
+        "screenshots"
+      ]
     }
   ],
   "activityExceptions": {
@@ -8295,6 +8428,7 @@
       "openPeople"
     ],
     "calculator/CalculatorActivity.kt": [
+      "showEnhancement",
       "showMode"
     ],
     "commands/tuixt/TuixtAdapter.kt": [

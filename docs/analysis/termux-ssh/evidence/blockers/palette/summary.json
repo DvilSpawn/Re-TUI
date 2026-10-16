@@ -1,0 +1,28 @@
+{
+  "summary": {
+    "catppuccin-latte": {
+      "captures": 5,
+      "recordStatuses": {
+        "manual review required": 5
+      },
+      "sampleCount": 189,
+      "sampleStatuses": {
+        "pass": 176,
+        "manual review required": 13
+      }
+    },
+    "catppuccin-mocha": {
+      "captures": 5,
+      "recordStatuses": {
+        "manual review required": 5
+      },
+      "sampleCount": 189,
+      "sampleStatuses": {
+        "pass": 176,
+        "manual review required": 13
+      }
+    }
+  },
+  "failingOrBlocked": [],
+  "visualProof": "INVALID first attempt: Activity transition screenshots captured unrelated foreground app; view state/color assertions alone are insufficient visual proof. Invalid compositor screenshots removed; final recapture is archived separately."
+}

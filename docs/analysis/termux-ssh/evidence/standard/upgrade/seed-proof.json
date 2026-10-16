@@ -1,0 +1,25 @@
+{
+  "launcherId": "upgrade_5bf0d2d66978",
+  "launcherCommand": "printf '%s\\n' UPGRADE_LAUNCHER_SAVED",
+  "windows": [
+    {
+      "target": "@38",
+      "marker": "UPGRADE_upgrade_5bf0d2d66978_0",
+      "panePid": "21405"
+    },
+    {
+      "target": "@39",
+      "marker": "UPGRADE_upgrade_5bf0d2d66978_1",
+      "panePid": "21424"
+    },
+    {
+      "target": "@40",
+      "marker": "UPGRADE_upgrade_5bf0d2d66978_2",
+      "panePid": "21443"
+    }
+  ],
+  "selection": "pages:0;LEFT_RIGHT|1|@38|@39;SINGLE|0|@40|",
+  "windowIds": "@38\n@39\n@40",
+  "stage": "READY_FOR_UPDATE",
+  "appUid": "11160"
+}

@@ -576,6 +576,7 @@ class AppsManager(context: Context) : XMLPrefsElement {
     }
 
     private fun isQuietModeEnabled(profile: UserHandle): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) return true
         val manager = context.getSystemService(Context.USER_SERVICE) as? UserManager ?: return true
         return runCatching { manager.isQuietModeEnabled(profile) }.getOrDefault(true)
     }
@@ -822,7 +823,13 @@ class AppsManager(context: Context) : XMLPrefsElement {
                 getIntent(info),
                 launchContext.packageManager.getLaunchIntentForPackage(packageName),
                 { first, second -> first.component == second.component }
-            ) { intent -> startActivitySafely { launchContext.startActivity(intent) } } ?: return false
+            ) { intent ->
+                if (packageName == REMEMBER_PACKAGE) {
+                    RetuiThemeBridge.putLauncherThemeExtras(intent, launchContext,
+                        ohi.andre.consolelauncher.tuils.FrameTarget.REMEMBER, REMEMBER_PACKAGE)
+                }
+                startActivitySafely { launchContext.startActivity(intent) }
+            } ?: return false
             launchedIntent.component?.let { info.componentName = it }
         }
 
@@ -1139,6 +1146,7 @@ class AppsManager(context: Context) : XMLPrefsElement {
     }
 
     fun requestPrivateSpaceQuietMode(quietMode: Boolean): String {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) return context.getString(R.string.output_private_space_unavailable)
         if (!hasPrivateSpace()) return context.getString(R.string.output_private_space_unavailable)
         val profile = privateProfile ?: return context.getString(R.string.output_private_space_unavailable)
         val manager = context.getSystemService(Context.USER_SERVICE) as? UserManager
@@ -2015,6 +2023,7 @@ class AppsManager(context: Context) : XMLPrefsElement {
 
     companion object {
         internal const val APP_LAUNCH_ACTION = Intent.ACTION_MAIN
+        private const val REMEMBER_PACKAGE = "com.dvil.retui.remember"
         internal const val APP_LAUNCH_CATEGORY = Intent.CATEGORY_LAUNCHER
 
         internal fun startActivitySafely(startActivity: () -> Unit): Boolean = try {

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="ohi.andre.consolelauncher.managers.BackupManagerTest" tests="31" skipped="0" failures="0" errors="0" timestamp="2026-10-16T03:33:20.372Z" hostname="Makos-MacBook-Air-6.local" time="0.195">
+  <properties/>
+  <testcase name="acceptsShareableConfigurationWithFrameLibrary" classname="ohi.andre.consolelauncher.managers.BackupManagerTest" time="0.109"/>
+  <testcase name="acceptsShareableConfigurationWithBehaviorAndFrames" classname="ohi.andre.consolelauncher.managers.BackupManagerTest" time="0.001"/>
+  <testcase name="rejectsIncompletePersonalBackupBeforeRestore" classname="ohi.andre.consolelauncher.managers.BackupManagerTest" time="0.0"/>
+  <testcase name="shareablePresetManifestPreservesItsName" classname="ohi.andre.consolelauncher.managers.BackupManagerTest" time="0.003"/>
+  <testcase name="acceptsExactShareableConfiguration" classname="ohi.andre.consolelauncher.managers.BackupManagerTest" time="0.0"/>
+  <testcase name="personalBackupIncludesPrivateNotesImagesLanguageAndThemeState" classname="ohi.andre.consolelauncher.managers.BackupManagerTest" time="0.0"/>
+  <testcase name="personalBackupIncludesSharedFrameLibraryAndSpaceSelections" classname="ohi.andre.consolelauncher.managers.BackupManagerTest" time="0.005"/>
+  <testcase name="rejectsEmptyOrTruncatedWrittenBackup" classname="ohi.andre.consolelauncher.managers.BackupManagerTest" time="0.001"/>
+  <testcase name="acceptsLegacyShareableConfiguration" classname="ohi.andre.consolelauncher.managers.BackupManagerTest" time="0.0"/>
+  <testcase name="portableExportUsesPresetNameAndDistinctExtension" classname="ohi.andre.consolelauncher.managers.BackupManagerTest" time="0.007"/>
+  <testcase name="rejectsCustomFramesFromPiSafeShareableConfiguration" classname="ohi.andre.consolelauncher.managers.BackupManagerTest" time="0.001"/>
+  <testcase name="userSelectedBehaviorManifestRecordsExactConsent" classname="ohi.andre.consolelauncher.managers.BackupManagerTest" time="0.0"/>
+  <testcase name="personalBackupIncludesModuleLibraryInstallProvenance" classname="ohi.andre.consolelauncher.managers.BackupManagerTest" time="0.0"/>
+  <testcase name="privateNotesAndLanguageFilesSurviveArchiveRoundTrip" classname="ohi.andre.consolelauncher.managers.BackupManagerTest" time="0.054"/>
+  <testcase name="personalBackupExcludesDownloadedEnginesButKeepsCalculatorUserFiles" classname="ohi.andre.consolelauncher.managers.BackupManagerTest" time="0.004"/>
+  <testcase name="acceptsShareableConfigurationWithFrames" classname="ohi.andre.consolelauncher.managers.BackupManagerTest" time="0.001"/>
+  <testcase name="currentLookManifestHasNoPresetName" classname="ohi.andre.consolelauncher.managers.BackupManagerTest" time="0.0"/>
+  <testcase name="personalBackupKeepsCalculatorHistoryAndOptions" classname="ohi.andre.consolelauncher.managers.BackupManagerTest" time="0.0"/>
+  <testcase name="acceptsVersionTwoPersonalBackupWithNestedPrivateAssets" classname="ohi.andre.consolelauncher.managers.BackupManagerTest" time="0.001"/>
+  <testcase name="acceptsExactWrittenBackup" classname="ohi.andre.consolelauncher.managers.BackupManagerTest" time="0.0"/>
+  <testcase name="rejectsExtraFilesInShareableConfiguration" classname="ohi.andre.consolelauncher.managers.BackupManagerTest" time="0.0"/>
+  <testcase name="acceptsCompressedBackupWithinCumulativeExpandedLimit" classname="ohi.andre.consolelauncher.managers.BackupManagerTest" time="0.001"/>
+  <testcase name="personalBackupIncludesFramePreferenceState" classname="ohi.andre.consolelauncher.managers.BackupManagerTest" time="0.0"/>
+  <testcase name="rejectsSchemaTwoShareableConfigurationWithoutPrivacyMarker" classname="ohi.andre.consolelauncher.managers.BackupManagerTest" time="0.0"/>
+  <testcase name="rejectsUnknownPrivateFileStore" classname="ohi.andre.consolelauncher.managers.BackupManagerTest" time="0.0"/>
+  <testcase name="rejectsShareableConfigurationMissingDeclaredBehavior" classname="ohi.andre.consolelauncher.managers.BackupManagerTest" time="0.0"/>
+  <testcase name="rejectsSmallCompressedBackupThatRestoreCannotExpandWithinLimit" classname="ohi.andre.consolelauncher.managers.BackupManagerTest" time="0.001"/>
+  <testcase name="acceptsPiSafeShareableConfiguration" classname="ohi.andre.consolelauncher.managers.BackupManagerTest" time="0.0"/>
+  <testcase name="rejectsUnknownUserSelectedBehaviorField" classname="ohi.andre.consolelauncher.managers.BackupManagerTest" time="0.001"/>
+  <testcase name="personalBackupKeepsStartupCompletionButNotPreviewDrafts" classname="ohi.andre.consolelauncher.managers.BackupManagerTest" time="0.0"/>
+  <testcase name="acceptsCompletePersonalBackup" classname="ohi.andre.consolelauncher.managers.BackupManagerTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -49,6 +49,104 @@ class PortablePresetIntegrationTest {
     }
 
     @Test
+    fun reopeningImporterReplacesPreviousFileAndError() {
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        fun incoming(name: String) = Intent(context, ohi.andre.consolelauncher.commands.tuixt.PresetImportActivity::class.java)
+            .setAction(Intent.ACTION_VIEW).setDataAndType(
+                Uri.parse("content://${instrumentation.context.packageName}.palette-fixtures/$name.retui"), BackupManager.PRESET_MIME)
+        val activity = instrumentation.startActivitySync(incoming("dracula").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        try {
+            await(activity, "Preset: Dracula")
+            instrumentation.runOnMainSync {
+                instrumentation.callActivityOnNewIntent(activity, incoming("tokyonight-storm"))
+                instrumentation.callActivityOnNewIntent(activity, Intent(Intent.ACTION_VIEW).setDataAndType(
+                    Uri.parse("content://missing.provider/preset.retui"), "text/plain"))
+            }
+            await(activity, "Unable to import preset")
+            // A completed inspection must not replace the newer error or enable its Import button.
+            instrumentation.waitForIdleSync()
+            instrumentation.runOnMainSync {
+                assertFalse(texts(activity.window.decorView).first { it is android.widget.Button && it.text == "Import" }.isEnabled)
+                instrumentation.callActivityOnNewIntent(activity, incoming("tokyonight-storm"))
+            }
+            await(activity, "Preset: TokyoNight Storm")
+        } finally { instrumentation.runOnMainSync { activity.finish() } }
+    }
+
+    @Test
+    fun websitePalettesOpenFromDownloadWrappersAndSaveWithoutApplying() {
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        val before = PresetManager.listPresets().toSet()
+        val active = ohi.andre.consolelauncher.tuils.Tuils.getFolder().listFiles().orEmpty()
+            .filter { it.isFile && it.extension == "xml" }.associateWith { it.readBytes() }
+        try {
+            for ((index, mime) in listOf(BackupManager.PRESET_MIME, "application/octet-stream", "application/zip", null).withIndex()) {
+                val name = if (index % 2 == 0) "tokyonight-storm" else "dracula"
+                val uri = Uri.parse("content://${instrumentation.context.packageName}.palette-fixtures/$name.retui")
+                val intent = Intent(context, ohi.andre.consolelauncher.commands.tuixt.PresetImportActivity::class.java)
+                    .setAction(if (index % 2 == 0) Intent.ACTION_VIEW else Intent.ACTION_SEND)
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                if (intent.action == Intent.ACTION_VIEW) intent.setDataAndType(uri, mime)
+                else {
+                    intent.type = mime
+                    intent.clipData = android.content.ClipData.newRawUri("Downloaded preset", uri)
+                }
+                val activity = instrumentation.startActivitySync(intent)
+                try {
+                    await(activity, "Preset: " + if (name == "dracula") "Dracula" else "TokyoNight Storm")
+                    instrumentation.runOnMainSync {
+                        texts(activity.window.decorView).first { it is android.widget.Button && it.text == "Import" }.performClick()
+                    }
+                    await(activity, "Saved preset:")
+                    active.forEach { (file, bytes) -> assertArrayEquals("Import changed ${file.name}", bytes, file.readBytes()) }
+                } finally { instrumentation.runOnMainSync { activity.finish() } }
+            }
+            assertEquals(4, (PresetManager.listPresets().toSet() - before).size)
+        } finally {
+            (PresetManager.listPresets().toSet() - before).forEach { File(PresetManager.presetsDir, it).deleteRecursively() }
+        }
+    }
+
+    @Test
+    fun errorScreenUsesLauncherFontInsetsAndCanRecoverThroughPicker() {
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        val uri = Uri.parse("content://${instrumentation.context.packageName}.palette-fixtures/dracula.retui")
+        val monitor = object : android.app.Instrumentation.ActivityMonitor() {
+            override fun onStartActivity(intent: Intent): android.app.Instrumentation.ActivityResult? =
+                if (intent.action == Intent.ACTION_OPEN_DOCUMENT)
+                    android.app.Instrumentation.ActivityResult(android.app.Activity.RESULT_OK, Intent().setData(uri)) else null
+        }
+        instrumentation.addMonitor(monitor)
+        val activity = instrumentation.startActivitySync(Intent(context,
+            ohi.andre.consolelauncher.commands.tuixt.PresetImportActivity::class.java)
+            .setAction(Intent.ACTION_VIEW).setDataAndType(Uri.parse("content://missing.provider/preset.retui"), BackupManager.PRESET_MIME)
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        try {
+            await(activity, "Unable to import preset")
+            instrumentation.runOnMainSync {
+                val header = texts(activity.window.decorView).first { it.text == "Import RetUI Preset" }
+                val error = texts(activity.window.decorView).first { it.text.startsWith("Unable to import preset") }
+                assertEquals(ohi.andre.consolelauncher.tuils.Tuils.getTypeface(context), error.typeface)
+                val insets = androidx.core.view.ViewCompat.getRootWindowInsets(header)!!
+                    .getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars() or androidx.core.view.WindowInsetsCompat.Type.displayCutout())
+                val location = IntArray(2)
+                header.getLocationOnScreen(location)
+                assertTrue("Header overlaps system bar/cutout", location[1] >= insets.top)
+                val button = texts(activity.window.decorView).first { it is android.widget.Button && it.text == "Choose preset file" }
+                assertEquals(android.view.View.VISIBLE, button.visibility)
+                button.performClick()
+            }
+            await(activity, "Preset: Dracula")
+            instrumentation.runOnMainSync {
+                assertTrue(texts(activity.window.decorView).first { it is android.widget.Button && it.text == "Import" }.isEnabled)
+            }
+        } finally {
+            instrumentation.runOnMainSync { activity.finish() }
+            instrumentation.removeMonitor(monitor)
+        }
+    }
+
+    @Test
     fun manualPickerAcceptsWronglyTypedLegacyPackageWithoutSaving() {
         val instrumentation = InstrumentationRegistry.getInstrumentation()
         val before = PresetManager.listPresets().toSet()
@@ -328,19 +426,47 @@ class PortablePresetIntegrationTest {
             assertNotEquals(destinationUri, shareUri)
             assertEquals(BackupManager.PRESET_MIME, context.contentResolver.getType(shareUri))
             assertArrayEquals(destination.readBytes(), context.contentResolver.openInputStream(shareUri)!!.use { it.readBytes() })
-            val recipient = InstrumentationRegistry.getInstrumentation().context.packageName
-            val recipientProvider = Uri.parse("content://$recipient.portable-fixtures")
-            context.grantUriPermission(recipient, shareUri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            try {
-                val read = context.contentResolver.call(recipientProvider, "read-share", shareUri.toString(), null)!!
-                assertNotEquals("Recipient proof requires a different app UID", android.os.Process.myUid(), read.getInt("uid"))
-                assertNull(read.getString("error"))
-                assertEquals(BackupManager.PRESET_MIME, read.getString("mime"))
-                assertArrayEquals(destination.readBytes(), read.getByteArray("bytes"))
-            } finally { context.revokeUriPermission(shareUri, Intent.FLAG_GRANT_READ_URI_PERMISSION) }
-            val denied = context.contentResolver.call(recipientProvider, "read-share", shareUri.toString(), null)!!
-            assertNotNull("Recipient access must end after revocation", denied.getString("error"))
+            // Permission lifecycle is verified below from an uninstrumented sender.
+            // Delete this private cached fixture as well as its SAF destination.
+            File(context.cacheDir, shareUri.path!!.removePrefix("/cache_files/")).parentFile!!.deleteRecursively()
         } finally { source.deleteRecursively(); destination.delete() }
+    }
+
+    @Test
+    fun independentUninstrumentedShareGrantEndsAfterRevocation() {
+        val automation = InstrumentationRegistry.getInstrumentation().uiAutomation
+        val share = "content://dev.retui.test.presetsender.FILE_PROVIDER/cache_files/preset-share/revoke.retui"
+        fun call(authority: String, method: String, argument: String? = null): String {
+            // Independent shell processes keep this probe outside instrumentation's Binder scope.
+            val command = "content call --uri content://$authority --method $method" +
+                (if (argument == null) "" else " --arg $argument")
+            return android.os.ParcelFileDescriptor.AutoCloseInputStream(automation.executeShellCommand(command))
+                .bufferedReader().use { it.readText() }
+        }
+        fun phase(name: String) = call("dev.retui.test.presetsender.cycle", name)
+        fun read() = call("dev.retui.test.presetrecipient.read", "read-share", share)
+        val prepared = phase("prepare")
+        assertTrue("Install the standalone sender helper: $prepared", prepared.contains("senderUid="))
+        try {
+            val before = read()
+            assertTrue("Private provider must deny initial access: $before", before.contains("SecurityException") ||
+                before.contains("FileNotFoundException: No content provider:"))
+            assertFalse("Denied probe must expose no bytes", before.contains("bytes=["))
+            phase("grant")
+            val granted = read()
+            val senderUid = Regex("""senderUid=(\d+)""").find(prepared)!!.groupValues[1]
+            val recipientUid = Regex("""uid=(\d+)""").find(granted)!!.groupValues[1]
+            assertNotEquals("Sender and recipient require distinct UIDs", senderUid, recipientUid)
+            assertFalse("Granted read failed: $granted", granted.contains("error="))
+            assertTrue(granted.contains("mime=" + BackupManager.PRESET_MIME))
+            val bytes = "independent-sender-preset".toByteArray(Charsets.UTF_8).joinToString(", ", "bytes=[", "]")
+            assertTrue("Granted read must return exact preset bytes: $granted", granted.contains(bytes))
+        } finally { phase("revoke") }
+        val denied = read()
+        assertTrue("Revoked recipient must receive a permission denial: $denied", denied.contains("SecurityException"))
+        assertFalse("Revoked recipient must receive no bytes", denied.contains("bytes=["))
+        // Vivo can still report GRANTED through its query API even when this actual read is denied.
+        android.util.Log.i("PresetGrantRegression", "Strict independent read lifecycle passed: $denied")
     }
 
     @Test

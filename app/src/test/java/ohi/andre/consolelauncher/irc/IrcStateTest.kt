@@ -162,4 +162,23 @@ class IrcStateTest {
         val s = IrcState(); s.buffer("#Foo["); s.buffer("#foo{"); assertEquals(2, s.buffers.size)
         s.status("one\ntwo"); assertEquals(2, s.buffers.first().lines.size)
     }
+
+    @Test fun chatHistoryBatchRestoresMessagesWithoutUnreadOrDuplicates() {
+        val s = IrcState(); s.nickname = "dvil"; s.buffer("#retui"); s.switch("#retui")
+        s.event(":server BATCH +h chathistory #retui")
+        s.event("@batch=h;msgid=abc;time=2026-10-12T10:00:00Z :alice!u@host PRIVMSG #retui :hello")
+        s.event(":server BATCH -h")
+        val b = s.buffer("#retui")
+        assertEquals(1, b.lines.size); assertEquals(0, b.unread)
+        s.event("@batch=h;msgid=abc;time=2026-10-12T10:00:00Z :alice!u@host PRIVMSG #retui :hello")
+        assertEquals(1, b.lines.size)
+    }
+
+    @Test fun disconnectClearsHistoryBatchContext() {
+        val s = IrcState(); s.nickname = "dvil"; s.buffer("#retui").joined = true
+        s.event(":server BATCH +h chathistory #retui")
+        s.disconnected()
+        s.event("@batch=h;msgid=after-disconnect :alice!u@host PRIVMSG #retui :live message")
+        assertEquals(1, s.buffer("#retui").unread)
+    }
 }

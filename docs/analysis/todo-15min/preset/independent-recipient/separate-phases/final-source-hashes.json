@@ -1,0 +1,8 @@
+{
+  "app/src/androidTest/java/ohi/andre/consolelauncher/managers/PortablePresetIntegrationTest.kt": "aaf91633ce1342685e4d6c7bd7fcfe3866c446b791480a889b1cc4d9aa9a9a0c",
+  "scripts/tests/preset-recipient/verify.py": "1858e02728a4d3f453fbc7aff888f6f660a3308c8e5711e771969990356c155b",
+  "scripts/tests/preset-recipient/build.py": "e38b392f8fe88f693543af0a7dd631bc61a435af27aa88442bc1395101ed9cf0",
+  "scripts/tests/preset-recipient/src/dev/retui/test/presetrecipient/SenderProvider.java": "c3c860703f85668db46b11a4d160fb717826f5d195b493d2b4bf61e9127b994e",
+  "scripts/tests/preset-recipient/src/dev/retui/test/presetrecipient/ReadProvider.java": "56b532731e011117cd4bfad299631dca48180eac1b0ad8f16ac14924ff5f84cd",
+  "scripts/tests/preset-recipient/src/dev/retui/test/presetrecipient/ShareProvider.java": "b1574abaaed19fe10be40c8401585b54b5fe75f5efa1ddda049a90b2c202114f"
+}

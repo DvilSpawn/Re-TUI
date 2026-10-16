@@ -1,0 +1,39 @@
+mDefaultWallpaperComponent=ComponentInfo{com.android.systemui/com.android.systemui.wallpapers.ImageWallpaper}
+mImageWallpaper=ComponentInfo{com.android.systemui/com.android.systemui.wallpapers.ImageWallpaper}
+System wallpaper state:
+ User 0: id=3: mWhich=3: mSystemWasBoth=true: mBindSource=CONNECTION_TRY_TO_REBIND
+ Display state:
+  displayId=0
+  mWidth=2134  mHeight=1067
+  mPadding=Rect(0, 0 - 0, 0)
+  mCropHint=Rect(0, 0 - 0, 0)
+  mName=
+  mAllowBackup=true
+  mWallpaperComponent=ComponentInfo{com.dvil.tui_renewed.calculatorpackdebug/ohi.andre.consolelauncher.wallpaper.RetuiWallpaperService}
+  mWallpaperDimAmount=0.0
+  isColorExtracted=false
+  mUidToDimAmount:
+  Wallpaper connection com.android.server.wallpaper.WallpaperManagerService$WallpaperConnection@af472b1:
+    mInfo.component=ComponentInfo{com.dvil.tui_renewed.calculatorpackdebug/ohi.andre.consolelauncher.wallpaper.RetuiWallpaperService}
+     mDisplayId=0
+     mToken=android.os.Binder@56df6e
+     mEngine=android.service.wallpaper.IWallpaperEngine$Stub$Proxy@c5870f7
+    mService=android.service.wallpaper.IWallpaperService$Stub$Proxy@a1d8b64
+    mLastDiedTime=-20467
+Lock wallpaper state:
+Fallback wallpaper state:
+ User 0: id=1: mWhich=1: mSystemWasBoth=false: mBindSource=INITIALIZE_FALLBACK
+ Display state:
+  displayId=0
+  mWidth=2134  mHeight=1067
+  mPadding=Rect(0, 0 - 0, 0)
+  mCropHint=Rect(0, 0 - 0, 0)
+  mName=
+  mAllowBackup=false
+  mWallpaperComponent=ComponentInfo{com.android.systemui/com.android.systemui.wallpapers.ImageWallpaper}
+  mWallpaperDimAmount=0.0
+  isColorExtracted=false
+  mUidToDimAmount:
+  Wallpaper connection com.android.server.wallpaper.WallpaperManagerService$WallpaperConnection@5d5cc82:
+    mService=android.service.wallpaper.IWallpaperService$Stub$Proxy@26501cd
+    mLastDiedTime=-308416

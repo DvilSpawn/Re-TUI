@@ -1,0 +1,19 @@
+{
+  "enabled": {
+    "apk": "/tmp/retui-ssh-final-access-candidate.apk",
+    "sha256": "2d2465084ea333b370b070d9ea09180f1d10e9d08a53f2de9a04695f6e8c6ce2",
+    "bytes": 7800858,
+    "dex_bytes": 4880616
+  },
+  "default": {
+    "apk": "/tmp/retui-ssh-final-default-no-ssh.apk",
+    "sha256": "758efc490bf6be995925a874d5cacd8b50596764b0c9a33932cc479bae62388e",
+    "bytes": 7659815,
+    "dex_bytes": 4706976
+  },
+  "delta_bytes": 141043,
+  "delta_percent": 1.841,
+  "default_jsch_mapping_class_count": 0,
+  "default_ssh_implementation_mapping_class_count": 0,
+  "boundary": "Same final production source; default SSH-disabled unsigned release vs enabled internal debug-signed candidate. Package/signing/label and conditional SSH keeps differ. This is not a total feature-cost comparison with the original checkout."
+}

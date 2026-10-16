@@ -99,6 +99,14 @@ class IrcTerminalSession(application: Application) : AndroidViewModel(applicatio
                     if (removing != null && (notice == "Certificate fingerprint successfully removed" || notice == "Certificate fingerprint not found")) { finishForget(removing, true); return@repeat }
                 }
                 runCatching { state.receive(message) }.onFailure { state.status("Incoming event could not be displayed; window limit or malformed data.") }
+                if (message.command == "JOIN") {
+                    val channel = message.params.firstOrNull().orEmpty()
+                    if ((channel.startsWith('#') || channel.startsWith('&')) &&
+                        IrcProtocol.fold(message.nick, state.mapping) == IrcProtocol.fold(state.nickname, state.mapping) &&
+                        client?.ready == true) {
+                        runCatching { actions.names(channel) }
+                    }
+                }
                 updated = true
             }
         }
@@ -288,6 +296,31 @@ class IrcActivity : LocalizedComponentActivity() {
             }
             guidance.text = reference.firstOrNull { it.substringBefore(' ') == prefix } ?: getString(R.string.irc_command_guidance)
             guidance.visibility = View.VISIBLE
+        } else if (navigation.page == IrcNavigation.Page.CHAT && session.client?.ready == true && text.isNotEmpty() &&
+            text.substring(0, input.selectionStart.coerceIn(0, text.length)).substringAfterLast(" ").startsWith("@")) {
+            val cursor = input.selectionStart.coerceIn(0, text.length)
+            val tokenStart = text.substring(0, cursor).indexOfLast { it.isWhitespace() } + 1
+            val token = text.substring(tokenStart, cursor)
+            if (token.startsWith("@")) {
+                val query = token.drop(1)
+                session.state.active.names.asSequence()
+                    .filter { query.isEmpty() || IrcProtocol.fold(it, session.state.mapping).startsWith(IrcProtocol.fold(query, session.state.mapping)) }
+                    .toList().sortedWith(String.CASE_INSENSITIVE_ORDER)
+                    .take(6)
+                    .forEach { nickname ->
+                        rows.addView(chip("@$nickname") {
+                            val current = input.text.toString()
+                            val end = input.selectionStart.coerceIn(0, current.length)
+                            val start = current.substring(0, end).indexOfLast { it.isWhitespace() } + 1
+                            val replacement = current.substring(0, start) + "@$nickname " + current.substring(end)
+                            switching = true
+                            input.setText(replacement)
+                            input.setSelection((start + nickname.length + 2).coerceAtMost(replacement.length))
+                            switching = false
+                            suggestions()
+                        })
+                    }
+            }
         } else if (navigation.page != IrcNavigation.Page.CHAT) {
             rows.addView(chip(getString(R.string.irc_back)) { closeNavigation() })
             if (navigation.page in listOf(IrcNavigation.Page.ACCOUNT, IrcNavigation.Page.REGISTER, IrcNavigation.Page.JOIN, IrcNavigation.Page.NETWORK))

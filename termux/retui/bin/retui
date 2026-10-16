@@ -1,7 +1,7 @@
 #!/data/data/com.termux/files/usr/bin/sh
 set -eu
 
-RETUI_VERSION="0.4.2"
+RETUI_VERSION="0.4.4"
 RETUI_BRIDGE_PROTOCOL="retui-bridge-v1"
 RETUI_SOCKET_PROTOCOL="retui-bridge-socket-v4"
 TERMUX_PREFIX_DEFAULT="/data/data/com.termux/files/usr"
@@ -19,7 +19,7 @@ die() {
 
 usage() {
     cat <<'EOF'
-retui 0.4.2
+retui 0.4.4
 
 Usage:
   retui version
@@ -164,6 +164,9 @@ resize_bridge() {
         [ "$cols" -gt 240 ] || [ "$rows" -gt 120 ]; then
         die "invalid bridge geometry (maximum 240x120)"
     fi
+    size_key="$session:$cols:$rows"
+    [ "${last_size_key:-}" != "$size_key" ] || return 0
+    last_size_key="$size_key"
     if valid_dimension "$cols" && valid_dimension "$rows"; then
         tmux resize-window -t "$session" -x "$cols" -y "$rows" 2>/dev/null || true
         tmux resize-pane -t "$session" -x "$cols" -y "$rows" 2>/dev/null || true
@@ -212,6 +215,122 @@ capture_frame() {
     printf '%s\n' "$pane" | base64 | tr -d '\n'
     printf '\n'
     printf '%s\n' "__RETUI_FRAME_END__"
+}
+
+# Raw PTY output cannot restore tmux's complete parser state after reconnect.
+# Use its notifications to request authoritative cells on the same control client.
+stream_output_loop() {
+    have awk || { printf '%s\n' '__RETUI_SOCKET_ERROR__ awk missing: pkg install gawk'; return; }
+    control_pid=""; parser_pid=""
+    cleanup_output_loop() {
+        [ -z "$parser_pid" ] || { kill "$parser_pid" 2>/dev/null || true; wait "$parser_pid" 2>/dev/null || true; }
+        [ -z "$control_pid" ] || { kill "$control_pid" 2>/dev/null || true; wait "$control_pid" 2>/dev/null || true; }
+        rm -rf "$stream_dir"
+    }
+    trap cleanup_output_loop EXIT
+    trap 'exit 0' HUP INT TERM
+    exec 4<>"$stream_dir/output"
+    tmux -C attach-session -f ignore-size -t "$(bridge_session)" < "$stream_dir/input" > "$stream_dir/output" 2>/dev/null &
+    control_pid="$!"
+    export RETUI_CONTROL_FD=/dev/fd/3
+    [ ! -e /proc/self/fd/3 ] || RETUI_CONTROL_FD=/proc/self/fd/3
+    export RETUI_CONTROL_TARGET="$client_target" RETUI_CONTROL_DIR="$stream_dir"
+    export RETUI_CONTROL_PANE="$(tmux display-message -p -t "$client_target" '#{pane_id}')"
+    export RETUI_CONTROL_SESSION="$(tmux display-message -p -t "$client_target" '#{session_id}')"
+    export RETUI_CONTROL_WINDOWS="$(tmux list-windows -t "$(bridge_session)" -F '#{?pane_dead,,#{window_id}:#I:#W}' | tr '\n' '\t')"
+    export RETUI_CONTROL_VERSION="$RETUI_VERSION"
+    # awk buffers reads; shell read performs a syscall per byte of a captured screen.
+    LC_ALL=C awk '
+    function shq(value, parts,n,i,r) {
+        n=split(value,parts,"\047"); r="\047" parts[1]
+        for(i=2;i<=n;i++) r=r "\047\\\047\047" parts[i]
+        return r "\047"
+    }
+    function command(value) { print value > control; fflush(control) }
+    function fail(message) { print "__RETUI_SOCKET_ERROR__ " message; fflush(); exit 1 }
+    function gone() { print "__RETUI_TARGET_GONE__ " target; fflush(); exit }
+    function exited(cmd,value) {
+        cmd="tmux display-message -p -t " target " \047#{pane_dead}\047"
+        value=""; cmd | getline value; close(cmd)
+        return value==1
+    }
+    function snapshot() {
+        pending=1; dirty=0
+        # Synchronous commands share one server turn; no shell export or output suppression.
+        command("display-message -p -t " target " \047__RETUI_SNAPSHOT_STATE__ #{pane_width}|#{pane_height}|#{cursor_x}|#{cursor_y}|#{alternate_on}|0|0|#{cursor_flag}|#{wrap_flag}|#{insert_flag}|#{scroll_region_upper}|#{scroll_region_lower}|#{keypad_cursor_flag}\047; capture-pane -p -e -N -t " target "; display-message -p \047__RETUI_SNAPSHOT_END__\047")
+    }
+    function encoded_file(path, cmd,line,result) {
+        cmd="base64 < " shq(path); result=""
+        while ((cmd | getline line)>0) result=result line
+        if (close(cmd)!=0) fail("terminal encoding failed")
+        return result
+    }
+    BEGIN {
+        target=ENVIRON["RETUI_CONTROL_TARGET"]; pane=ENVIRON["RETUI_CONTROL_PANE"]
+        session=ENVIRON["RETUI_CONTROL_SESSION"]; control=ENVIRON["RETUI_CONTROL_FD"]
+        dir=ENVIRON["RETUI_CONTROL_DIR"]; screen=dir "/screen"
+        windows=ENVIRON["RETUI_CONTROL_WINDOWS"]; version=ENVIRON["RETUI_CONTROL_VERSION"]
+        if (target !~ /^@[0-9]+$/ || pane !~ /^%[0-9]+$/ || session !~ /^\$[0-9]+$/) fail("invalid terminal target")
+        command("refresh-client -B \047retui_dead:%*:#{pane_dead}\047")
+        snapshot()
+    }
+    /^__RETUI_SNAPSHOT_STATE__ / {
+        state=substr($0,26); dirty=0
+        if (split(state,fields,"|")!=13 || fields[1]!~/^[0-9]+$/ || fields[2]!~/^[0-9]+$/ || fields[1]<1 || fields[1]>240 || fields[2]<1 || fields[2]>120) fail("invalid terminal geometry")
+        cols=fields[1]; rows=fields[2]; cursor=fields[3] ":" fields[4]; capture_next=1
+        next
+    }
+    /^%begin / {
+        if (!capture_next) next
+        capture_next=0; block=substr($0,8); bytes=0
+        for(row=0;row<rows;row++) {
+            if ((getline cell)<=0) fail("incomplete terminal capture")
+            bytes+=length(cell)+1
+            if (bytes>180000) fail("terminal capture too large")
+            print cell > screen
+        }
+        close(screen)
+        if ((getline ending)<=0 || ending!="%end " block) fail("invalid terminal capture")
+        body=encoded_file(screen)
+        print "__RETUI_TERMINAL_STATE__ " state
+        print "__RETUI_VERSION__ " version
+        print "__RETUI_TARGET__ " target
+        print "__RETUI_WINDOWS__ " windows
+        print "__RETUI_COLS__ " cols
+        print "__RETUI_ROWS__ " rows
+        print "__RETUI_CURSOR__ " cursor
+        print "__RETUI_FRAME_BASE64__ " body
+        print "__RETUI_FRAME_END__"; fflush()
+        next
+    }
+    /^__RETUI_SNAPSHOT_END__$/ {
+        pending=0
+        if (!ready) { ready=1; print "" > (dir "/ready"); close(dir "/ready") }
+        if (dirty) snapshot()
+        next
+    }
+    /^%output / {
+        if ($2==pane) { if (!pending) snapshot(); else dirty=1 }
+        next
+    }
+    /^%subscription-changed retui_dead / { if ($6==pane && $NF==1) gone(); next }
+    /^%window-close / || /^%unlinked-window-close / || /^%pane-died / || /^%pane-exited / {
+        if ($2==target || $2==pane) gone()
+    }
+    /^%window-add/ || /^%unlinked-window-add/ || /^%window-renamed/ || /^%unlinked-window-renamed/ || /^%window-close/ || /^%unlinked-window-close/ {
+        cmd="tmux list-windows -t " shq(session) " -F \047#{?pane_dead,,#{window_id}:#I:#W}\047"
+        windows=""
+        while ((cmd | getline entry)>0) windows=windows entry "\t"
+        close(cmd)
+        print windows > (dir "/windows"); close(dir "/windows")
+        print "__RETUI_WINDOWS_BASE64__ " encoded_file(dir "/windows"); fflush()
+        next
+    }
+    /^%error/ { if (exited()) gone(); fail("terminal command failed") }
+    /^%exit/ { if (exited()) gone(); fail("terminal stream closed") }
+    ' < "$stream_dir/output" 4>&- &
+    parser_pid="$!"
+    wait "$parser_pid"
 }
 
 stream_capture_loop() {
@@ -419,7 +538,7 @@ bridge_listener_ready() {
     printf '%s\n' "$ready_response" | grep -F -x '__RETUI_SOCKET_STATUS__ ok' >/dev/null 2>&1 &&
         printf '%s\n' "$ready_response" | grep -F -x "__RETUI_SOCKET__ $RETUI_SOCKET_PROTOCOL" >/dev/null 2>&1 &&
         printf '%s\n' "$ready_response" | grep -F -x "__RETUI_SESSION__ $(bridge_session)" >/dev/null 2>&1 &&
-        printf '%s\n' "$ready_response" | grep -F -x '__RETUI_VERSION__ 0.4.2' >/dev/null 2>&1
+        printf '%s\n' "$ready_response" | grep -F -x '__RETUI_VERSION__ 0.4.4' >/dev/null 2>&1
 }
 
 wait_for_bridge_listener() {
@@ -482,27 +601,51 @@ bridge_tcp_daemon() {
     have socat || die "socat missing: pkg install socat"
     ensure_tmux
     ensure_socket_token >/dev/null
-    exec socat TCP-LISTEN:"$(bridge_tcp_port)",bind=127.0.0.1,fork,reuseaddr EXEC:"$PREFIX/bin/retui bridge socket-client"
+    exec socat TCP-LISTEN:"$(bridge_tcp_port)",bind=127.0.0.1,fork,reuseaddr,nodelay EXEC:"$PREFIX/bin/retui bridge socket-client"
 }
 
 bridge_socket_client() {
+    set -f # Protocol fields are literal tokens, never filesystem globs.
     set -f
     ensure_tmux
     expected_token="${RETUI_SOCKET_TOKEN:-$(ensure_socket_token)}"
     authed=0
     streaming=0
     stream_pid=""
+    stream_dir=""
+    output_driven=0
     cleanup_socket_client() {
         if [ -n "$stream_pid" ]; then
             kill "$stream_pid" 2>/dev/null || true
             wait "$stream_pid" 2>/dev/null || true
             stream_pid=""
         fi
+        exec 3>&-
+        [ -z "$stream_dir" ] || rm -rf "$stream_dir"
+        stream_dir=""
     }
     start_socket_stream() {
         cleanup_socket_client
-        stream_capture_loop &
+        if [ "$output_driven" -eq 1 ]; then
+            stream_dir="$(mktemp -d)"
+            mkfifo "$stream_dir/input" "$stream_dir/output"
+            exec 3<>"$stream_dir/input"
+            stream_output_loop &
+        else
+            stream_capture_loop &
+        fi
         stream_pid="$!"
+        if [ "$output_driven" -eq 1 ]; then
+            # Keep accepted input behind the seed barrier; the first authoritative capture must be complete.
+            attempts=0
+            while [ ! -f "$stream_dir/ready" ]; do
+                if ! kill -0 "$stream_pid" 2>/dev/null || [ "$attempts" -ge 150 ]; then
+                    socket_error 'terminal seed failed'; return 1
+                fi
+                attempts=$((attempts + 1))
+                sleep 0.02
+            done
+        fi
     }
     maybe_capture_frame() {
         if [ "$streaming" -eq 0 ]; then
@@ -533,7 +676,8 @@ bridge_socket_client() {
                 printf '%s %s\n' '__RETUI_SOCKET_STATUS__' ok
                 [ "${5:-}" != PROBE ] || continue
                 [ "${7:-}" = NO_CREATE ] || ensure_bridge_session
-                case "${5:-}" in STREAM|stream|v2) streaming=1 ;; *) streaming=0 ;; esac
+                case "${5:-}" in OUTPUT|STREAM|stream|v2) streaming=1 ;; *) streaming=0 ;; esac
+                [ "${5:-}" != OUTPUT ] || output_driven=1
                 requested="$(decode_payload "${6:--}")" || { socket_error "invalid target"; exit 1; }
                 if [ -n "$requested" ]; then
                     client_target="$requested"
@@ -545,11 +689,15 @@ bridge_socket_client() {
                         continue
                     fi
                 fi
+                if [ "$(tmux display-message -p -t "$client_target" '#{pane_dead}' 2>/dev/null || true)" = 1 ]; then
+                    printf '%s %s\n' '__RETUI_TARGET_GONE__' "$client_target"
+                    continue
+                fi
                 resize_bridge "${3:-}" "${4:-}"
                 printf '%s %s\n' "__RETUI_SOCKET__" "$RETUI_SOCKET_PROTOCOL"
                 printf '%s %s\n' "__RETUI_SOCKET_STATUS__" "ok"
                 case "${5:-}" in
-                    STREAM|stream|v2)
+                    OUTPUT|STREAM|stream|v2)
                         streaming=1
                         start_socket_stream
                         ;;
@@ -561,8 +709,9 @@ bridge_socket_client() {
                 ;;
             CAPTURE)
                 [ "$authed" -eq 1 ] || { socket_error "auth required"; exit 1; }
+                last_size_key=""
                 resize_bridge "${2:-}" "${3:-}"
-                maybe_capture_frame
+                if [ "$output_driven" -eq 1 ]; then start_socket_stream; else maybe_capture_frame; fi
                 ;;
             ENTER)
                 [ "$authed" -eq 1 ] || { socket_error "auth required"; exit 1; }
@@ -585,6 +734,25 @@ bridge_socket_client() {
                     sleep "${RETUI_CAPTURE_DELAY:-0.08}"
                     capture_frame
                 fi
+                ;;
+            TYPE_HEX)
+                [ "$authed" -eq 1 ] && [ "$output_driven" -eq 1 ] || { socket_error 'output stream required'; exit 1; }
+                resize_bridge "${2:-}" "${3:-}"
+                shift 3
+                [ "$#" -gt 0 ] && [ "$#" -le 16384 ] || { socket_error 'invalid byte count'; exit 1; }
+                for byte in "$@"; do
+                    case "$byte" in [0-9a-f][0-9a-f]) ;; *) socket_error 'invalid byte'; exit 1 ;; esac
+                done
+                # Each complete command fits PIPE_BUF; capture requests cannot split a paste.
+                hex=""; count=0
+                for byte in "$@"; do
+                    hex="$hex $byte"; count=$((count + 1))
+                    if [ "$count" -eq 256 ]; then
+                        printf 'send-keys -H -t %s%s\n' "$client_target" "$hex" >&3
+                        hex=""; count=0
+                    fi
+                done
+                [ -z "$hex" ] || printf 'send-keys -H -t %s%s\n' "$client_target" "$hex" >&3
                 ;;
             TYPE)
                 [ "$authed" -eq 1 ] || { socket_error "auth required"; exit 1; }
@@ -673,7 +841,15 @@ bridge_socket_client() {
                     socket_error "key required"
                     continue
                 fi
-                tmux send-keys -t "$(bridge_target)" -- "$key"
+                case "$key" in
+                    *[!a-zA-Z0-9_:+.@-]*) fast_key=0 ;;
+                    *) fast_key="$output_driven" ;;
+                esac
+                if [ "$fast_key" -eq 1 ]; then
+                    printf 'send-keys -t %s -- %s\n' "$client_target" "$key" >&3
+                else
+                    tmux send-keys -t "$(bridge_target)" -- "$key"
+                fi
                 if [ "$streaming" -eq 0 ]; then
                     sleep "${RETUI_CAPTURE_DELAY:-0.08}"
                     capture_frame

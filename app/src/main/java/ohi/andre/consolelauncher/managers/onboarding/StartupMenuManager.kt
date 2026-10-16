@@ -175,6 +175,23 @@ object StartupMenuManager {
         return if (Tuils.isMyLauncherDefault(context.packageManager)) null else Intent(Settings.ACTION_HOME_SETTINGS)
     }
 
+    private var closingPreparation: java.lang.ref.WeakReference<View>? = null
+    private const val KEY_HOME_PENDING = "home_request_pending"
+
+    internal fun queueDefaultLauncherAfterClose(activity: Activity) {
+        if (isDryRun(activity) || !defaultLauncher(activity)) return
+        closingPreparation = java.lang.ref.WeakReference(activity.window.decorView)
+        prefs(activity).edit().putBoolean(KEY_HOME_PENDING, true).commit()
+    }
+    fun hasPendingDefaultLauncher(context: Context) = prefs(context).getBoolean(KEY_HOME_PENDING, false)
+    fun preparationWindowDismissed() = closingPreparation?.get()?.isAttachedToWindow != true
+    fun consumeDefaultLauncherRequest(context: Context): Intent? {
+        if (!hasPendingDefaultLauncher(context) || !preparationWindowDismissed()) return null
+        prefs(context).edit().remove(KEY_HOME_PENDING).commit()
+        closingPreparation = null
+        return defaultLauncherRequest(context)
+    }
+
     fun isFirstInstallPending(context: Context): Boolean {
         return !context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(KEY_COMPLETE, false)
     }
@@ -351,11 +368,6 @@ class StartupMenuActivity : ohi.andre.consolelauncher.localization.LocalizedComp
     private var palette: AutoColorManager.Snapshot? = null
     private var paletteReady = false
     private var buildResult: StartupMenuManager.ActionResult? = null
-    private var choosingDefaultLauncher = false
-    private val defaultLauncherResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        choosingDefaultLauncher = false
-        buildResult?.let { close(it) }
-    }
     private val buildTick = Runnable { advanceBuild() }
     private var previewPanel: View? = null
     private var previewHeader: View? = null
@@ -367,12 +379,11 @@ class StartupMenuActivity : ohi.andre.consolelauncher.localization.LocalizedComp
         requestNoTitleIfFullscreen(this)
         super.onCreate(savedInstanceState)
         savedInstanceState?.getString("default_launcher_result")?.let {
-            buildResult = StartupMenuManager.ActionResult(it, reload = true)
-            choosingDefaultLauncher = true
+            buildResult = StartupMenuManager.ActionResult(it, reload = savedInstanceState?.getBoolean("default_launcher_reload", true) ?: true)
         }
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
         applyFullscreen(this)
-        if (!StartupMenuManager.isActive(this) && !choosingDefaultLauncher) {
+        if (!StartupMenuManager.isActive(this) && buildResult == null) {
             if (!StartupMenuManager.isDryRun(this) && !StartupMenuManager.isFirstInstallPending(this)) LauncherActivity.preview(this)
             finish()
             return
@@ -388,12 +399,16 @@ class StartupMenuActivity : ohi.andre.consolelauncher.localization.LocalizedComp
                 }
             }
         })
+        if (buildResult != null) { completeSetup(); return }
         render()
         if (StartupMenuManager.isBuilding(this)) prepareBuild()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        if (choosingDefaultLauncher) outState.putString("default_launcher_result", buildResult?.message)
+        buildResult?.let {
+            outState.putString("default_launcher_result", it.message)
+            outState.putBoolean("default_launcher_reload", it.reload)
+        }
         super.onSaveInstanceState(outState)
     }
 
@@ -497,7 +512,7 @@ class StartupMenuActivity : ohi.andre.consolelauncher.localization.LocalizedComp
         when {
             building -> {
                 list.addView(terminalText(getString(R.string.startup_build_description), 13f), blockParams(18f))
-                buildProgress = terminalText("[----------]", 22f).apply {
+                buildProgress = terminalText("[░░░░░░░░░░]", 22f).apply {
                     id = R.id.startup_build_progress
                     typeface = Typeface.MONOSPACE
                     importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
@@ -605,6 +620,9 @@ class StartupMenuActivity : ohi.andre.consolelauncher.localization.LocalizedComp
         if (StartupMenuManager.level(this) == StartupMenuManager.ADVANCED) {
             list.addView(terminalText(getString(R.string.startup_features), 13f), blockParams(6f))
             StartupMenuManager.toggles(this).forEach { list.addView(toggleRow(it), blockParams(8f)) }
+            list.addView(button(getString(R.string.optional_calculator_title), false).apply {
+                setOnClickListener { ohi.andre.consolelauncher.calculator.OptionalCalculatorEngine.showManagement(this@StartupMenuActivity) }
+            }, blockParams(8f))
             list.addView(terminalText(getString(R.string.startup_access_note), 12f), blockParams(10f))
             list.addView(terminalText(getString(R.string.startup_visual_effects), 13f), blockParams(6f))
             list.addView(visualEffects(), blockParams(4f))
@@ -731,12 +749,12 @@ class StartupMenuActivity : ohi.andre.consolelauncher.localization.LocalizedComp
                 pageScroll?.post { pageScroll?.fullScroll(View.FOCUS_DOWN) }
             }
             val progress = (count * 9 / lines.size).coerceAtLeast(1)
-            buildProgress?.text = "[" + "#".repeat(progress) + "-".repeat(10 - progress) + "]"
+            buildProgress?.text = "[" + "█".repeat(progress) + "░".repeat(10 - progress) + "]"
             if (elapsed >= duration && paletteReady) {
                 try {
                     buildResult = StartupMenuManager.finish(this, palette)
                     buildOutput?.append("\n\n" + getString(R.string.startup_build_ready))
-                    buildProgress?.text = "[##########]"
+                    buildProgress?.text = "[██████████]"
                     buildStarted = SystemClock.uptimeMillis()
                 } catch (error: Exception) {
                     buildFailed(error)
@@ -745,22 +763,15 @@ class StartupMenuActivity : ohi.andre.consolelauncher.localization.LocalizedComp
             }
         } else if (elapsed >= if (duration == 0L) 0L else 350L) {
             buildStarted = 0L
-            try {
-                val request = StartupMenuManager.defaultLauncherRequest(this)
-                if (request != null) {
-                    choosingDefaultLauncher = true
-                    defaultLauncherResult.launch(request)
-                    return
-                }
-            } catch (error: Exception) {
-                choosingDefaultLauncher = false
-                Tuils.log(error)
-                Toast.makeText(this, R.string.startup_default_launcher_unavailable, Toast.LENGTH_LONG).show()
-            }
-            close(checkNotNull(buildResult))
+            completeSetup()
             return
         }
         main.postDelayed(buildTick, 100)
+    }
+
+    private fun completeSetup() {
+        StartupMenuManager.queueDefaultLauncherAfterClose(this)
+        close(checkNotNull(buildResult))
     }
 
     // Display-only pseudo-code; settings are applied exclusively by StartupMenuManager.finish.

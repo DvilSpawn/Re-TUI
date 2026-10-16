@@ -81,4 +81,11 @@ class IrcNavigationTest {
             assertEquals(0, s.active.unread)
         }
     }
+
+    @Test fun namesCanRefreshTheChannelThatJustRejoined() {
+        val s = IrcState(); val frames = mutableListOf<String>(); val a = IrcActions(s) { c, p, t -> frames.add(IrcProtocol.line(c, p, t)) }
+        s.buffer("#retui").joined = true
+        a.names("#retui")
+        assertEquals(listOf("NAMES #retui\r\n"), frames); assertTrue(s.buffer("#retui").namesLoading)
+    }
 }

@@ -1,0 +1,10 @@
+{
+  "package": "com.dvil.tui_renewed",
+  "versionCode": 503,
+  "apk": "/Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/build/ship-candidate/retui-3-build503-first-run-fixes.apk",
+  "sha256": "8d2a099a94277dd6d65e16db2c06af724e1b9ac6c654e20dfab592e84a34bc71",
+  "installed_sha256": "8d2a099a94277dd6d65e16db2c06af724e1b9ac6c654e20dfab592e84a34bc71",
+  "certificate_sha256": "f1f50b573286bfbd59b8bfbb39d202ea3adf173f12077d98110bb9ed981b93f2",
+  "data_preserved": true,
+  "catalog": "https://re-tui.pages.dev/calculator-packs/catalog.json"
+}

@@ -1,0 +1,17 @@
+HTTP/1.1 200 OK
+Server: nginx
+Date: Fri, 16 Oct 2026 09:04:39 GMT
+Content-Type: application/octet-stream
+Content-Length: 14016
+Last-Modified: Fri, 16 Oct 2026 06:45:17 GMT
+Connection: keep-alive
+ETag: "6ad1c7fd-36c0"
+Cache-Control: public,max-age=30,s-maxage=30,must-revalidate,no-transform
+Accept-Ranges: bytes
+
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+  0     0    0     0    0     0      0      0 --:--:--  0:00:01 --:--:--     0
+  0 14016    0     0    0     0      0      0 --:--:--  0:00:01 --:--:--     0

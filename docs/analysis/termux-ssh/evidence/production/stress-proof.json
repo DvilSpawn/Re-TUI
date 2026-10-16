@@ -1,0 +1,34 @@
+{
+  "payload_bytes": 65536,
+  "sha256": "7d7c65ae98f754eb7e0d0e64f9fe3e2bb3cf1954f26ca1bfa3d149e680296630",
+  "remote_burst_bytes": 20480,
+  "observed_stream_bytes": 45054,
+  "reconnects": [
+    {
+      "round": 1,
+      "job_pid": "20403",
+      "pty": "92x28"
+    },
+    {
+      "round": 2,
+      "job_pid": "20403",
+      "pty": "96x29"
+    },
+    {
+      "round": 3,
+      "job_pid": "20403",
+      "pty": "100x30"
+    },
+    {
+      "round": 4,
+      "job_pid": "20403",
+      "pty": "104x31"
+    },
+    {
+      "round": 5,
+      "job_pid": "20403",
+      "pty": "108x32"
+    }
+  ],
+  "bounds": "Raw-mode remote SHA proves bulk input; tmux may coalesce the 20 KiB burst before SSH delivery. A fresh emulator verifies Unicode and persistent redraw after each new SSH connection."
+}

@@ -54,6 +54,30 @@ class BackupManagerTest {
     }
 
     @Test
+    fun personalBackupKeepsCalculatorHistoryAndOptions() {
+        assertTrue(BackupManager.personalSharedPreferenceNames().contains("calculator"))
+    }
+
+    @Test
+    fun personalBackupExcludesDownloadedEnginesButKeepsCalculatorUserFiles() {
+        val root = Files.createTempDirectory("calculator-backup").toFile()
+        try {
+            val downloads = File(root, "calculator-engines").apply { mkdir() }
+            val archive = File(downloads, "qalculate-5.8.2.retui.calc.engine").apply { writeText("engine") }
+            val note = File(root, "calculator-notes.txt").apply { writeText("my calculations") }
+            assertFalse(BackupManager.isBackupCandidate(downloads, "calculator-engines"))
+            assertFalse(BackupManager.isBackupCandidate(archive, "calculator-engines/${archive.name}"))
+            val wallpapers = File(root, "wallpaper-downloads").apply { mkdir() }
+            val wallpaper = File(wallpapers, "clouds.retui-wallpaper").apply { writeText("wallpaper") }
+            assertFalse(BackupManager.isBackupCandidate(wallpapers, wallpapers.name))
+            assertFalse(BackupManager.isBackupCandidate(wallpaper, "${wallpapers.name}/${wallpaper.name}"))
+            assertTrue(BackupManager.isBackupCandidate(note, note.name))
+            assertTrue(BackupManager.personalSharedPreferenceNames().contains("calculator"))
+            assertTrue(BackupManager.personalSharedPreferenceNames().contains("retui_wallpaper"))
+        } finally { root.deleteRecursively() }
+    }
+
+    @Test
     fun personalBackupIncludesFramePreferenceState() {
         assertTrue(BackupManager.personalSharedPreferenceNames().contains("retui_frames"))
     }

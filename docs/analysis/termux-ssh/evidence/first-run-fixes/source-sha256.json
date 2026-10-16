@@ -1,0 +1,12 @@
+{
+  "app/src/main/java/ohi/andre/consolelauncher/LauncherActivity.kt": "dd4f19358176551ac3593ee3ea2afb2d9b37cfffd21fa2bd2cb584970195ea07",
+  "app/src/main/java/ohi/andre/consolelauncher/managers/onboarding/StartupMenuManager.kt": "d60a517888219c5932498e9668543ac6e0f00554f60936cd1a8998b301d0139d",
+  "app/src/main/java/ohi/andre/consolelauncher/calculator/CalculatorActivity.kt": "a98aac1ae91c7c824eaa23c39ce8867889726763036811d5faa59f5cf644a5eb",
+  "app/src/main/java/ohi/andre/consolelauncher/calculator/CalculatorEngine.kt": "68ba458656e4e60fff9ddb69abea02f3d8dd638fc49b4a06bc3c6f0cec761d83",
+  "app/src/main/java/ohi/andre/consolelauncher/calculator/CalculatorPackStore.kt": "b428edaf2a5a11e28db2731b6778541ca9a83259dac58017526207a88e8b002c",
+  "app/src/main/java/ohi/andre/consolelauncher/managers/BackupManager.kt": "e197b9bcd96d8214b7edcb358dddd93f0c38791e61dff73ebe970b1783b02dfa",
+  "app/build.gradle": "cc08ebda61b6ceb66f470924fce45b93e45fb3cd43db706ec23792dd34ee7f9c",
+  "app/src/androidTest/java/ohi/andre/consolelauncher/calculator/CalculatorPreviewIntegrationTest.kt": "b67a7b9391859a6529d93a6fb9b5559027340a7bf2fe266522ef232381247a6b",
+  "app/src/androidTest/java/ohi/andre/consolelauncher/calculator/CalculatorInlineEnhancementTest.kt": "5e800d3dcb87b14ec18816f682e41c5b098c3ef16914cbfd68c0075e60917b8f",
+  "app/src/androidTest/java/ohi/andre/consolelauncher/managers/onboarding/StartupFlowIntegrationTest.kt": "cde735488cabaa25fffd7af12d073dc65df99455fc31070122e88df121fb45e7"
+}

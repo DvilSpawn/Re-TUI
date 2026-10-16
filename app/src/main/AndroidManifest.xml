@@ -17,6 +17,7 @@
         android:resizeable="true"
         android:smallScreens="true" />
 
+
     <!-- permissions -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.FLASHLIGHT" />
@@ -193,6 +194,7 @@
             android:exported="false"
             android:foregroundServiceType="mediaPlayback" />
 
+        <activity android:name=".commands.tuixt.PresetMarketplaceActivity" android:exported="false" android:theme="@style/Custom.Solid" />
         <activity
             android:name=".commands.tuixt.PresetImportActivity"
             android:label="@string/portable_preset_import"
@@ -230,6 +232,8 @@
             android:label="@string/activity_label_ce041b1ca7"
             android:theme="@style/Custom.SystemWP"
             android:exported="false" />
+
+        <activity android:name=".wallpaper.WallpaperGalleryActivity" android:exported="false" android:theme="@style/Custom.Solid" />
 
         <activity
             android:name=".wallpaper.RetuiWallpaperActivity"
@@ -312,6 +316,17 @@
             android:theme="@style/RememberTheme"
             android:windowSoftInputMode="adjustNothing"
             android:exported="false" />
+        <activity android:name=".calculator.CalculatorPackActivity"
+            android:exported="true" android:excludeFromRecents="true"
+            android:label="@string/optional_calculator_title" android:theme="@style/Custom.Solid">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:mimeType="application/vnd.retui.calculator-engine+zip" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".calculator.CalculatorActivity"
             android:alwaysRetainTaskState="true"
@@ -321,10 +336,6 @@
             android:taskAffinity="${applicationId}.calculator"
             android:theme="@style/Custom.Floating"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden"
-            android:exported="false" />
-        <service
-            android:name=".calculator.QalculateService"
-            android:process=":qalculate"
             android:exported="false" />
         <activity android:name=".notes.SettingsActivity" android:exported="false" android:theme="@style/RememberTheme" />
         <provider android:name="androidx.core.content.FileProvider" android:authorities="${applicationId}.files" android:exported="false" android:grantUriPermissions="true">

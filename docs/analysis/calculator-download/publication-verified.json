@@ -1,0 +1,85 @@
+{
+  "verified_at_utc": "2026-10-16T02:55:06.235973+00:00",
+  "published": true,
+  "deployment": "https://9ac2ae0e.re-tui.pages.dev",
+  "baseline_commit": "9b26d36cd4c89069d604569b90814f353f7d2f8e",
+  "only_new_public_files": [
+    "docs/calculator-packs/qalculate-5.8.2-source.tar.gz",
+    "docs/calculator-packs/catalog.json",
+    "docs/calculator-packs/SHA256SUMS",
+    "docs/calculator-packs/qalculate-5.8.2.retui.calc.engine"
+  ],
+  "checks": [
+    {
+      "url": "https://re-tui.pages.dev/calculator-packs/SHA256SUMS",
+      "status": 200,
+      "bytes": 196,
+      "sha256": "710a6a9f4768bcab945e3d6212271e9908058c05c6b45c58d4cb6913c82b3d85",
+      "content_type": "application/octet-stream",
+      "matches_reviewed_asset": true,
+      "attempts": 1,
+      "passed": true
+    },
+    {
+      "url": "https://re-tui.pages.dev/calculator-packs/catalog.json",
+      "status": 200,
+      "bytes": 386,
+      "sha256": "7c691bce7c97e0821a63bc3b79685b0a4049a6ccdb158230ec6c789cb94e2acc",
+      "content_type": "application/json",
+      "matches_reviewed_asset": true,
+      "attempts": 1,
+      "passed": true
+    },
+    {
+      "url": "https://re-tui.pages.dev/calculator-packs/qalculate-5.8.2-source.tar.gz",
+      "status": 200,
+      "bytes": 8366546,
+      "sha256": "f15d2f782f60b04a5da9ffc0f422b21231638d06be29e2587f3b88a697f0dd01",
+      "content_type": "application/gzip",
+      "matches_reviewed_asset": true,
+      "attempts": 1,
+      "passed": true
+    },
+    {
+      "url": "https://re-tui.pages.dev/calculator-packs/qalculate-5.8.2.retui.calc.engine",
+      "status": 200,
+      "bytes": 1344544,
+      "sha256": "9449fd086db0a512f440b3038588e009274c259f36ee56d984f4fd8991ee55e3",
+      "content_type": "application/octet-stream",
+      "matches_reviewed_asset": true,
+      "attempts": 1,
+      "passed": true
+    },
+    {
+      "url": "https://re-tui.pages.dev/",
+      "status": 200,
+      "bytes": 3841,
+      "sha256": "170354bc3567a538e54962d16b3219baeddc1cdb59a6deaa795b6ad0d9d60d5a",
+      "content_type": "text/html; charset=utf-8",
+      "matches_reviewed_asset": false,
+      "attempts": 1,
+      "passed": true
+    },
+    {
+      "url": "https://re-tui.pages.dev/marketplace.html",
+      "status": 200,
+      "bytes": 14855,
+      "sha256": "c47a48e23bec989649c0d8f8a01923b5af8c646a65489d754f0b5d6198003c62",
+      "content_type": "text/html; charset=utf-8",
+      "matches_reviewed_asset": false,
+      "attempts": 1,
+      "passed": true
+    },
+    {
+      "url": "https://re-tui.pages.dev/api/presets",
+      "status": 200,
+      "bytes": 11300,
+      "sha256": "daf8632f502d6060420ad4dc8fe85cb0d631f4c798bb09d816f8402e4c38ca87",
+      "content_type": "application/json; charset=utf-8",
+      "matches_reviewed_asset": false,
+      "attempts": 1,
+      "passed": true
+    }
+  ],
+  "passed": true
+}

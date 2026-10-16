@@ -399,6 +399,8 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
                         showBackupProtectionDialog()
                     } else if (fileName == HubAction.CREATE_SHAREABLE_CONFIGURATION.name) {
                         showShareableConfigurationSourcePicker()
+                    } else if (fileName == HubAction.PRESET_MARKETPLACE.name) {
+                        openSettingsChild(Intent(this@ThemerActivity, PresetMarketplaceActivity::class.java))
                     } else if (fileName == HubAction.IMPORT_RETUI_PRESET.name) {
                         openSettingsChild(Intent(this@ThemerActivity, PresetImportActivity::class.java).setAction(Intent.ACTION_MAIN))
                     } else if (fileName == HubAction.RESTORE.name) {
@@ -594,6 +596,7 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
         BACKUP(R.string.hub_backup),
         CREATE_SHAREABLE_CONFIGURATION(R.string.hub_create_shareable_configuration),
         IMPORT_RETUI_PRESET(R.string.portable_preset_import),
+        PRESET_MARKETPLACE(R.string.preset_market_title),
         RESTORE(R.string.hub_restore),
         RATE_THE_APP(R.string.hub_rate_the_app),
         GITHUB(R.string.hub_github),
@@ -706,7 +709,7 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
             ensurePendingFontChanges()
             return mutableListOf(FONT_SCALE_PANEL)
         } else if (SECTION_PRESETS == section) {
-            return mutableListOf(HubAction.SAVE_CURRENT_AS_PRESET.name, HubAction.APPLY_PRESET.name, HubAction.REMOVE_PRESET.name)
+            return mutableListOf(HubAction.SAVE_CURRENT_AS_PRESET.name, HubAction.PRESET_MARKETPLACE.name, HubAction.APPLY_PRESET.name, HubAction.REMOVE_PRESET.name)
         } else if (SECTION_FRAMES == section) {
             return mutableListOf(FRAME_PANEL)
         } else if (SECTION_PRESET_APPLY == section) {
@@ -2308,6 +2311,11 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
     }
 
     private fun launchLiveWallpaperPicker() {
+        if (!ohi.andre.consolelauncher.wallpaper.WallpaperLibrary.available(this,
+                ohi.andre.consolelauncher.wallpaper.RetuiWallpaperSettings.scene(this))) {
+            openSettingsChild(Intent(this, RetuiWallpaperActivity::class.java))
+            return
+        }
         try {
             startActivity(
                 Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER).apply {

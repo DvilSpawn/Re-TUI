@@ -1,0 +1,26 @@
+[
+  {
+    "name": "SHA256SUMS",
+    "bytes": 196,
+    "sha256": "710a6a9f4768bcab945e3d6212271e9908058c05c6b45c58d4cb6913c82b3d85",
+    "liveMatchesLocal": true
+  },
+  {
+    "name": "catalog.json",
+    "bytes": 386,
+    "sha256": "7c691bce7c97e0821a63bc3b79685b0a4049a6ccdb158230ec6c789cb94e2acc",
+    "liveMatchesLocal": true
+  },
+  {
+    "name": "qalculate-5.8.2-source.tar.gz",
+    "bytes": 8366546,
+    "sha256": "f15d2f782f60b04a5da9ffc0f422b21231638d06be29e2587f3b88a697f0dd01",
+    "liveMatchesLocal": true
+  },
+  {
+    "name": "qalculate-5.8.2.retui.calc.engine",
+    "bytes": 1344544,
+    "sha256": "9449fd086db0a512f440b3038588e009274c259f36ee56d984f4fd8991ee55e3",
+    "liveMatchesLocal": true
+  }
+]

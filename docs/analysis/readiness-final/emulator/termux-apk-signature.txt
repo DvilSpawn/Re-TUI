@@ -1,0 +1,4 @@
+Signer #1 certificate DN: CN=APK Signer, OU=Earth, O=Earth
+Signer #1 certificate SHA-256 digest: b6da01480eefd5fbf2cd3771b8d1021ec791304bdd6c4bf41d3faabad48ee5e1
+Signer #1 certificate SHA-1 digest: 517955eabf69fc057c41c7d379dbbcef20ad85f2
+Signer #1 certificate MD5 digest: 31d49355a0cb585498aab40be822c3be

@@ -1,0 +1,10 @@
+{
+  "serial": "adb-10BE1C0FB40006A-RwuKbp._adb-tls-connect._tcp",
+  "package": "com.dvil.tui_renewed.termuxsshreleasecheck",
+  "installed_base_path": "/data/app/~~NGrHRHYcO7fwWkZYdup35w==/com.dvil.tui_renewed.termuxsshreleasecheck-8URlwxxV70r7uqKBsJoYYw==/base.apk",
+  "installed_apk_sha256": "2d2465084ea333b370b070d9ea09180f1d10e9d08a53f2de9a04695f6e8c6ce2",
+  "candidate_sha256": "2d2465084ea333b370b070d9ea09180f1d10e9d08a53f2de9a04695f6e8c6ce2",
+  "exact_installed_artifact_matches": true,
+  "minified_physical_checks": 4,
+  "minified_api23_checks": 3
+}

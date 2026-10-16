@@ -1,0 +1,52 @@
+{
+  "removed_owned_windows": [],
+  "windows_before": [],
+  "windows_after": [],
+  "sessions_after": [],
+  "dedicated_listener_pid": "30154",
+  "dedicated_listener_cmd": "/data/data/com.termux/files/usr/bin/sshd -D -e -f /data/data/com.termux/files/home/.retui/ssh/sshd_config ",
+  "normal_daemon_not_diagnostic": true,
+  "personal_ssh_settings_modified": false,
+  "uninstalled_temporary_packages": [
+    "com.dvil.tui_renewed.termuxlegacydebug.test",
+    "com.dvil.tui_renewed.termuxlegacydebug",
+    "com.dvil.tui_renewed.termuxsshreleasecheck.test",
+    "com.dvil.tui_renewed.termuxsshreleasecheck"
+  ],
+  "kept_debug_candidate_and_tests": true,
+  "production_launcher_replaced": false,
+  "explicit_server_environment_audit": [
+    {
+      "args": [
+        "list-sessions",
+        "-F",
+        "#{session_name}:#{session_attached}"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "list-windows",
+        "-a",
+        "-F",
+        "#{session_name}:#{window_id}:#{window_name}"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "no current target\n"
+    },
+    {
+      "args": [
+        "has-session",
+        "-t",
+        "=retui_workspace"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "no current target\n"
+    }
+  ],
+  "fixture_cleanup_note": "No sessions/windows were present at final audit; original three owned fixture names were already absent. No tmux windows deleted in final cleanup."
+}

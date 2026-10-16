@@ -1,0 +1,40 @@
+{
+  "unit": {
+    "tests": 457,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 5
+  },
+  "enabledTestsPassed": 452,
+  "builds": {
+    "debug": {
+      "path": "app/build/outputs/apk/playstore/debug/app-playstore-debug.apk",
+      "sha256": "964c50662ae7b966d20f029c0ea9459a4b2245b91850c5b48fdb3d83d2bc2c47",
+      "installed": false
+    },
+    "androidTest": {
+      "path": "app/build/outputs/apk/androidTest/playstore/debug/app-playstore-debug-androidTest.apk",
+      "sha256": "9f40c9c6738099d369b0c6012a3bbc794f8aaf9563eb34a08493bffe2f0aa826",
+      "installed": false
+    }
+  },
+  "releaseLint": {
+    "status": "incomplete",
+    "reason": "Stopped combined run after more than ten minutes with lintAnalyzePlaystoreRelease still in Kotlin analysis. No result from the previous source snapshot is substituted."
+  },
+  "releasePackaging": "Not completed for this reconciled checkpoint. The phone retains the prior validated candidate.",
+  "localizationExportCheck": "passed; 3677 keys",
+  "sourceWhitespaceCheck": {
+    "status": "passed",
+    "excluded": "Unmodified upstream license whitespace and raw docs/analysis evidence whitespace retained."
+  },
+  "otherSixWorktrees": {
+    "headStatusAndContentUnchanged": true
+  },
+  "recovery": {
+    "branchBundleVerified": true,
+    "untrackedArchiveSha256Verified": true,
+    "stashesPreserved": 3
+  },
+  "note": "Initial suite identified missing bundled coverage for restored Re:Member frame target; mapping fixed and all 457 tests rerun successfully."
+}

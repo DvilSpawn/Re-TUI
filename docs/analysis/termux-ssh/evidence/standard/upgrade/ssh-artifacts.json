@@ -1,0 +1,21 @@
+{
+  "sshEnabled": true,
+  "artifacts": [
+    {
+      "package": "com.dvil.tui_renewed.termuxsshdebug",
+      "path": "/Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/build/validated-standard-upgrade/ssh/app.apk",
+      "sha256": "587538abdba3bdee5c1135b24bac037c18f3d9e56d2c0d74a46b36c9259121f6",
+      "bytes": 17621023
+    },
+    {
+      "package": "com.dvil.tui_renewed.termuxsshdebug.test",
+      "path": "/Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/build/validated-standard-upgrade/ssh/test.apk",
+      "sha256": "93831c1f649a753eaf6c660c92155703e47b9bdd8f4922c1ff5d69aa59b3ed85",
+      "bytes": 1191926
+    }
+  ],
+  "appUidBefore": "11160",
+  "appUidAfter": "11160",
+  "seedCacheSurvivedUnchanged": true,
+  "updateUsedInstallReplaceOnly": true
+}

@@ -1,0 +1,41 @@
+{
+  "upstream_commit": "5b657c6adf4304e5198951ce815fe0205dcac29c",
+  "tmux_version": "tmux 3.6b",
+  "checks": [
+    "Fragmented escape sequences, fragmented UTF-8, wide glyphs and strict octal decoding",
+    "One control connection routes two windows to separate emulator buffers",
+    "Real tmux output preserves Unicode, wide cells and escaped backslash",
+    "200-line output burst scrolls to the same visible state as tmux without dropped bytes",
+    "Live alternate screen, hidden cursor and true color agree with tmux screen text",
+    "Reconnect: single-screen seed loses normal buffer; two-screen seed restores the tested transition",
+    "Changed geometry affects only the intended window/emulator",
+    "Emulator terminal-query replies are intercepted, not injected into tmux input",
+    "24 paired keystrokes reach both snapshot and emulator paths without loss",
+    "Disconnecting the observer leaves both shells/jobs running"
+  ],
+  "benchmarks": {
+    "existing_helper_input_to_snapshot": {
+      "samples": 24,
+      "median_ms": 285.25,
+      "p95_ms": 864.34,
+      "max_ms": 920.23
+    },
+    "same_helper_input_to_emulator": {
+      "samples": 24,
+      "median_ms": 40.56,
+      "p95_ms": 57.75,
+      "max_ms": 110.88
+    },
+    "persistent_control_input_to_emulator": {
+      "samples": 24,
+      "median_ms": 0.38,
+      "p95_ms": 0.85,
+      "max_ms": 0.88
+    }
+  },
+  "limits": [
+    "Host JVM buffer-state proof; no Android Canvas/IME/frame/battery measurement",
+    "Fresh raw-echo fixture, not a complete reconnect implementation or interactive editor test",
+    "No network/Android socket transport is included in the persistent control measurements"
+  ]
+}

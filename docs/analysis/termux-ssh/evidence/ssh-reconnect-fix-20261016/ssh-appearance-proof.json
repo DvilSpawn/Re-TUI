@@ -1,0 +1,10 @@
+{
+  "cycles": 73,
+  "reconnects": 24,
+  "loop_ms": 120203,
+  "remote_pids_preserved": true,
+  "both_tiles_resized": true,
+  "control_clients_restored_each_pause": true,
+  "diagnostic_daemon": false,
+  "pre_existing_control_clients": 0
+}

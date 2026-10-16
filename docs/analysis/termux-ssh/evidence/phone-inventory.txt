@@ -1,0 +1,8 @@
+Serial: 10BE1C0FB40006A
+Android: 16 / API 36
+Termux: 0.118.3 versionCode 1002, debuggable
+Launcher installed: versionCode 502 / versionName 3
+tmux 3.7b
+0.4.4
+OpenSSH_10.3p1, OpenSSL 3.6.3 9 Jun 2026
+OpenSSH_10.3p1, OpenSSL 3.6.3 9 Jun 2026

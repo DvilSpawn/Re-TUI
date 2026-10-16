@@ -23,24 +23,6 @@ public class PresetFixtureProvider extends ContentProvider {
     @Override public Uri insert(Uri uri, ContentValues values) { throw new UnsupportedOperationException(); }
     @Override public int delete(Uri uri, String selection, String[] selectionArgs) { return 0; }
     @Override public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) { return 0; }
-    @Override public android.os.Bundle call(String method, String argument, android.os.Bundle extras) {
-        if (!"read-share".equals(method)) return null;
-        android.os.Bundle result = new android.os.Bundle();
-        result.putInt("uid", android.os.Process.myUid());
-        Uri uri = Uri.parse(argument);
-        // Read as the recipient process, rather than inheriting the sender's Binder identity.
-        long identity = android.os.Binder.clearCallingIdentity();
-        try (java.io.InputStream input = getContext().getContentResolver().openInputStream(uri)) {
-            java.io.ByteArrayOutputStream bytes = new java.io.ByteArrayOutputStream();
-            byte[] buffer = new byte[8192];
-            int count;
-            while ((count = input.read(buffer)) != -1) bytes.write(buffer, 0, count);
-            result.putByteArray("bytes", bytes.toByteArray());
-            result.putString("mime", getContext().getContentResolver().getType(uri));
-        } catch (Exception error) { result.putString("error", error.toString()); }
-        finally { android.os.Binder.restoreCallingIdentity(identity); }
-        return result;
-    }
     @Override public ParcelFileDescriptor openFile(Uri uri, String mode) throws FileNotFoundException {
         String variant = uri.getLastPathSegment();
         if (!"r".equals(mode) || !("legacy.retui-backup".equals(variant) || "selected.retui".equals(variant) || "personal.retui".equals(variant)))

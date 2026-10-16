@@ -3,15 +3,22 @@ package ohi.andre.consolelauncher.commands.tuixt
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.localization.LocalizedComponentActivity
 import ohi.andre.consolelauncher.managers.BackupManager
 import ohi.andre.consolelauncher.managers.PresetManager
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager.XMLPrefsRoot
+import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
+import ohi.andre.consolelauncher.managers.settings.LauncherSettings
+import ohi.andre.consolelauncher.tuils.LauncherSystemUi
+import ohi.andre.consolelauncher.tuils.Tuils
 import ohi.andre.consolelauncher.tuils.displayMessage
 import java.io.File
 import java.util.concurrent.Executors
@@ -22,22 +29,42 @@ class PresetImportActivity : LocalizedComponentActivity() {
     private var staged: BackupManager.StagedPreset? = null
     @Volatile private var leaving = false
     private var saving = false
+    private var pendingIntent: Intent? = null
+    @Volatile private var inspection = 0
     private lateinit var preview: TextView
     private lateinit var confirm: Button
+    private lateinit var chooseFile: Button
 
     override fun onCreate(state: Bundle?) {
         super.onCreate(state)
+        XMLPrefsManager.loadCommons(this)
+        LauncherSettings.refreshFromLoadedPrefs()
+        LauncherSystemUi.applyFullscreen(this)
         onBackPressedDispatcher.addCallback(this, object : androidx.activity.OnBackPressedCallback(true) {
             override fun handleOnBackPressed() { if (!saving) finish() }
         })
         val layout = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(24, 24, 24, 24)
         }
         TuixtTheme.styleScreen(this, layout)
-        preview = TextView(this).apply { setText(R.string.portable_preset_inspecting); setTextIsSelectable(true) }
+        layout.addView(TextView(this).apply {
+            setText(R.string.portable_preset_import)
+            TuixtTheme.styleHeader(this@PresetImportActivity, this)
+        }, LinearLayout.LayoutParams(-1, -2).apply { bottomMargin = dp(12) })
+        preview = TextView(this).apply {
+            setText(R.string.portable_preset_inspecting)
+            setTextIsSelectable(true)
+            typeface = Tuils.getTypeface(this@PresetImportActivity)
+            textSize = 14f
+            setLineSpacing(dp(4).toFloat(), 1f)
+            setPadding(dp(14), dp(14), dp(14), dp(14))
+            accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE
+        }
         preview.setTextColor(TuixtTheme.textColor())
-        layout.addView(ScrollView(this).apply { addView(preview) }, LinearLayout.LayoutParams(-1, 0, 1f))
+        layout.addView(ScrollView(this).apply {
+            addView(preview)
+            TuixtTheme.stylePanel(this@PresetImportActivity, this)
+        }, LinearLayout.LayoutParams(-1, 0, 1f).apply { bottomMargin = dp(12) })
         confirm = Button(this).apply {
             setText(R.string.portable_preset_confirm)
             isEnabled = false
@@ -45,21 +72,51 @@ class PresetImportActivity : LocalizedComponentActivity() {
             setOnClickListener { savePreset() }
         }
         layout.addView(confirm)
+        chooseFile = Button(this).apply {
+            setText(R.string.portable_preset_choose_file)
+            visibility = View.GONE
+            TuixtTheme.styleButton(this@PresetImportActivity, this, true)
+            setOnClickListener { startActivityForResult(pickerIntent(), PICK_PRESET) }
+        }
+        layout.addView(chooseFile)
         layout.addView(Button(this).apply {
             setText(R.string.portable_preset_cancel)
             TuixtTheme.styleButton(this@PresetImportActivity, this, false)
             setOnClickListener { if (!saving) finish() }
         })
         setContentView(layout)
+        ViewCompat.setOnApplyWindowInsetsListener(layout) { view, insets ->
+            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
+            view.setPadding(bars.left + dp(12), bars.top + dp(12), bars.right + dp(12), bars.bottom + dp(12))
+            insets
+        }
+        ViewCompat.requestApplyInsets(layout)
+        readIntent(state)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        if (saving) { pendingIntent = intent; return }
+        setIntent(intent)
+        readIntent(null)
+    }
+
+    private fun readIntent(state: Bundle?) {
+        ++inspection
+        worker.execute { staged?.close(); staged = null }
         try {
             if (intent.action == Intent.ACTION_MAIN) {
                 if (state == null) startActivityForResult(pickerIntent(), PICK_PRESET)
                 else finish() // A recreation cancels inspection rather than retaining untrusted extras.
             } else {
-                require(intent.type == BackupManager.PRESET_MIME) { "Unsupported preset MIME type" }
+                // Download providers sometimes replace the custom MIME type with ZIP or binary.
+                // The private archive inspection remains the authority on package contents.
+                val mime = intent.type?.substringBefore(';')?.trim()?.lowercase(java.util.Locale.ROOT)
+                require(mime == null || mime in setOf(BackupManager.PRESET_MIME, "application/zip", "application/octet-stream", "application/x-zip-compressed")) { "Unsupported preset MIME type" }
                 val uri = when (intent.action) {
-                    Intent.ACTION_VIEW -> intent.data
+                    Intent.ACTION_VIEW -> intent.data ?: intent.clipData?.takeIf { it.itemCount == 1 }?.getItemAt(0)?.uri
                     Intent.ACTION_SEND -> intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)
+                        ?: intent.clipData?.takeIf { it.itemCount == 1 }?.getItemAt(0)?.uri
                     else -> throw IllegalArgumentException("Unsupported preset action")
                 }
                 inspect(requireNotNull(uri) { "Preset URI is missing" })
@@ -77,8 +134,16 @@ class PresetImportActivity : LocalizedComponentActivity() {
     }
 
     private fun inspect(uri: Uri) {
+        val request = ++inspection
+        confirm.visibility = View.VISIBLE
+        confirm.isEnabled = false
+        confirm.setText(R.string.portable_preset_confirm)
+        confirm.setOnClickListener { savePreset() }
+        chooseFile.visibility = View.GONE
+        preview.setText(R.string.portable_preset_inspecting)
         worker.execute {
             try {
+                staged?.close(); staged = null
                 require(uri.scheme == "content" && !uri.authority.isNullOrBlank()) { "Only readable content:// preset URIs are supported" }
                 // Do not lend this app's private provider access to an untrusted caller.
                 // Android strips user-id prefixes when opening URIs; reject them before authority checks.
@@ -90,7 +155,7 @@ class PresetImportActivity : LocalizedComponentActivity() {
                 require(provider?.applicationInfo?.uid != applicationInfo.uid || cachedShare) { "Choose the exported preset from a document provider" }
                 val source = requireNotNull(contentResolver.openInputStream(uri)) { "Unable to read preset URI" }
                 val result = BackupManager.inspectPreset(source, File(cacheDir, "preset-import"))
-                if (leaving) { result.close(); return@execute }
+                if (leaving || request != inspection) { result.close(); return@execute }
                 staged = result
                 val behavior = File(result.folder, XMLPrefsRoot.BEHAVIOR.path)
                 val behaviorPreview = if (!behavior.isFile) getString(R.string.portable_preset_no_behavior)
@@ -99,11 +164,11 @@ class PresetImportActivity : LocalizedComponentActivity() {
                 val text = getString(R.string.portable_preset_preview, result.name, result.sections,
                     result.producerVersion.ifBlank { getString(R.string.portable_preset_unknown_version) }, result.schema, behaviorPreview)
                 runOnUiThread {
-                    if (!leaving) { preview.text = text; confirm.isEnabled = true }
+                    if (!leaving && request == inspection) { preview.text = text; confirm.isEnabled = true }
                 }
             } catch (error: Exception) {
                 staged?.close(); staged = null
-                runOnUiThread { if (!leaving) showError(error) }
+                runOnUiThread { if (!leaving && request == inspection) showError(error) }
             }
         }
     }
@@ -123,17 +188,28 @@ class PresetImportActivity : LocalizedComponentActivity() {
                         confirm.setOnClickListener { finish() }
                     }
                     saving = false
+                    if (!leaving) pendingIntent?.let { pendingIntent = null; onNewIntent(it) }
                 }
             } catch (error: Exception) {
-                runOnUiThread { saving = false; if (!leaving) showError(error) }
+                runOnUiThread {
+                    saving = false
+                    if (!leaving) {
+                        showError(error)
+                        pendingIntent?.let { pendingIntent = null; onNewIntent(it) }
+                    }
+                }
             } finally { staged?.close(); staged = null }
         }
     }
 
     private fun showError(error: Exception) {
         confirm.isEnabled = false
+        confirm.visibility = View.GONE
+        chooseFile.visibility = View.VISIBLE
         preview.text = getString(R.string.portable_preset_error, error.displayMessage(this) ?: error.javaClass.simpleName)
     }
+
+    private fun dp(value: Int) = TuixtTheme.dp(this, value.toFloat())
 
     override fun onDestroy() {
         leaving = true

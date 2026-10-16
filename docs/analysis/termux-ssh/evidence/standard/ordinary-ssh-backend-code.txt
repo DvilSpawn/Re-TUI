@@ -1,0 +1,20 @@
+Ordinary standard release APK: app/build/validated-ssh-standard/app-playstore-standard-release.apk
+Class: TermuxWorkspaceActivity
+name          : 'getSshEnabled'
+      type          : '()Z'
+      access        : 0x0012 (PRIVATE FINAL)
+      code          -
+      registers     : 1
+      ins           : 1
+      outs          : 0
+      insns size    : 2 16-bit code units
+2dbbb0:                                        |[2dbbb0] ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceActivity.getSshEnabled:()Z
+2dbbc0: 1210                                   |0000: const/4 v0, #int 1 // #1
+2dbbc2: 0f00                                   |0001: return v0
+      catches       : (none)
+      positions     :
+        0x0000 line=1
+        0x0001 line=2
+      locals        :
+        0x0000 - 0x0002 reg=0 this Lohi/andre/consolelauncher/managers/termux/TermuxWorkspaceActivity;
+

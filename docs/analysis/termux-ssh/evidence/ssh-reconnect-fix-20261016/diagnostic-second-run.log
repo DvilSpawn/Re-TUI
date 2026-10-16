@@ -1,0 +1,41 @@
+INSTRUMENTATION_STATUS: class=ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceSshAppearanceTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=1
+INSTRUMENTATION_STATUS: stream=
+ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceSshAppearanceTest:
+INSTRUMENTATION_STATUS: test=defaultSshAppearanceResizesBothRemoteTilesAndPreservesDraftAcrossReconnect
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceSshAppearanceTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=1
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: Both tiles and colon draft must survive foreground reconnect
+	at org.junit.Assert.fail(Assert.java:89)
+	at ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceSshAppearanceTest.await(TermuxWorkspaceSshAppearanceTest.kt:88)
+	at ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceSshAppearanceTest.defaultSshAppearanceResizesBothRemoteTilesAndPreservesDraftAcrossReconnect(TermuxWorkspaceSshAppearanceTest.kt:250)
+
+INSTRUMENTATION_STATUS: stream=
+Error in defaultSshAppearanceResizesBothRemoteTilesAndPreservesDraftAcrossReconnect(ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceSshAppearanceTest):
+java.lang.AssertionError: Both tiles and colon draft must survive foreground reconnect
+	at org.junit.Assert.fail(Assert.java:89)
+	at ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceSshAppearanceTest.await(TermuxWorkspaceSshAppearanceTest.kt:88)
+	at ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceSshAppearanceTest.defaultSshAppearanceResizesBothRemoteTilesAndPreservesDraftAcrossReconnect(TermuxWorkspaceSshAppearanceTest.kt:250)
+
+INSTRUMENTATION_STATUS: test=defaultSshAppearanceResizesBothRemoteTilesAndPreservesDraftAcrossReconnect
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_RESULT: stream=
+
+Time: 68.664
+There was 1 failure:
+1) defaultSshAppearanceResizesBothRemoteTilesAndPreservesDraftAcrossReconnect(ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceSshAppearanceTest)
+java.lang.AssertionError: Both tiles and colon draft must survive foreground reconnect
+	at org.junit.Assert.fail(Assert.java:89)
+	at ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceSshAppearanceTest.await(TermuxWorkspaceSshAppearanceTest.kt:88)
+	at ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceSshAppearanceTest.defaultSshAppearanceResizesBothRemoteTilesAndPreservesDraftAcrossReconnect(TermuxWorkspaceSshAppearanceTest.kt:250)
+
+FAILURES!!!
+Tests run: 1,  Failures: 1
+
+
+INSTRUMENTATION_CODE: -1

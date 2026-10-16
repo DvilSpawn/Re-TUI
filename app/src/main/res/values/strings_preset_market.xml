@@ -1,0 +1,13 @@
+<resources>
+    <string name="preset_market_title">Preset marketplace</string>
+    <string name="preset_market_intro">Preview a palette, then download and import it. Apply it later with preset -apply. Your current look stays as it is.</string>
+    <string name="preset_market_loading">Loading…</string>
+    <string name="preset_market_error">Could not complete this request: %1$s</string>
+    <string name="preset_market_retry">Retry</string>
+    <string name="preset_market_download">Download &amp; import</string>
+    <string name="preset_market_sample">Re:TUI\n$ hello world\nYour terminal, your colors.</string>
+    <string name="preset_market_progress">Downloading %1$d / %2$d bytes…</string>
+    <string name="preset_market_saved">Imported: %1$s\nTo apply later: preset -apply %1$s</string>
+    <string name="preset_market_copy">Copy apply command</string>
+    <string name="preset_market_cancelled">Download cancelled. Your active preset has not changed.</string>
+</resources>

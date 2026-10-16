@@ -1,0 +1,5 @@
+<resources>
+    <string name="wallpaper_browse_downloads">Get more wallpapers</string>
+    <string name="wallpaper_restore_download">Preview and download</string>
+    <string name="wallpaper_optional_restore_description">This wallpaper is now a separate download. Install it to restore the preview. Your saved wallpaper settings are kept.</string>
+</resources>

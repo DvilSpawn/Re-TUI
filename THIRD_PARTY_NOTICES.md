@@ -269,3 +269,15 @@ as a feature reference. The upstream catalogue is MIT-licensed, copyright
 (c) 2026 Simon Schubert and contributors. Reference links are recorded in
 `docs/MODULE_LIBRARY.md` and the module metadata; the upstream MIT notice is
 retained alongside the hosted catalogue at `modules/LICENSE`.
+
+## Termux terminal engine
+
+The workspace uses the terminal-emulator sources from Termux 0.118.3, pinned at `5b657c6adf4304e5198951ce815fe0205dcac29c`, under `third_party/termux/`. Execution remains in the installed Termux app. See `LICENSES/Termux-Terminal-Emulator.txt`.
+
+## JSch SSH client
+
+The experimental local Termux connection uses the maintained JSch fork, `com.github.mwiede:jsch:2.28.8`. Upstream copyright notices and terms are retained in `LICENSES/JSch-BSD.txt`, bundled JZlib BSD terms in `LICENSES/JSch-JZlib-BSD.txt`, and bundled jBCrypt ISC terms in `LICENSES/JSch-jBCrypt-ISC.txt`. Source: https://github.com/mwiede/jsch .
+
+## Android Java library compatibility
+
+Android builds use `com.android.tools:desugar_jdk_libs:2.1.5` to make JSch's Java stream APIs available on Android 6 (API 23). This generated compatibility runtime is resolved through Gradle's `coreLibraryDesugaring` configuration rather than the normal app runtime classpath. It is a subset of OpenJDK, distributed under GPL version 2 with the Classpath Exception; see `LICENSES/Desugar-OpenJDK-GPL-2.0-Classpath.txt`. Source and version history: https://github.com/google/desugar_jdk_libs .

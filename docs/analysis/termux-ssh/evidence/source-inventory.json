@@ -1,0 +1,47 @@
+[
+  {
+    "path": "termux/retui/bin/retui",
+    "lines": 738,
+    "sha256": "d6286bd161ba42993234bc010da2f0e6b4ba08943a1f7aae2b610d0f38d9a8ec"
+  },
+  {
+    "path": "app/src/main/java/ohi/andre/consolelauncher/managers/termux/TermuxWorkspaceSocketClient.kt",
+    "lines": 235,
+    "sha256": "b416ed6b119563b2c4eb839e82abdf824280b5e1949838ca1f1166c7ba1471f4"
+  },
+  {
+    "path": "app/src/main/java/ohi/andre/consolelauncher/managers/termux/TermuxWorkspaceFrame.kt",
+    "lines": 47,
+    "sha256": "8a59144447f4dc5c2b554b41311cfa40dffcb632372b29ae84ec761ef99f8795"
+  },
+  {
+    "path": "app/src/main/java/ohi/andre/consolelauncher/managers/termux/TerminalGridView.kt",
+    "lines": 496,
+    "sha256": "309593832e9956c4ad7361a302631e296da7ef26d100e118467c31bae79fd33b"
+  },
+  {
+    "path": "app/src/main/java/ohi/andre/consolelauncher/managers/termux/TermuxWorkspaceActivity.kt",
+    "lines": 797,
+    "sha256": "d36ce88535326ea96dd18288275fada02225309ba4665c51d9a89c022404e6f1"
+  },
+  {
+    "path": "app/src/main/java/ohi/andre/consolelauncher/managers/termux/TermuxWorkspaceState.kt",
+    "lines": 80,
+    "sha256": "0296d68f6dd4ecb7c2765d5835273586960475b3f155e331b9719602a7ff6abf"
+  },
+  {
+    "path": "app/src/main/java/ohi/andre/consolelauncher/managers/termux/TermuxWorkspaceInputEditText.kt",
+    "lines": 72,
+    "sha256": "98a7cb5402aec49184f403888135c6b5e20d9d3466da91e72333133da6744f8b"
+  },
+  {
+    "path": "app/src/main/java/ohi/andre/consolelauncher/managers/termux/TermuxWorkspaceLauncherManager.kt",
+    "lines": 124,
+    "sha256": "bfe4cc58711da21c34189d2e71c5c5bb3b87de0d8428e14fbbe2dd5d3d84b3a0"
+  },
+  {
+    "path": "app/src/main/java/ohi/andre/consolelauncher/managers/termux/TermuxBridgeManager.kt",
+    "lines": 212,
+    "sha256": "92471516a1b30e088bb889a2a4f262418c34a7f95832ae8fe84897fa463720b4"
+  }
+]

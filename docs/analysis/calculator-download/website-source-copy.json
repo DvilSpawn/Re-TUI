@@ -1,0 +1,14 @@
+{
+  "website_directory": "/Users/mako/StudioProjects/Re-TUI-site/docs/calculator-packs",
+  "copied": [
+    "SHA256SUMS",
+    "catalog.json",
+    "qalculate-5.8.2-source.tar.gz",
+    "qalculate-5.8.2.retui.calc.engine"
+  ],
+  "all_four_hashes_match_live_publication": true,
+  "git_added": false,
+  "committed": false,
+  "pushed": false,
+  "durability_note": "These four website source files remain uncommitted. Every future Pages deployment must include them; an unrelated deployment from Git without these assets can remove the live download."
+}

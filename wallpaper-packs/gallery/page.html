@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Watch Re:TUI wallpaper previews and download only the wallpapers you want.">
+  <title>More wallpapers · Re:TUI</title>
+  <style>
+    :root{color-scheme:dark;font-family:system-ui,sans-serif;background:#101218;color:#e8edf1}
+    *{box-sizing:border-box}body{margin:0}main{max-width:1040px;margin:auto;padding:24px}
+    header{margin:8px 0 32px}a{color:#b3dac7}h1{font-size:clamp(28px,5vw,42px);line-height:1.15;margin:12px 0}
+    p{line-height:1.6;color:#bfc8d0}.eyebrow{letter-spacing:.13em;text-transform:uppercase;font-size:12px;color:#b3dac7}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:20px}
+    article{background:#191d25;border:1px solid #303641;border-radius:16px;overflow:hidden}
+    .preview{display:block;width:100%;aspect-ratio:216/480;object-fit:cover;image-rendering:pixelated;background:#080b0e}
+    .body{padding:20px}h2{font-size:21px;margin:0 0 8px}.size{font-size:13px;color:#8fa398}
+    .button{display:block;text-align:center;padding:13px 16px;border-radius:8px;background:#b3dac7;color:#0b2018;text-decoration:none;font-weight:650;margin:16px 0 12px;min-height:48px}
+    .disabled{background:#303641;color:#c4cbd2}.use{display:block;text-align:center;padding:12px;min-height:48px}
+    footer{margin-top:28px;border-top:1px solid #303641;padding-top:16px;font-size:14px}
+    details summary{padding:12px 0;cursor:pointer}details p{margin-top:0}code{word-break:break-all;font-size:12px}
+  </style>
+</head>
+<body><main>
+  <header>
+    <a href="/marketplace">Re:TUI marketplace</a>
+    <p class="eyebrow">Optional wallpapers</p>
+    <h1>Choose your next backdrop.</h1>
+    <p>Solid color, Sakura and Black Hole come with the launcher. Watch the previews below and get only the extras you want.</p>
+  </header>
+  <section class="grid" aria-label="Wallpaper previews">{{cards}}</section>
+  <footer>
+    <p>Open this gallery from Re:TUI’s wallpaper page. Download installs the pack inside the launcher, then tap “Use in Re:TUI”. Choose “Use on phone” to pick your home or lock screen. Downloading does not change your current wallpaper.</p>
+    <p>Clouds has eight scenes. Pixel Dream responds to taps and can react to music; Nagomi can add fish for new notifications. These use the launcher’s existing notification and music integrations.</p>
+    <p><a href="https://github.com/DvilSpawn/Re-TUI">Source code</a> · <a href="catalog.json">Download checksums</a></p>
+  </footer>
+</main></body></html>

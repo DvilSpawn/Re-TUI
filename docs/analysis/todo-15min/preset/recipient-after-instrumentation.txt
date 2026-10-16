@@ -1,0 +1,1 @@
+Result: Bundle[{uid=11182, error=java.lang.SecurityException: Permission Denial: opening provider ohi.andre.consolelauncher.tuils.GenericFileProvider from ProcessRecord{c5020cf 23036:com.dvil.tui_renewed.calculatorpackdebug.test:preset_recipient/u0a1182} (pid=23036, uid=11182) that is not exported from UID 11181}]

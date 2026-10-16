@@ -1,0 +1,459 @@
+Activity Resolver Table:
+  Full MIME Types:
+      application/vnd.retui.calculator-engine+zip:
+        83b3139 com.dvil.tui_renewed/ohi.andre.consolelauncher.calculator.CalculatorPackActivity filter 549837e
+          Action: "android.intent.action.SEND"
+          Action: "android.intent.action.VIEW"
+          Category: "android.intent.category.DEFAULT"
+          Category: "android.intent.category.BROWSABLE"
+          StaticType: "application/vnd.retui.calculator-engine+zip"
+      application/vnd.retui+zip:
+        9b23632 com.dvil.tui_renewed/ohi.andre.consolelauncher.commands.tuixt.PresetImportActivity filter a107f83
+          Action: "android.intent.action.VIEW"
+          Category: "android.intent.category.DEFAULT"
+          Category: "android.intent.category.BROWSABLE"
+          Scheme: "content"
+          StaticType: "application/vnd.retui+zip"
+        9b23632 com.dvil.tui_renewed/ohi.andre.consolelauncher.commands.tuixt.PresetImportActivity filter 2326500
+          Action: "android.intent.action.SEND"
+          Category: "android.intent.category.DEFAULT"
+          StaticType: "application/vnd.retui+zip"
+
+  Base MIME Types:
+      application:
+        9b23632 com.dvil.tui_renewed/ohi.andre.consolelauncher.commands.tuixt.PresetImportActivity filter a107f83
+          Action: "android.intent.action.VIEW"
+          Category: "android.intent.category.DEFAULT"
+          Category: "android.intent.category.BROWSABLE"
+          Scheme: "content"
+          StaticType: "application/vnd.retui+zip"
+        9b23632 com.dvil.tui_renewed/ohi.andre.consolelauncher.commands.tuixt.PresetImportActivity filter 2326500
+          Action: "android.intent.action.SEND"
+          Category: "android.intent.category.DEFAULT"
+          StaticType: "application/vnd.retui+zip"
+        83b3139 com.dvil.tui_renewed/ohi.andre.consolelauncher.calculator.CalculatorPackActivity filter 549837e
+          Action: "android.intent.action.SEND"
+          Action: "android.intent.action.VIEW"
+          Category: "android.intent.category.DEFAULT"
+          Category: "android.intent.category.BROWSABLE"
+          StaticType: "application/vnd.retui.calculator-engine+zip"
+
+  Schemes:
+      content:
+        9b23632 com.dvil.tui_renewed/ohi.andre.consolelauncher.commands.tuixt.PresetImportActivity filter a107f83
+          Action: "android.intent.action.VIEW"
+          Category: "android.intent.category.DEFAULT"
+          Category: "android.intent.category.BROWSABLE"
+          Scheme: "content"
+          StaticType: "application/vnd.retui+zip"
+
+  Non-Data Actions:
+      android.intent.action.MAIN:
+        2e4a394 com.dvil.tui_renewed/ohi.andre.consolelauncher.LauncherActivity filter da8ee3d
+          Action: "android.intent.action.MAIN"
+          Category: "android.intent.category.HOME"
+          Category: "android.intent.category.DEFAULT"
+          Category: "android.intent.category.LAUNCHER"
+          Category: "android.intent.category.LAUNCHER_APP"
+        9685bfb com.dvil.tui_renewed/ohi.andre.consolelauncher.tuils.stuff.FakeLauncherActivity filter c97d418
+          Action: "android.intent.action.MAIN"
+          Category: "android.intent.category.HOME"
+          Category: "android.intent.category.DEFAULT"
+      com.twofortyfouram.locale.intent.action.EDIT_SETTING:
+        514a7f5 com.dvil.tui_renewed/ohi.andre.consolelauncher.integrations.tasker.RetuiTaskerConfigActivity filter 176598a
+          Action: "com.twofortyfouram.locale.intent.action.EDIT_SETTING"
+      android.content.pm.action.CONFIRM_PIN_SHORTCUT:
+        7d190df com.dvil.tui_renewed/ohi.andre.consolelauncher.commands.tuixt.PinShortcutConfirmActivity filter 9d8d12c
+          Action: "android.content.pm.action.CONFIRM_PIN_SHORTCUT"
+          Category: "android.intent.category.DEFAULT"
+
+  MIME Typed Actions:
+      android.intent.action.SEND:
+        9b23632 com.dvil.tui_renewed/ohi.andre.consolelauncher.commands.tuixt.PresetImportActivity filter 2326500
+          Action: "android.intent.action.SEND"
+          Category: "android.intent.category.DEFAULT"
+          StaticType: "application/vnd.retui+zip"
+        83b3139 com.dvil.tui_renewed/ohi.andre.consolelauncher.calculator.CalculatorPackActivity filter 549837e
+          Action: "android.intent.action.SEND"
+          Action: "android.intent.action.VIEW"
+          Category: "android.intent.category.DEFAULT"
+          Category: "android.intent.category.BROWSABLE"
+          StaticType: "application/vnd.retui.calculator-engine+zip"
+      android.intent.action.VIEW:
+        9b23632 com.dvil.tui_renewed/ohi.andre.consolelauncher.commands.tuixt.PresetImportActivity filter a107f83
+          Action: "android.intent.action.VIEW"
+          Category: "android.intent.category.DEFAULT"
+          Category: "android.intent.category.BROWSABLE"
+          Scheme: "content"
+          StaticType: "application/vnd.retui+zip"
+        83b3139 com.dvil.tui_renewed/ohi.andre.consolelauncher.calculator.CalculatorPackActivity filter 549837e
+          Action: "android.intent.action.SEND"
+          Action: "android.intent.action.VIEW"
+          Category: "android.intent.category.DEFAULT"
+          Category: "android.intent.category.BROWSABLE"
+          StaticType: "application/vnd.retui.calculator-engine+zip"
+
+Receiver Resolver Table:
+  Non-Data Actions:
+      androidx.profileinstaller.action.SAVE_PROFILE:
+        c96e0ad com.dvil.tui_renewed/androidx.profileinstaller.ProfileInstallReceiver filter f290e30
+          Action: "androidx.profileinstaller.action.SAVE_PROFILE"
+      com.twofortyfouram.locale.intent.action.QUERY_CONDITION:
+        b48dd5c com.dvil.tui_renewed/com.joaomgcd.taskerpluginlibrary.condition.BroadcastReceiverCondition filter 2a07865
+          Action: "com.twofortyfouram.locale.intent.action.QUERY_CONDITION"
+      android.app.action.DEVICE_ADMIN_DISABLED:
+        1d4ce71 com.dvil.tui_renewed/ohi.andre.consolelauncher.tuils.stuff.PolicyReceiver filter ae88456
+          Action: "android.app.action.DEVICE_ADMIN_DISABLED"
+          Action: "android.app.action.DEVICE_ADMIN_ENABLED"
+      android.app.action.DEVICE_ADMIN_ENABLED:
+        1d4ce71 com.dvil.tui_renewed/ohi.andre.consolelauncher.tuils.stuff.PolicyReceiver filter ae88456
+          Action: "android.app.action.DEVICE_ADMIN_DISABLED"
+          Action: "android.app.action.DEVICE_ADMIN_ENABLED"
+      androidx.profileinstaller.action.INSTALL_PROFILE:
+        c96e0ad com.dvil.tui_renewed/androidx.profileinstaller.ProfileInstallReceiver filter 7808fe2
+          Action: "androidx.profileinstaller.action.INSTALL_PROFILE"
+      androidx.profileinstaller.action.SKIP_FILE:
+        c96e0ad com.dvil.tui_renewed/androidx.profileinstaller.ProfileInstallReceiver filter 8604f73
+          Action: "androidx.profileinstaller.action.SKIP_FILE"
+      androidx.profileinstaller.action.BENCHMARK_OPERATION:
+        c96e0ad com.dvil.tui_renewed/androidx.profileinstaller.ProfileInstallReceiver filter feddaa9
+          Action: "androidx.profileinstaller.action.BENCHMARK_OPERATION"
+      com.twofortyfouram.locale.intent.action.FIRE_SETTING:
+        89bc82e com.dvil.tui_renewed/com.joaomgcd.taskerpluginlibrary.action.BroadcastReceiverAction filter 2e66fcf
+          Action: "com.twofortyfouram.locale.intent.action.FIRE_SETTING"
+      com.dvil.tui_renewed.RETUI_CALLBACK:
+        dd6bcd7 com.dvil.tui_renewed/ohi.andre.consolelauncher.managers.callback.RetuiCallbackReceiver filter 74219c4
+          Action: "com.dvil.tui_renewed.RETUI_CALLBACK"
+
+Service Resolver Table:
+  Non-Data Actions:
+      com.twofortyfouram.locale.intent.action.QUERY_CONDITION:
+        630b592 com.dvil.tui_renewed/com.joaomgcd.taskerpluginlibrary.condition.IntentServiceCondition filter afbfb63
+          Action: "com.twofortyfouram.locale.intent.action.QUERY_CONDITION"
+      com.twofortyfouram.locale.intent.action.FIRE_SETTING:
+        6c17bf4 com.dvil.tui_renewed/com.joaomgcd.taskerpluginlibrary.action.IntentServiceAction filter 6de4f1d
+          Action: "com.twofortyfouram.locale.intent.action.FIRE_SETTING"
+      android.service.notification.NotificationListenerService:
+        e48af06 com.dvil.tui_renewed/ohi.andre.consolelauncher.managers.notifications.NotificationService filter eea89c7 permission android.permission.BIND_NOTIFICATION_LISTENER_SERVICE
+          Action: "android.service.notification.NotificationListenerService"
+      android.service.wallpaper.WallpaperService:
+        620393a com.dvil.tui_renewed/ohi.andre.consolelauncher.wallpaper.RetuiWallpaperService filter a0439eb permission android.permission.BIND_WALLPAPER
+          Action: "android.service.wallpaper.WallpaperService"
+        4347348 com.dvil.tui_renewed/ohi.andre.consolelauncher.wallpaper.nagomi.NagomiWallpaperService filter 72535e1 permission android.permission.BIND_WALLPAPER
+          Action: "android.service.wallpaper.WallpaperService"
+
+Domain verification status:
+
+Permissions:
+  Permission [com.dvil.tui_renewed.permission.RECEIVE_CMD] (21b861d):
+    sourcePackage=com.dvil.tui_renewed
+    uid=11170 gids=[] type=0 prot=signature
+    perm=PermissionInfo{32092 com.dvil.tui_renewed.permission.RECEIVE_CMD}
+    flags=0x0
+
+Permissions:
+  Permission [com.dvil.tui_renewed.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION] (82d8a63):
+    sourcePackage=com.dvil.tui_renewed
+    uid=11170 gids=[] type=0 prot=signature
+    perm=PermissionInfo{7204660 com.dvil.tui_renewed.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION}
+    flags=0x0
+
+Registered ContentProviders:
+  com.dvil.tui_renewed/ohi.andre.consolelauncher.tuils.GenericFileProvider:
+    Provider{c6f6719 com.dvil.tui_renewed/ohi.andre.consolelauncher.tuils.GenericFileProvider}
+  com.dvil.tui_renewed/androidx.core.content.FileProvider:
+    Provider{32eb3de com.dvil.tui_renewed/androidx.core.content.FileProvider}
+  com.dvil.tui_renewed/androidx.startup.InitializationProvider:
+    Provider{16469bf com.dvil.tui_renewed/androidx.startup.InitializationProvider}
+
+ContentProvider Authorities:
+  [com.dvil.tui_renewed.files]:
+    Provider{32eb3de com.dvil.tui_renewed/androidx.core.content.FileProvider}
+      applicationInfo=ApplicationInfo{8b3688c com.dvil.tui_renewed}
+  [com.dvil.tui_renewed.androidx-startup]:
+    Provider{16469bf com.dvil.tui_renewed/androidx.startup.InitializationProvider}
+      applicationInfo=ApplicationInfo{6865bd5 com.dvil.tui_renewed}
+  [com.dvil.tui_renewed.FILE_PROVIDER]:
+    Provider{c6f6719 com.dvil.tui_renewed/ohi.andre.consolelauncher.tuils.GenericFileProvider}
+      applicationInfo=ApplicationInfo{2ee2fea com.dvil.tui_renewed}
+
+Key Set Manager:
+  [com.dvil.tui_renewed]
+      Signing KeySets: 1458
+
+Packages:
+  Package [com.dvil.tui_renewed] (98fcc62):
+    appId=11170
+    pkg=Package{df6b41b com.dvil.tui_renewed}
+    codePath=/data/app/~~Jk3IvK8a--hV3iAvUEHv8g==/com.dvil.tui_renewed-3bQQMqWNpYUSoN26lGns-g==
+    resourcePath=/data/app/~~Jk3IvK8a--hV3iAvUEHv8g==/com.dvil.tui_renewed-3bQQMqWNpYUSoN26lGns-g==
+    legacyNativeLibraryDir=/data/app/~~Jk3IvK8a--hV3iAvUEHv8g==/com.dvil.tui_renewed-3bQQMqWNpYUSoN26lGns-g==/lib
+    extractNativeLibs=false
+    primaryCpuAbi=null
+    secondaryCpuAbi=null
+    cpuAbiOverride=null
+    versionCode=503 minSdk=23 targetSdk=36
+    minExtensionVersions=[]
+    versionName=3
+    hiddenApiEnforcementPolicy=2
+    usesNonSdkApi=false
+    splits=[base]
+    apkSigningVersion=2
+    flags=[ HAS_CODE ALLOW_CLEAR_USER_DATA ]
+    privateFlags=[ PRIVATE_FLAG_ACTIVITIES_RESIZE_MODE_RESIZEABLE_VIA_SDK_VERSION ALLOW_AUDIO_PLAYBACK_CAPTURE PRIVATE_FLAG_ALLOW_NATIVE_HEAP_POINTER_TAGGING ]
+    forceQueryable=false
+    pageSizeCompat=0
+    queriesPackages=[com.termux, net.dinglisch.android.taskerm]
+    queriesIntents=[Intent { act=android.service.wallpaper.WallpaperService }]
+    scannedAsStoppedSystemApp=false
+    supportsScreens=[small, medium, large, xlarge, resizeable, anyDensity]
+    timeStamp=2026-10-16 08:05:59
+    lastUpdateTime=2026-10-16 08:05:59
+    installerPackageName=null
+    installerPackageUid=-1
+    initiatingPackageName=com.android.shell
+    originatingPackageName=null
+    packageSource=1
+    appMetadataFilePath=null
+    appMetadataSource=0
+    signatures=PackageSignatures{affe2db version:2, signatures:[38363718], past signatures:[]}
+    installPermissionsFixed=false
+    pkgFlags=[ HAS_CODE ALLOW_CLEAR_USER_DATA ]
+    privatePkgFlags=[ PRIVATE_FLAG_ACTIVITIES_RESIZE_MODE_RESIZEABLE_VIA_SDK_VERSION ALLOW_AUDIO_PLAYBACK_CAPTURE PRIVATE_FLAG_ALLOW_NATIVE_HEAP_POINTER_TAGGING ]
+    apexModuleName=null
+    declared permissions:
+      com.dvil.tui_renewed.permission.RECEIVE_CMD: prot=signature
+      com.dvil.tui_renewed.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION: prot=signature
+    requested permissions:
+      android.permission.WRITE_SETTINGS
+      android.permission.READ_CALENDAR
+      android.permission.POST_NOTIFICATIONS
+      android.permission.ACCESS_FINE_LOCATION
+      android.permission.ACCESS_HIDDEN_PROFILES
+      android.permission.CHANGE_NETWORK_STATE
+      android.permission.FOREGROUND_SERVICE
+      android.permission.FOREGROUND_SERVICE_SPECIAL_USE
+      android.permission.EXPAND_STATUS_BAR
+      android.permission.BLUETOOTH
+      android.permission.INTERNET
+      android.permission.BLUETOOTH_ADMIN
+      com.termux.permission.RUN_COMMAND
+      android.permission.ACCESS_COARSE_LOCATION
+      android.permission.READ_PHONE_STATE
+      android.permission.CALL_PHONE
+      android.permission.WRITE_CONTACTS
+      android.permission.CHANGE_WIFI_STATE
+      android.permission.FLASHLIGHT
+      android.permission.ACCESS_NETWORK_STATE
+      android.permission.CAMERA
+      android.permission.USE_FINGERPRINT
+      android.permission.REQUEST_DELETE_PACKAGES
+      android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK
+      android.permission.VIBRATE
+      com.dvil.tui_renewed.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+      net.dinglisch.android.tasker.PERMISSION_RUN_TASKS
+      android.permission.ACCESS_WIFI_STATE
+      android.permission.USE_BIOMETRIC
+      android.permission.QUERY_ALL_PACKAGES
+      android.permission.WAKE_LOCK
+      android.permission.READ_CONTACTS
+    install permissions:
+      android.permission.ACCESS_HIDDEN_PROFILES: granted=true
+      android.permission.CHANGE_NETWORK_STATE: granted=true
+      android.permission.FOREGROUND_SERVICE: granted=true
+      android.permission.FOREGROUND_SERVICE_SPECIAL_USE: granted=true
+      android.permission.EXPAND_STATUS_BAR: granted=true
+      android.permission.BLUETOOTH: granted=true
+      android.permission.INTERNET: granted=true
+      android.permission.BLUETOOTH_ADMIN: granted=true
+      android.permission.CHANGE_WIFI_STATE: granted=true
+      android.permission.FLASHLIGHT: granted=true
+      android.permission.ACCESS_NETWORK_STATE: granted=true
+      android.permission.USE_FINGERPRINT: granted=true
+      android.permission.REQUEST_DELETE_PACKAGES: granted=true
+      android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK: granted=true
+      android.permission.VIBRATE: granted=true
+      com.dvil.tui_renewed.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION: granted=true
+      android.permission.ACCESS_WIFI_STATE: granted=true
+      android.permission.USE_BIOMETRIC: granted=true
+      android.permission.QUERY_ALL_PACKAGES: granted=true
+      android.permission.WAKE_LOCK: granted=true
+    User 0: ceDataInode=1746886 deDataInode=1746973 installed=true hidden=false vHidden=1 suspended=false distractionFlags=0 stopped=false vStopped=false notLaunched=false enabled=0 instant=false virtual=false quarantined=false
+      installReason=0
+      dataDir=/data/user/0/com.dvil.tui_renewed
+      firstInstallTime=2026-10-16 08:05:59
+      uninstallReason=0
+      overlay paths:
+        /product/overlay/NavigationBarModeGestural/NavigationBarModeGesturalOverlay.apk
+        /data/resource-cache/com.android.systemui-neutral-AZVv.frro
+        /data/resource-cache/com.android.systemui-accent-uooV.frro
+        /data/resource-cache/com.android.systemui-dynamic-co4F.frro
+      legacy overlay paths:
+        /product/overlay/NavigationBarModeGestural/NavigationBarModeGesturalOverlay.apk
+      gids=[3002, 3003, 3001]
+      runtime permissions:
+        android.permission.READ_CALENDAR: granted=false, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]
+        android.permission.POST_NOTIFICATIONS: granted=false, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]
+        android.permission.ACCESS_FINE_LOCATION: granted=false, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]
+        android.permission.ACCESS_COARSE_LOCATION: granted=false, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]
+        android.permission.READ_PHONE_STATE: granted=false, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]
+        android.permission.CALL_PHONE: granted=false, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]
+        android.permission.WRITE_CONTACTS: granted=false, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]
+        android.permission.CAMERA: granted=false, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]
+        android.permission.READ_CONTACTS: granted=false, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]
+    User 10: ceDataInode=0 deDataInode=0 installed=false hidden=false vHidden=1 suspended=false distractionFlags=0 stopped=true vStopped=false notLaunched=true enabled=0 instant=false virtual=false quarantined=false
+      installReason=0
+      dataDir=null
+      firstInstallTime=2026-10-16 08:05:59
+      uninstallReason=0
+      gids=[3002, 3003, 3001]
+      runtime permissions:
+
+Queries:
+  system apps queryable: false
+  queries via forceQueryable:
+  queries via package name:
+    com.dvil.tui_renewed:
+      net.dinglisch.android.taskerm
+      [com.termux,com.termux.api]
+  queries via component:
+    [com.vivo.globalanimation,com.vivo.audiofx,com.vivo.vdfs,com.vos.as.vit,com.vivo.fingerprintui,com.vivo.fuelsummary,com.vivo.pem,com.vivo.epm,com.vivo.upslide,com.vivo.aiengine,com.android.server.telecom,com.android.providers.settings,com.vivo.faceui,com.vivo.crontab,com.vivo.accessibilityenhance,android,com.android.dynsystem,com.vivo.smartmultiwindow,com.android.bbklog,com.qualcomm.qti.xrvd.service,com.android.localtransport,com.vivo.doubleinstance,com.vivo.ai.aie,com.vivo.daemonService,com.vivo.fingerprint,com.vivo.faceunlock,com.android.location.fused,com.vivo.nightpearl,com.vivo.minscreen,com.android.DeviceAsWebcam,com.android.inputdevices,com.vivo.abe,com.vivo.vibrator4d,com.vivo.ai.agent,com.vivo.gamewatch,com.vivo.gamecube,com.vivo.fingerprintvit,com.vivo.appfilter,com.novatek.novavis,com.vivo.vms,com.iqoo.powersaving,com.android.settings,com.vivo.pie,com.vivo.floatingball,com.vivo.networkstate,com.vivo.sps,com.android.keychain,com.bbk.SuperPowerSave]:
+      com.dvil.tui_renewed
+    com.vivo.globalsearch:
+      com.dvil.tui_renewed
+    com.android.launcher3:
+      com.dvil.tui_renewed
+    com.vivo.upnpserver:
+      com.dvil.tui_renewed
+    com.google.android.as:
+      com.dvil.tui_renewed
+    com.google.android.as.oss:
+      com.dvil.tui_renewed
+    com.google.android.apps.messaging:
+      com.dvil.tui_renewed
+    com.google.android.gm:
+      com.dvil.tui_renewed
+    com.google.android.apps.maps:
+      com.dvil.tui_renewed
+    com.Slack:
+      com.dvil.tui_renewed
+    com.PixelStudio:
+      com.dvil.tui_renewed
+    com.phonepe.app:
+      com.dvil.tui_renewed
+    com.instagram.android:
+      com.dvil.tui_renewed
+    com.google.android.apps.docs:
+      com.dvil.tui_renewed
+    org.kustom.wallpaper:
+      com.dvil.tui_renewed
+    com.csam.icici.bank.imobile:
+      com.dvil.tui_renewed
+    in.org.npci.upiapp:
+      com.dvil.tui_renewed
+    com.vivo.globaldragdrop:
+      com.dvil.tui_renewed
+    org.kustom.widget:
+      com.dvil.tui_renewed
+    com.naver.linewebtoon:
+      com.dvil.tui_renewed
+    com.myairtelapp:
+      com.dvil.tui_renewed
+    com.flipkart.android:
+      com.dvil.tui_renewed
+    in.amazon.mShop.android.shopping:
+      com.dvil.tui_renewed
+    com.crunchyroll.crunchyroid:
+      com.dvil.tui_renewed
+    com.valvesoftware.android.steam.community:
+      com.dvil.tui_renewed
+    com.jilaba.lalithaschemeapp:
+      com.dvil.tui_renewed
+    com.testerscommunity:
+      com.dvil.tui_renewed
+    com.pinterest:
+      com.dvil.tui_renewed
+    com.android.wallpaperbackup:
+      com.dvil.tui_renewed
+    ru.zdevs.zarchiver:
+      com.dvil.tui_renewed
+    com.google.ambient.streaming:
+      com.dvil.tui_renewed
+    com.act.mobile.apps:
+      com.dvil.tui_renewed
+    com.zeptoconsumerapp:
+      com.dvil.tui_renewed
+    com.whatsapp:
+      com.dvil.tui_renewed
+    com.drivetrackplusrefuel:
+      com.dvil.tui_renewed
+    com.olacabs.customer:
+      com.dvil.tui_renewed
+    com.iexceed.ib.digitalbankingprod:
+      com.dvil.tui_renewed
+    in.swiggy.android:
+      com.dvil.tui_renewed
+    com.digilocker.android:
+      com.dvil.tui_renewed
+    com.application.zomato:
+      com.dvil.tui_renewed
+    com.rapido.passenger:
+      com.dvil.tui_renewed
+    in.startv.hotstar:
+      com.dvil.tui_renewed
+    com.x8bit.bitwarden:
+      com.dvil.tui_renewed
+    com.jndapp.nothing.widgets.pack:
+      com.dvil.tui_renewed
+    com.openai.chatgpt:
+      com.dvil.tui_renewed
+    com.microsoft.teams:
+      com.dvil.tui_renewed
+    com.zoho.writer:
+      com.dvil.tui_renewed
+    com.microsoft.office.outlook:
+      com.dvil.tui_renewed
+    com.nurecausa.drtrustscaleconnect:
+      com.dvil.tui_renewed
+    com.yum.kfc:
+      com.dvil.tui_renewed
+    com.application.zomato.district:
+      com.dvil.tui_renewed
+    com.adobe.reader:
+      com.dvil.tui_renewed
+    com.imgur.mobile:
+      com.dvil.tui_renewed
+    helium314.keyboard:
+      com.dvil.tui_renewed
+    us.zoom.videomeetings:
+      com.dvil.tui_renewed
+    com.hdfcbank.smartwealthapp:
+      com.dvil.tui_renewed
+    com.nic.mparivahan:
+      com.dvil.tui_renewed
+    org.cris.aikyam:
+      com.dvil.tui_renewed
+    com.twitter.android:
+      com.dvil.tui_renewed
+    com.dvil.tui_renewed:
+      org.kustom.wallpaper
+  queryable via interaction:
+    User 0:
+      [com.vivo.globalanimation,com.vivo.audiofx,com.vivo.vdfs,com.vos.as.vit,com.vivo.fingerprintui,com.vivo.fuelsummary,com.vivo.pem,com.vivo.epm,com.vivo.upslide,com.vivo.aiengine,com.android.server.telecom,com.android.providers.settings,com.vivo.faceui,com.vivo.crontab,com.vivo.accessibilityenhance,android,com.android.dynsystem,com.vivo.smartmultiwindow,com.android.bbklog,com.qualcomm.qti.xrvd.service,com.android.localtransport,com.vivo.doubleinstance,com.vivo.ai.aie,com.vivo.daemonService,com.vivo.fingerprint,com.vivo.faceunlock,com.android.location.fused,com.vivo.nightpearl,com.vivo.minscreen,com.android.DeviceAsWebcam,com.android.inputdevices,com.vivo.abe,com.vivo.vibrator4d,com.vivo.ai.agent,com.vivo.gamewatch,com.vivo.gamecube,com.vivo.fingerprintvit,com.vivo.appfilter,com.novatek.novavis,com.vivo.vms,com.iqoo.powersaving,com.android.settings,com.vivo.pie,com.vivo.floatingball,com.vivo.networkstate,com.vivo.sps,com.android.keychain,com.bbk.SuperPowerSave]:
+        com.dvil.tui_renewed
+      [com.google.android.gms,com.google.android.gsf]:
+        com.dvil.tui_renewed
+      com.dvil.retui.keyboard:
+        com.dvil.tui_renewed
+    User 10:
+  queryable via uses-library:
+
+Dexopt state:
+  [com.dvil.tui_renewed]
+    path: /data/app/~~Jk3IvK8a--hV3iAvUEHv8g==/com.dvil.tui_renewed-3bQQMqWNpYUSoN26lGns-g==/base.apk
+      arm64: [status=verify] [reason=install] [primary-abi]
+        [location is /data/app/~~Jk3IvK8a--hV3iAvUEHv8g==/com.dvil.tui_renewed-3bQQMqWNpYUSoN26lGns-g==/oat/arm64/base.odex]
+
+Compiler stats:
+  [com.dvil.tui_renewed]
+     base.apk - 269

@@ -11,6 +11,9 @@ object TermuxWorkspaceLauncherManager {
     const val PREFS = "retui_tmux_workspace_launchers"
     private const val KEY_IDS = "ids"
     private const val KEY_COMMAND_PREFIX = "command_"
+    private const val KEY_TITLE_PREFIX = "title_"
+    private const val KEY_WORKDIR_PREFIX = "workdir_"
+    private const val KEY_LEGACY_MIGRATED = "legacy_apps_migrated_v1"
 
     private val BUILT_INS = listOf(
         Launcher("shell", "Shell", "", true),
@@ -65,6 +68,8 @@ object TermuxWorkspaceLauncherManager {
         store.edit()
             .putStringSet(KEY_IDS, ids)
             .remove(KEY_COMMAND_PREFIX + normalized)
+            .remove(KEY_TITLE_PREFIX + normalized)
+            .remove(KEY_WORKDIR_PREFIX + normalized)
             .apply()
         return removed
     }
@@ -93,7 +98,8 @@ object TermuxWorkspaceLauncherManager {
                 continue
             }
             seen.add(id)
-            out.add(Launcher(id, titleFromId(id), command, false))
+            out.add(Launcher(id, store.getString(KEY_TITLE_PREFIX + id, null) ?: titleFromId(id), command, false,
+                store.getString(KEY_WORKDIR_PREFIX + id, null)))
         }
         return out
     }
@@ -112,13 +118,48 @@ object TermuxWorkspaceLauncherManager {
 
     private fun isBuiltIn(id: String): Boolean = BUILT_INS.any { it.id == id }
 
-    private fun prefs(context: Context): SharedPreferences =
-        context.applicationContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+    @Synchronized
+    private fun prefs(context: Context): SharedPreferences {
+        val store = context.applicationContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        if (!store.getBoolean(KEY_LEGACY_MIGRATED, false)) {
+            val ids = LinkedHashSet(store.getStringSet(KEY_IDS, emptySet()) ?: emptySet())
+            val edit = store.edit()
+            for (app in TermuxAppManager.list(context).sortedBy { it.id }) {
+                var id = normalizeId(app.id)
+                if (id.isEmpty()) continue
+                // Built-ins must stay available; retain the old custom app under an explicit name.
+                if (isBuiltIn(id)) id = id.take(25) + "-legacy"
+                if (ids.contains(id) || store.contains(KEY_COMMAND_PREFIX + id)) continue
+                ids.add(id)
+                edit.putString(KEY_COMMAND_PREFIX + id, app.command)
+                    .putString(KEY_TITLE_PREFIX + id, app.title)
+                    .putString(KEY_WORKDIR_PREFIX + id, app.workDir)
+            }
+            // Keep the legacy store intact, including action metadata, even after migration succeeds.
+            edit.putStringSet(KEY_IDS, ids).putBoolean(KEY_LEGACY_MIGRATED, true).commit()
+        }
+        return store
+    }
 
     data class Launcher(
         val id: String,
         val title: String,
         val command: String,
-        val builtIn: Boolean
-    )
+        val builtIn: Boolean,
+        val workDir: String? = null
+    ) {
+        val launchCommand: String
+            get() {
+                val directory = workDir?.trim().orEmpty()
+                if (directory.isEmpty()) return command
+                val quoted = when {
+                    directory == "~" -> "\"\$HOME\""
+                    directory.startsWith("~/") -> "\"\$HOME\"/" + shellQuote(directory.substring(2))
+                    else -> shellQuote(directory)
+                }
+                return "cd -- $quoted && {\n$command\n}"
+            }
+
+        private fun shellQuote(value: String) = "'" + value.replace("'", "'\"'\"'") + "'"
+    }
 }

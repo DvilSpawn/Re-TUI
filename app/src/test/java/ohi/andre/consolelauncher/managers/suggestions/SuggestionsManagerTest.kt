@@ -8,6 +8,34 @@ import ohi.andre.consolelauncher.commands.CommandAbstraction
 import ohi.andre.consolelauncher.commands.main.raw.preset
 
 class SuggestionsManagerTest {
+    @Test fun termuxLaunchersKeepFriendlyLabelsAndDispatchExplicitlyDespiteCommandCollisions() {
+        val launchers = listOf(
+            ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceLauncherManager.Launcher("shell", "Shell", "", true),
+            ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceLauncherManager.Launcher("notes", "Notes", "nvim ~/notes", false)
+        )
+        val suggestions = SuggestionsManager.termuxLauncherSuggestions(launchers)
+        assertEquals(listOf("Shell", "Notes"), suggestions.map { it.text })
+        assertEquals(listOf("tmux launch shell", "tmux launch notes"), suggestions.map { it.getText() })
+        assertTrue(suggestions.all { it.exec && it.type == SuggestionsManager.Suggestion.TYPE_PERMANENT })
+        assertEquals(listOf("tmux launch notes"),
+            SuggestionsManager.termuxLauncherSuggestions(launchers, "NO").map { it.getText() })
+        assertTrue(SuggestionsManager.termuxLauncherSuggestions(launchers, "absent").isEmpty())
+    }
+
+    @Test fun termuxLaunchersAreSearchableByIdAndFriendlyTitle() {
+        val launcher = ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceLauncherManager.Launcher(
+            "mc", "Midnight Commander", "mc", true)
+        val suggestion = SuggestionsManager.termuxLauncherSuggestions(listOf(launcher)).single()
+        val candidate = SuggestionsManager.SearchResult(suggestion.text!!, suggestion.getText()!!,
+            SuggestionsManager.SearchResult.TYPE_COMMAND, suggestion, "${suggestion.text} ${suggestion.getText()}")
+        listOf("mc", "Midnight").forEach { query ->
+            val found = SuggestionsManager.rankSearchResults(query, listOf(candidate), 5, 0f, null, null).single()
+            assertEquals("tmux launch mc", (found.payload as SuggestionsManager.Suggestion).getText())
+        }
+        assertEquals("Midnight Commander",
+            SuggestionsManager.termuxLauncherSuggestions(listOf(launcher), "MID").single().text)
+    }
+
     @Test fun offlineHelpFiltersCatalogIdsWithoutChangingCommandRouting() {
         assertEquals(listOf("apps"), SuggestionsManager.helpTopics("help ").filter { it.id == "apps" }.map { it.id })
         assertTrue(SuggestionsManager.helpTopics("help -topic terminal").any { it.id == "terminal-basics" })

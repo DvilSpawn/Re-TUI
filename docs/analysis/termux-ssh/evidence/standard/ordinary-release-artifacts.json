@@ -1,0 +1,19 @@
+{
+  "package": "com.dvil.tui_renewed",
+  "default_ssh_enabled": true,
+  "normal_release_includes_ssh_factory_rules": true,
+  "jsch_mapping_classes": 92,
+  "artifacts": {
+    "apk": {
+      "path": "/Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/build/validated-ssh-standard/app-playstore-standard-release.apk",
+      "bytes": 7741267,
+      "sha256": "f839909a5b07f9dfa236ea8c845e42772837b701e1bfba8b7f6fc3f9fcd47977"
+    },
+    "aab": {
+      "path": "/Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/build/validated-ssh-standard/app-playstore-standard-release.aab",
+      "bytes": 8365852,
+      "sha256": "0bfae266278ddf94af73b134338be8248186ba1ee72ff0deb2eecd7f7eef7681"
+    }
+  },
+  "installed_over_production": false
+}

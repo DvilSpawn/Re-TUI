@@ -1,0 +1,24 @@
+openssh	10.6p1-2
+tmux	3.8
+total 48
+-rw-------. 1 u0_a215 u0_a215  177 Oct 16 14:37 authorized_keys
+-rwx------. 1 u0_a215 u0_a215 3083 Oct 16 14:37 dispatch.sh
+-rw-------. 1 u0_a215 u0_a215  513 Oct 16 14:37 host_ecdsa
+-rw-------. 1 u0_a215 u0_a215  161 Oct 16 14:37 host_ecdsa.pub
+-rw-------. 1 u0_a215 u0_a215    5 Oct 16 14:37 sshd.pid
+-rw-------. 1 u0_a215 u0_a215  628 Oct 16 14:37 sshd_config
+
+Start-Date: 2026-10-16  14:35:36
+Commandline: apt install -y tmux openssh
+Install: termux-auth:aarch64 (1.5.0-1, automatic), krb5:aarch64 (1.22.2, automatic), ldns:aarch64 (1.9.2, automatic), libdb:aarch64 (18.1.40-6, automatic), openssh-sftp-server:aarch64 (10.6p1-2, automatic), libresolv-wrapper:aarch64 (1.1.8, automatic), utf8proc:aarch64 (2.12.0, automatic), libedit:aarch64 (20260512-3.1-0, automatic), tmux:aarch64 (3.8), openssh:aarch64 (10.6p1-2)
+End-Date: 2026-10-16  14:35:36
+
+Start-Date: 2026-10-16  14:37:00
+Commandline: /data/data/com.termux/files/usr/bin/apt remove -y tmux openssh
+Remove: tmux:aarch64 (3.8), openssh:aarch64 (10.6p1-2)
+End-Date: 2026-10-16  14:37:00
+
+Start-Date: 2026-10-16  14:37:54
+Commandline: apt install -y tmux openssh
+Install: tmux:aarch64 (3.8), openssh:aarch64 (10.6p1-2)
+End-Date: 2026-10-16  14:37:55

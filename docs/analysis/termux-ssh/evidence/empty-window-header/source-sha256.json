@@ -1,0 +1,4 @@
+{
+  "app/src/main/java/ohi/andre/consolelauncher/managers/termux/TermuxWorkspaceActivity.kt": "144d69b2a52af82e5ab7e61ddaa8817eabdda424bd0769a83df451b2b93e6d11",
+  "app/src/androidTest/java/ohi/andre/consolelauncher/managers/termux/TermuxWorkspacePaneIntegrationTest.kt": "d8f9a612d488bb3741509d37e9ae0578a4db4fc9f9d7dc38c0c1383753e65072"
+}

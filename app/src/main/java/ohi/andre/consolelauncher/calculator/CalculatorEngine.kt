@@ -1,22 +1,12 @@
 package ohi.andre.consolelauncher.calculator
 
-import android.content.ComponentName
 import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
 import android.os.Build
-import android.os.Bundle
-import android.os.Handler
-import android.os.IBinder
 import android.os.Looper
-import android.os.Message
-import android.os.Messenger
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings
 import ohi.andre.consolelauncher.managers.xml.options.Behavior
 import ohi.andre.consolelauncher.tuils.Tuils
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 import java.util.UUID
 
 object CalculatorEngine {
@@ -28,7 +18,7 @@ object CalculatorEngine {
     }
     fun lastImeBottomOffset(context: Context): Int = prefs(context).getInt(LAST_IME_BOTTOM_OFFSET, 0)
     fun supported() = Build.VERSION.SDK_INT >= 24
-    fun enabled(context: Context) = supported() && LauncherSettings.getBoolean(Behavior.qalculate)
+    fun enabled(context: Context) = supported() && LauncherSettings.getBoolean(Behavior.qalculate) && WasmCalculatorRuntime.available(context)
 
     data class Result(val text: String, val error: Boolean = false,
         val approximate: Boolean = false, val reusable: String? = if (error) null else text,
@@ -38,76 +28,57 @@ object CalculatorEngine {
     class Request {
         val id: String = UUID.randomUUID().toString()
         @Volatile var cancelled = false; private set
-        private var remote: Messenger? = null
+        private var onCancel: (() -> Unit)? = null
         @Synchronized fun cancel() {
             cancelled = true
-            try { remote?.send(Message.obtain(null, 2).apply { data = Bundle().apply { putString("id", id) } }) }
-            catch (_: Exception) { }
+            onCancel?.invoke()
+            onCancel = null
         }
-        @Synchronized fun submit(service: Messenger, message: Message): Boolean {
+        @Synchronized internal fun attachCancellation(action: () -> Unit): Boolean {
             if (cancelled) return false
-            remote = service
-            service.send(message)
+            onCancel = action
             return true
         }
-        @Synchronized fun finished() { remote = null }
+        @Synchronized fun finished() { onCancel = null }
     }
 
     // Call on a worker thread. The same path serves the activity and `calc <expression>`.
     fun evaluate(context: Context, expression: String, options: Options = options(context), request: Request = Request(), preview: Boolean = false): Result {
         val input = expression.trim()
         if (input.isEmpty()) return Result("")
+        if (input.indexOf('\u0000') >= 0) return Result(context.getString(R.string.calculator_invalid), true, failure = "invalid")
         if (input.length > MAX_INPUT) return Result(context.getString(R.string.calculator_too_long, MAX_INPUT), true)
-        if (preview && !enabled(context)) return Result("", true, failure = "preview_unavailable")
-        if (!enabled(context)) return try {
-            val value = Tuils.eval(input)
-            if (!value.isFinite()) Result(context.getString(R.string.calculator_invalid), true)
-            else Result(if (value == value.toLong().toDouble()) value.toLong().toString() else value.toString())
-        } catch (_: Exception) { Result(context.getString(R.string.calculator_invalid), true) }
+        if (request.cancelled) return Result(context.getString(R.string.calculator_cancelled), true, failure = "cancelled")
+        if (!enabled(context)) return if (preview) basicPreview(context, input, request) else basic(context, input)
         check(Looper.myLooper() != Looper.getMainLooper())
-        val app = context.applicationContext
-        val completed = CountDownLatch(1)
-        var result = Result(context.getString(R.string.calculator_engine_stopped), true)
-        val reply = Messenger(Handler(Looper.getMainLooper()) { message ->
-            result = Result(message.data.getString("text").orEmpty(), message.data.getBoolean("error"),
-                message.data.getBoolean("approximate"), message.data.getString("reusable"), message.data.getString("failure"), message.data.getString("parsed"))
-            completed.countDown()
-            true
-        })
-        val connection = object : ServiceConnection {
-            override fun onServiceConnected(name: ComponentName, binder: IBinder) {
-                try {
-                    if (request.cancelled) { completed.countDown(); return }
-                    val submitted = request.submit(Messenger(binder), Message.obtain(null, 1).apply {
-                        replyTo = reply
-                        data = Bundle().apply {
-                            putString("id", request.id)
-                            putString("expression", input)
-                            putBoolean("degrees", options.degrees)
-                            putBoolean("exact", options.exact)
-                            putBoolean("preview", preview)
-                        }
-                    })
-                    if (!submitted) completed.countDown()
-                } catch (_: Exception) { completed.countDown() }
-            }
-            override fun onServiceDisconnected(name: ComponentName) { completed.countDown() }
-            override fun onNullBinding(name: ComponentName) { completed.countDown() }
-            override fun onBindingDied(name: ComponentName) { completed.countDown() }
-        }
-        var bound = false
-        try {
-            bound = app.bindService(Intent(app, QalculateService::class.java), connection, Context.BIND_AUTO_CREATE)
-            if (bound && !completed.await(8, TimeUnit.SECONDS)) {
-                request.cancel()
-                result = Result(context.getString(R.string.calculator_timeout), true, failure = "timeout")
-            }
-        } catch (_: Exception) {
-            return Result(context.getString(R.string.calculator_engine_stopped), true)
-        } finally {
-            request.finished()
-            if (bound) app.unbindService(connection)
-        }
-        return if (request.cancelled && result.failure != "timeout") Result(context.getString(R.string.calculator_cancelled), true, failure = "cancelled") else result
+        val result = WasmCalculatorRuntime.evaluate(context.applicationContext, input, options, request, preview)
+        // Devices without a working WebAssembly provider retain the built-in calculator.
+        return if (result.failure == "unavailable") {
+            if (preview) basicPreview(context, input, request) else basic(context, input)
+        } else result
     }
+
+    private fun basicPreview(context: Context, input: String, request: Request): Result {
+        val normalized = input.replace('×', '*').replace('÷', '/').replace('−', '-')
+        // The fallback has no variables or unit engine. Never interpret stateful or advanced input.
+        if (input.length > 256 || normalized.any { it !in '0'..'9' && !it.isWhitespace() && it !in ".()+-*/^" }) {
+            return Result("", true, failure = "preview_unavailable")
+        }
+        var depth = 0
+        for (character in normalized) {
+            if (character == '(') depth++
+            if (character == ')' && --depth < 0) return Result("", true, failure = "syntax")
+        }
+        if (depth != 0) return Result("", true, failure = "syntax")
+        val result = basic(context, normalized)
+        if (request.cancelled) return Result(context.getString(R.string.calculator_cancelled), true, failure = "cancelled")
+        return if (result.error) result
+        else result.copy(parsed = input, reusable = null)
+    }
+
+    private fun basic(context: Context, input: String): Result = try {
+        val value = Tuils.eval(input.replace('×', '*').replace('÷', '/').replace('−', '-'))
+        if (!value.isFinite()) Result(context.getString(R.string.calculator_invalid), true)
+        else Result(if (value == value.toLong().toDouble()) value.toLong().toString() else value.toString())
+    } catch (_: Exception) { Result(context.getString(R.string.calculator_invalid), true) }
 }

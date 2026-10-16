@@ -22,6 +22,7 @@ import android.widget.ScrollView
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.OneShotPreDrawListener
+import ohi.andre.consolelauncher.BuildConfig
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.BreathOutLayout
 import ohi.andre.consolelauncher.UIManager
@@ -72,7 +73,21 @@ class TermuxWorkspaceActivity : LocalizedActivity() {
     private val panels = arrayOfNulls<LinearLayout>(2)
     private val labels = arrayOfNulls<TextView>(2)
     private val grids = arrayOfNulls<TerminalGridView>(2)
+    private val sshEnabled get() = BuildConfig.TERMUX_SSH_PANE
+    private var ssh: TermuxWorkspaceSshConnection? = null
+    private var sshSetupPending = false
+    private var sshInstallAfterPermission = false
+    private var sshAttempts = 0
+    private var sshConnecting = false
+    private data class PendingColon(val tile: Int, val target: String, val epoch: Int, val generation: Int,
+        val actions: MutableList<Pair<String, String>>, var bytes: Int)
+    private var pendingColon: PendingColon? = null
+    private val sshAttachments = BooleanArray(2)
+    private val sshTileReady = BooleanArray(2)
+    private val sshTileEpoch = IntArray(2)
     private val clients = arrayOfNulls<TermuxWorkspaceSocketClient>(2)
+    private val terminals = arrayOfNulls<TermuxWorkspaceTerminal>(2)
+    private val renderPending = BooleanArray(2)
     private val lastGeometry = arrayOfNulls<Pair<Int, Int>>(2)
     private var geometryCapturePending = false
     private var geometryCaptureListener: OneShotPreDrawListener? = null
@@ -99,6 +114,17 @@ class TermuxWorkspaceActivity : LocalizedActivity() {
             resultLabel = null
             val raw = intent.getStringExtra(UIManager.EXTRA_TERMUX_RESULT_STDOUT).orEmpty()
             val exitCode = intent.getIntExtra(UIManager.EXTRA_TERMUX_RESULT_EXIT_CODE, Int.MIN_VALUE)
+            if (sshEnabled && sshSetupPending) {
+                sshSetupPending = false
+                if (exitCode != 0) { showSshPrompt(raw.lineSequence().firstOrNull { it.contains("__RETUI_SSH_ERROR__") }?.substringAfter("__RETUI_SSH_ERROR__ ") ?: getString(R.string.workspace_ssh_setup_failed)); return }
+                try {
+                    val info = TermuxWorkspaceSshSetup.parse(this@TermuxWorkspaceActivity, raw)
+                    TermuxBridgeManager.startRunCommand(this@TermuxWorkspaceActivity, TermuxBridgeManager.TERMUX_SH,
+                        TermuxBridgeManager.TERMUX_HOME, null, TermuxWorkspaceSshSetup.daemonArguments(this@TermuxWorkspaceActivity))
+                    openSsh(info)
+                } catch (e: Exception) { showSshPrompt(e.message ?: getString(R.string.workspace_ssh_setup_failed)) }
+                return
+            }
             if (helperUpdating) {
                 helperUpdating = false
                 if (TermuxHelperUpdate.succeeded(raw, exitCode)) {
@@ -157,6 +183,7 @@ class TermuxWorkspaceActivity : LocalizedActivity() {
         LauncherSystemUi.requestNoTitleIfFullscreen(this)
         super.onCreate(state)
         helperDeferred = state?.getBoolean("helperDeferred") ?: false
+        sshInstallAfterPermission = state?.getBoolean("sshInstallAfterPermission") ?: false
         Tuils.init(this); XMLPrefsManager.loadCommons(this); LauncherSystemUi.applyFullscreen(this)
         androidx.core.view.WindowCompat.setDecorFitsSystemWindows(window, false)
         selection = TermuxWorkspaceState.restore(state?.getString("selection") ?: prefs.getString("selection", null))
@@ -282,16 +309,23 @@ class TermuxWorkspaceActivity : LocalizedActivity() {
         runPendingCommand()
     }
     override fun onResume() {
-        super.onResume(); visible = true; generation++
+        super.onResume(); visible = true; generation++; sshAttempts = 0
         foreground = WeakReference(this)
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, IntentFilter(UIManager.ACTION_TERMUX_RESULT))
-        style(); runPendingCommand(); if (!isFinishing) startBridge()
+        style(); runPendingCommand()
+        if (!isFinishing) {
+            if (sshEnabled && sshInstallAfterPermission && TermuxBridgeManager.status(this).runCommandGranted) {
+                sshInstallAfterPermission = false
+                startSshSetup(true)
+            } else startBridge()
+        }
     }
     override fun onPause() {
         screen.setActive(false)
         if (foreground?.get() === this) foreground = null
-        visible = false; generation++; resultLabel = null; bootstrap = null
-        helperUpdating = false
+        visible = false; generation++; resultLabel = null; bootstrap = null; pendingColon = null
+        helperUpdating = false; sshSetupPending = false; sshConnecting = false
+        ssh?.close(); ssh = null
         cancelGeometryCapture()
         main.removeCallbacksAndMessages(null)
         clients.indices.forEach { closeTile(it); creating[it] = false }
@@ -314,6 +348,7 @@ class TermuxWorkspaceActivity : LocalizedActivity() {
     }
     override fun onSaveInstanceState(out: Bundle) {
         out.putBoolean("helperDeferred", helperDeferred)
+        out.putBoolean("sshInstallAfterPermission", sshInstallAfterPermission)
         out.putString("selection", selection.encode()); out.putString("draft", localDraft); out.putString("pending", pendingCommand)
         persist(); super.onSaveInstanceState(out)
     }
@@ -321,6 +356,7 @@ class TermuxWorkspaceActivity : LocalizedActivity() {
         prefs.edit().putString("selection", selection.encode()).putString("draft", localDraft).putBoolean("fn", fnMode).apply()
     }
     private fun startBridge() {
+        if (sshEnabled) { startSshSetup(false); return }
         if (!visible || resultLabel != null) return
         val ready = TermuxBridgeManager.status(this)
         if (!ready.termuxInstalled || !ready.runCommandDeclared) { showHelperPrompt(getString(R.string.workspace_helper_setup), false); return }
@@ -336,6 +372,116 @@ class TermuxWorkspaceActivity : LocalizedActivity() {
                 TermuxBridgeManager.createResultPendingIntent(this, label, null), arrayOf("-c", script, "retui-workspace"))
             awaitHelperResult(label)
         } catch (e: Exception) { resultLabel = null; showHelperPrompt(getString(R.string.workspace_helper_setup), false) }
+    }
+    private fun startSshSetup(install: Boolean) {
+        if (!visible || resultLabel != null || sshConnecting || ssh?.connected == true) return
+        if (!install && !TermuxWorkspaceSshSetup.isPaired(this)) { showSshPrompt(getString(R.string.workspace_ssh_enable_body), enable = true); return }
+        val ready = TermuxBridgeManager.status(this)
+        if (!ready.termuxInstalled || !ready.runCommandDeclared) { showSshPrompt(getString(R.string.workspace_helper_setup), enable = true); return }
+        if (!ready.runCommandGranted) {
+            if (install) {
+                sshInstallAfterPermission = true
+                if (TermuxBridgeManager.requestRunCommandPermissionIfPossible(this)) return
+                sshInstallAfterPermission = false
+            }
+            showSshPrompt(getString(R.string.workspace_helper_setup), enable = true); return
+        }
+        try {
+            val label = "workspace-ssh:$instance:$generation"
+            resultLabel = label; sshSetupPending = true
+            helperBody.setText(R.string.workspace_ssh_setting_up); status(getString(R.string.workspace_ssh_setting_up))
+            helperActions.removeAllViews()
+            TermuxBridgeManager.startRunCommand(this, TermuxBridgeManager.TERMUX_SH, TermuxBridgeManager.TERMUX_HOME,
+                TermuxBridgeManager.createResultPendingIntent(this, label, null), TermuxWorkspaceSshSetup.commandArguments(this, install))
+            main.postDelayed({ if (visible && resultLabel == label) { resultLabel = null; sshSetupPending = false; showSshPrompt(getString(R.string.workspace_helper_no_reply)) } }, if (install) 180000 else 30000)
+        } catch (e: Exception) { resultLabel = null; sshSetupPending = false; showSshPrompt(e.message ?: getString(R.string.workspace_ssh_setup_failed)) }
+    }
+    private fun showSshPrompt(message: String, enable: Boolean = false) {
+        status(message.lineSequence().first())
+        helperPanel.visibility = View.VISIBLE; tiles.visibility = View.GONE
+        helperBody.text = message; helperActions.removeAllViews()
+        helperAction(if (enable) R.string.workspace_ssh_enable else R.string.workspace_helper_retry) { sshAttempts = 0; startSshSetup(enable) }
+        if (!enable) helperAction(R.string.workspace_ssh_repair) {
+            ssh?.close(); ssh = null; sshConnecting = false; sshAttempts = 0
+            clearTiles(); TermuxWorkspaceSshSetup.clearPairing(this); startSshSetup(true)
+        }
+        helperAction(R.string.workspace_helper_permissions) { startActivity(Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, android.net.Uri.parse("package:$packageName"))) }
+        if (TermuxBridgeManager.isTermuxInstalled(this)) helperAction(R.string.workspace_helper_open_termux) { packageManager.getLaunchIntentForPackage(TermuxBridgeManager.TERMUX_PACKAGE)?.let { startActivity(it) } }
+        styleHelperPrompt()
+    }
+    private fun openSsh(info: TermuxWorkspaceSshSetup.ConnectionInfo) {
+        if (!visible) return
+        ssh?.close(); sshConnecting = true
+        lateinit var connection: TermuxWorkspaceSshConnection
+        connection = TermuxWorkspaceSshConnection(info, object : TermuxWorkspaceSshConnection.Listener {
+            override fun onReady(updated: List<Pair<String, String>>) {
+                if (!visible || ssh !== connection) return
+                sshConnecting = false
+                if (updated.isEmpty()) sshAttempts = 0
+                helperPanel.visibility = View.GONE; tiles.visibility = View.VISIBLE
+                windows = updated; reconcileWindows()
+                if (initialSelection) { selection.select(selection.focused, updated.firstOrNull()?.first); initialSelection = false }
+                applyLayout(); status(getString(if (selection.focusedTarget == null) R.string.workspace_empty else R.string.workspace_bridge_connecting)); runPendingCommand()
+            }
+            override fun onWindows(updated: List<Pair<String, String>>) {
+                if (!visible || ssh !== connection) return
+                windows = updated
+                frames.indices.forEach { tile -> frames[tile] = frames[tile]?.copy(window = updated.firstOrNull { it.first == selection.targets[tile] }?.second) }
+                reconcileWindows(); updateLabels(); persist()
+                if (updated.isEmpty()) status(getString(R.string.workspace_empty))
+            }
+            override fun onTargetGone(target: String) { if (visible && ssh === connection) targetGone(target) }
+            override fun onError(message: String) {
+                if (!visible || ssh !== connection) return
+                clearTiles(); connection.close(); ssh = null; sshConnecting = false
+                if (++sshAttempts < 3) {
+                    status(getString(R.string.workspace_bridge_connecting))
+                    val attemptGeneration = generation
+                    main.postDelayed({ if (visible && generation == attemptGeneration) startSshSetup(false) }, 750L * sshAttempts)
+                } else showSshPrompt(message)
+            }
+        })
+        ssh = connection; connection.connect()
+    }
+    private fun connectSshTile(tile: Int) {
+        val connection = ssh ?: return
+        val target = selection.targets[tile] ?: return
+        if (!visible || !connection.connected || sshAttachments[tile] || tile !in selection.visibleTiles || creating[tile]) return
+        val size = geometry(tile); val epoch = ++sshTileEpoch[tile]
+        val grid = grids[tile] ?: return
+        val terminal = TermuxWorkspaceTerminal(size.first, size.second, grid) { bytes ->
+            if (ssh === connection && sshTileEpoch[tile] == epoch) connection.write(tile, bytes)
+        }
+        terminals[tile] = terminal; sshAttachments[tile] = true; lastGeometry[tile] = size
+        frames[tile] = TermuxWorkspaceFrame(target, windows.firstOrNull { it.first == target }?.second, windows, "", size.first, size.second, null, null, null, null, null, null, null)
+        connection.attach(tile, target, size.first, size.second, { bytes ->
+            if (visible && ssh === connection && sshTileEpoch[tile] == epoch) {
+                sshAttempts = 0
+                if (!sshTileReady[tile]) {
+                    sshTileReady[tile] = true
+                    if (tile == selection.focused) status(getString(R.string.workspace_bridge_ready))
+                }
+                terminal.append(bytes); renderSshTerminal(tile, connection, epoch)
+            }
+        }, {
+            if (visible && ssh === connection && sshTileEpoch[tile] == epoch) {
+                closeTile(tile)
+                main.postDelayed({ if (visible && ssh === connection) connectSshTile(tile) }, 500)
+            }
+        })
+        updateLabels()
+    }
+    private fun renderSshTerminal(tile: Int, connection: TermuxWorkspaceSshConnection, epoch: Int) {
+        if (renderPending[tile]) return
+        renderPending[tile] = true
+        grids[tile]?.postOnAnimation {
+            if (sshTileEpoch[tile] != epoch) return@postOnAnimation
+            renderPending[tile] = false
+            if (visible && ssh === connection) terminals[tile]?.let { grids[tile]?.setEmulatorFrame(it.emulator) }
+        }
+    }
+    private fun writeSsh(bytes: ByteArray) {
+        if (!visible || bytes.isEmpty() || ssh?.write(selection.focused, bytes) != true) status(getString(R.string.workspace_bridge_input_not_sent))
     }
     private fun awaitHelperResult(label: String) {
         main.postDelayed({
@@ -414,34 +560,65 @@ class TermuxWorkspaceActivity : LocalizedActivity() {
     }
     override fun onRequestPermissionsResult(code: Int, permissions: Array<out String>, results: IntArray) {
         super.onRequestPermissionsResult(code, permissions, results)
+        if (sshEnabled && code == 8127) {
+            if (!TermuxBridgeManager.status(this).runCommandGranted) {
+                sshInstallAfterPermission = false
+                if (visible) showSshPrompt(getString(R.string.workspace_helper_setup), enable = true)
+            } else if (visible) {
+                val install = sshInstallAfterPermission
+                sshInstallAfterPermission = false
+                startSshSetup(install)
+            }
+            return
+        }
         if (visible) startBridge()
     }
     private fun connectTile(tile: Int) {
+        if (sshEnabled) { connectSshTile(tile); return }
         val boot = bootstrap ?: return
         if (!visible || clients[tile] != null || tile !in selection.visibleTiles) return
         if (selection.targets[tile] == null && !creating[tile]) return
         val ownTarget = if (creating[tile]) creationSeeds[tile] else selection.targets[tile]
         val geometry = if (creating[tile]) geometry(1 - tile) else geometry(tile)
+        val pendingBytes = java.util.concurrent.atomic.AtomicInteger()
         lateinit var client: TermuxWorkspaceSocketClient
         client = TermuxWorkspaceSocketClient(object : TermuxWorkspaceSocketClient.Listener {
-            override fun onFrame(raw: String) { main.post {
+            override fun onFrame(raw: String) {
+                if (pendingBytes.addAndGet(raw.length * 2) > 1048576) {
+                    client.close(); onError("Terminal output backlog; reconnect"); return
+                }
+                main.post {
+                    pendingBytes.addAndGet(-raw.length * 2)
+                    if (!visible || clients[tile] !== client) return@post
+                    val frame = try { TermuxWorkspaceFrame.parse(raw) } catch (e: Exception) { status(e.message.orEmpty()); return@post }
+                    val target = frame.target ?: return@post
+                    if (creating[tile] && target == creationSeeds[tile]) return@post
+                    if (selection.targets[1 - tile] == target) return@post
+                    val selectionChanged = creating[tile] || selection.targets[tile] != target || windows != frame.windows
+                    val creationCompleted = creating[tile]
+                    creating[tile] = false
+                    selection.select(tile, target); frames[tile] = frame.copy(window = frame.window ?: frame.windows.firstOrNull { it.first == target }?.second); windows = frame.windows
+                    reconcileWindows()
+                    val grid = grids[tile]!!
+                    terminals[tile] = frame.terminalState?.let { TermuxWorkspaceTerminal(frame, grid) }
+                    if (terminals[tile] != null) renderTerminal(tile, client)
+                    else grids[tile]?.setFrame(frame.body, frame.cols, frame.rows, frame.cursorX, frame.cursorY)
+                    status(getString(R.string.workspace_bridge_ready)); if (selectionChanged) { updateLabels(); persist() }; runPendingCommand()
+                    if (creationCompleted) scheduleGeometryCapture()
+                }
+            }
+            override fun onWindows(updated: List<Pair<String, String>>) { main.post {
                 if (!visible || clients[tile] !== client) return@post
-                val frame = try { TermuxWorkspaceFrame.parse(raw) } catch (e: Exception) { status(e.message.orEmpty()); return@post }
-                val target = frame.target ?: return@post
-                if (creating[tile] && target == creationSeeds[tile]) return@post
-                if (selection.targets[1 - tile] == target) return@post
-                val creationCompleted = creating[tile]
-                creating[tile] = false
-                selection.select(tile, target); frames[tile] = frame; windows = frame.windows
-                reconcileWindows()
-                grids[tile]?.setFrame(frame.body, frame.cols, frame.rows, frame.cursorX, frame.cursorY)
-                status(getString(R.string.workspace_bridge_ready)); updateLabels(); persist(); runPendingCommand()
-                if (creationCompleted) scheduleGeometryCapture()
+                windows = updated
+                frames.indices.forEach { index ->
+                    frames[index] = frames[index]?.copy(windows = updated, window = updated.firstOrNull { it.first == frames[index]?.target }?.second)
+                }
+                reconcileWindows(); updateLabels(); persist()
             } }
             override fun onStatus(status: String) { main.post {
                 if (!visible || clients[tile] !== client) return@post
                 if (creating[tile]) mutation(tile) { c, size -> c.newWindow(creationNames[tile], creationCommands[tile], size.first, size.second) }
-                else capture(tile)
+                else capture(tile, onlyIfChanged = true)
             } }
             override fun onTargetGone(target: String?) { main.post {
                 if (!visible || clients[tile] !== client) return@post
@@ -458,10 +635,27 @@ class TermuxWorkspaceActivity : LocalizedActivity() {
             } }
         })
         clients[tile] = client
+        lastGeometry[tile] = geometry
         client.connect(boot.socket!!, boot.token!!, geometry.first, geometry.second, boot.host, boot.port, true,
-            ownTarget, targeted = true)
+            ownTarget, targeted = true, outputDriven = true)
     }
-    private fun closeTile(tile: Int) { clients[tile]?.close(); clients[tile] = null; lastGeometry[tile] = null }
+    private fun renderTerminal(tile: Int, client: TermuxWorkspaceSocketClient) {
+        if (renderPending[tile]) return
+        renderPending[tile] = true
+        grids[tile]?.postOnAnimation {
+            renderPending[tile] = false
+            if (!visible || clients[tile] !== client) return@postOnAnimation
+            val terminal = terminals[tile] ?: return@postOnAnimation
+            grids[tile]?.setEmulatorFrame(terminal.emulator)
+            frames[tile] = frames[tile]?.copy(body = terminal.text())
+        }
+    }
+    private fun closeTile(tile: Int) {
+        if (pendingColon?.tile == tile) pendingColon = null
+        if (sshEnabled) { ++sshTileEpoch[tile]; sshAttachments[tile] = false; sshTileReady[tile] = false; ssh?.detach(tile) }
+        clients[tile]?.close(); clients[tile] = null; lastGeometry[tile] = null
+        terminals[tile] = null; renderPending[tile] = false
+    }
     private fun clearTiles() {
         for (tile in 0..1) {
             closeTile(tile); frames[tile] = null; creating[tile] = false
@@ -473,6 +667,12 @@ class TermuxWorkspaceActivity : LocalizedActivity() {
         clearTiles(); selection.movePage(delta); applyLayout()
     }
     private fun targetGone(target: String?) {
+        if (sshEnabled) {
+            windows = windows.filter { it.first != target }
+            reconcileWindows()
+            if (!creating.any { it }) status(getString(if (selection.focusedTarget == null) R.string.workspace_empty else R.string.workspace_shell_exited))
+            return
+        }
         val alive = windows.map { it.first }.filter { it != target }.toSet()
         clearTiles(); selection.reconcile(alive); windows = windows.filter { it.first in alive }
         applyLayout()
@@ -489,6 +689,17 @@ class TermuxWorkspaceActivity : LocalizedActivity() {
         return (grid.width / grid.characterWidth()).toInt().coerceIn(20, 240) to (grid.height / grid.lineHeight()).coerceIn(8, 120)
     }
     private fun capture(tile: Int, onlyIfChanged: Boolean = false) {
+        if (sshEnabled) {
+            if (visible && sshAttachments[tile] && tile in selection.visibleTiles) {
+                val size = geometry(tile)
+                if (!onlyIfChanged || size != lastGeometry[tile]) {
+                    terminals[tile]?.resize(size.first, size.second, grids[tile]!!)
+                    ssh?.resize(tile, size.first, size.second); lastGeometry[tile] = size
+                    terminals[tile]?.let { grids[tile]?.setEmulatorFrame(it.emulator) }
+                }
+            }
+            return
+        }
         val client = clients[tile]
         if (visible && client?.connected == true && !creating[tile] && tile in selection.visibleTiles) {
             val size = geometry(tile)
@@ -517,17 +728,58 @@ class TermuxWorkspaceActivity : LocalizedActivity() {
         if (!visible || client?.connected != true || !send(client, size)) status(getString(R.string.workspace_bridge_input_not_sent))
         else lastGeometry[tile] = size
     }
-    private fun directText(text: String) {
+    private fun directText(text: String) = routeText(text, true)
+    private fun routeText(text: String, queryColon: Boolean) {
         if (text.isEmpty() || screen.wake()) return
+        if (pendingColon != null) { queueColon("text", text); return }
         if (localDraft != null) { localDraft += text; updateLabels(); persist(); return }
-        if (text.startsWith(":")) { localDraft = text.drop(1); updateLabels(); persist(); return }
+        // Full-screen editors own colon commands; keep workspace commands at the shell.
+        if (sshEnabled && queryColon && text.startsWith(":")) {
+            val connection = ssh
+            val tile = selection.focused
+            val target = selection.focusedTarget
+            if (target == null) { localDraft = text.drop(1); updateLabels(); persist(); return }
+            if (connection?.connected != true) { status(getString(R.string.workspace_bridge_input_not_sent)); return }
+            if (text.length > 32768) { status(getString(R.string.workspace_bridge_input_not_sent)); return }
+            val pending = PendingColon(tile, target, sshTileEpoch[tile], generation, mutableListOf("text" to text), text.length * 2)
+            pendingColon = pending
+            connection.queryAlternate(target) { alternate ->
+                if (pendingColon !== pending) return@queryAlternate
+                pendingColon = null
+                if (!visible || ssh !== connection || generation != pending.generation || sshTileEpoch[tile] != pending.epoch || selection.focusedTarget != target) {
+                    status(getString(R.string.workspace_bridge_input_not_sent)); return@queryAlternate
+                }
+                if (alternate) routeText(text, false)
+                else { localDraft = text.drop(1); updateLabels(); persist() }
+                for ((kind, value) in pending.actions.drop(1)) {
+                    if (!visible || ssh !== connection || generation != pending.generation || sshTileEpoch[tile] != pending.epoch || selection.focusedTarget != target) break
+                    if (kind == "text") directText(value)
+                    else when (value) { "Enter" -> enter(); "BSpace" -> inputBackspace(); else -> sendKey(value) }
+                }
+            }
+            return
+        }
+        if (!sshEnabled && text.startsWith(":") && terminals[selection.focused]?.emulator?.isAlternateBufferActive != true) {
+            localDraft = text.drop(1); updateLabels(); persist(); return
+        }
         if (modifiers.isNotEmpty()) {
             if (text.length == 1 && text[0].code in 32..126) { key(if (text == " ") "Space" else text); return }
             // KEY accepts ASCII tokens only. Unicode/composed text and paste are literal
             // TYPE input; consume the latch rather than applying it to a later character.
             modifiers.clear(); bindKeys()
         }
-        mutation { client, size -> client.typeInput(text, size.first, size.second) }
+        if (sshEnabled) {
+            val terminal = terminals[selection.focused]
+            if (terminal != null && text.length > 1 && (text.contains('\n') || text.contains('\r'))) terminal.paste(text)
+            else writeSsh(text.toByteArray(Charsets.UTF_8))
+        }
+        else mutation { client, size -> client.typeInput(text, size.first, size.second) }
+    }
+    private fun queueColon(kind: String, value: String) {
+        val pending = pendingColon ?: return
+        pending.bytes += value.length * 2
+        if (pending.bytes > 65536) { pendingColon = null; status(getString(R.string.workspace_bridge_input_not_sent)); return }
+        pending.actions.add(kind to value)
     }
     private fun inputBackspace() {
         if (screen.wake()) return
@@ -541,7 +793,13 @@ class TermuxWorkspaceActivity : LocalizedActivity() {
     }
     private fun key(name: String) {
         val prefix = modifiers.joinToString("") { "$it-" }; modifiers.clear(); bindKeys()
-        mutation { client, size -> client.key(prefix + name, size.first, size.second) }
+        val token = prefix + name
+        if (pendingColon != null) { queueColon("key", token); return }
+        sendKey(token)
+    }
+    private fun sendKey(token: String) {
+        if (sshEnabled) writeSsh(terminals[selection.focused]?.key(token) ?: byteArrayOf())
+        else mutation { client, size -> client.key(token, size.first, size.second) }
     }
     private fun focusInput(show: Boolean) {
         input.showSoftInputOnFocus = show; input.requestFocus()
@@ -549,7 +807,13 @@ class TermuxWorkspaceActivity : LocalizedActivity() {
         if (show) (getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager).showSoftInput(input, InputMethodManager.SHOW_IMPLICIT)
     }
     private fun focusTile(tile: Int) {
+        if (tile != selection.focused) pendingColon = null
         selection.focus(tile); updateLabels(); persist()
+        if (sshEnabled && ssh?.connected == true) status(getString(when {
+            selection.focusedTarget == null -> R.string.workspace_empty
+            sshTileReady[tile] -> R.string.workspace_bridge_ready
+            else -> R.string.workspace_bridge_connecting
+        }))
         RetuiThemeBridge.sendToKeyboard(this, input, "retui_workspace:${selection.focusedTarget.orEmpty()}", "termux")
     }
     private fun status(message: String) { title.text = getString(R.string.workspace_bridge_label, getString(R.string.surface_termux_workspace_0f9f7), message); title.contentDescription = message }
@@ -557,6 +821,9 @@ class TermuxWorkspaceActivity : LocalizedActivity() {
         root.findViewById<View>(R.id.termux_workspace_pages).visibility = if (selection.pageCount > 1) View.VISIBLE else View.GONE
         root.findViewById<TextView>(R.id.termux_workspace_page_position).text = getString(R.string.workspace_page_position, selection.pageIndex + 1, selection.pageCount)
         for (tile in 0..1) labels[tile]?.apply {
+            val canChoose = windows.any { it.first != selection.targets[1 - tile] }
+            visibility = if (canChoose || selection.targets[tile] != null || tile == selection.focused && localDraft != null) View.VISIBLE else View.GONE
+            isClickable = canChoose
             text = if (tile == selection.focused && localDraft != null) ":${localDraft}" else
                 (if (tile == selection.focused) "▶ " else "  ") + (frames[tile]?.window ?: selection.targets[tile] ?: getString(R.string.workspace_choose_window))
             setTextColor(color(if (tile == selection.focused) Theme.selection_text_color else Theme.workspace_panel_text_color))
@@ -588,7 +855,7 @@ class TermuxWorkspaceActivity : LocalizedActivity() {
     private fun showWindowChooser(tile: Int, includeNew: Boolean, layout: TermuxWorkspaceState.Layout? = null) {
         val available = windows.filter { it.first != selection.targets[1 - tile] }
         val choices = available.map { it.second } + if (includeNew) listOf(getString(R.string.workspace_new_shell)) else emptyList()
-        if (choices.isEmpty()) { status(getString(R.string.workspace_choose_window)); return }
+        if (choices.isEmpty()) { status(getString(R.string.workspace_empty)); return }
         AlertDialog.Builder(this).setTitle(R.string.workspace_choose_window).setItems(choices.toTypedArray()) { _, which ->
             if (which == available.size) showPlacementChooser()
             else {
@@ -601,7 +868,7 @@ class TermuxWorkspaceActivity : LocalizedActivity() {
         showPlacementChooser(name, initial)
     }
     private fun showPlacementChooser(name: String? = null, initial: String? = null) {
-        if (bootstrap == null || creating.any { it }) { status(getString(R.string.workspace_bridge_input_not_sent)); return }
+        if ((if (sshEnabled) ssh?.connected != true else bootstrap == null) || creating.any { it }) { status(getString(R.string.workspace_bridge_input_not_sent)); return }
         val choices = selection.placements
         val labels = choices.map { placement -> getString(when (placement) {
             TermuxWorkspaceState.Placement.REPLACE_FOCUSED -> R.string.workspace_replace_focused
@@ -612,20 +879,31 @@ class TermuxWorkspaceActivity : LocalizedActivity() {
             TermuxWorkspaceState.Placement.REPLACE_SECOND -> if (selection.layout == TermuxWorkspaceState.Layout.TOP_BOTTOM) R.string.workspace_replace_bottom else R.string.workspace_replace_right
         }) }
         AlertDialog.Builder(this).setTitle(R.string.workspace_place_shell).setItems(labels.toTypedArray()) { _, which ->
-            if (!visible || bootstrap == null || creating.any { it }) return@setItems
+            if (!visible || (if (sshEnabled) ssh?.connected != true else bootstrap == null) || creating.any { it }) return@setItems
             val seed = selection.focusedTarget ?: windows.firstOrNull()?.first
             clearTiles(); selection.place(choices[which], null)
             val tile = selection.focused
             creating[tile] = true; creationSeeds[tile] = seed
             creationNames[tile] = name; creationCommands[tile] = initial
-            applyLayout(); connectTile(tile)
+            if (sshEnabled) {
+                val connection = ssh
+                val creationGeneration = generation
+                connection?.newWindow(name, initial) { target ->
+                    if (visible && ssh === connection && generation == creationGeneration && creating[tile]) {
+                        selection.select(tile, target); creating[tile] = false
+                        reconcileWindows(); applyLayout(); persist()
+                    }
+                }
+                applyLayout()
+            } else { applyLayout(); connectTile(tile) }
         }.setNegativeButton(android.R.string.cancel, null).show()
     }
     private fun selectWindow(raw: String) {
         val target = windows.firstOrNull { it.first == raw || it.second.substringBefore(':') == raw || it.second.substringAfter(':') == raw }?.first
         if (target == null) { status(getString(R.string.workspace_choose_window)); return }
         if (target == selection.targets[1 - selection.focused]) { focusTile(1 - selection.focused); if (selection.layout == TermuxWorkspaceState.Layout.SINGLE) applyLayout(); return }
-        mutation { c, size -> c.selectWindow(target, size.first, size.second) }
+        if (sshEnabled) { closeTile(selection.focused); frames[selection.focused] = null; selection.select(selection.focused, target); applyLayout() }
+        else mutation { c, size -> c.selectWindow(target, size.first, size.second) }
     }
     private fun switchFocused(next: Boolean) {
         val available = windows.filter { it.first != selection.targets[1 - selection.focused] }
@@ -637,9 +915,9 @@ class TermuxWorkspaceActivity : LocalizedActivity() {
         val raw = pendingCommand ?: return
         val clean = raw.trim().removePrefix(":").trim()
         val verb = clean.substringBefore(' ').lowercase()
-        if ((verb == "new" || verb == "launch" && clean.contains(' ')) && bootstrap == null) return
+        if ((verb == "new" || verb == "launch" && clean.contains(' ')) && (if (sshEnabled) ssh?.connected != true else bootstrap == null)) return
         val local = verb in setOf("new", "page", "launch", "help", "status", "diagnostics", "save", "rm", "remove", "home", "back", "", "open", "show")
-        if (!local && clients[selection.focused]?.connected != true) return
+        if (!local && (if (sshEnabled) ssh?.connected != true else clients[selection.focused]?.connected != true)) return
         pendingCommand = null; command(raw)
     }
     private fun command(raw: String) {
@@ -663,8 +941,9 @@ class TermuxWorkspaceActivity : LocalizedActivity() {
             "next", "right" -> switchFocused(true)
             "page" -> movePage(if (rest == "prev") -1 else 1)
             "refresh", "r" -> { selection.visibleTiles.forEach { capture(it) }; if (clients[selection.focused] == null) startBridge() }
-            "reconnect" -> { clients.indices.forEach { closeTile(it) }; bootstrap = null; startBridge() }
+            "reconnect" -> { clients.indices.forEach { closeTile(it) }; bootstrap = null; ssh?.close(); ssh = null; sshConnecting = false; sshAttempts = 0; startBridge() }
             "update" -> {
+                if (sshEnabled) { showSshPrompt(getString(R.string.workspace_ssh_enable_body), true); return }
                 helperDeferred = false
                 if (helperUpdating) helperPanel.visibility = View.VISIBLE
                 else {
@@ -692,7 +971,7 @@ class TermuxWorkspaceActivity : LocalizedActivity() {
         val launcher = TermuxWorkspaceLauncherManager.resolve(this, id)
         if (launcher == null) { status(getString(R.string.surface_unknown_launcher_run_launch_to_list_available_launchers_16ab0, id)); return }
         val existing = windows.firstOrNull { it.second.substringAfter(':') == launcher.id }
-        if (existing != null) selectWindow(existing.first) else newShell(selection.focused, launcher.id, launcher.command)
+        if (existing != null) selectWindow(existing.first) else newShell(selection.focused, launcher.id, launcher.launchCommand)
     }
     private fun diagnostics() {
         val bridge = TermuxBridgeManager.status(this)

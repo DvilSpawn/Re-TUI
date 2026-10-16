@@ -1,0 +1,25 @@
+{
+  "passed": true,
+  "capture": "phase-output.json",
+  "validated_against_final_strict_contract": true,
+  "serial": "10BE1C0FB40006A",
+  "before_read_denied": true,
+  "during_exact_bytes": true,
+  "after_security_exception": true,
+  "permission_reporting": {
+    "before": [
+      "-1",
+      "-1"
+    ],
+    "during": [
+      "0",
+      "0"
+    ],
+    "after": [
+      "0",
+      "0"
+    ]
+  },
+  "final_instrumentation": "phone-instrumented-final.log",
+  "instrumentation_passed": 2
+}

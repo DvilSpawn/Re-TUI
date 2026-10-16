@@ -10536,9 +10536,8 @@ class UIManager(
             appendTermuxLine(mContext.getString(R.string.surface_alias_rm_app_id_3df4f))
             return
         }
-        val id = TermuxAppManager.normalizeId(parts.get(1))
-        if (TermuxAppManager.remove(mContext!!, id)) {
-            removeTermuxAppManifest(id)
+        val id = TermuxWorkspaceLauncherManager.normalizeId(parts.get(1))
+        if (TermuxWorkspaceLauncherManager.remove(mContext!!, id)) {
             appendTermuxLine(mContext.getString(R.string.surface_termux_app_removed_4f6c4, id))
         } else {
             appendTermuxLine(mContext.getString(R.string.surface_termux_app_not_removed_bc850, id))

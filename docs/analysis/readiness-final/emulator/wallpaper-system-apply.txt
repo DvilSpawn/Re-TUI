@@ -1,0 +1,4 @@
+component=ComponentInfo{com.dvil.tui_renewed.calculatorpackdebug/ohi.andre.consolelauncher.wallpaper.RetuiWallpaperService}
+scene=clouds
+archive=/storage/emulated/0/Android/data/com.dvil.tui_renewed.calculatorpackdebug/files/Re-T-UI/wallpaper-downloads/clouds-dc250ad4364a.retui-wallpaper
+sha256=dc250ad4364a1e0ee94ee6dec5e84548e4ccc8c235110cf7e459940fd998e5e6

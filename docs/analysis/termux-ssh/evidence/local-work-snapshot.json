@@ -1,0 +1,180 @@
+{
+  "source": "/Users/mako/StudioProjects/TUI-ConsoleLauncher",
+  "worktree": "/Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher",
+  "base_commit": "6627e8cdcacc22e75094e342b9da5dedadc5a93a",
+  "branch": "dvil/termux-ssh-analysis",
+  "tracked_paths": 16,
+  "untracked_files": 18,
+  "untracked_bytes": 110308,
+  "verification": "Exact binary diff and copied file bytes match source. Source index and working tree were not modified. Ignored build outputs and local configuration were not copied.",
+  "files": [
+    {
+      "path": "app/build.gradle",
+      "sha256": "f27e52cf5c4add4890fe12a9649998fc3a4448cc78de6b7c497e6e68af2bb339",
+      "bytes": 16060
+    },
+    {
+      "path": "app/proguard-rules.pro",
+      "sha256": "1bae5fd8ea3767bfdde082c6b8d118802133dccca7794528e2aa666db50fefa4",
+      "bytes": 1293
+    },
+    {
+      "path": "app/src/androidTest/java/ohi/andre/consolelauncher/calculator/CalculatorInlineEnhancementTest.kt",
+      "sha256": "e5815c57d8ca326b1d84af4d6d406f35ea498525c4709de4692a6b19dba40803",
+      "bytes": 12694
+    },
+    {
+      "path": "app/src/androidTest/java/ohi/andre/consolelauncher/calculator/PortableCalculatorDeviceTest.kt",
+      "sha256": "137a7f4e260d8cc160c2efca57b0ceebfc46dae4ad39e0c4f8a161b558455c3f",
+      "bytes": 6921
+    },
+    {
+      "path": "app/src/main/AndroidManifest.xml",
+      "sha256": "fb861c1bad44e65e754cb13b0fdae86f12d314bc2d46d194f4cf5f091a770e64",
+      "bytes": 19520
+    },
+    {
+      "path": "app/src/main/assets/calculator-runtime/bootstrap.js",
+      "sha256": "ecac33e6b0c73c471baf7f9a7b820f8fce80e67c1491ee1b768204a50733d25c",
+      "bytes": 2040
+    },
+    {
+      "path": "app/src/main/assets/calculator-runtime/index.html",
+      "sha256": "a4d63f887489b08845711c938cf9cce2f551cca1da4b4b5c53b0fe4ba6068117",
+      "bytes": 153
+    },
+    {
+      "path": "app/src/main/assets/calculator-runtime/worker.js",
+      "sha256": "0926aedcb4b3785cb3075b7aa63f8ada8b1e099bc1c94650fcf7653c4764d058",
+      "bytes": 1257
+    },
+    {
+      "path": "app/src/main/assets/localization/catalog.json",
+      "sha256": "46ef5a7d9a75c5dcc70cb71f2c7b855a9d9e3b70198db4c71d0361db7664f962",
+      "bytes": 741105
+    },
+    {
+      "path": "app/src/main/assets/localization/english-template.zip",
+      "sha256": "56fa8b82701b59b76081e00d75f5e912de81ad3c98e9a1497007e1a8a06f6028",
+      "bytes": 123156
+    },
+    {
+      "path": "app/src/main/java/ohi/andre/consolelauncher/calculator/CalculatorActivity.kt",
+      "sha256": "73482ac90e4a0bb3ae99049aecba46668d7d4cbd8aede6d7c15e31453d76858a",
+      "bytes": 30830
+    },
+    {
+      "path": "app/src/main/java/ohi/andre/consolelauncher/calculator/CalculatorEngine.kt",
+      "sha256": "17c220328bb3c7cd7689c5a8abbb5a01b069665b065a8f4910b3f2253f453bd5",
+      "bytes": 3780
+    },
+    {
+      "path": "app/src/main/java/ohi/andre/consolelauncher/calculator/CalculatorPackActivity.kt",
+      "sha256": "4308a3dfc6da889b51bbf5cf6c4239a5a57edb37d348c3bc515930aeaeb3167e",
+      "bytes": 2373
+    },
+    {
+      "path": "app/src/main/java/ohi/andre/consolelauncher/calculator/CalculatorPackPanel.kt",
+      "sha256": "9b709482160d5576ab1ad8498f8ec5e00795ff4d908b5ef211cfe9de19d6779c",
+      "bytes": 12639
+    },
+    {
+      "path": "app/src/main/java/ohi/andre/consolelauncher/calculator/CalculatorPackStore.kt",
+      "sha256": "fe65aad9e0380f5b3e5c2a62765ec95737ee1a8ca62ddf7bb7f1b0a637023133",
+      "bytes": 16531
+    },
+    {
+      "path": "app/src/main/java/ohi/andre/consolelauncher/calculator/NativeQalculate.kt",
+      "deleted": true
+    },
+    {
+      "path": "app/src/main/java/ohi/andre/consolelauncher/calculator/OptionalCalculatorEngine.kt",
+      "sha256": "92cc0f654618e6538e2fc7d7f8cc1dfe6f22a21538233c2fa0e660eab3bdede7",
+      "bytes": 1683
+    },
+    {
+      "path": "app/src/main/java/ohi/andre/consolelauncher/calculator/QalculateService.kt",
+      "deleted": true
+    },
+    {
+      "path": "app/src/main/java/ohi/andre/consolelauncher/calculator/WasmCalculatorRuntime.kt",
+      "sha256": "60134f4cda2c6851ac84f1a4c82e181bcedca705c15abee5c1164cbd7bcc493b",
+      "bytes": 12882
+    },
+    {
+      "path": "app/src/main/java/ohi/andre/consolelauncher/managers/BackupManager.kt",
+      "sha256": "4dcb5ef3d83dd94d6b8b9ec7f16df5f5a316f7fb1e52220a1e188bf4807f5fcb",
+      "bytes": 54075
+    },
+    {
+      "path": "app/src/main/java/ohi/andre/consolelauncher/managers/onboarding/StartupMenuManager.kt",
+      "sha256": "1e0c9a932cd677e102d4ae29706c2cbb3444fac76728379d2b7bd18692b2e857",
+      "bytes": 50123
+    },
+    {
+      "path": "app/src/main/res/values/strings_optional_calculator.xml",
+      "sha256": "2461afa0a2ede5d40f7ef2300347f6390da2c818bc9d91c67d0ccf7c4d52bea1",
+      "bytes": 3700
+    },
+    {
+      "path": "app/src/test/java/ohi/andre/consolelauncher/calculator/CalculatorPackStoreTest.kt",
+      "sha256": "26e12c47c9c5e23cf7382d24cbdd6469406a48f915f883aed9f903c12e5cb5dc",
+      "bytes": 8785
+    },
+    {
+      "path": "app/src/test/java/ohi/andre/consolelauncher/managers/BackupManagerTest.kt",
+      "sha256": "40d2bcc8839fad1e585a8647601a5f024529536861f7fd957f5599ab425a6b84",
+      "bytes": 13784
+    },
+    {
+      "path": "docs/calculator.md",
+      "sha256": "fe9932efac434cc9d2620b0b787acdae41d0fb86669f9b3ccf296a2676edd722",
+      "bytes": 9124
+    },
+    {
+      "path": "docs/optional-calculator-engine.md",
+      "sha256": "ee16280bad6471982584696cf3f75fd422e366be68b74b5ad2a3cd2cb2c34235",
+      "bytes": 5248
+    },
+    {
+      "path": "language-packs/template/strings.xml",
+      "sha256": "3192781f0fda3b266b65f424edec7aded94c7850837f6a2fbe3b6c98794a6e97",
+      "bytes": 494586
+    },
+    {
+      "path": "native/qalculate/README.md",
+      "sha256": "bcade229852d9d6c27aa0953b1fb322efbaf4e32538706ec1c9699f08acd3384",
+      "bytes": 7708
+    },
+    {
+      "path": "native/qalculate/build_wasm.py",
+      "sha256": "8f5c8eae9e44bc0609133734c303497d5a6786fb485dba1cd1d4437239bc94ad",
+      "bytes": 5246
+    },
+    {
+      "path": "native/qalculate/package_wasm.py",
+      "sha256": "1815954360fa2d1d196c0ee737090acc7d409fb9231107395905abfb4e82de3f",
+      "bytes": 4142
+    },
+    {
+      "path": "native/qalculate/test_runtime_bootstrap.mjs",
+      "sha256": "6efe8b956e433c0b0b82ed18b7cb6f2a489faa190dcee1c1b68f63d531b7fefb",
+      "bytes": 3544
+    },
+    {
+      "path": "native/qalculate/test_wasm.cjs",
+      "sha256": "b845b839f39c7a94bf041ef7e662d6473f98820db39a973b325b76132be97805",
+      "bytes": 2230
+    },
+    {
+      "path": "native/qalculate/wasm_bridge.cpp",
+      "sha256": "5e795f6df1066d47a836e72fcb16edef976331507be01d5c0576ce060a2be67f",
+      "bytes": 8240
+    },
+    {
+      "path": "scripts/qalculate_source_bundle.py",
+      "sha256": "7c8f17c91ab14fd45aa26da4b937e6b47a19015400ebd9637eb02223d17aa865",
+      "bytes": 6636
+    }
+  ]
+}

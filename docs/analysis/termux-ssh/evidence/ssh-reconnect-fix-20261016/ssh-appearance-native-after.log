@@ -1,0 +1,7 @@
+
+PROCESS
+20151 19229 /data/data/com.termux/files/usr/bin/sshd -D -e -f /data/data/com.termux/files/home/.retui/ssh/sshd_config
+27912 19229 /data/data/com.termux/files/usr/bin/sh -c set -eu export PATH="$PREFIX/bin:$PATH" if [ "$2" = 1 ]; then printf 'DAEMON LOG\n'; tail -n 1600 "$1" || true; fi printf '\nPROCESS\n'; ps -A -o pid,ppid,args | grep '[s]shd' || true printf '\nPIDFILE\n'; cat "$HOME/.retui/ssh/sshd.pid" || true retui-appearance /data/data/com.termux/files/home/.retui/sshappearance-1800c523-sshd.log 0
+
+PIDFILE
+20151

@@ -1,0 +1,8 @@
+{
+  "prepare": "Result: Bundle[{senderUid=11186, phase=prepare}]\n",
+  "before": "Result: Bundle[{uid=11183, error=java.io.FileNotFoundException: No content provider: content://dev.retui.test.presetsender.FILE_PROVIDER/cache_files/preset-share/revoke.retui, readPermission=-1, fullReadPermission=-1}]\n",
+  "grant": "Result: Bundle[{senderUid=11186, phase=grant}]\n",
+  "during": "Result: Bundle[{uid=11183, mime=application/vnd.retui+zip, bytes=[105, 110, 100, 101, 112, 101, 110, 100, 101, 110, 116, 45, 115, 101, 110, 100, 101, 114, 45, 112, 114, 101, 115, 101, 116], readPermission=0, fullReadPermission=0}]\n",
+  "revoke": "Result: Bundle[{senderUid=11186, phase=revoke}]\n",
+  "after": "Result: Bundle[{uid=11183, error=java.lang.SecurityException: Permission Denial: opening provider dev.retui.test.presetrecipient.ShareProvider from ProcessRecord{79e7089 13052:dev.retui.test.presetrecipient/u0a1183} (pid=13052, uid=11183) that is not exported from UID 11186, readPermission=0, fullReadPermission=0}]\n"
+}

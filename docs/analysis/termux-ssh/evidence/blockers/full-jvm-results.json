@@ -1,0 +1,32 @@
+{
+  "counts": {
+    "tests": 438,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 5
+  },
+  "focused": [
+    {
+      "name": "ohi.andre.consolelauncher.managers.AppsManagerPrivateSpaceTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "ohi.andre.consolelauncher.managers.settings.PaletteCoverageRegistryTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "skipped": [
+    "ohi.andre.consolelauncher.irc.IrcLiveTest.certificateHostnameMismatchIsRejectedBeforeAuthentication",
+    "ohi.andre.consolelauncher.irc.IrcLiveTest.channelHistoryLoadsAfterReconnectWithoutPostingOrDuplicatingMessages",
+    "ohi.andre.consolelauncher.irc.IrcLiveTest.nativeClientAuthenticatesAndJoinsBothOfficialChannels",
+    "ohi.andre.consolelauncher.irc.IrcLiveTest.guestCannotConnectOrJoinRegisteredOnlyChannel",
+    "ohi.andre.consolelauncher.irc.IrcLiveTest.privateTestChannelDeliversAndRedactsOnTwoNativeSessionsWithoutPolling"
+  ],
+  "note": "Final source: exact-source-string guard test removed; supported API behavior tests retained, release lint verifies API guards. SSH-enabled debug full suite."
+}

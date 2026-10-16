@@ -1,0 +1,7 @@
+<resources>
+    <string name="workspace_ssh_enable">Enable Termux pane</string>
+    <string name="workspace_ssh_enable_body">Connect the existing pane directly to Termux. Setup installs missing tmux and OpenSSH packages and pairs this app locally. Re:TUI keeps your split layout; Termux keeps your shells running.</string>
+    <string name="workspace_ssh_setting_up">Preparing Termux connection…</string>
+    <string name="workspace_ssh_setup_failed">Termux connection setup failed. Retry or open Termux to check setup.</string>
+    <string name="workspace_ssh_repair">Repair connection</string>
+</resources>

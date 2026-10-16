@@ -1,0 +1,9 @@
+{
+  "serial": "10BE1C0FB40006A",
+  "package": "com.dvil.tui_renewed",
+  "versionCode": 503,
+  "apkSHA256": "a3c67776073fc56b2163c6b307f16e311746bb79ceb01bdde86d7ab39ec54f7e",
+  "aabSHA256": "312edaf9189d4a638e7ebfdcdaa5e1555e6cac9c733d95c0b646b7734c6f3ead",
+  "installedBytesMatch": true,
+  "speculativePenaltyChangesReverted": true
+}

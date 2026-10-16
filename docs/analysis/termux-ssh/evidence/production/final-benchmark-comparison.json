@@ -1,0 +1,50 @@
+{
+  "percentile": "nearest rank ceil(p*n), one-based",
+  "rows": [
+    {
+      "mode": "legacy",
+      "layout": "SINGLE",
+      "n": 24,
+      "p50_ms": 58.618255000000005,
+      "p95_ms": 86.850782,
+      "app_idle_cpu_percent": 0.88,
+      "termux_idle_cpu_percent": 0.29534600164843333,
+      "app_pss_mib": 168.396484375,
+      "termux_pss_mib": 66.57421875
+    },
+    {
+      "mode": "legacy",
+      "layout": "LEFT_RIGHT",
+      "n": 24,
+      "p50_ms": 42.515572500000005,
+      "p95_ms": 59.362552,
+      "app_idle_cpu_percent": 0.82,
+      "termux_idle_cpu_percent": 0.19705390208792217,
+      "app_pss_mib": 166.5419921875,
+      "termux_pss_mib": 42.63671875
+    },
+    {
+      "mode": "ssh",
+      "layout": "SINGLE",
+      "n": 24,
+      "p50_ms": 18.451770500000002,
+      "p95_ms": 36.341302,
+      "app_idle_cpu_percent": 1.02,
+      "termux_idle_cpu_percent": 0.29498858196201305,
+      "app_pss_mib": 173.4990234375,
+      "termux_pss_mib": 40.8798828125
+    },
+    {
+      "mode": "ssh",
+      "layout": "LEFT_RIGHT",
+      "n": 24,
+      "p50_ms": 16.558228999999997,
+      "p95_ms": 21.214844,
+      "app_idle_cpu_percent": 1.1098890110988902,
+      "termux_idle_cpu_percent": 0.5850945356183634,
+      "app_pss_mib": 181.14453125,
+      "termux_pss_mib": 36.6943359375
+    }
+  ],
+  "limitations": "One debug run per variant on one Vivo phone; 24 inputs/layout and 10s idle, not a battery, IME or release memory study. Existing Termux jobs held constant; UID PSS includes those jobs. First legacy bootstrap exited137; successful clean repeat after priming Termux foreground and removing only its failed fixture. Dedicated SSH daemon stopped only for legacy measurement."
+}

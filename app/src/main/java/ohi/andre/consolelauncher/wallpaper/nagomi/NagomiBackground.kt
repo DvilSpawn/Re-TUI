@@ -5,7 +5,7 @@ import android.graphics.*
 import android.media.ExifInterface
 import android.net.Uri
 import android.util.AtomicFile
-import ohi.andre.consolelauncher.R
+import ohi.andre.consolelauncher.wallpaper.WallpaperLibrary
 import java.io.File
 import java.io.IOException
 import kotlin.math.max
@@ -88,7 +88,8 @@ internal object NagomiBackground {
 
     fun load(context: Context, file: File?, width: Int, height: Int): Bitmap {
         val source = file?.takeIf { it.isFile }?.let { BitmapFactory.decodeFile(it.path) }
-            ?: BitmapFactory.decodeResource(context.resources, R.drawable.nagomi_pond_bed, BitmapFactory.Options().apply { inScaled = false })
+            ?: BitmapFactory.decodeFile(WallpaperLibrary.store(context).asset("nagomi", "nagomi_pond_bed.png").path, BitmapFactory.Options().apply { inScaled = false })
+            ?: Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888).apply { eraseColor(0xff345e52.toInt()) }
         val result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val scale = max(width.toFloat() / source.width, height.toFloat() / source.height)
         val w = source.width * scale

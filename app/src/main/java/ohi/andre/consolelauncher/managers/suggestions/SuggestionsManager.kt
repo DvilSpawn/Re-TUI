@@ -844,6 +844,15 @@ class SuggestionsManager(
             )
             candidates.add(SearchResult(name, pack.context.getString(R.string.search_command), SearchResult.TYPE_COMMAND, suggestion, name))
         }
+        for (suggestion in termuxLauncherSuggestions(TermuxWorkspaceLauncherManager.list(pack.context))) {
+            candidates.add(SearchResult(
+                suggestion.text!!,
+                suggestion.getText()!!,
+                SearchResult.TYPE_COMMAND,
+                suggestion,
+                "${suggestion.text} ${suggestion.getText()}"
+            ))
+        }
         for (group in pack.appsManager.groups) {
             candidates.add(
                 SearchResult(
@@ -2873,21 +2882,8 @@ class SuggestionsManager(
     }
 
     private fun suggestTermuxAppRoots(suggestions: MutableList<Suggestion?>, lower: String) {
-        if (lower.length == 0) {
-            return
-        }
-        for (launcher in TermuxWorkspaceLauncherManager.list(pack.context)) {
-            if (launcher.id.startsWith(lower)) {
-                suggestions.add(
-                    Suggestion(
-                        null,
-                        launcher.id,
-                        true,
-                        Suggestion.Companion.TYPE_COMMAND
-                    )
-                )
-            }
-        }
+        if (lower.isEmpty()) return
+        suggestions.addAll(termuxLauncherSuggestions(TermuxWorkspaceLauncherManager.list(pack.context), lower))
     }
 
     private fun suggestWidgetIds(
@@ -4965,6 +4961,15 @@ class SuggestionsManager(
             "-dock" to false,
             "-close" to true
         )
+
+        internal fun termuxLauncherSuggestions(
+            launchers: List<TermuxWorkspaceLauncherManager.Launcher>,
+            prefix: String? = null
+        ): List<Suggestion> = launchers.filter {
+            prefix == null || it.id.startsWith(prefix, true) || it.title.startsWith(prefix, true)
+        }.map {
+            Suggestion(null, it.title, true, Suggestion.TYPE_PERMANENT, "tmux launch ${it.id}")
+        }
 
         internal fun moduleRootOptionMatches(option: String, typed: String?): Boolean {
             val filter = typed?.trim { it <= ' ' }?.lowercase(Locale.getDefault()).orEmpty()

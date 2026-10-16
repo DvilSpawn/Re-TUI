@@ -1,0 +1,48 @@
+{
+  "commit": "bce4a7115c666afde43947b00a7f228c6e304113",
+  "qualification": "Release source matching installed build number and exact installed helper hash. Installed APK bytecode was not extracted or compared.",
+  "files": [
+    {
+      "original_path": "app/src/main/java/ohi/andre/consolelauncher/managers/termux/TermuxWorkspaceTerminal.kt",
+      "saved_as": "TermuxWorkspaceTerminal.kt",
+      "lines": 39,
+      "sha256": "34e9c78a3070c56795ffe7d82debc777afa24a1350239880d01eaf66b6bba65f"
+    },
+    {
+      "original_path": "app/src/main/java/ohi/andre/consolelauncher/managers/termux/TermuxWorkspaceOutput.kt",
+      "saved_as": "TermuxWorkspaceOutput.kt",
+      "lines": 27,
+      "sha256": "cefa70056026f822886e34e09dcd70f37ceebed71d2f4aa59ec6754869329893"
+    },
+    {
+      "original_path": "app/src/main/java/ohi/andre/consolelauncher/managers/termux/TermuxWorkspaceFrame.kt",
+      "saved_as": "TermuxWorkspaceFrame.kt",
+      "lines": 50,
+      "sha256": "b9f457a7176ebab88906b9b0c3fd32c648432bb96a2b8dbcd96183ca11345ac0"
+    },
+    {
+      "original_path": "app/src/main/java/ohi/andre/consolelauncher/managers/termux/TermuxWorkspaceSocketClient.kt",
+      "saved_as": "TermuxWorkspaceSocketClient.kt",
+      "lines": 262,
+      "sha256": "17927f10e6cc831fb7747e7bb1fa70769ff82a9baaf609a3259cdb07faa0a6bc"
+    },
+    {
+      "original_path": "app/src/main/java/ohi/andre/consolelauncher/managers/termux/TerminalGridView.kt",
+      "saved_as": "TerminalGridView.kt",
+      "lines": 549,
+      "sha256": "8e3b3fba5c7a47382cc3e827ef6099659fb60d14eaa27d6ecc8f3f0d93addd2c"
+    },
+    {
+      "original_path": "app/src/main/java/ohi/andre/consolelauncher/managers/termux/TermuxWorkspaceActivity.kt",
+      "saved_as": "TermuxWorkspaceActivity.kt",
+      "lines": 836,
+      "sha256": "ab9b98ac9bdc21008ef7f82e8d2b442e675e817f7e614fe151d32a82dd8bb9fb"
+    },
+    {
+      "original_path": "app/src/main/java/ohi/andre/consolelauncher/managers/termux/TermuxHelperUpdate.kt",
+      "saved_as": "TermuxHelperUpdate.kt",
+      "lines": 27,
+      "sha256": "771316ea752e81ac05e853a45c950d809b9043dd6550e93892ae68393b038737"
+    }
+  ]
+}

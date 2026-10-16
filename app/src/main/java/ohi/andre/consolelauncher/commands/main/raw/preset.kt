@@ -90,7 +90,9 @@ class preset : ParamCommand() {
         },
         market {
             override fun exec(pack: ExecutePack): String? {
-                pack.context.startActivity(Tuils.webPage(MARKETPLACE_URL))
+                pack.context.startActivity(android.content.Intent(pack.context,
+                    ohi.andre.consolelauncher.commands.tuixt.PresetMarketplaceActivity::class.java)
+                    .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK))
                 return null
             }
 

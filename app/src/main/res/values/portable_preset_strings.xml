@@ -3,6 +3,7 @@
     <string name="portable_preset_import">Import RetUI Preset</string>
     <string name="portable_preset_inspecting">Reading and validating preset…</string>
     <string name="portable_preset_confirm">Import</string>
+    <string name="portable_preset_choose_file">Choose preset file</string>
     <string name="portable_preset_cancel">Cancel</string>
     <string name="portable_preset_saved">Saved preset: %1$s\nApply it later through preset -apply. Active settings have not changed.</string>
     <string name="portable_preset_error">Unable to import preset: %1$s\nChoose a readable shared configuration using Import RetUI Preset. Personal backups belong in Restore Backup.</string>

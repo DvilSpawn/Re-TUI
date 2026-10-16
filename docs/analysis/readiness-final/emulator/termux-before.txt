@@ -1,0 +1,3 @@
+sshd ABSENT
+tmux ABSENT
+allow-external-apps=true

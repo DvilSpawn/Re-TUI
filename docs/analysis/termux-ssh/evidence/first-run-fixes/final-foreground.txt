@@ -1,0 +1,1 @@
+    topResumedActivity=ActivityRecord{217316087 u0 com.dvil.tui_renewed/ohi.andre.consolelauncher.LauncherActivity t34468 d0}

@@ -18,6 +18,39 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class TermuxWorkspacePaneIntegrationTest {
     private val instrumentation get() = InstrumentationRegistry.getInstrumentation()
+    @Test fun emptyWorkspaceHidesWindowChooserUntilAWindowIsAvailable() {
+        val context = instrumentation.targetContext
+        check(context.packageName.endsWith(".termuxsshdebug")) { "Use the disposable Termux test application" }
+        check(!TermuxWorkspaceSshSetup.isPaired(context)) { "This UI fixture must not connect to Termux" }
+        ActivityScenario.launch<TermuxWorkspaceActivity>(Intent(context, TermuxWorkspaceActivity::class.java)).use { scenario ->
+            scenario.onActivity { activity ->
+                val state = field(activity, "selection") as TermuxWorkspaceState
+                state.select(0, null); state.select(1, null); state.focus(0)
+                val labels = (field(activity, "labels") as Array<*>).map { it as android.widget.TextView }
+                val windowField = TermuxWorkspaceActivity::class.java.getDeclaredField("windows").apply { isAccessible = true }
+                fun refresh(windows: List<Pair<String, String>>) {
+                    windowField.set(activity, windows)
+                    call(activity, "updateLabels")
+                }
+                refresh(emptyList())
+                assertTrue(labels.all { it.visibility == View.GONE && !it.isClickable })
+                refresh(listOf("@1" to "0: shell"))
+                assertTrue(labels.all { it.visibility == View.VISIBLE && it.isClickable })
+                state.select(0, "@1")
+                refresh(listOf("@1" to "0: shell"))
+                assertEquals(View.VISIBLE, labels[0].visibility)
+                assertEquals(View.GONE, labels[1].visibility)
+                state.select(0, null)
+                refresh(emptyList())
+                assertTrue(labels.all { it.visibility == View.GONE && !it.isClickable })
+                call(activity, "directText", ":help")
+                assertEquals(View.VISIBLE, labels[0].visibility)
+                assertEquals(":help", labels[0].text.toString())
+                assertFalse(labels[0].isClickable)
+            }
+        }
+    }
+
     private fun field(activity: TermuxWorkspaceActivity, name: String): Any? =
         TermuxWorkspaceActivity::class.java.getDeclaredField(name).apply { isAccessible = true }.get(activity)
     private fun call(activity: TermuxWorkspaceActivity, name: String, vararg args: Any?) =
@@ -71,6 +104,8 @@ class TermuxWorkspacePaneIntegrationTest {
     }
 
     @Test fun liveAppearanceAndFadeRetainBothTilesDraftAndInputSelection() {
+        assumeTrue("Legacy socket appearance fixture; default SSH is covered by TermuxWorkspaceSshAppearanceTest",
+            !ohi.andre.consolelauncher.BuildConfig.TERMUX_SSH_PANE)
         assumeTrue("Disposable emulator fixture only", android.os.Build.FINGERPRINT.contains("generic") || android.os.Build.HARDWARE in listOf("goldfish", "ranchu"))
         val context = instrumentation.targetContext
         assumeTrue("Appearance fixture must not bootstrap a shared Termux runtime", !TermuxBridgeManager.status(context).termuxInstalled)

@@ -104,7 +104,8 @@ class LauncherInteractionRegressionTest {
             .contains("if ! bridge_listener_ready \"\$token\"; then"))
 
         val activity = File(root, "app/src/main/java/ohi/andre/consolelauncher/managers/termux/TermuxWorkspaceActivity.kt").readText()
-        val socketError = activity.substringAfter("override fun onError(message: String)").substringBefore("override fun onClosed()")
+        val socketListener = activity.substringAfter("TermuxWorkspaceSocketClient(object : TermuxWorkspaceSocketClient.Listener")
+        val socketError = socketListener.substringAfter("override fun onError(message: String)").substringBefore("override fun onClosed()")
         assertTrue(socketError.contains("clients[tile] !== client"))
         assertTrue(socketError.contains("closeTile(tile)"))
         assertFalse(socketError.contains("startBridge()"))

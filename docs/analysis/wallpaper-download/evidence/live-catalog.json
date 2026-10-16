@@ -1,0 +1,122 @@
+{
+  "catalog": "https://re-tui.pages.dev/wallpaper-packs/catalog.json",
+  "entries": [
+    {
+      "id": "topo",
+      "preview": {
+        "url": "https://re-tui.pages.dev/wallpaper-packs/previews/topo.gif",
+        "ok": true,
+        "bytes": 21674,
+        "sha256": "aa75ddfab51b81e33f48fee0e22b4ceebda90cf83b3c794bf59c53333aa53af7",
+        "gifSignature": "GIF89a"
+      },
+      "download": {
+        "url": "https://re-tui.pages.dev/wallpaper-packs/downloads/topo.retui-wallpaper",
+        "ok": true,
+        "bytes": 16817,
+        "sha256": "0b8f84e6dd4381a8754aaa03231dba130c8fd622f05f19858f349681feba4fb4",
+        "catalogHashMatches": true,
+        "catalogSizeMatches": true,
+        "entries": 2,
+        "manifest": {
+          "id": "topo",
+          "engine": "topo noise",
+          "api": 1,
+          "name": "Topo Noise"
+        },
+        "bundledAssetHashesMatch": true,
+        "pngCount": 0
+      }
+    },
+    {
+      "id": "pixel",
+      "preview": {
+        "url": "https://re-tui.pages.dev/wallpaper-packs/previews/pixel.gif",
+        "ok": true,
+        "bytes": 31513,
+        "sha256": "70051742ebc2f181338a9410a5397567135dc371c823d504ce7ba28f41f5f0ce",
+        "gifSignature": "GIF89a"
+      },
+      "download": {
+        "url": "https://re-tui.pages.dev/wallpaper-packs/downloads/pixel.retui-wallpaper",
+        "ok": true,
+        "bytes": 16818,
+        "sha256": "ee30f91c18045a03019ce7cc7a89f2f59030731e5606e60c14a0adf5b2853d2b",
+        "catalogHashMatches": true,
+        "catalogSizeMatches": true,
+        "entries": 2,
+        "manifest": {
+          "id": "pixel",
+          "engine": "pixel dream",
+          "api": 1,
+          "name": "Pixel Dream"
+        },
+        "bundledAssetHashesMatch": true,
+        "pngCount": 0
+      }
+    },
+    {
+      "id": "clouds",
+      "preview": {
+        "url": "https://re-tui.pages.dev/wallpaper-packs/previews/clouds.gif",
+        "ok": true,
+        "bytes": 493096,
+        "sha256": "3a270ee065c2484c29fdd5e68b2cdb38bd5cacbecbcf37642d0fefc35cc13592",
+        "gifSignature": "GIF89a"
+      },
+      "download": {
+        "url": "https://re-tui.pages.dev/wallpaper-packs/downloads/clouds.retui-wallpaper",
+        "ok": true,
+        "bytes": 186882,
+        "sha256": "dc250ad4364a1e0ee94ee6dec5e84548e4ccc8c235110cf7e459940fd998e5e6",
+        "catalogHashMatches": true,
+        "catalogSizeMatches": true,
+        "entries": 39,
+        "manifest": {
+          "id": "clouds",
+          "engine": "clouds",
+          "api": 1,
+          "name": "Clouds"
+        },
+        "bundledAssetHashesMatch": true,
+        "pngCount": 37
+      }
+    },
+    {
+      "id": "nagomi",
+      "preview": {
+        "url": "https://re-tui.pages.dev/wallpaper-packs/previews/nagomi.gif",
+        "ok": true,
+        "bytes": 599866,
+        "sha256": "d638b05dd51b159dedb64f10c94a88641a6eb3fa426cc0eba47535c14455d4a6",
+        "gifSignature": "GIF89a"
+      },
+      "download": {
+        "url": "https://re-tui.pages.dev/wallpaper-packs/downloads/nagomi.retui-wallpaper",
+        "ok": true,
+        "bytes": 502849,
+        "sha256": "a52e01bdeeba1da949a161dc2c27f358620a153f9a42bef49f325a231673cf52",
+        "catalogHashMatches": true,
+        "catalogSizeMatches": true,
+        "entries": 3,
+        "manifest": {
+          "id": "nagomi",
+          "engine": "nagomi",
+          "api": 1,
+          "name": "Nagomi Koi Pond"
+        },
+        "bundledAssetHashesMatch": true,
+        "pngCount": 1
+      }
+    }
+  ],
+  "verifiedAtUtc": "2026-10-16T03:05:34.156299+00:00",
+  "catalogHttpStatus": 200,
+  "userAgentChecks": {
+    "okhttp/4.12.0": 200,
+    "okhttp/5.1.0": 200,
+    "curl/8.7.1": 200,
+    "Python-urllib/3.14": 403
+  },
+  "verification": "Live HTTPS fetches; download SHA256/size checked against catalogue, PNG assets compared with currently bundled source images. No publication or device install."
+}

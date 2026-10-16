@@ -1,0 +1,8 @@
+{
+  "serial": "adb-10BE1C0FB40006A-RwuKbp._adb-tls-connect._tcp",
+  "package": "com.dvil.tui_renewed",
+  "versionCode": 503,
+  "apk": "app/build/ship-candidate/retui-3-build503-preset-import.apk",
+  "sha256": "c77f08e13e8dd16e983a5caca4ec35433192be108fa9e993c03a06395b4a57a1",
+  "installedBytesMatch": true
+}

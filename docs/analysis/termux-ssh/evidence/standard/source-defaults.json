@@ -1,0 +1,11 @@
+{
+  "files": {
+    "app/build.gradle": "11d1010d4eb7de6bd75ec1ebe993c8a2d2a6c2f481a38ca38f4e8293d248644a",
+    "app/proguard-termux-ssh.pro": "0fed099afe0fc9ed8e0661b34b023f24a95c9340e057b9b83d3fa2723500f222"
+  },
+  "normal_debug_and_release_ssh": true,
+  "release_r8_rules_always_included": true,
+  "diagnostic_legacy_build_only": true,
+  "user_backend_selector_added": false,
+  "normal_package_installed": false
+}

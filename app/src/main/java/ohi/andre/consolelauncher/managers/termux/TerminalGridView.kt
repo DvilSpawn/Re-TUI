@@ -29,6 +29,7 @@ class TerminalGridView @JvmOverloads constructor(
     private var terminalForeground = Color.WHITE
     private var terminalBackground = Color.BLACK
     private var terminalAccent = Color.WHITE
+    private var reverseBackground = Color.DKGRAY
     private var cols = 80
     private var rows = 24
     private var cursorX: Int? = null
@@ -38,6 +39,7 @@ class TerminalGridView @JvmOverloads constructor(
     private var baselineOffsetPx = 1f
     private var cells = Array(cols * rows) { Cell() }
     private var frame: String? = null
+    private var streamEmulator: com.termux.terminal.TerminalEmulator? = null
     private val normalGlyphWidths = HashMap<String, Float>()
     private val boldGlyphWidths = HashMap<String, Float>()
 
@@ -67,9 +69,10 @@ class TerminalGridView @JvmOverloads constructor(
         terminalForeground = foreground
         terminalBackground = background
         terminalAccent = accent
+        reverseBackground = ThemeColorResolver.blendPreservingAlpha(background, foreground, 0.36f)
         clearCells()
-        parseIntoGrid(frame)
-        invalidate()
+        val engine = streamEmulator
+        if (engine != null) setEmulatorFrame(engine) else { parseIntoGrid(frame); invalidate() }
     }
 
     fun characterWidth(): Float {
@@ -80,7 +83,57 @@ class TerminalGridView @JvmOverloads constructor(
         return max(1, cellHeightPx)
     }
 
+    /** Copy the engine's cells into the existing renderer, without ANSI reparsing. */
+    fun setEmulatorFrame(emulator: com.termux.terminal.TerminalEmulator) {
+        streamEmulator = emulator
+        frame = null
+        val c = emulator.mColumns.coerceIn(1, 240)
+        val r = emulator.mRows.coerceIn(1, 120)
+        val sizeChanged = c != cols || r != rows
+        if (sizeChanged) {
+            cols = c; rows = r
+            cells = Array(cols * rows) { Cell() }
+        } else clearCells()
+        cursorX = if (emulator.isCursorEnabled) emulator.cursorCol else null
+        cursorY = if (emulator.isCursorEnabled) emulator.cursorRow else null
+        val screen = emulator.screen
+        for (row in 0 until rows) {
+            val source = screen.allocateFullLineIfNecessary(screen.externalToInternalRow(row))
+            var offset = 0
+            var col = 0
+            var lastGlyphCol = -1
+            while (col < cols && offset < source.spaceUsed) {
+                val point = Character.codePointAt(source.mText, offset, source.spaceUsed)
+                val count = Character.charCount(point)
+                val width = com.termux.terminal.WcWidth.width(point)
+                if (width > 0) {
+                    val encoded = source.getStyle(col)
+                    val effects = com.termux.terminal.TextStyle.decodeEffect(encoded)
+                    val fore = com.termux.terminal.TextStyle.decodeForeColor(encoded)
+                    val back = com.termux.terminal.TextStyle.decodeBackColor(encoded)
+                    val style = Style().apply {
+                        foreground = if (fore == 256) null else if (fore < 0) fore else if (fore < 16) ThemeColorResolver.ansi(fore % 8, fore >= 8) else emulator.mColors.mCurrentColors[fore]
+                        background = if (back == 257) null else if (back < 0) back else if (back < 16) ThemeColorResolver.ansi(back % 8, back >= 8) else emulator.mColors.mCurrentColors[back]
+                        bold = effects and com.termux.terminal.TextStyle.CHARACTER_ATTRIBUTE_BOLD != 0
+                        reverse = (effects and com.termux.terminal.TextStyle.CHARACTER_ATTRIBUTE_INVERSE != 0) xor emulator.isReverseVideo
+                    }
+                    writeCell(col, row, String(source.mText, offset, count), style)
+                    if (width > 1 && col + 1 < cols) writeCell(col + 1, row, " ", style)
+                    lastGlyphCol = col
+                    col += width
+                } else if (lastGlyphCol >= 0) {
+                    // Keep combining characters on the previous glyph rather than a new cell.
+                    cells[indexOf(lastGlyphCol, row)].text += String(source.mText, offset, count)
+                }
+                offset += count
+            }
+        }
+        if (sizeChanged) requestLayoutSafely()
+        invalidate()
+    }
+
     fun setFrame(value: String?, frameCols: Int, frameRows: Int, cursorCol: Int?, cursorRow: Int?) {
+        streamEmulator = null
         frame = value
         val cleanCols = frameCols.coerceIn(1, 240)
         val cleanRows = frameRows.coerceIn(1, 120)
@@ -126,6 +179,15 @@ class TerminalGridView @JvmOverloads constructor(
                     backgroundPaint.color = background
                     canvas.drawRect(left, top, left + width + 0.75f, top + height, backgroundPaint)
                 }
+            }
+        }
+        // Paint all backgrounds first so continuation cells cannot cover wide glyphs.
+        for (row in 0 until rows) {
+            val top = row * height
+            for (col in 0 until cols) {
+                val cell = cells[indexOf(col, row)]
+                val left = col * width
+                val isCursor = cursorX == col && cursorY == row
                 if (cell.text.isNotEmpty() && cell.text != " ") {
                     textPaint.color = if (isCursor) terminalBackground else cell.foreground
                     textPaint.typeface = if (cell.bold) boldTypeface else normalTypeface
@@ -279,8 +341,8 @@ class TerminalGridView @JvmOverloads constructor(
                 foreground = style.background!!
                 background = originalForeground
             } else {
-                background = foreground
                 foreground = terminalBackground
+                background = reverseBackground
             }
         }
         return ResolvedStyle(foreground, background)

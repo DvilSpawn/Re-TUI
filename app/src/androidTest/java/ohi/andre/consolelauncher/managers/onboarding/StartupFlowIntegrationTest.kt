@@ -270,9 +270,22 @@ class StartupFlowIntegrationTest {
         org.junit.Assume.assumeTrue(roles.isRoleAvailable(android.app.role.RoleManager.ROLE_HOME))
         org.junit.Assume.assumeFalse(roles.isRoleHeld(android.app.role.RoleManager.ROLE_HOME))
         val requests = java.util.concurrent.atomic.AtomicInteger()
+        val preparation = java.util.concurrent.atomic.AtomicReference<StartupMenuActivity>()
+        val progress = java.util.concurrent.atomic.AtomicReference<TextView>()
+        val output = java.util.concurrent.atomic.AtomicReference<TextView>()
+        val nextButton = java.util.concurrent.atomic.AtomicReference<View>()
+        val completeBeforeRequest = java.util.concurrent.atomic.AtomicBoolean()
+        val dismissedBeforeRequest = java.util.concurrent.atomic.AtomicBoolean()
+        val launcherReadyBeforeRequest = java.util.concurrent.atomic.AtomicBoolean()
         val monitor = object : android.app.Instrumentation.ActivityMonitor() {
             override fun onStartActivity(intent: Intent): android.app.Instrumentation.ActivityResult? {
                 if (intent.action != "android.app.role.action.REQUEST_ROLE") return null
+                completeBeforeRequest.set(progress.get()?.text?.toString() == "[██████████]" &&
+                    output.get()?.text?.contains(context.getString(R.string.startup_build_ready)) == true)
+                dismissedBeforeRequest.set(preparation.get()?.isDestroyed == true &&
+                    progress.get()?.isAttachedToWindow == false && nextButton.get()?.isAttachedToWindow == false)
+                launcherReadyBeforeRequest.set(ActivityLifecycleMonitorRegistry.getInstance().getActivitiesInStage(Stage.RESUMED)
+                    .filterIsInstance<LauncherActivity>().any { it.uiManager != null && it.window.decorView.hasWindowFocus() })
                 requests.incrementAndGet()
                 return android.app.Instrumentation.ActivityResult(android.app.Activity.RESULT_CANCELED, null)
             }
@@ -282,11 +295,21 @@ class StartupFlowIntegrationTest {
             open().use { scenario ->
                 StartupMenuManager.setDefaultLauncher(context, true)
                 StartupMenuManager.toggleAutoTheme(context)
+                scenario.onActivity { preparation.set(it); nextButton.set(it.findViewById(R.id.startup_next)) }
                 next(scenario)
                 next(scenario)
-                next(scenario)
+                scenario.onActivity {
+                    it.findViewById<View>(R.id.startup_next).performClick()
+                    progress.set(it.findViewById(R.id.startup_build_progress))
+                    output.set(it.findViewById(R.id.startup_build_output))
+                }
                 await("Setup completes after declining the Home role") { !StartupMenuManager.isFirstInstallPending(context) && requests.get() == 1 }
                 await("Setup closes after the chooser returns") { scenario.state == androidx.lifecycle.Lifecycle.State.DESTROYED }
+                assertTrue("Preparation reaches its final progress and ready output before asking", completeBeforeRequest.get())
+                assertTrue("Preparation activity and controls are fully detached before asking", dismissedBeforeRequest.get())
+                assertTrue("The actual launcher is ready before asking", launcherReadyBeforeRequest.get())
+                assertEquals("Cancellation must not repeat the chooser", 1, requests.get())
+                assertFalse(StartupMenuManager.hasPendingDefaultLauncher(context))
                 assertFalse(roles.isRoleHeld(android.app.role.RoleManager.ROLE_HOME))
             }
         } finally {
@@ -397,6 +420,18 @@ class StartupFlowIntegrationTest {
             instrumentation.runOnMainSync {
                 screen.findViewById<View>(R.id.startup_next).performClick()
             }
+            if (android.os.Build.VERSION.SDK_INT >= 26 && !android.animation.ValueAnimator.areAnimatorsEnabled()) {
+                await("Reduced-motion setup completes without an animation delay") { !preview.getBoolean("active", false) }
+                instrumentation.runOnMainSync {
+                    val output = screen.findViewById<TextView>(R.id.startup_build_output).text.toString()
+                    assertTrue(output.startsWith("launcher.configure {"))
+                    assertTrue(output.contains("border = dashed"))
+                    assertTrue(output.contains("stroke = 3.5 dp"))
+                    assertTrue(output.contains("gap = 9 dp"))
+                    assertEquals("[██████████]", screen.findViewById<TextView>(R.id.startup_build_progress).text.toString())
+                }
+                return@use
+            }
             SystemClock.sleep(150)
             instrumentation.runOnMainSync {
                 initial = screen.findViewById<TextView>(R.id.startup_build_output).text.toString()
@@ -412,8 +447,9 @@ class StartupFlowIntegrationTest {
                 assertTrue(output.contains("stroke = 3.5 dp"))
                 assertTrue(output.contains("gap = 9 dp"))
                 val bar = screen.findViewById<TextView>(R.id.startup_build_progress)
-                assertTrue(bar.text.contains('#'))
-                assertNotEquals("[##########]", bar.text.toString())
+                assertTrue(bar.text.contains('█'))
+                assertTrue(bar.text.contains('░'))
+                assertNotEquals("[██████████]", bar.text.toString())
                 val bounds = android.graphics.Rect()
                 assertTrue("Progress remains visible while the code scrolls", bar.getGlobalVisibleRect(bounds))
             }

@@ -1,0 +1,1608 @@
+DAEMON LOG
+debug3: rexec:10 setting PasswordAuthentication no
+debug3: rexec:11 setting KbdInteractiveAuthentication no
+debug3: rexec:12 setting PermitEmptyPasswords no
+debug3: rexec:13 setting PermitRootLogin no
+debug3: rexec:14 setting StrictModes yes
+debug3: rexec:15 setting DisableForwarding yes
+debug3: rexec:16 setting PermitUserRC no
+debug3: rexec:17 setting PermitUserEnvironment no
+debug3: rexec:18 setting PermitTTY yes
+debug3: rexec:19 setting UseDNS no
+debug3: rexec:20 setting LogLevel ERROR
+debug3: rexec:21 setting ForceCommand "/data/data/com.termux/files/home/.retui/ssh/dispatch.sh"
+debug1: sshd-session version OpenSSH_10.3, OpenSSL 3.6.3 9 Jun 2026
+debug2: server_accept_loop: child 19461 for connection from 127.0.0.1 to 127.0.0.1 received config
+debug1: rexec start in 8 out 8 newsock 8 config_s 10/11
+debug1: rexec start in 8 out 8 newsock 8 config_s 11/12
+debug1: network sockets: 8, 8
+debug2: fd 8 setting TCP_NODELAY
+debug3: set_sock_tos: set socket 8 IP_TOS 0xb8
+debug3: server_process_channel_timeouts: setting 0 timeouts
+debug3: channel_clear_timeouts: clearing
+Connection from 127.0.0.1 port 36562 on 127.0.0.1 port 8928
+debug2: fd 8 setting O_NONBLOCK
+debug2: Network child is on pid 19467
+debug3: preauth child monitor started
+debug3: recv_rexec_state: entering fd = 4
+debug3: ssh_msg_recv entering
+debug3: ssh_msg_recv entering
+debug2: parse_hostkeys: privkey 0: ecdsa-sha2-nistp256
+debug2: parse_hostkeys: pubkey 0: ecdsa-sha2-nistp256
+debug3: recv_rexec_state: done
+debug2: parse_server_config_depth: config rexec len 630
+debug3: rexec:1 setting Port 8928
+debug3: rexec:2 setting ListenAddress 127.0.0.1
+debug3: rexec:3 setting AddressFamily inet
+debug3: rexec:4 setting HostKey "/data/data/com.termux/files/home/.retui/ssh/host_ecdsa"
+debug3: rexec:5 setting PidFile "/data/data/com.termux/files/home/.retui/ssh/sshd.pid"
+debug3: rexec:6 setting AuthorizedKeysFile "/data/data/com.termux/files/home/.retui/ssh/authorized_keys"
+debug3: rexec:7 setting AllowUsers u0_a1000
+debug3: rexec:8 setting AuthenticationMethods publickey
+debug3: rexec:9 setting PubkeyAuthentication yes
+debug3: rexec:10 setting PasswordAuthentication no
+debug3: rexec:11 setting KbdInteractiveAuthentication no
+debug3: rexec:12 setting PermitEmptyPasswords no
+debug3: rexec:13 setting PermitRootLogin no
+debug3: rexec:14 setting StrictModes yes
+debug3: rexec:15 setting DisableForwarding yes
+debug3: rexec:16 setting PermitUserRC no
+debug3: rexec:17 setting PermitUserEnvironment no
+debug3: rexec:18 setting PermitTTY yes
+debug3: rexec:19 setting UseDNS no
+debug3: rexec:20 setting LogLevel ERROR
+debug3: rexec:21 setting ForceCommand "/data/data/com.termux/files/home/.retui/ssh/dispatch.sh"
+debug1: sshd-session version OpenSSH_10.3, OpenSSL 3.6.3 9 Jun 2026
+debug2: server_accept_loop: child 19465 for connection from 127.0.0.1 to 127.0.0.1 received config
+debug1: network sockets: 8, 8
+debug2: fd 8 setting TCP_NODELAY
+debug3: set_sock_tos: set socket 8 IP_TOS 0xb8
+debug3: server_process_channel_timeouts: setting 0 timeouts
+debug3: channel_clear_timeouts: clearing
+Connection from 127.0.0.1 port 36586 on 127.0.0.1 port 8928
+debug2: fd 8 setting O_NONBLOCK
+debug2: Network child is on pid 19468
+debug3: preauth child monitor started
+debug3: recv_rexec_state: entering fd = 4
+debug3: ssh_msg_recv entering
+debug3: ssh_msg_recv entering
+debug2: parse_hostkeys: privkey 0: ecdsa-sha2-nistp256
+debug2: parse_hostkeys: pubkey 0: ecdsa-sha2-nistp256
+debug3: recv_rexec_state: done
+debug2: parse_server_config_depth: config rexec len 630
+debug3: rexec:1 setting Port 8928
+debug3: rexec:2 setting ListenAddress 127.0.0.1
+debug3: rexec:3 setting AddressFamily inet
+debug3: rexec:4 setting HostKey "/data/data/com.termux/files/home/.retui/ssh/host_ecdsa"
+debug3: rexec:5 setting PidFile "/data/data/com.termux/files/home/.retui/ssh/sshd.pid"
+debug3: rexec:6 setting AuthorizedKeysFile "/data/data/com.termux/files/home/.retui/ssh/authorized_keys"
+debug3: rexec:7 setting AllowUsers u0_a1000
+debug3: rexec:8 setting AuthenticationMethods publickey
+debug3: rexec:9 setting PubkeyAuthentication yes
+debug3: rexec:10 setting PasswordAuthentication no
+debug3: rexec:11 setting KbdInteractiveAuthentication no
+debug3: rexec:12 setting PermitEmptyPasswords no
+debug3: rexec:13 setting PermitRootLogin no
+debug3: rexec:14 setting StrictModes yes
+debug3: rexec:15 setting DisableForwarding yes
+debug3: rexec:16 setting PermitUserRC no
+debug3: rexec:17 setting PermitUserEnvironment no
+debug3: rexec:18 setting PermitTTY yes
+debug3: rexec:19 setting UseDNS no
+debug3: rexec:20 setting LogLevel ERROR
+debug3: rexec:21 setting ForceCommand "/data/data/com.termux/files/home/.retui/ssh/dispatch.sh"
+debug1: sshd-session version OpenSSH_10.3, OpenSSL 3.6.3 9 Jun 2026
+debug2: server_accept_loop: child 19463 for connection from 127.0.0.1 to 127.0.0.1 received config
+debug1: network sockets: 8, 8
+debug2: fd 8 setting TCP_NODELAY
+debug3: set_sock_tos: set socket 8 IP_TOS 0xb8
+debug3: server_process_channel_timeouts: setting 0 timeouts
+debug3: channel_clear_timeouts: clearing
+Connection from 127.0.0.1 port 36568 on 127.0.0.1 port 8928
+debug2: fd 8 setting O_NONBLOCK
+debug2: Network child is on pid 19469
+debug3: preauth child monitor started
+debug3: recv_rexec_state: entering fd = 4
+debug3: ssh_msg_recv entering
+debug3: ssh_msg_recv entering
+debug2: parse_hostkeys: privkey 0: ecdsa-sha2-nistp256
+debug2: parse_hostkeys: pubkey 0: ecdsa-sha2-nistp256
+debug3: recv_rexec_state: done
+debug2: parse_server_config_depth: config rexec len 630
+debug3: rexec:1 setting Port 8928
+debug3: rexec:2 setting ListenAddress 127.0.0.1
+debug3: rexec:3 setting AddressFamily inet
+debug3: rexec:4 setting HostKey "/data/data/com.termux/files/home/.retui/ssh/host_ecdsa"
+debug3: rexec:5 setting PidFile "/data/data/com.termux/files/home/.retui/ssh/sshd.pid"
+debug3: rexec:6 setting AuthorizedKeysFile "/data/data/com.termux/files/home/.retui/ssh/authorized_keys"
+debug3: rexec:7 setting AllowUsers u0_a1000
+debug3: rexec:8 setting AuthenticationMethods publickey
+debug3: rexec:9 setting PubkeyAuthentication yes
+debug3: rexec:10 setting PasswordAuthentication no
+debug3: rexec:11 setting KbdInteractiveAuthentication no
+debug3: rexec:12 setting PermitEmptyPasswords no
+debug3: rexec:13 setting PermitRootLogin no
+debug3: rexec:14 setting StrictModes yes
+debug3: rexec:15 setting DisableForwarding yes
+debug3: rexec:16 setting PermitUserRC no
+debug3: rexec:17 setting PermitUserEnvironment no
+debug3: rexec:18 setting PermitTTY yes
+debug3: rexec:19 setting UseDNS no
+debug3: rexec:20 setting LogLevel ERROR
+debug3: rexec:21 setting ForceCommand "/data/data/com.termux/files/home/.retui/ssh/dispatch.sh"
+debug1: sshd-session version OpenSSH_10.3, OpenSSL 3.6.3 9 Jun 2026
+debug1: network sockets: 8, 8
+debug2: fd 8 setting TCP_NODELAY
+debug3: set_sock_tos: set socket 8 IP_TOS 0xb8
+debug3: server_process_channel_timeouts: setting 0 timeouts
+debug3: channel_clear_timeouts: clearing
+Connection from 127.0.0.1 port 36574 on 127.0.0.1 port 8928
+debug2: fd 8 setting O_NONBLOCK
+debug2: Network child is on pid 19470
+debug3: preauth child monitor started
+debug1: network sockets: 5, 5 [preauth]
+debug2: server_accept_loop: child 19464 for connection from 127.0.0.1 to 127.0.0.1 received config
+debug3: recv_privsep_state: begin [preauth]
+debug3: mm_get_state: entering [preauth]
+debug3: mm_request_send: entering, type 51 [preauth]
+debug3: mm_get_state: waiting for MONITOR_ANS_STATE [preauth]
+debug3: mm_request_receive_expect: entering, type 52 [preauth]
+debug3: mm_request_receive: entering [preauth]
+debug3: mm_request_receive: entering
+debug3: monitor_read: checking request 51
+debug1: mm_answer_state: config len 630
+debug3: mm_request_send: entering, type 52
+debug3: mm_answer_state: done
+debug2: monitor_read: 51 used once, disabling now
+debug3: mm_get_state: done [preauth]
+debug2: parse_hostkeys: key 0: ecdsa-sha2-nistp256 [preauth]
+debug3: recv_privsep_state: done [preauth]
+debug2: parse_server_config_depth: config rexec len 630 [preauth]
+debug3: rexec:1 setting Port 8928 [preauth]
+debug3: rexec:2 setting ListenAddress 127.0.0.1 [preauth]
+debug3: rexec:3 setting AddressFamily inet [preauth]
+debug3: rexec:4 setting HostKey "/data/data/com.termux/files/home/.retui/ssh/host_ecdsa" [preauth]
+debug3: rexec:5 setting PidFile "/data/data/com.termux/files/home/.retui/ssh/sshd.pid" [preauth]
+debug3: rexec:6 setting AuthorizedKeysFile "/data/data/com.termux/files/home/.retui/ssh/authorized_keys" [preauth]
+debug3: rexec:7 setting AllowUsers u0_a1000 [preauth]
+debug3: rexec:8 setting AuthenticationMethods publickey [preauth]
+debug3: rexec:9 setting PubkeyAuthentication yes [preauth]
+debug3: rexec:10 setting PasswordAuthentication no [preauth]
+debug3: rexec:11 setting KbdInteractiveAuthentication no [preauth]
+debug3: rexec:12 setting PermitEmptyPasswords no [preauth]
+debug3: rexec:13 setting PermitRootLogin no [preauth]
+debug3: rexec:14 setting StrictModes yes [preauth]
+debug3: rexec:15 setting DisableForwarding yes [preauth]
+debug3: rexec:16 setting PermitUserRC no [preauth]
+debug3: rexec:17 setting PermitUserEnvironment no [preauth]
+debug3: rexec:18 setting PermitTTY yes [preauth]
+debug3: rexec:19 setting UseDNS no [preauth]
+debug3: rexec:20 setting LogLevel ERROR [preauth]
+debug3: rexec:21 setting ForceCommand "/data/data/com.termux/files/home/.retui/ssh/dispatch.sh" [preauth]
+debug2: fd 5 is TCP_NODELAY [preauth]
+debug3: set_sock_tos: set socket 5 IP_TOS 0xb8 [preauth]
+debug3: recv_rexec_state: entering fd = 4
+debug3: ssh_msg_recv entering
+debug3: ssh_msg_recv entering
+debug2: parse_hostkeys: privkey 0: ecdsa-sha2-nistp256
+debug2: parse_hostkeys: pubkey 0: ecdsa-sha2-nistp256
+debug3: recv_rexec_state: done
+debug2: parse_server_config_depth: config rexec len 630
+debug3: rexec:1 setting Port 8928
+debug3: rexec:2 setting ListenAddress 127.0.0.1
+debug3: rexec:3 setting AddressFamily inet
+debug3: rexec:4 setting HostKey "/data/data/com.termux/files/home/.retui/ssh/host_ecdsa"
+debug3: rexec:5 setting PidFile "/data/data/com.termux/files/home/.retui/ssh/sshd.pid"
+debug3: rexec:6 setting AuthorizedKeysFile "/data/data/com.termux/files/home/.retui/ssh/authorized_keys"
+debug3: rexec:7 setting AllowUsers u0_a1000
+debug3: rexec:8 setting AuthenticationMethods publickey
+debug3: rexec:9 setting PubkeyAuthentication yes
+debug3: rexec:10 setting PasswordAuthentication no
+debug3: rexec:11 setting KbdInteractiveAuthentication no
+debug3: rexec:12 setting PermitEmptyPasswords no
+debug3: rexec:13 setting PermitRootLogin no
+debug3: rexec:14 setting StrictModes yes
+debug3: rexec:15 setting DisableForwarding yes
+debug3: rexec:16 setting PermitUserRC no
+debug3: rexec:17 setting PermitUserEnvironment no
+debug3: rexec:18 setting PermitTTY yes
+debug3: rexec:19 setting UseDNS no
+debug3: rexec:20 setting LogLevel ERROR
+debug3: rexec:21 setting ForceCommand "/data/data/com.termux/files/home/.retui/ssh/dispatch.sh"
+debug1: sshd-session version OpenSSH_10.3, OpenSSL 3.6.3 9 Jun 2026
+debug1: network sockets: 8, 8
+debug2: fd 8 setting TCP_NODELAY
+debug3: set_sock_tos: set socket 8 IP_TOS 0xb8
+debug3: server_process_channel_timeouts: setting 0 timeouts
+debug3: channel_clear_timeouts: clearing
+Connection from 127.0.0.1 port 36566 on 127.0.0.1 port 8928
+debug2: fd 8 setting O_NONBLOCK
+debug1: network sockets: 5, 5 [preauth]
+debug2: server_accept_loop: child 19462 for connection from 127.0.0.1 to 127.0.0.1 received config
+debug3: recv_privsep_state: begin [preauth]
+debug3: mm_get_state: entering [preauth]
+debug3: mm_request_send: entering, type 51 [preauth]
+debug3: mm_get_state: waiting for MONITOR_ANS_STATE [preauth]
+debug3: mm_request_receive_expect: entering, type 52 [preauth]
+debug3: mm_request_receive: entering [preauth]
+debug3: mm_request_receive: entering
+debug2: Network child is on pid 19471
+debug3: preauth child monitor started
+debug3: monitor_read: checking request 51
+debug1: mm_answer_state: config len 630
+debug3: mm_request_send: entering, type 52
+debug3: mm_answer_state: done
+debug2: monitor_read: 51 used once, disabling now
+debug3: mm_get_state: done [preauth]
+debug2: parse_hostkeys: key 0: ecdsa-sha2-nistp256 [preauth]
+debug3: recv_privsep_state: done [preauth]
+debug2: parse_server_config_depth: config rexec len 630 [preauth]
+debug3: rexec:1 setting Port 8928 [preauth]
+debug3: rexec:2 setting ListenAddress 127.0.0.1 [preauth]
+debug3: rexec:3 setting AddressFamily inet [preauth]
+debug3: rexec:4 setting HostKey "/data/data/com.termux/files/home/.retui/ssh/host_ecdsa" [preauth]
+debug3: rexec:5 setting PidFile "/data/data/com.termux/files/home/.retui/ssh/sshd.pid" [preauth]
+debug3: rexec:6 setting AuthorizedKeysFile "/data/data/com.termux/files/home/.retui/ssh/authorized_keys" [preauth]
+debug3: rexec:7 setting AllowUsers u0_a1000 [preauth]
+debug3: rexec:8 setting AuthenticationMethods publickey [preauth]
+debug3: rexec:9 setting PubkeyAuthentication yes [preauth]
+debug3: rexec:10 setting PasswordAuthentication no [preauth]
+debug3: rexec:11 setting KbdInteractiveAuthentication no [preauth]
+debug3: rexec:12 setting PermitEmptyPasswords no [preauth]
+debug3: rexec:13 setting PermitRootLogin no [preauth]
+debug3: rexec:14 setting StrictModes yes [preauth]
+debug3: rexec:15 setting DisableForwarding yes [preauth]
+debug3: rexec:16 setting PermitUserRC no [preauth]
+debug3: rexec:17 setting PermitUserEnvironment no [preauth]
+debug3: rexec:18 setting PermitTTY yes [preauth]
+debug3: rexec:19 setting UseDNS no [preauth]
+debug3: rexec:20 setting LogLevel ERROR [preauth]
+debug3: rexec:21 setting ForceCommand "/data/data/com.termux/files/home/.retui/ssh/dispatch.sh" [preauth]
+debug2: fd 5 is TCP_NODELAY [preauth]
+debug3: set_sock_tos: set socket 5 IP_TOS 0xb8 [preauth]
+debug1: sshd-auth version OpenSSH_10.3, OpenSSL 3.6.3 9 Jun 2026 [preauth]
+debug3: server_process_channel_timeouts: setting 0 timeouts [preauth]
+debug3: channel_clear_timeouts: clearing [preauth]
+debug3: fd 5 is O_NONBLOCK [preauth]
+debug1: list_hostkey_types: ecdsa-sha2-nistp256 [preauth]
+debug1: Local version string SSH-2.0-OpenSSH_10.3 [preauth]
+debug1: Remote protocol version 2.0, remote software version OpenSSH-keyscan [preauth]
+debug1: compat_banner: match: OpenSSH-keyscan pat OpenSSH* compat 0x04000000 [preauth]
+debug3: mm_sshkey_setcompat: entering [preauth]
+debug3: mm_request_send: entering, type 18 [preauth]
+debug3: mm_request_receive: entering
+debug3: monitor_read: checking request 18
+debug3: mm_answer_setcompat: entering
+debug2: monitor_read: 18 used once, disabling now
+debug3: send packet: type 20 [preauth]
+debug1: SSH2_MSG_KEXINIT sent [preauth]
+debug3: receive packet: type 20 [preauth]
+debug1: SSH2_MSG_KEXINIT received [preauth]
+debug2: local server KEXINIT proposal [preauth]
+debug2: KEX algorithms: mlkem768x25519-sha256,sntrup761x25519-sha512,sntrup761x25519-sha512@openssh.com,curve25519-sha256,curve25519-sha256@libssh.org,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,ext-info-s,kex-strict-s-v00@openssh.com [preauth]
+debug2: host key algorithms: ecdsa-sha2-nistp256 [preauth]
+debug2: ciphers ctos: chacha20-poly1305@openssh.com,aes128-gcm@openssh.com,aes256-gcm@openssh.com,aes128-ctr,aes192-ctr,aes256-ctr [preauth]
+debug2: ciphers stoc: chacha20-poly1305@openssh.com,aes128-gcm@openssh.com,aes256-gcm@openssh.com,aes128-ctr,aes192-ctr,aes256-ctr [preauth]
+debug2: MACs ctos: umac-64-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha1-etm@openssh.com,umac-64@openssh.com,umac-128@openssh.com,hmac-sha2-256,hmac-sha2-512,hmac-sha1 [preauth]
+debug2: MACs stoc: umac-64-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha1-etm@openssh.com,umac-64@openssh.com,umac-128@openssh.com,hmac-sha2-256,hmac-sha2-512,hmac-sha1 [preauth]
+debug2: compression ctos: none,zlib@openssh.com [preauth]
+debug2: compression stoc: none,zlib@openssh.com [preauth]
+debug2: languages ctos:  [preauth]
+debug2: languages stoc:  [preauth]
+debug2: first_kex_follows 0  [preauth]
+debug2: reserved 0  [preauth]
+debug2: peer client KEXINIT proposal [preauth]
+debug2: KEX algorithms: mlkem768x25519-sha256,sntrup761x25519-sha512,sntrup761x25519-sha512@openssh.com,curve25519-sha256,curve25519-sha256@libssh.org,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512,diffie-hellman-group14-sha256 [preauth]
+debug2: host key algorithms: rsa-sha2-512,rsa-sha2-256,ssh-rsa [preauth]
+debug2: ciphers ctos: chacha20-poly1305@openssh.com,aes128-gcm@openssh.com,aes256-gcm@openssh.com,aes128-ctr,aes192-ctr,aes256-ctr [preauth]
+debug2: ciphers stoc: chacha20-poly1305@openssh.com,aes128-gcm@openssh.com,aes256-gcm@openssh.com,aes128-ctr,aes192-ctr,aes256-ctr [preauth]
+debug2: MACs ctos: umac-64-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha1-etm@openssh.com,umac-64@openssh.com,umac-128@openssh.com,hmac-sha2-256,hmac-sha2-512,hmac-sha1 [preauth]
+debug2: MACs stoc: umac-64-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha1-etm@openssh.com,umac-64@openssh.com,umac-128@openssh.com,hmac-sha2-256,hmac-sha2-512,hmac-sha1 [preauth]
+debug2: compression ctos: none,zlib@openssh.com [preauth]
+debug2: compression stoc: none,zlib@openssh.com [preauth]
+debug2: languages ctos:  [preauth]
+debug2: languages stoc:  [preauth]
+debug2: first_kex_follows 0  [preauth]
+debug2: reserved 0  [preauth]
+debug1: kex: algorithm: mlkem768x25519-sha256 [preauth]
+debug1: kex: host key algorithm: (no match) [preauth]
+Unable to negotiate with 127.0.0.1 port 36562: no matching host key type found. Their offer: rsa-sha2-512,rsa-sha2-256,ssh-rsa [preauth]
+debug1: monitor_read_log: child log fd closed
+debug3: mm_request_receive: entering
+debug3: mm_request_receive: monitor fd closed
+debug1: mm_reap: child exited with status 255
+debug1: do_cleanup
+debug1: Killing privsep child 19467
+debug1: network sockets: 5, 5 [preauth]
+debug1: sshd-auth version OpenSSH_10.3, OpenSSL 3.6.3 9 Jun 2026 [preauth]
+debug3: server_process_channel_timeouts: setting 0 timeouts [preauth]
+debug3: channel_clear_timeouts: clearing [preauth]
+debug3: fd 5 is O_NONBLOCK [preauth]
+debug1: list_hostkey_types: ecdsa-sha2-nistp256 [preauth]
+debug3: server_accept_loop: child 19461 for connection from 127.0.0.1 to 127.0.0.1 closed pipe
+debug1: child_close: enter
+debug1: Local version string SSH-2.0-OpenSSH_10.3 [preauth]
+debug1: Remote protocol version 2.0, remote software version OpenSSH-keyscan [preauth]
+debug1: compat_banner: match: OpenSSH-keyscan pat OpenSSH* compat 0x04000000 [preauth]
+debug1: child_reap: preauth child 19461 for connection from 127.0.0.1 to 127.0.0.1 exited with status 255
+debug3: mm_sshkey_setcompat: entering [preauth]
+debug3: mm_request_send: entering, type 18 [preauth]
+debug1: srclimit_penalise: inactive penalty for ipv4 127.0.0.1/32 already exists, 9 seconds remaining
+debug3: mm_request_receive: entering
+debug3: monitor_read: checking request 18
+debug3: mm_answer_setcompat: entering
+debug2: monitor_read: 18 used once, disabling now
+debug3: send packet: type 20 [preauth]
+debug1: SSH2_MSG_KEXINIT sent [preauth]
+debug3: recv_privsep_state: begin [preauth]
+debug3: receive packet: type 20 [preauth]
+debug3: mm_get_state: entering [preauth]
+debug1: SSH2_MSG_KEXINIT received [preauth]
+debug2: local server KEXINIT proposal [preauth]
+debug3: mm_request_send: entering, type 51 [preauth]
+debug2: KEX algorithms: mlkem768x25519-sha256,sntrup761x25519-sha512,sntrup761x25519-sha512@openssh.com,curve25519-sha256,curve25519-sha256@libssh.org,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,ext-info-s,kex-strict-s-v00@openssh.com [preauth]
+debug3: mm_request_receive: entering
+debug2: host key algorithms: ecdsa-sha2-nistp256 [preauth]
+debug3: monitor_read: checking request 51
+debug1: mm_answer_state: config len 630
+debug2: ciphers ctos: chacha20-poly1305@openssh.com,aes128-gcm@openssh.com,aes256-gcm@openssh.com,aes128-ctr,aes192-ctr,aes256-ctr [preauth]
+debug2: ciphers stoc: chacha20-poly1305@openssh.com,aes128-gcm@openssh.com,aes256-gcm@openssh.com,aes128-ctr,aes192-ctr,aes256-ctr [preauth]
+debug2: MACs ctos: umac-64-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha1-etm@openssh.com,umac-64@openssh.com,umac-128@openssh.com,hmac-sha2-256,hmac-sha2-512,hmac-sha1 [preauth]
+debug2: MACs stoc: umac-64-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha1-etm@openssh.com,umac-64@openssh.com,umac-128@openssh.com,hmac-sha2-256,hmac-sha2-512,hmac-sha1 [preauth]
+debug3: mm_request_send: entering, type 52
+debug3: mm_answer_state: done
+debug2: monitor_read: 51 used once, disabling now
+debug2: compression ctos: none,zlib@openssh.com [preauth]
+debug2: compression stoc: none,zlib@openssh.com [preauth]
+debug3: mm_get_state: waiting for MONITOR_ANS_STATE [preauth]
+debug2: languages ctos:  [preauth]
+debug3: mm_request_receive_expect: entering, type 52 [preauth]
+debug2: languages stoc:  [preauth]
+debug3: mm_request_receive: entering [preauth]
+debug2: first_kex_follows 0  [preauth]
+debug2: reserved 0  [preauth]
+debug3: mm_get_state: done [preauth]
+debug2: peer client KEXINIT proposal [preauth]
+debug2: KEX algorithms: mlkem768x25519-sha256,sntrup761x25519-sha512,sntrup761x25519-sha512@openssh.com,curve25519-sha256,curve25519-sha256@libssh.org,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512,diffie-hellman-group14-sha256 [preauth]
+debug2: host key algorithms: sk-ssh-ed25519@openssh.com [preauth]
+debug2: ciphers ctos: chacha20-poly1305@openssh.com,aes128-gcm@openssh.com,aes256-gcm@openssh.com,aes128-ctr,aes192-ctr,aes256-ctr [preauth]
+debug2: ciphers stoc: chacha20-poly1305@openssh.com,aes128-gcm@openssh.com,aes256-gcm@openssh.com,aes128-ctr,aes192-ctr,aes256-ctr [preauth]
+debug2: parse_hostkeys: key 0: ecdsa-sha2-nistp256 [preauth]
+debug2: MACs ctos: umac-64-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha1-etm@openssh.com,umac-64@openssh.com,umac-128@openssh.com,hmac-sha2-256,hmac-sha2-512,hmac-sha1 [preauth]
+debug2: MACs stoc: umac-64-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha1-etm@openssh.com,umac-64@openssh.com,umac-128@openssh.com,hmac-sha2-256,hmac-sha2-512,hmac-sha1 [preauth]
+debug3: recv_privsep_state: done [preauth]
+debug2: compression ctos: none,zlib@openssh.com [preauth]
+debug2: parse_server_config_depth: config rexec len 630 [preauth]
+debug2: compression stoc: none,zlib@openssh.com [preauth]
+debug2: languages ctos:  [preauth]
+debug3: rexec:1 setting Port 8928 [preauth]
+debug2: languages stoc:  [preauth]
+debug3: rexec:2 setting ListenAddress 127.0.0.1 [preauth]
+debug2: first_kex_follows 0  [preauth]
+debug2: reserved 0  [preauth]
+debug3: rexec:3 setting AddressFamily inet [preauth]
+debug1: kex: algorithm: mlkem768x25519-sha256 [preauth]
+debug3: rexec:4 setting HostKey "/data/data/com.termux/files/home/.retui/ssh/host_ecdsa" [preauth]
+debug1: kex: host key algorithm: (no match) [preauth]
+debug3: rexec:5 setting PidFile "/data/data/com.termux/files/home/.retui/ssh/sshd.pid" [preauth]
+Unable to negotiate with 127.0.0.1 port 36586: no matching host key type found. Their offer: sk-ssh-ed25519@openssh.com [preauth]
+debug3: rexec:6 setting AuthorizedKeysFile "/data/data/com.termux/files/home/.retui/ssh/authorized_keys" [preauth]
+debug3: rexec:7 setting AllowUsers u0_a1000 [preauth]
+debug3: rexec:8 setting AuthenticationMethods publickey [preauth]
+debug3: rexec:9 setting PubkeyAuthentication yes [preauth]
+debug3: rexec:10 setting PasswordAuthentication no [preauth]
+debug3: rexec:11 setting KbdInteractiveAuthentication no [preauth]
+debug3: rexec:12 setting PermitEmptyPasswords no [preauth]
+debug3: rexec:13 setting PermitRootLogin no [preauth]
+debug3: rexec:14 setting StrictModes yes [preauth]
+debug3: rexec:15 setting DisableForwarding yes [preauth]
+debug3: rexec:16 setting PermitUserRC no [preauth]
+debug3: rexec:17 setting PermitUserEnvironment no [preauth]
+debug3: rexec:18 setting PermitTTY yes [preauth]
+debug3: rexec:19 setting UseDNS no [preauth]
+debug3: rexec:20 setting LogLevel ERROR [preauth]
+debug3: rexec:21 setting ForceCommand "/data/data/com.termux/files/home/.retui/ssh/dispatch.sh" [preauth]
+debug2: fd 5 is TCP_NODELAY [preauth]
+debug3: set_sock_tos: set socket 5 IP_TOS 0xb8 [preauth]
+debug1: sshd-auth version OpenSSH_10.3, OpenSSL 3.6.3 9 Jun 2026 [preauth]
+debug1: monitor_read_log: child log fd closed
+debug3: mm_request_receive: entering
+debug3: mm_request_receive: monitor fd closed
+debug3: server_process_channel_timeouts: setting 0 timeouts [preauth]
+debug1: mm_reap: child exited with status 255
+debug1: do_cleanup
+debug1: Killing privsep child 19468
+debug3: channel_clear_timeouts: clearing [preauth]
+debug3: fd 5 is O_NONBLOCK [preauth]
+debug1: list_hostkey_types: ecdsa-sha2-nistp256 [preauth]
+debug1: Local version string SSH-2.0-OpenSSH_10.3 [preauth]
+debug1: Remote protocol version 2.0, remote software version OpenSSH-keyscan [preauth]
+debug1: compat_banner: match: OpenSSH-keyscan pat OpenSSH* compat 0x04000000 [preauth]
+debug3: mm_sshkey_setcompat: entering [preauth]
+debug3: mm_request_send: entering, type 18 [preauth]
+debug3: mm_request_receive: entering
+debug3: monitor_read: checking request 18
+debug3: mm_answer_setcompat: entering
+debug2: monitor_read: 18 used once, disabling now
+debug3: send packet: type 20 [preauth]
+debug1: SSH2_MSG_KEXINIT sent [preauth]
+debug3: server_accept_loop: child 19465 for connection from 127.0.0.1 to 127.0.0.1 closed pipe
+debug1: child_close: enter
+debug1: child_reap: preauth child 19465 for connection from 127.0.0.1 to 127.0.0.1 exited with status 255
+debug1: srclimit_penalise: inactive penalty for ipv4 127.0.0.1/32 already exists, 10 seconds remaining
+debug3: receive packet: type 20 [preauth]
+debug1: SSH2_MSG_KEXINIT received [preauth]
+debug2: local server KEXINIT proposal [preauth]
+debug2: KEX algorithms: mlkem768x25519-sha256,sntrup761x25519-sha512,sntrup761x25519-sha512@openssh.com,curve25519-sha256,curve25519-sha256@libssh.org,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,ext-info-s,kex-strict-s-v00@openssh.com [preauth]
+debug2: host key algorithms: ecdsa-sha2-nistp256 [preauth]
+debug2: ciphers ctos: chacha20-poly1305@openssh.com,aes128-gcm@openssh.com,aes256-gcm@openssh.com,aes128-ctr,aes192-ctr,aes256-ctr [preauth]
+debug2: ciphers stoc: chacha20-poly1305@openssh.com,aes128-gcm@openssh.com,aes256-gcm@openssh.com,aes128-ctr,aes192-ctr,aes256-ctr [preauth]
+debug2: MACs ctos: umac-64-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha1-etm@openssh.com,umac-64@openssh.com,umac-128@openssh.com,hmac-sha2-256,hmac-sha2-512,hmac-sha1 [preauth]
+debug2: MACs stoc: umac-64-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha1-etm@openssh.com,umac-64@openssh.com,umac-128@openssh.com,hmac-sha2-256,hmac-sha2-512,hmac-sha1 [preauth]
+debug2: compression ctos: none,zlib@openssh.com [preauth]
+debug2: compression stoc: none,zlib@openssh.com [preauth]
+debug2: languages ctos:  [preauth]
+debug2: languages stoc:  [preauth]
+debug2: first_kex_follows 0  [preauth]
+debug2: reserved 0  [preauth]
+debug2: peer client KEXINIT proposal [preauth]
+debug2: KEX algorithms: mlkem768x25519-sha256,sntrup761x25519-sha512,sntrup761x25519-sha512@openssh.com,curve25519-sha256,curve25519-sha256@libssh.org,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512,diffie-hellman-group14-sha256 [preauth]
+debug2: host key algorithms: sk-ecdsa-sha2-nistp256@openssh.com [preauth]
+debug2: ciphers ctos: chacha20-poly1305@openssh.com,aes128-gcm@openssh.com,aes256-gcm@openssh.com,aes128-ctr,aes192-ctr,aes256-ctr [preauth]
+debug2: ciphers stoc: chacha20-poly1305@openssh.com,aes128-gcm@openssh.com,aes256-gcm@openssh.com,aes128-ctr,aes192-ctr,aes256-ctr [preauth]
+debug2: MACs ctos: umac-64-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha1-etm@openssh.com,umac-64@openssh.com,umac-128@openssh.com,hmac-sha2-256,hmac-sha2-512,hmac-sha1 [preauth]
+debug2: MACs stoc: umac-64-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha1-etm@openssh.com,umac-64@openssh.com,umac-128@openssh.com,hmac-sha2-256,hmac-sha2-512,hmac-sha1 [preauth]
+debug2: compression ctos: none,zlib@openssh.com [preauth]
+debug2: compression stoc: none,zlib@openssh.com [preauth]
+debug2: languages ctos:  [preauth]
+debug2: languages stoc:  [preauth]
+debug2: first_kex_follows 0  [preauth]
+debug2: reserved 0  [preauth]
+debug1: kex: algorithm: mlkem768x25519-sha256 [preauth]
+debug1: kex: host key algorithm: (no match) [preauth]
+Unable to negotiate with 127.0.0.1 port 36574: no matching host key type found. Their offer: sk-ecdsa-sha2-nistp256@openssh.com [preauth]
+debug1: monitor_read_log: child log fd closed
+debug3: mm_request_receive: entering
+debug3: mm_request_receive: monitor fd closed
+debug1: mm_reap: child exited with status 255
+debug1: do_cleanup
+debug1: Killing privsep child 19470
+debug1: network sockets: 5, 5 [preauth]
+debug3: recv_privsep_state: begin [preauth]
+debug3: mm_get_state: entering [preauth]
+debug3: mm_request_send: entering, type 51 [preauth]
+debug3: mm_request_receive: entering
+debug3: monitor_read: checking request 51
+debug1: mm_answer_state: config len 630
+debug3: mm_request_send: entering, type 52
+debug3: mm_answer_state: done
+debug2: monitor_read: 51 used once, disabling now
+debug3: mm_get_state: waiting for MONITOR_ANS_STATE [preauth]
+debug3: mm_request_receive_expect: entering, type 52 [preauth]
+debug3: mm_request_receive: entering [preauth]
+debug3: mm_get_state: done [preauth]
+debug2: parse_hostkeys: key 0: ecdsa-sha2-nistp256 [preauth]
+debug3: recv_privsep_state: done [preauth]
+debug2: parse_server_config_depth: config rexec len 630 [preauth]
+debug3: rexec:1 setting Port 8928 [preauth]
+debug3: rexec:2 setting ListenAddress 127.0.0.1 [preauth]
+debug3: rexec:3 setting AddressFamily inet [preauth]
+debug3: rexec:4 setting HostKey "/data/data/com.termux/files/home/.retui/ssh/host_ecdsa" [preauth]
+debug3: rexec:5 setting PidFile "/data/data/com.termux/files/home/.retui/ssh/sshd.pid" [preauth]
+debug3: rexec:6 setting AuthorizedKeysFile "/data/data/com.termux/files/home/.retui/ssh/authorized_keys" [preauth]
+debug3: rexec:7 setting AllowUsers u0_a1000 [preauth]
+debug3: server_accept_loop: child 19464 for connection from 127.0.0.1 to 127.0.0.1 closed pipe
+debug3: rexec:8 setting AuthenticationMethods publickey [preauth]
+debug1: child_close: enter
+debug3: rexec:9 setting PubkeyAuthentication yes [preauth]
+debug3: rexec:10 setting PasswordAuthentication no [preauth]
+debug3: rexec:11 setting KbdInteractiveAuthentication no [preauth]
+debug3: rexec:12 setting PermitEmptyPasswords no [preauth]
+debug3: rexec:13 setting PermitRootLogin no [preauth]
+debug3: rexec:14 setting StrictModes yes [preauth]
+debug3: rexec:15 setting DisableForwarding yes [preauth]
+debug1: child_reap: preauth child 19464 for connection from 127.0.0.1 to 127.0.0.1 exited with status 255
+debug1: srclimit_penalise: inactive penalty for ipv4 127.0.0.1/32 already exists, 11 seconds remaining
+debug3: rexec:16 setting PermitUserRC no [preauth]
+debug3: rexec:17 setting PermitUserEnvironment no [preauth]
+debug3: rexec:18 setting PermitTTY yes [preauth]
+debug3: rexec:19 setting UseDNS no [preauth]
+debug3: rexec:20 setting LogLevel ERROR [preauth]
+debug3: rexec:21 setting ForceCommand "/data/data/com.termux/files/home/.retui/ssh/dispatch.sh" [preauth]
+debug2: fd 5 is TCP_NODELAY [preauth]
+debug3: set_sock_tos: set socket 5 IP_TOS 0xb8 [preauth]
+debug1: sshd-auth version OpenSSH_10.3, OpenSSL 3.6.3 9 Jun 2026 [preauth]
+debug3: server_process_channel_timeouts: setting 0 timeouts [preauth]
+debug3: channel_clear_timeouts: clearing [preauth]
+debug3: fd 5 is O_NONBLOCK [preauth]
+debug1: list_hostkey_types: ecdsa-sha2-nistp256 [preauth]
+debug1: Local version string SSH-2.0-OpenSSH_10.3 [preauth]
+debug1: Remote protocol version 2.0, remote software version OpenSSH-keyscan [preauth]
+debug1: compat_banner: match: OpenSSH-keyscan pat OpenSSH* compat 0x04000000 [preauth]
+debug3: mm_sshkey_setcompat: entering [preauth]
+debug3: mm_request_send: entering, type 18 [preauth]
+debug3: mm_request_receive: entering
+debug3: monitor_read: checking request 18
+debug3: mm_answer_setcompat: entering
+debug2: monitor_read: 18 used once, disabling now
+debug3: send packet: type 20 [preauth]
+debug1: SSH2_MSG_KEXINIT sent [preauth]
+debug3: receive packet: type 20 [preauth]
+debug1: SSH2_MSG_KEXINIT received [preauth]
+debug2: local server KEXINIT proposal [preauth]
+debug2: KEX algorithms: mlkem768x25519-sha256,sntrup761x25519-sha512,sntrup761x25519-sha512@openssh.com,curve25519-sha256,curve25519-sha256@libssh.org,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,ext-info-s,kex-strict-s-v00@openssh.com [preauth]
+debug2: host key algorithms: ecdsa-sha2-nistp256 [preauth]
+debug2: ciphers ctos: chacha20-poly1305@openssh.com,aes128-gcm@openssh.com,aes256-gcm@openssh.com,aes128-ctr,aes192-ctr,aes256-ctr [preauth]
+debug2: ciphers stoc: chacha20-poly1305@openssh.com,aes128-gcm@openssh.com,aes256-gcm@openssh.com,aes128-ctr,aes192-ctr,aes256-ctr [preauth]
+debug2: MACs ctos: umac-64-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha1-etm@openssh.com,umac-64@openssh.com,umac-128@openssh.com,hmac-sha2-256,hmac-sha2-512,hmac-sha1 [preauth]
+debug2: MACs stoc: umac-64-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha1-etm@openssh.com,umac-64@openssh.com,umac-128@openssh.com,hmac-sha2-256,hmac-sha2-512,hmac-sha1 [preauth]
+debug2: compression ctos: none,zlib@openssh.com [preauth]
+debug2: compression stoc: none,zlib@openssh.com [preauth]
+debug2: languages ctos:  [preauth]
+debug2: languages stoc:  [preauth]
+debug2: first_kex_follows 0  [preauth]
+debug2: reserved 0  [preauth]
+debug2: peer client KEXINIT proposal [preauth]
+debug2: KEX algorithms: mlkem768x25519-sha256,sntrup761x25519-sha512,sntrup761x25519-sha512@openssh.com,curve25519-sha256,curve25519-sha256@libssh.org,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512,diffie-hellman-group14-sha256 [preauth]
+debug2: host key algorithms: ssh-ed25519 [preauth]
+debug2: ciphers ctos: chacha20-poly1305@openssh.com,aes128-gcm@openssh.com,aes256-gcm@openssh.com,aes128-ctr,aes192-ctr,aes256-ctr [preauth]
+debug2: ciphers stoc: chacha20-poly1305@openssh.com,aes128-gcm@openssh.com,aes256-gcm@openssh.com,aes128-ctr,aes192-ctr,aes256-ctr [preauth]
+debug2: MACs ctos: umac-64-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha1-etm@openssh.com,umac-64@openssh.com,umac-128@openssh.com,hmac-sha2-256,hmac-sha2-512,hmac-sha1 [preauth]
+debug2: MACs stoc: umac-64-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha1-etm@openssh.com,umac-64@openssh.com,umac-128@openssh.com,hmac-sha2-256,hmac-sha2-512,hmac-sha1 [preauth]
+debug2: compression ctos: none,zlib@openssh.com [preauth]
+debug2: compression stoc: none,zlib@openssh.com [preauth]
+debug2: languages ctos:  [preauth]
+debug2: languages stoc:  [preauth]
+debug2: first_kex_follows 0  [preauth]
+debug2: reserved 0  [preauth]
+debug1: kex: algorithm: mlkem768x25519-sha256 [preauth]
+debug1: kex: host key algorithm: (no match) [preauth]
+Unable to negotiate with 127.0.0.1 port 36568: no matching host key type found. Their offer: ssh-ed25519 [preauth]
+debug1: monitor_read_log: child log fd closed
+debug3: mm_request_receive: entering
+debug3: mm_request_receive: monitor fd closed
+debug1: mm_reap: child exited with status 255
+debug1: do_cleanup
+debug1: Killing privsep child 19469
+debug3: server_accept_loop: child 19463 for connection from 127.0.0.1 to 127.0.0.1 closed pipe
+debug1: child_close: enter
+debug1: child_reap: preauth child 19463 for connection from 127.0.0.1 to 127.0.0.1 exited with status 255
+debug1: srclimit_penalise: inactive penalty for ipv4 127.0.0.1/32 already exists, 12 seconds remaining
+debug1: network sockets: 5, 5 [preauth]
+debug3: recv_privsep_state: begin [preauth]
+debug3: mm_get_state: entering [preauth]
+debug3: mm_request_send: entering, type 51 [preauth]
+debug3: mm_request_receive: entering
+debug3: monitor_read: checking request 51
+debug1: mm_answer_state: config len 630
+debug3: mm_request_send: entering, type 52
+debug3: mm_answer_state: done
+debug2: monitor_read: 51 used once, disabling now
+debug3: mm_get_state: waiting for MONITOR_ANS_STATE [preauth]
+debug3: mm_request_receive_expect: entering, type 52 [preauth]
+debug3: mm_request_receive: entering [preauth]
+debug3: mm_get_state: done [preauth]
+debug2: parse_hostkeys: key 0: ecdsa-sha2-nistp256 [preauth]
+debug3: recv_privsep_state: done [preauth]
+debug2: parse_server_config_depth: config rexec len 630 [preauth]
+debug3: rexec:1 setting Port 8928 [preauth]
+debug3: rexec:2 setting ListenAddress 127.0.0.1 [preauth]
+debug3: rexec:3 setting AddressFamily inet [preauth]
+debug3: rexec:4 setting HostKey "/data/data/com.termux/files/home/.retui/ssh/host_ecdsa" [preauth]
+debug3: rexec:5 setting PidFile "/data/data/com.termux/files/home/.retui/ssh/sshd.pid" [preauth]
+debug3: rexec:6 setting AuthorizedKeysFile "/data/data/com.termux/files/home/.retui/ssh/authorized_keys" [preauth]
+debug3: rexec:7 setting AllowUsers u0_a1000 [preauth]
+debug3: rexec:8 setting AuthenticationMethods publickey [preauth]
+debug3: rexec:9 setting PubkeyAuthentication yes [preauth]
+debug3: rexec:10 setting PasswordAuthentication no [preauth]
+debug3: rexec:11 setting KbdInteractiveAuthentication no [preauth]
+debug3: rexec:12 setting PermitEmptyPasswords no [preauth]
+debug3: rexec:13 setting PermitRootLogin no [preauth]
+debug3: rexec:14 setting StrictModes yes [preauth]
+debug3: rexec:15 setting DisableForwarding yes [preauth]
+debug3: rexec:16 setting PermitUserRC no [preauth]
+debug3: rexec:17 setting PermitUserEnvironment no [preauth]
+debug3: rexec:18 setting PermitTTY yes [preauth]
+debug3: rexec:19 setting UseDNS no [preauth]
+debug3: rexec:20 setting LogLevel ERROR [preauth]
+debug3: rexec:21 setting ForceCommand "/data/data/com.termux/files/home/.retui/ssh/dispatch.sh" [preauth]
+debug2: fd 5 is TCP_NODELAY [preauth]
+debug3: set_sock_tos: set socket 5 IP_TOS 0xb8 [preauth]
+debug1: sshd-auth version OpenSSH_10.3, OpenSSL 3.6.3 9 Jun 2026 [preauth]
+debug3: server_process_channel_timeouts: setting 0 timeouts [preauth]
+debug3: channel_clear_timeouts: clearing [preauth]
+debug3: fd 5 is O_NONBLOCK [preauth]
+debug1: list_hostkey_types: ecdsa-sha2-nistp256 [preauth]
+debug1: Local version string SSH-2.0-OpenSSH_10.3 [preauth]
+debug1: Remote protocol version 2.0, remote software version OpenSSH-keyscan [preauth]
+debug1: compat_banner: match: OpenSSH-keyscan pat OpenSSH* compat 0x04000000 [preauth]
+debug3: mm_sshkey_setcompat: entering [preauth]
+debug3: mm_request_send: entering, type 18 [preauth]
+debug3: mm_request_receive: entering
+debug3: monitor_read: checking request 18
+debug3: mm_answer_setcompat: entering
+debug2: monitor_read: 18 used once, disabling now
+debug3: send packet: type 20 [preauth]
+debug1: SSH2_MSG_KEXINIT sent [preauth]
+debug3: receive packet: type 20 [preauth]
+debug1: SSH2_MSG_KEXINIT received [preauth]
+debug2: local server KEXINIT proposal [preauth]
+debug2: KEX algorithms: mlkem768x25519-sha256,sntrup761x25519-sha512,sntrup761x25519-sha512@openssh.com,curve25519-sha256,curve25519-sha256@libssh.org,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,ext-info-s,kex-strict-s-v00@openssh.com [preauth]
+debug2: host key algorithms: ecdsa-sha2-nistp256 [preauth]
+debug2: ciphers ctos: chacha20-poly1305@openssh.com,aes128-gcm@openssh.com,aes256-gcm@openssh.com,aes128-ctr,aes192-ctr,aes256-ctr [preauth]
+debug2: ciphers stoc: chacha20-poly1305@openssh.com,aes128-gcm@openssh.com,aes256-gcm@openssh.com,aes128-ctr,aes192-ctr,aes256-ctr [preauth]
+debug2: MACs ctos: umac-64-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha1-etm@openssh.com,umac-64@openssh.com,umac-128@openssh.com,hmac-sha2-256,hmac-sha2-512,hmac-sha1 [preauth]
+debug2: MACs stoc: umac-64-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha1-etm@openssh.com,umac-64@openssh.com,umac-128@openssh.com,hmac-sha2-256,hmac-sha2-512,hmac-sha1 [preauth]
+debug2: compression ctos: none,zlib@openssh.com [preauth]
+debug2: compression stoc: none,zlib@openssh.com [preauth]
+debug2: languages ctos:  [preauth]
+debug2: languages stoc:  [preauth]
+debug2: first_kex_follows 0  [preauth]
+debug2: reserved 0  [preauth]
+debug2: peer client KEXINIT proposal [preauth]
+debug2: KEX algorithms: mlkem768x25519-sha256,sntrup761x25519-sha512,sntrup761x25519-sha512@openssh.com,curve25519-sha256,curve25519-sha256@libssh.org,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512,diffie-hellman-group14-sha256 [preauth]
+debug2: host key algorithms: ecdsa-sha2-nistp256,ecdsa-sha2-nistp384,ecdsa-sha2-nistp521 [preauth]
+debug2: ciphers ctos: chacha20-poly1305@openssh.com,aes128-gcm@openssh.com,aes256-gcm@openssh.com,aes128-ctr,aes192-ctr,aes256-ctr [preauth]
+debug2: ciphers stoc: chacha20-poly1305@openssh.com,aes128-gcm@openssh.com,aes256-gcm@openssh.com,aes128-ctr,aes192-ctr,aes256-ctr [preauth]
+debug2: MACs ctos: umac-64-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha1-etm@openssh.com,umac-64@openssh.com,umac-128@openssh.com,hmac-sha2-256,hmac-sha2-512,hmac-sha1 [preauth]
+debug2: MACs stoc: umac-64-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha1-etm@openssh.com,umac-64@openssh.com,umac-128@openssh.com,hmac-sha2-256,hmac-sha2-512,hmac-sha1 [preauth]
+debug2: compression ctos: none,zlib@openssh.com [preauth]
+debug2: compression stoc: none,zlib@openssh.com [preauth]
+debug2: languages ctos:  [preauth]
+debug2: languages stoc:  [preauth]
+debug2: first_kex_follows 0  [preauth]
+debug2: reserved 0  [preauth]
+debug1: kex: algorithm: mlkem768x25519-sha256 [preauth]
+debug1: kex: host key algorithm: ecdsa-sha2-nistp256 [preauth]
+debug1: kex: client->server cipher: chacha20-poly1305@openssh.com MAC: <implicit> compression: none [preauth]
+debug1: kex: server->client cipher: chacha20-poly1305@openssh.com MAC: <implicit> compression: none [preauth]
+debug1: expecting SSH2_MSG_KEX_ECDH_INIT [preauth]
+debug3: receive packet: type 30 [preauth]
+debug1: SSH2_MSG_KEX_ECDH_INIT received [preauth]
+debug3: mm_sshkey_sign: entering [preauth]
+debug3: mm_request_send: entering, type 6 [preauth]
+debug3: mm_request_receive: entering
+debug3: monitor_read: checking request 6
+debug3: mm_answer_sign: entering
+debug1: mm_answer_sign: hostkey ecdsa-sha2-nistp256 index 0
+debug3: mm_answer_sign: ecdsa-sha2-nistp256 KEX signature len=100
+debug3: mm_request_send: entering, type 7
+debug2: monitor_read: 6 used once, disabling now
+debug3: mm_sshkey_sign: waiting for MONITOR_ANS_SIGN [preauth]
+debug3: mm_request_receive_expect: entering, type 7 [preauth]
+debug3: mm_request_receive: entering [preauth]
+debug3: mm_sshkey_sign: ecdsa-sha2-nistp256 signature len=100 [preauth]
+debug3: send packet: type 31 [preauth]
+debug3: send packet: type 21 [preauth]
+debug2: ssh_set_newkeys: mode 1 [preauth]
+debug1: rekey out after 134217728 blocks [preauth]
+debug1: SSH2_MSG_NEWKEYS sent [preauth]
+debug1: expecting SSH2_MSG_NEWKEYS [preauth]
+Connection closed by 127.0.0.1 port 36566 [preauth]
+debug1: monitor_read_log: child log fd closed
+debug3: mm_request_receive: entering
+debug3: mm_request_receive: monitor fd closed
+debug1: mm_reap: child exited with status 255
+debug1: do_cleanup
+debug1: Killing privsep child 19471
+debug3: server_accept_loop: child 19462 for connection from 127.0.0.1 to 127.0.0.1 closed pipe
+debug1: child_close: enter
+debug1: child_reap: preauth child 19462 for connection from 127.0.0.1 to 127.0.0.1 exited with status 255
+debug1: srclimit_penalise: inactive penalty for ipv4 127.0.0.1/32 already exists, 13 seconds remaining
+debug3: fd 8 is not O_NONBLOCK
+debug2: fd 9 setting O_NONBLOCK
+debug1: Forked child 19491.
+debug3: fd 8 is not O_NONBLOCK
+debug2: fd 10 setting O_NONBLOCK
+debug1: Forked child 19492.
+debug1: rexec start in 8 out 8 newsock 8 config_s 10/11
+debug1: rexec start in 8 out 8 newsock 8 config_s 9/10
+debug3: recv_rexec_state: entering fd = 4
+debug3: ssh_msg_recv entering
+debug3: ssh_msg_recv entering
+debug2: parse_hostkeys: privkey 0: ecdsa-sha2-nistp256
+debug2: parse_hostkeys: pubkey 0: ecdsa-sha2-nistp256
+debug3: recv_rexec_state: done
+debug2: parse_server_config_depth: config rexec len 630
+debug3: rexec:1 setting Port 8928
+debug3: rexec:2 setting ListenAddress 127.0.0.1
+debug3: rexec:3 setting AddressFamily inet
+debug3: rexec:4 setting HostKey "/data/data/com.termux/files/home/.retui/ssh/host_ecdsa"
+debug3: rexec:5 setting PidFile "/data/data/com.termux/files/home/.retui/ssh/sshd.pid"
+debug3: rexec:6 setting AuthorizedKeysFile "/data/data/com.termux/files/home/.retui/ssh/authorized_keys"
+debug3: rexec:7 setting AllowUsers u0_a1000
+debug3: rexec:8 setting AuthenticationMethods publickey
+debug3: rexec:9 setting PubkeyAuthentication yes
+debug3: rexec:10 setting PasswordAuthentication no
+debug3: rexec:11 setting KbdInteractiveAuthentication no
+debug3: rexec:12 setting PermitEmptyPasswords no
+debug3: rexec:13 setting PermitRootLogin no
+debug3: rexec:14 setting StrictModes yes
+debug3: rexec:15 setting DisableForwarding yes
+debug3: rexec:16 setting PermitUserRC no
+debug3: rexec:17 setting PermitUserEnvironment no
+debug3: rexec:18 setting PermitTTY yes
+debug3: rexec:19 setting UseDNS no
+debug3: rexec:20 setting LogLevel ERROR
+debug3: rexec:21 setting ForceCommand "/data/data/com.termux/files/home/.retui/ssh/dispatch.sh"
+debug1: sshd-session version OpenSSH_10.3, OpenSSL 3.6.3 9 Jun 2026
+debug2: server_accept_loop: child 19492 for connection from 127.0.0.1 to 127.0.0.1 received config
+debug1: network sockets: 8, 8
+debug2: fd 8 setting TCP_NODELAY
+debug3: set_sock_tos: set socket 8 IP_TOS 0xb8
+debug3: server_process_channel_timeouts: setting 0 timeouts
+debug3: channel_clear_timeouts: clearing
+Connection from 127.0.0.1 port 36598 on 127.0.0.1 port 8928
+debug2: fd 8 setting O_NONBLOCK
+debug2: Network child is on pid 19500
+debug3: preauth child monitor started
+debug3: recv_rexec_state: entering fd = 4
+debug3: ssh_msg_recv entering
+debug3: ssh_msg_recv entering
+debug2: parse_hostkeys: privkey 0: ecdsa-sha2-nistp256
+debug2: parse_hostkeys: pubkey 0: ecdsa-sha2-nistp256
+debug3: recv_rexec_state: done
+debug2: parse_server_config_depth: config rexec len 630
+debug3: rexec:1 setting Port 8928
+debug3: rexec:2 setting ListenAddress 127.0.0.1
+debug3: rexec:3 setting AddressFamily inet
+debug3: rexec:4 setting HostKey "/data/data/com.termux/files/home/.retui/ssh/host_ecdsa"
+debug3: rexec:5 setting PidFile "/data/data/com.termux/files/home/.retui/ssh/sshd.pid"
+debug3: rexec:6 setting AuthorizedKeysFile "/data/data/com.termux/files/home/.retui/ssh/authorized_keys"
+debug3: rexec:7 setting AllowUsers u0_a1000
+debug3: rexec:8 setting AuthenticationMethods publickey
+debug3: rexec:9 setting PubkeyAuthentication yes
+debug3: rexec:10 setting PasswordAuthentication no
+debug3: rexec:11 setting KbdInteractiveAuthentication no
+debug3: rexec:12 setting PermitEmptyPasswords no
+debug3: rexec:13 setting PermitRootLogin no
+debug3: rexec:14 setting StrictModes yes
+debug3: rexec:15 setting DisableForwarding yes
+debug3: rexec:16 setting PermitUserRC no
+debug3: rexec:17 setting PermitUserEnvironment no
+debug3: rexec:18 setting PermitTTY yes
+debug3: rexec:19 setting UseDNS no
+debug3: rexec:20 setting LogLevel ERROR
+debug3: rexec:21 setting ForceCommand "/data/data/com.termux/files/home/.retui/ssh/dispatch.sh"
+debug1: sshd-session version OpenSSH_10.3, OpenSSL 3.6.3 9 Jun 2026
+debug1: network sockets: 8, 8
+debug2: server_accept_loop: child 19491 for connection from 127.0.0.1 to 127.0.0.1 received config
+debug2: fd 8 setting TCP_NODELAY
+debug3: set_sock_tos: set socket 8 IP_TOS 0xb8
+debug3: server_process_channel_timeouts: setting 0 timeouts
+debug3: channel_clear_timeouts: clearing
+Connection from 127.0.0.1 port 36594 on 127.0.0.1 port 8928
+debug2: fd 8 setting O_NONBLOCK
+debug1: network sockets: 5, 5 [preauth]
+debug2: Network child is on pid 19503
+debug3: recv_privsep_state: begin [preauth]
+debug3: preauth child monitor started
+debug3: mm_get_state: entering [preauth]
+debug3: mm_request_send: entering, type 51 [preauth]
+debug3: mm_request_receive: entering
+debug3: monitor_read: checking request 51
+debug1: mm_answer_state: config len 630
+debug3: mm_request_send: entering, type 52
+debug3: mm_answer_state: done
+debug2: monitor_read: 51 used once, disabling now
+debug3: mm_get_state: waiting for MONITOR_ANS_STATE [preauth]
+debug3: mm_request_receive_expect: entering, type 52 [preauth]
+debug3: mm_request_receive: entering [preauth]
+debug3: mm_get_state: done [preauth]
+debug2: parse_hostkeys: key 0: ecdsa-sha2-nistp256 [preauth]
+debug3: recv_privsep_state: done [preauth]
+debug2: parse_server_config_depth: config rexec len 630 [preauth]
+debug3: rexec:1 setting Port 8928 [preauth]
+debug3: rexec:2 setting ListenAddress 127.0.0.1 [preauth]
+debug3: rexec:3 setting AddressFamily inet [preauth]
+debug3: rexec:4 setting HostKey "/data/data/com.termux/files/home/.retui/ssh/host_ecdsa" [preauth]
+debug3: rexec:5 setting PidFile "/data/data/com.termux/files/home/.retui/ssh/sshd.pid" [preauth]
+debug3: rexec:6 setting AuthorizedKeysFile "/data/data/com.termux/files/home/.retui/ssh/authorized_keys" [preauth]
+debug3: rexec:7 setting AllowUsers u0_a1000 [preauth]
+debug3: rexec:8 setting AuthenticationMethods publickey [preauth]
+debug3: rexec:9 setting PubkeyAuthentication yes [preauth]
+debug3: rexec:10 setting PasswordAuthentication no [preauth]
+debug3: rexec:11 setting KbdInteractiveAuthentication no [preauth]
+debug3: rexec:12 setting PermitEmptyPasswords no [preauth]
+debug3: rexec:13 setting PermitRootLogin no [preauth]
+debug3: rexec:14 setting StrictModes yes [preauth]
+debug3: rexec:15 setting DisableForwarding yes [preauth]
+debug3: rexec:16 setting PermitUserRC no [preauth]
+debug3: rexec:17 setting PermitUserEnvironment no [preauth]
+debug3: rexec:18 setting PermitTTY yes [preauth]
+debug3: rexec:19 setting UseDNS no [preauth]
+debug3: rexec:20 setting LogLevel ERROR [preauth]
+debug3: rexec:21 setting ForceCommand "/data/data/com.termux/files/home/.retui/ssh/dispatch.sh" [preauth]
+debug2: fd 5 is TCP_NODELAY [preauth]
+debug3: set_sock_tos: set socket 5 IP_TOS 0xb8 [preauth]
+debug1: sshd-auth version OpenSSH_10.3, OpenSSL 3.6.3 9 Jun 2026 [preauth]
+debug3: server_process_channel_timeouts: setting 0 timeouts [preauth]
+debug3: channel_clear_timeouts: clearing [preauth]
+debug3: fd 5 is O_NONBLOCK [preauth]
+debug1: list_hostkey_types: ecdsa-sha2-nistp256 [preauth]
+debug1: Local version string SSH-2.0-OpenSSH_10.3 [preauth]
+debug1: Remote protocol version 2.0, remote software version JSCH_2.28.8 [preauth]
+debug1: compat_banner: no match: JSCH_2.28.8 [preauth]
+debug3: mm_sshkey_setcompat: entering [preauth]
+debug3: mm_request_send: entering, type 18 [preauth]
+debug3: mm_request_receive: entering
+debug3: monitor_read: checking request 18
+debug3: mm_answer_setcompat: entering
+debug2: monitor_read: 18 used once, disabling now
+debug3: send packet: type 20 [preauth]
+debug1: SSH2_MSG_KEXINIT sent [preauth]
+debug3: receive packet: type 20 [preauth]
+debug1: SSH2_MSG_KEXINIT received [preauth]
+debug2: local server KEXINIT proposal [preauth]
+debug2: KEX algorithms: mlkem768x25519-sha256,sntrup761x25519-sha512,sntrup761x25519-sha512@openssh.com,curve25519-sha256,curve25519-sha256@libssh.org,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,ext-info-s,kex-strict-s-v00@openssh.com [preauth]
+debug2: host key algorithms: ecdsa-sha2-nistp256 [preauth]
+debug2: ciphers ctos: chacha20-poly1305@openssh.com,aes128-gcm@openssh.com,aes256-gcm@openssh.com,aes128-ctr,aes192-ctr,aes256-ctr [preauth]
+debug2: ciphers stoc: chacha20-poly1305@openssh.com,aes128-gcm@openssh.com,aes256-gcm@openssh.com,aes128-ctr,aes192-ctr,aes256-ctr [preauth]
+debug2: MACs ctos: umac-64-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha1-etm@openssh.com,umac-64@openssh.com,umac-128@openssh.com,hmac-sha2-256,hmac-sha2-512,hmac-sha1 [preauth]
+debug2: MACs stoc: umac-64-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha1-etm@openssh.com,umac-64@openssh.com,umac-128@openssh.com,hmac-sha2-256,hmac-sha2-512,hmac-sha1 [preauth]
+debug2: compression ctos: none,zlib@openssh.com [preauth]
+debug2: compression stoc: none,zlib@openssh.com [preauth]
+debug2: languages ctos:  [preauth]
+debug2: languages stoc:  [preauth]
+debug2: first_kex_follows 0  [preauth]
+debug2: reserved 0  [preauth]
+debug2: peer client KEXINIT proposal [preauth]
+debug2: KEX algorithms: ecdh-sha2-nistp256,ext-info-c,kex-strict-c-v00@openssh.com [preauth]
+debug2: host key algorithms: ecdsa-sha2-nistp256 [preauth]
+debug2: ciphers ctos: aes128-ctr [preauth]
+debug2: ciphers stoc: aes128-ctr [preauth]
+debug2: MACs ctos: hmac-sha2-256 [preauth]
+debug2: MACs stoc: hmac-sha2-256 [preauth]
+debug2: compression ctos: none [preauth]
+debug2: compression stoc: none [preauth]
+debug2: languages ctos:  [preauth]
+debug2: languages stoc:  [preauth]
+debug2: first_kex_follows 0  [preauth]
+debug2: reserved 0  [preauth]
+debug3: kex_choose_conf: will use strict KEX ordering [preauth]
+debug1: kex: algorithm: ecdh-sha2-nistp256 [preauth]
+debug1: kex: host key algorithm: ecdsa-sha2-nistp256 [preauth]
+debug1: kex: client->server cipher: aes128-ctr MAC: hmac-sha2-256 compression: none [preauth]
+debug1: kex: server->client cipher: aes128-ctr MAC: hmac-sha2-256 compression: none [preauth]
+debug1: expecting SSH2_MSG_KEX_ECDH_INIT [preauth]
+debug3: receive packet: type 30 [preauth]
+debug1: SSH2_MSG_KEX_ECDH_INIT received [preauth]
+debug1: network sockets: 5, 5 [preauth]
+debug3: recv_privsep_state: begin [preauth]
+debug3: mm_get_state: entering [preauth]
+debug3: mm_request_send: entering, type 51 [preauth]
+debug3: mm_request_receive: entering
+debug3: monitor_read: checking request 51
+debug1: mm_answer_state: config len 630
+debug3: mm_request_send: entering, type 52
+debug3: mm_answer_state: done
+debug2: monitor_read: 51 used once, disabling now
+debug3: mm_get_state: waiting for MONITOR_ANS_STATE [preauth]
+debug3: mm_request_receive_expect: entering, type 52 [preauth]
+debug3: mm_request_receive: entering [preauth]
+debug3: mm_get_state: done [preauth]
+debug2: parse_hostkeys: key 0: ecdsa-sha2-nistp256 [preauth]
+debug3: recv_privsep_state: done [preauth]
+debug2: parse_server_config_depth: config rexec len 630 [preauth]
+debug3: rexec:1 setting Port 8928 [preauth]
+debug3: rexec:2 setting ListenAddress 127.0.0.1 [preauth]
+debug3: rexec:3 setting AddressFamily inet [preauth]
+debug3: rexec:4 setting HostKey "/data/data/com.termux/files/home/.retui/ssh/host_ecdsa" [preauth]
+debug3: rexec:5 setting PidFile "/data/data/com.termux/files/home/.retui/ssh/sshd.pid" [preauth]
+debug3: rexec:6 setting AuthorizedKeysFile "/data/data/com.termux/files/home/.retui/ssh/authorized_keys" [preauth]
+debug3: rexec:7 setting AllowUsers u0_a1000 [preauth]
+debug3: rexec:8 setting AuthenticationMethods publickey [preauth]
+debug3: rexec:9 setting PubkeyAuthentication yes [preauth]
+debug3: rexec:10 setting PasswordAuthentication no [preauth]
+debug3: rexec:11 setting KbdInteractiveAuthentication no [preauth]
+debug3: rexec:12 setting PermitEmptyPasswords no [preauth]
+debug3: rexec:13 setting PermitRootLogin no [preauth]
+debug3: rexec:14 setting StrictModes yes [preauth]
+debug3: rexec:15 setting DisableForwarding yes [preauth]
+debug3: rexec:16 setting PermitUserRC no [preauth]
+debug3: rexec:17 setting PermitUserEnvironment no [preauth]
+debug3: rexec:18 setting PermitTTY yes [preauth]
+debug3: rexec:19 setting UseDNS no [preauth]
+debug3: rexec:20 setting LogLevel ERROR [preauth]
+debug3: rexec:21 setting ForceCommand "/data/data/com.termux/files/home/.retui/ssh/dispatch.sh" [preauth]
+debug2: fd 5 is TCP_NODELAY [preauth]
+debug3: set_sock_tos: set socket 5 IP_TOS 0xb8 [preauth]
+debug1: sshd-auth version OpenSSH_10.3, OpenSSL 3.6.3 9 Jun 2026 [preauth]
+debug3: server_process_channel_timeouts: setting 0 timeouts [preauth]
+debug3: channel_clear_timeouts: clearing [preauth]
+debug3: fd 5 is O_NONBLOCK [preauth]
+debug1: list_hostkey_types: ecdsa-sha2-nistp256 [preauth]
+debug1: Local version string SSH-2.0-OpenSSH_10.3 [preauth]
+kex_exchange_identification: Connection closed by remote host [preauth]
+debug3: mm_sshkey_sign: entering [preauth]
+debug3: mm_request_send: entering, type 6 [preauth]
+debug3: mm_sshkey_sign: waiting for MONITOR_ANS_SIGN [preauth]
+debug3: mm_request_receive_expect: entering, type 7 [preauth]
+debug3: mm_request_receive: entering [preauth]
+debug3: mm_request_receive: entering
+Connection closed by 127.0.0.1 port 36594 [preauth]
+debug3: monitor_read: checking request 6
+debug3: mm_answer_sign: entering
+debug1: mm_answer_sign: hostkey ecdsa-sha2-nistp256 index 0
+debug1: monitor_read_log: child log fd closed
+debug3: mm_request_receive: entering
+debug3: mm_request_receive: monitor fd closed
+debug1: mm_reap: child exited with status 255
+debug1: do_cleanup
+debug1: Killing privsep child 19503
+debug3: server_accept_loop: child 19491 for connection from 127.0.0.1 to 127.0.0.1 closed pipe
+debug1: child_close: enter
+debug1: child_reap: preauth child 19491 for connection from 127.0.0.1 to 127.0.0.1 exited with status 255
+debug1: srclimit_penalise: inactive penalty for ipv4 127.0.0.1/32 already exists, 14 seconds remaining
+srclimit_penalise: 127.0.0.1/32: activating ipv4 penalty of 15.180 seconds for penalty: connections without attempting authentication
+debug3: mm_answer_sign: ecdsa-sha2-nistp256 KEX signature len=101
+debug3: mm_request_send: entering, type 7
+debug2: monitor_read: 6 used once, disabling now
+debug3: mm_sshkey_sign: ecdsa-sha2-nistp256 signature len=101 [preauth]
+debug3: send packet: type 31 [preauth]
+debug3: send packet: type 21 [preauth]
+debug1: ssh_packet_send2_wrapped: resetting send seqnr 3 [preauth]
+debug2: ssh_set_newkeys: mode 1 [preauth]
+debug1: rekey out after 4294967296 blocks [preauth]
+debug1: SSH2_MSG_NEWKEYS sent [preauth]
+debug1: Sending SSH2_MSG_EXT_INFO [preauth]
+debug3: send packet: type 7 [preauth]
+debug1: expecting SSH2_MSG_NEWKEYS [preauth]
+debug3: receive packet: type 21 [preauth]
+debug1: ssh_packet_read_poll2: resetting read seqnr 3 [preauth]
+debug1: SSH2_MSG_NEWKEYS received [preauth]
+debug2: ssh_set_newkeys: mode 0 [preauth]
+debug1: rekey in after 4294967296 blocks [preauth]
+debug2: KEX algorithms: mlkem768x25519-sha256,sntrup761x25519-sha512,sntrup761x25519-sha512@openssh.com,curve25519-sha256,curve25519-sha256@libssh.org,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,ext-info-s,kex-strict-s-v00@openssh.com [preauth]
+debug2: host key algorithms: ecdsa-sha2-nistp256 [preauth]
+debug2: ciphers ctos: chacha20-poly1305@openssh.com,aes128-gcm@openssh.com,aes256-gcm@openssh.com,aes128-ctr,aes192-ctr,aes256-ctr [preauth]
+debug2: ciphers stoc: chacha20-poly1305@openssh.com,aes128-gcm@openssh.com,aes256-gcm@openssh.com,aes128-ctr,aes192-ctr,aes256-ctr [preauth]
+debug2: MACs ctos: umac-64-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha1-etm@openssh.com,umac-64@openssh.com,umac-128@openssh.com,hmac-sha2-256,hmac-sha2-512,hmac-sha1 [preauth]
+debug2: MACs stoc: umac-64-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha1-etm@openssh.com,umac-64@openssh.com,umac-128@openssh.com,hmac-sha2-256,hmac-sha2-512,hmac-sha1 [preauth]
+debug2: compression ctos: none,zlib@openssh.com [preauth]
+debug2: compression stoc: none,zlib@openssh.com [preauth]
+debug2: languages ctos:  [preauth]
+debug2: languages stoc:  [preauth]
+debug2: first_kex_follows 0  [preauth]
+debug2: reserved 0  [preauth]
+debug1: KEX done [preauth]
+debug3: receive packet: type 7 [preauth]
+debug1: SSH2_MSG_EXT_INFO received [preauth]
+debug3: kex_input_ext_info: extension ext-info-in-auth@openssh.com [preauth]
+debug1: kex_ext_info_check_ver: ext-info-in-auth@openssh.com=<0> [preauth]
+debug3: receive packet: type 5 [preauth]
+debug3: send packet: type 6 [preauth]
+debug3: receive packet: type 50 [preauth]
+debug1: userauth-request for user u0_a1000 service ssh-connection method none [preauth]
+debug1: attempt 0 failures 0 [preauth]
+debug3: mm_getpwnamallow: entering [preauth]
+debug3: mm_request_send: entering, type 8 [preauth]
+debug3: mm_request_receive: entering
+debug3: monitor_read: checking request 8
+debug3: mm_answer_pwnamallow: entering
+debug2: parse_server_config_depth: config reprocess config len 630
+debug3: auth2_setup_methods_lists: checking methods
+debug1: authentication methods list 0: publickey
+debug3: mm_answer_pwnamallow: sending MONITOR_ANS_PWNAM: 1
+debug3: mm_request_send: entering, type 9
+debug2: monitor_read: 8 used once, disabling now
+debug3: mm_getpwnamallow: waiting for MONITOR_ANS_PWNAM [preauth]
+debug3: mm_request_receive_expect: entering, type 9 [preauth]
+debug3: mm_request_receive: entering [preauth]
+debug3: server_process_channel_timeouts: setting 0 timeouts [preauth]
+debug3: channel_clear_timeouts: clearing [preauth]
+debug2: input_userauth_request: setting up authctxt for u0_a1000 [preauth]
+debug3: mm_inform_authserv: entering [preauth]
+debug3: mm_request_send: entering, type 4 [preauth]
+debug3: mm_request_receive: entering
+debug3: monitor_read: checking request 4
+debug3: mm_answer_authserv: service=ssh-connection, style=
+debug2: monitor_read: 4 used once, disabling now
+debug1: kex_server_update_ext_info: Sending SSH2_MSG_EXT_INFO [preauth]
+debug3: send packet: type 7 [preauth]
+debug3: auth2_setup_methods_lists: checking methods [preauth]
+debug1: authentication methods list 0: publickey [preauth]
+debug3: authmethod_lookup: method none not allowed by AuthenticationMethods [preauth]
+debug3: userauth_finish: failure partial=0 next methods="publickey" [preauth]
+debug3: send packet: type 51 [preauth]
+debug3: receive packet: type 50 [preauth]
+debug1: userauth-request for user u0_a1000 service ssh-connection method publickey [preauth]
+debug1: attempt 1 failures 0 [preauth]
+debug2: input_userauth_request: try method publickey [preauth]
+debug2: userauth_pubkey: valid user u0_a1000 querying public key ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBEOuTbismlKQuBpzSRjfVKlrfgHG/5c4+Votgp0L8yHeKErL6pDbtjBiS2OW7+i6PyFDTe+suk8RzdlV2LFj4Ao= [preauth]
+debug1: userauth_pubkey: publickey test pkalg ecdsa-sha2-nistp256 pkblob ECDSA SHA256:wLXK1G69C27PxUHIpJy7XCmd75l7h2Fj8B5ckX8VYBY [preauth]
+debug3: mm_key_allowed: entering [preauth]
+debug3: mm_request_send: entering, type 22 [preauth]
+debug3: mm_request_receive: entering
+debug3: monitor_read: checking request 22
+debug3: mm_answer_keyallowed: entering
+debug1: temporarily_use_uid: 11000/11000 (e=11000/11000)
+debug1: restore_uid: (unprivileged)
+debug1: temporarily_use_uid: 11000/11000 (e=11000/11000)
+debug1: trying public key file /data/data/com.termux/files/home/.retui/ssh/authorized_keys
+debug1: fd 9 clearing O_NONBLOCK
+debug1: /data/data/com.termux/files/home/.retui/ssh/authorized_keys:1: matching key found: ECDSA SHA256:wLXK1G69C27PxUHIpJy7XCmd75l7h2Fj8B5ckX8VYBY
+debug1: /data/data/com.termux/files/home/.retui/ssh/authorized_keys:1: key options: agent-forwarding port-forwarding pty user-rc x11-forwarding
+debug3: /data/data/com.termux/files/home/.retui/ssh/authorized_keys:1: key options: agent-forwarding port-forwarding pty user-rc x11-forwarding
+Accepted key ECDSA SHA256:wLXK1G69C27PxUHIpJy7XCmd75l7h2Fj8B5ckX8VYBY found at /data/data/com.termux/files/home/.retui/ssh/authorized_keys:1
+debug2: auth_check_authkeys_file: /data/data/com.termux/files/home/.retui/ssh/authorized_keys: processed 1/1 lines
+debug1: restore_uid: (unprivileged)
+debug3: mm_answer_keyallowed: publickey authentication test: ECDSA key is allowed
+debug3: mm_request_send: entering, type 23
+debug3: mm_key_allowed: waiting for MONITOR_ANS_KEYALLOWED [preauth]
+debug3: mm_request_receive_expect: entering, type 23 [preauth]
+debug3: mm_request_receive: entering [preauth]
+debug3: send packet: type 60 [preauth]
+debug2: userauth_pubkey: authenticated 0 pkalg ecdsa-sha2-nistp256 [preauth]
+debug3: user_specific_delay: user specific delay 0.285ms [preauth]
+debug3: ensure_minimum_time_since: elapsed 1.553ms, delaying 3.732ms (requested 5.285ms) [preauth]
+Postponed publickey for u0_a1000 from 127.0.0.1 port 36598 ssh2 [preauth]
+debug3: receive packet: type 50 [preauth]
+debug1: userauth-request for user u0_a1000 service ssh-connection method publickey [preauth]
+debug1: attempt 2 failures 0 [preauth]
+debug2: input_userauth_request: try method publickey [preauth]
+debug2: userauth_pubkey: valid user u0_a1000 attempting public key ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBEOuTbismlKQuBpzSRjfVKlrfgHG/5c4+Votgp0L8yHeKErL6pDbtjBiS2OW7+i6PyFDTe+suk8RzdlV2LFj4Ao= [preauth]
+debug3: userauth_pubkey: publickey have ecdsa-sha2-nistp256 signature for ECDSA SHA256:wLXK1G69C27PxUHIpJy7XCmd75l7h2Fj8B5ckX8VYBY [preauth]
+debug3: mm_key_allowed: entering [preauth]
+debug3: mm_request_send: entering, type 22 [preauth]
+debug3: mm_request_receive: entering
+debug3: monitor_read: checking request 22
+debug3: mm_answer_keyallowed: entering
+debug1: temporarily_use_uid: 11000/11000 (e=11000/11000)
+debug1: restore_uid: (unprivileged)
+debug1: temporarily_use_uid: 11000/11000 (e=11000/11000)
+debug1: trying public key file /data/data/com.termux/files/home/.retui/ssh/authorized_keys
+debug1: fd 9 clearing O_NONBLOCK
+debug1: /data/data/com.termux/files/home/.retui/ssh/authorized_keys:1: matching key found: ECDSA SHA256:wLXK1G69C27PxUHIpJy7XCmd75l7h2Fj8B5ckX8VYBY
+debug1: /data/data/com.termux/files/home/.retui/ssh/authorized_keys:1: key options: agent-forwarding port-forwarding pty user-rc x11-forwarding
+debug3: /data/data/com.termux/files/home/.retui/ssh/authorized_keys:1: key options: agent-forwarding port-forwarding pty user-rc x11-forwarding
+Accepted key ECDSA SHA256:wLXK1G69C27PxUHIpJy7XCmd75l7h2Fj8B5ckX8VYBY found at /data/data/com.termux/files/home/.retui/ssh/authorized_keys:1
+debug2: auth_check_authkeys_file: /data/data/com.termux/files/home/.retui/ssh/authorized_keys: processed 1/1 lines
+debug1: restore_uid: (unprivileged)
+debug3: mm_answer_keyallowed: publickey authentication: ECDSA key is allowed
+debug3: mm_request_send: entering, type 23
+debug3: mm_key_allowed: waiting for MONITOR_ANS_KEYALLOWED [preauth]
+debug3: mm_request_receive_expect: entering, type 23 [preauth]
+debug3: mm_request_receive: entering [preauth]
+debug3: mm_sshkey_verify: entering [preauth]
+debug3: mm_request_send: entering, type 24 [preauth]
+debug3: mm_request_receive: entering
+debug3: monitor_read: checking request 24
+debug3: mm_answer_keyverify: publickey ECDSA signature using ecdsa-sha2-nistp256 verified
+debug1: auth_activate_options: setting new authentication options
+debug3: mm_request_send: entering, type 25
+debug3: auth2_update_methods_lists: updating methods list after "publickey"
+debug2: authentication methods list 0 complete
+Accepted publickey for u0_a1000 from 127.0.0.1 port 36598 ssh2: ECDSA SHA256:wLXK1G69C27PxUHIpJy7XCmd75l7h2Fj8B5ckX8VYBY
+debug1: monitor_child_preauth: user u0_a1000 authenticated by privileged process
+debug3: mm_get_keystate: Waiting for new keys
+debug3: mm_request_receive_expect: entering, type 26
+debug3: mm_request_receive: entering
+debug3: mm_get_keystate: GOT new keys
+debug3: mm_sshkey_verify: waiting for MONITOR_ANS_KEYVERIFY [preauth]
+debug3: mm_request_receive_expect: entering, type 25 [preauth]
+debug3: mm_request_receive: entering [preauth]
+debug1: auth_activate_options: setting new authentication options [preauth]
+debug2: userauth_pubkey: authenticated 1 pkalg ecdsa-sha2-nistp256 [preauth]
+debug3: user_specific_delay: user specific delay 0.285ms [preauth]
+debug3: ensure_minimum_time_since: elapsed 1.216ms, delaying 4.069ms (requested 5.285ms) [preauth]
+debug3: auth2_update_methods_lists: updating methods list after "publickey" [preauth]
+debug2: authentication methods list 0 complete [preauth]
+debug3: send packet: type 52 [preauth]
+debug3: mm_request_send: entering, type 26 [preauth]
+debug3: mm_send_keystate: Finished sending state [preauth]
+debug1: monitor_read_log: child log fd closed
+debug3: monitor_child_preauth: preauth child 19500 terminated successfully
+User child is on pid 19507
+debug2: server_accept_loop: child 19492 for connection from 127.0.0.1 to 127.0.0.1 auth done
+debug1: child_close: enter (forcing)
+debug3: monitor_apply_keystate: packet_set_state
+debug2: ssh_set_newkeys: mode 0
+debug1: rekey in after 4294967296 blocks
+debug2: ssh_set_newkeys: mode 1
+debug1: rekey out after 4294967296 blocks
+debug1: ssh_packet_set_postauth: called
+debug3: ssh_packet_set_state: done
+debug3: notify_hostkeys: key 0: ecdsa-sha2-nistp256 SHA256:kU2/3T69nMo6UBPpbAzTTPExuPws7vEONSbhYwD16hY
+debug3: notify_hostkeys: sent 1 hostkeys
+debug3: send packet: type 80
+debug1: active: key options: agent-forwarding port-forwarding pty user-rc x11-forwarding
+debug3: sending debug message: /data/data/com.termux/files/home/.retui/ssh/authorized_keys:1: key options: agent-forwarding port-forwarding pty user-rc x11-forwarding
+debug3: send packet: type 4
+debug3: sending debug message: /data/data/com.termux/files/home/.retui/ssh/authorized_keys:1: key options: agent-forwarding port-forwarding pty user-rc x11-forwarding
+debug3: send packet: type 4
+debug1: Entering interactive session for SSH2.
+debug1: server_init_dispatch
+debug3: receive packet: type 90
+debug1: server_input_channel_open: ctype session rchan 55 win 1048576 max 16384
+debug1: input_session_request
+debug1: channel 0: new session [server-session] (inactive timeout: 0)
+debug2: session_new: allocate (allocated 0 max 10)
+debug3: session_unused: session id 0 unused
+debug1: session_new: session 0
+debug1: session_open: channel 0
+debug1: session_open: session 0: link with channel 0
+debug1: server_input_channel_open: confirm session
+debug3: send packet: type 91
+debug2: process_output: session QoS is now interactive
+debug3: set_sock_tos: set socket 8 IP_TOS 0xb8
+debug3: receive packet: type 98
+debug1: server_input_channel_req: channel 0 request exec reply 1
+debug1: session_by_channel: session 0 channel 0
+debug1: session_input_channel_req: session 0 req exec
+debug2: channel_set_xtype: labeled channel 0 as session:command (inactive timeout 0)
+Starting session: forced-command (config) '"/data/data/com.termux/files/home/.retui/ssh/dispatch.sh"' for u0_a1000 from 127.0.0.1 port 36598 id 0
+debug2: fd 12 setting O_NONBLOCK
+debug2: fd 11 setting O_NONBLOCK
+debug2: fd 14 setting O_NONBLOCK
+debug3: send packet: type 99
+debug2: process_output: session QoS is now non-interactive
+debug3: set_sock_tos: set socket 8 IP_TOS 0x00
+debug2: channel 0: read failed rfd 12 maxlen 32768: Broken pipe
+debug2: channel 0: read failed
+debug2: chan_shutdown_read: channel 0: (i0 o0 sock -1 wfd 12 efd 14 [read])
+debug2: channel 0: input open -> drain
+debug2: channel 0: read 0 from efd 14
+debug2: channel 0: closing read-efd 14
+debug2: channel 0: ibuf empty
+debug2: channel 0: send eof
+debug3: send packet: type 96
+debug2: channel 0: input drain -> closed
+debug1: Received SIGCHLD.
+debug1: session_by_pid: pid 19508
+debug2: channel 0: request exit-status confirm 0
+debug3: send packet: type 98
+debug1: session_exit_message: session 0 channel 0 pid 19508 exit 0
+debug1: session_exit_message: release channel 0
+debug2: channel 0: write failed
+debug2: chan_shutdown_write: channel 0: (i3 o0 sock -1 wfd 11 efd -1 [closed])
+debug2: channel 0: send eow
+debug2: channel 0: output open -> closed
+debug2: channel 0: send_close2
+debug2: channel 0: send close for remote id 55
+debug3: send packet: type 97
+debug3: channel 0: will not send data after close
+debug3: receive packet: type 97
+debug2: channel 0: rcvd close
+debug3: channel 0: will not send data after close
+debug2: channel 0: is dead
+debug2: channel 0: gc: notify user
+debug1: session_by_channel: session 0 channel 0
+debug1: session_close_by_channel: channel 0 child 0
+Close session: user u0_a1000 from 127.0.0.1 port 36598 id 0
+debug3: session_unused: session id 0 unused
+debug2: channel 0: gc: user detached
+debug2: channel 0: is dead
+debug2: channel 0: garbage collecting
+debug1: channel 0: free: server-session, nchannels 1
+debug3: channel 0: status: The following connections are open:
+  #0 server-session (t4 [session:command] r55 nm0 i3/0 o3/0 e[closed]/0 fd -1/-1/-1 sock -1 cc -1 nc0 io 0x00/0x00 B)
+
+debug3: receive packet: type 90
+debug1: server_input_channel_open: ctype session rchan 56 win 1048576 max 16384
+debug1: input_session_request
+debug1: channel 0: new session [server-session] (inactive timeout: 0)
+debug1: session_new: session 0
+debug1: session_open: channel 0
+debug1: session_open: session 0: link with channel 0
+debug1: server_input_channel_open: confirm session
+debug3: send packet: type 91
+debug2: process_output: session QoS is now interactive
+debug3: set_sock_tos: set socket 8 IP_TOS 0xb8
+debug3: receive packet: type 98
+debug1: server_input_channel_req: channel 0 request exec reply 1
+debug1: session_by_channel: session 0 channel 0
+debug1: session_input_channel_req: session 0 req exec
+debug2: channel_set_xtype: labeled channel 0 as session:command (inactive timeout 0)
+Starting session: forced-command (config) '"/data/data/com.termux/files/home/.retui/ssh/dispatch.sh"' for u0_a1000 from 127.0.0.1 port 36598 id 0
+debug2: fd 12 setting O_NONBLOCK
+debug2: fd 11 setting O_NONBLOCK
+debug2: fd 14 setting O_NONBLOCK
+debug3: send packet: type 99
+debug2: process_output: session QoS is now non-interactive
+debug3: set_sock_tos: set socket 8 IP_TOS 0x00
+debug3: receive packet: type 90
+debug1: server_input_channel_open: ctype session rchan 57 win 1048576 max 16384
+debug1: input_session_request
+debug1: channel 1: new session [server-session] (inactive timeout: 0)
+debug2: session_new: allocate (allocated 1 max 10)
+debug3: session_unused: session id 1 unused
+debug1: session_new: session 1
+debug1: session_open: channel 1
+debug1: session_open: session 1: link with channel 1
+debug1: server_input_channel_open: confirm session
+debug3: send packet: type 91
+debug3: receive packet: type 98
+debug1: server_input_channel_req: channel 1 request pty-req reply 1
+debug1: session_by_channel: session 1 channel 1
+debug1: session_input_channel_req: session 1 req pty-req
+debug1: Allocating pty.
+debug3: mm_request_send: entering, type 28
+debug3: mm_pty_allocate: waiting for MONITOR_ANS_PTY
+debug3: mm_request_receive_expect: entering, type 29
+debug3: mm_request_receive: entering
+debug3: mm_request_receive: entering
+debug3: monitor_read: checking request 28
+debug3: mm_answer_pty: entering
+debug2: session_new: allocate (allocated 0 max 10)
+debug3: session_unused: session id 0 unused
+debug1: session_new: session 0
+debug1: pty_setowner: no tty group
+debug3: mm_request_send: entering, type 29
+debug3: mm_answer_pty: tty /dev/pts/2 ptyfd 7
+debug1: session_pty_req: session 1 alloc /dev/pts/2
+debug3: send packet: type 99
+debug3: receive packet: type 90
+debug1: server_input_channel_open: ctype session rchan 58 win 1048576 max 16384
+debug1: input_session_request
+debug1: channel 2: new session [server-session] (inactive timeout: 0)
+debug2: session_new: allocate (allocated 2 max 10)
+debug3: session_unused: session id 2 unused
+debug1: session_new: session 2
+debug1: session_open: channel 2
+debug1: session_open: session 2: link with channel 2
+debug1: server_input_channel_open: confirm session
+debug3: send packet: type 91
+debug3: receive packet: type 98
+debug1: server_input_channel_req: channel 2 request pty-req reply 1
+debug1: session_by_channel: session 2 channel 2
+debug1: session_input_channel_req: session 2 req pty-req
+debug1: Allocating pty.
+debug3: mm_request_send: entering, type 28
+debug3: mm_pty_allocate: waiting for MONITOR_ANS_PTY
+debug3: mm_request_receive_expect: entering, type 29
+debug3: mm_request_receive: entering
+debug3: mm_request_receive: entering
+debug3: monitor_read: checking request 28
+debug3: mm_answer_pty: entering
+debug2: session_new: allocate (allocated 1 max 10)
+debug3: session_unused: session id 1 unused
+debug1: session_new: session 1
+debug1: pty_setowner: no tty group
+debug3: mm_request_send: entering, type 29
+debug3: mm_answer_pty: tty /dev/pts/3 ptyfd 11
+debug1: session_pty_req: session 2 alloc /dev/pts/3
+debug3: send packet: type 99
+debug3: receive packet: type 98
+debug1: server_input_channel_req: channel 1 request exec reply 1
+debug1: session_by_channel: session 1 channel 1
+debug1: session_input_channel_req: session 1 req exec
+debug2: channel_set_xtype: labeled channel 1 as session:command (inactive timeout 0)
+Starting session: forced-command (config) '"/data/data/com.termux/files/home/.retui/ssh/dispatch.sh"' on pts/2 for u0_a1000 from 127.0.0.1 port 36598 id 1
+debug1: Setting controlling tty using TIOCSCTTY.
+debug2: channel 1: rfd 17 isatty
+debug2: fd 17 setting O_NONBLOCK
+debug3: fd 9 is O_NONBLOCK
+debug3: send packet: type 99
+debug3: receive packet: type 98
+debug1: server_input_channel_req: channel 2 request exec reply 1
+debug1: session_by_channel: session 2 channel 2
+debug1: session_input_channel_req: session 2 req exec
+debug2: channel_set_xtype: labeled channel 2 as session:command (inactive timeout 0)
+Starting session: forced-command (config) '"/data/data/com.termux/files/home/.retui/ssh/dispatch.sh"' on pts/3 for u0_a1000 from 127.0.0.1 port 36598 id 2
+debug2: channel 2: rfd 13 isatty
+debug2: fd 13 setting O_NONBLOCK
+debug3: fd 15 is O_NONBLOCK
+debug3: send packet: type 99
+debug1: Setting controlling tty using TIOCSCTTY.
+debug3: receive packet: type 90
+debug1: server_input_channel_open: ctype session rchan 59 win 1048576 max 16384
+debug1: input_session_request
+debug1: channel 3: new session [server-session] (inactive timeout: 0)
+debug2: session_new: allocate (allocated 3 max 10)
+debug3: session_unused: session id 3 unused
+debug1: session_new: session 3
+debug1: session_open: channel 3
+debug1: session_open: session 3: link with channel 3
+debug1: server_input_channel_open: confirm session
+debug3: send packet: type 91
+debug3: receive packet: type 98
+debug1: server_input_channel_req: channel 3 request exec reply 1
+debug1: session_by_channel: session 3 channel 3
+debug1: session_input_channel_req: session 3 req exec
+debug2: channel_set_xtype: labeled channel 3 as session:command (inactive timeout 0)
+Starting session: forced-command (config) '"/data/data/com.termux/files/home/.retui/ssh/dispatch.sh"' for u0_a1000 from 127.0.0.1 port 36598 id 3
+debug2: fd 21 setting O_NONBLOCK
+debug2: fd 20 setting O_NONBLOCK
+debug2: fd 23 setting O_NONBLOCK
+debug3: send packet: type 99
+debug2: channel 3: read failed rfd 21 maxlen 32768: Broken pipe
+debug2: channel 3: read failed
+debug2: chan_shutdown_read: channel 3: (i0 o0 sock -1 wfd 21 efd 23 [read])
+debug2: channel 3: input open -> drain
+debug2: channel 3: read 0 from efd 23
+debug2: channel 3: closing read-efd 23
+debug2: channel 3: ibuf empty
+debug2: channel 3: send eof
+debug3: send packet: type 96
+debug2: channel 3: input drain -> closed
+debug1: Received SIGCHLD.
+debug1: session_by_pid: pid 19557
+debug2: channel 3: request exit-status confirm 0
+debug3: send packet: type 98
+debug1: session_exit_message: session 3 channel 3 pid 19557 exit 0
+debug1: session_exit_message: release channel 3
+debug2: channel 3: write failed
+debug2: chan_shutdown_write: channel 3: (i3 o0 sock -1 wfd 20 efd -1 [closed])
+debug2: channel 3: send eow
+debug2: channel 3: output open -> closed
+debug2: channel 3: send_close2
+debug2: channel 3: send close for remote id 59
+debug3: send packet: type 97
+debug3: channel 3: will not send data after close
+debug3: receive packet: type 97
+debug2: channel 3: rcvd close
+debug3: channel 3: will not send data after close
+debug2: channel 3: is dead
+debug2: channel 3: gc: notify user
+debug1: session_by_channel: session 3 channel 3
+debug1: session_close_by_channel: channel 3 child 0
+Close session: user u0_a1000 from 127.0.0.1 port 36598 id 3
+debug3: session_unused: session id 3 unused
+debug2: channel 3: gc: user detached
+debug2: channel 3: is dead
+debug2: channel 3: garbage collecting
+debug1: channel 3: free: server-session, nchannels 4
+debug3: channel 3: status: The following connections are open:
+  #0 server-session (t4 [session:command] r56 nm0 i0/0 o0/0 e[read]/0 fd 12/11/14 sock -1 cc -1 nc0 io 0x05/0x00 B)
+  #1 server-session (t4 [session:command] r57 nm0 i0/0 o0/0 e[closed]/0 fd 17/9/-1 sock -1 cc -1 nc0 io 0x01/0x00 TI)
+  #2 server-session (t4 [session:command] r58 nm0 i0/0 o0/0 e[closed]/0 fd 13/15/-1 sock -1 cc -1 nc0 io 0x01/0x00 TI)
+  #3 server-session (t4 [session:command] r59 nm0 i3/0 o3/0 e[closed]/0 fd -1/-1/-1 sock -1 cc -1 nc0 io 0x00/0x00 B)
+
+debug3: receive packet: type 90
+debug1: server_input_channel_open: ctype session rchan 60 win 1048576 max 16384
+debug1: input_session_request
+debug1: channel 3: new session [server-session] (inactive timeout: 0)
+debug1: session_new: session 3
+debug1: session_open: channel 3
+debug1: session_open: session 3: link with channel 3
+debug1: server_input_channel_open: confirm session
+debug3: send packet: type 91
+debug3: receive packet: type 98
+debug1: server_input_channel_req: channel 3 request exec reply 1
+debug1: session_by_channel: session 3 channel 3
+debug1: session_input_channel_req: session 3 req exec
+debug2: channel_set_xtype: labeled channel 3 as session:command (inactive timeout 0)
+Starting session: forced-command (config) '"/data/data/com.termux/files/home/.retui/ssh/dispatch.sh"' for u0_a1000 from 127.0.0.1 port 36598 id 3
+debug2: fd 21 setting O_NONBLOCK
+debug2: fd 20 setting O_NONBLOCK
+debug2: fd 23 setting O_NONBLOCK
+debug3: send packet: type 99
+debug2: channel 3: read failed rfd 21 maxlen 32768: Broken pipe
+debug2: channel 3: read failed
+debug2: chan_shutdown_read: channel 3: (i0 o0 sock -1 wfd 21 efd 23 [read])
+debug2: channel 3: input open -> drain
+debug2: channel 3: read 0 from efd 23
+debug2: channel 3: closing read-efd 23
+debug2: channel 3: ibuf empty
+debug2: channel 3: send eof
+debug3: send packet: type 96
+debug2: channel 3: input drain -> closed
+debug1: Received SIGCHLD.
+debug1: session_by_pid: pid 19578
+debug2: channel 3: request exit-status confirm 0
+debug3: send packet: type 98
+debug1: session_exit_message: session 3 channel 3 pid 19578 exit 0
+debug1: session_exit_message: release channel 3
+debug2: channel 3: write failed
+debug2: chan_shutdown_write: channel 3: (i3 o0 sock -1 wfd 20 efd -1 [closed])
+debug2: channel 3: send eow
+debug2: channel 3: output open -> closed
+debug2: channel 3: send_close2
+debug2: channel 3: send close for remote id 60
+debug3: send packet: type 97
+debug3: channel 3: will not send data after close
+debug3: receive packet: type 97
+debug2: channel 3: rcvd close
+debug3: channel 3: will not send data after close
+debug2: channel 3: is dead
+debug2: channel 3: gc: notify user
+debug1: session_by_channel: session 3 channel 3
+debug1: session_close_by_channel: channel 3 child 0
+Close session: user u0_a1000 from 127.0.0.1 port 36598 id 3
+debug3: session_unused: session id 3 unused
+debug2: channel 3: gc: user detached
+debug2: channel 3: is dead
+debug2: channel 3: garbage collecting
+debug1: channel 3: free: server-session, nchannels 4
+debug3: channel 3: status: The following connections are open:
+  #0 server-session (t4 [session:command] r56 nm0 i0/0 o0/0 e[read]/0 fd 12/11/14 sock -1 cc -1 nc0 io 0x05/0x00 B)
+  #1 server-session (t4 [session:command] r57 nm0 i0/0 o0/0 e[closed]/0 fd 17/9/-1 sock -1 cc -1 nc0 io 0x01/0x00 TI)
+  #2 server-session (t4 [session:command] r58 nm0 i0/0 o0/0 e[closed]/0 fd 13/15/-1 sock -1 cc -1 nc0 io 0x01/0x00 TI)
+  #3 server-session (t4 [session:command] r60 nm0 i3/0 o3/0 e[closed]/0 fd -1/-1/-1 sock -1 cc -1 nc0 io 0x00/0x00 B)
+
+debug3: receive packet: type 98
+debug1: server_input_channel_req: channel 1 request window-change reply 1
+debug1: session_by_channel: session 1 channel 1
+debug1: session_input_channel_req: session 1 req window-change
+debug3: send packet: type 99
+debug3: receive packet: type 98
+debug1: server_input_channel_req: channel 2 request window-change reply 1
+debug1: session_by_channel: session 2 channel 2
+debug1: session_input_channel_req: session 2 req window-change
+debug3: send packet: type 99
+debug3: receive packet: type 98
+debug1: server_input_channel_req: channel 1 request window-change reply 1
+debug1: session_by_channel: session 1 channel 1
+debug1: session_input_channel_req: session 1 req window-change
+debug3: send packet: type 99
+debug3: receive packet: type 98
+debug1: server_input_channel_req: channel 2 request window-change reply 1
+debug1: session_by_channel: session 2 channel 2
+debug1: session_input_channel_req: session 2 req window-change
+debug3: send packet: type 99
+debug3: receive packet: type 98
+debug1: server_input_channel_req: channel 1 request window-change reply 1
+debug1: session_by_channel: session 1 channel 1
+debug1: session_input_channel_req: session 1 req window-change
+debug3: send packet: type 99
+debug3: receive packet: type 98
+debug1: server_input_channel_req: channel 2 request window-change reply 1
+debug1: session_by_channel: session 2 channel 2
+debug1: session_input_channel_req: session 2 req window-change
+debug3: send packet: type 99
+debug3: receive packet: type 97
+debug2: channel 1: rcvd close
+debug2: channel 1: output open -> drain
+debug2: chan_shutdown_read: channel 1: (i0 o1 sock -1 wfd 17 efd -1 [closed])
+debug2: channel 1: input open -> closed
+debug3: channel 1: will not send data after close
+debug2: channel 1: obuf empty
+debug2: chan_shutdown_write: channel 1: (i3 o1 sock -1 wfd 9 efd -1 [closed])
+debug2: channel 1: output drain -> closed
+debug2: channel 1: almost dead
+debug2: channel 1: gc: notify user
+debug1: session_by_channel: session 1 channel 1
+debug1: session_close_by_channel: channel 1 child 19528
+debug1: session_close_by_channel: channel 1: has child, ttyfd 13
+debug3: mm_request_send: entering, type 30
+debug3: mm_request_receive: entering
+debug3: monitor_read: checking request 30
+debug3: mm_answer_pty_cleanup: entering
+debug1: session_by_tty: session 0 tty /dev/pts/2
+debug3: mm_session_close: session 0 pid 19507
+debug3: mm_session_close: tty /dev/pts/2 ptyfd 7
+debug1: session_pty_cleanup2: session 0 release /dev/pts/2
+debug3: session_unused: session id 0 unused
+debug2: channel 1: almost dead
+debug2: channel 1: gc: notify user
+debug1: session_by_channel: session 1 channel 1
+debug1: session_close_by_channel: channel 1 child 19528
+debug1: session_close_by_channel: channel 1: has child, ttyfd -1
+debug3: receive packet: type 97
+debug2: channel 2: rcvd close
+debug2: channel 2: output open -> drain
+debug2: chan_shutdown_read: channel 2: (i0 o1 sock -1 wfd 13 efd -1 [closed])
+debug2: channel 2: input open -> closed
+debug3: receive packet: type 97
+debug2: channel 0: rcvd close
+debug2: channel 0: output open -> drain
+debug2: chan_shutdown_read: channel 0: (i0 o1 sock -1 wfd 12 efd 14 [read])
+debug1: chan_shutdown_extended_read: channel 0: (i0 o1 sock -1 wfd -1 efd 14 [read])
+debug2: channel 0: input open -> closed
+debug3: channel 0: will not send data after close
+debug3: channel 1: will not send data after close
+debug3: channel 2: will not send data after close
+debug2: channel 0: obuf empty
+debug2: chan_shutdown_write: channel 0: (i3 o1 sock -1 wfd 11 efd -1 [closed])
+debug2: channel 0: output drain -> closed
+debug2: channel 0: almost dead
+debug2: channel 0: gc: notify user
+debug1: session_by_channel: session 0 channel 0
+debug1: session_close_by_channel: channel 0 child 19517
+debug1: session_close_by_channel: channel 0: has child, ttyfd -1
+debug2: channel 1: almost dead
+debug2: channel 1: gc: notify user
+debug1: session_by_channel: session 1 channel 1
+debug1: session_close_by_channel: channel 1 child 19528
+debug1: session_close_by_channel: channel 1: has child, ttyfd -1
+debug2: channel 2: obuf empty
+debug2: chan_shutdown_write: channel 2: (i3 o1 sock -1 wfd 15 efd -1 [closed])
+debug2: channel 2: output drain -> closed
+debug2: channel 2: almost dead
+debug2: channel 2: gc: notify user
+debug1: session_by_channel: session 2 channel 2
+debug1: session_close_by_channel: channel 2 child 19530
+debug1: session_close_by_channel: channel 2: has child, ttyfd 16
+debug3: mm_request_send: entering, type 30
+debug2: channel 0: almost dead
+debug2: channel 0: gc: notify user
+debug1: session_by_channel: session 0 channel 0
+debug1: session_close_by_channel: channel 0 child 19517
+debug1: session_close_by_channel: channel 0: has child, ttyfd -1
+debug2: channel 1: almost dead
+debug2: channel 1: gc: notify user
+debug1: session_by_channel: session 1 channel 1
+debug1: session_close_by_channel: channel 1 child 19528
+debug1: session_close_by_channel: channel 1: has child, ttyfd -1
+debug2: channel 2: almost dead
+debug2: channel 2: gc: notify user
+debug1: session_by_channel: session 2 channel 2
+debug1: session_close_by_channel: channel 2 child 19530
+debug1: session_close_by_channel: channel 2: has child, ttyfd -1
+Connection closed by 127.0.0.1 port 36598
+debug1: channel 0: free: server-session, nchannels 3
+debug3: channel 0: status: The following connections are open:
+  #0 server-session (t4 [session:command] r56 nm0 i3/0 o3/0 e[closed]/0 fd -1/-1/-1 sock -1 cc -1 nc0 io 0x00/0x00 B)
+  #1 server-session (t4 [session:command] r57 nm0 i3/0 o3/0 e[closed]/0 fd -1/-1/-1 sock -1 cc -1 nc0 io 0x00/0x00 TI)
+  #2 server-session (t4 [session:command] r58 nm0 i3/0 o3/0 e[closed]/0 fd -1/-1/-1 sock -1 cc -1 nc0 io 0x00/0x00 TI)
+
+debug1: channel 1: free: server-session, nchannels 2
+debug3: channel 1: status: The following connections are open:
+  #1 server-session (t4 [session:command] r57 nm0 i3/0 o3/0 e[closed]/0 fd -1/-1/-1 sock -1 cc -1 nc0 io 0x00/0x00 TI)
+  #2 server-session (t4 [session:command] r58 nm0 i3/0 o3/0 e[closed]/0 fd -1/-1/-1 sock -1 cc -1 nc0 io 0x00/0x00 TI)
+
+debug1: channel 2: free: server-session, nchannels 1
+debug3: channel 2: status: The following connections are open:
+  #2 server-session (t4 [session:command] r58 nm0 i3/0 o3/0 e[closed]/0 fd -1/-1/-1 sock -1 cc -1 nc0 io 0x00/0x00 TI)
+
+Close session: user u0_a1000 from 127.0.0.1 port 36598 id 0
+debug3: session_unused: session id 0 unused
+Close session: user u0_a1000 from 127.0.0.1 port 36598 id 1
+debug3: session_unused: session id 1 unused
+Close session: user u0_a1000 from 127.0.0.1 port 36598 id 2
+debug3: session_unused: session id 2 unused
+debug1: do_cleanup
+Transferred: sent 12400, received 3720 bytes
+Closing connection to 127.0.0.1 port 36598
+debug3: mm_request_send: entering, type 50
+debug3: mm_request_receive: entering
+debug3: monitor_read: checking request 30
+debug3: mm_answer_pty_cleanup: entering
+debug1: session_by_tty: session 1 tty /dev/pts/3
+debug3: mm_session_close: session 1 pid 19507
+debug3: mm_session_close: tty /dev/pts/3 ptyfd 11
+debug1: session_pty_cleanup2: session 1 release /dev/pts/3
+debug3: session_unused: session id 1 unused
+debug3: mm_request_receive: entering
+debug3: monitor_read: checking request 50
+debug3: mm_answer_term: tearing down sessions
+debug3: fd 8 is not O_NONBLOCK
+drop connection #0 from [127.0.0.1]:36600 on [127.0.0.1]:8928 penalty: connections without attempting authentication
+debug3: fd 8 is not O_NONBLOCK
+drop connection #0 from [127.0.0.1]:36610 on [127.0.0.1]:8928 penalty: connections without attempting authentication
+debug3: fd 8 is not O_NONBLOCK
+drop connection #0 from [127.0.0.1]:36612 on [127.0.0.1]:8928 penalty: connections without attempting authentication
+debug3: fd 8 is not O_NONBLOCK
+drop connection #0 from [127.0.0.1]:36614 on [127.0.0.1]:8928 penalty: connections without attempting authentication
+debug3: fd 8 is not O_NONBLOCK
+drop connection #0 from [127.0.0.1]:36626 on [127.0.0.1]:8928 penalty: connections without attempting authentication
+debug3: fd 8 is not O_NONBLOCK
+drop connection #0 from [127.0.0.1]:36632 on [127.0.0.1]:8928 penalty: connections without attempting authentication
+debug3: fd 8 is not O_NONBLOCK
+drop connection #0 from [127.0.0.1]:36648 on [127.0.0.1]:8928 penalty: connections without attempting authentication
+debug3: fd 8 is not O_NONBLOCK
+drop connection #0 from [127.0.0.1]:32848 on [127.0.0.1]:8928 penalty: connections without attempting authentication
+debug3: fd 8 is not O_NONBLOCK
+drop connection #0 from [127.0.0.1]:32854 on [127.0.0.1]:8928 penalty: connections without attempting authentication
+debug3: fd 8 is not O_NONBLOCK
+debug3: drop connection #0 from [127.0.0.1]:32856 on [127.0.0.1]:8928 penalty: connections without attempting authentication
+debug3: fd 8 is not O_NONBLOCK
+debug3: drop connection #0 from [127.0.0.1]:32862 on [127.0.0.1]:8928 penalty: connections without attempting authentication
+debug3: fd 8 is not O_NONBLOCK
+debug3: drop connection #0 from [127.0.0.1]:32870 on [127.0.0.1]:8928 penalty: connections without attempting authentication
+debug3: fd 8 is not O_NONBLOCK
+debug3: drop connection #0 from [127.0.0.1]:32880 on [127.0.0.1]:8928 penalty: connections without attempting authentication
+debug3: fd 8 is not O_NONBLOCK
+debug3: drop connection #0 from [127.0.0.1]:32882 on [127.0.0.1]:8928 penalty: connections without attempting authentication
+debug3: fd 8 is not O_NONBLOCK
+debug3: drop connection #0 from [127.0.0.1]:32898 on [127.0.0.1]:8928 penalty: connections without attempting authentication
+debug3: fd 8 is not O_NONBLOCK
+debug3: drop connection #0 from [127.0.0.1]:32902 on [127.0.0.1]:8928 penalty: connections without attempting authentication
+debug3: fd 8 is not O_NONBLOCK
+debug3: drop connection #0 from [127.0.0.1]:32910 on [127.0.0.1]:8928 penalty: connections without attempting authentication
+debug3: fd 8 is not O_NONBLOCK
+debug3: drop connection #0 from [127.0.0.1]:32926 on [127.0.0.1]:8928 penalty: connections without attempting authentication
+debug3: fd 8 is not O_NONBLOCK
+debug3: drop connection #0 from [127.0.0.1]:32936 on [127.0.0.1]:8928 penalty: connections without attempting authentication
+debug3: fd 8 is not O_NONBLOCK
+debug3: drop connection #0 from [127.0.0.1]:32942 on [127.0.0.1]:8928 penalty: connections without attempting authentication
+debug3: fd 8 is not O_NONBLOCK
+debug3: drop connection #0 from [127.0.0.1]:32946 on [127.0.0.1]:8928 penalty: connections without attempting authentication
+
+PROCESS
+16310 19229 /data/data/com.termux/files/usr/bin/sshd -D -E /data/data/com.termux/files/home/.retui/sshappearance-f1f2cdeb-sshd.log -o LogLevel=DEBUG3 -f /data/data/com.termux/files/home/.retui/ssh/sshd_config
+20022 19229 /data/data/com.termux/files/usr/bin/sh -c set -eu export PATH="$PREFIX/bin:$PATH" printf 'DAEMON LOG\n'; tail -n 1600 "$1" || true printf '\nPROCESS\n'; ps -A -o pid,ppid,args | grep '[s]shd' || true printf '\nPIDFILE\n'; cat "$HOME/.retui/ssh/sshd.pid" || true retui-appearance /data/data/com.termux/files/home/.retui/sshappearance-f1f2cdeb-sshd.log
+
+PIDFILE
+16310

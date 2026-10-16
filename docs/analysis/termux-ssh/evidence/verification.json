@@ -1,0 +1,25 @@
+{
+  "date": "2026-10-15",
+  "checks": {
+    "copied_local_work_hashes": "passed",
+    "production_source_inventory_hashes": "passed",
+    "report_local_links": "passed",
+    "evidence_json_sample_counts": "passed: three runs, 40 native samples per path per run",
+    "python_syntax": "passed",
+    "whitespace": "passed",
+    "helper_real_tmux_tests": "8 passed, 7.761 seconds",
+    "tile_real_tmux_tests": "5 passed, 3.962 seconds",
+    "host_emulator_probe": "10 checks passed",
+    "device_functional_checks": "unknown host rejected; normal and alternate-screen reconnect; naive shared selection; grouped independent selection and survival",
+    "installed_helper_hash_after_testing": "unchanged",
+    "temporary_device_directories_and_adb_forwards_after_testing": "absent"
+  },
+  "not_run": [
+    "APK build",
+    "Android instrumentation",
+    "new Android SSH UI",
+    "real editor sessions",
+    "touch/IME-to-drawn-frame",
+    "CPU/memory/battery/lifecycle stress"
+  ]
+}

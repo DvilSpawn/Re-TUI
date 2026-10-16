@@ -1,0 +1,10 @@
+{
+  "apk": "/Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/build/ship-candidate/retui-3-build503-wallpaper-downloads.apk",
+  "sha256": "f4ff82b421e03b4e323a19f26b3550fa45d2537380d48340789f58172b9cc0d6",
+  "installed_sha256": "f4ff82b421e03b4e323a19f26b3550fa45d2537380d48340789f58172b9cc0d6",
+  "package": "com.dvil.tui_renewed",
+  "versionCode": 503,
+  "data_preserved": true,
+  "optional_packs_preinstalled": false,
+  "certificate_sha256": "f1f50b573286bfbd59b8bfbb39d202ea3adf173f12077d98110bb9ed981b93f2"
+}

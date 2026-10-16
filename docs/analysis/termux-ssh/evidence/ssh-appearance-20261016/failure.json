@@ -1,0 +1,12 @@
+{
+  "description": "Both unique fixture windows must reach the live window list",
+  "focus": true,
+  "status": "No shell windows · add a new shell · TERMUX WORKSPACE",
+  "helper": "Preparing Termux connection…",
+  "helper_visible": 8,
+  "ssh_connected": true,
+  "ssh_connecting": false,
+  "selection": "pages:0;SINGLE|0||",
+  "ready": "[false, false]",
+  "terminal_text": "[, ]"
+}

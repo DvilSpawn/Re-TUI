@@ -7,10 +7,10 @@ dependencies {
 
 android {
     namespace = "ohi.andre.consolelauncher"
+    sourceSets.main.java.srcDir rootProject.file('third_party/termux/terminal-emulator')
     compileSdk = 36
     ndkVersion = '27.1.12297006'
-    sourceSets.main.jniLibs.srcDir layout.buildDirectory.dir('qalculate/jniLibs').get().asFile
-    sourceSets.main.assets.srcDir layout.buildDirectory.dir('qalculate/notices').get().asFile
+    sourceSets.main.assets.srcDir layout.buildDirectory.dir('runtime-notices').get().asFile
     sourceSets.main.assets.srcDir layout.buildDirectory.dir('termux-helper-assets').get().asFile
 
     def keystorePropertiesFile = rootProject.file("local.properties")
@@ -39,7 +39,17 @@ android {
         }
     }
 
+    def engineCatalogUrl = providers.gradleProperty('calculatorEngineCatalogUrl').getOrElse('https://re-tui.pages.dev/calculator-packs/catalog.json')
+    if (engineCatalogUrl) {
+        def engineUri = new URI(engineCatalogUrl)
+        if (engineUri.scheme != 'https' || !engineUri.host || engineUri.userInfo || engineUri.port != -1 || engineUri.query || engineUri.fragment) {
+            throw new GradleException('calculatorEngineCatalogUrl must be an HTTPS catalogue URL')
+        }
+    }
+
     defaultConfig {
+        buildConfigField 'String', 'CALCULATOR_ENGINE_CATALOG_URL', groovy.json.JsonOutput.toJson(engineCatalogUrl)
+        buildConfigField 'boolean', 'TERMUX_SSH_PANE', 'true'
         applicationId = "com.dvil.tui_renewed"
         minSdk = 23
         targetSdk = 36
@@ -48,9 +58,13 @@ android {
 
         testInstrumentationRunner = providers.gradleProperty('ircReleaseSmokeRunner').map { it.toBoolean() }
                 .getOrElse(false) ? "ohi.andre.consolelauncher.irc.IrcReleaseSmokeInstrumentation"
-                : "androidx.test.runner.AndroidJUnitRunner"
+                : providers.gradleProperty('termuxSshReleaseCheck').map { it.toBoolean() }.getOrElse(false)
+                    ? "ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceSshReleaseInstrumentation"
+                    : "androidx.test.runner.AndroidJUnitRunner"
         manifestPlaceholders.applicationLabel = '@string/app_name'
     }
+
+    testBuildType = providers.gradleProperty('termuxSshReleaseCheck').map { it.toBoolean() }.getOrElse(false) ? 'release' : 'debug'
 
     buildFeatures {
         buildConfig = true
@@ -59,6 +73,20 @@ android {
 
     buildTypes {
         debug {
+            if (providers.gradleProperty('termuxSshPane').isPresent()) {
+                applicationIdSuffix = '.termuxsshdebug'
+                manifestPlaceholders.applicationLabel = 'Re:TUI Termux Test'
+            }
+            buildConfigField 'boolean', 'TERMUX_SSH_PANE', providers.gradleProperty('termuxSshPane').map { it.toBoolean().toString() }.getOrElse('true')
+            if (providers.gradleProperty('termuxPaneBaseline').map { it.toBoolean() }.getOrElse(false)) {
+                buildConfigField 'boolean', 'TERMUX_SSH_PANE', 'false'
+                applicationIdSuffix = '.termuxlegacydebug'
+                manifestPlaceholders.applicationLabel = 'Re:TUI Pane Baseline Test'
+            }
+            if (providers.gradleProperty('calculatorPackDebug').map { it.toBoolean() }.getOrElse(false)) {
+                applicationIdSuffix = '.calculatorpackdebug'
+                manifestPlaceholders.applicationLabel = 'Re:TUI Calculator Pack Test'
+            }
             pseudoLocalesEnabled = true
             if (providers.gradleProperty('fetchDebug').map { it.toBoolean() }.getOrElse(false)) {
                 def paletteDebug = providers.gradleProperty('paletteDebug').map { it.toBoolean() }.getOrElse(false)
@@ -70,6 +98,12 @@ android {
             }
         }
         release {
+            proguardFile 'proguard-termux-ssh.pro'
+            if (providers.gradleProperty('termuxSshReleaseCheck').map { it.toBoolean() }.getOrElse(false)) {
+                applicationIdSuffix = '.termuxsshreleasecheck'
+                manifestPlaceholders.applicationLabel = 'Re:TUI SSH Release Check'
+                signingConfig = signingConfigs.debug
+            }
             minifyEnabled = true
             shrinkResources = true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
@@ -90,6 +124,7 @@ android {
     }
 
     compileOptions {
+        coreLibraryDesugaringEnabled true
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
@@ -111,24 +146,12 @@ androidComponents.beforeVariants(androidComponents.selector().all()) { variant -
     }
 }
 
-def buildNativeQalculate = tasks.register('buildNativeQalculate', Exec) {
-    group = 'build'
-    description = 'Builds the offline Qalculate JNI engine from pinned upstream sources for all four ABIs.'
-    inputs.files(rootProject.fileTree('native/qalculate') { exclude '**/__pycache__/**' })
-    outputs.dir(layout.buildDirectory.dir('qalculate/jniLibs'))
-    commandLine 'python3', rootProject.file('native/qalculate/build.py'),
-            '--ndk', new File(androidComponents.sdkComponents.sdkDirectory.get().asFile, "ndk/${android.ndkVersion}")
-}
-tasks.matching { it.name.startsWith('merge') && it.name.endsWith('JniLibFolders') }.configureEach {
-    dependsOn(buildNativeQalculate)
-}
-def qalculateNotices = tasks.register('qalculateNotices', Sync) {
+def runtimeNotices = tasks.register('runtimeNotices', Sync) {
     from(rootProject.projectDir) {
         include 'LICENSE', 'THIRD_PARTY_NOTICES.md', 'LICENSES/**'
-        include 'native/qalculate/README.md', 'native/qalculate/sources.json'
         include 'third_party/*.json', 'third_party/*.md', 'third_party/*.patch'
     }
-    into(layout.buildDirectory.dir('qalculate/notices/licenses'))
+    into(layout.buildDirectory.dir('runtime-notices/licenses'))
 }
 def termuxHelperAssets = tasks.register('termuxHelperAssets', Sync) {
     from(rootProject.file('termux/retui/bin/retui'))
@@ -179,7 +202,7 @@ tasks.matching {
     (it.name.startsWith('merge') && it.name.endsWith('Assets')) ||
             it.name.toLowerCase(Locale.ROOT).contains('lint')
 }.configureEach {
-    dependsOn(qalculateNotices, termuxHelperAssets)
+    dependsOn(runtimeNotices, termuxHelperAssets)
 }
 
 def guardedSourceSetNames = ["main", "fdroid", "playstore"]
@@ -280,7 +303,8 @@ def addCommonSourceInputErrors = { File sourceFile, List<String> errors ->
 
 def isAllowedAsset = { File assetsDir, File sourceFile ->
     def relativeAssetPath = assetsDir.toPath().relativize(sourceFile.toPath()).toString().replace(File.separator, "/")
-    return relativeAssetPath == "JetBrainsMonoNerdFont-Regular.ttf"
+    return relativeAssetPath in ["termux-ssh/setup.sh", "termux-ssh/daemon.sh", "termux-ssh/dispatch.sh", "calculator-runtime/index.html", "calculator-runtime/bootstrap.js", "calculator-runtime/worker.js"]
+            || relativeAssetPath == "JetBrainsMonoNerdFont-Regular.ttf"
             || relativeAssetPath in ["localization/catalog.json", "localization/english-template.zip"]
             || relativeAssetPath in ["module-library/index.json", "module-library/todo.lua",
                 "module-library/habits.lua", "module-library/focus.lua",
@@ -387,6 +411,7 @@ tasks.register("cleanLocalArtifacts", Delete) {
 }
 
 dependencies {
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
     implementation 'androidx.activity:activity:1.13.0'
     implementation 'androidx.appcompat:appcompat:1.7.1'
     implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.1.0'
@@ -398,10 +423,12 @@ dependencies {
     implementation 'com.jayway.jsonpath:json-path:3.0.0'
     implementation 'org.luaj:luaj-jse:3.0.1'
     implementation 'org.jsoup:jsoup:1.22.1'
+    implementation 'com.github.mwiede:jsch:2.28.8'
     implementation 'it.andreuzzi:CompareString2:1.0.9'
     implementation 'com.google.zxing:core:3.5.4'
     implementation 'com.joaomgcd:taskerpluginlibrary:0.4.10'
 
+    androidTestCompileOnly 'com.google.errorprone:error_prone_annotations:2.30.0'
     androidTestImplementation 'androidx.test:runner:1.6.2'
     androidTestImplementation 'androidx.test.ext:junit:1.2.1'
     testImplementation 'junit:junit:4.13.2'

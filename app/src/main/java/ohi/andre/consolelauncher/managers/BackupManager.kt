@@ -93,6 +93,7 @@ object BackupManager {
         "retui_module_prompt",
         "retui_callback_auth",
         "retui_frames",
+        "calculator",
         "pomodoro_state",
         RetuiCreditManager.PREFS,
         SpaceManager.PREFS,
@@ -663,6 +664,8 @@ object BackupManager {
         if (name == null || name.length == 0) return false
         if (name.startsWith(ohi.andre.consolelauncher.managers.BackupManager.SHARED_PREFS_DIR)) return false
         if (name.startsWith("spaces/.")) return false
+        if (name == "calculator-engines" || name.startsWith("calculator-engines/")) return false
+        if (name == "wallpaper-downloads" || name.startsWith("wallpaper-downloads/")) return false
         if (name.startsWith(".restore-") || name.startsWith(PRIVATE_FILES_DIR) ||
             name.endsWith(ohi.andre.consolelauncher.managers.BackupManager.BACKUP_SUFFIX)) return false
         if (name.startsWith("crash.txt")) return false

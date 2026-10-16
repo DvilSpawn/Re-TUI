@@ -1,0 +1,8 @@
+{
+  "apk_sha256": "97fe61ad7af6a5fdc48fa99255862ad1002f57e3d48cefa9dae89ebc9201efa3",
+  "setup_asset_sha256": "77317289d529978ced5b0b63032604ab1648722fe672c7ba913bbda15d388e7c",
+  "setup_source_sha256": "77317289d529978ced5b0b63032604ab1648722fe672c7ba913bbda15d388e7c",
+  "uses_kernel_lock": true,
+  "loopback_source_penalties_disabled": true,
+  "retains_all_hostkey_foreign_listener_probe": true
+}

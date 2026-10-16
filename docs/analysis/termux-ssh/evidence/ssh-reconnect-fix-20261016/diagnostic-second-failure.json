@@ -1,0 +1,14 @@
+{
+  "description": "Both tiles and colon draft must survive foreground reconnect",
+  "focus": true,
+  "status": "Session.connect: java.net.SocketException: Connection reset · TERMUX WORKSPACE",
+  "helper": "Session.connect: java.net.SocketException: Connection reset",
+  "helper_visible": 0,
+  "ssh_connecting": false,
+  "cycles": 30,
+  "reconnects": 9,
+  "draft": "retained 😀 appearance",
+  "selection": "pages:0;LEFT_RIGHT|1|@70|@71",
+  "ready": "[false, false]",
+  "terminal_text": "[, ]"
+}

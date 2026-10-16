@@ -8,7 +8,8 @@ data class TermuxWorkspaceFrame(
     val target: String?, val window: String?, val windows: List<Pair<String, String>>,
     val body: String?, val cols: Int, val rows: Int, val cursorX: Int?, val cursorY: Int?,
     val protocol: String?, val socket: String?, val token: String?, val host: String?, val port: Int?,
-    val helperVersion: String? = null
+    val helperVersion: String? = null,
+    val terminalState: List<Int>? = null, val normalBody: String? = null
 ) {
     companion object {
         @OptIn(ExperimentalEncodingApi::class)
@@ -41,7 +42,9 @@ data class TermuxWorkspaceFrame(
                 }, body, value("COLS")?.toIntOrNull()?.coerceIn(20, 240) ?: 80,
                 value("ROWS")?.toIntOrNull()?.coerceIn(8, 120) ?: 24,
                 cursor?.getOrNull(0)?.toIntOrNull(), cursor?.getOrNull(1)?.toIntOrNull(),
-                value("SOCKET"), value("SOCKET_NAME"), value("TOKEN"), value("TCP_HOST"), value("TCP_PORT")?.toIntOrNull(), value("VERSION"))
+                value("SOCKET"), value("SOCKET_NAME"), value("TOKEN"), value("TCP_HOST"), value("TCP_PORT")?.toIntOrNull(), value("VERSION"),
+                value("TERMINAL_STATE")?.split('|')?.map { it.toLongOrNull()?.let { value -> if (value == 4294967295L) 0 else value.toInt().also { require(value in 0..240) } } ?: error("Invalid terminal state") }?.also { require(it.size == 13) },
+                value("NORMAL_BASE64")?.let { Base64.decode(it).toString(Charsets.UTF_8) })
         }
     }
 }

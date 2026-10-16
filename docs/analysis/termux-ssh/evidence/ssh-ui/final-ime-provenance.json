@@ -1,0 +1,22 @@
+{
+  "device": "adb-10BE1C0FB40006A-RwuKbp._adb-tls-connect._tcp",
+  "appAndTest": [
+    {
+      "package": "com.dvil.tui_renewed.termuxsshdebug",
+      "apk": "app/build/outputs/apk/playstore/debug/app-playstore-debug.apk",
+      "sha256": "2cf5c3e440091e9c72f44d4bd60f31f34054a16ecce6090bee86b87bcc1980a5",
+      "bytes": 16790644,
+      "installedBytesMatch": true
+    },
+    {
+      "package": "com.dvil.tui_renewed.termuxsshdebug.test",
+      "apk": "app/build/outputs/apk/androidTest/playstore/debug/app-playstore-debug-androidTest.apk",
+      "sha256": "8c1d3e6b524fc54f2bec55cce00223a642acdd1e9385a88e40ec0c9afbe5872a",
+      "bytes": 1273728,
+      "installedBytesMatch": true
+    }
+  ],
+  "uiResult": "OK (3 tests), 15.525 seconds",
+  "integrationResult": "OK (1 test), 1.919 seconds",
+  "boundary": "Synthetic InputConnection composition/commits and IME GO action with exact remote saved-file assertion; actual installed IME show/hide with insets, emulator rows and remote tmux pane_height checks; not a third-party keyboard tapping/composition-engine test."
+}

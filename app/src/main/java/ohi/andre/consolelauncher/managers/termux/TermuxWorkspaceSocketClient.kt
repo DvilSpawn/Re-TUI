@@ -17,6 +17,8 @@ import java.util.concurrent.TimeUnit
 
 class TermuxWorkspaceSocketClient(private val listener: Listener) {
     interface Listener {
+        fun onOutput(target: String, bytes: ByteArray) {}
+        fun onWindows(windows: List<Pair<String, String>>) {}
         fun onFrame(frame: String)
         fun onStatus(status: String)
         fun onError(message: String)
@@ -29,6 +31,7 @@ class TermuxWorkspaceSocketClient(private val listener: Listener) {
     @Volatile private var running = false
     private var started = false
     private var targeted = false
+    private var outputDriven = false
     private val writeLock = Any()
     private var localSocket: LocalSocket? = null
     private var tcpSocket: Socket? = null
@@ -38,10 +41,11 @@ class TermuxWorkspaceSocketClient(private val listener: Listener) {
 
     fun connect(socketName: String, token: String, cols: Int, rows: Int,
                 tcpHost: String?, tcpPort: Int?, stream: Boolean,
-                target: String? = null, targeted: Boolean = false) {
+                target: String? = null, targeted: Boolean = false, outputDriven: Boolean = false) {
         check(!started) { "Create a new client to reconnect" }
         started = true
         this.targeted = targeted
+        this.outputDriven = outputDriven
         require(target == null || target.matches(Regex("@[0-9]+"))) { "Invalid window target" }
         require(socketName == SOCKET_NAME) { "Unexpected bridge socket" }
         require(token.matches(Regex("[A-Za-z0-9_-]{1,128}"))) { "Invalid bridge token" }
@@ -60,9 +64,10 @@ class TermuxWorkspaceSocketClient(private val listener: Listener) {
                     if (!running) return@Thread
                     writer = out
                 }
-                out.write("HELLO $token ${cleanCols(cols)} ${cleanRows(rows)} ${if (stream) "STREAM" else "CAPTURE"} ${target?.let { encode(it) } ?: "-"}${if (targeted) " NO_CREATE" else ""}\n")
+                out.write("HELLO $token ${cleanCols(cols)} ${cleanRows(rows)} ${if (outputDriven) "OUTPUT" else if (stream) "STREAM" else "CAPTURE"} ${target?.let { encode(it) } ?: "-"}${if (targeted) " NO_CREATE" else ""}\n")
                 out.flush()
-                readFrames(BufferedReader(InputStreamReader(input, StandardCharsets.UTF_8)))
+                // Preserve partial UTF-8 bytes across tmux output notification boundaries.
+                readFrames(BufferedReader(InputStreamReader(input, StandardCharsets.ISO_8859_1)))
             } catch (e: Exception) {
                 if (running) listener.onError(e.message ?: e.javaClass.simpleName)
             } finally {
@@ -77,8 +82,14 @@ class TermuxWorkspaceSocketClient(private val listener: Listener) {
     fun sendInput(input: String, cols: Int, rows: Int): Boolean =
         sendRaw(if (input.isEmpty()) "ENTER ${cleanCols(cols)} ${cleanRows(rows)}"
         else "SEND ${cleanCols(cols)} ${cleanRows(rows)} ${encode(input)}")
-    fun typeInput(input: String, cols: Int, rows: Int): Boolean =
-        input.isEmpty() || sendRaw("TYPE ${cleanCols(cols)} ${cleanRows(rows)} ${encode(input)}")
+    fun typeInput(input: String, cols: Int, rows: Int): Boolean {
+        if (input.isEmpty()) return true
+        val bytes = input.toByteArray(StandardCharsets.UTF_8)
+        return if (outputDriven && bytes.size <= 16384) {
+            val hex = bytes.joinToString(" ") { (it.toInt() and 255).toString(16).padStart(2, '0') }
+            sendRaw("TYPE_HEX ${cleanCols(cols)} ${cleanRows(rows)} $hex")
+        } else sendRaw("TYPE ${cleanCols(cols)} ${cleanRows(rows)} ${encode(input)}")
+    }
     fun newWindow(name: String?, command: String?, cols: Int, rows: Int) =
         sendRaw("NEW ${cleanCols(cols)} ${cleanRows(rows)} ${if (name.isNullOrBlank()) "-" else encode(name)} ${if (command.isNullOrBlank()) "-" else encode(command)}")
     fun switchWindow(direction: String, cols: Int, rows: Int) =
@@ -120,7 +131,7 @@ class TermuxWorkspaceSocketClient(private val listener: Listener) {
     private fun connectTcp(port: Int): Socket {
         for (attempt in 0 until 6) {
             if (!running) error("connection cancelled")
-            val candidate = Socket()
+            val candidate = Socket().apply { tcpNoDelay = true }
             tcpSocket = candidate
             try {
                 candidate.soTimeout = 3000
@@ -162,6 +173,22 @@ class TermuxWorkspaceSocketClient(private val listener: Listener) {
                         frame.setLength(0)
                         continue
                     }
+                    line.startsWith("__RETUI_WINDOWS_BASE64__ ") -> {
+                        check(protocol && authenticated && session) { "Window update before handshake" }
+                        val value = Base64.decode(line.substringAfter(' '), Base64.NO_WRAP).toString(StandardCharsets.UTF_8)
+                        listener.onWindows(TermuxWorkspaceFrame.parse("__RETUI_WINDOWS__ $value").windows)
+                        continue
+                    }
+                    line.startsWith("__RETUI_OUTPUT_BASE64__ ") || line.startsWith("__RETUI_OUTPUT_OCTAL__ ") -> {
+                        check(protocol && authenticated && session && connected) { "Output before seed" }
+                        val parts = line.split(' ', limit = 3)
+                        check(parts.size == 3 && parts[1].matches(Regex("@[0-9]+"))) { "Invalid output target" }
+                        val bytes = if (parts[0] == "__RETUI_OUTPUT_OCTAL__") TermuxWorkspaceOutput.decode(parts[2])
+                            else Base64.decode(parts[2], Base64.NO_WRAP)
+                        check(bytes.size <= 65536) { "Output too large" }
+                        listener.onOutput(parts[1], bytes)
+                        continue
+                    }
                     line.startsWith("__RETUI_FRAME_BASE64__ ") -> {
                         check(protocol && authenticated && session) { "Invalid bridge handshake" }
                         Base64.decode(line.substringAfter(' '), Base64.DEFAULT)
@@ -179,7 +206,7 @@ class TermuxWorkspaceSocketClient(private val listener: Listener) {
                     tcpSocket?.soTimeout = 0
                     listener.onStatus("ok")
                 }
-                listener.onFrame(frame.toString())
+                listener.onFrame(frame.toString().toByteArray(StandardCharsets.ISO_8859_1).toString(StandardCharsets.UTF_8))
                 frame.setLength(0)
                 inBody = false
             }

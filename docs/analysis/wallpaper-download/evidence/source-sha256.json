@@ -1,0 +1,12 @@
+{
+  "app/src/main/java/ohi/andre/consolelauncher/wallpaper/RetuiWallpaperActivity.kt": "7e8071933d0fbb94a23b23a2ba5591eedbe44b529846cfa63f89726e6da5559a",
+  "app/src/main/java/ohi/andre/consolelauncher/wallpaper/WallpaperGalleryActivity.kt": "3a9699fc52501464dec0c5e2767e80381ee60f135f6650f7a8b19a4ac605e08f",
+  "app/src/main/java/ohi/andre/consolelauncher/wallpaper/WallpaperLibrary.kt": "757762092fc2e67162ef76f09e4e96b031a8aa60b2f2b16db9fef73979d2fe26",
+  "app/src/main/java/ohi/andre/consolelauncher/wallpaper/WallpaperPackStore.kt": "c0a533edcabacbb6a70352895de7e83e1a113d4247aa3c98483bd53c2586b03f",
+  "app/src/main/java/ohi/andre/consolelauncher/wallpaper/CloudsView.kt": "e753215bf763114b06542a8c7306216015e3172e92362f3572d933c2060746a2",
+  "app/src/main/java/ohi/andre/consolelauncher/wallpaper/RetuiWallpaperService.kt": "9fefc3d0ca7259272c56522c8625f079a2a736277fe01f7c4b72e745069752a2",
+  "app/src/main/java/ohi/andre/consolelauncher/wallpaper/nagomi/NagomiBackground.kt": "8d1afbcfcfa65c1cf9ea6fba0b358b13e7b4b2db0d2e72c2849e80e0fc66fc28",
+  "app/src/main/java/ohi/andre/consolelauncher/wallpaper/nagomi/NagomiWallpaperService.kt": "0503030da5c15a44eba5e3629de650001c80e803bce912bdab33033da7483708",
+  "app/src/main/java/ohi/andre/consolelauncher/commands/tuixt/ThemerActivity.kt": "b5fec2b43127744266e0c6bc56700f1ebbc9252c8c39ba53bfc8c7115a2db986",
+  "app/src/main/java/ohi/andre/consolelauncher/managers/BackupManager.kt": "04c0e6c89f87c8af55090e0aff980a45558098cf2aaf2525853cc8c334d47d3e"
+}

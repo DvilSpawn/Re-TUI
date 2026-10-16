@@ -1,0 +1,9 @@
+[
+  {
+    "coordinate": "com.android.tools:desugar_jdk_libs:2.1.5",
+    "configuration": "coreLibraryDesugaring",
+    "license_files": ["Desugar-OpenJDK-GPL-2.0-Classpath.txt"],
+    "project_url": "https://github.com/google/desugar_jdk_libs",
+    "license_metadata": "GNU General Public License, version 2, with the Classpath Exception"
+  }
+]

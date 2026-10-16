@@ -1,0 +1,36 @@
+{
+  "summary": {
+    "catppuccin-latte": {
+      "captures": 5,
+      "recordStatuses": {
+        "manual review required": 5
+      },
+      "sampleStatuses": {
+        "pass": 176,
+        "manual review required": 13
+      },
+      "manualSampleKinds": {
+        "text/disabled": 8,
+        "span/disabled": 4,
+        "platform-error-popup/unknown": 1
+      }
+    },
+    "catppuccin-mocha": {
+      "captures": 5,
+      "recordStatuses": {
+        "manual review required": 5
+      },
+      "sampleStatuses": {
+        "pass": 177,
+        "manual review required": 13
+      },
+      "manualSampleKinds": {
+        "text/disabled": 8,
+        "span/disabled": 4,
+        "platform-error-popup/unknown": 1
+      }
+    }
+  },
+  "failingOrBlocked": [],
+  "manualReview": "Four normal screenshots visually inspected after final capture. Disabled controls and platform error-popup samples retain manual-review classification. Theme sample covers two contrasting themes, not all21."
+}

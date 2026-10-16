@@ -20,7 +20,7 @@ fail() { printf '%s\n' "__RETUI_UPDATE_ERROR__ $1"; exit 1; }
 for tool in sha256sum mktemp head wc chmod cp mv sh base64; do
     command -v "$tool" >/dev/null 2>&1 || fail tools
 done
-command -v tmux >/dev/null 2>&1 && command -v socat >/dev/null 2>&1 || fail dependencies
+command -v tmux >/dev/null 2>&1 && command -v socat >/dev/null 2>&1 && command -v awk >/dev/null 2>&1 || fail dependencies
 [ -d "$bin_dir" ] && [ ! -L "$bin_dir" ] || fail path
 [ ! -L "$prefix/share" ] && [ ! -L "$share_dir" ] || fail path
 mkdir -p "$share_dir"

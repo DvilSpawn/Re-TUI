@@ -1,0 +1,11 @@
+{
+  "branch": "dvil/termux-ssh-analysis",
+  "base": "6627e8cdcacc22e75094e342b9da5dedadc5a93a",
+  "files": {
+    "app/src/main/java/ohi/andre/consolelauncher/managers/AppsManager.kt": "49442bd9a547634026c06dbc14b45bd281d47cb43349427717d8f012cf207dc6",
+    "scripts/terminal_colors/coverage.json": "ff5bad1887c5545bb4c0c36d3c547a8efb66001cbc46e847033f6e8fb395e231",
+    "app/src/androidTest/assets/terminal-colors/coverage.json": "ff5bad1887c5545bb4c0c36d3c547a8efb66001cbc46e847033f6e8fb395e231",
+    "app/src/androidTest/java/ohi/andre/consolelauncher/managers/settings/PaletteReadabilityTest.kt": "f20fed01f28ff3f14ed23003f84bd008e3abc4299495c8175dca40a89b17a59c"
+  },
+  "scope": "Two API guards, meaningful palette surface registration and rendering checks; no calculator production rendering or Termux transport source changes in this follow-up."
+}

@@ -1,0 +1,16 @@
+{
+  "application": {
+    "path": "/Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/build/validated-production-blockers/app-playstore-ssh-check-release.apk",
+    "bytes": 7800927,
+    "sha256": "c101fe38a864845cc3d92661a3fe17cfe13bfd28c75443881bf1b8c4766bcf43"
+  },
+  "installed_apk_sha256": "c101fe38a864845cc3d92661a3fe17cfe13bfd28c75443881bf1b8c4766bcf43",
+  "installed_matches_candidate": true,
+  "serial": "adb-10BE1C0FB40006A-RwuKbp._adb-tls-connect._tcp",
+  "physical_minified_checks": 4,
+  "apps_manager_source_sha256": "49442bd9a547634026c06dbc14b45bd281d47cb43349427717d8f012cf207dc6",
+  "apps_manager_source_matches_full_gate_snapshot": true,
+  "source_scope": "Fresh physical minified proof includes both runtime API guards; no fresh API23 emulator run. Earlier SSH API23 compatibility evidence is separate.",
+  "debug_pairing_restored": true,
+  "release_check_test_packages_removed": true
+}

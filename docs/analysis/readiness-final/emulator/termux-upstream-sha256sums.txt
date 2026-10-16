@@ -1,0 +1,5 @@
+7600078440c3c34ef050bc009b00fc3215cb87ec4a449e01a696f74cf4249db2  termux-app_v0.118.3+github-debug_universal.apk
+72fdb596045116bf5ba1b5bdf5b26fddb9acc0bd074ad9f2da9eb0ae85e83a4e  termux-app_v0.118.3+github-debug_arm64-v8a.apk
+89416397b70f9ff67a0044e8abe6ef82487cd48fcf543e2d23e02688cc541cf0  termux-app_v0.118.3+github-debug_armeabi-v7a.apk
+3550e61f4d9eb49b712fd1bd9519dc37085a4d8eb597c57a340f0a64859b7144  termux-app_v0.118.3+github-debug_x86_64.apk
+b6a980ac2fbda1c61edc7be389ce69da9a90af8444d27164b5e20b7a22442570  termux-app_v0.118.3+github-debug_x86.apk

@@ -160,6 +160,7 @@
     <string name="frame_target_widget_drawer">Widget drawer</string>
     <string name="frame_target_keyboard">Re:TUI Keyboard</string>
     <string name="frame_target_files">Re:TUI Files</string>
+    <string name="frame_target_remember">Re:Member</string>
     <string name="frame_target_overlays">Overlay windows</string>
     <string name="frame_target_settings">Settings and dialogs</string>
     <string name="frame_target_dialog">Dialogs</string>

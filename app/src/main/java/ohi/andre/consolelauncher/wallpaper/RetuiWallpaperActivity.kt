@@ -45,6 +45,9 @@ import ohi.andre.consolelauncher.tuils.LauncherSystemUi.applyFullscreen
 class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompatActivity() {
     private lateinit var root: FrameLayout
     private lateinit var preview: android.view.View
+    private lateinit var sceneSpinner: Spinner
+    private lateinit var applyButton: Button
+    private var previewAvailable = true
     private lateinit var colorSpinner: Spinner
     private lateinit var colorLabel: TextView
     private lateinit var densityLabel: TextView
@@ -74,7 +77,7 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
         applyFullscreen(this)
 
         root = FrameLayout(this)
-        scene = savedInstanceState?.getString("preview_scene") ?: RetuiWallpaperSettings.scene(this)
+        scene = savedInstanceState?.getString("preview_scene") ?: intent.getStringExtra("preview_scene") ?: RetuiWallpaperSettings.scene(this)
         nagomiBackground = if (savedInstanceState?.containsKey("nagomi_background") == true)
             savedInstanceState.getString("nagomi_background")?.let(::File)?.takeIf { it.isFile }
         else NagomiBackground.saved(this).takeIf { it.isFile }
@@ -94,8 +97,9 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
         settingsPanel = panel
         val selectors = row()
         selectors.addView(label(getString(R.string.editor_retuiwallpaperactivity_wallpaper_f00e8)))
-        val scenes = listOf("csakura", "black hole", TopoNoiseView.SCENE, PixelDreamView.SCENE, CloudsView.SCENE, NagomiView.SCENE, "solid")
-        selectors.addView(spinner(scenes, scenes.indexOf(scene).coerceAtLeast(0), ::switchScene))
+        val scenes = availableScenes()
+        sceneSpinner = spinner(scenes, scenes.indexOf(scene).coerceAtLeast(0), ::switchScene)
+        selectors.addView(sceneSpinner)
         colorLabel = label(getString(R.string.editor_retuiwallpaperactivity_color_34171))
         selectors.addView(colorLabel)
         colorSpinner = paletteSpinner()
@@ -210,7 +214,9 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
         panel.addView(nagomiControls)
 
         val apply = row()
-        apply.addView(compactControl(getString(R.string.editor_retuiwallpaperactivity_use_on_phone_d908b)) { useOnPhone() })
+        applyButton = compactControl(getString(R.string.editor_retuiwallpaperactivity_use_on_phone_d908b)) { useOnPhone() }
+        apply.addView(applyButton)
+        apply.addView(compactControl(getString(R.string.wallpaper_browse_downloads)) { openWallpaperDownloads() })
         panel.addView(apply)
         panelParams = FrameLayout.LayoutParams(-1, dp(318), Gravity.TOP).apply {
             leftMargin = dp(8); topMargin = dp(8); rightMargin = dp(8)
@@ -231,7 +237,27 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
     override fun onResume() {
         super.onResume()
         resumed = true
+        if (::sceneSpinner.isInitialized) {
+            val scenes = availableScenes()
+            val replacement = spinner(scenes, scenes.indexOf(scene).coerceAtLeast(0), ::switchScene)
+            (sceneSpinner.parent as ViewGroup).let { parent ->
+                val index = parent.indexOfChild(sceneSpinner)
+                parent.removeView(sceneSpinner); sceneSpinner = replacement; parent.addView(replacement, index)
+            }
+            if (!previewAvailable && WallpaperLibrary.available(this, scene)) {
+                replacePreview()
+                replacePaletteSpinner()
+                updateSceneControls()
+            }
+        }
         (preview as? NagomiView)?.setResumed(true)
+    }
+
+    private fun availableScenes(): List<String> = (listOf("solid", "csakura", "black hole") +
+        WallpaperPackStore.SCENES.values.filter { WallpaperLibrary.available(this, it) } + scene).distinct()
+
+    private fun openWallpaperDownloads() {
+        startActivity(Intent(this, WallpaperGalleryActivity::class.java).putExtra("preview_scene", scene))
     }
 
     override fun onPause() {
@@ -310,6 +336,7 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
     }
 
     private fun save() {
+        check(WallpaperLibrary.available(this, scene)) { "Download the selected wallpaper before applying it" }
         if (scene == NagomiView.SCENE) NagomiBackground.apply(this, nagomiBackground)
         RetuiWallpaperSettings.saveScene(this, scene)
         when (val current = preview) {
@@ -342,31 +369,51 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
         sendBroadcast(Intent(RetuiWallpaperService.ACTION_REFRESH).setPackage(packageName))
     }
 
-    private fun createPreview(name: String): android.view.View = when (name) {
-        "black hole" -> BlackHoleView(this).apply { loadPosition() }
-        TopoNoiseView.SCENE -> TopoNoiseView(this).apply { loadPosition() }
-        PixelDreamView.SCENE -> PixelDreamView(this).apply { loadPosition() }
-        "solid" -> SolidColorView(this)
-        CloudsView.SCENE -> CloudsView(this)
-        NagomiView.SCENE -> NagomiView(this).apply {
-            pondBackground = nagomiBackground
-            setResumed(resumed)
+    private fun createPreview(name: String): android.view.View {
+        previewAvailable = WallpaperLibrary.available(this, name)
+        if (!previewAvailable) return LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            gravity = Gravity.CENTER
+            setPadding(dp(24), dp(128), dp(24), dp(24))
+            setBackgroundColor(Color.rgb(16, 18, 24))
+            addView(TextView(this@RetuiWallpaperActivity).apply {
+                setText(R.string.wallpaper_optional_restore_description)
+                setTextColor(Color.WHITE); textSize = 17f; gravity = Gravity.CENTER
+            })
+            addView(control(getString(R.string.wallpaper_restore_download)) { openWallpaperDownloads() }.apply {
+                minHeight = dp(48)
+            })
         }
-        else -> CsakuraView(this).apply { loadPosition() }
-    }.also { view ->
-        if (AppearanceSettings.crtFilter() && view !is NagomiView) {
-            view.foreground = CrtOverlayDrawable(this).apply {
-                setAccentColor(LauncherSettings.getColor(Theme.output_text_color))
+        return when (name) {
+            "black hole" -> BlackHoleView(this).apply { loadPosition() }
+            TopoNoiseView.SCENE -> TopoNoiseView(this).apply { loadPosition() }
+            PixelDreamView.SCENE -> PixelDreamView(this).apply { loadPosition() }
+            "solid" -> SolidColorView(this)
+            CloudsView.SCENE -> CloudsView(this)
+            NagomiView.SCENE -> NagomiView(this).apply {
+                pondBackground = nagomiBackground
+                setResumed(resumed)
+            }
+            else -> CsakuraView(this).apply { loadPosition() }
+        }.also { view ->
+            if (AppearanceSettings.crtFilter() && view !is NagomiView) {
+                view.foreground = CrtOverlayDrawable(this).apply {
+                    setAccentColor(LauncherSettings.getColor(Theme.output_text_color))
+                }
             }
         }
+    }
+
+    private fun replacePreview() {
+        root.removeView(preview)
+        preview = createPreview(scene)
+        root.addView(preview, 0, FrameLayout.LayoutParams(-1, -1))
     }
 
     private fun switchScene(name: String) {
         if (name == scene) return
         scene = name
-        root.removeView(preview)
-        preview = createPreview(scene)
-        root.addView(preview, 0, FrameLayout.LayoutParams(-1, -1))
+        replacePreview()
         densityLabel.text = when (scene) {
             "black hole" -> getString(R.string.editor_retuiwallpaperactivity_dust_1717e)
             TopoNoiseView.SCENE -> getString(R.string.wallpaper_topo_detail)
@@ -418,26 +465,29 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
                 if (value == "PICK…") showSolidColorPicker(current) else current.color = Color.parseColor(value) or Color.BLACK
             }
         }
-        else -> (current as CsakuraView).let { spinner(CsakuraView.PALETTE_NAMES, CsakuraView.PALETTE_NAMES.indexOf(it.paletteName).coerceAtLeast(0), it::setPalette) }
+        is CsakuraView -> spinner(CsakuraView.PALETTE_NAMES, CsakuraView.PALETTE_NAMES.indexOf(current.paletteName).coerceAtLeast(0), current::setPalette)
+        else -> spinner(listOf(scene), 0) { }
     }
 
     private fun updateSceneControls() {
+        val available = WallpaperLibrary.available(this, scene)
+        applyButton.isEnabled = available
         val clouds = scene == CloudsView.SCENE
         val nagomi = scene == NagomiView.SCENE
-        nagomiControls.visibility = if (nagomi) View.VISIBLE else View.GONE
-        colorLabel.visibility = if (nagomi) View.GONE else View.VISIBLE
-        colorSpinner.visibility = if (nagomi) View.GONE else View.VISIBLE
+        nagomiControls.visibility = if (nagomi && available) View.VISIBLE else View.GONE
+        colorLabel.visibility = if (nagomi || !available) View.GONE else View.VISIBLE
+        colorSpinner.visibility = if (nagomi || !available) View.GONE else View.VISIBLE
         colorLabel.text = getString(if (clouds) R.string.wallpaper_clouds_scene_label else R.string.editor_retuiwallpaperactivity_color_34171)
-        val visibility = if (scene == "solid" || scene == PixelDreamView.SCENE || clouds || nagomi) View.GONE else View.VISIBLE
+        val visibility = if (!available || scene == "solid" || scene == PixelDreamView.SCENE || clouds || nagomi) View.GONE else View.VISIBLE
         positionControls.forEach { it.visibility = visibility }
         tuningControls.forEach { it.visibility = visibility }
-        topoColorRow.visibility = if (scene == TopoNoiseView.SCENE) View.VISIBLE else View.GONE
-        pixelColorRow.visibility = if (scene == PixelDreamView.SCENE) View.VISIBLE else View.GONE
+        topoColorRow.visibility = if (scene == TopoNoiseView.SCENE && available) View.VISIBLE else View.GONE
+        pixelColorRow.visibility = if (scene == PixelDreamView.SCENE && available) View.VISIBLE else View.GONE
         val zoomVisibility = if (scene == TopoNoiseView.SCENE) View.GONE else View.VISIBLE
         zoomLabel.visibility = zoomVisibility
         zoomMinus.visibility = zoomVisibility
         zoomPlus.visibility = zoomVisibility
-        panelParams.height = if (nagomi) ViewGroup.LayoutParams.WRAP_CONTENT else dp(if (clouds) 116 else if (scene == TopoNoiseView.SCENE) 318 else 268)
+        panelParams.height = if (!available) dp(116) else if (nagomi) ViewGroup.LayoutParams.WRAP_CONTENT else dp(if (clouds) 116 else if (scene == TopoNoiseView.SCENE) 318 else 268)
         settingsPanel.layoutParams = panelParams
         topoColorControls.forEachIndexed { index, button ->
             val topo = preview as? TopoNoiseView ?: return@forEachIndexed
@@ -621,6 +671,7 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
     }
 
     private fun useOnPhone() {
+        if (!WallpaperLibrary.available(this, scene)) { openWallpaperDownloads(); return }
         if (imageLoading) {
             Toast.makeText(this, R.string.nagomi_image_loading, Toast.LENGTH_SHORT).show()
             return

@@ -1,0 +1,14 @@
+{
+  "description": "Both tiles and colon draft must survive foreground reconnect",
+  "focus": true,
+  "status": "connection is closed by foreign host · TERMUX WORKSPACE",
+  "helper": "connection is closed by foreign host",
+  "helper_visible": 0,
+  "ssh_connecting": false,
+  "cycles": 15,
+  "reconnects": 4,
+  "draft": "retained 😀 appearance",
+  "selection": "pages:0;LEFT_RIGHT|1|@58|@59",
+  "ready": "[false, false]",
+  "terminal_text": "[, ]"
+}

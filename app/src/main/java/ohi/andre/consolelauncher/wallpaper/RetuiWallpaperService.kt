@@ -248,7 +248,7 @@ class RetuiWallpaperService : WallpaperService() {
         }
 
         private fun refreshView(recreate: Boolean) {
-            val selected = RetuiWallpaperSettings.scene(this@RetuiWallpaperService)
+            val selected = WallpaperLibrary.effectiveScene(this@RetuiWallpaperService, RetuiWallpaperSettings.scene(this@RetuiWallpaperService))
             if (recreate || !viewMatchesScene(selected)) {
                 releaseView()
                 view = createView()
@@ -315,7 +315,7 @@ class RetuiWallpaperService : WallpaperService() {
             }
         }
 
-        private fun createView(): View = when (RetuiWallpaperSettings.scene(this@RetuiWallpaperService)) {
+        private fun createView(): View = when (WallpaperLibrary.effectiveScene(this@RetuiWallpaperService, RetuiWallpaperSettings.scene(this@RetuiWallpaperService))) {
             "black hole" -> BlackHoleView(this@RetuiWallpaperService).apply { loadPosition() }
             "solid" -> SolidColorView(this@RetuiWallpaperService)
             CloudsView.SCENE -> CloudsView(this@RetuiWallpaperService)

@@ -1,0 +1,47 @@
+{
+  "ordinary_package": "com.dvil.tui_renewed",
+  "default_ssh_enabled": true,
+  "release_check_property_used": false,
+  "required_class_definitions": [
+    "com.jcraft.jsch.UserAuthNone",
+    "com.jcraft.jsch.UserAuthPublicKey",
+    "com.jcraft.jsch.DHEC256",
+    "com.jcraft.jsch.jce.Random",
+    "com.jcraft.jsch.jce.KeyPairGenECDSA",
+    "com.jcraft.jsch.jce.SignatureECDSA256",
+    "com.jcraft.jsch.jce.ECDHN",
+    "com.jcraft.jsch.jce.AES128CTR",
+    "com.jcraft.jsch.jce.HMACSHA1",
+    "com.jcraft.jsch.jce.HMACSHA256",
+    "com.jcraft.jsch.jce.SHA256",
+    "com.jcraft.jsch.jce.SHA1",
+    "com.jcraft.jsch.jce.MD5",
+    "com.jcraft.jsch.jce.TripleDESCBC",
+    "ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceSshConnection",
+    "ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceSshSetup"
+  ],
+  "required_class_count": 16,
+  "core_session_runtime_class": "com.jcraft.jsch.m1",
+  "core_session_factory_package_shared": true,
+  "user_auth_public_key_declared_constructor_retained": true,
+  "mapping_sha256": "893195cb66d01f8fe1d97c7c9941cb43205e15dcdf058b7ce30bd4d9defc1f97",
+  "artifacts": {
+    "apk": {
+      "path": "/Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/build/validated-ssh-standard/app-playstore-standard-release.apk",
+      "sha256": "f839909a5b07f9dfa236ea8c845e42772837b701e1bfba8b7f6fc3f9fcd47977",
+      "dex_class_count": 4310,
+      "required_ssh_class_definitions_present": 16,
+      "missing": [],
+      "core_session_class_present": true
+    },
+    "aab": {
+      "path": "/Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/build/validated-ssh-standard/app-playstore-standard-release.aab",
+      "sha256": "0bfae266278ddf94af73b134338be8248186ba1ee72ff0deb2eecd7f7eef7681",
+      "dex_class_count": 4310,
+      "required_ssh_class_definitions_present": 16,
+      "missing": [],
+      "core_session_class_present": true
+    }
+  },
+  "ordinary_activity_ssh_getter_returns_constant_true": true
+}

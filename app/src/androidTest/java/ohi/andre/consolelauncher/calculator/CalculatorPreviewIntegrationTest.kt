@@ -18,6 +18,73 @@ class CalculatorPreviewIntegrationTest {
     private val instrumentation = InstrumentationRegistry.getInstrumentation()
     private val context = instrumentation.targetContext
 
+    @Test fun basicPreviewWorksWithoutOptionalEngineAndDoesNotCommitAnswerOrHistory() {
+        XMLPrefsManager.loadCommons(context)
+        val mode = LauncherSettings.get(Behavior.qalculate)
+        val prefs = CalculatorEngine.prefs(context)
+        val saved = prefs.all.toMap()
+        val transcript = "calc> 3*5\n15"
+        var activity: CalculatorActivity? = null
+        try {
+            LauncherSettings.set(context, Behavior.qalculate, "false")
+            prefs.edit().putString("terminal_ans", "15").putString("terminal_transcript", transcript)
+                .putString("terminal_draft", "").commit()
+            val options = CalculatorEngine.Options(true, false)
+            fun preview(input: String, request: CalculatorEngine.Request = CalculatorEngine.Request()) =
+                CalculatorEngine.evaluate(context, input, options, request, preview = true)
+            for ((expression, expected) in listOf("5+5" to "10", "(2+3)×4" to "20", "9÷2" to "4.5", "2^3" to "8")) {
+                val result = preview(expression)
+                assertFalse(result.toString(), result.error)
+                assertEquals(expected, result.text)
+                assertEquals(expression, result.parsed)
+                assertNull("Preview is not a committed answer", result.reusable)
+            }
+            for (expression in listOf("x=99", "save(99,x)", "sqrt(144)", "5 ft to cm", "ans")) {
+                assertEquals(expression, "preview_unavailable", preview(expression).failure)
+            }
+            for (expression in listOf("2+", "(2+3", "2+3)", "1/0", "1 2")) {
+                assertTrue("Incomplete/invalid expression: $expression", preview(expression).error)
+            }
+            val cancelled = CalculatorEngine.Request().apply { cancel() }
+            assertEquals("cancelled", preview("5+5", cancelled).failure)
+            assertEquals("15", prefs.getString("terminal_ans", null))
+            assertEquals(transcript, prefs.getString("terminal_transcript", null))
+
+            val screen = instrumentation.startActivitySync(Intent(context, CalculatorActivity::class.java)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) as CalculatorActivity
+            activity = screen
+            instrumentation.runOnMainSync {
+                screen.findViewById<EditText>(R.id.calculator_expression).setText("5+5")
+            }
+            var hint = ""
+            val deadline = SystemClock.uptimeMillis() + 8000
+            while (SystemClock.uptimeMillis() < deadline) {
+                instrumentation.runOnMainSync { hint = screen.findViewById<TextView>(R.id.calculator_preview).text.toString() }
+                if (hint.contains("5+5") && hint.contains("10") && hint.contains("→")) break
+                SystemClock.sleep(30)
+            }
+            assertTrue("Basic live preview: $hint", hint.contains("5+5") && hint.contains("10") && hint.contains("→"))
+            assertEquals("15", prefs.getString("terminal_ans", null))
+            assertEquals(transcript, prefs.getString("terminal_transcript", null))
+            instrumentation.runOnMainSync {
+                assertEquals(transcript, screen.findViewById<TextView>(R.id.calculator_result).text.toString())
+            }
+        } finally {
+            instrumentation.runOnMainSync { activity?.finishAndRemoveTask() }; instrumentation.waitForIdleSync()
+            val editor = prefs.edit().clear()
+            for ((key, value) in saved) when (value) {
+                is String -> editor.putString(key, value)
+                is Boolean -> editor.putBoolean(key, value)
+                is Int -> editor.putInt(key, value)
+                is Long -> editor.putLong(key, value)
+                is Float -> editor.putFloat(key, value)
+                is Set<*> -> editor.putStringSet(key, value.filterIsInstance<String>().toSet())
+            }
+            editor.commit()
+            LauncherSettings.set(context, Behavior.qalculate, mode)
+        }
+    }
+
     @Test fun nativePreviewExposesInterpretationWithoutSavingOrDiscardingVariables() {
         XMLPrefsManager.loadCommons(context)
         val mode = LauncherSettings.get(Behavior.qalculate)

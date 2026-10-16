@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="wallpaper_library_title">Wallpaper gallery</string>
+    <string name="wallpaper_library_intro">Browse animated previews here. Download a wallpaper to customize it, then choose when to use it.</string>
+    <string name="wallpaper_library_back">Back</string>
+    <string name="wallpaper_library_loading">Loading wallpapers…</string>
+    <string name="wallpaper_library_empty">No wallpapers are available yet.</string>
+    <string name="wallpaper_library_unavailable">Couldn’t load the gallery. Check your connection and try again.</string>
+    <string name="wallpaper_library_retry">Try again</string>
+    <string name="wallpaper_library_preview_description">Animated preview of %1$s</string>
+    <string name="wallpaper_library_installed">Installed. Preview and customize it before applying.</string>
+    <string name="wallpaper_library_ready">Available to download</string>
+    <string name="wallpaper_library_download">Download</string>
+    <string name="wallpaper_library_preview_use">Preview / Use</string>
+    <string name="wallpaper_library_confirm">Download and install this wallpaper? Your current wallpaper stays in place until you apply the new one.</string>
+    <string name="wallpaper_library_cancel">Cancel</string>
+    <string name="wallpaper_library_downloading">Downloading and installing…</string>
+    <string name="wallpaper_library_cancelling">Cancelling…</string>
+    <string name="wallpaper_library_cancelled">Download cancelled. Your wallpaper hasn’t changed.</string>
+    <string name="wallpaper_library_failed">Couldn’t install this wallpaper. Check your connection and try again.</string>
+</resources>

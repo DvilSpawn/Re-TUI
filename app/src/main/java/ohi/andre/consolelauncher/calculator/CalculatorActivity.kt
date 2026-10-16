@@ -10,6 +10,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.view.ViewGroup
+import android.view.HapticFeedbackConstants
 import android.view.inputmethod.EditorInfo
 import android.widget.*
 import ohi.andre.consolelauncher.R
@@ -32,6 +33,9 @@ class CalculatorActivity : LocalizedActivity() {
     private lateinit var input: EditText
     private lateinit var transcript: TextView
     private lateinit var previewHint: TextView
+    private lateinit var engineAction: TextView
+    private lateinit var enginePanel: CalculatorPackPanel
+    private var enhancementExpanded = true
     @Volatile private var previewGeneration = 0
     private var pendingPreview: Runnable? = null
     private var resumed = false
@@ -122,7 +126,6 @@ class CalculatorActivity : LocalizedActivity() {
         LauncherSystemUi.requestNoTitleIfFullscreen(this)
         super.onCreate(state)
         Tuils.init(this); XMLPrefsManager.loadCommons(this); LauncherSystemUi.applyFullscreen(this)
-        if (CalculatorEngine.supported()) LauncherSettings.set(this, Behavior.qalculate, "true")
         androidx.core.view.WindowCompat.setDecorFitsSystemWindows(window, false)
         val screen = FrameLayout(this).apply { isClickable = true }
         val safeHost = TuixtLayout.addFoldAwareHost(this, screen, ViewGroup.LayoutParams.MATCH_PARENT)
@@ -139,6 +142,28 @@ class CalculatorActivity : LocalizedActivity() {
         transcript = root.findViewById(R.id.calculator_result)
         previewHint = root.findViewById(R.id.calculator_preview)
         scroll = root.findViewById(R.id.calculator_transcript_scroll)
+        engineAction = TextView(this).apply {
+            minHeight = Tuils.dpToPx(this@CalculatorActivity, 48)
+            gravity = android.view.Gravity.CENTER_VERTICAL
+            setPadding(Tuils.dpToPx(this@CalculatorActivity, 4), 0, Tuils.dpToPx(this@CalculatorActivity, 4), 0)
+            isClickable = true
+            isFocusable = true
+            setOnClickListener {
+                showEnhancement()
+            }
+        }
+        root.findViewById<LinearLayout>(R.id.calculator_main_pane).addView(engineAction, 0,
+            LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
+        enhancementExpanded = state?.getBoolean("calculator_enhancement_expanded", true) ?: true
+        enginePanel = CalculatorPackPanel(this, inline = true,
+            onChanged = { updateEngineStatus(); schedulePreview() },
+            onDismiss = {
+                enhancementExpanded = false
+                updateEngineStatus()
+                scroll.post { scroll.scrollTo(0, scroll.getChildAt(0).height) }
+            })
+        (scroll.getChildAt(0) as LinearLayout).addView(enginePanel.view, 0)
+        scroll.layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f)
         submit = root.findViewById(R.id.calculator_equals)
         cancelButton = root.findViewById(R.id.calculator_cancel_request)
         scroll.addOnLayoutChangeListener { _, _, top, _, bottom, _, oldTop, _, oldBottom ->
@@ -224,7 +249,10 @@ class CalculatorActivity : LocalizedActivity() {
                     setTypeface(Tuils.getTypeface(this@CalculatorActivity), android.graphics.Typeface.BOLD)
                     if (label == "√") contentDescription = getString(R.string.surface_square_root_47a32)
                     if (label == "⌫") contentDescription = getString(R.string.surface_backspace_88d13)
-                    setOnClickListener { insertKey(label) }
+                    setOnClickListener {
+                        it.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+                        insertKey(label)
+                    }
                 }
                 if (index >= lastRowStart) bottomRow.addKey(key, if (letters && label == "SPACE") 14f else if (letters) 3f else 1f)
                 else symbols.addView(key, keyLayout(index))
@@ -275,7 +303,10 @@ class CalculatorActivity : LocalizedActivity() {
             }
             input.requestFocus()
         }
-        tabs.forEach { (tab, mode) -> tab.setOnClickListener { showMode(mode) } }
+        tabs.forEach { (tab, mode) -> tab.setOnClickListener {
+            it.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+            showMode(mode)
+        } }
         fun style(view: View) {
             if (view is TextView) {
                 view.typeface = Tuils.getTypeface(this)
@@ -321,11 +352,25 @@ class CalculatorActivity : LocalizedActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) = schedulePreview()
         })
-        submit.setOnClickListener { execute() }
-        cancelButton.setOnClickListener { cancel() }
+        submit.setOnClickListener {
+            it.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+            execute()
+        }
+        cancelButton.setOnClickListener {
+            it.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+            cancel()
+        }
         helpTab = root.findViewById(R.id.calculator_help_tab)
         mainTab = root.findViewById(R.id.calculator_main_tab)
-        helpTab.setOnClickListener { selectHelp(true) }
+        helpTab.setOnClickListener {
+            ohi.andre.consolelauncher.commands.tuixt.TuixtDialog.showOptions(this,
+                getString(R.string.optional_calculator_help_title),
+                listOf(getString(R.string.optional_calculator_help_title), getString(R.string.optional_calculator_title)),
+                ohi.andre.consolelauncher.commands.tuixt.TuixtDialog.ItemAction { choice ->
+                    if (choice == 0) selectHelp(true)
+                    else showEnhancement()
+                })
+        }
         TerminalPaneIcon.apply(helpTab, R.drawable.ic_material_help_24)
         mainTab.setOnClickListener { selectHelp(false) }
         selectHelp(false)
@@ -368,6 +413,7 @@ class CalculatorActivity : LocalizedActivity() {
             main.post {
                 if (request !== active || isDestroyed) return@post
                 request = null; submit.isEnabled = true; cancelButton.visibility = View.GONE
+                updateEngineStatus()
                 val displayed = if (result.error) result.text else CalculatorSession.display(result.text)
                 append((if (!result.error && (result.approximate || displayed != result.text)) "≈ " else "") + displayed)
                 if (!result.error) {
@@ -398,14 +444,23 @@ class CalculatorActivity : LocalizedActivity() {
     }
     override fun onSaveInstanceState(state: Bundle) {
         persist()
+        state.putBoolean("calculator_enhancement_expanded", enhancementExpanded)
         windowPanel.save(state)
         super.onSaveInstanceState(state)
     }
     override fun onPause() { resumed = false; clearPreview(); windowPanel.persist(); persist(); super.onPause() }
+    private fun updateEngineStatus() {
+        engineAction.text = OptionalCalculatorEngine.statusText(this)
+        enginePanel.view.visibility = if (enhancementExpanded && CalculatorEngine.supported() &&
+            (enginePanel.isBusy || CalculatorPackStore.installedVersion(this) == null)) View.VISIBLE else View.GONE
+        mainTab.setText(if (CalculatorEngine.enabled(this)) R.string.optional_calculator_header_enhanced else R.string.optional_calculator_header_basic)
+    }
+
     override fun onResume() {
         super.onResume()
         resumed = true
         if (!::root.isInitialized) return
+        updateEngineStatus()
         fun refresh(view: View) {
             if (view is TextView) {
                 view.typeface = Tuils.getTypeface(this)
@@ -447,11 +502,29 @@ class CalculatorActivity : LocalizedActivity() {
             1.5f, AppearanceSettings.outputCornerRadius(), AppearanceSettings.dashedBorders(), target = FrameTarget.OVERLAYS)
         TerminalBorderRuntime.bind(root.findViewById(R.id.calculator_window_border), mainTab)
         windowPanel.refreshTheme()
+        enginePanel.refreshTheme()
         root.findViewById<View>(R.id.calculator_main_pane).background = TerminalBorderRuntime.panelDrawable(this,
             ThemeColorResolver.color(Theme.workspace_output_background_color),
             ThemeColorResolver.withMaxAlpha(ThemeColorResolver.color(Theme.workspace_panel_border_color), 210),
             1.2f, AppearanceSettings.outputCornerRadius(), AppearanceSettings.dashedBorders(), target = FrameTarget.OVERLAYS)
         schedulePreview()
     }
-    override fun onDestroy() { clearPreview(); request?.cancel(); request = null; worker.shutdownNow(); super.onDestroy() }
+    private fun showEnhancement() {
+        if (CalculatorPackStore.installedVersion(this) != null || !CalculatorEngine.supported()) {
+            OptionalCalculatorEngine.showManagement(this) { updateEngineStatus(); schedulePreview() }
+        } else {
+            enhancementExpanded = true
+            enginePanel.refresh()
+            updateEngineStatus()
+            scroll.post { scroll.scrollTo(0, 0) }
+        }
+    }
+
+    @Deprecated("Platform document picker result")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: android.content.Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (::enginePanel.isInitialized) enginePanel.onActivityResult(requestCode, resultCode, data)
+    }
+
+    override fun onDestroy() { if (::enginePanel.isInitialized) enginePanel.destroy(); clearPreview(); request?.cancel(); request = null; worker.shutdownNow(); super.onDestroy() }
 }

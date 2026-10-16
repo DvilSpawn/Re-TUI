@@ -1,0 +1,667 @@
+[
+  {
+    "name": "ohi.andre.consolelauncher.wallpaper.RetuiWallpaperSettingsTest",
+    "tests": "2",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.managers.podcast.PodcastParserTest",
+    "tests": "7",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.integrations.tasker.RetuiTaskerInputTest",
+    "tests": "3",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.managers.xml.AutoColorManagerTest",
+    "tests": "3",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.managers.xml.options.SurfaceBorderTest",
+    "tests": "2",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.LauncherInteractionRegressionTest",
+    "tests": "6",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.managers.lua.BundledLuaLocalizationTest",
+    "tests": "1",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.managers.PresetManagerTest",
+    "tests": "18",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.managers.BackupRestoreTransactionTest",
+    "tests": "3",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.managers.ToolbarShortcutManagerTest",
+    "tests": "1",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.managers.settings.LauncherModeTest",
+    "tests": "6",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.wallpaper.PixelDreamViewTest",
+    "tests": "1",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.managers.RetuiThemeBridgeTest",
+    "tests": "4",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceLauncherManagerTest",
+    "tests": "3",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.irc.IrcNavigationTest",
+    "tests": "9",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.commands.tuixt.PresetMarketplaceTest",
+    "tests": "2",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.managers.LauncherSoundManagerTest",
+    "tests": "1",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.tuils.FrameManagerTest",
+    "tests": "25",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.LauncherSurfaceSessionStoreTest",
+    "tests": "3",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.wallpaper.RetuiWallpaperServiceTest",
+    "tests": "6",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.commands.tuixt.TuixtDialogTest",
+    "tests": "2",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.managers.AppsManagerPrivateSpaceTest",
+    "tests": "2",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.UIManagerUnifiedStatusTest",
+    "tests": "1",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.help.CommandQuickReferenceTest",
+    "tests": "2",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.managers.KeyboardShortcutManagerTest",
+    "tests": "5",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.managers.AppsManagerLaunchTest",
+    "tests": "3",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.commands.CommandGroupLocaleTest",
+    "tests": "2",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.managers.ChangelogPolicyTest",
+    "tests": "4",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.wallpaper.NagomiSchoolTest",
+    "tests": "4",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.irc.IrcLiveTest",
+    "tests": "5",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "5"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.managers.settings.ThemeColorResolverTest",
+    "tests": "12",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.irc.IrcProtocolTest",
+    "tests": "6",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.notes.RedactionFormatTest",
+    "tests": "2",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.calculator.CalculatorPackStoreTest",
+    "tests": "12",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.help.OfflineHelpCatalogTest",
+    "tests": "1",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.commands.tuixt.SettingsFontImportTest",
+    "tests": "2",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.notes.FolderLibraryTest",
+    "tests": "3",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.wallpaper.WallpaperPackStoreTest",
+    "tests": "4",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.managers.settings.PaletteCoverageRegistryTest",
+    "tests": "3",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.PlayLicenseRegressionTest",
+    "tests": "1",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.managers.widgets.AndroidWidgetSizingTest",
+    "tests": "4",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.managers.status.WeatherResponseParserTest",
+    "tests": "2",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceStateTest",
+    "tests": "5",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.tuils.LauncherFontScaleTest",
+    "tests": "2",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.managers.SpaceManagerTest",
+    "tests": "1",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.managers.status.ColoredAsciiHtmlParserTest",
+    "tests": "2",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.commands.tuixt.SettingsInputValidationTest",
+    "tests": "6",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.managers.suggestions.SuggestionsManagerTest",
+    "tests": "14",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.commands.tuixt.SettingsColorSafetyTest",
+    "tests": "4",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.help.BottomCornerDockWiringTest",
+    "tests": "1",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.commands.tuixt.SectionAccordionStateTest",
+    "tests": "2",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.managers.BackupRestoreRecoveryTest",
+    "tests": "5",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.managers.BackupManagerTest",
+    "tests": "31",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.help.ResizeCornerDispatchTest",
+    "tests": "1",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceSshConnectionTest",
+    "tests": "5",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.notes.NoteExporterTest",
+    "tests": "2",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceFrameTest",
+    "tests": "2",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.ModuleSuggestionScrollTest",
+    "tests": "1",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.help.HelpMarkupTest",
+    "tests": "2",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.managers.status.UnlockTransitionTest",
+    "tests": "6",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.help.TerminalPaneLayoutTest",
+    "tests": "8",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.managers.PortablePresetTest",
+    "tests": "20",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.calculator.CalculatorSessionTest",
+    "tests": "4",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.managers.lua.LuaWidgetManagerTimerTest",
+    "tests": "1",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.notes.CanonicalAppearanceTest",
+    "tests": "1",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.UIManagerImeSizingTest",
+    "tests": "7",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.managers.onboarding.StartupMenuManagerTest",
+    "tests": "3",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.irc.IrcStateTest",
+    "tests": "17",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.tuils.TerminalBorderRuntimeTest",
+    "tests": "4",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.managers.termux.TerminalGridViewTest",
+    "tests": "1",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.managers.modules.ModuleManagerTest",
+    "tests": "1",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.managers.FileOperationCancellationTest",
+    "tests": "8",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.notes.NoteModelTest",
+    "tests": "4",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.managers.xml.options.BehaviorSettingsTest",
+    "tests": "2",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.commands.main.raw.FilesCommandTest",
+    "tests": "11",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.irc.IrcClientTest",
+    "tests": "11",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.help.HelpNavigationTest",
+    "tests": "2",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.managers.xml.XMLPrefsManagerTest",
+    "tests": "1",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.managers.settings.StatusRowResolverTest",
+    "tests": "8",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.managers.settings.ThemeColorAuditTest",
+    "tests": "1",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.managers.suggestions.SearchModeTest",
+    "tests": "13",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.managers.settings.TextShadowsTest",
+    "tests": "1",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.managers.modules.ReminderManagerTest",
+    "tests": "1",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceReleaseContractTest",
+    "tests": "8",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.managers.TimeManagerTest",
+    "tests": "1",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceSshSetupTest",
+    "tests": "4",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.notes.MarkdownDocumentTest",
+    "tests": "4",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.CalendarLabelsTest",
+    "tests": "1",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.irc.IrcRetirementWiringTest",
+    "tests": "2",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.help.CalculatorWindowControlsTest",
+    "tests": "6",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.tuils.NineSliceFrameDrawableTest",
+    "tests": "3",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.calculator.StandardCalculatorTest",
+    "tests": "6",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.calculator.CalculatorEditingTest",
+    "tests": "2",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.managers.termux.TermuxHelperUpdateTest",
+    "tests": "2",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "ohi.andre.consolelauncher.profile.ProfileStoreTest",
+    "tests": "3",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  }
+]

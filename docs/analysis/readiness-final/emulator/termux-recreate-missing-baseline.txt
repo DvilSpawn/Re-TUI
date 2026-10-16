@@ -1,0 +1,40 @@
+Reading package lists...
+Building dependency tree...
+Reading state information...
+The following packages were automatically installed and are no longer required:
+  krb5 ldns libdb libedit libresolv-wrapper openssh-sftp-server termux-auth
+  utf8proc
+Use 'apt autoremove' to remove them.
+The following packages will be REMOVED:
+  openssh tmux
+0 upgraded, 0 newly installed, 2 to remove and 74 not upgraded.
+After this operation, 7934 kB disk space will be freed.
+(Reading database ... 
+(Reading database ... 5%
+(Reading database ... 10%
+(Reading database ... 15%
+(Reading database ... 20%
+(Reading database ... 25%
+(Reading database ... 30%
+(Reading database ... 35%
+(Reading database ... 40%
+(Reading database ... 45%
+(Reading database ... 50%
+(Reading database ... 55%
+(Reading database ... 60%
+(Reading database ... 65%
+(Reading database ... 70%
+(Reading database ... 75%
+(Reading database ... 80%
+(Reading database ... 85%
+(Reading database ... 90%
+(Reading database ... 95%
+(Reading database ... 100%
+(Reading database ... 5303 files and directories currently installed.)
+Removing openssh (10.6p1-2) ...
+Removing tmux (3.8) ...
+sshd ABSENT
+tmux ABSENT
+
+WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
+

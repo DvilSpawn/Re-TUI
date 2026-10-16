@@ -10,7 +10,10 @@ class IrcState {
     var conversationVisible = true
     var joining = ""; private set
     var joinError = ""; private set
-    fun beginNames() { active.names.clear(); active.namesLoading = true; active.namesError = "" }
+    fun beginNames(channel: String = active.name) {
+        val b = buffer(channel)
+        b.names.clear(); b.namesLoading = true; b.namesError = ""
+    }
     fun beginDirectory() { directory.clear(); directoryLoading = true; directoryTruncated = false; directoryError = "" }
     fun failDirectory(text: String) { directoryLoading = false; directoryError = text }
     fun beginJoin(channel: String) { joining = channel; joinError = "" }
