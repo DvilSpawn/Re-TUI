@@ -346,6 +346,10 @@
     <string name="output_private_space_unavailable">Private Space is unavailable.</string>
     <string name="output_private_space_locked">Private Space is locked.</string>
     <string name="output_private_space_action_failed">Private Space action failed.</string>
+    <string name="output_private_space_auth_required">Complete Android authentication to unlock Private Space. Cancelling keeps it locked.</string>
+    <string name="output_private_space_foreground_required">Android denied the Private Space request. Set Re:TUI as your default launcher, open its home screen, and try again.</string>
+    <string name="output_private_space_not_ready">Private Space is locked or still starting. Run private -unlock. If it remains unavailable, open private -settings.</string>
+    <string name="output_app_launch_failed">Android could not open this app. Try again or check its app settings.</string>
     <string name="output_private_space_locked_now">Private Space lock requested.</string>
     <string name="output_private_space_unlock_requested">Private Space unlock requested.</string>
     <string name="output_private_space_settings_android">Open Android Settings to manage Private Space on this Android version.</string>

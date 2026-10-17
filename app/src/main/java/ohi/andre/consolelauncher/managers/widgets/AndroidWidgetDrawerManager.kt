@@ -8,11 +8,13 @@ import android.appwidget.AppWidgetProviderInfo
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Canvas
+import android.graphics.Paint
 import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
-import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
+import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
 import android.util.SizeF
@@ -34,15 +36,17 @@ import android.widget.GridLayout
 import android.widget.HorizontalScrollView
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.RelativeLayout
 import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
+import ohi.andre.consolelauncher.managers.suggestions.SuggestionChipStyler
+import ohi.andre.consolelauncher.managers.SpaceManager
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings.cyberdeckMode
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings.dashedBorders
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings.moduleCornerRadius
-import ohi.andre.consolelauncher.managers.ui.OverlayLayoutManager
+import ohi.andre.consolelauncher.help.PanelBackdrop
+import ohi.andre.consolelauncher.tuils.LauncherFontScale
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.options.Suggestions
 import ohi.andre.consolelauncher.managers.xml.options.Theme
@@ -79,9 +83,21 @@ class AndroidWidgetDrawerManager(
     private val preferences = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
     private val drawerRoot: View? = rootView.findViewById(R.id.android_widget_drawer_root)
     private val drawerContainer: View? = rootView.findViewById(R.id.android_widget_drawer_container)
-    private val drawerContainerBaseMargins = IntArray(4)
+    private val viewport: FrameLayout? = rootView.findViewById(R.id.android_widget_viewport)
+    private val drawerSurface: View? = rootView.findViewById(R.id.android_widget_surface)
+    private val commands: View? = rootView.findViewById(R.id.android_widget_commands)
+    private val addButton: TextView? = rootView.findViewById(R.id.android_widget_add)
+    private val removeButton: TextView? = rootView.findViewById(R.id.android_widget_remove)
+    private val editButton: TextView? = rootView.findViewById(R.id.android_widget_edit)
+    private val commandToggle: TextView? = rootView.findViewById(R.id.android_widget_command_toggle)
+    private val emptyView: View? = rootView.findViewById(R.id.android_widget_empty)
+    private val emptyAdd: TextView? = rootView.findViewById(R.id.android_widget_empty_add)
+    private val widgetFrames = mutableMapOf<Int, WidgetFrame>()
+    private var editMode = false
+    private var commandsVisible = false
+    private val renderRunnable = Runnable { if (isOpen) renderWidgets() }
     private val drawerScroll: ScrollView? = rootView.findViewById(R.id.android_widget_drawer_scroll)
-    private val widgetGrid: GridLayout? = rootView.findViewById(R.id.android_widget_grid)
+    private val widgetGrid: WidgetGridLayout? = rootView.findViewById(R.id.android_widget_grid)
     private val header: TextView? = rootView.findViewById(R.id.android_widget_drawer_header)
     private val footer: TextView? = rootView.findViewById(R.id.android_widget_drawer_footer)
     private val closeButton: TextView? = rootView.findViewById(R.id.android_widget_drawer_add)
@@ -94,16 +110,50 @@ class AndroidWidgetDrawerManager(
     private val commandInput: EditText? = rootView.findViewById(R.id.android_widget_input)
     private val commandSend: TextView? = rootView.findViewById(R.id.android_widget_send)
     private var pickerOverlay: View? = null
-    private var cachedWidgetProviderOptions: List<WidgetProviderOption>? = null
     private var pickerLoadGeneration = 0
     private var editingWidgetId = INVALID_WIDGET_ID
+    private var resizePreviewFrame: WidgetFrame? = null
+    private var providerResizePosted = false
+    private val providerResizeRunnable = Runnable {
+        providerResizePosted = false
+        val frame = resizePreviewFrame
+        val preview = widgetGrid?.resizePreview?.second
+        if (frame != null && preview != null) {
+            val host = frame.getChildAt(0) as AppWidgetHostView
+            updateHostWidgetSize(host, (preview.width - frame.paddingLeft - frame.paddingRight).coerceAtLeast(1),
+                (preview.height - frame.paddingTop - frame.paddingBottom).coerceAtLeast(1))
+            frame.tag = null
+        }
+    }
     private var lastRenderedCellSize = 0
     private var listening = false
     private var surfaceOpen = false
+    private var recordsReadable = true
 
     init {
-        OverlayLayoutManager.captureBaseMargins(drawerContainer, drawerContainerBaseMargins)
-        configureInputAnchor()
+        viewport?.let(PanelBackdrop::install)
+        widgetGrid?.addOnLayoutChangeListener { _, l, t, r, b, oldL, oldT, oldR, oldB ->
+            if (r - l != oldR - oldL) finishResizePreview(false)
+            if (r - l != oldR - oldL || b - t != oldB - oldT) scheduleRender()
+        }
+        addButton?.setOnClickListener { executeAddWidgetCommand() }
+        emptyAdd?.setOnClickListener { executeAddWidgetCommand() }
+        removeButton?.setOnClickListener {
+            loadRecords().firstOrNull { it.appWidgetId == editingWidgetId }?.let(::removeWidget)
+            editingWidgetId = INVALID_WIDGET_ID
+            renderWidgets()
+        }
+        editButton?.setOnClickListener {
+            editMode = !editMode
+            if (!editMode) editingWidgetId = INVALID_WIDGET_ID
+            renderWidgets()
+        }
+        commandToggle?.setOnClickListener {
+            commandsVisible = !commandsVisible
+            if (!commandsVisible) { commandInput?.clearFocus(); closeKeyboard() }
+            renderWidgets()
+        }
+        drawerSurface?.setOnClickListener { }
         configureWidgetCommandInput()
         configureOutsideEditCancellation()
         drawerRoot?.setOnClickListener { hide() }
@@ -121,40 +171,63 @@ class AndroidWidgetDrawerManager(
 
         closeKeyboard()
         openSurface()
-        configureInputAnchor()
         cleanupWidgetState()
         startListening()
         styleChrome()
         drawerRoot.visibility = View.VISIBLE
-        drawerRoot.post { renderWidgets() }
+        scheduleRender()
     }
 
     fun hide() {
+        if (!isOpen && !surfaceOpen) return
+        finishResizePreview(false)
         hideWidgetPicker()
         editingWidgetId = INVALID_WIDGET_ID
+        editMode = false
+        commandsVisible = false
+        commandInput?.clearFocus()
+        closeKeyboard()
+        stopListening()
+        drawerRoot?.removeCallbacks(renderRunnable)
         drawerRoot?.visibility = View.GONE
         closeSurface()
     }
 
     fun applyDisplayMargins(left: Int, top: Int, right: Int, bottom: Int) {
-        OverlayLayoutManager.applyMarginsWithBase(
-            drawerContainer,
-            drawerContainerBaseMargins,
-            left,
-            top,
-            right,
-            bottom
-        )
-        configureInputAnchor()
-        if (isOpen) {
-            drawerContainer?.post { renderWidgets() }
+        (viewport?.layoutParams as? FrameLayout.LayoutParams)?.let { params ->
+            if (params.leftMargin != left || params.topMargin != top || params.rightMargin != right || params.bottomMargin != bottom) {
+                finishResizePreview(false)
+                params.setMargins(left, top, right, bottom)
+                viewport.layoutParams = params
+            }
         }
+        scheduleRender()
     }
 
-    fun refreshGrid() {
-        if (isOpen) {
-            widgetGrid?.post { renderWidgets() }
+    fun refreshGrid() = scheduleRender()
+
+    private fun scheduleRender() {
+        drawerRoot?.removeCallbacks(renderRunnable)
+        if (isOpen) drawerRoot?.post(renderRunnable)
+    }
+
+    fun handleBack(): Boolean {
+        when {
+            pickerOverlay != null -> hideWidgetPicker()
+            editMode || editingWidgetId != INVALID_WIDGET_ID -> {
+                editingWidgetId = INVALID_WIDGET_ID
+                editMode = false
+                renderWidgets()
+            }
+            commandsVisible -> {
+                commandsVisible = false
+                commandInput?.clearFocus()
+                closeKeyboard()
+                renderWidgets()
+            }
+            else -> return false
         }
+        return true
     }
 
     private fun configureOutsideEditCancellation() {
@@ -192,7 +265,7 @@ class AndroidWidgetDrawerManager(
                 renderWidgets()
             }
         } ?: renderWidgets()
-        return true
+        return false
     }
 
     private fun findEditingWidgetFrame(): WidgetFrame? {
@@ -229,6 +302,7 @@ class AndroidWidgetDrawerManager(
     }
 
     fun stopListening() {
+        finishResizePreview()
         if (!listening) {
             return
         }
@@ -243,6 +317,9 @@ class AndroidWidgetDrawerManager(
 
     fun dispose() {
         stopListening()
+        drawerRoot?.removeCallbacks(renderRunnable)
+        hideWidgetPicker()
+        widgetFrames.clear()
     }
 
     fun handleActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
@@ -473,9 +550,10 @@ class AndroidWidgetDrawerManager(
                 commandSuggestionChip(suggestion),
                 LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT
+                    ViewGroup.LayoutParams.WRAP_CONTENT
                 ).apply {
-                    marginEnd = Tuils.dpToPx(context, 6)
+                    val spaces = SuggestionChipStyler.spacing()
+                    setMargins(spaces[0], spaces[1], spaces[0], spaces[1])
                 }
             )
         }
@@ -549,21 +627,12 @@ class AndroidWidgetDrawerManager(
     }
 
     private fun commandSuggestionChip(suggestion: WidgetCommandSuggestion): TextView {
-        return TextView(context).apply {
+        return SuggestionChipStyler.createView(context).apply {
             text = suggestion.label
             gravity = Gravity.CENTER
             isClickable = true
             isFocusable = true
-            minWidth = Tuils.dpToPx(context, 62)
-            setPadding(
-                Tuils.dpToPx(context, 10),
-                0,
-                Tuils.dpToPx(context, 10),
-                0
-            )
             setTextColor(appSuggestionTextColor())
-            textSize = 11f
-            setTypeface(Tuils.getTypeface(context), Typeface.BOLD)
             background = appSuggestionBackground()
             setOnClickListener {
                 if (suggestion.executeOnTap) {
@@ -641,7 +710,7 @@ class AndroidWidgetDrawerManager(
     }
 
     private fun showWidgetPicker() {
-        val root = drawerRoot as? ViewGroup ?: return
+        val root = viewport ?: return
         hideWidgetPicker()
         cleanupWidgetState()
 
@@ -695,6 +764,18 @@ class AndroidWidgetDrawerManager(
             )
         )
         panel.addView(headerRow)
+        val search = EditText(context).apply {
+            hint = context.getString(R.string.widget_pane_search)
+            setSingleLine(true)
+            setTextColor(pickerColor)
+            setHintTextColor(ThemeColorResolver.color(Theme.field_hint_color))
+            typeface = Tuils.getTypeface(context)
+            textSize = 12f
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) importantForAutofill = View.IMPORTANT_FOR_AUTOFILL_NO
+            tag = "widget-picker-search"
+        }
+        panel.addView(search, LinearLayout.LayoutParams(-1, Tuils.dpToPx(context, 48)))
 
         val scrollView = ScrollView(context).apply {
             isFillViewport = false
@@ -734,14 +815,15 @@ class AndroidWidgetDrawerManager(
 
         root.addView(
             overlay,
-            RelativeLayout.LayoutParams(
+            FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
             )
         )
         pickerOverlay = overlay
+        LauncherFontScale.applyRecursively(panel)
         val pickerGeneration = ++pickerLoadGeneration
-        populateWidgetPickerAsync(content, pickerGeneration)
+        populateWidgetPickerAsync(content, search, pickerGeneration)
     }
 
     private fun hideWidgetPicker() {
@@ -749,20 +831,14 @@ class AndroidWidgetDrawerManager(
         pickerLoadGeneration++
         (overlay.parent as? ViewGroup)?.removeView(overlay)
         pickerOverlay = null
+        closeKeyboard()
     }
 
-    private fun populateWidgetPickerAsync(content: LinearLayout, pickerGeneration: Int) {
-        val cachedProviders = cachedWidgetProviderOptions
+    private fun populateWidgetPickerAsync(content: LinearLayout, search: EditText, pickerGeneration: Int) {
         content.removeAllViews()
-        if (cachedProviders != null) {
-            populateWidgetPicker(content, cachedProviders)
-            return
-        }
-
         content.addView(pickerStatusText(context.getString(R.string.manager_androidwidgetdrawermanager_loading_widgets_af1a9)))
         Thread {
-            val providers = loadWidgetProviderOptions()
-            cachedWidgetProviderOptions = providers
+            val result = runCatching { loadWidgetProviderOptions() }
             activity.runOnUiThread {
                 if (pickerGeneration != pickerLoadGeneration
                     || pickerOverlay == null
@@ -770,8 +846,30 @@ class AndroidWidgetDrawerManager(
                 ) {
                     return@runOnUiThread
                 }
-                content.removeAllViews()
-                populateWidgetPicker(content, providers)
+                val providers = result.getOrElse { error ->
+                    Tuils.log(error)
+                    content.removeAllViews()
+                    content.addView(pickerButton(context.getString(R.string.widget_pane_retry)).apply {
+                        setOnClickListener { showWidgetPicker() }
+                    }, LinearLayout.LayoutParams(-1, Tuils.dpToPx(context, 48)))
+                    return@runOnUiThread
+                }
+                fun filterProviders() {
+                    val query = search.text.toString().trim()
+                    content.removeAllViews()
+                    val filtered = providers.filter { it.appLabel.contains(query, true) || it.widgetLabel.contains(query, true) }
+                    populateWidgetPicker(content, filtered)
+                    LauncherFontScale.applyRecursively(content)
+                    if (filtered.isEmpty() && providers.isNotEmpty()) {
+                        (content.getChildAt(0) as? TextView)?.setText(R.string.widget_pane_no_matches)
+                    }
+                }
+                search.addTextChangedListener(object : TextWatcher {
+                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
+                    override fun afterTextChanged(s: Editable?) = filterProviders()
+                })
+                filterProviders()
             }
         }.start()
     }
@@ -1065,15 +1163,20 @@ class AndroidWidgetDrawerManager(
             .remove(KEY_PENDING_WIDGET_STARTED_AT)
             .apply()
         if (appWidgetId != INVALID_WIDGET_ID) {
-            deleteWidgetId(appWidgetId)
-            untrackAllocatedWidgetId(appWidgetId)
+            val otherIds = SpaceManager.widgetIdsInOtherSpaces(context)
+            val currentRecords = loadRecords()
+            if (recordsReadable && otherIds != null && appWidgetId !in otherIds && currentRecords.none { it.appWidgetId == appWidgetId }) {
+                deleteWidgetId(appWidgetId)
+                untrackAllocatedWidgetId(appWidgetId)
+            }
         }
     }
 
     private fun removeWidget(record: WidgetRecord) {
-        deleteWidgetId(record.appWidgetId)
-        untrackAllocatedWidgetId(record.appWidgetId)
-        saveRecords(loadRecords().filter { it.appWidgetId != record.appWidgetId })
+        val remaining = loadRecords().filter { it.appWidgetId != record.appWidgetId }
+        if (!recordsReadable) return
+        saveRecords(remaining)
+        cleanupTrackedOrphans(remaining)
         renderWidgets()
     }
 
@@ -1088,25 +1191,20 @@ class AndroidWidgetDrawerManager(
 
     private fun renderWidgets() {
         val grid = widgetGrid ?: return
-        if (grid.width <= 0) {
-            grid.post { renderWidgets() }
-            return
-        }
+        if (grid.width <= 0 || !isOpen || resizePreviewFrame != null) return
 
-        grid.removeAllViews()
         val records = loadRecords()
         val validRecords = cleanupWidgetState(records)
-        val pendingWidgetId = activePendingWidgetId()
         if (validRecords != records) {
             saveRecords(validRecords)
         }
-        if (validRecords.isEmpty() && pendingWidgetId == INVALID_WIDGET_ID) {
-            deleteHostIfIdle()
-        }
 
+        val retained = validRecords.map { it.appWidgetId }.toSet()
+        widgetFrames.keys.retainAll(retained)
         val baseColumns = baseColumnCount()
         val cellSize = uniformCellSize(grid, baseColumns)
         lastRenderedCellSize = cellSize
+        grid.cellSize = cellSize
         val displayColumns = displayColumnCount(grid, cellSize, baseColumns)
         val cellMargin = Tuils.dpToPx(context, 4)
         val supportedRecords = validRecords.map { constrainRecordToProvider(it, cellSize, cellMargin) }
@@ -1114,88 +1212,67 @@ class AndroidWidgetDrawerManager(
             saveRecords(supportedRecords)
         }
         val displayRecords = layoutRecordsForColumns(supportedRecords, displayColumns)
-        val displayRows = displayRowCount(displayRecords, cellSize)
+        val displayRows = displayRowCount(displayRecords)
+        val layoutChanged = grid.columnCount != displayColumns || grid.rowCount != displayRows ||
+            grid.childCount != displayRecords.size || displayRecords.any { record ->
+                val frame = widgetFrames[record.appWidgetId]
+                val params = frame?.layoutParams as? GridLayout.LayoutParams
+                params == null || params.rowSpec != GridLayout.spec(record.row, record.rowSpan) ||
+                    params.columnSpec != GridLayout.spec(record.col, record.colSpan) ||
+                    params.width != max(1, cellSize * record.colSpan - cellMargin * 2) ||
+                    params.height != max(1, cellSize * record.rowSpan - cellMargin * 2)
+            }
+        if (layoutChanged) grid.removeAllViews()
         grid.columnCount = displayColumns
         grid.rowCount = displayRows
-        grid.minimumHeight = displayRows * cellSize
+        grid.minimumHeight = if (displayRecords.isEmpty()) 0 else displayRows * cellSize
 
         for (record in displayRecords) {
             val providerInfo = appWidgetManager.getAppWidgetInfo(record.appWidgetId) ?: continue
             val widgetWidth = max(1, (cellSize * record.colSpan) - (cellMargin * 2))
             val widgetHeight = max(1, (cellSize * record.rowSpan) - (cellMargin * 2))
-            val hostView = appWidgetHost.createView(widgetHostContext, record.appWidgetId, providerInfo)
-            updateHostWidgetSize(hostView, widgetWidth, widgetHeight)
-
-            val frame = WidgetFrame(context, record.appWidgetId)
-            frame.background = TerminalBorderRuntime.panelDrawable(
-                context,
-                Color.TRANSPARENT,
-                ThemeColorResolver.color(Theme.widget_panel_border_color),
-                1.0f,
-                moduleCornerRadius(),
-                dashedBorders(),
-                target = FrameTarget.WIDGET_DRAWER
-            )
-            frame.setPadding(0, 0, 0, 0)
-            frame.addView(
-                hostView,
-                FrameLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT
-                )
-            )
-            val failureOverlay = buildWidgetFailureView(
-                record.appWidgetId,
-                providerInfo.loadLabel(context.packageManager)?.toString()
-                    ?.takeIf { it.isNotBlank() }
-                    ?: providerInfo.provider.packageName
-            ).apply {
-                visibility = View.GONE
-            }
-            frame.addView(
-                failureOverlay,
-                FrameLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT
-                )
-            )
-            frame.addView(
-                widgetIdBadge(record),
-                FrameLayout.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    Gravity.TOP or Gravity.START
-                ).apply {
-                    setMargins(
-                        Tuils.dpToPx(context, 8),
-                        Tuils.dpToPx(context, 2),
-                        0,
-                        0
-                    )
+            val frame = widgetFrames.getOrPut(record.appWidgetId) {
+                WidgetFrame(context, record.appWidgetId).apply {
+                    val hostView = appWidgetHost.createView(widgetHostContext, record.appWidgetId, providerInfo)
+                    addView(hostView, FrameLayout.LayoutParams(-1, -1))
                 }
-            )
-            frame.postDelayed({
-                if (containsAndroidWidgetFailure(hostView)) {
-                    failureOverlay.visibility = View.VISIBLE
-                }
-            }, WIDGET_FAILURE_SCAN_DELAY_MS)
-            if (editingWidgetId == record.appWidgetId) {
-                addEditControls(frame, record)
             }
+            val hostView = frame.getChildAt(0) as AppWidgetHostView
+            val inset = Tuils.dpToPx(context, 8)
+            frame.setPadding(inset, inset, inset, inset)
+            frame.clipToPadding = false
+            val size = (widgetWidth - inset * 2).coerceAtLeast(1) to (widgetHeight - inset * 2).coerceAtLeast(1)
+            if (frame.tag != size) {
+                updateHostWidgetSize(hostView, size.first, size.second)
+                frame.tag = size
+            }
+            while (frame.childCount > 1) frame.removeViewAt(1)
+            frame.background = if (editMode || editingWidgetId == record.appWidgetId) TerminalBorderRuntime.panelDrawable(
+                context, Color.TRANSPARENT, ThemeColorResolver.color(Theme.widget_panel_border_color),
+                1f, moduleCornerRadius(), dashedBorders(), target = FrameTarget.WIDGET_DRAWER) else null
+            if (commandsVisible) {
+                frame.addView(widgetIdBadge(record), FrameLayout.LayoutParams(-2, -2, Gravity.TOP or Gravity.START))
+            }
+            if (editingWidgetId == record.appWidgetId) addEditControls(frame, record)
 
-            val params = GridLayout.LayoutParams(
-                GridLayout.spec(record.row, record.rowSpan),
-                GridLayout.spec(record.col, record.colSpan)
-            )
+            val params = WidgetGridLayout.LayoutParams(record.row, record.rowSpan, record.col, record.colSpan)
             params.width = widgetWidth
             params.height = widgetHeight
             params.setMargins(cellMargin, cellMargin, cellMargin, cellMargin)
-            frame.layoutParams = params
-            grid.addView(frame)
+            if (frame.parent == null) grid.addView(frame, params)
         }
 
-        updateLabels(supportedRecords.size, displayColumns, displayRows)
+        updateLabels(supportedRecords.size)
+        emptyView?.visibility = if (supportedRecords.isEmpty()) View.VISIBLE else View.GONE
+        addButton?.visibility = if (supportedRecords.isEmpty()) View.GONE else View.VISIBLE
+        editButton?.visibility = if (supportedRecords.isEmpty()) View.GONE else View.VISIBLE
+        editButton?.setText(if (editMode) R.string.widget_pane_done else R.string.widget_pane_edit)
+        removeButton?.visibility = if (editingWidgetId != INVALID_WIDGET_ID) View.VISIBLE else View.GONE
+        footer?.visibility = if (editMode) View.VISIBLE else View.GONE
+        commands?.visibility = if (commandsVisible) View.VISIBLE else View.GONE
+        commandToggle?.isSelected = commandsVisible
         updateWidgetCommandSuggestions()
+        LauncherFontScale.applyRecursively(drawerSurface)
     }
 
     private fun widgetIdBadge(record: WidgetRecord): TextView {
@@ -1225,206 +1302,116 @@ class AndroidWidgetDrawerManager(
     }
 
     private fun addEditControls(frame: FrameLayout, record: WidgetRecord) {
-        val controlSize = Tuils.dpToPx(context, 30)
-        val controlGap = Tuils.dpToPx(context, 4)
-        val providerInfo = appWidgetManager.getAppWidgetInfo(record.appWidgetId)
-        val bounds = providerInfo?.let(::widgetSpanBounds)
-
-        if (bounds != null && bounds.maxRows > bounds.minRows) {
-            frame.addView(
-                resizeControl(
-                    context.getString(R.string.manager_androidwidgetdrawermanager_drag_to_resize_the_top_edge_0998f),
-                    record,
-                    ResizeEdge.TOP
-                ),
-                FrameLayout.LayoutParams(
-                    controlSize,
-                    controlSize,
-                    Gravity.TOP or Gravity.CENTER_HORIZONTAL
-                ).apply {
-                    setMargins(0, controlGap, 0, 0)
+        val bounds = appWidgetManager.getAppWidgetInfo(record.appWidgetId)?.let(::widgetSpanBounds) ?: return
+        if (bounds.minColumns == bounds.maxColumns && bounds.minRows == bounds.maxRows) return
+        for (top in listOf(true, false)) for (left in listOf(true, false)) {
+            val corner = (if (top) "top" else "bottom") + "-" + (if (left) "left" else "right")
+            val handle = object : View(context) {
+                private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                    color = ThemeColorResolver.color(Theme.widget_control_text_color)
+                    strokeWidth = Tuils.dpToPx(context, 2).toFloat()
+                    strokeCap = Paint.Cap.ROUND
+                    alpha = 180
                 }
-            )
-            frame.addView(
-                resizeControl(
-                    context.getString(R.string.manager_androidwidgetdrawermanager_drag_to_resize_the_bottom_edge_ff1f7),
-                    record,
-                    ResizeEdge.BOTTOM
-                ),
-                FrameLayout.LayoutParams(
-                    controlSize,
-                    controlSize,
-                    Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
-                )
-            )
-        }
-        if (bounds != null && bounds.maxColumns > bounds.minColumns) {
-            frame.addView(
-                resizeControl(
-                    context.getString(R.string.manager_androidwidgetdrawermanager_drag_to_resize_the_left_edge_f1698),
-                    record,
-                    ResizeEdge.LEFT
-                ),
-                FrameLayout.LayoutParams(
-                    controlSize,
-                    controlSize,
-                    Gravity.START or Gravity.CENTER_VERTICAL
-                )
-            )
-            frame.addView(
-                resizeControl(
-                    context.getString(R.string.manager_androidwidgetdrawermanager_drag_to_resize_the_right_edge_9355b),
-                    record,
-                    ResizeEdge.RIGHT
-                ),
-                FrameLayout.LayoutParams(
-                    controlSize,
-                    controlSize,
-                    Gravity.END or Gravity.CENTER_VERTICAL
-                )
-            )
-        }
-
-        val topActions = LinearLayout(context).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER
-        }
-        topActions.addView(
-            editControl("X", context.getString(R.string.manager_androidwidgetdrawermanager_cancel_widget_edit_6d41a), {
-                editingWidgetId = INVALID_WIDGET_ID
-                renderWidgets()
-            }),
-            LinearLayout.LayoutParams(
-                controlSize,
-                controlSize
-            )
-        )
-        frame.addView(
-            topActions,
-            FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                Gravity.TOP or Gravity.END
-            )
-        )
-    }
-
-    private fun resizeControl(
-        description: String,
-        record: WidgetRecord,
-        edge: ResizeEdge
-    ): ImageView {
-        val touchSlop = ViewConfiguration.get(context).scaledTouchSlop
-        var startRawX = 0f
-        var startRawY = 0f
-        var moved = false
-
-        return ImageView(context).apply {
-            contentDescription = description
-            isClickable = true
-            isFocusable = true
-            setImageResource(R.drawable.ic_widget_resize_arrow)
-            setColorFilter(ThemeColorResolver.color(Theme.widget_control_text_color))
-            setPadding(
-                Tuils.dpToPx(context, 8),
-                Tuils.dpToPx(context, 8),
-                Tuils.dpToPx(context, 8),
-                Tuils.dpToPx(context, 8)
-            )
-            setImageLevel(when (edge) {
-                ResizeEdge.TOP -> 0
-                ResizeEdge.RIGHT -> 2_500
-                ResizeEdge.BOTTOM -> 5_000
-                ResizeEdge.LEFT -> 7_500
-            })
-            background = TerminalBorderRuntime.panelDrawable(
-                context,
-                ThemeColorResolver.color(Theme.widget_control_background_color),
-                ThemeColorResolver.color(Theme.widget_control_border_color),
-                1f,
-                moduleCornerRadius(),
-                dashedBorders(),
-                target = FrameTarget.WIDGET_DRAWER
-            )
-            setOnTouchListener { view, event ->
-                when (event.actionMasked) {
-                    MotionEvent.ACTION_DOWN -> {
-                        startRawX = event.rawX
-                        startRawY = event.rawY
-                        moved = false
-                        view.parent?.requestDisallowInterceptTouchEvent(true)
-                        view.isPressed = true
-                        true
-                    }
-                    MotionEvent.ACTION_MOVE -> {
-                        if (abs(event.rawX - startRawX) > touchSlop
-                            || abs(event.rawY - startRawY) > touchSlop
-                        ) {
-                            moved = true
-                        }
-                        true
-                    }
-                    MotionEvent.ACTION_UP -> {
-                        view.isPressed = false
-                        view.parent?.requestDisallowInterceptTouchEvent(false)
-                        if (moved) {
-                            val deltaCells = dragDeltaCells(edge, event.rawX - startRawX, event.rawY - startRawY)
-                            if (deltaCells != 0) {
-                                resizeWidgetFromDrag(record, edge, deltaCells)
-                            }
-                        } else {
-                            view.performClick()
-                        }
-                        true
-                    }
-                    MotionEvent.ACTION_CANCEL -> {
-                        view.isPressed = false
-                        view.parent?.requestDisallowInterceptTouchEvent(false)
-                        true
-                    }
-                    else -> true
+                override fun onDraw(canvas: Canvas) {
+                    val inset = Tuils.dpToPx(context, 2).toFloat()
+                    val length = Tuils.dpToPx(context, 7).toFloat()
+                    val x = if (left) inset else width - inset
+                    val y = if (top) inset else height - inset
+                    canvas.drawLine(x, y, x + if (left) length else -length, y, paint)
+                    canvas.drawLine(x, y, x, y + if (top) length else -length, paint)
                 }
-            }
-        }
-    }
-
-    private fun editControl(
-        label: String,
-        description: String,
-        onClick: () -> Unit,
-        onLongClick: (() -> Unit)? = null
-    ): TextView {
-        return baseEditControl(label, description).apply {
-            setOnClickListener { onClick() }
-            if (onLongClick != null) {
+            }.apply {
+                tag = "widget-resize-$corner"
+                contentDescription = context.getString(R.string.widget_pane_resize_corner, corner)
+                isClickable = true
+                isFocusable = true
+                setOnClickListener { resizeWidgetCorner(record, left, top, if (left) -lastRenderedCellSize.toFloat() else lastRenderedCellSize.toFloat(), if (top) -lastRenderedCellSize.toFloat() else lastRenderedCellSize.toFloat()) }
                 setOnLongClickListener {
-                    onLongClick()
+                    resizeWidgetCorner(record, left, top, if (left) lastRenderedCellSize.toFloat() else -lastRenderedCellSize.toFloat(), if (top) lastRenderedCellSize.toFloat() else -lastRenderedCellSize.toFloat()); true
+                }
+                var startX = 0f; var startY = 0f
+                var moved = false
+                var startBounds = WidgetResizeRect(0, 0, 1, 1)
+                setOnTouchListener { view, event ->
+                    when (event.actionMasked) {
+                        MotionEvent.ACTION_DOWN -> {
+                            startX = event.rawX; startY = event.rawY; moved = false
+                            startBounds = WidgetResizeRect(frame.left, frame.top, frame.right, frame.bottom)
+                            resizePreviewFrame = frame as WidgetFrame
+                            parent?.requestDisallowInterceptTouchEvent(true)
+                            view.isPressed = true
+                        }
+                        MotionEvent.ACTION_MOVE -> {
+                            moved = moved || abs(event.rawX - startX) > ViewConfiguration.get(context).scaledTouchSlop || abs(event.rawY - startY) > ViewConfiguration.get(context).scaledTouchSlop
+                            if (moved) {
+                                val cell = max(1, lastRenderedCellSize)
+                                val margin = Tuils.dpToPx(context, 4)
+                                val preview = previewWidgetCorner(startBounds, left, top, event.rawX - startX, event.rawY - startY,
+                                    bounds.minColumns * cell - 2 * margin, bounds.maxColumns * cell - 2 * margin,
+                                    bounds.minRows * cell - 2 * margin, bounds.maxRows * cell - 2 * margin,
+                                    widgetGrid?.width ?: frame.width, margin)
+                                frame.bringToFront()
+                                widgetGrid?.resizePreview = frame to preview
+                                // Native content reflows every frame; provider callbacks are coalesced.
+                                if (!providerResizePosted) {
+                                    providerResizePosted = true
+                                    widgetGrid?.postDelayed(providerResizeRunnable, 80)
+                                }
+                            }
+                        }
+                        MotionEvent.ACTION_UP -> {
+                            view.isPressed = false
+                            parent?.requestDisallowInterceptTouchEvent(false)
+                            finishResizePreview(false, restoreProvider = false)
+                            if (moved) resizeWidgetCorner(record, left, top, event.rawX - startX, event.rawY - startY)
+                            else view.performClick()
+                        }
+                        MotionEvent.ACTION_CANCEL -> {
+                            view.isPressed = false
+                            parent?.requestDisallowInterceptTouchEvent(false)
+                            finishResizePreview()
+                        }
+                    }
                     true
                 }
             }
+            // Keep the grip visually small while retaining an accessible touch target.
+            val size = Tuils.dpToPx(context, 48).coerceAtMost(min(frame.width.takeIf { it > 0 } ?: Int.MAX_VALUE, frame.height.takeIf { it > 0 } ?: Int.MAX_VALUE) / 2)
+            frame.addView(handle, FrameLayout.LayoutParams(size, size,
+                (if (top) Gravity.TOP else Gravity.BOTTOM) or (if (left) Gravity.LEFT else Gravity.RIGHT)).apply {
+                setMargins(-frame.paddingLeft, -frame.paddingTop, -frame.paddingRight, -frame.paddingBottom)
+            })
         }
     }
 
-    private fun baseEditControl(label: String, description: String): TextView {
-        return TextView(context).apply {
-            text = label
-            contentDescription = description
-            gravity = Gravity.CENTER
-            isClickable = true
-            isFocusable = true
-            setTextColor(ThemeColorResolver.color(Theme.widget_control_text_color))
-            textSize = if (label.length > 1) 10f else 16f
-            setTypeface(Tuils.getTypeface(context), Typeface.BOLD)
-            background = TerminalBorderRuntime.panelDrawable(
-                context,
-                ThemeColorResolver.color(Theme.widget_control_background_color),
-                ThemeColorResolver.color(Theme.widget_control_border_color),
-                1f,
-                moduleCornerRadius(),
-                dashedBorders(),
-                target = FrameTarget.WIDGET_DRAWER
-            )
-        }
+    private fun finishResizePreview(render: Boolean = true, restoreProvider: Boolean = true) {
+        val frame = resizePreviewFrame ?: return
+        val hadPreview = widgetGrid?.resizePreview != null
+        resizePreviewFrame = null
+        widgetGrid?.removeCallbacks(providerResizeRunnable)
+        providerResizePosted = false
+        widgetGrid?.resizePreview = null
+        if (restoreProvider && hadPreview) {
+            val width = (frame.layoutParams.width - frame.paddingLeft - frame.paddingRight).coerceAtLeast(1)
+            val height = (frame.layoutParams.height - frame.paddingTop - frame.paddingBottom).coerceAtLeast(1)
+            updateHostWidgetSize(frame.getChildAt(0) as AppWidgetHostView, width, height)
+            frame.tag = width to height
+        } else frame.tag = null
+        if (render) renderWidgets()
+    }
+
+    private fun resizeWidgetCorner(record: WidgetRecord, left: Boolean, top: Boolean, dx: Float, dy: Float) {
+        val records = loadRecords().filterValid()
+        val current = records.firstOrNull { it.appWidgetId == record.appWidgetId } ?: return
+        val bounds = appWidgetManager.getAppWidgetInfo(record.appWidgetId)?.let(::widgetSpanBounds) ?: return
+        val horizontal = if (left) ResizeEdge.LEFT else ResizeEdge.RIGHT
+        val vertical = if (top) ResizeEdge.TOP else ResizeEdge.BOTTOM
+        val width = resizeHorizontalEdgeByCells(current, horizontal, dragDeltaCells(horizontal, dx, dy), bounds)
+        val resized = resizeVerticalEdgeByCells(width, vertical, dragDeltaCells(vertical, dx, dy), bounds)
+        saveRecords(compactRecordsWithLocked(resized, records))
+        editingWidgetId = resized.appWidgetId
+        renderWidgets()
     }
 
     private fun dragDeltaCells(edge: ResizeEdge, deltaX: Float, deltaY: Float): Int {
@@ -1436,33 +1423,6 @@ class AndroidWidgetDrawerManager(
             ResizeEdge.BOTTOM -> deltaY
         }
         return (edgeDelta / cellSize.toFloat()).roundToInt()
-    }
-
-    private fun resizeWidgetFromDrag(record: WidgetRecord, edge: ResizeEdge, deltaCells: Int) {
-        val records = loadRecords().filterValid()
-        val currentRecord = records.firstOrNull { it.appWidgetId == record.appWidgetId } ?: return
-        val otherRecords = records.filter { it.appWidgetId != currentRecord.appWidgetId }
-        val providerInfo = appWidgetManager.getAppWidgetInfo(currentRecord.appWidgetId) ?: return
-        val bounds = widgetSpanBounds(providerInfo)
-        val updatedRecord = when (edge) {
-            ResizeEdge.LEFT,
-            ResizeEdge.RIGHT -> resizeHorizontalEdgeByCells(currentRecord, otherRecords, edge, deltaCells, bounds)
-            ResizeEdge.TOP,
-            ResizeEdge.BOTTOM -> resizeVerticalEdgeByCells(currentRecord, edge, deltaCells, bounds)
-        }
-
-        if (updatedRecord.col == currentRecord.col
-            && updatedRecord.row == currentRecord.row
-            && updatedRecord.colSpan == currentRecord.colSpan
-            && updatedRecord.rowSpan == currentRecord.rowSpan
-        ) {
-            return
-        }
-
-        val updatedRecords = compactRecordsWithLocked(updatedRecord, records)
-        saveRecords(updatedRecords)
-        editingWidgetId = updatedRecord.appWidgetId
-        renderWidgets()
     }
 
     private fun moveWidgetByDrag(appWidgetId: Int, deltaX: Float, deltaY: Float) {
@@ -1477,7 +1437,7 @@ class AndroidWidgetDrawerManager(
 
         val records = loadRecords().filterValid()
         val currentRecord = records.firstOrNull { it.appWidgetId == appWidgetId } ?: return
-        val baseColumns = baseColumnCount()
+        val baseColumns = widgetGrid?.columnCount?.takeIf { it > 0 } ?: baseColumnCount()
         val boundedRecord = normalizeRecord(currentRecord, baseColumns)
         val targetCol = (boundedRecord.col + deltaColumns)
             .coerceIn(0, baseColumns - boundedRecord.colSpan)
@@ -1497,15 +1457,15 @@ class AndroidWidgetDrawerManager(
 
     private fun resizeHorizontalEdgeByCells(
         record: WidgetRecord,
-        otherRecords: List<WidgetRecord>,
         edge: ResizeEdge,
         deltaCells: Int,
         bounds: WidgetSpanBounds
     ): WidgetRecord {
         return if (deltaCells > 0) {
-            expandHorizontalEdge(record, otherRecords, edge, bounds.maxColumns, deltaCells)
+            AndroidWidgetLayout.growHorizontalEdge(record, edge, bounds.maxColumns,
+                widgetGrid?.columnCount?.takeIf { it > 0 } ?: baseColumnCount(), deltaCells)
         } else {
-            shrinkHorizontalEdge(record, edge, bounds.minColumns, -deltaCells)
+            AndroidWidgetLayout.shrinkHorizontalEdge(record, edge, bounds.minColumns, -deltaCells)
         }
     }
 
@@ -1516,163 +1476,20 @@ class AndroidWidgetDrawerManager(
         bounds: WidgetSpanBounds
     ): WidgetRecord {
         return if (deltaCells > 0) {
-            expandVerticalEdge(record, edge, deltaCells, bounds.maxRows)
+            AndroidWidgetLayout.growVerticalEdge(record, edge, bounds.maxRows, deltaCells)
         } else {
-            shrinkVerticalEdge(record, edge, bounds.minRows, -deltaCells)
+            AndroidWidgetLayout.shrinkVerticalEdge(record, edge, bounds.minRows, -deltaCells)
         }
     }
 
-    private fun shrinkHorizontalEdge(
-        record: WidgetRecord,
-        edge: ResizeEdge,
-        minimumColumns: Int,
-        resizeStep: Int
-    ): WidgetRecord {
-        if (record.colSpan > minimumColumns) {
-            val shrinkBy = minOf(resizeStep, record.colSpan - minimumColumns)
-            val newColSpan = record.colSpan - shrinkBy
-            return if (edge == ResizeEdge.RIGHT) {
-                record.copy(col = record.col + shrinkBy, colSpan = newColSpan)
-            } else {
-                record.copy(colSpan = newColSpan)
-            }
-        }
-        return record
-    }
+    private fun compactRecordsWithLocked(lockedRecord: WidgetRecord, records: List<WidgetRecord>) =
+        AndroidWidgetLayout.place(lockedRecord, records, widgetGrid?.columnCount?.takeIf { it > 0 } ?: baseColumnCount())
 
-    private fun expandHorizontalEdge(
-        record: WidgetRecord,
-        otherRecords: List<WidgetRecord>,
-        edge: ResizeEdge,
-        baseColumns: Int,
-        resizeStep: Int
-    ): WidgetRecord {
-        val newColSpan = (record.colSpan + resizeStep).coerceAtMost(baseColumns)
-        if (newColSpan == record.colSpan) {
-            return record
-        }
+    private fun layoutRecordsForColumns(records: List<WidgetRecord>, columnCount: Int) =
+        AndroidWidgetLayout.layout(records, columnCount)
 
-        if (edge == ResizeEdge.LEFT) {
-            val newCol = max(0, record.col - (newColSpan - record.colSpan))
-            return record.copy(col = newCol, colSpan = record.col + record.colSpan - newCol)
-        }
-
-        val inPlaceRecord = record.copy(colSpan = newColSpan)
-        if (record.col + newColSpan <= baseColumns) {
-            return inPlaceRecord
-        }
-
-        return moveRecordBelow(record, otherRecords, newColSpan, record.rowSpan)
-    }
-
-    private fun shrinkVerticalEdge(
-        record: WidgetRecord,
-        edge: ResizeEdge,
-        minimumRows: Int,
-        resizeStep: Int
-    ): WidgetRecord {
-        if (record.rowSpan > minimumRows) {
-            val shrinkBy = minOf(resizeStep, record.rowSpan - minimumRows)
-            val newRowSpan = record.rowSpan - shrinkBy
-            return if (edge == ResizeEdge.BOTTOM) {
-                record.copy(row = record.row + shrinkBy, rowSpan = newRowSpan)
-            } else {
-                record.copy(rowSpan = newRowSpan)
-            }
-        }
-        return record
-    }
-
-    private fun expandVerticalEdge(
-        record: WidgetRecord,
-        edge: ResizeEdge,
-        resizeStep: Int,
-        maximumRows: Int
-    ): WidgetRecord {
-        val growBy = min(resizeStep, maximumRows - record.rowSpan)
-        if (growBy <= 0) return record
-        if (edge == ResizeEdge.TOP) {
-            val newRow = max(0, record.row - growBy)
-            return record.copy(row = newRow, rowSpan = record.row + record.rowSpan - newRow)
-        }
-
-        return record.copy(rowSpan = record.rowSpan + growBy)
-    }
-
-    private fun moveRecordBelow(
-        record: WidgetRecord,
-        otherRecords: List<WidgetRecord>,
-        colSpan: Int,
-        rowSpan: Int
-    ): WidgetRecord {
-        val position = nextOpenPosition(
-            otherRecords,
-            colSpan,
-            rowSpan,
-            record.row + record.rowSpan,
-            baseColumnCount()
-        )
-        return record.copy(
-            col = position.col,
-            row = position.row,
-            colSpan = colSpan,
-            rowSpan = rowSpan
-        )
-    }
-
-    private fun compactRecordsWithLocked(
-        lockedRecord: WidgetRecord,
-        records: List<WidgetRecord>
-    ): List<WidgetRecord> {
-        val baseColumns = baseColumnCount()
-        val placed = mutableListOf(normalizeRecord(lockedRecord, baseColumns))
-        records
-            .filter { it.appWidgetId != lockedRecord.appWidgetId }
-            .sortedWith(compareBy<WidgetRecord> { it.row }.thenBy { it.col })
-            .forEach { record ->
-                val normalizedRecord = normalizeRecord(record, baseColumns)
-                val position = nextOpenPosition(
-                    placed,
-                    normalizedRecord.colSpan,
-                    normalizedRecord.rowSpan,
-                    columnCount = baseColumns
-                )
-                val placedRecord = normalizedRecord.copy(col = position.col, row = position.row)
-                placed.add(placedRecord)
-            }
-
-        return placed.sortedWith(compareBy<WidgetRecord> { it.row }.thenBy { it.col })
-    }
-
-    private fun layoutRecordsForColumns(
-        records: List<WidgetRecord>,
-        columnCount: Int
-    ): List<WidgetRecord> {
-        val placed = mutableListOf<WidgetRecord>()
-        records
-            .sortedWith(compareBy<WidgetRecord> { it.row }.thenBy { it.col })
-            .forEach { record ->
-                val normalizedRecord = normalizeRecord(record, columnCount)
-                val position = nextOpenPosition(
-                    placed,
-                    normalizedRecord.colSpan,
-                    normalizedRecord.rowSpan,
-                    columnCount = columnCount
-                )
-                placed.add(normalizedRecord.copy(col = position.col, row = position.row))
-            }
-        return placed.sortedWith(compareBy<WidgetRecord> { it.row }.thenBy { it.col })
-    }
-
-    private fun normalizeRecord(record: WidgetRecord, columnCount: Int = baseColumnCount()): WidgetRecord {
-        val colSpan = record.colSpan.coerceIn(1, columnCount)
-        return record.copy(
-            col = record.col.coerceIn(0, columnCount - colSpan),
-            row = max(0, record.row),
-            colSpan = colSpan,
-            rowSpan = max(1, record.rowSpan)
-        )
-    }
+    private fun normalizeRecord(record: WidgetRecord, columnCount: Int = baseColumnCount()) =
+        AndroidWidgetLayout.normalizeRecord(record, columnCount)
 
     private fun updateHostWidgetSize(
         hostView: AppWidgetHostView,
@@ -1707,8 +1524,6 @@ class AndroidWidgetDrawerManager(
             orientation = LinearLayout.VERTICAL
             gravity = Gravity.CENTER
             setPadding(padding, padding, padding, padding)
-            isClickable = true
-            isLongClickable = true
             background = TerminalBorderRuntime.panelDrawable(
                 context,
                 ThemeColorResolver.color(Theme.widget_panel_background_color),
@@ -1718,16 +1533,20 @@ class AndroidWidgetDrawerManager(
                 dashedBorders(),
                 target = FrameTarget.WIDGET_DRAWER
             )
-            contentDescription = context.getString(R.string.manager_androidwidgetdrawermanager_widget_failed_to_render_tap_to_remove_101fb, label)
-            setOnClickListener { removeWidgetById(appWidgetId) }
-            setOnLongClickListener {
-                removeWidgetById(appWidgetId)
-                true
-            }
-
             addView(errorText(context.getString(R.string.manager_androidwidgetdrawermanager_widget_failed_to_render_6bf8a), textColor, 11f, true))
             addView(errorText(label.uppercase(), mutedTextColor, 9f, false))
-            addView(errorText(context.getString(R.string.manager_androidwidgetdrawermanager_tap_to_remove_19778), textColor, 9f, false))
+            addView(LinearLayout(context).apply {
+                gravity = Gravity.CENTER
+                addView(pickerButton(context.getString(R.string.widget_pane_retry)).apply {
+                    setOnClickListener {
+                        widgetFrames.remove(appWidgetId)
+                        renderWidgets()
+                    }
+                }, LinearLayout.LayoutParams(0, Tuils.dpToPx(context, 48), 1f))
+                addView(pickerButton(context.getString(R.string.widget_pane_remove)).apply {
+                    setOnClickListener { removeWidgetById(appWidgetId) }
+                }, LinearLayout.LayoutParams(0, Tuils.dpToPx(context, 48), 1f))
+            })
         }
     }
 
@@ -1752,41 +1571,10 @@ class AndroidWidgetDrawerManager(
         }
     }
 
-    private fun containsAndroidWidgetFailure(view: View): Boolean {
-        if (view is TextView
-            && view.text?.toString()?.contains("Couldn't add widget", ignoreCase = true) == true
-        ) {
-            return true
-        }
-
-        if (view is ViewGroup) {
-            for (i in 0 until view.childCount) {
-                if (containsAndroidWidgetFailure(view.getChildAt(i))) {
-                    return true
-                }
-            }
-        }
-
-        return false
-    }
-
-    private fun deleteHostIfIdle() {
-        if (activePendingWidgetId() != INVALID_WIDGET_ID) {
-            return
-        }
-        try {
-            appWidgetHost.deleteHost()
-            saveAllocatedWidgetIds(emptySet())
-        } catch (e: RuntimeException) {
-            Tuils.log(e)
-        }
-    }
-
     private fun cleanupWidgetState(records: List<WidgetRecord> = loadRecords()): List<WidgetRecord> {
         cleanupStalePendingWidget(records)
         val validRecords = records.filterValid()
         cleanupTrackedOrphans(validRecords)
-        cleanupLegacyOrphans(validRecords)
         return validRecords
     }
 
@@ -1809,9 +1597,11 @@ class AndroidWidgetDrawerManager(
     }
 
     private fun cleanupTrackedOrphans(records: List<WidgetRecord>) {
+        if (!recordsReadable) return
+        val otherIds = SpaceManager.widgetIdsInOtherSpaces(context) ?: return
         val savedIds = records.map { it.appWidgetId }.toSet()
         val pendingId = activePendingWidgetId()
-        val retainedIds = savedIds.toMutableSet()
+        val retainedIds = (savedIds + otherIds).toMutableSet()
         if (pendingId != INVALID_WIDGET_ID) {
             retainedIds.add(pendingId)
         }
@@ -1822,37 +1612,6 @@ class AndroidWidgetDrawerManager(
             }
         }
         saveAllocatedWidgetIds(retainedIds)
-    }
-
-    private fun cleanupLegacyOrphans(records: List<WidgetRecord>) {
-        if (preferences.getBoolean(KEY_LEGACY_ORPHAN_CLEANUP_DONE, false)) {
-            return
-        }
-
-        val pendingId = activePendingWidgetId()
-        val savedIds = records.map { it.appWidgetId }.toSet()
-        val knownIds = savedIds.toMutableSet()
-        knownIds.addAll(loadAllocatedWidgetIds())
-        if (pendingId != INVALID_WIDGET_ID) {
-            knownIds.add(pendingId)
-        }
-        if (knownIds.isEmpty()) {
-            return
-        }
-
-        val protectedIds = savedIds.toMutableSet()
-        if (pendingId != INVALID_WIDGET_ID) {
-            protectedIds.add(pendingId)
-        }
-
-        val minId = max(1, knownIds.minOrNull()!! - LEGACY_CLEANUP_SCAN_RADIUS)
-        val maxId = knownIds.maxOrNull()!! + LEGACY_CLEANUP_SCAN_RADIUS
-        for (appWidgetId in minId..maxId) {
-            if (appWidgetId !in protectedIds) {
-                deleteWidgetId(appWidgetId, logErrors = false)
-            }
-        }
-        preferences.edit().putBoolean(KEY_LEGACY_ORPHAN_CLEANUP_DONE, true).apply()
     }
 
     private fun activePendingWidgetId(): Int {
@@ -1928,28 +1687,28 @@ class AndroidWidgetDrawerManager(
             dashedBorders(),
             target = FrameTarget.WIDGET_DRAWER
         )
-        TerminalBorderRuntime.bind(drawerContainer, header, footer)
+        listOfNotNull(addButton, editButton, commandToggle, emptyAdd).forEach { button ->
+            button.typeface = Tuils.getTypeface(context)
+            button.textSize = 12f
+            button.setTextColor(ThemeColorResolver.color(Theme.widget_control_text_color))
+            button.background = TerminalBorderRuntime.panelDrawable(context,
+                ThemeColorResolver.color(Theme.widget_control_background_color), borderColor,
+                1f, moduleCornerRadius(), dashedBorders(), target = FrameTarget.WIDGET_DRAWER)
+            button.isFocusable = true
+        }
+        (emptyView as? ViewGroup)?.getChildAt(0)?.let { view ->
+            (view as? TextView)?.apply { setTextColor(drawerColor); typeface = Tuils.getTypeface(context) }
+        }
+        header?.textSize = 12f
+        closeButton?.background = android.graphics.drawable.InsetDrawable(closeButton?.background, 0, 0, 0, Tuils.dpToPx(context, 28))
+        TerminalBorderRuntime.bind(drawerContainer, header)
         updateWidgetCommandSuggestions()
     }
 
-    private fun updateLabels(recordCount: Int, displayColumns: Int, displayRows: Int) {
-        header?.text = context.getString(R.string.manager_androidwidgetdrawermanager_widgets_9209f, recordCount)
-        footer?.text = context.getString(R.string.manager_androidwidgetdrawermanager_grid_x_ddf2d, displayColumns, max(1, displayRows))
-    }
-
-    private fun configureInputAnchor() {
-        val dummyAnchor =
-            rootView.findViewById<View?>(R.id.android_widget_drawer_dummy_input_anchor) ?: return
-        rootView.post {
-            val params = dummyAnchor.layoutParams as? RelativeLayout.LayoutParams ?: return@post
-            params.height = 0
-            params.removeRule(RelativeLayout.ALIGN_PARENT_TOP)
-            params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
-            dummyAnchor.layoutParams = params
-            if (isOpen) {
-                dummyAnchor.post { renderWidgets() }
-            }
-        }
+    private fun updateLabels(recordCount: Int) {
+        header?.setText(R.string.widget_pane_title)
+        header?.contentDescription = context.getString(R.string.manager_androidwidgetdrawermanager_widgets_9209f, recordCount)
+        footer?.text = context.getString(R.string.widget_pane_edit_hint)
     }
 
     private fun baseColumnCount(): Int {
@@ -1976,7 +1735,7 @@ class AndroidWidgetDrawerManager(
         val contentRatio = grid.width.toFloat() / max(1f, rootWidth.toFloat())
         val portraitEquivalentGridWidth = max(1, (shortestRootSide * contentRatio).toInt())
         val minimumCellSize = Tuils.dpToPx(context, MIN_WIDGET_CELL_DP)
-        return max(minimumCellSize, portraitEquivalentGridWidth / baseColumns)
+        return max(1, min(grid.width / baseColumns, max(minimumCellSize, portraitEquivalentGridWidth / baseColumns)))
     }
 
     private fun displayColumnCount(grid: GridLayout, cellSize: Int, baseColumns: Int): Int {
@@ -1985,12 +1744,8 @@ class AndroidWidgetDrawerManager(
             .coerceAtMost(MAX_GRID_COLUMNS)
     }
 
-    private fun displayRowCount(displayRecords: List<WidgetRecord>, cellSize: Int): Int {
-        val contentRows = displayRecords.maxOfOrNull { it.row + it.rowSpan } ?: 0
-        val viewportRows = ((drawerScroll?.height ?: drawerContainer?.height ?: 0) / max(1, cellSize))
-            .coerceAtLeast(0)
-        return max(1, max(contentRows, viewportRows))
-    }
+    private fun displayRowCount(displayRecords: List<WidgetRecord>): Int =
+        max(1, displayRecords.maxOfOrNull { it.row + it.rowSpan } ?: 0)
 
     private fun openSurface() {
         if (surfaceOpen) {
@@ -2029,7 +1784,7 @@ class AndroidWidgetDrawerManager(
                 verticalResizable = providerInfo.resizeMode and AppWidgetProviderInfo.RESIZE_VERTICAL != 0
             ),
             cellSize,
-            cellMargin,
+            cellMargin + Tuils.dpToPx(context, 8),
             min(baseColumnCount(), MAX_WIDGET_COLUMNS),
             minWidgetColumns(),
             minWidgetRows(),
@@ -2047,53 +1802,15 @@ class AndroidWidgetDrawerManager(
         val span = widgetSpanBounds(providerInfo, cellSize, cellMargin)
             .constrain(record.colSpan, record.rowSpan)
         return record.copy(
-            col = record.col.coerceIn(0, baseColumnCount() - span.colSpan),
+            col = max(0, record.col),
             colSpan = span.colSpan,
             rowSpan = span.rowSpan
         )
     }
 
-    private fun nextOpenPosition(
-        records: List<WidgetRecord>,
-        colSpan: Int,
-        rowSpan: Int,
-        startRow: Int = 0,
-        columnCount: Int = baseColumnCount()
-    ): WidgetPosition {
-        val boundedColSpan = colSpan.coerceIn(1, columnCount)
-        for (row in max(0, startRow)..MAX_PLACEMENT_SCAN_ROWS) {
-            for (col in 0..(columnCount - boundedColSpan)) {
-                if (isOpenSlot(records, col, row, boundedColSpan, rowSpan)) {
-                    return WidgetPosition(col, row)
-                }
-            }
-        }
-        val row = records.maxOfOrNull { it.row + it.rowSpan } ?: 0
-        return WidgetPosition(0, row)
-    }
-
-    private fun isOpenSlot(
-        records: List<WidgetRecord>,
-        col: Int,
-        row: Int,
-        colSpan: Int,
-        rowSpan: Int
-    ): Boolean {
-        val right = col + colSpan
-        val bottom = row + rowSpan
-        for (record in records) {
-            val recordRight = record.col + record.colSpan
-            val recordBottom = record.row + record.rowSpan
-            val intersects = col < recordRight
-                && right > record.col
-                && row < recordBottom
-                && bottom > record.row
-            if (intersects) {
-                return false
-            }
-        }
-        return true
-    }
+    private fun nextOpenPosition(records: List<WidgetRecord>, colSpan: Int, rowSpan: Int,
+        startRow: Int = 0, columnCount: Int = baseColumnCount()) =
+        AndroidWidgetLayout.nextOpenPosition(records, colSpan, rowSpan, startRow, columnCount)
 
     private fun List<WidgetRecord>.filterValid(): List<WidgetRecord> {
         return filter { appWidgetManager.getAppWidgetInfo(it.appWidgetId) != null }
@@ -2193,6 +1910,7 @@ class AndroidWidgetDrawerManager(
 
     private fun loadRecords(): List<WidgetRecord> {
         val raw = preferences.getString(KEY_WIDGETS, "[]") ?: "[]"
+        recordsReadable = true
         val records = ArrayList<WidgetRecord>()
         val baseColumns = baseColumnCount()
         try {
@@ -2208,7 +1926,7 @@ class AndroidWidgetDrawerManager(
                         sanitizeWidgetCode(obj.optString("wid")) ?: Tuils.EMPTYSTRING,
                         appWidgetId,
                         obj.optString("provider"),
-                        obj.optInt("col", 0).coerceIn(0, baseColumns - 1),
+                        obj.optInt("col", 0).coerceIn(0, MAX_GRID_COLUMNS - 1),
                         max(0, obj.optInt("row", 0)),
                         obj.optInt("colSpan", 2).coerceIn(1, baseColumns),
                         max(1, obj.optInt("rowSpan", 2))
@@ -2216,6 +1934,7 @@ class AndroidWidgetDrawerManager(
                 )
             }
         } catch (e: Exception) {
+            recordsReadable = false
             Tuils.log(e)
         }
         return normalizeWidgetCodes(records)
@@ -2237,18 +1956,6 @@ class AndroidWidgetDrawerManager(
         preferences.edit().putString(KEY_WIDGETS, array.toString()).apply()
     }
 
-    private data class WidgetRecord(
-        val wid: String,
-        val appWidgetId: Int,
-        val provider: String,
-        val col: Int,
-        val row: Int,
-        val colSpan: Int,
-        val rowSpan: Int
-    )
-
-    private data class WidgetPosition(val col: Int, val row: Int)
-
     private data class WidgetProviderOption(
         val providerInfo: AppWidgetProviderInfo,
         val appLabel: String,
@@ -2261,13 +1968,6 @@ class AndroidWidgetDrawerManager(
         val inputText: String,
         val executeOnTap: Boolean = false
     )
-
-    private enum class ResizeEdge {
-        LEFT,
-        RIGHT,
-        TOP,
-        BOTTOM
-    }
 
     private inner class RetuiAppWidgetHost(context: Context, hostId: Int) :
         AppWidgetHost(context, hostId) {
@@ -2292,8 +1992,13 @@ class AndroidWidgetDrawerManager(
         private var downRawY = 0f
         private var dragMoved = false
         private var longPressTriggered = false
+        private var resizeGesture = false
         private val editRunnable = Runnable {
+            val cancel = MotionEvent.obtain(0, android.os.SystemClock.uptimeMillis(), MotionEvent.ACTION_CANCEL, downX, downY, 0)
+            super.dispatchTouchEvent(cancel)
+            cancel.recycle()
             longPressTriggered = true
+            editMode = true
             dragMoved = false
             editingWidgetId = appWidgetId
             performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
@@ -2308,12 +2013,28 @@ class AndroidWidgetDrawerManager(
 
         fun matches(widgetId: Int): Boolean = appWidgetId == widgetId
 
+        override fun onDetachedFromWindow() {
+            if (resizePreviewFrame === this) finishResizePreview(false)
+            removeCallbacks(editRunnable)
+            super.onDetachedFromWindow()
+        }
+
         override fun dispatchTouchEvent(event: MotionEvent): Boolean {
+            if (event.actionMasked == MotionEvent.ACTION_DOWN) {
+                resizeGesture = editingWidgetId == appWidgetId && (1 until childCount).any { index ->
+                    val child = getChildAt(index)
+                    child.tag?.toString()?.startsWith("widget-resize-") == true &&
+                        event.x >= child.left && event.x < child.right && event.y >= child.top && event.y < child.bottom
+                }
+                if (resizeGesture) { removeCallbacks(editRunnable); longPressTriggered = false }
+            }
+            if (resizeGesture) {
+                val handled = super.dispatchTouchEvent(event)
+                if (event.actionMasked == MotionEvent.ACTION_UP || event.actionMasked == MotionEvent.ACTION_CANCEL) resizeGesture = false
+                return handled
+            }
             when (event.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
-                    if (editingWidgetId != INVALID_WIDGET_ID && editingWidgetId != appWidgetId) {
-                        return cancelWidgetEditForOutsideTouch(event.rawX, event.rawY)
-                    }
                     downX = event.x
                     downY = event.y
                     downRawX = event.rawX
@@ -2321,9 +2042,15 @@ class AndroidWidgetDrawerManager(
                     dragMoved = false
                     longPressTriggered = false
                     removeCallbacks(editRunnable)
-                    if (editingWidgetId != appWidgetId) {
-                        postDelayed(editRunnable, ViewConfiguration.getLongPressTimeout().toLong())
+                    if (editMode) {
+                        editingWidgetId = appWidgetId
+                        longPressTriggered = true
+                        parent?.requestDisallowInterceptTouchEvent(true)
+                        alpha = .82f
+                        bringToFront()
+                        return true
                     }
+                    postDelayed(editRunnable, ViewConfiguration.getLongPressTimeout().toLong())
                 }
                 MotionEvent.ACTION_MOVE -> {
                     if (longPressTriggered) {
@@ -2388,7 +2115,6 @@ class AndroidWidgetDrawerManager(
         private const val KEY_ALLOCATED_WIDGET_IDS = "allocated_widget_ids"
         private const val KEY_PENDING_WIDGET_ID = "pending_widget_id"
         private const val KEY_PENDING_WIDGET_STARTED_AT = "pending_widget_started_at"
-        private const val KEY_LEGACY_ORPHAN_CLEANUP_DONE = "legacy_orphan_cleanup_done"
         private const val INVALID_WIDGET_ID = -1
         private const val MIN_GRID_COLUMNS = 2
         private const val MAX_GRID_COLUMNS = 12
@@ -2398,8 +2124,6 @@ class AndroidWidgetDrawerManager(
         private const val MAX_COMMAND_SPAN_SUGGESTION = 8
         private const val MAX_PLACEMENT_SCAN_ROWS = 120
         private const val PENDING_WIDGET_TIMEOUT_MS = 10 * 60 * 1000L
-        private const val LEGACY_CLEANUP_SCAN_RADIUS = 8
-        private const val WIDGET_FAILURE_SCAN_DELAY_MS = 500L
     }
 }
 
@@ -2449,6 +2173,10 @@ internal fun calculateWidgetSpanBounds(
         fallback.coerceIn(1, limit)
     }
 
+    fun maximumSpan(size: Int, limit: Int): Int = if (size > 0) {
+        kotlin.math.floor((size.toDouble() + safeMargin * 2.0) / safeCellSize).toInt().coerceIn(1, limit)
+    } else limit
+
     fun resizeMinimum(resizeValue: Int, defaultValue: Int, resizable: Boolean): Int =
         resizeValue.takeIf { resizable && it > 0 && (defaultValue <= 0 || it <= defaultValue) }
             ?: defaultValue
@@ -2465,7 +2193,7 @@ internal fun calculateWidgetSpanBounds(
             maxColumns
         )
     } else defaultColumns
-    val maxSupportedColumns = if (spec.horizontalResizable) maxColumns else defaultColumns
+    val maxSupportedColumns = if (spec.horizontalResizable) maximumSpan(spec.maxResizeWidth, maxColumns).coerceAtLeast(minColumns) else defaultColumns
 
     val minRows = if (spec.verticalResizable) {
         minimumSpan(
@@ -2474,7 +2202,7 @@ internal fun calculateWidgetSpanBounds(
             maxRows
         )
     } else defaultRows
-    val maxSupportedRows = if (spec.verticalResizable) maxRows else defaultRows
+    val maxSupportedRows = if (spec.verticalResizable) maximumSpan(spec.maxResizeHeight, maxRows).coerceAtLeast(minRows) else defaultRows
 
     return WidgetSpanBounds(
         WidgetSpan(

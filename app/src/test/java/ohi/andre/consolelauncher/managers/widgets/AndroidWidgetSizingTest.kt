@@ -28,8 +28,8 @@ class AndroidWidgetSizingTest {
 
         assertEquals(WidgetSpan(2, 1), github.initial)
         assertEquals(4, github.maxColumns)
-        assertEquals(120, github.maxRows)
-        assertEquals(WidgetSpan(4, 2), github.constrain(4, 2))
+        assertEquals(1, github.maxRows)
+        assertEquals(WidgetSpan(4, 1), github.constrain(4, 2))
     }
 
     @Test fun targetCellsWinAndFixedAxesStayFixed() {
@@ -72,7 +72,7 @@ class AndroidWidgetSizingTest {
         assertEquals(WidgetSpan(1, 1), fallback.initial)
     }
 
-    @Test fun independentlyResizableAxesIgnoreProviderMaximums() {
+    @Test fun independentlyResizableAxesRespectProviderMaximums() {
         val listWidget = calculateWidgetSpanBounds(
             WidgetSizeSpec(
                 minWidth = 200,
@@ -97,7 +97,7 @@ class AndroidWidgetSizingTest {
         assertEquals(2, listWidget.minColumns)
         assertEquals(2, listWidget.maxColumns)
         assertEquals(1, listWidget.minRows)
-        assertEquals(120, listWidget.maxRows)
-        assertEquals(WidgetSpan(2, 20), listWidget.constrain(4, 20))
+        assertEquals(6, listWidget.maxRows)
+        assertEquals(WidgetSpan(2, 6), listWidget.constrain(4, 20))
     }
 }

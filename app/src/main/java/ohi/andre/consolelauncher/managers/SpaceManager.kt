@@ -208,6 +208,33 @@ object SpaceManager {
         return target
     }
 
+    /** Null means a snapshot could not be read; widget cleanup must then retain bindings. */
+    fun widgetIdsInOtherSpaces(context: Context): Set<Int>? = try {
+        val activeId = prefs(context).getString(KEY_ACTIVE_SPACE_ID, null)
+        val ids = mutableSetOf<Int>()
+        val directories = checkNotNull(spacesDir().listFiles()) { "Unable to read saved Spaces" }
+        for (space in directories.filter { it.isDirectory && safeSpaceId(it.name) && it.name != activeId }) {
+            val snapshot = File(space, "$SHARED_PREFS_FOLDER/android_widget_drawer.properties")
+            check(snapshot.isFile) { "Missing widget snapshot" }
+            for (line in readText(snapshot).lineSequence().filter { it.isNotBlank() }) {
+                val parts = line.split("|", limit = 3)
+                check(parts.size == 3) { "Invalid widget snapshot" }
+                val key = String(android.util.Base64.decode(parts[1], android.util.Base64.NO_WRAP), Charsets.UTF_8)
+                if (key != "widgets") continue
+                check(parts[0] == "string") { "Invalid widget snapshot type" }
+                val records = org.json.JSONArray(String(android.util.Base64.decode(parts[2], android.util.Base64.NO_WRAP), Charsets.UTF_8))
+                for (index in 0 until records.length()) {
+                    val id = records.getJSONObject(index).getInt("appWidgetId")
+                    if (id > 0) ids.add(id)
+                }
+            }
+        }
+        ids
+    } catch (error: Exception) {
+        Tuils.log(error)
+        null
+    }
+
     private fun snapshotToSpace(context: Context, id: String) {
         val root = Tuils.getFolder()
         val staging = File(spacesDir(), ".$id-staging")

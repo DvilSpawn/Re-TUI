@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_pane_title">Widgets</string>
+    <string name="widget_pane_empty">Your widgets live here.</string>
+    <string name="widget_pane_add">+ Add widget</string>
+    <string name="widget_pane_edit">Edit</string>
+    <string name="widget_pane_done">Done</string>
+    <string name="widget_pane_commands">Commands</string>
+    <string name="widget_pane_close">Close widgets</string>
+    <string name="widget_pane_search">Search widgets or apps</string>
+    <string name="widget_pane_no_matches">No matching widgets.</string>
+    <string name="widget_pane_retry">Retry</string>
+    <string name="widget_pane_remove">Remove</string>
+    <string name="widget_pane_remove_description">Remove %1$s</string>
+    <string name="widget_pane_edit_hint">Drag to move. Drag a corner to resize. Tap Done to finish.</string>
+    <string name="widget_pane_resize_corner">Resize widget from %1$s corner</string>
+</resources>

@@ -1,0 +1,20 @@
+{
+  "package": "com.dvil.tui_renewed",
+  "variant": "playstoreDebug",
+  "candidate": "/Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/build/outputs/apk/playstore/debug/app-playstore-debug-private-space-inplace.apk",
+  "sha256": "99fda354f26199e4fcdd544209d50fc78f6958205d018cb010d8f2491456a4ae",
+  "signerSha256": "f1f50b573286bfbd59b8bfbb39d202ea3adf173f12077d98110bb9ed981b93f2",
+  "unitTests": {
+    "tests": 471,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 5
+  },
+  "privateSpaceTests": 6,
+  "installed": true,
+  "deviceAuthenticationVerified": false,
+  "blockedBy": null,
+  "hardwareSerial": "10BE1C0FB40006A",
+  "installedApkMatchesCandidate": true,
+  "appDataPreserved": true
+}

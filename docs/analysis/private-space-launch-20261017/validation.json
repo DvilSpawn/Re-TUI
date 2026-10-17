@@ -1,0 +1,27 @@
+{
+  "package": "com.dvil.tui_renewed",
+  "hardwareSerial": "10BE1C0FB40006A",
+  "candidate": "/tmp/retui-private-launch-inplace.apk",
+  "sha256": "d2279958fc4556192ab8b1744282d7a4f118aa3e7d2d97cfcd93c4bf64023748",
+  "installed": true,
+  "installedApkMatchesCandidate": true,
+  "appDataPreserved": true,
+  "unitTests": {
+    "tests": 472,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 5
+  },
+  "phoneTests": 2,
+  "observedPrivateProfile": {
+    "quietMode": false,
+    "userUnlocked": false,
+    "started": false,
+    "vivoXspaceProfileFlag": true
+  },
+  "userConfirmedAuthentication": true,
+  "privateAppLaunchResolved": false,
+  "userConfirmedFullLockUnlockDidNotRecover": true,
+  "nativePrivateLauncherPackage": "com.vivo.privacylauncher",
+  "nativePrivateLauncherXspaceServicePermission": "signature|privileged"
+}

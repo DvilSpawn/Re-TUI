@@ -56,6 +56,7 @@ internal class HelpWindowPanel(private val host: FrameLayout, private val conten
     private var minimumSize: Pair<Int, Int>? = null
     init {
         host.addView(panel)
+        PanelBackdrop.install(host)
         panel.addView(content, FrameLayout.LayoutParams(-1, -1))
         actions = LinearLayout(context).apply {
             orientation = LinearLayout.HORIZONTAL

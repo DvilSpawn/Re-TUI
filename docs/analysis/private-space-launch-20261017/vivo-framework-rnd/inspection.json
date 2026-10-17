@@ -1,0 +1,17 @@
+{
+  "serial": "10BE1C0FB40006A",
+  "model": "I2220",
+  "fingerprint": "iQOO/I2220T/I2220:16/BP2A.250605.031.A3_IN/compiler260909163242:user/release-keys",
+  "homeRole": "com.dvil.tui_renewed",
+  "nativePrivateModeStatus": "0",
+  "inspectionReadOnly": true,
+  "profileState": "not started (am get-started-user-state 10)",
+  "hashes": {
+    "vivo-framework.jar": "fd9bed8ff7af45c97df33fca18dd048ed0d64e75a35314d7bd2fe86bd613bb8a",
+    "services.jar": "b137d4debdcd21c3e365b639c608800cadc3a06ed94fc3fc869d02c029fd693f",
+    "PrivacyLauncher.apk": "ac968f7643cac02cc910e0472aa90d47911920628352b0175386827a0625154d",
+    "vivo-services.jar": "9a6fb91a051ca37b95dcb5c1ab9770f1b89a9d26029cf72644694af933a42fa5",
+    "framework.jar": "22227e9e37ae546e5097c70a4a68aea11da87d89e66e8cced419468b4bcf3ffe",
+    "XSpace.apk": "c312a52cd59294fb62af9e08e4b715943ff21517cc329305a1ecae062c92d5d6"
+  }
+}

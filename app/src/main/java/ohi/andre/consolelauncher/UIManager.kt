@@ -1680,11 +1680,8 @@ class UIManager(
             return
         }
 
-        hideLauncherChromeForSurface()
-        restoreLauncherChromeOnResume = true
-
         val intent = ThemerActivity.launchIntent(mContext!!, section)
-        startActivityAfterChromeHidden(intent)
+        mContext!!.startActivity(intent)
     }
 
     private fun startActivityAfterChromeHidden(intent: Intent) {
@@ -2441,6 +2438,7 @@ class UIManager(
         if (mRootView == null) return
 
         val landscape = shouldUseResponsiveLandscape(configuration)
+        applyTerminalOutputEdgeInsets(landscape)
         applyLandscapeFoldGutter(configuration)
         var topMargins = getDisplayMargins(Ui.display_margin_top_section)
         var bottomMargins = getDisplayMargins(Ui.display_margin_bottom_section)
@@ -2499,10 +2497,27 @@ class UIManager(
             imeBottomOffset + searchInset,
             extraTopPx = if (duoTopPanesSwapped) {
                 systemInsetTop + Tuils.mmToPx(metrics, topMargins[1]) + (headerContainer?.height ?: 0)
-            } else 0,
+            } else if (landscape) systemInsetTop else 0,
             extraHorizontalPx = searchInset
         )
         applyTerminalOverlayDisplayMargins(topMargins, bottomMargins, metrics)
+    }
+
+    private fun applyTerminalOutputEdgeInsets(landscape: Boolean) {
+        terminalContainer?.let { container ->
+            val top = if (landscape) 0 else Tuils.dpToPx(mContext, 8)
+            if (container.paddingTop != top) {
+                container.setPadding(container.paddingLeft, top, container.paddingRight, container.paddingBottom)
+            }
+        }
+        (terminalTrayToggle?.layoutParams as? MarginLayoutParams)?.let { params ->
+            val top = if (landscape) 0 else -Tuils.dpToPx(mContext, 10)
+            if (params.topMargin != top) {
+                params.topMargin = top
+                terminalTrayToggle?.layoutParams = params
+            }
+        }
+        applyTerminalOutputContentInsets()
     }
 
     private fun getDisplayMargins(save: Ui?): IntArray {
@@ -6688,6 +6703,10 @@ class UIManager(
                 false
             }
         })
+
+        for (id in intArrayOf(R.id.termux_overlay, R.id.file_overlay, R.id.apps_drawer_root)) {
+            rootView.findViewById<ViewGroup>(id)?.let { ohi.andre.consolelauncher.help.PanelBackdrop.installEmbedded(it) }
+        }
 
         appDrawerPaneManager = AppDrawerPaneManager(
             mContext!!,
@@ -13690,7 +13709,7 @@ class UIManager(
             return
         }
         if (this.isAndroidWidgetDrawerOpen) {
-            hideAndroidWidgetDrawer()
+            if (androidWidgetDrawerManager?.handleBack() != true) hideAndroidWidgetDrawer()
             return
         }
         if (this.isAppsDrawerOpen) {
@@ -13735,7 +13754,6 @@ class UIManager(
         mTerminalAdapter!!.requestInputFocus()
         if (!preserveSelection) mTerminalAdapter!!.focusInputEnd()
         if (showSoftKeyboard) {
-            sendRetuiKeyboardTheme(input as? EditText, "launcher")
             input?.post(Runnable {
                 sendRetuiKeyboardTheme(input as? EditText, "launcher")
                 imm.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT)
@@ -13755,6 +13773,7 @@ class UIManager(
             handler!!.removeCallbacks(eventsRefreshRunnable)
             handler!!.removeCallbacks(luaWidgetTickRunnable)
             handler!!.removeCallbacks(fontRefreshRunnable)
+            mRootView?.removeCallbacks(fontRefreshRunnable)
         }
         setMusicVisualizerPlaying(false)
         val pomodoroOverlay =
@@ -13823,7 +13842,6 @@ class UIManager(
         setMusicVisualizerPlaying(lastMusicPlaying)
         scheduleInternalMusicTickerIfNeeded()
         scheduleEventsRefreshIfNeeded()
-        scheduleTypefaceRefreshes()
 
         if (ramManager != null) ramManager!!.start()
         if (batteryManager != null) batteryManager!!.start()
@@ -13933,14 +13951,9 @@ class UIManager(
             return
         }
 
-        mRootView.post(Runnable { this.refreshLauncherTypeface() })
-
-        if (handler != null) {
-            handler!!.removeCallbacks(fontRefreshRunnable)
-            handler!!.postDelayed(fontRefreshRunnable, 120)
-            handler!!.postDelayed(fontRefreshRunnable, 360)
-            handler!!.postDelayed(fontRefreshRunnable, 900)
-        }
+        mRootView.removeCallbacks(fontRefreshRunnable)
+        handler?.removeCallbacks(fontRefreshRunnable)
+        mRootView.postOnAnimation(fontRefreshRunnable)
     }
 
     private fun refreshLauncherTypeface() {
@@ -13966,6 +13979,7 @@ class UIManager(
     }
 
     private fun applyTypefaceRecursively(view: View?, typeface: Typeface?) {
+        if (view is android.appwidget.AppWidgetHostView) return
         if (view is TextView) {
             val textView = view
             val current = textView.getTypeface()

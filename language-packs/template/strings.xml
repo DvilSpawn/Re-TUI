@@ -4121,6 +4121,7 @@ help -topic &lt;id&gt; → open a manual category or article</string>
 	-&gt; Programmer 
 
 Thanks to Luke Winward for his original idea</string>
+    <string name="output_app_launch_failed">Android could not open this app. Try again or check its app settings.</string>
     <string name="output_appnotfound">Application not found</string>
     <string name="output_bluetooth">Bluetooth active:</string>
     <string name="output_bluetooth_unavailable">Bluetooth is not available on this device</string>
@@ -4145,10 +4146,14 @@ Try to use "$ help" or "$ tutorial"</string>
     <string name="output_notification_error">The notification service couldn't be started:</string>
     <string name="output_numbernotfound">Contact not found</string>
     <string name="output_playing">Playing:</string>
+    <string name="output_private_command_disabled">The private command is disabled. Enable it in Behaviour settings under Commands.</string>
     <string name="output_private_space_action_failed">Private Space action failed.</string>
+    <string name="output_private_space_auth_required">Complete Android authentication to unlock Private Space. Cancelling keeps it locked.</string>
+    <string name="output_private_space_foreground_required">Android denied the Private Space request. Set Re:TUI as your default launcher, open its home screen, and try again.</string>
     <string name="output_private_space_hidden">Private Space entrypoint hidden.</string>
     <string name="output_private_space_locked">Private Space is locked.</string>
     <string name="output_private_space_locked_now">Private Space lock requested.</string>
+    <string name="output_private_space_not_ready">Private Space is locked or still starting. Run private -unlock. If it remains unavailable, open private -settings.</string>
     <string name="output_private_space_settings_android">Open Android Settings to manage Private Space on this Android version.</string>
     <string name="output_private_space_shown">Private Space entrypoint shown.</string>
     <string name="output_private_space_unavailable">Private Space is unavailable.</string>
@@ -4228,6 +4233,11 @@ Your terminal, your colors.</string>
     <string name="preset_market_saved">Imported: %1$s
 To apply later: preset -apply %1$s</string>
     <string name="preset_market_title">Preset marketplace</string>
+    <string name="private_space_compatibility_notice">Private Space requires Android 15+, Re:TUI as your default launcher, and compatible device software. Some implementations, including certain Vivo/iQOO versions, may prevent locking, unlocking, or opening private apps. Use your phone’s Private Space interface if this happens.
+
+Disabling this option hides Re:TUI access; it does not lock Private Space. Save Settings to apply your choice.</string>
+    <string name="private_space_compatibility_title">Private Space compatibility</string>
+    <string name="private_space_enable_command">Enable command</string>
     <string name="reminder_add_reminder">ADD REMINDER</string>
     <string name="reminder_add_title">Add reminder</string>
     <string name="reminder_cancel">CANCEL</string>
@@ -4349,6 +4359,8 @@ To apply later: preset -apply %1$s</string>
     <string name="setting_behavior_enable_crt_filter_description">If true, Re:T-UI draws a CRT scanline overlay over the launcher</string>
     <string name="setting_behavior_enable_cyberdeck_mode_description">If true, Re:T-UI uses angular cyberdeck drawables while keeping the active theme colors</string>
     <string name="setting_behavior_enable_music_description">If true, you will be able to use Re:T-UI as a music player. Otherwise, the music command will try to communicate with the music player that your using</string>
+    <string name="setting_behavior_enable_private_command_description">Enable the private command and PRI drawer entry for Android Private Space on supported devices.</string>
+    <string name="setting_behavior_enable_private_command_label">Enable private command</string>
     <string name="setting_behavior_events_lookahead_days_description">Number of days after today to include in the launcher Events module. 0 shows only upcoming events today</string>
     <string name="setting_behavior_home_path_description">The path to your home directory</string>
     <string name="setting_behavior_htmlextractor_default_format_description">The default format used by htmlextract -use</string>
@@ -6076,6 +6088,20 @@ Ready for the next command</string>
     <string name="weather_location_required">Weather location is not configured.</string>
     <string name="weather_response_invalid">The weather service returned an invalid response.</string>
     <string name="weather_updated">Weather updated at</string>
+    <string name="widget_pane_add">+ Add widget</string>
+    <string name="widget_pane_close">Close widgets</string>
+    <string name="widget_pane_commands">Commands</string>
+    <string name="widget_pane_done">Done</string>
+    <string name="widget_pane_edit">Edit</string>
+    <string name="widget_pane_edit_hint">Drag to move. Drag a corner to resize. Tap Done to finish.</string>
+    <string name="widget_pane_empty">Your widgets live here.</string>
+    <string name="widget_pane_no_matches">No matching widgets.</string>
+    <string name="widget_pane_remove">Remove</string>
+    <string name="widget_pane_remove_description">Remove %1$s</string>
+    <string name="widget_pane_resize_corner">Resize widget from %1$s corner</string>
+    <string name="widget_pane_retry">Retry</string>
+    <string name="widget_pane_search">Search widgets or apps</string>
+    <string name="widget_pane_title">Widgets</string>
     <string name="wifi_label">WiFi:</string>
     <string name="workspace_bridge_connecting">Connecting</string>
     <string name="workspace_bridge_disconnected">Disconnected · refresh to reconnect</string>

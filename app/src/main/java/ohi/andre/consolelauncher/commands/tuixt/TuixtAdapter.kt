@@ -283,9 +283,22 @@ class TuixtAdapter(
             styleToggle(settingHolder.itemView.getContext(), settingHolder.toggle, checked)
             settingHolder.toggle.setOnClickListener(View.OnClickListener { v: View? ->
                 val next = !getCurrentValue(item).toBoolean()
-                changeDraft(item, next.toString())
-                styleToggle(settingHolder.itemView.getContext(), settingHolder.toggle, next)
-                settingHolder.toggle.sendAccessibilityEvent(AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED)
+                if (item === Behavior.enable_private_command && next) {
+                    val context = settingHolder.itemView.context
+                    TuixtDialog.showConfirm(context,
+                        context.getString(R.string.private_space_compatibility_title),
+                        context.getString(R.string.private_space_compatibility_notice),
+                        context.getString(R.string.private_space_enable_command),
+                        context.getString(android.R.string.cancel),
+                        TuixtDialog.ConfirmAction {
+                            changeDraft(item, "true")
+                            notifyDataSetChanged()
+                        })
+                } else {
+                    changeDraft(item, next.toString())
+                    styleToggle(settingHolder.itemView.getContext(), settingHolder.toggle, next)
+                    settingHolder.toggle.sendAccessibilityEvent(AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED)
+                }
             })
         } else if (XMLPrefsSave.COLOR == item.type() || XMLPrefsSave.AUTO_COLOR == item.type()) {
             settingHolder.toggle.setVisibility(View.GONE)
@@ -411,6 +424,7 @@ class TuixtAdapter(
 
     private fun displayLabel(context: Context, item: XMLPrefsSave): String {
         return when (item.label()) {
+            "enable_private_command" -> context.getString(R.string.setting_behavior_enable_private_command_label)
             "breath_out" -> context.getString(R.string.setting_behavior_breath_out_label)
             "breath_out_seconds" -> context.getString(R.string.setting_behavior_breath_out_seconds_label)
             "unified_status_border" -> context.getString(R.string.editor_tuixtadapter_unified_bottom_console_d8bbf)

@@ -12440,6 +12440,13 @@
     },
     "type": "string"
   },
+  "output_app_launch_failed": {
+    "formatted": true,
+    "forms": {
+      "other": "Android could not open this app. Try again or check its app settings."
+    },
+    "type": "string"
+  },
   "output_appnotfound": {
     "formatted": true,
     "forms": {
@@ -12601,10 +12608,31 @@
     },
     "type": "string"
   },
+  "output_private_command_disabled": {
+    "formatted": true,
+    "forms": {
+      "other": "The private command is disabled. Enable it in Behaviour settings under Commands."
+    },
+    "type": "string"
+  },
   "output_private_space_action_failed": {
     "formatted": true,
     "forms": {
       "other": "Private Space action failed."
+    },
+    "type": "string"
+  },
+  "output_private_space_auth_required": {
+    "formatted": true,
+    "forms": {
+      "other": "Complete Android authentication to unlock Private Space. Cancelling keeps it locked."
+    },
+    "type": "string"
+  },
+  "output_private_space_foreground_required": {
+    "formatted": true,
+    "forms": {
+      "other": "Android denied the Private Space request. Set Re:TUI as your default launcher, open its home screen, and try again."
     },
     "type": "string"
   },
@@ -12626,6 +12654,13 @@
     "formatted": true,
     "forms": {
       "other": "Private Space lock requested."
+    },
+    "type": "string"
+  },
+  "output_private_space_not_ready": {
+    "formatted": true,
+    "forms": {
+      "other": "Private Space is locked or still starting. Run private -unlock. If it remains unavailable, open private -settings."
     },
     "type": "string"
   },
@@ -13081,6 +13116,27 @@
     "formatted": true,
     "forms": {
       "other": "Preset marketplace"
+    },
+    "type": "string"
+  },
+  "private_space_compatibility_notice": {
+    "formatted": true,
+    "forms": {
+      "other": "Private Space requires Android 15+, Re:TUI as your default launcher, and compatible device software. Some implementations, including certain Vivo/iQOO versions, may prevent locking, unlocking, or opening private apps. Use your phone’s Private Space interface if this happens.\n\nDisabling this option hides Re:TUI access; it does not lock Private Space. Save Settings to apply your choice."
+    },
+    "type": "string"
+  },
+  "private_space_compatibility_title": {
+    "formatted": true,
+    "forms": {
+      "other": "Private Space compatibility"
+    },
+    "type": "string"
+  },
+  "private_space_enable_command": {
+    "formatted": true,
+    "forms": {
+      "other": "Enable command"
     },
     "type": "string"
   },
@@ -13861,6 +13917,20 @@
     "formatted": false,
     "forms": {
       "other": "If true, you will be able to use Re:T-UI as a music player. Otherwise, the music command will try to communicate with the music player that your using"
+    },
+    "type": "string"
+  },
+  "setting_behavior_enable_private_command_description": {
+    "formatted": true,
+    "forms": {
+      "other": "Enable the private command and PRI drawer entry for Android Private Space on supported devices."
+    },
+    "type": "string"
+  },
+  "setting_behavior_enable_private_command_label": {
+    "formatted": true,
+    "forms": {
+      "other": "Enable private command"
     },
     "type": "string"
   },
@@ -25378,6 +25448,104 @@
     "formatted": true,
     "forms": {
       "other": "Weather updated at"
+    },
+    "type": "string"
+  },
+  "widget_pane_add": {
+    "formatted": true,
+    "forms": {
+      "other": "+ Add widget"
+    },
+    "type": "string"
+  },
+  "widget_pane_close": {
+    "formatted": true,
+    "forms": {
+      "other": "Close widgets"
+    },
+    "type": "string"
+  },
+  "widget_pane_commands": {
+    "formatted": true,
+    "forms": {
+      "other": "Commands"
+    },
+    "type": "string"
+  },
+  "widget_pane_done": {
+    "formatted": true,
+    "forms": {
+      "other": "Done"
+    },
+    "type": "string"
+  },
+  "widget_pane_edit": {
+    "formatted": true,
+    "forms": {
+      "other": "Edit"
+    },
+    "type": "string"
+  },
+  "widget_pane_edit_hint": {
+    "formatted": true,
+    "forms": {
+      "other": "Drag to move. Drag a corner to resize. Tap Done to finish."
+    },
+    "type": "string"
+  },
+  "widget_pane_empty": {
+    "formatted": true,
+    "forms": {
+      "other": "Your widgets live here."
+    },
+    "type": "string"
+  },
+  "widget_pane_no_matches": {
+    "formatted": true,
+    "forms": {
+      "other": "No matching widgets."
+    },
+    "type": "string"
+  },
+  "widget_pane_remove": {
+    "formatted": true,
+    "forms": {
+      "other": "Remove"
+    },
+    "type": "string"
+  },
+  "widget_pane_remove_description": {
+    "formatted": true,
+    "forms": {
+      "other": "Remove %1$s"
+    },
+    "type": "string"
+  },
+  "widget_pane_resize_corner": {
+    "formatted": true,
+    "forms": {
+      "other": "Resize widget from %1$s corner"
+    },
+    "type": "string"
+  },
+  "widget_pane_retry": {
+    "formatted": true,
+    "forms": {
+      "other": "Retry"
+    },
+    "type": "string"
+  },
+  "widget_pane_search": {
+    "formatted": true,
+    "forms": {
+      "other": "Search widgets or apps"
+    },
+    "type": "string"
+  },
+  "widget_pane_title": {
+    "formatted": true,
+    "forms": {
+      "other": "Widgets"
     },
     "type": "string"
   },

@@ -33,7 +33,7 @@ object LauncherFontScale {
 
     @JvmStatic
     fun applyRecursively(view: View?) {
-        if (view == null || view is AsciiArtTextView) return
+        if (view == null || view is AsciiArtTextView || view is android.appwidget.AppWidgetHostView) return
 
         if (view is TextView) apply(view)
         if (view is ViewGroup) {

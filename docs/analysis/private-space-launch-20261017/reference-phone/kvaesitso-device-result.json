@@ -1,0 +1,26 @@
+{
+  "hardwareSerial": "10BE1C0FB40006A",
+  "referencePackage": "de.mm20.launcher2.release",
+  "versionName": "1.41.0",
+  "versionCode": 2026091500,
+  "apkSha256": "55e4a287f1198be22f040c2ad1443f5861b58b1d1394d7377221f1ad4448b810",
+  "referenceWasDefaultHome": true,
+  "hiddenProfilePermission": [
+    "android.permission.ACCESS_HIDDEN_PROFILES: granted=true"
+  ],
+  "profileStateAfterAuthentication": [
+    "Type: android.os.usertype.full.SYSTEM",
+    "State: RUNNING_UNLOCKED",
+    "Type: android.os.usertype.profile.PRIVATE",
+    "State: -1",
+    "Started users state: [0=RUNNING_UNLOCKED]"
+  ],
+  "foregroundAfterAuthentication": [
+    "mCurrentFocus=Window{2b1bba9 u0 de.mm20.launcher2.release/de.mm20.launcher2.ui.launcher.LauncherActivity type=1 }",
+    "mFocusedApp=ActivityRecord{199282870 u0 de.mm20.launcher2.release/de.mm20.launcher2.ui.launcher.LauncherActivity t34868 d0}"
+  ],
+  "userConfirmedPinAcceptedAndReturnedHome": true,
+  "referenceUnlockStartedPrivateProfile": false,
+  "privateAppLaunchFromReference": "Not reached: private profile stayed stopped after PIN",
+  "observedAuthentication": "User-entered PIN only; no credentials recorded"
+}

@@ -22,6 +22,7 @@ import android.os.Parcelable
 import android.os.Process
 import android.os.UserHandle
 import android.os.UserManager
+import android.provider.Settings
 import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -483,7 +484,7 @@ class AppsManager(context: Context) : XMLPrefsElement {
                 val profileType = profileType(launcherApps, profile, current, canAccessPrivateProfiles)
                 if (profileType == LaunchInfo.ProfileType.PRIVATE) {
                     privateProfile = profile
-                    privateSpaceLocked = isQuietModeEnabled(profile)
+                    privateSpaceLocked = !isPrivateProfileReady(profile)
                 }
                 for (activity in activities) {
                     val component = activity.getComponentName()
@@ -575,15 +576,17 @@ class AppsManager(context: Context) : XMLPrefsElement {
         }
     }
 
-    private fun isQuietModeEnabled(profile: UserHandle): Boolean {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) return true
-        val manager = context.getSystemService(Context.USER_SERVICE) as? UserManager ?: return true
-        return runCatching { manager.isQuietModeEnabled(profile) }.getOrDefault(true)
+    private fun isPrivateProfileReady(profile: UserHandle): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) return false
+        val manager = context.getSystemService(Context.USER_SERVICE) as? UserManager ?: return false
+        return runCatching {
+            privateProfileReady(manager.isQuietModeEnabled(profile), manager.isUserUnlocked(profile))
+        }.getOrDefault(false)
     }
 
     private fun refreshPrivateSpaceState() {
         val profile = privateProfile ?: return
-        privateSpaceLocked = isQuietModeEnabled(profile)
+        privateSpaceLocked = !isPrivateProfileReady(profile)
     }
 
     private fun isDefaultLauncher(): Boolean {
@@ -806,6 +809,7 @@ class AppsManager(context: Context) : XMLPrefsElement {
         if (launchContext == null || info == null) {
             return false
         }
+        if (info.isPrivateProfile && (!hasPrivateSpace() || isPrivateSpaceLocked())) return false
 
         if (!info.currentProfile) {
             try {
@@ -814,7 +818,7 @@ class AppsManager(context: Context) : XMLPrefsElement {
                 if (launcherApps == null) return false
                 launcherApps.startMainActivity(info.componentName, info.userHandle, null, null)
             } catch (e: Throwable) {
-                Tuils.log(e)
+                Log.w("AppsManager", "Profile app launch failed", e)
                 return false
             }
         } else {
@@ -1110,7 +1114,8 @@ class AppsManager(context: Context) : XMLPrefsElement {
         return ArrayList(hiddenApps?.filter { !it.isPrivateProfile } ?: emptyList())
     }
 
-    fun hasPrivateSpace(): Boolean = privateProfile != null && privateSpaceAccessAllowed()
+    fun hasPrivateSpace(): Boolean = XMLPrefsManager.getBoolean(Behavior.enable_private_command) &&
+        privateProfile != null && privateSpaceAccessAllowed()
 
     private fun privateSpaceAccessAllowed(): Boolean =
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM && isDefaultLauncher()
@@ -1151,27 +1156,31 @@ class AppsManager(context: Context) : XMLPrefsElement {
         val profile = privateProfile ?: return context.getString(R.string.output_private_space_unavailable)
         val manager = context.getSystemService(Context.USER_SERVICE) as? UserManager
             ?: return context.getString(R.string.output_private_space_unavailable)
-        val requested = runCatching { manager.requestQuietModeEnabled(quietMode, profile) }.getOrDefault(false)
-        if (!requested) return context.getString(R.string.output_private_space_action_failed)
-        privateSpaceLocked = quietMode
+        val requested = runCatching { manager.requestQuietModeEnabled(quietMode, profile) }
+            .onFailure { Log.w("AppsManager", "Private Space quiet-mode request failed", it) }
+        // Android owns the asynchronous transition, including credential confirmation.
+        refreshPrivateSpaceState()
         notifyPrivateSpaceUi()
-        return context.getString(if (quietMode) R.string.output_private_space_locked_now else R.string.output_private_space_unlock_requested)
+        return context.getString(privateSpaceRequestMessage(quietMode, requested))
     }
 
     fun openPrivateSpaceSettings(): String? {
         if (!hasPrivateSpace()) return context.getString(R.string.output_private_space_unavailable)
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.BAKLAVA) {
-            return context.getString(R.string.output_private_space_settings_android)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.BAKLAVA) {
+            val launcherApps = context.getSystemService(Context.LAUNCHER_APPS_SERVICE) as? LauncherApps
+            val sender = runCatching { launcherApps?.getPrivateSpaceSettingsIntent() }.getOrNull()
+            if (sender != null) {
+                try {
+                    context.startIntentSender(sender, null, 0, 0, 0)
+                    return null
+                } catch (e: Exception) {
+                    Log.w("AppsManager", "Private Space settings unavailable", e)
+                }
+            }
         }
-        val launcherApps = context.getSystemService(Context.LAUNCHER_APPS_SERVICE) as? LauncherApps
-            ?: return context.getString(R.string.output_private_space_unavailable)
-        val sender = runCatching { launcherApps.getPrivateSpaceSettingsIntent() }.getOrNull()
-            ?: return context.getString(R.string.output_private_space_unavailable)
-        val activity = context as? Activity
-            ?: return context.getString(R.string.output_private_space_unavailable)
         return runCatching {
-            activity.startIntentSender(sender, null, 0, 0, 0)
-            null
+            context.startActivity(Intent(Settings.ACTION_SECURITY_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            context.getString(R.string.output_private_space_settings_android)
         }.getOrElse { context.getString(R.string.output_private_space_unavailable) }
     }
 
@@ -2056,6 +2065,18 @@ class AppsManager(context: Context) : XMLPrefsElement {
 
         private const val PROFILE_PREFIX = "profile"
         var instance: XMLPrefsElement? = null
+
+        internal fun privateProfileReady(quietMode: Boolean, userUnlocked: Boolean): Boolean =
+            !quietMode && userUnlocked
+
+        internal fun privateSpaceRequestMessage(quietMode: Boolean, result: Result<Boolean>): Int = when {
+            result.exceptionOrNull() is SecurityException -> R.string.output_private_space_foreground_required
+            result.isFailure -> R.string.output_private_space_action_failed
+            !quietMode && result.getOrThrow() == false -> R.string.output_private_space_auth_required
+            result.getOrThrow() == false -> R.string.output_private_space_action_failed
+            quietMode -> R.string.output_private_space_locked_now
+            else -> R.string.output_private_space_unlock_requested
+        }
 
         internal fun profileTypeForUserType(
             userType: String?,

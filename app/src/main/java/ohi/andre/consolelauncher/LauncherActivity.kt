@@ -419,7 +419,6 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
         main = MainManager(this)
         attachLauncherUi(null, openStartupMenu = true, playBootSound = true)
         handleKeyboardShortcutIntent(intent)
-        System.gc()
     }
 
     fun keyboardShortcutApps(): List<LaunchInfo> {
@@ -665,7 +664,6 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
             if (maybeShowChangelog()) return
             uiManager!!.resume()
             requestStartupHomeAfterDraw()
-            uiManager!!.activateTerminalInput(openKeyboardOnStart)
             val guideMessage = GuideManager.consumePendingResumeMessage(this)
             if (!guideMessage.isNullOrEmpty()) {
                 uiManager!!.setOutput(guideMessage, TerminalManager.CATEGORY_OUTPUT)
@@ -796,7 +794,6 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
         if (hasFocus && this@LauncherActivity.uiManager != null && !StartupMenuManager.isFirstInstallPending(this)) {
             if (maybeShowChangelog()) return
             uiManager!!.activateTerminalInput(openKeyboardOnStart)
-            uiManager!!.scheduleTypefaceRefreshes()
         }
     }
 

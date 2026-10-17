@@ -31,10 +31,9 @@ import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.borderColor
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.dp
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.rect
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleButton
-import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleHeader
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleInput
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.stylePanel
-import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleScreen
+import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.stylePaneScreen
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.surfaceColor
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings.refreshFromLoadedPrefs
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
@@ -83,6 +82,7 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
         ThemeColorResolver.clearPreview()
         overridePendingTransition(0, 0)
         applyFullscreen(this)
+        androidx.core.view.WindowCompat.setDecorFitsSystemWindows(window, false)
 
         val intent = getIntent()
         asciiSettingsMode = MODE_ASCII_SETTINGS == intent.getStringExtra(MODE)
@@ -96,10 +96,10 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
         file = if (asciiSettingsMode) asciiFile else File(path!!)
 
         val screen = FrameLayout(this)
-        styleScreen(this, screen)
+        stylePaneScreen(this, screen)
         screen.setFitsSystemWindows(false)
         ViewCompat.setOnApplyWindowInsetsListener(screen) { view, insets ->
-            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
             val keyboard = insets.getInsets(WindowInsetsCompat.Type.ime())
             previewKeyboardVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
             view.setPadding(bars.left, bars.top, bars.right, maxOf(bars.bottom, keyboard.bottom))
@@ -107,10 +107,10 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
             insets
         }
         val contentHost = addFoldAwareHost(this, screen, ViewGroup.LayoutParams.MATCH_PARENT)
-
-        val root = LinearLayout(this)
-        root.setOrientation(LinearLayout.VERTICAL)
-        root.setPadding(dp(this, 14f), dp(this, 50f), dp(this, 14f), dp(this, 14f))
+        val viewport = FrameLayout(this)
+        contentHost.addView(viewport, ViewGroup.LayoutParams(-1, -1))
+        val surface = layoutInflater.inflate(R.layout.settings_surface, viewport, false)
+        val root = surface.findViewById<LinearLayout>(R.id.settings_panel)
         stylePanel(this, root)
         root.addOnLayoutChangeListener { _, _, top, _, bottom, _, _, _, _ ->
             appearancePreview?.setAvailableHeight(bottom - top, previewKeyboardVisible)
@@ -118,16 +118,7 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
         window.setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN or
             android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
 
-        val panelLeft = dp(this, 28f)
-        val panelTop = dp(this, 34f)
-        val panelParams = FrameLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.MATCH_PARENT
-        )
-        panelParams.setMargins(panelLeft, panelTop, dp(this, 28f), dp(this, 28f))
-        contentHost.addView(root, panelParams)
-
-        val header = TextView(this)
+        val header = surface.findViewById<TextView>(R.id.settings_header)
         header.setText(
             when {
                 asciiSettingsMode -> getString(R.string.editor_tuixtactivity_ascii_settings_4a299)
@@ -135,15 +126,10 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
                 else -> getString(R.string.editor_tuixtactivity_themer_93fef, file!!.getName())
             }
         )
-        styleHeader(this, header)
-        val headerParams = FrameLayout.LayoutParams(
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-        headerParams.gravity = Gravity.TOP or Gravity.START
-        headerParams.leftMargin = panelLeft + dp(this, 38f)
-        headerParams.topMargin = panelTop - dp(this, 11f)
-        contentHost.addView(header, headerParams)
+        TuixtTheme.stylePaneHeader(this, header)
+        viewport.addView(surface, FrameLayout.LayoutParams(-1, -1))
+        ohi.andre.consolelauncher.help.PanelBackdrop.install(viewport)
+        ohi.andre.consolelauncher.tuils.TerminalBorderRuntime.bind(root, header)
 
         // RecyclerView
         recyclerView = RecyclerView(this)
@@ -217,9 +203,9 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
                 Toast.makeText(this, getString(R.string.editor_tuixtactivity_changes_saved_previewing_launcher_8e180), Toast.LENGTH_SHORT)
                     .show()
                 LauncherActivity.previewIfRunning()
-                styleScreen(this, screen)
+                stylePaneScreen(this, screen)
                 stylePanel(this, root)
-                styleHeader(this, header)
+                TuixtTheme.stylePaneHeader(this, header)
                 styleInput(this, searchBox)
                 styleButton(this, btnCancel, false)
                 styleButton(this, btnSave, true)

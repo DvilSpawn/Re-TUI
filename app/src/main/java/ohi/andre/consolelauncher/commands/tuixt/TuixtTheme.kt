@@ -49,7 +49,7 @@ object TuixtTheme {
     fun dialogErrorColor(): Int = SettingsColorSafety.readable(ThemeColorResolver.color(Theme.error_text_color), color(Theme.dialog_panel_background_color))
 
     @JvmStatic
-    fun surfaceColor(): Int = color(Theme.settings_panel_background_color)
+    fun surfaceColor(): Int = ThemeColorResolver.color(Theme.settings_panel_background_color)
 
     @JvmStatic
     fun overlayColor(): Int = color(Theme.settings_screen_color)
@@ -62,6 +62,11 @@ object TuixtTheme {
             overlay.setAccentColor(textColor())
             view.foreground = overlay
         }
+    }
+
+    internal fun stylePaneScreen(context: Context, view: View) {
+        styleScreen(context, view)
+        view.setBackgroundColor(android.graphics.Color.TRANSPARENT)
     }
 
     @JvmStatic
@@ -82,6 +87,15 @@ object TuixtTheme {
 
     @JvmStatic
     fun styleHeader(context: Context, view: TextView) = styleHeader(context, view, false)
+
+    internal fun stylePaneHeader(context: Context, view: TextView) {
+        view.setTextColor(color(Theme.settings_header_text_color))
+        view.typeface = Tuils.getTypeface(context)
+        view.textSize = ohi.andre.consolelauncher.tuils.LauncherFontScale.terminalTextSizeSp()
+        view.background = TerminalBorderRuntime.tabDrawable(context,
+            color(Theme.settings_header_background_color), color(Theme.settings_header_border_color),
+            target = FrameTarget.HEADER)
+    }
 
     @JvmStatic
     fun styleDialogHeader(context: Context, view: TextView) = styleHeader(context, view, true)

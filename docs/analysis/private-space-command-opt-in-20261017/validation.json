@@ -1,0 +1,26 @@
+{
+  "unitSuite": {
+    "tests": 473,
+    "skipped": 5,
+    "failures": 0,
+    "errors": 0
+  },
+  "settingsInstrumentation": {
+    "tests": 1,
+    "passed": 1,
+    "durationSeconds": 3.388
+  },
+  "emulator": "retui_private_space_api36_20261017",
+  "privateUser": 11,
+  "apkSha256": "d3fd2097a43882a61219b70e7161c669f3a855fc654c242f499a299649888d70",
+  "phoneUpdated": false,
+  "newFeatureChecks": [
+    "cancel leaves opt-in off",
+    "confirm remains a draft until Save",
+    "Save enables command discovery",
+    "off waits for Save",
+    "all six disabled actions return an enable message without execution",
+    "disabled opt-in hides private apps without locking profile (first cycle of wider flow)"
+  ],
+  "widerRegression": "First authenticated launch and off/on gate passed; after cancellation the second authenticated unlock did not start the private profile in two runs. Remains unresolved; do not reuse earlier full-flow pass as validation of this candidate."
+}

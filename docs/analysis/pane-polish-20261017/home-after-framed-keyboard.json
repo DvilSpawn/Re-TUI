@@ -1,0 +1,23 @@
+{
+  "keyboardOnStart": true,
+  "framesEnabled": true,
+  "cycles": 10,
+  "firstDrawMs": [
+    37.826823,
+    42.351823,
+    45.415104,
+    39.488646,
+    43.558177,
+    46.047604,
+    41.405468,
+    35.697291,
+    31.455677,
+    53.674114
+  ],
+  "firstDrawMedianMs": 41.405468,
+  "firstDrawP95Ms": 53.674114,
+  "frameCount": 98,
+  "frameP95Ms": 32.560054,
+  "framesOver32ms": 6,
+  "framesOver100ms": 0
+}

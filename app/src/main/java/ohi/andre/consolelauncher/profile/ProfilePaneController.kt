@@ -72,6 +72,7 @@ class ProfilePaneController(
         host.removeAllViews()
         LayoutInflater.from(context).inflate(R.layout.profile_surface, host, true)
         overlay = host.findViewById(R.id.profile_overlay)
+        ohi.andre.consolelauncher.help.PanelBackdrop.installEmbedded(overlay as android.view.ViewGroup)
         window = host.findViewById(R.id.profile_window_border)
         header = host.findViewById(R.id.profile_window_label)
         close = host.findViewById(R.id.profile_close)

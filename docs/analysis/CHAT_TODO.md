@@ -95,3 +95,72 @@ The [resumed report](readiness-resume/README.md) supersedes earlier open-item no
 - [x] Build the signed candidate, verify installed APK bytes, and confirm normal launcher SSH authentication/window listing.
 
 See [final evidence and exact validation limits](termux-ssh/evidence/ssh-reconnect-fix-20261016/README.md). This closes the repeated reconnect blocker; the longer OEM/battery run and the other unchecked journeys above remain open. Final suite: 454 total, 449 passed, five opt-in skips, zero failures/errors. No public release was made.
+
+## Widget pane improvement — 17 October 2026
+
+Approved for implementation after the source review. Implemented and checked on the wireless Vivo phone and disposable emulator. Evidence: [widget pane results](widget-pane-20261017/README.md).
+
+- [x] Protect Android widget bindings across Spaces; remove destructive whole-host and guessed-ID cleanup.
+- [x] Preserve saved drag positions and anchor the correct edge during resizing.
+- [x] Retain host views while editing/resizing, and stop listening while the pane is hidden.
+- [x] Refresh installed widget providers when opening the picker.
+- [x] Reuse Calc/Help/Settings pane controls and safe-area geometry.
+- [x] Keep normal viewing clean, with badges/resize controls in edit mode and a collapsible command strip.
+- [x] Add a clear empty-state Add widget action and searchable widget previews.
+- [x] Replace tap-to-delete failure cards with Retry and explicit Remove actions.
+- [x] Add focused regression checks and validate native widget interactions on the wireless phone, including portrait/landscape, Spaces, resize, recovery, and recreation.
+
+Retain native Android widgets and existing commands. No new widget runtime, marketplace, or dependency is needed.
+
+- [x] Correct the language-resource configuration handoff exposed by real landscape testing; retain installed translations across rotation/font changes.
+- [x] Keep provider fonts and sizes intact during launcher typography refreshes.
+- [ ] Broader third-party widget/configuration/collection compatibility, palette coverage, and release lint/minification remain follow-up validation.
+
+Final focused validation: 458 unit tests passed, five existing live-network skips; 20 widget device checks and four language regressions passed across the Vivo/API 36 and emulator/API 35. No public release or everyday phone-app update.
+
+### Widget controls, home return, and panel backdrop — 2026-10-17
+
+- [x] Replace the widget arrows and overlaid edit buttons with a thin frame and four subtle corner grips; retain touch targets and accessible resize actions.
+- [x] Drag directly in Edit mode; keep normal widget taps and scrolling outside Edit mode. Move Remove into the bottom toolbar.
+- [x] Keep empty grid rows at their real cell positions, expose the scroll indicator, and honor provider resize maxima.
+- [x] Use the launcher suggestion chip component, padding, typography, and natural height in widget commands.
+- [x] Remove repeated resume/focus font traversals, duplicate keyboard activation/theme sends, and forced startup garbage collection. Cache immutable frame bytes and unchanged exported PNGs with invalidation on saved changes.
+- [x] Blur the launcher beneath Settings/Help/Calc and embedded panels; preserve Settings panel transparency. Provide dimming when window blur is disabled or unsupported, and clear embedded effects on hide/detach.
+- [x] Complete the recorded portrait/landscape acceptance checks, system-blur-disabled fallback check, and before/after framed-keyboard home timings. See `pane-polish-20261017/README.md` for the evidence.
+- [ ] Validate reported lag on additional affected users' devices and configurations; a single phone benchmark cannot establish that all home-return stalls are fixed.
+
+### Landscape output edge — 2026-10-17
+
+- [x] Remove the fixed output top gap in landscape, retain configured output/section margins, honor the system top inset, and keep the OUTPUT tab inside the available edge.
+- [x] Verify portrait → landscape → portrait restoration and user/system margin composition on API 35. Evidence: `output-landscape-edge-20261017/README.md`.
+
+### Settings always expanded — 2026-10-17
+
+- [x] Remove Settings hub/editor resizing, dragging, maximize/reset controls, and floating-window state handling. Keep the terminal frame, safe viewport, keyboard handling, blur, and drafts.
+- [x] Verify six recreation/geometry/draft/blur checks on API 35, plus the unit suite. Evidence: `settings-expanded-20261017/README.md`.
+- [x] Install the signed expanded-Settings update in place on the Vivo; verify APK bytes and retained app-data directories.
+
+### Expanded widget pane and live resize — 2026-10-17
+
+- [x] Keep the widget pane expanded within its available viewport; remove outer floating window controls and geometry persistence while retaining individual widget edit controls.
+- [x] Preview the actual native widget's size continuously while dragging, respect provider limits/fixed axes, coalesce size hints, and commit the grid size only on release. Restore size/options on cancellation or pane close.
+- [x] Verify native preview/cancel/close/snap behavior and expanded geometry with portrait/landscape emulator checks, plus four new pure bounds tests. Evidence: `widgets-expanded-20261017/README.md`.
+- [x] Install this combined update on the Vivo in the signed Private Space correction build; APK/data preservation evidence: `private-space-unlock-20261017/validation.json`.
+- [ ] Check physical-device resize fluidity.
+
+### Private Space unlock response — 2026-10-17
+
+- [x] Interpret Android's credential-required return value as pending authentication; distinguish real exceptions and security rejection. Read actual profile lock state instead of assuming the request already completed.
+- [x] Pass six Private Space unit checks and the complete unit suite, export/check localization assets, build and install in place on the Vivo with app data retained. Evidence: `private-space-unlock-20261017/README.md`.
+- [ ] Confirm Android credential prompt, successful unlock and cancellation remaining locked on the phone; user authentication is required for final confirmation.
+- [x] Compare official Kvaesitso v1.41.0 on the Vivo: default HOME and hidden-profile permission verified; PIN authentication returned home with the private profile still stopped. Restore Re:TUI HOME, keyboard and rotation defaults.
+- [x] Verify the same signed Re:TUI APK on an isolated Android 16 emulator: two PIN-authenticated PRI launches into the private user, cancellation remaining locked, and relocking hiding private apps. Evidence: `private-space-launch-20261017/emulator-api36/README.md`.
+- [ ] Resolve Vivo-specific profile startup/app launch compatibility. Standard Android emulator success and the Kvaesitso phone failure do not establish a working Vivo integration.
+- [x] Research online reports and inspect the phone framework read-only: Vivo skips standard quiet-mode locking and uses privileged profile lifecycle calls; record native-handoff direction and unresolved direct-launch diagnosis. Evidence: `private-space-launch-20261017/vivo-framework-rnd/README.md`.
+
+### Private command opt-in — 2026-10-17
+
+- [x] Add the default-off Behaviour command toggle, terminal-themed compatibility confirmation, draft/Save boundary, disabled execution message and hidden PRI/command discovery.
+- [x] Pass the Settings confirmation/cancel/save/disable emulator test and 473-case unit suite (five existing skips). Evidence: `private-space-command-opt-in-20261017/README.md`.
+- [x] Review requested µLauncher and Olauncher source and upstream issues; no verified Vivo workaround found. Evidence: `private-space-launch-20261017/additional-launcher-review.md`.
+- [ ] Resolve the current emulator unlock retry after cancelling authentication. The first private launch and opt-in gate passed; the second authenticated unlock did not start the private profile in two runs.

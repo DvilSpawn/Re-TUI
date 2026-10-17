@@ -1,167 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/android_widget_drawer_root"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@android:color/transparent"
-    android:clickable="true"
-    android:focusable="true"
-    android:visibility="gone">
-
-    <View
-        android:id="@+id/android_widget_drawer_dummy_input_anchor"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_alignParentBottom="true"
-        android:visibility="invisible" />
-
-    <LinearLayout
-        android:id="@+id/android_widget_drawer_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@id/android_widget_drawer_dummy_input_anchor"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="18dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="4dp"
-        android:background="@drawable/apps_drawer_border"
-        android:orientation="vertical"
-        android:padding="2dp">
-
-        <ScrollView
-            android:id="@+id/android_widget_drawer_scroll"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:clipToPadding="false"
-            android:fillViewport="false"
-            android:overScrollMode="ifContentScrolls"
-            android:paddingStart="14dp"
-            android:paddingTop="20dp"
-            android:paddingEnd="14dp"
-            android:paddingBottom="18dp"
-            android:scrollbars="none">
-
-            <GridLayout
-                android:id="@+id/android_widget_grid"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:columnCount="4"
-                android:orientation="horizontal" />
-
-        </ScrollView>
-
-        <LinearLayout
-            android:id="@+id/android_widget_input_group"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:gravity="center_vertical"
-            android:minHeight="42dp"
-            android:orientation="horizontal"
-            android:paddingStart="8dp"
-            android:paddingTop="6dp"
-            android:paddingEnd="8dp"
-            android:paddingBottom="6dp">
-
-            <TextView
-                android:id="@+id/android_widget_prefix"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/ui_android_widget_drawer_w"
-                style="@style/Retui.Text.Body" />
-
-            <EditText
-                android:id="@+id/android_widget_input"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="@null"
-                android:hint="@string/ui_android_widget_drawer_add_show_resize_remove"
-                android:imeOptions="actionGo|flagNoFullscreen"
-                android:importantForAutofill="no"
-                android:inputType="text|textNoSuggestions"
-                android:singleLine="true"
-                android:textCursorDrawable="@drawable/cursor"
-                style="@style/Retui.Text.Body" />
-
-            <TextView
-                android:id="@+id/android_widget_send"
-                android:layout_width="42dp"
-                android:layout_height="30dp"
-                android:gravity="center"
-                android:text="@string/ui_android_widget_drawer_run"
-                style="@style/Retui.Text.Caption" />
-
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@android:color/transparent" android:clickable="true" android:focusable="true"
+    android:clipChildren="false" android:clipToPadding="false" android:visibility="gone">
+    <FrameLayout android:id="@+id/android_widget_viewport" android:layout_width="match_parent" android:layout_height="match_parent"
+        android:clipChildren="false" android:clipToPadding="false">
+    <FrameLayout android:id="@+id/android_widget_surface" android:layout_width="match_parent"
+        android:layout_height="match_parent" android:paddingStart="8dp" android:paddingEnd="8dp"
+        android:paddingBottom="4dp" android:clipChildren="false" android:clipToPadding="false">
+        <LinearLayout android:id="@+id/android_widget_drawer_container" android:layout_width="match_parent"
+            android:layout_height="match_parent" android:layout_marginTop="18dp" android:layout_marginBottom="2dp"
+            android:orientation="vertical" android:paddingTop="28dp" android:paddingBottom="8dp"
+            android:paddingStart="8dp" android:paddingEnd="8dp">
+            <ScrollView android:id="@+id/android_widget_drawer_scroll" android:layout_width="match_parent"
+                android:layout_height="0dp" android:layout_weight="1" android:clipToPadding="false"
+                android:fillViewport="true" android:overScrollMode="ifContentScrolls" android:scrollbars="vertical" android:fadeScrollbars="false">
+                <FrameLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+                    <ohi.andre.consolelauncher.managers.widgets.WidgetGridLayout android:id="@+id/android_widget_grid" android:layout_width="match_parent"
+                        android:layout_height="wrap_content" android:columnCount="4" android:orientation="horizontal" />
+                    <LinearLayout android:id="@+id/android_widget_empty" android:layout_width="match_parent"
+                        android:layout_height="wrap_content" android:layout_gravity="center" android:gravity="center"
+                        android:orientation="vertical" android:paddingTop="32dp" android:paddingBottom="32dp" android:visibility="gone">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="@string/widget_pane_empty" style="@style/Retui.Text.Body" />
+                        <TextView android:id="@+id/android_widget_empty_add" android:layout_width="wrap_content"
+                            android:layout_height="48dp" android:gravity="center" android:paddingStart="16dp"
+                            android:paddingEnd="16dp" android:text="@string/widget_pane_add" style="@style/Retui.Text.Body" />
+                    </LinearLayout>
+                </FrameLayout>
+            </ScrollView>
+            <LinearLayout android:id="@+id/android_widget_commands" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:orientation="vertical" android:visibility="gone">
+                <LinearLayout android:id="@+id/android_widget_input_group" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:gravity="center_vertical" android:minHeight="48dp"
+                    android:orientation="horizontal" android:paddingStart="8dp" android:paddingEnd="8dp">
+                    <TextView android:id="@+id/android_widget_prefix" android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" android:text="@string/ui_android_widget_drawer_w" style="@style/Retui.Text.Body" />
+                    <EditText android:id="@+id/android_widget_input" android:layout_width="0dp" android:layout_height="48dp"
+                        android:layout_weight="1" android:background="@null" android:hint="@string/ui_android_widget_drawer_add_show_resize_remove"
+                        android:imeOptions="actionGo|flagNoFullscreen" android:importantForAutofill="no"
+                        android:inputType="text|textNoSuggestions" android:singleLine="true"
+                        android:textCursorDrawable="@drawable/cursor" style="@style/Retui.Text.Body" />
+                    <TextView android:id="@+id/android_widget_send" android:layout_width="48dp" android:layout_height="48dp"
+                        android:gravity="center" android:text="@string/ui_android_widget_drawer_run" style="@style/Retui.Text.Caption" />
+                </LinearLayout>
+                <HorizontalScrollView android:id="@+id/android_widget_suggestions_container" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:fillViewport="false" android:focusable="false"
+                    android:overScrollMode="never" android:scrollbars="none">
+                    <LinearLayout android:id="@+id/android_widget_suggestions_group" android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" android:gravity="center_vertical" android:orientation="horizontal" />
+                </HorizontalScrollView>
+            </LinearLayout>
+            <TextView android:id="@+id/android_widget_drawer_footer" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:gravity="center" android:visibility="gone" style="@style/Retui.Text.Caption" />
+            <LinearLayout android:id="@+id/android_widget_actions" android:layout_width="match_parent"
+                android:layout_height="48dp" android:orientation="horizontal" android:gravity="center_vertical">
+                <TextView android:id="@+id/android_widget_add" android:layout_width="0dp" android:layout_height="match_parent"
+                    android:layout_weight="1" android:gravity="center" android:text="@string/widget_pane_add" style="@style/Retui.Text.Body" />
+                <TextView android:id="@+id/android_widget_edit" android:layout_width="0dp" android:layout_height="match_parent"
+                    android:layout_weight="1" android:gravity="center" android:text="@string/widget_pane_edit" style="@style/Retui.Text.Body" />
+                <TextView android:id="@+id/android_widget_remove" android:layout_width="0dp" android:layout_height="match_parent"
+                    android:layout_weight="1" android:gravity="center" android:visibility="gone"
+                    android:text="@string/widget_pane_remove" style="@style/Retui.Text.Body" />
+                <TextView android:id="@+id/android_widget_command_toggle" android:layout_width="0dp" android:layout_height="match_parent"
+                    android:layout_weight="1" android:gravity="center" android:text="@string/widget_pane_commands" style="@style/Retui.Text.Body" />
+            </LinearLayout>
         </LinearLayout>
-
-        <HorizontalScrollView
-            android:id="@+id/android_widget_suggestions_container"
-            android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:layout_marginTop="2dp"
-            android:fillViewport="false"
-            android:focusable="false"
-            android:overScrollMode="never"
-            android:scrollbars="none">
-
-            <LinearLayout
-                android:id="@+id/android_widget_suggestions_group"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="center_vertical"
-                android:orientation="horizontal" />
-
-        </HorizontalScrollView>
-
-    </LinearLayout>
-
-    <TextView
-        android:id="@+id/android_widget_drawer_header"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignStart="@id/android_widget_drawer_container"
-        android:layout_alignTop="@id/android_widget_drawer_container"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="-10dp"
-        android:background="@drawable/apps_drawer_header_border"
-        android:fontFamily="monospace"
-        android:paddingStart="12dp"
-        android:paddingTop="2dp"
-        android:paddingEnd="12dp"
-        android:paddingBottom="2dp"
-        android:text="@string/ui_android_widget_drawer_widgets_0"
-        style="@style/Retui.Text.Body" />
-
-    <TextView
-        android:id="@+id/android_widget_drawer_add"
-        android:layout_width="42dp"
-        android:layout_height="34dp"
-        android:layout_alignTop="@id/android_widget_drawer_container"
-        android:layout_alignEnd="@id/android_widget_drawer_container"
-        android:layout_marginTop="-10dp"
-        android:layout_marginEnd="24dp"
-        android:background="@drawable/apps_drawer_header_border"
-        android:fontFamily="monospace"
-        android:gravity="center"
-        android:text="@string/ui_android_widget_drawer_x"
-        android:textSize="20sp" />
-
-    <TextView
-        android:id="@+id/android_widget_drawer_footer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignEnd="@id/android_widget_drawer_container"
-        android:layout_alignBottom="@id/android_widget_drawer_container"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="78dp"
-        android:background="@drawable/apps_drawer_header_border"
-        android:fontFamily="monospace"
-        android:paddingStart="12dp"
-        android:paddingTop="2dp"
-        android:paddingEnd="12dp"
-        android:paddingBottom="2dp"
-        android:text="@string/ui_android_widget_drawer_grid_4"
-        style="@style/Retui.Text.Control" />
-
-</RelativeLayout>
+        <FrameLayout android:id="@+id/android_widget_header_row" android:layout_width="match_parent" android:layout_height="48dp"
+            android:layout_marginStart="18dp" android:layout_marginEnd="18dp" android:layout_marginTop="8dp">
+            <FrameLayout android:layout_width="match_parent" android:layout_height="20dp" android:layout_marginEnd="58dp">
+                <TextView android:id="@+id/android_widget_drawer_header" android:layout_width="wrap_content" android:layout_height="20dp"
+                    android:gravity="center_vertical" android:paddingStart="10dp" android:paddingEnd="10dp"
+                    android:singleLine="true" android:ellipsize="end" android:text="@string/ui_android_widget_drawer_widgets_0" />
+            </FrameLayout>
+            <TextView android:id="@+id/android_widget_drawer_add" android:layout_width="48dp" android:layout_height="48dp"
+                android:layout_gravity="top|end" android:gravity="top|center_horizontal" android:contentDescription="@string/widget_pane_close"
+                android:text="@string/ui_android_widget_drawer_x" style="@style/Retui.Text.Body" />
+        </FrameLayout>
+    </FrameLayout>
+    </FrameLayout>
+</FrameLayout>

@@ -95,7 +95,8 @@ object LanguagePacks {
 
     fun wrap(context: Context): Context {
         if (!ready) return context
-        val configuration = Configuration(context.resources.configuration)
+        // Override language only; orientation, density and window size must follow the host.
+        val configuration = Configuration()
         configure(configuration)
         val configured = context.createConfigurationContext(configuration)
         return object : ContextWrapper(configured) {
@@ -105,9 +106,10 @@ object LanguagePacks {
 
     fun resources(base: Resources): Resources {
         if (!ready) return base
-        if (base is PackResources) return if (base.createdGeneration == generation) base else resources(base.original)
+        if (base is PackResources) return if (base.createdGeneration == generation &&
+            base.originalConfiguration == base.original.configuration) base else resources(base.original)
         return synchronized(wrappers) {
-            wrappers[base]?.get() ?: run {
+            wrappers[base]?.get()?.takeIf { it.createdGeneration == generation && it.originalConfiguration == base.configuration } ?: run {
                 val config = Configuration(base.configuration)
                 configure(config)
                 val englishConfig = Configuration(config).apply { setLocale(Locale.ENGLISH) }
@@ -124,6 +126,7 @@ object LanguagePacks {
 private class PackResources(val original: Resources, config: Configuration, private val english: Resources) :
     Resources(original.assets, original.displayMetrics, config) {
     val createdGeneration = LanguagePacks.generation
+    val originalConfiguration = Configuration(original.configuration)
     private fun key(id: Int) = runCatching { getResourceEntryName(id) }.getOrNull()
     private fun own(id: Int): String? = key(id)?.takeIf { LanguagePacks.definition(it) != null }
     override fun getText(id: Int): CharSequence {

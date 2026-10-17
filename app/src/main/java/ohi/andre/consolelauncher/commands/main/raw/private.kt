@@ -5,6 +5,8 @@ import ohi.andre.consolelauncher.commands.CommandAbstraction
 import ohi.andre.consolelauncher.commands.ExecutePack
 import ohi.andre.consolelauncher.commands.main.MainPack
 import ohi.andre.consolelauncher.commands.main.specific.ParamCommand
+import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
+import ohi.andre.consolelauncher.managers.xml.options.Behavior
 
 class `private` : ParamCommand() {
     private enum class Param : ohi.andre.consolelauncher.commands.main.Param {
@@ -60,7 +62,9 @@ class `private` : ParamCommand() {
     override fun paramForString(pack: MainPack, param: String): ohi.andre.consolelauncher.commands.main.Param? =
         Param.get(param)
 
-    override fun doThings(pack: ExecutePack): String? = null
+    override fun doThings(pack: ExecutePack): String? =
+        if (XMLPrefsManager.getBoolean(Behavior.enable_private_command)) null
+        else pack.context.getString(R.string.output_private_command_disabled)
 
     override fun helpRes(): Int = R.string.help_private
 

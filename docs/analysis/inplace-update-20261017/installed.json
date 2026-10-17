@@ -1,0 +1,23 @@
+{
+  "serial": "10BE1C0FB40006A",
+  "package": "com.dvil.tui_renewed",
+  "installed": true,
+  "installedApkSha256": "5a79bfd3940762bf79fb1f59e9567c4a0198b1dc20b4b5494fe6cac80a1c63d8",
+  "exactArtifactMatches": true,
+  "signersMatch": true,
+  "firstInstallTimePreserved": true,
+  "appDataInodesPreserved": true,
+  "packageAfter": [
+    "Preferred Activities User 0:",
+    "versionCode=503 minSdk=23 targetSdk=36",
+    "versionName=3",
+    "lastUpdateTime=2026-10-17 10:49:16",
+    "User 0: ceDataInode=1746886 deDataInode=1746973 installed=true hidden=false vHidden=1 suspended=false distractionFlags=0 stopped=false vStopped=false notLaunched=false enabled=0 instant=false virtual=false quarantined=false",
+    "dataDir=/data/user/0/com.dvil.tui_renewed",
+    "firstInstallTime=2026-10-16 08:05:59",
+    "dataDir=null",
+    "firstInstallTime=2026-10-16 08:05:59",
+    "User 0:"
+  ],
+  "launch": "Starting: Intent { act=android.intent.action.MAIN cat=[android.intent.category.HOME] cmp=com.dvil.tui_renewed/ohi.andre.consolelauncher.LauncherActivity }\nStatus: ok\nLaunchState: WARM\nActivity: com.dvil.tui_renewed/ohi.andre.consolelauncher.LauncherActivity\nTotalTime: 584\nWaitTime: 588\nComplete"
+}

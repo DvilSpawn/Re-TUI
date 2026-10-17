@@ -1,0 +1,28 @@
+{
+  "tests": 463,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 5,
+  "passed": 458,
+  "apk_sha256": "fa86468293fc4b68fb49299640a63d02652a397fa3fded4111714b5403db291c",
+  "device_checks": {
+    "phone-portrait-results.txt": 5,
+    "phone-landscape-results.txt": 5,
+    "phone-language-results.txt": 2,
+    "emulator-portrait-results.txt": 5,
+    "emulator-landscape-results.txt": 5,
+    "emulator-language-results.txt": 2
+  },
+  "device_checks_passed": 24,
+  "phone_installed_apk_sha256": "fa86468293fc4b68fb49299640a63d02652a397fa3fded4111714b5403db291c",
+  "emulator_installed_apk_sha256": "fa86468293fc4b68fb49299640a63d02652a397fa3fded4111714b5403db291c",
+  "cleanup": {
+    "phone_test_apps_removed": true,
+    "emulator_test_apps_removed": true,
+    "binding_grants_revoked": true,
+    "phone_rotation_restored": true,
+    "emulator_rotation_restored": true,
+    "phone_ime_unchanged": "com.dvil.retui.keyboard/.RetuiKeyboardService",
+    "owned_emulator_stopped": true
+  }
+}

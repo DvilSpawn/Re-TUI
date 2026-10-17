@@ -1,0 +1,87 @@
+{
+  "branch": "dvil/termux-ssh-analysis",
+  "phone": {
+    "model": "Vivo I2220",
+    "serial": "10BE1C0FB40006A",
+    "api": 36,
+    "package": "com.dvil.tui_renewed.termuxsshdebug",
+    "everydayPackageChanged": false
+  },
+  "unitTests": {
+    "tests": 463,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 5
+  },
+  "acceptanceRuns": {
+    "phone-portrait-release-check.txt": 13,
+    "phone-landscape-final.txt": 9,
+    "phone-blur-disabled.txt": 1,
+    "phone-picker-final-api-guard.txt": 1
+  },
+  "performance": {
+    "beforeFramedKeyboard": {
+      "keyboardOnStart": true,
+      "framesEnabled": true,
+      "cycles": 10,
+      "firstDrawMs": [
+        81.854948,
+        50.032291,
+        87.669219,
+        70.663125,
+        66.399792,
+        59.655521,
+        59.44875,
+        66.923907,
+        64.086614,
+        68.149532
+      ],
+      "firstDrawMedianMs": 66.399792,
+      "firstDrawP95Ms": 87.669219,
+      "frameCount": 92,
+      "frameP95Ms": 60.659326,
+      "framesOver32ms": 24,
+      "framesOver100ms": 0
+    },
+    "afterFramedKeyboard": {
+      "keyboardOnStart": true,
+      "framesEnabled": true,
+      "cycles": 10,
+      "firstDrawMs": [
+        37.826823,
+        42.351823,
+        45.415104,
+        39.488646,
+        43.558177,
+        46.047604,
+        41.405468,
+        35.697291,
+        31.455677,
+        53.674114
+      ],
+      "firstDrawMedianMs": 41.405468,
+      "firstDrawP95Ms": 53.674114,
+      "frameCount": 98,
+      "frameP95Ms": 32.560054,
+      "framesOver32ms": 6,
+      "framesOver100ms": 0
+    },
+    "beforeApkSha256": "f3b0cd7a6fcef74d1dc20d3e78b1f4f8cdbdc3bc95bf9d1357db3d3a9a2f6142",
+    "afterApkSha256": "2a5360ddde92b3219f4baf3b82279ca21f8dcd2051089ee31bb10b940e0469e9"
+  },
+  "finalApkSha256": "c4c883fcd7cbe153f3be9585b9a5194a076e1dfcd920e688b230c12e150e2e84",
+  "finalLint": {
+    "errors": 0,
+    "fatal": 0,
+    "warnings": 620,
+    "hints": 311
+  },
+  "released": false,
+  "cleanup": {
+    "isolatedPackagesRemoved": true,
+    "keyboardPreserved": "com.dvil.retui.keyboard/.RetuiKeyboardService",
+    "accelerometerRotation": 0,
+    "userRotation": 0,
+    "disableWindowBlursRestored": 0
+  }
+}

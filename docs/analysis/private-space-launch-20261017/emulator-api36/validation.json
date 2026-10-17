@@ -1,0 +1,35 @@
+{
+  "emulator": "retui_private_space_api36_20261017",
+  "serial": "emulator-5580",
+  "sdk": "36",
+  "release": "16",
+  "fingerprint": "google/sdk_gphone64_arm64/emu64a:16/BE4B.251210.005/14574095:user/release-keys",
+  "systemImage": "android-36.1/google_apis_playstore/arm64-v8a",
+  "targetPackage": "com.dvil.tui_renewed",
+  "targetApkSha256": "d2279958fc4556192ab8b1744282d7a4f118aa3e7d2d97cfcd93c4bf64023748",
+  "matchesVivoInstalledCandidate": true,
+  "privateUserId": 11,
+  "fixturePackage": "dev.retui.privatespacetest",
+  "fixtureInstalledInPersonalProfile": false,
+  "fixtureProvisioning": "ADB-created disposable PRIVATE profile; device test PIN configured before creating final profile; test fixture initially started for installation. All measured unlocks used Android authentication UI, not administrative user-start commands.",
+  "checks": {
+    "androidPinAuthentication": true,
+    "privateDrawerAppLaunchInPrivateUser": true,
+    "successfulUnlockAndLaunchCycles": 2,
+    "cancelKeepsLocked": true,
+    "relockHidesPrivateApps": true,
+    "finalProfileLocked": true
+  },
+  "instrumentationTests": {
+    "tests": 1,
+    "failures": 0,
+    "durationSeconds": 51.491
+  },
+  "phoneReference": "../reference-phone/kvaesitso-device-result.json",
+  "limitations": [
+    "Native first-use Private Space setup wizard was not tested.",
+    "Vivo unlock/app-launch compatibility is not resolved by this emulator result.",
+    "Google Play services logged background-service errors while the disposable profile stopped; no Re:TUI crash was observed during the passing test."
+  ],
+  "emulatorStopped": true
+}

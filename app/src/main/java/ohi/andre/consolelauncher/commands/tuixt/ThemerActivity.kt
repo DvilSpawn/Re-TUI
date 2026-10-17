@@ -63,7 +63,7 @@ import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleInput
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleIconButton
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleListItem
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.stylePanel
-import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleScreen
+import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.stylePaneScreen
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleToggle
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.textColor
 import ohi.andre.consolelauncher.managers.BackupManager
@@ -197,36 +197,30 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
 
         val screen = FrameLayout(this)
         screenRoot = screen
-        styleScreen(this, screen)
-        screen.setFitsSystemWindows(true)
+        stylePaneScreen(this, screen)
+        androidx.core.view.WindowCompat.setDecorFitsSystemWindows(window, false)
+        androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(screen) { view, insets ->
+            val bars = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars() or
+                androidx.core.view.WindowInsetsCompat.Type.displayCutout())
+            val keyboard = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.ime())
+            view.setPadding(bars.left, bars.top, bars.right, maxOf(bars.bottom, keyboard.bottom))
+            insets
+        }
         val contentHost = addFoldAwareHost(this, screen, ViewGroup.LayoutParams.MATCH_PARENT)
-
-        val root = LinearLayout(this)
+        val viewport = FrameLayout(this)
+        contentHost.addView(viewport, ViewGroup.LayoutParams(-1, -1))
+        val surface = layoutInflater.inflate(R.layout.settings_surface, viewport, false)
+        val root = surface.findViewById<LinearLayout>(R.id.settings_panel)
         panelRoot = root
-        root.setOrientation(LinearLayout.VERTICAL)
-        root.setPadding(dp(this, 14f), dp(this, 50f), dp(this, 14f), dp(this, 14f))
         stylePanel(this, root)
-
-        val panelLeft = dp(this, 28f)
-        val panelTop = dp(this, 34f)
-        val panelParams = FrameLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.MATCH_PARENT
-        )
-        panelParams.setMargins(panelLeft, panelTop, dp(this, 28f), dp(this, 28f))
-        contentHost.addView(root, panelParams)
-
-        header = TextView(this)
+        header = surface.findViewById(R.id.settings_header)
         header!!.setText(getHeaderText(section))
-        TuixtTheme.styleHeader(this, header!!)
-        val headerParams = FrameLayout.LayoutParams(
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-        headerParams.gravity = Gravity.TOP or Gravity.START
-        headerParams.leftMargin = panelLeft + dp(this, 38f)
-        headerParams.topMargin = panelTop - dp(this, 11f)
-        contentHost.addView(header, headerParams)
+        TuixtTheme.stylePaneHeader(this, header!!)
+        viewport.addView(surface, FrameLayout.LayoutParams(-1, -1))
+        ohi.andre.consolelauncher.help.PanelBackdrop.install(viewport)
+        ohi.andre.consolelauncher.tuils.TerminalBorderRuntime.bind(root, header)
+        window.setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN or
+            android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
 
         recyclerView = RecyclerView(this)
         recyclerView!!.setLayoutParams(
@@ -444,9 +438,9 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
         deliverCompletedOperation()
         freezeWallpaperInteraction()
         applyFullscreen(this)
-        screenRoot?.let { styleScreen(this, it) }
+        screenRoot?.let { stylePaneScreen(this, it) }
         panelRoot?.let { stylePanel(this, it) }
-        header?.let { TuixtTheme.styleHeader(this, it) }
+        header?.let { TuixtTheme.stylePaneHeader(this, it) }
         sectionsAdapter?.notifyDataSetChanged()
         supportFooter?.let { footer ->
             for (index in 0 until footer.childCount) {

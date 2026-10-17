@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="setting_behavior_enable_private_command_label">Enable private command</string>
+    <string name="setting_behavior_enable_private_command_description">Enable the private command and PRI drawer entry for Android Private Space on supported devices.</string>
+    <string name="private_space_compatibility_title">Private Space compatibility</string>
+    <string name="private_space_compatibility_notice">Private Space requires Android 15+, Re:TUI as your default launcher, and compatible device software. Some implementations, including certain Vivo/iQOO versions, may prevent locking, unlocking, or opening private apps. Use your phone’s Private Space interface if this happens.\n\nDisabling this option hides Re:TUI access; it does not lock Private Space. Save Settings to apply your choice.</string>
+    <string name="private_space_enable_command">Enable command</string>
+    <string name="output_private_command_disabled">The private command is disabled. Enable it in Behaviour settings under Commands.</string>
+</resources>

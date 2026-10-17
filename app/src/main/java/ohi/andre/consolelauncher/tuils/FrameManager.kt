@@ -116,6 +116,9 @@ object FrameManager {
     ) {
         override fun sizeOf(key: String, value: LoadedFrame): Int = value.bitmap.allocationByteCount
     }
+    private val sharedSources = object : LruCache<String, SharedFrameSource>(4 * 1024 * 1024) {
+        override fun sizeOf(key: String, value: SharedFrameSource): Int = value.png.size
+    }
     private val invalidAssets = HashSet<String>()
     @Volatile private var cachedState: FrameState? = null
     @Volatile private var bundledPackReady = false
@@ -603,10 +606,12 @@ object FrameManager {
         }
     }
 
+    @Synchronized
     fun sharedSource(context: Context, target: FrameTarget): SharedFrameSource? {
         if (!isEnabled(context)) return null
         val state = currentState()
         val assetId = state.assignments[assignmentKey(resolvedTarget(state.applyToAll, target))] ?: return null
+        sharedSources.get(assetId)?.let { return it }
         return try {
             val parsed = parseBundle(FileInputStream(assetFile(frameDir(), assetId)).use {
                 it.readLimited(MAX_BUNDLE_BYTES, LocalizedArgumentException(R.string.manager_framemanager_frame_bundle_is_too_large_13aa8))
@@ -629,7 +634,7 @@ object FrameManager {
                 parsed.spec.leftMode,
                 parsed.spec.centerMode,
                 parsed.spec.filtering
-            )
+            ).also { sharedSources.put(assetId, it) }
         } catch (error: Exception) {
             Log.e("TUI-FRAME", "Unable to share $assetId frame", error)
             null
@@ -770,6 +775,7 @@ object FrameManager {
     @Synchronized
     private fun clearCache() {
         cache.evictAll()
+        sharedSources.evictAll()
         invalidAssets.clear()
         cachedState = null
         bundledPackReady = false

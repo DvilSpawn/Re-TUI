@@ -1,0 +1,13 @@
+# Expanded widget pane and live widget resizing
+
+The outer widget pane always fills its available viewport. Removed its floating window wrapper, move/resize/maximize/reset controls, and geometry reads/writes. Display margins, keyboard insets, split-pane placement, close button, backdrop blur, commands, and the actual widgets' edit controls remain.
+
+Individual widgets now preview resizing in pixels during a corner drag. The existing AppWidgetHostView is remeasured and laid out at the preview bounds, so native content can reflow before the pointer is released. Provider min/max sizes and fixed axes constrain the preview. Provider size hints are coalesced to at most one pending update every 80ms; layout updates follow the display's normal rendering cadence. Saved positions/sizes remain unchanged during the gesture. Release commits the snapped grid size and resolves collisions. Cancel, pane close, and interrupted layout restore the original provider options and discard temporary geometry.
+
+Validation: APK builds and 467 unit cases completed with 462 passing, five opt-in live-network cases skipped, and zero failures. Four new pure checks cover sub-cell pixel movement, anchored corners, bounds, and fixed axes. The API 35 emulator's seven widget checks pass in portrait and landscape, including native preview before release, provider hints during the drag, cancellation/close restoration, final snap, retained widget identity, no floating controls despite old saved geometry, real scrolling, chip-height parity, keyboard clearance, picker, recreation, and Space ownership safety. Final parent-routing checks send screen-coordinate gestures through the widget frame rather than directly to its grip; results are in the `emulator-parent-gesture-*.txt` files.
+
+The screenshots named `widgets-live-resize-*.png` were captured while the drag was still held. This fixture is a real native AppWidget from the test APK. Third-party widgets can deliver their own responsive layouts asynchronously; broad provider/OEM compatibility and physical-device fluidity remain unverified for this revision.
+
+Iteration logs retain an initial System UI ANR that blocked emulator input and an overly restrictive test assumption that chips must be shorter than 48dp. The final chip check compares directly with the configured launcher chip height, which correctly permits larger font/padding settings. The emulator ANR dialog was cleared before the successful acceptance runs.
+
+The regular launcher APK is signed and prepared for an in-place update. The phone disconnected and its advertised endpoint refused reconnection; see `validation.json` for installation status. No commit or public release was made.

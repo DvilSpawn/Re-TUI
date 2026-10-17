@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="ohi.andre.consolelauncher.managers.AppsManagerPrivateSpaceTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-10-17T08:36:19.911Z" hostname="Makos-MacBook-Air-6.local" time="0.001">
+  <properties/>
+  <testcase name="acceptedRequestsDoNotClaimTheTransitionIsFinished" classname="ohi.andre.consolelauncher.managers.AppsManagerPrivateSpaceTest" time="0.0"/>
+  <testcase name="profileTypesDoNotTreatPrivateProfilesAsWorkProfiles" classname="ohi.andre.consolelauncher.managers.AppsManagerPrivateSpaceTest" time="0.0"/>
+  <testcase name="unlockNeedingCredentialsIsPendingAuthenticationRatherThanFailure" classname="ohi.andre.consolelauncher.managers.AppsManagerPrivateSpaceTest" time="0.0"/>
+  <testcase name="platformExceptionsAndRejectedLockStillReportFailure" classname="ohi.andre.consolelauncher.managers.AppsManagerPrivateSpaceTest" time="0.0"/>
+  <testcase name="privateProfileVisibilityIsLockedToThePrivateSurface" classname="ohi.andre.consolelauncher.managers.AppsManagerPrivateSpaceTest" time="0.0"/>
+  <testcase name="securityRejectionExplainsTheForegroundDefaultLauncherRequirement" classname="ohi.andre.consolelauncher.managers.AppsManagerPrivateSpaceTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

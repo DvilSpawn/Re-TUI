@@ -1,0 +1,156 @@
+
+> Task :app:validateRuntimeNotices
+Verified notice records for 73 external runtime components
+
+> Task :app:validateSourceInputs
+> Task :app:preBuild
+> Task :app:prePlaystoreDebugBuild
+> Task :app:mergePlaystoreDebugNativeDebugMetadata NO-SOURCE
+> Task :app:generatePlaystoreDebugBuildConfig UP-TO-DATE
+> Task :app:generatePlaystoreDebugResValues UP-TO-DATE
+> Task :app:generatePlaystoreDebugResources UP-TO-DATE
+> Task :app:packagePlaystoreDebugResources UP-TO-DATE
+> Task :retui-contract:preBuild UP-TO-DATE
+> Task :retui-contract:preDebugBuild UP-TO-DATE
+> Task :retui-contract:processDebugNavigationResources UP-TO-DATE
+> Task :retui-datetime-picker:preBuild UP-TO-DATE
+> Task :retui-datetime-picker:preDebugBuild UP-TO-DATE
+> Task :retui-datetime-picker:processDebugNavigationResources UP-TO-DATE
+> Task :app:processPlaystoreDebugNavigationResources UP-TO-DATE
+> Task :app:parsePlaystoreDebugLocalResources UP-TO-DATE
+> Task :app:generatePlaystoreDebugRFile UP-TO-DATE
+> Task :retui-contract:generateDebugResources UP-TO-DATE
+> Task :retui-contract:packageDebugResources UP-TO-DATE
+> Task :retui-contract:parseDebugLocalResources UP-TO-DATE
+> Task :retui-contract:generateDebugRFile UP-TO-DATE
+> Task :retui-contract:compileDebugKotlin UP-TO-DATE
+> Task :retui-contract:javaPreCompileDebug UP-TO-DATE
+> Task :retui-contract:compileDebugJavaWithJavac NO-SOURCE
+> Task :retui-contract:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :retui-datetime-picker:generateDebugResources UP-TO-DATE
+> Task :retui-datetime-picker:packageDebugResources UP-TO-DATE
+> Task :retui-datetime-picker:parseDebugLocalResources UP-TO-DATE
+> Task :retui-datetime-picker:generateDebugRFile UP-TO-DATE
+> Task :retui-datetime-picker:compileDebugKotlin UP-TO-DATE
+> Task :retui-datetime-picker:javaPreCompileDebug UP-TO-DATE
+> Task :retui-datetime-picker:compileDebugJavaWithJavac NO-SOURCE
+> Task :retui-datetime-picker:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :app:javaPreCompilePlaystoreDebug UP-TO-DATE
+> Task :app:generatePlaystoreDebugAssets UP-TO-DATE
+> Task :app:runtimeNotices UP-TO-DATE
+> Task :app:termuxHelperAssets UP-TO-DATE
+> Task :retui-contract:generateDebugAssets UP-TO-DATE
+> Task :retui-contract:mergeDebugAssets UP-TO-DATE
+> Task :retui-datetime-picker:generateDebugAssets UP-TO-DATE
+> Task :retui-datetime-picker:mergeDebugAssets UP-TO-DATE
+> Task :app:mergePlaystoreDebugAssets UP-TO-DATE
+> Task :app:compressPlaystoreDebugAssets UP-TO-DATE
+> Task :app:generatePlaystoreDebugGlobalSynthetics UP-TO-DATE
+> Task :app:l8DexDesugarLibPlaystoreDebug UP-TO-DATE
+> Task :app:checkPlaystoreDebugDuplicateClasses UP-TO-DATE
+> Task :app:desugarPlaystoreDebugFileDependencies UP-TO-DATE
+> Task :app:mergeExtDexPlaystoreDebug UP-TO-DATE
+> Task :retui-datetime-picker:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :retui-contract:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :retui-contract:processDebugJavaRes UP-TO-DATE
+> Task :app:mergeLibDexPlaystoreDebug UP-TO-DATE
+> Task :retui-datetime-picker:processDebugJavaRes UP-TO-DATE
+> Task :retui-contract:writeDebugAarMetadata UP-TO-DATE
+> Task :retui-datetime-picker:writeDebugAarMetadata UP-TO-DATE
+> Task :app:checkPlaystoreDebugAarMetadata UP-TO-DATE
+> Task :app:mapPlaystoreDebugSourceSetPaths UP-TO-DATE
+> Task :app:compilePlaystoreDebugNavigationResources UP-TO-DATE
+> Task :app:mergePlaystoreDebugResources UP-TO-DATE
+> Task :app:createPlaystoreDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksPlaystoreDebug UP-TO-DATE
+> Task :retui-contract:extractDeepLinksDebug UP-TO-DATE
+> Task :retui-contract:processDebugManifest UP-TO-DATE
+> Task :retui-datetime-picker:extractDeepLinksDebug UP-TO-DATE
+> Task :retui-datetime-picker:processDebugManifest UP-TO-DATE
+> Task :app:processPlaystoreDebugMainManifest UP-TO-DATE
+> Task :app:processPlaystoreDebugManifest UP-TO-DATE
+> Task :app:processPlaystoreDebugManifestForPackage UP-TO-DATE
+> Task :retui-contract:mapDebugSourceSetPaths UP-TO-DATE
+> Task :retui-contract:compileDebugLibraryResources UP-TO-DATE
+> Task :retui-datetime-picker:mapDebugSourceSetPaths UP-TO-DATE
+> Task :retui-datetime-picker:compileDebugLibraryResources UP-TO-DATE
+> Task :app:processPlaystoreDebugResources UP-TO-DATE
+> Task :app:mergePlaystoreDebugJniLibFolders UP-TO-DATE
+> Task :retui-contract:mergeDebugJniLibFolders UP-TO-DATE
+> Task :retui-contract:mergeDebugNativeLibs NO-SOURCE
+> Task :retui-contract:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :retui-datetime-picker:mergeDebugJniLibFolders UP-TO-DATE
+> Task :retui-datetime-picker:mergeDebugNativeLibs NO-SOURCE
+> Task :retui-datetime-picker:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :app:mergePlaystoreDebugNativeLibs NO-SOURCE
+> Task :app:stripPlaystoreDebugDebugSymbols NO-SOURCE
+> Task :app:validateSigningPlaystoreDebug UP-TO-DATE
+> Task :app:writePlaystoreDebugAppMetadata UP-TO-DATE
+> Task :app:writePlaystoreDebugSigningConfigVersions UP-TO-DATE
+> Task :app:prePlaystoreDebugAndroidTestBuild SKIPPED
+> Task :app:processPlaystoreDebugAndroidTestManifest UP-TO-DATE
+> Task :app:generatePlaystoreDebugAndroidTestBuildConfig UP-TO-DATE
+> Task :app:generatePlaystoreDebugAndroidTestResValues UP-TO-DATE
+> Task :app:generatePlaystoreDebugAndroidTestResources UP-TO-DATE
+> Task :app:packagePlaystoreDebugAndroidTestResources UP-TO-DATE
+> Task :app:processPlaystoreDebugAndroidTestNavigationResources UP-TO-DATE
+> Task :app:parsePlaystoreDebugAndroidTestLocalResources UP-TO-DATE
+> Task :app:generatePlaystoreDebugAndroidTestRFile UP-TO-DATE
+> Task :app:javaPreCompilePlaystoreDebugAndroidTest UP-TO-DATE
+> Task :app:generatePlaystoreDebugAndroidTestAssets UP-TO-DATE
+> Task :app:mergePlaystoreDebugAndroidTestAssets UP-TO-DATE
+> Task :app:compressPlaystoreDebugAndroidTestAssets UP-TO-DATE
+> Task :app:generatePlaystoreDebugAndroidTestGlobalSynthetics UP-TO-DATE
+> Task :app:checkPlaystoreDebugAndroidTestDuplicateClasses UP-TO-DATE
+> Task :app:desugarPlaystoreDebugAndroidTestFileDependencies UP-TO-DATE
+> Task :app:mergeExtDexPlaystoreDebugAndroidTest UP-TO-DATE
+> Task :app:mergeLibDexPlaystoreDebugAndroidTest UP-TO-DATE
+> Task :app:checkPlaystoreDebugAndroidTestAarMetadata UP-TO-DATE
+> Task :app:mapPlaystoreDebugAndroidTestSourceSetPaths UP-TO-DATE
+> Task :app:compilePlaystoreDebugAndroidTestNavigationResources UP-TO-DATE
+> Task :app:mergePlaystoreDebugAndroidTestResources UP-TO-DATE
+> Task :app:processPlaystoreDebugAndroidTestResources UP-TO-DATE
+> Task :app:mergePlaystoreDebugAndroidTestJniLibFolders UP-TO-DATE
+> Task :app:mergePlaystoreDebugAndroidTestNativeLibs NO-SOURCE
+> Task :app:stripPlaystoreDebugAndroidTestDebugSymbols NO-SOURCE
+> Task :app:validateSigningPlaystoreDebugAndroidTest UP-TO-DATE
+> Task :app:writePlaystoreDebugAndroidTestSigningConfigVersions UP-TO-DATE
+
+> Task :app:compilePlaystoreDebugKotlin
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/commands/tuixt/TuixtActivity.kt:80:27 The corresponding parameter in the supertype 'LocalizedActivity' is named 'state'. This may cause problems when calling this function with named arguments.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/commands/tuixt/TuixtActivity.kt:84:9 'fun overridePendingTransition(p0: Int, p1: Int): Unit' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/commands/tuixt/TuixtActivity.kt:120:53 'static field SOFT_INPUT_ADJUST_RESIZE: Int' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/commands/tuixt/TuixtActivity.kt:615:9 'fun overridePendingTransition(p0: Int, p1: Int): Unit' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/commands/tuixt/TuixtActivity.kt:776:18 This declaration overrides a deprecated member but is not marked as deprecated itself. Add the '@Deprecated' annotation or suppress the diagnostic.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/commands/tuixt/TuixtActivity.kt:785:13 'fun overridePendingTransition(p0: Int, p1: Int): Unit' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/commands/tuixt/TuixtActivity.kt:799:17 'fun overridePendingTransition(p0: Int, p1: Int): Unit' is deprecated. Deprecated in Java.
+
+> Task :app:compilePlaystoreDebugJavaWithJavac UP-TO-DATE
+> Task :app:processPlaystoreDebugJavaRes UP-TO-DATE
+> Task :app:mergePlaystoreDebugJavaResource UP-TO-DATE
+> Task :app:dexBuilderPlaystoreDebug
+> Task :app:mergeProjectDexPlaystoreDebug
+> Task :app:packagePlaystoreDebug
+> Task :app:bundlePlaystoreDebugClassesToCompileJar
+> Task :app:createPlaystoreDebugApkListingFileRedirect UP-TO-DATE
+> Task :app:assemblePlaystoreDebug
+> Task :app:compilePlaystoreDebugAndroidTestKotlin
+> Task :app:compilePlaystoreDebugAndroidTestJavaWithJavac UP-TO-DATE
+> Task :app:processPlaystoreDebugAndroidTestJavaRes UP-TO-DATE
+> Task :app:mergePlaystoreDebugAndroidTestJavaResource UP-TO-DATE
+> Task :app:dexBuilderPlaystoreDebugAndroidTest
+> Task :app:mergeProjectDexPlaystoreDebugAndroidTest
+> Task :app:packagePlaystoreDebugAndroidTest
+> Task :app:createPlaystoreDebugAndroidTestApkListingFileRedirect UP-TO-DATE
+> Task :app:assemblePlaystoreDebugAndroidTest
+
+[Incubating] Problems report is available at: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/9.4.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 5s
+111 actionable tasks: 11 executed, 100 up-to-date

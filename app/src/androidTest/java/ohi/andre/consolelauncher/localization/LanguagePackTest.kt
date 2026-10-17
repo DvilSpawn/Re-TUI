@@ -111,6 +111,34 @@ class LanguagePackTest {
         }
     }
 
+    @Suppress("DEPRECATION")
+    @Test fun translatedResourcesFollowOrientationAndFontChanges() {
+        val id = "configuration-${System.nanoTime()}"
+        val original = LanguagePacks.selectedId()
+        try {
+            LanguagePacks.import(archive(id).inputStream())
+            LanguagePacks.select(id)
+            val base = android.content.res.Resources(context.assets, context.resources.displayMetrics,
+                Configuration(context.resources.configuration))
+            val before = LanguagePacks.resources(base)
+            val changed = Configuration(base.configuration).apply {
+                orientation = Configuration.ORIENTATION_LANDSCAPE
+                fontScale = 1.3f
+                screenWidthDp = 900
+            }
+            base.updateConfiguration(changed, base.displayMetrics)
+            val after = LanguagePacks.resources(base)
+            assertNotSame(before, after)
+            assertEquals(Configuration.ORIENTATION_LANDSCAPE, after.configuration.orientation)
+            assertEquals(1.3f, after.configuration.fontScale, .01f)
+            assertEquals(900, after.configuration.screenWidthDp)
+            assertEquals("اختبار اللغة", after.getString(R.string.language_packs_title))
+        } finally {
+            if (LanguagePacks.installed().any { it.id == id }) LanguagePacks.remove(id)
+            LanguagePacks.select(original)
+        }
+    }
+
     @Test fun malformedPacksCannotReplaceInstalledTranslation() {
         val id = "test-${System.nanoTime()}"
         val original = LanguagePacks.selectedId()

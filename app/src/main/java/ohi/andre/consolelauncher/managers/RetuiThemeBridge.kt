@@ -27,6 +27,7 @@ import ohi.andre.consolelauncher.tuils.Tuils
 object RetuiThemeBridge {
     private const val KEYBOARD_PRIVATE_OPTIONS_PREFIX = "com.dvil.retui.keyboard"
     private const val KEYBOARD_APPLY_CONTEXT_ACTION = "com.dvil.retui.keyboard.APPLY_CONTEXT"
+    private val exportedImages = HashMap<String, String>()
     private const val KEYBOARD_PACKAGE = "com.dvil.retui.keyboard"
 
     fun putLauncherThemeExtras(intent: Intent, context: Context) {
@@ -52,7 +53,8 @@ object RetuiThemeBridge {
         if (input == null) {
             return
         }
-        input.privateImeOptions = buildKeyboardPrivateOptions(contextLabel, mode)
+        val options = buildKeyboardPrivateOptions(contextLabel, mode)
+        if (input.privateImeOptions != options) input.privateImeOptions = options
     }
 
     fun sendToKeyboard(
@@ -106,11 +108,14 @@ object RetuiThemeBridge {
             val directory = File(context.cacheDir, cacheFolder)
             check(directory.exists() || directory.mkdirs()) { context.getString(R.string.integration_retuithemebridge_unable_to_create_frame_share_folder_ea7a1) }
             val image = File(directory, "active.png")
-            val temporary = File(directory, "active.png.tmp")
-            temporary.delete()
-            FileOutputStream(temporary).use { it.write(source.png) }
-            check(!image.exists() || image.delete()) { context.getString(R.string.integration_retuithemebridge_unable_to_replace_shared_frame_image_c0e2d) }
-            check(temporary.renameTo(image)) { context.getString(R.string.integration_retuithemebridge_unable_to_publish_shared_frame_image_70d8d) }
+            synchronized(exportedImages) {
+                if (exportedImages[image.absolutePath] != source.imageId || !image.isFile || image.length() != source.png.size.toLong()) {
+                    val temporary = File(directory, "active.png.tmp")
+                    FileOutputStream(temporary).use { it.write(source.png) }
+                    check(temporary.renameTo(image)) { context.getString(R.string.integration_retuithemebridge_unable_to_publish_shared_frame_image_70d8d) }
+                    exportedImages[image.absolutePath] = source.imageId
+                }
+            }
 
             val uri = FileProvider.getUriForFile(context, GenericFileProvider.PROVIDER_NAME, image)
             context.grantUriPermission(recipientPackage, uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)

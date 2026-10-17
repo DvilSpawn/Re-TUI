@@ -7,5 +7,10 @@
             android:authorities="${applicationId}.portable-fixtures"
             android:process=":preset_recipient"
             android:exported="true" android:grantUriPermissions="true" />
+        <receiver android:name="ohi.andre.consolelauncher.managers.widgets.WidgetPaneFixtureProvider"
+            android:label="ReTUI Widget Fixture" android:exported="true">
+            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_pane_fixture" />
+        </receiver>
     </application>
 </manifest>

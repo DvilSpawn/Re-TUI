@@ -14,6 +14,7 @@ import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.RelativeLayout
 import android.widget.TextView
+import android.widget.Toast
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.commands.main.MainPack
 import ohi.andre.consolelauncher.managers.AppsManager
@@ -115,8 +116,17 @@ class AppDrawerPaneManager(
                 AdapterView.OnItemClickListener { _: AdapterView<*>?, _: View?, position: Int, _: Long ->
                     val entry = entries[position]
                     if (entry is AppEntry) {
-                        appsManager.launch(context, entry.app)
-                        hide()
+                        if (appsManager.launch(context, entry.app)) {
+                            hide()
+                        } else {
+                            val message = if (entry.app.isPrivateProfile && appsManager.isPrivateSpaceLocked()) {
+                                R.string.output_private_space_not_ready
+                            } else {
+                                R.string.output_app_launch_failed
+                            }
+                            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+                            show()
+                        }
                     } else if (entry is PrivateActionEntry) {
                         when (entry.action) {
                             PrivateAction.LOCK -> appsManager.requestPrivateSpaceQuietMode(true)

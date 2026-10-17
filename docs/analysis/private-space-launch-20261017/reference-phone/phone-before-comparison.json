@@ -1,0 +1,9 @@
+{
+  "serial": "adb-10BE1C0FB40006A-RwuKbp._adb-tls-connect._tcp",
+  "hardwareSerial": "10BE1C0FB40006A",
+  "home": "com.dvil.tui_renewed",
+  "keyboard": "com.dvil.retui.keyboard/.RetuiKeyboardService",
+  "rotation": "0",
+  "userRotation": "0",
+  "kvaesitsoPreviouslyInstalled": false
+}

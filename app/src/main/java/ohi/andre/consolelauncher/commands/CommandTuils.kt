@@ -60,6 +60,10 @@ object CommandTuils {
         if (DUO_COMMAND.equals(name, ignoreCase = true) && !getBoolean(Behavior.duo_mode)) {
             return true
         }
+        if (name.equals("private", ignoreCase = true) &&
+            !XMLPrefsManager.getBoolean(Behavior.enable_private_command)) {
+            return true
+        }
 
         for (hidden in HIDDEN_COMMANDS) {
             if (hidden.equals(name, ignoreCase = true)) {
