@@ -64,7 +64,7 @@ class ChangelogPaneIntegrationTest {
                 scenario.onActivity {
                     val output = it.findViewById<TextView>(R.id.offline_help_output)
                     assertTrue(output.text.contains("Build ${BuildConfig.VERSION_CODE}"))
-                    assertTrue(output.text.contains("Native IRC"))
+                    assertTrue(output.text.contains("Termux, connected through SSH"))
                     assertTrue(output.isTextSelectable)
                     assertFalse(it.findViewById<EditText>(R.id.offline_help_input).isShown)
                     assertEquals(BuildConfig.VERSION_CODE, prefs.getInt("last_seen_version_code", 0))
