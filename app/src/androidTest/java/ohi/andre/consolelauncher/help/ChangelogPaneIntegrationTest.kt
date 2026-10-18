@@ -24,6 +24,31 @@ import java.io.File
 /** Standalone pane fixture; never launches account/network/setup workflows. */
 @RunWith(AndroidJUnit4::class)
 class ChangelogPaneIntegrationTest {
+    @Test fun outdatedLanguagePackCannotReplaceInstalledReleaseNotes() {
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        val context = instrumentation.targetContext
+        val packs = ohi.andre.consolelauncher.localization.LanguagePacks
+        val original = packs.selectedId()
+        val id = "changelog-stale-${System.nanoTime()}"
+        try {
+            val archive = ohi.andre.consolelauncher.localization.LanguagePackTest().archive(id,
+                xml = """<resources><string name="changelog_release_highlights">PREVIOUS BUILD NOTES</string></resources>""")
+            packs.import(archive.inputStream())
+            packs.select(id)
+            ActivityScenario.launch<ChangelogActivity>(Intent(context, ChangelogActivity::class.java)).use { scenario ->
+                scenario.onActivity {
+                    assertEquals("PREVIOUS BUILD NOTES", it.getString(R.string.changelog_release_highlights))
+                    val output = it.findViewById<TextView>(R.id.offline_help_output).text.toString()
+                    assertTrue(output.contains("Termux, connected through SSH"))
+                    assertFalse(output.contains("PREVIOUS BUILD NOTES"))
+                }
+            }
+        } finally {
+            packs.select(original)
+            if (packs.installed().any { it.id == id }) packs.remove(id)
+        }
+    }
+
     @get:Rule val windows = WindowPreferencesRule()
     private val instrumentation = InstrumentationRegistry.getInstrumentation()
     private val context get() = instrumentation.targetContext

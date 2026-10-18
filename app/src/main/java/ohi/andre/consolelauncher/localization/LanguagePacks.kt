@@ -119,6 +119,10 @@ object LanguagePacks {
         }
     }
 
+    // Release-specific content must not be replaced by an older installed language pack.
+    fun bundledText(resources: Resources, id: Int): CharSequence =
+        (if (resources is PackResources) resources.original else resources).getText(id)
+
     fun definition(key: String): JSONObject? = if (ready) catalog.optJSONObject(key) else null
 }
 

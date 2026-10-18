@@ -113,7 +113,7 @@ class ChangelogActivity : LocalizedComponentActivity() {
         close.setTextColor(ThemeColorResolver.color(Theme.workspace_control_text_color))
         val text = SpannableStringBuilder()
         HelpText.title(text, getString(R.string.changelog_release_heading, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE))
-        HelpText.body(text, getString(R.string.changelog_release_highlights),
+        HelpText.body(text, ohi.andre.consolelauncher.localization.LanguagePacks.bundledText(resources, R.string.changelog_release_highlights).toString(),
             ThemeColorResolver.color(Theme.workspace_header_background_color), Tuils.dpToPx(this, 12))
         output.text = text
         windowPanel.refreshTheme()

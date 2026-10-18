@@ -16,7 +16,7 @@ Before each release, update `changelog_release_highlights` in
 `app/src/main/res/values/strings_changelog.xml` to match the actual shipped features;
 the displayed version/build come from the installed APK. These are concise highlights,
 not the technical/audit ledger or a claim that default-network signup is open.
-Refresh localization exports during release preparation. No version bump, release
+Release highlights read the bundled APK text rather than an installed language-pack override, so older packs cannot replace the current notes. Pane labels and controls still use the selected language. Refresh localization exports during release preparation. No version bump, release
 publication or device install is part of adding this pane.
 
 ## Physical-phone verification
