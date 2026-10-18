@@ -1,0 +1,18 @@
+{
+  "hardwareSerial": "10BE1C0FB40006A",
+  "apkSha256": "d3fd2097a43882a61219b70e7161c669f3a855fc654c242f499a299649888d70",
+  "priorApkSha256": "d2279958fc4556192ab8b1744282d7a4f118aa3e7d2d97cfcd93c4bf64023748",
+  "homeRole": "com.dvil.tui_renewed",
+  "packageFields": [
+    "versionCode=503 minSdk=23 targetSdk=36",
+    "versionName=3",
+    "lastUpdateTime=2026-10-17 20:08:11",
+    "User 0: ceDataInode=1746886 deDataInode=1746973 installed=true hidden=false vHidden=1 suspended=false distractionFlags=0 stopped=false vStopped=false notLaunched=false enabled=0 instant=false virtual=false quarantined=false",
+    "firstInstallTime=2026-10-16 08:05:59",
+    "User 10: ceDataInode=0 deDataInode=0 installed=false hidden=false vHidden=1 suspended=false distractionFlags=0 stopped=true vStopped=false notLaunched=true enabled=0 instant=false virtual=false quarantined=false",
+    "firstInstallTime=2026-10-16 08:05:59"
+  ],
+  "dataInodes": "1746886\n1746973",
+  "installMode": "adb install --no-incremental --user 0 -r; no uninstall or clear; matching signer verified before install",
+  "freshPreInstallMetadata": "Unavailable: shell stat denied after signer and serial checks. Compare retained first-install time/inodes with prior recorded phone checkpoint instead."
+}

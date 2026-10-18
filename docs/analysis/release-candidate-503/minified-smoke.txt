@@ -1,0 +1,28 @@
+/data/local/tmp/retui-rc-ui.xml: 1 file pulled, 0 skipped. 14.7 MB/s (22323 bytes in 0.001s)
+/data/local/tmp/retui-rc-ui.xml: 1 file pulled, 0 skipped. 8.5 MB/s (8699 bytes in 0.001s)
+/data/local/tmp/retui-rc-ui.xml: 1 file pulled, 0 skipped. 10.1 MB/s (13394 bytes in 0.001s)
+/data/local/tmp/retui-rc-ui.xml: 1 file pulled, 0 skipped. 6.4 MB/s (8699 bytes in 0.001s)
+/data/local/tmp/retui-rc-ui.xml: 1 file pulled, 0 skipped. 9.9 MB/s (22323 bytes in 0.002s)
+Minified APK: native widget retained, full-window blur, Back gesture closes commands then pane
+/data/local/tmp/retui-rc-ui.xml: 1 file pulled, 0 skipped. 3.3 MB/s (8699 bytes in 0.002s)
+/data/local/tmp/rc-widget.png: 1 file pulled, 0 skipped. 58.4 MB/s (88496 bytes in 0.001s)
+/data/local/tmp/retui-rc-ui.xml: 1 file pulled, 0 skipped. 14.2 MB/s (22323 bytes in 0.002s)
+Minified APK: reopening retains the same native widget
+/data/local/tmp/retui-rc-ui.xml: 1 file pulled, 0 skipped. 13.1 MB/s (22323 bytes in 0.002s)
+/data/local/tmp/retui-rc-ui.xml: 1 file pulled, 0 skipped. 11.1 MB/s (22425 bytes in 0.002s)
+/data/local/tmp/retui-rc-ui.xml: 1 file pulled, 0 skipped. 20.1 MB/s (22489 bytes in 0.001s)
+/data/local/tmp/retui-rc-ui.xml: 1 file pulled, 0 skipped. 3.2 MB/s (6247 bytes in 0.002s)
+/data/local/tmp/retui-rc-ui.xml: 1 file pulled, 0 skipped. 15.9 MB/s (22619 bytes in 0.001s)
+Minified APK: cancelling authentication leaves the private profile locked
+/data/local/tmp/retui-rc-ui.xml: 1 file pulled, 0 skipped. 13.9 MB/s (22619 bytes in 0.002s)
+/data/local/tmp/retui-rc-ui.xml: 1 file pulled, 0 skipped. 5.8 MB/s (6247 bytes in 0.001s)
+/data/local/tmp/retui-rc-ui.xml: 1 file pulled, 0 skipped. 23.7 MB/s (22741 bytes in 0.001s)
+/data/local/tmp/retui-rc-ui.xml: 1 file pulled, 0 skipped. 22.6 MB/s (17727 bytes in 0.001s)
+/data/local/tmp/retui-rc-ui.xml: 1 file pulled, 0 skipped. 15.5 MB/s (17394 bytes in 0.001s)
+/data/local/tmp/retui-rc-ui.xml: 1 file pulled, 0 skipped. 11.8 MB/s (17014 bytes in 0.001s)
+Minified APK: retry authentication succeeds and PRI tap launches fixture in private user 11, absent owner 0
+/data/local/tmp/retui-rc-ui.xml: 1 file pulled, 0 skipped. 21.8 MB/s (22766 bytes in 0.001s)
+/data/local/tmp/retui-rc-ui.xml: 1 file pulled, 0 skipped. 17.3 MB/s (22767 bytes in 0.001s)
+/data/local/tmp/retui-rc-ui.xml: 1 file pulled, 0 skipped. 15.7 MB/s (22824 bytes in 0.001s)
+/data/local/tmp/retui-rc-ui.xml: 1 file pulled, 0 skipped. 14.1 MB/s (17378 bytes in 0.001s)
+Minified APK: relocking removes PRI and private apps

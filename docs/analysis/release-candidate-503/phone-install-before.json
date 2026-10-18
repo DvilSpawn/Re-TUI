@@ -1,0 +1,9 @@
+{
+  "hardwareSerial": "10BE1C0FB40006A",
+  "home": "com.dvil.tui_renewed",
+  "dataInodes": "1746886\n1746973",
+  "firstInstallTime": "2026-10-16 08:05:59",
+  "version": "503 minSdk=23 targetSdk=36",
+  "packageFlags": "pkgFlags=[ DEBUGGABLE HAS_CODE ALLOW_CLEAR_USER_DATA ]",
+  "apkSha256": "7a45ac5e24e86289c5153a7950eeea4d0dfea15f4162638aa83b49927b8ca3e3"
+}

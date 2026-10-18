@@ -1,0 +1,51 @@
+INSTRUMENTATION_STATUS: class=ohi.andre.consolelauncher.managers.widgets.PanelBackdropIntegrationTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=3
+INSTRUMENTATION_STATUS: stream=
+ohi.andre.consolelauncher.managers.widgets.PanelBackdropIntegrationTest:
+INSTRUMENTATION_STATUS: test=embeddedBlurClearsWhenPanelsHideOrDetach
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=ohi.andre.consolelauncher.managers.widgets.PanelBackdropIntegrationTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=3
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=embeddedBlurClearsWhenPanelsHideOrDetach
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=ohi.andre.consolelauncher.managers.widgets.PanelBackdropIntegrationTest
+INSTRUMENTATION_STATUS: current=2
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=3
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=widgetActivityBackdropIsTransparentAndBlurredWithoutChangingTheBoardFill
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=ohi.andre.consolelauncher.managers.widgets.PanelBackdropIntegrationTest
+INSTRUMENTATION_STATUS: current=2
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=3
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=widgetActivityBackdropIsTransparentAndBlurredWithoutChangingTheBoardFill
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=ohi.andre.consolelauncher.managers.widgets.PanelBackdropIntegrationTest
+INSTRUMENTATION_STATUS: current=3
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=3
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=transparentSettingsKeepsLauncherVisibleAndBlursBehindThePane
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=ohi.andre.consolelauncher.managers.widgets.PanelBackdropIntegrationTest
+INSTRUMENTATION_STATUS: current=3
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=3
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=transparentSettingsKeepsLauncherVisibleAndBlursBehindThePane
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_RESULT: stream=
+
+Time: 9.479
+
+OK (3 tests)
+
+
+INSTRUMENTATION_CODE: -1

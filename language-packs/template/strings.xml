@@ -244,35 +244,58 @@ Cancel stops the current calculation. Back closes Help and retains your reading 
     <string name="changelog_continue">Continue to Launcher</string>
     <string name="changelog_pane_title">CHANGELOG</string>
     <string name="changelog_release_heading">Re:TUI %1$s · Build %2$d</string>
-    <string name="changelog_release_highlights">What is new in this update
+    <string name="changelog_release_highlights">This update makes the launcher's panes more consistent, rebuilds widget editing, and brings presets, wallpapers, and optional tools into the launcher's download flow.
 
-## Native IRC
-- Talk through standard IRC with channel and private-conversation chips, Channels, People and concise Help. Slash commands remain available.
-- Sign in through one prompt; optional device-key authentication reconnects without saving your password.
-- Messages appear immediately. Pending or uncertain sends are labelled; duplicate server echoes and automatic retries are avoided.
+## A better widget pane
 
-## Calculator
-- Terminal input with 123, ABC and FUNC key layers for numbers, units, variables and functions.
-- Live hints preview how Qalculate interprets your expression and its possible result.
-- Continue from the last answer: 5+5 gives 10, then +5 gives 15. Assignment and conversion controls are easier to reach.
+- Scroll through your widget board and find widgets through a searchable picker with previews.
+- Move widgets directly and resize them using four subtle corner handles.
+- See widgets resize while dragging, within the limits supported by each widget provider.
+- Settings and Widgets now stay expanded, with no floating-window controls.
+- Transparent pane backgrounds reveal the launcher through blur, including behind the status bar. Devices without blur support use dimming.
 
-## Floating tools and Help
-- Calculator, Help and IRC share raised headers, inner panes, theme-controlled borders and remembered window sizes.
-- Calculator and Help stay expanded in landscape. Help closes with Back and remembers your place; calculator help leaves your calculation intact.
+## Termux, connected through SSH
 
-## Termux workspace
-- A separate workspace with two independent terminal tiles, split layouts and multiple pages. Existing shells and jobs keep running when you leave.
-- The workspace checks its helper and offers Update now / Later. Updates use the matching helper bundled with Launcher, with checksum verification and installation-failure recovery.
-- Improved Unicode input, resizing and reconnect restoration.
+- The Termux pane now uses a local SSH connection, while Termux and tmux manage your shells and running jobs.
+- Keep the familiar split panes, workspace pages, launcher fonts, and colors.
+- Guided setup installs and configures the required Termux support.
+- Improved reconnection and session restoration when returning to the workspace.
+- Saved Termux Apps appear in launcher suggestions for quickly reopening your terminal tools.
+- Empty workspaces no longer show an unnecessary window chooser.
 
-## Launcher
-- Guided first-run setup with live border previews and a terminal-style build animation.
-- Classic/Search controls, optional search-category tabs and independent app-drawer rail appearance controls.
-- Portable preset sharing/import, an optional idle fade, improved unlock tracking and the JetBrains Mono Nerd Font Regular default.
+## Download what you want
 
-## Before you start
-- Termux still needs its command permission, external-app access, tmux and socat. The update prompt offers setup guidance when needed.
-- IRC uses TLS, not end-to-end encryption. Server operators can read messages; closing the IRC pane disconnects.
+- Browse and preview 21 curated terminal color presets with preset -market.
+- Downloaded presets are imported without changing your current appearance. Apply one when ready with preset -apply &lt;saved-name&gt;.
+- Preview optional wallpaper packs inside the launcher, confirm the download, and install them automatically.
+- Download and install the optional Qalculate engine directly from the calculator.
+- Browse and install native launcher modules with module -library.
+
+## Settings and theme improvements
+
+- Preview appearance changes before saving them.
+- Improved settings persistence and recovery of unfinished edits.
+- Better readability for transparent and low-contrast themes, plus fixes for cursor colors and panel borders.
+- More reliable preset imports from browsers and Android's file picker, with themed error screens and clearer recovery options.
+- Improved backup and interrupted-restore recovery, including preservation of older modules during upgrades.
+
+## Everyday fixes
+
+- Fixed basic calculator expressions showing preview unavailable.
+- Added haptic feedback to calculator keyboard controls.
+- The default-launcher prompt now appears after the preparation animation finishes.
+- Setup progress uses terminal glyphs.
+- Reduced repeated work when returning Home from another app.
+- Improved landscape pane alignment while respecting system and custom margins.
+- Improved IRC history refresh and added message deletion where supported by the server.
+
+## Optional Private Space support
+
+Enable the private command under Settings → Behaviour to access Android Private Space on supported devices.
+
+This feature is off by default. It requires Android 15 or later and a compatible implementation of Android's standard Private Space APIs. Some manufacturer implementations, including the Vivo device tested during development, may authenticate successfully but still prevent app launching.
+
+Authentication cancellation and retry handling have also been corrected.
 
 You can reopen these notes with the changelog command. These highlights are bundled with the installed app and work offline.</string>
     <string name="command_bluetooth_false_4603a">%1$s false</string>

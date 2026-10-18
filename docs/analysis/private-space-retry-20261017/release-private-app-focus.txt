@@ -1,0 +1,2 @@
+  mCurrentFocus=Window{d7f7fea u11 dev.retui.privatespacetest/dev.retui.privatespacetest.MainActivity}
+  mFocusedApp=ActivityRecord{260493045 u11 dev.retui.privatespacetest/.MainActivity t53}

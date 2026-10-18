@@ -23,8 +23,7 @@ internal object PanelBackdrop {
         if (activity is LauncherActivity) installEmbedded(host) else installWindow(host, activity)
     }
 
-    private fun installWindow(host: View, activity: Activity) {
-        val window = activity.window
+    internal fun installWindow(host: View, activity: Activity, window: android.view.Window = activity.window) {
         window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
         window.setDimAmount(.38f)
         if (Build.VERSION.SDK_INT < 31) return

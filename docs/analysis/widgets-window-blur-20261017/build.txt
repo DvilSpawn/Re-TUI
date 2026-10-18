@@ -1,0 +1,328 @@
+
+> Task :app:validateRuntimeNotices
+Verified notice records for 73 external runtime components
+
+> Task :app:validateSourceInputs
+> Task :app:preBuild
+> Task :app:prePlaystoreDebugBuild
+> Task :app:mergePlaystoreDebugNativeDebugMetadata NO-SOURCE
+> Task :app:generatePlaystoreDebugBuildConfig
+> Task :app:generatePlaystoreDebugResValues UP-TO-DATE
+> Task :app:generatePlaystoreDebugResources UP-TO-DATE
+> Task :app:packagePlaystoreDebugResources UP-TO-DATE
+> Task :retui-contract:preBuild UP-TO-DATE
+> Task :retui-contract:preDebugBuild UP-TO-DATE
+> Task :retui-contract:processDebugNavigationResources UP-TO-DATE
+> Task :retui-datetime-picker:preBuild UP-TO-DATE
+> Task :retui-datetime-picker:preDebugBuild UP-TO-DATE
+> Task :retui-datetime-picker:processDebugNavigationResources UP-TO-DATE
+> Task :app:processPlaystoreDebugNavigationResources
+> Task :app:parsePlaystoreDebugLocalResources UP-TO-DATE
+> Task :app:generatePlaystoreDebugRFile UP-TO-DATE
+> Task :retui-contract:generateDebugResources UP-TO-DATE
+> Task :retui-contract:packageDebugResources UP-TO-DATE
+> Task :retui-contract:parseDebugLocalResources UP-TO-DATE
+> Task :retui-contract:generateDebugRFile UP-TO-DATE
+> Task :retui-contract:compileDebugKotlin UP-TO-DATE
+> Task :retui-contract:javaPreCompileDebug UP-TO-DATE
+> Task :retui-contract:compileDebugJavaWithJavac NO-SOURCE
+> Task :retui-contract:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :retui-datetime-picker:generateDebugResources UP-TO-DATE
+> Task :retui-datetime-picker:packageDebugResources UP-TO-DATE
+> Task :retui-datetime-picker:parseDebugLocalResources UP-TO-DATE
+> Task :retui-datetime-picker:generateDebugRFile UP-TO-DATE
+> Task :retui-datetime-picker:compileDebugKotlin UP-TO-DATE
+> Task :retui-datetime-picker:javaPreCompileDebug UP-TO-DATE
+> Task :retui-datetime-picker:compileDebugJavaWithJavac NO-SOURCE
+> Task :retui-datetime-picker:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :app:javaPreCompilePlaystoreDebug UP-TO-DATE
+> Task :app:generatePlaystoreDebugAssets UP-TO-DATE
+> Task :app:runtimeNotices UP-TO-DATE
+> Task :app:termuxHelperAssets UP-TO-DATE
+> Task :retui-contract:generateDebugAssets UP-TO-DATE
+> Task :retui-contract:mergeDebugAssets UP-TO-DATE
+> Task :retui-datetime-picker:generateDebugAssets UP-TO-DATE
+> Task :retui-datetime-picker:mergeDebugAssets UP-TO-DATE
+> Task :app:mergePlaystoreDebugAssets UP-TO-DATE
+> Task :app:compressPlaystoreDebugAssets UP-TO-DATE
+> Task :app:generatePlaystoreDebugGlobalSynthetics UP-TO-DATE
+> Task :app:l8DexDesugarLibPlaystoreDebug UP-TO-DATE
+> Task :app:checkPlaystoreDebugDuplicateClasses UP-TO-DATE
+> Task :app:desugarPlaystoreDebugFileDependencies UP-TO-DATE
+> Task :app:mergeExtDexPlaystoreDebug UP-TO-DATE
+> Task :retui-datetime-picker:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :retui-contract:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :retui-contract:processDebugJavaRes UP-TO-DATE
+> Task :retui-datetime-picker:processDebugJavaRes UP-TO-DATE
+> Task :retui-contract:writeDebugAarMetadata UP-TO-DATE
+> Task :retui-datetime-picker:writeDebugAarMetadata UP-TO-DATE
+> Task :app:checkPlaystoreDebugAarMetadata UP-TO-DATE
+> Task :app:mergeLibDexPlaystoreDebug UP-TO-DATE
+> Task :app:mapPlaystoreDebugSourceSetPaths UP-TO-DATE
+> Task :app:compilePlaystoreDebugNavigationResources UP-TO-DATE
+> Task :app:mergePlaystoreDebugResources UP-TO-DATE
+> Task :app:createPlaystoreDebugCompatibleScreenManifests
+> Task :app:extractDeepLinksPlaystoreDebug
+> Task :retui-contract:extractDeepLinksDebug UP-TO-DATE
+> Task :retui-contract:processDebugManifest UP-TO-DATE
+> Task :retui-datetime-picker:extractDeepLinksDebug UP-TO-DATE
+> Task :retui-datetime-picker:processDebugManifest UP-TO-DATE
+
+> Task :app:processPlaystoreDebugMainManifest
+/Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/playstore/AndroidManifest.xml:6:5-8:31 Warning:
+	uses-permission#com.android.vending.CHECK_LICENSE was tagged at AndroidManifest.xml:6 to remove other declarations but no other declaration present
+
+> Task :app:processPlaystoreDebugManifest
+> Task :retui-contract:mapDebugSourceSetPaths UP-TO-DATE
+> Task :retui-contract:compileDebugLibraryResources UP-TO-DATE
+> Task :retui-datetime-picker:mapDebugSourceSetPaths UP-TO-DATE
+> Task :retui-datetime-picker:compileDebugLibraryResources UP-TO-DATE
+> Task :app:mergePlaystoreDebugJniLibFolders UP-TO-DATE
+> Task :retui-contract:mergeDebugJniLibFolders UP-TO-DATE
+> Task :retui-contract:mergeDebugNativeLibs NO-SOURCE
+> Task :retui-contract:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :app:processPlaystoreDebugManifestForPackage
+> Task :retui-datetime-picker:mergeDebugJniLibFolders UP-TO-DATE
+> Task :retui-datetime-picker:mergeDebugNativeLibs NO-SOURCE
+> Task :retui-datetime-picker:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :app:mergePlaystoreDebugNativeLibs NO-SOURCE
+> Task :app:stripPlaystoreDebugDebugSymbols NO-SOURCE
+> Task :app:validateSigningPlaystoreDebug UP-TO-DATE
+> Task :app:writePlaystoreDebugAppMetadata UP-TO-DATE
+> Task :app:writePlaystoreDebugSigningConfigVersions UP-TO-DATE
+> Task :app:processPlaystoreDebugResources
+
+> Task :app:compilePlaystoreDebugKotlin
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/LauncherActivity.kt:33:8 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/LauncherActivity.kt:174:31 The corresponding parameter in the supertype 'Outputable' is named 'output'. This may cause problems when calling this function with named arguments.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/LauncherActivity.kt:180:43 The corresponding parameter in the supertype 'Outputable' is named 'output'. This may cause problems when calling this function with named arguments.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/LauncherActivity.kt:186:31 The corresponding parameter in the supertype 'Outputable' is named 'output'. This may cause problems when calling this function with named arguments.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/LauncherActivity.kt:195:34 The corresponding parameter in the supertype 'LocalizedAppCompatActivity' is named 'state'. This may cause problems when calling this function with named arguments.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/LauncherActivity.kt:212:21 'fun startActivityForResult(intent: Intent, requestCode: Int): Unit' is deprecated. This method has been deprecated in favor of using the Activity Result API
+      which brings increased type safety via an {@link ActivityResultContract} and the prebuilt
+      contracts for common intents available in
+      {@link androidx.activity.result.contract.ActivityResultContracts}, provides hooks for
+      testing, and allow receiving results in separate, testable classes independent from your
+      activity. Use
+      {@link #registerForActivityResult(ActivityResultContract, ActivityResultCallback)}
+      passing in a {@link StartActivityForResult} object for the {@link ActivityResultContract}.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/LauncherActivity.kt:216:21 'fun startActivityForResult(intent: Intent, requestCode: Int): Unit' is deprecated. This method has been deprecated in favor of using the Activity Result API
+      which brings increased type safety via an {@link ActivityResultContract} and the prebuilt
+      contracts for common intents available in
+      {@link androidx.activity.result.contract.ActivityResultContracts}, provides hooks for
+      testing, and allow receiving results in separate, testable classes independent from your
+      activity. Use
+      {@link #registerForActivityResult(ActivityResultContract, ActivityResultCallback)}
+      passing in a {@link StartActivityForResult} object for the {@link ActivityResultContract}.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/LauncherActivity.kt:248:9 'fun overridePendingTransition(p0: Int, p1: Int): Unit' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/LauncherActivity.kt:304:61 Java type mismatch: inferred type is 'Thread?', but 'Thread' was expected.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/LauncherActivity.kt:304:69 Java type mismatch: inferred type is 'Throwable?', but 'Throwable' was expected.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/LauncherActivity.kt:316:9 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/LauncherActivity.kt:404:123 'static field SOFT_INPUT_ADJUST_RESIZE: Int' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/LauncherActivity.kt:538:69 'static field SOFT_INPUT_ADJUST_RESIZE: Int' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/LauncherActivity.kt:539:110 'static field SOFT_INPUT_ADJUST_RESIZE: Int' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/LauncherActivity.kt:714:40 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/LauncherActivity.kt:764:29 The corresponding parameter in the supertype 'Reloadable' is named 'header'. This may cause problems when calling this function with named arguments.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/MainManager.kt:13:8 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/MainManager.kt:206:44 Java type mismatch: inferred type is 'String?', but 'CharSequence' was expected.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/MainManager.kt:266:9 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/MainManager.kt:407:36 'fun <T : Parcelable!> getParcelableExtra(p0: String!): T?' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/MainManager.kt:412:25 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/MainManager.kt:434:9 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/MainManager.kt:542:53 Unchecked cast of 'MutableList<out Any>' to 'MutableList<AppsManager.LaunchInfo>'.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/MainManager.kt:645:13 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/MainManager.kt:741:29 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/MainManager.kt:758:21 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/UIManager.kt:91:8 'class GestureDetectorCompat : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/UIManager.kt:93:8 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/UIManager.kt:308:34 'class GestureDetectorCompat : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/UIManager.kt:656:25 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/UIManager.kt:3930:9 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/UIManager.kt:6543:32 'fun <T : Parcelable!> getParcelableArrayListExtra(p0: String!): ArrayList<T!>?' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/UIManager.kt:6617:17 'constructor(p0: @NonNull() Context, p1: @NonNull() GestureDetector.OnGestureListener): GestureDetectorCompat' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/UIManager.kt:7182:9 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/UIManager.kt:7185:23 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/UIManager.kt:7281:21 'fun setBackgroundDrawable(p0: Drawable!): Unit' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/UIManager.kt:7304:21 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/UIManager.kt:7318:21 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/UIManager.kt:7338:21 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/UIManager.kt:11821:13 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/UIManager.kt:11850:13 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/UIManager.kt:11860:13 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/UIManager.kt:13556:9 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/UIManager.kt:13578:80 'static field SHOW_FORCED: Int' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/UIManager.kt:14385:19 'fun setBackgroundDrawable(p0: Drawable!): Unit' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/commands/main/raw/tui.kt:8:8 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/commands/main/raw/tui.kt:61:17 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/help/ChangelogActivity.kt:125:38 The corresponding parameter in the supertype 'ComponentActivity' is named 'outState'. This may cause problems when calling this function with named arguments.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/irc/IrcActivity.kt:185:27 The corresponding parameter in the supertype 'LocalizedComponentActivity' is named 'state'. This may cause problems when calling this function with named arguments.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/irc/IrcActivity.kt:252:38 The corresponding parameter in the supertype 'ComponentActivity' is named 'outState'. This may cause problems when calling this function with named arguments.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/AliasManager.kt:23:8 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/AliasManager.kt:236:9 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/AliasManager.kt:307:56 Java type mismatch: inferred type is 'MutableList<AliasManager.Alias>?', but '(Mutable)Collection<out AliasManager.Alias!>' was expected.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/AliasManager.kt:373:29 The corresponding parameter in the supertype 'Any' is named 'other'. This may cause problems when calling this function with named arguments.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/ClockManager.kt:15:8 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/ClockManager.kt:19:22 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/ClockManager.kt:67:20 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/ClockManager.kt:272:30 Only safe (?.) or non-null asserted (!!.) calls are allowed on a nullable receiver of type 'String?'.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/ClockManager.kt:273:28 Only safe (?.) or non-null asserted (!!.) calls are allowed on a nullable receiver of type 'String?'.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/ContactManager.kt:21:8 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/ContactManager.kt:34:9 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/ContactManager.kt:142:34 Type argument is not within its bounds: must be subtype of 'Comparable<in ContactManager.Contact!>!'.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/ContactManager.kt:204:9 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/ContactManager.kt:231:60 'static field TIMES_CONTACTED: String' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/ContactManager.kt:232:60 'static field LAST_TIME_CONTACTED: String' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/ContactManager.kt:246:83 'static field TIMES_CONTACTED: String' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/ContactManager.kt:248:83 'static field LAST_TIME_CONTACTED: String' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/ContactManager.kt:386:32 The corresponding parameter in the supertype 'Comparable' is named 'other'. This may cause problems when calling this function with named arguments.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/HTMLExtractManager.kt:23:8 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/HTMLExtractManager.kt:69:9 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/HTMLExtractManager.kt:111:29 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/HTMLExtractManager.kt:122:33 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/HTMLExtractManager.kt:160:63 Java type mismatch: inferred type is 'String?', but 'String' was expected.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/HTMLExtractManager.kt:193:29 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/HTMLExtractManager.kt:262:54 Unchecked cast of 'Any?' to 'LinkedHashMap<String?, Any?>'.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/HTMLExtractManager.kt:549:9 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/HTMLExtractManager.kt:746:17 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/HTMLExtractManager.kt:797:50 Java type mismatch: inferred type is 'String?', but 'CharSequence' was expected.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/HTMLExtractManager.kt:799:25 Java type mismatch: inferred type is 'String?', but 'String' was expected.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/HTMLExtractManager.kt:866:50 Java type mismatch: inferred type is 'String?', but 'CharSequence' was expected.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/HTMLExtractManager.kt:868:37 Java type mismatch: inferred type is 'String?', but 'String' was expected.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/HTMLExtractManager.kt:987:32 Only safe (?.) or non-null asserted (!!.) calls are allowed on a nullable receiver of type 'String?'.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/LockdownManager.kt:10:8 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/LockdownManager.kt:15:23 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/NotesManager.kt:27:8 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/NotesManager.kt:199:9 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/NotesManager.kt:208:17 Java type mismatch: inferred type is 'String?', but 'String' was expected.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/NotesManager.kt:243:17 Java type mismatch: inferred type is 'String?', but 'String' was expected.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/NotesManager.kt:365:9 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/NotesManager.kt:375:32 The corresponding parameter in the supertype 'Comparable' is named 'other'. This may cause problems when calling this function with named arguments.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/PomodoroManager.kt:15:8 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/PomodoroManager.kt:23:22 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/PomodoroManager.kt:53:20 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/TuiLocationManager.kt:12:8 'class Criteria : Any, Parcelable' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/TuiLocationManager.kt:20:8 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/TuiLocationManager.kt:55:9 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/TuiLocationManager.kt:75:44 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/TuiLocationManager.kt:76:21 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/TuiLocationManager.kt:150:34 'constructor(): Criteria' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/TuiLocationManager.kt:151:11 'fun setAltitudeRequired(p0: Boolean): Unit' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/TuiLocationManager.kt:152:11 'fun setAccuracy(p0: Int): Unit' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/TuiLocationManager.kt:152:40 'class Criteria : Any, Parcelable' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/TuiLocationManager.kt:152:49 'static field ACCURACY_COARSE: Int' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/TuiLocationManager.kt:153:11 'fun setBearingRequired(p0: Boolean): Unit' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/TuiLocationManager.kt:154:11 'fun setCostAllowed(p0: Boolean): Unit' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/TuiLocationManager.kt:155:11 'fun setHorizontalAccuracy(p0: Int): Unit' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/TuiLocationManager.kt:155:50 'class Criteria : Any, Parcelable' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/TuiLocationManager.kt:155:59 'static field ACCURACY_LOW: Int' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/TuiLocationManager.kt:156:11 'fun setPowerRequirement(p0: Int): Unit' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/TuiLocationManager.kt:156:48 'class Criteria : Any, Parcelable' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/TuiLocationManager.kt:156:57 'static field POWER_LOW: Int' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/TuiLocationManager.kt:157:11 'fun setSpeedRequired(p0: Boolean): Unit' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/TuiLocationManager.kt:163:21 'fun requestLocationUpdates(p0: Long, p1: Float, p2: Criteria, p3: LocationListener, p4: Looper?): Unit' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/TuiLocationManager.kt:186:36 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/TuiLocationManager.kt:187:13 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/TuiLocationManager.kt:210:17 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/lua/LuaWidgetEngine.kt:1210:17 Condition is always 'false'.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/lua/LuaWidgetEngine.kt:1222:17 Condition is always 'false'.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/lua/LuaWidgetEngine.kt:1235:17 Condition is always 'false'.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/lua/LuaWidgetEngine.kt:1243:17 Condition is always 'false'.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/lua/LuaWidgetEngine.kt:1251:17 Condition is always 'false'.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/lua/LuaWidgetEngine.kt:1258:17 Condition is always 'false'.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/lua/LuaWidgetEngine.kt:1580:13 Condition is always 'false'.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/lua/LuaWidgetEngine.kt:1599:13 Condition is always 'false'.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/lua/LuaWidgetEngine.kt:1612:13 Condition is always 'false'.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/lua/LuaWidgetEngine.kt:1691:60 'fun create(contentType: MediaType?, content: String): RequestBody' is deprecated. Moved to extension function. Put the 'content' argument first to fix Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/lua/LuaWidgetEngine.kt:2066:41 Condition is always 'false'.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/lua/LuaWidgetEngine.kt:2333:13 Condition is always 'false'.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/lua/LuaWidgetEngine.kt:2341:13 Condition is always 'false'.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/lua/LuaWidgetEngine.kt:2354:13 Condition is always 'false'.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/lua/LuaWidgetEngine.kt:2369:13 Condition is always 'false'.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/lua/LuaWidgetEngine.kt:2383:13 Condition is always 'false'.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/lua/LuaWidgetEngine.kt:2386:68 'static field VIBRATOR_SERVICE: String' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/lua/LuaWidgetEngine.kt:2398:22 'fun vibrate(p0: Long): Unit' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/lua/LuaWidgetEngine.kt:2404:13 Condition is always 'false'.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/lua/LuaWidgetEngine.kt:2440:13 Condition is always 'false'.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/notifications/KeeperService.kt:175:40 Java type mismatch: inferred type is 'Array<CharSequence?>?', but 'Any' was expected.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/notifications/KeeperService.kt:175:57 Java type mismatch: inferred type is 'Array<CharSequence?>?', but 'Any' was expected.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/notifications/NotificationService.kt:47:8 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/notifications/NotificationService.kt:68:43 'constructor(): Handler' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/notifications/NotificationService.kt:416:9 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/notifications/NotificationService.kt:459:9 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/notifications/NotificationService.kt:584:70 'static fun getExtras(p0: @NonNull() Notification): @Nullable() Bundle?' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/notifications/NotificationService.kt:730:29 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/notifications/NotificationService.kt:755:13 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/notifications/NotificationService.kt:763:13 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/notifications/NotificationService.kt:771:13 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/notifications/NotificationService.kt:813:17 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/notifications/NotificationService.kt:856:17 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/notifications/NotificationService.kt:863:17 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/notifications/NotificationService.kt:870:17 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/notifications/NotificationService.kt:899:48 'fun get(p0: String!): Any?' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/notifications/NotificationService.kt:1163:67 'static fun getExtras(p0: @NonNull() Notification): @Nullable() Bundle?' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/notifications/NotificationService.kt:1187:9 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/notifications/NotificationService.kt:1219:22 'fun <T : Parcelable!> readParcelable(p0: ClassLoader?): T?' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/notifications/NotificationService.kt:1272:13 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/notifications/NotificationService.kt:1283:13 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/notifications/reply/ReplyManager.kt:24:8 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/notifications/reply/ReplyManager.kt:129:13 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/notifications/reply/ReplyManager.kt:286:9 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/notifications/reply/ReplyManager.kt:470:17 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/termux/TermuxWorkspaceActivity.kt:22:8 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/termux/TermuxWorkspaceActivity.kt:314:9 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/termux/TermuxWorkspaceActivity.kt:332:9 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/termux/TermuxWorkspaceActivity.kt:417:34 The corresponding parameter in the supertype 'Listener' is named 'windows'. This may cause problems when calling this function with named arguments.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/termux/TermuxWorkspaceActivity.kt:426:36 The corresponding parameter in the supertype 'Listener' is named 'windows'. This may cause problems when calling this function with named arguments.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/termux/TermuxWorkspaceActivity.kt:586:34 The corresponding parameter in the supertype 'Listener' is named 'frame'. This may cause problems when calling this function with named arguments.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/managers/termux/TermuxWorkspaceActivity.kt:610:36 The corresponding parameter in the supertype 'Listener' is named 'windows'. This may cause problems when calling this function with named arguments.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/notes/Theme.kt:281:16 'fun setDecorFitsSystemWindows(p0: Boolean): Unit' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/notes/Theme.kt:290:12 'var statusBarColor: Int' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/notes/Theme.kt:291:12 'var navigationBarColor: Int' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/tuils/PrivateIOReceiver.kt:15:8 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/tuils/PrivateIOReceiver.kt:62:53 'fun get(p0: String!): Any?' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/tuils/PrivateIOReceiver.kt:63:51 'fun get(p0: String!): Any?' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/tuils/PrivateIOReceiver.kt:86:54 'fun getParcelableArrayExtra(p0: String!): Array<(out) Parcelable!>?' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/tuils/PrivateIOReceiver.kt:87:49 'fun <T : Parcelable!> getParcelableExtra(p0: String!): T?' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/tuils/PrivateIOReceiver.kt:145:13 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/tuils/Tuils.kt:79:8 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/tuils/Tuils.kt:138:28 Only safe (?.) or non-null asserted (!!.) calls are allowed on a nullable receiver of type 'String?'.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/tuils/Tuils.kt:139:25 Only safe (?.) or non-null asserted (!!.) calls are allowed on a nullable receiver of type 'String?'.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/tuils/Tuils.kt:272:34 'fun getFromLocation(p0: Double, p1: Double, p2: Int): (Mutable)List<Address!>?' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/tuils/Tuils.kt:286:21 'fun getRunningServices(p0: Int): (Mutable)List<ActivityManager.RunningServiceInfo!>!' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/tuils/Tuils.kt:531:29 'fun getAvailableBlocks(): Int' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/tuils/Tuils.kt:532:43 'fun getBlockSize(): Int' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/tuils/Tuils.kt:539:29 'fun getBlockCount(): Int' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/tuils/Tuils.kt:540:43 'fun getBlockSize(): Int' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/tuils/Tuils.kt:576:24 'fun getPreferredActivities(p0: (Mutable)List<IntentFilter!>, p1: (Mutable)List<ComponentName!>, p2: String?): Int' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/tuils/Tuils.kt:744:38 'constructor(p0: Bitmap!): BitmapDrawable' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/tuils/Tuils.kt:796:9 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/tuils/Tuils.kt:819:9 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/tuils/Tuils.kt:851:9 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/tuils/Tuils.kt:857:9 'class LocalBroadcastManager : Any' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/tuils/Tuils.kt:909:27 'constructor(p0: String!): DexFile' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/tuils/Tuils.kt:910:44 'fun entries(): Enumeration<String!>!' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/tuils/Tuils.kt:1137:80 Java type mismatch: inferred type is 'Class<T (of fun <T> getDefaultValue)>?', but 'Class<*>' was expected.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/tuils/Tuils.kt:1137:94 Unchecked cast of 'Any!' to 'T? (of fun <T> getDefaultValue)'.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/tuils/Tuils.kt:1499:45 Java type mismatch: inferred type is 'String?', but 'String' was expected.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/tuils/Tuils.kt:1617:81 'static field MODE_BACKGROUND_ACTIVITY_START_ALLOWED: Int' is deprecated. Deprecated in Java.
+w: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/app/src/main/java/ohi/andre/consolelauncher/tuils/Tuils.kt:1760:55 Unchecked cast of 'Any?' to 'T? (of fun <T> get)'.
+
+> Task :app:compilePlaystoreDebugJavaWithJavac
+> Task :app:processPlaystoreDebugJavaRes UP-TO-DATE
+> Task :app:mergePlaystoreDebugJavaResource UP-TO-DATE
+> Task :app:dexBuilderPlaystoreDebug
+> Task :app:mergeProjectDexPlaystoreDebug
+> Task :app:packagePlaystoreDebug
+> Task :app:createPlaystoreDebugApkListingFileRedirect
+> Task :app:assemblePlaystoreDebug
+
+[Incubating] Problems report is available at: file:///Users/mako/.codex/worktrees/termux-ssh-analysis/TUI-ConsoleLauncher/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/9.4.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 8s
+78 actionable tasks: 16 executed, 62 up-to-date

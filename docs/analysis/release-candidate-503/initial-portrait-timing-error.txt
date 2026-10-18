@@ -1,0 +1,224 @@
+INSTRUMENTATION_STATUS: class=ohi.andre.consolelauncher.managers.widgets.PanelBackdropIntegrationTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=11
+INSTRUMENTATION_STATUS: stream=
+ohi.andre.consolelauncher.managers.widgets.PanelBackdropIntegrationTest:
+INSTRUMENTATION_STATUS: test=embeddedBlurClearsWhenPanelsHideOrDetach
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=ohi.andre.consolelauncher.managers.widgets.PanelBackdropIntegrationTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=11
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=embeddedBlurClearsWhenPanelsHideOrDetach
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=ohi.andre.consolelauncher.managers.widgets.PanelBackdropIntegrationTest
+INSTRUMENTATION_STATUS: current=2
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=11
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=backGestureClosesCommandsBeforeClosingTheWidgetWindow
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=ohi.andre.consolelauncher.managers.widgets.PanelBackdropIntegrationTest
+INSTRUMENTATION_STATUS: current=2
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=11
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=backGestureClosesCommandsBeforeClosingTheWidgetWindow
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=ohi.andre.consolelauncher.managers.widgets.PanelBackdropIntegrationTest
+INSTRUMENTATION_STATUS: current=3
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=11
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=transparentSettingsKeepsLauncherVisibleAndBlursBehindThePane
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=ohi.andre.consolelauncher.managers.widgets.PanelBackdropIntegrationTest
+INSTRUMENTATION_STATUS: current=3
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=11
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=transparentSettingsKeepsLauncherVisibleAndBlursBehindThePane
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=ohi.andre.consolelauncher.managers.widgets.PanelBackdropIntegrationTest
+INSTRUMENTATION_STATUS: current=4
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=11
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=widgetWindowBlursBehindVisibleSystemBarsWithoutChangingTheBoardFill
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=ohi.andre.consolelauncher.managers.widgets.PanelBackdropIntegrationTest
+INSTRUMENTATION_STATUS: current=4
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=11
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=widgetWindowBlursBehindVisibleSystemBarsWithoutChangingTheBoardFill
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=ohi.andre.consolelauncher.managers.widgets.WidgetPaneIntegrationTest
+INSTRUMENTATION_STATUS: current=5
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=11
+INSTRUMENTATION_STATUS: stream=
+ohi.andre.consolelauncher.managers.widgets.WidgetPaneIntegrationTest:
+INSTRUMENTATION_STATUS: test=resizingShowsNativeContentBeforeReleaseAndCancelRestoresIt
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=ohi.andre.consolelauncher.managers.widgets.WidgetPaneIntegrationTest
+INSTRUMENTATION_STATUS: current=5
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=11
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=resizingShowsNativeContentBeforeReleaseAndCancelRestoresIt
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=ohi.andre.consolelauncher.managers.widgets.WidgetPaneIntegrationTest
+INSTRUMENTATION_STATUS: current=6
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=11
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=commandInputRemainsVisibleAboveTheKeyboard
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=ohi.andre.consolelauncher.managers.widgets.WidgetPaneIntegrationTest
+INSTRUMENTATION_STATUS: current=6
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=11
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=commandInputRemainsVisibleAboveTheKeyboard
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=ohi.andre.consolelauncher.managers.widgets.WidgetPaneIntegrationTest
+INSTRUMENTATION_STATUS: current=7
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=11
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=boardScrollsAndChipsMatchLauncherHeight
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=ohi.andre.consolelauncher.managers.widgets.WidgetPaneIntegrationTest
+INSTRUMENTATION_STATUS: current=7
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=11
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: Swiping the board must move the viewport
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at ohi.andre.consolelauncher.managers.widgets.WidgetPaneIntegrationTest.boardScrollsAndChipsMatchLauncherHeight$lambda$31$lambda$28(WidgetPaneIntegrationTest.kt:158)
+	at ohi.andre.consolelauncher.managers.widgets.WidgetPaneIntegrationTest$$ExternalSyntheticLambda3.invoke(D8$$SyntheticClass:0)
+	at ohi.andre.consolelauncher.managers.widgets.WidgetPaneIntegrationTest.main$lambda$0(WidgetPaneIntegrationTest.kt:30)
+	at ohi.andre.consolelauncher.managers.widgets.WidgetPaneIntegrationTest$$ExternalSyntheticLambda32.run(D8$$SyntheticClass:0)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:520)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:328)
+	at android.app.Instrumentation$SyncRunnable.run(Instrumentation.java:2650)
+	at android.os.Handler.handleCallback(Handler.java:1051)
+	at android.os.Handler.dispatchMessage(Handler.java:107)
+	at android.os.Looper.loopOnce(Looper.java:266)
+	at android.os.Looper.loop(Looper.java:361)
+	at android.app.ActivityThread.main(ActivityThread.java:10341)
+	at java.lang.reflect.Method.invoke(Native Method)
+	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:675)
+	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:1002)
+
+INSTRUMENTATION_STATUS: stream=
+Error in boardScrollsAndChipsMatchLauncherHeight(ohi.andre.consolelauncher.managers.widgets.WidgetPaneIntegrationTest):
+java.lang.AssertionError: Swiping the board must move the viewport
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at ohi.andre.consolelauncher.managers.widgets.WidgetPaneIntegrationTest.boardScrollsAndChipsMatchLauncherHeight$lambda$31$lambda$28(WidgetPaneIntegrationTest.kt:158)
+	at ohi.andre.consolelauncher.managers.widgets.WidgetPaneIntegrationTest$$ExternalSyntheticLambda3.invoke(D8$$SyntheticClass:0)
+	at ohi.andre.consolelauncher.managers.widgets.WidgetPaneIntegrationTest.main$lambda$0(WidgetPaneIntegrationTest.kt:30)
+	at ohi.andre.consolelauncher.managers.widgets.WidgetPaneIntegrationTest$$ExternalSyntheticLambda32.run(D8$$SyntheticClass:0)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:520)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:328)
+	at android.app.Instrumentation$SyncRunnable.run(Instrumentation.java:2650)
+	at android.os.Handler.handleCallback(Handler.java:1051)
+	at android.os.Handler.dispatchMessage(Handler.java:107)
+	at android.os.Looper.loopOnce(Looper.java:266)
+	at android.os.Looper.loop(Looper.java:361)
+	at android.app.ActivityThread.main(ActivityThread.java:10341)
+	at java.lang.reflect.Method.invoke(Native Method)
+	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:675)
+	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:1002)
+
+INSTRUMENTATION_STATUS: test=boardScrollsAndChipsMatchLauncherHeight
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_STATUS: class=ohi.andre.consolelauncher.managers.widgets.WidgetPaneIntegrationTest
+INSTRUMENTATION_STATUS: current=8
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=11
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=nativeWidgetSurvivesEditingCommandsRetryAndHide
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=ohi.andre.consolelauncher.managers.widgets.WidgetPaneIntegrationTest
+INSTRUMENTATION_STATUS: current=8
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=11
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=nativeWidgetSurvivesEditingCommandsRetryAndHide
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=ohi.andre.consolelauncher.managers.widgets.WidgetPaneIntegrationTest
+INSTRUMENTATION_STATUS: current=9
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=11
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=expandedPaneIgnoresFloatingGeometryAndRetainsBindingsAcrossRecreation
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=ohi.andre.consolelauncher.managers.widgets.WidgetPaneIntegrationTest
+INSTRUMENTATION_STATUS: current=9
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=11
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=expandedPaneIgnoresFloatingGeometryAndRetainsBindingsAcrossRecreation
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=ohi.andre.consolelauncher.managers.widgets.WidgetPaneIntegrationTest
+INSTRUMENTATION_STATUS: current=10
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=11
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=pickerSearchAndBackKeepThePaneOpen
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=ohi.andre.consolelauncher.managers.widgets.WidgetPaneIntegrationTest
+INSTRUMENTATION_STATUS: current=10
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=11
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=pickerSearchAndBackKeepThePaneOpen
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=ohi.andre.consolelauncher.managers.widgets.WidgetPaneIntegrationTest
+INSTRUMENTATION_STATUS: current=11
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=11
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=emptyAndClonedSpacesKeepBindingsAndUnreadableSnapshotsBlockCleanup
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=ohi.andre.consolelauncher.managers.widgets.WidgetPaneIntegrationTest
+INSTRUMENTATION_STATUS: current=11
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=11
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=emptyAndClonedSpacesKeepBindingsAndUnreadableSnapshotsBlockCleanup
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_RESULT: stream=
+
+Time: 48.655
+There was 1 failure:
+1) boardScrollsAndChipsMatchLauncherHeight(ohi.andre.consolelauncher.managers.widgets.WidgetPaneIntegrationTest)
+java.lang.AssertionError: Swiping the board must move the viewport
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at ohi.andre.consolelauncher.managers.widgets.WidgetPaneIntegrationTest.boardScrollsAndChipsMatchLauncherHeight$lambda$31$lambda$28(WidgetPaneIntegrationTest.kt:158)
+	at ohi.andre.consolelauncher.managers.widgets.WidgetPaneIntegrationTest$$ExternalSyntheticLambda3.invoke(D8$$SyntheticClass:0)
+	at ohi.andre.consolelauncher.managers.widgets.WidgetPaneIntegrationTest.main$lambda$0(WidgetPaneIntegrationTest.kt:30)
+	at ohi.andre.consolelauncher.managers.widgets.WidgetPaneIntegrationTest$$ExternalSyntheticLambda32.run(D8$$SyntheticClass:0)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:520)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:328)
+	at android.app.Instrumentation$SyncRunnable.run(Instrumentation.java:2650)
+	at android.os.Handler.handleCallback(Handler.java:1051)
+	at android.os.Handler.dispatchMessage(Handler.java:107)
+	at android.os.Looper.loopOnce(Looper.java:266)
+	at android.os.Looper.loop(Looper.java:361)
+	at android.app.ActivityThread.main(ActivityThread.java:10341)
+	at java.lang.reflect.Method.invoke(Native Method)
+	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:675)
+	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:1002)
+
+FAILURES!!!
+Tests run: 11,  Failures: 1
+
+
+INSTRUMENTATION_CODE: -1

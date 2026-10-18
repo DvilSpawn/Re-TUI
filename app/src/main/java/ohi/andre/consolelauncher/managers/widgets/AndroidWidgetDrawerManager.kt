@@ -1,6 +1,7 @@
 package ohi.andre.consolelauncher.managers.widgets
 
 import android.app.Activity
+import android.app.Dialog
 import android.appwidget.AppWidgetHost
 import android.appwidget.AppWidgetHostView
 import android.appwidget.AppWidgetManager
@@ -39,6 +40,12 @@ import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.ComponentDialog
+import androidx.activity.OnBackPressedCallback
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import ohi.andre.consolelauncher.LauncherActivity
 import ohi.andre.consolelauncher.managers.suggestions.SuggestionChipStyler
 import ohi.andre.consolelauncher.managers.SpaceManager
 import ohi.andre.consolelauncher.R
@@ -129,9 +136,9 @@ class AndroidWidgetDrawerManager(
     private var listening = false
     private var surfaceOpen = false
     private var recordsReadable = true
+    private var paneDialog: Dialog? = null
 
     init {
-        viewport?.let(PanelBackdrop::install)
         widgetGrid?.addOnLayoutChangeListener { _, l, t, r, b, oldL, oldT, oldR, oldB ->
             if (r - l != oldR - oldL) finishResizePreview(false)
             if (r - l != oldR - oldL || b - t != oldB - oldT) scheduleRender()
@@ -150,7 +157,7 @@ class AndroidWidgetDrawerManager(
         }
         commandToggle?.setOnClickListener {
             commandsVisible = !commandsVisible
-            if (!commandsVisible) { commandInput?.clearFocus(); closeKeyboard() }
+            if (!commandsVisible) { commandInput?.clearFocus(); hidePaneKeyboard() }
             renderWidgets()
         }
         drawerSurface?.setOnClickListener { }
@@ -169,13 +176,67 @@ class AndroidWidgetDrawerManager(
             return
         }
 
-        closeKeyboard()
+        hidePaneKeyboard()
         openSurface()
         cleanupWidgetState()
         startListening()
         styleChrome()
         drawerRoot.visibility = View.VISIBLE
+        if (paneDialog == null) openPaneWindow()
         scheduleRender()
+    }
+
+    private fun hidePaneKeyboard() {
+        commandInput?.windowToken?.let { token ->
+            (context.getSystemService(Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager)
+                .hideSoftInputFromWindow(token, 0)
+        }
+        closeKeyboard()
+    }
+
+    private fun openPaneWindow() {
+        // Like Settings, blur the whole launcher window beneath the pane, including system-bar areas.
+        val root = drawerRoot ?: return
+        val parent = root.parent as? ViewGroup ?: return
+        val index = parent.indexOfChild(root)
+        val params = root.layoutParams
+        parent.removeView(root)
+        val host = FrameLayout(activity)
+        host.addView(root, FrameLayout.LayoutParams(-1, -1))
+        val dialog = ComponentDialog(activity, R.style.Custom_Floating)
+        dialog.onBackPressedDispatcher.addCallback(dialog, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() { if (!handleBack()) hide() }
+        })
+        paneDialog = dialog
+        dialog.setContentView(host)
+        dialog.setOnDismissListener {
+            if (paneDialog === dialog) { paneDialog = null; hide() }
+            (root.parent as? ViewGroup)?.removeView(root)
+            parent.addView(root, min(index, parent.childCount), params)
+        }
+        val window = dialog.window!!
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        window.setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN or
+            android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+        val originalIcons = WindowCompat.getInsetsController(activity.window, activity.window.decorView)
+        WindowCompat.getInsetsController(window, window.decorView).apply {
+            isAppearanceLightStatusBars = originalIcons.isAppearanceLightStatusBars
+            isAppearanceLightNavigationBars = originalIcons.isAppearanceLightNavigationBars
+        }
+        ViewCompat.setOnApplyWindowInsetsListener(host) { view, insets ->
+            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
+            val keyboard = insets.getInsets(WindowInsetsCompat.Type.ime())
+            view.setPadding(bars.left, 0, bars.right, bars.bottom)
+            (activity as? LauncherActivity)?.uiManager?.applyWindowInsets(
+                bars.left, bars.top, bars.right, bars.bottom,
+                max(0, keyboard.bottom - bars.bottom), insets.isVisible(WindowInsetsCompat.Type.ime()))
+            insets
+        }
+        PanelBackdrop.installWindow(host, activity, window)
+        ohi.andre.consolelauncher.tuils.LauncherSystemUi.applyFullscreen(dialog)
+        dialog.show()
+        window.setLayout(-1, -1)
+        ViewCompat.requestApplyInsets(host)
     }
 
     fun hide() {
@@ -186,10 +247,13 @@ class AndroidWidgetDrawerManager(
         editMode = false
         commandsVisible = false
         commandInput?.clearFocus()
-        closeKeyboard()
+        hidePaneKeyboard()
         stopListening()
         drawerRoot?.removeCallbacks(renderRunnable)
         drawerRoot?.visibility = View.GONE
+        val dialog = paneDialog
+        paneDialog = null
+        dialog?.dismiss()
         closeSurface()
     }
 
@@ -222,7 +286,7 @@ class AndroidWidgetDrawerManager(
             commandsVisible -> {
                 commandsVisible = false
                 commandInput?.clearFocus()
-                closeKeyboard()
+                hidePaneKeyboard()
                 renderWidgets()
             }
             else -> return false
@@ -316,6 +380,7 @@ class AndroidWidgetDrawerManager(
     }
 
     fun dispose() {
+        hide()
         stopListening()
         drawerRoot?.removeCallbacks(renderRunnable)
         hideWidgetPicker()
@@ -404,7 +469,7 @@ class AndroidWidgetDrawerManager(
 
     private fun executeAddWidgetCommand() {
         commandInput?.clearFocus()
-        closeKeyboard()
+        hidePaneKeyboard()
         showWidgetPicker()
         showWidgetCommandStatus(context.getString(R.string.manager_androidwidgetdrawermanager_pick_a_widget_0598a))
     }
@@ -831,7 +896,7 @@ class AndroidWidgetDrawerManager(
         pickerLoadGeneration++
         (overlay.parent as? ViewGroup)?.removeView(overlay)
         pickerOverlay = null
-        closeKeyboard()
+        hidePaneKeyboard()
     }
 
     private fun populateWidgetPickerAsync(content: LinearLayout, search: EditText, pickerGeneration: Int) {

@@ -1,0 +1,46 @@
+{
+  "branch": "dvil/termux-ssh-analysis",
+  "head": "7703f3b2dbbd059ad6ae9f8910136089189782e0",
+  "sourcePatchSha256": "032921b5e5e56bfb34849fbbe80b95549562c5fe381fb382a44c73a8cb297d47",
+  "unit": {
+    "total": 473,
+    "passed": 468,
+    "skipped": 5,
+    "failures": 0,
+    "errors": 0
+  },
+  "releaseLint": {
+    "Warning": 621,
+    "Hint": 311,
+    "Error": 0
+  },
+  "artifacts": {
+    "retui-3-build503-rc1.aab": "06da326a5cc76ffd99b5c2829a6202268780059a72eb63c5e8e77eea4d0f2ae6",
+    "retui-3-build503-rc1.apk": "76f407531f0f6699ea26e1f85ad4a24876f8f1099bb6d0b91e68515dbee855e8"
+  },
+  "published": false,
+  "minifiedEmulatorSmoke": [
+    "Minified APK: native widget retained, full-window blur, Back gesture closes commands then pane",
+    "Minified APK: reopening retains the same native widget",
+    "Minified APK: cancelling authentication leaves the private profile locked",
+    "Minified APK: retry authentication succeeds and PRI tap launches fixture in private user 11, absent owner 0",
+    "Minified APK: relocking removes PRI and private apps"
+  ],
+  "minifiedNonDebuggable": true,
+  "apk16KbZipAlignmentPassed": true,
+  "physicalWidgetChecks": {
+    "portrait": 11,
+    "landscape": 11,
+    "failures": 0,
+    "navigationMode": "gestures"
+  },
+  "phoneInstalledRelease": {
+    "hardwareSerial": "10BE1C0FB40006A",
+    "home": "com.dvil.tui_renewed",
+    "dataInodes": "1746886\n1746973",
+    "firstInstallTime": "2026-10-16 08:05:59",
+    "version": "503 minSdk=23 targetSdk=36",
+    "packageFlags": "pkgFlags=[ HAS_CODE ALLOW_CLEAR_USER_DATA ]",
+    "apkSha256": "76f407531f0f6699ea26e1f85ad4a24876f8f1099bb6d0b91e68515dbee855e8"
+  }
+}

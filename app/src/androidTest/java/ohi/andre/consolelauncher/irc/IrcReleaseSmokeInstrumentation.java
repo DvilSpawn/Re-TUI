@@ -123,6 +123,8 @@ public class IrcReleaseSmokeInstrumentation extends Instrumentation {
             require(activity != null, "Home did not automatically open update notes");
             await(() -> prefs.getInt("last_seen_version_code", -1) == version);
             require(text("offline_help_output").contains("Build " + version), "Automatic notice has wrong build");
+            String expectedText = arguments.getString("changelog_expected_text");
+            if (expectedText != null) require(text("offline_help_output").contains(expectedText), "Automatic notice has stale release notes");
             await(() -> activity.hasWindowFocus());
             capture("changelog-auto");
             int closeId = context.getResources().getIdentifier("changelog_close", "id", context.getPackageName());

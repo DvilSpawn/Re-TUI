@@ -50,24 +50,26 @@ class PrivateSpaceLaunchIntegrationTest {
         }
         val profileId = InstrumentationRegistry.getArguments().getString("privateUserId")!!.toInt()
         assertEquals(android.os.UserHandle.getUserHandleForUid(profileId * 100000), profile)
-        ohi.andre.consolelauncher.tuils.Tuils.init(context)
-        ohi.andre.consolelauncher.managers.xml.XMLPrefsManager.dispose()
-        ohi.andre.consolelauncher.managers.xml.XMLPrefsManager.loadCommons(context)
-        ohi.andre.consolelauncher.managers.settings.LauncherSettings.refreshFromLoadedPrefs()
-        previousPrivateCommandEnabled = XMLPrefsManager.get(Behavior.enable_private_command)
-        LauncherSettings.set(context, Behavior.enable_private_command, "true")
-        ohi.andre.consolelauncher.managers.notifications.NotificationManager.create(context)
-        ohi.andre.consolelauncher.managers.settings.LauncherSettings.set(context,
-            ohi.andre.consolelauncher.managers.xml.options.Notifications.show_notifications, "false")
-        ohi.andre.consolelauncher.managers.settings.LauncherSettings.set(context,
-            ohi.andre.consolelauncher.managers.xml.options.Notifications.terminal_notifications, "false")
-        ohi.andre.consolelauncher.managers.settings.LauncherSettings.set(context,
-            ohi.andre.consolelauncher.managers.xml.options.Behavior.tui_notification, "false")
-        ohi.andre.consolelauncher.managers.settings.LauncherSettings.set(context,
-            ohi.andre.consolelauncher.managers.xml.options.Behavior.auto_show_keyboard, "false")
-        context.getSharedPreferences("retui_startup", Context.MODE_PRIVATE).edit()
-            .putBoolean("initialized", true).putBoolean("complete", true).putBoolean("active", false).commit()
-        ohi.andre.consolelauncher.managers.ChangelogManager.markSeen(context)
+        instrumentation.runOnMainSync {
+            ohi.andre.consolelauncher.tuils.Tuils.init(context)
+            ohi.andre.consolelauncher.managers.xml.XMLPrefsManager.dispose()
+            ohi.andre.consolelauncher.managers.xml.XMLPrefsManager.loadCommons(context)
+            ohi.andre.consolelauncher.managers.settings.LauncherSettings.refreshFromLoadedPrefs()
+            previousPrivateCommandEnabled = XMLPrefsManager.get(Behavior.enable_private_command)
+            LauncherSettings.set(context, Behavior.enable_private_command, "true")
+            ohi.andre.consolelauncher.managers.notifications.NotificationManager.create(context)
+            ohi.andre.consolelauncher.managers.settings.LauncherSettings.set(context,
+                ohi.andre.consolelauncher.managers.xml.options.Notifications.show_notifications, "false")
+            ohi.andre.consolelauncher.managers.settings.LauncherSettings.set(context,
+                ohi.andre.consolelauncher.managers.xml.options.Notifications.terminal_notifications, "false")
+            ohi.andre.consolelauncher.managers.settings.LauncherSettings.set(context,
+                ohi.andre.consolelauncher.managers.xml.options.Behavior.tui_notification, "false")
+            ohi.andre.consolelauncher.managers.settings.LauncherSettings.set(context,
+                ohi.andre.consolelauncher.managers.xml.options.Behavior.auto_show_keyboard, "false")
+            context.getSharedPreferences("retui_startup", Context.MODE_PRIVATE).edit()
+                .putBoolean("initialized", true).putBoolean("complete", true).putBoolean("active", false).commit()
+            ohi.andre.consolelauncher.managers.ChangelogManager.markSeen(context)
+        }
         fun waitFor(label: String, ready: () -> Boolean) {
             val deadline = SystemClock.uptimeMillis() + 15000
             while (!ready() && SystemClock.uptimeMillis() < deadline) Thread.sleep(100)
@@ -102,6 +104,8 @@ class PrivateSpaceLaunchIntegrationTest {
         fun unlockWithFixturePin() {
             request(false)
             waitFor("Android PIN entry is focused") { pinField(instrumentation.uiAutomation.rootInActiveWindow) != null }
+            // SystemUI can focus the field before the authentication prompt finishes animating.
+            instrumentation.uiAutomation.waitForIdle(500, 5000)
             val input = pinField(instrumentation.uiAutomation.rootInActiveWindow)!!
             assertTrue("Enter the emulator fixture PIN", input.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT,
                 Bundle().apply { putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, "2468") }))
@@ -158,6 +162,7 @@ class PrivateSpaceLaunchIntegrationTest {
         waitFor("Android dismissed cancelled authentication") {
             pinField(instrumentation.uiAutomation.rootInActiveWindow) == null
         }
+        instrumentation.uiAutomation.waitForIdle(500, 5000)
         assertTrue("Cancel keeps quiet mode on", users.isQuietModeEnabled(profile))
         assertTrue(manager.privateApps().isEmpty())
         activity = home()

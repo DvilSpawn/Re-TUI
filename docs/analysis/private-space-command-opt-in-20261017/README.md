@@ -7,3 +7,5 @@ Validation: app and instrumentation builds passed; 473 unit cases, 468 passed, f
 **Open regression:** the wider emulator flow passed its first PIN unlock → private fixture launch, including disabling/re-enabling Re:TUI access without locking the profile. It then failed to unlock the profile on retry after cancelling authentication, twice. Waiting for the cancelled PIN UI to disappear did not resolve it. This is retained in `post-cancel-retry.txt`; the earlier pre-toggle APK's two-cycle pass does not establish a pass for this candidate. No production-readiness or release claim is made.
 
 The two requested upstream launchers were source-reviewed in [additional launcher review](../private-space-launch-20261017/additional-launcher-review.md). No upstream implementation was copied.
+
+The open retry checkpoint above is superseded by the [subsequent retry investigation and release checks](../private-space-retry-20261017/README.md): corrected authentication/fixture synchronization passed three consecutive full flows and a minified release UI check.

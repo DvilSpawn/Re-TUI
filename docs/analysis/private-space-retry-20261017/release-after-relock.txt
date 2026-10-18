@@ -1,0 +1,9 @@
+  UserInfo{11:PrivateFixture:1090} serialNo=11 isPrimary=false parentId=0
+    Type: android.os.usertype.profile.PRIVATE
+    Flags: 4240 (INITIALIZED|PROFILE|QUIET_MODE)
+    State: -1
+    Created: +4h7m32s401ms ago
+    Last logged in: +1m17s473ms ago
+    Last logged in fingerprint: 37e367c5392bf1d0d27da7fe15db73744ccb7be1
+    Start time: <unknown>
+    Unlock time: <unknown>

@@ -1,0 +1,45 @@
+{
+  "sourceHead": "7703f3b2dbbd059ad6ae9f8910136089189782e0",
+  "productionSourceChanged": false,
+  "testFix": "Serialize fixture initialization on main thread; wait for SystemUI accessibility idle before entering PIN and after cancel dismissal.",
+  "unit": {
+    "tests": 473,
+    "skipped": 5,
+    "failures": 0,
+    "errors": 0
+  },
+  "releaseLint": {
+    "Warning": 621,
+    "Hint": 311
+  },
+  "emulator": {
+    "serial": "emulator-5580",
+    "sdk": 36,
+    "privateUser": 11,
+    "fixturePackage": "dev.retui.privatespacetest",
+    "fixtureAbsentOwner": true,
+    "consecutiveDebugFlowsPassed": 3,
+    "privateAppLaunches": 6,
+    "minifiedReleaseUiFlow": "cancel -> quiet mode stays on -> unlock again -> fixture PIN -> PRI tap -> foreground private user11 -> relock -> PRI absent",
+    "shellStartedPrivateProfile": false
+  },
+  "artifacts": {
+    "/tmp/retui-private-command-inplace.apk": {
+      "sha256": "d3fd2097a43882a61219b70e7161c669f3a855fc654c242f499a299649888d70",
+      "bytes": 19818629
+    },
+    "/tmp/retui-release-ready-503.apk": {
+      "sha256": "533c2caf29ff38919dde701541bfbbb8823a2f2c5ac324d7ce20cfa028adfe36",
+      "bytes": 7270904
+    },
+    "/tmp/retui-release-ready-503.aab": {
+      "sha256": "86f85deaab818a7fc116a160617b16c3e30d526ed6a45d5a5d06acc46a4d2fad",
+      "bytes": 7911095
+    }
+  },
+  "remaining": [
+    "User widget acceptance on the physical phone",
+    "Vivo native Private Space compatibility remains unsupported and disclosed"
+  ],
+  "published": false
+}

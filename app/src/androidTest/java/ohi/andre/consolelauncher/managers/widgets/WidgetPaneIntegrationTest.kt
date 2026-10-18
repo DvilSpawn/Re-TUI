@@ -36,6 +36,8 @@ class WidgetPaneIntegrationTest {
         manager.javaClass.getDeclaredField(name).apply { isAccessible = true }.get(manager)
     private fun call(manager: AndroidWidgetDrawerManager, name: String) =
         manager.javaClass.getDeclaredMethod(name).apply { isAccessible = true }.invoke(manager)
+    private fun <T : View> widgetView(home: LauncherActivity, id: Int): T =
+        (field(manager(home), "drawerRoot") as View).findViewById(id)
     private fun views(root: View): List<View> = listOf(root) + if (root is ViewGroup)
         (0 until root.childCount).flatMap { views(root.getChildAt(it)) } else emptyList()
     private fun capture(name: String) {
@@ -45,7 +47,8 @@ class WidgetPaneIntegrationTest {
         }
     }
 
-    internal fun fixture(keyboardOnStart: Boolean = false, run: (LauncherActivity, AndroidWidgetDrawerManager) -> Unit) {
+    internal fun fixture(keyboardOnStart: Boolean = false, systemBarsVisible: Boolean = false,
+        run: (LauncherActivity, AndroidWidgetDrawerManager) -> Unit) {
         check(context.packageName.endsWith(".termuxsshdebug")) { "Use the isolated test application" }
         Tuils.init(context)
         val original = Tuils.getFolder()
@@ -68,6 +71,7 @@ class WidgetPaneIntegrationTest {
         LauncherSettings.set(context, ohi.andre.consolelauncher.managers.xml.options.Notifications.terminal_notifications, "false")
         LauncherSettings.set(context, ohi.andre.consolelauncher.managers.xml.options.Behavior.tui_notification, "false")
         LauncherSettings.set(context, ohi.andre.consolelauncher.managers.xml.options.Behavior.auto_show_keyboard, keyboardOnStart.toString())
+        if (systemBarsVisible) LauncherSettings.set(context, ohi.andre.consolelauncher.managers.xml.options.Ui.fullscreen, "false")
         ohi.andre.consolelauncher.managers.ChangelogManager.markSeen(context)
         var home: LauncherActivity? = null
         try {
@@ -126,11 +130,11 @@ class WidgetPaneIntegrationTest {
         for (index in 0 until records.length()) records.getJSONObject(index).put("row", index * 7)
         preferences.edit().putString("widgets", records.toString()).commit()
         main { drawer.refreshGrid() }; settle()
-        val scroll = home.findViewById<android.widget.ScrollView>(R.id.android_widget_drawer_scroll)
+        val scroll = widgetView<android.widget.ScrollView>(home, R.id.android_widget_drawer_scroll)
         val rect = android.graphics.Rect()
         main {
             assertTrue("A long widget board must scroll", scroll.canScrollVertically(1))
-            val grid = home.findViewById<GridLayout>(R.id.android_widget_grid)
+            val grid = widgetView<GridLayout>(home, R.id.android_widget_grid)
             val cell = field(drawer, "lastRenderedCellSize") as Int
             val margin = Tuils.dpToPx(context, 4)
             assertEquals("Empty rows must occupy uniform cells instead of collapsing", 14 * cell + margin, grid.getChildAt(2).top)
@@ -140,23 +144,17 @@ class WidgetPaneIntegrationTest {
         val x = rect.exactCenterX()
         val from = (rect.bottom - 20).toFloat()
         val to = (rect.top + 30).toFloat()
-        val time = android.os.SystemClock.uptimeMillis()
-        fun touch(action: Int, y: Float, at: Long) {
-            android.view.MotionEvent.obtain(time, at, action, x, y, 0).also {
-                assertTrue(instrumentation.uiAutomation.injectInputEvent(it, true)); it.recycle()
-            }
-        }
-        touch(android.view.MotionEvent.ACTION_DOWN, from, time)
-        for (step in 1..10) touch(android.view.MotionEvent.ACTION_MOVE, from + (to - from) * step / 10, time + step * 20)
-        touch(android.view.MotionEvent.ACTION_UP, to, time + 220)
+        // Use a timed touchscreen swipe instead of injecting future-dated events back-to-back.
+        android.os.ParcelFileDescriptor.AutoCloseInputStream(instrumentation.uiAutomation.executeShellCommand(
+            "input swipe ${x.toInt()} ${from.toInt()} ${x.toInt()} ${to.toInt()} 350")).use { it.readBytes() }
         settle()
         main {
             assertTrue("Swiping the board must move the viewport", scroll.scrollY > 0)
-            home.findViewById<View>(R.id.android_widget_command_toggle).performClick()
+            widgetView<View>(home, R.id.android_widget_command_toggle).performClick()
         }
         settle()
         main {
-            val chip = home.findViewById<ViewGroup>(R.id.android_widget_suggestions_group).getChildAt(0) as TextView
+            val chip = widgetView<ViewGroup>(home, R.id.android_widget_suggestions_group).getChildAt(0) as TextView
             val launcherChip = ohi.andre.consolelauncher.managers.suggestions.SuggestionChipStyler.createView(home).apply { text = chip.text }
             ohi.andre.consolelauncher.tuils.LauncherFontScale.applyRecursively(launcherChip)
             launcherChip.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
@@ -167,12 +165,12 @@ class WidgetPaneIntegrationTest {
 
     @Test fun resizingShowsNativeContentBeforeReleaseAndCancelRestoresIt() = fixture { home, drawer ->
         addFixture(drawer)
-        val grid = home.findViewById<GridLayout>(R.id.android_widget_grid)
+        val grid = widgetView<GridLayout>(home, R.id.android_widget_grid)
         val frame = grid.getChildAt(0) as ViewGroup
         val host = frame.getChildAt(0) as AppWidgetHostView
         val preferences = context.getSharedPreferences("android_widget_drawer", 0)
         main {
-            home.findViewById<View>(R.id.android_widget_edit).performClick()
+            widgetView<View>(home, R.id.android_widget_edit).performClick()
             val time = android.os.SystemClock.uptimeMillis()
             for (action in listOf(android.view.MotionEvent.ACTION_DOWN, android.view.MotionEvent.ACTION_UP)) {
                 android.view.MotionEvent.obtain(time, time + 1, action, frame.width / 2f, frame.height / 2f, 0).also { frame.dispatchTouchEvent(it); it.recycle() }
@@ -258,11 +256,11 @@ class WidgetPaneIntegrationTest {
 
     @Test fun nativeWidgetSurvivesEditingCommandsRetryAndHide() = fixture { home, drawer ->
         val root = home.window.decorView
-        val grid = home.findViewById<GridLayout>(R.id.android_widget_grid)
+        val grid = widgetView<GridLayout>(home, R.id.android_widget_grid)
         main {
-            assertTrue(home.findViewById<View>(R.id.android_widget_empty).isShown)
-            assertEquals(View.GONE, home.findViewById<View>(R.id.android_widget_commands).visibility)
-            assertEquals("Close widgets", home.findViewById<View>(R.id.android_widget_drawer_add).contentDescription)
+            assertTrue(widgetView<View>(home, R.id.android_widget_empty).isShown)
+            assertEquals(View.GONE, widgetView<View>(home, R.id.android_widget_commands).visibility)
+            assertEquals("Close widgets", widgetView<View>(home, R.id.android_widget_drawer_add).contentDescription)
         }
         capture("widgets-empty")
         val id = addFixture(drawer)
@@ -285,21 +283,21 @@ class WidgetPaneIntegrationTest {
         }
         main {
             assertFalse(views(grid).filterIsInstance<TextView>().any { it.text.toString().startsWith("[W_ID:") })
-            home.findViewById<View>(R.id.android_widget_edit).performClick()
+            widgetView<View>(home, R.id.android_widget_edit).performClick()
         }
         settle()
         main {
             assertSame(host, (grid.getChildAt(0) as ViewGroup).getChildAt(0))
             assertFalse("Editing controls must not cover widgets with ID badges", views(grid).filterIsInstance<TextView>().any { it.text.toString().startsWith("[W_ID:") })
-            home.findViewById<View>(R.id.android_widget_edit).performClick()
-            home.findViewById<View>(R.id.android_widget_command_toggle).performClick()
+            widgetView<View>(home, R.id.android_widget_edit).performClick()
+            widgetView<View>(home, R.id.android_widget_command_toggle).performClick()
         }
         settle()
         main {
-            assertTrue(home.findViewById<View>(R.id.android_widget_commands).isShown)
+            assertTrue(widgetView<View>(home, R.id.android_widget_commands).isShown)
             assertEquals("Editing and commands must keep the native view attached", 0, detaches)
             assertTrue(drawer.handleBack())
-            assertEquals(View.GONE, home.findViewById<View>(R.id.android_widget_commands).visibility)
+            assertEquals(View.GONE, widgetView<View>(home, R.id.android_widget_commands).visibility)
             host.findViewById<TextView>(android.R.id.text1).performClick()
         }
         settle()
@@ -376,8 +374,8 @@ class WidgetPaneIntegrationTest {
             .putFloat("widgets_height", .5f).putFloat("widgets_left", .25f).putFloat("widgets_top", .25f).commit()
         val savedGeometry = windows.all.toMap()
         fun checkPane(activity: LauncherActivity) {
-            val surface = activity.findViewById<View>(R.id.android_widget_surface)
-            val viewport = activity.findViewById<View>(R.id.android_widget_viewport)
+            val surface = widgetView<View>(activity, R.id.android_widget_surface)
+            val viewport = widgetView<View>(activity, R.id.android_widget_viewport)
             assertSame("The widget pane no longer has a floating wrapper", viewport, surface.parent)
             assertEquals(viewport.width, surface.width)
             assertEquals(viewport.height, surface.height)
@@ -385,8 +383,8 @@ class WidgetPaneIntegrationTest {
                 assertNull("No widget-pane window controls remain: $tag", activity.window.decorView.findViewWithTag<View>("widgets-$tag"))
             }
             val title = android.graphics.Rect(); val close = android.graphics.Rect()
-            assertTrue(activity.findViewById<View>(R.id.android_widget_drawer_header).getGlobalVisibleRect(title))
-            assertTrue(activity.findViewById<View>(R.id.android_widget_drawer_add).getGlobalVisibleRect(close))
+            assertTrue(widgetView<View>(activity, R.id.android_widget_drawer_header).getGlobalVisibleRect(title))
+            assertTrue(widgetView<View>(activity, R.id.android_widget_drawer_add).getGlobalVisibleRect(close))
             assertFalse("Close must not overlap the title", android.graphics.Rect.intersects(title, close))
         }
         main { checkPane(home); drawer.hide() }
@@ -403,7 +401,7 @@ class WidgetPaneIntegrationTest {
             settle()
             main {
                 checkPane(replacement)
-                assertEquals(1, replacement.findViewById<GridLayout>(R.id.android_widget_grid).childCount)
+                assertEquals(1, widgetView<GridLayout>(replacement, R.id.android_widget_grid).childCount)
                 assertNotNull(AppWidgetManager.getInstance(context).getAppWidgetInfo(id))
                 restored.hide()
             }
@@ -413,8 +411,8 @@ class WidgetPaneIntegrationTest {
 
     @Test fun commandInputRemainsVisibleAboveTheKeyboard() = fixture { home, drawer ->
         main {
-            home.findViewById<View>(R.id.android_widget_command_toggle).performClick()
-            val input = home.findViewById<EditText>(R.id.android_widget_input)
+            widgetView<View>(home, R.id.android_widget_command_toggle).performClick()
+            val input = widgetView<EditText>(home, R.id.android_widget_input)
             input.requestFocus()
             (context.getSystemService(Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager)
                 .showSoftInput(input, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT)
@@ -424,7 +422,7 @@ class WidgetPaneIntegrationTest {
             val insets = androidx.core.view.ViewCompat.getRootWindowInsets(home.window.decorView)!!
             assertTrue("Widget command keyboard should open", insets.isVisible(androidx.core.view.WindowInsetsCompat.Type.ime()))
             val bounds = android.graphics.Rect()
-            assertTrue(home.findViewById<View>(R.id.android_widget_input).getGlobalVisibleRect(bounds))
+            assertTrue(widgetView<View>(home, R.id.android_widget_input).getGlobalVisibleRect(bounds))
             val keyboardTop = home.window.decorView.height - insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.ime()).bottom
             assertTrue("Widget input is covered by the keyboard", bounds.bottom <= keyboardTop)
         }
@@ -433,8 +431,18 @@ class WidgetPaneIntegrationTest {
     }
 
     @Test fun pickerSearchAndBackKeepThePaneOpen() = fixture { home, drawer ->
-        main { home.findViewById<View>(R.id.android_widget_empty_add).performClick() }
-        settle(); Thread.sleep(1000)
+        main { widgetView<View>(home, R.id.android_widget_empty_add).performClick() }
+        settle()
+        val deadline = android.os.SystemClock.uptimeMillis() + 15000
+        var loaded = false
+        while (!loaded && android.os.SystemClock.uptimeMillis() < deadline) {
+            main {
+                val overlay = field(drawer, "pickerOverlay") as View
+                loaded = views(overlay).any { it.contentDescription?.toString()?.contains("ReTUI Widget Fixture") == true }
+            }
+            if (!loaded) Thread.sleep(100)
+        }
+        assertTrue("The asynchronous provider list must finish loading before searching", loaded)
         main {
             val overlay = field(drawer, "pickerOverlay") as View
             val search = overlay.findViewWithTag<EditText>("widget-picker-search")
@@ -475,7 +483,7 @@ class WidgetPaneIntegrationTest {
         main { drawer.hide() }
         SpaceManager.switchTo(context, populated.id)
         main { drawer.show() }; settle()
-        main { assertEquals(1, home.findViewById<GridLayout>(R.id.android_widget_grid).childCount) }
+        main { assertEquals(1, widgetView<GridLayout>(home, R.id.android_widget_grid).childCount) }
         File(Tuils.getFolder(), "spaces/${empty.id}/shared_prefs/android_widget_drawer.properties").writeText("corrupted snapshot")
         assertNull("Unreadable snapshots must prevent destructive cleanup", SpaceManager.widgetIdsInOtherSpaces(context))
         main { drawer.refreshGrid() }; settle()

@@ -6729,10 +6729,8 @@ class UIManager(
                 { if (!duoLayoutActive) closeKeyboard() },
                 {
                     setWallpaperTouchEnabled(false)
-                    if (!duoLayoutActive) hideLauncherChromeForSurface()
                 },
                 {
-                    restoreLauncherChromeAfterSurface()
                     restoreWallpaperTouchAfterDrawerClose()
                 }
             )

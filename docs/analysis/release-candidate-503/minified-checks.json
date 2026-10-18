@@ -1,0 +1,7 @@
+[
+  "Minified APK: native widget retained, full-window blur, Back gesture closes commands then pane",
+  "Minified APK: reopening retains the same native widget",
+  "Minified APK: cancelling authentication leaves the private profile locked",
+  "Minified APK: retry authentication succeeds and PRI tap launches fixture in private user 11, absent owner 0",
+  "Minified APK: relocking removes PRI and private apps"
+]

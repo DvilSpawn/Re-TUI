@@ -163,4 +163,15 @@ Final focused validation: 458 unit tests passed, five existing live-network skip
 - [x] Add the default-off Behaviour command toggle, terminal-themed compatibility confirmation, draft/Save boundary, disabled execution message and hidden PRI/command discovery.
 - [x] Pass the Settings confirmation/cancel/save/disable emulator test and 473-case unit suite (five existing skips). Evidence: `private-space-command-opt-in-20261017/README.md`.
 - [x] Review requested µLauncher and Olauncher source and upstream issues; no verified Vivo workaround found. Evidence: `private-space-launch-20261017/additional-launcher-review.md`.
-- [ ] Resolve the current emulator unlock retry after cancelling authentication. The first private launch and opt-in gate passed; the second authenticated unlock did not start the private profile in two runs.
+- [x] Resolve the emulator unlock retry verification: synchronize fixture initialization and Android authentication UI readiness. Three consecutive full flows passed, followed by a visible terminal cancel → unlock → private-user app launch → relock check on the minified release APK. See `private-space-retry-20261017/README.md`; no production workaround was required.
+- [x] Refresh normal release APK/AAB and release lint without bypasses: 473 unit cases, 468 passed/five skipped; lint zero errors, 621 warnings/311 hints. Sign and verify local release artifacts.
+- [x] Install the latest normal signed build 503 in place on the physical Vivo, verify installed APK hash and retained data/HOME evidence, and leave the phone available for widget testing.
+- [ ] User acceptance of the widget pane on the physical Vivo. The phone has the debug candidate; the minified release APK was separately smoke-tested on the emulator.
+
+### Widget activity backdrop — 2026-10-17
+
+- [x] Preserve the actual widget board's configured fill; make the outer activity backing transparent and blur the screen behind it using the Settings window policy. Restore all background/window state on close.
+- [x] Pass eight focused physical-phone checks across portrait/landscape, Settings, cleanup, native resize/cancel and keyboard layout. Install the correction in place with fresh signer, APK-byte and data preservation checks. Evidence: `widgets-activity-backdrop-20261017/README.md`.
+- [x] Rebuild release APK/AAB and repeat release gates after the widget backdrop correction. Build 503 RC1 has signed artifacts, a fresh 473-case unit run, zero release-lint errors, 22 final phone checks and exact minified widget/Private Space smoke checks. Evidence: `release-candidate-503/README.md`.
+- [x] Replace the remaining inset-view blur with the same full-window blur path as Settings, covering visible system bars. Keep the board fill and expanded geometry; verify 20 phone checks across both orientations and install in place. This supersedes the earlier temporary activity-backing approach: `widgets-window-blur-20261017/README.md`.
+- [x] Replace the legacy widget-window Back handler with AndroidX dispatch for Android 16 gestures, test real edge gestures, and install the exact minified RC APK on the Vivo with fresh byte/signature/data checks. No public release has been made.
