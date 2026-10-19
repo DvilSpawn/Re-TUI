@@ -313,8 +313,8 @@
             android:label="@string/activity_label_afc97f0f35"
             android:launchMode="singleTask"
             android:taskAffinity="${applicationId}.notes"
-            android:theme="@style/RememberTheme"
-            android:windowSoftInputMode="adjustNothing"
+            android:theme="@style/Custom.Floating"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden"
             android:exported="false" />
         <activity android:name=".calculator.CalculatorPackActivity"
             android:exported="true" android:excludeFromRecents="true"

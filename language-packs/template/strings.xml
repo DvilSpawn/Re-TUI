@@ -305,7 +305,14 @@ You can reopen these notes with the changelog command. These highlights are bund
 - Replaced the preview tabs with swipeable Status, Terminal, Music, Help and Calculator examples. Appearance drafts update the previews without saving or running actions.
 - Unlocked Private Space apps can now launch from typed app names. Use private -open &lt;app name&gt; to explicitly choose the private copy.
 - Fixed missing alphabetical headings in private -ls and repeated, out-of-order letter sections in the private app drawer.
-- Private app launching remains unavailable while locked or when Private Space support is disabled.</string>
+- Private app launching remains unavailable while locked or when Private Space support is disabled.
+
+## Hotfix 2 · Build 505
+
+- Notes now shares the pane frame, header, window controls and background blur used by Help and Calculator.
+- Notes actions sit inside the pane with simpler controls, improved spacing and room for the keyboard.
+- Use 10 Help home from any offline help article, topic list or command reference to jump directly to the main directory.
+- Updated offline topics for Notes, Settings previews, Private Space, the optional Qalculate engine and Termux SSH setup.</string>
     <string name="command_bluetooth_false_4603a">%1$s false</string>
     <string name="command_bluetooth_opening_bluetooth_settings_android_no_long_c4672">Opening Bluetooth settings. Android no longer allows third-party launchers to toggle Bluetooth directly.</string>
     <string name="command_bluetooth_true_630fa">%1$s true</string>
@@ -2585,7 +2592,7 @@ username "Work User" "Desk Phone"
 
 Change displayed prompt labels; quotes keep each label together.</string>
     <string name="offline_help_article_argument_shapes_title">Enter names, text, colors, and booleans</string>
-    <string name="offline_help_article_calculator_editing_limits_body">Tap the calculator input to position the cursor or select text. Function and square-root keys wrap selected text, or insert parentheses with the cursor inside. Backspace deletes the selection or previous character. ABC uses staggered QWERTY rows within the same keypad-height budget as 123, and long input scrolls horizontally. Expressions are limited to 1024 characters. The native worker has a four-second watchdog; the client waits up to eight seconds for completion. Cancel targets the active calculation and late results are ignored. The floating pane enforces minimum sizing for the input, hint and keypad; Calculator stays expanded in landscape. Larger fonts and a smaller screen can reduce the available floating resize range.
+    <string name="offline_help_article_calculator_editing_limits_body">Tap the calculator input to position the cursor or select text. Function and square-root keys wrap selected text, or insert parentheses with the cursor inside. Backspace deletes the selection or previous character. ABC uses staggered QWERTY rows within the same keypad-height budget as 123, and long input scrolls horizontally. Expressions are limited to 1024 characters. Calculations have a timeout so a long-running expression cannot block the interface indefinitely. Cancel targets the active calculation and late results are ignored. The floating pane enforces minimum sizing for the input, hint and keypad; Calculator stays expanded in landscape. Larger fonts and a smaller screen can reduce the available floating resize range.
 
 ## Examples
 
@@ -2674,13 +2681,13 @@ At `help&gt;`, choose a displayed number or tap its line. 1 opens Topics; 2/3 mo
 
 The header window control switches between expanded and floating reading. Drag the header to move a floating window or its corners to resize it. Text reflows rather than scaling.</string>
     <string name="offline_help_article_calculator_help_title">Calculator</string>
-    <string name="offline_help_article_calculator_offline_engine_body">The advanced calculator is bundled with the app and its definitions; it does not download an engine when you calculate. It is available on Android 7 and later. It does not fetch current online currency rates or provide arbitrary external command execution. Native definitions and engine messages are English; launcher-owned messages can use a selected language pack. The advanced engine runs in a separate private worker process, which can be stopped if a calculation exceeds its deadline.</string>
+    <string name="offline_help_article_calculator_offline_engine_body">The advanced Qalculate engine is an optional download, not part of the APK. Download Qalculate in the calculator asks for confirmation, downloads a verified engine package and installs it automatically. Import engine file installs a compatible package you already have. Basic arithmetic remains available without it; after installation advanced calculations work offline. It does not fetch current online currency rates or provide arbitrary external command execution. Engine definitions and messages are English; launcher-owned messages can use a selected language pack. The optional engine runs with a calculation timeout and does not execute arbitrary shell commands.</string>
     <string name="offline_help_article_calculator_offline_engine_title">Offline calculator capabilities</string>
     <string name="offline_help_article_calculator_workflow_body">calc opens the calculator; calc &lt;expression&gt; evaluates one launcher result. At the home prompt or in an alias, use the calc prefix: bare numbers/expressions are not automatically calculations. Inside the pane, type after calc&gt; and press Enter or ↵. 123 provides numbers, ABC provides QWERTY letters/units and FUNC provides functions/constants. Use to for conversion; in is an inch unit.
 
 The hint below the input previews how the engine reads the expression and its possible result; it does not submit or change history. Start with +, -, *, / or ^ to continue the previous successful answer without typing ans. ans is still available inside larger expressions and conversions. Errors or cancellation do not replace the last result. clear clears the transcript but keeps ans, and exit closes the pane. The help tab explains expressions and editing.
 
-On Android 7+, opening the pane enables bundled Qalculate; the one-shot launcher command follows the saved Qalculate/engine settings. Enable qalculate in Settings → behavior.xml for units and symbolic maths from the prompt. Suggestions reflect that setting. Android 6 uses the basic evaluator. Pane calculations use approximate mode; one-shot calculations follow stored engine options.
+Basic arithmetic works without an engine download. For units and advanced maths, choose Download Qalculate in the calculator, review the confirmation and let Launcher download, verify and install the optional engine. Import engine file is also available. Once installed, the engine works offline. The one-shot launcher command follows the saved Qalculate/engine settings; enable qalculate in Behaviour for advanced prompt calculations. Pane calculations use approximate mode; one-shot calculations follow stored engine options.
 
 ## Examples
 
@@ -2843,7 +2850,7 @@ Read the calculator command reference.</string>
     <string name="offline_help_article_command_basics_title">Choose a launcher command, alias, or shell</string>
     <string name="offline_help_article_command_reference_body">At the launcher prompt, enter help for this offline manual, tutorial for Getting started, or help &lt;command&gt; for bundled syntax and configured priority without running that command. help -topic &lt;id&gt; opens a known category/article. Topic suggestions match IDs, titles and body text and open the selected topic directly. Hidden compatibility names are omitted from the ordinary command list; commands without reference text show a fallback, not invented syntax.
 
-Lists show up to seven choices with 8/9 for previous/next pages when available. Tap an entry or enter its number and press ↵. Within an article, 1 returns to its list and 2/3 move between topics when shown. Android Back or 0 closes the manual. Bare help restores the previous article/page and reading position; explicit topic links open the requested topic. Use 1 for Topics within an article and 10 for Categories within a list. Examples are text, not executable buttons. The calculator help tab opens the dedicated offline reader. Online tutorial options and companion/network services do not become offline because this manual is bundled.
+Lists show up to seven choices with 8/9 for previous/next pages when available. Tap an entry or enter its number and press ↵. Within an article, 1 returns to its list and 2/3 move between topics when shown. Android Back or 0 closes the manual. Bare help restores the previous article/page and reading position; explicit topic links open the requested topic. Use 1 for Topics within an article and 10 Help home from any article or list to return directly to the first page of the main directory. Examples are text, not executable buttons. The calculator help tab opens the dedicated offline reader. Online tutorial options and companion/network services do not become offline because this manual is bundled.
 
 ## Examples
 
@@ -2891,7 +2898,7 @@ The LauncherSettings snapshot keeps runtime reads consistent, but refresh routes
 
 ## Preview versus apply
 
-LauncherActivity.preview preserves terminal UI state during an in-place rebuild; it does not undo saved settings. Transient color previews and staged startup/frame/font editors are different mechanisms. Follow each editor's Save/Apply and Cancel controls rather than assuming all previews are unsaved trials.
+The appearance editors show compact, swipeable Status, Terminal, Music, Help and Calculator previews. Draft appearance updates are shown before Save. Preview controls do not run commands or launch apps. Cancel discards the draft; nonvisual Behaviour changes take effect only after Save. Startup and frame editors keep their own staged controls. Command-line config writes persist immediately; the Settings preview does not undo those writes. Follow each editor's Save/Apply and Cancel controls rather than assuming all previews are unsaved trials.
 
 ## Examples
 
@@ -3420,6 +3427,14 @@ This manual is bundled with Launcher and can be read offline. IRC and network se
 - Appearance: app-drawer category/alphabet rails have independent normal and selected colors. The default font is JetBrains Mono Nerd Font Regular; custom/system font controls remain available.
 - Idle fade: optionally fade Home and the Termux workspace to the wallpaper. It is off by default. Read Idle fade in Appearance.
 
+## Recent updates
+
+- Help home: use 10 from any article or topic list to return directly to the main directory.
+- Notes: the library and editor share the terminal pane styling and background blur. Read Notes in Tools.
+- Settings: swipe through Status, Terminal, Music, Help and Calculator previews before saving appearance changes. Read Configuration workflow in Appearance.
+- Private Space: enable the private command in Behaviour on supported devices, unlock, then use `private -open &lt;app name&gt;`. Read Private Space in Apps.
+- Calculator: basic arithmetic is ready immediately; advanced Qalculate is downloaded and installed after confirmation.
+
 ## Find an article directly
 
 ```
@@ -3428,7 +3443,11 @@ help -topic irc-community
 
 At Launcher Home, open the offline IRC guide. `help irc` prints the shorter command reference instead. Use numbered choices or tap a topic in this reader; Android Back closes Help and keeps your place.</string>
     <string name="offline_help_article_new_features_title">Explore the new terminal tools</string>
-    <string name="offline_help_article_notes_workflow_body">## Library storage
+    <string name="offline_help_article_notes_workflow_body">## Notes pane
+
+Run `notes` to open the library. Notes uses the same terminal pane frame, header and background blur as Help and Calculator. Its toolbar is inside the pane. The window control switches between expanded and floating in portrait; landscape stays expanded. Open a folder and select a note to edit it. Edits are saved automatically; Back returns from the document to the library. Returning Home keeps Notes in its own task. The editor and toolbar make room for the keyboard.
+
+## Library storage
 
 notes opens the integrated Remember library/editor in its own task, not a separate app. Current storage is a private remember-notes.xml index plus Markdown/assets in notes-library; legacy notes.xml is retained as an import recovery copy, not the primary live database. NotesManager adapts the library for status/module display.
 
@@ -3873,7 +3892,7 @@ Type a command at the launcher prompt and press Enter. Typing help by itself doe
 
 ## Navigate the manual
 
-&gt;! Nothing on this page executes: examples are text, not command buttons. In the manual, type a displayed number and press Enter, or tap its numbered line. Android Back or 0 closes Help immediately. Bare help restores your previous page and reading position. Use 1 for Topics within an article and 10 for Categories within a topic list. The compact number keys belong only to the manual, not the launcher command prompt.</string>
+&gt;! Nothing on this page executes: examples are text, not command buttons. In the manual, type a displayed number and press Enter, or tap its numbered line. Android Back or 0 closes Help immediately. Bare help restores your previous page and reading position. Use 1 for Topics within an article. From any article or topic list, tap 10 Help home or enter 10 to jump directly to the first page of the main help directory. This includes command-reference articles; you do not need to retrace earlier pages. The compact number keys belong only to the manual, not the launcher command prompt.</string>
     <string name="offline_help_article_terminal_basics_title">Terminal basics</string>
     <string name="offline_help_article_termux_bridge_setup_body">Tbridge -status/-doctor report whether Termux is installed and RUN_COMMAND is declared/granted. -setup prints setup instructions. -probe dispatches a diagnostic shell script only after readiness checks. The bridge requires allow-external-apps=true in Termux in addition to launcher permission; shared-storage scripts may need termux-setup-storage. Legacy -dirs/-files/-ls only print a retirement message. File browsing is delegated to Re:T-UI Files, not restored by changing file_backend. Grant only the access needed by scripts you trust.
 
@@ -3919,7 +3938,7 @@ At Launcher Home, read this offline guide without changing the helper. :update b
 
 Bare termux or tmux opens the interactive workspace. tmux launch &lt;id&gt; focuses/creates a launcher window; built-ins include shell, htop, mc, nano, vim, python, node and logs. Their executables must already be installed in Termux. tmux switch selects an index/visible window token, new creates a window, save persists a custom launcher command and rm removes that saved launcher, not its package. Scripts run with Termux access: review them first.
 
-Inside the workspace, a colon starts local control mode; ordinary input goes to its selected tmux window using an authenticated targeted socket. There is no silent fallback to session-global input. :status reports installation, permission, socket and geometry. :update reopens the helper update prompt; it never sends a chat or shell message. :new, :switch, :prev, :next, :reconnect and :home are local controls. Tap a window label, use :switch &lt;window&gt; locally, or tmux switch &lt;window&gt; at Launcher Home to select an index/name; :prev/:next and a horizontal terminal swipe switch adjacent windows. The active window is highlighted. Connecting/Ready/Disconnected appears in the header without replacing a running terminal with typing/key status. Ready confirms the authenticated bridge handshake, not execution of each queued key. Input that cannot be queued is not automatically replayed. Returning Home or backgrounding closes only the launcher stream; Termux tmux jobs and shell drafts continue. Returning to the pane reconnects without killing the session. This Launcher needs helper 0.4.2. Opening the workspace checks compatibility and offers Update now / Later. Update now installs the checksum-verified helper bundled with the APK through Termux and reconnects without stopping shells/jobs. The previous helper is kept at $PREFIX/share/retui/retui.previous, and installation failures attempt rollback. Custom helpers at the normal path are replaced only with your approval. Termux must already be installed with command permission and allow-external-apps enabled; missing tmux/socat packages require pkg install tmux socat in Termux. Setup is never silently changed. No helper is downloaded from a changing Git branch. A timed-out command may still finish in Termux; Launcher does not automatically retry installation. If an interrupted update lock persists, check that no updater is running before inspecting $PREFIX/share/retui/.update-lock. Launcher will not remove unknown locks.
+Inside the workspace, a colon starts local control mode; ordinary input goes to its selected tmux window through an authenticated local SSH connection. SSH is the standard interactive transport; the Re:TUI helper still handles workspace discovery and setup. Follow the in-pane setup prompt to prepare Termux SSH access. There is no silent fallback to session-global input. :status reports installation, permission, connection and geometry. :update reopens the helper update prompt; it never sends a chat or shell message. :new, :switch, :prev, :next, :reconnect and :home are local controls. Tap a window label, use :switch &lt;window&gt; locally, or tmux switch &lt;window&gt; at Launcher Home to select an index/name; :prev/:next and a horizontal terminal swipe switch adjacent windows. The active window is highlighted. Connecting/Ready/Disconnected appears in the header without replacing a running terminal with typing/key status. Ready confirms the terminal connection, not completion of each command. Input that cannot be queued is not automatically replayed. Returning Home or backgrounding closes only the launcher stream; Termux tmux jobs and shell drafts continue. Returning to the pane reconnects without killing the session. This Launcher includes helper 0.4.4. Opening the workspace checks compatibility and offers Update now / Later. Update now installs the checksum-verified helper bundled with the APK through Termux and reconnects without stopping shells/jobs. The previous helper is kept at $PREFIX/share/retui/retui.previous, and installation failures attempt rollback. Custom helpers at the normal path are replaced only with your approval. Termux must already be installed with command permission and allow-external-apps enabled; the SSH setup prompt identifies missing Termux packages and asks before installation. Setup is never silently changed. No helper is downloaded from a changing Git branch. A timed-out command may still finish in Termux; Launcher does not automatically retry installation. If an interrupted update lock persists, check that no updater is running before inspecting $PREFIX/share/retui/.update-lock. Launcher will not remove unknown locks.
 
 termux -run opens the one-shot console, not an interactive full-screen Linux app. Registered termux: sources can update modules with script stdout. Legacy -app-add/-apps only show workspace help; use tmux save for custom launchers. termux -setup is unhandled; use tbridge -setup. Retired tbridge -dirs/-files/-ls do not browse files; use the Re:TUI Files companion.
 
@@ -4101,13 +4120,34 @@ help -topic &lt;id&gt; → open a manual category or article</string>
     <string name="offline_help_presets_title">Presets</string>
     <string name="offline_help_previous">Previous topic</string>
     <string name="offline_help_previous_page">Previous page</string>
+    <string name="offline_help_private_space_body">## Enable on a supported device
+
+In Settings → Behaviour, enable the private command and read the compatibility notice. Re:TUI must be the default launcher. Android Private Space support depends on the device implementation; authentication alone does not guarantee that a manufacturer allows another launcher to open private apps.
+
+## Unlock and launch
+
+Run `private -unlock` and authenticate in Android. `private -ls` lists private apps alphabetically. Type an app name at Home to launch an unlocked private app when no personal app matches, or use `private -open &lt;app name&gt;` to explicitly choose the private copy. Replace the placeholder with the full app name. Locked private apps cannot launch; private apps are kept out of general suggestions.
+
+## Lock, hide and settings
+
+`private -lock` locks the space. `private -hide` hides its drawer entry; hiding is not the same as locking. `private -show` restores the entry. `private -settings` asks Android to open the profile settings when supported. If authentication succeeds but apps still do not open, check the device’s own Private Space interface; some manufacturer implementations are incompatible.
+
+## Example
+
+```
+private -unlock
+private -ls
+private -open Example App
+private -lock
+```</string>
+    <string name="offline_help_private_space_title">Private Space: unlock and open apps</string>
     <string name="offline_help_reference_body">Choose a numbered topic. Use 0 to return to the launcher.</string>
     <string name="offline_help_reference_title">Command reference</string>
     <string name="offline_help_reset_window">Reset window geometry</string>
     <string name="offline_help_resize_corner">Resize width and height: drag, tap to grow, long press to shrink</string>
     <string name="offline_help_resize_height">Resize height: drag, tap to grow, long press to shrink</string>
     <string name="offline_help_resize_width">Resize width: drag, tap to grow, long press to shrink</string>
-    <string name="offline_help_root">Categories</string>
+    <string name="offline_help_root">Help home</string>
     <string name="offline_help_title">Offline manual</string>
     <string name="offline_help_tools_body">IRC, Calculator, notes and other built-in tools. Choose a numbered topic. Use 0 to return to the launcher.</string>
     <string name="offline_help_tools_title">Tools</string>

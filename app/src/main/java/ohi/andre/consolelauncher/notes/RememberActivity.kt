@@ -2,6 +2,12 @@ package ohi.andre.consolelauncher.notes
 
 import ohi.andre.consolelauncher.tuils.displayMessage
 import ohi.andre.consolelauncher.R
+import ohi.andre.consolelauncher.commands.tuixt.TuixtLayout
+import ohi.andre.consolelauncher.help.HelpWindowPanel
+import ohi.andre.consolelauncher.tuils.TerminalBorderRuntime
+import ohi.andre.consolelauncher.tuils.FrameTarget
+import ohi.andre.consolelauncher.tuils.LauncherSystemUi
+import ohi.andre.consolelauncher.tuils.Tuils
 
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
@@ -55,6 +61,7 @@ class RememberActivity : ohi.andre.consolelauncher.localization.LocalizedCompone
     private lateinit var theme: RetuiTheme
     private lateinit var store: NoteStore
     private lateinit var library: NoteLibrary
+    private lateinit var windowPanel: HelpWindowPanel
     private lateinit var surfaceHost: FrameLayout
     private lateinit var treeHost: LinearLayout
     private lateinit var toolbar: LinearLayout
@@ -83,7 +90,10 @@ class RememberActivity : ohi.andre.consolelauncher.localization.LocalizedCompone
     private var headingPopup: PopupWindow? = null
 
     override fun onCreate(state: Bundle?) {
+        LauncherSystemUi.requestNoTitleIfFullscreen(this)
         super.onCreate(state)
+        Tuils.init(this)
+        ohi.andre.consolelauncher.managers.xml.XMLPrefsManager.loadCommons(this)
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 if (!::library.isInitialized) finish()
@@ -96,7 +106,7 @@ class RememberActivity : ohi.andre.consolelauncher.localization.LocalizedCompone
         store = NoteStore(this)
         NoteExporter(this).clearExports()
         library = loadStarterLibrary() ?: return
-        buildUi()
+        buildUi(state)
         (state?.getString("open_note") ?: intent.getStringExtra("note_id"))?.let(::openNote)
         state?.getStringArrayList("expanded_folders")?.let { expandedFolders.addAll(it) }
         if (surface == Surface.HOME) renderTree()
@@ -157,44 +167,53 @@ class RememberActivity : ohi.andre.consolelauncher.localization.LocalizedCompone
         }
     }
 
-    private fun buildUi() {
-        val root = FrameLayout(this).apply {
-            clipChildren = false
-            clipToPadding = false
-            tag = "retui_edge_to_edge"
+    private fun buildUi(state: Bundle? = null) {
+        LauncherSystemUi.applyFullscreen(this)
+        androidx.core.view.WindowCompat.setDecorFitsSystemWindows(window, false)
+        val screen = FrameLayout(this).apply { isClickable = true }
+        val host = TuixtLayout.addFoldAwareHost(this, screen, ViewGroup.LayoutParams.MATCH_PARENT)
+        // Use the same pane geometry as Help; Notes supplies its own body and actions.
+        val root = layoutInflater.inflate(R.layout.offline_help_surface, host, false)
+        val body = root.findViewById<LinearLayout>(R.id.offline_help_panel)
+        body.removeAllViews()
+        val header = root.findViewById<TextView>(R.id.offline_help_header).apply {
+            text = getString(R.string.editor_noteseditoractivity_notes_70440)
+            includeFontPadding = false
+            typeface = android.graphics.Typeface.create(theme.typeface(this@RememberActivity), android.graphics.Typeface.BOLD)
+            textSize = theme.outputHeaderSize.toFloat()
+            setTextColor(theme.headerText)
+            background = TerminalBorderRuntime.tabDrawable(this@RememberActivity, theme.header, FrameTarget.OVERLAYS)
         }
-        val shell = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            clipChildren = false
-            clipToPadding = false
-            setPadding(dp(4), dp(8), dp(4), dp(8))
-        }
-        root.addView(shell, FrameLayout.LayoutParams(-1, -1))
-        shell.addView(retuiIdentityTab().apply {
-            (getChildAt(0) as? TextView)?.translationY = 0f
-        }, LinearLayout.LayoutParams(-1, dp(34)))
-
-        surfaceHost = FrameLayout(this).apply {
-            tag = "retui_panel"
-            setOnClickListener { clearSelection() }
-        }
-        shell.addView(surfaceHost, LinearLayout.LayoutParams(-1, 0, 1f).apply {
-            setMargins(dp(16), -dp(17), dp(16), 0)
-        })
-
+        body.background = TerminalBorderRuntime.panelDrawable(this, theme.panel, theme.panelBorder,
+            1.5f, theme.outputRadius, theme.dashed, target = FrameTarget.OVERLAYS)
+        TerminalBorderRuntime.bind(body, header)
+        surfaceHost = FrameLayout(this).apply { tag = "retui_panel" }
+        body.addView(surfaceHost, LinearLayout.LayoutParams(-1, 0, 1f))
         toolbar = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
-            setPadding(dp(6), 0, dp(6), 0)
-            tag = "retui_toolbar"
+            tag = "notes-toolbar"
         }
-        shell.addView(toolbar, LinearLayout.LayoutParams(-1, dp(44)).apply {
-            setMargins(dp(16), dp(8), dp(16), 0)
-        })
-
+        body.addView(toolbar, LinearLayout.LayoutParams(-1, dp(48)))
+        val viewport = FrameLayout(this)
+        host.addView(viewport, ViewGroup.LayoutParams(-1, -1))
+        windowPanel = HelpWindowPanel(viewport, root, state, statePrefix = "notes", floatingInLandscape = false)
+        windowPanel.reserveBottomCorners(toolbar)
+        windowPanel.refreshTheme()
+        val top = RetuiTheme.parseMargins(theme.displayMargins) ?: listOf(0f, 0f, 0f, 0f)
+        val bottom = RetuiTheme.parseMargins(theme.displayBottomMargins) ?: listOf(0f, 0f, 0f, 0f)
+        fun mm(value: Float) = (value * resources.displayMetrics.xdpi / 25.4f).roundToInt()
+        androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(screen) { view, insets ->
+            val bars = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars() or
+                androidx.core.view.WindowInsetsCompat.Type.displayCutout())
+            val ime = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.ime())
+            view.setPadding(bars.left + mm(top[0]), bars.top + mm(top[1]),
+                bars.right + mm(top[2]), maxOf(bars.bottom, ime.bottom) + mm(bottom[3]))
+            insets
+        }
         showHome()
-        finishRetui(root, theme)
-        shell.setBackgroundColor(Color.TRANSPARENT)
+        setContentView(screen)
+        androidx.core.view.ViewCompat.requestApplyInsets(screen)
     }
 
     private fun showHome() {
@@ -213,7 +232,7 @@ class RememberActivity : ohi.andre.consolelauncher.localization.LocalizedCompone
         }
         treeHost = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(dp(8), dp(24), dp(8), dp(8))
+            setPadding(dp(8), dp(8), dp(8), dp(8))
             setOnClickListener { clearSelection() }
         }
         homeScroll.addView(treeHost, FrameLayout.LayoutParams(-1, -2))
@@ -397,7 +416,18 @@ class RememberActivity : ohi.andre.consolelauncher.localization.LocalizedCompone
             BarMode.NEW_FOLDER -> renderInput("", this@RememberActivity.getString(R.string.notes_rememberactivity_folder_name_b2ce0), ::confirmNewFolder)
             BarMode.DELETE -> renderDeleteConfirmation()
         }
+        styleToolbar()
+    }
+
+    private fun styleToolbar() {
         applyRetuiStyle(toolbar, theme)
+        for (index in 0 until toolbar.childCount) {
+            (toolbar.getChildAt(index) as? ImageButton)?.apply {
+                background = null
+                layoutParams.height = dp(48)
+                androidx.appcompat.widget.TooltipCompat.setTooltipText(this, contentDescription)
+            }
+        }
     }
 
     private fun renderSelectionTools() {
@@ -571,8 +601,7 @@ class RememberActivity : ohi.andre.consolelauncher.localization.LocalizedCompone
         }
         editor = MarkdownEditText(this).apply {
             tag = "retui_document"
-            minHeight = resources.displayMetrics.heightPixels
-            setPadding(dp(14), dp(28), dp(14), dp(64))
+            setPadding(dp(8), dp(8), dp(8), dp(64))
             background = null
             contentDescription = this@RememberActivity.getString(R.string.notes_rememberactivity_markdown_note_editor_0bd6e)
             imageFile = ::ownedImage
@@ -600,6 +629,7 @@ class RememberActivity : ohi.andre.consolelauncher.localization.LocalizedCompone
             bottomMargin = dp(8)
         })
         applyRetuiStyle(surfaceHost, theme)
+        surfaceHost.background = null
         if (isNew) editor.post {
             editor.requestFocus()
             editor.setSelection(editor.length())
@@ -612,7 +642,7 @@ class RememberActivity : ohi.andre.consolelauncher.localization.LocalizedCompone
         toolbar.removeAllViews()
         if (revealed) {
             toolbar.addView(editorIcon(R.drawable.remember_ic_visibility_off, this@RememberActivity.getString(R.string.notes_rememberactivity_re_redact_57217), ::hideRedactions))
-            applyRetuiStyle(toolbar, theme)
+            styleToolbar()
             return
         }
         toolbar.addView(editorIcon(R.drawable.remember_ic_add_notes, this@RememberActivity.getString(R.string.notes_rememberactivity_new_note_2b7b0)) { newNotePrompt() })
@@ -630,7 +660,7 @@ class RememberActivity : ohi.andre.consolelauncher.localization.LocalizedCompone
             renderEditorToolbar()
         })
         if (!isNew) toolbar.addView(editorIcon(R.drawable.remember_ic_tree_delete, this@RememberActivity.getString(R.string.notes_rememberactivity_delete_note_a8ed4)) { confirmEditorDelete() })
-        applyRetuiStyle(toolbar, theme)
+        styleToolbar()
     }
 
     private fun showSelectionPopup() {
@@ -1180,6 +1210,7 @@ class RememberActivity : ohi.andre.consolelauncher.localization.LocalizedCompone
 
     override fun onSaveInstanceState(outState: Bundle) {
         persistEditor()
+        if (::windowPanel.isInitialized) windowPanel.save(outState)
         if (surface == Surface.EDITOR && ::note.isInitialized) {
             outState.putString("open_note", note.id)
             outState.putBoolean("raw_mode", editor.rawMode)
@@ -1192,6 +1223,7 @@ class RememberActivity : ohi.andre.consolelauncher.localization.LocalizedCompone
 
     override fun onResume() {
         super.onResume()
+        LauncherSystemUi.applyFullscreen(this)
         refreshFromDisk()
     }
 
@@ -1214,6 +1246,7 @@ class RememberActivity : ohi.andre.consolelauncher.localization.LocalizedCompone
 
     override fun onPause() {
         super.onPause()
+        if (::windowPanel.isInitialized) windowPanel.persist()
         dismissSelectionPopup()
         saveHandler.removeCallbacks(saveTask)
         if (revealed) hideRedactions()

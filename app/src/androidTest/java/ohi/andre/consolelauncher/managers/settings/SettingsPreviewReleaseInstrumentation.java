@@ -112,7 +112,7 @@ public final class SettingsPreviewReleaseInstrumentation extends Instrumentation
     @Override public void onCreate(Bundle arguments) { super.onCreate(arguments);background=arguments.getString("background", "original");mode=arguments.getString("mode", "preview");start(); }
     @Override public void onStart() {
         Bundle result=new Bundle();
-        try { if("private".equals(mode)) privateJourney(); else if("changelog".equals(mode)) changelogJourney(); else journey();result.putString("stream","\nOK: " + mode + " release journey\n");finish(Activity.RESULT_OK,result); }
+        try { if("hotfix2".equals(mode)) hotfixTwoJourney(); else if("private".equals(mode)) privateJourney(); else if("changelog".equals(mode)) changelogJourney(); else journey();result.putString("stream","\nOK: " + mode + " release journey\n");finish(Activity.RESULT_OK,result); }
         catch(Throwable failure) {
             StringWriter trace=new StringWriter();failure.printStackTrace(new PrintWriter(trace));
             result.putString("stream",trace.toString());finish(Activity.RESULT_CANCELED,result);
@@ -172,7 +172,7 @@ public final class SettingsPreviewReleaseInstrumentation extends Instrumentation
         require(apps.getActivityList("dev.retui.privatespacetest",android.os.Process.myUserHandle()).isEmpty(),"Fixture must not be personal");
         fixture("behavior.xml","BEHAVIOR",Collections.singletonMap("enable_private_command","true"));
         fixture("behavior.xml","BEHAVIOR",Collections.singletonMap("auto_show_keyboard","false"));
-        getTargetContext().getSharedPreferences("changelogPrefs",0).edit().putInt("last_seen_version_code",504).commit();
+        getTargetContext().getSharedPreferences("changelogPrefs",0).edit().putInt("last_seen_version_code",releaseVersion()).commit();
         try {
             activity=home();
             if(users.isQuietModeEnabled(profile) || !users.isUserUnlocked(profile)) {
@@ -199,15 +199,49 @@ public final class SettingsPreviewReleaseInstrumentation extends Instrumentation
             for(Map.Entry<String,byte[]> entry:original.entrySet()) Files.write(new File(folder(),entry.getKey()).toPath(),entry.getValue());
         }
     }
+    @SuppressWarnings("deprecation")
+    private int releaseVersion() {
+        try { return getTargetContext().getPackageManager().getPackageInfo(getTargetContext().getPackageName(),0).versionCode; }
+        catch(android.content.pm.PackageManager.NameNotFoundException error) { throw new AssertionError(error); }
+    }
+    private void hotfixTwoJourney() throws Exception {
+        changelogJourney();
+        Activity help=startActivitySync(new Intent().setClassName(getTargetContext().getPackageName(),
+            "ohi.andre.consolelauncher.help.OfflineHelpActivity").putExtra("topic","termux-workspace").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        try {
+            settle();
+            runOnMainSync(()-> {
+                TextView output=help.findViewById(resource("offline_help_output","id"));
+                require(output.getText().toString().contains("10 " + text(resource("offline_help_root","string"))),"Article has no Help home");
+                ((EditText)help.findViewById(resource("offline_help_input","id"))).setText("10");
+                help.findViewById(resource("offline_help_enter","id")).performClick();
+                require(output.getText().toString().startsWith("1 " + text(resource("offline_help_getting_started_title","string"))),"Help home did not reset directory");
+            });
+            settle();screenshot("hotfix2-help-home");
+        } finally { runOnMainSync(help::finish); }
+        Activity notes=startActivitySync(new Intent().setClassName(getTargetContext().getPackageName(),
+            "ohi.andre.consolelauncher.notes.RememberActivity").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        try {
+            settle();
+            runOnMainSync(()-> {
+                View body=notes.findViewById(resource("offline_help_panel","id"));
+                View toolbar=notes.getWindow().getDecorView().findViewWithTag("notes-bottom-dock");
+                require(body!=null && toolbar!=null && toolbar.getParent()==body,"Notes does not use shared pane");
+                require(toolbar.getBackground()==null,"Notes toolbar is boxed");
+                require((notes.getWindow().getAttributes().flags & android.view.WindowManager.LayoutParams.FLAG_DIM_BEHIND)!=0,"Notes backdrop missing");
+            });
+            screenshot("hotfix2-notes");
+        } finally { runOnMainSync(notes::finishAndRemoveTask); }
+    }
     private void changelogJourney() throws Exception {
         Activity activity=startActivitySync(new Intent().setClassName(getTargetContext().getPackageName(),"ohi.andre.consolelauncher.help.ChangelogActivity").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));settle();
         try {
             runOnMainSync(()-> {
                 String notes=((TextView)activity.findViewById(resource("offline_help_output","id"))).getText().toString();
-                require(notes.contains("Hotfix #1") && notes.contains("Termux, connected through SSH"),"Appended or previous notes missing");
-                require(notes.contains("Build 504"),"Release number missing");
+                require(notes.contains("Hotfix 2") && notes.contains("Hotfix #1") && notes.contains("Termux, connected through SSH"),"Appended or previous notes missing");
+                require(notes.contains("Build " + releaseVersion()),"Release number missing");
             });
-            require(getTargetContext().getSharedPreferences("changelogPrefs",0).getInt("last_seen_version_code",0)==504,"Release not acknowledged");
+            require(getTargetContext().getSharedPreferences("changelogPrefs",0).getInt("last_seen_version_code",0)==releaseVersion(),"Release not acknowledged");
             screenshot("hotfix-changelog");
         } finally { runOnMainSync(activity::finish); }
     }
@@ -215,7 +249,7 @@ public final class SettingsPreviewReleaseInstrumentation extends Instrumentation
         Map<String,byte[]> originals=files();
         Activity home=null,editor=null;
         getTargetContext().getSharedPreferences("retui_startup",0).edit().putBoolean("initialized",true).putBoolean("complete",true).putBoolean("active",false).commit();
-        getTargetContext().getSharedPreferences("changelogPrefs",0).edit().putInt("last_seen_version_code",504).commit();
+        getTargetContext().getSharedPreferences("changelogPrefs",0).edit().putInt("last_seen_version_code",releaseVersion()).commit();
         fixture("notifications.xml","NOTIFICATIONS",Collections.singletonMap("terminal_notifications","false"));
         fixture("notifications.xml","NOTIFICATIONS",Collections.singletonMap("show_notifications","false"));
         fixture("behavior.xml","BEHAVIOR",Collections.singletonMap("auto_show_keyboard","false"));

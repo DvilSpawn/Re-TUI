@@ -13,7 +13,12 @@ object LauncherNotes {
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             .putExtra("note_id", id)
             .putExtra("show_library", id == null)
-        RetuiThemeBridge.putLauncherThemeExtras(intent, context, ohi.andre.consolelauncher.tuils.FrameTarget.SETTINGS, context.packageName)
+        RetuiThemeBridge.putLauncherThemeExtras(intent, context, ohi.andre.consolelauncher.tuils.FrameTarget.OVERLAYS, context.packageName)
+        // Notes is a terminal pane, not a module: use the same typography as Help and Calc.
+        intent.putExtra(com.dvil.retui.contract.RetuiVisualContract.BODY_TEXT_SIZE,
+            ohi.andre.consolelauncher.tuils.LauncherFontScale.terminalTextSizeSp().toInt())
+        intent.putExtra(com.dvil.retui.contract.RetuiVisualContract.HEADER_TEXT_SIZE,
+            ohi.andre.consolelauncher.managers.settings.AppearanceSettings.outputHeaderTextSize())
         context.startActivity(intent)
     }
 

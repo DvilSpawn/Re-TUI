@@ -41,6 +41,7 @@ class ChangelogPaneIntegrationTest {
                     val output = it.findViewById<TextView>(R.id.offline_help_output).text.toString()
                     assertTrue(output.contains("Termux, connected through SSH"))
                     assertTrue(output.contains("Hotfix #1"))
+                    assertTrue(output.contains("Hotfix 2"))
                     assertFalse(output.contains("PREVIOUS BUILD NOTES"))
                 }
             }
@@ -67,6 +68,7 @@ class ChangelogPaneIntegrationTest {
                     assertTrue(output.text.contains("Build ${BuildConfig.VERSION_CODE}"))
                     assertTrue(output.text.contains("Termux, connected through SSH"))
                     assertTrue(output.text.contains("Hotfix #1"))
+                    assertTrue(output.text.contains("Hotfix 2"))
                     assertTrue(output.isTextSelectable)
                     assertFalse(it.findViewById<EditText>(R.id.offline_help_input).isShown)
                     assertEquals(BuildConfig.VERSION_CODE, prefs.getInt("last_seen_version_code", 0))

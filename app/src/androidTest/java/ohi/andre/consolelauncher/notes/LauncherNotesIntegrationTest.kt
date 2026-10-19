@@ -245,6 +245,26 @@ class LauncherNotesIntegrationTest {
                 }
                 instrumentation.waitForIdleSync()
             }
+            instrumentation.runOnMainSync {
+                val editor = findEditor(pane)!!
+                editor.requestFocus()
+                (notes.getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager)
+                    .showSoftInput(editor, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT)
+            }
+            awaitUi { androidx.core.view.ViewCompat.getRootWindowInsets(pane)
+                ?.isVisible(androidx.core.view.WindowInsetsCompat.Type.ime()) == true }
+            instrumentation.runOnMainSync {
+                val toolbar = notes.window.decorView.findViewWithTag<View>("notes-bottom-dock")
+                val visible = android.graphics.Rect()
+                notes.window.decorView.getWindowVisibleDisplayFrame(visible)
+                val location = IntArray(2)
+                toolbar.getLocationOnScreen(location)
+                assertTrue("Toolbar covered by keyboard", location[1] + toolbar.height <= visible.bottom)
+                assertTrue("Editor collapsed", pane.height > 0)
+            }
+            File(context.cacheDir, "notes-keyboard.png").outputStream().use {
+                instrumentation.uiAutomation.takeScreenshot().compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it)
+            }
         } finally {
             instrumentation.runOnMainSync { activity?.finishAndRemoveTask() }
             instrumentation.waitForIdleSync()
@@ -259,6 +279,53 @@ class LauncherNotesIntegrationTest {
                     is Long -> putLong(key, value)
                 } }
             }.commit()
+        }
+    }
+
+    @Test fun notesUsesSharedPaneWithUnboxedToolbarAndBackdrop() {
+        ohi.andre.consolelauncher.tuils.Tuils.init(context)
+        ohi.andre.consolelauncher.managers.xml.XMLPrefsManager.loadCommons(context)
+        val monitor = instrumentation.addMonitor(RememberActivity::class.java.name, null, false)
+        instrumentation.runOnMainSync { LauncherNotes.open(context) }
+        val notes = instrumentation.waitForMonitorWithTimeout(monitor, 10000) as RememberActivity
+        instrumentation.removeMonitor(monitor)
+        try {
+            instrumentation.waitForIdleSync()
+            android.os.SystemClock.sleep(500)
+            instrumentation.runOnMainSync {
+                val root = notes.window.decorView
+                val body = root.findViewById<android.widget.LinearLayout>(R.id.offline_help_panel)
+                val header = root.findViewById<android.widget.TextView>(R.id.offline_help_header)
+                val toolbar = root.findViewWithTag<View>("notes-bottom-dock")
+                val surface = root.findViewWithTag<View>("retui_panel")
+                assertSame(body, toolbar.parent)
+                assertSame(body, surface.parent)
+                assertNull(toolbar.background)
+                assertNull(surface.background)
+                assertEquals(context.getString(R.string.editor_noteseditoractivity_notes_70440), header.text)
+                assertNotNull(root.findViewWithTag<View>("notes-window-toggle"))
+                assertTrue(notes.window.attributes.flags and android.view.WindowManager.LayoutParams.FLAG_DIM_BEHIND != 0)
+                if (android.os.Build.VERSION.SDK_INT >= 31)
+                    assertTrue(notes.window.attributes.flags and android.view.WindowManager.LayoutParams.FLAG_BLUR_BEHIND != 0)
+                val bounds = android.graphics.Rect()
+                assertTrue(toolbar.getGlobalVisibleRect(bounds))
+                assertEquals(toolbar.height, bounds.height())
+            }
+            File(context.cacheDir, "notes-shared-pane.png").outputStream().use {
+                instrumentation.uiAutomation.takeScreenshot().compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it)
+            }
+        } finally { instrumentation.runOnMainSync { notes.finishAndRemoveTask() } }
+        for ((activityClass, name) in listOf(
+            ohi.andre.consolelauncher.help.OfflineHelpActivity::class.java to "help",
+            ohi.andre.consolelauncher.calculator.CalculatorActivity::class.java to "calc")) {
+            val activity = instrumentation.startActivitySync(Intent(context, activityClass).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            try {
+                instrumentation.waitForIdleSync()
+                android.os.SystemClock.sleep(500)
+                File(context.cacheDir, "notes-comparison-$name.png").outputStream().use {
+                    instrumentation.uiAutomation.takeScreenshot().compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it)
+                }
+            } finally { instrumentation.runOnMainSync { activity.finishAndRemoveTask() } }
         }
     }
 

@@ -15,6 +15,7 @@ object OfflineHelpCatalog {
         HelpTopic("automation", R.string.offline_help_automation_title, R.string.offline_help_automation_body),
         HelpTopic("troubleshooting", R.string.offline_help_troubleshooting_title, R.string.offline_help_troubleshooting_body),
         HelpTopic("reference", R.string.offline_help_reference_title, R.string.offline_help_reference_body),
+        HelpTopic("private-space", R.string.offline_help_private_space_title, R.string.offline_help_private_space_body, "apps"),
         HelpTopic("terminal-basics", R.string.offline_help_article_terminal_basics_title, R.string.offline_help_article_terminal_basics_body, "getting-started"),
         HelpTopic("startup-setup", R.string.offline_help_article_startup_setup_title, R.string.offline_help_article_startup_setup_body, "getting-started"),
         HelpTopic("new-features", R.string.offline_help_article_new_features_title, R.string.offline_help_article_new_features_body, "getting-started"),

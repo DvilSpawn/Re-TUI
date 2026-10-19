@@ -247,8 +247,6 @@ class OfflineHelpActivity : LocalizedComponentActivity() {
             } }
             if (nav.previous) choice(8, getString(R.string.offline_help_previous_page)) { page-- }
             if (nav.next) choice(9, getString(R.string.offline_help_next_page)) { page++ }
-            if (category != null) choice(10, getString(R.string.offline_help_root)) { category = null; page = rootPage }
-            choice(0, getString(R.string.offline_help_close)) { closeHelp(consumeChoice = true) }
         } else {
             val body = if (current.startsWith("command:")) reference.firstOrNull { "command:${it.javaClass.simpleName}" == current }
                 ?.let { OfflineHelpReference.text(this, it) } ?: getString(R.string.offline_help_no_reference)
@@ -260,8 +258,11 @@ class OfflineHelpActivity : LocalizedComponentActivity() {
             choice(1, getString(R.string.offline_help_topics)) { article = null; page = index.coerceAtLeast(0) / 7 }
             if (index > 0) choice(2, getString(R.string.offline_help_previous)) { article = entries[index - 1] }
             if (index >= 0 && index < entries.lastIndex) choice(3, getString(R.string.offline_help_next)) { article = entries[index + 1] }
-            choice(0, getString(R.string.offline_help_close)) { closeHelp(consumeChoice = true) }
         }
+        if (category != null || article != null) choice(10, getString(R.string.offline_help_root)) {
+            category = null; article = null; page = 0; rootPage = 0
+        }
+        choice(0, getString(R.string.offline_help_close)) { closeHelp(consumeChoice = true) }
         output.text = text
         output.movementMethod = LinkMovementMethod.getInstance()
         androidx.core.view.OneShotPreDrawListener.add(output) {
