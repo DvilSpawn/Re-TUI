@@ -151,7 +151,7 @@ class SuggestionsManager(
     private val luaSuggestionEngines = LinkedHashMap<String?, LuaWidgetEngine?>()
     private val suggestionRequestId = AtomicLong(0L)
     private val searchRenderer = searchResultsView?.let {
-        SearchModeResultRenderer(pack, it, ::getSuggestionView, ::openSearchResult)
+        SearchModeResultRenderer(pack, it, ::openSearchResult)
     }
     @Volatile private var searchNotifications: List<NotificationService.Notification> = emptyList()
     private var searchInputActive = false
@@ -395,16 +395,8 @@ class SuggestionsManager(
 
         comparator = CustomComparator(noInputIndexes ?: IntArray(0), indexes ?: IntArray(0))
 
-        val uselessView = getSuggestionView(pack.context)
-        uselessView.setVisibility(View.INVISIBLE)
-
-        val params = LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-        params.setMargins(spaces[0], spaces[1], spaces[2], spaces[3])
-
-        (suggestionsView.getParent() as LinearLayout).addView(uselessView, params)
+        (suggestionsView.parent as LinearLayout).addView(SuggestionChipStyler.createTrailingSpace(
+            pack.context,ohi.andre.consolelauncher.presentation.HomeAppearance.saved()))
     }
 
     fun show() {

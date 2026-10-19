@@ -58,6 +58,19 @@ class TerminalBorderDrawable(
         invalidateSelf()
     }
 
+    override fun getConstantState(): ConstantState {
+        val top = topCutouts.map(::RectF)
+        val bottom = bottomCutouts.map(::RectF)
+        // A saved presentation must not retain this drawable's View callback through the outer instance.
+        val fill=fillColor;val border=borderColor;val stroke=strokeWidthPx;val radius=radiusPx
+        val dashedLine=dashed;val dash=dashLengthPx;val gap=dashGapPx;val cyber=cyberdeck;val notch=cyberdeckNotch
+        return object : ConstantState() {
+            override fun getChangingConfigurations() = 0
+            override fun newDrawable(): Drawable = TerminalBorderDrawable(fill, border, stroke,
+                radius, dashedLine, dash, gap, cyber, notch).apply { setCutouts(top, bottom) }
+        }
+    }
+
     override fun draw(canvas: Canvas) {
         val b = bounds
         if (b.isEmpty) return

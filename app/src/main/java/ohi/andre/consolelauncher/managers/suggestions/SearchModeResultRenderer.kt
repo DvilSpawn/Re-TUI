@@ -1,34 +1,24 @@
 package ohi.andre.consolelauncher.managers.suggestions
 
 import ohi.andre.consolelauncher.R
-import android.content.Context
-import android.graphics.Typeface
-import android.view.Gravity
 import android.view.View
-import android.view.ViewGroup
 import android.widget.HorizontalScrollView
 import android.widget.LinearLayout
 import android.widget.TextView
 import ohi.andre.consolelauncher.commands.main.MainPack
-import ohi.andre.consolelauncher.managers.settings.AppearanceSettings
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.options.Behavior
-import ohi.andre.consolelauncher.managers.xml.options.SurfaceBorder
-import ohi.andre.consolelauncher.managers.xml.options.Suggestions
-import ohi.andre.consolelauncher.managers.xml.options.Theme
-import ohi.andre.consolelauncher.managers.xml.options.Ui
-import ohi.andre.consolelauncher.tuils.FrameTarget
-import ohi.andre.consolelauncher.tuils.TerminalBorderRuntime
-import ohi.andre.consolelauncher.tuils.Tuils
+import ohi.andre.consolelauncher.presentation.HomeAppearance
+import ohi.andre.consolelauncher.presentation.SearchResultPresentation
 
 class SearchModeResultRenderer(
     private val pack: MainPack,
     private val container: LinearLayout,
-    private val chipFactory: (Context) -> TextView,
     private val onClick: (SuggestionsManager.SearchResult) -> Unit
 ) {
     private val context = pack.context
     private val chipStyler = SuggestionChipStyler(pack)
+    private val appearance=HomeAppearance.saved()
     private var rowState = emptyMap<Int, RowState>()
     private var latestResults = emptyList<SuggestionsManager.SearchResult>()
     private var activeCategoryType: Int? = null
@@ -87,113 +77,44 @@ class SearchModeResultRenderer(
         clear()
         val resultCard = resultCard()
         resultCard.addView(categoryHeader(context.getString(R.string.search_category_output), SuggestionsManager.SearchResult.TYPE_COMMAND))
-        val card = TextView(context)
-        card.typeface = Tuils.getTypeface(context)
-        card.textSize = XMLPrefsManager.getInt(Ui.input_output_size).toFloat()
-        card.setTextColor(XMLPrefsManager.getColor(Theme.output_text_color))
-        card.gravity = Gravity.START
-        card.setPadding(dp(12), dp(10), dp(12), dp(10))
-        card.minHeight = dp(48)
-        card.maxHeight = dp(240)
+        val card = SearchResultPresentation.output(context,output.toString().trim(),appearance)
         card.setTextIsSelectable(true)
-        card.text = output.toString().trim()
-        resultCard.addView(card, LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        ))
+        resultCard.addView(card)
         container.addView(resultCard, cardLayoutParams())
     }
 
     private fun resultStrip(results: List<SuggestionsManager.SearchResult>) =
-        HorizontalScrollView(context).apply {
-            isHorizontalScrollBarEnabled = false
-            isFillViewport = false
-            val row = LinearLayout(context).apply { orientation = LinearLayout.HORIZONTAL }
-            for (result in results) {
-                row.addView(resultChip(result), LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                ).apply { setMargins(dp(3), 0, dp(3), dp(4)) })
-            }
-            addView(row, ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            ))
+        SearchResultPresentation.strip(context,false).apply {
+            results.forEach { SearchResultPresentation.addChip(this,resultChip(it)) }
         }
 
-    private fun categoryTabs(
-        groups: List<List<SuggestionsManager.SearchResult>>,
-        selectedType: Int
-    ) = HorizontalScrollView(context).apply {
-        isHorizontalScrollBarEnabled = false
-        isFillViewport = false
-        val row = LinearLayout(context).apply { orientation = LinearLayout.HORIZONTAL }
-        for (group in groups) {
-            val type = group.first().type
-            row.addView(categoryChip(type, type == selectedType), LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            ).apply { setMargins(dp(3), dp(6), dp(3), 0) })
+    private fun categoryTabs(groups: List<List<SuggestionsManager.SearchResult>>,selectedType: Int) =
+        SearchResultPresentation.strip(context,true).apply {
+            groups.forEach { group ->
+                val type=group.first().type
+                SearchResultPresentation.addChip(this,categoryChip(type,type==selectedType))
+            }
         }
-        addView(row, ViewGroup.LayoutParams(
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        ))
-    }
 
     private fun categoryChip(type: Int, selected: Boolean): TextView =
-        chipFactory(context).apply {
-            text = categoryLabel(type)
-            contentDescription = categoryLabel(type)
-            setTypeface(Tuils.getTypeface(context), if (selected) Typeface.BOLD else Typeface.NORMAL)
-            alpha = if (selected) 1f else 0.62f
-            minWidth = dp(52)
-            gravity = Gravity.CENTER
-            chipStyler.apply(this, suggestionType(type), null)
+        SearchResultPresentation.chip(context,categoryLabel(type),chipStyler.binding(suggestionType(type),null),appearance,selected).apply {
+            contentDescription=categoryLabel(type)
             setOnClickListener {
-                categoryScrollX = categoryStrip?.scrollX ?: categoryScrollX
-                activeCategoryType = type
+                categoryScrollX=categoryStrip?.scrollX ?: categoryScrollX
+                activeCategoryType=type
                 render(latestResults)
             }
         }
 
     private fun resultChip(result: SuggestionsManager.SearchResult): TextView =
-        chipFactory(context).apply {
-            text = result.title
-            contentDescription = listOf(result.title, result.subtitle)
-                .filter { it.isNotBlank() }
-                .joinToString(", ")
+        SearchResultPresentation.chip(context,result.title,chipStyler.binding(suggestionType(result.type),result.payload),appearance).apply {
+            contentDescription=listOf(result.title,result.subtitle).filter { it.isNotBlank() }.joinToString(", ")
             setOnClickListener { onClick(result) }
-            chipStyler.apply(this, suggestionType(result.type), result.payload)
         }
 
-    private fun resultCard() = LinearLayout(context).apply {
-        orientation = LinearLayout.VERTICAL
-        setPadding(dp(7), dp(5), dp(7), dp(7))
-        background = TerminalBorderRuntime.panelDrawable(
-            context,
-            XMLPrefsManager.getColor(Theme.suggestions_background_color),
-            AppearanceSettings.surfaceBorderColor(SurfaceBorder.SUGGESTIONS),
-            1f,
-            AppearanceSettings.moduleCornerRadius(),
-            AppearanceSettings.dashedBorders(),
-            target = FrameTarget.SUGGESTIONS
-        )
-    }
-
-    private fun cardLayoutParams() = LinearLayout.LayoutParams(
-        ViewGroup.LayoutParams.MATCH_PARENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT
-    ).apply { setMargins(dp(8), dp(8), dp(8), dp(8)) }
-
-    private fun categoryHeader(label: String, type: Int) = TextView(context).apply {
-        ohi.andre.consolelauncher.managers.settings.TextShadows.apply(this, Theme.suggestions_text_shadow_color)
-        text = label
-        setTypeface(Tuils.getTypeface(context), Typeface.BOLD)
-        textSize = (XMLPrefsManager.getInt(Suggestions.suggestions_size) * 0.72f).coerceAtLeast(9f)
-        setTextColor(chipStyler.suggestionTextColor(suggestionType(type)))
-        setPadding(dp(3), dp(4), dp(3), dp(2))
-    }
+    private fun resultCard() = SearchResultPresentation.card(context,appearance)
+    private fun cardLayoutParams() = SearchResultPresentation.cardLayoutParams(context)
+    private fun categoryHeader(label: String,type: Int) = SearchResultPresentation.header(context,label,suggestionType(type),appearance)
 
     private fun categoryLabel(type: Int): String = when (type) {
         SuggestionsManager.SearchResult.TYPE_APP -> context.getString(R.string.search_category_apps)
@@ -219,8 +140,6 @@ class SearchModeResultRenderer(
         SuggestionsManager.SearchResult.TYPE_GROUP -> SuggestionsManager.Suggestion.TYPE_APPGP
         else -> SuggestionsManager.Suggestion.TYPE_PERMANENT
     }
-
-    private fun dp(value: Int): Int = Tuils.dpToPx(context, value)
 
     private fun currentRowState(): Map<Int, RowState> =
         rowState.mapValues { (_, state) -> state.copy(scrollX = state.view?.scrollX ?: state.scrollX, view = null) }

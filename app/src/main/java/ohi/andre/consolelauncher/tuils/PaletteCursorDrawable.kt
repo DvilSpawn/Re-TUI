@@ -13,11 +13,11 @@ class PaletteCursorDrawable(private val width: Int) : Drawable() {
     var role: Theme = Theme.cursor_color
     private val paint = Paint()
     private var opacity = 255
-
     override fun draw(canvas: Canvas) {
         paint.color = ThemeColorResolver.color(role)
         paint.alpha = android.graphics.Color.alpha(paint.color) * opacity / 255
         canvas.drawRect(bounds, paint)
+
     }
 
     override fun getIntrinsicWidth() = width

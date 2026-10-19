@@ -13,7 +13,7 @@ import android.graphics.drawable.LayerDrawable
 import kotlin.math.roundToInt
 
 class NineSliceFrameDrawable(
-    frame: LoadedFrame,
+    private val frame: LoadedFrame,
     private val density: Float,
     private val intrinsicDp: Float? = null
 ) : Drawable() {
@@ -125,6 +125,20 @@ class NineSliceFrameDrawable(
     override fun setColorFilter(colorFilter: ColorFilter?) {
         paint.colorFilter = colorFilter
         invalidateSelf()
+    }
+
+    override fun getAlpha() = paint.alpha
+    override fun getColorFilter() = paint.colorFilter
+
+    override fun getConstantState(): ConstantState {
+        val source=frame;val scale=density;val intrinsic=intrinsicDp
+        val center=drawCenter;val alpha=paint.alpha;val filter=paint.colorFilter
+        return object: ConstantState() {
+            override fun newDrawable(): Drawable = NineSliceFrameDrawable(source,scale,intrinsic).apply {
+                drawCenter=center;setAlpha(alpha);setColorFilter(filter)
+            }
+            override fun getChangingConfigurations()=0
+        }
     }
 
     override fun getIntrinsicWidth(): Int = intrinsicDp?.let {

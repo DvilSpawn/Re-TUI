@@ -297,7 +297,15 @@ This feature is off by default. It requires Android 15 or later and a compatible
 
 Authentication cancellation and retry handling have also been corrected.
 
-You can reopen these notes with the changelog command. These highlights are bundled with the installed app and work offline.</string>
+You can reopen these notes with the changelog command. These highlights are bundled with the installed app and work offline.
+
+## Hotfix #1 · Build 504
+
+- Fixed the Settings preview crash when swiping between panes with transparent themes, including Kois.
+- Replaced the preview tabs with swipeable Status, Terminal, Music, Help and Calculator examples. Appearance drafts update the previews without saving or running actions.
+- Unlocked Private Space apps can now launch from typed app names. Use private -open &lt;app name&gt; to explicitly choose the private copy.
+- Fixed missing alphabetical headings in private -ls and repeated, out-of-order letter sections in the private app drawer.
+- Private app launching remains unavailable while locked or when Private Space support is disabled.</string>
     <string name="command_bluetooth_false_4603a">%1$s false</string>
     <string name="command_bluetooth_opening_bluetooth_settings_android_no_long_c4672">Opening Bluetooth settings. Android no longer allows third-party launchers to toggle Bluetooth directly.</string>
     <string name="command_bluetooth_true_630fa">%1$s true</string>
@@ -1353,6 +1361,7 @@ $ post https://httpbin.org/post hello world</string>
 Local saved presets are not sanitized portable exports or personal backups. Save your current setup before applying a different preset. 
 To share a look, use Settings &gt; System &amp; Support &gt; Create Shareable Configuration.</string>
     <string name="help_private">-ls -&gt; list Private Space apps 
+-open &lt;app&gt; -&gt; launch an unlocked Private Space app 
 -lock -&gt; lock Private Space 
 -unlock -&gt; unlock Private Space 
 -settings -&gt; open Private Space settings when Android exposes them 
@@ -4884,16 +4893,24 @@ Disabling this option hides Re:TUI access; it does not lock Private Space. Save 
     <string name="settings_file_operation_working">Working on your files…</string>
     <string name="settings_font_too_large">Font files must be 8 MiB or smaller.</string>
     <string name="settings_preview_ansi">ANSI</string>
+    <string name="settings_preview_current_home">YOUR LAUNCHER · Unsaved preview · Tap to expand</string>
     <string name="settings_preview_disabled">Disabled</string>
     <string name="settings_preview_draft">LIVE PREVIEW · Sample content · Apply with Save</string>
+    <string name="settings_preview_expand">Expand launcher preview</string>
+    <string name="settings_preview_home_unavailable">Open the launcher first to preview your current layout.</string>
+    <string name="settings_preview_module_card">MODULE</string>
     <string name="settings_preview_modules">Modules</string>
     <string name="settings_preview_normal">Normal</string>
     <string name="settings_preview_page">%1$s · %2$d / %3$d · Swipe to explore</string>
     <string name="settings_preview_palette">ANSI palette · Normal 30–37 / Bright 90–97</string>
+    <string name="settings_preview_return_editor">Return to editor · Changes are not applied</string>
     <string name="settings_preview_selected">Selected</string>
     <string name="settings_preview_status">Status</string>
+    <string name="settings_preview_status_card">STATUS</string>
     <string name="settings_preview_status_hidden">Status lines are hidden. Enable one below to preview it.</string>
     <string name="settings_preview_terminal">Terminal</string>
+    <string name="settings_preview_terminal_card">TERMINAL</string>
+    <string name="settings_preview_wallpaper_full">System wallpaper is shown in the full preview.</string>
     <string name="shortcut_index_greater">The index is greater than the shortcuts count</string>
     <string name="sms_hint">Enter SMS message</string>
     <string name="start_notification">Re:T-UI started</string>

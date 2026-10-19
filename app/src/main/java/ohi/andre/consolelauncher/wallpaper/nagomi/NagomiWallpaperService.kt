@@ -22,7 +22,19 @@ import ohi.andre.consolelauncher.wallpaper.shouldRenderWallpaper
 class NagomiWallpaperService : WallpaperService() {
     override fun onCreateEngine(): Engine = PondEngine()
 
-    private inner class PondEngine : Engine() {
+    private inner class PondEngine : Engine(), ohi.andre.consolelauncher.wallpaper.WallpaperPreviewSource.Source {
+        override fun capturePreview(result: (android.graphics.Bitmap?)->Unit) {
+            val rect=surfaceHolder.surfaceFrame
+            if (android.os.Build.VERSION.SDK_INT<24 || !surfaceHolder.surface.isValid || rect.width()<=0 || rect.height()<=0) { result(null);return }
+            val bitmap=ohi.andre.consolelauncher.wallpaper.WallpaperPreviewSource.bitmap(rect.width(),rect.height())
+            if (bitmap==null) { result(null);return }
+            try {
+                android.view.PixelCopy.request(surfaceHolder.surface,bitmap,{ status ->
+                    if (status==android.view.PixelCopy.SUCCESS) result(bitmap) else { bitmap.recycle();result(null) }
+                },handler)
+            } catch (_: Exception) { bitmap.recycle();result(null) }
+        }
+
         private val handler = Handler(Looper.getMainLooper())
         private val renderer = NagomiRenderer(this@NagomiWallpaperService)
         private val power = getSystemService(PowerManager::class.java)
@@ -92,6 +104,7 @@ class NagomiWallpaperService : WallpaperService() {
         }
 
         override fun onSurfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
+            if (!isPreview) ohi.andre.consolelauncher.wallpaper.WallpaperPreviewSource.register(this)
             hasSurface = true
             schedule()
         }
@@ -109,6 +122,7 @@ class NagomiWallpaperService : WallpaperService() {
         override fun onComputeColors() = WallpaperColors(Color.valueOf(0xff345e52.toInt()), Color.valueOf(0xff91b5a6.toInt()), null)
 
         override fun onDestroy() {
+            ohi.andre.consolelauncher.wallpaper.WallpaperPreviewSource.unregister(this)
             handler.removeCallbacks(frame)
             renderer.releaseSurface()
             if (registered) {

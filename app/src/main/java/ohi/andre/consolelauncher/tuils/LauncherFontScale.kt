@@ -43,11 +43,22 @@ object LauncherFontScale {
         }
     }
 
-    private fun apply(view: TextView) {
+    internal fun pixelsToSp(view: TextView): Float = if (android.os.Build.VERSION.SDK_INT >= 34)
+        TypedValue.deriveDimension(TypedValue.COMPLEX_UNIT_SP, view.textSize, view.resources.displayMetrics)
+    else view.textSize / view.resources.displayMetrics.scaledDensity
+
+    internal fun setBaseSize(view: TextView, baseSp: Float, offset: Int) {
+        val scaled = scaledSp(baseSp, offset)
+        view.setTextSize(TypedValue.COMPLEX_UNIT_SP, scaled)
+        view.setTag(R.id.retui_font_base_size_sp, baseSp)
+        view.setTag(R.id.retui_font_scaled_size_sp, scaled)
+    }
+
+    internal fun apply(view: TextView, offset: Int = offsetSp()) {
         val density = view.resources.displayMetrics.scaledDensity
         if (density <= 0f) return
 
-        val currentSp = view.textSize / density
+        val currentSp = pixelsToSp(view)
         val previousScaled = view.getTag(R.id.retui_font_scaled_size_sp) as? Float
         var baseSp = view.getTag(R.id.retui_font_base_size_sp) as? Float
         if (baseSp == null || previousScaled == null || abs(currentSp - previousScaled) > 0.05f) {
@@ -55,7 +66,7 @@ object LauncherFontScale {
             view.setTag(R.id.retui_font_base_size_sp, baseSp)
         }
 
-        val scaledSp = scaledSp(baseSp)
+        val scaledSp = scaledSp(baseSp, offset)
         if (abs(currentSp - scaledSp) > 0.05f) {
             view.setTextSize(TypedValue.COMPLEX_UNIT_SP, scaledSp)
         }

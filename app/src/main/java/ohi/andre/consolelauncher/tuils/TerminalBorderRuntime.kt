@@ -13,6 +13,8 @@ import kotlin.math.min
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings
 
 object TerminalBorderRuntime {
+    data class Style(val cyberdeck: Boolean, val stroke: Float, val dash: Float, val gap: Float, val headerRadius: Int)
+
     internal fun drawsBorder(frameActive: Boolean, borderEnabled: Boolean, cyberdeck: Boolean, dashed: Boolean): Boolean =
         !frameActive && borderEnabled && (cyberdeck || dashed)
 
@@ -61,17 +63,18 @@ object TerminalBorderRuntime {
         cyberdeckNotch: Boolean = true,
         borderEnabled: Boolean = true,
         frameEnabled: Boolean = true,
-        target: FrameTarget = FrameTarget.CONTROLS
+        target: FrameTarget = FrameTarget.CONTROLS,
+        style: Style? = null
     ): Drawable {
         val availableFrame = FrameManager.drawable(context, target)
         val frame = availableFrame.takeIf { drawsFrame(it != null, frameEnabled) }
-        val cyberdeck = frame == null && AppearanceSettings.cyberdeckMode()
+        val cyberdeck = frame == null && (style?.cyberdeck ?: AppearanceSettings.cyberdeckMode())
         val stroke = if (!drawsBorder(frame != null, borderEnabled, cyberdeck, dashed)) {
             0
         } else if (cyberdeck) {
             max(1, Tuils.dpToPx(context, strokeDp).toInt())
         } else {
-            max(1, Tuils.dpToPx(context, AppearanceSettings.dashedBorderStrokeWidthDp(strokeDp / 1.5f)).toInt())
+            max(1, Tuils.dpToPx(context, (style?.stroke ?: AppearanceSettings.dashedBorderStrokeWidthDp(strokeDp / 1.5f))).toInt())
         }
         val fallback = TerminalBorderDrawable(
             effectiveFillColor(frame != null, fillColor),
@@ -79,8 +82,8 @@ object TerminalBorderRuntime {
             stroke,
             if (cyberdeck) 0f else radiusPx,
             dashed && !cyberdeck,
-            Tuils.dpToPx(context, AppearanceSettings.dashLength().toFloat()).toFloat(),
-            Tuils.dpToPx(context, AppearanceSettings.dashGap().toFloat()).toFloat(),
+            Tuils.dpToPx(context, (style?.dash ?: AppearanceSettings.dashLength().toFloat())).toFloat(),
+            Tuils.dpToPx(context, (style?.gap ?: AppearanceSettings.dashGap().toFloat())).toFloat(),
             cyberdeck,
             cyberdeckNotch
         )
@@ -100,10 +103,12 @@ object TerminalBorderRuntime {
         fillColor: Int,
         borderColor: Int,
         alwaysBorder: Boolean = false,
-        target: FrameTarget = FrameTarget.CONTROLS
+        target: FrameTarget = FrameTarget.CONTROLS,
+        style: Style? = null,
+        draftDashed: Boolean = false
     ): Drawable {
         val frame = FrameManager.drawable(context, target)
-        if (frame == null && AppearanceSettings.cyberdeckMode()) {
+        if (frame == null && (style?.cyberdeck ?: AppearanceSettings.cyberdeckMode())) {
             return TerminalBorderDrawable(
                 fillColor,
                 borderColor,
@@ -118,13 +123,13 @@ object TerminalBorderRuntime {
 
         val bg = GradientDrawable()
         bg.shape = GradientDrawable.RECTANGLE
-        bg.cornerRadius = Tuils.dpToPx(context, AppearanceSettings.headerCornerRadius().toFloat())
+        bg.cornerRadius = Tuils.dpToPx(context, (style?.headerRadius ?: AppearanceSettings.headerCornerRadius()).toFloat())
         bg.setColor(effectiveFillColor(frame != null, fillColor))
-        val dashed = AppearanceSettings.dashedBorders()
+        val dashed = if (style==null) AppearanceSettings.dashedBorders() else draftDashed
         if (drawsTabBorder(frame != null, alwaysBorder, false, dashed, Color.alpha(borderColor))) {
-            val stroke = max(1, Tuils.dpToPx(context, AppearanceSettings.dashedBorderStrokeWidthDp()).toInt())
-            val dashLength = AppearanceSettings.dashLength()
-            val dashGap = AppearanceSettings.dashGap()
+            val stroke = max(1, Tuils.dpToPx(context, (style?.stroke ?: AppearanceSettings.dashedBorderStrokeWidthDp())).toInt())
+            val dashLength = (style?.dash?.toInt() ?: AppearanceSettings.dashLength())
+            val dashGap = (style?.gap?.toInt() ?: AppearanceSettings.dashGap())
             if (dashed && dashLength > 0 && dashGap > 0) {
                 bg.setStroke(
                     stroke,
@@ -149,6 +154,32 @@ object TerminalBorderRuntime {
 
     fun customFrameActive(context: Context, target: FrameTarget = FrameTarget.CONTROLS): Boolean =
         FrameManager.isActive(context, target)
+
+    /** A detached presentation has no message loop until attached; bind after real layout instead. */
+    internal fun bindPresentation(panel: View?, vararg cutoutViews: View?) {
+        val border=panel ?: return
+        val tag=ohi.andre.consolelauncher.R.id.home_border_layout_binding
+        (border.getTag(tag) as? PresentationBinding)?.let { previous ->
+            previous.views.forEach { it.removeOnLayoutChangeListener(previous.listener) }
+        }
+        border.setTag(tag,null)
+        val drawable=border.background as? TerminalBorderDrawable ?: return
+        val views=cutoutViews.filterNotNull()
+        val all=listOf(border)+views
+        lateinit var listener: View.OnLayoutChangeListener
+        fun bindWhenReady() {
+            if(border.width<=0 || views.any { it.visibility!=View.GONE && it.width<=0 }) return
+            CutoutRunnable(border,drawable,views).run()
+            all.forEach { it.removeOnLayoutChangeListener(listener) }
+            border.setTag(tag,null)
+        }
+        listener=View.OnLayoutChangeListener { _,_,_,_,_,_,_,_,_->bindWhenReady() }
+        border.setTag(tag,PresentationBinding(all,listener))
+        all.forEach { it.addOnLayoutChangeListener(listener) }
+        if(all.all { it.isLaidOut && !it.isLayoutRequested }) bindWhenReady()
+    }
+
+    private data class PresentationBinding(val views: List<View>,val listener: View.OnLayoutChangeListener)
 
     fun bind(panel: View?, vararg cutoutViews: View?) {
         val border = panel ?: return
@@ -221,15 +252,23 @@ object TerminalBorderRuntime {
         }
 
         private fun descendantBounds(panel: View, child: View): Rect? {
-            val group = panel as? ViewGroup ?: return null
-            var parent = child.parent
-            while (parent != null && parent !== group) {
-                parent = parent.parent
+            // Headers can be siblings of their border. Shared ancestor coordinates also work detached.
+            var ancestor: ViewGroup? = panel as? ViewGroup ?: panel.parent as? ViewGroup
+            while(ancestor!=null) {
+                var parent=child.parent
+                while(parent!=null && parent!==ancestor) parent=parent.parent
+                if(parent===ancestor) {
+                    val panelBounds=Rect(0,0,panel.width,panel.height)
+                    if(panel!==ancestor) ancestor.offsetDescendantRectToMyCoords(panel,panelBounds)
+                    val common=ancestor
+                    return Rect(0,0,child.width,child.height).also {
+                        common.offsetDescendantRectToMyCoords(child,it)
+                        it.offset(-panelBounds.left,-panelBounds.top)
+                    }
+                }
+                ancestor=ancestor.parent as? ViewGroup
             }
-            if (parent !== group) return null
-            return Rect(0, 0, child.width, child.height).also {
-                group.offsetDescendantRectToMyCoords(child, it)
-            }
+            return null
         }
     }
 }

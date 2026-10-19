@@ -53,18 +53,21 @@ android {
         applicationId = "com.dvil.tui_renewed"
         minSdk = 23
         targetSdk = 36
-        versionCode = 503
+        versionCode = 504
         versionName = "3"
 
         testInstrumentationRunner = providers.gradleProperty('ircReleaseSmokeRunner').map { it.toBoolean() }
                 .getOrElse(false) ? "ohi.andre.consolelauncher.irc.IrcReleaseSmokeInstrumentation"
                 : providers.gradleProperty('termuxSshReleaseCheck').map { it.toBoolean() }.getOrElse(false)
                     ? "ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceSshReleaseInstrumentation"
-                    : "androidx.test.runner.AndroidJUnitRunner"
+                    : providers.gradleProperty('settingsPreviewReleaseCheck').map { it.toBoolean() }.getOrElse(false)
+                        ? "ohi.andre.consolelauncher.managers.settings.SettingsPreviewReleaseInstrumentation"
+                        : "androidx.test.runner.AndroidJUnitRunner"
         manifestPlaceholders.applicationLabel = '@string/app_name'
     }
 
-    testBuildType = providers.gradleProperty('termuxSshReleaseCheck').map { it.toBoolean() }.getOrElse(false) ? 'release' : 'debug'
+    testBuildType = (providers.gradleProperty('termuxSshReleaseCheck').map { it.toBoolean() }.getOrElse(false)
+            || providers.gradleProperty('settingsPreviewReleaseCheck').map { it.toBoolean() }.getOrElse(false)) ? 'release' : 'debug'
 
     buildFeatures {
         buildConfig = true

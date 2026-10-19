@@ -48,6 +48,13 @@ class AsciiArtTextView : AppCompatTextView {
         text = ""
     }
 
+    internal fun captureFrame(): (AsciiArtTextView)->Unit {
+        val frame=lines.joinToString("\n")
+        val color=textColor;val viewport=viewportRowsSetting;val pane=paneHeightRowsSetting
+        val colors=lineColors.flatMapIndexed { index, row -> row.toList() + if (index<lineColors.lastIndex) listOf(color) else emptyList() }.toIntArray()
+        return { it.setAsciiFrame(frame,color,viewport,pane,colors) }
+    }
+
     fun setAsciiFrame(
         text: String?,
         color: Int,

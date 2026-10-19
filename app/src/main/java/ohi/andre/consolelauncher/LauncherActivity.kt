@@ -461,7 +461,7 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.MATCH_PARENT
         )
-        layoutInflater.inflate(R.layout.base_view, mainView, true)
+        ohi.andre.consolelauncher.presentation.LauncherHomePresentation.inflateInto(this, mainView)
         setContentView(mainView)
 
         if (terminalState == null && XMLPrefsManager.getBoolean(Ui.show_restart_message)) {
@@ -888,6 +888,8 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
     companion object {
         @JvmField
         var instance: LauncherActivity? = null
+
+        internal fun captureHomePreview() = instance?.let { it.uiManager?.captureHomePreview(it.resources.configuration) }
 
         @JvmStatic
         fun preview(context: Context) {

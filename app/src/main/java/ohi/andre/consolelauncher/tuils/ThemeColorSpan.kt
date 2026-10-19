@@ -7,7 +7,8 @@ import ohi.andre.consolelauncher.managers.settings.ThemeColorResolver
 import ohi.andre.consolelauncher.managers.xml.options.Theme
 
 /** Retains color ownership across an in-place terminal history restoration. */
-class ThemeColorSpan(val role: Theme) : ForegroundColorSpan(ThemeColorResolver.color(role)) {
+class ThemeColorSpan private constructor(val role: Theme, color: Int) : ForegroundColorSpan(color) {
+    constructor(role: Theme): this(role,ThemeColorResolver.color(role))
     companion object {
         fun text(text: CharSequence?, role: Theme): SpannableString {
             val result = SpannableString(text ?: "")
@@ -15,14 +16,16 @@ class ThemeColorSpan(val role: Theme) : ForegroundColorSpan(ThemeColorResolver.c
             return result
         }
 
-        fun refresh(text: CharSequence): SpannableString {
+        fun refresh(text: CharSequence): SpannableString = refresh(text, ThemeColorResolver::color)
+
+        internal fun refresh(text: CharSequence, color: (Theme)->Int): SpannableString {
             val result = SpannableString(text)
             for (span in result.getSpans(0, result.length, ThemeColorSpan::class.java)) {
                 val start = result.getSpanStart(span)
                 val end = result.getSpanEnd(span)
                 val flags = result.getSpanFlags(span)
                 result.removeSpan(span)
-                result.setSpan(ThemeColorSpan(span.role), start, end, flags)
+                result.setSpan(ThemeColorSpan(span.role,color(span.role)), start, end, flags)
             }
             return result
         }

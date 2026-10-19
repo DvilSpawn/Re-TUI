@@ -14,6 +14,18 @@ class `private` : ParamCommand() {
             override fun args(): IntArray? = IntArray(0)
             override fun exec(pack: ExecutePack): String? = (pack as MainPack).appsManager.listPrivateApps()
         },
+        `open` {
+            override fun args(): IntArray = intArrayOf(CommandAbstraction.PLAIN_TEXT)
+            override fun exec(pack: ExecutePack): String? {
+                val manager = (pack as MainPack).appsManager
+                if (!manager.hasPrivateSpace()) return pack.context.getString(R.string.output_private_space_unavailable)
+                if (manager.isPrivateSpaceLocked()) return pack.context.getString(R.string.output_private_space_locked)
+                val app = manager.findPrivateApp(pack.getString())
+                    ?: return pack.context.getString(R.string.output_appnotfound)
+                return if (manager.launch(pack.context, app)) null
+                else pack.context.getString(R.string.output_app_launch_failed)
+            }
+        },
         lock {
             override fun args(): IntArray? = IntArray(0)
             override fun exec(pack: ExecutePack): String? =

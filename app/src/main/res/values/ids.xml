@@ -4,4 +4,16 @@
     <item name="notification_terminal_widget" type="id" />
     <item name="retui_font_base_size_sp" type="id" />
     <item name="retui_font_scaled_size_sp" type="id" />
+    <item type="id" name="home_widget_binding" />
+    <item type="id" name="home_dock_binding" />
+    <item type="id" name="home_root_binding" />
+    <item type="id" name="home_suggestion_binding" />
+    <item type="id" name="home_search_binding" />
+    <item type="id" name="home_border_layout_binding" />
+    <item type="id" name="home_output_header_binding" />
+    <item type="id" name="home_module_content_binding" />
+    <item type="id" name="home_module_body_schema" />
+    <item type="id" name="home_module_scroll_policy" />
+    <item type="id" name="home_preview_appearance" />
+    <item type="id" name="home_duo_controls" />
 </resources>

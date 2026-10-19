@@ -1132,7 +1132,17 @@ class AppsManager(context: Context) : XMLPrefsElement {
 
     fun privateApps(): MutableList<LaunchInfo> {
         if (!isPrivateSpaceTabVisible()) return ArrayList()
-        return ArrayList(privateShownApps)
+        return ArrayList(privateShownApps).apply {
+            sortWith { a, b -> Tuils.alphabeticCompare(a.publicLabel, b.publicLabel) }
+        }
+    }
+
+    /** Explicit command lookup only; private apps stay out of general suggestions and discovery. */
+    fun findPrivateApp(label: String?): LaunchInfo? {
+        if (label == null || !hasPrivateSpace() || isPrivateSpaceLocked()) return null
+        val apps = ArrayList(privateShownApps).apply { addAll(privateHiddenApps) }
+        return AppUtils.findLaunchInfoWithLabel(apps, label)
+            ?: AppUtils.findLaunchInfosWithPackage(label, apps).firstOrNull()
     }
 
     fun listPrivateApps(): String {

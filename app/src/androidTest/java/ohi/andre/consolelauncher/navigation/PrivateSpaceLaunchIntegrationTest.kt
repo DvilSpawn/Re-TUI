@@ -82,6 +82,7 @@ class PrivateSpaceLaunchIntegrationTest {
             }
             waitFor("Launcher ready") { LauncherActivity.instance?.uiManager != null }
             instrumentation.waitForIdleSync()
+            waitFor("Home window focused") { LauncherActivity.instance?.hasWindowFocus() == true }
             return LauncherActivity.instance!!
         }
         fun shell(command: String): String = ParcelFileDescriptor.AutoCloseInputStream(
@@ -139,23 +140,69 @@ class PrivateSpaceLaunchIntegrationTest {
             }
             instrumentation.sendStatus(0, Bundle().apply { putString("stream", "PRI tap launched fixture in user $profileId\n") })
         }
+        fun launchFromCommand(command: String) {
+            instrumentation.runOnMainSync {
+                val main = LauncherActivity::class.java.getDeclaredField("main").apply { isAccessible = true }
+                    .get(activity) as ohi.andre.consolelauncher.MainManager
+                main.onCommand(command, null as String?, false)
+            }
+            waitFor("Command launched fixture in private user $profileId") {
+                shell("dumpsys window").lineSequence().any {
+                    it.contains("mCurrentFocus=") && it.contains("u$profileId ") && it.contains(fixturePackage)
+                }
+            }
+            instrumentation.sendStatus(0, Bundle().apply { putString("stream", "Command launched fixture in user $profileId: $command\n") })
+            activity = home()
+        }
+        fun verifyAlphabeticalPrivateDrawer() {
+            instrumentation.runOnMainSync {
+                val field = AppsManager::class.java.getDeclaredField("privateShownApps").apply { isAccessible = true }
+                val original = field.get(manager)
+                try {
+                    val scrambled = ('A'..'Z').reversed().map { letter ->
+                        AppsManager.LaunchInfo("test.$letter", "test.$letter.Main", "${letter}pp", profile, 11L, false, AppsManager.LaunchInfo.ProfileType.PRIVATE)
+                    }.toMutableList()
+                    field.set(manager, scrambled)
+                    assertEquals(('A'..'Z').map { "${it}pp" }, manager.privateApps().map { it.publicLabel })
+                    val printed = manager.listPrivateApps().lines()
+                    assertEquals(('A'..'Z').map { it.toString() }, printed.filter { it.length == 1 && it[0] in 'A'..'Z' })
+                    activity.uiManager!!.showAppsDrawer()
+                    val tabs = activity.findViewById<LinearLayout>(R.id.apps_group_tabs)
+                    (0 until tabs.childCount).map { tabs.getChildAt(it) }.filterIsInstance<TextView>()
+                        .first { it.text.toString() == "PRI" }.performClick()
+                    val list = activity.findViewById<ListView>(R.id.apps_list)
+                    val rows = (0 until list.adapter.count).map { (list.adapter.getView(it, null, list) as TextView).text.toString() }
+                    assertEquals(('A'..'Z').map { "${it}pp" }, rows.filter { it.endsWith("pp") })
+                    assertEquals(26, rows.count { it.startsWith("[") && it.length <= 5 })
+                    val ui = activity.uiManager!!
+                    (ui.javaClass.getDeclaredField("appDrawerPaneManager").apply { isAccessible = true }.get(ui) as AppDrawerPaneManager).hide()
+                } finally { field.set(manager, original) }
+            }
+        }
         assertTrue("Fixture must not be installed in personal profile",
             launcherApps.getActivityList(fixturePackage, android.os.Process.myUserHandle()).isEmpty())
         request(true)
-        waitFor("Profile locked") { users.isQuietModeEnabled(profile) && manager.isPrivateSpaceLocked() }
+        waitFor("Profile locked") { users.isQuietModeEnabled(profile) && !users.isUserUnlocked(profile) && manager.isPrivateSpaceLocked() }
         assertTrue(manager.privateApps().isEmpty())
+        assertNull(manager.findPrivateApp("Private Profile Test"))
         assertFalse(manager.isPrivateSpaceTabVisible())
         unlockWithFixturePin()
         LauncherSettings.set(context, Behavior.enable_private_command, "false")
         assertFalse(manager.hasPrivateSpace())
         assertFalse(manager.isPrivateSpaceTabVisible())
         assertTrue(manager.privateApps().isEmpty())
+        assertNull(manager.findPrivateApp("Private Profile Test"))
         assertTrue("Disabling Re:TUI access must not lock the Android profile", users.isUserUnlocked(profile))
         LauncherSettings.set(context, Behavior.enable_private_command, "true")
+        verifyAlphabeticalPrivateDrawer()
         launchFromPrivateDrawer()
         activity = home()
+        // The fixture's first word is the built-in command "private". Use the supported
+        // space-free app label for the bare-name route, and the full label for -open.
+        launchFromCommand("PrivateProfileTest")
+        launchFromCommand("private -open Private Profile Test")
         request(true)
-        waitFor("Relocked profile") { users.isQuietModeEnabled(profile) && manager.isPrivateSpaceLocked() }
+        waitFor("Relocked profile") { users.isQuietModeEnabled(profile) && !users.isUserUnlocked(profile) && manager.isPrivateSpaceLocked() }
         request(false)
         waitFor("Authentication displayed for cancellation") { pinField(instrumentation.uiAutomation.rootInActiveWindow) != null }
         shell("input keyevent 4")
@@ -165,12 +212,13 @@ class PrivateSpaceLaunchIntegrationTest {
         instrumentation.uiAutomation.waitForIdle(500, 5000)
         assertTrue("Cancel keeps quiet mode on", users.isQuietModeEnabled(profile))
         assertTrue(manager.privateApps().isEmpty())
+        assertNull(manager.findPrivateApp("Private Profile Test"))
         activity = home()
         unlockWithFixturePin()
         launchFromPrivateDrawer()
         activity = home()
         request(true)
-        waitFor("Final profile lock") { users.isQuietModeEnabled(profile) && manager.isPrivateSpaceLocked() }
+        waitFor("Final profile lock") { users.isQuietModeEnabled(profile) && !users.isUserUnlocked(profile) && manager.isPrivateSpaceLocked() }
     }
 
     @Test

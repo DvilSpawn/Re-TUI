@@ -24,7 +24,7 @@ class CommandGroupLocaleTest {
             .getCommandByName("private")
 
         assertEquals(
-            setOf("-ls", "-lock", "-unlock", "-settings", "-show", "-hide"),
+            setOf("-ls", "-open", "-lock", "-unlock", "-settings", "-show", "-hide"),
             (command as? ParamCommand)?.params()?.toSet()
         )
     }

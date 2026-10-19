@@ -339,6 +339,7 @@
         \n-tutorial -> open the Apps command guide
     </string>
     <string name="help_private">-ls -> list Private Space apps
+        \n-open &lt;app&gt; -> launch an unlocked Private Space app
         \n-lock -> lock Private Space
         \n-unlock -> unlock Private Space
         \n-settings -> open Private Space settings when Android exposes them

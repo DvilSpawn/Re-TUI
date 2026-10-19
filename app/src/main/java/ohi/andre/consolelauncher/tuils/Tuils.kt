@@ -168,97 +168,29 @@ object Tuils {
                 Log.e("TUI-FONT", "Unable to load font prefs, trying filesystem fallback", e)
             }
 
-            val tui = folder
-            var font = resolveConfiguredFontFile(tui, configuredFont)
-            if (font == null) {
-                font = resolveLegacyFontFile(tui)
-                if (prefsLoaded && !systemFont && font != null && (configuredFont == null || configuredFont.trim { it <= ' ' }.length == 0)) {
-                    try {
-                        LauncherSettings.setUi(Ui.font_file, font.getName())
-                    } catch (ignored: Exception) {
-                    }
-                }
+            val loaded=LauncherTypeface.load(context,folder,prefsLoaded && systemFont,configuredFont)
+            if(prefsLoaded && !systemFont && loaded.legacyFileName!=null) {
+                try { LauncherSettings.setUi(Ui.font_file,loaded.legacyFileName) } catch(_:Exception) { }
             }
-
-            if (prefsLoaded && systemFont) {
-                globalTypeface = Typeface.DEFAULT
-                fontPath = null
-                Log.e("TUI-FONT", "Using system font")
-            } else if (font != null && font.exists() && font.length() > 0) {
-                try {
-                    fontPath = font.getAbsolutePath()
-                    Log.e("TUI-FONT", "Attempting to create Typeface from: " + fontPath)
-                    globalTypeface = Typeface.createFromFile(font)
-                    Log.e("TUI-FONT", "Loaded custom font: " + fontPath)
-                } catch (e: Exception) {
-                    Log.e("TUI-FONT", "Failed to load font from " + font.getAbsolutePath(), e)
-                    log(e)
-                    toFile(e)
-                    globalTypeface = null
-                }
+            loaded.customFontError?.let { error ->
+                Log.e("TUI-FONT","Failed to load custom font; falling back to ${loaded.path}",error)
+                log(error)
+                toFile(error)
             }
-
-            if (globalTypeface == null) {
-                try {
-                    globalTypeface =
-                        Typeface.createFromAsset(context.getAssets(), BUNDLED_FONT_ASSET)
-                    fontPath = "asset://$BUNDLED_FONT_ASSET"
-                    Log.e("TUI-FONT", "Falling back to bundled font")
-                } catch (e: Exception) {
-                    globalTypeface = Typeface.MONOSPACE
-                    fontPath = null
-                    Log.e("TUI-FONT", "Falling back to system default font")
-                }
-            }
+            globalTypeface=loaded.typeface
+            fontPath=loaded.path
+            Log.e("TUI-FONT",when {
+                prefsLoaded && systemFont -> "Using system font"
+                loaded.path?.startsWith("asset://")==true -> "Falling back to bundled font"
+                loaded.path!=null -> "Loaded custom font: ${loaded.path}"
+                else -> "Falling back to system default font"
+            })
         }
         return globalTypeface
     }
 
-    internal fun resolveConfiguredFontFile(tui: File?, configuredFont: String?): File? {
-        var configuredFont = configuredFont
-        if (tui == null || configuredFont == null) {
-            return null
-        }
-
-        configuredFont = configuredFont.trim { it <= ' ' }
-        if (configuredFont.length == 0) {
-            return null
-        }
-
-        val direct = File(tui, configuredFont)
-        if (direct.exists() && direct.isFile()) {
-            return direct
-        }
-
-        val fontsDir = File(tui, "fonts")
-        val inFontsDir = File(fontsDir, configuredFont)
-        if (inFontsDir.exists() && inFontsDir.isFile()) {
-            return inFontsDir
-        }
-
-        return null
-    }
-
-    private fun resolveLegacyFontFile(tui: File?): File? {
-        if (tui == null) {
-            return null
-        }
-
-        val files = tui.listFiles()
-        if (files == null) {
-            return null
-        }
-
-        for (f in files) {
-            if (f.isDirectory()) continue
-            val name = f.getName().lowercase(Locale.getDefault())
-            if (name.endsWith(".ttf") || name.endsWith(".otf")) {
-                return f
-            }
-        }
-
-        return null
-    }
+    internal fun resolveConfiguredFontFile(tui:File?,configuredFont:String?):File? =
+        LauncherTypeface.resolveConfiguredFile(tui,configuredFont)
 
     fun cancelFont() {
         globalTypeface = null
@@ -1017,20 +949,18 @@ object Tuils {
     }
 
     fun insertHeaders(s: MutableList<String?>, newLine: Boolean) {
-        var current = 0.toChar()
-        for (count in s.indices) {
-            val st = s.get(count)!!.trim { it <= ' ' }.uppercase(Locale.getDefault())
-            if (st.length < 0) continue
-
-            val c = st.get(0)
-            if (current != c) {
-                s.add(
-                    count,
-                    (if (newLine) NEWLINE else EMPTYSTRING) + c + (if (newLine) NEWLINE else EMPTYSTRING)
-                )
-                current = c
+        var current: Char? = null
+        val grouped = ArrayList<String?>(s.size)
+        for (item in s) {
+            val first = item?.trim()?.uppercase(Locale.getDefault())?.firstOrNull()
+            if (first != null && first != current) {
+                grouped.add((if (newLine) NEWLINE else EMPTYSTRING) + first + (if (newLine) NEWLINE else EMPTYSTRING))
+                current = first
             }
+            grouped.add(item)
         }
+        s.clear()
+        s.addAll(grouped)
     }
 
     fun addPrefix(list: MutableList<String?>, prefix: String) {

@@ -1,0 +1,10 @@
+<resources>
+    <string name="settings_preview_current_home">YOUR LAUNCHER · Unsaved preview · Tap to expand</string>
+    <string name="settings_preview_expand">Expand launcher preview</string>
+    <string name="settings_preview_return_editor">Return to editor · Changes are not applied</string>
+    <string name="settings_preview_home_unavailable">Open the launcher first to preview your current layout.</string>
+    <string name="settings_preview_wallpaper_full">System wallpaper is shown in the full preview.</string>
+    <string name="settings_preview_status_card">STATUS</string>
+    <string name="settings_preview_terminal_card">TERMINAL</string>
+    <string name="settings_preview_module_card">MODULE</string>
+</resources>

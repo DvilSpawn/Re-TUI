@@ -439,7 +439,7 @@ class MainManager(private val mContext: LauncherActivity) {
         val launched = appsManager.launch(mainPack.context, i)
         if (!launched) return false
 
-        if (showAppHistory) {
+        if (showAppHistory && !i.isPrivateProfile) {
             val intent = appsManager.getIntent(i)!!
             appFormat = XMLPrefsManager.get(Behavior.app_launch_format)
             outputColor = XMLPrefsManager.getColor(Theme.output_text_color)
@@ -624,6 +624,7 @@ class MainManager(private val mContext: LauncherActivity) {
 
             // Check if input exactly matches an app label or component
             val i = appsManager.findLaunchInfoWithLabel(input, AppsManager.SHOWN_APPS)
+                ?: appsManager.findPrivateApp(input)
             if (i != null) {
                 // If it matches exactly, and we have arguments, maybe it's NOT an app launch but a command with same name
                 // But TuiCommandTrigger should have caught it first.

@@ -7,6 +7,10 @@ import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
 import android.view.View
+import android.view.Gravity
+import ohi.andre.consolelauncher.presentation.HomeAppearance
+import ohi.andre.consolelauncher.managers.xml.options.Ui
+import ohi.andre.consolelauncher.tuils.LauncherFontScale
 import android.view.ViewGroup
 import android.widget.HorizontalScrollView
 import android.widget.LinearLayout
@@ -15,13 +19,11 @@ import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.commands.main.MainPack
 import ohi.andre.consolelauncher.managers.AppsManager
 import ohi.andre.consolelauncher.managers.AppsManager.LaunchInfo
-import ohi.andre.consolelauncher.managers.settings.AppearanceSettings.moduleCornerRadius
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.options.Suggestions
 import ohi.andre.consolelauncher.tuils.Tuils
 import ohi.andre.consolelauncher.tuils.TerminalBorderRuntime
 import ohi.andre.consolelauncher.tuils.FrameTarget
-import ohi.andre.consolelauncher.managers.settings.AppearanceSettings
 
 /*Copyright Francesco Andreuzzi
 
@@ -181,115 +183,116 @@ class SuggestionRunnable(
 internal class SuggestionChipStyler(private val context: Context, private val appsManager: AppsManager? = null) {
     constructor(pack: MainPack) : this(pack.context, pack.appsManager)
 
+    private val appearance=ohi.andre.consolelauncher.presentation.HomeAppearance.saved()
+
+    internal data class Binding(val type: Int,val backgroundOverride: Int=Int.MAX_VALUE,val textOverride: Int=Int.MAX_VALUE)
+    internal object TrailingSpace
+
     companion object {
-        fun spacing(): IntArray = XMLPrefsManager.getListOfIntValues(XMLPrefsManager.get(Suggestions.suggestions_spaces), 4, 0)
-
-        fun createView(context: Context, spaces: IntArray = spacing()): TextView = TextView(context).apply {
-            typeface = Tuils.getTypeface(context)
-            textSize = XMLPrefsManager.getInt(Suggestions.suggestions_size).toFloat()
-            setPadding(spaces[2], spaces[3], spaces[2], spaces[3])
-            setLines(1)
-            maxLines = 1
+        fun spacing(appearance: HomeAppearance = HomeAppearance.saved()): IntArray {
+            val parts = appearance.raw(Suggestions.suggestions_spaces).orEmpty()
+                .replace(Regex("[\\[\\]\\s]"), "").split(',')
+            return IntArray(4) { parts.getOrNull(it)?.toIntOrNull() ?: 0 }
         }
-    }
 
-    private val transparentSuggestions = XMLPrefsManager.getBoolean(Suggestions.transparent_suggestions)
-    private val suggAppBg = XMLPrefsManager.getColor(Suggestions.apps_background_color)
-    private val suggAliasBg = XMLPrefsManager.getColor(Suggestions.alias_background_color)
-    private val suggCmdBg = XMLPrefsManager.getColor(Suggestions.cmd_background_color)
-    private val suggContactBg = XMLPrefsManager.getColor(Suggestions.contact_background_color)
-    private val suggFileBg = XMLPrefsManager.getColor(Suggestions.file_background_color)
-    private val suggSongBg = XMLPrefsManager.getColor(Suggestions.song_background_color)
-    private val suggDefaultBg = XMLPrefsManager.getColor(Suggestions.default_background_color)
-    private val suggAppText = XMLPrefsManager.getColor(Suggestions.apps_text_color)
-    private val suggAliasText = XMLPrefsManager.getColor(Suggestions.alias_text_color)
-    private val suggCmdText = XMLPrefsManager.getColor(Suggestions.cmd_text_color)
-    private val suggContactText = XMLPrefsManager.getColor(Suggestions.contact_text_color)
-    private val suggFileText = XMLPrefsManager.getColor(Suggestions.file_text_color)
-    private val suggSongText = XMLPrefsManager.getColor(Suggestions.song_text_color)
-    private val suggDefaultText = XMLPrefsManager.getColor(Suggestions.default_text_color)
+        fun createView(context: Context, spaces: IntArray = spacing()): TextView =
+            createView(context, HomeAppearance.saved(), spaces)
 
-    fun apply(view: TextView, type: Int, payload: Any?) {
-        ohi.andre.consolelauncher.managers.settings.TextShadows.apply(view, ohi.andre.consolelauncher.managers.xml.options.Theme.suggestions_text_shadow_color)
-        var bgColor = Int.MAX_VALUE
-        var textColor = Int.MAX_VALUE
-        var styledPayload = payload
-        if (type == SuggestionsManager.Suggestion.TYPE_APP || type == SuggestionsManager.Suggestion.TYPE_APPGP) {
-            if (styledPayload is LaunchInfo) {
-                styledPayload = appsManager?.groups?.firstOrNull { it.contains(styledPayload) } ?: styledPayload
+        fun createView(context: Context, appearance: HomeAppearance, spaces: IntArray = spacing(appearance)): TextView =
+            TextView(context).apply {
+                typeface = appearance.font(context)
+                LauncherFontScale.setBaseSize(this, appearance.number(Suggestions.suggestions_size), appearance.number(Ui.font_size_offset).toInt())
+                setPadding(spaces[2], spaces[3], spaces[2], spaces[3])
+                setLines(1)
+                maxLines = 1
             }
-            if (styledPayload is AppsManager.Group) {
-                bgColor = styledPayload.bgColor
-                textColor = styledPayload.foreColor
+
+        /** Existing trailing breathing room; its asymmetric margins also reserve the strip's height. */
+        fun createTrailingSpace(context: Context, appearance: HomeAppearance): TextView = createView(context,appearance).apply {
+            visibility=View.INVISIBLE
+            setTag(R.id.home_suggestion_binding,TrailingSpace)
+            val spaces=spacing(appearance)
+            layoutParams=LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+                setMargins(spaces[0],spaces[1],spaces[2],spaces[3])
             }
         }
-        view.background = if (bgColor == Int.MAX_VALUE) suggestionBg(type) else suggestionColorBg(bgColor)
-        view.setTextColor(if (textColor == Int.MAX_VALUE) suggestionTextColor(type) else textColor)
-    }
 
-    private fun suggestionBg(type: Int): Drawable {
-        if (transparentSuggestions) {
-            return ColorDrawable(Color.TRANSPARENT)
-        } else {
-            when (type) {
-                SuggestionsManager.Suggestion.TYPE_APP, SuggestionsManager.Suggestion.TYPE_APPGP -> return suggestionColorBg(suggAppBg)
-                SuggestionsManager.Suggestion.TYPE_ALIAS -> return suggestionColorBg(suggAliasBg)
-                SuggestionsManager.Suggestion.TYPE_COMMAND, SuggestionsManager.Suggestion.TYPE_MODULE -> return suggestionColorBg(suggCmdBg)
-                SuggestionsManager.Suggestion.TYPE_CONTACT, SuggestionsManager.Suggestion.TYPE_CONTACT_ROOT -> return suggestionColorBg(suggContactBg)
-
-                SuggestionsManager.Suggestion.TYPE_FILE,
-                SuggestionsManager.Suggestion.TYPE_CONFIGFILE,
-                SuggestionsManager.Suggestion.TYPE_FILE_ACTION -> return suggestionColorBg(suggFileBg)
-                SuggestionsManager.Suggestion.TYPE_SONG -> return suggestionColorBg(suggSongBg)
-                else -> return suggestionColorBg(suggDefaultBg)
+        fun layoutParams(appearance: HomeAppearance): LinearLayout.LayoutParams {
+            val spaces = spacing(appearance)
+            return LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+                gravity = Gravity.CENTER_VERTICAL
+                setMargins(spaces[0], spaces[1], spaces[0], spaces[1])
             }
         }
-    }
 
-    private fun suggestionColorBg(color: Int): Drawable {
-        if (AppearanceSettings.cyberdeckMode() || TerminalBorderRuntime.customFrameActive(context, FrameTarget.SUGGESTIONS)) {
-            return TerminalBorderRuntime.panelDrawable(
-                context,
-                color,
-                AppearanceSettings.terminalBorderColor(),
-                1.0f,
-                0,
-                true,
-                target = FrameTarget.SUGGESTIONS
-            )
+        internal fun styleDraft(view: TextView,binding: Binding,
+            appearance: HomeAppearance, saved: HomeAppearance?=null) {
+            view.setTag(R.id.home_suggestion_binding,binding)
+            view.typeface = appearance.font(view.context)
+            LauncherFontScale.setBaseSize(view, appearance.number(Suggestions.suggestions_size), appearance.number(Ui.font_size_offset).toInt())
+            val spaces = spacing(appearance)
+            view.setPadding(spaces[2], spaces[3], spaces[2], spaces[3])
+            val shadow=appearance.color(ohi.andre.consolelauncher.managers.xml.options.Theme.suggestions_text_shadow_color)
+            if(Color.alpha(shadow)==0) view.setShadowLayer(0f,0f,0f,Color.TRANSPARENT)
+            else {
+                val params=ohi.andre.consolelauncher.managers.settings.TextShadows.parameters(appearance.raw(Ui.shadow_params))
+                view.setShadowLayer(params[2],params[0],params[1],shadow)
+            }
+            val bg=if(binding.backgroundOverride!=Int.MAX_VALUE) binding.backgroundOverride
+                else appearance.rawColor(colorKey(binding.type,false))
+            view.background=if(binding.backgroundOverride==Int.MAX_VALUE && appearance.bool(Suggestions.transparent_suggestions))
+                ColorDrawable(Color.TRANSPARENT) else colorBackground(view.context,bg,appearance)
+            view.setTextColor(if(binding.textOverride!=Int.MAX_VALUE) binding.textOverride else textColor(binding.type,appearance))
         }
 
-        val bg = GradientDrawable()
-        bg.setShape(GradientDrawable.RECTANGLE)
-        bg.setCornerRadius(Tuils.dpToPx(context, moduleCornerRadius()).toFloat())
-        bg.setColor(color)
-        return bg
-    }
-
-    fun suggestionTextColor(type: Int): Int {
-        var chosen: Int
-
-        when (type) {
-            SuggestionsManager.Suggestion.TYPE_APP, SuggestionsManager.Suggestion.TYPE_APPGP -> chosen =
-                suggAppText
-
-            SuggestionsManager.Suggestion.TYPE_ALIAS -> chosen = suggAliasText
-            SuggestionsManager.Suggestion.TYPE_COMMAND, SuggestionsManager.Suggestion.TYPE_MODULE -> chosen =
-                suggCmdText
-
-            SuggestionsManager.Suggestion.TYPE_CONTACT, SuggestionsManager.Suggestion.TYPE_CONTACT_ROOT -> chosen =
-                suggContactText
-
-            SuggestionsManager.Suggestion.TYPE_FILE,
-            SuggestionsManager.Suggestion.TYPE_CONFIGFILE,
-            SuggestionsManager.Suggestion.TYPE_FILE_ACTION -> chosen =
-                suggFileText
-
-            SuggestionsManager.Suggestion.TYPE_SONG -> chosen = suggSongText
-            else -> chosen = suggDefaultText
+        private fun colorBackground(context: Context,color: Int,appearance: ohi.andre.consolelauncher.presentation.HomeAppearance): Drawable {
+            if(appearance.bool(ohi.andre.consolelauncher.managers.xml.options.Behavior.enable_cyberdeck_mode)
+                || TerminalBorderRuntime.customFrameActive(context,FrameTarget.SUGGESTIONS)) {
+                return TerminalBorderRuntime.panelDrawablePx(context,color,
+                    appearance.color(ohi.andre.consolelauncher.managers.xml.options.Theme.terminal_border_color),
+                    1f,0f,true,target=FrameTarget.SUGGESTIONS,
+                    style=appearance.borderStyle().let { it.copy(stroke=it.stroke*(1f/1.5f)) })
+            }
+            return GradientDrawable().apply {
+                shape=GradientDrawable.RECTANGLE
+                cornerRadius=Tuils.dpToPx(context,appearance.radius(ohi.andre.consolelauncher.managers.xml.options.Ui.module_corner_radius)).toFloat()
+                setColor(color)
+            }
         }
 
-        if (chosen == Int.Companion.MAX_VALUE) chosen = suggDefaultText
-        return chosen
+        internal fun textColor(type: Int,appearance: ohi.andre.consolelauncher.presentation.HomeAppearance): Int {
+            val chosen=appearance.rawColor(colorKey(type,true))
+            return if(chosen==Int.MAX_VALUE) appearance.rawColor(Suggestions.default_text_color) else chosen
+        }
+
+        private fun colorKey(type: Int,text: Boolean): Suggestions = when(type) {
+            SuggestionsManager.Suggestion.TYPE_APP, SuggestionsManager.Suggestion.TYPE_APPGP ->
+                if(text) Suggestions.apps_text_color else Suggestions.apps_background_color
+            SuggestionsManager.Suggestion.TYPE_ALIAS -> if(text) Suggestions.alias_text_color else Suggestions.alias_background_color
+            SuggestionsManager.Suggestion.TYPE_COMMAND, SuggestionsManager.Suggestion.TYPE_MODULE ->
+                if(text) Suggestions.cmd_text_color else Suggestions.cmd_background_color
+            SuggestionsManager.Suggestion.TYPE_CONTACT, SuggestionsManager.Suggestion.TYPE_CONTACT_ROOT ->
+                if(text) Suggestions.contact_text_color else Suggestions.contact_background_color
+            SuggestionsManager.Suggestion.TYPE_FILE, SuggestionsManager.Suggestion.TYPE_CONFIGFILE, SuggestionsManager.Suggestion.TYPE_FILE_ACTION ->
+                if(text) Suggestions.file_text_color else Suggestions.file_background_color
+            SuggestionsManager.Suggestion.TYPE_SONG -> if(text) Suggestions.song_text_color else Suggestions.song_background_color
+            else -> if(text) Suggestions.default_text_color else Suggestions.default_background_color
+        }
     }
+
+    fun apply(view: TextView, type: Int, payload: Any?) = styleDraft(view, binding(type, payload), appearance)
+
+    fun binding(type: Int, payload: Any?): Binding {
+        var bgColor=Int.MAX_VALUE
+        var textColor=Int.MAX_VALUE
+        var styledPayload=payload
+        if(type==SuggestionsManager.Suggestion.TYPE_APP || type==SuggestionsManager.Suggestion.TYPE_APPGP) {
+            if(styledPayload is LaunchInfo)
+                styledPayload=appsManager?.groups?.firstOrNull { it.contains(styledPayload) } ?: styledPayload
+            if(styledPayload is AppsManager.Group) { bgColor=styledPayload.bgColor;textColor=styledPayload.foreColor }
+        }
+        return Binding(type,bgColor,textColor)
+    }
+
+    fun suggestionTextColor(type: Int): Int = textColor(type,appearance)
 }

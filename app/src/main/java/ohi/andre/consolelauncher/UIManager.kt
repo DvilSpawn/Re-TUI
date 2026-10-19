@@ -557,23 +557,9 @@ class UIManager(
     private val labelIndexes = FloatArray(labelViews.size)
     private val labelSizes = IntArray(labelViews.size)
     private val labelTexts = arrayOfNulls<CharSequence>(labelViews.size)
+    private var statusAppearance: ohi.andre.consolelauncher.presentation.HomeAppearance? = null
     private var unifiedStatusActive = false
-    private var unifiedStatusVisible = BooleanArray(Label.entries.size)
-    private var unifiedStatusDate: TextView? = null
-    private var unifiedStatusTime: TextView? = null
-    private var unifiedStatusBattery: TextView? = null
-    private var unifiedStatusWeatherIcon: ImageView? = null
-    private var unifiedStatusWeather: TextView? = null
-    private var unifiedStatusWeatherLocation: TextView? = null
-    private var unifiedStatusWeatherDetails: TextView? = null
-    private var unifiedStatusStorageInternalIcon: ImageView? = null
-    private var unifiedStatusStorageInternal: TextView? = null
-    private var unifiedStatusStorageExternalIcon: ImageView? = null
-    private var unifiedStatusStorageExternal: TextView? = null
-    private var unifiedStatusNetwork: TextView? = null
-    private var unifiedStatusRamIcon: ImageView? = null
-    private var unifiedStatusRam: TextView? = null
-    private var unifiedStatusUnlock: TextView? = null
+    private var unifiedStatusHost: ViewGroup? = null
     private var unifiedModulesToggle: ImageButton? = null
     private var unifiedModulesVisible = true
     private val unifiedModulesAutoHideRunnable = Runnable {
@@ -802,6 +788,13 @@ class UIManager(
     private var lastWeatherUpdateMillis: Long = 0
 
     //    you need to use labelIndexes[i]
+    internal fun captureHomePreview(configuration:Configuration) = (mRootView as? ViewGroup)?.let { ohi.andre.consolelauncher.presentation.LauncherHomeSnapshot.capture(it, ohi.andre.consolelauncher.presentation.StatusPresentation.capture(labelTexts),captureUnifiedContent(),captureTrayPresentationState(),ohi.andre.consolelauncher.presentation.LauncherHomeSnapshot.Insets(systemInsetLeft,systemInsetTop,systemInsetRight,systemInsetBottom),configuration) }
+
+    internal fun captureTrayPresentationState() = ohi.andre.consolelauncher.presentation.TerminalTrayPresentation.RuntimeState(
+        keyboardVisible,imeBottomOffset,systemInsetBottom,imeInsetVisible,terminalTrayExpanded,landscapeLayoutActive,duoLayoutActive,!TextUtils.isEmpty(activeModule),
+        searchOnlyMode,Tuils.getHint(pack?.currentDirectory?.absolutePath),
+        keyboardMarginsOverride=keyboardMarginOverrideActive(imeInsetVisible,imeBottomOffset,mTerminalAdapter?.inputView?.hasFocus()==true),duoSide=activeDuoLayoutMode?:DUO_LAYOUT_OFF)
+
     private fun updateText(l: Label, s: CharSequence?) {
         if (labelTexts[l.ordinal] === s) {
             return
@@ -818,132 +811,22 @@ class UIManager(
             return
         }
 
-        val indexs: MutableList<Float> = ArrayList()
-        for (count in Label.entries.toTypedArray().indices) {
-            if (labelIndexes[count].toInt() == base && labelTexts[count] != null) indexs.add(
-                labelIndexes[count]
-            )
-        }
-        //        now I'm sorting the labels on the same line for decimals (2.1, 2.0, ...)
-        Collections.sort(indexs)
-
-        var sequence: CharSequence = Tuils.EMPTYSTRING
-
-        for (c in indexs.indices) {
-            val i: Float = indexs.get(c)!!
-
-            for (a in Label.entries.toTypedArray().indices) {
-                if (i == labelIndexes[a] && labelTexts[a] != null) sequence =
-                    TextUtils.concat(sequence, labelTexts[a])
-            }
-        }
-
-        if (sequence.length == 0) labelViews[base]!!.setVisibility(View.GONE)
-        else {
-            val view = labelViews[base]!!
-            view.setVisibility(View.VISIBLE)
-            if (shouldUseAsciiViewport(base) && view is AsciiArtTextView) {
-                val frame = labelTexts[Label.ascii.ordinal]
-                val frameColor = if (frame is AsciiAnimationManager.AsciiFrameText) frame.color() else asciiColor
-                view.setAsciiFrame(
-                    frame?.toString(),
-                    frameColor,
-                    XMLPrefsManager.getInt(Ui.ascii_max_lines),
-                    XMLPrefsManager.getInt(Ui.ascii_pane_height_rows),
-                    (frame as? AsciiAnimationManager.AsciiFrameText)?.colors()
-                )
-            } else {
-                view.setText(sequence)
-            }
-        }
+        val members=labelIndexes.indices.filter { labelIndexes[it].toInt()==base && labelTexts[it]!=null }.sortedBy { labelIndexes[it] }
+        ohi.andre.consolelauncher.presentation.StatusPresentation.bindLiveContent(
+            labelViews[base]!!,members,labelTexts,statusAppearance ?: ohi.andre.consolelauncher.presentation.HomeAppearance.saved())
     }
 
-    private fun setupUnifiedStatus(show: BooleanArray, padding: IntArray) {
+    private fun setupUnifiedStatus() {
         val root = mRootView ?: return
         val container = root.findViewById<LinearLayout?>(R.id.unified_status_container) ?: return
         unifiedStatusActive = true
-        unifiedStatusVisible = show.copyOf()
-        unifiedStatusDate = root.findViewById(R.id.unified_status_date)
-        unifiedStatusTime = root.findViewById(R.id.unified_status_time)
-        unifiedStatusBattery = root.findViewById(R.id.unified_status_battery)
-        unifiedStatusWeatherIcon = root.findViewById(R.id.unified_status_weather_icon)
-        unifiedStatusWeather = root.findViewById(R.id.unified_status_weather)
-        unifiedStatusWeatherLocation = root.findViewById(R.id.unified_status_weather_location)
-        unifiedStatusWeatherDetails = root.findViewById(R.id.unified_status_weather_details)
-        unifiedStatusStorageInternalIcon = root.findViewById(R.id.unified_status_storage_internal_icon)
-        unifiedStatusStorageInternal = root.findViewById(R.id.unified_status_storage_internal)
-        unifiedStatusStorageExternalIcon = root.findViewById(R.id.unified_status_storage_external_icon)
-        unifiedStatusStorageExternal = root.findViewById(R.id.unified_status_storage_external)
-        unifiedStatusNetwork = root.findViewById(R.id.unified_status_network)
-        unifiedStatusRamIcon = root.findViewById(R.id.unified_status_ram_icon)
-        unifiedStatusRam = root.findViewById(R.id.unified_status_ram)
-        unifiedStatusUnlock = root.findViewById(R.id.unified_status_unlock)
         unifiedModulesToggle = root.findViewById(R.id.unified_modules_toggle)
 
         container.visibility = View.VISIBLE
-        val horizontalInset = max(padding[0], Tuils.dpToPx(mContext, 8))
-        val verticalInset = max(padding[1], Tuils.dpToPx(mContext, 4))
-        container.setPadding(
-            horizontalInset,
-            verticalInset,
-            max(padding[2], Tuils.dpToPx(mContext, 8)),
-            max(padding[3], verticalInset)
-        )
-        val typeface = Tuils.getTypeface(mContext)
-        listOfNotNull(
-            unifiedStatusDate,
-            unifiedStatusTime,
-            unifiedStatusBattery,
-            unifiedStatusWeather,
-            unifiedStatusWeatherLocation,
-            unifiedStatusWeatherDetails,
-            unifiedStatusStorageInternal,
-            unifiedStatusStorageExternal,
-            unifiedStatusNetwork,
-            unifiedStatusRam,
-            unifiedStatusUnlock
-        ).forEach { it.typeface = typeface }
-        unifiedStatusDate?.setTextColor(getColor(Theme.time_text_color))
-        unifiedStatusTime?.setTextColor(getColor(Theme.time_text_color))
-        unifiedStatusBattery?.setTextColor(getColor(Theme.battery_text_high))
-        val timeSize = labelSizes[Label.time.ordinal].toFloat().coerceIn(18f, 28f)
-        val compactSize = (timeSize * 0.65f).coerceAtLeast(11f)
-        unifiedStatusDate?.setTextSize(TypedValue.COMPLEX_UNIT_SP, compactSize)
-        unifiedStatusTime?.setTextSize(TypedValue.COMPLEX_UNIT_SP, timeSize)
-        unifiedStatusBattery?.setTextSize(
-            TypedValue.COMPLEX_UNIT_SP,
-            labelSizes[Label.battery.ordinal].toFloat().coerceIn(11f, 16f)
-        )
-        unifiedStatusWeatherIcon?.imageTintList = ColorStateList.valueOf(getColor(Theme.weather_text_color))
-        unifiedStatusStorageInternalIcon?.imageTintList = ColorStateList.valueOf(getColor(Theme.storage_text_color))
-        unifiedStatusStorageExternalIcon?.imageTintList = ColorStateList.valueOf(getColor(Theme.storage_text_color))
-        unifiedStatusRamIcon?.imageTintList = ColorStateList.valueOf(getColor(Theme.ram_text_color))
-        styleUnifiedMetric(unifiedStatusWeather, 0, Theme.weather_text_color, compactSize)
-        styleUnifiedMetric(unifiedStatusWeatherLocation, 0, Theme.weather_text_color, compactSize)
-        styleUnifiedMetric(unifiedStatusWeatherDetails, 0, Theme.weather_text_color, compactSize)
-        styleUnifiedMetric(unifiedStatusStorageInternal, 0, Theme.storage_text_color, compactSize)
-        styleUnifiedMetric(unifiedStatusStorageExternal, 0, Theme.storage_text_color, compactSize)
-        styleUnifiedMetric(unifiedStatusNetwork, R.drawable.ic_status_wifi_40, Theme.network_info_text_color, compactSize)
-        styleUnifiedMetric(unifiedStatusRam, 0, Theme.ram_text_color, compactSize)
-        styleUnifiedMetric(unifiedStatusUnlock, R.drawable.ic_status_lock_open_40, Theme.unlock_counter_text_color, compactSize)
-
+        ohi.andre.consolelauncher.presentation.UnifiedStatusPresentation.style(root,statusAppearance ?: ohi.andre.consolelauncher.presentation.HomeAppearance.saved())
         unifiedModulesToggle?.apply {
-            imageTintList = ColorStateList.valueOf(getColor(Theme.icon_button_color))
-            background = TerminalBorderRuntime.panelDrawable(
-                mContext,
-                getColor(Theme.icon_button_background_color),
-                getColor(Theme.icon_button_border_color),
-                1.25f,
-                moduleCornerRadius(),
-                dashedBorders(),
-                false,
-                true,
-                true,
-                FrameTarget.ICON_BUTTON
-            )
-            visibility = if (getBoolean(Behavior.show_module_dock)) View.VISIBLE else View.GONE
             setOnClickListener { setUnifiedModulesVisible(!unifiedModulesVisible, true) }
-            container.post { translationY = container.paddingBottom + height / 2f }
+            container.post { ohi.andre.consolelauncher.presentation.UnifiedStatusPresentation.positionModulesToggle(root) }
         }
         renderUnifiedStatus()
         root.post {
@@ -952,110 +835,58 @@ class UIManager(
         }
     }
 
-    private fun styleUnifiedMetric(view: TextView?, iconRes: Int, colorSetting: Theme, size: Float) {
-        if (view == null) return
-        val color = getColor(colorSetting)
-        view.setTextColor(color)
-        view.setTextSize(TypedValue.COMPLEX_UNIT_SP, size)
-        view.compoundDrawablePadding = Tuils.dpToPx(mContext, 3)
-        view.includeFontPadding = false
-        view.height = Tuils.dpToPx(mContext, 16)
-        view.gravity = view.gravity or Gravity.CENTER_VERTICAL
-        if (iconRes != 0) setUnifiedMetricIcon(view, iconRes, color)
-    }
-
-    private fun setUnifiedMetricIcon(view: TextView, iconRes: Int, color: Int) {
-        val icon = ContextCompat.getDrawable(mContext, iconRes)?.mutate()
-        val size = Tuils.dpToPx(mContext, 16)
-        icon?.setBounds(0, 0, size, size)
-        icon?.let { DrawableCompat.setTint(it, color) }
-        view.setCompoundDrawables(icon, null, null, null)
+    private fun captureUnifiedContent(): ohi.andre.consolelauncher.presentation.UnifiedStatusPresentation.Content {
+        val appearance=statusAppearance ?: ohi.andre.consolelauncher.presentation.HomeAppearance.saved()
+        val show=ohi.andre.consolelauncher.presentation.StatusPresentation.descriptors.map { appearance.bool(it.visible) }
+        val now=java.util.Date()
+        val battery=compactUnifiedBattery(labelTexts[Label.battery.ordinal])
+        val condition=lastWeatherCondition ?: compactUnifiedWeatherCondition(labelTexts[Label.weather.ordinal])
+        val location=XMLPrefsManager.get(Behavior.weather_location)?.trim()?.takeUnless { it.isEmpty() || it=="null" }.orEmpty()
+        val details=lastWeatherDetails ?: compactUnifiedWeatherDetails(labelTexts[Label.weather.ordinal])
+        val internal=storageManager?.compactInternal().orEmpty()
+        val external=storageManager?.compactExternal().orEmpty()
+        val connection=networkManager?.compactConnection().orEmpty()
+        val ram=ramManager?.compactValue().orEmpty()
+        val texts=linkedMapOf<Int,CharSequence>(
+            R.id.unified_status_date to android.text.format.DateFormat.getMediumDateFormat(mContext).format(now),
+            R.id.unified_status_time to android.text.format.DateFormat.getTimeFormat(mContext).format(now),
+            R.id.unified_status_battery to battery,
+            R.id.unified_status_weather to if(condition.isEmpty()) "" else ": $condition",
+            R.id.unified_status_weather_location to location,
+            R.id.unified_status_weather_details to details,
+            R.id.unified_status_storage_internal to internal,
+            R.id.unified_status_storage_external to external,
+            R.id.unified_status_network to connection,
+            R.id.unified_status_ram to ram,
+            R.id.unified_status_unlock to unlockManager?.count()?.let { java.text.NumberFormat.getIntegerInstance().format(it) }.orEmpty()
+        )
+        fun visible(ordinal:Int,id:Int)=if(show[ordinal] && !texts[id].isNullOrEmpty()) View.VISIBLE else View.GONE
+        val visibility=linkedMapOf(
+            R.id.unified_status_date to if(show[Label.time.ordinal]) View.VISIBLE else View.GONE,
+            R.id.unified_status_time to if(show[Label.time.ordinal]) View.VISIBLE else View.GONE,
+            R.id.unified_status_battery to visible(Label.battery.ordinal,R.id.unified_status_battery),
+            R.id.unified_status_weather to visible(Label.weather.ordinal,R.id.unified_status_weather),
+            R.id.unified_status_weather_icon to visible(Label.weather.ordinal,R.id.unified_status_weather),
+            R.id.unified_status_weather_location to if(show[Label.weather.ordinal] && condition.isNotEmpty() && location.isNotEmpty()) View.VISIBLE else View.GONE,
+            R.id.unified_status_weather_details to if(show[Label.weather.ordinal] && condition.isNotEmpty() && details.isNotEmpty()) View.VISIBLE else View.GONE,
+            R.id.unified_status_storage_internal to visible(Label.storage.ordinal,R.id.unified_status_storage_internal),
+            R.id.unified_status_storage_internal_icon to visible(Label.storage.ordinal,R.id.unified_status_storage_internal),
+            R.id.unified_status_storage_external to visible(Label.storage.ordinal,R.id.unified_status_storage_external),
+            R.id.unified_status_storage_external_icon to visible(Label.storage.ordinal,R.id.unified_status_storage_external),
+            R.id.unified_status_network to visible(Label.network.ordinal,R.id.unified_status_network),
+            R.id.unified_status_ram to visible(Label.ram.ordinal,R.id.unified_status_ram),
+            R.id.unified_status_ram_icon to visible(Label.ram.ordinal,R.id.unified_status_ram),
+            R.id.unified_status_unlock to if(show[Label.unlock.ordinal] && unlockManager!=null) View.VISIBLE else View.GONE
+        )
+        return ohi.andre.consolelauncher.presentation.UnifiedStatusPresentation.Content(texts,visibility,
+            appearance.color(Theme.battery_text_high),if(networkManager?.compactConnectionUsesWifi()==true) R.drawable.ic_status_wifi_40 else R.drawable.ic_material_signal_cellular_alt_24)
     }
 
     private fun renderUnifiedStatus() {
         if (!unifiedStatusActive) return
-        val showTime = unifiedStatusVisible[Label.time.ordinal]
-        unifiedStatusDate?.visibility = if (showTime) View.VISIBLE else View.GONE
-        unifiedStatusTime?.visibility = if (showTime) View.VISIBLE else View.GONE
-        if (showTime) {
-            val now = java.util.Date()
-            unifiedStatusDate?.text = android.text.format.DateFormat.getMediumDateFormat(mContext).format(now)
-            unifiedStatusTime?.text = android.text.format.DateFormat.getTimeFormat(mContext).format(now)
-        }
-
-        val battery = compactUnifiedBattery(labelTexts[Label.battery.ordinal])
-        unifiedStatusBattery?.visibility =
-            if (unifiedStatusVisible[Label.battery.ordinal] && battery.isNotEmpty()) View.VISIBLE else View.GONE
-        unifiedStatusBattery?.text = battery
-
-        val weatherCondition = lastWeatherCondition
-            ?: compactUnifiedWeatherCondition(labelTexts[Label.weather.ordinal])
-        val weatherLocation = XMLPrefsManager.get(Behavior.weather_location)
-            ?.trim()
-            ?.takeUnless { it.isEmpty() || it == "null" }
-            .orEmpty()
-        val weatherDetails = lastWeatherDetails
-            ?: compactUnifiedWeatherDetails(labelTexts[Label.weather.ordinal])
-        val showWeather = unifiedStatusVisible[Label.weather.ordinal] && weatherCondition.isNotEmpty()
-        unifiedStatusWeatherIcon?.visibility = if (showWeather) View.VISIBLE else View.GONE
-        unifiedStatusWeather?.visibility = if (showWeather) View.VISIBLE else View.GONE
-        unifiedStatusWeather?.text = if (weatherCondition.isEmpty()) "" else ": $weatherCondition"
-        unifiedStatusWeatherLocation?.visibility =
-            if (showWeather && weatherLocation.isNotEmpty()) View.VISIBLE else View.GONE
-        unifiedStatusWeatherLocation?.text = weatherLocation
-        unifiedStatusWeatherDetails?.visibility =
-            if (showWeather && weatherDetails.isNotEmpty()) View.VISIBLE else View.GONE
-        unifiedStatusWeatherDetails?.text = weatherDetails
-
-        val showStorage = unifiedStatusVisible[Label.storage.ordinal]
-        val internalStorage = storageManager?.compactInternal().orEmpty()
-        val externalStorage = storageManager?.compactExternal().orEmpty()
-        unifiedStatusStorageInternal?.text = internalStorage
-        unifiedStatusStorageInternal?.visibility = if (showStorage && internalStorage.isNotEmpty()) View.VISIBLE else View.GONE
-        unifiedStatusStorageInternalIcon?.visibility = unifiedStatusStorageInternal?.visibility ?: View.GONE
-        unifiedStatusStorageExternal?.text = externalStorage
-        unifiedStatusStorageExternal?.visibility = if (showStorage && externalStorage.isNotEmpty()) View.VISIBLE else View.GONE
-        unifiedStatusStorageExternalIcon?.visibility = unifiedStatusStorageExternal?.visibility ?: View.GONE
-
-        val connection = networkManager?.compactConnection().orEmpty()
-        unifiedStatusNetwork?.visibility =
-            if (unifiedStatusVisible[Label.network.ordinal] && connection.isNotEmpty()) View.VISIBLE else View.GONE
-        unifiedStatusNetwork?.text = connection
-        unifiedStatusNetwork?.let {
-            val icon = if (networkManager?.compactConnectionUsesWifi() == true) {
-                R.drawable.ic_status_wifi_40
-            } else {
-                R.drawable.ic_material_signal_cellular_alt_24
-            }
-            if (it.tag != icon) {
-                it.tag = icon
-                setUnifiedMetricIcon(it, icon, getColor(Theme.network_info_text_color))
-            }
-        }
-
-        val ram = ramManager?.compactValue().orEmpty()
-        unifiedStatusRam?.text = ram
-        unifiedStatusRam?.visibility =
-            if (unifiedStatusVisible[Label.ram.ordinal] && ram.isNotEmpty()) View.VISIBLE else View.GONE
-        unifiedStatusRamIcon?.visibility = unifiedStatusRam?.visibility ?: View.GONE
-
-        unifiedStatusUnlock?.text = unlockManager?.count()?.let { java.text.NumberFormat.getIntegerInstance().format(it) }.orEmpty()
-        unifiedStatusUnlock?.visibility =
-            if (unifiedStatusVisible[Label.unlock.ordinal] && unlockManager != null) View.VISIBLE else View.GONE
-    }
-
-    private fun shouldUseAsciiViewport(base: Int): Boolean {
-        val asciiBase = labelIndexes[Label.ascii.ordinal].toInt()
-        if (base != asciiBase || labelTexts[Label.ascii.ordinal] == null) {
-            return false
-        }
-
-        for (i in Label.entries.toTypedArray().indices) {
-            if (i != Label.ascii.ordinal && labelIndexes[i].toInt() == base && labelTexts[i] != null) {
-                return false
-            }
-        }
-        return true
+        val root=mRootView ?: return
+        ohi.andre.consolelauncher.presentation.UnifiedStatusPresentation.bindContent(root,captureUnifiedContent(),
+            statusAppearance ?: ohi.andre.consolelauncher.presentation.HomeAppearance.saved())
     }
 
     private fun ensureAsciiViewportView(parent: LinearLayout, index: Int): TextView {
@@ -1134,8 +965,7 @@ class UIManager(
 
     private inner class PagerAdapter : RecyclerView.Adapter<PagerViewHolder>() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PagerViewHolder {
-            val inflater = LayoutInflater.from(parent.getContext())
-            val view = inflater.inflate(R.layout.home_modules_page, parent, false)
+            val view = ohi.andre.consolelauncher.presentation.HomeLayoutPresentation.inflateModulesPage(parent.context,parent)
             setupHomeWidgetsPage(view)
             // ViewPager2 requires match_parent for its children
             view.setLayoutParams(
@@ -1185,7 +1015,6 @@ class UIManager(
     private var mainContainer: View? = null
     private var headerContainer: ViewGroup? = null
     private var unifiedBottomConsole: ViewGroup? = null
-    private var unifiedStatusHost: ViewGroup? = null
     private var unifiedDockHost: ViewGroup? = null
     private var unifiedModuleScroll: ScrollView? = null
     private var unifiedModuleHost: ViewGroup? = null
@@ -1213,11 +1042,6 @@ class UIManager(
     private var imeInsetVisible = false
 
     private val genericBorderCornerRadius: Int
-    private var bgColors: Array<String?>
-    private var outlineColors: Array<String?>
-    private var shadowXOffset: Int
-    private var shadowYOffset: Int
-    private var shadowRadius: Float
     private var useDashed: Boolean
     private var margins: Array<IntArray?>
 
@@ -1235,6 +1059,7 @@ class UIManager(
     private val mExecuter: CommandExecuter
 
     private fun setupTerminalPage(terminalPage: View) {
+        val appearance=ohi.andre.consolelauncher.presentation.HomeAppearance.saved()
         terminalTrayContainer = mRootView!!.findViewById<View?>(R.id.terminal_tray_container)
         persistentInputContainer = mRootView!!.findViewById<View?>(R.id.persistent_input_container)
         if (terminalTrayContainer != null && portraitTrayParams == null && terminalTrayContainer!!.getLayoutParams() is FrameLayout.LayoutParams) {
@@ -1249,18 +1074,7 @@ class UIManager(
         terminalView!!.setOnTouchListener(this)
         (terminalView!!.getParent().getParent() as View).setOnTouchListener(this)
 
-        Companion.applyBgRect(
-            mContext!!,
-            terminalOutputBorder!!,
-            bgColors[OUTPUT_BGCOLOR_INDEX],
-            margins[OUTPUT_MARGINS_INDEX]!!,
-            Tuils.dpToPx(mContext, outputCornerRadius()),
-            useDashed,
-            AppearanceSettings.surfaceBorderColor(SurfaceBorder.OUTPUT),
-            true,
-            SurfaceBorder.OUTPUT
-        )
-        terminalView!!.setBackgroundColor(Color.TRANSPARENT)
+        ohi.andre.consolelauncher.presentation.HomeChromePresentation.styleSurface(terminalOutputBorder!!,appearance)
         terminalView!!.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
@@ -1275,13 +1089,7 @@ class UIManager(
 
             override fun afterTextChanged(s: Editable?) {}
         })
-        Companion.applyShadow(
-            terminalView!!,
-            outlineColors[OUTPUT_BGCOLOR_INDEX]!!,
-            shadowXOffset,
-            shadowYOffset,
-            shadowRadius
-        )
+        ohi.andre.consolelauncher.presentation.HomeChromePresentation.styleOutputText(terminalView!!,appearance)
         restoreTerminalTrayState()
         styleTerminalTrayToggle()
         applyTerminalTrayState(false)
@@ -1323,34 +1131,9 @@ class UIManager(
         inputGroup.setOnClickListener(openTerminalInput)
         applyRetuiKeyboardTheme(inputView, "launcher")
 
-        Companion.applyBgRect(
-            mContext!!,
-            inputGroup,
-            bgColors[INPUT_BGCOLOR_INDEX],
-            margins[INPUTAREA_MARGINS_INDEX]!!,
-            genericBorderCornerRadius,
-            useDashed,
-            AppearanceSettings.surfaceBorderColor(SurfaceBorder.INPUT),
-            false,
-            SurfaceBorder.INPUT
-        )
-        Companion.applyShadow(
-            inputView,
-            outlineColors[INPUT_BGCOLOR_INDEX]!!,
-            shadowXOffset,
-            shadowYOffset,
-            shadowRadius
-        )
-        Companion.applyShadow(
-            prefixView,
-            outlineColors[INPUT_BGCOLOR_INDEX]!!,
-            shadowXOffset,
-            shadowYOffset,
-            shadowRadius
-        )
-
-        Companion.applyMargins(inputView, margins[INPUTFIELD_MARGINS_INDEX]!!)
-        Companion.applyMargins(prefixView, margins[INPUTFIELD_MARGINS_INDEX]!!)
+        ohi.andre.consolelauncher.presentation.HomeChromePresentation.styleSurface(inputGroup,appearance)
+        ohi.andre.consolelauncher.presentation.HomeChromePresentation.styleInputText(inputView,appearance)
+        ohi.andre.consolelauncher.presentation.HomeChromePresentation.styleInputText(prefixView,appearance)
 
         var submitView = mRootView.findViewById<View?>(R.id.submit_tv) as ImageView?
         val showSubmit = XMLPrefsManager.getBoolean(Ui.show_enter_button)
@@ -1384,17 +1167,7 @@ class UIManager(
             toolbarView = mRootView.findViewById<View?>(R.id.tools_view)
             hideToolbarNoInput = XMLPrefsManager.getBoolean(Toolbar.hide_toolbar_no_input)
 
-            Companion.applyBgRect(
-                mContext!!,
-                toolbarView!!,
-                bgColors[TOOLBAR_BGCOLOR_INDEX],
-                margins[TOOLBAR_MARGINS_INDEX]!!,
-                genericBorderCornerRadius,
-                useDashed,
-                AppearanceSettings.surfaceBorderColor(SurfaceBorder.TOOLBAR),
-                false,
-                SurfaceBorder.TOOLBAR
-            )
+            ohi.andre.consolelauncher.presentation.HomeChromePresentation.styleSurface(toolbarView!!,appearance)
 
             if (appDrawerView != null) {
                 appDrawerView.setColorFilter(XMLPrefsManager.getColor(Theme.toolbar_icon_color), PorterDuff.Mode.SRC_IN)
@@ -1467,17 +1240,7 @@ class UIManager(
                         v!!.clearFocus()
                     }
                 })
-                Companion.applyBgRect(
-                    mContext!!,
-                    sv,
-                    bgColors[SUGGESTIONS_BGCOLOR_INDEX],
-                    margins[SUGGESTIONS_MARGINS_INDEX]!!,
-                    genericBorderCornerRadius,
-                    useDashed,
-                    AppearanceSettings.surfaceBorderColor(SurfaceBorder.SUGGESTIONS),
-                    true,
-                    SurfaceBorder.SUGGESTIONS
-                )
+                ohi.andre.consolelauncher.presentation.HomeChromePresentation.styleSurface(sv,appearance)
 
                 val suggestionsView =
                     mRootView.findViewById<View?>(R.id.suggestions_group) as LinearLayout?
@@ -1505,6 +1268,8 @@ class UIManager(
             if (sugGroup != null) sugGroup.setVisibility(View.GONE)
             hideModuleSuggestionsStrip()
         }
+
+        ohi.andre.consolelauncher.presentation.HomeLayoutPresentation.suggestionsVisibility(mRootView,appearance)
 
         if (searchOnlyMode) {
             configureSearchOnlyLayout()
@@ -1619,24 +1384,8 @@ class UIManager(
     }
 
     private fun styleToolbarButtonChrome(vararg buttons: ImageButton?) {
-        val context = mContext ?: return
-        if (!cyberdeckMode() && FrameManager.drawable(context, FrameTarget.TOOLBAR) == null) {
-            return
-        }
-        for (button in buttons) {
-            if (button == null) {
-                continue
-            }
-            button.setBackground(
-                TerminalBorderRuntime.customFrame(context, ColorDrawable(Color.TRANSPARENT), FrameTarget.TOOLBAR)
-                    ?: CyberpunkIconFrameDrawable(
-                    ThemeColorResolver.withMaxAlpha(terminalBorderColor(), 230),
-                    Tuils.dpToPx(context, 1.6f),
-                    Tuils.dpToPx(context, 9f),
-                    Tuils.dpToPx(context, 9f)
-                )
-            )
-        }
+        val appearance=ohi.andre.consolelauncher.presentation.HomeAppearance.saved()
+        buttons.filterNotNull().forEach { ohi.andre.consolelauncher.presentation.HomeChromePresentation.styleToolbarButton(it,appearance) }
     }
 
     private fun countVisibleWeightedChildren(toolbarLayout: LinearLayout): Int {
@@ -1725,50 +1474,8 @@ class UIManager(
 
     private fun attachUnifiedBottomConsoleIfReady() {
         if (searchOnlyMode || !unifiedStatusActive) return
-        val statusHost = unifiedStatusHost ?: return
-        val dockHost = unifiedDockHost ?: return
-        val moduleHost = unifiedModuleHost ?: return
-        val header = headerContainer ?: return
-        val dock = moduleDockScroll ?: return
-        val modules = homeModulesContainer ?: return
-
-        if (header.parent !== statusHost) {
-            detachFromParent(header)
-            statusHost.removeAllViews()
-            statusHost.addView(
-                header,
-                FrameLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                )
-            )
-        }
-        if (dock.parent !== dockHost) {
-            detachFromParent(dock)
-            dock.setPadding(dock.paddingLeft, dock.paddingBottom, dock.paddingRight, dock.paddingBottom)
-            dockHost.removeAllViews()
-            dockHost.addView(
-                dock,
-                FrameLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                )
-            )
-        }
-        if (modules.parent !== moduleHost) {
-            detachFromParent(modules)
-            moduleHost.removeAllViews()
-            moduleHost.addView(
-                modules,
-                FrameLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                )
-            )
-        }
-
-        unifiedBottomConsole?.visibility = View.VISIBLE
-        mainContainer?.visibility = View.GONE
+        val root=mRootView as? ViewGroup ?:return
+        if(!ohi.andre.consolelauncher.presentation.HomeLayoutPresentation.attachUnified(root)) return
         updateUnifiedBottomModuleBounds()
     }
 
@@ -1787,13 +1494,13 @@ class UIManager(
             if (TextUtils.isEmpty(activeModule) || content.childCount == 0) return@post
             val rootHeight = mRootView?.height ?: 0
             val availableHeight = max(0, rootHeight - imeBottomOffset - systemInsetBottom)
-            val cap = min(Tuils.dpToPx(mContext, 240), (availableHeight * 0.34f).roundToInt())
             val width = max(1, scroll.width)
             content.measure(
                 View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY),
                 View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
             )
-            val targetHeight = boundedUnifiedModuleHeight(content.measuredHeight, cap)
+            val targetHeight = ohi.andre.consolelauncher.presentation.TerminalTrayPresentation.unifiedModuleHeight(
+                content.measuredHeight,availableHeight,Tuils.dpToPx(mContext,240))
             if (scroll.layoutParams.height != targetHeight) {
                 scroll.layoutParams.height = targetHeight
                 scroll.requestLayout()
@@ -1984,22 +1691,7 @@ class UIManager(
         landscapeSplitContainer!!.setVisibility(View.VISIBLE)
         applyLandscapeFoldGutter(mContext.resources.configuration)
 
-        landscapeLeftPane!!.addView(
-            mainContainer, FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-            )
-        )
-        landscapeRightPane!!.addView(
-            terminalTrayContainer, FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-            )
-        )
-
-        if (root.indexOfChild(landscapeSplitContainer) < 0) {
-            root.addView(landscapeSplitContainer, 0)
-        }
+        ohi.andre.consolelauncher.presentation.HomeLayoutPresentation.attachLandscape(root,mainContainer,terminalTrayContainer)
     }
 
     private fun activateDuoLayout() {
@@ -2016,37 +1708,12 @@ class UIManager(
         landscapeSplitContainer!!.setVisibility(View.VISIBLE)
         applyLandscapeFoldGutter(mContext.resources.configuration)
 
-        val targetPane =
-            (if (ohi.andre.consolelauncher.UIManager.Companion.DUO_LAYOUT_LEFT == activeMode) landscapeLeftPane else landscapeRightPane)!!
-        duoTopPanesSwapped = getBoolean(Behavior.duo_swap_top_panes)
-        val modulePane = if (duoModulePaneIsLeft(activeMode, duoTopPanesSwapped)) {
-            landscapeLeftPane!!
-        } else {
-            landscapeRightPane!!
-        }
-        modulePane.addView(
-            mainContainer, FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-            )
-        )
-
-        val trayParams = FrameLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-            Gravity.BOTTOM
-        )
-        targetPane.addView(terminalTrayContainer, trayParams)
-        if (shouldUseSplitDuoLauncher()) {
-            attachSplitDuoStatusHeader(activeMode)
-        }
+        duoTopPanesSwapped=getBoolean(Behavior.duo_swap_top_panes)
+        splitDuoStatusActive=shouldUseSplitDuoLauncher()
+        ohi.andre.consolelauncher.presentation.HomeLayoutPresentation.attachDuo(root,activeMode,
+            ohi.andre.consolelauncher.presentation.HomeAppearance.saved(),imeBottomOffset,mainContainer,terminalTrayContainer,moduleSuggestionsScroll)
         attachDuoSwitchButton(activeMode)
-        attachDuoModuleSuggestions(modulePane)
         attachDuoDrawers(activeMode)
-
-        if (root.indexOfChild(landscapeSplitContainer) < 0) {
-            root.addView(landscapeSplitContainer, 0)
-        }
     }
 
     private fun restorePortraitLayout() {
@@ -2078,8 +1745,7 @@ class UIManager(
                 Gravity.BOTTOM
             )
 
-        root.addView(mainContainer, 0, mainParams)
-        root.addView(terminalTrayContainer, min(1, root.getChildCount()), trayParams)
+        ohi.andre.consolelauncher.presentation.HomeLayoutPresentation.attachPortrait(root,mainParams,trayParams,mainContainer,terminalTrayContainer)
     }
 
     private fun clearLandscapePanes() {
@@ -2102,25 +1768,6 @@ class UIManager(
         if (landscapeRightPane != null) {
             landscapeRightPane!!.removeAllViews()
         }
-    }
-
-    private fun attachSplitDuoStatusHeader(activeMode: String?) {
-        val emptyPane = if (duoTopPanesSwapped) {
-            if (activeMode == DUO_LAYOUT_LEFT) landscapeLeftPane else landscapeRightPane
-        } else getDuoEmptyPane(activeMode)
-        if (emptyPane == null || headerContainer == null) {
-            splitDuoStatusActive = false
-            return
-        }
-
-        detachFromParent(headerContainer)
-        val params = FrameLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-            Gravity.TOP or Gravity.START
-        )
-        emptyPane.addView(headerContainer, params)
-        splitDuoStatusActive = true
     }
 
     private fun restoreSplitDuoStatusHeader() {
@@ -2176,70 +1823,15 @@ class UIManager(
     }
 
     private fun attachDuoSwitchButton(activeMode: String?) {
-        val moveToLeft = DUO_LAYOUT_RIGHT == activeMode
-        val emptyPane = getDuoEmptyPane(activeMode)
-        if (emptyPane == null) {
-            return
-        }
-
-        val targetMode: String = if (moveToLeft) DUO_LAYOUT_LEFT else DUO_LAYOUT_RIGHT
+        val pane=getDuoEmptyPane(activeMode)?:return
         detachFromParent(duoControls)
-        val controls = LinearLayout(mContext).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER_VERTICAL
-        }
-        duoControls = controls
-        controls.addView(createDuoSwitchButton(targetMode, moveToLeft),
-            LinearLayout.LayoutParams(Tuils.dpToPx(mContext, 56), Tuils.dpToPx(mContext, 48)))
-        fun addDrawerButton(icon: Int, description: Int, action: () -> Unit) {
-            val button = ImageButton(mContext).apply {
-                setImageResource(icon)
-                contentDescription = mContext.getString(description)
-                setColorFilter(terminalBorderColor())
-                background = TerminalBorderRuntime.panelDrawablePx(
-                    mContext, ThemeColorResolver.withMaxAlpha(terminalHeaderBackground(), 224),
-                    terminalBorderColor(), 1.5f,
-                    max(genericBorderCornerRadius, Tuils.dpToPx(mContext, 6)).toFloat(), useDashed)
-                setOnClickListener { action() }
-            }
-            controls.addView(button, LinearLayout.LayoutParams(
-                Tuils.dpToPx(mContext, 48), Tuils.dpToPx(mContext, 48)
-            ).apply { marginStart = Tuils.dpToPx(mContext, 8) })
-        }
-        if (getBoolean(Behavior.swipe_up_apps_drawer)) {
-            addDrawerButton(R.drawable.ic_menu, R.string.cd_open_app_drawer) {
-                if (isAppsDrawerOpen) hideAppsDrawer() else showAppsDrawer()
-            }
-        }
-        if (getBoolean(Behavior.show_android_widget_drawer_button)) {
-            addDrawerButton(R.drawable.ic_toolbar_widgets_24, R.string.ui_base_view_android_widgets) {
-                if (isAndroidWidgetDrawerOpen) hideAndroidWidgetDrawer() else showAndroidWidgetDrawer()
-            }
-        }
-        val margin = Tuils.dpToPx(mContext, 18)
-        val params = FrameLayout.LayoutParams(
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-            Tuils.dpToPx(mContext, 48),
-            Gravity.BOTTOM or (if (moveToLeft) Gravity.START else Gravity.END)
-        )
-        params.setMargins(margin, margin, margin, margin + imeBottomOffset)
-        emptyPane.addView(controls, params)
-    }
-
-    private fun attachDuoModuleSuggestions(modulePane: ViewGroup) {
-        val strip = moduleSuggestionsScroll ?: return
-        detachFromParent(strip)
-        val margin = Tuils.dpToPx(mContext, 18)
-        modulePane.addView(
-            strip,
-            FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                Gravity.BOTTOM
-            ).apply {
-                setMargins(margin, 0, margin, margin + Tuils.dpToPx(mContext, 56) + imeBottomOffset)
-            }
-        )
+        val side=activeMode?:DUO_LAYOUT_RIGHT
+        val controls=ohi.andre.consolelauncher.presentation.DuoControlsPresentation.attach(pane,side,
+            ohi.andre.consolelauncher.presentation.HomeAppearance.saved(),imeBottomOffset)
+        duoControls=controls.root
+        controls.switch.setOnClickListener { setDuoLayoutMode(if(side==DUO_LAYOUT_RIGHT) DUO_LAYOUT_LEFT else DUO_LAYOUT_RIGHT) }
+        controls.apps?.setOnClickListener { if(isAppsDrawerOpen) hideAppsDrawer() else showAppsDrawer() }
+        controls.widgets?.setOnClickListener { if(isAndroidWidgetDrawerOpen) hideAndroidWidgetDrawer() else showAndroidWidgetDrawer() }
     }
 
     private fun restoreModuleSuggestionsStrip() {
@@ -2269,27 +1861,6 @@ class UIManager(
             })
         }
         duoControls?.bringToFront()
-    }
-
-    private fun createDuoSwitchButton(targetMode: String?, moveToLeft: Boolean): TextView {
-        val button = TextView(mContext)
-        val textColor = terminalBorderColor()
-        button.text = if (moveToLeft) "<<" else ">>"
-        button.contentDescription = mContext.getString(R.string.surface_move_re_t_ui_to_screen_eba98, targetMode)
-        button.gravity = Gravity.CENTER
-        button.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
-        button.textSize = 18f
-        button.setTextColor(textColor)
-        button.background = TerminalBorderRuntime.panelDrawablePx(
-            mContext,
-            ThemeColorResolver.withMaxAlpha(terminalHeaderBackground(), 224),
-            textColor,
-            1.5f,
-            max(genericBorderCornerRadius, Tuils.dpToPx(mContext, 6)).toFloat(),
-            useDashed
-        )
-        button.setOnClickListener { setDuoLayoutMode(targetMode) }
-        return button
     }
 
     private fun applyLandscapeFoldGutter(configuration: Configuration?) {
@@ -2489,7 +2060,7 @@ class UIManager(
         if (splitDuoStatusActive) {
             applySectionDisplayMargins(headerContainer, topMargins, metrics, 0, systemInsetTop)
         }
-        val searchInset = if (searchOnlyMode) Tuils.dpToPx(mContext, SEARCH_MODE_EDGE_INSET_DP) else 0
+        val searchInset = ohi.andre.consolelauncher.presentation.HomeLayoutPresentation.searchEdgeInset(mContext!!,searchOnlyMode)
         applySectionDisplayMargins(
             terminalTrayContainer,
             bottomMargins,
@@ -2500,24 +2071,15 @@ class UIManager(
             } else if (landscape) systemInsetTop else 0,
             extraHorizontalPx = searchInset
         )
+        if(duoLayoutActive) ohi.andre.consolelauncher.presentation.HomeLayoutPresentation.finishDuoLayout(mRootView as ViewGroup,
+            ohi.andre.consolelauncher.presentation.HomeAppearance.saved(),
+            ohi.andre.consolelauncher.presentation.LauncherHomeSnapshot.Insets(systemInsetLeft,systemInsetTop,systemInsetRight,systemInsetBottom),captureTrayPresentationState())
         applyTerminalOverlayDisplayMargins(topMargins, bottomMargins, metrics)
     }
 
     private fun applyTerminalOutputEdgeInsets(landscape: Boolean) {
-        terminalContainer?.let { container ->
-            val top = if (landscape) 0 else Tuils.dpToPx(mContext, 8)
-            if (container.paddingTop != top) {
-                container.setPadding(container.paddingLeft, top, container.paddingRight, container.paddingBottom)
-            }
-        }
-        (terminalTrayToggle?.layoutParams as? MarginLayoutParams)?.let { params ->
-            val top = if (landscape) 0 else -Tuils.dpToPx(mContext, 10)
-            if (params.topMargin != top) {
-                params.topMargin = top
-                terminalTrayToggle?.layoutParams = params
-            }
-        }
-        applyTerminalOutputContentInsets()
+        mRootView?.let { ohi.andre.consolelauncher.presentation.TerminalTrayPresentation.applyEdgeInsets(it,landscape,
+            (statusAppearance ?: ohi.andre.consolelauncher.presentation.HomeAppearance.saved())) }
     }
 
     private fun getDisplayMargins(save: Ui?): IntArray {
@@ -2532,37 +2094,7 @@ class UIManager(
         extraTopPx: Int = 0,
         extraHorizontalPx: Int = 0
     ) {
-        if (view == null) {
-            return
-        }
-
-        val left = Tuils.mmToPx(metrics, marginMm[0]) + extraHorizontalPx
-        val top = extraTopPx + Tuils.mmToPx(metrics, marginMm[1])
-        val right = Tuils.mmToPx(metrics, marginMm[2]) + extraHorizontalPx
-        val bottom = Tuils.mmToPx(metrics, marginMm[3]) + extraBottomPx
-
-        val params = view.getLayoutParams()
-        if (params is MarginLayoutParams) {
-            val marginParams = params
-            if (marginParams.leftMargin == left
-                && marginParams.topMargin == top
-                && marginParams.rightMargin == right
-                && marginParams.bottomMargin == bottom
-            ) {
-                return
-            }
-            marginParams.setMargins(left, top, right, bottom)
-            view.setLayoutParams(marginParams)
-        } else {
-            if (view.paddingLeft == left
-                && view.paddingTop == top
-                && view.paddingRight == right
-                && view.paddingBottom == bottom
-            ) {
-                return
-            }
-            view.setPadding(left, top, right, bottom)
-        }
+        ohi.andre.consolelauncher.presentation.HomeLayoutPresentation.applySectionMargins(view,marginMm,metrics,extraBottomPx,extraTopPx,extraHorizontalPx)
     }
 
     private fun applyTerminalOverlayDisplayMargins(
@@ -2836,66 +2368,17 @@ class UIManager(
     }
 
     private fun configureSearchOnlyLayout() {
-        val tray = terminalTrayContainer ?: return
-        mainContainer?.visibility = View.GONE
-        unifiedBottomConsole?.visibility = View.GONE
-        landscapeSplitContainer?.visibility = View.GONE
-        terminalContainer?.visibility = View.GONE
-        mRootView?.findViewById<View?>(R.id.search_mode_results_scroll)?.visibility = View.VISIBLE
-        mRootView?.findViewById<View?>(R.id.module_suggestions_container)?.visibility = View.GONE
-        mRootView?.findViewById<View?>(R.id.tools_view)?.visibility = View.GONE
-        mRootView?.findViewById<View?>(R.id.suggestions_container)?.visibility = View.GONE
-        styleSearchModeClockTab()
+        val root=mRootView as? ViewGroup ?: return
+        ohi.andre.consolelauncher.presentation.HomeLayoutPresentation.configureSearch(root,
+            (statusAppearance ?: ohi.andre.consolelauncher.presentation.HomeAppearance.saved()))
         appDrawerPaneManager?.hide()
         androidWidgetDrawerManager?.hide()
-        (tray.layoutParams as? FrameLayout.LayoutParams)?.let { params ->
-            params.width = ViewGroup.LayoutParams.MATCH_PARENT
-            params.height = ViewGroup.LayoutParams.MATCH_PARENT
-            params.gravity = Gravity.BOTTOM
-            tray.layoutParams = params
-        }
-        (mTerminalAdapter?.inputView as? EditText)?.setHint(R.string.search_mode_hint)
-    }
-
-    private fun styleSearchModeClockTab() {
-        val clock = mRootView?.findViewById<TextClock?>(R.id.search_mode_clock_tab) ?: return
-        val input = mRootView?.findViewById<View?>(R.id.input_group)
-        clock.visibility = View.VISIBLE
-        clock.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
-        clock.setTextColor(getColor(Theme.time_text_color))
-        clock.background = TerminalBorderRuntime.tabDrawable(
-            mContext,
-            terminalHeaderTabBackground(),
-            FrameTarget.INPUT
-        )
-        (clock.layoutParams as? LinearLayout.LayoutParams)?.let { params ->
-            params.bottomMargin = -(margins[INPUTAREA_MARGINS_INDEX]?.get(1) ?: 0)
-            clock.layoutParams = params
-        }
-        TerminalBorderRuntime.bind(input, clock)
     }
 
     private fun calculateExpandedTerminalTrayHeight(rootHeight: Int, collapsedHeight: Int): Int {
-        val adaptiveMaximum: Int
-        if (rootHeight <= 0) {
-            adaptiveMaximum =
-                max(collapsedHeight, UIUtils.dpToPx(mContext!!, if (keyboardVisible) 220 else 320))
-        } else {
-            val trayPercent = if (keyboardVisible) 0.34f else 0.48f
-            adaptiveMaximum = max(collapsedHeight, Math.round(rootHeight * trayPercent))
-        }
-        return calculateNativeTerminalTrayHeight(
-            applyTerminalTrayMaxHeight(adaptiveMaximum, collapsedHeight)
-        )
-    }
-
-    private fun applyTerminalTrayMaxHeight(expandedHeight: Int, collapsedHeight: Int): Int {
-        val maxHeightDp = outputTrayMaxHeightDp()
-        if (maxHeightDp <= 0) {
-            return expandedHeight
-        }
-        val maxHeight = UIUtils.dpToPx(mContext!!, maxHeightDp)
-        return max(collapsedHeight, min(expandedHeight, maxHeight))
+        val limit=ohi.andre.consolelauncher.presentation.TerminalTrayPresentation.expandedLimit(rootHeight,collapsedHeight,keyboardVisible,
+            UIUtils.dpToPx(mContext!!,if(keyboardVisible) 220 else 320),UIUtils.dpToPx(mContext!!,outputTrayMaxHeightDp()))
+        return calculateNativeTerminalTrayHeight(limit)
     }
 
     private fun updateTerminalTrayToggleText() {
@@ -2956,21 +2439,8 @@ class UIManager(
     }
 
     private fun calculateCollapsedTerminalTrayHeight(): Int {
-        val minHeight = UIUtils.dpToPx(mContext!!, 66)
-        val maxHeight = UIUtils.dpToPx(mContext!!, if (keyboardVisible) 96 else 132)
-        if (terminalView == null || TextUtils.isEmpty(terminalView!!.getText())) {
-            return minHeight
-        }
-
-        var lineCount = max(1, terminalView!!.getLineCount())
-        if (lineCount <= 0) {
-            lineCount =
-                terminalView!!.getText().toString().split("\\n".toRegex()).toTypedArray().size
-        }
-        val contentHeight =
-            ((lineCount * max(terminalView!!.getLineHeight(), UIUtils.dpToPx(mContext!!, 18)))
-                    + terminalOutputChromeHeight())
-        return max(minHeight, min(maxHeight, contentHeight))
+        return ohi.andre.consolelauncher.presentation.TerminalTrayPresentation.contentHeight(terminalView,terminalOutputChromeHeight(),
+            UIUtils.dpToPx(mContext!!,66),UIUtils.dpToPx(mContext!!,if(keyboardVisible) 96 else 132),UIUtils.dpToPx(mContext!!,18))
     }
 
     private fun calculateHeaderOnlyTerminalTrayHeight(): Int =
@@ -2980,79 +2450,17 @@ class UIManager(
         )
 
     private fun calculateNativeTerminalTrayHeight(maxHeight: Int): Int {
-        val minHeight = UIUtils.dpToPx(mContext!!, 66)
-        if (terminalView == null || TextUtils.isEmpty(terminalView!!.getText())) {
-            return minHeight
-        }
-
-        var lineCount = max(1, terminalView!!.getLineCount())
-        if (lineCount <= 0) {
-            lineCount =
-                terminalView!!.getText().toString().split("\\n".toRegex()).toTypedArray().size
-        }
-        val contentHeight =
-            ((lineCount * max(terminalView!!.getLineHeight(), UIUtils.dpToPx(mContext!!, 18)))
-                    + terminalOutputChromeHeight())
-        return max(minHeight, min(maxHeight, contentHeight))
+        return ohi.andre.consolelauncher.presentation.TerminalTrayPresentation.contentHeight(terminalView,terminalOutputChromeHeight(),
+            UIUtils.dpToPx(mContext!!,66),maxHeight,UIUtils.dpToPx(mContext!!,18))
     }
 
     private fun applyTerminalOutputContentInsets() {
-        val context = mContext ?: return
-        val outputBorder = terminalOutputBorder ?: return
-        val outputMargins = margins[OUTPUT_MARGINS_INDEX] ?: return
-        val horizontalInset = max(0, outputMargins[2]) +
-                UIUtils.dpToPx(context, TERMINAL_OUTPUT_HORIZONTAL_PADDING_DP)
-        val verticalUserInset = max(0, outputMargins[3])
-        val topInset = verticalUserInset + terminalOutputTopContentInset()
-        val bottomInset = verticalUserInset +
-                UIUtils.dpToPx(context, TERMINAL_OUTPUT_BOTTOM_PADDING_DP)
-
-        if (outputBorder.paddingLeft == horizontalInset
-            && outputBorder.paddingTop == topInset
-            && outputBorder.paddingRight == horizontalInset
-            && outputBorder.paddingBottom == bottomInset
-        ) {
-            return
-        }
-
-        outputBorder.setPadding(horizontalInset, topInset, horizontalInset, bottomInset)
+        mRootView?.let { ohi.andre.consolelauncher.presentation.TerminalTrayPresentation.applyContentInsets(it,
+            (statusAppearance ?: ohi.andre.consolelauncher.presentation.HomeAppearance.saved())) }
     }
 
     private fun terminalOutputChromeHeight(): Int {
-        val context = mContext ?: return 0
-        val fallback = UIUtils.dpToPx(context, TERMINAL_OUTPUT_HEIGHT_ALLOWANCE_DP)
-        val outputBorder = terminalOutputBorder ?: return fallback
-        val borderMargins = outputBorder.layoutParams as? MarginLayoutParams
-        val containerPadding = (terminalContainer?.paddingTop ?: 0) +
-                (terminalContainer?.paddingBottom ?: 0)
-        val dynamicHeight = containerPadding +
-                (borderMargins?.topMargin ?: 0) +
-                (borderMargins?.bottomMargin ?: 0) +
-                outputBorder.paddingTop +
-                outputBorder.paddingBottom
-        return max(fallback, dynamicHeight)
-    }
-
-    private fun terminalOutputTopContentInset(): Int {
-        val context = mContext ?: return 0
-        val baseInset = UIUtils.dpToPx(context, TERMINAL_OUTPUT_TOP_PADDING_DP)
-        if (this.isOutputHeaderNone) {
-            return baseInset
-        }
-
-        val toggle = terminalTrayToggle ?: return baseInset
-        val headerHeight = when {
-            toggle.height > 0 -> toggle.height
-            toggle.measuredHeight > 0 -> toggle.measuredHeight
-            else -> (toggle.textSize + toggle.paddingTop + toggle.paddingBottom).roundToInt()
-        }
-        val headerTopMargin = (toggle.layoutParams as? MarginLayoutParams)?.topMargin ?: 0
-        val headerClearance = max(
-            0,
-            headerHeight + headerTopMargin +
-                    UIUtils.dpToPx(context, TERMINAL_OUTPUT_HEADER_GAP_DP)
-        )
-        return max(baseInset, headerClearance)
+        return mRootView?.let { ohi.andre.consolelauncher.presentation.TerminalTrayPresentation.chromeHeight(it) }?:0
     }
 
     private fun setupHomeWidgetsPage(homePage: View) {
@@ -3534,19 +2942,9 @@ class UIManager(
             moduleSuggestionsOriginalIndex = moduleSuggestionsOriginalParent!!.indexOfChild(moduleSuggestionsScroll)
             moduleSuggestionsOriginalParams = copyLayoutParams(moduleSuggestionsScroll!!.layoutParams)
         }
-        val stripBackground = ThemeColorResolver.color(Theme.chip_background_color)
         moduleSuggestionsScroll!!.setFocusable(false)
-        Companion.applyBgRect(
-            mContext!!,
-            moduleSuggestionsScroll!!,
-            String.format("#%08X", stripBackground),
-            margins[SUGGESTIONS_MARGINS_INDEX]!!,
-            genericBorderCornerRadius,
-            useDashed,
-            AppearanceSettings.surfaceBorderColor(SurfaceBorder.SUGGESTIONS),
-            true,
-            SurfaceBorder.SUGGESTIONS
-        )
+        ohi.andre.consolelauncher.presentation.HomeChromePresentation.styleSurface(moduleSuggestionsScroll!!,
+            ohi.andre.consolelauncher.presentation.HomeAppearance.saved())
         hideModuleSuggestionsStrip()
     }
 
@@ -3591,35 +2989,9 @@ class UIManager(
             hideModuleSuggestionsStrip()
             return
         }
-        val suggestionSpaces = XMLPrefsManager.getListOfIntValues(
-            XMLPrefsManager.get(Suggestions.suggestions_spaces),
-            4,
-            0
-        )
-        val horizontalPadding = suggestionSpaces[2]
-        val verticalPadding = suggestionSpaces[3]
-        val textSize = XMLPrefsManager.getInt(Suggestions.suggestions_size).toFloat()
+        val appearance=ohi.andre.consolelauncher.presentation.HomeAppearance.saved()
         for (suggestion in suggestions) {
-            val chip = TextView(context)
-            TextShadows.apply(chip, Theme.suggestions_text_shadow_color)
-            chip.text = suggestion.label
-            chip.gravity = Gravity.CENTER
-            chip.setLines(1)
-            chip.maxLines = 1
-            chip.ellipsize = TextUtils.TruncateAt.END
-            chip.minWidth = Tuils.dpToPx(context, 56)
-            chip.setPadding(
-                horizontalPadding,
-                verticalPadding,
-                horizontalPadding,
-                verticalPadding
-            )
-            chip.setTypeface(Tuils.getTypeface(context), Typeface.BOLD)
-            chip.setTextColor(notificationWidgetTextColor())
-            chip.textSize = textSize
-            chip.setBackground(
-                TerminalBorderRuntime.tabDrawable(context, terminalHeaderTabBackground(), FrameTarget.SUGGESTIONS)
-            )
+            val chip=ohi.andre.consolelauncher.presentation.ModuleSuggestionPresentation.create(context,suggestion.label.orEmpty(),appearance)
             chip.setOnClickListener(View.OnClickListener { v: View? ->
                 val action = suggestion.action.orEmpty()
                 if (action.endsWith(" ")) {
@@ -3629,18 +3001,7 @@ class UIManager(
                 }
                 refreshSuggestionsForActiveModule()
             })
-            val params = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-            params.setMargins(
-                suggestionSpaces[0],
-                suggestionSpaces[1],
-                suggestionSpaces[0],
-                suggestionSpaces[1]
-            )
-            params.gravity = Gravity.CENTER_VERTICAL
-            group.addView(chip, params)
+            group.addView(chip,ohi.andre.consolelauncher.presentation.ModuleSuggestionPresentation.layoutParams(appearance))
         }
         scroll.visibility = View.VISIBLE
         scroll.post(Runnable {
@@ -3865,8 +3226,7 @@ class UIManager(
     }
 
     private fun showMusicModule() {
-        val musicWidget = LayoutInflater.from(mContext)
-            .inflate(R.layout.music_module, homeModulesContainer, false)
+        val musicWidget = ohi.andre.consolelauncher.presentation.ModulePanelPresentation.inflate(mContext,homeModulesContainer,ohi.andre.consolelauncher.presentation.ModulePanelPresentation.Kind.MUSIC)
         homeModulesContainer!!.addView(musicWidget)
         musicWidget.setVisibility(View.VISIBLE)
         val close = musicWidget.findViewById<TextView?>(R.id.music_module_close)
@@ -3883,8 +3243,7 @@ class UIManager(
 
     private fun showNotificationsModule() {
         ensureNotificationServiceForModule()
-        val notificationWidget = LayoutInflater.from(mContext)
-            .inflate(R.layout.notification_module, homeModulesContainer, false)
+        val notificationWidget = ohi.andre.consolelauncher.presentation.ModulePanelPresentation.inflate(mContext,homeModulesContainer,ohi.andre.consolelauncher.presentation.ModulePanelPresentation.Kind.NOTIFICATIONS)
         homeModulesContainer!!.addView(notificationWidget)
         notificationWidget.setVisibility(View.VISIBLE)
         notificationWidget.setClickable(true)
@@ -3986,8 +3345,7 @@ class UIManager(
         widgetId: String?,
         result: LuaWidgetEngine.RenderResult
     ) {
-        val moduleView = LayoutInflater.from(mContext)
-            .inflate(R.layout.module_text_panel, homeModulesContainer, false)
+        val moduleView = ohi.andre.consolelauncher.presentation.ModulePanelPresentation.inflate(mContext,homeModulesContainer,ohi.andre.consolelauncher.presentation.ModulePanelPresentation.Kind.TEXT)
         homeModulesContainer!!.addView(moduleView)
 
         val label = moduleView.findViewById<TextView?>(R.id.module_text_label)
@@ -4014,7 +3372,7 @@ class UIManager(
 
         if (scroll != null) {
             scroll.removeAllViews()
-            val content = LinearLayout(mContext)
+            val content = ohi.andre.consolelauncher.presentation.ModuleBodyPresentation.group(mContext)
             content.setOrientation(LinearLayout.VERTICAL)
             content.setLayoutParams(
                 ViewGroup.LayoutParams(
@@ -4074,7 +3432,7 @@ class UIManager(
         module: String? = null,
         fontMode: String? = null
     ) {
-        val view = TextView(mContext)
+        val view = ohi.andre.consolelauncher.presentation.ModuleBodyPresentation.paragraph(mContext)
         view.setText(text)
         view.setTextColor(notificationWidgetTextColor())
         view.setTextSize(moduleBodyTextSize().toFloat())
@@ -4159,7 +3517,7 @@ class UIManager(
         if (actions.isEmpty()) {
             return
         }
-        val topSpacer = View(mContext)
+        val topSpacer = ohi.andre.consolelauncher.presentation.ModuleBodyPresentation.space(mContext,8)
         topSpacer.setLayoutParams(
             LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -4171,7 +3529,7 @@ class UIManager(
         var row: LinearLayout? = null
         for (i in actions.indices) {
             if (i % 2 == 0) {
-                row = LinearLayout(mContext)
+                row = ohi.andre.consolelauncher.presentation.ModuleBodyPresentation.group(mContext,ohi.andre.consolelauncher.presentation.ModuleBodyPresentation.GroupKind.ROW)
                 row.setOrientation(LinearLayout.HORIZONTAL)
                 row.setLayoutParams(
                     LinearLayout.LayoutParams(
@@ -4187,7 +3545,7 @@ class UIManager(
     }
 
     private fun luaSurfaceButton(action: LuaSurfaceAction): TextView {
-        val button = TextView(mContext)
+        val button = ohi.andre.consolelauncher.presentation.ModuleBodyPresentation.action(mContext)
         button.setText(action.label)
         button.setSingleLine(false)
         button.setGravity(Gravity.CENTER)
@@ -4198,28 +3556,14 @@ class UIManager(
             Tuils.dpToPx(mContext, 10),
             Tuils.dpToPx(mContext, 7)
         )
-        button.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
-        button.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
-        button.setTextColor(moduleNameTextColor())
-        button.setBackground(luaSurfaceButtonBackground())
+        ohi.andre.consolelauncher.presentation.ModuleContentPresentation.action(button,
+            statusAppearance ?: ohi.andre.consolelauncher.presentation.HomeAppearance.saved())
         val lp = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
         val margin = Tuils.dpToPx(mContext, 4)
         lp.setMargins(margin, margin, margin, margin)
         button.setLayoutParams(lp)
         button.setOnClickListener(View.OnClickListener { action.run.run() })
         return button
-    }
-
-    private fun luaSurfaceButtonBackground(): Drawable {
-        return TerminalBorderRuntime.panelDrawable(
-            mContext!!,
-            moduleButtonBackgroundColor(),
-            moduleButtonBorderColor(),
-            1.2f,
-            moduleCornerRadius(),
-            dashedBorders(),
-            target = FrameTarget.MODULES
-        )
     }
 
     private fun renderLuaLayout(
@@ -4292,7 +3636,7 @@ class UIManager(
     ) {
         val type = obj.optString("type", obj.optString("kind", "text")).lowercase(Locale.US)
         if ("column" == type || "container" == type) {
-            val column = LinearLayout(mContext)
+            val column = ohi.andre.consolelauncher.presentation.ModuleBodyPresentation.group(mContext,ohi.andre.consolelauncher.presentation.ModuleBodyPresentation.GroupKind.COLUMN)
             column.setOrientation(LinearLayout.VERTICAL)
             column.setLayoutParams(
                 LinearLayout.LayoutParams(
@@ -4305,7 +3649,7 @@ class UIManager(
             return
         }
         if ("row" == type) {
-            val row = LinearLayout(mContext)
+            val row = ohi.andre.consolelauncher.presentation.ModuleBodyPresentation.group(mContext,ohi.andre.consolelauncher.presentation.ModuleBodyPresentation.GroupKind.ROW)
             row.setOrientation(LinearLayout.HORIZONTAL)
             row.setLayoutParams(
                 LinearLayout.LayoutParams(
@@ -4318,7 +3662,7 @@ class UIManager(
             if (children != null) {
                 for (i in 0..<children.length()) {
                     val child = children.optJSONObject(i) ?: continue
-                    val childBox = LinearLayout(mContext)
+                    val childBox = ohi.andre.consolelauncher.presentation.ModuleBodyPresentation.group(mContext,ohi.andre.consolelauncher.presentation.ModuleBodyPresentation.GroupKind.WEIGHTED_COLUMN)
                     childBox.setOrientation(LinearLayout.VERTICAL)
                     val lp = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
                     val margin = Tuils.dpToPx(mContext, 3)
@@ -4350,7 +3694,7 @@ class UIManager(
             return
         }
         if ("spacer" == type) {
-            val spacer = View(mContext)
+            val spacer = ohi.andre.consolelauncher.presentation.ModuleBodyPresentation.space(mContext,max(1,obj.optInt("size",8)))
             spacer.setLayoutParams(
                 LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
@@ -4439,8 +3783,7 @@ class UIManager(
     }
 
     private fun showTextModule(module: String?, text: CharSequence?) {
-        val moduleView = LayoutInflater.from(mContext)
-            .inflate(R.layout.module_text_panel, homeModulesContainer, false)
+        val moduleView = ohi.andre.consolelauncher.presentation.ModulePanelPresentation.inflate(mContext,homeModulesContainer,ohi.andre.consolelauncher.presentation.ModulePanelPresentation.Kind.TEXT)
         homeModulesContainer!!.addView(moduleView)
 
         val label = moduleView.findViewById<TextView?>(R.id.module_text_label)
@@ -4497,7 +3840,7 @@ class UIManager(
         scroll.removeAllViews()
         body.setVisibility(View.GONE)
 
-        val content = LinearLayout(mContext)
+        val content = ohi.andre.consolelauncher.presentation.ModuleBodyPresentation.group(mContext)
         content.setOrientation(LinearLayout.VERTICAL)
         content.setLayoutParams(
             FrameLayout.LayoutParams(
@@ -4528,7 +3871,7 @@ class UIManager(
         text: CharSequence,
         module: String?
     ) {
-        val view = TextView(mContext)
+        val view = ohi.andre.consolelauncher.presentation.ModuleBodyPresentation.paragraph(mContext)
         if (text is Spanned) {
             view.setText(text, TextView.BufferType.SPANNABLE)
         } else {
@@ -4583,40 +3926,8 @@ class UIManager(
     }
 
     private fun constrainRssModuleScroll(scroll: ScrollView, content: LinearLayout) {
-        scroll.setFillViewport(false)
-        scroll.setOverScrollMode(View.OVER_SCROLL_IF_CONTENT_SCROLLS)
-        scroll.getViewTreeObserver()
-            .addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
-                override fun onPreDraw(): Boolean {
-                    if (scroll.getViewTreeObserver().isAlive()) {
-                        scroll.getViewTreeObserver().removeOnPreDrawListener(this)
-                    }
-
-                    val viewportPadding = scroll.getPaddingTop() + scroll.getPaddingBottom()
-                    var lineHeight = UIUtils.dpToPx(mContext, 18)
-                    for (i in 0..<content.getChildCount()) {
-                        val child = content.getChildAt(i)
-                        if (child is TextView) {
-                            lineHeight = max(lineHeight, child.getLineHeight())
-                        }
-                    }
-
-                    val maxHeight = lineHeight * RSS_MODULE_VISIBLE_LINES + viewportPadding
-                    val contentHeight = content.getHeight() + viewportPadding
-                    if (maxHeight <= 0 || contentHeight <= 0) {
-                        return true
-                    }
-
-                    val targetHeight = max(scroll.getMinimumHeight(), min(contentHeight, maxHeight))
-                    val params = scroll.getLayoutParams()
-                    if (params != null && params.height != targetHeight) {
-                        params.height = targetHeight
-                        scroll.setLayoutParams(params)
-                    }
-                    scroll.setVerticalScrollBarEnabled(contentHeight > targetHeight)
-                    return true
-                }
-            })
+        ohi.andre.consolelauncher.presentation.ModulePanelPresentation.limitTextScroll(scroll,
+            ohi.andre.consolelauncher.presentation.ModulePanelPresentation.ScrollPolicy(RSS_MODULE_VISIBLE_LINES,true))
     }
 
     private fun shouldRenderScriptSegments(module: String?): Boolean {
@@ -4637,7 +3948,7 @@ class UIManager(
         scroll.removeAllViews()
         body.setVisibility(View.GONE)
 
-        val content = LinearLayout(mContext)
+        val content = ohi.andre.consolelauncher.presentation.ModuleBodyPresentation.group(mContext)
         content.setOrientation(LinearLayout.VERTICAL)
         content.setLayoutParams(
             FrameLayout.LayoutParams(
@@ -4663,7 +3974,7 @@ class UIManager(
         module: String?,
         fontMode: String
     ) {
-        val view = TextView(mContext)
+        val view = ohi.andre.consolelauncher.presentation.ModuleBodyPresentation.paragraph(mContext)
         view.setText(text)
         view.setTextColor(notificationWidgetTextColor())
         view.setTextSize(moduleBodyTextSize().toFloat())
@@ -4680,44 +3991,15 @@ class UIManager(
     }
 
     private fun constrainEventModuleScroll(module: String?, scroll: ScrollView?, body: TextView?) {
-        val id = ModuleManager.normalize(module)
-        val source = ModuleManager.getModuleSource(mContext, id)
-        val eventsModule = ModuleManager.EVENTS == id && ModuleManager.isLauncherSource(source)
-        val rssModule = ModuleManager.RSS == id
-        if ((!eventsModule && !rssModule) || scroll == null || body == null) {
-            return
-        }
-
-        scroll.setFillViewport(false)
-        scroll.setOverScrollMode(View.OVER_SCROLL_IF_CONTENT_SCROLLS)
-        scroll.getViewTreeObserver()
-            .addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
-                override fun onPreDraw(): Boolean {
-                    if (scroll.getViewTreeObserver().isAlive()) {
-                        scroll.getViewTreeObserver().removeOnPreDrawListener(this)
-                    }
-
-                    val viewportPadding = scroll.getPaddingTop() + scroll.getPaddingBottom()
-                    val maxHeight = if (rssModule) {
-                        calculateModuleLineHeight(body, RSS_MODULE_VISIBLE_LINES) + viewportPadding
-                    } else {
-                        calculateCalendarTextHeight(body) + viewportPadding
-                    }
-                    val contentHeight = body.getHeight() + viewportPadding
-                    if (maxHeight <= 0 || contentHeight <= 0) {
-                        return true
-                    }
-
-                    val targetHeight = max(scroll.getMinimumHeight(), min(contentHeight, maxHeight))
-                    val params = scroll.getLayoutParams()
-                    if (params != null && params.height != targetHeight) {
-                        params.height = targetHeight
-                        scroll.setLayoutParams(params)
-                    }
-                    scroll.setVerticalScrollBarEnabled(contentHeight > targetHeight)
-                    return true
-                }
-            })
+        val id=ModuleManager.normalize(module)
+        val source=ModuleManager.getModuleSource(mContext,id)
+        val events=ModuleManager.EVENTS==id && ModuleManager.isLauncherSource(source)
+        val rss=ModuleManager.RSS==id
+        if((!events && !rss) || scroll==null || body==null) return
+        val lines=if(rss) min(RSS_MODULE_VISIBLE_LINES,max(1,countVisibleLines(body.text.toString())))
+            else countVisibleLines(buildCalendarModuleText())
+        ohi.andre.consolelauncher.presentation.ModulePanelPresentation.limitTextScroll(scroll,
+            ohi.andre.consolelauncher.presentation.ModulePanelPresentation.ScrollPolicy(lines,false))
     }
 
     private fun applyModuleBodyTypeface(
@@ -4728,7 +4010,6 @@ class UIManager(
         if (body == null) {
             return
         }
-        TextShadows.apply(body, Theme.module_text_shadow_color)
         val useThemeTypeface = if (MODULE_TEXT_FONT_MONO == fontMode) {
             false
         } else if (MODULE_TEXT_FONT_THEME == fontMode) {
@@ -4740,12 +4021,8 @@ class UIManager(
             R.id.module_text_font_mode,
             if (useThemeTypeface) MODULE_TEXT_FONT_THEME else MODULE_TEXT_FONT_MONO
         )
-        val style = if (body.getTypeface() != null) body.getTypeface().getStyle() else Typeface.NORMAL
-        if (useThemeTypeface) {
-            body.setTypeface(Tuils.getTypeface(mContext), style)
-        } else {
-            body.setTypeface(Typeface.MONOSPACE, style)
-        }
+        ohi.andre.consolelauncher.presentation.ModuleContentPresentation.body(body,
+            statusAppearance ?: ohi.andre.consolelauncher.presentation.HomeAppearance.saved(),useThemeTypeface)
     }
 
     private fun buildCalendarModuleView(): View {
@@ -4762,7 +4039,7 @@ class UIManager(
         val currentDay =
             if (today.get(Calendar.MONTH) == month && today.get(Calendar.YEAR) == year) today.get(Calendar.DAY_OF_MONTH) else -1
 
-        val content = LinearLayout(mContext)
+        val content = ohi.andre.consolelauncher.presentation.ModuleBodyPresentation.group(mContext,ohi.andre.consolelauncher.presentation.ModuleBodyPresentation.GroupKind.CALENDAR)
         content.setOrientation(LinearLayout.VERTICAL)
         val calendarInset = Tuils.dpToPx(mContext, 2)
         content.setPadding(calendarInset, 0, calendarInset, 0)
@@ -4826,7 +4103,7 @@ class UIManager(
     }
 
     private fun calendarRow(): LinearLayout {
-        val row = LinearLayout(mContext)
+        val row = ohi.andre.consolelauncher.presentation.ModuleBodyPresentation.group(mContext,ohi.andre.consolelauncher.presentation.ModuleBodyPresentation.GroupKind.CALENDAR_ROW)
         row.setOrientation(LinearLayout.HORIZONTAL)
         row.setBaselineAligned(false)
         row.setLayoutParams(
@@ -4840,6 +4117,7 @@ class UIManager(
 
     private fun calendarCell(text: String, bold: Boolean, today: Boolean): TextView {
         val cell = calendarTextView(if (today) "[$text]" else text, bold || today, today)
+        ohi.andre.consolelauncher.presentation.ModuleBodyPresentation.calendarCell(cell)
         cell.setGravity(Gravity.CENTER)
         cell.setMinHeight(0)
         cell.setPadding(0, 0, 0, 0)
@@ -4849,7 +4127,7 @@ class UIManager(
     }
 
     private fun calendarTextView(text: String, bold: Boolean, highlight: Boolean): TextView {
-        val view = TextView(mContext)
+        val view = ohi.andre.consolelauncher.presentation.ModuleBodyPresentation.calendarText(mContext)
         view.setText(text)
         view.setSingleLine(true)
         view.setIncludeFontPadding(false)
@@ -4860,6 +4138,8 @@ class UIManager(
             Tuils.getTypeface(mContext),
             if (bold) Typeface.BOLD else Typeface.NORMAL
         )
+        ohi.andre.consolelauncher.presentation.ModuleContentPresentation.body(view,
+            statusAppearance ?: ohi.andre.consolelauncher.presentation.HomeAppearance.saved(),true)
         return view
     }
 
@@ -4884,20 +4164,6 @@ class UIManager(
         return false
     }
 
-    private fun calculateCalendarTextHeight(body: TextView): Int {
-        val lineHeight = body.getLineHeight()
-        val lines = countVisibleLines(buildCalendarModuleText())
-        val padding = body.getPaddingTop() + body.getPaddingBottom()
-        return max(lineHeight, lineHeight * lines + padding)
-    }
-
-    private fun calculateModuleLineHeight(body: TextView, maxLines: Int): Int {
-        val lineHeight = body.getLineHeight()
-        val lines = min(maxLines, max(1, countVisibleLines(body.getText().toString())))
-        val padding = body.getPaddingTop() + body.getPaddingBottom()
-        return max(lineHeight, lineHeight * lines + padding)
-    }
-
     private fun countVisibleLines(text: String?): Int {
         if (TextUtils.isEmpty(text)) {
             return 1
@@ -4912,9 +4178,8 @@ class UIManager(
 
     private fun styleModuleClose(close: TextView?, target: FrameTarget = FrameTarget.MODULES) {
         if (close == null) return
-        val bgColor = ThemeColorResolver.color(Theme.module_header_control_background_color)
-        close.setBackground(TerminalBorderRuntime.tabDrawable(mContext!!, bgColor, target))
-        close.setTextSize(moduleHeaderTextSize().toFloat())
+        ohi.andre.consolelauncher.presentation.ModuleContentPresentation.close(close,
+            statusAppearance ?: ohi.andre.consolelauncher.presentation.HomeAppearance.saved(),target)
     }
 
     private fun closeHomeModule() {
@@ -6568,19 +5833,8 @@ class UIManager(
 
         restoreLauncherSurfaceSession()
 
-        val bgColor =
-            if (!XMLPrefsManager.getBoolean(Ui.system_wallpaper) || !canApplyTheme)
-                getColor(Theme.background_color)
-            else getColor(Theme.wallpaper_overlay_color)
-        if (cyberdeckMode()) {
-            rootView.background = CyberpunkBackdropDrawable(
-                bgColor,
-                terminalBorderColor(),
-                getColor(Theme.device_text_color)
-            )
-        } else {
-            rootView.setBackgroundColor(bgColor)
-        }
+        ohi.andre.consolelauncher.presentation.HomeChromePresentation.styleRoot(rootView,
+            ohi.andre.consolelauncher.presentation.HomeAppearance.saved(),canApplyTheme)
 
         styleHackOverlay(rootView)
         setupTermuxConsole(rootView)
@@ -6764,107 +6018,8 @@ class UIManager(
         Arrays.fill(labelIndexes, LABEL_INDEX_UNMAPPED)
         Arrays.fill(labelTexts, null)
 
-        val show = BooleanArray(Label.entries.size)
-        show[Label.notes.ordinal] = XMLPrefsManager.getBoolean(Ui.show_notes)
-        show[Label.ram.ordinal] = XMLPrefsManager.getBoolean(Ui.show_ram)
-        show[Label.device.ordinal] = XMLPrefsManager.getBoolean(Ui.show_device_name)
-        show[Label.time.ordinal] = XMLPrefsManager.getBoolean(Ui.show_time)
-        show[Label.battery.ordinal] = XMLPrefsManager.getBoolean(Ui.show_battery)
-        show[Label.network.ordinal] = XMLPrefsManager.getBoolean(Ui.show_network_info)
-        show[Label.storage.ordinal] = XMLPrefsManager.getBoolean(Ui.show_storage_info)
-        show[Label.weather.ordinal] = XMLPrefsManager.getBoolean(Ui.show_weather)
-        show[Label.unlock.ordinal] = XMLPrefsManager.getBoolean(Ui.show_unlock_counter)
-        show[Label.ascii.ordinal] = XMLPrefsManager.getBoolean(Ui.show_ascii)
-
-        val indexes = FloatArray(Label.entries.size)
-        indexes[Label.notes.ordinal] =
-            if (show[Label.notes.ordinal]) XMLPrefsManager.getFloat(Ui.notes_index) else Int.Companion.MAX_VALUE.toFloat()
-        indexes[Label.ram.ordinal] =
-            if (show[Label.ram.ordinal]) XMLPrefsManager.getFloat(Ui.ram_index) else Int.Companion.MAX_VALUE.toFloat()
-        indexes[Label.device.ordinal] =
-            if (show[Label.device.ordinal]) XMLPrefsManager.getFloat(Ui.device_index) else Int.Companion.MAX_VALUE.toFloat()
-        indexes[Label.time.ordinal] =
-            if (show[Label.time.ordinal]) XMLPrefsManager.getFloat(Ui.time_index) else Int.Companion.MAX_VALUE.toFloat()
-        indexes[Label.battery.ordinal] =
-            if (show[Label.battery.ordinal]) XMLPrefsManager.getFloat(Ui.battery_index) else Int.Companion.MAX_VALUE.toFloat()
-        indexes[Label.network.ordinal] =
-            if (show[Label.network.ordinal]) XMLPrefsManager.getFloat(Ui.network_index) else Int.Companion.MAX_VALUE.toFloat()
-        indexes[Label.storage.ordinal] =
-            if (show[Label.storage.ordinal]) XMLPrefsManager.getFloat(Ui.storage_index) else Int.Companion.MAX_VALUE.toFloat()
-        indexes[Label.weather.ordinal] =
-            if (show[Label.weather.ordinal]) XMLPrefsManager.getFloat(Ui.weather_index) else Int.Companion.MAX_VALUE.toFloat()
-        indexes[Label.unlock.ordinal] =
-            if (show[Label.unlock.ordinal]) XMLPrefsManager.getFloat(Ui.unlock_index) else Int.Companion.MAX_VALUE.toFloat()
-        indexes[Label.ascii.ordinal] =
-            if (show[Label.ascii.ordinal]) XMLPrefsManager.getFloat(Ui.ascii_index) else Int.Companion.MAX_VALUE.toFloat()
-
-        val statusLineAlignments = intArrayOf(
-            getInt(Ui.ram_status_alignment),
-            getInt(Ui.device_status_alignment),
-            getInt(Ui.time_status_alignment),
-            getInt(Ui.battery_status_alignment),
-            getInt(Ui.storage_status_alignment),
-            getInt(Ui.network_status_alignment),
-            getInt(Ui.notes_status_alignment),
-            getInt(Ui.weather_status_alignment),
-            getInt(Ui.unlock_status_alignment),
-            getInt(Ui.ascii_status_alignment)
-        )
-
-        fun themeColor(theme: Theme): String = String.format(
-            Locale.US,
-            "#%08X",
-            XMLPrefsManager.getColor(theme)
-        )
-
-        val statusLineBgColors = arrayOf<String?>(
-            themeColor(Theme.ram_status_background_color),
-            themeColor(Theme.device_status_background_color),
-            themeColor(Theme.time_status_background_color),
-            themeColor(Theme.battery_status_background_color),
-            themeColor(Theme.storage_status_background_color),
-            themeColor(Theme.network_status_background_color),
-            themeColor(Theme.notes_status_background_color),
-            themeColor(Theme.weather_status_background_color),
-            themeColor(Theme.unlock_status_background_color),
-            themeColor(Theme.ascii_status_background_color)
-        )
-        val otherBgColors = arrayOf<String?>(
-            themeColor(Theme.input_background_color),
-            themeColor(Theme.output_background_color),
-            themeColor(Theme.suggestions_background_color),
-            themeColor(Theme.toolbar_background_color)
-        )
-        bgColors = arrayOfNulls<String>(statusLineBgColors.size + otherBgColors.size)
-        System.arraycopy(statusLineBgColors, 0, bgColors, 0, statusLineBgColors.size)
-        System.arraycopy(otherBgColors, 0, bgColors, statusLineBgColors.size, otherBgColors.size)
-
-        val statusLineOutlineColors = arrayOf<String?>(
-            themeColor(Theme.ram_status_text_shadow_color),
-            themeColor(Theme.device_status_text_shadow_color),
-            themeColor(Theme.time_status_text_shadow_color),
-            themeColor(Theme.battery_status_text_shadow_color),
-            themeColor(Theme.storage_status_text_shadow_color),
-            themeColor(Theme.network_status_text_shadow_color),
-            themeColor(Theme.notes_status_text_shadow_color),
-            themeColor(Theme.weather_status_text_shadow_color),
-            themeColor(Theme.unlock_status_text_shadow_color),
-            themeColor(Theme.ascii_status_text_shadow_color)
-        )
-        val otherOutlineColors = arrayOf<String?>(
-            themeColor(Theme.input_text_shadow_color),
-            themeColor(Theme.output_text_shadow_color),
-        )
-        outlineColors = arrayOfNulls<String>(statusLineOutlineColors.size + otherOutlineColors.size)
-        System.arraycopy(statusLineOutlineColors, 0, outlineColors, 0, statusLineOutlineColors.size)
-        System.arraycopy(otherOutlineColors, 0, outlineColors, 10, otherOutlineColors.size)
-
-        val shadowParams =
-            XMLPrefsManager.getListOfStringValues(XMLPrefsManager.get(Ui.shadow_params), 3, "0")
-        shadowXOffset = shadowParams[0]!!.toInt()
-        shadowYOffset = shadowParams[1]!!.toInt()
-        shadowRadius = shadowParams[2]!!.toFloat()
-
+        statusAppearance=ohi.andre.consolelauncher.presentation.HomeAppearance.saved()
+        val show=ohi.andre.consolelauncher.presentation.StatusPresentation.descriptors.map { statusAppearance!!.bool(it.visible) }.toBooleanArray()
         genericBorderCornerRadius = Tuils.dpToPx(mContext, dashedBorderCornerRadius())
 
         useDashed = dashedBorders()
@@ -6886,38 +6041,12 @@ class UIManager(
             0
         )
 
-        val visibleLabels = ArrayList<Pair<Float, Label>>()
-        for (ordinal in indexes.indices) {
-            val value = indexes[ordinal]
-            if (value != Int.Companion.MAX_VALUE.toFloat()) {
-                visibleLabels.add(value to Label.entries[ordinal])
-            }
-        }
-        val labelRows = StatusRowResolver.groupVisible(visibleLabels)
+        val labelRows=ohi.andre.consolelauncher.presentation.StatusPresentation.rows(statusAppearance!!).map { row -> row.map { Label.entries[it] } }
 
         val lViewsParent = labelViews[0]!!.getParent() as LinearLayout
         val unifiedStatusBorder = AppearanceSettings.unifiedStatusBorder()
-        Companion.applyMargins(
-            lViewsParent,
-            if (unifiedStatusBorder) intArrayOf(0, 0, 0, Tuils.dpToPx(mContext, 4)) else IntArray(4)
-        )
-        if (unifiedStatusBorder) {
-            lViewsParent.background = TerminalBorderRuntime.panelDrawablePx(
-                mContext!!,
-                getColor(Theme.unified_status_background_color),
-                terminalBorderColor(),
-                1.5f,
-                Tuils.dpToPx(mContext, moduleCornerRadius()).toFloat(),
-                useDashed,
-                false,
-                true,
-                target = FrameTarget.STATUS_GROUP
-            )
-        } else {
-            lViewsParent.background = null
-        }
-        val statusTextInsets = margins[0]!!
-
+        ohi.andre.consolelauncher.presentation.HomeLayoutPresentation.styleStatusGroup(rootView,
+            (statusAppearance ?: ohi.andre.consolelauncher.presentation.HomeAppearance.saved()))
         for (count in labelViews.indices) {
             labelViews[count]!!.setOnTouchListener(this)
 
@@ -6938,54 +6067,10 @@ class UIManager(
                     ensureAsciiViewportView(lViewsParent, count)
                 }
 
-                if (labelViews[count] is AsciiArtTextView) {
-                    labelViews[count]!!.setTypeface(Typeface.MONOSPACE)
-                } else {
-                    labelViews[count]!!.setTypeface(Tuils.getTypeface(context))
-                }
+                ohi.andre.consolelauncher.presentation.StatusPresentation.bindStyle(
+                    labelViews[count]!!,os[0].ordinal,statusAppearance!!,unifiedStatusBorder)
+                if (!os.contains(Label.notes)) labelViews[count]!!.isVerticalScrollBarEnabled=false
 
-                val styleLabel = os[0].ordinal
-
-                //                -1 = left     0 = center     1 = right
-                val p = statusLineAlignments[styleLabel]
-                labelViews[count]!!.setGravity(
-                    when {
-                        p == 0 -> Gravity.CENTER_HORIZONTAL
-                        p > 0 -> Gravity.END
-                        else -> Gravity.START
-                    }
-                )
-
-                if (!os.contains(Label.notes)) {
-                    labelViews[count]!!.setVerticalScrollBarEnabled(false)
-                }
-
-                Companion.applyBgRect(
-                    mContext!!,
-                    labelViews[count]!!,
-                    bgColors[styleLabel],
-                    IntArray(4),
-                    if (unifiedStatusBorder) 0 else Tuils.dpToPx(mContext, moduleCornerRadius()),
-                    useDashed,
-                    AppearanceSettings.surfaceBorderColor(SurfaceBorder.entries[styleLabel]),
-                    false,
-                    SurfaceBorder.entries[styleLabel],
-                    !unifiedStatusBorder,
-                    !unifiedStatusBorder
-                )
-                labelViews[count]!!.setPadding(
-                    statusTextInsets[0],
-                    statusTextInsets[1],
-                    statusTextInsets[2],
-                    statusTextInsets[3]
-                )
-                Companion.applyShadow(
-                    labelViews[count]!!,
-                    outlineColors[styleLabel]!!,
-                    shadowXOffset,
-                    shadowYOffset,
-                    shadowRadius
-                )
             } else {
                 lViewsParent.removeView(labelViews[count])
                 labelViews[count] = null
@@ -6994,7 +6079,7 @@ class UIManager(
 
         if (unifiedStatusBorder) {
             labelViews.forEach { it?.visibility = View.GONE }
-            setupUnifiedStatus(show, statusTextInsets)
+            setupUnifiedStatus()
         }
 
         if (show[Label.ram.ordinal]) {
@@ -7226,71 +6311,16 @@ class UIManager(
             FrameTarget.MUSIC
         )
         styleModuleClose(musicWidget.findViewById<TextView?>(R.id.music_module_close), FrameTarget.MUSIC)
-        sizeMusicVisualizer(musicWidget)
 
-        val titleView = musicWidget.findViewById<TextView?>(R.id.music_song_title)
-        val singerView = musicWidget.findViewById<TextView?>(R.id.music_singer)
-        val appPrefixView = musicWidget.findViewById<TextView?>(R.id.music_app_prefix)
-        val appLabelView = musicWidget.findViewById<TextView?>(R.id.music_app_label)
-        if (titleView != null) {
-            titleView.setTextSize(TypedValue.COMPLEX_UNIT_SP, moduleBodyTextSize().toFloat())
-            titleView.setIncludeFontPadding(true)
-        }
-        if (singerView != null) {
-            singerView.setTextSize(TypedValue.COMPLEX_UNIT_SP, moduleBodyTextSize().toFloat())
-            singerView.setIncludeFontPadding(true)
-        }
-        if (appPrefixView != null) {
-            appPrefixView.setTextColor(musicWidgetTextColor())
-            appPrefixView.setTypeface(Tuils.getTypeface(mContext))
-            appPrefixView.setTextSize(TypedValue.COMPLEX_UNIT_SP, moduleBodyTextSize().toFloat())
-            appPrefixView.setIncludeFontPadding(true)
-            appPrefixView.setSingleLine(true)
-        }
-        if (appLabelView != null) {
-            appLabelView.setTextColor(musicWidgetTextColor())
-            appLabelView.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
-            appLabelView.setTextSize(TypedValue.COMPLEX_UNIT_SP, moduleBodyTextSize().toFloat())
-            appLabelView.setIncludeFontPadding(true)
-            appLabelView.setSingleLine(true)
-            appLabelView.setEllipsize(TextUtils.TruncateAt.END)
-            appLabelView.setOnClickListener(View.OnClickListener { v: View? -> launchCurrentMusicApp() })
-        }
+        val musicAppearance=statusAppearance ?: ohi.andre.consolelauncher.presentation.HomeAppearance.saved()
+        ohi.andre.consolelauncher.presentation.ModulePanelPresentation.musicContent(musicWidget,musicAppearance)
+        musicWidget.findViewById<TextView>(R.id.music_app_label)?.setOnClickListener { launchCurrentMusicApp() }
         updateMusicAppRow(musicWidget, musicWidgetTextColor())
 
         // Style control buttons
-        val widgetColor = musicWidgetTextColor()
-        val widgetBorderColor = moduleButtonBorderColor()
-        val useDashed = dashedBorders()
-
         val prevBtn = musicWidget.findViewById<TextView?>(R.id.music_prev)
         val nextBtn = musicWidget.findViewById<TextView?>(R.id.music_next)
         val playPauseBtn = musicWidget.findViewById<TextView?>(R.id.music_play_pause)
-
-        val buttons = arrayOf<View?>(prevBtn, nextBtn, playPauseBtn)
-        for (b in buttons) {
-            if (b is TextView) {
-                val btn = b
-                btn.setTextColor(widgetColor)
-                btn.setTypeface(Tuils.getTypeface(mContext))
-                btn.setTextSize(TypedValue.COMPLEX_UNIT_SP, moduleBodyTextSize().toFloat())
-                btn.setIncludeFontPadding(true)
-                btn.setSingleLine(true)
-                btn.setEllipsize(TextUtils.TruncateAt.END)
-
-                btn.setBackgroundDrawable(
-                    TerminalBorderRuntime.panelDrawable(
-                        mContext!!,
-                        moduleButtonBackgroundColor(),
-                        widgetBorderColor,
-                        1.2f,
-                        moduleCornerRadius(),
-                        useDashed,
-                        target = FrameTarget.MUSIC
-                    )
-                )
-            }
-        }
 
         if (prevBtn != null) {
             prevBtn.setOnClickListener(View.OnClickListener { v: View? ->
@@ -7395,20 +6425,7 @@ class UIManager(
     }
 
     private fun sizeMusicVisualizer(musicWidget: View) {
-        val visualizer = musicWidget.findViewById<MusicVisualizerView?>(R.id.music_visualizer)
-        val border = musicWidget.findViewById<View?>(R.id.music_module_border)
-        if (visualizer == null || border == null) return
-
-        border.post(Runnable {
-            val height = border.getHeight() - border.getPaddingTop() - border.getPaddingBottom()
-            if (height > 0) {
-                val params = visualizer.getLayoutParams()
-                if (params != null && params.height != height) {
-                    params.height = height
-                    visualizer.setLayoutParams(params)
-                }
-            }
-        })
+        ohi.andre.consolelauncher.presentation.ModulePanelPresentation.sizeVisualizer(musicWidget)
     }
 
     private fun styleHackOverlay(rootView: View) {
@@ -13012,7 +12029,7 @@ class UIManager(
         widgetTextColor: Int,
         widgetBorderColor: Int
     ): TextView {
-        val row = TextView(mContext)
+        val row = ohi.andre.consolelauncher.presentation.ModuleBodyPresentation.notificationText(mContext,false,notificationCompactForKeyboard)
         TextShadows.apply(row, Theme.module_text_shadow_color)
         val lp = LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
@@ -13034,7 +12051,8 @@ class UIManager(
         )
         row.setTextColor(widgetTextColor)
         row.setText(text)
-        row.setBackground(TuiWidgetDecorator.getRowBackground(mContext!!, widgetBorderColor))
+        ohi.andre.consolelauncher.presentation.ModuleContentPresentation.notificationRow(row,
+            statusAppearance ?: ohi.andre.consolelauncher.presentation.HomeAppearance.saved(),widgetTextColor,widgetBorderColor,true)
         return row
     }
 
@@ -13043,7 +12061,7 @@ class UIManager(
         widgetTextColor: Int,
         widgetBorderColor: Int
     ): TextView {
-        val row = TextView(mContext)
+        val row = ohi.andre.consolelauncher.presentation.ModuleBodyPresentation.notificationText(mContext,true,notificationCompactForKeyboard)
         TextShadows.apply(row, Theme.module_text_shadow_color)
         val lp = LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
@@ -13064,6 +12082,8 @@ class UIManager(
             Tuils.dpToPx(mContext, 6),
             Tuils.dpToPx(mContext, if (notificationCompactForKeyboard) 5 else 10)
         )
+        ohi.andre.consolelauncher.presentation.ModuleContentPresentation.notificationRow(row,
+            statusAppearance ?: ohi.andre.consolelauncher.presentation.HomeAppearance.saved(),widgetTextColor,widgetBorderColor,false)
         return row
     }
 
@@ -13143,94 +12163,29 @@ class UIManager(
     }
 
     private fun applyNotificationWidgetSize(notificationWidget: View) {
-        val border = notificationWidget.findViewById<View?>(R.id.notification_module_border)
-        if (border != null) {
-            val lp = border.getLayoutParams()
-            if (lp != null && lp.height != ViewGroup.LayoutParams.WRAP_CONTENT) {
-                lp.height = ViewGroup.LayoutParams.WRAP_CONTENT
-                border.setLayoutParams(lp)
-            }
-            border.setMinimumHeight(calculateNotificationWidgetMinHeight())
-        }
-
-        val scrollView = notificationWidget.findViewById<ScrollView?>(R.id.notification_scroll)
-        if (scrollView != null) {
-            val lp = scrollView.getLayoutParams()
-            if (lp != null && lp.height != ViewGroup.LayoutParams.WRAP_CONTENT) {
-                lp.height = ViewGroup.LayoutParams.WRAP_CONTENT
-                scrollView.setLayoutParams(lp)
-            }
-            scrollView.setFillViewport(false)
-        }
-
-        notificationWidget.setPadding(
-            notificationWidget.getPaddingLeft(),
-            notificationWidget.getPaddingTop(),
-            notificationWidget.getPaddingRight(),
-            Tuils.dpToPx(mContext, if (notificationCompactForKeyboard) 6 else 12)
-        )
-    }
-
-    private fun calculateNotificationWidgetMinHeight(): Int {
-        return Tuils.dpToPx(mContext, if (notificationCompactForKeyboard) 104 else 112)
+        ohi.andre.consolelauncher.presentation.ModulePanelPresentation.notificationSize(notificationWidget,notificationCompactForKeyboard)
     }
 
     private fun calculateNotificationContentMaxHeight(): Int {
-        val rootHeight = if (mRootView != null) mRootView.getHeight() else 0
-        val fallbackMax = Tuils.dpToPx(mContext, if (notificationCompactForKeyboard) 92 else 180)
-        val floor = Tuils.dpToPx(mContext, if (notificationCompactForKeyboard) 58 else 96)
-        if (rootHeight <= 0) {
-            return fallbackMax
-        }
-        val modulePercent = if (notificationCompactForKeyboard) 0.16f else 0.28f
-        val adaptiveMax = Math.round(rootHeight * modulePercent)
-        return min(fallbackMax, max(floor, adaptiveMax))
+        return ohi.andre.consolelauncher.presentation.ModulePanelPresentation.notificationMaxHeight(mContext,
+            mRootView?.height?:0,notificationCompactForKeyboard)
     }
 
     private fun constrainNotificationContentScroll(scrollView: ScrollView?) {
-        if (scrollView == null) {
-            return
-        }
-
-        scrollView.post(Runnable {
-            val content = scrollView.getChildAt(0)
-            if (content != null) {
-                val contentHeight =
-                    content.getHeight() + scrollView.getPaddingTop() + scrollView.getPaddingBottom()
-                if (contentHeight > 0) {
-                    val maxHeight = calculateNotificationContentMaxHeight()
-                    val targetHeight =
-                        if (contentHeight > maxHeight) maxHeight else ViewGroup.LayoutParams.WRAP_CONTENT
-                    val lp = scrollView.getLayoutParams()
-                    if (lp != null && lp.height != targetHeight) {
-                        lp.height = targetHeight
-                        scrollView.setLayoutParams(lp)
-                    }
-                    scrollView.setFillViewport(targetHeight != ViewGroup.LayoutParams.WRAP_CONTENT)
-                    scrollView.setVerticalScrollBarEnabled(contentHeight > maxHeight)
-                }
-            }
-        })
+        if(scrollView==null) return
+        ohi.andre.consolelauncher.presentation.ModulePanelPresentation.limitNotifications(scrollView,calculateNotificationContentMaxHeight())
     }
 
     private fun styleNotificationPagerButton(button: View?) {
         if (button !is TextView) return
-        val text = button
-        text.setTextColor(moduleNameTextColor())
-        text.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
-        text.setTextSize(moduleBodyTextSize().toFloat())
-        text.setBackground(
-            TuiWidgetDecorator.getRowBackground(
-                mContext!!,
-                notificationWidgetBorderColor()
-            )
-        )
+        ohi.andre.consolelauncher.presentation.ModulePanelPresentation.notificationPager(button,
+            statusAppearance ?: ohi.andre.consolelauncher.presentation.HomeAppearance.saved())
     }
 
     private fun styleNotificationSettingsButton(button: ImageButton?) {
         if (button == null) return
-        button.setColorFilter(moduleNameTextColor(), PorterDuff.Mode.SRC_IN)
-        button.setBackground(TerminalBorderRuntime.tabDrawable(mContext, ThemeColorResolver.color(Theme.module_header_control_background_color), FrameTarget.NOTIFICATIONS))
+        ohi.andre.consolelauncher.presentation.ModulePanelPresentation.notificationSettings(button,
+            statusAppearance ?: ohi.andre.consolelauncher.presentation.HomeAppearance.saved())
     }
 
     private fun clampNotificationIndex() {
@@ -14278,13 +13233,8 @@ class UIManager(
             persistentInputHeight: Int,
             imeVisible: Boolean
         ): Int {
-            val requested = max(0, requestedHeight)
-            if (!imeVisible || rootHeight <= 0) return requested
-            val availableAboveIme = max(
-                0,
-                rootHeight - max(0, imeBottomOffset) - max(0, systemBottomInset)
-            )
-            return min(requested, max(0, availableAboveIme - max(0, persistentInputHeight)))
+            return ohi.andre.consolelauncher.presentation.TerminalTrayPresentation.constrain(
+                requestedHeight,rootHeight,imeBottomOffset,systemBottomInset,persistentInputHeight,imeVisible)
         }
 
         internal fun legacyImeBottomOffset(
@@ -14313,7 +13263,7 @@ class UIManager(
             if (autoHideEnabled && !expanded) View.INVISIBLE else View.VISIBLE
 
         internal fun headerOnlyTerminalTrayHeight(headerBottom: Int, fallback: Int): Int =
-            if (headerBottom > 0) headerBottom else fallback
+            ohi.andre.consolelauncher.presentation.TerminalTrayPresentation.headerOnly(headerBottom,fallback)
 
         internal fun compactUnifiedBattery(value: CharSequence?): String {
             val text = value?.toString().orEmpty()
@@ -14382,20 +13332,9 @@ class UIManager(
                 } catch (e: Exception) {
                     terminalWindowBackground()
                 }
-                v.setBackgroundDrawable(
-                    TerminalBorderRuntime.panelDrawablePx(
-                        context,
-                        color,
-                        borderColor,
-                        1.5f,
-                        cornerRadius.toFloat(),
-                        dashed,
-                        cyberdeckNotch,
-                        allowBorder && AppearanceSettings.surfaceBorderEnabled(surface),
-                        allowFrame,
-                        FrameTarget.fromSurface(surface)
-                    )
-                )
+                ohi.andre.consolelauncher.presentation.HomeAppearance.surface(context, v, color, borderColor,
+                    cornerRadius.toFloat(), dashed, cyberdeckNotch, surface, allowBorder, allowFrame)
+
             } catch (e: Exception) {
                 Tuils.toFile(e)
                 Tuils.log(e)

@@ -79,7 +79,6 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
     override fun onCreate(savedInstanceState: Bundle?) {
         requestNoTitleIfFullscreen(this)
         super.onCreate(savedInstanceState)
-        ThemeColorResolver.clearPreview()
         overridePendingTransition(0, 0)
         applyFullscreen(this)
         androidx.core.view.WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -203,6 +202,7 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
                 Toast.makeText(this, getString(R.string.editor_tuixtactivity_changes_saved_previewing_launcher_8e180), Toast.LENGTH_SHORT)
                     .show()
                 LauncherActivity.previewIfRunning()
+                appearancePreview?.onSaved()
                 stylePaneScreen(this, screen)
                 stylePanel(this, root)
                 TuixtTheme.stylePaneHeader(this, header)
@@ -225,7 +225,6 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
                 break
             }
         }
-        if (xmlRoot == XMLPrefsRoot.THEME) ThemeColorResolver.clearPreview()
 
         if (asciiSettingsMode) {
             originalRows = buildAsciiSettingsRows()
@@ -269,7 +268,6 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
             if (xmlRoot == XMLPrefsRoot.UI || xmlRoot == XMLPrefsRoot.THEME || xmlRoot == XMLPrefsRoot.BEHAVIOR) {
                 appearancePreview = SettingsAppearancePreview(this, { item -> adapter?.draftValue(item) }, { item -> adapter?.hasDraft(item) == true }).also {
                     root.addView(it, 0, LinearLayout.LayoutParams(-1, -2))
-                    it.restorePage(savedInstanceState?.getInt("appearance_page", 0) ?: 0)
                     it.refresh()
                 }
             }
@@ -769,7 +767,6 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
 
     private fun attemptClose() {
         if (!hasUnsavedChanges()) {
-            discardThemePreview()
             setResult(BACK_PRESSED)
             finish()
             overridePendingTransition(0, 0)
@@ -783,8 +780,7 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
             getString(R.string.editor_tuixtactivity_discard_36fff),
             getString(R.string.editor_tuixtactivity_keep_editing_ced7d),
             ConfirmAction {
-                discardThemePreview()
-                setResult(BACK_PRESSED)
+                    setResult(BACK_PRESSED)
                 finish()
                 overridePendingTransition(0, 0)
             })
@@ -792,13 +788,8 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
 
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putBundle("appearance_draft", adapter?.saveDraftState())
-        outState.putInt("appearance_page", appearancePreview?.selectedPage() ?: 0)
         plainTextEditor?.let { outState.putString("plain_text_draft", it.text.toString()) }
         super.onSaveInstanceState(outState)
-    }
-
-    private fun discardThemePreview() {
-        ThemeColorResolver.clearPreview()
     }
 
     private fun hasUnsavedChanges(): Boolean {

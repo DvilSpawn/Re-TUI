@@ -9,7 +9,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 class OutlineEditText : AppCompatEditText {
-    private val idleCursorPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val cursorPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private var idleCursorVisible = false
     private var idleCursorDrawn = true
     private var idleCursorColor = 0xffffffff.toInt()
@@ -63,23 +63,7 @@ class OutlineEditText : AppCompatEditText {
             return
         }
 
-        val text = text
-        val end = text?.length ?: 0
-        var x = compoundPaddingLeft - scrollX.toFloat()
-        if (end > 0) {
-            x += paint.measureText(text, 0, end)
-        }
-
-        val density = resources.displayMetrics.density
-        val lineHeight = max(lineHeight, (18f * density).toInt())
-        val centerY = height / 2
-        val top = max(paddingTop, centerY - lineHeight / 2)
-        val bottom = min(height - paddingBottom, centerY + lineHeight / 2)
-        val width = max(3f * density, 3f)
-
-        idleCursorPaint.color = idleCursorColor
-        idleCursorPaint.style = Paint.Style.FILL
-        canvas.drawRect(x, top.toFloat(), x + width, bottom.toFloat(), idleCursorPaint)
+        IdleCursorPresentation.draw(canvas,this,idleCursorColor,cursorPaint)
     }
 
     override fun onAttachedToWindow() {

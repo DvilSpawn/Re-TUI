@@ -3,7 +3,6 @@ package ohi.andre.consolelauncher.managers
 import android.app.Activity
 import android.content.Context
 import android.graphics.Color
-import android.graphics.PorterDuff
 import android.os.IBinder
 import android.text.InputType
 import android.text.Spannable
@@ -42,6 +41,8 @@ import ohi.andre.consolelauncher.UIManager
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import android.content.Intent
 import ohi.andre.consolelauncher.tuils.ThemeColorSpan
+import ohi.andre.consolelauncher.presentation.HomeAppearance
+import ohi.andre.consolelauncher.presentation.HomeChromePresentation
 
 /*Copyright Francesco Andreuzzi
 
@@ -291,36 +292,31 @@ class TerminalManager(
         prefix = XMLPrefsManager.get(Ui.input_prefix)
         suPrefix = XMLPrefsManager.get(Ui.input_root_prefix)
 
-        val ioSize = XMLPrefsManager.getInt(Ui.input_output_size)
+        val appearance=HomeAppearance.saved()
 
-        prefixView.setTypeface(Tuils.getTypeface(context))
-        prefixView.setTextColor(XMLPrefsManager.getColor(Theme.input_text_color))
-        prefixView.setTextSize(ioSize.toFloat())
-        prefixView.setText(if (prefix.endsWith(Tuils.SPACE)) prefix else prefix + Tuils.SPACE)
-        this.mPrefix = prefixView
-
-        val toolbarColor = XMLPrefsManager.getColor(Theme.toolbar_icon_color)
-        val enterColor = XMLPrefsManager.getColor(Theme.enter_icon_color)
+        HomeChromePresentation.styleTerminalText(prefixView,appearance,true)
+        prefixView.text=if(prefix.endsWith(Tuils.SPACE)) prefix else prefix+Tuils.SPACE
+        this.mPrefix=prefixView
 
         if (submitView != null) {
-            submitView.setColorFilter(enterColor, PorterDuff.Mode.SRC_IN)
+            HomeChromePresentation.styleToolbarIcon(submitView,appearance)
             submitView.setOnClickListener(View.OnClickListener { v: View? -> onNewInput() })
         }
 
         if (backView != null) {
-            backView.setColorFilter(toolbarColor, PorterDuff.Mode.SRC_IN)
+            HomeChromePresentation.styleToolbarIcon(backView,appearance)
             backView.setBackgroundColor(0)
             backView.setOnClickListener(View.OnClickListener { v: View? -> onBackPressed() })
         }
 
         if (nextView != null) {
-            nextView.setColorFilter(toolbarColor, PorterDuff.Mode.SRC_IN)
+            HomeChromePresentation.styleToolbarIcon(nextView,appearance)
             nextView.setBackgroundColor(0)
             nextView.setOnClickListener(View.OnClickListener { v: View? -> onNextPressed() })
         }
 
         if (pasteView != null) {
-            pasteView.setColorFilter(toolbarColor, PorterDuff.Mode.SRC_IN)
+            HomeChromePresentation.styleToolbarIcon(pasteView,appearance)
             pasteView.setBackgroundColor(0)
             pasteView.setOnClickListener(View.OnClickListener { v: View? ->
                 val text = Tuils.getTextFromClipboard(context)
@@ -331,7 +327,7 @@ class TerminalManager(
         }
 
         if (deleteView != null) {
-            deleteView.setColorFilter(toolbarColor, PorterDuff.Mode.SRC_IN)
+            HomeChromePresentation.styleToolbarIcon(deleteView,appearance)
             deleteView.setBackgroundColor(0)
             deleteView.setOnClickListener(View.OnClickListener { v: View? ->
                 this.input = Tuils.EMPTYSTRING
@@ -339,14 +335,11 @@ class TerminalManager(
         }
 
         this.mTerminalView = terminalView
-        this.mTerminalView!!.setTypeface(Tuils.getTypeface(context))
-        this.mTerminalView!!.setTextSize(ioSize.toFloat())
+        HomeChromePresentation.styleTerminalText(this.mTerminalView!!,appearance,false)
         this.mTerminalView!!.setMovementMethod(getInstance(XMLPrefsManager.getInt(Behavior.long_click_duration)))
         this.mTerminalView!!.setTextIsSelectable(true)
 
-        val hintColor = XMLPrefsManager.getColor(Theme.session_info_text_color)
-
-        mTerminalView!!.setHintTextColor(hintColor)
+        HomeChromePresentation.styleOutputText(mTerminalView!!,appearance)
 
         if (clearAfterMs > 0) this.mTerminalView!!.postDelayed(clearRunnable, clearAfterMs.toLong())
         if (maxLines > 0) {
@@ -382,10 +375,7 @@ class TerminalManager(
         this.mScrollView = v
 
         this.mInputView = inputView
-        this.mInputView!!.setTextSize(ioSize.toFloat())
-        this.mInputView!!.setTextColor(XMLPrefsManager.getColor(Theme.input_text_color))
-        this.mInputView!!.setHintTextColor(XMLPrefsManager.getColor(Theme.field_hint_color))
-        this.mInputView!!.setTypeface(Tuils.getTypeface(context))
+        HomeChromePresentation.styleTerminalText(this.mInputView!!,appearance,true)
         this.mInputView!!.setHint(Tuils.getHint(mainPack.currentDirectory.getAbsolutePath()))
         this.mInputView!!.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS)
         Tuils.setCursorDrawableColor(this.mInputView!!, XMLPrefsManager.getColor(Theme.cursor_color))

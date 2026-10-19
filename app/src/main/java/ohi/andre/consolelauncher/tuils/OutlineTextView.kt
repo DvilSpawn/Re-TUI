@@ -7,6 +7,7 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.annotation.Nullable
 
 class OutlineTextView : AppCompatTextView {
+    internal var redrawPassesOverride: Int? = null
 
     constructor(context: Context) : super(context)
 
@@ -15,7 +16,7 @@ class OutlineTextView : AppCompatTextView {
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
     override fun draw(canvas: Canvas) {
-        val drawTimes = OutlineTextView.drawPasses(tag)
+        val drawTimes = if(tag==null) 1 else (redrawPassesOverride ?: redrawTimes).coerceIn(1,8)
 
         for (c in 0 until drawTimes) {
             super.draw(canvas)

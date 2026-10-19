@@ -69,7 +69,35 @@ class RetuiWallpaperService : WallpaperService() {
 
     override fun onCreateEngine(): Engine = RetuiEngine()
 
-    private inner class RetuiEngine : Engine() {
+    private inner class RetuiEngine : Engine(), WallpaperPreviewSource.Source {
+        override fun capturePreview(result: (android.graphics.Bitmap?)->Unit) {
+            if (Build.VERSION.SDK_INT>=24) {
+                val rect=surfaceHolder.surfaceFrame
+                if (!surfaceHolder.surface.isValid) { result(null);return }
+                val bitmap=WallpaperPreviewSource.bitmap(rect.width(),rect.height())
+                if (bitmap==null) { result(null);return }
+                try {
+                    android.view.PixelCopy.request(surfaceHolder.surface,bitmap,{ status ->
+                        if (status==android.view.PixelCopy.SUCCESS) result(bitmap) else { bitmap.recycle();result(null) }
+                    },handler)
+                } catch (_: Exception) { bitmap.recycle();result(null) }
+                return
+            }
+            // PixelCopy is unavailable on Android 6; draw the existing renderer without advancing it.
+            val bitmap=WallpaperPreviewSource.bitmap(view.width,view.height)
+            if (bitmap==null) { result(null);return }
+            try {
+                val canvas=android.graphics.Canvas(bitmap)
+                canvas.scale(bitmap.width.toFloat()/view.width,bitmap.height.toFloat()/view.height)
+                view.draw(canvas)
+                if (AppearanceSettings.crtFilter()) {
+                    crtOverlay.setBounds(0,0,view.width,view.height)
+                    crtOverlay.draw(canvas)
+                }
+            } catch (_: Exception) { bitmap.recycle();result(null);return }
+            result(bitmap)
+        }
+
         private val handler = Handler(Looper.getMainLooper())
         private val powerManager = getSystemService(PowerManager::class.java)
         private val keyguardManager = getSystemService(KeyguardManager::class.java)
@@ -172,6 +200,7 @@ class RetuiWallpaperService : WallpaperService() {
         }
 
         override fun onSurfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
+            if (!isPreview) WallpaperPreviewSource.register(this)
             layoutView(width, height)
             (view as? CloudsView)?.resetClock()
             fullRedrawPending = !draw(fullSurface = true)
@@ -199,6 +228,7 @@ class RetuiWallpaperService : WallpaperService() {
         }
 
         override fun onDestroy() {
+            WallpaperPreviewSource.unregister(this)
             handler.removeCallbacks(drawFrame)
             visible = false
             interactionEnabled = false

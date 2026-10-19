@@ -17,6 +17,17 @@ class MusicVisualizerView : View {
     private val targets = FloatArray(BAR_COUNT)
     private val random = Random(1337L)
 
+    private var frozen = false
+    internal data class Frame(val bars:List<Float>,val color:Int,val opacity:Float)
+    internal fun captureFrame()=Frame(heights.toList(),barColor,alpha)
+    internal fun setFrozenFrame(frame:Frame,color:Int?=null) {
+        frozen=true;playing=false
+        for(i in heights.indices) { heights[i]=frame.bars.getOrElse(i){MIN_BAR};targets[i]=heights[i] }
+        barColor=color?.let { Color.argb(140,Color.red(it),Color.green(it),Color.blue(it)) }?:frame.color
+        paint.color=barColor;alpha=frame.opacity
+        invalidate()
+    }
+
     private var playing = false
     private var lastFrameTime = 0L
     private var barColor = Color.parseColor("#66FF3B30")
@@ -80,7 +91,7 @@ class MusicVisualizerView : View {
             lastFrameTime = now
         }
 
-        if (playing && now - lastFrameTime >= FRAME_DELAY_MS) {
+        if (!frozen && playing && now - lastFrameTime >= FRAME_DELAY_MS) {
             lastFrameTime = now
             updateTargets()
         }
@@ -89,16 +100,16 @@ class MusicVisualizerView : View {
         val barWidth = max(4f, spacing * 0.72f)
 
         for (i in 0 until BAR_COUNT) {
-            heights[i] += (targets[i] - heights[i]) * if (playing) 0.22f else 0.1f
+            if(!frozen) heights[i] += (targets[i] - heights[i]) * if (playing) 0.22f else 0.1f
             val left = i * spacing
             val right = left + barWidth
             val top = height * (1f - clamp(heights[i]))
             canvas.drawRect(left, top, right, height.toFloat(), paint)
         }
 
-        if (playing && isShown) {
+        if (!frozen && playing && isShown) {
             postInvalidateDelayed(FRAME_DELAY_MS)
-        } else if (!isCollapsed() && isCollapsing()) {
+        } else if (!frozen && !isCollapsed() && isCollapsing()) {
             postInvalidateDelayed(FRAME_DELAY_MS)
         }
     }
