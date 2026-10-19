@@ -10,6 +10,11 @@ enum class Toolbar(
     private val info: Int,
     private val type: String
 ) : XMLPrefsSave {
+    gesture_button_enabled("false", R.string.setting_toolbar_gesture_enabled, XMLPrefsSave.BOOLEAN),
+    gesture_up("", R.string.setting_toolbar_gesture_up, XMLPrefsSave.TEXT),
+    gesture_down("", R.string.setting_toolbar_gesture_down, XMLPrefsSave.TEXT),
+    gesture_left("", R.string.setting_toolbar_gesture_left, XMLPrefsSave.TEXT),
+    gesture_right("", R.string.setting_toolbar_gesture_right, XMLPrefsSave.TEXT),
     show_toolbar("true", R.string.setting_toolbar_show_toolbar_description, XMLPrefsSave.BOOLEAN),
     hide_toolbar_no_input("false", R.string.setting_toolbar_hide_toolbar_no_input_description, XMLPrefsSave.BOOLEAN),
     shortcut_button_1_enabled("false", R.string.setting_toolbar_shortcut_button_1_enabled_description, XMLPrefsSave.BOOLEAN),

@@ -304,6 +304,7 @@ class UIManager(
     private var policy: DevicePolicyManager?
     private var component: ComponentName?
     private var swipeDownNotifications: Boolean
+    private var gestureStartedOnOutput = false
     private var swipeUpAppsDrawer: Boolean
     private var gestureDetector: GestureDetectorCompat? = null
     private var appDrawerPaneManager: AppDrawerPaneManager? = null
@@ -1289,6 +1290,21 @@ class UIManager(
         }
 
         var added = 0
+        if (XMLPrefsManager.getBoolean(Toolbar.gesture_button_enabled)) {
+            val button = ohi.andre.consolelauncher.tuils.ToolbarGestureButton(mContext!!) { direction ->
+                val option = when (direction) {
+                    ohi.andre.consolelauncher.tuils.ToolbarGestureDirection.UP -> Toolbar.gesture_up
+                    ohi.andre.consolelauncher.tuils.ToolbarGestureDirection.DOWN -> Toolbar.gesture_down
+                    ohi.andre.consolelauncher.tuils.ToolbarGestureDirection.LEFT -> Toolbar.gesture_left
+                    ohi.andre.consolelauncher.tuils.ToolbarGestureDirection.RIGHT -> Toolbar.gesture_right
+                }
+                XMLPrefsManager.get(option)?.takeIf { it.isNotBlank() }?.let { executeToolbarShortcut(it) }
+            }
+            button.setColorFilter(XMLPrefsManager.getColor(Theme.toolbar_icon_color), PorterDuff.Mode.SRC_IN)
+            styleToolbarButtonChrome(button)
+            toolbarLayout.addView(button, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1f))
+            added++
+        }
         for (slotIndex in 1..ToolbarShortcutManager.MAX_SLOTS) {
             val slot = slot(slotIndex)
             if (!slot.enabled) {
@@ -5860,7 +5876,7 @@ class UIManager(
         lockOnDbTap = XMLPrefsManager.getBoolean(Behavior.double_tap_lock)
         doubleTapCmd = XMLPrefsManager.get(Behavior.double_tap_cmd)
         swipeDownNotifications = XMLPrefsManager.getBoolean(Behavior.swipe_down_notifications)
-        swipeUpAppsDrawer = false
+        swipeUpAppsDrawer = XMLPrefsManager.getBoolean(Behavior.swipe_up_apps_drawer)
 
         if (!lockOnDbTap && doubleTapCmd == null && !swipeDownNotifications && !swipeUpAppsDrawer) {
             policy = null
@@ -5870,7 +5886,7 @@ class UIManager(
             gestureDetector =
                 GestureDetectorCompat(mContext!!, object : GestureDetector.OnGestureListener {
                     override fun onDown(e: MotionEvent): Boolean {
-                        return false
+                        return true
                     }
 
                     override fun onShowPress(e: MotionEvent) {}
@@ -5896,6 +5912,11 @@ class UIManager(
                         velocityX: Float,
                         velocityY: Float
                     ): Boolean {
+                        if (gestureStartedOnOutput) return false
+                        if (swipeUpAppsDrawer && velocityY < -100 && abs(velocityY) > abs(velocityX)) {
+                            showAppsDrawer()
+                            return true
+                        }
                         if (swipeDownNotifications && velocityY > 100 && abs(velocityY) > abs(
                                 velocityX
                             )
@@ -5948,6 +5969,7 @@ class UIManager(
                 onLauncherInteraction()
             }
             if (gestureDetector != null && event != null) {
+                if (event.actionMasked == MotionEvent.ACTION_DOWN) gestureStartedOnOutput = false
                 val handled = gestureDetector!!.onTouchEvent(event)
                 if (!handled && event.action == MotionEvent.ACTION_UP) {
                     v!!.performClick()
@@ -12959,11 +12981,14 @@ class UIManager(
 
     override fun onTouch(v: View, event: MotionEvent): Boolean {
         onLauncherInteraction()
-        gestureDetector?.onTouchEvent(event)
+        if (event.actionMasked == MotionEvent.ACTION_DOWN) {
+            gestureStartedOnOutput = v === terminalView || v === terminalView?.parent?.parent
+        }
+        val handled = gestureDetector?.onTouchEvent(event) == true
         if (event.actionMasked == MotionEvent.ACTION_UP) {
             v.performClick()
         }
-        return v.onTouchEvent(event)
+        return if (gestureStartedOnOutput) v.onTouchEvent(event) else handled || v.onTouchEvent(event)
     }
 
     private fun onLauncherInteraction() {

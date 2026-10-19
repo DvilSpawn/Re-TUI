@@ -424,7 +424,7 @@ internal fun panel(
     theme.frame?.let { return it.drawable(ColorDrawable(color), interactive) }
     return GradientDrawable().apply {
         setColor(color)
-        setStroke(
+        if (theme.cyberdeck || theme.dashed) setStroke(
             ((if (theme.cyberdeck) 3f else theme.stroke) * density).roundToInt().coerceAtLeast(1),
             border,
             if (theme.dashed) theme.dash * density else 0f,

@@ -528,7 +528,11 @@ object XMLPrefsManager {
             is Ui -> uiSection(label)
             is Behavior -> behaviorSection(label)
             is Suggestions -> suggestionsSection(label)
-            is Toolbar -> if (label.startsWith("shortcut_button")) "Custom Shortcuts" else "Visibility"
+            is Toolbar -> when {
+                label.startsWith("gesture_") -> "Gesture Button"
+                label.startsWith("shortcut_button") -> "Custom Shortcuts"
+                else -> "Visibility"
+            }
             is Notifications -> notificationSection(label)
             is Apps -> if (label.startsWith("default_app_n")) "Default App Suggestions" else "App Drawer"
             is Rss -> rssSection(label)

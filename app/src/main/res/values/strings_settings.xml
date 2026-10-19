@@ -202,7 +202,7 @@
     <!-- Behavior.kt: show_weather_updates -->
     <string name="setting_behavior_show_weather_updates_description" formatted="false">"If false, Re:T-UI won\'t show information about the weather in the output field"</string>
     <!-- Behavior.kt: swipe_up_apps_drawer -->
-    <string name="setting_behavior_swipe_up_apps_drawer_description" formatted="false">"If true, swiping up will open the apps drawer"</string>
+    <string name="setting_behavior_swipe_up_apps_drawer_description" formatted="false">"Show the apps drawer button and allow swipe-up on non-scrolling launcher surfaces. Terminal output remains scrollable"</string>
     <!-- Behavior.kt: show_music_widget -->
     <string name="setting_behavior_show_music_widget_description" formatted="false">"If true, the music module will be shown in the context container"</string>
     <!-- Behavior.kt: auto_show_music_widget -->
@@ -893,4 +893,10 @@
     <string name="setting_ui_output_header_text_size_description" formatted="false">"Text size for output and overlay header labels (sp)"</string>
     <string name="setting_theme_suggestions_text_shadow_color_description">Text shadow color for launcher suggestions, search categories and module suggestion buttons. Transparent disables the shadow. Offset and blur use shadow_params.</string>
     <string name="setting_theme_module_text_shadow_color_description">Text shadow color for module panel text, headings and controls. Transparent disables the shadow. Offset and blur use shadow_params.</string>
+    <string name="setting_toolbar_gesture_enabled">Show a toolbar button: hold until it vibrates, drag in a direction, then release. Drag back to the centre to cancel.</string>
+    <string name="setting_toolbar_gesture_up">Up: app launcher name or command, for example notifications -open. Empty disables this direction.</string>
+    <string name="setting_toolbar_gesture_down">Down: app launcher name or command. Empty disables this direction.</string>
+    <string name="setting_toolbar_gesture_left">Left: app launcher name or command. Empty disables this direction.</string>
+    <string name="setting_toolbar_gesture_right">Right: app launcher name or command. Empty disables this direction.</string>
+    <string name="toolbar_gesture_hint">Hold, drag up/down/left/right, then release</string>
 </resources>

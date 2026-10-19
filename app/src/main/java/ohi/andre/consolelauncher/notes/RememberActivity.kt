@@ -717,6 +717,7 @@ class RememberActivity : ohi.andre.consolelauncher.localization.LocalizedCompone
             .coerceIn(dp(4), resources.displayMetrics.widthPixels - width - dp(4))
         val y = editorLocation[1] + editor.totalPaddingTop + layout.getLineBottom(endLine) + editor.lineHeight * 2
         selectionPopup = PopupWindow(content, width, -2, false).apply {
+            animationStyle = 0
             isOutsideTouchable = true
             isTouchable = true
             setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -759,6 +760,7 @@ class RememberActivity : ohi.andre.consolelauncher.localization.LocalizedCompone
         }
         applyRetuiStyle(content, theme)
         headingPopup = PopupWindow(content, dp(138), dp(44), false).apply {
+            animationStyle = 0
             isOutsideTouchable = true
             isTouchable = true
             setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -1018,11 +1020,13 @@ class RememberActivity : ohi.andre.consolelauncher.localization.LocalizedCompone
         }
         applyRetuiStyle(shell, theme)
         dialog = AlertDialog.Builder(this).setView(shell).create()
+        dialog.create()
+        dialog.window?.apply {
+            setWindowAnimations(0)
+            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            setLayout((resources.displayMetrics.widthPixels * 0.9f).roundToInt(), ViewGroup.LayoutParams.WRAP_CONTENT)
+        }
         dialog.setOnShowListener {
-            dialog.window?.apply {
-                setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-                setLayout((resources.displayMetrics.widthPixels * 0.9f).roundToInt(), ViewGroup.LayoutParams.WRAP_CONTENT)
-            }
             focus?.requestFocus()
             if (focus is EditText) {
                 (getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager).showSoftInput(focus, InputMethodManager.SHOW_IMPLICIT)

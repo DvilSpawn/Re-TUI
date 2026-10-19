@@ -312,7 +312,15 @@ You can reopen these notes with the changelog command. These highlights are bund
 - Notes now shares the pane frame, header, window controls and background blur used by Help and Calculator.
 - Notes actions sit inside the pane with simpler controls, improved spacing and room for the keyboard.
 - Use 10 Help home from any offline help article, topic list or command reference to jump directly to the main directory.
-- Updated offline topics for Notes, Settings previews, Private Space, the optional Qalculate engine and Termux SSH setup.</string>
+- Updated offline topics for Notes, Settings previews, Private Space, the optional Qalculate engine and Termux SSH setup.
+
+## Hotfix 3 · Build 506
+
+- Notes dialogs, fields, cards and formatting popups now respect the selected border style, including borders off.
+- New-note and other Notes dialogs open at their final size without the entrance animation.
+- Added an optional toolbar gesture button: hold until it vibrates, drag up/down/left/right, then release. Return to the centre to cancel.
+- Configure gesture_button_enabled and gesture_up/down/left/right in toolbar.xml. Each direction accepts an app launcher name, alias or command; empty directions are disabled. For example, set gesture_up to notifications -open.
+- Restored swipe-up for the app drawer on non-scrolling launcher surfaces. Terminal output remains dedicated to scrolling.</string>
     <string name="command_bluetooth_false_4603a">%1$s false</string>
     <string name="command_bluetooth_opening_bluetooth_settings_android_no_long_c4672">Opening Bluetooth settings. Android no longer allows third-party launchers to toggle Bluetooth directly.</string>
     <string name="command_bluetooth_true_630fa">%1$s true</string>
@@ -4487,7 +4495,7 @@ Disabling this option hides Re:TUI access; it does not lock Private Space. Save 
     <string name="setting_behavior_status_time_format_description">Define the time format for the status lines at the top. You can resize parts with [size=30]HH:mm[/size], use {clock_words} for Six Fifty Seven, and use %n for a new line</string>
     <string name="setting_behavior_storage_format_description">Define the storage format</string>
     <string name="setting_behavior_swipe_down_notifications_description">If true, swiping down will expand the notification shade</string>
-    <string name="setting_behavior_swipe_up_apps_drawer_description">If true, swiping up will open the apps drawer</string>
+    <string name="setting_behavior_swipe_up_apps_drawer_description">Show the apps drawer button and allow swipe-up on non-scrolling launcher surfaces. Terminal output remains scrollable</string>
     <string name="setting_behavior_time_format_separator_description">This is the separator between your different time formats</string>
     <string name="setting_behavior_toggle_output_state_description">Legacy output tray toggle. Use output_tray_mode=toggled for manual expanded/collapsed control</string>
     <string name="setting_behavior_tui_notification_click_cmd_description">The command ran when the Re:T-UI notification is clicked</string>
@@ -4813,6 +4821,11 @@ Disabling this option hides Re:TUI access; it does not lock Private Space. Save 
     <string name="setting_theme_workspace_panel_background_color_description">Background color for the main panel in workspace panels, including the calculator. AUTO follows terminal_window_background_color.</string>
     <string name="setting_theme_workspace_panel_border_color_description">Border color for the main panel in workspace panels, including the calculator. AUTO follows terminal_border_color.</string>
     <string name="setting_theme_workspace_panel_text_color_description">Shared text color for calculator and offline help bodies, prompts and title bars, and default embedded Termux grid text and panel labels. Explicit ANSI colors are retained. AUTO follows output_text_color.</string>
+    <string name="setting_toolbar_gesture_down">Down: app launcher name or command. Empty disables this direction.</string>
+    <string name="setting_toolbar_gesture_enabled">Show a toolbar button: hold until it vibrates, drag in a direction, then release. Drag back to the centre to cancel.</string>
+    <string name="setting_toolbar_gesture_left">Left: app launcher name or command. Empty disables this direction.</string>
+    <string name="setting_toolbar_gesture_right">Right: app launcher name or command. Empty disables this direction.</string>
+    <string name="setting_toolbar_gesture_up">Up: app launcher name or command, for example notifications -open. Empty disables this direction.</string>
     <string name="setting_toolbar_hide_toolbar_no_input_description">If true, the toolbar will be hidden when the input field is empty</string>
     <string name="setting_toolbar_shortcut_button_1_command_description">Command, alias, or app name executed by the first custom toolbar button</string>
     <string name="setting_toolbar_shortcut_button_1_enabled_description">If true, the first custom toolbar button is shown</string>
@@ -5873,6 +5886,7 @@ TASKER       </string>
     <string name="themer_wallpaper_picker_is_unavailable_on_this_device_a5a4d">Wallpaper picker is unavailable on this device.</string>
     <string name="themer_x_px_changes_stay_staged_until_save_frame_settings_d0a46">%1$s  •  %2$d x %3$d px
 Changes stay staged until Save Frame Settings.</string>
+    <string name="toolbar_gesture_hint">Hold, drag up/down/left/right, then release</string>
     <string name="toolbar_icon_apps">Apps</string>
     <string name="toolbar_icon_bell">Bell</string>
     <string name="toolbar_icon_chat">Chat</string>

@@ -22,7 +22,7 @@ fun Activity.showNewNotePrompt(
     initialFolderId: String?,
     openExisting: (id: String) -> Unit,
     create: (name: String, folderId: String?) -> Unit
-) {
+): AlertDialog {
     fun dp(value: Int) = (value * resources.displayMetrics.density).toInt()
     val folders = availableFolders.sortedBy { it.name.lowercase() }
     val folderIds = listOf<String?>(null) + folders.map { it.id }
@@ -35,6 +35,8 @@ fun Activity.showNewNotePrompt(
         tag = "retui_input"
     }
     val directory = Spinner(this).apply {
+        setPopupBackgroundDrawable(panel(theme.inputBg, theme.panelBorder, theme.radius, theme,
+            resources.displayMetrics.density))
         adapter = object : ArrayAdapter<String>(this@showNewNotePrompt, android.R.layout.simple_spinner_item, folderNames) {
             init { setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
             private fun style(view: View, dropdown: Boolean): View = view.apply {
@@ -137,12 +139,15 @@ fun Activity.showNewNotePrompt(
     }
     applyRetuiStyle(shell, theme)
     dialog = AlertDialog.Builder(this).setView(shell).create()
+    dialog.create()
+    dialog.window?.apply {
+        setWindowAnimations(0)
+        setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        setLayout((resources.displayMetrics.widthPixels * 0.9f).toInt(), ViewGroup.LayoutParams.WRAP_CONTENT)
+    }
     dialog.setOnShowListener {
-        dialog.window?.apply {
-            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            setLayout((resources.displayMetrics.widthPixels * 0.9f).toInt(), ViewGroup.LayoutParams.WRAP_CONTENT)
-        }
         title.requestFocus()
     }
     dialog.show()
+    return dialog
 }
