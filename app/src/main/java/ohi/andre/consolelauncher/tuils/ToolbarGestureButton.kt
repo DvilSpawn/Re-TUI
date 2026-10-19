@@ -4,7 +4,7 @@ import android.content.Context
 import android.view.HapticFeedbackConstants
 import android.view.MotionEvent
 import android.view.ViewConfiguration
-import android.widget.ImageButton
+import androidx.appcompat.widget.AppCompatImageButton
 import android.widget.Toast
 import ohi.andre.consolelauncher.R
 import kotlin.math.abs
@@ -23,7 +23,7 @@ internal enum class ToolbarGestureDirection {
 }
 
 /** Owns its touch stream so dragging never scrolls the terminal underneath it. */
-internal class ToolbarGestureButton(context: Context, private val execute: (ToolbarGestureDirection) -> Unit) : ImageButton(context) {
+internal class ToolbarGestureButton(context: Context, private val execute: (ToolbarGestureDirection) -> Unit) : AppCompatImageButton(context) {
     private var downX = 0f
     private var downY = 0f
     private var armed = false
