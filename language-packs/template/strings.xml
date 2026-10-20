@@ -970,6 +970,9 @@ Timer paused.</string>
     <string name="frame_pack_name_length">Pack name must be 1 to 80 characters.</string>
     <string name="frame_right">Right</string>
     <string name="frame_role_error">%1$s: %2$s</string>
+    <string name="frame_selector_collapsed">Collapsed</string>
+    <string name="frame_selector_default">Default border</string>
+    <string name="frame_selector_expanded">Expanded</string>
     <string name="frame_slices_center">Slices must leave a center region inside the %1$s x %2$s PNG.</string>
     <string name="frame_slices_positive">Slice values must be positive whole pixels.</string>
     <string name="frame_stretch">Stretch</string>

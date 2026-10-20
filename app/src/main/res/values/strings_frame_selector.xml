@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="frame_selector_default">Default border</string>
+    <string name="frame_selector_expanded">Expanded</string>
+    <string name="frame_selector_collapsed">Collapsed</string>
+</resources>

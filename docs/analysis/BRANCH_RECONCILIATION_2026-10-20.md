@@ -21,7 +21,8 @@ Two branch histories contained exact patch equivalents already on master:
 Both were merged with the `ours` strategy **only after every branch patch was
 verified as already applied**. Each merge retained exactly the preceding master
 tree. This records ancestry without replacing newer code with the old copies.
-The application implementation remains the tested `681e7bbc` implementation.
+At the end of the initial reconciliation, the application implementation remained
+the tested `681e7bbc` implementation. The later inline-selector work is recorded below.
 
 ## User decisions after reconciliation
 
@@ -35,13 +36,32 @@ The application implementation remains the tested `681e7bbc` implementation.
 - **Abandon the historical separate GitHub build flavor** on
   `origin/Dvil/github-release`. Do not restore its separate application ID or
   package-specific routing. No remote branch was deleted.
-- **Inline frame selector: explanation requested, no merge requested.** Keep
-  `backups-frames` available while this is discussed. Its reusable idea is a
-  collapsible list of already-imported frames under each surface's assignment;
-  any implementation must use the current frame-pack model.
+- **Inline frame selector: rework and local-master commit authorized.** Adapted
+  the collapsible selector to the current draft library and frame-pack model;
+  the older implementation was not copied over current frame management.
 
-The remaining undecided items below retain their original disposition. These
-decisions change the merge candidates, not application code or preserved files.
+The remaining undecided items below retain their original disposition. Terminal
+Home, ASCII World / Fortress and the mixed prototype checkouts remain preserved.
+
+### Inline frame selector implementation
+
+Tapping a surface's `FRAME:` row expands the choices directly underneath it.
+Choices include Default Border, existing pack assets and unused imports still
+present in the draft. Names are sorted without duplicate asset IDs; unavailable
+assets are marked and disabled. Selection updates only that draft assignment and
+the PNG preview. The existing Save Frame Settings flow publishes the edits.
+The picker also supports all-surfaces mode, closes after a choice or mode change,
+and exposes its expanded state to accessibility services.
+
+Validation: Play Store debug APK and instrumentation APK assembled; all 25
+`FrameManagerTest` unit tests and three focused Android emulator tests passed
+(two inline-selector tests plus settings Back navigation). Tests exercised reuse,
+pack/unused assets, missing/corrupt assets, per-surface and global choices, and
+unchanged active state bytes before Save. Localization exports are synchronized.
+Runtime notices passed separately for all 73 external components; the filtered
+debug build excluded that task because it disables release configurations.
+Screenshot: `build/inline-frame-selector.png`. No physical phone or release build
+was tested for this change.
 
 ## Pruned local branches
 
@@ -65,7 +85,7 @@ registration for the already-missing `/private/tmp/retui-irc-fix.qZiiwC` was pru
 | `codex/terminal-mode` | The normal SSH pane and Classic/Search modes. | New `mode terminal`: persistent scrolling SSH tile dashboard, bottom Search with +/settings, blurred Search overlay, widget scripts, more than two SSH viewers, helper 0.4.8 and associated tests. Master has no `TerminalHomeView` or Terminal mode enum value. | Keep if Terminal Home is wanted; port onto the current scene/layout code and validate before merging. |
 | `dvil/settings-preview-carousel` | Core live settings preview and shared current rendering, committed in `681e7bbc`. The optional WebAssembly calculator engine is also already on master. | The earlier alternative renderer architecture, including direct draft-aware clock/RAM/storage/network/notes/unlock collectors and a standalone clock. Those can preview non-battery behavior-format edits; the current cards use captured launcher output for those rows. Old tests/docs and earlier calculator copies are also present. | Do not replace current preview/rendering with the old implementation. Decide whether to port only the additional draft-format preview behavior; abandon duplicate infrastructure only after that decision. |
 | `codex/downloadable-features` | Downloadable wallpaper packs, renderer assets, the wallpaper catalogue, and the newer portable Qalculate engine pack. | Older native companion APK (`:qalculate-runtime` plus `QalculateProtocol`), `feature -list` / `feature -get qalculate`, older hosted-WebView gallery, extra marketplace device tests and prototype documentation. | Native calculator companion and its install commands abandoned by the user. Gallery, tests and generic feature-discovery command remain undecided; preserve the mixed checkout. |
-| `backups-frames` (`294fb864`) | Re:Member frame target, app-launch theme extras and their current test assertion. | An inline expand/collapse frame selector. The old code depends on the former asset-list API and does not match the current frame-pack/per-element UI. | Decide whether to reintroduce an inline selector; the Re:Member parts need no duplicate merge. |
+| `backups-frames` (`294fb864`) | Re:Member frame target, app-launch theme extras and their current test assertion. Inline selection is now reworked for the current frame-pack/per-element UI. | The obsolete implementation using the former asset-list API. | No further feature merge required; old branch remains a recovery reference. |
 
 The first three have **uncommitted** changes even though their committed branch
 tips are already ancestors of master. A plain Git merge would miss those changes.

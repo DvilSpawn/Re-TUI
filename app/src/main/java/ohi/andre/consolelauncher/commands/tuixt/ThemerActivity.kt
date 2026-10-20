@@ -140,6 +140,7 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
     private var pendingFontFileName: String? = null
     private var pendingTypographySizes: MutableMap<XMLPrefsSave, Int>? = null
     private var pendingFrameTarget: FrameTarget? = null
+    private var expandedFrameSelector: String? = null
     class HubState : ViewModel() {
         var frameEditSession: FrameManager.EditSession? = null
         @Volatile var fileOperationRunning = false
@@ -187,6 +188,7 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
                 }
             }
             pendingFrameTarget = state.getString("hub_frame_target")?.let { id -> FrameTarget.entries.firstOrNull { it.id == id } }
+            expandedFrameSelector = state.getString("hub_frame_selector")
             pendingRestoreUri = state.getString("hub_restore_uri")?.let(Uri::parse)
             backupExportPending = state.getBoolean("hub_export_pending") &&
                 (!state.getBoolean("hub_export_encrypted") || pendingBackupPassword != null)
@@ -722,6 +724,7 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
+        outState.putString("hub_frame_selector", expandedFrameSelector)
         outState.putString("hub_section", section)
         outState.putStringArrayList("hub_history", ArrayList(sectionBackStack))
         pendingFontSizeOffset?.let { outState.putInt("hub_font_offset", it) }
@@ -815,6 +818,7 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
             pendingFontFileName = null
             pendingTypographySizes = null
         }
+        if (targetSection != SECTION_FRAMES) expandedFrameSelector = null
         section = targetSection
         header!!.setText(getHeaderText(section))
         sectionItems.clear()
@@ -890,6 +894,7 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
             setOnCheckedChangeListener { _, checked ->
                 try {
                     session.applyToAll = checked
+                    expandedFrameSelector = null
                     sectionsAdapter?.notifyDataSetChanged()
                 } catch (error: Exception) {
                     Toast.makeText(this@ThemerActivity, error.displayMessage(this@ThemerActivity), Toast.LENGTH_LONG).show()
@@ -998,12 +1003,56 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
         }, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
         row.addView(previewRow)
 
+        val selectorKey = target?.id ?: "global"
+        val expanded = expandedFrameSelector == selectorKey
         row.addView(TextView(this).apply {
             val selected = session.selectedAssetId(target)
-            text = if (selected == null) getString(R.string.themer_frame_default_border_03aae) else
+            val label = if (selected == null) getString(R.string.themer_frame_default_border_03aae) else
                 getString(R.string.themer_frame_9fec1, session.assignedName(target) ?: getString(R.string.themer_missing_or_corrupt_c7da0))
+            text = "$label ${if (expanded) "▴" else "▾"}"
             styleButton(this@ThemerActivity, this, false)
+            isFocusable = true
+            androidx.core.view.ViewCompat.setStateDescription(this, getString(
+                if (expanded) R.string.frame_selector_expanded else R.string.frame_selector_collapsed
+            ))
+            setOnClickListener {
+                expandedFrameSelector = if (expanded) null else selectorKey
+                sectionsAdapter?.notifyDataSetChanged()
+            }
         }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(this, 46f)))
+
+        if (expanded) {
+            val selectedId = session.selectedAssetId(target)
+            val options = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                setPadding(0, dp(this@ThemerActivity, 6f), 0, dp(this@ThemerActivity, 8f))
+            }
+            listOf<FrameManager.FrameAsset?>(null).plus(session.assets()).forEach { asset ->
+                options.addView(TextView(this).apply {
+                    text = when {
+                        asset == null -> getString(R.string.frame_selector_default)
+                        asset.valid -> asset.name
+                        else -> "⚠ ${asset.name}: ${getString(R.string.themer_missing_or_corrupt_c7da0)}"
+                    }
+                    styleListItem(this@ThemerActivity, this, asset?.id == selectedId)
+                    isEnabled = asset?.valid != false
+                    isFocusable = isEnabled
+                    if (!isEnabled) alpha = 0.5f
+                    setOnClickListener {
+                        try {
+                            session.select(target, asset?.id)
+                            expandedFrameSelector = null
+                            sectionsAdapter?.notifyDataSetChanged()
+                        } catch (error: Exception) {
+                            Toast.makeText(this@ThemerActivity, error.displayMessage(this@ThemerActivity), Toast.LENGTH_LONG).show()
+                        }
+                    }
+                }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+                    bottomMargin = dp(this@ThemerActivity, 4f)
+                })
+            }
+            row.addView(options)
+        }
 
         val actions = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
         actions.addView(TextView(this).apply {
@@ -2114,6 +2163,7 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
     }
 
     private fun reloadForFrame(message: String) {
+        expandedFrameSelector = null
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
         sectionsAdapter?.notifyDataSetChanged()
     }

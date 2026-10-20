@@ -123,7 +123,7 @@ object FrameManager {
     @Volatile private var cachedState: FrameState? = null
     @Volatile private var bundledPackReady = false
 
-    data class FrameAsset(val id: String, val name: String)
+    data class FrameAsset(val id: String, val name: String, val valid: Boolean = true)
 
     data class FrameDetails(
         val name: String,
@@ -279,6 +279,21 @@ object FrameManager {
 
         fun packs(): List<FramePack> = state.packs.values
             .sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.name })
+
+        fun assets(): List<FrameAsset> {
+            val ids = referencedAssetIds(state).toMutableSet()
+            directory.listFiles().orEmpty().mapNotNullTo(ids) { assetId(it.name) }
+            return ids.map { id ->
+                try {
+                    val parsed = parseBundle(FileInputStream(assetFile(directory, id)).use {
+                        it.readLimited(MAX_BUNDLE_BYTES, LocalizedArgumentException(R.string.frame_limit_13aa8bbe))
+                    })
+                    FrameAsset(id, parsed.name)
+                } catch (_: Exception) {
+                    FrameAsset(id, id.take(8), valid = false)
+                }
+            }.sortedWith(compareBy<FrameAsset, String>(String.CASE_INSENSITIVE_ORDER) { it.name }.thenBy { it.id })
+        }
 
         fun activePackId(): String? = state.activePackId
 

@@ -5097,6 +5097,27 @@
     },
     "type": "string"
   },
+  "frame_selector_collapsed": {
+    "formatted": true,
+    "forms": {
+      "other": "Collapsed"
+    },
+    "type": "string"
+  },
+  "frame_selector_default": {
+    "formatted": true,
+    "forms": {
+      "other": "Default border"
+    },
+    "type": "string"
+  },
+  "frame_selector_expanded": {
+    "formatted": true,
+    "forms": {
+      "other": "Expanded"
+    },
+    "type": "string"
+  },
   "frame_slices_center": {
     "formatted": true,
     "forms": {
