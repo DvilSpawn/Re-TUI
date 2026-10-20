@@ -265,9 +265,10 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
             )
             recyclerView!!.setAdapter(adapter)
             adapter?.restoreDraftState(savedInstanceState?.getBundle("appearance_draft"))
-            if (xmlRoot == XMLPrefsRoot.UI || xmlRoot == XMLPrefsRoot.THEME || xmlRoot == XMLPrefsRoot.BEHAVIOR) {
+            if (xmlRoot == XMLPrefsRoot.UI || xmlRoot == XMLPrefsRoot.THEME || xmlRoot == XMLPrefsRoot.BEHAVIOR || xmlRoot == XMLPrefsRoot.TOOLBAR || xmlRoot == XMLPrefsRoot.SUGGESTIONS) {
                 appearancePreview = SettingsAppearancePreview(this, { item -> adapter?.draftValue(item) }, { item -> adapter?.hasDraft(item) == true }).also {
                     root.addView(it, 0, LinearLayout.LayoutParams(-1, -2))
+                    it.restorePage(savedInstanceState?.getInt("appearance_page") ?: 0)
                     it.refresh()
                 }
             }
@@ -788,6 +789,7 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
 
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putBundle("appearance_draft", adapter?.saveDraftState())
+        outState.putInt("appearance_page", appearancePreview?.selectedPage() ?: 0)
         plainTextEditor?.let { outState.putString("plain_text_draft", it.text.toString()) }
         super.onSaveInstanceState(outState)
     }

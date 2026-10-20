@@ -1725,7 +1725,7 @@ Wiki:
     <string name="hub_preferred_music_app">Preferred Music App</string>
     <string name="hub_presets">Presets</string>
     <string name="hub_rate_the_app">Rate the App</string>
-    <string name="hub_re_keyboard_shortcuts">Re Keyboard Shortcuts</string>
+    <string name="hub_re_keyboard_shortcuts">RE:TUI Keys Shortcuts</string>
     <string name="hub_reddit">Reddit</string>
     <string name="hub_remove_preset">Remove Preset</string>
     <string name="hub_restore">Restore</string>
@@ -4956,17 +4956,20 @@ Disabling this option hides Re:TUI access; it does not lock Private Space. Save 
     <string name="settings_file_operation_working">Working on your files…</string>
     <string name="settings_font_too_large">Font files must be 8 MiB or smaller.</string>
     <string name="settings_preview_ansi">ANSI</string>
+    <string name="settings_preview_ansi_caption">ANSI SAMPLE · Draft palette · Save to apply</string>
     <string name="settings_preview_current_home">YOUR LAUNCHER · Unsaved preview · Tap to expand</string>
     <string name="settings_preview_disabled">Disabled</string>
-    <string name="settings_preview_draft">LIVE PREVIEW · Sample content · Apply with Save</string>
+    <string name="settings_preview_draft">LIVE VALUES · Draft appearance · Save to apply</string>
     <string name="settings_preview_expand">Expand launcher preview</string>
     <string name="settings_preview_home_unavailable">Open the launcher first to preview your current layout.</string>
     <string name="settings_preview_module_card">MODULE</string>
     <string name="settings_preview_modules">Modules</string>
+    <string name="settings_preview_no_launcher">Open the launcher to preview its current output and input.</string>
     <string name="settings_preview_normal">Normal</string>
     <string name="settings_preview_page">%1$s · %2$d / %3$d · Swipe to explore</string>
     <string name="settings_preview_palette">ANSI palette · Normal 30–37 / Bright 90–97</string>
     <string name="settings_preview_return_editor">Return to editor · Changes are not applied</string>
+    <string name="settings_preview_sample_caption">SAMPLE CONTENT · Draft appearance · Save to apply</string>
     <string name="settings_preview_selected">Selected</string>
     <string name="settings_preview_status">Status</string>
     <string name="settings_preview_status_card">STATUS</string>
@@ -5786,7 +5789,7 @@ DEFAULT BORDER FALLBACK</string>
     <string name="themer_presets_theme_modules_terminal_output_e4fc7">
 
 PRESETS · THEME · MODULES · TERMINAL OUTPUT</string>
-    <string name="themer_re_keyboard_shortcuts_310c5">Re Keyboard Shortcuts</string>
+    <string name="themer_re_keyboard_shortcuts_310c5">RE:TUI Keys Shortcuts</string>
     <string name="themer_re_t_ui_appearance_settings_f0df9">Re:T-UI Appearance Settings</string>
     <string name="themer_re_t_ui_behavior_settings_01843">Re:T-UI Behavior Settings</string>
     <string name="themer_re_t_ui_fonts_45a98">Re:T-UI Fonts</string>

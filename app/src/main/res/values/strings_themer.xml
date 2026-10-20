@@ -323,7 +323,7 @@
     <!-- updateStatus -->
     <string name="themer_presets_theme_modules_terminal_output_e4fc7" formatted="false">"\n\nPRESETS · THEME · MODULES · TERMINAL OUTPUT"</string>
     <!-- getHeaderText -->
-    <string name="themer_re_keyboard_shortcuts_310c5" formatted="false">"Re Keyboard Shortcuts"</string>
+    <string name="themer_re_keyboard_shortcuts_310c5" formatted="false">RE:TUI Keys Shortcuts</string>
     <!-- getHeaderText -->
     <string name="themer_re_t_ui_appearance_settings_f0df9" formatted="false">"Re:T-UI Appearance Settings"</string>
     <!-- getHeaderText -->
@@ -519,7 +519,7 @@
     <string name="hub_retui_wallpaper">RETUI WALLPAPER</string>
     <string name="hub_preferred_music_app">Preferred Music App</string>
     <string name="hub_tasker_integration">Tasker Integration</string>
-    <string name="hub_re_keyboard_shortcuts">Re Keyboard Shortcuts</string>
+    <string name="hub_re_keyboard_shortcuts">RE:TUI Keys Shortcuts</string>
     <string name="hub_fonts">Fonts</string>
     <string name="hub_typography">Typography</string>
     <string name="hub_presets">Presets</string>

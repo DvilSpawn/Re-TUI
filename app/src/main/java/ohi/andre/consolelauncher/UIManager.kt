@@ -840,7 +840,7 @@ class UIManager(
         val appearance=statusAppearance ?: ohi.andre.consolelauncher.presentation.HomeAppearance.saved()
         val show=ohi.andre.consolelauncher.presentation.StatusPresentation.descriptors.map { appearance.bool(it.visible) }
         val now=java.util.Date()
-        val battery=compactUnifiedBattery(labelTexts[Label.battery.ordinal])
+        val battery=if (XMLPrefsManager.getBoolean(Behavior.battery_progress_bar)) labelTexts[Label.battery.ordinal] ?: "" else compactUnifiedBattery(labelTexts[Label.battery.ordinal])
         val condition=lastWeatherCondition ?: compactUnifiedWeatherCondition(labelTexts[Label.weather.ordinal])
         val location=XMLPrefsManager.get(Behavior.weather_location)?.trim()?.takeUnless { it.isEmpty() || it=="null" }.orEmpty()
         val details=lastWeatherDetails ?: compactUnifiedWeatherDetails(labelTexts[Label.weather.ordinal])

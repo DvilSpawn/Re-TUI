@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="settings_preview_draft">LIVE PREVIEW · Sample content · Apply with Save</string>
+    <string name="settings_preview_draft">LIVE VALUES · Draft appearance · Save to apply</string>
     <string name="settings_preview_status">Status</string>
     <string name="settings_preview_terminal">Terminal</string>
     <string name="settings_preview_modules">Modules</string>
@@ -11,4 +11,7 @@
     <string name="settings_preview_normal">Normal</string>
     <string name="settings_preview_selected">Selected</string>
     <string name="settings_preview_disabled">Disabled</string>
+    <string name="settings_preview_ansi_caption">ANSI SAMPLE · Draft palette · Save to apply</string>
+    <string name="settings_preview_no_launcher">Open the launcher to preview its current output and input.</string>
+    <string name="settings_preview_sample_caption">SAMPLE CONTENT · Draft appearance · Save to apply</string>
 </resources>

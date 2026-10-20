@@ -20,13 +20,13 @@ import ohi.andre.consolelauncher.tuils.ThemeColorSpan
 /** Frozen launcher content and viewport, rendered by Home's own components. No controllers or views retained. */
 internal class LauncherHomeSnapshot private constructor(
     val width:Int,val height:Int,val saved:HomeAppearance,
-    private val statuses:StatusPresentation.Content?,private val unified:UnifiedStatusPresentation.Content?,
+    val statuses:StatusPresentation.Content?,val unified:UnifiedStatusPresentation.Content?,
     private val tray:TerminalTrayPresentation.RuntimeState?,private val insets:Insets,
     private val configuration:Configuration,private val input:CharSequence,private val hint:CharSequence?,
     private val prefix:CharSequence,private val output:CharSequence,private val outputHint:CharSequence?,
     private val clock:CharSequence,private val header:TerminalTrayToggleView.Binding?,
     private val dock:List<DockEntry>,private val toolbar:ToolbarContent,
-    private val suggestions:SuggestionsPresentationSnapshot,private val module:ModulePresentationSnapshot?,
+    private val suggestions:SuggestionsPresentationSnapshot,val module:ModulePresentationSnapshot?,
     private val sourceScroll:Map<Int,Pair<Int,Int>>,private val canApplyTheme:Boolean,
     private val foldWidth:Int,private val modulePageLandscape:Boolean,private val notesScroll:Pair<Int,Int>?
 ) {
@@ -107,6 +107,41 @@ internal class LauncherHomeSnapshot private constructor(
         scroll.forEach { (id,offset) -> root.findViewById<View>(id)?.scrollTo(offset.first,offset.second) }
         notesOffset?.let { StatusPresentation.notesView(root,appearance,saved)?.scrollTo(it.first,it.second) }
         root.setTag(R.id.home_preview_appearance,appearance)
+    }
+
+    /** Section cards use the same passive XML, binders and captured content as the full scene. */
+    fun bindTerminalCard(parent:LinearLayout,appearance:HomeAppearance) {
+        val controls=LauncherHomePresentation.inflate(parent.context)
+        val terminal=LayoutInflater.from(parent.context).inflate(R.layout.terminal_page,parent,false)
+        parent.addView(terminal,LinearLayout.LayoutParams(-1,ohi.andre.consolelauncher.tuils.Tuils.dpToPx(parent.context,150)))
+        HomeChromePresentation.styleSurface(terminal.findViewById(R.id.terminal_output_border),appearance)
+        terminal.findViewById<TextView>(R.id.terminal_view).apply {
+            text=ThemeColorSpan.refresh(output,appearance::color)
+            hint=outputHint
+            HomeChromePresentation.styleTerminalText(this,appearance,false)
+        }
+        terminal.findViewById<TextView>(R.id.terminal_tray_toggle).apply {
+            setTag(R.id.home_output_header_binding,header?:TerminalTrayToggleView.Binding(false,false))
+            TerminalTrayToggleView.styleDraft(this,terminal,appearance,saved)
+        }
+        controls.findViewById<TextView>(R.id.input_view).apply {
+            text=ThemeColorSpan.refresh(input,appearance::color)
+            this.hint=this@LauncherHomeSnapshot.hint
+            HomeChromePresentation.styleTerminalText(this,appearance,true)
+        }
+        controls.findViewById<TextView>(R.id.prefix_view).apply {
+            text=if(appearance.changed(Ui.input_prefix,saved)) appearance.raw(Ui.input_prefix).orEmpty() else prefix
+            HomeChromePresentation.styleTerminalText(this,appearance,true)
+        }
+        suggestions.bind(controls,appearance)
+        toolbar.bind(controls,appearance)
+        for(id in intArrayOf(R.id.input_group,R.id.tools_view,R.id.suggestions_container)) {
+            val section=controls.findViewById<View>(id)
+            HomeChromePresentation.styleSurface(section,appearance)
+            (section.parent as ViewGroup).removeView(section)
+            parent.addView(section,LinearLayout.LayoutParams(-1,section.layoutParams.height))
+        }
+        makePassive(parent,appearance)
     }
 
     private fun layout(root:View) {

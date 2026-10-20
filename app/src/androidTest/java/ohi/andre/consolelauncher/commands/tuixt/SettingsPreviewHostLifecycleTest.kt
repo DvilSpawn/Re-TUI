@@ -20,8 +20,8 @@ class SettingsPreviewHostLifecycleTest {
                     val before = appearanceState()
                     val cards = preview(editor)
                     instrumentation.runOnMainSync {
-                        assertEquals(5, cards.pager.adapter!!.itemCount)
-                        assertEquals(1, cards.childCount)
+                        assertEquals(6, cards.pager.adapter!!.itemCount)
+                        assertEquals(2, cards.childCount)
                         cards.pager.setCurrentItem(1, false)
                     }
                     settle()

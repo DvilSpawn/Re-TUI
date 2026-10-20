@@ -6535,7 +6535,7 @@
   "hub_re_keyboard_shortcuts": {
     "formatted": true,
     "forms": {
-      "other": "Re Keyboard Shortcuts"
+      "other": "RE:TUI Keys Shortcuts"
     },
     "type": "string"
   },
@@ -17483,6 +17483,13 @@
     },
     "type": "string"
   },
+  "settings_preview_ansi_caption": {
+    "formatted": true,
+    "forms": {
+      "other": "ANSI SAMPLE · Draft palette · Save to apply"
+    },
+    "type": "string"
+  },
   "settings_preview_current_home": {
     "formatted": true,
     "forms": {
@@ -17500,7 +17507,7 @@
   "settings_preview_draft": {
     "formatted": true,
     "forms": {
-      "other": "LIVE PREVIEW · Sample content · Apply with Save"
+      "other": "LIVE VALUES · Draft appearance · Save to apply"
     },
     "type": "string"
   },
@@ -17532,6 +17539,13 @@
     },
     "type": "string"
   },
+  "settings_preview_no_launcher": {
+    "formatted": true,
+    "forms": {
+      "other": "Open the launcher to preview its current output and input."
+    },
+    "type": "string"
+  },
   "settings_preview_normal": {
     "formatted": true,
     "forms": {
@@ -17557,6 +17571,13 @@
     "formatted": true,
     "forms": {
       "other": "Return to editor · Changes are not applied"
+    },
+    "type": "string"
+  },
+  "settings_preview_sample_caption": {
+    "formatted": true,
+    "forms": {
+      "other": "SAMPLE CONTENT · Draft appearance · Save to apply"
     },
     "type": "string"
   },
@@ -22857,7 +22878,7 @@
   "themer_re_keyboard_shortcuts_310c5": {
     "formatted": false,
     "forms": {
-      "other": "Re Keyboard Shortcuts"
+      "other": "RE:TUI Keys Shortcuts"
     },
     "type": "string"
   },
