@@ -23,6 +23,26 @@ verified as already applied**. Each merge retained exactly the preceding master
 tree. This records ancestry without replacing newer code with the old copies.
 The application implementation remains the tested `681e7bbc` implementation.
 
+## User decisions after reconciliation
+
+- **Leave Terminal Home and ASCII World / Fortress alone.** Preserve their
+  worktree changes and saved stashes without merging, resetting or dropping them.
+- **Abandon the old native calculator companion.** Do not merge the prototype
+  `:qalculate-runtime`, `QalculateProtocol` or its companion-install commands.
+  The current portable WebAssembly calculator on master remains in use. The
+  mixed downloadable-features checkout stays preserved because its wallpaper
+  work and tests have not been decided; abandonment does not delete that work.
+- **Abandon the historical separate GitHub build flavor** on
+  `origin/Dvil/github-release`. Do not restore its separate application ID or
+  package-specific routing. No remote branch was deleted.
+- **Inline frame selector: explanation requested, no merge requested.** Keep
+  `backups-frames` available while this is discussed. Its reusable idea is a
+  collapsible list of already-imported frames under each surface's assignment;
+  any implementation must use the current frame-pack model.
+
+The remaining undecided items below retain their original disposition. These
+decisions change the merge candidates, not application code or preserved files.
+
 ## Pruned local branches
 
 - `codex/live-settings-preview-current`
@@ -44,7 +64,7 @@ registration for the already-missing `/private/tmp/retui-irc-fix.qZiiwC` was pru
 | --- | --- | --- | --- |
 | `codex/terminal-mode` | The normal SSH pane and Classic/Search modes. | New `mode terminal`: persistent scrolling SSH tile dashboard, bottom Search with +/settings, blurred Search overlay, widget scripts, more than two SSH viewers, helper 0.4.8 and associated tests. Master has no `TerminalHomeView` or Terminal mode enum value. | Keep if Terminal Home is wanted; port onto the current scene/layout code and validate before merging. |
 | `dvil/settings-preview-carousel` | Core live settings preview and shared current rendering, committed in `681e7bbc`. The optional WebAssembly calculator engine is also already on master. | The earlier alternative renderer architecture, including direct draft-aware clock/RAM/storage/network/notes/unlock collectors and a standalone clock. Those can preview non-battery behavior-format edits; the current cards use captured launcher output for those rows. Old tests/docs and earlier calculator copies are also present. | Do not replace current preview/rendering with the old implementation. Decide whether to port only the additional draft-format preview behavior; abandon duplicate infrastructure only after that decision. |
-| `codex/downloadable-features` | Downloadable wallpaper packs, renderer assets, the wallpaper catalogue, and the newer portable Qalculate engine pack. | Older native companion APK (`:qalculate-runtime` plus `QalculateProtocol`), `feature -list` / `feature -get qalculate`, older hosted-WebView gallery, extra marketplace device tests and prototype documentation. | Recommend abandoning the old companion/gallery implementation in favor of current implementations. Retain or port any wanted tests and generic feature-discovery command separately. |
+| `codex/downloadable-features` | Downloadable wallpaper packs, renderer assets, the wallpaper catalogue, and the newer portable Qalculate engine pack. | Older native companion APK (`:qalculate-runtime` plus `QalculateProtocol`), `feature -list` / `feature -get qalculate`, older hosted-WebView gallery, extra marketplace device tests and prototype documentation. | Native calculator companion and its install commands abandoned by the user. Gallery, tests and generic feature-discovery command remain undecided; preserve the mixed checkout. |
 | `backups-frames` (`294fb864`) | Re:Member frame target, app-launch theme extras and their current test assertion. | An inline expand/collapse frame selector. The old code depends on the former asset-list API and does not match the current frame-pack/per-element UI. | Decide whether to reintroduce an inline selector; the Re:Member parts need no duplicate merge. |
 
 The first three have **uncommitted** changes even though their committed branch
@@ -94,8 +114,8 @@ frame backup, the origin contains these historical differences:
 - `origin/Dvil/github-release`: old separate `.github` package/build flavor,
   package-specific callback routing/diagnostics and an old website direct-APK
   link (`30f7f2ed`, `27ccad8d`, plus merge commits). Current master has Play Store
-  and F-Droid flavors rather than this separate application ID. Decide whether
-  an additional application identity is still wanted.
+  and F-Droid flavors rather than this separate application ID. **Abandoned by
+  the user after reconciliation; excluded from future merge candidates.**
 - `upstream/dev`: 29 upstream-only commits with an old RxJava/manager rewrite,
   including removal of changelog/messages and replacement of app managers.
   This is the original upstream development experiment, not a Re:TUI feature
