@@ -346,19 +346,17 @@ object PresetManager {
             File(Tuils.getFolder(), XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS.path)
         val themeXml = sanitizeShareableXml(presetTheme, XMLPrefsRoot.THEME)
         val suggestionsXml = sanitizeShareableXml(presetSuggestions, XMLPrefsRoot.SUGGESTIONS)
+        // Parse all files before touching active settings: a late conflict must not partially apply a preset.
+        val presetUi = File(presetFolder, XMLPrefsRoot.UI.path)
+        val uiValues = if (presetUi.isFile) readAllowed(presetUi, XMLPrefsRoot.UI, SHAREABLE_UI) else emptyMap()
+        val presetBehavior = File(presetFolder, XMLPrefsRoot.BEHAVIOR.path)
+        val behaviorValues = if (presetBehavior.isFile) readAllowed(presetBehavior, XMLPrefsRoot.BEHAVIOR,
+            Behavior.entries.toTypedArray(), ::isSelectedBehaviorValue) else emptyMap()
         Tuils.insertOld(currentTheme)
         Tuils.insertOld(currentSuggestions)
         writeText(currentTheme, themeXml)
         writeText(currentSuggestions, suggestionsXml)
-        val presetUi = File(presetFolder, XMLPrefsManager.XMLPrefsRoot.UI.path)
-        if (presetUi.isFile) applyAllowed(presetUi, XMLPrefsRoot.UI, SHAREABLE_UI)
-        val presetBehavior = File(presetFolder, XMLPrefsManager.XMLPrefsRoot.BEHAVIOR.path)
-        if (presetBehavior.isFile) applyAllowed(
-            presetBehavior,
-            XMLPrefsRoot.BEHAVIOR,
-            Behavior.entries.toTypedArray(),
-            ::isSelectedBehaviorValue
-        )
+        for ((setting, value) in uiValues + behaviorValues) LauncherSettings.set(setting, value)
         FrameManager.applyPortableState(presetFolder)
         LauncherSettings.setAutoColorPick(false)
     }
@@ -603,8 +601,10 @@ object PresetManager {
         val file = File(getSavedPresetFolder(presetName), XMLPrefsRoot.BEHAVIOR.path)
         if (!file.isFile) return emptyMap()
         val known = Behavior.entries.associateBy { it.label() }
-        val root = parseXml(file).documentElement
+        val document = parseXml(file)
+        val root = document.documentElement
         require(root?.nodeName == XMLPrefsRoot.BEHAVIOR.name) { "Invalid preset XML: ${file.name}" }
+        XMLPrefsManager.migrateRootValues(document, root, XMLPrefsRoot.BEHAVIOR)
         val values = LinkedHashMap<Behavior, String>()
         for (index in 0 until root.childNodes.length) {
             val node = root.childNodes.item(index)
@@ -641,6 +641,7 @@ object PresetManager {
         val parsed = LinkedHashMap<XMLPrefsSave, String>()
         val document = parseXml(file)
         require(document.documentElement?.nodeName == root.name) { "Invalid preset XML: ${file.name}" }
+        XMLPrefsManager.migrateRootValues(document, document.documentElement, root)
         val children = document.documentElement.childNodes
         for (index in 0 until children.length) {
             val node = children.item(index)
@@ -653,14 +654,17 @@ object PresetManager {
         return xml(root, values, { parsed[it] }, validator, useCurrentMode = false)
     }
 
-    private fun applyAllowed(
+    internal fun readAllowed(
         file: File,
         rootType: XMLPrefsRoot,
         values: Array<out XMLPrefsSave>,
         validator: (XMLPrefsSave, String) -> Boolean = ::isShareableValue
-    ) {
+    ): Map<XMLPrefsSave, String> {
         validateXmlRoot(file, rootType.name)
-        val root = parseXml(file).documentElement
+        val document = parseXml(file)
+        val root = document.documentElement
+        XMLPrefsManager.migrateRootValues(document, root, rootType)
+        val result = LinkedHashMap<XMLPrefsSave, String>()
         val allowed = values.associateBy { it.label() }
         val children = root.childNodes
         for (index in 0 until children.length) {
@@ -668,8 +672,9 @@ object PresetManager {
             val setting = allowed[node.nodeName] ?: continue
             val value = node.attributes?.getNamedItem(XMLPrefsManager.VALUE_ATTRIBUTE)?.nodeValue ?: continue
             if (!validator(setting, value)) continue
-            LauncherSettings.set(setting, value)
+            result[setting] = value
         }
+        return result
     }
 
     private fun shareableValues(root: XMLPrefsRoot): Array<out XMLPrefsSave> = when (root) {
@@ -737,8 +742,12 @@ object PresetManager {
 
     private fun selectedBehaviorSettings(labels: Set<String>): Array<Behavior> {
         val known = Behavior.entries.associateBy { it.label() }
-        require(labels.all { it in known }) { "Unknown behavior setting selected" }
-        return Behavior.entries.filter { it.label() in labels }.toTypedArray()
+        val normalized = labels.flatMap { label ->
+            if (label == "time_format") listOf("status_time_format", "output_time_format")
+            else listOf(XMLPrefsManager.canonicalSettingLabel(XMLPrefsRoot.BEHAVIOR, label))
+        }.toSet()
+        require(normalized.all { it in known }) { "Unknown behavior setting selected" }
+        return Behavior.entries.filter { it.label() in normalized }.toTypedArray()
     }
 
     fun applyBuiltIn(name: kotlin.String?): Boolean {

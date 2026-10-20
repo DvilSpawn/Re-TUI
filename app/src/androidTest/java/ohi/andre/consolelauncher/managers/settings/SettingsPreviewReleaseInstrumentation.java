@@ -112,7 +112,7 @@ public final class SettingsPreviewReleaseInstrumentation extends Instrumentation
     @Override public void onCreate(Bundle arguments) { super.onCreate(arguments);background=arguments.getString("background", "original");mode=arguments.getString("mode", "preview");start(); }
     @Override public void onStart() {
         Bundle result=new Bundle();
-        try { if("hotfix2".equals(mode)) hotfixTwoJourney(); else if("private".equals(mode)) privateJourney(); else if("changelog".equals(mode)) changelogJourney(); else journey();result.putString("stream","\nOK: " + mode + " release journey\n");finish(Activity.RESULT_OK,result); }
+        try { if("hotfix4".equals(mode)) hotfixFourJourney(); else if("hotfix2".equals(mode)) hotfixTwoJourney(); else if("private".equals(mode)) privateJourney(); else if("changelog".equals(mode)) changelogJourney(); else journey();result.putString("stream","\nOK: " + mode + " release journey\n");finish(Activity.RESULT_OK,result); }
         catch(Throwable failure) {
             StringWriter trace=new StringWriter();failure.printStackTrace(new PrintWriter(trace));
             result.putString("stream",trace.toString());finish(Activity.RESULT_CANCELED,result);
@@ -203,6 +203,64 @@ public final class SettingsPreviewReleaseInstrumentation extends Instrumentation
     private int releaseVersion() {
         try { return getTargetContext().getPackageManager().getPackageInfo(getTargetContext().getPackageName(),0).versionCode; }
         catch(android.content.pm.PackageManager.NameNotFoundException error) { throw new AssertionError(error); }
+    }
+    private String setting(String file,String key) throws Exception {
+        Document doc=DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new File(folder(),file));
+        Element node=(Element)doc.getElementsByTagName(key).item(0);
+        return node==null?null:node.getAttribute("value");
+    }
+    private void writeFixture(File file,String xml) throws Exception {
+        file.getParentFile().mkdirs();Files.write(file.toPath(),xml.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+    }
+    private void hotfixFourJourney() throws Exception {
+        Map<String,byte[]> original=files(), backups=new HashMap<>();
+        File preset=new File(folder(),"presets/compatibility-hotfix4-fixture");
+        require(!preset.exists(),"Fixture already exists");
+        String clock="[size=30]HH:mm[/size]@EEE, dd MMM";
+        String behavior="<BEHAVIOR><time_format value=\""+clock+"\"/><auto_show_keyboard value=\"false\"/></BEHAVIOR>";
+        Activity activity=null;
+        String[] names={"behavior.xml","theme.xml","ui.xml"};
+        for(String name:names) {
+            File backup=new File(folder(),name+".pre-migration");
+            if(backup.isFile()) { backups.put(name,Files.readAllBytes(backup.toPath()));Files.delete(backup.toPath()); }
+        }
+        try {
+            writeFixture(new File(folder(),"behavior.xml"),behavior);
+            writeFixture(new File(folder(),"theme.xml"),"<THEME><input_bg value=\"#ff000000\"/><status_lines_bg value=\"#ff000000,#FF123456\"/></THEME>");
+            writeFixture(new File(folder(),"ui.xml"),"<UI><display_margin_mm value=\"1,2,3,4\"/><status_lines_alignment value=\"1,0,-1\"/></UI>");
+            getTargetContext().getSharedPreferences("retui_startup",0).edit().putBoolean("initialized",true).putBoolean("complete",true).putBoolean("active",false).commit();
+            getTargetContext().getSharedPreferences("changelogPrefs",0).edit().putInt("last_seen_version_code",releaseVersion()).commit();
+            activity=home();settle();
+            require(clock.equals(setting("behavior.xml","status_time_format")),"Status clock lost");
+            require(clock.equals(setting("behavior.xml","output_time_format")),"Output clock lost");
+            require("#ff000000".equals(setting("theme.xml","input_background_color")),"Opaque black changed");
+            require("#FF123456".equals(setting("theme.xml","device_status_background_color")),"Status list lost");
+            require("1,2,3,4".equals(setting("ui.xml","display_margin_top_section")),"Margin lost");
+            require(Arrays.equals(behavior.getBytes(java.nio.charset.StandardCharsets.UTF_8),Files.readAllBytes(new File(folder(),"behavior.xml.pre-migration").toPath())),"Recovery copy differs");
+            screenshot("hotfix4-upgraded-home");
+            writeFixture(new File(preset,"theme.xml"),"<THEME><input_color value=\"#112233\"/><input_text_color value=\"#445566\"/><status_lines_bg value=\"#ff000000\"/></THEME>");
+            writeFixture(new File(preset,"suggestions.xml"),"<SUGGESTIONS/>");
+            writeFixture(new File(preset,"ui.xml"),"<UI><display_margin_mm value=\"2,3,4,5\"/></UI>");
+            writeFixture(new File(preset,"behavior.xml"),"<BEHAVIOR><time_format value=\"HH:mm:ss@EEE\"/></BEHAVIOR>");
+            command(activity,"preset -apply compatibility-hotfix4-fixture");settle();
+            require("#445566".equals(setting("theme.xml","input_text_color")),"Preset alias precedence failed");
+            require("2,3,4,5".equals(setting("ui.xml","display_margin_top_section")),"Saved preset margin lost");
+            require("HH:mm:ss@EEE".equals(setting("behavior.xml","output_time_format")),"Saved preset output clock lost");
+            Map<String,byte[]> beforeConflict=files();
+            writeFixture(new File(preset,"theme.xml"),"<THEME><input_text_color value=\"#AA0000\"/></THEME>");
+            writeFixture(new File(preset,"behavior.xml"),"<BEHAVIOR><status_time_format value=\"HH:mm\"/><status_time_format value=\"ss\"/></BEHAVIOR>");
+            activity=home();command(activity,"preset -apply compatibility-hotfix4-fixture");settle();
+            for(String name:names) require(Arrays.equals(beforeConflict.get(name),Files.readAllBytes(new File(folder(),name).toPath())),"Conflict partially applied "+name);
+            changelogJourney();
+        } finally {
+            if(launcher!=null) { Activity last=launcher;runOnMainSync(last::finish); }
+            for(Map.Entry<String,byte[]> entry:original.entrySet()) Files.write(new File(folder(),entry.getKey()).toPath(),entry.getValue());
+            for(String name:names) {
+                File backup=new File(folder(),name+".pre-migration");
+                if(backups.containsKey(name)) Files.write(backup.toPath(),backups.get(name));else backup.delete();
+            }
+            File[] children=preset.listFiles();if(children!=null) for(File file:children) file.delete();preset.delete();
+        }
     }
     private void hotfixTwoJourney() throws Exception {
         changelogJourney();

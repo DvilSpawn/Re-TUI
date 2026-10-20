@@ -130,15 +130,14 @@ object XMLPrefsManager {
                 root = d.getElementsByTagName(element.name).item(0) as Element?
             }
 
-            if (element === XMLPrefsRoot.UI) {
-                needToWrite = needToWrite or migrateRenamedUiValue(
-                    d,
-                    root,
-                    "display_margin_mm",
-                    Ui.display_margin_top_section.label()
-                )
+            try {
+                needToWrite = migrateRootValues(d, root, element)
+                if (needToWrite) preserveMigrationSource(file)
+            } catch (error: Exception) {
+                Tuils.log(error)
+                Tuils.sendXMLParseError(context, element.path)
+                continue
             }
-            needToWrite = needToWrite or migrateRootValues(d, root, element)
             needToWrite = needToWrite or ensureDefaultSectionComments(d, root, element)
 
             val nodes = root!!.getElementsByTagName("*")
@@ -315,12 +314,39 @@ object XMLPrefsManager {
     internal fun canonicalSettingLabel(element: XMLPrefsRoot, label: String): String =
         renamesFor(element).firstOrNull { it.first == label }?.second ?: label
 
-    private fun migrateRootValues(d: Document, root: Element?, element: XMLPrefsRoot): Boolean {
+    internal fun migrateRootValues(d: Document, root: Element?, element: XMLPrefsRoot): Boolean {
         var changed = false
         if (root == null) {
             return false
         }
 
+        val seen = HashMap<String, String>()
+        val duplicates = ArrayList<Node>()
+        for (index in 0 until root.childNodes.length) {
+            val node = root.childNodes.item(index) as? Element ?: continue
+            if (!node.hasAttribute(VALUE_ATTRIBUTE)) continue
+            val value = node.getAttribute(VALUE_ATTRIBUTE)
+            val previous = seen.put(node.tagName, value)
+            require(previous == null || previous == value) { "Conflicting setting: ${node.tagName}" }
+            if (previous != null) duplicates.add(node)
+        }
+        duplicates.forEach { root.removeChild(it); changed = true }
+        if (element === XMLPrefsRoot.BEHAVIOR) {
+            findDirectChild(root, "time_format")?.let { legacy ->
+                for (name in arrayOf("status_time_format", "output_time_format")) {
+                    if (findDirectChild(root, name) == null) {
+                        root.insertBefore(d.createElement(name).apply {
+                            setAttribute(VALUE_ATTRIBUTE, legacy.getAttribute(VALUE_ATTRIBUTE))
+                        }, legacy)
+                    }
+                }
+                root.removeChild(legacy)
+                changed = true
+            }
+        }
+        if (element === XMLPrefsRoot.UI) {
+            changed = renameDirectChild(d, root, "display_margin_mm", "display_margin_top_section") or changed
+        }
         for (rename in renamesFor(element)) {
             changed = renameDirectChild(d, root, rename.first, rename.second) or changed
         }
@@ -351,6 +377,23 @@ object XMLPrefsManager {
         }
 
         return changed
+    }
+
+    /** Keep the original bytes before the first destructive settings migration. */
+    @Synchronized
+    internal fun preserveMigrationSource(file: File) {
+        val backup = File(file.parentFile, file.name + ".pre-migration")
+        if (backup.isFile) return
+        val temporary = File.createTempFile(file.name + ".migration-", ".tmp", file.parentFile)
+        try {
+            FileOutputStream(temporary).use { output ->
+                file.inputStream().use { it.copyTo(output) }
+                output.fd.sync()
+            }
+            check(temporary.renameTo(backup)) { "Cannot preserve original settings: ${file.name}" }
+        } finally {
+            temporary.delete()
+        }
     }
 
     private fun renameDirectChild(d: Document, root: Element, oldName: String, newName: String): Boolean {
@@ -647,36 +690,6 @@ object XMLPrefsManager {
         label.contains("hidden") || label.contains("include") -> "Filtering"
         label.contains("click") -> "Actions"
         else -> "Item Display"
-    }
-
-    private fun migrateRenamedUiValue(
-        d: Document,
-        root: Element?,
-        oldName: String?,
-        newName: String?
-    ): Boolean {
-        val oldElement = findDirectChild(root, oldName)
-        if (oldElement == null) {
-            return false
-        }
-
-        var newElement = findDirectChild(root, newName)
-        if (newElement == null) {
-            var value = Ui.display_margin_top_section.defaultValue()
-            try {
-                val oldValue = oldElement.getAttribute(VALUE_ATTRIBUTE)
-                if (oldValue != null && oldValue.length > 0) {
-                    value = oldValue
-                }
-            } catch (ignored: Exception) {
-            }
-
-            newElement = d.createElement(newName)
-            newElement.setAttribute(VALUE_ATTRIBUTE, value)
-            root!!.appendChild(newElement)
-        }
-        root!!.removeChild(oldElement)
-        return true
     }
 
     private fun findDirectChild(root: Element?, name: String?): Element? {
@@ -1431,7 +1444,6 @@ object XMLPrefsManager {
         BEHAVIOR(Behavior.entries.toTypedArray()) {
             override fun delete(): Array<String?>? {
                 return arrayOf<String?>(
-                    "time_format",
                     "show_hints",
                     "enable_app_launch",
                     "network_info_update_ms",

@@ -320,7 +320,17 @@ You can reopen these notes with the changelog command. These highlights are bund
 - New-note and other Notes dialogs open at their final size without the entrance animation.
 - Added an optional toolbar gesture button: hold until it vibrates, drag up/down/left/right, then release. Return to the centre to cancel.
 - Configure gesture_button_enabled and gesture_up/down/left/right in toolbar.xml. Each direction accepts an app launcher name, alias or command; empty directions are disabled. For example, set gesture_up to notifications -open.
-- Restored swipe-up for the app drawer on non-scrolling launcher surfaces. Terminal output remains dedicated to scrolling.</string>
+- Restored swipe-up for the app drawer on non-scrolling launcher surfaces. Terminal output remains dedicated to scrolling.
+
+## Hotfix 4 · Build 507
+
+- Preserve legacy time_format lists for both status and output clocks when the replacement setting is missing.
+- Preserve existing current values and keep an original-file .pre-migration recovery copy before startup migrates settings.
+- Apply old status background, shadow, alignment and display-margin settings consistently across startup and presets.
+- Prefer current setting names over their old aliases. Reject conflicting duplicate settings before applying preset XML changes.
+- Keep valid opaque-black backgrounds and shadows instead of replacing them with transparency.
+
+If an older version already deleted a clock format, restore it from a backup. This update cannot reconstruct previously deleted values.</string>
     <string name="command_bluetooth_false_4603a">%1$s false</string>
     <string name="command_bluetooth_opening_bluetooth_settings_android_no_long_c4672">Opening Bluetooth settings. Android no longer allows third-party launchers to toggle Bluetooth directly.</string>
     <string name="command_bluetooth_true_630fa">%1$s true</string>
