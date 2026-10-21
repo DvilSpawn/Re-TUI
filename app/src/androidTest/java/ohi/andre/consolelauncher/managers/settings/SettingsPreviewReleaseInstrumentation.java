@@ -41,7 +41,7 @@ public final class SettingsPreviewReleaseInstrumentation extends Instrumentation
     private String text(int id) { return getTargetContext().getString(id); }
     private ViewGroup thumbnail(Activity activity) {
         ViewGroup panel=activity.findViewById(resource("settings_panel","id"));
-        return (ViewGroup)((ViewGroup)panel.getChildAt(0)).getChildAt(0);
+        return (ViewGroup)((ViewGroup)panel.getChildAt(0)).getChildAt(1);
     }
     private void swipe(Activity activity, boolean forward) throws Exception {
         int[] bounds=new int[4];
@@ -109,6 +109,11 @@ public final class SettingsPreviewReleaseInstrumentation extends Instrumentation
     }
     private String background;
     private String mode;
+    @Override public void runOnMainSync(Runnable action) {
+        final java.util.concurrent.atomic.AtomicReference<Throwable> failure=new java.util.concurrent.atomic.AtomicReference<>();
+        super.runOnMainSync(()-> { try { action.run(); } catch(Throwable error) { failure.set(error); } });
+        if(failure.get()!=null) throw new AssertionError("UI assertion failed",failure.get());
+    }
     @Override public void onCreate(Bundle arguments) { super.onCreate(arguments);background=arguments.getString("background", "original");mode=arguments.getString("mode", "preview");start(); }
     @Override public void onStart() {
         Bundle result=new Bundle();
@@ -330,8 +335,10 @@ public final class SettingsPreviewReleaseInstrumentation extends Instrumentation
             settle();hideKeyboard(editor);final Activity currentEditor=editor;
             Map<String,byte[]> before=files();
             runOnMainSync(()-> {
-                TextView battery=currentEditor.findViewById(resource("tv0","id"));
-                require(battery!=null && battery.getText().toString().contains("#"),"Live battery bar missing from preview");
+                boolean battery=false;
+                for(View view:views(thumbnail(currentEditor)))
+                    if(view instanceof TextView && ((TextView)view).getText().toString().contains("#")) battery=true;
+                require(battery,"Live battery bar missing from preview");
             });
             for(String page:Arrays.asList("Terminal","Modules","Help","Calculator","ANSI")) {
                 swipe(editor,true);
