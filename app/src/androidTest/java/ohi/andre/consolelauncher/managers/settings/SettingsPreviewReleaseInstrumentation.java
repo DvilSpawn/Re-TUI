@@ -112,7 +112,7 @@ public final class SettingsPreviewReleaseInstrumentation extends Instrumentation
     @Override public void onCreate(Bundle arguments) { super.onCreate(arguments);background=arguments.getString("background", "original");mode=arguments.getString("mode", "preview");start(); }
     @Override public void onStart() {
         Bundle result=new Bundle();
-        try { if("hotfix4".equals(mode)) hotfixFourJourney(); else if("hotfix2".equals(mode)) hotfixTwoJourney(); else if("private".equals(mode)) privateJourney(); else if("changelog".equals(mode)) changelogJourney(); else journey();result.putString("stream","\nOK: " + mode + " release journey\n");finish(Activity.RESULT_OK,result); }
+        try { if("hotfix5".equals(mode)) hotfixFiveJourney(); else if("hotfix4".equals(mode)) hotfixFourJourney(); else if("hotfix2".equals(mode)) hotfixTwoJourney(); else if("private".equals(mode)) privateJourney(); else if("changelog".equals(mode)) changelogJourney(); else journey();result.putString("stream","\nOK: " + mode + " release journey\n");finish(Activity.RESULT_OK,result); }
         catch(Throwable failure) {
             StringWriter trace=new StringWriter();failure.printStackTrace(new PrintWriter(trace));
             result.putString("stream",trace.toString());finish(Activity.RESULT_CANCELED,result);
@@ -302,6 +302,68 @@ public final class SettingsPreviewReleaseInstrumentation extends Instrumentation
             require(getTargetContext().getSharedPreferences("changelogPrefs",0).getInt("last_seen_version_code",0)==releaseVersion(),"Release not acknowledged");
             screenshot("hotfix-changelog");
         } finally { runOnMainSync(activity::finish); }
+    }
+
+    private TextView label(Activity activity, String value) {
+        for(View view:views(activity.getWindow().getDecorView()))
+            if(view instanceof TextView && ((TextView)view).getText().toString().equals(value)) return (TextView)view;
+        throw new AssertionError("Missing control: " + value);
+    }
+    private TextView frameSelector(Activity activity) {
+        for(View view:views(activity.getWindow().getDecorView()))
+            if(view instanceof TextView && ((TextView)view).getText().toString().startsWith("FRAME:")) return (TextView)view;
+        throw new AssertionError("Missing inline frame selector");
+    }
+    private void hotfixFiveJourney() throws Exception {
+        changelogJourney();
+        Map<String,byte[]> original=files();Activity editor=null,frames=null;
+        getTargetContext().getSharedPreferences("retui_startup",0).edit().putBoolean("initialized",true).putBoolean("complete",true).putBoolean("active",false).commit();
+        fixture("behavior.xml","BEHAVIOR",Collections.singletonMap("auto_show_keyboard","false"));
+        fixture("behavior.xml","BEHAVIOR",Collections.singletonMap("battery_progress_bar","true"));
+        fixture("behavior.xml","BEHAVIOR",Collections.singletonMap("battery_progress_bar_length","10"));
+        fixture("behavior.xml","BEHAVIOR",Collections.singletonMap("battery_progress_bar_symbol","#"));
+        fixture("ui.xml","UI",Collections.singletonMap("show_battery","true"));
+        try {
+            home();settle();
+            editor=startActivitySync(new Intent().setClassName(getTargetContext().getPackageName(),EDITOR)
+                .putExtra("path",new File(folder(),"ui.xml").getAbsolutePath()).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+            settle();hideKeyboard(editor);final Activity currentEditor=editor;
+            Map<String,byte[]> before=files();
+            runOnMainSync(()-> {
+                TextView battery=currentEditor.findViewById(resource("tv0","id"));
+                require(battery!=null && battery.getText().toString().contains("#"),"Live battery bar missing from preview");
+            });
+            for(String page:Arrays.asList("Terminal","Modules","Help","Calculator","ANSI")) {
+                swipe(editor,true);
+                runOnMainSync(()-> {
+                    boolean found=false;
+                    for(View view:views(currentEditor.getWindow().getDecorView()))
+                        if(view instanceof TextView && ((TextView)view).getText().toString().contains(page+" ·")) found=true;
+                    require(found,"Preview page missing: "+page);
+                });
+            }
+            screenshot("hotfix5-ansi");unchanged(before);
+            runOnMainSync(currentEditor::finish);editor=null;
+            frames=startActivitySync(new Intent().setClassName(getTargetContext().getPackageName(),
+                "ohi.andre.consolelauncher.commands.tuixt.ThemerActivity").putExtra("section","frames").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+            settle();final Activity currentFrames=frames;before=files();
+            runOnMainSync(()->frameSelector(currentFrames).performClick());settle();
+            runOnMainSync(()-> {
+                require(frameSelector(currentFrames).getText().toString().endsWith("▴"),"Selector did not expand");
+                label(currentFrames,"Sprout Lands icon button").performClick();
+            });settle();
+            runOnMainSync(()-> {
+                String selected=frameSelector(currentFrames).getText().toString();
+                require(selected.contains("Sprout Lands icon button") && selected.endsWith("▾"),"Selection did not update inline");
+                frameSelector(currentFrames).performClick();
+            });settle();
+            runOnMainSync(()->label(currentFrames,text(resource("frame_selector_default","string"))).performClick());settle();
+            unchanged(before);screenshot("hotfix5-frame-selector");
+        } finally {
+            final Activity finalEditor=editor,finalFrames=frames;
+            runOnMainSync(()-> { if(finalEditor!=null)finalEditor.finish();if(finalFrames!=null)finalFrames.finish(); });
+            for(Map.Entry<String,byte[]> entry:original.entrySet()) Files.write(new File(folder(),entry.getKey()).toPath(),entry.getValue());
+        }
     }
     private void journey() throws Exception {
         Map<String,byte[]> originals=files();

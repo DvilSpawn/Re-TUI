@@ -330,7 +330,15 @@ You can reopen these notes with the changelog command. These highlights are bund
 - Prefer current setting names over their old aliases. Reject conflicting duplicate settings before applying preset XML changes.
 - Keep valid opaque-black backgrounds and shadows instead of replacing them with transparency.
 
-If an older version already deleted a clock format, restore it from a backup. This update cannot reconstruct previously deleted values.</string>
+If an older version already deleted a clock format, restore it from a backup. This update cannot reconstruct previously deleted values.
+
+## Hotfix 5 · Build 508
+
+- Settings previews now reuse the current launcher status, terminal and module rendering, including the configured battery progress bar.
+- Swipe between Status, Terminal, Modules, Help, Calculator and ANSI preview cards. Help, Calculator and ANSI use illustrative samples.
+- Appearance drafts stay temporary until Save, and preview controls do not run commands or launch apps.
+- Choose already-imported frames from an inline list beneath each FRAME row, for one surface or all surfaces. Missing or corrupt frames are marked and unavailable for selection. Save Frame Settings applies the pending assignments.
+- Corrected the integration entry name to RE:TUI Keys Shortcuts.</string>
     <string name="command_bluetooth_false_4603a">%1$s false</string>
     <string name="command_bluetooth_opening_bluetooth_settings_android_no_long_c4672">Opening Bluetooth settings. Android no longer allows third-party launchers to toggle Bluetooth directly.</string>
     <string name="command_bluetooth_true_630fa">%1$s true</string>
