@@ -7,6 +7,7 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 import ohi.andre.consolelauncher.UIManager
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
+import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave
 import ohi.andre.consolelauncher.managers.xml.options.Behavior
 import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.tuils.SystemUtils
@@ -17,15 +18,21 @@ import ohi.andre.consolelauncher.managers.xml.options.Ui
 class RamManager(
     context: Context,
     delay: Long,
-    private val size: Int,
-    private val listener: StatusUpdateListener?
+    private var size: Int,
+    private val listener: StatusUpdateListener?,
+    private val read: (XMLPrefsSave) -> String = XMLPrefsManager::get
 ) : StatusManager(context, delay) {
+    override fun refreshAppearance() {
+        size = XMLPrefsManager.getInt(ohi.andre.consolelauncher.managers.xml.options.Ui.ram_size)
+        super.refreshAppearance()
+    }
+
     private val av = "%av"
     private val tot = "%tot"
 
     private var ramPatterns: MutableList<Pattern>? = null
     private var ramFormat: String? = null
-    private var color = 0
+    private val color get() = XMLPrefsManager.getColor(Theme.ram_text_color)
     private var compactValue = ""
 
     fun compactValue(): String = compactValue
@@ -35,8 +42,8 @@ class RamManager(
 
     override fun update() {
         if (ramFormat == null) {
-            ramFormat = XMLPrefsManager.get(Behavior.ram_format)
-            color = XMLPrefsManager.getColor(Theme.ram_text_color)
+            ramFormat = read(Behavior.ram_format)
+
         }
 
         if (ramPatterns == null) {

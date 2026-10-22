@@ -9,9 +9,14 @@ import ohi.andre.consolelauncher.managers.xml.options.Ui
 class TimeManager(
     context: Context,
     delay: Long,
-    private val size: Int,
+    private var size: Int,
     private val listener: StatusUpdateListener?
 ) : StatusManager(context, delay) {
+    override fun refreshAppearance() {
+        size = ohi.andre.consolelauncher.managers.xml.XMLPrefsManager.getInt(ohi.andre.consolelauncher.managers.xml.options.Ui.time_size)
+        super.refreshAppearance()
+    }
+
     override fun update() {
         listener?.onUpdate(
             UIManager.Label.time,

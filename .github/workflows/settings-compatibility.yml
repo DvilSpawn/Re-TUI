@@ -1,0 +1,82 @@
+name: Settings compatibility
+
+on:
+  pull_request:
+    paths:
+      - 'app/**'
+      - 'retui-contract/**'
+      - 'retui-datetime-picker/**'
+      - 'scripts/**'
+      - 'third_party/**'
+      - '*gradle*'
+      - 'gradle/**'
+      - '.github/workflows/settings-compatibility.yml'
+  push:
+    branches: [master]
+    paths:
+      - 'app/**'
+      - 'scripts/**'
+      - 'third_party/**'
+      - 'gradle/**'
+      - '*gradle*'
+      - '.github/workflows/settings-compatibility.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: android-actions/setup-android@v3
+      - name: Install test prerequisites
+        run: sudo apt-get update && sudo apt-get install -y tmux openssh-client
+      - name: Verify settings and repository checks
+        run: python3 scripts/verify_settings.py host
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: settings-host-results
+          path: |
+            build/validation/settings-reload/
+            app/build/test-results/
+  reload:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        api: [23, 35]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - name: Build isolated regression APKs
+        run: ./gradlew :app:assemblePlaystoreDebug :app:assemblePlaystoreDebugAndroidTest -PtestPackageSuffix=palettedebug --console=plain
+      - name: Verify live reload and save reliability
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api }}
+          arch: x86_64
+          script: |
+            adb install -r app/build/outputs/apk/playstore/debug/app-playstore-debug.apk
+            adb install -r app/build/outputs/apk/androidTest/playstore/debug/app-playstore-debug-androidTest.apk
+            mkdir -p build/validation/settings-reload
+            adb shell am instrument -w -r -e class ohi.andre.consolelauncher.managers.settings.SettingsReloadIntegrationTest com.dvil.tui_renewed.palettedebug.test/androidx.test.runner.AndroidJUnitRunner > build/validation/settings-reload/reload.txt
+            python3 -c "import sys;sys.path.insert(0,'scripts');from verify_settings import parse_instrumentation;from pathlib import Path;r=parse_instrumentation(Path('build/validation/settings-reload/reload.txt').read_text());assert len(r)==6 and all(t['status']=='passed' for t in r),r"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: settings-emulator-${{ matrix.api }}
+          path: build/validation/settings-reload/

@@ -452,8 +452,16 @@ class TerminalHomeView(context: Context) : LinearLayout(context) {
         val tile = layout.add(UUID.randomUUID().toString()) ?: run { Toast.makeText(context, R.string.terminal_home_full, Toast.LENGTH_SHORT).show(); return }
         render(TileRuntime(tile, title, command, target)); placeTiles(); save(); connectTiles()
     }
-    private fun render(r: TileRuntime) {
-        runtimes[r.tile.id] = r
+    fun refreshAppearance() {
+        setBackgroundColor(bg)
+        status.setTextColor(fg)
+        runtimes.values.forEach(::styleTile)
+        refreshKeys()
+        RetuiThemeBridge.applyToKeyboardInput(input, TermuxBridgeManager.TERMUX_HOME, "termux")
+        if (input.hasFocus()) RetuiThemeBridge.sendToKeyboard(context,input,TermuxBridgeManager.TERMUX_HOME,"termux")
+    }
+
+    private fun styleTile(r: TileRuntime) {
         r.heading.text = r.title; r.heading.setTextColor(fg); r.heading.typeface = Typeface.MONOSPACE
         r.heading.setPadding(dp(6), 0, dp(6), 0)
         r.panel.background = android.graphics.drawable.GradientDrawable().apply {
@@ -468,6 +476,11 @@ class TerminalHomeView(context: Context) : LinearLayout(context) {
         }
         r.grid.updateThemeColors(fg, bg, accent)
         r.grid.setTerminalTypeface(Tuils.getTypeface(context)); r.grid.setTerminalTextSizeSp(LauncherFontScale.terminalTextSizeSp())
+    }
+
+    private fun render(r: TileRuntime) {
+        runtimes[r.tile.id] = r
+        styleTile(r)
         r.panel.addView(r.heading, LayoutParams(-1, dp(30))); r.panel.addView(r.grid, LayoutParams(-1, 0, 1f))
         fun bindGesture(view: View, tap: () -> Unit) {
             val detector = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {

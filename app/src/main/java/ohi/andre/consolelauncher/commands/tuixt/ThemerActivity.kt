@@ -555,9 +555,7 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
 
             Toast.makeText(this@ThemerActivity, getString(R.string.themer_preset_applied_reloading_5539d), Toast.LENGTH_SHORT)
                 .show()
-            recyclerView!!.postDelayed(Runnable {
-                LauncherActivity.preview(this)
-            }, 500)
+
         } catch (e: Exception) {
             Toast.makeText(this@ThemerActivity, e.displayMessage(this@ThemerActivity), Toast.LENGTH_SHORT).show()
         }

@@ -56,7 +56,7 @@ class SettingsPreviewMatrixTest {
     ))
 
     @Test fun classicPortraitWithScaledGroupedStatus() = verify("classic-portrait-scaled-grouped", false, false, mapOf(
-        Ui.font_size_offset to "4", Ui.show_ram to "true", Ui.show_time to "true", Ui.ram_index to "0", Ui.time_index to "0.1"
+        Ui.font_size_offset to "4", Ui.show_ram to "true", Ui.show_time to "true", Ui.ram_index to "1", Ui.time_index to "1.1"
     ))
 
     @Test fun searchLandscapeWithTransparencyAndCustomFrame() = verify("search-landscape-transparent-frame", true, true, mapOf(

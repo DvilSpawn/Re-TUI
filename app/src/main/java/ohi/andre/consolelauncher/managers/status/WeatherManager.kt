@@ -16,7 +16,7 @@ import ohi.andre.consolelauncher.UIManager
 class WeatherManager(
     context: Context,
     delay: Long,
-    private val size: Int,
+    private var size: Int,
     private val listener: StatusUpdateListener?
 ) : StatusManager(context, delay) {
     private var url: String? = null
@@ -34,6 +34,11 @@ class WeatherManager(
         } else {
             locationQuery = where
         }
+    }
+
+    override fun refreshAppearance() {
+        // The next scheduled response uses the new size; changing a font must not fetch weather.
+        size = XMLPrefsManager.getInt(ohi.andre.consolelauncher.managers.xml.options.Ui.weather_size)
     }
 
     override fun update() {

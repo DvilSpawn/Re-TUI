@@ -17,7 +17,10 @@ import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.presentation.*
 import ohi.andre.consolelauncher.tuils.*
 
-/** Passive Home components with captured launcher content and private draft appearance. */
+/**
+ * Status, Terminal and Modules are crops of one detached Home scene built by Home's own layout and binders
+ * (LauncherHomeSnapshot.createDraft), restyled in place per edit. Help, Calculator and ANSI are samples.
+ */
 internal class SettingsAppearancePreview(
     context: Context,
     private val draft: (XMLPrefsSave) -> String?,
@@ -25,16 +28,12 @@ internal class SettingsAppearancePreview(
 ) : LinearLayout(context) {
     private var saved = HomeAppearance.saved()
     private var live:LauncherHomeSnapshot?=null
+    internal var scene:ViewGroup?=null
+        private set
     private val pageLabel=TextView(context)
     private val pageNames=listOf("Status", "Terminal", "Modules", "Help", "Calculator", "ANSI")
     private val pageOffsets=IntArray(pageNames.size)
-    private val liveTicker=object:Runnable {
-        override fun run() {
-            if(!isAttachedToWindow || windowVisibility!=View.VISIBLE) return
-            refresh()
-            postDelayed(this,2000)
-        }
-    }
+    private val stale=BooleanArray(pageNames.size)
     internal val pager = ViewPager2(context)
     private val refreshTask = Runnable { render() }
     private val pages = object : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -45,6 +44,7 @@ internal class SettingsAppearancePreview(
                 isFillViewport = true
             }) {}
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+            stale[position] = false
             val scroll = holder.itemView as ScrollView
             val offset = pageOffsets[position]
             scroll.setOnScrollChangeListener(null as View.OnScrollChangeListener?)
@@ -52,20 +52,24 @@ internal class SettingsAppearancePreview(
             val appearance = saved.overlay(draft, hasDraft)
             val body = LinearLayout(context).apply {
                 orientation = VERTICAL
-                setPadding(dp(8), dp(8), dp(8), dp(8))
                 setBackgroundColor(ColorUtils.compositeColors(appearance.color(Theme.background_color), Color.BLACK))
             }
             scroll.addView(body, FrameLayout.LayoutParams(-1, -2))
-            when (position) {
-                0 -> status(body, appearance)
-                1 -> terminal(body, appearance)
-                2 -> {
-                    (live?.module ?: ModulePresentationSnapshot.idleMusic(context)).bind(body, appearance)
+            if (position <= 2 && scene == null) body.addView(TextView(context).apply {
+                text = context.getString(R.string.settings_preview_no_launcher)
+                setTextColor(appearance.color(Theme.output_text_color))
+                typeface = appearance.font(context)
+                setPadding(dp(8), dp(8), dp(8), dp(8))
+            }) else when (position) {
+                0, 1 -> body.addView(ScenePort(position))
+                2 -> if (live?.module != null) body.addView(ScenePort(2)) else {
+                    body.setPadding(dp(8), dp(8), dp(8), dp(8))
+                    ModulePresentationSnapshot.idleMusic(context).bind(body, appearance)
                     body.findViewById<View>(R.id.music_module)?.let(ModulePanelPresentation::sizeVisualizer)
                 }
-                3 -> workspace(body, appearance, false)
-                4 -> workspace(body, appearance, true)
-                5 -> ansi(body, appearance)
+                3 -> workspace(body.padded(), appearance, false)
+                4 -> workspace(body.padded(), appearance, true)
+                5 -> ansi(body.padded(), appearance)
             }
             passive(body)
             scroll.post {
@@ -73,6 +77,53 @@ internal class SettingsAppearancePreview(
                 scroll.setOnScrollChangeListener { _, _, y, _, _ -> pageOffsets[position]=y }
             }
         }
+    }
+
+    private fun LinearLayout.padded() = apply { setPadding(dp(8), dp(8), dp(8), dp(8)) }
+
+    /** Draws one region of the shared scene, fitted to this page's width. The scene stays detached and passive. */
+    private inner class ScenePort(private val page: Int) : View(context) {
+        private fun region(): android.graphics.Rect? {
+            val root = scene ?: return null
+            val full = android.graphics.Rect(0, 0, root.width, root.height)
+            val area = when (page) {
+                0 -> bounds(root, R.id.header_container) ?: bounds(root, R.id.unified_status_host)
+                1 -> bounds(root, R.id.terminal_tray_container)?.let { android.graphics.Rect(0, it.top, root.width, root.height) }
+                else -> bounds(root, R.id.home_modules_root)
+            }
+            return area?.takeIf { it.intersect(full) && !it.isEmpty } ?: full
+        }
+        override fun onMeasure(widthSpec: Int, heightSpec: Int) {
+            val width = MeasureSpec.getSize(widthSpec)
+            val area = region()
+            setMeasuredDimension(width, if (area == null) 0 else (area.height().toLong() * width / area.width()).toInt())
+        }
+        override fun onDraw(canvas: android.graphics.Canvas) {
+            val root = scene ?: return
+            val area = region() ?: return
+            val scale = width.toFloat() / area.width()
+            canvas.save()
+            canvas.scale(scale, scale)
+            canvas.translate(-area.left.toFloat(), -area.top.toFloat())
+            canvas.clipRect(area)
+            root.draw(canvas)
+            canvas.restore()
+        }
+    }
+
+    /** View bounds in scene coordinates; null when hidden or empty. */
+    private fun bounds(root: ViewGroup, id: Int): android.graphics.Rect? {
+        var view: View = root.findViewById(id) ?: return null
+        if (view.width == 0 || view.height == 0) return null
+        val rect = android.graphics.Rect(0, 0, view.width, view.height)
+        while (view !== root) {
+            if (view.visibility != View.VISIBLE) return null
+            rect.offset(view.left + view.translationX.toInt(), view.top + view.translationY.toInt())
+            val parent = view.parent as? View ?: return null
+            rect.offset(-parent.scrollX, -parent.scrollY)
+            view = parent
+        }
+        return rect
     }
 
     init {
@@ -87,8 +138,13 @@ internal class SettingsAppearancePreview(
         addView(pageLabel,LayoutParams(-1,-2))
         pager.descendantFocusability=ViewGroup.FOCUS_BLOCK_DESCENDANTS
         pager.adapter = pages
+        // The default change crossfade makes every rebind flash.
+        (pager.getChildAt(0) as? RecyclerView)?.itemAnimator = null
         pager.registerOnPageChangeCallback(object:ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position:Int) { updateLabel(position) }
+            override fun onPageSelected(position:Int) {
+                updateLabel(position)
+                if(stale[position]) pages.notifyItemChanged(position)
+            }
         })
         updateLabel(0)
         addView(pager, LayoutParams(-1, dp(190)))
@@ -107,60 +163,30 @@ internal class SettingsAppearancePreview(
     fun selectedPage()=pager.currentItem
     fun restorePage(position:Int) { pager.setCurrentItem(position.coerceIn(0,pageNames.lastIndex),false) }
     private fun render() {
-        live=LauncherActivity.captureHomePreview()
-        pages.notifyDataSetChanged()
+        if (pager.scrollState != ViewPager2.SCROLL_STATE_IDLE) {
+            removeCallbacks(refreshTask)
+            postDelayed(refreshTask,60)
+            return
+        }
+        // Home is captured once per visit; each edit restyles that one frozen scene in place.
+        val appearance = saved.overlay(draft, hasDraft)
+        if (live == null) { live = LauncherActivity.captureHomePreview();scene = null }
+        val snapshot = live
+        val current = scene
+        if (snapshot != null) {
+            if (current == null) scene = snapshot.createDraft(context, appearance)
+            else snapshot.bindDraft(current, appearance)
+        }
+        // Only the visible page redraws now; the rest catch up when selected.
+        stale.fill(true)
+        pages.notifyItemChanged(pager.currentItem)
     }
-    override fun onAttachedToWindow() { super.onAttachedToWindow();post(liveTicker) }
+    override fun onAttachedToWindow() { super.onAttachedToWindow();refresh() }
     override fun onWindowVisibilityChanged(visibility:Int) {
         super.onWindowVisibilityChanged(visibility)
-        if(isAttachedToWindow) { removeCallbacks(liveTicker);if(visibility==View.VISIBLE) post(liveTicker) }
+        if(isAttachedToWindow && visibility==View.VISIBLE) { live=null;refresh() }
     }
-    override fun onDetachedFromWindow() { removeCallbacks(refreshTask);removeCallbacks(liveTicker);super.onDetachedFromWindow() }
-
-    private fun status(parent: LinearLayout, appearance: HomeAppearance) {
-        val batteryIntent=context.registerReceiver(null,android.content.IntentFilter(android.content.Intent.ACTION_BATTERY_CHANGED))
-        val battery=batteryIntent?.let {
-            val level=it.getIntExtra(android.os.BatteryManager.EXTRA_LEVEL,0)*100f / it.getIntExtra(android.os.BatteryManager.EXTRA_SCALE,100).coerceAtLeast(1)
-            val charging=it.getIntExtra(android.os.BatteryManager.EXTRA_STATUS,-1) in listOf(android.os.BatteryManager.BATTERY_STATUS_CHARGING,android.os.BatteryManager.BATTERY_STATUS_FULL)
-            BatteryPresentation.render(context,level,charging,appearance.number(Ui.battery_size,12f).toInt(),
-                appearance.number(Behavior.battery_medium).toInt(),appearance.number(Behavior.battery_low).toInt(),appearance)
-        }
-        val source=live?.statuses
-        val texts=source?.texts?.toMutableList() ?: MutableList<CharSequence?>(StatusPresentation.descriptors.size) { null }
-        if(battery!=null) texts[3]=battery
-        val content=StatusPresentation.Content(texts,source?.asciiColor,source?.asciiColors)
-        if(appearance.bool(SurfaceBorderOption.unified_status_border) && live?.unified!=null) {
-            val root=LayoutInflater.from(context).inflate(R.layout.about_device_view,parent,false)
-            parent.addView(root)
-            for(id in intArrayOf(R.id.tv0,R.id.tv1,R.id.tv2,R.id.tv3,R.id.tv4,R.id.tv5,R.id.tv6,R.id.tv7,R.id.tv8,R.id.tv9)) root.findViewById<View>(id).visibility=View.GONE
-            root.findViewById<View>(R.id.unified_status_container).visibility=View.VISIBLE
-            UnifiedStatusPresentation.style(root,appearance)
-            val unified=checkNotNull(live?.unified)
-            val bound=if(battery==null) unified else unified.copy(texts=unified.texts+(R.id.unified_status_battery to battery))
-            UnifiedStatusPresentation.bindContent(root,bound,appearance,saved)
-        } else StatusPresentation.rows(appearance,saved).forEachIndexed { index,members ->
-            val template=LayoutInflater.from(context).inflate(R.layout.about_device_view,null,false)
-            val id=intArrayOf(R.id.tv0,R.id.tv1,R.id.tv2,R.id.tv3,R.id.tv4,R.id.tv5,R.id.tv6,R.id.tv7,R.id.tv8,R.id.tv9)[index]
-            val original=template.findViewById<TextView>(id)
-            val base=LauncherFontScale.pixelsToSp(original)
-            val row=if(members==listOf(9)) AsciiArtTextView(context) else original.also {(it.parent as ViewGroup).removeView(it)}
-            row.id=id
-            parent.addView(row,LayoutParams(-1,-2))
-            StatusPresentation.bindStyle(row,members.first(),appearance)
-            StatusPresentation.bindContent(row,members,content,appearance,saved)
-            LauncherFontScale.setBaseSize(row,base,appearance.number(Ui.font_size_offset).toInt())
-        }
-    }
-
-    private fun terminal(parent:LinearLayout,appearance:HomeAppearance) {
-        val snapshot=live
-        if(snapshot!=null) snapshot.bindTerminalCard(parent,appearance)
-        else parent.addView(TextView(context).apply {
-            text=context.getString(R.string.settings_preview_no_launcher)
-            setTextColor(appearance.color(Theme.output_text_color))
-            typeface=appearance.font(context)
-        })
-    }
+    override fun onDetachedFromWindow() { removeCallbacks(refreshTask);super.onDetachedFromWindow() }
 
     private fun ansi(parent:LinearLayout,appearance:HomeAppearance) {
         fun line(text:String,role:Theme) = TextView(context).apply {

@@ -47,7 +47,8 @@ class config : ParamCommand() {
                 if (save is Ui && StatusRowResolver.isStatusIndex(save)) {
                     LauncherSettings.setStatusIndex(pack.context, save, value)
                 } else {
-                    set(pack.context, save, value)
+                    if (value.isEmpty()) ohi.andre.consolelauncher.managers.settings.LauncherSettings.erase(pack.context, save)
+                    else set(pack.context, save, value)
                 }
 
                 (pack.context as Reloadable).addMessage(
@@ -55,55 +56,10 @@ class config : ParamCommand() {
                     save.label() + " -> " + value
                 )
 
-                if (save.label()!!.startsWith("default_app_n")) {
-                    return pack.context.getString(R.string.output_usedefapp)
-                } else if (save === Behavior.unlock_counter_cycle_start) {
-                    val preferences = pack.context.getSharedPreferences(UIManager.PREFS_NAME, 0)
-                    preferences.edit()
-                        .putLong(UIManager.NEXT_UNLOCK_CYCLE_RESTART, 0)
-                        .putInt(UIManager.UNLOCK_KEY, 0)
-                        .apply()
-                } else if (save === Behavior.show_module_dock) {
-                    val intent = Intent(UIManager.ACTION_MODULE_COMMAND)
-                    intent.putExtra(UIManager.EXTRA_MODULE_COMMAND, "rebuild")
-                    LocalBroadcastManager.getInstance(pack.context.getApplicationContext())
-                        .sendBroadcast(intent)
-                } else if (save === Behavior.show_tmux_workspace_button
-                    && pack.context is LauncherActivity
-                    && (pack.context as LauncherActivity).uiManager != null
-                ) {
-                    (pack.context as LauncherActivity).uiManager!!.refreshTermuxWorkspaceToolbarButton()
-                } else if (save === Behavior.show_android_widget_drawer_button
-                    && pack.context is LauncherActivity
-                    && (pack.context as LauncherActivity).uiManager != null
-                ) {
-                    (pack.context as LauncherActivity).uiManager!!.refreshAndroidWidgetDrawerToolbarButton()
-                } else if ((save === Behavior.enable_cyberdeck_mode || save === Behavior.enable_crt_filter || save === Ui.enable_crt_vignette) && pack.context is Reloadable) {
-                    (pack.context as Reloadable).reload()
-                } else if (save === Behavior.duo_mode && !"true".equals(
-                        value,
-                        ignoreCase = true
-                    ) && pack.context is LauncherActivity
-                    && (pack.context as LauncherActivity).uiManager != null
-                ) {
-                    (pack.context as LauncherActivity).uiManager!!.setDuoLayoutMode(UIManager.DUO_LAYOUT_OFF)
-                } else if (save === Behavior.orientation && pack.context is LauncherActivity) {
-                    (pack.context as LauncherActivity).applyOrientationPreference()
-                } else if (isResponsiveLandscapeSetting(save)
-                    && pack.context is LauncherActivity
-                    && (pack.context as LauncherActivity).uiManager != null
-                ) {
-                    (pack.context as LauncherActivity).uiManager!!.refreshResponsiveLandscapeLayout()
-                } else if (isDisplayMarginSetting(save)
-                    && pack.context is LauncherActivity
-                    && (pack.context as LauncherActivity).uiManager != null
-                ) {
-                    (pack.context as LauncherActivity).uiManager!!.refreshDisplayMargins()
-                } else if (isAndroidWidgetGridSetting(save)
-                    && pack.context is LauncherActivity
-                    && (pack.context as LauncherActivity).uiManager != null
-                ) {
-                    (pack.context as LauncherActivity).uiManager!!.refreshAndroidWidgetDrawerGrid()
+                if (save.label()!!.startsWith("default_app_n")) return pack.context.getString(R.string.output_usedefapp)
+                if (save === Behavior.unlock_counter_cycle_start) {
+                    pack.context.getSharedPreferences(UIManager.PREFS_NAME, 0).edit()
+                        .putLong(UIManager.NEXT_UNLOCK_CYCLE_RESTART, 0).putInt(UIManager.UNLOCK_KEY, 0).apply()
                 }
 
                 return null
@@ -173,7 +129,7 @@ class config : ParamCommand() {
 
             override fun exec(pack: ExecutePack): String? {
                 val save = pack.getPrefsSave()
-                set(pack.context, save, Tuils.EMPTYSTRING)
+                ohi.andre.consolelauncher.managers.settings.LauncherSettings.erase(pack.context, save)
 
                 (pack.context as Reloadable).addMessage(
                     save.parent()!!.path(),
@@ -276,16 +232,9 @@ class config : ParamCommand() {
             override fun exec(pack: ExecutePack): String? {
                 val size = pack.getInt()
 
-                set(pack.context, Ui.device_size, size.toString())
-                set(pack.context, Ui.ram_size, size.toString())
-                set(pack.context, Ui.network_size, size.toString())
-                set(pack.context, Ui.storage_size, size.toString())
-                set(pack.context, Ui.battery_size, size.toString())
-                set(pack.context, Ui.notes_size, size.toString())
-                set(pack.context, Ui.time_size, size.toString())
-                set(pack.context, Ui.weather_size, size.toString())
-                set(pack.context, Ui.unlock_size, size.toString())
-                set(pack.context, Ui.input_output_size, size.toString())
+                LauncherSettings.applyChanges(pack.context, listOf(Ui.device_size, Ui.ram_size, Ui.network_size,
+                    Ui.storage_size, Ui.battery_size, Ui.notes_size, Ui.time_size, Ui.weather_size, Ui.unlock_size,
+                    Ui.input_output_size).associateWith { size.toString() })
 
                 return null
             }
@@ -303,41 +252,6 @@ class config : ParamCommand() {
                     save.parent()!!.path(),
                     save.label() + " -> " + save.defaultValue()
                 )
-                if (save === Behavior.orientation && pack.context is LauncherActivity) {
-                    (pack.context as LauncherActivity).applyOrientationPreference()
-                } else if ((save === Behavior.enable_cyberdeck_mode || save === Behavior.enable_crt_filter || save === Ui.enable_crt_vignette) && pack.context is Reloadable) {
-                    (pack.context as Reloadable).reload()
-                } else if (save === Behavior.show_tmux_workspace_button
-                    && pack.context is LauncherActivity
-                    && (pack.context as LauncherActivity).uiManager != null
-                ) {
-                    (pack.context as LauncherActivity).uiManager!!.refreshTermuxWorkspaceToolbarButton()
-                } else if (save === Behavior.show_android_widget_drawer_button
-                    && pack.context is LauncherActivity
-                    && (pack.context as LauncherActivity).uiManager != null
-                ) {
-                    (pack.context as LauncherActivity).uiManager!!.refreshAndroidWidgetDrawerToolbarButton()
-                } else if (save === Behavior.duo_mode && pack.context is LauncherActivity
-                    && (pack.context as LauncherActivity).uiManager != null
-                ) {
-                    (pack.context as LauncherActivity).uiManager!!.setDuoLayoutMode(UIManager.DUO_LAYOUT_OFF)
-                } else if (isResponsiveLandscapeSetting(save)
-                    && pack.context is LauncherActivity
-                    && (pack.context as LauncherActivity).uiManager != null
-                ) {
-                    (pack.context as LauncherActivity).uiManager!!.refreshResponsiveLandscapeLayout()
-                } else if (isDisplayMarginSetting(save)
-                    && pack.context is LauncherActivity
-                    && (pack.context as LauncherActivity).uiManager != null
-                ) {
-                    (pack.context as LauncherActivity).uiManager!!.refreshDisplayMargins()
-                } else if (isAndroidWidgetGridSetting(save)
-                    && pack.context is LauncherActivity
-                    && (pack.context as LauncherActivity).uiManager != null
-                ) {
-                    (pack.context as LauncherActivity).uiManager!!.refreshAndroidWidgetDrawerGrid()
-                }
-
                 return null
             }
         },
@@ -441,24 +355,5 @@ class config : ParamCommand() {
     }
 
     companion object {
-        private fun isDisplayMarginSetting(save: XMLPrefsSave?): Boolean {
-            return save === Ui.display_margin_top_section
-                    || save === Ui.display_margin_bottom_section
-                    || save === Ui.keyboard_visible_margin_override
-                    || save === Ui.display_margin_landscape_mm
-        }
-
-        private fun isResponsiveLandscapeSetting(save: XMLPrefsSave?): Boolean {
-            return save === Ui.split_duo_launcher
-                    || save === Behavior.duo_swap_top_panes
-                    || save === Behavior.swipe_up_apps_drawer
-                    || save === Ui.show_ascii_landscape
-        }
-
-        private fun isAndroidWidgetGridSetting(save: XMLPrefsSave?): Boolean {
-            return save === Ui.android_widget_grid_columns
-                    || save === Ui.android_widget_min_columns
-                    || save === Ui.android_widget_min_rows
-        }
     }
 }

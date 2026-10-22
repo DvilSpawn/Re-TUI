@@ -213,7 +213,6 @@ object TaskerIntegrationManager {
     private fun applyPreset(context: Context, preset: String?): Result {
         val name = required(preset, context.getString(R.string.manager_taskerintegrationmanager_preset_name_is_required_4417a))
         PresetManager.apply(name)
-        refreshLauncher()
         return Result(true, context.getString(R.string.manager_taskerintegrationmanager_preset_applied_71a47, name))
     }
 
@@ -224,7 +223,6 @@ object TaskerIntegrationManager {
         val element = Theme.entries.firstOrNull { it.label().equals(requested, true) }
             ?: return Result(false, context.getString(R.string.manager_taskerintegrationmanager_unknown_theme_element_cdc2e, requested))
         LauncherSettings.set(context, element, color)
-        refreshLauncher()
         return Result(true, context.getString(R.string.manager_taskerintegrationmanager_theme_updated_582ad, element.label()))
     }
 
@@ -263,7 +261,6 @@ object TaskerIntegrationManager {
         Tuils.init(context.applicationContext)
         val target = SpaceManager.switchTo(context, required(space, context.getString(R.string.manager_taskerintegrationmanager_space_name_is_required_e3d46)))
         NotificationService.requestReload(context)
-        refreshLauncher()
         return Result(true, context.getString(R.string.manager_taskerintegrationmanager_switched_to_space_c4781, target.name))
     }
 

@@ -44,6 +44,7 @@ import java.util.regex.Matcher
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.commands.main.raw.shortcut
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
+import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave
 import ohi.andre.consolelauncher.managers.xml.options.Ui
 import ohi.andre.consolelauncher.tuils.LongClickableSpan
 import ohi.andre.consolelauncher.tuils.Tuils
@@ -54,7 +55,9 @@ import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager.resetFile
 /**
  * Created by francescoandreuzzi on 12/02/2018.
  */
-class NotesManager(var mContext: Context, noteView: TextView?) {
+// readOnly: a settings preview copy that must not register receivers or change the shared sort order.
+class NotesManager(var mContext: Context, noteView: TextView?,
+                   read: (XMLPrefsSave) -> String = XMLPrefsManager::get, readOnly: Boolean = false) {
     var oldNotes: CharSequence? = null
     var hasChanged: Boolean = false
 
@@ -107,16 +110,16 @@ class NotesManager(var mContext: Context, noteView: TextView?) {
 
         packageManager = mContext.getPackageManager()
 
-        val optionalSeparator = "\\" + XMLPrefsManager.get(Behavior.optional_values_separator)
+        val optionalSeparator = "\\" + read(Behavior.optional_values_separator)
         val optional = "%\\(([^" + optionalSeparator + "]*)" + optionalSeparator + "([^)]*)\\)"
         optionalPattern = Pattern.compile(optional, Pattern.CASE_INSENSITIVE)
 
         color = XMLPrefsManager.getColor(Theme.notes_text_color)
         lockedColor = XMLPrefsManager.getColor(Theme.locked_notes_text_color)
 
-        footer = XMLPrefsManager.get(Ui.notes_footer)
-        header = XMLPrefsManager.get(Ui.notes_header)
-        divider = XMLPrefsManager.get(Ui.notes_divider)
+        footer = read(Ui.notes_footer)
+        header = read(Ui.notes_header)
+        divider = read(Ui.notes_divider)
         divider = Tuils.patternNewline.matcher(divider).replaceAll(Tuils.NEWLINE)
 
         allowLink = XMLPrefsManager.getBoolean(Behavior.notes_allow_link)
@@ -125,7 +128,7 @@ class NotesManager(var mContext: Context, noteView: TextView?) {
             linkColor = XMLPrefsManager.getColor(Theme.link_text_color)
         }
 
-        Note.Companion.sorting = XMLPrefsManager.getInt(Behavior.notes_sorting)
+        if (!readOnly) Note.Companion.sorting = XMLPrefsManager.getInt(Behavior.notes_sorting)
 
         load(mContext, true)
 
@@ -196,7 +199,7 @@ class NotesManager(var mContext: Context, noteView: TextView?) {
             }
         }
 
-        LocalBroadcastManager.getInstance(mContext.getApplicationContext())
+        if (!readOnly) LocalBroadcastManager.getInstance(mContext.getApplicationContext())
             .registerReceiver(receiver, filter)
     }
 

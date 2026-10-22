@@ -18,7 +18,17 @@ import android.widget.TextView
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.managers.settings.StatusRowResolver
 import ohi.andre.consolelauncher.managers.settings.TextShadows
+import android.content.Context
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+import ohi.andre.consolelauncher.managers.NotesManager
 import ohi.andre.consolelauncher.managers.status.AsciiAnimationManager
+import ohi.andre.consolelauncher.managers.status.NetworkManager
+import ohi.andre.consolelauncher.managers.status.RamManager
+import ohi.andre.consolelauncher.managers.status.StatusUpdateListener
+import ohi.andre.consolelauncher.managers.status.StorageManager
+import ohi.andre.consolelauncher.managers.status.UnlockManager
+import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave
 import ohi.andre.consolelauncher.managers.xml.options.*
 import ohi.andre.consolelauncher.tuils.*
 
@@ -98,17 +108,70 @@ internal object StatusPresentation {
             return
         }
         val parts=members.mapNotNull { ordinal ->
-            if(saved!=null && ordinal==2) {
+            if(saved!=null && ordinal==2 && listOf(Behavior.status_time_format,Behavior.time_format_separator,
+                    Ui.time_size,Ui.font_size_offset,Theme.time_text_color).any { appearance.changed(it,saved) }) {
                 ohi.andre.consolelauncher.managers.TimeManager.previewStatus(view.context,
                     appearance.raw(Behavior.status_time_format).orEmpty(),
                     appearance.raw(Behavior.time_format_separator).orEmpty(),
                     appearance.number(Ui.time_size,12f).toInt(),appearance.color(Theme.time_text_color))
-            } else content.texts.getOrNull(ordinal)?.let { text ->
-                if(saved==null) text else draftText(text,ordinal,view,appearance,saved)
+            } else {
+                val formatted=if(saved==null) null else draftFormat(view.context,ordinal,appearance,saved)
+                (formatted ?: content.texts.getOrNull(ordinal))?.let { text ->
+                    if(saved==null) text else draftText(text,ordinal,view,appearance,saved)
+                }
             }
         }
         view.text=TextUtils.concat(*parts.toTypedArray())
         view.visibility=if(view.text.isNullOrEmpty()) View.GONE else View.VISIBLE
+    }
+
+    fun deviceText(read:(XMLPrefsSave)->String):String {
+        val name=read(Ui.deviceName).ifEmpty { android.os.Build.DEVICE }
+        var text=Pattern.compile("%u",Pattern.CASE_INSENSITIVE or Pattern.LITERAL).matcher(read(Behavior.device_format)).replaceAll(Matcher.quoteReplacement(read(Ui.username)))
+        text=Pattern.compile("%d",Pattern.CASE_INSENSITIVE or Pattern.LITERAL).matcher(text).replaceAll(Matcher.quoteReplacement(name))
+        return Tuils.patternNewline.matcher(text).replaceAll(Matcher.quoteReplacement(Tuils.NEWLINE))
+    }
+
+    private val formatKeys:Map<Int,List<XMLPrefsSave>> = mapOf(
+        0 to listOf(Behavior.ram_format),
+        1 to listOf(Behavior.device_format,Ui.username,Ui.deviceName),
+        4 to listOf(Behavior.storage_format),
+        5 to listOf(Behavior.network_info_format,Behavior.max_optional_depth,Behavior.optional_values_separator),
+        6 to listOf(Ui.notes_header,Ui.notes_footer,Ui.notes_divider,Behavior.optional_values_separator),
+        8 to listOf(Behavior.unlock_counter_format,Behavior.not_available_text,Behavior.unlock_time_divider,Behavior.unlock_time_order))
+
+    // Re-runs the row's own formatter on the draft in saved colours/sizes; draftText then applies draft styling.
+    // shortcut: unlock times (%t) show not-available text because preview copies never observe unlocks.
+    private val batteryKeys=listOf<XMLPrefsSave>(Behavior.battery_progress_bar,Behavior.battery_progress_bar_length,Behavior.battery_progress_bar_symbol,
+        Behavior.battery_format,Behavior.battery_medium,Behavior.battery_low,Behavior.optional_values_separator,Ui.enable_battery_status)
+
+    /** Battery text rendered from the draft at the current charge; null when no battery setting is drafted. */
+    fun draftBattery(context:Context,appearance:HomeAppearance,saved:HomeAppearance):CharSequence? {
+        if(batteryKeys.none { appearance.changed(it,saved) }) return null
+        val sticky=context.registerReceiver(null,android.content.IntentFilter(android.content.Intent.ACTION_BATTERY_CHANGED)) ?: return null
+        val level=sticky.getIntExtra(android.os.BatteryManager.EXTRA_LEVEL,0)*100f/sticky.getIntExtra(android.os.BatteryManager.EXTRA_SCALE,100).coerceAtLeast(1)
+        val charging=sticky.getIntExtra(android.os.BatteryManager.EXTRA_STATUS,-1) in
+            listOf(android.os.BatteryManager.BATTERY_STATUS_CHARGING,android.os.BatteryManager.BATTERY_STATUS_FULL)
+        return BatteryPresentation.render(context,level,charging,appearance.number(Ui.battery_size,12f).toInt(),
+            appearance.number(Behavior.battery_medium).toInt(),appearance.number(Behavior.battery_low).toInt(),appearance)
+    }
+
+    private fun draftFormat(context:Context,ordinal:Int,appearance:HomeAppearance,saved:HomeAppearance):CharSequence? {
+        if(ordinal==3) return draftBattery(context,appearance,saved)
+        if(formatKeys[ordinal]?.any { appearance.changed(it,saved) }!=true) return null
+        val read:(XMLPrefsSave)->String={ appearance.raw(it).orEmpty() }
+        val size=saved.number(descriptors[ordinal].size,12f).toInt()
+        var out:CharSequence?=null
+        val listener=StatusUpdateListener { _,text -> out=text }
+        runCatching { when(ordinal) {
+            0->RamManager(context,0,size,listener,read).refreshNow()
+            1->out=Tuils.span(context,deviceText(read),saved.color(Theme.device_text_color),size)
+            4->StorageManager(context,0,size,listener,read).refreshNow()
+            5->NetworkManager(context,0,size,listener,read).refreshNow()
+            6->out=NotesManager(context,null,read,readOnly=true).getNotes()
+            8->UnlockManager(context,size,listener,read).refreshNow()
+        } }.onFailure { Tuils.log(it) }
+        return out
     }
 
     private fun draftText(source:CharSequence,ordinal:Int,view:TextView,appearance:HomeAppearance,saved:HomeAppearance):CharSequence {

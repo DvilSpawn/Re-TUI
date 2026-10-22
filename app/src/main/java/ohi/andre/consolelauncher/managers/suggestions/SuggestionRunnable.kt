@@ -183,7 +183,7 @@ class SuggestionRunnable(
 internal class SuggestionChipStyler(private val context: Context, private val appsManager: AppsManager? = null) {
     constructor(pack: MainPack) : this(pack.context, pack.appsManager)
 
-    private val appearance=ohi.andre.consolelauncher.presentation.HomeAppearance.saved()
+    private val appearance get() = ohi.andre.consolelauncher.presentation.HomeAppearance.saved()
 
     internal data class Binding(val type: Int,val backgroundOverride: Int=Int.MAX_VALUE,val textOverride: Int=Int.MAX_VALUE)
     internal object TrailingSpace

@@ -90,6 +90,13 @@ android {
                 applicationIdSuffix = '.calculatorpackdebug'
                 manifestPlaceholders.applicationLabel = 'Re:TUI Calculator Pack Test'
             }
+            def testPackageSuffix = providers.gradleProperty('testPackageSuffix').orNull
+            if (testPackageSuffix != null) {
+                if (!(testPackageSuffix in ['base', 'librarydebug', 'palettedebug', 'fetchdebug', 'calculatorpackdebug', 'termuxsshdebug']))
+                    throw new GradleException('Unsupported testPackageSuffix')
+                applicationIdSuffix = testPackageSuffix == 'base' ? '' : '.' + testPackageSuffix
+                manifestPlaceholders.applicationLabel = 'Re:TUI Test'
+            }
             pseudoLocalesEnabled = true
             if (providers.gradleProperty('fetchDebug').map { it.toBoolean() }.getOrElse(false)) {
                 def paletteDebug = providers.gradleProperty('paletteDebug').map { it.toBoolean() }.getOrElse(false)
@@ -172,7 +179,12 @@ def validateRuntimeNotices = tasks.register('validateRuntimeNotices') {
         def entries = new groovy.json.JsonSlurper().parse(rootProject.file('third_party/runtime-libraries.json'))
         def recorded = entries.collect { it.coordinate }.toSet()
         if (recorded.size() != entries.size()) throw new GradleException('Duplicate runtime notice coordinates')
-        ['playstoreReleaseRuntimeClasspath', 'fdroidReleaseRuntimeClasspath'].each { name ->
+        def runtimes = ['playstoreReleaseRuntimeClasspath', 'fdroidReleaseRuntimeClasspath']
+                .findAll { configurations.findByName(it) != null }
+        if (runtimes.isEmpty()) runtimes = ['playstoreDebugRuntimeClasspath', 'fdroidDebugRuntimeClasspath']
+                .findAll { configurations.findByName(it) != null }
+        if (runtimes.isEmpty()) throw new GradleException('No application runtime configuration to validate')
+        runtimes.each { name ->
             def resolved = configurations.getByName(name).incoming.resolutionResult.allComponents
                     .findAll { it.id instanceof org.gradle.api.artifacts.component.ModuleComponentIdentifier }
                     .collect { it.id.displayName }.toSet()

@@ -227,7 +227,22 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
             }
         }
 
-        XMLPrefsManager.loadCommons(this)
+        if (!XMLPrefsManager.loadCommons(this)) {
+            super.onCreate(savedInstanceState)
+            val error = android.widget.LinearLayout(this).apply {
+                orientation = android.widget.LinearLayout.VERTICAL
+                setPadding(32, 64, 32, 32)
+                addView(android.widget.TextView(this@LauncherActivity).apply {
+                    text = getString(R.string.settings_load_failed, XMLPrefsManager.lastLoadError.orEmpty())
+                })
+                addView(android.widget.Button(this@LauncherActivity).apply {
+                    setText(R.string.settings_load_retry)
+                    setOnClickListener { recreate() }
+                })
+            }
+            setContentView(error)
+            return
+        }
         refreshFromLoadedPrefs()
         LauncherSettings.freezeLegacyWallpaperAuto(this)
         SpaceManager.ensureInitialized(this)
@@ -517,18 +532,22 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
         }
     }
 
+    fun applySettingsAppearance(previous: LauncherSettings.Snapshot, current: LauncherSettings.Snapshot) {
+        applyWallpaperWindowMode()
+        uiManager?.applyAppearance(previous, current)
+    }
+
     fun refreshUiInPlace() {
         runOnUiThread {
             if (isFinishing || isDestroyed || uiManager == null) return@runOnUiThread
+            XMLPrefsManager.dispose()
+            if (!XMLPrefsManager.loadCommons(this)) return@runOnUiThread
             val oldManager = uiManager
             val terminalState = oldManager?.snapshotTerminalState()
             oldManager?.preserveSurfaceSessionForReload()
             oldManager?.pause()
             oldManager?.dispose()
 
-            XMLPrefsManager.dispose()
-            invalidate()
-            XMLPrefsManager.loadCommons(this)
             refreshFromLoadedPrefs()
             TimeManager(this)
             Tuils.cancelFont()

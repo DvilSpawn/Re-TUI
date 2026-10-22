@@ -10,7 +10,7 @@ The goal is not to turn T-UI into a conventional launcher with a terminal theme 
 
 Re:TUI supports Android 6.0 and newer and targets current Android APIs.
 
-> **First-install note:** If background transparency does not take effect immediately, type `restart` and press Enter.
+Wallpaper colors are applied once during setup. Run `wallpaper -auto` and confirm `yes` to refresh them after changing wallpapers.
 
 New users can follow the illustrated [Getting Started guide](docs/GETTING_STARTED.md)
 for the Basic and Advanced startup choices.
@@ -84,22 +84,28 @@ This keeps the launcher lean for Play Store builds while preserving power-user L
 
 ### Build from source
 
-Install the Android SDK/NDK versions declared in `app/build.gradle`, Python 3 and
-the native prerequisites in [native/qalculate/README.md](native/qalculate/README.md).
+Install JDK 17 and the Android SDK versions declared in `app/build.gradle`.
 Configure your own SDK path using `ANDROID_HOME` or an ignored `local.properties`.
+Building the optional calculator engine has additional native prerequisites listed
+in [native/qalculate/README.md](native/qalculate/README.md); it is not required to
+compile the launcher APK.
 Then build and run the reusable unit tests:
 
 ```sh
 ./gradlew :app:assembleFdroidDebug :app:testFdroidDebugUnitTest
 ```
 
-The current source declares version **3**, build **500**. `assemblePlaystoreRelease`
+The current version is declared in `app/build.gradle`. `assemblePlaystoreRelease`
 and `bundlePlaystoreRelease` produce the release APK and Play Store bundle.
 Official signing keys are private and are not needed to compile your own debug
 APK. Never add signing files, credentials, release reports or personal device
 configuration to Git. The repository includes reusable tests, build documentation,
 required license notices and runtime Help/changelog content, not maintainer-local
 release notes or VPS operating records.
+
+See [settings compatibility and verification](docs/development/settings-and-reloads.md)
+for the save/reload contract, upgrade fixtures, host checks and device test matrix.
+Test output and personal device data belong under ignored `build/` directories.
 
 ---
 

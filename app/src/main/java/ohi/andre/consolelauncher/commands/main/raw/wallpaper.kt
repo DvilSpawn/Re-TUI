@@ -209,7 +209,6 @@ class wallpaper : ParamCommand() {
                     "wallpaper",
                     result.message(pack.context)
                 )
-                LauncherActivity.preview(pack.context)
                 return Tuils.EMPTYSTRING
             }
 

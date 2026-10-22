@@ -6,6 +6,7 @@ import android.net.ConnectivityManager
 import android.net.wifi.WifiManager
 import ohi.andre.consolelauncher.UIManager
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
+import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave
 import ohi.andre.consolelauncher.managers.xml.options.Behavior
 import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.tuils.NetUtils.getIPAddress
@@ -21,9 +22,15 @@ import ohi.andre.consolelauncher.tuils.NetUtils
 class NetworkManager(
     context: Context,
     delay: Long,
-    private val size: Int,
-    private val listener: StatusUpdateListener?
+    private var size: Int,
+    private val listener: StatusUpdateListener?,
+    private val read: (XMLPrefsSave) -> String = XMLPrefsManager::get
 ) : StatusManager(context, delay) {
+    override fun refreshAppearance() {
+        size = XMLPrefsManager.getInt(ohi.andre.consolelauncher.managers.xml.options.Ui.network_size)
+        super.refreshAppearance()
+    }
+
     private val zero = "0"
     private val one = "1"
     private val on = "on"
@@ -61,7 +68,7 @@ class NetworkManager(
 
     private var format: String? = null
     private var optionalValueSeparator: String? = null
-    private var color = 0
+    private val color get() = XMLPrefsManager.getColor(Theme.network_info_text_color)
     private var compactConnection = ""
     private var compactConnectionUsesWifi = false
 
@@ -97,11 +104,11 @@ class NetworkManager(
 
     override fun update() {
         if (format == null) {
-            format = XMLPrefsManager.get(Behavior.network_info_format)
-            color = XMLPrefsManager.getColor(Theme.network_info_text_color)
-            maxDepth = XMLPrefsManager.getInt(Behavior.max_optional_depth)
+            format = read(Behavior.network_info_format)
 
-            optionalValueSeparator = XMLPrefsManager.get(Behavior.optional_values_separator)
+            maxDepth = read(Behavior.max_optional_depth).trim().toIntOrNull() ?: Behavior.max_optional_depth.defaultValue()?.toIntOrNull() ?: 0
+
+            optionalValueSeparator = read(Behavior.optional_values_separator)
             val quotedSep = Pattern.quote(optionalValueSeparator)
 
             val wifiRegex = "%\\(([^" + quotedSep + "]*)" + quotedSep + "([^)]*)\\)"

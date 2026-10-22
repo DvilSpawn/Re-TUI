@@ -31,5 +31,9 @@ abstract class StatusManager(
         handler.removeCallbacks(updateRunnable)
     }
 
+    open fun refreshAppearance() { if (running) update() }
+
+    fun refreshNow() = update()
+
     protected abstract fun update()
 }

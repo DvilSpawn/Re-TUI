@@ -62,169 +62,147 @@ object XMLPrefsManager {
         }
     }
 
-    fun dispose() {
+    /** Invalidate the disk view without throwing away the last working values. */
+    fun dispose() { commonsLoaded = false }
+
+    @Volatile var commonsLoaded: Boolean = false
+    @Volatile var lastLoadError: String? = null
+        private set
+    @Volatile var validationWarnings: List<String> = emptyList()
+        private set
+    internal var settingsContext: Context? = null
+        private set
+
+    fun loadCommons(context: Context?): Boolean = loadCandidate(context, emptyMap())
+
+    fun saveRawSettings(context: Context, file: File, text: String) = synchronized(
+        ohi.andre.consolelauncher.managers.settings.SettingsFiles.lock) {
+        val root = XMLPrefsRoot.entries.firstOrNull { it.path == file.name }
+            ?: throw IOException("Unknown settings file: ${file.name}")
+        require(file.canonicalFile == File(Tuils.getFolder(), root.path).canonicalFile) { "Invalid settings path" }
+        val document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(text.byteInputStream())
+        require(document.documentElement.tagName == root.name) { "Unexpected root in ${file.name}" }
+        val nodes = document.documentElement.childNodes
+        for (i in 0 until nodes.length) {
+            val node = nodes.item(i) as? Element ?: continue
+            val setting = root.enums.firstOrNull { it.label() == node.tagName } ?: continue
+            val value = node.getAttribute(VALUE_ATTRIBUTE)
+            if (value != ohi.andre.consolelauncher.managers.settings.LauncherSettings.get(setting))
+                require(ohi.andre.consolelauncher.managers.settings.SettingsValidation.error(setting, value) == null) {
+                    "Invalid setting: ${setting.label()}"
+                }
+        }
+        val previous = ohi.andre.consolelauncher.managers.settings.LauncherSettings.currentSnapshot()
+        val wasLoaded = commonsLoaded
         commonsLoaded = false
-
-        for (element in XMLPrefsRoot.entries) {
-            if (element === XMLPrefsRoot.APPS) continue
-            element.getValues()?.list?.clear()
+        if (!loadCandidate(context, mapOf(file.canonicalFile to text))) {
+            commonsLoaded = wasLoaded
+            throw IOException(lastLoadError ?: "Unable to save settings")
         }
+        val current = ohi.andre.consolelauncher.managers.settings.LauncherSettings.currentSnapshot()
+        val changed = current.values.keys.filterTo(linkedSetOf()) { previous.values[it] != current.values[it] }
+        ohi.andre.consolelauncher.managers.settings.SettingsRefreshCoordinator.request(context,
+            ohi.andre.consolelauncher.managers.settings.LauncherSettings.Change(previous, current, changed))
     }
 
-    var commonsLoaded: Boolean = false
-    fun loadCommons(context: Context?) {
-        if (context == null) {
-            return
-        }
-        Tuils.init(context)
-        ohi.andre.consolelauncher.managers.BackupManager.recoverInterruptedRestore(context)
-        init(context)
+    private fun loadCandidate(context: Context?, overrides: Map<File, String>): Boolean = synchronized(
+        ohi.andre.consolelauncher.managers.settings.SettingsFiles.lock) {
+        if (context == null) return@synchronized false
+        var reading = "settings"
+        var staging: File? = null
+        try {
+            settingsContext = context.applicationContext
+            Tuils.init(context)
+            ohi.andre.consolelauncher.managers.BackupManager.recoverInterruptedRestore(context)
+            ohi.andre.consolelauncher.managers.settings.SettingsFiles.recover(settingsContext)
+            init(context)
+            if (commonsLoaded) return@synchronized true
 
-        if (commonsLoaded) return
-        commonsLoaded = true
-
-        val folder = Tuils.getFolder()
-        StartupMenuManager.initialize(context, XMLPrefsRoot.entries.any { File(folder, it.path).isFile })
-        FirstRunPresetManager.seedIfNeeded(context, folder)
-
-        for (element in XMLPrefsRoot.entries) {
-            if (element === XMLPrefsRoot.APPS) continue
-
-            element.getValues()?.list?.clear()
-
-            val file = File(folder, element.path)
-            if (!file.exists()) {
-                resetFile(file, element.name)
-            }
-
-            val o: Array<Any?>?
-            try {
-                o = buildDocument(file, element.name)
-                if (o == null) {
-                    Tuils.sendXMLParseError(context, element.path)
-                    return
+            val folder = Tuils.getFolder()
+            val existing = XMLPrefsRoot.entries.any { File(folder, it.path).isFile }
+            StartupMenuManager.initialize(context, existing)
+            FirstRunPresetManager.seedIfNeeded(context, folder)
+            val candidates = linkedMapOf<XMLPrefsRoot, ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsList>()
+            val replacements = linkedMapOf<File, File?>()
+            val migrationSources = arrayListOf<File>()
+            val warnings = arrayListOf<String>()
+            val prepared = File.createTempFile(".settings-load-", ".tmp", folder)
+            staging = prepared
+            check(prepared.delete() && prepared.mkdir()) { "Unable to prepare settings" }
+            for (element in XMLPrefsRoot.entries) {
+                if (element === XMLPrefsRoot.APPS) continue
+                reading = element.path
+                val file = File(folder, element.path)
+                val parser = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+                val exists = file.exists() || File(file.path + ".bak").exists()
+                val override = overrides[file.canonicalFile]
+                val d = if (override != null) override.byteInputStream().use { parser.parse(it) }
+                    else if (exists) AtomicFile(file).openRead().use { parser.parse(it) }
+                    else parser.newDocument().also { it.appendChild(it.createElement(element.name)) }
+                val root = d.documentElement
+                require(root != null && root.tagName == element.name) { "Unexpected root in ${element.path}" }
+                val migrated = migrateRootValues(d, root, element)
+                if (migrated && exists) migrationSources.add(file)
+                var changed = !exists || migrated || override != null
+                changed = ensureDefaultSectionComments(d, root, element) || changed
+                val values = ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsList()
+                val missing = element.enums.toMutableList()
+                val deleted = element.delete().orEmpty().toSet()
+                // Iterate a copy: removal from the live NodeList would skip the next entry.
+                val nodes = (0 until root.childNodes.length).map { root.childNodes.item(it) }
+                for (node in nodes) {
+                    if (node !is Element || !node.hasAttribute(VALUE_ATTRIBUTE)) continue
+                    val setting = missing.firstOrNull { it.label() == node.tagName }
+                    if (setting != null) {
+                        missing.remove(setting)
+                        val raw = node.getAttribute(VALUE_ATTRIBUTE)
+                        values.add(node.tagName, raw)
+                        if (ohi.andre.consolelauncher.managers.settings.SettingsValidation.error(setting, raw) != null)
+                            warnings.add("${element.path}:${setting.label()}")
+                    } else if (node.tagName in deleted) {
+                        root.removeChild(node); changed = true
+                    }
                 }
-            } catch (e: SAXParseException) {
-                Tuils.sendXMLParseError(context, element.path, e)
-                continue
-            } catch (e: Exception) {
-                Tuils.log(e)
-                return
-            }
-
-            var d = o[0] as Document
-            var root = o[1] as Element?
-
-            //            we are keeping this because maybe there are some new values to write
-            val enums: MutableList<XMLPrefsSave> = ArrayList<XMLPrefsSave>(element.enums)
-
-            val deleted: Array<String?>? = element.delete()?.map { it }?.toTypedArray()
-            var needToWrite = false
-
-            if (root == null) {
-                resetFile(file, element.name)
-                try {
-                    d = builder!!.parse(file)
-                } catch (e: Exception) {
+                if (missing.isNotEmpty()) {
+                    appendMissingPrefs(d, root, element, missing, values)
+                    changed = true
                 }
-                root = d.getElementsByTagName(element.name).item(0) as Element?
-            }
-
-            try {
-                needToWrite = migrateRootValues(d, root, element)
-                if (needToWrite) preserveMigrationSource(file)
-            } catch (error: Exception) {
-                Tuils.log(error)
-                Tuils.sendXMLParseError(context, element.path)
-                continue
-            }
-            needToWrite = needToWrite or ensureDefaultSectionComments(d, root, element)
-
-            val nodes = root!!.getElementsByTagName("*")
-
-            for (count in 0..<nodes.getLength()) {
-                val node = nodes.item(count)
-                val nn = node.getNodeName()
-
-                var value: String?
-                try {
-                    value = node.getAttributes().getNamedItem(VALUE_ATTRIBUTE).getNodeValue()
-                } catch (e: Exception) {
-                    continue
-                }
-
-                var check = false
-                for (en in enums.indices) {
-                    val opt = enums.get(en)
-
-                    if (opt.label() == nn) {
-                        val s = enums.removeAt(en)
-
-                        if (s.type() == XMLPrefsSave.AUTO_COLOR &&
-                            !value.equals("auto", true) &&
-                            value?.matches("^#[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?$".toRegex()) != true
-                        ) {
-                            value = s.defaultValue()
-                            (node as Element).setAttribute(VALUE_ATTRIBUTE, value)
-                            needToWrite = true
-                        }
-
-                        val iv = s.invalidValues()
-                        if (iv != null) {
-                            for (temp in iv) {
-                                if (temp == value) {
-                                    value = opt.defaultValue()
-
-                                    val em = node as Element
-                                    em.setAttribute(VALUE_ATTRIBUTE, value)
-
-                                    needToWrite = true
-
-                                    break
-                                }
+                if (element === XMLPrefsRoot.UI) {
+                    val raw = StatusRowResolver.settings.associateWith { values[it]?.value }
+                    if (raw.all { (setting, value) -> ohi.andre.consolelauncher.managers.settings.SettingsValidation.error(setting, value) == null }) {
+                        val normalized = StatusRowResolver.normalize(raw)
+                        if (normalized.changed) {
+                            for ((setting, value) in normalized.values) {
+                                findDirectChild(root, setting.label()!!)!!.setAttribute(VALUE_ATTRIBUTE, value)
+                                values.add(setting.label(), value)
                             }
+                            changed = true
                         }
-
-                        element.getValues()!!.add(nn!!, value!!)
-
-                        check = true
-                        break
                     }
                 }
-
-                if (!check && deleted != null) {
-                    val index = Tuils.find(nn, deleted)
-                    if (index != -1) {
-                        deleted[index] = null
-                        val e = node as Element
-                        root.removeChild(e)
-
-                        needToWrite = true
-                    }
+                candidates[element] = values
+                if (changed) {
+                    val staged = File(prepared, element.path)
+                    writeTo(d, staged)
+                    replacements[file] = staged
                 }
             }
-
-            if (enums.isNotEmpty()) {
-                appendMissingPrefs(d, root, element, enums)
-                needToWrite = true
+            // Do not create migration copies until every input file has been parsed successfully.
+            migrationSources.forEach(::preserveMigrationSource)
+            ohi.andre.consolelauncher.managers.settings.SettingsFiles.replace(settingsContext, replacements) {
+                candidates.forEach { (element, values) -> element.publishValues(values) }
+                commonsLoaded = true
+                lastLoadError = null
+                validationWarnings = warnings.toList()
+                ohi.andre.consolelauncher.managers.settings.LauncherSettings.refreshFromLoadedPrefs()
             }
-            if (element === XMLPrefsRoot.UI) {
-                needToWrite = normalizeStatusRows(root, element) || needToWrite
-            }
-            if (needToWrite) writeTo(d, file)
-        }
-    }
-
-    private fun normalizeStatusRows(root: Element, element: XMLPrefsRoot): Boolean {
-        val raw = StatusRowResolver.settings.associateWith { setting ->
-            findDirectChild(root, setting.label() ?: "")?.getAttribute(VALUE_ATTRIBUTE)
-        }
-        val result = StatusRowResolver.normalize(raw)
-        for ((setting, value) in result.values) {
-            findDirectChild(root, setting.label() ?: "")?.setAttribute(VALUE_ATTRIBUTE, value)
-            element.getValues()!!.add(setting.label(), value)
-        }
-        return result.changed
+            true
+        } catch (error: Exception) {
+            lastLoadError = "$reading: ${error.message ?: error.javaClass.simpleName}"
+            Tuils.log(error)
+            Tuils.sendXMLParseError(context, reading)
+            false
+        } finally { staging?.deleteRecursively() }
     }
 
     private val STATUS_KEYS = arrayOf(
@@ -320,11 +298,13 @@ object XMLPrefsManager {
             return false
         }
 
+        val singletonNames = element.enums.mapNotNull { it.label() }.toSet() +
+            renamesFor(element).map { it.first } + setOf("time_format", "status_lines_bg", "status_lines_shadow_color", "status_lines_alignment")
         val seen = HashMap<String, String>()
         val duplicates = ArrayList<Node>()
         for (index in 0 until root.childNodes.length) {
             val node = root.childNodes.item(index) as? Element ?: continue
-            if (!node.hasAttribute(VALUE_ATTRIBUTE)) continue
+            if (!node.hasAttribute(VALUE_ATTRIBUTE) || node.tagName !in singletonNames) continue
             // Notification filters and per-app formats are repeatable records, not singleton options.
             if (element === XMLPrefsRoot.NOTIFICATIONS && (node.tagName == "filter" || node.tagName == "format")) continue
             val value = node.getAttribute(VALUE_ATTRIBUTE)
@@ -382,8 +362,7 @@ object XMLPrefsManager {
     }
 
     /** Keep the original bytes before the first destructive settings migration. */
-    @Synchronized
-    internal fun preserveMigrationSource(file: File) {
+    internal fun preserveMigrationSource(file: File) = synchronized(ohi.andre.consolelauncher.managers.settings.SettingsFiles.lock) {
         val backup = File(file.parentFile, file.name + ".pre-migration")
         if (backup.isFile) return
         val temporary = File.createTempFile(file.name + ".migration-", ".tmp", file.parentFile)
@@ -441,7 +420,8 @@ object XMLPrefsManager {
         d: Document,
         root: Element,
         element: XMLPrefsRoot,
-        missing: MutableList<XMLPrefsSave>
+        missing: MutableList<XMLPrefsSave>,
+        values: XMLPrefsList
     ) {
         val grouped = groupBySection(missing)
         for (entry in grouped.entries) {
@@ -455,7 +435,7 @@ object XMLPrefsManager {
                 root.appendChild(em)
                 root.appendChild(d.createTextNode("\n"))
 
-                element.getValues()!!.add(save.label()!!, value!!)
+                values.add(save.label()!!, value!!)
             }
         }
     }
@@ -465,14 +445,14 @@ object XMLPrefsManager {
             return false
         }
 
-        val existing: MutableMap<String, Node> = HashMap()
+        val existing = linkedMapOf<String, MutableList<Node>>()
         val children = root.childNodes
         for (index in 0..<children.length) {
             val node = children.item(index)
             if (node.nodeType != Node.ELEMENT_NODE) {
                 continue
             }
-            existing[node.nodeName] = node.cloneNode(true)
+            existing.getOrPut(node.nodeName) { arrayListOf() }.add(node.cloneNode(true))
         }
 
         if (existing.isEmpty()) {
@@ -491,8 +471,8 @@ object XMLPrefsManager {
             val nodes: MutableList<Node> = ArrayList<Node>()
             for (save in entry.value) {
                 val label = save.label() ?: continue
-                val node = existing[label] ?: continue
-                nodes.add(node)
+                val known = existing.remove(label) ?: continue
+                nodes.addAll(known)
             }
             if (nodes.isEmpty()) {
                 continue
@@ -511,6 +491,7 @@ object XMLPrefsManager {
             addedAny = true
         }
 
+        existing.values.flatten().forEach { root.appendChild(it) }
         return addedAny
     }
 
@@ -751,7 +732,7 @@ object XMLPrefsManager {
         return XMLPrefsManager.get(Boolean::class.javaPrimitiveType, prefsSave) ?: false
     }
 
-    fun getColor(prefsSave: XMLPrefsSave): Int {
+    fun getColor(prefsSave: XMLPrefsSave): Int = synchronized(ohi.andre.consolelauncher.managers.settings.SettingsFiles.lock) {
         if (prefsSave is Theme) return ThemeColorResolver.color(prefsSave)
         if (prefsSave.parent() == null) return Int.Companion.MAX_VALUE
 
@@ -781,7 +762,7 @@ object XMLPrefsManager {
         return get(prefsSave)
     }
 
-    fun <T> get(c: Class<T>?, root: XMLPrefsRoot, s: String?): T? {
+    fun <T> get(c: Class<T>?, root: XMLPrefsRoot, s: String?): T? = synchronized(ohi.andre.consolelauncher.managers.settings.SettingsFiles.lock) {
         try {
             val entry = root.getValues()!!.get(s)
             if (entry == null) return null
@@ -791,7 +772,7 @@ object XMLPrefsManager {
         }
     }
 
-    fun <T> get(c: Class<T>?, prefsSave: XMLPrefsSave?): T? {
+    fun <T> get(c: Class<T>?, prefsSave: XMLPrefsSave?): T? = synchronized(ohi.andre.consolelauncher.managers.settings.SettingsFiles.lock) {
         try {
             val entry = prefsSave!!.parent()!!.getValues()!!.get(prefsSave)
             if (entry == null) throw NullPointerException("Entry not found for " + prefsSave.label())
@@ -817,23 +798,8 @@ object XMLPrefsManager {
     private val LIST_DECORATION: Pattern = Pattern.compile("[\\[\\]\\s]")
 
     fun getListOfIntValues(values: String, length: Int, defaultValue: Int): IntArray {
-        var values = values
-        val parsed = IntArray(length)
-        values = removeListDecoration(values)
-        val split: Array<String?> =
-            values.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        var count = 0
-        while (count < split.size) {
-            try {
-                parsed[count] = split[count]!!.toInt()
-            } catch (e: Exception) {
-                parsed[count] = defaultValue
-            }
-            count++
-        }
-        while (count < split.size) parsed[count] = defaultValue
-
-        return parsed
+        val parts = removeListDecoration(values).split(',')
+        return IntArray(length) { index -> parts.getOrNull(index)?.toIntOrNull() ?: defaultValue }
     }
 
     fun getListOfStringValues(values: String, length: Int, defaultValue: String?): Array<String?> {
@@ -879,8 +845,7 @@ object XMLPrefsManager {
     //    [0] = document
     //    [1] = root
     @Throws(Exception::class)
-    @Synchronized
-    fun buildDocument(file: File?, rootName: String?): Array<Any?>? {
+    fun buildDocument(file: File?, rootName: String?): Array<Any?>? = synchronized(ohi.andre.consolelauncher.managers.settings.SettingsFiles.lock) {
         if (file == null) {
             return null
         }
@@ -905,9 +870,8 @@ object XMLPrefsManager {
         return arrayOf<Any?>(d, r)
     }
 
-    @Synchronized
     @Throws(Exception::class)
-    fun writeTo(d: Document?, f: File?) {
+    fun writeTo(d: Document?, f: File?) = synchronized(ohi.andre.consolelauncher.managers.settings.SettingsFiles.lock) {
         val transformer = TransformerFactory.newInstance().newTransformer()
         val writer = StringWriter()
         transformer.transform(DOMSource(checkNotNull(d)), StreamResult(writer))
@@ -936,7 +900,7 @@ object XMLPrefsManager {
         elementName: String?,
         attributeNames: Array<out String?>,
         attributeValues: Array<out String?>
-    ): String? {
+    ): String? = synchronized(ohi.andre.consolelauncher.managers.settings.SettingsFiles.lock) {
         try {
             val o: Array<Any?>?
             try {
@@ -998,17 +962,15 @@ object XMLPrefsManager {
         )
     }
 
-    @Synchronized
     fun setMany(
         file: File?,
         elementNames: Array<String?>?,
         attributeNames: Array<out String?>,
         attributeValues: Array<out Array<out String?>?>
-    ): String? {
+    ): String? = synchronized(ohi.andre.consolelauncher.managers.settings.SettingsFiles.lock) {
         return setMany(file, elementNames, null, null, attributeNames, attributeValues, true)
     }
 
-    @Synchronized
     fun setMany(
         file: File?,
         elementNames: Array<String?>?,
@@ -1017,7 +979,7 @@ object XMLPrefsManager {
         attributeNames: Array<out String?>,
         attributeValues: Array<out Array<out String?>?>,
         addIfNotFound: Boolean
-    ): String? {
+    ): String? = synchronized(ohi.andre.consolelauncher.managers.settings.SettingsFiles.lock) {
         try {
             val o: Array<Any?>?
             try {
@@ -1098,7 +1060,7 @@ object XMLPrefsManager {
         nodeName: String?,
         thatHasThose: Array<out String?>? = null,
         forValues: Array<out String?>? = null
-    ): String? {
+    ): String? = synchronized(ohi.andre.consolelauncher.managers.settings.SettingsFiles.lock) {
         try {
             val o: Array<Any?>?
             try {
@@ -1318,7 +1280,7 @@ object XMLPrefsManager {
         return true
     }
 
-    fun resetFile(f: File?, name: String?): Boolean {
+    fun resetFile(f: File?, name: String?): Boolean = synchronized(ohi.andre.consolelauncher.managers.settings.SettingsFiles.lock) {
         if (f == null) {
             return false
         }
@@ -1496,7 +1458,8 @@ object XMLPrefsManager {
         //        alias
 
         var path: String
-        private var prefsValues: XMLPrefsList?
+        internal fun publishValues(values: XMLPrefsList) { prefsValues = values }
+        @Volatile private var prefsValues: XMLPrefsList?
         var enums: MutableList<XMLPrefsSave>
 
         init {
@@ -1506,8 +1469,8 @@ object XMLPrefsManager {
             this.path = this.name.lowercase(Locale.getDefault()) + ".xml"
         }
 
-        @Synchronized
-        override fun write(save: XMLPrefsSave, value: String) {
+        override fun write(save: XMLPrefsSave, value: String) = synchronized(
+            ohi.andre.consolelauncher.managers.settings.SettingsFiles.lock) {
             if (prefsValues == null) {
                 prefsValues = XMLPrefsList()
             }

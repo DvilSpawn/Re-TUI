@@ -17,7 +17,11 @@ class LauncherApplication : Application() {
     override fun attachBaseContext(base: Context) {
         super.attachBaseContext(base)
         ohi.andre.consolelauncher.tuils.Tuils.init(base)
-        ohi.andre.consolelauncher.managers.BackupManager.recoverInterruptedRestore(base)
+        // Startup retries recovery in the settings loader, which can show the preserved-file error.
+        runCatching {
+            ohi.andre.consolelauncher.managers.BackupManager.recoverInterruptedRestore(base)
+            ohi.andre.consolelauncher.managers.settings.SettingsFiles.recover(base)
+        }.onFailure { ohi.andre.consolelauncher.tuils.Tuils.log(it) }
         LanguagePacks.initialize(base)
     }
     override fun getResources(): Resources = LanguagePacks.resources(super.getResources())

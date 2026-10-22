@@ -6,6 +6,11 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class XMLPrefsManagerTest {
+    @org.junit.Test fun malformedLegacyMarginListsHaveBoundedNonDestructiveFallbacks() {
+        org.junit.Assert.assertArrayEquals(intArrayOf(1,2,3,4), XMLPrefsManager.getListOfIntValues("1,2,3,4,5",4,9))
+        org.junit.Assert.assertArrayEquals(intArrayOf(1,9,9,9), XMLPrefsManager.getListOfIntValues("[1,broken]",4,9))
+    }
+
     @Test fun notificationFiltersAndFormatsRemainSeparateRecords() {
         val document = javax.xml.parsers.DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument()
         val root = document.createElement("NOTIFICATIONS"); document.appendChild(root)

@@ -36,6 +36,8 @@ class CurrentLiveSettingsPreviewTest {
         File(context.getExternalFilesDir(null),"current-preview-$name.png").outputStream().use {bitmap.compress(Bitmap.CompressFormat.PNG,100,it)}
         bitmap.recycle()
     }
+    /** Home rows are drawn from the preview's detached scene, built with Home's own layout. */
+    private fun scene(activity:TuixtActivity)=checkNotNull(SettingsPreviewFixture.preview(activity).scene) { "Preview scene missing" }
     private val onlyBattery=mapOf<XMLPrefsSave,String>(Ui.show_battery to "true",Ui.battery_index to "1",Ui.show_ram to "false",Ui.show_device_name to "false",
         Ui.show_time to "false",Ui.show_notes to "false",Ui.show_storage_info to "false",Ui.show_network_info to "false",Ui.show_weather to "false",
         Ui.show_unlock_counter to "false",Ui.show_ascii to "false",SurfaceBorderOption.unified_status_border to "false")
@@ -49,7 +51,7 @@ class CurrentLiveSettingsPreviewTest {
                 val level=sticky.getIntExtra(android.os.BatteryManager.EXTRA_LEVEL,0)*100/sticky.getIntExtra(android.os.BatteryManager.EXTRA_SCALE,100)
                 instrumentation.runOnMainSync {
                     val actual=LauncherActivity.captureHomePreview()!!.statuses!!.texts[3].toString()
-                    val shown=preview(activity).findViewById<TextView>(R.id.tv0)
+                    val shown=scene(activity).findViewById<TextView>(R.id.tv0)
                     assertEquals("[${"#".repeat(10)}] $level%",actual)
                     assertEquals(actual,shown.text.toString())
                     val home=LauncherActivity.instance!!.findViewById<TextView>(R.id.tv0)
@@ -59,7 +61,7 @@ class CurrentLiveSettingsPreviewTest {
                 capture("saved-battery")
                 draft(activity,Behavior.battery_progress_bar_symbol to "=",Behavior.battery_progress_bar_length to "12")
                 instrumentation.runOnMainSync {
-                    assertEquals("[${"=".repeat(12)}] $level%",preview(activity).findViewById<TextView>(R.id.tv0).text.toString())
+                    assertEquals("[${"=".repeat(12)}] $level%",scene(activity).findViewById<TextView>(R.id.tv0).text.toString())
                     assertEquals("#",LauncherSettings.get(Behavior.battery_progress_bar_symbol))
                     assertFalse(ThemeColorResolver.hasPreview())
                 }
@@ -67,7 +69,7 @@ class CurrentLiveSettingsPreviewTest {
                 capture("draft-battery")
                 draft(activity,SurfaceBorderOption.unified_status_border to "true")
                 instrumentation.runOnMainSync {
-                    assertTrue(preview(activity).findViewById<TextView>(R.id.unified_status_battery).text.toString().startsWith("["))
+                    assertTrue(scene(activity).findViewById<TextView>(R.id.unified_status_battery).text.toString().startsWith("["))
                 }
                 before.assertUnchanged()
                 capture("unified-battery")
@@ -98,14 +100,14 @@ class CurrentLiveSettingsPreviewTest {
                     instrumentation.runOnMainSync {preview(activity).pager.setCurrentItem(1,false)};settle()
                     instrumentation.runOnMainSync {
                         val card=preview(activity)
-                        assertTrue(card.findViewById<TextView>(R.id.terminal_view).text.contains("CURRENT-MASTER-LIVE-OUTPUT"))
-                        assertEquals("live draft input",card.findViewById<TextView>(R.id.input_view).text.toString())
-                        assertFalse(views(card).any {it is android.widget.EditText || it.hasOnClickListeners()})
+                        assertTrue(scene(activity).findViewById<TextView>(R.id.terminal_view).text.contains("CURRENT-MASTER-LIVE-OUTPUT"))
+                        assertEquals("live draft input",scene(activity).findViewById<TextView>(R.id.input_view).text.toString())
+                        assertFalse((views(card)+views(scene(activity))).any {it is android.widget.EditText || it.hasOnClickListeners()})
                         card.pager.setCurrentItem(2,false)
                     };settle()
                     draft(activity,Theme.module_panel_text_color to "#FFABCDEF")
                     instrumentation.runOnMainSync {
-                        val texts=views(preview(activity)).filterIsInstance<TextView>()
+                        val texts=views(scene(activity)).filterIsInstance<TextView>()
                         assertEquals(0xFFABCDEF.toInt(),texts.first {it.text.toString()=="Actual module content"}.currentTextColor)
                         val run=texts.first {it.text.toString()=="Run"}
                         assertFalse(run.hasOnClickListeners());assertFalse(run.performClick())
@@ -198,7 +200,7 @@ class CurrentLiveSettingsPreviewTest {
                     val texts=checkNotNull(snapshot.statuses).texts
                     assertTrue("Fixture must exercise multiple real status sources",texts.count {!it.isNullOrEmpty()}>=6)
                     for(index in descriptors.indices) {
-                        val row=card.findViewById<TextView>(intArrayOf(R.id.tv0,R.id.tv1,R.id.tv2,R.id.tv3,R.id.tv4,R.id.tv5,R.id.tv6,R.id.tv7,R.id.tv8,R.id.tv9)[index])
+                        val row=scene(activity).findViewById<TextView>(intArrayOf(R.id.tv0,R.id.tv1,R.id.tv2,R.id.tv3,R.id.tv4,R.id.tv5,R.id.tv6,R.id.tv7,R.id.tv8,R.id.tv9)[index])
                         if(!texts[index].isNullOrEmpty()) {
                             val displayed=if(row is ohi.andre.consolelauncher.tuils.AsciiArtTextView) {
                                 @Suppress("UNCHECKED_CAST")
@@ -213,7 +215,7 @@ class CurrentLiveSettingsPreviewTest {
                 SettingsPreviewFixture.capture("all-status-live")
                 draft(activity,Theme.ram_text_color to "#FF32AB67",Ui.ram_status_alignment to "1",Ui.dashed_border_stroke_width to "2.5")
                 instrumentation.runOnMainSync {
-                    val ram=preview(activity).findViewById<TextView>(R.id.tv0)
+                    val ram=scene(activity).findViewById<TextView>(R.id.tv0)
                     assertEquals(0xFF32AB67.toInt(),ram.currentTextColor)
                     assertEquals(android.view.Gravity.END,ram.gravity and android.view.Gravity.RELATIVE_HORIZONTAL_GRAVITY_MASK)
                     val text=ram.text as Spanned
@@ -223,7 +225,7 @@ class CurrentLiveSettingsPreviewTest {
                 SettingsPreviewFixture.capture("all-status-draft")
                 instrumentation.runOnMainSync {
                     val card=preview(activity)
-                    views(card).filterIsInstance<android.widget.ScrollView>().first().scrollTo(0,card.findViewById<View>(R.id.tv4).top)
+                    views(card).filterIsInstance<android.widget.ScrollView>().first().fullScroll(View.FOCUS_DOWN)
                 }
                 settle()
                 SettingsPreviewFixture.capture("all-status-lower")

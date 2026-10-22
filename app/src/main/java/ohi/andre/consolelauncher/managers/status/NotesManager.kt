@@ -7,10 +7,15 @@ import ohi.andre.consolelauncher.tuils.UIUtils
 class NotesManager(
     context: Context,
     delay: Long,
-    private val size: Int,
+    private var size: Int,
     private val notesManager: ohi.andre.consolelauncher.managers.NotesManager?,
     private val listener: StatusUpdateListener?
 ) : StatusManager(context, delay) {
+    override fun refreshAppearance() {
+        size = ohi.andre.consolelauncher.managers.xml.XMLPrefsManager.getInt(ohi.andre.consolelauncher.managers.xml.options.Ui.notes_size)
+        super.refreshAppearance()
+    }
+
     override fun update() {
         notesManager?.refresh()
         if (notesManager != null && notesManager.hasChanged) {

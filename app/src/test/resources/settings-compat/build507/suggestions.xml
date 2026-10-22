@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SUGGESTIONS>
+<!-- #Default Styling -->
+<default_text_color value="#FFFFFFFF"/>
+<default_background_color value="#FF9EA58C"/>
+
+<!-- #Category Styling -->
+<apps_text_color value="#FFFFFFFF"/>
+<apps_background_color value="#FF8CA266"/>
+<alias_text_color value="#FFFFFFFF"/>
+<alias_background_color value="#FF87A57C"/>
+<cmd_text_color value="#FFFFFFFF"/>
+<cmd_background_color value="#FF9EA14F"/>
+<song_text_color value="#FFFFFFFF"/>
+<song_background_color value="#FF91AF92"/>
+<contact_text_color value="#FFFFFFFF"/>
+<contact_background_color value="#FFB3AC96"/>
+<file_text_color value="#FFFFFFFF"/>
+<file_background_color value="#FF73A181"/>
+</SUGGESTIONS>

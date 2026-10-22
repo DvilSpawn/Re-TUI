@@ -18,9 +18,57 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
 
-/** Opt-in phone measurement against two explicitly provisioned disposable tmux windows. */
+/** Opt-in phone measurement against test-owned disposable tmux windows. */
 class TerminalHomeDeviceBenchmarkTest {
     private val instrumentation get() = InstrumentationRegistry.getInstrumentation()
+    private val ownedTargets=mutableListOf<String>()
+    private var previousFixture: ByteArray?=null
+    private val context get()=instrumentation.targetContext
+    private val fixtureFile get()=File(context.cacheDir,"terminal-pane-benchmark.json")
+    private fun nativeScript(script: String): String {
+        val label="home-reload-fixture-"+java.util.UUID.randomUUID()
+        val done=CountDownLatch(1)
+        val answer=AtomicReference<android.content.Intent>()
+        val bus=androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(context)
+        val receiver=object:android.content.BroadcastReceiver() {
+            override fun onReceive(c:Context?,intent:android.content.Intent?) {
+                if(intent?.getStringExtra(ohi.andre.consolelauncher.UIManager.EXTRA_TERMUX_RESULT_PATH)==label) {
+                    answer.set(intent);done.countDown()
+                }
+            }
+        }
+        bus.registerReceiver(receiver,android.content.IntentFilter(ohi.andre.consolelauncher.UIManager.ACTION_TERMUX_RESULT))
+        try {
+            TermuxBridgeManager.startRunCommand(context,TermuxBridgeManager.TERMUX_SH,TermuxBridgeManager.TERMUX_HOME,
+                TermuxBridgeManager.createResultPendingIntent(context,label,null),arrayOf("-c",script))
+            assertTrue("Real Termux fixture timed out",done.await(20,TimeUnit.SECONDS))
+            assertEquals(answer.get().getStringExtra(ohi.andre.consolelauncher.UIManager.EXTRA_TERMUX_RESULT_STDERR),0,
+                answer.get().getIntExtra(ohi.andre.consolelauncher.UIManager.EXTRA_TERMUX_RESULT_EXIT_CODE,-1))
+            return answer.get().getStringExtra(ohi.andre.consolelauncher.UIManager.EXTRA_TERMUX_RESULT_STDOUT).orEmpty()
+        } finally {bus.unregisterReceiver(receiver)}
+    }
+    @org.junit.Before fun prepareDisposableTerminals() {
+        val args=InstrumentationRegistry.getArguments()
+        if(args.getString("terminalHomeDeviceBenchmark")!="true" && args.getString("terminalHomeEightDevice")!="true") return
+        assertTrue("Pair the isolated app before benchmarking",TermuxWorkspaceSshSetup.isPaired(context))
+        previousFixture=fixtureFile.takeIf {it.isFile}?.readBytes()
+        fun quote(value:String)="'"+value.replace("'","'\\''")+"'"
+        val command="bash --noprofile --norc -i"
+        repeat(8) { index ->
+            val name="retui-reload-"+java.util.UUID.randomUUID().toString().take(8)+"-$index"
+            val target=nativeScript("tmux new-window -d -t '=retui_workspace' -P -F '#{window_id}' -n "+quote(name)+" "+quote(command)).trim()
+            require(target.matches(Regex("@[0-9]+")))
+            ownedTargets.add(target)
+        }
+        fixtureFile.writeText(JSONObject().put("targets",org.json.JSONArray(ownedTargets)).toString())
+    }
+    @org.junit.After fun removeOnlyOwnedTerminals() {
+        if(ownedTargets.isNotEmpty()) {
+            nativeScript(ownedTargets.joinToString("\n") {"tmux kill-window -t '$it' 2>/dev/null || true"})
+            ownedTargets.clear()
+            previousFixture?.let {fixtureFile.writeBytes(it)} ?: fixtureFile.delete()
+        }
+    }
     private fun field(owner: Any, name: String): Any? = owner.javaClass.getDeclaredField(name).apply { isAccessible = true }.get(owner)
     private fun set(owner: Any, name: String, value: Any?) = owner.javaClass.getDeclaredField(name).apply { isAccessible = true }.set(owner, value)
     private fun call(owner: Any, name: String, vararg args: Any?) = owner.javaClass.declaredMethods.single { it.name == name && it.parameterTypes.size == args.size }.apply { isAccessible = true }.invoke(owner, *args)
@@ -186,6 +234,22 @@ class TerminalHomeDeviceBenchmarkTest {
                         (0..7).filter { it != index }.forEach { assertFalse(text.contains("HOME_SLOT_${it}_é")) }
                     }
                     home!!.pause(); home!!.resume()
+                }
+                val oldColor=ohi.andre.consolelauncher.managers.settings.LauncherSettings.get(
+                    ohi.andre.consolelauncher.managers.xml.options.Theme.workspace_output_text_color)
+                try {
+                    instrumentation.runOnMainSync {
+                        val connection=field(home!!,"connection")
+                        val terminals=entries.map {field(it,"terminal")}
+                        ohi.andre.consolelauncher.managers.settings.LauncherSettings.set(context,
+                            ohi.andre.consolelauncher.managers.xml.options.Theme.workspace_output_text_color,"#FF12AB78")
+                        home!!.refreshAppearance()
+                        assertSame("Restyling must retain the SSH connection",connection,field(home!!,"connection"))
+                        entries.forEachIndexed {index,entry -> assertSame(terminals[index],field(entry,"terminal"))}
+                    }
+                } finally {
+                    ohi.andre.consolelauncher.managers.settings.LauncherSettings.set(context,
+                        ohi.andre.consolelauncher.managers.xml.options.Theme.workspace_output_text_color,oldColor)
                 }
                 await("Reconnect must preserve all eight shells and their output") {
                     entries.withIndex().all { (index, entry) ->

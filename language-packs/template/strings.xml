@@ -523,7 +523,7 @@ Stage: %1$s</string>
     <string name="command_mode_enabled">%1$s mode enabled.</string>
     <string name="command_mode_search_mode_enabled_ba524">Search mode enabled.</string>
     <string name="command_mode_unknown_launcher_mode_usage_mode_search_cl_a86ba">Unknown launcher mode: %1$s
-Usage: mode classic|search</string>
+Usage: mode classic|search|terminal</string>
     <string name="command_module_built_in_modules_cannot_be_removed_use_mod_274e3">Built-in modules cannot be removed. Use module -hide %1$s instead.</string>
     <string name="command_module_invalid_lua_module_id_123ed">Invalid Lua module id.</string>
     <string name="command_module_local_lua_modules_e9afe">
@@ -1269,7 +1269,8 @@ Lua apps run inside Re:T-UI, not Termux. They use the same sandbox, prefs, files
     <string name="help_mode">Switch launcher layout.
 Usage:
 $ mode classic
-$ mode search</string>
+$ mode search
+$ mode terminal</string>
     <string name="help_module">Show and manage Re:T-UI modules. 
 
 Usage: 
@@ -4466,7 +4467,7 @@ Disabling this option hides Re:TUI access; it does not lock Private Space. Save 
     <string name="setting_behavior_home_path_description">The path to your home directory</string>
     <string name="setting_behavior_htmlextractor_default_format_description">The default format used by htmlextract -use</string>
     <string name="setting_behavior_input_format_description">Define the input format </string>
-    <string name="setting_behavior_launcher_mode_description">Launcher layout mode: classic or search</string>
+    <string name="setting_behavior_launcher_mode_description">Launcher layout mode: classic, search, or terminal</string>
     <string name="setting_behavior_launcher_sounds_description">If true, Re:T-UI will play its bundled launcher sound pack</string>
     <string name="setting_behavior_location_update_mindistance_description">The minimum distance (in meters) to get a location update</string>
     <string name="setting_behavior_location_update_mintime_description">The amount of time between two location updates (in minutes, must be an integer value)</string>
@@ -4966,6 +4967,10 @@ Disabling this option hides Re:TUI access; it does not lock Private Space. Save 
     <string name="settings_file_operation_finishing">Finishing restore…</string>
     <string name="settings_file_operation_working">Working on your files…</string>
     <string name="settings_font_too_large">Font files must be 8 MiB or smaller.</string>
+    <string name="settings_load_failed">Your settings could not be loaded. Your files have been preserved.
+
+%1$s</string>
+    <string name="settings_load_retry">Retry loading settings</string>
     <string name="settings_preview_ansi">ANSI</string>
     <string name="settings_preview_ansi_caption">ANSI SAMPLE · Draft palette · Save to apply</string>
     <string name="settings_preview_current_home">YOUR LAUNCHER · Unsaved preview · Tap to expand</string>
@@ -5633,6 +5638,26 @@ Updated: </string>
     <string name="tasker_theme_element">Theme element</string>
     <string name="tasker_update_module">Update module text</string>
     <string name="tasker_value">Value</string>
+    <string name="terminal_home_add">Add terminal</string>
+    <string name="terminal_home_arrange">Drag to move. Other panes move down to make room. Drag an edge handle to resize. Tap outside or Back to finish.</string>
+    <string name="terminal_home_background_help">Termux is not responding. Open Termux once and allow background activity in Android settings, then tap here to reconnect.</string>
+    <string name="terminal_home_custom">Custom command</string>
+    <string name="terminal_home_disconnected">Disconnected · tap title to reconnect</string>
+    <string name="terminal_home_existing">Existing session</string>
+    <string name="terminal_home_exited">Session ended · tap title to reconnect</string>
+    <string name="terminal_home_full">No room for another terminal. Resize or remove a tile.</string>
+    <string name="terminal_home_hint">Tap a terminal to type. Hold anywhere in a pane for options. Scroll for more terminals.</string>
+    <string name="terminal_home_input">Terminal input</string>
+    <string name="terminal_home_location">Weather location (city)</string>
+    <string name="terminal_home_move_resize">Move / resize</string>
+    <string name="terminal_home_reconnect">Reconnect / restart</string>
+    <string name="terminal_home_remove">Remove tile (keep session)</string>
+    <string name="terminal_home_resize_hint">↔ Move · ◢ Resize</string>
+    <string name="terminal_home_search">Search ↑</string>
+    <string name="terminal_home_settings">Settings</string>
+    <string name="terminal_home_setup">Open Termux setup to install or update the helper and grant access. Tap here to reconnect.</string>
+    <string name="terminal_home_setup_button">Termux setup</string>
+    <string name="terminal_home_shell">New shell</string>
     <string name="themer_1_app_2_apps_5e208">•  1 APP     ••  2 APPS</string>
     <string name="themer_active_5b74a">  •  ACTIVE</string>
     <string name="themer_all_surfaces_d0273">All surfaces</string>

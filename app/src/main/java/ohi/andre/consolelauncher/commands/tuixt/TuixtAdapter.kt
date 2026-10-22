@@ -1,7 +1,10 @@
 package ohi.andre.consolelauncher.commands.tuixt
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
+import android.os.Process
+import android.os.UserManager
 import android.graphics.Typeface
 import android.text.Editable
 import android.text.TextWatcher
@@ -31,6 +34,8 @@ import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.rowAccentColor
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings.get
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings.set
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave
+import ohi.andre.consolelauncher.managers.AppsManager
+import ohi.andre.consolelauncher.managers.xml.options.Apps
 import ohi.andre.consolelauncher.managers.xml.options.Behavior
 import ohi.andre.consolelauncher.managers.xml.options.Cmd
 import ohi.andre.consolelauncher.managers.xml.options.Theme
@@ -112,11 +117,8 @@ class TuixtAdapter(
                 pendingChanges[item] = value
             }
         }
-        for (entry in pendingChanges.entries) {
-            val item = entry.key
-            val value = entry.value
-            set(context, item, value)
-        }
+        ohi.andre.consolelauncher.managers.settings.LauncherSettings.applyChanges(context,
+            pendingChanges.entries.filter { it.key != null }.associate { it.key!! to it.value })
         pendingChanges.clear()
         onDraftChanged()
     }
@@ -232,15 +234,17 @@ class TuixtAdapter(
         settingHolder.description.setTextColor(rowTextColor())
         styleInput(settingHolder.itemView.getContext(), settingHolder.input)
 
-        if (item === Cmd.default_search) {
+        val defaultApp = item is Apps && item.label()!!.startsWith("default_app_n")
+        if (item === Cmd.default_search || defaultApp) {
             settingHolder.toggle.visibility = View.GONE
             settingHolder.colorPreview.visibility = View.GONE
             settingHolder.input.visibility = View.VISIBLE
             settingHolder.input.setText(currentValue)
             settingHolder.action.visibility = View.VISIBLE
-            settingHolder.action.text = settingHolder.itemView.context.getString(R.string.editor_tuixtadapter_providers_1bec3)
+            settingHolder.action.text = settingHolder.itemView.context.getString(
+                if (defaultApp) R.string.toolbar_icon_apps else R.string.editor_tuixtadapter_providers_1bec3)
             styleButton(settingHolder.itemView.context, settingHolder.action, false)
-            settingHolder.action.setOnClickListener { onOpenSearchProviders() }
+            settingHolder.action.setOnClickListener { if (defaultApp) pickDefaultApp(settingHolder, item) else onOpenSearchProviders() }
             settingHolder.textWatcher = object : TextWatcher {
                 override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
@@ -359,6 +363,21 @@ class TuixtAdapter(
                 }
             }
             settingHolder.input.addTextChangedListener(settingHolder.textWatcher)
+        }
+    }
+
+    private fun pickDefaultApp(holder: ViewHolder, item: XMLPrefsSave) {
+        val context = holder.itemView.context
+        val pm = context.packageManager
+        // shortcut: current profile only; work-profile apps can still be set with `apps -default_app`.
+        val serial = (context.getSystemService(Context.USER_SERVICE) as UserManager).getSerialNumberForUser(Process.myUserHandle())
+        val apps = pm.queryIntentActivities(Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER), 0)
+            .map { AppsManager.LaunchInfo(it.activityInfo.packageName, it.activityInfo.name, it.loadLabel(pm).toString(), profileSerial = serial) }
+            .sortedBy { it.lowercaseLabel }
+        val values = listOf(Apps.MOST_USED, Apps.NULL) + apps.map { it.write() }
+        val labels = listOf(Apps.MOST_USED, Apps.NULL) + apps.map { it.publicLabel }
+        TuixtDialog.showOptions(context, displayLabel(context, item), labels, values.indexOf(holder.input.text.toString())) {
+            holder.input.setText(values[it])
         }
     }
 

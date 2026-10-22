@@ -177,6 +177,7 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
         styleButton(this, btnSave, true)
         btnSave.setOnClickListener(View.OnClickListener { v: View? ->
             var saved = false
+            var rawSettingsFile = false
             if (adapter != null) {
                 try {
                     adapter!!.saveAll(this, recyclerView)
@@ -187,9 +188,19 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
             } else if (plainTextEditor != null) {
                 try {
                     val currentText = plainTextEditor!!.getText().toString()
-                    Tuils.write(file, "", currentText)
-                    XMLPrefsManager.dispose()
-                    XMLPrefsManager.loadCommons(this)
+                    val target = checkNotNull(file)
+                    if (target.canonicalFile.parentFile == Tuils.getFolder().canonicalFile &&
+                        XMLPrefsRoot.entries.any { it.path == target.name }) {
+                        rawSettingsFile = true
+                        XMLPrefsManager.saveRawSettings(this, target, currentText)
+                    } else {
+                        val atomic = android.util.AtomicFile(target)
+                        val output = atomic.startWrite()
+                        try {
+                            output.write(currentText.toByteArray(Charsets.UTF_8))
+                            atomic.finishWrite(output)
+                        } catch (error: Exception) { atomic.failWrite(output); throw error }
+                    }
                     refreshFromLoadedPrefs()
                     originalRawText = currentText
                     saved = true
@@ -201,7 +212,7 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
                 ThemeColorResolver.clearPreview()
                 Toast.makeText(this, getString(R.string.editor_tuixtactivity_changes_saved_previewing_launcher_8e180), Toast.LENGTH_SHORT)
                     .show()
-                LauncherActivity.previewIfRunning()
+                if (plainTextEditor != null && !rawSettingsFile) LauncherActivity.previewIfRunning()
                 appearancePreview?.onSaved()
                 stylePaneScreen(this, screen)
                 stylePanel(this, root)

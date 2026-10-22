@@ -1,16 +1,13 @@
 package ohi.andre.consolelauncher.managers.settings
 
-import android.app.Dialog
 import android.app.Instrumentation
 import android.graphics.Rect
-import android.view.KeyEvent
 import android.view.View
 import android.view.accessibility.AccessibilityNodeInfo
 import android.widget.EditText
 import android.widget.TextView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import ohi.andre.consolelauncher.R
-import ohi.andre.consolelauncher.commands.tuixt.SettingsAppearancePreview
 import ohi.andre.consolelauncher.commands.tuixt.TuixtActivity
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.options.Behavior
@@ -22,21 +19,6 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class SettingsPreviewJourneyTest {
-    private fun expanded(preview: SettingsAppearancePreview) = SettingsAppearancePreview::class.java
-        .getDeclaredField("expanded").apply { isAccessible = true }.get(preview) as? Dialog
-
-    private fun waitForExpandedFocus(preview: SettingsAppearancePreview) {
-        repeat(30) {
-            var focused = false
-            SettingsPreviewFixture.instrumentation.runOnMainSync {
-                focused = expanded(preview)?.window?.decorView?.hasWindowFocus() == true
-            }
-            if (focused) return
-            Thread.sleep(100)
-        }
-        fail("Expanded preview never received window focus")
-    }
-
     private fun discardChanges() = with(SettingsPreviewFixture) {
         var discard: AccessibilityNodeInfo? = null
         repeat(30) {
@@ -51,7 +33,7 @@ class SettingsPreviewJourneyTest {
         assertTrue(discard!!.performAction(AccessibilityNodeInfo.ACTION_CLICK)); settle()
     }
 
-    @Test fun expansionBackAndRecreationKeepDraftWithoutWriting() = with(SettingsPreviewFixture) {
+    @Test fun draftSurvivesRecreationWithoutWriting() = with(SettingsPreviewFixture) {
         withHome(mapOf(Ui.enable_dashed_border to "true", Ui.dashed_border_stroke_width to "1.5", Behavior.enable_cyberdeck_mode to "false")) {
             var activity = open(XMLPrefsManager.XMLPrefsRoot.UI)
             val before = source(XMLPrefsManager.XMLPrefsRoot.UI).readBytes()
@@ -60,24 +42,9 @@ class SettingsPreviewJourneyTest {
                 search(activity, "dashed_border_stroke_width"); edit(activity, "2.5")
                 hideKeyboard(activity)
                 capture("editor-current-home")
-                repeat(3) {
-                    instrumentation.runOnMainSync {
-                        thumbnail(activity).performClick()
-                        val dialog = checkNotNull(expanded(preview(activity)))
-                        assertTrue(dialog.isShowing)
-                        val scene = dialog.window!!.decorView.findViewById<View>(R.id.mainview)
-                        assertTrue("Expanded scene must contain current Home content", views(scene).any { it.id == R.id.terminal_view })
-                        assertFalse("Preview must not create a live command input", views(scene).any { it is EditText })
-                        assertFalse("Frozen launcher controls must not retain actions", views(scene).any { it.hasOnClickListeners() || it.isLongClickable })
-                    }
-                    waitForExpandedFocus(preview(activity))
-                    if (it == 0) capture("expanded-current-home")
-                    instrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_BACK); settle()
-                    savedState.assertUnchanged()
-                    instrumentation.runOnMainSync {
-                        assertNull(expanded(preview(activity)))
-                        assertEquals("2.5", adapter(activity).draftValue(Ui.dashed_border_stroke_width))
-                    }
+                savedState.assertUnchanged()
+                instrumentation.runOnMainSync {
+                    assertEquals("2.5", adapter(activity).draftValue(Ui.dashed_border_stroke_width))
                 }
                 val monitor = Instrumentation.ActivityMonitor(TuixtActivity::class.java.name, null, false)
                 instrumentation.addMonitor(monitor)
@@ -98,7 +65,7 @@ class SettingsPreviewJourneyTest {
         }
     }
 
-    @Test fun transparentThemeDraftExpandsAndCancelDiscardsIt() = with(SettingsPreviewFixture) {
+    @Test fun transparentThemeDraftCancelDiscardsIt() = with(SettingsPreviewFixture) {
         withHome(mapOf(Theme.output_background_color to "#00000000")) {
             val activity = open(XMLPrefsManager.XMLPrefsRoot.THEME)
             val before = source(XMLPrefsManager.XMLPrefsRoot.THEME).readBytes()
@@ -106,16 +73,13 @@ class SettingsPreviewJourneyTest {
             try {
                 search(activity, "output_background_color"); edit(activity, "#62123456")
                 hideKeyboard(activity)
-                instrumentation.runOnMainSync { thumbnail(activity).performClick(); assertTrue(checkNotNull(expanded(preview(activity))).isShowing) }
-                waitForExpandedFocus(preview(activity))
-                instrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_BACK); settle()
                 assertEquals("#00000000", LauncherSettings.get(Theme.output_background_color))
-                assertFalse(ThemeColorResolver.hasPreview())
                 savedState.assertUnchanged()
                 assertArrayEquals(before, source(XMLPrefsManager.XMLPrefsRoot.THEME).readBytes())
                 click(activity, R.string.editor_tuixtactivity_cancel_1507c)
                 discardChanges()
                 assertTrue(activity.isFinishing || activity.isDestroyed)
+                assertFalse(ThemeColorResolver.hasPreview())
                 savedState.assertUnchanged()
                 assertArrayEquals(before, source(XMLPrefsManager.XMLPrefsRoot.THEME).readBytes())
                 assertEquals("#00000000", LauncherSettings.get(Theme.output_background_color))

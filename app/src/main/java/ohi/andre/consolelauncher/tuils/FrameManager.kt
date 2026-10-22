@@ -699,21 +699,35 @@ object FrameManager {
         normalizeFrameFolder(File(destinationRoot, FRAME_FOLDER))
     }
 
-    fun applyPortableState(sourceRoot: File) {
+    internal fun stagePortableState(sourceRoot: File, stagingRoot: File): File? {
         val source = File(sourceRoot, FRAME_FOLDER)
-        if (!source.isDirectory) return
+        if (!source.isDirectory) return null
         validatePortableState(sourceRoot)
-        normalizeFrameFolder(source)
-        normalizeFrameFolder(frameDir())
-
-        val merged = File(Tuils.getFolder(), ".$FRAME_FOLDER.merging")
+        val incoming = File(stagingRoot, "incoming-frames")
+        copyFrameFolder(source, incoming)
+        normalizeFrameFolder(incoming)
+        val merged = File(stagingRoot, FRAME_FOLDER)
         copyFrameFolder(frameDir(), merged)
-        for (file in source.listFiles().orEmpty()) {
+        normalizeFrameFolder(merged)
+        for (file in incoming.listFiles().orEmpty()) {
             if (assetId(file.name) != null) Tuils.copy(file, File(merged, file.name))
         }
-        writeStateFile(merged, readState(source))
-        applyFrameFolder(merged)
-        if (merged.exists()) Tuils.delete(merged)
+        writeStateFile(merged, readState(incoming))
+        validateFrameFolder(merged)
+        return merged
+    }
+
+    internal fun settingsCommitted() = clearCache()
+
+    fun applyPortableState(sourceRoot: File) = synchronized(ohi.andre.consolelauncher.managers.settings.SettingsFiles.lock) {
+        val staging = File.createTempFile(".settings-frames-", ".tmp", Tuils.getFolder())
+        check(staging.delete() && staging.mkdir())
+        try {
+            val merged = stagePortableState(sourceRoot, staging) ?: return@synchronized
+            ohi.andre.consolelauncher.managers.settings.LauncherSettings.applyChangesWithFiles(null, emptyMap(),
+                mapOf(File(Tuils.getFolder(), FRAME_FOLDER) to merged))
+            clearCache()
+        } finally { staging.deleteRecursively() }
     }
 
     fun validatePortableState(root: File) {

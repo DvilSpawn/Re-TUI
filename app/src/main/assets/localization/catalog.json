@@ -413,7 +413,7 @@
     "type": "string"
   },
   "calculator_help_expressions": {
-    "formatted": true,
+    "formatted": false,
     "forms": {
       "other": "EXPRESSIONS / OPERATORS\n\n2 + 3 * 4 → 14\n(2 + 3) * 4 → 20\n2^3 → 8\nUse +, −, ×, ÷, parentheses, ^ and %."
     },
@@ -2123,7 +2123,7 @@
   "command_mode_unknown_launcher_mode_usage_mode_search_cl_a86ba": {
     "formatted": true,
     "forms": {
-      "other": "Unknown launcher mode: %1$s\nUsage: mode classic|search"
+      "other": "Unknown launcher mode: %1$s\nUsage: mode classic|search|terminal"
     },
     "type": "string"
   },
@@ -6010,7 +6010,7 @@
   "help_mode": {
     "formatted": true,
     "forms": {
-      "other": "Switch launcher layout.\nUsage:\n$ mode classic\n$ mode search"
+      "other": "Switch launcher layout.\nUsage:\n$ mode classic\n$ mode search\n$ mode terminal"
     },
     "type": "string"
   },
@@ -14000,7 +14000,7 @@
   "setting_behavior_launcher_mode_description": {
     "formatted": false,
     "forms": {
-      "other": "Launcher layout mode: classic or search"
+      "other": "Launcher layout mode: classic, search, or terminal"
     },
     "type": "string"
   },
@@ -17494,6 +17494,20 @@
     "formatted": true,
     "forms": {
       "other": "Font files must be 8 MiB or smaller."
+    },
+    "type": "string"
+  },
+  "settings_load_failed": {
+    "formatted": true,
+    "forms": {
+      "other": "Your settings could not be loaded. Your files have been preserved.\n\n%1$s"
+    },
+    "type": "string"
+  },
+  "settings_load_retry": {
+    "formatted": true,
+    "forms": {
+      "other": "Retry loading settings"
     },
     "type": "string"
   },
@@ -21766,6 +21780,146 @@
     "formatted": true,
     "forms": {
       "other": "Value"
+    },
+    "type": "string"
+  },
+  "terminal_home_add": {
+    "formatted": true,
+    "forms": {
+      "other": "Add terminal"
+    },
+    "type": "string"
+  },
+  "terminal_home_arrange": {
+    "formatted": true,
+    "forms": {
+      "other": "Drag to move. Other panes move down to make room. Drag an edge handle to resize. Tap outside or Back to finish."
+    },
+    "type": "string"
+  },
+  "terminal_home_background_help": {
+    "formatted": true,
+    "forms": {
+      "other": "Termux is not responding. Open Termux once and allow background activity in Android settings, then tap here to reconnect."
+    },
+    "type": "string"
+  },
+  "terminal_home_custom": {
+    "formatted": true,
+    "forms": {
+      "other": "Custom command"
+    },
+    "type": "string"
+  },
+  "terminal_home_disconnected": {
+    "formatted": true,
+    "forms": {
+      "other": "Disconnected · tap title to reconnect"
+    },
+    "type": "string"
+  },
+  "terminal_home_existing": {
+    "formatted": true,
+    "forms": {
+      "other": "Existing session"
+    },
+    "type": "string"
+  },
+  "terminal_home_exited": {
+    "formatted": true,
+    "forms": {
+      "other": "Session ended · tap title to reconnect"
+    },
+    "type": "string"
+  },
+  "terminal_home_full": {
+    "formatted": true,
+    "forms": {
+      "other": "No room for another terminal. Resize or remove a tile."
+    },
+    "type": "string"
+  },
+  "terminal_home_hint": {
+    "formatted": true,
+    "forms": {
+      "other": "Tap a terminal to type. Hold anywhere in a pane for options. Scroll for more terminals."
+    },
+    "type": "string"
+  },
+  "terminal_home_input": {
+    "formatted": true,
+    "forms": {
+      "other": "Terminal input"
+    },
+    "type": "string"
+  },
+  "terminal_home_location": {
+    "formatted": true,
+    "forms": {
+      "other": "Weather location (city)"
+    },
+    "type": "string"
+  },
+  "terminal_home_move_resize": {
+    "formatted": true,
+    "forms": {
+      "other": "Move / resize"
+    },
+    "type": "string"
+  },
+  "terminal_home_reconnect": {
+    "formatted": true,
+    "forms": {
+      "other": "Reconnect / restart"
+    },
+    "type": "string"
+  },
+  "terminal_home_remove": {
+    "formatted": true,
+    "forms": {
+      "other": "Remove tile (keep session)"
+    },
+    "type": "string"
+  },
+  "terminal_home_resize_hint": {
+    "formatted": true,
+    "forms": {
+      "other": "↔ Move · ◢ Resize"
+    },
+    "type": "string"
+  },
+  "terminal_home_search": {
+    "formatted": true,
+    "forms": {
+      "other": "Search ↑"
+    },
+    "type": "string"
+  },
+  "terminal_home_settings": {
+    "formatted": true,
+    "forms": {
+      "other": "Settings"
+    },
+    "type": "string"
+  },
+  "terminal_home_setup": {
+    "formatted": true,
+    "forms": {
+      "other": "Open Termux setup to install or update the helper and grant access. Tap here to reconnect."
+    },
+    "type": "string"
+  },
+  "terminal_home_setup_button": {
+    "formatted": true,
+    "forms": {
+      "other": "Termux setup"
+    },
+    "type": "string"
+  },
+  "terminal_home_shell": {
+    "formatted": true,
+    "forms": {
+      "other": "New shell"
     },
     "type": "string"
   },

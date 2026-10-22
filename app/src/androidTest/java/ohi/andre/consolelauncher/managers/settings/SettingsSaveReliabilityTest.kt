@@ -97,15 +97,18 @@ class SettingsSaveReliabilityTest {
     @Test fun previewUsesTheLauncherFontCalculationAtMinimumOffset() = fixture {
         LauncherSettings.set(Ui.font_size_offset, "-8")
         LauncherSettings.set(Ui.input_output_size, "14")
-        val activity = i.startActivitySync(Intent(c, TuixtActivity::class.java).putExtra(TuixtActivity.PATH, File(Tuils.getFolder(), "ui.xml").absolutePath).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) as TuixtActivity
-        try {
-            val preview = TuixtActivity::class.java.getDeclaredField("appearancePreview").apply { isAccessible = true }.get(activity)!!
-            val sample = preview.javaClass.getDeclaredMethod("sample", String::class.java, Theme::class.java, Ui::class.java).apply { isAccessible = true }
-            main {
-                val text = sample.invoke(preview, "font sample", Theme.output_text_color, Ui.input_output_size) as TextView
-                assertEquals(6f, text.textSize / c.resources.displayMetrics.scaledDensity, .01f)
-                assertEquals(-8, ohi.andre.consolelauncher.tuils.LauncherFontScale.offsetSp())
-            }
-        } finally { main { activity.finish() } }
+        main {
+            val root=ohi.andre.consolelauncher.presentation.LauncherHomePresentation.inflate(c)
+            root.measure(View.MeasureSpec.makeMeasureSpec(1080,View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(2400,View.MeasureSpec.EXACTLY))
+            root.layout(0,0,1080,2400)
+            val snapshot=checkNotNull(ohi.andre.consolelauncher.presentation.LauncherHomeSnapshot.capture(root))
+            val preview=android.widget.LinearLayout(c).apply {orientation=android.widget.LinearLayout.VERTICAL}
+            snapshot.bindTerminalCard(preview,ohi.andre.consolelauncher.presentation.HomeAppearance.saved())
+            val text=preview.findViewById<TextView>(R.id.input_view)
+            assertEquals(6f,text.textSize/c.resources.displayMetrics.scaledDensity,.01f)
+            assertEquals(-8,ohi.andre.consolelauncher.tuils.LauncherFontScale.offsetSp())
+        }
+
     }
 }

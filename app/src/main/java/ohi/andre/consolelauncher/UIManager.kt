@@ -1179,6 +1179,15 @@ class UIManager(
             if (searchOnlyMode && hasFocus) refreshStockSuggestions()
             if (!inputTouchInProgress) applyDisplayMarginsForConfigurationOnMainThread()
         }
+        // Focus can survive a return to Home with the keyboard up; typing must still open Terminal search.
+        inputView.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                if (LauncherMode.isTerminal() && terminalHome != null && !terminalSearchOpen && inputView.hasFocus() && !s.isNullOrEmpty())
+                    showTerminalSearch(true)
+            }
+        })
         if (inputView is OutlineEditText) {
             val outlineInput = inputView
             outlineInput.setIdleCursorColor(XMLPrefsManager.getColor(Theme.cursor_color))
@@ -6219,26 +6228,9 @@ class UIManager(
         }
 
         if (show[Label.device.ordinal]) {
-            val USERNAME = Pattern.compile("%u", Pattern.CASE_INSENSITIVE or Pattern.LITERAL)
-            val DV = Pattern.compile("%d", Pattern.CASE_INSENSITIVE or Pattern.LITERAL)
-
-            var deviceFormat = XMLPrefsManager.get(Behavior.device_format)
-
-            val username = XMLPrefsManager.get(Ui.username)
-            var deviceName = XMLPrefsManager.get(Ui.deviceName)
-            if (deviceName.length == 0) {
-                deviceName = Build.DEVICE
-            }
-
-            deviceFormat = USERNAME.matcher(deviceFormat)
-                .replaceAll(Matcher.quoteReplacement(username))
-            deviceFormat = DV.matcher(deviceFormat).replaceAll(Matcher.quoteReplacement(deviceName))
-            deviceFormat = Tuils.patternNewline.matcher(deviceFormat)
-                .replaceAll(Matcher.quoteReplacement(Tuils.NEWLINE))
-
             updateText(
                 Label.device, Tuils.span(
-                    mContext, deviceFormat, XMLPrefsManager.getColor(
+                    mContext, ohi.andre.consolelauncher.presentation.StatusPresentation.deviceText(XMLPrefsManager::get), XMLPrefsManager.getColor(
                         Theme.device_text_color
                     ), labelSizes[Label.device.ordinal]
                 )
@@ -12586,6 +12578,61 @@ class UIManager(
     }
 
     private class LuaSurfaceAction(val label: String, val run: Runnable)
+
+    fun applyAppearance(previous: LauncherSettings.Snapshot, current: LauncherSettings.Snapshot) {
+        val root = mRootView as? ViewGroup ?: return
+        val old = ohi.andre.consolelauncher.presentation.HomeAppearance(previous.values)
+        val next = ohi.andre.consolelauncher.presentation.HomeAppearance(current.values)
+        statusAppearance = next
+        ohi.andre.consolelauncher.presentation.HomeChromePresentation.styleRoot(root, next, root.getTag(R.id.home_root_binding) as? Boolean ?: true)
+        fun style(view: View) {
+            ohi.andre.consolelauncher.presentation.HomeChromePresentation.styleSurface(view, next, old)
+            (view.getTag(R.id.home_widget_binding) as? TuiWidgetDecorator.Binding)?.let {
+                TuiWidgetDecorator.decorateDraft(view, it, next)
+            }
+            if (view is ImageView) {
+                ohi.andre.consolelauncher.presentation.HomeChromePresentation.styleToolbarIcon(view, next)
+                if (view.parent?.let { it is View && it.id == R.id.tools_view } == true)
+                    ohi.andre.consolelauncher.presentation.HomeChromePresentation.styleToolbarButton(view, next)
+            }
+            if (view is TextView) {
+                if (view.id in intArrayOf(R.id.input_view, R.id.prefix_view, R.id.terminal_view)) {
+                    ohi.andre.consolelauncher.presentation.HomeChromePresentation.styleTerminalText(view, next, view.id != R.id.terminal_view)
+                    if (view.id == R.id.terminal_view) view.text = ohi.andre.consolelauncher.tuils.ThemeColorSpan.refresh(view.text, next::color)
+                }
+                (view.getTag(R.id.home_suggestion_binding) as? ohi.andre.consolelauncher.managers.suggestions.SuggestionChipStyler.Binding)?.let {
+                    ohi.andre.consolelauncher.managers.suggestions.SuggestionChipStyler.styleDraft(view, it, next, old)
+                }
+                ohi.andre.consolelauncher.presentation.ModuleContentPresentation.styleDraft(view, next, old)
+            }
+            if (view is ViewGroup) for (index in 0 until view.childCount) style(view.getChildAt(index))
+        }
+        style(root)
+        ohi.andre.consolelauncher.presentation.StatusPresentation.rows(next).forEachIndexed { index, members ->
+            labelViews?.getOrNull(index)?.let { view ->
+                ohi.andre.consolelauncher.presentation.StatusPresentation.bindStyle(view, members.first(), next, unifiedStatusActive)
+                ohi.andre.consolelauncher.presentation.StatusPresentation.bindContent(view, members,
+                    ohi.andre.consolelauncher.presentation.StatusPresentation.capture(labelTexts), next, old)
+            }
+        }
+        ohi.andre.consolelauncher.presentation.UnifiedStatusPresentation.style(root, next)
+        if (searchOnlyMode) ohi.andre.consolelauncher.presentation.HomeLayoutPresentation.styleSearchClock(root, next)
+        for (id in intArrayOf(R.id.terminal_home_add_tab, R.id.terminal_home_settings_tab)) {
+            root.findViewById<ImageButton>(id)?.let { button ->
+                button.setColorFilter(next.color(Theme.time_text_color))
+                button.background = root.findViewById<View>(R.id.search_mode_clock_tab)?.background?.constantState?.newDrawable()?.mutate()
+            }
+        }
+        terminalTrayToggle?.let { TerminalTrayToggleView.styleDraft(it, root, next, old) }
+        listOfNotNull(ramManager,storageManager,networkManager,tuiTimeManager,unlockManager,tuiNotesManager,weatherManager)
+            .forEach { it.refreshAppearance() }
+        batteryManager?.refreshAppearance()
+        terminalHome?.refreshAppearance()
+        val input = mTerminalAdapter?.inputView as? EditText
+        applyRetuiKeyboardTheme(input, "launcher")
+        if (keyboardVisible && input?.hasFocus() == true) sendRetuiKeyboardTheme(input, "launcher")
+        root.invalidate()
+    }
 
     fun preserveSurfaceSessionForReload() {
         captureLauncherSurfaceSession()

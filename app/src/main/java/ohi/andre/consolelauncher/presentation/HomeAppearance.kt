@@ -13,11 +13,12 @@ import ohi.andre.consolelauncher.tuils.*
 
 /** Immutable values: rendering a draft never writes the settings singleton or its caches. */
 internal class HomeAppearance(private val values: Map<XMLPrefsSave, String?>) {
-    private val colors=java.util.EnumMap<Theme,Int>(Theme::class.java)
+    private val colors=java.util.concurrent.ConcurrentHashMap<Theme,Int>()
     private var typeface:Typeface?=null
     fun raw(key: XMLPrefsSave): String? = values[key] ?: key.defaultValue()
-    fun bool(key: XMLPrefsSave) = raw(key).toBoolean()
-    fun number(key: XMLPrefsSave, fallback: Float = 0f) = raw(key)?.toFloatOrNull()?.takeIf { it.isFinite() } ?: fallback
+    private fun effective(key: XMLPrefsSave) = raw(key)?.takeIf { it.isNotEmpty() } ?: key.defaultValue()
+    fun bool(key: XMLPrefsSave) = effective(key).toBoolean()
+    fun number(key: XMLPrefsSave, fallback: Float = 0f) = effective(key)?.toFloatOrNull()?.takeIf { it.isFinite() } ?: fallback
     fun rawColor(key: XMLPrefsSave): Int = runCatching { Color.parseColor(raw(key)) }.getOrDefault(Color.WHITE)
     fun color(role: Theme):Int = colors.getOrPut(role) { ThemeColorResolver.resolve(role, { raw(it) }, emptyMap()) }
     fun differs(saved: HomeAppearance) = values.any { (key,_) -> changed(key,saved) }
@@ -30,8 +31,14 @@ internal class HomeAppearance(private val values: Map<XMLPrefsSave, String?>) {
         HomeAppearance(values.mapValues { (k,v) -> if (hasDraft(k)) draft(k) ?: v else v })
 
     companion object {
-        fun saved() = HomeAppearance((Theme.entries + Ui.entries + Behavior.entries + SurfaceBorderOption.entries + Suggestions.entries + Toolbar.entries)
-            .associateWith<XMLPrefsSave, String?> { LauncherSettings.get(it) })
+        @Volatile private var cached: Pair<Long,HomeAppearance>? = null
+
+        // Snapshots copy every setting and drop the colour/font caches, so reuse one until settings change.
+        fun saved(): HomeAppearance {
+            val revision = LauncherSettings.currentRevision()
+            cached?.takeIf { it.first == revision }?.let { return it.second }
+            return HomeAppearance(LauncherSettings.currentSnapshot().values).also { cached = revision to it }
+        }
 
         /** Shared by Home's existing surface construction and the detached draft scene. */
         fun surface(context: Context, view: View, fill: Int, border: Int, radiusPx: Float,

@@ -8419,6 +8419,7 @@
       "showPodcastSpeedMenu",
       "showPodcastTagsDialog",
       "showRichTermuxOutput",
+      "showTerminalSearch",
       "showTermuxAppGridOutput",
       "showTextModule"
     ],

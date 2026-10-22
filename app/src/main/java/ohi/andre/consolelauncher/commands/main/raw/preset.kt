@@ -40,7 +40,6 @@ class preset : ParamCommand() {
 
                     if (pack.context is Reloadable) {
                         (pack.context as Reloadable).addMessage("preset", pack.context.getString(R.string.command_preset_applied_preset_c132b, name.trim()))
-                        LauncherActivity.preview(pack.context)
                     }
 
                     return pack.context.getString(R.string.command_preset_preset_applied_0611f, name.trim())

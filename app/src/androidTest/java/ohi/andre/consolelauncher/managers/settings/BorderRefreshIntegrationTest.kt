@@ -65,7 +65,7 @@ class BorderRefreshIntegrationTest {
         org.junit.Assert.fail("Launcher output never became visible")
     }
 
-    @Test fun borderChangesRebuildRunningUiWithoutRestartingActivity() {
+    @Test fun borderChangesRestyleRunningUiWithoutRestartingActivity() {
         val instrumentation = InstrumentationRegistry.getInstrumentation()
         val context = instrumentation.targetContext
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R &&
@@ -172,10 +172,13 @@ class BorderRefreshIntegrationTest {
                 }
                 instrumentation.waitForIdleSync()
                 awaitVisibleOutput(launcher)
-                assertNotSame("Live border refresh missing for ${setting.label()}", oldManager, launcher.uiManager)
+                if (setting == SurfaceBorderOption.unified_status_border)
+                    assertNotSame("Grouping status surfaces requires reconstruction", oldManager, launcher.uiManager)
+                else assertSame("Border styling must retain the live UI manager for ${setting.label()}", oldManager, launcher.uiManager)
                 val restored = launcher.uiManager!!.snapshotTerminalState()!!
                 assertEquals(state.input, restored.input)
-                assertEquals(state.output.toString(), restored.output.toString())
+                org.junit.Assert.assertTrue("Existing output survives command feedback", restored.output.toString().startsWith(state.output.toString()))
+                if (setting != Ui.enable_dashed_border) assertEquals(state.output.toString(), restored.output.toString())
                 assertEquals(state.commands, restored.commands)
                 assertEquals(state.historyPosition, restored.historyPosition)
                 assertEquals(state.root, restored.root)

@@ -65,6 +65,20 @@ class SettingsCompatibilityTest {
             }
         }
     }
+    @Test fun unknownRepeatableXmlIsPreservedWhenAddingSectionComments() {
+        val document=DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(
+            "<UI><input_output_size value=\"14\"/><future_option value=\"first\"/><future_option value=\"second\"/></UI>".byteInputStream())
+        val root=document.documentElement
+        assertFalse(XMLPrefsManager.migrateRootValues(document,root,XMLPrefsManager.XMLPrefsRoot.UI))
+        val sections=XMLPrefsManager::class.java.getDeclaredMethod("ensureDefaultSectionComments",
+            org.w3c.dom.Document::class.java,org.w3c.dom.Element::class.java,XMLPrefsManager.XMLPrefsRoot::class.java).apply {isAccessible=true}
+        sections.invoke(XMLPrefsManager,document,root,XMLPrefsManager.XMLPrefsRoot.UI)
+        val future=root.getElementsByTagName("future_option")
+        assertEquals(2,future.length)
+        assertEquals("first",(future.item(0) as org.w3c.dom.Element).getAttribute("value"))
+        assertEquals("second",(future.item(1) as org.w3c.dom.Element).getAttribute("value"))
+    }
+
     @Test fun validBlackIsNeverAnInvalidSettingValue() {
         for (setting in Theme.entries) for (color in listOf("#ff000000","#FF000000","#000000","#00000000")) {
             assertFalse(setting.name,setting.invalidValues()?.contains(color)==true)

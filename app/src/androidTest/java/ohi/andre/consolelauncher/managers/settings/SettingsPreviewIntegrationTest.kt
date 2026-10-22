@@ -68,7 +68,13 @@ internal object SettingsPreviewFixture {
         try {
             fixture.forEach { (key, value) -> LauncherSettings.set(key, value) }
             ActivityScenario.launch<LauncherActivity>(Intent(context, LauncherActivity::class.java)).use {
-                settle()
+                val deadline=android.os.SystemClock.uptimeMillis()+5000
+                var ready=false
+                while(!ready && android.os.SystemClock.uptimeMillis()<deadline) {
+                    settle()
+                    instrumentation.runOnMainSync { ready=LauncherActivity.captureHomePreview()!=null }
+                }
+                assertTrue("Home must draw before opening a preview",ready)
                 run()
             }
         } finally { instrumentation.runOnMainSync { original.forEach { (key, value) -> LauncherSettings.set(key, value) } } }

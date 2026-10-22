@@ -13,6 +13,10 @@
     {
       "path": "app/src/main/res/drawable/remember_ic_tree_branch_last.xml",
       "sha256": "4af69699eefed4cccb25f1574edab832f84ca6e2193f29d0d2171573314038da"
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_toolbar_gesture_24.xml",
+      "sha256": "a788d09e3355e302b50cf57a7fb9a4e571fc997c6235a50c6f62980838c49c40"
     }
   ]
 }

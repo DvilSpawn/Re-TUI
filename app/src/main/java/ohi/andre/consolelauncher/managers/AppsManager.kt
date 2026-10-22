@@ -1651,6 +1651,7 @@ class AppsManager(context: Context) : XMLPrefsElement {
                                 this.apps
                             ).firstOrNull()
                         }
+                        if (info == null) info = AppUtils.findLaunchInfoWithLabel(this.apps, vl)
                         if (info == null) continue
                         suggested.add(SuggestedApp(info, USER_DEFINIED, count + 1))
                     }

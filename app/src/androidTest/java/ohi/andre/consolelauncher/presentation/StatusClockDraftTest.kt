@@ -16,6 +16,17 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class StatusClockDraftTest {
+    @org.junit.Test fun unchangedClockUsesCapturedContentRatherThanSamplingAnotherSecond() {
+        val instrumentation=androidx.test.platform.app.InstrumentationRegistry.getInstrumentation()
+        instrumentation.runOnMainSync {
+            val appearance=HomeAppearance.saved()
+            val texts=arrayOfNulls<CharSequence>(10).apply {this[2]="FROZEN_CLOCK_SECOND"}
+            val view=android.widget.TextView(instrumentation.targetContext)
+            StatusPresentation.bindContent(view,listOf(2),StatusPresentation.capture(texts),appearance,appearance)
+            org.junit.Assert.assertEquals("FROZEN_CLOCK_SECOND",view.text.toString())
+        }
+    }
+
     @Test fun draftClockUsesFormatterWithoutChangingSavedSettingsOrLiveClock() {
         val instrumentation = InstrumentationRegistry.getInstrumentation()
         val context = instrumentation.targetContext

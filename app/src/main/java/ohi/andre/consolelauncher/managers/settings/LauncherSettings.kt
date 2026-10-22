@@ -22,7 +22,9 @@ import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.managers.xml.options.Ui
 import ohi.andre.consolelauncher.tuils.Tuils
 import ohi.andre.consolelauncher.tuils.UIUtils
-import java.util.Map
+import java.io.File
+import android.util.AtomicFile
+import javax.xml.parsers.DocumentBuilderFactory
 
 object LauncherSettings {
     private val LOCK = Any()
@@ -85,6 +87,7 @@ object LauncherSettings {
         synchronized(LOCK) {
             snapshot.clear()
             snapshotLoaded = false
+            revision++
         }
     }
 
@@ -92,7 +95,9 @@ object LauncherSettings {
     fun debugSummary(): String {
         synchronized(LOCK) {
             return "settings_snapshot_loaded: " + snapshotLoaded +
-                "\nsettings_snapshot_values: " + snapshot.size
+                "\nsettings_snapshot_values: " + snapshot.size +
+                "\nsettings_revision: " + revision +
+                "\nsettings_validation_warnings: " + XMLPrefsManager.validationWarnings.joinToString(",")
         }
     }
 
@@ -101,24 +106,89 @@ object LauncherSettings {
         set(null, value, rawValue)
     }
 
+    data class Snapshot(val revision: Long, val values: kotlin.collections.Map<XMLPrefsSave, String?>)
+    data class Change(val previous: Snapshot, val current: Snapshot, val settings: Set<XMLPrefsSave>)
+    private var revision = 0L
+
+    fun currentRevision(): Long = synchronized(LOCK) {
+        if (!snapshotLoaded) refreshFromLoadedPrefsLocked()
+        revision
+    }
+
+    fun currentSnapshot(): Snapshot = synchronized(LOCK) {
+        if (!snapshotLoaded) refreshFromLoadedPrefsLocked()
+        Snapshot(revision, java.util.Collections.unmodifiableMap(XMLPrefsManager.XMLPrefsRoot.entries
+            .flatMap { it.enums }.associateWith { snapshot[key(it)] ?: it.defaultValue() }))
+    }
+
     @JvmStatic
     fun set(context: Context?, value: XMLPrefsSave?, rawValue: String?) {
-        if (value == null) {
-            return
+        if (value != null) applyChanges(context, mapOf(value to rawValue.orEmpty()))
+    }
+
+    @JvmOverloads
+    fun applyChanges(context: Context?, changes: kotlin.collections.Map<XMLPrefsSave, String?>): Change =
+        applyChangesWithFiles(context, changes, emptyMap())
+
+    /** The public config -erase command deliberately stores an empty override. */
+    fun erase(context: Context?, setting: XMLPrefsSave): Change =
+        applyChangesWithFiles(context, mapOf(setting to ""), emptyMap(), setOf(setting))
+
+    internal fun applyChangesWithFiles(context: Context?, changes: kotlin.collections.Map<XMLPrefsSave, String?>,
+                                      files: kotlin.collections.Map<File, File?>, clear: Set<XMLPrefsSave> = emptySet()): Change = synchronized(SettingsFiles.lock) {
+        val owner = context?.applicationContext ?: XMLPrefsManager.settingsContext
+        SettingsFiles.recover(owner)
+        val previous = currentSnapshot()
+        val edits = changes.filter { (setting, raw) -> (raw ?: "") != get(setting) }
+        for ((setting, raw) in edits) {
+            val error = if (setting in clear && raw.isNullOrEmpty()) null else SettingsValidation.error(setting, raw)
+            require(error == null) { "${setting.label()}: ${owner?.getString(error!!) ?: "Invalid setting value"}" }
         }
-
-        val parent: XMLPrefsElement = value.parent() ?: throw IllegalStateException("Settings manager is not available: ${value.label()}")
-
-        parent.write(value, rawValue ?: Tuils.EMPTYSTRING)
-        synchronized(LOCK) {
-            if (rawValue != null) {
-                snapshot[key(value)] = rawValue
-            } else {
-                snapshot.remove(key(value))
+        if (edits.isEmpty() && files.isEmpty()) return@synchronized Change(previous, previous, emptySet())
+        val folder = Tuils.getFolder()
+        val staging = File.createTempFile(".settings-save-", ".tmp", folder)
+        check(staging.delete() && staging.mkdir()) { "Unable to prepare settings save" }
+        try {
+            val replacements = files.toMutableMap()
+            for ((path, group) in edits.entries.groupBy { (setting, _) ->
+                setting.parent()?.path() ?: XMLPrefsManager.XMLPrefsRoot.entries.firstOrNull { setting in it.enums }?.path
+                    ?: error("Settings manager is not available: ${setting.label()}")
+            }) {
+                val root = XMLPrefsManager.XMLPrefsRoot.entries.first { it.path == path }
+                val target = File(folder, path)
+                val parser = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+                val document = if (target.exists()) AtomicFile(target).openRead().use { parser.parse(it) }
+                    else parser.newDocument().also { it.appendChild(it.createElement(root.name)) }
+                require(document.documentElement.tagName == root.name) { "Unexpected root in $path" }
+                for ((setting, raw) in group) {
+                    val nodes = document.documentElement.childNodes
+                    val matching = (0 until nodes.length).mapNotNull { nodes.item(it) as? org.w3c.dom.Element }
+                        .filter { it.tagName == setting.label() }
+                    val node = matching.firstOrNull() ?: document.createElement(setting.label()).also { document.documentElement.appendChild(it) }
+                    matching.drop(1).forEach { document.documentElement.removeChild(it) }
+                    node.setAttribute(XMLPrefsManager.VALUE_ATTRIBUTE, raw.orEmpty())
+                }
+                val staged = File(staging, path)
+                XMLPrefsManager.writeTo(document, staged)
+                replacements[target] = staged
             }
-            snapshotLoaded = true
-        }
-        onSettingChanged(context, value)
+            SettingsFiles.replace(owner, replacements) {
+                synchronized(LOCK) {
+                    for ((setting, raw) in edits) {
+                        val root = XMLPrefsManager.XMLPrefsRoot.entries.first { setting in it.enums }
+                        root.getValues()?.add(setting.label(), raw.orEmpty())
+                        setting.parent()?.getValues()?.add(setting.label(), raw.orEmpty())
+                        snapshot[key(setting)] = raw.orEmpty()
+                    }
+                    snapshotLoaded = true
+                    revision++
+                }
+            }
+            if (files.keys.any { it.name == "frames" }) ohi.andre.consolelauncher.tuils.FrameManager.settingsCommitted()
+            val change = Change(previous, currentSnapshot(), edits.keys.toSet())
+            SettingsRefreshCoordinator.request(owner, change)
+            change
+        } finally { staging.deleteRecursively() }
     }
 
     @JvmStatic
@@ -129,9 +199,7 @@ object LauncherSettings {
     fun setStatusIndex(context: Context?, setting: Ui, value: String?) {
         val current = StatusRowResolver.settings.associateWith { get(it) }
         val reordered = StatusRowResolver.reorder(current, mapOf(setting to value))
-        for ((item, position) in reordered.values) {
-            if (current[item] != position) set(context, item, position)
-        }
+        applyChanges(context, reordered.values.filter { (item, value) -> current[item] != value })
     }
 
     @JvmStatic
@@ -156,14 +224,13 @@ object LauncherSettings {
 
     internal fun applyWallpaperSnapshot(context: Context, snapshot: AutoColorManager.Snapshot): AutoColorManager.Snapshot {
         if (!snapshot.succeeded) return snapshot
-        set(context, Ui.system_wallpaper, "true")
+        val changes = linkedMapOf<XMLPrefsSave, String?>(Ui.system_wallpaper to "true")
         snapshot.colors.forEach { (setting, color) ->
-            if (setting !is Theme || !setting.advanced) {
-                set(context, setting, String.format(Locale.US, "#%08X", color))
-            }
+            if (setting !is Theme || !setting.advanced) changes[setting] = String.format(Locale.US, "#%08X", color)
         }
-        set(context, Theme.wallpaper_overlay_color, "#00000000")
-        set(context, Ui.auto_color_pick, "false")
+        changes[Theme.wallpaper_overlay_color] = "#00000000"
+        changes[Ui.auto_color_pick] = "false"
+        applyChanges(context, changes)
         return snapshot
     }
 
@@ -172,7 +239,7 @@ object LauncherSettings {
         if (!getBoolean(Ui.auto_color_pick)) return
         Thread({
             val result = applyWallpaperAuto(context)
-            if (result.succeeded) Handler(Looper.getMainLooper()).post { LauncherActivity.previewIfRunning() }
+
         }, "retui-auto-theme").start()
     }
 
@@ -194,19 +261,22 @@ object LauncherSettings {
     }
 
     private fun refreshFromLoadedPrefsLocked() {
-        snapshot.clear()
+        val loaded = HashMap<String, String>()
         for (root in XMLPrefsManager.XMLPrefsRoot.values()) {
             for (save in root.enums) {
                 try {
                     // Some settings (notifications/apps) are owned by a live manager, not the XML root cache.
                     val value: String? = (save.parent() ?: root).getValues()?.get(save)?.value
                     if (value != null) {
-                        snapshot[key(save)] = value
+                        loaded[key(save)] = value
                     }
                 } catch (ignored: Exception) {
                 }
             }
         }
+        if (snapshotLoaded && loaded != snapshot) revision++
+        snapshot.clear()
+        snapshot.putAll(loaded)
         snapshotLoaded = true
     }
 
@@ -216,40 +286,4 @@ object LauncherSettings {
         return parentPath + ":" + value.label()
     }
 
-    private val themeRefreshHandler by lazy { Handler(Looper.getMainLooper()) }
-    private val themeRefresh = Runnable { LauncherActivity.previewIfRunning() }
-
-    private fun onSettingChanged(context: Context?, value: XMLPrefsSave) {
-        if (value.type() == XMLPrefsSave.COLOR && value != Theme.terminal_border_color && value != Theme.terminal_header_border_color) {
-            themeRefreshHandler.removeCallbacks(themeRefresh)
-            themeRefreshHandler.postDelayed(themeRefresh, 100)
-        }
-        if (value == Behavior.breath_out || value == Behavior.breath_out_seconds) {
-            val launcher = LauncherActivity.instance
-            if (launcher != null) launcher.window.decorView.post {
-                if (LauncherActivity.instance === launcher) launcher.refreshBreathOutSettings()
-            }
-        }
-        if (value == Ui.system_font || value == Ui.font_file) {
-            Tuils.cancelFont()
-            UIUtils.cancelFont()
-        }
-        TermuxWorkspaceActivity.refreshIfRunning()
-
-        if (context == null) {
-            return
-        }
-
-        if (value is SurfaceBorderOption || value == Ui.enable_dashed_border ||
-            value == Ui.dashed_border_dash_length || value == Ui.dashed_border_gap_length ||
-            value == Ui.dashed_border_stroke_width || value == Ui.dashed_border_corner_radius ||
-            value == Theme.terminal_border_color || value == Theme.terminal_header_border_color
-        ) {
-            LauncherActivity.previewIfRunning()
-        }
-
-        if (value is Notifications || value == Behavior.preferred_music_app) {
-            NotificationService.requestReload(context)
-        }
-    }
 }

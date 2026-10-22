@@ -666,7 +666,7 @@ object BackupManager {
         if (name.startsWith("spaces/.")) return false
         if (name == "calculator-engines" || name.startsWith("calculator-engines/")) return false
         if (name == "wallpaper-downloads" || name.startsWith("wallpaper-downloads/")) return false
-        if (name.startsWith(".restore-") || name.startsWith(PRIVATE_FILES_DIR) ||
+        if (name.startsWith(".settings-") || name == "settings-transaction" || name.startsWith("settings-transaction/") || name.startsWith(".restore-") || name.startsWith(PRIVATE_FILES_DIR) ||
             name.endsWith(ohi.andre.consolelauncher.managers.BackupManager.BACKUP_SUFFIX)) return false
         if (name.startsWith("crash.txt")) return false
         return file.isDirectory() || file.isFile()

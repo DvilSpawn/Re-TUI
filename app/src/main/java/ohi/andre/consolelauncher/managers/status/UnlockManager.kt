@@ -11,6 +11,7 @@ import androidx.core.content.ContextCompat
 import ohi.andre.consolelauncher.UIManager
 import ohi.andre.consolelauncher.managers.TimeManager
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
+import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave
 import ohi.andre.consolelauncher.managers.xml.options.Behavior
 import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.tuils.Tuils
@@ -21,9 +22,16 @@ import java.util.regex.Matcher
 
 class UnlockManager(
     context: Context,
-    private val size: Int,
-    private val listener: StatusUpdateListener?
+    private var size: Int,
+    private val listener: StatusUpdateListener?,
+    private val read: (XMLPrefsSave) -> String = XMLPrefsManager::get
 ) : StatusManager(context, 0) {
+    override fun refreshAppearance() {
+        size = ohi.andre.consolelauncher.managers.xml.XMLPrefsManager.getInt(ohi.andre.consolelauncher.managers.xml.options.Ui.unlock_size)
+        unlockColor = XMLPrefsManager.getColor(Theme.unlock_counter_text_color)
+        super.refreshAppearance()
+    }
+
     private val preferences: SharedPreferences
 
     private var unlockTimes = 0
@@ -51,9 +59,9 @@ class UnlockManager(
     private fun init() {
         unlockTimes = preferences.getInt(UNLOCK_KEY, 0)
         unlockColor = XMLPrefsManager.getColor(Theme.unlock_counter_text_color)
-        unlockFormat = XMLPrefsManager.get(Behavior.unlock_counter_format)
-        notAvailableText = XMLPrefsManager.get(Behavior.not_available_text)
-        unlockTimeDivider = XMLPrefsManager.get(Behavior.unlock_time_divider)
+        unlockFormat = read(Behavior.unlock_counter_format)
+        notAvailableText = read(Behavior.not_available_text)
+        unlockTimeDivider = read(Behavior.unlock_time_divider)
         unlockTimeDivider =
             Tuils.patternNewline.matcher(unlockTimeDivider).replaceAll(Tuils.NEWLINE)
 
@@ -67,7 +75,7 @@ class UnlockManager(
 
         unlockHour = m.group(1).toInt()
         unlockMinute = m.group(2).toInt()
-        unlockTimeOrder = XMLPrefsManager.getInt(Behavior.unlock_time_order)
+        unlockTimeOrder = read(Behavior.unlock_time_order).trim().toIntOrNull() ?: Behavior.unlock_time_order.defaultValue()?.toIntOrNull() ?: 0
         nextUnlockCycleRestart = preferences.getLong(NEXT_UNLOCK_CYCLE_RESTART, 0)
 
         m = timePattern.matcher(unlockFormat)

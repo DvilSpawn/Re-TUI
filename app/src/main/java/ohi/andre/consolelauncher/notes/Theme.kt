@@ -2,6 +2,7 @@ package ohi.andre.consolelauncher.notes
 
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.tuils.Tuils
+import ohi.andre.consolelauncher.tuils.CrtOverlayDrawable
 
 import android.app.Activity
 import android.content.Context

@@ -319,7 +319,7 @@ object PresetManager {
     }
 
     @Throws(Exception::class)
-    fun apply(name: kotlin.String) {
+    fun apply(name: kotlin.String) = synchronized(ohi.andre.consolelauncher.managers.settings.SettingsFiles.lock) {
         val cleanName = cleanPresetPackageName(name)
         var presetFolder: File = File(presetsDir, cleanName)
         if (!presetFolder.isDirectory()) {
@@ -332,7 +332,7 @@ object PresetManager {
 
         if (!presetFolder.isDirectory()) {
             if (applyBuiltIn(cleanName)) {
-                return
+                return@synchronized
             }
             throw IllegalArgumentException("Preset not found")
         }
@@ -341,24 +341,27 @@ object PresetManager {
         val presetSuggestions = File(presetFolder, XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS.path)
         require(!(!presetTheme.isFile() || !presetSuggestions.isFile())) { "Preset is incomplete" }
 
-        val currentTheme: File = File(Tuils.getFolder(), XMLPrefsManager.XMLPrefsRoot.THEME.path)
-        val currentSuggestions: File =
-            File(Tuils.getFolder(), XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS.path)
-        val themeXml = sanitizeShareableXml(presetTheme, XMLPrefsRoot.THEME)
-        val suggestionsXml = sanitizeShareableXml(presetSuggestions, XMLPrefsRoot.SUGGESTIONS)
         // Parse all files before touching active settings: a late conflict must not partially apply a preset.
         val presetUi = File(presetFolder, XMLPrefsRoot.UI.path)
         val uiValues = if (presetUi.isFile) readAllowed(presetUi, XMLPrefsRoot.UI, SHAREABLE_UI) else emptyMap()
         val presetBehavior = File(presetFolder, XMLPrefsRoot.BEHAVIOR.path)
         val behaviorValues = if (presetBehavior.isFile) readAllowed(presetBehavior, XMLPrefsRoot.BEHAVIOR,
             Behavior.entries.toTypedArray(), ::isSelectedBehaviorValue) else emptyMap()
-        Tuils.insertOld(currentTheme)
-        Tuils.insertOld(currentSuggestions)
-        writeText(currentTheme, themeXml)
-        writeText(currentSuggestions, suggestionsXml)
-        for ((setting, value) in uiValues + behaviorValues) LauncherSettings.set(setting, value)
-        FrameManager.applyPortableState(presetFolder)
-        LauncherSettings.setAutoColorPick(false)
+        val changes = linkedMapOf<XMLPrefsSave, String?>()
+        changes.putAll(readAllowed(presetTheme, XMLPrefsRoot.THEME, Theme.entries.toTypedArray()))
+        changes.putAll(readAllowed(presetSuggestions, XMLPrefsRoot.SUGGESTIONS, Suggestions.entries.toTypedArray()))
+        changes.putAll(uiValues)
+        changes.putAll(behaviorValues)
+        changes[Ui.auto_color_pick] = "false"
+        val staging = File.createTempFile(".settings-preset-", ".tmp", Tuils.getFolder())
+        check(staging.delete() && staging.mkdir())
+        try {
+            val frames = FrameManager.stagePortableState(presetFolder, staging)
+            LauncherSettings.applyChangesWithFiles(null, changes,
+                if (frames == null) emptyMap() else mapOf(File(Tuils.getFolder(), "frames") to frames))
+            if (frames != null) FrameManager.settingsCommitted()
+        } finally { staging.deleteRecursively() }
+
     }
 
     @Throws(Exception::class)
@@ -879,13 +882,9 @@ object PresetManager {
         }
 
         colors.put(Theme.toolbar_background_color, "#00000000")
-        for (entry in colors.entries) {
-            LauncherSettings.setTheme(entry.key, entry.value)
-        }
-        for (entry in suggestionColors.entries) {
-            LauncherSettings.setSuggestion(entry.key, entry.value)
-        }
-        LauncherSettings.setAutoColorPick(false)
+        LauncherSettings.applyChanges(null, buildMap<XMLPrefsSave, String?> {
+            putAll(colors); putAll(suggestionColors); put(Ui.auto_color_pick, "false")
+        })
         return true
     }
 

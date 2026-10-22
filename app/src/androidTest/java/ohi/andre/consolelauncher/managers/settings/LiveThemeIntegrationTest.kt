@@ -149,7 +149,7 @@ class LiveThemeIntegrationTest {
             }
             android.os.SystemClock.sleep(300)
             instrumentation.waitForIdleSync()
-            assertNotSame("Color settings must trigger existing in-place refresh", manager, launcher.uiManager)
+            assertSame("Palette changes must retain the live UI manager", manager, launcher.uiManager)
             assertSame(launcher, ohi.andre.consolelauncher.LauncherActivity.instance)
             assertEquals("Long-lived package receiver resolves new installed color", 0xff445566.toInt(), (ohi.andre.consolelauncher.managers.AppsManager.instance as ohi.andre.consolelauncher.managers.AppsManager).appInstalledColor)
             assertEquals(0xff445566.toInt(), (ohi.andre.consolelauncher.managers.AppsManager.instance as ohi.andre.consolelauncher.managers.AppsManager).appUninstalledColor)
@@ -193,7 +193,7 @@ class LiveThemeIntegrationTest {
                 LauncherSettings.set(context, ohi.andre.consolelauncher.managers.xml.options.Suggestions.default_background_color, "#FF445566")
             }
             android.os.SystemClock.sleep(300); instrumentation.waitForIdleSync()
-            assertNotSame("Standalone suggestion color changes must refresh too", beforeSuggestionChange, launcher.uiManager)
+            assertSame("Suggestion colors must retain the live UI manager", beforeSuggestionChange, launcher.uiManager)
             assertSame(launcher, ohi.andre.consolelauncher.LauncherActivity.instance)
         } finally {
             instrumentation.runOnMainSync { launcher.finish(); original.forEach { (key, value) -> LauncherSettings.set(key, value) } }

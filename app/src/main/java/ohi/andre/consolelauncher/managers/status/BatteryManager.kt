@@ -23,7 +23,7 @@ import ohi.andre.consolelauncher.tuils.UIUtils
 
 class BatteryManager(
     context: Context,
-    private val size: Int,
+    private var size: Int,
     private val mediumPercentage: Int,
     private val lowPercentage: Int,
     private val listener: StatusUpdateListener?
@@ -49,6 +49,11 @@ class BatteryManager(
 
     init {
         this.context = context.getApplicationContext()
+    }
+
+    fun refreshAppearance() {
+        size = XMLPrefsManager.getInt(Ui.battery_size)
+        if (lastPercentage >= 0) update(lastPercentage)
     }
 
     fun start() {

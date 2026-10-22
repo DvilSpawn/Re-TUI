@@ -10,13 +10,12 @@ class TermuxWorkspaceReleaseContractTest {
         .first { File(it, "app/src/main").isDirectory }
     private val activity = File(root, "app/src/main/java/ohi/andre/consolelauncher/managers/termux/TermuxWorkspaceActivity.kt").readText()
 
-    @Test fun settingsNotifyWorkspaceAfterFontInvalidationBeforeContextGate() {
-        val settings = File(root, "app/src/main/java/ohi/andre/consolelauncher/managers/settings/LauncherSettings.kt").readText()
-            .substringAfter("private fun onSettingChanged(")
+    @Test fun settingsNotifyWorkspaceAfterFontInvalidationWithoutRequiringAnActivityContext() {
+        val settings = File(root, "app/src/main/java/ohi/andre/consolelauncher/managers/settings/SettingsRefreshCoordinator.kt").readText()
         val refresh = settings.indexOf("TermuxWorkspaceActivity.refreshIfRunning()")
         assertTrue("Foreground workspace is not notified of setting changes", refresh >= 0)
         assertTrue("Workspace refresh must use the invalidated font cache", refresh > settings.indexOf("UIUtils.cancelFont()"))
-        assertTrue("Context-free settings must notify the foreground workspace", refresh < settings.indexOf("if (context == null)"))
+        assertFalse("Context-free publications must still refresh the workspace", settings.contains("if (owner == null) return"))
     }
 
     @Test fun appearanceRefreshOnlySchedulesChangedGeometryWithoutInputOrTransportReset() {

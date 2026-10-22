@@ -8,6 +8,7 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 import ohi.andre.consolelauncher.UIManager
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
+import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave
 import ohi.andre.consolelauncher.managers.xml.options.Behavior
 import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.tuils.SystemUtils
@@ -17,9 +18,15 @@ import ohi.andre.consolelauncher.tuils.UIUtils
 class StorageManager(
     context: Context,
     delay: Long,
-    private val size: Int,
-    private val listener: StatusUpdateListener?
+    private var size: Int,
+    private val listener: StatusUpdateListener?,
+    private val read: (XMLPrefsSave) -> String = XMLPrefsManager::get
 ) : StatusManager(context, delay) {
+    override fun refreshAppearance() {
+        size = XMLPrefsManager.getInt(ohi.andre.consolelauncher.managers.xml.options.Ui.storage_size)
+        super.refreshAppearance()
+    }
+
     private val intAv = "%iav"
     private val intTot = "%itot"
     private val extAv = "%eav"
@@ -27,7 +34,7 @@ class StorageManager(
 
     private var storagePatterns: MutableList<Pattern>? = null
     private var storageFormat: String? = null
-    private var color = 0
+    private val color get() = XMLPrefsManager.getColor(Theme.storage_text_color)
     private var compactInternal = ""
     private var compactExternal = ""
 
@@ -37,8 +44,8 @@ class StorageManager(
 
     override fun update() {
         if (storageFormat == null) {
-            storageFormat = XMLPrefsManager.get(Behavior.storage_format)
-            color = XMLPrefsManager.getColor(Theme.storage_text_color)
+            storageFormat = read(Behavior.storage_format)
+
         }
 
         if (storagePatterns == null) {

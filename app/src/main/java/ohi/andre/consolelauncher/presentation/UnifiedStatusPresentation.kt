@@ -61,6 +61,7 @@ internal object UnifiedStatusPresentation {
             setMetricIcon(it,icon,appearance.color(Theme.network_info_text_color))
         } }
         if(saved!=null) {
+            StatusPresentation.draftBattery(root.context,appearance,saved)?.let { root.findViewById<TextView>(R.id.unified_status_battery)?.text=it }
             val visibilityKeys=mapOf(
                 Ui.show_time to listOf(R.id.unified_status_date,R.id.unified_status_time),
                 Ui.show_battery to listOf(R.id.unified_status_battery),
