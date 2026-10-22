@@ -848,9 +848,11 @@ class UIManager(
         val external=storageManager?.compactExternal().orEmpty()
         val connection=networkManager?.compactConnection().orEmpty()
         val ram=ramManager?.compactValue().orEmpty()
+        // A customised status_time_format replaces the system date/time pair (issue #27); the default keeps the compact look.
+        val customTime=XMLPrefsManager.get(Behavior.status_time_format)!=Behavior.status_time_format.defaultValue()
         val texts=linkedMapOf<Int,CharSequence>(
-            R.id.unified_status_date to android.text.format.DateFormat.getMediumDateFormat(mContext).format(now),
-            R.id.unified_status_time to android.text.format.DateFormat.getTimeFormat(mContext).format(now),
+            R.id.unified_status_date to if(customTime) "" else android.text.format.DateFormat.getMediumDateFormat(mContext).format(now),
+            R.id.unified_status_time to if(customTime) labelTexts[Label.time.ordinal] ?: "" else android.text.format.DateFormat.getTimeFormat(mContext).format(now),
             R.id.unified_status_battery to battery,
             R.id.unified_status_weather to if(condition.isEmpty()) "" else ": $condition",
             R.id.unified_status_weather_location to location,
@@ -863,7 +865,7 @@ class UIManager(
         )
         fun visible(ordinal:Int,id:Int)=if(show[ordinal] && !texts[id].isNullOrEmpty()) View.VISIBLE else View.GONE
         val visibility=linkedMapOf(
-            R.id.unified_status_date to if(show[Label.time.ordinal]) View.VISIBLE else View.GONE,
+            R.id.unified_status_date to if(show[Label.time.ordinal] && !customTime) View.VISIBLE else View.GONE,
             R.id.unified_status_time to if(show[Label.time.ordinal]) View.VISIBLE else View.GONE,
             R.id.unified_status_battery to visible(Label.battery.ordinal,R.id.unified_status_battery),
             R.id.unified_status_weather to visible(Label.weather.ordinal,R.id.unified_status_weather),

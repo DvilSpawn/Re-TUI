@@ -62,6 +62,19 @@ internal object UnifiedStatusPresentation {
         } }
         if(saved!=null) {
             StatusPresentation.draftBattery(root.context,appearance,saved)?.let { root.findViewById<TextView>(R.id.unified_status_battery)?.text=it }
+            if(appearance.changed(Behavior.status_time_format,saved) || appearance.changed(Behavior.time_format_separator,saved)) {
+                // Mirrors Home: a customised format replaces the system date/time pair.
+                val format=appearance.raw(Behavior.status_time_format).orEmpty()
+                val custom=format!=Behavior.status_time_format.defaultValue()
+                val now=java.util.Date()
+                root.findViewById<TextView>(R.id.unified_status_time)?.text=if(custom) ohi.andre.consolelauncher.managers.TimeManager.previewStatus(root.context,format,
+                    appearance.raw(Behavior.time_format_separator).orEmpty(),appearance.number(Ui.time_size,12f).toInt(),appearance.color(Theme.time_text_color))
+                    else android.text.format.DateFormat.getTimeFormat(root.context).format(now)
+                root.findViewById<TextView>(R.id.unified_status_date)?.let { date ->
+                    if(!custom) date.text=android.text.format.DateFormat.getMediumDateFormat(root.context).format(now)
+                    date.visibility=if(!custom && appearance.bool(Ui.show_time)) View.VISIBLE else View.GONE
+                }
+            }
             val visibilityKeys=mapOf(
                 Ui.show_time to listOf(R.id.unified_status_date,R.id.unified_status_time),
                 Ui.show_battery to listOf(R.id.unified_status_battery),
