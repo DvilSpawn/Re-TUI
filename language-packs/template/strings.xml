@@ -4486,7 +4486,7 @@ Disabling this option hides Re:TUI access; it does not lock Private Space. Save 
     <string name="setting_behavior_output_auto_hide_seconds_description">Seconds before auto-hide collapses output to its header (1-3600)</string>
     <string name="setting_behavior_output_format_description">Define the output format </string>
     <string name="setting_behavior_output_header_mode_description">Output header display: normal, arrows, or none. None hides the manual tray toggle.</string>
-    <string name="setting_behavior_output_time_format_description">Define the time format for the output lines. You can resize parts with [size=30]HH:mm[/size]</string>
+    <string name="setting_behavior_output_time_format_description">Define the time format for the output lines. Letters are read as date and time codes, so wrap plain words in single quotes, for example 'Time:' HH:mm. An invalid format falls back to HH:mm:ss. You can resize parts with [size=30]HH:mm[/size]</string>
     <string name="setting_behavior_output_tray_mode_description">Canonical output tray behavior: native, auto, or toggled</string>
     <string name="setting_behavior_pomodoro_focus_minutes_description">Focus period length in minutes for Pomodoro sessions</string>
     <string name="setting_behavior_pomodoro_relax_minutes_description">Relax/break period length in minutes for Pomodoro sessions</string>
@@ -4514,7 +4514,7 @@ Disabling this option hides Re:TUI access; it does not lock Private Space. Save 
     <string name="setting_behavior_sound_reminder_description">Play the launcher reminder sound</string>
     <string name="setting_behavior_sound_success_description">Play the successful action sound</string>
     <string name="setting_behavior_sound_timer_description">Play the timer completion sound</string>
-    <string name="setting_behavior_status_time_format_description">Define the time format for the status lines at the top. You can resize parts with [size=30]HH:mm[/size], use {clock_words} for Six Fifty Seven, and use %n for a new line</string>
+    <string name="setting_behavior_status_time_format_description">Define the time format for the status lines at the top. Letters are read as date and time codes, so wrap plain words in single quotes, for example 'Time:' HH:mm. An invalid format falls back to HH:mm:ss. You can resize parts with [size=30]HH:mm[/size], use {clock_words} for Six Fifty Seven, and use %n for a new line</string>
     <string name="setting_behavior_storage_format_description">Define the storage format</string>
     <string name="setting_behavior_swipe_down_notifications_description">If true, swiping down will expand the notification shade</string>
     <string name="setting_behavior_swipe_up_apps_drawer_description">Show the apps drawer button and allow swipe-up on non-scrolling launcher surfaces. Terminal output remains scrollable</string>

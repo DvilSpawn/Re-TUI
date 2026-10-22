@@ -14133,7 +14133,7 @@
   "setting_behavior_output_time_format_description": {
     "formatted": false,
     "forms": {
-      "other": "Define the time format for the output lines. You can resize parts with [size=30]HH:mm[/size]"
+      "other": "Define the time format for the output lines. Letters are read as date and time codes, so wrap plain words in single quotes, for example 'Time:' HH:mm. An invalid format falls back to HH:mm:ss. You can resize parts with [size=30]HH:mm[/size]"
     },
     "type": "string"
   },
@@ -14329,7 +14329,7 @@
   "setting_behavior_status_time_format_description": {
     "formatted": false,
     "forms": {
-      "other": "Define the time format for the status lines at the top. You can resize parts with [size=30]HH:mm[/size], use {clock_words} for Six Fifty Seven, and use %n for a new line"
+      "other": "Define the time format for the status lines at the top. Letters are read as date and time codes, so wrap plain words in single quotes, for example 'Time:' HH:mm. An invalid format falls back to HH:mm:ss. You can resize parts with [size=30]HH:mm[/size], use {clock_words} for Six Fifty Seven, and use %n for a new line"
     },
     "type": "string"
   },
