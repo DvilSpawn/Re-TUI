@@ -97,9 +97,16 @@ internal object StatusPresentation {
             view.visibility=if(content.texts.getOrNull(9).isNullOrEmpty() || (landscape && !appearance.bool(Ui.show_ascii_landscape))) View.GONE else View.VISIBLE
             return
         }
-        val parts=members.mapNotNull { ordinal -> content.texts.getOrNull(ordinal)?.let { text ->
-            if(saved==null) text else draftText(text,ordinal,view,appearance,saved)
-        } }
+        val parts=members.mapNotNull { ordinal ->
+            if(saved!=null && ordinal==2) {
+                ohi.andre.consolelauncher.managers.TimeManager.previewStatus(view.context,
+                    appearance.raw(Behavior.status_time_format).orEmpty(),
+                    appearance.raw(Behavior.time_format_separator).orEmpty(),
+                    appearance.number(Ui.time_size,12f).toInt(),appearance.color(Theme.time_text_color))
+            } else content.texts.getOrNull(ordinal)?.let { text ->
+                if(saved==null) text else draftText(text,ordinal,view,appearance,saved)
+            }
+        }
         view.text=TextUtils.concat(*parts.toTypedArray())
         view.visibility=if(view.text.isNullOrEmpty()) View.GONE else View.VISIBLE
     }

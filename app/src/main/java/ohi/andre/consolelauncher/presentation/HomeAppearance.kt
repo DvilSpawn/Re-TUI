@@ -38,7 +38,7 @@ internal class HomeAppearance(private val values: Map<XMLPrefsSave, String?>) {
                     dashed: Boolean, notch: Boolean, surface: SurfaceBorder,
                     allowBorder: Boolean, allowFrame: Boolean, appearance: HomeAppearance? = null) {
             view.background = TerminalBorderRuntime.panelDrawablePx(context, fill, border, 1.5f, radiusPx,
-                dashed, notch, allowBorder && (appearance?.let { dashed && it.bool(surface.enabled) } ?: AppearanceSettings.surfaceBorderEnabled(surface)), allowFrame,
+                dashed, notch, allowBorder && (appearance?.let { (dashed || it.bool(Behavior.enable_cyberdeck_mode)) && it.bool(surface.enabled) } ?: AppearanceSettings.surfaceBorderEnabled(surface)), allowFrame,
                 FrameTarget.fromSurface(surface), appearance?.borderStyle())
         }
     }

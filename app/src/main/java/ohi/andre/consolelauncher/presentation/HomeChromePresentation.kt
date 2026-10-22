@@ -31,6 +31,7 @@ internal object HomeChromePresentation {
             else -> return false
         }
         try {
+            if(view.id==R.id.input_group) view.foreground=null
             if(saved==null || appearance.changed(panel.margins,saved)) margins(view,appearance,panel.margins)
             val radius=if(panel.surface==SurfaceBorder.OUTPUT) appearance.radius(Ui.output_corner_radius)
                 else appearance.number(Ui.dashed_border_corner_radius).toInt().coerceIn(0,48)

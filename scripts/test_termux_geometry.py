@@ -82,6 +82,8 @@ object RetuiThemeBridge { fun sendToKeyboard(c:Any,i:Input,label:String,mode:Str
 class Selection { val focused=1; val focusedTarget get()=targets[focused]; val targets=mutableListOf<String?>("@1","@2"); var visibleTiles=listOf(0,1); fun select(tile:Int,target:String?){targets[tile]=target} }
 class Harness(val clients:Array<TermuxWorkspaceSocketClient?>) : Activity() {
  var geometryCaptureListener:OneShotPreDrawListener?=null
+ var helperUpdating=false
+ fun styleHelperPrompt(){}
  val screen=Screen(); var foreground:WeakReference<Harness>?=null;var generation=0;var resultLabel:String?=null;var bootstrap:Any?=null;val main=Main();val receiver=Any();var isFinishing=false
  val frames=arrayOfNulls<TermuxWorkspaceFrame>(2);var windows=emptyList<Pair<String,String>>();var pendingRuns=0
  fun closeTile(tile:Int){clients[tile]?.close();clients[tile]=null;lastGeometry[tile]=null};fun persist(){};fun runPendingCommand(){pendingRuns++};fun startBridge(){};fun reconcileWindows(){}

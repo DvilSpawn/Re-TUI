@@ -117,7 +117,8 @@ object TerminalBorderRuntime {
                 false,
                 0f,
                 0f,
-                true
+                true,
+                flipVertically = target == FrameTarget.OUTPUT
             )
         }
 
@@ -163,7 +164,7 @@ object TerminalBorderRuntime {
             previous.views.forEach { it.removeOnLayoutChangeListener(previous.listener) }
         }
         border.setTag(tag,null)
-        val drawable=border.background as? TerminalBorderDrawable ?: return
+        val drawable=(border.foreground as? TerminalBorderDrawable) ?: border.background as? TerminalBorderDrawable ?: return
         val views=cutoutViews.filterNotNull()
         val all=listOf(border)+views
         lateinit var listener: View.OnLayoutChangeListener
@@ -183,7 +184,7 @@ object TerminalBorderRuntime {
 
     fun bind(panel: View?, vararg cutoutViews: View?) {
         val border = panel ?: return
-        val drawable = border.background as? TerminalBorderDrawable ?: return
+        val drawable = (border.foreground as? TerminalBorderDrawable) ?: border.background as? TerminalBorderDrawable ?: return
         val views = cutoutViews.filterNotNull()
         if (views.isEmpty()) {
             drawable.setCutouts(emptyList(), emptyList())

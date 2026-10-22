@@ -219,7 +219,7 @@
     <!-- mode.kt: exec -->
     <string name="command_mode_search_mode_enabled_ba524" formatted="false">"Search mode enabled."</string>
     <!-- mode.kt: exec -->
-    <string name="command_mode_unknown_launcher_mode_usage_mode_search_cl_a86ba">"Unknown launcher mode: %1$s\nUsage: mode classic|search"</string>
+    <string name="command_mode_unknown_launcher_mode_usage_mode_search_cl_a86ba">"Unknown launcher mode: %1$s\nUsage: mode classic|search|terminal"</string>
     <string name="command_mode_enabled">"%1$s mode enabled."</string>
     <!-- module.kt: exec -->
     <string name="command_module_built_in_modules_cannot_be_removed_use_mod_274e3">"Built-in modules cannot be removed. Use module -hide %1$s instead."</string>

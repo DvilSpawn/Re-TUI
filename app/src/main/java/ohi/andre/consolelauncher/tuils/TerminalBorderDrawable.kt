@@ -21,7 +21,8 @@ class TerminalBorderDrawable(
     private val dashLengthPx: Float,
     private val dashGapPx: Float,
     private val cyberdeck: Boolean = false,
-    private val cyberdeckNotch: Boolean = true
+    private val cyberdeckNotch: Boolean = true,
+    private val flipVertically: Boolean = false
 ) : Drawable() {
     private val fillPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
@@ -63,11 +64,11 @@ class TerminalBorderDrawable(
         val bottom = bottomCutouts.map(::RectF)
         // A saved presentation must not retain this drawable's View callback through the outer instance.
         val fill=fillColor;val border=borderColor;val stroke=strokeWidthPx;val radius=radiusPx
-        val dashedLine=dashed;val dash=dashLengthPx;val gap=dashGapPx;val cyber=cyberdeck;val notch=cyberdeckNotch
+        val dashedLine=dashed;val dash=dashLengthPx;val gap=dashGapPx;val cyber=cyberdeck;val notch=cyberdeckNotch;val flipped=flipVertically
         return object : ConstantState() {
             override fun getChangingConfigurations() = 0
             override fun newDrawable(): Drawable = TerminalBorderDrawable(fill, border, stroke,
-                radius, dashedLine, dash, gap, cyber, notch).apply { setCutouts(top, bottom) }
+                radius, dashedLine, dash, gap, cyber, notch, flipped).apply { setCutouts(top, bottom) }
         }
     }
 
@@ -76,7 +77,10 @@ class TerminalBorderDrawable(
         if (b.isEmpty) return
 
         if (cyberdeck) {
+            val saved = canvas.save()
+            if (flipVertically) canvas.scale(1f, -1f, b.exactCenterX(), b.exactCenterY())
             drawCyberpunk(canvas)
+            canvas.restoreToCount(saved)
             return
         }
 

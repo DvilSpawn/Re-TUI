@@ -6,10 +6,10 @@ import java.io.File
 
 class TermuxHelperUpdateTest {
     @Test fun onlyExactSuccessfulCallbackConfirmsInstallation() {
-        assertTrue(TermuxHelperUpdate.succeeded("__RETUI_UPDATE_OK__ 0.4.4\n", 0))
-        for ((output, code) in listOf("__RETUI_UPDATE_OK__ 0.4.4" to 1,
-            "__RETUI_UPDATE_OK__ 0.4.4" to Int.MIN_VALUE, "__RETUI_UPDATE_OK__ 0.3.4" to 0,
-            "__RETUI_UPDATE_OK__ 0.4.4\nextra" to 0, "permission denied" to 0))
+        assertTrue(TermuxHelperUpdate.succeeded("__RETUI_UPDATE_OK__ 0.4.8\n", 0))
+        for ((output, code) in listOf("__RETUI_UPDATE_OK__ 0.4.8" to 1,
+            "__RETUI_UPDATE_OK__ 0.4.8" to Int.MIN_VALUE, "__RETUI_UPDATE_OK__ 0.3.4" to 0,
+            "__RETUI_UPDATE_OK__ 0.4.8\nextra" to 0, "permission denied" to 0))
             assertFalse(TermuxHelperUpdate.succeeded(output, code))
     }
     @Test fun checksumRejectsEmptyOrOversizedPayloadAndMatchesBundledSource() {

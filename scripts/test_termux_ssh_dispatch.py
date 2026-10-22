@@ -23,7 +23,7 @@ class SshDispatchTest(unittest.TestCase):
         self.bin = self.home / 'bin'
         self.bin.mkdir()
         self.tmux = self.bin / 'tmux'
-        self.tmux.write_text('#!/bin/sh\nexec ' + shutil.which('tmux') + ' -L retui-ssh-' + uuid.uuid4().hex + ' "$@"\n')
+        self.tmux.write_text('#!/bin/sh\nexec ' + shutil.which('tmux') + ' -L retui-ssh-' + uuid.uuid4().hex + ' -f /dev/null "$@"\n')
         self.tmux.chmod(0o700)
         self.env = dict(os.environ, HOME=str(self.home), PREFIX=str(self.home), HISTFILE='/dev/null',
                         PATH=str(self.bin) + os.pathsep + os.environ['PATH'], TERM='xterm-256color')
@@ -48,6 +48,26 @@ class SshDispatchTest(unittest.TestCase):
     def windows(self):
         return subprocess.check_output([str(self.tmux), 'list-windows', '-t', '=retui_workspace',
                                         '-F', '#{window_id}:#{window_name}'], text=True).splitlines()
+
+    def test_home_scope_is_independent_and_migration_preserves_process(self):
+        classic = self.dispatch('new - -').stdout.strip()
+        name = 'retui-home-fixture'
+        encoded = base64.b64encode(name.encode()).decode()
+        home_owned = self.dispatch('new ' + encoded + ' -').stdout.strip()
+        pid = subprocess.check_output([str(self.tmux), 'display-message', '-p', '-t', home_owned, '#{pane_pid}'], text=True).strip()
+        moved = self.dispatch('home adopt ' + home_owned + ' ' + encoded)
+        self.assertEqual(0, moved.returncode, moved.stderr)
+        self.assertEqual(0, self.dispatch('home adopt ' + home_owned + ' ' + encoded).returncode)
+        self.assertIn(classic + ':', self.dispatch('list').stdout)
+        self.assertNotIn(home_owned + ':', self.dispatch('list').stdout)
+        self.assertIn(home_owned + ':', self.dispatch('home list').stdout)
+        self.assertEqual(pid, subprocess.check_output([str(self.tmux), 'display-message', '-p', '-t', home_owned, '#{pane_pid}'], text=True).strip())
+        fresh = self.dispatch('home new - -').stdout.strip()
+        self.assertNotEqual(fresh, classic)
+        self.assertNotEqual(0, self.dispatch('home mode ' + classic).returncode)
+        self.assertNotEqual(0, self.dispatch('mode ' + fresh).returncode)
+        self.assertNotEqual(0, self.dispatch('home adopt ' + classic + ' !!!').returncode)
+        self.assertNotEqual(0, self.dispatch('other list').returncode)
 
     def test_read_only_open_and_validation_never_create_shell(self):
         result = self.dispatch('list')
@@ -106,6 +126,46 @@ class SshDispatchTest(unittest.TestCase):
             self.assertEqual(expected, actual)
             subprocess.run([str(self.tmux), 'kill-session', '-t', '=' + viewer], check=True)
         self.assertEqual(2, len(self.windows()))
+
+    def test_home_viewer_clears_manual_sizing_and_tracks_pty_without_restarting_shell(self):
+        import fcntl
+        import pty
+        import select
+        import signal
+        import struct
+        import termios
+        self.dispatch('new - -')
+        target = self.dispatch('home new - -').stdout.strip()
+        subprocess.run([str(self.tmux), 'resize-window', '-t', target, '-x', '38', '-y', '8'], check=True)
+        def value(fmt):
+            return subprocess.check_output([str(self.tmux),'display-message','-p','-t',target,fmt],text=True).strip()
+        pid = value('#{pane_pid}')
+        terminal, slave = pty.openpty()
+        fcntl.ioctl(slave,termios.TIOCSWINSZ,struct.pack('HHHH',16,77,0,0))
+        process = subprocess.Popen(['/bin/sh',str(DISPATCH)],stdin=slave,stdout=slave,stderr=slave,
+            start_new_session=True,env=dict(self.env,SSH_ORIGINAL_COMMAND=f'home attach resize_proof {target}'))
+        os.close(slave)
+        os.set_blocking(terminal,False)
+        def wait_size(expected):
+            deadline = time.monotonic()+5
+            while time.monotonic()<deadline:
+                if select.select([terminal],[],[],.05)[0]:
+                    try: os.read(terminal,65536)
+                    except OSError: break
+                if value('#{window_width}x#{window_height}') == expected: return
+            self.assertEqual(expected,value('#{window_width}x#{window_height}'))
+        try:
+            wait_size('77x16')
+            fcntl.ioctl(terminal,termios.TIOCSWINSZ,struct.pack('HHHH',24,58,0,0))
+            os.killpg(process.pid,signal.SIGWINCH)
+            wait_size('58x24')
+            self.assertEqual(pid,value('#{pane_pid}'))
+            self.assertEqual('latest',subprocess.check_output([str(self.tmux),'show-options','-wv','-t',target,'window-size'],text=True).strip())
+        finally:
+            if process.poll() is None: os.killpg(process.pid,signal.SIGTERM)
+            try: process.wait(timeout=3)
+            except subprocess.TimeoutExpired: process.kill(); process.wait()
+            os.close(terminal)
 
     def test_real_dispatch_pty_streams_independent_tiles_and_detach_preserves_jobs(self):
         import fcntl

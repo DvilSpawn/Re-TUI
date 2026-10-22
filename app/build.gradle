@@ -308,6 +308,7 @@ def isAllowedAsset = { File assetsDir, File sourceFile ->
     def relativeAssetPath = assetsDir.toPath().relativize(sourceFile.toPath()).toString().replace(File.separator, "/")
     return relativeAssetPath in ["termux-ssh/setup.sh", "termux-ssh/daemon.sh", "termux-ssh/dispatch.sh", "calculator-runtime/index.html", "calculator-runtime/bootstrap.js", "calculator-runtime/worker.js"]
             || relativeAssetPath == "JetBrainsMonoNerdFont-Regular.ttf"
+            || relativeAssetPath == "terminal-widgets/dashboard.sh"
             || relativeAssetPath in ["localization/catalog.json", "localization/english-template.zip"]
             || relativeAssetPath in ["module-library/index.json", "module-library/todo.lua",
                 "module-library/habits.lua", "module-library/focus.lua",

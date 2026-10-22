@@ -112,6 +112,15 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <LinearLayout
+                android:id="@+id/search_mode_tabs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="bottom"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:visibility="gone">
             <TextClock
                 android:id="@+id/search_mode_clock_tab"
                 style="@style/Retui.Text.Control"
@@ -127,6 +136,27 @@
                 android:paddingEnd="10dp"
                 android:paddingBottom="3dp"
                 android:visibility="gone" />
+
+                <Space android:layout_width="0dp" android:layout_height="1dp" android:layout_weight="1" />
+                <ImageButton
+                    android:id="@+id/terminal_home_add_tab"
+                    android:layout_width="36dp"
+                    android:layout_height="28dp"
+                    android:layout_marginEnd="4dp"
+                    android:padding="6dp"
+                    android:src="@drawable/ic_workspace_add_24"
+                    android:contentDescription="@string/terminal_home_add"
+                    android:visibility="gone" />
+                <ImageButton
+                    android:id="@+id/terminal_home_settings_tab"
+                    android:layout_width="36dp"
+                    android:layout_height="28dp"
+                    android:layout_marginEnd="18dp"
+                    android:padding="6dp"
+                    android:src="@drawable/remember_ic_settings"
+                    android:contentDescription="@string/terminal_home_settings"
+                    android:visibility="gone" />
+            </LinearLayout>
 
             <HorizontalScrollView
                 android:id="@+id/module_suggestions_container"

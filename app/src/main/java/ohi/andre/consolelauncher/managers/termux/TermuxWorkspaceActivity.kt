@@ -995,37 +995,10 @@ class TermuxWorkspaceActivity : LocalizedActivity() {
     }
     private fun localOutput(text: String) { AlertDialog.Builder(this).setTitle(R.string.surface_termux_workspace_0f9f7).setMessage(text).setPositiveButton(android.R.string.ok, null).show() }
     private fun bindKeys() {
-        val nav = listOf("REFRESH", "ESC", "/", "-", "HOME", "↑", "END", "PGUP", "TAB", "CTRL", "ALT", "SHIFT", "←", "↓", "→", "PGDN")
-        val fn = listOf("REFRESH", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "BTAB", "INS", "DEL", "ENTER", "BKSP")
-        val names = mapOf("ESC" to "Escape", "HOME" to "Home", "END" to "End", "↑" to "Up", "↓" to "Down", "←" to "Left", "→" to "Right", "PGUP" to "PageUp", "PGDN" to "PageDown", "TAB" to "Tab", "BTAB" to "BTab", "INS" to "Insert", "DEL" to "Delete", "ENTER" to "Enter", "BKSP" to "BSpace")
-        val modifierNames = mapOf("CTRL" to "C", "ALT" to "M", "SHIFT" to "S")
-        val specs = if (resources.configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE) fn + nav else if (fnMode) fn else nav
-        val count = specs.size / 2
-        for ((rowIndex, rowId) in listOf(R.id.termux_workspace_keys_row_one, R.id.termux_workspace_keys_row_two).withIndex()) {
-            val row = root.findViewById<LinearLayout>(rowId); row.removeAllViews()
-            for (index in 0 until count) {
-                val name = specs[rowIndex * count + index]
-                val key = TextView(this).apply {
-                    text = name + if (modifierNames[name] in modifiers) "*" else ""
-                    gravity = Gravity.CENTER; typeface = Tuils.getTypeface(this@TermuxWorkspaceActivity); textSize = 10f
-                    setTextColor(color(Theme.workspace_control_text_color))
-                    setOnClickListener {
-                        val modifier = modifierNames[name]
-                        if (modifier != null) { if (!modifiers.add(modifier)) modifiers.remove(modifier); bindKeys() }
-                        else if (name == "REFRESH") { selection.visibleTiles.forEach { capture(it) }; if (clients[selection.focused] == null) startBridge() }
-                        else key(names[name] ?: name)
-                    }
-                }
-                var down = 0f
-                key.setOnTouchListener { _, event ->
-                    if (event.actionMasked == MotionEvent.ACTION_DOWN) down = event.x
-                    if (event.actionMasked == MotionEvent.ACTION_UP && abs(event.x - down) > dp(48)) {
-                        fnMode = !fnMode; bindKeys(); persist(); true
-                    } else false
-                }
-                row.addView(key, LinearLayout.LayoutParams(0, -1, 1f))
-            }
-        }
+        TermuxSpecialKeys.bind(root, fnMode, modifiers, color(Theme.workspace_control_text_color),
+            { fnMode = it; bindKeys(); persist() },
+            { selection.visibleTiles.forEach { capture(it) }; if (clients[selection.focused] == null) startBridge() },
+            { key(it) })
     }
     private fun style() {
         styleHelperPrompt()

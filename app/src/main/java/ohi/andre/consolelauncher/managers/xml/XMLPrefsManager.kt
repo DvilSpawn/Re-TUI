@@ -325,6 +325,8 @@ object XMLPrefsManager {
         for (index in 0 until root.childNodes.length) {
             val node = root.childNodes.item(index) as? Element ?: continue
             if (!node.hasAttribute(VALUE_ATTRIBUTE)) continue
+            // Notification filters and per-app formats are repeatable records, not singleton options.
+            if (element === XMLPrefsRoot.NOTIFICATIONS && (node.tagName == "filter" || node.tagName == "format")) continue
             val value = node.getAttribute(VALUE_ATTRIBUTE)
             val previous = seen.put(node.tagName, value)
             require(previous == null || previous == value) { "Conflicting setting: ${node.tagName}" }

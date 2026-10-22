@@ -46,7 +46,10 @@ class TermuxWorkspaceSshIntegrationTest {
         } finally { broadcasts.unregisterReceiver(receiver) }
     }
 
-    @Test fun pairedSshConnectsAndIndependentTilesStreamThenDetachWithoutKillingShells() {
+    @Test fun pairedSshConnectsAndIndependentTilesStreamThenDetachWithoutKillingShells() = verifyWorkspace("retui_workspace")
+    @Test fun homeSshConnectsAndIndependentTilesStreamThenDetachWithoutKillingShells() = verifyWorkspace("retui_home")
+
+    private fun verifyWorkspace(workspace: String) {
         assumeTrue(InstrumentationRegistry.getArguments().getString("termuxSshDevice") == "true")
         // Vivo freezes background instrumentation despite framework isFrozen=false.
         // A real visible screen keeps native command and SSH callbacks scheduled.
@@ -71,7 +74,7 @@ class TermuxWorkspaceSshIntegrationTest {
             override fun onWindows(windows: List<Pair<String, String>>) = Unit
             override fun onTargetGone(target: String) = Unit
             override fun onError(message: String) { error.set(message); ready.countDown() }
-        })
+        }, workspace)
         val created = mutableListOf<String>()
         try {
             stage("connecting")
@@ -79,7 +82,7 @@ class TermuxWorkspaceSshIntegrationTest {
             assertTrue("SSH readiness timed out", ready.await(20, TimeUnit.SECONDS))
             assertNull(error.get())
             assertTrue(connection.connected)
-            for (tile in 0..1) {
+            for (tile in listOf(0, 7)) {
                 stage("creating tile $tile")
                 val made = CountDownLatch(1)
                 val target = AtomicReference<String>()
@@ -100,8 +103,8 @@ class TermuxWorkspaceSshIntegrationTest {
                     android.os.SystemClock.uptimeMillis() < deadline) Thread.sleep(50)
                 assertTrue("Tile $tile did not stream terminal output: ${error.get()}", output.await(10, TimeUnit.SECONDS))
             }
-            connection.detach(0); connection.detach(1)
-            val windows = runCommand(arrayOf("-c", "tmux list-windows -t '=retui_workspace' -F '#{window_id}'"))
+            connection.detach(0); connection.detach(7)
+            val windows = runCommand(arrayOf("-c", "tmux list-windows -t '=$workspace' -F '#{window_id}'"))
             for (target in created) assertTrue("Detach killed $target", windows.lineSequence().contains(target))
         } finally {
             stage("closing connection")

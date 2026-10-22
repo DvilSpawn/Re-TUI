@@ -79,7 +79,7 @@ object AppearanceSettings {
 
     @JvmStatic
     fun surfaceBorderEnabled(surface: SurfaceBorder): Boolean =
-        SurfaceBorder.isEnabled(dashedBorders(), LauncherSettings.getBoolean(surface.enabled))
+        SurfaceBorder.isEnabled(dashedBorders() || cyberdeckMode(), LauncherSettings.getBoolean(surface.enabled))
 
     @JvmStatic
     fun surfaceBorderColor(surface: SurfaceBorder): Int =

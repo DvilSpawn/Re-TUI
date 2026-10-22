@@ -996,7 +996,65 @@ class UIManager(
 
     private var suggestionsManager: SuggestionsManager? = null
     private val searchOnlyMode: Boolean
-        get() = LauncherMode.isSearch()
+        get() = LauncherMode.usesSearch()
+
+    private var terminalHome: ohi.andre.consolelauncher.managers.termux.TerminalHomeView? = null
+    private var terminalSearchOpen = false
+    private var terminalHomeDim: View? = null
+
+    private fun configureTerminalHome() {
+        if (!LauncherMode.isTerminal() || terminalHome != null) return
+        val tray = terminalTrayContainer ?: return
+        val parent = tray.parent as? FrameLayout ?: return
+        val home = ohi.andre.consolelauncher.managers.termux.TerminalHomeView(mContext!!)
+        terminalHome = home
+        parent.addView(home, parent.indexOfChild(tray), FrameLayout.LayoutParams(-1, -1))
+        terminalHomeDim = View(mContext).apply {
+            setBackgroundColor(0x99000000.toInt())
+            setOnClickListener { showTerminalSearch(false) }
+            visibility = View.GONE
+        }.also { parent.addView(it, parent.indexOfChild(tray), FrameLayout.LayoutParams(-1, -1)) }
+        mRootView?.findViewById<View>(R.id.terminal_home_add_tab)?.setOnClickListener {
+            showTerminalSearch(false); home.showAddTerminal()
+        }
+        mRootView?.findViewById<View>(R.id.terminal_home_settings_tab)?.setOnClickListener {
+            showTerminalSearch(false); openSettingsSurface(null)
+        }
+        persistentInputContainer?.addOnLayoutChangeListener { _, _, top, _, bottom, _, oldTop, _, oldBottom ->
+            if (bottom - top != oldBottom - oldTop) applyDisplayMarginsForConfigurationOnMainThread()
+        }
+        val inputContainer = persistentInputContainer as? LinearLayout
+        if (inputContainer != null) {
+            val keys = android.view.LayoutInflater.from(mContext).inflate(R.layout.termux_special_keys, inputContainer, false)
+            keys.visibility = View.GONE
+            (keys.layoutParams as LinearLayout.LayoutParams).topMargin = Tuils.dpToPx(mContext, 2)
+            val inputGroup = inputContainer.findViewById<View>(R.id.input_group)
+            inputContainer.addView(keys, inputContainer.indexOfChild(inputGroup) + 1)
+            home.bindSpecialKeys(keys)
+            home.onTerminalFocusChanged = { focused ->
+                val terminalFocused = focused && !terminalSearchOpen
+                inputGroup.visibility = if (terminalFocused) View.GONE else View.VISIBLE
+                inputContainer.findViewById<View>(R.id.search_mode_tabs)?.visibility = if (terminalFocused) View.GONE else View.VISIBLE
+                keys.visibility = if (terminalFocused && keyboardVisible) View.VISIBLE else View.GONE
+                applyDisplayMarginsForConfigurationOnMainThread()
+            }
+        }
+        showTerminalSearch(false)
+        applyDisplayMarginsForConfigurationOnMainThread()
+        home.resume()
+    }
+
+    private fun showTerminalSearch(show: Boolean) {
+        terminalSearchOpen = show
+        terminalHome?.releaseInput()
+        configureSearchOnlyLayout()
+        terminalHomeDim?.visibility = if (show) View.VISIBLE else View.GONE
+        if (android.os.Build.VERSION.SDK_INT >= 31) {
+            terminalHome?.setRenderEffect(if (show) android.graphics.RenderEffect.createBlurEffect(18f, 18f, android.graphics.Shader.TileMode.CLAMP) else null)
+        }
+        terminalHome?.importantForAccessibility = if (show) View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS else View.IMPORTANT_FOR_ACCESSIBILITY_AUTO
+        if (show) { activateTerminalInput(true); refreshStockSuggestions() } else closeKeyboard()
+    }
 
     private var terminalView: TextView? = null
 
@@ -1109,6 +1167,7 @@ class UIManager(
                 }
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                     inputTouchInProgress = false
+                    if (event.actionMasked == MotionEvent.ACTION_UP && LauncherMode.isTerminal() && !terminalSearchOpen) showTerminalSearch(true)
                     inputView.post { applyDisplayMarginsForConfigurationOnMainThread() }
                 }
             }
@@ -1116,6 +1175,7 @@ class UIManager(
         }
         inputView.setOnFocusChangeListener { _, hasFocus ->
             suggestionsManager?.setSearchInputActive(keyboardVisible)
+            if (LauncherMode.isTerminal() && terminalHome != null && hasFocus && inputTouchInProgress && !terminalSearchOpen) showTerminalSearch(true)
             if (searchOnlyMode && hasFocus) refreshStockSuggestions()
             if (!inputTouchInProgress) applyDisplayMarginsForConfigurationOnMainThread()
         }
@@ -1125,6 +1185,7 @@ class UIManager(
             outlineInput.setIdleCursorVisible(true)
         }
         val openTerminalInput = View.OnClickListener {
+            if (LauncherMode.isTerminal() && !terminalSearchOpen) showTerminalSearch(true)
             activateTerminalInput(true)
             refreshStockSuggestions()
         }
@@ -1281,6 +1342,7 @@ class UIManager(
         }
 
 
+        configureTerminalHome()
         scheduleTypefaceRefreshes()
     }
 
@@ -1988,6 +2050,7 @@ class UIManager(
         val layoutStateChanged =
             !hasLastLayoutState || keyboardVisible != newKeyboardVisible || lastObservedRootHeight != rootHeight
         keyboardVisible = newKeyboardVisible
+        if (LauncherMode.isTerminal()) terminalHome?.updateKeyboardVisibility(newKeyboardVisible)
         hasLastLayoutState = true
         lastObservedRootHeight = rootHeight
         if (!layoutStateChanged) {
@@ -2090,6 +2153,12 @@ class UIManager(
         if(duoLayoutActive) ohi.andre.consolelauncher.presentation.HomeLayoutPresentation.finishDuoLayout(mRootView as ViewGroup,
             ohi.andre.consolelauncher.presentation.HomeAppearance.saved(),
             ohi.andre.consolelauncher.presentation.LauncherHomeSnapshot.Insets(systemInsetLeft,systemInsetTop,systemInsetRight,systemInsetBottom),captureTrayPresentationState())
+        if (LauncherMode.isTerminal()) {
+            val bottomChrome = persistentInputContainer?.height ?: 0
+            val bottomClearance = bottomChrome + searchInset + Tuils.mmToPx(metrics, bottomMargins[3])
+            terminalHome?.setSearchBarClearance(bottomClearance, bottomChrome)
+            applySectionDisplayMargins(terminalHome, topMargins, metrics, imeBottomOffset, systemInsetTop)
+        }
         applyTerminalOverlayDisplayMargins(topMargins, bottomMargins, metrics)
     }
 
@@ -2389,6 +2458,31 @@ class UIManager(
             (statusAppearance ?: ohi.andre.consolelauncher.presentation.HomeAppearance.saved()))
         appDrawerPaneManager?.hide()
         androidWidgetDrawerManager?.hide()
+        val tray = terminalTrayContainer ?: return
+        mRootView?.findViewById<View>(R.id.search_mode_tabs)?.visibility = View.VISIBLE
+        if (LauncherMode.isTerminal()) {
+            tray.visibility = View.VISIBLE
+            mRootView?.findViewById<View>(R.id.search_mode_results_scroll)?.visibility = if (terminalSearchOpen) View.VISIBLE else View.GONE
+            (tray.layoutParams as? FrameLayout.LayoutParams)?.let { params ->
+                params.height = if (terminalSearchOpen) ViewGroup.LayoutParams.MATCH_PARENT else ViewGroup.LayoutParams.WRAP_CONTENT
+                tray.layoutParams = params
+            }
+        }
+        val clock = mRootView?.findViewById<TextView>(R.id.search_mode_clock_tab) ?: return
+        val add = mRootView?.findViewById<ImageButton>(R.id.terminal_home_add_tab)
+        val settings = mRootView?.findViewById<ImageButton>(R.id.terminal_home_settings_tab)
+        for (button in listOfNotNull(add, settings)) {
+            button.visibility = if (LauncherMode.isTerminal()) View.VISIBLE else View.GONE
+            button.setColorFilter(clock.currentTextColor)
+            button.background = clock.background?.constantState?.newDrawable()?.mutate()
+            (button.layoutParams as? LinearLayout.LayoutParams)?.bottomMargin = (clock.layoutParams as? LinearLayout.LayoutParams)?.bottomMargin ?: 0
+        }
+        TerminalBorderRuntime.bind(mRootView?.findViewById<View>(R.id.input_group), clock, add, settings)
+        if (LauncherMode.isTerminal()) {
+            val terminalFocused = !terminalSearchOpen && keyboardVisible && terminalHome?.hasTerminalFocus == true
+            mRootView?.findViewById<View>(R.id.search_mode_tabs)?.visibility = if (terminalFocused) View.GONE else View.VISIBLE
+            mRootView?.findViewById<View>(R.id.input_group)?.visibility = if (terminalFocused) View.GONE else View.VISIBLE
+        }
     }
 
     private fun calculateExpandedTerminalTrayHeight(rootHeight: Int, collapsedHeight: Int): Int {
@@ -12504,6 +12598,8 @@ class UIManager(
     }
 
     fun dispose() {
+        terminalHome?.pause()
+        terminalHome = null
         launcherWindowFocused = false
         ramManager?.stop()
         batteryManager?.stop()
@@ -12570,6 +12666,7 @@ class UIManager(
     }
 
     fun onStart(openKeyboardOnStart: Boolean) {
+        if (LauncherMode.isTerminal()) { showTerminalSearch(false); return }
         activateTerminalInput(openKeyboardOnStart)
     }
 
@@ -12669,6 +12766,10 @@ class UIManager(
     }
 
     fun onBackPressed() {
+        if (LauncherMode.isTerminal()) {
+            if (terminalSearchOpen) showTerminalSearch(false) else terminalHome?.releaseInput()
+            return
+        }
         if (handleTermuxBackPressed()) {
             return
         }
@@ -12737,6 +12838,7 @@ class UIManager(
     }
 
     fun pause() {
+        terminalHome?.pause()
         launcherWindowFocused = false
 
         if (mTerminalAdapter != null) {
@@ -12805,6 +12907,7 @@ class UIManager(
     }
 
     fun resume() {
+        terminalHome?.resume()
         if (handler == null) {
             return
         }

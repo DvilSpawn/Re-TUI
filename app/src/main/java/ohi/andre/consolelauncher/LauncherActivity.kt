@@ -530,6 +530,7 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
             invalidate()
             XMLPrefsManager.loadCommons(this)
             refreshFromLoadedPrefs()
+            TimeManager(this)
             Tuils.cancelFont()
 
             backButtonEnabled = LauncherSettings.getBoolean(Behavior.back_button_enabled)

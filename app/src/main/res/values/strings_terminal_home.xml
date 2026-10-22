@@ -1,0 +1,22 @@
+<resources>
+    <string name="terminal_home_add">Add terminal</string>
+    <string name="terminal_home_search">Search ↑</string>
+    <string name="terminal_home_setup_button">Termux setup</string>
+    <string name="terminal_home_setup">Open Termux setup to install or update the helper and grant access. Tap here to reconnect.</string>
+    <string name="terminal_home_hint">Tap a terminal to type. Hold anywhere in a pane for options. Scroll for more terminals.</string>
+    <string name="terminal_home_input">Terminal input</string>
+    <string name="terminal_home_shell">New shell</string>
+    <string name="terminal_home_custom">Custom command</string>
+    <string name="terminal_home_existing">Existing session</string>
+    <string name="terminal_home_location">Weather location (city)</string>
+    <string name="terminal_home_full">No room for another terminal. Resize or remove a tile.</string>
+    <string name="terminal_home_exited">Session ended · tap title to reconnect</string>
+    <string name="terminal_home_disconnected">Disconnected · tap title to reconnect</string>
+    <string name="terminal_home_arrange">Drag to move. Other panes move down to make room. Drag an edge handle to resize. Tap outside or Back to finish.</string>
+    <string name="terminal_home_move_resize">Move / resize</string>
+    <string name="terminal_home_reconnect">Reconnect / restart</string>
+    <string name="terminal_home_remove">Remove tile (keep session)</string>
+    <string name="terminal_home_resize_hint">↔ Move · ◢ Resize</string>
+    <string name="terminal_home_background_help">Termux is not responding. Open Termux once and allow background activity in Android settings, then tap here to reconnect.</string>
+    <string name="terminal_home_settings">Settings</string>
+</resources>

@@ -7,8 +7,9 @@ import ohi.andre.consolelauncher.managers.xml.options.Behavior
 object LauncherMode {
     const val CLASSIC = "classic"
     const val SEARCH = "search"
+    const val TERMINAL = "terminal"
 
-    val values = listOf(CLASSIC, SEARCH)
+    val values = listOf(CLASSIC, SEARCH, TERMINAL)
 
     fun current(): String = resolve(
         LauncherSettings.get(Behavior.launcher_mode),
@@ -17,6 +18,8 @@ object LauncherMode {
 
     fun isClassic(): Boolean = current() == CLASSIC
     fun isSearch(): Boolean = current() == SEARCH
+    fun usesSearch(): Boolean = current() in listOf(SEARCH, TERMINAL)
+    fun isTerminal(): Boolean = current() == TERMINAL
 
     fun set(context: Context?, mode: String?): Boolean {
         val normalized = normalize(mode) ?: return false

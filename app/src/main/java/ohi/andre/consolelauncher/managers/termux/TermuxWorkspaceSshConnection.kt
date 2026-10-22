@@ -24,9 +24,10 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 
 /** One local SSH connection; tmux owns the shells, while channels are disposable viewers. */
-class TermuxWorkspaceSshConnection(
+class TermuxWorkspaceSshConnection @JvmOverloads constructor(
     private val info: TermuxWorkspaceSshSetup.ConnectionInfo,
-    private val listener: Listener
+    private val listener: Listener,
+    private val workspace: String = "retui_workspace"
 ) {
     interface Listener {
         fun onReady(windows: List<Pair<String, String>>)
@@ -59,7 +60,10 @@ class TermuxWorkspaceSshConnection(
         @Volatile var opening: Future<*>? = null
     }
 
-    fun connect() {
+    @JvmOverloads fun connect(homeTargets: Map<String, String> = emptyMap()) {
+        require(workspace in listOf("retui_workspace", "retui_home")) { "Invalid workspace" }
+        require(homeTargets.isEmpty() || workspace == "retui_home") { "Migration requires home scope" }
+        require(homeTargets.keys.all { validTarget(it) }) { "Invalid migration target" }
         check(started.compareAndSet(false, true)) { "Create a new connection to reconnect" }
         execute {
             require(info.port in 1..65535) { "Invalid Termux SSH port" }
@@ -89,6 +93,7 @@ class TermuxWorkspaceSshConnection(
             connection.connect(8000)
             if (!running.get()) { connection.disconnect(); return@execute }
             connected = true
+            homeTargets.forEach { (target, name) -> runCommand("adopt $target ${encode(name)}") }
             val windows = listWindows()
             if (windows.isNotEmpty()) startControl()
             post { listener.onReady(windows) }
@@ -97,7 +102,7 @@ class TermuxWorkspaceSshConnection(
 
     fun attach(tile: Int, target: String, cols: Int, rows: Int,
                onOutput: (ByteArray) -> Unit, onClosed: () -> Unit) {
-        require(tile in 0..1 && validTarget(target)) { "Invalid terminal tile" }
+        require(tile >= 0 && validTarget(target)) { "Invalid terminal tile" }
         detach(tile)
         val viewer = Tile(target, "${instance}_${tile}_${UUID.randomUUID().toString().replace("-", "")}", cleanCols(cols), cleanRows(rows), onOutput, onClosed)
         synchronized(tiles) { tiles[tile] = viewer }
@@ -280,7 +285,7 @@ class TermuxWorkspaceSshConnection(
         check(running.get()) { "SSH connection closed" }
         val connection = session ?: error("SSH connection unavailable")
         check(connection.isConnected) { "Termux SSH disconnected" }
-        return (connection.openChannel("exec") as ChannelExec).apply { setCommand(command) }
+        return (connection.openChannel("exec") as ChannelExec).apply { setCommand(if (workspace == "retui_home") "home $command" else command) }
     }
 
     private fun runCommand(command: String): String {

@@ -6,8 +6,8 @@ import org.junit.Test
 
 class LauncherModeTest {
     @Test
-    fun supportedModesAreClassicAndSearch() {
-        assertEquals(listOf("classic", "search"), LauncherMode.values)
+    fun supportedModesIncludeTerminal() {
+        assertEquals(listOf("classic", "search", "terminal"), LauncherMode.values)
     }
 
     @Test

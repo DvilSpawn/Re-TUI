@@ -6,6 +6,28 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class XMLPrefsManagerTest {
+    @Test fun notificationFiltersAndFormatsRemainSeparateRecords() {
+        val document = javax.xml.parsers.DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument()
+        val root = document.createElement("NOTIFICATIONS"); document.appendChild(root)
+        for (tag in listOf("filter","format")) for (id in 0..1) {
+            root.appendChild(document.createElement(tag).apply {
+                setAttribute("id",id.toString()); setAttribute("value","value-$id")
+            })
+        }
+        assertEquals(false,XMLPrefsManager.migrateRootValues(document,root,XMLPrefsManager.XMLPrefsRoot.NOTIFICATIONS))
+        for (tag in listOf("filter","format")) {
+            assertEquals(2,root.getElementsByTagName(tag).length)
+            assertEquals("value-1",(root.getElementsByTagName(tag).item(1) as org.w3c.dom.Element).getAttribute("value"))
+        }
+    }
+    @Test fun conflictingNotificationSingletonStillFails() {
+        val document = javax.xml.parsers.DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument()
+        val root = document.createElement("NOTIFICATIONS"); document.appendChild(root)
+        for (value in listOf("true","false")) root.appendChild(document.createElement("show_notifications").apply {setAttribute("value",value)})
+        org.junit.Assert.assertThrows(IllegalArgumentException::class.java) {
+            XMLPrefsManager.migrateRootValues(document,root,XMLPrefsManager.XMLPrefsRoot.NOTIFICATIONS)
+        }
+    }
     @Test fun legacyTimeFormatIsMigratedWithoutChangingItsValue() {
         val document = javax.xml.parsers.DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument()
         val root = document.createElement("BEHAVIOR")

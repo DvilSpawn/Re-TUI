@@ -20,6 +20,8 @@ new_shell() {
 # Only whitespace-delimited validated fields are accepted; never evaluate a client command.
 set -f
 set -- ${SSH_ORIGINAL_COMMAND:-}
+# A fixed scope selects independent windows, not grouped roots shared across modes.
+if [ "${1:-}" = home ]; then root=retui_home; shift; fi
 operation=${1:-}
 case "$operation" in
     list)
@@ -49,6 +51,26 @@ case "$operation" in
         fi
         printf '%s\n' "$target"
         ;;
+    adopt)
+        [ "$root" = retui_home ] && [ "$#" = 3 ] || fail 'Invalid migration arguments'
+        expected=$(decode "$3") || fail 'Invalid migration name'
+        case "$expected" in retui-home-*) ;; *) fail 'Invalid migration name';; esac
+        # Only the exact saved home-owned window may move; never recreate its process.
+        if valid_window "$2" 2>/dev/null; then exit 0; fi
+        case "$2" in @*[!0-9]*|@|'') fail 'Invalid migration target';; @*) ;; *) fail 'Invalid migration target';; esac
+        tmux list-windows -t '=retui_workspace' -F '#{window_id}' 2>/dev/null | grep -F -x -- "$2" >/dev/null || exit 0
+        actual=$(tmux display-message -p -t "$2" '#{window_name}')
+        [ "$actual" = "$expected" ] || exit 0
+        hold=''
+        if ! has_root; then
+            hold=$(new_shell new-session -d -P -F '#{window_id}' -s "$root" -n migration -c "$HOME")
+        fi
+        if ! tmux move-window -s "retui_workspace:$2" -t "$root:"; then
+            [ -z "$hold" ] || tmux kill-window -t "$hold"
+            fail 'Could not move home window'
+        fi
+        [ -z "$hold" ] || tmux kill-window -t "$hold"
+        ;;
     attach)
         [ "$#" = 3 ] || fail 'Invalid attach arguments'
         case "$2" in ''|*[!A-Za-z0-9_-]*) fail 'Invalid tile identity';; esac
@@ -62,6 +84,11 @@ case "$operation" in
         trap cleanup EXIT HUP INT TERM
         tmux set-option -t "=$viewer:" status off
         tmux select-window -t "$viewer:$3"
+        if [ "$root" = retui_home ]; then
+            # Legacy resize-window calls leave manual sizing; only this window's viewer should size it.
+            tmux set-option -w -t "$3" aggressive-resize on
+            tmux set-option -w -t "$3" window-size latest
+        fi
         tmux attach-session -t "=$viewer"
         ;;
     control)

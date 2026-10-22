@@ -18,6 +18,7 @@ import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.managers.xml.options.Ui
 import ohi.andre.consolelauncher.managers.xml.options.Toolbar
 import ohi.andre.consolelauncher.managers.xml.options.Suggestions
+import ohi.andre.consolelauncher.managers.xml.options.SurfaceBorder
 import ohi.andre.consolelauncher.managers.xml.options.SurfaceBorderOption
 import androidx.viewpager2.widget.ViewPager2
 import ohi.andre.consolelauncher.tuils.FrameTarget
@@ -263,6 +264,17 @@ internal object HomeLayoutPresentation {
             root.findViewById<View>(id)?.visibility=View.GONE
         }
         root.findViewById<View>(R.id.search_mode_results_scroll)?.visibility=View.VISIBLE
+        root.findViewById<View>(R.id.input_group)?.let { input ->
+            val radius=ohi.andre.consolelauncher.tuils.Tuils.dpToPx(root.context,appearance.radius(Ui.dashed_border_corner_radius)).toFloat()
+            val border=SurfaceBorder.resolveColor(appearance.raw(SurfaceBorder.INPUT.color),appearance.color(Theme.terminal_border_color))
+            val dashed=appearance.bool(Ui.enable_dashed_border)
+            input.background=TerminalBorderRuntime.panelDrawablePx(root.context,appearance.color(Theme.input_background_color),
+                border,1.5f,radius,dashed,false,borderEnabled=false,frameEnabled=false,target=FrameTarget.INPUT,style=appearance.borderStyle())
+            input.foreground=TerminalBorderRuntime.panelDrawablePx(root.context,android.graphics.Color.TRANSPARENT,
+                border,1.5f,radius,dashed,false,
+                borderEnabled=appearance.bool(Behavior.enable_cyberdeck_mode) || (dashed && appearance.bool(SurfaceBorder.INPUT.enabled)),
+                target=FrameTarget.INPUT,style=appearance.borderStyle())
+        }
         styleSearchClock(root,appearance)
         (tray.layoutParams as? FrameLayout.LayoutParams)?.let { params ->
             params.width=ViewGroup.LayoutParams.MATCH_PARENT

@@ -55,28 +55,7 @@
             android:clipChildren="false"
             android:clipToPadding="false" />
 
-        <LinearLayout
-            android:id="@+id/termux_workspace_tools"
-            android:layout_width="match_parent"
-            android:layout_height="64dp"
-            android:layout_marginTop="8dp"
-            android:gravity="center"
-            android:orientation="vertical">
-
-                <LinearLayout
-                    android:id="@+id/termux_workspace_keys_row_one"
-                    android:layout_width="match_parent"
-                    android:layout_height="32dp"
-                    android:gravity="center"
-                    android:orientation="horizontal" />
-
-                <LinearLayout
-                    android:id="@+id/termux_workspace_keys_row_two"
-                    android:layout_width="match_parent"
-                    android:layout_height="32dp"
-                    android:gravity="center"
-                    android:orientation="horizontal" />
-        </LinearLayout>
+        <include layout="@layout/termux_special_keys" />
 
         <LinearLayout
             android:id="@+id/termux_workspace_input_group"

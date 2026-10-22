@@ -25,24 +25,31 @@ import java.util.regex.Pattern
 /**
  * Created by francescoandreuzzi on 26/07/2017.
  */
-class TimeManager(context: Context) {
+class TimeManager private constructor(
+    context: Context,
+    outputFormat: String,
+    statusFormat: String,
+    separator: String,
+    register: Boolean
+) {
+    constructor(context: Context) : this(context,
+        XMLPrefsManager.get(Behavior.output_time_format),
+        XMLPrefsManager.get(Behavior.status_time_format),
+        XMLPrefsManager.get(Behavior.time_format_separator), true)
     private var outputDateFormatList: Array<FormatEntry?>?
     private var statusDateFormatList: Array<FormatEntry?>?
 
     init {
-        instance = this
-        val separator = XMLPrefsManager.get(Behavior.time_format_separator)
-
-        outputDateFormatList =
-            createList(context, XMLPrefsManager.get(Behavior.output_time_format), separator)
-        statusDateFormatList =
-            createList(context, XMLPrefsManager.get(Behavior.status_time_format), separator)
+        if (register) instance = this
+        outputDateFormatList = createList(context, outputFormat, separator, register)
+        statusDateFormatList = createList(context, statusFormat, separator, register)
     }
 
     private fun createList(
         context: Context,
         format: String,
-        separator: String
+        separator: String,
+        reportErrors: Boolean
     ): Array<FormatEntry?> {
         val formats: Array<String?> =
             format.split(separator.toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
@@ -52,6 +59,7 @@ class TimeManager(context: Context) {
             var currentFormat = formats[c] ?: Tuils.EMPTYSTRING
             try {
                 currentFormat = Tuils.patternNewline.matcher(currentFormat).replaceAll(Tuils.NEWLINE)
+                    .replace("\\n", Tuils.NEWLINE)
 
                 var color: Int? = null
                 val m: Matcher = COLOR_PATTERN.matcher(currentFormat)
@@ -63,7 +71,7 @@ class TimeManager(context: Context) {
                 formats[c] = currentFormat
                 list[c] = buildEntry(color, currentFormat)
             } catch (e: Exception) {
-                Tuils.sendOutput(AppearanceSettings.errorTextColor(), context, context.getString(R.string.manager_timemanager_invalid_time_format_c3076, currentFormat))
+                if (reportErrors) Tuils.sendOutput(AppearanceSettings.errorTextColor(), context, context.getString(R.string.manager_timemanager_invalid_time_format_c3076, currentFormat))
                 if (c > 0) list[c] = list[0]
                 else list[c] = buildFallbackEntry()
             }
@@ -348,6 +356,13 @@ class TimeManager(context: Context) {
         val clockWords: Boolean = false
     )
     companion object {
+        internal fun previewStatus(context: Context, format: String, separator: String, size: Int, color: Int): CharSequence =
+            runCatching {
+                val formatter = TimeManager(context, "", format, separator, false)
+                val entry = formatter.get(0, true)
+                formatter.span(context, entry, if (entry?.color == null) color else TerminalManager.NO_COLOR, Date(), size)
+            }.getOrDefault("")
+
         private val COLOR_PATTERN: Pattern = Pattern.compile("#(?:\\d|[a-fA-F]){6}")
         private val CLOCK_WORDS_PATTERN: Pattern = Pattern.compile(
             Pattern.quote("{clock_words}"),

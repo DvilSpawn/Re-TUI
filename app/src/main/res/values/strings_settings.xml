@@ -232,7 +232,7 @@
     <!-- Behavior.kt: sound_timer -->
     <string name="setting_behavior_sound_timer_description" formatted="false">"Play the timer completion sound"</string>
     <!-- Behavior.kt: launcher_mode -->
-    <string name="setting_behavior_launcher_mode_description" formatted="false">"Launcher layout mode: classic or search"</string>
+    <string name="setting_behavior_launcher_mode_description" formatted="false">"Launcher layout mode: classic, search, or terminal"</string>
     <string name="setting_behavior_search_category_tabs_description">In Search mode, show one result category at a time with tabs. Turn off to show all category rows together in a single pane.</string>
     <!-- Behavior.kt: search_only_mode -->
     <string name="setting_behavior_search_only_mode_description" formatted="false">"Legacy search mode toggle used only when launcher_mode is empty"</string>
