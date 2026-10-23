@@ -1,6 +1,7 @@
 package ohi.andre.consolelauncher.managers.widgets
 
 import kotlin.math.max
+import ohi.andre.consolelauncher.managers.termux.TerminalHomeLayout
 
 internal data class WidgetRecord(
         val wid: String,
@@ -55,6 +56,22 @@ internal object AndroidWidgetLayout {
             placed.add(record.copy(col = position.col, row = position.row))
         }
         return placed.sortedWith(compareBy<WidgetRecord> { it.row }.thenBy { it.col })
+    }
+
+    /**
+     * Terminal-mode arrangement: the edited widget stays where it was put, widgets in its way are pushed straight
+     * down in order, and with [settle] everything then floats back up. Null when the widget cannot fit there.
+     */
+    fun flow(locked: WidgetRecord, records: List<WidgetRecord>, columns: Int, settle: Boolean): List<WidgetRecord>? {
+        fun tile(record: WidgetRecord) = TerminalHomeLayout.Tile(record.appWidgetId.toString(), record.col, record.row, record.colSpan, record.rowSpan)
+        val engine = TerminalHomeLayout(columns) { true }
+        val original = layout(records, columns)
+        if (original.none { it.appWidgetId == locked.appWidgetId }) return null
+        val moved = engine.reflow(tile(normalizeRecord(locked, columns)), original.map(::tile)) ?: return null
+        val placement = (if (settle) engine.compact(moved) else moved).associateBy { it.id }
+        return original.map { record ->
+            placement.getValue(record.appWidgetId.toString()).let { record.copy(col = it.x, row = it.y, colSpan = it.width, rowSpan = it.height) }
+        }
     }
 
     fun normalizeRecord(record: WidgetRecord, columnCount: Int): WidgetRecord {

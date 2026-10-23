@@ -1103,6 +1103,19 @@ enum class Ui : XMLPrefsSave {
             return R.string.setting_ui_android_widget_min_rows_description
         }
     },
+    android_widget_spacing {
+        override fun defaultValue(): String? {
+            return "8"
+        }
+
+        override fun type(): String? {
+            return XMLPrefsSave.INTEGER
+        }
+
+        override fun infoRes(): Int {
+            return R.string.setting_ui_android_widget_spacing_description
+        }
+    },
     suggestions_area_margin {
         override fun defaultValue(): String? {
             return "3,3,0,0"

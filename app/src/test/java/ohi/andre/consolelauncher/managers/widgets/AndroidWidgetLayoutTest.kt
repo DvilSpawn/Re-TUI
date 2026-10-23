@@ -57,4 +57,29 @@ class AndroidWidgetLayoutTest {
         assertEquals(atEdge, AndroidWidgetLayout.growHorizontalEdge(atEdge, ResizeEdge.RIGHT, 4, 8, 5))
     }
 
+    @Test fun flowPushesCollisionsStraightDownInsteadOfRelocatingThem() {
+        val top = widget(1, col = 0, row = 0, width = 2, height = 2)
+        val below = widget(2, col = 0, row = 2, width = 2, height = 1)
+        val side = widget(3, col = 2, row = 0, width = 2, height = 2)
+        val grown = top.copy(rowSpan = 3)
+        val result = AndroidWidgetLayout.flow(grown, listOf(top, below, side), 4, settle = false)!!
+        assertEquals(grown, result.first { it.appWidgetId == 1 })
+        assertEquals(below.copy(row = 3), result.first { it.appWidgetId == 2 })
+        assertEquals(side, result.first { it.appWidgetId == 3 })
+    }
+
+    @Test fun settledFlowClosesGapsAndKeepsColumnOrder() {
+        val a = widget(1, col = 0, row = 0, width = 2, height = 2)
+        val b = widget(2, col = 0, row = 2, width = 2, height = 2)
+        val c = widget(3, col = 0, row = 4, width = 2, height = 1)
+        val moved = a.copy(col = 2)
+        val result = AndroidWidgetLayout.flow(moved, listOf(a, b, c), 4, settle = true)!!
+        assertEquals(moved, result.first { it.appWidgetId == 1 })
+        assertEquals(b.copy(row = 0), result.first { it.appWidgetId == 2 })
+        assertEquals(c.copy(row = 2), result.first { it.appWidgetId == 3 })
+        // Dragging past the edge snaps back onto the board; an unknown widget cannot be placed.
+        assertEquals(2, AndroidWidgetLayout.flow(a.copy(col = 3), listOf(a, b, c), 4, settle = true)!!.first { it.appWidgetId == 1 }.col)
+        assertNull(AndroidWidgetLayout.flow(widget(9), listOf(a, b, c), 4, settle = true))
+    }
+
 }

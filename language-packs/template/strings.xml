@@ -2041,6 +2041,7 @@ Use module -approve </string>
     <string name="manager_androidwidgetdrawermanager_drag_to_resize_the_left_edge_f1698">Drag to resize the left edge.</string>
     <string name="manager_androidwidgetdrawermanager_drag_to_resize_the_right_edge_9355b">Drag to resize the right edge.</string>
     <string name="manager_androidwidgetdrawermanager_drag_to_resize_the_top_edge_0998f">Drag to resize the top edge.</string>
+    <string name="manager_androidwidgetdrawermanager_grid_status">Grid: %1$d columns, %2$ddp spacing</string>
     <string name="manager_androidwidgetdrawermanager_grid_x_ddf2d">grid %1$d x %2$d</string>
     <string name="manager_androidwidgetdrawermanager_loading_widgets_af1a9">Loading widgets...</string>
     <string name="manager_androidwidgetdrawermanager_no_widget_for_w_id_0f5d6">No widget for [W_ID:%1$s].</string>
@@ -2052,6 +2053,7 @@ Use module -approve </string>
     <string name="manager_androidwidgetdrawermanager_resized_to_x_476c9">%1$s resized to %2$d x %3$d</string>
     <string name="manager_androidwidgetdrawermanager_tap_to_remove_19778">TAP TO REMOVE</string>
     <string name="manager_androidwidgetdrawermanager_unknown_widget_command_155c9">Unknown widget command: %1$s</string>
+    <string name="manager_androidwidgetdrawermanager_usage_grid">Usage: grid &lt;columns 2-12&gt; [spacing 0-24]</string>
     <string name="manager_androidwidgetdrawermanager_usage_remove_w_id_13569">Usage: remove &lt;W_ID&gt;</string>
     <string name="manager_androidwidgetdrawermanager_usage_resize_w_id_height_width_9def5">Usage: resize &lt;W_ID&gt; &lt;height&gt; &lt;width&gt;</string>
     <string name="manager_androidwidgetdrawermanager_widget_failed_to_render_6bf8a">WIDGET FAILED TO RENDER</string>
@@ -4856,9 +4858,10 @@ Disabling this option hides Re:TUI access; it does not lock Private Space. Save 
     <string name="setting_toolbar_shortcut_button_2_enabled_description">If true, the second custom toolbar button is shown</string>
     <string name="setting_toolbar_shortcut_button_2_icon_description">Icon key for the second custom toolbar button</string>
     <string name="setting_toolbar_show_toolbar_description">If false, the toolbar is hidden</string>
-    <string name="setting_ui_android_widget_grid_columns_description">Base column count for the Android widget drawer. Rows and landscape columns are computed from square cells</string>
+    <string name="setting_ui_android_widget_grid_columns_description">Column count for the widget pane, from 2 to 12. More columns make smaller cells for a denser pane. Rows use square cells</string>
     <string name="setting_ui_android_widget_min_columns_description">Fallback starting width when a widget app does not provide valid Android sizing metadata</string>
     <string name="setting_ui_android_widget_min_rows_description">Fallback starting height when a widget app does not provide valid Android sizing metadata</string>
+    <string name="setting_ui_android_widget_spacing_description">Space between widgets in dp, from 0 to 24. Lower it for a denser widget pane</string>
     <string name="setting_ui_ascii_index_description">Changing this position inserts the ASCII pane at that row and shifts that row and later rows down when saved. For example, inserting ASCII at 1 moves 1 to 2 and 1.1 to 2.1. ASCII always uses its own row.</string>
     <string name="setting_ui_ascii_max_lines_description">Number of source rows shown in the ASCII viewport. Use -1 to auto-zoom wide art.</string>
     <string name="setting_ui_ascii_pane_height_rows_description">Maximum physical height of the ASCII pane, measured in text rows.</string>

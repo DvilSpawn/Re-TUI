@@ -33,7 +33,7 @@ internal object SettingsRefreshCoordinator {
         Ui.keyboard_visible_margin_override, Ui.display_margin_landscape_mm)
     private val landscape = setOf(Ui.split_duo_launcher, Behavior.duo_swap_top_panes,
         Behavior.swipe_up_apps_drawer, Ui.show_ascii_landscape)
-    private val widgetGrid = setOf(Ui.android_widget_grid_columns, Ui.android_widget_min_columns, Ui.android_widget_min_rows)
+    private val widgetGrid = setOf(Ui.android_widget_grid_columns, Ui.android_widget_min_columns, Ui.android_widget_min_rows, Ui.android_widget_spacing)
     private val geometry = margins + landscape + widgetGrid + setOf(
         Behavior.show_tmux_workspace_button, Behavior.show_android_widget_drawer_button)
     internal fun effect(setting: XMLPrefsSave): Effect = when {

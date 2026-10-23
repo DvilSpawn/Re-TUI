@@ -860,11 +860,13 @@
     <!-- Ui.kt: toolbar_margins -->
     <string name="setting_ui_toolbar_margins_description" formatted="false">"[horizontal_margin],[vertical_margin],[horizontal_padding],[vertical_padding]"</string>
     <!-- Ui.kt: android_widget_grid_columns -->
-    <string name="setting_ui_android_widget_grid_columns_description" formatted="false">"Base column count for the Android widget drawer. Rows and landscape columns are computed from square cells"</string>
+    <string name="setting_ui_android_widget_grid_columns_description" formatted="false">"Column count for the widget pane, from 2 to 12. More columns make smaller cells for a denser pane. Rows use square cells"</string>
     <!-- Ui.kt: android_widget_min_columns -->
     <string name="setting_ui_android_widget_min_columns_description" formatted="false">"Fallback starting width when a widget app does not provide valid Android sizing metadata"</string>
     <!-- Ui.kt: android_widget_min_rows -->
     <string name="setting_ui_android_widget_min_rows_description" formatted="false">"Fallback starting height when a widget app does not provide valid Android sizing metadata"</string>
+    <!-- Ui.kt: android_widget_spacing -->
+    <string name="setting_ui_android_widget_spacing_description" formatted="false">"Space between widgets in dp, from 0 to 24. Lower it for a denser widget pane"</string>
     <!-- Ui.kt: suggestions_area_margin -->
     <string name="setting_ui_suggestions_area_margin_description" formatted="false">"Suggestion pane spacing in pixels: [outer horizontal margin],[outer vertical margin],[inner horizontal padding],[inner vertical padding]. Also applies to contextual module suggestions; it does not control spacing between chips or module-dock buttons."</string>
     <!-- Ui.kt: module_dock_spacing_dp -->

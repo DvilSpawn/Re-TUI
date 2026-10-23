@@ -6,7 +6,7 @@
     <!-- layout/android_widget_drawer.xml: android:text -->
     <string name="ui_android_widget_drawer_w" formatted="false" translatable="false">"$W "</string>
     <!-- layout/android_widget_drawer.xml: android:hint -->
-    <string name="ui_android_widget_drawer_add_show_resize_remove" formatted="false" translatable="false">"add | show | resize | remove"</string>
+    <string name="ui_android_widget_drawer_add_show_resize_remove" formatted="false" translatable="false">"add | show | resize | remove | grid"</string>
     <!-- layout/android_widget_drawer.xml: android:text -->
     <string name="ui_android_widget_drawer_run" formatted="false">"RUN"</string>
     <!-- layout/android_widget_drawer.xml: android:text -->

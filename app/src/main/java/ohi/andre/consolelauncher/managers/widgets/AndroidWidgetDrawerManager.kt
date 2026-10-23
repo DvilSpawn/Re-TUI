@@ -57,6 +57,7 @@ import ohi.andre.consolelauncher.tuils.LauncherFontScale
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.options.Suggestions
 import ohi.andre.consolelauncher.managers.xml.options.Theme
+import ohi.andre.consolelauncher.managers.settings.LauncherSettings
 import ohi.andre.consolelauncher.managers.settings.ThemeColorResolver
 import ohi.andre.consolelauncher.managers.xml.options.Ui
 import ohi.andre.consolelauncher.tuils.TerminalBorderRuntime
@@ -133,6 +134,8 @@ class AndroidWidgetDrawerManager(
         }
     }
     private var lastRenderedCellSize = 0
+    private var lastDisplayRecords: List<WidgetRecord> = emptyList()
+    private val flowTargets = mutableMapOf<Int, Pair<Float, Float>>()
     private var listening = false
     private var surfaceOpen = false
     private var recordsReadable = true
@@ -462,6 +465,7 @@ class AndroidWidgetDrawerManager(
             "show" -> executeShowWidgetCommand(parts.drop(1))
             "resize" -> executeResizeWidgetCommand(parts)
             "remove" -> executeRemoveWidgetCommand(parts)
+            "grid" -> executeGridCommand(parts)
             else -> showWidgetCommandStatus(context.getString(R.string.manager_androidwidgetdrawermanager_unknown_widget_command_155c9, parts.firstOrNull().orEmpty()))
         }
         updateWidgetCommandSuggestions()
@@ -535,6 +539,21 @@ class AndroidWidgetDrawerManager(
         )
     }
 
+    /** `grid` reports the pane density; `grid <columns> [spacing]` changes it through the same settings as the Settings app. */
+    private fun executeGridCommand(parts: List<String>) {
+        val columns = parts.getOrNull(1)?.toIntOrNull()
+        val spacing = parts.getOrNull(2)?.let { it.toIntOrNull() ?: -1 }
+        if (parts.size > 1 && (columns !in MIN_GRID_COLUMNS..MAX_GRID_COLUMNS || spacing != null && spacing !in 0..MAX_WIDGET_SPACING_DP)) {
+            showWidgetCommandStatus(context.getString(R.string.manager_androidwidgetdrawermanager_usage_grid))
+            return
+        }
+        if (columns != null) LauncherSettings.set(context, Ui.android_widget_grid_columns, columns.toString())
+        if (spacing != null) LauncherSettings.set(context, Ui.android_widget_spacing, spacing.toString())
+        scheduleRender()
+        showWidgetCommandStatus(context.getString(R.string.manager_androidwidgetdrawermanager_grid_status, baseColumnCount(),
+            XMLPrefsManager.getInt(Ui.android_widget_spacing).coerceIn(0, MAX_WIDGET_SPACING_DP)))
+    }
+
     private fun executeRemoveWidgetCommand(parts: List<String>) {
         if (parts.size < 2) {
             showWidgetCommandStatus(context.getString(R.string.manager_androidwidgetdrawermanager_usage_remove_w_id_13569))
@@ -577,6 +596,15 @@ class AndroidWidgetDrawerManager(
                 suggestions.add(WidgetCommandSuggestion("show", "show "))
                 suggestions.add(WidgetCommandSuggestion("resize", "resize "))
                 suggestions.add(WidgetCommandSuggestion("remove", "remove "))
+                suggestions.add(WidgetCommandSuggestion("grid", "grid "))
+            }
+            lowerInput == "grid" || lowerInput.startsWith("grid ") -> {
+                val columnsTyped = parts.size >= 3 || parts.size == 2 && lowerInput.endsWith(" ")
+                if (!columnsTyped) {
+                    for (columns in listOf(4, 6, 8)) suggestions.add(WidgetCommandSuggestion("$columns cols", "grid $columns "))
+                } else for (spacing in listOf(0, 4, 8)) {
+                    suggestions.add(WidgetCommandSuggestion("${spacing}dp", "grid ${parts[1]} $spacing", executeOnTap = true))
+                }
             }
             lowerInput == "add" || lowerInput.startsWith("add ") -> {
                 suggestions.add(
@@ -1271,12 +1299,14 @@ class AndroidWidgetDrawerManager(
         lastRenderedCellSize = cellSize
         grid.cellSize = cellSize
         val displayColumns = displayColumnCount(grid, cellSize, baseColumns)
-        val cellMargin = Tuils.dpToPx(context, 4)
+        val cellMargin = cellMargin()
         val supportedRecords = validRecords.map { constrainRecordToProvider(it, cellSize, cellMargin) }
         if (supportedRecords != validRecords) {
             saveRecords(supportedRecords)
         }
         val displayRecords = layoutRecordsForColumns(supportedRecords, displayColumns)
+        lastDisplayRecords = displayRecords
+        clearFlowPreview()
         val displayRows = displayRowCount(displayRecords)
         val layoutChanged = grid.columnCount != displayColumns || grid.rowCount != displayRows ||
             grid.childCount != displayRecords.size || displayRecords.any { record ->
@@ -1291,6 +1321,7 @@ class AndroidWidgetDrawerManager(
         grid.columnCount = displayColumns
         grid.rowCount = displayRows
         grid.minimumHeight = if (displayRecords.isEmpty()) 0 else displayRows * cellSize
+        showEditGrid()
 
         for (record in displayRecords) {
             val providerInfo = appWidgetManager.getAppWidgetInfo(record.appWidgetId) ?: continue
@@ -1303,18 +1334,26 @@ class AndroidWidgetDrawerManager(
                 }
             }
             val hostView = frame.getChildAt(0) as AppWidgetHostView
-            val inset = Tuils.dpToPx(context, 8)
-            frame.setPadding(inset, inset, inset, inset)
+            frame.setPadding(0, 0, 0, 0)
             frame.clipToPadding = false
-            val size = (widgetWidth - inset * 2).coerceAtLeast(1) to (widgetHeight - inset * 2).coerceAtLeast(1)
+            val size = widgetWidth to widgetHeight
             if (frame.tag != size) {
                 updateHostWidgetSize(hostView, size.first, size.second)
                 frame.tag = size
             }
             while (frame.childCount > 1) frame.removeViewAt(1)
-            frame.background = if (editMode || editingWidgetId == record.appWidgetId) TerminalBorderRuntime.panelDrawable(
-                context, Color.TRANSPARENT, ThemeColorResolver.color(Theme.widget_panel_border_color),
-                1f, moduleCornerRadius(), dashedBorders(), target = FrameTarget.WIDGET_DRAWER) else null
+            // Spacing is the only gap, so the edit border is a layer over the widget; the selected one is bolder.
+            val selected = editingWidgetId == record.appWidgetId
+            // A plain outline: theme frames can draw no border at all, and edit mode must always show one.
+            if (editMode || selected) frame.addView(View(context).apply {
+                background = GradientDrawable().apply {
+                    // Unselected widgets get a faint outline in the grid's colour; only the edited one stands out.
+                    setStroke(Tuils.dpToPx(context, if (selected) 3 else 1),
+                        if (selected) ThemeColorResolver.color(Theme.widget_control_text_color) else widgetGrid?.gridColor ?: 0)
+                    cornerRadius = Tuils.dpToPx(context, moduleCornerRadius()).toFloat()
+                }
+                importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+            }, FrameLayout.LayoutParams(-1, -1))
             if (commandsVisible) {
                 frame.addView(widgetIdBadge(record), FrameLayout.LayoutParams(-2, -2, Gravity.TOP or Gravity.START))
             }
@@ -1374,13 +1413,12 @@ class AndroidWidgetDrawerManager(
             val handle = object : View(context) {
                 private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
                     color = ThemeColorResolver.color(Theme.widget_control_text_color)
-                    strokeWidth = Tuils.dpToPx(context, 2).toFloat()
+                    strokeWidth = Tuils.dpToPx(context, 4).toFloat()
                     strokeCap = Paint.Cap.ROUND
-                    alpha = 180
                 }
                 override fun onDraw(canvas: Canvas) {
-                    val inset = Tuils.dpToPx(context, 2).toFloat()
-                    val length = Tuils.dpToPx(context, 7).toFloat()
+                    val inset = Tuils.dpToPx(context, 3).toFloat()
+                    val length = Tuils.dpToPx(context, 14).toFloat()
                     val x = if (left) inset else width - inset
                     val y = if (top) inset else height - inset
                     canvas.drawLine(x, y, x + if (left) length else -length, y, paint)
@@ -1411,13 +1449,16 @@ class AndroidWidgetDrawerManager(
                             moved = moved || abs(event.rawX - startX) > ViewConfiguration.get(context).scaledTouchSlop || abs(event.rawY - startY) > ViewConfiguration.get(context).scaledTouchSlop
                             if (moved) {
                                 val cell = max(1, lastRenderedCellSize)
-                                val margin = Tuils.dpToPx(context, 4)
+                                val margin = cellMargin()
                                 val preview = previewWidgetCorner(startBounds, left, top, event.rawX - startX, event.rawY - startY,
                                     bounds.minColumns * cell - 2 * margin, bounds.maxColumns * cell - 2 * margin,
                                     bounds.minRows * cell - 2 * margin, bounds.maxRows * cell - 2 * margin,
                                     widgetGrid?.width ?: frame.width, margin)
                                 frame.bringToFront()
                                 widgetGrid?.resizePreview = frame to preview
+                                (lastDisplayRecords.firstOrNull { it.appWidgetId == record.appWidgetId } ?: record).let { shown ->
+                                    resizedCorner(shown, left, top, event.rawX - startX, event.rawY - startY)?.let(::previewFlow)
+                                }
                                 // Native content reflows every frame; provider callbacks are coalesced.
                                 if (!providerResizePosted) {
                                     providerResizePosted = true
@@ -1454,6 +1495,7 @@ class AndroidWidgetDrawerManager(
         val frame = resizePreviewFrame ?: return
         val hadPreview = widgetGrid?.resizePreview != null
         resizePreviewFrame = null
+        clearFlowPreview()
         widgetGrid?.removeCallbacks(providerResizeRunnable)
         providerResizePosted = false
         widgetGrid?.resizePreview = null
@@ -1469,14 +1511,56 @@ class AndroidWidgetDrawerManager(
     private fun resizeWidgetCorner(record: WidgetRecord, left: Boolean, top: Boolean, dx: Float, dy: Float) {
         val records = loadRecords().filterValid()
         val current = records.firstOrNull { it.appWidgetId == record.appWidgetId } ?: return
-        val bounds = appWidgetManager.getAppWidgetInfo(record.appWidgetId)?.let(::widgetSpanBounds) ?: return
-        val horizontal = if (left) ResizeEdge.LEFT else ResizeEdge.RIGHT
-        val vertical = if (top) ResizeEdge.TOP else ResizeEdge.BOTTOM
-        val width = resizeHorizontalEdgeByCells(current, horizontal, dragDeltaCells(horizontal, dx, dy), bounds)
-        val resized = resizeVerticalEdgeByCells(width, vertical, dragDeltaCells(vertical, dx, dy), bounds)
+        val resized = resizedCorner(current, left, top, dx, dy) ?: return
         saveRecords(compactRecordsWithLocked(resized, records))
         editingWidgetId = resized.appWidgetId
         renderWidgets()
+    }
+
+    private fun resizedCorner(current: WidgetRecord, left: Boolean, top: Boolean, dx: Float, dy: Float): WidgetRecord? {
+        val bounds = appWidgetManager.getAppWidgetInfo(current.appWidgetId)?.let(::widgetSpanBounds) ?: return null
+        val horizontal = if (left) ResizeEdge.LEFT else ResizeEdge.RIGHT
+        val vertical = if (top) ResizeEdge.TOP else ResizeEdge.BOTTOM
+        val width = resizeHorizontalEdgeByCells(current, horizontal, dragDeltaCells(horizontal, dx, dy), bounds)
+        return resizeVerticalEdgeByCells(width, vertical, dragDeltaCells(vertical, dx, dy), bounds)
+    }
+
+    /**
+     * Slides the widgets to where the edit will leave them, as Terminal mode does while editing. The preview is
+     * already settled, so it matches the drop and the board never grows past what the drop can use.
+     */
+    private fun previewFlow(proposed: WidgetRecord) {
+        val grid = widgetGrid ?: return
+        val cell = max(1, lastRenderedCellSize).toFloat()
+        val flow = AndroidWidgetLayout.flow(proposed, lastDisplayRecords, grid.columnCount, settle = true) ?: return
+        grid.landing = flow.firstOrNull { it.appWidgetId == proposed.appWidgetId }
+        grid.minimumHeight = max(grid.minimumHeight, (flow.maxOfOrNull { it.row + it.rowSpan } ?: 0) * cell.toInt())
+        for (record in lastDisplayRecords) {
+            if (record.appWidgetId == proposed.appWidgetId) continue
+            val frame = widgetFrames[record.appWidgetId] ?: continue
+            val target = flow.first { it.appWidgetId == record.appWidgetId }
+            val shift = (target.col - record.col) * cell to (target.row - record.row) * cell
+            if (flowTargets[record.appWidgetId] != shift) {
+                flowTargets[record.appWidgetId] = shift
+                frame.animate().translationX(shift.first).translationY(shift.second).setDuration(120).start()
+            }
+        }
+    }
+
+    private fun previewMove(appWidgetId: Int, dx: Float, dy: Float) {
+        val record = lastDisplayRecords.firstOrNull { it.appWidgetId == appWidgetId } ?: return
+        val cell = max(1, lastRenderedCellSize)
+        val columns = widgetGrid?.columnCount?.takeIf { it > 0 } ?: return
+        // Below the other widgets every row settles to the same spot.
+        val floor = lastDisplayRecords.filter { it.appWidgetId != appWidgetId }.maxOfOrNull { it.row + it.rowSpan } ?: 0
+        previewFlow(record.copy(col = (record.col + (dx / cell).roundToInt()).coerceIn(0, max(0, columns - record.colSpan)),
+            row = (record.row + (dy / cell).roundToInt()).coerceIn(0, floor)))
+    }
+
+    private fun clearFlowPreview() {
+        flowTargets.keys.forEach { id -> widgetFrames[id]?.apply { animate().cancel(); translationX = 0f; translationY = 0f } }
+        flowTargets.clear()
+        widgetGrid?.landing = null
     }
 
     private fun dragDeltaCells(edge: ResizeEdge, deltaX: Float, deltaY: Float): Int {
@@ -1501,7 +1585,8 @@ class AndroidWidgetDrawerManager(
         }
 
         val records = loadRecords().filterValid()
-        val currentRecord = records.firstOrNull { it.appWidgetId == appWidgetId } ?: return
+        val currentRecord = lastDisplayRecords.firstOrNull { it.appWidgetId == appWidgetId }
+            ?: records.firstOrNull { it.appWidgetId == appWidgetId } ?: return
         val baseColumns = widgetGrid?.columnCount?.takeIf { it > 0 } ?: baseColumnCount()
         val boundedRecord = normalizeRecord(currentRecord, baseColumns)
         val targetCol = (boundedRecord.col + deltaColumns)
@@ -1547,8 +1632,11 @@ class AndroidWidgetDrawerManager(
         }
     }
 
-    private fun compactRecordsWithLocked(lockedRecord: WidgetRecord, records: List<WidgetRecord>) =
-        AndroidWidgetLayout.place(lockedRecord, records, widgetGrid?.columnCount?.takeIf { it > 0 } ?: baseColumnCount())
+    private fun compactRecordsWithLocked(lockedRecord: WidgetRecord, records: List<WidgetRecord>): List<WidgetRecord> {
+        val columns = widgetGrid?.columnCount?.takeIf { it > 0 } ?: baseColumnCount()
+        return AndroidWidgetLayout.flow(lockedRecord, records, columns, settle = true)
+            ?: AndroidWidgetLayout.place(lockedRecord, records, columns)
+    }
 
     private fun layoutRecordsForColumns(records: List<WidgetRecord>, columnCount: Int) =
         AndroidWidgetLayout.layout(records, columnCount)
@@ -1781,6 +1869,18 @@ class AndroidWidgetDrawerManager(
             .coerceIn(MIN_GRID_COLUMNS, MAX_GRID_COLUMNS)
     }
 
+    /** In edit mode the dot grid fills the visible pane, not just the rows widgets occupy. */
+    private fun showEditGrid() {
+        val grid = widgetGrid ?: return
+        grid.gridColor = if (editMode) (ThemeColorResolver.color(Theme.widget_panel_border_color) and 0x00ffffff) or 0x80000000.toInt() else 0
+        val viewport = drawerScroll?.let { it.height - it.paddingTop - it.paddingBottom } ?: 0
+        if (editMode && grid.childCount > 0) grid.minimumHeight = max(grid.minimumHeight, viewport)
+    }
+
+    /** Half the configured space between widgets, so neighbours are exactly that far apart. */
+    private fun cellMargin(): Int =
+        Tuils.dpToPx(context, XMLPrefsManager.getInt(Ui.android_widget_spacing).coerceIn(0, MAX_WIDGET_SPACING_DP)) / 2
+
     private fun minWidgetColumns(baseColumns: Int = baseColumnCount()): Int {
         return XMLPrefsManager.getInt(Ui.android_widget_min_columns)
             .coerceIn(1, min(MAX_MIN_WIDGET_SPAN, baseColumns))
@@ -1832,7 +1932,7 @@ class AndroidWidgetDrawerManager(
         providerInfo: AppWidgetProviderInfo,
         cellSize: Int = lastRenderedCellSize.takeIf { it > 0 }
             ?: Tuils.dpToPx(context, MIN_WIDGET_CELL_DP),
-        cellMargin: Int = Tuils.dpToPx(context, 4)
+        cellMargin: Int = cellMargin()
     ): WidgetSpanBounds {
         val supportsModernSizing = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
         return calculateWidgetSpanBounds(
@@ -1845,12 +1945,13 @@ class AndroidWidgetDrawerManager(
                 maxResizeHeight = if (supportsModernSizing) providerInfo.maxResizeHeight else 0,
                 targetColumns = if (supportsModernSizing) providerInfo.targetCellWidth else 0,
                 targetRows = if (supportsModernSizing) providerInfo.targetCellHeight else 0,
-                horizontalResizable = providerInfo.resizeMode and AppWidgetProviderInfo.RESIZE_HORIZONTAL != 0,
-                verticalResizable = providerInfo.resizeMode and AppWidgetProviderInfo.RESIZE_VERTICAL != 0
+                // As in other launchers, every widget can be resized even when its app declares a fixed size.
+                horizontalResizable = true,
+                verticalResizable = true
             ),
             cellSize,
-            cellMargin + Tuils.dpToPx(context, 8),
-            min(baseColumnCount(), MAX_WIDGET_COLUMNS),
+            cellMargin,
+            baseColumnCount(),
             minWidgetColumns(),
             minWidgetRows(),
             MAX_PLACEMENT_SCAN_ROWS
@@ -1861,7 +1962,7 @@ class AndroidWidgetDrawerManager(
         record: WidgetRecord,
         cellSize: Int = lastRenderedCellSize.takeIf { it > 0 }
             ?: Tuils.dpToPx(context, MIN_WIDGET_CELL_DP),
-        cellMargin: Int = Tuils.dpToPx(context, 4)
+        cellMargin: Int = cellMargin()
     ): WidgetRecord {
         val providerInfo = appWidgetManager.getAppWidgetInfo(record.appWidgetId) ?: return record
         val span = widgetSpanBounds(providerInfo, cellSize, cellMargin)
@@ -2058,6 +2159,36 @@ class AndroidWidgetDrawerManager(
         private var dragMoved = false
         private var longPressTriggered = false
         private var resizeGesture = false
+        private var lastRawX = 0f
+        private var lastRawY = 0f
+        private var scrollStart = 0
+        private fun scrollShift() = (drawerScroll?.scrollY ?: 0) - scrollStart
+        /** Keeps the widget under the finger and the other widgets previewing their landing spots. */
+        private fun applyDrag() {
+            val deltaX = lastRawX - downRawX
+            val deltaY = lastRawY - downRawY + scrollShift()
+            if (!dragMoved && abs(deltaX) <= touchSlop && abs(deltaY) <= touchSlop) return
+            dragMoved = true
+            translationX = deltaX
+            translationY = deltaY
+            previewMove(appWidgetId, deltaX, deltaY)
+        }
+        private val edgeScroll = object : Runnable {
+            override fun run() {
+                val scroll = drawerScroll ?: return
+                val origin = IntArray(2).also(scroll::getLocationOnScreen)
+                val zone = Tuils.dpToPx(context, 48)
+                val step = when {
+                    lastRawY < origin[1] + zone -> -Tuils.dpToPx(context, 12)
+                    lastRawY > origin[1] + scroll.height - zone -> Tuils.dpToPx(context, 12)
+                    else -> 0
+                }
+                if (step == 0 || !scroll.canScrollVertically(step)) return
+                scroll.scrollBy(0, step)
+                applyDrag()
+                postOnAnimation(this)
+            }
+        }
         private val editRunnable = Runnable {
             val cancel = MotionEvent.obtain(0, android.os.SystemClock.uptimeMillis(), MotionEvent.ACTION_CANCEL, downX, downY, 0)
             super.dispatchTouchEvent(cancel)
@@ -2065,7 +2196,9 @@ class AndroidWidgetDrawerManager(
             longPressTriggered = true
             editMode = true
             dragMoved = false
+            scrollStart = drawerScroll?.scrollY ?: 0
             editingWidgetId = appWidgetId
+            showEditGrid()
             performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
             parent?.requestDisallowInterceptTouchEvent(true)
             bringToFront()
@@ -2081,6 +2214,7 @@ class AndroidWidgetDrawerManager(
         override fun onDetachedFromWindow() {
             if (resizePreviewFrame === this) finishResizePreview(false)
             removeCallbacks(editRunnable)
+            removeCallbacks(edgeScroll)
             super.onDetachedFromWindow()
         }
 
@@ -2104,6 +2238,9 @@ class AndroidWidgetDrawerManager(
                     downY = event.y
                     downRawX = event.rawX
                     downRawY = event.rawY
+                    lastRawX = event.rawX
+                    lastRawY = event.rawY
+                    scrollStart = drawerScroll?.scrollY ?: 0
                     dragMoved = false
                     longPressTriggered = false
                     removeCallbacks(editRunnable)
@@ -2119,13 +2256,11 @@ class AndroidWidgetDrawerManager(
                 }
                 MotionEvent.ACTION_MOVE -> {
                     if (longPressTriggered) {
-                        val deltaX = event.rawX - downRawX
-                        val deltaY = event.rawY - downRawY
-                        if (abs(deltaX) > touchSlop || abs(deltaY) > touchSlop) {
-                            dragMoved = true
-                            translationX = deltaX
-                            translationY = deltaY
-                        }
+                        lastRawX = event.rawX
+                        lastRawY = event.rawY
+                        applyDrag()
+                        removeCallbacks(edgeScroll)
+                        if (dragMoved) postOnAnimation(edgeScroll)
                         return true
                     }
 
@@ -2135,9 +2270,11 @@ class AndroidWidgetDrawerManager(
                 }
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                     removeCallbacks(editRunnable)
+                    removeCallbacks(edgeScroll)
                     if (longPressTriggered) {
                         val deltaX = event.rawX - downRawX
-                        val deltaY = event.rawY - downRawY
+                        val deltaY = event.rawY - downRawY + scrollShift()
+                        clearFlowPreview()
                         alpha = 1f
                         translationX = 0f
                         translationY = 0f
@@ -2183,7 +2320,7 @@ class AndroidWidgetDrawerManager(
         private const val INVALID_WIDGET_ID = -1
         private const val MIN_GRID_COLUMNS = 2
         private const val MAX_GRID_COLUMNS = 12
-        private const val MAX_WIDGET_COLUMNS = 4
+        private const val MAX_WIDGET_SPACING_DP = 24
         private const val MAX_MIN_WIDGET_SPAN = 2
         private const val MIN_WIDGET_CELL_DP = 72
         private const val MAX_COMMAND_SPAN_SUGGESTION = 8

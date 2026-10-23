@@ -8380,6 +8380,13 @@
     },
     "type": "string"
   },
+  "manager_androidwidgetdrawermanager_grid_status": {
+    "formatted": true,
+    "forms": {
+      "other": "Grid: %1$d columns, %2$ddp spacing"
+    },
+    "type": "string"
+  },
   "manager_androidwidgetdrawermanager_grid_x_ddf2d": {
     "formatted": true,
     "forms": {
@@ -8454,6 +8461,13 @@
     "formatted": true,
     "forms": {
       "other": "Unknown widget command: %1$s"
+    },
+    "type": "string"
+  },
+  "manager_androidwidgetdrawermanager_usage_grid": {
+    "formatted": false,
+    "forms": {
+      "other": "Usage: grid <columns 2-12> [spacing 0-24]"
     },
     "type": "string"
   },
@@ -16723,7 +16737,7 @@
   "setting_ui_android_widget_grid_columns_description": {
     "formatted": false,
     "forms": {
-      "other": "Base column count for the Android widget drawer. Rows and landscape columns are computed from square cells"
+      "other": "Column count for the widget pane, from 2 to 12. More columns make smaller cells for a denser pane. Rows use square cells"
     },
     "type": "string"
   },
@@ -16738,6 +16752,13 @@
     "formatted": false,
     "forms": {
       "other": "Fallback starting height when a widget app does not provide valid Android sizing metadata"
+    },
+    "type": "string"
+  },
+  "setting_ui_android_widget_spacing_description": {
+    "formatted": false,
+    "forms": {
+      "other": "Space between widgets in dp, from 0 to 24. Lower it for a denser widget pane"
     },
     "type": "string"
   },

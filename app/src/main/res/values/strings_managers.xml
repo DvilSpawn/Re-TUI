@@ -42,6 +42,10 @@
     <string name="manager_androidwidgetdrawermanager_usage_remove_w_id_13569" formatted="false">"Usage: remove &lt;W_ID&gt;"</string>
     <!-- AndroidWidgetDrawerManager.kt: executeResizeWidgetCommand -->
     <string name="manager_androidwidgetdrawermanager_usage_resize_w_id_height_width_9def5" formatted="false">"Usage: resize &lt;W_ID&gt; &lt;height&gt; &lt;width&gt;"</string>
+    <!-- AndroidWidgetDrawerManager.kt: executeGridCommand -->
+    <string name="manager_androidwidgetdrawermanager_usage_grid" formatted="false">"Usage: grid &lt;columns 2-12&gt; [spacing 0-24]"</string>
+    <!-- AndroidWidgetDrawerManager.kt: executeGridCommand -->
+    <string name="manager_androidwidgetdrawermanager_grid_status">"Grid: %1$d columns, %2$ddp spacing"</string>
     <!-- AndroidWidgetDrawerManager.kt: buildWidgetFailureView -->
     <string name="manager_androidwidgetdrawermanager_widget_failed_to_render_6bf8a" formatted="false">"WIDGET FAILED TO RENDER"</string>
     <!-- AndroidWidgetDrawerManager.kt: buildWidgetFailureView -->

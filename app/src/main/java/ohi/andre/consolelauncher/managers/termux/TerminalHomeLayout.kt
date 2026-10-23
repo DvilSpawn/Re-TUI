@@ -1,12 +1,18 @@
 package ohi.andre.consolelauncher.managers.termux
 
-/** Grid coordinates stay independent of screen pixels and terminal connections. */
-class TerminalHomeLayout {
+/**
+ * Grid coordinates stay independent of screen pixels and terminal connections.
+ * Also arranges the widget pane, which supplies its own column count and per-widget size limits.
+ */
+class TerminalHomeLayout(
+    private val columns: Int = 6,
+    private val sizeAllowed: (Tile) -> Boolean = { it.width in 2..6 && it.height in 2..12 }
+) {
     data class Tile(val id: String, var x: Int, var y: Int, var width: Int, var height: Int)
     val tiles = mutableListOf<Tile>()
     fun fits(tile: Tile, excluding: String? = tile.id): Boolean =
-        tile.x >= 0 && tile.y >= 0 && tile.width in 2..6 && tile.height in 2..12 &&
-            tile.x + tile.width <= 6 && tile.y <= Int.MAX_VALUE - tile.height && tiles.none {
+        tile.x >= 0 && tile.y >= 0 && tile.width >= 1 && tile.height >= 1 && sizeAllowed(tile) &&
+            tile.x + tile.width <= columns && tile.y <= Int.MAX_VALUE - tile.height && tiles.none {
                 it.id != excluding && tile.x < it.x + it.width && tile.x + tile.width > it.x &&
                     tile.y < it.y + it.height && tile.y + tile.height > it.y
             }
@@ -22,7 +28,7 @@ class TerminalHomeLayout {
     /** Anchor the edited tile; only push obstructing tiles down, preserving their sizes. */
     fun reflow(proposed: Tile, original: List<Tile> = tiles): List<Tile>? {
         if (original.none { it.id == proposed.id }) return null
-        val placed = TerminalHomeLayout()
+        val placed = TerminalHomeLayout(columns, sizeAllowed)
         if (!placed.fits(proposed)) return null
         placed.tiles += proposed.copy()
         for (tile in original.filter { it.id != proposed.id }.sortedWith(compareBy({ it.y }, { it.x }, { it.id }))) {
@@ -52,7 +58,7 @@ class TerminalHomeLayout {
     }
     fun applyPlacement(placement: List<Tile>) {
         require(placement.map { it.id }.toSet() == tiles.map { it.id }.toSet())
-        val check = TerminalHomeLayout().apply { tiles.addAll(placement) }
+        val check = TerminalHomeLayout(columns, sizeAllowed).apply { tiles.addAll(placement) }
         require(placement.all { check.fits(it) })
         tiles.forEach { tile ->
             val next = placement.first { it.id == tile.id }
