@@ -33,10 +33,12 @@ class TerminalPaneLayoutTest {
     }
 
     @Test fun outputAndPromptShareTightContinuousPane() {
+        // Side padding keeps text off the inner pane's border; output and prompt still share one pane.
         val pane = element("calculator_surface", "calculator_main_pane")
-        assertEquals("0dp", pane.getAttribute("android:paddingStart"))
+        assertEquals("8dp", pane.getAttribute("android:paddingStart"))
         assertEquals("0dp", element("calculator_surface", "calculator_result").getAttribute("android:paddingBottom"))
         val helpPane = element("offline_help_surface", "offline_help_main_pane")
+        assertEquals("8dp", helpPane.getAttribute("android:paddingStart"))
         val prompt = element("offline_help_surface", "offline_help_prompt")
         assertEquals(helpPane.getAttribute("android:id"), (prompt.parentNode.parentNode as Element).getAttribute("android:id"))
         assertEquals("0dp", element("offline_help_surface", "offline_help_scroll").getAttribute("android:paddingStart"))
