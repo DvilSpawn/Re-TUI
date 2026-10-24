@@ -4913,7 +4913,7 @@ Disabling this option hides Re:TUI access; it does not lock Private Space. Save 
     <string name="setting_ui_output_corner_radius_description">Rounded corner radius for the output terminal panel (dp)</string>
     <string name="setting_ui_output_field_margins_description">[horizontal_margin],[vertical_margin],[horizontal_padding],[vertical_padding]</string>
     <string name="setting_ui_output_header_text_size_description">Text size for output and overlay header labels (sp)</string>
-    <string name="setting_ui_output_tray_max_height_description">Maximum height for the expanded output tray in dp. 0 fits the current output up to the adaptive viewport limit</string>
+    <string name="setting_ui_output_tray_max_height_description">Maximum height for the output tray in dp. 0 lets it fill the space below the status and modules</string>
     <string name="setting_ui_ram_index_description">Changing to a whole-number position inserts a row and shifts that row and later rows down when saved. Decimal positions join a row in left-to-right order: 4.1 and 4.2 share row 4. Existing decimal groups stay together when shifted. ASCII always uses its own row.</string>
     <string name="setting_ui_ram_size_description">The ram label font size</string>
     <string name="setting_ui_ram_status_alignment_description">RAM status line alignment (&lt;0 = left, =0 = center, &gt;0 = right)</string>

@@ -17122,7 +17122,7 @@
   "setting_ui_output_tray_max_height_description": {
     "formatted": false,
     "forms": {
-      "other": "Maximum height for the expanded output tray in dp. 0 fits the current output up to the adaptive viewport limit"
+      "other": "Maximum height for the output tray in dp. 0 lets it fill the space below the status and modules"
     },
     "type": "string"
   },

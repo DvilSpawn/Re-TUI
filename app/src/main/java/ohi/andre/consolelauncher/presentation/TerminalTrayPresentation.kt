@@ -45,6 +45,31 @@ internal object TerminalTrayPresentation {
 
     fun headerOnly(headerBottom:Int,fallback:Int)=if(headerBottom>0) headerBottom else fallback
 
+    /** Output room between the top section's content (header, dock, open module) and the bottom chrome;
+     *  -1 when the sections are not stacked in portrait or margins place the output above the top section. */
+    fun roomBelowTopContent(root:View,rootHeight:Int,bottomChrome:Int):Int {
+        val main=root.findViewById<View>(R.id.main_container)?:return -1
+        val header=root.findViewById<View>(R.id.header_container)?:return -1
+        val tray=root.findViewById<View>(R.id.terminal_tray_container)?:return -1
+        if(rootHeight<=0 || header.parent!==main || tray.parent!==main.parent) return -1
+        val mainTop=(main.layoutParams as? ViewGroup.MarginLayoutParams)?.topMargin?:0
+        val trayBottom=rootHeight-root.paddingBottom-((tray.layoutParams as? ViewGroup.MarginLayoutParams)?.bottomMargin?:0)
+        if(trayBottom<=mainTop) return -1
+        val page=root.findViewById<ViewGroup>(R.id.home_modules_root)
+        // The page fills its viewport, so measure the dock and open module rather than the page itself.
+        val content=page?.getChildAt(0) as? ViewGroup
+        val used=content?.let { c -> (0 until c.childCount).map(c::getChildAt).filter { it.visibility!=View.GONE }.sumOf { it.measuredHeight } }?:0
+        val top=mainTop+header.measuredHeight+(page?.paddingTop?:0)+used
+        // The output header sits 10dp above the pane; keep a small gap below the dock or module.
+        return max(0,trayBottom-bottomChrome-top-Tuils.dpToPx(root.context,16))
+    }
+
+    /** Fit the output in [room]: native and auto fill it up to [fillHeight]; other modes only shrink. */
+    fun fitRoom(requested:Int,fillHeight:Int,room:Int,header:Int,fill:Boolean):Int {
+        if(room<0) return requested
+        return max(header,min(room,if(fill) fillHeight else requested))
+    }
+
     fun chromeHeight(root:View):Int {
         val fallback=Tuils.dpToPx(root.context,38)
         val output=root.findViewById<View>(R.id.terminal_output_border)?:return fallback
@@ -154,7 +179,10 @@ internal object TerminalTrayPresentation {
             val inputHeight=root.findViewById<View>(R.id.persistent_input_container)?.measuredHeight?:0
             val console=root.findViewById<View>(R.id.unified_bottom_console)
             val consoleHeight=if(appearance.bool(SurfaceBorderOption.unified_status_border) && console?.visibility==View.VISIBLE) console.measuredHeight else 0
-            params?.height=constrain(requested,viewportHeight,state.imeBottom,state.systemBottom,inputHeight+consoleHeight,state.imeVisible || state.imeBottom>0)
+            val room=roomBelowTopContent(root,viewportHeight,inputHeight+consoleHeight)
+            val cap=if(maxDp>0) min(room,Tuils.dpToPx(root.context,maxDp)) else room
+            val fitted=fitRoom(requested,cap,room,header,(native || auto) && !autoHide)
+            params?.height=constrain(fitted,viewportHeight,state.imeBottom,state.systemBottom,inputHeight+consoleHeight,state.imeVisible || state.imeBottom>0)
         }
         if(params!=null) container.layoutParams=params
         TerminalTrayToggleView.updateText(root.context,toggle,none,landscape,expanded,arrows,native,auto,autoHide,appearance.color(ohi.andre.consolelauncher.managers.xml.options.Theme.tab_text_color))

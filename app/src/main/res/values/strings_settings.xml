@@ -852,7 +852,7 @@
     <!-- Ui.kt: output_field_margins -->
     <string name="setting_ui_output_field_margins_description" formatted="false">"[horizontal_margin],[vertical_margin],[horizontal_padding],[vertical_padding]"</string>
     <!-- Ui.kt: output_tray_max_height -->
-    <string name="setting_ui_output_tray_max_height_description" formatted="false">"Maximum height for the expanded output tray in dp. 0 fits the current output up to the adaptive viewport limit"</string>
+    <string name="setting_ui_output_tray_max_height_description" formatted="false">"Maximum height for the output tray in dp. 0 lets it fill the space below the status and modules"</string>
     <!-- Ui.kt: input_field_margins -->
     <string name="setting_ui_input_field_margins_description" formatted="false">"The dimension of the input field (where cmds are inserted). [horizontal_margin],[vertical_margin],[horizontal_padding],[vertical_padding]"</string>
     <!-- Ui.kt: input_area_margins -->

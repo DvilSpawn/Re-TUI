@@ -1535,9 +1535,10 @@ class UIManager(
         mainContainer = rootView.findViewById<View?>(R.id.main_container)
         headerContainer = rootView.findViewById<ViewGroup?>(R.id.header_container)
         headerContainer?.addOnLayoutChangeListener { _, _, top, _, bottom, _, oldTop, _, oldBottom ->
-            if (duoTopPanesSwapped && bottom - top != oldBottom - oldTop) {
-                applyDisplayMarginsForConfiguration(currentConfiguration)
-            }
+            if (bottom - top == oldBottom - oldTop) return@addOnLayoutChangeListener
+            if (duoTopPanesSwapped) applyDisplayMarginsForConfiguration(currentConfiguration)
+            // The output fills the room below the header.
+            headerContainer?.post { applyTerminalTrayState(false) }
         }
         unifiedBottomConsole = rootView.findViewById<ViewGroup?>(R.id.unified_bottom_console)
         unifiedStatusHost = rootView.findViewById<ViewGroup?>(R.id.unified_status_host)
@@ -2441,8 +2442,18 @@ class UIManager(
         } else {
             requestedHeight = if (terminalTrayExpanded) expandedHeight else calculateHeaderOnlyTerminalTrayHeight()
         }
-        val targetHeight = constrainTerminalOutputHeight(
+        val room = ohi.andre.consolelauncher.presentation.TerminalTrayPresentation.roomBelowTopContent(
+            mRootView!!, rootHeight, persistentBottomChromeHeight())
+        val maxPx = UIUtils.dpToPx(mContext!!, outputTrayMaxHeightDp())
+        val fittedHeight = ohi.andre.consolelauncher.presentation.TerminalTrayPresentation.fitRoom(
             requestedHeight,
+            if (maxPx > 0) min(room, maxPx) else room,
+            room,
+            calculateHeaderOnlyTerminalTrayHeight(),
+            !this.isOutputAutoHideEnabled && (this.isOutputTrayNativeMode || this.isOutputTrayAutoMode)
+        )
+        val targetHeight = constrainTerminalOutputHeight(
+            fittedHeight,
             rootHeight,
             imeBottomOffset,
             systemInsetBottom,
@@ -2598,6 +2609,10 @@ class UIManager(
         moduleDock = homePage.findViewById<LinearLayout?>(R.id.module_dock)
         homeModulesContainer = homePage.findViewById<ViewGroup?>(R.id.home_modules_container)
         if (homeModulesContainer == null) return
+        // The output fills the room below the open module, so refit when it changes height.
+        homeModulesContainer!!.addOnLayoutChangeListener { view, _, top, _, bottom, _, oldTop, _, oldBottom ->
+            if (bottom - top != oldBottom - oldTop) view.post { applyTerminalTrayState(false) }
+        }
 
         ensureSystemLuaModules()
         activeModule = ""
