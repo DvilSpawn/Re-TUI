@@ -244,101 +244,52 @@ Cancel stops the current calculation. Back closes Help and retains your reading 
     <string name="changelog_continue">Continue to Launcher</string>
     <string name="changelog_pane_title">CHANGELOG</string>
     <string name="changelog_release_heading">Re:TUI %1$s · Build %2$d</string>
-    <string name="changelog_release_highlights">This update makes the launcher's panes more consistent, rebuilds widget editing, and brings presets, wallpapers, and optional tools into the launcher's download flow.
+    <string name="changelog_release_highlights">Re:TUI V.4 adds **Terminal mode**, a new home screen made of live terminals. This update also rebuilds the widget pane, stops the output pane from overlapping your modules, and applies settings changes instantly.
 
-## A better widget pane
+## New: Terminal mode
 
-- Scroll through your widget board and find widgets through a searchable picker with previews.
-- Move widgets directly and resize them using four subtle corner handles.
-- See widgets resize while dragging, within the limits supported by each widget provider.
-- Settings and Widgets now stay expanded, with no floating-window controls.
-- Transparent pane backgrounds reveal the launcher through blur, including behind the status bar. Devices without blur support use dimming.
+Switch with `mode terminal`. Use `mode classic` or `mode search` to go back.
 
-## Termux, connected through SSH
+- Your home screen becomes a scrolling grid of live Termux terminals, connected through the same local SSH link as the Termux pane.
+- Tap a terminal to type straight into it. Special-key rows (Ctrl, Alt, arrows, function keys) appear above the keyboard.
+- Shells keep running in tmux when you scroll away, leave the launcher or restart it. Each terminal's position, size and session are saved.
+- Add terminals with **+**: a new shell, an existing tmux session, a custom command, or the built-in Clock, Weather, Dashboard and Re:TUI Fetch tiles. Fetch shows system info next to an ASCII skull.
+- Hold a terminal to move, resize, reconnect or remove it. Other terminals move aside while you drag and settle neatly when you let go. Removing a tile leaves its shell running.
+- Search stays at the bottom, styled like Search mode, over a soft blur of your terminals.
+- Terminal mode keeps its sessions separate from the Classic Termux pane.
 
-- The Termux pane now uses a local SSH connection, while Termux and tmux manage your shells and running jobs.
-- Keep the familiar split panes, workspace pages, launcher fonts, and colors.
-- Guided setup installs and configures the required Termux support.
-- Improved reconnection and session restoration when returning to the workspace.
-- Saved Termux Apps appear in launcher suggestions for quickly reopening your terminal tools.
-- Empty workspaces no longer show an unnecessary window chooser.
+Terminal mode uses Termux. If Termux or its SSH setup is missing, use **+ → Termux setup**. The Weather tile gets its data from wttr.in. The other tiles work offline.
 
-## Download what you want
+## Widget pane, rebuilt
 
-- Browse and preview 21 curated terminal color presets with preset -market.
-- Downloaded presets are imported without changing your current appearance. Apply one when ready with preset -apply &lt;saved-name&gt;.
-- Preview optional wallpaper packs inside the launcher, confirm the download, and install them automatically.
-- Download and install the optional Qalculate engine directly from the calculator.
-- Browse and install native launcher modules with module -library.
+- Long-press a widget to edit it in place, with corner handles for resizing.
+- Every widget can be resized, including ones whose app sets a fixed size.
+- While you edit, a dot grid fills the pane and a ghost shows where a dragged widget will land. Other widgets move aside and settle when you let go.
+- Pack widgets more tightly with the new `grid` command in the widget pane's Commands bar. For example, `grid 8 4` sets 8 columns with 4dp spacing, and `grid` on its own shows the current values. You can also set spacing with the new `android_widget_spacing` setting.
+- The widget you're editing gets a bold outline and the others a faint one. Outlines disappear when you tap Done.
 
-## Settings and theme improvements
+## Output pane
 
-- Preview appearance changes before saving them.
-- Improved settings persistence and recovery of unfinished edits.
-- Better readability for transparent and low-contrast themes, plus fixes for cursor colors and panel borders.
-- More reliable preset imports from browsers and Android's file picker, with themed error screens and clearer recovery options.
-- Improved backup and interrupted-restore recovery, including preservation of older modules during upgrades.
+- The output pane now fills the space below the status and modules without overlapping them, with or without the keyboard.
+- When you open a module, the output sits just below it instead of shrinking to a fixed height.
+- `output_tray_max_height` still caps the output's height. At 0, the output fills the available space.
 
-## Everyday fixes
+## Settings
 
-- Fixed basic calculator expressions showing preview unavailable.
-- Added haptic feedback to calculator keyboard controls.
-- The default-launcher prompt now appears after the preparation animation finishes.
-- Setup progress uses terminal glyphs.
-- Reduced repeated work when returning Home from another app.
-- Improved landscape pane alignment while respecting system and custom margins.
-- Improved IRC history refresh and added message deletion where supported by the server.
+- Saved settings now apply right away, without restarting the launcher.
+- Settings are checked before they apply, so a broken configuration shows a retry screen instead of stopping the launcher from starting.
+- The appearance preview draws your real Home screen and updates as you edit.
+- Choose default apps by name in Settings.
+- `status_time_format` now applies to the unified status card (#27).
+- Time-format settings now explain that plain words must be wrapped in single quotes.
 
-## Optional Private Space support
+## Fixes and polish
 
-Enable the private command under Settings → Behaviour to access Android Private Space on supported devices.
+- Typing into a still-focused search bar now opens Terminal search.
+- Smoother scrolling and lighter rendering, including a cheaper CRT overlay.
+- Tighter side padding in Help and Calculator.
 
-This feature is off by default. It requires Android 15 or later and a compatible implementation of Android's standard Private Space APIs. Some manufacturer implementations, including the Vivo device tested during development, may authenticate successfully but still prevent app launching.
-
-Authentication cancellation and retry handling have also been corrected.
-
-You can reopen these notes with the changelog command. These highlights are bundled with the installed app and work offline.
-
-## Hotfix #1 · Build 504
-
-- Fixed the Settings preview crash when swiping between panes with transparent themes, including Kois.
-- Replaced the preview tabs with swipeable Status, Terminal, Music, Help and Calculator examples. Appearance drafts update the previews without saving or running actions.
-- Unlocked Private Space apps can now launch from typed app names. Use private -open &lt;app name&gt; to explicitly choose the private copy.
-- Fixed missing alphabetical headings in private -ls and repeated, out-of-order letter sections in the private app drawer.
-- Private app launching remains unavailable while locked or when Private Space support is disabled.
-
-## Hotfix 2 · Build 505
-
-- Notes now shares the pane frame, header, window controls and background blur used by Help and Calculator.
-- Notes actions sit inside the pane with simpler controls, improved spacing and room for the keyboard.
-- Use 10 Help home from any offline help article, topic list or command reference to jump directly to the main directory.
-- Updated offline topics for Notes, Settings previews, Private Space, the optional Qalculate engine and Termux SSH setup.
-
-## Hotfix 3 · Build 506
-
-- Notes dialogs, fields, cards and formatting popups now respect the selected border style, including borders off.
-- New-note and other Notes dialogs open at their final size without the entrance animation.
-- Added an optional toolbar gesture button: hold until it vibrates, drag up/down/left/right, then release. Return to the centre to cancel.
-- Configure gesture_button_enabled and gesture_up/down/left/right in toolbar.xml. Each direction accepts an app launcher name, alias or command; empty directions are disabled. For example, set gesture_up to notifications -open.
-- Restored swipe-up for the app drawer on non-scrolling launcher surfaces. Terminal output remains dedicated to scrolling.
-
-## Hotfix 4 · Build 507
-
-- Preserve legacy time_format lists for both status and output clocks when the replacement setting is missing.
-- Preserve existing current values and keep an original-file .pre-migration recovery copy before startup migrates settings.
-- Apply old status background, shadow, alignment and display-margin settings consistently across startup and presets.
-- Prefer current setting names over their old aliases. Reject conflicting duplicate settings before applying preset XML changes.
-- Keep valid opaque-black backgrounds and shadows instead of replacing them with transparency.
-
-If an older version already deleted a clock format, restore it from a backup. This update cannot reconstruct previously deleted values.
-
-## Hotfix 5 · Build 508
-
-- Settings previews now reuse the current launcher status, terminal and module rendering, including the configured battery progress bar.
-- Swipe between Status, Terminal, Modules, Help, Calculator and ANSI preview cards. Help, Calculator and ANSI use illustrative samples.
-- Appearance drafts stay temporary until Save, and preview controls do not run commands or launch apps.
-- Choose already-imported frames from an inline list beneath each FRAME row, for one surface or all surfaces. Missing or corrupt frames are marked and unavailable for selection. Save Frame Settings applies the pending assignments.
-- Corrected the integration entry name to RE:TUI Keys Shortcuts.</string>
+Reopen these notes anytime with the `changelog` command.</string>
     <string name="command_bluetooth_false_4603a">%1$s false</string>
     <string name="command_bluetooth_opening_bluetooth_settings_android_no_long_c4672">Opening Bluetooth settings. Android no longer allows third-party launchers to toggle Bluetooth directly.</string>
     <string name="command_bluetooth_true_630fa">%1$s true</string>

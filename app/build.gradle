@@ -53,8 +53,8 @@ android {
         applicationId = "com.dvil.tui_renewed"
         minSdk = 23
         targetSdk = 36
-        versionCode = 508
-        versionName = "3"
+        versionCode = 600
+        versionName = "4"
 
         testInstrumentationRunner = providers.gradleProperty('ircReleaseSmokeRunner').map { it.toBoolean() }
                 .getOrElse(false) ? "ohi.andre.consolelauncher.irc.IrcReleaseSmokeInstrumentation"
