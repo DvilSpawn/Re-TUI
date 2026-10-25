@@ -68,6 +68,12 @@ jobs:
         with:
           # The legacy 'tools' package no longer exists in current cmdline-tools.
           packages: platform-tools
+      # Without KVM the API 35 emulator is too slow to start the test process before Android kills it.
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
       - name: Build isolated regression APKs
         run: ./gradlew :app:assemblePlaystoreDebug :app:assemblePlaystoreDebugAndroidTest -PtestPackageSuffix=palettedebug --console=plain
       - name: Verify live reload and save reliability
