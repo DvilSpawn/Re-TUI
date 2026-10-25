@@ -2561,6 +2561,21 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
             setPadding(dp(this@ThemerActivity, 4f), 0, 0, dp(this@ThemerActivity, 8f))
         })
 
+        if (!KeyboardShortcutManager.keyboardInstalled(this)) {
+            val warning = ohi.andre.consolelauncher.managers.settings.ThemeColorResolver.color(ohi.andre.consolelauncher.managers.xml.options.Theme.warning_text_color)
+            root.addView(TextView(this).apply {
+                text = getString(R.string.themer_keys_app_required)
+                setTextColor(warning)
+                setTypeface(Tuils.getTypeface(this@ThemerActivity), Typeface.BOLD)
+                textSize = 12f
+                setLineSpacing(0f, 1.08f)
+                setPadding(dp(this@ThemerActivity, 12f), dp(this@ThemerActivity, 10f), dp(this@ThemerActivity, 12f), dp(this@ThemerActivity, 10f))
+                background = rect(this@ThemerActivity, surfaceColor(), warning, 1.25f, 14)
+            }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+                bottomMargin = dp(this@ThemerActivity, 8f)
+            })
+        }
+
         val card = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(dp(this@ThemerActivity, 12f), dp(this@ThemerActivity, 12f), dp(this@ThemerActivity, 12f), dp(this@ThemerActivity, 12f))

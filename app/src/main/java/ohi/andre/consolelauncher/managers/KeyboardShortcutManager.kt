@@ -48,6 +48,10 @@ object KeyboardShortcutManager {
         val keys: LinkedHashMap<Char, MutableList<Mapping>> = linkedMapOf()
     )
 
+    /** Shortcuts only work inside the RE:TUI Keys keyboard app. */
+    fun keyboardInstalled(context: Context): Boolean =
+        runCatching { context.packageManager.getPackageInfo(KEYBOARD_PACKAGE, 0) }.isSuccess
+
     internal fun mappings(context: Context, key: Char): List<Mapping> =
         if (key in 'a'..'z') load(context).keys[key].orEmpty() else emptyList()
 

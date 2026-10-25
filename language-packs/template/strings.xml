@@ -295,7 +295,11 @@ Reopen these notes anytime with the `changelog` command.
 
 - Clock, Weather, Dashboard and Re:TUI Fetch tiles are visible again in themes with transparent borders. Terminal colours left on auto now always stay readable.
 - Switching presets no longer fails with an invalid value for song_text_color, or any other setting a preset leaves at its default.
-- The changelog heading now reads Re:TUI V.4.</string>
+- The changelog heading now reads Re:TUI V.4.
+
+## Hotfix 2 · Build 602
+
+- RE:TUI Keys Shortcuts in Settings now warns when the RE:TUI Keys keyboard app is not installed, since the shortcuts only work there.</string>
     <string name="command_bluetooth_false_4603a">%1$s false</string>
     <string name="command_bluetooth_opening_bluetooth_settings_android_no_long_c4672">Opening Bluetooth settings. Android no longer allows third-party launchers to toggle Bluetooth directly.</string>
     <string name="command_bluetooth_true_630fa">%1$s true</string>
@@ -5740,6 +5744,7 @@ Updated: </string>
     <string name="themer_integration_5c0a9">INTEGRATION  </string>
     <string name="themer_invalid_frame_settings_7301e">Invalid frame settings.</string>
     <string name="themer_keep_editing_ced7d">Keep Editing</string>
+    <string name="themer_keys_app_required">RE:TUI Keys is not installed. These shortcuts only work in the RE:TUI Keys keyboard, so install it and set it as your keyboard to use them.</string>
     <string name="themer_launcher_app_list_is_not_ready_return_home_and_reopen_sett_a05a4">Launcher app list is not ready. Return home and reopen Settings.</string>
     <string name="themer_live_wallpaper_picker_is_unavailable_on_this_device_05a68">Live wallpaper picker is unavailable on this device.</string>
     <string name="themer_lockdown_disabled_5cdbb">Lockdown disabled.</string>

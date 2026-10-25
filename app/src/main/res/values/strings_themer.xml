@@ -520,6 +520,7 @@
     <string name="hub_preferred_music_app">Preferred Music App</string>
     <string name="hub_tasker_integration">Tasker Integration</string>
     <string name="hub_re_keyboard_shortcuts">RE:TUI Keys Shortcuts</string>
+    <string name="themer_keys_app_required">RE:TUI Keys is not installed. These shortcuts only work in the RE:TUI Keys keyboard, so install it and set it as your keyboard to use them.</string>
     <string name="hub_fonts">Fonts</string>
     <string name="hub_typography">Typography</string>
     <string name="hub_presets">Presets</string>
