@@ -80,6 +80,7 @@ jobs:
             adb install -r app/build/outputs/apk/androidTest/playstore/debug/app-playstore-debug-androidTest.apk
             mkdir -p build/validation/settings-reload
             adb shell am instrument -w -r -e class ohi.andre.consolelauncher.managers.settings.SettingsReloadIntegrationTest com.dvil.tui_renewed.palettedebug.test/androidx.test.runner.AndroidJUnitRunner > build/validation/settings-reload/reload.txt
+            adb logcat -d -b crash -b main > build/validation/settings-reload/logcat.txt || true
             python3 -c "import sys;sys.path.insert(0,'scripts');from verify_settings import parse_instrumentation;from pathlib import Path;r=parse_instrumentation(Path('build/validation/settings-reload/reload.txt').read_text());assert len(r)==6 and all(t['status']=='passed' for t in r),r"
       - uses: actions/upload-artifact@v4
         if: always()
