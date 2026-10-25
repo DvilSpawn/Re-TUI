@@ -38,6 +38,9 @@ jobs:
         with:
           python-version: '3.12'
       - uses: android-actions/setup-android@v3
+        with:
+          # The legacy 'tools' package no longer exists in current cmdline-tools.
+          packages: platform-tools
       - name: Install test prerequisites
         run: sudo apt-get update && sudo apt-get install -y tmux openssh-client
       - name: Verify settings and repository checks
@@ -62,6 +65,9 @@ jobs:
           distribution: temurin
           java-version: '17'
       - uses: android-actions/setup-android@v3
+        with:
+          # The legacy 'tools' package no longer exists in current cmdline-tools.
+          packages: platform-tools
       - name: Build isolated regression APKs
         run: ./gradlew :app:assemblePlaystoreDebug :app:assemblePlaystoreDebugAndroidTest -PtestPackageSuffix=palettedebug --console=plain
       - name: Verify live reload and save reliability
