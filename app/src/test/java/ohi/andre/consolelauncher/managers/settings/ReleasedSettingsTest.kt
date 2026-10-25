@@ -45,6 +45,11 @@ class ReleasedSettingsTest {
         assertNotNull(SettingsValidation.error(Behavior.launcher_mode,"unknown"))
         assertNull(SettingsValidation.error(Theme.workspace_panel_text_color,"auto"))
     }
+    @Test fun presetsCanRestoreAnEmptyDefaultColor() {
+        // Switching from a preset with a song color back to one that leaves it at "" must not be rejected.
+        assertNull(SettingsValidation.error(Suggestions.song_text_color,""))
+        assertNotNull(SettingsValidation.error(Suggestions.song_background_color,""))
+    }
     @Test fun erasedBooleanAndNumberRenderWithTheSameDefaultsAsSavedSettings() {
         val appearance = ohi.andre.consolelauncher.presentation.HomeAppearance(mapOf(
             Ui.enable_dashed_border to "", Ui.input_output_size to ""))

@@ -243,7 +243,7 @@ Cancel stops the current calculation. Back closes Help and retains your reading 
     <string name="cd_submit_command">Submit command</string>
     <string name="changelog_continue">Continue to Launcher</string>
     <string name="changelog_pane_title">CHANGELOG</string>
-    <string name="changelog_release_heading">Re:TUI %1$s · Build %2$d</string>
+    <string name="changelog_release_heading">Re:TUI V.%1$s · Build %2$d</string>
     <string name="changelog_release_highlights">Re:TUI V.4 adds **Terminal mode**, a new home screen made of live terminals. This update also rebuilds the widget pane, stops the output pane from overlapping your modules, and applies settings changes instantly.
 
 ## New: Terminal mode
@@ -289,7 +289,13 @@ Terminal mode uses Termux. If Termux or its SSH setup is missing, use **+ → Te
 - Smoother scrolling and lighter rendering, including a cheaper CRT overlay.
 - Tighter side padding in Help and Calculator.
 
-Reopen these notes anytime with the `changelog` command.</string>
+Reopen these notes anytime with the `changelog` command.
+
+## Hotfix 1 · Build 601
+
+- Clock, Weather, Dashboard and Re:TUI Fetch tiles are visible again in themes with transparent borders. Terminal colours left on auto now always stay readable.
+- Switching presets no longer fails with an invalid value for song_text_color, or any other setting a preset leaves at its default.
+- The changelog heading now reads Re:TUI V.4.</string>
     <string name="command_bluetooth_false_4603a">%1$s false</string>
     <string name="command_bluetooth_opening_bluetooth_settings_android_no_long_c4672">Opening Bluetooth settings. Android no longer allows third-party launchers to toggle Bluetooth directly.</string>
     <string name="command_bluetooth_true_630fa">%1$s true</string>

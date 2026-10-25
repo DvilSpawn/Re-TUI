@@ -106,6 +106,10 @@ object ThemeColorResolver {
         fun c(parent: Theme) = resolve(parent, values, previews, resolving)
         fun blend(base: Theme, overlay: Theme, ratio: Float) =
             blendPreservingAlpha(c(base), c(overlay), ratio)
+        // Terminal text must stay visible when a borderless theme makes the accent or window transparent.
+        fun solid(role: Theme) = c(role).let { if (alpha(it) == 0) c(Theme.output_text_color) else it } or 0xFF000000.toInt()
+        fun ansiBlend(base: Theme, overlay: Theme, ratio: Float) =
+            blendPreservingAlpha(solid(base), solid(overlay), ratio)
 
         return when (role) {
             Theme.accent_color -> c(Theme.terminal_border_color)
@@ -251,19 +255,19 @@ object ThemeColorResolver {
 
             Theme.ansi_black -> rgb(0, 0, 0)
             Theme.ansi_red -> rgb(190, 62, 62)
-            Theme.ansi_green -> blend(Theme.terminal_window_background_color, Theme.accent_color, 0.28f)
+            Theme.ansi_green -> ansiBlend(Theme.terminal_window_background_color, Theme.accent_color, 0.28f)
             Theme.ansi_yellow -> c(Theme.warning_text_color)
-            Theme.ansi_blue -> blend(Theme.terminal_window_background_color, Theme.output_text_color, 0.18f)
+            Theme.ansi_blue -> ansiBlend(Theme.terminal_window_background_color, Theme.output_text_color, 0.18f)
             Theme.ansi_magenta -> rgb(176, 112, 204)
-            Theme.ansi_cyan -> blend(Theme.accent_color, Theme.output_text_color, 0.16f)
+            Theme.ansi_cyan -> ansiBlend(Theme.accent_color, Theme.output_text_color, 0.16f)
             Theme.ansi_white -> c(Theme.output_text_color)
             Theme.ansi_bright_black -> c(Theme.muted_text_color)
             Theme.ansi_bright_red -> rgb(255, 70, 70)
-            Theme.ansi_bright_green -> blend(Theme.accent_color, Theme.output_text_color, 0.28f)
-            Theme.ansi_bright_yellow -> blend(Theme.warning_text_color, Theme.output_text_color, 0.28f)
-            Theme.ansi_bright_blue -> blend(Theme.output_text_color, Theme.accent_color, 0.42f)
+            Theme.ansi_bright_green -> ansiBlend(Theme.accent_color, Theme.output_text_color, 0.28f)
+            Theme.ansi_bright_yellow -> ansiBlend(Theme.warning_text_color, Theme.output_text_color, 0.28f)
+            Theme.ansi_bright_blue -> ansiBlend(Theme.output_text_color, Theme.accent_color, 0.42f)
             Theme.ansi_bright_magenta -> rgb(220, 150, 255)
-            Theme.ansi_bright_cyan -> blend(Theme.accent_color, Theme.output_text_color, 0.32f)
+            Theme.ansi_bright_cyan -> ansiBlend(Theme.accent_color, Theme.output_text_color, 0.32f)
             Theme.ansi_bright_white -> c(Theme.output_text_color)
             else -> parse(role.defaultValue()) ?: WHITE
         }

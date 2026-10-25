@@ -18,6 +18,8 @@ object SettingsValidation {
 
     fun error(item: XMLPrefsSave, value: String?): Int? {
         val raw = value.orEmpty()
+        // A setting's own default is always valid, e.g. song_text_color's "" (follow the theme).
+        if (raw == item.defaultValue().orEmpty()) return null
         if (item === Behavior.unlock_counter_cycle_start) {
             val time = Regex("^(\\d{1,2})\\.(\\d{1,2})$").matchEntire(raw)
             return if (time == null || time.groupValues[1].toInt() !in 0..23 ||

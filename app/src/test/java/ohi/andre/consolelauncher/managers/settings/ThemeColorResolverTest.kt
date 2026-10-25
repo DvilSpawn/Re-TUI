@@ -191,4 +191,16 @@ class ThemeColorResolverTest {
             Theme.app_drawer_alphabet_selected_border_color, shared::get, emptyMap()))
     }
 
+    @Test
+    fun inheritedAnsiColorsStayVisibleInBorderlessThemes() {
+        // Bundled terminal tiles print in cyan; a transparent border and window must not hide them.
+        val values = mapOf(
+            Theme.terminal_border_color to "#00000000",
+            Theme.terminal_window_background_color to "#00000000",
+            Theme.output_text_color to "#FFE0D0FF"
+        )
+        for (role in Theme.entries.filter { it.name.startsWith("ansi_") }) {
+            assertEquals(role.name, 0xFF, ThemeColorResolver.resolve(role, values::get, emptyMap()) ushr 24)
+        }
+    }
 }
