@@ -301,7 +301,8 @@ Reopen these notes anytime with the `changelog` command.
 
 - RE:TUI Keys Shortcuts in Settings now warns when the RE:TUI Keys keyboard app is not installed, since the shortcuts only work there.
 - Fixed a freeze on Home after long sessions: the output pane now keeps the last 1000 lines unless max_lines sets a limit.
-- Terminal mode resize handles and the selected-pane outline are visible again in themes with transparent borders.</string>
+- Terminal mode resize handles and the selected-pane outline are visible again in themes with transparent borders.
+- Aliases created when pinning a shortcut now appear in suggestions right away, without restarting the launcher.</string>
     <string name="command_bluetooth_false_4603a">%1$s false</string>
     <string name="command_bluetooth_opening_bluetooth_settings_android_no_long_c4672">Opening Bluetooth settings. Android no longer allows third-party launchers to toggle Bluetooth directly.</string>
     <string name="command_bluetooth_true_630fa">%1$s true</string>
