@@ -65,6 +65,8 @@ class TerminalHomeView(context: Context) : LinearLayout(context) {
     private val fg get() = ThemeColorResolver.color(Theme.workspace_output_text_color)
     private val bg get() = ThemeColorResolver.color(Theme.workspace_output_background_color)
     private val accent get() = ThemeColorResolver.color(Theme.workspace_panel_border_color)
+    // Borderless themes make the panel border transparent; edit guides and handles must stay visible.
+    private val editAccent get() = accent.let { if (it and 0xffffff == 0) fg else it } or 0xFF000000.toInt()
     private inner class TileRuntime(val tile: TerminalHomeLayout.Tile, val title: String, var command: String, var target: String?) {
         val panel = LinearLayout(context).apply { orientation = VERTICAL }
         val heading = TextView(context)
@@ -556,7 +558,7 @@ class TerminalHomeView(context: Context) : LinearLayout(context) {
             val cw = cellWidth(); val ch = cellHeight()
             val phase = (android.os.SystemClock.uptimeMillis() % 1600L) / 1600.0
             val alpha = (64 + 80 * (0.5 - 0.5 * kotlin.math.cos(phase * 2 * Math.PI))).roundToInt()
-            paint.color = (accent and 0x00ffffff) or (alpha shl 24)
+            paint.color = (editAccent and 0x00ffffff) or (alpha shl 24)
             paint.style = android.graphics.Paint.Style.FILL
             val half = resources.displayMetrics.density * 1.5f
             val firstRow = (scroll.scrollY / ch).toInt()
@@ -569,8 +571,8 @@ class TerminalHomeView(context: Context) : LinearLayout(context) {
             postInvalidateOnAnimation()
             preview?.let {
                 val r = rect(it)
-                paint.style = android.graphics.Paint.Style.FILL; paint.color = (accent and 0x00ffffff) or 0x33000000
-                canvas.drawRect(r, paint); stroke(canvas, r, accent, 2)
+                paint.style = android.graphics.Paint.Style.FILL; paint.color = (editAccent and 0x00ffffff) or 0x33000000
+                canvas.drawRect(r, paint); stroke(canvas, r, editAccent, 2)
             }
             val frame = rect(if (dragging && edges == 0) origin ?: selected.tile else selected.tile)
             if (dragging && edges == 0) {
@@ -581,13 +583,13 @@ class TerminalHomeView(context: Context) : LinearLayout(context) {
                 selected.panel.draw(canvas)
                 canvas.restoreToCount(layer)
             }
-            stroke(canvas, frame, accent, 3)
+            stroke(canvas, frame, editAccent, 3)
             if (!dragging || edges != 0) {
                 for ((x,y) in listOf(frame.centerX() to frame.top, frame.centerX() to frame.bottom,
                     frame.left to frame.centerY(), frame.right to frame.centerY())) {
                     paint.style = android.graphics.Paint.Style.FILL; paint.color = bg
                     canvas.drawCircle(x,y,dp(9).toFloat(),paint)
-                    paint.color = accent; canvas.drawCircle(x,y,dp(7).toFloat(),paint)
+                    paint.color = editAccent; canvas.drawCircle(x,y,dp(7).toFloat(),paint)
                 }
             }
         }
