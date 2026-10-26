@@ -1089,6 +1089,9 @@ class SuggestionsManager(
         }
 
         val fullInput = (beforeLastSpace + Tuils.SPACE + lastWord).trim().lowercase(Locale.getDefault())
+        if (suggestSearchApps(suggestionList, beforeLastSpace, lastWord)) {
+            return suggestionList
+        }
         if (beforeLastSpace.equals("mode", true)) {
             comparator.noInput = false
             modeTargets(lastWord).forEach { target ->
@@ -1364,6 +1367,47 @@ class SuggestionsManager(
 
         Collections.sort<Suggestion?>(suggestionList, comparator)
         return suggestionList
+    }
+
+    /**
+     * App name chips for "search -app [provider] ..." and "search -add ... -app ...", so users pick
+     * an app by name. Returns true when the input is one of those forms.
+     */
+    private fun suggestSearchApps(
+        suggestions: MutableList<Suggestion?>,
+        beforeLastSpace: String,
+        lastWord: String
+    ): Boolean {
+        val words = beforeLastSpace.split(Tuils.SPACE.toRegex()).filter { it.isNotEmpty() }
+        if (words.size < 2 || !words[0].equals("search", true)) return false
+
+        val choiceStart: Int
+        val choices: List<String>
+        if (words[1].equals("-app", true) && words.size >= 3) {
+            choiceStart = 3
+            choices = search.appChoices(pack.context, words[2]) +
+                listOf(SearchProviderManager.BROWSER, search.AUTO)
+        } else if (words[1].equals("-add", true)) {
+            val flag = words.indexOfFirst { it.equals("-app", true) }
+            if (flag < 0) return false
+            choiceStart = flag + 1
+            choices = pack.appsManager.shownApps().mapNotNull { it.publicLabel } +
+                listOf(SearchProviderManager.BROWSER)
+        } else {
+            return false
+        }
+
+        comparator.noInput = false
+        // The app name may span several words ("YouTube Music"); match on everything typed after the flag.
+        val typedWords = words.drop(choiceStart)
+        val typed = (typedWords + lastWord).joinToString(Tuils.SPACE).trim()
+        val prefix = words.take(choiceStart).joinToString(Tuils.SPACE)
+        choices.distinct()
+            .filter { typed.isEmpty() || it.startsWith(typed, true) || it.contains(typed, true) }
+            .sortedBy { !it.startsWith(typed, true) }
+            .take(max(1, counts!![Suggestion.TYPE_APP]))
+            .forEach { suggestions.add(Suggestion(prefix, it, true, Suggestion.TYPE_COMMAND)) }
+        return true
     }
 
     private fun suggestOrientationCommand(suggestions: MutableList<Suggestion?>) {
@@ -5052,6 +5096,12 @@ class SuggestionsManager(
             "yt" -> "YouTube"
             "dd" -> "DuckDuckGo"
             "ps" -> "Play Store"
+            "mp" -> "Maps"
+            "wp" -> "Wikipedia"
+            "rd" -> "Reddit"
+            "gh" -> "GitHub"
+            "tr" -> "Translate"
+            "ym" -> "YouTube Music"
             "u" -> "Open URL"
             else -> name.replace('_', ' ').replaceFirstChar { it.titlecase(Locale.getDefault()) }
         }

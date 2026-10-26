@@ -2883,6 +2883,76 @@
     },
     "type": "string"
   },
+  "command_search_app_ambiguous": {
+    "formatted": true,
+    "forms": {
+      "other": "Several apps match \"%1$s\": %2$s. Type more of the name."
+    },
+    "type": "string"
+  },
+  "command_search_app_not_found": {
+    "formatted": true,
+    "forms": {
+      "other": "No installed app matches \"%1$s\"."
+    },
+    "type": "string"
+  },
+  "command_search_app_not_installed": {
+    "formatted": true,
+    "forms": {
+      "other": "%1$s (not installed)"
+    },
+    "type": "string"
+  },
+  "command_search_opens_in": {
+    "formatted": true,
+    "forms": {
+      "other": " (opens in %1$s)"
+    },
+    "type": "string"
+  },
+  "command_search_provider_app_auto": {
+    "formatted": true,
+    "forms": {
+      "other": "-%1$s now opens in the app that can handle its link, or your browser."
+    },
+    "type": "string"
+  },
+  "command_search_provider_app_set": {
+    "formatted": true,
+    "forms": {
+      "other": "-%1$s now opens in %2$s."
+    },
+    "type": "string"
+  },
+  "command_search_provider_saved_app": {
+    "formatted": true,
+    "forms": {
+      "other": "Search provider -%1$s saved. Opens in %2$s."
+    },
+    "type": "string"
+  },
+  "command_search_provider_saved_browser": {
+    "formatted": true,
+    "forms": {
+      "other": "Search provider -%1$s saved. Opens in your browser."
+    },
+    "type": "string"
+  },
+  "command_search_provider_saved_several": {
+    "formatted": true,
+    "forms": {
+      "other": "Search provider -%1$s saved. Several apps can open it: %2$s. Pick one with: search -app %1$s [app name]"
+    },
+    "type": "string"
+  },
+  "command_search_provider_unavailable": {
+    "formatted": true,
+    "forms": {
+      "other": "Nothing on this phone can open -%1$s."
+    },
+    "type": "string"
+  },
   "command_search_search_param_is_reserved_d1d4f": {
     "formatted": true,
     "forms": {
@@ -2925,10 +2995,24 @@
     },
     "type": "string"
   },
+  "command_search_usage_search_app": {
+    "formatted": true,
+    "forms": {
+      "other": "Usage: search -app [provider] [app name | browser | auto]"
+    },
+    "type": "string"
+  },
   "command_search_usage_search_rm_param_6eab8": {
     "formatted": false,
     "forms": {
       "other": "Usage: search -rm [param]"
+    },
+    "type": "string"
+  },
+  "command_search_your_browser": {
+    "formatted": false,
+    "forms": {
+      "other": "your browser"
     },
     "type": "string"
   },
@@ -6164,7 +6248,7 @@
   "help_search": {
     "formatted": true,
     "forms": {
-      "other": "Use a file-backed search provider before entering a query. \n\n-[provider] [search this...] -> use a provider from search.txt \n-add [provider] [url_template] -> add or replace a provider \n-rm [provider] -> remove a provider \n-ls -> list providers \n-file -> open search.txt \n-reset -> restore the default providers \n\nTemplate tokens: {query}, {query+}, {slug}, {raw}, {url} \nExample: search -add sdw https://stardewvalleywiki.com/{slug}"
+      "other": "Use a file-backed search provider before entering a query. \n\n-[provider] [search this...] -> use a provider from search.txt \n-add [provider] [url_template] -> add or replace a provider \n-add [provider] [url_template] -app [app name] -> open it in that app \n-app [provider] [app name | browser | auto] -> choose where a provider opens \n-rm [provider] -> remove a provider \n-ls -> list providers \n-file -> open search.txt \n-reset -> restore the default providers \n\nTemplate tokens: {query}, {query+}, {slug}, {raw}, {url} \nExample: search -add sdw https://stardewvalleywiki.com/{slug} \n\nProviders open in the one app that can handle their link, otherwise in your browser."
     },
     "type": "string"
   },

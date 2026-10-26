@@ -454,6 +454,30 @@
     <string name="command_search_unable_to_reset_search_providers_8d59c" formatted="false">"Unable to reset search providers."</string>
     <!-- search.kt: exec -->
     <string name="command_search_usage_search_rm_param_6eab8" formatted="false">"Usage: search -rm [param]"</string>
+    <!-- search.kt: app -->
+    <string name="command_search_usage_search_app">"Usage: search -app [provider] [app name | browser | auto]"</string>
+    <!-- search.kt: add, app -->
+    <string name="command_search_provider_saved_app">"Search provider -%1$s saved. Opens in %2$s."</string>
+    <!-- search.kt: add -->
+    <string name="command_search_provider_saved_browser">"Search provider -%1$s saved. Opens in your browser."</string>
+    <!-- search.kt: add -->
+    <string name="command_search_provider_saved_several">"Search provider -%1$s saved. Several apps can open it: %2$s. Pick one with: search -app %1$s [app name]"</string>
+    <!-- search.kt: app -->
+    <string name="command_search_provider_app_set">"-%1$s now opens in %2$s."</string>
+    <!-- search.kt: app -->
+    <string name="command_search_provider_app_auto">"-%1$s now opens in the app that can handle its link, or your browser."</string>
+    <!-- search.kt: add, app -->
+    <string name="command_search_app_not_found">"No installed app matches \"%1$s\"."</string>
+    <!-- search.kt: add, app -->
+    <string name="command_search_app_ambiguous">"Several apps match \"%1$s\": %2$s. Type more of the name."</string>
+    <!-- search.kt: app names -->
+    <string name="command_search_your_browser" formatted="false">"your browser"</string>
+    <!-- search.kt: app names -->
+    <string name="command_search_app_not_installed">"%1$s (not installed)"</string>
+    <!-- search.kt: ls -->
+    <string name="command_search_opens_in">" (opens in %1$s)"</string>
+    <!-- search.kt: open -->
+    <string name="command_search_provider_unavailable">"Nothing on this phone can open -%1$s."</string>
     <!-- space.kt: exec -->
     <string name="command_space_created_and_switched_to_space_d546d">"Created and switched to Space: %1$s"</string>
     <!-- space.kt: exec -->

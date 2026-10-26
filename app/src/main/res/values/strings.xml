@@ -497,12 +497,15 @@ Enable qalculate in Settings → behavior.xml for units and symbolic maths, e.g.
     <string name="help_search">Use a file-backed search provider before entering a query.
         \n\n-[provider] [search this...] -> use a provider from search.txt
         \n-add [provider] [url_template] -> add or replace a provider
+        \n-add [provider] [url_template] -app [app name] -> open it in that app
+        \n-app [provider] [app name | browser | auto] -> choose where a provider opens
         \n-rm [provider] -> remove a provider
         \n-ls -> list providers
         \n-file -> open search.txt
         \n-reset -> restore the default providers
         \n\nTemplate tokens: {query}, {query+}, {slug}, {raw}, {url}
         \nExample: search -add sdw https://stardewvalleywiki.com/{slug}
+        \n\nProviders open in the one app that can handle their link, otherwise in your browser.
     </string>
     <string name="help_share">$ share [pathToFile]
     </string>

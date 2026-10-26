@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher.commands.main.raw
 
+import android.app.SearchManager
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -31,21 +32,33 @@ class search : ParamCommand() {
                     return pack.context.getString(R.string.command_search_search_param_is_reserved_d1d4f, name)
                 }
 
-                val template = args.get(1) ?: return usageAdd(pack.context)
+                val appIndex = args.indexOfFirst { APP_FLAG.equals(it, ignoreCase = true) }
+                val appName = if (appIndex < 0) null else Tuils.toPlanString(args.subList(appIndex + 1, args.size), Tuils.SPACE)
+                val templateArgs = if (appIndex < 0) args else args.subList(0, appIndex)
+                if (templateArgs.size < 2) return usageAdd(pack.context)
+
+                val template = templateArgs.get(1) ?: return usageAdd(pack.context)
                 var fallback: String? = null
-                if (args.size > 2) {
-                    var rest = args.subList(2, args.size)
+                if (templateArgs.size > 2) {
+                    var rest = templateArgs.subList(2, templateArgs.size)
                     if (!rest.isEmpty() && "=>" == rest.get(0)) {
                         rest = rest.subList(1, rest.size)
                     }
                     fallback = Tuils.toPlanString(rest, Tuils.SPACE)
                 }
 
-                val saved = SearchProviderManager.add(name, template, fallback)
-                return if (saved)
-                    pack.context.getString(R.string.command_search_search_provider_saved_c4c69, stripParam(name))
-                else
-                    usageAdd(pack.context)
+                var app: String? = null
+                if (appName != null) {
+                    app = when (val match = matchApp(pack, appName)) {
+                        is AppMatch.Found -> match.app
+                        is AppMatch.Problem -> return match.message
+                    }
+                }
+
+                val saved = SearchProviderManager.add(name, template, fallback, app)
+                if (!saved) return usageAdd(pack.context)
+                val provider = SearchProviderManager.get(name) ?: return usageAdd(pack.context)
+                return savedMessage(pack.context, provider)
             }
 
             override fun args(): IntArray? {
@@ -67,6 +80,37 @@ class search : ParamCommand() {
                     pack.context.getString(R.string.command_search_search_provider_removed_1f35a, stripParam(name))
                 else
                     pack.context.getString(R.string.command_search_search_provider_not_found_7169f, stripParam(name))
+            }
+
+            override fun args(): IntArray? {
+                return intArrayOf(CommandAbstraction.TEXTLIST)
+            }
+        },
+        app {
+            override fun exec(pack: ExecutePack): String? {
+                val args = pack.getList<String?>()
+                val usage = pack.context.getString(R.string.command_search_usage_search_app)
+                if (args.size < 2) return usage
+
+                val provider = SearchProviderManager.get(args.get(0))
+                    ?: return pack.context.getString(R.string.command_search_search_provider_not_found_7169f, stripParam(args.get(0)))
+                val appName = Tuils.toPlanString(args.subList(1, args.size), Tuils.SPACE)
+
+                if (AUTO.equals(appName.trim(), ignoreCase = true)) {
+                    SearchProviderManager.setApp(provider.name, null)
+                    return pack.context.getString(R.string.command_search_provider_app_auto, provider.name)
+                }
+
+                val app = when (val match = matchApp(pack, appName)) {
+                    is AppMatch.Found -> match.app
+                    is AppMatch.Problem -> return match.message
+                }
+                SearchProviderManager.setApp(provider.name, app)
+                return pack.context.getString(
+                    R.string.command_search_provider_app_set,
+                    provider.name,
+                    appDisplayName(pack.context, app)
+                )
             }
 
             override fun args(): IntArray? {
@@ -262,27 +306,119 @@ class search : ParamCommand() {
             context: Context
         ): String {
             try {
-                start(provider.render(query), context)
+                if (start(provider.render(query), provider.app, context)) return Tuils.EMPTYSTRING
             } catch (firstError: Exception) {
-                val fallback = provider.renderFallback(query)
-                if (fallback == null) {
-                    return firstError.toString()
-                }
-
-                try {
-                    start(fallback, context)
-                } catch (secondError: Exception) {
-                    return secondError.toString()
-                }
+                if (provider.fallbackTemplate == null) return firstError.toString()
             }
 
-            return Tuils.EMPTYSTRING
+            val fallback = provider.renderFallback(query)
+                ?: return context.getString(R.string.command_search_provider_unavailable, provider.name)
+            try {
+                if (start(fallback, provider.app, context)) return Tuils.EMPTYSTRING
+            } catch (secondError: Exception) {
+                return secondError.toString()
+            }
+            return context.getString(R.string.command_search_provider_unavailable, provider.name)
         }
 
-        private fun start(rendered: String?, context: Context) {
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(rendered))
+        /**
+         * Opens [rendered] in the pinned app, else the one app that can open it, else the browser.
+         * Returns false when nothing can handle it, so the caller can try the fallback template.
+         */
+        private fun start(rendered: String, app: String?, context: Context): Boolean {
+            val pm = context.packageManager
+            val intents = if (rendered.startsWith(SearchProviderManager.WEB_SEARCH)) {
+                val webSearch = Intent(Intent.ACTION_WEB_SEARCH)
+                    .putExtra(SearchManager.QUERY, rendered.substring(SearchProviderManager.WEB_SEARCH.length))
+                // Unpinned web searches would show a chooser; let the fallback URL run instead.
+                if (app == null || app == SearchProviderManager.BROWSER) emptyList()
+                else listOf(webSearch.setPackage(app))
+            } else {
+                val view = Intent(Intent.ACTION_VIEW, Uri.parse(rendered))
+                val target = when (app) {
+                    null -> SearchProviderManager.detectedApp(context, rendered)
+                    SearchProviderManager.BROWSER -> SearchProviderManager.defaultBrowser(context)
+                    else -> app
+                }
+                listOfNotNull(target?.let { Intent(view).setPackage(it) }, view)
+            }
+
+            val intent = intents.firstOrNull { it.resolveActivity(pm) != null } ?: return false
             context.startActivity(intent)
+            return true
         }
+
+        private sealed class AppMatch {
+            class Found(val app: String) : AppMatch()
+            class Problem(val message: String) : AppMatch()
+        }
+
+        /** Resolves a typed app name (or "browser") to a package, so users never type packages. */
+        private fun matchApp(pack: ExecutePack, typed: String): AppMatch {
+            val name = typed.trim()
+            if (SearchProviderManager.BROWSER.equals(name, ignoreCase = true)) {
+                return AppMatch.Found(SearchProviderManager.BROWSER)
+            }
+
+            val apps = (pack as? MainPack)?.appsManager?.shownApps().orEmpty()
+                .filter { it.publicLabel != null && it.componentName != null }
+            val exact = apps.filter { it.publicLabel.equals(name, ignoreCase = true) }
+            val matches = exact.ifEmpty {
+                apps.filter { it.publicLabel!!.startsWith(name, ignoreCase = true) }
+            }.ifEmpty {
+                apps.filter { it.publicLabel!!.contains(name, ignoreCase = true) }
+            }.distinctBy { it.componentName!!.packageName }
+
+            return when (matches.size) {
+                1 -> AppMatch.Found(matches[0].componentName!!.packageName)
+                0 -> AppMatch.Problem(pack.context.getString(R.string.command_search_app_not_found, name))
+                else -> AppMatch.Problem(
+                    pack.context.getString(
+                        R.string.command_search_app_ambiguous,
+                        name,
+                        matches.joinToString(", ") { it.publicLabel!! }
+                    )
+                )
+            }
+        }
+
+        private fun savedMessage(context: Context, provider: SearchProviderManager.Provider): String {
+            provider.app?.let {
+                return context.getString(R.string.command_search_provider_saved_app, provider.name, appDisplayName(context, it))
+            }
+            val apps = SearchProviderManager.appsFor(context, provider.render("test"))
+            return when (apps.size) {
+                0 -> context.getString(R.string.command_search_provider_saved_browser, provider.name)
+                1 -> context.getString(R.string.command_search_provider_saved_app, provider.name, appDisplayName(context, apps[0]))
+                else -> context.getString(
+                    R.string.command_search_provider_saved_several,
+                    provider.name,
+                    apps.joinToString(", ") { appDisplayName(context, it) }
+                )
+            }
+        }
+
+        private fun appDisplayName(context: Context, app: String): String =
+            if (app == SearchProviderManager.BROWSER) context.getString(R.string.command_search_your_browser)
+            else SearchProviderManager.appLabel(context, app) ?: context.getString(R.string.command_search_app_not_installed, app)
+
+        /** Where a provider opens on this phone, for -ls. */
+        private fun opensIn(context: Context, provider: SearchProviderManager.Provider): String {
+            val app = provider.app
+                ?: SearchProviderManager.detectedApp(context, provider.render("test"))
+                ?: return context.getString(R.string.command_search_your_browser)
+            return appDisplayName(context, app)
+        }
+
+        /** Candidate apps for a provider's link, used by suggestions after "search -app [provider]". */
+        internal fun appChoices(context: Context, providerName: String?): List<String> {
+            val provider = SearchProviderManager.get(providerName) ?: return emptyList()
+            return SearchProviderManager.appsFor(context, provider.render("test"))
+                .mapNotNull { SearchProviderManager.appLabel(context, it) }
+        }
+
+        private const val APP_FLAG = "-app"
+        internal const val AUTO = "auto"
 
         private fun listProviders(context: android.content.Context): String {
             val providers = SearchProviderManager.load()
@@ -298,6 +434,7 @@ class search : ParamCommand() {
                 if (provider.fallbackTemplate != null) {
                     output.append(" => ").append(provider.fallbackTemplate)
                 }
+                output.append(context.getString(R.string.command_search_opens_in, opensIn(context, provider)))
             }
 
             return output.toString()

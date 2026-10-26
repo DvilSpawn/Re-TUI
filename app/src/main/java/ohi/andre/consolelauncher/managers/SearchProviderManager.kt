@@ -1,5 +1,8 @@
 package ohi.andre.consolelauncher.managers
 
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import ohi.andre.consolelauncher.tuils.Tuils
 import java.io.BufferedReader
@@ -15,6 +18,20 @@ object SearchProviderManager {
     private const val ASSIGN = "="
     private const val FALLBACK = "=>"
     private const val COMMENT = "#"
+    private const val APP_PREFIX = "@"
+
+    /** Template prefix that sends Android's web search request instead of opening a URL. */
+    const val WEB_SEARCH = "websearch:"
+
+    /** Pinned app value that always opens the provider in the default browser. */
+    const val BROWSER = "browser"
+
+    /** Written once the version 2 defaults have been merged into an existing file. */
+    internal const val DEFAULTS_MARKER = "# defaults: 2"
+
+    private const val GOOGLE_APP = "com.google.android.googlequicksearchbox"
+    private const val LEGACY_GOOGLE = "https://www.google.com/search?q={query}"
+    private const val PROBE_URL = "https://www.example.com/"
 
     fun get(name: String?): Provider? {
         val normalized = normalizeName(name)
@@ -31,27 +48,32 @@ object SearchProviderManager {
 
     fun load(): MutableList<Provider> {
         ensureFile()
-        val providers: MutableList<Provider> = ArrayList<Provider>()
+        val lines = ArrayList<String>()
 
         try {
             val reader = BufferedReader(FileReader(file()))
             var line: String?
             while ((reader.readLine().also { line = it }) != null) {
-                val provider = parse(line)
-                if (provider != null) providers.add(provider)
+                lines.add(line!!)
             }
             reader.close()
         } catch (e: Exception) {
             Tuils.log(e)
         }
 
+        val providers = lines.mapNotNullTo(ArrayList<Provider>()) { parse(it) }
+        if (lines.none { it.trim() == DEFAULTS_MARKER }) {
+            val upgraded = upgradeDefaults(providers)
+            write(upgraded)
+            return upgraded
+        }
         return providers
     }
 
     @JvmOverloads
-    fun add(name: String?, template: String, fallbackTemplate: String? = null): Boolean {
+    fun add(name: String?, template: String, fallbackTemplate: String? = null, app: String? = null): Boolean {
         val normalized = normalizeName(name)
-        if (normalized == null || !validTemplate(template)) {
+        if (normalized == null || !validTemplate(template) || !validApp(app)) {
             return false
         }
 
@@ -62,7 +84,21 @@ object SearchProviderManager {
             }
         }
 
-        providers.add(Provider(normalized, template.trim { it <= ' ' }, clean(fallbackTemplate)))
+        providers.add(Provider(normalized, template.trim { it <= ' ' }, clean(fallbackTemplate), clean(app)))
+        return write(providers)
+    }
+
+    /** Pins [app] (a package or [BROWSER]) to a provider; null returns it to automatic detection. */
+    fun setApp(name: String?, app: String?): Boolean {
+        val normalized = normalizeName(name) ?: return false
+        if (!validApp(app)) return false
+
+        val providers = load()
+        val index = providers.indexOfFirst { it.name.equals(normalized, ignoreCase = true) }
+        if (index < 0) return false
+
+        val provider = providers[index]
+        providers[index] = Provider(provider.name, provider.template, provider.fallbackTemplate, clean(app))
         return write(providers)
     }
 
@@ -102,6 +138,45 @@ object SearchProviderManager {
         return labels
     }
 
+    /** Installed apps, other than browsers, that can open [url]. */
+    fun appsFor(context: Context, url: String): List<String> {
+        if (url.startsWith(WEB_SEARCH)) return emptyList()
+        val uri = Uri.parse(url)
+        if (uri.scheme == null) return emptyList()
+
+        val browsers = handlers(context, Uri.parse(PROBE_URL))
+        return handlers(context, uri).filter { it !in browsers && it != context.packageName }
+    }
+
+    /** The app a URL opens in when nothing is pinned: the only non-browser app that can open it. */
+    fun detectedApp(context: Context, url: String): String? = appsFor(context, url).singleOrNull()
+
+    /** The user's default browser, or null when Android would ask. */
+    fun defaultBrowser(context: Context): String? {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(PROBE_URL)).addCategory(Intent.CATEGORY_BROWSABLE)
+        val resolved = context.packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY)
+            ?.activityInfo?.packageName ?: return null
+        return if (resolved == "android" || resolved.contains("resolver")) null else resolved
+    }
+
+    fun appLabel(context: Context, packageName: String): String? = try {
+        val pm = context.packageManager
+        pm.getApplicationLabel(pm.getApplicationInfo(packageName, 0)).toString()
+    } catch (e: PackageManager.NameNotFoundException) {
+        null
+    }
+
+    private fun handlers(context: Context, uri: Uri): Set<String> {
+        val intent = Intent(Intent.ACTION_VIEW, uri).addCategory(Intent.CATEGORY_BROWSABLE)
+        return try {
+            context.packageManager.queryIntentActivities(intent, PackageManager.MATCH_ALL)
+                .mapTo(LinkedHashSet()) { it.activityInfo.packageName }
+        } catch (e: Exception) {
+            Tuils.log(e)
+            emptySet()
+        }
+    }
+
     private fun ensureFile() {
         try {
             val file = file()
@@ -113,7 +188,7 @@ object SearchProviderManager {
         }
     }
 
-    private fun parse(rawLine: String?): Provider? {
+    internal fun parse(rawLine: String?): Provider? {
         if (rawLine == null) return null
 
         val line = rawLine.trim { it <= ' ' }
@@ -125,6 +200,15 @@ object SearchProviderManager {
         val name = normalizeName(pair[0])
         var value = pair[1]!!.trim { it <= ' ' }
         var fallback: String? = null
+        var app: String? = null
+
+        if (value.startsWith(APP_PREFIX)) {
+            val end = value.indexOfFirst { it.isWhitespace() }
+            if (end < 0) return null
+            app = value.substring(APP_PREFIX.length, end)
+            value = value.substring(end).trim { it <= ' ' }
+            if (!validApp(app)) return null
+        }
 
         val fallbackIndex = value.indexOf(FALLBACK)
         if (fallbackIndex >= 0) {
@@ -136,8 +220,35 @@ object SearchProviderManager {
             return null
         }
 
-        return Provider(name, value, clean(fallback))
+        return Provider(name, value, clean(fallback), app)
     }
+
+    internal fun serialize(provider: Provider): String {
+        val builder = StringBuilder(provider.name).append(ASSIGN)
+        if (provider.app != null) builder.append(APP_PREFIX).append(provider.app).append(' ')
+        builder.append(provider.template)
+        if (provider.fallbackTemplate != null) {
+            builder.append(' ').append(FALLBACK).append(' ').append(provider.fallbackTemplate)
+        }
+        return builder.toString()
+    }
+
+    /**
+     * Brings a pre-version-2 file up to date once: an untouched Google provider switches to the
+     * Google app, and providers new in version 2 are added unless the name is already taken.
+     */
+    internal fun upgradeDefaults(providers: MutableList<Provider>): MutableList<Provider> {
+        val upgraded = providers.mapTo(ArrayList<Provider>()) { provider ->
+            if (provider.name == "gg" && provider.template == LEGACY_GOOGLE &&
+                provider.fallbackTemplate == null && provider.app == null
+            ) googleProvider() else provider
+        }
+        val names = upgraded.mapTo(HashSet()) { it.name }
+        defaultProviders().filter { it.name in ADDED_IN_V2 && it.name !in names }.forEach(upgraded::add)
+        return upgraded
+    }
+
+    private val ADDED_IN_V2 = setOf("mp", "wp", "rd", "gh", "tr", "ym")
 
     private fun normalizeName(name: String?): String? {
         var name = name
@@ -159,6 +270,11 @@ object SearchProviderManager {
         }
 
         return name
+    }
+
+    private fun validApp(app: String?): Boolean {
+        val value = clean(app) ?: return true
+        return value == BROWSER || value.matches(Regex("[A-Za-z][A-Za-z0-9_]*(\\.[A-Za-z0-9_]+)+"))
     }
 
     private fun validTemplate(template: String?): Boolean {
@@ -192,18 +308,16 @@ object SearchProviderManager {
             writer.newLine()
             writer.write("# Optional fallback: name=primary_template => fallback_template")
             writer.newLine()
+            writer.write("# Optional app: name=@package url_template (or @browser). Without it, the one app that can open the link is used.")
+            writer.newLine()
             writer.write("# Tokens: {query}=URL encoded, {query+}=plus encoded, {slug}=spaces_to_underscores, {raw}=unchanged, {url}=open URL")
             writer.newLine()
+            writer.write("# websearch:{raw} sends a web search to the app instead of opening a URL")
+            writer.newLine()
+            writer.write(DEFAULTS_MARKER)
+            writer.newLine()
             for (provider in providers) {
-                writer.write(provider.name)
-                writer.write(ASSIGN)
-                writer.write(provider.template)
-                if (provider.fallbackTemplate != null) {
-                    writer.write(" ")
-                    writer.write(FALLBACK)
-                    writer.write(" ")
-                    writer.write(provider.fallbackTemplate)
-                }
+                writer.write(serialize(provider))
                 writer.newLine()
             }
             writer.close()
@@ -214,9 +328,12 @@ object SearchProviderManager {
         }
     }
 
-    private fun defaultProviders(): MutableList<Provider> {
+    private fun googleProvider() =
+        Provider("gg", WEB_SEARCH + "{raw}", LEGACY_GOOGLE, GOOGLE_APP)
+
+    internal fun defaultProviders(): MutableList<Provider> {
         val providers: MutableList<Provider> = ArrayList<Provider>()
-        providers.add(Provider("gg", "https://www.google.com/search?q={query}", null))
+        providers.add(googleProvider())
         providers.add(
             Provider(
                 "ps",
@@ -227,10 +344,22 @@ object SearchProviderManager {
         providers.add(Provider("yt", "https://www.youtube.com/results?search_query={query+}", null))
         providers.add(Provider("dd", "https://duckduckgo.com/?q={query}", null))
         providers.add(Provider("u", "{url}", null))
+        providers.add(Provider("mp", "https://www.google.com/maps/search/?api=1&query={query}", null))
+        providers.add(Provider("wp", "https://en.wikipedia.org/w/index.php?search={query}", null))
+        providers.add(Provider("rd", "https://www.reddit.com/search/?q={query}", null))
+        providers.add(Provider("gh", "https://github.com/search?q={query}", null))
+        providers.add(Provider("tr", "https://translate.google.com/?sl=auto&text={query}", null))
+        providers.add(Provider("ym", "https://music.youtube.com/search?q={query}", null))
         return providers
     }
 
-    class Provider(val name: String, val template: String, val fallbackTemplate: String?) {
+    class Provider @JvmOverloads constructor(
+        val name: String,
+        val template: String,
+        val fallbackTemplate: String?,
+        /** A package, [BROWSER], or null to detect the app from the link. */
+        val app: String? = null
+    ) {
         fun render(query: String?): String {
             return renderTemplate(template, query)
         }
