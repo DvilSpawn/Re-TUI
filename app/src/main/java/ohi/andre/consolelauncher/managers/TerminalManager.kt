@@ -423,7 +423,11 @@ class TerminalManager(
 
     private fun writeToView(text: CharSequence?) {
         mTerminalView!!.post(Runnable {
-            mTerminalView!!.append(text)
+            val view = mTerminalView ?: return@Runnable
+            view.append(text)
+            // Unlimited output (max_lines -1) let notifications pile up spans until drawing caused ANRs.
+            val cut = overflowStart(view.text, if (maxLines > 0) maxLines else OUTPUT_LINE_CAP)
+            if (cut > 0) view.editableText?.delete(0, cut)
             scrollToEnd()
         })
     }
@@ -625,6 +629,19 @@ class TerminalManager(
         const val CATEGORY_NO_COLOR: Int = 20
 
         var NO_COLOR: Int = Int.Companion.MAX_VALUE
+
+        /** Lines kept when max_lines is unlimited; each output line carries several spans. */
+        internal const val OUTPUT_LINE_CAP = 1000
+
+        /** Start of the text that keeps only the last [maxLines] lines, or 0 when nothing needs trimming. */
+        internal fun overflowStart(text: CharSequence, maxLines: Int): Int {
+            var newlines = 0
+            for (index in text.length - 1 downTo 0) {
+                // Output lines start with a newline, so one at index 0 leaves nothing to trim.
+                if (text[index] == '\n' && ++newlines == maxLines) return if (index > 0) index + 1 else 0
+            }
+            return 0
+        }
 
         const val FORMAT_INPUT: String = "%i"
         const val FORMAT_OUTPUT: String = "%o"
