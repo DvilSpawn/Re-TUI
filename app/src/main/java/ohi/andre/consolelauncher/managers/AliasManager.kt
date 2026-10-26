@@ -158,6 +158,8 @@ class AliasManager(private val context: Context) {
                 }
             }
         }
+        LocalBroadcastManager.getInstance(context.getApplicationContext())
+            .registerReceiver(receiver, filter)
 
         paramMarker = XMLPrefsManager.get(Behavior.alias_param_marker) ?: Tuils.EMPTYSTRING
         parameterPattern = Pattern.compile(Pattern.quote(paramMarker))
