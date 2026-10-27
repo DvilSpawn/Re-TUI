@@ -12622,6 +12622,9 @@ class UIManager(
                     ohi.andre.consolelauncher.managers.suggestions.SuggestionChipStyler.styleDraft(view, it, next, old)
                 }
                 ohi.andre.consolelauncher.presentation.ModuleContentPresentation.styleDraft(view, next, old)
+                // Module dock buttons draw their own frame, so presets must restyle them too.
+                if (view.getTag(R.id.home_dock_binding) is Boolean)
+                    ohi.andre.consolelauncher.managers.modules.ModuleDockButtonFactory.styleDraft(view, next)
             }
             if (view is ViewGroup) for (index in 0 until view.childCount) style(view.getChildAt(index))
         }
