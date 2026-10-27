@@ -43,6 +43,7 @@ import ohi.andre.consolelauncher.commands.main.specific.ParamCommand
 import ohi.andre.consolelauncher.commands.main.specific.PermanentSuggestionCommand
 import ohi.andre.consolelauncher.managers.AliasManager
 import ohi.andre.consolelauncher.managers.AppFinder
+import ohi.andre.consolelauncher.managers.WebSearchFallback
 import ohi.andre.consolelauncher.managers.AppsManager
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings
 import ohi.andre.consolelauncher.managers.AppsManager.Group.GroupLaunchInfo
@@ -1092,6 +1093,13 @@ class SuggestionsManager(
         val fullInput = (beforeLastSpace + Tuils.SPACE + lastWord).trim().lowercase(Locale.getDefault())
         if (suggestSearchApps(suggestionList, beforeLastSpace, lastWord)) {
             return suggestionList
+        }
+        // A phrase waiting for confirmation gets a chip that runs the search.
+        WebSearchFallback.pending?.let { query ->
+            if ((beforeLastSpace + Tuils.SPACE + lastWord).trim() == query) {
+                comparator.noInput = false
+                suggestionList.add(Suggestion(null, "search $query", true, Suggestion.TYPE_COMMAND))
+            }
         }
         if (beforeLastSpace.equals("mode", true)) {
             comparator.noInput = false

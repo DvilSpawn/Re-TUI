@@ -37,6 +37,11 @@ import ohi.andre.consolelauncher.managers.settings.MusicSettings.enabled
 import ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceLauncherManager
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.options.Behavior
+import ohi.andre.consolelauncher.managers.xml.options.Cmd
+import ohi.andre.consolelauncher.managers.SearchProviderManager
+import ohi.andre.consolelauncher.managers.WebSearchFallback
+import ohi.andre.consolelauncher.commands.main.raw.search
+import ohi.andre.consolelauncher.managers.suggestions.SuggestionsManager
 import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.tuils.PrivateIOReceiver
 import ohi.andre.consolelauncher.tuils.StoppableThread
@@ -217,6 +222,7 @@ class MainManager(private val mContext: LauncherActivity) {
         for (c in cmds.indices) {
             mainPack.clear()
             mainPack.commandColor = colors[c]
+            WebSearchFallback.cancelUnless(cmds[c] ?: Tuils.EMPTYSTRING)
 
             for (trigger in triggers) {
                 val r: Boolean
@@ -556,6 +562,28 @@ class MainManager(private val mContext: LauncherActivity) {
         }
     }
 
+    /** Asks before searching unrecognised phrases with the default provider; Enter again confirms. */
+    private fun offerWebSearch(query: String) {
+        val provider = SearchProviderManager.get(XMLPrefsManager.get(Cmd.default_search))
+            ?: SearchProviderManager.get("gg")
+        if (provider == null) {
+            Tuils.sendOutput(mContext, mContext.getString(R.string.output_commandnotfound), TerminalManager.CATEGORY_OUTPUT)
+            return
+        }
+        if (WebSearchFallback.confirm(query)) {
+            val error = search.openProvider(provider, query, mContext)
+            if (error.isNotEmpty()) Tuils.sendOutput(mContext, error, TerminalManager.CATEGORY_OUTPUT)
+            return
+        }
+        Tuils.sendOutput(
+            mContext,
+            mContext.getString(R.string.output_web_search_prompt, query, SuggestionsManager.providerTitle(provider.name)),
+            TerminalManager.CATEGORY_OUTPUT
+        )
+        // Put the phrase back so Enter confirms and editing it cancels.
+        mContext.runOnUiThread { mContext.uiManager?.setInput(query) }
+    }
+
     private inner class ShellCommandTrigger : CmdTrigger {
         @Throws(Exception::class)
         override fun trigger(info: MainPack?, input: String?): Boolean {
@@ -574,7 +602,13 @@ class MainManager(private val mContext: LauncherActivity) {
                 return true
             }
 
-            if (XMLPrefsManager.getBoolean(Behavior.shell_requires_prefix)) {
+            val shellWithoutPrefix = !XMLPrefsManager.getBoolean(Behavior.shell_requires_prefix)
+            if (WebSearchFallback.looksLikeSearch(trimmed, shellWithoutPrefix)) {
+                offerWebSearch(trimmed)
+                return true
+            }
+
+            if (!shellWithoutPrefix) {
                 LauncherSoundManager.play(mContext, LauncherSoundManager.Event.ERROR)
                 Tuils.sendOutput(
                     mContext,

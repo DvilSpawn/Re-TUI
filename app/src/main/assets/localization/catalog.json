@@ -12881,6 +12881,13 @@
     },
     "type": "string"
   },
+  "output_web_search_prompt": {
+    "formatted": true,
+    "forms": {
+      "other": "\"%1$s\" isn't a command. Press Enter again to search %2$s, or edit it to cancel."
+    },
+    "type": "string"
+  },
   "output_wifi": {
     "formatted": true,
     "forms": {

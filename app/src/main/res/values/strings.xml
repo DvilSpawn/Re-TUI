@@ -137,6 +137,7 @@
 
     <!-- command/args -->
     <string name="output_commandnotfound">Command not found.\nTry to use \"$ help\" or \"$ tutorial\"</string>
+    <string name="output_web_search_prompt">\"%1$s\" isn\'t a command. Press Enter again to search %2$s, or edit it to cancel.</string>
     <string name="output_invalid_param">Invalid option:</string>
 
     <!-- flash -->
