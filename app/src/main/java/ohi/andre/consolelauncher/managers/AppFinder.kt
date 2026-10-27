@@ -33,9 +33,44 @@ object AppFinder {
     }
 
     /**
+     * Everyday app types Android has no category for: words people type, and package fragments
+     * that usually mean that type. Fragments of three letters or fewer must be a whole package segment.
+     */
+    private val TYPE_HINTS: List<Pair<List<String>, List<String>>> = listOf(
+        listOf("bank", "banking", "finance", "money", "pay", "payments", "upi", "wallet", "loan", "invest", "stocks", "trading") to
+            listOf("bank", "pay", "upi", "wallet", "finance", "money", "paisa", "phonepe", "paytm", "loan", "credit", "invest", "trading", "wealth", "stock"),
+        listOf("shop", "shopping", "store", "buy") to
+            listOf("shop", "store", "cart", "mall", "amazon", "flipkart", "myntra", "meesho", "ebay"),
+        listOf("food", "delivery", "restaurant", "eat", "grocery", "groceries") to
+            listOf("food", "swiggy", "zomato", "eats", "grocery", "blinkit", "zepto", "bigbasket", "dominos"),
+        listOf("taxi", "cab", "ride", "rides") to
+            listOf("cab", "cabs", "taxi", "ride", "uber", "olacabs", "rapido", "lyft"),
+        listOf("travel", "flight", "flights", "hotel", "hotels", "train", "trains") to
+            listOf("travel", "flight", "hotel", "trip", "irctc", "booking", "airbnb", "makemytrip", "goibibo"),
+        listOf("mail", "email") to
+            listOf("mail", "gm", "outlook", "proton"),
+        listOf("browser", "web", "internet") to
+            listOf("browser", "chrome", "firefox", "brave", "opera", "comet", "duckduckgo", "edge"),
+        listOf("health", "fitness", "workout", "medicine") to
+            listOf("health", "fit", "workout", "medic", "pharm")
+    )
+
+    internal fun matchesTypeHint(packageName: String?, query: String): Boolean {
+        val q = query.trim().lowercase(Locale.getDefault())
+        if (q.length < MIN_KEYWORD_QUERY || packageName.isNullOrEmpty()) return false
+        val segments = packageName.lowercase(Locale.ROOT).split('.')
+        return TYPE_HINTS.any { (words, fragments) ->
+            words.any { it.startsWith(q) } && fragments.any { fragment ->
+                if (fragment.length <= 3) segments.any { it == fragment }
+                else segments.any { it.contains(fragment) }
+            }
+        }
+    }
+
+    /**
      * How well [query] matches an app, lower is better, or null when it doesn't match:
      * 0 label starts with it, 1 a label word starts with it, 2 label contains it,
-     * 3 package contains it, 4 the app's category matches it.
+     * 3 package contains it, 4 the app's category or type matches it.
      */
     internal fun rank(label: String?, packageName: String?, categoryWords: String, query: String): Int? {
         val q = query.trim().lowercase(Locale.getDefault())
@@ -47,6 +82,7 @@ object AppFinder {
         if (q.length < MIN_KEYWORD_QUERY) return null
         if (packageName.orEmpty().lowercase(Locale.ROOT).contains(q)) return 3
         if (categoryWords.split(' ').any { it.startsWith(q) }) return 4
+        if (matchesTypeHint(packageName, q)) return 4
         return null
     }
 

@@ -33,4 +33,19 @@ class AppFinderTest {
         assertEquals(0, AppFinder.rank("YouTube Music", "com.google.android.apps.youtube.music", "", "  YOU "))
         assertEquals(1, AppFinder.rank("YouTube Music", "com.google.android.apps.youtube.music", "", "Mus"))
     }
+
+    @Test fun bankFindsBankNamesAndPaymentAppsWithoutACategory() {
+        // Name and package matches rank first, then apps of the same type.
+        assertEquals(1, AppFinder.rank("HDFC Bank", "com.hdfcbank.android.now", "", "bank"))
+        assertEquals(3, AppFinder.rank("iMobile", "com.csam.icici.bank.imobile", "", "bank"))
+        assertEquals(4, AppFinder.rank("PhonePe", "com.phonepe.app", "", "bank"))
+        assertEquals(4, AppFinder.rank("Google Pay", "com.google.android.apps.nbu.paisa.user", "", "bank"))
+        assertNull(AppFinder.rank("Swiggy", "in.swiggy.android", "", "bank"))
+    }
+
+    @Test fun shortTypeFragmentsMustBeWholePackageSegments() {
+        assertEquals(4, AppFinder.rank("Gmail", "com.google.android.gm", "", "email"))
+        assertNull(AppFinder.rank("Play services", "com.google.android.gms", "", "email"))
+        assertEquals(4, AppFinder.rank("Ola", "com.olacabs.customer", "", "taxi"))
+    }
 }

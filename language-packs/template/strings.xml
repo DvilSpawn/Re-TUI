@@ -5972,7 +5972,8 @@ Ready for the next command</string>
     <string name="ui_android_widget_drawer_run">RUN</string>
     <string name="ui_android_widget_drawer_widgets_0">Widgets/ [0]</string>
     <string name="ui_apps_drawer_applications_s">Applications/ [s]</string>
-    <string name="ui_apps_drawer_filter_hint">&gt; find: name or what it does (music, maps, camera)</string>
+    <string name="ui_apps_drawer_filter_clear">Clear search</string>
+    <string name="ui_apps_drawer_filter_hint">find app or type</string>
     <string name="ui_apps_drawer_total_0">total 0 [~]</string>
     <string name="ui_base_view_android_widgets">Android widgets</string>
     <string name="ui_base_view_termux_workspace">Termux workspace</string>

@@ -24170,10 +24170,17 @@
     },
     "type": "string"
   },
+  "ui_apps_drawer_filter_clear": {
+    "formatted": false,
+    "forms": {
+      "other": "Clear search"
+    },
+    "type": "string"
+  },
   "ui_apps_drawer_filter_hint": {
     "formatted": false,
     "forms": {
-      "other": "> find: name or what it does (music, maps, camera)"
+      "other": "find app or type"
     },
     "type": "string"
   },

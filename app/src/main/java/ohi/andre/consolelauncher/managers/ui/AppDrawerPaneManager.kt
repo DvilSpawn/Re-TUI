@@ -15,6 +15,7 @@ import android.widget.AbsListView
 import android.widget.AdapterView
 import android.widget.BaseAdapter
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.RelativeLayout
@@ -57,7 +58,10 @@ class AppDrawerPaneManager(
     private val alphaTabs: LinearLayout? = rootView.findViewById(R.id.apps_alpha_tabs)
     private val header: TextView? = rootView.findViewById(R.id.apps_drawer_header)
     private val footer: TextView? = rootView.findViewById(R.id.apps_drawer_footer)
+    private val filterBox: View? = rootView.findViewById(R.id.apps_drawer_filter_box)
     private val filterInput: EditText? = rootView.findViewById(R.id.apps_drawer_filter)
+    private val filterIcon: ImageView? = rootView.findViewById(R.id.apps_drawer_filter_icon)
+    private val filterClear: ImageView? = rootView.findViewById(R.id.apps_drawer_filter_clear)
     private var filter = Tuils.EMPTYSTRING
     private var colors: IntArray? = null
     private var adapter: AppsDrawerAdapter? = null
@@ -125,6 +129,19 @@ class AppDrawerPaneManager(
             input.setTextColor(drawerColor)
             input.setHintTextColor(ThemeColorResolver.color(Theme.field_hint_color))
         }
+        // A framed box with a search glyph, so the field reads as search rather than loose text.
+        filterBox?.background = TerminalBorderRuntime.panelDrawable(
+            context,
+            headerBackgroundColor,
+            borderColor,
+            1f,
+            moduleCornerRadius(),
+            dashedBorders(),
+            cyberdeckNotch = false,
+            target = FrameTarget.APP_DRAWER
+        )
+        filterIcon?.setColorFilter(drawerColor)
+        filterClear?.setColorFilter(drawerColor)
         colors = intArrayOf(drawerColor, borderColor, backgroundColor)
 
         val drawerPanel = drawerContainer ?: drawerRoot.findViewById(R.id.apps_drawer_container)
@@ -206,10 +223,18 @@ class AppDrawerPaneManager(
 
     private fun configureFilter() {
         val input = filterInput ?: return
+        filterClear?.setOnClickListener { input.setText(Tuils.EMPTYSTRING) }
+        // Tapping anywhere in the box focuses the field and opens the keyboard.
+        filterBox?.setOnClickListener {
+            input.requestFocus()
+            (context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager)
+                ?.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT)
+        }
         input.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
+                filterClear?.visibility = if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
                 val next = s?.toString()?.trim().orEmpty()
                 if (next == filter) return
                 filter = next

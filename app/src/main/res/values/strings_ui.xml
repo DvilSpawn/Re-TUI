@@ -20,7 +20,9 @@
     <!-- layout/apps_drawer.xml: android:text -->
     <string name="ui_apps_drawer_total_0" formatted="false">"total 0 [~]"</string>
     <!-- layout/apps_drawer.xml: android:hint -->
-    <string name="ui_apps_drawer_filter_hint" formatted="false">"&gt; find: name or what it does (music, maps, camera)"</string>
+    <string name="ui_apps_drawer_filter_hint" formatted="false">"find app or type"</string>
+    <!-- layout/apps_drawer.xml: android:contentDescription -->
+    <string name="ui_apps_drawer_filter_clear" formatted="false">"Clear search"</string>
     <!-- layout/base_view.xml: android:contentDescription -->
     <string name="ui_base_view_android_widgets" formatted="false">"Android widgets"</string>
     <!-- layout/base_view.xml: android:contentDescription -->
