@@ -18,14 +18,79 @@ if [ "$mode" = fetch ]; then
     android=$(getprop ro.build.version.release 2>/dev/null || true)
     kernel=$(uname -r)
     arch=$(uname -m)
-    skull='     .-========-.
-    /  .----.    \
-   |  /      \   |
-   |  | () () |  |
-    \  \ /\ /  /
-     |  ||||  |
-     \__||||__/
-       RE:TUI'
+    # A terminal icon spinning about its vertical axis, drawn as 20x22 pixel art with two
+    # pixels per cell. o outline, k body, w prompt, s the edge seen while it turns. The back
+    # is the face mirrored without its prompt. All 12 frames are worked out once, here.
+    icon='..oooooooooooooooo..
+.okkkkkkkkkkkkkkkko.
+okkkkkkkkkkkkkkkkkko
+okkkkkkkkkkkkkkkkkko
+okkwwkkkkkkkkkkkkkko
+okkkwwkkkkkkkkkkkkko
+okkkkwwkkkkkkkkkkkko
+okkkkkwwkkkkkkkkkkko
+okkkkwwkkkkkkkkkkkko
+okkkwwkkkkkkkkkkkkko
+okkwwkkkkkkkkkkkkkko
+okkkkkkkkwwwwwwkkkko
+okkkkkkkkwwwwwwkkkko
+okkkkkkkkkkkkkkkkkko
+okkkkkkkkkkkkkkkkkko
+okkkkkkkkkkkkkkkkkko
+.okkkkkkkkkkkkkkkko.
+..oooooooooooooooo..'
+    frames=()
+    frame_text=
+    while IFS= read -r line; do
+        if [ "$line" = '--' ]; then frames+=("$frame_text"); frame_text=; else frame_text+="$line"$'\n'; fi
+    done < <(printf '%s\n' "$icon" | awk -v n=12 '
+        { face[NR-1]=$0 }
+        END {
+            c["o"]=37; c["k"]=30; c["w"]=97; c["s"]=90; up="\342\226\200"; down="\342\226\204"
+            for (f=0; f<n; f++) {
+                a=2*3.14159265*f/n; co=cos(a); si=sin(a); ac=(co<0?-co:co); as=(si<0?-si:si)
+                half=10*ac; t=2.5*as; side=(co*si<0?1:-1)
+                for (y=0; y<22; y++) for (x=0; x<20; x++) px[y,x]="."
+                for (y=0; y<18; y++) for (x=0; x<20; x++) {
+                    d=x+0.5-10; ch="."
+                    if (ac>0.02 && (d<0?-d:d)<half) {
+                        u=int(d/ac+10); if (co<0) u=19-u
+                        ch=substr(face[y],u+1,1); if (co<0 && ch=="w") ch="k"
+                    } else if (y>=1 && y<=16 && ((side>0 && d>=half && d<half+t) || (side<0 && d>=-half-t && d<-half))) ch="s"
+                    px[y+2,x]=ch
+                }
+                for (y=0; y<22; y+=2) {
+                    line=""
+                    for (x=0; x<20; x++) {
+                        t2=px[y,x]; b=px[y+1,x]
+                        if (t2=="." && b==".") line=line "\033[0m "
+                        else if (b==".") line=line "\033[0;" c[t2] "m" up
+                        else if (t2==".") line=line "\033[0;" c[b] "m" down
+                        else line=line "\033[0;" c[t2] ";" (c[b]+10) "m" up
+                    }
+                    print line "\033[0m"
+                }
+                print "--"
+            }
+        }')
+    frame=0
+    esc=$'\033'
+    # draw_fetch <rows>: one frame of the spin beside (or above) the details, built without
+    # spawning processes since it runs five times a second.
+    draw_fetch() {
+        local art_rows=() lines=() i screen=
+        while IFS= read -r i; do art_rows+=("$i"); done <<< "${frames[frame % ${#frames[@]}]%$'\n'}"
+        frame=$((frame+1))
+        if [ "$layout" = side ]; then
+            for ((i=0; i<${#info_rows[@]} || i<${#art_rows[@]}; i++)); do
+                lines+=("${art_rows[i]:-$(printf '%20s' '')}$esc[0;36m  ${info_rows[i]:0:$((width-22))}")
+            done
+        else
+            lines=("${art_rows[@]}" "$esc[0;36m" "${info_rows[@]}")
+        fi
+        for ((i=0; i<${#lines[@]} && i<height; i++)); do screen+="${lines[i]}$esc[K"$'\n'; done
+        printf '%s' "$esc[H$esc[36m$screen$esc[0m$esc[J"
+    }
 fi
 last_fetch=0
 while :; do
@@ -93,26 +158,27 @@ Uptime: ${uptime_text:-unavailable}
 RAM: ${memory:-unavailable}
 Home: ${storage:-unavailable}
 Shell: Bash ${BASH_VERSION%%(*}"
-        if [ "$width" -ge 60 ]; then
-            output=$(paste -d ' ' <(printf '%s\n' "$skull" | awk '{printf "%-20s\n",$0}') <(printf '%s\n' "$info"))
-        elif [ "$height" -ge 20 ]; then
-            output="$skull
-
-$info"
-        else
-            output='   .-======-.
-  /  ()  ()  \
-  \   /\   /
-   \_||||_/
-RE:TUI / Termux'
-            output="$output
-$(date '+%d %b %Y %H:%M:%S')
-Device: ${model:-Android} / ${android:-?}
-Arch: $arch
-RAM: ${memory:-unavailable}
-Home: ${storage:-unavailable}"
-
+        layout=
+        if [ "$width" -ge 46 ] && [ "$height" -ge 11 ]; then
+            layout=side
+        elif [ "$width" -ge 20 ] && [ "$height" -ge 24 ]; then
+            layout=stack
         fi
+        if [ -n "$layout" ]; then
+            info_rows=()
+            while IFS= read -r line; do info_rows+=("$line"); done < <(
+                if [ "$layout" = side ]; then printf '%s\n' "$info"; else printf '%s\n' "$info" | fold -s -w "$width"; fi)
+            # Five frames a second; the details above refresh once a second.
+            for step in 1 2 3 4 5; do
+                draw_fetch
+                [ "${RETUI_WIDGET_ONCE:-0}" = 1 ] && break 2
+                sleep 0.2
+            done
+            last_rendered=
+            continue
+        fi
+        # Too small for the art: the details matter more.
+        output="$info"
     fi
     # Assemble first; never expose a cleared terminal between capture frames.
     rendered=$(printf '%s\n' "$output" | fold -s -w "${width:-40}" | head -n "$height")

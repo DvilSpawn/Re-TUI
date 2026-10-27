@@ -419,6 +419,8 @@
     <!-- showNotificationSettingsPopup -->
     <string name="surface_no_notification_selected_1f0ee" formatted="false">"No notification selected."</string>
     <string name="surface_open_a_notification_first" formatted="false">"Open a notification from the list first."</string>
+    <string name="surface_notification_group_row" formatted="false">"%1$s [%2$d]  %3$s"</string>
+    <string name="surface_notification_group_back" formatted="false">"&lt; %1$s"</string>
     <!-- renderNotificationRows -->
     <string name="surface_no_notifications_273d1" formatted="false">"No notifications."</string>
     <!-- appendTermuxResult -->

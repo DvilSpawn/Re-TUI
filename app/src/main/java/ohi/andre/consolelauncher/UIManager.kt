@@ -120,6 +120,7 @@ import ohi.andre.consolelauncher.managers.modules.ModuleVariableManager
 import ohi.andre.consolelauncher.managers.modules.ReminderManager
 import ohi.andre.consolelauncher.managers.modules.UpcomingEventsManager
 import ohi.andre.consolelauncher.managers.music.MusicService
+import ohi.andre.consolelauncher.managers.notifications.NotificationGroups
 import ohi.andre.consolelauncher.managers.notifications.NotificationManager
 import ohi.andre.consolelauncher.managers.notifications.NotificationService
 import ohi.andre.consolelauncher.managers.notifications.reply.ReplyManager
@@ -311,6 +312,8 @@ class UIManager(
     private var androidWidgetDrawerManager: AndroidWidgetDrawerManager? = null
     private val currentOverlayNotifications = ArrayList<NotificationService.Notification>()
     private var currentNotificationIndex = 0
+    /** The app group whose notifications the list shows, or null for the top-level list. */
+    private var openNotificationGroup: String? = null
     private var notificationReplyFocusKey: String? = null
     private val termuxBuffer = StringBuilder()
     private var notificationCompactForKeyboard = false
@@ -3265,6 +3268,7 @@ class UIManager(
         // Opening the notifications module always starts at the list.
         if (ModuleManager.NOTIFICATIONS == id && ModuleManager.NOTIFICATIONS != activeModule) {
             ModuleManager.notificationExpanded = false
+            openNotificationGroup = null
         }
         activeModule = id
         ModuleManager.setActiveModule(mContext, id)
@@ -12120,18 +12124,39 @@ class UIManager(
             wireNotificationOpen(row, notification)
             rows.addView(row)
         } else {
-            for (i in 0..<maxRows) {
-                val notification = currentOverlayNotifications.get(i)
+            val group = if (listing) openNotificationGroup else null
+            val entries = listedNotificationEntries()
+            if (group != null && !notificationCompactForKeyboard) {
+                // A row back to the full list, alongside the Back key.
+                val back = buildNotificationRow(
+                    mContext.getString(R.string.surface_notification_group_back, entries.first().head.appName ?: entries.first().head.pkg),
+                    widgetTextColor,
+                    widgetBorderColor
+                )
+                back.isClickable = true
+                back.setOnClickListener { collapseNotification() }
+                rows.addView(back)
+            }
+            for (entry in entries.take(if (notificationCompactForKeyboard) 1 else entries.size)) {
+                val notification = entry.head
                 val row = buildNotificationRow(
-                    buildNotificationLine(notification),
+                    when {
+                        entry.isGroup -> buildNotificationGroupLine(entry)
+                        // The back row already names the app.
+                        group != null -> notification.preview.takeUnless { it.isNullOrEmpty() } ?: buildNotificationLine(notification)
+                        else -> buildNotificationLine(notification)
+                    },
                     widgetTextColor,
                     widgetBorderColor
                 )
                 if (listing) {
-                    // Tapping a row expands it; reply and actions live in the expanded view.
+                    // Tapping a group lists its notifications; tapping one expands it, where reply and actions live.
                     row.isClickable = true
                     row.isFocusable = true
-                    row.setOnClickListener { expandNotification(i) }
+                    row.setOnClickListener {
+                        if (entry.isGroup) listNotificationGroup(notification.group)
+                        else expandNotification(currentOverlayNotifications.indexOf(notification))
+                    }
                 } else {
                     wireNotificationOpen(row, notification)
                 }
@@ -12239,10 +12264,11 @@ class UIManager(
             fallback = cleanNotificationValue(notification.text)
         }
 
+        val pages = pageableNotifications()
         val out = StringBuilder()
-        out.append(currentNotificationIndex + 1)
+        out.append(pages.indexOf(notification) + 1)
             .append(" / ")
-            .append(currentOverlayNotifications.size)
+            .append(pages.size)
             .append("    ")
             .append(if (appName != null) appName else mContext.getString(R.string.surface_notification_c18f8))
         if (!TextUtils.isEmpty(title)) {
@@ -12288,6 +12314,33 @@ class UIManager(
         }
         return (if (appName != null) appName else mContext.getString(R.string.surface_notification_c18f8)) + "  " + (if (preview != null) preview else Tuils.EMPTYSTRING)
     }
+
+    private fun buildNotificationGroupLine(entry: NotificationGroups.Entry<NotificationService.Notification>): CharSequence {
+        val head = entry.head
+        val appName = head.appName.takeUnless { it.isNullOrEmpty() } ?: head.pkg
+        // A summary's title is usually the app name again, so its text alone reads better.
+        val preview = (if (head.groupSummary) head.body else head.preview).takeUnless { it.isNullOrEmpty() }
+            ?: head.preview.takeUnless { it.isNullOrEmpty() } ?: head.text.orEmpty()
+        return mContext.getString(R.string.surface_notification_group_row, appName, entry.children.size, preview)
+    }
+
+    private fun notificationEntries() =
+        NotificationGroups.entries(currentOverlayNotifications, { it.group }, { it.groupSummary })
+
+    /** The rows the list shows: the open group's notifications, or the top level. */
+    private fun listedNotificationEntries(): List<NotificationGroups.Entry<NotificationService.Notification>> {
+        val group = openNotificationGroup ?: return notificationEntries()
+        val children = NotificationGroups.children(currentOverlayNotifications, group, { it.group }, { it.groupSummary })
+        if (children.isEmpty()) {
+            // The group dropped below two notifications, so the top level shows what is left.
+            openNotificationGroup = null
+            return notificationEntries()
+        }
+        return children.map { NotificationGroups.Entry(it, emptyList()) }
+    }
+
+    /** What Prev and Next step through from an expanded notification. */
+    private fun pageableNotifications() = NotificationGroups.pageable(listedNotificationEntries())
 
     private fun setNotificationWidgetCompact(rootView: View, compact: Boolean) {
         if (notificationCompactForKeyboard == compact) {
@@ -12404,7 +12457,7 @@ class UIManager(
         if (notificationWidget == null) return
         val replyActive = ModulePromptManager.isNotificationReplyActive(mContext)
         val expanded = ModuleManager.NOTIFICATIONS == activeModule && ModuleManager.notificationExpanded
-        val enabled = expanded && currentOverlayNotifications.size > 1 && !replyActive
+        val enabled = expanded && pageableNotifications().size > 1 && !replyActive
         val clearEnabled = expanded && !replyActive && !TextUtils.isEmpty(currentNotification()?.key)
         val prev = notificationWidget.findViewById<TextView?>(R.id.notification_module_prev)
         val next = notificationWidget.findViewById<TextView?>(R.id.notification_module_next)
@@ -12433,11 +12486,26 @@ class UIManager(
         refreshNotificationModuleView()
     }
 
-    /** Back from an expanded notification returns to the list; false when there is nothing to collapse. */
+    private fun listNotificationGroup(group: String?) {
+        if (group == null) return
+        openNotificationGroup = group
+        refreshNotificationModuleView()
+    }
+
+    /**
+     * Back from an expanded notification returns to the list it came from, and back from a group's
+     * list returns to the top level; false when there is nothing to collapse.
+     */
     fun collapseNotification(): Boolean {
-        if (ModuleManager.NOTIFICATIONS != activeModule || !ModuleManager.notificationExpanded) return false
-        if (ModulePromptManager.isNotificationReplyActive(mContext)) return false
-        ModuleManager.notificationExpanded = false
+        if (ModuleManager.NOTIFICATIONS != activeModule) return false
+        if (ModuleManager.notificationExpanded) {
+            if (ModulePromptManager.isNotificationReplyActive(mContext)) return false
+            ModuleManager.notificationExpanded = false
+        } else if (openNotificationGroup != null) {
+            openNotificationGroup = null
+        } else {
+            return false
+        }
         refreshNotificationModuleView()
         return true
     }
@@ -12448,20 +12516,17 @@ class UIManager(
         return false
     }
 
-    fun nextNotificationPage() {
-        if (!requireExpandedNotification()) return
-        if (currentOverlayNotifications.isEmpty()) return
-        if (ModulePromptManager.isNotificationReplyActive(mContext)) return
-        currentNotificationIndex = (currentNotificationIndex + 1) % currentOverlayNotifications.size
-        refreshNotificationModuleView()
-    }
+    fun nextNotificationPage() = stepNotificationPage(1)
 
-    fun previousNotificationPage() {
+    fun previousNotificationPage() = stepNotificationPage(-1)
+
+    private fun stepNotificationPage(delta: Int) {
         if (!requireExpandedNotification()) return
-        if (currentOverlayNotifications.isEmpty()) return
         if (ModulePromptManager.isNotificationReplyActive(mContext)) return
-        currentNotificationIndex =
-            (currentNotificationIndex - 1 + currentOverlayNotifications.size) % currentOverlayNotifications.size
+        val pages = pageableNotifications()
+        if (pages.isEmpty()) return
+        val at = pages.indexOf(currentNotification()).coerceAtLeast(0)
+        currentNotificationIndex = currentOverlayNotifications.indexOf(pages[(at + delta + pages.size) % pages.size])
         refreshNotificationModuleView()
     }
 
@@ -12504,10 +12569,14 @@ class UIManager(
         }
 
         NotificationService.requestDismiss(mContext, key)
-        currentOverlayNotifications.removeAt(currentNotificationIndex)
+        // Move on to the next notification in the same list, or back to the list after its last one.
+        val pages = pageableNotifications()
+        val at = pages.indexOf(notification)
+        val following = pages.getOrNull(at + 1) ?: pages.getOrNull(at - 1)
+        currentOverlayNotifications.remove(notification)
+        if (following != null) currentNotificationIndex = currentOverlayNotifications.indexOf(following)
         clampNotificationIndex()
-        // Clearing the last one has nothing left to show, so return to the (empty) list.
-        if (currentOverlayNotifications.isEmpty()) ModuleManager.notificationExpanded = false
+        if (following == null) ModuleManager.notificationExpanded = false
         refreshNotificationModuleView()
     }
 

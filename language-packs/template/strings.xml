@@ -5376,6 +5376,8 @@ Use ADD or type podcast add &lt;feed-url&gt;.</string>
     </plurals>
     <string name="surface_notification_c18f8">Notification</string>
     <string name="surface_notification_excluded_from_launcher_panel_18a97">Notification excluded from launcher panel.</string>
+    <string name="surface_notification_group_back">&lt; %1$s</string>
+    <string name="surface_notification_group_row">%1$s [%2$d]  %3$s</string>
     <string name="surface_null_dereferencing_cinematic_stakes_7489a">[NULL] dereferencing cinematic stakes...</string>
     <string name="surface_null_recovering_from_fake_catastrophe_adc60">[NULL] recovering from fake catastrophe...</string>
     <string name="surface_oldest_first_autoplay_d3909">Oldest first autoplay</string>

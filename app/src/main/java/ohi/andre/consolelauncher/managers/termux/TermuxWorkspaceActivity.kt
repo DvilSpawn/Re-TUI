@@ -1030,11 +1030,16 @@ class TermuxWorkspaceActivity : LocalizedActivity() {
         title.setTextColor(color(Theme.workspace_panel_text_color))
         title.background = TerminalBorderRuntime.tabDrawable(this, color(Theme.workspace_header_background_color), FrameTarget.OVERLAYS)
         TerminalBorderRuntime.bind(root.findViewById(R.id.termux_workspace_border), title)
-        panels.forEach { it?.background = panelDrawable(Theme.workspace_output_background_color) }
+        panels.forEach {
+            it?.background = panelDrawable(Theme.workspace_output_background_color)
+            // The terminal grid paints its own cells edge to edge, so the border is drawn above it.
+            it?.foreground = panelDrawable(android.graphics.Color.TRANSPARENT)
+        }
         updateLabels()
         scheduleGeometryCapture()
     }
-    private fun panelDrawable(background: Theme) = TerminalBorderRuntime.panelDrawable(this, color(background), color(Theme.workspace_panel_border_color),
+    private fun panelDrawable(background: Theme) = panelDrawable(color(background))
+    private fun panelDrawable(fill: Int) = TerminalBorderRuntime.panelDrawable(this, fill, color(Theme.workspace_panel_border_color),
         1.2f, AppearanceSettings.outputCornerRadius(), AppearanceSettings.dashedBorders(), target = FrameTarget.OVERLAYS)
     private fun bindChrome(id: Int, drawable: Int, description: Int, action: () -> Unit) {
         root.findViewById<TextView>(id).apply {

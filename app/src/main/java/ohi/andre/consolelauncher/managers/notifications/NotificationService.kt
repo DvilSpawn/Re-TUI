@@ -686,6 +686,8 @@ class NotificationService : NotificationListenerService() {
                             n.preview = buildNotificationPreview(bundle, text)
                             n.title = extractNotificationTitle(bundle)
                             n.body = extractNotificationBody(bundle)
+                            if (currentSbn.isGroup) n.group = currentSbn.groupKey
+                            n.groupSummary = notification.flags and android.app.Notification.FLAG_GROUP_SUMMARY != 0
                             pushOverlayNotification(n)
 
                             s = TextUtils.replace(
@@ -1196,6 +1198,9 @@ class NotificationService : NotificationListenerService() {
         var title: String? = null
         var body: String? = null
         var key: String? = null
+        /** The app's notification group, or null when it posts this one on its own. */
+        var group: String? = null
+        var groupSummary: Boolean = false
         var pendingIntent: PendingIntent?
 
         constructor(time: Long, text: String?, pkg: String?, pi: PendingIntent?, key: String?) {
@@ -1215,6 +1220,8 @@ class NotificationService : NotificationListenerService() {
             title = `in`.readString()
             body = `in`.readString()
             key = `in`.readString()
+            group = `in`.readString()
+            groupSummary = `in`.readInt() != 0
             pendingIntent =
                 `in`.readParcelable<PendingIntent?>(PendingIntent::class.java.getClassLoader())
         }
@@ -1232,6 +1239,8 @@ class NotificationService : NotificationListenerService() {
             dest.writeString(title)
             dest.writeString(body)
             dest.writeString(key)
+            dest.writeString(group)
+            dest.writeInt(if (groupSummary) 1 else 0)
             dest.writeParcelable(pendingIntent, flags)
         }
 

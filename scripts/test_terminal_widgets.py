@@ -40,8 +40,15 @@ class TerminalWidgetsTest(unittest.TestCase):
 
     def test_fetch_has_local_system_information(self):
         result = self.render('fetch', 80)
-        for label in ('RE:TUI', 'Termux', 'Android:', 'Kernel:', 'Arch:', 'RAM:', 'Uptime:', 'Home:', '.-========-.'):
+        for label in ('RE:TUI', 'Termux', 'Android:', 'Kernel:', 'Arch:', 'RAM:', 'Uptime:', 'Home:'):
             self.assertIn(label, result)
+        # The spinning terminal starts face on: half blocks with a white prompt on a black body,
+        # one art row beside each detail line and nothing after the last one.
+        self.assertIn('\u2580', result)
+        self.assertIn('\x1b[0;97;107m', result)
+        self.assertRegex(result, r'\x1b\[0m\x1b\[0;36m  RE:TUI / Termux')
+        self.assertIn('Shell: Bash', result.split('\x1b[K\n')[10])
+        self.assertEqual(11, result.count('\x1b[K\n'))
         self.assertNotIn('Weather', result)
         self.assertRegex(result, r'\d\d:\d\d:\d\d')
 
@@ -49,7 +56,7 @@ class TerminalWidgetsTest(unittest.TestCase):
         result = self.render('fetch', 40)
         self.assertIn('RE:TUI / Termux', result)
         self.assertIn('RAM:', result)
-        self.assertIn('.-======-.', result)
+        self.assertNotIn('\u2580', result, 'A narrow tile shows the details instead of a squeezed skull')
 
     def test_weather_failure_remains_readable(self):
         result = self.render('weather', location="City /? & ' test")

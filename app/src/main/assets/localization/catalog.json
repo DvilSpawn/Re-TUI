@@ -20201,6 +20201,20 @@
     },
     "type": "string"
   },
+  "surface_notification_group_back": {
+    "formatted": false,
+    "forms": {
+      "other": "< %1$s"
+    },
+    "type": "string"
+  },
+  "surface_notification_group_row": {
+    "formatted": false,
+    "forms": {
+      "other": "%1$s [%2$d]  %3$s"
+    },
+    "type": "string"
+  },
   "surface_null_dereferencing_cinematic_stakes_7489a": {
     "formatted": false,
     "forms": {
