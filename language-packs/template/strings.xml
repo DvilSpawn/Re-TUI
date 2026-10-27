@@ -302,7 +302,16 @@ Reopen these notes anytime with the `changelog` command.
 - RE:TUI Keys Shortcuts in Settings now warns when the RE:TUI Keys keyboard app is not installed, since the shortcuts only work there.
 - Fixed a freeze on Home after long sessions: the output pane now keeps the last 1000 lines unless max_lines sets a limit.
 - Terminal mode resize handles and the selected-pane outline are visible again in themes with transparent borders.
-- Aliases created when pinning a shortcut now appear in suggestions right away, without restarting the launcher.</string>
+- Aliases created when pinning a shortcut now appear in suggestions right away, without restarting the launcher.
+
+## Hotfix 3 · Build 603
+
+- Search providers open in their own apps: Google searches open the Google app, and YouTube, Maps and others skip the "Open with" chooser. New providers: -mp Maps, -wp Wikipedia, -rd Reddit, -gh GitHub, -tr Translate and -ym YouTube Music. Choose where a provider opens by app name with search -app.
+- Typing a phrase that isn't a command, such as how tall is everest, now offers a search with your default provider. Press Enter again or tap the chip to search; nothing is sent until you confirm.
+- The app drawer has a search box, and apps -ls [filter] opens it filtered. Find apps by part of the name or by what they do, such as music, maps, bank or taxi.
+- Notifications open as a list. Tap one to expand it, then use Prev, Next, Clear or Reply; Back returns to the list. Replies work for any app that offers them, without reply -bind, and go to that exact conversation.
+- The command input now works properly with keyboards such as fcitx5.
+- Applying a preset now restyles the module dock too.</string>
     <string name="command_bluetooth_false_4603a">%1$s false</string>
     <string name="command_bluetooth_opening_bluetooth_settings_android_no_long_c4672">Opening Bluetooth settings. Android no longer allows third-party launchers to toggle Bluetooth directly.</string>
     <string name="command_bluetooth_true_630fa">%1$s true</string>
