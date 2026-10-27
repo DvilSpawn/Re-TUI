@@ -5371,6 +5371,7 @@ Use ADD or type podcast add &lt;feed-url&gt;.</string>
     <string name="surface_null_recovering_from_fake_catastrophe_adc60">[NULL] recovering from fake catastrophe...</string>
     <string name="surface_oldest_first_autoplay_d3909">Oldest first autoplay</string>
     <string name="surface_oldest_first_da9dd">OLDEST FIRST</string>
+    <string name="surface_open_a_notification_first">Open a notification from the list first.</string>
     <string name="surface_open_launch_the_termux_android_app_1789b">open    -&gt; launch the Termux Android app</string>
     <string name="surface_open_reminder_e9efa">%1$s
 Open: reminder</string>
@@ -5468,7 +5469,7 @@ local commands: :help :refresh :restart :stop :detach :open%3$s</string>
     <string name="surface_select_tmux_window_a51c6">select tmux window: %1$s</string>
     <string name="surface_selected_notification_cannot_be_cleared_20da0">Selected notification cannot be cleared.</string>
     <string name="surface_selected_notification_cannot_be_excluded_5df6b">Selected notification cannot be excluded.</string>
-    <string name="surface_selected_notification_is_not_replyable_bind_the_app_with_r_0cf3e">Selected notification is not replyable. Bind the app with reply -bind first.</string>
+    <string name="surface_selected_notification_is_not_replyable_bind_the_app_with_r_0cf3e">This notification doesn't offer a reply.</string>
     <string name="surface_sent_enter_df691">sent enter</string>
     <string name="surface_sent_faa06">sent: %1$s</string>
     <string name="surface_sent_interrupt_e9bc2">sent interrupt</string>

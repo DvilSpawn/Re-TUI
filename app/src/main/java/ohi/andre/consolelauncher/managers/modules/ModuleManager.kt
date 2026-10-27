@@ -23,6 +23,9 @@ import org.json.JSONObject
 object ModuleManager {
     const val MUSIC: String = "music"
     const val NOTIFICATIONS: String = "notifications"
+
+    /** True while the notifications module shows one notification rather than the list. */
+    @JvmStatic @Volatile var notificationExpanded: Boolean = false
     const val TIMER: String = "timer"
     const val CALENDAR: String = "calendar"
     const val EVENTS: String = "events"
@@ -442,9 +445,12 @@ object ModuleManager {
                 suggestions.addAll(ModulePromptManager.getSuggestions(context))
                 return suggestions
             }
-            suggestions.add(ModuleSuggestion.Companion.command(context.getString(R.string.module_action_prev), "notifications -prev"))
-            suggestions.add(ModuleSuggestion.Companion.command(context.getString(R.string.module_action_next), "notifications -next"))
-            suggestions.add(ModuleSuggestion.Companion.command(context.getString(R.string.module_action_reply), "notifications -reply"))
+            // Paging and reply act on one notification, so they appear once it is expanded.
+            if (notificationExpanded) {
+                suggestions.add(ModuleSuggestion.Companion.command(context.getString(R.string.module_action_prev), "notifications -prev"))
+                suggestions.add(ModuleSuggestion.Companion.command(context.getString(R.string.module_action_next), "notifications -next"))
+                suggestions.add(ModuleSuggestion.Companion.command(context.getString(R.string.module_action_reply), "notifications -reply"))
+            }
             suggestions.add(ModuleSuggestion.Companion.command(context.getString(R.string.module_action_open), "notifications -open"))
             suggestions.add(ModuleSuggestion.Companion.command(context.getString(R.string.module_action_access), "notifications -access"))
             suggestions.add(ModuleSuggestion.Companion.command(context.getString(R.string.module_action_rules), "notifications -ls"))

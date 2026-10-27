@@ -6,6 +6,9 @@ import android.os.Bundle
 
 class NotificationWear {
     @JvmField var app: BoundApp? = null
+    /** The source notification's key and package; replies don't need the app to be bound. */
+    @JvmField var key: String? = null
+    @JvmField var packageName: String? = null
     @JvmField var pendingIntent: PendingIntent? = null
     @JvmField var remoteInputs: Array<RemoteInput>? = null
     @JvmField var bundle: Bundle? = null
@@ -17,7 +20,7 @@ class NotificationWear {
     override fun equals(other: Any?): Boolean {
         return try {
             val wear = other as NotificationWear
-            wear.app!!.packageName == app!!.packageName
+            if (key != null) wear.key == key else wear.packageName == packageName
         } catch (e: Exception) {
             false
         }

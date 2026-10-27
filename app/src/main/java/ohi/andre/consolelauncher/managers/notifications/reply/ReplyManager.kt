@@ -44,7 +44,8 @@ import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager.writeTo
  * Created by francescoandreuzzi on 17/01/2018.
  */
 class ReplyManager(context: Context) : XMLPrefsElement {
-    private var notificationWears: MutableSet<NotificationWear>? = null
+    /** Most recent reply targets by notification key, capped so unbound apps can't grow it forever. */
+    private var notificationWears: MutableMap<String, NotificationWear>? = null
     private var receiver: BroadcastReceiver? = null
 
     private var values: XMLPrefsList? = null
@@ -60,7 +61,7 @@ class ReplyManager(context: Context) : XMLPrefsElement {
     init {
         this.context = context.getApplicationContext()
 
-        notificationWears = HashSet<NotificationWear>()
+        notificationWears = newWearStore()
         values = XMLPrefsList()
 
         instance = WeakReference<ReplyManager?>(this)
@@ -83,6 +84,12 @@ class ReplyManager(context: Context) : XMLPrefsElement {
                     if (intent.getAction() == ACTION) {
                         val app: String? = intent.getStringExtra(ID)
                         val what: String? = intent.getStringExtra(WHAT)
+                        // A module reply names the exact notification, so it works for any app.
+                        val keyed = intent.getStringExtra(KEY)?.let { notificationWears?.get(it) }
+                        if (keyed != null && what != null) {
+                            replyTo(this@ReplyManager.context!!, keyed, what)
+                            return
+                        }
                         Log.i(
                             "RetuiReplyDebug", ("ReplyManager ACTION received id=" + app
                                     + " hasText=" + (what != null))
@@ -222,21 +229,20 @@ class ReplyManager(context: Context) : XMLPrefsElement {
     fun onNotification(notification: StatusBarNotification, text: CharSequence?) {
         if (!enabled) return
 
-        val app: BoundApp? = findApp(notification.getPackageName())
-        if (app == null) return
+        val wears = notificationWears ?: return
+        val w = extractWearNotification(notification) ?: return
+        val key = notification.key ?: return
 
-        val w = extractWearNotification(notification)
-        if (w == null) return
-
-        val old = findNotificationWear(app)
-
+        val old = wears[key]
         if (old != null && (w.pendingIntent == null || w.remoteInputs == null || w.remoteInputs!!.size == 0)) return
-        if (old != null) notificationWears!!.remove(old)
 
         w.text = text
-        w.app = app
+        w.app = findApp(notification.getPackageName())
+        w.key = key
+        w.packageName = notification.getPackageName()
 
-        notificationWears!!.add(w)
+        wears.remove(key)
+        wears[key] = w
     }
 
     private fun replyTo(context: Context, applicationId: Int, what: String?) {
@@ -449,17 +455,27 @@ class ReplyManager(context: Context) : XMLPrefsElement {
     }
 
     private fun findNotificationWear(bapp: BoundApp): NotificationWear? {
-        for (h in notificationWears!!) {
-            if (h.app != null && h.app!!.packageName == bapp.packageName) return h
-        }
-        return null
+        val wears = notificationWears ?: return null
+        return synchronized(wears) { wears.values.lastOrNull { it.packageName == bapp.packageName } }
     }
 
     private fun findNotificationWear(id: Int): NotificationWear? {
-        for (h in notificationWears!!) {
-            if (h.app != null && h.app!!.applicationId == id) return h
-        }
-        return null
+        val app = findApp(id) ?: return null
+        return findNotificationWear(app)
+    }
+
+    // Written by the notification thread and read on the main thread.
+    private fun newWearStore(): MutableMap<String, NotificationWear> =
+        java.util.Collections.synchronizedMap(object : LinkedHashMap<String, NotificationWear>() {
+            override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, NotificationWear>?): Boolean =
+                size > MAX_REPLY_TARGETS
+        })
+
+    /** True when the notification with [key] offers a reply, whether or not its app is bound. */
+    fun canReplyToNotification(key: String?): Boolean {
+        if (!enabled || key == null) return false
+        val wear = notificationWears?.get(key) ?: return false
+        return wear.pendingIntent != null && wear.remoteInputs != null && wear.remoteInputs!!.isNotEmpty()
     }
 
     fun dispose(context: Context) {
@@ -599,6 +615,8 @@ class ReplyManager(context: Context) : XMLPrefsElement {
         var ACTION: String = BuildConfig.APPLICATION_ID + ".reply"
         var ID: String = "id"
         var WHAT: String = "what"
+        var KEY: String = "notification_key"
+        private const val MAX_REPLY_TARGETS = 100
         var ACTION_UPDATE: String = BuildConfig.APPLICATION_ID + ".update"
         var ACTION_LS: String = BuildConfig.APPLICATION_ID + ".lsreplies"
 

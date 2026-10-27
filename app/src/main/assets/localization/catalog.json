@@ -20229,6 +20229,13 @@
     },
     "type": "string"
   },
+  "surface_open_a_notification_first": {
+    "formatted": false,
+    "forms": {
+      "other": "Open a notification from the list first."
+    },
+    "type": "string"
+  },
   "surface_open_launch_the_termux_android_app_1789b": {
     "formatted": false,
     "forms": {
@@ -20883,7 +20890,7 @@
   "surface_selected_notification_is_not_replyable_bind_the_app_with_r_0cf3e": {
     "formatted": false,
     "forms": {
-      "other": "Selected notification is not replyable. Bind the app with reply -bind first."
+      "other": "This notification doesn't offer a reply."
     },
     "type": "string"
   },

@@ -3262,6 +3262,10 @@ class UIManager(
             handler!!.removeCallbacks(eventsRefreshRunnable)
             handler!!.removeCallbacks(luaWidgetTickRunnable)
         }
+        // Opening the notifications module always starts at the list.
+        if (ModuleManager.NOTIFICATIONS == id && ModuleManager.NOTIFICATIONS != activeModule) {
+            ModuleManager.notificationExpanded = false
+        }
         activeModule = id
         ModuleManager.setActiveModule(mContext, id)
         updateModuleDockSelection()
@@ -12061,11 +12065,14 @@ class UIManager(
             previousFocusKey = notificationKey(selected)
         }
 
+        // New notifications must not swap the one being read for another.
+        val expandedKey = if (ModuleManager.notificationExpanded) notificationKey(currentNotification()) else null
         currentOverlayNotifications.clear()
         if (notifications != null) {
             currentOverlayNotifications.addAll(notifications.filterNotNull())
         }
         suggestionsManager?.setSearchNotifications(currentOverlayNotifications)
+        findNotificationIndexByKey(expandedKey).takeIf { it >= 0 }?.let { currentNotificationIndex = it }
         preserveNotificationReplyFocus(previousFocusKey)
         clampNotificationIndex()
 
@@ -12105,7 +12112,8 @@ class UIManager(
             }
             return
         }
-        if (ModuleManager.NOTIFICATIONS == activeModule) {
+        val listing = ModuleManager.NOTIFICATIONS == activeModule && !ModuleManager.notificationExpanded
+        if (ModuleManager.NOTIFICATIONS == activeModule && ModuleManager.notificationExpanded) {
             clampNotificationIndex()
             val notification = currentOverlayNotifications.get(currentNotificationIndex)
             val row = buildNotificationDetailRow(notification, widgetTextColor, widgetBorderColor)
@@ -12119,7 +12127,14 @@ class UIManager(
                     widgetTextColor,
                     widgetBorderColor
                 )
-                wireNotificationOpen(row, notification)
+                if (listing) {
+                    // Tapping a row expands it; reply and actions live in the expanded view.
+                    row.isClickable = true
+                    row.isFocusable = true
+                    row.setOnClickListener { expandNotification(i) }
+                } else {
+                    wireNotificationOpen(row, notification)
+                }
                 rows.addView(row)
             }
         }
@@ -12388,31 +12403,53 @@ class UIManager(
     private fun updateNotificationPagerButtons(notificationWidget: View?) {
         if (notificationWidget == null) return
         val replyActive = ModulePromptManager.isNotificationReplyActive(mContext)
-        val enabled =
-            ModuleManager.NOTIFICATIONS == activeModule && currentOverlayNotifications.size > 1 && !replyActive
-        val clearEnabled =
-            ModuleManager.NOTIFICATIONS == activeModule && !replyActive && !TextUtils.isEmpty(currentNotification()?.key)
+        val expanded = ModuleManager.NOTIFICATIONS == activeModule && ModuleManager.notificationExpanded
+        val enabled = expanded && currentOverlayNotifications.size > 1 && !replyActive
+        val clearEnabled = expanded && !replyActive && !TextUtils.isEmpty(currentNotification()?.key)
         val prev = notificationWidget.findViewById<TextView?>(R.id.notification_module_prev)
         val next = notificationWidget.findViewById<TextView?>(R.id.notification_module_next)
         val clear = notificationWidget.findViewById<TextView?>(R.id.notification_module_clear)
         if (prev != null) {
-            prev.setVisibility(if (ModuleManager.NOTIFICATIONS == activeModule) View.VISIBLE else View.GONE)
+            prev.setVisibility(if (expanded) View.VISIBLE else View.GONE)
             prev.setEnabled(enabled)
             prev.setAlpha(if (enabled) 1f else 0.35f)
         }
         if (next != null) {
-            next.setVisibility(if (ModuleManager.NOTIFICATIONS == activeModule) View.VISIBLE else View.GONE)
+            next.setVisibility(if (expanded) View.VISIBLE else View.GONE)
             next.setEnabled(enabled)
             next.setAlpha(if (enabled) 1f else 0.35f)
         }
         if (clear != null) {
-            clear.setVisibility(if (ModuleManager.NOTIFICATIONS == activeModule) View.VISIBLE else View.GONE)
+            clear.setVisibility(if (expanded) View.VISIBLE else View.GONE)
             clear.setEnabled(clearEnabled)
             clear.setAlpha(if (clearEnabled) 1f else 0.35f)
         }
     }
 
+    fun expandNotification(index: Int) {
+        if (index !in currentOverlayNotifications.indices) return
+        currentNotificationIndex = index
+        ModuleManager.notificationExpanded = true
+        refreshNotificationModuleView()
+    }
+
+    /** Back from an expanded notification returns to the list; false when there is nothing to collapse. */
+    fun collapseNotification(): Boolean {
+        if (ModuleManager.NOTIFICATIONS != activeModule || !ModuleManager.notificationExpanded) return false
+        if (ModulePromptManager.isNotificationReplyActive(mContext)) return false
+        ModuleManager.notificationExpanded = false
+        refreshNotificationModuleView()
+        return true
+    }
+
+    private fun requireExpandedNotification(): Boolean {
+        if (ModuleManager.notificationExpanded) return true
+        Tuils.sendOutput(mContext, mContext.getString(R.string.surface_open_a_notification_first))
+        return false
+    }
+
     fun nextNotificationPage() {
+        if (!requireExpandedNotification()) return
         if (currentOverlayNotifications.isEmpty()) return
         if (ModulePromptManager.isNotificationReplyActive(mContext)) return
         currentNotificationIndex = (currentNotificationIndex + 1) % currentOverlayNotifications.size
@@ -12420,6 +12457,7 @@ class UIManager(
     }
 
     fun previousNotificationPage() {
+        if (!requireExpandedNotification()) return
         if (currentOverlayNotifications.isEmpty()) return
         if (ModulePromptManager.isNotificationReplyActive(mContext)) return
         currentNotificationIndex =
@@ -12428,6 +12466,7 @@ class UIManager(
     }
 
     fun startCurrentNotificationReply() {
+        if (!requireExpandedNotification()) return
         val notification = currentNotification()
         if (notification == null) {
             Tuils.sendOutput(mContext, mContext.getString(R.string.surface_no_notification_selected_1f0ee))
@@ -12444,13 +12483,15 @@ class UIManager(
         ModulePromptManager.startNotificationReply(
             mContext,
             notification.pkg ?: return,
-            notification.appName
+            notification.appName,
+            notification.key
         )
         refreshSuggestionsForActiveModule()
     }
 
     fun dismissCurrentNotification() {
         if (ModulePromptManager.isNotificationReplyActive(mContext)) return
+        if (!requireExpandedNotification()) return
         val notification = currentNotification()
         if (notification == null) {
             Tuils.sendOutput(mContext, mContext.getString(R.string.surface_no_notification_selected_1f0ee))
@@ -12465,6 +12506,8 @@ class UIManager(
         NotificationService.requestDismiss(mContext, key)
         currentOverlayNotifications.removeAt(currentNotificationIndex)
         clampNotificationIndex()
+        // Clearing the last one has nothing left to show, so return to the (empty) list.
+        if (currentOverlayNotifications.isEmpty()) ModuleManager.notificationExpanded = false
         refreshNotificationModuleView()
     }
 
@@ -12502,9 +12545,8 @@ class UIManager(
         get() {
             val notification = currentNotification()
             val replyManager = ReplyManager.getInstance()
-            return notification != null && replyManager != null && replyManager.canReplyTo(
-                notification.pkg
-            )
+            return notification != null && replyManager != null &&
+                (replyManager.canReplyToNotification(notification.key) || replyManager.canReplyTo(notification.pkg))
         }
 
     private fun currentNotification(): NotificationService.Notification? {
@@ -12862,6 +12904,9 @@ class UIManager(
         }
         if (this.isOutputTrayToggleEnabled && terminalTrayExpanded) {
             setTerminalTrayExpanded(false)
+            return
+        }
+        if (collapseNotification()) {
             return
         }
         if (mTerminalAdapter != null) {

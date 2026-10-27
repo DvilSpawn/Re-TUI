@@ -38,6 +38,7 @@ object ModulePromptManager {
     private const val KEY_EDIT_ID = "edit_id"
     private const val KEY_PACKAGE = "package"
     private const val KEY_APP_NAME = "app_name"
+    private const val KEY_NOTIFICATION = "notification_key"
 
     fun isActive(context: Context): Boolean {
         return prefs(context).getBoolean(KEY_ACTIVE, false)
@@ -87,7 +88,8 @@ object ModulePromptManager {
         prompt(context, context.getString(R.string.manager_modulepromptmanager_which_reminder_do_you_want_to_remove_a9614, formatList(context)))
     }
 
-    fun startNotificationReply(context: Context, pkg: String, appName: String?) {
+    @JvmOverloads
+    fun startNotificationReply(context: Context, pkg: String, appName: String?, notificationKey: String? = null) {
         if (TextUtils.isEmpty(pkg)) {
             Tuils.sendOutput(context, context.getString(R.string.manager_modulepromptmanager_no_notification_selected_1f0ee))
             return
@@ -102,6 +104,7 @@ object ModulePromptManager {
             .putString(KEY_STEP, "text")
             .putString(KEY_PACKAGE, pkg)
             .putString(KEY_APP_NAME, label)
+            .putString(KEY_NOTIFICATION, notificationKey)
             .apply()
         prompt(context, context.getString(R.string.manager_modulepromptmanager_reply_to_c030d, label))
     }
@@ -170,6 +173,7 @@ object ModulePromptManager {
         val intent = Intent(ReplyManager.ACTION)
         intent.putExtra(ReplyManager.ID, prefs.getString(KEY_PACKAGE, ""))
         intent.putExtra(ReplyManager.WHAT, value)
+        intent.putExtra(ReplyManager.KEY, prefs.getString(KEY_NOTIFICATION, null))
         Log.i(
             "RetuiReplyDebug", ("module reply input captured pkg="
                     + prefs.getString(KEY_PACKAGE, "")

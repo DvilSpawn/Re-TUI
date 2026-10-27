@@ -418,6 +418,7 @@
     <string name="surface_no_notes_add_notes_add_todo_follow_up_open_editor_notes_3d1ec" formatted="false">"No notes.\nAdd: notes -add TODO: follow up\nOpen editor: notes"</string>
     <!-- showNotificationSettingsPopup -->
     <string name="surface_no_notification_selected_1f0ee" formatted="false">"No notification selected."</string>
+    <string name="surface_open_a_notification_first" formatted="false">"Open a notification from the list first."</string>
     <!-- renderNotificationRows -->
     <string name="surface_no_notifications_273d1" formatted="false">"No notifications."</string>
     <!-- appendTermuxResult -->
@@ -661,7 +662,7 @@
     <!-- excludeNotificationFromPanel -->
     <string name="surface_selected_notification_cannot_be_excluded_5df6b" formatted="false">"Selected notification cannot be excluded."</string>
     <!-- startCurrentNotificationReply -->
-    <string name="surface_selected_notification_is_not_replyable_bind_the_app_with_r_0cf3e" formatted="false">"Selected notification is not replyable. Bind the app with reply -bind first."</string>
+    <string name="surface_selected_notification_is_not_replyable_bind_the_app_with_r_0cf3e" formatted="false">"This notification doesn\'t offer a reply."</string>
     <!-- submitTermuxAppInput -->
     <string name="surface_sent_enter_df691" formatted="false">"sent enter"</string>
     <!-- submitTermuxAppInput -->
