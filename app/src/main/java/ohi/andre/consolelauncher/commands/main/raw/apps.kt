@@ -27,17 +27,18 @@ class apps : ParamCommand() {
             }
 
             override fun exec(pack: ExecutePack): String? {
+                val filter = pack.getString()
                 if (LauncherActivity.instance != null) {
                     LauncherActivity.instance!!.runOnUiThread(Runnable {
                         if (LauncherActivity.instance!!.uiManager != null) {
-                            LauncherActivity.instance!!.uiManager!!.showAppsDrawer()
+                            LauncherActivity.instance!!.uiManager!!.showAppsDrawer(filter)
                         }
                     })
                     return null
                 }
                 return (pack as MainPack).appsManager.printApps(
                     AppsManager.SHOWN_APPS,
-                    pack.getString()
+                    filter
                 )
             }
 

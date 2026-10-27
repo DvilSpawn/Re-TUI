@@ -5716,7 +5716,7 @@ class UIManager(
                 } else if (action == ACTION_UPDATE_APPS) {
                     refreshSuggestionsNow()
                     refreshModuleSuggestionsStrip()
-                    if (isAppsDrawerOpen) showAppsDrawer()
+                    appDrawerPaneManager?.refresh()
                 } else if (action == ACTION_UPDATE_HINT) {
                     mTerminalAdapter!!.setDefaultHint()
                     refreshFileConsole(false)
@@ -12550,9 +12550,10 @@ class UIManager(
         androidWidgetDrawerManager?.hide()
     }
 
-    fun showAppsDrawer() {
+    @JvmOverloads
+    fun showAppsDrawer(filter: String? = null) {
         androidWidgetDrawerManager?.hide()
-        appDrawerPaneManager?.show()
+        appDrawerPaneManager?.show(filter)
         scheduleTypefaceRefreshes()
     }
 

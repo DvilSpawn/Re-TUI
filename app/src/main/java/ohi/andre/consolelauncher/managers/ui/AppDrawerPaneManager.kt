@@ -3,13 +3,18 @@ package ohi.andre.consolelauncher.managers.ui
 import android.content.Context
 import android.graphics.Color
 import android.graphics.Typeface
+import android.text.Editable
 import android.text.TextUtils
+import android.text.TextWatcher
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.AbsListView
 import android.widget.AdapterView
 import android.widget.BaseAdapter
+import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.RelativeLayout
@@ -17,6 +22,7 @@ import android.widget.TextView
 import android.widget.Toast
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.commands.main.MainPack
+import ohi.andre.consolelauncher.managers.AppFinder
 import ohi.andre.consolelauncher.managers.AppsManager
 import ohi.andre.consolelauncher.managers.AppsManager.LaunchInfo
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings.dashedBorders
@@ -51,6 +57,9 @@ class AppDrawerPaneManager(
     private val alphaTabs: LinearLayout? = rootView.findViewById(R.id.apps_alpha_tabs)
     private val header: TextView? = rootView.findViewById(R.id.apps_drawer_header)
     private val footer: TextView? = rootView.findViewById(R.id.apps_drawer_footer)
+    private val filterInput: EditText? = rootView.findViewById(R.id.apps_drawer_filter)
+    private var filter = Tuils.EMPTYSTRING
+    private var colors: IntArray? = null
     private var adapter: AppsDrawerAdapter? = null
     private val entries: MutableList<AppDrawerEntry> = ArrayList()
     private val alphaPositions = LinkedHashMap<String?, Int?>()
@@ -64,6 +73,7 @@ class AppDrawerPaneManager(
         OverlayLayoutManager.captureBaseMargins(drawerContainer, drawerContainerBaseMargins)
         configureInputAnchor()
         drawerRoot?.setOnClickListener { hide() }
+        configureFilter()
     }
 
     val isOpen: Boolean
@@ -71,10 +81,26 @@ class AppDrawerPaneManager(
 
     fun hide() {
         drawerRoot?.visibility = View.GONE
+        hideFilterKeyboard()
         closeSurface()
     }
 
-    fun show() {
+    /** Opens the drawer, optionally narrowed to apps matching [query] (as in `apps -ls cam`). */
+    fun show(query: String? = null) {
+        filter = query?.trim().orEmpty()
+        filterInput?.let { input ->
+            if (input.text.toString() != filter) input.setText(filter)
+            input.setSelection(input.text.length)
+        }
+        showDrawer()
+    }
+
+    /** Rebuilds an open drawer after apps change, keeping the current filter. */
+    fun refresh() {
+        if (isOpen) showDrawer()
+    }
+
+    private fun showDrawer() {
         if (drawerRoot == null || appsList == null || header == null || footer == null) {
             return
         }
@@ -94,6 +120,12 @@ class AppDrawerPaneManager(
         header.typeface = Tuils.getTypeface(context)
         header.setTypeface(header.typeface, Typeface.BOLD)
         footer.typeface = Tuils.getTypeface(context)
+        filterInput?.let { input ->
+            input.typeface = Tuils.getTypeface(context)
+            input.setTextColor(drawerColor)
+            input.setHintTextColor(ThemeColorResolver.color(Theme.field_hint_color))
+        }
+        colors = intArrayOf(drawerColor, borderColor, backgroundColor)
 
         val drawerPanel = drawerContainer ?: drawerRoot.findViewById(R.id.apps_drawer_container)
         drawerPanel?.background = TerminalBorderRuntime.panelDrawable(
@@ -125,14 +157,14 @@ class AppDrawerPaneManager(
                                 R.string.output_app_launch_failed
                             }
                             Toast.makeText(context, message, Toast.LENGTH_LONG).show()
-                            show()
+                            showDrawer()
                         }
                     } else if (entry is PrivateActionEntry) {
                         when (entry.action) {
                             PrivateAction.LOCK -> appsManager.requestPrivateSpaceQuietMode(true)
                             PrivateAction.HIDE -> appsManager.setPrivateSpaceEntrypointVisible(false)
                         }
-                        show()
+                        showDrawer()
                     }
                 }
             appsList.setOnScrollListener(object : AbsListView.OnScrollListener {
@@ -170,6 +202,38 @@ class AppDrawerPaneManager(
             right,
             bottom
         )
+    }
+
+    private fun configureFilter() {
+        val input = filterInput ?: return
+        input.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                val next = s?.toString()?.trim().orEmpty()
+                if (next == filter) return
+                filter = next
+                val appsManager = mainPackProvider()?.appsManager ?: return
+                val c = colors ?: return
+                if (isOpen) rebuildContents(appsManager, c[0], c[1], c[2])
+            }
+        })
+        // Go launches the best match, so "mus" + Enter opens the music app.
+        input.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId != EditorInfo.IME_ACTION_GO && actionId != EditorInfo.IME_ACTION_DONE) return@setOnEditorActionListener false
+            val first = entries.firstOrNull { it is AppEntry } as? AppEntry ?: return@setOnEditorActionListener true
+            val appsManager = mainPackProvider()?.appsManager ?: return@setOnEditorActionListener true
+            if (appsManager.launch(context, first.app)) hide()
+            true
+        }
+    }
+
+    private fun hideFilterKeyboard() {
+        val input = filterInput ?: return
+        if (!input.hasFocus()) return
+        input.clearFocus()
+        (context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager)
+            ?.hideSoftInputFromWindow(input.windowToken, 0)
     }
 
     private fun configureInputAnchor() {
@@ -375,7 +439,12 @@ class AppDrawerPaneManager(
         borderColor: Int,
         backgroundColor: Int
     ) {
-        val visibleApps = if (selectedPrivate) appsManager.privateApps() else getAppsForDrawer(appsManager)
+        val filtering = filter.isNotEmpty() && !selectedPrivate
+        val visibleApps = when {
+            selectedPrivate -> appsManager.privateApps()
+            filtering -> AppFinder.find(context, getAppsForDrawer(appsManager), filter)
+            else -> getAppsForDrawer(appsManager)
+        }
         entries.clear()
         alphaPositions.clear()
         selectedAlpha = null
@@ -387,6 +456,11 @@ class AppDrawerPaneManager(
 
         var currentSection: String? = null
         for (app in visibleApps) {
+            if (filtering) {
+                // Best matches first, without letter sections.
+                entries.add(AppEntry(app))
+                continue
+            }
             val section = sectionForApp(app)
             if (section != currentSection) {
                 alphaPositions[section] = entries.size
@@ -402,6 +476,8 @@ class AppDrawerPaneManager(
         val scope = if (selectedGroup == null) "all" else selectedGroup
         header?.text = if (selectedPrivate) {
             context.getString(R.string.manager_appdrawerpanemanager_private_space_9f6b2, visibleApps.size)
+        } else if (filtering) {
+            context.getString(R.string.manager_appdrawerpanemanager_matching, visibleApps.size, filter)
         } else {
             context.getString(R.string.manager_appdrawerpanemanager_applications_a46d2, visibleApps.size, scope)
         }

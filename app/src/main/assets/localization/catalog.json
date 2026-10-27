@@ -5870,7 +5870,7 @@
   "help_apps": {
     "formatted": true,
     "forms": {
-      "other": "-ls -> open the app drawer, or list visible apps when the drawer is unavailable \n-lsh -> list your hidden apps \n-show [appName] -> re-show an hidden app \n-hide [appName] -> hide an app \n-l [appName] -> show details about an app \n-ps [appName] -> show Google Play Store page for an app \n-st [appName] -> show Settings details for an app \n-default_app [index] [appName or most_used or null] -> set the default_app at the specified index \n-frc [appName] -> force Re:T-UI to launch an app \n-file -> open apps.xml \n-reset [appName] -> reset the \"launched_times\" value of the given app to 0 \n-mkgp [groupName] -> create a new group with the given name \n-rmgp [groupName] -> delete the group with the given name \n-gp_bg_color [groupName] [color] -> set the background color for the given group \n-gp_fore_color [groupName] [color] -> set the text color for the given group \n-addtogp [groupName] [appName] -> add the given app to the given group \n-rmfromgp [groupName] [appName] -> remove the given app from the given group \n-lsgp [OPTIONAL: groupName] -> list your groups, or list the content of the given group \n-tutorial -> open the Apps command guide"
+      "other": "-ls [filter] -> open the app drawer, optionally showing only apps matching a name or what they do (music, maps, camera) \n-lsh -> list your hidden apps \n-show [appName] -> re-show an hidden app \n-hide [appName] -> hide an app \n-l [appName] -> show details about an app \n-ps [appName] -> show Google Play Store page for an app \n-st [appName] -> show Settings details for an app \n-default_app [index] [appName or most_used or null] -> set the default_app at the specified index \n-frc [appName] -> force Re:T-UI to launch an app \n-file -> open apps.xml \n-reset [appName] -> reset the \"launched_times\" value of the given app to 0 \n-mkgp [groupName] -> create a new group with the given name \n-rmgp [groupName] -> delete the group with the given name \n-gp_bg_color [groupName] [color] -> set the background color for the given group \n-gp_fore_color [groupName] [color] -> set the text color for the given group \n-addtogp [groupName] [appName] -> add the given app to the given group \n-rmfromgp [groupName] [appName] -> remove the given app from the given group \n-lsgp [OPTIONAL: groupName] -> list your groups, or list the content of the given group \n-tutorial -> open the Apps command guide"
     },
     "type": "string"
   },
@@ -8629,6 +8629,13 @@
     "formatted": true,
     "forms": {
       "other": "groups %1$d | tabs %2$d"
+    },
+    "type": "string"
+  },
+  "manager_appdrawerpanemanager_matching": {
+    "formatted": true,
+    "forms": {
+      "other": "Applications/ [%1$d] matching \"%2$s\""
     },
     "type": "string"
   },
@@ -24160,6 +24167,13 @@
     "formatted": false,
     "forms": {
       "other": "Applications/ [s]"
+    },
+    "type": "string"
+  },
+  "ui_apps_drawer_filter_hint": {
+    "formatted": false,
+    "forms": {
+      "other": "> find: name or what it does (music, maps, camera)"
     },
     "type": "string"
   },

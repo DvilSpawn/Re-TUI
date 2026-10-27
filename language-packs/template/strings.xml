@@ -1059,7 +1059,7 @@ Timer paused.</string>
 -file -&gt; open alias.txt 
 -tutorial -&gt; open the external GitHub wiki in a browser (network) 
 Home aliases expand before built-in commands; avoid conflicting names. Script aliases execute code through Termux; inspect the script first.</string>
-    <string name="help_apps">-ls -&gt; open the app drawer, or list visible apps when the drawer is unavailable 
+    <string name="help_apps">-ls [filter] -&gt; open the app drawer, optionally showing only apps matching a name or what they do (music, maps, camera) 
 -lsh -&gt; list your hidden apps 
 -show [appName] -&gt; re-show an hidden app 
 -hide [appName] -&gt; hide an app 
@@ -2045,6 +2045,7 @@ Use module -approve </string>
     <string name="manager_appdrawerpanemanager_all_6b428">ALL</string>
     <string name="manager_appdrawerpanemanager_applications_a46d2">Applications/ [%1$d] &lt;%2$s&gt;</string>
     <string name="manager_appdrawerpanemanager_groups_tabs_ef814">groups %1$d | tabs %2$d</string>
+    <string name="manager_appdrawerpanemanager_matching">Applications/ [%1$d] matching "%2$s"</string>
     <string name="manager_appdrawerpanemanager_private_7d5e1">PRI</string>
     <string name="manager_appdrawerpanemanager_private_hide_4d1c2">[ HIDE PRIVATE SPACE ]</string>
     <string name="manager_appdrawerpanemanager_private_lock_6b0f1">[ LOCK PRIVATE SPACE ]</string>
@@ -5971,6 +5972,7 @@ Ready for the next command</string>
     <string name="ui_android_widget_drawer_run">RUN</string>
     <string name="ui_android_widget_drawer_widgets_0">Widgets/ [0]</string>
     <string name="ui_apps_drawer_applications_s">Applications/ [s]</string>
+    <string name="ui_apps_drawer_filter_hint">&gt; find: name or what it does (music, maps, camera)</string>
     <string name="ui_apps_drawer_total_0">total 0 [~]</string>
     <string name="ui_base_view_android_widgets">Android widgets</string>
     <string name="ui_base_view_termux_workspace">Termux workspace</string>

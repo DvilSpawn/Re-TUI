@@ -42,6 +42,7 @@ import ohi.andre.consolelauncher.commands.main.raw.files as FilesCommand
 import ohi.andre.consolelauncher.commands.main.specific.ParamCommand
 import ohi.andre.consolelauncher.commands.main.specific.PermanentSuggestionCommand
 import ohi.andre.consolelauncher.managers.AliasManager
+import ohi.andre.consolelauncher.managers.AppFinder
 import ohi.andre.consolelauncher.managers.AppsManager
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings
 import ohi.andre.consolelauncher.managers.AppsManager.Group.GroupLaunchInfo
@@ -4426,6 +4427,24 @@ class SuggestionsManager(
                         canClickToLaunch && clickToLaunch,
                         Suggestion.Companion.TYPE_APP,
                         if (canClickToLaunch && clickToLaunch) i else null
+                    )
+                )
+            }
+
+            // Then apps found by what they do or their package, e.g. "music" -> Spotify.
+            val suggested = suggestions.mapNotNullTo(HashSet()) { if (it?.type == Suggestion.TYPE_APP) it.text else null }
+            for (app in AppFinder.findByKeyword(pack.context, apps, afterLastSpace)) {
+                if (canInsert == 0) return
+                val label = app.publicLabel ?: continue
+                if (!suggested.add(label)) continue
+                canInsert--
+                suggestions.add(
+                    SuggestionsManager.Suggestion(
+                        beforeLastSpace,
+                        label,
+                        canClickToLaunch && clickToLaunch,
+                        Suggestion.Companion.TYPE_APP,
+                        if (canClickToLaunch && clickToLaunch) app else null
                     )
                 )
             }

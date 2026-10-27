@@ -67,6 +67,8 @@
     <!-- AppDrawerPaneManager.kt: rebuildContents -->
     <string name="manager_appdrawerpanemanager_applications_a46d2">"Applications/ [%1$d] &lt;%2$s&gt;"</string>
     <!-- AppDrawerPaneManager.kt: rebuildContents -->
+    <string name="manager_appdrawerpanemanager_matching">"Applications/ [%1$d] matching \"%2$s\""</string>
+    <!-- AppDrawerPaneManager.kt: rebuildContents -->
     <string name="manager_appdrawerpanemanager_groups_tabs_ef814">"groups %1$d | tabs %2$d"</string>
     <!-- AppsManager.kt: format -->
     <string name="manager_appsmanager_activities_3c20b" formatted="false">"Activities: "</string>

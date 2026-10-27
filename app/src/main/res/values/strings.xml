@@ -318,7 +318,7 @@
         \n-tutorial -> open the external GitHub wiki in a browser (network)
         \nHome aliases expand before built-in commands; avoid conflicting names. Script aliases execute code through Termux; inspect the script first.
     </string>
-    <string name="help_apps">-ls -> open the app drawer, or list visible apps when the drawer is unavailable
+    <string name="help_apps">-ls [filter] -> open the app drawer, optionally showing only apps matching a name or what they do (music, maps, camera)
         \n-lsh -> list your hidden apps
         \n-show [appName] -> re-show an hidden app
         \n-hide [appName] -> hide an app

@@ -28,16 +28,36 @@
         android:background="@drawable/apps_drawer_border"
         android:padding="2dp">
 
+        <EditText
+            android:id="@+id/apps_drawer_filter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="58dp"
+            android:layout_marginTop="18dp"
+            android:layout_marginEnd="42dp"
+            android:background="@null"
+            android:hint="@string/ui_apps_drawer_filter_hint"
+            android:imeOptions="actionGo|flagNoFullscreen"
+            android:importantForAutofill="no"
+            android:inputType="text|textNoSuggestions"
+            android:maxLines="1"
+            android:minHeight="44dp"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            style="@style/Retui.Text.Body"
+            android:fontFamily="monospace" />
+
         <ListView
             android:id="@+id/apps_list"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:divider="@android:color/transparent"
             android:dividerHeight="0dp"
             android:fastScrollEnabled="false"
             android:listSelector="@android:color/transparent"
             android:paddingStart="58dp"
-            android:paddingTop="14dp"
+            android:paddingTop="4dp"
             android:paddingEnd="42dp"
             android:paddingBottom="44dp"
             android:scrollbars="none" />
