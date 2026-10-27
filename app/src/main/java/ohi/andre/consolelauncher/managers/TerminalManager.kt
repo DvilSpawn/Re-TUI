@@ -377,7 +377,8 @@ class TerminalManager(
         this.mInputView = inputView
         HomeChromePresentation.styleTerminalText(this.mInputView!!,appearance,true)
         this.mInputView!!.setHint(Tuils.getHint(mainPack.currentDirectory.getAbsolutePath()))
-        this.mInputView!!.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS)
+        // Without a class the field reports TYPE_NULL, and IMEs such as fcitx5 fall back to raw keys.
+        this.mInputView!!.setInputType(InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS)
         Tuils.setCursorDrawableColor(this.mInputView!!, XMLPrefsManager.getColor(Theme.cursor_color))
         this.mInputView!!.setHighlightColor(Color.TRANSPARENT)
         this.mInputView!!.setOnEditorActionListener(OnEditorActionListener { v1: TextView?, actionId: Int, event: KeyEvent? ->
