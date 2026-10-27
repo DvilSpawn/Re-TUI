@@ -311,7 +311,13 @@ Reopen these notes anytime with the `changelog` command.
 - The app drawer has a search box, and apps -ls [filter] opens it filtered. Find apps by part of the name or by what they do, such as music, maps, bank or taxi.
 - Notifications open as a list. Tap one to expand it, then use Prev, Next, Clear or Reply; Back returns to the list. Replies work for any app that offers them, without reply -bind, and go to that exact conversation.
 - The command input now works properly with keyboards such as fcitx5.
-- Applying a preset now restyles the module dock too.</string>
+- Applying a preset now restyles the module dock too.
+
+## Hotfix 4 · Build 604
+
+- Grouped notifications, such as WhatsApp's "8 messages from 2 chats", now open as a list of their chats. Tap a chat to expand it and reply; Back returns to the group, then to all notifications.
+- The Termux pane border now stays visible over full-screen terminal apps such as Midnight Commander.
+- The Re:TUI Fetch tile shows a spinning pixel-art terminal instead of the ASCII skull. Remove and re-add an existing Fetch tile to see it.</string>
     <string name="command_bluetooth_false_4603a">%1$s false</string>
     <string name="command_bluetooth_opening_bluetooth_settings_android_no_long_c4672">Opening Bluetooth settings. Android no longer allows third-party launchers to toggle Bluetooth directly.</string>
     <string name="command_bluetooth_true_630fa">%1$s true</string>
