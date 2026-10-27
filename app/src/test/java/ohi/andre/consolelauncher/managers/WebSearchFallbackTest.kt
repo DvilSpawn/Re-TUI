@@ -33,16 +33,22 @@ class WebSearchFallbackTest {
     }
 
     @Test fun secondEnterConfirmsAndOtherInputCancels() {
-        assertFalse(WebSearchFallback.confirm("how tall is everest"))
+        assertEquals(WebSearchFallback.Step.ASK, WebSearchFallback.next("how tall is everest", now = 1_000))
         assertEquals("how tall is everest", WebSearchFallback.pending)
-        assertTrue(WebSearchFallback.confirm(" how tall is everest "))
+        assertEquals(WebSearchFallback.Step.SEARCH, WebSearchFallback.next(" how tall is everest ", now = 2_000))
         assertNull(WebSearchFallback.pending)
 
-        assertFalse(WebSearchFallback.confirm("nearest cafe"))
+        assertEquals(WebSearchFallback.Step.ASK, WebSearchFallback.next("nearest cafe", now = 3_000))
         WebSearchFallback.cancelUnless("apps -ls")
         assertNull(WebSearchFallback.pending)
-        assertFalse(WebSearchFallback.confirm("nearest cafe"))
+        assertEquals(WebSearchFallback.Step.ASK, WebSearchFallback.next("nearest cafe", now = 4_000))
         WebSearchFallback.cancelUnless("nearest cafe")
-        assertTrue(WebSearchFallback.confirm("nearest cafe"))
+        assertEquals(WebSearchFallback.Step.SEARCH, WebSearchFallback.next("nearest cafe", now = 5_000))
+    }
+
+    @Test fun anImmediateRepeatDoesNotConfirm() {
+        assertEquals(WebSearchFallback.Step.ASK, WebSearchFallback.next("weather tomorrow", now = 10_000))
+        assertEquals(WebSearchFallback.Step.IGNORE, WebSearchFallback.next("weather tomorrow", now = 10_100))
+        assertEquals(WebSearchFallback.Step.SEARCH, WebSearchFallback.next("weather tomorrow", now = 11_000))
     }
 }

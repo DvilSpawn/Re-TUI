@@ -570,18 +570,23 @@ class MainManager(private val mContext: LauncherActivity) {
             Tuils.sendOutput(mContext, mContext.getString(R.string.output_commandnotfound), TerminalManager.CATEGORY_OUTPUT)
             return
         }
-        if (WebSearchFallback.confirm(query)) {
-            val error = search.openProvider(provider, query, mContext)
-            if (error.isNotEmpty()) Tuils.sendOutput(mContext, error, TerminalManager.CATEGORY_OUTPUT)
-            return
+        when (WebSearchFallback.next(query)) {
+            WebSearchFallback.Step.IGNORE -> return
+            WebSearchFallback.Step.SEARCH -> {
+                val error = search.openProvider(provider, query, mContext)
+                if (error.isNotEmpty()) Tuils.sendOutput(mContext, error, TerminalManager.CATEGORY_OUTPUT)
+                return
+            }
+            WebSearchFallback.Step.ASK -> Unit
         }
         Tuils.sendOutput(
             mContext,
             mContext.getString(R.string.output_web_search_prompt, query, SuggestionsManager.providerTitle(provider.name)),
             TerminalManager.CATEGORY_OUTPUT
         )
-        // Put the phrase back so Enter confirms and editing it cancels.
-        mContext.runOnUiThread { mContext.uiManager?.setInput(query) }
+        // Put the phrase back so Enter confirms and editing it cancels. Post it: commands run before
+        // the input bar is cleared, so setting it now would be wiped straight away.
+        android.os.Handler(android.os.Looper.getMainLooper()).post { mContext.uiManager?.setInput(query) }
     }
 
     private inner class ShellCommandTrigger : CmdTrigger {

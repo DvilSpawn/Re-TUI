@@ -14,9 +14,13 @@ object WebSearchFallback {
         "source", "test", "trap", "type", "ulimit", "umask", "unset", "wait"
     )
 
+    /** A confirmation needs a deliberate second Enter, not a double tap or a doubled key event. */
+    internal const val MIN_CONFIRM_DELAY_MS = 600L
+
     /** The query waiting for confirmation, or null. */
     @Volatile var pending: String? = null
         private set
+    @Volatile private var pendingSince = 0L
 
     /**
      * True when [input] reads like a question or phrase rather than a shell command: two or more
@@ -34,18 +38,22 @@ object WebSearchFallback {
     fun looksLikeSearch(input: String, shellWithoutPrefix: Boolean): Boolean =
         looksLikeSearch(input, shellWithoutPrefix, ::onPath)
 
+    enum class Step { ASK, IGNORE, SEARCH }
+
     /**
-     * Records [input] as pending and returns false the first time; returns true when the same
-     * input is submitted again, which confirms the search.
+     * ASK records [input] as pending the first time, SEARCH confirms when the same input comes
+     * back, and IGNORE drops a repeat that arrives too quickly to be a deliberate second Enter.
      */
-    fun confirm(input: String): Boolean {
+    fun next(input: String, now: Long = System.currentTimeMillis()): Step {
         val query = input.trim()
         if (query == pending) {
+            if (now - pendingSince < MIN_CONFIRM_DELAY_MS) return Step.IGNORE
             pending = null
-            return true
+            return Step.SEARCH
         }
         pending = query
-        return false
+        pendingSince = now
+        return Step.ASK
     }
 
     /** Any other command cancels a pending search. */
