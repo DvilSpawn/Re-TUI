@@ -317,7 +317,14 @@ Reopen these notes anytime with the `changelog` command.
 
 - Grouped notifications, such as WhatsApp's "8 messages from 2 chats", now open as a list of their chats. Tap a chat to expand it and reply; Back returns to the group, then to all notifications.
 - The Termux pane border now stays visible over full-screen terminal apps such as Midnight Commander.
-- The Re:TUI Fetch tile shows a spinning pixel-art terminal instead of the ASCII skull. Remove and re-add an existing Fetch tile to see it.</string>
+- The Re:TUI Fetch tile shows a spinning pixel-art terminal instead of the ASCII skull. Remove and re-add an existing Fetch tile to see it.
+
+## Hotfix 5 · Build 605
+
+- Two new downloadable live wallpapers. Astro Chart is a pixel-art planet and busy station with ships docking and passing. Matrix Rain is falling glyphs in six colour styles; with wallpaper touch on, the rain parts and ripples under your finger. Get them with Get more wallpapers on the wallpaper page.
+- Setting up the launcher for the first time now ends with a short screen that builds it step by step from your choices.
+- In Search mode, a phrase that isn't a command now keeps the "Enter again to search" prompt on screen.
+- wallpaper -auto now recolours the Search and Terminal mode results right away, without a restart.</string>
     <string name="command_bluetooth_false_4603a">%1$s false</string>
     <string name="command_bluetooth_opening_bluetooth_settings_android_no_long_c4672">Opening Bluetooth settings. Android no longer allows third-party launchers to toggle Bluetooth directly.</string>
     <string name="command_bluetooth_true_630fa">%1$s true</string>
