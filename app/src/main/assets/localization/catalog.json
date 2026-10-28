@@ -17777,6 +17777,13 @@
     },
     "type": "string"
   },
+  "settings_preview_title": {
+    "formatted": true,
+    "forms": {
+      "other": "Preview"
+    },
+    "type": "string"
+  },
   "settings_preview_wallpaper_full": {
     "formatted": true,
     "forms": {

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="settings_preview_title">Preview</string>
     <string name="settings_preview_draft">LIVE VALUES · Draft appearance · Save to apply</string>
     <string name="settings_preview_status">Status</string>
     <string name="settings_preview_terminal">Terminal</string>

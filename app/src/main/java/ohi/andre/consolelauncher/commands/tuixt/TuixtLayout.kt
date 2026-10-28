@@ -49,6 +49,29 @@ object TuixtLayout {
         }
     }
 
+    /**
+     * Landscape settings with a live preview: the preview pane on the left and the settings on the right,
+     * split at the fold gutter when one is set. Returns (preview pane, settings pane).
+     */
+    @JvmStatic
+    fun addPreviewSplit(context: Context, screen: FrameLayout): Pair<FrameLayout, FrameLayout> {
+        val split = LinearLayout(context)
+        split.orientation = LinearLayout.HORIZONTAL
+        split.clipChildren = false
+        split.clipToPadding = false
+        screen.addView(split, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
+        val previewPane = createPane(context)
+        val settingsPane = createPane(context)
+        split.addView(previewPane, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1f))
+        split.addView(View(context), LinearLayout.LayoutParams(getLandscapeGutterWidth(context), ViewGroup.LayoutParams.MATCH_PARENT))
+        split.addView(settingsPane, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1f))
+        return previewPane to settingsPane
+    }
+
+    @JvmStatic
+    fun usesPreviewSplit(context: Context): Boolean =
+        UIManager.isResponsiveLandscapeConfiguration(context.resources.configuration)
+
     private fun createPane(context: Context): FrameLayout {
         val pane = FrameLayout(context)
         pane.clipChildren = false

@@ -8800,7 +8800,7 @@ class UIManager(
             fileOutput!!.setText(if (text == null) Tuils.EMPTYSTRING else text)
         }
         if (fileScroll != null) {
-            fileScroll!!.post(Runnable { fileScroll!!.fullScroll(View.FOCUS_UP) })
+            fileScroll!!.post(Runnable { fileScroll!!.scrollTo(0, 0) })
         }
     }
 
@@ -12167,7 +12167,7 @@ class UIManager(
         constrainNotificationContentScroll(scrollView)
 
         if (scrollView != null) {
-            scrollView.post(Runnable { scrollView.fullScroll(View.FOCUS_UP) })
+            scrollView.post(Runnable { scrollView.scrollTo(0, 0) }) // fullScroll would take focus from the input
         }
     }
 

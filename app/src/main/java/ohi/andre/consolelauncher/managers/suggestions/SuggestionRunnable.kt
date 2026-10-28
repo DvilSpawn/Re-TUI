@@ -52,7 +52,7 @@ class SuggestionRunnable(
     private val scrollView: HorizontalScrollView?
     private val scrollRunnable: Runnable = object : Runnable {
         override fun run() {
-            scrollView!!.fullScroll(View.FOCUS_LEFT)
+            scrollView!!.scrollTo(0, 0) // fullScroll would take focus from the input on hardware keyboards
         }
     }
     private var lastSuggestionSignature = ""

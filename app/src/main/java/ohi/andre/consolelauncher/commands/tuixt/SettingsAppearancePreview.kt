@@ -20,24 +20,29 @@ import ohi.andre.consolelauncher.tuils.*
 /**
  * Status, Terminal and Modules are crops of one detached Home scene built by Home's own layout and binders
  * (LauncherHomeSnapshot.createDraft), restyled in place per edit. Help, Calculator and ANSI are samples.
+ * The side-by-side landscape layout adds a first page showing that whole scene.
  */
 internal class SettingsAppearancePreview(
     context: Context,
     private val draft: (XMLPrefsSave) -> String?,
-    private val hasDraft: (XMLPrefsSave) -> Boolean
+    private val hasDraft: (XMLPrefsSave) -> Boolean,
+    wholeHome: Boolean = false
 ) : LinearLayout(context) {
     private var saved = HomeAppearance.saved()
     private var live:LauncherHomeSnapshot?=null
     internal var scene:ViewGroup?=null
         private set
     private val pageLabel=TextView(context)
-    private val pageNames=listOf("Status", "Terminal", "Modules", "Help", "Calculator", "ANSI")
-    private val pageOffsets=IntArray(pageNames.size)
-    private val stale=BooleanArray(pageNames.size)
+    private val pageNames=listOf("Status", "Terminal", "Modules", "Help", "Calculator", "ANSI", "Home")
+    // Pages by kind, an index into pageNames; positions shift when the Home page is shown.
+    private val pageKinds=(if (wholeHome) listOf(HOME) else emptyList()) + (0..5)
+    private var filling=false
+    private val pageOffsets=IntArray(pageKinds.size)
+    private val stale=BooleanArray(pageKinds.size)
     internal val pager = ViewPager2(context)
     private val refreshTask = Runnable { render() }
     private val pages = object : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-        override fun getItemCount() = pageNames.size
+        override fun getItemCount() = pageKinds.size
         override fun onCreateViewHolder(parent: ViewGroup, type: Int): RecyclerView.ViewHolder =
             object : RecyclerView.ViewHolder(ScrollView(context).apply {
                 layoutParams = ViewGroup.LayoutParams(-1, -1)
@@ -55,13 +60,14 @@ internal class SettingsAppearancePreview(
                 setBackgroundColor(ColorUtils.compositeColors(appearance.color(Theme.background_color), Color.BLACK))
             }
             scroll.addView(body, FrameLayout.LayoutParams(-1, -2))
-            if (position <= 2 && scene == null) body.addView(TextView(context).apply {
+            val kind = pageKinds[position]
+            if ((kind <= 2 || kind == HOME) && scene == null) body.addView(TextView(context).apply {
                 text = context.getString(R.string.settings_preview_no_launcher)
                 setTextColor(appearance.color(Theme.output_text_color))
                 typeface = appearance.font(context)
                 setPadding(dp(8), dp(8), dp(8), dp(8))
-            }) else when (position) {
-                0, 1 -> body.addView(ScenePort(position))
+            }) else when (kind) {
+                0, 1, HOME -> body.addView(ScenePort(kind))
                 2 -> if (live?.module != null) body.addView(ScenePort(2)) else {
                     body.setPadding(dp(8), dp(8), dp(8), dp(8))
                     ModulePresentationSnapshot.idleMusic(context).bind(body, appearance)
@@ -89,6 +95,7 @@ internal class SettingsAppearancePreview(
             val area = when (page) {
                 0 -> bounds(root, R.id.header_container) ?: bounds(root, R.id.unified_status_host)
                 1 -> bounds(root, R.id.terminal_tray_container)?.let { android.graphics.Rect(0, it.top, root.width, root.height) }
+                HOME -> full
                 else -> bounds(root, R.id.home_modules_root)
             }
             return area?.takeIf { it.intersect(full) && !it.isEmpty } ?: full
@@ -153,15 +160,23 @@ internal class SettingsAppearancePreview(
     private fun dp(value: Int) = Tuils.dpToPx(context, value)
     fun onSaved() { saved = HomeAppearance.saved(); refresh() }
     fun refresh() { removeCallbacks(refreshTask); postDelayed(refreshTask, 60) }
+    /** Lets the pager take all the height its parent gives it, for the side-by-side landscape layout. */
+    fun fillHeight() {
+        filling = true
+        pager.layoutParams = LayoutParams(-1, 0, 1f)
+    }
     fun setAvailableHeight(height: Int, keyboardVisible: Boolean = false) {
+        if (filling) return
         val desired = dp(if (keyboardVisible || height < dp(500)) 120 else 190)
         if (pager.layoutParams.height != desired) pager.layoutParams = pager.layoutParams.apply { this.height = desired }
     }
     private fun updateLabel(position:Int) {
-        pageLabel.text="${context.getString(if(position==5) R.string.settings_preview_ansi_caption else if(position>=3) R.string.settings_preview_sample_caption else R.string.settings_preview_draft)}\n${context.getString(R.string.settings_preview_page,pageNames[position],position+1,pageNames.size)}"
+        val kind=pageKinds[position]
+        pageLabel.text="${context.getString(if(kind==5) R.string.settings_preview_ansi_caption else if(kind in 3..4) R.string.settings_preview_sample_caption else R.string.settings_preview_draft)}\n${context.getString(R.string.settings_preview_page,pageNames[kind],position+1,pageKinds.size)}"
     }
-    fun selectedPage()=pager.currentItem
-    fun restorePage(position:Int) { pager.setCurrentItem(position.coerceIn(0,pageNames.lastIndex),false) }
+    /** The selected page's kind, so a rotation between layouts keeps the same page. */
+    fun selectedPage()=pageKinds[pager.currentItem]
+    fun restorePage(kind:Int) { pager.setCurrentItem(pageKinds.indexOf(kind).coerceAtLeast(0),false) }
     private fun render() {
         if (pager.scrollState != ViewPager2.SCROLL_STATE_IDLE) {
             removeCallbacks(refreshTask)
@@ -282,4 +297,6 @@ internal class SettingsAppearancePreview(
         if (view is TextView) view.setTextIsSelectable(false)
         if (view is ViewGroup) for (i in 0 until view.childCount) passive(view.getChildAt(i))
     }
+
+    private companion object { const val HOME = 6 }
 }

@@ -75,6 +75,7 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
     private var asciiSettingsMode = false
     private var appearancePreview: SettingsAppearancePreview? = null
     private var previewKeyboardVisible = false
+    private var previewPanelViews: Pair<LinearLayout, TextView>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         requestNoTitleIfFullscreen(this)
@@ -105,7 +106,12 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
             appearancePreview?.setAvailableHeight(view.height, previewKeyboardVisible)
             insets
         }
-        val contentHost = addFoldAwareHost(this, screen, ViewGroup.LayoutParams.MATCH_PARENT)
+        val fileName = file!!.getName().lowercase(Locale.ROOT)
+        val previewRoot = if (asciiSettingsMode) null else XMLPrefsRoot.entries.firstOrNull { fileName == it.path() }
+            ?.takeIf { it == XMLPrefsRoot.UI || it == XMLPrefsRoot.THEME || it == XMLPrefsRoot.BEHAVIOR || it == XMLPrefsRoot.TOOLBAR || it == XMLPrefsRoot.SUGGESTIONS }
+        // In landscape the preview gets its own pane beside the settings instead of a strip above them.
+        val previewSplit = if (previewRoot != null && TuixtLayout.usesPreviewSplit(this)) TuixtLayout.addPreviewSplit(this, screen) else null
+        val contentHost = previewSplit?.second ?: addFoldAwareHost(this, screen, ViewGroup.LayoutParams.MATCH_PARENT)
         val viewport = FrameLayout(this)
         contentHost.addView(viewport, ViewGroup.LayoutParams(-1, -1))
         val surface = layoutInflater.inflate(R.layout.settings_surface, viewport, false)
@@ -217,6 +223,7 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
                 stylePaneScreen(this, screen)
                 stylePanel(this, root)
                 TuixtTheme.stylePaneHeader(this, header)
+                previewPanelViews?.let { (panel, title) -> stylePanel(this, panel); TuixtTheme.stylePaneHeader(this, title) }
                 styleInput(this, searchBox)
                 styleButton(this, btnCancel, false)
                 styleButton(this, btnSave, true)
@@ -229,7 +236,6 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
         root.addView(bottomBar)
 
         // Load data
-        val fileName = file!!.getName().lowercase(Locale.ROOT)
         for (rootEnum in XMLPrefsRoot.entries.toTypedArray()) {
             if (fileName == rootEnum.path()) {
                 xmlRoot = rootEnum
@@ -276,9 +282,12 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
             )
             recyclerView!!.setAdapter(adapter)
             adapter?.restoreDraftState(savedInstanceState?.getBundle("appearance_draft"))
-            if (xmlRoot == XMLPrefsRoot.UI || xmlRoot == XMLPrefsRoot.THEME || xmlRoot == XMLPrefsRoot.BEHAVIOR || xmlRoot == XMLPrefsRoot.TOOLBAR || xmlRoot == XMLPrefsRoot.SUGGESTIONS) {
-                appearancePreview = SettingsAppearancePreview(this, { item -> adapter?.draftValue(item) }, { item -> adapter?.hasDraft(item) == true }).also {
-                    root.addView(it, 0, LinearLayout.LayoutParams(-1, -2))
+            if (previewRoot != null) {
+                appearancePreview = SettingsAppearancePreview(this, { item -> adapter?.draftValue(item) }, { item -> adapter?.hasDraft(item) == true },
+                    wholeHome = previewSplit != null).also {
+                    val previewPanel = previewSplit?.let { split -> addPreviewPanel(split.first) }
+                    if (previewPanel == null) root.addView(it, 0, LinearLayout.LayoutParams(-1, -2))
+                    else { previewPanel.addView(it, LinearLayout.LayoutParams(-1, 0, 1f)); it.fillHeight() }
                     it.restorePage(savedInstanceState?.getInt("appearance_page") ?: 0)
                     it.refresh()
                 }
@@ -334,6 +343,23 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
         }
 
         setContentView(screen)
+    }
+
+    /** The landscape preview pane, framed like the settings panel beside it. */
+    private fun addPreviewPanel(pane: FrameLayout): LinearLayout {
+        val viewport = FrameLayout(this)
+        pane.addView(viewport, ViewGroup.LayoutParams(-1, -1))
+        val surface = layoutInflater.inflate(R.layout.settings_surface, viewport, false)
+        val panel = surface.findViewById<LinearLayout>(R.id.settings_panel)
+        val title = surface.findViewById<TextView>(R.id.settings_header)
+        title.setText(R.string.settings_preview_title)
+        stylePanel(this, panel)
+        TuixtTheme.stylePaneHeader(this, title)
+        viewport.addView(surface, FrameLayout.LayoutParams(-1, -1))
+        ohi.andre.consolelauncher.help.PanelBackdrop.install(viewport)
+        ohi.andre.consolelauncher.tuils.TerminalBorderRuntime.bind(panel, title)
+        previewPanelViews = panel to title
+        return panel
     }
 
     override fun onResume() {

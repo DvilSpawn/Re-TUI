@@ -4999,6 +4999,7 @@ Disabling this option hides Re:TUI access; it does not lock Private Space. Save 
     <string name="settings_preview_status_hidden">Status lines are hidden. Enable one below to preview it.</string>
     <string name="settings_preview_terminal">Terminal</string>
     <string name="settings_preview_terminal_card">TERMINAL</string>
+    <string name="settings_preview_title">Preview</string>
     <string name="settings_preview_wallpaper_full">System wallpaper is shown in the full preview.</string>
     <string name="shortcut_index_greater">The index is greater than the shortcuts count</string>
     <string name="sms_hint">Enter SMS message</string>

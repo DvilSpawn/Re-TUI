@@ -1,7 +1,6 @@
 package ohi.andre.consolelauncher.managers.suggestions
 
 import ohi.andre.consolelauncher.R
-import android.view.View
 import android.widget.HorizontalScrollView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -61,7 +60,8 @@ class SearchModeResultRenderer(
             val prior = previous[type]
             strip.post {
                 if (prior?.signature == signature) strip.scrollTo(prior.scrollX, 0)
-                else strip.fullScroll(View.FOCUS_LEFT)
+                // Not fullScroll: outside touch mode (hardware keyboard) it moves focus to the first chip.
+                else strip.scrollTo(0, 0)
             }
             nextState[type] = RowState(signature, 0, strip)
             card.addView(strip)
