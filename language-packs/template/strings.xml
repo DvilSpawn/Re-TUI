@@ -324,7 +324,12 @@ Reopen these notes anytime with the `changelog` command.
 - Two new downloadable live wallpapers. Astro Chart is a pixel-art planet and busy station with ships docking and passing. Matrix Rain is falling glyphs in six colour styles; with wallpaper touch on, the rain parts and ripples under your finger. Get them with Get more wallpapers on the wallpaper page.
 - Setting up the launcher for the first time now ends with a short screen that builds it step by step from your choices.
 - In Search mode, a phrase that isn't a command now keeps the "Enter again to search" prompt on screen.
-- wallpaper -auto now recolours the Search and Terminal mode results right away, without a restart.</string>
+- wallpaper -auto now recolours the Search and Terminal mode results right away, without a restart.
+
+## Hotfix 6 · Build 606
+
+- Typing on a hardware keyboard now stays in the input. Before, the first key could move focus to a suggestion, so Enter opened that app instead of running what you typed.
+- Settings in landscape show the live preview on the left and the settings on the right. The preview opens on a new Home page that shows your whole Home screen as you edit.</string>
     <string name="command_bluetooth_false_4603a">%1$s false</string>
     <string name="command_bluetooth_opening_bluetooth_settings_android_no_long_c4672">Opening Bluetooth settings. Android no longer allows third-party launchers to toggle Bluetooth directly.</string>
     <string name="command_bluetooth_true_630fa">%1$s true</string>
