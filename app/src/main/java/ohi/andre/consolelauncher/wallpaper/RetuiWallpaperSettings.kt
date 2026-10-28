@@ -17,6 +17,9 @@ object RetuiWallpaperSettings {
     private const val PALETTE = "palette"
     private const val SCENE = "scene"
     private const val CLOUD_SCENE = "cloud_scene"
+    private const val ASTRO_SEED = "astro_seed"
+    private const val MATRIX_STYLE = "matrix_style"
+    private const val MATRIX_GLYPHS = "matrix_glyphs"
     private const val BLACK_HOLE_PALETTE = "black_hole_palette"
     private const val SOLID_COLOR = "solid_color"
     private const val TOPO_OFFSET_X = "topo_offset_x"
@@ -58,6 +61,23 @@ object RetuiWallpaperSettings {
         else -> saved
     }
     fun cloudScene(context: Context): Int = prefs(context).getInt(CLOUD_SCENE, 8).coerceIn(1, 8)
+
+    fun astroSeed(context: Context): Int {
+        val prefs = prefs(context)
+        if (prefs.contains(ASTRO_SEED)) return prefs.getInt(ASTRO_SEED, 0)
+        return Random.nextInt(0, 1 shl 20).also { prefs.edit().putInt(ASTRO_SEED, it).apply() }
+    }
+
+    fun saveAstroSeed(context: Context, seed: Int) {
+        prefs(context).edit().putInt(ASTRO_SEED, seed).apply()
+    }
+
+    fun matrixStyle(context: Context): String = prefs(context).getString(MATRIX_STYLE, "classic") ?: "classic"
+    fun matrixGlyphs(context: Context): String = prefs(context).getString(MATRIX_GLYPHS, "katakana") ?: "katakana"
+
+    fun saveMatrix(context: Context, style: String, glyphs: String) {
+        prefs(context).edit().putString(MATRIX_STYLE, style).putString(MATRIX_GLYPHS, glyphs.lowercase()).apply()
+    }
 
     fun saveCloudScene(context: Context, number: Int) {
         prefs(context).edit().putInt(CLOUD_SCENE, number.coerceIn(1, 8)).apply()

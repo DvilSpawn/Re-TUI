@@ -41,6 +41,8 @@ import ohi.andre.consolelauncher.managers.settings.LauncherSettings
 import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.tuils.CrtOverlayDrawable
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi.applyFullscreen
+import ohi.andre.consolelauncher.wallpaper.astro.AstroChartView
+import ohi.andre.consolelauncher.wallpaper.astro.AstroWorld
 
 class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompatActivity() {
     private lateinit var root: FrameLayout
@@ -63,6 +65,8 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
     private lateinit var topoColorRow: View
     private lateinit var pixelColorRow: View
     private lateinit var settingsPanel: View
+    private lateinit var regrowRow: View
+    private lateinit var regrowButton: Button
     private lateinit var panelParams: FrameLayout.LayoutParams
     private var scene = "csakura"
     private lateinit var nagomiControls: LinearLayout
@@ -163,14 +167,18 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
         tuningControls.add(shape)
 
         val regrow = row()
-        regrow.addView(compactControl(getString(R.string.editor_retuiwallpaperactivity_regenerate_e63ad)) {
+        regrowButton = compactControl(getString(R.string.editor_retuiwallpaperactivity_regenerate_e63ad)) {
             when (val current = preview) {
                 is CsakuraView -> current.regrow()
                 is BlackHoleView -> current.regenerate()
                 is TopoNoiseView -> current.regenerate()
                 is PixelDreamView -> current.regenerate()
+                is AstroChartView -> { current.reseed(); replacePaletteSpinner() }
+                is MatrixRainView -> { current.nextCharSet(); updateSceneControls() }
             }
-        })
+        }
+        regrow.addView(regrowButton)
+        regrowRow = regrow
         panel.addView(regrow)
         tuningControls.add(regrow)
 
@@ -365,6 +373,8 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
             )
             is SolidColorView -> RetuiWallpaperSettings.saveSolidColor(this, hex(current.color))
             is CloudsView -> RetuiWallpaperSettings.saveCloudScene(this, current.sceneNumber)
+            is AstroChartView -> RetuiWallpaperSettings.saveAstroSeed(this, current.seed)
+            is MatrixRainView -> RetuiWallpaperSettings.saveMatrix(this, current.styleName, current.charSet.name)
         }
         sendBroadcast(Intent(RetuiWallpaperService.ACTION_REFRESH).setPackage(packageName))
     }
@@ -390,6 +400,8 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
             PixelDreamView.SCENE -> PixelDreamView(this).apply { loadPosition() }
             "solid" -> SolidColorView(this)
             CloudsView.SCENE -> CloudsView(this)
+            AstroChartView.SCENE -> AstroChartView(this)
+            MatrixRainView.SCENE -> MatrixRainView(this)
             NagomiView.SCENE -> NagomiView(this).apply {
                 pondBackground = nagomiBackground
                 setResumed(resumed)
@@ -441,6 +453,10 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
 
     private fun paletteSpinner(): Spinner = when (val current = preview) {
         is NagomiView -> spinner(listOf("Nagomi"), 0) { }
+        is AstroChartView -> AstroWorld.PALETTES.map { it.name }.let { names ->
+            spinner(names, names.indexOf(current.worldName).coerceAtLeast(0)) { current.showWorld(names.indexOf(it)) }
+        }
+        is MatrixRainView -> spinner(MatrixRainView.STYLE_NAMES, MatrixRainView.STYLE_NAMES.indexOf(current.styleName).coerceAtLeast(0), current::setStyle)
         is CloudsView -> CloudsView.sceneNames(this).let { names ->
             spinner(names, current.sceneNumber - 1) { current.setScene(names.indexOf(it) + 1) }
         }
@@ -474,20 +490,28 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
         applyButton.isEnabled = available
         val clouds = scene == CloudsView.SCENE
         val nagomi = scene == NagomiView.SCENE
+        val astro = scene == AstroChartView.SCENE
+        val matrix = scene == MatrixRainView.SCENE
         nagomiControls.visibility = if (nagomi && available) View.VISIBLE else View.GONE
         colorLabel.visibility = if (nagomi || !available) View.GONE else View.VISIBLE
         colorSpinner.visibility = if (nagomi || !available) View.GONE else View.VISIBLE
-        colorLabel.text = getString(if (clouds) R.string.wallpaper_clouds_scene_label else R.string.editor_retuiwallpaperactivity_color_34171)
-        val visibility = if (!available || scene == "solid" || scene == PixelDreamView.SCENE || clouds || nagomi) View.GONE else View.VISIBLE
+        colorLabel.text = getString(if (clouds) R.string.wallpaper_clouds_scene_label else if (astro) R.string.wallpaper_astro_world_label else if (matrix) R.string.wallpaper_matrix_style_label else R.string.editor_retuiwallpaperactivity_color_34171)
+        val visibility = if (!available || scene == "solid" || scene == PixelDreamView.SCENE || clouds || nagomi || astro || matrix) View.GONE else View.VISIBLE
         positionControls.forEach { it.visibility = visibility }
         tuningControls.forEach { it.visibility = visibility }
+        if ((astro || matrix) && available) regrowRow.visibility = View.VISIBLE  // Astro: a new world; Matrix: the next glyph set
+        regrowButton.text = when {
+            astro -> getString(R.string.wallpaper_astro_reseed)
+            matrix -> getString(R.string.wallpaper_matrix_glyphs, (preview as? MatrixRainView)?.charSet?.name ?: "")
+            else -> getString(R.string.editor_retuiwallpaperactivity_regenerate_e63ad)
+        }
         topoColorRow.visibility = if (scene == TopoNoiseView.SCENE && available) View.VISIBLE else View.GONE
         pixelColorRow.visibility = if (scene == PixelDreamView.SCENE && available) View.VISIBLE else View.GONE
         val zoomVisibility = if (scene == TopoNoiseView.SCENE) View.GONE else View.VISIBLE
         zoomLabel.visibility = zoomVisibility
         zoomMinus.visibility = zoomVisibility
         zoomPlus.visibility = zoomVisibility
-        panelParams.height = if (!available) dp(116) else if (nagomi) ViewGroup.LayoutParams.WRAP_CONTENT else dp(if (clouds) 116 else if (scene == TopoNoiseView.SCENE) 318 else 268)
+        panelParams.height = if (!available) dp(116) else if (nagomi) ViewGroup.LayoutParams.WRAP_CONTENT else dp(if (clouds) 116 else if (astro || matrix) 166 else if (scene == TopoNoiseView.SCENE) 318 else 268)
         settingsPanel.layoutParams = panelParams
         topoColorControls.forEachIndexed { index, button ->
             val topo = preview as? TopoNoiseView ?: return@forEachIndexed
@@ -731,6 +755,7 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
                 TopoNoiseView.SCENE -> getString(R.string.wallpaper_topo_noise)
                 PixelDreamView.SCENE -> getString(R.string.wallpaper_pixel_dream)
                 CloudsView.SCENE -> getString(R.string.wallpaper_clouds)
+                MatrixRainView.SCENE -> getString(R.string.wallpaper_matrix_rain)
                 NagomiView.SCENE -> getString(R.string.nagomi_title)
                 "solid" -> getString(R.string.wallpaper_solid)
                 else -> it

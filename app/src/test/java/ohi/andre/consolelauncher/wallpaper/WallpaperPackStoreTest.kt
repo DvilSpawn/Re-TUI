@@ -35,14 +35,24 @@ class WallpaperPackStoreTest {
             assertFalse(store.installed("clouds"))
         } finally { root.deleteRecursively() }
     }
-    @Test fun catalogueRejectsUnknownIdsExternalPathsDuplicatesAndFutureApis() {
-        fun catalog(id: String = "topo", path: String = "downloads/topo.retui-wallpaper", api: Int = 1, duplicate: Boolean = false): String {
-            val row = """{"id":"$id","api":$api,"name":"Topo","description":"Contours","download":"$path","preview":"previews/topo.gif","sha256":"${"0".repeat(64)}"}"""
-            return """{"schema":1,"wallpapers":[$row${if (duplicate) ",$row" else ""}]}"""
+    @Test fun catalogueSkipsRowsThisBuildCannotUseWithoutDroppingTheRest() {
+        fun row(id: String = "topo", path: String = "downloads/$id.retui-wallpaper", api: Int = 1, extra: String = "") =
+            """{"id":"$id","api":$api,"name":"$id","description":"Contours","download":"$path","preview":"previews/$id.gif","sha256":"${"0".repeat(64)}"$extra}"""
+        fun catalog(vararg rows: String, schema: Int = 2) = """{"schema":$schema,"wallpapers":[${rows.joinToString(",")}]}"""
+        val skipped = listOf(row(id = "future-wallpaper"), row(path = "https://other.example/file"), row(path = "../file"),
+            row(path = "%2e%2e/file"), row(api = 2), """{"id":"topo"}""", "42")
+        for (bad in skipped) {
+            val entries = WallpaperLibrary.parse(catalog(bad, row(id = "clouds")))
+            assertEquals(bad, listOf("clouds"), entries.map { it.id })
         }
-        assertEquals("topo", WallpaperLibrary.parse(catalog()).single().id)
-        val bad = listOf(catalog(id = "untrusted"), catalog(path = "https://other.example/file"), catalog(path = "../file"), catalog(path = "%2e%2e/file"), catalog(api = 2), catalog(duplicate = true))
-        for (text in bad) try { WallpaperLibrary.parse(text); fail(text) } catch (_: IllegalArgumentException) { }
+        // Unknown fields are ignored, and the first usable row per id wins so newer pack apis can sit before a fallback.
+        val entries = WallpaperLibrary.parse(catalog(row(api = 2, path = "downloads/topo-v2.retui-wallpaper"),
+            row(extra = ""","minLauncher":700,"tags":["calm"]"""), row(path = "downloads/duplicate.retui-wallpaper"), row(id = "astro"), row(id = "matrix")))
+        assertEquals(listOf("topo", "astro", "matrix"), entries.map { it.id })
+        assertTrue(entries.first().url.endsWith("/wallpaper-packs/downloads/topo.retui-wallpaper"))
+        for (text in listOf(catalog(row(), schema = 1), catalog(row(), schema = 3), """{"schema":2}""", "[]",
+            catalog(*Array(257) { row() })))
+            try { WallpaperLibrary.parse(text); fail(text) } catch (_: Exception) { }
     }
     @Test fun retainsOnlyVerifiedArchiveAndCancellationPreservesInstalledPack() {
         val root = Files.createTempDirectory("wallpaper-transaction").toFile()

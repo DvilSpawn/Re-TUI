@@ -818,11 +818,7 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
     }
 
     private fun setWallpaperInteractionEnabled(enabled: Boolean) {
-        sendBroadcast(
-            Intent(RetuiWallpaperService.ACTION_INTERACTION)
-                .setPackage(packageName)
-                .putExtra(RetuiWallpaperService.EXTRA_INTERACTION_ENABLED, enabled)
-        )
+        RetuiWallpaperService.setInteraction(this, enabled)
     }
 
     override fun onCreateContextMenu(menu: ContextMenu?, v: View?, menuInfo: ContextMenuInfo?) {

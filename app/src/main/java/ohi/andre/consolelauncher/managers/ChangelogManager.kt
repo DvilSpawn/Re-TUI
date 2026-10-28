@@ -17,6 +17,10 @@ object ChangelogManager {
         prefs.edit().putInt(LAST_SEEN, maxOf(BuildConfig.VERSION_CODE, prefs.getInt(LAST_SEEN, 0))).apply()
     }
 
+    fun markSeenOnFirstRun(context: Context) {
+        if (!context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).contains(LAST_SEEN)) markSeen(context)
+    }
+
     fun maybeOpen(activity: Activity): Boolean {
         val prefs = activity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         val seen = if (prefs.contains(LAST_SEEN)) prefs.getInt(LAST_SEEN, 0) else null

@@ -23,6 +23,7 @@ import ohi.andre.consolelauncher.managers.music.MusicService
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.tuils.CrtOverlayDrawable
+import ohi.andre.consolelauncher.wallpaper.astro.AstroChartView
 
 internal fun shouldScheduleWallpaperFrame(
     visible: Boolean,
@@ -60,6 +61,17 @@ class RetuiWallpaperService : WallpaperService() {
         const val ACTION_TOUCH_INTERACTION = "com.dvil.tui_renewed.action.WALLPAPER_TOUCH_INTERACTION"
         const val EXTRA_INTERACTION_ENABLED = "interaction_enabled"
         const val EXTRA_TOUCH_ENABLED = "touch_enabled"
+
+        /**
+         * The launcher's last interaction state. An engine created after the launcher already has focus
+         * (for example after the app restarts) would otherwise miss the broadcast and stay frozen.
+         */
+        @Volatile private var launcherInteraction = false
+
+        fun setInteraction(context: Context, enabled: Boolean) {
+            launcherInteraction = enabled
+            context.sendBroadcast(Intent(ACTION_INTERACTION).setPackage(context.packageName).putExtra(EXTRA_INTERACTION_ENABLED, enabled))
+        }
     }
 
     override fun onCreate() {
@@ -167,6 +179,7 @@ class RetuiWallpaperService : WallpaperService() {
                 ContextCompat.RECEIVER_NOT_EXPORTED
             )
             receiverRegistered = true
+            interactionEnabled = launcherInteraction
             localBroadcastManager.registerReceiver(
                 mediaReceiver,
                 IntentFilter(MusicService.ACTION_MUSIC_CHANGED)
@@ -177,7 +190,7 @@ class RetuiWallpaperService : WallpaperService() {
 
         override fun onVisibilityChanged(visible: Boolean) {
             this.visible = visible
-            if (!visible) interactionEnabled = false
+            interactionEnabled = visible && launcherInteraction
             updateTouchHandling()
             handler.removeCallbacks(drawFrame)
             if (visible) refreshView(recreate = false)
@@ -187,6 +200,7 @@ class RetuiWallpaperService : WallpaperService() {
             if (!touchAllowed()) return
             val current = view
             if (current is PixelDreamView) current.handleTouch(event)
+            if (current is MatrixRainView) current.handleTouch(event)
         }
 
         @RequiresApi(27)
@@ -196,6 +210,8 @@ class RetuiWallpaperService : WallpaperService() {
             is TopoNoiseView -> current.wallpaperColors()
             is PixelDreamView -> current.wallpaperColors()
             is CloudsView -> current.wallpaperColors()
+            is AstroChartView -> current.wallpaperColors()
+            is MatrixRainView -> current.wallpaperColors()
             else -> (current as SolidColorView).wallpaperColors()
         }
 
@@ -203,6 +219,8 @@ class RetuiWallpaperService : WallpaperService() {
             if (!isPreview) WallpaperPreviewSource.register(this)
             layoutView(width, height)
             (view as? CloudsView)?.resetClock()
+            (view as? AstroChartView)?.resetClock()
+            (view as? MatrixRainView)?.resetClock()
             fullRedrawPending = !draw(fullSurface = true)
             scheduleIfVisible()
         }
@@ -248,6 +266,8 @@ class RetuiWallpaperService : WallpaperService() {
         private fun scheduleIfVisible() {
             handler.removeCallbacks(drawFrame)
             (view as? CloudsView)?.resetClock()
+            (view as? AstroChartView)?.resetClock()  // resume where it paused, without replaying hidden time
+            (view as? MatrixRainView)?.resetClock()
             if (shouldScheduleWallpaperFrame(shouldRender(), fullRedrawPending, isAnimated())) {
                 handler.post(drawFrame)
             }
@@ -269,6 +289,7 @@ class RetuiWallpaperService : WallpaperService() {
         private fun updateTouchHandling() {
             val enabled = touchAllowed() && view is PixelDreamView
             (view as? PixelDreamView)?.setInteractionEnabled(enabled)
+            (view as? MatrixRainView)?.touchEffects = if (touchAllowed()) MatrixRainView.TOUCH_AVOID or MatrixRainView.TOUCH_FLICKER or MatrixRainView.TOUCH_SHOCKWAVE else 0
         }
 
         private fun setInteractionEnabled(enabled: Boolean) {
@@ -307,7 +328,7 @@ class RetuiWallpaperService : WallpaperService() {
                 }
             }
             // Bitmap layers need the same GPU path as the picker; CPU compositing is costly.
-            val hardware = if (current is CloudsView && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val hardware = if ((current is CloudsView || current is AstroChartView || current is MatrixRainView) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 try { surfaceHolder.lockHardwareCanvas() } catch (_: Exception) { null }
             } else null
             val canvas = hardware ?: (try { lockSoftware() } catch (_: Exception) { null }) ?: return false
@@ -317,6 +338,8 @@ class RetuiWallpaperService : WallpaperService() {
                     is CsakuraView -> current.advance()
                     is PixelDreamView -> current.advance()
                     is CloudsView -> current.advance()
+                    is AstroChartView -> current.advance()
+                    is MatrixRainView -> current.advance()
                 }
                 current.draw(canvas)
                 if (AppearanceSettings.crtFilter()) {
@@ -333,6 +356,8 @@ class RetuiWallpaperService : WallpaperService() {
             is BlackHoleView -> BlackHoleView.FRAME_DELAY_MS
             is PixelDreamView -> 50L
             is CloudsView -> CloudsView.FRAME_DELAY_MS
+            is AstroChartView -> AstroChartView.FRAME_DELAY_MS
+            is MatrixRainView -> MatrixRainView.FRAME_DELAY_MS
             else -> 1000L / CsakuraView.FPS
         }
 
@@ -342,6 +367,8 @@ class RetuiWallpaperService : WallpaperService() {
                 is CsakuraView -> current.release()
                 is TopoNoiseView -> current.release()
                 is CloudsView -> current.release()
+                is AstroChartView -> current.release()
+                is MatrixRainView -> current.release()
             }
         }
 
@@ -349,6 +376,8 @@ class RetuiWallpaperService : WallpaperService() {
             "black hole" -> BlackHoleView(this@RetuiWallpaperService).apply { loadPosition() }
             "solid" -> SolidColorView(this@RetuiWallpaperService)
             CloudsView.SCENE -> CloudsView(this@RetuiWallpaperService)
+            AstroChartView.SCENE -> AstroChartView(this@RetuiWallpaperService)
+            MatrixRainView.SCENE -> MatrixRainView(this@RetuiWallpaperService)
             TopoNoiseView.SCENE -> TopoNoiseView(this@RetuiWallpaperService).apply { loadPosition() }
             PixelDreamView.SCENE -> PixelDreamView(this@RetuiWallpaperService).apply {
                 loadPosition()
@@ -361,12 +390,14 @@ class RetuiWallpaperService : WallpaperService() {
             "black hole" -> view is BlackHoleView
             "solid" -> view is SolidColorView
             CloudsView.SCENE -> view is CloudsView
+            AstroChartView.SCENE -> view is AstroChartView
+            MatrixRainView.SCENE -> view is MatrixRainView
             TopoNoiseView.SCENE -> view is TopoNoiseView
             PixelDreamView.SCENE -> view is PixelDreamView
             else -> view is CsakuraView
         }
 
-        private fun isAnimated(): Boolean = view is BlackHoleView || view is CsakuraView || view is PixelDreamView || view is CloudsView
+        private fun isAnimated(): Boolean = view is BlackHoleView || view is CsakuraView || view is PixelDreamView || view is CloudsView || view is AstroChartView || view is MatrixRainView
 
         private fun loadPosition() = when (val current = view) {
             is BlackHoleView -> current.loadPosition()
@@ -374,6 +405,8 @@ class RetuiWallpaperService : WallpaperService() {
             is TopoNoiseView -> current.loadPosition()
             is PixelDreamView -> current.loadPosition()
             is CloudsView -> current.setScene(RetuiWallpaperSettings.cloudScene(this@RetuiWallpaperService))
+            is AstroChartView -> current.loadSeed()
+            is MatrixRainView -> current.loadSettings()
             else -> Unit
         }
     }

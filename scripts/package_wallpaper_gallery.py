@@ -14,7 +14,12 @@ PACKS = [
     ('pixel', 'pixel dream', 'Pixel Dream', 'A sparse pixel field with tap ripples, custom colors and optional music pulses.'),
     ('clouds', 'clouds', 'Clouds', 'Eight layered skies. Pixel clouds drift at different speeds while the stars stay still.'),
     ('nagomi', 'nagomi', 'Nagomi Koi Pond', 'Koi, tiny fish and drifting plants. Pick a pond photo or use the original background.'),
+    ('astro', 'astro chart', 'Astro Chart', 'A pixel-art planet and busy station. Small craft dock and land while freighters cross at different depths.'),
+    ('matrix', 'matrix rain', 'Matrix Rain', 'Falling glyph streams in six colour styles. Touch parts the rain and sends a ripple.'),
 ]
+# catalog.json is read by builds that reject the whole file on any id they do not know, so it stays at these four.
+# New wallpapers go only in catalog-v2.json, which every later build reads and which skips rows it cannot use.
+LEGACY = ('topo', 'pixel', 'clouds', 'nagomi')
 
 
 def prepare(output: Path):
@@ -45,7 +50,8 @@ def prepare(output: Path):
                             preview=f'previews/{ident}.gif', download=f'downloads/{ident}.retui-wallpaper',
                             bytes=target.stat().st_size, sha256=hashlib.sha256(target.read_bytes()).hexdigest()))
         shutil.copy2(gif, output / records[-1]['preview'])
-    (output / 'catalog.json').write_text(json.dumps({'schema': 1, 'wallpapers': records}, indent=2) + '\n')
+    (output / 'catalog.json').write_text(json.dumps({'schema': 1, 'wallpapers': [row for row in records if row['id'] in LEGACY]}, indent=2) + '\n')
+    (output / 'catalog-v2.json').write_text(json.dumps({'schema': 2, 'wallpapers': records}, indent=2) + '\n')
     template = (ROOT / 'wallpaper-packs/gallery/page.html').read_text()
     cards = []
     for item in records:

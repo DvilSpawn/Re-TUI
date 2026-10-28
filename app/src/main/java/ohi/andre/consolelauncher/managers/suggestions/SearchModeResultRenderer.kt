@@ -18,7 +18,9 @@ class SearchModeResultRenderer(
 ) {
     private val context = pack.context
     private val chipStyler = SuggestionChipStyler(pack)
-    private val appearance=HomeAppearance.saved()
+    // Read per render (cached per settings revision) so theme changes reach new cards without a restart.
+    private val appearance get() = HomeAppearance.saved()
+    private var latestOutput: CharSequence? = null
     private var rowState = emptyMap<Int, RowState>()
     private var latestResults = emptyList<SuggestionsManager.SearchResult>()
     private var activeCategoryType: Int? = null
@@ -28,6 +30,7 @@ class SearchModeResultRenderer(
     fun clear() {
         rowState = emptyMap()
         latestResults = emptyList()
+        latestOutput = null
         activeCategoryType = null
         categoryStrip = null
         categoryScrollX = 0
@@ -38,6 +41,7 @@ class SearchModeResultRenderer(
         val previous = currentRowState()
         categoryScrollX = categoryStrip?.scrollX ?: categoryScrollX
         latestResults = results
+        latestOutput = null
         rowState = previous
         container.removeAllViews()
         val groups = groupResults(results)
@@ -81,6 +85,13 @@ class SearchModeResultRenderer(
         card.setTextIsSelectable(true)
         resultCard.addView(card)
         container.addView(resultCard, cardLayoutParams())
+        latestOutput = output
+    }
+
+    /** Redraws what is showing with the current theme, e.g. after wallpaper -auto or a preset. */
+    fun refreshAppearance() {
+        latestOutput?.let { renderOutput(it); return }
+        if (latestResults.isNotEmpty()) render(latestResults)
     }
 
     private fun resultStrip(results: List<SuggestionsManager.SearchResult>) =

@@ -253,7 +253,7 @@ Switch with `mode terminal`. Use `mode classic` or `mode search` to go back.
 - Your home screen becomes a scrolling grid of live Termux terminals, connected through the same local SSH link as the Termux pane.
 - Tap a terminal to type straight into it. Special-key rows (Ctrl, Alt, arrows, function keys) appear above the keyboard.
 - Shells keep running in tmux when you scroll away, leave the launcher or restart it. Each terminal's position, size and session are saved.
-- Add terminals with **+**: a new shell, an existing tmux session, a custom command, or the built-in Clock, Weather, Dashboard and Re:TUI Fetch tiles. Fetch shows system info next to an ASCII skull.
+- Add terminals with **+**: a new shell, an existing tmux session, a custom command, or the built-in Clock, Weather, Dashboard and Re:TUI Fetch tiles. Fetch shows system info next to a spinning pixel-art terminal.
 - Hold a terminal to move, resize, reconnect or remove it. Other terminals move aside while you drag and settle neatly when you let go. Removing a tile leaves its shell running.
 - Search stays at the bottom, styled like Search mode, over a soft blur of your terminals.
 - Terminal mode keeps its sessions separate from the Classic Termux pane.
@@ -5012,17 +5012,23 @@ Disabling this option hides Re:TUI access; it does not lock Private Space. Save 
     <string name="startup_border_preview">This pane previews your border. Choose Dashed to adjust its width and gap.</string>
     <string name="startup_border_stroke">Stroke width: %1$s dp</string>
     <string name="startup_border_summary"> (stroke %1$s dp, gap %2$d dp)</string>
-    <string name="startup_build_apply">&gt; Applying your choices</string>
     <string name="startup_build_button">Build my launcher</string>
-    <string name="startup_build_description">Your choices, written out as we prepare your home screen. This is a configuration illustration, not executable code.</string>
     <string name="startup_build_failed">Setup could not finish. Your choices are saved. Please try again.</string>
+    <string name="startup_build_online">System online</string>
     <string name="startup_build_preview">&gt; Rehearsing setup — no launcher settings changed</string>
-    <string name="startup_build_ready">&gt; Ready. Make yourself at home.</string>
+    <string name="startup_build_stage_borders">Drawing borders</string>
+    <string name="startup_build_stage_choices">Reading your choices</string>
+    <string name="startup_build_stage_effects">Tuning effects</string>
+    <string name="startup_build_stage_features">Enabling features</string>
+    <string name="startup_build_stage_home">Waking home screen</string>
+    <string name="startup_build_stage_settings">Writing settings</string>
+    <string name="startup_build_stage_wallpaper">Sampling wallpaper</string>
     <string name="startup_build_title">Building your launcher</string>
+    <string name="startup_build_welcome">Welcome home</string>
     <string name="startup_choices_reversible">Every choice can be changed later in Settings. Go back now if you want to adjust anything.</string>
     <string name="startup_choose_a_setup_level_review_it_here_then_apply_once">Choose a setup level, review it here, then apply once.</string>
     <string name="startup_classic_base">Classic base</string>
-    <string name="startup_configuration_description">Start with Basic, or choose Advanced for individual feature controls. Nothing changes until you build your launcher on the final page.</string>
+    <string name="startup_configuration_description">Start with Basic, or choose Advanced for individual feature controls.</string>
     <string name="startup_continue">Continue</string>
     <string name="startup_crt">CRT</string>
     <string name="startup_cyberdeck">Cyberdeck</string>
@@ -5041,12 +5047,9 @@ Disabling this option hides Re:TUI access; it does not lock Private Space. Save 
     <string name="startup_intro_launch_title">01 / Type to launch</string>
     <string name="startup_intro_next">Next, choose your setup. Your choices are saved as you go and applied only at the end.</string>
     <string name="startup_intro_tools_body">Type a command, then press Enter:
-
 calc → open the calculator
 help → read the offline manual
-settings → customize your launcher
-
-You can learn more as you go. These three are a good start.</string>
+settings → customize your launcher</string>
     <string name="startup_intro_tools_title">03 / More than an app launcher</string>
     <string name="startup_later">LATER</string>
     <string name="startup_launcher_sounds">Launcher sounds</string>
@@ -6166,6 +6169,8 @@ Ready for the next command</string>
     <string name="volume_stream_ring">Ring</string>
     <string name="volume_stream_system">System</string>
     <string name="volume_stream_voice_call">Voice call</string>
+    <string name="wallpaper_astro_reseed">RESEED</string>
+    <string name="wallpaper_astro_world_label">World</string>
     <string name="wallpaper_black_hole">Black hole</string>
     <string name="wallpaper_browse_downloads">Get more wallpapers</string>
     <string name="wallpaper_clouds">Clouds</string>
@@ -6191,6 +6196,9 @@ Ready for the next command</string>
     <string name="wallpaper_library_retry">Try again</string>
     <string name="wallpaper_library_title">Wallpaper gallery</string>
     <string name="wallpaper_library_unavailable">Couldn’t load the gallery. Check your connection and try again.</string>
+    <string name="wallpaper_matrix_glyphs">GLYPHS: %1$s</string>
+    <string name="wallpaper_matrix_rain">Matrix Rain</string>
+    <string name="wallpaper_matrix_style_label">Style</string>
     <string name="wallpaper_optional_restore_description">This wallpaper is now a separate download. Install it to restore the preview. Your saved wallpaper settings are kept.</string>
     <string name="wallpaper_pick_color">Pick color…</string>
     <string name="wallpaper_pixel_colors">COLORS</string>

@@ -5,7 +5,6 @@
     <item name="startup_next" type="id" />
     <item name="startup_back" type="id" />
     <item name="startup_build_progress" type="id" />
-    <item name="startup_build_output" type="id" />
     <item name="startup_preview_panel" type="id" />
     <item name="startup_dash_controls" type="id" />
     <item name="startup_border_stroke" type="id" />

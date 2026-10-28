@@ -256,6 +256,8 @@ object StartupMenuManager {
         }
 
         val themeResult = applyChoices(context, palette)
+        // New installs start on the current release; its changelog is for people upgrading.
+        ohi.andre.consolelauncher.managers.ChangelogManager.markSeenOnFirstRun(context)
         prefs(context).edit().putBoolean(KEY_ACTIVE, false).putBoolean(KEY_COMPLETE, true)
             .putBoolean(KEY_BUILDING, false).apply()
         val followUp = mutableListOf<String>()
@@ -360,11 +362,21 @@ object StartupMenuManager {
 }
 
 class StartupMenuActivity : ohi.andre.consolelauncher.localization.LocalizedComponentActivity() {
+    private companion object {
+        const val BUILD_STAGES = 7
+        const val WALLPAPER_STAGE = 1
+        const val WRITE_STAGE = 5
+        const val STAGE_MS = 620f
+        const val ONLINE_MS = 700L
+        const val WELCOME_MS = 650L
+    }
     private val main = Handler(Looper.getMainLooper())
     private var pageScroll: ScrollView? = null
-    private var buildOutput: TextView? = null
-    private var buildProgress: TextView? = null
+    private var buildView: StartupBuildView? = null
     private var buildStarted = 0L
+    private var lastBuildTick = 0L
+    private var buildPosition = 0f
+    private var finaleStarted = 0L
     private var palette: AutoColorManager.Snapshot? = null
     private var paletteReady = false
     private var buildResult: StartupMenuManager.ActionResult? = null
@@ -420,7 +432,7 @@ class StartupMenuActivity : ohi.andre.consolelauncher.localization.LocalizedComp
             return
         }
         applyFullscreen(this)
-        if (buildStarted != 0L) { main.removeCallbacks(buildTick); main.post(buildTick) }
+        if (buildStarted != 0L) { lastBuildTick = SystemClock.uptimeMillis(); main.removeCallbacks(buildTick); main.post(buildTick) }
     }
 
     override fun onPause() {
@@ -492,9 +504,24 @@ class StartupMenuActivity : ohi.andre.consolelauncher.localization.LocalizedComp
 
         val page = StartupMenuManager.page(this)
         val building = StartupMenuManager.isBuilding(this) || buildResult != null
+        if (building) {
+            buildView = StartupBuildView(this).apply {
+                id = R.id.startup_build_progress
+                typeface = Tuils.getTypeface(this@StartupMenuActivity) ?: Typeface.MONOSPACE
+                text = textColor()
+                accent = ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.accentColor()
+                dim = androidx.core.graphics.ColorUtils.setAlphaComponent(textColor(), 0x8c)
+                title = "RE:TUI"
+                subtitle = getString(R.string.startup_build_title)
+                onlineText = getString(R.string.startup_build_online).uppercase(java.util.Locale.getDefault())
+                welcomeText = getString(R.string.startup_build_welcome).uppercase(java.util.Locale.getDefault())
+                describeBuild(this)
+            }
+            panel.addView(buildView, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f))
+            return screen
+        }
         panel.addView(terminalText(getString(R.string.startup_page_progress, page + 1), 12f), blockParams(10f))
         val title = when {
-            building -> R.string.startup_build_title
             page == StartupMenuManager.WELCOME -> R.string.startup_welcome_title
             page == StartupMenuManager.CONFIGURE -> R.string.startup_set_up_your_launcher
             else -> R.string.startup_thanks_title
@@ -510,21 +537,6 @@ class StartupMenuActivity : ohi.andre.consolelauncher.localization.LocalizedComp
 
         val list = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
         when {
-            building -> {
-                list.addView(terminalText(getString(R.string.startup_build_description), 13f), blockParams(18f))
-                buildProgress = terminalText("[░░░░░░░░░░]", 22f).apply {
-                    id = R.id.startup_build_progress
-                    typeface = Typeface.MONOSPACE
-                    importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
-                }
-                panel.addView(buildProgress, blockParams(16f))
-                buildOutput = terminalText("", 14f).apply {
-                    id = R.id.startup_build_output
-                    typeface = Typeface.MONOSPACE
-                    accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE
-                }
-                list.addView(buildOutput, blockParams(8f))
-            }
             page == StartupMenuManager.WELCOME -> {
                 list.addView(terminalText(getString(R.string.startup_welcome_body), 14f), blockParams(16f))
                 list.addView(guideCard(R.string.startup_intro_launch_title, R.string.startup_intro_launch_body), blockParams(10f))
@@ -540,13 +552,18 @@ class StartupMenuActivity : ohi.andre.consolelauncher.localization.LocalizedComp
                 list.addView(terminalText(getString(R.string.startup_thanks_feedback), 14f), blockParams(14f))
             }
         }
-        pageScroll = ScrollView(this).apply { id = R.id.startup_scroll; addView(list) }
+        pageScroll = ScrollView(this).apply {
+            id = R.id.startup_scroll
+            addView(list)
+            // small screens cannot fit a whole page: keep the scrollbar and a fade at the edge so more is obviously below
+            isScrollbarFadingEnabled = false
+            isVerticalFadingEdgeEnabled = true
+            setFadingEdgeLength(dp(this@StartupMenuActivity, 28f))
+        }
         panel.addView(pageScroll, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f))
         if (page == StartupMenuManager.CONFIGURE) {
             pageScroll?.post { pageScroll?.scrollTo(0, StartupMenuManager.configScroll(this)) }
         }
-        if (building) return screen
-
         val controls = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
@@ -581,6 +598,9 @@ class StartupMenuActivity : ohi.andre.consolelauncher.localization.LocalizedComp
     private fun buildConfiguration(list: LinearLayout) {
         list.addView(terminalText(getString(R.string.startup_configuration_description), 13f), blockParams(12f))
         list.addView(levelRow(), blockParams(10f))
+        if (StartupMenuManager.level(this) == StartupMenuManager.BASIC) {
+            list.addView(terminalText(getString(R.string.startup_basic_description), 12f), blockParams(12f))
+        }
         list.addView(choiceToggleRow(getString(R.string.startup_auto_theme), getString(R.string.startup_theme_snapshot_description),
             StartupMenuManager.autoTheme(this)) {
             StartupMenuManager.toggleAutoTheme(this)
@@ -626,8 +646,6 @@ class StartupMenuActivity : ohi.andre.consolelauncher.localization.LocalizedComp
             list.addView(terminalText(getString(R.string.startup_access_note), 12f), blockParams(10f))
             list.addView(terminalText(getString(R.string.startup_visual_effects), 13f), blockParams(6f))
             list.addView(visualEffects(), blockParams(4f))
-        } else {
-            list.addView(terminalText(getString(R.string.startup_basic_description), 12f), blockParams(8f))
         }
     }
 
@@ -689,7 +707,7 @@ class StartupMenuActivity : ohi.andre.consolelauncher.localization.LocalizedComp
 
     private fun guideCard(title: Int, body: Int): View = LinearLayout(this).apply {
         orientation = LinearLayout.VERTICAL
-        setPadding(dp(context, 12f), dp(context, 12f), dp(context, 12f), dp(context, 12f))
+        setPadding(dp(context, 12f), dp(context, 10f), dp(context, 12f), dp(context, 10f))
         stylePanel(context, this)
         previewBorder(this, Theme.settings_panel_background_color, Theme.settings_panel_border_color)
         addView(terminalText(getString(title), 15f).apply { setTypeface(typeface, Typeface.BOLD) }, blockParams(6f))
@@ -720,6 +738,9 @@ class StartupMenuActivity : ohi.andre.consolelauncher.localization.LocalizedComp
 
     private fun prepareBuild() {
         buildStarted = SystemClock.uptimeMillis()
+        lastBuildTick = buildStarted
+        buildPosition = 0f
+        finaleStarted = 0L
         paletteReady = false
         Thread({
             try {
@@ -727,7 +748,10 @@ class StartupMenuActivity : ohi.andre.consolelauncher.localization.LocalizedComp
                     AutoColorManager.currentWallpaperColorSnapshot(this)
                 } else null
                 main.post {
-                    if (!isFinishing && !isDestroyed) { palette = snapshot; paletteReady = true }
+                    if (!isFinishing && !isDestroyed) {
+                        palette = snapshot; paletteReady = true
+                        buildView?.let { describeBuild(it) }
+                    }
                 }
             } catch (error: Exception) {
                 main.post { if (!isFinishing && !isDestroyed) buildFailed(error) }
@@ -736,37 +760,42 @@ class StartupMenuActivity : ohi.andre.consolelauncher.localization.LocalizedComp
         main.post(buildTick)
     }
 
+    // The log runs at a steady pace but waits on the real work: sampling the wallpaper cannot finish
+    // before the palette is read, and writing settings is where StartupMenuManager.finish applies them.
     private fun advanceBuild() {
         if (isFinishing || isDestroyed) return
-        val elapsed = SystemClock.uptimeMillis() - buildStarted
-        val duration = if (android.os.Build.VERSION.SDK_INT >= 26 && !ValueAnimator.areAnimatorsEnabled()) 0L else 2400L
-        val lines = configurationLines()
-        val count = if (duration == 0L) lines.size else (1 + elapsed * lines.size / duration).toInt().coerceAtMost(lines.size)
+        val view = buildView ?: return
+        val now = SystemClock.uptimeMillis()
+        val reduced = android.os.Build.VERSION.SDK_INT >= 26 && !ValueAnimator.areAnimatorsEnabled()
+        val stages = BUILD_STAGES.toFloat()
         if (buildResult == null) {
-            val output = lines.take(count).joinToString("\n")
-            if (buildOutput?.text?.toString() != output) {
-                buildOutput?.text = output
-                pageScroll?.post { pageScroll?.fullScroll(View.FOCUS_DOWN) }
-            }
-            val progress = (count * 9 / lines.size).coerceAtLeast(1)
-            buildProgress?.text = "[" + "█".repeat(progress) + "░".repeat(10 - progress) + "]"
-            if (elapsed >= duration && paletteReady) {
+            buildPosition = if (reduced) stages else buildPosition + (now - lastBuildTick) / STAGE_MS
+            buildPosition = buildPosition.coerceAtMost(if (!paletteReady) WALLPAPER_STAGE + 0.95f else WRITE_STAGE.toFloat())
+            if (buildPosition >= WRITE_STAGE && paletteReady) {
                 try {
                     buildResult = StartupMenuManager.finish(this, palette)
-                    buildOutput?.append("\n\n" + getString(R.string.startup_build_ready))
-                    buildProgress?.text = "[██████████]"
-                    buildStarted = SystemClock.uptimeMillis()
                 } catch (error: Exception) {
                     buildFailed(error)
                     return
                 }
             }
-        } else if (elapsed >= if (duration == 0L) 0L else 350L) {
+        } else if (finaleStarted == 0L) {
+            buildPosition = if (reduced) stages else (buildPosition + (now - lastBuildTick) / STAGE_MS).coerceAtMost(stages)
+            if (buildPosition >= stages) finaleStarted = now
+        }
+        lastBuildTick = now
+        val finale = when {
+            finaleStarted == 0L -> 0
+            reduced || now - finaleStarted >= ONLINE_MS -> 2
+            else -> 1
+        }
+        view.update(buildPosition, finale)
+        if (finale == 2 && (reduced || now - finaleStarted >= ONLINE_MS + WELCOME_MS)) {
             buildStarted = 0L
             completeSetup()
             return
         }
-        main.postDelayed(buildTick, 100)
+        main.postDelayed(buildTick, 50)
     }
 
     private fun completeSetup() {
@@ -774,28 +803,36 @@ class StartupMenuActivity : ohi.andre.consolelauncher.localization.LocalizedComp
         close(checkNotNull(buildResult))
     }
 
-    // Display-only pseudo-code; settings are applied exclusively by StartupMenuManager.finish.
-    private fun configurationLines(): List<String> = buildList {
-        add("launcher.configure {")
-        add("  setup = ${StartupMenuManager.level(this@StartupMenuActivity)}")
-        add("  palette = ${if (StartupMenuManager.autoTheme(this@StartupMenuActivity)) "wallpaper.current" else "theme.keep_current"}")
-        val border = StartupMenuManager.border(this@StartupMenuActivity)
-        add("  border = $border")
-        if (border != StartupMenuManager.BORDER_NONE) {
-            add("  stroke = ${StartupMenuManager.borderStroke(this@StartupMenuActivity)} dp")
-            if (border == StartupMenuManager.BORDER_DASHED) add("  gap = ${StartupMenuManager.borderGap(this@StartupMenuActivity)} dp")
+    private fun describeBuild(view: StartupBuildView) {
+        val level = StartupMenuManager.level(this)
+        val border = StartupMenuManager.border(this)
+        val stroke = StartupMenuManager.borderStroke(this)
+        val gap = StartupMenuManager.borderGap(this)
+        val features = StartupMenuManager.toggles(this).filter { StartupMenuManager.selectedFeature(level, it.id, it.enabled) }
+        val effects = StartupMenuManager.effectValues(level, StartupMenuManager.cyberdeck(this), StartupMenuManager.crt(this))
+        val swatches = palette?.colors?.values?.map { it or 0xff000000.toInt() }?.distinct()?.take(5).orEmpty()
+        val borderLabel = "border = $border" + when (border) {
+            StartupMenuManager.BORDER_NONE -> ""
+            StartupMenuManager.BORDER_DASHED -> " · $stroke dp · gap $gap dp"
+            else -> " · $stroke dp"
         }
-        add("  features {")
-        StartupMenuManager.toggles(this@StartupMenuActivity).filter {
-            StartupMenuManager.selectedFeature(StartupMenuManager.level(this@StartupMenuActivity), it.id, it.enabled)
-        }.forEach { add("    ${it.id} = on") }
-        add("  }")
-        val effects = StartupMenuManager.effectValues(StartupMenuManager.level(this@StartupMenuActivity),
-            StartupMenuManager.cyberdeck(this@StartupMenuActivity), StartupMenuManager.crt(this@StartupMenuActivity))
-        add("  cyberdeck = ${effects.first}")
-        add("  crt = ${effects.second}")
-        add("}")
-        add(getString(if (StartupMenuManager.isDryRun(this@StartupMenuActivity)) R.string.startup_build_preview else R.string.startup_build_apply))
+        fun stage(label: Int, detail: StartupBuildView.Detail?) =
+            StartupBuildView.Stage(getString(label).uppercase(java.util.Locale.getDefault()), detail)
+        view.stages = listOf(
+            stage(R.string.startup_build_stage_choices, StartupBuildView.Detail.Text("setup = $level")),
+            stage(R.string.startup_build_stage_wallpaper, StartupBuildView.Detail.Swatches(swatches,
+                if (StartupMenuManager.autoTheme(this) && !StartupMenuManager.isDryRun(this)) "palette = wallpaper" else "palette = keep current")),
+            stage(R.string.startup_build_stage_borders, StartupBuildView.Detail.Border(border, stroke, gap, borderLabel)),
+            stage(R.string.startup_build_stage_features, StartupBuildView.Detail.Text(
+                features.joinToString(", ") { it.label.lowercase(java.util.Locale.getDefault()) }.ifEmpty { getString(R.string.startup_none) })),
+            stage(R.string.startup_build_stage_effects, StartupBuildView.Detail.Text("cyberdeck = ${effects.first} · crt = ${effects.second}")),
+            stage(R.string.startup_build_stage_settings, StartupBuildView.Detail.Text(
+                if (StartupMenuManager.isDryRun(this)) getString(R.string.startup_build_preview) else "theme.xml  ui.xml  behavior.xml")),
+            stage(R.string.startup_build_stage_home, null))
+        view.sketch = StartupBuildView.Sketch(swatches, border, stroke, gap,
+            statusRows = 2 + features.count { it.id == StartupMenuManager.STATUS || it.id == StartupMenuManager.NOTIFICATIONS },
+            dock = features.any { it.id == StartupMenuManager.MODULE_DOCK },
+            cyberdeck = effects.first, crt = effects.second)
     }
 
     private fun buildFailed(error: Exception) {
@@ -887,7 +924,8 @@ class StartupMenuActivity : ohi.andre.consolelauncher.localization.LocalizedComp
     }
 
     private fun close(result: StartupMenuManager.ActionResult) {
-        Toast.makeText(this, result.message, Toast.LENGTH_LONG).show()
+        // A finished build already said so on screen, and its message lands in the launcher output.
+        if (!result.reload) Toast.makeText(this, result.message, Toast.LENGTH_LONG).show()
         finish()
         if (result.reload) {
             LauncherActivity.instance?.addMessage("startup", result.message)

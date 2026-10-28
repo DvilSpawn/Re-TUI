@@ -57,7 +57,7 @@ class WallpaperGalleryTest {
             }
         }.toByteArray()
         val hash = MessageDigest.getInstance("SHA-256").digest(pack).joinToString("") { "%02x".format(it.toInt() and 255) }
-        val catalog = """{"schema":1,"wallpapers":[{"id":"topo","api":1,"name":"Gallery fixture","description":"Contours test","download":"downloads/topo.retui-wallpaper","preview":"previews/topo.gif","sha256":"$hash"}]}"""
+        val catalog = """{"schema":2,"wallpapers":[{"id":"from-a-later-build","api":1,"name":"Future","description":"Skipped","download":"downloads/future.retui-wallpaper","preview":"previews/future.gif","sha256":"$hash"},{"id":"topo","api":1,"name":"Gallery fixture","description":"Contours test","download":"downloads/topo.retui-wallpaper","preview":"previews/topo.gif","sha256":"$hash"}]}"""
         val storeRoot = File(context.filesDir, "wallpaper-packs")
         val existing = File(storeRoot, "topo")
         val backup = File(context.cacheDir, "gallery-backup-${UUID.randomUUID()}")

@@ -18,8 +18,14 @@ class WallpaperGalleryTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder:
             output = Path(folder)
             prepare(output)
-            catalog = json.loads((output / 'catalog.json').read_text())
-            self.assertEqual(['topo', 'pixel', 'clouds', 'nagomi'], [row['id'] for row in catalog['wallpapers']])
+            legacy = json.loads((output / 'catalog.json').read_text())
+            catalog = json.loads((output / 'catalog-v2.json').read_text())
+            # Builds before Astro Chart reject unknown ids and more than four rows, so the schema 1 file must not grow.
+            self.assertEqual(1, legacy['schema'])
+            self.assertEqual(['topo', 'pixel', 'clouds', 'nagomi'], [row['id'] for row in legacy['wallpapers']])
+            self.assertEqual(2, catalog['schema'])
+            self.assertEqual(['topo', 'pixel', 'clouds', 'nagomi', 'astro', 'matrix'], [row['id'] for row in catalog['wallpapers']])
+            self.assertEqual(legacy['wallpapers'], catalog['wallpapers'][:4])
             page = (output / 'index.html').read_text()
             self.assertNotIn('{{', page)
             for row in catalog['wallpapers']:

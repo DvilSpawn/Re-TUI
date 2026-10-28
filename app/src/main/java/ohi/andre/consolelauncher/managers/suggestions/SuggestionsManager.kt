@@ -158,6 +158,8 @@ class SuggestionsManager(
     @Volatile private var searchNotifications: List<NotificationService.Notification> = emptyList()
     private var searchInputActive = false
     @Volatile private var inlineOutput: CharSequence? = null
+    // "Press Enter again to search" for the phrase put back in the input; kept until the input changes
+    @Volatile private var searchPrompt: Pair<String, CharSequence>? = null
 
     private val clickListener = View.OnClickListener { v: View? ->
         val suggestion = v!!.getTag(R.id.suggestion_id) as Suggestion
@@ -266,9 +268,17 @@ class SuggestionsManager(
             )) View.VISIBLE else View.INVISIBLE
     }
 
+    fun refreshSearchAppearance() {
+        if (searchMode) searchRenderer?.refreshAppearance()
+    }
+
     fun showInlineOutput(output: CharSequence?) {
         if (!searchMode || output.isNullOrBlank()) return
         inlineOutput = output
+        searchPrompt = WebSearchFallback.pending?.let { query ->
+            suggestionRequestId.incrementAndGet()  // results for the phrase must not replace its prompt
+            query to output
+        }
         (pack.context as Activity).runOnUiThread {
             searchRenderer?.renderOutput(output)
             updateSearchResultsVisibility()
@@ -677,6 +687,19 @@ class SuggestionsManager(
         val query = input
         val requestId = suggestionRequestId.incrementAndGet()
         lastSuggestionThread?.interrupt()
+        // Submitting clears the input and the phrase is then put back; neither should hide the prompt.
+        val prompt = searchPrompt
+        if (prompt != null && prompt.first == WebSearchFallback.pending && (query.isBlank() || query.trim() == prompt.first)) {
+            inlineOutput = prompt.second
+            (pack.context as Activity).runOnUiThread {
+                if (isLatestSuggestionRequest(requestId)) {
+                    searchRenderer?.renderOutput(prompt.second)
+                    updateSearchResultsVisibility()
+                }
+            }
+            return
+        }
+        searchPrompt = null
         if (query.trim().isEmpty()) {
             inlineOutput = null
             val results = getEmptySearchModeResults()

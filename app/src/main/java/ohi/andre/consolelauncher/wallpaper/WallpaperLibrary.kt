@@ -12,7 +12,15 @@ import java.net.URI
 import java.util.concurrent.TimeUnit
 
 object WallpaperLibrary {
-    const val CATALOG_URL = "https://re-tui.pages.dev/wallpaper-packs/catalog.json"
+    /**
+     * Schema 2 only grows. Rows this build cannot use (a newer wallpaper, a newer pack api) are skipped rather than
+     * failing the whole catalogue, and unknown fields are ignored. A breaking change needs a new file, because builds
+     * reading this one stay installed. catalog.json is frozen at schema 1 for builds before Astro Chart: they reject
+     * any id they do not know.
+     */
+    const val CATALOG_URL = "https://re-tui.pages.dev/wallpaper-packs/catalog-v2.json"
+    private const val CATALOG_SCHEMA = 2
+    private const val MAX_ROWS = 256
     data class Entry(val id: String, val title: String, val description: String, val url: String, val preview: String, val sha256: String)
     internal var client = OkHttpClient.Builder().callTimeout(30, TimeUnit.SECONDS)
         .connectTimeout(5, TimeUnit.SECONDS).readTimeout(2, TimeUnit.SECONDS)
@@ -24,19 +32,22 @@ object WallpaperLibrary {
 
     internal fun parse(text: String): List<Entry> {
         val root = JSONObject(text)
-        require(root.getInt("schema") == 1) { "Unsupported wallpaper catalogue" }
+        require(root.getInt("schema") == CATALOG_SCHEMA) { "Unsupported wallpaper catalogue" }
         val list = root.getJSONArray("wallpapers")
-        require(list.length() <= WallpaperPackStore.SCENES.size)
+        require(list.length() <= MAX_ROWS)
         val seen = HashSet<String>()
-        return (0 until list.length()).map { index ->
-            val item = list.getJSONObject(index)
-            val id = item.getString("id")
-            require(id in WallpaperPackStore.SCENES && seen.add(id) && item.getInt("api") == 1)
-            val title = item.getString("name"); val description = item.getString("description")
-            require(title.length in 1..80 && description.length in 1..400)
-            val hash = item.getString("sha256"); require(hash.matches(Regex("[a-f0-9]{64}")))
-            Entry(id, title, description, resolve(item.getString("download")), resolve(item.getString("preview")), hash)
+        // The first usable row per id wins, so a catalogue can list a newer pack api before a fallback for older builds.
+        return (0 until list.length()).mapNotNull { index ->
+            runCatching { entry(list.getJSONObject(index)) }.getOrNull()?.takeIf { seen.add(it.id) }
         }
+    }
+    private fun entry(item: JSONObject): Entry? {
+        val id = item.getString("id")
+        if (id !in WallpaperPackStore.SCENES || item.getInt("api") != 1) return null
+        val title = item.getString("name"); val description = item.getString("description")
+        require(title.length in 1..80 && description.length in 1..400)
+        val hash = item.getString("sha256"); require(hash.matches(Regex("[a-f0-9]{64}")))
+        return Entry(id, title, description, resolve(item.getString("download")), resolve(item.getString("preview")), hash)
     }
     private fun resolve(path: String): String {
         require(!path.contains('%') && !path.contains('\\') && path.split('/').none { it == "." || it == ".." })

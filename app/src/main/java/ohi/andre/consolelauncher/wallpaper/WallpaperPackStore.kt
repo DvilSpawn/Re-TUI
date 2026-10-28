@@ -17,7 +17,8 @@ class WallpaperPackStore(private val root: File) {
             if (cancelled() || Thread.currentThread().isInterrupted) throw CancellationException("Wallpaper installation cancelled")
         }
         const val MAX_BYTES = 4 * 1024 * 1024
-        val SCENES = linkedMapOf("topo" to "topo noise", "pixel" to "pixel dream", "clouds" to "clouds", "nagomi" to "nagomi")
+        val SCENES = linkedMapOf("topo" to "topo noise", "pixel" to "pixel dream", "clouds" to "clouds", "nagomi" to "nagomi",
+            "astro" to "astro chart", "matrix" to "matrix rain")
         fun assets(id: String): Set<String> = when (id) {
             "clouds" -> (1..8).flatMap { scene ->
                 val count = when (scene) { 5 -> 5; 6, 8 -> 6; else -> 4 }

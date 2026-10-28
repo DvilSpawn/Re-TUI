@@ -12748,7 +12748,10 @@ class UIManager(
             }
         }
         ohi.andre.consolelauncher.presentation.UnifiedStatusPresentation.style(root, next)
-        if (searchOnlyMode) ohi.andre.consolelauncher.presentation.HomeLayoutPresentation.styleSearchClock(root, next)
+        if (searchOnlyMode) {
+            configureSearchOnlyLayout()  // the search bar and clock tab are drawn from the theme, not the traversal above
+            suggestionsManager?.refreshSearchAppearance()
+        }
         for (id in intArrayOf(R.id.terminal_home_add_tab, R.id.terminal_home_settings_tab)) {
             root.findViewById<ImageButton>(id)?.let { button ->
                 button.setColorFilter(next.color(Theme.time_text_color))

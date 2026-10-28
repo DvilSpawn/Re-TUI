@@ -454,11 +454,7 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
     }
 
     private fun freezeWallpaperInteraction() {
-        sendBroadcast(
-            Intent(RetuiWallpaperService.ACTION_INTERACTION)
-                .setPackage(packageName)
-                .putExtra(RetuiWallpaperService.EXTRA_INTERACTION_ENABLED, false)
-        )
+        RetuiWallpaperService.setInteraction(this, false)
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
