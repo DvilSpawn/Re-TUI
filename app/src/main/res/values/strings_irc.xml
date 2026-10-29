@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="help_irc">irc — open the native TLS IRC terminal. /server, /connect, /login, /register, /join, /window, /query, /msg and /help.</string>
+    <string name="help_irc">irc — open the IRC client. Connect to Libera.Chat, OFTC or any TLS network, several at once. /network, /server, /connect, /login, /join, /window, /query, /msg and /help.</string>
     <string name="irc_title">IRC</string>
     <string name="irc_input_hint">message or /command</string>
     <string name="irc_send">Send IRC input</string>
@@ -11,8 +11,8 @@
     <string name="irc_more">More</string>
     <string name="irc_sign_in">Sign in</string>
     <string name="irc_create_account">Create account</string>
-    <string name="irc_register_explanation">Choose a username, then a masked password. We join only after your account is confirmed. Re:TUI remembers this device by default; you can turn that off below.</string>
-    <string name="irc_network">Network</string>
+    <string name="irc_register_explanation">Choose a username, then a masked password. This works on networks that support sign-up from IRC apps; we join only after your account is confirmed. Elsewhere, such as Libera.Chat, connect first and use /register your@email. Re:TUI remembers this device by default; you can turn that off below.</string>
+    <string name="irc_network">Server</string>
     <string name="irc_cancel">Cancel</string>
     <string name="irc_back">Back to conversation</string>
     <string name="irc_continue">Continue</string>
@@ -21,14 +21,13 @@
     <string name="irc_joining">Joining %1$s…</string>
     <string name="irc_account_hint">IRC account name</string>
     <string name="irc_account_invalid">Use an IRC nickname: up to 30 characters, without spaces. Advanced account names can use /login.</string>
-    <string name="irc_account_explanation">Enter your IRC account name, then your password. This name will also be your nickname.</string>
+    <string name="irc_account_explanation">Enter your %1$s account name, then your password. This name will also be your nickname.</string>
     <string name="irc_network_hint">hostname [TLS port]</string>
     <string name="irc_network_explanation">Choose a TLS network. Account names belong to that network. Default port: 6697.</string>
-    <string name="irc_join_hint">Enter a channel such as #retui, then Continue.</string>
+    <string name="irc_join_hint">Enter a channel such as #linux, then Continue.</string>
     <string name="irc_search_hint">Search this view</string>
-    <string name="irc_welcome">IRC, at your fingertips.\nSign in, choose a channel, and talk.</string>
-    <string name="irc_signup_info">Create an IRC account with a username and password. No email is required. Registration is subject to server limits.</string>
-    <string name="irc_other_network">Use an existing account on this network. Nickname-only connections and registration are available through commands where supported.</string>
+    <string name="irc_welcome">Connect as a guest to start chatting, or sign in with your account on this network.</string>
+    <string name="irc_signup_info">Sign-up rules belong to each network. Some ask for an email address or verification before an account works.</string>
     <string name="irc_browse">Browse network</string>
     <string name="irc_directory">Network channels</string>
     <string name="irc_join_name">Join by channel name</string>
@@ -41,7 +40,7 @@
     <string name="irc_all_commands">All commands</string>
     <string name="irc_quick_help">1. Type a message and press ↵ to send.\n2. Tap a conversation chip to switch chats.\n3. Open Channels to find or join a channel.</string>
     <string name="irc_connection_details">Connection details</string>
-    <string name="irc_security_details">TLS protects the connection, not against server operators. Private conversations are not end-to-end encrypted.\nLeaving this pane disconnects. Passwords are not saved. Unconfirmed messages are never retried automatically.</string>
+    <string name="irc_security_details">TLS protects the connection, not against server operators. Private conversations are not end-to-end encrypted.\nLeaving this pane disconnects every network. Networks that were connected reconnect when you open IRC again, if they need no password. Passwords are not saved. Unconfirmed messages are never retried automatically.</string>
     <string name="irc_diagnostics">Server diagnostics</string>
     <string name="irc_leave">Leave %1$s</string>
     <string name="irc_leave_question">Leave %1$s? Your in-session draft will be kept.</string>
@@ -52,30 +51,61 @@
     <string name="irc_action_failed">Could not complete this action.</string>
     <string name="irc_delete_message">Delete a message</string>
     <string name="irc_delete_explanation">Choose a message. You can request deletion of your own messages; channel moderators can delete other messages. The server checks permission.</string>
-    <string name="irc_delete_question">Delete this message from IRC history and supported clients? Copies on Discord or other clients may remain.</string>
+    <string name="irc_delete_question">Delete this message from IRC history and supported clients? Copies in other clients may remain.</string>
     <string name="irc_delete_confirm">Delete from IRC</string>
     <string name="irc_delete_unavailable">Message deletion is unavailable on this connection.</string>
     <string name="irc_delete_missing">This message is no longer available for deletion.</string>
     <string name="irc_command_guidance">Choose a command for its syntax. Nothing is sent until you press ↵.</string>
     <string name="irc_reconnect">Reconnect</string>
+    <string name="irc_connect_guest">Connect</string>
+    <string name="irc_reconnect_as">Reconnect as %1$s</string>
+    <string name="irc_connect_as">Connect as %1$s (no account)</string>
+    <string name="irc_change_nickname">Change nickname</string>
+    <string name="irc_nickname_hint">nickname</string>
+    <string name="irc_nickname_explanation">Your nickname is %1$s. Type a new one, then Continue. Signing in uses your account name instead.</string>
+    <string name="irc_networks">Networks</string>
+    <string name="irc_split_title">Split view</string>
+    <string name="irc_split_empty">Tap this label to choose a conversation from any network. Tap below it to type here.</string>
+    <string name="irc_split_status">network home</string>
+    <string name="irc_split_focus">Second conversation. Tap to type into it.</string>
+    <string name="irc_split_off">Split view: off</string>
+    <string name="irc_split_auto">Split view: top and bottom, side by side in landscape</string>
+    <string name="irc_split_choose_main">Show in the typing side (▶)</string>
+    <string name="irc_split_choose_beside">Show in the other side</string>
+    <string name="irc_split_main_label">Typing into %1$s. Tap to choose another conversation.</string>
+    <string name="irc_split_beside_label">Showing %1$s. Tap to choose another conversation.</string>
+    <string name="irc_split_side">Split view: side by side</string>
+    <string name="irc_split_stack">Split view: top and bottom</string>
+    <string name="irc_networks_chip">Networks. Current network: %1$s</string>
+    <string name="irc_network_online">connected</string>
+    <string name="irc_network_connecting">connecting…</string>
+    <string name="irc_network_offline">offline</string>
+    <string name="irc_add_network">Add a network</string>
+    <string name="irc_add_network_explanation">Pick a network, or type a server address and TLS port (6697 if left out), then Continue.</string>
+    <string name="irc_remove_network">Remove %1$s</string>
+    <string name="irc_remove_network_question">Remove %1$s from this phone? It disconnects and its device key is deleted. Your account on the network is not touched.</string>
+    <string name="irc_rejoin_list">Rejoins: %1$s</string>
+    <string name="irc_retired_server">Re:TUI\'s own IRC server has closed. Libera.Chat is selected below, or open Networks to choose another. Your channels and account there do not carry over.</string>
     <string name="irc_remember_device">Remember this device</string>
-    <string name="irc_device_explanation">Reconnect automatically with a protected device key; no saved password. Anyone using your unlocked Launcher can access this account. A new phone or reinstall needs password sign-in.</string>
+    <string name="irc_device_explanation">Reconnect without a password, using a protected key on this phone. Works on networks whose NickServ accepts certificates, such as Libera.Chat and OFTC. Anyone using your unlocked Launcher can use this account. A new phone or reinstall needs password sign-in.</string>
     <string name="irc_device_pending">Registering this device key…</string>
-    <string name="irc_device_saved">Device remembered. IRC reconnects automatically when opened.</string>
+    <string name="irc_device_saved">Device remembered. This network reconnects without a password.</string>
     <string name="irc_device_failed">Device login could not be confirmed. Sign in with your password to retry.</string>
     <string name="irc_forget_device">Forget this device</string>
-    <string name="irc_forget_explanation">Remove the login key from this phone and disconnect? Server revocation will also be requested if this account is connected. If offline, remove its old certificate through NickServ on a trusted client.</string>
-    <string name="irc_device_forgotten">Local device key removed. Password sign-in is required. Check NickServ certificate authorization if server revocation could not complete.</string>
-    <string name="irc_device_removing">Removing device authorization…</string>
-    <string name="irc_device_revoked">Device authorization revoked and local key removed.</string>
+    <string name="irc_forget_explanation">Remove the sign-in key from this phone? The network may still list its certificate, but it can no longer be used. You can remove it there with NickServ CERT DEL.</string>
+    <string name="irc_device_forgotten">Device key removed from this phone. Sign in with your password next time.</string>
     <string-array name="irc_commands">
         <item>Connection</item>
-        <item>/server hostname [TLS-port] — choose a network while disconnected</item>
+        <item>/network — list your networks and switch between them</item>
+        <item>/network add hostname [TLS-port] — add a network</item>
+        <item>/network next|prev|name — switch network (Alt+←/→)</item>
+        <item>/split [auto|side|stack|off] — show a second conversation beside this one</item>
+        <item>/server hostname [TLS-port] — change this network\'s server while disconnected</item>
         <item>/nick nickname — choose your display name</item>
         <item>/connect — connect; account login asks for a masked password</item>
         <item>/reconnect — reconnect without resending messages</item>
         <item>/login account — enter a masked account password</item>
-        <item>/register — guided username/password signup; connected clients use NickServ</item>
+        <item>/register [email] — sign up; when connected, registers with NickServ (some networks need the email)</item>
         <item>/disconnect — close the connection</item>
         <item>/quit — disconnect</item>
         <item>Conversations</item>
@@ -101,5 +131,5 @@
         <item>/help — open short, local help</item>
         <item>//text — send /text literally</item>
     </string-array>
-    <string name="irc_help">Native IRC terminal — one TLS network at a time.\n/server [host] [TLS port] · default irc.kokodoko.cloud 6697\n/nick nickname · /connect · /login account (masked SASL password)\n/register (guided signup offline; masked NickServ password when connected)\n/join #channel · /j #channel · /part [#channel]\n/window [number|name|next|prev|close] · /buffer is an alias\n/query nick · /msg nick text · /me action · /names · /list\n/topic [text] · /whois nick · /mode target modes · /kick nick [reason]\n/oper name (masked password) · /disconnect · /quit · /clear · /help\nPlain text goes only to the active joined channel or query. //text sends /text literally. Unknown commands never become messages or launcher commands.\nWindow markers: * unread · ! mention/private message. Passwords are never transcript/history entries. TLS is verified; no plaintext fallback.\nRegister once, then sign in or reconnect before joining registered-only channels. Server-readable, not end-to-end encrypted. On supported networks, rejoining loads up to 100 recent channel messages. Server-confirmed deletions replace messages with a deletion marker. There is no push or background service; leaving disconnects. Unconfirmed messages are never retried automatically.</string>
+    <string name="irc_help">IRC client — one or more TLS networks at once.\n/network · /network add host [port] · /network next|prev|name (Alt+←/→)\n/server [host] [TLS port] · /nick nickname · /connect · /login account (masked SASL password)\n/register [email] (guided signup offline where supported; masked NickServ password when connected)\n/join #channel · /j #channel · /part [#channel]\n/window [number|name|next|prev|close] · /buffer is an alias\n/query nick · /msg nick text · /me action · /names · /list\n/topic [text] · /whois nick · /mode target modes · /kick nick [reason]\n/oper name (masked password) · /disconnect · /quit · /clear · /help\nPlain text goes only to the active joined channel or query. //text sends /text literally. Unknown commands never become messages or launcher commands.\nWindow markers: + unread · ! mention/private message. The first chip names the network; its marker counts messages on your other networks.\n/split [auto|side|stack|off] shows a second conversation, from any network, beside the one you type into (▶). Tap a tile\'s label to choose what it shows, or hold a conversation chip; tap a tile to type into it.\nEach network rejoins the channels you were in. A dropped connection reconnects by itself when it needs no password. Passwords are never saved or shown. TLS is verified; no plaintext fallback.\nServer-readable, not end-to-end encrypted. On supported networks, rejoining loads up to 100 recent channel messages. There is no push or background service; leaving disconnects. Unconfirmed messages are never retried automatically.</string>
 </resources>

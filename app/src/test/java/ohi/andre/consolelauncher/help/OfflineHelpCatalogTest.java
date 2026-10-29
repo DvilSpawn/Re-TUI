@@ -60,11 +60,12 @@ public class OfflineHelpCatalogTest {
         assertEquals("reference", articleCategories.get("command-reference"));
         assertEquals(new HashSet<>(roots), new HashSet<>(articleCategories.values()));
         assertTrue(bodies.get("irc-community").contains("Search text in navigation views is never posted"));
-        assertTrue(bodies.get("irc-community").contains("when the network permits registration"));
+        assertTrue(bodies.get("irc-community").contains("on networks that allow signup from apps"));
         assertTrue(bodies.get("irc-community").contains("not recipient delivery or a read receipt"));
+        assertTrue(bodies.get("irc-community").contains("Add a network"));
         assertTrue(bodies.get("irc-accounts-privacy").contains("not a portable restore code"));
         assertTrue(bodies.get("irc-accounts-privacy").contains("not end-to-end encrypted"));
-        assertTrue(bodies.get("irc-accounts-privacy").contains("Local deletion is not proof of server revocation"));
+        assertTrue(bodies.get("irc-accounts-privacy").contains("nothing can use it"));
         assertTrue(bodies.get("floating-tools").contains("Calculator and Help stay expanded in landscape"));
         assertTrue(bodies.get("idle-fade").contains("breath_out_seconds"));
         assertTrue(bodies.get("termux-helper-updates").contains(":update"));

@@ -22,26 +22,25 @@ import javax.net.ssl.SSLSocketFactory
 import javax.net.ssl.X509ExtendedKeyManager
 import javax.security.auth.x500.X500Principal
 
-/** Private keys cannot be exported; only the confirmed account/network binding is stored. */
+/**
+ * One non-exportable client certificate per network account (IRC "CertFP"). Which accounts use one is
+ * recorded on the saved network (IrcNetwork.device); this class only holds the keys.
+ */
 class IrcDeviceKey(context: Context) {
     data class Identity(val host: String, val port: Int, val account: String) {
         val alias get() = "retui-irc-" + digest("${host.lowercase(Locale.ROOT)}:$port\u0000${account.lowercase(Locale.ROOT)}".toByteArray())
     }
-    private val record = AtomicFile(File(context.noBackupFilesDir, "irc-device.json"))
+    // Written by builds before multi-network IRC, for the retired Re:TUI server only.
+    private val legacyRecord = AtomicFile(File(context.noBackupFilesDir, "irc-device.json"))
     companion object {
         private fun digest(bytes: ByteArray) = MessageDigest.getInstance("SHA-256").digest(bytes).joinToString("") { "%02x".format(it.toInt() and 255) }
     }
     private fun store() = KeyStore.getInstance("AndroidKeyStore").apply { load(null) }
-    fun remembered(): Identity? = runCatching {
-        val data = record.openRead().use { JSONObject(String(it.readBytes(), Charsets.UTF_8)) }
-        val identity = Identity(data.getString("host"), data.getInt("port"), data.getString("account"))
-        check(identity.host == "irc.kokodoko.cloud" && identity.port in 1..65535 && IrcProtocol.nick(identity.account))
-        check(store().containsAlias(identity.alias)); identity
-    }.getOrNull()
+    fun has(identity: Identity): Boolean = runCatching { store().containsAlias(identity.alias) }.getOrDefault(false)
     fun ensure(identity: Identity) {
         val keys = store()
         if (keys.containsAlias(identity.alias)) {
-            if (keys.getCertificate(identity.alias).publicKey.algorithm == "EC" || remembered()?.alias == identity.alias) return
+            if (keys.getCertificate(identity.alias).publicKey.algorithm == "EC") return
             // Replace only an unconfirmed draft key from the initial RSA implementation.
             keys.deleteEntry(identity.alias)
         }
@@ -56,16 +55,18 @@ class IrcDeviceKey(context: Context) {
         KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_EC, "AndroidKeyStore").apply { initialize(specification) }.generateKeyPair()
     }
     fun fingerprint(identity: Identity): String = digest(store().getCertificate(identity.alias).encoded)
-    fun remember(identity: Identity) {
-        check(store().containsAlias(identity.alias))
-        val bytes = JSONObject().put("host", identity.host).put("port", identity.port).put("account", identity.account).toString().toByteArray()
-        val stream = record.startWrite()
-        try { stream.write(bytes); record.finishWrite(stream) } catch (error: Exception) { record.failWrite(stream); throw error }
-    }
     fun forget(identity: Identity) {
-        val current = remembered()
         val keys = store(); if (keys.containsAlias(identity.alias)) keys.deleteEntry(identity.alias)
-        if (current?.alias == identity.alias) record.delete()
+    }
+    /** Removes the retired server's device key and record. Returns whether one existed. */
+    fun clearLegacy(): Boolean {
+        val identity = runCatching {
+            val data = legacyRecord.openRead().use { JSONObject(String(it.readBytes(), Charsets.UTF_8)) }
+            Identity(data.getString("host"), data.getInt("port"), data.getString("account"))
+        }.getOrNull() ?: return false
+        runCatching { forget(identity) }
+        legacyRecord.delete()
+        return true
     }
     fun factory(identity: Identity): SSLSocketFactory {
         val keys = store(); check(keys.containsAlias(identity.alias))

@@ -27,7 +27,9 @@ import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.tuils.Tuils
 
 class AliasManager(private val context: Context) {
-    private var aliases: MutableList<Alias>? = null
+    @Volatile private var aliases: MutableList<Alias>? = null
+    // alias.txt as last read; an edit from the document editor or elsewhere is picked up on the next lookup.
+    @Volatile private var loadedStamp: Pair<Long, Long>? = null
     private val paramSeparator: String
     private val aliasLabelFormat: String
     private val replaceAllMarkers: Boolean
@@ -37,7 +39,14 @@ class AliasManager(private val context: Context) {
 
     private val receiver: BroadcastReceiver
 
+    private fun stamp(file: File) = file.lastModified() to file.length()
+    private fun fresh() {
+        val file = Tuils.getFolder()?.let { File(it, PATH) } ?: return
+        if (stamp(file) != loadedStamp) reload()
+    }
+
     fun printAliases(): String {
+        fresh()
         var output: String = Tuils.EMPTYSTRING
         for (a in aliases!!) {
             output = output + "[" + a.scope + "] " + a.name + " --> " + a.value + Tuils.NEWLINE
@@ -110,6 +119,7 @@ class AliasManager(private val context: Context) {
     }
 
     private fun getALias(name: String, scope: String): String? {
+        fresh()
         var scope = scope
         scope = sanitizeScope(scope)
         for (a in aliases!!) {
@@ -178,60 +188,62 @@ class AliasManager(private val context: Context) {
         return a
     }
 
+    @Synchronized
     fun reload() {
-        if (aliases != null) aliases!!.clear()
-        else aliases = ArrayList<Alias>()
-
+        // Lookups may run on the suggestion thread: build the new list, then swap it in.
+        val loaded = ArrayList<Alias>()
         val root: File? = Tuils.getFolder()
-        if (root == null) return
+        if (root == null) { aliases = loaded; return }
 
         val file = File(root, PATH)
 
         try {
             if (!file.exists()) file.createNewFile()
+            loadedStamp = stamp(file)
 
-            val reader = BufferedReader(InputStreamReader(FileInputStream(file)))
+            BufferedReader(InputStreamReader(FileInputStream(file))).use { reader ->
+                var line: String?
+                while ((reader.readLine().also { line = it }) != null) {
+                    val splatted = line!!.split("=".toRegex(), limit = 2).toTypedArray()
+                    if (splatted.size < 2) continue
 
-            var line: String?
-            while ((reader.readLine().also { line = it }) != null) {
-                val splatted = line!!.split("=".toRegex(), limit = 2).toTypedArray()
-                if (splatted.size < 2) continue
+                    var name: String
+                    var value: String = Tuils.EMPTYSTRING
+                    name = splatted[0]
+                    value = splatted[1]
 
-                var name: String
-                var value: String = Tuils.EMPTYSTRING
-                name = splatted[0]
-                value = splatted[1]
+                    name = name.trim { it <= ' ' }
+                    value = value.trim { it <= ' ' }
+                    var scope: String = SCOPE_DEFAULT
+                    val scopeIndex: Int = name.lastIndexOf(SCOPE_SEPARATOR)
+                    if (scopeIndex > 0 && scopeIndex < name.length - 1) {
+                        scope = sanitizeScope(name.substring(scopeIndex + 1))
+                        name = name.substring(0, scopeIndex).trim { it <= ' ' }
+                    }
 
-                name = name.trim { it <= ' ' }
-                value = value.trim { it <= ' ' }
-                var scope: String = SCOPE_DEFAULT
-                val scopeIndex: Int = name.lastIndexOf(SCOPE_SEPARATOR)
-                if (scopeIndex > 0 && scopeIndex < name.length - 1) {
-                    scope = sanitizeScope(name.substring(scopeIndex + 1))
-                    name = name.substring(0, scopeIndex).trim { it <= ' ' }
-                }
-
-                if (name.equals(value, ignoreCase = true)) {
-                    Tuils.sendOutput(
-                        AppearanceSettings.errorTextColor(), context,
-                        context.getString(R.string.output_notaddingalias1) + Tuils.SPACE + name + Tuils.SPACE + context.getString(
-                            R.string.output_notaddingalias2
+                    if (name.equals(value, ignoreCase = true)) {
+                        Tuils.sendOutput(
+                            AppearanceSettings.errorTextColor(), context,
+                            context.getString(R.string.output_notaddingalias1) + Tuils.SPACE + name + Tuils.SPACE + context.getString(
+                                R.string.output_notaddingalias2
+                            )
                         )
-                    )
-                } else if (value.startsWith(name + Tuils.SPACE)) {
-                    Tuils.sendOutput(
-                        AppearanceSettings.errorTextColor(), context,
-                        context.getString(R.string.output_notaddingalias1) + Tuils.SPACE + name + Tuils.SPACE + context.getString(
-                            R.string.output_notaddingalias3
+                    } else if (value.startsWith(name + Tuils.SPACE)) {
+                        Tuils.sendOutput(
+                            AppearanceSettings.errorTextColor(), context,
+                            context.getString(R.string.output_notaddingalias1) + Tuils.SPACE + name + Tuils.SPACE + context.getString(
+                                R.string.output_notaddingalias3
+                            )
                         )
-                    )
-                } else {
-                    aliases!!.add(Alias(name, value, scope, parameterPattern))
+                    } else {
+                        loaded.add(Alias(name, value, scope, parameterPattern))
+                    }
                 }
             }
         } catch (e: Exception) {
             Tuils.log(e)
         }
+        aliases = loaded
     }
 
     fun dispose() {
@@ -306,6 +318,7 @@ class AliasManager(private val context: Context) {
     fun getAliases(excludeEmtpy: Boolean, scope: String?): MutableList<Alias?> {
         var scope = scope
         scope = if (scope == null) null else sanitizeScope(scope)
+        fresh()
         val l: MutableList<Alias?> = ArrayList<Alias?>(aliases)
         if (scope != null) {
             for (c in l.indices.reversed()) {

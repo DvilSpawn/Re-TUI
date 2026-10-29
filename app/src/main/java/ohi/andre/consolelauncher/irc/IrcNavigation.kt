@@ -1,8 +1,11 @@
 package ohi.andre.consolelauncher.irc
 
 /** Local presentation only. Search/account text never enters conversation drafts. */
-class IrcNavigation(private val state: IrcState) {
-    enum class Page { CHAT, CHANNELS, DIRECTORY, PEOPLE, HELP, COMMANDS, MORE, DELETE_MESSAGES, DELETE_CONFIRM, NETWORK, ACCOUNT, REGISTER, JOIN, LEAVE, DETAILS, DIAGNOSTICS, FORGET_DEVICE }
+class IrcNavigation(private val current: () -> IrcState) {
+    constructor(state: IrcState) : this({ state })
+    private val state get() = current()
+    enum class Page { CHAT, CHANNELS, DIRECTORY, PEOPLE, HELP, COMMANDS, MORE, DELETE_MESSAGES, DELETE_CONFIRM, NETWORK, ACCOUNT, REGISTER, JOIN, LEAVE, DETAILS, DIAGNOSTICS, FORGET_DEVICE,
+        NETWORKS, ADD_NETWORK, NICKNAME, REMOVE_NETWORK, CONVERSATIONS }
     var page = Page.CHAT; private set
     var text = ""
     var scroll = 0
@@ -41,5 +44,4 @@ class IrcActions(private val state: IrcState, private val send: (String, List<St
         check(b?.joined == true && b.lines.any { it.messageId == id && it.command in setOf("PRIVMSG", "NOTICE") && !it.pending }) { "This message is no longer available for deletion." }
         send("REDACT", listOf(target, id), null)
     }
-    fun authenticated(defaultNetwork: Boolean) { if (defaultNetwork) join("#retui") }
 }

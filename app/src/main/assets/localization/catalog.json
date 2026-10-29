@@ -104,6 +104,28 @@
     },
     "type": "string"
   },
+  "apps_ranked_just_now": {
+    "formatted": true,
+    "forms": {
+      "other": "just now"
+    },
+    "type": "string"
+  },
+  "apps_ranked_launches": {
+    "formatted": true,
+    "forms": {
+      "one": "%1$d launch",
+      "other": "%1$d launches"
+    },
+    "type": "plurals"
+  },
+  "apps_ranked_none": {
+    "formatted": true,
+    "forms": {
+      "other": "No app launches recorded yet. Apps you open from Re:TUI appear here."
+    },
+    "type": "string"
+  },
   "backup_error_password": {
     "formatted": true,
     "forms": {
@@ -5863,14 +5885,14 @@
   "help_alias": {
     "formatted": true,
     "forms": {
-      "other": "-add [aliasName] [alias content] -> add a home alias \n-add -a [aliasName] [alias content] -> add a home alias \n-add -s [aliasName] [script path] -> add a Termux script alias \n-rm [aliasName] -> remove an existing alias \n-ls -> list your aliases \n-file -> open alias.txt \n-tutorial -> open the external GitHub wiki in a browser (network) \nHome aliases expand before built-in commands; avoid conflicting names. Script aliases execute code through Termux; inspect the script first."
+      "other": "-add [aliasName] [alias content] -> add a home alias \n-add -a [aliasName] [alias content] -> add a home alias \n-add -s [aliasName] [script path] -> add a Termux script alias \n-rm [aliasName] -> remove an existing alias \n-ls -> list your aliases \n-file -> open alias.txt \n-tutorial -> open the external Aliases guide on re-tui.pages.dev (network) \nHome aliases expand before built-in commands; avoid conflicting names. Script aliases execute code through Termux; inspect the script first."
     },
     "type": "string"
   },
   "help_apps": {
     "formatted": true,
     "forms": {
-      "other": "-ls [filter] -> open the app drawer, optionally showing only apps matching a name or what they do (music, maps, camera) \n-lsh -> list your hidden apps \n-show [appName] -> re-show an hidden app \n-hide [appName] -> hide an app \n-l [appName] -> show details about an app \n-ps [appName] -> show Google Play Store page for an app \n-st [appName] -> show Settings details for an app \n-default_app [index] [appName or most_used or null] -> set the default_app at the specified index \n-frc [appName] -> force Re:T-UI to launch an app \n-file -> open apps.xml \n-reset [appName] -> reset the \"launched_times\" value of the given app to 0 \n-mkgp [groupName] -> create a new group with the given name \n-rmgp [groupName] -> delete the group with the given name \n-gp_bg_color [groupName] [color] -> set the background color for the given group \n-gp_fore_color [groupName] [color] -> set the text color for the given group \n-addtogp [groupName] [appName] -> add the given app to the given group \n-rmfromgp [groupName] [appName] -> remove the given app from the given group \n-lsgp [OPTIONAL: groupName] -> list your groups, or list the content of the given group \n-tutorial -> open the Apps command guide"
+      "other": "-ls [filter] -> open the app drawer, optionally showing only apps matching a name or what they do (music, maps, camera) \n-r [count] -> apps you opened most recently from Re:TUI (default 10) \n-n [count] -> newest installed apps (default 10) \n-u [count] -> your most-used apps (default 10) \n-lsh -> list your hidden apps \n-show [appName] -> re-show an hidden app \n-hide [appName] -> hide an app \n-l [appName] -> show details about an app \n-ps [appName] -> show Google Play Store page for an app \n-st [appName] -> show Settings details for an app \n-default_app [index] [appName or most_used or null] -> set the default_app at the specified index \n-frc [appName] -> force Re:T-UI to launch an app \n-file -> open apps.xml \n-reset [appName] -> reset the \"launched_times\" value of the given app to 0 \n-mkgp [groupName] -> create a new group with the given name \n-rmgp [groupName] -> delete the group with the given name \n-gp_bg_color [groupName] [color] -> set the background color for the given group \n-gp_fore_color [groupName] [color] -> set the text color for the given group \n-addtogp [groupName] [appName] -> add the given app to the given group \n-rmfromgp [groupName] [appName] -> remove the given app from the given group \n-lsgp [OPTIONAL: groupName] -> list your groups, or list the content of the given group \n-tutorial -> open the external Apps guide on re-tui.pages.dev (network)"
     },
     "type": "string"
   },
@@ -5940,7 +5962,7 @@
   "help_config": {
     "formatted": true,
     "forms": {
-      "other": "-ls [optional: config file] -> list known files/options; with a file, read its values \n-info [option] -> read the type, default, and description \n-get [option] -> read the current value \n-set [option] [value] -> change a value; some options refresh live, others need restart \n-append [option] [value] -> concatenate text directly onto the current value, without a separator \n-file [known config file] -> edit a supported file such as behavior.xml, ui.xml, or theme.xml; saving changes configuration \n-erase [option] -> empty a value \n-reset [option] -> restore its default value \n-fontsize [integer] -> change ten legacy UI size fields, not all typography; use Settings for suggestions, module, and header sizes \n-apply [file] -> move an existing file into the configuration folder and rotate existing XML or font assets \n-tutorial -> open the external tutorial page (network) \n\nWarning: keep a personal backup before broad edits. -apply is a move, not a copy or portable preset import; it may replace existing assets and its reported path does not verify a successful move. Use the Settings shareable-configuration import for portable presets. \nKnown issue: -ls rss.xml currently returns notification values, not RSS values; do not use it to inspect feed configuration."
+      "other": "-ls [optional: config file] -> list known files/options; with a file, read its values \n-info [option] -> read the type, default, and description \n-get [option] -> read the current value \n-set [option] [value] -> change a value; some options refresh live, others need restart \n-append [option] [value] -> concatenate text directly onto the current value, without a separator \n-file [known config file] -> edit a supported file such as behavior.xml, ui.xml, or theme.xml; saving changes configuration \n-erase [option] -> empty a value \n-reset [option] -> restore its default value \n-fontsize [integer] -> change ten legacy UI size fields, not all typography; use Settings for suggestions, module, and header sizes \n-apply [file] -> move an existing file into the configuration folder and rotate existing XML or font assets \n-tutorial -> open the external Configuration guide on re-tui.pages.dev (network) \n\nWarning: keep a personal backup before broad edits. -apply is a move, not a copy or portable preset import; it may replace existing assets and its reported path does not verify a successful move. Use the Settings shareable-configuration import for portable presets. \nKnown issue: -ls rss.xml currently returns notification values, not RSS values; do not use it to inspect feed configuration."
     },
     "type": "string"
   },
@@ -6031,7 +6053,7 @@
   "help_htmlextract": {
     "formatted": true,
     "forms": {
-      "other": "Extract text from HTML pages \n-query [filter ID] [optional: format ID] [URL] -> parse the specified XPath entry with the specified URL \n-add [type] [ID] [expression] -> add a new expression of the given type (json, xpath or format) \n-rm [ID] -> remove an existing expression \n-edit [ID] [expression] -> change an existing expression \n-ls [type] -> shows the expressions of the given type \n-tutorial -> show the tutorial on GitHub \n-file -> open the file htmlextract.xml"
+      "other": "Extract text from HTML pages \n-query [filter ID] [optional: format ID] [URL] -> parse the specified XPath entry with the specified URL \n-add [type] [ID] [expression] -> add a new expression of the given type (json, xpath or format) \n-rm [ID] -> remove an existing expression \n-edit [ID] [expression] -> change an existing expression \n-ls [type] -> shows the expressions of the given type \n-tutorial -> open the offline Feeds and text automation guide \n-file -> open the file htmlextract.xml"
     },
     "type": "string"
   },
@@ -6059,7 +6081,7 @@
   "help_irc": {
     "formatted": true,
     "forms": {
-      "other": "irc — open the native TLS IRC terminal. /server, /connect, /login, /register, /join, /window, /query, /msg and /help."
+      "other": "irc — open the IRC client. Connect to Libera.Chat, OFTC or any TLS network, several at once. /network, /server, /connect, /login, /join, /window, /query, /msg and /help."
     },
     "type": "string"
   },
@@ -6122,7 +6144,7 @@
   "help_notifications": {
     "formatted": true,
     "forms": {
-      "other": "-inc [appName] -> include an application \n-exc [appName] -> exclude an application \n-open -> open the launcher notification shade; try the system shade only when the launcher UI is unavailable \n-next -> show the next notification in the module \n-prev -> show the previous notification in the module \n-reply -> reply to the selected module notification \n-clear -> dismiss the selected module notification, not clear terminal output \n-on -> add the notifications module to the dock \n-off -> remove the notifications module from the dock \n-color [color] [appName] -> set the color to be used for the application \n-format [ID] [appName] -> apply the format with the given ID to the corresponding application \n-add_filter [ID] [filter] -> create a new filter with the given ID \n-add_format [ID] [format] -> create a new format with the given ID \n-rm_filter [ID] -> delete the filter having the given ID \n-rm_format [ID] -> delete the format having the given ID \n-ls -> list included/excluded apps and content filters \n-access -> show the system settings page dedicated to the Notification Access \n-file -> open notifications.xml \n-tutorial -> open the external tutorial page (network) \nNotification access exposes private message content to the launcher. -on/-off only change dock membership, not Android listener access. Replies can send real messages; dismissal removes the selected notification."
+      "other": "-inc [appName] -> include an application \n-exc [appName] -> exclude an application \n-open -> open the launcher notification shade; try the system shade only when the launcher UI is unavailable \n-next -> show the next notification in the module \n-prev -> show the previous notification in the module \n-reply -> reply to the selected module notification \n-clear -> dismiss the selected module notification, not clear terminal output \n-on -> add the notifications module to the dock \n-off -> remove the notifications module from the dock \n-color [color] [appName] -> set the color to be used for the application \n-format [ID] [appName] -> apply the format with the given ID to the corresponding application \n-add_filter [ID] [filter] -> create a new filter with the given ID \n-add_format [ID] [format] -> create a new format with the given ID \n-rm_filter [ID] -> delete the filter having the given ID \n-rm_format [ID] -> delete the format having the given ID \n-ls -> list included/excluded apps and content filters \n-access -> show the system settings page dedicated to the Notification Access \n-file -> open notifications.xml \n-tutorial -> open the external Notifications guide on re-tui.pages.dev (network) \nNotification access exposes private message content to the launcher. -on/-off only change dock membership, not Android listener access. Replies can send real messages; dismissal removes the selected notification."
     },
     "type": "string"
   },
@@ -6220,7 +6242,7 @@
   "help_reply": {
     "formatted": true,
     "forms": {
-      "other": "-to [ID or packageName] [what] -> reply to the last notification from the application bound with the given ID \n-bind [appName] -> bind the application \n-unbind [appName] -> unbind the application \n-ls -> show your bound applications \n-check [ID or packageName] -> check the last notification from the application bound with the given ID \n-tutorial -> open the tutorial page on GitHub"
+      "other": "-to [ID or packageName] [what] -> reply to the last notification from the application bound with the given ID \n-bind [appName] -> bind the application \n-unbind [appName] -> unbind the application \n-ls -> show your bound applications \n-check [ID or packageName] -> check the last notification from the application bound with the given ID \n-tutorial -> open the external Notifications guide on re-tui.pages.dev, which covers replies (network)"
     },
     "type": "string"
   },
@@ -6430,7 +6452,7 @@
   "help_weather": {
     "formatted": true,
     "forms": {
-      "other": "Use tuiweather with these options; no API key is needed. \n-set_location [place or latitude,longitude] -> save weather_location and request an update \n-update -> request a manual weather update \n-enable -> enable show_weather and reload the launcher \n-disable -> disable show_weather and reload the launcher \n-tutorial -> open the external weather tutorial webpage (network) \n\nWeather requires network access to met.no. Place names use Android Geocoder and may fail to resolve. Coordinates are sent to the weather service; choose their precision deliberately. \n\nModule: \n$ module -show weather \n$ module -dock add weather"
+      "other": "Use tuiweather with these options; no API key is needed. \n-set_location [place or latitude,longitude] -> save weather_location and request an update \n-update -> request a manual weather update \n-enable -> enable show_weather and reload the launcher \n-disable -> disable show_weather and reload the launcher \n-tutorial -> open the external Status and Weather guide on re-tui.pages.dev (network) \n\nWeather requires network access to met.no. Place names use Android Geocoder and may fail to resolve. Coordinates are sent to the weather service; choose their precision deliberately. \n\nModule: \n$ module -show weather \n$ module -dock add weather"
     },
     "type": "string"
   },
@@ -6458,7 +6480,7 @@
   "help_workstation_quickstart": {
     "formatted": true,
     "forms": {
-      "other": "Re:T-UI workstation quickstart \nThis launcher expects you to drive. Use commands first; UI surfaces are helpers. \n \nTry: \n guide -> start a non-blocking walkthrough \n app name -> launch an app by name \n alias -add ll apps -ls -> create a reusable shortcut \n apps -hide appName -> remove visual noise from the drawer \n wallpaper -auto -> derive a theme from your current wallpaper \n preset -save mylook -> save the result \n module -ls -> inspect available terminal modules \n \nWiki: \n https://github.com/DvilSpawn/Re-TUI/wiki/Getting-Started \n https://github.com/DvilSpawn/Re-TUI/wiki/Command-Reference \n https://github.com/DvilSpawn/Re-TUI/wiki/Aliases \n https://github.com/DvilSpawn/Re-TUI/wiki/App-Drawer \n https://github.com/DvilSpawn/Re-TUI/wiki/Presets-and-Wallpaper-Auto-Color \n https://github.com/DvilSpawn/Re-TUI/wiki/Termux-Integration"
+      "other": "Re:T-UI workstation quickstart \nThis launcher expects you to drive. Use commands first; UI surfaces are helpers. \n \nTry: \n guide -> start a non-blocking walkthrough \n app name -> launch an app by name \n alias -add ll apps -ls -> create a reusable shortcut \n apps -hide appName -> remove visual noise from the drawer \n wallpaper -auto -> derive a theme from your current wallpaper \n preset -save mylook -> save the result \n module -ls -> inspect available terminal modules \n \nWiki: \n https://github.com/DvilSpawn/Re-TUI/wiki/Getting-Started \n https://github.com/DvilSpawn/Re-TUI/wiki/Command-Reference \n https://github.com/DvilSpawn/Re-TUI/wiki/Aliases \n https://github.com/DvilSpawn/Re-TUI/wiki/App-Drawer \n https://github.com/DvilSpawn/Re-TUI/wiki/Presets-and-Wallpaper-Auto-Color \n https://re-tui.pages.dev/termux"
     },
     "type": "string"
   },
@@ -6990,7 +7012,7 @@
   "irc_account_explanation": {
     "formatted": true,
     "forms": {
-      "other": "Enter your IRC account name, then your password. This name will also be your nickname."
+      "other": "Enter your %1$s account name, then your password. This name will also be your nickname."
     },
     "type": "string"
   },
@@ -7012,6 +7034,20 @@
     "formatted": true,
     "forms": {
       "other": "Could not complete this action."
+    },
+    "type": "string"
+  },
+  "irc_add_network": {
+    "formatted": true,
+    "forms": {
+      "other": "Add a network"
+    },
+    "type": "string"
+  },
+  "irc_add_network_explanation": {
+    "formatted": true,
+    "forms": {
+      "other": "Pick a network, or type a server address and TLS port (6697 if left out), then Continue."
     },
     "type": "string"
   },
@@ -7043,6 +7079,13 @@
     },
     "type": "string"
   },
+  "irc_change_nickname": {
+    "formatted": true,
+    "forms": {
+      "other": "Change nickname"
+    },
+    "type": "string"
+  },
   "irc_channels": {
     "formatted": true,
     "forms": {
@@ -7061,6 +7104,20 @@
     "formatted": true,
     "forms": {
       "other": "Choose a command for its syntax. Nothing is sent until you press ↵."
+    },
+    "type": "string"
+  },
+  "irc_connect_as": {
+    "formatted": true,
+    "forms": {
+      "other": "Connect as %1$s (no account)"
+    },
+    "type": "string"
+  },
+  "irc_connect_guest": {
+    "formatted": true,
+    "forms": {
+      "other": "Connect"
     },
     "type": "string"
   },
@@ -7116,7 +7173,7 @@
   "irc_delete_question": {
     "formatted": true,
     "forms": {
-      "other": "Delete this message from IRC history and supported clients? Copies on Discord or other clients may remain."
+      "other": "Delete this message from IRC history and supported clients? Copies in other clients may remain."
     },
     "type": "string"
   },
@@ -7130,7 +7187,7 @@
   "irc_device_explanation": {
     "formatted": true,
     "forms": {
-      "other": "Reconnect automatically with a protected device key; no saved password. Anyone using your unlocked Launcher can access this account. A new phone or reinstall needs password sign-in."
+      "other": "Reconnect without a password, using a protected key on this phone. Works on networks whose NickServ accepts certificates, such as Libera.Chat and OFTC. Anyone using your unlocked Launcher can use this account. A new phone or reinstall needs password sign-in."
     },
     "type": "string"
   },
@@ -7144,7 +7201,7 @@
   "irc_device_forgotten": {
     "formatted": true,
     "forms": {
-      "other": "Local device key removed. Password sign-in is required. Check NickServ certificate authorization if server revocation could not complete."
+      "other": "Device key removed from this phone. Sign in with your password next time."
     },
     "type": "string"
   },
@@ -7155,24 +7212,10 @@
     },
     "type": "string"
   },
-  "irc_device_removing": {
-    "formatted": true,
-    "forms": {
-      "other": "Removing device authorization…"
-    },
-    "type": "string"
-  },
-  "irc_device_revoked": {
-    "formatted": true,
-    "forms": {
-      "other": "Device authorization revoked and local key removed."
-    },
-    "type": "string"
-  },
   "irc_device_saved": {
     "formatted": true,
     "forms": {
-      "other": "Device remembered. IRC reconnects automatically when opened."
+      "other": "Device remembered. This network reconnects without a password."
     },
     "type": "string"
   },
@@ -7221,14 +7264,14 @@
   "irc_forget_explanation": {
     "formatted": true,
     "forms": {
-      "other": "Remove the login key from this phone and disconnect? Server revocation will also be requested if this account is connected. If offline, remove its old certificate through NickServ on a trusted client."
+      "other": "Remove the sign-in key from this phone? The network may still list its certificate, but it can no longer be used. You can remove it there with NickServ CERT DEL."
     },
     "type": "string"
   },
   "irc_help": {
     "formatted": true,
     "forms": {
-      "other": "Native IRC terminal — one TLS network at a time.\n/server [host] [TLS port] · default irc.kokodoko.cloud 6697\n/nick nickname · /connect · /login account (masked SASL password)\n/register (guided signup offline; masked NickServ password when connected)\n/join #channel · /j #channel · /part [#channel]\n/window [number|name|next|prev|close] · /buffer is an alias\n/query nick · /msg nick text · /me action · /names · /list\n/topic [text] · /whois nick · /mode target modes · /kick nick [reason]\n/oper name (masked password) · /disconnect · /quit · /clear · /help\nPlain text goes only to the active joined channel or query. //text sends /text literally. Unknown commands never become messages or launcher commands.\nWindow markers: * unread · ! mention/private message. Passwords are never transcript/history entries. TLS is verified; no plaintext fallback.\nRegister once, then sign in or reconnect before joining registered-only channels. Server-readable, not end-to-end encrypted. On supported networks, rejoining loads up to 100 recent channel messages. Server-confirmed deletions replace messages with a deletion marker. There is no push or background service; leaving disconnects. Unconfirmed messages are never retried automatically."
+      "other": "IRC client — one or more TLS networks at once.\n/network · /network add host [port] · /network next|prev|name (Alt+←/→)\n/server [host] [TLS port] · /nick nickname · /connect · /login account (masked SASL password)\n/register [email] (guided signup offline where supported; masked NickServ password when connected)\n/join #channel · /j #channel · /part [#channel]\n/window [number|name|next|prev|close] · /buffer is an alias\n/query nick · /msg nick text · /me action · /names · /list\n/topic [text] · /whois nick · /mode target modes · /kick nick [reason]\n/oper name (masked password) · /disconnect · /quit · /clear · /help\nPlain text goes only to the active joined channel or query. //text sends /text literally. Unknown commands never become messages or launcher commands.\nWindow markers: + unread · ! mention/private message. The first chip names the network; its marker counts messages on your other networks.\n/split [auto|side|stack|off] shows a second conversation, from any network, beside the one you type into (▶). Tap a tile's label to choose what it shows, or hold a conversation chip; tap a tile to type into it.\nEach network rejoins the channels you were in. A dropped connection reconnects by itself when it needs no password. Passwords are never saved or shown. TLS is verified; no plaintext fallback.\nServer-readable, not end-to-end encrypted. On supported networks, rejoining loads up to 100 recent channel messages. There is no push or background service; leaving disconnects. Unconfirmed messages are never retried automatically."
     },
     "type": "string"
   },
@@ -7249,7 +7292,7 @@
   "irc_join_hint": {
     "formatted": true,
     "forms": {
-      "other": "Enter a channel such as #retui, then Continue."
+      "other": "Enter a channel such as #linux, then Continue."
     },
     "type": "string"
   },
@@ -7305,7 +7348,14 @@
   "irc_network": {
     "formatted": true,
     "forms": {
-      "other": "Network"
+      "other": "Server"
+    },
+    "type": "string"
+  },
+  "irc_network_connecting": {
+    "formatted": true,
+    "forms": {
+      "other": "connecting…"
     },
     "type": "string"
   },
@@ -7323,17 +7373,52 @@
     },
     "type": "string"
   },
+  "irc_network_offline": {
+    "formatted": true,
+    "forms": {
+      "other": "offline"
+    },
+    "type": "string"
+  },
+  "irc_network_online": {
+    "formatted": true,
+    "forms": {
+      "other": "connected"
+    },
+    "type": "string"
+  },
+  "irc_networks": {
+    "formatted": true,
+    "forms": {
+      "other": "Networks"
+    },
+    "type": "string"
+  },
+  "irc_networks_chip": {
+    "formatted": true,
+    "forms": {
+      "other": "Networks. Current network: %1$s"
+    },
+    "type": "string"
+  },
+  "irc_nickname_explanation": {
+    "formatted": true,
+    "forms": {
+      "other": "Your nickname is %1$s. Type a new one, then Continue. Signing in uses your account name instead."
+    },
+    "type": "string"
+  },
+  "irc_nickname_hint": {
+    "formatted": true,
+    "forms": {
+      "other": "nickname"
+    },
+    "type": "string"
+  },
   "irc_no_matches": {
     "formatted": true,
     "forms": {
       "other": "No matches yet."
-    },
-    "type": "string"
-  },
-  "irc_other_network": {
-    "formatted": true,
-    "forms": {
-      "other": "Use an existing account on this network. Nickname-only connections and registration are available through commands where supported."
     },
     "type": "string"
   },
@@ -7379,6 +7464,13 @@
     },
     "type": "string"
   },
+  "irc_reconnect_as": {
+    "formatted": true,
+    "forms": {
+      "other": "Reconnect as %1$s"
+    },
+    "type": "string"
+  },
   "irc_refresh": {
     "formatted": true,
     "forms": {
@@ -7389,7 +7481,14 @@
   "irc_register_explanation": {
     "formatted": true,
     "forms": {
-      "other": "Choose a username, then a masked password. We join only after your account is confirmed. Re:TUI remembers this device by default; you can turn that off below."
+      "other": "Choose a username, then a masked password. This works on networks that support sign-up from IRC apps; we join only after your account is confirmed. Elsewhere, such as Libera.Chat, connect first and use /register your@email. Re:TUI remembers this device by default; you can turn that off below."
+    },
+    "type": "string"
+  },
+  "irc_rejoin_list": {
+    "formatted": true,
+    "forms": {
+      "other": "Rejoins: %1$s"
     },
     "type": "string"
   },
@@ -7397,6 +7496,27 @@
     "formatted": true,
     "forms": {
       "other": "Remember this device"
+    },
+    "type": "string"
+  },
+  "irc_remove_network": {
+    "formatted": true,
+    "forms": {
+      "other": "Remove %1$s"
+    },
+    "type": "string"
+  },
+  "irc_remove_network_question": {
+    "formatted": true,
+    "forms": {
+      "other": "Remove %1$s from this phone? It disconnects and its device key is deleted. Your account on the network is not touched."
+    },
+    "type": "string"
+  },
+  "irc_retired_server": {
+    "formatted": true,
+    "forms": {
+      "other": "Re:TUI's own IRC server has closed. Libera.Chat is selected below, or open Networks to choose another. Your channels and account there do not carry over."
     },
     "type": "string"
   },
@@ -7417,7 +7537,7 @@
   "irc_security_details": {
     "formatted": true,
     "forms": {
-      "other": "TLS protects the connection, not against server operators. Private conversations are not end-to-end encrypted.\nLeaving this pane disconnects. Passwords are not saved. Unconfirmed messages are never retried automatically."
+      "other": "TLS protects the connection, not against server operators. Private conversations are not end-to-end encrypted.\nLeaving this pane disconnects every network. Networks that were connected reconnect when you open IRC again, if they need no password. Passwords are not saved. Unconfirmed messages are never retried automatically."
     },
     "type": "string"
   },
@@ -7445,7 +7565,91 @@
   "irc_signup_info": {
     "formatted": true,
     "forms": {
-      "other": "Create an IRC account with a username and password. No email is required. Registration is subject to server limits."
+      "other": "Sign-up rules belong to each network. Some ask for an email address or verification before an account works."
+    },
+    "type": "string"
+  },
+  "irc_split_auto": {
+    "formatted": true,
+    "forms": {
+      "other": "Split view: top and bottom, side by side in landscape"
+    },
+    "type": "string"
+  },
+  "irc_split_beside_label": {
+    "formatted": true,
+    "forms": {
+      "other": "Showing %1$s. Tap to choose another conversation."
+    },
+    "type": "string"
+  },
+  "irc_split_choose_beside": {
+    "formatted": true,
+    "forms": {
+      "other": "Show in the other side"
+    },
+    "type": "string"
+  },
+  "irc_split_choose_main": {
+    "formatted": true,
+    "forms": {
+      "other": "Show in the typing side (▶)"
+    },
+    "type": "string"
+  },
+  "irc_split_empty": {
+    "formatted": true,
+    "forms": {
+      "other": "Tap this label to choose a conversation from any network. Tap below it to type here."
+    },
+    "type": "string"
+  },
+  "irc_split_focus": {
+    "formatted": true,
+    "forms": {
+      "other": "Second conversation. Tap to type into it."
+    },
+    "type": "string"
+  },
+  "irc_split_main_label": {
+    "formatted": true,
+    "forms": {
+      "other": "Typing into %1$s. Tap to choose another conversation."
+    },
+    "type": "string"
+  },
+  "irc_split_off": {
+    "formatted": true,
+    "forms": {
+      "other": "Split view: off"
+    },
+    "type": "string"
+  },
+  "irc_split_side": {
+    "formatted": true,
+    "forms": {
+      "other": "Split view: side by side"
+    },
+    "type": "string"
+  },
+  "irc_split_stack": {
+    "formatted": true,
+    "forms": {
+      "other": "Split view: top and bottom"
+    },
+    "type": "string"
+  },
+  "irc_split_status": {
+    "formatted": true,
+    "forms": {
+      "other": "network home"
+    },
+    "type": "string"
+  },
+  "irc_split_title": {
+    "formatted": true,
+    "forms": {
+      "other": "Split view"
     },
     "type": "string"
   },
@@ -7459,7 +7663,7 @@
   "irc_welcome": {
     "formatted": true,
     "forms": {
-      "other": "IRC, at your fingertips.\nSign in, choose a channel, and talk."
+      "other": "Connect as a guest to start chatting, or sign in with your account on this network."
     },
     "type": "string"
   },
@@ -11470,7 +11674,7 @@
   "offline_help_article_home_back_retention_body": {
     "formatted": false,
     "forms": {
-      "other": "Back is contextual: it handles a workspace or Termux console before podcast/profile surfaces, drawers and the output tray. In the Termux console, Back hides the keyboard before closing the console. Android Home is a separate action. In-place launcher refresh preserves terminal state. Podcast filters, search and scroll, and Termux console buffer/drafts are retained only while the launcher process survives. Calculator history, answer and editing position use separate saved preferences. Help Back closes the reader immediately and keeps its article/reading position for reopening. Calculator, Help and IRC retain independent expanded/floating choice and bounds; Calculator and Help remain expanded in landscape. IRC Back first leaves Channels/People/Help navigation; Back from its conversation closes the pane and disconnects. Remembered device authentication can reconnect next time, but it is not chat transcript or process-death draft persistence. Launcher UI retention does not guarantee that a remote tmux job or session is still running."
+      "other": "Back is contextual: it handles a workspace or Termux console before podcast/profile surfaces, drawers and the output tray. In the Termux console, Back hides the keyboard before closing the console. Android Home is a separate action. In-place launcher refresh preserves terminal state. Podcast filters, search and scroll, and Termux console buffer/drafts are retained only while the launcher process survives. Calculator history, answer and editing position use separate saved preferences. Help Back closes the reader immediately and keeps its article/reading position for reopening. Calculator, Help and IRC retain independent expanded/floating choice and bounds; Calculator and Help remain expanded in landscape. IRC Back first leaves Channels/People/Help navigation; Back from its conversation closes the pane and disconnects every network. Networks reconnect next time when they need no password, but it is not chat transcript or process-death draft persistence. Launcher UI retention does not guarantee that a remote tmux job or session is still running."
     },
     "type": "string"
   },
@@ -11540,7 +11744,7 @@
   "offline_help_article_irc_accounts_privacy_body": {
     "formatted": false,
     "forms": {
-      "other": "## Remember this device\n\nOn the default Re:TUI network, Remember this device authorizes a protected Android Keystore key after successful account authentication. Create account enables this choice by default and explains it before password entry; you can turn it off. Passwords are not saved. After enrollment is confirmed, opening IRC automatically reconnects and requests #retui.\n\nThis is a device reconnect key, not a portable restore code. A new phone, reinstall, deleted app data or a missing key needs password sign-in again. Anyone using your unlocked Launcher can use the remembered account. Keep your account password recoverable independently.\n\n## If reconnect fails\n\nCheck your network and the chosen server, then use Reconnect or password Sign in. A rejected key or TLS failure does not silently downgrade authentication. Account names belong to a network; an account on another IRC server or an old experimental community login is not automatically a Re:TUI IRC account. Use Network while disconnected to choose a compatible TLS server.\n\n## Forget this device\n\nConnection details offers Forget this device. While connected to the bound account it requests server revocation, waits for confirmation, then removes the local key and disconnects. If offline or revocation fails, local removal can still happen; follow the warning and remove the old certificate authorization through NickServ on a trusted client. Local deletion is not proof of server revocation.\n\n## Privacy and retention\n\nTLS verifies and encrypts the connection, but messages are not end-to-end encrypted. Server operators can read channel and private messages. The server receives your connection address; nickname display and IP cloaking are not anonymity from the operator. Never share passwords or private recovery information in a channel.\n\nThe default network uses a one-week server-history policy with cleanup in batches, not instantaneous deletion. External networks have their own policies. Launcher has no persistent local transcript, background IRC service, push or offline replay in this version. Rotation retains conversations, but password entry cancels; leaving the pane disconnects. Process death does not preserve an unsent chat draft.\n\nFor default-network moderation, privacy or account-deletion requests, contact the developer privately. dvil is the configured moderator. Forget this device does not delete the server account or its history."
+      "other": "## Remember this device\n\nRemember this device asks the network's NickServ to trust a protected Android Keystore key after you sign in. Create account turns it on by default; you can turn it off. Passwords are not saved. Afterwards the network reconnects without a password and rejoins your channels. It works on networks whose services accept certificates, such as Libera.Chat and OFTC.\n\nThis is a device key, not a portable restore code. A new phone, reinstall, deleted app data or a missing key needs password sign-in again. Anyone using your unlocked Launcher can use the remembered account. Keep your account password recoverable independently.\n\n## If reconnect fails\n\nCheck your network and the server, then use Reconnect or password Sign in. A rejected key or TLS failure never silently downgrades to a guest connection. Account names belong to one network; an account on one network is not an account on another.\n\n## Forget this device\n\nConnection details offers Forget this device. It deletes the key from this phone. The network may still list the certificate, but nothing can use it; remove it with NickServ CERT DEL from a signed-in client if you want. Removing a network also deletes its key. Neither deletes your account.\n\n## Privacy and retention\n\nTLS verifies and encrypts the connection, but messages are not end-to-end encrypted. Server operators can read channel and private messages and see your connection address. Each network has its own rules and history retention. Launcher keeps no transcript after you close IRC and has no background IRC service or push. Rotation retains conversations, but password entry cancels; leaving the pane disconnects."
     },
     "type": "string"
   },
@@ -11554,14 +11758,14 @@
   "offline_help_article_irc_community_body": {
     "formatted": false,
     "forms": {
-      "other": "## Open and sign in\n\nEnter `irc` at Launcher Home. Tap Sign in, enter your IRC account name, then the masked password in the same composer. On the Re:TUI network the account name is also your nickname. Wait for Connected and confirmed membership of #retui before sending. Joining means the server has not confirmed membership yet.\n\nCreate account uses the same username/password flow when the network permits registration. If registration is closed or rejected, use an existing account or wait for signup to open; Launcher does not fall back to a guest account.\n\n## Everyday navigation\n\n1. Type a message in the active conversation and press ↵ to send.\n2. Tap a named conversation chip to switch channels or private conversations. Unread counts and mention markers identify activity elsewhere.\n3. Open Channels to switch to an open channel, browse the network, or join by name. Search text in navigation views is never posted as a message.\n\nPeople lists nicknames in the active channel. Tap a nickname to open a private conversation; that alone sends nothing. Help begins with three short instructions; All commands opens the grouped reference. Channels, People and Help temporarily replace the conversation view without discarding its draft or reading position.\n\nBack first leaves a temporary view. From the conversation it closes the pane and disconnects. More offers connection details, diagnostics, leave/close and disconnect; leaving a channel asks for confirmation.\n\n## Optional slash commands\n\n```\n/join #help\n/window #retui\n/query nickname\n/help\n```\n\nUse these inside IRC, not at Launcher Home. /join requests membership; /window switches an open conversation; /query opens a private conversation without sending. Replace nickname with the intended person. Typing / offers syntax hints. Unknown slash commands are rejected, never sent as messages. `//text` sends a literal leading slash.\n\n## Sending safely\n\nMessages appear immediately with their confirmation state. Server echo confirms server acceptance, not recipient delivery or a read receipt. Disconnect can leave a send uncertain; it is never automatically retried. Check the conversation before manually resending. Opening this offline article does not sign in, join or send anything."
+      "other": "## Open and connect\n\nEnter `irc` at Launcher Home. The first time, Libera.Chat is selected. Tap Connect as … to join as a guest, or Sign in and enter your account name, then the masked password in the same composer. Change nickname picks the name others see.\n\nRe:TUI's own IRC server has closed. Accounts and channels from it do not carry over; choose any public network instead.\n\nCreate account uses the same username/password flow on networks that allow signup from apps. On networks such as Libera.Chat, connect first, then use /register with your email address; the password is asked for separately and masked. Launcher never falls back to a guest connection when sign-in fails.\n\n## Networks\n\nThe first chip under the conversation names the current network. Its marker counts unread messages and mentions on your other networks. Tap it for Networks: switch network, Add a network (Libera.Chat, OFTC, Rizon, hackint or any TLS server) or remove one. Every network stays connected while you switch.\n\nEach network rejoins the channels you were in. Networks that were connected when you closed IRC reconnect when you open it again, when they need no password. A dropped connection retries by itself for a few minutes.\n\n## Everyday navigation\n\n1. Type a message in the active conversation and press ↵ to send.\n2. Tap a named conversation chip to switch channels or private conversations. Unread counts and mention markers identify activity elsewhere.\n3. Open Channels to switch to an open channel, browse the network, or join by name. Search text in navigation views is never posted as a message.\n\nPeople lists nicknames in the active channel. Tap a nickname to open a private conversation; that alone sends nothing. Back first leaves a temporary view. From the conversation it closes the pane and disconnects every network.\n\n## Optional slash commands\n\n```\n/network\n/network add irc.oftc.net\n/join #linux\n/query nickname\n/help\n```\n\nUse these inside IRC, not at Launcher Home. /network lists networks and switches; Alt+← and Alt+→ also switch. /join requests membership; /query opens a private conversation without sending. Typing / offers syntax hints. Unknown slash commands are rejected, never sent as messages. `//text` sends a literal leading slash.\n\n## Sending safely\n\nMessages appear immediately with their confirmation state. Server echo confirms server acceptance, not recipient delivery or a read receipt. Disconnect can leave a send uncertain; it is never automatically retried. Opening this offline article does not connect, join or send anything."
     },
     "type": "string"
   },
   "offline_help_article_irc_community_title": {
     "formatted": false,
     "forms": {
-      "other": "IRC: sign in, join and talk"
+      "other": "IRC: connect, join and talk"
     },
     "type": "string"
   },
@@ -11694,7 +11898,7 @@
   "offline_help_article_new_features_body": {
     "formatted": false,
     "forms": {
-      "other": "## Start here\n\nThis manual is bundled with Launcher and can be read offline. IRC and network services still need a connection. Read examples here; entering them at a live prompt can perform their described actions.\n\n- IRC: open `irc`, sign in, wait for #retui, then talk. Find IRC guides in Tools.\n- Calculator: use 123, ABC and FUNC, check the interpretation/result hint, and use `to` for conversions. Read Calculator help in Tools.\n- Floating tools: Calculator, Help and IRC start expanded, remember their window choice and retain their floating size. Find Floating tools in Appearance.\n- Termux: the separate workspace has pages and up to two independent tiles. It offers a prompted update for the APK-bundled helper. Read Termux workspace and Helper updates in Automation.\n- Presets: a shared .retui package is inspected and saved first, not immediately applied. Personal .retui-backup archives are separate. Read Portable preset import in Presets.\n- Startup: new installs complete the introduction, configuration and build animation before entering Launcher. Existing completed setups are kept. Read Startup setup in Getting started.\n- Appearance: app-drawer category/alphabet rails have independent normal and selected colors. The default font is JetBrains Mono Nerd Font Regular; custom/system font controls remain available.\n- Idle fade: optionally fade Home and the Termux workspace to the wallpaper. It is off by default. Read Idle fade in Appearance.\n\n## Recent updates\n\n- Help home: use 10 from any article or topic list to return directly to the main directory.\n- Notes: the library and editor share the terminal pane styling and background blur. Read Notes in Tools.\n- Settings: swipe through Status, Terminal, Music, Help and Calculator previews before saving appearance changes. Read Configuration workflow in Appearance.\n- Private Space: enable the private command in Behaviour on supported devices, unlock, then use `private -open <app name>`. Read Private Space in Apps.\n- Calculator: basic arithmetic is ready immediately; advanced Qalculate is downloaded and installed after confirmation.\n\n## Find an article directly\n\n```\nhelp -topic irc-community\n```\n\nAt Launcher Home, open the offline IRC guide. `help irc` prints the shorter command reference instead. Use numbered choices or tap a topic in this reader; Android Back closes Help and keeps your place."
+      "other": "## Start here\n\nThis manual is bundled with Launcher and can be read offline. IRC and network services still need a connection. Read examples here; entering them at a live prompt can perform their described actions.\n\n- IRC: open `irc`, connect to Libera.Chat or another network, join a channel, then talk. Several networks can be connected at once. Find IRC guides in Tools.\n- Calculator: use 123, ABC and FUNC, check the interpretation/result hint, and use `to` for conversions. Read Calculator help in Tools.\n- Floating tools: Calculator, Help and IRC start expanded, remember their window choice and retain their floating size. Find Floating tools in Appearance.\n- Termux: the separate workspace has pages and up to two independent tiles. It offers a prompted update for the APK-bundled helper. Read Termux workspace and Helper updates in Automation.\n- Presets: a shared .retui package is inspected and saved first, not immediately applied. Personal .retui-backup archives are separate. Read Portable preset import in Presets.\n- Startup: new installs complete the introduction, configuration and build animation before entering Launcher. Existing completed setups are kept. Read Startup setup in Getting started.\n- Appearance: app-drawer category/alphabet rails have independent normal and selected colors. The default font is JetBrains Mono Nerd Font Regular; custom/system font controls remain available.\n- Idle fade: optionally fade Home and the Termux workspace to the wallpaper. It is off by default. Read Idle fade in Appearance.\n\n## Recent updates\n\n- Help home: use 10 from any article or topic list to return directly to the main directory.\n- Notes: the library and editor share the terminal pane styling and background blur. Read Notes in Tools.\n- Settings: swipe through Status, Terminal, Music, Help and Calculator previews before saving appearance changes. Read Configuration workflow in Appearance.\n- Private Space: enable the private command in Behaviour on supported devices, unlock, then use `private -open <app name>`. Read Private Space in Apps.\n- Calculator: basic arithmetic is ready immediately; advanced Qalculate is downloaded and installed after confirmation.\n\n## Find an article directly\n\n```\nhelp -topic irc-community\n```\n\nAt Launcher Home, open the offline IRC guide. `help irc` prints the shorter command reference instead. Use numbered choices or tap a topic in this reader; Android Back closes Help and keeps your place."
     },
     "type": "string"
   },

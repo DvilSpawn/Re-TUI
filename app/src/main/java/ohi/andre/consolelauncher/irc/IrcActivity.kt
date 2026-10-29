@@ -4,8 +4,6 @@ import android.content.Context
 import android.app.Application
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.text.InputType
 import android.text.SpannableStringBuilder
 import android.text.Spanned
@@ -18,8 +16,6 @@ import android.view.inputmethod.EditorInfo
 import android.widget.*
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModelProvider
-import java.util.concurrent.ArrayBlockingQueue
-import java.util.concurrent.atomic.AtomicBoolean
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.BuildConfig
 import ohi.andre.consolelauncher.commands.tuixt.TuixtLayout
@@ -34,133 +30,121 @@ import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.tuils.*
 
+/** Every saved network's connection. The pane shows one network at a time; the others keep running. */
 class IrcTerminalSession(application: Application) : AndroidViewModel(application) {
-    val state = IrcState()
-    val navigation = IrcNavigation(state)
-    val actions = IrcActions(state, ::send)
     val devices = IrcDeviceKey(application)
-    var rememberDevice = false
-    var deviceStatus = ""
-    private var pendingDevice: IrcDeviceKey.Identity? = null
-    private var revokingDevice: IrcDeviceKey.Identity? = null
+    private val store = IrcNetworkStore(java.io.File(application.noBackupFilesDir, "irc-networks.json"))
+    val connections = mutableListOf<IrcConnection>()
+    var active: IrcConnection; private set
+    val state get() = active.state
+    val navigation = IrcNavigation { active.state }
+    val actions get() = active.actions
     internal var connector: ((String, Int) -> java.net.Socket)? = null
+    var changed: (() -> Unit)? = null
     var initialized = false
-    fun restoreDevice() {
+    /** Set once after upgrading from a build that used the retired Re:TUI server. */
+    var retiredServer = false
+    init {
+        retiredServer = runCatching { devices.clearLegacy() }.getOrDefault(false)
+        store.load().forEach { connections.add(connection(it).apply { stored = true }) }
+        // First run: Libera.Chat is offered, and saved once it is actually used.
+        if (connections.isEmpty()) connections.add(connection(IrcNetwork.PRESETS.first()))
+        // A network never connected has no nickname yet; use the one chosen elsewhere.
+        connections.firstNotNullOfOrNull { it.network.nickname.ifEmpty { null } }?.let { known ->
+            connections.filter { it.network.nickname.isEmpty() }.forEach { it.state.nickname = known }
+        }
+        active = connections.first()
+    }
+    private fun connection(network: IrcNetwork) = IrcConnection(getApplication(), network, devices, { connector }, { changed?.invoke() }, ::persist)
+    private fun persist() { runCatching { store.save(connections.filter { it.stored }.map { it.network }) } }
+    private fun keep(connection: IrcConnection) { if (!connection.stored) { connection.stored = true; persist() } }
+
+    // The active network, as the pane and its commands see it.
+    var host: String get() = active.host; set(value) { active.host = value }
+    var port: Int get() = active.port; set(value) { active.port = value }
+    var account: String get() = active.account; set(value) { active.account = value }
+    var rememberDevice: Boolean get() = active.rememberDevice; set(value) { active.rememberDevice = value }
+    val deviceStatus get() = active.deviceStatus
+    val connectionText get() = active.connectionText
+    val client get() = active.client
+    fun connect(password: CharArray = charArrayOf(), external: Boolean = false, register: Boolean = false) {
+        keep(active); active.connect(password, external, register)
+    }
+    fun reconnect() { keep(active); active.reconnect() }
+    fun disconnect() = active.disconnect()
+    fun forgetDevice() = active.forgetDevice()
+    fun send(command: String, parameters: List<String> = emptyList(), body: String? = null) = active.send(command, parameters, body)
+    fun say(target: String, body: String) = active.say(target, body)
+
+    /** The pane opened: reconnect networks that were online when it closed and need no password. */
+    fun restore() {
         if (initialized) return
         initialized = true
-        if (devices.remembered() != null) reconnectDevice()
+        connections.filter { it.network.connectOnOpen && (it.deviceReady || it.network.account.isEmpty()) }
+            .forEach { connection -> runCatching { connection.reconnect() }.onFailure { connection.state.status(it.message ?: "Could not reconnect") } }
     }
-    fun reconnectDevice() {
-        val identity = devices.remembered() ?: error("Device key unavailable. Sign in with a password.")
-        host = identity.host; port = identity.port; account = identity.account; state.nickname = identity.account
-        connect(external = true)
-    }
-    fun forgetDevice() {
-        val identity = devices.remembered() ?: return
-        if (client?.ready == true && host == identity.host && port == identity.port && account.equals(identity.account, true)) {
-            runCatching {
-                send("PRIVMSG", listOf("NickServ"), "CERT DEL ${devices.fingerprint(identity)}")
-                revokingDevice = identity; deviceStatus = getApplication<Application>().getString(R.string.irc_device_removing)
-                val generation = epoch
-                ui.postDelayed({ if (generation == epoch && revokingDevice == identity) finishForget(identity, false) }, 10_000)
-            }.onFailure { finishForget(identity, false) }
-        } else finishForget(identity, false)
-    }
-    private fun finishForget(identity: IrcDeviceKey.Identity, confirmed: Boolean) {
-        revokingDevice = null; devices.forget(identity)
-        pendingDevice = null; rememberDevice = false; disconnect(); account = ""
-        deviceStatus = getApplication<Application>().getString(if (confirmed) R.string.irc_device_revoked else R.string.irc_device_forgotten)
+    /** The pane closed. Connections end, but each network remembers whether to reconnect. */
+    fun suspendAll() { connections.forEach { it.suspend() }; initialized = false; changed?.invoke() }
+    fun switchTo(connection: IrcConnection) {
+        if (connection === active) return
+        state.conversationVisible = false
+        active = connection
+        state.conversationVisible = navigation.page == IrcNavigation.Page.CHAT
+        if (state.conversationVisible) state.acknowledge()
         changed?.invoke()
     }
-    var host = "irc.kokodoko.cloud"; var port = 6697
-    var connectionText = "Offline"
-    var account = ""
-    var client: IrcClient? = null; private set
-    var changed: (() -> Unit)? = null
-    private val ui = Handler(Looper.getMainLooper())
-    private val incoming = ArrayBlockingQueue<Pair<Int, IrcMessage>>(256)
-    private val drainScheduled = AtomicBoolean(false)
-    private var epoch = 0
-    private fun scheduleDrain() { if (drainScheduled.compareAndSet(false, true)) ui.post { drain() } }
-    private fun drain() {
-        var updated = false
-        repeat(64) {
-            val (generation, message) = incoming.poll() ?: return@repeat
-            if (generation == epoch) {
-                val identity = pendingDevice
-                if (message.command == "NOTICE" && message.nick.equals("NickServ", true) && message.params.firstOrNull()?.let { IrcProtocol.fold(it, state.mapping) == IrcProtocol.fold(state.nickname, state.mapping) } == true) {
-                    val notice = IrcProtocol.display(message.params.lastOrNull().orEmpty())
-                    if (identity != null && (notice == "Certificate fingerprint successfully added" || notice == "That certificate fingerprint was already authorized")) {
-                        runCatching { devices.remember(identity) }.onSuccess { deviceStatus = getApplication<Application>().getString(R.string.irc_device_saved) }
-                            .onFailure { deviceStatus = getApplication<Application>().getString(R.string.irc_device_failed) }
-                        pendingDevice = null
-                    }
-                    val removing = revokingDevice
-                    if (removing != null && (notice == "Certificate fingerprint successfully removed" || notice == "Certificate fingerprint not found")) { finishForget(removing, true); return@repeat }
-                }
-                runCatching { state.receive(message) }.onFailure { state.status("Incoming event could not be displayed; window limit or malformed data.") }
-                if (message.command == "JOIN") {
-                    val channel = message.params.firstOrNull().orEmpty()
-                    if ((channel.startsWith('#') || channel.startsWith('&')) &&
-                        IrcProtocol.fold(message.nick, state.mapping) == IrcProtocol.fold(state.nickname, state.mapping) &&
-                        client?.ready == true) {
-                        runCatching { actions.names(channel) }
-                    }
-                }
-                updated = true
+    fun cycle(forward: Boolean) {
+        val index = connections.indexOf(active)
+        switchTo(connections[(index + if (forward) 1 else connections.size - 1) % connections.size])
+    }
+    /** Adds a network, or switches to it when it is already saved. An unused first-run network is replaced. */
+    fun add(network: IrcNetwork): IrcConnection {
+        connections.firstOrNull { it.host.equals(network.host, true) && it.port == network.port }?.let { keep(it); switchTo(it); return it }
+        // A new network starts with the nickname you already use elsewhere.
+        val connection = connection(network.copy(id = network.id.takeIf { id -> connections.none { it.network.id == id } }
+            ?: IrcNetwork.custom(network.host, network.port, connections.map { it.network.id }).id,
+            nickname = network.nickname.ifEmpty { state.nickname }))
+        val draft = connections.singleOrNull()?.takeIf { !it.stored && it.client == null }
+        if (draft != null) connections[0] = connection else connections.add(connection)
+        connection.stored = true; persist()
+        if (draft != null) { active = connection; changed?.invoke() } else switchTo(connection)
+        return connection
+    }
+    fun remove(connection: IrcConnection) {
+        connection.disconnect()
+        if (connection.network.device) runCatching { devices.forget(connection.identity) }
+        val index = connections.indexOf(connection)
+        connections.remove(connection)
+        if (connections.isEmpty()) connections.add(connection(IrcNetwork.PRESETS.first()))
+        persist()
+        active = connections[index.coerceAtMost(connections.lastIndex)]
+        changed?.invoke()
+    }
+    /** Split view: a second conversation shown beside the one you type into, as in the Termux workspace. */
+    enum class Split { OFF, AUTO, SIDE, STACK }
+    var split = Split.valueOf(application.getSharedPreferences("irc_pane", 0).getString("split", Split.OFF.name) ?: Split.OFF.name)
+        set(value) { field = value; getApplication<Application>().getSharedPreferences("irc_pane", 0).edit().putString("split", value.name).apply() }
+    // Which slot the typing conversation fills, so tiles keep their places when focus moves.
+    var splitSlot = 0
+    var beside: Pair<IrcConnection, String>? = null
+    // Which tile a conversation chosen from the list goes to: the typing tile, or the other one.
+    var choosingBeside = false
+    var previous: Pair<IrcConnection, String>? = null
+    fun target(pair: Pair<IrcConnection, String>?): Pair<IrcConnection, IrcState.Buffer>? = pair?.takeIf { it.first in connections }?.let { (connection, name) ->
+        connection.state.buffers.firstOrNull { IrcProtocol.fold(it.name, connection.state.mapping) == IrcProtocol.fold(name, connection.state.mapping) }?.let { connection to it }
+    }
+    /** What the second tile shows: chosen, else the conversation you were in before, else another network's. */
+    fun besideTarget(): Pair<IrcConnection, IrcState.Buffer>? {
+        val current = active to state.active
+        fun usable(candidate: Pair<IrcConnection, IrcState.Buffer>?) = candidate?.takeIf { it.first !== current.first || it.second !== current.second }
+        // Unless chosen, a network's status window is not a conversation worth showing.
+        fun conversation(candidate: Pair<IrcConnection, IrcState.Buffer>?) = usable(candidate)?.takeIf { it.second.number != 1 }
+        return usable(target(beside)) ?: conversation(target(previous))
+            ?: connections.filter { it !== active }.firstNotNullOfOrNull { other ->
+                conversation(other to other.state.active) ?: other.state.buffers.firstOrNull { it.number != 1 }?.let { conversation(other to it) }
             }
-        }
-        drainScheduled.set(false)
-        if (incoming.isNotEmpty()) scheduleDrain()
-        if (updated) changed?.invoke()
     }
-    fun connect(password: CharArray = charArrayOf(), external: Boolean = false, register: Boolean = false) {
-        val identity = IrcDeviceKey.Identity(host.lowercase(java.util.Locale.ROOT), port, account)
-        val enroll = rememberDevice && !external && host.equals("irc.kokodoko.cloud", true) && account.isNotBlank()
-        if (external) check(devices.remembered() == identity) { "Device key unavailable. Sign in with a password." }
-        disconnect()
-        deviceStatus = ""
-        val generation = ++epoch
-        state.status("Connecting to $host:$port with verified TLS")
-        client = IrcClient(host, port, state.nickname, account, password,
-            // A busy server must not create an unbounded Android main-thread callback backlog.
-            receive = { message -> check(incoming.offer(generation to message)) { "IRC UI backlog full" }; scheduleDrain() },
-            connection = { connected, text -> ui.post { if (generation == epoch) {
-                connectionText = if (connected) "Connected · $host" else if (register) text else if (text.startsWith("Disconnected")) "Disconnected · Sign in to retry" else "Connecting…"
-                if (!connected && text.startsWith("Disconnected")) { state.disconnected(); pendingDevice = null; if (external) deviceStatus = getApplication<Application>().getString(R.string.irc_device_failed) }
-                if (connected && enroll) runCatching {
-                    if (register) devices.ensure(identity)
-                    send("PRIVMSG", listOf("NickServ"), "CERT ADD ${devices.fingerprint(identity)}")
-                    pendingDevice = identity; deviceStatus = getApplication<Application>().getString(R.string.irc_device_pending)
-                    ui.postDelayed({ if (generation == epoch && pendingDevice == identity) { pendingDevice = null; deviceStatus = getApplication<Application>().getString(R.string.irc_device_failed); changed?.invoke() } }, 10_000)
-                }.onFailure { deviceStatus = getApplication<Application>().getString(R.string.irc_device_failed) }
-                if (connected && account.isNotEmpty()) runCatching { actions.authenticated(host.equals("irc.kokodoko.cloud", true)) }.onFailure { state.status(it.message ?: "Could not join channel") }
-                changed?.invoke()
-            } } }, connector = connector ?: { h, p ->
-                if (enroll && !register) devices.ensure(identity)
-                IrcClient.tlsSocket(h, p, if (external || enroll && !register) devices.factory(identity) else javax.net.ssl.SSLSocketFactory.getDefault() as javax.net.ssl.SSLSocketFactory)
-            }, external = external, register = register)
-        client!!.start(); changed?.invoke()
-    }
-    fun disconnect() {
-        val removing = revokingDevice; revokingDevice = null
-        if (removing != null) { devices.forget(removing); account = ""; rememberDevice = false; deviceStatus = getApplication<Application>().getString(R.string.irc_device_forgotten) }
-        epoch++; pendingDevice = null; client?.close(); client = null; incoming.clear(); state.disconnected(); connectionText = "Offline"; changed?.invoke()
-    }
-    fun send(command: String, parameters: List<String> = emptyList(), body: String? = null) {
-        val current = client ?: throw IllegalStateException("Not connected. /connect first.")
-        current.send(command, parameters, body)
-    }
-    fun say(target: String, body: String) {
-        require(IrcProtocol.target(target) && body.isNotBlank() && target.lowercase() !in setOf("nickserv", "chanserv", "hostserv", "operserv")) { "Use masked /login, /register or /oper for service authentication." }
-        require(IrcProtocol.validUnicode(body) && body.none { it < ' ' && it != '\u0001' })
-        require(!body.contains('\r') && !body.contains('\n') && !body.contains('\u0000'))
-        // Check buffer capacity before enqueueing; a UI failure must never encourage a duplicate send.
-        state.buffer(target)
-        send("PRIVMSG", listOf(target), body)
-        state.local(target, body, client?.echoMessages == true); changed?.invoke()
-    }
-    override fun onCleared() { changed = null; disconnect(); super.onCleared() }
+    override fun onCleared() { changed = null; connections.forEach { it.suspend() }; super.onCleared() }
 }
 
 /** One transcript, one composer, terminal commands and numbered buffer shortcuts. */
@@ -170,11 +154,20 @@ class IrcActivity : LocalizedComponentActivity() {
     private lateinit var input: EditText
     private lateinit var output: TextView
     private lateinit var scroll: ScrollView
+    private lateinit var tiles: LinearLayout
+    private lateinit var besideTile: LinearLayout
+    private lateinit var mainTile: LinearLayout
+    private lateinit var mainLabel: TextView
+    private lateinit var besideLabel: TextView
+    private lateinit var besideOutput: TextView
+    private lateinit var besideScroll: ScrollView
+    private var displayedTarget: Pair<IrcConnection, String>? = null
     private lateinit var root: View
     private lateinit var windowPanel: HelpWindowPanel
     private var secretCommand = ""
     private var secretAccount = ""
     private var priorDraft = ""
+    private var registerEmail = ""
     private var switching = false
     private var displayedWindow = 1
     private var displayedText = ""
@@ -197,12 +190,46 @@ class IrcActivity : LocalizedComponentActivity() {
         windowPanel = HelpWindowPanel(host, root, saved, "irc", root.findViewById(R.id.irc_header), root.findViewById(R.id.irc_header_row), showHeaderReset = false)
         windowPanel.reserveBottomCorners(root.findViewById(R.id.irc_suggestion_scroll))
         input = root.findViewById(R.id.irc_input); output = root.findViewById(R.id.irc_output); scroll = root.findViewById(R.id.irc_scroll)
+        tiles = root.findViewById(R.id.irc_tiles)
+        // Each tile gets a label row, as in the Termux workspace: ▶ marks the one you type into; tap a label to choose what it shows.
+        fun tileLabel() = TextView(this).apply {
+            gravity = android.view.Gravity.CENTER_VERTICAL; setPadding(dp(6), 0, dp(6), 0); maxLines = 1; ellipsize = android.text.TextUtils.TruncateAt.END
+        }
+        mainLabel = tileLabel().apply { tag = "irc-main-label"; setOnClickListener { chooseConversation(false) } }
+        tiles.removeView(scroll)
+        mainTile = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            addView(mainLabel, LinearLayout.LayoutParams(-1, dp(24)))
+            addView(scroll, LinearLayout.LayoutParams(-1, 0, 1f))
+        }
+        tiles.addView(mainTile, LinearLayout.LayoutParams(-1, 0, 1f))
+        besideLabel = tileLabel().apply { tag = "irc-beside-label"; setOnClickListener { chooseConversation(true) } }
+        besideOutput = TextView(this).apply { setPadding(dp(6), dp(2), dp(6), dp(6)) }
+        // Fill the viewport so a tap below short text still lands on the tile rather than the scroller.
+        besideScroll = ScrollView(this).apply { isFillViewport = true; addView(besideOutput, FrameLayout.LayoutParams(-1, -1)) }
+        besideTile = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL; tag = "irc-beside"
+            addView(besideLabel, LinearLayout.LayoutParams(-1, dp(24)))
+            addView(besideScroll, LinearLayout.LayoutParams(-1, 0, 1f))
+            // Tapping the second tile makes it the conversation you type into, like focusing a Termux tile.
+            isClickable = true; isFocusable = true; contentDescription = getString(R.string.irc_split_focus)
+            setOnClickListener { focusBeside() }
+        }
+        besideOutput.setOnClickListener { focusBeside() }
+        tiles.addView(besideTile)
+        // A tap on the transcript means "type here"; long-press still selects text to copy.
+        val taps = android.view.GestureDetector(this, object : android.view.GestureDetector.SimpleOnGestureListener() {
+            override fun onSingleTapUp(e: android.view.MotionEvent): Boolean { input.post { focusInput() }; return false }
+        })
+        output.setOnTouchListener { _, event -> taps.onTouchEvent(event); false }
+        scroll.setOnTouchListener { _, event -> taps.onTouchEvent(event); false }
         input.isSaveEnabled = false
         input.setOnKeyListener { _, key, event ->
             when {
                 key == KeyEvent.KEYCODE_ENTER && !event.isShiftPressed -> { if (event.action == KeyEvent.ACTION_UP) submit(); true }
                 event.action == KeyEvent.ACTION_DOWN && event.isAltPressed && key in KeyEvent.KEYCODE_1..KeyEvent.KEYCODE_9 -> { switchWindow((key - KeyEvent.KEYCODE_1 + 1).toString()); true }
                 event.action == KeyEvent.ACTION_DOWN && event.isCtrlPressed && key == KeyEvent.KEYCODE_TAB -> { switchWindow(if (event.isShiftPressed) "prev" else "next"); true }
+                event.action == KeyEvent.ACTION_DOWN && event.isAltPressed && key in listOf(KeyEvent.KEYCODE_DPAD_LEFT, KeyEvent.KEYCODE_DPAD_RIGHT) -> { switchNetwork { session.cycle(key == KeyEvent.KEYCODE_DPAD_RIGHT) }; true }
                 else -> false
             }
         }
@@ -226,7 +253,7 @@ class IrcActivity : LocalizedComponentActivity() {
         }
         style(); setContentView(screen)
         onBackPressedDispatcher.addCallback(this, object : androidx.activity.OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() { if (secretCommand.isNotEmpty()) cancelSecret() else if (navigation.page != IrcNavigation.Page.CHAT) closeNavigation() else { session.disconnect(); finish() } }
+            override fun handleOnBackPressed() { if (secretCommand.isNotEmpty()) cancelSecret() else if (navigation.page != IrcNavigation.Page.CHAT) closeNavigation() else { session.suspendAll(); finish() } }
         })
         scroll.setOnScrollChangeListener { _, _, y, _, _ -> if (!restoringScroll) { if (navigation.page == IrcNavigation.Page.CHAT) session.state.active.scroll = y else navigation.scroll = y } }
         restoringScroll = true
@@ -236,7 +263,7 @@ class IrcActivity : LocalizedComponentActivity() {
     override fun onStart() {
         super.onStart(); session.changed = { render() }
         if (BuildConfig.DEBUG && intent.getBooleanExtra("irc_offline_fixture", false)) session.initialized = true
-        action { session.restoreDevice() }; render()
+        action { session.restore() }; render()
     }
     override fun onPause() { windowPanel.persist(); super.onPause() }
     override fun onResume() {
@@ -246,7 +273,7 @@ class IrcActivity : LocalizedComponentActivity() {
     override fun onStop() {
         cancelSecret(); session.changed = null
         if (!isChangingConfigurations && navigation.page in listOf(IrcNavigation.Page.ACCOUNT, IrcNavigation.Page.REGISTER)) navigation.close()
-        if (!isChangingConfigurations) { session.disconnect(); session.initialized = false }
+        if (!isChangingConfigurations) session.suspendAll()
         super.onStop()
     }
     override fun onSaveInstanceState(out: Bundle) { windowPanel.save(out); super.onSaveInstanceState(out) }
@@ -271,14 +298,16 @@ class IrcActivity : LocalizedComponentActivity() {
         input.setPadding(dp(8), dp(4), dp(8), dp(4))
         windowPanel.refreshTheme()
     }
-    private fun chip(label: String, action: () -> Unit): View {
+    private fun chip(label: String, hold: (() -> Unit)? = null, action: () -> Unit): View {
         val spaces = SuggestionChipStyler.spacing()
         val chip = SuggestionChipStyler.createView(this, spaces).apply { text = label; importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO }
         SuggestionChipStyler(this).apply(chip, SuggestionsManager.Suggestion.TYPE_COMMAND, null)
         return FrameLayout(this).apply {
             minimumHeight = dp(48); minimumWidth = dp(48); isClickable = true; isFocusable = true; contentDescription = label
-            layoutParams = LinearLayout.LayoutParams(-2, -1).apply { setMargins(spaces[0], 0, spaces[0], 0) }
+            // Wraps the chip so a large launcher font is never clipped; 48dp stays the minimum tap target.
+            layoutParams = LinearLayout.LayoutParams(-2, -2).apply { setMargins(spaces[0], 0, spaces[0], 0) }
             addView(chip, FrameLayout.LayoutParams(-2, -2, android.view.Gravity.CENTER)); setOnClickListener { action() }
+            if (hold != null) setOnLongClickListener { hold(); true }
         }
     }
     private fun suggestions() {
@@ -323,7 +352,7 @@ class IrcActivity : LocalizedComponentActivity() {
             }
         } else if (navigation.page != IrcNavigation.Page.CHAT) {
             rows.addView(chip(getString(R.string.irc_back)) { closeNavigation() })
-            if (navigation.page in listOf(IrcNavigation.Page.ACCOUNT, IrcNavigation.Page.REGISTER, IrcNavigation.Page.JOIN, IrcNavigation.Page.NETWORK))
+            if (navigation.page in listOf(IrcNavigation.Page.ACCOUNT, IrcNavigation.Page.REGISTER, IrcNavigation.Page.JOIN, IrcNavigation.Page.NETWORK, IrcNavigation.Page.ADD_NETWORK, IrcNavigation.Page.NICKNAME))
                 rows.addView(chip(getString(R.string.irc_continue)) { submit() })
         } else if (session.client?.ready == true) {
             rows.addView(chip(getString(R.string.irc_channels)) { openNavigation(IrcNavigation.Page.CHANNELS) })
@@ -331,18 +360,18 @@ class IrcActivity : LocalizedComponentActivity() {
             rows.addView(chip(getString(R.string.irc_help_title)) { openNavigation(IrcNavigation.Page.HELP) })
             rows.addView(chip(getString(R.string.irc_more)) { openNavigation(IrcNavigation.Page.MORE) })
         } else {
-            if (session.devices.remembered() != null) rows.addView(chip(getString(R.string.irc_reconnect)) { action { session.reconnectDevice() } })
+            if (session.active.deviceReady) rows.addView(chip(getString(R.string.irc_reconnect)) { action { session.reconnect() } })
+            else rows.addView(chip(getString(R.string.irc_connect_guest)) { action { session.connect() } })
             rows.addView(chip(getString(R.string.irc_sign_in)) { openNavigation(IrcNavigation.Page.ACCOUNT) })
-            rows.addView(chip(getString(R.string.irc_network)) { openNavigation(IrcNavigation.Page.NETWORK) })
+            rows.addView(chip(getString(R.string.irc_networks)) { openNavigation(IrcNavigation.Page.NETWORKS) })
             rows.addView(chip(getString(R.string.irc_help_title)) { openNavigation(IrcNavigation.Page.HELP) })
         }
     }
     private fun restoreDraft() { switching = true; input.setText(if (navigation.page == IrcNavigation.Page.CHAT) session.state.active.draft else navigation.text); input.setSelection(input.length()); switching = false; suggestions() }
     private fun openNavigation(page: IrcNavigation.Page) {
         if (secretCommand.isNotEmpty()) return
-        if (page == IrcNavigation.Page.REGISTER) {
-            session.rememberDevice = session.host.equals("irc.kokodoko.cloud", true)
-        }
+        // A new account is remembered unless the user opts out; existing sign-ins opt in.
+        if (page == IrcNavigation.Page.REGISTER) session.rememberDevice = true
         if (navigation.page == IrcNavigation.Page.CHAT) session.state.active.scroll = scroll.scrollY
         navigation.open(page); input.error = null; restoreDraft(); render(); scroll.post { scroll.scrollTo(0, 0) }
     }
@@ -360,6 +389,15 @@ class IrcActivity : LocalizedComponentActivity() {
         check(session.client?.ready == true && session.client?.messageRedaction == true && session.state.active.joined) { getString(R.string.irc_delete_unavailable) }
         openNavigation(IrcNavigation.Page.DELETE_MESSAGES)
     }
+    /** Switches network, keeping each network's reading position and draft. */
+    private fun switchNetwork(change: () -> Unit) {
+        if (secretCommand.isNotEmpty()) return
+        action {
+            if (navigation.page == IrcNavigation.Page.CHAT) session.state.active.scroll = scroll.scrollY
+            restoringScroll = true; navigation.close(); change(); displayedWindow = -1; restoreDraft(); render()
+            scroll.post { scroll.scrollTo(0, session.state.active.scroll); restoringScroll = false }
+        }
+    }
     private fun switchWindow(value: String) {
         if (secretCommand.isNotEmpty()) return
         action { if (navigation.page == IrcNavigation.Page.CHAT) session.state.active.scroll = scroll.scrollY; restoringScroll = true; navigation.close(); session.state.switch(value); restoreDraft(); render(); scroll.post { scroll.scrollTo(0, session.state.active.scroll); restoringScroll = false } }
@@ -371,16 +409,16 @@ class IrcActivity : LocalizedComponentActivity() {
         if (changedBuffer && secretCommand.isEmpty()) restoreDraft()
         val bottom = scroll.getChildAt(0)?.let { it.height - scroll.scrollY - scroll.height < dp(32) } ?: true
         val oldY = if (changedBuffer) active.scroll else scroll.scrollY
-        val title = if (active.number == 1) getString(R.string.irc_title) else active.name
+        val title = if (active.number == 1) session.active.network.name else active.name
         root.findViewById<TextView>(R.id.irc_context).text = title + if (active.number != 1 && !active.name.startsWith('#') && !active.name.startsWith('&')) " · ${getString(R.string.irc_private)}" else active.topic.takeIf { it.isNotEmpty() }?.let { " · $it" }.orEmpty()
         root.findViewById<TextView>(R.id.irc_status).text = when {
             secretCommand.isNotEmpty() -> getString(R.string.irc_password_context, secretAccount)
             state.joining.isNotEmpty() -> getString(R.string.irc_joining, state.joining)
             state.joinError.isNotEmpty() -> state.joinError
-            else -> "${state.nickname} · ${session.connectionText}" + session.deviceStatus.takeIf { it.isNotEmpty() }?.let { "\n$it" }.orEmpty()
+            else -> "${state.nickname} · ${if (active.number == 1) session.connectionText else "${session.active.network.name} · ${session.connectionText}"}" + session.deviceStatus.takeIf { it.isNotEmpty() }?.let { "\n$it" }.orEmpty()
         }
-        val searchable = navigation.page in listOf(IrcNavigation.Page.CHANNELS, IrcNavigation.Page.DIRECTORY, IrcNavigation.Page.PEOPLE, IrcNavigation.Page.COMMANDS, IrcNavigation.Page.DELETE_MESSAGES)
-        val editable = secretCommand.isNotEmpty() || searchable || navigation.page in listOf(IrcNavigation.Page.CHAT, IrcNavigation.Page.ACCOUNT, IrcNavigation.Page.REGISTER, IrcNavigation.Page.NETWORK, IrcNavigation.Page.JOIN)
+        val searchable = navigation.page in listOf(IrcNavigation.Page.CHANNELS, IrcNavigation.Page.DIRECTORY, IrcNavigation.Page.PEOPLE, IrcNavigation.Page.COMMANDS, IrcNavigation.Page.DELETE_MESSAGES, IrcNavigation.Page.CONVERSATIONS)
+        val editable = secretCommand.isNotEmpty() || searchable || navigation.page in listOf(IrcNavigation.Page.CHAT, IrcNavigation.Page.ACCOUNT, IrcNavigation.Page.REGISTER, IrcNavigation.Page.NETWORK, IrcNavigation.Page.JOIN, IrcNavigation.Page.ADD_NETWORK, IrcNavigation.Page.NICKNAME)
         input.isEnabled = editable
         root.findViewById<View>(R.id.irc_prompt_row).visibility = if (editable) View.VISIBLE else View.GONE
         root.findViewById<View>(R.id.irc_send).isEnabled = editable && !searchable
@@ -388,13 +426,15 @@ class IrcActivity : LocalizedComponentActivity() {
             secretCommand.isNotEmpty() -> "password> "
             navigation.page == IrcNavigation.Page.CHAT -> "> "
             navigation.page in listOf(IrcNavigation.Page.ACCOUNT, IrcNavigation.Page.REGISTER) -> "account> "
-            navigation.page == IrcNavigation.Page.NETWORK -> "server> "
+            navigation.page in listOf(IrcNavigation.Page.NETWORK, IrcNavigation.Page.ADD_NETWORK) -> "server> "
+            navigation.page == IrcNavigation.Page.NICKNAME -> "nick> "
             navigation.page == IrcNavigation.Page.JOIN -> "join> "
             else -> if (searchable) "find> " else "nav> "
         }
         if (secretCommand.isEmpty()) input.hint = getString(when (navigation.page) {
             IrcNavigation.Page.ACCOUNT, IrcNavigation.Page.REGISTER -> R.string.irc_account_hint
-            IrcNavigation.Page.NETWORK -> R.string.irc_network_hint
+            IrcNavigation.Page.NETWORK, IrcNavigation.Page.ADD_NETWORK -> R.string.irc_network_hint
+            IrcNavigation.Page.NICKNAME -> R.string.irc_nickname_hint
             IrcNavigation.Page.JOIN -> R.string.irc_join_hint
             IrcNavigation.Page.CHAT -> R.string.irc_input_hint
             else -> if (searchable) R.string.irc_search_hint else R.string.irc_input_hint
@@ -405,29 +445,117 @@ class IrcActivity : LocalizedComponentActivity() {
         output.visibility = if (showTranscript) View.VISIBLE else View.GONE
         root.findViewById<View>(R.id.irc_navigation).visibility = if (showTranscript) View.GONE else View.VISIBLE
         if (showTranscript && (transcript != displayedText || changedBuffer || pageChanged)) {
-            val styled = SpannableStringBuilder()
-            active.lines.forEachIndexed { i, line ->
-                if (i > 0) styled.append('\n')
-                val start = styled.length; styled.append(line.text)
-                if (line.sender.isNotEmpty()) {
-                    val end = if (line.text.startsWith('<')) line.text.indexOf('>').let { if (it >= 0) it + 1 else 0 } else 0
-                    if (end > 0) styled.setSpan(ForegroundColorSpan(ThemeColorResolver.color(Theme.workspace_control_text_color)), start, start + end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                } else if (!line.text.contains("rejected", true) && !line.text.contains("uncertain", true)) {
-                    styled.setSpan(ForegroundColorSpan(ThemeColorResolver.color(Theme.muted_text_color)), start, styled.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                }
-            }
-            output.text = styled
+            output.text = styled(active.lines)
             scroll.post { if (navigation.page == IrcNavigation.Page.CHAT) scroll.scrollTo(0, if (!changedBuffer && !pageChanged && bottom) scroll.getChildAt(0).height else if (pageChanged) active.scroll else oldY) }
         }
         displayedText = transcript; displayedWindow = active.number; displayedPage = navigation.page
+        val shown = session.active to active.name
+        displayedTarget?.let { before -> if ((before.first !== shown.first || before.second != shown.second) && before.second != "status") session.previous = before }
+        displayedTarget = shown
+        renderSplit()
         if (!showTranscript) renderNavigation()
         val windows = root.findViewById<LinearLayout>(R.id.irc_windows); windows.removeAllViews()
+        // The first chip names this network; its marker counts unread messages on the others.
+        val others = session.connections.filter { it !== session.active }
+        val elsewhere = others.sumOf { it.unread }
+        val networkMarker = if (others.any { it.highlighted }) " !$elsewhere" else if (elsewhere > 0) " +$elsewhere" else ""
+        windows.addView(chip("⇄ ${session.active.network.name}$networkMarker") { openNavigation(IrcNavigation.Page.NETWORKS) }.apply {
+            contentDescription = getString(R.string.irc_networks_chip, session.active.network.name)
+        })
         state.buffers.filter { it.number != 1 }.forEach { b ->
             val marker = if (b.highlight) " !${b.unread}" else if (b.unread > 0) " +${b.unread}" else ""
-            windows.addView(chip("${if (b.number == state.current) "[" else ""}${b.name}$marker${if (b.number == state.current) "]" else ""}") { switchWindow(b.number.toString()) })
+            windows.addView(chip("${if (b.number == state.current) "[" else ""}${b.name}$marker${if (b.number == state.current) "]" else ""}",
+                hold = { showBeside(session.active, b.name) }) { switchWindow(b.number.toString()) })
         }
-        root.findViewById<View>(R.id.irc_window_scroll).visibility = if (windows.childCount == 0) View.GONE else View.VISIBLE
+        root.findViewById<View>(R.id.irc_window_scroll).visibility = View.VISIBLE
         suggestions()
+    }
+    private fun styled(lines: List<IrcState.Line>): SpannableStringBuilder {
+        val styled = SpannableStringBuilder()
+        lines.forEachIndexed { i, line ->
+            if (i > 0) styled.append('\n')
+            val start = styled.length; styled.append(line.text)
+            if (line.sender.isNotEmpty()) {
+                val end = if (line.text.startsWith('<')) line.text.indexOf('>').let { if (it >= 0) it + 1 else 0 } else 0
+                if (end > 0) styled.setSpan(ForegroundColorSpan(ThemeColorResolver.color(Theme.workspace_control_text_color)), start, start + end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            } else if (!line.text.contains("rejected", true) && !line.text.contains("uncertain", true)) {
+                styled.setSpan(ForegroundColorSpan(ThemeColorResolver.color(Theme.muted_text_color)), start, styled.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
+        }
+        return styled
+    }
+    private fun layoutSide() = when (session.split) {
+        IrcTerminalSession.Split.SIDE -> true
+        IrcTerminalSession.Split.AUTO -> resources.configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
+        else -> false
+    }
+    private fun conversationName(connection: IrcConnection, buffer: IrcState.Buffer) =
+        "${connection.network.name} · ${if (buffer.number == 1) getString(R.string.irc_split_status) else buffer.name}"
+    private fun styleLabel(label: TextView, focused: Boolean) {
+        label.typeface = Tuils.getTypeface(this); label.textSize = LauncherFontScale.terminalTextSizeSp() * 0.85f
+        label.setTextColor(ThemeColorResolver.color(if (focused) Theme.selection_text_color else Theme.workspace_panel_text_color))
+        label.setBackgroundColor(ThemeColorResolver.color(if (focused) Theme.selection_background_color else Theme.workspace_header_background_color))
+    }
+    /** Lays out the tiles and fills the second one; it reads like any open conversation, so it counts as read. */
+    private fun renderSplit() {
+        val on = session.split != IrcTerminalSession.Split.OFF
+        besideTile.visibility = if (on) View.VISIBLE else View.GONE
+        mainLabel.visibility = if (on) View.VISIBLE else View.GONE
+        // Tile labels carry the names, so the context line above would only repeat the focused one.
+        root.findViewById<View>(R.id.irc_context).visibility = if (on) View.GONE else View.VISIBLE
+        tiles.orientation = if (layoutSide()) LinearLayout.HORIZONTAL else LinearLayout.VERTICAL
+        val gap = dp(6)
+        val horizontal = tiles.orientation == LinearLayout.HORIZONTAL
+        val first = if (session.splitSlot == 0) mainTile else besideTile
+        if (tiles.getChildAt(0) !== first) { tiles.removeView(first); tiles.addView(first, 0) }
+        for (i in 0 until tiles.childCount) tiles.getChildAt(i).layoutParams = (if (horizontal) LinearLayout.LayoutParams(0, -1, 1f) else LinearLayout.LayoutParams(-1, 0, 1f)).apply {
+            if (on && i == 1) { if (horizontal) leftMargin = gap else topMargin = gap }
+        }
+        if (!on) return
+        styleLabel(mainLabel, true); styleLabel(besideLabel, false)
+        mainLabel.text = "▶ " + conversationName(session.active, session.state.active)
+        mainLabel.contentDescription = getString(R.string.irc_split_main_label, mainLabel.text.drop(2))
+        besideOutput.setTextColor(ThemeColorResolver.color(Theme.workspace_panel_text_color))
+        besideOutput.typeface = Tuils.getTypeface(this); besideOutput.textSize = LauncherFontScale.terminalTextSizeSp()
+        besideTile.background = null
+        val target = session.besideTarget()
+        if (target == null) {
+            besideLabel.text = "  " + getString(R.string.irc_split_title)
+            besideOutput.text = getString(R.string.irc_split_empty)
+            return
+        }
+        val (connection, buffer) = target
+        session.beside = connection to buffer.name
+        buffer.unread = 0; buffer.highlight = false
+        besideLabel.text = "  " + conversationName(connection, buffer)
+        besideLabel.contentDescription = getString(R.string.irc_split_beside_label, conversationName(connection, buffer))
+        val atBottom = besideScroll.getChildAt(0)?.let { it.height - besideScroll.scrollY - besideScroll.height < dp(32) } ?: true
+        besideOutput.text = styled(buffer.lines)
+        if (atBottom) besideScroll.post { besideScroll.scrollTo(0, besideOutput.height) }
+    }
+    /** Like the Termux window chooser: lists every open conversation on every network for one tile. */
+    private fun chooseConversation(beside: Boolean) {
+        session.choosingBeside = beside
+        openNavigation(IrcNavigation.Page.CONVERSATIONS)
+    }
+    private fun showBeside(connection: IrcConnection, name: String) {
+        if (connection === session.active && IrcProtocol.fold(name, connection.state.mapping) == IrcProtocol.fold(session.state.active.name, connection.state.mapping)) return
+        session.beside = connection to name
+        if (session.split == IrcTerminalSession.Split.OFF) session.split = IrcTerminalSession.Split.AUTO
+        render()
+    }
+    /** The second tile becomes the conversation you type into; the one you left takes its place. */
+    private fun focusBeside() {
+        val (connection, buffer) = session.besideTarget() ?: return
+        val left = session.active to session.state.active.name
+        session.splitSlot = 1 - session.splitSlot
+        switchNetwork { session.switchTo(connection); connection.state.switch(buffer.number.toString()) }
+        session.beside = left
+        render(); focusInput()
+    }
+    private fun focusInput() {
+        if (!input.requestFocus()) return
+        (getSystemService(INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager).showSoftInput(input, 0)
     }
     private fun renderNavigation() {
         val rows = root.findViewById<LinearLayout>(R.id.irc_navigation); rows.removeAllViews()
@@ -449,15 +577,65 @@ class IrcActivity : LocalizedComponentActivity() {
         val state = session.state
         when (navigation.page) {
             IrcNavigation.Page.CHAT -> {
-                line(label(R.string.irc_welcome))
-                line(label(if (session.host.equals("irc.kokodoko.cloud", true)) R.string.irc_signup_info else R.string.irc_other_network))
-                if (session.connectionText.startsWith("Disconnected")) line(session.connectionText)
-                if (session.client?.ready == true) line(label(R.string.irc_channels)) { openNavigation(IrcNavigation.Page.CHANNELS) }
-                else {
+                // The network's home: who you are here and how to connect.
+                val connection = session.active
+                if (session.retiredServer) line(label(R.string.irc_retired_server))
+                line("${connection.host}:${connection.port} · TLS")
+                if (connection.ready) {
+                    // Open conversations are on the chips below; these start new ones.
+                    line(label(R.string.irc_join_name)) { openNavigation(IrcNavigation.Page.JOIN) }
+                    line(label(R.string.irc_browse)) { session.actions.directory(); openNavigation(IrcNavigation.Page.DIRECTORY) }
+                    if (connection.network.channels.isNotEmpty()) line(getString(R.string.irc_rejoin_list, connection.network.channels.joinToString(" ")))
+                    line(label(R.string.irc_change_nickname)) { openNavigation(IrcNavigation.Page.NICKNAME) }
+                    line(label(R.string.irc_disconnect)) { session.disconnect() }
+                } else {
+                    line(label(R.string.irc_welcome))
+                    if (connection.deviceReady) line(getString(R.string.irc_reconnect_as, connection.account)) { session.reconnect() }
+                    line(getString(R.string.irc_connect_as, state.nickname)) { session.connect() }
+                    line(label(R.string.irc_change_nickname)) { openNavigation(IrcNavigation.Page.NICKNAME) }
                     line(label(R.string.irc_sign_in)) { openNavigation(IrcNavigation.Page.ACCOUNT) }
                     line(label(R.string.irc_create_account)) { openNavigation(IrcNavigation.Page.REGISTER) }
+                    if (connection.network.channels.isNotEmpty()) line(getString(R.string.irc_rejoin_list, connection.network.channels.joinToString(" ")))
                 }
+                line(label(R.string.irc_networks)) { openNavigation(IrcNavigation.Page.NETWORKS) }
                 line(label(R.string.irc_help_title)) { openNavigation(IrcNavigation.Page.HELP) }
+            }
+            IrcNavigation.Page.NETWORKS -> {
+                line(label(R.string.irc_networks))
+                session.connections.forEach { connection ->
+                    val status = if (connection.ready) label(R.string.irc_network_online) else if (connection.client != null) label(R.string.irc_network_connecting) else label(R.string.irc_network_offline)
+                    val marker = if (connection.highlighted) " · !${connection.unread}" else if (connection.unread > 0) " · +${connection.unread}" else ""
+                    val current = if (connection === session.active) "[${connection.network.name}]" else connection.network.name
+                    line("$current · $status$marker") {
+                        // The current network opens its home; another network opens where you left it.
+                        if (connection === session.active) { state.switch("1"); closeNavigation() } else switchNetwork { session.switchTo(connection) }
+                    }
+                }
+                line(label(R.string.irc_add_network)) { openNavigation(IrcNavigation.Page.ADD_NETWORK) }
+                if (session.connections.size > 1 || session.active.stored) line(getString(R.string.irc_remove_network, session.active.network.name)) { openNavigation(IrcNavigation.Page.REMOVE_NETWORK) }
+            }
+            IrcNavigation.Page.ADD_NETWORK -> {
+                line(label(R.string.irc_add_network)); line(label(R.string.irc_add_network_explanation))
+                IrcNetwork.PRESETS.filter { preset -> session.connections.none { it.stored && it.host.equals(preset.host, true) } && navigation.matches(preset.name + " " + preset.host) }
+                    .forEach { preset -> line("${preset.name} · ${preset.host}") { switchNetwork { session.add(preset) } } }
+            }
+            IrcNavigation.Page.NICKNAME -> { line(label(R.string.irc_change_nickname)); line(getString(R.string.irc_nickname_explanation, state.nickname)) }
+            IrcNavigation.Page.CONVERSATIONS -> {
+                line(label(if (session.choosingBeside) R.string.irc_split_choose_beside else R.string.irc_split_choose_main))
+                session.connections.forEach { connection ->
+                    connection.state.buffers.filter { it.number == 1 || it.joined || !(it.name.startsWith('#') || it.name.startsWith('&')) }
+                        .filter { navigation.matches(conversationName(connection, it)) }.forEach { buffer ->
+                            line(conversationName(connection, buffer)) {
+                                if (session.choosingBeside) { closeNavigation(); showBeside(connection, buffer.name) }
+                                else switchNetwork { session.switchTo(connection); connection.state.switch(buffer.number.toString()) }
+                            }
+                        }
+                }
+            }
+            IrcNavigation.Page.REMOVE_NETWORK -> {
+                line(getString(R.string.irc_remove_network_question, session.active.network.name))
+                line(getString(R.string.irc_remove_network, session.active.network.name)) { switchNetwork { session.remove(session.active) } }
+                line(label(R.string.irc_cancel)) { closeNavigation() }
             }
             IrcNavigation.Page.CHANNELS -> {
                 line(label(R.string.irc_channels))
@@ -465,7 +643,8 @@ class IrcActivity : LocalizedComponentActivity() {
                 open.forEach { b -> line(b.name + if (b.unread > 0) " · ${b.unread}${if (b.highlight) " !" else ""}" else "") {
                     if ((b.name.startsWith('#') || b.name.startsWith('&')) && !b.joined) joinChannel(b.name) else switchWindow(b.number.toString())
                 } }
-                if (session.host.equals("irc.kokodoko.cloud", true)) listOf("#retui", "#help").filter { channel -> navigation.matches(channel) && state.buffers.none { IrcProtocol.fold(it.name, state.mapping) == IrcProtocol.fold(channel, state.mapping) } }.forEach { channel -> line(channel) { joinChannel(channel) } }
+                // Channels this network rejoins, when they are not open.
+                session.active.network.channels.filter { channel -> navigation.matches(channel) && state.buffers.none { IrcProtocol.fold(it.name, state.mapping) == IrcProtocol.fold(channel, state.mapping) } }.forEach { channel -> line(channel) { joinChannel(channel) } }
                 line(label(R.string.irc_browse)) { session.actions.directory(); openNavigation(IrcNavigation.Page.DIRECTORY) }
                 line(label(R.string.irc_join_name)) { openNavigation(IrcNavigation.Page.JOIN) }
             }
@@ -515,7 +694,14 @@ class IrcActivity : LocalizedComponentActivity() {
                 if (state.active.joined && session.client?.ready == true && session.client?.messageRedaction == true) line(label(R.string.irc_delete_message)) { openDeleteMessages() }
                 if (state.active.joined) line(getString(R.string.irc_leave, state.active.name)) { openNavigation(IrcNavigation.Page.LEAVE) }
                 else if (state.active.number != 1) line(label(R.string.irc_close_conversation)) { state.closeActive(); closeNavigation() }
-                line(label(R.string.irc_disconnect)) { session.disconnect(); session.account = ""; closeNavigation() }
+                line(label(R.string.irc_networks)) { openNavigation(IrcNavigation.Page.NETWORKS) }
+                val split = session.split
+                fun splitLine(mode: IrcTerminalSession.Split, text: Int) = line((if (split == mode) "[✓] " else "[ ] ") + label(text)) { session.split = mode; closeNavigation() }
+                splitLine(IrcTerminalSession.Split.OFF, R.string.irc_split_off)
+                splitLine(IrcTerminalSession.Split.AUTO, R.string.irc_split_auto)
+                splitLine(IrcTerminalSession.Split.SIDE, R.string.irc_split_side)
+                splitLine(IrcTerminalSession.Split.STACK, R.string.irc_split_stack)
+                line(label(R.string.irc_disconnect)) { session.disconnect(); closeNavigation() }
             }
             IrcNavigation.Page.DELETE_MESSAGES -> {
                 line(label(R.string.irc_delete_message)); line(label(R.string.irc_delete_explanation))
@@ -547,21 +733,16 @@ class IrcActivity : LocalizedComponentActivity() {
                 line(label(R.string.irc_network_explanation))
             }
             IrcNavigation.Page.ACCOUNT -> {
-                line(label(R.string.irc_sign_in)); line(label(R.string.irc_account_explanation))
+                line(label(R.string.irc_sign_in)); line(getString(R.string.irc_account_explanation, session.active.network.name))
                 line(label(R.string.irc_create_account)) { openNavigation(IrcNavigation.Page.REGISTER) }
-                if (session.host.equals("irc.kokodoko.cloud", true)) {
-                    line(label(R.string.irc_signup_info))
-                    line((if (session.rememberDevice) "[✓] " else "[ ] ") + label(R.string.irc_remember_device)) { session.rememberDevice = !session.rememberDevice }
-                    line(label(R.string.irc_device_explanation))
-                }
+                line((if (session.rememberDevice) "[✓] " else "[ ] ") + label(R.string.irc_remember_device)) { session.rememberDevice = !session.rememberDevice }
+                line(label(R.string.irc_device_explanation))
             }
             IrcNavigation.Page.REGISTER -> {
                 line(label(R.string.irc_create_account)); line(label(R.string.irc_register_explanation))
-                if (session.host.equals("irc.kokodoko.cloud", true)) {
-                    line(label(R.string.irc_signup_info))
-                    line((if (session.rememberDevice) "[✓] " else "[ ] ") + label(R.string.irc_remember_device)) { session.rememberDevice = !session.rememberDevice }
-                    line(label(R.string.irc_device_explanation))
-                }
+                line(label(R.string.irc_signup_info))
+                line((if (session.rememberDevice) "[✓] " else "[ ] ") + label(R.string.irc_remember_device)) { session.rememberDevice = !session.rememberDevice }
+                line(label(R.string.irc_device_explanation))
                 line(label(R.string.irc_sign_in)) { openNavigation(IrcNavigation.Page.ACCOUNT) }
             }
             IrcNavigation.Page.JOIN -> { line(label(R.string.irc_join_name)); line(label(R.string.irc_join_hint)) }
@@ -574,7 +755,7 @@ class IrcActivity : LocalizedComponentActivity() {
                 line(label(R.string.irc_connection_details)); line("${session.host}:${session.port}\n${session.connectionText}")
                 line(label(R.string.irc_security_details))
                 if (session.deviceStatus.isNotEmpty()) line(session.deviceStatus)
-                if (session.devices.remembered() != null) line(label(R.string.irc_forget_device)) { openNavigation(IrcNavigation.Page.FORGET_DEVICE) }
+                if (session.active.network.device) line(label(R.string.irc_forget_device)) { openNavigation(IrcNavigation.Page.FORGET_DEVICE) }
                 line(label(R.string.irc_diagnostics)) { openNavigation(IrcNavigation.Page.DIAGNOSTICS) }
                 if (session.client?.ready != true) line(label(R.string.irc_sign_in)) { openNavigation(IrcNavigation.Page.ACCOUNT) }
             }
@@ -602,13 +783,20 @@ class IrcActivity : LocalizedComponentActivity() {
     private fun cancelSecret() {
         if (secretCommand.isEmpty()) return
         switching = true; input.text.clear(); switching = false
-        secretCommand = ""; secretAccount = ""
+        secretCommand = ""; secretAccount = ""; registerEmail = ""
         if (!priorSecure) window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
         input.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE or InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
         input.typeface = Tuils.getTypeface(this)
         input.imeOptions = EditorInfo.IME_ACTION_SEND or EditorInfo.IME_FLAG_NO_EXTRACT_UI
         input.hint = getString(R.string.irc_input_hint); input.maxLines = 3
         session.state.active.draft = priorDraft; priorDraft = ""; restoreDraft(); render()
+    }
+    private fun server(text: String): Pair<String, Int> {
+        val pieces = text.trim().split(Regex("\\s+"))
+        require(pieces.size in 1..2 && IrcNetwork.validHost(pieces[0])) { getString(R.string.irc_network_hint) }
+        val port = pieces.getOrNull(1)?.toIntOrNull() ?: if (pieces.size == 2) 0 else 6697
+        require(port in 1..65535) { getString(R.string.irc_network_hint) }
+        return pieces[0] to port
     }
     private fun submit() {
         input.error = null
@@ -617,9 +805,15 @@ class IrcActivity : LocalizedComponentActivity() {
             try {
                 require(secret.isNotEmpty() && secret.size <= 256 && secret.none { it == '\u0000' || it == '\r' || it == '\n' }) { "Password must be 1–256 characters with no line breaks." }
                 when (command) {
-                    "SASL login" -> { session.account = name; session.connect(secret) }
+                    // Services identify the current nickname, so sign in under the account's name.
+                    "SASL login" -> { session.account = name; session.state.nickname = name; session.connect(secret) }
                     "Create account" -> { session.account = name; session.state.nickname = name; session.connect(secret, register = true) }
-                    "NickServ register" -> { require(secret.none { it.isWhitespace() }) { "NickServ passwords cannot contain spaces." }; session.send("PRIVMSG", listOf("NickServ"), "REGISTER ${String(secret)}"); session.state.status("Registration submitted privately to NickServ; check its response in status.") }
+                    "NickServ register" -> {
+                        require(secret.none { it.isWhitespace() }) { "NickServ passwords cannot contain spaces." }
+                        // Networks such as Libera.Chat also need an email address after the password.
+                        session.send("PRIVMSG", listOf("NickServ"), "REGISTER ${String(secret)}" + registerEmail.takeIf { it.isNotEmpty() }?.let { " $it" }.orEmpty())
+                        session.state.status("Registration submitted privately to NickServ; check its response in status.")
+                    }
                     "Operator login" -> { session.send("OPER", listOf(name, String(secret))); session.state.status("Operator authentication submitted; check the server response.") }
                 }
                 cancelSecret(); render()
@@ -640,10 +834,15 @@ class IrcActivity : LocalizedComponentActivity() {
                     IrcNavigation.Page.JOIN -> joinChannel(original.trim())
                     IrcNavigation.Page.NETWORK -> {
                         check(session.client?.ready != true) { getString(R.string.irc_disconnect_first) }
-                        val pieces = original.trim().split(Regex("\\s+"))
-                        require(pieces.size in 1..2 && pieces[0].length <= 253 && pieces[0].matches(Regex("[A-Za-z0-9.:-]+"))) { getString(R.string.irc_network_hint) }
-                        val port = pieces.getOrNull(1)?.toInt() ?: 6697; require(port in 1..65535)
-                        session.disconnect(); session.host = pieces[0]; session.port = port; session.account = ""; closeNavigation()
+                        val (host, port) = server(original)
+                        session.disconnect(); session.host = host; session.port = port; closeNavigation()
+                    }
+                    IrcNavigation.Page.ADD_NETWORK -> { val (host, port) = server(original); switchNetwork { session.add(IrcNetwork.custom(host, port, emptyList())) } }
+                    IrcNavigation.Page.NICKNAME -> {
+                        val name = original.trim()
+                        require(IrcProtocol.nick(name)) { getString(R.string.irc_account_invalid) }
+                        if (session.client?.ready == true) session.send("NICK", listOf(name)) else session.state.nickname = name
+                        closeNavigation()
                     }
                     else -> renderNavigation()
                 }
@@ -660,19 +859,41 @@ class IrcActivity : LocalizedComponentActivity() {
                 fun channel(): String { val target = rest.ifEmpty { session.state.active.name }; require(IrcProtocol.target(target) && target.first() in "#&") { "Use #channel." }; return target }
                 when (command) {
                     "help" -> { require(rest.isEmpty()); openNavigation(IrcNavigation.Page.HELP); return }
-                    "server" -> { check(session.client == null) { "/disconnect before changing servers." }; if (rest.isNotEmpty()) { val p = rest.split(' '); require(p.size <= 2 && p[0].length <= 253 && p[0].matches(Regex("[A-Za-z0-9.:-]+"))); val port = p.getOrNull(1)?.toInt() ?: 6697; require(port in 1..65535); session.host = p[0]; session.port = port; session.account = "" }; session.state.status("Server ${session.host}:${session.port} · verified TLS only") }
+                    "server" -> { check(session.client == null) { "/disconnect before changing servers." }; if (rest.isNotEmpty()) { val (host, port) = server(rest); session.host = host; session.port = port }; session.state.status("Server ${session.host}:${session.port} · verified TLS only") }
+                    "split" -> {
+                        session.split = when (rest.lowercase(java.util.Locale.ROOT)) {
+                            "" -> if (session.split == IrcTerminalSession.Split.OFF) IrcTerminalSession.Split.AUTO else IrcTerminalSession.Split.OFF
+                            "auto", "on" -> IrcTerminalSession.Split.AUTO
+                            "side" -> IrcTerminalSession.Split.SIDE
+                            "stack", "top" -> IrcTerminalSession.Split.STACK
+                            "off" -> IrcTerminalSession.Split.OFF
+                            else -> throw IllegalArgumentException("Use /split, /split auto, /split side, /split stack or /split off.")
+                        }
+                    }
+                    "network", "networks" -> {
+                        val verb = rest.substringBefore(' ').lowercase(java.util.Locale.ROOT); val target = rest.substringAfter(' ', "").trim()
+                        when {
+                            rest.isEmpty() || verb == "list" -> { openNavigation(IrcNavigation.Page.NETWORKS); return }
+                            verb == "add" -> { val (host, port) = server(target); switchNetwork { session.add(IrcNetwork.PRESETS.firstOrNull { it.host.equals(host, true) && it.port == port } ?: IrcNetwork.custom(host, port, emptyList())) }; return }
+                            verb == "next" || verb == "prev" -> { switchNetwork { session.cycle(verb == "next") }; return }
+                            else -> {
+                                val match = session.connections.firstOrNull { it.network.name.equals(rest, true) || it.host.equals(rest, true) }
+                                    ?: throw IllegalArgumentException("No such network. /network lists saved networks; /network add host [port] adds one.")
+                                switchNetwork { session.switchTo(match) }; return
+                            }
+                        }
+                    }
                     "nick" -> { require(IrcProtocol.nick(rest)) { "Use /nick nickname (up to 30 IRC nickname characters)." }; if (session.client?.ready == true) session.send("NICK", listOf(rest)) else session.state.nickname = rest }
                     "connect", "reconnect" -> {
                         require(rest.isEmpty()) { "Use /server host port, /nick nickname, then /connect or /login account." }
-                        val remembered = session.devices.remembered()
-                        if (remembered != null && session.host.equals(remembered.host, true) && session.port == remembered.port && (session.account.isEmpty() || session.account.equals(remembered.account, true))) session.reconnectDevice()
+                        if (session.active.deviceReady) session.reconnect()
                         else if (session.account.isEmpty()) session.connect()
                         else { requestSecret("SASL login", session.account); return }
                     }
                     "login" -> { requestSecret("SASL login", rest.ifEmpty { session.state.nickname }); return }
                     "register" -> {
-                        require(rest.isEmpty()) { "Use /register with no password argument." }
-                        if (session.client?.ready == true) requestSecret("NickServ register", session.state.nickname) else openNavigation(IrcNavigation.Page.REGISTER)
+                        require(rest.isEmpty() || rest.matches(Regex("[^\\s@]+@[^\\s@]+"))) { "Use /register, or /register email where the network asks for one. Never type the password here." }
+                        if (session.client?.ready == true) { registerEmail = rest; requestSecret("NickServ register", session.state.nickname) } else openNavigation(IrcNavigation.Page.REGISTER)
                         return
                     }
                     "oper" -> { require(session.client?.ready == true); requestSecret("Operator login", rest); return }
@@ -690,7 +911,7 @@ class IrcActivity : LocalizedComponentActivity() {
                     "kick" -> { require(session.state.active.joined); val nick = rest.substringBefore(' '); require(IrcProtocol.nick(nick)); session.send("KICK", listOf(session.state.active.name, nick), rest.substringAfter(' ', "").takeIf { it.isNotEmpty() }) }
                     "delete" -> { require(rest.isEmpty()); openDeleteMessages(); return }
                     "clear" -> { require(rest.isEmpty()); session.state.active.lines.clear() }
-                    "disconnect", "quit" -> { require(rest.isEmpty()); session.disconnect(); session.account = "" }
+                    "disconnect", "quit" -> { require(rest.isEmpty()); session.disconnect() }
                     else -> throw IllegalArgumentException("Unknown IRC command. /help lists supported commands; nothing was sent.")
                 }
             }

@@ -8426,7 +8426,8 @@
     "irc/IrcActivity.kt": [
       "openDeleteMessages",
       "openNavigation",
-      "openPeople"
+      "openPeople",
+      "showBeside"
     ],
     "calculator/CalculatorActivity.kt": [
       "showEnhancement",

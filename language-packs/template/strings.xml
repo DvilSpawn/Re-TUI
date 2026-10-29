@@ -16,6 +16,12 @@
     <string name="app_other_profile_label">%1$s (Profile)</string>
     <string name="app_shortcut_not_found">Shortcut not found</string>
     <string name="app_work_profile_label">%1$s (Work)</string>
+    <string name="apps_ranked_just_now">just now</string>
+    <plurals name="apps_ranked_launches">
+        <item quantity="one">%1$d launch</item>
+        <item quantity="other">%1$d launches</item>
+    </plurals>
+    <string name="apps_ranked_none">No app launches recorded yet. Apps you open from Re:TUI appear here.</string>
     <string name="backup_error_password">Backup password is incorrect or the file was changed</string>
     <string name="backup_error_unsupported">Unsupported backup package</string>
     <string name="battery_label">Battery:</string>
@@ -1084,9 +1090,12 @@ Timer paused.</string>
 -rm [aliasName] -&gt; remove an existing alias 
 -ls -&gt; list your aliases 
 -file -&gt; open alias.txt 
--tutorial -&gt; open the external GitHub wiki in a browser (network) 
+-tutorial -&gt; open the external Aliases guide on re-tui.pages.dev (network) 
 Home aliases expand before built-in commands; avoid conflicting names. Script aliases execute code through Termux; inspect the script first.</string>
     <string name="help_apps">-ls [filter] -&gt; open the app drawer, optionally showing only apps matching a name or what they do (music, maps, camera) 
+-r [count] -&gt; apps you opened most recently from Re:TUI (default 10) 
+-n [count] -&gt; newest installed apps (default 10) 
+-u [count] -&gt; your most-used apps (default 10) 
 -lsh -&gt; list your hidden apps 
 -show [appName] -&gt; re-show an hidden app 
 -hide [appName] -&gt; hide an app 
@@ -1104,7 +1113,7 @@ Home aliases expand before built-in commands; avoid conflicting names. Script al
 -addtogp [groupName] [appName] -&gt; add the given app to the given group 
 -rmfromgp [groupName] [appName] -&gt; remove the given app from the given group 
 -lsgp [OPTIONAL: groupName] -&gt; list your groups, or list the content of the given group 
--tutorial -&gt; open the Apps command guide</string>
+-tutorial -&gt; open the external Apps guide on re-tui.pages.dev (network)</string>
     <string name="help_beep">Emit a "beep". 
 
 Usage: 
@@ -1139,7 +1148,7 @@ $ cd /sdcard/Download</string>
 -reset [option] -&gt; restore its default value 
 -fontsize [integer] -&gt; change ten legacy UI size fields, not all typography; use Settings for suggestions, module, and header sizes 
 -apply [file] -&gt; move an existing file into the configuration folder and rotate existing XML or font assets 
--tutorial -&gt; open the external tutorial page (network) 
+-tutorial -&gt; open the external Configuration guide on re-tui.pages.dev (network) 
 
 Warning: keep a personal backup before broad edits. -apply is a move, not a copy or portable preset import; it may replace existing assets and its reported path does not verify a successful move. Use the Settings shareable-configuration import for portable presets. 
 Known issue: -ls rss.xml currently returns notification values, not RSS values; do not use it to inspect feed configuration.</string>
@@ -1212,7 +1221,7 @@ $ help [command]</string>
 -rm [ID] -&gt; remove an existing expression 
 -edit [ID] [expression] -&gt; change an existing expression 
 -ls [type] -&gt; shows the expressions of the given type 
--tutorial -&gt; show the tutorial on GitHub 
+-tutorial -&gt; open the offline Feeds and text automation guide 
 -file -&gt; open the file htmlextract.xml</string>
     <string name="help_inspect">Inspect an installed application. 
 Usage: 
@@ -1238,7 +1247,7 @@ Examples:
 $ intent -view geo:0,0?q=home 
 $ intent -activity -a android.intent.action.SEND -t text/plain --es android.intent.extra.TEXT standup notes 
 $ intent -broadcast -a net.dinglisch.android.tasker.ACTION_TASK -p net.dinglisch.android.taskerm --es task_name Work</string>
-    <string name="help_irc">irc — open the native TLS IRC terminal. /server, /connect, /login, /register, /join, /window, /query, /msg and /help.</string>
+    <string name="help_irc">irc — open the IRC client. Connect to Libera.Chat, OFTC or any TLS network, several at once. /network, /server, /connect, /login, /join, /window, /query, /msg and /help.</string>
     <string name="help_landscape">Save the Re:T-UI landscape preference and enable adaptive split layout when the window is wide enough. 
 
 Usage: 
@@ -1351,7 +1360,7 @@ Each entry opens a full note file. Notes opens in its own task in Recents. Locke
 -ls -&gt; list included/excluded apps and content filters 
 -access -&gt; show the system settings page dedicated to the Notification Access 
 -file -&gt; open notifications.xml 
--tutorial -&gt; open the external tutorial page (network) 
+-tutorial -&gt; open the external Notifications guide on re-tui.pages.dev (network) 
 Notification access exposes private message content to the launcher. -on/-off only change dock membership, not Android listener access. Replies can send real messages; dismissal removes the selected notification.</string>
     <string name="help_open">Open a file. 
 Usage: 
@@ -1430,7 +1439,7 @@ Choose a future date/time in dd/mm/yy HH:mm format; the final two tokens are dat
 -unbind [appName] -&gt; unbind the application 
 -ls -&gt; show your bound applications 
 -check [ID or packageName] -&gt; check the last notification from the application bound with the given ID 
--tutorial -&gt; open the tutorial page on GitHub</string>
+-tutorial -&gt; open the external Notifications guide on re-tui.pages.dev, which covers replies (network)</string>
     <string name="help_restart">Restart Re:T-UI and load modified values</string>
     <string name="help_retuitoken">Manage the private Re:T-UI callback credential for Termux, Tasker, and modules. 
 
@@ -1672,7 +1681,7 @@ mode:
 -update -&gt; request a manual weather update 
 -enable -&gt; enable show_weather and reload the launcher 
 -disable -&gt; disable show_weather and reload the launcher 
--tutorial -&gt; open the external weather tutorial webpage (network) 
+-tutorial -&gt; open the external Status and Weather guide on re-tui.pages.dev (network) 
 
 Weather requires network access to met.no. Place names use Android Geocoder and may fail to resolve. Coordinates are sent to the weather service; choose their precision deliberately. 
 
@@ -1718,7 +1727,7 @@ Wiki:
  https://github.com/DvilSpawn/Re-TUI/wiki/Aliases 
  https://github.com/DvilSpawn/Re-TUI/wiki/App-Drawer 
  https://github.com/DvilSpawn/Re-TUI/wiki/Presets-and-Wallpaper-Auto-Color 
- https://github.com/DvilSpawn/Re-TUI/wiki/Termux-Integration</string>
+ https://re-tui.pages.dev/termux</string>
     <string name="hint_file_console_input">Enter file command</string>
     <string name="hint_termux_input">Enter command</string>
     <string name="hint_wallpaper_auto_confirm">Yes/No</string>
@@ -1794,17 +1803,22 @@ Wiki:
     <string name="invalid_name">Invalid name</string>
     <string name="invalid_number">Invalid number</string>
     <string name="invalid_regex">Invalid regex:</string>
-    <string name="irc_account_explanation">Enter your IRC account name, then your password. This name will also be your nickname.</string>
+    <string name="irc_account_explanation">Enter your %1$s account name, then your password. This name will also be your nickname.</string>
     <string name="irc_account_hint">IRC account name</string>
     <string name="irc_account_invalid">Use an IRC nickname: up to 30 characters, without spaces. Advanced account names can use /login.</string>
     <string name="irc_action_failed">Could not complete this action.</string>
+    <string name="irc_add_network">Add a network</string>
+    <string name="irc_add_network_explanation">Pick a network, or type a server address and TLS port (6697 if left out), then Continue.</string>
     <string name="irc_all_commands">All commands</string>
     <string name="irc_back">Back to conversation</string>
     <string name="irc_browse">Browse network</string>
     <string name="irc_cancel">Cancel</string>
+    <string name="irc_change_nickname">Change nickname</string>
     <string name="irc_channels">Channels</string>
     <string name="irc_close_conversation">Close conversation</string>
     <string name="irc_command_guidance">Choose a command for its syntax. Nothing is sent until you press ↵.</string>
+    <string name="irc_connect_as">Connect as %1$s (no account)</string>
+    <string name="irc_connect_guest">Connect</string>
     <string name="irc_connection_details">Connection details</string>
     <string name="irc_continue">Continue</string>
     <string name="irc_create_account">Create account</string>
@@ -1812,37 +1826,37 @@ Wiki:
     <string name="irc_delete_explanation">Choose a message. You can request deletion of your own messages; channel moderators can delete other messages. The server checks permission.</string>
     <string name="irc_delete_message">Delete a message</string>
     <string name="irc_delete_missing">This message is no longer available for deletion.</string>
-    <string name="irc_delete_question">Delete this message from IRC history and supported clients? Copies on Discord or other clients may remain.</string>
+    <string name="irc_delete_question">Delete this message from IRC history and supported clients? Copies in other clients may remain.</string>
     <string name="irc_delete_unavailable">Message deletion is unavailable on this connection.</string>
-    <string name="irc_device_explanation">Reconnect automatically with a protected device key; no saved password. Anyone using your unlocked Launcher can access this account. A new phone or reinstall needs password sign-in.</string>
+    <string name="irc_device_explanation">Reconnect without a password, using a protected key on this phone. Works on networks whose NickServ accepts certificates, such as Libera.Chat and OFTC. Anyone using your unlocked Launcher can use this account. A new phone or reinstall needs password sign-in.</string>
     <string name="irc_device_failed">Device login could not be confirmed. Sign in with your password to retry.</string>
-    <string name="irc_device_forgotten">Local device key removed. Password sign-in is required. Check NickServ certificate authorization if server revocation could not complete.</string>
+    <string name="irc_device_forgotten">Device key removed from this phone. Sign in with your password next time.</string>
     <string name="irc_device_pending">Registering this device key…</string>
-    <string name="irc_device_removing">Removing device authorization…</string>
-    <string name="irc_device_revoked">Device authorization revoked and local key removed.</string>
-    <string name="irc_device_saved">Device remembered. IRC reconnects automatically when opened.</string>
+    <string name="irc_device_saved">Device remembered. This network reconnects without a password.</string>
     <string name="irc_diagnostics">Server diagnostics</string>
     <string name="irc_directory">Network channels</string>
     <string name="irc_directory_limit">Showing the first 1,000 channels. You can still join a channel by name.</string>
     <string name="irc_disconnect">Disconnect</string>
     <string name="irc_disconnect_first">Disconnect before changing networks.</string>
     <string name="irc_forget_device">Forget this device</string>
-    <string name="irc_forget_explanation">Remove the login key from this phone and disconnect? Server revocation will also be requested if this account is connected. If offline, remove its old certificate through NickServ on a trusted client.</string>
-    <string name="irc_help">Native IRC terminal — one TLS network at a time.
-/server [host] [TLS port] · default irc.kokodoko.cloud 6697
-/nick nickname · /connect · /login account (masked SASL password)
-/register (guided signup offline; masked NickServ password when connected)
+    <string name="irc_forget_explanation">Remove the sign-in key from this phone? The network may still list its certificate, but it can no longer be used. You can remove it there with NickServ CERT DEL.</string>
+    <string name="irc_help">IRC client — one or more TLS networks at once.
+/network · /network add host [port] · /network next|prev|name (Alt+←/→)
+/server [host] [TLS port] · /nick nickname · /connect · /login account (masked SASL password)
+/register [email] (guided signup offline where supported; masked NickServ password when connected)
 /join #channel · /j #channel · /part [#channel]
 /window [number|name|next|prev|close] · /buffer is an alias
 /query nick · /msg nick text · /me action · /names · /list
 /topic [text] · /whois nick · /mode target modes · /kick nick [reason]
 /oper name (masked password) · /disconnect · /quit · /clear · /help
 Plain text goes only to the active joined channel or query. //text sends /text literally. Unknown commands never become messages or launcher commands.
-Window markers: * unread · ! mention/private message. Passwords are never transcript/history entries. TLS is verified; no plaintext fallback.
-Register once, then sign in or reconnect before joining registered-only channels. Server-readable, not end-to-end encrypted. On supported networks, rejoining loads up to 100 recent channel messages. Server-confirmed deletions replace messages with a deletion marker. There is no push or background service; leaving disconnects. Unconfirmed messages are never retried automatically.</string>
+Window markers: + unread · ! mention/private message. The first chip names the network; its marker counts messages on your other networks.
+/split [auto|side|stack|off] shows a second conversation, from any network, beside the one you type into (▶). Tap a tile's label to choose what it shows, or hold a conversation chip; tap a tile to type into it.
+Each network rejoins the channels you were in. A dropped connection reconnects by itself when it needs no password. Passwords are never saved or shown. TLS is verified; no plaintext fallback.
+Server-readable, not end-to-end encrypted. On supported networks, rejoining loads up to 100 recent channel messages. There is no push or background service; leaving disconnects. Unconfirmed messages are never retried automatically.</string>
     <string name="irc_help_title">Help</string>
     <string name="irc_input_hint">message or /command</string>
-    <string name="irc_join_hint">Enter a channel such as #retui, then Continue.</string>
+    <string name="irc_join_hint">Enter a channel such as #linux, then Continue.</string>
     <string name="irc_join_name">Join by channel name</string>
     <string name="irc_joining">Joining %1$s…</string>
     <string name="irc_leave">Leave %1$s</string>
@@ -1850,11 +1864,17 @@ Register once, then sign in or reconnect before joining registered-only channels
     <string name="irc_leave_question">Leave %1$s? Your in-session draft will be kept.</string>
     <string name="irc_loading">Loading…</string>
     <string name="irc_more">More</string>
-    <string name="irc_network">Network</string>
+    <string name="irc_network">Server</string>
+    <string name="irc_network_connecting">connecting…</string>
     <string name="irc_network_explanation">Choose a TLS network. Account names belong to that network. Default port: 6697.</string>
     <string name="irc_network_hint">hostname [TLS port]</string>
+    <string name="irc_network_offline">offline</string>
+    <string name="irc_network_online">connected</string>
+    <string name="irc_networks">Networks</string>
+    <string name="irc_networks_chip">Networks. Current network: %1$s</string>
+    <string name="irc_nickname_explanation">Your nickname is %1$s. Type a new one, then Continue. Signing in uses your account name instead.</string>
+    <string name="irc_nickname_hint">nickname</string>
     <string name="irc_no_matches">No matches yet.</string>
-    <string name="irc_other_network">Use an existing account on this network. Nickname-only connections and registration are available through commands where supported.</string>
     <string name="irc_password_context">%1$s · masked password · Back cancels</string>
     <string name="irc_people">People</string>
     <string name="irc_people_requires_channel">Join a channel to see its people.</string>
@@ -1863,20 +1883,36 @@ Register once, then sign in or reconnect before joining registered-only channels
 2. Tap a conversation chip to switch chats.
 3. Open Channels to find or join a channel.</string>
     <string name="irc_reconnect">Reconnect</string>
+    <string name="irc_reconnect_as">Reconnect as %1$s</string>
     <string name="irc_refresh">Refresh</string>
-    <string name="irc_register_explanation">Choose a username, then a masked password. We join only after your account is confirmed. Re:TUI remembers this device by default; you can turn that off below.</string>
+    <string name="irc_register_explanation">Choose a username, then a masked password. This works on networks that support sign-up from IRC apps; we join only after your account is confirmed. Elsewhere, such as Libera.Chat, connect first and use /register your@email. Re:TUI remembers this device by default; you can turn that off below.</string>
+    <string name="irc_rejoin_list">Rejoins: %1$s</string>
     <string name="irc_remember_device">Remember this device</string>
+    <string name="irc_remove_network">Remove %1$s</string>
+    <string name="irc_remove_network_question">Remove %1$s from this phone? It disconnects and its device key is deleted. Your account on the network is not touched.</string>
+    <string name="irc_retired_server">Re:TUI's own IRC server has closed. Libera.Chat is selected below, or open Networks to choose another. Your channels and account there do not carry over.</string>
     <string name="irc_search_hint">Search this view</string>
     <string name="irc_secret_hint">Password · masked, session only · Back cancels</string>
     <string name="irc_security_details">TLS protects the connection, not against server operators. Private conversations are not end-to-end encrypted.
-Leaving this pane disconnects. Passwords are not saved. Unconfirmed messages are never retried automatically.</string>
+Leaving this pane disconnects every network. Networks that were connected reconnect when you open IRC again, if they need no password. Passwords are not saved. Unconfirmed messages are never retried automatically.</string>
     <string name="irc_send">Send IRC input</string>
     <string name="irc_show_more">Show next 50</string>
     <string name="irc_sign_in">Sign in</string>
-    <string name="irc_signup_info">Create an IRC account with a username and password. No email is required. Registration is subject to server limits.</string>
+    <string name="irc_signup_info">Sign-up rules belong to each network. Some ask for an email address or verification before an account works.</string>
+    <string name="irc_split_auto">Split view: top and bottom, side by side in landscape</string>
+    <string name="irc_split_beside_label">Showing %1$s. Tap to choose another conversation.</string>
+    <string name="irc_split_choose_beside">Show in the other side</string>
+    <string name="irc_split_choose_main">Show in the typing side (▶)</string>
+    <string name="irc_split_empty">Tap this label to choose a conversation from any network. Tap below it to type here.</string>
+    <string name="irc_split_focus">Second conversation. Tap to type into it.</string>
+    <string name="irc_split_main_label">Typing into %1$s. Tap to choose another conversation.</string>
+    <string name="irc_split_off">Split view: off</string>
+    <string name="irc_split_side">Split view: side by side</string>
+    <string name="irc_split_stack">Split view: top and bottom</string>
+    <string name="irc_split_status">network home</string>
+    <string name="irc_split_title">Split view</string>
     <string name="irc_title">IRC</string>
-    <string name="irc_welcome">IRC, at your fingertips.
-Sign in, choose a channel, and talk.</string>
+    <string name="irc_welcome">Connect as a guest to start chatting, or sign in with your account on this network.</string>
     <string name="language_packs_active">Active: %1$s</string>
     <string name="language_packs_browse">Browse GitHub releases</string>
     <string name="language_packs_cancel">Cancel</string>
@@ -3180,7 +3216,7 @@ guide -resume
 
 Resume stored path progress.</string>
     <string name="offline_help_article_guided_walkthrough_title">Read help or follow a guided task</string>
-    <string name="offline_help_article_home_back_retention_body">Back is contextual: it handles a workspace or Termux console before podcast/profile surfaces, drawers and the output tray. In the Termux console, Back hides the keyboard before closing the console. Android Home is a separate action. In-place launcher refresh preserves terminal state. Podcast filters, search and scroll, and Termux console buffer/drafts are retained only while the launcher process survives. Calculator history, answer and editing position use separate saved preferences. Help Back closes the reader immediately and keeps its article/reading position for reopening. Calculator, Help and IRC retain independent expanded/floating choice and bounds; Calculator and Help remain expanded in landscape. IRC Back first leaves Channels/People/Help navigation; Back from its conversation closes the pane and disconnects. Remembered device authentication can reconnect next time, but it is not chat transcript or process-death draft persistence. Launcher UI retention does not guarantee that a remote tmux job or session is still running.</string>
+    <string name="offline_help_article_home_back_retention_body">Back is contextual: it handles a workspace or Termux console before podcast/profile surfaces, drawers and the output tray. In the Termux console, Back hides the keyboard before closing the console. Android Home is a separate action. In-place launcher refresh preserves terminal state. Podcast filters, search and scroll, and Termux console buffer/drafts are retained only while the launcher process survives. Calculator history, answer and editing position use separate saved preferences. Help Back closes the reader immediately and keeps its article/reading position for reopening. Calculator, Help and IRC retain independent expanded/floating choice and bounds; Calculator and Help remain expanded in landscape. IRC Back first leaves Channels/People/Help navigation; Back from its conversation closes the pane and disconnects every network. Networks reconnect next time when they need no password, but it is not chat transcript or process-death draft persistence. Launcher UI retention does not guarantee that a remote tmux job or session is still running.</string>
     <string name="offline_help_article_home_back_retention_title">Home, Back and retained sessions</string>
     <string name="offline_help_article_http_actions_body">Post takes a URL token and the remaining body text. A body beginning with { or [ uses JSON media type; otherwise it is text/plain. It sends a real HTTP POST and prints status/response asynchronously. Webhook -add stores a name, URL, and template; a configured name triggers its POST with arguments. -ls prints names/URLs, and -rm removes a saved hook. Webhook arguments can be recorded in history. Avoid putting credentials or private message bodies in examples, URLs, terminal screenshots, or history; remote endpoints may retain what you send.
 
@@ -3239,31 +3275,35 @@ Find uniquely saved imported name before choosing apply.</string>
     <string name="offline_help_article_import_retui_title">Inspect a shared preset without applying it</string>
     <string name="offline_help_article_irc_accounts_privacy_body">## Remember this device
 
-On the default Re:TUI network, Remember this device authorizes a protected Android Keystore key after successful account authentication. Create account enables this choice by default and explains it before password entry; you can turn it off. Passwords are not saved. After enrollment is confirmed, opening IRC automatically reconnects and requests #retui.
+Remember this device asks the network's NickServ to trust a protected Android Keystore key after you sign in. Create account turns it on by default; you can turn it off. Passwords are not saved. Afterwards the network reconnects without a password and rejoins your channels. It works on networks whose services accept certificates, such as Libera.Chat and OFTC.
 
-This is a device reconnect key, not a portable restore code. A new phone, reinstall, deleted app data or a missing key needs password sign-in again. Anyone using your unlocked Launcher can use the remembered account. Keep your account password recoverable independently.
+This is a device key, not a portable restore code. A new phone, reinstall, deleted app data or a missing key needs password sign-in again. Anyone using your unlocked Launcher can use the remembered account. Keep your account password recoverable independently.
 
 ## If reconnect fails
 
-Check your network and the chosen server, then use Reconnect or password Sign in. A rejected key or TLS failure does not silently downgrade authentication. Account names belong to a network; an account on another IRC server or an old experimental community login is not automatically a Re:TUI IRC account. Use Network while disconnected to choose a compatible TLS server.
+Check your network and the server, then use Reconnect or password Sign in. A rejected key or TLS failure never silently downgrades to a guest connection. Account names belong to one network; an account on one network is not an account on another.
 
 ## Forget this device
 
-Connection details offers Forget this device. While connected to the bound account it requests server revocation, waits for confirmation, then removes the local key and disconnects. If offline or revocation fails, local removal can still happen; follow the warning and remove the old certificate authorization through NickServ on a trusted client. Local deletion is not proof of server revocation.
+Connection details offers Forget this device. It deletes the key from this phone. The network may still list the certificate, but nothing can use it; remove it with NickServ CERT DEL from a signed-in client if you want. Removing a network also deletes its key. Neither deletes your account.
 
 ## Privacy and retention
 
-TLS verifies and encrypts the connection, but messages are not end-to-end encrypted. Server operators can read channel and private messages. The server receives your connection address; nickname display and IP cloaking are not anonymity from the operator. Never share passwords or private recovery information in a channel.
-
-The default network uses a one-week server-history policy with cleanup in batches, not instantaneous deletion. External networks have their own policies. Launcher has no persistent local transcript, background IRC service, push or offline replay in this version. Rotation retains conversations, but password entry cancels; leaving the pane disconnects. Process death does not preserve an unsent chat draft.
-
-For default-network moderation, privacy or account-deletion requests, contact the developer privately. dvil is the configured moderator. Forget this device does not delete the server account or its history.</string>
+TLS verifies and encrypts the connection, but messages are not end-to-end encrypted. Server operators can read channel and private messages and see your connection address. Each network has its own rules and history retention. Launcher keeps no transcript after you close IRC and has no background IRC service or push. Rotation retains conversations, but password entry cancels; leaving the pane disconnects.</string>
     <string name="offline_help_article_irc_accounts_privacy_title">IRC accounts, reconnect and privacy</string>
-    <string name="offline_help_article_irc_community_body">## Open and sign in
+    <string name="offline_help_article_irc_community_body">## Open and connect
 
-Enter `irc` at Launcher Home. Tap Sign in, enter your IRC account name, then the masked password in the same composer. On the Re:TUI network the account name is also your nickname. Wait for Connected and confirmed membership of #retui before sending. Joining means the server has not confirmed membership yet.
+Enter `irc` at Launcher Home. The first time, Libera.Chat is selected. Tap Connect as … to join as a guest, or Sign in and enter your account name, then the masked password in the same composer. Change nickname picks the name others see.
 
-Create account uses the same username/password flow when the network permits registration. If registration is closed or rejected, use an existing account or wait for signup to open; Launcher does not fall back to a guest account.
+Re:TUI's own IRC server has closed. Accounts and channels from it do not carry over; choose any public network instead.
+
+Create account uses the same username/password flow on networks that allow signup from apps. On networks such as Libera.Chat, connect first, then use /register with your email address; the password is asked for separately and masked. Launcher never falls back to a guest connection when sign-in fails.
+
+## Networks
+
+The first chip under the conversation names the current network. Its marker counts unread messages and mentions on your other networks. Tap it for Networks: switch network, Add a network (Libera.Chat, OFTC, Rizon, hackint or any TLS server) or remove one. Every network stays connected while you switch.
+
+Each network rejoins the channels you were in. Networks that were connected when you closed IRC reconnect when you open it again, when they need no password. A dropped connection retries by itself for a few minutes.
 
 ## Everyday navigation
 
@@ -3271,25 +3311,24 @@ Create account uses the same username/password flow when the network permits reg
 2. Tap a named conversation chip to switch channels or private conversations. Unread counts and mention markers identify activity elsewhere.
 3. Open Channels to switch to an open channel, browse the network, or join by name. Search text in navigation views is never posted as a message.
 
-People lists nicknames in the active channel. Tap a nickname to open a private conversation; that alone sends nothing. Help begins with three short instructions; All commands opens the grouped reference. Channels, People and Help temporarily replace the conversation view without discarding its draft or reading position.
-
-Back first leaves a temporary view. From the conversation it closes the pane and disconnects. More offers connection details, diagnostics, leave/close and disconnect; leaving a channel asks for confirmation.
+People lists nicknames in the active channel. Tap a nickname to open a private conversation; that alone sends nothing. Back first leaves a temporary view. From the conversation it closes the pane and disconnects every network.
 
 ## Optional slash commands
 
 ```
-/join #help
-/window #retui
+/network
+/network add irc.oftc.net
+/join #linux
 /query nickname
 /help
 ```
 
-Use these inside IRC, not at Launcher Home. /join requests membership; /window switches an open conversation; /query opens a private conversation without sending. Replace nickname with the intended person. Typing / offers syntax hints. Unknown slash commands are rejected, never sent as messages. `//text` sends a literal leading slash.
+Use these inside IRC, not at Launcher Home. /network lists networks and switches; Alt+← and Alt+→ also switch. /join requests membership; /query opens a private conversation without sending. Typing / offers syntax hints. Unknown slash commands are rejected, never sent as messages. `//text` sends a literal leading slash.
 
 ## Sending safely
 
-Messages appear immediately with their confirmation state. Server echo confirms server acceptance, not recipient delivery or a read receipt. Disconnect can leave a send uncertain; it is never automatically retried. Check the conversation before manually resending. Opening this offline article does not sign in, join or send anything.</string>
-    <string name="offline_help_article_irc_community_title">IRC: sign in, join and talk</string>
+Messages appear immediately with their confirmation state. Server echo confirms server acceptance, not recipient delivery or a read receipt. Disconnect can leave a send uncertain; it is never automatically retried. Opening this offline article does not connect, join or send anything.</string>
+    <string name="offline_help_article_irc_community_title">IRC: connect, join and talk</string>
     <string name="offline_help_article_language_packs_body">Language packs supply text, not scripts. Import validates the pack archive, resource keys and formatting arguments. Missing translations fall back to bundled English. Installed packs and the selected language stay local to Launcher; an older pack version cannot replace a newer installed version. Selecting a pack changes launcher text and layout direction, not command names or flags. External app labels, feed titles, your documents, and native calculator definitions/messages are not automatically translated. Acceptance of a partial pack does not establish translation quality.</string>
     <string name="offline_help_article_language_packs_title">Use language packs with English fallback</string>
     <string name="offline_help_article_launcher_modes_body">Classic shows the command terminal; Search presents categorized results and inline output around the search field. Search is a different layout, not a sandbox or an assurance that text cannot execute commands: both layouts keep the launcher command path. Use mode to inspect the current mode, mode search to switch, or mode classic to return. A mode change refreshes the existing launcher UI. An active command guide can control the normal suggestion row, so use guide -off when you want normal suggestions again.
@@ -3458,7 +3497,7 @@ Change podcast playback speed.</string>
 
 This manual is bundled with Launcher and can be read offline. IRC and network services still need a connection. Read examples here; entering them at a live prompt can perform their described actions.
 
-- IRC: open `irc`, sign in, wait for #retui, then talk. Find IRC guides in Tools.
+- IRC: open `irc`, connect to Libera.Chat or another network, join a channel, then talk. Several networks can be connected at once. Find IRC guides in Tools.
 - Calculator: use 123, ABC and FUNC, check the interpretation/result hint, and use `to` for conversions. Read Calculator help in Tools.
 - Floating tools: Calculator, Help and IRC start expanded, remember their window choice and retain their floating size. Find Floating tools in Appearance.
 - Termux: the separate workspace has pages and up to two independent tiles. It offers a prompted update for the APK-bundled helper. Read Termux workspace and Helper updates in Automation.

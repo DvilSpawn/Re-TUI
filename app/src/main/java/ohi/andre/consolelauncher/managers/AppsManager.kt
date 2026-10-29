@@ -87,6 +87,8 @@ class AppsManager(context: Context) : XMLPrefsElement {
     private val PRIVATE_ENTRYPOINT_VISIBLE = "private_space_entrypoint_visible"
     private val preferences: SharedPreferences
     private val editor: SharedPreferences.Editor
+    // When each app was last opened from Re:TUI (apps -r). Private Space launches are never recorded.
+    private val lastLaunched: SharedPreferences
 
     private val profileBroadcast: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -176,6 +178,7 @@ class AppsManager(context: Context) : XMLPrefsElement {
 
         this.preferences = context.getSharedPreferences(PREFS, 0)
         this.editor = preferences.edit()
+        this.lastLaunched = context.getSharedPreferences("apps_last_launch", 0)
 
         this.groups = ArrayList<Group>()
 
@@ -843,6 +846,7 @@ class AppsManager(context: Context) : XMLPrefsElement {
                 super.run()
 
                 if (!info.isPrivateProfile && appsHolder != null) appsHolder!!.requestSuggestionUpdate(info)
+                if (!info.isPrivateProfile) lastLaunched.edit().putLong(info.write(), System.currentTimeMillis()).apply()
                 writeLaunchTimes(info)
             }
         }.start()
@@ -1218,6 +1222,27 @@ class AppsManager(context: Context) : XMLPrefsElement {
 
     fun printApps(type: Int): String? {
         return printNApps(type, -1)
+    }
+
+    enum class Ranking { RECENT, NEWEST, MOST_USED }
+
+    /** apps -r / -n / -u: the top [n] shown apps, each with when it was opened or installed, or how often it was opened. */
+    fun printRanked(ranking: Ranking, n: Int): String {
+        val packages = context.packageManager
+        val rows = ranked(shownApps().filter { !it.isPrivateProfile }, n.coerceIn(1, 500)) { app ->
+            when (ranking) {
+                Ranking.RECENT -> lastLaunched.getLong(app.write(), 0L).takeIf { it > 0 }
+                Ranking.NEWEST -> app.componentName?.packageName?.let { name -> runCatching { packages.getPackageInfo(name, 0).firstInstallTime }.getOrNull() }
+                Ranking.MOST_USED -> app.launchedTimes.toLong().takeIf { it > 0 }
+            }
+        }
+        if (rows.isEmpty()) return context.getString(if (ranking == Ranking.NEWEST) R.string.output_appnotfound else R.string.apps_ranked_none)
+        val now = System.currentTimeMillis()
+        return rows.joinToString(Tuils.NEWLINE) { (app, value) ->
+            app.publicLabel + " · " + if (ranking == Ranking.MOST_USED) context.resources.getQuantityString(R.plurals.apps_ranked_launches, value.toInt(), value)
+                else if (now - value < 60_000) context.getString(R.string.apps_ranked_just_now)
+                else android.text.format.DateUtils.getRelativeTimeSpanString(value, now, android.text.format.DateUtils.MINUTE_IN_MILLIS)
+        }
     }
 
     fun printApps(type: Int, text: String?): String? {
@@ -2042,6 +2067,10 @@ class AppsManager(context: Context) : XMLPrefsElement {
     }
 
     companion object {
+        /** The [n] items with the largest [key], largest first; items without a value are left out. */
+        internal fun <T> ranked(items: List<T>, n: Int, key: (T) -> Long?): List<Pair<T, Long>> =
+            items.mapNotNull { item -> key(item)?.let { item to it } }.sortedByDescending { it.second }.take(n)
+
         internal const val APP_LAUNCH_ACTION = Intent.ACTION_MAIN
         private const val REMEMBER_PACKAGE = "com.dvil.retui.remember"
         internal const val APP_LAUNCH_CATEGORY = Intent.CATEGORY_LAUNCHER

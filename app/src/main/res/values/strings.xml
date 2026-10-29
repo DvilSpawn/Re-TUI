@@ -316,10 +316,13 @@
         \n-rm [aliasName] -> remove an existing alias
         \n-ls -> list your aliases
         \n-file -> open alias.txt
-        \n-tutorial -> open the external GitHub wiki in a browser (network)
+        \n-tutorial -> open the external Aliases guide on re-tui.pages.dev (network)
         \nHome aliases expand before built-in commands; avoid conflicting names. Script aliases execute code through Termux; inspect the script first.
     </string>
     <string name="help_apps">-ls [filter] -> open the app drawer, optionally showing only apps matching a name or what they do (music, maps, camera)
+        \n-r [count] -> apps you opened most recently from Re:TUI (default 10)
+        \n-n [count] -> newest installed apps (default 10)
+        \n-u [count] -> your most-used apps (default 10)
         \n-lsh -> list your hidden apps
         \n-show [appName] -> re-show an hidden app
         \n-hide [appName] -> hide an app
@@ -337,8 +340,14 @@
         \n-addtogp [groupName] [appName] -> add the given app to the given group
         \n-rmfromgp [groupName] [appName] -> remove the given app from the given group
         \n-lsgp [OPTIONAL: groupName] -> list your groups, or list the content of the given group
-        \n-tutorial -> open the Apps command guide
+        \n-tutorial -> open the external Apps guide on re-tui.pages.dev (network)
     </string>
+    <string name="apps_ranked_none">No app launches recorded yet. Apps you open from Re:TUI appear here.</string>
+    <string name="apps_ranked_just_now">just now</string>
+    <plurals name="apps_ranked_launches">
+        <item quantity="one">%1$d launch</item>
+        <item quantity="other">%1$d launches</item>
+    </plurals>
     <string name="help_private">-ls -> list Private Space apps
         \n-open &lt;app&gt; -> launch an unlocked Private Space app
         \n-lock -> lock Private Space
@@ -378,7 +387,7 @@ Enable qalculate in Settings → behavior.xml for units and symbolic maths, e.g.
         \n-reset [option] -> restore its default value
         \n-fontsize [integer] -> change ten legacy UI size fields, not all typography; use Settings for suggestions, module, and header sizes
         \n-apply [file] -> move an existing file into the configuration folder and rotate existing XML or font assets
-        \n-tutorial -> open the external tutorial page (network)
+        \n-tutorial -> open the external Configuration guide on re-tui.pages.dev (network)
         \n\nWarning: keep a personal backup before broad edits. -apply is a move, not a copy or portable preset import; it may replace existing assets and its reported path does not verify a successful move. Use the Settings shareable-configuration import for portable presets.
         \nKnown issue: -ls rss.xml currently returns notification values, not RSS values; do not use it to inspect feed configuration.
     </string>
@@ -438,7 +447,7 @@ Enable qalculate in Settings → behavior.xml for units and symbolic maths, e.g.
         \n  https://github.com/DvilSpawn/Re-TUI/wiki/Aliases
         \n  https://github.com/DvilSpawn/Re-TUI/wiki/App-Drawer
         \n  https://github.com/DvilSpawn/Re-TUI/wiki/Presets-and-Wallpaper-Auto-Color
-        \n  https://github.com/DvilSpawn/Re-TUI/wiki/Termux-Integration
+        \n  https://re-tui.pages.dev/termux
     </string>
     <string name="help_htmlextract">Extract text from HTML pages
         \n-query [filter ID] [optional: format ID] [URL] -> parse the specified XPath entry with the specified URL
@@ -446,7 +455,7 @@ Enable qalculate in Settings → behavior.xml for units and symbolic maths, e.g.
         \n-rm [ID] -> remove an existing expression
         \n-edit [ID] [expression] -> change an existing expression
         \n-ls [type] -> shows the expressions of the given type
-        \n-tutorial -> show the tutorial on GitHub
+        \n-tutorial -> open the offline Feeds and text automation guide
         \n-file -> open the file htmlextract.xml</string>
     <string name="help_landscape">Save the Re:T-UI landscape preference and enable adaptive split layout when the window is wide enough.
         \n\nUsage:
@@ -493,7 +502,7 @@ Enable qalculate in Settings → behavior.xml for units and symbolic maths, e.g.
         \n-unbind [appName] -> unbind the application
         \n-ls -> show your bound applications
         \n-check [ID or packageName] -> check the last notification from the application bound with the given ID
-        \n-tutorial -> open the tutorial page on GitHub</string>
+        \n-tutorial -> open the external Notifications guide on re-tui.pages.dev, which covers replies (network)</string>
     <string name="help_restart">Restart Re:T-UI and load modified values</string>
     <string name="help_search">Use a file-backed search provider before entering a query.
         \n\n-[provider] [search this...] -> use a provider from search.txt
@@ -586,7 +595,7 @@ Enable qalculate in Settings → behavior.xml for units and symbolic maths, e.g.
         \n-update -> request a manual weather update
         \n-enable -> enable show_weather and reload the launcher
         \n-disable -> disable show_weather and reload the launcher
-        \n-tutorial -> open the external weather tutorial webpage (network)
+        \n-tutorial -> open the external Status and Weather guide on re-tui.pages.dev (network)
         \n\nWeather requires network access to met.no. Place names use Android Geocoder and may fail to resolve. Coordinates are sent to the weather service; choose their precision deliberately.
         \n\nModule:
         \n$ module -show weather
@@ -634,7 +643,7 @@ Enable qalculate in Settings → behavior.xml for units and symbolic maths, e.g.
         \n-ls -> list included/excluded apps and content filters
         \n-access -> show the system settings page dedicated to the Notification Access
         \n-file -> open notifications.xml
-        \n-tutorial -> open the external tutorial page (network)
+        \n-tutorial -> open the external Notifications guide on re-tui.pages.dev (network)
         \nNotification access exposes private message content to the launcher. -on/-off only change dock membership, not Android listener access. Replies can send real messages; dismissal removes the selected notification.</string>
     <string name="help_location">Show your current location</string>
     <string name="help_cntcts">-ls -> list your contacts

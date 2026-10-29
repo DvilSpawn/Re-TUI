@@ -70,6 +70,24 @@ class apps : ParamCommand() {
                 return (pack as MainPack).appsManager.printApps(AppsManager.HIDDEN_APPS)
             }
         },
+        r {
+            override fun args(): IntArray? = intArrayOf(CommandAbstraction.INT)
+            override fun exec(pack: ExecutePack): String? = (pack as MainPack).appsManager.printRanked(AppsManager.Ranking.RECENT, pack.getInt())
+            override fun onNotArgEnough(pack: ExecutePack, n: Int): String? = (pack as MainPack).appsManager.printRanked(AppsManager.Ranking.RECENT, RANKED_COUNT)
+            override fun onArgNotFound(pack: ExecutePack, index: Int): String? = pack.context.getString(R.string.invalid_integer)
+        },
+        n {
+            override fun args(): IntArray? = intArrayOf(CommandAbstraction.INT)
+            override fun exec(pack: ExecutePack): String? = (pack as MainPack).appsManager.printRanked(AppsManager.Ranking.NEWEST, pack.getInt())
+            override fun onNotArgEnough(pack: ExecutePack, n: Int): String? = (pack as MainPack).appsManager.printRanked(AppsManager.Ranking.NEWEST, RANKED_COUNT)
+            override fun onArgNotFound(pack: ExecutePack, index: Int): String? = pack.context.getString(R.string.invalid_integer)
+        },
+        u {
+            override fun args(): IntArray? = intArrayOf(CommandAbstraction.INT)
+            override fun exec(pack: ExecutePack): String? = (pack as MainPack).appsManager.printRanked(AppsManager.Ranking.MOST_USED, pack.getInt())
+            override fun onNotArgEnough(pack: ExecutePack, n: Int): String? = (pack as MainPack).appsManager.printRanked(AppsManager.Ranking.MOST_USED, RANKED_COUNT)
+            override fun onArgNotFound(pack: ExecutePack, index: Int): String? = pack.context.getString(R.string.invalid_integer)
+        },
         show {
             override fun args(): IntArray? {
                 return intArrayOf(CommandAbstraction.HIDDEN_PACKAGE)
@@ -376,12 +394,17 @@ class apps : ParamCommand() {
         return 4
     }
 
+    // Suggestion chips, everyday views first. -file still works when typed; config opens apps.xml too.
     public override fun params(): Array<String?> {
-        return Param.Companion.labels()
+        val all = Param.Companion.labels().filterNotNull()
+        return (SUGGESTED.filter { it in all } + all.filter { it !in SUGGESTED && it != "-file" }).toTypedArray()
     }
 
     companion object {
-        private const val APPS_DOC_URL = "https://dvilspawn.github.io/Re-TUI/apps.html"
+        private const val APPS_DOC_URL = "https://re-tui.pages.dev/apps"
+        private const val RANKED_COUNT = 10
+        private val SUGGESTED = listOf("-ls", "-r", "-n", "-u", "-l", "-hide", "-show", "-lsh", "-st", "-ps",
+            "-lsgp", "-mkgp", "-addtogp", "-rmfromgp", "-rmgp", "-gp_bg_color", "-gp_fore_color", "-default_app", "-frc", "-reset", "-tutorial")
 
         private fun openSettings(context: Context, packageName: String?) {
             Tuils.openSettingsPage(context, packageName)

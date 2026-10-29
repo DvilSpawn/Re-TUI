@@ -58,17 +58,11 @@ class IrcNavigationTest {
         a.query("alice"); assertEquals("alice", s.active.name); assertEquals(listOf("LIST"), frames)
         assertThrows(IllegalArgumentException::class.java) { a.query("NickServ") }
     }
-    @Test fun authenticatedDefaultNetworkJoinsMainChannelOnlyAndNoPendingResend() {
-        val s = IrcState(); val frames = mutableListOf<String>(); val a = IrcActions(s) { c, p, t -> frames.add(IrcProtocol.line(c, p, t)) }
-        a.authenticated(false); assertTrue(frames.isEmpty())
-        s.local("#retui", "old message", true); s.disconnected(); a.authenticated(true)
-        assertEquals(listOf("JOIN #retui\r\n"), frames); assertFalse(s.buffer("#retui").lines.single().pending)
-    }
     @Test fun restoredMembershipDoesNotStealRequestedConversationOrReadHiddenMessages() {
         for (channels in listOf(listOf("#retui", "#help"), listOf("#help", "#retui"))) {
             val s = IrcState(); s.nickname = "me"
             val a = IrcActions(s) { _, _, _ -> }
-            a.authenticated(true)
+            a.join("#retui")
             channels.forEach { s.receive(IrcMessage.parse(":me!u@host JOIN $it")) }
             assertEquals("#retui", s.active.name)
             assertTrue(s.buffer("#help").joined)

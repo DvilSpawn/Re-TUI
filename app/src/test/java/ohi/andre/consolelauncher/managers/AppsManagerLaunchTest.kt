@@ -34,4 +34,12 @@ class AppsManagerLaunchTest {
         assertEquals("CurrentAlias", launched)
         assertEquals(listOf("OldAlias", "CurrentAlias"), attempts)
     }
+
+    @Test
+    fun rankedListsLargestFirstAndLeavesOutAppsWithoutAValue() {
+        val values = mapOf("old" to 1L, "never" to null, "new" to 30L, "mid" to 10L)
+        val ranked = AppsManager.ranked(values.keys.toList(), 2) { values[it] }
+        assertEquals(listOf("new" to 30L, "mid" to 10L), ranked)
+        assertEquals(3, AppsManager.ranked(values.keys.toList(), 10) { values[it] }.size)
+    }
 }

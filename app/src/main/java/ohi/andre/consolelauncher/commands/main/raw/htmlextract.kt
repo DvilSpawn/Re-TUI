@@ -157,7 +157,8 @@ class htmlextract : ParamCommand() {
             }
 
             override fun exec(pack: ExecutePack): String? {
-                pack.context.startActivity(Tuils.webPage("https://github.com/DvilSpawn/Re-TUI/wiki/HTMLExtract"))
+                // The site has no htmlextract page; the offline guide covers it.
+                ohi.andre.consolelauncher.help.OfflineHelpActivity.open(pack.context, "feed-and-text-automation")
                 return null
             }
         },

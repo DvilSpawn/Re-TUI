@@ -14,7 +14,9 @@ class IrcDeviceKeyTest {
     @Test fun optInLiveTlsAcceptsDeviceCertificateAndAdvertisesExternalWithoutLogin() {
         assumeTrue(InstrumentationRegistry.getArguments().getString("irc_tls_probe") == "true")
         val devices = IrcDeviceKey(InstrumentationRegistry.getInstrumentation().targetContext)
-        val identity = IrcDeviceKey.Identity("irc.kokodoko.cloud", 6697, "probe" + System.nanoTime().toString().takeLast(8))
+        // Any TLS network that offers SASL EXTERNAL, e.g. -e irc_tls_probe_host irc.libera.chat
+        val host = InstrumentationRegistry.getArguments().getString("irc_tls_probe_host") ?: "irc.libera.chat"
+        val identity = IrcDeviceKey.Identity(host, 6697, "probe" + System.nanoTime().toString().takeLast(8))
         try {
             devices.ensure(identity)
             (IrcClient.tlsSocket(identity.host, identity.port, devices.factory(identity)) as SSLSocket).use { socket ->
@@ -41,24 +43,34 @@ class IrcDeviceKeyTest {
             }
         } finally { devices.forget(identity) }
     }
-    @Test fun keyIsNonExportableNetworkBoundPersistentAndForgettableWithoutPasswordStorage() {
+    @Test fun keyIsNonExportableAccountBoundPersistentAndForgettable() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val record = File(context.noBackupFilesDir, "irc-device.json")
-        val original = record.takeIf { it.exists() }?.readBytes()
         val devices = IrcDeviceKey(context)
-        val identity = IrcDeviceKey.Identity("irc.kokodoko.cloud", 16697, "fixture" + System.nanoTime().toString().takeLast(8))
+        val identity = IrcDeviceKey.Identity("irc.example.org", 16697, "fixture" + System.nanoTime().toString().takeLast(8))
         try {
+            assertFalse(devices.has(identity))
             devices.ensure(identity); val fingerprint = devices.fingerprint(identity)
             assertEquals(64, fingerprint.length)
             val key = KeyStore.getInstance("AndroidKeyStore").apply { load(null) }.getKey(identity.alias, null) as PrivateKey
             assertNull("Private key bytes cannot be exported", key.encoded)
-            devices.remember(identity)
-            assertEquals(identity, IrcDeviceKey(context).remembered()); assertEquals(fingerprint, IrcDeviceKey(context).fingerprint(identity))
+            assertTrue(IrcDeviceKey(context).has(identity)); assertEquals(fingerprint, IrcDeviceKey(context).fingerprint(identity))
             assertNotEquals(identity.alias, identity.copy(port = 6697).alias); assertNotEquals(identity.alias, identity.copy(account = "other").alias)
-            assertFalse(record.readText().contains("password")); assertFalse(record.readText().contains("PRIVATE KEY"))
             assertNotNull(devices.factory(identity))
-            devices.forget(identity); assertNull(devices.remembered())
-            assertFalse(KeyStore.getInstance("AndroidKeyStore").apply { load(null) }.containsAlias(identity.alias))
+            devices.forget(identity); assertFalse(devices.has(identity))
+        } finally { devices.forget(identity) }
+    }
+    @Test fun retiredServerKeyAndRecordAreRemovedOnce() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val record = File(context.noBackupFilesDir, "irc-device.json")
+        val original = record.takeIf { it.exists() }?.readBytes()
+        val devices = IrcDeviceKey(context)
+        val identity = IrcDeviceKey.Identity("irc.kokodoko.cloud", 16698, "fixture" + System.nanoTime().toString().takeLast(8))
+        try {
+            devices.ensure(identity)
+            record.writeText("""{"host":"${identity.host}","port":${identity.port},"account":"${identity.account}"}""")
+            assertTrue(devices.clearLegacy())
+            assertFalse(record.exists()); assertFalse(devices.has(identity))
+            assertFalse("Only once", devices.clearLegacy())
         } finally {
             devices.forget(identity)
             if (original != null) record.writeBytes(original) else record.delete()

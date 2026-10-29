@@ -2,6 +2,7 @@ package ohi.andre.consolelauncher.commands
 
 import ohi.andre.consolelauncher.commands.main.specific.ParamCommand
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.util.Locale
 
@@ -27,5 +28,12 @@ class CommandGroupLocaleTest {
             setOf("-ls", "-open", "-lock", "-unlock", "-settings", "-show", "-hide"),
             (command as? ParamCommand)?.params()?.toSet()
         )
+    }
+
+    @Test
+    fun appsChipsLeadWithEverydayViewsAndLeaveRawFileOut() {
+        val params = (CommandGroup("ohi.andre.consolelauncher.commands.main.raw").getCommandByName("apps") as ParamCommand).params().toList()
+        assertEquals(listOf("-ls", "-r", "-n", "-u"), params.take(4))
+        assertTrue("-file" !in params && "-tutorial" in params && "-gp_fore_color" in params)
     }
 }

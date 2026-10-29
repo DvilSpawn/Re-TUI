@@ -297,7 +297,7 @@ class notifications : ParamCommand() {
             }
 
             override fun exec(pack: ExecutePack): String? {
-                pack.context.startActivity(Tuils.webPage("https://github.com/DvilSpawn/Re-TUI/wiki/Notifications"))
+                pack.context.startActivity(Tuils.webPage("https://re-tui.pages.dev/notifications"))
                 return null
             }
         },

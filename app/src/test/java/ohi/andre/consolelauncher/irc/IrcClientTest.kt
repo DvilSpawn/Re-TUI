@@ -244,6 +244,37 @@ class IrcClientTest {
             assertFalse(sent.any { it == "CAP END" || it.startsWith("JOIN") || it.contains("secret") })
         }
     }
+    /** A network that offers no SASL at all (OFTC) gets the password through NickServ, after the welcome. */
+    @Test fun servicesFallbackIdentifiesOnlyWhenTheServerHasNoSasl() {
+        for (offered in listOf("echo-message", "sasl=PLAIN echo-message")) ServerSocket(0).use { server ->
+            val sent = CopyOnWriteArrayList<String>(); val outcome = CountDownLatch(1); val text = java.util.concurrent.atomic.AtomicReference("")
+            val fixture = thread {
+                server.accept().use { peer ->
+                    peer.soTimeout = 5000; val reader = peer.getInputStream().bufferedReader(); val writer = peer.getOutputStream().bufferedWriter()
+                    fun send(line: String) { writer.write(line + "\r\n"); writer.flush() }
+                    repeat(3) { sent.add(reader.readLine()) }; send(":s CAP test LS :$offered")
+                    sent.add(reader.readLine()); send(":s CAP test ACK :echo-message")
+                    if (!offered.contains("sasl")) { sent.add(reader.readLine()); send(":s 001 test :Welcome") }
+                    while (true) { val line = reader.readLine() ?: break; sent.add(line) }
+                }
+            }
+            val c = IrcClient("localhost", server.localPort, "test", "test", "secret".toCharArray(), {}, { ok, t -> if (ok || t.startsWith("Disconnected")) { text.set(t); outcome.countDown() } },
+                { _, port -> Socket("127.0.0.1", port) }, servicesFallback = true)
+            try {
+                c.start(); assertTrue(outcome.await(5, TimeUnit.SECONDS))
+                if (offered.contains("sasl")) {
+                    // SASL on offer is still required: the request is for sasl, never a NickServ password.
+                    assertTrue(sent.any { it.startsWith("CAP REQ") && it.contains("sasl") })
+                } else {
+                    assertTrue(c.ready); assertTrue(text.get().contains("NickServ"))
+                    val deadline = System.nanoTime() + 2_000_000_000
+                    while (sent.none { it == "PRIVMSG NickServ :IDENTIFY secret" } && System.nanoTime() < deadline) Thread.sleep(20)
+                    assertTrue(sent.contains("PRIVMSG NickServ :IDENTIFY secret"))
+                    assertFalse(sent.any { it.startsWith("AUTHENTICATE") })
+                }
+            } finally { c.close(); fixture.join(5000) }
+        }
+    }
     @Test fun outgoingMessagesCannotBeQueuedBeforeRegistration() {
         val c = IrcClient("localhost", 6697, "test", receive = {}, connection = { _, _ -> })
         assertThrows(IllegalStateException::class.java) { c.send("PRIVMSG", listOf("#c"), "hello") }; c.close()
@@ -264,6 +295,33 @@ class IrcClientTest {
             val c = IrcClient("localhost", server.localPort, "test", "test", "secret".toCharArray(), {}, { ok, text -> if (ok) ready.set(true); if (text.startsWith("Disconnected")) disconnected.countDown() }, { _, port -> Socket("127.0.0.1", port) })
             try { c.start(); assertTrue(disconnected.await(5, TimeUnit.SECONDS)); assertFalse(ready.get()); assertFalse(c.ready) }
             finally { c.close(); fixture.join(5000) }
+        }
+    }
+
+    @Test fun nicknameInUseFallsBackAndWrongPasswordSaysSo() {
+        for (rejected in listOf(false, true)) ServerSocket(0).use { server ->
+            val sent = CopyOnWriteArrayList<String>(); val outcome = CountDownLatch(1); val text = java.util.concurrent.atomic.AtomicReference("")
+            val fixture = thread {
+                server.accept().use { peer ->
+                    peer.soTimeout = 5000; val reader = peer.getInputStream().bufferedReader(); val writer = peer.getOutputStream().bufferedWriter()
+                    fun send(line: String) { writer.write(line + "\r\n"); writer.flush() }
+                    repeat(3) { sent.add(reader.readLine()) }
+                    send(":s 433 * test :Nickname is already in use"); sent.add(reader.readLine())
+                    send(":s CAP * LS :sasl=PLAIN"); sent.add(reader.readLine()); send(":s CAP * ACK :sasl")
+                    sent.add(reader.readLine()); send("AUTHENTICATE +"); sent.add(reader.readLine())
+                    if (rejected) send(":s 904 test_ :SASL authentication failed")
+                    else { send(":s 903 test_ :SASL authentication successful"); sent.add(reader.readLine()); send(":s 001 test_ :Welcome") }
+                    while (true) { val line = reader.readLine() ?: break; sent.add(line) }
+                }
+            }
+            val c = IrcClient("localhost", server.localPort, "test", "test", "secret".toCharArray(), {}, { ok, t -> if (ok || t.startsWith("Disconnected")) { text.set(t); outcome.countDown() } },
+                { _, port -> Socket("127.0.0.1", port) })
+            try {
+                c.start(); assertTrue(outcome.await(5, TimeUnit.SECONDS))
+                assertTrue(sent.contains("NICK test_"))
+                if (rejected) { assertFalse(c.ready); assertTrue(text.get().contains("check the account name and password")) }
+                else assertTrue(c.ready)
+            } finally { c.close(); fixture.join(5000) }
         }
     }
 }

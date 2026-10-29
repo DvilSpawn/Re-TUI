@@ -122,7 +122,10 @@ class IrcTerminalDeviceTest {
                 assertTrue("Toggle retains accessible hit target", toggle.width >= Tuils.dpToPx(activity, 48) && toggle.height >= Tuils.dpToPx(activity, 48))
                 assertSame(outer, inner.parent); assertNotNull("Separately themed inner pane", inner.background)
                 assertSame(inner, activity.findViewById<View>(R.id.irc_context).parent)
-                assertSame(inner, activity.findViewById<View>(R.id.irc_scroll).parent)
+                assertSame(inner, activity.findViewById<View>(R.id.irc_tiles).parent)
+                assertSame(activity.findViewById<View>(R.id.irc_tiles), (activity.findViewById<View>(R.id.irc_scroll).parent as View).parent)
+                // Text sits inside the inner pane's border, not on it.
+                assertTrue(inner.paddingLeft >= Tuils.dpToPx(activity, 8) && inner.paddingRight >= Tuils.dpToPx(activity, 8))
                 assertSame(inner, activity.findViewById<View>(R.id.irc_prompt_row).parent)
                 val actions = activity.findViewById<View>(R.id.irc_suggestion_scroll)
                 assertSame(outer, actions.parent)

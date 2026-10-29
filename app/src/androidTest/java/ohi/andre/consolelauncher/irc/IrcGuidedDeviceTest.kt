@@ -6,6 +6,8 @@ import android.text.InputType
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.FrameLayout
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.ScrollView
 import androidx.test.platform.app.InstrumentationRegistry
@@ -17,6 +19,7 @@ import ohi.andre.consolelauncher.managers.xml.options.Ui
 import ohi.andre.consolelauncher.tuils.Tuils
 import ohi.andre.consolelauncher.tuils.LauncherFontScale
 import org.junit.Assert.*
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import java.net.ServerSocket
@@ -65,7 +68,7 @@ class IrcGuidedDeviceTest {
                             "REDACT" -> if (rejectRedaction) reply(":s FAIL REDACT REDACT_FORBIDDEN ${m.params[0]} ${m.params[1]} :Fixture permission denied")
                                 else reply(":mod!u@fixture REDACT ${m.params[0]} ${m.params[1]}")
                             "LIST" -> { reply(":s 321 $nick :Start"); reply(":s 322 $nick #fixture 2 :A test channel"); reply(":s 323 $nick :End") }
-                            "PRIVMSG" -> if (m.params[0] == "NickServ" && m.params[1].startsWith("CERT ADD ")) reply(":NickServ!service@fixture NOTICE $nick :Certificate fingerprint successfully added")
+                            "PRIVMSG" -> if (m.params[0] == "NickServ" && (m.params[1] == "CERT ADD" || m.params[1].startsWith("CERT ADD "))) reply(":NickServ!service@fixture NOTICE $nick :Certificate fingerprint successfully added")
                                 else if (m.params[0] == "NickServ" && m.params[1].startsWith("CERT DEL ")) reply(":NickServ!service@fixture NOTICE $nick :Certificate fingerprint successfully removed")
                                 else reply(":$nick!u@fixture PRIVMSG ${m.params[0]} :${m.params[1]}")
                         }
@@ -75,14 +78,18 @@ class IrcGuidedDeviceTest {
         }
         override fun close() { socket?.close(); server.close(); worker.join(5000) }
     }
+    /** Each test starts from no saved networks: the first-run Libera.Chat entry, unsaved. */
+    @Before fun forgetSavedNetworks() { File(instrumentation.targetContext.noBackupFilesDir, "irc-networks.json").delete() }
+    /** The fixture network rejoins #retui, as a network the user had joined it on would. */
+    private fun rejoin(a: IrcActivity) = a.session.active.update(a.session.active.network.copy(channels = listOf("#retui")))
     private fun start(): IrcActivity {
         val a = instrumentation.startActivitySync(Intent(instrumentation.targetContext, IrcActivity::class.java).putExtra("irc_offline_fixture", true).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) as IrcActivity
         waitFor { var resumed = false; main { resumed = a.lifecycle.currentState == androidx.lifecycle.Lifecycle.State.RESUMED && a.onBackPressedDispatcher.hasEnabledCallbacks() }; resumed }
         return a
     }
     private fun main(block: () -> Unit) = instrumentation.runOnMainSync(block)
-    private fun waitFor(condition: () -> Boolean) {
-        val deadline = System.nanoTime() + 5_000_000_000
+    private fun waitFor(seconds: Long = 5, condition: () -> Boolean) {
+        val deadline = System.nanoTime() + seconds * 1_000_000_000
         while (System.nanoTime() < deadline) { instrumentation.waitForIdleSync(); if (condition()) return; android.os.SystemClock.sleep(25) }
         assertTrue("Fixture state arrived", condition())
     }
@@ -113,7 +120,7 @@ class IrcGuidedDeviceTest {
             Peer(historyBodies = bodies.take(count)).use { peer ->
                 try {
                     main {
-                        a.session.connector = { _, _ -> Socket("127.0.0.1", peer.server.localPort) }
+                        a.session.connector = { _, _ -> Socket("127.0.0.1", peer.server.localPort) }; rejoin(a)
                         a.session.account = "fixture"; a.session.state.nickname = "fixture"
                         a.session.connect("fixture-only-password".toCharArray())
                     }
@@ -138,7 +145,7 @@ class IrcGuidedDeviceTest {
         Peer(historyBodies = listOf("keep this message", "fixture-secret"), redactionId = "fixture-1").use { peer ->
             try {
                 main {
-                    a.session.connector = { _, _ -> Socket("127.0.0.1", peer.server.localPort) }
+                    a.session.connector = { _, _ -> Socket("127.0.0.1", peer.server.localPort) }; rejoin(a)
                     a.session.account = "fixture"; a.session.state.nickname = "fixture"
                     a.session.connect("fixture-only-password".toCharArray())
                 }
@@ -158,7 +165,7 @@ class IrcGuidedDeviceTest {
             Peer(historyBodies = listOf("delete fixture", "keep fixture"), manualRedaction = true, rejectRedaction = rejected).use { peer ->
                 try {
                     main {
-                        a.session.connector = { _, _ -> Socket("127.0.0.1", peer.server.localPort) }
+                        a.session.connector = { _, _ -> Socket("127.0.0.1", peer.server.localPort) }; rejoin(a)
                         a.session.account = "fixture"; a.session.state.nickname = "fixture"
                         a.session.connect("fixture-only-password".toCharArray())
                     }
@@ -189,7 +196,7 @@ class IrcGuidedDeviceTest {
         Peer().use { peer ->
             try {
                 main {
-                    a.session.connector = { _, _ -> Socket("127.0.0.1", peer.server.localPort) }
+                    a.session.connector = { _, _ -> Socket("127.0.0.1", peer.server.localPort) }; rejoin(a)
                     input(a).setText("preserved draft"); click(a, "Sign in"); submit(a, "fixture")
                     assertEquals(InputType.TYPE_TEXT_VARIATION_PASSWORD, input(a).inputType and InputType.TYPE_MASK_VARIATION)
                     submit(a, "fixture-only-password")
@@ -204,7 +211,7 @@ class IrcGuidedDeviceTest {
                     a.onBackPressedDispatcher.onBackPressed(); assertEquals("my channel draft", input(a).text.toString())
                     submit(a, "/help"); assertEquals("#retui", a.session.state.active.name)
                     a.onBackPressedDispatcher.onBackPressed()
-                    click(a, "Channels"); submit(a, "#help"); click(a, "#help")
+                    click(a, "Channels"); click(a, "Join by channel name"); submit(a, "#help")
                 }
                 waitFor { a.session.state.active.name == "#help" && a.session.state.active.joined }
                 main { click(a, "People") }
@@ -252,7 +259,7 @@ class IrcGuidedDeviceTest {
         val a = start()
         Peer().use { peer ->
             try {
-                main { a.session.connector = { _, _ -> Socket("127.0.0.1", peer.server.localPort) }; a.session.account = "fixture"; a.session.state.nickname = "fixture"; a.session.connect("fixture-password".toCharArray()) }
+                main { a.session.connector = { _, _ -> Socket("127.0.0.1", peer.server.localPort) }; rejoin(a); a.session.account = "fixture"; a.session.state.nickname = "fixture"; a.session.connect("fixture-password".toCharArray()) }
                 waitFor { a.session.state.active.joined }
                 main { click(a, "Channels"); click(a, "Browse network"); input(a).setText("fixture") }
                 waitFor { a.session.state.directory.size == 1 && !a.session.state.directoryLoading }
@@ -293,67 +300,69 @@ class IrcGuidedDeviceTest {
             capture(a, "command")
         } finally { main { a.finish() }; instrumentation.waitForIdleSync() }
     }
-    @Test fun deviceEnrollmentAutomaticReconnectAndRevocationUseFixtureOnly() {
-        val context = instrumentation.targetContext; val record = File(context.noBackupFilesDir, "irc-device.json")
-        val original = record.takeIf { it.exists() }?.readBytes()
-        val identity = IrcDeviceKey.Identity("irc.kokodoko.cloud", 6697, "fixture" + System.nanoTime().toString().takeLast(8))
+    @Test fun deviceEnrollmentAutomaticReconnectAndForgetUseFixtureOnly() {
+        val context = instrumentation.targetContext
         val devices = IrcDeviceKey(context)
+        val account = "fixture" + System.nanoTime().toString().takeLast(8)
+        var identity: IrcDeviceKey.Identity? = null
         var a = start()
         try {
-            devices.ensure(identity)
             Peer().use { first ->
                 main {
-                    a.session.connector = { _, _ -> Socket("127.0.0.1", first.server.localPort) }
-                    a.session.rememberDevice = true; a.session.account = identity.account; a.session.state.nickname = identity.account
+                    a.session.connector = { _, _ -> Socket("127.0.0.1", first.server.localPort) }; rejoin(a)
+                    a.session.rememberDevice = true; a.session.account = account; a.session.state.nickname = account
+                    // The loopback connector bypasses the device TLS factory, so create the key it would present.
+                    identity = a.session.active.identity; devices.ensure(identity!!)
                     a.session.connect("fixture-only-password".toCharArray())
                 }
-                waitFor { devices.remembered() == identity }
+                waitFor { a.session.active.network.device && a.session.state.active.joined }
                 assertEquals(listOf("PLAIN"), first.mechanisms)
+                // A password sign-in presented the key, so services add the current certificate.
+                assertTrue(first.frames.any { it.command == "PRIVMSG" && it.params.last() == "CERT ADD" })
                 main { a.finish() }; instrumentation.waitForIdleSync()
             }
             a = start()
             Peer().use { second ->
                 main {
                     a.session.connector = { _, _ -> Socket("127.0.0.1", second.server.localPort) }
-                    a.session.initialized = false; a.session.restoreDevice()
+                    a.session.initialized = false; a.session.restore()
                 }
                 waitFor { a.session.state.active.joined }
                 assertEquals(listOf("EXTERNAL"), second.mechanisms)
                 assertFalse(second.frames.any { it.command == "PRIVMSG" })
                 main { a.session.forgetDevice() }
-                waitFor { devices.remembered() == null && a.session.client == null }
-                assertTrue(second.frames.any { it.command == "PRIVMSG" && it.params.last().startsWith("CERT DEL ") })
-                assertEquals(context.getString(R.string.irc_device_revoked), a.session.deviceStatus)
+                assertFalse(devices.has(identity!!)); assertFalse(a.session.active.network.device)
+                assertEquals(context.getString(R.string.irc_device_forgotten), a.session.deviceStatus)
             }
         } finally {
             main { a.finish() }; instrumentation.waitForIdleSync()
-            devices.forget(identity)
-            if (original != null) record.writeBytes(original) else record.delete()
+            identity?.let(devices::forget)
         }
     }
     @Test fun usernamePasswordSignupEnrollsAndReconnectsWithoutPassword() {
-        val context = instrumentation.targetContext; val record = File(context.noBackupFilesDir, "irc-device.json")
-        val original = record.takeIf { it.exists() }?.readBytes()
-        val identity = IrcDeviceKey.Identity("irc.kokodoko.cloud", 6697, "signup" + System.nanoTime().toString().takeLast(8))
-        val devices = IrcDeviceKey(context)
+        val devices = IrcDeviceKey(instrumentation.targetContext)
+        val account = "signup" + System.nanoTime().toString().takeLast(8)
         var a = start()
+        val identity = a.session.active.identity.copy(account = account)
         try {
             Peer("REGISTER SUCCESS <account> :Account successfully registered").use { peer ->
                 main {
-                    a.session.connector = { _, _ -> Socket("127.0.0.1", peer.server.localPort) }
+                    a.session.connector = { _, _ -> Socket("127.0.0.1", peer.server.localPort) }; rejoin(a)
                     input(a).setText("keep signup draft"); click(a, "Sign in"); click(a, "Create account")
                     assertTrue(a.session.rememberDevice)
                 }
                 capture(a, "signup")
                 main {
-                    submit(a, identity.account)
+                    submit(a, account)
                     assertEquals(InputType.TYPE_TEXT_VARIATION_PASSWORD, input(a).inputType and InputType.TYPE_MASK_VARIATION)
                     assertTrue(a.window.attributes.flags and android.view.WindowManager.LayoutParams.FLAG_SECURE != 0)
                     submit(a, "signup fixture password")
                 }
-                waitFor { devices.remembered() == identity && a.session.state.active.joined }
+                waitFor { a.session.active.network.device && a.session.state.active.joined }
+                assertTrue(devices.has(identity))
                 assertEquals(1, peer.frames.count { it.command == "REGISTER" }); assertTrue(peer.mechanisms.isEmpty())
                 assertEquals(1, peer.frames.count { it.command == "JOIN" })
+                // A new account's connection carried no certificate, so the fingerprint is named.
                 assertTrue(peer.frames.any { it.command == "PRIVMSG" && it.params.last().startsWith("CERT ADD ") })
                 assertFalse(a.session.state.buffers.any { b -> b.lines.any { it.text.contains("signup fixture password") } })
                 assertEquals("keep signup draft", a.session.state.buffers.first().draft)
@@ -362,28 +371,136 @@ class IrcGuidedDeviceTest {
             }
             a = start()
             Peer().use { peer ->
-                main { a.session.connector = { _, _ -> Socket("127.0.0.1", peer.server.localPort) }; a.session.initialized = false; a.session.restoreDevice() }
+                main { a.session.connector = { _, _ -> Socket("127.0.0.1", peer.server.localPort) }; a.session.initialized = false; a.session.restore() }
                 waitFor { a.session.state.active.joined }
                 assertEquals(listOf("EXTERNAL"), peer.mechanisms)
                 assertFalse(peer.frames.any { it.command == "REGISTER" || it.command == "PRIVMSG" })
             }
         } finally {
             main { a.finish() }; instrumentation.waitForIdleSync(); devices.forget(identity)
-            if (original != null) record.writeBytes(original) else record.delete()
+        }
+    }
+    @Test fun twoNetworksKeepSeparateWindowsUnreadAndSavedChannels() {
+        val a = start()
+        Peer().use { libera -> Peer().use { other ->
+            try {
+                main {
+                    a.session.connector = { host, _ -> Socket("127.0.0.1", if (host == "irc.example.org") other.server.localPort else libera.server.localPort) }
+                    rejoin(a); a.session.state.nickname = "fixture"; a.session.changed?.invoke()
+                    click(a, "Connect as fixture (no account)")
+                }
+                waitFor { a.session.state.active.name == "#retui" && a.session.state.active.joined }
+                assertTrue("Guest connection, no SASL", libera.mechanisms.isEmpty())
+                main {
+                    submit(a, "/network add irc.example.org")
+                    assertEquals("irc.example.org", a.session.active.host); assertEquals(2, a.session.connections.size)
+                    assertTrue("Libera keeps running", a.session.connections.first().ready)
+                    a.session.state.nickname = "fixture"; submit(a, "/connect")
+                }
+                waitFor { a.session.active.ready }
+                main { submit(a, "/join #other") }
+                waitFor { a.session.state.active.name == "#other" && a.session.state.active.joined }
+                main {
+                    // A mention on Libera shows on the network chip while another network is open.
+                    a.session.connections.first().state.receive(IrcMessage.parse(":alice!u@x PRIVMSG #retui :hello fixture")); a.session.changed?.invoke()
+                    val chip = (a.findViewById<LinearLayout>(R.id.irc_windows).getChildAt(0) as FrameLayout).getChildAt(0) as TextView
+                    assertEquals("⇄ irc.example.org !1", chip.text.toString())
+                    assertEquals(listOf("#other"), a.session.state.buffers.drop(1).map { it.name })
+                    click(a, "⇄ irc.example.org !1"); assertEquals(IrcNavigation.Page.NETWORKS, a.session.navigation.page)
+                }
+                capture(a, "networks")
+                main {
+                    click(a, "Libera.Chat · connected · !1")
+                    assertEquals("irc.libera.chat", a.session.active.host); assertEquals("#retui", a.session.state.active.name)
+                    assertEquals(0, a.session.state.active.unread)
+                    assertTrue(a.findViewById<TextView>(R.id.irc_output).text.contains("<alice> hello fixture"))
+                }
+                capture(a, "network-switched")
+                val saved = IrcNetworkStore(File(instrumentation.targetContext.noBackupFilesDir, "irc-networks.json")).load()
+                assertEquals(listOf("irc.libera.chat" to listOf("#retui"), "irc.example.org" to listOf("#other")), saved.map { it.host to it.channels })
+                assertTrue(saved.all { it.connectOnOpen })
+                main { a.onBackPressedDispatcher.onBackPressed() }
+                assertTrue(a.session.connections.all { it.client == null })
+                assertFalse(libera.frames.any { it.command == "PRIVMSG" } || other.frames.any { it.command == "PRIVMSG" })
+            } finally { main { a.finish() }; instrumentation.waitForIdleSync() }
+        } }
+    }
+    @Test fun splitViewShowsAnotherNetworkAndTappingItMovesTheComposerThere() {
+        val a = start()
+        Peer().use { libera -> Peer().use { other ->
+            try {
+                main {
+                    a.session.split = IrcTerminalSession.Split.OFF
+                    a.session.connector = { host, _ -> Socket("127.0.0.1", if (host == "irc.example.org") other.server.localPort else libera.server.localPort) }
+                    rejoin(a); a.session.state.nickname = "fixture"; a.session.connect()
+                }
+                waitFor { a.session.state.active.name == "#retui" && a.session.state.active.joined }
+                main { submit(a, "/network add irc.example.org"); submit(a, "/connect") }
+                waitFor { a.session.active.ready }
+                main { submit(a, "/join #other") }
+                waitFor { a.session.state.active.name == "#other" && a.session.state.active.joined }
+                main {
+                    submit(a, "/split side")
+                    val beside = a.window.decorView.findViewWithTag<LinearLayout>("irc-beside")
+                    assertEquals(View.VISIBLE, beside.visibility)
+                    assertEquals(LinearLayout.HORIZONTAL, a.findViewById<LinearLayout>(R.id.irc_tiles).orientation)
+                    // The conversation left behind shows beside the one you type into, and counts as read.
+                    assertTrue((beside.getChildAt(0) as TextView).text.toString(), (beside.getChildAt(0) as TextView).text.contains("Libera.Chat · #retui"))
+                    a.session.connections.first().state.receive(IrcMessage.parse(":alice!u@x PRIVMSG #retui :visible beside")); a.session.changed?.invoke()
+                    assertTrue(((beside.getChildAt(1) as ScrollView).getChildAt(0) as TextView).text.contains("<alice> visible beside"))
+                    assertEquals(0, a.session.connections.first().unread)
+                }
+                capture(a, "split")
+                main {
+                    // Tap the transcript area, as a finger would, rather than the tile's frame.
+                    ((a.window.decorView.findViewWithTag<LinearLayout>("irc-beside").getChildAt(1) as ScrollView).getChildAt(0)).performClick()
+                    assertEquals("irc.libera.chat", a.session.active.host); assertEquals("#retui", a.session.state.active.name)
+                    val beside = a.window.decorView.findViewWithTag<LinearLayout>("irc-beside")
+                    assertTrue((beside.getChildAt(0) as TextView).text.contains("irc.example.org · #other"))
+                    // Tiles keep their places: the typing side moved to where you tapped.
+                    assertSame(beside, a.findViewById<LinearLayout>(R.id.irc_tiles).getChildAt(1).takeIf { a.session.splitSlot == 0 } ?: a.findViewById<LinearLayout>(R.id.irc_tiles).getChildAt(0))
+                    // Each tile has a Termux-style label; ▶ marks the one you type into.
+                    assertEquals("▶ Libera.Chat · #retui", a.window.decorView.findViewWithTag<TextView>("irc-main-label").text.toString())
+                    // The other tile's label opens a chooser listing every network's conversations.
+                    a.window.decorView.findViewWithTag<View>("irc-beside-label").performClick()
+                    assertEquals(IrcNavigation.Page.CONVERSATIONS, a.session.navigation.page)
+                    click(a, "Libera.Chat · network home")
+                    assertTrue((beside.getChildAt(0) as TextView).text.contains("Libera.Chat · network home"))
+                    assertEquals("#retui", a.session.state.active.name)
+                    submit(a, "/split off"); assertEquals(View.GONE, beside.visibility)
+                }
+                assertFalse(libera.frames.any { it.command == "PRIVMSG" } || other.frames.any { it.command == "PRIVMSG" })
+            } finally { main { a.session.split = IrcTerminalSession.Split.OFF; a.finish() }; instrumentation.waitForIdleSync() }
+        } }
+    }
+    @Test fun droppedConnectionReconnectsByItselfAndRejoins() {
+        val a = start()
+        Peer().use { second ->
+            val first = Peer()
+            try {
+                val ports = java.util.concurrent.ConcurrentLinkedQueue(listOf(first.server.localPort, second.server.localPort))
+                main { a.session.connector = { _, _ -> Socket("127.0.0.1", checkNotNull(ports.poll())) }; rejoin(a); a.session.state.nickname = "fixture"; a.session.connect() }
+                waitFor { a.session.state.active.joined }
+                first.close()
+                waitFor { a.session.connectionText.contains("reconnecting in 5s") }
+                main { assertTrue(a.findViewById<TextView>(R.id.irc_status).text.contains("reconnecting in 5s")) }
+                waitFor(15) { a.session.client?.ready == true && a.session.state.active.joined }
+                assertTrue(second.frames.any { it.command == "JOIN" && it.params.first() == "#retui" })
+            } finally { first.close(); main { a.finish() }; instrumentation.waitForIdleSync() }
         }
     }
     @Test fun closedSignupReportsFailureWithoutJoiningOrSavingDevice() {
-        val a = start(); val remembered = a.session.devices.remembered()
+        val a = start()
         Peer().use { peer ->
             try {
                 main {
-                    a.session.connector = { _, _ -> Socket("127.0.0.1", peer.server.localPort) }
+                    a.session.connector = { _, _ -> Socket("127.0.0.1", peer.server.localPort) }; rejoin(a)
                     submit(a, "/register"); assertEquals(IrcNavigation.Page.REGISTER, a.session.navigation.page)
                     submit(a, "closedfixture"); submit(a, "never-sent-fixture-password")
                 }
                 waitFor { a.session.connectionText.startsWith("Disconnected") }
                 assertTrue(a.session.connectionText.contains("Registration is closed"))
-                assertEquals(remembered, a.session.devices.remembered())
+                assertFalse(a.session.active.network.device)
                 assertFalse(peer.frames.any { it.command in listOf("REGISTER", "JOIN", "PRIVMSG") })
                 assertFalse(a.session.state.buffers.any { b -> b.lines.any { it.text.contains("never-sent-fixture-password") } })
                 capture(a, "signup-closed")
@@ -391,13 +508,13 @@ class IrcGuidedDeviceTest {
         }
     }
     @Test fun signupPasswordCancellationDoesNotCreateConnectionOrReplaceDraft() {
-        val a = start(); val remembered = a.session.devices.remembered()
+        val a = start()
         try {
             main {
                 input(a).setText("signup cancel draft"); submit(a, "/register"); submit(a, "fixture")
                 input(a).setText("cancel-signup-secret"); a.onBackPressedDispatcher.onBackPressed()
                 assertEquals("signup cancel draft", input(a).text.toString()); assertNull(a.session.client)
-                assertEquals(remembered, a.session.devices.remembered())
+                assertFalse(a.session.active.network.device)
                 assertEquals(0, a.window.attributes.flags and android.view.WindowManager.LayoutParams.FLAG_SECURE)
             }
         } finally { main { a.finish() }; instrumentation.waitForIdleSync() }
