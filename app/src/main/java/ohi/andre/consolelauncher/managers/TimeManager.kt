@@ -25,18 +25,22 @@ import java.util.regex.Pattern
 /**
  * Created by francescoandreuzzi on 26/07/2017.
  */
-class TimeManager(context: Context) {
+class TimeManager(
+    context: Context,
+    private val values: ohi.andre.consolelauncher.managers.settings.AppearanceValues = ohi.andre.consolelauncher.managers.settings.AppearanceValues.saved,
+    private val standalone: Boolean = false
+) {
     private var outputDateFormatList: Array<FormatEntry?>?
     private var statusDateFormatList: Array<FormatEntry?>?
 
     init {
-        instance = this
-        val separator = XMLPrefsManager.get(Behavior.time_format_separator)
+        if (!standalone) instance = this
+        val separator = values.get(Behavior.time_format_separator)
 
         outputDateFormatList =
-            createList(context, XMLPrefsManager.get(Behavior.output_time_format), separator)
+            createList(context, values.get(Behavior.output_time_format), separator)
         statusDateFormatList =
-            createList(context, XMLPrefsManager.get(Behavior.status_time_format), separator)
+            createList(context, values.get(Behavior.status_time_format), separator)
     }
 
     private fun createList(
@@ -45,7 +49,7 @@ class TimeManager(context: Context) {
         separator: String
     ): Array<FormatEntry?> {
         val formats: Array<String?> =
-            format.split(separator.toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+            format.split(runCatching { separator.toRegex() }.getOrElse { Pattern.quote(separator).toRegex() }).dropLastWhile { it.isEmpty() }.toTypedArray()
         val list: Array<FormatEntry?> = arrayOfNulls<FormatEntry>(formats.size)
 
         for (c in list.indices) {
@@ -63,7 +67,7 @@ class TimeManager(context: Context) {
                 formats[c] = currentFormat
                 list[c] = buildEntry(color, currentFormat)
             } catch (e: Exception) {
-                Tuils.sendOutput(AppearanceSettings.errorTextColor(), context, context.getString(R.string.manager_timemanager_invalid_time_format_c3076, currentFormat))
+                if (!standalone) Tuils.sendOutput(AppearanceSettings.errorTextColor(), context, context.getString(R.string.manager_timemanager_invalid_time_format_c3076, currentFormat))
                 if (c > 0) list[c] = list[0]
                 else list[c] = buildFallbackEntry()
             }
@@ -310,10 +314,7 @@ class TimeManager(context: Context) {
             if (segmentSize != Int.Companion.MAX_VALUE && context != null) {
                 builder.setSpan(
                     AbsoluteSizeSpan(
-                        Tuils.convertSpToPixels(
-                            segmentSize.toFloat(),
-                            context
-                        )
+                        (ohi.andre.consolelauncher.tuils.LauncherFontScale.scaledSp(segmentSize.toFloat(), values.int(ohi.andre.consolelauncher.managers.xml.options.Ui.font_size_offset)) * context.resources.displayMetrics.scaledDensity).toInt()
                     ), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
                 )
             }
@@ -323,9 +324,9 @@ class TimeManager(context: Context) {
             return Tuils.EMPTYSTRING
         }
 
-        val clr = if (color != TerminalManager.NO_COLOR) color else entry.color ?: XMLPrefsManager.getColor(Theme.time_text_color)
+        val clr = if (color != TerminalManager.NO_COLOR) color else entry.color ?: values.color(Theme.time_text_color)
         builder.setSpan(
-            if (color == TerminalManager.NO_COLOR && entry.color == null) ThemeColorSpan(Theme.time_text_color) else ForegroundColorSpan(clr),
+            if (!standalone && color == TerminalManager.NO_COLOR && entry.color == null) ThemeColorSpan(Theme.time_text_color) else ForegroundColorSpan(clr),
             0,
             builder.length,
             Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
@@ -337,7 +338,7 @@ class TimeManager(context: Context) {
         outputDateFormatList = null
         statusDateFormatList = null
 
-        instance = null
+        if (!standalone) instance = null
     }
 
     private class FormatEntry(val color: Int?, val segments: MutableList<FormatSegment?>)

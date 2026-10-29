@@ -27,6 +27,8 @@ object TerminalTrayToggleView {
         outputColor: Int,
         outputHeaderTextSize: Int,
         tabBackgroundColor: Int,
+        values: ohi.andre.consolelauncher.managers.settings.AppearanceValues = ohi.andre.consolelauncher.managers.settings.AppearanceValues.saved,
+        font: Typeface? = null,
         onClick: () -> Unit
     ) {
         if (toggle == null) return
@@ -37,8 +39,8 @@ object TerminalTrayToggleView {
 
         toggle.visibility = View.VISIBLE
         toggle.setTextColor(outputColor)
-        toggle.setTypeface(Tuils.getTypeface(context), Typeface.BOLD)
-        toggle.textSize = outputHeaderTextSize.toFloat()
+        toggle.setTypeface(font ?: Tuils.getTypeface(context), Typeface.BOLD)
+        values.applySize(toggle, outputHeaderTextSize.toFloat())
         toggle.gravity = Gravity.CENTER
         if (outputHeaderArrowsOnly) {
             toggle.minWidth = Tuils.dpToPx(context, 48)
@@ -57,7 +59,7 @@ object TerminalTrayToggleView {
                 Tuils.dpToPx(context, 2)
             )
         }
-        toggle.background = TerminalBorderRuntime.tabDrawable(context, tabBackgroundColor, FrameTarget.OUTPUT)
+        toggle.background = TerminalBorderRuntime.tabDrawable(context, tabBackgroundColor, FrameTarget.OUTPUT, values)
         TerminalBorderRuntime.bind(terminalOutputBorder, toggle)
         toggle.setOnClickListener { onClick() }
     }

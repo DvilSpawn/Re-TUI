@@ -12195,6 +12195,237 @@
     },
     "type": "string"
   },
+  "optional_calculator_cancel": {
+    "formatted": true,
+    "forms": {
+      "other": "Cancel"
+    },
+    "type": "string"
+  },
+  "optional_calculator_close": {
+    "formatted": true,
+    "forms": {
+      "other": "Close"
+    },
+    "type": "string"
+  },
+  "optional_calculator_complete": {
+    "formatted": true,
+    "forms": {
+      "other": "Calculator engine updated."
+    },
+    "type": "string"
+  },
+  "optional_calculator_download": {
+    "formatted": true,
+    "forms": {
+      "other": "Download Qalculate"
+    },
+    "type": "string"
+  },
+  "optional_calculator_enable": {
+    "formatted": true,
+    "forms": {
+      "other": "Enable Qalculate"
+    },
+    "type": "string"
+  },
+  "optional_calculator_failed": {
+    "formatted": true,
+    "forms": {
+      "other": "Engine operation failed: %1$s"
+    },
+    "type": "string"
+  },
+  "optional_calculator_header_basic": {
+    "formatted": true,
+    "forms": {
+      "other": "Calculator · Basic"
+    },
+    "type": "string"
+  },
+  "optional_calculator_header_enhanced": {
+    "formatted": true,
+    "forms": {
+      "other": "Calculator · Qalculate"
+    },
+    "type": "string"
+  },
+  "optional_calculator_help_title": {
+    "formatted": true,
+    "forms": {
+      "other": "Calculator help"
+    },
+    "type": "string"
+  },
+  "optional_calculator_import": {
+    "formatted": true,
+    "forms": {
+      "other": "Import engine file"
+    },
+    "type": "string"
+  },
+  "optional_calculator_import_description": {
+    "formatted": true,
+    "forms": {
+      "other": "Install this calculator engine file? Only continue if you trust its source. Re:TUI checks pack compatibility and file integrity before replacing the current engine. No second app is installed."
+    },
+    "type": "string"
+  },
+  "optional_calculator_inline_description": {
+    "formatted": true,
+    "forms": {
+      "other": "Add units, conversions and advanced maths. Works offline after download."
+    },
+    "type": "string"
+  },
+  "optional_calculator_inline_title": {
+    "formatted": true,
+    "forms": {
+      "other": "Qalculate · optional"
+    },
+    "type": "string"
+  },
+  "optional_calculator_install": {
+    "formatted": true,
+    "forms": {
+      "other": "Install pack"
+    },
+    "type": "string"
+  },
+  "optional_calculator_invalid_file": {
+    "formatted": true,
+    "forms": {
+      "other": "Choose a readable calculator engine file from a document provider."
+    },
+    "type": "string"
+  },
+  "optional_calculator_missing_description": {
+    "formatted": true,
+    "forms": {
+      "other": "Basic calculations work now. Download or import the optional Qalculate pack for units, exact results and advanced expressions. It runs inside Re:TUI and works offline after installation."
+    },
+    "type": "string"
+  },
+  "optional_calculator_not_now": {
+    "formatted": true,
+    "forms": {
+      "other": "Hide calculator enhancement"
+    },
+    "type": "string"
+  },
+  "optional_calculator_pack_installed": {
+    "formatted": true,
+    "forms": {
+      "other": "Qalculate %1$s installed. Works offline inside this launcher."
+    },
+    "type": "string"
+  },
+  "optional_calculator_picker_unavailable": {
+    "formatted": true,
+    "forms": {
+      "other": "No document picker is available."
+    },
+    "type": "string"
+  },
+  "optional_calculator_protocol_error": {
+    "formatted": true,
+    "forms": {
+      "other": "The calculator pack is incompatible. Import a compatible pack and try again."
+    },
+    "type": "string"
+  },
+  "optional_calculator_remove": {
+    "formatted": true,
+    "forms": {
+      "other": "Remove engine"
+    },
+    "type": "string"
+  },
+  "optional_calculator_remove_description": {
+    "formatted": true,
+    "forms": {
+      "other": "Remove the downloaded Qalculate engine? Your history and calculator settings will be kept."
+    },
+    "type": "string"
+  },
+  "optional_calculator_removed": {
+    "formatted": true,
+    "forms": {
+      "other": "Qalculate removed. Your history and settings are kept."
+    },
+    "type": "string"
+  },
+  "optional_calculator_status_basic": {
+    "formatted": true,
+    "forms": {
+      "other": "Basic calculator · Download Qalculate"
+    },
+    "type": "string"
+  },
+  "optional_calculator_status_enhanced": {
+    "formatted": true,
+    "forms": {
+      "other": "Qalculate active · Manage"
+    },
+    "type": "string"
+  },
+  "optional_calculator_status_installed": {
+    "formatted": true,
+    "forms": {
+      "other": "Basic calculator · Qalculate installed"
+    },
+    "type": "string"
+  },
+  "optional_calculator_status_unsupported": {
+    "formatted": true,
+    "forms": {
+      "other": "Basic calculator · Enhancement unavailable"
+    },
+    "type": "string"
+  },
+  "optional_calculator_title": {
+    "formatted": true,
+    "forms": {
+      "other": "Calculator enhancement"
+    },
+    "type": "string"
+  },
+  "optional_calculator_unpublished_description": {
+    "formatted": true,
+    "forms": {
+      "other": "The download catalogue has not been published for this build. You can import a .retui.calc.engine file now. Basic calculations remain available."
+    },
+    "type": "string"
+  },
+  "optional_calculator_unsupported_description": {
+    "formatted": true,
+    "forms": {
+      "other": "The portable calculator requires Android 7 or newer and a WebView with WebAssembly support. Basic calculations and your history remain available."
+    },
+    "type": "string"
+  },
+  "optional_calculator_update": {
+    "formatted": true,
+    "forms": {
+      "other": "Check for update"
+    },
+    "type": "string"
+  },
+  "optional_calculator_use_basic": {
+    "formatted": true,
+    "forms": {
+      "other": "Use basic calculator"
+    },
+    "type": "string"
+  },
+  "optional_calculator_working": {
+    "formatted": true,
+    "forms": {
+      "other": "Preparing calculator engine…"
+    },
+    "type": "string"
+  },
   "output_about": {
     "formatted": true,
     "forms": {

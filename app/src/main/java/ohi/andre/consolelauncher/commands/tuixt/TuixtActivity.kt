@@ -280,7 +280,7 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
             )
             recyclerView!!.setAdapter(adapter)
             adapter?.restoreDraftState(savedInstanceState?.getBundle("appearance_draft"))
-            if (xmlRoot == XMLPrefsRoot.UI || xmlRoot == XMLPrefsRoot.THEME || xmlRoot == XMLPrefsRoot.BEHAVIOR) {
+            if (xmlRoot in listOf(XMLPrefsRoot.UI, XMLPrefsRoot.THEME, XMLPrefsRoot.BEHAVIOR, XMLPrefsRoot.TOOLBAR, XMLPrefsRoot.SUGGESTIONS)) {
                 appearancePreview = SettingsAppearancePreview(this, { item -> adapter?.draftValue(item) }, { item -> adapter?.hasDraft(item) == true }).also {
                     root.addView(it, 0, LinearLayout.LayoutParams(-1, -2))
                     it.restorePage(savedInstanceState?.getInt("appearance_page", 0) ?: 0)

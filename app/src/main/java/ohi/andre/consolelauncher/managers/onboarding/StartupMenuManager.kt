@@ -605,6 +605,9 @@ class StartupMenuActivity : ohi.andre.consolelauncher.localization.LocalizedComp
         if (StartupMenuManager.level(this) == StartupMenuManager.ADVANCED) {
             list.addView(terminalText(getString(R.string.startup_features), 13f), blockParams(6f))
             StartupMenuManager.toggles(this).forEach { list.addView(toggleRow(it), blockParams(8f)) }
+            list.addView(button(getString(R.string.optional_calculator_title), false).apply {
+                setOnClickListener { ohi.andre.consolelauncher.calculator.OptionalCalculatorEngine.showManagement(this@StartupMenuActivity) }
+            }, blockParams(8f))
             list.addView(terminalText(getString(R.string.startup_access_note), 12f), blockParams(10f))
             list.addView(terminalText(getString(R.string.startup_visual_effects), 13f), blockParams(6f))
             list.addView(visualEffects(), blockParams(4f))

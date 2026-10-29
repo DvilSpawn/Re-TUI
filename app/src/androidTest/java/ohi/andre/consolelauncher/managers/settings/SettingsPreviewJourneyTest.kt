@@ -165,7 +165,10 @@ class SettingsPreviewJourneyTest {
     }
 
     @Test fun filteredStatusSaveMatchesDraftOrder() = fixture(StatusRowResolver.settings.associateWith<Ui, String> { it.defaultValue()!! } + mapOf<XMLPrefsSave, String>(
-        Ui.show_ram to "true", Ui.show_time to "true", Ui.show_battery to "true"
+        Ui.show_ram to "true", Ui.show_time to "true", Ui.show_battery to "true",
+        Behavior.ram_format to "RAM", Behavior.status_time_format to "'TIME'", Behavior.battery_format to "BATTERY",
+        Behavior.battery_progress_bar to "false", Ui.show_device_name to "false", Ui.show_storage_info to "false",
+        Ui.show_network_info to "false", Ui.show_notes to "false", Ui.show_weather to "false", Ui.show_unlock_counter to "false", Ui.show_ascii to "false"
     )) {
         val activity = open(XMLPrefsManager.XMLPrefsRoot.UI)
         try {
@@ -191,7 +194,20 @@ class SettingsPreviewJourneyTest {
                 (activity.getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager)
                     .showSoftInput(input, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT)
             }
-            Thread.sleep(700); instrumentation.waitForIdleSync()
+            val deadline = android.os.SystemClock.uptimeMillis() + 5000
+            var keyboardVisible = false
+            while (!keyboardVisible && android.os.SystemClock.uptimeMillis() < deadline) {
+                Thread.sleep(100)
+                instrumentation.runOnMainSync {
+                    keyboardVisible = activity.window.decorView.rootWindowInsets.isVisible(android.view.WindowInsets.Type.ime())
+                    if (!keyboardVisible && activity.hasWindowFocus()) {
+                        val input = settings(activity).findViewById<EditText>(R.id.setting_input)
+                        input.requestFocus()
+                        androidx.core.view.WindowCompat.getInsetsController(activity.window, activity.window.decorView).show(androidx.core.view.WindowInsetsCompat.Type.ime())
+                    }
+                }
+            }
+            instrumentation.waitForIdleSync()
             instrumentation.runOnMainSync {
                 assertTrue("Keyboard must be visible for this check", activity.window.decorView.rootWindowInsets.isVisible(android.view.WindowInsets.Type.ime()))
                 assertTrue("Preview should compact when keyboard opens", pager(activity).height < originalHeight)

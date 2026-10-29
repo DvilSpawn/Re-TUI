@@ -11,6 +11,10 @@ import android.view.ViewGroup
 import kotlin.math.max
 import kotlin.math.min
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings
+import ohi.andre.consolelauncher.managers.settings.AppearanceValues
+import ohi.andre.consolelauncher.managers.xml.options.Behavior
+import ohi.andre.consolelauncher.managers.xml.options.Ui
+import ohi.andre.consolelauncher.managers.xml.options.Theme
 
 object TerminalBorderRuntime {
     internal fun drawsBorder(frameActive: Boolean, borderEnabled: Boolean, cyberdeck: Boolean, dashed: Boolean): Boolean =
@@ -35,7 +39,8 @@ object TerminalBorderRuntime {
         cyberdeckNotch: Boolean = true,
         borderEnabled: Boolean = true,
         frameEnabled: Boolean = true,
-        target: FrameTarget = FrameTarget.CONTROLS
+        target: FrameTarget = FrameTarget.CONTROLS,
+        values: AppearanceValues = AppearanceValues.saved
     ): Drawable {
         return panelDrawablePx(
             context,
@@ -47,7 +52,8 @@ object TerminalBorderRuntime {
             cyberdeckNotch,
             borderEnabled,
             frameEnabled,
-            target
+            target,
+            values
         )
     }
 
@@ -61,17 +67,18 @@ object TerminalBorderRuntime {
         cyberdeckNotch: Boolean = true,
         borderEnabled: Boolean = true,
         frameEnabled: Boolean = true,
-        target: FrameTarget = FrameTarget.CONTROLS
+        target: FrameTarget = FrameTarget.CONTROLS,
+        values: AppearanceValues = AppearanceValues.saved
     ): Drawable {
         val availableFrame = FrameManager.drawable(context, target)
         val frame = availableFrame.takeIf { drawsFrame(it != null, frameEnabled) }
-        val cyberdeck = frame == null && AppearanceSettings.cyberdeckMode()
+        val cyberdeck = frame == null && values.bool(Behavior.enable_cyberdeck_mode)
         val stroke = if (!drawsBorder(frame != null, borderEnabled, cyberdeck, dashed)) {
             0
         } else if (cyberdeck) {
             max(1, Tuils.dpToPx(context, strokeDp).toInt())
         } else {
-            max(1, Tuils.dpToPx(context, AppearanceSettings.dashedBorderStrokeWidthDp(strokeDp / 1.5f)).toInt())
+            max(1, Tuils.dpToPx(context, (values.float(Ui.dashed_border_stroke_width) * strokeDp / 1.5f).coerceIn(.5f, 8f)).toInt())
         }
         val fallback = TerminalBorderDrawable(
             effectiveFillColor(frame != null, fillColor),
@@ -79,8 +86,8 @@ object TerminalBorderRuntime {
             stroke,
             if (cyberdeck) 0f else radiusPx,
             dashed && !cyberdeck,
-            Tuils.dpToPx(context, AppearanceSettings.dashLength().toFloat()).toFloat(),
-            Tuils.dpToPx(context, AppearanceSettings.dashGap().toFloat()).toFloat(),
+            Tuils.dpToPx(context, values.int(Ui.dashed_border_dash_length).toFloat()).toFloat(),
+            Tuils.dpToPx(context, values.int(Ui.dashed_border_gap_length).toFloat()).toFloat(),
             cyberdeck,
             cyberdeckNotch
         )
@@ -90,9 +97,10 @@ object TerminalBorderRuntime {
     fun tabDrawable(
         context: Context,
         fillColor: Int,
-        target: FrameTarget = FrameTarget.CONTROLS
+        target: FrameTarget = FrameTarget.CONTROLS,
+        values: AppearanceValues = AppearanceValues.saved
     ): Drawable {
-        return tabDrawable(context, fillColor, AppearanceSettings.terminalHeaderTabBorderColor(), target = target)
+        return tabDrawable(context, fillColor, values.color(Theme.terminal_header_border_color), target = target, values = values)
     }
 
     fun tabDrawable(
@@ -100,10 +108,11 @@ object TerminalBorderRuntime {
         fillColor: Int,
         borderColor: Int,
         alwaysBorder: Boolean = false,
-        target: FrameTarget = FrameTarget.CONTROLS
+        target: FrameTarget = FrameTarget.CONTROLS,
+        values: AppearanceValues = AppearanceValues.saved
     ): Drawable {
         val frame = FrameManager.drawable(context, target)
-        if (frame == null && AppearanceSettings.cyberdeckMode()) {
+        if (frame == null && values.bool(Behavior.enable_cyberdeck_mode)) {
             return TerminalBorderDrawable(
                 fillColor,
                 borderColor,
@@ -118,13 +127,13 @@ object TerminalBorderRuntime {
 
         val bg = GradientDrawable()
         bg.shape = GradientDrawable.RECTANGLE
-        bg.cornerRadius = Tuils.dpToPx(context, AppearanceSettings.headerCornerRadius().toFloat())
+        bg.cornerRadius = Tuils.dpToPx(context, values.radius(Ui.header_corner_radius).toFloat())
         bg.setColor(effectiveFillColor(frame != null, fillColor))
-        val dashed = AppearanceSettings.dashedBorders()
+        val dashed = values.bool(Ui.enable_dashed_border)
         if (drawsTabBorder(frame != null, alwaysBorder, false, dashed, Color.alpha(borderColor))) {
-            val stroke = max(1, Tuils.dpToPx(context, AppearanceSettings.dashedBorderStrokeWidthDp()).toInt())
-            val dashLength = AppearanceSettings.dashLength()
-            val dashGap = AppearanceSettings.dashGap()
+            val stroke = max(1, Tuils.dpToPx(context, values.float(Ui.dashed_border_stroke_width).coerceIn(.5f, 8f)).toInt())
+            val dashLength = values.int(Ui.dashed_border_dash_length)
+            val dashGap = values.int(Ui.dashed_border_gap_length)
             if (dashed && dashLength > 0 && dashGap > 0) {
                 bg.setStroke(
                     stroke,

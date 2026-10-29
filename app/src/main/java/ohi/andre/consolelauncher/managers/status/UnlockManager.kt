@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher.managers.status
 
+import ohi.andre.consolelauncher.managers.settings.AppearanceValues
 import android.app.KeyguardManager
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -22,7 +23,9 @@ import java.util.regex.Matcher
 class UnlockManager(
     context: Context,
     private val size: Int,
-    private val listener: StatusUpdateListener?
+    private val listener: StatusUpdateListener?,
+    private val values: AppearanceValues = AppearanceValues.saved,
+    private val clock: TimeManager? = null
 ) : StatusManager(context, 0) {
     private val preferences: SharedPreferences
 
@@ -50,14 +53,14 @@ class UnlockManager(
 
     private fun init() {
         unlockTimes = preferences.getInt(UNLOCK_KEY, 0)
-        unlockColor = XMLPrefsManager.getColor(Theme.unlock_counter_text_color)
-        unlockFormat = XMLPrefsManager.get(Behavior.unlock_counter_format)
-        notAvailableText = XMLPrefsManager.get(Behavior.not_available_text)
-        unlockTimeDivider = XMLPrefsManager.get(Behavior.unlock_time_divider)
+        unlockColor = values.color(Theme.unlock_counter_text_color)
+        unlockFormat = values.get(Behavior.unlock_counter_format)
+        notAvailableText = values.get(Behavior.not_available_text)
+        unlockTimeDivider = values.get(Behavior.unlock_time_divider)
         unlockTimeDivider =
             Tuils.patternNewline.matcher(unlockTimeDivider).replaceAll(Tuils.NEWLINE)
 
-        val start = XMLPrefsManager.get(Behavior.unlock_counter_cycle_start)
+        val start = values.get(Behavior.unlock_counter_cycle_start)
         val p = Pattern.compile("(\\d{1,2}).(\\d{1,2})")
         var m = p.matcher(start)
         if (!m.find()) {
@@ -67,7 +70,7 @@ class UnlockManager(
 
         unlockHour = m.group(1).toInt()
         unlockMinute = m.group(2).toInt()
-        unlockTimeOrder = XMLPrefsManager.getInt(Behavior.unlock_time_order)
+        unlockTimeOrder = values.int(Behavior.unlock_time_order)
         nextUnlockCycleRestart = preferences.getLong(NEXT_UNLOCK_CYCLE_RESTART, 0)
 
         m = timePattern.matcher(unlockFormat)
@@ -196,6 +199,18 @@ class UnlockManager(
         init()
     }
 
+    data class State(val count: Int, val nextCycle: Long, val recent: LongArray?)
+    fun snapshot(): State = State(unlockTimes, nextUnlockCycleRestart, lastUnlocks?.copyOf())
+    fun refreshNow(state: State? = null) {
+        init()
+        if (state != null) {
+            unlockTimes = state.count
+            nextUnlockCycleRestart = state.nextCycle
+            state.recent?.let { recent -> lastUnlocks?.let { target -> recent.copyInto(target, endIndex = minOf(recent.size, target.size)) } }
+        }
+        invalidateUnlockText()
+    }
+
     private fun invalidateUnlockText() {
         var cp = unlockFormat!!
         cp = unlockCount.matcher(cp).replaceAll(unlockTimes.toString())
@@ -239,7 +254,7 @@ class UnlockManager(
 
                 val time: CharSequence?
                 if (lastUnlocks!![c] > 0) {
-                    time = TimeManager.instance!!.getCharSequence(timeGroup, lastUnlocks!![c])
+                    time = (clock ?: TimeManager.instance)?.getCharSequence(timeGroup, lastUnlocks!![c])
                 } else {
                     time = notAvailableText
                 }

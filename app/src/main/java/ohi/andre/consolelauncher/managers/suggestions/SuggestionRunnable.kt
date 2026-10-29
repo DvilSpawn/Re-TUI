@@ -178,7 +178,8 @@ class SuggestionRunnable(
 
 }
 
-internal class SuggestionChipStyler(private val context: Context, private val appsManager: AppsManager? = null) {
+internal class SuggestionChipStyler(private val context: Context, private val appsManager: AppsManager? = null,
+    private val values: ohi.andre.consolelauncher.managers.settings.AppearanceValues = ohi.andre.consolelauncher.managers.settings.AppearanceValues.saved) {
     constructor(pack: MainPack) : this(pack.context, pack.appsManager)
 
     companion object {
@@ -193,24 +194,26 @@ internal class SuggestionChipStyler(private val context: Context, private val ap
         }
     }
 
-    private val transparentSuggestions = XMLPrefsManager.getBoolean(Suggestions.transparent_suggestions)
-    private val suggAppBg = XMLPrefsManager.getColor(Suggestions.apps_background_color)
-    private val suggAliasBg = XMLPrefsManager.getColor(Suggestions.alias_background_color)
-    private val suggCmdBg = XMLPrefsManager.getColor(Suggestions.cmd_background_color)
-    private val suggContactBg = XMLPrefsManager.getColor(Suggestions.contact_background_color)
-    private val suggFileBg = XMLPrefsManager.getColor(Suggestions.file_background_color)
-    private val suggSongBg = XMLPrefsManager.getColor(Suggestions.song_background_color)
-    private val suggDefaultBg = XMLPrefsManager.getColor(Suggestions.default_background_color)
-    private val suggAppText = XMLPrefsManager.getColor(Suggestions.apps_text_color)
-    private val suggAliasText = XMLPrefsManager.getColor(Suggestions.alias_text_color)
-    private val suggCmdText = XMLPrefsManager.getColor(Suggestions.cmd_text_color)
-    private val suggContactText = XMLPrefsManager.getColor(Suggestions.contact_text_color)
-    private val suggFileText = XMLPrefsManager.getColor(Suggestions.file_text_color)
-    private val suggSongText = XMLPrefsManager.getColor(Suggestions.song_text_color)
-    private val suggDefaultText = XMLPrefsManager.getColor(Suggestions.default_text_color)
+    private val transparentSuggestions = values.bool(Suggestions.transparent_suggestions)
+    private val suggAppBg = values.color(Suggestions.apps_background_color)
+    private val suggAliasBg = values.color(Suggestions.alias_background_color)
+    private val suggCmdBg = values.color(Suggestions.cmd_background_color)
+    private val suggContactBg = values.color(Suggestions.contact_background_color)
+    private val suggFileBg = values.color(Suggestions.file_background_color)
+    private val suggSongBg = values.color(Suggestions.song_background_color)
+    private val suggDefaultBg = values.color(Suggestions.default_background_color)
+    private val suggAppText = values.color(Suggestions.apps_text_color)
+    private val suggAliasText = values.color(Suggestions.alias_text_color)
+    private val suggCmdText = values.color(Suggestions.cmd_text_color)
+    private val suggContactText = values.color(Suggestions.contact_text_color)
+    private val suggFileText = values.color(Suggestions.file_text_color)
+    private val suggSongText = values.color(Suggestions.song_text_color)
+    private val suggDefaultText = values.color(Suggestions.default_text_color)
 
     fun apply(view: TextView, type: Int, payload: Any?) {
-        ohi.andre.consolelauncher.managers.settings.TextShadows.apply(view, ohi.andre.consolelauncher.managers.xml.options.Theme.suggestions_text_shadow_color)
+        view.setTag(R.id.preview_suggestion_type, type)
+        val shadow = ohi.andre.consolelauncher.managers.settings.TextShadows.parameters(values.get(ohi.andre.consolelauncher.managers.xml.options.Ui.shadow_params))
+        view.setShadowLayer(shadow[2], shadow[0], shadow[1], values.color(ohi.andre.consolelauncher.managers.xml.options.Theme.suggestions_text_shadow_color))
         var bgColor = Int.MAX_VALUE
         var textColor = Int.MAX_VALUE
         var styledPayload = payload
@@ -247,21 +250,21 @@ internal class SuggestionChipStyler(private val context: Context, private val ap
     }
 
     private fun suggestionColorBg(color: Int): Drawable {
-        if (AppearanceSettings.cyberdeckMode() || TerminalBorderRuntime.customFrameActive(context, FrameTarget.SUGGESTIONS)) {
+        if (values.bool(ohi.andre.consolelauncher.managers.xml.options.Behavior.enable_cyberdeck_mode) || TerminalBorderRuntime.customFrameActive(context, FrameTarget.SUGGESTIONS)) {
             return TerminalBorderRuntime.panelDrawable(
                 context,
                 color,
-                AppearanceSettings.terminalBorderColor(),
+                values.color(ohi.andre.consolelauncher.managers.xml.options.Theme.terminal_border_color),
                 1.0f,
                 0,
                 true,
-                target = FrameTarget.SUGGESTIONS
+                target = FrameTarget.SUGGESTIONS, values = values
             )
         }
 
         val bg = GradientDrawable()
         bg.setShape(GradientDrawable.RECTANGLE)
-        bg.setCornerRadius(Tuils.dpToPx(context, moduleCornerRadius()).toFloat())
+        bg.setCornerRadius(Tuils.dpToPx(context, values.radius(ohi.andre.consolelauncher.managers.xml.options.Ui.module_corner_radius)).toFloat())
         bg.setColor(color)
         return bg
     }

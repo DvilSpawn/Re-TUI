@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="optional_calculator_title">Calculator enhancement</string>
+    <string name="optional_calculator_status_basic">Basic calculator · Download Qalculate</string>
+    <string name="optional_calculator_status_installed">Basic calculator · Qalculate installed</string>
+    <string name="optional_calculator_status_enhanced">Qalculate active · Manage</string>
+    <string name="optional_calculator_missing_description">Basic calculations work now. Download or import the optional Qalculate pack for units, exact results and advanced expressions. It runs inside Re:TUI and works offline after installation.</string>
+    <string name="optional_calculator_install">Install pack</string>
+    <string name="optional_calculator_download">Download Qalculate</string>
+    <string name="optional_calculator_import">Import engine file</string>
+    <string name="optional_calculator_update">Check for update</string>
+    <string name="optional_calculator_enable">Enable Qalculate</string>
+    <string name="optional_calculator_use_basic">Use basic calculator</string>
+    <string name="optional_calculator_close">Close</string>
+    <string name="optional_calculator_cancel">Cancel</string>
+    <string name="optional_calculator_remove">Remove engine</string>
+    <string name="optional_calculator_remove_description">Remove the downloaded Qalculate engine? Your history and calculator settings will be kept.</string>
+    <string name="optional_calculator_protocol_error">The calculator pack is incompatible. Import a compatible pack and try again.</string>
+    <string name="optional_calculator_header_basic">Calculator · Basic</string>
+    <string name="optional_calculator_header_enhanced">Calculator · Qalculate</string>
+    <string name="optional_calculator_help_title">Calculator help</string>
+    <string name="optional_calculator_status_unsupported">Basic calculator · Enhancement unavailable</string>
+    <string name="optional_calculator_unpublished_description">The download catalogue has not been published for this build. You can import a .retui.calc.engine file now. Basic calculations remain available.</string>
+    <string name="optional_calculator_unsupported_description">The portable calculator requires Android 7 or newer and a WebView with WebAssembly support. Basic calculations and your history remain available.</string>
+    <string name="optional_calculator_pack_installed">Qalculate %1$s installed. Works offline inside this launcher.</string>
+    <string name="optional_calculator_import_description">Install this calculator engine file? Only continue if you trust its source. Re:TUI checks pack compatibility and file integrity before replacing the current engine. No second app is installed.</string>
+    <string name="optional_calculator_invalid_file">Choose a readable calculator engine file from a document provider.</string>
+    <string name="optional_calculator_picker_unavailable">No document picker is available.</string>
+    <string name="optional_calculator_working">Preparing calculator engine…</string>
+    <string name="optional_calculator_complete">Calculator engine updated.</string>
+    <string name="optional_calculator_failed">Engine operation failed: %1$s</string>
+    <string name="optional_calculator_inline_title">Qalculate · optional</string>
+    <string name="optional_calculator_inline_description">Add units, conversions and advanced maths. Works offline after download.</string>
+    <string name="optional_calculator_not_now">Hide calculator enhancement</string>
+    <string name="optional_calculator_removed">Qalculate removed. Your history and settings are kept.</string>
+</resources>

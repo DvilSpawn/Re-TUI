@@ -1,4 +1,4 @@
-# Re:TUI Qalculate JNI engine
+# Re:TUI Qalculate engine
 
 This is an independently authored bridge to upstream libqalculate, licensed with
 Re:TUI under GPL-3.0-or-later. It contains no Jost Herkenhoff wrapper, SWIG input,
@@ -9,39 +9,60 @@ from an engine upgrade. `sources.json` pins the upstream archives and SHA-256
 checksums for libqalculate, GMP, MPFR and libxml2. These projects keep their own
 licenses; see `THIRD_PARTY_NOTICES.md` and `LICENSES/` in the repository root.
 
-## Build
+## Portable optional pack (WebAssembly)
 
-Host prerequisites: macOS or Linux, Python 3.12+, a host C/C++ compiler, make,
-patch, pkg-config, intltool (including its Perl XML::Parser dependency), and
-Android NDK **27.1.12297006**. The release archives already contain configure
-scripts; regenerating them with autoconf/automake is unnecessary.
+The launcher uses one downloadable `.retui.calc.engine` pack across Play, GitHub,
+F-Droid and self-built distributions. The pack is imported into launcher-private
+storage; it is not an Android application and needs no publisher signing key.
+Its independently authored `wasm_bridge.cpp` preserves the JNI adapter's math and
+preview semantics. The launcher hosts the engine in a disposable Web Worker. Filesystem support is
+disabled; the adapter explicitly returns ENOSYS for the unused upstream async
+thread IPC pipes. The worker performs synchronous calculations and is terminated
+by the host for cancellation/timeouts.
 
-On macOS, `brew install intltool pkgconf` supplies the extra host tools. On Debian
-or Ubuntu, install `build-essential intltool pkg-config python3` (Python must be
-3.12 or newer). Install the pinned NDK through Android Studio's SDK Manager.
+Host prerequisites: Python 3.12+, make, pkg-config, a host C/C++ compiler, Node.js
+and Emscripten **3.1.67**. Install the SDK in an ordinary writable directory:
 
-Normal APK builds invoke `:app:buildNativeQalculate` automatically. To build one
-architecture during native development:
+```sh
+git clone https://github.com/emscripten-core/emsdk.git "$HOME/.cache/retui-emsdk"
+"$HOME/.cache/retui-emsdk/emsdk" install 3.1.67
+"$HOME/.cache/retui-emsdk/emsdk" activate 3.1.67
+. "$HOME/.cache/retui-emsdk/emsdk_env.sh"
+python3 native/qalculate/build_wasm.py --emsdk "$HOME/.cache/retui-emsdk"
+node native/qalculate/test_wasm.cjs
+python3 native/qalculate/package_wasm.py
+```
+
+The build verifies every source archive using `sources.json`. Build intermediates
+and complete logs are under ignored `app/build/qalculate/wasm`. The output is
+`dist/engine.js` plus `dist/engine.wasm`; the packager writes the installable pack,
+`catalog.json` and `SHA256SUMS` to `site/calculator-packs` for later publication.
+Use `--base-url` with the packager to host a fork's catalogue without an owner key.
+Publishing these generated files is a separate step from building the launcher.
+
+The ZIP contains exactly `manifest.json`, `engine.js`, `engine.wasm`, `LICENSE.txt`
+and `NOTICE.txt`. The schema-1 manifest declares `kind: "qalculate"`, `runtimeApi: 1`,
+version `5.8.2`, and a `files` map of SHA-256 digests for all four payload files.
+Catalogue downloads additionally verify the SHA-256 of the entire ZIP. Manual
+imports are user-selected code, not publisher-authenticated merely by internal hashes.
+
+GMP, MPFR and libxml2 are linked into the WASM engine. Network/currency updates,
+external command/gnuplot execution, ICU and iconv support are disabled. Definitions
+are compiled into the engine. Core messages/definitions use English.
+
+## Native reference build
+
+`build.py` and `bridge.cpp` remain for native parity/reference testing, not launcher
+packaging. They require Android NDK **27.1.12297006** and build all four ABIs:
 
 ```sh
 python3 native/qalculate/build.py --ndk /path/to/android-sdk/ndk/27.1.12297006 --abis arm64-v8a
 ```
 
-The full build includes arm64-v8a, armeabi-v7a, x86_64 and x86 at Android API 24.
-Android 6 continues using the basic Kotlin calculator. Each archive is verified
-before extraction. Sources, logs and compiled intermediates live under ignored
-`app/build/qalculate/`. Deleting that directory produces a clean rebuild.
-The build script invalidates native intermediates when its recipe, source pins
-or patch change. JNI source changes relink against the cached native libraries.
+## Historical native reference boundary
 
-GMP, MPFR and libxml2 are statically linked into `libretui_qalculate.so`; the
-NDK's `libc++_shared.so` is packaged alongside it. Linker segments use 16 KiB
-alignment. No device-time downloads are needed. Network/currency updates,
-external command/gnuplot execution, ICU and iconv support are disabled. UTF-8
-XML definitions are compiled into the library. This build uses English core
-messages/definitions; launcher-owned messages still use Android localization.
-
-## Boundary and cancellation
+The following describes the retained JNI reference adapter. Launcher delivery uses
+the portable worker and cancellation described in `docs/optional-calculator-engine.md`.
 
 Kotlin passes bounded standard UTF-8 bytes and booleans (degrees, exact and preview).
 JNI returns one status byte (error and approximation flags) followed by UTF-8 text; it does not expose upstream
@@ -83,7 +104,9 @@ python3 scripts/qalculate_source_bundle.py \
 
 For a Play Store release, use the release APK and also pass
 `--aab app/build/outputs/bundle/playstoreRelease/app-playstore-release.aab`
-to record both binary hashes against the same source tree.
+to record both binary hashes against the same source tree. For the optional engine,
+also pass `--engine-pack app/build/qalculate/wasm/site/calculator-packs/qalculate-5.8.2.retui.calc.engine`.
+The resulting manifest ties the launcher and portable engine to the same source snapshot.
 
 The bundle includes app source, our bridge/build recipe/patch, the original native
 archives, matching Tasker Plugin Library source/build archives, notices, and a

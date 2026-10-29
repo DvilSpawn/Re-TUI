@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher.managers.status
 
+import ohi.andre.consolelauncher.managers.settings.AppearanceValues
 import android.content.Context
 import android.os.Environment
 import android.os.StatFs
@@ -18,7 +19,8 @@ class StorageManager(
     context: Context,
     delay: Long,
     private val size: Int,
-    private val listener: StatusUpdateListener?
+    private val listener: StatusUpdateListener?,
+    private val values: AppearanceValues = AppearanceValues.saved
 ) : StatusManager(context, delay) {
     private val intAv = "%iav"
     private val intTot = "%itot"
@@ -35,10 +37,12 @@ class StorageManager(
 
     fun compactExternal(): String = compactExternal
 
+    fun refreshNow() = update()
+
     override fun update() {
         if (storageFormat == null) {
-            storageFormat = XMLPrefsManager.get(Behavior.storage_format)
-            color = XMLPrefsManager.getColor(Theme.storage_text_color)
+            storageFormat = values.get(Behavior.storage_format)
+            color = values.color(Theme.storage_text_color)
         }
 
         if (storagePatterns == null) {
@@ -125,7 +129,7 @@ class StorageManager(
         copy = patterns[25].matcher(copy).replaceAll(Matcher.quoteReplacement(SystemUtils.formatSize(eav.toLong(), SystemUtils.GIGA).toString()))
         copy = patterns[26].matcher(copy).replaceAll(Matcher.quoteReplacement(SystemUtils.formatSize(etot.toLong(), SystemUtils.GIGA).toString()))
 
-        listener?.onUpdate(UIManager.Label.storage, UIUtils.span(context, copy, color, size))
+        listener?.onUpdate(UIManager.Label.storage, values.span(context, copy, Theme.storage_text_color, size))
     }
 
     private fun removableStorageCapacity(): String {

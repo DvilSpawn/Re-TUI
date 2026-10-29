@@ -1,6 +1,7 @@
 package ohi.andre.consolelauncher.managers.status
 
 import android.bluetooth.BluetoothAdapter
+import ohi.andre.consolelauncher.managers.settings.AppearanceValues
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.wifi.WifiManager
@@ -22,7 +23,8 @@ class NetworkManager(
     context: Context,
     delay: Long,
     private val size: Int,
-    private val listener: StatusUpdateListener?
+    private val listener: StatusUpdateListener?,
+    private val values: AppearanceValues = AppearanceValues.saved
 ) : StatusManager(context, delay) {
     private val zero = "0"
     private val one = "1"
@@ -95,13 +97,15 @@ class NetworkManager(
         }
     }
 
+    fun refreshNow() = update()
+
     override fun update() {
         if (format == null) {
-            format = XMLPrefsManager.get(Behavior.network_info_format)
-            color = XMLPrefsManager.getColor(Theme.network_info_text_color)
-            maxDepth = XMLPrefsManager.getInt(Behavior.max_optional_depth)
+            format = values.get(Behavior.network_info_format)
+            color = values.color(Theme.network_info_text_color)
+            maxDepth = values.int(Behavior.max_optional_depth)
 
-            optionalValueSeparator = XMLPrefsManager.get(Behavior.optional_values_separator)
+            optionalValueSeparator = values.get(Behavior.optional_values_separator)
             val quotedSep = Pattern.quote(optionalValueSeparator)
 
             val wifiRegex = "%\\(([^" + quotedSep + "]*)" + quotedSep + "([^)]*)\\)"
@@ -149,7 +153,7 @@ class NetworkManager(
             else -> ""
         }
 
-        val bluetoothOn = mBluetoothAdapter != null && mBluetoothAdapter.isEnabled()
+        val bluetoothOn = try { mBluetoothAdapter?.isEnabled == true } catch (_: SecurityException) { false }
 
         var copy = format
 
@@ -204,7 +208,7 @@ class NetworkManager(
         copy = Tuils.patternNewline.matcher(copy).replaceAll(Tuils.NEWLINE)
 
         if (listener != null) {
-            listener.onUpdate(UIManager.Label.network, Tuils.span(context, copy, color, size))
+            listener.onUpdate(UIManager.Label.network, values.span(context, copy, Theme.network_info_text_color, size))
         }
     }
 

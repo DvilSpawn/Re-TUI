@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher
 
+import ohi.andre.consolelauncher.managers.settings.AppearanceValues
 import ohi.andre.consolelauncher.R
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
@@ -974,74 +975,18 @@ class UIManager(
 
     private fun renderUnifiedStatus() {
         if (!unifiedStatusActive) return
-        val showTime = unifiedStatusVisible[Label.time.ordinal]
-        unifiedStatusDate?.visibility = if (showTime) View.VISIBLE else View.GONE
-        unifiedStatusTime?.visibility = if (showTime) View.VISIBLE else View.GONE
-        if (showTime) {
-            val now = java.util.Date()
-            unifiedStatusDate?.text = android.text.format.DateFormat.getMediumDateFormat(mContext).format(now)
-            unifiedStatusTime?.text = android.text.format.DateFormat.getTimeFormat(mContext).format(now)
-        }
-
-        val battery = compactUnifiedBattery(labelTexts[Label.battery.ordinal])
-        unifiedStatusBattery?.visibility =
-            if (unifiedStatusVisible[Label.battery.ordinal] && battery.isNotEmpty()) View.VISIBLE else View.GONE
-        unifiedStatusBattery?.text = battery
-
-        val weatherCondition = lastWeatherCondition
-            ?: compactUnifiedWeatherCondition(labelTexts[Label.weather.ordinal])
-        val weatherLocation = XMLPrefsManager.get(Behavior.weather_location)
-            ?.trim()
-            ?.takeUnless { it.isEmpty() || it == "null" }
-            .orEmpty()
-        val weatherDetails = lastWeatherDetails
-            ?: compactUnifiedWeatherDetails(labelTexts[Label.weather.ordinal])
-        val showWeather = unifiedStatusVisible[Label.weather.ordinal] && weatherCondition.isNotEmpty()
-        unifiedStatusWeatherIcon?.visibility = if (showWeather) View.VISIBLE else View.GONE
-        unifiedStatusWeather?.visibility = if (showWeather) View.VISIBLE else View.GONE
-        unifiedStatusWeather?.text = if (weatherCondition.isEmpty()) "" else ": $weatherCondition"
-        unifiedStatusWeatherLocation?.visibility =
-            if (showWeather && weatherLocation.isNotEmpty()) View.VISIBLE else View.GONE
-        unifiedStatusWeatherLocation?.text = weatherLocation
-        unifiedStatusWeatherDetails?.visibility =
-            if (showWeather && weatherDetails.isNotEmpty()) View.VISIBLE else View.GONE
-        unifiedStatusWeatherDetails?.text = weatherDetails
-
-        val showStorage = unifiedStatusVisible[Label.storage.ordinal]
-        val internalStorage = storageManager?.compactInternal().orEmpty()
-        val externalStorage = storageManager?.compactExternal().orEmpty()
-        unifiedStatusStorageInternal?.text = internalStorage
-        unifiedStatusStorageInternal?.visibility = if (showStorage && internalStorage.isNotEmpty()) View.VISIBLE else View.GONE
-        unifiedStatusStorageInternalIcon?.visibility = unifiedStatusStorageInternal?.visibility ?: View.GONE
-        unifiedStatusStorageExternal?.text = externalStorage
-        unifiedStatusStorageExternal?.visibility = if (showStorage && externalStorage.isNotEmpty()) View.VISIBLE else View.GONE
-        unifiedStatusStorageExternalIcon?.visibility = unifiedStatusStorageExternal?.visibility ?: View.GONE
-
-        val connection = networkManager?.compactConnection().orEmpty()
-        unifiedStatusNetwork?.visibility =
-            if (unifiedStatusVisible[Label.network.ordinal] && connection.isNotEmpty()) View.VISIBLE else View.GONE
-        unifiedStatusNetwork?.text = connection
-        unifiedStatusNetwork?.let {
-            val icon = if (networkManager?.compactConnectionUsesWifi() == true) {
-                R.drawable.ic_status_wifi_40
-            } else {
-                R.drawable.ic_material_signal_cellular_alt_24
-            }
-            if (it.tag != icon) {
-                it.tag = icon
-                setUnifiedMetricIcon(it, icon, getColor(Theme.network_info_text_color))
-            }
-        }
-
-        val ram = ramManager?.compactValue().orEmpty()
-        unifiedStatusRam?.text = ram
-        unifiedStatusRam?.visibility =
-            if (unifiedStatusVisible[Label.ram.ordinal] && ram.isNotEmpty()) View.VISIBLE else View.GONE
-        unifiedStatusRamIcon?.visibility = unifiedStatusRam?.visibility ?: View.GONE
-
-        unifiedStatusUnlock?.text = unlockManager?.count()?.let { java.text.NumberFormat.getIntegerInstance().format(it) }.orEmpty()
-        unifiedStatusUnlock?.visibility =
-            if (unifiedStatusVisible[Label.unlock.ordinal] && unlockManager != null) View.VISIBLE else View.GONE
+        val root = mRootView ?: return
+        ohi.andre.consolelauncher.managers.status.UnifiedStatusRenderer.bind(root,
+            ohi.andre.consolelauncher.managers.settings.AppearanceValues.saved, unifiedStatusVisible,
+            ohi.andre.consolelauncher.managers.status.UnifiedStatusRenderer.State(
+                battery = if (getBoolean(Behavior.battery_progress_bar)) labelTexts[Label.battery.ordinal] ?: "" else compactUnifiedBattery(labelTexts[Label.battery.ordinal]),
+                weather = lastWeatherCondition ?: compactUnifiedWeatherCondition(labelTexts[Label.weather.ordinal]),
+                location = XMLPrefsManager.get(Behavior.weather_location).trim().takeUnless { it == "null" }.orEmpty(),
+                details = lastWeatherDetails ?: compactUnifiedWeatherDetails(labelTexts[Label.weather.ordinal]),
+                internalStorage = storageManager?.compactInternal().orEmpty(), externalStorage = storageManager?.compactExternal().orEmpty(),
+                connection = networkManager?.compactConnection().orEmpty(), wifi = networkManager?.compactConnectionUsesWifi() == true,
+                ram = ramManager?.compactValue().orEmpty(), unlocks = unlockManager?.count()?.let { java.text.NumberFormat.getIntegerInstance().format(it) }.orEmpty()
+            ), Tuils.getTypeface(mContext))
     }
 
     private fun shouldUseAsciiViewport(base: Int): Boolean {
@@ -1249,18 +1194,8 @@ class UIManager(
         terminalView!!.setOnTouchListener(this)
         (terminalView!!.getParent().getParent() as View).setOnTouchListener(this)
 
-        Companion.applyBgRect(
-            mContext!!,
-            terminalOutputBorder!!,
-            bgColors[OUTPUT_BGCOLOR_INDEX],
-            margins[OUTPUT_MARGINS_INDEX]!!,
-            Tuils.dpToPx(mContext, outputCornerRadius()),
-            useDashed,
-            AppearanceSettings.surfaceBorderColor(SurfaceBorder.OUTPUT),
-            true,
-            SurfaceBorder.OUTPUT
-        )
-        terminalView!!.setBackgroundColor(Color.TRANSPARENT)
+        Companion.applyMargins(terminalOutputBorder!!, margins[OUTPUT_MARGINS_INDEX]!!)
+        ohi.andre.consolelauncher.tuils.TerminalOutputRenderer.style(terminalOutputBorder!!, terminalView!!)
         terminalView!!.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
@@ -1275,13 +1210,6 @@ class UIManager(
 
             override fun afterTextChanged(s: Editable?) {}
         })
-        Companion.applyShadow(
-            terminalView!!,
-            outlineColors[OUTPUT_BGCOLOR_INDEX]!!,
-            shadowXOffset,
-            shadowYOffset,
-            shadowRadius
-        )
         restoreTerminalTrayState()
         styleTerminalTrayToggle()
         applyTerminalTrayState(false)
@@ -1452,6 +1380,8 @@ class UIManager(
         }
         pendingOutputs.clear()
 
+        ohi.andre.consolelauncher.tuils.InputControlsRenderer.style(mRootView,
+            ohi.andre.consolelauncher.managers.settings.AppearanceValues.saved, Tuils.getTypeface(mContext))
         mTerminalAdapter!!.focusInputEnd()
 
         setupModuleSuggestionsStrip()
@@ -1619,24 +1549,8 @@ class UIManager(
     }
 
     private fun styleToolbarButtonChrome(vararg buttons: ImageButton?) {
-        val context = mContext ?: return
-        if (!cyberdeckMode() && FrameManager.drawable(context, FrameTarget.TOOLBAR) == null) {
-            return
-        }
-        for (button in buttons) {
-            if (button == null) {
-                continue
-            }
-            button.setBackground(
-                TerminalBorderRuntime.customFrame(context, ColorDrawable(Color.TRANSPARENT), FrameTarget.TOOLBAR)
-                    ?: CyberpunkIconFrameDrawable(
-                    ThemeColorResolver.withMaxAlpha(terminalBorderColor(), 230),
-                    Tuils.dpToPx(context, 1.6f),
-                    Tuils.dpToPx(context, 9f),
-                    Tuils.dpToPx(context, 9f)
-                )
-            )
-        }
+        buttons.filterNotNull().forEach { ohi.andre.consolelauncher.tuils.InputControlsRenderer.styleToolbarButton(
+            it, ohi.andre.consolelauncher.managers.settings.AppearanceValues.saved) }
     }
 
     private fun countVisibleWeightedChildren(toolbarLayout: LinearLayout): Int {
@@ -3943,37 +3857,34 @@ class UIManager(
         refreshSuggestionsForActiveModule()
     }
 
-    /** Uses the module renderer while making every generated action inert. */
-    fun buildLuaPreview(module: String, result: LuaWidgetEngine.RenderResult): View {
-        val panel = LinearLayout(mContext).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(Tuils.dpToPx(mContext, 12), Tuils.dpToPx(mContext, 12), Tuils.dpToPx(mContext, 12), Tuils.dpToPx(mContext, 12))
-            ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.stylePanel(mContext, this)
-        }
-        addLuaText(panel, result.title?.takeIf { it.isNotBlank() } ?: LuaWidgetManager.getName(module), module)
-        if (TextUtils.isEmpty(result.layoutJson) || !renderLuaLayout(panel, module, result.layoutJson)) {
-            addLuaBodyText(panel, result.body?.takeIf { it.isNotEmpty() } ?: "No module output", module)
-        }
-        addLuaResultActions(panel, module, module, result)
-        for (suggestion in result.suggestions) addLuaText(panel, suggestion?.label, module)
+    /** Builds a second instance of the real module; no Lua execution or active callbacks. */
+    fun buildLuaPreview(module: String, result: LuaWidgetEngine.RenderResult, values: AppearanceValues = AppearanceValues.saved): View {
+        val panel = createLuaWidgetModule(module, module, result, values)
         fun makeInert(view: View) {
             view.setOnClickListener(null)
             view.isClickable = false
             view.isLongClickable = false
+            view.isFocusable = false
             if (view is ViewGroup) for (index in 0 until view.childCount) makeInert(view.getChildAt(index))
         }
         makeInert(panel)
         return panel
     }
 
-    private fun showLuaWidgetModule(
+    private var lastLuaPreview: Pair<String, LuaWidgetEngine.RenderResult>? = null
+    private fun showLuaWidgetModule(module: String?, widgetId: String?, result: LuaWidgetEngine.RenderResult) {
+        lastLuaPreview = module.orEmpty() to result.copy()
+        homeModulesContainer?.addView(createLuaWidgetModule(module, widgetId, result, AppearanceValues.saved))
+    }
+
+    private fun createLuaWidgetModule(
         module: String?,
         widgetId: String?,
-        result: LuaWidgetEngine.RenderResult
-    ) {
+        result: LuaWidgetEngine.RenderResult,
+        values: AppearanceValues
+    ): View {
         val moduleView = LayoutInflater.from(mContext)
             .inflate(R.layout.module_text_panel, homeModulesContainer, false)
-        homeModulesContainer!!.addView(moduleView)
 
         val label = moduleView.findViewById<TextView?>(R.id.module_text_label)
         val close = moduleView.findViewById<TextView?>(R.id.module_text_close)
@@ -3992,9 +3903,9 @@ class UIManager(
         }
         if (close != null) {
             close.setOnClickListener(View.OnClickListener { v: View? -> closeHomeModule() })
-            close.setTextColor(moduleNameTextColor())
-            close.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
-            close.setTextSize(moduleHeaderTextSize().toFloat())
+            close.setTextColor(values.color(Theme.module_panel_text_color))
+            close.setTypeface(values.typeface(mContext), Typeface.BOLD)
+            values.applySize(close, Ui.module_header_text_size)
         }
 
         if (scroll != null) {
@@ -4010,27 +3921,28 @@ class UIManager(
             scroll.addView(content)
 
             if (!TextUtils.isEmpty(result.error)) {
-                addLuaText(content, mContext.getString(R.string.surface_lua_error_95ede, result.error), module)
+                addLuaText(content, mContext.getString(R.string.surface_lua_error_95ede, result.error), module, values = values)
                 if (!TextUtils.isEmpty(result.errorStage)) {
-                    addLuaText(content, mContext.getString(R.string.surface_stage_6da98, result.errorStage), module)
+                    addLuaText(content, mContext.getString(R.string.surface_stage_6da98, result.errorStage), module, values = values)
                 }
             } else if (!TextUtils.isEmpty(result.layoutJson)
-                && renderLuaLayout(content, module, result.layoutJson)
+                && renderLuaLayout(content, module, result.layoutJson, values = values)
             ) {
                 // The declarative layout rendered itself.
             } else {
                 addLuaBodyText(
                     content,
                     if (TextUtils.isEmpty(result.body)) mContext.getString(R.string.surface_no_widget_output_yet_c383d) else result.body,
-                    module
+                    module,
+                    values = values
                 )
             }
-            addLuaResultActions(content, module, widgetId, result)
+            addLuaResultActions(content, module, widgetId, result, values = values)
         } else if (body != null) {
             body.setText(if (TextUtils.isEmpty(result.body)) mContext.getString(R.string.surface_no_widget_output_yet_c383d) else result.body)
-            body.setTextColor(notificationWidgetTextColor())
-            body.setTextSize(moduleBodyTextSize().toFloat())
-            applyModuleBodyTypeface(body, module)
+            body.setTextColor(values.color(Theme.module_panel_text_color))
+            values.applySize(body, Ui.module_body_text_size)
+            applyModuleBodyTypeface(body, module, values = values)
         }
 
         decorateWidget(
@@ -4038,34 +3950,36 @@ class UIManager(
             R.id.module_text_border,
             R.id.module_text_label,
             R.id.module_text_close,
-            notificationWidgetBorderColor(),
-            moduleNameTextColor(),
-            FrameTarget.MODULES
+            values.color(Theme.module_panel_border_color),
+            values.color(Theme.module_panel_text_color),
+            FrameTarget.MODULES, values
         )
-        styleModuleClose(close)
+        styleModuleClose(close, values = values)
+        return moduleView
     }
 
-    private fun addLuaBodyText(parent: LinearLayout, text: String?, module: String? = null) {
+    private fun addLuaBodyText(parent: LinearLayout, text: String?, module: String? = null, values: AppearanceValues = AppearanceValues.saved) {
         if (TextUtils.isEmpty(text)) {
-            addLuaText(parent, "", module)
+            addLuaText(parent, "", module, values = values)
             return
         }
-        addLuaText(parent, text, module)
+        addLuaText(parent, text, module, values = values)
     }
 
     private fun addLuaText(
         parent: LinearLayout,
         text: String?,
         module: String? = null,
-        fontMode: String? = null
+        fontMode: String? = null,
+        values: AppearanceValues = AppearanceValues.saved
     ) {
         val view = TextView(mContext)
         view.setText(text)
-        view.setTextColor(notificationWidgetTextColor())
-        view.setTextSize(moduleBodyTextSize().toFloat())
+        view.setTextColor(values.color(Theme.module_panel_text_color))
+        values.applySize(view, Ui.module_body_text_size)
         view.setIncludeFontPadding(true)
         view.setLineSpacing(Tuils.dpToPx(mContext, 2).toFloat(), 1f)
-        applyModuleBodyTypeface(view, module, fontMode)
+        applyModuleBodyTypeface(view, module, fontMode, values = values)
         view.setLayoutParams(
             LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -4079,7 +3993,8 @@ class UIManager(
         parent: LinearLayout,
         module: String?,
         widgetId: String?,
-        result: LuaWidgetEngine.RenderResult
+        result: LuaWidgetEngine.RenderResult,
+        values: AppearanceValues = AppearanceValues.saved
     ) {
         val actions = ArrayList<LuaSurfaceAction>()
         var index = 1
@@ -4137,10 +4052,10 @@ class UIManager(
                 }
             )
         }
-        addLuaButtonGrid(parent, actions)
+        addLuaButtonGrid(parent, actions, values = values)
     }
 
-    private fun addLuaButtonGrid(parent: LinearLayout, actions: MutableList<LuaSurfaceAction>) {
+    private fun addLuaButtonGrid(parent: LinearLayout, actions: MutableList<LuaSurfaceAction>, values: AppearanceValues = AppearanceValues.saved) {
         if (actions.isEmpty()) {
             return
         }
@@ -4166,12 +4081,12 @@ class UIManager(
                 )
                 parent.addView(row)
             }
-            val button = luaSurfaceButton(actions[i])
+            val button = luaSurfaceButton(actions[i], values = values)
             row!!.addView(button)
         }
     }
 
-    private fun luaSurfaceButton(action: LuaSurfaceAction): TextView {
+    private fun luaSurfaceButton(action: LuaSurfaceAction, values: AppearanceValues = AppearanceValues.saved): TextView {
         val button = TextView(mContext)
         button.setText(action.label)
         button.setSingleLine(false)
@@ -4183,10 +4098,10 @@ class UIManager(
             Tuils.dpToPx(mContext, 10),
             Tuils.dpToPx(mContext, 7)
         )
-        button.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
-        button.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
-        button.setTextColor(moduleNameTextColor())
-        button.setBackground(luaSurfaceButtonBackground())
+        button.setTypeface(values.typeface(mContext), Typeface.BOLD)
+        values.applySize(button, 12f)
+        button.setTextColor(values.color(Theme.module_panel_text_color))
+        button.setBackground(luaSurfaceButtonBackground(values = values))
         val lp = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
         val margin = Tuils.dpToPx(mContext, 4)
         lp.setMargins(margin, margin, margin, margin)
@@ -4195,15 +4110,15 @@ class UIManager(
         return button
     }
 
-    private fun luaSurfaceButtonBackground(): Drawable {
+    private fun luaSurfaceButtonBackground(values: AppearanceValues = AppearanceValues.saved): Drawable {
         return TerminalBorderRuntime.panelDrawable(
             mContext!!,
-            moduleButtonBackgroundColor(),
-            moduleButtonBorderColor(),
+            values.color(Theme.module_action_background_color),
+            values.color(Theme.module_action_border_color),
             1.2f,
-            moduleCornerRadius(),
-            dashedBorders(),
-            target = FrameTarget.MODULES
+            values.radius(Ui.module_corner_radius),
+            values.bool(Ui.enable_dashed_border),
+            target = FrameTarget.MODULES, values = values
         )
     }
 
@@ -4211,7 +4126,8 @@ class UIManager(
         parent: LinearLayout,
         module: String?,
         rawJson: String?,
-        appSurface: Boolean = false
+        appSurface: Boolean = false,
+        values: AppearanceValues = AppearanceValues.saved
     ): Boolean {
         if (TextUtils.isEmpty(rawJson)) {
             return false
@@ -4219,13 +4135,13 @@ class UIManager(
         try {
             val trimmed = rawJson!!.trim { it <= ' ' }
             if (trimmed.startsWith("[")) {
-                renderLuaLayoutArray(parent, module, JSONArray(trimmed), appSurface)
+                renderLuaLayoutArray(parent, module, JSONArray(trimmed), appSurface, values = values)
             } else {
-                renderLuaLayoutObject(parent, module, JSONObject(trimmed), appSurface)
+                renderLuaLayoutObject(parent, module, JSONObject(trimmed), appSurface, values = values)
             }
             return true
         } catch (e: Exception) {
-            addLuaText(parent, mContext.getString(R.string.surface_layout_error_b5bcf, e.message), module)
+            addLuaText(parent, mContext.getString(R.string.surface_layout_error_b5bcf, e.message), module, values = values)
             return true
         }
     }
@@ -4234,16 +4150,17 @@ class UIManager(
         parent: LinearLayout,
         module: String?,
         array: JSONArray,
-        appSurface: Boolean
+        appSurface: Boolean,
+        values: AppearanceValues = AppearanceValues.saved
     ) {
         for (i in 0..<array.length()) {
             val item = array.opt(i)
             if (item is JSONObject) {
-                renderLuaLayoutObject(parent, module, item, appSurface)
+                renderLuaLayoutObject(parent, module, item, appSurface, values = values)
             } else if (item is JSONArray) {
-                renderLuaLayoutCompact(parent, module, item, appSurface)
+                renderLuaLayoutCompact(parent, module, item, appSurface, values = values)
             } else if (item != null) {
-                addLuaText(parent, item.toString(), module)
+                addLuaText(parent, item.toString(), module, values = values)
             }
         }
     }
@@ -4252,7 +4169,8 @@ class UIManager(
         parent: LinearLayout,
         module: String?,
         array: JSONArray,
-        appSurface: Boolean
+        appSurface: Boolean,
+        values: AppearanceValues = AppearanceValues.saved
     ) {
         if (array.length() == 0) {
             return
@@ -4266,14 +4184,15 @@ class UIManager(
         } else {
             obj.put("text", array.optString(1, ""))
         }
-        renderLuaLayoutObject(parent, module, obj, appSurface)
+        renderLuaLayoutObject(parent, module, obj, appSurface, values = values)
     }
 
     private fun renderLuaLayoutObject(
         parent: LinearLayout,
         module: String?,
         obj: JSONObject,
-        appSurface: Boolean
+        appSurface: Boolean,
+        values: AppearanceValues = AppearanceValues.saved
     ) {
         val type = obj.optString("type", obj.optString("kind", "text")).lowercase(Locale.US)
         if ("column" == type || "container" == type) {
@@ -4286,7 +4205,7 @@ class UIManager(
                 )
             )
             parent.addView(column)
-            renderLuaLayoutChildren(column, module, obj.optJSONArray("children"), appSurface)
+            renderLuaLayoutChildren(column, module, obj.optJSONArray("children"), appSurface, values = values)
             return
         }
         if ("row" == type) {
@@ -4310,7 +4229,7 @@ class UIManager(
                     lp.setMargins(margin, margin, margin, margin)
                     childBox.setLayoutParams(lp)
                     row.addView(childBox)
-                    renderLuaLayoutObject(childBox, module, child, appSurface)
+                    renderLuaLayoutObject(childBox, module, child, appSurface, values = values)
                 }
             }
             return
@@ -4318,20 +4237,21 @@ class UIManager(
         if ("button" == type || "action" == type || "command" == type || "module" == type) {
             addLuaButtonGrid(
                 parent,
-                mutableListOf(luaLayoutSurfaceAction(module, obj, appSurface))
+                mutableListOf(luaLayoutSurfaceAction(module, obj, appSurface)),
+                values = values
             )
             return
         }
         if ("progress" == type) {
-            addLuaText(parent, formatLuaLayoutProgress(obj), module, MODULE_TEXT_FONT_MONO)
+            addLuaText(parent, formatLuaLayoutProgress(obj), module, MODULE_TEXT_FONT_MONO, values = values)
             return
         }
         if ("divider" == type) {
-            addLuaText(parent, "----------------", module, MODULE_TEXT_FONT_MONO)
+            addLuaText(parent, "----------------", module, MODULE_TEXT_FONT_MONO, values = values)
             return
         }
         if ("pre" == type || "ascii" == type || "code" == type) {
-            addLuaText(parent, obj.optString("text", obj.optString("label", "")), module, MODULE_TEXT_FONT_MONO)
+            addLuaText(parent, obj.optString("text", obj.optString("label", "")), module, MODULE_TEXT_FONT_MONO, values = values)
             return
         }
         if ("spacer" == type) {
@@ -4346,14 +4266,15 @@ class UIManager(
             return
         }
         val text = obj.optString("text", obj.optString("label", ""))
-        addLuaText(parent, text, module)
+        addLuaText(parent, text, module, values = values)
     }
 
     private fun renderLuaLayoutChildren(
         parent: LinearLayout,
         module: String?,
         children: JSONArray?,
-        appSurface: Boolean
+        appSurface: Boolean,
+        values: AppearanceValues = AppearanceValues.saved
     ) {
         if (children == null) {
             return
@@ -4361,9 +4282,9 @@ class UIManager(
         for (i in 0..<children.length()) {
             val child = children.opt(i)
             if (child is JSONObject) {
-                renderLuaLayoutObject(parent, module, child, appSurface)
+                renderLuaLayoutObject(parent, module, child, appSurface, values = values)
             } else if (child is JSONArray) {
-                renderLuaLayoutCompact(parent, module, child, appSurface)
+                renderLuaLayoutCompact(parent, module, child, appSurface, values = values)
             }
         }
     }
@@ -4708,12 +4629,14 @@ class UIManager(
     private fun applyModuleBodyTypeface(
         body: TextView?,
         module: String? = null,
-        fontMode: String? = null
+        fontMode: String? = null,
+        values: AppearanceValues = AppearanceValues.saved
     ) {
         if (body == null) {
             return
         }
-        TextShadows.apply(body, Theme.module_text_shadow_color)
+        val shadow = TextShadows.parameters(values.get(Ui.shadow_params))
+        body.setShadowLayer(shadow[2], shadow[0], shadow[1], values.color(Theme.module_text_shadow_color))
         val useThemeTypeface = if (MODULE_TEXT_FONT_MONO == fontMode) {
             false
         } else if (MODULE_TEXT_FONT_THEME == fontMode) {
@@ -4727,7 +4650,7 @@ class UIManager(
         )
         val style = if (body.getTypeface() != null) body.getTypeface().getStyle() else Typeface.NORMAL
         if (useThemeTypeface) {
-            body.setTypeface(Tuils.getTypeface(mContext), style)
+            body.setTypeface(values.typeface(mContext), style)
         } else {
             body.setTypeface(Typeface.MONOSPACE, style)
         }
@@ -4895,11 +4818,11 @@ class UIManager(
         return count
     }
 
-    private fun styleModuleClose(close: TextView?, target: FrameTarget = FrameTarget.MODULES) {
+    private fun styleModuleClose(close: TextView?, target: FrameTarget = FrameTarget.MODULES, values: AppearanceValues = AppearanceValues.saved) {
         if (close == null) return
-        val bgColor = ThemeColorResolver.color(Theme.module_header_control_background_color)
-        close.setBackground(TerminalBorderRuntime.tabDrawable(mContext!!, bgColor, target))
-        close.setTextSize(moduleHeaderTextSize().toFloat())
+        val bgColor = values.color(Theme.module_header_control_background_color)
+        close.setBackground(TerminalBorderRuntime.tabDrawable(mContext!!, bgColor, target, values))
+        values.applySize(close, Ui.module_header_text_size)
     }
 
     private fun closeHomeModule() {
@@ -5005,26 +4928,9 @@ class UIManager(
     }
 
     private fun updateMusicModuleText(musicWidget: View) {
-        val title = musicWidget.findViewById<TextView?>(R.id.music_song_title)
-        val singer = musicWidget.findViewById<TextView?>(R.id.music_singer)
-        val visualizer = musicWidget.findViewById<MusicVisualizerView?>(R.id.music_visualizer)
+        ohi.andre.consolelauncher.tuils.MusicModuleRenderer.bind(musicWidget, lastMusicSong, lastMusicSinger, musicTitlePrefix(), musicSubtitlePrefix())
+        val visualizer = musicWidget.findViewById<MusicVisualizerView>(R.id.music_visualizer)
         val textColor = musicWidgetTextColor()
-        if (title != null) {
-            title.setText(
-                if (!TextUtils.isEmpty(lastMusicSong)) musicTitlePrefix() + lastMusicSong!!.uppercase(
-                    Locale.getDefault()
-                ) else musicTitlePrefix() + "-"
-            )
-            title.setTextColor(textColor)
-        }
-        if (singer != null) {
-            singer.setText(
-                if (!TextUtils.isEmpty(lastMusicSinger)) musicSubtitlePrefix() + lastMusicSinger!!.uppercase(
-                    Locale.getDefault()
-                ) else musicSubtitlePrefix() + "-"
-            )
-            singer.setTextColor(textColor)
-        }
         updateMusicAppRow(musicWidget, textColor)
         if (visualizer != null) {
             visualizer.setBarColor(textColor)
@@ -6929,46 +6835,11 @@ class UIManager(
 
                 val styleLabel = os[0].ordinal
 
-                //                -1 = left     0 = center     1 = right
-                val p = statusLineAlignments[styleLabel]
-                labelViews[count]!!.setGravity(
-                    when {
-                        p == 0 -> Gravity.CENTER_HORIZONTAL
-                        p > 0 -> Gravity.END
-                        else -> Gravity.START
-                    }
-                )
+                ohi.andre.consolelauncher.managers.status.StatusSurfaceRenderer.style(
+                    labelViews[count]!!, Label.entries[styleLabel],
+                    ohi.andre.consolelauncher.managers.settings.AppearanceValues.saved, unifiedStatusBorder,
+                    if (labelViews[count] is AsciiArtTextView) Typeface.MONOSPACE else Tuils.getTypeface(context))
 
-                if (!os.contains(Label.notes)) {
-                    labelViews[count]!!.setVerticalScrollBarEnabled(false)
-                }
-
-                Companion.applyBgRect(
-                    mContext!!,
-                    labelViews[count]!!,
-                    bgColors[styleLabel],
-                    IntArray(4),
-                    if (unifiedStatusBorder) 0 else Tuils.dpToPx(mContext, moduleCornerRadius()),
-                    useDashed,
-                    AppearanceSettings.surfaceBorderColor(SurfaceBorder.entries[styleLabel]),
-                    false,
-                    SurfaceBorder.entries[styleLabel],
-                    !unifiedStatusBorder,
-                    !unifiedStatusBorder
-                )
-                labelViews[count]!!.setPadding(
-                    statusTextInsets[0],
-                    statusTextInsets[1],
-                    statusTextInsets[2],
-                    statusTextInsets[3]
-                )
-                Companion.applyShadow(
-                    labelViews[count]!!,
-                    outlineColors[styleLabel]!!,
-                    shadowXOffset,
-                    shadowYOffset,
-                    shadowRadius
-                )
             } else {
                 lViewsParent.removeView(labelViews[count])
                 labelViews[count] = null
@@ -7001,30 +6872,8 @@ class UIManager(
         }
 
         if (show[Label.device.ordinal]) {
-            val USERNAME = Pattern.compile("%u", Pattern.CASE_INSENSITIVE or Pattern.LITERAL)
-            val DV = Pattern.compile("%d", Pattern.CASE_INSENSITIVE or Pattern.LITERAL)
-
-            var deviceFormat = XMLPrefsManager.get(Behavior.device_format)
-
-            val username = XMLPrefsManager.get(Ui.username)
-            var deviceName = XMLPrefsManager.get(Ui.deviceName)
-            if (deviceName.length == 0) {
-                deviceName = Build.DEVICE
-            }
-
-            deviceFormat = USERNAME.matcher(deviceFormat)
-                .replaceAll(Matcher.quoteReplacement(username))
-            deviceFormat = DV.matcher(deviceFormat).replaceAll(Matcher.quoteReplacement(deviceName))
-            deviceFormat = Tuils.patternNewline.matcher(deviceFormat)
-                .replaceAll(Matcher.quoteReplacement(Tuils.NEWLINE))
-
-            updateText(
-                Label.device, Tuils.span(
-                    mContext, deviceFormat, XMLPrefsManager.getColor(
-                        Theme.device_text_color
-                    ), labelSizes[Label.device.ordinal]
-                )
-            )
+            updateText(Label.device, ohi.andre.consolelauncher.managers.status.DeviceTextRenderer.render(
+                mContext!!, ohi.andre.consolelauncher.managers.settings.AppearanceValues.saved))
         }
 
         if (show[Label.time.ordinal]) {
@@ -7199,81 +7048,14 @@ class UIManager(
 
     private fun styleMusicWidget(musicWidget: View?) {
         if (musicWidget == null) return
-        decorateWidget(
-            musicWidget,
-            R.id.music_module_border,
-            R.id.music_module_label,
-            R.id.music_module_close,
-            musicWidgetBorderColor(),
-            musicWidgetTextColor(),
-            FrameTarget.MUSIC
-        )
-        styleModuleClose(musicWidget.findViewById<TextView?>(R.id.music_module_close), FrameTarget.MUSIC)
+        ohi.andre.consolelauncher.tuils.MusicModuleRenderer.style(musicWidget,
+            ohi.andre.consolelauncher.managers.settings.AppearanceValues.saved, Tuils.getTypeface(mContext))
         sizeMusicVisualizer(musicWidget)
-
-        val titleView = musicWidget.findViewById<TextView?>(R.id.music_song_title)
-        val singerView = musicWidget.findViewById<TextView?>(R.id.music_singer)
-        val appPrefixView = musicWidget.findViewById<TextView?>(R.id.music_app_prefix)
-        val appLabelView = musicWidget.findViewById<TextView?>(R.id.music_app_label)
-        if (titleView != null) {
-            titleView.setTextSize(TypedValue.COMPLEX_UNIT_SP, moduleBodyTextSize().toFloat())
-            titleView.setIncludeFontPadding(true)
-        }
-        if (singerView != null) {
-            singerView.setTextSize(TypedValue.COMPLEX_UNIT_SP, moduleBodyTextSize().toFloat())
-            singerView.setIncludeFontPadding(true)
-        }
-        if (appPrefixView != null) {
-            appPrefixView.setTextColor(musicWidgetTextColor())
-            appPrefixView.setTypeface(Tuils.getTypeface(mContext))
-            appPrefixView.setTextSize(TypedValue.COMPLEX_UNIT_SP, moduleBodyTextSize().toFloat())
-            appPrefixView.setIncludeFontPadding(true)
-            appPrefixView.setSingleLine(true)
-        }
-        if (appLabelView != null) {
-            appLabelView.setTextColor(musicWidgetTextColor())
-            appLabelView.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
-            appLabelView.setTextSize(TypedValue.COMPLEX_UNIT_SP, moduleBodyTextSize().toFloat())
-            appLabelView.setIncludeFontPadding(true)
-            appLabelView.setSingleLine(true)
-            appLabelView.setEllipsize(TextUtils.TruncateAt.END)
-            appLabelView.setOnClickListener(View.OnClickListener { v: View? -> launchCurrentMusicApp() })
-        }
         updateMusicAppRow(musicWidget, musicWidgetTextColor())
-
-        // Style control buttons
-        val widgetColor = musicWidgetTextColor()
-        val widgetBorderColor = moduleButtonBorderColor()
-        val useDashed = dashedBorders()
-
-        val prevBtn = musicWidget.findViewById<TextView?>(R.id.music_prev)
-        val nextBtn = musicWidget.findViewById<TextView?>(R.id.music_next)
-        val playPauseBtn = musicWidget.findViewById<TextView?>(R.id.music_play_pause)
-
-        val buttons = arrayOf<View?>(prevBtn, nextBtn, playPauseBtn)
-        for (b in buttons) {
-            if (b is TextView) {
-                val btn = b
-                btn.setTextColor(widgetColor)
-                btn.setTypeface(Tuils.getTypeface(mContext))
-                btn.setTextSize(TypedValue.COMPLEX_UNIT_SP, moduleBodyTextSize().toFloat())
-                btn.setIncludeFontPadding(true)
-                btn.setSingleLine(true)
-                btn.setEllipsize(TextUtils.TruncateAt.END)
-
-                btn.setBackgroundDrawable(
-                    TerminalBorderRuntime.panelDrawable(
-                        mContext!!,
-                        moduleButtonBackgroundColor(),
-                        widgetBorderColor,
-                        1.2f,
-                        moduleCornerRadius(),
-                        useDashed,
-                        target = FrameTarget.MUSIC
-                    )
-                )
-            }
-        }
+        musicWidget.findViewById<TextView>(R.id.music_app_label)?.setOnClickListener { launchCurrentMusicApp() }
+        val prevBtn = musicWidget.findViewById<TextView>(R.id.music_prev)
+        val nextBtn = musicWidget.findViewById<TextView>(R.id.music_next)
+        val playPauseBtn = musicWidget.findViewById<TextView>(R.id.music_play_pause)
 
         if (prevBtn != null) {
             prevBtn.setOnClickListener(View.OnClickListener { v: View? ->
@@ -13503,6 +13285,22 @@ class UIManager(
     fun preserveSurfaceSessionForReload() {
         captureLauncherSurfaceSession()
     }
+
+    fun snapshotAppearanceState(): ohi.andre.consolelauncher.managers.settings.LauncherAppearanceState =
+        ohi.andre.consolelauncher.managers.settings.LauncherAppearanceState(
+            labels = Label.entries.mapNotNull { label -> labelTexts[label.ordinal]?.let { label to if (it is AsciiAnimationManager.AsciiFrameText) it else android.text.SpannedString(it) } }.toMap(),
+            terminal = snapshotTerminalState(),
+            moduleTitle = homeModulesContainer?.findViewById<TextView>(R.id.module_text_label)?.text?.toString().orEmpty(),
+            moduleText = android.text.SpannedString(homeModulesContainer?.findViewById<TextView>(R.id.module_text_body)?.text ?: ""),
+            song = lastMusicSong, singer = lastMusicSinger, playing = lastMusicPlaying,
+            musicApp = homeModulesContainer?.findViewById<TextView>(R.id.music_app_label)?.text?.toString().orEmpty(),
+            suggestions = mRootView?.findViewById<LinearLayout>(R.id.suggestions_group)?.let { group ->
+                (0 until group.childCount).mapNotNull { index -> (group.getChildAt(index) as? TextView)?.let { it.text.toString() to (it.getTag(R.id.preview_suggestion_type) as? Int ?: 0) } }
+            }.orEmpty(),
+            unlock = unlockManager?.snapshot(),
+            luaModule = lastLuaPreview?.first?.takeIf { it == activeModule },
+            luaResult = lastLuaPreview?.takeIf { it.first == activeModule }?.second?.copy()
+        )
 
     fun snapshotTerminalState(): TerminalManager.State? = mTerminalAdapter?.snapshotState()
 

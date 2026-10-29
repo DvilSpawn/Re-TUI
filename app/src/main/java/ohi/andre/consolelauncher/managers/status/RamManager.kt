@@ -1,6 +1,7 @@
 package ohi.andre.consolelauncher.managers.status
 
 import android.app.ActivityManager
+import ohi.andre.consolelauncher.managers.settings.AppearanceValues
 import android.content.Context
 import java.util.ArrayList
 import java.util.regex.Matcher
@@ -18,7 +19,8 @@ class RamManager(
     context: Context,
     delay: Long,
     private val size: Int,
-    private val listener: StatusUpdateListener?
+    private val listener: StatusUpdateListener?,
+    private val values: AppearanceValues = AppearanceValues.saved
 ) : StatusManager(context, delay) {
     private val av = "%av"
     private val tot = "%tot"
@@ -33,10 +35,12 @@ class RamManager(
     private val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
     private val memory = ActivityManager.MemoryInfo()
 
+    fun refreshNow() = update()
+
     override fun update() {
         if (ramFormat == null) {
-            ramFormat = XMLPrefsManager.get(Behavior.ram_format)
-            color = XMLPrefsManager.getColor(Theme.ram_text_color)
+            ramFormat = values.get(Behavior.ram_format)
+            color = values.color(Theme.ram_text_color)
         }
 
         if (ramPatterns == null) {
@@ -82,6 +86,6 @@ class RamManager(
 
         copy = patterns[11].matcher(copy).replaceAll(Matcher.quoteReplacement(Tuils.NEWLINE))
 
-        listener?.onUpdate(UIManager.Label.ram, UIUtils.span(context, copy, color, size))
+        listener?.onUpdate(UIManager.Label.ram, values.span(context, copy, Theme.ram_text_color, size))
     }
 }

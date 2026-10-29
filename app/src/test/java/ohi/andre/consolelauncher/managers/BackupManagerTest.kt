@@ -54,6 +54,11 @@ class BackupManagerTest {
     }
 
     @Test
+    fun personalBackupKeepsCalculatorHistoryAndOptions() {
+        assertTrue(BackupManager.personalSharedPreferenceNames().contains("calculator"))
+    }
+
+    @Test
     fun personalBackupIncludesFramePreferenceState() {
         assertTrue(BackupManager.personalSharedPreferenceNames().contains("retui_frames"))
     }

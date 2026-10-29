@@ -7,6 +7,8 @@ import android.graphics.drawable.Drawable
 import android.view.View
 import android.widget.TextView
 import androidx.core.graphics.ColorUtils
+import ohi.andre.consolelauncher.managers.settings.AppearanceValues
+import ohi.andre.consolelauncher.managers.xml.options.Ui
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings
 import ohi.andre.consolelauncher.managers.settings.ThemeColorResolver
 import ohi.andre.consolelauncher.managers.xml.options.Theme
@@ -38,36 +40,38 @@ object TuiWidgetDecorator {
         closeViewId: Int,
         borderColor: Int,
         textColor: Int,
-        target: FrameTarget = FrameTarget.MODULES
+        target: FrameTarget = FrameTarget.MODULES,
+        values: AppearanceValues = AppearanceValues.saved,
+        font: Typeface? = null
     ) {
         if (widgetRoot == null) {
             return
         }
 
         val context = widgetRoot.context
-        val widgetBgColor = ThemeColorResolver.color(Theme.module_panel_background_color)
-        val labelMaskColor = ThemeColorResolver.color(Theme.module_header_background_color)
-        val useDashed = AppearanceSettings.dashedBorders()
+        val widgetBgColor = values.color(Theme.module_panel_background_color)
+        val labelMaskColor = values.color(Theme.module_header_background_color)
+        val useDashed = values.bool(Ui.enable_dashed_border)
 
         val borderView = widgetRoot.findViewById<View>(borderViewId)
         if (borderView != null) {
-            borderView.background = panelDrawable(
+            borderView.background = TerminalBorderRuntime.panelDrawable(
                 context,
                 widgetBgColor,
                 borderColor,
                 1.5f,
-                AppearanceSettings.moduleCornerRadius(),
+                values.radius(Ui.module_corner_radius),
                 useDashed,
-                target = target
+                target = target, values = values
             )
         }
 
         val widgetLabel = widgetRoot.findViewById<TextView>(labelViewId)
         if (widgetLabel != null) {
             widgetLabel.setTextColor(textColor)
-            widgetLabel.setTypeface(Tuils.getTypeface(context), Typeface.BOLD)
-            widgetLabel.textSize = AppearanceSettings.moduleHeaderTextSize().toFloat()
-            widgetLabel.background = TerminalBorderRuntime.tabDrawable(context, labelMaskColor, target)
+            widgetLabel.setTypeface(font ?: values.typeface(context), Typeface.BOLD)
+            values.applySize(widgetLabel, Ui.module_header_text_size)
+            widgetLabel.background = TerminalBorderRuntime.tabDrawable(context, labelMaskColor, target, values)
         }
 
         if (borderView != null) {

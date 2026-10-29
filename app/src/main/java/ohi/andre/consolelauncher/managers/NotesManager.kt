@@ -54,7 +54,11 @@ import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager.resetFile
 /**
  * Created by francescoandreuzzi on 12/02/2018.
  */
-class NotesManager(var mContext: Context, noteView: TextView?) {
+class NotesManager(
+    var mContext: Context, noteView: TextView?,
+    private val values: ohi.andre.consolelauncher.managers.settings.AppearanceValues = ohi.andre.consolelauncher.managers.settings.AppearanceValues.saved,
+    private val readOnly: Boolean = false
+) {
     var oldNotes: CharSequence? = null
     var hasChanged: Boolean = false
 
@@ -77,15 +81,19 @@ class NotesManager(var mContext: Context, noteView: TextView?) {
 
     private fun load(context: Context?, loadClasses: Boolean) {
         try {
-            val library = NoteStore(mContext).load()
+            val store = NoteStore(mContext)
+            val library = if (readOnly && !store.hasDatabase()) LauncherNotes.importLegacy(mContext) else store.load()
             notes.clear()
             notes.addAll(library.notes.map { Note(it.createdAt, it.preview(), it.locked).apply { id = it.id } })
-            Collections.sort(notes)
+            if (readOnly) notes.sortWith { a, b -> a.compare(b, values.int(Behavior.notes_sorting)) } else Collections.sort(notes)
             observedRevision = NoteStore.revision
             invalidateNotes()
         } catch (e: Exception) {
             Tuils.log(e)
-            Tuils.sendOutput(mContext, R.string.output_error)
+            if (readOnly) {
+                oldNotes = mContext.getString(R.string.output_error)
+                hasChanged = true
+            } else Tuils.sendOutput(mContext, R.string.output_error)
         }
     }
 
@@ -107,25 +115,25 @@ class NotesManager(var mContext: Context, noteView: TextView?) {
 
         packageManager = mContext.getPackageManager()
 
-        val optionalSeparator = "\\" + XMLPrefsManager.get(Behavior.optional_values_separator)
+        val optionalSeparator = Pattern.quote(values.get(Behavior.optional_values_separator).ifEmpty { Behavior.optional_values_separator.defaultValue().orEmpty() })
         val optional = "%\\(([^" + optionalSeparator + "]*)" + optionalSeparator + "([^)]*)\\)"
         optionalPattern = Pattern.compile(optional, Pattern.CASE_INSENSITIVE)
 
-        color = XMLPrefsManager.getColor(Theme.notes_text_color)
-        lockedColor = XMLPrefsManager.getColor(Theme.locked_notes_text_color)
+        color = values.color(Theme.notes_text_color)
+        lockedColor = values.color(Theme.locked_notes_text_color)
 
-        footer = XMLPrefsManager.get(Ui.notes_footer)
-        header = XMLPrefsManager.get(Ui.notes_header)
-        divider = XMLPrefsManager.get(Ui.notes_divider)
+        footer = values.get(Ui.notes_footer)
+        header = values.get(Ui.notes_header)
+        divider = values.get(Ui.notes_divider)
         divider = Tuils.patternNewline.matcher(divider).replaceAll(Tuils.NEWLINE)
 
-        allowLink = XMLPrefsManager.getBoolean(Behavior.notes_allow_link)
+        allowLink = values.bool(Behavior.notes_allow_link)
         if (allowLink && noteView != null) {
             noteView.setMovementMethod(LinkMovementMethod())
-            linkColor = XMLPrefsManager.getColor(Theme.link_text_color)
+            linkColor = values.color(Theme.link_text_color)
         }
 
-        Note.Companion.sorting = XMLPrefsManager.getInt(Behavior.notes_sorting)
+        if (!readOnly) Note.Companion.sorting = values.int(Behavior.notes_sorting)
 
         load(mContext, true)
 
@@ -196,7 +204,7 @@ class NotesManager(var mContext: Context, noteView: TextView?) {
             }
         }
 
-        LocalBroadcastManager.getInstance(mContext.getApplicationContext())
+        if (!readOnly) LocalBroadcastManager.getInstance(mContext.getApplicationContext())
             .registerReceiver(receiver, filter)
     }
 
@@ -231,6 +239,7 @@ class NotesManager(var mContext: Context, noteView: TextView?) {
                 }
             }, 0, t.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
 
+            t.setSpan(ForegroundColorSpan(if (n.lock) lockedColor else color), 0, t.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
             ns = TextUtils.concat(ns, t, if (j != notes.size - 1) divider else Tuils.EMPTYSTRING)
         }
 
@@ -362,7 +371,7 @@ class NotesManager(var mContext: Context, noteView: TextView?) {
     }
 
     fun dispose(context: Context) {
-        LocalBroadcastManager.getInstance(context.getApplicationContext())
+        if (!readOnly) LocalBroadcastManager.getInstance(context.getApplicationContext())
             .unregisterReceiver(receiver)
     }
 
@@ -372,8 +381,10 @@ class NotesManager(var mContext: Context, noteView: TextView?) {
         Comparable<Note> {
         var id: String = ""
 
-        override fun compareTo(o: Note): Int {
-            when (sorting) {
+        override fun compareTo(o: Note): Int = compare(o, sorting)
+
+        fun compare(o: Note, order: Int): Int {
+            when (order) {
                 SORTING_TIME_UPDOWN -> return creationTime.compareTo(o.creationTime)
                 SORTING_TIME_DOWNUP -> return o.creationTime.compareTo(creationTime)
                 SORTING_ALPHA_UPDOWN -> return Tuils.alphabeticCompare(text, o.text)

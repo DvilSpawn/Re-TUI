@@ -1,3 +1,16 @@
+# Calculator runtime delivery
+
+Advanced calculation is now an optional portable engine pack installed inside the
+launcher. See [optional-calculator-engine.md](optional-calculator-engine.md) for the
+current architecture, download/import flow, build instructions and verification.
+The following historical validation describes the earlier bundled native backend;
+it is not proof of the portable pack implementation.
+
+> Optional calculator engine: the launcher now keeps basic arithmetic locally and uses
+> the separately installed `com.dvil.retui.calculator.engine` package for Qalculate.
+> See [optional-calculator-engine.md](optional-calculator-engine.md) for installation,
+> user-approved connections across signing keys, delivery, and upgrade behavior.
+
 # Calculator
 
 `calc` opens a terminal with an attached keypad dock. Enter an expression after

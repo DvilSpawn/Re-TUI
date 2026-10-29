@@ -77,6 +77,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--apk', type=Path, required=True)
     parser.add_argument('--aab', type=Path, help='Also record the matching Play Store bundle')
+    parser.add_argument('--engine-pack', type=Path, help='Record the matching portable .retui.calc.engine pack')
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
     sources = json.loads((ROOT / 'native/qalculate/sources.json').read_text())
@@ -109,6 +110,9 @@ def main():
     }
     if args.aab:
         manifest.update(aab=args.aab.name, aab_sha256=sha256(args.aab))
+    for kind, path in [('engine_pack', args.engine_pack)]:
+        if path:
+            manifest.update({kind: path.name, kind + '_sha256': sha256(path)})
     args.output.parent.mkdir(parents=True, exist_ok=True)
     with tarfile.open(args.output, 'w:gz') as archive:
         for path in paths:

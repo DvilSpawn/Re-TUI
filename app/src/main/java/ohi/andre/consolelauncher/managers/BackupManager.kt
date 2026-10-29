@@ -93,6 +93,7 @@ object BackupManager {
         "retui_module_prompt",
         "retui_callback_auth",
         "retui_frames",
+        "calculator",
         "pomodoro_state",
         RetuiCreditManager.PREFS,
         SpaceManager.PREFS,
