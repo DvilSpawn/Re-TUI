@@ -16,6 +16,9 @@
     <string name="app_other_profile_label">%1$s (Profile)</string>
     <string name="app_shortcut_not_found">Shortcut not found</string>
     <string name="app_work_profile_label">%1$s (Work)</string>
+    <string name="apps_drawer_most_used">Most used · %1$d (tap for A–Z)</string>
+    <string name="apps_drawer_newest">Newest installed · %1$d (tap for A–Z)</string>
+    <string name="apps_drawer_recent">Recently opened · %1$d (tap for A–Z)</string>
     <string name="apps_ranked_just_now">just now</string>
     <plurals name="apps_ranked_launches">
         <item quantity="one">%1$d launch</item>
@@ -250,92 +253,47 @@ Cancel stops the current calculation. Back closes Help and retains your reading 
     <string name="changelog_continue">Continue to Launcher</string>
     <string name="changelog_pane_title">CHANGELOG</string>
     <string name="changelog_release_heading">Re:TUI V.%1$s · Build %2$d</string>
-    <string name="changelog_release_highlights">Re:TUI V.4 adds **Terminal mode**, a new home screen made of live terminals. This update also rebuilds the widget pane, stops the output pane from overlapping your modules, and applies settings changes instantly.
+    <string name="changelog_release_highlights">Re:TUI V.5 turns IRC into a full client for any network, lets you open your dock modules from Search and Terminal mode, and adds recent, newest and most-used views to the app drawer.
 
-## New: Terminal mode
+## IRC, rebuilt
 
-Switch with `mode terminal`. Use `mode classic` or `mode search` to go back.
+The old Re:TUI chat server is retired. The IRC pane now connects to real IRC networks.
 
-- Your home screen becomes a scrolling grid of live Termux terminals, connected through the same local SSH link as the Termux pane.
-- Tap a terminal to type straight into it. Special-key rows (Ctrl, Alt, arrows, function keys) appear above the keyboard.
-- Shells keep running in tmux when you scroll away, leave the launcher or restart it. Each terminal's position, size and session are saved.
-- Add terminals with **+**: a new shell, an existing tmux session, a custom command, or the built-in Clock, Weather, Dashboard and Re:TUI Fetch tiles. Fetch shows system info next to a spinning pixel-art terminal.
-- Hold a terminal to move, resize, reconnect or remove it. Other terminals move aside while you drag and settle neatly when you let go. Removing a tile leaves its shell running.
-- Search stays at the bottom, styled like Search mode, over a soft blur of your terminals.
-- Terminal mode keeps its sessions separate from the Classic Termux pane.
+- Pick Libera.Chat, OFTC, Rizon or hackint, or add any server that supports TLS. Connect to several networks at once.
+- Channels open side by side in a Termux-style split view. Tap a pane to start typing in it.
+- Dropped connections reconnect by themselves and rejoin your channels. They also reconnect as soon as your phone is back online.
+- Sign in with your account once, and Re:TUI can remember this phone with a device key, so you don't need the password next time. Where a network has no SASL, sign-in goes through NickServ.
+- If your nickname is taken, Re:TUI tries a variant instead of failing. When sign-in fails, the pane says why, such as a wrong password or an unverified account.
+- **Stay connected:** turn it on in the Networks page or with `/background on`. Your networks stay online after you close the pane, with an ongoing notification and a Disconnect button. Private messages and mentions of your nickname arrive as notifications; tap one to open that conversation.
 
-Terminal mode uses Termux. If Termux or its SSH setup is missing, use **+ → Termux setup**. The Weather tile gets its data from wttr.in. The other tiles work offline.
+## Modules in Search and Terminal mode
 
-## Widget pane, rebuilt
+- Search results have a new **MODULES** group that lists your dock modules.
+- Tap one to open it right under the chips. The wallpaper blurs behind it, and the search bar and other results stay where they are.
+- Swipe sideways or tap another chip to switch modules. Tap the open chip, X or Back to close the module and return to your search.
 
-- Long-press a widget to edit it in place, with corner handles for resizing.
-- Every widget can be resized, including ones whose app sets a fixed size.
-- While you edit, a dot grid fills the pane and a ghost shows where a dragged widget will land. Other widgets move aside and settle when you let go.
-- Pack widgets more tightly with the new `grid` command in the widget pane's Commands bar. For example, `grid 8 4` sets 8 columns with 4dp spacing, and `grid` on its own shows the current values. You can also set spacing with the new `android_widget_spacing` setting.
-- The widget you're editing gets a bold outline and the others a faint one. Outlines disappear when you tap Done.
+## Apps
+
+- `apps -r` opens the app drawer with your recently opened apps first, `apps -n` with the newest installed and `apps -u` with the most used. Tap the header to go back to A–Z.
+- The `apps` suggestion chips now lead with the views you use most.
 
 ## Output pane
 
-- The output pane now fills the space below the status and modules without overlapping them, with or without the keyboard.
-- When you open a module, the output sits just below it instead of shrinking to a fixed height.
-- `output_tray_max_height` still caps the output's height. At 0, the output fills the available space.
+- The output pane always keeps at least three lines, even when modules fill the screen.
+- When the output pane is collapsed, a ! on the OUTPUT tab shows that something new arrived.
 
-## Settings
+## Weather
 
-- Saved settings now apply right away, without restarting the launcher.
-- Settings are checked before they apply, so a broken configuration shows a retry screen instead of stopping the launcher from starting.
-- The appearance preview draws your real Home screen and updates as you edit.
-- Choose default apps by name in Settings.
-- `status_time_format` now applies to the unified status card (#27).
-- Time-format settings now explain that plain words must be wrapped in single quotes.
+- `%name` shows your location again.
+- New placeholders for `weather_format`: `%temp_min` and `%temp_max` for the next 24 hours, and `%rain` for the rain expected in the next hour.
 
-## Fixes and polish
+## Fixes
 
-- Typing into a still-focused search bar now opens Terminal search.
-- Smoother scrolling and lighter rendering, including a cheaper CRT overlay.
-- Tighter side padding in Help and Calculator.
+- Changes to alias.txt apply as soon as you save, without `restart`.
+- `-tutorial` on every command opens the right guide.
+- In Search and Terminal mode, the app drawer no longer closes on its own, Back closes open panes in Terminal mode, and `clear` also clears the results card.
 
-Reopen these notes anytime with the `changelog` command.
-
-## Hotfix 1 · Build 601
-
-- Clock, Weather, Dashboard and Re:TUI Fetch tiles are visible again in themes with transparent borders. Terminal colours left on auto now always stay readable.
-- Switching presets no longer fails with an invalid value for song_text_color, or any other setting a preset leaves at its default.
-- The changelog heading now reads Re:TUI V.4.
-
-## Hotfix 2 · Build 602
-
-- RE:TUI Keys Shortcuts in Settings now warns when the RE:TUI Keys keyboard app is not installed, since the shortcuts only work there.
-- Fixed a freeze on Home after long sessions: the output pane now keeps the last 1000 lines unless max_lines sets a limit.
-- Terminal mode resize handles and the selected-pane outline are visible again in themes with transparent borders.
-- Aliases created when pinning a shortcut now appear in suggestions right away, without restarting the launcher.
-
-## Hotfix 3 · Build 603
-
-- Search providers open in their own apps: Google searches open the Google app, and YouTube, Maps and others skip the "Open with" chooser. New providers: -mp Maps, -wp Wikipedia, -rd Reddit, -gh GitHub, -tr Translate and -ym YouTube Music. Choose where a provider opens by app name with search -app.
-- Typing a phrase that isn't a command, such as how tall is everest, now offers a search with your default provider. Press Enter again or tap the chip to search; nothing is sent until you confirm.
-- The app drawer has a search box, and apps -ls [filter] opens it filtered. Find apps by part of the name or by what they do, such as music, maps, bank or taxi.
-- Notifications open as a list. Tap one to expand it, then use Prev, Next, Clear or Reply; Back returns to the list. Replies work for any app that offers them, without reply -bind, and go to that exact conversation.
-- The command input now works properly with keyboards such as fcitx5.
-- Applying a preset now restyles the module dock too.
-
-## Hotfix 4 · Build 604
-
-- Grouped notifications, such as WhatsApp's "8 messages from 2 chats", now open as a list of their chats. Tap a chat to expand it and reply; Back returns to the group, then to all notifications.
-- The Termux pane border now stays visible over full-screen terminal apps such as Midnight Commander.
-- The Re:TUI Fetch tile shows a spinning pixel-art terminal instead of the ASCII skull. Remove and re-add an existing Fetch tile to see it.
-
-## Hotfix 5 · Build 605
-
-- Two new downloadable live wallpapers. Astro Chart is a pixel-art planet and busy station with ships docking and passing. Matrix Rain is falling glyphs in six colour styles; with wallpaper touch on, the rain parts and ripples under your finger. Get them with Get more wallpapers on the wallpaper page.
-- Setting up the launcher for the first time now ends with a short screen that builds it step by step from your choices.
-- In Search mode, a phrase that isn't a command now keeps the "Enter again to search" prompt on screen.
-- wallpaper -auto now recolours the Search and Terminal mode results right away, without a restart.
-
-## Hotfix 6 · Build 606
-
-- Typing on a hardware keyboard now stays in the input. Before, the first key could move focus to a suggestion, so Enter opened that app instead of running what you typed.
-- Settings in landscape show the live preview on the left and the settings on the right. The preview opens on a new Home page that shows your whole Home screen as you edit.</string>
+Reopen these notes anytime with the `changelog` command.</string>
     <string name="command_bluetooth_false_4603a">%1$s false</string>
     <string name="command_bluetooth_opening_bluetooth_settings_android_no_long_c4672">Opening Bluetooth settings. Android no longer allows third-party launchers to toggle Bluetooth directly.</string>
     <string name="command_bluetooth_true_630fa">%1$s true</string>
@@ -1093,9 +1051,9 @@ Timer paused.</string>
 -tutorial -&gt; open the external Aliases guide on re-tui.pages.dev (network) 
 Home aliases expand before built-in commands; avoid conflicting names. Script aliases execute code through Termux; inspect the script first.</string>
     <string name="help_apps">-ls [filter] -&gt; open the app drawer, optionally showing only apps matching a name or what they do (music, maps, camera) 
--r [count] -&gt; apps you opened most recently from Re:TUI (default 10) 
--n [count] -&gt; newest installed apps (default 10) 
--u [count] -&gt; your most-used apps (default 10) 
+-r [count] -&gt; open the app drawer with the apps you opened from Re:TUI most recently first 
+-n [count] -&gt; open the app drawer with the newest installed apps first 
+-u [count] -&gt; open the app drawer with your most-used apps first 
 -lsh -&gt; list your hidden apps 
 -show [appName] -&gt; re-show an hidden app 
 -hide [appName] -&gt; hide an app 
@@ -1853,7 +1811,7 @@ Plain text goes only to the active joined channel or query. //text sends /text l
 Window markers: + unread · ! mention/private message. The first chip names the network; its marker counts messages on your other networks.
 /split [auto|side|stack|off] shows a second conversation, from any network, beside the one you type into (▶). Tap a tile's label to choose what it shows, or hold a conversation chip; tap a tile to type into it.
 Each network rejoins the channels you were in. A dropped connection reconnects by itself when it needs no password. Passwords are never saved or shown. TLS is verified; no plaintext fallback.
-Server-readable, not end-to-end encrypted. On supported networks, rejoining loads up to 100 recent channel messages. There is no push or background service; leaving disconnects. Unconfirmed messages are never retried automatically.</string>
+Server-readable, not end-to-end encrypted. On supported networks, rejoining loads up to 100 recent channel messages. Leaving disconnects unless /background is on: then networks stay connected in a notification, you show as away, and mentions and private messages notify you. Unconfirmed messages are never retried automatically.</string>
     <string name="irc_help_title">Help</string>
     <string name="irc_input_hint">message or /command</string>
     <string name="irc_join_hint">Enter a channel such as #linux, then Continue.</string>
@@ -1863,6 +1821,7 @@ Server-readable, not end-to-end encrypted. On supported networks, rejoining load
     <string name="irc_leave_confirm">Leave channel</string>
     <string name="irc_leave_question">Leave %1$s? Your in-session draft will be kept.</string>
     <string name="irc_loading">Loading…</string>
+    <string name="irc_mentions_channel">IRC mentions and private messages</string>
     <string name="irc_more">More</string>
     <string name="irc_network">Server</string>
     <string name="irc_network_connecting">connecting…</string>
@@ -1896,6 +1855,12 @@ Server-readable, not end-to-end encrypted. On supported networks, rejoining load
     <string name="irc_security_details">TLS protects the connection, not against server operators. Private conversations are not end-to-end encrypted.
 Leaving this pane disconnects every network. Networks that were connected reconnect when you open IRC again, if they need no password. Passwords are not saved. Unconfirmed messages are never retried automatically.</string>
     <string name="irc_send">Send IRC input</string>
+    <string name="irc_service_channel">IRC connection</string>
+    <string name="irc_service_connected">Connected · %1$s</string>
+    <string name="irc_service_connected_some">Connected · %1$s · %2$d reconnecting</string>
+    <string name="irc_service_disconnect">Disconnect</string>
+    <string name="irc_service_reconnecting">Reconnecting…</string>
+    <string name="irc_service_title">IRC</string>
     <string name="irc_show_more">Show next 50</string>
     <string name="irc_sign_in">Sign in</string>
     <string name="irc_signup_info">Sign-up rules belong to each network. Some ask for an email address or verification before an account works.</string>
@@ -1911,6 +1876,11 @@ Leaving this pane disconnects every network. Networks that were connected reconn
     <string name="irc_split_stack">Split view: top and bottom</string>
     <string name="irc_split_status">network home</string>
     <string name="irc_split_title">Split view</string>
+    <string name="irc_stay_connected">Stay connected in background</string>
+    <string name="irc_stay_connected_explanation">Keeps your networks connected after the pane closes, shows a notification while they are, marks you away and notifies you of mentions and private messages. Uses some battery.</string>
+    <string name="irc_stay_connected_no_notifications">Notifications are off for Re:TUI, so mentions will not alert you. Allow them in Android settings.</string>
+    <string name="irc_stay_connected_off">Leaving the pane disconnects again.</string>
+    <string name="irc_stay_connected_on">Staying connected after the pane closes. Mentions and private messages will notify you.</string>
     <string name="irc_title">IRC</string>
     <string name="irc_welcome">Connect as a guest to start chatting, or sign in with your account on this network.</string>
     <string name="language_packs_active">Active: %1$s</string>
@@ -3289,7 +3259,7 @@ Connection details offers Forget this device. It deletes the key from this phone
 
 ## Privacy and retention
 
-TLS verifies and encrypts the connection, but messages are not end-to-end encrypted. Server operators can read channel and private messages and see your connection address. Each network has its own rules and history retention. Launcher keeps no transcript after you close IRC and has no background IRC service or push. Rotation retains conversations, but password entry cancels; leaving the pane disconnects.</string>
+TLS verifies and encrypts the connection, but messages are not end-to-end encrypted. Server operators can read channel and private messages and see your connection address. Each network has its own rules and history retention. Launcher keeps no transcript on disk; with Stay connected on, conversations stay in memory while the background service runs, and mention notifications show the message text. Rotation retains conversations, but password entry cancels; leaving the pane disconnects unless Stay connected is on.</string>
     <string name="offline_help_article_irc_accounts_privacy_title">IRC accounts, reconnect and privacy</string>
     <string name="offline_help_article_irc_community_body">## Open and connect
 
@@ -3311,7 +3281,7 @@ Each network rejoins the channels you were in. Networks that were connected when
 2. Tap a named conversation chip to switch channels or private conversations. Unread counts and mention markers identify activity elsewhere.
 3. Open Channels to switch to an open channel, browse the network, or join by name. Search text in navigation views is never posted as a message.
 
-People lists nicknames in the active channel. Tap a nickname to open a private conversation; that alone sends nothing. Back first leaves a temporary view. From the conversation it closes the pane and disconnects every network.
+People lists nicknames in the active channel. Tap a nickname to open a private conversation; that alone sends nothing. Back first leaves a temporary view. From the conversation it closes the pane and disconnects every network, unless Stay connected in background is on (Networks page or /background on): then a notification keeps them connected, you show as away, and mentions and private messages notify you.
 
 ## Optional slash commands
 
@@ -4284,6 +4254,7 @@ Try to use "$ help" or "$ tutorial"</string>
     <string name="output_groupexists">This group already exists</string>
     <string name="output_groupnotfound">Group not found</string>
     <string name="output_groupspace">Spaces are not allowed inside group names</string>
+    <string name="output_header_unread">%1$s, new output</string>
     <string name="output_invalid_param">Invalid option:</string>
     <string name="output_invalidarg">Invalid argument</string>
     <string name="output_invalidcolor">Invalid color</string>
@@ -4442,6 +4413,7 @@ Disabling this option hides Re:TUI access; it does not lock Private Space. Save 
     <string name="search_category_contact_actions">CONTACT ACTIONS</string>
     <string name="search_category_contacts">CONTACTS</string>
     <string name="search_category_enable_access">ENABLE ACCESS</string>
+    <string name="search_category_modules">MODULES</string>
     <string name="search_category_notifications">NOTIFICATIONS</string>
     <string name="search_category_output">OUTPUT</string>
     <string name="search_category_params">PARAMS</string>
@@ -4459,6 +4431,8 @@ Disabling this option hides Re:TUI access; it does not lock Private Space. Save 
     </plurals>
     <string name="search_message">Message %1$s</string>
     <string name="search_mode_hint">Search apps, contacts, notifications, or the web…</string>
+    <string name="search_module">MODULE</string>
+    <string name="search_modules_empty">Your module dock is empty. module -ls lists modules you can add to it.</string>
     <string name="search_notification">NOTIFICATION</string>
     <string name="search_notification_access">ACCESS · Open Android notification access</string>
     <string name="search_open_url">Open URL</string>
@@ -4584,7 +4558,7 @@ Disabling this option hides Re:TUI access; it does not lock Private Space. Save 
     <string name="setting_behavior_unlock_counter_format_description">The format used to show the unlock counter</string>
     <string name="setting_behavior_unlock_time_divider_description">The divider between the last unlock times</string>
     <string name="setting_behavior_unlock_time_order_description">1 = up-down. 2 = down-up</string>
-    <string name="setting_behavior_weather_format_description">The format used to show the weather</string>
+    <string name="setting_behavior_weather_format_description">The format used to show the weather. Placeholders: %name (place), %main or %description (conditions), %temp, %temp_min and %temp_max (next 24 hours), %rain (next hour), %humidity, %speed (wind), %deg (wind direction), %pressure, %clouds</string>
     <string name="setting_behavior_weather_key_description">Legacy OpenWeather setting. It is no longer used.</string>
     <string name="setting_behavior_weather_location_description">Place name or fixed coordinates separated by a comma (lat,lon). Weather never requests device location.</string>
     <string name="setting_behavior_weather_temperature_measure_description">metric = Celsius; imperial = Fahrenheit; standard = Kelvin</string>
