@@ -181,4 +181,18 @@ class IrcStateTest {
         s.event("@batch=h;msgid=after-disconnect :alice!u@host PRIVMSG #retui :live message")
         assertEquals(1, s.buffer("#retui").unread)
     }
+    @Test fun mentionsAndPrivateMessagesNotifyButHistoryChatterAndStatusDoNot() {
+        val s = IrcState(); s.nickname = "dvil"; s.conversationVisible = false
+        val heard = mutableListOf<String>()
+        s.onMention = { buffer, line -> heard.add("${buffer.name}:${line.body}") }
+        s.event(":dvil!u@host JOIN #retui")
+        s.event(":alice!u@host PRIVMSG #retui :just chatting")
+        s.event(":alice!u@host PRIVMSG #retui :dvil, are you there?")
+        s.event(":bob!u@host PRIVMSG dvil :hi in private")
+        s.event(":server BATCH +old chathistory #retui")
+        s.event("@batch=old;msgid=x;time=2026-10-13T15:01:00Z :carol!u@host PRIVMSG #retui :dvil from history")
+        s.event(":server BATCH -old")
+        s.event(":server NOTICE dvil :dvil server notice")
+        assertEquals(listOf("#retui:dvil, are you there?", "bob:hi in private"), heard)
+    }
 }

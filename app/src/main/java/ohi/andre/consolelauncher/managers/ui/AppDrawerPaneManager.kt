@@ -63,6 +63,9 @@ class AppDrawerPaneManager(
     private val filterIcon: ImageView? = rootView.findViewById(R.id.apps_drawer_filter_icon)
     private val filterClear: ImageView? = rootView.findViewById(R.id.apps_drawer_filter_clear)
     private var filter = Tuils.EMPTYSTRING
+    // apps -r / -n / -u: list in this order instead of A-Z, until the header is tapped or the drawer reopens.
+    private var ranking: AppsManager.Ranking? = null
+    private var rankingLimit = 500
     private var colors: IntArray? = null
     private var adapter: AppsDrawerAdapter? = null
     private val entries: MutableList<AppDrawerEntry> = ArrayList()
@@ -78,6 +81,13 @@ class AppDrawerPaneManager(
         configureInputAnchor()
         drawerRoot?.setOnClickListener { hide() }
         configureFilter()
+        header?.setOnClickListener {
+            if (ranking == null) return@setOnClickListener
+            ranking = null
+            val appsManager = mainPackProvider()?.appsManager ?: return@setOnClickListener
+            val c = colors ?: return@setOnClickListener
+            rebuildContents(appsManager, c[0], c[1], c[2])
+        }
     }
 
     val isOpen: Boolean
@@ -89,8 +99,10 @@ class AppDrawerPaneManager(
         closeSurface()
     }
 
-    /** Opens the drawer, optionally narrowed to apps matching [query] (as in `apps -ls cam`). */
-    fun show(query: String? = null) {
+    /** Opens the drawer, optionally narrowed to apps matching [query] (as in `apps -ls cam`) or in [ranking] order. */
+    fun show(query: String? = null, ranking: AppsManager.Ranking? = null, limit: Int = 500) {
+        this.ranking = ranking
+        rankingLimit = limit
         filter = query?.trim().orEmpty()
         filterInput?.let { input ->
             if (input.text.toString() != filter) input.setText(filter)
@@ -465,11 +477,14 @@ class AppDrawerPaneManager(
         backgroundColor: Int
     ) {
         val filtering = filter.isNotEmpty() && !selectedPrivate
+        val ranked = ranking?.takeIf { !filtering && !selectedPrivate }?.let { appsManager.rankedApps(it, rankingLimit, getAppsForDrawer(appsManager)) }
         val visibleApps = when {
             selectedPrivate -> appsManager.privateApps()
             filtering -> AppFinder.find(context, getAppsForDrawer(appsManager), filter)
+            ranked != null -> ranked.map { it.first }
             else -> getAppsForDrawer(appsManager)
         }
+        val now = System.currentTimeMillis()
         entries.clear()
         alphaPositions.clear()
         selectedAlpha = null
@@ -480,7 +495,12 @@ class AppDrawerPaneManager(
         }
 
         var currentSection: String? = null
-        for (app in visibleApps) {
+        for ((index, app) in visibleApps.withIndex()) {
+            if (ranked != null) {
+                // Ranked order, without letter sections; each row says when or how often.
+                entries.add(AppEntry(app, appsManager.describeRank(ranking!!, ranked[index].second, now)))
+                continue
+            }
             if (filtering) {
                 // Best matches first, without letter sections.
                 entries.add(AppEntry(app))
@@ -503,6 +523,12 @@ class AppDrawerPaneManager(
             context.getString(R.string.manager_appdrawerpanemanager_private_space_9f6b2, visibleApps.size)
         } else if (filtering) {
             context.getString(R.string.manager_appdrawerpanemanager_matching, visibleApps.size, filter)
+        } else if (ranked != null) {
+            context.getString(when (ranking!!) {
+                AppsManager.Ranking.RECENT -> R.string.apps_drawer_recent
+                AppsManager.Ranking.NEWEST -> R.string.apps_drawer_newest
+                AppsManager.Ranking.MOST_USED -> R.string.apps_drawer_most_used
+            }, visibleApps.size)
         } else {
             context.getString(R.string.manager_appdrawerpanemanager_applications_a46d2, visibleApps.size, scope)
         }
@@ -650,7 +676,7 @@ class AppDrawerPaneManager(
         override val viewType: Int = 0
     }
 
-    private class AppEntry(val app: LaunchInfo) : AppDrawerEntry() {
+    private class AppEntry(val app: LaunchInfo, val detail: CharSequence? = null) : AppDrawerEntry() {
         override val viewType: Int = 1
     }
 
@@ -728,7 +754,12 @@ class AppDrawerPaneManager(
             textView.textSize = 16f
             textView.typeface = Tuils.getTypeface(context)
             textView.setBackgroundColor(ThemeColorResolver.color(Theme.app_drawer_row_background_color))
-            textView.text = app.publicLabel
+            val detail = entry.detail
+            textView.text = if (detail == null) app.publicLabel else android.text.SpannableString("${app.publicLabel}  · $detail").apply {
+                val start = length - detail.length - 3
+                setSpan(android.text.style.ForegroundColorSpan(ThemeColorResolver.color(Theme.field_hint_color)), start, length, 0)
+                setSpan(android.text.style.RelativeSizeSpan(0.8f), start, length, 0)
+            }
             return textView
         }
     }

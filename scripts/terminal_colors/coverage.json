@@ -8398,6 +8398,7 @@
       "openNotificationShade",
       "openPodcastSurface",
       "openProfileSurface",
+      "openSearchModules",
       "openSettingsSurface",
       "openTermuxApp",
       "openTermuxConsole",
@@ -8425,6 +8426,7 @@
     ],
     "irc/IrcActivity.kt": [
       "openDeleteMessages",
+      "openMention",
       "openNavigation",
       "openPeople",
       "showBeside"

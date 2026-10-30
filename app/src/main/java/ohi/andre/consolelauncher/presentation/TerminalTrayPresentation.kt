@@ -65,10 +65,15 @@ internal object TerminalTrayPresentation {
     }
 
     /** Fit the output in [room]: native and auto fill it up to [fillHeight]; other modes only shrink. */
-    fun fitRoom(requested:Int,fillHeight:Int,room:Int,header:Int,fill:Boolean):Int {
+    // A tall top section must not squeeze the output to its header: an open pane keeps [minimum]
+    // (a few lines) even if that covers the bottom of the top section.
+    fun fitRoom(requested:Int,fillHeight:Int,room:Int,header:Int,fill:Boolean,minimum:Int=0):Int {
         if(room<0) return requested
-        return max(header,min(room,if(fill) fillHeight else requested))
+        return max(max(header,min(room,if(fill) fillHeight else requested)),min(requested,minimum))
     }
+
+    /** The pane's frame plus three lines of output. */
+    fun minimumOpen(chrome:Int,lineHeight:Int):Int = chrome+3*lineHeight
 
     fun chromeHeight(root:View):Int {
         val fallback=Tuils.dpToPx(root.context,38)
@@ -181,7 +186,8 @@ internal object TerminalTrayPresentation {
             val consoleHeight=if(appearance.bool(SurfaceBorderOption.unified_status_border) && console?.visibility==View.VISIBLE) console.measuredHeight else 0
             val room=roomBelowTopContent(root,viewportHeight,inputHeight+consoleHeight)
             val cap=if(maxDp>0) min(room,Tuils.dpToPx(root.context,maxDp)) else room
-            val fitted=fitRoom(requested,cap,room,header,(native || auto) && !autoHide)
+            val fitted=fitRoom(requested,cap,room,header,(native || auto) && !autoHide,
+                minimumOpen(chrome,max(lineMinimum,text?.lineHeight?:0)))
             params?.height=constrain(fitted,viewportHeight,state.imeBottom,state.systemBottom,inputHeight+consoleHeight,state.imeVisible || state.imeBottom>0)
         }
         if(params!=null) container.layoutParams=params

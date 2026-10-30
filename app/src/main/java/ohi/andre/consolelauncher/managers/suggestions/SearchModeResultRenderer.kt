@@ -1,6 +1,8 @@
 package ohi.andre.consolelauncher.managers.suggestions
 
 import ohi.andre.consolelauncher.R
+import android.view.View
+import android.view.ViewGroup
 import android.widget.HorizontalScrollView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -13,8 +15,11 @@ import ohi.andre.consolelauncher.presentation.SearchResultPresentation
 class SearchModeResultRenderer(
     private val pack: MainPack,
     private val container: LinearLayout,
-    private val onClick: (SuggestionsManager.SearchResult) -> Unit
+    private val onClick: (SuggestionsManager.SearchResult) -> Unit,
+    // The dock module open in the results (its id and view), shown under the MODULES chips.
+    private val openModule: () -> Pair<String, View>? = { null }
 ) {
+    private var moduleWasOpen = false
     private val context = pack.context
     private val chipStyler = SuggestionChipStyler(pack)
     // Read per render (cached per settings revision) so theme changes reach new cards without a restart.
@@ -47,7 +52,11 @@ class SearchModeResultRenderer(
         if (groups.isEmpty()) return
 
         val card = resultCard()
-        val selectedType = selectedCategoryType(activeCategoryType, groups)
+        val module = openModule()
+        // A module just opened from its chip: show the MODULES group it lives in.
+        val opened = module != null && !moduleWasOpen && groups.any { it.first().type == SuggestionsManager.SearchResult.TYPE_MODULE }
+        moduleWasOpen = module != null
+        val selectedType = if (opened) SuggestionsManager.SearchResult.TYPE_MODULE else selectedCategoryType(activeCategoryType, groups)
         activeCategoryType = selectedType
         val tabbed = XMLPrefsManager.getBoolean(Behavior.search_category_tabs)
         val visibleGroups = visibleGroups(groups, selectedType, tabbed)
@@ -65,6 +74,10 @@ class SearchModeResultRenderer(
             }
             nextState[type] = RowState(signature, 0, strip)
             card.addView(strip)
+            if (type == SuggestionsManager.SearchResult.TYPE_MODULE && module != null) {
+                (module.second.parent as? ViewGroup)?.removeView(module.second)
+                card.addView(module.second)
+            }
         }
         rowState = nextState
         categoryStrip = null
@@ -84,6 +97,8 @@ class SearchModeResultRenderer(
         val card = SearchResultPresentation.output(context,output.toString().trim(),appearance)
         card.setTextIsSelectable(true)
         resultCard.addView(card)
+        // A module's buttons can print output; the module stays open under it.
+        openModule()?.second?.let { module -> (module.parent as? ViewGroup)?.removeView(module); resultCard.addView(module) }
         container.addView(resultCard, cardLayoutParams())
         latestOutput = output
     }
@@ -118,7 +133,8 @@ class SearchModeResultRenderer(
         }
 
     private fun resultChip(result: SuggestionsManager.SearchResult): TextView =
-        SearchResultPresentation.chip(context,result.title,chipStyler.binding(suggestionType(result.type),result.payload),appearance).apply {
+        SearchResultPresentation.chip(context,result.title,chipStyler.binding(suggestionType(result.type),result.payload),appearance,
+            if (result.type == SuggestionsManager.SearchResult.TYPE_MODULE) result.payload == openModule()?.first else null).apply {
             contentDescription=listOf(result.title,result.subtitle).filter { it.isNotBlank() }.joinToString(", ")
             setOnClickListener { onClick(result) }
         }
@@ -138,6 +154,7 @@ class SearchModeResultRenderer(
         SuggestionsManager.SearchResult.TYPE_PROVIDER -> context.getString(R.string.search_category_web)
         SuggestionsManager.SearchResult.TYPE_PERMISSION -> context.getString(R.string.search_category_enable_access)
         SuggestionsManager.SearchResult.TYPE_CONTACT_ACTION -> context.getString(R.string.search_category_contact_actions)
+        SuggestionsManager.SearchResult.TYPE_MODULE -> context.getString(R.string.search_category_modules)
         else -> context.getString(R.string.search_category_results)
     }
 
@@ -148,6 +165,7 @@ class SearchModeResultRenderer(
         SuggestionsManager.SearchResult.TYPE_COMMAND -> SuggestionsManager.Suggestion.TYPE_COMMAND
         SuggestionsManager.SearchResult.TYPE_PARAMETER -> SuggestionsManager.Suggestion.TYPE_COMMAND
         SuggestionsManager.SearchResult.TYPE_PROVIDER -> SuggestionsManager.Suggestion.TYPE_COMMAND
+        SuggestionsManager.SearchResult.TYPE_MODULE -> SuggestionsManager.Suggestion.TYPE_MODULE
         SuggestionsManager.SearchResult.TYPE_GROUP -> SuggestionsManager.Suggestion.TYPE_APPGP
         else -> SuggestionsManager.Suggestion.TYPE_PERMANENT
     }
@@ -171,6 +189,7 @@ class SearchModeResultRenderer(
             SuggestionsManager.SearchResult.TYPE_NOTIFICATION,
             SuggestionsManager.SearchResult.TYPE_ALIAS,
             SuggestionsManager.SearchResult.TYPE_COMMAND,
+            SuggestionsManager.SearchResult.TYPE_MODULE,
             SuggestionsManager.SearchResult.TYPE_PARAMETER,
             SuggestionsManager.SearchResult.TYPE_GROUP,
             SuggestionsManager.SearchResult.TYPE_PROVIDER,

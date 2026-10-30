@@ -1,9 +1,15 @@
 package ohi.andre.consolelauncher.tuils
 
 import android.content.Context
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.RectF
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
+import android.text.SpannableString
+import android.text.Spanned
 import android.text.TextUtils
+import android.text.style.ReplacementSpan
 import android.view.Gravity
 import android.view.View
 import android.widget.TextView
@@ -15,6 +21,7 @@ import ohi.andre.consolelauncher.managers.settings.AppearanceSettings
 import ohi.andre.consolelauncher.managers.xml.options.Behavior
 import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.managers.xml.options.Ui
+import kotlin.math.roundToInt
 
 /**
  * Stateless chrome/text helper for the terminal output tray toggle.
@@ -93,7 +100,8 @@ object TerminalTrayToggleView {
         outputTrayNativeMode: Boolean,
         outputTrayAutoMode: Boolean,
         outputAutoHideEnabled: Boolean,
-        outputColor: Int
+        outputColor: Int,
+        unread: Boolean = false
     ) {
         if (toggle == null) return
         toggle.setTag(R.id.home_output_header_binding,Binding(outputHeaderNone,outputHeaderArrowsOnly,
@@ -131,9 +139,35 @@ object TerminalTrayToggleView {
             outputTrayAutoMode -> if (terminalTrayExpanded) context.getString(R.string.integration_terminaltraytoggleview_output_auto_v_69560) else context.getString(R.string.integration_terminaltraytoggleview_output_auto_b2829)
             else -> if (terminalTrayExpanded) context.getString(R.string.integration_terminaltraytoggleview_output_v_93c86) else context.getString(R.string.integration_terminaltraytoggleview_output_9dd6b)
         }
-        if (!TextUtils.equals(toggle.text, text)) {
-            toggle.text = text
+        // New output while the pane is closed: a boxed "!" after the label until it is opened.
+        val shown: CharSequence = if (unread && collapsed) SpannableString("$text !").apply {
+            setSpan(NoticeSpan(outputColor), length - 1, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        } else text
+        if (!TextUtils.equals(toggle.text, shown) || (toggle.text is Spanned) != (shown is Spanned)) {
+            toggle.text = shown
         }
+        toggle.contentDescription = if (shown is Spanned) context.getString(R.string.output_header_unread, text) else null
+    }
+
+    /** Draws its character inside a small outlined square, the height of a capital letter. */
+    internal class NoticeSpan(private val color: Int) : ReplacementSpan() {
+        override fun getSize(paint: Paint, text: CharSequence?, start: Int, end: Int, fm: Paint.FontMetricsInt?): Int =
+            side(paint).roundToInt()
+
+        override fun draw(canvas: Canvas, text: CharSequence?, start: Int, end: Int, x: Float, top: Int, y: Int, bottom: Int, paint: Paint) {
+            val side = side(paint)
+            val stroke = (paint.textSize / 10f).coerceAtLeast(1f)
+            val box = RectF(x + stroke / 2, y - side + paint.descent() / 2 + stroke / 2, x + side - stroke / 2, y + paint.descent() / 2 - stroke / 2)
+            val old = Triple(paint.color, paint.style, paint.strokeWidth)
+            paint.color = color; paint.style = Paint.Style.STROKE; paint.strokeWidth = stroke
+            canvas.drawRect(box, paint)
+            paint.style = Paint.Style.FILL
+            val mark = text?.subSequence(start, end)?.toString() ?: "!"
+            canvas.drawText(mark, box.centerX() - paint.measureText(mark) / 2, box.centerY() - (paint.ascent() + paint.descent()) / 2, paint)
+            paint.color = old.first; paint.style = old.second; paint.strokeWidth = old.third
+        }
+
+        private fun side(paint: Paint) = paint.textSize * 1.05f
     }
 
     private fun hide(toggle: TextView) {

@@ -28,7 +28,7 @@ class apps : ParamCommand() {
 
             override fun exec(pack: ExecutePack): String? {
                 val filter = pack.getString()
-                if (LauncherActivity.instance != null) {
+                if (drawerAvailable()) {
                     LauncherActivity.instance!!.runOnUiThread(Runnable {
                         if (LauncherActivity.instance!!.uiManager != null) {
                             LauncherActivity.instance!!.uiManager!!.showAppsDrawer(filter)
@@ -43,7 +43,7 @@ class apps : ParamCommand() {
             }
 
             override fun onNotArgEnough(pack: ExecutePack, n: Int): String? {
-                if (LauncherActivity.instance != null) {
+                if (drawerAvailable()) {
                     LauncherActivity.instance!!.runOnUiThread(Runnable {
                         if (LauncherActivity.instance!!.uiManager != null) {
                             LauncherActivity.instance!!.uiManager!!.showAppsDrawer()
@@ -72,20 +72,20 @@ class apps : ParamCommand() {
         },
         r {
             override fun args(): IntArray? = intArrayOf(CommandAbstraction.INT)
-            override fun exec(pack: ExecutePack): String? = (pack as MainPack).appsManager.printRanked(AppsManager.Ranking.RECENT, pack.getInt())
-            override fun onNotArgEnough(pack: ExecutePack, n: Int): String? = (pack as MainPack).appsManager.printRanked(AppsManager.Ranking.RECENT, RANKED_COUNT)
+            override fun exec(pack: ExecutePack): String? = openRanked(pack, AppsManager.Ranking.RECENT, pack.getInt())
+            override fun onNotArgEnough(pack: ExecutePack, n: Int): String? = openRanked(pack, AppsManager.Ranking.RECENT, RANKED_ALL)
             override fun onArgNotFound(pack: ExecutePack, index: Int): String? = pack.context.getString(R.string.invalid_integer)
         },
         n {
             override fun args(): IntArray? = intArrayOf(CommandAbstraction.INT)
-            override fun exec(pack: ExecutePack): String? = (pack as MainPack).appsManager.printRanked(AppsManager.Ranking.NEWEST, pack.getInt())
-            override fun onNotArgEnough(pack: ExecutePack, n: Int): String? = (pack as MainPack).appsManager.printRanked(AppsManager.Ranking.NEWEST, RANKED_COUNT)
+            override fun exec(pack: ExecutePack): String? = openRanked(pack, AppsManager.Ranking.NEWEST, pack.getInt())
+            override fun onNotArgEnough(pack: ExecutePack, n: Int): String? = openRanked(pack, AppsManager.Ranking.NEWEST, RANKED_ALL)
             override fun onArgNotFound(pack: ExecutePack, index: Int): String? = pack.context.getString(R.string.invalid_integer)
         },
         u {
             override fun args(): IntArray? = intArrayOf(CommandAbstraction.INT)
-            override fun exec(pack: ExecutePack): String? = (pack as MainPack).appsManager.printRanked(AppsManager.Ranking.MOST_USED, pack.getInt())
-            override fun onNotArgEnough(pack: ExecutePack, n: Int): String? = (pack as MainPack).appsManager.printRanked(AppsManager.Ranking.MOST_USED, RANKED_COUNT)
+            override fun exec(pack: ExecutePack): String? = openRanked(pack, AppsManager.Ranking.MOST_USED, pack.getInt())
+            override fun onNotArgEnough(pack: ExecutePack, n: Int): String? = openRanked(pack, AppsManager.Ranking.MOST_USED, RANKED_ALL)
             override fun onArgNotFound(pack: ExecutePack, index: Int): String? = pack.context.getString(R.string.invalid_integer)
         },
         show {
@@ -402,7 +402,18 @@ class apps : ParamCommand() {
 
     companion object {
         private const val APPS_DOC_URL = "https://re-tui.pages.dev/apps"
-        private const val RANKED_COUNT = 10
+        private const val RANKED_ALL = 500
+
+        private fun drawerAvailable() = LauncherActivity.instance != null
+
+        /** Opens the drawer in [ranking] order; says why instead when nothing is recorded yet. */
+        private fun openRanked(pack: ExecutePack, ranking: AppsManager.Ranking, n: Int): String? {
+            val apps = (pack as MainPack).appsManager
+            if (apps.rankedApps(ranking, n).isEmpty()) return apps.rankedEmpty(ranking)
+            val launcher = LauncherActivity.instance?.takeIf { drawerAvailable() } ?: return apps.printRanked(ranking, n)
+            launcher.runOnUiThread { launcher.uiManager?.showAppsDrawer(ranking = ranking, limit = n) }
+            return null
+        }
         private val SUGGESTED = listOf("-ls", "-r", "-n", "-u", "-l", "-hide", "-show", "-lsh", "-st", "-ps",
             "-lsgp", "-mkgp", "-addtogp", "-rmfromgp", "-rmgp", "-gp_bg_color", "-gp_fore_color", "-default_app", "-frc", "-reset", "-tutorial")
 

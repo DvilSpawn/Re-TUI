@@ -23,6 +23,9 @@ class IrcClient(private val host: String, private val port: Int, private val nic
     // Networks without SASL (OFTC, for one) sign in through NickServ after the welcome instead.
     private val servicesFallback: Boolean = false) : AutoCloseable {
     companion object {
+        // Mobile networks drop idle connections silently: after this much quiet, PING once;
+        // a second quiet interval means the link is gone.
+        internal var keepAliveMs = 60_000
         private val hostnameVerifier = OkHttpClient().hostnameVerifier
         fun tlsSocket(host: String, port: Int, factory: SSLSocketFactory = SSLSocketFactory.getDefault() as SSLSocketFactory): Socket {
             // Networks publish IPv6 and IPv4 addresses; a phone without a working IPv6 route must still connect.
@@ -96,6 +99,17 @@ class IrcClient(private val host: String, private val port: Int, private val nic
                 queue(IrcProtocol.line("NICK", listOf(nickname)))
                 queue(IrcProtocol.line("USER", listOf(nickname, "0", "*"), "Re:TUI IRC"))
                 val input = connected.getInputStream()
+                var pinged = false
+                fun read(): Int {
+                    while (true) {
+                        try { return input.read().also { pinged = false } }
+                        catch (quiet: java.net.SocketTimeoutException) {
+                            if (!ready) throw quiet
+                            if (pinged) throw Failure("No reply from the server for ${2 * keepAliveMs / 1000} seconds; the connection was lost.")
+                            pinged = true; queue(IrcProtocol.line("PING", trailing = "retui"))
+                        }
+                    }
+                }
                 fun endCapabilities() { if (!negotiated) { negotiated = true; queue(IrcProtocol.line("CAP", listOf("END"))) } }
                 fun submitRegistration() {
                     check(!registrationSent)
@@ -106,14 +120,14 @@ class IrcClient(private val host: String, private val port: Int, private val nic
                 }
                 fun finishRegistration() {
                     if (welcomed && authenticated && !ready) {
-                        connected.soTimeout = 180_000
+                        connected.soTimeout = keepAliveMs
                         ready = true; connection(true, "Connected · $host:$port · account registered")
                     }
                 }
                 while (!closed.get()) {
                     val bytes = ByteArrayOutputStream()
                     while (true) {
-                        val c = input.read()
+                        val c = read()
                         if (c == -1) throw java.io.EOFException()
                         if (c == 10) break
                         if (c != 13) bytes.write(c)
@@ -190,6 +204,7 @@ class IrcClient(private val host: String, private val port: Int, private val nic
                             check(account.isEmpty() || authenticated && negotiated || viaServices) { "Unauthenticated welcome rejected" }
                             if (viaServices && !external) queue(IrcProtocol.line("PRIVMSG", listOf("NickServ"), "IDENTIFY " + String(secret)))
                             if (viaServices) secret.fill('\u0000')
+                            connected.soTimeout = keepAliveMs
                             ready = true
                             connection(true, "Connected · $host:$port · ${when { account.isEmpty() -> "nickname only"; viaServices -> "signed in through NickServ"; else -> "SASL authenticated" }}")
                         } }

@@ -178,6 +178,7 @@ import ohi.andre.consolelauncher.managers.termux.TerminalGridView
 import ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceLauncherManager
 import ohi.andre.consolelauncher.managers.widgets.AndroidWidgetDrawerManager
 import ohi.andre.consolelauncher.managers.ui.AppDrawerPaneManager
+import ohi.andre.consolelauncher.managers.ui.SearchModuleCarousel
 import ohi.andre.consolelauncher.managers.ui.OverlayLayoutManager
 import ohi.andre.consolelauncher.managers.lua.LuaWidgetEngine
 import ohi.andre.consolelauncher.managers.lua.LuaWidgetEngine.UpdateListener
@@ -1050,9 +1051,10 @@ class UIManager(
     }
 
     private fun showTerminalSearch(show: Boolean) {
+        if (!show) searchModules?.close(backToSearch = false)
         terminalSearchOpen = show
         terminalHome?.releaseInput()
-        configureSearchOnlyLayout()
+        configureSearchOnlyLayout(closeDrawers = true)
         terminalHomeDim?.visibility = if (show) View.VISIBLE else View.GONE
         if (android.os.Build.VERSION.SDK_INT >= 31) {
             terminalHome?.setRenderEffect(if (show) android.graphics.RenderEffect.createBlurEffect(18f, 18f, android.graphics.Shader.TileMode.CLAMP) else null)
@@ -1076,6 +1078,12 @@ class UIManager(
 
     private val viewPager: ViewPager2
     private var homeModulesContainer: ViewGroup? = null
+    // Search and Terminal modes show dock modules in a carousel over the blurred wallpaper; while it is open,
+    // module rendering targets the carousel instead of Classic's home page.
+    private var searchModules: SearchModuleCarousel? = null
+    private var classicModulesContainer: ViewGroup? = null
+    private var searchModulesExtra: String? = null
+    val isSearchModulesOpen: Boolean get() = searchModules?.isOpen == true
     private var mainContainer: View? = null
     private var headerContainer: ViewGroup? = null
     private var unifiedBottomConsole: ViewGroup? = null
@@ -1189,6 +1197,7 @@ class UIManager(
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
+                if (!s.isNullOrEmpty() && inputView.hasFocus() && isSearchModulesOpen) searchModules?.close(backToSearch = false)
                 if (LauncherMode.isTerminal() && terminalHome != null && !terminalSearchOpen && inputView.hasFocus() && !s.isNullOrEmpty())
                     showTerminalSearch(true)
             }
@@ -1642,7 +1651,7 @@ class UIManager(
             if (landscapeLayoutActive || mainContainer!!.parent !== mRootView || terminalTrayContainer!!.parent !== mRootView) {
                 restorePortraitLayout()
             }
-            configureSearchOnlyLayout()
+            configureSearchOnlyLayout(closeDrawers = true)
             applyDisplayMarginsForConfiguration(configuration)
             return
         }
@@ -2291,6 +2300,7 @@ class UIManager(
             return
         }
         terminalTrayExpanded = expanded
+        if (expanded) outputUnread = false
         saveTerminalTrayState()
         if (this.isOutputAutoHideEnabled && expanded) {
             scheduleTerminalOutputAutoHide()
@@ -2308,6 +2318,15 @@ class UIManager(
         if (this.isOutputAutoHideEnabled) {
             terminalTrayExpanded = !output.isNullOrEmpty()
             if (terminalTrayExpanded) scheduleTerminalOutputAutoHide() else cancelTerminalOutputAutoHide()
+        }
+        val unread = when {
+            output.isNullOrEmpty() -> false
+            this.isOutputTrayToggledMode && !this.isOutputAutoHideEnabled && !terminalTrayExpanded -> outputUnread || !appended.isNullOrBlank()
+            else -> false
+        }
+        if (unread != outputUnread) {
+            outputUnread = unread
+            updateTerminalTrayToggleText()
         }
         applyTerminalTrayState(false)
     }
@@ -2453,7 +2472,9 @@ class UIManager(
             if (maxPx > 0) min(room, maxPx) else room,
             room,
             calculateHeaderOnlyTerminalTrayHeight(),
-            !this.isOutputAutoHideEnabled && (this.isOutputTrayNativeMode || this.isOutputTrayAutoMode)
+            !this.isOutputAutoHideEnabled && (this.isOutputTrayNativeMode || this.isOutputTrayAutoMode),
+            ohi.andre.consolelauncher.presentation.TerminalTrayPresentation.minimumOpen(terminalOutputChromeHeight(),
+                max(UIUtils.dpToPx(mContext!!, 18), terminalView?.lineHeight ?: 0))
         )
         val targetHeight = constrainTerminalOutputHeight(
             fittedHeight,
@@ -2477,8 +2498,11 @@ class UIManager(
         }
     }
 
-    private fun configureSearchOnlyLayout() {
+    // Output, typing and theme refreshes re-apply this layout too; only a real layout change ([closeDrawers]) may close
+    // a drawer the user opened, such as apps -ls in Search or Terminal mode.
+    private fun configureSearchOnlyLayout(closeDrawers: Boolean = false) {
         val root=mRootView as? ViewGroup ?: return
+        if (!closeDrawers && (isAppsDrawerOpen || isAndroidWidgetDrawerOpen)) return
         ohi.andre.consolelauncher.presentation.HomeLayoutPresentation.configureSearch(root,
             (statusAppearance ?: ohi.andre.consolelauncher.presentation.HomeAppearance.saved()))
         appDrawerPaneManager?.hide()
@@ -2510,11 +2534,59 @@ class UIManager(
         }
     }
 
+    /** Opens [module] (or the last one) under the MODULES chips in the results; says so when the dock has no modules. */
+    fun openSearchModules(module: String?, toggle: Boolean = false): Boolean {
+        if (!searchOnlyMode) return false
+        val id = module?.let { ModuleManager.normalize(it) }?.takeIf { ModuleManager.isKnown(mContext, it) }
+        val slot = searchModules ?: SearchModuleCarousel(mContext as Activity,
+            dock = { (ModuleManager.getDock(mContext).filterNotNull().filter { it.isNotEmpty() } + listOfNotNull(searchModulesExtra)).distinct() },
+            render = { target, container ->
+                if (homeModulesContainer !== container) { classicModulesContainer = homeModulesContainer; homeModulesContainer = container }
+                showHomeModule(target)
+            },
+            changed = {
+                suggestionsManager?.refreshSearchResults()
+                // Bring the open module into view. Not fullScroll: outside touch mode it moves focus.
+                mRootView?.findViewById<ScrollView>(R.id.search_mode_results_scroll)?.let { results ->
+                    results.post { searchModules?.view?.takeIf { it.isAttachedToWindow }?.let { module ->
+                        val bottom = generateSequence(module) { it.parent as? View }.takeWhile { it !== results }.sumOf { it.top } + module.height
+                        results.scrollTo(0, (bottom - results.height + results.paddingBottom).coerceAtLeast(0))
+                    } }
+                }
+            },
+            closed = { backToSearch ->
+                closeHomeModule()
+                homeModulesContainer = classicModulesContainer
+                searchModulesExtra = null
+                // Opening the module put the keyboard away; closing it returns to the search as it was.
+                if (backToSearch) activateTerminalInput(true)
+            },
+            behind = { listOfNotNull(terminalHome) }
+        ).also { slot ->
+            searchModules = slot
+            suggestionsManager?.openModule = { slot.current?.takeIf { slot.isOpen }?.let { it to slot.view } }
+        }
+        if (toggle && id != null && slot.isOpen && slot.current == id) { slot.close(); return true }
+        searchModulesExtra = id?.takeIf { it !in ModuleManager.getDock(mContext) }
+        // The module opens in the results layer: Terminal mode shows its search overlay for it.
+        if (LauncherMode.isTerminal() && !terminalSearchOpen) showTerminalSearch(true)
+        // The keyboard would leave the module little room; the search bar stays.
+        closeKeyboard()
+        if (!slot.open(id)) {
+            Tuils.sendOutput(mContext, mContext.getString(R.string.search_modules_empty))
+            return false
+        }
+        return true
+    }
+
     private fun calculateExpandedTerminalTrayHeight(rootHeight: Int, collapsedHeight: Int): Int {
         val limit=ohi.andre.consolelauncher.presentation.TerminalTrayPresentation.expandedLimit(rootHeight,collapsedHeight,keyboardVisible,
             UIUtils.dpToPx(mContext!!,if(keyboardVisible) 220 else 320),UIUtils.dpToPx(mContext!!,outputTrayMaxHeightDp()))
         return calculateNativeTerminalTrayHeight(limit)
     }
+
+    // Output arrived while the toggled pane was closed; cleared when it opens.
+    private var outputUnread = false
 
     private fun updateTerminalTrayToggleText() {
         TerminalTrayToggleView.updateText(
@@ -2527,7 +2599,8 @@ class UIManager(
             this.isOutputTrayNativeMode,
             this.isOutputTrayAutoMode,
             this.isOutputAutoHideEnabled,
-            getColor(Theme.tab_text_color)
+            getColor(Theme.tab_text_color),
+            outputUnread
         )
     }
 
@@ -4327,6 +4400,8 @@ class UIManager(
     }
 
     private fun closeHomeModule() {
+        // A module's own close button in the carousel closes the carousel (which then closes the module).
+        if (isSearchModulesOpen) { searchModules?.close(); return }
         val dockScrollX = consumeModuleDockScrollX()
         if (handler != null) {
             handler!!.removeCallbacks(eventsRefreshRunnable)
@@ -4583,6 +4658,7 @@ class UIManager(
         val module = intent.getStringExtra(EXTRA_MODULE_NAME)
 
         if ("rebuild" == command) {
+            searchModules?.refresh()
             rebuildModuleDock()
             if (homeModulesContainer != null && !TextUtils.isEmpty(activeModule) && ModuleManager.getDock(
                     mContext
@@ -4591,9 +4667,11 @@ class UIManager(
                 showHomeModule(activeModule)
             }
         } else if ("show" == command) {
-            showHomeModule(module)
+            if (searchOnlyMode) openSearchModules(module) else showHomeModule(module)
+        } else if ("search_toggle" == command) {
+            openSearchModules(module, toggle = true)
         } else if ("close" == command) {
-            closeHomeModule()
+            if (isSearchModulesOpen) searchModules?.close() else closeHomeModule()
         } else if ("update" == command) {
             if (!TextUtils.isEmpty(module) && module == activeModule) {
                 showHomeModule(module)
@@ -5781,6 +5859,9 @@ class UIManager(
                 } else if (action == ACTION_CLEAR) {
                     mTerminalAdapter!!.clear()
                     if (suggestionsManager != null) suggestionsManager!!.requestSuggestion(Tuils.EMPTYSTRING)
+                    // Search and Terminal modes draw the "$ clear" echo into their output card from a queued update;
+                    // clear that card after it lands.
+                    if (searchOnlyMode) terminalContainer?.post { suggestionsManager?.requestSuggestion(Tuils.EMPTYSTRING) }
                 } else if (action == ACTION_HACK) {
                     playHackOverlay()
                 } else if (action == ACTION_WEATHER) {
@@ -12662,9 +12743,9 @@ class UIManager(
     }
 
     @JvmOverloads
-    fun showAppsDrawer(filter: String? = null) {
+    fun showAppsDrawer(filter: String? = null, ranking: ohi.andre.consolelauncher.managers.AppsManager.Ranking? = null, limit: Int = 500) {
         androidWidgetDrawerManager?.hide()
-        appDrawerPaneManager?.show(filter)
+        appDrawerPaneManager?.show(filter, ranking, limit)
         scheduleTypefaceRefreshes()
     }
 
@@ -12948,10 +13029,6 @@ class UIManager(
     }
 
     fun onBackPressed() {
-        if (LauncherMode.isTerminal()) {
-            if (terminalSearchOpen) showTerminalSearch(false) else terminalHome?.releaseInput()
-            return
-        }
         if (handleTermuxBackPressed()) {
             return
         }
@@ -12972,6 +13049,15 @@ class UIManager(
         }
         if (this.isAppsDrawerOpen) {
             hideAppsDrawer()
+            return
+        }
+        if (isSearchModulesOpen) {
+            searchModules?.close()
+            return
+        }
+        // Surfaces opened by commands (podcast, profile, drawers) close first in every mode.
+        if (LauncherMode.isTerminal()) {
+            if (terminalSearchOpen) showTerminalSearch(false) else terminalHome?.releaseInput()
             return
         }
         if (this.isOutputTrayToggleEnabled && terminalTrayExpanded) {

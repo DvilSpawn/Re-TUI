@@ -320,9 +320,9 @@
         \nHome aliases expand before built-in commands; avoid conflicting names. Script aliases execute code through Termux; inspect the script first.
     </string>
     <string name="help_apps">-ls [filter] -> open the app drawer, optionally showing only apps matching a name or what they do (music, maps, camera)
-        \n-r [count] -> apps you opened most recently from Re:TUI (default 10)
-        \n-n [count] -> newest installed apps (default 10)
-        \n-u [count] -> your most-used apps (default 10)
+        \n-r [count] -> open the app drawer with the apps you opened from Re:TUI most recently first
+        \n-n [count] -> open the app drawer with the newest installed apps first
+        \n-u [count] -> open the app drawer with your most-used apps first
         \n-lsh -> list your hidden apps
         \n-show [appName] -> re-show an hidden app
         \n-hide [appName] -> hide an app
@@ -343,6 +343,11 @@
         \n-tutorial -> open the external Apps guide on re-tui.pages.dev (network)
     </string>
     <string name="apps_ranked_none">No app launches recorded yet. Apps you open from Re:TUI appear here.</string>
+    <string name="search_modules_empty">Your module dock is empty. module -ls lists modules you can add to it.</string>
+    <string name="output_header_unread">%1$s, new output</string>
+    <string name="apps_drawer_recent">Recently opened · %1$d (tap for A–Z)</string>
+    <string name="apps_drawer_newest">Newest installed · %1$d (tap for A–Z)</string>
+    <string name="apps_drawer_most_used">Most used · %1$d (tap for A–Z)</string>
     <string name="apps_ranked_just_now">just now</string>
     <plurals name="apps_ranked_launches">
         <item quantity="one">%1$d launch</item>

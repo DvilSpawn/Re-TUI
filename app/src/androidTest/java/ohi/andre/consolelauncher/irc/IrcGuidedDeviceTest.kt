@@ -79,10 +79,16 @@ class IrcGuidedDeviceTest {
         override fun close() { socket?.close(); server.close(); worker.join(5000) }
     }
     /** Each test starts from no saved networks: the first-run Libera.Chat entry, unsaved. */
-    @Before fun forgetSavedNetworks() { File(instrumentation.targetContext.noBackupFilesDir, "irc-networks.json").delete() }
+    @Before fun forgetSavedNetworks() {
+        // The session outlives each pane, as it does in the app; every test starts from a fresh one.
+        instrumentation.runOnMainSync { IrcTerminalSession.reset() }
+        File(instrumentation.targetContext.noBackupFilesDir, "irc-networks.json").delete()
+    }
     /** The fixture network rejoins #retui, as a network the user had joined it on would. */
     private fun rejoin(a: IrcActivity) = a.session.active.update(a.session.active.network.copy(channels = listOf("#retui")))
     private fun start(): IrcActivity {
+        // Each pane in these tests stands for a fresh app process, as the pane-owned session used to be.
+        instrumentation.runOnMainSync { IrcTerminalSession.reset() }
         val a = instrumentation.startActivitySync(Intent(instrumentation.targetContext, IrcActivity::class.java).putExtra("irc_offline_fixture", true).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) as IrcActivity
         waitFor { var resumed = false; main { resumed = a.lifecycle.currentState == androidx.lifecycle.Lifecycle.State.RESUMED && a.onBackPressedDispatcher.hasEnabledCallbacks() }; resumed }
         return a
@@ -555,4 +561,40 @@ class IrcGuidedDeviceTest {
             capture(activity, "narrow-large-font")
         } finally { main { a?.finish(); LauncherSettings.set(context, Ui.font_size_offset, original) }; instrumentation.waitForIdleSync() }
     }
+    @Test fun stayConnectedKeepsNetworksAfterThePaneClosesAndNotifiesMentions() {
+        val context = instrumentation.targetContext
+        if (android.os.Build.VERSION.SDK_INT >= 33) instrumentation.uiAutomation.grantRuntimePermission(context.packageName, android.Manifest.permission.POST_NOTIFICATIONS)
+        val notifications = context.getSystemService(android.app.NotificationManager::class.java)
+        val a = start()
+        Peer().use { peer ->
+            try {
+                main {
+                    a.session.connector = { _, _ -> Socket("127.0.0.1", peer.server.localPort) }; rejoin(a)
+                    a.session.account = "fixture"; a.session.state.nickname = "fixture"
+                    a.session.stayConnected = true
+                    a.session.connect("fixture-only-password".toCharArray())
+                }
+                waitFor { a.session.state.active.name == "#retui" && a.session.state.active.joined }
+                main { a.onBackPressedDispatcher.onBackPressed() }
+                waitFor { a.isDestroyed }
+                val session = IrcTerminalSession.get(context)
+                // Still connected, marked away, kept alive by the service's notification.
+                assertTrue(session.active.ready)
+                waitFor { peer.frames.any { it.command == "AWAY" && it.params.isNotEmpty() } }
+                waitFor { notifications.activeNotifications.any { it.id == 7301 } }
+                main { session.connections.first().state.receive(IrcMessage.parse(":alice!u@x PRIVMSG #retui :fixture, are you around?")) }
+                waitFor { notifications.activeNotifications.any { it.notification.extras.getCharSequence("android.text")?.contains("are you around?") == true } }
+                // Opening the pane again: back from away, mention notifications cleared.
+                val b = instrumentation.startActivitySync(Intent(context, IrcActivity::class.java).putExtra("irc_offline_fixture", true).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) as IrcActivity
+                waitFor { peer.frames.any { it.command == "AWAY" && it.params.isEmpty() } }
+                waitFor { notifications.activeNotifications.none { it.notification.extras.getCharSequence("android.text")?.contains("are you around?") == true } }
+                main { b.finish() }
+                waitFor { b.isDestroyed }
+                main { session.disconnectAll() }
+                waitFor { notifications.activeNotifications.none { it.id == 7301 } }
+                assertFalse(session.connections.any { it.busy })
+            } finally { main { IrcTerminalSession.get(context).stayConnected = false; IrcTerminalSession.reset() }; instrumentation.waitForIdleSync() }
+        }
+    }
 }
+

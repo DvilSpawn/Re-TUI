@@ -94,12 +94,25 @@
     <string name="irc_forget_device">Forget this device</string>
     <string name="irc_forget_explanation">Remove the sign-in key from this phone? The network may still list its certificate, but it can no longer be used. You can remove it there with NickServ CERT DEL.</string>
     <string name="irc_device_forgotten">Device key removed from this phone. Sign in with your password next time.</string>
+    <string name="irc_stay_connected">Stay connected in background</string>
+    <string name="irc_stay_connected_explanation">Keeps your networks connected after the pane closes, shows a notification while they are, marks you away and notifies you of mentions and private messages. Uses some battery.</string>
+    <string name="irc_stay_connected_on">Staying connected after the pane closes. Mentions and private messages will notify you.</string>
+    <string name="irc_stay_connected_off">Leaving the pane disconnects again.</string>
+    <string name="irc_stay_connected_no_notifications">Notifications are off for Re:TUI, so mentions will not alert you. Allow them in Android settings.</string>
+    <string name="irc_service_channel">IRC connection</string>
+    <string name="irc_mentions_channel">IRC mentions and private messages</string>
+    <string name="irc_service_title">IRC</string>
+    <string name="irc_service_connected">Connected · %1$s</string>
+    <string name="irc_service_connected_some">Connected · %1$s · %2$d reconnecting</string>
+    <string name="irc_service_reconnecting">Reconnecting…</string>
+    <string name="irc_service_disconnect">Disconnect</string>
     <string-array name="irc_commands">
         <item>Connection</item>
         <item>/network — list your networks and switch between them</item>
         <item>/network add hostname [TLS-port] — add a network</item>
         <item>/network next|prev|name — switch network (Alt+←/→)</item>
         <item>/split [auto|side|stack|off] — show a second conversation beside this one</item>
+        <item>/background [on|off] — stay connected after the pane closes, with mention notifications</item>
         <item>/server hostname [TLS-port] — change this network\'s server while disconnected</item>
         <item>/nick nickname — choose your display name</item>
         <item>/connect — connect; account login asks for a masked password</item>
@@ -131,5 +144,5 @@
         <item>/help — open short, local help</item>
         <item>//text — send /text literally</item>
     </string-array>
-    <string name="irc_help">IRC client — one or more TLS networks at once.\n/network · /network add host [port] · /network next|prev|name (Alt+←/→)\n/server [host] [TLS port] · /nick nickname · /connect · /login account (masked SASL password)\n/register [email] (guided signup offline where supported; masked NickServ password when connected)\n/join #channel · /j #channel · /part [#channel]\n/window [number|name|next|prev|close] · /buffer is an alias\n/query nick · /msg nick text · /me action · /names · /list\n/topic [text] · /whois nick · /mode target modes · /kick nick [reason]\n/oper name (masked password) · /disconnect · /quit · /clear · /help\nPlain text goes only to the active joined channel or query. //text sends /text literally. Unknown commands never become messages or launcher commands.\nWindow markers: + unread · ! mention/private message. The first chip names the network; its marker counts messages on your other networks.\n/split [auto|side|stack|off] shows a second conversation, from any network, beside the one you type into (▶). Tap a tile\'s label to choose what it shows, or hold a conversation chip; tap a tile to type into it.\nEach network rejoins the channels you were in. A dropped connection reconnects by itself when it needs no password. Passwords are never saved or shown. TLS is verified; no plaintext fallback.\nServer-readable, not end-to-end encrypted. On supported networks, rejoining loads up to 100 recent channel messages. There is no push or background service; leaving disconnects. Unconfirmed messages are never retried automatically.</string>
+    <string name="irc_help">IRC client — one or more TLS networks at once.\n/network · /network add host [port] · /network next|prev|name (Alt+←/→)\n/server [host] [TLS port] · /nick nickname · /connect · /login account (masked SASL password)\n/register [email] (guided signup offline where supported; masked NickServ password when connected)\n/join #channel · /j #channel · /part [#channel]\n/window [number|name|next|prev|close] · /buffer is an alias\n/query nick · /msg nick text · /me action · /names · /list\n/topic [text] · /whois nick · /mode target modes · /kick nick [reason]\n/oper name (masked password) · /disconnect · /quit · /clear · /help\nPlain text goes only to the active joined channel or query. //text sends /text literally. Unknown commands never become messages or launcher commands.\nWindow markers: + unread · ! mention/private message. The first chip names the network; its marker counts messages on your other networks.\n/split [auto|side|stack|off] shows a second conversation, from any network, beside the one you type into (▶). Tap a tile\'s label to choose what it shows, or hold a conversation chip; tap a tile to type into it.\nEach network rejoins the channels you were in. A dropped connection reconnects by itself when it needs no password. Passwords are never saved or shown. TLS is verified; no plaintext fallback.\nServer-readable, not end-to-end encrypted. On supported networks, rejoining loads up to 100 recent channel messages. Leaving disconnects unless /background is on: then networks stay connected in a notification, you show as away, and mentions and private messages notify you. Unconfirmed messages are never retried automatically.</string>
 </resources>

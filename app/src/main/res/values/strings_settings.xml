@@ -176,7 +176,7 @@
     <!-- Behavior.kt: weather_location -->
     <string name="setting_behavior_weather_location_description" formatted="false">"Place name or fixed coordinates separated by a comma (lat,lon). Weather never requests device location."</string>
     <!-- Behavior.kt: weather_format -->
-    <string name="setting_behavior_weather_format_description" formatted="false">"The format used to show the weather"</string>
+    <string name="setting_behavior_weather_format_description" formatted="false">"The format used to show the weather. Placeholders: %name (place), %main or %description (conditions), %temp, %temp_min and %temp_max (next 24 hours), %rain (next hour), %humidity, %speed (wind), %deg (wind direction), %pressure, %clouds"</string>
     <!-- Behavior.kt: clear_on_lock -->
     <string name="setting_behavior_clear_on_lock_description" formatted="false">"If true, Re:T-UI will clear the screen when you lock the phone"</string>
     <!-- Behavior.kt: unlock_counter_format -->

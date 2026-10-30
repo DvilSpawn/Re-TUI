@@ -17,6 +17,7 @@ import ohi.andre.consolelauncher.help.WindowPreferencesRule
 import ohi.andre.consolelauncher.managers.suggestions.SuggestionChipStyler
 import ohi.andre.consolelauncher.tuils.Tuils
 import org.junit.Assert.*
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import java.io.File
@@ -25,6 +26,8 @@ import java.io.File
 class IrcTerminalDeviceTest {
     @get:Rule val windows = WindowPreferencesRule()
     private val instrumentation = InstrumentationRegistry.getInstrumentation()
+    // The session outlives each pane, as it does in the app; every test starts from a fresh one.
+    @Before fun freshSession() = instrumentation.runOnMainSync { IrcTerminalSession.reset() }
     private fun check(block: (IrcActivity) -> Unit) {
         val activity = instrumentation.startActivitySync(Intent(instrumentation.targetContext, IrcActivity::class.java)
             .putExtra("irc_offline_fixture", true).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) as IrcActivity

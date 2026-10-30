@@ -31,6 +31,16 @@ internal object WeatherResponseParser {
             readNumber(document, "$details.wind_speed")?.let {
                 values["speed"] = number(if (temperatureMeasure == "imperial") it * 2.236936 else it)
             }
+            // %temp_min / %temp_max: the next 24 hours of the forecast; this feed gives no daily extremes.
+            nextDayRange(document)?.let { (low, high) ->
+                values["temp_min"] = number(convertTemperature(low, temperatureMeasure))
+                values["temp_max"] = number(convertTemperature(high, temperatureMeasure))
+            }
+            // %rain: precipitation expected in the next hour (else the next six), in mm or inches.
+            (readNumber(document, "$.properties.timeseries[0].data.next_1_hours.details.precipitation_amount")
+                ?: readNumber(document, "$.properties.timeseries[0].data.next_6_hours.details.precipitation_amount"))?.let {
+                values["rain"] = number(if (temperatureMeasure == "imperial") it / 25.4 else it)
+            }
             WeatherSnapshot(values, symbol, conditionResource(symbol))
         } catch (_: Exception) {
             null
@@ -119,6 +129,22 @@ internal object WeatherResponseParser {
             symbol == "clearsky" -> R.string.weather_condition_clearsky
             else -> R.string.weather_condition_unknown
         }
+    }
+
+    /** Lowest and highest forecast temperature within 24 hours of the first entry, in Celsius. */
+    private fun nextDayRange(document: com.jayway.jsonpath.DocumentContext): Pair<Double, Double>? = try {
+        val times = document.read<List<String>>("$.properties.timeseries[*].time")
+        val entries = document.read<List<Map<String, Any?>>>("$.properties.timeseries[*].data.instant.details")
+        val format = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US).apply { timeZone = java.util.TimeZone.getTimeZone("UTC") }
+        val start = times.firstOrNull()?.let { format.parse(it.removeSuffix("Z"))?.time }
+        val temperatures = times.indices.mapNotNull { index ->
+            val time = format.parse(times[index].removeSuffix("Z"))?.time ?: return@mapNotNull null
+            if (start == null || time - start >= 24 * 3_600_000L) return@mapNotNull null
+            (entries.getOrNull(index)?.get("air_temperature") as? Number)?.toDouble()
+        }
+        if (temperatures.isEmpty()) null else temperatures.min() to temperatures.max()
+    } catch (_: Exception) {
+        null
     }
 
     private fun convertTemperature(celsius: Double, measure: String): Double = when (measure) {

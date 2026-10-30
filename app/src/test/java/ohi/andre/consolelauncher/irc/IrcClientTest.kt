@@ -324,4 +324,27 @@ class IrcClientTest {
             } finally { c.close(); fixture.join(5000) }
         }
     }
+    @Test fun silentConnectionIsPingedThenDroppedInsteadOfHangingForever() {
+        val previous = IrcClient.keepAliveMs
+        IrcClient.keepAliveMs = 300
+        ServerSocket(0).use { server ->
+            val sent = CopyOnWriteArrayList<String>(); val dropped = CountDownLatch(1); val text = java.util.concurrent.atomic.AtomicReference("")
+            val fixture = thread {
+                server.accept().use { peer ->
+                    peer.soTimeout = 5000; val reader = peer.getInputStream().bufferedReader(); val writer = peer.getOutputStream().bufferedWriter()
+                    repeat(3) { sent.add(reader.readLine()) }
+                    writer.write(":s CAP * LS :\r\n:s 001 test :Welcome\r\n"); writer.flush()
+                    // Then the network goes quiet: no PONG, no traffic.
+                    while (true) { val line = runCatching { reader.readLine() }.getOrNull() ?: break; sent.add(line) }
+                }
+            }
+            val c = IrcClient("localhost", server.localPort, "test", "", charArrayOf(), {}, { ok, t -> if (!ok && t.startsWith("Disconnected")) { text.set(t); dropped.countDown() } },
+                { _, port -> Socket("127.0.0.1", port) })
+            try {
+                c.start(); assertTrue(dropped.await(5, TimeUnit.SECONDS))
+                assertTrue(sent.any { it.startsWith("PING") })
+                assertTrue(text.get().contains("No reply"))
+            } finally { c.close(); IrcClient.keepAliveMs = previous; fixture.join(5000) }
+        }
+    }
 }

@@ -71,8 +71,16 @@ acceptance, not delivery or reading. Uncertain sends are not automatically retri
 TLS is not end-to-end encryption: server operators can read messages and see
 connection addresses.
 
-Back first leaves temporary navigation, then closes the pane and disconnects every network.
-There is no background IRC service, push or persistent local transcript. On servers
+Back first leaves temporary navigation, then closes the pane and disconnects every network,
+unless **Stay connected in background** is on (Networks page, or `/background on`). Then
+a foreground service keeps every network connected with a notification ("IRC · Connected ·
+Libera.Chat, OFTC") and a Disconnect action; you show as away while the pane is closed, and
+mentions and private messages arrive as notifications that open the conversation. It costs
+some battery and needs notification permission for the alerts.
+
+Connections ping the server after 60 seconds of silence and reconnect when there is no reply,
+and a network waiting to reconnect retries as soon as the phone is back online. There is no
+push without a running connection and no persistent transcript on disk. On servers
 offering IRCv3 chat history, each confirmed channel join loads up to 100 recent
 messages (or the server's smaller limit). This includes messages sent while the
 pane was closed. Overlapping history is deduplicated by message ID or server time;

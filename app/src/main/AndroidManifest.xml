@@ -190,6 +190,13 @@
                 android:value="Maintains the launcher console state and provides persistent access to Re:T-UI commands via notification."/>
         </service>
         <service
+            android:name=".irc.IrcConnectionService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_TYPE"
+                android:value="Keeps the user's IRC chat connections open while the chat pane is closed, when the user turns on Stay connected, so they can receive messages and mentions."/>
+        </service>
+        <service
             android:name=".managers.music.MusicService"
             android:enabled="true"
             android:exported="false"

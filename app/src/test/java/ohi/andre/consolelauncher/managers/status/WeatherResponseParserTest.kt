@@ -36,4 +36,26 @@ class WeatherResponseParserTest {
         assertNull(WeatherResponseParser.parseCoordinates("127954"))
         assertNull(WeatherResponseParser.parseCoordinates("91,0"))
     }
+
+    @Test
+    fun nextDayRangeAndRainComeFromTheForecast() {
+        val forecast = """{"properties":{"timeseries":[
+            {"time":"2026-10-30T07:00:00Z","data":{"instant":{"details":{"air_temperature":7.9}},
+              "next_1_hours":{"summary":{"symbol_code":"fog"},"details":{"precipitation_amount":0.4}},
+              "next_6_hours":{"summary":{"symbol_code":"cloudy"},"details":{"precipitation_amount":1.2}}}},
+            {"time":"2026-10-30T13:00:00Z","data":{"instant":{"details":{"air_temperature":11.5}}}},
+            {"time":"2026-10-31T03:00:00Z","data":{"instant":{"details":{"air_temperature":4.2}}}},
+            {"time":"2026-10-31T09:00:00Z","data":{"instant":{"details":{"air_temperature":-3.0}}}}
+        ]}}"""
+        val metric = WeatherResponseParser.parse(forecast, "metric")!!.values
+        // The last entry is 26 hours ahead, outside the next day.
+        assertEquals("4.2", metric["temp_min"])
+        assertEquals("11.5", metric["temp_max"])
+        assertEquals("0.4", metric["rain"])
+        val imperial = WeatherResponseParser.parse(forecast, "imperial")!!.values
+        assertEquals("39.6", imperial["temp_min"])
+        assertEquals("52.7", imperial["temp_max"])
+        // Without them the placeholders stay unset rather than wrong.
+        assertNull(WeatherResponseParser.parse(response, "metric")!!.values["rain"])
+    }
 }

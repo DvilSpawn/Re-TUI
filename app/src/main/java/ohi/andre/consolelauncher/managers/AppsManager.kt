@@ -1226,24 +1226,34 @@ class AppsManager(context: Context) : XMLPrefsElement {
 
     enum class Ranking { RECENT, NEWEST, MOST_USED }
 
-    /** apps -r / -n / -u: the top [n] shown apps, each with when it was opened or installed, or how often it was opened. */
-    fun printRanked(ranking: Ranking, n: Int): String {
+    /** apps -r / -n / -u: [apps] ordered by when they were opened or installed, or how often; apps without a value are left out. */
+    fun rankedApps(ranking: Ranking, n: Int = 500, apps: List<LaunchInfo> = shownApps()): List<Pair<LaunchInfo, Long>> {
         val packages = context.packageManager
-        val rows = ranked(shownApps().filter { !it.isPrivateProfile }, n.coerceIn(1, 500)) { app ->
+        return ranked(apps.filter { !it.isPrivateProfile }, n.coerceIn(1, 500)) { app ->
             when (ranking) {
                 Ranking.RECENT -> lastLaunched.getLong(app.write(), 0L).takeIf { it > 0 }
                 Ranking.NEWEST -> app.componentName?.packageName?.let { name -> runCatching { packages.getPackageInfo(name, 0).firstInstallTime }.getOrNull() }
                 Ranking.MOST_USED -> app.launchedTimes.toLong().takeIf { it > 0 }
             }
         }
-        if (rows.isEmpty()) return context.getString(if (ranking == Ranking.NEWEST) R.string.output_appnotfound else R.string.apps_ranked_none)
-        val now = System.currentTimeMillis()
-        return rows.joinToString(Tuils.NEWLINE) { (app, value) ->
-            app.publicLabel + " · " + if (ranking == Ranking.MOST_USED) context.resources.getQuantityString(R.plurals.apps_ranked_launches, value.toInt(), value)
-                else if (now - value < 60_000) context.getString(R.string.apps_ranked_just_now)
-                else android.text.format.DateUtils.getRelativeTimeSpanString(value, now, android.text.format.DateUtils.MINUTE_IN_MILLIS)
-        }
     }
+
+    /** "5 minutes ago" or "3 launches", for a value from [rankedApps]. */
+    fun describeRank(ranking: Ranking, value: Long, now: Long = System.currentTimeMillis()): CharSequence = when {
+        ranking == Ranking.MOST_USED -> context.resources.getQuantityString(R.plurals.apps_ranked_launches, value.toInt(), value)
+        now - value < 60_000 -> context.getString(R.string.apps_ranked_just_now)
+        else -> android.text.format.DateUtils.getRelativeTimeSpanString(value, now, android.text.format.DateUtils.MINUTE_IN_MILLIS)
+    }
+
+    /** Text form of [rankedApps], for when the drawer is not available. */
+    fun printRanked(ranking: Ranking, n: Int): String {
+        val rows = rankedApps(ranking, n)
+        if (rows.isEmpty()) return rankedEmpty(ranking)
+        val now = System.currentTimeMillis()
+        return rows.joinToString(Tuils.NEWLINE) { (app, value) -> app.publicLabel + " · " + describeRank(ranking, value, now) }
+    }
+
+    fun rankedEmpty(ranking: Ranking): String = context.getString(if (ranking == Ranking.NEWEST) R.string.output_appnotfound else R.string.apps_ranked_none)
 
     fun printApps(type: Int, text: String?): String? {
         if (text == null) return printApps(type)

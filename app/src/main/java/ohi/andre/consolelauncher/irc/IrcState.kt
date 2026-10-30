@@ -8,6 +8,7 @@ class IrcState {
     var directoryTruncated = false; private set
     var directoryError = ""; private set
     var conversationVisible = true
+    var onMention: ((Buffer, Line) -> Unit)? = null
     var joining = ""; private set
     var joinError = ""; private set
     fun beginNames(channel: String = active.name) {
@@ -67,8 +68,11 @@ class IrcState {
         if (target.lines.size > 200) target.lines.removeAt(0)
         if (incoming && (current != target.number || !conversationVisible)) {
             target.unread = (target.unread + 1).coerceAtMost(999)
-            target.highlight = target.highlight || !target.name.startsWith('#') && !target.name.startsWith('&') ||
+            val mention = !target.name.startsWith('#') && !target.name.startsWith('&') ||
                 Regex("(?i)(?<![A-Za-z0-9_])${Regex.escape(nickname)}(?![A-Za-z0-9_])").containsMatchIn(line.body)
+            target.highlight = target.highlight || mention
+            // A private message or your nickname, as it arrives; replayed history and the status window never notify.
+            if (mention && !historical && target.number != 1 && line.sender.isNotEmpty()) onMention?.invoke(target, line)
         }
     }
     fun status(text: String, incoming: Boolean = false) { text.lines().take(200).forEach { append(buffers.first(), Line("-!- " + IrcProtocol.display(it)), incoming) } }

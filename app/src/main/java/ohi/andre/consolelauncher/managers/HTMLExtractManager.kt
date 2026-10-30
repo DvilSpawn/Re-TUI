@@ -146,7 +146,10 @@ class HTMLExtractManager(context: Context, client: OkHttpClient) {
                             ) ?: throw IllegalArgumentException(context.getString(R.string.weather_response_invalid))
 
                             val condition = context.getString(snapshot.conditionResource)
-                            val displayValues = snapshot.values + mapOf("main" to condition, "description" to condition)
+                            // %name was the place in the original weather source; MET Norway's forecast has none.
+                            val place = ohi.andre.consolelauncher.managers.status.WeatherManager.placeName(context)
+                            val displayValues = snapshot.values + mapOf("main" to condition, "description" to condition) +
+                                listOfNotNull(place?.let { "name" to it })
                             var o: CharSequence = ohi.andre.consolelauncher.tuils.ThemeColorSpan.text(weatherFormat, Theme.weather_text_color) ?: SpannableString(weatherFormat)
 
                             val m = weatherFormatPattern.matcher(weatherFormat)

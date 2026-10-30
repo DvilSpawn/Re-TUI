@@ -14,8 +14,6 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import android.widget.*
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModelProvider
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.BuildConfig
 import ohi.andre.consolelauncher.commands.tuixt.TuixtLayout
@@ -30,8 +28,19 @@ import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.tuils.*
 
-/** Every saved network's connection. The pane shows one network at a time; the others keep running. */
-class IrcTerminalSession(application: Application) : AndroidViewModel(application) {
+/**
+ * Every saved network's connection, one per app process. The pane shows one network at a time; the others keep
+ * running. With [stayConnected], [IrcConnectionService] keeps them open after the pane closes.
+ */
+class IrcTerminalSession private constructor(private val application: Application) {
+    companion object {
+        @Volatile private var instance: IrcTerminalSession? = null
+        fun get(context: Context): IrcTerminalSession = instance ?: synchronized(this) {
+            instance ?: IrcTerminalSession(context.applicationContext as Application).also { instance = it }
+        }
+        /** Tests start from the saved networks again, as a fresh app process would. */
+        internal fun reset() = synchronized(this) { instance?.let { it.suspendAll(); it.stopWatching() }; instance = null }
+    }
     val devices = IrcDeviceKey(application)
     private val store = IrcNetworkStore(java.io.File(application.noBackupFilesDir, "irc-networks.json"))
     val connections = mutableListOf<IrcConnection>()
@@ -40,7 +49,12 @@ class IrcTerminalSession(application: Application) : AndroidViewModel(applicatio
     val navigation = IrcNavigation { active.state }
     val actions get() = active.actions
     internal var connector: ((String, Int) -> java.net.Socket)? = null
+    // The open pane redraws through [changed]; the background service updates its notification through [service].
     var changed: (() -> Unit)? = null
+    var service: (() -> Unit)? = null
+    // Mentions and private messages while the pane is closed, for the service to notify.
+    var mentioned: ((IrcConnection, IrcState.Buffer, IrcState.Line) -> Unit)? = null
+    private fun dispatch() { changed?.invoke(); service?.invoke(); syncService() }
     var initialized = false
     /** Set once after upgrading from a build that used the retired Re:TUI server. */
     var retiredServer = false
@@ -55,7 +69,10 @@ class IrcTerminalSession(application: Application) : AndroidViewModel(applicatio
         }
         active = connections.first()
     }
-    private fun connection(network: IrcNetwork) = IrcConnection(getApplication(), network, devices, { connector }, { changed?.invoke() }, ::persist)
+    private fun connection(network: IrcNetwork) = IrcConnection(application, network, devices, { connector }, ::dispatch, ::persist).also { c ->
+        c.state.onMention = { buffer, line -> if (!visible) mentioned?.invoke(c, buffer, line) }
+        c.away = !visible && stayConnected
+    }
     private fun persist() { runCatching { store.save(connections.filter { it.stored }.map { it.network }) } }
     private fun keep(connection: IrcConnection) { if (!connection.stored) { connection.stored = true; persist() } }
 
@@ -84,14 +101,58 @@ class IrcTerminalSession(application: Application) : AndroidViewModel(applicatio
             .forEach { connection -> runCatching { connection.reconnect() }.onFailure { connection.state.status(it.message ?: "Could not reconnect") } }
     }
     /** The pane closed. Connections end, but each network remembers whether to reconnect. */
-    fun suspendAll() { connections.forEach { it.suspend() }; initialized = false; changed?.invoke() }
+    fun suspendAll() { connections.forEach { it.suspend() }; initialized = false; dispatch() }
+
+    private val prefs get() = application.getSharedPreferences("irc_pane", 0)
+    /** Keep networks connected after the pane closes, in a foreground service with a notification. */
+    var stayConnected: Boolean
+        get() = prefs.getBoolean("stay_connected", false)
+        set(value) { prefs.edit().putBoolean("stay_connected", value).apply(); syncService() }
+    /** Whether the pane is on screen; while it is not, conversations count unread and mentions notify. */
+    var visible = false; private set
+    /** The pane is on screen again: you are back, and what you open counts as read. */
+    fun foreground() {
+        visible = true
+        connections.forEach { it.away = false; it.state.conversationVisible = it === active && navigation.page == IrcNavigation.Page.CHAT }
+        if (state.conversationVisible) state.acknowledge()
+        IrcConnectionService.clearMentions(application)
+        watch(); syncService()
+    }
+    /** The pane closed. Staying connected marks you away; otherwise every network disconnects. */
+    fun background() {
+        visible = false
+        if (!stayConnected) { suspendAll(); stopWatching(); return }
+        connections.forEach { it.state.conversationVisible = false; it.away = true }
+        dispatch()
+    }
+    /** Ends every connection and the background service (its notification's Disconnect action). */
+    fun disconnectAll() { connections.forEach { it.suspend() }; initialized = false; stopWatching(); dispatch() }
+    private fun syncService() {
+        if (stayConnected && connections.any { it.busy }) IrcConnectionService.start(application)
+        else IrcConnectionService.stop(application)
+    }
+    // The phone coming back online retries waiting networks at once instead of after their back-off.
+    private var networkCallback: android.net.ConnectivityManager.NetworkCallback? = null
+    private fun watch() {
+        if (networkCallback != null || android.os.Build.VERSION.SDK_INT < 24) return
+        val manager = application.getSystemService(android.net.ConnectivityManager::class.java) ?: return
+        val ui = android.os.Handler(android.os.Looper.getMainLooper())
+        networkCallback = object : android.net.ConnectivityManager.NetworkCallback() {
+            override fun onAvailable(network: android.net.Network) { ui.post { connections.forEach { it.networkReturned() } } }
+        }.also { callback -> runCatching { manager.registerDefaultNetworkCallback(callback) }.onFailure { networkCallback = null } }
+    }
+    private fun stopWatching() {
+        val callback = networkCallback ?: return
+        networkCallback = null
+        runCatching { application.getSystemService(android.net.ConnectivityManager::class.java)?.unregisterNetworkCallback(callback) }
+    }
     fun switchTo(connection: IrcConnection) {
         if (connection === active) return
         state.conversationVisible = false
         active = connection
         state.conversationVisible = navigation.page == IrcNavigation.Page.CHAT
         if (state.conversationVisible) state.acknowledge()
-        changed?.invoke()
+        dispatch()
     }
     fun cycle(forward: Boolean) {
         val index = connections.indexOf(active)
@@ -107,7 +168,7 @@ class IrcTerminalSession(application: Application) : AndroidViewModel(applicatio
         val draft = connections.singleOrNull()?.takeIf { !it.stored && it.client == null }
         if (draft != null) connections[0] = connection else connections.add(connection)
         connection.stored = true; persist()
-        if (draft != null) { active = connection; changed?.invoke() } else switchTo(connection)
+        if (draft != null) { active = connection; dispatch() } else switchTo(connection)
         return connection
     }
     fun remove(connection: IrcConnection) {
@@ -118,12 +179,12 @@ class IrcTerminalSession(application: Application) : AndroidViewModel(applicatio
         if (connections.isEmpty()) connections.add(connection(IrcNetwork.PRESETS.first()))
         persist()
         active = connections[index.coerceAtMost(connections.lastIndex)]
-        changed?.invoke()
+        dispatch()
     }
     /** Split view: a second conversation shown beside the one you type into, as in the Termux workspace. */
     enum class Split { OFF, AUTO, SIDE, STACK }
     var split = Split.valueOf(application.getSharedPreferences("irc_pane", 0).getString("split", Split.OFF.name) ?: Split.OFF.name)
-        set(value) { field = value; getApplication<Application>().getSharedPreferences("irc_pane", 0).edit().putString("split", value.name).apply() }
+        set(value) { field = value; prefs.edit().putString("split", value.name).apply() }
     // Which slot the typing conversation fills, so tiles keep their places when focus moves.
     var splitSlot = 0
     var beside: Pair<IrcConnection, String>? = null
@@ -144,7 +205,6 @@ class IrcTerminalSession(application: Application) : AndroidViewModel(applicatio
                 conversation(other to other.state.active) ?: other.state.buffers.firstOrNull { it.number != 1 }?.let { conversation(other to it) }
             }
     }
-    override fun onCleared() { changed = null; connections.forEach { it.suspend() }; super.onCleared() }
 }
 
 /** One transcript, one composer, terminal commands and numbered buffer shortcuts. */
@@ -180,7 +240,7 @@ class IrcActivity : LocalizedComponentActivity() {
         super.onCreate(saved)
         Tuils.init(this); XMLPrefsManager.loadCommons(this); LauncherSystemUi.applyFullscreen(this)
         androidx.core.view.WindowCompat.setDecorFitsSystemWindows(window, false)
-        session = ViewModelProvider(this)[IrcTerminalSession::class.java]
+        session = IrcTerminalSession.get(this)
         // Non-exported debug fixtures must never reconnect a maintainer's real account.
         if (BuildConfig.DEBUG && intent.getBooleanExtra("irc_offline_fixture", false)) session.initialized = true
         val screen = FrameLayout(this).apply { isClickable = true }
@@ -253,7 +313,7 @@ class IrcActivity : LocalizedComponentActivity() {
         }
         style(); setContentView(screen)
         onBackPressedDispatcher.addCallback(this, object : androidx.activity.OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() { if (secretCommand.isNotEmpty()) cancelSecret() else if (navigation.page != IrcNavigation.Page.CHAT) closeNavigation() else { session.suspendAll(); finish() } }
+            override fun handleOnBackPressed() { if (secretCommand.isNotEmpty()) cancelSecret() else if (navigation.page != IrcNavigation.Page.CHAT) closeNavigation() else { if (!session.stayConnected) session.suspendAll(); finish() } }
         })
         scroll.setOnScrollChangeListener { _, _, y, _, _ -> if (!restoringScroll) { if (navigation.page == IrcNavigation.Page.CHAT) session.state.active.scroll = y else navigation.scroll = y } }
         restoringScroll = true
@@ -263,7 +323,33 @@ class IrcActivity : LocalizedComponentActivity() {
     override fun onStart() {
         super.onStart(); session.changed = { render() }
         if (BuildConfig.DEBUG && intent.getBooleanExtra("irc_offline_fixture", false)) session.initialized = true
+        openMention(intent)
+        session.foreground()
         action { session.restore() }; render()
+    }
+    override fun onNewIntent(next: Intent) {
+        super.onNewIntent(next); setIntent(next)
+        if (openMention(next)) { session.foreground(); render() }
+    }
+    private val notificationPermission = registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.RequestPermission()) { granted ->
+        if (!granted) session.state.status(getString(R.string.irc_stay_connected_no_notifications))
+    }
+    private fun setStayConnected(on: Boolean) {
+        session.stayConnected = on
+        session.state.status(getString(if (on) R.string.irc_stay_connected_on else R.string.irc_stay_connected_off))
+        if (on && android.os.Build.VERSION.SDK_INT >= 33 &&
+            checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED
+        ) notificationPermission.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+    }
+    /** A mention notification names the network and conversation to open. */
+    private fun openMention(from: Intent): Boolean {
+        val id = from.getStringExtra(IrcConnectionService.EXTRA_NETWORK) ?: return false
+        from.removeExtra(IrcConnectionService.EXTRA_NETWORK)
+        val connection = session.connections.firstOrNull { it.network.id == id } ?: return false
+        if (navigation.page != IrcNavigation.Page.CHAT) navigation.close()
+        session.switchTo(connection)
+        from.getStringExtra(IrcConnectionService.EXTRA_BUFFER)?.let { runCatching { connection.state.switch(it) } }
+        return true
     }
     override fun onPause() { windowPanel.persist(); super.onPause() }
     override fun onResume() {
@@ -273,7 +359,7 @@ class IrcActivity : LocalizedComponentActivity() {
     override fun onStop() {
         cancelSecret(); session.changed = null
         if (!isChangingConfigurations && navigation.page in listOf(IrcNavigation.Page.ACCOUNT, IrcNavigation.Page.REGISTER)) navigation.close()
-        if (!isChangingConfigurations) session.suspendAll()
+        if (!isChangingConfigurations) session.background()
         super.onStop()
     }
     override fun onSaveInstanceState(out: Bundle) { windowPanel.save(out); super.onSaveInstanceState(out) }
@@ -612,6 +698,8 @@ class IrcActivity : LocalizedComponentActivity() {
                     }
                 }
                 line(label(R.string.irc_add_network)) { openNavigation(IrcNavigation.Page.ADD_NETWORK) }
+                line((if (session.stayConnected) "[✓] " else "[ ] ") + label(R.string.irc_stay_connected)) { setStayConnected(!session.stayConnected); renderNavigation() }
+                line(label(R.string.irc_stay_connected_explanation))
                 if (session.connections.size > 1 || session.active.stored) line(getString(R.string.irc_remove_network, session.active.network.name)) { openNavigation(IrcNavigation.Page.REMOVE_NETWORK) }
             }
             IrcNavigation.Page.ADD_NETWORK -> {
@@ -860,6 +948,14 @@ class IrcActivity : LocalizedComponentActivity() {
                 when (command) {
                     "help" -> { require(rest.isEmpty()); openNavigation(IrcNavigation.Page.HELP); return }
                     "server" -> { check(session.client == null) { "/disconnect before changing servers." }; if (rest.isNotEmpty()) { val (host, port) = server(rest); session.host = host; session.port = port }; session.state.status("Server ${session.host}:${session.port} · verified TLS only") }
+                    "background", "stay" -> {
+                        setStayConnected(when (rest.lowercase(java.util.Locale.ROOT)) {
+                            "" -> !session.stayConnected
+                            "on" -> true
+                            "off" -> false
+                            else -> throw IllegalArgumentException("Use /background, /background on or /background off.")
+                        })
+                    }
                     "split" -> {
                         session.split = when (rest.lowercase(java.util.Locale.ROOT)) {
                             "" -> if (session.split == IrcTerminalSession.Split.OFF) IrcTerminalSession.Split.AUTO else IrcTerminalSession.Split.OFF

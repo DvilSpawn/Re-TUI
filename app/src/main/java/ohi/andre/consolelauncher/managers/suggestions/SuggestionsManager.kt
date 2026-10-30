@@ -153,7 +153,7 @@ class SuggestionsManager(
     private val luaSuggestionEngines = LinkedHashMap<String?, LuaWidgetEngine?>()
     private val suggestionRequestId = AtomicLong(0L)
     private val searchRenderer = searchResultsView?.let {
-        SearchModeResultRenderer(pack, it, ::openSearchResult)
+        SearchModeResultRenderer(pack, it, ::openSearchResult) { openModule() }
     }
     @Volatile private var searchNotifications: List<NotificationService.Notification> = emptyList()
     private var searchInputActive = false
@@ -263,10 +263,16 @@ class SuggestionsManager(
 
     private fun updateSearchResultsVisibility() {
         if (!searchMode) return
-        searchResultsView?.visibility = if (showSearchResults(
+        searchResultsView?.visibility = if (openModule() != null || showSearchResults(
                 searchInputActive, mTerminalAdapter.input.isNotBlank(), !inlineOutput.isNullOrBlank()
             )) View.VISIBLE else View.INVISIBLE
     }
+
+    /** The dock module open in Search results, set by the launcher while one is open. */
+    var openModule: () -> Pair<String, View>? = { null }
+
+    /** Redraws the results for what is typed now, e.g. after a module opened or closed in them. */
+    fun refreshSearchResults() { if (searchMode) requestSuggestion(mTerminalAdapter.input) }
 
     fun refreshSearchAppearance() {
         if (searchMode) searchRenderer?.refreshAppearance()
@@ -728,6 +734,12 @@ class SuggestionsManager(
         lastSuggestionThread!!.start()
     }
 
+    /** Your dock modules, as a MODULES group in Search results. */
+    private fun dockModuleResults(): List<SearchResult> = ModuleManager.getDock(pack.context).filterNotNull().filter { it.isNotEmpty() }.map { id ->
+        val name = ModuleManager.displayName(pack.context, id)
+        SearchResult(name, pack.context.getString(R.string.search_module), SearchResult.TYPE_MODULE, id, "$name $id")
+    }
+
     private fun getEmptySearchModeResults(): List<SearchResult> {
         val counts = noInputCounts ?: return emptyList()
         val results = ArrayList<SearchResult>()
@@ -759,6 +771,8 @@ class SuggestionsManager(
             results.add(SearchResult(name, pack.context.getString(R.string.search_command), SearchResult.TYPE_COMMAND, suggestion, name))
             commandsLeft--
         }
+
+        results.addAll(dockModuleResults())
 
         if (showAppsGpDefault) {
             pack.appsManager.groups.take(counts[Suggestion.TYPE_APPGP]).forEach { group ->
@@ -870,6 +884,7 @@ class SuggestionsManager(
                 "${suggestion.text} ${suggestion.getText()}"
             ))
         }
+        candidates.addAll(dockModuleResults())
         for (group in pack.appsManager.groups) {
             candidates.add(
                 SearchResult(
@@ -961,6 +976,11 @@ class SuggestionsManager(
             SearchResult.TYPE_PARAMETER ->
                 (result.payload as? Suggestion)?.let(::clickSuggestion)
             SearchResult.TYPE_GROUP -> renderGroup(result.payload as? AppsManager.Group)
+            SearchResult.TYPE_MODULE -> (result.payload as? String)?.let { module ->
+                // Opens this module under the MODULES chips (or closes it when already open); swipe for the others.
+                androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(pack.context.applicationContext).sendBroadcast(Intent(ohi.andre.consolelauncher.UIManager.ACTION_MODULE_COMMAND)
+                    .putExtra(ohi.andre.consolelauncher.UIManager.EXTRA_MODULE_COMMAND, "search_toggle").putExtra(ohi.andre.consolelauncher.UIManager.EXTRA_MODULE_NAME, module))
+            }
             SearchResult.TYPE_PROVIDER -> openProvider(result.payload as? ProviderAction)
             SearchResult.TYPE_PERMISSION -> openPermission(result.payload as? String)
             SearchResult.TYPE_CONTACT_ACTION -> openContactAction(result.payload as? ContactAction)
@@ -4853,6 +4873,7 @@ class SuggestionsManager(
             const val TYPE_PERMISSION = 7
             const val TYPE_CONTACT_ACTION = 8
             const val TYPE_PARAMETER = 9
+            const val TYPE_MODULE = 10
         }
     }
 

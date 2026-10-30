@@ -7,6 +7,8 @@
     <string name="search_category_app_groups" formatted="false">"APP GROUPS"</string>
     <string name="search_category_apps" formatted="false">"APPS"</string>
     <string name="search_category_commands" formatted="false">"COMMANDS"</string>
+    <string name="search_category_modules" formatted="false">"MODULES"</string>
+    <string name="search_module" formatted="false">"MODULE"</string>
     <string name="search_category_contact_actions" formatted="false">"CONTACT ACTIONS"</string>
     <string name="search_category_contacts" formatted="false">"CONTACTS"</string>
     <string name="search_category_enable_access" formatted="false">"ENABLE ACCESS"</string>

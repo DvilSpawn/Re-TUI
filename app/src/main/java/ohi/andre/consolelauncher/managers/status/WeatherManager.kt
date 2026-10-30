@@ -125,6 +125,23 @@ class WeatherManager(
             latitude,
             longitude
         )
+        rememberPlace(latitude, longitude)
+    }
+
+    /** Looks up the town at these coordinates once, for %name (MET Norway's forecast carries no place name). */
+    private fun rememberPlace(latitude: Double, longitude: Double) {
+        val key = placeKey(latitude, longitude)
+        val preferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        preferences.edit().putString(CURRENT_PLACE_KEY, key).apply()
+        if (preferences.getString(CACHE_PLACE_KEY, null) == key) return
+        Thread {
+            runCatching {
+                if (!Geocoder.isPresent()) return@runCatching
+                val address = Geocoder(context, Locale.getDefault()).getFromLocation(latitude, longitude, 1)?.firstOrNull() ?: return@runCatching
+                val name = listOf(address.locality, address.subAdminArea, address.adminArea).firstOrNull { !it.isNullOrBlank() } ?: return@runCatching
+                preferences.edit().putString(CACHE_PLACE_KEY, key).putString(CACHE_PLACE, name).apply()
+            }
+        }.start()
     }
 
     fun setDelay(delay: Int) {
@@ -132,6 +149,25 @@ class WeatherManager(
     }
 
     companion object {
+        /**
+         * The weather location's name for %name: the town found for the forecast's coordinates, else the place
+         * name as typed in weather_location (never coordinates).
+         */
+        fun placeName(context: Context): String? {
+            val preferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            val current = preferences.getString(CURRENT_PLACE_KEY, null)
+            if (current != null && preferences.getString(CACHE_PLACE_KEY, null) == current) {
+                preferences.getString(CACHE_PLACE, null)?.let { return it }
+            }
+            val typed = XMLPrefsManager.get(Behavior.weather_location)?.trim()
+            return typed?.takeIf { it.isNotEmpty() && it != "null" && WeatherResponseParser.parseCoordinates(it) == null }
+        }
+
+        internal fun placeKey(latitude: Double, longitude: Double) = String.format(Locale.US, "%.3f,%.3f", latitude, longitude)
+
+        private const val CURRENT_PLACE_KEY = "place_for"
+        private const val CACHE_PLACE_KEY = "place_key"
+        private const val CACHE_PLACE = "place_name"
         private const val PREFS_NAME = "retui_weather"
         private const val CACHE_QUERY = "location_query"
         private const val CACHE_LATITUDE = "latitude"

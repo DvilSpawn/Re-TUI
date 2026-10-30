@@ -45,6 +45,16 @@ class IrcConnection(
     private var reconnectTask: Runnable? = null
 
     val ready get() = client?.ready == true
+    /** Connected, connecting, or waiting to reconnect: something a background service must keep alive. */
+    val busy get() = client != null || reconnectTask != null
+    /** Marked away on the network while nobody is looking at the pane; re-sent after a reconnect. */
+    var away = false
+        set(value) {
+            if (field == value) return
+            field = value
+            if (ready) runCatching { sendAway() }
+        }
+    private fun sendAway() = if (away) send("AWAY", emptyList(), "Away from Re:TUI") else send("AWAY")
     // Conversations only: server notices in the status window are not messages to read.
     val unread get() = state.buffers.filter { it.number != 1 }.sumOf { it.unread }
     val highlighted get() = state.buffers.any { it.number != 1 && it.highlight }
@@ -136,6 +146,7 @@ class IrcConnection(
         connectionText = "Connected · ${network.host}"
         reconnectAttempt = 0
         update(network.copy(nickname = state.nickname, connectOnOpen = true))
+        if (away) runCatching { sendAway() }
         if (enroll) runCatching {
             // A new account's connection carried no certificate, so name its fingerprint (Ergo's format);
             // a password sign-in presented the key, and every services package can add the current one.
@@ -181,6 +192,12 @@ class IrcConnection(
             if (generation == epoch && !ready) runCatching { connect(external = reconnectMode == Mode.DEVICE) }
                 .onFailure { connectionText = "Disconnected · Reconnect to try again"; changed() }
         }.also { ui.postDelayed(it, delay * 1000L) }
+    }
+    /** The phone is online again: a network waiting out its reconnect delay tries now. */
+    fun networkReturned() {
+        val task = reconnectTask ?: return
+        ui.removeCallbacks(task); reconnectAttempt = 0
+        task.run()
     }
     /** Connects the way this network last connected without a password. */
     fun reconnect() {
