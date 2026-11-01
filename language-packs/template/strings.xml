@@ -19,6 +19,12 @@
     <string name="apps_drawer_most_used">Most used · %1$d (tap for A–Z)</string>
     <string name="apps_drawer_newest">Newest installed · %1$d (tap for A–Z)</string>
     <string name="apps_drawer_recent">Recently opened · %1$d (tap for A–Z)</string>
+    <string name="apps_drawer_tab_most_used">TOP</string>
+    <string name="apps_drawer_tab_most_used_description">Most used first</string>
+    <string name="apps_drawer_tab_newest">NEW</string>
+    <string name="apps_drawer_tab_newest_description">Newest installed first</string>
+    <string name="apps_drawer_tab_recent">REC</string>
+    <string name="apps_drawer_tab_recent_description">Recently opened first</string>
     <string name="apps_ranked_just_now">just now</string>
     <plurals name="apps_ranked_launches">
         <item quantity="one">%1$d launch</item>
@@ -47,13 +53,20 @@
     <string name="calculator_category_temperature">Temperature</string>
     <string name="calculator_category_time">Time</string>
     <string name="calculator_category_volume">Volume</string>
+    <string name="calculator_clear_all">Clear history and answer</string>
     <string name="calculator_clear_entry">Clear current entry</string>
     <string name="calculator_clear_history">Clear history</string>
     <string name="calculator_clear_history_confirm">Delete all calculator history? This cannot be undone.</string>
+    <string name="calculator_clear_input">Clear input</string>
     <string name="calculator_converter">Converter</string>
     <string name="calculator_copy">Copy result</string>
     <string name="calculator_degrees">Degrees</string>
     <string name="calculator_delete">Delete</string>
+    <string name="calculator_digit_grouping_indian">Indian · 14,00,000</string>
+    <string name="calculator_digit_grouping_international">International · 1,400,000</string>
+    <string name="calculator_digit_grouping_menu">Digit grouping · %1$s</string>
+    <string name="calculator_digit_grouping_none">None · 1400000</string>
+    <string name="calculator_digit_grouping_title">Digit grouping</string>
     <string name="calculator_div_zero">Cannot divide by zero. Edit the number and try again.</string>
     <string name="calculator_domain">This operation is outside the supported domain.</string>
     <string name="calculator_empty_history">No calculations yet.</string>
@@ -184,7 +197,7 @@ Cancel stops the current calculation. Back closes Help and retains your reading 
     <string name="calculator_standard">Standard</string>
     <string name="calculator_swap">Swap units</string>
     <string name="calculator_symbolic">Symbolic functions</string>
-    <string name="calculator_terminal_help">Enter an expression and press ↵. After a result, +5 or *2 continues it. Use ans only for an explicit reference. Commands: help, clear, exit.</string>
+    <string name="calculator_terminal_help">Enter an expression and press =. C clears what you typed; AC starts over. After a result, +5 or *2 continues it. Use ans only for an explicit reference. Commands: help, clear, exit.</string>
     <string name="calculator_terminal_no_answer">No previous result. Calculate an expression first.</string>
     <string name="calculator_timeout">Calculation timed out. Try a simpler expression.</string>
     <string name="calculator_to">To</string>
@@ -292,6 +305,16 @@ The old Re:TUI chat server is retired. The IRC pane now connects to real IRC net
 - Changes to alias.txt apply as soon as you save, without `restart`.
 - `-tutorial` on every command opens the right guide.
 - In Search and Terminal mode, the app drawer no longer closes on its own, Back closes open panes in Terminal mode, and `clear` also clears the results card.
+
+## V.5.1 · Build 701
+
+- Type text as ASCII art: Settings, Personalization, ASCII Settings, Type text as ASCII. Pick from five fonts with a live preview; saving keeps your previous art as ascii.txt.bak.
+- ASCII effects: print, decrypt, slide, wipe, rain, waves, beams, burn, middleout, colorshift and glitch animate the art each time Home appears. They work on typed, imported and coloured art. Set the speed, loop them with a rest in between, or tap the art to replay.
+- Settings search: a search box in the Settings hub finds any setting by name or description and opens it on its page. `settings clock format` opens Settings with that search.
+- Settings pages: settings that sat in the wrong section moved next to the ones they belong with, for example the alias syntax settings now sit together under Commands.
+- App drawer: REC, NEW and TOP tabs under the groups order the drawer by recently opened, newest installed or most used.
+- Astro Chart: a new monochrome option in the World list shows a black sky with white stars and the planet, station and ships dithered to black and white.
+- Calculator: on the number pad, = now gives the result, C clears what you typed and AC starts over; hold ⌫ to clear the input. Results group their digits as 1,400,000, or as 14,00,000 in lakhs and crores: choose Digit grouping from the calculator's ? menu.
 
 Reopen these notes anytime with the `changelog` command.</string>
     <string name="command_bluetooth_false_4603a">%1$s false</string>
@@ -810,6 +833,11 @@ Timer paused.</string>
     <string name="editor_tuixtactivity_ascii_settings_4a299">ASCII Settings</string>
     <string name="editor_tuixtactivity_ascii_txt_2739a">ASCII TXT</string>
     <string name="editor_tuixtactivity_ascii_txt_saved_55025">ascii.txt saved.</string>
+    <string name="editor_tuixtactivity_ascii_type_text">TYPE TEXT AS ASCII</string>
+    <string name="editor_tuixtactivity_ascii_type_text_hint">Text, e.g. HELLO</string>
+    <string name="editor_tuixtactivity_ascii_type_text_save">Save to ascii.txt</string>
+    <string name="editor_tuixtactivity_ascii_type_text_saved">ascii.txt saved; the previous art is in ascii.txt.bak.</string>
+    <string name="editor_tuixtactivity_ascii_type_text_title">Type text as ASCII</string>
     <string name="editor_tuixtactivity_behavior_70e30">Behavior/ %1$s</string>
     <string name="editor_tuixtactivity_cancel_1507c">CANCEL</string>
     <string name="editor_tuixtactivity_changes_saved_previewing_launcher_8e180">Changes saved. Previewing launcher...</string>
@@ -1471,10 +1499,11 @@ Template tokens: {query}, {query+}, {slug}, {raw}, {url}
 Example: search -add sdw https://stardewvalleywiki.com/{slug} 
 
 Providers open in the one app that can handle their link, otherwise in your browser.</string>
-    <string name="help_settings">Open the Re:T-UI settings/Themer overlay. 
+    <string name="help_settings">Open the Re:T-UI settings/Themer overlay, or search every setting at once. 
 
 Usage: 
-$ settings</string>
+$ settings 
+$ settings clock format</string>
     <string name="help_share">$ share [pathToFile]</string>
     <string name="help_shell">Run an explicit embedded shell command. 
 Usage: 
@@ -2552,7 +2581,11 @@ See app hide/show syntax; choose actual app arguments from completion.
 apps -frc &lt;appName&gt;
 ```
 
-Explicit app launch when a name conflicts; replace the placeholder.</string>
+Explicit app launch when a name conflicts; replace the placeholder.
+
+## Recent, newest and most used
+
+Below the group tabs on the left of the drawer, REC, NEW and TOP order the list by recently opened, newest installed or most used, each with when or how often. They order whichever group is chosen; tap the active one, or the header, to return to A–Z. apps -r, apps -n and apps -u open the drawer in those orders.</string>
     <string name="offline_help_article_app_discovery_title">Find apps and hide launcher entries</string>
     <string name="offline_help_article_app_groups_body">A group is a local launcher collection, not an Android folder or permission boundary. Create a short single-word name, add installed apps with apps -addtogp &lt;group&gt; &lt;app&gt;, then list its members. Choose actual app labels/profile matches through completion. Quoted names with spaces can be saved, but typing them at the home prompt does not select the group correctly.
 
@@ -2638,6 +2671,29 @@ username "Work User" "Desk Phone"
 
 Change displayed prompt labels; quotes keep each label together.</string>
     <string name="offline_help_article_argument_shapes_title">Enter names, text, colors, and booleans</string>
+    <string name="offline_help_article_ascii_effects_body">## Type text as ASCII
+
+Open Settings, then Personalization, ASCII Settings, Type text as ASCII. Type a word or a short line and pick a font: small, standard, slant, mini or shadow. The preview shows the art as the ASCII pane will, shrunk to fit. Save to ascii.txt replaces the art and turns the ASCII pane on; the previous ascii.txt is kept as ascii.txt.bak, so an imported drawing is never lost.
+
+## Effects
+
+An effect animates the ASCII art each time Home appears, then leaves it still: print, decrypt, slide, wipe, rain, waves, beams, burn, middleout, colorshift or glitch. Choose one in the sheet (tap the preview to replay it) or with ascii_effect in ASCII Settings. Effects work on any ascii.txt: typed, imported or coloured. Art with its own ::frame animation keeps that animation instead.
+
+- ascii_effect_speed plays the effect slow, normal or fast.
+- ascii_effect_loop_seconds plays it again after resting that many seconds; 0 plays it once each time Home appears.
+- Tap the ASCII art on Home to replay the effect.
+
+Looping pauses when Home is hidden and after two minutes without a touch, so it never runs unattended. Very large art (over 4,000 characters) stays still.
+
+## Check the settings
+
+```
+config -get ascii_effect
+config -get ascii_effect_speed
+```
+
+These only show the current values. To change them, use ASCII Settings or an explicit config -set.</string>
+    <string name="offline_help_article_ascii_effects_title">Type text as ASCII art and animate it</string>
     <string name="offline_help_article_calculator_editing_limits_body">Tap the calculator input to position the cursor or select text. Function and square-root keys wrap selected text, or insert parentheses with the cursor inside. Backspace deletes the selection or previous character. ABC uses staggered QWERTY rows within the same keypad-height budget as 123, and long input scrolls horizontally. Expressions are limited to 1024 characters. Calculations have a timeout so a long-running expression cannot block the interface indefinitely. Cancel targets the active calculation and late results are ignored. The floating pane enforces minimum sizing for the input, hint and keypad; Calculator stays expanded in landscape. Larger fonts and a smaller screen can reduce the available floating resize range.
 
 ## Examples
@@ -3478,6 +3534,10 @@ This manual is bundled with Launcher and can be read offline. IRC and network se
 
 ## Recent updates
 
+- ASCII art: type text as ASCII art in a choice of fonts, and animate any ASCII art with effects such as decrypt, rain or glitch. Read ASCII art and effects in Appearance.
+- Settings search: find any setting by name or description from the Settings hub, or with settings &lt;words&gt;. Read Settings search in Appearance.
+- App drawer: REC, NEW and TOP tabs under the groups order the drawer by recently opened, newest installed or most used.
+- Astro Chart: choose monochrome in the World list for a black sky and a planet dithered to black and white.
 - Help home: use 10 from any article or topic list to return directly to the main directory.
 - Notes: the library and editor share the terminal pane styling and background blur. Read Notes in Tools.
 - Settings: swipe through Status, Terminal, Music, Help and Calculator previews before saving appearance changes. Read Configuration workflow in Appearance.
@@ -3793,6 +3853,20 @@ search -dd android launcher
 
 Open a DuckDuckGo query if the default dd provider exists.</string>
     <string name="offline_help_article_search_providers_title">Search the web with a named provider</string>
+    <string name="offline_help_article_settings_search_body">## Find any setting
+
+The Settings hub has a search box above its categories. Type a few words, such as clock format, ascii loop or city: every setting on every page is searched by its name and its description, along with hub pages such as Fonts, Presets and Backup. Every word must match somewhere; hits in the name rank first.
+
+Each result shows the setting, where it lives (for example Behavior › behavior.xml › Formats) and the first line of its description. Tap one to open that page showing just that setting. Clear the page's search box to see the whole page again. Back clears the hub search before it closes Settings.
+
+## From the command line
+
+```
+settings clock format
+```
+
+At Launcher Home this opens Settings with that search already filled in. settings on its own opens the hub as before.</string>
+    <string name="offline_help_article_settings_search_title">Search every setting at once</string>
     <string name="offline_help_article_share_retui_body">In Settings choose Create Shareable Configuration, then current active look or a saved local preset. Review selected behavior fields before exporting. The default behavior field set is restricted, but schema 3 explicitly permits user-selected behavior values, including text/commands. Do not call every export anonymous or safe to publish. UI excludes username, deviceName, font_file and legacy auto_color_pick; aliases, notes, notification/reply bindings and callback tokens are not sections of a shareable package.
 Save-document export writes and verifies a ZIP with manifest.txt and sanitized XML, naming it .retui with MIME application/vnd.retui+zip. Sharing afterward uses a privately cached content URI with temporary read permission. Third-party apps may drop the MIME; use the manual import picker if tap-to-open fails.
 Current export code emits theme, optional UI, suggestions and selected behavior; it does not add frame entries, although supported schema-1 imports can include frames. Custom frame packs are not included in this export route. Use this Settings action to export; preset -export is not supported.
@@ -4133,7 +4207,11 @@ Request a manual weather refresh.
 tuiweather -enable
 ```
 
-Show weather; changes setting and reloads launcher.</string>
+Show weather; changes setting and reloads launcher.
+
+## What the weather line shows
+
+weather_format sets the line. Placeholders: %name (the place), %main or %description (conditions), %temp, %temp_min and %temp_max (lowest and highest over the next 24 hours), %rain (expected in the next hour, mm or inches), %humidity, %speed and %deg (wind), %pressure and %clouds. A placeholder the forecast lacks stays empty.</string>
     <string name="offline_help_article_weather_setup_title">Set a weather place without an API key</string>
     <string name="offline_help_article_webhooks_privacy_body">webhook -add saves a name, destination URL and body template in webhooks.xml. Invoking a named webhook renders its arguments and dispatches an asynchronous HTTP POST. Nonempty arguments are saved to recent history before dispatch, including when the request later fails; up to five entries per webhook feed suggestions. JSON templates substitute within parsed values to preserve escaping; plain-text templates use simpler substitution.
 Inspect the endpoint and template before invoking one. Requests can disclose arguments or trigger remote actions. A dispatched request or HTTP response does not prove the remote service performed the action you intended. Personal backups can include webhook definitions and history; treat those archives as private.
@@ -4457,6 +4535,9 @@ Disabling this option hides Re:TUI access; it does not lock Private Space. Save 
     <string name="setting_behavior_ascii_animation_description">If true, Re:T-UI will animate framed content pasted into ascii.txt</string>
     <string name="setting_behavior_ascii_animation_frame_delay_ms_description">Default delay between animated ASCII frames in milliseconds</string>
     <string name="setting_behavior_ascii_animation_max_file_kb_description">Maximum ASCII TXT import size, in KB</string>
+    <string name="setting_behavior_ascii_effect_description">Animates the ASCII art each time Home appears, then leaves it still: print, decrypt, slide, wipe, rain, waves, beams, burn, middleout, colorshift or glitch. Tap the art to replay it. Works with typed, imported and coloured art; art with its own frame animation keeps that instead.</string>
+    <string name="setting_behavior_ascii_effect_loop_seconds_description">Seconds the ASCII effect rests before playing again. 0 plays it once each time Home appears. Looping stops while Home is idle or hidden and resumes when you touch it.</string>
+    <string name="setting_behavior_ascii_effect_speed_description">How fast the ASCII effect plays: slow (half speed), normal or fast (double speed).</string>
     <string name="setting_behavior_auto_hide_output_description">Collapse output to its clickable header after a delay. Disabled when output_header_mode is none</string>
     <string name="setting_behavior_auto_scroll_description">If true, the terminal will be automatically scrolled down when the keyboard is open</string>
     <string name="setting_behavior_auto_show_keyboard_description">If true, your keyboard will be shown everytime you go back to Re:T-UI</string>
@@ -4472,6 +4553,7 @@ Disabling this option hides Re:TUI access; it does not lock Private Space. Save 
     <string name="setting_behavior_breath_out_label">Breath out</string>
     <string name="setting_behavior_breath_out_seconds_description">Idle timeout in seconds before the launcher fades away when Breath out is enabled. Default: 900 seconds. Use a positive number.</string>
     <string name="setting_behavior_breath_out_seconds_label">Breath out timeout (seconds)</string>
+    <string name="setting_behavior_calculator_digit_grouping_description">How the calculator groups digits in results: international (1,400,000), indian (14,00,000, in lakhs and crores) or none (1400000). What you type is unchanged.</string>
     <string name="setting_behavior_clear_after_cmds_description">Auto-clear after n commands (if -1, this feature will be disabled)</string>
     <string name="setting_behavior_clear_after_seconds_description">Auto-clear after n seconds (if -1, this feature will be disabled)</string>
     <string name="setting_behavior_clear_input_after_command_description">Clear the launcher input and refresh suggestions after running a command</string>
@@ -5895,7 +5977,9 @@ PRESETS · THEME · MODULES · TERMINAL OUTPUT</string>
     <string name="themer_save_frame_settings_cd8c7">Save Frame Settings</string>
     <string name="themer_save_preset_008df">Save Preset</string>
     <string name="themer_saved_and_applied_57003">%1$s saved and applied.</string>
+    <string name="themer_search_all_settings">Search all settings…</string>
     <string name="themer_search_apps_ca3ce">Search apps</string>
+    <string name="themer_search_no_results">No setting matches. Try fewer or shorter words.</string>
     <string name="themer_select_and_save_another_font_before_deleting_the_active_fo_add4a">Select and save another font before deleting the active font.</string>
     <string name="themer_select_wallpaper_4842b">Select wallpaper</string>
     <string name="themer_selected_font_is_no_longer_available_b914c">Selected font is no longer available.</string>
@@ -6195,6 +6279,7 @@ Ready for the next command</string>
     <string name="volume_stream_ring">Ring</string>
     <string name="volume_stream_system">System</string>
     <string name="volume_stream_voice_call">Voice call</string>
+    <string name="wallpaper_astro_monochrome">monochrome</string>
     <string name="wallpaper_astro_reseed">RESEED</string>
     <string name="wallpaper_astro_world_label">World</string>
     <string name="wallpaper_black_hole">Black hole</string>

@@ -125,6 +125,48 @@
     },
     "type": "string"
   },
+  "apps_drawer_tab_most_used": {
+    "formatted": true,
+    "forms": {
+      "other": "TOP"
+    },
+    "type": "string"
+  },
+  "apps_drawer_tab_most_used_description": {
+    "formatted": true,
+    "forms": {
+      "other": "Most used first"
+    },
+    "type": "string"
+  },
+  "apps_drawer_tab_newest": {
+    "formatted": true,
+    "forms": {
+      "other": "NEW"
+    },
+    "type": "string"
+  },
+  "apps_drawer_tab_newest_description": {
+    "formatted": true,
+    "forms": {
+      "other": "Newest installed first"
+    },
+    "type": "string"
+  },
+  "apps_drawer_tab_recent": {
+    "formatted": true,
+    "forms": {
+      "other": "REC"
+    },
+    "type": "string"
+  },
+  "apps_drawer_tab_recent_description": {
+    "formatted": true,
+    "forms": {
+      "other": "Recently opened first"
+    },
+    "type": "string"
+  },
   "apps_ranked_just_now": {
     "formatted": true,
     "forms": {
@@ -301,6 +343,13 @@
     },
     "type": "string"
   },
+  "calculator_clear_all": {
+    "formatted": true,
+    "forms": {
+      "other": "Clear history and answer"
+    },
+    "type": "string"
+  },
   "calculator_clear_entry": {
     "formatted": true,
     "forms": {
@@ -319,6 +368,13 @@
     "formatted": true,
     "forms": {
       "other": "Delete all calculator history? This cannot be undone."
+    },
+    "type": "string"
+  },
+  "calculator_clear_input": {
+    "formatted": true,
+    "forms": {
+      "other": "Clear input"
     },
     "type": "string"
   },
@@ -347,6 +403,41 @@
     "formatted": true,
     "forms": {
       "other": "Delete"
+    },
+    "type": "string"
+  },
+  "calculator_digit_grouping_indian": {
+    "formatted": true,
+    "forms": {
+      "other": "Indian · 14,00,000"
+    },
+    "type": "string"
+  },
+  "calculator_digit_grouping_international": {
+    "formatted": true,
+    "forms": {
+      "other": "International · 1,400,000"
+    },
+    "type": "string"
+  },
+  "calculator_digit_grouping_menu": {
+    "formatted": true,
+    "forms": {
+      "other": "Digit grouping · %1$s"
+    },
+    "type": "string"
+  },
+  "calculator_digit_grouping_none": {
+    "formatted": true,
+    "forms": {
+      "other": "None · 1400000"
+    },
+    "type": "string"
+  },
+  "calculator_digit_grouping_title": {
+    "formatted": true,
+    "forms": {
+      "other": "Digit grouping"
     },
     "type": "string"
   },
@@ -731,7 +822,7 @@
   "calculator_terminal_help": {
     "formatted": true,
     "forms": {
-      "other": "Enter an expression and press ↵. After a result, +5 or *2 continues it. Use ans only for an explicit reference. Commands: help, clear, exit."
+      "other": "Enter an expression and press =. C clears what you typed; AC starts over. After a result, +5 or *2 continues it. Use ans only for an explicit reference. Commands: help, clear, exit."
     },
     "type": "string"
   },
@@ -1214,7 +1305,7 @@
   "changelog_release_highlights": {
     "formatted": false,
     "forms": {
-      "other": "Re:TUI V.5 turns IRC into a full client for any network, lets you open your dock modules from Search and Terminal mode, and adds recent, newest and most-used views to the app drawer.\n\n## IRC, rebuilt\n\nThe old Re:TUI chat server is retired. The IRC pane now connects to real IRC networks.\n\n- Pick Libera.Chat, OFTC, Rizon or hackint, or add any server that supports TLS. Connect to several networks at once.\n- Channels open side by side in a Termux-style split view. Tap a pane to start typing in it.\n- Dropped connections reconnect by themselves and rejoin your channels. They also reconnect as soon as your phone is back online.\n- Sign in with your account once, and Re:TUI can remember this phone with a device key, so you don't need the password next time. Where a network has no SASL, sign-in goes through NickServ.\n- If your nickname is taken, Re:TUI tries a variant instead of failing. When sign-in fails, the pane says why, such as a wrong password or an unverified account.\n- **Stay connected:** turn it on in the Networks page or with `/background on`. Your networks stay online after you close the pane, with an ongoing notification and a Disconnect button. Private messages and mentions of your nickname arrive as notifications; tap one to open that conversation.\n\n## Modules in Search and Terminal mode\n\n- Search results have a new **MODULES** group that lists your dock modules.\n- Tap one to open it right under the chips. The wallpaper blurs behind it, and the search bar and other results stay where they are.\n- Swipe sideways or tap another chip to switch modules. Tap the open chip, X or Back to close the module and return to your search.\n\n## Apps\n\n- `apps -r` opens the app drawer with your recently opened apps first, `apps -n` with the newest installed and `apps -u` with the most used. Tap the header to go back to A–Z.\n- The `apps` suggestion chips now lead with the views you use most.\n\n## Output pane\n\n- The output pane always keeps at least three lines, even when modules fill the screen.\n- When the output pane is collapsed, a ! on the OUTPUT tab shows that something new arrived.\n\n## Weather\n\n- `%name` shows your location again.\n- New placeholders for `weather_format`: `%temp_min` and `%temp_max` for the next 24 hours, and `%rain` for the rain expected in the next hour.\n\n## Fixes\n\n- Changes to alias.txt apply as soon as you save, without `restart`.\n- `-tutorial` on every command opens the right guide.\n- In Search and Terminal mode, the app drawer no longer closes on its own, Back closes open panes in Terminal mode, and `clear` also clears the results card.\n\nReopen these notes anytime with the `changelog` command."
+      "other": "Re:TUI V.5 turns IRC into a full client for any network, lets you open your dock modules from Search and Terminal mode, and adds recent, newest and most-used views to the app drawer.\n\n## IRC, rebuilt\n\nThe old Re:TUI chat server is retired. The IRC pane now connects to real IRC networks.\n\n- Pick Libera.Chat, OFTC, Rizon or hackint, or add any server that supports TLS. Connect to several networks at once.\n- Channels open side by side in a Termux-style split view. Tap a pane to start typing in it.\n- Dropped connections reconnect by themselves and rejoin your channels. They also reconnect as soon as your phone is back online.\n- Sign in with your account once, and Re:TUI can remember this phone with a device key, so you don't need the password next time. Where a network has no SASL, sign-in goes through NickServ.\n- If your nickname is taken, Re:TUI tries a variant instead of failing. When sign-in fails, the pane says why, such as a wrong password or an unverified account.\n- **Stay connected:** turn it on in the Networks page or with `/background on`. Your networks stay online after you close the pane, with an ongoing notification and a Disconnect button. Private messages and mentions of your nickname arrive as notifications; tap one to open that conversation.\n\n## Modules in Search and Terminal mode\n\n- Search results have a new **MODULES** group that lists your dock modules.\n- Tap one to open it right under the chips. The wallpaper blurs behind it, and the search bar and other results stay where they are.\n- Swipe sideways or tap another chip to switch modules. Tap the open chip, X or Back to close the module and return to your search.\n\n## Apps\n\n- `apps -r` opens the app drawer with your recently opened apps first, `apps -n` with the newest installed and `apps -u` with the most used. Tap the header to go back to A–Z.\n- The `apps` suggestion chips now lead with the views you use most.\n\n## Output pane\n\n- The output pane always keeps at least three lines, even when modules fill the screen.\n- When the output pane is collapsed, a ! on the OUTPUT tab shows that something new arrived.\n\n## Weather\n\n- `%name` shows your location again.\n- New placeholders for `weather_format`: `%temp_min` and `%temp_max` for the next 24 hours, and `%rain` for the rain expected in the next hour.\n\n## Fixes\n\n- Changes to alias.txt apply as soon as you save, without `restart`.\n- `-tutorial` on every command opens the right guide.\n- In Search and Terminal mode, the app drawer no longer closes on its own, Back closes open panes in Terminal mode, and `clear` also clears the results card.\n\n## V.5.1 · Build 701\n\n- Type text as ASCII art: Settings, Personalization, ASCII Settings, Type text as ASCII. Pick from five fonts with a live preview; saving keeps your previous art as ascii.txt.bak.\n- ASCII effects: print, decrypt, slide, wipe, rain, waves, beams, burn, middleout, colorshift and glitch animate the art each time Home appears. They work on typed, imported and coloured art. Set the speed, loop them with a rest in between, or tap the art to replay.\n- Settings search: a search box in the Settings hub finds any setting by name or description and opens it on its page. `settings clock format` opens Settings with that search.\n- Settings pages: settings that sat in the wrong section moved next to the ones they belong with, for example the alias syntax settings now sit together under Commands.\n- App drawer: REC, NEW and TOP tabs under the groups order the drawer by recently opened, newest installed or most used.\n- Astro Chart: a new monochrome option in the World list shows a black sky with white stars and the planet, station and ships dithered to black and white.\n- Calculator: on the number pad, = now gives the result, C clears what you typed and AC starts over; hold ⌫ to clear the input. Results group their digits as 1,400,000, or as 14,00,000 in lakhs and crores: choose Digit grouping from the calculator's ? menu.\n\nReopen these notes anytime with the `changelog` command."
     },
     "type": "string"
   },
@@ -4279,6 +4370,41 @@
     },
     "type": "string"
   },
+  "editor_tuixtactivity_ascii_type_text": {
+    "formatted": false,
+    "forms": {
+      "other": "TYPE TEXT AS ASCII"
+    },
+    "type": "string"
+  },
+  "editor_tuixtactivity_ascii_type_text_hint": {
+    "formatted": false,
+    "forms": {
+      "other": "Text, e.g. HELLO"
+    },
+    "type": "string"
+  },
+  "editor_tuixtactivity_ascii_type_text_save": {
+    "formatted": false,
+    "forms": {
+      "other": "Save to ascii.txt"
+    },
+    "type": "string"
+  },
+  "editor_tuixtactivity_ascii_type_text_saved": {
+    "formatted": false,
+    "forms": {
+      "other": "ascii.txt saved; the previous art is in ascii.txt.bak."
+    },
+    "type": "string"
+  },
+  "editor_tuixtactivity_ascii_type_text_title": {
+    "formatted": false,
+    "forms": {
+      "other": "Type text as ASCII"
+    },
+    "type": "string"
+  },
   "editor_tuixtactivity_behavior_70e30": {
     "formatted": true,
     "forms": {
@@ -6298,7 +6424,7 @@
   "help_settings": {
     "formatted": true,
     "forms": {
-      "other": "Open the Re:T-UI settings/Themer overlay. \n\nUsage: \n$ settings"
+      "other": "Open the Re:T-UI settings/Themer overlay, or search every setting at once. \n\nUsage: \n$ settings \n$ settings clock format"
     },
     "type": "string"
   },
@@ -11373,7 +11499,7 @@
   "offline_help_article_app_discovery_body": {
     "formatted": false,
     "forms": {
-      "other": "Use apps -ls to browse visible launchable apps in the drawer. Without an active launcher interface it can print a visible-app list; an unavailable drawer does not always trigger that fallback. apps -lsh prints hidden entries and accepts a filter. Choose installed apps through completion: identities can include an activity and Android user profile. apps -frc resolves visible or hidden apps for an explicit launch. App details, Android app settings and store pages are separate actions.\n\nHiding removes an activity from normal launcher choices, not its installation, running state or Android access. apps -show restores a hidden entry. Hidden apps can still open through intents, settings or other launchers. If an app is missing, check hidden entries, profile availability and whether it exposes a launcher activity. Package events refresh the app manager; apps -ls is not a list of every background package.\n\nApp groups and drawer tabs organize entries. Opening the app drawer hides the widgets drawer and vice versa. Back closes the active drawer after higher-priority surfaces; Android Home returns to Launcher Home from the Termux workspace/console. Work-profile launches depend on Android profile access.\n\n## Examples\n\n```\napps -ls\n```\n\nOpen the app drawer.\n\n```\napps -lsh\n```\n\nInspect hidden apps.\n\n```\nhelp apps\n```\n\nSee app hide/show syntax; choose actual app arguments from completion.\n\n```\napps -frc <appName>\n```\n\nExplicit app launch when a name conflicts; replace the placeholder."
+      "other": "Use apps -ls to browse visible launchable apps in the drawer. Without an active launcher interface it can print a visible-app list; an unavailable drawer does not always trigger that fallback. apps -lsh prints hidden entries and accepts a filter. Choose installed apps through completion: identities can include an activity and Android user profile. apps -frc resolves visible or hidden apps for an explicit launch. App details, Android app settings and store pages are separate actions.\n\nHiding removes an activity from normal launcher choices, not its installation, running state or Android access. apps -show restores a hidden entry. Hidden apps can still open through intents, settings or other launchers. If an app is missing, check hidden entries, profile availability and whether it exposes a launcher activity. Package events refresh the app manager; apps -ls is not a list of every background package.\n\nApp groups and drawer tabs organize entries. Opening the app drawer hides the widgets drawer and vice versa. Back closes the active drawer after higher-priority surfaces; Android Home returns to Launcher Home from the Termux workspace/console. Work-profile launches depend on Android profile access.\n\n## Examples\n\n```\napps -ls\n```\n\nOpen the app drawer.\n\n```\napps -lsh\n```\n\nInspect hidden apps.\n\n```\nhelp apps\n```\n\nSee app hide/show syntax; choose actual app arguments from completion.\n\n```\napps -frc <appName>\n```\n\nExplicit app launch when a name conflicts; replace the placeholder.\n\n## Recent, newest and most used\n\nBelow the group tabs on the left of the drawer, REC, NEW and TOP order the list by recently opened, newest installed or most used, each with when or how often. They order whichever group is chosen; tap the active one, or the header, to return to A–Z. apps -r, apps -n and apps -u open the drawer in those orders."
     },
     "type": "string"
   },
@@ -11451,6 +11577,20 @@
     "formatted": false,
     "forms": {
       "other": "Enter names, text, colors, and booleans"
+    },
+    "type": "string"
+  },
+  "offline_help_article_ascii_effects_body": {
+    "formatted": false,
+    "forms": {
+      "other": "## Type text as ASCII\n\nOpen Settings, then Personalization, ASCII Settings, Type text as ASCII. Type a word or a short line and pick a font: small, standard, slant, mini or shadow. The preview shows the art as the ASCII pane will, shrunk to fit. Save to ascii.txt replaces the art and turns the ASCII pane on; the previous ascii.txt is kept as ascii.txt.bak, so an imported drawing is never lost.\n\n## Effects\n\nAn effect animates the ASCII art each time Home appears, then leaves it still: print, decrypt, slide, wipe, rain, waves, beams, burn, middleout, colorshift or glitch. Choose one in the sheet (tap the preview to replay it) or with ascii_effect in ASCII Settings. Effects work on any ascii.txt: typed, imported or coloured. Art with its own ::frame animation keeps that animation instead.\n\n- ascii_effect_speed plays the effect slow, normal or fast.\n- ascii_effect_loop_seconds plays it again after resting that many seconds; 0 plays it once each time Home appears.\n- Tap the ASCII art on Home to replay the effect.\n\nLooping pauses when Home is hidden and after two minutes without a touch, so it never runs unattended. Very large art (over 4,000 characters) stays still.\n\n## Check the settings\n\n```\nconfig -get ascii_effect\nconfig -get ascii_effect_speed\n```\n\nThese only show the current values. To change them, use ASCII Settings or an explicit config -set."
+    },
+    "type": "string"
+  },
+  "offline_help_article_ascii_effects_title": {
+    "formatted": false,
+    "forms": {
+      "other": "Type text as ASCII art and animate it"
     },
     "type": "string"
   },
@@ -12003,7 +12143,7 @@
   "offline_help_article_new_features_body": {
     "formatted": false,
     "forms": {
-      "other": "## Start here\n\nThis manual is bundled with Launcher and can be read offline. IRC and network services still need a connection. Read examples here; entering them at a live prompt can perform their described actions.\n\n- IRC: open `irc`, connect to Libera.Chat or another network, join a channel, then talk. Several networks can be connected at once. Find IRC guides in Tools.\n- Calculator: use 123, ABC and FUNC, check the interpretation/result hint, and use `to` for conversions. Read Calculator help in Tools.\n- Floating tools: Calculator, Help and IRC start expanded, remember their window choice and retain their floating size. Find Floating tools in Appearance.\n- Termux: the separate workspace has pages and up to two independent tiles. It offers a prompted update for the APK-bundled helper. Read Termux workspace and Helper updates in Automation.\n- Presets: a shared .retui package is inspected and saved first, not immediately applied. Personal .retui-backup archives are separate. Read Portable preset import in Presets.\n- Startup: new installs complete the introduction, configuration and build animation before entering Launcher. Existing completed setups are kept. Read Startup setup in Getting started.\n- Appearance: app-drawer category/alphabet rails have independent normal and selected colors. The default font is JetBrains Mono Nerd Font Regular; custom/system font controls remain available.\n- Idle fade: optionally fade Home and the Termux workspace to the wallpaper. It is off by default. Read Idle fade in Appearance.\n\n## Recent updates\n\n- Help home: use 10 from any article or topic list to return directly to the main directory.\n- Notes: the library and editor share the terminal pane styling and background blur. Read Notes in Tools.\n- Settings: swipe through Status, Terminal, Music, Help and Calculator previews before saving appearance changes. Read Configuration workflow in Appearance.\n- Private Space: enable the private command in Behaviour on supported devices, unlock, then use `private -open <app name>`. Read Private Space in Apps.\n- Calculator: basic arithmetic is ready immediately; advanced Qalculate is downloaded and installed after confirmation.\n\n## Find an article directly\n\n```\nhelp -topic irc-community\n```\n\nAt Launcher Home, open the offline IRC guide. `help irc` prints the shorter command reference instead. Use numbered choices or tap a topic in this reader; Android Back closes Help and keeps your place."
+      "other": "## Start here\n\nThis manual is bundled with Launcher and can be read offline. IRC and network services still need a connection. Read examples here; entering them at a live prompt can perform their described actions.\n\n- IRC: open `irc`, connect to Libera.Chat or another network, join a channel, then talk. Several networks can be connected at once. Find IRC guides in Tools.\n- Calculator: use 123, ABC and FUNC, check the interpretation/result hint, and use `to` for conversions. Read Calculator help in Tools.\n- Floating tools: Calculator, Help and IRC start expanded, remember their window choice and retain their floating size. Find Floating tools in Appearance.\n- Termux: the separate workspace has pages and up to two independent tiles. It offers a prompted update for the APK-bundled helper. Read Termux workspace and Helper updates in Automation.\n- Presets: a shared .retui package is inspected and saved first, not immediately applied. Personal .retui-backup archives are separate. Read Portable preset import in Presets.\n- Startup: new installs complete the introduction, configuration and build animation before entering Launcher. Existing completed setups are kept. Read Startup setup in Getting started.\n- Appearance: app-drawer category/alphabet rails have independent normal and selected colors. The default font is JetBrains Mono Nerd Font Regular; custom/system font controls remain available.\n- Idle fade: optionally fade Home and the Termux workspace to the wallpaper. It is off by default. Read Idle fade in Appearance.\n\n## Recent updates\n\n- ASCII art: type text as ASCII art in a choice of fonts, and animate any ASCII art with effects such as decrypt, rain or glitch. Read ASCII art and effects in Appearance.\n- Settings search: find any setting by name or description from the Settings hub, or with settings <words>. Read Settings search in Appearance.\n- App drawer: REC, NEW and TOP tabs under the groups order the drawer by recently opened, newest installed or most used.\n- Astro Chart: choose monochrome in the World list for a black sky and a planet dithered to black and white.\n- Help home: use 10 from any article or topic list to return directly to the main directory.\n- Notes: the library and editor share the terminal pane styling and background blur. Read Notes in Tools.\n- Settings: swipe through Status, Terminal, Music, Help and Calculator previews before saving appearance changes. Read Configuration workflow in Appearance.\n- Private Space: enable the private command in Behaviour on supported devices, unlock, then use `private -open <app name>`. Read Private Space in Apps.\n- Calculator: basic arithmetic is ready immediately; advanced Qalculate is downloaded and installed after confirmation.\n\n## Find an article directly\n\n```\nhelp -topic irc-community\n```\n\nAt Launcher Home, open the offline IRC guide. `help irc` prints the shorter command reference instead. Use numbered choices or tap a topic in this reader; Android Back closes Help and keeps your place."
     },
     "type": "string"
   },
@@ -12179,6 +12319,20 @@
     "formatted": false,
     "forms": {
       "other": "Search the web with a named provider"
+    },
+    "type": "string"
+  },
+  "offline_help_article_settings_search_body": {
+    "formatted": false,
+    "forms": {
+      "other": "## Find any setting\n\nThe Settings hub has a search box above its categories. Type a few words, such as clock format, ascii loop or city: every setting on every page is searched by its name and its description, along with hub pages such as Fonts, Presets and Backup. Every word must match somewhere; hits in the name rank first.\n\nEach result shows the setting, where it lives (for example Behavior › behavior.xml › Formats) and the first line of its description. Tap one to open that page showing just that setting. Clear the page's search box to see the whole page again. Back clears the hub search before it closes Settings.\n\n## From the command line\n\n```\nsettings clock format\n```\n\nAt Launcher Home this opens Settings with that search already filled in. settings on its own opens the hub as before."
+    },
+    "type": "string"
+  },
+  "offline_help_article_settings_search_title": {
+    "formatted": false,
+    "forms": {
+      "other": "Search every setting at once"
     },
     "type": "string"
   },
@@ -12367,7 +12521,7 @@
   "offline_help_article_weather_setup_body": {
     "formatted": false,
     "forms": {
-      "other": "Use tuiweather -set_location with a place name or latitude,longitude. Coordinates are used directly; Android Geocoder resolves place names and caches a match. Ambiguous names may resolve unexpectedly; empty or failed matches require correction. Setting a location requests a refresh; -update requests another. Forecasts use MET Norway/met.no, not OpenWeather. No API key is needed: weather_key is unused and -set_key is unsupported.\n\n-enable/-disable changes weather visibility and reloads the launcher. weather_native offers built-in controls; weather can be a scripted module depending on the registry. Forecasts require network and send configured coordinates to the service; choose precision deliberately. Geocoding may also need network. This path does not request live device GPS access; location uses a separate subsystem.\n\nThe weather-specific tutorial option opens an online page, unlike the launcher's offline tutorial.\n\n## Examples\n\n```\ntuiweather -set_location London\n```\n\nSave a place name and request weather; may contact a geocoder/weather service.\n\n```\ntuiweather -update\n```\n\nRequest a manual weather refresh.\n\n```\ntuiweather -enable\n```\n\nShow weather; changes setting and reloads launcher."
+      "other": "Use tuiweather -set_location with a place name or latitude,longitude. Coordinates are used directly; Android Geocoder resolves place names and caches a match. Ambiguous names may resolve unexpectedly; empty or failed matches require correction. Setting a location requests a refresh; -update requests another. Forecasts use MET Norway/met.no, not OpenWeather. No API key is needed: weather_key is unused and -set_key is unsupported.\n\n-enable/-disable changes weather visibility and reloads the launcher. weather_native offers built-in controls; weather can be a scripted module depending on the registry. Forecasts require network and send configured coordinates to the service; choose precision deliberately. Geocoding may also need network. This path does not request live device GPS access; location uses a separate subsystem.\n\nThe weather-specific tutorial option opens an online page, unlike the launcher's offline tutorial.\n\n## Examples\n\n```\ntuiweather -set_location London\n```\n\nSave a place name and request weather; may contact a geocoder/weather service.\n\n```\ntuiweather -update\n```\n\nRequest a manual weather refresh.\n\n```\ntuiweather -enable\n```\n\nShow weather; changes setting and reloads launcher.\n\n## What the weather line shows\n\nweather_format sets the line. Placeholders: %name (the place), %main or %description (conditions), %temp, %temp_min and %temp_max (lowest and highest over the next 24 hours), %rain (expected in the next hour, mm or inches), %humidity, %speed and %deg (wind), %pressure and %clouds. A placeholder the forecast lacks stays empty."
     },
     "type": "string"
   },
@@ -14208,6 +14362,27 @@
     },
     "type": "string"
   },
+  "setting_behavior_ascii_effect_description": {
+    "formatted": false,
+    "forms": {
+      "other": "Animates the ASCII art each time Home appears, then leaves it still: print, decrypt, slide, wipe, rain, waves, beams, burn, middleout, colorshift or glitch. Tap the art to replay it. Works with typed, imported and coloured art; art with its own frame animation keeps that instead."
+    },
+    "type": "string"
+  },
+  "setting_behavior_ascii_effect_loop_seconds_description": {
+    "formatted": false,
+    "forms": {
+      "other": "Seconds the ASCII effect rests before playing again. 0 plays it once each time Home appears. Looping stops while Home is idle or hidden and resumes when you touch it."
+    },
+    "type": "string"
+  },
+  "setting_behavior_ascii_effect_speed_description": {
+    "formatted": false,
+    "forms": {
+      "other": "How fast the ASCII effect plays: slow (half speed), normal or fast (double speed)."
+    },
+    "type": "string"
+  },
   "setting_behavior_auto_hide_output_description": {
     "formatted": false,
     "forms": {
@@ -14310,6 +14485,13 @@
     "formatted": true,
     "forms": {
       "other": "Breath out timeout (seconds)"
+    },
+    "type": "string"
+  },
+  "setting_behavior_calculator_digit_grouping_description": {
+    "formatted": false,
+    "forms": {
+      "other": "How the calculator groups digits in results: international (1,400,000), indian (14,00,000, in lakhs and crores) or none (1400000). What you type is unchanged."
     },
     "type": "string"
   },
@@ -23842,10 +24024,24 @@
     },
     "type": "string"
   },
+  "themer_search_all_settings": {
+    "formatted": false,
+    "forms": {
+      "other": "Search all settings…"
+    },
+    "type": "string"
+  },
   "themer_search_apps_ca3ce": {
     "formatted": false,
     "forms": {
       "other": "Search apps"
+    },
+    "type": "string"
+  },
+  "themer_search_no_results": {
+    "formatted": false,
+    "forms": {
+      "other": "No setting matches. Try fewer or shorter words."
     },
     "type": "string"
   },
@@ -25806,6 +26002,13 @@
     "formatted": true,
     "forms": {
       "other": "Voice call"
+    },
+    "type": "string"
+  },
+  "wallpaper_astro_monochrome": {
+    "formatted": true,
+    "forms": {
+      "other": "monochrome"
     },
     "type": "string"
   },
