@@ -257,6 +257,24 @@ class TuixtAdapter(
             settingHolder.input.setVisibility(View.GONE)
             settingHolder.options.setVisibility(View.VISIBLE)
             bindOptionSwitch(settingHolder, item, arrayOf<String>("native", "auto", "toggled"))
+        } else if (item === Behavior.calculator_digit_grouping) {
+            settingHolder.toggle.setVisibility(View.GONE)
+            settingHolder.colorPreview.setVisibility(View.GONE)
+            settingHolder.input.setVisibility(View.GONE)
+            settingHolder.options.setVisibility(View.VISIBLE)
+            bindOptionSwitch(settingHolder, item, ohi.andre.consolelauncher.calculator.CalculatorSession.GROUPINGS.toTypedArray())
+        } else if (item === Behavior.ascii_effect_speed) {
+            settingHolder.toggle.setVisibility(View.GONE)
+            settingHolder.colorPreview.setVisibility(View.GONE)
+            settingHolder.input.setVisibility(View.GONE)
+            settingHolder.options.setVisibility(View.VISIBLE)
+            bindOptionSwitch(settingHolder, item, ohi.andre.consolelauncher.tuils.asciifx.AsciiEffects.SPEEDS.toTypedArray())
+        } else if (item === Behavior.ascii_effect) {
+            settingHolder.toggle.setVisibility(View.GONE)
+            settingHolder.colorPreview.setVisibility(View.GONE)
+            settingHolder.input.setVisibility(View.GONE)
+            settingHolder.options.setVisibility(View.VISIBLE)
+            bindOptionSwitch(settingHolder, item, ohi.andre.consolelauncher.tuils.asciifx.AsciiEffects.NAMES.toTypedArray())
         } else if (item === Behavior.output_header_mode) {
             settingHolder.toggle.setVisibility(View.GONE)
             settingHolder.colorPreview.setVisibility(View.GONE)
@@ -441,28 +459,7 @@ class TuixtAdapter(
         }
     }
 
-    private fun displayLabel(context: Context, item: XMLPrefsSave): String {
-        return when (item.label()) {
-            "enable_private_command" -> context.getString(R.string.setting_behavior_enable_private_command_label)
-            "breath_out" -> context.getString(R.string.setting_behavior_breath_out_label)
-            "breath_out_seconds" -> context.getString(R.string.setting_behavior_breath_out_seconds_label)
-            "unified_status_border" -> context.getString(R.string.editor_tuixtadapter_unified_bottom_console_d8bbf)
-            "show_ascii" -> context.getString(R.string.editor_tuixtadapter_show_ascii_txt_871d6)
-            "show_ascii_landscape" -> context.getString(R.string.editor_tuixtadapter_show_ascii_in_landscape_587c0)
-            "ascii_max_lines" -> context.getString(R.string.editor_tuixtadapter_ascii_viewport_rows_30da0)
-            "ascii_pane_height_rows" -> context.getString(R.string.editor_tuixtadapter_ascii_pane_height_2d2b7)
-            "ascii_animation" -> context.getString(R.string.editor_tuixtadapter_enable_animated_ascii_5a922)
-            "ascii_animation_frame_delay_ms" -> context.getString(R.string.editor_tuixtadapter_animation_frame_delay_46de0)
-            "ascii_animation_max_file_kb" -> context.getString(R.string.editor_tuixtadapter_max_ascii_import_file_size_7ae47)
-            "ascii_index" -> context.getString(R.string.editor_tuixtadapter_ascii_position_4b86a)
-            "ascii_size" -> context.getString(R.string.editor_tuixtadapter_legacy_ascii_text_size_37f49)
-            "ascii_status_alignment" -> context.getString(R.string.editor_tuixtadapter_ascii_alignment_bb48f)
-            "ascii_text_color" -> context.getString(R.string.editor_tuixtadapter_ascii_text_color_ee845)
-            "ascii_status_background_color" -> context.getString(R.string.editor_tuixtadapter_ascii_background_color_e5078)
-            "ascii_status_text_shadow_color" -> context.getString(R.string.editor_tuixtadapter_ascii_text_shadow_color_1219b)
-            else -> item.label()
-        } ?: ""
-    }
+    private fun displayLabel(context: Context, item: XMLPrefsSave): String = settingDisplayLabel(context, item)
 
     private fun rebuildVisibleRows() {
         visibleRows.clear()
@@ -752,4 +749,28 @@ class TuixtAdapter(
         private const val VIEW_TYPE_SECTION = 0
         private const val VIEW_TYPE_SETTING = 1
     }
+}
+
+/** The name a settings row shows for [item]; settings search uses the same names. */
+internal fun settingDisplayLabel(context: Context, item: XMLPrefsSave): String {
+    return when (item.label()) {
+        "enable_private_command" -> context.getString(R.string.setting_behavior_enable_private_command_label)
+        "breath_out" -> context.getString(R.string.setting_behavior_breath_out_label)
+        "breath_out_seconds" -> context.getString(R.string.setting_behavior_breath_out_seconds_label)
+        "unified_status_border" -> context.getString(R.string.editor_tuixtadapter_unified_bottom_console_d8bbf)
+        "show_ascii" -> context.getString(R.string.editor_tuixtadapter_show_ascii_txt_871d6)
+        "show_ascii_landscape" -> context.getString(R.string.editor_tuixtadapter_show_ascii_in_landscape_587c0)
+        "ascii_max_lines" -> context.getString(R.string.editor_tuixtadapter_ascii_viewport_rows_30da0)
+        "ascii_pane_height_rows" -> context.getString(R.string.editor_tuixtadapter_ascii_pane_height_2d2b7)
+        "ascii_animation" -> context.getString(R.string.editor_tuixtadapter_enable_animated_ascii_5a922)
+        "ascii_animation_frame_delay_ms" -> context.getString(R.string.editor_tuixtadapter_animation_frame_delay_46de0)
+        "ascii_animation_max_file_kb" -> context.getString(R.string.editor_tuixtadapter_max_ascii_import_file_size_7ae47)
+        "ascii_index" -> context.getString(R.string.editor_tuixtadapter_ascii_position_4b86a)
+        "ascii_size" -> context.getString(R.string.editor_tuixtadapter_legacy_ascii_text_size_37f49)
+        "ascii_status_alignment" -> context.getString(R.string.editor_tuixtadapter_ascii_alignment_bb48f)
+        "ascii_text_color" -> context.getString(R.string.editor_tuixtadapter_ascii_text_color_ee845)
+        "ascii_status_background_color" -> context.getString(R.string.editor_tuixtadapter_ascii_background_color_e5078)
+        "ascii_status_text_shadow_color" -> context.getString(R.string.editor_tuixtadapter_ascii_text_shadow_color_1219b)
+        else -> item.label()
+    } ?: ""
 }

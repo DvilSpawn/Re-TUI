@@ -54,6 +54,10 @@
     <string name="setting_behavior_ascii_animation_frame_delay_ms_description" formatted="false">"Default delay between animated ASCII frames in milliseconds"</string>
     <!-- Behavior.kt: ascii_animation_max_file_kb -->
     <string name="setting_behavior_ascii_animation_max_file_kb_description" formatted="false">"Maximum ASCII TXT import size, in KB"</string>
+    <string name="setting_behavior_ascii_effect_loop_seconds_description" formatted="false">"Seconds the ASCII effect rests before playing again. 0 plays it once each time Home appears. Looping stops while Home is idle or hidden and resumes when you touch it."</string>
+    <string name="setting_behavior_ascii_effect_description" formatted="false">"Animates the ASCII art each time Home appears, then leaves it still: print, decrypt, slide, wipe, rain, waves, beams, burn, middleout, colorshift or glitch. Tap the art to replay it. Works with typed, imported and coloured art; art with its own frame animation keeps that instead."</string>
+    <string name="setting_behavior_calculator_digit_grouping_description" formatted="false">"How the calculator groups digits in results: international (1,400,000), indian (14,00,000, in lakhs and crores) or none (1400000). What you type is unchanged."</string>
+    <string name="setting_behavior_ascii_effect_speed_description" formatted="false">"How fast the ASCII effect plays: slow (half speed), normal or fast (double speed)."</string>
     <!-- Behavior.kt: clear_after_cmds -->
     <string name="setting_behavior_clear_after_cmds_description" formatted="false">"Auto-clear after n commands (if -1, this feature will be disabled)"</string>
     <!-- Behavior.kt: clear_input_after_command -->

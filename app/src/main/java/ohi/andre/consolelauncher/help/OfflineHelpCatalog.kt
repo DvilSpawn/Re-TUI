@@ -37,6 +37,8 @@ object OfflineHelpCatalog {
         HelpTopic("appearance-borders", R.string.offline_help_article_appearance_borders_title, R.string.offline_help_article_appearance_borders_body, "appearance"),
         HelpTopic("floating-tools", R.string.offline_help_article_floating_tools_title, R.string.offline_help_article_floating_tools_body, "appearance"),
         HelpTopic("idle-fade", R.string.offline_help_article_idle_fade_title, R.string.offline_help_article_idle_fade_body, "appearance"),
+        HelpTopic("ascii-effects", R.string.offline_help_article_ascii_effects_title, R.string.offline_help_article_ascii_effects_body, "appearance"),
+        HelpTopic("settings-search", R.string.offline_help_article_settings_search_title, R.string.offline_help_article_settings_search_body, "appearance"),
         HelpTopic("orientation-and-layout", R.string.offline_help_article_orientation_and_layout_title, R.string.offline_help_article_orientation_and_layout_body, "appearance"),
         HelpTopic("image-frame-packs", R.string.offline_help_article_image_frame_packs_title, R.string.offline_help_article_image_frame_packs_body, "appearance"),
         HelpTopic("configuration-editor", R.string.offline_help_article_configuration_editor_title, R.string.offline_help_article_configuration_editor_body, "appearance"),

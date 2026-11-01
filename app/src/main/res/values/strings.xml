@@ -283,9 +283,10 @@
         \n-theme -> inspect effective theme, auto color, and font state
         \n-presets -> inspect preset directory and available presets
     </string>
-    <string name="help_settings">Open the Re:T-UI settings/Themer overlay.
+    <string name="help_settings">Open the Re:T-UI settings/Themer overlay, or search every setting at once.
         \n\nUsage:
         \n$ settings
+        \n$ settings clock format
     </string>
     <string name="help_wallpaper">-static -> open the static wallpaper picker
         \n-live -> open the live wallpaper picker
@@ -348,6 +349,14 @@
     <string name="apps_drawer_recent">Recently opened · %1$d (tap for A–Z)</string>
     <string name="apps_drawer_newest">Newest installed · %1$d (tap for A–Z)</string>
     <string name="apps_drawer_most_used">Most used · %1$d (tap for A–Z)</string>
+    <string name="calculator_clear_input">Clear input</string>
+    <string name="calculator_clear_all">Clear history and answer</string>
+    <string name="apps_drawer_tab_recent">REC</string>
+    <string name="apps_drawer_tab_newest">NEW</string>
+    <string name="apps_drawer_tab_most_used">TOP</string>
+    <string name="apps_drawer_tab_recent_description">Recently opened first</string>
+    <string name="apps_drawer_tab_newest_description">Newest installed first</string>
+    <string name="apps_drawer_tab_most_used_description">Most used first</string>
     <string name="apps_ranked_just_now">just now</string>
     <plurals name="apps_ranked_launches">
         <item quantity="one">%1$d launch</item>

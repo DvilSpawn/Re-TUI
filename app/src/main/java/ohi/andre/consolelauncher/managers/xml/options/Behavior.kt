@@ -30,6 +30,11 @@ enum class Behavior : XMLPrefsSave {
         override fun infoRes(): Int = R.string.setting_behavior_qalculate_description
         override fun type(): String = XMLPrefsSave.BOOLEAN
     },
+    calculator_digit_grouping {
+        override fun defaultValue(): String = "international"
+        override fun infoRes(): Int = R.string.setting_behavior_calculator_digit_grouping_description
+        override fun type(): String = XMLPrefsSave.TEXT
+    },
     double_tap_lock {
         override fun defaultValue(): String? {
             return "true"
@@ -347,6 +352,45 @@ enum class Behavior : XMLPrefsSave {
 
         override fun type(): String? {
             return XMLPrefsSave.INTEGER
+        }
+    },
+    ascii_effect {
+        override fun defaultValue(): String? {
+            return "none"
+        }
+
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_ascii_effect_description
+        }
+
+        override fun type(): String? {
+            return XMLPrefsSave.TEXT
+        }
+    },
+    ascii_effect_loop_seconds {
+        override fun defaultValue(): String? {
+            return "0"
+        }
+
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_ascii_effect_loop_seconds_description
+        }
+
+        override fun type(): String? {
+            return XMLPrefsSave.INTEGER
+        }
+    },
+    ascii_effect_speed {
+        override fun defaultValue(): String? {
+            return "normal"
+        }
+
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_ascii_effect_speed_description
+        }
+
+        override fun type(): String? {
+            return XMLPrefsSave.TEXT
         }
     },
     clear_after_cmds {

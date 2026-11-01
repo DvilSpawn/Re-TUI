@@ -55,6 +55,7 @@ internal class AstroWorld(val seed: Int, val w: Int, val h: Int) {
         private val NEBULAE = arrayOf(floatArrayOf(0.75f, 0.52f), floatArrayOf(0.95f, 0.66f), floatArrayOf(0.40f, 0.60f),
             floatArrayOf(0.08f, 0.82f), floatArrayOf(0.50f, 0.88f), floatArrayOf(0.62f, 0.30f))
         private val ICE = arrayOf("#f0f4ff", "#b8c4e8", "#5a6290", "#141830").map(::rgb).toIntArray()
+        private const val MONO_STAR = 0xFFFFFFFF.toInt()
         private const val TW = 512
         private const val TH = 256
 
@@ -293,10 +294,13 @@ internal class AstroWorld(val seed: Int, val w: Int, val h: Int) {
         }
     }
 
-    fun drawStars(f: AstroFrame, t: Float) {
+    fun drawStars(f: AstroFrame, t: Float, mono: Boolean = false) {
         for (i in starX.indices) {
             val ph = starPhase[i]
-            f.set(starX[i], starY[i], starC[i], 0.55f + 0.45f * sin(t * (0.6f + ph % 1.3f) + ph * 7))
+            val twinkle = sin(t * (0.6f + ph % 1.3f) + ph * 7)
+            // In monochrome a star is a white pixel that now and then blinks out, not a grey a dither would lose.
+            if (mono) { if (twinkle > -0.8f) f.set(starX[i], starY[i], MONO_STAR) }
+            else f.set(starX[i], starY[i], starC[i], 0.55f + 0.45f * twinkle)
         }
     }
 }

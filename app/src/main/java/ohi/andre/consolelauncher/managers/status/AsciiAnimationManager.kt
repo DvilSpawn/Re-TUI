@@ -86,6 +86,9 @@ class AsciiAnimationManager(
         return frames[0].text
     }
 
+    /** Whether the art is its own frame animation (which an effect would fight with). */
+    val animated get() = frames.size >= 2
+
     fun start() {
         if (running || frames.size < 2) {
             return

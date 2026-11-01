@@ -67,4 +67,22 @@ internal class AstroFrame(val w: Int, val h: Int) {
         val i = y * w + x
         px[i] = if (alpha >= 1f) c else AstroPixels.mix(px[i], c, alpha)
     }
+
+    /** Ordered (Bayer 4x4) dithering of each pixel's brightness to pure black or white, like a halftone print. */
+    fun monochrome(gain: Float = MONO_GAIN) {
+        for (y in 0 until h) {
+            val row = y * w
+            for (x in 0 until w) {
+                val c = px[row + x]
+                val lum = ((c shr 16 and 255) * 299 + (c shr 8 and 255) * 587 + (c and 255) * 114) / 255000f
+                px[row + x] = if (minOf(1f, lum * gain) > AstroPixels.dither(x, y)) MONO_WHITE else MONO_BLACK
+            }
+        }
+    }
+
+    companion object {
+        const val MONO_GAIN = 1f
+        const val MONO_WHITE = 0xFFFFFFFF.toInt()
+        const val MONO_BLACK = 0xFF000000.toInt()
+    }
 }

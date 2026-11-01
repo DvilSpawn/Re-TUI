@@ -254,6 +254,11 @@
     <string name="editor_tuixtactivity_file_exceeds_kb_limit_9bba2">"file exceeds %1$d KB limit"</string>
     <!-- TuixtActivity.kt: buildAsciiActions -->
     <string name="editor_tuixtactivity_import_ascii_txt_9b586" formatted="false">"IMPORT ASCII TXT"</string>
+    <string name="editor_tuixtactivity_ascii_type_text" formatted="false">"TYPE TEXT AS ASCII"</string>
+    <string name="editor_tuixtactivity_ascii_type_text_title" formatted="false">"Type text as ASCII"</string>
+    <string name="editor_tuixtactivity_ascii_type_text_hint" formatted="false">"Text, e.g. HELLO"</string>
+    <string name="editor_tuixtactivity_ascii_type_text_save" formatted="false">"Save to ascii.txt"</string>
+    <string name="editor_tuixtactivity_ascii_type_text_saved" formatted="false">"ascii.txt saved; the previous art is in ascii.txt.bak."</string>
     <!-- TuixtActivity.kt: handleAsciiImportResult -->
     <string name="editor_tuixtactivity_imported_animated_ascii_frames_d5b9c">"Imported animated ASCII: %1$d frames."</string>
     <!-- TuixtActivity.kt: handleAsciiImportResult -->
@@ -444,6 +449,7 @@
     <string name="wallpaper_clouds_scene_label">Scene</string>
     <string name="wallpaper_astro_world_label">World</string>
     <string name="wallpaper_astro_reseed">RESEED</string>
+    <string name="wallpaper_astro_monochrome">monochrome</string>
     <string name="wallpaper_matrix_rain">Matrix Rain</string>
     <string name="wallpaper_matrix_style_label">Style</string>
     <string name="wallpaper_matrix_glyphs">GLYPHS: %1$s</string>

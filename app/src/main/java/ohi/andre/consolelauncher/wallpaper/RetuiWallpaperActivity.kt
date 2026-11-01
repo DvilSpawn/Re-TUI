@@ -373,7 +373,7 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
             )
             is SolidColorView -> RetuiWallpaperSettings.saveSolidColor(this, hex(current.color))
             is CloudsView -> RetuiWallpaperSettings.saveCloudScene(this, current.sceneNumber)
-            is AstroChartView -> RetuiWallpaperSettings.saveAstroSeed(this, current.seed)
+            is AstroChartView -> RetuiWallpaperSettings.saveAstroSeed(this, current.seed, current.mono)
             is MatrixRainView -> RetuiWallpaperSettings.saveMatrix(this, current.styleName, current.charSet.name)
         }
         sendBroadcast(Intent(RetuiWallpaperService.ACTION_REFRESH).setPackage(packageName))
@@ -453,8 +453,13 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
 
     private fun paletteSpinner(): Spinner = when (val current = preview) {
         is NagomiView -> spinner(listOf("Nagomi"), 0) { }
-        is AstroChartView -> AstroWorld.PALETTES.map { it.name }.let { names ->
-            spinner(names, names.indexOf(current.worldName).coerceAtLeast(0)) { current.showWorld(names.indexOf(it)) }
+        // The worlds, then Monochrome: the current world dithered to black and white over a plain black sky.
+        is AstroChartView -> (AstroWorld.PALETTES.map { it.name } + getString(R.string.wallpaper_astro_monochrome)).let { names ->
+            spinner(names, if (current.mono) names.lastIndex else names.indexOf(current.worldName).coerceAtLeast(0)) {
+                val index = names.indexOf(it)
+                current.mono = index == names.lastIndex
+                if (!current.mono) current.showWorld(index)
+            }
         }
         is MatrixRainView -> spinner(MatrixRainView.STYLE_NAMES, MatrixRainView.STYLE_NAMES.indexOf(current.styleName).coerceAtLeast(0), current::setStyle)
         is CloudsView -> CloudsView.sceneNames(this).let { names ->

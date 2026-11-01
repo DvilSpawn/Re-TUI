@@ -28,6 +28,8 @@ import java.util.concurrent.Executors
 
 class CalculatorActivity : LocalizedActivity() {
     companion object {
+        // Its own label (shown as C or AC), so the ABC pad's letter C still types a c.
+        private const val CLEAR_KEY = "AC"
         fun open(context: Context) = context.startActivity(Intent(context, CalculatorActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
     }
     private lateinit var input: EditText
@@ -48,6 +50,7 @@ class CalculatorActivity : LocalizedActivity() {
     private var request: CalculatorEngine.Request? = null
     private var answer: String? = null
     private var history = ""
+    private var clearButton: Button? = null
     private lateinit var helpTab: TextView
     private lateinit var mainTab: TextView
     private lateinit var root: View
@@ -87,7 +90,7 @@ class CalculatorActivity : LocalizedActivity() {
                         result.failure in listOf("preview_unavailable", "timeout", "cancelled") || result.parsed == null && !result.error -> getString(R.string.calculator_preview_unavailable)
                         result.error -> if (result.failure == "syntax") getString(R.string.calculator_preview_incomplete) else result.text.lineSequence().first()
                         else -> getString(R.string.calculator_preview_format, result.parsed,
-                            (if (result.approximate) "≈ " else "") + CalculatorSession.display(result.text))
+                            (if (result.approximate) "≈ " else "") + CalculatorSession.display(result.text, grouping()))
                     }
                     scroll.post { scroll.scrollTo(0, scroll.getChildAt(0).height) }
                 }
@@ -172,7 +175,8 @@ class CalculatorActivity : LocalizedActivity() {
         val symbols = root.findViewById<GridLayout>(R.id.calculator_symbols)
         val suggestionSize = LauncherFontScale.terminalTextSizeSp()
         val modes = mapOf(
-            "123" to listOf("7", "8", "9", "÷", "4", "5", "6", "×", "1", "2", "3", "−", ".", "0", "⌫", "+", "(", ")", "="),
+            // The number pad works like a pocket calculator: "=" (the submit key) calculates and C/AC clears.
+            "123" to listOf("7", "8", "9", "÷", "4", "5", "6", "×", "1", "2", "3", "−", ".", "0", "⌫", "+", "(", ")", CLEAR_KEY),
             "ABC" to "QWERTYUIOPASDFGHJKLZXCVBNM".map(Char::toString) + listOf("⌫", "_", "SPACE"),
             "FUNC" to listOf("sqrt", "sin", "cos", "tan", "log", "ln", "abs", "pi", "e", "ans", "to", "of", "(", ")", "^", "!", "%", "⌫", "=")
         )
@@ -182,6 +186,7 @@ class CalculatorActivity : LocalizedActivity() {
             root.findViewById<Button>(R.id.calculator_functions_tab) to "FUNC"
         )
         fun insertKey(label: String) {
+            if (label == CLEAR_KEY) { clearKey(); return }
             if (label == "⌫") {
                 val edit = CalculatorEditing.backspace(input.text.toString(), input.selectionStart, input.selectionEnd)
                 input.setText(edit.text); input.setSelection(edit.cursor); persist(); return
@@ -253,10 +258,19 @@ class CalculatorActivity : LocalizedActivity() {
                         it.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
                         insertKey(label)
                     }
+                    if (label == "⌫") setOnLongClickListener {
+                        // Holding backspace clears the whole input.
+                        it.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+                        input.setText(""); persist(); true
+                    }
+                    if (label == CLEAR_KEY) clearButton = this
                 }
                 if (index >= lastRowStart) bottomRow.addKey(key, if (letters && label == "SPACE") 14f else if (letters) 3f else 1f)
                 else symbols.addView(key, keyLayout(index))
             }
+            (submit as TextView).text = if (mode == "123") "=" else "↵"
+            if (mode != "123") clearButton = null
+            updateClearKey()
             bottomRow.addKey(submit, if (letters) 3f else 1f)
             bottomRow.addKey(cancelButton)
             symbols.addView(bottomRow, GridLayout.LayoutParams().apply {
@@ -350,7 +364,7 @@ class CalculatorActivity : LocalizedActivity() {
         input.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(s: Editable?) = schedulePreview()
+            override fun afterTextChanged(s: Editable?) { schedulePreview(); updateClearKey() }
         })
         submit.setOnClickListener {
             it.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
@@ -365,10 +379,14 @@ class CalculatorActivity : LocalizedActivity() {
         helpTab.setOnClickListener {
             ohi.andre.consolelauncher.commands.tuixt.TuixtDialog.showOptions(this,
                 getString(R.string.optional_calculator_help_title),
-                listOf(getString(R.string.optional_calculator_help_title), getString(R.string.optional_calculator_title)),
+                listOf(getString(R.string.optional_calculator_help_title), getString(R.string.optional_calculator_title),
+                    getString(R.string.calculator_digit_grouping_menu, groupingLabel(grouping()))),
                 ohi.andre.consolelauncher.commands.tuixt.TuixtDialog.ItemAction { choice ->
-                    if (choice == 0) selectHelp(true)
-                    else showEnhancement()
+                    when (choice) {
+                        0 -> selectHelp(true)
+                        1 -> showEnhancement()
+                        else -> chooseGrouping()
+                    }
                 })
         }
         TerminalPaneIcon.apply(helpTab, R.drawable.ic_material_help_24)
@@ -414,8 +432,10 @@ class CalculatorActivity : LocalizedActivity() {
                 if (request !== active || isDestroyed) return@post
                 request = null; submit.isEnabled = true; cancelButton.visibility = View.GONE
                 updateEngineStatus()
-                val displayed = if (result.error) result.text else CalculatorSession.display(result.text)
-                append((if (!result.error && (result.approximate || displayed != result.text)) "≈ " else "") + displayed)
+                val displayed = if (result.error) result.text else CalculatorSession.display(result.text, grouping())
+                // Grouping commas alone do not make a result approximate.
+                val rounded = !result.error && CalculatorSession.display(result.text) != result.text
+                append((if (!result.error && (result.approximate || rounded)) "≈ " else "") + displayed)
                 if (!result.error) {
                     answer = result.reusable
                     if (input.text.toString().trim() == expression) input.setText("")
@@ -425,6 +445,38 @@ class CalculatorActivity : LocalizedActivity() {
             }
         }
     }
+    private fun grouping(): String =
+        LauncherSettings.get(Behavior.calculator_digit_grouping)?.takeIf { it in CalculatorSession.GROUPINGS } ?: CalculatorSession.GROUPING_INTERNATIONAL
+
+    private fun groupingLabel(grouping: String) = getString(when (grouping) {
+        CalculatorSession.GROUPING_INDIAN -> R.string.calculator_digit_grouping_indian
+        CalculatorSession.GROUPING_NONE -> R.string.calculator_digit_grouping_none
+        else -> R.string.calculator_digit_grouping_international
+    })
+
+    private fun chooseGrouping() {
+        ohi.andre.consolelauncher.commands.tuixt.TuixtDialog.showOptions(this, getString(R.string.calculator_digit_grouping_title),
+            CalculatorSession.GROUPINGS.map(::groupingLabel),
+            ohi.andre.consolelauncher.commands.tuixt.TuixtDialog.ItemAction { choice ->
+                LauncherSettings.set(this, Behavior.calculator_digit_grouping, CalculatorSession.GROUPINGS[choice])
+                schedulePreview()
+            })
+    }
+
+    /** C clears what is typed; with nothing typed it is AC and starts over, history and last answer included. */
+    private fun clearKey() {
+        if (input.text.isNotEmpty()) input.setText("")
+        else if (request == null) { history = ""; answer = null; renderTerminal() }
+        persist(); updateClearKey()
+    }
+
+    private fun updateClearKey() {
+        val key = clearButton ?: return
+        val empty = !::input.isInitialized || input.text.isEmpty()
+        key.text = if (empty) "AC" else "C"
+        key.contentDescription = getString(if (empty) R.string.calculator_clear_all else R.string.calculator_clear_input)
+    }
+
     private fun append(text: String) {
         history = (history.trimEnd() + "\n" + text + "\n").trimStart().takeLast(65536)
         transcript.text = history.trimEnd()

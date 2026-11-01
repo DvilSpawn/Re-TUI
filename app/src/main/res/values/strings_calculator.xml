@@ -125,7 +125,12 @@
     <string name="calculator_unit_kib">Kibibytes (binary, 1024 bytes)</string>
     <string name="calculator_unit_mib">Mebibytes (binary)</string>
     <string name="calculator_unit_gib">Gibibytes (binary)</string>
-    <string name="calculator_terminal_help">Enter an expression and press ↵. After a result, +5 or *2 continues it. Use ans only for an explicit reference. Commands: help, clear, exit.</string>
+    <string name="calculator_digit_grouping_title">Digit grouping</string>
+    <string name="calculator_digit_grouping_menu">Digit grouping · %1$s</string>
+    <string name="calculator_digit_grouping_international">International · 1,400,000</string>
+    <string name="calculator_digit_grouping_indian">Indian · 14,00,000</string>
+    <string name="calculator_digit_grouping_none">None · 1400000</string>
+    <string name="calculator_terminal_help">Enter an expression and press =. C clears what you typed; AC starts over. After a result, +5 or *2 continues it. Use ans only for an explicit reference. Commands: help, clear, exit.</string>
     <string name="calculator_terminal_no_answer">No previous result. Calculate an expression first.</string>
     <string name="calculator_hints">Calculator hints</string>
     <string name="calculator_hints_body" formatted="false">CALCULATOR\n\nEnter an expression after calc&gt; and press Enter or ↵.\n\nContinue a result\n5 + 5 → 10\n+5 → 15\n*2 → 30\nA leading +, −, ×, ÷ or ^ continues the last successful result. A complete expression starts fresh. Use (-5) for a standalone negative value after a result. Errors and cancellation keep the last result.\n\nArithmetic\n2 + 3 * 4 → 14\n(2 + 3) * 4 → 20\nsqrt(144) → 12\n2^3 → 8\n\nConvert units\n5 ft to cm → 152.4 cm\n*2 → 304.8 cm\nans to ft → 10 ft\nUse to for conversion. The word in means inches.\n\nExplicit answers and variables\nans is optional: sqrt(ans), 100 / ans and ans to ft refer to the last result. ans = 5 sets it. Named assignments such as tax = 18% go to Qalculate; these variables last only while the engine process remains alive.\n\nKeypad and editing\n123: numbers, operators and =\nABC: letters, units and variable names\nFUNC: functions, constants and =\nTap the input to place the cursor or select text. Function keys insert parentheses with the cursor inside. ⌫ deletes. = inserts an assignment; ↵ evaluates.\n\nCommands\nclear — clear the transcript, keeping the last result\nhelp — open the calculator guide\nexit — close the calculator\n\nCancel stops the current calculation. Back closes Help and retains your reading position.</string>

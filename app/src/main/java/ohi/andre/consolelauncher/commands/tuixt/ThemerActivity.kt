@@ -84,6 +84,7 @@ import ohi.andre.consolelauncher.managers.settings.MusicSettings.preferredPackag
 import ohi.andre.consolelauncher.managers.xml.options.Behavior
 import ohi.andre.consolelauncher.managers.xml.options.Suggestions
 import ohi.andre.consolelauncher.managers.xml.options.Ui
+import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi.applyFullscreen
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi.requestNoTitleIfFullscreen
@@ -124,6 +125,11 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
     private var recyclerView: RecyclerView? = null
     private var header: TextView? = null
     private var supportFooter: LinearLayout? = null
+    private var searchBox: EditText? = null
+    private var searchResults: List<SettingsSearch.Entry> = emptyList()
+    // Built off the main thread as the hub opens; a search before it is ready waits for it.
+    private val searchIndexTask = java.util.concurrent.FutureTask { buildSearchIndex() }
+    private val searchIndex: List<SettingsSearch.Entry> get() = searchIndexTask.also { if (!it.isDone) it.run() }.get()
     private var sectionsAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>? = null
     private val sectionItems: MutableList<String> = ArrayList<String>()
     private val sectionBackStack = ArrayDeque<String>()
@@ -301,6 +307,7 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
                     bindKeyboardShortcutPanel(holder)
                     return
                 }
+                searchResultAt(fileName)?.let { result -> bindSearchResult(holder.itemView as TextView, result); return }
                 val itemView = holder.itemView as TextView
                 itemView.text = hubItemLabel(fileName).uppercase(Locale.getDefault())
                 val selected = section == SECTION_FONTS &&
@@ -313,110 +320,7 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
                 )
                 params.setMargins(0, 0, 0, dp(this@ThemerActivity, 8f))
                 itemView.setLayoutParams(params)
-                holder.itemView.setOnClickListener(View.OnClickListener { _: View? ->
-                    if (section == SECTION_PRESET_APPLY) {
-                        applyPreset(fileName)
-                        return@OnClickListener
-                    }
-                    if (section == SECTION_PRESET_REMOVE) {
-                        confirmRemovePreset(fileName)
-                        return@OnClickListener
-                    }
-                    if (fileName == HubAction.APPEARANCE.name) {
-                        openSection(SECTION_APPEARANCE)
-                    } else if (fileName == HubAction.BEHAVIOR.name) {
-                        openSection(SECTION_BEHAVIOR)
-                    } else if (fileName == HubAction.SOUNDS.name) {
-                        openSoundsSettings()
-                    } else if (fileName == HubAction.PERSONALIZATION.name) {
-                        openSection(SECTION_PERSONALIZATION)
-                    } else if (fileName == HubAction.ASCII_SETTINGS.name) {
-                        openAsciiSettings()
-                    } else if (fileName == HubAction.INTEGRATIONS.name) {
-                        openSection(SECTION_INTEGRATIONS)
-                    } else if (fileName == HubAction.LANGUAGE_PACKS.name) {
-                        openSettingsChild(Intent(this@ThemerActivity, ohi.andre.consolelauncher.localization.LanguagePackActivity::class.java))
-                    } else if (fileName == HubAction.SYSTEM_SUPPORT.name) {
-                        openSection(SECTION_SYSTEM)
-                    } else if (fileName == HubAction.OPEN_WALLPAPER_PICKER.name) {
-                        launchWallpaperPicker()
-                    } else if (fileName == HubAction.OPEN_LIVE_WALLPAPER_PICKER.name) {
-                        launchLiveWallpaperPicker()
-                    } else if (fileName == HubAction.RETUI_WALLPAPER.name) {
-                        openSettingsChild(Intent(this@ThemerActivity, RetuiWallpaperActivity::class.java))
-                    } else if (fileName == HubAction.PREFERRED_MUSIC_APP.name) {
-                        showPreferredMusicAppPicker()
-                    } else if (fileName == HubAction.TASKER_INTEGRATION.name) {
-                        showTaskerIntegrationDialog()
-                    } else if (fileName == HubAction.RE_KEYBOARD_SHORTCUTS.name) {
-                        openSection(SECTION_KEYBOARD_SHORTCUTS)
-                    } else if (fileName == HubAction.FONTS.name) {
-                        openSection(SECTION_FONTS)
-                    } else if (fileName == HubAction.TYPOGRAPHY.name) {
-                        openSection(SECTION_TYPOGRAPHY)
-                    } else if (fileName == HubAction.PRESETS.name) {
-                        openSection(SECTION_PRESETS)
-                    } else if (fileName == HubAction.FRAMES.name) {
-                        openSection(SECTION_FRAMES)
-                    } else if (section == SECTION_FRAMES) {
-                        return@OnClickListener
-                    } else if (section == SECTION_PRESETS && fileName == HubAction.SAVE_CURRENT_AS_PRESET.name) {
-                        showSavePresetInput()
-                    } else if (section == SECTION_PRESETS && fileName == HubAction.APPLY_PRESET.name) {
-                        openSection(SECTION_PRESET_APPLY)
-                    } else if (section == SECTION_PRESETS && fileName == HubAction.REMOVE_PRESET.name) {
-                        openSection(SECTION_PRESET_REMOVE)
-                    } else if (section == SECTION_PRESET_APPLY) {
-                        applyPreset(fileName)
-                    } else if (section == SECTION_PRESET_REMOVE) {
-                        confirmRemovePreset(fileName)
-                    } else if (section == SECTION_FONTS && fileName == HubAction.DEFAULT_SYSTEM_FONT.name) {
-                        applySystemFont()
-                    } else if (section == SECTION_FONTS && fileName == HubAction.IMPORT_FONT.name) {
-                        launchFontImportPicker()
-                    } else if (fileName == HubAction.TOOLBAR_BUTTONS.name) {
-                        showToolbarButtonsDialog()
-                    } else if (isDystopiaRow(fileName)) {
-                        handleDystopiaOptIn()
-                    } else if (fileName == HubAction.VIEW_CRASH_LOG.name) {
-                        val crashFile = File(Tuils.getFolder(), "crash.txt")
-                        if (!crashFile.exists() || crashFile.length() == 0L) {
-                            Toast.makeText(
-                                this@ThemerActivity,
-                                getString(R.string.themer_no_crash_log_found_79ebe),
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        } else {
-                            val intent = Intent(this@ThemerActivity, TuixtActivity::class.java)
-                            intent.putExtra(TuixtActivity.PATH, crashFile.getAbsolutePath())
-                            openSettingsChild(intent)
-                        }
-                    } else if (fileName == HubAction.BACKUP.name) {
-                        showBackupProtectionDialog()
-                    } else if (fileName == HubAction.CREATE_SHAREABLE_CONFIGURATION.name) {
-                        showShareableConfigurationSourcePicker()
-                    } else if (fileName == HubAction.PRESET_MARKETPLACE.name) {
-                        openSettingsChild(Intent(this@ThemerActivity, PresetMarketplaceActivity::class.java))
-                    } else if (fileName == HubAction.IMPORT_RETUI_PRESET.name) {
-                        openSettingsChild(Intent(this@ThemerActivity, PresetImportActivity::class.java).setAction(Intent.ACTION_MAIN))
-                    } else if (fileName == HubAction.RESTORE.name) {
-                        launchRestorePicker()
-                    } else if (fileName == HubAction.RATE_THE_APP.name) {
-                        openPlayStoreListing()
-                    } else if (fileName == HubAction.GITHUB.name) {
-                        openExternalUrl(GITHUB_URL)
-                    } else if (fileName == HubAction.DISCORD.name) {
-                        openExternalUrl(DISCORD_URL)
-                    } else if (fileName == HubAction.REDDIT.name) {
-                        openExternalUrl(REDDIT_URL)
-                    } else if (fileName == HubAction.SEND_FEEDBACK.name) {
-                        openFeedbackEmail()
-                    } else if (fileName == HubAction.LEARN_MORE.name) {
-                        openLearnMore()
-                    } else {
-                        openConfigFile(fileName)
-                    }
-                })
+                holder.itemView.setOnClickListener { onHubItem(fileName) }
             }
 
             override fun getItemCount(): Int {
@@ -425,6 +329,23 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
         }
 
         recyclerView!!.setAdapter(sectionsAdapter)
+
+        searchBox = EditText(this).apply {
+            hint = getString(R.string.themer_search_all_settings)
+            isSingleLine = true
+            styleInput(this@ThemerActivity, this)
+            addTextChangedListener(object : android.text.TextWatcher {
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = refreshSearch()
+                override fun afterTextChanged(s: android.text.Editable?) = Unit
+            })
+        }
+        Thread(searchIndexTask, "settings-search-index").start()
+        root.addView(searchBox, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            .apply { bottomMargin = dp(this@ThemerActivity, 10f) })
+        searchBox!!.visibility = if (section == SECTION_HOME) View.VISIBLE else View.GONE
+        // `settings <words>` from the command line arrives with the search filled in.
+        if (savedInstanceState == null) intent?.getStringExtra(EXTRA_QUERY)?.takeIf { it.isNotBlank() }?.let { searchBox!!.setText(it) }
 
         root.addView(recyclerView)
         supportFooter = buildSupportFooter()
@@ -595,6 +516,210 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
         SEND_FEEDBACK(R.string.hub_send_feedback),
         LEARN_MORE(R.string.hub_learn_more),
         SIGN_UP_FOR_RETUI_CREDITS(R.string.hub_sign_up_for_retui_credits)
+    }
+
+    private fun refreshSearch() {
+        if (section != SECTION_HOME) return
+        val query = searchBox?.text?.toString().orEmpty()
+        searchResults = SettingsSearch.search(searchIndex, query)
+        sectionItems.clear()
+        if (query.isBlank()) sectionItems.addAll(getItemsForSection(section))
+        else sectionItems.addAll(searchResults.indices.map { SEARCH_RESULT_PREFIX + it })
+        if (query.isNotBlank() && searchResults.isEmpty()) sectionItems.add(SEARCH_EMPTY)
+        sectionsAdapter?.notifyDataSetChanged()
+        recyclerView?.scrollToPosition(0)
+    }
+
+    private fun searchResultAt(id: String): SettingsSearch.Entry? = when {
+        id == SEARCH_EMPTY -> SettingsSearch.Entry(getString(R.string.themer_search_no_results), "", "", "", Unit)
+        id.startsWith(SEARCH_RESULT_PREFIX) -> searchResults.getOrNull(id.removePrefix(SEARCH_RESULT_PREFIX).toIntOrNull() ?: -1)
+        else -> null
+    }
+
+    private fun bindSearchResult(view: TextView, result: SettingsSearch.Entry) {
+        val text = android.text.SpannableStringBuilder(result.title)
+        if (result.place.isNotEmpty()) {
+            val start = text.length
+            text.append("\n").append(result.place)
+            text.setSpan(android.text.style.RelativeSizeSpan(0.78f), start, text.length, 0)
+        }
+        if (result.description.isNotEmpty()) {
+            val start = text.length
+            // One line of description is enough to tell similar settings apart.
+            text.append("\n").append(result.description.lineSequence().first().let { if (it.length > 110) it.take(107) + "…" else it })
+            text.setSpan(android.text.style.RelativeSizeSpan(0.78f), start, text.length, 0)
+            text.setSpan(android.text.style.StyleSpan(Typeface.NORMAL), start, text.length, 0)
+        }
+        view.text = text
+        styleListItem(this, view, false)
+        view.layoutParams = RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            .apply { setMargins(0, 0, 0, dp(this@ThemerActivity, 8f)) }
+        view.setOnClickListener(if (result.target == Unit) null else View.OnClickListener { openSearchResult(result.target) })
+    }
+
+    /** Every setting on every page, and every hub destination, with where it lives. */
+    private fun buildSearchIndex(): List<SettingsSearch.Entry> {
+        val groups = linkedMapOf(
+            SECTION_APPEARANCE to getString(R.string.hub_appearance), SECTION_BEHAVIOR to getString(R.string.hub_behavior),
+            SECTION_PERSONALIZATION to getString(R.string.hub_personalization), SECTION_INTEGRATIONS to getString(R.string.hub_integrations),
+            SECTION_SYSTEM to getString(R.string.hub_system_support)
+        )
+        val itemsByGroup = groups.keys.associateWith { getItemsForSection(it) }
+        val out = ArrayList<SettingsSearch.Entry>()
+        val showAnsi = XMLPrefsManager.getBoolean(Behavior.show_tmux_workspace_button)
+        val sounds = getString(R.string.themer_sounds_fb1c3)
+        val ascii = groups[SECTION_PERSONALIZATION] + " › " + getString(R.string.hub_ascii_settings)
+        for (root in XMLPrefsManager.XMLPrefsRoot.entries) {
+            val file = root.path()
+            val group = itemsByGroup.entries.firstOrNull { file in it.value }?.let { groups[it.key] } ?: continue
+            for (save in root.enums) {
+                // Only what a settings page actually shows.
+                if (save === Behavior.toggle_output_state || save === Behavior.qalculate || save === Ui.auto_color_pick ||
+                    XMLPrefsManager.isAdvancedSuggestionSetting(save) ||
+                    (save is Theme && save.name.startsWith("ansi_") && !showAnsi)) continue
+                val sectionName = XMLPrefsManager.sectionFor(save)
+                val place = when {
+                    XMLPrefsManager.isAsciiArtSetting(save) -> ascii
+                    save is Behavior && sectionName == sounds -> groups[SECTION_BEHAVIOR] + " › " + sounds
+                    else -> "$group › $file › $sectionName"
+                }
+                out += SettingsSearch.Entry(settingDisplayLabel(this, save), place, save.info(this).orEmpty(), save.label().orEmpty(), save)
+            }
+        }
+        for ((key, items) in itemsByGroup) for (id in items) {
+            out += SettingsSearch.Entry(hubItemLabel(id), groups[key].orEmpty(), "", id, id)
+        }
+        groups.forEach { (key, name) -> out += SettingsSearch.Entry(name, "", "", key, key) }
+        return out
+    }
+
+    private fun openSearchResult(target: Any) {
+        when (target) {
+            in TOP_SECTIONS -> openSection(target as String)
+            is String -> onHubItem(target)
+            is XMLPrefsSave -> {
+                val intent = Intent(this, TuixtActivity::class.java)
+                val sounds = getString(R.string.themer_sounds_fb1c3)
+                if (XMLPrefsManager.isAsciiArtSetting(target)) {
+                    intent.putExtra(TuixtActivity.MODE, TuixtActivity.MODE_ASCII_SETTINGS)
+                } else {
+                    val root = XMLPrefsManager.XMLPrefsRoot.entries.firstOrNull { target in it.enums } ?: return
+                    intent.putExtra(TuixtActivity.PATH, File(Tuils.getFolder(), root.path()).absolutePath)
+                    if (target is Behavior) {
+                        if (XMLPrefsManager.sectionFor(target) == sounds) intent.putExtra(TuixtActivity.ONLY_SECTION, sounds)
+                        else intent.putExtra(TuixtActivity.EXCLUDE_SECTION, sounds)
+                    }
+                }
+                intent.putExtra(TuixtActivity.FOCUS, target.label())
+                openSettingsChild(intent)
+            }
+        }
+    }
+
+    /** What tapping hub item [fileName] does (a section, a settings page or an action); search results reuse it. */
+    private fun onHubItem(fileName: String) {
+        if (section == SECTION_PRESET_APPLY) {
+            applyPreset(fileName)
+            return
+        }
+        if (section == SECTION_PRESET_REMOVE) {
+            confirmRemovePreset(fileName)
+            return
+        }
+        if (fileName == HubAction.APPEARANCE.name) {
+            openSection(SECTION_APPEARANCE)
+        } else if (fileName == HubAction.BEHAVIOR.name) {
+            openSection(SECTION_BEHAVIOR)
+        } else if (fileName == HubAction.SOUNDS.name) {
+            openSoundsSettings()
+        } else if (fileName == HubAction.PERSONALIZATION.name) {
+            openSection(SECTION_PERSONALIZATION)
+        } else if (fileName == HubAction.ASCII_SETTINGS.name) {
+            openAsciiSettings()
+        } else if (fileName == HubAction.INTEGRATIONS.name) {
+            openSection(SECTION_INTEGRATIONS)
+        } else if (fileName == HubAction.LANGUAGE_PACKS.name) {
+            openSettingsChild(Intent(this@ThemerActivity, ohi.andre.consolelauncher.localization.LanguagePackActivity::class.java))
+        } else if (fileName == HubAction.SYSTEM_SUPPORT.name) {
+            openSection(SECTION_SYSTEM)
+        } else if (fileName == HubAction.OPEN_WALLPAPER_PICKER.name) {
+            launchWallpaperPicker()
+        } else if (fileName == HubAction.OPEN_LIVE_WALLPAPER_PICKER.name) {
+            launchLiveWallpaperPicker()
+        } else if (fileName == HubAction.RETUI_WALLPAPER.name) {
+            openSettingsChild(Intent(this@ThemerActivity, RetuiWallpaperActivity::class.java))
+        } else if (fileName == HubAction.PREFERRED_MUSIC_APP.name) {
+            showPreferredMusicAppPicker()
+        } else if (fileName == HubAction.TASKER_INTEGRATION.name) {
+            showTaskerIntegrationDialog()
+        } else if (fileName == HubAction.RE_KEYBOARD_SHORTCUTS.name) {
+            openSection(SECTION_KEYBOARD_SHORTCUTS)
+        } else if (fileName == HubAction.FONTS.name) {
+            openSection(SECTION_FONTS)
+        } else if (fileName == HubAction.TYPOGRAPHY.name) {
+            openSection(SECTION_TYPOGRAPHY)
+        } else if (fileName == HubAction.PRESETS.name) {
+            openSection(SECTION_PRESETS)
+        } else if (fileName == HubAction.FRAMES.name) {
+            openSection(SECTION_FRAMES)
+        } else if (section == SECTION_FRAMES) {
+            return
+        } else if (section == SECTION_PRESETS && fileName == HubAction.SAVE_CURRENT_AS_PRESET.name) {
+            showSavePresetInput()
+        } else if (section == SECTION_PRESETS && fileName == HubAction.APPLY_PRESET.name) {
+            openSection(SECTION_PRESET_APPLY)
+        } else if (section == SECTION_PRESETS && fileName == HubAction.REMOVE_PRESET.name) {
+            openSection(SECTION_PRESET_REMOVE)
+        } else if (section == SECTION_PRESET_APPLY) {
+            applyPreset(fileName)
+        } else if (section == SECTION_PRESET_REMOVE) {
+            confirmRemovePreset(fileName)
+        } else if (section == SECTION_FONTS && fileName == HubAction.DEFAULT_SYSTEM_FONT.name) {
+            applySystemFont()
+        } else if (section == SECTION_FONTS && fileName == HubAction.IMPORT_FONT.name) {
+            launchFontImportPicker()
+        } else if (fileName == HubAction.TOOLBAR_BUTTONS.name) {
+            showToolbarButtonsDialog()
+        } else if (isDystopiaRow(fileName)) {
+            handleDystopiaOptIn()
+        } else if (fileName == HubAction.VIEW_CRASH_LOG.name) {
+            val crashFile = File(Tuils.getFolder(), "crash.txt")
+            if (!crashFile.exists() || crashFile.length() == 0L) {
+                Toast.makeText(
+                    this@ThemerActivity,
+                    getString(R.string.themer_no_crash_log_found_79ebe),
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                val intent = Intent(this@ThemerActivity, TuixtActivity::class.java)
+                intent.putExtra(TuixtActivity.PATH, crashFile.getAbsolutePath())
+                openSettingsChild(intent)
+            }
+        } else if (fileName == HubAction.BACKUP.name) {
+            showBackupProtectionDialog()
+        } else if (fileName == HubAction.CREATE_SHAREABLE_CONFIGURATION.name) {
+            showShareableConfigurationSourcePicker()
+        } else if (fileName == HubAction.PRESET_MARKETPLACE.name) {
+            openSettingsChild(Intent(this@ThemerActivity, PresetMarketplaceActivity::class.java))
+        } else if (fileName == HubAction.IMPORT_RETUI_PRESET.name) {
+            openSettingsChild(Intent(this@ThemerActivity, PresetImportActivity::class.java).setAction(Intent.ACTION_MAIN))
+        } else if (fileName == HubAction.RESTORE.name) {
+            launchRestorePicker()
+        } else if (fileName == HubAction.RATE_THE_APP.name) {
+            openPlayStoreListing()
+        } else if (fileName == HubAction.GITHUB.name) {
+            openExternalUrl(GITHUB_URL)
+        } else if (fileName == HubAction.DISCORD.name) {
+            openExternalUrl(DISCORD_URL)
+        } else if (fileName == HubAction.REDDIT.name) {
+            openExternalUrl(REDDIT_URL)
+        } else if (fileName == HubAction.SEND_FEEDBACK.name) {
+            openFeedbackEmail()
+        } else if (fileName == HubAction.LEARN_MORE.name) {
+            openLearnMore()
+        } else {
+            openConfigFile(fileName)
+        }
     }
 
     private fun hubItemLabel(id: String): String {
@@ -815,6 +940,10 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
         if (targetSection != SECTION_FRAMES) expandedFrameSelector = null
         section = targetSection
         header!!.setText(getHeaderText(section))
+        searchBox?.let { box ->
+            if (section != SECTION_HOME && box.text.isNotEmpty()) box.setText("")
+            box.visibility = if (section == SECTION_HOME) View.VISIBLE else View.GONE
+        }
         sectionItems.clear()
         sectionItems.addAll(getItemsForSection(section))
         sectionsAdapter!!.notifyDataSetChanged()
@@ -1660,6 +1789,8 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
     }
 
     private fun handleSettingsBack() {
+        // Back first clears a search, then leaves the hub as usual.
+        if (section == SECTION_HOME && searchBox?.text?.isNotEmpty() == true) { searchBox!!.setText(""); return }
         if (section == SECTION_FRAMES && frameEditSession?.hasChanges() == true) {
             TuixtDialog.showConfirm(
                 this,
@@ -3337,6 +3468,10 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
             }
 
         const val EXTRA_SECTION: String = "section"
+        const val EXTRA_QUERY: String = "query"
+        private const val SEARCH_RESULT_PREFIX = "\u0000search:"
+        private const val SEARCH_EMPTY = "\u0000search-empty"
+        private val TOP_SECTIONS by lazy { setOf(SECTION_APPEARANCE, SECTION_BEHAVIOR, SECTION_PERSONALIZATION, SECTION_INTEGRATIONS, SECTION_SYSTEM) }
         const val SECTION_HOME: String = "home"
         const val SECTION_APPEARANCE: String = "appearance"
         const val SECTION_BEHAVIOR: String = "behavior"

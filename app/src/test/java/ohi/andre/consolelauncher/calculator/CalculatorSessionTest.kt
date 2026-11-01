@@ -31,6 +31,11 @@ class CalculatorSessionTest {
         assertEquals("10", CalculatorSession.display("1E+1"))
         assertEquals("0.000946969696969697 mi", CalculatorSession.display("0.000946969696969696969696969696969697 mi"))
         assertEquals("1/3", CalculatorSession.display("1/3"))
+        assertEquals("1,400,000", CalculatorSession.display("1400000", CalculatorSession.GROUPING_INTERNATIONAL))
+        assertEquals("1,40,000", CalculatorSession.display("140000", CalculatorSession.GROUPING_INDIAN))
+        assertEquals("-12,34,56,789.5 km", CalculatorSession.display("-123456789.5 km", CalculatorSession.GROUPING_INDIAN))
+        assertEquals("999", CalculatorSession.display("999", CalculatorSession.GROUPING_INDIAN))
+        assertEquals("140000", CalculatorSession.display("140000", CalculatorSession.GROUPING_NONE))
     }
     @Test fun substitutesWholeAnswerTokensWithGroupingAndUnits() {
         assertEquals("(5 ft) * 2", CalculatorSession.expand("ans * 2", "5 ft"))

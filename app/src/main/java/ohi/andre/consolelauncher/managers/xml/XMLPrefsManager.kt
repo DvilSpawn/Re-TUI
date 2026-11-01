@@ -578,6 +578,9 @@ object XMLPrefsManager {
             save === Behavior.ascii_animation ||
             save === Behavior.ascii_animation_frame_delay_ms ||
             save === Behavior.ascii_animation_max_file_kb ||
+            save === Behavior.ascii_effect ||
+            save === Behavior.ascii_effect_loop_seconds ||
+            save === Behavior.ascii_effect_speed ||
             save === Theme.ascii_text_color ||
             save === Theme.ascii_status_background_color ||
             save === Theme.ascii_status_text_shadow_color
@@ -607,8 +610,11 @@ object XMLPrefsManager {
         }
         label == "background_color" || label == "wallpaper_overlay_color" ||
             label == "settings_wallpaper_overlay_color" -> "Launcher"
+        label.startsWith("module_") || label.startsWith("terminal_") -> "Modules And Panels"
         label.contains("_status_") || label.startsWith("battery_text_") ||
             label in arrayOf(
+                "notes_text_color",
+                "locked_notes_text_color",
                 "device_text_color",
                 "ascii_text_color",
                 "time_text_color",
@@ -625,6 +631,11 @@ object XMLPrefsManager {
     }
 
     private fun uiSection(label: String): String = when {
+        // Text sizes of modules, output and input belong with the fonts, not the status lines.
+        label in arrayOf("module_header_text_size", "module_body_text_size", "output_header_text_size", "input_output_size") -> "Text And Font"
+        // Where things sit and how much room they get.
+        label in arrayOf("landscape_fold_gutter_mm", "output_tray_max_height", "module_dock_spacing_dp", "auto_color_pick",
+            "statusbar_light_icons") || label.startsWith("android_widget_") -> "Layout"
         label.contains("ascii") -> "Status Lines"
         label.startsWith("show_") && (label.contains("ram") || label.contains("battery") || label.contains("time") ||
             label.contains("storage") || label.contains("network") || label.contains("notes") || label.contains("weather") ||
@@ -639,7 +650,14 @@ object XMLPrefsManager {
     }
 
     private fun behaviorSection(label: String): String = when {
-        label == "qalculate" -> "Commands"
+        label == "qalculate" || label.startsWith("calculator_") -> "Commands"
+        // Alias and command-line syntax sits with the other command settings, not the output formats.
+        label in arrayOf("alias_param_separator", "alias_content_format", "multiple_cmd_separator", "optional_values_separator",
+            "max_optional_depth", "append_quote_before_file") -> "Commands"
+        label == "swipe_down_notifications" -> "Input"
+        label in arrayOf("random_play", "songs_folder", "songs_from_mediastore") -> "Modules"
+        // How the battery line is drawn, beside battery_format.
+        label.startsWith("battery_") -> "Formats"
         label.contains("sound") -> "Sounds"
         label.contains("notification") -> "Notifications"
         label.contains("weather") || label.contains("location") -> "Weather"

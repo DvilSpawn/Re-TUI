@@ -86,6 +86,7 @@ class AppDrawerPaneManager(
             ranking = null
             val appsManager = mainPackProvider()?.appsManager ?: return@setOnClickListener
             val c = colors ?: return@setOnClickListener
+            buildGroupTabs(appsManager, c[0], c[1], c[2])
             rebuildContents(appsManager, c[0], c[1], c[2])
         }
     }
@@ -336,6 +337,67 @@ class AppDrawerPaneManager(
         if (appsManager.isPrivateSpaceTabVisible()) {
             addPrivateTab(drawerColor, borderColor, backgroundColor)
         }
+        // The orders `apps -r / -n / -u` open with, as tabs: they sort whichever group is chosen.
+        groupTabs.addView(View(context).apply {
+            setBackgroundColor(ThemeColorResolver.color(Theme.app_drawer_group_border_color))
+            layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, Tuils.dpToPx(context, 1)).apply {
+                topMargin = Tuils.dpToPx(context, 4)
+                bottomMargin = Tuils.dpToPx(context, 8)
+            }
+        })
+        for (option in AppsManager.Ranking.entries) addRankingTab(option, drawerColor, borderColor, backgroundColor)
+    }
+
+    private fun addRankingTab(option: AppsManager.Ranking, drawerColor: Int, borderColor: Int, backgroundColor: Int) {
+        val tabs = groupTabs ?: return
+        val tab = TextView(context)
+        tab.layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, Tuils.dpToPx(context, 34))
+            .apply { bottomMargin = Tuils.dpToPx(context, 4) }
+        tab.gravity = Gravity.CENTER
+        tab.setPadding(Tuils.dpToPx(context, 2), 0, Tuils.dpToPx(context, 2), 0)
+        tab.text = context.getString(when (option) {
+            AppsManager.Ranking.RECENT -> R.string.apps_drawer_tab_recent
+            AppsManager.Ranking.NEWEST -> R.string.apps_drawer_tab_newest
+            AppsManager.Ranking.MOST_USED -> R.string.apps_drawer_tab_most_used
+        })
+        tab.contentDescription = context.getString(when (option) {
+            AppsManager.Ranking.RECENT -> R.string.apps_drawer_tab_recent_description
+            AppsManager.Ranking.NEWEST -> R.string.apps_drawer_tab_newest_description
+            AppsManager.Ranking.MOST_USED -> R.string.apps_drawer_tab_most_used_description
+        })
+        tab.maxLines = 1
+        tab.ellipsize = TextUtils.TruncateAt.END
+        tab.textSize = 9.5f
+        tab.setTypeface(Tuils.getTypeface(context), Typeface.BOLD)
+        tab.minWidth = 0
+        tab.minimumWidth = 0
+        val selected = ranking == option && !selectedPrivate
+        tab.background = TerminalBorderRuntime.panelDrawable(
+            context,
+            if (selected) ThemeColorResolver.color(Theme.app_drawer_group_selected_background_color)
+            else ThemeColorResolver.color(Theme.app_drawer_group_background_color),
+            if (selected) ThemeColorResolver.color(Theme.app_drawer_group_selected_border_color)
+            else ThemeColorResolver.color(Theme.app_drawer_group_border_color),
+            1.5f,
+            2,
+            dashedBorders(),
+            target = FrameTarget.APP_DRAWER
+        )
+        tab.setTextColor(
+            if (selected) ThemeColorResolver.color(Theme.app_drawer_group_selected_text_color)
+            else ThemeColorResolver.color(Theme.app_drawer_group_text_color)
+        )
+        tab.setOnClickListener {
+            // Tapping the active order goes back to A–Z; a typed filter would hide the order, so it clears.
+            ranking = if (ranking == option && !selectedPrivate) null else option
+            rankingLimit = 500
+            if (selectedPrivate) { selectedPrivate = false; selectedGroup = null }
+            if (filter.isNotEmpty()) { filter = Tuils.EMPTYSTRING; filterInput?.setText(Tuils.EMPTYSTRING) }
+            val appsManager = mainPackProvider()?.appsManager ?: return@setOnClickListener
+            buildGroupTabs(appsManager, drawerColor, borderColor, backgroundColor)
+            rebuildContents(appsManager, drawerColor, borderColor, backgroundColor)
+        }
+        tabs.addView(tab)
     }
 
     private fun addPrivateTab(drawerColor: Int, borderColor: Int, backgroundColor: Int) {

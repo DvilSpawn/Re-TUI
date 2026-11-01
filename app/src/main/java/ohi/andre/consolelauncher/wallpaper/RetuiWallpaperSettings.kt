@@ -18,6 +18,7 @@ object RetuiWallpaperSettings {
     private const val SCENE = "scene"
     private const val CLOUD_SCENE = "cloud_scene"
     private const val ASTRO_SEED = "astro_seed"
+    private const val ASTRO_MONO = "astro_mono"
     private const val MATRIX_STYLE = "matrix_style"
     private const val MATRIX_GLYPHS = "matrix_glyphs"
     private const val BLACK_HOLE_PALETTE = "black_hole_palette"
@@ -68,9 +69,11 @@ object RetuiWallpaperSettings {
         return Random.nextInt(0, 1 shl 20).also { prefs.edit().putInt(ASTRO_SEED, it).apply() }
     }
 
-    fun saveAstroSeed(context: Context, seed: Int) {
-        prefs(context).edit().putInt(ASTRO_SEED, seed).apply()
+    fun saveAstroSeed(context: Context, seed: Int, mono: Boolean = astroMono(context)) {
+        prefs(context).edit().putInt(ASTRO_SEED, seed).putBoolean(ASTRO_MONO, mono).apply()
     }
+
+    fun astroMono(context: Context): Boolean = prefs(context).getBoolean(ASTRO_MONO, false)
 
     fun matrixStyle(context: Context): String = prefs(context).getString(MATRIX_STYLE, "classic") ?: "classic"
     fun matrixGlyphs(context: Context): String = prefs(context).getString(MATRIX_GLYPHS, "katakana") ?: "katakana"

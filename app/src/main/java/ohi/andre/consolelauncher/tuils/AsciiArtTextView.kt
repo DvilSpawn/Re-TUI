@@ -6,11 +6,19 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Typeface
+import android.os.SystemClock
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.Gravity
 import androidx.appcompat.widget.AppCompatTextView
+import java.util.Collections
 import java.util.LinkedHashMap
+import java.util.WeakHashMap
+import ohi.andre.consolelauncher.tuils.asciifx.AsciiArt
+import ohi.andre.consolelauncher.tuils.asciifx.AsciiEffect
+import ohi.andre.consolelauncher.tuils.asciifx.AsciiEffects
+import ohi.andre.consolelauncher.tuils.asciifx.AsciiGrid
+import ohi.andre.consolelauncher.tuils.asciifx.TICKS_PER_SECOND
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.max
@@ -27,6 +35,35 @@ class AsciiArtTextView : AppCompatTextView {
     private var frameHash = 1
     private val bitmapCache = LinkedHashMap<String, Bitmap>(16, 0.75f, true)
     private var bitmapCacheBytes = 0
+    private val glyph = CharArray(1)
+    private var effect: AsciiEffect? = null
+    private var effectGrid: AsciiGrid? = null
+    private var effectStart = 0L
+    private var effectTicks = 0
+    private var pendingEffect: String? = null
+    private var loopName: String? = null
+    private var loopDelayMs = 0L
+    private var effectSpeed = 1f
+    private val loopReplay = Runnable { loopName?.let { name -> startEffect(name) } }
+    private val effectFrame = object : Runnable {
+        override fun run() {
+            val running = effect ?: return
+            val due = ((SystemClock.uptimeMillis() - effectStart) * TICKS_PER_SECOND * effectSpeed / 1000).toInt()
+            // A late frame catches up a few ticks at most rather than jumping.
+            if (due - effectTicks > MAX_CATCH_UP_TICKS) effectTicks = due - MAX_CATCH_UP_TICKS
+            var more = true
+            while (effectTicks < due && more) { more = running.step(); effectTicks++ }
+            if (!more || effectTicks > MAX_EFFECT_TICKS) {
+                endFrames()
+                // Looping: the art rests for the delay, then plays again.
+                if (loopName != null && loopDelayMs > 0) postDelayed(loopReplay, loopDelayMs)
+                return
+            }
+            effectGrid?.let(running::compose)
+            invalidate()
+            postOnAnimation(this)
+        }
+    }
 
     constructor(context: Context) : super(context) {
         init()
@@ -81,7 +118,9 @@ class AsciiArtTextView : AppCompatTextView {
         viewportRowsSetting = if (viewportRows > 0) viewportRows else DEFAULT_VIEWPORT_ROWS
         paneHeightRowsSetting = if (paneHeightRows > 0) paneHeightRows else DEFAULT_PANE_ROWS
         contentBounds = ContentBounds.from(lines)
+        val oldHash = frameHash
         frameHash = 31 * lines.hashCode() + (colors?.contentHashCode() ?: 0)
+        if (frameHash != oldHash && effect != null) endFrames()
         if (oldLineCount != lines.size ||
             oldBoundsWidth != contentBounds.width() ||
             oldViewportRowsSetting != viewportRowsSetting ||
@@ -90,7 +129,59 @@ class AsciiArtTextView : AppCompatTextView {
             requestLayout()
         }
         invalidate()
+        pendingEffect?.let { if (contentBounds.hasContent) { pendingEffect = null; startEffect(it) } }
     }
+
+    /**
+     * Plays [name] (an [AsciiEffects] name) over the current art; none or unknown names do nothing. With
+     * [loopSeconds] above 0 it plays again after resting that long, until [stopEffect]; [delayed] waits one rest first.
+     */
+    fun playEffect(name: String?, loopSeconds: Int = 0, delayed: Boolean = false, speed: Float = 1f) {
+        stopEffect()
+        if (name == null || name == AsciiEffects.NONE) return
+        effectSpeed = speed.coerceIn(0.25f, 4f)
+        loopName = name.takeIf { loopSeconds > 0 }
+        loopDelayMs = loopSeconds * 1000L
+        if (delayed && loopName != null) { postDelayed(loopReplay, loopDelayMs); return }
+        startEffect(name)
+    }
+
+    private fun startEffect(name: String) {
+        endFrames()
+        if (!contentBounds.hasContent) { pendingEffect = name; return }
+        val box = (contentBounds.top..contentBounds.bottom).map { row ->
+            val line = lines[row]
+            (contentBounds.left..contentBounds.right).map { col -> line.getOrNull(col) ?: ' ' }.joinToString("")
+        }
+        val colors = (contentBounds.top..contentBounds.bottom).map { row ->
+            IntArray(contentBounds.width()) { i -> lineColors.getOrNull(row)?.getOrNull(contentBounds.left + i) ?: 0 }
+        }
+        val next = AsciiEffects.create(name, AsciiArt(box, colors, textColor)) ?: return
+        effect = next
+        effectGrid = AsciiGrid(next.rows, next.cols).also(next::compose)
+        effectStart = SystemClock.uptimeMillis()
+        effectTicks = 0
+        invalidate()
+        postOnAnimation(effectFrame)
+    }
+
+    /** Ends any effect and its loop at once, showing the finished art. */
+    fun stopEffect() {
+        loopName = null
+        removeCallbacks(loopReplay)
+        endFrames()
+    }
+
+    private fun endFrames() {
+        pendingEffect = null
+        removeCallbacks(effectFrame)
+        if (effect == null && effectGrid == null) return
+        effect = null
+        effectGrid = null
+        invalidate()
+    }
+
+    val effectRunning get() = effect != null
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         configurePaint(baseTextSizePx())
@@ -123,6 +214,15 @@ class AsciiArtTextView : AppCompatTextView {
             return
         }
 
+        if (effectGrid != null) {
+            // A new frame every tick: drawn directly, not cached.
+            canvas.save()
+            canvas.translate(paddingLeft.toFloat(), paddingTop.toFloat())
+            canvas.clipRect(0, 0, availableWidth, availableHeight)
+            drawFrame(canvas, availableWidth, availableHeight)
+            canvas.restore()
+            return
+        }
         val bitmap = bitmapForCurrentFrame(availableWidth, availableHeight)
         canvas.drawBitmap(bitmap, paddingLeft.toFloat(), paddingTop.toFloat(), null)
     }
@@ -134,7 +234,14 @@ class AsciiArtTextView : AppCompatTextView {
         }
     }
 
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        synchronized(live) { live.add(this) }
+    }
+
     override fun onDetachedFromWindow() {
+        synchronized(live) { live.remove(this) }
+        stopEffect()
         clearBitmapCache()
         super.onDetachedFromWindow()
     }
@@ -159,10 +266,14 @@ class AsciiArtTextView : AppCompatTextView {
         )
         val bitmapCanvas = Canvas(bitmap)
         bitmap.eraseColor(Color.TRANSPARENT)
+        drawFrame(bitmapCanvas, availableWidth, availableHeight)
+        return bitmap
+    }
 
+    private fun drawFrame(bitmapCanvas: Canvas, availableWidth: Int, availableHeight: Int) {
         if (isAutoFitMode()) {
             drawFittedFrame(bitmapCanvas, availableWidth, availableHeight)
-            return bitmap
+            return
         }
 
         configurePaint(scaledTextSizePx(availableWidth, availableHeight))
@@ -183,11 +294,10 @@ class AsciiArtTextView : AppCompatTextView {
                 break
             }
 
-            val line = lines[lineIndex]
-            if (columnWindow.start < line.length) {
-                val end = min(line.length, columnWindow.end)
+            run {
+                val end = columnWindow.end
                 for (col in columnWindow.start until end) {
-                    val ch = line[col]
+                    val ch = symbolAt(lineIndex, col)
                     if (!ch.isWhitespace()) {
                         asciiPaint.color = cellColor(lineIndex, col)
                         drawCell(
@@ -205,8 +315,6 @@ class AsciiArtTextView : AppCompatTextView {
             baseline += lineHeight
             top += lineHeight
         }
-
-        return bitmap
     }
 
     private fun drawFittedFrame(canvas: Canvas, availableWidth: Int, availableHeight: Int) {
@@ -235,11 +343,10 @@ class AsciiArtTextView : AppCompatTextView {
         canvas.translate(offsetX, offsetY)
         canvas.scale(scale, scale)
         for (row in contentBounds.top..contentBounds.bottom) {
-            val line = lines[row]
-            if (contentBounds.left < line.length) {
-                val end = min(line.length, contentBounds.right + 1)
+            run {
+                val end = contentBounds.right + 1
                 for (col in contentBounds.left until end) {
-                    val ch = line[col]
+                    val ch = symbolAt(row, col)
                     if (!ch.isWhitespace()) {
                         asciiPaint.color = cellColor(row, col)
                         drawCell(
@@ -269,11 +376,10 @@ class AsciiArtTextView : AppCompatTextView {
         offsetY: Float
     ) {
         for (row in contentBounds.top..contentBounds.bottom) {
-            val line = lines[row]
-            if (contentBounds.left < line.length) {
-                val end = min(line.length, contentBounds.right + 1)
+            run {
+                val end = contentBounds.right + 1
                 for (col in contentBounds.left until end) {
-                    val ch = line[col]
+                    val ch = symbolAt(row, col)
                     if (!ch.isWhitespace()) {
                         asciiPaint.color = cellColor(row, col)
                         drawScaledCell(
@@ -317,8 +423,16 @@ class AsciiArtTextView : AppCompatTextView {
         asciiPaint.isAntiAlias = false
     }
 
-    private fun cellColor(row: Int, col: Int): Int =
-        lineColors.getOrNull(row)?.getOrNull(col)?.takeIf { it != 0 } ?: textColor
+    private fun cellColor(row: Int, col: Int): Int {
+        effectGrid?.let { grid -> return grid.color(row - contentBounds.top, col - contentBounds.left).takeIf { it != 0 } ?: textColor }
+        return lineColors.getOrNull(row)?.getOrNull(col)?.takeIf { it != 0 } ?: textColor
+    }
+
+    // While an effect plays, the art's box shows the effect's grid instead of the art.
+    private fun symbolAt(row: Int, col: Int): Char {
+        effectGrid?.let { grid -> return grid.symbol(row - contentBounds.top, col - contentBounds.left) }
+        return lines.getOrNull(row)?.getOrNull(col) ?: ' '
+    }
 
     private fun splitColors(lines: List<String>, colors: IntArray?): List<IntArray> {
         if (colors == null) return emptyList()
@@ -344,7 +458,11 @@ class AsciiArtTextView : AppCompatTextView {
             '\u2593' -> drawShadeCell(canvas, left, top, cellWidth, lineHeight, 205)
             '\u2592' -> drawShadeCell(canvas, left, top, cellWidth, lineHeight, 145)
             '\u2591' -> drawShadeCell(canvas, left, top, cellWidth, lineHeight, 85)
-            else -> canvas.drawText(ch.toString(), left, baseline, asciiPaint)
+            in '\u2581'..'\u2587' -> {
+                val fill = lineHeight * (ch - '\u2580') / 8f
+                canvas.drawRect(left, top + lineHeight - fill, left + ceil(cellWidth.toDouble()).toFloat(), top + lineHeight, asciiPaint)
+            }
+            else -> { glyph[0] = ch; canvas.drawText(glyph, 0, 1, left, baseline, asciiPaint) }
         }
     }
 
@@ -616,6 +734,20 @@ class AsciiArtTextView : AppCompatTextView {
     private data class ColumnWindow(val start: Int, val end: Int, val offset: Int)
 
     companion object {
+        private const val MAX_CATCH_UP_TICKS = 4
+        // Effects are intros: anything still running after 20 seconds just shows the art.
+        private const val MAX_EFFECT_TICKS = 20 * TICKS_PER_SECOND
+        private val live: MutableSet<AsciiArtTextView> = Collections.newSetFromMap(WeakHashMap())
+
+        /** Plays [name] on every ASCII pane on screen (the status pane and the unified status card). */
+        fun playEffects(name: String?, loopSeconds: Int = 0, delayed: Boolean = false, speed: Float = 1f) {
+            synchronized(live) { live.toList() }.filter { it.isShown }.forEach { it.playEffect(name, loopSeconds, delayed, speed) }
+        }
+
+        fun stopEffects() {
+            synchronized(live) { live.toList() }.forEach { it.stopEffect() }
+        }
+
         private const val VIEWPORT_TEXT_SIZE_SP = 12f
         private const val MIN_VIEWPORT_TEXT_SIZE_SP = 2.5f
         private const val FIT_INSET_PX = 4f

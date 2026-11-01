@@ -16,6 +16,11 @@ import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.HorizontalScrollView
+import android.graphics.Typeface
+import ohi.andre.consolelauncher.tuils.FigletFont
+import ohi.andre.consolelauncher.tuils.AsciiArtTextView
+import ohi.andre.consolelauncher.tuils.asciifx.AsciiEffects
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -343,6 +348,8 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
         }
 
         setContentView(screen)
+        // Opened from settings search: show just that setting (clearing the box shows the whole page again).
+        if (savedInstanceState == null && adapter != null) intent.getStringExtra(FOCUS)?.let { searchBox.setText(it) }
     }
 
     /** The landscape preview pane, framed like the settings panel beside it. */
@@ -387,6 +394,9 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
         }
         addAsciiAction(actions, getString(R.string.editor_tuixtactivity_import_ascii_txt_9b586)) {
             launchAsciiImportPicker()
+        }
+        addAsciiAction(actions, getString(R.string.editor_tuixtactivity_ascii_type_text)) {
+            showAsciiTextSheet()
         }
 
         return actions
@@ -441,6 +451,9 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
         rows.add(TuixtAdapter.SettingsRow.setting(Behavior.ascii_animation, getString(R.string.editor_tuixtactivity_animation_62afd)))
         rows.add(TuixtAdapter.SettingsRow.setting(Behavior.ascii_animation_frame_delay_ms, getString(R.string.editor_tuixtactivity_animation_62afd)))
         rows.add(TuixtAdapter.SettingsRow.setting(Behavior.ascii_animation_max_file_kb, getString(R.string.editor_tuixtactivity_animation_62afd)))
+        rows.add(TuixtAdapter.SettingsRow.setting(Behavior.ascii_effect, getString(R.string.editor_tuixtactivity_animation_62afd)))
+        rows.add(TuixtAdapter.SettingsRow.setting(Behavior.ascii_effect_speed, getString(R.string.editor_tuixtactivity_animation_62afd)))
+        rows.add(TuixtAdapter.SettingsRow.setting(Behavior.ascii_effect_loop_seconds, getString(R.string.editor_tuixtactivity_animation_62afd)))
 
         addSection(rows, getString(R.string.editor_tuixtactivity_layout_972ad))
         rows.add(TuixtAdapter.SettingsRow.setting(Ui.ascii_index, getString(R.string.editor_tuixtactivity_layout_972ad)))
@@ -529,7 +542,8 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
                 } else if (node.nodeType == Node.ELEMENT_NODE) {
                     val element = node as Element
                     val save = remaining.remove(element.nodeName) ?: continue
-                    val section = activeSection ?: XMLPrefsManager.sectionFor(save)
+                    // The code's sections win over older section comments in the file, so regrouping reaches every install.
+                    val section = XMLPrefsManager.sectionFor(save)
                     addGroupedRow(groupedRows, section, save)
                 }
             }
@@ -611,6 +625,98 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
             }
         }
         return rows
+    }
+
+    /**
+     * Types text as FIGlet letters with a live preview; an effect chip plays that intro on the preview (tap it to
+     * replay). Saving replaces ascii.txt (the old art goes to ascii.txt.bak) and keeps the chosen effect.
+     */
+    private fun showAsciiTextSheet() {
+        val content = LinearLayout(this)
+        content.orientation = LinearLayout.VERTICAL
+        val input = EditText(this)
+        input.hint = getString(R.string.editor_tuixtactivity_ascii_type_text_hint)
+        input.isSingleLine = true
+        styleInput(this, input)
+        content.addView(input, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
+
+        var font = FigletFont.DEFAULT
+        var effect = LauncherSettings.get(Behavior.ascii_effect)?.takeIf { it in AsciiEffects.NAMES } ?: AsciiEffects.NONE
+        var speed = LauncherSettings.get(Behavior.ascii_effect_speed)?.takeIf { it in AsciiEffects.SPEEDS } ?: "normal"
+        fun chipRow(names: List<String>, chosen: () -> String, pick: (String) -> Unit): List<TextView> {
+            val row = LinearLayout(this)
+            row.orientation = LinearLayout.HORIZONTAL
+            val views = names.map { name ->
+                TextView(this).also { chip ->
+                    chip.text = name
+                    chip.gravity = Gravity.CENTER
+                    chip.setOnClickListener { pick(name) }
+                    row.addView(chip, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+                        .apply { marginEnd = dp(this@TuixtActivity, 6f) })
+                }
+            }
+            content.addView(HorizontalScrollView(this).apply {
+                isHorizontalScrollBarEnabled = false
+                setPadding(0, dp(this@TuixtActivity, 10f), 0, 0)
+                addView(row)
+            })
+            return views
+        }
+
+        val preview = AsciiArtTextView(this)
+        preview.setPadding(0, dp(this, 12f), 0, 0)
+        fun art(): String = FigletFont.load(this, font)?.render(input.text.toString().trim()).orEmpty()
+        lateinit var fontChips: List<TextView>
+        lateinit var effectChips: List<TextView>
+        lateinit var speedChips: List<TextView>
+        fun redraw(replay: Boolean) {
+            fontChips.forEach { styleButton(this, it, it.text == font) }
+            effectChips.forEach { styleButton(this, it, it.text == effect) }
+            speedChips.forEach { styleButton(this, it, it.text == speed) }
+            // Auto-fit, as in the ASCII pane: wide text shrinks to the sheet's width.
+            preview.setAsciiFrame(art().ifEmpty { FigletFont.load(this, font)?.render("Re:TUI").orEmpty() },
+                LauncherSettings.getColor(Theme.ascii_text_color), -1, PREVIEW_ROWS)
+            if (replay) preview.playEffect(effect, speed = AsciiEffects.speed(speed))
+        }
+        fontChips = chipRow(FigletFont.BUNDLED, { font }) { font = it; redraw(true) }
+        effectChips = chipRow(AsciiEffects.NAMES, { effect }) { effect = it; redraw(true) }
+        speedChips = chipRow(AsciiEffects.SPEEDS, { speed }) { speed = it; redraw(true) }
+        content.addView(preview, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
+        preview.setOnClickListener { preview.playEffect(effect, speed = AsciiEffects.speed(speed)) }
+        input.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = redraw(false)
+            override fun afterTextChanged(s: Editable?) = Unit
+        })
+        redraw(true)
+
+        TuixtDialog.showContent(
+            this,
+            getString(R.string.editor_tuixtactivity_ascii_type_text_title),
+            content,
+            getString(R.string.editor_tuixtactivity_ascii_type_text_save),
+            getString(R.string.editor_tuixtactivity_cancel_1507c),
+            ConfirmAction { art().takeIf { it.isNotBlank() }?.let { saveAsciiText(it, effect, speed) } }
+        )
+    }
+
+    private fun saveAsciiText(art: String, effect: String, speed: String) {
+        val file = asciiFile
+        try {
+            file.parentFile?.mkdirs()
+            if (file.exists()) file.copyTo(File(file.parentFile, "ascii.txt.bak"), overwrite = true)
+            Tuils.write(file, "", art + "\n")
+        } catch (e: Exception) {
+            notifyAsciiImport(getString(R.string.editor_tuixtactivity_could_not_write_ascii_txt_5d089, e.message), true)
+            return
+        }
+        // Typed art is meant to be seen: turn the ASCII pane on if it is off, and keep the effect it was previewed with.
+        val changes = LinkedHashMap<XMLPrefsSave, String?>()
+        if (!LauncherSettings.getBoolean(Ui.show_ascii)) changes[Ui.show_ascii] = "true"
+        if (effect != LauncherSettings.get(Behavior.ascii_effect)) changes[Behavior.ascii_effect] = effect
+        if (speed != LauncherSettings.get(Behavior.ascii_effect_speed)) changes[Behavior.ascii_effect_speed] = speed
+        if (changes.isNotEmpty()) LauncherSettings.applyChanges(this, changes)
+        reloadLauncherForAscii(getString(R.string.editor_tuixtactivity_ascii_type_text_saved))
     }
 
     private fun openAsciiTxt() {
@@ -845,7 +951,9 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
         const val PATH: String = "path"
         const val MODE: String = "mode"
         const val MODE_ASCII_SETTINGS: String = "ascii_settings"
+        private const val PREVIEW_ROWS = 7
         const val ONLY_SECTION: String = "only_section"
+        const val FOCUS: String = "focus"
         const val EXCLUDE_SECTION: String = "exclude_section"
         const val ERROR_KEY: String = "error"
         const val BACK_PRESSED: Int = 2

@@ -71,6 +71,41 @@ https://github.com/ryanoasis/nerd-fonts/releases/tag/v3.5.1.
 This replaces the inherited Lucida Console asset in current builds; removing
 that asset does not remove it from earlier Git revisions or published binaries.
 
+## FIGlet fonts
+
+The ASCII settings page's "Type text" sheet bundles the FIGlet fonts Small,
+Standard, Slant, Mini and Shadow (`app/src/main/assets/figlet/`) by Glenn
+Chappell and Ian Chai, with later changes by Paul Burton and John Cowan, from
+the FIGlet distribution (https://github.com/cmatsuoka/figlet). Each font is
+bundled unmodified and keeps its header, which permits modification as long as
+the modifier's name is placed on a comment line. The renderer is Re:TUI's own
+code.
+
+## TerminalTextEffects
+
+The ASCII effects (`tuils/asciifx/`) are a Kotlin port of the effect engine and
+the print, decrypt, slide, wipe, rain and waves effects of TerminalTextEffects
+by ChrisBuilds (https://github.com/ChrisBuilds/terminaltexteffects), MIT
+License, Copyright (c) 2023 ChrisBuilds:
+
+> Permission is hereby granted, free of charge, to any person obtaining a copy
+> of this software and associated documentation files (the "Software"), to deal
+> in the Software without restriction, including without limitation the rights
+> to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> copies of the Software, and to permit persons to whom the Software is
+> furnished to do so, subject to the following conditions:
+>
+> The above copyright notice and this permission notice shall be included in all
+> copies or substantial portions of the Software.
+>
+> THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+> AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+> SOFTWARE.
+
 ## Maintainer-authored sounds and imagery
 
 On 2026-10-11 the maintainer confirmed the bundled launcher WAV sounds and

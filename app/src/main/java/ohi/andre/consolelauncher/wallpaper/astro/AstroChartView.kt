@@ -35,11 +35,15 @@ class AstroChartView(context: Context) : View(context) {
         private const val WARM_UP_STEPS = 60 * 20
         private const val MIN_BOOT_MS = 1600L
         private const val ONLINE_MS = 500L
+        private const val BLACK = 0xFF000000.toInt()
         private val preparer = Executors.newSingleThreadExecutor { r -> Thread(r, "astro-chart").apply { isDaemon = true } }
     }
 
     var seed = RetuiWallpaperSettings.astroSeed(context)
         private set
+    /** Monochrome: a black sky without the nebula, and the whole frame dithered to black and white pixels. */
+    var mono = RetuiWallpaperSettings.astroMono(context)
+        set(value) { field = value; invalidate() }
     val worldName get() = AstroWorld.nameOf(seed)
 
     private val paint = Paint().apply { isFilterBitmap = false; isAntiAlias = false; isDither = false }
@@ -108,12 +112,12 @@ class AstroChartView(context: Context) : View(context) {
             flybys.removeAll { it.gone }
         }
 
-        fun render() {
+        fun render(mono: Boolean) {
             val f = frame
-            System.arraycopy(base, 0, f.px, 0, base.size)
+            if (mono) f.px.fill(BLACK) else System.arraycopy(base, 0, f.px, 0, base.size)
             val t = time
             frames++
-            world.drawStars(f, t)
+            world.drawStars(f, t, mono)
             flybys.forEach { if (it.far) it.draw(f, t, frames) }
             world.drawRings(f, t, front = false)
             world.drawPlanet(f, t)
@@ -122,6 +126,7 @@ class AstroChartView(context: Context) : View(context) {
             station.draw(f, t)
             traffic.ships.forEach { it.draw(f, frames) }
             flybys.forEach { if (!it.far) it.draw(f, t, frames) }
+            if (mono) f.monochrome()
             bitmap.setPixels(f.px, 0, gw, 0, 0, gw, gh)
         }
     }
@@ -194,6 +199,7 @@ class AstroChartView(context: Context) : View(context) {
     }
 
     fun loadSeed() {
+        mono = RetuiWallpaperSettings.astroMono(context)
         val saved = RetuiWallpaperSettings.astroSeed(context)
         if (saved != seed) { seed = saved; dropScene() }
     }
@@ -203,7 +209,7 @@ class AstroChartView(context: Context) : View(context) {
         val s = currentScene(now)
         canvas.drawColor(Color.BLACK)
         if (s != null) {
-            s.render()
+            s.render(mono)
             blit(canvas, s.bitmap, s.gw, s.gh, s.cell)
             return
         }
@@ -252,6 +258,7 @@ class AstroChartView(context: Context) : View(context) {
 
     @RequiresApi(27)
     fun wallpaperColors(): WallpaperColors {
+        if (mono) return WallpaperColors(Color.valueOf(Color.WHITE), Color.valueOf(Color.BLACK), Color.valueOf(Color.GRAY))
         val colours = AstroWorld.signature(seed)
         return WallpaperColors(Color.valueOf(colours[0]), Color.valueOf(colours[1]), Color.valueOf(colours[2]))
     }

@@ -70,11 +70,16 @@ class CalculatorSessionIntegrationTest {
             instrumentation.runOnMainSync {
                 val field = activity!!.findViewById<EditText>(R.id.calculator_expression)
                 val symbols = activity!!.findViewById<android.view.ViewGroup>(R.id.calculator_symbols)
+                // The number pad's = is the submit key; the FUNC pad keeps an = that inserts, for equations.
+                assertEquals("=", activity!!.findViewById<TextView>(R.id.calculator_equals).text.toString())
+                activity!!.findViewById<View>(R.id.calculator_functions_tab).performClick()
                 field.setText("ans "); field.setSelection(field.length())
-                symbols.descendants.filterIsInstance<TextView>().first { it.text.toString() == "=" }.performClick()
+                val submit = activity!!.findViewById<View>(R.id.calculator_equals)
+                symbols.descendants.filterIsInstance<TextView>().first { it !== submit && it.text.toString() == "=" }.performClick()
                 assertEquals("ans =", field.text.toString())
-                assertTrue("Equals inserts; only Enter evaluates", activity!!.findViewById<View>(R.id.calculator_equals).isEnabled)
+                assertTrue("FUNC = inserts; only the submit key evaluates", submit.isEnabled)
                 assertNull(prefs.getString("terminal_ans", null))
+                activity!!.findViewById<View>(R.id.calculator_numbers_tab).performClick()
             }
             assertEquals("-5", execute("-5")) // With no previous result, signs retain their normal meaning.
             assertEquals("10", execute("5+5"))

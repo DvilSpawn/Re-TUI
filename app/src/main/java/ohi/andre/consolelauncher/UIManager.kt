@@ -191,6 +191,7 @@ import ohi.andre.consolelauncher.managers.xml.options.Toolbar
 import ohi.andre.consolelauncher.managers.xml.options.Ui
 import ohi.andre.consolelauncher.managers.xml.options.SurfaceBorder
 import ohi.andre.consolelauncher.tuils.AsciiArtTextView
+import ohi.andre.consolelauncher.tuils.asciifx.AsciiEffects
 import ohi.andre.consolelauncher.tuils.CrtOverlayDrawable
 import ohi.andre.consolelauncher.tuils.CyberpunkBackdropDrawable
 import ohi.andre.consolelauncher.tuils.CyberpunkIconFrameDrawable
@@ -575,9 +576,11 @@ class UIManager(
     private var asciiAnimationManager: AsciiAnimationManager? = null
     private var asciiIdlePaused = false
     private var launcherWindowFocused = true
+    private var touchStartedOnAscii = false
     private val asciiIdlePauseRunnable = Runnable {
         asciiIdlePaused = true
         asciiAnimationManager?.stop()
+        AsciiArtTextView.stopEffects()
     }
 
     private val statusUpdateListener: StatusUpdateListener =
@@ -6138,6 +6141,8 @@ class UIManager(
 
             gestureDetector!!.setOnDoubleTapListener(object : GestureDetector.OnDoubleTapListener {
                 override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+                    // Tapping the ASCII art replays its effect.
+                    if (touchStartedOnAscii) { playAsciiEffect(); return true }
                     return false
                 }
 
@@ -6455,6 +6460,7 @@ class UIManager(
             )
             asciiAnimationManager!!.start()
             scheduleAsciiIdlePause()
+            playAsciiEffect()
         }
 
         if (show[Label.unlock.ordinal]) {
@@ -13200,6 +13206,7 @@ class UIManager(
         if (unlockManager != null) unlockManager!!.start()
         tuiNotesManager?.start()
         resumeAsciiAnimation()
+        playAsciiEffect()
         if (androidWidgetDrawerManager?.isOpen == true) {
             androidWidgetDrawerManager?.startListening()
         } else {
@@ -13357,6 +13364,7 @@ class UIManager(
         onLauncherInteraction()
         if (event.actionMasked == MotionEvent.ACTION_DOWN) {
             gestureStartedOnOutput = v === terminalView || v === terminalView?.parent?.parent
+            touchStartedOnAscii = v is AsciiArtTextView
         }
         val handled = gestureDetector?.onTouchEvent(event) == true
         if (event.actionMasked == MotionEvent.ACTION_UP) {
@@ -13372,6 +13380,8 @@ class UIManager(
         if (asciiIdlePaused) {
             asciiIdlePaused = false
             asciiAnimationManager?.start()
+            // A looping effect picks up after its rest; a play-once effect stays finished.
+            playAsciiEffect(delayed = true)
         }
         scheduleAsciiIdlePause()
     }
@@ -13379,6 +13389,19 @@ class UIManager(
     private fun pauseAsciiAnimation() {
         handler?.removeCallbacks(asciiIdlePauseRunnable)
         asciiAnimationManager?.stop()
+        AsciiArtTextView.stopEffects()
+    }
+
+    /** Home appeared (or the art changed): play the chosen intro effect, unless the art animates by itself. */
+    private fun playAsciiEffect(delayed: Boolean = false) {
+        val manager = asciiAnimationManager ?: return
+        if (manager.animated || isLockdownOverlayVisible) return
+        val name = XMLPrefsManager.get(Behavior.ascii_effect)
+        val loop = XMLPrefsManager.getInt(Behavior.ascii_effect_loop_seconds).coerceAtLeast(0)
+        if (delayed && loop == 0) return
+        // After the art is bound to its view, which happens on the next pass.
+        val speed = AsciiEffects.speed(XMLPrefsManager.get(Behavior.ascii_effect_speed))
+        (handler ?: Handler(Looper.getMainLooper())).post { AsciiArtTextView.playEffects(name, loop, delayed, speed) }
     }
 
     private fun resumeAsciiAnimation() {

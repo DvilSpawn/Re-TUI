@@ -436,6 +436,8 @@
     <string name="themer_slot_off_b2989">"Slot %1$d: off"</string>
     <!-- openSoundsSettings -->
     <string name="themer_sounds_fb1c3" formatted="false">"Sounds"</string>
+    <string name="themer_search_all_settings" formatted="false">"Search all settings…"</string>
+    <string name="themer_search_no_results" formatted="false">"No setting matches. Try fewer or shorter words."</string>
     <!-- refreshRow -->
     <string name="themer_sp_base_7639d">"%1$dSP  ·  BASE %2$d"</string>
     <!-- refreshRow -->
