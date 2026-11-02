@@ -221,6 +221,7 @@ class TuixtAdapter(
         settingHolder.colorPicker.removeAllViews()
         settingHolder.colorPicker.visibility = View.GONE
         settingHolder.options.removeAllViews()
+        settingHolder.options.orientation = LinearLayout.HORIZONTAL
         settingHolder.options.setVisibility(View.GONE)
         settingHolder.itemView.setBackground(
             rect(
@@ -449,8 +450,7 @@ class TuixtAdapter(
             if (holder.action.visibility == View.VISIBLE) styleButton(context, holder.action, false)
             if (holder.options.visibility == View.VISIBLE) {
                 val current = getCurrentValue(item)?.trim()?.lowercase().orEmpty()
-                for (childIndex in 0 until holder.options.childCount) {
-                    val button = holder.options.getChildAt(childIndex) as? TextView ?: continue
+                for (button in optionButtons(holder.options)) {
                     val iconPicker = item === Toolbar.shortcut_button_1_icon || item === Toolbar.shortcut_button_2_icon
                     if (iconPicker) styleButton(context, button, true)
                     else styleChoice(context, button, button.tag == current)
@@ -482,10 +482,23 @@ class TuixtAdapter(
         }
         current = current!!.trim { it <= ' ' }.lowercase()
 
-        for (option in options) {
+        // More than fit across one row (the ASCII effects) wrap into rows of OPTIONS_PER_ROW, padded so every
+        // button keeps the same width.
+        val context = holder.itemView.context
+        val wrap = options.size > OPTIONS_PER_ROW
+        if (wrap) holder.options.orientation = LinearLayout.VERTICAL
+        var row = holder.options
+        for ((index, option) in options.withIndex()) {
+            if (wrap && index % OPTIONS_PER_ROW == 0) {
+                row = LinearLayout(context)
+                row.orientation = LinearLayout.HORIZONTAL
+                val rowParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+                if (index > 0) rowParams.topMargin = dp(context, 6f)
+                holder.options.addView(row, rowParams)
+            }
             val button = TextView(holder.itemView.getContext())
             val params = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
-            if (holder.options.getChildCount() > 0) {
+            if (row.getChildCount() > 0) {
                 params.leftMargin = dp(holder.itemView.getContext(), 6f)
             }
             button.setLayoutParams(params)
@@ -504,7 +517,22 @@ class TuixtAdapter(
                 changeDraft(item, option)
                 notifyDataSetChanged()
             })
-            holder.options.addView(button)
+            row.addView(button)
+        }
+        while (wrap && row.childCount < OPTIONS_PER_ROW) {
+            val spacer = View(context)
+            val params = LinearLayout.LayoutParams(0, 0, 1f)
+            params.leftMargin = dp(context, 6f)
+            row.addView(spacer, params)
+        }
+    }
+
+    /** The choice buttons in an options container, whether laid out in one row or wrapped into several. */
+    private fun optionButtons(options: LinearLayout): List<TextView> = (0 until options.childCount).flatMap { index ->
+        when (val child = options.getChildAt(index)) {
+            is TextView -> listOf(child)
+            is LinearLayout -> optionButtons(child)
+            else -> emptyList()
         }
     }
 
@@ -746,6 +774,7 @@ class TuixtAdapter(
     }
 
     companion object {
+        private const val OPTIONS_PER_ROW = 4
         private const val VIEW_TYPE_SECTION = 0
         private const val VIEW_TYPE_SETTING = 1
     }

@@ -2,6 +2,7 @@ package ohi.andre.consolelauncher.wallpaper
 
 import android.app.WallpaperManager
 import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
@@ -12,6 +13,7 @@ import ohi.andre.consolelauncher.wallpaper.nagomi.NagomiWallpaperService
 import java.io.File
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
+import androidx.core.util.AtomicFile
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.Gravity
@@ -42,7 +44,16 @@ import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.tuils.CrtOverlayDrawable
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi.applyFullscreen
 import ohi.andre.consolelauncher.wallpaper.astro.AstroChartView
+import ohi.andre.consolelauncher.wallpaper.pixel.DoomFireView
+import ohi.andre.consolelauncher.wallpaper.pixel.PhotoDitherView
+import ohi.andre.consolelauncher.wallpaper.pixel.PixelLook
+import ohi.andre.consolelauncher.wallpaper.pixel.RipplesView
+import ohi.andre.consolelauncher.wallpaper.pixel.ShorelineView
 import ohi.andre.consolelauncher.wallpaper.astro.AstroWorld
+
+private const val PHOTO_REQUEST = 3078
+private const val APPLY_REQUEST = 3079
+private const val NAGOMI_APPLY_REQUEST = 3080
 
 class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompatActivity() {
     private lateinit var root: FrameLayout
@@ -71,6 +82,11 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
     private var scene = "csakura"
     private lateinit var nagomiControls: LinearLayout
     private var nagomiBackground: File? = null
+    private var pickedPhoto: File? = null
+    private var wasOursBeforeApply = false
+    private lateinit var photoControls: View
+    private lateinit var ripplesButton: TextView
+    private lateinit var shoreControls: LinearLayout
     private var resumed = false
     private var imageRevision = 0
     private var imageLoading = false
@@ -221,6 +237,24 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
         }
         panel.addView(nagomiControls)
 
+        photoControls = row().apply {
+            addView(compactControl(getString(R.string.wallpaper_photo_choose)) {
+                startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                    type = "image/*"
+                    addCategory(Intent.CATEGORY_OPENABLE)
+                }, PHOTO_REQUEST)
+            })
+            ripplesButton = compactControl("") {
+                (preview as? PhotoDitherView)?.let { it.ripples = !it.ripples }
+                updateSceneControls()
+            }
+            addView(ripplesButton)
+        }
+        panel.addView(photoControls)
+
+        shoreControls = row()
+        panel.addView(shoreControls)
+
         val apply = row()
         applyButton = compactControl(getString(R.string.editor_retuiwallpaperactivity_use_on_phone_d908b)) { useOnPhone() }
         apply.addView(applyButton)
@@ -261,7 +295,7 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
         (preview as? NagomiView)?.setResumed(true)
     }
 
-    private fun availableScenes(): List<String> = (listOf("solid", "csakura", "black hole") +
+    private fun availableScenes(): List<String> = (listOf("solid", "csakura", "black hole", PhotoDitherView.SCENE, RipplesView.SCENE, DoomFireView.SCENE, ShorelineView.SCENE) +
         WallpaperPackStore.SCENES.values.filter { WallpaperLibrary.available(this, it) } + scene).distinct()
 
     private fun openWallpaperDownloads() {
@@ -283,6 +317,9 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
     @Deprecated("Legacy activity result used by this activity")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == APPLY_REQUEST) { finishApply(resultCode); return }
+        if (requestCode == NAGOMI_APPLY_REQUEST) return
+        if (requestCode == PHOTO_REQUEST && resultCode == RESULT_OK) { importPhoto(data?.data ?: return); return }
         if (requestCode != 3077 || resultCode != RESULT_OK) return
         val uri = data?.data ?: return
         val revision = ++imageRevision
@@ -304,6 +341,24 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
                 }
             }
         }, "Nagomi image import").start()
+    }
+
+    /** Copies the picked photo privately (bounded, rotated upright) and previews it; Use on phone saves it. */
+    private fun importPhoto(uri: Uri) {
+        val revision = ++imageRevision
+        imageLoading = true
+        Thread({
+            val result = runCatching { NagomiBackground.import(applicationContext, uri) }
+            runOnUiThread {
+                if (isDestroyed || revision != imageRevision) { result.getOrNull()?.delete(); return@runOnUiThread }
+                imageLoading = false
+                result.onSuccess { file ->
+                    pickedPhoto?.delete()
+                    pickedPhoto = file
+                    (preview as? PhotoDitherView)?.photo = file
+                }.onFailure { Toast.makeText(this, R.string.nagomi_image_failed, Toast.LENGTH_LONG).show() }
+            }
+        }, "Dither photo import").start()
     }
 
     private fun openNagomiLink(url: String) {
@@ -337,6 +392,8 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
 
     private fun move(dx: Float, dy: Float) {
         when (val current = preview) {
+            is PhotoDitherView -> current.offset += dy / 16f * PhotoDitherView.OFFSET_STEP
+            is ShorelineView -> { current.offsetX += dx / 16f * ShorelineView.OFFSET_STEP; current.offsetY += dy / 16f * ShorelineView.OFFSET_STEP }
             is CsakuraView -> { current.offsetX += dx; current.offsetY += dy }
             is BlackHoleView -> { current.offsetX += dx; current.offsetY += dy }
             is TopoNoiseView -> { current.offsetX += dx; current.offsetY += dy }
@@ -346,37 +403,61 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
     private fun save() {
         check(WallpaperLibrary.available(this, scene)) { "Download the selected wallpaper before applying it" }
         if (scene == NagomiView.SCENE) NagomiBackground.apply(this, nagomiBackground)
-        RetuiWallpaperSettings.saveScene(this, scene)
+        // Staged, not applied: Android's apply page previews these, and they only replace the running wallpaper's
+        // settings once the user applies there (see onActivityResult). Nagomi has its own service and applies now.
+        val target: Context = if (scene == NagomiView.SCENE) this else RetuiWallpaperSettings.beginPending(this)
+        PhotoDitherView.pending(this).delete()
+        if (scene == PhotoDitherView.SCENE) pickedPhoto?.let { picked ->
+            val staged = AtomicFile(PhotoDitherView.pending(this))
+            val output = staged.startWrite()
+            try { picked.inputStream().use { it.copyTo(output) }; staged.finishWrite(output) } catch (e: Exception) { staged.failWrite(output); throw e }
+        }
+        RetuiWallpaperSettings.saveScene(target, scene)
         when (val current = preview) {
-            is CsakuraView -> RetuiWallpaperSettings.save(
-                this, current.offsetX, current.offsetY, current.treeScale,
+            is CsakuraView -> RetuiWallpaperSettings.save(target, current.offsetX, current.offsetY, current.treeScale,
                 current.treeHeight, current.treeWidth, current.petalDensity, current.treeSeed,
                 current.paletteName
             )
             is BlackHoleView -> {
-                RetuiWallpaperSettings.save(
-                    this, current.offsetX, current.offsetY, current.sceneScale,
+                RetuiWallpaperSettings.save(target, current.offsetX, current.offsetY, current.sceneScale,
                     current.diskTilt, current.diskWidth,
                     current.particleDensity, RetuiWallpaperSettings.treeSeed(this), RetuiWallpaperSettings.palette(this)
                 )
-                RetuiWallpaperSettings.saveBlackHolePalette(this, current.paletteName)
+                RetuiWallpaperSettings.saveBlackHolePalette(target, current.paletteName)
             }
-            is TopoNoiseView -> RetuiWallpaperSettings.saveTopo(
-                this, current.offsetX, current.offsetY, current.noiseScale, current.relief,
+            is TopoNoiseView -> RetuiWallpaperSettings.saveTopo(target, current.offsetX, current.offsetY, current.noiseScale, current.relief,
                 current.contourDensity, current.seed, current.paletteName,
                 current.color(0), current.color(1), current.color(2)
             )
-            is PixelDreamView -> RetuiWallpaperSettings.savePixelDream(
-                this, current.paletteName, current.currentSeed(),
+            is PixelDreamView -> RetuiWallpaperSettings.savePixelDream(target, current.paletteName, current.currentSeed(),
                 current.color(0), current.color(1), current.color(2), current.color(3),
                 current.color(4), current.color(5)
             )
-            is SolidColorView -> RetuiWallpaperSettings.saveSolidColor(this, hex(current.color))
-            is CloudsView -> RetuiWallpaperSettings.saveCloudScene(this, current.sceneNumber)
-            is AstroChartView -> RetuiWallpaperSettings.saveAstroSeed(this, current.seed, current.mono)
-            is MatrixRainView -> RetuiWallpaperSettings.saveMatrix(this, current.styleName, current.charSet.name)
+            is SolidColorView -> RetuiWallpaperSettings.saveSolidColor(target, hex(current.color))
+            is CloudsView -> RetuiWallpaperSettings.saveCloudScene(target, current.sceneNumber)
+            is AstroChartView -> RetuiWallpaperSettings.saveAstroSeed(target, current.seed, current.mono)
+            is MatrixRainView -> RetuiWallpaperSettings.saveMatrix(target, current.styleName, current.charSet.name)
+            is PhotoDitherView -> RetuiWallpaperSettings.savePixelWallpaper(target, scene, current.look.id, current.ripples, current.offset)
+            is RipplesView -> RetuiWallpaperSettings.savePixelWallpaper(target, scene, current.style)
+            is DoomFireView -> RetuiWallpaperSettings.savePixelWallpaper(target, scene, current.styleName)
+            is ShorelineView -> RetuiWallpaperSettings.saveShoreline(target, current.look.id, current.offsetX, current.offsetY, current.mode, current.customText)
         }
-        sendBroadcast(Intent(RetuiWallpaperService.ACTION_REFRESH).setPackage(packageName))
+        if (scene == NagomiView.SCENE) sendBroadcast(Intent(RetuiWallpaperService.ACTION_REFRESH).setPackage(packageName))
+    }
+
+    /** Android reported back from its apply page: keep the staged choices only if the wallpaper was applied. */
+    private fun finishApply(resultCode: Int) {
+        val ours = (WallpaperManager.getInstance(this).wallpaperInfo?.component?.className == RetuiWallpaperService::class.java.name)
+        // Some systems return no result when applying, so becoming the live wallpaper also counts as applied.
+        val applied = resultCode == RESULT_OK || (ours && !wasOursBeforeApply)
+        android.util.Log.i("TUI-Wallpaper", "apply page result=$resultCode applied=$applied")
+        if (applied) {
+            RetuiWallpaperService.applyStaged(this)
+            pickedPhoto = null
+        } else {
+            RetuiWallpaperSettings.discardPending(this)
+            PhotoDitherView.pending(this).delete()
+        }
     }
 
     private fun createPreview(name: String): android.view.View {
@@ -402,6 +483,10 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
             CloudsView.SCENE -> CloudsView(this)
             AstroChartView.SCENE -> AstroChartView(this)
             MatrixRainView.SCENE -> MatrixRainView(this)
+            PhotoDitherView.SCENE -> PhotoDitherView(this).apply { pickedPhoto?.let { photo = it } }
+            RipplesView.SCENE -> RipplesView(this)
+            DoomFireView.SCENE -> DoomFireView(this)
+            ShorelineView.SCENE -> ShorelineView(this)
             NagomiView.SCENE -> NagomiView(this).apply {
                 pondBackground = nagomiBackground
                 setResumed(resumed)
@@ -461,6 +546,11 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
                 if (!current.mono) current.showWorld(index)
             }
         }
+        // Pixel wallpapers: the palette the picture is dithered to (fire also keeps its classic colours).
+        is DoomFireView -> spinner(DoomFireView.LOOKS, DoomFireView.LOOKS.indexOf(current.styleName).coerceAtLeast(0)) { current.styleName = it }
+        is PhotoDitherView -> PixelLook.entries.map { it.id }.let { names -> spinner(names, names.indexOf(current.look.id)) { current.look = PixelLook.of(it) } }
+        is ShorelineView -> PixelLook.entries.map { it.id }.let { names -> spinner(names, names.indexOf(current.look.id)) { current.look = PixelLook.of(it) } }
+        is RipplesView -> spinner(RipplesView.STYLES, RipplesView.STYLES.indexOf(current.style).coerceAtLeast(0)) { current.style = it }
         is MatrixRainView -> spinner(MatrixRainView.STYLE_NAMES, MatrixRainView.STYLE_NAMES.indexOf(current.styleName).coerceAtLeast(0), current::setStyle)
         is CloudsView -> CloudsView.sceneNames(this).let { names ->
             spinner(names, current.sceneNumber - 1) { current.setScene(names.indexOf(it) + 1) }
@@ -497,12 +587,22 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
         val nagomi = scene == NagomiView.SCENE
         val astro = scene == AstroChartView.SCENE
         val matrix = scene == MatrixRainView.SCENE
+        val pixelScene = scene == PhotoDitherView.SCENE || scene == RipplesView.SCENE || scene == DoomFireView.SCENE || scene == ShorelineView.SCENE
+        photoControls.visibility = if (scene == PhotoDitherView.SCENE) View.VISIBLE else View.GONE
+        bindShoreControls(available)
+        (preview as? PhotoDitherView)?.let {
+            ripplesButton.text = getString(if (it.ripples) R.string.wallpaper_photo_ripples_on else R.string.wallpaper_photo_ripples_off)
+        }
         nagomiControls.visibility = if (nagomi && available) View.VISIBLE else View.GONE
         colorLabel.visibility = if (nagomi || !available) View.GONE else View.VISIBLE
         colorSpinner.visibility = if (nagomi || !available) View.GONE else View.VISIBLE
-        colorLabel.text = getString(if (clouds) R.string.wallpaper_clouds_scene_label else if (astro) R.string.wallpaper_astro_world_label else if (matrix) R.string.wallpaper_matrix_style_label else R.string.editor_retuiwallpaperactivity_color_34171)
-        val visibility = if (!available || scene == "solid" || scene == PixelDreamView.SCENE || clouds || nagomi || astro || matrix) View.GONE else View.VISIBLE
+        colorLabel.text = getString(if (clouds) R.string.wallpaper_clouds_scene_label else if (astro) R.string.wallpaper_astro_world_label else if (matrix) R.string.wallpaper_matrix_style_label else if (pixelScene) R.string.wallpaper_pixel_look_label else R.string.editor_retuiwallpaperactivity_color_34171)
+        val visibility = if (!available || scene == "solid" || scene == PixelDreamView.SCENE || clouds || nagomi || astro || matrix || pixelScene) View.GONE else View.VISIBLE
         positionControls.forEach { it.visibility = visibility }
+        // The photo moves up and down only: show its ↑ and ↓.
+        if (scene == PhotoDitherView.SCENE && available) positionControls.take(2).forEach { it.visibility = View.VISIBLE }
+        // The shoreline moves the time (and its waves) every way.
+        if (scene == ShorelineView.SCENE && available) positionControls.forEach { it.visibility = View.VISIBLE }
         tuningControls.forEach { it.visibility = visibility }
         if ((astro || matrix) && available) regrowRow.visibility = View.VISIBLE  // Astro: a new world; Matrix: the next glyph set
         regrowButton.text = when {
@@ -516,7 +616,8 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
         zoomLabel.visibility = zoomVisibility
         zoomMinus.visibility = zoomVisibility
         zoomPlus.visibility = zoomVisibility
-        panelParams.height = if (!available) dp(116) else if (nagomi) ViewGroup.LayoutParams.WRAP_CONTENT else dp(if (clouds) 116 else if (astro || matrix) 166 else if (scene == TopoNoiseView.SCENE) 318 else 268)
+        panelParams.height = if (!available) dp(116) else if (nagomi) ViewGroup.LayoutParams.WRAP_CONTENT
+            else if (scene == PhotoDitherView.SCENE || scene == ShorelineView.SCENE) dp(166) else dp(if (clouds || pixelScene) 116 else if (astro || matrix) 166 else if (scene == TopoNoiseView.SCENE) 318 else 268)
         settingsPanel.layoutParams = panelParams
         topoColorControls.forEachIndexed { index, button ->
             val topo = preview as? TopoNoiseView ?: return@forEachIndexed
@@ -527,6 +628,33 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
             val pixel = preview as? PixelDreamView ?: return@forEachIndexed
             button.setBackgroundColor(pixel.color(index))
             button.setTextColor(if (ColorUtils.calculateLuminance(pixel.color(index)) > 0.5) Color.BLACK else Color.WHITE)
+        }
+    }
+
+    /** Shoreline: what is written on the sand (time, date or your own text) and a button to edit the text. */
+    private fun bindShoreControls(available: Boolean) {
+        shoreControls.removeAllViews()
+        val shore = preview as? ShorelineView
+        shoreControls.visibility = if (shore != null && available) View.VISIBLE else View.GONE
+        if (shore == null) return
+        shoreControls.addView(label(getString(R.string.wallpaper_shore_text_label)))
+        shoreControls.addView(spinner(ShorelineView.MODES, ShorelineView.MODES.indexOf(shore.mode)) { mode ->
+            if (mode == shore.mode) return@spinner
+            shore.mode = mode
+            if (mode == ShorelineView.CUSTOM && shore.customText.isBlank()) editShoreText(shore)
+        })
+        shoreControls.addView(compactControl(getString(R.string.wallpaper_shore_edit_text)) { editShoreText(shore) })
+    }
+
+    private fun editShoreText(shore: ShorelineView) {
+        TuixtDialog.showInput(this, getString(R.string.wallpaper_shore_text_title),
+            shore.customText.ifBlank { getString(R.string.wallpaper_shore_text_hint) },
+            getString(android.R.string.ok), getString(android.R.string.cancel)
+        ) { value ->
+            if (value.isNullOrBlank()) return@showInput
+            shore.customText = value.trim()
+            shore.mode = ShorelineView.CUSTOM
+            bindShoreControls(true)
         }
     }
 
@@ -710,17 +838,20 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
             return
         }
         val component = ComponentName(this, if (scene == NagomiView.SCENE) NagomiWallpaperService::class.java else RetuiWallpaperService::class.java)
+        wasOursBeforeApply = WallpaperManager.getInstance(this).wallpaperInfo?.component?.className == RetuiWallpaperService::class.java.name
+        val request = if (scene == NagomiView.SCENE) NAGOMI_APPLY_REQUEST else APPLY_REQUEST
+        RetuiWallpaperSettings.markApplyStarted(this)
         // A selected component can have a stopped engine after an update or test run.
         // Let Android bind/apply it instead of assuming wallpaperInfo means it is running.
         try {
-            startActivity(Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER).apply {
+            startActivityForResult(Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER).apply {
                 putExtra(
                     WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT,
                     component
                 )
-            })
+            }, request)
         } catch (_: Exception) {
-            startActivity(Intent(WallpaperManager.ACTION_LIVE_WALLPAPER_CHOOSER))
+            startActivityForResult(Intent(WallpaperManager.ACTION_LIVE_WALLPAPER_CHOOSER), request)
         }
     }
 
@@ -761,6 +892,10 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
                 PixelDreamView.SCENE -> getString(R.string.wallpaper_pixel_dream)
                 CloudsView.SCENE -> getString(R.string.wallpaper_clouds)
                 MatrixRainView.SCENE -> getString(R.string.wallpaper_matrix_rain)
+                PhotoDitherView.SCENE -> getString(R.string.wallpaper_dither_photo)
+                RipplesView.SCENE -> getString(R.string.wallpaper_ripples)
+                DoomFireView.SCENE -> getString(R.string.wallpaper_doom_fire)
+                ShorelineView.SCENE -> getString(R.string.wallpaper_shoreline)
                 NagomiView.SCENE -> getString(R.string.nagomi_title)
                 "solid" -> getString(R.string.wallpaper_solid)
                 else -> it

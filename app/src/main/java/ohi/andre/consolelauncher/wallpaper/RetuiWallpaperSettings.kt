@@ -19,6 +19,13 @@ object RetuiWallpaperSettings {
     private const val CLOUD_SCENE = "cloud_scene"
     private const val ASTRO_SEED = "astro_seed"
     private const val ASTRO_MONO = "astro_mono"
+    private const val PIXEL_LOOK = "pixel_look_"
+    private const val PHOTO_RIPPLES = "photo_ripples"
+    private const val PHOTO_OFFSET = "photo_offset"
+    private const val SHORE_OFFSET_X = "shore_offset_x"
+    private const val SHORE_OFFSET_Y = "shore_offset_y"
+    private const val SHORE_MODE = "shore_mode"
+    private const val SHORE_TEXT = "shore_text"
     private const val MATRIX_STYLE = "matrix_style"
     private const val MATRIX_GLYPHS = "matrix_glyphs"
     private const val BLACK_HOLE_PALETTE = "black_hole_palette"
@@ -74,6 +81,25 @@ object RetuiWallpaperSettings {
     }
 
     fun astroMono(context: Context): Boolean = prefs(context).getBoolean(ASTRO_MONO, false)
+
+    /** The look (palette) a pixel wallpaper is dithered to, per scene; null keeps the scene's default. */
+    fun pixelLook(context: Context, scene: String): String? = prefs(context).getString(PIXEL_LOOK + scene, null)
+    fun photoRipples(context: Context): Boolean = prefs(context).getBoolean(PHOTO_RIPPLES, true)
+    fun photoOffset(context: Context): Float = prefs(context).getFloat(PHOTO_OFFSET, 0f)
+    fun shoreOffsetX(context: Context): Float = prefs(context).getFloat(SHORE_OFFSET_X, 0f)
+    fun shoreOffsetY(context: Context): Float = prefs(context).getFloat(SHORE_OFFSET_Y, 0f)
+    fun shoreMode(context: Context): String = prefs(context).getString(SHORE_MODE, "time") ?: "time"
+    fun shoreText(context: Context): String = prefs(context).getString(SHORE_TEXT, "") ?: ""
+    fun saveShoreline(context: Context, look: String, offsetX: Float, offsetY: Float, mode: String, text: String) {
+        prefs(context).edit().putString(PIXEL_LOOK + "shoreline", look).putFloat(SHORE_OFFSET_X, offsetX).putFloat(SHORE_OFFSET_Y, offsetY)
+            .putString(SHORE_MODE, mode).putString(SHORE_TEXT, text).apply()
+    }
+    fun savePixelWallpaper(context: Context, scene: String, look: String, ripples: Boolean? = null, photoOffset: Float? = null) {
+        prefs(context).edit().putString(PIXEL_LOOK + scene, look).apply {
+            if (ripples != null) putBoolean(PHOTO_RIPPLES, ripples)
+            if (photoOffset != null) putFloat(PHOTO_OFFSET, photoOffset)
+        }.apply()
+    }
 
     fun matrixStyle(context: Context): String = prefs(context).getString(MATRIX_STYLE, "classic") ?: "classic"
     fun matrixGlyphs(context: Context): String = prefs(context).getString(MATRIX_GLYPHS, "katakana") ?: "katakana"
@@ -205,6 +231,81 @@ object RetuiWallpaperSettings {
 
     private fun prefs(context: Context) =
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+
+    // Use on phone stages the picker's choices here. Android's apply page previews them (its engine reads through
+    // previewContext); the running wallpaper keeps the committed settings until the user really applies.
+    private const val PENDING = "retui_wallpaper_pending"
+    private const val PENDING_MARK = "__pending"
+    private const val APPLY_STARTED = "__apply_started"
+    private const val PREVIEWED = "__previewed"
+    /** How long after Use on phone a wallpaper change still counts as the user applying the staged choice. */
+    private const val APPLY_WINDOW_MS = 10 * 60_000L
+
+    /** Settings as the apply page should preview them: the staged ones while a choice is pending. */
+    class PreviewContext(base: Context) : android.content.ContextWrapper(base) {
+        override fun getSharedPreferences(name: String?, mode: Int): android.content.SharedPreferences {
+            val pending = baseContext.getSharedPreferences(PENDING, Context.MODE_PRIVATE)
+            return if (name == PREFS && pending.contains(PENDING_MARK)) pending else super.getSharedPreferences(name, mode)
+        }
+    }
+
+    fun previewContext(context: Context): Context = context as? PreviewContext ?: PreviewContext(context)
+
+    /** Starts a staged copy of the current settings; save into the returned context. */
+    fun beginPending(context: Context): Context {
+        val pending = context.getSharedPreferences(PENDING, Context.MODE_PRIVATE).edit().clear()
+        copy(prefs(context).all, pending)
+        pending.putBoolean(PENDING_MARK, true).commit()
+        return PreviewContext(context)
+    }
+
+    fun hasPending(context: Context): Boolean = context.getSharedPreferences(PENDING, Context.MODE_PRIVATE).contains(PENDING_MARK)
+
+    /** Android's apply page is opening for the staged choice. */
+    fun markApplyStarted(context: Context) {
+        context.getSharedPreferences(PENDING, Context.MODE_PRIVATE).edit().putLong(APPLY_STARTED, System.currentTimeMillis()).commit()
+    }
+
+    /** The apply page is showing the staged choice. */
+    fun markPreviewed(context: Context) {
+        if (applyInProgress(context)) context.getSharedPreferences(PENDING, Context.MODE_PRIVATE).edit().putBoolean(PREVIEWED, true).commit()
+    }
+
+    /** The staged choice was shown on the apply page, which has since closed somewhere other than the picker. */
+    fun previewedForApply(context: Context): Boolean =
+        applyInProgress(context) && context.getSharedPreferences(PENDING, Context.MODE_PRIVATE).getBoolean(PREVIEWED, false)
+
+    /** A staged choice whose apply page opened in the last few minutes. */
+    fun applyInProgress(context: Context): Boolean {
+        val staged = context.getSharedPreferences(PENDING, Context.MODE_PRIVATE)
+        val started = staged.getLong(APPLY_STARTED, 0L)
+        return staged.contains(PENDING_MARK) && System.currentTimeMillis() - started in 0..APPLY_WINDOW_MS
+    }
+
+    /** The user applied: the staged settings become the wallpaper's. */
+    fun commitPending(context: Context) {
+        val staged = context.getSharedPreferences(PENDING, Context.MODE_PRIVATE)
+        if (!staged.contains(PENDING_MARK)) return
+        val committed = prefs(context).edit().clear()
+        copy(staged.all.filterKeys { it != PENDING_MARK && it != APPLY_STARTED && it != PREVIEWED }, committed)
+        committed.commit()
+        staged.edit().clear().commit()
+    }
+
+    fun discardPending(context: Context) {
+        context.getSharedPreferences(PENDING, Context.MODE_PRIVATE).edit().clear().commit()
+    }
+
+    private fun copy(values: Map<String, *>, editor: android.content.SharedPreferences.Editor) {
+        for ((key, value) in values) when (value) {
+            is Boolean -> editor.putBoolean(key, value)
+            is Int -> editor.putInt(key, value)
+            is Long -> editor.putLong(key, value)
+            is Float -> editor.putFloat(key, value)
+            is String -> editor.putString(key, value)
+            is Set<*> -> editor.putStringSet(key, value.filterIsInstance<String>().toSet())
+        }
+    }
 
     private fun legacyPixelColor(context: Context, key: String, fallback: Int): Int =
         prefs(context).getInt(key, fallback)
