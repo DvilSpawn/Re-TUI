@@ -1305,7 +1305,7 @@
   "changelog_release_highlights": {
     "formatted": false,
     "forms": {
-      "other": "Re:TUI V.5 turns IRC into a full client for any network, lets you open your dock modules from Search and Terminal mode, and adds recent, newest and most-used views to the app drawer.\n\n## IRC, rebuilt\n\nThe old Re:TUI chat server is retired. The IRC pane now connects to real IRC networks.\n\n- Pick Libera.Chat, OFTC, Rizon or hackint, or add any server that supports TLS. Connect to several networks at once.\n- Channels open side by side in a Termux-style split view. Tap a pane to start typing in it.\n- Dropped connections reconnect by themselves and rejoin your channels. They also reconnect as soon as your phone is back online.\n- Sign in with your account once, and Re:TUI can remember this phone with a device key, so you don't need the password next time. Where a network has no SASL, sign-in goes through NickServ.\n- If your nickname is taken, Re:TUI tries a variant instead of failing. When sign-in fails, the pane says why, such as a wrong password or an unverified account.\n- **Stay connected:** turn it on in the Networks page or with `/background on`. Your networks stay online after you close the pane, with an ongoing notification and a Disconnect button. Private messages and mentions of your nickname arrive as notifications; tap one to open that conversation.\n\n## Modules in Search and Terminal mode\n\n- Search results have a new **MODULES** group that lists your dock modules.\n- Tap one to open it right under the chips. The wallpaper blurs behind it, and the search bar and other results stay where they are.\n- Swipe sideways or tap another chip to switch modules. Tap the open chip, X or Back to close the module and return to your search.\n\n## Apps\n\n- `apps -r` opens the app drawer with your recently opened apps first, `apps -n` with the newest installed and `apps -u` with the most used. Tap the header to go back to A–Z.\n- The `apps` suggestion chips now lead with the views you use most.\n\n## Output pane\n\n- The output pane always keeps at least three lines, even when modules fill the screen.\n- When the output pane is collapsed, a ! on the OUTPUT tab shows that something new arrived.\n\n## Weather\n\n- `%name` shows your location again.\n- New placeholders for `weather_format`: `%temp_min` and `%temp_max` for the next 24 hours, and `%rain` for the rain expected in the next hour.\n\n## Fixes\n\n- Changes to alias.txt apply as soon as you save, without `restart`.\n- `-tutorial` on every command opens the right guide.\n- In Search and Terminal mode, the app drawer no longer closes on its own, Back closes open panes in Terminal mode, and `clear` also clears the results card.\n\n## V.5.1 · Build 701\n\n- Type text as ASCII art: Settings, Personalization, ASCII Settings, Type text as ASCII. Pick from five fonts with a live preview; saving keeps your previous art as ascii.txt.bak.\n- ASCII effects: print, decrypt, slide, wipe, rain, waves, beams, burn, middleout, colorshift and glitch animate the art each time Home appears. They work on typed, imported and coloured art. Set the speed, loop them with a rest in between, or tap the art to replay.\n- Settings search: a search box in the Settings hub finds any setting by name or description and opens it on its page. `settings clock format` opens Settings with that search.\n- Settings pages: settings that sat in the wrong section moved next to the ones they belong with, for example the alias syntax settings now sit together under Commands.\n- App drawer: REC, NEW and TOP tabs under the groups order the drawer by recently opened, newest installed or most used.\n- Astro Chart: a new monochrome option in the World list shows a black sky with white stars and the planet, station and ships dithered to black and white.\n- Calculator: on the number pad, = now gives the result, C clears what you typed and AC starts over; hold ⌫ to clear the input. Results group their digits as 1,400,000, or as 14,00,000 in lakhs and crores: choose Digit grouping from the calculator's ? menu.\n\nReopen these notes anytime with the `changelog` command."
+      "other": "Re:TUI V.5 turns IRC into a full client for any network, lets you open your dock modules from Search and Terminal mode, and adds recent, newest and most-used views to the app drawer.\n\n## IRC, rebuilt\n\nThe old Re:TUI chat server is retired. The IRC pane now connects to real IRC networks.\n\n- Pick Libera.Chat, OFTC, Rizon or hackint, or add any server that supports TLS. Connect to several networks at once.\n- Channels open side by side in a Termux-style split view. Tap a pane to start typing in it.\n- Dropped connections reconnect by themselves and rejoin your channels. They also reconnect as soon as your phone is back online.\n- Sign in with your account once, and Re:TUI can remember this phone with a device key, so you don't need the password next time. Where a network has no SASL, sign-in goes through NickServ.\n- If your nickname is taken, Re:TUI tries a variant instead of failing. When sign-in fails, the pane says why, such as a wrong password or an unverified account.\n- **Stay connected:** turn it on in the Networks page or with `/background on`. Your networks stay online after you close the pane, with an ongoing notification and a Disconnect button. Private messages and mentions of your nickname arrive as notifications; tap one to open that conversation.\n\n## Modules in Search and Terminal mode\n\n- Search results have a new **MODULES** group that lists your dock modules.\n- Tap one to open it right under the chips. The wallpaper blurs behind it, and the search bar and other results stay where they are.\n- Swipe sideways or tap another chip to switch modules. Tap the open chip, X or Back to close the module and return to your search.\n\n## Apps\n\n- `apps -r` opens the app drawer with your recently opened apps first, `apps -n` with the newest installed and `apps -u` with the most used. Tap the header to go back to A–Z.\n- The `apps` suggestion chips now lead with the views you use most.\n\n## Output pane\n\n- The output pane always keeps at least three lines, even when modules fill the screen.\n- When the output pane is collapsed, a ! on the OUTPUT tab shows that something new arrived.\n\n## Weather\n\n- `%name` shows your location again.\n- New placeholders for `weather_format`: `%temp_min` and `%temp_max` for the next 24 hours, and `%rain` for the rain expected in the next hour.\n\n## Fixes\n\n- Changes to alias.txt apply as soon as you save, without `restart`.\n- `-tutorial` on every command opens the right guide.\n- In Search and Terminal mode, the app drawer no longer closes on its own, Back closes open panes in Terminal mode, and `clear` also clears the results card.\n\n## V.5.1 · Build 701\n\n- Type text as ASCII art: Settings, Personalization, ASCII Settings, Type text as ASCII. Pick from five fonts with a live preview; saving keeps your previous art as ascii.txt.bak.\n- ASCII effects: print, decrypt, slide, wipe, rain, waves, beams, burn, middleout, colorshift and glitch animate the art each time Home appears. They work on typed, imported and coloured art. Set the speed, loop them with a rest in between, or tap the art to replay.\n- Settings search: a search box in the Settings hub finds any setting by name or description and opens it on its page. `settings clock format` opens Settings with that search.\n- Settings pages: settings that sat in the wrong section moved next to the ones they belong with, for example the alias syntax settings now sit together under Commands.\n- App drawer: REC, NEW and TOP tabs under the groups order the drawer by recently opened, newest installed or most used.\n- Astro Chart: a new monochrome option in the World list shows a black sky with white stars and the planet, station and ships dithered to black and white.\n- Calculator: on the number pad, = now gives the result, C clears what you typed and AC starts over; hold ⌫ to clear the input. Results group their digits as 1,400,000, or as 14,00,000 in lakhs and crores: choose Digit grouping from the calculator's ? menu.\n\n## V.5.2 · Build 702\n\n- Pixel wallpapers: four new live wallpapers drawn as crisp, dithered pixels, in mono, Game Boy or your theme's colours. Pick them in Settings, Personalization, Re:TUI Wallpaper.\n- Shoreline: the time, the date or your own words in dot-matrix letters on black sand, with waves that wash over the bottom of the text and slowly give it back. Move it with the arrows.\n- Dither photo: any photo dithered into a small framed picture, with optional ripples. Ripples: a still pool that ripples where you touch. Doom fire: a classic pixel fire.\n- Use on phone: the wallpaper you set up now takes effect on phones that return straight to the home screen after applying, such as vivo.\n- ASCII Settings: the effect choices wrap into rows so every name is readable.\n\nReopen these notes anytime with the `changelog` command."
     },
     "type": "string"
   },
@@ -12143,7 +12143,7 @@
   "offline_help_article_new_features_body": {
     "formatted": false,
     "forms": {
-      "other": "## Start here\n\nThis manual is bundled with Launcher and can be read offline. IRC and network services still need a connection. Read examples here; entering them at a live prompt can perform their described actions.\n\n- IRC: open `irc`, connect to Libera.Chat or another network, join a channel, then talk. Several networks can be connected at once. Find IRC guides in Tools.\n- Calculator: use 123, ABC and FUNC, check the interpretation/result hint, and use `to` for conversions. Read Calculator help in Tools.\n- Floating tools: Calculator, Help and IRC start expanded, remember their window choice and retain their floating size. Find Floating tools in Appearance.\n- Termux: the separate workspace has pages and up to two independent tiles. It offers a prompted update for the APK-bundled helper. Read Termux workspace and Helper updates in Automation.\n- Presets: a shared .retui package is inspected and saved first, not immediately applied. Personal .retui-backup archives are separate. Read Portable preset import in Presets.\n- Startup: new installs complete the introduction, configuration and build animation before entering Launcher. Existing completed setups are kept. Read Startup setup in Getting started.\n- Appearance: app-drawer category/alphabet rails have independent normal and selected colors. The default font is JetBrains Mono Nerd Font Regular; custom/system font controls remain available.\n- Idle fade: optionally fade Home and the Termux workspace to the wallpaper. It is off by default. Read Idle fade in Appearance.\n\n## Recent updates\n\n- ASCII art: type text as ASCII art in a choice of fonts, and animate any ASCII art with effects such as decrypt, rain or glitch. Read ASCII art and effects in Appearance.\n- Settings search: find any setting by name or description from the Settings hub, or with settings <words>. Read Settings search in Appearance.\n- App drawer: REC, NEW and TOP tabs under the groups order the drawer by recently opened, newest installed or most used.\n- Astro Chart: choose monochrome in the World list for a black sky and a planet dithered to black and white.\n- Help home: use 10 from any article or topic list to return directly to the main directory.\n- Notes: the library and editor share the terminal pane styling and background blur. Read Notes in Tools.\n- Settings: swipe through Status, Terminal, Music, Help and Calculator previews before saving appearance changes. Read Configuration workflow in Appearance.\n- Private Space: enable the private command in Behaviour on supported devices, unlock, then use `private -open <app name>`. Read Private Space in Apps.\n- Calculator: basic arithmetic is ready immediately; advanced Qalculate is downloaded and installed after confirmation.\n\n## Find an article directly\n\n```\nhelp -topic irc-community\n```\n\nAt Launcher Home, open the offline IRC guide. `help irc` prints the shorter command reference instead. Use numbered choices or tap a topic in this reader; Android Back closes Help and keeps your place."
+      "other": "## Start here\n\nThis manual is bundled with Launcher and can be read offline. IRC and network services still need a connection. Read examples here; entering them at a live prompt can perform their described actions.\n\n- IRC: open `irc`, connect to Libera.Chat or another network, join a channel, then talk. Several networks can be connected at once. Find IRC guides in Tools.\n- Calculator: use 123, ABC and FUNC, check the interpretation/result hint, and use `to` for conversions. Read Calculator help in Tools.\n- Floating tools: Calculator, Help and IRC start expanded, remember their window choice and retain their floating size. Find Floating tools in Appearance.\n- Termux: the separate workspace has pages and up to two independent tiles. It offers a prompted update for the APK-bundled helper. Read Termux workspace and Helper updates in Automation.\n- Presets: a shared .retui package is inspected and saved first, not immediately applied. Personal .retui-backup archives are separate. Read Portable preset import in Presets.\n- Startup: new installs complete the introduction, configuration and build animation before entering Launcher. Existing completed setups are kept. Read Startup setup in Getting started.\n- Appearance: app-drawer category/alphabet rails have independent normal and selected colors. The default font is JetBrains Mono Nerd Font Regular; custom/system font controls remain available.\n- Idle fade: optionally fade Home and the Termux workspace to the wallpaper. It is off by default. Read Idle fade in Appearance.\n\n## Recent updates\n\n- Pixel wallpapers: shoreline (time, date or your own words with waves washing over them), dither photo, ripples and doom fire, in Settings, Personalization, Re:TUI Wallpaper.\n- ASCII art: type text as ASCII art in a choice of fonts, and animate any ASCII art with effects such as decrypt, rain or glitch. Read ASCII art and effects in Appearance.\n- Settings search: find any setting by name or description from the Settings hub, or with settings <words>. Read Settings search in Appearance.\n- App drawer: REC, NEW and TOP tabs under the groups order the drawer by recently opened, newest installed or most used.\n- Astro Chart: choose monochrome in the World list for a black sky and a planet dithered to black and white.\n- Help home: use 10 from any article or topic list to return directly to the main directory.\n- Notes: the library and editor share the terminal pane styling and background blur. Read Notes in Tools.\n- Settings: swipe through Status, Terminal, Music, Help and Calculator previews before saving appearance changes. Read Configuration workflow in Appearance.\n- Private Space: enable the private command in Behaviour on supported devices, unlock, then use `private -open <app name>`. Read Private Space in Apps.\n- Calculator: basic arithmetic is ready immediately; advanced Qalculate is downloaded and installed after confirmation.\n\n## Find an article directly\n\n```\nhelp -topic irc-community\n```\n\nAt Launcher Home, open the offline IRC guide. `help irc` prints the shorter command reference instead. Use numbered choices or tap a topic in this reader; Android Back closes Help and keeps your place."
     },
     "type": "string"
   },
@@ -26061,6 +26061,20 @@
     },
     "type": "string"
   },
+  "wallpaper_dither_photo": {
+    "formatted": true,
+    "forms": {
+      "other": "dither photo"
+    },
+    "type": "string"
+  },
+  "wallpaper_doom_fire": {
+    "formatted": true,
+    "forms": {
+      "other": "doom fire"
+    },
+    "type": "string"
+  },
   "wallpaper_hex_hint": {
     "formatted": true,
     "forms": {
@@ -26229,6 +26243,27 @@
     },
     "type": "string"
   },
+  "wallpaper_photo_choose": {
+    "formatted": true,
+    "forms": {
+      "other": "CHOOSE PHOTO"
+    },
+    "type": "string"
+  },
+  "wallpaper_photo_ripples_off": {
+    "formatted": true,
+    "forms": {
+      "other": "RIPPLES: OFF"
+    },
+    "type": "string"
+  },
+  "wallpaper_photo_ripples_on": {
+    "formatted": true,
+    "forms": {
+      "other": "RIPPLES: ON"
+    },
+    "type": "string"
+  },
   "wallpaper_pick_color": {
     "formatted": true,
     "forms": {
@@ -26250,6 +26285,13 @@
     },
     "type": "string"
   },
+  "wallpaper_pixel_look_label": {
+    "formatted": true,
+    "forms": {
+      "other": "Look"
+    },
+    "type": "string"
+  },
   "wallpaper_pixel_pick_color": {
     "formatted": true,
     "forms": {
@@ -26264,10 +26306,52 @@
     },
     "type": "string"
   },
+  "wallpaper_ripples": {
+    "formatted": true,
+    "forms": {
+      "other": "ripples"
+    },
+    "type": "string"
+  },
   "wallpaper_sakura": {
     "formatted": true,
     "forms": {
       "other": "Sakura"
+    },
+    "type": "string"
+  },
+  "wallpaper_shore_edit_text": {
+    "formatted": true,
+    "forms": {
+      "other": "EDIT TEXT"
+    },
+    "type": "string"
+  },
+  "wallpaper_shore_text_hint": {
+    "formatted": true,
+    "forms": {
+      "other": "Type anything (up to 40 letters)"
+    },
+    "type": "string"
+  },
+  "wallpaper_shore_text_label": {
+    "formatted": true,
+    "forms": {
+      "other": "Text"
+    },
+    "type": "string"
+  },
+  "wallpaper_shore_text_title": {
+    "formatted": true,
+    "forms": {
+      "other": "Write on the sand"
+    },
+    "type": "string"
+  },
+  "wallpaper_shoreline": {
+    "formatted": true,
+    "forms": {
+      "other": "shoreline"
     },
     "type": "string"
   },

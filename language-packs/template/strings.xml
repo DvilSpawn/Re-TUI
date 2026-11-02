@@ -316,6 +316,14 @@ The old Re:TUI chat server is retired. The IRC pane now connects to real IRC net
 - Astro Chart: a new monochrome option in the World list shows a black sky with white stars and the planet, station and ships dithered to black and white.
 - Calculator: on the number pad, = now gives the result, C clears what you typed and AC starts over; hold ⌫ to clear the input. Results group their digits as 1,400,000, or as 14,00,000 in lakhs and crores: choose Digit grouping from the calculator's ? menu.
 
+## V.5.2 · Build 702
+
+- Pixel wallpapers: four new live wallpapers drawn as crisp, dithered pixels, in mono, Game Boy or your theme's colours. Pick them in Settings, Personalization, Re:TUI Wallpaper.
+- Shoreline: the time, the date or your own words in dot-matrix letters on black sand, with waves that wash over the bottom of the text and slowly give it back. Move it with the arrows.
+- Dither photo: any photo dithered into a small framed picture, with optional ripples. Ripples: a still pool that ripples where you touch. Doom fire: a classic pixel fire.
+- Use on phone: the wallpaper you set up now takes effect on phones that return straight to the home screen after applying, such as vivo.
+- ASCII Settings: the effect choices wrap into rows so every name is readable.
+
 Reopen these notes anytime with the `changelog` command.</string>
     <string name="command_bluetooth_false_4603a">%1$s false</string>
     <string name="command_bluetooth_opening_bluetooth_settings_android_no_long_c4672">Opening Bluetooth settings. Android no longer allows third-party launchers to toggle Bluetooth directly.</string>
@@ -3534,6 +3542,7 @@ This manual is bundled with Launcher and can be read offline. IRC and network se
 
 ## Recent updates
 
+- Pixel wallpapers: shoreline (time, date or your own words with waves washing over them), dither photo, ripples and doom fire, in Settings, Personalization, Re:TUI Wallpaper.
 - ASCII art: type text as ASCII art in a choice of fonts, and animate any ASCII art with effects such as decrypt, rain or glitch. Read ASCII art and effects in Appearance.
 - Settings search: find any setting by name or description from the Settings hub, or with settings &lt;words&gt;. Read Settings search in Appearance.
 - App drawer: REC, NEW and TOP tabs under the groups order the drawer by recently opened, newest installed or most used.
@@ -6287,6 +6296,8 @@ Ready for the next command</string>
     <string name="wallpaper_clouds">Clouds</string>
     <string name="wallpaper_clouds_scene">Clouds %1$d</string>
     <string name="wallpaper_clouds_scene_label">Scene</string>
+    <string name="wallpaper_dither_photo">dither photo</string>
+    <string name="wallpaper_doom_fire">doom fire</string>
     <string name="wallpaper_hex_hint">#AARRGGBB</string>
     <string name="wallpaper_hex_invalid">Enter a valid #AARRGGBB or #RRGGBB value</string>
     <string name="wallpaper_library_back">Back</string>
@@ -6311,12 +6322,22 @@ Ready for the next command</string>
     <string name="wallpaper_matrix_rain">Matrix Rain</string>
     <string name="wallpaper_matrix_style_label">Style</string>
     <string name="wallpaper_optional_restore_description">This wallpaper is now a separate download. Install it to restore the preview. Your saved wallpaper settings are kept.</string>
+    <string name="wallpaper_photo_choose">CHOOSE PHOTO</string>
+    <string name="wallpaper_photo_ripples_off">RIPPLES: OFF</string>
+    <string name="wallpaper_photo_ripples_on">RIPPLES: ON</string>
     <string name="wallpaper_pick_color">Pick color…</string>
     <string name="wallpaper_pixel_colors">COLORS</string>
     <string name="wallpaper_pixel_dream">Pixel Dream</string>
+    <string name="wallpaper_pixel_look_label">Look</string>
     <string name="wallpaper_pixel_pick_color">Pick Pixel Dream Color</string>
     <string name="wallpaper_restore_download">Preview and download</string>
+    <string name="wallpaper_ripples">ripples</string>
     <string name="wallpaper_sakura">Sakura</string>
+    <string name="wallpaper_shore_edit_text">EDIT TEXT</string>
+    <string name="wallpaper_shore_text_hint">Type anything (up to 40 letters)</string>
+    <string name="wallpaper_shore_text_label">Text</string>
+    <string name="wallpaper_shore_text_title">Write on the sand</string>
+    <string name="wallpaper_shoreline">shoreline</string>
     <string name="wallpaper_solid">Solid color</string>
     <string name="wallpaper_topo_colors">COLORS</string>
     <string name="wallpaper_topo_contours">CONTOURS</string>
