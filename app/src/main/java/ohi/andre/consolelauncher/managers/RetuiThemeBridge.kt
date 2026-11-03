@@ -28,7 +28,6 @@ object RetuiThemeBridge {
     private const val KEYBOARD_PRIVATE_OPTIONS_PREFIX = "com.dvil.retui.keyboard"
     private const val KEYBOARD_APPLY_CONTEXT_ACTION = "com.dvil.retui.keyboard.APPLY_CONTEXT"
     private val exportedImages = HashMap<String, String>()
-    private const val KEYBOARD_PACKAGE = "com.dvil.retui.keyboard"
 
     fun putLauncherThemeExtras(intent: Intent, context: Context) {
         RetuiVisualContract.putInto(intent, buildLauncherThemeBundle(context))
@@ -67,20 +66,21 @@ object RetuiThemeBridge {
             return
         }
         val bundle = buildLauncherThemeBundle(context, contextLabel, mode)
-        addFrame(context, bundle, FrameTarget.KEYBOARD, KEYBOARD_PACKAGE, "retui-keyboard-frame")
-        addKeyboardFrames(context, bundle)
+        val keyboardPackage = RetuiKeysPackage.resolve(context) ?: RetuiKeysPackage.CURRENT
+        addFrame(context, bundle, FrameTarget.KEYBOARD, keyboardPackage, "retui-keyboard-frame")
+        addKeyboardFrames(context, bundle, keyboardPackage)
         bundle.putString(KeyboardShortcutManager.BUNDLE_KEY, KeyboardShortcutManager.keyboardJson(context))
         applyToKeyboardInput(input, contextLabel, mode)
         val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager?
         imm?.sendAppPrivateCommand(input, KEYBOARD_APPLY_CONTEXT_ACTION, bundle)
     }
 
-    private fun addKeyboardFrames(context: Context, bundle: Bundle) {
+    private fun addKeyboardFrames(context: Context, bundle: Bundle, keyboardPackage: String) {
         val frames = Bundle()
         KEYBOARD_FRAME_TARGETS.forEach { target ->
             frames.putBundle(
                 target.id,
-                frameBundle(context, target, KEYBOARD_PACKAGE, "retui-keyboard-${target.id}-frame")
+                frameBundle(context, target, keyboardPackage, "retui-keyboard-${target.id}-frame")
             )
         }
         bundle.putBundle(RetuiVisualContract.FRAME_ROLES, frames)

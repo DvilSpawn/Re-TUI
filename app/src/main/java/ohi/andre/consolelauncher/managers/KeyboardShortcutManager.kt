@@ -29,7 +29,6 @@ object KeyboardShortcutManager {
 
     private const val PREFS = "retui_keyboard_shortcuts"
     private const val STATE = "state"
-    private const val KEYBOARD_PACKAGE = "com.dvil.retui.keyboard"
     private const val ACTION_APP = "app"
     private const val VERSION = 1
     private const val ICON_SIZE = 64
@@ -50,7 +49,7 @@ object KeyboardShortcutManager {
 
     /** Shortcuts only work inside the RE:TUI Keys keyboard app. */
     fun keyboardInstalled(context: Context): Boolean =
-        runCatching { context.packageManager.getPackageInfo(KEYBOARD_PACKAGE, 0) }.isSuccess
+        RetuiKeysPackage.resolve(context) != null
 
     internal fun mappings(context: Context, key: Char): List<Mapping> =
         if (key in 'a'..'z') load(context).keys[key].orEmpty() else emptyList()
@@ -241,7 +240,9 @@ object KeyboardShortcutManager {
             }
         }
         val uri = FileProvider.getUriForFile(context, GenericFileProvider.PROVIDER_NAME, file)
-        context.grantUriPermission(KEYBOARD_PACKAGE, uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        RetuiKeysPackage.resolve(context)?.let {
+            context.grantUriPermission(it, uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
         uri
     }.getOrNull()
 
