@@ -324,6 +324,10 @@ The old Re:TUI chat server is retired. The IRC pane now connects to real IRC net
 - Use on phone: the wallpaper you set up now takes effect on phones that return straight to the home screen after applying, such as vivo.
 - ASCII Settings: the effect choices wrap into rows so every name is readable.
 
+## V.5.2 Hotfix 1 · Build 703
+
+- RE:TUI Keys: theme sync, keyboard frames and RE:TUI Keys Shortcuts work with the keyboard's new app (com.dvil.retui.keys, from Keys 0.2.1) as well as earlier versions.
+
 Reopen these notes anytime with the `changelog` command.</string>
     <string name="command_bluetooth_false_4603a">%1$s false</string>
     <string name="command_bluetooth_opening_bluetooth_settings_android_no_long_c4672">Opening Bluetooth settings. Android no longer allows third-party launchers to toggle Bluetooth directly.</string>
