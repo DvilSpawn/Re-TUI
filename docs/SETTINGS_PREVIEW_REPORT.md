@@ -1,5 +1,7 @@
 # Settings preview implementation and test report
 
+> Historical report. See the [20 October live-rendering update](LIVE_SETTINGS_PREVIEW_REPORT.md) for the current implementation and validation.
+
 Date: 14 October 2026. Branch: `dvil/settings-preview-carousel`.
 
 ## Delivered
